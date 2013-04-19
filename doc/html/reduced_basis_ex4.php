@@ -204,7 +204,7 @@ PDE variable number
 <div class ="fragment">
 <pre>
             const unsigned int u_var = 0;
-            
+        
 </pre>
 </div>
 <div class = "comment">
@@ -220,7 +220,7 @@ EIM variable number
         
             const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi =
               c.element_fe_var[u_var]-&gt;get_phi();
-            
+        
             const std::vector&lt;Point&gt;& qpoints =
               c.element_fe_var[u_var]-&gt;get_xyz();
         
@@ -370,12 +370,13 @@ function that we "empirically" interpolate.
         {
         public:
         
-          SimpleEIMEvaluation()
+          SimpleEIMEvaluation(const Parallel::Communicator& comm)
+            : RBEIMEvaluation(comm)
           {
             attach_parametrized_function(&sg);
           }
         
-          /** 
+          /**
            * Parametrized function that we approximate with EIM
            */
           ShiftedGaussian sg;
@@ -398,17 +399,17 @@ A simple subclass of RBEIMConstruction.
            * Constructor.
            */
           SimpleEIMConstruction (EquationSystems& es,
-                                 const std::string& name,
-                                 const unsigned int number)
-          : Parent(es, name, number)
+                                 const std::string& name_in,
+                                 const unsigned int number_in)
+          : Parent(es, name_in, number_in)
           {
           }
-          
+        
           /**
            * The type of the parent.
            */
           typedef RBEIMConstruction Parent;
-          
+        
           /**
            * Provide an implementation of build_eim_assembly
            */
@@ -416,7 +417,7 @@ A simple subclass of RBEIMConstruction.
           {
             return AutoPtr&lt;ElemAssembly&gt;(new EIM_F(*this, index));
           }
-          
+        
           /**
            * Initialize data structures.
            */
@@ -438,7 +439,7 @@ A simple subclass of RBEIMConstruction.
            * Inner product assembly object
            */
           EIM_IP_assembly ip;
-          
+        
         };
         
         #endif
@@ -448,20 +449,7 @@ A simple subclass of RBEIMConstruction.
 <a name="comments"></a> 
 <br><br><br> <h1> The source file rb_classes.h with comments: </h1> 
 <div class = "comment">
-  
-
-<br><br>rbOOmit is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-  
-
-<br><br>You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-<br><br></div>
+</div>
 
 <div class ="fragment">
 <pre>
@@ -499,7 +487,8 @@ A simple subclass of RBEvaluation.
           /**
            * Constructor. Just set the theta expansion.
            */
-          SimpleRBEvaluation()
+          SimpleRBEvaluation(const Parallel::Communicator& comm)
+            : RBEvaluation(comm)
           {
             set_rb_theta_expansion(eim_test_rb_theta_expansion);
           }
@@ -517,9 +506,9 @@ A simple subclass of RBEvaluation.
         public:
         
           SimpleRBConstruction (EquationSystems& es,
-                                const std::string& name,
-                                const unsigned int number)
-          : Parent(es, name, number),
+                                const std::string& name_in,
+                                const unsigned int number_in)
+          : Parent(es, name_in, number_in),
             dirichlet_bc(AutoPtr&lt;DirichletBoundary&gt;(NULL))
           {}
         
@@ -554,7 +543,7 @@ Generate a DirichletBoundary object
 <div class ="fragment">
 <pre>
             dirichlet_bc = build_zero_dirichlet_boundary_object();
-            
+        
 </pre>
 </div>
 <div class = "comment">
@@ -569,7 +558,7 @@ and the Dirichlet boundary variable numbers
             dirichlet_bc-&gt;b.insert(2);
             dirichlet_bc-&gt;b.insert(3);
             dirichlet_bc-&gt;variables.push_back(u_var);
-            
+        
 </pre>
 </div>
 <div class = "comment">
@@ -633,7 +622,7 @@ linear system before doing an element loop.
            * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
            */
           EimTestRBThetaExpansion eim_test_rb_theta_expansion;
-          
+        
           /**
            * The object that stores the "assembly" expansion of the parameter dependent PDE,
            * i.e. the objects that define how to assemble the set of parameter-independent
@@ -655,40 +644,6 @@ linear system before doing an element loop.
 <a name="comments"></a> 
 <br><br><br> <h1> The source file reduced_basis_ex4.C with comments: </h1> 
 <div class = "comment">
-  
-
-<br><br></div>
-
-<div class ="fragment">
-<pre>
-        /* rbOOmit is distributed in the hope that it will be useful, */
-        /* but WITHOUT ANY WARRANTY; without even the implied warranty of */
-        /* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
-        /* Lesser General Public License for more details. */
-          
-        /* You should have received a copy of the GNU Lesser General Public */
-        /* License along with this library; if not, write to the Free Software */
-        /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
-        
-</pre>
-</div>
-<div class = "comment">
-<h1>Reduced Basis Example 4 - Empirical Interpolation Method</h1>
-
-
-<br><br>In this example problem we develop a reduced basis approximation for a parametrized
-PDE that has "non-affine" parameter dependence. This requires the use of the
-Empirical Interpolation Method (EIM).
-
-<br><br>We first use EIM to construct an affine approximation to the non-affine term,
-which is a parametrized function that is a Gaussian with "center" defined
-by the two parameters (mu_1,mu_2) \in [-1,1]^2. We then employ this EIM
-approximation in order to generate a reduced basis approximation for the
-parametrized PDE: -0.05 * Laplacian(u) = f(mu_1,mu_2), with zero Dirichlet
-boundary conditions.
-
-
-<br><br>Basic include file needed for the mesh functionality.
 </div>
 
 <div class ="fragment">
@@ -783,12 +738,13 @@ Read the "online_mode" flag from the command line
 </pre>
 </div>
 <div class = "comment">
-Create a mesh (just a simple square)
+Create a mesh (just a simple square) on the default MPI
+communicator
 </div>
 
 <div class ="fragment">
 <pre>
-          Mesh mesh (dim);
+          Mesh mesh (init.comm(), dim);
           MeshTools::Generation::build_square (mesh,
                                                n_elem, n_elem,
                                                -1., 1.,
@@ -810,7 +766,7 @@ the EIM and RB Construction objects
             equation_systems.add_system&lt;SimpleEIMConstruction&gt; ("EIM");
           SimpleRBConstruction & rb_construction =
             equation_systems.add_system&lt;SimpleRBConstruction&gt; ("RB");
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -840,7 +796,7 @@ Initialize the standard RBEvaluation object
 
 <div class ="fragment">
 <pre>
-          SimpleRBEvaluation rb_eval;
+          SimpleRBEvaluation rb_eval(mesh.comm());
         
 </pre>
 </div>
@@ -850,8 +806,8 @@ Initialize the EIM RBEvaluation object
 
 <div class ="fragment">
 <pre>
-          SimpleEIMEvaluation eim_rb_eval;
-          
+          SimpleEIMEvaluation eim_rb_eval(mesh.comm());
+        
 </pre>
 </div>
 <div class = "comment">
@@ -875,7 +831,7 @@ Read data from input file and print state
 <pre>
             eim_construction.process_parameters_file(eim_parameters);
             eim_construction.print_info();
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -908,7 +864,7 @@ attach the EIM theta objects to the RBConstruction and RBEvaluation objects
 <pre>
             eim_rb_eval.initialize_eim_theta_objects();
             rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
-            
+        
 </pre>
 </div>
 <div class = "comment">
@@ -979,7 +935,7 @@ attach the EIM theta objects to rb_eval objects
 <pre>
             eim_rb_eval.initialize_eim_theta_objects();
             rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
-            
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1148,7 +1104,7 @@ read in the data from files
     <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> interior_assembly(FEMContext &amp;c)
     {
       <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var = 0;
-      
+  
       <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> eim_var = 0;
   
       <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW =
@@ -1156,7 +1112,7 @@ read in the data from files
   
       <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi =
         c.element_fe_var[u_var]-&gt;get_phi();
-      
+  
       <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; qpoints =
         c.element_fe_var[u_var]-&gt;get_xyz();
   
@@ -1225,12 +1181,13 @@ read in the data from files
   {
   <B><FONT COLOR="#228B22">public</FONT></B>:
   
-    SimpleEIMEvaluation()
+    SimpleEIMEvaluation(<B><FONT COLOR="#228B22">const</FONT></B> Parallel::Communicator&amp; comm)
+      : RBEIMEvaluation(comm)
     {
       attach_parametrized_function(&amp;sg);
     }
   
-    <I><FONT COLOR="#B22222">/** 
+    <I><FONT COLOR="#B22222">/**
      * Parametrized function that we approximate with EIM
      */</FONT></I>
     ShiftedGaussian sg;
@@ -1245,17 +1202,17 @@ read in the data from files
      * Constructor.
      */</FONT></I>
     SimpleEIMConstruction (EquationSystems&amp; es,
-                           <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name,
-                           <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number)
-    : Parent(es, name, number)
+                           <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name_in,
+                           <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number_in)
+    : Parent(es, name_in, number_in)
     {
     }
-    
+  
     <I><FONT COLOR="#B22222">/**
      * The type of the parent.
      */</FONT></I>
     <B><FONT COLOR="#228B22">typedef</FONT></B> RBEIMConstruction Parent;
-    
+  
     <I><FONT COLOR="#B22222">/**
      * Provide an implementation of build_eim_assembly
      */</FONT></I>
@@ -1263,7 +1220,7 @@ read in the data from files
     {
       <B><FONT COLOR="#A020F0">return</FONT></B> AutoPtr&lt;ElemAssembly&gt;(<B><FONT COLOR="#A020F0">new</FONT></B> EIM_F(*<B><FONT COLOR="#A020F0">this</FONT></B>, index));
     }
-    
+  
     <I><FONT COLOR="#B22222">/**
      * Initialize data structures.
      */</FONT></I>
@@ -1285,7 +1242,7 @@ read in the data from files
      * Inner product assembly object
      */</FONT></I>
     EIM_IP_assembly ip;
-    
+  
   };
   
   #endif
@@ -1293,9 +1250,6 @@ read in the data from files
 <a name="nocomments"></a> 
 <br><br><br> <h1> The source file rb_classes.h without comments: </h1> 
 <pre> 
-    
-    
-  
   #ifndef __rb_classes_h__
   #define __rb_classes_h__
   
@@ -1313,7 +1267,8 @@ read in the data from files
     <I><FONT COLOR="#B22222">/**
      * Constructor. Just set the theta expansion.
      */</FONT></I>
-    SimpleRBEvaluation()
+    SimpleRBEvaluation(<B><FONT COLOR="#228B22">const</FONT></B> Parallel::Communicator&amp; comm)
+      : RBEvaluation(comm)
     {
       set_rb_theta_expansion(eim_test_rb_theta_expansion);
     }
@@ -1331,9 +1286,9 @@ read in the data from files
   <B><FONT COLOR="#228B22">public</FONT></B>:
   
     SimpleRBConstruction (EquationSystems&amp; es,
-                          <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name,
-                          <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number)
-    : Parent(es, name, number),
+                          <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name_in,
+                          <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number_in)
+    : Parent(es, name_in, number_in),
       dirichlet_bc(AutoPtr&lt;DirichletBoundary&gt;(NULL))
     {}
   
@@ -1360,13 +1315,13 @@ read in the data from files
       u_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, FIRST);
   
       dirichlet_bc = build_zero_dirichlet_boundary_object();
-      
+  
       dirichlet_bc-&gt;b.insert(0);
       dirichlet_bc-&gt;b.insert(1);
       dirichlet_bc-&gt;b.insert(2);
       dirichlet_bc-&gt;b.insert(3);
       dirichlet_bc-&gt;variables.push_back(u_var);
-      
+  
       get_dof_map().add_dirichlet_boundary(*dirichlet_bc);
   
       <B><FONT COLOR="#5F9EA0">Parent</FONT></B>::init_data();
@@ -1396,7 +1351,7 @@ read in the data from files
      * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
      */</FONT></I>
     EimTestRBThetaExpansion eim_test_rb_theta_expansion;
-    
+  
     <I><FONT COLOR="#B22222">/**
      * The object that stores the &quot;assembly&quot; expansion of the parameter dependent PDE,
      * i.e. the objects that define how to assemble the set of parameter-independent
@@ -1416,18 +1371,6 @@ read in the data from files
 <a name="nocomments"></a> 
 <br><br><br> <h1> The source file reduced_basis_ex4.C without comments: </h1> 
 <pre> 
-    
-  <I><FONT COLOR="#B22222">/* rbOOmit is distributed in the hope that it will be useful, */</FONT></I>
-  <I><FONT COLOR="#B22222">/* but WITHOUT ANY WARRANTY; without even the implied warranty of */</FONT></I>
-  <I><FONT COLOR="#B22222">/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */</FONT></I>
-  <I><FONT COLOR="#B22222">/* Lesser General Public License for more details. */</FONT></I>
-    
-  <I><FONT COLOR="#B22222">/* You should have received a copy of the GNU Lesser General Public */</FONT></I>
-  <I><FONT COLOR="#B22222">/* License along with this library; if not, write to the Free Software */</FONT></I>
-  <I><FONT COLOR="#B22222">/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */</FONT></I>
-  
-  
-  
   #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_generation.h&quot;</FONT></B>
@@ -1467,7 +1410,7 @@ read in the data from files
     <B><FONT COLOR="#A020F0">if</FONT></B> ( command_line.search(1, <B><FONT COLOR="#BC8F8F">&quot;-online_mode&quot;</FONT></B>) )
       online_mode = command_line.next(online_mode);
   
-    Mesh mesh (dim);
+    Mesh mesh (init.comm(), dim);
     <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_square (mesh,
                                          n_elem, n_elem,
                                          -1., 1.,
@@ -1480,16 +1423,16 @@ read in the data from files
       equation_systems.add_system&lt;SimpleEIMConstruction&gt; (<B><FONT COLOR="#BC8F8F">&quot;EIM&quot;</FONT></B>);
     SimpleRBConstruction &amp; rb_construction =
       equation_systems.add_system&lt;SimpleRBConstruction&gt; (<B><FONT COLOR="#BC8F8F">&quot;RB&quot;</FONT></B>);
-    
+  
     equation_systems.init ();
   
     mesh.print_info();
     equation_systems.print_info();
   
-    SimpleRBEvaluation rb_eval;
+    SimpleRBEvaluation rb_eval(mesh.comm());
   
-    SimpleEIMEvaluation eim_rb_eval;
-    
+    SimpleEIMEvaluation eim_rb_eval(mesh.comm());
+  
     eim_construction.set_rb_evaluation(eim_rb_eval);
     rb_construction.set_rb_evaluation(rb_eval);
   
@@ -1497,7 +1440,7 @@ read in the data from files
     {
       eim_construction.process_parameters_file(eim_parameters);
       eim_construction.print_info();
-    
+  
       eim_construction.initialize_rb_construction();
       eim_construction.train_reduced_basis();
       eim_construction.get_rb_evaluation().write_offline_data_to_files(<B><FONT COLOR="#BC8F8F">&quot;eim_data&quot;</FONT></B>);
@@ -1506,7 +1449,7 @@ read in the data from files
   
       eim_rb_eval.initialize_eim_theta_objects();
       rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
-      
+  
       eim_construction.initialize_eim_assembly_objects();
       rb_construction.get_rb_assembly_expansion().attach_multiple_F_assembly(eim_construction.get_eim_assembly_objects());
   
@@ -1528,7 +1471,7 @@ read in the data from files
   
       eim_rb_eval.initialize_eim_theta_objects();
       rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
-      
+  
       rb_eval.read_offline_data_from_files(<B><FONT COLOR="#BC8F8F">&quot;rb_data&quot;</FONT></B>);
   
       Real online_center_x = infile(<B><FONT COLOR="#BC8F8F">&quot;online_center_x&quot;</FONT></B>, 0.);
@@ -1558,23 +1501,24 @@ read in the data from files
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+make[4]: Entering directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/reduced_basis/reduced_basis_ex4'
 ***************************************************************
 * Running Example reduced_basis_ex4:
-*  mpirun -np 12 example-devel -online_mode 0 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel -online_mode 0 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
  
-*** Warning, This code is untested, experimental, or likely to see future API changes: src/reduced_basis/rb_parametrized.C, line 41, compiled Jan 31 2013 at 21:51:32 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 41, compiled Apr 19 2013 at 11:42:51 ***
  Mesh Information:
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=676
-    n_local_nodes()=68
+    n_local_nodes()=186
   n_elem()=625
-    n_local_elem()=51
+    n_local_elem()=156
     n_active_elem()=625
   n_subdomains()=1
-  n_partitions()=12
-  n_processors()=12
+  n_partitions()=4
+  n_processors()=4
   n_threads()=1
   processor_id()=0
 
@@ -1587,16 +1531,16 @@ read in the data from files
     Infinite Element Mapping="CARTESIAN" 
     Approximation Orders="FIRST", "THIRD" 
     n_dofs()=676
-    n_local_dofs()=68
+    n_local_dofs()=186
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 7.99852
-      Average Off-Processor Bandwidth <= 1.20118
+      Average  On-Processor Bandwidth <= 8.33136
+      Average Off-Processor Bandwidth <= 0.488166
       Maximum  On-Processor Bandwidth <= 11
-      Maximum Off-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 8
     DofMap Constraints
       Number of DoF Constraints = 0
       Number of Node Constraints = 0
@@ -1607,16 +1551,16 @@ read in the data from files
     Infinite Element Mapping="CARTESIAN" 
     Approximation Orders="FIRST", "THIRD" 
     n_dofs()=676
-    n_local_dofs()=68
+    n_local_dofs()=186
     n_constrained_dofs()=100
-    n_local_constrained_dofs()=16
+    n_local_constrained_dofs()=25
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 7.99852
-      Average Off-Processor Bandwidth <= 1.20118
+      Average  On-Processor Bandwidth <= 8.33136
+      Average Off-Processor Bandwidth <= 0.488166
       Maximum  On-Processor Bandwidth <= 11
-      Maximum Off-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 8
     DofMap Constraints
       Number of DoF Constraints = 100
       Average DoF Constraint Length= 0
@@ -1748,8 +1692,8 @@ Performing RB solves on training set
 Maximum (absolute) error bound is 0.86594
 
 Performing truth solve at parameter:
-center_x: -5.000000e-01
-center_y: 5.000000e-01
+center_x: 5.000000e-01
+center_y: -5.000000e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -1759,8 +1703,8 @@ Performing RB solves on training set
 Maximum (absolute) error bound is 0.816903
 
 Performing truth solve at parameter:
-center_x: 5.000000e-01
-center_y: -5.000000e-01
+center_x: -5.000000e-01
+center_y: 5.000000e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -1770,7 +1714,7 @@ Performing RB solves on training set
 Maximum (absolute) error bound is 0.681622
 
 Performing truth solve at parameter:
-center_x: 1.000000e+00
+center_x: -1.000000e+00
 center_y: 0.000000e+00
 
 Enriching the RB space
@@ -1781,7 +1725,7 @@ Performing RB solves on training set
 Maximum (absolute) error bound is 0.658046
 
 Performing truth solve at parameter:
-center_x: -1.000000e+00
+center_x: 1.000000e+00
 center_y: 0.000000e+00
 
 Enriching the RB space
@@ -1825,8 +1769,8 @@ Performing RB solves on training set
 Maximum (absolute) error bound is 0.184868
 
 Performing truth solve at parameter:
-center_x: 5.000000e-01
-center_y: -1.000000e+00
+center_x: -1.000000e+00
+center_y: 5.000000e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -1836,8 +1780,8 @@ Performing RB solves on training set
 Maximum (absolute) error bound is 0.214039
 
 Performing truth solve at parameter:
-center_x: 1.000000e+00
-center_y: -5.000000e-01
+center_x: -5.000000e-01
+center_y: 1.000000e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -1847,8 +1791,8 @@ Performing RB solves on training set
 Maximum (absolute) error bound is 0.175349
 
 Performing truth solve at parameter:
-center_x: -1.000000e+00
-center_y: -5.000000e-01
+center_x: 1.000000e+00
+center_y: 5.000000e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -1858,8 +1802,8 @@ Performing RB solves on training set
 Maximum (absolute) error bound is 0.163258
 
 Performing truth solve at parameter:
-center_x: -5.000000e-01
-center_y: -1.000000e+00
+center_x: 5.000000e-01
+center_y: 1.000000e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -1870,7 +1814,7 @@ Maximum (absolute) error bound is 0.161335
 
 Performing truth solve at parameter:
 center_x: 5.000000e-01
-center_y: 1.000000e+00
+center_y: -1.000000e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -1881,7 +1825,7 @@ Maximum (absolute) error bound is 0.159752
 
 Performing truth solve at parameter:
 center_x: 1.000000e+00
-center_y: 5.000000e-01
+center_y: -5.000000e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -1891,8 +1835,8 @@ Performing RB solves on training set
 Maximum (absolute) error bound is 0.123948
 
 Performing truth solve at parameter:
-center_x: -5.000000e-01
-center_y: 1.000000e+00
+center_x: -1.000000e+00
+center_y: -5.000000e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -1904,8 +1848,8 @@ Maximum (absolute) error bound is 0.162888
 Maximum number of basis functions reached: Nmax = 20.
 Perform one more Greedy iteration for error bounds.
 Performing truth solve at parameter:
-center_x: -1.000000e+00
-center_y: 5.000000e-01
+center_x: -5.000000e-01
+center_y: -1.000000e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -1943,11 +1887,11 @@ quiet mode? 1
 
 ---- Basis dimension: 0 ----
 Performing RB solves on training set
-Maximum (absolute) error bound is 0.388376
+Maximum (absolute) error bound is 0.388534
 
 Performing truth solve at parameter:
-center_x: -1.111111e-01
-center_y: 1.111111e-01
+center_x: 1.111111e-01
+center_y: -1.111111e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -1955,11 +1899,11 @@ Updating RB residual terms
 
 ---- Basis dimension: 1 ----
 Performing RB solves on training set
-Maximum (absolute) error bound is 0.176776
+Maximum (absolute) error bound is 0.17691
 
 Performing truth solve at parameter:
-center_x: 5.555556e-01
-center_y: -5.555556e-01
+center_x: -5.555556e-01
+center_y: 5.555556e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -1967,7 +1911,7 @@ Updating RB residual terms
 
 ---- Basis dimension: 2 ----
 Performing RB solves on training set
-Maximum (absolute) error bound is 0.15644
+Maximum (absolute) error bound is 0.156396
 
 Performing truth solve at parameter:
 center_x: 5.555556e-01
@@ -1979,7 +1923,7 @@ Updating RB residual terms
 
 ---- Basis dimension: 3 ----
 Performing RB solves on training set
-Maximum (absolute) error bound is 0.130994
+Maximum (absolute) error bound is 0.130261
 
 Performing truth solve at parameter:
 center_x: -5.555556e-01
@@ -1991,11 +1935,11 @@ Updating RB residual terms
 
 ---- Basis dimension: 4 ----
 Performing RB solves on training set
-Maximum (absolute) error bound is 0.0984295
+Maximum (absolute) error bound is 0.0995149
 
 Performing truth solve at parameter:
-center_x: -5.555556e-01
-center_y: 5.555556e-01
+center_x: 5.555556e-01
+center_y: -5.555556e-01
 
 Enriching the RB space
 Updating RB matrices
@@ -2003,43 +1947,7 @@ Updating RB residual terms
 
 ---- Basis dimension: 5 ----
 Performing RB solves on training set
-Maximum (absolute) error bound is 0.0475053
-
-Performing truth solve at parameter:
-center_x: -1.000000e+00
-center_y: 1.111111e-01
-
-Enriching the RB space
-Updating RB matrices
-Updating RB residual terms
-
----- Basis dimension: 6 ----
-Performing RB solves on training set
-Maximum (absolute) error bound is 0.0432771
-
-Performing truth solve at parameter:
-center_x: 1.000000e+00
-center_y: -1.111111e-01
-
-Enriching the RB space
-Updating RB matrices
-Updating RB residual terms
-
----- Basis dimension: 7 ----
-Performing RB solves on training set
-Maximum (absolute) error bound is 0.0310976
-
-Performing truth solve at parameter:
-center_x: 1.111111e-01
-center_y: 1.000000e+00
-
-Enriching the RB space
-Updating RB matrices
-Updating RB residual terms
-
----- Basis dimension: 8 ----
-Performing RB solves on training set
-Maximum (absolute) error bound is 0.0264776
+Maximum (absolute) error bound is 0.0478085
 
 Performing truth solve at parameter:
 center_x: -1.111111e-01
@@ -2049,13 +1957,49 @@ Enriching the RB space
 Updating RB matrices
 Updating RB residual terms
 
----- Basis dimension: 9 ----
+---- Basis dimension: 6 ----
 Performing RB solves on training set
-Maximum (absolute) error bound is 0.0242248
+Maximum (absolute) error bound is 0.0432272
+
+Performing truth solve at parameter:
+center_x: 1.111111e-01
+center_y: 1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 7 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.0306345
 
 Performing truth solve at parameter:
 center_x: 1.000000e+00
-center_y: -1.000000e+00
+center_y: -1.111111e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 8 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.0268713
+
+Performing truth solve at parameter:
+center_x: -1.000000e+00
+center_y: 1.111111e-01
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
+---- Basis dimension: 9 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.0243775
+
+Performing truth solve at parameter:
+center_x: -1.000000e+00
+center_y: 1.000000e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -2063,7 +2007,7 @@ Updating RB residual terms
 
 ---- Basis dimension: 10 ----
 Performing RB solves on training set
-Maximum (absolute) error bound is 0.0228554
+Maximum (absolute) error bound is 0.0231995
 
 Performing truth solve at parameter:
 center_x: -1.000000e+00
@@ -2075,7 +2019,7 @@ Updating RB residual terms
 
 ---- Basis dimension: 11 ----
 Performing RB solves on training set
-Maximum (absolute) error bound is 0.0206759
+Maximum (absolute) error bound is 0.0207146
 
 Performing truth solve at parameter:
 center_x: 1.000000e+00
@@ -2087,11 +2031,11 @@ Updating RB residual terms
 
 ---- Basis dimension: 12 ----
 Performing RB solves on training set
-Maximum (absolute) error bound is 0.0188747
+Maximum (absolute) error bound is 0.0181294
 
 Performing truth solve at parameter:
-center_x: -1.000000e+00
-center_y: 1.000000e+00
+center_x: 1.000000e+00
+center_y: -1.000000e+00
 
 Enriching the RB space
 Updating RB matrices
@@ -2099,19 +2043,7 @@ Updating RB residual terms
 
 ---- Basis dimension: 13 ----
 Performing RB solves on training set
-Maximum (absolute) error bound is 0.00819468
-
-Performing truth solve at parameter:
-center_x: 3.333333e-01
-center_y: -1.000000e+00
-
-Enriching the RB space
-Updating RB matrices
-Updating RB residual terms
-
----- Basis dimension: 14 ----
-Performing RB solves on training set
-Maximum (absolute) error bound is 0.00761207
+Maximum (absolute) error bound is 0.00827867
 
 Performing truth solve at parameter:
 center_x: -3.333333e-01
@@ -2121,169 +2053,50 @@ Enriching the RB space
 Updating RB matrices
 Updating RB residual terms
 
+---- Basis dimension: 14 ----
+Performing RB solves on training set
+Maximum (absolute) error bound is 0.00726206
+
+Performing truth solve at parameter:
+center_x: 5.555556e-01
+center_y: -1.000000e+00
+
+Enriching the RB space
+Updating RB matrices
+Updating RB residual terms
+
 ---- Basis dimension: 15 ----
 Performing RB solves on training set
-Maximum (absolute) error bound is 0.00555548
+Maximum (absolute) error bound is 0.00574847
 
 Maximum number of basis functions reached: Nmax = 15
-************************************************************************************************************************
-***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
-************************************************************************************************************************
 
----------------------------------------------- PETSc Performance Summary: ----------------------------------------------
-
-/workspace/libmesh/examples/reduced_basis/reduced_basis_ex4/.libs/lt-example-devel on a intel-12. named hbar.ices.utexas.edu with 12 processors, by benkirk Thu Jan 31 22:18:08 2013
-Using Petsc Release Version 3.3.0, Patch 2, Fri Jul 13 15:42:00 CDT 2012 
-
-                         Max       Max/Min        Avg      Total 
-Time (sec):           3.712e+00      1.00000   3.712e+00
-Objects:              9.080e+02      1.00000   9.080e+02
-Flops:                3.442e+07      1.81602   2.798e+07  3.357e+08
-Flops/sec:            9.274e+06      1.81602   7.537e+06  9.044e+07
-MPI Messages:         6.874e+04      3.02107   4.567e+04  5.480e+05
-MPI Message Lengths:  3.778e+06      2.28532   5.603e+01  3.070e+07
-MPI Reductions:       3.640e+04      1.00000
-
-Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
-                            e.g., VecAXPY() for real vectors of length N --> 2N flops
-                            and VecAXPY() for complex vectors of length N --> 8N flops
-
-Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
-                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 3.7118e+00 100.0%  3.3571e+08 100.0%  5.480e+05 100.0%  5.603e+01      100.0%  3.640e+04 100.0% 
-
-------------------------------------------------------------------------------------------------------------------------
-See the 'Profiling' chapter of the users' manual for details on interpreting output.
-Phase summary info:
-   Count: number of times phase was executed
-   Time and Flops: Max - maximum over all processors
-                   Ratio - ratio of maximum to minimum over all processors
-   Mess: number of messages sent
-   Avg. len: average message length
-   Reduct: number of global reductions
-   Global: entire computation
-   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
-      %T - percent time in this phase         %f - percent flops in this phase
-      %M - percent messages in this phase     %L - percent message lengths in this phase
-      %R - percent reductions in this phase
-   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
-------------------------------------------------------------------------------------------------------------------------
-Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
-                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %f %M %L %R  %T %f %M %L %R Mflop/s
-------------------------------------------------------------------------------------------------------------------------
-
---- Event Stage 0: Main Stage
-
-VecDot              7375 1.0 3.4578e-01 2.2 9.96e+05 1.8 0.0e+00 0.0e+00 7.4e+03  7  3  0  0 20   7  3  0  0 20    29
-VecMDot             3271 1.0 3.1318e-02 1.2 6.13e+06 1.8 0.0e+00 0.0e+00 3.3e+03  1 18  0  0  9   1 18  0  0  9  1942
-VecNorm             3996 1.0 6.1615e-02 1.2 4.72e+05 1.8 0.0e+00 0.0e+00 4.0e+03  2  1  0  0 11   2  1  0  0 11    76
-VecScale            3747 1.0 2.0204e-03 1.3 2.55e+05 1.8 0.0e+00 0.0e+00 0.0e+00  0  1  0  0  0   0  1  0  0  0  1254
-VecCopy             2084 1.0 1.2670e-03 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecSet             11325 1.0 4.8068e-03 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecAXPY             6635 1.0 1.3803e-02 1.1 9.00e+05 1.8 0.0e+00 0.0e+00 0.0e+00  0  3  0  0  0   0  3  0  0  0   648
-VecMAXPY            3396 1.0 4.9820e-03 1.6 6.62e+06 1.8 0.0e+00 0.0e+00 0.0e+00  0 20  0  0  0   0 20  0  0  0 13205
-VecAssemblyBegin    2159 1.0 2.8868e-01 1.6 0.00e+00 0.0 2.2e+03 8.1e+01 6.5e+03  6  0  0  1 18   6  0  0  1 18     0
-VecAssemblyEnd      2159 1.0 1.4429e-03 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecScatterBegin    11209 1.0 4.1280e-02 1.7 0.00e+00 0.0 5.4e+05 5.6e+01 0.0e+00  1  0 99 99  0   1  0 99 99  0     0
-VecScatterEnd      11209 1.0 2.3566e-01 8.9 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  4  0  0  0  0   4  0  0  0  0     0
-VecNormalize        3396 1.0 2.4838e-02 1.1 6.93e+05 1.8 0.0e+00 0.0e+00 3.4e+03  1  2  0  0  9   1  2  0  0  9   277
-MatMult             3396 1.0 3.0067e-02 1.4 3.59e+06 1.6 1.6e+05 5.4e+01 0.0e+00  1 11 30 29  0   1 11 30 29  0  1228
-MatMultAdd          6900 1.0 2.2571e-01 4.6 7.76e+06 1.6 3.3e+05 5.4e+01 0.0e+00  4 24 60 58  0   4 24 60 58  0   353
-MatSolve            3471 1.0 1.0747e-02 2.3 7.48e+06 2.2 0.0e+00 0.0e+00 0.0e+00  0 19  0  0  0   0 19  0  0  0  6005
-MatLUFactorNum        32 1.0 1.3368e-03 2.1 2.31e+05 2.5 0.0e+00 0.0e+00 0.0e+00  0  1  0  0  0   0  1  0  0  0  1407
-MatILUFactorSym       32 1.0 2.6917e-03 1.8 0.00e+00 0.0 0.0e+00 0.0e+00 9.6e+01  0  0  0  0  0   0  0  0  0  0     0
-MatAssemblyBegin    7119 1.0 4.5067e-01 1.1 0.00e+00 0.0 2.2e+02 2.5e+02 1.4e+04 11  0  0  0 39  11  0  0  0 39     0
-MatAssemblyEnd      7119 1.0 2.5899e-02 1.2 0.00e+00 0.0 3.5e+03 1.6e+01 3.0e+02  1  0  1  0  1   1  0  1  0  1     0
-MatGetRow           4488 1.8 8.3470e-04 1.8 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatGetRowIJ           32 1.0 1.8358e-05 3.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatGetOrdering        32 1.0 8.9741e-04 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 6.4e+01  0  0  0  0  0   0  0  0  0  0     0
-MatZeroEntries        46 1.0 1.0800e-04 1.9 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatAXPY               33 1.0 1.8420e-02 1.0 0.00e+00 0.0 3.2e+03 1.6e+01 5.3e+02  0  0  1  0  1   0  0  1  0  1     0
-KSPGMRESOrthog      3271 1.0 3.8336e-02 1.1 1.23e+07 1.8 0.0e+00 0.0e+00 3.3e+03  1 36  0  0  9   1 36  0  0  9  3187
-KSPSetUp             107 1.0 5.9795e-04 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-KSPSolve              75 1.0 1.5163e-01 1.0 2.48e+07 1.9 1.6e+05 5.4e+01 6.9e+03  4 71 30 29 19   4 71 30 29 19  1565
-PCSetUp               64 1.0 1.1992e-02 1.2 2.31e+05 2.5 0.0e+00 0.0e+00 1.6e+02  0  1  0  0  0   0  1  0  0  0   157
-PCSetUpOnBlocks       75 1.0 1.0059e-02 1.2 2.31e+05 2.5 0.0e+00 0.0e+00 1.6e+02  0  1  0  0  0   0  1  0  0  0   187
-PCApply             3471 1.0 4.0677e-02 1.2 7.48e+06 2.2 0.0e+00 0.0e+00 0.0e+00  1 19  0  0  0   1 19  0  0  0  1586
-------------------------------------------------------------------------------------------------------------------------
-
-Memory usage is given in bytes:
-
-Object Type          Creations   Destructions     Memory  Descendants' Mem.
-Reports information only for process 0.
-
---- Event Stage 0: Main Stage
-
-              Vector   451            451       867528     0
-      Vector Scatter    61             61        63196     0
-           Index Set   218            218       175128     0
-   IS L to G Mapping    23             23        12972     0
-              Matrix   146            146      1141880     0
-       Krylov Solver     4              4        38720     0
-      Preconditioner     4              4         3568     0
-              Viewer     1              0            0     0
-========================================================================================================================
-Average time to get PetscTime(): 0
-Average time for MPI_Barrier(): 4.62532e-06
-Average time for zero size MPI_Send(): 1.32521e-05
-#PETSc Option Table entries:
--ksp_right_pc
--log_summary
--online_mode 0
--pc_type bjacobi
--sub_pc_factor_levels 4
--sub_pc_factor_zeropivot 0
--sub_pc_type ilu
-#End of PETSc Option Table entries
-Compiled without FORTRAN kernels
-Compiled with full precision matrices (default)
-sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
-Configure run at: Thu Nov  8 11:21:02 2012
-Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared-libraries=1 --with-mpi-dir=/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1 --with-mumps=true --download-mumps=1 --with-metis=true --download-metis=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_intel_lp64.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_sequential.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_core.so]" --with-lapack-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_lapack95_lp64.a]"
------------------------------------------
-Libraries compiled on Thu Nov  8 11:21:02 2012 on daedalus.ices.utexas.edu 
-Machine characteristics: Linux-2.6.32-279.1.1.el6.x86_64-x86_64-with-redhat-6.3-Carbon
-Using PETSc directory: /opt/apps/ossw/libraries/petsc/petsc-3.3-p2
-Using PETSc arch: intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt
------------------------------------------
-
-Using C compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx  -wd1572 -O3   -fPIC   ${COPTFLAGS} ${CFLAGS}
-Using Fortran compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90  -fPIC -O3   ${FOPTFLAGS} ${FFLAGS} 
------------------------------------------
-
-Using include paths: -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/include
------------------------------------------
-
-Using C linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx
-Using Fortran linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90
-Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lpetsc -lX11 -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lHYPRE -lpthread -lsuperlu_dist_3.0 -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.3 -Wl,-rpath,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -L/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,-rpath,/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -L/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -Wl,-rpath,/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -L/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lcilkrts -lstdc++ -lgcc_s -lirc -lirc_s -ldl 
------------------------------------------
-
-
- ----------------------------------------------------------------------------------------------------------------------
-| Processor id:   0                                                                                                    |
-| Num Processors: 12                                                                                                   |
-| Time:           Thu Jan 31 22:18:08 2013                                                                             |
-| OS:             Linux                                                                                                |
-| HostName:       hbar.ices.utexas.edu                                                                                 |
-| OS Release:     2.6.32-279.1.1.el6.x86_64                                                                            |
-| OS Version:     #1 SMP Tue Jul 10 11:24:23 CDT 2012                                                                  |
-| Machine:        x86_64                                                                                               |
-| Username:       benkirk                                                                                              |
-| Configuration:  ./configure  '--enable-everything'                                                                   |
-|  '--prefix=/workspace/libmesh/install'                                                                               |
-|  'CXX=icpc'                                                                                                          |
-|  'CC=icc'                                                                                                            |
-|  'FC=ifort'                                                                                                          |
-|  'F77=ifort'                                                                                                         |
-|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                             |
-|  'PETSC_ARCH=intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
-|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                        |
-|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/intel-12.1/mpich2-1.4.1p1/mkl-intel-10.3.12.361'|
-|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/intel-12.1'                                                    |
- ----------------------------------------------------------------------------------------------------------------------
  -------------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=3.89743, Active time=3.65681                                                      |
+| Processor id:   0                                                                                                 |
+| Num Processors: 4                                                                                                 |
+| Time:           Fri Apr 19 11:55:34 2013                                                                          |
+| OS:             Linux                                                                                             |
+| HostName:       spark.ices.utexas.edu                                                                             |
+| OS Release:     2.6.32-279.22.1.el6.x86_64                                                                        |
+| OS Version:     #1 SMP Tue Feb 5 14:33:39 CST 2013                                                                |
+| Machine:        x86_64                                                                                            |
+| Username:       roystgnr                                                                                          |
+| Configuration:  ../configure  '--enable-everything'                                                               |
+|  'METHODS=devel'                                                                                                  |
+|  '--prefix=/h2/roystgnr/libmesh-test'                                                                             |
+|  'CXX=distcc /usr/bin/g++'                                                                                        |
+|  'CC=distcc /usr/bin/gcc'                                                                                         |
+|  'FC=distcc /usr/bin/gfortran'                                                                                    |
+|  'F77=distcc /usr/bin/gfortran'                                                                                   |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                          |
+|  'PETSC_ARCH=gcc-system-mkl-gf-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                     |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/gcc-system/mpich2-1.4.1p1/mkl-gf-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/gcc-system'                                                 |
+|  'HDF5_DIR=/opt/apps/ossw/libraries/hdf5/hdf5-1.8.9/sl6/gcc-system'                                               |
+ -------------------------------------------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=2.19545, Active time=2.13119                                                      |
  -------------------------------------------------------------------------------------------------------------------
 | Event                                 nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                                 w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -2291,130 +2104,130 @@ Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12
 |                                                                                                                   |
 |                                                                                                                   |
 | DofMap                                                                                                            |
-|   add_neighbors_to_send_list()        2         0.0062      0.003114    0.0100      0.005013    0.17     0.27     |
-|   build_constraint_matrix()           1122      0.0115      0.000010    0.0115      0.000010    0.31     0.31     |
-|   build_sparsity()                    2         0.0043      0.002171    0.0131      0.006570    0.12     0.36     |
-|   cnstrn_elem_mat_vec()               1122      0.0097      0.000009    0.0097      0.000009    0.27     0.27     |
-|   create_dof_constraints()            2         0.0128      0.006393    0.0474      0.023677    0.35     1.29     |
-|   distribute_dofs()                   2         0.0223      0.011149    0.0836      0.041783    0.61     2.29     |
-|   dof_indices()                       8897      0.5055      0.000057    0.5055      0.000057    13.82    13.82    |
-|   prepare_send_list()                 2         0.0001      0.000035    0.0001      0.000035    0.00     0.00     |
-|   reinit()                            2         0.0576      0.028809    0.0576      0.028809    1.58     1.58     |
+|   add_neighbors_to_send_list()        2         0.0015      0.000735    0.0021      0.001058    0.07     0.10     |
+|   build_constraint_matrix()           3432      0.0041      0.000001    0.0041      0.000001    0.19     0.19     |
+|   build_sparsity()                    2         0.0012      0.000601    0.0033      0.001635    0.06     0.15     |
+|   cnstrn_elem_mat_vec()               3432      0.0052      0.000002    0.0052      0.000002    0.25     0.25     |
+|   create_dof_constraints()            2         0.0020      0.000984    0.0049      0.002474    0.09     0.23     |
+|   distribute_dofs()                   2         0.0030      0.001508    0.0174      0.008693    0.14     0.82     |
+|   dof_indices()                       25849     0.1102      0.000004    0.1102      0.000004    5.17     5.17     |
+|   prepare_send_list()                 2         0.0000      0.000007    0.0000      0.000007    0.00     0.00     |
+|   reinit()                            2         0.0048      0.002407    0.0048      0.002407    0.23     0.23     |
 |                                                                                                                   |
 | FE                                                                                                                |
-|   compute_shape_functions()           7728      0.1885      0.000024    0.1885      0.000024    5.16     5.16     |
-|   init_shape_functions()              828       0.0308      0.000037    0.0308      0.000037    0.84     0.84     |
-|   inverse_map()                       6340      0.0649      0.000010    0.0649      0.000010    1.77     1.77     |
+|   compute_shape_functions()           22632     0.0876      0.000004    0.0876      0.000004    4.11     4.11     |
+|   init_shape_functions()              1242      0.0058      0.000005    0.0058      0.000005    0.27     0.27     |
+|   inverse_map()                       15568     0.0395      0.000003    0.0395      0.000003    1.85     1.85     |
 |                                                                                                                   |
 | FEMap                                                                                                             |
-|   compute_affine_map()                7728      0.0794      0.000010    0.0794      0.000010    2.17     2.17     |
-|   compute_face_map()                  690       0.0148      0.000021    0.0299      0.000043    0.40     0.82     |
-|   init_face_shape_functions()         46        0.0008      0.000017    0.0008      0.000017    0.02     0.02     |
-|   init_reference_to_physical_map()    828       0.0182      0.000022    0.0182      0.000022    0.50     0.50     |
+|   compute_affine_map()                22632     0.0507      0.000002    0.0507      0.000002    2.38     2.38     |
+|   compute_face_map()                  1104      0.0046      0.000004    0.0104      0.000009    0.22     0.49     |
+|   init_face_shape_functions()         46        0.0001      0.000002    0.0001      0.000002    0.00     0.00     |
+|   init_reference_to_physical_map()    1242      0.0046      0.000004    0.0046      0.000004    0.22     0.22     |
 |                                                                                                                   |
 | Mesh                                                                                                              |
-|   find_neighbors()                    1         0.0137      0.013692    0.0148      0.014839    0.37     0.41     |
-|   renumber_nodes_and_elem()           2         0.0006      0.000287    0.0006      0.000287    0.02     0.02     |
+|   find_neighbors()                    1         0.0017      0.001710    0.0020      0.001993    0.08     0.09     |
+|   renumber_nodes_and_elem()           2         0.0002      0.000081    0.0002      0.000081    0.01     0.01     |
 |                                                                                                                   |
 | MeshCommunication                                                                                                 |
-|   assign_global_indices()             2         0.0555      0.027760    0.0622      0.031116    1.52     1.70     |
-|   compute_hilbert_indices()           2         0.0107      0.005345    0.0107      0.005345    0.29     0.29     |
-|   find_global_indices()               2         0.0044      0.002187    0.0200      0.010007    0.12     0.55     |
-|   parallel_sort()                     2         0.0031      0.001534    0.0037      0.001827    0.08     0.10     |
+|   assign_global_indices()             2         0.0157      0.007860    0.0249      0.012469    0.74     1.17     |
+|   compute_hilbert_indices()           2         0.0050      0.002521    0.0050      0.002521    0.24     0.24     |
+|   find_global_indices()               2         0.0007      0.000365    0.0153      0.007646    0.03     0.72     |
+|   parallel_sort()                     2         0.0005      0.000231    0.0092      0.004598    0.02     0.43     |
 |                                                                                                                   |
 | MeshTools::Generation                                                                                             |
-|   build_cube()                        1         0.0033      0.003255    0.0033      0.003255    0.09     0.09     |
+|   build_cube()                        1         0.0005      0.000536    0.0005      0.000536    0.03     0.03     |
 |                                                                                                                   |
 | MetisPartitioner                                                                                                  |
-|   partition()                         1         0.0492      0.049191    0.0585      0.058473    1.35     1.60     |
+|   partition()                         1         0.0050      0.005015    0.0082      0.008246    0.24     0.39     |
 |                                                                                                                   |
 | Parallel                                                                                                          |
-|   allgather()                         22        0.0018      0.000081    0.0019      0.000085    0.05     0.05     |
-|   barrier()                           2         0.0001      0.000034    0.0001      0.000034    0.00     0.00     |
-|   broadcast()                         560       0.0035      0.000006    0.0035      0.000006    0.09     0.09     |
-|   max(bool)                           5         0.0000      0.000006    0.0000      0.000006    0.00     0.00     |
-|   max(scalar)                         617       0.0625      0.000101    0.0625      0.000101    1.71     1.71     |
-|   max(vector)                         42        0.0006      0.000014    0.0014      0.000034    0.02     0.04     |
-|   maxloc(scalar)                      58        0.1044      0.001799    0.1044      0.001799    2.85     2.85     |
-|   min(bool)                           202       0.0013      0.000006    0.0013      0.000006    0.04     0.04     |
-|   min(scalar)                         166       0.0115      0.000069    0.0115      0.000069    0.31     0.31     |
-|   min(vector)                         42        0.0007      0.000017    0.0016      0.000039    0.02     0.04     |
-|   probe()                             478       0.0029      0.000006    0.0029      0.000006    0.08     0.08     |
-|   receive()                           382       0.0044      0.000011    0.0069      0.000018    0.12     0.19     |
-|   send()                              294       0.0009      0.000003    0.0009      0.000003    0.03     0.03     |
-|   send_receive()                      298       0.0023      0.000008    0.0099      0.000033    0.06     0.27     |
-|   sum()                               56        0.0010      0.000018    0.0024      0.000043    0.03     0.07     |
+|   allgather()                         22        0.0163      0.000741    0.0164      0.000747    0.76     0.77     |
+|   barrier()                           2         0.0000      0.000009    0.0000      0.000009    0.00     0.00     |
+|   broadcast()                         560       0.0024      0.000004    0.0024      0.000004    0.11     0.11     |
+|   max(bool)                           5         0.0000      0.000004    0.0000      0.000004    0.00     0.00     |
+|   max(scalar)                         617       0.0099      0.000016    0.0099      0.000016    0.46     0.46     |
+|   max(vector)                         42        0.0003      0.000008    0.0010      0.000025    0.02     0.05     |
+|   maxloc(scalar)                      58        0.1202      0.002073    0.1202      0.002073    5.64     5.64     |
+|   min(bool)                           202       0.0010      0.000005    0.0010      0.000005    0.05     0.05     |
+|   min(scalar)                         166       0.0136      0.000082    0.0136      0.000082    0.64     0.64     |
+|   min(vector)                         42        0.0004      0.000011    0.0013      0.000031    0.02     0.06     |
+|   probe()                             142       0.0041      0.000029    0.0041      0.000029    0.19     0.19     |
+|   receive()                           110       0.0004      0.000003    0.0008      0.000007    0.02     0.04     |
+|   send()                              86        0.0002      0.000002    0.0002      0.000002    0.01     0.01     |
+|   send_receive()                      90        0.0004      0.000004    0.0012      0.000014    0.02     0.06     |
+|   sum()                               56        0.0102      0.000182    0.0103      0.000184    0.48     0.48     |
 |                                                                                                                   |
 | Parallel::Request                                                                                                 |
-|   wait()                              294       0.0006      0.000002    0.0006      0.000002    0.02     0.02     |
+|   wait()                              86        0.0001      0.000001    0.0001      0.000001    0.00     0.00     |
 |                                                                                                                   |
 | Partitioner                                                                                                       |
-|   set_node_processor_ids()            1         0.0016      0.001567    0.0027      0.002725    0.04     0.07     |
-|   set_parent_processor_ids()          1         0.0011      0.001143    0.0011      0.001143    0.03     0.03     |
+|   set_node_processor_ids()            1         0.0005      0.000524    0.0007      0.000674    0.02     0.03     |
+|   set_parent_processor_ids()          1         0.0002      0.000187    0.0002      0.000187    0.01     0.01     |
 |                                                                                                                   |
 | PetscLinearSolver                                                                                                 |
-|   solve()                             75        0.1795      0.002393    0.1795      0.002393    4.91     4.91     |
+|   solve()                             75        0.2182      0.002909    0.2182      0.002909    10.24    10.24    |
 |                                                                                                                   |
 | PointLocatorTree                                                                                                  |
-|   init(no master)                     1         0.0065      0.006497    0.0069      0.006877    0.18     0.19     |
-|   operator()                          440       0.0346      0.000079    0.0400      0.000091    0.95     1.09     |
+|   init(no master)                     1         0.0013      0.001298    0.0015      0.001547    0.06     0.07     |
+|   operator()                          440       0.0126      0.000029    0.0148      0.000034    0.59     0.69     |
 |                                                                                                                   |
 | RBConstruction                                                                                                    |
-|   add_scaled_matrix_and_vector()      23        0.1530      0.006653    0.5971      0.025960    4.18     16.33    |
-|   clear()                             3         0.0014      0.000478    0.0014      0.000478    0.04     0.04     |
-|   compute_Fq_representor_innerprods() 2         0.0059      0.002941    0.0523      0.026160    0.16     1.43     |
-|   compute_max_error_bound()           37        0.0143      0.000388    1.5333      0.041440    0.39     41.93    |
-|   enrich_RB_space()                   15        0.0105      0.000702    0.0105      0.000702    0.29     0.29     |
-|   train_reduced_basis()               2         0.0116      0.005799    2.3018      1.150877    0.32     62.94    |
-|   truth_assembly()                    15        0.0346      0.002308    0.0364      0.002425    0.95     0.99     |
-|   truth_solve()                       15        0.0018      0.000118    0.0779      0.005196    0.05     2.13     |
-|   update_RB_system_matrices()         36        0.0428      0.001190    0.0428      0.001190    1.17     1.17     |
-|   update_residual_terms()             15        0.0319      0.002126    0.0718      0.004785    0.87     1.96     |
+|   add_scaled_matrix_and_vector()      23        0.1996      0.008679    0.3434      0.014932    9.37     16.12    |
+|   clear()                             3         0.0006      0.000186    0.0006      0.000186    0.03     0.03     |
+|   compute_Fq_representor_innerprods() 2         0.0047      0.002338    0.0500      0.025020    0.22     2.35     |
+|   compute_max_error_bound()           37        0.0067      0.000182    1.0228      0.027642    0.32     47.99    |
+|   enrich_RB_space()                   15        0.0087      0.000580    0.0087      0.000580    0.41     0.41     |
+|   train_reduced_basis()               2         0.0095      0.004750    1.4281      0.714063    0.45     67.01    |
+|   truth_assembly()                    15        0.0176      0.001174    0.0183      0.001222    0.83     0.86     |
+|   truth_solve()                       15        0.0015      0.000102    0.0591      0.003938    0.07     2.77     |
+|   update_RB_system_matrices()         36        0.0278      0.000773    0.0278      0.000773    1.31     1.31     |
+|   update_residual_terms()             15        0.0299      0.001996    0.0701      0.004673    1.40     3.29     |
 |                                                                                                                   |
 | RBEIMConstruction                                                                                                 |
-|   compute_best_fit_error()            525       0.8898      0.001695    1.0499      0.002000    24.33    28.71    |
-|   enrich_RB_space()                   21        0.0564      0.002683    0.4241      0.020194    1.54     11.60    |
-|   truth_solve()                       571       0.2464      0.000432    0.5349      0.000937    6.74     14.63    |
-|   update_RB_system_matrices()         21        0.0316      0.001506    0.1020      0.004856    0.87     2.79     |
+|   compute_best_fit_error()            525       0.5501      0.001048    0.6351      0.001210    25.81    29.80    |
+|   enrich_RB_space()                   21        0.0430      0.002050    0.1512      0.007199    2.02     7.09     |
+|   truth_solve()                       571       0.1651      0.000289    0.3488      0.000611    7.74     16.37    |
+|   update_RB_system_matrices()         21        0.0170      0.000808    0.0429      0.002045    0.80     2.01     |
 |                                                                                                                   |
 | RBEIMEvaluation                                                                                                   |
-|   rb_solve()                          178       0.0164      0.000092    0.0164      0.000092    0.45     0.45     |
-|   write_offline_data_to_files()       1         0.0002      0.000232    0.0010      0.000987    0.01     0.03     |
+|   rb_solve()                          434       0.0150      0.000034    0.0150      0.000034    0.70     0.70     |
+|   write_offline_data_to_files()       1         0.0004      0.000374    0.0011      0.001116    0.02     0.05     |
 |                                                                                                                   |
 | RBEvaluation                                                                                                      |
-|   clear()                             3         0.0002      0.000054    0.0002      0.000054    0.00     0.00     |
-|   compute_residual_dual_norm()        144       0.4209      0.002923    0.4209      0.002923    11.51    11.51    |
-|   rb_solve()                          144       0.0257      0.000179    0.4604      0.003197    0.70     12.59    |
-|   resize_data_structures()            2         0.0005      0.000242    0.0005      0.000242    0.01     0.01     |
-|   write_offline_data_to_files()       2         0.0020      0.000992    0.0020      0.000992    0.05     0.05     |
-|   write_out_basis_functions()         2         0.0001      0.000044    0.1336      0.066800    0.00     3.65     |
-|   write_out_vectors()                 2         0.0694      0.034687    0.1335      0.066756    1.90     3.65     |
+|   clear()                             3         0.0001      0.000033    0.0001      0.000033    0.00     0.00     |
+|   compute_residual_dual_norm()        400       0.2404      0.000601    0.2404      0.000601    11.28    11.28    |
+|   rb_solve()                          400       0.0157      0.000039    0.2700      0.000675    0.74     12.67    |
+|   resize_data_structures()            2         0.0000      0.000024    0.0000      0.000024    0.00     0.00     |
+|   write_offline_data_to_files()       2         0.0023      0.001133    0.0023      0.001133    0.11     0.11     |
+|   write_out_basis_functions()         2         0.0003      0.000133    0.0402      0.020101    0.01     1.89     |
+|   write_out_vectors()                 2         0.0086      0.004292    0.0399      0.019967    0.40     1.87     |
  -------------------------------------------------------------------------------------------------------------------
-| Totals:                               41169     3.6568                                          100.00            |
+| Totals:                               102555    2.1312                                          100.00            |
  -------------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example reduced_basis_ex4:
-*  mpirun -np 12 example-devel -online_mode 0 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel -online_mode 0 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
 ***************************************************************
 * Running Example reduced_basis_ex4:
-*  mpirun -np 12 example-devel -online_mode 1 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel -online_mode 1 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
  
-*** Warning, This code is untested, experimental, or likely to see future API changes: src/reduced_basis/rb_parametrized.C, line 41, compiled Jan 31 2013 at 21:51:32 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/reduced_basis/rb_parametrized.C, line 41, compiled Apr 19 2013 at 11:42:51 ***
  Mesh Information:
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=676
-    n_local_nodes()=68
+    n_local_nodes()=186
   n_elem()=625
-    n_local_elem()=51
+    n_local_elem()=156
     n_active_elem()=625
   n_subdomains()=1
-  n_partitions()=12
-  n_processors()=12
+  n_partitions()=4
+  n_processors()=4
   n_threads()=1
   processor_id()=0
 
@@ -2427,16 +2240,16 @@ Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12
     Infinite Element Mapping="CARTESIAN" 
     Approximation Orders="FIRST", "THIRD" 
     n_dofs()=676
-    n_local_dofs()=68
+    n_local_dofs()=186
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 7.99852
-      Average Off-Processor Bandwidth <= 1.20118
+      Average  On-Processor Bandwidth <= 8.33136
+      Average Off-Processor Bandwidth <= 0.488166
       Maximum  On-Processor Bandwidth <= 11
-      Maximum Off-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 8
     DofMap Constraints
       Number of DoF Constraints = 0
       Number of Node Constraints = 0
@@ -2447,16 +2260,16 @@ Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12
     Infinite Element Mapping="CARTESIAN" 
     Approximation Orders="FIRST", "THIRD" 
     n_dofs()=676
-    n_local_dofs()=68
+    n_local_dofs()=186
     n_constrained_dofs()=100
-    n_local_constrained_dofs()=16
+    n_local_constrained_dofs()=25
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 7.99852
-      Average Off-Processor Bandwidth <= 1.20118
+      Average  On-Processor Bandwidth <= 8.33136
+      Average Off-Processor Bandwidth <= 0.488166
       Maximum  On-Processor Bandwidth <= 11
-      Maximum Off-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 8
     DofMap Constraints
       Number of DoF Constraints = 100
       Average DoF Constraint Length= 0
@@ -2465,139 +2278,33 @@ Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12
 center_x: -6.000000e-01
 center_y: 7.000000e-01
 
-************************************************************************************************************************
-***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
-************************************************************************************************************************
 
----------------------------------------------- PETSc Performance Summary: ----------------------------------------------
-
-/workspace/libmesh/examples/reduced_basis/reduced_basis_ex4/.libs/lt-example-devel on a intel-12. named hbar.ices.utexas.edu with 12 processors, by benkirk Thu Jan 31 22:18:09 2013
-Using Petsc Release Version 3.3.0, Patch 2, Fri Jul 13 15:42:00 CDT 2012 
-
-                         Max       Max/Min        Avg      Total 
-Time (sec):           6.237e-01      1.00855   6.219e-01
-Objects:              6.000e+01      1.00000   6.000e+01
-Flops:                4.760e+03      1.78947   3.943e+03  4.732e+04
-Flops/sec:            7.632e+03      1.77484   6.340e+03  7.608e+04
-MPI Messages:         3.900e+01      3.25000   2.500e+01  3.000e+02
-MPI Message Lengths:  1.548e+03      2.37423   4.165e+01  1.250e+04
-MPI Reductions:       1.810e+02      1.00000
-
-Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
-                            e.g., VecAXPY() for real vectors of length N --> 2N flops
-                            and VecAXPY() for complex vectors of length N --> 8N flops
-
-Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
-                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 6.2190e-01 100.0%  4.7320e+04 100.0%  3.000e+02 100.0%  4.165e+01      100.0%  1.800e+02  99.4% 
-
-------------------------------------------------------------------------------------------------------------------------
-See the 'Profiling' chapter of the users' manual for details on interpreting output.
-Phase summary info:
-   Count: number of times phase was executed
-   Time and Flops: Max - maximum over all processors
-                   Ratio - ratio of maximum to minimum over all processors
-   Mess: number of messages sent
-   Avg. len: average message length
-   Reduct: number of global reductions
-   Global: entire computation
-   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
-      %T - percent time in this phase         %f - percent flops in this phase
-      %M - percent messages in this phase     %L - percent message lengths in this phase
-      %R - percent reductions in this phase
-   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
-------------------------------------------------------------------------------------------------------------------------
-Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
-                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %f %M %L %R  %T %f %M %L %R Mflop/s
-------------------------------------------------------------------------------------------------------------------------
-
---- Event Stage 0: Main Stage
-
-VecCopy                2 1.0 1.1921e-05 6.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecSet                45 1.0 2.6941e-05 1.7 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecAXPY               35 1.0 5.3103e-03105.1 4.76e+03 1.8 0.0e+00 0.0e+00 0.0e+00  0100  0  0  0   0100  0  0  0     9
-VecAssemblyBegin      37 1.0 1.5505e-02 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 1.1e+02  2  0  0  0 61   2  0  0  0 62     0
-VecAssemblyEnd        37 1.0 4.1723e-05 1.7 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecScatterBegin        2 1.0 2.1291e-04 4.0 0.00e+00 0.0 1.0e+02 8.1e+01 0.0e+00  0  0 33 65  0   0  0 33 65  0     0
-VecScatterEnd          2 1.0 1.9193e-0426.8 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatZeroEntries         4 1.0 1.5974e-05 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-------------------------------------------------------------------------------------------------------------------------
-
-Memory usage is given in bytes:
-
-Object Type          Creations   Destructions     Memory  Descendants' Mem.
-Reports information only for process 0.
-
---- Event Stage 0: Main Stage
-
-              Vector    45             45        90904     0
-      Vector Scatter     2              2         2072     0
-           Index Set     4              4         3120     0
-   IS L to G Mapping     2              2         1128     0
-              Matrix     6              6        33184     0
-              Viewer     1              0            0     0
-========================================================================================================================
-Average time to get PetscTime(): 0
-Average time for MPI_Barrier(): 8.39233e-06
-Average time for zero size MPI_Send(): 1.34905e-05
-#PETSc Option Table entries:
--ksp_right_pc
--log_summary
--online_mode 1
--pc_type bjacobi
--sub_pc_factor_levels 4
--sub_pc_factor_zeropivot 0
--sub_pc_type ilu
-#End of PETSc Option Table entries
-Compiled without FORTRAN kernels
-Compiled with full precision matrices (default)
-sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
-Configure run at: Thu Nov  8 11:21:02 2012
-Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared-libraries=1 --with-mpi-dir=/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1 --with-mumps=true --download-mumps=1 --with-metis=true --download-metis=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_intel_lp64.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_sequential.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_core.so]" --with-lapack-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_lapack95_lp64.a]"
------------------------------------------
-Libraries compiled on Thu Nov  8 11:21:02 2012 on daedalus.ices.utexas.edu 
-Machine characteristics: Linux-2.6.32-279.1.1.el6.x86_64-x86_64-with-redhat-6.3-Carbon
-Using PETSc directory: /opt/apps/ossw/libraries/petsc/petsc-3.3-p2
-Using PETSc arch: intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt
------------------------------------------
-
-Using C compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx  -wd1572 -O3   -fPIC   ${COPTFLAGS} ${CFLAGS}
-Using Fortran compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90  -fPIC -O3   ${FOPTFLAGS} ${FFLAGS} 
------------------------------------------
-
-Using include paths: -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/include
------------------------------------------
-
-Using C linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx
-Using Fortran linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90
-Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lpetsc -lX11 -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lHYPRE -lpthread -lsuperlu_dist_3.0 -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.3 -Wl,-rpath,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -L/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,-rpath,/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -L/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -Wl,-rpath,/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -L/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lcilkrts -lstdc++ -lgcc_s -lirc -lirc_s -ldl 
------------------------------------------
-
-
- ----------------------------------------------------------------------------------------------------------------------
-| Processor id:   0                                                                                                    |
-| Num Processors: 12                                                                                                   |
-| Time:           Thu Jan 31 22:18:09 2013                                                                             |
-| OS:             Linux                                                                                                |
-| HostName:       hbar.ices.utexas.edu                                                                                 |
-| OS Release:     2.6.32-279.1.1.el6.x86_64                                                                            |
-| OS Version:     #1 SMP Tue Jul 10 11:24:23 CDT 2012                                                                  |
-| Machine:        x86_64                                                                                               |
-| Username:       benkirk                                                                                              |
-| Configuration:  ./configure  '--enable-everything'                                                                   |
-|  '--prefix=/workspace/libmesh/install'                                                                               |
-|  'CXX=icpc'                                                                                                          |
-|  'CC=icc'                                                                                                            |
-|  'FC=ifort'                                                                                                          |
-|  'F77=ifort'                                                                                                         |
-|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                             |
-|  'PETSC_ARCH=intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
-|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                        |
-|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/intel-12.1/mpich2-1.4.1p1/mkl-intel-10.3.12.361'|
-|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/intel-12.1'                                                    |
- ----------------------------------------------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Processor id:   0                                                                                                 |
+| Num Processors: 4                                                                                                 |
+| Time:           Fri Apr 19 11:55:34 2013                                                                          |
+| OS:             Linux                                                                                             |
+| HostName:       spark.ices.utexas.edu                                                                             |
+| OS Release:     2.6.32-279.22.1.el6.x86_64                                                                        |
+| OS Version:     #1 SMP Tue Feb 5 14:33:39 CST 2013                                                                |
+| Machine:        x86_64                                                                                            |
+| Username:       roystgnr                                                                                          |
+| Configuration:  ../configure  '--enable-everything'                                                               |
+|  'METHODS=devel'                                                                                                  |
+|  '--prefix=/h2/roystgnr/libmesh-test'                                                                             |
+|  'CXX=distcc /usr/bin/g++'                                                                                        |
+|  'CC=distcc /usr/bin/gcc'                                                                                         |
+|  'FC=distcc /usr/bin/gfortran'                                                                                    |
+|  'F77=distcc /usr/bin/gfortran'                                                                                   |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                          |
+|  'PETSC_ARCH=gcc-system-mkl-gf-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                     |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/gcc-system/mpich2-1.4.1p1/mkl-gf-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/gcc-system'                                                 |
+|  'HDF5_DIR=/opt/apps/ossw/libraries/hdf5/hdf5-1.8.9/sl6/gcc-system'                                               |
+ -------------------------------------------------------------------------------------------------------------------
  --------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.64686, Active time=0.596457                                                |
+| libMesh Performance: Alive time=0.21897, Active time=0.196295                                                |
  --------------------------------------------------------------------------------------------------------------
 | Event                            nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                            w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -2605,87 +2312,88 @@ Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12
 |                                                                                                              |
 |                                                                                                              |
 | DofMap                                                                                                       |
-|   add_neighbors_to_send_list()   2         0.0063      0.003166    0.0102      0.005088    1.06     1.71     |
-|   build_sparsity()               2         0.0044      0.002196    0.0129      0.006464    0.74     2.17     |
-|   create_dof_constraints()       2         0.0124      0.006220    0.0470      0.023511    2.09     7.88     |
-|   distribute_dofs()              2         0.0220      0.011020    0.1160      0.057981    3.70     19.44    |
-|   dof_indices()                  899       0.0492      0.000055    0.0492      0.000055    8.25     8.25     |
-|   prepare_send_list()            2         0.0001      0.000032    0.0001      0.000032    0.01     0.01     |
-|   reinit()                       2         0.0468      0.023393    0.0468      0.023393    7.84     7.84     |
+|   add_neighbors_to_send_list()   2         0.0015      0.000745    0.0021      0.001067    0.76     1.09     |
+|   build_sparsity()               2         0.0013      0.000638    0.0034      0.001701    0.65     1.73     |
+|   create_dof_constraints()       2         0.0020      0.001010    0.0049      0.002435    1.03     2.48     |
+|   distribute_dofs()              2         0.0031      0.001548    0.0095      0.004754    1.58     4.84     |
+|   dof_indices()                  1387      0.0063      0.000005    0.0063      0.000005    3.23     3.23     |
+|   prepare_send_list()            2         0.0000      0.000007    0.0000      0.000007    0.01     0.01     |
+|   reinit()                       2         0.0051      0.002543    0.0051      0.002543    2.59     2.59     |
 |                                                                                                              |
 | EquationSystems                                                                                              |
-|   build_solution_vector()        1         0.0014      0.001429    0.0185      0.018548    0.24     3.11     |
+|   build_solution_vector()        1         0.0008      0.000816    0.0028      0.002849    0.42     1.45     |
 |                                                                                                              |
 | ExodusII_IO                                                                                                  |
-|   write_nodal_data()             1         0.0070      0.007034    0.0070      0.007034    1.18     1.18     |
+|   write_nodal_data()             1         0.0935      0.093465    0.0935      0.093465    47.61    47.61    |
 |                                                                                                              |
 | Mesh                                                                                                         |
-|   find_neighbors()               1         0.0137      0.013687    0.0282      0.028157    2.29     4.72     |
-|   renumber_nodes_and_elem()      2         0.0005      0.000272    0.0005      0.000272    0.09     0.09     |
+|   find_neighbors()               1         0.0018      0.001761    0.0020      0.001970    0.90     1.00     |
+|   renumber_nodes_and_elem()      2         0.0002      0.000076    0.0002      0.000076    0.08     0.08     |
 |                                                                                                              |
 | MeshCommunication                                                                                            |
-|   assign_global_indices()        2         0.0671      0.033570    0.0871      0.043543    11.26    14.60    |
-|   compute_hilbert_indices()      2         0.0108      0.005404    0.0108      0.005404    1.81     1.81     |
-|   find_global_indices()          2         0.0042      0.002119    0.0378      0.018916    0.71     6.34     |
-|   parallel_sort()                2         0.0043      0.002127    0.0170      0.008480    0.71     2.84     |
+|   assign_global_indices()        2         0.0270      0.013520    0.0281      0.014054    13.78    14.32    |
+|   compute_hilbert_indices()      2         0.0055      0.002743    0.0055      0.002743    2.80     2.80     |
+|   find_global_indices()          2         0.0008      0.000384    0.0073      0.003626    0.39     3.69     |
+|   parallel_sort()                2         0.0004      0.000217    0.0007      0.000329    0.22     0.34     |
 |                                                                                                              |
 | MeshOutput                                                                                                   |
-|   write_equation_systems()       1         0.0001      0.000096    0.0266      0.026648    0.02     4.47     |
+|   write_equation_systems()       1         0.0001      0.000068    0.0965      0.096462    0.03     49.14    |
 |                                                                                                              |
 | MeshTools::Generation                                                                                        |
-|   build_cube()                   1         0.0031      0.003069    0.0031      0.003069    0.51     0.51     |
+|   build_cube()                   1         0.0005      0.000530    0.0005      0.000530    0.27     0.27     |
 |                                                                                                              |
 | MetisPartitioner                                                                                             |
-|   partition()                    1         0.0492      0.049177    0.0704      0.070411    8.24     11.80    |
+|   partition()                    1         0.0052      0.005158    0.0087      0.008722    2.63     4.44     |
 |                                                                                                              |
 | Parallel                                                                                                     |
-|   allgather()                    22        0.0375      0.001703    0.0379      0.001725    6.28     6.36     |
-|   barrier()                      2         0.0019      0.000949    0.0019      0.000949    0.32     0.32     |
-|   broadcast()                    26        0.0004      0.000015    0.0003      0.000012    0.06     0.05     |
-|   max(bool)                      2         0.0000      0.000007    0.0000      0.000007    0.00     0.00     |
-|   max(scalar)                    177       0.0068      0.000038    0.0068      0.000038    1.13     1.13     |
-|   max(vector)                    39        0.0015      0.000039    0.0052      0.000134    0.25     0.88     |
-|   min(bool)                      201       0.0087      0.000043    0.0087      0.000043    1.45     1.45     |
-|   min(scalar)                    166       0.1153      0.000694    0.1153      0.000694    19.32    19.32    |
-|   min(vector)                    39        0.0016      0.000041    0.0070      0.000178    0.27     1.17     |
-|   probe()                        382       0.0205      0.000054    0.0205      0.000054    3.43     3.43     |
-|   receive()                      338       0.0022      0.000007    0.0222      0.000066    0.37     3.73     |
-|   send()                         338       0.0011      0.000003    0.0011      0.000003    0.19     0.19     |
-|   send_receive()                 298       0.0023      0.000008    0.0257      0.000086    0.38     4.31     |
-|   sum()                          48        0.0144      0.000301    0.0305      0.000635    2.42     5.11     |
+|   allgather()                    22        0.0008      0.000038    0.0009      0.000040    0.42     0.45     |
+|   barrier()                      2         0.0069      0.003438    0.0069      0.003438    3.50     3.50     |
+|   broadcast()                    26        0.0001      0.000004    0.0001      0.000003    0.05     0.04     |
+|   max(bool)                      2         0.0000      0.000003    0.0000      0.000003    0.00     0.00     |
+|   max(scalar)                    177       0.0015      0.000009    0.0015      0.000009    0.77     0.77     |
+|   max(vector)                    39        0.0004      0.000010    0.0014      0.000035    0.21     0.69     |
+|   min(bool)                      201       0.0015      0.000008    0.0015      0.000008    0.78     0.78     |
+|   min(scalar)                    166       0.0036      0.000022    0.0036      0.000022    1.83     1.83     |
+|   min(vector)                    39        0.0005      0.000014    0.0015      0.000039    0.27     0.77     |
+|   probe()                        110       0.0004      0.000004    0.0004      0.000004    0.20     0.20     |
+|   receive()                      98        0.0004      0.000004    0.0007      0.000008    0.18     0.37     |
+|   send()                         98        0.0003      0.000003    0.0003      0.000003    0.15     0.15     |
+|   send_receive()                 90        0.0004      0.000005    0.0013      0.000015    0.21     0.69     |
+|   sum()                          48        0.0006      0.000011    0.0009      0.000018    0.28     0.43     |
 |                                                                                                              |
 | Parallel::Request                                                                                            |
-|   wait()                         338       0.0007      0.000002    0.0007      0.000002    0.11     0.11     |
+|   wait()                         98        0.0001      0.000001    0.0001      0.000001    0.07     0.07     |
 |                                                                                                              |
 | Partitioner                                                                                                  |
-|   set_node_processor_ids()       1         0.0015      0.001471    0.0529      0.052857    0.25     8.86     |
-|   set_parent_processor_ids()     1         0.0012      0.001166    0.0012      0.001166    0.20     0.20     |
+|   set_node_processor_ids()       1         0.0005      0.000520    0.0012      0.001178    0.26     0.60     |
+|   set_parent_processor_ids()     1         0.0002      0.000164    0.0002      0.000164    0.08     0.08     |
 |                                                                                                              |
 | RBConstruction                                                                                               |
-|   clear()                        3         0.0007      0.000219    0.0007      0.000219    0.11     0.11     |
-|   load_rb_solution()             2         0.0063      0.003128    0.0063      0.003128    1.05     1.05     |
+|   clear()                        3         0.0004      0.000135    0.0004      0.000135    0.21     0.21     |
+|   load_rb_solution()             2         0.0002      0.000118    0.0002      0.000118    0.12     0.12     |
 |                                                                                                              |
 | RBEIMEvaluation                                                                                              |
-|   rb_solve()                     1         0.0112      0.011224    0.0112      0.011224    1.88     1.88     |
-|   read_offline_data_from_files() 1         0.0002      0.000247    0.0011      0.001144    0.04     0.19     |
+|   rb_solve()                     1         0.0088      0.008784    0.0088      0.008784    4.47     4.47     |
+|   read_offline_data_from_files() 1         0.0002      0.000213    0.0006      0.000636    0.11     0.32     |
 |                                                                                                              |
 | RBEvaluation                                                                                                 |
-|   clear()                        3         0.0002      0.000063    0.0002      0.000063    0.03     0.03     |
-|   compute_residual_dual_norm()   1         0.0037      0.003678    0.0037      0.003678    0.62     0.62     |
-|   rb_solve()                     1         0.0004      0.000385    0.0153      0.015287    0.06     2.56     |
-|   read_in_basis_functions()      2         0.0000      0.000024    0.1519      0.075941    0.01     25.46    |
-|   read_in_vectors()              2         0.0515      0.025765    0.1518      0.075917    8.64     25.46    |
-|   read_offline_data_from_files() 2         0.0016      0.000789    0.0021      0.001066    0.26     0.36     |
-|   resize_data_structures()       2         0.0006      0.000276    0.0006      0.000276    0.09     0.09     |
+|   clear()                        3         0.0001      0.000044    0.0001      0.000044    0.07     0.07     |
+|   compute_residual_dual_norm()   1         0.0010      0.000968    0.0010      0.000968    0.49     0.49     |
+|   rb_solve()                     1         0.0002      0.000174    0.0099      0.009926    0.09     5.06     |
+|   read_in_basis_functions()      2         0.0000      0.000013    0.0467      0.023363    0.01     23.80    |
+|   read_in_vectors()              2         0.0111      0.005526    0.0467      0.023349    5.63     23.79    |
+|   read_offline_data_from_files() 2         0.0010      0.000509    0.0011      0.000549    0.52     0.56     |
+|   resize_data_structures()       2         0.0001      0.000040    0.0001      0.000040    0.04     0.04     |
  --------------------------------------------------------------------------------------------------------------
-| Totals:                          3365      0.5965                                          100.00            |
+| Totals:                          2653      0.1963                                          100.00            |
  --------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example reduced_basis_ex4:
-*  mpirun -np 12 example-devel -online_mode 1 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel -online_mode 1 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
+make[4]: Leaving directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/reduced_basis/reduced_basis_ex4'
 </pre>
 </div>
 <?php make_footer() ?>

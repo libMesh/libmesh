@@ -39,9 +39,9 @@ Bring in everything from the libMesh namespace
         class FEMParameters
         {
         public:
-            FEMParameters() :  
+            FEMParameters() :
               domainfile("lshaped.xda"),
-              coarserefinements(0),            
+              coarserefinements(0),
               solver_quiet(true),
         	reuse_preconditioner(false),
               require_residual_reduction(true),
@@ -53,19 +53,19 @@ Bring in everything from the libMesh namespace
               nelem_target(30000), global_tolerance(0.0),
               refine_fraction(0.3), coarsen_fraction(0.3), coarsen_threshold(10),
               refine_uniformly(false),
-              max_adaptivesteps(1),      
+              max_adaptivesteps(1),
         	indicator_type("kelly"), patch_reuse(true),
-              fe_family(1, "LAGRANGE"), fe_order(1, 1),	
+              fe_family(1, "LAGRANGE"), fe_order(1, 1),
               analytic_jacobians(true), verify_analytic_jacobians(0.0),
               print_solution_norms(false), print_solutions(false),
               print_residual_norms(false), print_residuals(false),
               print_jacobian_norms(false), print_jacobians(false) {}
         
             void read(GetPot &input);
-           
+        
             std::string domainfile;
             unsigned int coarserefinements;
-                    
+        
             bool solver_quiet, reuse_preconditioner, require_residual_reduction;
             Real min_step_length;
             unsigned int max_linear_iterations, max_nonlinear_iterations;
@@ -78,8 +78,8 @@ Bring in everything from the libMesh namespace
             Real refine_fraction, coarsen_fraction, coarsen_threshold;
             bool refine_uniformly;
             unsigned int max_adaptivesteps;
-            
-            std::string indicator_type;    
+        
+            std::string indicator_type;
             bool patch_reuse;
         
             std::vector&lt;std::string&gt; fe_family;
@@ -140,9 +140,9 @@ Constructor
 <div class ="fragment">
 <pre>
           LaplaceSystem(EquationSystems& es,
-                       const std::string& name,
-                       const unsigned int number)
-          : FEMSystem(es, name, number),
+                       const std::string& name_in,
+                       const unsigned int number_in)
+          : FEMSystem(es, name_in, number_in),
             _fe_family("LAGRANGE"), _fe_order(1),
             _analytic_jacobians(true) { qoi.resize(2); }
         
@@ -228,7 +228,7 @@ Overloading the postprocess function
 
 <div class ="fragment">
 <pre>
-          virtual void element_postprocess(DiffContext &context);  
+          virtual void element_postprocess(DiffContext &context);
         
           virtual void side_postprocess(DiffContext &context);
         
@@ -244,7 +244,7 @@ Overloading the qoi function on elements
 <pre>
           virtual void element_qoi_derivative
             (DiffContext &context,
-             const QoISet & qois);  
+             const QoISet & qois);
         
 </pre>
 </div>
@@ -258,7 +258,7 @@ Overloading the qoi function on sides
 <pre>
           virtual void side_qoi_derivative
             (DiffContext &context,
-             const QoISet & qois);  
+             const QoISet & qois);
         
           Number exact_solution (const Point&);
         
@@ -266,7 +266,7 @@ Overloading the qoi function on sides
 </div>
 <div class = "comment">
 Variables to hold the computed QoIs
-  
+
 
 <br><br></div>
 
@@ -278,14 +278,14 @@ Variables to hold the computed QoIs
 </div>
 <div class = "comment">
 Variables to read in the exact QoIs from l-shaped.in
- 
+
 
 <br><br></div>
 
 <div class ="fragment">
 <pre>
           Number exact_QoI[2];
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -317,14 +317,14 @@ Calculate Jacobians analytically or not?
 
 <br><br>This example solves the Laplace equation on the classic "L-shaped"
 domain with adaptive mesh refinement. The exact
-solution is u(r,\theta) = r^{2/3} * \sin ( (2/3) * \theta). The kelly and 
-adjoint residual error estimators are used to develop error indicators and 
-guide mesh adaptation. Since we use the adjoint capabilities of libMesh in 
+solution is u(r,\theta) = r^{2/3} * \sin ( (2/3) * \theta). The kelly and
+adjoint residual error estimators are used to develop error indicators and
+guide mesh adaptation. Since we use the adjoint capabilities of libMesh in
 this example, we use the DiffSystem framework. This file (adjoints_ex1.C)
 contains the declaration of mesh and equation system objects, L-shaped.C
-contains the assembly of the system, element_qoi_derivative.C and 
-side_qoi_derivative.C contain the RHS for the adjoint systems. 
-Postprocessing to compute the QoIs is done in element_postprocess.C and 
+contains the assembly of the system, element_qoi_derivative.C and
+side_qoi_derivative.C contain the RHS for the adjoint systems.
+Postprocessing to compute the QoIs is done in element_postprocess.C and
 side_postprocess.C.
 
 
@@ -434,7 +434,7 @@ whether the output is the primal solution or the dual solution for the ith QoI
 
 <div class ="fragment">
 <pre>
-        void write_output(EquationSystems &es,                                   
+        void write_output(EquationSystems &es,
         		  unsigned int a_step,       // The adaptive step count
         		  std::string solution_type) // primal or adjoint solve
         {
@@ -448,10 +448,10 @@ whether the output is the primal solution or the dual solution for the ith QoI
                         &lt;&lt; std::setfill('0')
                         &lt;&lt; std::right
                         &lt;&lt; a_step;
-          
+        
           GMVIO(mesh).write_equation_systems
             (file_name_gmv.str(), es);
-        #endif    
+        #endif
         }
         
 </pre>
@@ -534,7 +534,7 @@ Nonlinear solver options
           {
             NewtonSolver *solver = new NewtonSolver(system);
             system.time_solver-&gt;diff_solver() = AutoPtr&lt;DiffSolver&gt;(solver);
-            
+        
             solver-&gt;quiet                       = param.solver_quiet;
             solver-&gt;max_nonlinear_iterations    = param.max_nonlinear_iterations;
             solver-&gt;minsteplength               = param.min_step_length;
@@ -547,7 +547,7 @@ Nonlinear solver options
         	solver-&gt;continue_after_max_iterations = true;
         	solver-&gt;continue_after_backtrack_failure = true;
               }
-            
+        
 </pre>
 </div>
 <div class = "comment">
@@ -558,7 +558,7 @@ And the linear solver options
 <pre>
             solver-&gt;max_linear_iterations       = param.max_linear_iterations;
             solver-&gt;initial_linear_tolerance    = param.initial_linear_tolerance;
-            solver-&gt;minimum_linear_tolerance    = param.minimum_linear_tolerance;      
+            solver-&gt;minimum_linear_tolerance    = param.minimum_linear_tolerance;
           }
         }
         
@@ -580,9 +580,9 @@ Build the mesh refinement object and set parameters for refining/coarsening etc
           AutoPtr&lt;MeshRefinement&gt; mesh_refinement(new MeshRefinement(mesh));
           mesh_refinement-&gt;coarsen_by_parents() = true;
           mesh_refinement-&gt;absolute_global_tolerance() = param.global_tolerance;
-          mesh_refinement-&gt;nelem_target()      = param.nelem_target;  
+          mesh_refinement-&gt;nelem_target()      = param.nelem_target;
           mesh_refinement-&gt;refine_fraction()   = param.refine_fraction;
-          mesh_refinement-&gt;coarsen_fraction()  = param.coarsen_fraction;  
+          mesh_refinement-&gt;coarsen_fraction()  = param.coarsen_fraction;
           mesh_refinement-&gt;coarsen_threshold() = param.coarsen_threshold;
         
           return mesh_refinement;
@@ -605,9 +605,9 @@ see the description of the Adjoint Refinement Error Estimator in adjoint_refinem
           std::cout&lt;&lt;"Computing the error estimate using the Adjoint Refinement Error Estimator"&lt;&lt;std::endl&lt;&lt;std::endl;
         
           AdjointRefinementEstimator *adjoint_refinement_estimator = new AdjointRefinementEstimator;
-          
+        
           error_estimator.reset (adjoint_refinement_estimator);
-          
+        
           adjoint_refinement_estimator-&gt;qoi_set() = qois;
         
 </pre>
@@ -619,7 +619,7 @@ We enrich the FE space for the dual problem by doing 2 uniform h refinements
 <div class ="fragment">
 <pre>
           adjoint_refinement_estimator-&gt;number_h_refinements = 2;
-              
+        
           return error_estimator;
         }
         
@@ -672,9 +672,9 @@ Make sure the general input file exists, and parse it
             std::ifstream i("general.in");
             if (!i)
               {
-                std::cerr &lt;&lt; '[' &lt;&lt; libMesh::processor_id() 
-                          &lt;&lt; "] Can't find general.in; exiting early." 
-                          &lt;&lt; std::endl; 
+                std::cerr &lt;&lt; '[' &lt;&lt; libMesh::processor_id()
+                          &lt;&lt; "] Can't find general.in; exiting early."
+                          &lt;&lt; std::endl;
                 libmesh_error();
               }
           }
@@ -700,16 +700,17 @@ Skip this default-2D example if libMesh was compiled as 1D-only.
 <div class ="fragment">
 <pre>
           libmesh_example_assert(2 &lt;= LIBMESH_DIM, "2D support");
-          
+        
 </pre>
 </div>
 <div class = "comment">
-Create a mesh.
+Create a mesh, with dimension to be overridden later, distributed
+across the default MPI communicator.
 </div>
 
 <div class ="fragment">
 <pre>
-          Mesh mesh;
+          Mesh mesh(init.comm());
         
 </pre>
 </div>
@@ -765,7 +766,7 @@ on the coarse grid read in from lshaped.xda
 <pre>
           MeshRefinement initial_uniform_refinements(mesh);
           initial_uniform_refinements.uniformly_refine(param.coarserefinements);
-            
+        
           std::cout &lt;&lt; "Building system" &lt;&lt; std::endl;
         
 </pre>
@@ -787,7 +788,7 @@ Set its parameters
 <div class ="fragment">
 <pre>
           set_system_parameters(system, param);
-          
+        
           std::cout &lt;&lt; "Initializing systems" &lt;&lt; std::endl;
         
           equation_systems.init ();
@@ -804,7 +805,7 @@ Print information about the mesh and system to the screen.
           equation_systems.print_info();
           LinearSolver&lt;Number&gt; *linear_solver = system.get_linear_solver();
         
-          {	
+          {
 </pre>
 </div>
 <div class = "comment">
@@ -815,7 +816,7 @@ Adaptively solve the timestep
 <pre>
             unsigned int a_step = 0;
             for (; a_step != param.max_adaptivesteps; ++a_step)
-              {	    	    
+              {
 </pre>
 </div>
 <div class = "comment">
@@ -838,7 +839,7 @@ target mesh size
 <pre>
                     else
                       libmesh_assert_greater (param.nelem_target, 0);
-            	
+        
         	linear_solver-&gt;reuse_preconditioner(false);
         
 </pre>
@@ -854,13 +855,13 @@ Solve the forward problem
 </pre>
 </div>
 <div class = "comment">
-Write out the computed primal solution	
+Write out the computed primal solution
 </div>
 
 <div class ="fragment">
 <pre>
                 write_output(equation_systems, a_step, "primal");
-        	
+        
 </pre>
 </div>
 <div class = "comment">
@@ -891,7 +892,7 @@ Declare a qoi_indices vector, each index will correspond to a QoI
 <pre>
                 std::vector&lt;unsigned int&gt; qoi_indices;
         	qoi_indices.push_back(0);
-        	qoi_indices.push_back(1);	
+        	qoi_indices.push_back(1);
         	qois.add_indices(qoi_indices);
         
 </pre>
@@ -903,8 +904,8 @@ estimate to be used for flagging elements for refinement
 
 <div class ="fragment">
 <pre>
-                qois.set_weight(0, 0.5);        
-        	qois.set_weight(1, 0.5);	
+                qois.set_weight(0, 0.5);
+        	qois.set_weight(1, 0.5);
         
 </pre>
 </div>
@@ -920,13 +921,13 @@ Make sure we get the contributions to the adjoint RHS from the sides
 </div>
 <div class = "comment">
 We are about to solve the adjoint system, but before we do this we see the same preconditioner
-flag to reuse the preconditioner from the forward solver		
+flag to reuse the preconditioner from the forward solver
 </div>
 
 <div class ="fragment">
 <pre>
                 linear_solver-&gt;reuse_preconditioner(param.reuse_preconditioner);
-        	
+        
 </pre>
 </div>
 <div class = "comment">
@@ -966,7 +967,7 @@ Swap the primal and dual solutions so we can write out the adjoint solution
 
 <div class ="fragment">
 <pre>
-                primal_solution.swap(dual_solution_0);            
+                primal_solution.swap(dual_solution_0);
         	write_output(equation_systems, a_step, "adjoint_0");
         
 </pre>
@@ -978,7 +979,7 @@ Swap back
 <div class ="fragment">
 <pre>
                 primal_solution.swap(dual_solution_0);
-        	
+        
 </pre>
 </div>
 <div class = "comment">
@@ -988,7 +989,7 @@ Get a pointer to the solution vector of the adjoint problem for QoI 0
 <div class ="fragment">
 <pre>
                 NumericVector&lt;Number&gt; &dual_solution_1 = system.get_adjoint_solution(1);
-        	
+        
 </pre>
 </div>
 <div class = "comment">
@@ -997,7 +998,7 @@ Swap again
 
 <div class ="fragment">
 <pre>
-                primal_solution.swap(dual_solution_1);            
+                primal_solution.swap(dual_solution_1);
         	write_output(equation_systems, a_step, "adjoint_1");
         
 </pre>
@@ -1009,7 +1010,7 @@ Swap back again
 <div class ="fragment">
 <pre>
                 primal_solution.swap(dual_solution_1);
-        				    
+        
         	std::cout &lt;&lt; "Adaptive step " &lt;&lt; a_step &lt;&lt; ", we have " &lt;&lt; mesh.n_active_elem()
                               &lt;&lt; " active elements and "
                               &lt;&lt; equation_systems.n_active_dofs()
@@ -1023,26 +1024,26 @@ Postprocess, compute the approximate QoIs and write them out to the console
 
 <div class ="fragment">
 <pre>
-                std::cout &lt;&lt; "Postprocessing: " &lt;&lt; std::endl; 
+                std::cout &lt;&lt; "Postprocessing: " &lt;&lt; std::endl;
         	system.postprocess_sides = true;
         	system.postprocess();
         	Number QoI_0_computed = system.get_QoI_value("computed", 0);
         	Number QoI_0_exact = system.get_QoI_value("exact", 0);
         	Number QoI_1_computed = system.get_QoI_value("computed", 1);
         	Number QoI_1_exact = system.get_QoI_value("exact", 1);
-        		
+        
         	std::cout&lt;&lt; "The relative error in QoI 0 is " &lt;&lt; std::setprecision(17)
                          &lt;&lt; std::abs(QoI_0_computed - QoI_0_exact) /
                             std::abs(QoI_0_exact) &lt;&lt; std::endl;
-        		
-        	std::cout&lt;&lt; "The relative error in QoI 1 is " &lt;&lt; std::setprecision(17) 
+        
+        	std::cout&lt;&lt; "The relative error in QoI 1 is " &lt;&lt; std::setprecision(17)
                          &lt;&lt; std::abs(QoI_1_computed - QoI_1_exact) /
                             std::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
-        	
+        
 </pre>
 </div>
 <div class = "comment">
-We will declare an error vector for passing to the adjoint refinement error estimator	
+We will declare an error vector for passing to the adjoint refinement error estimator
 </div>
 
 <div class ="fragment">
@@ -1059,7 +1060,7 @@ Build an adjoint refinement error estimator object
 <pre>
                 AutoPtr&lt;AdjointRefinementEstimator&gt; adjoint_refinement_error_estimator =
         	  build_adjoint_refinement_error_estimator(qois);
-        	
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1073,7 +1074,7 @@ Estimate the error in each element using the Adjoint Refinement estimator
 </pre>
 </div>
 <div class = "comment">
-Print out the computed error estimate, note that we access the global error estimates 
+Print out the computed error estimate, note that we access the global error estimates
 using an accessor function, right now sum(QoI_elementwise_error) != global_QoI_error_estimate
 </div>
 
@@ -1082,8 +1083,8 @@ using an accessor function, right now sum(QoI_elementwise_error) != global_QoI_e
                 std::cout&lt;&lt; "The computed relative error in QoI 0 is " &lt;&lt; std::setprecision(17)
                          &lt;&lt; std::abs(adjoint_refinement_error_estimator-&gt;get_global_QoI_error_estimate(0)) /
                             std::abs(QoI_0_exact) &lt;&lt; std::endl;
-        		
-        	std::cout&lt;&lt; "The computed relative error in QoI 1 is " &lt;&lt; std::setprecision(17) 
+        
+        	std::cout&lt;&lt; "The computed relative error in QoI 1 is " &lt;&lt; std::setprecision(17)
                          &lt;&lt; std::abs(adjoint_refinement_error_estimator-&gt;get_global_QoI_error_estimate(1)) /
         	  std::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
         
@@ -1102,13 +1103,13 @@ Also print out effecitivity indices (estimated error/true error)
         	std::cout&lt;&lt; "The effectivity index for the computed error in QoI 1 is " &lt;&lt; std::setprecision(17)
                          &lt;&lt; std::abs(adjoint_refinement_error_estimator-&gt;get_global_QoI_error_estimate(1)) /
         	  std::abs(QoI_1_computed - QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
-        					    	    
+        
 </pre>
 </div>
 <div class = "comment">
-We have to refine either based on reaching an error tolerance or 
+We have to refine either based on reaching an error tolerance or
 a number of elements target, which should be verified above
-Otherwise we flag elements by error tolerance or nelem target	  
+Otherwise we flag elements by error tolerance or nelem target
 
 
 <br><br>Uniform refinement
@@ -1117,7 +1118,7 @@ Otherwise we flag elements by error tolerance or nelem target
 <div class ="fragment">
 <pre>
                 if(param.refine_uniformly)
-        	  {	  			    
+        	  {
         	    mesh_refinement-&gt;uniformly_refine(1);
         	  }
 </pre>
@@ -1129,9 +1130,9 @@ Adaptively refine based on reaching an error tolerance
 <div class ="fragment">
 <pre>
                 else if(param.global_tolerance &gt;= 0. && param.nelem_target == 0.)
-        	  {	      	    
-        	    mesh_refinement-&gt;flag_elements_by_error_tolerance (QoI_elementwise_error);              
-        	    
+        	  {
+        	    mesh_refinement-&gt;flag_elements_by_error_tolerance (QoI_elementwise_error);
+        
         	    mesh_refinement-&gt;refine_and_coarsen_elements();
         	  }
 </pre>
@@ -1142,19 +1143,19 @@ Adaptively refine based on reaching a target number of elements
 
 <div class ="fragment">
 <pre>
-                else 
-        	  {	      	    	    
+                else
+        	  {
         	    if (mesh.n_active_elem() &gt;= param.nelem_target)
         	      {
         		std::cout&lt;&lt;"We reached the target number of elements."&lt;&lt;std::endl &lt;&lt;std::endl;
         		break;
-        	      }				
-        	    
+        	      }
+        
         	    mesh_refinement-&gt;flag_elements_by_nelem_target (QoI_elementwise_error);
-        	    	    
+        
         	    mesh_refinement-&gt;refine_and_coarsen_elements();
         	  }
-                    
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1181,28 +1182,28 @@ Do one last solve if necessary
 <div class ="fragment">
 <pre>
             if (a_step == param.max_adaptivesteps)
-              {	 
-        	linear_solver-&gt;reuse_preconditioner(false);	
+              {
+        	linear_solver-&gt;reuse_preconditioner(false);
         	system.solve();
-        	
+        
         	write_output(equation_systems, a_step, "primal");
         
         	NumericVector&lt;Number&gt; &primal_solution = *system.solution;
-        	
+        
         	QoISet qois;
         	std::vector&lt;unsigned int&gt; qoi_indices;
         
         	qoi_indices.push_back(0);
-        	qoi_indices.push_back(1);	
+        	qoi_indices.push_back(1);
         	qois.add_indices(qoi_indices);
-        	
-        	qois.set_weight(0, 0.5);	
-        	qois.set_weight(1, 0.5);	
         
-        	system.assemble_qoi_sides = true;	
+        	qois.set_weight(0, 0.5);
+        	qois.set_weight(1, 0.5);
+        
+        	system.assemble_qoi_sides = true;
         	linear_solver-&gt;reuse_preconditioner(param.reuse_preconditioner);
         	system.adjoint_solve();
-        		
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1214,37 +1215,37 @@ Now that we have solved the adjoint, set the adjoint_already_solved boolean to t
                 system.set_adjoint_already_solved(true);
         
         	NumericVector&lt;Number&gt; &dual_solution_0 = system.get_adjoint_solution(0);
-        	
-        	primal_solution.swap(dual_solution_0);	    
+        
+        	primal_solution.swap(dual_solution_0);
         	write_output(equation_systems, a_step, "adjoint_0");
         
         	primal_solution.swap(dual_solution_0);
-        	
+        
         	NumericVector&lt;Number&gt; &dual_solution_1 = system.get_adjoint_solution(1);
-        	
-        	primal_solution.swap(dual_solution_1);	    
+        
+        	primal_solution.swap(dual_solution_1);
         	write_output(equation_systems, a_step, "adjoint_1");
         
         	primal_solution.swap(dual_solution_1);
-        					
+        
         	std::cout &lt;&lt; "Adaptive step " &lt;&lt; a_step &lt;&lt; ", we have " &lt;&lt; mesh.n_active_elem()
         		  &lt;&lt; " active elements and "
         		  &lt;&lt; equation_systems.n_active_dofs()
-        		  &lt;&lt; " active dofs." &lt;&lt; std::endl ;	
-        	
-        	std::cout &lt;&lt; "Postprocessing: " &lt;&lt; std::endl; 
+        		  &lt;&lt; " active dofs." &lt;&lt; std::endl ;
+        
+        	std::cout &lt;&lt; "Postprocessing: " &lt;&lt; std::endl;
         	system.postprocess_sides = true;
         	system.postprocess();
-        	
+        
         	Number QoI_0_computed = system.get_QoI_value("computed", 0);
         	Number QoI_0_exact = system.get_QoI_value("exact", 0);
         	Number QoI_1_computed = system.get_QoI_value("computed", 1);
         	Number QoI_1_exact = system.get_QoI_value("exact", 1);
-        	
+        
         	std::cout&lt;&lt; "The relative error in QoI 0 is " &lt;&lt; std::setprecision(17)
                          &lt;&lt; std::abs(QoI_0_computed - QoI_0_exact) /
                             std::abs(QoI_0_exact) &lt;&lt; std::endl;
-        	
+        
         	std::cout&lt;&lt; "The relative error in QoI 1 is " &lt;&lt; std::setprecision(17)
                          &lt;&lt; std::abs(QoI_1_computed - QoI_1_exact) /
                             std::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
@@ -1271,7 +1272,7 @@ Build an adjoint refinement error estimator object
 <pre>
                 AutoPtr&lt;AdjointRefinementEstimator&gt; adjoint_refinement_error_estimator =
         	  build_adjoint_refinement_error_estimator(qois);
-        	
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1285,7 +1286,7 @@ Estimate the error in each element using the Adjoint Refinement estimator
 </pre>
 </div>
 <div class = "comment">
-Print out the computed error estimate, note that we access the global error estimates 
+Print out the computed error estimate, note that we access the global error estimates
 using an accessor function, right now sum(QoI_elementwise_error) != global_QoI_error_estimate
 </div>
 
@@ -1294,10 +1295,10 @@ using an accessor function, right now sum(QoI_elementwise_error) != global_QoI_e
                 std::cout&lt;&lt; "The computed relative error in QoI 0 is " &lt;&lt; std::setprecision(17)
                          &lt;&lt; std::abs(adjoint_refinement_error_estimator-&gt;get_global_QoI_error_estimate(0)) /
                             std::abs(QoI_0_exact) &lt;&lt; std::endl;
-        		
-        	std::cout&lt;&lt; "The computed relative error in QoI 1 is " &lt;&lt; std::setprecision(17) 
+        
+        	std::cout&lt;&lt; "The computed relative error in QoI 1 is " &lt;&lt; std::setprecision(17)
                          &lt;&lt; std::abs(adjoint_refinement_error_estimator-&gt;get_global_QoI_error_estimate(1)) /
-        	  std::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;	
+        	  std::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
         
 </pre>
 </div>
@@ -1318,15 +1319,15 @@ Also print out effecitivity indices (estimated error/true error)
               }
           }
         
-          std::cerr &lt;&lt; '[' &lt;&lt; libMesh::processor_id() 
-                    &lt;&lt; "] Completing output." &lt;&lt; std::endl; 
+          std::cerr &lt;&lt; '[' &lt;&lt; libMesh::processor_id()
+                    &lt;&lt; "] Completing output." &lt;&lt; std::endl;
         
         #endif // #ifndef LIBMESH_ENABLE_AMR
-            
+        
 </pre>
 </div>
 <div class = "comment">
-All done.  
+All done.
 </div>
 
 <div class ="fragment">
@@ -1376,7 +1377,7 @@ Bring in everything from the libMesh namespace
 Last modified: Feb 13, 2009
 
 
-<br><br>Define the postprocess function to compute QoI 0, the integral of the the solution 
+<br><br>Define the postprocess function to compute QoI 0, the integral of the the solution
 over a subdomain
 
 
@@ -1386,9 +1387,9 @@ over a subdomain
 <pre>
         void LaplaceSystem::element_postprocess (DiffContext &context)
         
-        {  
+        {
           FEMContext &c = libmesh_cast_ref&lt;FEMContext&&gt;(context);
-                    
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1416,7 +1417,7 @@ The number of local degrees of freedom in each variable
 </pre>
 </div>
 <div class = "comment">
-The function R = int_{omega} T dR 
+The function R = int_{omega} T dR
 omega is a subset of Omega (the whole domain), omega = [0.75, 1.0] x [0.0, 0.25]
 
 
@@ -1425,18 +1426,18 @@ omega is a subset of Omega (the whole domain), omega = [0.75, 1.0] x [0.0, 0.25]
 <div class ="fragment">
 <pre>
           Number dQoI_0 = 0.;
-          
+        
 </pre>
 </div>
 <div class = "comment">
-Loop over quadrature points  
-  
+Loop over quadrature points
+
 
 <br><br></div>
 
 <div class ="fragment">
 <pre>
-          for (unsigned int qp = 0; qp != n_qpoints; qp++)    
+          for (unsigned int qp = 0; qp != n_qpoints; qp++)
             {
 </pre>
 </div>
@@ -1458,7 +1459,7 @@ If in the sub-domain omega, add the contribution to the integral R
 <div class ="fragment">
 <pre>
               if(fabs(x - 0.875) &lt;= 0.125 && fabs(y - 0.125) &lt;= 0.125)
-          	{      
+          	{
 </pre>
 </div>
 <div class = "comment">
@@ -1491,8 +1492,8 @@ Update the computed value of the global functional R, by adding the contribution
 
 <div class ="fragment">
 <pre>
-          computed_QoI[0] = computed_QoI[0] + dQoI_0;    
-          
+          computed_QoI[0] = computed_QoI[0] + dQoI_0;
+        
         }
 </pre>
 </div>
@@ -1544,7 +1545,7 @@ to see if it was requested from us
                                                     const QoISet & /* qois */)
         {
           FEMContext &c = libmesh_cast_ref&lt;FEMContext&&gt;(context);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1568,7 +1569,7 @@ The basis functions for the element
 <div class ="fragment">
 <pre>
           const std::vector&lt;std::vector&lt;Real&gt; &gt;          &phi = c.element_fe_var[0]-&gt;get_phi();
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1588,8 +1589,8 @@ The number of local degrees of freedom in each variable
 <div class ="fragment">
 <pre>
           const unsigned int n_T_dofs = c.dof_indices_var[0].size();
-          unsigned int n_qpoints = (c.get_element_qrule())-&gt;n_points();  
-          
+          unsigned int n_qpoints = (c.get_element_qrule())-&gt;n_points();
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1601,7 +1602,7 @@ Our system has only one variable, so we only have to fill the [0][0] subderivati
 <div class ="fragment">
 <pre>
           DenseSubVector&lt;Number&gt; &Q = *c.elem_qoi_subderivatives[0][0];
-              
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1614,7 +1615,7 @@ Loop over the qps
             {
               const Real x = q_point[qp](0);
               const Real y = q_point[qp](1);
-                          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1625,11 +1626,11 @@ to the adjoint rhs
 <div class ="fragment">
 <pre>
               if(fabs(x - 0.875) &lt;= 0.125 && fabs(y - 0.125) &lt;= 0.125)
-              	{  	        	 	  
+              	{
         	  for (unsigned int i=0; i != n_T_dofs; i++)
         	    Q(i) += JxW[qp] *phi[i][qp] ;
               	}
-                    
+        
             } // end of the quadrature point qp-loop
         }
 </pre>
@@ -1658,9 +1659,9 @@ to the adjoint rhs
         void FEMParameters::read(GetPot &input)
         {
             std::vector&lt;std::string&gt; variable_names;
-           
-            
-            GETPOT_INT_INPUT(coarserefinements);  
+        
+        
+            GETPOT_INT_INPUT(coarserefinements);
             GETPOT_INPUT(domainfile);
         
             GETPOT_INPUT(solver_quiet);
@@ -1679,7 +1680,7 @@ to the adjoint rhs
             GETPOT_INPUT(refine_fraction);
             GETPOT_INPUT(coarsen_fraction);
             GETPOT_INPUT(coarsen_threshold);
-            GETPOT_INT_INPUT(max_adaptivesteps);   
+            GETPOT_INT_INPUT(max_adaptivesteps);
             GETPOT_INPUT(refine_uniformly);
             GETPOT_INPUT(indicator_type);
             GETPOT_INPUT(patch_reuse);
@@ -1765,7 +1766,7 @@ Bring in everything from the libMesh namespace
           GetPot infile("l-shaped.in");
           exact_QoI[0] = infile("QoI_0", 0.0);
           exact_QoI[1] = infile("QoI_1", 0.0);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1849,7 +1850,7 @@ Element basis functions
 <div class ="fragment">
 <pre>
           const std::vector&lt;std::vector&lt;RealGradient&gt; &gt; &dphi = c.element_fe_var[0]-&gt;get_dphi();
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1858,7 +1859,7 @@ The number of local degrees of freedom in each variable
 
 <div class ="fragment">
 <pre>
-          const unsigned int n_T_dofs = c.dof_indices_var[0].size(); 
+          const unsigned int n_T_dofs = c.dof_indices_var[0].size();
         
 </pre>
 </div>
@@ -1887,7 +1888,7 @@ weight functions.
           unsigned int n_qpoints = (c.get_element_qrule())-&gt;n_points();
         
           for (unsigned int qp=0; qp != n_qpoints; qp++)
-            {     	
+            {
 </pre>
 </div>
 <div class = "comment">
@@ -1921,7 +1922,7 @@ The analytic jacobian
 <pre>
                     K(i,j) += JxW[qp] * ( dphi[i][qp] * dphi[j][qp] );
             } // end of the quadrature point qp-loop
-          
+        
           return compute_jacobian;
         }
         
@@ -1939,7 +1940,7 @@ Set Dirichlet bcs, side contributions to global stiffness matrix
 </pre>
 </div>
 <div class = "comment">
-Are the jacobians specified analytically ? 
+Are the jacobians specified analytically ?
 </div>
 
 <div class ="fragment">
@@ -1947,7 +1948,7 @@ Are the jacobians specified analytically ?
           bool compute_jacobian = request_jacobian && _analytic_jacobians;
         
           FEMContext &c = libmesh_cast_ref&lt;FEMContext&&gt;(context);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1990,7 +1991,7 @@ The number of local degrees of freedom in each variable
 
 <div class ="fragment">
 <pre>
-          const unsigned int n_T_dofs = c.dof_indices_var[0].size(); 
+          const unsigned int n_T_dofs = c.dof_indices_var[0].size();
         
 </pre>
 </div>
@@ -2002,7 +2003,7 @@ The subvectors and submatrices we need to fill:
 <pre>
           DenseSubMatrix&lt;Number&gt; &K = *c.elem_subjacobians[0][0];
           DenseSubVector&lt;Number&gt; &F = *c.elem_subresiduals[0];
-              
+        
           unsigned int n_qpoints = (c.get_side_qrule())-&gt;n_points();
         
           const Real penalty = 1./(TOLERANCE*TOLERANCE);
@@ -2018,7 +2019,7 @@ Compute the solution at the old Newton iterate
 <div class ="fragment">
 <pre>
               Number T = c.side_value(0, qp);
-                    
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2050,24 +2051,24 @@ The analytic jacobian
 
 <div class ="fragment">
 <pre>
-                    K(i,j) += JxW[qp] * penalty * phi[i][qp] * phi[j][qp];    
-        	
+                    K(i,j) += JxW[qp] * penalty * phi[i][qp] * phi[j][qp];
+        
             } // end of the quadrature point qp-loop
-          
+        
           return compute_jacobian;
         }
         
 </pre>
 </div>
 <div class = "comment">
-Override the default DiffSystem postprocess function to compute the 
-approximations to the QoIs 
+Override the default DiffSystem postprocess function to compute the
+approximations to the QoIs
 </div>
 
 <div class ="fragment">
 <pre>
         void LaplaceSystem::postprocess()
-        {  
+        {
 </pre>
 </div>
 <div class = "comment">
@@ -2081,10 +2082,10 @@ Reset the array holding the computed QoIs
         
           FEMSystem::postprocess();
         
-          CommWorld.sum(computed_QoI[0]);
+          this-&gt;comm().sum(computed_QoI[0]);
         
-          CommWorld.sum(computed_QoI[1]);
-             
+          this-&gt;comm().sum(computed_QoI[1]);
+        
         }
         
 </pre>
@@ -2096,7 +2097,7 @@ u_exact = r^(2/3)*sin(2*theta/3). We use this to set the Dirichlet boundary cond
 
 <div class ="fragment">
 <pre>
-        Number LaplaceSystem::exact_solution(const Point& p)// xyz location   
+        Number LaplaceSystem::exact_solution(const Point& p)// xyz location
         {
           const Real x1 = p(0);
           const Real x2 = p(1);
@@ -2113,9 +2114,9 @@ Make sure 0 <= theta <= 2*pi
 <pre>
           if (theta &lt; 0)
             theta += 2. * libMesh::pi;
-            
+        
           return pow(x1*x1 + x2*x2, 1./3.)*sin(2./3.*theta);
-                   
+        
         }
 </pre>
 </div>
@@ -2167,9 +2168,9 @@ derivative of the solution over part of the boundary
 <pre>
         void LaplaceSystem::side_postprocess(DiffContext &context)
         {
-          
+        
           FEMContext &c = libmesh_cast_ref&lt;FEMContext&&gt;(context);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2188,8 +2189,8 @@ will be used to assemble the linear system.
         
           const std::vector&lt;Point&gt; &face_normals = c.side_fe_var[0]-&gt;get_normals();
         
-          unsigned int n_qpoints = (c.get_side_qrule())-&gt;n_points();  
-          
+          unsigned int n_qpoints = (c.get_side_qrule())-&gt;n_points();
+        
           Number dQoI_1 = 0. ;
         
 </pre>
@@ -2207,7 +2208,7 @@ to get the QoI
               const Real y = q_point[qp](1);
         
               const Real TOL = 1.e-5;
-              
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2226,7 +2227,7 @@ Get the value of the gradient at this point
 
 <div class ="fragment">
 <pre>
-                  const Gradient grad_T = c.side_gradient(0,qp);          
+                  const Gradient grad_T = c.side_gradient(0,qp);
         
 </pre>
 </div>
@@ -2236,12 +2237,12 @@ Add the contribution of this qp to the integral QoI
 
 <div class ="fragment">
 <pre>
-                  dQoI_1 += JxW[qp] * (grad_T * face_normals[qp] * x * (x - 1.)) ;          
+                  dQoI_1 += JxW[qp] * (grad_T * face_normals[qp] * x * (x - 1.)) ;
         	}
-              
+        
             } // end of the quadrature point qp-loop
-          
-          computed_QoI[1] = computed_QoI[1] + dQoI_1; 
+        
+          computed_QoI[1] = computed_QoI[1] + dQoI_1;
         }
 </pre>
 </div>
@@ -2293,7 +2294,7 @@ to see if it was requested from us
                                                  const QoISet & /* qois */)
         {
           FEMContext &c = libmesh_cast_ref&lt;FEMContext&&gt;(context);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2317,7 +2318,7 @@ Basis Functions
 <div class ="fragment">
 <pre>
           const std::vector&lt;std::vector&lt;RealGradient&gt; &gt; &dphi = c.side_fe_var[0]-&gt;get_dphi();
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2347,7 +2348,7 @@ The number of local degrees of freedom in each variable
 <div class ="fragment">
 <pre>
           const unsigned int n_T_dofs = c.dof_indices_var[0].size();
-          unsigned int n_qpoints = (c.get_side_qrule())-&gt;n_points();  
+          unsigned int n_qpoints = (c.get_side_qrule())-&gt;n_points();
         
 </pre>
 </div>
@@ -2366,8 +2367,8 @@ Our system has only one variable, so we only have to fill the [1][0] subderivati
           for (unsigned int qp=0; qp != n_qpoints; qp++)
             {
               const Real x = q_point[qp](0);
-              const Real y = q_point[qp](1);                  
-              
+              const Real y = q_point[qp](1);
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2378,13 +2379,13 @@ to the adjoint rhs
 <div class ="fragment">
 <pre>
               if(fabs(y - 1.0) &lt;= TOL && x &gt; 0.0)
-          	{  	  	  	  
+          	{
           	  for (unsigned int i=0; i != n_T_dofs; i++)
-        	    {	      
-        	      Q1(i) += JxW[qp] * (dphi[i][qp] * face_normals[qp]) * x * (x - 1.);  	    	    	    	    	  
+        	    {
+        	      Q1(i) += JxW[qp] * (dphi[i][qp] * face_normals[qp]) * x * (x - 1.);
         	    }
-          	}      
-             
+          	}
+        
             } // end of the quadrature point qp-loop
         }
 </pre>
@@ -2407,9 +2408,9 @@ to the adjoint rhs
   <B><FONT COLOR="#228B22">class</FONT></B> FEMParameters
   {
   <B><FONT COLOR="#228B22">public</FONT></B>:
-      FEMParameters() :  
+      FEMParameters() :
         domainfile(<B><FONT COLOR="#BC8F8F">&quot;lshaped.xda&quot;</FONT></B>),
-        coarserefinements(0),            
+        coarserefinements(0),
         solver_quiet(true),
   	reuse_preconditioner(false),
         require_residual_reduction(true),
@@ -2421,19 +2422,19 @@ to the adjoint rhs
         nelem_target(30000), global_tolerance(0.0),
         refine_fraction(0.3), coarsen_fraction(0.3), coarsen_threshold(10),
         refine_uniformly(false),
-        max_adaptivesteps(1),      
+        max_adaptivesteps(1),
   	indicator_type(<B><FONT COLOR="#BC8F8F">&quot;kelly&quot;</FONT></B>), patch_reuse(true),
-        fe_family(1, <B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>), fe_order(1, 1),	
+        fe_family(1, <B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>), fe_order(1, 1),
         analytic_jacobians(true), verify_analytic_jacobians(0.0),
         print_solution_norms(false), print_solutions(false),
         print_residual_norms(false), print_residuals(false),
         print_jacobian_norms(false), print_jacobians(false) {}
   
       <B><FONT COLOR="#228B22">void</FONT></B> read(GetPot &amp;input);
-     
+  
       <B><FONT COLOR="#5F9EA0">std</FONT></B>::string domainfile;
       <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> coarserefinements;
-              
+  
       <B><FONT COLOR="#228B22">bool</FONT></B> solver_quiet, reuse_preconditioner, require_residual_reduction;
       Real min_step_length;
       <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_linear_iterations, max_nonlinear_iterations;
@@ -2446,8 +2447,8 @@ to the adjoint rhs
       Real refine_fraction, coarsen_fraction, coarsen_threshold;
       <B><FONT COLOR="#228B22">bool</FONT></B> refine_uniformly;
       <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> max_adaptivesteps;
-      
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::string indicator_type;    
+  
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::string indicator_type;
       <B><FONT COLOR="#228B22">bool</FONT></B> patch_reuse;
   
       <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;std::string&gt; fe_family;
@@ -2477,9 +2478,9 @@ to the adjoint rhs
   {
   <B><FONT COLOR="#228B22">public</FONT></B>:
     LaplaceSystem(EquationSystems&amp; es,
-                 <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name,
-                 <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number)
-    : FEMSystem(es, name, number),
+                 <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name_in,
+                 <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number_in)
+    : FEMSystem(es, name_in, number_in),
       _fe_family(<B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>), _fe_order(1),
       _analytic_jacobians(true) { qoi.resize(2); }
   
@@ -2514,28 +2515,28 @@ to the adjoint rhs
   				DiffContext &amp;context);
   
   
-    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> element_postprocess(DiffContext &amp;context);  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> element_postprocess(DiffContext &amp;context);
   
     <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> side_postprocess(DiffContext &amp;context);
   
   
     <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> element_qoi_derivative
       (DiffContext &amp;context,
-       <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; qois);  
+       <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; qois);
   
   
     <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> side_qoi_derivative
       (DiffContext &amp;context,
-       <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; qois);  
+       <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; qois);
   
     Number exact_solution (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp;);
   
-    
+  
     Number computed_QoI[2];
   
-   
+  
     Number exact_QoI[2];
-    
+  
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::string _fe_family;
     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> _fe_order;
   
@@ -2574,7 +2575,7 @@ to the adjoint rhs
   
   
   
-  <B><FONT COLOR="#228B22">void</FONT></B> write_output(EquationSystems &amp;es,		                   
+  <B><FONT COLOR="#228B22">void</FONT></B> write_output(EquationSystems &amp;es,
   		  <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> a_step,       <I><FONT COLOR="#B22222">// The adaptive step count
 </FONT></I>  		  <B><FONT COLOR="#5F9EA0">std</FONT></B>::string solution_type) <I><FONT COLOR="#B22222">// primal or adjoint solve
 </FONT></I>  {
@@ -2588,10 +2589,10 @@ to the adjoint rhs
                   &lt;&lt; std::setfill(<B><FONT COLOR="#BC8F8F">'0'</FONT></B>)
                   &lt;&lt; std::right
                   &lt;&lt; a_step;
-    
+  
     GMVIO(mesh).write_equation_systems
       (file_name_gmv.str(), es);
-  #endif    
+  #endif
   }
   
   
@@ -2617,7 +2618,7 @@ to the adjoint rhs
     {
       NewtonSolver *solver = <B><FONT COLOR="#A020F0">new</FONT></B> NewtonSolver(system);
       system.time_solver-&gt;diff_solver() = AutoPtr&lt;DiffSolver&gt;(solver);
-      
+  
       solver-&gt;quiet                       = param.solver_quiet;
       solver-&gt;max_nonlinear_iterations    = param.max_nonlinear_iterations;
       solver-&gt;minsteplength               = param.min_step_length;
@@ -2630,10 +2631,10 @@ to the adjoint rhs
   	solver-&gt;continue_after_max_iterations = true;
   	solver-&gt;continue_after_backtrack_failure = true;
         }
-      
+  
       solver-&gt;max_linear_iterations       = param.max_linear_iterations;
       solver-&gt;initial_linear_tolerance    = param.initial_linear_tolerance;
-      solver-&gt;minimum_linear_tolerance    = param.minimum_linear_tolerance;      
+      solver-&gt;minimum_linear_tolerance    = param.minimum_linear_tolerance;
     }
   }
   
@@ -2646,9 +2647,9 @@ to the adjoint rhs
     AutoPtr&lt;MeshRefinement&gt; mesh_refinement(<B><FONT COLOR="#A020F0">new</FONT></B> MeshRefinement(mesh));
     mesh_refinement-&gt;coarsen_by_parents() = true;
     mesh_refinement-&gt;absolute_global_tolerance() = param.global_tolerance;
-    mesh_refinement-&gt;nelem_target()      = param.nelem_target;  
+    mesh_refinement-&gt;nelem_target()      = param.nelem_target;
     mesh_refinement-&gt;refine_fraction()   = param.refine_fraction;
-    mesh_refinement-&gt;coarsen_fraction()  = param.coarsen_fraction;  
+    mesh_refinement-&gt;coarsen_fraction()  = param.coarsen_fraction;
     mesh_refinement-&gt;coarsen_threshold() = param.coarsen_threshold;
   
     <B><FONT COLOR="#A020F0">return</FONT></B> mesh_refinement;
@@ -2661,13 +2662,13 @@ to the adjoint rhs
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt;<B><FONT COLOR="#BC8F8F">&quot;Computing the error estimate using the Adjoint Refinement Error Estimator&quot;</FONT></B>&lt;&lt;std::endl&lt;&lt;std::endl;
   
     AdjointRefinementEstimator *adjoint_refinement_estimator = <B><FONT COLOR="#A020F0">new</FONT></B> AdjointRefinementEstimator;
-    
+  
     error_estimator.reset (adjoint_refinement_estimator);
-    
+  
     adjoint_refinement_estimator-&gt;qoi_set() = qois;
   
     adjoint_refinement_estimator-&gt;number_h_refinements = 2;
-        
+  
     <B><FONT COLOR="#A020F0">return</FONT></B> error_estimator;
   }
   
@@ -2688,9 +2689,9 @@ to the adjoint rhs
       <B><FONT COLOR="#5F9EA0">std</FONT></B>::ifstream i(<B><FONT COLOR="#BC8F8F">&quot;general.in&quot;</FONT></B>);
       <B><FONT COLOR="#A020F0">if</FONT></B> (!i)
         {
-          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">'['</FONT></B> &lt;&lt; libMesh::processor_id() 
-                    &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;] Can't find general.in; exiting early.&quot;</FONT></B> 
-                    &lt;&lt; std::endl; 
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">'['</FONT></B> &lt;&lt; libMesh::processor_id()
+                    &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;] Can't find general.in; exiting early.&quot;</FONT></B>
+                    &lt;&lt; std::endl;
           libmesh_error();
         }
     }
@@ -2700,8 +2701,8 @@ to the adjoint rhs
     param.read(infile);
   
     libmesh_example_assert(2 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
-    
-    Mesh mesh;
+  
+    Mesh mesh(init.comm());
   
     AutoPtr&lt;MeshRefinement&gt; mesh_refinement =
       build_mesh_refinement(mesh, param);
@@ -2715,13 +2716,13 @@ to the adjoint rhs
   
     MeshRefinement initial_uniform_refinements(mesh);
     initial_uniform_refinements.uniformly_refine(param.coarserefinements);
-      
+  
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Building system&quot;</FONT></B> &lt;&lt; std::endl;
   
     LaplaceSystem &amp;system = equation_systems.add_system&lt;LaplaceSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;LaplaceSystem&quot;</FONT></B>);
   
     set_system_parameters(system, param);
-    
+  
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Initializing systems&quot;</FONT></B> &lt;&lt; std::endl;
   
     equation_systems.init ();
@@ -2730,88 +2731,88 @@ to the adjoint rhs
     equation_systems.print_info();
     LinearSolver&lt;Number&gt; *linear_solver = system.get_linear_solver();
   
-    {	
+    {
       <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> a_step = 0;
       <B><FONT COLOR="#A020F0">for</FONT></B> (; a_step != param.max_adaptivesteps; ++a_step)
-        {	    	    
+        {
   	<B><FONT COLOR="#A020F0">if</FONT></B> (param.global_tolerance != 0.)
   	  libmesh_assert_equal_to (param.nelem_target, 0);
               <B><FONT COLOR="#A020F0">else</FONT></B>
                 libmesh_assert_greater (param.nelem_target, 0);
-      	
+  
   	linear_solver-&gt;reuse_preconditioner(false);
   
   	system.solve();
   
   	write_output(equation_systems, a_step, <B><FONT COLOR="#BC8F8F">&quot;primal&quot;</FONT></B>);
-  	
+  
   	NumericVector&lt;Number&gt; &amp;primal_solution = *system.solution;
   
   	QoISet qois;
   
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; qoi_indices;
   	qoi_indices.push_back(0);
-  	qoi_indices.push_back(1);	
+  	qoi_indices.push_back(1);
   	qois.add_indices(qoi_indices);
   
-  	qois.set_weight(0, 0.5);	
-  	qois.set_weight(1, 0.5);	
+  	qois.set_weight(0, 0.5);
+  	qois.set_weight(1, 0.5);
   
   	system.assemble_qoi_sides = true;
   
   	linear_solver-&gt;reuse_preconditioner(param.reuse_preconditioner);
-  	
+  
   	system.adjoint_solve();
   
   	system.set_adjoint_already_solved(true);
   
   	NumericVector&lt;Number&gt; &amp;dual_solution_0 = system.get_adjoint_solution(0);
   
-  	primal_solution.swap(dual_solution_0);	    
+  	primal_solution.swap(dual_solution_0);
   	write_output(equation_systems, a_step, <B><FONT COLOR="#BC8F8F">&quot;adjoint_0&quot;</FONT></B>);
   
   	primal_solution.swap(dual_solution_0);
-  	
+  
   	NumericVector&lt;Number&gt; &amp;dual_solution_1 = system.get_adjoint_solution(1);
-  	
-  	primal_solution.swap(dual_solution_1);	    
+  
+  	primal_solution.swap(dual_solution_1);
   	write_output(equation_systems, a_step, <B><FONT COLOR="#BC8F8F">&quot;adjoint_1&quot;</FONT></B>);
   
   	primal_solution.swap(dual_solution_1);
-  				    
+  
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Adaptive step &quot;</FONT></B> &lt;&lt; a_step &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, we have &quot;</FONT></B> &lt;&lt; mesh.n_active_elem()
                         &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; active elements and &quot;</FONT></B>
                         &lt;&lt; equation_systems.n_active_dofs()
   		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; active dofs.&quot;</FONT></B> &lt;&lt; std::endl ;
   
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Postprocessing: &quot;</FONT></B> &lt;&lt; std::endl; 
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Postprocessing: &quot;</FONT></B> &lt;&lt; std::endl;
   	system.postprocess_sides = true;
   	system.postprocess();
   	Number QoI_0_computed = system.get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;computed&quot;</FONT></B>, 0);
   	Number QoI_0_exact = system.get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>, 0);
   	Number QoI_1_computed = system.get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;computed&quot;</FONT></B>, 1);
   	Number QoI_1_exact = system.get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>, 1);
-  		
+  
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The relative error in QoI 0 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
                    &lt;&lt; std::abs(QoI_0_computed - QoI_0_exact) /
                       <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_0_exact) &lt;&lt; std::endl;
-  		
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The relative error in QoI 1 is &quot;</FONT></B> &lt;&lt; std::setprecision(17) 
+  
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The relative error in QoI 1 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
                    &lt;&lt; std::abs(QoI_1_computed - QoI_1_exact) /
                       <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
-  	
+  
   	ErrorVector QoI_elementwise_error;
   
   	AutoPtr&lt;AdjointRefinementEstimator&gt; adjoint_refinement_error_estimator =
   	  build_adjoint_refinement_error_estimator(qois);
-  	
+  
   	adjoint_refinement_error_estimator-&gt;estimate_error(system, QoI_elementwise_error);
   
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The computed relative error in QoI 0 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
                    &lt;&lt; std::abs(adjoint_refinement_error_estimator-&gt;get_global_QoI_error_estimate(0)) /
                       <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_0_exact) &lt;&lt; std::endl;
-  		
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The computed relative error in QoI 1 is &quot;</FONT></B> &lt;&lt; std::setprecision(17) 
+  
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The computed relative error in QoI 1 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
                    &lt;&lt; std::abs(adjoint_refinement_error_estimator-&gt;get_global_QoI_error_estimate(1)) /
   	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
   
@@ -2822,31 +2823,31 @@ to the adjoint rhs
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The effectivity index for the computed error in QoI 1 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
                    &lt;&lt; std::abs(adjoint_refinement_error_estimator-&gt;get_global_QoI_error_estimate(1)) /
   	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_1_computed - QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
-  					    	    
+  
   
   	<B><FONT COLOR="#A020F0">if</FONT></B>(param.refine_uniformly)
-  	  {	  			    
+  	  {
   	    mesh_refinement-&gt;uniformly_refine(1);
   	  }
   	<B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>(param.global_tolerance &gt;= 0. &amp;&amp; param.nelem_target == 0.)
-  	  {	      	    
-  	    mesh_refinement-&gt;flag_elements_by_error_tolerance (QoI_elementwise_error);              
-  	    
+  	  {
+  	    mesh_refinement-&gt;flag_elements_by_error_tolerance (QoI_elementwise_error);
+  
   	    mesh_refinement-&gt;refine_and_coarsen_elements();
   	  }
-  	<B><FONT COLOR="#A020F0">else</FONT></B> 
-  	  {	      	    	    
+  	<B><FONT COLOR="#A020F0">else</FONT></B>
+  	  {
   	    <B><FONT COLOR="#A020F0">if</FONT></B> (mesh.n_active_elem() &gt;= param.nelem_target)
   	      {
   		<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt;<B><FONT COLOR="#BC8F8F">&quot;We reached the target number of elements.&quot;</FONT></B>&lt;&lt;std::endl &lt;&lt;std::endl;
   		<B><FONT COLOR="#A020F0">break</FONT></B>;
-  	      }				
-  	    
+  	      }
+  
   	    mesh_refinement-&gt;flag_elements_by_nelem_target (QoI_elementwise_error);
-  	    	    
+  
   	    mesh_refinement-&gt;refine_and_coarsen_elements();
   	  }
-              
+  
   	equation_systems.reinit();
   
           <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Refined mesh to &quot;</FONT></B>
@@ -2857,62 +2858,62 @@ to the adjoint rhs
         }
   
       <B><FONT COLOR="#A020F0">if</FONT></B> (a_step == param.max_adaptivesteps)
-        {	 
-  	linear_solver-&gt;reuse_preconditioner(false);	
+        {
+  	linear_solver-&gt;reuse_preconditioner(false);
   	system.solve();
-  	
+  
   	write_output(equation_systems, a_step, <B><FONT COLOR="#BC8F8F">&quot;primal&quot;</FONT></B>);
   
   	NumericVector&lt;Number&gt; &amp;primal_solution = *system.solution;
-  	
+  
   	QoISet qois;
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; qoi_indices;
   
   	qoi_indices.push_back(0);
-  	qoi_indices.push_back(1);	
+  	qoi_indices.push_back(1);
   	qois.add_indices(qoi_indices);
-  	
-  	qois.set_weight(0, 0.5);	
-  	qois.set_weight(1, 0.5);	
   
-  	system.assemble_qoi_sides = true;	
+  	qois.set_weight(0, 0.5);
+  	qois.set_weight(1, 0.5);
+  
+  	system.assemble_qoi_sides = true;
   	linear_solver-&gt;reuse_preconditioner(param.reuse_preconditioner);
   	system.adjoint_solve();
-  		
+  
   	system.set_adjoint_already_solved(true);
   
   	NumericVector&lt;Number&gt; &amp;dual_solution_0 = system.get_adjoint_solution(0);
-  	
-  	primal_solution.swap(dual_solution_0);	    
+  
+  	primal_solution.swap(dual_solution_0);
   	write_output(equation_systems, a_step, <B><FONT COLOR="#BC8F8F">&quot;adjoint_0&quot;</FONT></B>);
   
   	primal_solution.swap(dual_solution_0);
-  	
+  
   	NumericVector&lt;Number&gt; &amp;dual_solution_1 = system.get_adjoint_solution(1);
-  	
-  	primal_solution.swap(dual_solution_1);	    
+  
+  	primal_solution.swap(dual_solution_1);
   	write_output(equation_systems, a_step, <B><FONT COLOR="#BC8F8F">&quot;adjoint_1&quot;</FONT></B>);
   
   	primal_solution.swap(dual_solution_1);
-  					
+  
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Adaptive step &quot;</FONT></B> &lt;&lt; a_step &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, we have &quot;</FONT></B> &lt;&lt; mesh.n_active_elem()
   		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; active elements and &quot;</FONT></B>
   		  &lt;&lt; equation_systems.n_active_dofs()
-  		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; active dofs.&quot;</FONT></B> &lt;&lt; std::endl ;	
-  	
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Postprocessing: &quot;</FONT></B> &lt;&lt; std::endl; 
+  		  &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; active dofs.&quot;</FONT></B> &lt;&lt; std::endl ;
+  
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Postprocessing: &quot;</FONT></B> &lt;&lt; std::endl;
   	system.postprocess_sides = true;
   	system.postprocess();
-  	
+  
   	Number QoI_0_computed = system.get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;computed&quot;</FONT></B>, 0);
   	Number QoI_0_exact = system.get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>, 0);
   	Number QoI_1_computed = system.get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;computed&quot;</FONT></B>, 1);
   	Number QoI_1_exact = system.get_QoI_value(<B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>, 1);
-  	
+  
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The relative error in QoI 0 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
                    &lt;&lt; std::abs(QoI_0_computed - QoI_0_exact) /
                       <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_0_exact) &lt;&lt; std::endl;
-  	
+  
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The relative error in QoI 1 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
                    &lt;&lt; std::abs(QoI_1_computed - QoI_1_exact) /
                       <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
@@ -2921,16 +2922,16 @@ to the adjoint rhs
   
   	AutoPtr&lt;AdjointRefinementEstimator&gt; adjoint_refinement_error_estimator =
   	  build_adjoint_refinement_error_estimator(qois);
-  	
+  
   	adjoint_refinement_error_estimator-&gt;estimate_error(system, QoI_elementwise_error);
   
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The computed relative error in QoI 0 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
                    &lt;&lt; std::abs(adjoint_refinement_error_estimator-&gt;get_global_QoI_error_estimate(0)) /
                       <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_0_exact) &lt;&lt; std::endl;
-  		
-  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The computed relative error in QoI 1 is &quot;</FONT></B> &lt;&lt; std::setprecision(17) 
+  
+  	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The computed relative error in QoI 1 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
                    &lt;&lt; std::abs(adjoint_refinement_error_estimator-&gt;get_global_QoI_error_estimate(1)) /
-  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;	
+  	  <B><FONT COLOR="#5F9EA0">std</FONT></B>::abs(QoI_1_exact) &lt;&lt; std::endl &lt;&lt; std::endl;
   
   	<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;The effectivity index for the computed error in QoI 0 is &quot;</FONT></B> &lt;&lt; std::setprecision(17)
                    &lt;&lt; std::abs(adjoint_refinement_error_estimator-&gt;get_global_QoI_error_estimate(0)) /
@@ -2943,11 +2944,11 @@ to the adjoint rhs
         }
     }
   
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">'['</FONT></B> &lt;&lt; libMesh::processor_id() 
-              &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;] Completing output.&quot;</FONT></B> &lt;&lt; std::endl; 
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">'['</FONT></B> &lt;&lt; libMesh::processor_id()
+              &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;] Completing output.&quot;</FONT></B> &lt;&lt; std::endl;
   
   #endif <I><FONT COLOR="#B22222">// #ifndef LIBMESH_ENABLE_AMR
-</FONT></I>      
+</FONT></I>  
     <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
 </pre> 
@@ -2969,9 +2970,9 @@ to the adjoint rhs
   
   <B><FONT COLOR="#228B22">void</FONT></B> LaplaceSystem::element_postprocess (DiffContext &amp;context)
   
-  {  
+  {
     FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
-              
+  
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = c.element_fe_var[0]-&gt;get_JxW();
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt; &amp;xyz = c.element_fe_var[0]-&gt;get_xyz();
@@ -2981,15 +2982,15 @@ to the adjoint rhs
   
   
     Number dQoI_0 = 0.;
-    
-    
-    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp = 0; qp != n_qpoints; qp++)    
+  
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp = 0; qp != n_qpoints; qp++)
       {
         <B><FONT COLOR="#228B22">const</FONT></B> Real x = xyz[qp](0);
         <B><FONT COLOR="#228B22">const</FONT></B> Real y = xyz[qp](1);
   
         <B><FONT COLOR="#A020F0">if</FONT></B>(fabs(x - 0.875) &lt;= 0.125 &amp;&amp; fabs(y - 0.125) &lt;= 0.125)
-    	{      
+    	{
     	  Number T = c.interior_value(0, qp);
   
     	  dQoI_0 += JxW[qp] * T;
@@ -2997,8 +2998,8 @@ to the adjoint rhs
       }
   
   
-    computed_QoI[0] = computed_QoI[0] + dQoI_0;    
-    
+    computed_QoI[0] = computed_QoI[0] + dQoI_0;
+  
   }
 </pre> 
 <a name="nocomments"></a> 
@@ -3019,30 +3020,30 @@ to the adjoint rhs
                                               <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; <I><FONT COLOR="#B22222">/* qois */</FONT></I>)
   {
     FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
-    
+  
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = c.element_fe_var[0]-&gt;get_JxW();
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;          &amp;phi = c.element_fe_var[0]-&gt;get_phi();
-    
+  
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;q_point = c.element_fe_var[0]-&gt;get_xyz();
   
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_T_dofs = c.dof_indices_var[0].size();
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = (c.get_element_qrule())-&gt;n_points();  
-    
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = (c.get_element_qrule())-&gt;n_points();
+  
     DenseSubVector&lt;Number&gt; &amp;Q = *c.elem_qoi_subderivatives[0][0];
-        
+  
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
       {
         <B><FONT COLOR="#228B22">const</FONT></B> Real x = q_point[qp](0);
         <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
-                    
+  
         <B><FONT COLOR="#A020F0">if</FONT></B>(fabs(x - 0.875) &lt;= 0.125 &amp;&amp; fabs(y - 0.125) &lt;= 0.125)
-        	{  	        	 	  
+        	{
   	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
   	    Q(i) += JxW[qp] *phi[i][qp] ;
         	}
-              
+  
       } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
 </FONT></I>  }
 </pre> 
@@ -3065,9 +3066,9 @@ to the adjoint rhs
   <B><FONT COLOR="#228B22">void</FONT></B> FEMParameters::read(GetPot &amp;input)
   {
       <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;std::string&gt; variable_names;
-     
-      
-      GETPOT_INT_INPUT(coarserefinements);  
+  
+  
+      GETPOT_INT_INPUT(coarserefinements);
       GETPOT_INPUT(domainfile);
   
       GETPOT_INPUT(solver_quiet);
@@ -3086,7 +3087,7 @@ to the adjoint rhs
       GETPOT_INPUT(refine_fraction);
       GETPOT_INPUT(coarsen_fraction);
       GETPOT_INPUT(coarsen_threshold);
-      GETPOT_INT_INPUT(max_adaptivesteps);   
+      GETPOT_INT_INPUT(max_adaptivesteps);
       GETPOT_INPUT(refine_uniformly);
       GETPOT_INPUT(indicator_type);
       GETPOT_INPUT(patch_reuse);
@@ -3150,7 +3151,7 @@ to the adjoint rhs
     GetPot infile(<B><FONT COLOR="#BC8F8F">&quot;l-shaped.in&quot;</FONT></B>);
     exact_QoI[0] = infile(<B><FONT COLOR="#BC8F8F">&quot;QoI_0&quot;</FONT></B>, 0.0);
     exact_QoI[1] = infile(<B><FONT COLOR="#BC8F8F">&quot;QoI_1&quot;</FONT></B>, 0.0);
-    
+  
     <B><FONT COLOR="#5F9EA0">FEMSystem</FONT></B>::init_data();
   
     <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;time_evolving(0);
@@ -3182,8 +3183,8 @@ to the adjoint rhs
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = c.element_fe_var[0]-&gt;get_JxW();
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt; &amp;dphi = c.element_fe_var[0]-&gt;get_dphi();
-    
-    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_T_dofs = c.dof_indices_var[0].size(); 
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_T_dofs = c.dof_indices_var[0].size();
   
     DenseSubMatrix&lt;Number&gt; &amp;K = *c.elem_subjacobians[0][0];
     DenseSubVector&lt;Number&gt; &amp;F = *c.elem_subresiduals[0];
@@ -3191,7 +3192,7 @@ to the adjoint rhs
     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = (c.get_element_qrule())-&gt;n_points();
   
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
-      {     	
+      {
         Gradient grad_T = c.interior_gradient(0, qp);
   
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
@@ -3201,7 +3202,7 @@ to the adjoint rhs
             <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_T_dofs; ++j)
               K(i,j) += JxW[qp] * ( dphi[i][qp] * dphi[j][qp] );
       } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
-</FONT></I>    
+</FONT></I>  
     <B><FONT COLOR="#A020F0">return</FONT></B> compute_jacobian;
   }
   
@@ -3211,7 +3212,7 @@ to the adjoint rhs
     <B><FONT COLOR="#228B22">bool</FONT></B> compute_jacobian = request_jacobian &amp;&amp; _analytic_jacobians;
   
     FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
-    
+  
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = c.side_fe_var[0]-&gt;get_JxW();
   
@@ -3219,11 +3220,11 @@ to the adjoint rhs
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;qside_point = c.side_fe_var[0]-&gt;get_xyz();
   
-    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_T_dofs = c.dof_indices_var[0].size(); 
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_T_dofs = c.dof_indices_var[0].size();
   
     DenseSubMatrix&lt;Number&gt; &amp;K = *c.elem_subjacobians[0][0];
     DenseSubVector&lt;Number&gt; &amp;F = *c.elem_subresiduals[0];
-        
+  
     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = (c.get_side_qrule())-&gt;n_points();
   
     <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1./(TOLERANCE*TOLERANCE);
@@ -3231,7 +3232,7 @@ to the adjoint rhs
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
       {
         Number T = c.side_value(0, qp);
-              
+  
         Number u_dirichlet = exact_solution (qside_point[qp]);
   
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
@@ -3239,27 +3240,27 @@ to the adjoint rhs
         <B><FONT COLOR="#A020F0">if</FONT></B> (compute_jacobian)
   	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
   	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_T_dofs; ++j)
-  	    K(i,j) += JxW[qp] * penalty * phi[i][qp] * phi[j][qp];    
-  	
+  	    K(i,j) += JxW[qp] * penalty * phi[i][qp] * phi[j][qp];
+  
       } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
-</FONT></I>    
+</FONT></I>  
     <B><FONT COLOR="#A020F0">return</FONT></B> compute_jacobian;
   }
   
   <B><FONT COLOR="#228B22">void</FONT></B> LaplaceSystem::postprocess()
-  {  
+  {
     computed_QoI[0] = 0.0;
     computed_QoI[1] = 0.0;
   
     <B><FONT COLOR="#5F9EA0">FEMSystem</FONT></B>::postprocess();
   
-    CommWorld.sum(computed_QoI[0]);
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;comm().sum(computed_QoI[0]);
   
-    CommWorld.sum(computed_QoI[1]);
-       
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;comm().sum(computed_QoI[1]);
+  
   }
   
-  Number LaplaceSystem::exact_solution(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p)<I><FONT COLOR="#B22222">// xyz location   
+  Number LaplaceSystem::exact_solution(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p)<I><FONT COLOR="#B22222">// xyz location
 </FONT></I>  {
     <B><FONT COLOR="#228B22">const</FONT></B> Real x1 = p(0);
     <B><FONT COLOR="#228B22">const</FONT></B> Real x2 = p(1);
@@ -3268,9 +3269,9 @@ to the adjoint rhs
   
     <B><FONT COLOR="#A020F0">if</FONT></B> (theta &lt; 0)
       theta += 2. * libMesh::pi;
-      
+  
     <B><FONT COLOR="#A020F0">return</FONT></B> pow(x1*x1 + x2*x2, 1./3.)*sin(2./3.*theta);
-             
+  
   }
 </pre> 
 <a name="nocomments"></a> 
@@ -3290,9 +3291,9 @@ to the adjoint rhs
   
   <B><FONT COLOR="#228B22">void</FONT></B> LaplaceSystem::side_postprocess(DiffContext &amp;context)
   {
-    
+  
     FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
-    
+  
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = c.side_fe_var[0]-&gt;get_JxW();
   
@@ -3300,8 +3301,8 @@ to the adjoint rhs
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt; &amp;face_normals = c.side_fe_var[0]-&gt;get_normals();
   
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = (c.get_side_qrule())-&gt;n_points();  
-    
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = (c.get_side_qrule())-&gt;n_points();
+  
     Number dQoI_1 = 0. ;
   
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
@@ -3310,17 +3311,17 @@ to the adjoint rhs
         <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
   
         <B><FONT COLOR="#228B22">const</FONT></B> Real TOL = 1.e-5;
-        
+  
         <B><FONT COLOR="#A020F0">if</FONT></B>(fabs(y - 1.0) &lt;= TOL &amp;&amp; x &gt; 0.0)
   	{
-  	  <B><FONT COLOR="#228B22">const</FONT></B> Gradient grad_T = c.side_gradient(0,qp);	  
+  	  <B><FONT COLOR="#228B22">const</FONT></B> Gradient grad_T = c.side_gradient(0,qp);
   
-  	  dQoI_1 += JxW[qp] * (grad_T * face_normals[qp] * x * (x - 1.)) ;	  
+  	  dQoI_1 += JxW[qp] * (grad_T * face_normals[qp] * x * (x - 1.)) ;
   	}
-        
+  
       } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
-</FONT></I>    
-    computed_QoI[1] = computed_QoI[1] + dQoI_1; 
+</FONT></I>  
+    computed_QoI[1] = computed_QoI[1] + dQoI_1;
   }
 </pre> 
 <a name="nocomments"></a> 
@@ -3341,18 +3342,18 @@ to the adjoint rhs
                                            <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; <I><FONT COLOR="#B22222">/* qois */</FONT></I>)
   {
     FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
-    
+  
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = c.side_fe_var[0]-&gt;get_JxW();
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt; &amp;dphi = c.side_fe_var[0]-&gt;get_dphi();
-    
+  
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;q_point = c.side_fe_var[0]-&gt;get_xyz();
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt; &amp;face_normals = c.side_fe_var[0]-&gt;get_normals();
   
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_T_dofs = c.dof_indices_var[0].size();
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = (c.get_side_qrule())-&gt;n_points();  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = (c.get_side_qrule())-&gt;n_points();
   
     DenseSubVector&lt;Number&gt; &amp;Q1 = *c.elem_qoi_subderivatives[1][0];
   
@@ -3361,28 +3362,29 @@ to the adjoint rhs
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
       {
         <B><FONT COLOR="#228B22">const</FONT></B> Real x = q_point[qp](0);
-        <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);                  
-        
+        <B><FONT COLOR="#228B22">const</FONT></B> Real y = q_point[qp](1);
+  
         <B><FONT COLOR="#A020F0">if</FONT></B>(fabs(y - 1.0) &lt;= TOL &amp;&amp; x &gt; 0.0)
-    	{  	  	  	  
+    	{
     	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_T_dofs; i++)
-  	    {	      
-  	      Q1(i) += JxW[qp] * (dphi[i][qp] * face_normals[qp]) * x * (x - 1.);  	    	    	    	    	  
+  	    {
+  	      Q1(i) += JxW[qp] * (dphi[i][qp] * face_normals[qp]) * x * (x - 1.);
   	    }
-    	}      
-       
+    	}
+  
       } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
 </FONT></I>  }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+make[4]: Entering directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/adjoints/adjoints_ex4'
 ***************************************************************
 * Running Example adjoints_ex4:
-*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
  
-Started /workspace/libmesh/examples/adjoints/adjoints_ex4/.libs/lt-example-devel
+Started /net/spark/workspace/roystgnr/libmesh/git/devel/examples/adjoints/adjoints_ex4/.libs/lt-example-devel
 Reading in and building the mesh
 Building system
 Initializing systems
@@ -3390,13 +3392,13 @@ Initializing systems
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=65
-    n_local_nodes()=9
+    n_local_nodes()=21
   n_elem()=15
-    n_local_elem()=2
+    n_local_elem()=5
     n_active_elem()=12
   n_subdomains()=1
-  n_partitions()=12
-  n_processors()=12
+  n_partitions()=4
+  n_processors()=4
   n_threads()=1
   processor_id()=0
 
@@ -3409,220 +3411,91 @@ Initializing systems
     Infinite Element Mapping="CARTESIAN" 
     Approximation Orders="SECOND", "THIRD" 
     n_dofs()=65
-    n_local_dofs()=9
+    n_local_dofs()=21
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 6.04615
-      Average Off-Processor Bandwidth <= 7.44615
-      Maximum  On-Processor Bandwidth <= 9
-      Maximum Off-Processor Bandwidth <= 24
+      Average  On-Processor Bandwidth <= 10.2923
+      Average Off-Processor Bandwidth <= 3.47692
+      Maximum  On-Processor Bandwidth <= 21
+      Maximum Off-Processor Bandwidth <= 16
     DofMap Constraints
       Number of DoF Constraints = 0
       Number of Node Constraints = 0
 
-  Nonlinear solver converged, step 0, residual reduction 9.00967e-11 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 8.99985e-11 < 1e-09
 Adaptive step 0, we have 12 active elements and 65 active dofs.
 Postprocessing: 
-The relative error in QoI 0 is 1.7448570691338565
-The relative error in QoI 1 is 0.0044573233516788623
+The relative error in QoI 0 is inf
+The relative error in QoI 1 is inf
 
 Computing the error estimate using the Adjoint Refinement Error Estimator
 
-The computed relative error in QoI 0 is 0.00017026143514898767
-The computed relative error in QoI 1 is 0.00457780519036798
+The computed relative error in QoI 0 is inf
+The computed relative error in QoI 1 is inf
 
-The effectivity index for the computed error in QoI 0 is 9.7579015588655131e-05
-The effectivity index for the computed error in QoI 1 is 1.027030087158415
+The effectivity index for the computed error in QoI 0 is 6.2029227321009616e-05
+The effectivity index for the computed error in QoI 1 is 0.0045983013122305322
 
 Refined mesh to 48 active elements and 225 active dofs.
-  Nonlinear solver converged, step 0, residual reduction 5.5824097513293915e-11 < 1.0000000000000001e-09
+  Nonlinear solver converged, step 0, residual reduction 6.3455558581624914e-11 < 1.0000000000000001e-09
 Adaptive step 1, we have 48 active elements and 225 active dofs.
 Postprocessing: 
-The relative error in QoI 0 is 0.0002799284426043872
-The relative error in QoI 1 is 0.00047776972754756789
+The relative error in QoI 0 is inf
+The relative error in QoI 1 is inf
 
 Computing the error estimate using the Adjoint Refinement Error Estimator
 
-The computed relative error in QoI 0 is 0.00022981235921150828
-The computed relative error in QoI 1 is 0.00059422670729913397
+The computed relative error in QoI 0 is inf
+The computed relative error in QoI 1 is inf
 
-The effectivity index for the computed error in QoI 0 is 0.82096823414365871
-The effectivity index for the computed error in QoI 1 is 1.2437512739648648
+The effectivity index for the computed error in QoI 0 is 0.00022987680218270143
+The effectivity index for the computed error in QoI 1 is 0.0005945107583468955
 
 Refined mesh to 192 active elements and 833 active dofs.
-  Nonlinear solver converged, step 0, residual reduction 5.6041129488121567e-11 < 1.0000000000000001e-09
+  Nonlinear solver converged, step 0, residual reduction 5.5183873316805855e-11 < 1.0000000000000001e-09
 Adaptive step 2, we have 192 active elements and 833 active dofs.
 Postprocessing: 
-The relative error in QoI 0 is 0.00012462746000072101
-The relative error in QoI 1 is 0.00012048195187250474
+The relative error in QoI 0 is inf
+The relative error in QoI 1 is inf
 
 Computing the error estimate using the Adjoint Refinement Error Estimator
 
-The computed relative error in QoI 0 is 0.00010469994335778309
-The computed relative error in QoI 1 is 5.8180352053268931e-05
+The computed relative error in QoI 0 is inf
+The computed relative error in QoI 1 is inf
 
-The effectivity index for the computed error in QoI 0 is 0.840103323594795
-The effectivity index for the computed error in QoI 1 is 0.48289682520113875
-
-************************************************************************************************************************
-***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
-************************************************************************************************************************
-
----------------------------------------------- PETSc Performance Summary: ----------------------------------------------
-
-/workspace/libmesh/examples/adjoints/adjoints_ex4/.libs/lt-example-devel on a intel-12. named hbar.ices.utexas.edu with 12 processors, by benkirk Thu Jan 31 22:04:36 2013
-Using Petsc Release Version 3.3.0, Patch 2, Fri Jul 13 15:42:00 CDT 2012 
-
-                         Max       Max/Min        Avg      Total 
-Time (sec):           4.960e+00      1.00001   4.960e+00
-Objects:              9.480e+02      1.00851   9.440e+02
-Flops:                5.853e+07      1.12282   5.535e+07  6.642e+08
-Flops/sec:            1.180e+07      1.12282   1.116e+07  1.339e+08
-MPI Messages:         5.036e+03      1.99643   3.573e+03  4.288e+04
-MPI Message Lengths:  7.723e+05      1.57519   1.764e+02  7.564e+06
-MPI Reductions:       2.925e+03      1.00274
-
-Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
-                            e.g., VecAXPY() for real vectors of length N --> 2N flops
-                            and VecAXPY() for complex vectors of length N --> 8N flops
-
-Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
-                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 4.9595e+00 100.0%  6.6422e+08 100.0%  4.288e+04 100.0%  1.764e+02      100.0%  2.920e+03 100.0% 
-
-------------------------------------------------------------------------------------------------------------------------
-See the 'Profiling' chapter of the users' manual for details on interpreting output.
-Phase summary info:
-   Count: number of times phase was executed
-   Time and Flops: Max - maximum over all processors
-                   Ratio - ratio of maximum to minimum over all processors
-   Mess: number of messages sent
-   Avg. len: average message length
-   Reduct: number of global reductions
-   Global: entire computation
-   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
-      %T - percent time in this phase         %f - percent flops in this phase
-      %M - percent messages in this phase     %L - percent message lengths in this phase
-      %R - percent reductions in this phase
-   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
-------------------------------------------------------------------------------------------------------------------------
-Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
-                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %f %M %L %R  %T %f %M %L %R Mflop/s
-------------------------------------------------------------------------------------------------------------------------
-
---- Event Stage 0: Main Stage
-
-KSPGMRESOrthog       665 1.0 2.4963e-02 1.3 1.28e+07 1.1 0.0e+00 0.0e+00 6.6e+02  0 22  0  0 23   0 22  0  0 23  5867
-KSPSetUp              24 1.0 3.5810e-04 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-KSPSolve               3 1.0 8.1131e-03 1.0 1.15e+06 1.9 5.8e+03 7.2e+01 2.9e+02  0  2 14  6 10   0  2 14  6 10  1275
-PCSetUp               18 1.0 2.2453e-02 1.1 4.55e+06 1.2 0.0e+00 0.0e+00 7.1e+01  0  7  0  0  2   0  7  0  0  2  2204
-PCSetUpOnBlocks        3 1.0 1.2147e-03 1.3 7.36e+04 2.8 0.0e+00 0.0e+00 1.9e+01  0  0  0  0  1   0  0  0  0  1   461
-PCApply              709 1.0 7.6324e-02 1.1 3.77e+07 1.2 0.0e+00 0.0e+00 3.4e+01  1 64  0  0  1   1 64  0  0  1  5535
-VecDot                 6 1.0 8.3685e-05 1.4 5.70e+03 1.1 0.0e+00 0.0e+00 6.0e+00  0  0  0  0  0   0  0  0  0  0   792
-VecMDot              665 1.0 2.0520e-02 1.4 6.37e+06 1.1 0.0e+00 0.0e+00 6.6e+02  0 11  0  0 23   0 11  0  0 23  3566
-VecNorm              721 1.0 2.3231e-02 1.2 4.60e+05 1.1 0.0e+00 0.0e+00 7.2e+02  0  1  0  0 25   0  1  0  0 25   228
-VecScale             694 1.0 6.4611e-04 1.4 2.27e+05 1.1 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  4027
-VecCopy              168 1.0 1.8120e-04 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecSet              2147 1.0 3.4201e-03 2.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecAXPY               61 1.0 1.2612e-04 1.2 3.56e+04 1.1 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  3238
-VecMAXPY             694 1.0 4.0722e-03 1.1 6.82e+06 1.1 0.0e+00 0.0e+00 0.0e+00  0 12  0  0  0   0 12  0  0  0 19224
-VecAssemblyBegin     312 1.0 1.1067e-01 4.9 0.00e+00 0.0 3.0e+03 6.7e+01 7.2e+02  1  0  7  3 25   1  0  7  3 25     0
-VecAssemblyEnd       312 1.0 3.8338e-04 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecScatterBegin      800 1.0 3.4866e-03 1.4 0.00e+00 0.0 3.4e+04 2.0e+02 0.0e+00  0  0 80 90  0   0  0 80 90  0     0
-VecScatterEnd        800 1.0 2.9991e-03 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecNormalize         694 1.0 9.6445e-03 1.4 6.80e+05 1.1 0.0e+00 0.0e+00 6.9e+02  0  1  0  0 24   0  1  0  0 24   809
-MatMult              132 1.0 1.3068e-03 1.4 1.97e+05 1.8 5.8e+03 7.2e+01 0.0e+00  0  0 14  6  0   0  0 14  6  0  1439
-MatMultTranspose     562 1.0 1.6367e-02 1.1 6.91e+06 1.1 2.4e+04 2.4e+02 0.0e+00  0 12 56 75  0   0 12 56 75  0  4855
-MatSolve             135 1.0 4.7350e-04 1.7 4.66e+05 2.2 0.0e+00 0.0e+00 0.0e+00  0  1  0  0  0   0  1  0  0  0  8305
-MatSolveTranspos     574 1.0 5.3732e-02 1.1 3.28e+07 1.1 0.0e+00 0.0e+00 0.0e+00  1 56  0  0  0   1 56  0  0  0  6879
-MatLUFactorNum         9 1.0 6.1092e-03 1.2 4.55e+06 1.2 0.0e+00 0.0e+00 0.0e+00  0  7  0  0  0   0  7  0  0  0  8100
-MatILUFactorSym        9 1.0 1.3348e-02 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 2.7e+01  0  0  0  0  1   0  0  0  0  1     0
-MatAssemblyBegin      30 1.0 3.2574e-0226.4 0.00e+00 0.0 6.4e+02 5.3e+02 6.0e+01  0  0  1  5  2   0  0  1  5  2     0
-MatAssemblyEnd        30 1.0 1.8322e-03 1.1 0.00e+00 0.0 5.2e+02 4.4e+01 4.8e+01  0  0  1  0  2   0  0  1  0  2     0
-MatGetRowIJ            9 1.0 3.7909e-05 2.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatGetOrdering         9 1.0 5.6553e-04 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 2.6e+01  0  0  0  0  1   0  0  0  0  1     0
-MatZeroEntries        39 1.0 2.0766e-04 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-------------------------------------------------------------------------------------------------------------------------
-
-Memory usage is given in bytes:
-
-Object Type          Creations   Destructions     Memory  Descendants' Mem.
-Reports information only for process 0.
-
---- Event Stage 0: Main Stage
-
-       Krylov Solver    27             27       185328     0
-      Preconditioner    27             27        23472     0
-              Vector   620            620      2843424     0
-      Vector Scatter    66             66        68376     0
-           Index Set   128            128       110684     0
-   IS L to G Mapping    21             21        11844     0
-              Matrix    54             54      1996240     0
-              Viewer     1              0            0     0
-========================================================================================================================
-Average time to get PetscTime(): 9.53674e-08
-Average time for MPI_Barrier(): 4.57764e-06
-Average time for zero size MPI_Send(): 1.4325e-05
-#PETSc Option Table entries:
--ksp_right_pc
--log_summary
--pc_type bjacobi
--sub_pc_factor_levels 4
--sub_pc_factor_zeropivot 0
--sub_pc_type ilu
-#End of PETSc Option Table entries
-Compiled without FORTRAN kernels
-Compiled with full precision matrices (default)
-sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
-Configure run at: Thu Nov  8 11:21:02 2012
-Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared-libraries=1 --with-mpi-dir=/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1 --with-mumps=true --download-mumps=1 --with-metis=true --download-metis=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_intel_lp64.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_sequential.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_core.so]" --with-lapack-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_lapack95_lp64.a]"
------------------------------------------
-Libraries compiled on Thu Nov  8 11:21:02 2012 on daedalus.ices.utexas.edu 
-Machine characteristics: Linux-2.6.32-279.1.1.el6.x86_64-x86_64-with-redhat-6.3-Carbon
-Using PETSc directory: /opt/apps/ossw/libraries/petsc/petsc-3.3-p2
-Using PETSc arch: intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt
------------------------------------------
-
-Using C compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx  -wd1572 -O3   -fPIC   ${COPTFLAGS} ${CFLAGS}
-Using Fortran compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90  -fPIC -O3   ${FOPTFLAGS} ${FFLAGS} 
------------------------------------------
-
-Using include paths: -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/include
------------------------------------------
-
-Using C linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx
-Using Fortran linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90
-Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lpetsc -lX11 -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lHYPRE -lpthread -lsuperlu_dist_3.0 -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.3 -Wl,-rpath,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -L/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,-rpath,/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -L/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -Wl,-rpath,/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -L/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lcilkrts -lstdc++ -lgcc_s -lirc -lirc_s -ldl 
------------------------------------------
+The effectivity index for the computed error in QoI 0 is 0.00010471304480264564
+The effectivity index for the computed error in QoI 1 is 5.8173302203917334e-05
 
 
- ----------------------------------------------------------------------------------------------------------------------
-| Processor id:   0                                                                                                    |
-| Num Processors: 12                                                                                                   |
-| Time:           Thu Jan 31 22:04:36 2013                                                                             |
-| OS:             Linux                                                                                                |
-| HostName:       hbar.ices.utexas.edu                                                                                 |
-| OS Release:     2.6.32-279.1.1.el6.x86_64                                                                            |
-| OS Version:     #1 SMP Tue Jul 10 11:24:23 CDT 2012                                                                  |
-| Machine:        x86_64                                                                                               |
-| Username:       benkirk                                                                                              |
-| Configuration:  ./configure  '--enable-everything'                                                                   |
-|  '--prefix=/workspace/libmesh/install'                                                                               |
-|  'CXX=icpc'                                                                                                          |
-|  'CC=icc'                                                                                                            |
-|  'FC=ifort'                                                                                                          |
-|  'F77=ifort'                                                                                                         |
-|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                             |
-|  'PETSC_ARCH=intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
-|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                        |
-|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/intel-12.1/mpich2-1.4.1p1/mkl-intel-10.3.12.361'|
-|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/intel-12.1'                                                    |
- ----------------------------------------------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Processor id:   0                                                                                                 |
+| Num Processors: 4                                                                                                 |
+| Time:           Fri Apr 19 11:48:21 2013                                                                          |
+| OS:             Linux                                                                                             |
+| HostName:       spark.ices.utexas.edu                                                                             |
+| OS Release:     2.6.32-279.22.1.el6.x86_64                                                                        |
+| OS Version:     #1 SMP Tue Feb 5 14:33:39 CST 2013                                                                |
+| Machine:        x86_64                                                                                            |
+| Username:       roystgnr                                                                                          |
+| Configuration:  ../configure  '--enable-everything'                                                               |
+|  'METHODS=devel'                                                                                                  |
+|  '--prefix=/h2/roystgnr/libmesh-test'                                                                             |
+|  'CXX=distcc /usr/bin/g++'                                                                                        |
+|  'CC=distcc /usr/bin/gcc'                                                                                         |
+|  'FC=distcc /usr/bin/gfortran'                                                                                    |
+|  'F77=distcc /usr/bin/gfortran'                                                                                   |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                          |
+|  'PETSC_ARCH=gcc-system-mkl-gf-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                     |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/gcc-system/mpich2-1.4.1p1/mkl-gf-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/gcc-system'                                                 |
+|  'HDF5_DIR=/opt/apps/ossw/libraries/hdf5/hdf5-1.8.9/sl6/gcc-system'                                               |
+ -------------------------------------------------------------------------------------------------------------------
  ----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=5.90292, Active time=4.8106                                                    |
+| libMesh Performance: Alive time=2.00285, Active time=1.90319                                                   |
  ----------------------------------------------------------------------------------------------------------------
 | Event                              nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                              w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -3630,115 +3503,117 @@ Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12
 |                                                                                                                |
 |                                                                                                                |
 | DofMap                                                                                                         |
-|   add_neighbors_to_send_list()     15        0.0700      0.004668    0.1126      0.007509    1.46     2.34     |
-|   build_sparsity()                 15        0.0413      0.002756    0.1240      0.008264    0.86     2.58     |
-|   create_dof_constraints()         15        0.0326      0.002174    0.0326      0.002174    0.68     0.68     |
-|   distribute_dofs()                15        0.4315      0.028766    1.2232      0.081550    8.97     25.43    |
-|   dof_indices()                    5402      0.6318      0.000117    0.6318      0.000117    13.13    13.13    |
-|   old_dof_indices()                3690      0.4292      0.000116    0.4292      0.000116    8.92     8.92     |
-|   prepare_send_list()              15        0.0010      0.000068    0.0010      0.000068    0.02     0.02     |
-|   reinit()                         15        0.7419      0.049462    0.7419      0.049462    15.42    15.42    |
+|   add_neighbors_to_send_list()     15        0.0181      0.001207    0.0246      0.001641    0.95     1.29     |
+|   build_sparsity()                 15        0.0123      0.000822    0.0320      0.002135    0.65     1.68     |
+|   create_dof_constraints()         15        0.0089      0.000595    0.0089      0.000595    0.47     0.47     |
+|   distribute_dofs()                15        0.0647      0.004315    0.1662      0.011082    3.40     8.73     |
+|   dof_indices()                    15806     0.1603      0.000010    0.1603      0.000010    8.42     8.42     |
+|   old_dof_indices()                11070     0.1055      0.000010    0.1055      0.000010    5.54     5.54     |
+|   prepare_send_list()              15        0.0002      0.000015    0.0002      0.000015    0.01     0.01     |
+|   reinit()                         15        0.0896      0.005974    0.0896      0.005974    4.71     4.71     |
 |                                                                                                                |
 | EquationSystems                                                                                                |
-|   build_solution_vector()          9         0.0025      0.000273    0.0137      0.001522    0.05     0.28     |
+|   build_solution_vector()          9         0.0012      0.000132    0.0048      0.000538    0.06     0.25     |
 |                                                                                                                |
 | FE                                                                                                             |
-|   compute_shape_functions()        2668      0.2601      0.000097    0.2601      0.000097    5.41     5.41     |
-|   init_shape_functions()           490       0.0288      0.000059    0.0288      0.000059    0.60     0.60     |
-|   inverse_map()                    7248      0.1152      0.000016    0.1152      0.000016    2.40     2.40     |
+|   compute_shape_functions()        7426      0.1281      0.000017    0.1281      0.000017    6.73     6.73     |
+|   init_shape_functions()           796       0.0101      0.000013    0.0101      0.000013    0.53     0.53     |
+|   inverse_map()                    19260     0.1136      0.000006    0.1136      0.000006    5.97     5.97     |
 |                                                                                                                |
 | FEMSystem                                                                                                      |
-|   assemble_qoi_derivative()        6         0.0334      0.005569    0.2404      0.040065    0.69     5.00     |
-|   assembly()                       3         0.0054      0.001797    0.0351      0.011689    0.11     0.73     |
-|   assembly(get_jacobian)           6         0.0339      0.005653    0.3978      0.066307    0.71     8.27     |
-|   assembly(get_residual)           6         0.0309      0.005143    0.2388      0.039799    0.64     4.96     |
-|   numerical_elem_jacobian()        378       0.1579      0.000418    0.1579      0.000418    3.28     3.28     |
-|   numerical_side_jacobian()        78        0.0102      0.000130    0.0102      0.000130    0.21     0.21     |
-|   postprocess()                    3         0.0028      0.000949    0.0215      0.007155    0.06     0.45     |
+|   assemble_qoi_derivative()        6         0.0363      0.006049    0.1273      0.021222    1.91     6.69     |
+|   assembly()                       3         0.0025      0.000835    0.0139      0.004646    0.13     0.73     |
+|   assembly(get_jacobian)           6         0.0359      0.005977    0.2499      0.041653    1.88     13.13    |
+|   assembly(get_residual)           6         0.0277      0.004614    0.1178      0.019635    1.45     6.19     |
+|   numerical_elem_jacobian()        1134      0.1210      0.000107    0.1210      0.000107    6.36     6.36     |
+|   numerical_side_jacobian()        132       0.0061      0.000046    0.0061      0.000046    0.32     0.32     |
+|   postprocess()                    3         0.0017      0.000557    0.0095      0.003166    0.09     0.50     |
 |                                                                                                                |
 | FEMap                                                                                                          |
-|   compute_affine_map()             2668      0.0451      0.000017    0.0451      0.000017    0.94     0.94     |
-|   compute_face_map()               442       0.0147      0.000033    0.0366      0.000083    0.31     0.76     |
-|   init_face_shape_functions()      48        0.0007      0.000015    0.0007      0.000015    0.02     0.02     |
-|   init_reference_to_physical_map() 490       0.0252      0.000051    0.0252      0.000051    0.52     0.52     |
+|   compute_affine_map()             7426      0.0427      0.000006    0.0427      0.000006    2.24     2.24     |
+|   compute_face_map()               748       0.0086      0.000012    0.0227      0.000030    0.45     1.19     |
+|   init_face_shape_functions()      48        0.0002      0.000004    0.0002      0.000004    0.01     0.01     |
+|   init_reference_to_physical_map() 796       0.0109      0.000014    0.0109      0.000014    0.57     0.57     |
 |                                                                                                                |
 | GMVIO                                                                                                          |
-|   write_nodal_data()               9         0.0235      0.002616    0.0246      0.002731    0.49     0.51     |
+|   write_nodal_data()               9         0.0253      0.002811    0.0258      0.002869    1.33     1.36     |
 |                                                                                                                |
 | ImplicitSystem                                                                                                 |
-|   adjoint_solve()                  6         0.0017      0.000290    0.7747      0.129119    0.04     16.10    |
+|   adjoint_solve()                  6         0.0008      0.000133    0.7429      0.123813    0.04     39.03    |
 |                                                                                                                |
 | LocationMap                                                                                                    |
-|   find()                           26460     0.1686      0.000006    0.1686      0.000006    3.50     3.50     |
-|   init()                           23        0.0611      0.002658    0.0611      0.002658    1.27     1.27     |
+|   find()                           26460     0.0422      0.000002    0.0422      0.000002    2.22     2.22     |
+|   init()                           23        0.0165      0.000718    0.0165      0.000718    0.87     0.87     |
 |                                                                                                                |
 | Mesh                                                                                                           |
-|   all_second_order()               1         0.0004      0.000415    0.0004      0.000415    0.01     0.01     |
-|   contract()                       14        0.0281      0.002007    0.1049      0.007495    0.58     2.18     |
-|   find_neighbors()                 17        0.3406      0.020035    0.3432      0.020189    7.08     7.13     |
-|   renumber_nodes_and_elem()        14        0.0768      0.005487    0.0768      0.005487    1.60     1.60     |
+|   all_second_order()               1         0.0001      0.000095    0.0001      0.000095    0.00     0.00     |
+|   contract()                       14        0.0079      0.000568    0.0241      0.001720    0.42     1.27     |
+|   find_neighbors()                 17        0.0580      0.003411    0.0614      0.003615    3.05     3.23     |
+|   renumber_nodes_and_elem()        14        0.0161      0.001152    0.0161      0.001152    0.85     0.85     |
 |                                                                                                                |
 | MeshCommunication                                                                                              |
-|   broadcast()                      1         0.0011      0.001076    0.0016      0.001584    0.02     0.03     |
-|   compute_hilbert_indices()        6         0.0023      0.000384    0.0023      0.000384    0.05     0.05     |
-|   find_global_indices()            6         0.0020      0.000336    0.0129      0.002144    0.04     0.27     |
-|   parallel_sort()                  6         0.0048      0.000793    0.0053      0.000886    0.10     0.11     |
+|   broadcast()                      1         0.0002      0.000232    0.0005      0.000529    0.01     0.03     |
+|   compute_hilbert_indices()        6         0.0008      0.000133    0.0008      0.000133    0.04     0.04     |
+|   find_global_indices()            6         0.0003      0.000051    0.0029      0.000481    0.02     0.15     |
+|   parallel_sort()                  6         0.0006      0.000101    0.0011      0.000181    0.03     0.06     |
 |                                                                                                                |
 | MeshOutput                                                                                                     |
-|   write_equation_systems()         9         0.0005      0.000052    0.0398      0.004423    0.01     0.83     |
+|   write_equation_systems()         9         0.0002      0.000026    0.0315      0.003496    0.01     1.65     |
 |                                                                                                                |
 | MeshRefinement                                                                                                 |
-|   _coarsen_elements()              20        0.0241      0.001205    0.0243      0.001216    0.50     0.51     |
-|   _refine_elements()               23        0.2052      0.008923    0.5431      0.023614    4.27     11.29    |
-|   add_point()                      26460     0.1546      0.000006    0.3289      0.000012    3.21     6.84     |
-|   make_coarsening_compatible()     28        0.0824      0.002942    0.0824      0.002942    1.71     1.71     |
-|   make_refinement_compatible()     28        0.0001      0.000003    0.0003      0.000010    0.00     0.01     |
+|   _coarsen_elements()              20        0.0113      0.000565    0.0121      0.000603    0.59     0.63     |
+|   _refine_elements()               23        0.0531      0.002307    0.1560      0.006785    2.79     8.20     |
+|   add_point()                      26460     0.0521      0.000002    0.0973      0.000004    2.74     5.11     |
+|   make_coarsening_compatible()     28        0.0309      0.001102    0.0309      0.001102    1.62     1.62     |
+|   make_flags_parallel_consistent() 28        0.0159      0.000569    0.0248      0.000884    0.84     1.30     |
+|   make_refinement_compatible()     28        0.0001      0.000002    0.0002      0.000006    0.00     0.01     |
 |                                                                                                                |
 | MetisPartitioner                                                                                               |
-|   partition()                      5         0.0393      0.007868    0.0502      0.010034    0.82     1.04     |
+|   partition()                      5         0.0034      0.000674    0.0062      0.001242    0.18     0.33     |
 |                                                                                                                |
 | NewtonSolver                                                                                                   |
-|   solve()                          3         0.0199      0.006618    0.0895      0.029833    0.41     1.86     |
+|   solve()                          3         0.0149      0.004959    0.0514      0.017149    0.78     2.70     |
 |                                                                                                                |
 | Parallel                                                                                                       |
-|   allgather()                      59        0.0168      0.000285    0.0170      0.000287    0.35     0.35     |
-|   broadcast()                      9         0.0004      0.000045    0.0003      0.000035    0.01     0.01     |
-|   max(bool)                        73        0.0039      0.000054    0.0039      0.000054    0.08     0.08     |
-|   max(scalar)                      2118      0.0146      0.000007    0.0146      0.000007    0.30     0.30     |
-|   max(vector)                      510       0.0069      0.000014    0.0171      0.000034    0.14     0.36     |
-|   min(bool)                        2629      0.0170      0.000006    0.0170      0.000006    0.35     0.35     |
-|   min(scalar)                      2069      0.0632      0.000031    0.0632      0.000031    1.31     1.31     |
-|   min(vector)                      510       0.0075      0.000015    0.0185      0.000036    0.16     0.38     |
-|   probe()                          1232      0.0169      0.000014    0.0169      0.000014    0.35     0.35     |
-|   receive()                        1232      0.0078      0.000006    0.0249      0.000020    0.16     0.52     |
-|   send()                           1232      0.0040      0.000003    0.0040      0.000003    0.08     0.08     |
-|   send_receive()                   1244      0.0100      0.000008    0.0420      0.000034    0.21     0.87     |
-|   sum()                            124       0.0033      0.000027    0.0043      0.000034    0.07     0.09     |
+|   allgather()                      59        0.0051      0.000086    0.0051      0.000087    0.27     0.27     |
+|   broadcast()                      27        0.0001      0.000005    0.0001      0.000003    0.01     0.00     |
+|   max(bool)                        73        0.0039      0.000054    0.0039      0.000054    0.21     0.21     |
+|   max(scalar)                      2454      0.0096      0.000004    0.0096      0.000004    0.50     0.50     |
+|   max(vector)                      594       0.0041      0.000007    0.0105      0.000018    0.22     0.55     |
+|   min(bool)                        3077      0.0117      0.000004    0.0117      0.000004    0.61     0.61     |
+|   min(scalar)                      2405      0.0192      0.000008    0.0192      0.000008    1.01     1.01     |
+|   min(vector)                      594       0.0045      0.000008    0.0111      0.000019    0.24     0.58     |
+|   probe()                          672       0.0035      0.000005    0.0035      0.000005    0.19     0.19     |
+|   receive()                        672       0.0023      0.000003    0.0059      0.000009    0.12     0.31     |
+|   send()                           672       0.0014      0.000002    0.0014      0.000002    0.07     0.07     |
+|   send_receive()                   684       0.0029      0.000004    0.0111      0.000016    0.15     0.58     |
+|   sum()                            124       0.0018      0.000015    0.0022      0.000018    0.09     0.12     |
 |                                                                                                                |
 | Parallel::Request                                                                                              |
-|   wait()                           1232      0.0024      0.000002    0.0024      0.000002    0.05     0.05     |
+|   wait()                           672       0.0007      0.000001    0.0007      0.000001    0.04     0.04     |
 |                                                                                                                |
 | Partitioner                                                                                                    |
-|   set_node_processor_ids()         5         0.0028      0.000556    0.0059      0.001179    0.06     0.12     |
-|   set_parent_processor_ids()       5         0.0008      0.000167    0.0008      0.000167    0.02     0.02     |
+|   set_node_processor_ids()         5         0.0006      0.000122    0.0020      0.000406    0.03     0.11     |
+|   set_parent_processor_ids()       5         0.0001      0.000023    0.0001      0.000023    0.01     0.01     |
 |                                                                                                                |
 | PetscLinearSolver                                                                                              |
-|   solve()                          15        0.1419      0.009463    0.1419      0.009463    2.95     2.95     |
+|   solve()                          15        0.3746      0.024975    0.3746      0.024975    19.68    19.68    |
 |                                                                                                                |
 | ProjectVector                                                                                                  |
-|   operator()                       36        0.0575      0.001597    0.5101      0.014170    1.20     10.60    |
+|   operator()                       36        0.0652      0.001811    0.2591      0.007197    3.42     13.61    |
 |                                                                                                                |
 | System                                                                                                         |
-|   project_vector()                 36        0.0494      0.001372    0.8199      0.022775    1.03     17.04    |
+|   project_vector()                 36        0.0348      0.000966    0.3606      0.010016    1.83     18.94    |
  ----------------------------------------------------------------------------------------------------------------
-| Totals:                            91234     4.8106                                          100.00            |
+| Totals:                            130808    1.9032                                          100.00            |
  ----------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example adjoints_ex4:
-*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
+make[4]: Leaving directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/adjoints/adjoints_ex4'
 </pre>
 </div>
 <?php make_footer() ?>
