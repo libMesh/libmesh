@@ -862,33 +862,33 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
                                                              this_point,
                                                              tol);
 
-        if (other_iter == other_sorted_bndry_nodes.end())
+	// Not every node on this_sorted_bndry_nodes will necessarily be stitched, so
+	// if its pair is not found on other_mesh, just continue.
+        if (other_iter != other_sorted_bndry_nodes.end())
           {
-            libMesh::err << "Error: Matching point could not be found in other_mesh!" << std::endl;
-            libmesh_error();
+	    // Check that the points do indeed match - should not be necessary unless something
+	    // is wrong with fuzzy_binary_find.  To be on the safe side, we'll check.  Use the
+	    // same comparison used by the sorting algorithm.
+	    {
+	      // Grab the other point from the iterator
+	      Point other_point = other_iter->first;
+
+	      if (!this_point.relative_fuzzy_equals(other_point, tol))
+		{
+		  libMesh::out << "Error: mismatched points: " << this_point << " and " << other_point << std::endl;
+		  libmesh_error();
+		}
+	    }
+
+
+	    // Associate these two nodes in both the node_to_node_map and the other_to_this_node_map
+	    dof_id_type
+	      this_node_id = this_sorted_bndry_nodes[i].second,
+	      other_node_id = other_iter->second;
+	    node_to_node_map[this_node_id] = other_node_id;
+	    other_to_this_node_map[other_node_id] = this_node_id;
           }
 
-        // Check that the points do indeed match - should not be necessary unless something
-        // is wrong with fuzzy_binary_find.  To be on the safe side, we'll check.
-        {
-          // Grab the other point from the iterator
-          Point other_point = other_iter->first;
-          Real dist = (this_point - other_point).size();
-
-          if (dist >= tol)
-            {
-              libMesh::out << "Error: mismatched points: " << this_point << " and " << other_point << std::endl;
-              libmesh_error();
-            }
-        }
-
-
-        // Associate these two nodes in both the node_to_node_map and the other_to_this_node_map
-        dof_id_type
-          this_node_id = this_sorted_bndry_nodes[i].second,
-          other_node_id = other_iter->second;
-        node_to_node_map[this_node_id] = other_node_id;
-        other_to_this_node_map[other_node_id] = this_node_id;
       }
 
 
