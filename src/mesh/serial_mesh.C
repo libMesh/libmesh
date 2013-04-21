@@ -797,8 +797,10 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
       this_sorted_bndry_nodes(this_boundary_node_ids.size()),
       other_sorted_bndry_nodes(other_boundary_node_ids.size());
 
-    // Comparison object that will be used later
-    FuzzyPointCompare mein_comp(tol);
+    // Comparison object that will be used later.  We control the tolerance
+    // used in this sorting, not the user.  So far, I've had reasonable success
+    // with TOLERANCE...
+    FuzzyPointCompare mein_comp(TOLERANCE);
 
     // Create and sort the vectors we will use to do the geometric searching
     {
@@ -850,6 +852,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
 	      // Grab the other point from the iterator
 	      Point other_point = other_iter->first;
 
+              // TODO: Shall we let the user control whether a relative or absolute tolerance
+              // is used here?  And if a relative tolerance is used, what should it be relative to?
 	      if (!this_point.relative_fuzzy_equals(other_point, tol))
 		{
 		  libMesh::out << "Error: mismatched points: " << this_point << " and " << other_point << std::endl;
