@@ -133,6 +133,16 @@ namespace Utility
     return (it == last || value < *it) ? last : it;
   }
 
+  /**
+   * As above, but takes a custom comparison object.
+   */
+  template<class ForwardIterator, class T, class Compare>
+  ForwardIterator binary_find(ForwardIterator first, ForwardIterator last, const T& value, Compare comp)
+  {
+    ForwardIterator it = std::lower_bound(first, last, value, comp);
+    return (it == last || comp(value,*it)) ? last : it;
+  }
+
 
   //-------------------------------------------------------------------
   /**
