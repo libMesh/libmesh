@@ -94,41 +94,37 @@ namespace
 
   typedef std::vector< std::pair<Point, dof_id_type> > PointVector;
 
-  PointVector::iterator fuzzy_binary_find(PointVector::iterator first,
+  PointVector::iterator fuzzy_binary_find(PointVector::iterator cur,
                                           PointVector::iterator last,
                                           Point val,
                                           Real tol)
   {
     PointVector::iterator it;
     std::iterator_traits<PointVector::iterator>::difference_type count, step;
-    count = std::distance(first, last);
+    count = std::distance(cur, last);
 
     // Object we'll use to make comparisons
     FuzzyPointCompare comp(tol);
 
     while (count>0)
       {
-        it = first;
+        it = cur;
         step = count/2;
         std::advance (it, step);
 
-        // Grab the point out of 'it'
-        Point p = it->first;
-
-        // If p relative_fuzzy_equals val, return 'it'
-        if (p.relative_fuzzy_equals(val, tol))
-          return it;
-
-        // Otherwise, continue binary searching
-        if ( comp(p,val) )
+        if ( comp(it->first,val) )
           {
-            first = ++it;
+            cur = ++it;
             count -= step+1;
           }
         else
           count = step;
       }
-    return first;
+
+    if ( comp(val,cur->first) )
+      return last;
+    else
+      return cur;
   }
 
 }
