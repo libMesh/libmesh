@@ -37,8 +37,8 @@
         class NonlinearNeoHookeCurrentConfig {
         public:
           NonlinearNeoHookeCurrentConfig(
-              const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi, GetPot& args) :
-              dphi(dphi) {
+              const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi_in, GetPot& args) :
+              dphi(dphi_in) {
             E = args("material/neohooke/e_modulus", 10000.0);
             nu = args("material/neohooke/nu", 0.3);
           }
@@ -83,7 +83,6 @@
         };
         
         #endif /* NONLINEAR_NEOHOOKE_CC_H_ */
-        
 </pre>
 </div>
 
@@ -272,7 +271,7 @@ We currently invert tensors with the assumption that they're 3x3
 
 <div class ="fragment">
 <pre>
-          libmesh_assert (dim == 3); 
+          libmesh_assert (dim == 3);
         
 </pre>
 </div>
@@ -438,6 +437,16 @@ Advance to the next timestep in a transient problem
 </pre>
 </div>
 <div class = "comment">
+Initialize libMesh and any dependent libraries
+</div>
+
+<div class ="fragment">
+<pre>
+          LibMeshInit init(argc, argv);
+        
+</pre>
+</div>
+<div class = "comment">
 Skip this example if we do not meet certain requirements
 </div>
 
@@ -450,12 +459,12 @@ Skip this example if we do not meet certain requirements
 </pre>
 </div>
 <div class = "comment">
-Initialize libMesh and any dependent libraries
+Trilinos gives us an inverted element on this one...
 </div>
 
 <div class ="fragment">
 <pre>
-          LibMeshInit init(argc, argv);
+          libmesh_example_assert(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
         
 </pre>
 </div>
@@ -495,7 +504,16 @@ Create System and Mesh
           int dim = args("mesh/generation/dimension", 3);
           libmesh_example_assert(dim &lt;= LIBMESH_DIM, "3D support");
         
-          Mesh mesh(dim);
+</pre>
+</div>
+<div class = "comment">
+Create a mesh distributed across the default MPI communicator.
+</div>
+
+<div class ="fragment">
+<pre>
+          Mesh mesh(init.comm(), dim);
+        
           EquationSystems systems(mesh);
         
 </pre>
@@ -521,7 +539,6 @@ run the systems
           out &lt;&lt; "Finished calculations" &lt;&lt; std::endl;
           return 0;
         }
-        
 </pre>
 </div>
 
@@ -571,14 +588,11 @@ run the systems
         	  invF.zero();
         	  for (unsigned int i = 0; i &lt; 3; ++i)
         	    for (unsigned int j = 0; j &lt; 3; ++j) {
-        	      invF(i, j) += grad_u(i)(j);
+        	      invF(i, j) += libmesh_real(grad_u(i)(j));
         	    }
-            F.add(inv(invF));
-        	}
+        	  F.add(inv(invF));
         
-        	if (F.det() &lt; -TOLERANCE) {
-        		std::cout &lt;&lt; "detF &lt; 0" &lt;&lt; std::endl;
-        		libmesh_error();
+        	  libmesh_assert_greater (F.det(), -TOLERANCE);
         	}
         
         	if (this-&gt;calculate_linearized_stiffness) {
@@ -732,9 +746,9 @@ Bring in everything from the libMesh namespace
 <pre>
         using namespace libMesh;
         
-        SolidSystem::SolidSystem(EquationSystems& es, const std::string& name,
-            const unsigned int number) :
-            FEMSystem(es, name, number) {
+        SolidSystem::SolidSystem(EquationSystems& es, const std::string& name_in,
+            const unsigned int number_in) :
+            FEMSystem(es, name_in, number_in) {
         
 </pre>
 </div>
@@ -770,7 +784,7 @@ the auxiliary system.
               unsigned int source_dof = node-&gt;dof_number(this-&gt;number(), var[d], 0);
               unsigned int dest_dof = node-&gt;dof_number(aux_sys.number(), undefo_var[d],
                   0);
-              Real value = this-&gt;current_local_solution-&gt;el(source_dof);
+              Number value = this-&gt;current_local_solution-&gt;el(source_dof);
               aux_sys.current_local_solution-&gt;set(dest_dof, value);
             }
           }
@@ -1262,8 +1276,13 @@ calculate coordinates of qp on undeformed mesh
               Point orig_point;
               for (unsigned int i = 0; i &lt; n_x_dofs; ++i) {
                 for (unsigned int d = 0; d &lt; c.dim; ++d) {
-                  Real orig_val = auxsys.current_solution(undefo_dofs[d][i]);
+                  Number orig_val = auxsys.current_solution(undefo_dofs[d][i]);
+        
+        #if LIBMESH_USE_COMPLEX_NUMBERS
+                  orig_point(d) += phi[i][qp] * orig_val.real();
+        #else
                   orig_point(d) += phi[i][qp] * orig_val;
+        #endif
                 }
               }
         
@@ -1308,7 +1327,6 @@ Assemble
         
           return request_jacobian;
         }
-        
 </pre>
 </div>
 
@@ -1335,8 +1353,8 @@ Assemble
   <B><FONT COLOR="#228B22">class</FONT></B> NonlinearNeoHookeCurrentConfig {
   <B><FONT COLOR="#228B22">public</FONT></B>:
     NonlinearNeoHookeCurrentConfig(
-        <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi, GetPot&amp; args) :
-        dphi(dphi) {
+        <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi_in, GetPot&amp; args) :
+        dphi(dphi_in) {
       E = args(<B><FONT COLOR="#BC8F8F">&quot;material/neohooke/e_modulus&quot;</FONT></B>, 10000.0);
       nu = args(<B><FONT COLOR="#BC8F8F">&quot;material/neohooke/nu&quot;</FONT></B>, 0.3);
     }
@@ -1381,7 +1399,6 @@ Assemble
   };
   
   #endif <I><FONT COLOR="#B22222">/* NONLINEAR_NEOHOOKE_CC_H_ */</FONT></I>
-  
 </pre> 
 <a name="nocomments"></a> 
 <br><br><br> <h1> The source file solid_system.h without comments: </h1> 
@@ -1461,7 +1478,7 @@ Assemble
   <B><FONT COLOR="#228B22">void</FONT></B> setup(EquationSystems&amp; systems, Mesh&amp; mesh, GetPot&amp; args)
   {
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
-    libmesh_assert (dim == 3); 
+    libmesh_assert (dim == 3);
   
     ElemType eltype = Utility::string_to_enum&lt;ElemType&gt;(args(<B><FONT COLOR="#BC8F8F">&quot;mesh/generation/element_type&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;hex8&quot;</FONT></B>));
     <B><FONT COLOR="#228B22">int</FONT></B> nx = args(<B><FONT COLOR="#BC8F8F">&quot;mesh/generation/num_elem&quot;</FONT></B>, 4, 0);
@@ -1543,11 +1560,13 @@ Assemble
   
   <B><FONT COLOR="#228B22">int</FONT></B> main(<B><FONT COLOR="#228B22">int</FONT></B> argc, <B><FONT COLOR="#228B22">char</FONT></B>** argv)
   {
+    LibMeshInit init(argc, argv);
+  
   #ifndef LIBMESH_HAVE_VTK
     libmesh_example_assert(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-vtk&quot;</FONT></B>);
   #endif
   
-    LibMeshInit init(argc, argv);
+    libmesh_example_assert(libMesh::default_solver_package() != TRILINOS_SOLVERS, <B><FONT COLOR="#BC8F8F">&quot;--enable-petsc&quot;</FONT></B>);
   
     <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::n_threads() &gt; 1)
       {
@@ -1561,7 +1580,8 @@ Assemble
     <B><FONT COLOR="#228B22">int</FONT></B> dim = args(<B><FONT COLOR="#BC8F8F">&quot;mesh/generation/dimension&quot;</FONT></B>, 3);
     libmesh_example_assert(dim &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;3D support&quot;</FONT></B>);
   
-    Mesh mesh(dim);
+    Mesh mesh(init.comm(), dim);
+  
     EquationSystems systems(mesh);
   
     setup(systems, mesh, args);
@@ -1571,7 +1591,6 @@ Assemble
     out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Finished calculations&quot;</FONT></B> &lt;&lt; std::endl;
     <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
-  
 </pre> 
 <a name="nocomments"></a> 
 <br><br><br> <h1> The source file nonlinear_neohooke_cc.C without comments: </h1> 
@@ -1615,14 +1634,11 @@ Assemble
   	  invF.zero();
   	  <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; 3; ++i)
   	    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j = 0; j &lt; 3; ++j) {
-  	      invF(i, j) += grad_u(i)(j);
+  	      invF(i, j) += libmesh_real(grad_u(i)(j));
   	    }
-      F.add(inv(invF));
-  	}
+  	  F.add(inv(invF));
   
-  	<B><FONT COLOR="#A020F0">if</FONT></B> (F.det() &lt; -TOLERANCE) {
-  		<B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;detF &lt; 0&quot;</FONT></B> &lt;&lt; std::endl;
-  		libmesh_error();
+  	  libmesh_assert_greater (F.det(), -TOLERANCE);
   	}
   
   	<B><FONT COLOR="#A020F0">if</FONT></B> (<B><FONT COLOR="#A020F0">this</FONT></B>-&gt;calculate_linearized_stiffness) {
@@ -1754,9 +1770,9 @@ Assemble
   
   using namespace libMesh;
   
-  <B><FONT COLOR="#5F9EA0">SolidSystem</FONT></B>::SolidSystem(EquationSystems&amp; es, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name,
-      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number) :
-      FEMSystem(es, name, number) {
+  <B><FONT COLOR="#5F9EA0">SolidSystem</FONT></B>::SolidSystem(EquationSystems&amp; es, <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name_in,
+      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number_in) :
+      FEMSystem(es, name_in, number_in) {
   
     <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;time_solver = AutoPtr&lt;TimeSolver&gt;(<B><FONT COLOR="#A020F0">new</FONT></B> SteadySolver(*<B><FONT COLOR="#A020F0">this</FONT></B>));
   }
@@ -1775,7 +1791,7 @@ Assemble
         <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> source_dof = node-&gt;dof_number(<B><FONT COLOR="#A020F0">this</FONT></B>-&gt;number(), var[d], 0);
         <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dest_dof = node-&gt;dof_number(aux_sys.number(), undefo_var[d],
             0);
-        Real value = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;current_local_solution-&gt;el(source_dof);
+        Number value = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;current_local_solution-&gt;el(source_dof);
         aux_sys.current_local_solution-&gt;set(dest_dof, value);
       }
     }
@@ -1983,8 +1999,13 @@ Assemble
         Point orig_point;
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; n_x_dofs; ++i) {
           <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> d = 0; d &lt; c.dim; ++d) {
-            Real orig_val = auxsys.current_solution(undefo_dofs[d][i]);
+            Number orig_val = auxsys.current_solution(undefo_dofs[d][i]);
+  
+  #<B><FONT COLOR="#A020F0">if</FONT></B> LIBMESH_USE_COMPLEX_NUMBERS
+            orig_point(d) += phi[i][qp] * orig_val.real();
+  #<B><FONT COLOR="#A020F0">else</FONT></B>
             orig_point(d) += phi[i][qp] * orig_val;
+  #endif
           }
         }
   
@@ -2013,27 +2034,27 @@ Assemble
   
     <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;
   }
-  
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+make[4]: Entering directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/fem_system/fem_system_ex2'
 ***************************************************************
 * Running Example fem_system_ex2:
-*  mpirun -np 2 example-dbg  
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
  
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../../../include/libmesh/diff_physics.h, line 371, compiled Feb  1 2013 at 09:22:48 ***
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../../../include/libmesh/vtk_io.h, line 178, compiled Feb  1 2013 at 09:22:42 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../../../include/libmesh/diff_physics.h, line 382, compiled Apr 19 2013 at 11:50:09 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: ../src/mesh/vtk_io.C, line 358, compiled Apr 19 2013 at 11:42:41 ***
 ===== Time Step    0 (  0.00%), time =    0.00 =====
 Solving Solid
 Assembling the System
 Nonlinear Residual: 3691.41
 Linear solve starting, tolerance 0.00
-Linear solve finished, step 8, residual 0.00
+Linear solve finished, step 12, residual 0.00
 Trying full Newton step
-  Current Residual: 0.35
-  Nonlinear solver current_residual 0.35 > 0.00
+  Current Residual: 0.16
+  Nonlinear solver current_residual 0.16 > 0.00
   Nonlinear solver relative residual 0.00 > 0.00
   Nonlinear solver converged, step 0, relative step size 0.00 < 0.00
 Doing a reinit of the equation systems
@@ -2041,16 +2062,16 @@ Advancing to next step
 ===== Time Step    1 ( 20.00%), time =    0.00 =====
 Solving Solid
 Assembling the System
-Nonlinear Residual: 738516.25
+Nonlinear Residual: 738516.15
 Linear solve starting, tolerance 0.00
-Linear solve finished, step 8, residual 0.00
+Linear solve finished, step 12, residual 0.00
 Trying full Newton step
-  Current Residual: 72.25
+  Current Residual: 52.19
   Nonlinear step: |du|/|u| = 0.06, |du| = 1.04
 Assembling the System
-Nonlinear Residual: 72.25
+Nonlinear Residual: 52.19
 Linear solve starting, tolerance 0.00
-Linear solve finished, step 13, residual 0.00
+Linear solve finished, step 15, residual 0.00
 Trying full Newton step
   Current Residual: 1.56
   Nonlinear solver current_residual 1.56 > 0.00
@@ -2061,46 +2082,53 @@ Advancing to next step
 ===== Time Step    2 ( 40.00%), time =    0.00 =====
 Solving Solid
 Assembling the System
-Nonlinear Residual: 788389.66
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 9, residual 0.00
-Trying full Newton step
-  Current Residual: 84.42
-  Nonlinear step: |du|/|u| = 0.06, |du| = 1.05
-Assembling the System
-Nonlinear Residual: 84.42
+Nonlinear Residual: 788391.92
 Linear solve starting, tolerance 0.00
 Linear solve finished, step 12, residual 0.00
 Trying full Newton step
-  Current Residual: 3.97
-  Nonlinear solver current_residual 3.97 > 0.00
+  Current Residual: 58.83
+  Nonlinear step: |du|/|u| = 0.06, |du| = 1.05
+Assembling the System
+Nonlinear Residual: 58.83
+Linear solve starting, tolerance 0.00
+Linear solve finished, step 16, residual 0.00
+Trying full Newton step
+  Current Residual: 3.93
+  Nonlinear step: |du|/|u| = 0.00, |du| = 0.02
+Assembling the System
+Nonlinear Residual: 3.93
+Linear solve starting, tolerance 0.00
+Linear solve finished, step 15, residual 0.00
+Trying full Newton step
+  Current Residual: 0.01
+  Nonlinear solver current_residual 0.01 > 0.00
   Nonlinear solver relative residual 0.00 > 0.00
-  Nonlinear solver converged, step 1, relative step size 0.00 < 0.00
+  Nonlinear solver converged, step 2, relative step size 0.00 < 0.00
 Doing a reinit of the equation systems
 Advancing to next step
 ===== Time Step    3 ( 60.00%), time =    0.00 =====
 Solving Solid
 Assembling the System
-Nonlinear Residual: 844777.74
+Nonlinear Residual: 844767.72
 Linear solve starting, tolerance 0.00
-Linear solve finished, step 9, residual 0.00
+Linear solve finished, step 12, residual 0.00
 Trying full Newton step
-  Current Residual: 124.74
+  Current Residual: 84.75
   Nonlinear step: |du|/|u| = 0.06, |du| = 1.06
 Assembling the System
-Nonlinear Residual: 124.74
+Nonlinear Residual: 84.75
 Linear solve starting, tolerance 0.00
-Linear solve finished, step 13, residual 0.00
+Linear solve finished, step 16, residual 0.00
 Trying full Newton step
-  Current Residual: 8.64
+  Current Residual: 8.60
   Nonlinear step: |du|/|u| = 0.00, |du| = 0.02
 Assembling the System
-Nonlinear Residual: 8.64
+Nonlinear Residual: 8.60
 Linear solve starting, tolerance 0.00
-Linear solve finished, step 14, residual 0.00
+Linear solve finished, step 15, residual 0.00
 Trying full Newton step
-  Current Residual: 0.03
-  Nonlinear solver current_residual 0.03 > 0.00
+  Current Residual: 0.05
+  Nonlinear solver current_residual 0.05 > 0.00
   Nonlinear solver relative residual 0.00 > 0.00
   Nonlinear solver converged, step 2, relative step size 0.00 < 0.00
 Doing a reinit of the equation systems
@@ -2108,95 +2136,58 @@ Advancing to next step
 ===== Time Step    4 ( 80.00%), time =    0.00 =====
 Solving Solid
 Assembling the System
-Nonlinear Residual: 909688.39
+Nonlinear Residual: 909688.38
 Linear solve starting, tolerance 0.00
-Linear solve finished, step 9, residual 0.00
+Linear solve finished, step 13, residual 0.00
 Trying full Newton step
-  Current Residual: 256.39
+  Current Residual: 165.58
   Nonlinear step: |du|/|u| = 0.07, |du| = 1.07
 Assembling the System
-Nonlinear Residual: 256.39
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 14, residual 0.00
-Trying full Newton step
-  Current Residual: 20.00
-  Nonlinear step: |du|/|u| = 0.00, |du| = 0.03
-Assembling the System
-Nonlinear Residual: 20.00
+Nonlinear Residual: 165.58
 Linear solve starting, tolerance 0.00
 Linear solve finished, step 17, residual 0.00
 Trying full Newton step
-  Current Residual: 0.12
-  Nonlinear solver current_residual 0.12 > 0.00
+  Current Residual: 20.40
+  Nonlinear step: |du|/|u| = 0.00, |du| = 0.03
+Assembling the System
+Nonlinear Residual: 20.40
+Linear solve starting, tolerance 0.00
+Linear solve finished, step 20, residual 0.00
+Trying full Newton step
+  Current Residual: 0.14
+  Nonlinear solver current_residual 0.14 > 0.00
   Nonlinear solver relative residual 0.00 > 0.00
   Nonlinear solver converged, step 2, relative step size 0.00 < 0.00
 Doing a reinit of the equation systems
 Advancing to next step
 Finished calculations
 
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| N7libMesh10DiffSolverE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| N7libMesh10FEAbstractE reference count information:
-|  Creations:    534
-|  Destructions: 534
-| N7libMesh10Parameters5ValueE reference count information:
-|  Creations:    5
-|  Destructions: 5
-| N7libMesh10TimeSolverE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| N7libMesh12LinearSolverIdEE reference count information:
-|  Creations:    2
-|  Destructions: 2
-| N7libMesh12SparseMatrixIdEE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| N7libMesh13NumericVectorIdEE reference count information:
-|  Creations:    75
-|  Destructions: 75
-| N7libMesh15EquationSystemsE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| N7libMesh4ElemE reference count information:
-|  Creations:    2465
-|  Destructions: 2465
-| N7libMesh4NodeE reference count information:
-|  Creations:    125
-|  Destructions: 125
-| N7libMesh5QBaseE reference count information:
-|  Creations:    465
-|  Destructions: 465
-| N7libMesh6DofMapE reference count information:
-|  Creations:    2
-|  Destructions: 2
-| N7libMesh6SystemE reference count information:
-|  Creations:    2
-|  Destructions: 2
-| N7libMesh9DofObjectE reference count information:
-|  Creations:    4480
-|  Destructions: 4480
- ---------------------------------------------------------------------------- 
-
- -------------------------------------------------------------
-| Processor id:   0                                           |
-| Num Processors: 2                                           |
-| Time:           Fri Feb  1 09:31:49 2013                    |
-| OS:             Linux                                       |
-| HostName:       lkirk-home                                  |
-| OS Release:     3.2.0-35-generic                            |
-| OS Version:     #55-Ubuntu SMP Wed Dec 5 17:42:16 UTC 2012  |
-| Machine:        x86_64                                      |
-| Username:       benkirk                                     |
-| Configuration:  ./configure  '--prefix=/home/benkirk/codes/install'|
-|  '--disable-glibcxx-debugging'                              |
-|  '--enable-everything'                                      |
- -------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Processor id:   0                                                                                                 |
+| Num Processors: 4                                                                                                 |
+| Time:           Fri Apr 19 11:50:22 2013                                                                          |
+| OS:             Linux                                                                                             |
+| HostName:       spark.ices.utexas.edu                                                                             |
+| OS Release:     2.6.32-279.22.1.el6.x86_64                                                                        |
+| OS Version:     #1 SMP Tue Feb 5 14:33:39 CST 2013                                                                |
+| Machine:        x86_64                                                                                            |
+| Username:       roystgnr                                                                                          |
+| Configuration:  ../configure  '--enable-everything'                                                               |
+|  'METHODS=devel'                                                                                                  |
+|  '--prefix=/h2/roystgnr/libmesh-test'                                                                             |
+|  'CXX=distcc /usr/bin/g++'                                                                                        |
+|  'CC=distcc /usr/bin/gcc'                                                                                         |
+|  'FC=distcc /usr/bin/gfortran'                                                                                    |
+|  'F77=distcc /usr/bin/gfortran'                                                                                   |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                          |
+|  'PETSC_ARCH=gcc-system-mkl-gf-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                     |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/gcc-system/mpich2-1.4.1p1/mkl-gf-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/gcc-system'                                                 |
+|  'HDF5_DIR=/opt/apps/ossw/libraries/hdf5/hdf5-1.8.9/sl6/gcc-system'                                               |
+ -------------------------------------------------------------------------------------------------------------------
  ----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=6.03736, Active time=5.89942                                                   |
+| libMesh Performance: Alive time=0.862794, Active time=0.741512                                                 |
  ----------------------------------------------------------------------------------------------------------------
 | Event                              nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                              w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -2204,572 +2195,104 @@ Finished calculations
 |                                                                                                                |
 |                                                                                                                |
 | DofMap                                                                                                         |
-|   add_neighbors_to_send_list()     12        0.0633      0.005278    0.1407      0.011723    1.07     2.38     |
-|   build_sparsity()                 6         0.0768      0.012795    0.1419      0.023651    1.30     2.41     |
-|   create_dof_constraints()         12        0.0033      0.000272    0.0033      0.000272    0.06     0.06     |
-|   distribute_dofs()                12        0.2208      0.018399    0.8698      0.072484    3.74     14.74    |
-|   dof_indices()                    29856     2.4221      0.000081    2.4221      0.000081    41.06    41.06    |
-|   old_dof_indices()                2560      0.2635      0.000103    0.2635      0.000103    4.47     4.47     |
-|   prepare_send_list()              12        0.0020      0.000169    0.0020      0.000169    0.03     0.03     |
-|   reinit()                         12        0.2184      0.018203    0.2184      0.018203    3.70     3.70     |
+|   add_neighbors_to_send_list()     12        0.0027      0.000227    0.0095      0.000795    0.37     1.29     |
+|   build_sparsity()                 6         0.0020      0.000332    0.0068      0.001128    0.27     0.91     |
+|   create_dof_constraints()         12        0.0005      0.000041    0.0005      0.000041    0.07     0.07     |
+|   distribute_dofs()                12        0.0023      0.000195    0.0117      0.000974    0.32     1.58     |
+|   dof_indices()                    16316     0.0858      0.000005    0.0858      0.000005    11.58    11.58    |
+|   old_dof_indices()                1280      0.0079      0.000006    0.0079      0.000006    1.07     1.07     |
+|   prepare_send_list()              12        0.0003      0.000027    0.0003      0.000027    0.04     0.04     |
+|   reinit()                         12        0.0028      0.000233    0.0028      0.000233    0.38     0.38     |
 |                                                                                                                |
 | EquationSystems                                                                                                |
-|   build_solution_vector()          5         0.0055      0.001109    0.0743      0.014862    0.09     1.26     |
+|   build_solution_vector()          5         0.0010      0.000191    0.0065      0.001297    0.13     0.87     |
 |                                                                                                                |
 | FE                                                                                                             |
-|   compute_shape_functions()        6272      0.5041      0.000080    0.5041      0.000080    8.55     8.55     |
-|   init_shape_functions()           2242      0.0567      0.000025    0.0567      0.000025    0.96     0.96     |
+|   compute_shape_functions()        3200      0.0318      0.000010    0.0318      0.000010    4.29     4.29     |
+|   init_shape_functions()           1100      0.0098      0.000009    0.0098      0.000009    1.32     1.32     |
 |                                                                                                                |
 | FEMSystem                                                                                                      |
-|   assembly()                       11        0.9274      0.084313    2.1994      0.199943    15.72    37.28    |
-|   assembly(get_residual)           11        0.1628      0.014801    1.4332      0.130294    2.76     24.29    |
+|   assembly()                       12        0.1370      0.011416    0.2158      0.017980    18.47    29.10    |
+|   assembly(get_residual)           12        0.0288      0.002402    0.1080      0.009000    3.89     14.56    |
 |                                                                                                                |
 | FEMap                                                                                                          |
-|   compute_affine_map()             290       0.0045      0.000016    0.0045      0.000016    0.08     0.08     |
-|   compute_face_map()               2112      0.0289      0.000014    0.0289      0.000014    0.49     0.49     |
-|   compute_map()                    5982      0.2241      0.000037    0.2241      0.000037    3.80     3.80     |
-|   init_face_shape_functions()      44        0.0012      0.000028    0.0012      0.000028    0.02     0.02     |
-|   init_reference_to_physical_map() 2242      0.0796      0.000035    0.0796      0.000035    1.35     1.35     |
+|   compute_affine_map()             138       0.0006      0.000005    0.0006      0.000005    0.09     0.09     |
+|   compute_face_map()               960       0.0034      0.000004    0.0034      0.000004    0.46     0.46     |
+|   compute_map()                    3062      0.0255      0.000008    0.0255      0.000008    3.44     3.44     |
+|   init_face_shape_functions()      48        0.0004      0.000007    0.0004      0.000007    0.05     0.05     |
+|   init_reference_to_physical_map() 1100      0.0121      0.000011    0.0121      0.000011    1.63     1.63     |
 |                                                                                                                |
 | LocationMap                                                                                                    |
-|   init()                           5         0.0013      0.000266    0.0013      0.000266    0.02     0.02     |
+|   init()                           5         0.0002      0.000046    0.0002      0.000046    0.03     0.03     |
 |                                                                                                                |
 | Mesh                                                                                                           |
-|   contract()                       5         0.0003      0.000068    0.0007      0.000137    0.01     0.01     |
-|   find_neighbors()                 1         0.0057      0.005743    0.0059      0.005915    0.10     0.10     |
-|   renumber_nodes_and_elem()        7         0.0007      0.000099    0.0007      0.000099    0.01     0.01     |
+|   contract()                       5         0.0000      0.000010    0.0001      0.000023    0.01     0.02     |
+|   find_neighbors()                 1         0.0003      0.000280    0.0005      0.000496    0.04     0.07     |
+|   renumber_nodes_and_elem()        7         0.0001      0.000014    0.0001      0.000014    0.01     0.01     |
 |                                                                                                                |
 | MeshCommunication                                                                                              |
-|   compute_hilbert_indices()        2         0.0024      0.001188    0.0024      0.001188    0.04     0.04     |
-|   find_global_indices()            2         0.0011      0.000552    0.0053      0.002652    0.02     0.09     |
-|   parallel_sort()                  2         0.0010      0.000523    0.0012      0.000619    0.02     0.02     |
+|   compute_hilbert_indices()        2         0.0005      0.000231    0.0005      0.000231    0.06     0.06     |
+|   find_global_indices()            2         0.0001      0.000075    0.0015      0.000737    0.02     0.20     |
+|   parallel_sort()                  2         0.0003      0.000163    0.0006      0.000280    0.04     0.08     |
 |                                                                                                                |
 | MeshOutput                                                                                                     |
-|   write_equation_systems()         5         0.0167      0.003331    0.0913      0.018268    0.28     1.55     |
+|   write_equation_systems()         5         0.0073      0.001460    0.0141      0.002826    0.98     1.91     |
 |                                                                                                                |
 | MeshRefinement                                                                                                 |
-|   _coarsen_elements()              5         0.0002      0.000036    0.0002      0.000040    0.00     0.00     |
-|   _refine_elements()               5         0.0004      0.000082    0.0004      0.000087    0.01     0.01     |
-|   make_coarsening_compatible()     10        0.0004      0.000039    0.0004      0.000039    0.01     0.01     |
-|   make_refinement_compatible()     10        0.0000      0.000003    0.0001      0.000007    0.00     0.00     |
+|   _coarsen_elements()              5         0.0000      0.000006    0.0001      0.000015    0.00     0.01     |
+|   _refine_elements()               5         0.0001      0.000017    0.0003      0.000051    0.01     0.03     |
+|   make_coarsening_compatible()     10        0.0001      0.000008    0.0001      0.000008    0.01     0.01     |
+|   make_flags_parallel_consistent() 10        0.0005      0.000052    0.0034      0.000338    0.07     0.46     |
+|   make_refinement_compatible()     10        0.0000      0.000001    0.0001      0.000005    0.00     0.01     |
 |                                                                                                                |
 | MeshTools::Generation                                                                                          |
-|   build_cube()                     1         0.0020      0.002030    0.0020      0.002030    0.03     0.03     |
+|   build_cube()                     1         0.0002      0.000160    0.0002      0.000160    0.02     0.02     |
 |                                                                                                                |
 | MetisPartitioner                                                                                               |
-|   partition()                      1         0.0045      0.004475    0.0068      0.006819    0.08     0.12     |
+|   partition()                      1         0.0010      0.000959    0.0016      0.001582    0.13     0.21     |
 |                                                                                                                |
 | NewtonSolver                                                                                                   |
-|   solve()                          5         0.0639      0.012775    4.1008      0.820158    1.08     69.51    |
+|   solve()                          5         0.2210      0.044191    0.6325      0.126505    29.80    85.30    |
 |                                                                                                                |
 | Parallel                                                                                                       |
-|   allgather()                      40        0.0005      0.000011    0.0005      0.000013    0.01     0.01     |
-|   max(bool)                        15907     0.0504      0.000003    0.0504      0.000003    0.85     0.85     |
-|   max(scalar)                      34154     0.1126      0.000003    0.1126      0.000003    1.91     1.91     |
-|   max(vector)                      7131      0.0519      0.000007    0.1268      0.000018    0.88     2.15     |
-|   max(vector<bool>)                25        0.0011      0.000043    0.0014      0.000057    0.02     0.02     |
-|   min(bool)                        15316     0.0503      0.000003    0.0503      0.000003    0.85     0.85     |
-|   min(scalar)                      27286     0.1475      0.000005    0.1475      0.000005    2.50     2.50     |
-|   min(vector)                      7131      0.0522      0.000007    0.1287      0.000018    0.88     2.18     |
-|   probe()                          152       0.0029      0.000019    0.0029      0.000019    0.05     0.05     |
-|   receive()                        152       0.0012      0.000008    0.0042      0.000028    0.02     0.07     |
-|   send()                           152       0.0007      0.000004    0.0007      0.000004    0.01     0.01     |
-|   send_receive()                   156       0.0017      0.000011    0.0070      0.000045    0.03     0.12     |
-|   sum()                            67        0.0008      0.000011    0.0015      0.000023    0.01     0.03     |
+|   allgather()                      40        0.0026      0.000064    0.0026      0.000065    0.35     0.35     |
+|   max(bool)                        21        0.0003      0.000015    0.0003      0.000015    0.04     0.04     |
+|   max(scalar)                      1325      0.0048      0.000004    0.0048      0.000004    0.65     0.65     |
+|   max(vector)                      323       0.0018      0.000006    0.0054      0.000017    0.24     0.72     |
+|   min(bool)                        1663      0.0059      0.000004    0.0059      0.000004    0.80     0.80     |
+|   min(scalar)                      1312      0.0611      0.000047    0.0611      0.000047    8.24     8.24     |
+|   min(vector)                      323       0.0020      0.000006    0.0057      0.000018    0.28     0.76     |
+|   probe()                          594       0.0040      0.000007    0.0040      0.000007    0.54     0.54     |
+|   receive()                        594       0.0013      0.000002    0.0054      0.000009    0.18     0.73     |
+|   send()                           594       0.0007      0.000001    0.0007      0.000001    0.10     0.10     |
+|   send_receive()                   598       0.0019      0.000003    0.0086      0.000014    0.26     1.16     |
+|   sum()                            68        0.0006      0.000009    0.0018      0.000027    0.08     0.24     |
 |                                                                                                                |
 | Parallel::Request                                                                                              |
-|   wait()                           152       0.0003      0.000002    0.0003      0.000002    0.00     0.00     |
+|   wait()                           594       0.0004      0.000001    0.0004      0.000001    0.06     0.06     |
 |                                                                                                                |
 | Partitioner                                                                                                    |
-|   set_node_processor_ids()         1         0.0018      0.001837    0.0047      0.004694    0.03     0.08     |
-|   set_parent_processor_ids()       1         0.0002      0.000220    0.0002      0.000220    0.00     0.00     |
+|   set_node_processor_ids()         1         0.0001      0.000088    0.0006      0.000621    0.01     0.08     |
+|   set_parent_processor_ids()       1         0.0000      0.000022    0.0000      0.000022    0.00     0.00     |
 |                                                                                                                |
 | PetscLinearSolver                                                                                              |
-|   solve()                          11        0.0306      0.002786    0.0306      0.002786    0.52     0.52     |
+|   solve()                          12        0.0475      0.003957    0.0475      0.003957    6.40     6.40     |
 |                                                                                                                |
 | ProjectVector                                                                                                  |
-|   operator()                       20        0.0151      0.000756    0.2823      0.014114    0.26     4.79     |
+|   operator()                       20        0.0023      0.000113    0.0108      0.000538    0.30     1.45     |
 |                                                                                                                |
 | System                                                                                                         |
-|   project_vector()                 20        0.0119      0.000597    0.4275      0.021376    0.20     7.25     |
+|   project_vector()                 20        0.0176      0.000881    0.0347      0.001736    2.38     4.68     |
  ----------------------------------------------------------------------------------------------------------------
-| Totals:                            159633    5.8994                                          100.00            |
+| Totals:                            35478     0.7415                                          100.00            |
  ----------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example fem_system_ex2:
-*  mpirun -np 2 example-dbg  
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
-***************************************************************
-* Running Example fem_system_ex2:
-*  mpirun -np 2 example-devel  
-***************************************************************
- 
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../../../include/libmesh/diff_physics.h, line 371, compiled Feb  1 2013 at 09:23:13 ***
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../../../include/libmesh/vtk_io.h, line 178, compiled Feb  1 2013 at 09:23:01 ***
-===== Time Step    0 (  0.00%), time =    0.00 =====
-Solving Solid
-Assembling the System
-Nonlinear Residual: 3691.41
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 8, residual 0.00
-Trying full Newton step
-  Current Residual: 0.35
-  Nonlinear solver current_residual 0.35 > 0.00
-  Nonlinear solver relative residual 0.00 > 0.00
-  Nonlinear solver converged, step 0, relative step size 0.00 < 0.00
-Doing a reinit of the equation systems
-Advancing to next step
-===== Time Step    1 ( 20.00%), time =    0.00 =====
-Solving Solid
-Assembling the System
-Nonlinear Residual: 738516.25
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 8, residual 0.00
-Trying full Newton step
-  Current Residual: 72.25
-  Nonlinear step: |du|/|u| = 0.06, |du| = 1.04
-Assembling the System
-Nonlinear Residual: 72.25
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 13, residual 0.00
-Trying full Newton step
-  Current Residual: 1.56
-  Nonlinear solver current_residual 1.56 > 0.00
-  Nonlinear solver relative residual 0.00 > 0.00
-  Nonlinear solver converged, step 1, relative step size 0.00 < 0.00
-Doing a reinit of the equation systems
-Advancing to next step
-===== Time Step    2 ( 40.00%), time =    0.00 =====
-Solving Solid
-Assembling the System
-Nonlinear Residual: 788389.66
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 9, residual 0.00
-Trying full Newton step
-  Current Residual: 84.42
-  Nonlinear step: |du|/|u| = 0.06, |du| = 1.05
-Assembling the System
-Nonlinear Residual: 84.42
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 12, residual 0.00
-Trying full Newton step
-  Current Residual: 3.97
-  Nonlinear solver current_residual 3.97 > 0.00
-  Nonlinear solver relative residual 0.00 > 0.00
-  Nonlinear solver converged, step 1, relative step size 0.00 < 0.00
-Doing a reinit of the equation systems
-Advancing to next step
-===== Time Step    3 ( 60.00%), time =    0.00 =====
-Solving Solid
-Assembling the System
-Nonlinear Residual: 844777.74
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 9, residual 0.00
-Trying full Newton step
-  Current Residual: 124.74
-  Nonlinear step: |du|/|u| = 0.06, |du| = 1.06
-Assembling the System
-Nonlinear Residual: 124.74
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 13, residual 0.00
-Trying full Newton step
-  Current Residual: 8.64
-  Nonlinear step: |du|/|u| = 0.00, |du| = 0.02
-Assembling the System
-Nonlinear Residual: 8.64
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 14, residual 0.00
-Trying full Newton step
-  Current Residual: 0.03
-  Nonlinear solver current_residual 0.03 > 0.00
-  Nonlinear solver relative residual 0.00 > 0.00
-  Nonlinear solver converged, step 2, relative step size 0.00 < 0.00
-Doing a reinit of the equation systems
-Advancing to next step
-===== Time Step    4 ( 80.00%), time =    0.00 =====
-Solving Solid
-Assembling the System
-Nonlinear Residual: 909688.39
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 9, residual 0.00
-Trying full Newton step
-  Current Residual: 256.39
-  Nonlinear step: |du|/|u| = 0.07, |du| = 1.07
-Assembling the System
-Nonlinear Residual: 256.39
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 14, residual 0.00
-Trying full Newton step
-  Current Residual: 20.00
-  Nonlinear step: |du|/|u| = 0.00, |du| = 0.03
-Assembling the System
-Nonlinear Residual: 20.00
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 17, residual 0.00
-Trying full Newton step
-  Current Residual: 0.12
-  Nonlinear solver current_residual 0.12 > 0.00
-  Nonlinear solver relative residual 0.00 > 0.00
-  Nonlinear solver converged, step 2, relative step size 0.00 < 0.00
-Doing a reinit of the equation systems
-Advancing to next step
-Finished calculations
-
- -------------------------------------------------------------
-| Processor id:   0                                           |
-| Num Processors: 2                                           |
-| Time:           Fri Feb  1 09:31:50 2013                    |
-| OS:             Linux                                       |
-| HostName:       lkirk-home                                  |
-| OS Release:     3.2.0-35-generic                            |
-| OS Version:     #55-Ubuntu SMP Wed Dec 5 17:42:16 UTC 2012  |
-| Machine:        x86_64                                      |
-| Username:       benkirk                                     |
-| Configuration:  ./configure  '--prefix=/home/benkirk/codes/install'|
-|  '--disable-glibcxx-debugging'                              |
-|  '--enable-everything'                                      |
- -------------------------------------------------------------
- ----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.891264, Active time=0.832516                                                 |
- ----------------------------------------------------------------------------------------------------------------
-| Event                              nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
-|                                              w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
-|----------------------------------------------------------------------------------------------------------------|
-|                                                                                                                |
-|                                                                                                                |
-| DofMap                                                                                                         |
-|   add_neighbors_to_send_list()     12        0.0045      0.000377    0.0093      0.000779    0.54     1.12     |
-|   build_sparsity()                 6         0.0055      0.000923    0.0099      0.001648    0.66     1.19     |
-|   create_dof_constraints()         12        0.0007      0.000059    0.0007      0.000059    0.08     0.08     |
-|   distribute_dofs()                12        0.0031      0.000255    0.0086      0.000720    0.37     1.04     |
-|   dof_indices()                    29856     0.1645      0.000006    0.1645      0.000006    19.75    19.75    |
-|   old_dof_indices()                2560      0.0172      0.000007    0.0172      0.000007    2.07     2.07     |
-|   prepare_send_list()              12        0.0003      0.000022    0.0003      0.000022    0.03     0.03     |
-|   reinit()                         12        0.0036      0.000298    0.0036      0.000298    0.43     0.43     |
-|                                                                                                                |
-| EquationSystems                                                                                                |
-|   build_solution_vector()          5         0.0019      0.000379    0.0078      0.001552    0.23     0.93     |
-|                                                                                                                |
-| FE                                                                                                             |
-|   compute_shape_functions()        6272      0.0703      0.000011    0.0703      0.000011    8.44     8.44     |
-|   init_shape_functions()           2242      0.0129      0.000006    0.0129      0.000006    1.54     1.54     |
-|                                                                                                                |
-| FEMSystem                                                                                                      |
-|   assembly()                       11        0.3165      0.028769    0.4554      0.041398    38.01    54.70    |
-|   assembly(get_residual)           11        0.0470      0.004271    0.1855      0.016864    5.64     22.28    |
-|                                                                                                                |
-| FEMap                                                                                                          |
-|   compute_affine_map()             290       0.0012      0.000004    0.0012      0.000004    0.15     0.15     |
-|   compute_face_map()               2112      0.0091      0.000004    0.0091      0.000004    1.09     1.09     |
-|   compute_map()                    5982      0.0679      0.000011    0.0679      0.000011    8.15     8.15     |
-|   init_face_shape_functions()      44        0.0003      0.000007    0.0003      0.000007    0.04     0.04     |
-|   init_reference_to_physical_map() 2242      0.0179      0.000008    0.0179      0.000008    2.15     2.15     |
-|                                                                                                                |
-| LocationMap                                                                                                    |
-|   init()                           5         0.0004      0.000074    0.0004      0.000074    0.04     0.04     |
-|                                                                                                                |
-| Mesh                                                                                                           |
-|   contract()                       5         0.0001      0.000015    0.0002      0.000037    0.01     0.02     |
-|   find_neighbors()                 1         0.0004      0.000379    0.0004      0.000442    0.05     0.05     |
-|   renumber_nodes_and_elem()        7         0.0002      0.000023    0.0002      0.000023    0.02     0.02     |
-|                                                                                                                |
-| MeshCommunication                                                                                              |
-|   compute_hilbert_indices()        2         0.0006      0.000284    0.0006      0.000284    0.07     0.07     |
-|   find_global_indices()            2         0.0001      0.000072    0.0011      0.000562    0.02     0.14     |
-|   parallel_sort()                  2         0.0002      0.000082    0.0002      0.000115    0.02     0.03     |
-|                                                                                                                |
-| MeshOutput                                                                                                     |
-|   write_equation_systems()         5         0.0112      0.002241    0.0193      0.003851    1.35     2.31     |
-|                                                                                                                |
-| MeshRefinement                                                                                                 |
-|   _coarsen_elements()              5         0.0000      0.000010    0.0001      0.000012    0.01     0.01     |
-|   _refine_elements()               5         0.0001      0.000024    0.0002      0.000031    0.01     0.02     |
-|   make_coarsening_compatible()     10        0.0001      0.000015    0.0001      0.000015    0.02     0.02     |
-|   make_refinement_compatible()     10        0.0000      0.000002    0.0000      0.000004    0.00     0.01     |
-|                                                                                                                |
-| MeshTools::Generation                                                                                          |
-|   build_cube()                     1         0.0002      0.000187    0.0002      0.000187    0.02     0.02     |
-|                                                                                                                |
-| MetisPartitioner                                                                                               |
-|   partition()                      1         0.0008      0.000788    0.0013      0.001289    0.09     0.15     |
-|                                                                                                                |
-| NewtonSolver                                                                                                   |
-|   solve()                          5         0.0137      0.002734    0.7298      0.145954    1.64     87.66    |
-|                                                                                                                |
-| Parallel                                                                                                       |
-|   allgather()                      40        0.0002      0.000006    0.0003      0.000006    0.03     0.03     |
-|   max(bool)                        21        0.0001      0.000006    0.0001      0.000006    0.02     0.02     |
-|   max(scalar)                      1185      0.0031      0.000003    0.0031      0.000003    0.37     0.37     |
-|   max(vector)                      288       0.0014      0.000005    0.0037      0.000013    0.17     0.44     |
-|   min(bool)                        1478      0.0037      0.000003    0.0037      0.000003    0.45     0.45     |
-|   min(scalar)                      1172      0.0062      0.000005    0.0062      0.000005    0.74     0.74     |
-|   min(vector)                      288       0.0015      0.000005    0.0038      0.000013    0.18     0.45     |
-|   probe()                          152       0.0010      0.000007    0.0010      0.000007    0.12     0.12     |
-|   receive()                        152       0.0006      0.000004    0.0016      0.000011    0.07     0.19     |
-|   send()                           152       0.0005      0.000003    0.0005      0.000003    0.06     0.06     |
-|   send_receive()                   156       0.0008      0.000005    0.0031      0.000020    0.09     0.37     |
-|   sum()                            67        0.0005      0.000007    0.0006      0.000010    0.05     0.08     |
-|                                                                                                                |
-| Parallel::Request                                                                                              |
-|   wait()                           152       0.0001      0.000001    0.0001      0.000001    0.02     0.02     |
-|                                                                                                                |
-| Partitioner                                                                                                    |
-|   set_node_processor_ids()         1         0.0001      0.000125    0.0003      0.000277    0.02     0.03     |
-|   set_parent_processor_ids()       1         0.0000      0.000026    0.0000      0.000026    0.00     0.00     |
-|                                                                                                                |
-| PetscLinearSolver                                                                                              |
-|   solve()                          11        0.0296      0.002688    0.0296      0.002688    3.55     3.55     |
-|                                                                                                                |
-| ProjectVector                                                                                                  |
-|   operator()                       20        0.0052      0.000260    0.0243      0.001216    0.62     2.92     |
-|                                                                                                                |
-| System                                                                                                         |
-|   project_vector()                 20        0.0057      0.000284    0.0400      0.001998    0.68     4.80     |
- ----------------------------------------------------------------------------------------------------------------
-| Totals:                            57115     0.8325                                          100.00            |
- ----------------------------------------------------------------------------------------------------------------
-
- 
-***************************************************************
-* Done Running Example fem_system_ex2:
-*  mpirun -np 2 example-devel  
-***************************************************************
-***************************************************************
-* Running Example fem_system_ex2:
-*  mpirun -np 2 example-opt  
-***************************************************************
- 
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../../../include/libmesh/diff_physics.h, line 371, compiled Feb  1 2013 at 09:22:30 ***
-*** Warning, This code is untested, experimental, or likely to see future API changes: ../../../include/libmesh/vtk_io.h, line 178, compiled Feb  1 2013 at 09:22:23 ***
-===== Time Step    0 (  0.00%), time =    0.00 =====
-Solving Solid
-Assembling the System
-Nonlinear Residual: 3691.41
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 8, residual 0.00
-Trying full Newton step
-  Current Residual: 0.35
-  Nonlinear solver current_residual 0.35 > 0.00
-  Nonlinear solver relative residual 0.00 > 0.00
-  Nonlinear solver converged, step 0, relative step size 0.00 < 0.00
-Doing a reinit of the equation systems
-Advancing to next step
-===== Time Step    1 ( 20.00%), time =    0.00 =====
-Solving Solid
-Assembling the System
-Nonlinear Residual: 738516.25
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 8, residual 0.00
-Trying full Newton step
-  Current Residual: 72.25
-  Nonlinear step: |du|/|u| = 0.06, |du| = 1.04
-Assembling the System
-Nonlinear Residual: 72.25
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 13, residual 0.00
-Trying full Newton step
-  Current Residual: 1.56
-  Nonlinear solver current_residual 1.56 > 0.00
-  Nonlinear solver relative residual 0.00 > 0.00
-  Nonlinear solver converged, step 1, relative step size 0.00 < 0.00
-Doing a reinit of the equation systems
-Advancing to next step
-===== Time Step    2 ( 40.00%), time =    0.00 =====
-Solving Solid
-Assembling the System
-Nonlinear Residual: 788389.66
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 9, residual 0.00
-Trying full Newton step
-  Current Residual: 84.42
-  Nonlinear step: |du|/|u| = 0.06, |du| = 1.05
-Assembling the System
-Nonlinear Residual: 84.42
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 12, residual 0.00
-Trying full Newton step
-  Current Residual: 3.97
-  Nonlinear solver current_residual 3.97 > 0.00
-  Nonlinear solver relative residual 0.00 > 0.00
-  Nonlinear solver converged, step 1, relative step size 0.00 < 0.00
-Doing a reinit of the equation systems
-Advancing to next step
-===== Time Step    3 ( 60.00%), time =    0.00 =====
-Solving Solid
-Assembling the System
-Nonlinear Residual: 844777.74
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 9, residual 0.00
-Trying full Newton step
-  Current Residual: 124.74
-  Nonlinear step: |du|/|u| = 0.06, |du| = 1.06
-Assembling the System
-Nonlinear Residual: 124.74
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 13, residual 0.00
-Trying full Newton step
-  Current Residual: 8.64
-  Nonlinear step: |du|/|u| = 0.00, |du| = 0.02
-Assembling the System
-Nonlinear Residual: 8.64
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 14, residual 0.00
-Trying full Newton step
-  Current Residual: 0.03
-  Nonlinear solver current_residual 0.03 > 0.00
-  Nonlinear solver relative residual 0.00 > 0.00
-  Nonlinear solver converged, step 2, relative step size 0.00 < 0.00
-Doing a reinit of the equation systems
-Advancing to next step
-===== Time Step    4 ( 80.00%), time =    0.00 =====
-Solving Solid
-Assembling the System
-Nonlinear Residual: 909688.39
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 9, residual 0.00
-Trying full Newton step
-  Current Residual: 256.39
-  Nonlinear step: |du|/|u| = 0.07, |du| = 1.07
-Assembling the System
-Nonlinear Residual: 256.39
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 14, residual 0.00
-Trying full Newton step
-  Current Residual: 20.00
-  Nonlinear step: |du|/|u| = 0.00, |du| = 0.03
-Assembling the System
-Nonlinear Residual: 20.00
-Linear solve starting, tolerance 0.00
-Linear solve finished, step 17, residual 0.00
-Trying full Newton step
-  Current Residual: 0.12
-  Nonlinear solver current_residual 0.12 > 0.00
-  Nonlinear solver relative residual 0.00 > 0.00
-  Nonlinear solver converged, step 2, relative step size 0.00 < 0.00
-Doing a reinit of the equation systems
-Advancing to next step
-Finished calculations
-
- -------------------------------------------------------------
-| Processor id:   0                                           |
-| Num Processors: 2                                           |
-| Time:           Fri Feb  1 09:31:54 2013                    |
-| OS:             Linux                                       |
-| HostName:       lkirk-home                                  |
-| OS Release:     3.2.0-35-generic                            |
-| OS Version:     #55-Ubuntu SMP Wed Dec 5 17:42:16 UTC 2012  |
-| Machine:        x86_64                                      |
-| Username:       benkirk                                     |
-| Configuration:  ./configure  '--prefix=/home/benkirk/codes/install'|
-|  '--disable-glibcxx-debugging'                              |
-|  '--enable-everything'                                      |
- -------------------------------------------------------------
- ----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.579611, Active time=0.511288                                                 |
- ----------------------------------------------------------------------------------------------------------------
-| Event                              nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
-|                                              w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
-|----------------------------------------------------------------------------------------------------------------|
-|                                                                                                                |
-|                                                                                                                |
-| DofMap                                                                                                         |
-|   add_neighbors_to_send_list()     12        0.0012      0.000099    0.0018      0.000150    0.23     0.35     |
-|   build_sparsity()                 6         0.0051      0.000847    0.0071      0.001187    0.99     1.39     |
-|   create_dof_constraints()         12        0.0006      0.000052    0.0006      0.000052    0.12     0.12     |
-|   distribute_dofs()                12        0.0012      0.000098    0.0037      0.000312    0.23     0.73     |
-|   dof_indices()                    29856     0.0237      0.000001    0.0237      0.000001    4.63     4.63     |
-|   old_dof_indices()                2560      0.0023      0.000001    0.0023      0.000001    0.45     0.45     |
-|   prepare_send_list()              12        0.0003      0.000023    0.0003      0.000023    0.05     0.05     |
-|   reinit()                         12        0.0018      0.000153    0.0018      0.000153    0.36     0.36     |
-|                                                                                                                |
-| EquationSystems                                                                                                |
-|   build_solution_vector()          5         0.0015      0.000305    0.0026      0.000519    0.30     0.51     |
-|                                                                                                                |
-| FE                                                                                                             |
-|   compute_shape_functions()        3520      0.0176      0.000005    0.0176      0.000005    3.44     3.44     |
-|   init_shape_functions()           2156      0.0108      0.000005    0.0108      0.000005    2.11     2.11     |
-|                                                                                                                |
-| FEMSystem                                                                                                      |
-|   assembly()                       11        0.2861      0.026005    0.3298      0.029985    55.95    64.51    |
-|   assembly(get_residual)           11        0.0385      0.003498    0.0798      0.007258    7.52     15.62    |
-|                                                                                                                |
-| FEMap                                                                                                          |
-|   compute_affine_map()             160       0.0004      0.000002    0.0004      0.000002    0.08     0.08     |
-|   compute_face_map()               2112      0.0039      0.000002    0.0039      0.000002    0.77     0.77     |
-|   compute_map()                    3360      0.0111      0.000003    0.0111      0.000003    2.17     2.17     |
-|   init_face_shape_functions()      44        0.0003      0.000007    0.0003      0.000007    0.06     0.06     |
-|   init_reference_to_physical_map() 2156      0.0158      0.000007    0.0158      0.000007    3.09     3.09     |
-|                                                                                                                |
-| LocationMap                                                                                                    |
-|   init()                           5         0.0002      0.000047    0.0002      0.000047    0.05     0.05     |
-|                                                                                                                |
-| Mesh                                                                                                           |
-|   contract()                       5         0.0000      0.000009    0.0001      0.000021    0.01     0.02     |
-|   find_neighbors()                 1         0.0003      0.000311    0.0015      0.001484    0.06     0.29     |
-|   renumber_nodes_and_elem()        7         0.0001      0.000013    0.0001      0.000013    0.02     0.02     |
-|                                                                                                                |
-| MeshCommunication                                                                                              |
-|   compute_hilbert_indices()        2         0.0006      0.000302    0.0006      0.000302    0.12     0.12     |
-|   find_global_indices()            2         0.0001      0.000063    0.0016      0.000800    0.02     0.31     |
-|   parallel_sort()                  2         0.0002      0.000100    0.0006      0.000319    0.04     0.12     |
-|                                                                                                                |
-| MeshOutput                                                                                                     |
-|   write_equation_systems()         5         0.0109      0.002182    0.0135      0.002701    2.13     2.64     |
-|                                                                                                                |
-| MeshRefinement                                                                                                 |
-|   _coarsen_elements()              5         0.0000      0.000005    0.0000      0.000007    0.00     0.01     |
-|   _refine_elements()               5         0.0001      0.000012    0.0001      0.000019    0.01     0.02     |
-|   make_coarsening_compatible()     5         0.0000      0.000007    0.0000      0.000007    0.01     0.01     |
-|   make_refinement_compatible()     5         0.0000      0.000002    0.0000      0.000005    0.00     0.01     |
-|                                                                                                                |
-| MeshTools::Generation                                                                                          |
-|   build_cube()                     1         0.0002      0.000200    0.0002      0.000200    0.04     0.04     |
-|                                                                                                                |
-| MetisPartitioner                                                                                               |
-|   partition()                      1         0.0006      0.000613    0.0011      0.001053    0.12     0.21     |
-|                                                                                                                |
-| NewtonSolver                                                                                                   |
-|   solve()                          5         0.0285      0.005695    0.4724      0.094477    5.57     92.39    |
-|                                                                                                                |
-| Parallel                                                                                                       |
-|   allgather()                      40        0.0003      0.000008    0.0003      0.000008    0.06     0.06     |
-|   max(bool)                        21        0.0001      0.000004    0.0001      0.000004    0.02     0.02     |
-|   max(scalar)                      13        0.0012      0.000093    0.0012      0.000093    0.24     0.24     |
-|   max(vector)                      2         0.0000      0.000006    0.0000      0.000006    0.00     0.00     |
-|   min(bool)                        10        0.0000      0.000004    0.0000      0.000004    0.01     0.01     |
-|   min(vector)                      2         0.0001      0.000055    0.0001      0.000055    0.02     0.02     |
-|   probe()                          152       0.0025      0.000017    0.0025      0.000017    0.50     0.50     |
-|   receive()                        152       0.0005      0.000003    0.0031      0.000020    0.10     0.61     |
-|   send()                           152       0.0003      0.000002    0.0003      0.000002    0.07     0.07     |
-|   send_receive()                   156       0.0007      0.000005    0.0044      0.000028    0.14     0.86     |
-|   sum()                            67        0.0009      0.000013    0.0009      0.000013    0.17     0.17     |
-|                                                                                                                |
-| Parallel::Request                                                                                              |
-|   wait()                           152       0.0001      0.000001    0.0001      0.000001    0.02     0.02     |
-|                                                                                                                |
-| Partitioner                                                                                                    |
-|   set_node_processor_ids()         1         0.0001      0.000072    0.0001      0.000105    0.01     0.02     |
-|   set_parent_processor_ids()       1         0.0000      0.000026    0.0000      0.000026    0.01     0.01     |
-|                                                                                                                |
-| PetscLinearSolver                                                                                              |
-|   solve()                          11        0.0309      0.002809    0.0309      0.002809    6.04     6.04     |
-|                                                                                                                |
-| ProjectVector                                                                                                  |
-|   operator()                       20        0.0044      0.000218    0.0077      0.000386    0.85     1.51     |
-|                                                                                                                |
-| System                                                                                                         |
-|   project_vector()                 20        0.0049      0.000247    0.0137      0.000685    0.97     2.68     |
- ----------------------------------------------------------------------------------------------------------------
-| Totals:                            47045     0.5113                                          100.00            |
- ----------------------------------------------------------------------------------------------------------------
-
- 
-***************************************************************
-* Done Running Example fem_system_ex2:
-*  mpirun -np 2 example-opt  
-***************************************************************
+make[4]: Leaving directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/fem_system/fem_system_ex2'
 </pre>
 </div>
 <?php make_footer() ?>

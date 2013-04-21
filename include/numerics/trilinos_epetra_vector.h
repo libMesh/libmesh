@@ -719,6 +719,11 @@ EpetraVector<T>::EpetraVector(Epetra_Vector & v,
   myFirstID_ = _vec->Map().MinMyGID();
   myNumIDs_ = _vec->Map().NumMyElements();
 
+  _map = new Epetra_Map(_vec->GlobalLength(),
+                        _vec->MyLength(),
+                        0,
+                        Epetra_MpiComm (this->comm().get()));
+
   //Currently we impose the restriction that NumVectors==1, so we won't
   //need the LDA argument when calling ExtractView. Hence the "dummy" arg.
   int dummy;
@@ -883,10 +888,18 @@ template <typename T>
 inline
 void EpetraVector<T>::clear ()
 {
-  if ((this->initialized()) && (this->_destroy_vec_on_exit))
+  if (this->initialized())
   {
-    delete _vec;
-    _vec = NULL;
+    // We might just be an interface to a user-provided _vec
+    if (this->_destroy_vec_on_exit)
+      {
+        delete _vec;
+        _vec = NULL;
+      }
+
+    // But we currently always own our own _map
+    delete _map;
+    _map = NULL;
   }
 
   this->_is_closed = this->_is_initialized = false;

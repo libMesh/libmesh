@@ -132,7 +132,7 @@ examples/introduction/introduction_ex1/output.xda
 examples/introduction/introduction_ex2/eqn_sys.dat
 examples/introduction/introduction_ex2/eqn_sys.dat.0000
 examples/introduction/introduction_ex3/out.pvtu
-examples/introduction/introduction_ex3/out_0.vtu
+examples/introduction/introduction_ex3/out_*.vtu
 examples/introduction/introduction_ex4/exact_solution.C
 examples/introduction/introduction_ex4/gnuplot_script
 examples/introduction/introduction_ex4/gnuplot_script_data
@@ -146,7 +146,7 @@ examples/miscellaneous/miscellaneous_ex1/orig_mesh.e
 examples/miscellaneous/miscellaneous_ex3/lshaped.xda
 examples/miscellaneous/miscellaneous_ex3/out.e
 examples/miscellaneous/miscellaneous_ex4/out.pvtu
-examples/miscellaneous/miscellaneous_ex4/out_0.vtu
+examples/miscellaneous/miscellaneous_ex4/out_*.vtu
 examples/miscellaneous/miscellaneous_ex5/lshaped.xda
 examples/miscellaneous/miscellaneous_ex5/lshaped_dg.e
 examples/miscellaneous/miscellaneous_ex6/delaunay_l_shaped_hole.e

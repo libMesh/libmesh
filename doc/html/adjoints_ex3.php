@@ -57,10 +57,10 @@ Constructor
 <div class ="fragment">
 <pre>
           CoupledSystem(EquationSystems& es,
-                       const std::string& name,
-                       const unsigned int number)
-            : FEMSystem(es, name, number), Peclet(1.) {qoi.resize(1);}
-         
+                       const std::string& name_in,
+                       const unsigned int number_in)
+            : FEMSystem(es, name_in, number_in), Peclet(1.) {qoi.resize(1);}
+        
 </pre>
 </div>
 <div class = "comment">
@@ -73,9 +73,9 @@ Function to get computed QoI values
 <pre>
           Number &get_QoI_value()
             {
-              return computed_QoI;       
+              return computed_QoI;
             }
-            
+        
           Number &get_parameter_value(unsigned int parameter_index)
             {
               return parameters[parameter_index];
@@ -88,13 +88,13 @@ Function to get computed QoI values
         	{
         	  parameter_vector[i] = &parameters[i];
         	}
-              
+        
               return parameter_vector;
             }
         
           Real &get_Pe()
             {
-              return Peclet;       
+              return Peclet;
             }
         
          protected:
@@ -228,7 +228,7 @@ Destructor
 <div class ="fragment">
 <pre>
           virtual ~CoupledFEMFunctionsx () {}
-                
+        
           virtual AutoPtr&lt;FEMFunctionBase&lt;Number&gt; &gt; clone () const
           {return AutoPtr&lt;FEMFunctionBase&lt;Number&gt; &gt;( new CoupledFEMFunctionsx(*this) ); }
         
@@ -240,9 +240,9 @@ Destructor
         			     const Real time = 0.);
         
          private:
-          
+        
           unsigned int var;
-             
+        
         };
         
         
@@ -268,7 +268,7 @@ Destructor
 <div class ="fragment">
 <pre>
           virtual ~CoupledFEMFunctionsy () {}
-            
+        
           virtual AutoPtr&lt;FEMFunctionBase&lt;Number&gt; &gt; clone () const
           {return AutoPtr&lt;FEMFunctionBase&lt;Number&gt; &gt;( new CoupledFEMFunctionsy(*this) ); }
         
@@ -279,9 +279,9 @@ Destructor
         
           virtual Number operator() (const FEMContext&, const Point& p,
         			     const Real time = 0.);
-          
+        
          private:
-          
+        
           unsigned int var;
         
         };
@@ -356,9 +356,9 @@ Bring in everything from the libMesh namespace
               steadystate_tolerance(0.),
               timesolver_norm(0,L2),
               dimension(2),
-        	domaintype("square"), domainfile("mesh.xda"), elementtype("quad"),	
+        	domaintype("square"), domainfile("mesh.xda"), elementtype("quad"),
         	fine_mesh_file_primal("fine_mesh.xda"), fine_mesh_soln_primal("fine_mesh_soln.xda"),
-        	fine_mesh_file_adjoint("fine_mesh.xda"), fine_mesh_soln_adjoint("fine_mesh_soln.xda"),	      
+        	fine_mesh_file_adjoint("fine_mesh.xda"), fine_mesh_soln_adjoint("fine_mesh_soln.xda"),
               elementorder(2),
               domain_xmin(0.0), domain_ymin(0.0), domain_zmin(0.0),
               domain_edge_width(1.0), domain_edge_length(1.0), domain_edge_height(1.0),
@@ -389,7 +389,7 @@ Bring in everything from the libMesh namespace
               output_gmv(false), output_tecplot(false),
               run_simulation(true), run_postprocess(false),
               fe_family(1, "LAGRANGE"), fe_order(1, 1),
-              extra_quadrature_order(0),	
+              extra_quadrature_order(0),
               analytic_jacobians(true), verify_analytic_jacobians(0.0),
               print_solution_norms(false), print_solutions(false),
               print_residual_norms(false), print_residuals(false),
@@ -436,7 +436,7 @@ Bring in everything from the libMesh namespace
             std::string indicator_type;
             bool patch_reuse;
             unsigned int sobolev_order;
-            std::string adjoint_residual_type;   
+            std::string adjoint_residual_type;
             bool alternate_with_uniform_steps;
             unsigned int alternate_step_number;
             bool component_wise_error;
@@ -456,7 +456,7 @@ Bring in everything from the libMesh namespace
             std::vector&lt;std::string&gt; fe_family;
             std::vector&lt;unsigned int&gt; fe_order;
             int extra_quadrature_order;
-            
+        
             bool analytic_jacobians;
             Real verify_analytic_jacobians;
         
@@ -501,17 +501,17 @@ Bring in everything from the libMesh namespace
         {
         public:
           CoupledSystemQoI(){}
-          virtual ~CoupledSystemQoI(){} 
+          virtual ~CoupledSystemQoI(){}
         
           virtual void init_qoi( std::vector&lt;Number&gt;& sys_qoi);
-          virtual void postprocess( ){} 
-          
-          virtual void side_qoi_derivative(DiffContext &context, const QoISet & qois);   
+          virtual void postprocess( ){}
+        
+          virtual void side_qoi_derivative(DiffContext &context, const QoISet & qois);
         
           virtual void side_qoi(DiffContext &context, const QoISet & qois);
         
           virtual AutoPtr&lt;DifferentiableQoI&gt; clone( )
-          { AutoPtr&lt;DifferentiableQoI&gt; my_clone( new CoupledSystemQoI ); 
+          { AutoPtr&lt;DifferentiableQoI&gt; my_clone( new CoupledSystemQoI );
             *my_clone = *this;
             return my_clone;
           }
@@ -704,8 +704,8 @@ Local includes
 </pre>
 </div>
 <div class = "comment">
-We solve a coupled Stokes + Convection Diffusion system in an H channel geometry 
-with 2 inlets and 2 outlets. The QoI is the species 
+We solve a coupled Stokes + Convection Diffusion system in an H channel geometry
+with 2 inlets and 2 outlets. The QoI is the species
 flux from left outlet
 
 
@@ -713,7 +713,7 @@ flux from left outlet
 Wall
 ----------------------------------------------------------------
 0                                                                1
-----------------------------     ------------------------------- 
+----------------------------     -------------------------------
 |     |
 Wall |     | Wall
 |     |
@@ -725,26 +725,26 @@ Wall
 
 <br><br>The equations governing this flow are:
 Stokes: -VectorLaplacian(velocity) + grad(pressure) = vector(0)
-Convection-Diffusion: - dot(velocity, grad(concentration) ) + Laplacian(concentration) = 0  
+Convection-Diffusion: - dot(velocity, grad(concentration) ) + Laplacian(concentration) = 0
 
 
 <br><br>The boundary conditions are:
-u_1(0) = -(y-2)*(y-3), u_2(0) = 0 ; u_1(1) = (y-2)*(y-3), u_2(1) = 0 ; 
+u_1(0) = -(y-2)*(y-3), u_2(0) = 0 ; u_1(1) = (y-2)*(y-3), u_2(1) = 0 ;
 u_1(walls) = 0, u_2(walls) = 0;
 C(0) = 1 ; C(1) = 0;
 grad(C) dot n (walls) = 0 ;
-grad(C) dot n (2) = 0 ; grad(C) dot n (3) = 0  
+grad(C) dot n (2) = 0 ; grad(C) dot n (3) = 0
 
 
 <br><br>The QoI is:
 Q((u,v), C) = integral_{left_outlet}  - u * C ds
 
 
-<br><br>The complete equal order adjoint QoI error estimate is: (Notation for derivatives: grad(C) = C,1 + C,2) 
-Q(u) - Q(u_h) \leq 
-|e(u_1)|_{H1} |e(u_1^*)|_{H1} +  |e(u_2)|_{H1} |e(u_2^*)|_{H1} +  (1/Pe) * |e(C)|_{H1} |e(C^*)|_{H1}  + 
+<br><br>The complete equal order adjoint QoI error estimate is: (Notation for derivatives: grad(C) = C,1 + C,2)
+Q(u) - Q(u_h) \leq
+|e(u_1)|_{H1} |e(u_1^*)|_{H1} +  |e(u_2)|_{H1} |e(u_2^*)|_{H1} +  (1/Pe) * |e(C)|_{H1} |e(C^*)|_{H1}  +
 ||e(u_1,1)||_{L2} ||e(p^*)||_{L2} + ||e(u_2,2)||_{L2} ||e(p^*)||_{L2} + ||e(u_1,1^*)||_{L2} ||e(p)||_{L2} + ||e(u_2,2^*)||_{L2} ||e(p)||_{L2}  +
-||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} + ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2} 
+||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} + ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2}
 ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} + ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2}
 = error_non_pressure + error_with_pressure + error_convection_diffusion_x + error_convection_diffusion_y
 
@@ -807,7 +807,7 @@ Write tecplot, gmv and xda/xdr output
 
 <div class ="fragment">
 <pre>
-        void write_output(EquationSystems &es,                  
+        void write_output(EquationSystems &es,
                           unsigned int t_step, // The timestep count
                           unsigned int a_step, // The adaptive step count
                           std::string solution_type, // primal or adjoint solve
@@ -1079,7 +1079,7 @@ We're done, so write out a file (for e.g. Make to check)
         void read_output(EquationSystems &es,
                          unsigned int t_step,
                          unsigned int a_step,
-                         std::string solution_type, 
+                         std::string solution_type,
                          FEMParameters &param)
         {
           MeshBase &mesh = es.get_mesh();
@@ -1371,7 +1371,7 @@ And the linear solver options
 <pre>
               solver-&gt;max_linear_iterations       = param.max_linear_iterations;
               solver-&gt;initial_linear_tolerance    = param.initial_linear_tolerance;
-              solver-&gt;minimum_linear_tolerance    = param.minimum_linear_tolerance;      
+              solver-&gt;minimum_linear_tolerance    = param.minimum_linear_tolerance;
             }
         }
         
@@ -1383,9 +1383,9 @@ And the linear solver options
           AutoPtr&lt;MeshRefinement&gt; mesh_refinement(new MeshRefinement(mesh));
           mesh_refinement-&gt;coarsen_by_parents() = true;
           mesh_refinement-&gt;absolute_global_tolerance() = param.global_tolerance;
-          mesh_refinement-&gt;nelem_target()      = param.nelem_target;  
+          mesh_refinement-&gt;nelem_target()      = param.nelem_target;
           mesh_refinement-&gt;refine_fraction()   = param.refine_fraction;
-          mesh_refinement-&gt;coarsen_fraction()  = param.coarsen_fraction;  
+          mesh_refinement-&gt;coarsen_fraction()  = param.coarsen_fraction;
           mesh_refinement-&gt;coarsen_threshold() = param.coarsen_threshold;
         
           return mesh_refinement;
@@ -1397,7 +1397,7 @@ And the linear solver options
 </div>
 <div class = "comment">
 This function builds the Kelly error indicator. This indicator can be used
-for comparisons of adjoint and non-adjoint based error indicators 
+for comparisons of adjoint and non-adjoint based error indicators
 </div>
 
 <div class ="fragment">
@@ -1415,7 +1415,7 @@ for comparisons of adjoint and non-adjoint based error indicators
 </div>
 <div class = "comment">
 Functions to build the adjoint based error indicators
-The error_non_pressure and error_pressure constributions are estimated using 
+The error_non_pressure and error_pressure constributions are estimated using
 the build_error_estimator_component_wise function below
 </div>
 
@@ -1423,17 +1423,17 @@ the build_error_estimator_component_wise function below
 <pre>
         AutoPtr&lt;ErrorEstimator&gt;
         build_error_estimator_component_wise
-          (FEMParameters &param, 
+          (FEMParameters &param,
            std::vector&lt;std::vector&lt;Real&gt; &gt; &term_weights,
            std::vector&lt;libMeshEnums::FEMNormType&gt; &primal_error_norm_type,
            std::vector&lt;libMeshEnums::FEMNormType&gt; &dual_error_norm_type)
-        {  
+        {
           AutoPtr&lt;ErrorEstimator&gt; error_estimator;
         
           AdjointResidualErrorEstimator *adjoint_residual_estimator = new AdjointResidualErrorEstimator;
         
           error_estimator.reset (adjoint_residual_estimator);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1448,7 +1448,7 @@ Both the primal and dual weights are going to be estimated using the patch recov
         
           PatchRecoveryErrorEstimator *p2 =
             new PatchRecoveryErrorEstimator;
-          adjoint_residual_estimator-&gt;dual_error_estimator().reset(p2);  
+          adjoint_residual_estimator-&gt;dual_error_estimator().reset(p2);
         
 </pre>
 </div>
@@ -1464,7 +1464,7 @@ Set the boolean for specifying whether we are reusing patches while building the
 </pre>
 </div>
 <div class = "comment">
-Using the user filled error norm type vector, we pass the type of norm to be used for 
+Using the user filled error norm type vector, we pass the type of norm to be used for
 the error in each variable, we can have different types of norms for the primal and
 dual variables
 </div>
@@ -1472,11 +1472,11 @@ dual variables
 <div class ="fragment">
 <pre>
           unsigned int size = primal_error_norm_type.size();
-          
+        
           libmesh_assert_equal_to (size, dual_error_norm_type.size());
           for (unsigned int i = 0; i != size; ++i)
             {
-              adjoint_residual_estimator-&gt;primal_error_estimator()-&gt;error_norm.set_type(i, primal_error_norm_type[i]);      
+              adjoint_residual_estimator-&gt;primal_error_estimator()-&gt;error_norm.set_type(i, primal_error_norm_type[i]);
               adjoint_residual_estimator-&gt;dual_error_estimator()-&gt;error_norm.set_type(i, dual_error_norm_type[i]);
             }
         
@@ -1505,7 +1505,7 @@ term_weights matrix
 </pre>
 </div>
 <div class = "comment">
-The error_convection_diffusion_x and error_convection_diffusion_y are the nonlinear contributions which 
+The error_convection_diffusion_x and error_convection_diffusion_y are the nonlinear contributions which
 are computed using the build_weighted_error_estimator_component_wise below
 </div>
 
@@ -1518,17 +1518,17 @@ are computed using the build_weighted_error_estimator_component_wise below
            std::vector&lt;libMeshEnums::FEMNormType&gt; &primal_error_norm_type,
            std::vector&lt;libMeshEnums::FEMNormType&gt; &dual_error_norm_type,
            std::vector&lt;FEMFunctionBase&lt;Number&gt;*&gt; coupled_system_weight_functions)
-        {  
+        {
           AutoPtr&lt;ErrorEstimator&gt; error_estimator;
         
           AdjointResidualErrorEstimator *adjoint_residual_estimator = new AdjointResidualErrorEstimator;
         
           error_estimator.reset (adjoint_residual_estimator);
-          
+        
 </pre>
 </div>
 <div class = "comment">
-Using the user filled error norm type vector, we pass the type of norm to be used for 
+Using the user filled error norm type vector, we pass the type of norm to be used for
 the error in each variable, we can have different types of norms for the primal and
 dual variables
 
@@ -1543,7 +1543,7 @@ dual variables
         
           PatchRecoveryErrorEstimator *p2 =
             new PatchRecoveryErrorEstimator;
-          adjoint_residual_estimator-&gt;dual_error_estimator().reset(p2);  
+          adjoint_residual_estimator-&gt;dual_error_estimator().reset(p2);
         
           p1-&gt;set_patch_reuse(param.patch_reuse);
           p2-&gt;set_patch_reuse(param.patch_reuse);
@@ -1575,7 +1575,7 @@ error estimator objects declared above
           for (unsigned int i = 0; i != size; ++i)
             {
               p1-&gt;weight_functions.push_back(coupled_system_weight_functions[i]);
-              adjoint_residual_estimator-&gt;primal_error_estimator()-&gt;error_norm.set_type(i, primal_error_norm_type[i]);      
+              adjoint_residual_estimator-&gt;primal_error_estimator()-&gt;error_norm.set_type(i, primal_error_norm_type[i]);
               adjoint_residual_estimator-&gt;dual_error_estimator()-&gt;error_norm.set_type(i, dual_error_norm_type[i]);
             }
         
@@ -1633,6 +1633,16 @@ Skip adaptive examples on a non-adaptive libMesh build
           libmesh_example_assert(false, "--enable-amr");
         #else
         
+</pre>
+</div>
+<div class = "comment">
+This doesn't converge with Eigen BICGSTAB for some reason...
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_example_assert(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
+        
           std::cout &lt;&lt; "Started " &lt;&lt; argv[0] &lt;&lt; std::endl;
         
 </pre>
@@ -1647,9 +1657,9 @@ Make sure the general input file exists, and parse it
             std::ifstream i("general.in");
             if (!i)
               {
-                std::cerr &lt;&lt; '[' &lt;&lt; libMesh::processor_id() 
-                          &lt;&lt; "] Can't find general.in; exiting early." 
-                          &lt;&lt; std::endl; 
+                std::cerr &lt;&lt; '[' &lt;&lt; libMesh::processor_id()
+                          &lt;&lt; "] Can't find general.in; exiting early."
+                          &lt;&lt; std::endl;
                 libmesh_error();
               }
           }
@@ -1676,16 +1686,17 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
 <div class ="fragment">
 <pre>
           libmesh_example_assert(2 &lt;= LIBMESH_DIM, "2D support");
-          
+        
 </pre>
 </div>
 <div class = "comment">
-Create a mesh.
+Create a mesh with the given dimension, distributed
+across the default MPI communicator.
 </div>
 
 <div class ="fragment">
 <pre>
-          Mesh mesh (param.dimension);
+          Mesh mesh(init.comm(), param.dimension);
         
 </pre>
 </div>
@@ -1761,7 +1772,7 @@ Print information about the mesh and system to the screen.
 </pre>
 </div>
 <div class = "comment">
-Count the number of steps used  
+Count the number of steps used
 </div>
 
 <div class ="fragment">
@@ -1787,7 +1798,7 @@ Adaptively solve the timestep
 <div class ="fragment">
 <pre>
           for (; a_step &lt;= param.max_adaptivesteps; ++a_step)
-            {                                    
+            {
 </pre>
 </div>
 <div class = "comment">
@@ -1803,7 +1814,7 @@ simultaneously
                 {
                   std::cout&lt;&lt;"We cant refine to both a non-zero tolerance and a target number of elements, EXITING adaptive loop. "&lt;&lt;std::endl&lt;&lt;std::endl;
                   break;
-                }        
+                }
         
 </pre>
 </div>
@@ -1866,7 +1877,7 @@ We just call a postprocess here to set the variable computed_QoI to the value co
 </pre>
 </div>
 <div class = "comment">
-Get the value of the computed_QoI variable of the CoupledSystem class 
+Get the value of the computed_QoI variable of the CoupledSystem class
 </div>
 
 <div class ="fragment">
@@ -1903,7 +1914,7 @@ Make sure we get the contributions to the adjoint RHS from the sides
 <div class = "comment">
 We are about to solve the adjoint system, but before we
 do this we see the same preconditioner flag to reuse the
-preconditioner from the forward solver                
+preconditioner from the forward solver
 </div>
 
 <div class ="fragment">
@@ -1934,7 +1945,7 @@ Now that we have solved the adjoint, set the adjoint_already_solved boolean to t
 </pre>
 </div>
 <div class = "comment">
-To plot the adjoint solution, we swap it with the primal solution 
+To plot the adjoint solution, we swap it with the primal solution
 and use the write_output function
 </div>
 
@@ -1978,11 +1989,11 @@ error_estimator_convection_diffusion_y
 <div class ="fragment">
 <pre>
                   ErrorVector error;
-                  
+        
 </pre>
 </div>
 <div class = "comment">
-We first construct the non-pressure contributions 
+We first construct the non-pressure contributions
 </div>
 
 <div class ="fragment">
@@ -2000,14 +2011,14 @@ error contributions
 <div class ="fragment">
 <pre>
                   std::vector&lt;libMeshEnums::FEMNormType&gt;
-                    primal_norm_type_vector_non_pressure;                        
+                    primal_norm_type_vector_non_pressure;
                   primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
                   primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
                   primal_norm_type_vector_non_pressure.push_back(L2);
                   primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
         
                   std::vector&lt;libMeshEnums::FEMNormType&gt;
-                    dual_norm_type_vector_non_pressure;                        
+                    dual_norm_type_vector_non_pressure;
                   dual_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
                   dual_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
                   dual_norm_type_vector_non_pressure.push_back(L2);
@@ -2029,7 +2040,7 @@ to the QoI error from the non pressure term
 
 <div class ="fragment">
 <pre>
-                  AutoPtr&lt;ErrorEstimator&gt; error_estimator_non_pressure = 
+                  AutoPtr&lt;ErrorEstimator&gt; error_estimator_non_pressure =
                     build_error_estimator_component_wise
                       (param, weights_matrix_non_pressure,
                        primal_norm_type_vector_non_pressure,
@@ -2077,14 +2088,14 @@ error contributions
 <div class ="fragment">
 <pre>
                   std::vector&lt;libMeshEnums::FEMNormType&gt;
-                    primal_norm_type_vector_with_pressure;                        
+                    primal_norm_type_vector_with_pressure;
                   primal_norm_type_vector_with_pressure.push_back(H1_X_SEMINORM);
                   primal_norm_type_vector_with_pressure.push_back(H1_Y_SEMINORM);
                   primal_norm_type_vector_with_pressure.push_back(L2);
                   primal_norm_type_vector_with_pressure.push_back(L2);
         
                   std::vector&lt;libMeshEnums::FEMNormType&gt;
-                    dual_norm_type_vector_with_pressure;                        
+                    dual_norm_type_vector_with_pressure;
                   dual_norm_type_vector_with_pressure.push_back(H1_X_SEMINORM);
                   dual_norm_type_vector_with_pressure.push_back(H1_Y_SEMINORM);
                   dual_norm_type_vector_with_pressure.push_back(L2);
@@ -2119,7 +2130,7 @@ to the QoI error from the pressure term
 </pre>
 </div>
 <div class = "comment">
-Estimate the contributions to the QoI error from the pressure terms  
+Estimate the contributions to the QoI error from the pressure terms
 </div>
 
 <div class ="fragment">
@@ -2140,7 +2151,7 @@ Plot the error due to the pressure terms
 </div>
 <div class = "comment">
 Now for the convection diffusion term errors (in the x and y directions)
-	  
+
 
 <br><br></div>
 
@@ -2157,14 +2168,14 @@ The norm type vectors and weights matrix for the convection_diffusion_x errors
 <div class ="fragment">
 <pre>
                   std::vector&lt;libMeshEnums::FEMNormType&gt;
-                    primal_norm_type_vector_convection_diffusion_x;                        
+                    primal_norm_type_vector_convection_diffusion_x;
                   primal_norm_type_vector_convection_diffusion_x.push_back(L2);
                   primal_norm_type_vector_convection_diffusion_x.push_back(L2);
                   primal_norm_type_vector_convection_diffusion_x.push_back(L2);
                   primal_norm_type_vector_convection_diffusion_x.push_back(H1_X_SEMINORM);
         
                   std::vector&lt;libMeshEnums::FEMNormType&gt;
-                    dual_norm_type_vector_convection_diffusion_x;                        
+                    dual_norm_type_vector_convection_diffusion_x;
                   dual_norm_type_vector_convection_diffusion_x.push_back(L2);
                   dual_norm_type_vector_convection_diffusion_x.push_back(L2);
                   dual_norm_type_vector_convection_diffusion_x.push_back(L2);
@@ -2177,19 +2188,19 @@ Note that we need the error of the dual concentration in L2
 <div class ="fragment">
 <pre>
                   dual_norm_type_vector_convection_diffusion_x.push_back(L2);
-        	  
+        
                   std::vector&lt;std::vector&lt;Real&gt; &gt;
                     weights_matrix_convection_diffusion_x
                       (system.n_vars(),
                        std::vector&lt;Real&gt;(system.n_vars(), 0.0));
-        	  weights_matrix_convection_diffusion_x[0][3] = 1.;                  
-                  weights_matrix_convection_diffusion_x[3][3] = 1.;                  
+        	  weights_matrix_convection_diffusion_x[0][3] = 1.;
+                  weights_matrix_convection_diffusion_x[3][3] = 1.;
         
 </pre>
 </div>
 <div class = "comment">
 We will also have to build and pass the weight functions to the weighted patch recovery estimators
-	  
+
 
 <br><br>We pass the identity function as weights to error entries that the above matrix will scale to 0.
 </div>
@@ -2201,14 +2212,14 @@ We will also have to build and pass the weight functions to the weighted patch r
 </pre>
 </div>
 <div class = "comment">
-Declare object of class CoupledFEMFunctionsx, the definition of the function contains the weight 
+Declare object of class CoupledFEMFunctionsx, the definition of the function contains the weight
 to be applied to the relevant terms
 For ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2} term, returns C,1_h
 </div>
 
 <div class ="fragment">
 <pre>
-                  CoupledFEMFunctionsx convdiffx0(system, 0);                            
+                  CoupledFEMFunctionsx convdiffx0(system, 0);
 </pre>
 </div>
 <div class = "comment">
@@ -2217,7 +2228,7 @@ For ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} term, returns (u_1)_h
 
 <div class ="fragment">
 <pre>
-                  CoupledFEMFunctionsx convdiffx3(system, 3);                  
+                  CoupledFEMFunctionsx convdiffx3(system, 3);
         
 </pre>
 </div>
@@ -2230,8 +2241,8 @@ Make a vector of pointers to these objects
                   std::vector&lt;FEMFunctionBase&lt;Number&gt; *&gt; coupled_system_weight_functions_x;
                   coupled_system_weight_functions_x.push_back(&convdiffx0);
                   coupled_system_weight_functions_x.push_back(&identity);
-                  coupled_system_weight_functions_x.push_back(&identity);                  
-                  coupled_system_weight_functions_x.push_back(&convdiffx3);                         
+                  coupled_system_weight_functions_x.push_back(&identity);
+                  coupled_system_weight_functions_x.push_back(&convdiffx3);
         
 </pre>
 </div>
@@ -2253,7 +2264,7 @@ to the QoI error from the convection diffusion x term
 </div>
 <div class = "comment">
 Estimate the contributions to the QoI error from the
-convection diffusion x term  
+convection diffusion x term
 </div>
 
 <div class ="fragment">
@@ -2271,7 +2282,7 @@ Plot this error
 <pre>
                   write_error(equation_systems, error_convection_diffusion_x,
                               0, a_step, param, "_convection_diffusion_x");
-        	  
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2291,14 +2302,14 @@ The norm type vectors and weights matrix for the convection_diffusion_x errors
 <div class ="fragment">
 <pre>
                   std::vector&lt;libMeshEnums::FEMNormType&gt;
-                    primal_norm_type_vector_convection_diffusion_y;                        
+                    primal_norm_type_vector_convection_diffusion_y;
                   primal_norm_type_vector_convection_diffusion_y.push_back(L2);
                   primal_norm_type_vector_convection_diffusion_y.push_back(L2);
                   primal_norm_type_vector_convection_diffusion_y.push_back(L2);
                   primal_norm_type_vector_convection_diffusion_y.push_back(H1_Y_SEMINORM);
         
                   std::vector&lt;libMeshEnums::FEMNormType&gt;
-                    dual_norm_type_vector_convection_diffusion_y;                        
+                    dual_norm_type_vector_convection_diffusion_y;
                   dual_norm_type_vector_convection_diffusion_y.push_back(L2);
                   dual_norm_type_vector_convection_diffusion_y.push_back(L2);
                   dual_norm_type_vector_convection_diffusion_y.push_back(L2);
@@ -2311,22 +2322,22 @@ Note that we need the error of the dual concentration in L2
 <div class ="fragment">
 <pre>
                   dual_norm_type_vector_convection_diffusion_y.push_back(L2);
-        	  
+        
                   std::vector&lt;std::vector&lt;Real&gt; &gt;
                     weights_matrix_convection_diffusion_y
                       (system.n_vars(), std::vector&lt;Real&gt;(system.n_vars(), 0.0));
-        	  weights_matrix_convection_diffusion_y[1][3] = 1.;                  
-                  weights_matrix_convection_diffusion_y[3][3] = 1.;                  	  
-                  
+        	  weights_matrix_convection_diffusion_y[1][3] = 1.;
+                  weights_matrix_convection_diffusion_y[3][3] = 1.;
+        
 </pre>
 </div>
 <div class = "comment">
-For ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2} term, returns C,2_h	  
+For ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2} term, returns C,2_h
 </div>
 
 <div class ="fragment">
 <pre>
-                  CoupledFEMFunctionsy convdiffy1(system, 1);                  
+                  CoupledFEMFunctionsy convdiffy1(system, 1);
 </pre>
 </div>
 <div class = "comment">
@@ -2335,7 +2346,7 @@ For ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} term, returns (u_2)_h
 
 <div class ="fragment">
 <pre>
-                  CoupledFEMFunctionsy convdiffy3(system, 3);                  
+                  CoupledFEMFunctionsy convdiffy3(system, 3);
         
 </pre>
 </div>
@@ -2349,8 +2360,8 @@ Make a vector of pointers to these objects
                   coupled_system_weight_functions_y.push_back(&identity);
                   coupled_system_weight_functions_y.push_back(&convdiffy1);
                   coupled_system_weight_functions_y.push_back(&identity);
-                  coupled_system_weight_functions_y.push_back(&convdiffy3);                  
-        	  
+                  coupled_system_weight_functions_y.push_back(&convdiffy3);
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2371,7 +2382,7 @@ to the QoI error from the convection diffsion y term
 </div>
 <div class = "comment">
 Estimate the contributions to the QoI error from the
-convection diffusion y terms  
+convection diffusion y terms
 </div>
 
 <div class ="fragment">
@@ -2387,7 +2398,7 @@ Plot this error
 <div class ="fragment">
 <pre>
                   write_error(equation_systems, error_convection_diffusion_y, 0, a_step, param, "_convection_diffusion_y");
-        	            
+        
                   if(param.indicator_type == "adjoint_residual")
                     {
                       error.resize(error_non_pressure.size());
@@ -2402,7 +2413,7 @@ pressure terms to get the complete estimate
 <div class ="fragment">
 <pre>
                       for(unsigned int i = 0; i &lt; error.size(); i++)
-                        {                          
+                        {
                           error[i] = error_non_pressure[i] + error_with_pressure[i] + error_convection_diffusion_x[i] + error_convection_diffusion_y[i];
                         }
                     }
@@ -2453,8 +2464,8 @@ target
                       mesh_refinement-&gt;uniformly_refine(1);
                     }
                   else if(param.global_tolerance &gt;= 0. && param.nelem_target == 0.) // Refine based on reaching an error tolerance
-                    {                              
-                      mesh_refinement-&gt;flag_elements_by_error_tolerance (error);              
+                    {
+                      mesh_refinement-&gt;flag_elements_by_error_tolerance (error);
         
 </pre>
 </div>
@@ -2467,7 +2478,7 @@ Carry out the adaptive mesh refinement/coarsening
                       mesh_refinement-&gt;refine_and_coarsen_elements();
                     }
                   else // Refine based on reaching a target number of elements
-                    {                                
+                    {
 </pre>
 </div>
 <div class = "comment">
@@ -2506,19 +2517,18 @@ Carry out the adaptive mesh refinement/coarsening
           write_output_footers(param);
         
         #endif // #ifndef LIBMESH_ENABLE_AMR
-            
+        
 </pre>
 </div>
 <div class = "comment">
-All done.  
+All done.
 </div>
 
 <div class ="fragment">
 <pre>
-          return 0;    
+          return 0;
         
         }
-        
 </pre>
 </div>
 
@@ -2588,7 +2598,7 @@ Set the parabolic inflow boundary conditions at stations 0 & 1
 <div class ="fragment">
 <pre>
               output(_u_var) = (_sign)*((y-2) * (y-3));
-              output(_v_var) = 0;      
+              output(_v_var) = 0;
             }
         
           virtual AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; clone() const
@@ -2601,7 +2611,7 @@ Set the parabolic inflow boundary conditions at stations 0 & 1
         
         
         void CoupledSystem::init_data ()
-        {  
+        {
 </pre>
 </div>
 <div class = "comment">
@@ -2611,7 +2621,7 @@ approximation type
 
 <div class ="fragment">
 <pre>
-          GetPot infile("coupled_system.in");  
+          GetPot infile("coupled_system.in");
           Peclet = infile("Peclet", 1.);
           unsigned int pressure_p = infile("pressure_p", 1);
           std::string fe_family = infile("fe_family", std::string("LAGRANGE"));
@@ -2643,7 +2653,7 @@ will be approximated using second-order approximation.
         			      fefamily);
           v_var = this-&gt;add_variable ("v", static_cast&lt;Order&gt;(pressure_p+1),
         			      fefamily);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2672,7 +2682,7 @@ be approximated using second-order approximation, the same as the velocity compo
 </pre>
 </div>
 <div class = "comment">
-Tell the system to march velocity forward in time, but 
+Tell the system to march velocity forward in time, but
 leave p as a constraint only
 </div>
 
@@ -2717,7 +2727,7 @@ Set Dirichlet boundary conditions
           const boundary_id_type wall_id = 3;
           std::set&lt;boundary_id_type&gt; wall_bdy;
           wall_bdy.insert(wall_id);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2737,7 +2747,7 @@ The C_only identifier for setting the concentrations at the inlets
 <div class ="fragment">
 <pre>
           std::vector&lt;unsigned int&gt; C_only(1, C_var);
-            
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2786,7 +2796,7 @@ and set C = 1
             (DirichletBoundary (left_inlet_bdy, uv, &inflow_left));
           this-&gt;get_dof_map().add_dirichlet_boundary
             (DirichletBoundary (left_inlet_bdy, C_only, &one));
-           
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2804,10 +2814,10 @@ and set C = 0
 </pre>
 </div>
 <div class = "comment">
-Note that the remaining boundary conditions are the natural boundary conditions for the concentration 
-on the wall (grad(c) dot n = 0) and natural boundary conditions for the velocity and the concentration 
+Note that the remaining boundary conditions are the natural boundary conditions for the concentration
+on the wall (grad(c) dot n = 0) and natural boundary conditions for the velocity and the concentration
 on the outlets ((grad(velocity) dot n - p n) dot t = 0, grad(C) dot n = 0)
-  
+
 
 <br><br>Do the parent's initialization after variables and boundary constraints are defined
 </div>
@@ -2836,7 +2846,7 @@ use the same basis.
           c.element_fe_var[u_var]-&gt;get_phi();
           c.element_fe_var[u_var]-&gt;get_dphi();
           c.element_fe_var[u_var]-&gt;get_xyz();
-          
+        
           c.element_fe_var[p_var]-&gt;get_phi();
         
           c.side_fe_var[u_var]-&gt;get_JxW();
@@ -2862,7 +2872,7 @@ will be used to assemble the linear system.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;Real&gt; &JxW = 
+          const std::vector&lt;Real&gt; &JxW =
             c.element_fe_var[u_var]-&gt;get_JxW();
         
 </pre>
@@ -2873,7 +2883,7 @@ The velocity shape functions at interior quadrature points.
 
 <div class ="fragment">
 <pre>
-          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = 
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi =
             c.element_fe_var[u_var]-&gt;get_phi();
         
 </pre>
@@ -2899,7 +2909,7 @@ quadrature points.
 <pre>
           const std::vector&lt;std::vector&lt;Real&gt; &gt;& psi =
             c.element_fe_var[p_var]-&gt;get_phi();
-         
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2909,8 +2919,8 @@ The number of local degrees of freedom in each variable
 <div class ="fragment">
 <pre>
           const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
-          const unsigned int n_u_dofs = c.dof_indices_var[u_var].size(); 
-          libmesh_assert_equal_to (n_u_dofs, c.dof_indices_var[v_var].size()); 
+          const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+          libmesh_assert_equal_to (n_u_dofs, c.dof_indices_var[v_var].size());
         
 </pre>
 </div>
@@ -2923,16 +2933,16 @@ The subvectors and submatrices we need to fill:
           DenseSubMatrix&lt;Number&gt; &Kuu = *c.elem_subjacobians[u_var][u_var];
           DenseSubMatrix&lt;Number&gt; &Kup = *c.elem_subjacobians[u_var][p_var];
           DenseSubVector&lt;Number&gt; &Fu = *c.elem_subresiduals[u_var];
-          
-          DenseSubMatrix&lt;Number&gt; &Kvv = *c.elem_subjacobians[v_var][v_var];      
-          DenseSubMatrix&lt;Number&gt; &Kvp = *c.elem_subjacobians[v_var][p_var];    
-          DenseSubVector&lt;Number&gt; &Fv = *c.elem_subresiduals[v_var];  
+        
+          DenseSubMatrix&lt;Number&gt; &Kvv = *c.elem_subjacobians[v_var][v_var];
+          DenseSubMatrix&lt;Number&gt; &Kvp = *c.elem_subjacobians[v_var][p_var];
+          DenseSubVector&lt;Number&gt; &Fv = *c.elem_subresiduals[v_var];
         
           DenseSubMatrix&lt;Number&gt; &KCu = *c.elem_subjacobians[C_var][u_var];
-          DenseSubMatrix&lt;Number&gt; &KCv = *c.elem_subjacobians[C_var][v_var];  
+          DenseSubMatrix&lt;Number&gt; &KCv = *c.elem_subjacobians[C_var][v_var];
           DenseSubMatrix&lt;Number&gt; &KCC = *c.elem_subjacobians[C_var][C_var];
           DenseSubVector&lt;Number&gt; &FC = *c.elem_subresiduals[C_var];
-              
+        
 </pre>
 </div>
 <div class = "comment">
@@ -2958,12 +2968,12 @@ Compute the solution & its gradient at the old Newton iterate
 
 <div class ="fragment">
 <pre>
-              Number p = c.interior_value(p_var, qp), 
+              Number p = c.interior_value(p_var, qp),
         	u = c.interior_value(u_var, qp),
-        	v = c.interior_value(v_var, qp);	
+        	v = c.interior_value(v_var, qp);
               Gradient grad_u = c.interior_gradient(u_var, qp),
         	grad_v = c.interior_gradient(v_var, qp),
-        	grad_C = c.interior_gradient(C_var, qp);	
+        	grad_C = c.interior_gradient(C_var, qp);
         
 </pre>
 </div>
@@ -2974,7 +2984,7 @@ dot product if you have the full vector at your disposal.
 
 <div class ="fragment">
 <pre>
-              NumberVectorValue U     (u,     v);           
+              NumberVectorValue U     (u,     v);
               const Number C_x = grad_C(0);
               const Number C_y = grad_C(1);
         
@@ -3000,11 +3010,11 @@ Stokes equations residuals
 <pre>
                   Fu(i) += JxW[qp] *
                            (p*dphi[i][qp](0) -                // pressure term
-        		    (grad_u*dphi[i][qp]));            // diffusion term                  		    
-                    
+        		    (grad_u*dphi[i][qp]));            // diffusion term
+        
                   Fv(i) += JxW[qp] *
                            (p*dphi[i][qp](1) -                // pressure term
-        		    (grad_v*dphi[i][qp]));            // diffusion term		    		    	    
+        		    (grad_v*dphi[i][qp]));            // diffusion term
         
 </pre>
 </div>
@@ -3014,9 +3024,9 @@ Concentration Equation Residual
 
 <div class ="fragment">
 <pre>
-                  FC(i) += JxW[qp] * 
+                  FC(i) += JxW[qp] *
         	           ( (U*grad_C)*phi[i][qp] +                // convection term
-        	            (1./Peclet)*(grad_C*dphi[i][qp]) );     // diffusion term     	    
+        	            (1./Peclet)*(grad_C*dphi[i][qp]) );     // diffusion term
         
 </pre>
 </div>
@@ -3044,18 +3054,18 @@ Matrix contributions for the uu and vv couplings.
                       for (unsigned int j=0; j != n_u_dofs; j++)
                         {
                           Kuu(i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp])); /* diffusion term  */
-                                 		  
+        
                           Kvv(i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp])); /* diffusion term  */
-        		                    
+        
         		  KCu(i,j) += JxW[qp]* ( (phi[j][qp]*C_x)*phi[i][qp] ); /* convection term */
-        		  
-        		  KCv(i,j) += JxW[qp]*( (phi[j][qp]*C_y)*phi[i][qp] );  /* convection term */		  	   
-        		  
+        
+        		  KCv(i,j) += JxW[qp]*( (phi[j][qp]*C_y)*phi[i][qp] );  /* convection term */
+        
         		  KCC(i,j) += JxW[qp]*
-        		              ( (U*dphi[j][qp])*phi[i][qp] +      /* nonlinear term (convection) */  
+        		              ( (U*dphi[j][qp])*phi[i][qp] +      /* nonlinear term (convection) */
         		              (1./Peclet)*(dphi[j][qp]*dphi[i][qp]) ); /* diffusion term */
         		}
-        	      
+        
 </pre>
 </div>
 <div class = "comment">
@@ -3071,10 +3081,10 @@ Matrix contributions for the up and vp couplings.
         		}
         	    }
         	}
-                
+        
             } // end of the quadrature point qp-loop
         
-              return request_jacobian;    
+              return request_jacobian;
         }
         
         
@@ -3141,7 +3151,7 @@ The subvectors and submatrices we need to fill:
 <div class ="fragment">
 <pre>
           DenseSubMatrix&lt;Number&gt; &Kpu = *c.elem_subjacobians[p_var][u_var];
-          DenseSubMatrix&lt;Number&gt; &Kpv = *c.elem_subjacobians[p_var][v_var];  
+          DenseSubMatrix&lt;Number&gt; &Kpv = *c.elem_subjacobians[p_var][v_var];
           DenseSubVector&lt;Number&gt; &Fp = *c.elem_subresiduals[p_var];
         
 </pre>
@@ -3164,7 +3174,7 @@ Compute the velocity gradient at the old Newton iterate
 <div class ="fragment">
 <pre>
               Gradient grad_u = c.interior_gradient(u_var, qp),
-        	grad_v = c.interior_gradient(v_var, qp);	
+        	grad_v = c.interior_gradient(v_var, qp);
         
 </pre>
 </div>
@@ -3178,7 +3188,7 @@ computes the contributions of the continuity equation.
               for (unsigned int i=0; i != n_p_dofs; i++)
                 {
                   Fp(i) += JxW[qp] * psi[i][qp] *
-                           (grad_u(0) + grad_v(1));          
+                           (grad_u(0) + grad_v(1));
         
                   if (request_jacobian && c.elem_solution_derivative)
                     {
@@ -3187,7 +3197,7 @@ computes the contributions of the continuity equation.
                       for (unsigned int j=0; j != n_u_dofs; j++)
                         {
                           Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
-                          Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);                  
+                          Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
                         }
                     }
                 }
@@ -3197,13 +3207,13 @@ computes the contributions of the continuity equation.
         }
         
         void CoupledSystem::postprocess()
-        {    
+        {
 </pre>
 </div>
 <div class = "comment">
 We need to overload the postprocess function to set the computed_QoI variable of the CoupledSystem class
 to the qoi value stored in System::qoi[0]
-  
+
 
 <br><br></div>
 
@@ -3217,12 +3227,12 @@ to the qoi value stored in System::qoi[0]
 </pre>
 </div>
 <div class = "comment">
-These functions supply the nonlinear weighting for the adjoint residual error estimate which 
+These functions supply the nonlinear weighting for the adjoint residual error estimate which
 arise due to the convection term in the convection-diffusion equation:
 ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} + ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2}
 ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} + ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2}
 These functions compute (u_1)_h or C,1_h , and (u_2)_h or C,2_h , and supply it to the weighted patch recovery error estimator
-In CoupledFEMFunctionsx, the object built with var = 0, returns the (u_1)_h weight, while 
+In CoupledFEMFunctionsx, the object built with var = 0, returns the (u_1)_h weight, while
 the object built with var = 1, returns the C,1_h weight. The switch statment
 distinguishes the behavior of the two objects
 Same thing for CoupledFEMFunctionsy
@@ -3232,8 +3242,8 @@ Same thing for CoupledFEMFunctionsy
 <pre>
         Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
         					const Real /* time */)
-        { 
-          Real weight = 0.0;
+        {
+          Number weight = 0.0;
         
           switch(var)
             {
@@ -3267,7 +3277,7 @@ Same thing for CoupledFEMFunctionsy
         Number CoupledFEMFunctionsy::operator()(const FEMContext& c, const Point& p,
         					const Real /* time */)
         {
-          Real weight = 0.0;
+          Number weight = 0.0;
         
           switch(var)
             {
@@ -3296,7 +3306,6 @@ Same thing for CoupledFEMFunctionsy
         
           return weight;
         }
-        
 </pre>
 </div>
 
@@ -3338,14 +3347,14 @@ Mesh construction
         void build_domain (Mesh &mesh, FEMParameters &param)
         {
           mesh.read(param.domainfile);
-              
+        
           std::cout&lt;&lt;"Making elements 2nd order"&lt;&lt;std::endl;
-          
+        
 </pre>
 </div>
 <div class = "comment">
 Right now we are setting approximation orders in the code, rather than reading them in
-That needs to be fixed and the second ordering should be done only if one of the 
+That needs to be fixed and the second ordering should be done only if one of the
 approximation orders is greater than 1
 </div>
 
@@ -3470,7 +3479,7 @@ approximation orders is greater than 1
             GETPOT_INPUT(component_wise_error);
             GETPOT_INPUT(compute_sensitivities);
             GETPOT_INPUT(compare_to_fine_solution_primal);
-            GETPOT_INPUT(compare_to_fine_solution_adjoint);    
+            GETPOT_INPUT(compare_to_fine_solution_adjoint);
             GETPOT_INPUT(do_forward_sensitivity);
             GETPOT_INPUT(do_adjoint_sensitivity);
             GETPOT_INPUT(postprocess_adjoint);
@@ -3531,7 +3540,7 @@ approximation orders is greater than 1
             GETPOT_INPUT(print_residuals);
             GETPOT_INPUT(print_jacobian_norms);
             GETPOT_INPUT(print_jacobians);
-                
+        
         
 </pre>
 </div>
@@ -3570,8 +3579,8 @@ libmesh_error();
 </pre>
 </div>
 <div class = "comment">
-Here we define the functions to compute the QoI (side_qoi) 
-and supply the right hand side for the associated adjoint problem (side_qoi_derivative) 
+Here we define the functions to compute the QoI (side_qoi)
+and supply the right hand side for the associated adjoint problem (side_qoi_derivative)
 
 
 <br><br></div>
@@ -3608,7 +3617,7 @@ to see if it was requested from us
         					 const QoISet & /* qois */)
         {
           FEMContext &c = libmesh_cast_ref&lt;FEMContext&&gt;(context);
-           
+        
 </pre>
 </div>
 <div class = "comment">
@@ -3630,20 +3639,20 @@ Get velocity basis functions phi
           const std::vector&lt;std::vector&lt;Real&gt; &gt; &phi = c.side_fe_var[0]-&gt;get_phi();
         
           const std::vector&lt;Point &gt; &q_point = c.side_fe_var[0]-&gt;get_xyz();
-                  
+        
 </pre>
 </div>
 <div class = "comment">
-The number of local degrees of freedom in each variable  
+The number of local degrees of freedom in each variable
 </div>
 
 <div class ="fragment">
 <pre>
-          const unsigned int n_u_dofs = c.dof_indices_var[1].size();  
-                
+          const unsigned int n_u_dofs = c.dof_indices_var[1].size();
+        
           DenseSubVector&lt;Number&gt; &Qu = *c.elem_qoi_subderivatives[0][0];
           DenseSubVector&lt;Number&gt; &QC = *c.elem_qoi_subderivatives[0][3];
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -3657,8 +3666,8 @@ weight functions.
 
 <div class ="fragment">
 <pre>
-          unsigned int n_qpoints = c.side_qrule-&gt;n_points();  
-          
+          unsigned int n_qpoints = c.side_qrule-&gt;n_points();
+        
           Number u = 0. ;
           Number C = 0. ;
         
@@ -3681,7 +3690,7 @@ Loop over all the qps on this side
 <div class ="fragment">
 <pre>
               for (unsigned int qp=0; qp != n_qpoints; qp++)
-          	{      
+          	{
         	  Real x = q_point[qp](0);
         
 </pre>
@@ -3697,14 +3706,14 @@ If side is on left outlet
 </pre>
 </div>
 <div class = "comment">
-Get u at the qp 
+Get u at the qp
 </div>
 
 <div class ="fragment">
 <pre>
                       u = c.side_value(0,qp);
         	      C = c.side_value(3,qp);
-        	      
+        
 </pre>
 </div>
 <div class = "comment">
@@ -3719,7 +3728,7 @@ Add the contribution from each basis function
         		  QC(i) += JxW[qp] * phi[i][qp] * -u;
         		}
         	    } // end if
-        	    	  
+        
           	} // end quadrature loop
         
             } // end if on outlet
@@ -3735,9 +3744,9 @@ This function computes the actual QoI
 <pre>
         void CoupledSystemQoI::side_qoi(DiffContext &context, const QoISet & /* qois */)
         {
-          
+        
           FEMContext &c = libmesh_cast_ref&lt;FEMContext&&gt;(context);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -3765,12 +3774,12 @@ to get the QoI
 
 <div class ="fragment">
 <pre>
-          unsigned int n_qpoints = c.side_qrule-&gt;n_points();  
-            
+          unsigned int n_qpoints = c.side_qrule-&gt;n_points();
+        
           Number dQoI_0 = 0. ;
           Number u = 0. ;
           Number C = 0. ;
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -3779,18 +3788,18 @@ If side is on the left outlet
 
 <div class ="fragment">
 <pre>
-          if(c.has_side_boundary_id(2)) 
-            {             
+          if(c.has_side_boundary_id(2))
+            {
 </pre>
 </div>
 <div class = "comment">
-Loop over all the qps on this side 
+Loop over all the qps on this side
 </div>
 
 <div class ="fragment">
 <pre>
-              for (unsigned int qp=0; qp != n_qpoints; qp++) 
-        	{ 
+              for (unsigned int qp=0; qp != n_qpoints; qp++)
+        	{
         	  Real x = q_point[qp](0);
         
         	  if(x &lt; 0.)
@@ -3798,23 +3807,23 @@ Loop over all the qps on this side
 </pre>
 </div>
 <div class = "comment">
-Get u and C at the qp 
+Get u and C at the qp
 </div>
 
 <div class ="fragment">
 <pre>
                       u = c.side_value(0,qp);
         	      C = c.side_value(3,qp);
-        	  
+        
         	      dQoI_0 += JxW[qp] * -u * C;
         	    } // end if
-        	  
+        
           	} // end quadrature loop
         
             } // end if on bdry
-            
+        
           c.elem_qoi[0] += dQoI_0;
-            
+        
         }
 </pre>
 </div>
@@ -3862,9 +3871,9 @@ Initial conditions
                              const std::string&,
                              const std::string&)
         {
-          
+        
           return 1.;
-              
+        
         }
         
         
@@ -3984,16 +3993,16 @@ Write new headers if we're starting a new simulation
   {
   <B><FONT COLOR="#228B22">public</FONT></B>:
     CoupledSystem(EquationSystems&amp; es,
-                 <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name,
-                 <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number)
-      : FEMSystem(es, name, number), Peclet(1.) {qoi.resize(1);}
-   
+                 <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name_in,
+                 <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number_in)
+      : FEMSystem(es, name_in, number_in), Peclet(1.) {qoi.resize(1);}
+  
   
     Number &amp;get_QoI_value()
       {
-        <B><FONT COLOR="#A020F0">return</FONT></B> computed_QoI;       
+        <B><FONT COLOR="#A020F0">return</FONT></B> computed_QoI;
       }
-      
+  
     Number &amp;get_parameter_value(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> parameter_index)
       {
         <B><FONT COLOR="#A020F0">return</FONT></B> parameters[parameter_index];
@@ -4006,13 +4015,13 @@ Write new headers if we're starting a new simulation
   	{
   	  parameter_vector[i] = &amp;parameters[i];
   	}
-        
+  
         <B><FONT COLOR="#A020F0">return</FONT></B> parameter_vector;
       }
   
     Real &amp;get_Pe()
       {
-        <B><FONT COLOR="#A020F0">return</FONT></B> Peclet;       
+        <B><FONT COLOR="#A020F0">return</FONT></B> Peclet;
       }
   
    <B><FONT COLOR="#228B22">protected</FONT></B>:
@@ -4048,7 +4057,7 @@ Write new headers if we're starting a new simulation
     CoupledFEMFunctionsx(System&amp; <I><FONT COLOR="#B22222">/* sys */</FONT></I>, <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> var_number) {var = var_number;}
   
     <B><FONT COLOR="#228B22">virtual</FONT></B> ~CoupledFEMFunctionsx () {}
-          
+  
     <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;FEMFunctionBase&lt;Number&gt; &gt; clone () <B><FONT COLOR="#228B22">const</FONT></B>
     {<B><FONT COLOR="#A020F0">return</FONT></B> AutoPtr&lt;FEMFunctionBase&lt;Number&gt; &gt;( <B><FONT COLOR="#A020F0">new</FONT></B> CoupledFEMFunctionsx(*<B><FONT COLOR="#A020F0">this</FONT></B>) ); }
   
@@ -4060,9 +4069,9 @@ Write new headers if we're starting a new simulation
   			     <B><FONT COLOR="#228B22">const</FONT></B> Real time = 0.);
   
    <B><FONT COLOR="#228B22">private</FONT></B>:
-    
+  
     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> var;
-       
+  
   };
   
   
@@ -4072,7 +4081,7 @@ Write new headers if we're starting a new simulation
     CoupledFEMFunctionsy(System&amp; <I><FONT COLOR="#B22222">/* sys */</FONT></I>, <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> var_number) {var = var_number;}
   
     <B><FONT COLOR="#228B22">virtual</FONT></B> ~CoupledFEMFunctionsy () {}
-      
+  
     <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;FEMFunctionBase&lt;Number&gt; &gt; clone () <B><FONT COLOR="#228B22">const</FONT></B>
     {<B><FONT COLOR="#A020F0">return</FONT></B> AutoPtr&lt;FEMFunctionBase&lt;Number&gt; &gt;( <B><FONT COLOR="#A020F0">new</FONT></B> CoupledFEMFunctionsy(*<B><FONT COLOR="#A020F0">this</FONT></B>) ); }
   
@@ -4083,9 +4092,9 @@ Write new headers if we're starting a new simulation
   
     <B><FONT COLOR="#228B22">virtual</FONT></B> Number <B><FONT COLOR="#A020F0">operator</FONT></B>() (<B><FONT COLOR="#228B22">const</FONT></B> FEMContext&amp;, <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
   			     <B><FONT COLOR="#228B22">const</FONT></B> Real time = 0.);
-    
+  
    <B><FONT COLOR="#228B22">private</FONT></B>:
-    
+  
     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> var;
   
   };
@@ -4132,9 +4141,9 @@ Write new headers if we're starting a new simulation
         steadystate_tolerance(0.),
         timesolver_norm(0,L2),
         dimension(2),
-  	domaintype(<B><FONT COLOR="#BC8F8F">&quot;square&quot;</FONT></B>), domainfile(<B><FONT COLOR="#BC8F8F">&quot;mesh.xda&quot;</FONT></B>), elementtype(<B><FONT COLOR="#BC8F8F">&quot;quad&quot;</FONT></B>),	
+  	domaintype(<B><FONT COLOR="#BC8F8F">&quot;square&quot;</FONT></B>), domainfile(<B><FONT COLOR="#BC8F8F">&quot;mesh.xda&quot;</FONT></B>), elementtype(<B><FONT COLOR="#BC8F8F">&quot;quad&quot;</FONT></B>),
   	fine_mesh_file_primal(<B><FONT COLOR="#BC8F8F">&quot;fine_mesh.xda&quot;</FONT></B>), fine_mesh_soln_primal(<B><FONT COLOR="#BC8F8F">&quot;fine_mesh_soln.xda&quot;</FONT></B>),
-  	fine_mesh_file_adjoint(<B><FONT COLOR="#BC8F8F">&quot;fine_mesh.xda&quot;</FONT></B>), fine_mesh_soln_adjoint(<B><FONT COLOR="#BC8F8F">&quot;fine_mesh_soln.xda&quot;</FONT></B>),	      
+  	fine_mesh_file_adjoint(<B><FONT COLOR="#BC8F8F">&quot;fine_mesh.xda&quot;</FONT></B>), fine_mesh_soln_adjoint(<B><FONT COLOR="#BC8F8F">&quot;fine_mesh_soln.xda&quot;</FONT></B>),
         elementorder(2),
         domain_xmin(0.0), domain_ymin(0.0), domain_zmin(0.0),
         domain_edge_width(1.0), domain_edge_length(1.0), domain_edge_height(1.0),
@@ -4165,7 +4174,7 @@ Write new headers if we're starting a new simulation
         output_gmv(false), output_tecplot(false),
         run_simulation(true), run_postprocess(false),
         fe_family(1, <B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>), fe_order(1, 1),
-        extra_quadrature_order(0),	
+        extra_quadrature_order(0),
         analytic_jacobians(true), verify_analytic_jacobians(0.0),
         print_solution_norms(false), print_solutions(false),
         print_residual_norms(false), print_residuals(false),
@@ -4212,7 +4221,7 @@ Write new headers if we're starting a new simulation
       <B><FONT COLOR="#5F9EA0">std</FONT></B>::string indicator_type;
       <B><FONT COLOR="#228B22">bool</FONT></B> patch_reuse;
       <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> sobolev_order;
-      <B><FONT COLOR="#5F9EA0">std</FONT></B>::string adjoint_residual_type;   
+      <B><FONT COLOR="#5F9EA0">std</FONT></B>::string adjoint_residual_type;
       <B><FONT COLOR="#228B22">bool</FONT></B> alternate_with_uniform_steps;
       <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> alternate_step_number;
       <B><FONT COLOR="#228B22">bool</FONT></B> component_wise_error;
@@ -4232,7 +4241,7 @@ Write new headers if we're starting a new simulation
       <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;std::string&gt; fe_family;
       <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; fe_order;
       <B><FONT COLOR="#228B22">int</FONT></B> extra_quadrature_order;
-      
+  
       <B><FONT COLOR="#228B22">bool</FONT></B> analytic_jacobians;
       Real verify_analytic_jacobians;
   
@@ -4263,17 +4272,17 @@ Write new headers if we're starting a new simulation
   {
   <B><FONT COLOR="#228B22">public</FONT></B>:
     CoupledSystemQoI(){}
-    <B><FONT COLOR="#228B22">virtual</FONT></B> ~CoupledSystemQoI(){} 
+    <B><FONT COLOR="#228B22">virtual</FONT></B> ~CoupledSystemQoI(){}
   
     <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_qoi( std::vector&lt;Number&gt;&amp; sys_qoi);
-    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> postprocess( ){} 
-    
-    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> side_qoi_derivative(DiffContext &amp;context, <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; qois);   
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> postprocess( ){}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> side_qoi_derivative(DiffContext &amp;context, <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; qois);
   
     <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> side_qoi(DiffContext &amp;context, <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; qois);
   
     <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;DifferentiableQoI&gt; clone( )
-    { AutoPtr&lt;DifferentiableQoI&gt; my_clone( <B><FONT COLOR="#A020F0">new</FONT></B> CoupledSystemQoI ); 
+    { AutoPtr&lt;DifferentiableQoI&gt; my_clone( <B><FONT COLOR="#A020F0">new</FONT></B> CoupledSystemQoI );
       *my_clone = *<B><FONT COLOR="#A020F0">this</FONT></B>;
       <B><FONT COLOR="#A020F0">return</FONT></B> my_clone;
     }
@@ -4440,7 +4449,7 @@ Write new headers if we're starting a new simulation
   }
   
   
-  <B><FONT COLOR="#228B22">void</FONT></B> write_output(EquationSystems &amp;es,                  
+  <B><FONT COLOR="#228B22">void</FONT></B> write_output(EquationSystems &amp;es,
                     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> t_step, <I><FONT COLOR="#B22222">// The timestep count
 </FONT></I>                    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> a_step, <I><FONT COLOR="#B22222">// The adaptive step count
 </FONT></I>                    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string solution_type, <I><FONT COLOR="#B22222">// primal or adjoint solve
@@ -4664,7 +4673,7 @@ Write new headers if we're starting a new simulation
   <B><FONT COLOR="#228B22">void</FONT></B> read_output(EquationSystems &amp;es,
                    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> t_step,
                    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> a_step,
-                   <B><FONT COLOR="#5F9EA0">std</FONT></B>::string solution_type, 
+                   <B><FONT COLOR="#5F9EA0">std</FONT></B>::string solution_type,
                    FEMParameters &amp;param)
   {
     MeshBase &amp;mesh = es.get_mesh();
@@ -4835,7 +4844,7 @@ Write new headers if we're starting a new simulation
   
         solver-&gt;max_linear_iterations       = param.max_linear_iterations;
         solver-&gt;initial_linear_tolerance    = param.initial_linear_tolerance;
-        solver-&gt;minimum_linear_tolerance    = param.minimum_linear_tolerance;      
+        solver-&gt;minimum_linear_tolerance    = param.minimum_linear_tolerance;
       }
   }
   
@@ -4847,9 +4856,9 @@ Write new headers if we're starting a new simulation
     AutoPtr&lt;MeshRefinement&gt; mesh_refinement(<B><FONT COLOR="#A020F0">new</FONT></B> MeshRefinement(mesh));
     mesh_refinement-&gt;coarsen_by_parents() = true;
     mesh_refinement-&gt;absolute_global_tolerance() = param.global_tolerance;
-    mesh_refinement-&gt;nelem_target()      = param.nelem_target;  
+    mesh_refinement-&gt;nelem_target()      = param.nelem_target;
     mesh_refinement-&gt;refine_fraction()   = param.refine_fraction;
-    mesh_refinement-&gt;coarsen_fraction()  = param.coarsen_fraction;  
+    mesh_refinement-&gt;coarsen_fraction()  = param.coarsen_fraction;
     mesh_refinement-&gt;coarsen_threshold() = param.coarsen_threshold;
   
     <B><FONT COLOR="#A020F0">return</FONT></B> mesh_refinement;
@@ -4868,34 +4877,34 @@ Write new headers if we're starting a new simulation
   
   AutoPtr&lt;ErrorEstimator&gt;
   build_error_estimator_component_wise
-    (FEMParameters &amp;param, 
+    (FEMParameters &amp;param,
      <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;std::vector&lt;Real&gt; &gt; &amp;term_weights,
      <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;libMeshEnums::FEMNormType&gt; &amp;primal_error_norm_type,
      <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;libMeshEnums::FEMNormType&gt; &amp;dual_error_norm_type)
-  {  
+  {
     AutoPtr&lt;ErrorEstimator&gt; error_estimator;
   
     AdjointResidualErrorEstimator *adjoint_residual_estimator = <B><FONT COLOR="#A020F0">new</FONT></B> AdjointResidualErrorEstimator;
   
     error_estimator.reset (adjoint_residual_estimator);
-    
+  
     PatchRecoveryErrorEstimator *p1 =
       <B><FONT COLOR="#A020F0">new</FONT></B> PatchRecoveryErrorEstimator;
     adjoint_residual_estimator-&gt;primal_error_estimator().reset(p1);
   
     PatchRecoveryErrorEstimator *p2 =
       <B><FONT COLOR="#A020F0">new</FONT></B> PatchRecoveryErrorEstimator;
-    adjoint_residual_estimator-&gt;dual_error_estimator().reset(p2);  
+    adjoint_residual_estimator-&gt;dual_error_estimator().reset(p2);
   
     p1-&gt;set_patch_reuse(param.patch_reuse);
     p2-&gt;set_patch_reuse(param.patch_reuse);
   
     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> size = primal_error_norm_type.size();
-    
+  
     libmesh_assert_equal_to (size, dual_error_norm_type.size());
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i = 0; i != size; ++i)
       {
-        adjoint_residual_estimator-&gt;primal_error_estimator()-&gt;error_norm.set_type(i, primal_error_norm_type[i]);      
+        adjoint_residual_estimator-&gt;primal_error_estimator()-&gt;error_norm.set_type(i, primal_error_norm_type[i]);
         adjoint_residual_estimator-&gt;dual_error_estimator()-&gt;error_norm.set_type(i, dual_error_norm_type[i]);
       }
   
@@ -4919,13 +4928,13 @@ Write new headers if we're starting a new simulation
      <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;libMeshEnums::FEMNormType&gt; &amp;primal_error_norm_type,
      <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;libMeshEnums::FEMNormType&gt; &amp;dual_error_norm_type,
      <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;FEMFunctionBase&lt;Number&gt;*&gt; coupled_system_weight_functions)
-  {  
+  {
     AutoPtr&lt;ErrorEstimator&gt; error_estimator;
   
     AdjointResidualErrorEstimator *adjoint_residual_estimator = <B><FONT COLOR="#A020F0">new</FONT></B> AdjointResidualErrorEstimator;
   
     error_estimator.reset (adjoint_residual_estimator);
-    
+  
   
     WeightedPatchRecoveryErrorEstimator *p1 =
       <B><FONT COLOR="#A020F0">new</FONT></B> WeightedPatchRecoveryErrorEstimator;
@@ -4933,7 +4942,7 @@ Write new headers if we're starting a new simulation
   
     PatchRecoveryErrorEstimator *p2 =
       <B><FONT COLOR="#A020F0">new</FONT></B> PatchRecoveryErrorEstimator;
-    adjoint_residual_estimator-&gt;dual_error_estimator().reset(p2);  
+    adjoint_residual_estimator-&gt;dual_error_estimator().reset(p2);
   
     p1-&gt;set_patch_reuse(param.patch_reuse);
     p2-&gt;set_patch_reuse(param.patch_reuse);
@@ -4948,7 +4957,7 @@ Write new headers if we're starting a new simulation
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i = 0; i != size; ++i)
       {
         p1-&gt;weight_functions.push_back(coupled_system_weight_functions[i]);
-        adjoint_residual_estimator-&gt;primal_error_estimator()-&gt;error_norm.set_type(i, primal_error_norm_type[i]);      
+        adjoint_residual_estimator-&gt;primal_error_estimator()-&gt;error_norm.set_type(i, primal_error_norm_type[i]);
         adjoint_residual_estimator-&gt;dual_error_estimator()-&gt;error_norm.set_type(i, dual_error_norm_type[i]);
       }
   
@@ -4973,15 +4982,17 @@ Write new headers if we're starting a new simulation
     libmesh_example_assert(false, <B><FONT COLOR="#BC8F8F">&quot;--enable-amr&quot;</FONT></B>);
   #<B><FONT COLOR="#A020F0">else</FONT></B>
   
+    libmesh_example_assert(libMesh::default_solver_package() != EIGEN_SOLVERS, <B><FONT COLOR="#BC8F8F">&quot;--enable-petsc&quot;</FONT></B>);
+  
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Started &quot;</FONT></B> &lt;&lt; argv[0] &lt;&lt; std::endl;
   
     {
       <B><FONT COLOR="#5F9EA0">std</FONT></B>::ifstream i(<B><FONT COLOR="#BC8F8F">&quot;general.in&quot;</FONT></B>);
       <B><FONT COLOR="#A020F0">if</FONT></B> (!i)
         {
-          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">'['</FONT></B> &lt;&lt; libMesh::processor_id() 
-                    &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;] Can't find general.in; exiting early.&quot;</FONT></B> 
-                    &lt;&lt; std::endl; 
+          <B><FONT COLOR="#5F9EA0">std</FONT></B>::cerr &lt;&lt; <B><FONT COLOR="#BC8F8F">'['</FONT></B> &lt;&lt; libMesh::processor_id()
+                    &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;] Can't find general.in; exiting early.&quot;</FONT></B>
+                    &lt;&lt; std::endl;
           libmesh_error();
         }
     }
@@ -4992,8 +5003,8 @@ Write new headers if we're starting a new simulation
     param.read(infile);
   
     libmesh_example_assert(2 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D support&quot;</FONT></B>);
-    
-    Mesh mesh (param.dimension);
+  
+    Mesh mesh(init.comm(), param.dimension);
   
     AutoPtr&lt;MeshRefinement&gt; mesh_refinement =
       build_mesh_refinement(mesh, param);
@@ -5031,12 +5042,12 @@ Write new headers if we're starting a new simulation
     LinearSolver&lt;Number&gt; *linear_solver = system.get_linear_solver();
   
     <B><FONT COLOR="#A020F0">for</FONT></B> (; a_step &lt;= param.max_adaptivesteps; ++a_step)
-      {                                    
+      {
         <B><FONT COLOR="#A020F0">if</FONT></B>(param.global_tolerance &gt; 0 &amp;&amp; param.nelem_target &gt; 0)
           {
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt;<B><FONT COLOR="#BC8F8F">&quot;We cant refine to both a non-zero tolerance and a target number of elements, EXITING adaptive loop. &quot;</FONT></B>&lt;&lt;std::endl&lt;&lt;std::endl;
             <B><FONT COLOR="#A020F0">break</FONT></B>;
-          }        
+          }
   
         linear_solver-&gt;reuse_preconditioner(false);
   
@@ -5083,18 +5094,18 @@ Write new headers if we're starting a new simulation
             Real Pe = (dynamic_cast&lt;CoupledSystem&amp;&gt;(system)).get_Pe();
   
             ErrorVector error;
-            
+  
             ErrorVector error_non_pressure;
   
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;libMeshEnums::FEMNormType&gt;
-              primal_norm_type_vector_non_pressure;                        
+              primal_norm_type_vector_non_pressure;
             primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
             primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
             primal_norm_type_vector_non_pressure.push_back(L2);
             primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
   
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;libMeshEnums::FEMNormType&gt;
-              dual_norm_type_vector_non_pressure;                        
+              dual_norm_type_vector_non_pressure;
             dual_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
             dual_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
             dual_norm_type_vector_non_pressure.push_back(L2);
@@ -5107,7 +5118,7 @@ Write new headers if we're starting a new simulation
             weights_matrix_non_pressure[1][1] = 1.;
             weights_matrix_non_pressure[3][3] = 1./Pe;
   
-            AutoPtr&lt;ErrorEstimator&gt; error_estimator_non_pressure = 
+            AutoPtr&lt;ErrorEstimator&gt; error_estimator_non_pressure =
               build_error_estimator_component_wise
                 (param, weights_matrix_non_pressure,
                  primal_norm_type_vector_non_pressure,
@@ -5120,14 +5131,14 @@ Write new headers if we're starting a new simulation
             ErrorVector error_with_pressure;
   
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;libMeshEnums::FEMNormType&gt;
-              primal_norm_type_vector_with_pressure;                        
+              primal_norm_type_vector_with_pressure;
             primal_norm_type_vector_with_pressure.push_back(H1_X_SEMINORM);
             primal_norm_type_vector_with_pressure.push_back(H1_Y_SEMINORM);
             primal_norm_type_vector_with_pressure.push_back(L2);
             primal_norm_type_vector_with_pressure.push_back(L2);
   
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;libMeshEnums::FEMNormType&gt;
-              dual_norm_type_vector_with_pressure;                        
+              dual_norm_type_vector_with_pressure;
             dual_norm_type_vector_with_pressure.push_back(H1_X_SEMINORM);
             dual_norm_type_vector_with_pressure.push_back(H1_Y_SEMINORM);
             dual_norm_type_vector_with_pressure.push_back(L2);
@@ -5154,41 +5165,41 @@ Write new headers if we're starting a new simulation
   
             write_error(equation_systems, error_with_pressure, 0, a_step, param, <B><FONT COLOR="#BC8F8F">&quot;_with_pressure&quot;</FONT></B>);
   
-  	  
+  
             ErrorVector error_convection_diffusion_x;
   
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;libMeshEnums::FEMNormType&gt;
-              primal_norm_type_vector_convection_diffusion_x;                        
+              primal_norm_type_vector_convection_diffusion_x;
             primal_norm_type_vector_convection_diffusion_x.push_back(L2);
             primal_norm_type_vector_convection_diffusion_x.push_back(L2);
             primal_norm_type_vector_convection_diffusion_x.push_back(L2);
             primal_norm_type_vector_convection_diffusion_x.push_back(H1_X_SEMINORM);
   
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;libMeshEnums::FEMNormType&gt;
-              dual_norm_type_vector_convection_diffusion_x;                        
+              dual_norm_type_vector_convection_diffusion_x;
             dual_norm_type_vector_convection_diffusion_x.push_back(L2);
             dual_norm_type_vector_convection_diffusion_x.push_back(L2);
             dual_norm_type_vector_convection_diffusion_x.push_back(L2);
             dual_norm_type_vector_convection_diffusion_x.push_back(L2);
-  	  
+  
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;std::vector&lt;Real&gt; &gt;
               weights_matrix_convection_diffusion_x
                 (system.n_vars(),
                  <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Real&gt;(system.n_vars(), 0.0));
-  	  weights_matrix_convection_diffusion_x[0][3] = 1.;                  
-            weights_matrix_convection_diffusion_x[3][3] = 1.;                  
+  	  weights_matrix_convection_diffusion_x[0][3] = 1.;
+            weights_matrix_convection_diffusion_x[3][3] = 1.;
   
-  	  
+  
             ConstFEMFunction&lt;Number&gt; identity(1);
   
-            CoupledFEMFunctionsx convdiffx0(system, 0);                  	  
-  	  CoupledFEMFunctionsx convdiffx3(system, 3);                  
+            CoupledFEMFunctionsx convdiffx0(system, 0);
+  	  CoupledFEMFunctionsx convdiffx3(system, 3);
   
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;FEMFunctionBase&lt;Number&gt; *&gt; coupled_system_weight_functions_x;
             coupled_system_weight_functions_x.push_back(&amp;convdiffx0);
             coupled_system_weight_functions_x.push_back(&amp;identity);
-            coupled_system_weight_functions_x.push_back(&amp;identity);                  
-            coupled_system_weight_functions_x.push_back(&amp;convdiffx3);                         
+            coupled_system_weight_functions_x.push_back(&amp;identity);
+            coupled_system_weight_functions_x.push_back(&amp;convdiffx3);
   
             AutoPtr&lt;ErrorEstimator&gt; error_estimator_convection_diffusion_x =
             build_weighted_error_estimator_component_wise
@@ -5202,38 +5213,38 @@ Write new headers if we're starting a new simulation
   
             write_error(equation_systems, error_convection_diffusion_x,
                         0, a_step, param, <B><FONT COLOR="#BC8F8F">&quot;_convection_diffusion_x&quot;</FONT></B>);
-  	  
+  
             ErrorVector error_convection_diffusion_y;
   
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;libMeshEnums::FEMNormType&gt;
-              primal_norm_type_vector_convection_diffusion_y;                        
+              primal_norm_type_vector_convection_diffusion_y;
             primal_norm_type_vector_convection_diffusion_y.push_back(L2);
             primal_norm_type_vector_convection_diffusion_y.push_back(L2);
             primal_norm_type_vector_convection_diffusion_y.push_back(L2);
             primal_norm_type_vector_convection_diffusion_y.push_back(H1_Y_SEMINORM);
   
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;libMeshEnums::FEMNormType&gt;
-              dual_norm_type_vector_convection_diffusion_y;                        
+              dual_norm_type_vector_convection_diffusion_y;
             dual_norm_type_vector_convection_diffusion_y.push_back(L2);
             dual_norm_type_vector_convection_diffusion_y.push_back(L2);
             dual_norm_type_vector_convection_diffusion_y.push_back(L2);
             dual_norm_type_vector_convection_diffusion_y.push_back(L2);
-  	  
+  
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;std::vector&lt;Real&gt; &gt;
               weights_matrix_convection_diffusion_y
                 (system.n_vars(), std::vector&lt;Real&gt;(system.n_vars(), 0.0));
-  	  weights_matrix_convection_diffusion_y[1][3] = 1.;                  
-            weights_matrix_convection_diffusion_y[3][3] = 1.;                  	  
-            
-            CoupledFEMFunctionsy convdiffy1(system, 1);                  
-  	  CoupledFEMFunctionsy convdiffy3(system, 3);                  
+  	  weights_matrix_convection_diffusion_y[1][3] = 1.;
+            weights_matrix_convection_diffusion_y[3][3] = 1.;
+  
+            CoupledFEMFunctionsy convdiffy1(system, 1);
+  	  CoupledFEMFunctionsy convdiffy3(system, 3);
   
             <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;FEMFunctionBase&lt;Number&gt; *&gt; coupled_system_weight_functions_y;
             coupled_system_weight_functions_y.push_back(&amp;identity);
             coupled_system_weight_functions_y.push_back(&amp;convdiffy1);
             coupled_system_weight_functions_y.push_back(&amp;identity);
-            coupled_system_weight_functions_y.push_back(&amp;convdiffy3);                  
-  	  
+            coupled_system_weight_functions_y.push_back(&amp;convdiffy3);
+  
             AutoPtr&lt;ErrorEstimator&gt; error_estimator_convection_diffusion_y =
               build_weighted_error_estimator_component_wise
                 (param, weights_matrix_convection_diffusion_y,
@@ -5244,13 +5255,13 @@ Write new headers if we're starting a new simulation
             error_estimator_convection_diffusion_y-&gt;estimate_error(system, error_convection_diffusion_y);
   
             write_error(equation_systems, error_convection_diffusion_y, 0, a_step, param, <B><FONT COLOR="#BC8F8F">&quot;_convection_diffusion_y&quot;</FONT></B>);
-  	            
+  
             <B><FONT COLOR="#A020F0">if</FONT></B>(param.indicator_type == <B><FONT COLOR="#BC8F8F">&quot;adjoint_residual&quot;</FONT></B>)
               {
                 error.resize(error_non_pressure.size());
   
                 <B><FONT COLOR="#A020F0">for</FONT></B>(<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i = 0; i &lt; error.size(); i++)
-                  {                          
+                  {
                     error[i] = error_non_pressure[i] + error_with_pressure[i] + error_convection_diffusion_x[i] + error_convection_diffusion_y[i];
                   }
               }
@@ -5271,13 +5282,13 @@ Write new headers if we're starting a new simulation
                 mesh_refinement-&gt;uniformly_refine(1);
               }
             <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B>(param.global_tolerance &gt;= 0. &amp;&amp; param.nelem_target == 0.) <I><FONT COLOR="#B22222">// Refine based on reaching an error tolerance
-</FONT></I>              {                              
-                mesh_refinement-&gt;flag_elements_by_error_tolerance (error);              
+</FONT></I>              {
+                mesh_refinement-&gt;flag_elements_by_error_tolerance (error);
   
                 mesh_refinement-&gt;refine_and_coarsen_elements();
               }
             <B><FONT COLOR="#A020F0">else</FONT></B> <I><FONT COLOR="#B22222">// Refine based on reaching a target number of elements
-</FONT></I>              {                                
+</FONT></I>              {
                 <B><FONT COLOR="#A020F0">if</FONT></B> (mesh.n_active_elem() &gt;= param.nelem_target)
                   {
                     <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt;<B><FONT COLOR="#BC8F8F">&quot;We reached the target number of elements.&quot;</FONT></B>&lt;&lt;std::endl &lt;&lt;std::endl;
@@ -5299,11 +5310,10 @@ Write new headers if we're starting a new simulation
     write_output_footers(param);
   
   #endif <I><FONT COLOR="#B22222">// #ifndef LIBMESH_ENABLE_AMR
-</FONT></I>      
-    <B><FONT COLOR="#A020F0">return</FONT></B> 0;    
+</FONT></I>  
+    <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   
   }
-  
 </pre> 
 <a name="nocomments"></a> 
 <br><br><br> <h1> The source file coupled_system.C without comments: </h1> 
@@ -5343,7 +5353,7 @@ Write new headers if we're starting a new simulation
         output.zero();
         <B><FONT COLOR="#228B22">const</FONT></B> Real y=p(1);
         output(_u_var) = (_sign)*((y-2) * (y-3));
-        output(_v_var) = 0;      
+        output(_v_var) = 0;
       }
   
     <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; clone() <B><FONT COLOR="#228B22">const</FONT></B>
@@ -5356,8 +5366,8 @@ Write new headers if we're starting a new simulation
   
   
   <B><FONT COLOR="#228B22">void</FONT></B> CoupledSystem::init_data ()
-  {  
-    GetPot infile(<B><FONT COLOR="#BC8F8F">&quot;coupled_system.in&quot;</FONT></B>);  
+  {
+    GetPot infile(<B><FONT COLOR="#BC8F8F">&quot;coupled_system.in&quot;</FONT></B>);
     Peclet = infile(<B><FONT COLOR="#BC8F8F">&quot;Peclet&quot;</FONT></B>, 1.);
     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> pressure_p = infile(<B><FONT COLOR="#BC8F8F">&quot;pressure_p&quot;</FONT></B>, 1);
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::string fe_family = infile(<B><FONT COLOR="#BC8F8F">&quot;fe_family&quot;</FONT></B>, std::string(<B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>));
@@ -5370,7 +5380,7 @@ Write new headers if we're starting a new simulation
   			      fefamily);
     v_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>, static_cast&lt;Order&gt;(pressure_p+1),
   			      fefamily);
-    
+  
     p_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>, static_cast&lt;Order&gt;(pressure_p),
   			      fefamily);
   
@@ -5400,11 +5410,11 @@ Write new headers if we're starting a new simulation
     <B><FONT COLOR="#228B22">const</FONT></B> boundary_id_type wall_id = 3;
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::set&lt;boundary_id_type&gt; wall_bdy;
     wall_bdy.insert(wall_id);
-    
+  
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; uv(1, u_var);
     uv.push_back(v_var);
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; C_only(1, C_var);
-      
+  
     ZeroFunction&lt;Number&gt; zero;
     ConstFunction&lt;Number&gt; one(1);
   
@@ -5419,13 +5429,13 @@ Write new headers if we're starting a new simulation
       (DirichletBoundary (left_inlet_bdy, uv, &amp;inflow_left));
     <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_dof_map().add_dirichlet_boundary
       (DirichletBoundary (left_inlet_bdy, C_only, &amp;one));
-     
+  
     <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_dof_map().add_dirichlet_boundary
       (DirichletBoundary (right_inlet_bdy, uv, &amp;inflow_right));
     <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_dof_map().add_dirichlet_boundary
       (DirichletBoundary (right_inlet_bdy, C_only, &amp;zero));
   
-    
+  
     <B><FONT COLOR="#5F9EA0">FEMSystem</FONT></B>::init_data();
   }
   
@@ -5437,7 +5447,7 @@ Write new headers if we're starting a new simulation
     c.element_fe_var[u_var]-&gt;get_phi();
     c.element_fe_var[u_var]-&gt;get_dphi();
     c.element_fe_var[u_var]-&gt;get_xyz();
-    
+  
     c.element_fe_var[p_var]-&gt;get_phi();
   
     c.side_fe_var[u_var]-&gt;get_JxW();
@@ -5452,10 +5462,10 @@ Write new headers if we're starting a new simulation
     FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
   
   
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = 
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW =
       c.element_fe_var[u_var]-&gt;get_JxW();
   
-    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = 
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi =
       c.element_fe_var[u_var]-&gt;get_phi();
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi =
@@ -5463,36 +5473,36 @@ Write new headers if we're starting a new simulation
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; psi =
       c.element_fe_var[p_var]-&gt;get_phi();
-   
+  
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_p_dofs = c.dof_indices_var[p_var].size();
-    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.dof_indices_var[u_var].size(); 
-    libmesh_assert_equal_to (n_u_dofs, c.dof_indices_var[v_var].size()); 
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.dof_indices_var[u_var].size();
+    libmesh_assert_equal_to (n_u_dofs, c.dof_indices_var[v_var].size());
   
     DenseSubMatrix&lt;Number&gt; &amp;Kuu = *c.elem_subjacobians[u_var][u_var];
     DenseSubMatrix&lt;Number&gt; &amp;Kup = *c.elem_subjacobians[u_var][p_var];
     DenseSubVector&lt;Number&gt; &amp;Fu = *c.elem_subresiduals[u_var];
-    
-    DenseSubMatrix&lt;Number&gt; &amp;Kvv = *c.elem_subjacobians[v_var][v_var];      
-    DenseSubMatrix&lt;Number&gt; &amp;Kvp = *c.elem_subjacobians[v_var][p_var];    
-    DenseSubVector&lt;Number&gt; &amp;Fv = *c.elem_subresiduals[v_var];  
+  
+    DenseSubMatrix&lt;Number&gt; &amp;Kvv = *c.elem_subjacobians[v_var][v_var];
+    DenseSubMatrix&lt;Number&gt; &amp;Kvp = *c.elem_subjacobians[v_var][p_var];
+    DenseSubVector&lt;Number&gt; &amp;Fv = *c.elem_subresiduals[v_var];
   
     DenseSubMatrix&lt;Number&gt; &amp;KCu = *c.elem_subjacobians[C_var][u_var];
-    DenseSubMatrix&lt;Number&gt; &amp;KCv = *c.elem_subjacobians[C_var][v_var];  
+    DenseSubMatrix&lt;Number&gt; &amp;KCv = *c.elem_subjacobians[C_var][v_var];
     DenseSubMatrix&lt;Number&gt; &amp;KCC = *c.elem_subjacobians[C_var][C_var];
     DenseSubVector&lt;Number&gt; &amp;FC = *c.elem_subresiduals[C_var];
-        
+  
     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.element_qrule-&gt;n_points();
   
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
       {
-        Number p = c.interior_value(p_var, qp), 
+        Number p = c.interior_value(p_var, qp),
   	u = c.interior_value(u_var, qp),
-  	v = c.interior_value(v_var, qp);	
+  	v = c.interior_value(v_var, qp);
         Gradient grad_u = c.interior_gradient(u_var, qp),
   	grad_v = c.interior_gradient(v_var, qp),
-  	grad_C = c.interior_gradient(C_var, qp);	
+  	grad_C = c.interior_gradient(C_var, qp);
   
-        NumberVectorValue U     (u,     v);           
+        NumberVectorValue U     (u,     v);
         <B><FONT COLOR="#228B22">const</FONT></B> Number C_x = grad_C(0);
         <B><FONT COLOR="#228B22">const</FONT></B> Number C_y = grad_C(1);
   
@@ -5500,15 +5510,15 @@ Write new headers if we're starting a new simulation
           {
             Fu(i) += JxW[qp] *
                      (p*dphi[i][qp](0) -                <I><FONT COLOR="#B22222">// pressure term
-</FONT></I>  		    (grad_u*dphi[i][qp]));            <I><FONT COLOR="#B22222">// diffusion term                  		    
-</FONT></I>              
+</FONT></I>  		    (grad_u*dphi[i][qp]));            <I><FONT COLOR="#B22222">// diffusion term
+</FONT></I>  
             Fv(i) += JxW[qp] *
                      (p*dphi[i][qp](1) -                <I><FONT COLOR="#B22222">// pressure term
-</FONT></I>  		    (grad_v*dphi[i][qp]));            <I><FONT COLOR="#B22222">// diffusion term		    		    	    
+</FONT></I>  		    (grad_v*dphi[i][qp]));            <I><FONT COLOR="#B22222">// diffusion term
 </FONT></I>  
-  	  FC(i) += JxW[qp] * 
+  	  FC(i) += JxW[qp] *
   	           ( (U*grad_C)*phi[i][qp] +                <I><FONT COLOR="#B22222">// convection term
-</FONT></I>  	            (1./Peclet)*(grad_C*dphi[i][qp]) );     <I><FONT COLOR="#B22222">// diffusion term     	    
+</FONT></I>  	            (1./Peclet)*(grad_C*dphi[i][qp]) );     <I><FONT COLOR="#B22222">// diffusion term
 </FONT></I>  
   
             <B><FONT COLOR="#A020F0">if</FONT></B> (request_jacobian &amp;&amp; c.elem_solution_derivative)
@@ -5518,18 +5528,18 @@ Write new headers if we're starting a new simulation
                 <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_u_dofs; j++)
                   {
                     Kuu(i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp])); <I><FONT COLOR="#B22222">/* diffusion term  */</FONT></I>
-                           		  
+  
                     Kvv(i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp])); <I><FONT COLOR="#B22222">/* diffusion term  */</FONT></I>
-  		                    
+  
   		  KCu(i,j) += JxW[qp]* ( (phi[j][qp]*C_x)*phi[i][qp] ); <I><FONT COLOR="#B22222">/* convection term */</FONT></I>
-  		  
-  		  KCv(i,j) += JxW[qp]*( (phi[j][qp]*C_y)*phi[i][qp] );  <I><FONT COLOR="#B22222">/* convection term */</FONT></I>		  	   
-  		  
+  
+  		  KCv(i,j) += JxW[qp]*( (phi[j][qp]*C_y)*phi[i][qp] );  <I><FONT COLOR="#B22222">/* convection term */</FONT></I>
+  
   		  KCC(i,j) += JxW[qp]*
-  		              ( (U*dphi[j][qp])*phi[i][qp] +      <I><FONT COLOR="#B22222">/* nonlinear term (convection) */</FONT></I>  
+  		              ( (U*dphi[j][qp])*phi[i][qp] +      <I><FONT COLOR="#B22222">/* nonlinear term (convection) */</FONT></I>
   		              (1./Peclet)*(dphi[j][qp]*dphi[i][qp]) ); <I><FONT COLOR="#B22222">/* diffusion term */</FONT></I>
   		}
-  	      
+  
   	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_p_dofs; j++)
   		{
   		  Kup(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](0);
@@ -5537,10 +5547,10 @@ Write new headers if we're starting a new simulation
   		}
   	    }
   	}
-          
+  
       } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
 </FONT></I>  
-        <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;    
+        <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;
   }
   
   
@@ -5562,19 +5572,19 @@ Write new headers if we're starting a new simulation
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_p_dofs = c.dof_indices_var[p_var].size();
   
     DenseSubMatrix&lt;Number&gt; &amp;Kpu = *c.elem_subjacobians[p_var][u_var];
-    DenseSubMatrix&lt;Number&gt; &amp;Kpv = *c.elem_subjacobians[p_var][v_var];  
+    DenseSubMatrix&lt;Number&gt; &amp;Kpv = *c.elem_subjacobians[p_var][v_var];
     DenseSubVector&lt;Number&gt; &amp;Fp = *c.elem_subresiduals[p_var];
   
     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.element_qrule-&gt;n_points();
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
       {
         Gradient grad_u = c.interior_gradient(u_var, qp),
-  	grad_v = c.interior_gradient(v_var, qp);	
+  	grad_v = c.interior_gradient(v_var, qp);
   
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_p_dofs; i++)
           {
             Fp(i) += JxW[qp] * psi[i][qp] *
-                     (grad_u(0) + grad_v(1));          
+                     (grad_u(0) + grad_v(1));
   
             <B><FONT COLOR="#A020F0">if</FONT></B> (request_jacobian &amp;&amp; c.elem_solution_derivative)
               {
@@ -5583,7 +5593,7 @@ Write new headers if we're starting a new simulation
                 <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_u_dofs; j++)
                   {
                     Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
-                    Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);                  
+                    Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
                   }
               }
           }
@@ -5593,8 +5603,8 @@ Write new headers if we're starting a new simulation
   }
   
   <B><FONT COLOR="#228B22">void</FONT></B> CoupledSystem::postprocess()
-  {    
-    
+  {
+  
     computed_QoI = 0.0;
   
     computed_QoI = System::qoi[0];
@@ -5602,8 +5612,8 @@ Write new headers if we're starting a new simulation
   
   Number CoupledFEMFunctionsx::<B><FONT COLOR="#A020F0">operator</FONT></B>()(<B><FONT COLOR="#228B22">const</FONT></B> FEMContext&amp; c, <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
   					<B><FONT COLOR="#228B22">const</FONT></B> Real <I><FONT COLOR="#B22222">/* time */</FONT></I>)
-  { 
-    Real weight = 0.0;
+  {
+    Number weight = 0.0;
   
     <B><FONT COLOR="#A020F0">switch</FONT></B>(var)
       {
@@ -5637,7 +5647,7 @@ Write new headers if we're starting a new simulation
   Number CoupledFEMFunctionsy::<B><FONT COLOR="#A020F0">operator</FONT></B>()(<B><FONT COLOR="#228B22">const</FONT></B> FEMContext&amp; c, <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
   					<B><FONT COLOR="#228B22">const</FONT></B> Real <I><FONT COLOR="#B22222">/* time */</FONT></I>)
   {
-    Real weight = 0.0;
+    Number weight = 0.0;
   
     <B><FONT COLOR="#A020F0">switch</FONT></B>(var)
       {
@@ -5666,7 +5676,6 @@ Write new headers if we're starting a new simulation
   
     <B><FONT COLOR="#A020F0">return</FONT></B> weight;
   }
-  
 </pre> 
 <a name="nocomments"></a> 
 <br><br><br> <h1> The source file domain.C without comments: </h1> 
@@ -5686,9 +5695,9 @@ Write new headers if we're starting a new simulation
   <B><FONT COLOR="#228B22">void</FONT></B> build_domain (Mesh &amp;mesh, FEMParameters &amp;param)
   {
     mesh.read(param.domainfile);
-        
+  
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout&lt;&lt;<B><FONT COLOR="#BC8F8F">&quot;Making elements 2nd order&quot;</FONT></B>&lt;&lt;std::endl;
-    
+  
     mesh.all_second_order();
   
   }
@@ -5802,7 +5811,7 @@ Write new headers if we're starting a new simulation
       GETPOT_INPUT(component_wise_error);
       GETPOT_INPUT(compute_sensitivities);
       GETPOT_INPUT(compare_to_fine_solution_primal);
-      GETPOT_INPUT(compare_to_fine_solution_adjoint);    
+      GETPOT_INPUT(compare_to_fine_solution_adjoint);
       GETPOT_INPUT(do_forward_sensitivity);
       GETPOT_INPUT(do_adjoint_sensitivity);
       GETPOT_INPUT(postprocess_adjoint);
@@ -5863,7 +5872,7 @@ Write new headers if we're starting a new simulation
       GETPOT_INPUT(print_residuals);
       GETPOT_INPUT(print_jacobian_norms);
       GETPOT_INPUT(print_jacobians);
-          
+  
   
   
   }
@@ -5886,41 +5895,41 @@ Write new headers if we're starting a new simulation
   					 <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; <I><FONT COLOR="#B22222">/* qois */</FONT></I>)
   {
     FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
-     
+  
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = c.side_fe_var[0]-&gt;get_JxW();
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt; &amp;phi = c.side_fe_var[0]-&gt;get_phi();
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;q_point = c.side_fe_var[0]-&gt;get_xyz();
-            
-    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.dof_indices_var[1].size();  
-          
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.dof_indices_var[1].size();
+  
     DenseSubVector&lt;Number&gt; &amp;Qu = *c.elem_qoi_subderivatives[0][0];
     DenseSubVector&lt;Number&gt; &amp;QC = *c.elem_qoi_subderivatives[0][3];
-    
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.side_qrule-&gt;n_points();  
-    
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.side_qrule-&gt;n_points();
+  
     Number u = 0. ;
     Number C = 0. ;
   
     <B><FONT COLOR="#A020F0">if</FONT></B>(c.has_side_boundary_id(2))
       {
         <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
-    	{      
+    	{
   	  Real x = q_point[qp](0);
   
   	  <B><FONT COLOR="#A020F0">if</FONT></B>(x &lt; 0.)
   	    {
   	      u = c.side_value(0,qp);
   	      C = c.side_value(3,qp);
-  	      
+  
   	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_u_dofs; i++)
   		{
   		  Qu(i) += JxW[qp] * -phi[i][qp] * C;
   		  QC(i) += JxW[qp] * phi[i][qp] * -u;
   		}
   	    } <I><FONT COLOR="#B22222">// end if
-</FONT></I>  	    	  
+</FONT></I>  
     	} <I><FONT COLOR="#B22222">// end quadrature loop
 </FONT></I>  
       } <I><FONT COLOR="#B22222">// end if on outlet
@@ -5928,41 +5937,41 @@ Write new headers if we're starting a new simulation
   
   <B><FONT COLOR="#228B22">void</FONT></B> CoupledSystemQoI::side_qoi(DiffContext &amp;context, <B><FONT COLOR="#228B22">const</FONT></B> QoISet &amp; <I><FONT COLOR="#B22222">/* qois */</FONT></I>)
   {
-    
+  
     FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
-    
+  
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = c.side_fe_var[0]-&gt;get_JxW();
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point &gt; &amp;q_point = c.side_fe_var[0]-&gt;get_xyz();
   
   
-    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.side_qrule-&gt;n_points();  
-      
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = c.side_qrule-&gt;n_points();
+  
     Number dQoI_0 = 0. ;
     Number u = 0. ;
     Number C = 0. ;
-    
-    <B><FONT COLOR="#A020F0">if</FONT></B>(c.has_side_boundary_id(2)) 
-      {             
-        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++) 
-  	{ 
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B>(c.has_side_boundary_id(2))
+      {
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+  	{
   	  Real x = q_point[qp](0);
   
   	  <B><FONT COLOR="#A020F0">if</FONT></B>(x &lt; 0.)
   	    {
   	      u = c.side_value(0,qp);
   	      C = c.side_value(3,qp);
-  	  
+  
   	      dQoI_0 += JxW[qp] * -u * C;
   	    } <I><FONT COLOR="#B22222">// end if
-</FONT></I>  	  
+</FONT></I>  
     	} <I><FONT COLOR="#B22222">// end quadrature loop
 </FONT></I>  
       } <I><FONT COLOR="#B22222">// end if on bdry
-</FONT></I>      
+</FONT></I>  
     c.elem_qoi[0] += dQoI_0;
-      
+  
   }
 </pre> 
 <a name="nocomments"></a> 
@@ -5988,9 +5997,9 @@ Write new headers if we're starting a new simulation
                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;,
                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;)
   {
-    
+  
     <B><FONT COLOR="#A020F0">return</FONT></B> 1.;
-        
+  
   }
   
   
@@ -6047,12 +6056,13 @@ Write new headers if we're starting a new simulation
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+make[4]: Entering directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/adjoints/adjoints_ex3'
 ***************************************************************
 * Running Example adjoints_ex3:
-*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
  
-Started /workspace/libmesh/examples/adjoints/adjoints_ex3/.libs/lt-example-devel
+Started /net/spark/workspace/roystgnr/libmesh/git/devel/examples/adjoints/adjoints_ex3/.libs/lt-example-devel
 Building mesh
 Making elements 2nd order
 Building system
@@ -6061,13 +6071,13 @@ Initializing systems
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=99
-    n_local_nodes()=9
+    n_local_nodes()=27
   n_elem()=16
-    n_local_elem()=1
+    n_local_elem()=4
     n_active_elem()=16
   n_subdomains()=1
-  n_partitions()=12
-  n_processors()=12
+  n_partitions()=4
+  n_processors()=4
   n_threads()=1
   processor_id()=0
 
@@ -6080,16 +6090,16 @@ Initializing systems
     Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
     Approximation Orders="SECOND", "THIRD" "FIRST", "THIRD" "SECOND", "THIRD" 
     n_dofs()=331
-    n_local_dofs()=31
+    n_local_dofs()=91
     n_constrained_dofs()=138
-    n_local_constrained_dofs()=12
+    n_local_constrained_dofs()=34
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 26.6465
-      Average Off-Processor Bandwidth <= 14.9607
-      Maximum  On-Processor Bandwidth <= 40
-      Maximum Off-Processor Bandwidth <= 58
+      Average  On-Processor Bandwidth <= 36.7855
+      Average Off-Processor Bandwidth <= 5.91541
+      Maximum  On-Processor Bandwidth <= 62
+      Maximum Off-Processor Bandwidth <= 40
     DofMap Constraints
       Number of DoF Constraints = 138
       Number of Heterogenous Constraints= 5
@@ -6102,209 +6112,79 @@ Adaptive step 0
 Solving the forward problem
 We have 16 active elements and 193 active dofs.
 
-  Nonlinear solver converged, step 1, residual reduction 3.15613e-14 < 1e-05
-The boundary QoI is 0.083342124064156073
+  Nonlinear solver converged, step 1, residual reduction 9.03212e-14 < 1e-05
+The boundary QoI is 0.083342124064158307
 
 Solving the adjoint problem
 Adaptive step 1
 Solving the forward problem
-We have 22 active elements and 252 active dofs.
+We have 22 active elements and 259 active dofs.
 
-  Nonlinear solver converged, step 1, residual reduction 4.5276725407867625e-14 < 1.0000000000000001e-05
-  Nonlinear solver converged, step 1, relative step size 1.84204962374437e-07 < 1.0000000000000001e-05
-The boundary QoI is 0.083371201417110491
+  Nonlinear solver converged, step 0, residual reduction 5.6868816087085118e-07 < 1.0000000000000001e-05
+The boundary QoI is 0.082286987672833115
 
 Solving the adjoint problem
 Adaptive step 2
 Solving the forward problem
 We have 31 active elements and 363 active dofs.
 
-  Nonlinear solver converged, step 1, residual reduction 3.6669327656860259e-14 < 1.0000000000000001e-05
-  Nonlinear solver converged, step 1, relative step size 2.1327428624706532e-06 < 1.0000000000000001e-05
-The boundary QoI is 0.083340262583617361
+  Nonlinear solver converged, step 1, residual reduction 3.8583229881642115e-14 < 1.0000000000000001e-05
+  Nonlinear solver converged, step 1, relative step size 7.5013647980960183e-07 < 1.0000000000000001e-05
+The boundary QoI is 0.083169669189009962
 
 Solving the adjoint problem
 Adaptive step 3
 Solving the forward problem
-We have 43 active elements and 509 active dofs.
+We have 43 active elements and 522 active dofs.
 
-  Nonlinear solver converged, step 1, residual reduction 3.4058549053809103e-14 < 1.0000000000000001e-05
-  Nonlinear solver converged, step 1, relative step size 5.2079904624620959e-07 < 1.0000000000000001e-05
-The boundary QoI is 0.083351743975040693
+  Nonlinear solver converged, step 1, residual reduction 4.3999517315436118e-14 < 1.0000000000000001e-05
+  Nonlinear solver converged, step 1, relative step size 6.565604269298289e-06 < 1.0000000000000001e-05
+The boundary QoI is 0.083339483627459909
 
 Solving the adjoint problem
 Adaptive step 4
 Solving the forward problem
-We have 58 active elements and 678 active dofs.
+We have 58 active elements and 671 active dofs.
 
-  Nonlinear solver converged, step 1, residual reduction 5.683943234671867e-14 < 1.0000000000000001e-05
-  Nonlinear solver converged, step 1, relative step size 9.5442261043687988e-07 < 1.0000000000000001e-05
-The boundary QoI is 0.083341223115712029
+  Nonlinear solver converged, step 0, residual reduction 3.9242900634249945e-06 < 1.0000000000000001e-05
+The boundary QoI is 0.083044585890271971
 
 Solving the adjoint problem
 Adaptive step 5
 Solving the forward problem
-We have 76 active elements and 892 active dofs.
+We have 76 active elements and 898 active dofs.
 
-  Nonlinear solver converged, step 1, residual reduction 5.2964788875310523e-14 < 1.0000000000000001e-05
-  Nonlinear solver converged, step 1, relative step size 1.0598543749730705e-06 < 1.0000000000000001e-05
-The boundary QoI is 0.083339335310075036
-
-************************************************************************************************************************
-***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
-************************************************************************************************************************
-
----------------------------------------------- PETSc Performance Summary: ----------------------------------------------
-
-/workspace/libmesh/examples/adjoints/adjoints_ex3/.libs/lt-example-devel on a intel-12. named hbar.ices.utexas.edu with 12 processors, by benkirk Thu Jan 31 22:03:36 2013
-Using Petsc Release Version 3.3.0, Patch 2, Fri Jul 13 15:42:00 CDT 2012 
-
-                         Max       Max/Min        Avg      Total 
-Time (sec):           4.594e+00      1.00039   4.593e+00
-Objects:              1.048e+03      1.00000   1.048e+03
-Flops:                2.742e+08      2.23422   2.033e+08  2.440e+09
-Flops/sec:            5.970e+07      2.23422   4.426e+07  5.312e+08
-MPI Messages:         4.524e+04      2.42071   3.209e+04  3.850e+05
-MPI Message Lengths:  9.538e+06      3.04351   1.985e+02  7.643e+07
-MPI Reductions:       2.021e+04      1.00000
-
-Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
-                            e.g., VecAXPY() for real vectors of length N --> 2N flops
-                            and VecAXPY() for complex vectors of length N --> 8N flops
-
-Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
-                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 4.5932e+00 100.0%  2.4397e+09 100.0%  3.850e+05 100.0%  1.985e+02      100.0%  2.020e+04 100.0% 
-
-------------------------------------------------------------------------------------------------------------------------
-See the 'Profiling' chapter of the users' manual for details on interpreting output.
-Phase summary info:
-   Count: number of times phase was executed
-   Time and Flops: Max - maximum over all processors
-                   Ratio - ratio of maximum to minimum over all processors
-   Mess: number of messages sent
-   Avg. len: average message length
-   Reduct: number of global reductions
-   Global: entire computation
-   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
-      %T - percent time in this phase         %f - percent flops in this phase
-      %M - percent messages in this phase     %L - percent message lengths in this phase
-      %R - percent reductions in this phase
-   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
-------------------------------------------------------------------------------------------------------------------------
-Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
-                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %f %M %L %R  %T %f %M %L %R Mflop/s
-------------------------------------------------------------------------------------------------------------------------
-
---- Event Stage 0: Main Stage
-
-KSPGMRESOrthog      8887 1.0 1.8699e-01 1.8 4.67e+07 1.7 0.0e+00 0.0e+00 8.9e+03  3 19  0  0 44   3 19  0  0 44  2490
-KSPSetUp              34 1.0 3.8290e-04 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-KSPSolve              12 1.0 4.8343e-01 1.0 2.64e+08 2.2 3.4e+05 1.9e+02 1.7e+04 11 96 88 85 85  11 96 88 85 85  4847
-PCSetUp               34 1.0 2.6568e-02 2.1 2.86e+06 6.4 0.0e+00 0.0e+00 1.4e+02  0  1  0  0  1   0  1  0  0  1   666
-PCSetUpOnBlocks       12 1.0 1.8801e-02 2.4 2.15e+06 5.9 0.0e+00 0.0e+00 8.4e+01  0  1  0  0  0   0  1  0  0  0   743
-PCApply             9206 1.0 1.7213e-01 1.5 1.34e+08 2.7 0.0e+00 0.0e+00 3.5e+01  3 47  0  0  0   3 47  0  0  0  6706
-VecMDot             8887 1.0 1.6883e-01 2.2 2.33e+07 1.7 0.0e+00 0.0e+00 8.9e+03  3 10  0  0 44   3 10  0  0 44  1374
-VecNorm             9254 1.0 7.3636e-02 1.2 1.59e+06 1.7 0.0e+00 0.0e+00 9.3e+03  1  1  0  0 46   1  1  0  0 46   215
-VecScale            9189 1.0 4.8704e-03 1.6 7.88e+05 1.7 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  1612
-VecCopy              540 1.0 3.7336e-04 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecSet             10785 1.0 4.5660e-03 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecAXPY              616 1.0 4.7112e-04 1.3 1.05e+05 1.7 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  2220
-VecMAXPY            9189 1.0 1.7510e-02 1.6 2.50e+07 1.7 0.0e+00 0.0e+00 0.0e+00  0 10  0  0  0   0 10  0  0  0 14206
-VecAssemblyBegin     439 1.0 2.5481e-01 2.0 0.00e+00 0.0 1.3e+03 1.2e+02 1.1e+03  4  0  0  0  6   4  0  0  0  6     0
-VecAssemblyEnd       439 1.0 3.8910e-04 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecScatterBegin     9466 1.0 3.3267e-02 1.5 0.00e+00 0.0 3.7e+05 2.0e+02 0.0e+00  1  0 96 95  0   1  0 96 95  0     0
-VecScatterEnd       9466 1.0 3.9813e-02 2.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  1  0  0  0  0   1  0  0  0  0     0
-VecNormalize        9189 1.0 8.0337e-02 1.2 2.36e+06 1.7 0.0e+00 0.0e+00 9.2e+03  2  1  0  0 45   2  1  0  0 45   293
-MatMult             8669 1.0 1.3033e-01 1.4 8.41e+07 2.3 3.4e+05 1.9e+02 0.0e+00  2 30 88 85  0   2 30 88 85  0  5637
-MatMultTranspose     520 1.0 7.2153e-03 1.5 3.53e+06 2.8 1.8e+04 1.7e+02 0.0e+00  0  1  5  4  0   0  1  5  4  0  4353
-MatSolve            8681 1.0 8.7650e-02 2.2 1.29e+08 2.7 0.0e+00 0.0e+00 0.0e+00  1 45  0  0  0   1 45  0  0  0 12664
-MatSolveTranspos     525 1.0 5.2588e-03 3.8 4.90e+06 5.0 0.0e+00 0.0e+00 0.0e+00  0  2  0  0  0   0  2  0  0  0  7708
-MatLUFactorNum        17 1.0 3.4902e-03 3.4 2.86e+06 6.4 0.0e+00 0.0e+00 0.0e+00  0  1  0  0  0   0  1  0  0  0  5068
-MatILUFactorSym       17 1.0 1.8230e-02 3.0 0.00e+00 0.0 0.0e+00 0.0e+00 5.1e+01  0  0  0  0  0   0  0  0  0  0     0
-MatAssemblyBegin      34 1.0 2.9724e-02 3.2 0.00e+00 0.0 8.5e+02 3.0e+03 6.8e+01  0  0  0  3  0   0  0  0  3  0     0
-MatAssemblyEnd        34 1.0 3.7963e-03 1.5 0.00e+00 0.0 4.3e+02 4.6e+01 4.8e+01  0  0  0  0  0   0  0  0  0  0     0
-MatGetRowIJ           17 1.0 1.6212e-05 3.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatGetOrdering        17 1.0 1.1694e-03 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 6.8e+01  0  0  0  0  0   0  0  0  0  0     0
-MatZeroEntries        29 1.0 1.3733e-04 1.8 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-------------------------------------------------------------------------------------------------------------------------
-
-Memory usage is given in bytes:
-
-Object Type          Creations   Destructions     Memory  Descendants' Mem.
-Reports information only for process 0.
-
---- Event Stage 0: Main Stage
-
-       Krylov Solver    23             23       214192     0
-      Preconditioner    23             23        20448     0
-              Vector   641            641      1544336     0
-      Vector Scatter    86             86        89096     0
-           Index Set   208            208       170712     0
-   IS L to G Mapping    31             31        17484     0
-              Matrix    35             35      1462044     0
-              Viewer     1              0            0     0
-========================================================================================================================
-Average time to get PetscTime(): 9.53674e-08
-Average time for MPI_Barrier(): 5.81741e-06
-Average time for zero size MPI_Send(): 1.45038e-05
-#PETSc Option Table entries:
--ksp_right_pc
--log_summary
--pc_type bjacobi
--sub_pc_factor_levels 4
--sub_pc_factor_zeropivot 0
--sub_pc_type ilu
-#End of PETSc Option Table entries
-Compiled without FORTRAN kernels
-Compiled with full precision matrices (default)
-sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
-Configure run at: Thu Nov  8 11:21:02 2012
-Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared-libraries=1 --with-mpi-dir=/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1 --with-mumps=true --download-mumps=1 --with-metis=true --download-metis=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_intel_lp64.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_sequential.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_core.so]" --with-lapack-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_lapack95_lp64.a]"
------------------------------------------
-Libraries compiled on Thu Nov  8 11:21:02 2012 on daedalus.ices.utexas.edu 
-Machine characteristics: Linux-2.6.32-279.1.1.el6.x86_64-x86_64-with-redhat-6.3-Carbon
-Using PETSc directory: /opt/apps/ossw/libraries/petsc/petsc-3.3-p2
-Using PETSc arch: intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt
------------------------------------------
-
-Using C compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx  -wd1572 -O3   -fPIC   ${COPTFLAGS} ${CFLAGS}
-Using Fortran compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90  -fPIC -O3   ${FOPTFLAGS} ${FFLAGS} 
------------------------------------------
-
-Using include paths: -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/include
------------------------------------------
-
-Using C linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx
-Using Fortran linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90
-Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lpetsc -lX11 -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lHYPRE -lpthread -lsuperlu_dist_3.0 -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.3 -Wl,-rpath,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -L/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,-rpath,/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -L/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -Wl,-rpath,/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -L/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lcilkrts -lstdc++ -lgcc_s -lirc -lirc_s -ldl 
------------------------------------------
+  Nonlinear solver converged, step 1, residual reduction 5.9607546528653657e-14 < 1.0000000000000001e-05
+  Nonlinear solver converged, step 1, relative step size 2.0501238293058485e-07 < 1.0000000000000001e-05
+The boundary QoI is 0.08333916169049338
 
 
- ----------------------------------------------------------------------------------------------------------------------
-| Processor id:   0                                                                                                    |
-| Num Processors: 12                                                                                                   |
-| Time:           Thu Jan 31 22:03:37 2013                                                                             |
-| OS:             Linux                                                                                                |
-| HostName:       hbar.ices.utexas.edu                                                                                 |
-| OS Release:     2.6.32-279.1.1.el6.x86_64                                                                            |
-| OS Version:     #1 SMP Tue Jul 10 11:24:23 CDT 2012                                                                  |
-| Machine:        x86_64                                                                                               |
-| Username:       benkirk                                                                                              |
-| Configuration:  ./configure  '--enable-everything'                                                                   |
-|  '--prefix=/workspace/libmesh/install'                                                                               |
-|  'CXX=icpc'                                                                                                          |
-|  'CC=icc'                                                                                                            |
-|  'FC=ifort'                                                                                                          |
-|  'F77=ifort'                                                                                                         |
-|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                             |
-|  'PETSC_ARCH=intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
-|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                        |
-|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/intel-12.1/mpich2-1.4.1p1/mkl-intel-10.3.12.361'|
-|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/intel-12.1'                                                    |
- ----------------------------------------------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Processor id:   0                                                                                                 |
+| Num Processors: 4                                                                                                 |
+| Time:           Fri Apr 19 11:47:50 2013                                                                          |
+| OS:             Linux                                                                                             |
+| HostName:       spark.ices.utexas.edu                                                                             |
+| OS Release:     2.6.32-279.22.1.el6.x86_64                                                                        |
+| OS Version:     #1 SMP Tue Feb 5 14:33:39 CST 2013                                                                |
+| Machine:        x86_64                                                                                            |
+| Username:       roystgnr                                                                                          |
+| Configuration:  ../configure  '--enable-everything'                                                               |
+|  'METHODS=devel'                                                                                                  |
+|  '--prefix=/h2/roystgnr/libmesh-test'                                                                             |
+|  'CXX=distcc /usr/bin/g++'                                                                                        |
+|  'CC=distcc /usr/bin/gcc'                                                                                         |
+|  'FC=distcc /usr/bin/gfortran'                                                                                    |
+|  'F77=distcc /usr/bin/gfortran'                                                                                   |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                          |
+|  'PETSC_ARCH=gcc-system-mkl-gf-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                     |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/gcc-system/mpich2-1.4.1p1/mkl-gf-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/gcc-system'                                                 |
+|  'HDF5_DIR=/opt/apps/ossw/libraries/hdf5/hdf5-1.8.9/sl6/gcc-system'                                               |
+ -------------------------------------------------------------------------------------------------------------------
  ---------------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=4.63935, Active time=4.42348                                                        |
+| libMesh Performance: Alive time=2.09678, Active time=1.97643                                                        |
  ---------------------------------------------------------------------------------------------------------------------
 | Event                                   nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                                   w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -6312,132 +6192,134 @@ Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12
 |                                                                                                                     |
 |                                                                                                                     |
 | AdjointResidualErrorEstimator                                                                                       |
-|   estimate_error()                      20        0.0107      0.000536    1.3149      0.065746    0.24     29.73    |
+|   estimate_error()                      20        0.0014      0.000069    0.9382      0.046909    0.07     47.47    |
 |                                                                                                                     |
 | DofMap                                                                                                              |
-|   add_neighbors_to_send_list()          31        0.0158      0.000511    0.0565      0.001821    0.36     1.28     |
-|   build_constraint_matrix()             102       0.0092      0.000090    0.0092      0.000090    0.21     0.21     |
-|   build_sparsity()                      6         0.0124      0.002068    0.0426      0.007102    0.28     0.96     |
-|   cnstrn_elem_mat_vec()                 38        0.0118      0.000310    0.0118      0.000310    0.27     0.27     |
-|   constrain_elem_matrix()               13        0.0010      0.000077    0.0010      0.000077    0.02     0.02     |
-|   constrain_elem_vector()               51        0.0012      0.000023    0.0012      0.000023    0.03     0.03     |
-|   create_dof_constraints()              31        0.1181      0.003808    0.7457      0.024054    2.67     16.86    |
-|   distribute_dofs()                     31        0.0665      0.002145    0.1999      0.006447    1.50     4.52     |
-|   dof_indices()                         7590      1.2244      0.000161    1.2244      0.000161    27.68    27.68    |
-|   enforce_constraints_exactly()         39        0.0121      0.000309    0.0121      0.000309    0.27     0.27     |
-|   old_dof_indices()                     180       0.0484      0.000269    0.0484      0.000269    1.09     1.09     |
-|   prepare_send_list()                   31        0.0006      0.000021    0.0006      0.000021    0.01     0.01     |
-|   reinit()                              31        0.0926      0.002987    0.0926      0.002987    2.09     2.09     |
+|   add_neighbors_to_send_list()          31        0.0024      0.000079    0.0046      0.000149    0.12     0.23     |
+|   build_constraint_matrix()             298       0.0030      0.000010    0.0030      0.000010    0.15     0.15     |
+|   build_sparsity()                      6         0.0024      0.000406    0.0075      0.001243    0.12     0.38     |
+|   cnstrn_elem_mat_vec()                 105       0.0072      0.000068    0.0072      0.000068    0.36     0.36     |
+|   constrain_elem_matrix()               44        0.0013      0.000030    0.0013      0.000030    0.07     0.07     |
+|   constrain_elem_vector()               149       0.0007      0.000005    0.0007      0.000005    0.04     0.04     |
+|   create_dof_constraints()              31        0.0156      0.000503    0.0607      0.001959    0.79     3.07     |
+|   distribute_dofs()                     31        0.0056      0.000180    0.0288      0.000928    0.28     1.46     |
+|   dof_indices()                         25520     0.2032      0.000008    0.2032      0.000008    10.28    10.28    |
+|   enforce_constraints_exactly()         37        0.0068      0.000184    0.0068      0.000184    0.34     0.34     |
+|   old_dof_indices()                     590       0.0067      0.000011    0.0067      0.000011    0.34     0.34     |
+|   prepare_send_list()                   31        0.0001      0.000003    0.0001      0.000003    0.01     0.01     |
+|   reinit()                              31        0.0060      0.000193    0.0060      0.000193    0.30     0.30     |
 |                                                                                                                     |
 | EquationSystems                                                                                                     |
-|   build_discontinuous_solution_vector() 25        0.0057      0.000230    0.0222      0.000887    0.13     0.50     |
-|   build_solution_vector()               11        0.0042      0.000385    0.0360      0.003269    0.10     0.81     |
+|   build_discontinuous_solution_vector() 25        0.0019      0.000078    0.0033      0.000134    0.10     0.17     |
+|   build_solution_vector()               11        0.0012      0.000113    0.0099      0.000899    0.06     0.50     |
 |                                                                                                                     |
 | FE                                                                                                                  |
-|   compute_shape_functions()             3960      0.1822      0.000046    0.1822      0.000046    4.12     4.12     |
-|   init_shape_functions()                2260      0.1402      0.000062    0.1402      0.000062    3.17     3.17     |
-|   inverse_map()                         6496      0.1013      0.000016    0.1013      0.000016    2.29     2.29     |
+|   compute_shape_functions()             21372     0.1065      0.000005    0.1065      0.000005    5.39     5.39     |
+|   init_shape_functions()                5032      0.0401      0.000008    0.0401      0.000008    2.03     2.03     |
+|   inverse_map()                         10827     0.0364      0.000003    0.0364      0.000003    1.84     1.84     |
 |                                                                                                                     |
 | FEMSystem                                                                                                           |
-|   assemble_qoi()                        6         0.0078      0.001301    0.1236      0.020602    0.18     2.79     |
-|   assemble_qoi_derivative()             5         0.0331      0.006629    0.0970      0.019406    0.75     2.19     |
-|   assembly()                            12        0.0659      0.005489    0.2272      0.018937    1.49     5.14     |
-|   assembly(get_jacobian)                5         0.0229      0.004586    0.0808      0.016169    0.52     1.83     |
-|   assembly(get_residual)                12        0.0238      0.001979    0.1693      0.014104    0.54     3.83     |
+|   assemble_qoi()                        6         0.0031      0.000518    0.0486      0.008096    0.16     2.46     |
+|   assemble_qoi_derivative()             5         0.0266      0.005329    0.0438      0.008754    1.35     2.21     |
+|   assembly()                            10        0.0316      0.003164    0.0721      0.007211    1.60     3.65     |
+|   assembly(get_jacobian)                5         0.0132      0.002642    0.0295      0.005898    0.67     1.49     |
+|   assembly(get_residual)                10        0.0094      0.000940    0.0430      0.004302    0.48     2.18     |
 |                                                                                                                     |
 | FEMap                                                                                                               |
-|   compute_affine_map()                  3960      0.0767      0.000019    0.0767      0.000019    1.73     1.73     |
-|   compute_face_map()                    1216      0.0493      0.000041    0.1276      0.000105    1.11     2.89     |
-|   init_face_shape_functions()           812       0.0064      0.000008    0.0064      0.000008    0.15     0.15     |
-|   init_reference_to_physical_map()      2260      0.1712      0.000076    0.1712      0.000076    3.87     3.87     |
+|   compute_affine_map()                  21372     0.0648      0.000003    0.0648      0.000003    3.28     3.28     |
+|   compute_face_map()                    1896      0.0142      0.000007    0.0399      0.000021    0.72     2.02     |
+|   init_face_shape_functions()           812       0.0013      0.000002    0.0013      0.000002    0.06     0.06     |
+|   init_reference_to_physical_map()      5032      0.0538      0.000011    0.0538      0.000011    2.72     2.72     |
 |                                                                                                                     |
 | GMVIO                                                                                                               |
-|   write_nodal_data()                    11        0.0235      0.002138    0.0249      0.002265    0.53     0.56     |
+|   write_nodal_data()                    11        0.0138      0.001252    0.0145      0.001321    0.70     0.74     |
 |                                                                                                                     |
 | ImplicitSystem                                                                                                      |
-|   adjoint_solve()                       5         0.0055      0.001105    0.2391      0.047819    0.12     5.41     |
+|   adjoint_solve()                       5         0.0027      0.000547    0.1677      0.033542    0.14     8.49     |
 |                                                                                                                     |
 | LocationMap                                                                                                         |
-|   find()                                400       0.0028      0.000007    0.0028      0.000007    0.06     0.06     |
-|   init()                                10        0.0040      0.000401    0.0040      0.000401    0.09     0.09     |
+|   find()                                400       0.0005      0.000001    0.0005      0.000001    0.02     0.02     |
+|   init()                                10        0.0006      0.000062    0.0006      0.000062    0.03     0.03     |
 |                                                                                                                     |
 | Mesh                                                                                                                |
-|   all_first_order()                     25        0.0227      0.000908    0.0227      0.000908    0.51     0.51     |
-|   all_second_order()                    1         0.0014      0.001372    0.0014      0.001372    0.03     0.03     |
-|   contract()                            5         0.0002      0.000039    0.0004      0.000090    0.00     0.01     |
-|   find_neighbors()                      57        0.0468      0.000822    0.0552      0.000968    1.06     1.25     |
-|   renumber_nodes_and_elem()             69        0.0023      0.000033    0.0023      0.000033    0.05     0.05     |
+|   all_first_order()                     25        0.0016      0.000064    0.0016      0.000064    0.08     0.08     |
+|   all_second_order()                    1         0.0001      0.000142    0.0001      0.000142    0.01     0.01     |
+|   contract()                            5         0.0000      0.000009    0.0001      0.000024    0.00     0.01     |
+|   find_neighbors()                      57        0.0050      0.000088    0.0121      0.000212    0.25     0.61     |
+|   renumber_nodes_and_elem()             69        0.0005      0.000007    0.0005      0.000007    0.03     0.03     |
 |                                                                                                                     |
 | MeshCommunication                                                                                                   |
-|   compute_hilbert_indices()             32        0.0100      0.000312    0.0100      0.000312    0.23     0.23     |
-|   find_global_indices()                 32        0.0090      0.000281    0.0604      0.001888    0.20     1.37     |
-|   parallel_sort()                       32        0.0214      0.000670    0.0256      0.000799    0.48     0.58     |
+|   compute_hilbert_indices()             32        0.0030      0.000093    0.0030      0.000093    0.15     0.15     |
+|   find_global_indices()                 32        0.0011      0.000034    0.0125      0.000391    0.06     0.63     |
+|   parallel_sort()                       32        0.0021      0.000065    0.0054      0.000168    0.10     0.27     |
 |                                                                                                                     |
 | MeshOutput                                                                                                          |
-|   write_equation_systems()              11        0.0006      0.000055    0.0629      0.005720    0.01     1.42     |
+|   write_equation_systems()              11        0.0003      0.000023    0.0255      0.002315    0.01     1.29     |
 |                                                                                                                     |
 | MeshRefinement                                                                                                      |
-|   _coarsen_elements()                   10        0.0003      0.000028    0.0004      0.000036    0.01     0.01     |
-|   _refine_elements()                    10        0.0039      0.000394    0.0098      0.000978    0.09     0.22     |
-|   add_point()                           400       0.0025      0.000006    0.0053      0.000013    0.06     0.12     |
-|   make_coarsening_compatible()          20        0.0031      0.000156    0.0031      0.000156    0.07     0.07     |
-|   make_refinement_compatible()          20        0.0004      0.000020    0.0006      0.000028    0.01     0.01     |
+|   _coarsen_elements()                   10        0.0001      0.000005    0.0002      0.000015    0.00     0.01     |
+|   _refine_elements()                    10        0.0007      0.000070    0.0033      0.000330    0.04     0.17     |
+|   add_point()                           400       0.0006      0.000002    0.0012      0.000003    0.03     0.06     |
+|   make_coarsening_compatible()          20        0.0005      0.000027    0.0005      0.000027    0.03     0.03     |
+|   make_flags_parallel_consistent()      15        0.0008      0.000055    0.0055      0.000367    0.04     0.28     |
+|   make_refinement_compatible()          20        0.0001      0.000004    0.0002      0.000011    0.00     0.01     |
 |                                                                                                                     |
 | MetisPartitioner                                                                                                    |
-|   partition()                           32        0.1432      0.004476    0.2101      0.006566    3.24     4.75     |
+|   partition()                           32        0.0107      0.000333    0.0273      0.000854    0.54     1.38     |
 |                                                                                                                     |
 | NewtonSolver                                                                                                        |
-|   solve()                               6         0.1493      0.024877    1.0492      0.174873    3.37     23.72    |
+|   solve()                               6         0.0940      0.015661    0.5123      0.085382    4.75     25.92    |
 |                                                                                                                     |
 | Parallel                                                                                                            |
-|   allgather()                           169       0.0037      0.000022    0.0046      0.000027    0.08     0.10     |
-|   broadcast()                           22        0.0005      0.000022    0.0004      0.000018    0.01     0.01     |
-|   max(bool)                             52        0.0008      0.000016    0.0008      0.000016    0.02     0.02     |
-|   max(scalar)                           3960      0.0289      0.000007    0.0289      0.000007    0.65     0.65     |
-|   max(vector)                           906       0.0124      0.000014    0.0337      0.000037    0.28     0.76     |
-|   max(vector<bool>)                     10        0.0003      0.000028    0.0005      0.000055    0.01     0.01     |
-|   min(bool)                             4757      0.0324      0.000007    0.0324      0.000007    0.73     0.73     |
-|   min(scalar)                           3843      0.4466      0.000116    0.4466      0.000116    10.10    10.10    |
-|   min(vector)                           911       0.0131      0.000014    0.0331      0.000036    0.30     0.75     |
-|   probe()                               3476      0.0152      0.000004    0.0152      0.000004    0.34     0.34     |
-|   receive()                             3476      0.0188      0.000005    0.0347      0.000010    0.43     0.79     |
-|   send()                                3476      0.0093      0.000003    0.0093      0.000003    0.21     0.21     |
-|   send_receive()                        3540      0.0230      0.000007    0.0760      0.000021    0.52     1.72     |
-|   sum()                                 356       0.0057      0.000016    0.0518      0.000146    0.13     1.17     |
+|   allgather()                           169       0.0067      0.000039    0.0071      0.000042    0.34     0.36     |
+|   broadcast()                           22        0.0001      0.000003    0.0001      0.000003    0.00     0.00     |
+|   max(bool)                             52        0.0018      0.000036    0.0018      0.000036    0.09     0.09     |
+|   max(scalar)                           3484      0.0150      0.000004    0.0150      0.000004    0.76     0.76     |
+|   max(vector)                           787       0.0047      0.000006    0.0143      0.000018    0.24     0.72     |
+|   max(vector<bool>)                     10        0.0001      0.000007    0.0003      0.000029    0.00     0.01     |
+|   min(bool)                             4177      0.0168      0.000004    0.0168      0.000004    0.85     0.85     |
+|   min(scalar)                           3367      0.4617      0.000137    0.4617      0.000137    23.36    23.36    |
+|   min(vector)                           792       0.0052      0.000007    0.0154      0.000019    0.26     0.78     |
+|   probe()                               1128      0.0072      0.000006    0.0072      0.000006    0.37     0.37     |
+|   receive()                             1128      0.0023      0.000002    0.0096      0.000009    0.11     0.49     |
+|   send()                                1128      0.0011      0.000001    0.0011      0.000001    0.06     0.06     |
+|   send_receive()                        1192      0.0033      0.000003    0.0151      0.000013    0.17     0.76     |
+|   sum()                                 354       0.0050      0.000014    0.3842      0.001085    0.25     19.44    |
 |                                                                                                                     |
 | Parallel::Request                                                                                                   |
-|   wait()                                3476      0.0066      0.000002    0.0066      0.000002    0.15     0.15     |
+|   wait()                                1128      0.0008      0.000001    0.0008      0.000001    0.04     0.04     |
 |                                                                                                                     |
 | Partitioner                                                                                                         |
-|   set_node_processor_ids()              58        0.0203      0.000350    0.0548      0.000944    0.46     1.24     |
-|   set_parent_processor_ids()            32        0.0030      0.000094    0.0030      0.000094    0.07     0.07     |
+|   set_node_processor_ids()              58        0.0035      0.000060    0.0195      0.000337    0.18     0.99     |
+|   set_parent_processor_ids()            32        0.0003      0.000010    0.0003      0.000010    0.02     0.02     |
 |                                                                                                                     |
 | PatchRecoveryErrorEstimator                                                                                         |
-|   estimate_error()                      120       0.1386      0.001155    0.6973      0.005811    3.13     15.76    |
+|   estimate_error()                      120       0.1552      0.001293    0.5901      0.004917    7.85     29.86    |
 |                                                                                                                     |
 | PetscLinearSolver                                                                                                   |
-|   solve()                               17        0.5428      0.031927    0.5428      0.031927    12.27    12.27    |
+|   solve()                               15        0.3861      0.025737    0.3861      0.025737    19.53    19.53    |
 |                                                                                                                     |
 | ProjectVector                                                                                                       |
-|   operator()                            10        0.0068      0.000678    0.0633      0.006330    0.15     1.43     |
+|   operator()                            10        0.0028      0.000280    0.0135      0.001348    0.14     0.68     |
 |                                                                                                                     |
 | System                                                                                                              |
-|   project_vector()                      10        0.0272      0.002720    0.1202      0.012024    0.61     2.72     |
+|   project_vector()                      10        0.0122      0.001222    0.0321      0.003208    0.62     1.62     |
 |                                                                                                                     |
 | WeightedPatchRecoveryErrorEstimator                                                                                 |
-|   estimate_error()                      40        0.0970      0.002426    0.6069      0.015172    2.19     13.72    |
+|   estimate_error()                      40        0.0787      0.001968    0.3467      0.008667    3.98     17.54    |
 |                                                                                                                     |
 | XdrIO                                                                                                               |
-|   read()                                1         0.0019      0.001924    0.0020      0.002020    0.04     0.05     |
+|   read()                                1         0.0003      0.000273    0.0003      0.000305    0.01     0.02     |
  ---------------------------------------------------------------------------------------------------------------------
-| Totals:                                 63140     4.4235                                          100.00            |
+| Totals:                                 113746    1.9764                                          100.00            |
  ---------------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example adjoints_ex3:
-*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
+make[4]: Leaving directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/adjoints/adjoints_ex3'
 </pre>
 </div>
 <?php make_footer() ?>

@@ -25,6 +25,7 @@
 // Local includes
 #include "libmesh/mesh_base.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/point.h"
 
 // C++ includes
 #include <iostream>
@@ -569,6 +570,12 @@ public:
   void use_mesh_dimension_instead_of_spatial_dimension(bool val);
 
   /**
+   * Allows you to set a vector that is added to the coordinates of all
+   * of the nodes.  Effectively, this "moves" the mesh to a particular position
+   */
+  void set_coordinate_offset(Point p);
+
+  /**
    * This is the \p ExodusII_IO_Helper Conversion class.
    * It provides a data structure which contains \p ExodusII node/edge
    * maps and name conversions.  It's defined below.
@@ -712,6 +719,8 @@ public:
    * spatial dimension, when writing.  By default this is false.
    */
   bool _use_mesh_dimension_instead_of_spatial_dimension;
+
+  Point _coordinate_offset;
 };
 
 

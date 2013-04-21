@@ -27,6 +27,7 @@
 // Local Includes
 #include "libmesh/laspack_linear_solver.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -251,7 +252,7 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
     default:
       {
 	libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
-		      << this->_solver_type      << std::endl
+		      << Utility::enum_to_string(this->_solver_type) << std::endl
 		      << "Continuing with GMRES" << std::endl;
 
 	this->_solver_type = GMRES;
@@ -427,7 +428,7 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
     default:
       {
 	libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
-		      << this->_solver_type      << std::endl
+		      << Utility::enum_to_string(this->_solver_type) << std::endl
 		      << "Continuing with GMRES" << std::endl;
 
 	this->_solver_type = GMRES;

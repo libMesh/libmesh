@@ -95,7 +95,7 @@ installcheck-local:
 doc:
 	for dir in $(SUBDIRS) ; do \
 	  cd $$dir ; \
-	  make doc ; \
+	  $(MAKE) doc ; \
 	  cp *.php $(abs_top_srcdir)/doc/html ; \
 	  cd - ; \
 	done

@@ -117,7 +117,7 @@ for setting boundary conditions.
 </pre>
 </div>
 <div class = "comment">
-Prototype for calculation of the gradient of the exact solution.  
+Prototype for calculation of the gradient of the exact solution.
 </div>
 
 <div class ="fragment">
@@ -210,7 +210,7 @@ Read in parameters from the input file
           dim = input_file("dimension", 2);
           const std::string indicator_type = input_file("indicator_type", "kelly");
           singularity = input_file("singularity", true);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -220,7 +220,7 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
 <div class ="fragment">
 <pre>
           libmesh_example_assert(dim &lt;= LIBMESH_DIM, "2D/3D support");
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -249,21 +249,22 @@ the number of degrees of freedom.
             output_file += "_adaptive.m";
           else
             output_file += "_uniform.m";
-          
+        
           std::ofstream out (output_file.c_str());
           out &lt;&lt; "% dofs     L2-error     H1-error" &lt;&lt; std::endl;
           out &lt;&lt; "e = [" &lt;&lt; std::endl;
-          
+        
 </pre>
 </div>
 <div class = "comment">
-Create a mesh.
+Create a mesh, with dimension to be overridden later, on the
+default MPI communicator.
 </div>
 
 <div class ="fragment">
 <pre>
-          Mesh mesh;
-          
+          Mesh mesh(init.comm());
+        
 </pre>
 </div>
 <div class = "comment">
@@ -337,11 +338,11 @@ Creates a system named "Laplace"
 <pre>
           LinearImplicitSystem& system =
             equation_systems.add_system&lt;LinearImplicitSystem&gt; ("Laplace");
-          
+        
 </pre>
 </div>
 <div class = "comment">
-Adds the variable "u" to "Laplace", using 
+Adds the variable "u" to "Laplace", using
 the finite element type and order specified
 in the config file
 </div>
@@ -393,7 +394,7 @@ Linear solver tolerance.
 <pre>
           equation_systems.parameters.set&lt;Real&gt;("linear solver tolerance") =
             std::pow(TOLERANCE, 2.5);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -437,7 +438,7 @@ A refinement loop.
           for (unsigned int r_step=0; r_step&lt;max_r_steps; r_step++)
             {
               std::cout &lt;&lt; "Beginning Solve " &lt;&lt; r_step &lt;&lt; std::endl;
-              
+        
 </pre>
 </div>
 <div class = "comment">
@@ -457,7 +458,7 @@ Solve the system "Laplace", just like example 2.
                         &lt;&lt; ", final residual: "
                         &lt;&lt; system.final_linear_residual()
                         &lt;&lt; std::endl;
-              
+        
         #ifdef LIBMESH_HAVE_EXODUS_API
 </pre>
 </div>
@@ -539,7 +540,7 @@ for computing error information on a finite element mesh.
 <div class ="fragment">
 <pre>
                       ErrorVector error;
-                      
+        
                       if (indicator_type == "exact")
                         {
 </pre>
@@ -620,7 +621,7 @@ is reliable, but very expensive.
 </pre>
 </div>
 <div class = "comment">
-The Kelly error estimator is based on 
+The Kelly error estimator is based on
 an error bound for the Poisson problem
 on linear elements, but is useful for
 driving adaptive refinement in many problems
@@ -649,7 +650,7 @@ Write out the error distribution
         	      std::string error_output = "error_"+ss.str()+".gmv";
         #endif
                       error.plot_error( error_output, mesh );
-         
+        
 </pre>
 </div>
 <div class = "comment">
@@ -691,7 +692,7 @@ flag elements for both h and p
 </pre>
 </div>
 <div class = "comment">
-If we are doing hp refinement, we 
+If we are doing hp refinement, we
 try switching some elements from h to p
 </div>
 
@@ -705,7 +706,7 @@ try switching some elements from h to p
 </pre>
 </div>
 <div class = "comment">
-If we are doing "singular hp" refinement, we 
+If we are doing "singular hp" refinement, we
 try switching most elements from h to p
 </div>
 
@@ -735,7 +736,7 @@ Our only singular point is at the origin
                           hpselector.singular_points.push_back(Point());
                           hpselector.select_refinement(system);
                         }
-                      
+        
 </pre>
 </div>
 <div class = "comment">
@@ -757,7 +758,7 @@ elements.
                           refine_type == "matchedhp")
                         mesh_refinement.uniformly_p_refine(1);
                     }
-                
+        
 </pre>
 </div>
 <div class = "comment">
@@ -772,8 +773,8 @@ the current one.
 <pre>
                   equation_systems.reinit ();
                 }
-            }            
-          
+            }
+        
         #ifdef LIBMESH_HAVE_EXODUS_API
 </pre>
 </div>
@@ -825,11 +826,11 @@ out << "polyfit(log10(e(:,1)), log10(e(:,3)), 1)" << std::endl;
 <div class ="fragment">
 <pre>
         #endif // #ifndef LIBMESH_ENABLE_AMR
-          
+        
 </pre>
 </div>
 <div class = "comment">
-All done.  
+All done.
 </div>
 
 <div class ="fragment">
@@ -857,7 +858,7 @@ quadrant.
         {
           const Real x = p(0);
           const Real y = (dim &gt; 1) ? p(1) : 0.;
-          
+        
           if (singularity)
             {
 </pre>
@@ -891,7 +892,7 @@ Make the 3D solution similar
 <div class ="fragment">
 <pre>
               const Real z = (dim &gt; 2) ? p(2) : 0;
-                          
+        
               return pow(x*x + y*y, 1./3.)*sin(2./3.*theta) + z;
             }
           else
@@ -939,7 +940,7 @@ Gradient value to be returned.
 <div class ="fragment">
 <pre>
           Gradient gradu;
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -973,7 +974,7 @@ For convenience...
 <pre>
               const Real tt = 2./3.;
               const Real ot = 1./3.;
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -994,7 +995,7 @@ u_exact = r^(2/3)*sin(2*theta/3).
 <div class ="fragment">
 <pre>
               Real theta = atan2(y,x);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1089,7 +1090,7 @@ application.
 <div class ="fragment">
 <pre>
           PerfLog perf_log ("Matrix Assembly",false);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1108,7 +1109,7 @@ The dimension that we are running
 
 <div class ="fragment">
 <pre>
-          const unsigned int dim = mesh.mesh_dimension();
+          const unsigned int mesh_dim = mesh.mesh_dimension();
         
 </pre>
 </div>
@@ -1119,7 +1120,7 @@ Get a reference to the LinearImplicitSystem we are solving
 <div class ="fragment">
 <pre>
           LinearImplicitSystem& system = es.get_system&lt;LinearImplicitSystem&gt;("Laplace");
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1155,9 +1156,9 @@ of as a pointer that will clean up after itself.
 
 <div class ="fragment">
 <pre>
-          AutoPtr&lt;FEBase&gt; fe      (FEBase::build(dim, fe_type));
-          AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
-          
+          AutoPtr&lt;FEBase&gt; fe      (FEBase::build(mesh_dim, fe_type));
+          AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(mesh_dim, fe_type));
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1166,8 +1167,8 @@ Quadrature rules for numerical integration.
 
 <div class ="fragment">
 <pre>
-          AutoPtr&lt;QBase&gt; qrule(fe_type.default_quadrature_rule(dim));
-          AutoPtr&lt;QBase&gt; qface(fe_type.default_quadrature_rule(dim-1));
+          AutoPtr&lt;QBase&gt; qrule(fe_type.default_quadrature_rule(mesh_dim));
+          AutoPtr&lt;QBase&gt; qface(fe_type.default_quadrature_rule(mesh_dim-1));
         
 </pre>
 </div>
@@ -1186,7 +1187,7 @@ Tell the finite element object to use our quadrature rule.
 Here we define some references to cell-specific data that
 will be used to assemble the linear system.
 We begin with the element Jacobian * quadrature weight at each
-integration point.   
+integration point.
 </div>
 
 <div class ="fragment">
@@ -1283,8 +1284,8 @@ refined.
 <div class ="fragment">
 <pre>
           MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
-          
+          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+        
           for ( ; el != end_el; ++el)
             {
 </pre>
@@ -1297,7 +1298,7 @@ the name of the event to log.
 
 <div class ="fragment">
 <pre>
-              perf_log.push("elem init");      
+              perf_log.push("elem init");
         
 </pre>
 </div>
@@ -1364,7 +1365,7 @@ object will probably catch the error and abort.
 
 <div class ="fragment">
 <pre>
-              perf_log.pop("elem init");      
+              perf_log.pop("elem init");
         
 </pre>
 </div>
@@ -1393,7 +1394,7 @@ We need a forcing function to make the 1D case interesting
 
 <div class ="fragment">
 <pre>
-              if (dim == 1)
+              if (mesh_dim == 1)
                 for (unsigned int qp=0; qp&lt;qrule-&gt;n_points(); qp++)
                   {
                     Real x = q_point[qp](0);
@@ -1446,7 +1447,7 @@ Start logging the boundary condition computation
 </pre>
 </div>
 <div class = "comment">
-The penalty value.  
+The penalty value.
 </div>
 
 <div class ="fragment">
@@ -1467,7 +1468,7 @@ side MUST live on a boundary of the domain.
                   if (elem-&gt;neighbor(s) == NULL)
                     {
                       fe_face-&gt;reinit(elem,s);
-                      
+        
                       for (unsigned int qp=0; qp&lt;qface-&gt;n_points(); qp++)
                         {
                           const Number value = exact_solution (qface_points[qp],
@@ -1498,8 +1499,8 @@ Matrix contribution
                             for (unsigned int j=0; j&lt;psi.size(); j++)
                               Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
                         }
-                    } 
-                
+                    }
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1509,8 +1510,8 @@ Stop logging the boundary condition computation
 <div class ="fragment">
 <pre>
                 perf_log.pop ("BCs");
-              } 
-              
+              }
+        
         
 </pre>
 </div>
@@ -1638,9 +1639,9 @@ it will print its log to the screen. Pretty easy, huh?
     dim = input_file(<B><FONT COLOR="#BC8F8F">&quot;dimension&quot;</FONT></B>, 2);
     <B><FONT COLOR="#228B22">const</FONT></B> std::string indicator_type = input_file(<B><FONT COLOR="#BC8F8F">&quot;indicator_type&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;kelly&quot;</FONT></B>);
     singularity = input_file(<B><FONT COLOR="#BC8F8F">&quot;singularity&quot;</FONT></B>, true);
-    
+  
     libmesh_example_assert(dim &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D/3D support&quot;</FONT></B>);
-    
+  
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::string approx_name = <B><FONT COLOR="#BC8F8F">&quot;&quot;</FONT></B>;
     <B><FONT COLOR="#A020F0">if</FONT></B> (element_type == <B><FONT COLOR="#BC8F8F">&quot;tensor&quot;</FONT></B>)
       approx_name += <B><FONT COLOR="#BC8F8F">&quot;bi&quot;</FONT></B>;
@@ -1660,13 +1661,13 @@ it will print its log to the screen. Pretty easy, huh?
       output_file += <B><FONT COLOR="#BC8F8F">&quot;_adaptive.m&quot;</FONT></B>;
     <B><FONT COLOR="#A020F0">else</FONT></B>
       output_file += <B><FONT COLOR="#BC8F8F">&quot;_uniform.m&quot;</FONT></B>;
-    
+  
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::ofstream out (output_file.c_str());
     out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;% dofs     L2-error     H1-error&quot;</FONT></B> &lt;&lt; std::endl;
     out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;e = [&quot;</FONT></B> &lt;&lt; std::endl;
-    
-    Mesh mesh;
-    
+  
+    Mesh mesh(init.comm());
+  
     <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 1)
       <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_line(mesh,1,-1.,0.);
     <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 2)
@@ -1689,7 +1690,7 @@ it will print its log to the screen. Pretty easy, huh?
   
     LinearImplicitSystem&amp; system =
       equation_systems.add_system&lt;LinearImplicitSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>);
-    
+  
     system.add_variable(<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, static_cast&lt;Order&gt;(approx_order),
                         <B><FONT COLOR="#5F9EA0">Utility</FONT></B>::string_to_enum&lt;FEFamily&gt;(approx_type));
   
@@ -1702,7 +1703,7 @@ it will print its log to the screen. Pretty easy, huh?
   
     equation_systems.parameters.set&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;linear solver tolerance&quot;</FONT></B>) =
       <B><FONT COLOR="#5F9EA0">std</FONT></B>::pow(TOLERANCE, 2.5);
-    
+  
     equation_systems.print_info();
   
     ExactSolution exact_sol(equation_systems);
@@ -1714,7 +1715,7 @@ it will print its log to the screen. Pretty easy, huh?
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> r_step=0; r_step&lt;max_r_steps; r_step++)
       {
         <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Beginning Solve &quot;</FONT></B> &lt;&lt; r_step &lt;&lt; std::endl;
-        
+  
         system.solve();
   
         <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;System has: &quot;</FONT></B> &lt;&lt; equation_systems.n_active_dofs()
@@ -1726,7 +1727,7 @@ it will print its log to the screen. Pretty easy, huh?
                   &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, final residual: &quot;</FONT></B>
                   &lt;&lt; system.final_linear_residual()
                   &lt;&lt; std::endl;
-        
+  
   #ifdef LIBMESH_HAVE_EXODUS_API
         <B><FONT COLOR="#A020F0">if</FONT></B> (output_intermediate)
           {
@@ -1758,7 +1759,7 @@ it will print its log to the screen. Pretty easy, huh?
               {
   
                 ErrorVector error;
-                
+  
                 <B><FONT COLOR="#A020F0">if</FONT></B> (indicator_type == <B><FONT COLOR="#BC8F8F">&quot;exact&quot;</FONT></B>)
                   {
                     ExactErrorEstimator error_estimator;
@@ -1798,7 +1799,7 @@ it will print its log to the screen. Pretty easy, huh?
   	      <B><FONT COLOR="#5F9EA0">std</FONT></B>::string error_output = <B><FONT COLOR="#BC8F8F">&quot;error_&quot;</FONT></B>+ss.str()+<B><FONT COLOR="#BC8F8F">&quot;.gmv&quot;</FONT></B>;
   #endif
                 error.plot_error( error_output, mesh );
-   
+  
                 mesh_refinement.flag_elements_by_error_fraction (error);
   
                 <B><FONT COLOR="#A020F0">if</FONT></B> (refine_type == <B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>)
@@ -1817,7 +1818,7 @@ it will print its log to the screen. Pretty easy, huh?
                     hpselector.singular_points.push_back(Point());
                     hpselector.select_refinement(system);
                   }
-                
+  
                 mesh_refinement.refine_and_coarsen_elements();
               }
   
@@ -1830,11 +1831,11 @@ it will print its log to the screen. Pretty easy, huh?
                     refine_type == <B><FONT COLOR="#BC8F8F">&quot;matchedhp&quot;</FONT></B>)
                   mesh_refinement.uniformly_p_refine(1);
               }
-          
+  
             equation_systems.reinit ();
           }
-      }            
-    
+      }
+  
   #ifdef LIBMESH_HAVE_EXODUS_API
     ExodusII_IO (mesh).write_equation_systems (<B><FONT COLOR="#BC8F8F">&quot;lshaped.e&quot;</FONT></B>,
                                          equation_systems);
@@ -1848,7 +1849,7 @@ it will print its log to the screen. Pretty easy, huh?
     out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;title('&quot;</FONT></B> &lt;&lt; approx_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot; elements');&quot;</FONT></B> &lt;&lt; std::endl;
     out &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;legend('L2-error', 'H1-error');&quot;</FONT></B> &lt;&lt; std::endl;
   #endif <I><FONT COLOR="#B22222">// #ifndef LIBMESH_ENABLE_AMR
-</FONT></I>    
+</FONT></I>  
     <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
   
@@ -1862,7 +1863,7 @@ it will print its log to the screen. Pretty easy, huh?
 </FONT></I>  {
     <B><FONT COLOR="#228B22">const</FONT></B> Real x = p(0);
     <B><FONT COLOR="#228B22">const</FONT></B> Real y = (dim &gt; 1) ? p(1) : 0.;
-    
+  
     <B><FONT COLOR="#A020F0">if</FONT></B> (singularity)
       {
         Real theta = atan2(y,x);
@@ -1871,7 +1872,7 @@ it will print its log to the screen. Pretty easy, huh?
           theta += 2. * libMesh::pi;
   
         <B><FONT COLOR="#228B22">const</FONT></B> Real z = (dim &gt; 2) ? p(2) : 0;
-                    
+  
         <B><FONT COLOR="#A020F0">return</FONT></B> pow(x*x + y*y, 1./3.)*sin(2./3.*theta) + z;
       }
     <B><FONT COLOR="#A020F0">else</FONT></B>
@@ -1892,7 +1893,7 @@ it will print its log to the screen. Pretty easy, huh?
 </FONT></I>                            <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;) <I><FONT COLOR="#B22222">// unk_name, not needed
 </FONT></I>  {
     Gradient gradu;
-    
+  
     <B><FONT COLOR="#228B22">const</FONT></B> Real x = p(0);
     <B><FONT COLOR="#228B22">const</FONT></B> Real y = dim &gt; 1 ? p(1) : 0.;
   
@@ -1902,11 +1903,11 @@ it will print its log to the screen. Pretty easy, huh?
   
         <B><FONT COLOR="#228B22">const</FONT></B> Real tt = 2./3.;
         <B><FONT COLOR="#228B22">const</FONT></B> Real ot = 1./3.;
-    
+  
         <B><FONT COLOR="#228B22">const</FONT></B> Real r2 = x*x + y*y;
   
         Real theta = atan2(y,x);
-    
+  
         <B><FONT COLOR="#A020F0">if</FONT></B> (theta &lt; 0)
           theta += 2. * libMesh::pi;
   
@@ -1945,22 +1946,22 @@ it will print its log to the screen. Pretty easy, huh?
   
   
     PerfLog perf_log (<B><FONT COLOR="#BC8F8F">&quot;Matrix Assembly&quot;</FONT></B>,false);
-    
+  
     <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
   
-    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = mesh.mesh_dimension();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> mesh_dim = mesh.mesh_dimension();
   
     LinearImplicitSystem&amp; system = es.get_system&lt;LinearImplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>);
-    
+  
     <B><FONT COLOR="#228B22">const</FONT></B> DofMap&amp; dof_map = system.get_dof_map();
   
     FEType fe_type = dof_map.variable_type(0);
   
-    AutoPtr&lt;FEBase&gt; fe      (FEBase::build(dim, fe_type));
-    AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(dim, fe_type));
-    
-    AutoPtr&lt;QBase&gt; qrule(fe_type.default_quadrature_rule(dim));
-    AutoPtr&lt;QBase&gt; qface(fe_type.default_quadrature_rule(dim-1));
+    AutoPtr&lt;FEBase&gt; fe      (FEBase::build(mesh_dim, fe_type));
+    AutoPtr&lt;FEBase&gt; fe_face (FEBase::build(mesh_dim, fe_type));
+  
+    AutoPtr&lt;QBase&gt; qrule(fe_type.default_quadrature_rule(mesh_dim));
+    AutoPtr&lt;QBase&gt; qface(fe_type.default_quadrature_rule(mesh_dim-1));
   
     fe-&gt;attach_quadrature_rule      (qrule.get());
     fe_face-&gt;attach_quadrature_rule (qface.get());
@@ -1983,11 +1984,11 @@ it will print its log to the screen. Pretty easy, huh?
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices;
   
     <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
-    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
-    
+    <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  
     <B><FONT COLOR="#A020F0">for</FONT></B> ( ; el != end_el; ++el)
       {
-        perf_log.push(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
+        perf_log.push(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);
   
         <B><FONT COLOR="#228B22">const</FONT></B> Elem* elem = *el;
   
@@ -2000,7 +2001,7 @@ it will print its log to the screen. Pretty easy, huh?
   
         Fe.resize (dof_indices.size());
   
-        perf_log.pop(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);      
+        perf_log.pop(<B><FONT COLOR="#BC8F8F">&quot;elem init&quot;</FONT></B>);
   
         perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;Ke&quot;</FONT></B>);
   
@@ -2009,7 +2010,7 @@ it will print its log to the screen. Pretty easy, huh?
             <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;dphi.size(); j++)
               Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
   
-        <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 1)
+        <B><FONT COLOR="#A020F0">if</FONT></B> (mesh_dim == 1)
           <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qrule-&gt;n_points(); qp++)
             {
               Real x = q_point[qp](0);
@@ -2031,7 +2032,7 @@ it will print its log to the screen. Pretty easy, huh?
             <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
               {
                 fe_face-&gt;reinit(elem,s);
-                
+  
                 <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface-&gt;n_points(); qp++)
                   {
                     <B><FONT COLOR="#228B22">const</FONT></B> Number value = exact_solution (qface_points[qp],
@@ -2046,11 +2047,11 @@ it will print its log to the screen. Pretty easy, huh?
                       <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;psi.size(); j++)
                         Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
                   }
-              } 
-          
+              }
+  
           perf_log.pop (<B><FONT COLOR="#BC8F8F">&quot;BCs&quot;</FONT></B>);
-        } 
-        
+        }
+  
   
         perf_log.push (<B><FONT COLOR="#BC8F8F">&quot;matrix insertion&quot;</FONT></B>);
   
@@ -2067,9 +2068,10 @@ it will print its log to the screen. Pretty easy, huh?
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+make[4]: Entering directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/adaptivity/adaptivity_ex3'
 ***************************************************************
 * Running Example adaptivity_ex3:
-*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
  
  EquationSystems
@@ -2097,216 +2099,90 @@ it will print its log to the screen. Pretty easy, huh?
 
 Beginning Solve 0
 System has: 21 degrees of freedom.
-Linear solver converged at step: 10, final residual: 6.50889e-16
+Linear solver converged at step: 10, final residual: 6.95538e-16
 L2-Error is: 0.0150899
 H1-Error is: 0.125332
   Refining the mesh...
 Beginning Solve 1
 System has: 65 degrees of freedom.
-Linear solver converged at step: 24, final residual: 8.49648e-16
+Linear solver converged at step: 21, final residual: 1.29417e-15
 L2-Error is: 0.00515425
 H1-Error is: 0.0777803
   Refining the mesh...
 Beginning Solve 2
 System has: 97 degrees of freedom.
-Linear solver converged at step: 32, final residual: 1.93481e-15
+Linear solver converged at step: 26, final residual: 1.91529e-15
 L2-Error is: 0.00199025
 H1-Error is: 0.0494318
   Refining the mesh...
 Beginning Solve 3
 System has: 129 degrees of freedom.
-Linear solver converged at step: 45, final residual: 2.19413e-15
+Linear solver converged at step: 29, final residual: 1.15387e-15
 L2-Error is: 0.000890215
 H1-Error is: 0.0320056
   Refining the mesh...
 Beginning Solve 4
 System has: 161 degrees of freedom.
-Linear solver converged at step: 50, final residual: 2.79143e-15
+Linear solver converged at step: 29, final residual: 1.71187e-15
 L2-Error is: 0.000559523
 H1-Error is: 0.0215069
   Refining the mesh...
 Beginning Solve 5
 System has: 193 degrees of freedom.
-Linear solver converged at step: 50, final residual: 3.1083e-15
+Linear solver converged at step: 30, final residual: 1.35959e-15
 L2-Error is: 0.000483386
 H1-Error is: 0.0154837
   Refining the mesh...
 Beginning Solve 6
 System has: 225 degrees of freedom.
-Linear solver converged at step: 53, final residual: 3.5365e-15
+Linear solver converged at step: 37, final residual: 4.81002e-15
 L2-Error is: 0.000467457
 H1-Error is: 0.0123018
   Refining the mesh...
 Beginning Solve 7
 System has: 257 degrees of freedom.
-Linear solver converged at step: 52, final residual: 3.87729e-15
+Linear solver converged at step: 38, final residual: 2.18805e-15
 L2-Error is: 0.000463656
 H1-Error is: 0.0107815
   Refining the mesh...
 Beginning Solve 8
 System has: 341 degrees of freedom.
-Linear solver converged at step: 62, final residual: 3.33092e-15
+Linear solver converged at step: 36, final residual: 5.80633e-15
 L2-Error is: 0.000301328
 H1-Error is: 0.00820153
   Refining the mesh...
 Beginning Solve 9
 System has: 445 degrees of freedom.
-Linear solver converged at step: 55, final residual: 3.63615e-15
+Linear solver converged at step: 43, final residual: 6.00646e-15
 L2-Error is: 0.000182515
 H1-Error is: 0.00601168
-************************************************************************************************************************
-***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
-************************************************************************************************************************
 
----------------------------------------------- PETSc Performance Summary: ----------------------------------------------
-
-/workspace/libmesh/examples/adaptivity/adaptivity_ex3/.libs/lt-example-devel on a intel-12. named hbar.ices.utexas.edu with 12 processors, by benkirk Thu Jan 31 21:59:15 2013
-Using Petsc Release Version 3.3.0, Patch 2, Fri Jul 13 15:42:00 CDT 2012 
-
-                         Max       Max/Min        Avg      Total 
-Time (sec):           1.242e+00      1.00027   1.242e+00
-Objects:              7.620e+02      1.00528   7.602e+02
-Flops:                2.109e+06      2.61780   1.543e+06  1.852e+07
-Flops/sec:            1.698e+06      2.61780   1.242e+06  1.491e+07
-MPI Messages:         3.720e+03      1.43538   3.119e+03  3.743e+04
-MPI Message Lengths:  2.642e+05      1.74918   6.268e+01  2.346e+06
-MPI Reductions:       1.725e+03      1.00232
-
-Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
-                            e.g., VecAXPY() for real vectors of length N --> 2N flops
-                            and VecAXPY() for complex vectors of length N --> 8N flops
-
-Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
-                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 1.2418e+00 100.0%  1.8516e+07 100.0%  3.743e+04 100.0%  6.268e+01      100.0%  1.722e+03  99.8% 
-
-------------------------------------------------------------------------------------------------------------------------
-See the 'Profiling' chapter of the users' manual for details on interpreting output.
-Phase summary info:
-   Count: number of times phase was executed
-   Time and Flops: Max - maximum over all processors
-                   Ratio - ratio of maximum to minimum over all processors
-   Mess: number of messages sent
-   Avg. len: average message length
-   Reduct: number of global reductions
-   Global: entire computation
-   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
-      %T - percent time in this phase         %f - percent flops in this phase
-      %M - percent messages in this phase     %L - percent message lengths in this phase
-      %R - percent reductions in this phase
-   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
-------------------------------------------------------------------------------------------------------------------------
-Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
-                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %f %M %L %R  %T %f %M %L %R Mflop/s
-------------------------------------------------------------------------------------------------------------------------
-
---- Event Stage 0: Main Stage
-
-VecMDot              433 1.0 1.0941e-02 2.0 3.45e+05 1.9 0.0e+00 0.0e+00 4.3e+02  1 18  0  0 25   1 18  0  0 25   311
-VecNorm              462 1.0 1.7121e-02 2.3 2.65e+04 1.9 0.0e+00 0.0e+00 4.6e+02  1  1  0  0 27   1  1  0  0 27    15
-VecScale             452 1.0 2.3723e-04 1.4 1.30e+04 1.9 0.0e+00 0.0e+00 0.0e+00  0  1  0  0  0   0  1  0  0  0   539
-VecCopy               56 1.0 3.8862e-05 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecSet               602 1.0 2.5702e-04 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecAXPY               38 1.0 1.5811e-02 2.2 2.10e+03 1.9 0.0e+00 0.0e+00 0.0e+00  1  0  0  0  0   1  0  0  0  0     1
-VecMAXPY             452 1.0 4.0913e-04 1.5 3.76e+05 1.8 0.0e+00 0.0e+00 0.0e+00  0 20  0  0  0   0 20  0  0  0  9079
-VecAssemblyBegin     109 1.0 1.0250e-02 1.6 0.00e+00 0.0 9.4e+02 3.3e+01 2.5e+02  1  0  3  1 14   1  0  3  1 14     0
-VecAssemblyEnd       109 1.0 1.4257e-04 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecScatterBegin      497 1.0 1.9875e-03 1.3 0.00e+00 0.0 3.0e+04 6.5e+01 0.0e+00  0  0 80 83  0   0  0 80 83  0     0
-VecScatterEnd        497 1.0 7.8247e-03 4.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecNormalize         452 1.0 1.7401e-02 2.2 3.91e+04 1.9 0.0e+00 0.0e+00 4.5e+02  1  2  0  0 26   1  2  0  0 26    22
-MatMult              452 1.0 9.6679e-03 2.6 4.53e+05 2.6 2.7e+04 6.0e+01 0.0e+00  0 21 71 68  0   0 21 71 68  0   407
-MatSolve             462 1.1 9.3532e-04 1.9 7.85e+05 3.8 0.0e+00 0.0e+00 0.0e+00  0 34  0  0  0   0 34  0  0  0  6672
-MatLUFactorNum        10 1.0 3.0899e-04 2.3 1.29e+05 8.5 0.0e+00 0.0e+00 0.0e+00  0  4  0  0  0   0  4  0  0  0  2654
-MatILUFactorSym       10 1.0 8.5783e-04 2.2 0.00e+00 0.0 0.0e+00 0.0e+00 3.0e+01  0  0  0  0  2   0  0  0  0  2     0
-MatAssemblyBegin      20 1.0 1.3880e-02 2.2 0.00e+00 0.0 7.5e+02 2.7e+02 4.0e+01  1  0  2  8  2   1  0  2  8  2     0
-MatAssemblyEnd        20 1.0 2.8112e-03 1.1 0.00e+00 0.0 1.1e+03 1.6e+01 8.0e+01  0  0  3  1  5   0  0  3  1  5     0
-MatGetRowIJ           10 1.2 1.2875e-05 3.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatGetOrdering        10 1.2 6.5708e-04 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 3.6e+01  0  0  0  0  2   0  0  0  0  2     0
-MatZeroEntries        30 1.2 5.1260e-05 2.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-KSPGMRESOrthog       433 1.0 1.1635e-02 1.9 6.97e+05 1.9 0.0e+00 0.0e+00 4.3e+02  1 37  0  0 25   1 37  0  0 25   590
-KSPSetUp              20 1.0 3.4547e-04 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-KSPSolve              10 1.0 5.0354e-02 1.0 2.11e+06 2.6 2.7e+04 6.0e+01 9.8e+02  4100 71 68 57   4100 71 68 57   368
-PCSetUp               20 1.0 4.3621e-03 1.2 1.29e+05 8.5 0.0e+00 0.0e+00 8.8e+01  0  4  0  0  5   0  4  0  0  5   188
-PCSetUpOnBlocks       10 1.0 2.8186e-03 1.3 1.29e+05 8.5 0.0e+00 0.0e+00 6.8e+01  0  4  0  0  4   0  4  0  0  4   291
-PCApply              462 1.0 4.8213e-03 1.1 7.85e+05 3.8 0.0e+00 0.0e+00 0.0e+00  0 34  0  0  0   0 34  0  0  0  1294
-------------------------------------------------------------------------------------------------------------------------
-
-Memory usage is given in bytes:
-
-Object Type          Creations   Destructions     Memory  Descendants' Mem.
-Reports information only for process 0.
-
---- Event Stage 0: Main Stage
-
-              Vector   491            491       866464     0
-      Vector Scatter    46             46        47656     0
-           Index Set   125            125        98756     0
-   IS L to G Mapping    19             19        10716     0
-              Matrix    40             40       251320     0
-       Krylov Solver    20             20       193600     0
-      Preconditioner    20             20        17840     0
-              Viewer     1              0            0     0
-========================================================================================================================
-Average time to get PetscTime(): 9.53674e-08
-Average time for MPI_Barrier(): 5.19753e-06
-Average time for zero size MPI_Send(): 1.40866e-05
-#PETSc Option Table entries:
--ksp_right_pc
--log_summary
--pc_type bjacobi
--sub_pc_factor_levels 4
--sub_pc_factor_zeropivot 0
--sub_pc_type ilu
-#End of PETSc Option Table entries
-Compiled without FORTRAN kernels
-Compiled with full precision matrices (default)
-sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
-Configure run at: Thu Nov  8 11:21:02 2012
-Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared-libraries=1 --with-mpi-dir=/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1 --with-mumps=true --download-mumps=1 --with-metis=true --download-metis=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_intel_lp64.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_sequential.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_core.so]" --with-lapack-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_lapack95_lp64.a]"
------------------------------------------
-Libraries compiled on Thu Nov  8 11:21:02 2012 on daedalus.ices.utexas.edu 
-Machine characteristics: Linux-2.6.32-279.1.1.el6.x86_64-x86_64-with-redhat-6.3-Carbon
-Using PETSc directory: /opt/apps/ossw/libraries/petsc/petsc-3.3-p2
-Using PETSc arch: intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt
------------------------------------------
-
-Using C compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx  -wd1572 -O3   -fPIC   ${COPTFLAGS} ${CFLAGS}
-Using Fortran compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90  -fPIC -O3   ${FOPTFLAGS} ${FFLAGS} 
------------------------------------------
-
-Using include paths: -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/include
------------------------------------------
-
-Using C linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx
-Using Fortran linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90
-Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lpetsc -lX11 -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lHYPRE -lpthread -lsuperlu_dist_3.0 -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.3 -Wl,-rpath,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -L/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,-rpath,/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -L/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -Wl,-rpath,/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -L/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lcilkrts -lstdc++ -lgcc_s -lirc -lirc_s -ldl 
------------------------------------------
-
-
- ----------------------------------------------------------------------------------------------------------------------
-| Processor id:   0                                                                                                    |
-| Num Processors: 12                                                                                                   |
-| Time:           Thu Jan 31 21:59:15 2013                                                                             |
-| OS:             Linux                                                                                                |
-| HostName:       hbar.ices.utexas.edu                                                                                 |
-| OS Release:     2.6.32-279.1.1.el6.x86_64                                                                            |
-| OS Version:     #1 SMP Tue Jul 10 11:24:23 CDT 2012                                                                  |
-| Machine:        x86_64                                                                                               |
-| Username:       benkirk                                                                                              |
-| Configuration:  ./configure  '--enable-everything'                                                                   |
-|  '--prefix=/workspace/libmesh/install'                                                                               |
-|  'CXX=icpc'                                                                                                          |
-|  'CC=icc'                                                                                                            |
-|  'FC=ifort'                                                                                                          |
-|  'F77=ifort'                                                                                                         |
-|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                             |
-|  'PETSC_ARCH=intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
-|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                        |
-|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/intel-12.1/mpich2-1.4.1p1/mkl-intel-10.3.12.361'|
-|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/intel-12.1'                                                    |
- ----------------------------------------------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Processor id:   0                                                                                                 |
+| Num Processors: 4                                                                                                 |
+| Time:           Fri Apr 19 11:45:42 2013                                                                          |
+| OS:             Linux                                                                                             |
+| HostName:       spark.ices.utexas.edu                                                                             |
+| OS Release:     2.6.32-279.22.1.el6.x86_64                                                                        |
+| OS Version:     #1 SMP Tue Feb 5 14:33:39 CST 2013                                                                |
+| Machine:        x86_64                                                                                            |
+| Username:       roystgnr                                                                                          |
+| Configuration:  ../configure  '--enable-everything'                                                               |
+|  'METHODS=devel'                                                                                                  |
+|  '--prefix=/h2/roystgnr/libmesh-test'                                                                             |
+|  'CXX=distcc /usr/bin/g++'                                                                                        |
+|  'CC=distcc /usr/bin/gcc'                                                                                         |
+|  'FC=distcc /usr/bin/gfortran'                                                                                    |
+|  'F77=distcc /usr/bin/gfortran'                                                                                   |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                          |
+|  'PETSC_ARCH=gcc-system-mkl-gf-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                     |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/gcc-system/mpich2-1.4.1p1/mkl-gf-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/gcc-system'                                                 |
+|  'HDF5_DIR=/opt/apps/ossw/libraries/hdf5/hdf5-1.8.9/sl6/gcc-system'                                               |
+ -------------------------------------------------------------------------------------------------------------------
  ----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=1.31612, Active time=1.11235                                                   |
+| libMesh Performance: Alive time=0.722761, Active time=0.296766                                                 |
  ----------------------------------------------------------------------------------------------------------------
 | Event                              nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                              w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -2314,108 +2190,110 @@ Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12
 |                                                                                                                |
 |                                                                                                                |
 | DofMap                                                                                                         |
-|   add_neighbors_to_send_list()     19        0.0077      0.000404    0.0238      0.001255    0.69     2.14     |
-|   build_constraint_matrix()        36        0.0012      0.000032    0.0012      0.000032    0.10     0.10     |
-|   build_sparsity()                 10        0.0057      0.000572    0.0247      0.002474    0.51     2.22     |
-|   cnstrn_elem_mat_vec()            36        0.0012      0.000033    0.0012      0.000033    0.11     0.11     |
-|   create_dof_constraints()         19        0.0422      0.002222    0.0925      0.004870    3.79     8.32     |
-|   distribute_dofs()                19        0.0434      0.002283    0.1653      0.008700    3.90     14.86    |
-|   dof_indices()                    1422      0.0853      0.000060    0.0853      0.000060    7.66     7.66     |
-|   enforce_constraints_exactly()    8         0.0028      0.000352    0.0028      0.000352    0.25     0.25     |
-|   old_dof_indices()                74        0.0086      0.000117    0.0086      0.000117    0.78     0.78     |
-|   prepare_send_list()              19        0.0004      0.000021    0.0004      0.000021    0.04     0.04     |
-|   reinit()                         19        0.0627      0.003302    0.0627      0.003302    5.64     5.64     |
+|   add_neighbors_to_send_list()     19        0.0023      0.000122    0.0046      0.000243    0.78     1.56     |
+|   build_constraint_matrix()        115       0.0006      0.000005    0.0006      0.000005    0.21     0.21     |
+|   build_sparsity()                 10        0.0019      0.000186    0.0049      0.000493    0.63     1.66     |
+|   cnstrn_elem_mat_vec()            115       0.0017      0.000014    0.0017      0.000014    0.56     0.56     |
+|   create_dof_constraints()         19        0.0101      0.000529    0.0188      0.000987    3.39     6.32     |
+|   distribute_dofs()                19        0.0071      0.000375    0.0207      0.001088    2.40     6.97     |
+|   dof_indices()                    2305      0.0160      0.000007    0.0160      0.000007    5.39     5.39     |
+|   enforce_constraints_exactly()    8         0.0012      0.000152    0.0012      0.000152    0.41     0.41     |
+|   old_dof_indices()                236       0.0024      0.000010    0.0024      0.000010    0.79     0.79     |
+|   prepare_send_list()              19        0.0001      0.000005    0.0001      0.000005    0.03     0.03     |
+|   reinit()                         19        0.0076      0.000402    0.0076      0.000402    2.58     2.58     |
 |                                                                                                                |
 | EquationSystems                                                                                                |
-|   build_solution_vector()          1         0.0004      0.000431    0.0021      0.002123    0.04     0.19     |
+|   build_solution_vector()          1         0.0002      0.000181    0.0007      0.000695    0.06     0.23     |
 |                                                                                                                |
 | ExodusII_IO                                                                                                    |
-|   write_nodal_data()               1         0.0016      0.001599    0.0016      0.001599    0.14     0.14     |
+|   write_nodal_data()               1         0.0463      0.046302    0.0463      0.046302    15.60    15.60    |
 |                                                                                                                |
 | FE                                                                                                             |
-|   compute_shape_functions()        206       0.0100      0.000049    0.0100      0.000049    0.90     0.90     |
-|   init_shape_functions()           150       0.0064      0.000043    0.0064      0.000043    0.58     0.58     |
-|   inverse_map()                    2896      0.0200      0.000007    0.0200      0.000007    1.80     1.80     |
+|   compute_shape_functions()        670       0.0055      0.000008    0.0055      0.000008    1.86     1.86     |
+|   init_shape_functions()           452       0.0034      0.000008    0.0034      0.000008    1.15     1.15     |
+|   inverse_map()                    3947      0.0137      0.000003    0.0137      0.000003    4.63     4.63     |
 |                                                                                                                |
 | FEMap                                                                                                          |
-|   compute_affine_map()             206       0.0034      0.000016    0.0034      0.000016    0.30     0.30     |
-|   compute_face_map()               80        0.0028      0.000035    0.0068      0.000085    0.25     0.61     |
-|   init_face_shape_functions()      18        0.0003      0.000018    0.0003      0.000018    0.03     0.03     |
-|   init_reference_to_physical_map() 150       0.0084      0.000056    0.0084      0.000056    0.75     0.75     |
+|   compute_affine_map()             670       0.0036      0.000005    0.0036      0.000005    1.22     1.22     |
+|   compute_face_map()               242       0.0028      0.000011    0.0073      0.000030    0.94     2.46     |
+|   init_face_shape_functions()      18        0.0001      0.000005    0.0001      0.000005    0.03     0.03     |
+|   init_reference_to_physical_map() 452       0.0059      0.000013    0.0059      0.000013    1.99     1.99     |
 |                                                                                                                |
 | JumpErrorEstimator                                                                                             |
-|   estimate_error()                 9         0.0061      0.000676    0.0701      0.007793    0.55     6.31     |
+|   estimate_error()                 9         0.0069      0.000769    0.0306      0.003404    2.33     10.32    |
 |                                                                                                                |
 | LocationMap                                                                                                    |
-|   find()                           740       0.0051      0.000007    0.0051      0.000007    0.46     0.46     |
-|   init()                           18        0.0073      0.000408    0.0073      0.000408    0.66     0.66     |
+|   find()                           740       0.0013      0.000002    0.0013      0.000002    0.44     0.44     |
+|   init()                           18        0.0020      0.000111    0.0020      0.000111    0.67     0.67     |
 |                                                                                                                |
 | Mesh                                                                                                           |
-|   all_first_order()                9         0.0073      0.000814    0.0073      0.000814    0.66     0.66     |
-|   all_second_order()               1         0.0004      0.000432    0.0004      0.000432    0.04     0.04     |
-|   contract()                       9         0.0006      0.000069    0.0036      0.000403    0.06     0.33     |
-|   find_neighbors()                 29        0.0341      0.001174    0.0519      0.001789    3.06     4.66     |
-|   renumber_nodes_and_elem()        9         0.0030      0.000333    0.0030      0.000333    0.27     0.27     |
+|   all_first_order()                9         0.0009      0.000097    0.0009      0.000097    0.29     0.29     |
+|   all_second_order()               1         0.0001      0.000055    0.0001      0.000055    0.02     0.02     |
+|   contract()                       9         0.0003      0.000028    0.0008      0.000090    0.08     0.27     |
+|   find_neighbors()                 29        0.0068      0.000234    0.0089      0.000308    2.29     3.01     |
+|   renumber_nodes_and_elem()        9         0.0006      0.000062    0.0006      0.000062    0.19     0.19     |
 |                                                                                                                |
 | MeshCommunication                                                                                              |
-|   broadcast()                      1         0.0011      0.001057    0.0016      0.001598    0.10     0.14     |
-|   compute_hilbert_indices()        21        0.0072      0.000345    0.0072      0.000345    0.65     0.65     |
-|   find_global_indices()            21        0.0071      0.000338    0.0551      0.002626    0.64     4.96     |
-|   parallel_sort()                  21        0.0165      0.000788    0.0243      0.001156    1.49     2.18     |
+|   broadcast()                      1         0.0002      0.000169    0.0005      0.000488    0.06     0.16     |
+|   compute_hilbert_indices()        21        0.0035      0.000168    0.0035      0.000168    1.19     1.19     |
+|   find_global_indices()            21        0.0012      0.000056    0.0096      0.000457    0.39     3.23     |
+|   parallel_sort()                  21        0.0016      0.000077    0.0024      0.000116    0.54     0.82     |
 |                                                                                                                |
 | MeshOutput                                                                                                     |
-|   write_equation_systems()         1         0.0001      0.000119    0.0040      0.003971    0.01     0.36     |
+|   write_equation_systems()         1         0.0001      0.000053    0.0471      0.047113    0.02     15.88    |
 |                                                                                                                |
 | MeshRefinement                                                                                                 |
-|   _coarsen_elements()              18        0.0006      0.000031    0.0010      0.000056    0.05     0.09     |
-|   _refine_elements()               18        0.0074      0.000410    0.0225      0.001250    0.66     2.02     |
-|   add_point()                      740       0.0046      0.000006    0.0098      0.000013    0.41     0.88     |
-|   make_coarsening_compatible()     36        0.0139      0.000387    0.0139      0.000387    1.25     1.25     |
-|   make_refinement_compatible()     36        0.0008      0.000023    0.0016      0.000046    0.07     0.15     |
+|   _coarsen_elements()              18        0.0002      0.000013    0.0003      0.000017    0.08     0.11     |
+|   _refine_elements()               18        0.0022      0.000122    0.0054      0.000301    0.74     1.82     |
+|   add_point()                      740       0.0016      0.000002    0.0030      0.000004    0.55     1.01     |
+|   make_coarsening_compatible()     36        0.0046      0.000127    0.0046      0.000127    1.54     1.54     |
+|   make_flags_parallel_consistent() 27        0.0026      0.000098    0.0104      0.000387    0.89     3.52     |
+|   make_refinement_compatible()     36        0.0003      0.000009    0.0005      0.000013    0.10     0.16     |
 |                                                                                                                |
 | MetisPartitioner                                                                                               |
-|   partition()                      20        0.1516      0.007582    0.2149      0.010745    13.63    19.32    |
+|   partition()                      20        0.0145      0.000727    0.0255      0.001274    4.90     8.59     |
 |                                                                                                                |
 | Parallel                                                                                                       |
-|   allgather()                      99        0.0212      0.000214    0.0223      0.000226    1.91     2.01     |
-|   broadcast()                      9         0.0004      0.000043    0.0003      0.000034    0.03     0.03     |
-|   max(bool)                        92        0.0073      0.000079    0.0073      0.000079    0.66     0.66     |
-|   max(scalar)                      2495      0.0536      0.000021    0.0536      0.000021    4.82     4.82     |
-|   max(vector)                      593       0.0144      0.000024    0.0458      0.000077    1.29     4.12     |
-|   min(bool)                        3058      0.0553      0.000018    0.0553      0.000018    4.97     4.97     |
-|   min(scalar)                      2423      0.1852      0.000076    0.1852      0.000076    16.65    16.65    |
-|   min(vector)                      593       0.0148      0.000025    0.0483      0.000082    1.33     4.35     |
-|   probe()                          2156      0.0298      0.000014    0.0298      0.000014    2.68     2.68     |
-|   receive()                        2156      0.0128      0.000006    0.0430      0.000020    1.15     3.87     |
-|   send()                           2156      0.0062      0.000003    0.0062      0.000003    0.56     0.56     |
-|   send_receive()                   2198      0.0150      0.000007    0.0692      0.000031    1.35     6.22     |
-|   sum()                            143       0.0060      0.000042    0.0123      0.000086    0.54     1.11     |
+|   allgather()                      99        0.0008      0.000008    0.0011      0.000011    0.28     0.38     |
+|   broadcast()                      27        0.0001      0.000003    0.0001      0.000002    0.03     0.02     |
+|   max(bool)                        92        0.0005      0.000006    0.0005      0.000006    0.18     0.18     |
+|   max(scalar)                      2783      0.0110      0.000004    0.0110      0.000004    3.72     3.72     |
+|   max(vector)                      665       0.0046      0.000007    0.0119      0.000018    1.56     4.01     |
+|   min(bool)                        3445      0.0120      0.000003    0.0120      0.000003    4.04     4.04     |
+|   min(scalar)                      2711      0.0128      0.000005    0.0128      0.000005    4.32     4.32     |
+|   min(vector)                      665       0.0050      0.000008    0.0124      0.000019    1.69     4.18     |
+|   probe()                          912       0.0024      0.000003    0.0024      0.000003    0.82     0.82     |
+|   receive()                        912       0.0028      0.000003    0.0054      0.000006    0.95     1.81     |
+|   send()                           912       0.0017      0.000002    0.0017      0.000002    0.57     0.57     |
+|   send_receive()                   954       0.0038      0.000004    0.0121      0.000013    1.28     4.08     |
+|   sum()                            143       0.0011      0.000008    0.0023      0.000016    0.38     0.78     |
 |                                                                                                                |
 | Parallel::Request                                                                                              |
-|   wait()                           2156      0.0037      0.000002    0.0037      0.000002    0.33     0.33     |
+|   wait()                           912       0.0009      0.000001    0.0009      0.000001    0.32     0.32     |
 |                                                                                                                |
 | Partitioner                                                                                                    |
-|   set_node_processor_ids()         29        0.0115      0.000395    0.0898      0.003095    1.03     8.07     |
-|   set_parent_processor_ids()       20        0.0027      0.000134    0.0027      0.000134    0.24     0.24     |
+|   set_node_processor_ids()         29        0.0036      0.000123    0.0079      0.000274    1.21     2.68     |
+|   set_parent_processor_ids()       20        0.0005      0.000027    0.0005      0.000027    0.18     0.18     |
 |                                                                                                                |
 | PetscLinearSolver                                                                                              |
-|   solve()                          10        0.0627      0.006267    0.0627      0.006267    5.63     5.63     |
+|   solve()                          10        0.0383      0.003828    0.0383      0.003828    12.90    12.90    |
 |                                                                                                                |
 | ProjectVector                                                                                                  |
-|   operator()                       9         0.0015      0.000170    0.0114      0.001262    0.14     1.02     |
+|   operator()                       9         0.0013      0.000143    0.0050      0.000558    0.43     1.69     |
 |                                                                                                                |
 | System                                                                                                         |
-|   assemble()                       10        0.0078      0.000782    0.0261      0.002613    0.70     2.35     |
-|   project_vector()                 9         0.0113      0.001257    0.0343      0.003815    1.02     3.09     |
+|   assemble()                       10        0.0065      0.000652    0.0159      0.001586    2.20     5.34     |
+|   project_vector()                 9         0.0029      0.000322    0.0115      0.001277    0.98     3.87     |
  ----------------------------------------------------------------------------------------------------------------
-| Totals:                            27560     1.1123                                          100.00            |
+| Totals:                            26440     0.2968                                          100.00            |
  ----------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example adaptivity_ex3:
-*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
+make[4]: Leaving directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/adaptivity/adaptivity_ex3'
 </pre>
 </div>
 <?php make_footer() ?>

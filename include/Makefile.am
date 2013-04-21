@@ -42,7 +42,7 @@ test_headers:
 	@echo " "
 	@CXX="$(CXX)" \
 	  HEADERS_TO_TEST="$(headers_to_test)" \
-	  test_CXXFLAGS="$(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) -I$(top_builddir)/include" \
+	  test_CXXFLAGS="$(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) $(CXXFLAGS_DEVEL) -I$(top_builddir)/include" \
 	  $(top_srcdir)/contrib/bin/test_installed_headers.sh
 
 installcheck-local:

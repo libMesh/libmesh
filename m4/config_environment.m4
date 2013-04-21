@@ -6,7 +6,7 @@
 #
 # DESCRIPTION
 #
-#   Queries compile environment and SVN revision for use in configure summary 
+#   Queries compile environment and SVN revision for use in configure summary
 #   and pre-processing macros.
 #
 # LAST MODIFICATION

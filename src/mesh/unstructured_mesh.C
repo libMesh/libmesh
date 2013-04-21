@@ -848,6 +848,7 @@ void UnstructuredMesh::write (const std::string& name,
               << "     *.ucd   -- AVS's ASCII UCD format\n"
               << "     *.ugrid -- Kelly's DIVA ASCII format\n"
               << "     *.unv   -- I-deas Universal format\n"
+              << "     *.vtu   -- VTK (paraview-readable) format\n"
               << "     *.xda   -- libMesh ASCII format\n"
               << "     *.xdr   -- libMesh binary format,\n"
               << std::endl

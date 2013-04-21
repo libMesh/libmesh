@@ -36,7 +36,7 @@ if test "x$enable_coverage" = "xyes"; then
    # ----------------------------
    # Check for gcov/lcov binaries
    # ----------------------------
-   
+
    AC_CHECK_PROG(have_gcov,gcov, yes, no)
 
    if test "x$have_gcov" = "xno"; then
@@ -61,7 +61,7 @@ if test "x$enable_coverage" = "xyes"; then
 
    AC_LANG_PUSH([C])
    CFLAGS="${GCOV_FLAGS} ${CFLAGS}"
-   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[])],[], 
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[])],[],
      [AC_MSG_ERROR([unable to compile with code coverage ($CC --coverage)])])
    AC_LANG_POP([C])
 
@@ -71,7 +71,7 @@ if test "x$enable_coverage" = "xyes"; then
 
    AC_LANG_PUSH([C++])
    CXXFLAGS="${GCOV_FLAGS} ${CXXFLAGS}"
-   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[])],[], 
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[])],[],
      [AC_MSG_ERROR([unable to compile with code coverage ($CXX --coverage)])])
    AC_LANG_POP([C++])
 

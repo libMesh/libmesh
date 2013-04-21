@@ -1,7 +1,7 @@
 dnl -------------------------------------------------------------
 dnl GMV file I/O API for reading GMV files, by Frank Ortega
 dnl -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_GMV], 
+AC_DEFUN([CONFIGURE_GMV],
 [
   AC_ARG_ENABLE(gmv,
                 AC_HELP_STRING([--enable-gmv],
@@ -29,5 +29,5 @@ AC_DEFUN([CONFIGURE_GMV],
   fi
 
   AC_SUBST(GMV_INCLUDE)
-  AC_SUBST(GMV_LIBRARY)	
+  AC_SUBST(GMV_LIBRARY)
 ])

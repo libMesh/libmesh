@@ -448,14 +448,6 @@ inline Communicator::Communicator (const communicator &comm) :
   this->assign(comm);
 }
 
-#ifndef LIBMESH_HAVE_MPI
-  inline Communicator::Communicator (const int) :
-    _rank(0),
-    _size(1),
-    used_tag_values(),
-    _I_duped_it(false) {}
-#endif
-
 inline Communicator::~Communicator () {
   this->clear();
 }

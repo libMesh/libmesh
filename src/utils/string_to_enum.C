@@ -25,11 +25,13 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_eigen_solver_type.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/enum_fe_family.h"
 #include "libmesh/enum_inf_map_type.h"
 #include "libmesh/enum_quadrature_type.h"
 #include "libmesh/enum_preconditioner_type.h"
+#include "libmesh/enum_solver_type.h"
 #include "libmesh/elem.h"
 
 namespace libMesh
@@ -448,6 +450,93 @@ namespace {
   }
 #endif // LIBMESH_ENABLE_AMR
 
+
+  //---------------------------------------------------
+  std::map<std::string, EigenSolverType> eigensolvertype_to_enum;
+
+  // Initialize eigensolvertype_to_enum on first call
+  void init_eigensolvertype_to_enum ()
+  {
+    if (eigensolvertype_to_enum.empty())
+      {
+	eigensolvertype_to_enum["POWER"              ]=POWER;
+	eigensolvertype_to_enum["LAPACK"             ]=LAPACK;
+	eigensolvertype_to_enum["SUBSPACE"           ]=SUBSPACE;
+	eigensolvertype_to_enum["ARNOLDI"            ]=ARNOLDI;
+	eigensolvertype_to_enum["LANCZOS"            ]=LANCZOS;
+	eigensolvertype_to_enum["KRYLOVSCHUR"        ]=KRYLOVSCHUR;
+	eigensolvertype_to_enum["INVALID_EIGENSOLVER"]=INVALID_EIGENSOLVER;
+      }
+  }
+
+
+  std::map<EigenSolverType, std::string> enum_to_eigensolvertype;
+
+  // Initialize the enum_to_eigensolvertype on first call
+  void init_enum_to_eigensolvertype ()
+  {
+    // Build reverse map
+    if (enum_to_eigensolvertype.empty())
+      {
+	// Initialize eigensolvertype_to_enum on first call
+	init_eigensolvertype_to_enum();
+
+	build_reverse_map (eigensolvertype_to_enum.begin(),
+			   eigensolvertype_to_enum.end(),
+			   enum_to_eigensolvertype);
+      }
+  }
+
+
+  //---------------------------------------------------
+  std::map<std::string, SolverType> solvertype_to_enum;
+
+  // Initialize solvertype_to_enum on first call
+  void init_solvertype_to_enum ()
+  {
+    if (solvertype_to_enum.empty())
+      {
+	solvertype_to_enum["CG"            ]=CG;
+	solvertype_to_enum["CGN"           ]=CGN;
+	solvertype_to_enum["CGS"           ]=CGS;
+	solvertype_to_enum["CR"            ]=CR;
+	solvertype_to_enum["QMR"           ]=QMR;
+	solvertype_to_enum["TCQMR"         ]=TCQMR;
+	solvertype_to_enum["TFQMR"         ]=TFQMR;
+	solvertype_to_enum["BICG"          ]=BICG;
+	solvertype_to_enum["MINRES"        ]=MINRES;
+	solvertype_to_enum["GMRES"         ]=GMRES;
+	solvertype_to_enum["LSQR"          ]=LSQR;
+	solvertype_to_enum["JACOBI"        ]=JACOBI;
+	solvertype_to_enum["SOR_FORWARD"   ]=SOR_FORWARD;
+	solvertype_to_enum["SOR_BACKWARD"  ]=SOR_BACKWARD;
+	solvertype_to_enum["SSOR"          ]=SSOR;
+	solvertype_to_enum["RICHARDSON"    ]=RICHARDSON;
+	solvertype_to_enum["CHEBYSHEV"     ]=CHEBYSHEV;
+	solvertype_to_enum["INVALID_SOLVER"]=INVALID_SOLVER;
+      }
+  }
+
+
+  std::map<SolverType, std::string> enum_to_solvertype;
+
+  // Initialize the enum_to_solvertype on first call
+  void init_enum_to_solvertype ()
+  {
+    // Build reverse map
+    if (enum_to_solvertype.empty())
+      {
+	// Initialize solvertype_to_enum on first call
+	init_solvertype_to_enum();
+
+	build_reverse_map (solvertype_to_enum.begin(),
+			   solvertype_to_enum.end(),
+			   enum_to_solvertype);
+      }
+  }
+
+
+
 } // end anonymous namespace
 
 
@@ -674,6 +763,67 @@ namespace Utility {
     return enum_to_refinementstate_type[i];
   }
 #endif // LIBMESH_ENABLE_AMR
+
+
+  //------------------------------------------------------
+  // SolverType specialization
+  template <>
+  SolverType string_to_enum<SolverType> (const std::string& s)
+  {
+    init_solvertype_to_enum();
+
+    std::string upper(s);
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+
+    if (!solvertype_to_enum.count(upper))
+      libmesh_error();
+
+    return solvertype_to_enum[upper];
+  }
+
+
+
+  template <>
+  std::string enum_to_string<SolverType> (const SolverType i)
+  {
+    init_enum_to_solvertype();
+
+    if (!enum_to_solvertype.count(i))
+      libmesh_error();
+
+    return enum_to_solvertype[i];
+  }
+
+
+
+  //------------------------------------------------------
+  // EigenSolverType specialization
+  template <>
+  EigenSolverType string_to_enum<EigenSolverType> (const std::string& s)
+  {
+    init_eigensolvertype_to_enum();
+
+    std::string upper(s);
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+
+    if (!eigensolvertype_to_enum.count(upper))
+      libmesh_error();
+
+    return eigensolvertype_to_enum[upper];
+  }
+
+
+
+  template <>
+  std::string enum_to_string<EigenSolverType> (const EigenSolverType i)
+  {
+    init_enum_to_eigensolvertype();
+
+    if (!enum_to_eigensolvertype.count(i))
+      libmesh_error();
+
+    return enum_to_eigensolvertype[i];
+  }
 
 
 } // namespace Utility

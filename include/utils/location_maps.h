@@ -27,7 +27,7 @@
 #include "libmesh/point.h"
 
 // C++ Includes   -----------------------------------
-#include LIBMESH_INCLUDE_UNORDERED_MAP
+#include LIBMESH_INCLUDE_UNORDERED_MULTIMAP
 #include <vector>
 
 namespace libMesh

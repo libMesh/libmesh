@@ -27,6 +27,7 @@
 // Local Includes
 #include "libmesh/eigen_sparse_linear_solver.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -121,7 +122,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
     default:
       {
   	libMesh::err << "ERROR:  Unsupported Eigen Solver: "
-		     << this->_solver_type         << std::endl
+		     << Utility::enum_to_string(this->_solver_type) << std::endl
 		     << "Continuing with BICGSTAB" << std::endl;
 
   	this->_solver_type = BICGSTAB;

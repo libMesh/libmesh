@@ -15,7 +15,7 @@
 <div class = "comment">
 <h1>Miscellaneous Example 6 - Meshing with LibMesh's TetGen and Triangle Interfaces</h1>
 
-<br><br>LibMesh provides interfaces to both Triangle and TetGen for generating 
+<br><br>LibMesh provides interfaces to both Triangle and TetGen for generating
 Delaunay triangulations and tetrahedralizations in two and three dimensions
 (respectively).
 
@@ -53,8 +53,8 @@ Major functions called by main
 
 <div class ="fragment">
 <pre>
-        void triangulate_domain();
-        void tetrahedralize_domain();
+        void triangulate_domain(const Parallel::Communicator& comm);
+        void tetrahedralize_domain(const Parallel::Communicator& comm);
         
 </pre>
 </div>
@@ -102,8 +102,8 @@ Initialize libMesh and any dependent libaries, like in example 2.
 
 <div class ="fragment">
 <pre>
-          triangulate_domain();
-          
+          triangulate_domain(init.comm());
+        
           libmesh_example_assert(3 &lt;= LIBMESH_DIM, "3D support");
         
           std::cout &lt;&lt; "Tetrahedralizing a prismatic domain with a hole" &lt;&lt; std::endl;
@@ -116,15 +116,15 @@ Initialize libMesh and any dependent libaries, like in example 2.
 
 <div class ="fragment">
 <pre>
-          tetrahedralize_domain();
-          
+          tetrahedralize_domain(init.comm());
+        
           return 0;
         }
         
         
         
         
-        void triangulate_domain()
+        void triangulate_domain(const Parallel::Communicator& comm)
         {
         #ifdef LIBMESH_HAVE_TRIANGLE
 </pre>
@@ -147,8 +147,8 @@ Libmesh mesh that will eventually be created.
 
 <div class ="fragment">
 <pre>
-          Mesh mesh(2);
-            
+          Mesh mesh(comm, 2);
+        
 </pre>
 </div>
 <div class = "comment">
@@ -216,7 +216,7 @@ By default this is on.
 </div>
 <div class = "comment">
 Define holes...
-    
+
 
 <br><br>hole_1 is a circle (discretized by 50 points)
 </div>
@@ -258,9 +258,9 @@ hole_3 is an ellipse of 100 points which we define here
           for (unsigned int i=0; i&lt;n_ellipse_points; ++i)
             ellipse_points[i]= Point(ellipse_center(0)+a*cos(i*dtheta),
         			     ellipse_center(1)+b*sin(i*dtheta));
-            
+        
           ArbitraryHole hole_3(ellipse_center, ellipse_points);
-        	
+        
 </pre>
 </div>
 <div class = "comment">
@@ -273,7 +273,7 @@ Create the vector of Hole*'s ...
           holes.push_back(&hole_1);
           holes.push_back(&hole_2);
           holes.push_back(&hole_3);
-        	
+        
 </pre>
 </div>
 <div class = "comment">
@@ -309,26 +309,26 @@ Write the result to file
         
         
         
-        void tetrahedralize_domain()
+        void tetrahedralize_domain(const Parallel::Communicator& comm)
         {
         #ifdef LIBMESH_HAVE_TETGEN
 </pre>
 </div>
 <div class = "comment">
-The algorithm is broken up into several steps: 
+The algorithm is broken up into several steps:
 1.) A convex hull is constructed for a rectangular hole.
 2.) A convex hull is constructed for the domain exterior.
 3.) Neighbor information is updated so TetGen knows there is a convex hull
 4.) A vector of hole points is created.
 5.) The domain is tetrahedralized, the mesh is written out, etc.
-  
+
 
 <br><br>The mesh we will eventually generate
 </div>
 
 <div class ="fragment">
 <pre>
-          SerialMesh mesh(3);
+          SerialMesh mesh(comm,3);
         
 </pre>
 </div>
@@ -350,7 +350,7 @@ Lower and Upper bounding box limits for a rectangular hole within the unit cube.
 <div class ="fragment">
 <pre>
           add_cube_convex_hull_to_mesh(mesh, hole_lower_limit, hole_upper_limit);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -386,7 +386,7 @@ Lower and Upper bounding box limits for a rectangular hole within the unit cube.
 </div>
 <div class = "comment">
 5.) Set parameters and tetrahedralize the domain
-  
+
 
 <br><br>0 means "use TetGen default value"
 </div>
@@ -406,7 +406,7 @@ this size
 <div class ="fragment">
 <pre>
           Real volume_constraint = 0.001;
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -416,10 +416,10 @@ Construct the Delaunay tetrahedralization
 <div class ="fragment">
 <pre>
           TetGenMeshInterface t(mesh);
-          t.triangulate_conformingDelaunayMesh_carvehole(hole, 
-        						 quality_constraint, 
+          t.triangulate_conformingDelaunayMesh_carvehole(hole,
+        						 quality_constraint,
         						 volume_constraint);
-         
+        
 </pre>
 </div>
 <div class = "comment">
@@ -457,7 +457,7 @@ Finally, write out the result
         void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper_limit)
         {
         #ifdef LIBMESH_HAVE_TETGEN
-          SerialMesh cube_mesh(3);
+          SerialMesh cube_mesh(mesh.comm(),3);
         
           unsigned n_elem = 1;
         
@@ -467,7 +467,7 @@ Finally, write out the result
         				    lower_limit(1), upper_limit(1),
         				    lower_limit(2), upper_limit(2),
         				    HEX8);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -479,8 +479,8 @@ of the convex hull.
 <div class ="fragment">
 <pre>
           TetGenMeshInterface t(cube_mesh);
-          t.pointset_convexhull(); 
-          
+          t.pointset_convexhull();
+        
 </pre>
 </div>
 <div class = "comment">
@@ -499,10 +499,10 @@ with a dummy value, later to be assigned a value by the input mesh.
           {
             MeshBase::element_iterator it = cube_mesh.elements_begin();
             const MeshBase::element_iterator end = cube_mesh.elements_end();
-            for ( ; it != end; ++it) 
+            for ( ; it != end; ++it)
               {
         	Elem* elem = *it;
-        	  
+        
         	for (unsigned s=0; s&lt;elem-&gt;n_sides(); ++s)
         	  if (elem-&gt;neighbor(s) == NULL)
         	    {
@@ -515,7 +515,7 @@ Add the node IDs of this side to the set
 <div class ="fragment">
 <pre>
                       AutoPtr&lt;Elem&gt; side = elem-&gt;side(s);
-        		
+        
         	      for (unsigned n=0; n&lt;side-&gt;n_nodes(); ++n)
         		node_id_map.insert( std::make_pair(side-&gt;node(n), /*dummy_value=*/0) );
         	    }
@@ -525,7 +525,7 @@ Add the node IDs of this side to the set
 </pre>
 </div>
 <div class = "comment">
-For each node in the map, insert it into the input mesh and keep 
+For each node in the map, insert it into the input mesh and keep
 track of the ID assigned.
 </div>
 
@@ -573,12 +573,12 @@ Track ID value of new_node in map
 <pre>
               (*it).second = new_node-&gt;id();
             }
-          
+        
 </pre>
 </div>
 <div class = "comment">
 With the points added and the map data structure in place, we are
-ready to add each TRI3 element of the cube_mesh to the input Mesh 
+ready to add each TRI3 element of the cube_mesh to the input Mesh
 with proper node assignments
 </div>
 
@@ -587,7 +587,7 @@ with proper node assignments
           {
             MeshBase::element_iterator       el     = cube_mesh.elements_begin();
             const MeshBase::element_iterator end_el = cube_mesh.elements_end();
-            
+        
             for (; el != end_el; ++el)
               {
         	Elem* old_elem = *el;
@@ -675,8 +675,8 @@ Node pointer assigned from input mesh
   
   using namespace libMesh;
   
-  <B><FONT COLOR="#228B22">void</FONT></B> triangulate_domain();
-  <B><FONT COLOR="#228B22">void</FONT></B> tetrahedralize_domain();
+  <B><FONT COLOR="#228B22">void</FONT></B> triangulate_domain(<B><FONT COLOR="#228B22">const</FONT></B> Parallel::Communicator&amp; comm);
+  <B><FONT COLOR="#228B22">void</FONT></B> tetrahedralize_domain(<B><FONT COLOR="#228B22">const</FONT></B> Parallel::Communicator&amp; comm);
   
   <B><FONT COLOR="#228B22">void</FONT></B> add_cube_convex_hull_to_mesh(MeshBase&amp; mesh, Point lower_limit, Point upper_limit);
   
@@ -691,29 +691,29 @@ Node pointer assigned from input mesh
   
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Triangulating an L-shaped domain with holes&quot;</FONT></B> &lt;&lt; std::endl;
   
-    triangulate_domain();
-    
+    triangulate_domain(init.comm());
+  
     libmesh_example_assert(3 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;3D support&quot;</FONT></B>);
   
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Tetrahedralizing a prismatic domain with a hole&quot;</FONT></B> &lt;&lt; std::endl;
   
-    tetrahedralize_domain();
-    
+    tetrahedralize_domain(init.comm());
+  
     <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
   
   
   
   
-  <B><FONT COLOR="#228B22">void</FONT></B> triangulate_domain()
+  <B><FONT COLOR="#228B22">void</FONT></B> triangulate_domain(<B><FONT COLOR="#228B22">const</FONT></B> Parallel::Communicator&amp; comm)
   {
   #ifdef LIBMESH_HAVE_TRIANGLE
     <B><FONT COLOR="#228B22">typedef</FONT></B> TriangleInterface::Hole Hole;
     <B><FONT COLOR="#228B22">typedef</FONT></B> TriangleInterface::PolygonHole PolygonHole;
     <B><FONT COLOR="#228B22">typedef</FONT></B> TriangleInterface::ArbitraryHole ArbitraryHole;
   
-    Mesh mesh(2);
-      
+    Mesh mesh(comm, 2);
+  
     mesh.add_point(Point( 0. ,  0.));
     mesh.add_point(Point( 0. , -1.));
     mesh.add_point(Point(-1. , -1.));
@@ -729,7 +729,7 @@ Node pointer assigned from input mesh
   
     t.smooth_after_generating() = true;
   
-      
+  
     PolygonHole hole_1(Point(-0.5,  0.5), <I><FONT COLOR="#B22222">// center
 </FONT></I>  		     0.25,              <I><FONT COLOR="#B22222">// radius
 </FONT></I>  		     50);               <I><FONT COLOR="#B22222">// n. points
@@ -749,14 +749,14 @@ Node pointer assigned from input mesh
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_ellipse_points; ++i)
       ellipse_points[i]= Point(ellipse_center(0)+a*cos(i*dtheta),
   			     ellipse_center(1)+b*sin(i*dtheta));
-      
+  
     ArbitraryHole hole_3(ellipse_center, ellipse_points);
-  	
+  
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Hole*&gt; holes;
     holes.push_back(&amp;hole_1);
     holes.push_back(&amp;hole_2);
     holes.push_back(&amp;hole_3);
-  	
+  
     t.attach_hole_list(&amp;holes);
   
     t.triangulate();
@@ -768,17 +768,17 @@ Node pointer assigned from input mesh
   
   
   
-  <B><FONT COLOR="#228B22">void</FONT></B> tetrahedralize_domain()
+  <B><FONT COLOR="#228B22">void</FONT></B> tetrahedralize_domain(<B><FONT COLOR="#228B22">const</FONT></B> Parallel::Communicator&amp; comm)
   {
   #ifdef LIBMESH_HAVE_TETGEN
-    
-    SerialMesh mesh(3);
+  
+    SerialMesh mesh(comm,3);
   
     Point hole_lower_limit(0.2, 0.2, 0.4);
     Point hole_upper_limit(0.8, 0.8, 0.6);
   
     add_cube_convex_hull_to_mesh(mesh, hole_lower_limit, hole_upper_limit);
-    
+  
     add_cube_convex_hull_to_mesh(mesh, Point(0.,0.,0.), Point(1., 1., 1.));
   
     mesh.find_neighbors();
@@ -786,16 +786,16 @@ Node pointer assigned from input mesh
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Point&gt; hole(1);
     hole[0] = Point( 0.5*(hole_lower_limit + hole_upper_limit) );
   
-    
+  
     Real quality_constraint = 2.0;
   
     Real volume_constraint = 0.001;
-    
+  
     TetGenMeshInterface t(mesh);
-    t.triangulate_conformingDelaunayMesh_carvehole(hole, 
-  						 quality_constraint, 
+    t.triangulate_conformingDelaunayMesh_carvehole(hole,
+  						 quality_constraint,
   						 volume_constraint);
-   
+  
     mesh.prepare_for_use();
   
     mesh.write(<B><FONT COLOR="#BC8F8F">&quot;hole_3D.e&quot;</FONT></B>);
@@ -817,7 +817,7 @@ Node pointer assigned from input mesh
   <B><FONT COLOR="#228B22">void</FONT></B> add_cube_convex_hull_to_mesh(MeshBase&amp; mesh, Point lower_limit, Point upper_limit)
   {
   #ifdef LIBMESH_HAVE_TETGEN
-    SerialMesh cube_mesh(3);
+    SerialMesh cube_mesh(mesh.comm(),3);
   
     <B><FONT COLOR="#228B22">unsigned</FONT></B> n_elem = 1;
   
@@ -827,10 +827,10 @@ Node pointer assigned from input mesh
   				    lower_limit(1), upper_limit(1),
   				    lower_limit(2), upper_limit(2),
   				    HEX8);
-    
+  
     TetGenMeshInterface t(cube_mesh);
-    t.pointset_convexhull(); 
-    
+    t.pointset_convexhull();
+  
   
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::map&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B>,<B><FONT COLOR="#228B22">unsigned</FONT></B>&gt; node_id_map;
     <B><FONT COLOR="#228B22">typedef</FONT></B> std::map&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B>,<B><FONT COLOR="#228B22">unsigned</FONT></B>&gt;::iterator iterator;
@@ -838,15 +838,15 @@ Node pointer assigned from input mesh
     {
       <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::element_iterator it = cube_mesh.elements_begin();
       <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::element_iterator end = cube_mesh.elements_end();
-      <B><FONT COLOR="#A020F0">for</FONT></B> ( ; it != end; ++it) 
+      <B><FONT COLOR="#A020F0">for</FONT></B> ( ; it != end; ++it)
         {
   	Elem* elem = *it;
-  	  
+  
   	<B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> s=0; s&lt;elem-&gt;n_sides(); ++s)
   	  <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
   	    {
   	      AutoPtr&lt;Elem&gt; side = elem-&gt;side(s);
-  		
+  
   	      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> n=0; n&lt;side-&gt;n_nodes(); ++n)
   		node_id_map.insert( std::make_pair(side-&gt;node(n), <I><FONT COLOR="#B22222">/*dummy_value=*/</FONT></I>0) );
   	    }
@@ -863,11 +863,11 @@ Node pointer assigned from input mesh
   
         (*it).second = new_node-&gt;id();
       }
-    
+  
     {
       <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::element_iterator       el     = cube_mesh.elements_begin();
       <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::element_iterator end_el = cube_mesh.elements_end();
-      
+  
       <B><FONT COLOR="#A020F0">for</FONT></B> (; el != end_el; ++el)
         {
   	Elem* old_elem = *el;
@@ -899,132 +899,41 @@ Node pointer assigned from input mesh
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+make[4]: Entering directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/miscellaneous/miscellaneous_ex6'
 ***************************************************************
 * Running Example miscellaneous_ex6:
-*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
  
 Triangulating an L-shaped domain with holes
 Tetrahedralizing a prismatic domain with a hole
-************************************************************************************************************************
-***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
-************************************************************************************************************************
 
----------------------------------------------- PETSc Performance Summary: ----------------------------------------------
-
-/workspace/libmesh/examples/miscellaneous/miscellaneous_ex6/.libs/lt-example-devel on a intel-12. named hbar.ices.utexas.edu with 12 processors, by benkirk Thu Jan 31 22:10:22 2013
-Using Petsc Release Version 3.3.0, Patch 2, Fri Jul 13 15:42:00 CDT 2012 
-
-                         Max       Max/Min        Avg      Total 
-Time (sec):           3.338e-01      1.00000   3.338e-01
-Objects:              1.000e+00      1.00000   1.000e+00
-Flops:                0.000e+00      0.00000   0.000e+00  0.000e+00
-Flops/sec:            0.000e+00      0.00000   0.000e+00  0.000e+00
-MPI Messages:         0.000e+00      0.00000   0.000e+00  0.000e+00
-MPI Message Lengths:  0.000e+00      0.00000   0.000e+00  0.000e+00
-MPI Reductions:       1.000e+00      1.00000
-
-Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
-                            e.g., VecAXPY() for real vectors of length N --> 2N flops
-                            and VecAXPY() for complex vectors of length N --> 8N flops
-
-Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
-                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 3.3373e-01 100.0%  0.0000e+00   0.0%  0.000e+00   0.0%  0.000e+00        0.0%  0.000e+00   0.0% 
-
-------------------------------------------------------------------------------------------------------------------------
-See the 'Profiling' chapter of the users' manual for details on interpreting output.
-Phase summary info:
-   Count: number of times phase was executed
-   Time and Flops: Max - maximum over all processors
-                   Ratio - ratio of maximum to minimum over all processors
-   Mess: number of messages sent
-   Avg. len: average message length
-   Reduct: number of global reductions
-   Global: entire computation
-   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
-      %T - percent time in this phase         %f - percent flops in this phase
-      %M - percent messages in this phase     %L - percent message lengths in this phase
-      %R - percent reductions in this phase
-   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
-------------------------------------------------------------------------------------------------------------------------
-Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
-                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %f %M %L %R  %T %f %M %L %R Mflop/s
-------------------------------------------------------------------------------------------------------------------------
-
---- Event Stage 0: Main Stage
-
-------------------------------------------------------------------------------------------------------------------------
-
-Memory usage is given in bytes:
-
-Object Type          Creations   Destructions     Memory  Descendants' Mem.
-Reports information only for process 0.
-
---- Event Stage 0: Main Stage
-
-              Viewer     1              0            0     0
-========================================================================================================================
-Average time to get PetscTime(): 0
-Average time for MPI_Barrier(): 8.01086e-06
-Average time for zero size MPI_Send(): 1.60933e-05
-#PETSc Option Table entries:
--ksp_right_pc
--log_summary
--pc_type bjacobi
--sub_pc_factor_levels 4
--sub_pc_factor_zeropivot 0
--sub_pc_type ilu
-#End of PETSc Option Table entries
-Compiled without FORTRAN kernels
-Compiled with full precision matrices (default)
-sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
-Configure run at: Thu Nov  8 11:21:02 2012
-Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared-libraries=1 --with-mpi-dir=/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1 --with-mumps=true --download-mumps=1 --with-metis=true --download-metis=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_intel_lp64.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_sequential.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_core.so]" --with-lapack-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_lapack95_lp64.a]"
------------------------------------------
-Libraries compiled on Thu Nov  8 11:21:02 2012 on daedalus.ices.utexas.edu 
-Machine characteristics: Linux-2.6.32-279.1.1.el6.x86_64-x86_64-with-redhat-6.3-Carbon
-Using PETSc directory: /opt/apps/ossw/libraries/petsc/petsc-3.3-p2
-Using PETSc arch: intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt
------------------------------------------
-
-Using C compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx  -wd1572 -O3   -fPIC   ${COPTFLAGS} ${CFLAGS}
-Using Fortran compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90  -fPIC -O3   ${FOPTFLAGS} ${FFLAGS} 
------------------------------------------
-
-Using include paths: -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/include
------------------------------------------
-
-Using C linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx
-Using Fortran linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90
-Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lpetsc -lX11 -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lHYPRE -lpthread -lsuperlu_dist_3.0 -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.3 -Wl,-rpath,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -L/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,-rpath,/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -L/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -Wl,-rpath,/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -L/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lcilkrts -lstdc++ -lgcc_s -lirc -lirc_s -ldl 
------------------------------------------
-
-
- ----------------------------------------------------------------------------------------------------------------------
-| Processor id:   0                                                                                                    |
-| Num Processors: 12                                                                                                   |
-| Time:           Thu Jan 31 22:10:22 2013                                                                             |
-| OS:             Linux                                                                                                |
-| HostName:       hbar.ices.utexas.edu                                                                                 |
-| OS Release:     2.6.32-279.1.1.el6.x86_64                                                                            |
-| OS Version:     #1 SMP Tue Jul 10 11:24:23 CDT 2012                                                                  |
-| Machine:        x86_64                                                                                               |
-| Username:       benkirk                                                                                              |
-| Configuration:  ./configure  '--enable-everything'                                                                   |
-|  '--prefix=/workspace/libmesh/install'                                                                               |
-|  'CXX=icpc'                                                                                                          |
-|  'CC=icc'                                                                                                            |
-|  'FC=ifort'                                                                                                          |
-|  'F77=ifort'                                                                                                         |
-|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                             |
-|  'PETSC_ARCH=intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
-|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                        |
-|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/intel-12.1/mpich2-1.4.1p1/mkl-intel-10.3.12.361'|
-|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/intel-12.1'                                                    |
- ----------------------------------------------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Processor id:   0                                                                                                 |
+| Num Processors: 4                                                                                                 |
+| Time:           Fri Apr 19 11:51:25 2013                                                                          |
+| OS:             Linux                                                                                             |
+| HostName:       spark.ices.utexas.edu                                                                             |
+| OS Release:     2.6.32-279.22.1.el6.x86_64                                                                        |
+| OS Version:     #1 SMP Tue Feb 5 14:33:39 CST 2013                                                                |
+| Machine:        x86_64                                                                                            |
+| Username:       roystgnr                                                                                          |
+| Configuration:  ../configure  '--enable-everything'                                                               |
+|  'METHODS=devel'                                                                                                  |
+|  '--prefix=/h2/roystgnr/libmesh-test'                                                                             |
+|  'CXX=distcc /usr/bin/g++'                                                                                        |
+|  'CC=distcc /usr/bin/gcc'                                                                                         |
+|  'FC=distcc /usr/bin/gfortran'                                                                                    |
+|  'F77=distcc /usr/bin/gfortran'                                                                                   |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                          |
+|  'PETSC_ARCH=gcc-system-mkl-gf-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                     |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/gcc-system/mpich2-1.4.1p1/mkl-gf-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/gcc-system'                                                 |
+|  'HDF5_DIR=/opt/apps/ossw/libraries/hdf5/hdf5-1.8.9/sl6/gcc-system'                                               |
+ -------------------------------------------------------------------------------------------------------------------
  -----------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.384824, Active time=0.236021                                            |
+| libMesh Performance: Alive time=0.269246, Active time=0.133998                                            |
  -----------------------------------------------------------------------------------------------------------
 | Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -1032,51 +941,52 @@ Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12
 |                                                                                                           |
 |                                                                                                           |
 | Mesh                                                                                                      |
-|   find_neighbors()            5         0.0493      0.009866    0.0515      0.010304    20.90    21.83    |
-|   renumber_nodes_and_elem()   6         0.0015      0.000256    0.0015      0.000256    0.65     0.65     |
-|   write()                     2         0.0164      0.008207    0.0167      0.008356    6.95     7.08     |
+|   find_neighbors()            5         0.0081      0.001623    0.0086      0.001712    6.06     6.39     |
+|   renumber_nodes_and_elem()   6         0.0004      0.000072    0.0004      0.000072    0.32     0.32     |
+|   write()                     2         0.0735      0.036749    0.0737      0.036837    54.85    54.98    |
 |                                                                                                           |
 | MeshCommunication                                                                                         |
-|   compute_hilbert_indices()   2         0.0315      0.015730    0.0315      0.015730    13.33    13.33    |
-|   find_global_indices()       2         0.0111      0.005563    0.0488      0.024403    4.71     20.68    |
-|   parallel_sort()             2         0.0037      0.001871    0.0046      0.002289    1.59     1.94     |
+|   compute_hilbert_indices()   2         0.0165      0.008250    0.0165      0.008250    12.31    12.31    |
+|   find_global_indices()       2         0.0021      0.001046    0.0195      0.009739    1.56     14.54    |
+|   parallel_sort()             2         0.0006      0.000277    0.0006      0.000316    0.41     0.47     |
 |                                                                                                           |
 | MeshTools::Generation                                                                                     |
-|   build_cube()                2         0.0003      0.000128    0.0003      0.000128    0.11     0.11     |
+|   build_cube()                2         0.0001      0.000048    0.0001      0.000048    0.07     0.07     |
 |                                                                                                           |
 | MetisPartitioner                                                                                          |
-|   partition()                 1         0.1018      0.101809    0.1257      0.125685    43.14    53.25    |
+|   partition()                 1         0.0278      0.027838    0.0374      0.037440    20.77    27.94    |
 |                                                                                                           |
 | Parallel                                                                                                  |
-|   allgather()                 6         0.0006      0.000105    0.0008      0.000127    0.27     0.32     |
-|   broadcast()                 2         0.0000      0.000010    0.0000      0.000010    0.01     0.01     |
-|   max(scalar)                 129       0.0013      0.000010    0.0013      0.000010    0.54     0.54     |
-|   max(vector)                 31        0.0005      0.000017    0.0014      0.000046    0.22     0.60     |
-|   min(bool)                   153       0.0014      0.000009    0.0014      0.000009    0.59     0.59     |
-|   min(scalar)                 124       0.0059      0.000048    0.0059      0.000048    2.50     2.50     |
-|   min(vector)                 31        0.0006      0.000020    0.0018      0.000058    0.26     0.76     |
-|   probe()                     110       0.0008      0.000008    0.0008      0.000008    0.36     0.36     |
-|   receive()                   110       0.0007      0.000007    0.0016      0.000015    0.31     0.68     |
-|   send()                      110       0.0004      0.000003    0.0004      0.000003    0.16     0.16     |
-|   send_receive()              114       0.0009      0.000008    0.0033      0.000029    0.37     1.39     |
-|   sum()                       6         0.0004      0.000075    0.0008      0.000139    0.19     0.35     |
+|   allgather()                 6         0.0002      0.000026    0.0002      0.000037    0.11     0.17     |
+|   broadcast()                 2         0.0000      0.000005    0.0000      0.000005    0.01     0.01     |
+|   max(scalar)                 129       0.0006      0.000005    0.0006      0.000005    0.45     0.45     |
+|   max(vector)                 31        0.0002      0.000007    0.0006      0.000018    0.16     0.42     |
+|   min(bool)                   153       0.0005      0.000004    0.0005      0.000004    0.40     0.40     |
+|   min(scalar)                 124       0.0010      0.000008    0.0010      0.000008    0.72     0.72     |
+|   min(vector)                 31        0.0003      0.000008    0.0006      0.000020    0.19     0.46     |
+|   probe()                     30        0.0001      0.000003    0.0001      0.000003    0.07     0.07     |
+|   receive()                   30        0.0001      0.000003    0.0002      0.000006    0.07     0.14     |
+|   send()                      30        0.0001      0.000002    0.0001      0.000002    0.05     0.05     |
+|   send_receive()              34        0.0001      0.000004    0.0004      0.000013    0.10     0.33     |
+|   sum()                       6         0.0001      0.000008    0.0001      0.000013    0.04     0.06     |
 |                                                                                                           |
 | Parallel::Request                                                                                         |
-|   wait()                      110       0.0003      0.000003    0.0003      0.000003    0.14     0.14     |
+|   wait()                      30        0.0000      0.000002    0.0000      0.000002    0.03     0.03     |
 |                                                                                                           |
 | Partitioner                                                                                               |
-|   set_node_processor_ids()    1         0.0028      0.002846    0.0047      0.004729    1.21     2.00     |
-|   set_parent_processor_ids()  1         0.0035      0.003460    0.0035      0.003460    1.47     1.47     |
-|   single_partition()          2         0.0001      0.000029    0.0001      0.000029    0.02     0.02     |
+|   set_node_processor_ids()    1         0.0011      0.001115    0.0013      0.001277    0.83     0.95     |
+|   set_parent_processor_ids()  1         0.0005      0.000508    0.0005      0.000508    0.38     0.38     |
+|   single_partition()          2         0.0000      0.000006    0.0000      0.000006    0.01     0.01     |
  -----------------------------------------------------------------------------------------------------------
-| Totals:                       1062      0.2360                                          100.00            |
+| Totals:                       662       0.1340                                          100.00            |
  -----------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example miscellaneous_ex6:
-*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
+make[4]: Leaving directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/miscellaneous/miscellaneous_ex6'
 </pre>
 </div>
 <?php make_footer() ?>

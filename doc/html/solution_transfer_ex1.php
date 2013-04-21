@@ -41,7 +41,7 @@ Bring in everything from the libMesh namespace
         
         
         Number initial_value(const Point& p,
-                             const Parameters& parameters,
+                             const Parameters& /* parameters */,
                              const std::string&,
                              const std::string&)
         {
@@ -62,10 +62,10 @@ Bring in everything from the libMesh namespace
         
         #ifdef LIBMESH_HAVE_DTK
         
-          Mesh from_mesh;
+          Mesh from_mesh(init.comm());
           MeshTools::Generation::build_cube(from_mesh, 4, 4, 4, 0, 1, 0, 1, 0, 1, HEX8);
-          from_mesh.print_info();  
-          EquationSystems from_es(from_mesh);  
+          from_mesh.print_info();
+          EquationSystems from_es(from_mesh);
           System & from_sys = from_es.add_system&lt;ExplicitSystem&gt;("From");
           unsigned int from_var = from_sys.add_variable("from");
           from_sys.attach_init_function(initialize);
@@ -75,8 +75,8 @@ Bring in everything from the libMesh namespace
         
           Mesh to_mesh;
           MeshTools::Generation::build_cube(to_mesh, 5, 5, 5, 0, 1, 0, 1, 0, 1, TET4);
-          to_mesh.print_info();  
-          EquationSystems to_es(to_mesh);  
+          to_mesh.print_info();
+          EquationSystems to_es(to_mesh);
           System & to_sys = to_es.add_system&lt;ExplicitSystem&gt;("To");
           unsigned int to_var = to_sys.add_variable("to");
           to_es.init();
@@ -84,12 +84,12 @@ Bring in everything from the libMesh namespace
           DTKSolutionTransfer dtk_transfer;
         
           dtk_transfer.transfer(from_sys.variable(from_var), to_sys.variable(to_var));
-          
+        
           to_es.update();
           ExodusII_IO(to_mesh).write_equation_systems("to.e", to_es);
-          
+        
         #endif
-          
+        
           return 0;
         }
 </pre>
@@ -114,7 +114,7 @@ Bring in everything from the libMesh namespace
   
   
   Number initial_value(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
-                       <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp; parameters,
+                       <B><FONT COLOR="#228B22">const</FONT></B> Parameters&amp; <I><FONT COLOR="#B22222">/* parameters */</FONT></I>,
                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;,
                        <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp;)
   {
@@ -135,10 +135,10 @@ Bring in everything from the libMesh namespace
   
   #ifdef LIBMESH_HAVE_DTK
   
-    Mesh from_mesh;
+    Mesh from_mesh(init.comm());
     <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube(from_mesh, 4, 4, 4, 0, 1, 0, 1, 0, 1, HEX8);
-    from_mesh.print_info();  
-    EquationSystems from_es(from_mesh);  
+    from_mesh.print_info();
+    EquationSystems from_es(from_mesh);
     System &amp; from_sys = from_es.add_system&lt;ExplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;From&quot;</FONT></B>);
     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> from_var = from_sys.add_variable(<B><FONT COLOR="#BC8F8F">&quot;from&quot;</FONT></B>);
     from_sys.attach_init_function(initialize);
@@ -148,8 +148,8 @@ Bring in everything from the libMesh namespace
   
     Mesh to_mesh;
     <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube(to_mesh, 5, 5, 5, 0, 1, 0, 1, 0, 1, TET4);
-    to_mesh.print_info();  
-    EquationSystems to_es(to_mesh);  
+    to_mesh.print_info();
+    EquationSystems to_es(to_mesh);
     System &amp; to_sys = to_es.add_system&lt;ExplicitSystem&gt;(<B><FONT COLOR="#BC8F8F">&quot;To&quot;</FONT></B>);
     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> to_var = to_sys.add_variable(<B><FONT COLOR="#BC8F8F">&quot;to&quot;</FONT></B>);
     to_es.init();
@@ -157,51 +157,51 @@ Bring in everything from the libMesh namespace
     DTKSolutionTransfer dtk_transfer;
   
     dtk_transfer.transfer(from_sys.variable(from_var), to_sys.variable(to_var));
-    
+  
     to_es.update();
     ExodusII_IO(to_mesh).write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;to.e&quot;</FONT></B>, to_es);
-    
+  
   #endif
-    
+  
     <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+make[4]: Entering directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/solution_transfer/solution_transfer_ex1'
 ***************************************************************
 * Running Example solution_transfer_ex1:
-*  mpirun -np 2 example-dbg  
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
  
 
- ---------------------------------------------------------------------------- 
-| Reference count information                                                |
- ---------------------------------------------------------------------------- 
-| N7libMesh4ElemE reference count information:
-|  Creations:    1
-|  Destructions: 1
-| N7libMesh9DofObjectE reference count information:
-|  Creations:    1
-|  Destructions: 1
- ---------------------------------------------------------------------------- 
-
- -------------------------------------------------------------
-| Processor id:   0                                           |
-| Num Processors: 2                                           |
-| Time:           Fri Feb  1 09:31:25 2013                    |
-| OS:             Linux                                       |
-| HostName:       lkirk-home                                  |
-| OS Release:     3.2.0-35-generic                            |
-| OS Version:     #55-Ubuntu SMP Wed Dec 5 17:42:16 UTC 2012  |
-| Machine:        x86_64                                      |
-| Username:       benkirk                                     |
-| Configuration:  ./configure  '--prefix=/home/benkirk/codes/install'|
-|  '--disable-glibcxx-debugging'                              |
-|  '--enable-everything'                                      |
- -------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Processor id:   0                                                                                                 |
+| Num Processors: 4                                                                                                 |
+| Time:           Fri Apr 19 11:50:29 2013                                                                          |
+| OS:             Linux                                                                                             |
+| HostName:       spark.ices.utexas.edu                                                                             |
+| OS Release:     2.6.32-279.22.1.el6.x86_64                                                                        |
+| OS Version:     #1 SMP Tue Feb 5 14:33:39 CST 2013                                                                |
+| Machine:        x86_64                                                                                            |
+| Username:       roystgnr                                                                                          |
+| Configuration:  ../configure  '--enable-everything'                                                               |
+|  'METHODS=devel'                                                                                                  |
+|  '--prefix=/h2/roystgnr/libmesh-test'                                                                             |
+|  'CXX=distcc /usr/bin/g++'                                                                                        |
+|  'CC=distcc /usr/bin/gcc'                                                                                         |
+|  'FC=distcc /usr/bin/gfortran'                                                                                    |
+|  'F77=distcc /usr/bin/gfortran'                                                                                   |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                          |
+|  'PETSC_ARCH=gcc-system-mkl-gf-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                     |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/gcc-system/mpich2-1.4.1p1/mkl-gf-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/gcc-system'                                                 |
+|  'HDF5_DIR=/opt/apps/ossw/libraries/hdf5/hdf5-1.8.9/sl6/gcc-system'                                               |
+ -------------------------------------------------------------------------------------------------------------------
  -----------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.05201, Active time=0.00031                                              |
+| libMesh Performance: Alive time=0.053403, Active time=0.002006                                            |
  -----------------------------------------------------------------------------------------------------------
 | Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -209,73 +209,21 @@ Bring in everything from the libMesh namespace
 |                                                                                                           |
 |                                                                                                           |
 | Parallel                                                                                                  |
-|   max(scalar)                 8         0.0001      0.000007    0.0001      0.000007    17.10    17.10    |
-|   max(vector)                 2         0.0000      0.000015    0.0001      0.000035    9.68     22.58    |
-|   min(bool)                   10        0.0001      0.000007    0.0001      0.000007    22.90    22.90    |
-|   min(scalar)                 8         0.0001      0.000015    0.0001      0.000015    38.06    38.06    |
-|   min(vector)                 2         0.0000      0.000019    0.0001      0.000042    12.26    27.10    |
+|   max(scalar)                 8         0.0004      0.000049    0.0004      0.000049    19.54    19.54    |
+|   max(vector)                 2         0.0001      0.000045    0.0004      0.000188    4.54     18.79    |
+|   min(bool)                   10        0.0004      0.000044    0.0004      0.000044    21.88    21.88    |
+|   min(scalar)                 8         0.0009      0.000112    0.0009      0.000112    44.77    44.77    |
+|   min(vector)                 2         0.0002      0.000093    0.0005      0.000228    9.27     22.73    |
  -----------------------------------------------------------------------------------------------------------
-| Totals:                       30        0.0003                                          100.00            |
- -----------------------------------------------------------------------------------------------------------
-
- 
-***************************************************************
-* Done Running Example solution_transfer_ex1:
-*  mpirun -np 2 example-dbg  
-***************************************************************
-***************************************************************
-* Running Example solution_transfer_ex1:
-*  mpirun -np 2 example-devel  
-***************************************************************
- 
-
- -------------------------------------------------------------
-| Processor id:   0                                           |
-| Num Processors: 2                                           |
-| Time:           Fri Feb  1 09:31:26 2013                    |
-| OS:             Linux                                       |
-| HostName:       lkirk-home                                  |
-| OS Release:     3.2.0-35-generic                            |
-| OS Version:     #55-Ubuntu SMP Wed Dec 5 17:42:16 UTC 2012  |
-| Machine:        x86_64                                      |
-| Username:       benkirk                                     |
-| Configuration:  ./configure  '--prefix=/home/benkirk/codes/install'|
-|  '--disable-glibcxx-debugging'                              |
-|  '--enable-everything'                                      |
- -------------------------------------------------------------
- -----------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.044522, Active time=0.000148                                            |
- -----------------------------------------------------------------------------------------------------------
-| Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
-|                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
-|-----------------------------------------------------------------------------------------------------------|
-|                                                                                                           |
-|                                                                                                           |
-| Parallel                                                                                                  |
-|   max(scalar)                 8         0.0000      0.000003    0.0000      0.000003    16.22    16.22    |
-|   max(vector)                 2         0.0000      0.000005    0.0000      0.000014    6.76     18.92    |
-|   min(bool)                   10        0.0000      0.000003    0.0000      0.000003    22.30    22.30    |
-|   min(scalar)                 8         0.0001      0.000009    0.0001      0.000009    46.62    46.62    |
-|   min(vector)                 2         0.0000      0.000006    0.0000      0.000015    8.11     20.27    |
- -----------------------------------------------------------------------------------------------------------
-| Totals:                       30        0.0001                                          100.00            |
+| Totals:                       30        0.0020                                          100.00            |
  -----------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example solution_transfer_ex1:
-*  mpirun -np 2 example-devel  
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
-***************************************************************
-* Running Example solution_transfer_ex1:
-*  mpirun -np 2 example-opt  
-***************************************************************
- 
- 
-***************************************************************
-* Done Running Example solution_transfer_ex1:
-*  mpirun -np 2 example-opt  
-***************************************************************
+make[4]: Leaving directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/solution_transfer/solution_transfer_ex1'
 </pre>
 </div>
 <?php make_footer() ?>

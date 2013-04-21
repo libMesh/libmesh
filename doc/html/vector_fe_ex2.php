@@ -30,8 +30,8 @@
           LaplaceExactSolution(){}
         
           ~LaplaceExactSolution(){}
-          
-          Real operator()( unsigned int component, 
+        
+          Real operator()( unsigned int component,
         		   Real x, Real y, Real z = 0.0)
           {
             const Real hp = 0.5*pi;
@@ -60,8 +60,8 @@
           LaplaceExactGradient(){}
         
           ~LaplaceExactGradient(){}
-          
-          RealGradient operator()( unsigned int component, 
+        
+          RealGradient operator()( unsigned int component,
         			   Real x, Real y, Real z = 0.0)
           {
             const Real hp = 0.5*pi;
@@ -137,7 +137,7 @@ Constructor
           LaplaceSystem( EquationSystems& es,
         		 const std::string& name,
         		 const unsigned int number);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -147,7 +147,7 @@ System initialization
 <div class ="fragment">
 <pre>
           virtual void init_data ();
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -157,7 +157,7 @@ Context initialization
 <div class ="fragment">
 <pre>
           virtual void init_context(DiffContext &context);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -169,7 +169,7 @@ Time dependent parts
 <pre>
           virtual bool element_time_derivative (bool request_jacobian,
                                                 DiffContext& context);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -195,7 +195,7 @@ Indices for each variable;
           unsigned int u_var;
         
           void init_dirichlet_bcs();
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -205,7 +205,7 @@ Returns the value of a forcing function at point p.
 <div class ="fragment">
 <pre>
           RealGradient forcing(const Point& p);
-          
+        
           LaplaceExactSolution exact_solution;
         };
         
@@ -259,11 +259,11 @@ contiguously.
             output(_u_var+2) = soln( 2, x, y, z );
           }
         
-          virtual Number component( unsigned int component, const Point& p,
+          virtual Number component( unsigned int component_in, const Point& p,
         			    const Real )
           {
             const Real x=p(0), y=p(1), z=p(2);
-            return soln( component, x, y, z );
+            return soln( component_in, x, y, z );
           }
         
           virtual AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; clone() const
@@ -306,11 +306,11 @@ through templating, but I'm being lazy.
             output(_u_var+2) = soln( 2, x, y, z );
           }
         
-          virtual Gradient component( unsigned int component, const Point& p,
+          virtual Gradient component( unsigned int component_in, const Point& p,
         			    const Real )
           {
             const Real x=p(0), y=p(1), z=p(2);
-            return soln( component, x, y, z );
+            return soln( component_in, x, y, z );
           }
         
           virtual AutoPtr&lt;FunctionBase&lt;Gradient&gt; &gt; clone() const
@@ -358,9 +358,9 @@ Bring in everything from the libMesh namespace
         using namespace libMesh;
         
         LaplaceSystem::LaplaceSystem( EquationSystems& es,
-        			      const std::string& name,
-        			      const unsigned int number)
-          : FEMSystem(es, name, number)
+        			      const std::string& name_in,
+        			      const unsigned int number_in)
+          : FEMSystem(es, name_in, number_in)
         {
           return;
         }
@@ -453,7 +453,7 @@ Get finite element object
 <pre>
           FEGenericBase&lt;RealGradient&gt;* fe;
           c.get_element_fe&lt;RealGradient&gt;( u_var, fe );
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -491,7 +491,7 @@ Get finite element object
 <pre>
           FEGenericBase&lt;RealGradient&gt;* fe = NULL;
           c.get_element_fe&lt;RealGradient&gt;( u_var, fe );
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -526,7 +526,7 @@ quadrature points.
 <div class ="fragment">
 <pre>
           const std::vector&lt;std::vector&lt;RealTensor&gt; &gt;& grad_phi = fe-&gt;get_dphi();
-         
+        
           const std::vector&lt;Point&gt;& qpoint = fe-&gt;get_xyz();
         
 </pre>
@@ -542,7 +542,7 @@ The number of local degrees of freedom in each variable
           DenseSubMatrix&lt;Number&gt; &Kuu = *c.elem_subjacobians[u_var][u_var];
         
           DenseSubVector&lt;Number&gt; &Fu = *c.elem_subresiduals[u_var];
-              
+        
 </pre>
 </div>
 <div class = "comment">
@@ -561,7 +561,7 @@ weight functions.
           for (unsigned int qp=0; qp != n_qpoints; qp++)
             {
               Tensor grad_u;
-              
+        
               c.interior_gradient( u_var, qp, grad_u );
         
         
@@ -602,12 +602,12 @@ Matrix contributions for the uu and vv couplings.
                       for (unsigned int j=0; j != n_u_dofs; j++)
                         {
                           Kuu(i,j) += grad_phi[j][qp].contract(grad_phi[i][qp])*JxW[qp];
-                         
+        
         		}
         	    }
                 }
             } // end of the quadrature point qp-loop
-          
+        
           return request_jacobian;
         }
         
@@ -627,7 +627,7 @@ Get finite element object
 <pre>
           FEGenericBase&lt;RealGradient&gt;* side_fe = NULL;
           c.get_side_fe&lt;RealGradient&gt;( u_var, side_fe );
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -684,14 +684,14 @@ in the discussion above.
             {
               Gradient u;
               c.side_value( u_var, qp, u );
-         
+        
               Gradient u_exact( this-&gt;exact_solution( 0, qpoint[qp](0), qpoint[qp](1) ),
         			this-&gt;exact_solution( 1, qpoint[qp](0), qpoint[qp](1) ));
         
               for (unsigned int i=0; i != n_u_dofs; i++)
         	{
         	  Fu(i) += penalty*(u - u_exact)*phi[i][qp]*JxW[qp];
-        	  
+        
         	  if (request_jacobian)
         	    {
         	      for (unsigned int j=0; j != n_u_dofs; j++)
@@ -707,7 +707,7 @@ in the discussion above.
         RealGradient LaplaceSystem::forcing( const Point& p )
         {
           Real x = p(0); Real y = p(1); Real z = p(2);
-          
+        
           const Real eps = 1.e-3;
         
           const Real fx = -(exact_solution(0,x,y,z-eps) +
@@ -717,7 +717,7 @@ in the discussion above.
         		    exact_solution(0,x-eps,y,z) +
         		    exact_solution(0,x+eps,y,z) -
         		    6.*exact_solution(0,x,y,z))/eps/eps;
-          
+        
           const Real fy = -(exact_solution(1,x,y,z-eps) +
         		    exact_solution(1,x,y,z+eps) +
         		    exact_solution(1,x,y-eps,z) +
@@ -733,7 +733,7 @@ in the discussion above.
         		    exact_solution(2,x-eps,y,z) +
         		    exact_solution(2,x+eps,y,z) -
         		    6.*exact_solution(2,x,y,z))/eps/eps;
-          
+        
           return RealGradient( fx, fy, fz );
         }
 </pre>
@@ -838,13 +838,14 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
 </pre>
 </div>
 <div class = "comment">
-Create a mesh.
+Create a mesh, with dimension to be overridden later, on the
+default MPI communicator.
 </div>
 
 <div class ="fragment">
 <pre>
-          Mesh mesh;
-          
+          Mesh mesh(init.comm());
+        
 </pre>
 </div>
 <div class = "comment">
@@ -894,7 +895,7 @@ Declare the system "Navier-Stokes" and its variables.
 
 <div class ="fragment">
 <pre>
-          LaplaceSystem & system = 
+          LaplaceSystem & system =
             equation_systems.add_system&lt;LaplaceSystem&gt; ("Laplace");
         
 </pre>
@@ -937,7 +938,7 @@ And the nonlinear solver options
             infile("relative_residual_tolerance", 0.0);
           solver.absolute_residual_tolerance =
             infile("absolute_residual_tolerance", 0.0);
-            
+        
 </pre>
 </div>
 <div class = "comment">
@@ -964,7 +965,7 @@ Print information about the system to the screen.
           system.solve();
         
           ExactSolution exact_sol( equation_systems );
-          
+        
           std::vector&lt;FunctionBase&lt;Number&gt;* &gt; sols;
           std::vector&lt;FunctionBase&lt;Gradient&gt;* &gt; grads;
         
@@ -973,7 +974,7 @@ Print information about the system to the screen.
         
           exact_sol.attach_exact_values(sols);
           exact_sol.attach_exact_derivs(grads);
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -994,7 +995,7 @@ Compute the error.
 <div class ="fragment">
 <pre>
           exact_sol.compute_error("Laplace", "u");
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1009,9 +1010,9 @@ Print out the error values
           std::cout &lt;&lt; "H1-Error is: "
         	    &lt;&lt; exact_sol.h1_error("Laplace", "u")
         	    &lt;&lt; std::endl;
-          
+        
         #ifdef LIBMESH_HAVE_EXODUS_API
-          
+        
 </pre>
 </div>
 <div class = "comment">
@@ -1021,7 +1022,7 @@ We write the file in the ExodusII format.
 <div class ="fragment">
 <pre>
           ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
-          
+        
         #endif // #ifdef LIBMESH_HAVE_EXODUS_API
         
           UCDIO(mesh).write_equation_systems("out.inp", equation_systems);
@@ -1029,7 +1030,7 @@ We write the file in the ExodusII format.
 </pre>
 </div>
 <div class = "comment">
-All done.  
+All done.
 </div>
 
 <div class ="fragment">
@@ -1055,8 +1056,8 @@ All done.
     LaplaceExactSolution(){}
   
     ~LaplaceExactSolution(){}
-    
-    Real <B><FONT COLOR="#A020F0">operator</FONT></B>()( <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> component, 
+  
+    Real <B><FONT COLOR="#A020F0">operator</FONT></B>()( <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> component,
   		   Real x, Real y, Real z = 0.0)
     {
       <B><FONT COLOR="#228B22">const</FONT></B> Real hp = 0.5*pi;
@@ -1085,8 +1086,8 @@ All done.
     LaplaceExactGradient(){}
   
     ~LaplaceExactGradient(){}
-    
-    RealGradient <B><FONT COLOR="#A020F0">operator</FONT></B>()( <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> component, 
+  
+    RealGradient <B><FONT COLOR="#A020F0">operator</FONT></B>()( <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> component,
   			   Real x, Real y, Real z = 0.0)
     {
       <B><FONT COLOR="#228B22">const</FONT></B> Real hp = 0.5*pi;
@@ -1139,14 +1140,14 @@ All done.
     LaplaceSystem( EquationSystems&amp; es,
   		 <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name,
   		 <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number);
-    
+  
     <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_data ();
-    
+  
     <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_context(DiffContext &amp;context);
-    
+  
     <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> element_time_derivative (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
                                           DiffContext&amp; context);
-    
+  
     <I><FONT COLOR="#B22222">/*
     virtual bool side_constraint (bool request_jacobian,
   				DiffContext&amp; context);
@@ -1156,9 +1157,9 @@ All done.
     <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var;
   
     <B><FONT COLOR="#228B22">void</FONT></B> init_dirichlet_bcs();
-    
+  
     RealGradient forcing(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p);
-    
+  
     LaplaceExactSolution exact_solution;
   };
   
@@ -1197,11 +1198,11 @@ All done.
       output(_u_var+2) = soln( 2, x, y, z );
     }
   
-    <B><FONT COLOR="#228B22">virtual</FONT></B> Number component( <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> component, <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+    <B><FONT COLOR="#228B22">virtual</FONT></B> Number component( <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> component_in, <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
   			    <B><FONT COLOR="#228B22">const</FONT></B> Real )
     {
       <B><FONT COLOR="#228B22">const</FONT></B> Real x=p(0), y=p(1), z=p(2);
-      <B><FONT COLOR="#A020F0">return</FONT></B> soln( component, x, y, z );
+      <B><FONT COLOR="#A020F0">return</FONT></B> soln( component_in, x, y, z );
     }
   
     <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; clone() <B><FONT COLOR="#228B22">const</FONT></B>
@@ -1235,11 +1236,11 @@ All done.
       output(_u_var+2) = soln( 2, x, y, z );
     }
   
-    <B><FONT COLOR="#228B22">virtual</FONT></B> Gradient component( <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> component, <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+    <B><FONT COLOR="#228B22">virtual</FONT></B> Gradient component( <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> component_in, <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
   			    <B><FONT COLOR="#228B22">const</FONT></B> Real )
     {
       <B><FONT COLOR="#228B22">const</FONT></B> Real x=p(0), y=p(1), z=p(2);
-      <B><FONT COLOR="#A020F0">return</FONT></B> soln( component, x, y, z );
+      <B><FONT COLOR="#A020F0">return</FONT></B> soln( component_in, x, y, z );
     }
   
     <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;FunctionBase&lt;Gradient&gt; &gt; clone() <B><FONT COLOR="#228B22">const</FONT></B>
@@ -1273,9 +1274,9 @@ All done.
   using namespace libMesh;
   
   <B><FONT COLOR="#5F9EA0">LaplaceSystem</FONT></B>::LaplaceSystem( EquationSystems&amp; es,
-  			      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name,
-  			      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number)
-    : FEMSystem(es, name, number)
+  			      <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name_in,
+  			      <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number_in)
+    : FEMSystem(es, name_in, number_in)
   {
     <B><FONT COLOR="#A020F0">return</FONT></B>;
   }
@@ -1317,7 +1318,7 @@ All done.
   
     FEGenericBase&lt;RealGradient&gt;* fe;
     c.get_element_fe&lt;RealGradient&gt;( u_var, fe );
-    
+  
     fe-&gt;get_JxW();
     fe-&gt;get_phi();
     fe-&gt;get_dphi();
@@ -1338,14 +1339,14 @@ All done.
   
     FEGenericBase&lt;RealGradient&gt;* fe = NULL;
     c.get_element_fe&lt;RealGradient&gt;( u_var, fe );
-    
+  
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = fe-&gt;get_JxW();
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; phi = fe-&gt;get_phi();
   
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealTensor&gt; &gt;&amp; grad_phi = fe-&gt;get_dphi();
-   
+  
     <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; qpoint = fe-&gt;get_xyz();
   
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.dof_indices_var[u_var].size();
@@ -1353,13 +1354,13 @@ All done.
     DenseSubMatrix&lt;Number&gt; &amp;Kuu = *c.elem_subjacobians[u_var][u_var];
   
     DenseSubVector&lt;Number&gt; &amp;Fu = *c.elem_subresiduals[u_var];
-        
+  
     <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = (c.get_element_qrule())-&gt;n_points();
   
     <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
       {
         Tensor grad_u;
-        
+  
         c.interior_gradient( u_var, qp, grad_u );
   
   
@@ -1374,12 +1375,12 @@ All done.
                 <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_u_dofs; j++)
                   {
                     Kuu(i,j) += grad_phi[j][qp].contract(grad_phi[i][qp])*JxW[qp];
-                   
+  
   		}
   	    }
           }
       } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
-</FONT></I>    
+</FONT></I>  
     <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;
   }
   
@@ -1391,7 +1392,7 @@ All done.
   
     FEGenericBase&lt;RealGradient&gt;* side_fe = NULL;
     c.get_side_fe&lt;RealGradient&gt;( u_var, side_fe );
-    
+  
   
     const std::vector&lt;Real&gt; &amp;JxW = side_fe-&gt;get_JxW();
   
@@ -1412,14 +1413,14 @@ All done.
       {
         Gradient u;
         c.side_value( u_var, qp, u );
-   
+  
         Gradient u_exact( this-&gt;exact_solution( 0, qpoint[qp](0), qpoint[qp](1) ),
   			this-&gt;exact_solution( 1, qpoint[qp](0), qpoint[qp](1) ));
   
         for (unsigned int i=0; i != n_u_dofs; i++)
   	{
   	  Fu(i) += penalty*(u - u_exact)*phi[i][qp]*JxW[qp];
-  	  
+  
   	  if (request_jacobian)
   	    {
   	      for (unsigned int j=0; j != n_u_dofs; j++)
@@ -1435,7 +1436,7 @@ All done.
   RealGradient LaplaceSystem::forcing( <B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p )
   {
     Real x = p(0); Real y = p(1); Real z = p(2);
-    
+  
     <B><FONT COLOR="#228B22">const</FONT></B> Real eps = 1.e-3;
   
     <B><FONT COLOR="#228B22">const</FONT></B> Real fx = -(exact_solution(0,x,y,z-eps) +
@@ -1445,7 +1446,7 @@ All done.
   		    exact_solution(0,x-eps,y,z) +
   		    exact_solution(0,x+eps,y,z) -
   		    6.*exact_solution(0,x,y,z))/eps/eps;
-    
+  
     <B><FONT COLOR="#228B22">const</FONT></B> Real fy = -(exact_solution(1,x,y,z-eps) +
   		    exact_solution(1,x,y,z+eps) +
   		    exact_solution(1,x,y-eps,z) +
@@ -1461,7 +1462,7 @@ All done.
   		    exact_solution(2,x-eps,y,z) +
   		    exact_solution(2,x+eps,y,z) -
   		    6.*exact_solution(2,x,y,z))/eps/eps;
-    
+  
     <B><FONT COLOR="#A020F0">return</FONT></B> RealGradient( fx, fy, fz );
   }
 </pre> 
@@ -1493,8 +1494,8 @@ All done.
   
     libmesh_example_assert(3 &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D/3D support&quot;</FONT></B>);
   
-    Mesh mesh;
-    
+    Mesh mesh(init.comm());
+  
     <B><FONT COLOR="#5F9EA0">MeshTools</FONT></B>::Generation::build_cube (mesh,
   				     grid_size,
   				     grid_size,
@@ -1508,7 +1509,7 @@ All done.
   
     EquationSystems equation_systems (mesh);
   
-    LaplaceSystem &amp; system = 
+    LaplaceSystem &amp; system =
       equation_systems.add_system&lt;LaplaceSystem&gt; (<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>);
   
     system.time_solver =
@@ -1527,7 +1528,7 @@ All done.
       infile(<B><FONT COLOR="#BC8F8F">&quot;relative_residual_tolerance&quot;</FONT></B>, 0.0);
     solver.absolute_residual_tolerance =
       infile(<B><FONT COLOR="#BC8F8F">&quot;absolute_residual_tolerance&quot;</FONT></B>, 0.0);
-      
+  
     solver.max_linear_iterations =
       infile(<B><FONT COLOR="#BC8F8F">&quot;max_linear_iterations&quot;</FONT></B>, 50000);
     solver.initial_linear_tolerance =
@@ -1538,7 +1539,7 @@ All done.
     system.solve();
   
     ExactSolution exact_sol( equation_systems );
-    
+  
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;FunctionBase&lt;Number&gt;* &gt; sols;
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;FunctionBase&lt;Gradient&gt;* &gt; grads;
   
@@ -1547,23 +1548,23 @@ All done.
   
     exact_sol.attach_exact_values(sols);
     exact_sol.attach_exact_derivs(grads);
-    
+  
     <B><FONT COLOR="#228B22">int</FONT></B> extra_error_quadrature = infile(<B><FONT COLOR="#BC8F8F">&quot;extra_error_quadrature&quot;</FONT></B>,2);
     exact_sol.extra_quadrature_order(extra_error_quadrature);
   
     exact_sol.compute_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>);
-    
+  
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;L2-Error is: &quot;</FONT></B>
   	    &lt;&lt; exact_sol.l2_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
   	    &lt;&lt; std::endl;
     <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;H1-Error is: &quot;</FONT></B>
   	    &lt;&lt; exact_sol.h1_error(<B><FONT COLOR="#BC8F8F">&quot;Laplace&quot;</FONT></B>, <B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>)
   	    &lt;&lt; std::endl;
-    
+  
   #ifdef LIBMESH_HAVE_EXODUS_API
-    
+  
     ExodusII_IO(mesh).write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;out.e&quot;</FONT></B>, equation_systems);
-    
+  
   #endif <I><FONT COLOR="#B22222">// #ifdef LIBMESH_HAVE_EXODUS_API
 </FONT></I>  
     UCDIO(mesh).write_equation_systems(<B><FONT COLOR="#BC8F8F">&quot;out.inp&quot;</FONT></B>, equation_systems);
@@ -1574,22 +1575,23 @@ All done.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+make[4]: Entering directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/vector_fe/vector_fe_ex2'
 ***************************************************************
 * Running Example vector_fe_ex2:
-*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
  
  Mesh Information:
   mesh_dimension()=3
   spatial_dimension()=3
   n_nodes()=216
-    n_local_nodes()=43
+    n_local_nodes()=78
   n_elem()=125
-    n_local_elem()=10
+    n_local_elem()=32
     n_active_elem()=125
   n_subdomains()=1
-  n_partitions()=12
-  n_processors()=12
+  n_partitions()=4
+  n_processors()=4
   n_threads()=1
   processor_id()=0
 
@@ -1602,16 +1604,16 @@ All done.
     Infinite Element Mapping="CARTESIAN" 
     Approximation Orders="FIRST", "THIRD" 
     n_dofs()=648
-    n_local_dofs()=129
+    n_local_dofs()=234
     n_constrained_dofs()=456
-    n_local_constrained_dofs()=84
+    n_local_constrained_dofs()=156
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 47.8056
-      Average Off-Processor Bandwidth <= 41.5556
-      Maximum  On-Processor Bandwidth <= 135
-      Maximum Off-Processor Bandwidth <= 141
+      Average  On-Processor Bandwidth <= 50.1111
+      Average Off-Processor Bandwidth <= 16.1111
+      Maximum  On-Processor Bandwidth <= 108
+      Maximum Off-Processor Bandwidth <= 99
     DofMap Constraints
       Number of DoF Constraints = 456
       Number of Heterogenous Constraints= 456
@@ -1621,166 +1623,40 @@ All done.
 Assembling the System
 Nonlinear Residual: 4.00845
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 16, residual 4.38343e-13
+Linear solve finished, step 15, residual 1.93334e-12
 Trying full Newton step
-  Current Residual: 4.5843e-13
-  Nonlinear solver converged, step 0, residual reduction 1.14366e-13 < 1e-12
+  Current Residual: 2.01512e-12
+  Nonlinear solver converged, step 0, residual reduction 5.02718e-13 < 1e-12
   Nonlinear solver relative step size 0.723571 > 1e-06
 L2-Error is: 0.142039
 H1-Error is: 0.902143
-************************************************************************************************************************
-***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
-************************************************************************************************************************
 
----------------------------------------------- PETSc Performance Summary: ----------------------------------------------
-
-/workspace/libmesh/examples/vector_fe/vector_fe_ex2/.libs/lt-example-devel on a intel-12. named hbar.ices.utexas.edu with 12 processors, by benkirk Thu Jan 31 22:22:49 2013
-Using Petsc Release Version 3.3.0, Patch 2, Fri Jul 13 15:42:00 CDT 2012 
-
-                         Max       Max/Min        Avg      Total 
-Time (sec):           6.424e-01      1.01752   6.394e-01
-Objects:              6.700e+01      1.03077   6.683e+01
-Flops:                1.008e+06      0.00000   2.478e+05  2.974e+06
-Flops/sec:            1.569e+06      0.00000   3.870e+05  4.644e+06
-MPI Messages:         3.860e+02      3.38596   3.092e+02  3.710e+03
-MPI Message Lengths:  2.652e+05      3.56014   3.937e+02  1.461e+06
-MPI Reductions:       1.390e+02      1.01460
-
-Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
-                            e.g., VecAXPY() for real vectors of length N --> 2N flops
-                            and VecAXPY() for complex vectors of length N --> 8N flops
-
-Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
-                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 6.3940e-01 100.0%  2.9737e+06 100.0%  3.710e+03 100.0%  3.937e+02      100.0%  1.378e+02  99.2% 
-
-------------------------------------------------------------------------------------------------------------------------
-See the 'Profiling' chapter of the users' manual for details on interpreting output.
-Phase summary info:
-   Count: number of times phase was executed
-   Time and Flops: Max - maximum over all processors
-                   Ratio - ratio of maximum to minimum over all processors
-   Mess: number of messages sent
-   Avg. len: average message length
-   Reduct: number of global reductions
-   Global: entire computation
-   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
-      %T - percent time in this phase         %f - percent flops in this phase
-      %M - percent messages in this phase     %L - percent message lengths in this phase
-      %R - percent reductions in this phase
-   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
-------------------------------------------------------------------------------------------------------------------------
-Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
-                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %f %M %L %R  %T %f %M %L %R Mflop/s
-------------------------------------------------------------------------------------------------------------------------
-
---- Event Stage 0: Main Stage
-
-KSPGMRESOrthog        16 1.0 8.1372e-04 4.5 7.49e+04 0.0 0.0e+00 0.0e+00 1.6e+01  0 12  0  0 12   0 12  0  0 12   431
-KSPSetUp               2 1.0 7.6056e-05 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-KSPSolve               1 1.0 4.6711e-03 1.0 1.01e+06 0.0 1.4e+03 1.8e+02 4.3e+01  1100 38 18 31   1100 38 18 31   635
-PCSetUp                2 1.0 2.8551e-03 3.3 2.30e+05 0.0 0.0e+00 0.0e+00 8.8e+00  0 10  0  0  6   0 10  0  0  6   104
-PCSetUpOnBlocks        1 1.0 2.3239e-03 6.7 2.30e+05 0.0 0.0e+00 0.0e+00 6.8e+00  0 10  0  0  5   0 10  0  0  5   127
-PCApply               18 1.0 4.8661e-04 2.1 3.64e+05 0.0 0.0e+00 0.0e+00 0.0e+00  0 34  0  0  0   0 34  0  0  0  2096
-VecMDot               16 1.0 7.4959e-04 6.5 3.74e+04 0.0 0.0e+00 0.0e+00 1.6e+01  0  6  0  0 12   0  6  0  0 12   233
-VecNorm               22 1.0 2.3499e-03 8.1 6.07e+03 0.0 0.0e+00 0.0e+00 2.2e+01  0  1  0  0 16   0  1  0  0 16    12
-VecScale              17 1.0 4.4107e-05 1.5 2.35e+03 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0   250
-VecCopy                5 1.0 2.0981e-05 2.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecSet                30 1.0 1.8358e-05 1.8 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecAXPY                3 1.0 3.6240e-05 2.6 8.28e+02 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0   107
-VecMAXPY              17 1.0 3.0279e-05 7.5 4.20e+04 0.0 0.0e+00 0.0e+00 0.0e+00  0  7  0  0  0   0  7  0  0  0  6506
-VecAssemblyBegin      18 1.0 4.6328e-0256.3 0.00e+00 0.0 2.1e+02 3.1e+02 4.5e+01  5  0  6  5 32   5  0  6  5 33     0
-VecAssemblyEnd        18 1.0 6.5327e-05 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecScatterBegin       24 1.0 2.3103e-04 3.0 0.00e+00 0.0 2.2e+03 2.5e+02 0.0e+00  0  0 60 38  0   0  0 60 38  0     0
-VecScatterEnd         24 1.0 2.0657e-0315.6 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecNormalize          17 1.0 2.1441e-0312.0 7.04e+03 0.0 0.0e+00 0.0e+00 1.7e+01  0  1  0  0 12   0  1  0  0 12    15
-MatMult               17 1.0 2.1527e-0375.9 3.25e+05 0.0 1.4e+03 1.8e+02 0.0e+00  0 42 38 18  0   0 42 38 18  0   577
-MatSolve              18 0.0 2.3913e-04 0.0 3.64e+05 0.0 0.0e+00 0.0e+00 0.0e+00  0 34  0  0  0   0 34  0  0  0  4265
-MatLUFactorNum         1 1.0 2.8515e-0413.4 2.30e+05 0.0 0.0e+00 0.0e+00 0.0e+00  0 10  0  0  0   0 10  0  0  0  1039
-MatILUFactorSym        1 1.0 1.7409e-0324.2 0.00e+00 0.0 0.0e+00 0.0e+00 3.0e+00  0  0  0  0  2   0  0  0  0  2     0
-MatAssemblyBegin       2 1.0 1.4100e-03 3.6 0.00e+00 0.0 1.6e+02 4.5e+03 4.0e+00  0  0  4 49  3   0  0  4 49  3     0
-MatAssemblyEnd         2 1.0 1.9109e-03 1.9 0.00e+00 0.0 1.7e+02 4.7e+01 8.0e+00  0  0  5  1  6   0  0  5  1  6     0
-MatGetRowIJ            1 0.0 3.8147e-06 0.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatGetOrdering         1 0.0 1.5593e-04 0.0 0.00e+00 0.0 0.0e+00 0.0e+00 3.7e+00  0  0  0  0  3   0  0  0  0  3     0
-MatZeroEntries         3 0.0 8.7976e-05 0.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-------------------------------------------------------------------------------------------------------------------------
-
-Memory usage is given in bytes:
-
-Object Type          Creations   Destructions     Memory  Descendants' Mem.
-Reports information only for process 0.
-
---- Event Stage 0: Main Stage
-
-       Krylov Solver     3              3        20592     0
-      Preconditioner     3              3         2608     0
-              Vector    38             38       105792     0
-      Vector Scatter     5              5         5180     0
-           Index Set    12             12        11556     0
-   IS L to G Mapping     1              1          564     0
-              Matrix     4              4       263704     0
-              Viewer     1              0            0     0
-========================================================================================================================
-Average time to get PetscTime(): 9.53674e-08
-Average time for MPI_Barrier(): 5.94139e-05
-Average time for zero size MPI_Send(): 3.39945e-05
-#PETSc Option Table entries:
--ksp_right_pc
--log_summary
--pc_type bjacobi
--sub_pc_factor_levels 4
--sub_pc_factor_zeropivot 0
--sub_pc_type ilu
-#End of PETSc Option Table entries
-Compiled without FORTRAN kernels
-Compiled with full precision matrices (default)
-sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
-Configure run at: Thu Nov  8 11:21:02 2012
-Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared-libraries=1 --with-mpi-dir=/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1 --with-mumps=true --download-mumps=1 --with-metis=true --download-metis=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_intel_lp64.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_sequential.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_core.so]" --with-lapack-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_lapack95_lp64.a]"
------------------------------------------
-Libraries compiled on Thu Nov  8 11:21:02 2012 on daedalus.ices.utexas.edu 
-Machine characteristics: Linux-2.6.32-279.1.1.el6.x86_64-x86_64-with-redhat-6.3-Carbon
-Using PETSc directory: /opt/apps/ossw/libraries/petsc/petsc-3.3-p2
-Using PETSc arch: intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt
------------------------------------------
-
-Using C compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx  -wd1572 -O3   -fPIC   ${COPTFLAGS} ${CFLAGS}
-Using Fortran compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90  -fPIC -O3   ${FOPTFLAGS} ${FFLAGS} 
------------------------------------------
-
-Using include paths: -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/include
------------------------------------------
-
-Using C linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx
-Using Fortran linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90
-Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lpetsc -lX11 -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lHYPRE -lpthread -lsuperlu_dist_3.0 -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.3 -Wl,-rpath,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -L/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,-rpath,/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -L/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -Wl,-rpath,/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -L/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lcilkrts -lstdc++ -lgcc_s -lirc -lirc_s -ldl 
------------------------------------------
-
-
- ----------------------------------------------------------------------------------------------------------------------
-| Processor id:   0                                                                                                    |
-| Num Processors: 12                                                                                                   |
-| Time:           Thu Jan 31 22:22:49 2013                                                                             |
-| OS:             Linux                                                                                                |
-| HostName:       hbar.ices.utexas.edu                                                                                 |
-| OS Release:     2.6.32-279.1.1.el6.x86_64                                                                            |
-| OS Version:     #1 SMP Tue Jul 10 11:24:23 CDT 2012                                                                  |
-| Machine:        x86_64                                                                                               |
-| Username:       benkirk                                                                                              |
-| Configuration:  ./configure  '--enable-everything'                                                                   |
-|  '--prefix=/workspace/libmesh/install'                                                                               |
-|  'CXX=icpc'                                                                                                          |
-|  'CC=icc'                                                                                                            |
-|  'FC=ifort'                                                                                                          |
-|  'F77=ifort'                                                                                                         |
-|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                             |
-|  'PETSC_ARCH=intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
-|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                        |
-|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/intel-12.1/mpich2-1.4.1p1/mkl-intel-10.3.12.361'|
-|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/intel-12.1'                                                    |
- ----------------------------------------------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Processor id:   0                                                                                                 |
+| Num Processors: 4                                                                                                 |
+| Time:           Fri Apr 19 11:58:48 2013                                                                          |
+| OS:             Linux                                                                                             |
+| HostName:       spark.ices.utexas.edu                                                                             |
+| OS Release:     2.6.32-279.22.1.el6.x86_64                                                                        |
+| OS Version:     #1 SMP Tue Feb 5 14:33:39 CST 2013                                                                |
+| Machine:        x86_64                                                                                            |
+| Username:       roystgnr                                                                                          |
+| Configuration:  ../configure  '--enable-everything'                                                               |
+|  'METHODS=devel'                                                                                                  |
+|  '--prefix=/h2/roystgnr/libmesh-test'                                                                             |
+|  'CXX=distcc /usr/bin/g++'                                                                                        |
+|  'CC=distcc /usr/bin/gcc'                                                                                         |
+|  'FC=distcc /usr/bin/gfortran'                                                                                    |
+|  'F77=distcc /usr/bin/gfortran'                                                                                   |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                          |
+|  'PETSC_ARCH=gcc-system-mkl-gf-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                     |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/gcc-system/mpich2-1.4.1p1/mkl-gf-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/gcc-system'                                                 |
+|  'HDF5_DIR=/opt/apps/ossw/libraries/hdf5/hdf5-1.8.9/sl6/gcc-system'                                               |
+ -------------------------------------------------------------------------------------------------------------------
  ----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=1.18615, Active time=0.57907                                                   |
+| libMesh Performance: Alive time=0.358299, Active time=0.227149                                                 |
  ----------------------------------------------------------------------------------------------------------------
 | Event                              nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                              w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -1788,91 +1664,92 @@ Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12
 |                                                                                                                |
 |                                                                                                                |
 | DofMap                                                                                                         |
-|   add_neighbors_to_send_list()     1         0.0025      0.002533    0.0219      0.021904    0.44     3.78     |
-|   build_constraint_matrix()        20        0.0014      0.000071    0.0014      0.000071    0.25     0.25     |
-|   build_sparsity()                 1         0.0037      0.003740    0.0116      0.011596    0.65     2.00     |
-|   cnstrn_elem_mat_vec()            10        0.0093      0.000927    0.0093      0.000927    1.60     1.60     |
-|   constrain_elem_vector()          10        0.0002      0.000022    0.0002      0.000022    0.04     0.04     |
-|   create_dof_constraints()         1         0.0118      0.011836    0.0494      0.049390    2.04     8.53     |
-|   distribute_dofs()                1         0.0041      0.004082    0.0130      0.013048    0.70     2.25     |
-|   dof_indices()                    270       0.0809      0.000300    0.0809      0.000300    13.98    13.98    |
-|   enforce_constraints_exactly()    3         0.0012      0.000399    0.0012      0.000399    0.21     0.21     |
-|   prepare_send_list()              1         0.0003      0.000262    0.0003      0.000262    0.05     0.05     |
-|   reinit()                         1         0.0071      0.007059    0.0071      0.007059    1.22     1.22     |
+|   add_neighbors_to_send_list()     1         0.0007      0.000655    0.0021      0.002142    0.29     0.94     |
+|   build_constraint_matrix()        64        0.0006      0.000010    0.0006      0.000010    0.27     0.27     |
+|   build_sparsity()                 1         0.0011      0.001096    0.0024      0.002392    0.48     1.05     |
+|   cnstrn_elem_mat_vec()            32        0.0058      0.000181    0.0058      0.000181    2.56     2.56     |
+|   constrain_elem_vector()          32        0.0002      0.000005    0.0002      0.000005    0.08     0.08     |
+|   create_dof_constraints()         1         0.0024      0.002364    0.0054      0.005391    1.04     2.37     |
+|   distribute_dofs()                1         0.0006      0.000574    0.0018      0.001787    0.25     0.79     |
+|   dof_indices()                    443       0.0107      0.000024    0.0107      0.000024    4.72     4.72     |
+|   enforce_constraints_exactly()    3         0.0007      0.000242    0.0007      0.000242    0.32     0.32     |
+|   prepare_send_list()              1         0.0000      0.000035    0.0000      0.000035    0.02     0.02     |
+|   reinit()                         1         0.0008      0.000832    0.0008      0.000832    0.37     0.37     |
 |                                                                                                                |
 | EquationSystems                                                                                                |
-|   build_solution_vector()          2         0.0007      0.000375    0.0082      0.004124    0.13     1.42     |
+|   build_solution_vector()          2         0.0004      0.000192    0.0024      0.001222    0.17     1.08     |
 |                                                                                                                |
 | ExodusII_IO                                                                                                    |
-|   write_nodal_data()               1         0.0042      0.004182    0.0042      0.004182    0.72     0.72     |
+|   write_nodal_data()               1         0.1175      0.117547    0.1175      0.117547    51.75    51.75    |
 |                                                                                                                |
 | FE                                                                                                             |
-|   compute_shape_functions()        58        0.1789      0.003084    0.1789      0.003084    30.89    30.89    |
-|   init_shape_functions()           31        0.0059      0.000190    0.0059      0.000190    1.02     1.02     |
+|   compute_shape_functions()        176       0.0338      0.000192    0.0338      0.000192    14.89    14.89    |
+|   init_shape_functions()           83        0.0019      0.000023    0.0019      0.000023    0.83     0.83     |
 |                                                                                                                |
 | FEMSystem                                                                                                      |
-|   assembly()                       1         0.0103      0.010284    0.0336      0.033574    1.78     5.80     |
-|   assembly(get_residual)           1         0.0021      0.002141    0.0149      0.014921    0.37     2.58     |
+|   assembly()                       1         0.0080      0.008048    0.0197      0.019714    3.54     8.68     |
+|   assembly(get_residual)           1         0.0023      0.002308    0.0078      0.007840    1.02     3.45     |
 |                                                                                                                |
 | FEMap                                                                                                          |
-|   compute_affine_map()             58        0.0019      0.000033    0.0019      0.000033    0.33     0.33     |
-|   compute_face_map()               28        0.0007      0.000024    0.0007      0.000024    0.12     0.12     |
-|   init_face_shape_functions()      2         0.0001      0.000060    0.0001      0.000060    0.02     0.02     |
-|   init_reference_to_physical_map() 31        0.0026      0.000085    0.0026      0.000085    0.45     0.45     |
+|   compute_affine_map()             176       0.0017      0.000010    0.0017      0.000010    0.76     0.76     |
+|   compute_face_map()               80        0.0005      0.000006    0.0005      0.000006    0.22     0.22     |
+|   init_face_shape_functions()      2         0.0000      0.000017    0.0000      0.000017    0.01     0.01     |
+|   init_reference_to_physical_map() 83        0.0014      0.000017    0.0014      0.000017    0.62     0.62     |
 |                                                                                                                |
 | Mesh                                                                                                           |
-|   find_neighbors()                 1         0.0060      0.006005    0.0216      0.021573    1.04     3.73     |
-|   renumber_nodes_and_elem()        2         0.0002      0.000117    0.0002      0.000117    0.04     0.04     |
+|   find_neighbors()                 1         0.0008      0.000801    0.0009      0.000905    0.35     0.40     |
+|   renumber_nodes_and_elem()        2         0.0001      0.000039    0.0001      0.000039    0.03     0.03     |
 |                                                                                                                |
 | MeshCommunication                                                                                              |
-|   compute_hilbert_indices()        2         0.0019      0.000947    0.0019      0.000947    0.33     0.33     |
-|   find_global_indices()            2         0.0013      0.000635    0.0116      0.005787    0.22     2.00     |
-|   parallel_sort()                  2         0.0026      0.001306    0.0068      0.003405    0.45     1.18     |
+|   compute_hilbert_indices()        2         0.0011      0.000563    0.0011      0.000563    0.50     0.50     |
+|   find_global_indices()            2         0.0003      0.000147    0.0022      0.001112    0.13     0.98     |
+|   parallel_sort()                  2         0.0004      0.000188    0.0005      0.000246    0.17     0.22     |
 |                                                                                                                |
 | MeshOutput                                                                                                     |
-|   write_equation_systems()         2         0.0034      0.001695    0.0161      0.008064    0.59     2.79     |
+|   write_equation_systems()         2         0.0031      0.001531    0.1232      0.061615    1.35     54.25    |
 |                                                                                                                |
 | MeshTools::Generation                                                                                          |
-|   build_cube()                     1         0.0010      0.000967    0.0010      0.000967    0.17     0.17     |
+|   build_cube()                     1         0.0003      0.000318    0.0003      0.000318    0.14     0.14     |
 |                                                                                                                |
 | MetisPartitioner                                                                                               |
-|   partition()                      1         0.0352      0.035157    0.0383      0.038331    6.07     6.62     |
+|   partition()                      1         0.0020      0.002023    0.0030      0.003043    0.89     1.34     |
 |                                                                                                                |
 | NewtonSolver                                                                                                   |
-|   solve()                          1         0.0374      0.037432    0.0955      0.095525    6.46     16.50    |
+|   solve()                          1         0.0032      0.003225    0.0434      0.043382    1.42     19.10    |
 |                                                                                                                |
 | Parallel                                                                                                       |
-|   allgather()                      9         0.0008      0.000088    0.0010      0.000108    0.14     0.17     |
-|   max(bool)                        1         0.0000      0.000007    0.0000      0.000007    0.00     0.00     |
-|   max(scalar)                      150       0.0776      0.000518    0.0776      0.000518    13.41    13.41    |
-|   max(vector)                      34        0.0011      0.000031    0.0036      0.000107    0.18     0.63     |
-|   min(bool)                        175       0.0043      0.000025    0.0043      0.000025    0.75     0.75     |
-|   min(scalar)                      143       0.0575      0.000402    0.0575      0.000402    9.93     9.93     |
-|   min(vector)                      34        0.0012      0.000034    0.0050      0.000147    0.20     0.86     |
-|   probe()                          132       0.0020      0.000015    0.0020      0.000015    0.35     0.35     |
-|   receive()                        132       0.0008      0.000006    0.0029      0.000022    0.14     0.50     |
-|   send()                           132       0.0004      0.000003    0.0004      0.000003    0.07     0.07     |
-|   send_receive()                   136       0.0014      0.000010    0.0050      0.000037    0.24     0.87     |
-|   sum()                            27        0.0040      0.000147    0.0055      0.000203    0.68     0.94     |
+|   allgather()                      9         0.0002      0.000019    0.0002      0.000024    0.08     0.09     |
+|   max(bool)                        1         0.0000      0.000004    0.0000      0.000004    0.00     0.00     |
+|   max(scalar)                      150       0.0075      0.000050    0.0075      0.000050    3.30     3.30     |
+|   max(vector)                      34        0.0004      0.000010    0.0011      0.000032    0.15     0.48     |
+|   min(bool)                        175       0.0012      0.000007    0.0012      0.000007    0.52     0.52     |
+|   min(scalar)                      143       0.0022      0.000016    0.0022      0.000016    0.99     0.99     |
+|   min(vector)                      34        0.0005      0.000013    0.0012      0.000035    0.20     0.52     |
+|   probe()                          36        0.0002      0.000007    0.0002      0.000007    0.11     0.11     |
+|   receive()                        36        0.0001      0.000004    0.0004      0.000011    0.06     0.17     |
+|   send()                           36        0.0001      0.000002    0.0001      0.000002    0.03     0.03     |
+|   send_receive()                   40        0.0002      0.000006    0.0008      0.000019    0.11     0.34     |
+|   sum()                            27        0.0003      0.000010    0.0004      0.000016    0.11     0.19     |
 |                                                                                                                |
 | Parallel::Request                                                                                              |
-|   wait()                           132       0.0003      0.000002    0.0003      0.000002    0.05     0.05     |
+|   wait()                           36        0.0001      0.000001    0.0001      0.000001    0.02     0.02     |
 |                                                                                                                |
 | Partitioner                                                                                                    |
-|   set_node_processor_ids()         1         0.0008      0.000787    0.0016      0.001592    0.14     0.27     |
-|   set_parent_processor_ids()       1         0.0003      0.000304    0.0003      0.000304    0.05     0.05     |
+|   set_node_processor_ids()         1         0.0002      0.000200    0.0004      0.000438    0.09     0.19     |
+|   set_parent_processor_ids()       1         0.0000      0.000046    0.0000      0.000046    0.02     0.02     |
 |                                                                                                                |
 | PetscLinearSolver                                                                                              |
-|   solve()                          1         0.0076      0.007648    0.0076      0.007648    1.32     1.32     |
+|   solve()                          1         0.0114      0.011413    0.0114      0.011413    5.02     5.02     |
  ----------------------------------------------------------------------------------------------------------------
-| Totals:                            1786      0.5791                                          100.00            |
+| Totals:                            1959      0.2271                                          100.00            |
  ----------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example vector_fe_ex2:
-*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
+make[4]: Leaving directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/vector_fe/vector_fe_ex2'
 </pre>
 </div>
 <?php make_footer() ?>

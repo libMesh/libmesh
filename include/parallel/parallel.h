@@ -158,7 +158,7 @@ namespace Parallel
   struct data_type    { /* unsigned int t; */ };
   struct request      { /* unsigned int r; */ };
   struct status       { /* unsigned int s; */ };
-  struct communicator { /* unsigned int s; */ };
+  typedef int communicator; // Must match petsc-nompi definition
 
   const unsigned int any_source=0;
 #endif // LIBMESH_HAVE_MPI
@@ -532,16 +532,6 @@ namespace Parallel
      * Constructor from MPI_Comm
      */
     explicit Communicator (const communicator &comm);
-
-#ifndef LIBMESH_HAVE_MPI
-    /*
-     * Constructor from int - we need this for the no MPI
-     * case since the constructor above is marked explicit,
-     * clang++ in particular will not call it with a dummy int
-     * argument.
-     */
-    explicit Communicator (const int);
-#endif
 
     /*
      * NON-VIRTUAL destructor

@@ -1,7 +1,7 @@
 dnl -------------------------------------------------------------
 dnl libHilbert
 dnl -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_LIBHILBERT], 
+AC_DEFUN([CONFIGURE_LIBHILBERT],
 [
   AC_ARG_ENABLE(libHilbert,
                 AC_HELP_STRING([--enable-libHilbert],
@@ -13,8 +13,8 @@ AC_DEFUN([CONFIGURE_LIBHILBERT],
 		 esac],
 		 [enablelibhilbert=$enableoptional])
 
-		 
-		
+
+
   dnl The LIBHILBERT API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   if (test $enablelibhilbert = yes); then
@@ -29,5 +29,5 @@ AC_DEFUN([CONFIGURE_LIBHILBERT],
   fi
 
   AC_SUBST(LIBHILBERT_INCLUDE)
-  AC_SUBST(LIBHILBERT_LIBRARY)	
+  AC_SUBST(LIBHILBERT_LIBRARY)
 ])

@@ -6,9 +6,12 @@ AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(------- Configuring compiler features -------)
 AC_MSG_RESULT(---------------------------------------------)
 
-# Test using any user-specified flags
+# Test using the devel mode flags, which should include any
+# user-specified flags
 libmesh_compiler_features_save_CXXFLAGS="$CXXFLAGS"
-CXXFLAGS="$libmesh_CXXFLAGS $CXXFLAGS"
+CXXFLAGS="$CXXFLAGS_DEVEL"
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
 
 # --------------------------------------------------------------
 # Real precision - double by default
@@ -41,11 +44,11 @@ ACX_CHOOSE_PRECISION
 # programs may simply use restrict as if every C compiler supported it;
 # for those that do not, the makefile or configuration header defines it
 # away.
-# 
+#
 # Although support in C++ for the restrict keyword is not required,
 # several C++ compilers do accept the keyword. This macro works for
 # them, too.
-# 
+#
 # This macro caches 'no' in the ac_cv_c_restrict variable if restrict is
 # not supported, and a supported spelling otherwise.
 AC_C_RESTRICT
@@ -110,7 +113,7 @@ AC_CHECK_SIZEOF(void *)
 # automatically... so we use a kind of hack with the 3rd
 # argument to do it.
 AC_CHECK_SIZEOF([function_pointer], [], [typedef void (*function_pointer)();])
-# AC_CHECK_SIZEOF([void(*)(void)]) <-- Does not work! 
+# AC_CHECK_SIZEOF([void(*)(void)]) <-- Does not work!
 
 # --------------------------------------------------------------
 # Check for Run Time Type Identification support
@@ -193,6 +196,7 @@ fi
 # -------------------------------------------------------------
 
 # Restore original CXXFLAGS for now
+AC_LANG_RESTORE
 CXXFLAGS="$libmesh_compiler_features_save_CXXFLAGS"
 
 AC_MSG_RESULT(---------------------------------------------)

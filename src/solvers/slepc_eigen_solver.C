@@ -30,6 +30,7 @@
 #include "libmesh/petsc_vector.h"
 #include "libmesh/slepc_eigen_solver.h"
 #include "libmesh/shell_matrix.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -582,7 +583,7 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
 
     default:
       libMesh::err << "ERROR:  Unsupported SLEPc Eigen Solver: "
-		    << this->_eigen_solver_type         << std::endl
+		    << Utility::enum_to_string(this->_eigen_solver_type) << std::endl
 		    << "Continuing with SLEPc defaults" << std::endl;
     }
 }

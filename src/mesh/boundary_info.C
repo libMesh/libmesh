@@ -1424,7 +1424,7 @@ boundary_id_type BoundaryInfo::get_id_by_name(const std::string& name) const
       return iter->first;
   }
 
-  std::cerr << "The sideset/nodeset name does not exist in mesh";
+  libMesh::err << "The sideset/nodeset named " << name << " does not exist in mesh!" << std::endl;
   libmesh_error();
 }
 

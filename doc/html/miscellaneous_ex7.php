@@ -119,7 +119,7 @@ Free energy enumeration
            * Static creation/destruction routines.  FIXME - this looks like
            * object-oriented C, can we get rid of it?
            */
-          static void Create(Biharmonic** b);
+          static void Create(Biharmonic** b, const Parallel::Communicator &comm);
           static void Destroy(Biharmonic** b);
         
         
@@ -146,7 +146,7 @@ delete _meshRefinement;
 
 <div class ="fragment">
 <pre>
-          };
+          }
         
         
 </pre>
@@ -352,7 +352,7 @@ Example includes
         
         using namespace libMesh;
         
-        void Biharmonic::Create(Biharmonic** b)
+        void Biharmonic::Create(Biharmonic** b, const Parallel::Communicator &comm)
         {
 </pre>
 </div>
@@ -362,7 +362,7 @@ ParallelMesh doesn't yet understand periodic BCs
 
 <div class ="fragment">
 <pre>
-          SerialMesh* mesh = new SerialMesh();
+          SerialMesh* mesh = new SerialMesh(comm);
           Biharmonic *biharmonic = new Biharmonic(mesh);
           *b = biharmonic;
         }
@@ -460,7 +460,7 @@ Print parameters
         
         
         
-        void Biharmonic::step(const Real& dt)
+        void Biharmonic::step(const Real& dt_in)
         {
 </pre>
 </div>
@@ -473,10 +473,10 @@ previous time step. We use vector assignment.  Only \p TransientSystems
 
 <div class ="fragment">
 <pre>
-          if (dt &lt; 0)
+          if (dt_in &lt; 0)
             _dt = _dt0;
           else
-            _dt = dt;
+            _dt = dt_in;
         
           *(_jr-&gt;old_local_solution) = *(_jr-&gt;current_local_solution);
         
@@ -835,9 +835,9 @@ Example includes
         using namespace libMesh;
         
         Biharmonic::JR::JR(EquationSystems& eqSys,
-        		   const std::string& name,
-        		   const unsigned int number) :
-          TransientNonlinearImplicitSystem(eqSys,name,number),
+        		   const std::string& name_in,
+        		   const unsigned int number_in) :
+          TransientNonlinearImplicitSystem(eqSys,name_in,number_in),
           _biharmonic(dynamic_cast&lt;Biharmonic&&gt;(eqSys))
         {
 </pre>
@@ -1754,7 +1754,7 @@ the bounds are always -1.0 and 1.0.
 <pre>
               XL.insert(XLe, dof_indices);
               XU.insert(XUe, dof_indices);
-            } 
+            }
         }
 </pre>
 </div>
@@ -1833,7 +1833,7 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
               libmesh_example_assert(dim &lt;= LIBMESH_DIM, "2D/3D support");
         
               Biharmonic* biharmonic;
-              Biharmonic::Create(&biharmonic);
+              Biharmonic::Create(&biharmonic,init.comm());
               biharmonic-&gt;viewParameters();
               biharmonic-&gt;init();
               biharmonic-&gt;run();
@@ -1919,8 +1919,6 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
         	       &lt;&lt; "Add --use-petsc-dm -snes_type virs to run the variational inequality version that ensures the solution is between -1.0 and 1.0 at all times.\n\n"
         	       &lt;&lt; std::endl;
         }
-        
-        
 </pre>
 </div>
 
@@ -1996,7 +1994,7 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
      * Static creation/destruction routines.  FIXME - this looks like
      * object-oriented C, can we get rid of it?
      */</FONT></I>
-    <B><FONT COLOR="#228B22">static</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> Create(Biharmonic** b);
+    <B><FONT COLOR="#228B22">static</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> Create(Biharmonic** b, <B><FONT COLOR="#228B22">const</FONT></B> Parallel::Communicator &amp;comm);
     <B><FONT COLOR="#228B22">static</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> Destroy(Biharmonic** b);
   
   
@@ -2015,7 +2013,7 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
      */</FONT></I>
     ~Biharmonic()
     {
-    };
+    }
   
   
     <B><FONT COLOR="#228B22">bool</FONT></B> verbose()         { <B><FONT COLOR="#A020F0">return</FONT></B> _verbose; }
@@ -2144,9 +2142,9 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
   
   using namespace libMesh;
   
-  <B><FONT COLOR="#228B22">void</FONT></B> Biharmonic::Create(Biharmonic** b)
+  <B><FONT COLOR="#228B22">void</FONT></B> Biharmonic::Create(Biharmonic** b, <B><FONT COLOR="#228B22">const</FONT></B> Parallel::Communicator &amp;comm)
   {
-    SerialMesh* mesh = <B><FONT COLOR="#A020F0">new</FONT></B> SerialMesh();
+    SerialMesh* mesh = <B><FONT COLOR="#A020F0">new</FONT></B> SerialMesh(comm);
     Biharmonic *biharmonic = <B><FONT COLOR="#A020F0">new</FONT></B> Biharmonic(mesh);
     *b = biharmonic;
   }
@@ -2228,12 +2226,12 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
   
   
   
-  <B><FONT COLOR="#228B22">void</FONT></B> Biharmonic::step(<B><FONT COLOR="#228B22">const</FONT></B> Real&amp; dt)
+  <B><FONT COLOR="#228B22">void</FONT></B> Biharmonic::step(<B><FONT COLOR="#228B22">const</FONT></B> Real&amp; dt_in)
   {
-    <B><FONT COLOR="#A020F0">if</FONT></B> (dt &lt; 0)
+    <B><FONT COLOR="#A020F0">if</FONT></B> (dt_in &lt; 0)
       _dt = _dt0;
     <B><FONT COLOR="#A020F0">else</FONT></B>
-      _dt = dt;
+      _dt = dt_in;
   
     *(_jr-&gt;old_local_solution) = *(_jr-&gt;current_local_solution);
   
@@ -2433,9 +2431,9 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
   using namespace libMesh;
   
   <B><FONT COLOR="#5F9EA0">Biharmonic</FONT></B>::JR::JR(EquationSystems&amp; eqSys,
-  		   <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name,
-  		   <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number) :
-    TransientNonlinearImplicitSystem(eqSys,name,number),
+  		   <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name_in,
+  		   <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number_in) :
+    TransientNonlinearImplicitSystem(eqSys,name_in,number_in),
     _biharmonic(dynamic_cast&lt;Biharmonic&amp;&gt;(eqSys))
   {
   #ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -2859,7 +2857,7 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
   	}
         XL.insert(XLe, dof_indices);
         XU.insert(XUe, dof_indices);
-      } 
+      }
   }
 </pre> 
 <a name="nocomments"></a> 
@@ -2892,7 +2890,7 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
         libmesh_example_assert(dim &lt;= LIBMESH_DIM, <B><FONT COLOR="#BC8F8F">&quot;2D/3D support&quot;</FONT></B>);
   
         Biharmonic* biharmonic;
-        <B><FONT COLOR="#5F9EA0">Biharmonic</FONT></B>::Create(&amp;biharmonic);
+        <B><FONT COLOR="#5F9EA0">Biharmonic</FONT></B>::Create(&amp;biharmonic,init.comm());
         biharmonic-&gt;viewParameters();
         biharmonic-&gt;init();
         biharmonic-&gt;run();
@@ -2978,15 +2976,14 @@ Skip higher-dimensional examples on a lower-dimensional libMesh build
   	       &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;Add --use-petsc-dm -snes_type virs to run the variational inequality version that ensures the solution is between -1.0 and 1.0 at all times.\n\n&quot;</FONT></B>
   	       &lt;&lt; std::endl;
   }
-  
-  
 </pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
+make[4]: Entering directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/miscellaneous/miscellaneous_ex7'
 ***************************************************************
 * Running Example miscellaneous_ex7:
-*  mpirun -np 12 example-devel --verbose dim=1 N=1024 initial_state=strip initial_center=0.5 initial_width=0.1 dt=1e-10 max_time=1e-8 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel --verbose dim=1 N=1024 initial_state=strip initial_center=0.5 initial_width=0.1 dt=1e-10 max_time=1e-8 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
  
 Biharmonic parameters:
@@ -3020,663 +3017,519 @@ Output filename base:      bih.1
 Writing state 1 at time 0 to file bih.1.e; output a total of 1 states so far
 Solving for state 2, time 0
   NL step  0, |residual|_2 = 3.865471e+00
-  NL step  1, |residual|_2 = 3.273390e-13
+  NL step  1, |residual|_2 = 6.791353e-15
 Writing state 2 at time 1.000000e-10 to file bih.1.e; output a total of 2 states so far
 Solving for state 3, time 1.000000e-10
   NL step  0, |residual|_2 = 3.861870e+00
-  NL step  1, |residual|_2 = 4.911254e-13
+  NL step  1, |residual|_2 = 5.295328e-13
 Writing state 3 at time 2.000000e-10 to file bih.1.e; output a total of 3 states so far
 Solving for state 4, time 2.000000e-10
   NL step  0, |residual|_2 = 3.858634e+00
-  NL step  1, |residual|_2 = 5.504431e-13
+  NL step  1, |residual|_2 = 6.826469e-12
 Writing state 4 at time 3.000000e-10 to file bih.1.e; output a total of 4 states so far
 Solving for state 5, time 3.000000e-10
   NL step  0, |residual|_2 = 3.855483e+00
-  NL step  1, |residual|_2 = 2.538109e-13
+  NL step  1, |residual|_2 = 2.625789e-11
 Writing state 5 at time 4.000000e-10 to file bih.1.e; output a total of 5 states so far
 Solving for state 6, time 4.000000e-10
   NL step  0, |residual|_2 = 3.852464e+00
-  NL step  1, |residual|_2 = 2.130937e-13
+  NL step  1, |residual|_2 = 3.298126e-11
 Writing state 6 at time 5.000000e-10 to file bih.1.e; output a total of 6 states so far
 Solving for state 7, time 5.000000e-10
   NL step  0, |residual|_2 = 3.849501e+00
-  NL step  1, |residual|_2 = 4.755840e-13
+  NL step  1, |residual|_2 = 5.351723e-10
 Writing state 7 at time 6.000000e-10 to file bih.1.e; output a total of 7 states so far
 Solving for state 8, time 6.000000e-10
   NL step  0, |residual|_2 = 3.846621e+00
-  NL step  1, |residual|_2 = 2.850507e-05
-  NL step  2, |residual|_2 = 1.035551e-14
+  NL step  1, |residual|_2 = 1.678735e-09
 Writing state 8 at time 7.000000e-10 to file bih.1.e; output a total of 8 states so far
 Solving for state 9, time 7.000000e-10
   NL step  0, |residual|_2 = 3.843784e+00
-  NL step  1, |residual|_2 = 3.758309e-13
+  NL step  1, |residual|_2 = 1.776743e-09
 Writing state 9 at time 8.000000e-10 to file bih.1.e; output a total of 9 states so far
 Solving for state 10, time 8.000000e-10
   NL step  0, |residual|_2 = 3.841009e+00
-  NL step  1, |residual|_2 = 2.661180e-05
-  NL step  2, |residual|_2 = 1.085903e-14
+  NL step  1, |residual|_2 = 2.711450e-09
 Writing state 10 at time 9.000000e-10 to file bih.1.e; output a total of 10 states so far
 Solving for state 11, time 9.000000e-10
   NL step  0, |residual|_2 = 3.838268e+00
-  NL step  1, |residual|_2 = 7.414734e-13
+  NL step  1, |residual|_2 = 1.204330e-08
 Writing state 11 at time 1.000000e-09 to file bih.1.e; output a total of 11 states so far
 Solving for state 12, time 1.000000e-09
   NL step  0, |residual|_2 = 3.835577e+00
-  NL step  1, |residual|_2 = 2.128310e-13
+  NL step  1, |residual|_2 = 1.982070e-08
 Writing state 12 at time 1.100000e-09 to file bih.1.e; output a total of 12 states so far
 Solving for state 13, time 1.100000e-09
   NL step  0, |residual|_2 = 3.832915e+00
-  NL step  1, |residual|_2 = 2.123789e-05
-  NL step  2, |residual|_2 = 6.615493e-15
+  NL step  1, |residual|_2 = 1.887360e-08
 Writing state 13 at time 1.200000e-09 to file bih.1.e; output a total of 13 states so far
 Solving for state 14, time 1.200000e-09
   NL step  0, |residual|_2 = 3.830295e+00
-  NL step  1, |residual|_2 = 6.349827e-13
+  NL step  1, |residual|_2 = 7.909848e-09
 Writing state 14 at time 1.300000e-09 to file bih.1.e; output a total of 14 states so far
 Solving for state 15, time 1.300000e-09
   NL step  0, |residual|_2 = 3.827700e+00
-  NL step  1, |residual|_2 = 9.367511e-06
-  NL step  2, |residual|_2 = 3.624526e-15
+  NL step  1, |residual|_2 = 1.049956e-08
 Writing state 15 at time 1.400000e-09 to file bih.1.e; output a total of 15 states so far
 Solving for state 16, time 1.400000e-09
   NL step  0, |residual|_2 = 3.825140e+00
-  NL step  1, |residual|_2 = 2.896459e-13
+  NL step  1, |residual|_2 = 3.280321e-08
 Writing state 16 at time 1.500000e-09 to file bih.1.e; output a total of 16 states so far
 Solving for state 17, time 1.500000e-09
   NL step  0, |residual|_2 = 3.822604e+00
-  NL step  1, |residual|_2 = 4.900514e-06
-  NL step  2, |residual|_2 = 3.090824e-15
+  NL step  1, |residual|_2 = 5.475702e-08
+  NL step  2, |residual|_2 = 2.323455e-15
 Writing state 17 at time 1.600000e-09 to file bih.1.e; output a total of 17 states so far
 Solving for state 18, time 1.600000e-09
   NL step  0, |residual|_2 = 3.820098e+00
-  NL step  1, |residual|_2 = 4.926258e-13
+  NL step  1, |residual|_2 = 3.707085e-08
 Writing state 18 at time 1.700000e-09 to file bih.1.e; output a total of 18 states so far
 Solving for state 19, time 1.700000e-09
   NL step  0, |residual|_2 = 3.817613e+00
-  NL step  1, |residual|_2 = 8.879049e-06
-  NL step  2, |residual|_2 = 4.180549e-15
+  NL step  1, |residual|_2 = 9.270300e-08
+  NL step  2, |residual|_2 = 2.353413e-15
 Writing state 19 at time 1.800000e-09 to file bih.1.e; output a total of 19 states so far
 Solving for state 20, time 1.800000e-09
   NL step  0, |residual|_2 = 3.815156e+00
-  NL step  1, |residual|_2 = 4.407590e-13
+  NL step  1, |residual|_2 = 1.778004e-08
 Writing state 20 at time 1.900000e-09 to file bih.1.e; output a total of 20 states so far
 Solving for state 21, time 1.900000e-09
   NL step  0, |residual|_2 = 3.812718e+00
-  NL step  1, |residual|_2 = 1.317082e-05
-  NL step  2, |residual|_2 = 5.648410e-15
+  NL step  1, |residual|_2 = 1.166306e-07
+  NL step  2, |residual|_2 = 2.344579e-15
 Writing state 21 at time 2.000000e-09 to file bih.1.e; output a total of 21 states so far
 Solving for state 22, time 2.000000e-09
   NL step  0, |residual|_2 = 3.810305e+00
-  NL step  1, |residual|_2 = 5.483949e-13
+  NL step  1, |residual|_2 = 5.194027e-08
+  NL step  2, |residual|_2 = 2.292010e-15
 Writing state 22 at time 2.100000e-09 to file bih.1.e; output a total of 22 states so far
 Solving for state 23, time 2.100000e-09
   NL step  0, |residual|_2 = 3.807909e+00
-  NL step  1, |residual|_2 = 1.657468e-05
-  NL step  2, |residual|_2 = 7.061230e-15
+  NL step  1, |residual|_2 = 7.569577e-08
+  NL step  2, |residual|_2 = 2.495208e-15
 Writing state 23 at time 2.200000e-09 to file bih.1.e; output a total of 23 states so far
 Solving for state 24, time 2.200000e-09
   NL step  0, |residual|_2 = 3.805536e+00
-  NL step  1, |residual|_2 = 3.962070e-05
-  NL step  2, |residual|_2 = 1.558919e-14
+  NL step  1, |residual|_2 = 7.326139e-08
+  NL step  2, |residual|_2 = 2.341764e-15
 Writing state 24 at time 2.300000e-09 to file bih.1.e; output a total of 24 states so far
 Solving for state 25, time 2.300000e-09
   NL step  0, |residual|_2 = 3.803179e+00
-  NL step  1, |residual|_2 = 1.919904e-05
-  NL step  2, |residual|_2 = 8.193367e-15
+  NL step  1, |residual|_2 = 4.221623e-08
+  NL step  2, |residual|_2 = 2.358325e-15
 Writing state 25 at time 2.400000e-09 to file bih.1.e; output a total of 25 states so far
 Solving for state 26, time 2.400000e-09
   NL step  0, |residual|_2 = 3.800842e+00
-  NL step  1, |residual|_2 = 3.451238e-05
-  NL step  2, |residual|_2 = 1.339852e-14
+  NL step  1, |residual|_2 = 1.024370e-07
+  NL step  2, |residual|_2 = 2.288452e-15
 Writing state 26 at time 2.500000e-09 to file bih.1.e; output a total of 26 states so far
 Solving for state 27, time 2.500000e-09
   NL step  0, |residual|_2 = 3.798522e+00
-  NL step  1, |residual|_2 = 2.119591e-05
-  NL step  2, |residual|_2 = 9.254262e-15
+  NL step  1, |residual|_2 = 3.410027e-08
 Writing state 27 at time 2.600000e-09 to file bih.1.e; output a total of 27 states so far
 Solving for state 28, time 2.600000e-09
   NL step  0, |residual|_2 = 3.796220e+00
-  NL step  1, |residual|_2 = 2.971326e-05
-  NL step  2, |residual|_2 = 1.165691e-14
+  NL step  1, |residual|_2 = 2.482465e-07
+  NL step  2, |residual|_2 = 2.646697e-15
 Writing state 28 at time 2.700000e-09 to file bih.1.e; output a total of 28 states so far
 Solving for state 29, time 2.700000e-09
   NL step  0, |residual|_2 = 3.793932e+00
-  NL step  1, |residual|_2 = 2.268267e-05
-  NL step  2, |residual|_2 = 9.873242e-15
+  NL step  1, |residual|_2 = 1.025109e-07
+  NL step  2, |residual|_2 = 2.243753e-15
 Writing state 29 at time 2.800000e-09 to file bih.1.e; output a total of 29 states so far
 Solving for state 30, time 2.800000e-09
   NL step  0, |residual|_2 = 3.791663e+00
-  NL step  1, |residual|_2 = 2.535024e-05
-  NL step  2, |residual|_2 = 9.862647e-15
+  NL step  1, |residual|_2 = 2.505431e-07
+  NL step  2, |residual|_2 = 2.438573e-15
 Writing state 30 at time 2.900000e-09 to file bih.1.e; output a total of 30 states so far
 Solving for state 31, time 2.900000e-09
   NL step  0, |residual|_2 = 3.789407e+00
-  NL step  1, |residual|_2 = 2.374583e-05
-  NL step  2, |residual|_2 = 1.023137e-14
+  NL step  1, |residual|_2 = 9.550927e-08
+  NL step  2, |residual|_2 = 2.429171e-15
 Writing state 31 at time 3.000000e-09 to file bih.1.e; output a total of 31 states so far
 Solving for state 32, time 3.000000e-09
   NL step  0, |residual|_2 = 3.787167e+00
-  NL step  1, |residual|_2 = 2.148967e-05
-  NL step  2, |residual|_2 = 8.615165e-15
+  NL step  1, |residual|_2 = 2.581924e-07
+  NL step  2, |residual|_2 = 2.508660e-15
 Writing state 32 at time 3.100000e-09 to file bih.1.e; output a total of 32 states so far
 Solving for state 33, time 3.100000e-09
   NL step  0, |residual|_2 = 3.784941e+00
-  NL step  1, |residual|_2 = 2.445092e-05
-  NL step  2, |residual|_2 = 1.069983e-14
+  NL step  1, |residual|_2 = 9.692862e-08
+  NL step  2, |residual|_2 = 2.404583e-15
 Writing state 33 at time 3.200000e-09 to file bih.1.e; output a total of 33 states so far
 Solving for state 34, time 3.200000e-09
   NL step  0, |residual|_2 = 3.782730e+00
-  NL step  1, |residual|_2 = 1.816303e-05
-  NL step  2, |residual|_2 = 7.494971e-15
+  NL step  1, |residual|_2 = 2.594179e-07
+  NL step  2, |residual|_2 = 2.491096e-15
 Writing state 34 at time 3.300000e-09 to file bih.1.e; output a total of 34 states so far
 Solving for state 35, time 3.300000e-09
   NL step  0, |residual|_2 = 3.780531e+00
-  NL step  1, |residual|_2 = 2.485300e-05
-  NL step  2, |residual|_2 = 1.092513e-14
+  NL step  1, |residual|_2 = 9.887434e-08
+  NL step  2, |residual|_2 = 2.479266e-15
 Writing state 35 at time 3.400000e-09 to file bih.1.e; output a total of 35 states so far
 Solving for state 36, time 3.400000e-09
   NL step  0, |residual|_2 = 3.778347e+00
-  NL step  1, |residual|_2 = 1.538250e-05
-  NL step  2, |residual|_2 = 6.478230e-15
+  NL step  1, |residual|_2 = 2.527746e-07
+  NL step  2, |residual|_2 = 2.569841e-15
 Writing state 36 at time 3.500000e-09 to file bih.1.e; output a total of 36 states so far
 Solving for state 37, time 3.500000e-09
   NL step  0, |residual|_2 = 3.776174e+00
-  NL step  1, |residual|_2 = 2.499823e-05
-  NL step  2, |residual|_2 = 1.108710e-14
+  NL step  1, |residual|_2 = 9.893108e-08
+  NL step  2, |residual|_2 = 2.460867e-15
 Writing state 37 at time 3.600000e-09 to file bih.1.e; output a total of 37 states so far
 Solving for state 38, time 3.600000e-09
   NL step  0, |residual|_2 = 3.774015e+00
-  NL step  1, |residual|_2 = 1.314885e-05
-  NL step  2, |residual|_2 = 5.631716e-15
+  NL step  1, |residual|_2 = 2.386953e-07
+  NL step  2, |residual|_2 = 2.287197e-15
 Writing state 38 at time 3.700000e-09 to file bih.1.e; output a total of 38 states so far
 Solving for state 39, time 3.700000e-09
   NL step  0, |residual|_2 = 3.771868e+00
-  NL step  1, |residual|_2 = 2.492579e-05
-  NL step  2, |residual|_2 = 1.091980e-14
+  NL step  1, |residual|_2 = 9.823210e-08
+  NL step  2, |residual|_2 = 2.425269e-15
 Writing state 39 at time 3.800000e-09 to file bih.1.e; output a total of 39 states so far
 Solving for state 40, time 3.800000e-09
   NL step  0, |residual|_2 = 3.769733e+00
-  NL step  1, |residual|_2 = 1.145153e-05
-  NL step  2, |residual|_2 = 5.217658e-15
+  NL step  1, |residual|_2 = 2.184248e-07
+  NL step  2, |residual|_2 = 2.412187e-15
 Writing state 40 at time 3.900000e-09 to file bih.1.e; output a total of 40 states so far
 Solving for state 41, time 3.900000e-09
   NL step  0, |residual|_2 = 3.767609e+00
-  NL step  1, |residual|_2 = 2.466983e-05
-  NL step  2, |residual|_2 = 1.100551e-14
+  NL step  1, |residual|_2 = 9.982364e-08
+  NL step  2, |residual|_2 = 2.594741e-15
 Writing state 41 at time 4.000000e-09 to file bih.1.e; output a total of 41 states so far
 Solving for state 42, time 4.000000e-09
   NL step  0, |residual|_2 = 3.765498e+00
-  NL step  1, |residual|_2 = 1.026161e-05
-  NL step  2, |residual|_2 = 4.926083e-15
+  NL step  1, |residual|_2 = 1.936364e-07
+  NL step  2, |residual|_2 = 2.566911e-15
 Writing state 42 at time 4.100000e-09 to file bih.1.e; output a total of 42 states so far
 Solving for state 43, time 4.100000e-09
   NL step  0, |residual|_2 = 3.763397e+00
-  NL step  1, |residual|_2 = 2.426047e-05
-  NL step  2, |residual|_2 = 1.058644e-14
+  NL step  1, |residual|_2 = 1.069263e-07
+  NL step  2, |residual|_2 = 2.410036e-15
 Writing state 43 at time 4.200000e-09 to file bih.1.e; output a total of 43 states so far
 Solving for state 44, time 4.200000e-09
   NL step  0, |residual|_2 = 3.761307e+00
-  NL step  1, |residual|_2 = 9.522752e-06
-  NL step  2, |residual|_2 = 4.585354e-15
+  NL step  1, |residual|_2 = 1.662948e-07
+  NL step  2, |residual|_2 = 2.717666e-15
 Writing state 44 at time 4.300000e-09 to file bih.1.e; output a total of 44 states so far
 Solving for state 45, time 4.300000e-09
   NL step  0, |residual|_2 = 3.759228e+00
-  NL step  1, |residual|_2 = 2.372440e-05
-  NL step  2, |residual|_2 = 1.016754e-14
+  NL step  1, |residual|_2 = 1.210237e-07
+  NL step  2, |residual|_2 = 2.503640e-15
 Writing state 45 at time 4.400000e-09 to file bih.1.e; output a total of 45 states so far
 Solving for state 46, time 4.400000e-09
   NL step  0, |residual|_2 = 3.757160e+00
-  NL step  1, |residual|_2 = 9.150374e-06
-  NL step  2, |residual|_2 = 4.489329e-15
+  NL step  1, |residual|_2 = 1.387212e-07
+  NL step  2, |residual|_2 = 2.443778e-15
 Writing state 46 at time 4.500000e-09 to file bih.1.e; output a total of 46 states so far
 Solving for state 47, time 4.500000e-09
   NL step  0, |residual|_2 = 3.755101e+00
-  NL step  1, |residual|_2 = 2.308525e-05
-  NL step  2, |residual|_2 = 9.946694e-15
+  NL step  1, |residual|_2 = 1.413200e-07
+  NL step  2, |residual|_2 = 2.453897e-15
 Writing state 47 at time 4.600000e-09 to file bih.1.e; output a total of 47 states so far
 Solving for state 48, time 4.600000e-09
   NL step  0, |residual|_2 = 3.753053e+00
-  NL step  1, |residual|_2 = 9.044983e-06
-  NL step  2, |residual|_2 = 4.535988e-15
+  NL step  1, |residual|_2 = 1.138969e-07
+  NL step  2, |residual|_2 = 2.520689e-15
 Writing state 48 at time 4.700000e-09 to file bih.1.e; output a total of 48 states so far
 Solving for state 49, time 4.700000e-09
   NL step  0, |residual|_2 = 3.751014e+00
-  NL step  1, |residual|_2 = 2.236390e-05
-  NL step  2, |residual|_2 = 9.539060e-15
+  NL step  1, |residual|_2 = 1.658550e-07
+  NL step  2, |residual|_2 = 2.425168e-15
 Writing state 49 at time 4.800000e-09 to file bih.1.e; output a total of 49 states so far
 Solving for state 50, time 4.800000e-09
   NL step  0, |residual|_2 = 3.748985e+00
-  NL step  1, |residual|_2 = 9.112047e-06
-  NL step  2, |residual|_2 = 4.449126e-15
+  NL step  1, |residual|_2 = 9.588393e-08
+  NL step  2, |residual|_2 = 2.380361e-15
 Writing state 50 at time 4.900000e-09 to file bih.1.e; output a total of 50 states so far
 Solving for state 51, time 4.900000e-09
   NL step  0, |residual|_2 = 3.746966e+00
-  NL step  1, |residual|_2 = 2.157881e-05
-  NL step  2, |residual|_2 = 9.194307e-15
+  NL step  1, |residual|_2 = 1.926354e-07
+  NL step  2, |residual|_2 = 2.380779e-15
 Writing state 51 at time 5.000000e-09 to file bih.1.e; output a total of 51 states so far
 Solving for state 52, time 5.000000e-09
   NL step  0, |residual|_2 = 3.744956e+00
-  NL step  1, |residual|_2 = 9.275811e-06
-  NL step  2, |residual|_2 = 4.541950e-15
+  NL step  1, |residual|_2 = 8.914698e-08
+  NL step  2, |residual|_2 = 2.400894e-15
 Writing state 52 at time 5.100000e-09 to file bih.1.e; output a total of 52 states so far
 Solving for state 53, time 5.100000e-09
   NL step  0, |residual|_2 = 3.742955e+00
-  NL step  1, |residual|_2 = 2.074620e-05
-  NL step  2, |residual|_2 = 8.821044e-15
+  NL step  1, |residual|_2 = 2.200581e-07
+  NL step  2, |residual|_2 = 2.622921e-15
 Writing state 53 at time 5.200000e-09 to file bih.1.e; output a total of 53 states so far
 Solving for state 54, time 5.200000e-09
   NL step  0, |residual|_2 = 3.740963e+00
-  NL step  1, |residual|_2 = 9.482812e-06
-  NL step  2, |residual|_2 = 4.490640e-15
+  NL step  1, |residual|_2 = 9.501731e-08
+  NL step  2, |residual|_2 = 2.551815e-15
 Writing state 54 at time 5.300000e-09 to file bih.1.e; output a total of 54 states so far
 Solving for state 55, time 5.300000e-09
   NL step  0, |residual|_2 = 3.738979e+00
-  NL step  1, |residual|_2 = 1.988031e-05
-  NL step  2, |residual|_2 = 8.486920e-15
+  NL step  1, |residual|_2 = 2.469333e-07
+  NL step  2, |residual|_2 = 2.529382e-15
 Writing state 55 at time 5.400000e-09 to file bih.1.e; output a total of 55 states so far
 Solving for state 56, time 5.400000e-09
   NL step  0, |residual|_2 = 3.737005e+00
-  NL step  1, |residual|_2 = 9.698778e-06
-  NL step  2, |residual|_2 = 4.792322e-15
+  NL step  1, |residual|_2 = 1.098357e-07
+  NL step  2, |residual|_2 = 2.611139e-15
 Writing state 56 at time 5.500000e-09 to file bih.1.e; output a total of 56 states so far
 Solving for state 57, time 5.500000e-09
   NL step  0, |residual|_2 = 3.735039e+00
-  NL step  1, |residual|_2 = 1.899356e-05
-  NL step  2, |residual|_2 = 8.001669e-15
+  NL step  1, |residual|_2 = 2.724056e-07
+  NL step  2, |residual|_2 = 2.504157e-15
 Writing state 57 at time 5.600000e-09 to file bih.1.e; output a total of 57 states so far
 Solving for state 58, time 5.600000e-09
   NL step  0, |residual|_2 = 3.733082e+00
-  NL step  1, |residual|_2 = 9.903517e-06
-  NL step  2, |residual|_2 = 4.693907e-15
+  NL step  1, |residual|_2 = 1.287789e-07
+  NL step  2, |residual|_2 = 2.315606e-15
 Writing state 58 at time 5.700000e-09 to file bih.1.e; output a total of 58 states so far
 Solving for state 59, time 5.700000e-09
   NL step  0, |residual|_2 = 3.731132e+00
-  NL step  1, |residual|_2 = 1.809677e-05
-  NL step  2, |residual|_2 = 7.694977e-15
+  NL step  1, |residual|_2 = 2.958737e-07
+  NL step  2, |residual|_2 = 2.431640e-15
 Writing state 59 at time 5.800000e-09 to file bih.1.e; output a total of 59 states so far
 Solving for state 60, time 5.800000e-09
   NL step  0, |residual|_2 = 3.729191e+00
-  NL step  1, |residual|_2 = 1.008627e-05
-  NL step  2, |residual|_2 = 4.802706e-15
+  NL step  1, |residual|_2 = 1.486029e-07
+  NL step  2, |residual|_2 = 2.465803e-15
 Writing state 60 at time 5.900000e-09 to file bih.1.e; output a total of 60 states so far
 Solving for state 61, time 5.900000e-09
   NL step  0, |residual|_2 = 3.727257e+00
-  NL step  1, |residual|_2 = 1.719930e-05
-  NL step  2, |residual|_2 = 7.358633e-15
+  NL step  1, |residual|_2 = 3.169299e-07
+  NL step  2, |residual|_2 = 2.622898e-15
 Writing state 61 at time 6.000000e-09 to file bih.1.e; output a total of 61 states so far
 Solving for state 62, time 6.000000e-09
   NL step  0, |residual|_2 = 3.725332e+00
-  NL step  1, |residual|_2 = 1.024226e-05
-  NL step  2, |residual|_2 = 4.915938e-15
+  NL step  1, |residual|_2 = 1.675296e-07
+  NL step  2, |residual|_2 = 2.414417e-15
 Writing state 62 at time 6.100000e-09 to file bih.1.e; output a total of 62 states so far
 Solving for state 63, time 6.100000e-09
   NL step  0, |residual|_2 = 3.723414e+00
-  NL step  1, |residual|_2 = 1.630925e-05
-  NL step  2, |residual|_2 = 7.032664e-15
+  NL step  1, |residual|_2 = 3.353144e-07
+  NL step  2, |residual|_2 = 2.456989e-15
 Writing state 63 at time 6.200000e-09 to file bih.1.e; output a total of 63 states so far
 Solving for state 64, time 6.200000e-09
   NL step  0, |residual|_2 = 3.721504e+00
-  NL step  1, |residual|_2 = 1.037030e-05
-  NL step  2, |residual|_2 = 4.902093e-15
+  NL step  1, |residual|_2 = 1.846217e-07
+  NL step  2, |residual|_2 = 2.613437e-15
 Writing state 64 at time 6.300000e-09 to file bih.1.e; output a total of 64 states so far
 Solving for state 65, time 6.300000e-09
   NL step  0, |residual|_2 = 3.719601e+00
-  NL step  1, |residual|_2 = 1.543354e-05
-  NL step  2, |residual|_2 = 6.563795e-15
+  NL step  1, |residual|_2 = 3.508814e-07
+  NL step  2, |residual|_2 = 2.482544e-15
 Writing state 65 at time 6.400000e-09 to file bih.1.e; output a total of 65 states so far
 Solving for state 66, time 6.400000e-09
   NL step  0, |residual|_2 = 3.717706e+00
-  NL step  1, |residual|_2 = 1.047125e-05
-  NL step  2, |residual|_2 = 4.902855e-15
+  NL step  1, |residual|_2 = 1.993937e-07
+  NL step  2, |residual|_2 = 2.434944e-15
 Writing state 66 at time 6.500000e-09 to file bih.1.e; output a total of 66 states so far
 Solving for state 67, time 6.500000e-09
   NL step  0, |residual|_2 = 3.715818e+00
-  NL step  1, |residual|_2 = 1.457808e-05
-  NL step  2, |residual|_2 = 6.199996e-15
+  NL step  1, |residual|_2 = 3.635735e-07
+  NL step  2, |residual|_2 = 2.556709e-15
 Writing state 67 at time 6.600000e-09 to file bih.1.e; output a total of 67 states so far
 Solving for state 68, time 6.600000e-09
   NL step  0, |residual|_2 = 3.713937e+00
-  NL step  1, |residual|_2 = 1.054706e-05
-  NL step  2, |residual|_2 = 5.061921e-15
+  NL step  1, |residual|_2 = 2.116130e-07
+  NL step  2, |residual|_2 = 2.473761e-15
 Writing state 68 at time 6.700000e-09 to file bih.1.e; output a total of 68 states so far
 Solving for state 69, time 6.700000e-09
   NL step  0, |residual|_2 = 3.712063e+00
-  NL step  1, |residual|_2 = 1.374788e-05
-  NL step  2, |residual|_2 = 5.864592e-15
+  NL step  1, |residual|_2 = 3.734010e-07
+  NL step  2, |residual|_2 = 2.527880e-15
 Writing state 69 at time 6.800000e-09 to file bih.1.e; output a total of 69 states so far
 Solving for state 70, time 6.800000e-09
   NL step  0, |residual|_2 = 3.710197e+00
-  NL step  1, |residual|_2 = 1.060014e-05
-  NL step  2, |residual|_2 = 4.976120e-15
+  NL step  1, |residual|_2 = 2.211980e-07
+  NL step  2, |residual|_2 = 2.400609e-15
 Writing state 70 at time 6.900000e-09 to file bih.1.e; output a total of 70 states so far
 Solving for state 71, time 6.900000e-09
   NL step  0, |residual|_2 = 3.708336e+00
-  NL step  1, |residual|_2 = 1.294717e-05
-  NL step  2, |residual|_2 = 5.657549e-15
+  NL step  1, |residual|_2 = 3.804259e-07
+  NL step  2, |residual|_2 = 2.394281e-15
 Writing state 71 at time 7.000000e-09 to file bih.1.e; output a total of 71 states so far
 Solving for state 72, time 7.000000e-09
   NL step  0, |residual|_2 = 3.706484e+00
-  NL step  1, |residual|_2 = 1.063299e-05
-  NL step  2, |residual|_2 = 5.072879e-15
+  NL step  1, |residual|_2 = 2.281627e-07
+  NL step  2, |residual|_2 = 2.563391e-15
 Writing state 72 at time 7.100000e-09 to file bih.1.e; output a total of 72 states so far
 Solving for state 73, time 7.100000e-09
   NL step  0, |residual|_2 = 3.704637e+00
-  NL step  1, |residual|_2 = 1.217949e-05
-  NL step  2, |residual|_2 = 5.410631e-15
+  NL step  1, |residual|_2 = 3.847491e-07
+  NL step  2, |residual|_2 = 2.486401e-15
 Writing state 73 at time 7.200000e-09 to file bih.1.e; output a total of 73 states so far
 Solving for state 74, time 7.200000e-09
   NL step  0, |residual|_2 = 3.702797e+00
-  NL step  1, |residual|_2 = 1.064804e-05
-  NL step  2, |residual|_2 = 5.235637e-15
+  NL step  1, |residual|_2 = 2.325837e-07
+  NL step  2, |residual|_2 = 2.406717e-15
 Writing state 74 at time 7.300000e-09 to file bih.1.e; output a total of 74 states so far
 Solving for state 75, time 7.300000e-09
   NL step  0, |residual|_2 = 3.700963e+00
-  NL step  1, |residual|_2 = 1.144777e-05
-  NL step  2, |residual|_2 = 5.155750e-15
+  NL step  1, |residual|_2 = 3.864999e-07
+  NL step  2, |residual|_2 = 2.434656e-15
 Writing state 75 at time 7.400000e-09 to file bih.1.e; output a total of 75 states so far
 Solving for state 76, time 7.400000e-09
   NL step  0, |residual|_2 = 3.699137e+00
-  NL step  1, |residual|_2 = 1.064752e-05
-  NL step  2, |residual|_2 = 5.074776e-15
+  NL step  1, |residual|_2 = 2.345800e-07
+  NL step  2, |residual|_2 = 2.600773e-15
 Writing state 76 at time 7.500000e-09 to file bih.1.e; output a total of 76 states so far
 Solving for state 77, time 7.500000e-09
   NL step  0, |residual|_2 = 3.697316e+00
-  NL step  1, |residual|_2 = 1.075443e-05
-  NL step  2, |residual|_2 = 5.005223e-15
+  NL step  1, |residual|_2 = 3.858276e-07
+  NL step  2, |residual|_2 = 2.479296e-15
 Writing state 77 at time 7.600000e-09 to file bih.1.e; output a total of 77 states so far
 Solving for state 78, time 7.600000e-09
   NL step  0, |residual|_2 = 3.695502e+00
-  NL step  1, |residual|_2 = 1.063335e-05
-  NL step  2, |residual|_2 = 5.196025e-15
+  NL step  1, |residual|_2 = 2.342992e-07
+  NL step  2, |residual|_2 = 2.388925e-15
 Writing state 78 at time 7.700000e-09 to file bih.1.e; output a total of 78 states so far
 Solving for state 79, time 7.700000e-09
   NL step  0, |residual|_2 = 3.693694e+00
-  NL step  1, |residual|_2 = 1.010139e-05
-  NL step  2, |residual|_2 = 4.842646e-15
+  NL step  1, |residual|_2 = 3.828952e-07
+  NL step  2, |residual|_2 = 2.600408e-15
 Writing state 79 at time 7.800000e-09 to file bih.1.e; output a total of 79 states so far
 Solving for state 80, time 7.800000e-09
   NL step  0, |residual|_2 = 3.691892e+00
-  NL step  1, |residual|_2 = 1.060699e-05
-  NL step  2, |residual|_2 = 5.125566e-15
+  NL step  1, |residual|_2 = 2.319080e-07
+  NL step  2, |residual|_2 = 2.659483e-15
 Writing state 80 at time 7.900000e-09 to file bih.1.e; output a total of 80 states so far
 Solving for state 81, time 7.900000e-09
   NL step  0, |residual|_2 = 3.690096e+00
-  NL step  1, |residual|_2 = 9.490165e-06
-  NL step  2, |residual|_2 = 4.525938e-15
+  NL step  1, |residual|_2 = 3.778738e-07
+  NL step  2, |residual|_2 = 2.615159e-15
 Writing state 81 at time 8.000000e-09 to file bih.1.e; output a total of 81 states so far
 Solving for state 82, time 8.000000e-09
   NL step  0, |residual|_2 = 3.688306e+00
-  NL step  1, |residual|_2 = 4.472771e-05
-  NL step  2, |residual|_2 = 1.804261e-14
+  NL step  1, |residual|_2 = 2.275868e-07
+  NL step  2, |residual|_2 = 2.439835e-15
 Writing state 82 at time 8.100000e-09 to file bih.1.e; output a total of 82 states so far
 Solving for state 83, time 8.100000e-09
   NL step  0, |residual|_2 = 3.686522e+00
-  NL step  1, |residual|_2 = 8.921876e-06
-  NL step  2, |residual|_2 = 4.341095e-15
+  NL step  1, |residual|_2 = 3.709386e-07
+  NL step  2, |residual|_2 = 2.363289e-15
 Writing state 83 at time 8.200000e-09 to file bih.1.e; output a total of 83 states so far
 Solving for state 84, time 8.200000e-09
   NL step  0, |residual|_2 = 3.684744e+00
-  NL step  1, |residual|_2 = 4.438729e-05
-  NL step  2, |residual|_2 = 1.843308e-14
+  NL step  1, |residual|_2 = 2.215246e-07
+  NL step  2, |residual|_2 = 2.408869e-15
 Writing state 84 at time 8.300000e-09 to file bih.1.e; output a total of 84 states so far
 Solving for state 85, time 8.300000e-09
   NL step  0, |residual|_2 = 3.682971e+00
-  NL step  1, |residual|_2 = 4.649949e-05
-  NL step  2, |residual|_2 = 1.903829e-14
+  NL step  1, |residual|_2 = 3.622657e-07
+  NL step  2, |residual|_2 = 2.323864e-15
 Writing state 85 at time 8.400000e-09 to file bih.1.e; output a total of 85 states so far
 Solving for state 86, time 8.400000e-09
   NL step  0, |residual|_2 = 3.681205e+00
-  NL step  1, |residual|_2 = 4.336459e-05
-  NL step  2, |residual|_2 = 1.826386e-14
+  NL step  1, |residual|_2 = 2.139174e-07
+  NL step  2, |residual|_2 = 2.295697e-15
 Writing state 86 at time 8.500000e-09 to file bih.1.e; output a total of 86 states so far
 Solving for state 87, time 8.500000e-09
   NL step  0, |residual|_2 = 3.679443e+00
-  NL step  1, |residual|_2 = 4.368782e-05
-  NL step  2, |residual|_2 = 1.803108e-14
+  NL step  1, |residual|_2 = 3.520296e-07
+  NL step  2, |residual|_2 = 2.376511e-15
 Writing state 87 at time 8.600000e-09 to file bih.1.e; output a total of 87 states so far
 Solving for state 88, time 8.600000e-09
   NL step  0, |residual|_2 = 3.677688e+00
-  NL step  1, |residual|_2 = 4.165611e-05
-  NL step  2, |residual|_2 = 1.737498e-14
+  NL step  1, |residual|_2 = 2.049672e-07
+  NL step  2, |residual|_2 = 2.508000e-15
 Writing state 88 at time 8.700000e-09 to file bih.1.e; output a total of 88 states so far
 Solving for state 89, time 8.700000e-09
   NL step  0, |residual|_2 = 3.675938e+00
-  NL step  1, |residual|_2 = 4.085314e-05
-  NL step  2, |residual|_2 = 1.721921e-14
+  NL step  1, |residual|_2 = 3.404019e-07
+  NL step  2, |residual|_2 = 2.459481e-15
 Writing state 89 at time 8.800000e-09 to file bih.1.e; output a total of 89 states so far
 Solving for state 90, time 8.800000e-09
   NL step  0, |residual|_2 = 3.674193e+00
-  NL step  1, |residual|_2 = 3.952923e-05
-  NL step  2, |residual|_2 = 1.694175e-14
+  NL step  1, |residual|_2 = 1.948828e-07
+  NL step  2, |residual|_2 = 2.472973e-15
 Writing state 90 at time 8.900000e-09 to file bih.1.e; output a total of 90 states so far
 Solving for state 91, time 8.900000e-09
   NL step  0, |residual|_2 = 3.672454e+00
-  NL step  1, |residual|_2 = 3.803852e-05
-  NL step  2, |residual|_2 = 1.625345e-14
+  NL step  1, |residual|_2 = 3.275496e-07
+  NL step  2, |residual|_2 = 2.655535e-15
 Writing state 91 at time 9.000000e-09 to file bih.1.e; output a total of 91 states so far
 Solving for state 92, time 9.000000e-09
   NL step  0, |residual|_2 = 3.670720e+00
-  NL step  1, |residual|_2 = 3.720056e-05
-  NL step  2, |residual|_2 = 1.609485e-14
+  NL step  1, |residual|_2 = 1.838827e-07
+  NL step  2, |residual|_2 = 2.526653e-15
 Writing state 92 at time 9.100000e-09 to file bih.1.e; output a total of 92 states so far
 Solving for state 93, time 9.100000e-09
   NL step  0, |residual|_2 = 3.668992e+00
-  NL step  1, |residual|_2 = 3.528826e-05
-  NL step  2, |residual|_2 = 1.517233e-14
+  NL step  1, |residual|_2 = 3.136350e-07
+  NL step  2, |residual|_2 = 2.328935e-15
 Writing state 93 at time 9.200000e-09 to file bih.1.e; output a total of 93 states so far
 Solving for state 94, time 9.200000e-09
   NL step  0, |residual|_2 = 3.667269e+00
-  NL step  1, |residual|_2 = 3.481663e-05
-  NL step  2, |residual|_2 = 1.537883e-14
+  NL step  1, |residual|_2 = 1.722002e-07
+  NL step  2, |residual|_2 = 2.247037e-15
 Writing state 94 at time 9.300000e-09 to file bih.1.e; output a total of 94 states so far
 Solving for state 95, time 9.300000e-09
   NL step  0, |residual|_2 = 3.665550e+00
-  NL step  1, |residual|_2 = 3.264834e-05
-  NL step  2, |residual|_2 = 1.432468e-14
+  NL step  1, |residual|_2 = 2.988151e-07
+  NL step  2, |residual|_2 = 2.459460e-15
 Writing state 95 at time 9.400000e-09 to file bih.1.e; output a total of 95 states so far
 Solving for state 96, time 9.400000e-09
   NL step  0, |residual|_2 = 3.663837e+00
-  NL step  1, |residual|_2 = 3.248051e-05
-  NL step  2, |residual|_2 = 1.416488e-14
+  NL step  1, |residual|_2 = 1.600913e-07
+  NL step  2, |residual|_2 = 2.484313e-15
 Writing state 96 at time 9.500000e-09 to file bih.1.e; output a total of 96 states so far
 Solving for state 97, time 9.500000e-09
   NL step  0, |residual|_2 = 3.662129e+00
-  NL step  1, |residual|_2 = 3.016688e-05
-  NL step  2, |residual|_2 = 1.333854e-14
+  NL step  1, |residual|_2 = 2.832423e-07
+  NL step  2, |residual|_2 = 2.481569e-15
 Writing state 97 at time 9.600000e-09 to file bih.1.e; output a total of 97 states so far
 Solving for state 98, time 9.600000e-09
   NL step  0, |residual|_2 = 3.660426e+00
-  NL step  1, |residual|_2 = 3.027161e-05
-  NL step  2, |residual|_2 = 1.326483e-14
+  NL step  1, |residual|_2 = 1.478468e-07
+  NL step  2, |residual|_2 = 2.436396e-15
 Writing state 98 at time 9.700000e-09 to file bih.1.e; output a total of 98 states so far
 Solving for state 99, time 9.700000e-09
   NL step  0, |residual|_2 = 3.658728e+00
-  NL step  1, |residual|_2 = 2.789414e-05
-  NL step  2, |residual|_2 = 1.201212e-14
+  NL step  1, |residual|_2 = 2.670648e-07
+  NL step  2, |residual|_2 = 2.318336e-15
 Writing state 99 at time 9.800000e-09 to file bih.1.e; output a total of 99 states so far
 Solving for state 100, time 9.800000e-09
   NL step  0, |residual|_2 = 3.657035e+00
-  NL step  1, |residual|_2 = 2.825614e-05
-  NL step  2, |residual|_2 = 1.219434e-14
+  NL step  1, |residual|_2 = 1.358089e-07
+  NL step  2, |residual|_2 = 2.353539e-15
 Writing state 100 at time 9.900000e-09 to file bih.1.e; output a total of 100 states so far
 Solving for state 101, time 9.900000e-09
   NL step  0, |residual|_2 = 3.655347e+00
-  NL step  1, |residual|_2 = 2.588161e-05
-  NL step  2, |residual|_2 = 1.124539e-14
+  NL step  1, |residual|_2 = 2.504283e-07
+  NL step  2, |residual|_2 = 2.337847e-15
 Writing state 101 at time 1.000000e-08 to file bih.1.e; output a total of 101 states so far
 Solving for state 102, time 1.000000e-08
   NL step  0, |residual|_2 = 3.653664e+00
-  NL step  1, |residual|_2 = 2.649134e-05
-  NL step  2, |residual|_2 = 1.148410e-14
-************************************************************************************************************************
-***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
-************************************************************************************************************************
-
----------------------------------------------- PETSc Performance Summary: ----------------------------------------------
-
-/workspace/libmesh/examples/miscellaneous/miscellaneous_ex7/.libs/lt-example-devel on a intel-12. named hbar.ices.utexas.edu with 12 processors, by benkirk Thu Jan 31 22:11:02 2013
-Using Petsc Release Version 3.3.0, Patch 2, Fri Jul 13 15:42:00 CDT 2012 
-
-                         Max       Max/Min        Avg      Total 
-Time (sec):           6.419e+00      1.00004   6.419e+00
-Objects:              5.717e+03      1.00000   5.717e+03
-Flops:                7.402e+06      1.04895   7.177e+06  8.613e+07
-Flops/sec:            1.153e+06      1.04895   1.118e+06  1.342e+07
-MPI Messages:         2.034e+04      1.01728   2.029e+04  2.434e+05
-MPI Message Lengths:  1.105e+07      1.02151   5.372e+02  1.308e+08
-MPI Reductions:       1.537e+04      1.00000
-
-Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
-                            e.g., VecAXPY() for real vectors of length N --> 2N flops
-                            and VecAXPY() for complex vectors of length N --> 8N flops
-
-Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
-                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 6.4190e+00 100.0%  8.6127e+07 100.0%  2.434e+05 100.0%  5.372e+02      100.0%  1.537e+04 100.0% 
-
-------------------------------------------------------------------------------------------------------------------------
-See the 'Profiling' chapter of the users' manual for details on interpreting output.
-Phase summary info:
-   Count: number of times phase was executed
-   Time and Flops: Max - maximum over all processors
-                   Ratio - ratio of maximum to minimum over all processors
-   Mess: number of messages sent
-   Avg. len: average message length
-   Reduct: number of global reductions
-   Global: entire computation
-   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
-      %T - percent time in this phase         %f - percent flops in this phase
-      %M - percent messages in this phase     %L - percent message lengths in this phase
-      %R - percent reductions in this phase
-   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
-------------------------------------------------------------------------------------------------------------------------
-Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
-                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %f %M %L %R  %T %f %M %L %R Mflop/s
-------------------------------------------------------------------------------------------------------------------------
-
---- Event Stage 0: Main Stage
-
-VecDot               188 1.0 1.3921e-03 1.1 6.60e+04 1.0 0.0e+00 0.0e+00 1.9e+02  0  1  0  0  1   0  1  0  0  1   552
-VecMDot              833 1.0 7.0674e-03 1.1 8.09e+05 1.0 0.0e+00 0.0e+00 8.3e+02  0 11  0  0  5   0 11  0  0  5  1333
-VecNorm             1397 1.0 9.8076e-03 1.1 4.92e+05 1.0 0.0e+00 0.0e+00 1.4e+03  0  7  0  0  9   0  7  0  0  9   584
-VecScale            1021 1.0 7.2575e-04 1.2 1.80e+05 1.0 0.0e+00 0.0e+00 0.0e+00  0  2  0  0  0   0  2  0  0  0  2884
-VecCopy             1245 1.0 8.6975e-04 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecSet              2172 1.0 1.7915e-03 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecAXPY              188 1.0 2.9659e-04 1.4 6.62e+04 1.0 0.0e+00 0.0e+00 0.0e+00  0  1  0  0  0   0  1  0  0  0  2599
-VecWAXPY             188 1.0 1.7405e-04 1.3 3.31e+04 1.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  2214
-VecMAXPY            1021 1.0 9.5534e-04 1.2 1.10e+06 1.0 0.0e+00 0.0e+00 0.0e+00  0 15  0  0  0   0 15  0  0  0 13467
-VecAssemblyBegin    3170 1.0 2.6592e-01 3.6 0.00e+00 0.0 6.9e+03 1.2e+01 8.1e+03  3  0  3  0 53   3  0  3  0 53     0
-VecAssemblyEnd      3170 1.0 2.2085e-03 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecScatterBegin     2180 1.0 9.0919e-03 1.1 0.00e+00 0.0 1.0e+05 8.4e+02 0.0e+00  0  0 42 67  0   0  0 42 67  0     0
-VecScatterEnd       2180 1.0 9.8939e-03 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecReduceArith       477 1.0 9.3451e-0324.9 1.67e+05 1.0 0.0e+00 0.0e+00 0.0e+00  0  2  0  0  0   0  2  0  0  0   209
-VecReduceComm        289 1.0 1.1070e-02 5.5 0.00e+00 0.0 0.0e+00 0.0e+00 2.9e+02  0  0  0  0  2   0  0  0  0  2     0
-VecNormalize        1021 1.0 8.7624e-03 1.1 5.39e+05 1.0 0.0e+00 0.0e+00 1.0e+03  0  7  0  0  7   0  7  0  0  7   717
-MatMult             1021 1.0 8.4660e-03 1.0 1.98e+06 1.1 2.5e+04 1.7e+01 0.0e+00  0 27 10  0  0   0 27 10  0  0  2721
-MatSolve            1021 1.0 3.9113e-03 1.0 1.96e+06 1.0 0.0e+00 0.0e+00 0.0e+00  0 27  0  0  0   0 27  0  0  0  5836
-MatLUFactorNum       188 1.0 8.5413e-03 1.1 5.39e+05 1.1 0.0e+00 0.0e+00 0.0e+00  0  7  0  0  0   0  7  0  0  0   735
-MatILUFactorSym      101 1.0 5.7631e-03 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 3.0e+02  0  0  0  0  2   0  0  0  0  2     0
-MatAssemblyBegin     376 1.0 1.4740e-0117.1 0.00e+00 0.0 6.8e+03 4.6e+01 7.5e+02  1  0  3  0  5   1  0  3  0  5     0
-MatAssemblyEnd       376 1.0 3.5045e-03 1.3 0.00e+00 0.0 4.8e+01 6.2e+00 8.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatGetRowIJ          101 1.0 4.4823e-05 1.8 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatGetOrdering       101 1.0 6.3262e-03 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 4.0e+02  0  0  0  0  3   0  0  0  0  3     0
-MatZeroEntries       190 1.0 5.0712e-04 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-SNESSolve            101 1.0 5.0690e+00 1.0 7.40e+06 1.0 2.4e+05 5.5e+02 1.5e+04 79100 98100 96  79100 98100 96    17
-SNESFunctionEval     289 1.0 2.9477e+00 1.0 0.00e+00 0.0 1.3e+05 6.1e+02 6.9e+03 46  0 53 60 45  46  0 53 60 45     0
-SNESJacobianEval     188 1.0 1.9986e+00 1.0 0.00e+00 0.0 8.6e+04 6.0e+02 4.1e+03 31  0 35 39 27  31  0 35 39 27     0
-SNESLineSearch       188 1.0 1.9214e+00 1.0 7.29e+05 1.0 8.8e+04 5.8e+02 5.3e+03 30 10 36 39 34  30 10 36 39 34     4
-KSPGMRESOrthog       833 1.0 8.4777e-03 1.1 1.62e+06 1.0 0.0e+00 0.0e+00 8.3e+02  0 22  0  0  5   0 22  0  0  5  2226
-KSPSetUp             376 1.0 3.2332e-03 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-KSPSolve             188 1.0 8.9893e-02 1.0 6.64e+06 1.0 2.0e+04 1.7e+01 2.8e+03  1 90  8  0 18   1 90  8  0 18   859
-PCSetUp              376 1.0 4.4060e-02 1.0 5.39e+05 1.1 0.0e+00 0.0e+00 9.1e+02  1  7  0  0  6   1  7  0  0  6   142
-PCSetUpOnBlocks      188 1.0 3.1049e-02 1.0 5.39e+05 1.1 0.0e+00 0.0e+00 7.1e+02  0  7  0  0  5   0  7  0  0  5   202
-PCApply             1021 1.0 1.3255e-02 1.0 1.96e+06 1.0 0.0e+00 0.0e+00 0.0e+00  0 27  0  0  0   0 27  0  0  0  1722
-------------------------------------------------------------------------------------------------------------------------
-
-Memory usage is given in bytes:
-
-Object Type          Creations   Destructions     Memory  Descendants' Mem.
-Reports information only for process 0.
-
---- Event Stage 0: Main Stage
-
-           Container   202            202       110696     0
-              Vector  2714           2714     14709648     0
-      Vector Scatter   484            484       501424     0
-           Index Set   995            995       918088     0
-   IS L to G Mapping     5              5         2820     0
-              Matrix   104            104      1557124     0
-                SNES   101            101       128068     0
-      SNESLineSearch   101            101        84840     0
-    Distributed Mesh   202            202       863752     0
-     Bipartite Graph   404            404       276336     0
-       Krylov Solver   202            202      1955360     0
-      Preconditioner   202            202       180184     0
-              Viewer     1              0            0     0
-========================================================================================================================
-Average time to get PetscTime(): 0
-Average time for MPI_Barrier(): 3.19481e-06
-Average time for zero size MPI_Send(): 1.44243e-05
-#PETSc Option Table entries:
---verbose dim=1
--ksp_right_pc
--log_summary
--pc_type bjacobi
--sub_pc_factor_levels 4
--sub_pc_factor_zeropivot 0
--sub_pc_type ilu
-#End of PETSc Option Table entries
-Compiled without FORTRAN kernels
-Compiled with full precision matrices (default)
-sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
-Configure run at: Thu Nov  8 11:21:02 2012
-Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared-libraries=1 --with-mpi-dir=/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1 --with-mumps=true --download-mumps=1 --with-metis=true --download-metis=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_intel_lp64.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_sequential.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_core.so]" --with-lapack-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_lapack95_lp64.a]"
------------------------------------------
-Libraries compiled on Thu Nov  8 11:21:02 2012 on daedalus.ices.utexas.edu 
-Machine characteristics: Linux-2.6.32-279.1.1.el6.x86_64-x86_64-with-redhat-6.3-Carbon
-Using PETSc directory: /opt/apps/ossw/libraries/petsc/petsc-3.3-p2
-Using PETSc arch: intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt
------------------------------------------
-
-Using C compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx  -wd1572 -O3   -fPIC   ${COPTFLAGS} ${CFLAGS}
-Using Fortran compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90  -fPIC -O3   ${FOPTFLAGS} ${FFLAGS} 
------------------------------------------
-
-Using include paths: -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/include
------------------------------------------
-
-Using C linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx
-Using Fortran linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90
-Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lpetsc -lX11 -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lHYPRE -lpthread -lsuperlu_dist_3.0 -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.3 -Wl,-rpath,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -L/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,-rpath,/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -L/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -Wl,-rpath,/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -L/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lcilkrts -lstdc++ -lgcc_s -lirc -lirc_s -ldl 
------------------------------------------
-
+  NL step  1, |residual|_2 = 1.243929e-07
+  NL step  2, |residual|_2 = 2.516733e-15
 Writing state 102 at time 1.010000e-08 to file bih.1.e; output a total of 102 states so far
 Writing state 102 at time 1.010000e-08 to file bih.1.e; output a total of 103 states so far
 
- ----------------------------------------------------------------------------------------------------------------------
-| Processor id:   0                                                                                                    |
-| Num Processors: 12                                                                                                   |
-| Time:           Thu Jan 31 22:11:02 2013                                                                             |
-| OS:             Linux                                                                                                |
-| HostName:       hbar.ices.utexas.edu                                                                                 |
-| OS Release:     2.6.32-279.1.1.el6.x86_64                                                                            |
-| OS Version:     #1 SMP Tue Jul 10 11:24:23 CDT 2012                                                                  |
-| Machine:        x86_64                                                                                               |
-| Username:       benkirk                                                                                              |
-| Configuration:  ./configure  '--enable-everything'                                                                   |
-|  '--prefix=/workspace/libmesh/install'                                                                               |
-|  'CXX=icpc'                                                                                                          |
-|  'CC=icc'                                                                                                            |
-|  'FC=ifort'                                                                                                          |
-|  'F77=ifort'                                                                                                         |
-|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                             |
-|  'PETSC_ARCH=intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
-|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                        |
-|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/intel-12.1/mpich2-1.4.1p1/mkl-intel-10.3.12.361'|
-|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/intel-12.1'                                                    |
- ----------------------------------------------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------
+| Processor id:   0                                                                                                 |
+| Num Processors: 4                                                                                                 |
+| Time:           Fri Apr 19 11:51:51 2013                                                                          |
+| OS:             Linux                                                                                             |
+| HostName:       spark.ices.utexas.edu                                                                             |
+| OS Release:     2.6.32-279.22.1.el6.x86_64                                                                        |
+| OS Version:     #1 SMP Tue Feb 5 14:33:39 CST 2013                                                                |
+| Machine:        x86_64                                                                                            |
+| Username:       roystgnr                                                                                          |
+| Configuration:  ../configure  '--enable-everything'                                                               |
+|  'METHODS=devel'                                                                                                  |
+|  '--prefix=/h2/roystgnr/libmesh-test'                                                                             |
+|  'CXX=distcc /usr/bin/g++'                                                                                        |
+|  'CC=distcc /usr/bin/gcc'                                                                                         |
+|  'FC=distcc /usr/bin/gfortran'                                                                                    |
+|  'F77=distcc /usr/bin/gfortran'                                                                                   |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                          |
+|  'PETSC_ARCH=gcc-system-mkl-gf-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                     |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/gcc-system/mpich2-1.4.1p1/mkl-gf-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/gcc-system'                                                 |
+|  'HDF5_DIR=/opt/apps/ossw/libraries/hdf5/hdf5-1.8.9/sl6/gcc-system'                                               |
+ -------------------------------------------------------------------------------------------------------------------
  ----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=6.86345, Active time=6.32439                                                   |
+| libMesh Performance: Alive time=12.2918, Active time=8.91372                                                   |
  ----------------------------------------------------------------------------------------------------------------
 | Event                              nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                              w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -3684,95 +3537,96 @@ Writing state 102 at time 1.010000e-08 to file bih.1.e; output a total of 103 st
 |                                                                                                                |
 |                                                                                                                |
 | DofMap                                                                                                         |
-|   add_neighbors_to_send_list()     1         0.0040      0.003971    0.0042      0.004207    0.06     0.07     |
-|   build_constraint_matrix()        41499     0.1953      0.000005    0.1953      0.000005    3.09     3.09     |
-|   build_sparsity()                 1         0.0028      0.002830    0.0088      0.008781    0.04     0.14     |
-|   constrain_elem_matrix()          16356     0.0414      0.000003    0.0414      0.000003    0.66     0.66     |
-|   constrain_elem_vector()          25143     0.0642      0.000003    0.0642      0.000003    1.02     1.02     |
-|   create_dof_constraints()         1         0.0313      0.031270    0.0596      0.059613    0.49     0.94     |
-|   distribute_dofs()                1         0.0162      0.016166    0.0503      0.050347    0.26     0.80     |
-|   dof_indices()                    50642     2.8309      0.000056    2.8309      0.000056    44.76    44.76    |
-|   enforce_constraints_exactly()    478       0.1522      0.000318    0.1522      0.000318    2.41     2.41     |
-|   prepare_send_list()              1         0.0000      0.000016    0.0000      0.000016    0.00     0.00     |
-|   reinit()                         1         0.0320      0.031998    0.0320      0.031998    0.51     0.51     |
+|   add_neighbors_to_send_list()     1         0.0010      0.001048    0.0011      0.001063    0.01     0.01     |
+|   build_constraint_matrix()        120064    0.1420      0.000001    0.1420      0.000001    1.59     1.59     |
+|   build_sparsity()                 1         0.0009      0.000905    0.0025      0.002509    0.01     0.03     |
+|   constrain_elem_matrix()          47104     0.0514      0.000001    0.0514      0.000001    0.58     0.58     |
+|   constrain_elem_vector()          72960     0.0755      0.000001    0.0755      0.000001    0.85     0.85     |
+|   create_dof_constraints()         1         0.0121      0.012083    0.0191      0.019082    0.14     0.21     |
+|   distribute_dofs()                1         0.0038      0.003789    0.0081      0.008060    0.04     0.09     |
+|   dof_indices()                    146950    0.8103      0.000006    0.8103      0.000006    9.09     9.09     |
+|   enforce_constraints_exactly()    470       0.1099      0.000234    0.1099      0.000234    1.23     1.23     |
+|   prepare_send_list()              1         0.0000      0.000002    0.0000      0.000002    0.00     0.00     |
+|   reinit()                         1         0.0039      0.003938    0.0039      0.003938    0.04     0.04     |
 |                                                                                                                |
 | EquationSystems                                                                                                |
-|   build_solution_vector()          103       0.4752      0.004614    1.0355      0.010053    7.51     16.37    |
+|   build_solution_vector()          103       0.2317      0.002250    0.4340      0.004214    2.60     4.87     |
 |                                                                                                                |
 | ExodusII_IO                                                                                                    |
-|   write_nodal_data()               103       0.0181      0.000176    0.0181      0.000176    0.29     0.29     |
+|   write_nodal_data()               103       5.3463      0.051906    5.3463      0.051906    59.98    59.98    |
 |                                                                                                                |
 | FE                                                                                                             |
-|   compute_shape_functions()        481       0.0452      0.000094    0.0452      0.000094    0.71     0.71     |
-|   init_shape_functions()           481       0.0982      0.000204    0.0982      0.000204    1.55     1.55     |
-|   inverse_map()                    17        0.0001      0.000007    0.0001      0.000007    0.00     0.00     |
+|   compute_shape_functions()        473       0.0079      0.000017    0.0079      0.000017    0.09     0.09     |
+|   init_shape_functions()           473       0.0165      0.000035    0.0165      0.000035    0.19     0.19     |
+|   inverse_map()                    17        0.0001      0.000003    0.0001      0.000003    0.00     0.00     |
 |                                                                                                                |
 | FEMap                                                                                                          |
-|   compute_affine_map()             41503     0.3087      0.000007    0.3087      0.000007    4.88     4.88     |
-|   compute_face_map()               2         0.0000      0.000010    0.0000      0.000010    0.00     0.00     |
-|   init_face_shape_functions()      2         0.0000      0.000023    0.0000      0.000023    0.00     0.00     |
-|   init_reference_to_physical_map() 481       0.0079      0.000016    0.0079      0.000016    0.12     0.12     |
+|   compute_affine_map()             120068    0.2075      0.000002    0.2075      0.000002    2.33     2.33     |
+|   compute_face_map()               2         0.0000      0.000003    0.0000      0.000003    0.00     0.00     |
+|   init_face_shape_functions()      2         0.0000      0.000003    0.0000      0.000003    0.00     0.00     |
+|   init_reference_to_physical_map() 473       0.0023      0.000005    0.0023      0.000005    0.03     0.03     |
 |                                                                                                                |
 | Mesh                                                                                                           |
-|   find_neighbors()                 1         0.0113      0.011315    0.0115      0.011474    0.18     0.18     |
-|   renumber_nodes_and_elem()        2         0.0005      0.000266    0.0005      0.000266    0.01     0.01     |
+|   find_neighbors()                 1         0.0016      0.001646    0.0018      0.001840    0.02     0.02     |
+|   renumber_nodes_and_elem()        2         0.0001      0.000062    0.0001      0.000062    0.00     0.00     |
 |                                                                                                                |
 | MeshCommunication                                                                                              |
-|   compute_hilbert_indices()        2         0.0162      0.008094    0.0162      0.008094    0.26     0.26     |
-|   find_global_indices()            2         0.0109      0.005465    0.0324      0.016209    0.17     0.51     |
-|   parallel_sort()                  2         0.0030      0.001523    0.0037      0.001863    0.05     0.06     |
+|   compute_hilbert_indices()        2         0.0085      0.004269    0.0085      0.004269    0.10     0.10     |
+|   find_global_indices()            2         0.0013      0.000633    0.0261      0.013068    0.01     0.29     |
+|   parallel_sort()                  2         0.0045      0.002233    0.0144      0.007190    0.05     0.16     |
 |                                                                                                                |
 | MeshOutput                                                                                                     |
-|   write_equation_systems()         103       0.0070      0.000068    1.0750      0.010437    0.11     17.00    |
+|   write_equation_systems()         103       0.0027      0.000026    5.7906      0.056219    0.03     64.96    |
 |                                                                                                                |
 | MeshTools::Generation                                                                                          |
-|   build_cube()                     1         0.0040      0.004022    0.0040      0.004022    0.06     0.06     |
+|   build_cube()                     1         0.0006      0.000617    0.0006      0.000617    0.01     0.01     |
 |                                                                                                                |
 | MetisPartitioner                                                                                               |
-|   partition()                      1         0.0203      0.020306    0.0359      0.035865    0.32     0.57     |
+|   partition()                      1         0.0035      0.003480    0.0176      0.017597    0.04     0.20     |
 |                                                                                                                |
 | Parallel                                                                                                       |
-|   allgather()                      7         0.0005      0.000067    0.0005      0.000074    0.01     0.01     |
-|   max(bool)                        1         0.0000      0.000008    0.0000      0.000008    0.00     0.00     |
-|   max(scalar)                      5455      0.0427      0.000008    0.0427      0.000008    0.68     0.68     |
-|   max(vector)                      1287      0.0207      0.000016    0.0509      0.000040    0.33     0.81     |
-|   min(bool)                        6736      0.0501      0.000007    0.0501      0.000007    0.79     0.79     |
-|   min(scalar)                      5453      0.0521      0.000010    0.0521      0.000010    0.82     0.82     |
-|   min(vector)                      1287      0.0216      0.000017    0.0558      0.000043    0.34     0.88     |
-|   probe()                          132       0.0008      0.000006    0.0008      0.000006    0.01     0.01     |
-|   receive()                        132       0.0010      0.000008    0.0018      0.000014    0.02     0.03     |
-|   send()                           132       0.0005      0.000004    0.0005      0.000004    0.01     0.01     |
-|   send_receive()                   136       0.0015      0.000011    0.0042      0.000031    0.02     0.07     |
-|   sum()                            793       0.0183      0.000023    0.0305      0.000038    0.29     0.48     |
+|   allgather()                      7         0.0010      0.000138    0.0013      0.000189    0.01     0.01     |
+|   max(bool)                        1         0.0000      0.000004    0.0000      0.000004    0.00     0.00     |
+|   max(scalar)                      5391      0.0257      0.000005    0.0257      0.000005    0.29     0.29     |
+|   max(vector)                      1271      0.0158      0.000012    0.0336      0.000026    0.18     0.38     |
+|   min(bool)                        6656      0.0297      0.000004    0.0297      0.000004    0.33     0.33     |
+|   min(scalar)                      5389      0.0416      0.000008    0.0416      0.000008    0.47     0.47     |
+|   min(vector)                      1271      0.0123      0.000010    0.0299      0.000023    0.14     0.34     |
+|   probe()                          36        0.0014      0.000040    0.0014      0.000040    0.02     0.02     |
+|   receive()                        36        0.0001      0.000003    0.0016      0.000044    0.00     0.02     |
+|   send()                           36        0.0001      0.000002    0.0001      0.000002    0.00     0.00     |
+|   send_receive()                   40        0.0002      0.000005    0.0019      0.000048    0.00     0.02     |
+|   sum()                            785       0.0225      0.000029    0.0401      0.000051    0.25     0.45     |
 |                                                                                                                |
 | Parallel::Request                                                                                              |
-|   wait()                           132       0.0003      0.000003    0.0003      0.000003    0.01     0.01     |
+|   wait()                           36        0.0001      0.000001    0.0001      0.000001    0.00     0.00     |
 |                                                                                                                |
 | Partitioner                                                                                                    |
-|   set_node_processor_ids()         1         0.0022      0.002208    0.0031      0.003130    0.03     0.05     |
-|   set_parent_processor_ids()       1         0.0018      0.001844    0.0018      0.001844    0.03     0.03     |
+|   set_node_processor_ids()         1         0.0007      0.000737    0.0063      0.006303    0.01     0.07     |
+|   set_parent_processor_ids()       1         0.0003      0.000294    0.0003      0.000294    0.00     0.00     |
 |                                                                                                                |
 | PetscNonlinearSolver                                                                                           |
-|   jacobian()                       188       0.6438      0.003424    1.9869      0.010569    10.18    31.42    |
-|   residual()                       289       0.8685      0.003005    2.9449      0.010190    13.73    46.56    |
-|   solve()                          101       0.1697      0.001680    5.1017      0.050511    2.68     80.67    |
+|   jacobian()                       184       0.6562      0.003566    1.2088      0.006569    7.36     13.56    |
+|   residual()                       285       0.8731      0.003064    1.7258      0.006055    9.80     19.36    |
+|   solve()                          101       0.1751      0.001734    3.1098      0.030790    1.96     34.89    |
 |                                                                                                                |
 | PointLocatorTree                                                                                               |
-|   init(no master)                  1         0.0265      0.026468    0.0270      0.027016    0.42     0.43     |
-|   operator()                       4         0.0002      0.000060    0.0003      0.000071    0.00     0.00     |
+|   init(no master)                  1         0.0064      0.006400    0.0066      0.006645    0.07     0.07     |
+|   operator()                       4         0.0001      0.000022    0.0001      0.000027    0.00     0.00     |
 |                                                                                                                |
 | System                                                                                                         |
-|   project_vector()                 1         0.0023      0.002262    0.0081      0.008115    0.04     0.13     |
-|   solve()                          101       0.0023      0.000023    5.1041      0.050535    0.04     80.70    |
+|   project_vector()                 1         0.0033      0.003339    0.0053      0.005274    0.04     0.06     |
+|   solve()                          101       0.0016      0.000015    3.1113      0.030805    0.02     34.91    |
  ----------------------------------------------------------------------------------------------------------------
-| Totals:                            199781    6.3244                                          100.00            |
+| Totals:                            531016    8.9137                                          100.00            |
  ----------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
 * Done Running Example miscellaneous_ex7:
-*  mpirun -np 12 example-devel --verbose dim=1 N=1024 initial_state=strip initial_center=0.5 initial_width=0.1 dt=1e-10 max_time=1e-8 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+*  mpirun -np 4 example-devel --verbose dim=1 N=1024 initial_state=strip initial_center=0.5 initial_width=0.1 dt=1e-10 max_time=1e-8 -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc
 ***************************************************************
+make[4]: Leaving directory `/net/spark/workspace/roystgnr/libmesh/git/devel/examples/miscellaneous/miscellaneous_ex7'
 </pre>
 </div>
 <?php make_footer() ?>

@@ -14,7 +14,7 @@ AC_ARG_ENABLE(default-comm-world,
               [AC_HELP_STRING([--enable-default-comm-world],[Provide global libMesh::CommWorld])],
               enabledefaultcommworld=$enableval,
               enabledefaultcommworld=yes)
-                
+
 AC_SUBST(enabledefaultcommworld)
 if test "$enabledefaultcommworld" != no ; then
   AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
@@ -34,7 +34,7 @@ AC_ARG_ENABLE(legacy-include-paths,
               [AC_HELP_STRING([--enable-legacy-include-paths],[allow for e.g. #include "header.h" instead of #include "libmesh/header.h"])],
               enablelegacyincludepaths=$enableval,
               enablelegacyincludepaths=no)
-                
+
 AC_SUBST(enablelegacyincludepaths)
 if test "$enablelegacyincludepaths" != no ; then
   AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
@@ -52,7 +52,7 @@ AC_ARG_ENABLE(legacy-using-namespace,
               [AC_HELP_STRING([--enable-legacy-using-namespace],[add "using namespace libMesh" to libMesh headers])],
               enablelegacyusingnamespace=$enableval,
               enablelegacyusingnamespace=no)
-                
+
 if test "$enablelegacyusingnamespace" != no ; then
   AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
   AC_MSG_RESULT([>>> Configuring library to dump names into global namespace <<<])

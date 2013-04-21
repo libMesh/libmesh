@@ -1,7 +1,7 @@
 dnl -------------------------------------------------------------
 dnl Space Filling Curves
 dnl -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_SFC], 
+AC_DEFUN([CONFIGURE_SFC],
 [
   AC_ARG_ENABLE(sfc,
                 AC_HELP_STRING([--enable-sfc],
@@ -29,7 +29,7 @@ AC_DEFUN([CONFIGURE_SFC],
   fi
 
   AC_SUBST(SFC_INCLUDE)
-  AC_SUBST(SFC_LIB)	
+  AC_SUBST(SFC_LIB)
 ])
 
 
@@ -52,7 +52,7 @@ AC_DEFUN([CONFIGURE_SFC],
 #   fi
 
 #   AC_SUBST(SFC_INCLUDE)
-#   AC_SUBST(SFC_LIB)	
+#   AC_SUBST(SFC_LIB)
 #   AC_SUBST(enablesfc)
 
 # ])

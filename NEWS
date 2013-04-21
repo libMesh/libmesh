@@ -1,3 +1,35 @@
+0.9.0 -> 0.9.1
+  * Multi-communicator-capable objects
+    * Communicator-using ParallelObject subclasses can be initialized
+      with arbitrary MPI communicators, independent of the
+      communicator used to init libMesh or the communicators used by
+      other non-interacting objects
+    * No internal library code still uses CommWorld communicators
+    * CommWorld and global Parallel:: methods can be disabled via
+      configure --disable-default-comm-world, breaking backwards
+      compatibility, to facilitate compile-time checking of
+      libMesh-based codes for compatibility with multi-communicator
+      usage.
+      * These methods will be disabled by default in future versions,
+	but configure --enable-default-comm-world will work for the
+        next few releases
+  * Additional specializations for Parallel:: communication methods
+  * New SolutionTransfer infrastructure, implementations, examples
+  * Singleton framework added
+  * Complex-valued libMesh builds can new read real-valued restarts
+  * Interface to and contrib copy of Eigen linear algebra package
+  * Interface to and contrib copy of newer Nemesis/ExodusII/NetCDF
+  * build Tecplot binary I/O library from source, 
+    * old behavior can be restored via --disable-tecio --enable-tecplot
+  * Assorted bugfixes:
+    * UnsteadySolver is now more robust inside AMR loops
+    * Preconditioner setup is more robust with AMR
+    * Fixes in Trilinos and SLEPc package interfaces
+    * Fix for multithreaded QoI derivative assembly
+    * Fixes for compiler and 3rd party library compatibility
+  * Clarifications, updates to API documentation
+
+
 0.8.0 -> 0.9.0
   * automake build system
     libMesh-specific implementation features:

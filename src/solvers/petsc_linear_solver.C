@@ -30,6 +30,7 @@
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/petsc_preconditioner.h"
 #include "libmesh/petsc_vector.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -1798,7 +1799,7 @@ void PetscLinearSolver<T>::set_petsc_solver_type()
 
     default:
       libMesh::err << "ERROR:  Unsupported PETSC Solver: "
-		    << this->_solver_type               << std::endl
+		    << Utility::enum_to_string(this->_solver_type) << std::endl
 		    << "Continuing with PETSC defaults" << std::endl;
     }
 }

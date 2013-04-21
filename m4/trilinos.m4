@@ -1,16 +1,16 @@
 dnl -------------------------------------------------------------
 dnl Trilinos 10
 dnl -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_TRILINOS_10], 
+AC_DEFUN([CONFIGURE_TRILINOS_10],
 [
   if (test "x$TRILINOS_DIR" = "x"); then
     # Ubuntu trilinos package?
     if (test -d /usr/include/trilinos); then
       TRILINOS_DIR=/usr/include/trilinos
-    else  
+    else
       TRILINOS_DIR=no
     fi
-  fi  	
+  fi
 
   AC_ARG_WITH(trilinos,
               AC_HELP_STRING([--with-trilinos=PATH],[Specify the path to Trilinos installation]),
@@ -31,7 +31,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        AC_DEFINE(HAVE_TRILINOS, 1,
                  [Flag indicating whether the library shall be compiled to use the Trilinos solver collection])
        AC_MSG_RESULT(<<< Configuring library with Trilinos 10 support >>>)
-       
+
        dnl ------------------------------------------------------
        dnl AztecOO
        dnl ------------------------------------------------------
@@ -44,13 +44,13 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                                          [enableaztecoo=no])
 					])
 		       ])
-                     
+
        if test "$enableaztecoo" != no ; then
           AC_DEFINE(HAVE_AZTECOO, 1,
                     [Flag indicating whether the library shall be compiled to use the Trilinos AztecOO linear solver])
           AC_MSG_RESULT(<<< Configuring library with AztecOO support >>>)
        fi
-       
+
        dnl ------------------------------------------------------
        dnl NOX
        dnl ------------------------------------------------------
@@ -63,13 +63,13 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                                          [enablenox=no])
 					])
 		       ])
-                     
+
        if test "$enablenox" != no ; then
           AC_DEFINE(HAVE_NOX, 1,
                     [Flag indicating whether the library shall be compiled to use the Trilinos NOX nonlinear solver])
           AC_MSG_RESULT(<<< Configuring library with NOX support >>>)
        fi
-       
+
        dnl ------------------------------------------------------
        dnl ML - prevent ML from keying on our 'HAVE_PETSC'
        dnl ------------------------------------------------------
@@ -92,7 +92,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
 #undef HAVE_PETSC
 #endif
 ])
-                     
+
        if test "$enableml" != no ; then
           AC_DEFINE(HAVE_ML, 1,
                     [Flag indicating whether the library shall be compiled to use the Trilinos ML package])
@@ -111,7 +111,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                                          [enabletpetra=no])
 					])
 		       ])
-                     
+
        if test "$enabletpetra" != no ; then
           AC_DEFINE(HAVE_TPETRA, 1,
                     [Flag indicating whether the library shall be compiled to use the Trilinos TPetra package])
@@ -130,7 +130,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                                                          [enabledtk=no])
 					])
 		       ])
-                     
+
        if test "$enabledtk" != no ; then
           AC_DEFINE(HAVE_DTK, 1,
                     [Flag indicating whether the library shall be compiled to use the Trilinos DTK nonlinear solver])
@@ -142,7 +142,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
   fi
 
   AC_SUBST(TRILINOS_MAKEFILE_EXPORT)
-  
+
   #########################################################
   # get requisite include and library variables by snarfing
   # them from the exported makefiles
@@ -178,11 +178,11 @@ dnl -------------------------------------------------------------
 dnl -------------------------------------------------------------
 dnl Trilinos 9
 dnl -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_TRILINOS_9], 
+AC_DEFUN([CONFIGURE_TRILINOS_9],
 [
   if test "x$TRILINOS_DIR" = "x"; then
     TRILINOS_DIR=no
-  fi  	
+  fi
 
   AC_ARG_WITH(trilinos,
               AC_HELP_STRING([--with-trilinos=PATH],[Specify the path to Trilinos installation]),
@@ -237,7 +237,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
   fi
 
 
-  
+
   dnl ML
   AC_ARG_WITH(ml,
               AC_HELP_STRING([--with-ml=PATH],[Specify the path to ML installation]),
@@ -336,7 +336,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
   #########################################################
   # get requisite include and library variables by snarfing
   # them from the exported makefiles
-  # 
+  #
   # AztecOO
   if (test $enableaztecoo != no); then
     cat <<EOF >Makefile_config_trilinos
@@ -359,7 +359,7 @@ EOF
     rm -f Makefile_config_trilinos
   fi
 
-  # 
+  #
   # Nox
   if (test $enablenox != no); then
     cat <<EOF >Makefile_config_trilinos
@@ -382,7 +382,7 @@ EOF
     rm -f Makefile_config_trilinos
   fi
 
-  # 
+  #
   # ML
   if (test $enableml != no); then
     cat <<EOF >Makefile_config_trilinos
@@ -407,7 +407,7 @@ EOF
 
 
 
-  # 
+  #
   # Tpetra
   if (test $enabletpetra != no); then
     cat <<EOF >Makefile_config_trilinos
@@ -446,7 +446,7 @@ dnl -------------------------------------------------------------
 dnl -------------------------------------------------------------
 dnl Trilinos -- wrapper for v9 and v10
 dnl -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_TRILINOS], 
+AC_DEFUN([CONFIGURE_TRILINOS],
 [
   AC_ARG_ENABLE(trilinos,
                 AC_HELP_STRING([--enable-trilinos],
@@ -457,11 +457,11 @@ AC_DEFUN([CONFIGURE_TRILINOS],
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-trilinos) ;;
 		 esac],
 		 [enabletrilinos=$enableoptional])
-  
+
   # Trump --enable-trilinos with --disable-mpi
   if (test "x$enablempi" = xno); then
     enabletrilinos=no
-  fi	
+  fi
 
   AC_ARG_VAR([TRILINOS_DIR],  [path to Trilinos installation])
 

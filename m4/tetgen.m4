@@ -1,7 +1,7 @@
 dnl -------------------------------------------------------------
 dnl TetGen tetrahedrization library
 dnl -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_TETGEN], 
+AC_DEFUN([CONFIGURE_TETGEN],
 [
   AC_ARG_ENABLE(tetgen,
                 AC_HELP_STRING([--enable-tetgen],
@@ -14,7 +14,7 @@ AC_DEFUN([CONFIGURE_TETGEN],
 		 [enabletetgen=$enableoptional])
 
 
-		 		 
+
   dnl The TETGEN API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   if (test $enabletetgen = yes); then
@@ -29,5 +29,5 @@ AC_DEFUN([CONFIGURE_TETGEN],
   fi
 
   AC_SUBST(TETGEN_INCLUDE)
-  AC_SUBST(TETGEN_LIBRARY)	
+  AC_SUBST(TETGEN_LIBRARY)
 ])

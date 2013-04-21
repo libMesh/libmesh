@@ -94,41 +94,37 @@ namespace
 
   typedef std::vector< std::pair<Point, dof_id_type> > PointVector;
 
-  PointVector::iterator fuzzy_binary_find(PointVector::iterator first,
+  PointVector::iterator fuzzy_binary_find(PointVector::iterator cur,
                                           PointVector::iterator last,
                                           Point val,
                                           Real tol)
   {
     PointVector::iterator it;
     std::iterator_traits<PointVector::iterator>::difference_type count, step;
-    count = std::distance(first, last);
+    count = std::distance(cur, last);
 
     // Object we'll use to make comparisons
     FuzzyPointCompare comp(tol);
 
     while (count>0)
       {
-        it = first;
+        it = cur;
         step = count/2;
         std::advance (it, step);
 
-        // Grab the point out of 'it'
-        Point p = it->first;
-
-        // If p relative_fuzzy_equals val, return 'it'
-        if (p.relative_fuzzy_equals(val, tol))
-          return it;
-
-        // Otherwise, continue binary searching
-        if ( comp(p,val) )
+        if ( comp(it->first,val) )
           {
-            first = ++it;
+            cur = ++it;
             count -= step+1;
           }
         else
           count = step;
       }
-    return first;
+
+    if ( comp(val,cur->first) )
+      return last;
+    else
+      return cur;
   }
 
 }
@@ -862,33 +858,33 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
                                                              this_point,
                                                              tol);
 
-        if (other_iter == other_sorted_bndry_nodes.end())
+	// Not every node on this_sorted_bndry_nodes will necessarily be stitched, so
+	// if its pair is not found on other_mesh, just continue.
+        if (other_iter != other_sorted_bndry_nodes.end())
           {
-            libMesh::err << "Error: Matching point could not be found in other_mesh!" << std::endl;
-            libmesh_error();
+	    // Check that the points do indeed match - should not be necessary unless something
+	    // is wrong with fuzzy_binary_find.  To be on the safe side, we'll check.  Use the
+	    // same comparison used by the sorting algorithm.
+	    {
+	      // Grab the other point from the iterator
+	      Point other_point = other_iter->first;
+
+	      if (!this_point.relative_fuzzy_equals(other_point, tol))
+		{
+		  libMesh::out << "Error: mismatched points: " << this_point << " and " << other_point << std::endl;
+		  libmesh_error();
+		}
+	    }
+
+
+	    // Associate these two nodes in both the node_to_node_map and the other_to_this_node_map
+	    dof_id_type
+	      this_node_id = this_sorted_bndry_nodes[i].second,
+	      other_node_id = other_iter->second;
+	    node_to_node_map[this_node_id] = other_node_id;
+	    other_to_this_node_map[other_node_id] = this_node_id;
           }
 
-        // Check that the points do indeed match - should not be necessary unless something
-        // is wrong with fuzzy_binary_find.  To be on the safe side, we'll check.
-        {
-          // Grab the other point from the iterator
-          Point other_point = other_iter->first;
-          Real dist = (this_point - other_point).size();
-
-          if (dist >= tol)
-            {
-              libMesh::out << "Error: mismatched points: " << this_point << " and " << other_point << std::endl;
-              libmesh_error();
-            }
-        }
-
-
-        // Associate these two nodes in both the node_to_node_map and the other_to_this_node_map
-        dof_id_type
-          this_node_id = this_sorted_bndry_nodes[i].second,
-          other_node_id = other_iter->second;
-        node_to_node_map[this_node_id] = other_node_id;
-        other_to_this_node_map[other_node_id] = this_node_id;
       }
 
 
