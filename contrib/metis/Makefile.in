@@ -105,41 +105,35 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libdbg_la_DEPENDENCIES =
 am__libdbg_la_SOURCES_DIST = include/metis.h GKlib/b64.c GKlib/blas.c \
-	GKlib/BUILD.txt GKlib/conf/check_thread_storage.c GKlib/csr.c \
-	GKlib/error.c GKlib/evaluate.c GKlib/fkvkselect.c GKlib/fs.c \
-	GKlib/getopt.c GKlib/gk_arch.h GKlib/gk_defs.h \
+	GKlib/csr.c GKlib/error.c GKlib/evaluate.c GKlib/fkvkselect.c \
+	GKlib/fs.c GKlib/getopt.c GKlib/gk_arch.h GKlib/gk_defs.h \
 	GKlib/gk_externs.h GKlib/gk_getopt.h GKlib/gk_macros.h \
 	GKlib/gk_mkblas.h GKlib/gk_mkmemory.h GKlib/gk_mkpqueue.h \
 	GKlib/gk_mkpqueue2.h GKlib/gk_mkrandom.h GKlib/gk_mksort.h \
 	GKlib/gk_mkutils.h GKlib/gk_proto.h GKlib/gk_struct.h \
-	GKlib/gk_types.h GKlib/GKlib.h GKlib/GKlibSystem.cmake \
-	GKlib/gkregex.c GKlib/gkregex.h GKlib/graph.c GKlib/htable.c \
-	GKlib/io.c GKlib/itemsets.c GKlib/Makefile GKlib/mcore.c \
-	GKlib/memory.c GKlib/ms_inttypes.h GKlib/ms_stat.h \
-	GKlib/ms_stdint.h GKlib/omp.c GKlib/pdb.c GKlib/pqueue.c \
-	GKlib/random.c GKlib/rw.c GKlib/seq.c GKlib/sort.c \
-	GKlib/string.c GKlib/test/fis.c GKlib/test/gkgraph.c \
-	GKlib/test/gksort.c GKlib/test/Makefile.in.old \
-	GKlib/test/Makefile.old GKlib/test/rw.c GKlib/test/strings.c \
-	GKlib/timers.c GKlib/tokenizer.c GKlib/util.c \
-	libmetis/auxapi.c libmetis/balance.c libmetis/bucketsort.c \
-	libmetis/checkgraph.c libmetis/coarsen.c libmetis/compress.c \
-	libmetis/contig.c libmetis/debug.c libmetis/defs.h \
-	libmetis/fm.c libmetis/fortran.c libmetis/frename.c \
-	libmetis/gklib.c libmetis/gklib_defs.h libmetis/gklib_rename.h \
-	libmetis/graph.c libmetis/initpart.c libmetis/kmetis.c \
-	libmetis/kwayfm.c libmetis/kwayrefine.c libmetis/macros.h \
-	libmetis/mcutil.c libmetis/mesh.c libmetis/meshpart.c \
-	libmetis/metislib.h libmetis/minconn.c libmetis/mincover.c \
-	libmetis/mmd.c libmetis/ometis.c libmetis/options.c \
-	libmetis/parmetis.c libmetis/pmetis.c libmetis/proto.h \
-	libmetis/refine.c libmetis/rename.h libmetis/separator.c \
-	libmetis/sfm.c libmetis/srefine.c libmetis/stat.c \
-	libmetis/stdheaders.h libmetis/struct.h libmetis/timing.c \
-	libmetis/util.c libmetis/wspace.c
+	GKlib/gk_types.h GKlib/GKlib.h GKlib/gkregex.c GKlib/gkregex.h \
+	GKlib/graph.c GKlib/htable.c GKlib/io.c GKlib/itemsets.c \
+	GKlib/mcore.c GKlib/memory.c GKlib/ms_inttypes.h \
+	GKlib/ms_stat.h GKlib/ms_stdint.h GKlib/omp.c GKlib/pdb.c \
+	GKlib/pqueue.c GKlib/random.c GKlib/rw.c GKlib/seq.c \
+	GKlib/sort.c GKlib/string.c GKlib/timers.c GKlib/tokenizer.c \
+	GKlib/util.c libmetis/auxapi.c libmetis/balance.c \
+	libmetis/bucketsort.c libmetis/checkgraph.c libmetis/coarsen.c \
+	libmetis/compress.c libmetis/contig.c libmetis/debug.c \
+	libmetis/defs.h libmetis/fm.c libmetis/fortran.c \
+	libmetis/frename.c libmetis/gklib.c libmetis/gklib_defs.h \
+	libmetis/gklib_rename.h libmetis/graph.c libmetis/initpart.c \
+	libmetis/kmetis.c libmetis/kwayfm.c libmetis/kwayrefine.c \
+	libmetis/macros.h libmetis/mcutil.c libmetis/mesh.c \
+	libmetis/meshpart.c libmetis/metislib.h libmetis/minconn.c \
+	libmetis/mincover.c libmetis/mmd.c libmetis/ometis.c \
+	libmetis/options.c libmetis/parmetis.c libmetis/pmetis.c \
+	libmetis/proto.h libmetis/refine.c libmetis/rename.h \
+	libmetis/separator.c libmetis/sfm.c libmetis/srefine.c \
+	libmetis/stat.c libmetis/stdheaders.h libmetis/struct.h \
+	libmetis/timing.c libmetis/util.c libmetis/wspace.c
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = GKlib/libdbg_la-b64.lo GKlib/libdbg_la-blas.lo \
-	GKlib/conf/libdbg_la-check_thread_storage.lo \
 	GKlib/libdbg_la-csr.lo GKlib/libdbg_la-error.lo \
 	GKlib/libdbg_la-evaluate.lo GKlib/libdbg_la-fkvkselect.lo \
 	GKlib/libdbg_la-fs.lo GKlib/libdbg_la-getopt.lo \
@@ -150,12 +144,10 @@ am__objects_1 = GKlib/libdbg_la-b64.lo GKlib/libdbg_la-blas.lo \
 	GKlib/libdbg_la-pdb.lo GKlib/libdbg_la-pqueue.lo \
 	GKlib/libdbg_la-random.lo GKlib/libdbg_la-rw.lo \
 	GKlib/libdbg_la-seq.lo GKlib/libdbg_la-sort.lo \
-	GKlib/libdbg_la-string.lo GKlib/test/libdbg_la-fis.lo \
-	GKlib/test/libdbg_la-gkgraph.lo GKlib/test/libdbg_la-gksort.lo \
-	GKlib/test/libdbg_la-rw.lo GKlib/test/libdbg_la-strings.lo \
-	GKlib/libdbg_la-timers.lo GKlib/libdbg_la-tokenizer.lo \
-	GKlib/libdbg_la-util.lo libmetis/libdbg_la-auxapi.lo \
-	libmetis/libdbg_la-balance.lo libmetis/libdbg_la-bucketsort.lo \
+	GKlib/libdbg_la-string.lo GKlib/libdbg_la-timers.lo \
+	GKlib/libdbg_la-tokenizer.lo GKlib/libdbg_la-util.lo \
+	libmetis/libdbg_la-auxapi.lo libmetis/libdbg_la-balance.lo \
+	libmetis/libdbg_la-bucketsort.lo \
 	libmetis/libdbg_la-checkgraph.lo libmetis/libdbg_la-coarsen.lo \
 	libmetis/libdbg_la-compress.lo libmetis/libdbg_la-contig.lo \
 	libmetis/libdbg_la-debug.lo libmetis/libdbg_la-fm.lo \
@@ -184,22 +176,18 @@ libdbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 @LIBMESH_DBG_MODE_TRUE@am_libdbg_la_rpath =
 libdevel_la_DEPENDENCIES =
 am__libdevel_la_SOURCES_DIST = include/metis.h GKlib/b64.c \
-	GKlib/blas.c GKlib/BUILD.txt GKlib/conf/check_thread_storage.c \
-	GKlib/csr.c GKlib/error.c GKlib/evaluate.c GKlib/fkvkselect.c \
-	GKlib/fs.c GKlib/getopt.c GKlib/gk_arch.h GKlib/gk_defs.h \
-	GKlib/gk_externs.h GKlib/gk_getopt.h GKlib/gk_macros.h \
-	GKlib/gk_mkblas.h GKlib/gk_mkmemory.h GKlib/gk_mkpqueue.h \
-	GKlib/gk_mkpqueue2.h GKlib/gk_mkrandom.h GKlib/gk_mksort.h \
-	GKlib/gk_mkutils.h GKlib/gk_proto.h GKlib/gk_struct.h \
-	GKlib/gk_types.h GKlib/GKlib.h GKlib/GKlibSystem.cmake \
+	GKlib/blas.c GKlib/csr.c GKlib/error.c GKlib/evaluate.c \
+	GKlib/fkvkselect.c GKlib/fs.c GKlib/getopt.c GKlib/gk_arch.h \
+	GKlib/gk_defs.h GKlib/gk_externs.h GKlib/gk_getopt.h \
+	GKlib/gk_macros.h GKlib/gk_mkblas.h GKlib/gk_mkmemory.h \
+	GKlib/gk_mkpqueue.h GKlib/gk_mkpqueue2.h GKlib/gk_mkrandom.h \
+	GKlib/gk_mksort.h GKlib/gk_mkutils.h GKlib/gk_proto.h \
+	GKlib/gk_struct.h GKlib/gk_types.h GKlib/GKlib.h \
 	GKlib/gkregex.c GKlib/gkregex.h GKlib/graph.c GKlib/htable.c \
-	GKlib/io.c GKlib/itemsets.c GKlib/Makefile GKlib/mcore.c \
-	GKlib/memory.c GKlib/ms_inttypes.h GKlib/ms_stat.h \
-	GKlib/ms_stdint.h GKlib/omp.c GKlib/pdb.c GKlib/pqueue.c \
-	GKlib/random.c GKlib/rw.c GKlib/seq.c GKlib/sort.c \
-	GKlib/string.c GKlib/test/fis.c GKlib/test/gkgraph.c \
-	GKlib/test/gksort.c GKlib/test/Makefile.in.old \
-	GKlib/test/Makefile.old GKlib/test/rw.c GKlib/test/strings.c \
+	GKlib/io.c GKlib/itemsets.c GKlib/mcore.c GKlib/memory.c \
+	GKlib/ms_inttypes.h GKlib/ms_stat.h GKlib/ms_stdint.h \
+	GKlib/omp.c GKlib/pdb.c GKlib/pqueue.c GKlib/random.c \
+	GKlib/rw.c GKlib/seq.c GKlib/sort.c GKlib/string.c \
 	GKlib/timers.c GKlib/tokenizer.c GKlib/util.c \
 	libmetis/auxapi.c libmetis/balance.c libmetis/bucketsort.c \
 	libmetis/checkgraph.c libmetis/coarsen.c libmetis/compress.c \
@@ -217,7 +205,6 @@ am__libdevel_la_SOURCES_DIST = include/metis.h GKlib/b64.c \
 	libmetis/stdheaders.h libmetis/struct.h libmetis/timing.c \
 	libmetis/util.c libmetis/wspace.c
 am__objects_2 = GKlib/libdevel_la-b64.lo GKlib/libdevel_la-blas.lo \
-	GKlib/conf/libdevel_la-check_thread_storage.lo \
 	GKlib/libdevel_la-csr.lo GKlib/libdevel_la-error.lo \
 	GKlib/libdevel_la-evaluate.lo GKlib/libdevel_la-fkvkselect.lo \
 	GKlib/libdevel_la-fs.lo GKlib/libdevel_la-getopt.lo \
@@ -228,10 +215,7 @@ am__objects_2 = GKlib/libdevel_la-b64.lo GKlib/libdevel_la-blas.lo \
 	GKlib/libdevel_la-pdb.lo GKlib/libdevel_la-pqueue.lo \
 	GKlib/libdevel_la-random.lo GKlib/libdevel_la-rw.lo \
 	GKlib/libdevel_la-seq.lo GKlib/libdevel_la-sort.lo \
-	GKlib/libdevel_la-string.lo GKlib/test/libdevel_la-fis.lo \
-	GKlib/test/libdevel_la-gkgraph.lo \
-	GKlib/test/libdevel_la-gksort.lo GKlib/test/libdevel_la-rw.lo \
-	GKlib/test/libdevel_la-strings.lo GKlib/libdevel_la-timers.lo \
+	GKlib/libdevel_la-string.lo GKlib/libdevel_la-timers.lo \
 	GKlib/libdevel_la-tokenizer.lo GKlib/libdevel_la-util.lo \
 	libmetis/libdevel_la-auxapi.lo libmetis/libdevel_la-balance.lo \
 	libmetis/libdevel_la-bucketsort.lo \
@@ -263,22 +247,18 @@ libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 @LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_rpath =
 liboprof_la_DEPENDENCIES =
 am__liboprof_la_SOURCES_DIST = include/metis.h GKlib/b64.c \
-	GKlib/blas.c GKlib/BUILD.txt GKlib/conf/check_thread_storage.c \
-	GKlib/csr.c GKlib/error.c GKlib/evaluate.c GKlib/fkvkselect.c \
-	GKlib/fs.c GKlib/getopt.c GKlib/gk_arch.h GKlib/gk_defs.h \
-	GKlib/gk_externs.h GKlib/gk_getopt.h GKlib/gk_macros.h \
-	GKlib/gk_mkblas.h GKlib/gk_mkmemory.h GKlib/gk_mkpqueue.h \
-	GKlib/gk_mkpqueue2.h GKlib/gk_mkrandom.h GKlib/gk_mksort.h \
-	GKlib/gk_mkutils.h GKlib/gk_proto.h GKlib/gk_struct.h \
-	GKlib/gk_types.h GKlib/GKlib.h GKlib/GKlibSystem.cmake \
+	GKlib/blas.c GKlib/csr.c GKlib/error.c GKlib/evaluate.c \
+	GKlib/fkvkselect.c GKlib/fs.c GKlib/getopt.c GKlib/gk_arch.h \
+	GKlib/gk_defs.h GKlib/gk_externs.h GKlib/gk_getopt.h \
+	GKlib/gk_macros.h GKlib/gk_mkblas.h GKlib/gk_mkmemory.h \
+	GKlib/gk_mkpqueue.h GKlib/gk_mkpqueue2.h GKlib/gk_mkrandom.h \
+	GKlib/gk_mksort.h GKlib/gk_mkutils.h GKlib/gk_proto.h \
+	GKlib/gk_struct.h GKlib/gk_types.h GKlib/GKlib.h \
 	GKlib/gkregex.c GKlib/gkregex.h GKlib/graph.c GKlib/htable.c \
-	GKlib/io.c GKlib/itemsets.c GKlib/Makefile GKlib/mcore.c \
-	GKlib/memory.c GKlib/ms_inttypes.h GKlib/ms_stat.h \
-	GKlib/ms_stdint.h GKlib/omp.c GKlib/pdb.c GKlib/pqueue.c \
-	GKlib/random.c GKlib/rw.c GKlib/seq.c GKlib/sort.c \
-	GKlib/string.c GKlib/test/fis.c GKlib/test/gkgraph.c \
-	GKlib/test/gksort.c GKlib/test/Makefile.in.old \
-	GKlib/test/Makefile.old GKlib/test/rw.c GKlib/test/strings.c \
+	GKlib/io.c GKlib/itemsets.c GKlib/mcore.c GKlib/memory.c \
+	GKlib/ms_inttypes.h GKlib/ms_stat.h GKlib/ms_stdint.h \
+	GKlib/omp.c GKlib/pdb.c GKlib/pqueue.c GKlib/random.c \
+	GKlib/rw.c GKlib/seq.c GKlib/sort.c GKlib/string.c \
 	GKlib/timers.c GKlib/tokenizer.c GKlib/util.c \
 	libmetis/auxapi.c libmetis/balance.c libmetis/bucketsort.c \
 	libmetis/checkgraph.c libmetis/coarsen.c libmetis/compress.c \
@@ -296,7 +276,6 @@ am__liboprof_la_SOURCES_DIST = include/metis.h GKlib/b64.c \
 	libmetis/stdheaders.h libmetis/struct.h libmetis/timing.c \
 	libmetis/util.c libmetis/wspace.c
 am__objects_3 = GKlib/liboprof_la-b64.lo GKlib/liboprof_la-blas.lo \
-	GKlib/conf/liboprof_la-check_thread_storage.lo \
 	GKlib/liboprof_la-csr.lo GKlib/liboprof_la-error.lo \
 	GKlib/liboprof_la-evaluate.lo GKlib/liboprof_la-fkvkselect.lo \
 	GKlib/liboprof_la-fs.lo GKlib/liboprof_la-getopt.lo \
@@ -307,10 +286,7 @@ am__objects_3 = GKlib/liboprof_la-b64.lo GKlib/liboprof_la-blas.lo \
 	GKlib/liboprof_la-pdb.lo GKlib/liboprof_la-pqueue.lo \
 	GKlib/liboprof_la-random.lo GKlib/liboprof_la-rw.lo \
 	GKlib/liboprof_la-seq.lo GKlib/liboprof_la-sort.lo \
-	GKlib/liboprof_la-string.lo GKlib/test/liboprof_la-fis.lo \
-	GKlib/test/liboprof_la-gkgraph.lo \
-	GKlib/test/liboprof_la-gksort.lo GKlib/test/liboprof_la-rw.lo \
-	GKlib/test/liboprof_la-strings.lo GKlib/liboprof_la-timers.lo \
+	GKlib/liboprof_la-string.lo GKlib/liboprof_la-timers.lo \
 	GKlib/liboprof_la-tokenizer.lo GKlib/liboprof_la-util.lo \
 	libmetis/liboprof_la-auxapi.lo libmetis/liboprof_la-balance.lo \
 	libmetis/liboprof_la-bucketsort.lo \
@@ -342,40 +318,34 @@ liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 @LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_rpath =
 libopt_la_DEPENDENCIES =
 am__libopt_la_SOURCES_DIST = include/metis.h GKlib/b64.c GKlib/blas.c \
-	GKlib/BUILD.txt GKlib/conf/check_thread_storage.c GKlib/csr.c \
-	GKlib/error.c GKlib/evaluate.c GKlib/fkvkselect.c GKlib/fs.c \
-	GKlib/getopt.c GKlib/gk_arch.h GKlib/gk_defs.h \
+	GKlib/csr.c GKlib/error.c GKlib/evaluate.c GKlib/fkvkselect.c \
+	GKlib/fs.c GKlib/getopt.c GKlib/gk_arch.h GKlib/gk_defs.h \
 	GKlib/gk_externs.h GKlib/gk_getopt.h GKlib/gk_macros.h \
 	GKlib/gk_mkblas.h GKlib/gk_mkmemory.h GKlib/gk_mkpqueue.h \
 	GKlib/gk_mkpqueue2.h GKlib/gk_mkrandom.h GKlib/gk_mksort.h \
 	GKlib/gk_mkutils.h GKlib/gk_proto.h GKlib/gk_struct.h \
-	GKlib/gk_types.h GKlib/GKlib.h GKlib/GKlibSystem.cmake \
-	GKlib/gkregex.c GKlib/gkregex.h GKlib/graph.c GKlib/htable.c \
-	GKlib/io.c GKlib/itemsets.c GKlib/Makefile GKlib/mcore.c \
-	GKlib/memory.c GKlib/ms_inttypes.h GKlib/ms_stat.h \
-	GKlib/ms_stdint.h GKlib/omp.c GKlib/pdb.c GKlib/pqueue.c \
-	GKlib/random.c GKlib/rw.c GKlib/seq.c GKlib/sort.c \
-	GKlib/string.c GKlib/test/fis.c GKlib/test/gkgraph.c \
-	GKlib/test/gksort.c GKlib/test/Makefile.in.old \
-	GKlib/test/Makefile.old GKlib/test/rw.c GKlib/test/strings.c \
-	GKlib/timers.c GKlib/tokenizer.c GKlib/util.c \
-	libmetis/auxapi.c libmetis/balance.c libmetis/bucketsort.c \
-	libmetis/checkgraph.c libmetis/coarsen.c libmetis/compress.c \
-	libmetis/contig.c libmetis/debug.c libmetis/defs.h \
-	libmetis/fm.c libmetis/fortran.c libmetis/frename.c \
-	libmetis/gklib.c libmetis/gklib_defs.h libmetis/gklib_rename.h \
-	libmetis/graph.c libmetis/initpart.c libmetis/kmetis.c \
-	libmetis/kwayfm.c libmetis/kwayrefine.c libmetis/macros.h \
-	libmetis/mcutil.c libmetis/mesh.c libmetis/meshpart.c \
-	libmetis/metislib.h libmetis/minconn.c libmetis/mincover.c \
-	libmetis/mmd.c libmetis/ometis.c libmetis/options.c \
-	libmetis/parmetis.c libmetis/pmetis.c libmetis/proto.h \
-	libmetis/refine.c libmetis/rename.h libmetis/separator.c \
-	libmetis/sfm.c libmetis/srefine.c libmetis/stat.c \
-	libmetis/stdheaders.h libmetis/struct.h libmetis/timing.c \
-	libmetis/util.c libmetis/wspace.c
+	GKlib/gk_types.h GKlib/GKlib.h GKlib/gkregex.c GKlib/gkregex.h \
+	GKlib/graph.c GKlib/htable.c GKlib/io.c GKlib/itemsets.c \
+	GKlib/mcore.c GKlib/memory.c GKlib/ms_inttypes.h \
+	GKlib/ms_stat.h GKlib/ms_stdint.h GKlib/omp.c GKlib/pdb.c \
+	GKlib/pqueue.c GKlib/random.c GKlib/rw.c GKlib/seq.c \
+	GKlib/sort.c GKlib/string.c GKlib/timers.c GKlib/tokenizer.c \
+	GKlib/util.c libmetis/auxapi.c libmetis/balance.c \
+	libmetis/bucketsort.c libmetis/checkgraph.c libmetis/coarsen.c \
+	libmetis/compress.c libmetis/contig.c libmetis/debug.c \
+	libmetis/defs.h libmetis/fm.c libmetis/fortran.c \
+	libmetis/frename.c libmetis/gklib.c libmetis/gklib_defs.h \
+	libmetis/gklib_rename.h libmetis/graph.c libmetis/initpart.c \
+	libmetis/kmetis.c libmetis/kwayfm.c libmetis/kwayrefine.c \
+	libmetis/macros.h libmetis/mcutil.c libmetis/mesh.c \
+	libmetis/meshpart.c libmetis/metislib.h libmetis/minconn.c \
+	libmetis/mincover.c libmetis/mmd.c libmetis/ometis.c \
+	libmetis/options.c libmetis/parmetis.c libmetis/pmetis.c \
+	libmetis/proto.h libmetis/refine.c libmetis/rename.h \
+	libmetis/separator.c libmetis/sfm.c libmetis/srefine.c \
+	libmetis/stat.c libmetis/stdheaders.h libmetis/struct.h \
+	libmetis/timing.c libmetis/util.c libmetis/wspace.c
 am__objects_4 = GKlib/libopt_la-b64.lo GKlib/libopt_la-blas.lo \
-	GKlib/conf/libopt_la-check_thread_storage.lo \
 	GKlib/libopt_la-csr.lo GKlib/libopt_la-error.lo \
 	GKlib/libopt_la-evaluate.lo GKlib/libopt_la-fkvkselect.lo \
 	GKlib/libopt_la-fs.lo GKlib/libopt_la-getopt.lo \
@@ -386,12 +356,10 @@ am__objects_4 = GKlib/libopt_la-b64.lo GKlib/libopt_la-blas.lo \
 	GKlib/libopt_la-pdb.lo GKlib/libopt_la-pqueue.lo \
 	GKlib/libopt_la-random.lo GKlib/libopt_la-rw.lo \
 	GKlib/libopt_la-seq.lo GKlib/libopt_la-sort.lo \
-	GKlib/libopt_la-string.lo GKlib/test/libopt_la-fis.lo \
-	GKlib/test/libopt_la-gkgraph.lo GKlib/test/libopt_la-gksort.lo \
-	GKlib/test/libopt_la-rw.lo GKlib/test/libopt_la-strings.lo \
-	GKlib/libopt_la-timers.lo GKlib/libopt_la-tokenizer.lo \
-	GKlib/libopt_la-util.lo libmetis/libopt_la-auxapi.lo \
-	libmetis/libopt_la-balance.lo libmetis/libopt_la-bucketsort.lo \
+	GKlib/libopt_la-string.lo GKlib/libopt_la-timers.lo \
+	GKlib/libopt_la-tokenizer.lo GKlib/libopt_la-util.lo \
+	libmetis/libopt_la-auxapi.lo libmetis/libopt_la-balance.lo \
+	libmetis/libopt_la-bucketsort.lo \
 	libmetis/libopt_la-checkgraph.lo libmetis/libopt_la-coarsen.lo \
 	libmetis/libopt_la-compress.lo libmetis/libopt_la-contig.lo \
 	libmetis/libopt_la-debug.lo libmetis/libopt_la-fm.lo \
@@ -416,40 +384,34 @@ libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 @LIBMESH_OPT_MODE_TRUE@am_libopt_la_rpath =
 libprof_la_DEPENDENCIES =
 am__libprof_la_SOURCES_DIST = include/metis.h GKlib/b64.c GKlib/blas.c \
-	GKlib/BUILD.txt GKlib/conf/check_thread_storage.c GKlib/csr.c \
-	GKlib/error.c GKlib/evaluate.c GKlib/fkvkselect.c GKlib/fs.c \
-	GKlib/getopt.c GKlib/gk_arch.h GKlib/gk_defs.h \
+	GKlib/csr.c GKlib/error.c GKlib/evaluate.c GKlib/fkvkselect.c \
+	GKlib/fs.c GKlib/getopt.c GKlib/gk_arch.h GKlib/gk_defs.h \
 	GKlib/gk_externs.h GKlib/gk_getopt.h GKlib/gk_macros.h \
 	GKlib/gk_mkblas.h GKlib/gk_mkmemory.h GKlib/gk_mkpqueue.h \
 	GKlib/gk_mkpqueue2.h GKlib/gk_mkrandom.h GKlib/gk_mksort.h \
 	GKlib/gk_mkutils.h GKlib/gk_proto.h GKlib/gk_struct.h \
-	GKlib/gk_types.h GKlib/GKlib.h GKlib/GKlibSystem.cmake \
-	GKlib/gkregex.c GKlib/gkregex.h GKlib/graph.c GKlib/htable.c \
-	GKlib/io.c GKlib/itemsets.c GKlib/Makefile GKlib/mcore.c \
-	GKlib/memory.c GKlib/ms_inttypes.h GKlib/ms_stat.h \
-	GKlib/ms_stdint.h GKlib/omp.c GKlib/pdb.c GKlib/pqueue.c \
-	GKlib/random.c GKlib/rw.c GKlib/seq.c GKlib/sort.c \
-	GKlib/string.c GKlib/test/fis.c GKlib/test/gkgraph.c \
-	GKlib/test/gksort.c GKlib/test/Makefile.in.old \
-	GKlib/test/Makefile.old GKlib/test/rw.c GKlib/test/strings.c \
-	GKlib/timers.c GKlib/tokenizer.c GKlib/util.c \
-	libmetis/auxapi.c libmetis/balance.c libmetis/bucketsort.c \
-	libmetis/checkgraph.c libmetis/coarsen.c libmetis/compress.c \
-	libmetis/contig.c libmetis/debug.c libmetis/defs.h \
-	libmetis/fm.c libmetis/fortran.c libmetis/frename.c \
-	libmetis/gklib.c libmetis/gklib_defs.h libmetis/gklib_rename.h \
-	libmetis/graph.c libmetis/initpart.c libmetis/kmetis.c \
-	libmetis/kwayfm.c libmetis/kwayrefine.c libmetis/macros.h \
-	libmetis/mcutil.c libmetis/mesh.c libmetis/meshpart.c \
-	libmetis/metislib.h libmetis/minconn.c libmetis/mincover.c \
-	libmetis/mmd.c libmetis/ometis.c libmetis/options.c \
-	libmetis/parmetis.c libmetis/pmetis.c libmetis/proto.h \
-	libmetis/refine.c libmetis/rename.h libmetis/separator.c \
-	libmetis/sfm.c libmetis/srefine.c libmetis/stat.c \
-	libmetis/stdheaders.h libmetis/struct.h libmetis/timing.c \
-	libmetis/util.c libmetis/wspace.c
+	GKlib/gk_types.h GKlib/GKlib.h GKlib/gkregex.c GKlib/gkregex.h \
+	GKlib/graph.c GKlib/htable.c GKlib/io.c GKlib/itemsets.c \
+	GKlib/mcore.c GKlib/memory.c GKlib/ms_inttypes.h \
+	GKlib/ms_stat.h GKlib/ms_stdint.h GKlib/omp.c GKlib/pdb.c \
+	GKlib/pqueue.c GKlib/random.c GKlib/rw.c GKlib/seq.c \
+	GKlib/sort.c GKlib/string.c GKlib/timers.c GKlib/tokenizer.c \
+	GKlib/util.c libmetis/auxapi.c libmetis/balance.c \
+	libmetis/bucketsort.c libmetis/checkgraph.c libmetis/coarsen.c \
+	libmetis/compress.c libmetis/contig.c libmetis/debug.c \
+	libmetis/defs.h libmetis/fm.c libmetis/fortran.c \
+	libmetis/frename.c libmetis/gklib.c libmetis/gklib_defs.h \
+	libmetis/gklib_rename.h libmetis/graph.c libmetis/initpart.c \
+	libmetis/kmetis.c libmetis/kwayfm.c libmetis/kwayrefine.c \
+	libmetis/macros.h libmetis/mcutil.c libmetis/mesh.c \
+	libmetis/meshpart.c libmetis/metislib.h libmetis/minconn.c \
+	libmetis/mincover.c libmetis/mmd.c libmetis/ometis.c \
+	libmetis/options.c libmetis/parmetis.c libmetis/pmetis.c \
+	libmetis/proto.h libmetis/refine.c libmetis/rename.h \
+	libmetis/separator.c libmetis/sfm.c libmetis/srefine.c \
+	libmetis/stat.c libmetis/stdheaders.h libmetis/struct.h \
+	libmetis/timing.c libmetis/util.c libmetis/wspace.c
 am__objects_5 = GKlib/libprof_la-b64.lo GKlib/libprof_la-blas.lo \
-	GKlib/conf/libprof_la-check_thread_storage.lo \
 	GKlib/libprof_la-csr.lo GKlib/libprof_la-error.lo \
 	GKlib/libprof_la-evaluate.lo GKlib/libprof_la-fkvkselect.lo \
 	GKlib/libprof_la-fs.lo GKlib/libprof_la-getopt.lo \
@@ -460,10 +422,7 @@ am__objects_5 = GKlib/libprof_la-b64.lo GKlib/libprof_la-blas.lo \
 	GKlib/libprof_la-pdb.lo GKlib/libprof_la-pqueue.lo \
 	GKlib/libprof_la-random.lo GKlib/libprof_la-rw.lo \
 	GKlib/libprof_la-seq.lo GKlib/libprof_la-sort.lo \
-	GKlib/libprof_la-string.lo GKlib/test/libprof_la-fis.lo \
-	GKlib/test/libprof_la-gkgraph.lo \
-	GKlib/test/libprof_la-gksort.lo GKlib/test/libprof_la-rw.lo \
-	GKlib/test/libprof_la-strings.lo GKlib/libprof_la-timers.lo \
+	GKlib/libprof_la-string.lo GKlib/libprof_la-timers.lo \
 	GKlib/libprof_la-tokenizer.lo GKlib/libprof_la-util.lo \
 	libmetis/libprof_la-auxapi.lo libmetis/libprof_la-balance.lo \
 	libmetis/libprof_la-bucketsort.lo \
@@ -828,8 +787,6 @@ pkg_sources = \
 	include/metis.h \
 	GKlib/b64.c \
 	GKlib/blas.c \
-	GKlib/BUILD.txt \
-	GKlib/conf/check_thread_storage.c \
 	GKlib/csr.c \
 	GKlib/error.c \
 	GKlib/evaluate.c \
@@ -852,14 +809,12 @@ pkg_sources = \
 	GKlib/gk_struct.h \
 	GKlib/gk_types.h \
 	GKlib/GKlib.h \
-	GKlib/GKlibSystem.cmake \
 	GKlib/gkregex.c \
 	GKlib/gkregex.h \
 	GKlib/graph.c \
 	GKlib/htable.c \
 	GKlib/io.c \
 	GKlib/itemsets.c \
-	GKlib/Makefile \
 	GKlib/mcore.c \
 	GKlib/memory.c \
 	GKlib/ms_inttypes.h \
@@ -873,13 +828,6 @@ pkg_sources = \
 	GKlib/seq.c \
 	GKlib/sort.c \
 	GKlib/string.c \
-	GKlib/test/fis.c \
-	GKlib/test/gkgraph.c \
-	GKlib/test/gksort.c \
-	GKlib/test/Makefile.in.old \
-	GKlib/test/Makefile.old \
-	GKlib/test/rw.c \
-	GKlib/test/strings.c \
 	GKlib/timers.c \
 	GKlib/tokenizer.c \
 	GKlib/util.c \
@@ -1028,15 +976,6 @@ GKlib/libdbg_la-b64.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdbg_la-blas.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/conf/$(am__dirstamp):
-	@$(MKDIR_P) GKlib/conf
-	@: > GKlib/conf/$(am__dirstamp)
-GKlib/conf/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) GKlib/conf/$(DEPDIR)
-	@: > GKlib/conf/$(DEPDIR)/$(am__dirstamp)
-GKlib/conf/libdbg_la-check_thread_storage.lo:  \
-	GKlib/conf/$(am__dirstamp) \
-	GKlib/conf/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdbg_la-csr.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdbg_la-error.lo: GKlib/$(am__dirstamp) \
@@ -1079,22 +1018,6 @@ GKlib/libdbg_la-sort.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdbg_la-string.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/$(am__dirstamp):
-	@$(MKDIR_P) GKlib/test
-	@: > GKlib/test/$(am__dirstamp)
-GKlib/test/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) GKlib/test/$(DEPDIR)
-	@: > GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libdbg_la-fis.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libdbg_la-gkgraph.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libdbg_la-gksort.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libdbg_la-rw.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libdbg_la-strings.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdbg_la-timers.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdbg_la-tokenizer.lo: GKlib/$(am__dirstamp) \
@@ -1183,9 +1106,6 @@ GKlib/libdevel_la-b64.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdevel_la-blas.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/conf/libdevel_la-check_thread_storage.lo:  \
-	GKlib/conf/$(am__dirstamp) \
-	GKlib/conf/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdevel_la-csr.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdevel_la-error.lo: GKlib/$(am__dirstamp) \
@@ -1228,16 +1148,6 @@ GKlib/libdevel_la-sort.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdevel_la-string.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libdevel_la-fis.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libdevel_la-gkgraph.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libdevel_la-gksort.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libdevel_la-rw.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libdevel_la-strings.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdevel_la-timers.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdevel_la-tokenizer.lo: GKlib/$(am__dirstamp) \
@@ -1320,9 +1230,6 @@ GKlib/liboprof_la-b64.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/liboprof_la-blas.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/conf/liboprof_la-check_thread_storage.lo:  \
-	GKlib/conf/$(am__dirstamp) \
-	GKlib/conf/$(DEPDIR)/$(am__dirstamp)
 GKlib/liboprof_la-csr.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/liboprof_la-error.lo: GKlib/$(am__dirstamp) \
@@ -1365,16 +1272,6 @@ GKlib/liboprof_la-sort.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/liboprof_la-string.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/liboprof_la-fis.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/liboprof_la-gkgraph.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/liboprof_la-gksort.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/liboprof_la-rw.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/liboprof_la-strings.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
 GKlib/liboprof_la-timers.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/liboprof_la-tokenizer.lo: GKlib/$(am__dirstamp) \
@@ -1457,9 +1354,6 @@ GKlib/libopt_la-b64.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libopt_la-blas.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/conf/libopt_la-check_thread_storage.lo:  \
-	GKlib/conf/$(am__dirstamp) \
-	GKlib/conf/$(DEPDIR)/$(am__dirstamp)
 GKlib/libopt_la-csr.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libopt_la-error.lo: GKlib/$(am__dirstamp) \
@@ -1502,16 +1396,6 @@ GKlib/libopt_la-sort.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libopt_la-string.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libopt_la-fis.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libopt_la-gkgraph.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libopt_la-gksort.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libopt_la-rw.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libopt_la-strings.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
 GKlib/libopt_la-timers.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libopt_la-tokenizer.lo: GKlib/$(am__dirstamp) \
@@ -1594,9 +1478,6 @@ GKlib/libprof_la-b64.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libprof_la-blas.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/conf/libprof_la-check_thread_storage.lo:  \
-	GKlib/conf/$(am__dirstamp) \
-	GKlib/conf/$(DEPDIR)/$(am__dirstamp)
 GKlib/libprof_la-csr.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libprof_la-error.lo: GKlib/$(am__dirstamp) \
@@ -1639,16 +1520,6 @@ GKlib/libprof_la-sort.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libprof_la-string.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libprof_la-fis.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libprof_la-gkgraph.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libprof_la-gksort.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libprof_la-rw.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
-GKlib/test/libprof_la-strings.lo: GKlib/test/$(am__dirstamp) \
-	GKlib/test/$(DEPDIR)/$(am__dirstamp)
 GKlib/libprof_la-timers.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libprof_la-tokenizer.lo: GKlib/$(am__dirstamp) \
@@ -1732,10 +1603,6 @@ mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f GKlib/*.$(OBJEXT)
 	-rm -f GKlib/*.lo
-	-rm -f GKlib/conf/*.$(OBJEXT)
-	-rm -f GKlib/conf/*.lo
-	-rm -f GKlib/test/*.$(OBJEXT)
-	-rm -f GKlib/test/*.lo
 	-rm -f libmetis/*.$(OBJEXT)
 	-rm -f libmetis/*.lo
 
@@ -1872,36 +1739,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-timers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-tokenizer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-util.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/conf/$(DEPDIR)/libdbg_la-check_thread_storage.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/conf/$(DEPDIR)/libdevel_la-check_thread_storage.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/conf/$(DEPDIR)/liboprof_la-check_thread_storage.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/conf/$(DEPDIR)/libopt_la-check_thread_storage.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/conf/$(DEPDIR)/libprof_la-check_thread_storage.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libdbg_la-fis.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libdbg_la-gkgraph.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libdbg_la-gksort.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libdbg_la-rw.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libdbg_la-strings.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libdevel_la-fis.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libdevel_la-gkgraph.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libdevel_la-gksort.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libdevel_la-rw.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libdevel_la-strings.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/liboprof_la-fis.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/liboprof_la-gkgraph.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/liboprof_la-gksort.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/liboprof_la-rw.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/liboprof_la-strings.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libopt_la-fis.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libopt_la-gkgraph.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libopt_la-gksort.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libopt_la-rw.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libopt_la-strings.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libprof_la-fis.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libprof_la-gkgraph.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libprof_la-gksort.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libprof_la-rw.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/test/$(DEPDIR)/libprof_la-strings.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libmetis/$(DEPDIR)/libdbg_la-auxapi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libmetis/$(DEPDIR)/libdbg_la-balance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libmetis/$(DEPDIR)/libdbg_la-bucketsort.Plo@am__quote@
@@ -2116,13 +1953,6 @@ GKlib/libdbg_la-blas.lo: GKlib/blas.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o GKlib/libdbg_la-blas.lo `test -f 'GKlib/blas.c' || echo '$(srcdir)/'`GKlib/blas.c
 
-GKlib/conf/libdbg_la-check_thread_storage.lo: GKlib/conf/check_thread_storage.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT GKlib/conf/libdbg_la-check_thread_storage.lo -MD -MP -MF GKlib/conf/$(DEPDIR)/libdbg_la-check_thread_storage.Tpo -c -o GKlib/conf/libdbg_la-check_thread_storage.lo `test -f 'GKlib/conf/check_thread_storage.c' || echo '$(srcdir)/'`GKlib/conf/check_thread_storage.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/conf/$(DEPDIR)/libdbg_la-check_thread_storage.Tpo GKlib/conf/$(DEPDIR)/libdbg_la-check_thread_storage.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/conf/check_thread_storage.c' object='GKlib/conf/libdbg_la-check_thread_storage.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o GKlib/conf/libdbg_la-check_thread_storage.lo `test -f 'GKlib/conf/check_thread_storage.c' || echo '$(srcdir)/'`GKlib/conf/check_thread_storage.c
-
 GKlib/libdbg_la-csr.lo: GKlib/csr.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT GKlib/libdbg_la-csr.lo -MD -MP -MF GKlib/$(DEPDIR)/libdbg_la-csr.Tpo -c -o GKlib/libdbg_la-csr.lo `test -f 'GKlib/csr.c' || echo '$(srcdir)/'`GKlib/csr.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libdbg_la-csr.Tpo GKlib/$(DEPDIR)/libdbg_la-csr.Plo
@@ -2269,41 +2099,6 @@ GKlib/libdbg_la-string.lo: GKlib/string.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/string.c' object='GKlib/libdbg_la-string.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o GKlib/libdbg_la-string.lo `test -f 'GKlib/string.c' || echo '$(srcdir)/'`GKlib/string.c
-
-GKlib/test/libdbg_la-fis.lo: GKlib/test/fis.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libdbg_la-fis.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libdbg_la-fis.Tpo -c -o GKlib/test/libdbg_la-fis.lo `test -f 'GKlib/test/fis.c' || echo '$(srcdir)/'`GKlib/test/fis.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libdbg_la-fis.Tpo GKlib/test/$(DEPDIR)/libdbg_la-fis.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/fis.c' object='GKlib/test/libdbg_la-fis.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libdbg_la-fis.lo `test -f 'GKlib/test/fis.c' || echo '$(srcdir)/'`GKlib/test/fis.c
-
-GKlib/test/libdbg_la-gkgraph.lo: GKlib/test/gkgraph.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libdbg_la-gkgraph.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libdbg_la-gkgraph.Tpo -c -o GKlib/test/libdbg_la-gkgraph.lo `test -f 'GKlib/test/gkgraph.c' || echo '$(srcdir)/'`GKlib/test/gkgraph.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libdbg_la-gkgraph.Tpo GKlib/test/$(DEPDIR)/libdbg_la-gkgraph.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/gkgraph.c' object='GKlib/test/libdbg_la-gkgraph.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libdbg_la-gkgraph.lo `test -f 'GKlib/test/gkgraph.c' || echo '$(srcdir)/'`GKlib/test/gkgraph.c
-
-GKlib/test/libdbg_la-gksort.lo: GKlib/test/gksort.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libdbg_la-gksort.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libdbg_la-gksort.Tpo -c -o GKlib/test/libdbg_la-gksort.lo `test -f 'GKlib/test/gksort.c' || echo '$(srcdir)/'`GKlib/test/gksort.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libdbg_la-gksort.Tpo GKlib/test/$(DEPDIR)/libdbg_la-gksort.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/gksort.c' object='GKlib/test/libdbg_la-gksort.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libdbg_la-gksort.lo `test -f 'GKlib/test/gksort.c' || echo '$(srcdir)/'`GKlib/test/gksort.c
-
-GKlib/test/libdbg_la-rw.lo: GKlib/test/rw.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libdbg_la-rw.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libdbg_la-rw.Tpo -c -o GKlib/test/libdbg_la-rw.lo `test -f 'GKlib/test/rw.c' || echo '$(srcdir)/'`GKlib/test/rw.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libdbg_la-rw.Tpo GKlib/test/$(DEPDIR)/libdbg_la-rw.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/rw.c' object='GKlib/test/libdbg_la-rw.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libdbg_la-rw.lo `test -f 'GKlib/test/rw.c' || echo '$(srcdir)/'`GKlib/test/rw.c
-
-GKlib/test/libdbg_la-strings.lo: GKlib/test/strings.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libdbg_la-strings.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libdbg_la-strings.Tpo -c -o GKlib/test/libdbg_la-strings.lo `test -f 'GKlib/test/strings.c' || echo '$(srcdir)/'`GKlib/test/strings.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libdbg_la-strings.Tpo GKlib/test/$(DEPDIR)/libdbg_la-strings.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/strings.c' object='GKlib/test/libdbg_la-strings.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libdbg_la-strings.lo `test -f 'GKlib/test/strings.c' || echo '$(srcdir)/'`GKlib/test/strings.c
 
 GKlib/libdbg_la-timers.lo: GKlib/timers.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT GKlib/libdbg_la-timers.lo -MD -MP -MF GKlib/$(DEPDIR)/libdbg_la-timers.Tpo -c -o GKlib/libdbg_la-timers.lo `test -f 'GKlib/timers.c' || echo '$(srcdir)/'`GKlib/timers.c
@@ -2585,13 +2380,6 @@ GKlib/libdevel_la-blas.lo: GKlib/blas.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o GKlib/libdevel_la-blas.lo `test -f 'GKlib/blas.c' || echo '$(srcdir)/'`GKlib/blas.c
 
-GKlib/conf/libdevel_la-check_thread_storage.lo: GKlib/conf/check_thread_storage.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT GKlib/conf/libdevel_la-check_thread_storage.lo -MD -MP -MF GKlib/conf/$(DEPDIR)/libdevel_la-check_thread_storage.Tpo -c -o GKlib/conf/libdevel_la-check_thread_storage.lo `test -f 'GKlib/conf/check_thread_storage.c' || echo '$(srcdir)/'`GKlib/conf/check_thread_storage.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/conf/$(DEPDIR)/libdevel_la-check_thread_storage.Tpo GKlib/conf/$(DEPDIR)/libdevel_la-check_thread_storage.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/conf/check_thread_storage.c' object='GKlib/conf/libdevel_la-check_thread_storage.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o GKlib/conf/libdevel_la-check_thread_storage.lo `test -f 'GKlib/conf/check_thread_storage.c' || echo '$(srcdir)/'`GKlib/conf/check_thread_storage.c
-
 GKlib/libdevel_la-csr.lo: GKlib/csr.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT GKlib/libdevel_la-csr.lo -MD -MP -MF GKlib/$(DEPDIR)/libdevel_la-csr.Tpo -c -o GKlib/libdevel_la-csr.lo `test -f 'GKlib/csr.c' || echo '$(srcdir)/'`GKlib/csr.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libdevel_la-csr.Tpo GKlib/$(DEPDIR)/libdevel_la-csr.Plo
@@ -2738,41 +2526,6 @@ GKlib/libdevel_la-string.lo: GKlib/string.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/string.c' object='GKlib/libdevel_la-string.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o GKlib/libdevel_la-string.lo `test -f 'GKlib/string.c' || echo '$(srcdir)/'`GKlib/string.c
-
-GKlib/test/libdevel_la-fis.lo: GKlib/test/fis.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libdevel_la-fis.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libdevel_la-fis.Tpo -c -o GKlib/test/libdevel_la-fis.lo `test -f 'GKlib/test/fis.c' || echo '$(srcdir)/'`GKlib/test/fis.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libdevel_la-fis.Tpo GKlib/test/$(DEPDIR)/libdevel_la-fis.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/fis.c' object='GKlib/test/libdevel_la-fis.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libdevel_la-fis.lo `test -f 'GKlib/test/fis.c' || echo '$(srcdir)/'`GKlib/test/fis.c
-
-GKlib/test/libdevel_la-gkgraph.lo: GKlib/test/gkgraph.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libdevel_la-gkgraph.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libdevel_la-gkgraph.Tpo -c -o GKlib/test/libdevel_la-gkgraph.lo `test -f 'GKlib/test/gkgraph.c' || echo '$(srcdir)/'`GKlib/test/gkgraph.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libdevel_la-gkgraph.Tpo GKlib/test/$(DEPDIR)/libdevel_la-gkgraph.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/gkgraph.c' object='GKlib/test/libdevel_la-gkgraph.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libdevel_la-gkgraph.lo `test -f 'GKlib/test/gkgraph.c' || echo '$(srcdir)/'`GKlib/test/gkgraph.c
-
-GKlib/test/libdevel_la-gksort.lo: GKlib/test/gksort.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libdevel_la-gksort.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libdevel_la-gksort.Tpo -c -o GKlib/test/libdevel_la-gksort.lo `test -f 'GKlib/test/gksort.c' || echo '$(srcdir)/'`GKlib/test/gksort.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libdevel_la-gksort.Tpo GKlib/test/$(DEPDIR)/libdevel_la-gksort.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/gksort.c' object='GKlib/test/libdevel_la-gksort.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libdevel_la-gksort.lo `test -f 'GKlib/test/gksort.c' || echo '$(srcdir)/'`GKlib/test/gksort.c
-
-GKlib/test/libdevel_la-rw.lo: GKlib/test/rw.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libdevel_la-rw.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libdevel_la-rw.Tpo -c -o GKlib/test/libdevel_la-rw.lo `test -f 'GKlib/test/rw.c' || echo '$(srcdir)/'`GKlib/test/rw.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libdevel_la-rw.Tpo GKlib/test/$(DEPDIR)/libdevel_la-rw.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/rw.c' object='GKlib/test/libdevel_la-rw.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libdevel_la-rw.lo `test -f 'GKlib/test/rw.c' || echo '$(srcdir)/'`GKlib/test/rw.c
-
-GKlib/test/libdevel_la-strings.lo: GKlib/test/strings.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libdevel_la-strings.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libdevel_la-strings.Tpo -c -o GKlib/test/libdevel_la-strings.lo `test -f 'GKlib/test/strings.c' || echo '$(srcdir)/'`GKlib/test/strings.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libdevel_la-strings.Tpo GKlib/test/$(DEPDIR)/libdevel_la-strings.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/strings.c' object='GKlib/test/libdevel_la-strings.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libdevel_la-strings.lo `test -f 'GKlib/test/strings.c' || echo '$(srcdir)/'`GKlib/test/strings.c
 
 GKlib/libdevel_la-timers.lo: GKlib/timers.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT GKlib/libdevel_la-timers.lo -MD -MP -MF GKlib/$(DEPDIR)/libdevel_la-timers.Tpo -c -o GKlib/libdevel_la-timers.lo `test -f 'GKlib/timers.c' || echo '$(srcdir)/'`GKlib/timers.c
@@ -3054,13 +2807,6 @@ GKlib/liboprof_la-blas.lo: GKlib/blas.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-blas.lo `test -f 'GKlib/blas.c' || echo '$(srcdir)/'`GKlib/blas.c
 
-GKlib/conf/liboprof_la-check_thread_storage.lo: GKlib/conf/check_thread_storage.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/conf/liboprof_la-check_thread_storage.lo -MD -MP -MF GKlib/conf/$(DEPDIR)/liboprof_la-check_thread_storage.Tpo -c -o GKlib/conf/liboprof_la-check_thread_storage.lo `test -f 'GKlib/conf/check_thread_storage.c' || echo '$(srcdir)/'`GKlib/conf/check_thread_storage.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/conf/$(DEPDIR)/liboprof_la-check_thread_storage.Tpo GKlib/conf/$(DEPDIR)/liboprof_la-check_thread_storage.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/conf/check_thread_storage.c' object='GKlib/conf/liboprof_la-check_thread_storage.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/conf/liboprof_la-check_thread_storage.lo `test -f 'GKlib/conf/check_thread_storage.c' || echo '$(srcdir)/'`GKlib/conf/check_thread_storage.c
-
 GKlib/liboprof_la-csr.lo: GKlib/csr.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-csr.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-csr.Tpo -c -o GKlib/liboprof_la-csr.lo `test -f 'GKlib/csr.c' || echo '$(srcdir)/'`GKlib/csr.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-csr.Tpo GKlib/$(DEPDIR)/liboprof_la-csr.Plo
@@ -3207,41 +2953,6 @@ GKlib/liboprof_la-string.lo: GKlib/string.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/string.c' object='GKlib/liboprof_la-string.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-string.lo `test -f 'GKlib/string.c' || echo '$(srcdir)/'`GKlib/string.c
-
-GKlib/test/liboprof_la-fis.lo: GKlib/test/fis.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/test/liboprof_la-fis.lo -MD -MP -MF GKlib/test/$(DEPDIR)/liboprof_la-fis.Tpo -c -o GKlib/test/liboprof_la-fis.lo `test -f 'GKlib/test/fis.c' || echo '$(srcdir)/'`GKlib/test/fis.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/liboprof_la-fis.Tpo GKlib/test/$(DEPDIR)/liboprof_la-fis.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/fis.c' object='GKlib/test/liboprof_la-fis.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/liboprof_la-fis.lo `test -f 'GKlib/test/fis.c' || echo '$(srcdir)/'`GKlib/test/fis.c
-
-GKlib/test/liboprof_la-gkgraph.lo: GKlib/test/gkgraph.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/test/liboprof_la-gkgraph.lo -MD -MP -MF GKlib/test/$(DEPDIR)/liboprof_la-gkgraph.Tpo -c -o GKlib/test/liboprof_la-gkgraph.lo `test -f 'GKlib/test/gkgraph.c' || echo '$(srcdir)/'`GKlib/test/gkgraph.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/liboprof_la-gkgraph.Tpo GKlib/test/$(DEPDIR)/liboprof_la-gkgraph.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/gkgraph.c' object='GKlib/test/liboprof_la-gkgraph.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/liboprof_la-gkgraph.lo `test -f 'GKlib/test/gkgraph.c' || echo '$(srcdir)/'`GKlib/test/gkgraph.c
-
-GKlib/test/liboprof_la-gksort.lo: GKlib/test/gksort.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/test/liboprof_la-gksort.lo -MD -MP -MF GKlib/test/$(DEPDIR)/liboprof_la-gksort.Tpo -c -o GKlib/test/liboprof_la-gksort.lo `test -f 'GKlib/test/gksort.c' || echo '$(srcdir)/'`GKlib/test/gksort.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/liboprof_la-gksort.Tpo GKlib/test/$(DEPDIR)/liboprof_la-gksort.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/gksort.c' object='GKlib/test/liboprof_la-gksort.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/liboprof_la-gksort.lo `test -f 'GKlib/test/gksort.c' || echo '$(srcdir)/'`GKlib/test/gksort.c
-
-GKlib/test/liboprof_la-rw.lo: GKlib/test/rw.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/test/liboprof_la-rw.lo -MD -MP -MF GKlib/test/$(DEPDIR)/liboprof_la-rw.Tpo -c -o GKlib/test/liboprof_la-rw.lo `test -f 'GKlib/test/rw.c' || echo '$(srcdir)/'`GKlib/test/rw.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/liboprof_la-rw.Tpo GKlib/test/$(DEPDIR)/liboprof_la-rw.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/rw.c' object='GKlib/test/liboprof_la-rw.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/liboprof_la-rw.lo `test -f 'GKlib/test/rw.c' || echo '$(srcdir)/'`GKlib/test/rw.c
-
-GKlib/test/liboprof_la-strings.lo: GKlib/test/strings.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/test/liboprof_la-strings.lo -MD -MP -MF GKlib/test/$(DEPDIR)/liboprof_la-strings.Tpo -c -o GKlib/test/liboprof_la-strings.lo `test -f 'GKlib/test/strings.c' || echo '$(srcdir)/'`GKlib/test/strings.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/liboprof_la-strings.Tpo GKlib/test/$(DEPDIR)/liboprof_la-strings.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/strings.c' object='GKlib/test/liboprof_la-strings.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/liboprof_la-strings.lo `test -f 'GKlib/test/strings.c' || echo '$(srcdir)/'`GKlib/test/strings.c
 
 GKlib/liboprof_la-timers.lo: GKlib/timers.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-timers.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-timers.Tpo -c -o GKlib/liboprof_la-timers.lo `test -f 'GKlib/timers.c' || echo '$(srcdir)/'`GKlib/timers.c
@@ -3523,13 +3234,6 @@ GKlib/libopt_la-blas.lo: GKlib/blas.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o GKlib/libopt_la-blas.lo `test -f 'GKlib/blas.c' || echo '$(srcdir)/'`GKlib/blas.c
 
-GKlib/conf/libopt_la-check_thread_storage.lo: GKlib/conf/check_thread_storage.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT GKlib/conf/libopt_la-check_thread_storage.lo -MD -MP -MF GKlib/conf/$(DEPDIR)/libopt_la-check_thread_storage.Tpo -c -o GKlib/conf/libopt_la-check_thread_storage.lo `test -f 'GKlib/conf/check_thread_storage.c' || echo '$(srcdir)/'`GKlib/conf/check_thread_storage.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/conf/$(DEPDIR)/libopt_la-check_thread_storage.Tpo GKlib/conf/$(DEPDIR)/libopt_la-check_thread_storage.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/conf/check_thread_storage.c' object='GKlib/conf/libopt_la-check_thread_storage.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o GKlib/conf/libopt_la-check_thread_storage.lo `test -f 'GKlib/conf/check_thread_storage.c' || echo '$(srcdir)/'`GKlib/conf/check_thread_storage.c
-
 GKlib/libopt_la-csr.lo: GKlib/csr.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT GKlib/libopt_la-csr.lo -MD -MP -MF GKlib/$(DEPDIR)/libopt_la-csr.Tpo -c -o GKlib/libopt_la-csr.lo `test -f 'GKlib/csr.c' || echo '$(srcdir)/'`GKlib/csr.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libopt_la-csr.Tpo GKlib/$(DEPDIR)/libopt_la-csr.Plo
@@ -3676,41 +3380,6 @@ GKlib/libopt_la-string.lo: GKlib/string.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/string.c' object='GKlib/libopt_la-string.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o GKlib/libopt_la-string.lo `test -f 'GKlib/string.c' || echo '$(srcdir)/'`GKlib/string.c
-
-GKlib/test/libopt_la-fis.lo: GKlib/test/fis.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libopt_la-fis.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libopt_la-fis.Tpo -c -o GKlib/test/libopt_la-fis.lo `test -f 'GKlib/test/fis.c' || echo '$(srcdir)/'`GKlib/test/fis.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libopt_la-fis.Tpo GKlib/test/$(DEPDIR)/libopt_la-fis.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/fis.c' object='GKlib/test/libopt_la-fis.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libopt_la-fis.lo `test -f 'GKlib/test/fis.c' || echo '$(srcdir)/'`GKlib/test/fis.c
-
-GKlib/test/libopt_la-gkgraph.lo: GKlib/test/gkgraph.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libopt_la-gkgraph.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libopt_la-gkgraph.Tpo -c -o GKlib/test/libopt_la-gkgraph.lo `test -f 'GKlib/test/gkgraph.c' || echo '$(srcdir)/'`GKlib/test/gkgraph.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libopt_la-gkgraph.Tpo GKlib/test/$(DEPDIR)/libopt_la-gkgraph.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/gkgraph.c' object='GKlib/test/libopt_la-gkgraph.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libopt_la-gkgraph.lo `test -f 'GKlib/test/gkgraph.c' || echo '$(srcdir)/'`GKlib/test/gkgraph.c
-
-GKlib/test/libopt_la-gksort.lo: GKlib/test/gksort.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libopt_la-gksort.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libopt_la-gksort.Tpo -c -o GKlib/test/libopt_la-gksort.lo `test -f 'GKlib/test/gksort.c' || echo '$(srcdir)/'`GKlib/test/gksort.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libopt_la-gksort.Tpo GKlib/test/$(DEPDIR)/libopt_la-gksort.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/gksort.c' object='GKlib/test/libopt_la-gksort.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libopt_la-gksort.lo `test -f 'GKlib/test/gksort.c' || echo '$(srcdir)/'`GKlib/test/gksort.c
-
-GKlib/test/libopt_la-rw.lo: GKlib/test/rw.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libopt_la-rw.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libopt_la-rw.Tpo -c -o GKlib/test/libopt_la-rw.lo `test -f 'GKlib/test/rw.c' || echo '$(srcdir)/'`GKlib/test/rw.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libopt_la-rw.Tpo GKlib/test/$(DEPDIR)/libopt_la-rw.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/rw.c' object='GKlib/test/libopt_la-rw.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libopt_la-rw.lo `test -f 'GKlib/test/rw.c' || echo '$(srcdir)/'`GKlib/test/rw.c
-
-GKlib/test/libopt_la-strings.lo: GKlib/test/strings.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libopt_la-strings.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libopt_la-strings.Tpo -c -o GKlib/test/libopt_la-strings.lo `test -f 'GKlib/test/strings.c' || echo '$(srcdir)/'`GKlib/test/strings.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libopt_la-strings.Tpo GKlib/test/$(DEPDIR)/libopt_la-strings.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/strings.c' object='GKlib/test/libopt_la-strings.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libopt_la-strings.lo `test -f 'GKlib/test/strings.c' || echo '$(srcdir)/'`GKlib/test/strings.c
 
 GKlib/libopt_la-timers.lo: GKlib/timers.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT GKlib/libopt_la-timers.lo -MD -MP -MF GKlib/$(DEPDIR)/libopt_la-timers.Tpo -c -o GKlib/libopt_la-timers.lo `test -f 'GKlib/timers.c' || echo '$(srcdir)/'`GKlib/timers.c
@@ -3992,13 +3661,6 @@ GKlib/libprof_la-blas.lo: GKlib/blas.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-blas.lo `test -f 'GKlib/blas.c' || echo '$(srcdir)/'`GKlib/blas.c
 
-GKlib/conf/libprof_la-check_thread_storage.lo: GKlib/conf/check_thread_storage.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/conf/libprof_la-check_thread_storage.lo -MD -MP -MF GKlib/conf/$(DEPDIR)/libprof_la-check_thread_storage.Tpo -c -o GKlib/conf/libprof_la-check_thread_storage.lo `test -f 'GKlib/conf/check_thread_storage.c' || echo '$(srcdir)/'`GKlib/conf/check_thread_storage.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/conf/$(DEPDIR)/libprof_la-check_thread_storage.Tpo GKlib/conf/$(DEPDIR)/libprof_la-check_thread_storage.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/conf/check_thread_storage.c' object='GKlib/conf/libprof_la-check_thread_storage.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/conf/libprof_la-check_thread_storage.lo `test -f 'GKlib/conf/check_thread_storage.c' || echo '$(srcdir)/'`GKlib/conf/check_thread_storage.c
-
 GKlib/libprof_la-csr.lo: GKlib/csr.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-csr.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-csr.Tpo -c -o GKlib/libprof_la-csr.lo `test -f 'GKlib/csr.c' || echo '$(srcdir)/'`GKlib/csr.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-csr.Tpo GKlib/$(DEPDIR)/libprof_la-csr.Plo
@@ -4145,41 +3807,6 @@ GKlib/libprof_la-string.lo: GKlib/string.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/string.c' object='GKlib/libprof_la-string.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-string.lo `test -f 'GKlib/string.c' || echo '$(srcdir)/'`GKlib/string.c
-
-GKlib/test/libprof_la-fis.lo: GKlib/test/fis.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libprof_la-fis.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libprof_la-fis.Tpo -c -o GKlib/test/libprof_la-fis.lo `test -f 'GKlib/test/fis.c' || echo '$(srcdir)/'`GKlib/test/fis.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libprof_la-fis.Tpo GKlib/test/$(DEPDIR)/libprof_la-fis.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/fis.c' object='GKlib/test/libprof_la-fis.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libprof_la-fis.lo `test -f 'GKlib/test/fis.c' || echo '$(srcdir)/'`GKlib/test/fis.c
-
-GKlib/test/libprof_la-gkgraph.lo: GKlib/test/gkgraph.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libprof_la-gkgraph.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libprof_la-gkgraph.Tpo -c -o GKlib/test/libprof_la-gkgraph.lo `test -f 'GKlib/test/gkgraph.c' || echo '$(srcdir)/'`GKlib/test/gkgraph.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libprof_la-gkgraph.Tpo GKlib/test/$(DEPDIR)/libprof_la-gkgraph.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/gkgraph.c' object='GKlib/test/libprof_la-gkgraph.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libprof_la-gkgraph.lo `test -f 'GKlib/test/gkgraph.c' || echo '$(srcdir)/'`GKlib/test/gkgraph.c
-
-GKlib/test/libprof_la-gksort.lo: GKlib/test/gksort.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libprof_la-gksort.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libprof_la-gksort.Tpo -c -o GKlib/test/libprof_la-gksort.lo `test -f 'GKlib/test/gksort.c' || echo '$(srcdir)/'`GKlib/test/gksort.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libprof_la-gksort.Tpo GKlib/test/$(DEPDIR)/libprof_la-gksort.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/gksort.c' object='GKlib/test/libprof_la-gksort.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libprof_la-gksort.lo `test -f 'GKlib/test/gksort.c' || echo '$(srcdir)/'`GKlib/test/gksort.c
-
-GKlib/test/libprof_la-rw.lo: GKlib/test/rw.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libprof_la-rw.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libprof_la-rw.Tpo -c -o GKlib/test/libprof_la-rw.lo `test -f 'GKlib/test/rw.c' || echo '$(srcdir)/'`GKlib/test/rw.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libprof_la-rw.Tpo GKlib/test/$(DEPDIR)/libprof_la-rw.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/rw.c' object='GKlib/test/libprof_la-rw.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libprof_la-rw.lo `test -f 'GKlib/test/rw.c' || echo '$(srcdir)/'`GKlib/test/rw.c
-
-GKlib/test/libprof_la-strings.lo: GKlib/test/strings.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/test/libprof_la-strings.lo -MD -MP -MF GKlib/test/$(DEPDIR)/libprof_la-strings.Tpo -c -o GKlib/test/libprof_la-strings.lo `test -f 'GKlib/test/strings.c' || echo '$(srcdir)/'`GKlib/test/strings.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/test/$(DEPDIR)/libprof_la-strings.Tpo GKlib/test/$(DEPDIR)/libprof_la-strings.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/test/strings.c' object='GKlib/test/libprof_la-strings.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/test/libprof_la-strings.lo `test -f 'GKlib/test/strings.c' || echo '$(srcdir)/'`GKlib/test/strings.c
 
 GKlib/libprof_la-timers.lo: GKlib/timers.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-timers.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-timers.Tpo -c -o GKlib/libprof_la-timers.lo `test -f 'GKlib/timers.c' || echo '$(srcdir)/'`GKlib/timers.c
@@ -4453,8 +4080,6 @@ mostlyclean-libtool:
 clean-libtool:
 	-rm -rf .libs _libs
 	-rm -rf GKlib/.libs GKlib/_libs
-	-rm -rf GKlib/conf/.libs GKlib/conf/_libs
-	-rm -rf GKlib/test/.libs GKlib/test/_libs
 	-rm -rf libmetis/.libs libmetis/_libs
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
@@ -4585,10 +4210,6 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f GKlib/$(DEPDIR)/$(am__dirstamp)
 	-rm -f GKlib/$(am__dirstamp)
-	-rm -f GKlib/conf/$(DEPDIR)/$(am__dirstamp)
-	-rm -f GKlib/conf/$(am__dirstamp)
-	-rm -f GKlib/test/$(DEPDIR)/$(am__dirstamp)
-	-rm -f GKlib/test/$(am__dirstamp)
 	-rm -f libmetis/$(DEPDIR)/$(am__dirstamp)
 	-rm -f libmetis/$(am__dirstamp)
 
@@ -4601,7 +4222,7 @@ clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf GKlib/$(DEPDIR) GKlib/conf/$(DEPDIR) GKlib/test/$(DEPDIR) libmetis/$(DEPDIR)
+	-rm -rf GKlib/$(DEPDIR) libmetis/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -4647,7 +4268,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf GKlib/$(DEPDIR) GKlib/conf/$(DEPDIR) GKlib/test/$(DEPDIR) libmetis/$(DEPDIR)
+	-rm -rf GKlib/$(DEPDIR) libmetis/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

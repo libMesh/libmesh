@@ -5,8 +5,6 @@ pkg_sources = \
 	include/metis.h \
 	GKlib/b64.c \
 	GKlib/blas.c \
-	GKlib/BUILD.txt \
-	GKlib/conf/check_thread_storage.c \
 	GKlib/csr.c \
 	GKlib/error.c \
 	GKlib/evaluate.c \
@@ -29,14 +27,12 @@ pkg_sources = \
 	GKlib/gk_struct.h \
 	GKlib/gk_types.h \
 	GKlib/GKlib.h \
-	GKlib/GKlibSystem.cmake \
 	GKlib/gkregex.c \
 	GKlib/gkregex.h \
 	GKlib/graph.c \
 	GKlib/htable.c \
 	GKlib/io.c \
 	GKlib/itemsets.c \
-	GKlib/Makefile \
 	GKlib/mcore.c \
 	GKlib/memory.c \
 	GKlib/ms_inttypes.h \
@@ -50,13 +46,6 @@ pkg_sources = \
 	GKlib/seq.c \
 	GKlib/sort.c \
 	GKlib/string.c \
-	GKlib/test/fis.c \
-	GKlib/test/gkgraph.c \
-	GKlib/test/gksort.c \
-	GKlib/test/Makefile.in.old \
-	GKlib/test/Makefile.old \
-	GKlib/test/rw.c \
-	GKlib/test/strings.c \
 	GKlib/timers.c \
 	GKlib/tokenizer.c \
 	GKlib/util.c \
