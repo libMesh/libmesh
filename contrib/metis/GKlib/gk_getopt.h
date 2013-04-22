@@ -4,7 +4,7 @@
 
 \date   Started 3/27/2007
 \author George
-\version\verbatim $Id$ \endverbatim
+\version\verbatim $Id: gk_getopt.h 10711 2011-08-31 22:23:04Z karypis $ \endverbatim
 */
 
 #ifndef _GK_GETOPT_H_

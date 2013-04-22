@@ -6,7 +6,7 @@ The priority queues are generated using the GK_MKPQUEUE macro.
 
 \date   Started 3/27/2007
 \author George
-\version\verbatim $Id$ \endverbatim
+\version\verbatim $Id: pqueue.c 10711 2011-08-31 22:23:04Z karypis $ \endverbatim
 */
 
 #include <GKlib.h>

@@ -4,7 +4,7 @@
 
 \date   Started 3/27/2007
 \author George
-\version\verbatim $Id$ \endverbatim
+\version\verbatim $Id: gk_defs.h 12732 2012-09-24 20:54:50Z karypis $ \endverbatim
 */
 
 #ifndef _GK_DEFS_H_
@@ -51,12 +51,19 @@
 #define GK_CSR_LOG      7
 #define GK_CSR_IDF      8
 #define GK_CSR_IDF2     9
+#define GK_CSR_MAXTF2   10
 
 #define GK_CSR_COS      1
 #define GK_CSR_JAC      2
 #define GK_CSR_MIN      3
+#define GK_CSR_AMIN     4
 
 #define GK_CSR_FMT_CLUTO        1
 #define GK_CSR_FMT_CSR          2
+#define GK_CSR_FMT_METIS        3
+#define GK_CSR_FMT_BINROW       4
+#define GK_CSR_FMT_BINCOL       5
+
+#define GK_GRAPH_FMT_METIS      1
 
 #endif

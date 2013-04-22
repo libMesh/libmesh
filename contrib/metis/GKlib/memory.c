@@ -9,25 +9,15 @@ can be used to define other memory allocation routines.
 
 \date   Started 4/3/2007
 \author George
-\version\verbatim $Id$ \endverbatim
+\version\verbatim $Id: memory.c 10783 2011-09-21 23:19:56Z karypis $ \endverbatim
 */
 
 
 #include <GKlib.h>
 
-/**
- * LIBMESH CHANGE: __thread is not portable across all platforms.  We detect
- * this using configure and set the appropriate value in LIBMESH_TLS, which is
- * defined in libmesh_config.h
- */
-#include "libmesh/libmesh_config.h"
-
 /* This is for the global mcore that tracks all heap allocations */
-#ifdef LIBMESH_TLS
-static LIBMESH_TLS gk_mcore_t *gkmcore = NULL;
-#else
-static gk_mcore_t *gkmcore = NULL;
-#endif
+static __thread gk_mcore_t *gkmcore = NULL;
+
 
 /*************************************************************************/
 /*! Define the set of memory allocation routines for each data type */

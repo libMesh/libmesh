@@ -4,7 +4,7 @@
 
 \date   Started 3/27/2007
 \author George
-\version\verbatim $Id$ \endverbatim
+\version\verbatim $Id: gk_struct.h 13005 2012-10-23 22:34:36Z karypis $ \endverbatim
 */
 
 #ifndef _GK_STRUCT_H_
@@ -54,6 +54,17 @@ GK_MKPQUEUE_T(gk_dpq_t,    gk_dkv_t)
 GK_MKPQUEUE_T(gk_idxpq_t,  gk_idxkv_t)
 
 
+#define GK_MKPQUEUE2_T(NAME, KTYPE, VTYPE)\
+typedef struct {\
+  ssize_t nnodes;\
+  ssize_t maxnodes;\
+\
+  /* Heap version of the data structure */ \
+  KTYPE *keys;\
+  VTYPE *vals;\
+} NAME;\
+
+
 
 /*-------------------------------------------------------------
  * The following data structure stores a sparse CSR format
@@ -66,7 +77,27 @@ typedef struct gk_csr_t {
   float *rowval, *colval;
   float *rnorms, *cnorms;
   float *rsums, *csums;
+  float *rsizes, *csizes;
+  float *rvols, *cvols;
+  float *rwgts, *cwgts;
 } gk_csr_t;
+
+
+/*-------------------------------------------------------------
+ * The following data structure stores a sparse graph 
+ *-------------------------------------------------------------*/
+typedef struct gk_graph_t {
+  int32_t nvtxs;                /*!< The number of vertices in the graph */
+  ssize_t *xadj;                /*!< The ptr-structure of the adjncy list */
+  int32_t *adjncy;              /*!< The adjacency list of the graph */
+  int32_t *iadjwgt;             /*!< The integer edge weights */
+  float *fadjwgt;               /*!< The floating point edge weights */
+  int32_t *ivwgts;              /*!< The integer vertex weights */
+  float *fvwgts;                /*!< The floating point vertex weights */
+  int32_t *ivsizes;             /*!< The integer vertex sizes */
+  float *fvsizes;               /*!< The floating point vertex sizes */
+  int32_t *vlabels;             /*!< The labels of the vertices */
+} gk_graph_t;
 
 
 /*-------------------------------------------------------------
