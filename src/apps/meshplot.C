@@ -24,12 +24,12 @@ int main(int argc, char** argv)
   Mesh mesh(init.comm());
   EquationSystems es(mesh);
 
-  std::cout << "Usage: " << argv[0]
+  libMesh::out << "Usage: " << argv[0]
             << " inputmesh inputsolution outputplot" << std::endl;
 
   START_LOG("mesh.read()", "main");
   mesh.read(argv[1]);
-  std::cout << "Loaded mesh " << argv[1] << std::endl;
+  libMesh::out << "Loaded mesh " << argv[1] << std::endl;
   STOP_LOG("mesh.read()", "main");
 
   START_LOG("es.read()", "main");
@@ -40,7 +40,7 @@ int main(int argc, char** argv)
           EquationSystems::READ_DATA |
           EquationSystems::READ_ADDITIONAL_DATA |
           EquationSystems::READ_BASIC_ONLY);
-  std::cout << "Loaded solution " << argv[2] << std::endl;
+  libMesh::out << "Loaded solution " << argv[2] << std::endl;
   STOP_LOG("es.read()", "main");
 
   START_LOG("write_equation_systems()", "main");
@@ -64,5 +64,5 @@ int main(int argc, char** argv)
     Nemesis_IO(mesh).write_equation_systems (outputname, es);
 
   STOP_LOG("write_equation_systems()", "main");
-  std::cout << "Wrote output " << argv[3] << std::endl;
+  libMesh::out << "Wrote output " << argv[3] << std::endl;
 }

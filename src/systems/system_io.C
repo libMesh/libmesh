@@ -698,7 +698,7 @@ void System::read_parallel_data (Xdr &io,
   //   dt   = pl.get_elapsed_time(),
   //   rate = total_read_size*sizeof(Number)/dt;
 
-  // std::cerr << "Read " << total_read_size << " \"Number\" values\n"
+  // libMesh::err << "Read " << total_read_size << " \"Number\" values\n"
   // 	    << " Elapsed time = " << dt << '\n'
   // 	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
 
@@ -762,7 +762,7 @@ void System::read_serialized_data (Xdr& io,
   //   dt   = pl.get_elapsed_time(),
   //   rate = total_read_size*sizeof(Number)/dt;
 
-  // std::cout << "Read " << total_read_size << " \"Number\" values\n"
+  // libMesh::out << "Read " << total_read_size << " \"Number\" values\n"
   // 	    << " Elapsed time = " << dt << '\n'
   // 	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
 
@@ -1028,7 +1028,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 		  for (unsigned int val=0; val<n_vals_tot_allvecs; val++, ++in_vals)
 		    {
 		      libmesh_assert (in_vals != input_vals.end());
-		      //std::cout << "*in_vals=" << *in_vals << '\n';
+		      //libMesh::out << "*in_vals=" << *in_vals << '\n';
 		      vals.push_back(*in_vals);
 		    }
 		}
@@ -1069,7 +1069,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 			  libmesh_assert (val_it != vals.end());
 			  libmesh_assert_greater_equal (dof_index, vec.first_local_index());
 			  libmesh_assert_less (dof_index, vec.last_local_index());
-			  //std::cout << "dof_index, *val_it = \t" << dof_index << ", " << *val_it << '\n';
+			  //libMesh::out << "dof_index, *val_it = \t" << dof_index << ", " << *val_it << '\n';
 			  vec.set (dof_index, *val_it);
 			}
 		    }
@@ -1660,7 +1660,7 @@ void System::write_parallel_data (Xdr &io,
   //   dt   = pl.get_elapsed_time(),
   //   rate = total_written_size*sizeof(Number)/dt;
 
-  // std::cerr << "Write " << total_written_size << " \"Number\" values\n"
+  // libMesh::err << "Write " << total_written_size << " \"Number\" values\n"
   // 	    << " Elapsed time = " << dt << '\n'
   // 	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
 
@@ -1733,7 +1733,7 @@ void System::write_serialized_data (Xdr& io,
   //   dt   = pl.get_elapsed_time(),
   //   rate = total_written_size*sizeof(Number)/dt;
 
-  // std::cout << "Write " << total_written_size << " \"Number\" values\n"
+  // libMesh::out << "Write " << total_written_size << " \"Number\" values\n"
   // 	    << " Elapsed time = " << dt << '\n'
   // 	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
 
@@ -1770,7 +1770,7 @@ void System::write_serialized_data (Xdr& io,
   //     dt2   = pl.get_elapsed_time(),
   //     rate2 = total_written_size*sizeof(Number)/(dt2-dt);
 
-  //   std::cout << "Write (new) " << total_written_size << " \"Number\" values\n"
+  //   libMesh::out << "Write (new) " << total_written_size << " \"Number\" values\n"
   // 	      << " Elapsed time = " << (dt2-dt) << '\n'
   // 	      << " Rate = " << rate2/1.e6 << "(MB/sec)\n\n";
 
@@ -1822,7 +1822,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
     num_vecs   = libmesh_cast_int<unsigned int>(vecs.size()),
     num_blks   = std::ceil(static_cast<double>(n_objs)/static_cast<double>(io_blksize));
 
-  // std::cout << "io_blksize = "    << io_blksize
+  // libMesh::out << "io_blksize = "    << io_blksize
   // 	    << ", num_objects = " << n_objs
   // 	    << ", num_blks = "    << num_blks
   // 	    << std::endl;

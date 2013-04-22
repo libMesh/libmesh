@@ -47,9 +47,9 @@ int main (int argc, char** argv)
 
   if (argc < 6)
     {
-      std::cerr << "Usage: " << argv[0]
-                << " ivar m0.mesh m1.mesh s0.soln s1.soln"
-                << std::endl;
+      libMesh::err << "Usage: " << argv[0]
+                   << " ivar m0.mesh m1.mesh s0.soln s1.soln"
+                   << std::endl;
 
       libmesh_error();
     }
@@ -59,16 +59,16 @@ int main (int argc, char** argv)
   Mesh mesh_fine(init.comm(), dim);
 
   // Read the coarse mesh
-  std::cout << "Reading Mesh " << argv[2] << std::endl;
+  libMesh::out << "Reading Mesh " << argv[2] << std::endl;
   mesh_coarse.read(argv[2]);
   mesh_coarse.print_info();
-  std::cout << std::endl;
+  libMesh::out << std::endl;
 
   // Read the fine mesh
-  std::cout << "Reading Mesh " << argv[3] << std::endl;
+  libMesh::out << "Reading Mesh " << argv[3] << std::endl;
   mesh_fine.read(argv[3]);
   mesh_fine.print_info();
-  std::cout << std::endl;
+  libMesh::out << std::endl;
 
 
   std::vector<Number> coarse_solution;
@@ -77,13 +77,13 @@ int main (int argc, char** argv)
   std::vector<std::string> fine_var_names;
 
   // Read the coarse solution
-  std::cout << "Reading Soln " << argv[4] << std::endl;
+  libMesh::out << "Reading Soln " << argv[4] << std::endl;
   LegacyXdrIO(mesh_coarse,true).read_mgf_soln(std::string(argv[4]),
                                               coarse_solution,
                                               coarse_var_names);
 
   // Read the fine solution
-  std::cout << "Reading Soln " << argv[5] << std::endl;
+  libMesh::out << "Reading Soln " << argv[5] << std::endl;
   LegacyXdrIO(mesh_fine,true).read_mgf_soln(std::string(argv[5]),
                                             fine_solution,
                                             fine_var_names);
@@ -98,21 +98,21 @@ int main (int argc, char** argv)
   Trees::OctTree octree_coarse(mesh_coarse,100);
   perf_log.stop_event("octree build");
 
-  std::cout << "n_active_bins() = " << octree_coarse.n_active_bins() << std::endl;
+  libMesh::out << "n_active_bins() = " << octree_coarse.n_active_bins() << std::endl;
 
   // sanity check.  Make sure that we can find all the element
   // centroids and all the mesh nodes!
   /*
     for (unsigned int e=0; e<mesh_coarse.n_elem(); e++)
     {
-    std::cout << "looking for centroid of element " << e << std::endl;
+    libMesh::out << "looking for centroid of element " << e << std::endl;
     const Elem* elem = octree_coarse.find_element(mesh_coarse.elem(e)->centroid(mesh_coarse));
 
     libmesh_assert(elem);
     }
     for (unsigned int n=0; n<mesh_coarse.n_nodes(); n++)
     {
-    std::cout << "looking for node " << n << std::endl;
+    libMesh::out << "looking for node " << n << std::endl;
     const Elem* elem = octree_coarse.find_element(mesh_coarse.vertex(n));
 
     libmesh_assert(elem);
@@ -222,8 +222,8 @@ int main (int argc, char** argv)
 
     error = sqrt(error);
 
-    std::cout << "Computed error=" << error
-              << std::endl;
+    libMesh::out << "Computed error=" << error
+                 << std::endl;
 
     // Now lets compute the error at each node in the fine mesh and plot it out.
     {

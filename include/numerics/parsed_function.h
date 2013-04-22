@@ -202,7 +202,7 @@ public:
 
       if (it == _additional_vars.end())
       {
-        std::cerr << "ERROR: Requested variable not found in parsed function\n" << std::endl;
+        libMesh::err << "ERROR: Requested variable not found in parsed function\n" << std::endl;
         libmesh_error();
       }
 

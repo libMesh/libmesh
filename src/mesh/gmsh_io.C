@@ -533,9 +533,9 @@ void GmshIO::read_mesh(std::istream& in)
                   static bool seen_high_dim_element = false;
                   if (!seen_high_dim_element)
                     {
-                      std::cerr << "Warning: can't load an element of dimension "
-                                << eletype.dim << " into a mesh of dimension "
-                                << dim << std::endl;
+                      libMesh::err << "Warning: can't load an element of dimension "
+                                   << eletype.dim << " into a mesh of dimension "
+                                   << dim << std::endl;
                       seen_high_dim_element = true;
                     }
                   int nod = 0;

@@ -304,10 +304,10 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
 
 #ifdef DEBUG
 
-  // std::cout << " [ ";
+  // libMesh::out << " [ ";
   // for (unsigned int i=0; i<_idx_buf.size(); i++)
-  //   std::cout << _idx_buf[i] << " ";
-  // std::cout << "]\n";
+  //   libMesh::out << _idx_buf[i] << " ";
+  // libMesh::out << "]\n";
 
   libmesh_assert_equal_to (this->n_var_groups(s), nvpg.size());
 
@@ -371,7 +371,7 @@ void DofObject::set_n_comp_group(const unsigned int s,
   libmesh_assert_less ((base_offset + 1), _idx_buf.size());
 
   // if (ncomp)
-  //   std::cout << "s,vg,ncomp="
+  //   libMesh::out << "s,vg,ncomp="
   // 	      << s  << ","
   // 	      << vg << ","
   // 	      << ncomp << '\n';
@@ -385,7 +385,7 @@ void DofObject::set_n_comp_group(const unsigned int s,
   _idx_buf[base_offset + 1] = (ncomp == 0) ? invalid_id - 1 : invalid_id;
 
   // this->debug_buffer();
-  // std::cout << "s,vg = " << s << "," << vg << '\n'
+  // libMesh::out << "s,vg = " << s << "," << vg << '\n'
   // 	    << "base_offset=" << base_offset << '\n'
   // 	    << "this->n_comp(s,vg)=" << this->n_comp(s,vg) << '\n'
   // 	    << "this->n_comp_group(s,vg)=" << this->n_comp_group(s,vg) << '\n'
@@ -426,10 +426,10 @@ void DofObject::set_dof_number(const unsigned int s,
     base_idx = dn;
 
 // #ifdef DEBUG
-//   std::cout << " [ ";
+//   libMesh::out << " [ ";
 //   for (unsigned int i=0; i<_idx_buf.size(); i++)
-//     std::cout << _idx_buf[i] << " ";
-//   std::cout << "]\n";
+//     libMesh::out << _idx_buf[i] << " ";
+//   libMesh::out << "]\n";
 // #endif
 
   libmesh_assert_equal_to (this->dof_number(s, var, comp), dn);
@@ -533,10 +533,10 @@ void DofObject::pack_indexing(std::back_insert_iterator<std::vector<int> > targe
 
 void DofObject::debug_buffer () const
 {
-  std::cout << " [ ";
+  libMesh::out << " [ ";
   for (unsigned int i=0; i<_idx_buf.size(); i++)
-    std::cout << _idx_buf[i] << " ";
-  std::cout << "]\n";
+    libMesh::out << _idx_buf[i] << " ";
+  libMesh::out << "]\n";
 }
 
 
