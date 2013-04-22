@@ -629,11 +629,11 @@ void DofMap::reinit(MeshBase& mesh)
 		      node->set_vg_dof_base(sys_num, vg,
 					    vertex_dofs);
 
-		      // std::cout << "sys_num,vg,old_node_dofs,vertex_dofs="
-		      // 		<< sys_num << ","
-		      // 		<< vg << ","
-		      // 		<< old_node_dofs << ","
-		      // 		<< vertex_dofs << '\n',
+		      // libMesh::out << "sys_num,vg,old_node_dofs,vertex_dofs="
+		      // 	      << sys_num << ","
+		      // 	      << vg << ","
+		      // 	      << old_node_dofs << ","
+		      // 	      << vertex_dofs << '\n',
 		      // 	node->debug_buffer();
 
 		      // libmesh_assert_equal_to (vertex_dofs, node->n_comp(sys_num, vg));
@@ -682,12 +682,12 @@ void DofMap::reinit(MeshBase& mesh)
 	        {
 		  libmesh_assert_greater_equal (old_node_dofs, vertex_dofs);
 		  // //if (vertex_dofs < new_node_dofs)
-		  //   std::cout << "sys_num,vg,old_node_dofs,vertex_dofs,new_node_dofs="
-		  // 	      << sys_num << ","
-		  // 	      << vg << ","
-		  // 	      << old_node_dofs << ","
-		  // 	      << vertex_dofs << ","
-		  // 	      << new_node_dofs << '\n',
+		  //   libMesh::out << "sys_num,vg,old_node_dofs,vertex_dofs,new_node_dofs="
+		  //                << sys_num << ","
+		  //                << vg << ","
+		  //                << old_node_dofs << ","
+		  //                << vertex_dofs << ","
+		  //                << new_node_dofs << '\n',
 		  //     node->debug_buffer();
 
 		  libmesh_assert_greater_equal (vertex_dofs,   new_node_dofs);
@@ -1105,7 +1105,7 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type &next_free_dof,
 
 #ifdef DEBUG
   {
-    // std::cout << "next_free_dof=" << next_free_dof << std::endl
+    // libMesh::out << "next_free_dof=" << next_free_dof << std::endl
     // 	      << "_n_SCALAR_dofs=" << _n_SCALAR_dofs << std::endl;
 
     // Make sure we didn't miss any nodes
@@ -1328,7 +1328,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 		    {
 		      _send_list.push_back(dof_index);
 		      // libmesh_here();
-		      // std::cout << "sys_num,v,c,dof_index="
+		      // libMesh::out << "sys_num,v,c,dof_index="
 		      // 		<< sys_num << ", "
 		      // 		<< v << ", "
 		      // 		<< c << ", "

@@ -224,16 +224,16 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
             {
               if (node_keys[i] == node_keys[j])
                 {
-		  std::cerr << "Error: nodes with duplicate Hilbert keys!" <<
+		  libMesh::err << "Error: nodes with duplicate Hilbert keys!" <<
                     std::endl;
                   CFixBitVec icoords[3], jcoords[3];
                   get_hilbert_coords(**nodej, bbox, jcoords);
-		  std::cerr <<
+		  libMesh::err <<
 		    "node " << (*nodej)->id() << ", " <<
 		    *(Point*)(*nodej) << " has HilbertIndices " <<
 		    node_keys[j] << std::endl;
                   get_hilbert_coords(**nodei, bbox, icoords);
-		  std::cerr <<
+		  libMesh::err <<
 		    "node " << (*nodei)->id() << ", " <<
 		    *(Point*)(*nodei) << " has HilbertIndices " <<
 		    node_keys[i] << std::endl;
@@ -264,18 +264,18 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
               if ((elem_keys[i] == elem_keys[j]) &&
                   ((*elemi)->level() == (*elemj)->level()))
                 {
-		  std::cerr <<
+		  libMesh::err <<
                     "Error: level " << (*elemi)->level() <<
                     " elements with duplicate Hilbert keys!" <<
                     std::endl;
-		  std::cerr <<
+		  libMesh::err <<
 		    "level " << (*elemj)->level() << " elem\n" <<
                     (**elemj) << " centroid " <<
 		    (*elemj)->centroid() << " has HilbertIndices " <<
 		    elem_keys[j] << " or " <<
 		    get_hilbert_index((*elemj)->centroid(), bbox) <<
                     std::endl;
-		  std::cerr <<
+		  libMesh::err <<
 		    "level " << (*elemi)->level() << " elem\n" <<
                     (**elemi) << " centroid " <<
 		    (*elemi)->centroid() << " has HilbertIndices " <<

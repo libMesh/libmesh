@@ -1171,7 +1171,7 @@ numeric_index_type PetscVector<T>::map_global_to_local_index (const numeric_inde
           error_message << "}\n";
         }
 
-      std::cerr << error_message.str();
+      libMesh::err << error_message.str();
 
       libmesh_error();
     }

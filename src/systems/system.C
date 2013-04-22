@@ -697,7 +697,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
                  _dof_map->get_send_list(), false,
                  GHOSTED);
 #else
-      std::cerr << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
+      libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
       libmesh_error();
 #endif
     }

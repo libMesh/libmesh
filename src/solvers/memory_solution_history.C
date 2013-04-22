@@ -145,7 +145,7 @@ namespace libMesh
     Real recovery_time = stored_sols->first;
 
     // Print out what time we are recovering vectors at
-//    std::cout << "Recovering solution vectors at time: " <<
+//    libMesh::out << "Recovering solution vectors at time: " <<
 //                 recovery_time << std::endl;
 
     // Do we not have a solution for this time?  Then
@@ -153,7 +153,7 @@ namespace libMesh
     if(stored_sols == stored_solutions.end() ||
        std::abs(recovery_time - _system.time) > TOLERANCE)
       {
-//	std::cout << "No more solutions to recover ! We are at time t = " <<
+//	libMesh::out << "No more solutions to recover ! We are at time t = " <<
 //                     _system.time << std::endl;
         return;
       }
