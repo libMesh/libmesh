@@ -748,7 +748,12 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   if( (this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
       (other_mesh_boundary_id != BoundaryInfo::invalid_id) )
   {
-    // Loop below fills in these arrays for the two meshes.
+    // While finding nodes on the boundary, also find the minimum edge length
+    // of all faces on both boundaries.  This will later be used in relative
+    // distance checks when stitching nodes.
+    Real h_min = std::numeric_limits<Real>::max();
+
+    // Loop below fills in these sets for the two meshes.
     std::set<dof_id_type> this_boundary_node_ids, other_boundary_node_ids;
     {
       // Make temporary fixed-size arrays for loop
@@ -776,6 +781,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
                         AutoPtr<Elem> side (el->build_side(side_id));
                         for (unsigned int node_id=0; node_id<side->n_nodes(); ++node_id)
                           set_array[i]->insert( side->node(node_id) );
+
+                        h_min = std::min(h_min, side->hmin());
                       }
                   }
             }
@@ -787,6 +794,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
         libMesh::out << "In SerialMesh::stitch_meshes:\n"
                      << "This mesh has "  << this_boundary_node_ids.size()  << " nodes on boundary " << this_mesh_boundary_id  << ".\n"
                      << "Other mesh has " << other_boundary_node_ids.size() << " nodes on boundary " << other_mesh_boundary_id << ".\n"
+                     << "Minimum edge length on both surfaces is " << h_min << ".\n"
                      << std::endl;
       }
 
@@ -818,7 +826,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
           for (unsigned ctr=0; set_it != set_it_end; ++set_it, ++ctr)
             {
               (*vec_array[i])[ctr] = std::make_pair( mesh_array[i]->point(*set_it), // The geometric point
-                                                     *set_it );                     // It's ID
+                                                     *set_it );                     // Its ID
             }
 
           // Sort the vectors based on the FuzzyPointCompare struct op()
@@ -846,15 +854,12 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
         if (other_iter != other_sorted_bndry_nodes.end())
           {
 	    // Check that the points do indeed match - should not be necessary unless something
-	    // is wrong with fuzzy_binary_find.  To be on the safe side, we'll check.  Use the
-	    // same comparison used by the sorting algorithm.
+	    // is wrong with binary_find.  To be on the safe side, we'll check.
 	    {
 	      // Grab the other point from the iterator
 	      Point other_point = other_iter->first;
 
-              // TODO: Shall we let the user control whether a relative or absolute tolerance
-              // is used here?  And if a relative tolerance is used, what should it be relative to?
-	      if (!this_point.relative_fuzzy_equals(other_point, tol))
+	      if (!this_point.absolute_fuzzy_equals(other_point, tol*h_min))
 		{
 		  libMesh::out << "Error: mismatched points: " << this_point << " and " << other_point << std::endl;
 		  libmesh_error();
