@@ -9,13 +9,10 @@ of standard functions (but with enhanced functionality).
 
 \date Started 11/1/99
 \author George
-\version $Id$
+\version $Id: string.c 10711 2011-08-31 22:23:04Z karypis $
 */
 /************************************************************************/
 
-#define _XOPEN_SOURCE 
-#include <stddef.h>
-#include <time.h>
 #include <GKlib.h>
 
 

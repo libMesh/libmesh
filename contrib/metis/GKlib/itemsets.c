@@ -7,7 +7,7 @@
  *
  * \date 6/13/2008
  * \author George Karypis
- * \version\verbatim $Id$ \endverbatim
+ * \version\verbatim $Id: itemsets.c 11075 2011-11-11 22:31:52Z karypis $ \endverbatim
  */
 
 #include <GKlib.h>
@@ -44,7 +44,7 @@ gk_csr_t *itemsets_project_matrix(isparams_t *param, gk_csr_t *mat, int cid);
 /*************************************************************************/
 /*! The entry point of the frequent itemset discovery code */
 /*************************************************************************/
-void gk_find_frequent_itemsets(int ntrans, int *tranptr, int *tranind, 
+void gk_find_frequent_itemsets(int ntrans, ssize_t *tranptr, int *tranind, 
         int minfreq, int maxfreq, int minlen, int maxlen, 
         void (*process_itemset)(void *stateptr, int nitems, int *itemids, 
                                 int ntrans, int *transids),
@@ -59,9 +59,7 @@ void gk_find_frequent_itemsets(int ntrans, int *tranptr, int *tranind,
   mat = gk_csr_Create();
   mat->nrows  = ntrans;
   mat->ncols  = tranind[gk_iargmax(tranptr[ntrans], tranind)]+1;
-  mat->rowptr = gk_zmalloc(ntrans+1, "gk_find_frequent_itemsets: mat.rowptr");
-  for (i=0; i<ntrans+1; i++)
-    mat->rowptr[i] = tranptr[i];
+  mat->rowptr = gk_zcopy(ntrans+1, tranptr, gk_zmalloc(ntrans+1, "gk_find_frequent_itemsets: mat.rowptr"));
   mat->rowind = gk_icopy(tranptr[ntrans], tranind, gk_imalloc(tranptr[ntrans], "gk_find_frequent_itemsets: mat.rowind"));
   mat->colids = gk_iincset(mat->ncols, 0, gk_imalloc(mat->ncols, "gk_find_frequent_itemsets: mat.colids"));
 

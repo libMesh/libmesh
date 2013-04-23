@@ -4,7 +4,7 @@
 
 \date   Started 4/09/07
 \author George
-\version\verbatim $Id$ \endverbatim
+\version\verbatim $Id: gk_mkpqueue.h 13005 2012-10-23 22:34:36Z karypis $ \endverbatim
 */
 
 
@@ -60,6 +60,7 @@ void FPRFX ## Reset(PQT *queue)\
 /**************************************************************************/\
 void FPRFX ## Free(PQT *queue)\
 {\
+  if (queue == NULL) return;\
   gk_free((void **)&queue->heap, &queue->locator, LTERM);\
   queue->maxnodes = 0;\
 }\
@@ -71,6 +72,7 @@ void FPRFX ## Free(PQT *queue)\
 /**************************************************************************/\
 void FPRFX ## Destroy(PQT *queue)\
 {\
+  if (queue == NULL) return;\
   FPRFX ## Free(queue);\
   gk_free((void **)&queue, LTERM);\
 }\
