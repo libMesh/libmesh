@@ -169,7 +169,8 @@ class SerialMesh : public UnstructuredMesh
    * Stitch \p other_mesh to this mesh so that this mesh is the union of the two meshes.
    * \p this_mesh_boundary and \p other_mesh_boundary are used to specify a dim-1 dimensional
    * surface on which we seek to merge any "overlapping" nodes, where we use the parameter
-   * \p tol to determine whether or not nodes are overlapping.
+   * \p tol as a relative tolerance (relative to the smallest edge length on the surfaces
+   * being stitched) to determine whether or not nodes are overlapping.
    * If \p clear_stitched_boundary_ids==true, this function clears boundary_info IDs in this
    * mesh associated \p this_mesh_boundary and \p other_mesh_boundary.
    */
