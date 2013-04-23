@@ -4,7 +4,7 @@
 
   \author George
   \date 9/23/2008
-  \version\verbatim $Id$ \endverbatim
+  \version\verbatim $Id: evaluate.c 13328 2012-12-31 14:57:40Z karypis $ \endverbatim
 */
 
 #include <GKlib.h>
@@ -17,9 +17,7 @@ float ComputeAccuracy(int n, gk_fkv_t *list)
 {
   int i, P, N, TP, FN = 0;
   float bAccuracy = 0.0;
-  float prev, acc;
-  
-  prev = list[0].key -1;
+  float acc;
   
   for (P=0, i=0;i<n;i++)
     P += (list[i].val == 1? 1 : 0);

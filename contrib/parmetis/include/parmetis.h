@@ -49,7 +49,7 @@
 **************************************************************************/
 #define PARMETIS_MAJOR_VERSION        4
 #define PARMETIS_MINOR_VERSION        0
-#define PARMETIS_SUBMINOR_VERSION     2
+#define PARMETIS_SUBMINOR_VERSION     3
 
 
 /*************************************************************************
