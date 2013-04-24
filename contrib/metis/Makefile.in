@@ -114,24 +114,24 @@ am__libdbg_la_SOURCES_DIST = include/metis.h GKlib/b64.c GKlib/blas.c \
 	GKlib/gk_types.h GKlib/GKlib.h GKlib/gkregex.c GKlib/gkregex.h \
 	GKlib/graph.c GKlib/htable.c GKlib/io.c GKlib/itemsets.c \
 	GKlib/mcore.c GKlib/memory.c GKlib/ms_inttypes.h \
-	GKlib/ms_stat.h GKlib/ms_stdint.h GKlib/omp.c GKlib/pdb.c \
-	GKlib/pqueue.c GKlib/random.c GKlib/rw.c GKlib/seq.c \
-	GKlib/sort.c GKlib/string.c GKlib/timers.c GKlib/tokenizer.c \
-	GKlib/util.c libmetis/auxapi.c libmetis/balance.c \
-	libmetis/bucketsort.c libmetis/checkgraph.c libmetis/coarsen.c \
-	libmetis/compress.c libmetis/contig.c libmetis/debug.c \
-	libmetis/defs.h libmetis/fm.c libmetis/fortran.c \
-	libmetis/frename.c libmetis/gklib.c libmetis/gklib_defs.h \
-	libmetis/gklib_rename.h libmetis/graph.c libmetis/initpart.c \
-	libmetis/kmetis.c libmetis/kwayfm.c libmetis/kwayrefine.c \
-	libmetis/macros.h libmetis/mcutil.c libmetis/mesh.c \
-	libmetis/meshpart.c libmetis/metislib.h libmetis/minconn.c \
-	libmetis/mincover.c libmetis/mmd.c libmetis/ometis.c \
-	libmetis/options.c libmetis/parmetis.c libmetis/pmetis.c \
-	libmetis/proto.h libmetis/refine.c libmetis/rename.h \
-	libmetis/separator.c libmetis/sfm.c libmetis/srefine.c \
-	libmetis/stat.c libmetis/stdheaders.h libmetis/struct.h \
-	libmetis/timing.c libmetis/util.c libmetis/wspace.c
+	GKlib/ms_stat.h GKlib/ms_stdint.h GKlib/pdb.c GKlib/pqueue.c \
+	GKlib/random.c GKlib/rw.c GKlib/seq.c GKlib/sort.c \
+	GKlib/string.c GKlib/timers.c GKlib/tokenizer.c GKlib/util.c \
+	libmetis/auxapi.c libmetis/balance.c libmetis/bucketsort.c \
+	libmetis/checkgraph.c libmetis/coarsen.c libmetis/compress.c \
+	libmetis/contig.c libmetis/debug.c libmetis/defs.h \
+	libmetis/fm.c libmetis/fortran.c libmetis/frename.c \
+	libmetis/gklib.c libmetis/gklib_defs.h libmetis/gklib_rename.h \
+	libmetis/graph.c libmetis/initpart.c libmetis/kmetis.c \
+	libmetis/kwayfm.c libmetis/kwayrefine.c libmetis/macros.h \
+	libmetis/mcutil.c libmetis/mesh.c libmetis/meshpart.c \
+	libmetis/metislib.h libmetis/minconn.c libmetis/mincover.c \
+	libmetis/mmd.c libmetis/ometis.c libmetis/options.c \
+	libmetis/parmetis.c libmetis/pmetis.c libmetis/proto.h \
+	libmetis/refine.c libmetis/rename.h libmetis/separator.c \
+	libmetis/sfm.c libmetis/srefine.c libmetis/stat.c \
+	libmetis/stdheaders.h libmetis/struct.h libmetis/timing.c \
+	libmetis/util.c libmetis/wspace.c
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = GKlib/libdbg_la-b64.lo GKlib/libdbg_la-blas.lo \
 	GKlib/libdbg_la-csr.lo GKlib/libdbg_la-error.lo \
@@ -140,14 +140,13 @@ am__objects_1 = GKlib/libdbg_la-b64.lo GKlib/libdbg_la-blas.lo \
 	GKlib/libdbg_la-gkregex.lo GKlib/libdbg_la-graph.lo \
 	GKlib/libdbg_la-htable.lo GKlib/libdbg_la-io.lo \
 	GKlib/libdbg_la-itemsets.lo GKlib/libdbg_la-mcore.lo \
-	GKlib/libdbg_la-memory.lo GKlib/libdbg_la-omp.lo \
-	GKlib/libdbg_la-pdb.lo GKlib/libdbg_la-pqueue.lo \
-	GKlib/libdbg_la-random.lo GKlib/libdbg_la-rw.lo \
-	GKlib/libdbg_la-seq.lo GKlib/libdbg_la-sort.lo \
-	GKlib/libdbg_la-string.lo GKlib/libdbg_la-timers.lo \
-	GKlib/libdbg_la-tokenizer.lo GKlib/libdbg_la-util.lo \
-	libmetis/libdbg_la-auxapi.lo libmetis/libdbg_la-balance.lo \
-	libmetis/libdbg_la-bucketsort.lo \
+	GKlib/libdbg_la-memory.lo GKlib/libdbg_la-pdb.lo \
+	GKlib/libdbg_la-pqueue.lo GKlib/libdbg_la-random.lo \
+	GKlib/libdbg_la-rw.lo GKlib/libdbg_la-seq.lo \
+	GKlib/libdbg_la-sort.lo GKlib/libdbg_la-string.lo \
+	GKlib/libdbg_la-timers.lo GKlib/libdbg_la-tokenizer.lo \
+	GKlib/libdbg_la-util.lo libmetis/libdbg_la-auxapi.lo \
+	libmetis/libdbg_la-balance.lo libmetis/libdbg_la-bucketsort.lo \
 	libmetis/libdbg_la-checkgraph.lo libmetis/libdbg_la-coarsen.lo \
 	libmetis/libdbg_la-compress.lo libmetis/libdbg_la-contig.lo \
 	libmetis/libdbg_la-debug.lo libmetis/libdbg_la-fm.lo \
@@ -186,24 +185,24 @@ am__libdevel_la_SOURCES_DIST = include/metis.h GKlib/b64.c \
 	GKlib/gkregex.c GKlib/gkregex.h GKlib/graph.c GKlib/htable.c \
 	GKlib/io.c GKlib/itemsets.c GKlib/mcore.c GKlib/memory.c \
 	GKlib/ms_inttypes.h GKlib/ms_stat.h GKlib/ms_stdint.h \
-	GKlib/omp.c GKlib/pdb.c GKlib/pqueue.c GKlib/random.c \
-	GKlib/rw.c GKlib/seq.c GKlib/sort.c GKlib/string.c \
-	GKlib/timers.c GKlib/tokenizer.c GKlib/util.c \
-	libmetis/auxapi.c libmetis/balance.c libmetis/bucketsort.c \
-	libmetis/checkgraph.c libmetis/coarsen.c libmetis/compress.c \
-	libmetis/contig.c libmetis/debug.c libmetis/defs.h \
-	libmetis/fm.c libmetis/fortran.c libmetis/frename.c \
-	libmetis/gklib.c libmetis/gklib_defs.h libmetis/gklib_rename.h \
-	libmetis/graph.c libmetis/initpart.c libmetis/kmetis.c \
-	libmetis/kwayfm.c libmetis/kwayrefine.c libmetis/macros.h \
-	libmetis/mcutil.c libmetis/mesh.c libmetis/meshpart.c \
-	libmetis/metislib.h libmetis/minconn.c libmetis/mincover.c \
-	libmetis/mmd.c libmetis/ometis.c libmetis/options.c \
-	libmetis/parmetis.c libmetis/pmetis.c libmetis/proto.h \
-	libmetis/refine.c libmetis/rename.h libmetis/separator.c \
-	libmetis/sfm.c libmetis/srefine.c libmetis/stat.c \
-	libmetis/stdheaders.h libmetis/struct.h libmetis/timing.c \
-	libmetis/util.c libmetis/wspace.c
+	GKlib/pdb.c GKlib/pqueue.c GKlib/random.c GKlib/rw.c \
+	GKlib/seq.c GKlib/sort.c GKlib/string.c GKlib/timers.c \
+	GKlib/tokenizer.c GKlib/util.c libmetis/auxapi.c \
+	libmetis/balance.c libmetis/bucketsort.c libmetis/checkgraph.c \
+	libmetis/coarsen.c libmetis/compress.c libmetis/contig.c \
+	libmetis/debug.c libmetis/defs.h libmetis/fm.c \
+	libmetis/fortran.c libmetis/frename.c libmetis/gklib.c \
+	libmetis/gklib_defs.h libmetis/gklib_rename.h libmetis/graph.c \
+	libmetis/initpart.c libmetis/kmetis.c libmetis/kwayfm.c \
+	libmetis/kwayrefine.c libmetis/macros.h libmetis/mcutil.c \
+	libmetis/mesh.c libmetis/meshpart.c libmetis/metislib.h \
+	libmetis/minconn.c libmetis/mincover.c libmetis/mmd.c \
+	libmetis/ometis.c libmetis/options.c libmetis/parmetis.c \
+	libmetis/pmetis.c libmetis/proto.h libmetis/refine.c \
+	libmetis/rename.h libmetis/separator.c libmetis/sfm.c \
+	libmetis/srefine.c libmetis/stat.c libmetis/stdheaders.h \
+	libmetis/struct.h libmetis/timing.c libmetis/util.c \
+	libmetis/wspace.c
 am__objects_2 = GKlib/libdevel_la-b64.lo GKlib/libdevel_la-blas.lo \
 	GKlib/libdevel_la-csr.lo GKlib/libdevel_la-error.lo \
 	GKlib/libdevel_la-evaluate.lo GKlib/libdevel_la-fkvkselect.lo \
@@ -211,13 +210,13 @@ am__objects_2 = GKlib/libdevel_la-b64.lo GKlib/libdevel_la-blas.lo \
 	GKlib/libdevel_la-gkregex.lo GKlib/libdevel_la-graph.lo \
 	GKlib/libdevel_la-htable.lo GKlib/libdevel_la-io.lo \
 	GKlib/libdevel_la-itemsets.lo GKlib/libdevel_la-mcore.lo \
-	GKlib/libdevel_la-memory.lo GKlib/libdevel_la-omp.lo \
-	GKlib/libdevel_la-pdb.lo GKlib/libdevel_la-pqueue.lo \
-	GKlib/libdevel_la-random.lo GKlib/libdevel_la-rw.lo \
-	GKlib/libdevel_la-seq.lo GKlib/libdevel_la-sort.lo \
-	GKlib/libdevel_la-string.lo GKlib/libdevel_la-timers.lo \
-	GKlib/libdevel_la-tokenizer.lo GKlib/libdevel_la-util.lo \
-	libmetis/libdevel_la-auxapi.lo libmetis/libdevel_la-balance.lo \
+	GKlib/libdevel_la-memory.lo GKlib/libdevel_la-pdb.lo \
+	GKlib/libdevel_la-pqueue.lo GKlib/libdevel_la-random.lo \
+	GKlib/libdevel_la-rw.lo GKlib/libdevel_la-seq.lo \
+	GKlib/libdevel_la-sort.lo GKlib/libdevel_la-string.lo \
+	GKlib/libdevel_la-timers.lo GKlib/libdevel_la-tokenizer.lo \
+	GKlib/libdevel_la-util.lo libmetis/libdevel_la-auxapi.lo \
+	libmetis/libdevel_la-balance.lo \
 	libmetis/libdevel_la-bucketsort.lo \
 	libmetis/libdevel_la-checkgraph.lo \
 	libmetis/libdevel_la-coarsen.lo \
@@ -257,24 +256,24 @@ am__liboprof_la_SOURCES_DIST = include/metis.h GKlib/b64.c \
 	GKlib/gkregex.c GKlib/gkregex.h GKlib/graph.c GKlib/htable.c \
 	GKlib/io.c GKlib/itemsets.c GKlib/mcore.c GKlib/memory.c \
 	GKlib/ms_inttypes.h GKlib/ms_stat.h GKlib/ms_stdint.h \
-	GKlib/omp.c GKlib/pdb.c GKlib/pqueue.c GKlib/random.c \
-	GKlib/rw.c GKlib/seq.c GKlib/sort.c GKlib/string.c \
-	GKlib/timers.c GKlib/tokenizer.c GKlib/util.c \
-	libmetis/auxapi.c libmetis/balance.c libmetis/bucketsort.c \
-	libmetis/checkgraph.c libmetis/coarsen.c libmetis/compress.c \
-	libmetis/contig.c libmetis/debug.c libmetis/defs.h \
-	libmetis/fm.c libmetis/fortran.c libmetis/frename.c \
-	libmetis/gklib.c libmetis/gklib_defs.h libmetis/gklib_rename.h \
-	libmetis/graph.c libmetis/initpart.c libmetis/kmetis.c \
-	libmetis/kwayfm.c libmetis/kwayrefine.c libmetis/macros.h \
-	libmetis/mcutil.c libmetis/mesh.c libmetis/meshpart.c \
-	libmetis/metislib.h libmetis/minconn.c libmetis/mincover.c \
-	libmetis/mmd.c libmetis/ometis.c libmetis/options.c \
-	libmetis/parmetis.c libmetis/pmetis.c libmetis/proto.h \
-	libmetis/refine.c libmetis/rename.h libmetis/separator.c \
-	libmetis/sfm.c libmetis/srefine.c libmetis/stat.c \
-	libmetis/stdheaders.h libmetis/struct.h libmetis/timing.c \
-	libmetis/util.c libmetis/wspace.c
+	GKlib/pdb.c GKlib/pqueue.c GKlib/random.c GKlib/rw.c \
+	GKlib/seq.c GKlib/sort.c GKlib/string.c GKlib/timers.c \
+	GKlib/tokenizer.c GKlib/util.c libmetis/auxapi.c \
+	libmetis/balance.c libmetis/bucketsort.c libmetis/checkgraph.c \
+	libmetis/coarsen.c libmetis/compress.c libmetis/contig.c \
+	libmetis/debug.c libmetis/defs.h libmetis/fm.c \
+	libmetis/fortran.c libmetis/frename.c libmetis/gklib.c \
+	libmetis/gklib_defs.h libmetis/gklib_rename.h libmetis/graph.c \
+	libmetis/initpart.c libmetis/kmetis.c libmetis/kwayfm.c \
+	libmetis/kwayrefine.c libmetis/macros.h libmetis/mcutil.c \
+	libmetis/mesh.c libmetis/meshpart.c libmetis/metislib.h \
+	libmetis/minconn.c libmetis/mincover.c libmetis/mmd.c \
+	libmetis/ometis.c libmetis/options.c libmetis/parmetis.c \
+	libmetis/pmetis.c libmetis/proto.h libmetis/refine.c \
+	libmetis/rename.h libmetis/separator.c libmetis/sfm.c \
+	libmetis/srefine.c libmetis/stat.c libmetis/stdheaders.h \
+	libmetis/struct.h libmetis/timing.c libmetis/util.c \
+	libmetis/wspace.c
 am__objects_3 = GKlib/liboprof_la-b64.lo GKlib/liboprof_la-blas.lo \
 	GKlib/liboprof_la-csr.lo GKlib/liboprof_la-error.lo \
 	GKlib/liboprof_la-evaluate.lo GKlib/liboprof_la-fkvkselect.lo \
@@ -282,13 +281,13 @@ am__objects_3 = GKlib/liboprof_la-b64.lo GKlib/liboprof_la-blas.lo \
 	GKlib/liboprof_la-gkregex.lo GKlib/liboprof_la-graph.lo \
 	GKlib/liboprof_la-htable.lo GKlib/liboprof_la-io.lo \
 	GKlib/liboprof_la-itemsets.lo GKlib/liboprof_la-mcore.lo \
-	GKlib/liboprof_la-memory.lo GKlib/liboprof_la-omp.lo \
-	GKlib/liboprof_la-pdb.lo GKlib/liboprof_la-pqueue.lo \
-	GKlib/liboprof_la-random.lo GKlib/liboprof_la-rw.lo \
-	GKlib/liboprof_la-seq.lo GKlib/liboprof_la-sort.lo \
-	GKlib/liboprof_la-string.lo GKlib/liboprof_la-timers.lo \
-	GKlib/liboprof_la-tokenizer.lo GKlib/liboprof_la-util.lo \
-	libmetis/liboprof_la-auxapi.lo libmetis/liboprof_la-balance.lo \
+	GKlib/liboprof_la-memory.lo GKlib/liboprof_la-pdb.lo \
+	GKlib/liboprof_la-pqueue.lo GKlib/liboprof_la-random.lo \
+	GKlib/liboprof_la-rw.lo GKlib/liboprof_la-seq.lo \
+	GKlib/liboprof_la-sort.lo GKlib/liboprof_la-string.lo \
+	GKlib/liboprof_la-timers.lo GKlib/liboprof_la-tokenizer.lo \
+	GKlib/liboprof_la-util.lo libmetis/liboprof_la-auxapi.lo \
+	libmetis/liboprof_la-balance.lo \
 	libmetis/liboprof_la-bucketsort.lo \
 	libmetis/liboprof_la-checkgraph.lo \
 	libmetis/liboprof_la-coarsen.lo \
@@ -327,24 +326,24 @@ am__libopt_la_SOURCES_DIST = include/metis.h GKlib/b64.c GKlib/blas.c \
 	GKlib/gk_types.h GKlib/GKlib.h GKlib/gkregex.c GKlib/gkregex.h \
 	GKlib/graph.c GKlib/htable.c GKlib/io.c GKlib/itemsets.c \
 	GKlib/mcore.c GKlib/memory.c GKlib/ms_inttypes.h \
-	GKlib/ms_stat.h GKlib/ms_stdint.h GKlib/omp.c GKlib/pdb.c \
-	GKlib/pqueue.c GKlib/random.c GKlib/rw.c GKlib/seq.c \
-	GKlib/sort.c GKlib/string.c GKlib/timers.c GKlib/tokenizer.c \
-	GKlib/util.c libmetis/auxapi.c libmetis/balance.c \
-	libmetis/bucketsort.c libmetis/checkgraph.c libmetis/coarsen.c \
-	libmetis/compress.c libmetis/contig.c libmetis/debug.c \
-	libmetis/defs.h libmetis/fm.c libmetis/fortran.c \
-	libmetis/frename.c libmetis/gklib.c libmetis/gklib_defs.h \
-	libmetis/gklib_rename.h libmetis/graph.c libmetis/initpart.c \
-	libmetis/kmetis.c libmetis/kwayfm.c libmetis/kwayrefine.c \
-	libmetis/macros.h libmetis/mcutil.c libmetis/mesh.c \
-	libmetis/meshpart.c libmetis/metislib.h libmetis/minconn.c \
-	libmetis/mincover.c libmetis/mmd.c libmetis/ometis.c \
-	libmetis/options.c libmetis/parmetis.c libmetis/pmetis.c \
-	libmetis/proto.h libmetis/refine.c libmetis/rename.h \
-	libmetis/separator.c libmetis/sfm.c libmetis/srefine.c \
-	libmetis/stat.c libmetis/stdheaders.h libmetis/struct.h \
-	libmetis/timing.c libmetis/util.c libmetis/wspace.c
+	GKlib/ms_stat.h GKlib/ms_stdint.h GKlib/pdb.c GKlib/pqueue.c \
+	GKlib/random.c GKlib/rw.c GKlib/seq.c GKlib/sort.c \
+	GKlib/string.c GKlib/timers.c GKlib/tokenizer.c GKlib/util.c \
+	libmetis/auxapi.c libmetis/balance.c libmetis/bucketsort.c \
+	libmetis/checkgraph.c libmetis/coarsen.c libmetis/compress.c \
+	libmetis/contig.c libmetis/debug.c libmetis/defs.h \
+	libmetis/fm.c libmetis/fortran.c libmetis/frename.c \
+	libmetis/gklib.c libmetis/gklib_defs.h libmetis/gklib_rename.h \
+	libmetis/graph.c libmetis/initpart.c libmetis/kmetis.c \
+	libmetis/kwayfm.c libmetis/kwayrefine.c libmetis/macros.h \
+	libmetis/mcutil.c libmetis/mesh.c libmetis/meshpart.c \
+	libmetis/metislib.h libmetis/minconn.c libmetis/mincover.c \
+	libmetis/mmd.c libmetis/ometis.c libmetis/options.c \
+	libmetis/parmetis.c libmetis/pmetis.c libmetis/proto.h \
+	libmetis/refine.c libmetis/rename.h libmetis/separator.c \
+	libmetis/sfm.c libmetis/srefine.c libmetis/stat.c \
+	libmetis/stdheaders.h libmetis/struct.h libmetis/timing.c \
+	libmetis/util.c libmetis/wspace.c
 am__objects_4 = GKlib/libopt_la-b64.lo GKlib/libopt_la-blas.lo \
 	GKlib/libopt_la-csr.lo GKlib/libopt_la-error.lo \
 	GKlib/libopt_la-evaluate.lo GKlib/libopt_la-fkvkselect.lo \
@@ -352,14 +351,13 @@ am__objects_4 = GKlib/libopt_la-b64.lo GKlib/libopt_la-blas.lo \
 	GKlib/libopt_la-gkregex.lo GKlib/libopt_la-graph.lo \
 	GKlib/libopt_la-htable.lo GKlib/libopt_la-io.lo \
 	GKlib/libopt_la-itemsets.lo GKlib/libopt_la-mcore.lo \
-	GKlib/libopt_la-memory.lo GKlib/libopt_la-omp.lo \
-	GKlib/libopt_la-pdb.lo GKlib/libopt_la-pqueue.lo \
-	GKlib/libopt_la-random.lo GKlib/libopt_la-rw.lo \
-	GKlib/libopt_la-seq.lo GKlib/libopt_la-sort.lo \
-	GKlib/libopt_la-string.lo GKlib/libopt_la-timers.lo \
-	GKlib/libopt_la-tokenizer.lo GKlib/libopt_la-util.lo \
-	libmetis/libopt_la-auxapi.lo libmetis/libopt_la-balance.lo \
-	libmetis/libopt_la-bucketsort.lo \
+	GKlib/libopt_la-memory.lo GKlib/libopt_la-pdb.lo \
+	GKlib/libopt_la-pqueue.lo GKlib/libopt_la-random.lo \
+	GKlib/libopt_la-rw.lo GKlib/libopt_la-seq.lo \
+	GKlib/libopt_la-sort.lo GKlib/libopt_la-string.lo \
+	GKlib/libopt_la-timers.lo GKlib/libopt_la-tokenizer.lo \
+	GKlib/libopt_la-util.lo libmetis/libopt_la-auxapi.lo \
+	libmetis/libopt_la-balance.lo libmetis/libopt_la-bucketsort.lo \
 	libmetis/libopt_la-checkgraph.lo libmetis/libopt_la-coarsen.lo \
 	libmetis/libopt_la-compress.lo libmetis/libopt_la-contig.lo \
 	libmetis/libopt_la-debug.lo libmetis/libopt_la-fm.lo \
@@ -393,24 +391,24 @@ am__libprof_la_SOURCES_DIST = include/metis.h GKlib/b64.c GKlib/blas.c \
 	GKlib/gk_types.h GKlib/GKlib.h GKlib/gkregex.c GKlib/gkregex.h \
 	GKlib/graph.c GKlib/htable.c GKlib/io.c GKlib/itemsets.c \
 	GKlib/mcore.c GKlib/memory.c GKlib/ms_inttypes.h \
-	GKlib/ms_stat.h GKlib/ms_stdint.h GKlib/omp.c GKlib/pdb.c \
-	GKlib/pqueue.c GKlib/random.c GKlib/rw.c GKlib/seq.c \
-	GKlib/sort.c GKlib/string.c GKlib/timers.c GKlib/tokenizer.c \
-	GKlib/util.c libmetis/auxapi.c libmetis/balance.c \
-	libmetis/bucketsort.c libmetis/checkgraph.c libmetis/coarsen.c \
-	libmetis/compress.c libmetis/contig.c libmetis/debug.c \
-	libmetis/defs.h libmetis/fm.c libmetis/fortran.c \
-	libmetis/frename.c libmetis/gklib.c libmetis/gklib_defs.h \
-	libmetis/gklib_rename.h libmetis/graph.c libmetis/initpart.c \
-	libmetis/kmetis.c libmetis/kwayfm.c libmetis/kwayrefine.c \
-	libmetis/macros.h libmetis/mcutil.c libmetis/mesh.c \
-	libmetis/meshpart.c libmetis/metislib.h libmetis/minconn.c \
-	libmetis/mincover.c libmetis/mmd.c libmetis/ometis.c \
-	libmetis/options.c libmetis/parmetis.c libmetis/pmetis.c \
-	libmetis/proto.h libmetis/refine.c libmetis/rename.h \
-	libmetis/separator.c libmetis/sfm.c libmetis/srefine.c \
-	libmetis/stat.c libmetis/stdheaders.h libmetis/struct.h \
-	libmetis/timing.c libmetis/util.c libmetis/wspace.c
+	GKlib/ms_stat.h GKlib/ms_stdint.h GKlib/pdb.c GKlib/pqueue.c \
+	GKlib/random.c GKlib/rw.c GKlib/seq.c GKlib/sort.c \
+	GKlib/string.c GKlib/timers.c GKlib/tokenizer.c GKlib/util.c \
+	libmetis/auxapi.c libmetis/balance.c libmetis/bucketsort.c \
+	libmetis/checkgraph.c libmetis/coarsen.c libmetis/compress.c \
+	libmetis/contig.c libmetis/debug.c libmetis/defs.h \
+	libmetis/fm.c libmetis/fortran.c libmetis/frename.c \
+	libmetis/gklib.c libmetis/gklib_defs.h libmetis/gklib_rename.h \
+	libmetis/graph.c libmetis/initpart.c libmetis/kmetis.c \
+	libmetis/kwayfm.c libmetis/kwayrefine.c libmetis/macros.h \
+	libmetis/mcutil.c libmetis/mesh.c libmetis/meshpart.c \
+	libmetis/metislib.h libmetis/minconn.c libmetis/mincover.c \
+	libmetis/mmd.c libmetis/ometis.c libmetis/options.c \
+	libmetis/parmetis.c libmetis/pmetis.c libmetis/proto.h \
+	libmetis/refine.c libmetis/rename.h libmetis/separator.c \
+	libmetis/sfm.c libmetis/srefine.c libmetis/stat.c \
+	libmetis/stdheaders.h libmetis/struct.h libmetis/timing.c \
+	libmetis/util.c libmetis/wspace.c
 am__objects_5 = GKlib/libprof_la-b64.lo GKlib/libprof_la-blas.lo \
 	GKlib/libprof_la-csr.lo GKlib/libprof_la-error.lo \
 	GKlib/libprof_la-evaluate.lo GKlib/libprof_la-fkvkselect.lo \
@@ -418,13 +416,13 @@ am__objects_5 = GKlib/libprof_la-b64.lo GKlib/libprof_la-blas.lo \
 	GKlib/libprof_la-gkregex.lo GKlib/libprof_la-graph.lo \
 	GKlib/libprof_la-htable.lo GKlib/libprof_la-io.lo \
 	GKlib/libprof_la-itemsets.lo GKlib/libprof_la-mcore.lo \
-	GKlib/libprof_la-memory.lo GKlib/libprof_la-omp.lo \
-	GKlib/libprof_la-pdb.lo GKlib/libprof_la-pqueue.lo \
-	GKlib/libprof_la-random.lo GKlib/libprof_la-rw.lo \
-	GKlib/libprof_la-seq.lo GKlib/libprof_la-sort.lo \
-	GKlib/libprof_la-string.lo GKlib/libprof_la-timers.lo \
-	GKlib/libprof_la-tokenizer.lo GKlib/libprof_la-util.lo \
-	libmetis/libprof_la-auxapi.lo libmetis/libprof_la-balance.lo \
+	GKlib/libprof_la-memory.lo GKlib/libprof_la-pdb.lo \
+	GKlib/libprof_la-pqueue.lo GKlib/libprof_la-random.lo \
+	GKlib/libprof_la-rw.lo GKlib/libprof_la-seq.lo \
+	GKlib/libprof_la-sort.lo GKlib/libprof_la-string.lo \
+	GKlib/libprof_la-timers.lo GKlib/libprof_la-tokenizer.lo \
+	GKlib/libprof_la-util.lo libmetis/libprof_la-auxapi.lo \
+	libmetis/libprof_la-balance.lo \
 	libmetis/libprof_la-bucketsort.lo \
 	libmetis/libprof_la-checkgraph.lo \
 	libmetis/libprof_la-coarsen.lo libmetis/libprof_la-compress.lo \
@@ -820,7 +818,6 @@ pkg_sources = \
 	GKlib/ms_inttypes.h \
 	GKlib/ms_stat.h \
 	GKlib/ms_stdint.h \
-	GKlib/omp.c \
 	GKlib/pdb.c \
 	GKlib/pqueue.c \
 	GKlib/random.c \
@@ -1002,8 +999,6 @@ GKlib/libdbg_la-mcore.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdbg_la-memory.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/libdbg_la-omp.lo: GKlib/$(am__dirstamp) \
-	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdbg_la-pdb.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdbg_la-pqueue.lo: GKlib/$(am__dirstamp) \
@@ -1132,8 +1127,6 @@ GKlib/libdevel_la-mcore.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdevel_la-memory.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/libdevel_la-omp.lo: GKlib/$(am__dirstamp) \
-	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdevel_la-pdb.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libdevel_la-pqueue.lo: GKlib/$(am__dirstamp) \
@@ -1255,8 +1248,6 @@ GKlib/liboprof_la-itemsets.lo: GKlib/$(am__dirstamp) \
 GKlib/liboprof_la-mcore.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/liboprof_la-memory.lo: GKlib/$(am__dirstamp) \
-	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/liboprof_la-omp.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/liboprof_la-pdb.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
@@ -1380,8 +1371,6 @@ GKlib/libopt_la-mcore.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libopt_la-memory.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/libopt_la-omp.lo: GKlib/$(am__dirstamp) \
-	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libopt_la-pdb.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libopt_la-pqueue.lo: GKlib/$(am__dirstamp) \
@@ -1504,8 +1493,6 @@ GKlib/libprof_la-mcore.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libprof_la-memory.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
-GKlib/libprof_la-omp.lo: GKlib/$(am__dirstamp) \
-	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libprof_la-pdb.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libprof_la-pqueue.lo: GKlib/$(am__dirstamp) \
@@ -1624,7 +1611,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdbg_la-itemsets.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdbg_la-mcore.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdbg_la-memory.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdbg_la-omp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdbg_la-pdb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdbg_la-pqueue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdbg_la-random.Plo@am__quote@
@@ -1650,7 +1636,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdevel_la-itemsets.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdevel_la-mcore.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdevel_la-memory.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdevel_la-omp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdevel_la-pdb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdevel_la-pqueue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdevel_la-random.Plo@am__quote@
@@ -1676,7 +1661,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-itemsets.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-mcore.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-memory.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-omp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-pdb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-pqueue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-random.Plo@am__quote@
@@ -1702,7 +1686,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-itemsets.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-mcore.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-memory.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-omp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-pdb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-pqueue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-random.Plo@am__quote@
@@ -1728,7 +1711,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-itemsets.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-mcore.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-memory.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-omp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-pdb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-pqueue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-random.Plo@am__quote@
@@ -2043,13 +2025,6 @@ GKlib/libdbg_la-memory.lo: GKlib/memory.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/memory.c' object='GKlib/libdbg_la-memory.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o GKlib/libdbg_la-memory.lo `test -f 'GKlib/memory.c' || echo '$(srcdir)/'`GKlib/memory.c
-
-GKlib/libdbg_la-omp.lo: GKlib/omp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT GKlib/libdbg_la-omp.lo -MD -MP -MF GKlib/$(DEPDIR)/libdbg_la-omp.Tpo -c -o GKlib/libdbg_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libdbg_la-omp.Tpo GKlib/$(DEPDIR)/libdbg_la-omp.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/omp.c' object='GKlib/libdbg_la-omp.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o GKlib/libdbg_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
 
 GKlib/libdbg_la-pdb.lo: GKlib/pdb.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT GKlib/libdbg_la-pdb.lo -MD -MP -MF GKlib/$(DEPDIR)/libdbg_la-pdb.Tpo -c -o GKlib/libdbg_la-pdb.lo `test -f 'GKlib/pdb.c' || echo '$(srcdir)/'`GKlib/pdb.c
@@ -2471,13 +2446,6 @@ GKlib/libdevel_la-memory.lo: GKlib/memory.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o GKlib/libdevel_la-memory.lo `test -f 'GKlib/memory.c' || echo '$(srcdir)/'`GKlib/memory.c
 
-GKlib/libdevel_la-omp.lo: GKlib/omp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT GKlib/libdevel_la-omp.lo -MD -MP -MF GKlib/$(DEPDIR)/libdevel_la-omp.Tpo -c -o GKlib/libdevel_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libdevel_la-omp.Tpo GKlib/$(DEPDIR)/libdevel_la-omp.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/omp.c' object='GKlib/libdevel_la-omp.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o GKlib/libdevel_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
-
 GKlib/libdevel_la-pdb.lo: GKlib/pdb.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT GKlib/libdevel_la-pdb.lo -MD -MP -MF GKlib/$(DEPDIR)/libdevel_la-pdb.Tpo -c -o GKlib/libdevel_la-pdb.lo `test -f 'GKlib/pdb.c' || echo '$(srcdir)/'`GKlib/pdb.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libdevel_la-pdb.Tpo GKlib/$(DEPDIR)/libdevel_la-pdb.Plo
@@ -2897,13 +2865,6 @@ GKlib/liboprof_la-memory.lo: GKlib/memory.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/memory.c' object='GKlib/liboprof_la-memory.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-memory.lo `test -f 'GKlib/memory.c' || echo '$(srcdir)/'`GKlib/memory.c
-
-GKlib/liboprof_la-omp.lo: GKlib/omp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-omp.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-omp.Tpo -c -o GKlib/liboprof_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-omp.Tpo GKlib/$(DEPDIR)/liboprof_la-omp.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/omp.c' object='GKlib/liboprof_la-omp.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
 
 GKlib/liboprof_la-pdb.lo: GKlib/pdb.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-pdb.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-pdb.Tpo -c -o GKlib/liboprof_la-pdb.lo `test -f 'GKlib/pdb.c' || echo '$(srcdir)/'`GKlib/pdb.c
@@ -3325,13 +3286,6 @@ GKlib/libopt_la-memory.lo: GKlib/memory.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o GKlib/libopt_la-memory.lo `test -f 'GKlib/memory.c' || echo '$(srcdir)/'`GKlib/memory.c
 
-GKlib/libopt_la-omp.lo: GKlib/omp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT GKlib/libopt_la-omp.lo -MD -MP -MF GKlib/$(DEPDIR)/libopt_la-omp.Tpo -c -o GKlib/libopt_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libopt_la-omp.Tpo GKlib/$(DEPDIR)/libopt_la-omp.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/omp.c' object='GKlib/libopt_la-omp.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o GKlib/libopt_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
-
 GKlib/libopt_la-pdb.lo: GKlib/pdb.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT GKlib/libopt_la-pdb.lo -MD -MP -MF GKlib/$(DEPDIR)/libopt_la-pdb.Tpo -c -o GKlib/libopt_la-pdb.lo `test -f 'GKlib/pdb.c' || echo '$(srcdir)/'`GKlib/pdb.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libopt_la-pdb.Tpo GKlib/$(DEPDIR)/libopt_la-pdb.Plo
@@ -3751,13 +3705,6 @@ GKlib/libprof_la-memory.lo: GKlib/memory.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/memory.c' object='GKlib/libprof_la-memory.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-memory.lo `test -f 'GKlib/memory.c' || echo '$(srcdir)/'`GKlib/memory.c
-
-GKlib/libprof_la-omp.lo: GKlib/omp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-omp.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-omp.Tpo -c -o GKlib/libprof_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-omp.Tpo GKlib/$(DEPDIR)/libprof_la-omp.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/omp.c' object='GKlib/libprof_la-omp.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
 
 GKlib/libprof_la-pdb.lo: GKlib/pdb.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-pdb.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-pdb.Tpo -c -o GKlib/libprof_la-pdb.lo `test -f 'GKlib/pdb.c' || echo '$(srcdir)/'`GKlib/pdb.c

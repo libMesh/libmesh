@@ -38,7 +38,6 @@ pkg_sources = \
 	GKlib/ms_inttypes.h \
 	GKlib/ms_stat.h \
 	GKlib/ms_stdint.h \
-	GKlib/omp.c \
 	GKlib/pdb.c \
 	GKlib/pqueue.c \
 	GKlib/random.c \
