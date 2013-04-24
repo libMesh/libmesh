@@ -202,7 +202,59 @@ void VTKIO::nodes_to_vtk()
 }
 
 
+void VTKIO::update_vtk_data(const MeshBase& mesh, Elem* elem,
+                            vtkIdList* pts, vtkCellArray* cells,
+                            std::vector<int>& types, unsigned int active_element_counter)
+    {
+        pts->SetNumberOfIds(elem->n_nodes());
+        
+        // get the connectivity for this element
+        std::vector<dof_id_type> conn;
+        elem->connectivity(0, VTK, conn);
+        
+        for (unsigned int i=0; i<conn.size(); ++i)
+        {
+            // If the node ID is not found in the _local_node_map, we'll
+            // add it to the _vtk_grid.  NOTE[JWP]: none of the examples
+            // I have actually enters this section of code...
+            if (_local_node_map.find(conn[i]) == _local_node_map.end())
+            {
+                dof_id_type global_node_id = elem->node(i);
+                
+                const Node* the_node = mesh.node_ptr(global_node_id);
+                
+                // Error checking...
+                if (the_node == NULL)
+                {
+                    libMesh::err << "Error getting pointer to node "
+                    << global_node_id
+                    << "!" << std::endl;
+                    libmesh_error();
+                }
+                
+                // InsertNextPoint accepts either a double or float array of length 3.
+                Real pt[3] = {0., 0., 0.};
+                for (unsigned int d=0; d<LIBMESH_DIM; ++d)
+                    pt[d] = (*the_node)(d);
+                
+                // Insert the point into the _vtk_grid
+                vtkIdType local = _vtk_grid->GetPoints()->InsertNextPoint(pt);
+                
+                // Update the _local_node_map with the ID returned by VTK
+                _local_node_map[global_node_id] = local;
+            }
+            
+            // Otherwise, the node ID was found in the _local_node_map, so
+            // insert it into the vtkIdList.
+            pts->InsertId(i, _local_node_map[conn[i]]);
+        }
 
+        cells->InsertNextCell(pts);
+        types[active_element_counter] = this->get_elem_type(elem->type());
+    }
+    
+    
+    
 void VTKIO::cells_to_vtk()
 {
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
@@ -211,59 +263,20 @@ void VTKIO::cells_to_vtk()
   vtkSmartPointer<vtkIdList> pts = vtkIdList::New();
 
   std::vector<int> types(mesh.n_active_local_elem());
-  unsigned active_element_counter = 0;
+  unsigned int active_element_counter = 0;
 
   MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
-  for (; it != end; ++it, ++active_element_counter)
+  for (; it != end; ++it)
     {
-      Elem *elem = *it;
-
-      pts->SetNumberOfIds(elem->n_nodes());
-
-      // get the connectivity for this element
-      std::vector<dof_id_type> conn;
-      elem->connectivity(0, VTK, conn);
-
-      for (unsigned int i=0; i<conn.size(); ++i)
-        {
-          // If the node ID is not found in the _local_node_map, we'll
-          // add it to the _vtk_grid.  NOTE[JWP]: none of the examples
-          // I have actually enters this section of code...
-          if (_local_node_map.find(conn[i]) == _local_node_map.end())
-            {
-              dof_id_type global_node_id = elem->node(i);
-
-              const Node* the_node = mesh.node_ptr(global_node_id);
-
-              // Error checking...
-              if (the_node == NULL)
-                {
-                  libMesh::err << "Error getting pointer to node "
-                               << global_node_id
-                               << "!" << std::endl;
-                  libmesh_error();
-                }
-
-              // InsertNextPoint accepts either a double or float array of length 3.
-              Real pt[3] = {0., 0., 0.};
-              for (unsigned int d=0; d<LIBMESH_DIM; ++d)
-                pt[d] = (*the_node)(d);
-
-              // Insert the point into the _vtk_grid
-              vtkIdType local = _vtk_grid->GetPoints()->InsertNextPoint(pt);
-
-              // Update the _local_node_map with the ID returned by VTK
-              _local_node_map[global_node_id] = local;
-            }
-
-          // Otherwise, the node ID was found in the _local_node_map, so
-          // insert it into the vtkIdList.
-          pts->InsertId(i, _local_node_map[conn[i]]);
-        }
-
-      cells->InsertNextCell(pts);
-      types[active_element_counter] = this->get_elem_type(elem->type());
+        Elem *elem = *it;
+        
+        if (!_write_boundary_mesh)
+            update_vtk_data(mesh, elem, pts, cells, types, active_element_counter++);
+        else if (elem->on_boundary())
+            for (unsigned int i_side=0; i_side<elem->n_sides(); i_side++)
+                if (elem->neighbor(i_side) == NULL)
+                    update_vtk_data(mesh, elem->side(i_side).get(), pts, cells, types, active_element_counter++);
     } // end loop over active elements
 
   pts->Delete();
@@ -352,6 +365,7 @@ VTKIO::VTKIO (MeshBase& mesh, MeshData* mesh_data) :
   MeshOutput<MeshBase>(mesh),
   _mesh_data(mesh_data),
   _compress(false),
+  _write_boundary_mesh(false),
   _local_node_map()
 {
   _vtk_grid = NULL;
@@ -365,6 +379,7 @@ VTKIO::VTKIO (const MeshBase& mesh, MeshData* mesh_data) :
   MeshOutput<MeshBase>(mesh),
   _mesh_data(mesh_data),
   _compress(false),
+  _write_boundary_mesh(false),
   _local_node_map()
 {
   _vtk_grid = NULL;
@@ -372,6 +387,19 @@ VTKIO::VTKIO (const MeshBase& mesh, MeshData* mesh_data) :
 }
 
 
+
+// Constructor for writing
+VTKIO::VTKIO (const MeshBase& mesh, bool write_boundary_mesh) :
+MeshOutput<MeshBase>(mesh),
+_mesh_data(NULL),
+_compress(false),
+_write_boundary_mesh(write_boundary_mesh),
+_local_node_map()
+{
+    _vtk_grid = NULL;
+    libmesh_experimental();
+}
+    
 
 vtkUnstructuredGrid* VTKIO::get_vtk_grid()
 {

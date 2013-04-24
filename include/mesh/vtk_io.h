@@ -37,6 +37,7 @@
 class vtkUnstructuredGrid;
 class vtkPoints;
 class vtkCellArray;
+class vtkIdList;
 
 namespace libMesh
 {
@@ -75,6 +76,9 @@ public:
    */
   explicit
   VTKIO (const MeshBase& mesh, MeshData* mesh_data=NULL);
+
+    explicit
+    VTKIO (const MeshBase& mesh, bool write_boundary_mesh);
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -121,7 +125,12 @@ private:
   vtkIdType get_elem_type(ElemType type);
 #endif
 
-  /**
+  void update_vtk_data(const MeshBase& mesh, Elem* elem,
+                     vtkIdList* pts, vtkCellArray* cells, std::vector<int>& types,
+                     unsigned int active_element_counter);
+    
+
+    /**
    * write the nodes from the mesh into a vtkUnstructuredGrid
    */
   void nodes_to_vtk();
@@ -151,6 +160,8 @@ private:
    * Flag to indicate whether the output should be compressed
    */
   bool _compress;
+    
+  bool _write_boundary_mesh;
 
   /**
    * maps global node id to node id of partition
