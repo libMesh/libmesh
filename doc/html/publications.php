@@ -474,20 +474,21 @@ J.&nbsp;W. Peterson.
 A.&nbsp;Satou, V.&nbsp;Ryzhii, F.&nbsp;T. Vasko, V.&nbsp;V. Mitin, and T.&nbsp;Otsuji.
  Numerical simulation of terahertz plasmons in gated graphene
   structures.
- In <em>Terahertz, RF, Millimeter, and Submillimeter-Wave Technology
-  and Applications VI, Vol.&nbsp;8624</em>. International Society for Optics and
-  Photonics (SPIE), February&nbsp;20, 2013.
- 
-  <a href="http://proceedings.spiedigitallibrary.org/proceeding.aspx?articleid=1655105">http://proceedings.spiedigitallibrary.org/proceeding.aspx?articleid=1655105</a>.
+ In L.&nbsp;P. Sadwick and C.&nbsp;M. O'Sullivan, editors, <em>Terahertz, RF,
+  Millimeter, and Submillimeter-Wave Technology and Applications VI,
+  Vol.&nbsp;8624</em>. International Society for Optics and Photonics (SPIE),
+  February&nbsp;20, 2013.
+ <a href="http://dx.doi.org/10.1117/12.2003611">http://dx.doi.org/10.1117/12.2003611</a>.
 <a name="Satou_2013"></a><pre>
 @inproceedings{Satou_2013,
   author = {A.~Satou and V.~Ryzhii and F.~T.~Vasko and V.~V.~Mitin and T.~Otsuji},
   title = {{Numerical simulation of terahertz plasmons in gated graphene structures}},
   booktitle = {{Terahertz, RF, Millimeter, and Submillimeter-Wave Technology and Applications VI, Vol.~8624}},
+  editor = {L.~P.~Sadwick and C.~M.~O'Sullivan},
   publisher = {International Society for Optics and Photonics (SPIE)},
   month = feb # {~20,},
   year = {2013},
-  note = {\url{http://proceedings.spiedigitallibrary.org/proceeding.aspx?articleid=1655105}}
+  note = {\url{http://dx.doi.org/10.1117/12.2003611}}
 }
 </pre>
 
@@ -552,21 +553,21 @@ P.&nbsp;Rong, O.&nbsp;von Estorff, L.&nbsp;Nagler, and M.&nbsp;Schanz.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Oden_2013">4</a>]
+[<a name="Millett_2013">4</a>]
 </td>
 <td class="bibtexitem">
-J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, and A.&nbsp;Hawkins-Daarud.
- Selection and assessment of phenomenological models of tumor
-  growth.
- <em>Mathematical Models and Methods in Applied Sciences</em>, 2013.
- <a href="http://dx.doi.org/10.1142/S0218202513500103">http://dx.doi.org/10.1142/S0218202513500103</a>.
-<a name="Oden_2013"></a><pre>
-@article{Oden_2013,
-  author = {J.~T.~Oden and E.~E.~Prudencio and A.~Hawkins-Daarud},
-  title = {{Selection and assessment of phenomenological models of tumor growth}},
-  journal = {Mathematical Models and Methods in Applied Sciences},
+P.&nbsp;C. Millett, M.&nbsp;R. Tonks, K.&nbsp;Chockalingam, Y.&nbsp;Zhang, and S.&nbsp;B. Biner.
+ Three dimensional calculations of the effective Kapitza resistance
+  of UO<sub>2</sub> grain boundaries containing intergranular bubbles.
+ <em>Journal of Nuclear Materials</em>, 2013.
+ <a href="http://dx.doi.org/10.1016/j.jnucmat.2013.02.039">http://dx.doi.org/10.1016/j.jnucmat.2013.02.039</a>.
+<a name="Millett_2013"></a><pre>
+@article{Millett_2013,
+  author = {P.~C.~Millett and M.~R.~Tonks and K.~Chockalingam and Y.~Zhang and S.~B.~Biner},
+  title = {{Three dimensional calculations of the effective Kapitza resistance of UO$_2$ grain boundaries containing intergranular bubbles}},
+  journal = {Journal of Nuclear Materials},
   year = 2013,
-  note = {\url{http://dx.doi.org/10.1142/S0218202513500103}}
+  note = {\url{http://dx.doi.org/10.1016/j.jnucmat.2013.02.039}}
 }
 </pre>
 
@@ -655,7 +656,32 @@ A.&nbsp;P.&nbsp;S. Bhalla, R.&nbsp;Bale, B.&nbsp;E. Griffith, and N.&nbsp;A. Pat
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gonzalez_2012">8</a>]
+[<a name="Gunther_2012">8</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;G&uuml;nther, H.&nbsp;Lamecker, and M.&nbsp;Weiser.
+ Flexible shape matching with finite element based LDDMM.
+ <em>International Journal of Computer Vision</em>, December 2012.
+ <a href="http://dx.doi.org/10.1007/s11263-012-0599-3">http://dx.doi.org/10.1007/s11263-012-0599-3</a>.
+<a name="Gunther_2012"></a><pre>
+@article{Gunther_2012,
+  author = {A.~G\"{u}nther and H.~Lamecker and M.~Weiser},
+  title = {{Flexible shape matching with finite element based LDDMM}},
+  journal = {International Journal of Computer Vision},
+  month = dec,
+  year = 2012,
+  note = {\url{http://dx.doi.org/10.1007/s11263-012-0599-3}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gonzalez_2012">9</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;G. Gonz&aacute;lez and J.&nbsp;R.&nbsp;R. Galv&aacute;n.
@@ -683,7 +709,7 @@ F.&nbsp;G. Gonz&aacute;lez and J.&nbsp;R.&nbsp;R. Galv&aacute;n.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bittl_2012">9</a>]
+[<a name="Bittl_2012">10</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Bittl and D.&nbsp;Kuzmin.
@@ -708,7 +734,7 @@ M.&nbsp;Bittl and D.&nbsp;Kuzmin.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2012">10</a>]
+[<a name="Vavourakis_2012">11</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekaterinaris.
@@ -734,7 +760,7 @@ V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekater
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vallaghe_2012">11</a>]
+[<a name="Vallaghe_2012">12</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
@@ -760,7 +786,7 @@ S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffith_2012">12</a>]
+[<a name="Griffith_2012">13</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -794,7 +820,178 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhang_2013">1</a>]
+[<a name="Oden_2013">1</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, and A.&nbsp;Hawkins-Daarud.
+ Selection and assessment of phenomenological models of tumor
+  growth.
+ <em>Mathematical Models and Methods in Applied Sciences</em>,
+  23(7):1309-1338, June 2013.
+ <a href="http://dx.doi.org/10.1142/S0218202513500103">http://dx.doi.org/10.1142/S0218202513500103</a>.
+<a name="Oden_2013"></a><pre>
+@article{Oden_2013,
+  author = {J.~T.~Oden and E.~E.~Prudencio and A.~Hawkins-Daarud},
+  title = {{Selection and assessment of phenomenological models of tumor growth}},
+  journal = {Mathematical Models and Methods in Applied Sciences},
+  year = 2013,
+  volume = 23,
+  number = 7,
+  month = jun,
+  pages = {1309--1338},
+  note = {\url{http://dx.doi.org/10.1142/S0218202513500103}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Chockalingam_2013">2</a>]
+</td>
+<td class="bibtexitem">
+K.&nbsp;Chockalingam, M.&nbsp;R. Tonks, J.&nbsp;D. Hales, D.&nbsp;R. Gaston, P.&nbsp;C. Millett, and
+  L.&nbsp;Zhang.
+ Crystal plasticity with Jacobian-Free Newton-Krylov.
+ <em>Computational Mechanics</em>, 51(5):617-627, May 2013.
+ <a href="http://dx.doi.org/10.1007/s00466-012-0741-7">http://dx.doi.org/10.1007/s00466-012-0741-7</a>.
+<a name="Chockalingam_2013"></a><pre>
+@article{Chockalingam_2013,
+  author = {K.~Chockalingam and M.~R.~Tonks and J.~D.~Hales and D.~R.~Gaston and P.~C.~Millett and L.~Zhang},
+  title = {{Crystal plasticity with Jacobian-Free Newton-Krylov}},
+  journal = {Computational Mechanics},
+  year = 2013,
+  volume = 51,
+  number = 5,
+  month = may,
+  pages = {617--627},
+  note = {\url{http://dx.doi.org/10.1007/s00466-012-0741-7}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Lee_2013">3</a>]
+</td>
+<td class="bibtexitem">
+K.&nbsp;Lee and K.&nbsp;Willcox.
+ Structural integrity assessment via structural response predictions
+  using a certified reduced basis model.
+ In <em>54th AIAA/ASME/ASCE/AHS/ASC Structures, Structural Dynamics,
+  and Materials Conference</em>, April&nbsp;8-11, 2013.
+ <a href="http://dx.doi.org/10.2514/6.2013-1625">http://dx.doi.org/10.2514/6.2013-1625</a>.
+<a name="Lee_2013"></a><pre>
+@inproceedings{Lee_2013,
+  author = {K.~Lee and K.~Willcox},
+  title = {{Structural integrity assessment via structural response predictions using a certified reduced basis model}},
+  booktitle = {{54th AIAA/ASME/ASCE/AHS/ASC Structures, Structural Dynamics, and Materials Conference}},
+  month = apr # {~8--11,},
+  year = {2013},
+  note = {\url{http://dx.doi.org/10.2514/6.2013-1625}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Bhatia_2013">4</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;Bhatia and P.&nbsp;Beran.
+ <em>h</em>-adaptive stabilized finite-element solver for calculation of
+  generalized aerodynamic forces.
+ In <em>54th AIAA/ASME/ASCE/AHS/ASC Structures, Structural Dynamics,
+  and Materials Conference</em>, April&nbsp;8-11, 2013.
+ <a href="http://dx.doi.org/10.2514/6.2013-1456">http://dx.doi.org/10.2514/6.2013-1456</a>.
+<a name="Bhatia_2013"></a><pre>
+@inproceedings{Bhatia_2013,
+  author = {M.~Bhatia and P.~Beran},
+  title = {{$h$-adaptive stabilized finite-element solver for calculation of generalized aerodynamic forces}},
+  booktitle = {{54th AIAA/ASME/ASCE/AHS/ASC Structures, Structural Dynamics, and Materials Conference}},
+  month = apr # {~8--11,},
+  year = {2013},
+  note = {\url{http://dx.doi.org/10.2514/6.2013-1456}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Opstal_2013">5</a>]
+</td>
+<td class="bibtexitem">
+T.&nbsp;M. van Opstal, P.&nbsp;T. Bauman, S.&nbsp;Prudhomme, and E.&nbsp;H. Brummelen.
+ Goal-oriented model adaptivity for viscous incompressible flows.
+ Technical Report 13-07, The Institute for Computational Engineering
+  and Sciences (ICES), April 2013.
+ <a href="https://www.ices.utexas.edu/media/reports/2013/1307.pdf">https://www.ices.utexas.edu/media/reports/2013/1307.pdf</a>.
+<a name="Opstal_2013"></a><pre>
+@techreport{Opstal_2013,
+  author = {T.~M.~van Opstal and P.~T.~Bauman and S.~Prudhomme and E.~H.~Brummelen},
+  title = {{Goal-oriented model adaptivity for viscous incompressible flows}},
+  institution = {The Institute for Computational Engineering and Sciences (ICES)},
+  day = {8},
+  month = apr,
+  year = {2013},
+  number = {13-07},
+  note = {\url{https://www.ices.utexas.edu/media/reports/2013/1307.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Guo_2013">6</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Guo, H.&nbsp;Huang, D.&nbsp;R. Gaston, C.&nbsp;J. Permann, D.&nbsp;Andrs, G.&nbsp;D. Redden, C.&nbsp;Lu,
+  D.&nbsp;T. Fox, and Y.&nbsp;Fujita.
+ A parallel, fully coupled, fully implicit solution to reactive
+  transport in porous media using the preconditioned Jacobian-Free
+  Newton-Krylov Method.
+ <em>Advances in Water Resources</em>, 53:101-108, March 2013.
+ <a href="http://dx.doi.org/10.1016/j.advwatres.2012.10.010">http://dx.doi.org/10.1016/j.advwatres.2012.10.010</a>.
+<a name="Guo_2013"></a><pre>
+@article{Guo_2013,
+  author = {L.~Guo and H.~Huang and D.~R.~Gaston and C.~J.~Permann and D.~Andrs and G.~D.~Redden and C.~Lu and D.~T.~Fox and Y.~Fujita},
+  title = {{A parallel, fully coupled, fully implicit solution to reactive transport in porous media using the preconditioned Jacobian-Free Newton-Krylov Method}},
+  journal = {Advances in Water Resources},
+  year = 2013,
+  month = mar,
+  volume = 53,
+  pages = {101--108},
+  note = {\url{http://dx.doi.org/10.1016/j.advwatres.2012.10.010}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Zhang_2013">7</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Zhang, M.&nbsp;R. Tonks, D.&nbsp;Gaston, J.&nbsp;W. Peterson, D.&nbsp;Andrs, P.&nbsp;C. Millett, and
@@ -823,7 +1020,7 @@ L.&nbsp;Zhang, M.&nbsp;R. Tonks, D.&nbsp;Gaston, J.&nbsp;W. Peterson, D.&nbsp;An
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2013">2</a>]
+[<a name="Fuentes_2013">8</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;S. Weinberg, A.&nbsp;Shetty, J.&nbsp;D. Hazle, and R.&nbsp;J.
@@ -855,7 +1052,7 @@ D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;S. Weinberg, A.&nbsp;Shetty, J.&nbsp;D
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2013">3</a>]
+[<a name="Huynh_2013">9</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -886,7 +1083,7 @@ D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2013">4</a>]
+[<a name="Vavourakis_2013">10</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanastasiou.
@@ -914,7 +1111,7 @@ V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanasta
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2013">5</a>]
+[<a name="Zhu_2013">11</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
@@ -942,7 +1139,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berr
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vetter_2013">6</a>]
+[<a name="Vetter_2013">12</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
@@ -979,7 +1176,64 @@ R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Galloway_2012">1</a>]
+[<a name="Francis_2012">1</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;K. Francis, J.&nbsp;Deang, R.&nbsp;S. Florea, D.&nbsp;R. Gaston, N.&nbsp;Lee, S.&nbsp;Nouranian,
+  C.&nbsp;J. Permann, J.&nbsp;Rudd, D.&nbsp;Seely, W.&nbsp;R. Whittington, and M.&nbsp;F. Horstemeyer.
+ Characterization and failure analysis of a polymeric clamp hanger
+  component.
+ <em>Engineering Failure Analysis</em>, 26:230-239, December 2012.
+ <a href="http://dx.doi.org/10.1016/j.engfailanal.2012.07.020">http://dx.doi.org/10.1016/j.engfailanal.2012.07.020</a>.
+<a name="Francis_2012"></a><pre>
+@article{Francis_2012,
+  author = {D.~K.~Francis and J.~Deang and R.~S.~Florea and D.~R.~Gaston and N.~Lee and S.~Nouranian and C.~J.~Permann and J.~Rudd and D.~Seely and W.~R.~Whittington and M.~F.~Horstemeyer},
+  title = {{Characterization and failure analysis of a polymeric clamp hanger component}},
+  journal = {Engineering Failure Analysis},
+  year = 2012,
+  month = dec,
+  volume = 26,
+  pages = {230--239},
+  note = {\url{http://dx.doi.org/10.1016/j.engfailanal.2012.07.020}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Sumner_2012">2</a>]
+</td>
+<td class="bibtexitem">
+T.&nbsp;Sumner, R.&nbsp;Hu, and T.&nbsp;H. Fanning.
+ Verification test suite for systems analysis tools.
+ Technical Report ANL/NE-12/61, Argonne National Laboratory, December
+  2012.
+ <a href="http://www.ipd.anl.gov/anlpubs/2013/02/75298.pdf">http://www.ipd.anl.gov/anlpubs/2013/02/75298.pdf</a>.
+<a name="Sumner_2012"></a><pre>
+@techreport{Sumner_2012,
+  author = {T.~Sumner and R.~Hu and T.~H.~Fanning},
+  title = {{Verification test suite for systems analysis tools}},
+  institution = {Argonne National Laboratory},
+  day = {21},
+  month = dec,
+  year = {2012},
+  number = {ANL/NE-12/61},
+  note = {\url{http://www.ipd.anl.gov/anlpubs/2013/02/75298.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Galloway_2012">3</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;D. Galloway, N.&nbsp;N. Carlson, and C.&nbsp;Unal.
@@ -1006,7 +1260,7 @@ J.&nbsp;D. Galloway, N.&nbsp;N. Carlson, and C.&nbsp;Unal.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Curtis_2012">2</a>]
+[<a name="Curtis_2012">4</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
@@ -1037,7 +1291,7 @@ F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rossa_2012">3</a>]
+[<a name="Rossa_2012">5</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;L. Rossa and A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
@@ -1067,7 +1321,7 @@ A.&nbsp;L. Rossa and A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Oliveira_2012">4</a>]
+[<a name="Oliveira_2012">6</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
@@ -1097,7 +1351,7 @@ S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bhalla_2012">5</a>]
+[<a name="Bhalla_2012">7</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;P.&nbsp;S. Bhalla, R.&nbsp;Bale, B.&nbsp;E. Griffith, and N.&nbsp;A. Patankar.
@@ -1124,7 +1378,7 @@ A.&nbsp;P.&nbsp;S. Bhalla, R.&nbsp;Bale, B.&nbsp;E. Griffith, and N.&nbsp;A. Pat
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Trepanier_2012">6</a>]
+[<a name="Trepanier_2012">8</a>]
 </td>
 <td class="bibtexitem">
 P.-Y. Tr&eacute;panier, I.&nbsp;Fortin, C.&nbsp;Lambert, and F.&nbsp;Lacroix.
@@ -1155,7 +1409,7 @@ P.-Y. Tr&eacute;panier, I.&nbsp;Fortin, C.&nbsp;Lambert, and F.&nbsp;Lacroix.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Clarno_2012">7</a>]
+[<a name="Clarno_2012">9</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;T. Clarno et&nbsp;al.
@@ -1182,7 +1436,7 @@ K.&nbsp;T. Clarno et&nbsp;al.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Amaziane_2012">8</a>]
+[<a name="Amaziane_2012">10</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;Amaziane, M.&nbsp;Jurak, and A.&nbsp;Keko.
@@ -1215,7 +1469,36 @@ B.&nbsp;Amaziane, M.&nbsp;Jurak, and A.&nbsp;Keko.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Ortensi_2012">9</a>]
+[<a name="Stull_2012">11</a>]
+</td>
+<td class="bibtexitem">
+C.&nbsp;J. Stull, B.&nbsp;J. Williams, and C.&nbsp;Unal.
+ Assessing the effect of parametric uncertainty on the FRAPCON-3.4
+  thermal conductivity model.
+ Technical Report LA-UR-12-25426, Los Alamos National Laboratory,
+  October 2012.
+
+  <a href="http://permalink.lanl.gov/object/tr?what=info:lanl-repo/lareport/LA-UR-12-25426">http://permalink.lanl.gov/object/tr?what=info:lanl-repo/lareport/LA-UR-12-25426</a>.
+<a name="Stull_2012"></a><pre>
+@techreport{Stull_2012,
+  author = {C.~J.~Stull and B.~J.~Williams and C.~Unal},
+  title = {{Assessing the effect of parametric uncertainty on the FRAPCON-3.4 thermal conductivity model}},
+  institution = {Los Alamos National Laboratory},
+  month = oct,
+  year = 2012,
+  number = {LA-UR-12-25426},
+  note = {\url{http://permalink.lanl.gov/object/tr?what=info:lanl-repo/lareport/LA-UR-12-25426}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Ortensi_2012">12</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;Ortensi, A.&nbsp;A. Bingham, D.&nbsp;Andrs, and R.&nbsp;C. Martineau.
@@ -1242,7 +1525,92 @@ J.&nbsp;Ortensi, A.&nbsp;A. Bingham, D.&nbsp;Andrs, and R.&nbsp;C. Martineau.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bingham_2012">10</a>]
+[<a name="Short_2012">13</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;P. Short.
+ Effects of fluid flow on 2D and 3D coupled microscale simulations of
+  porous boiling deposits (CRUD) in PWRs.
+ In <em>9th International Topical Meeting on Nuclear
+  Thermal-Hydraulics, Operation and Safety (NUTHOS-9), Kaohsiung, Taiwan</em>,
+  September&nbsp;9-13, 2012.
+
+  <a href="http://web.mit.edu/hereiam/Public/Andrew/NUTHOS-CRUD-Paper.docx">http://web.mit.edu/hereiam/Public/Andrew/NUTHOS-CRUD-Paper.docx</a>.
+<a name="Short_2012"></a><pre>
+@inproceedings{Short_2012,
+  author = {M.~P.~Short},
+  title = {{Effects of fluid flow on 2D and 3D coupled microscale simulations of porous boiling deposits (CRUD) in PWRs}},
+  booktitle = {{9th International Topical Meeting on Nuclear Thermal-Hydraulics, Operation and Safety (NUTHOS-9), Kaohsiung, Taiwan}},
+  month = sep # {~9--13,},
+  year = {2012},
+  note = {\url{http://web.mit.edu/hereiam/Public/Andrew/NUTHOS-CRUD-Paper.docx}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Novascone_2012">14</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;R. Novascone, J.&nbsp;D. Hales, B.&nbsp;W. Spencer, and R.&nbsp;L. Williamson.
+ Assessment of PCMI simulation using the multidimensional
+  multiphysics BISON fuel performance code.
+ Technical Report INL/CON-12-24744, Idaho National Laboratory,
+  September 2012.
+ <a href="http://www.inl.gov/technicalpublications/Documents/5538926.pdf">http://www.inl.gov/technicalpublications/Documents/5538926.pdf</a>.
+<a name="Novascone_2012"></a><pre>
+@techreport{Novascone_2012,
+  author = {S.~R.~Novascone and J.~D.~Hales and B.~W.~Spencer and R.~ L.~Williamson},
+  title = {{Assessment of PCMI simulation using the multidimensional multiphysics BISON fuel performance code}},
+  institution = {Idaho National Laboratory},
+  month = sep,
+  year = {2012},
+  number = {INL/CON-12-24744},
+  note = {\url{http://www.inl.gov/technicalpublications/Documents/5538926.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Spencer_2012">15</a>]
+</td>
+<td class="bibtexitem">
+B.&nbsp;W. Spencer, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, and R.&nbsp;L. Williamson.
+ 3D simulation of missing pellet surface defects in light water
+  reactor fuel rods.
+ Technical Report INL/CON-12-24745, Idaho National Laboratory,
+  September 2012.
+ <a href="http://www.inl.gov/technicalpublications/Documents/5561105.pdf">http://www.inl.gov/technicalpublications/Documents/5561105.pdf</a>.
+<a name="Spencer_2012"></a><pre>
+@techreport{Spencer_2012,
+  author = {B.~W.~Spencer and J.~D.~Hales and S.~R.~Novascone and R.~L.~Williamson},
+  title = {{3D simulation of missing pellet surface defects in light water reactor fuel rods}},
+  institution = {Idaho National Laboratory},
+  month = sep,
+  year = {2012},
+  number = {INL/CON-12-24745},
+  note = {\url{http://www.inl.gov/technicalpublications/Documents/5561105.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Bingham_2012">16</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;A. Bingham, J.&nbsp;Ortensi, R.&nbsp;Jain, I.&nbsp;Grindeanu, and T.&nbsp;Tautges.
@@ -1269,7 +1637,7 @@ A.&nbsp;A. Bingham, J.&nbsp;Ortensi, R.&nbsp;Jain, I.&nbsp;Grindeanu, and T.&nbs
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gaston_2012">11</a>]
+[<a name="Gaston_2012">17</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Gaston, L.&nbsp;Guo, G.&nbsp;Hansen, H.&nbsp;Huang, R.&nbsp;Johnson, D.&nbsp;Knoll, C.&nbsp;Newman, H.&nbsp;K.
@@ -1302,7 +1670,7 @@ D.&nbsp;Gaston, L.&nbsp;Guo, G.&nbsp;Hansen, H.&nbsp;Huang, R.&nbsp;Johnson, D.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gerner_2012c">12</a>]
+[<a name="Gerner_2012c">18</a>]
 </td>
 <td class="bibtexitem">
 A.-L. Gerner and K.&nbsp;Veroy.
@@ -1327,7 +1695,7 @@ A.-L. Gerner and K.&nbsp;Veroy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gerner_2012b">13</a>]
+[<a name="Gerner_2012b">19</a>]
 </td>
 <td class="bibtexitem">
 A.-L. Gerner, A.&nbsp;Reusken, and K.&nbsp;Veroy.
@@ -1352,7 +1720,7 @@ A.-L. Gerner, A.&nbsp;Reusken, and K.&nbsp;Veroy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bauman_2012">14</a>]
+[<a name="Bauman_2012">20</a>]
 </td>
 <td class="bibtexitem">
 P.&nbsp;T. Bauman, J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, S.&nbsp;Prudhomme, and K.&nbsp;Ravi-Chandar.
@@ -1380,7 +1748,89 @@ P.&nbsp;T. Bauman, J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, S.&nbsp;Prudhomme, and
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2012b">15</a>]
+[<a name="Kalashnikova_2012">21</a>]
+</td>
+<td class="bibtexitem">
+I.&nbsp;Kalashnikova and S.&nbsp;Arunajatesan.
+ A stable Galerkin reduced order model (ROM) for compressible flow.
+ In <em>10th World Congress on Computational Mechanics (WCCM 2012),
+  S&atilde;o Paulo, Brazil</em>, July&nbsp;8-13, 2012.
+ <a href="http://www.sandia.gov/~ikalash/WCCM2012-18407.pdf">http://www.sandia.gov/~ikalash/WCCM2012-18407.pdf</a>.
+<a name="Kalashnikova_2012"></a><pre>
+@inproceedings{Kalashnikova_2012,
+  author = {I.~Kalashnikova and S.~Arunajatesan},
+  title = {{A stable Galerkin reduced order model (ROM) for compressible flow}},
+  booktitle = {{10th World Congress on Computational Mechanics (WCCM 2012), S\~{a}o Paulo, Brazil}},
+  month = jul # {~8--13,},
+  year = {2012},
+  note = {\url{http://www.sandia.gov/~ikalash/WCCM2012-18407.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Guo_2012">22</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Guo, C.&nbsp;Lu, H.&nbsp;Huang, and D.&nbsp;R. Gaston.
+ Reactive transport modeling using a parallel fully-coupled simulator
+  based on preconditioned Jacobian-free Newton-Krylov.
+ Technical Report INL/CON-12-25018, Idaho National Laboratory, June
+  2012.
+ <a href="http://www.inl.gov/technicalpublications/Documents/5436971.pdf">http://www.inl.gov/technicalpublications/Documents/5436971.pdf</a>.
+<a name="Guo_2012"></a><pre>
+@techreport{Guo_2012,
+  author = {L.~Guo and C.~Lu and H.~Huang and D.~R.~Gaston},
+  title = {{Reactive transport modeling using a parallel fully-coupled simulator based on preconditioned Jacobian-free Newton-Krylov}},
+  institution = {Idaho National Laboratory},
+  month = jun,
+  year = {2012},
+  number = {INL/CON-12-25018},
+  note = {\url{http://www.inl.gov/technicalpublications/Documents/5436971.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gleicher_2012">23</a>]
+</td>
+<td class="bibtexitem">
+F.&nbsp;N. Gleicher, Y.&nbsp;Wang, D.&nbsp;R. Gaston, and R.&nbsp;Martineau.
+ The method of manufactured solutions for RattleSnake, a <em>S</em><sub>N</sub>
+  radiation transport solver inside the MOOSE framework.
+ Technical Report INL/CON-12-24712, Idaho National Laboratory, June
+  2012.
+ <a href="http://www.inl.gov/technicalpublications/Documents/5436964.pdf">http://www.inl.gov/technicalpublications/Documents/5436964.pdf</a>.
+<a name="Gleicher_2012"></a><pre>
+@techreport{Gleicher_2012,
+  author = {F.~N.~Gleicher and Y.~Wang and D.~R.~Gaston and R.~Martineau},
+  title = {{The method of manufactured solutions for RattleSnake, a $S_N$ radiation transport solver inside the MOOSE framework}},
+  institution = {Idaho National Laboratory},
+  month = jun,
+  year = {2012},
+  number = {INL/CON-12-24712},
+  note = {\url{http://www.inl.gov/technicalpublications/Documents/5436964.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Podgorney_2012b">24</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, H.&nbsp;Huang, M.&nbsp;Plummer, and D.&nbsp;Gaston.
@@ -1411,7 +1861,7 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, M.&nbsp;Plummer, and D.&nbsp;Gaston.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Camata_2012">16</a>]
+[<a name="Camata_2012">25</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga, G.&nbsp;F. Carey, and
@@ -1442,7 +1892,7 @@ J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="NEMO5">17</a>]
+[<a name="NEMO5">26</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Steiger.
@@ -1471,7 +1921,7 @@ S.&nbsp;Steiger.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Schulz_2012">18</a>]
+[<a name="Schulz_2012">27</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;W. Schulz, R.&nbsp;Ulerich, N.&nbsp;Malaya, P.&nbsp;T. Bauman, R.&nbsp;Stogner, and C.&nbsp;Simmons.
@@ -1499,7 +1949,63 @@ K.&nbsp;W. Schulz, R.&nbsp;Ulerich, N.&nbsp;Malaya, P.&nbsp;T. Bauman, R.&nbsp;S
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Corsini_2012">19</a>]
+[<a name="Williamson_2012b">28</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;L. Williamson and S.&nbsp;R. Novascone.
+ Application of the BISON fuel performance code to the FUMEX-III
+  coordinated research project.
+ Technical Report INL/EXT-12-25530, Idaho National Laboratory, April
+  2012.
+ <a href="http://www.inl.gov/technicalpublications/Documents/5427220.pdf">http://www.inl.gov/technicalpublications/Documents/5427220.pdf</a>.
+<a name="Williamson_2012b"></a><pre>
+@techreport{Williamson_2012b,
+  author = {R.~L.~Williamson and S.~R.~Novascone},
+  title = {{Application of the BISON fuel performance code to the FUMEX-III coordinated research project}},
+  institution = {Idaho National Laboratory},
+  month = apr,
+  year = {2012},
+  number = {INL/EXT-12-25530},
+  note = {\url{http://www.inl.gov/technicalpublications/Documents/5427220.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Zhang_2012">29</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Zhang, M.&nbsp;R. Tonks, P.&nbsp;C. Millett, Y.&nbsp;Zhang, K.&nbsp;Chockalingam, and B.&nbsp;Biner.
+ Phase-field modeling of temperature gradient driven pore migration
+  coupling with thermal conduction.
+ <em>Computational Materials Science</em>, 56:161-165, April 2012.
+ <a href="http://dx.doi.org/10.1016/j.commatsci.2012.01.002">http://dx.doi.org/10.1016/j.commatsci.2012.01.002</a>.
+<a name="Zhang_2012"></a><pre>
+@article{Zhang_2012,
+  author = {L.~Zhang and M.~R.~Tonks and P.~C.~Millett and Y.~Zhang and K.~Chockalingam and B.~Biner},
+  title = {{Phase-field modeling of temperature gradient driven pore migration coupling with thermal conduction}},
+  journal = {Computational Materials Science},
+  year = 2012,
+  month = apr,
+  volume = 56,
+  pages = {161--165},
+  note = {\url{http://dx.doi.org/10.1016/j.commatsci.2012.01.002}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Corsini_2012">30</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Corsini, A.&nbsp;Marchegiani, F.&nbsp;Rispoli, P.&nbsp;Venturini, and A.&nbsp;G. Sheard.
@@ -1528,7 +2034,7 @@ A.&nbsp;Corsini, A.&nbsp;Marchegiani, F.&nbsp;Rispoli, P.&nbsp;Venturini, and A.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2012">20</a>]
+[<a name="Zhu_2012">31</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;F. Zhu, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
@@ -1558,7 +2064,7 @@ Y.&nbsp;F. Zhu, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Akkoyun_2012">21</a>]
+[<a name="Akkoyun_2012">32</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Akkoyun et&nbsp;al.
@@ -1587,7 +2093,7 @@ S.&nbsp;Akkoyun et&nbsp;al.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Mahadevan_2012">22</a>]
+[<a name="Mahadevan_2012">33</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
@@ -1615,7 +2121,7 @@ V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2012">23</a>]
+[<a name="Podgorney_2012">34</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, C.&nbsp;Lu, and H.&nbsp;Huang.
@@ -1645,7 +2151,36 @@ R.&nbsp;Podgorney, C.&nbsp;Lu, and H.&nbsp;Huang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Slaughter_2012">24</a>]
+[<a name="Tonks_2012">35</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;R. Tonks, D.&nbsp;R. Gaston, P.&nbsp;C. Millett, D.&nbsp;Andrs, and P.&nbsp;Talbot.
+ An object-oriented finite element framework for multiphysics phase
+  field simulations.
+ <em>Computational Materials Science</em>, 51(1):20-29, January 2012.
+ <a href="http://dx.doi.org/10.1016/j.commatsci.2011.07.028">http://dx.doi.org/10.1016/j.commatsci.2011.07.028</a>.
+<a name="Tonks_2012"></a><pre>
+@article{Tonks_2012,
+  author = {M.~R.~Tonks and D.~R.~Gaston and P.~C.~Millett and D.~Andrs and P.~Talbot},
+  title = {{An object-oriented finite element framework for multiphysics phase field simulations}},
+  journal = {Computational Materials Science},
+  year = 2012,
+  month = jan,
+  volume = 51,
+  number = 1,
+  pages = {20--29},
+  note = {\url{http://dx.doi.org/10.1016/j.commatsci.2011.07.028}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Slaughter_2012">36</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;E. Slaughter and N.&nbsp;Zabaras.
@@ -1672,7 +2207,7 @@ A.&nbsp;E. Slaughter and N.&nbsp;Zabaras.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bordas_2012">25</a>]
+[<a name="Bordas_2012">37</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;M. Bordas, K.&nbsp;Gillow, D.&nbsp;Gavaghan, B.&nbsp;Rodriguez, and D.&nbsp;Kay.
@@ -1700,7 +2235,7 @@ R.&nbsp;M. Bordas, K.&nbsp;Gillow, D.&nbsp;Gavaghan, B.&nbsp;Rodriguez, and D.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hales_2012">26</a>]
+[<a name="Hales_2012">38</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;D. Hales, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, D.&nbsp;R. Gaston, and M.&nbsp;R. Tonks.
@@ -1729,7 +2264,7 @@ J.&nbsp;D. Hales, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, D.&nbsp;R. Gaston
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bassi_2012">27</a>]
+[<a name="Bassi_2012">39</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;Bassi, L.&nbsp;Botti, A.&nbsp;Colombo, D.&nbsp;A.&nbsp;Di Pietro, and P.&nbsp;Tesini.
@@ -1758,7 +2293,7 @@ F.&nbsp;Bassi, L.&nbsp;Botti, A.&nbsp;Colombo, D.&nbsp;A.&nbsp;Di Pietro, and P.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Andrijauskas_2012">28</a>]
+[<a name="Andrijauskas_2012">40</a>]
 </td>
 <td class="bibtexitem">
 T.&nbsp;Andrijauskas, A.&nbsp;A. Shylau, and I.&nbsp;V. Zozoulenko.
@@ -1786,7 +2321,7 @@ T.&nbsp;Andrijauskas, A.&nbsp;A. Shylau, and I.&nbsp;V. Zozoulenko.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Williamson_2012">29</a>]
+[<a name="Williamson_2012">41</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;L. Williamson, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, M.&nbsp;R. Tonks, D.&nbsp;R. Gaston,
@@ -1814,7 +2349,7 @@ R.&nbsp;L. Williamson, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, M.&nbsp;R. Tonks,
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2012">30</a>]
+[<a name="Eftang_2012">42</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -1841,7 +2376,7 @@ J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gerner_2012">31</a>]
+[<a name="Gerner_2012">43</a>]
 </td>
 <td class="bibtexitem">
 A.-L. Gerner and K.&nbsp;Veroy.
@@ -1872,7 +2407,7 @@ A.-L. Gerner and K.&nbsp;Veroy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brummelen_2012">32</a>]
+[<a name="Brummelen_2012">44</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&nbsp;Prudhomme.
@@ -1901,7 +2436,7 @@ E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2012">33</a>]
+[<a name="Huynh_2012">45</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -1930,7 +2465,7 @@ D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Wang_2012">34</a>]
+[<a name="Wang_2012">46</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Wang, A.&nbsp;A. Bingham, J.&nbsp;Ortensi, and C.&nbsp;J. Permann.
@@ -1955,7 +2490,7 @@ Y.&nbsp;Wang, A.&nbsp;A. Bingham, J.&nbsp;Ortensi, and C.&nbsp;J. Permann.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rabiti_2012">35</a>]
+[<a name="Rabiti_2012">47</a>]
 </td>
 <td class="bibtexitem">
 C.&nbsp;Rabiti, A.&nbsp;Alfonsi, D.&nbsp;Mandelli, J.&nbsp;Cogliati, and R.&nbsp;Martineau.
@@ -3443,7 +3978,35 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, and D.&nbsp;Gaston.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rossa_2010">18</a>]
+[<a name="Tonks_2010">18</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;Tonks, D.&nbsp;Gaston, C.&nbsp;Permann, P.&nbsp;Millett, G.&nbsp;Hansen, and D.&nbsp;Wolf.
+ A coupling methodology for mesoscale-informed nuclear fuel
+  performance codes.
+ <em>Nuclear Engineering and Design</em>, 240(10):2877-2883, 2010.
+ <a href="http://dx.doi.org/10.1016/j.nucengdes.2010.06.005">http://dx.doi.org/10.1016/j.nucengdes.2010.06.005</a>.
+<a name="Tonks_2010"></a><pre>
+@article{Tonks_2010,
+  author = {M.~Tonks and D.~Gaston and C.~Permann and P.~Millett and G.~Hansen and D.~Wolf},
+  title = {{A coupling methodology for mesoscale-informed nuclear fuel performance codes}},
+  journal = {Nuclear Engineering and Design},
+  year = 2010,
+  volume = 240,
+  number = 10,
+  pages = {2877--2883},
+  note = {\url{http://dx.doi.org/10.1016/j.nucengdes.2010.06.005}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Rossa_2010">19</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;L. Rossa, J.&nbsp;J. Camata, and A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
@@ -3474,7 +4037,7 @@ of coupled incompressible viscous flows and heat transfer}},
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010a">19</a>]
+[<a name="Knezevic_2010a">20</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
@@ -3504,7 +4067,7 @@ D.&nbsp;J. Knezevic and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhengyong_2010">20</a>]
+[<a name="Zhengyong_2010">21</a>]
 </td>
 <td class="bibtexitem">
 Z.&nbsp;Ren and J.&nbsp;Tang.
@@ -3533,7 +4096,7 @@ Z.&nbsp;Ren and J.&nbsp;Tang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Carey_2010">21</a>]
+[<a name="Carey_2010">22</a>]
 </td>
 <td class="bibtexitem">
 G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
@@ -3563,7 +4126,7 @@ G.&nbsp;F. Carey and D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_2010">22</a>]
+[<a name="Peterson_2010">23</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
@@ -3593,7 +4156,7 @@ J.&nbsp;W. Peterson, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2010">23</a>]
+[<a name="Botti_2010">24</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti, M.&nbsp;Piccinelli, B.&nbsp;Ene-Iordache, A.&nbsp;Remuzzi, and L.&nbsp;Antiga.
