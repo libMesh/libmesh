@@ -111,7 +111,8 @@ endif
 # The file extension for object files.
 # foo.C is compiled to foo.$(obj-suffix)
 # We don't use this in the libMesh build system, but old application codes do.
-obj-suffix := @host@.$(METHOD).lo
+obj-suffix     := @host@.$(METHOD).o
+libtool-suffix := @host@.$(METHOD).lo
 
 
 # use libmesh-config to get configuration details
@@ -135,35 +136,51 @@ libmesh_static   := $(shell $(libmesh_LIBTOOL) --config | grep build_old_libs | 
 ##################################
 # C++ rules                      #
 ##################################
-%.$(obj-suffix) : %.C
+%.$(libtool-suffix) : %.C
 	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
 	@$(libmesh_LIBTOOL) --tag=CXX $(LIBTOOLFLAGS) --mode=compile --quiet \
 	  $(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+
+%.$(obj-suffix) : %.C
+	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
+	$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 
 
 ##################################
 # C rules                        #
 ##################################
-%.$(obj-suffix) : %.c
+%.$(libtool-suffix) : %.c
 	@echo "Compiling C (in "$(mode)" mode) "$<"..."
 	@$(libmesh_LIBTOOL) --tag=CC $(LIBTOOLFLAGS) --mode=compile --quiet \
 	  $(libmesh_CC) $(libmesh_CPPFLAGS) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+
+%.$(obj-suffix) : %.c
+	@echo "Compiling C (in "$(mode)" mode) "$<"..."
+	$(libmesh_CC) $(libmesh_CPPFLAGS) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 
 
 ##################################
 # Fortran rules                  #
 ##################################
-%.$(obj-suffix) : %.f
-	@echo "Compiling Fortan (in "$(mode)" mode) "$<"..."
+%.$(libtool-suffix) : %.f
+	@echo "Compiling Fortran (in "$(mode)" mode) "$<"..."
 	@$(libmesh_LIBTOOL) --tag=F77 $(LIBTOOLFLAGS) --mode=compile --quiet \
 	  $(libmesh_F77) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
-%.$(obj-suffix) : %.f90
+%.$(obj-suffix) : %.f
+	@echo "Compiling Fortran (in "$(mode)" mode) "$<"..."
+	$(libmesh_F77) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+
+%.$(libtool-suffix) : %.f90
 	@echo "Compiling Fortan90 (in "$(mode)" mode) "$<"..."
 	@$(libmesh_LIBTOOL) --tag=FC $(LIBTOOLFLAGS) --mode=compile --quiet \
 	  $(libmesh_F90) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+
+%.$(obj-suffix) : %.f90
+	@echo "Compiling Fortan90 (in "$(mode)" mode) "$<"..."
+	$(libmesh_F90) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 
 echo_libmode:

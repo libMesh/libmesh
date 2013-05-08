@@ -217,7 +217,7 @@ Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
   // We evaluated the mesh function, but it will only return a valid set of values on one processor
   // (values will be empty on all other processors) so we need to broadcast those valid values
   // to all processors.
-  Number value;
+  Number value = 0;
   unsigned int root_id=0;
   if(values.size() != 0)
   {
