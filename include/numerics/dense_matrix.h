@@ -98,6 +98,22 @@ public:
   virtual T & el(const unsigned int i,
 		 const unsigned int j)     { return (*this)(i,j); }
 
+    
+    /**
+     *   Copies the elements of the column \p col to vector \p v
+     */
+    void get_column (const unsigned int col, DenseVector<T>& v);
+    
+    /**
+     *   Copies the elements of the vector \p v to column \p col
+     */
+    void set_column (const unsigned int col, const DenseVector<T>& v);
+
+    /**
+     *   Adds the vector \par v times \par f to the column \p col of this matrix
+     */
+    void add_column (const unsigned int col, T f, const DenseVector<T>& v);
+
   /**
    * Left multipliess by the matrix \p M2.
    */
@@ -470,7 +486,17 @@ private:
                    DenseMatrix<T>& U,
                    DenseMatrix<T>& VT);
 
-  /**
+    /**
+     * Computes the eigenvalues and right eigenvectors of the matrix using LAPACK.
+     * This assumes that the matrix is non-Hermitian, so the eigensystem 
+     * can be complex.
+     * Lapack routine "dgeev".
+     * [ Implementation in dense_matrix_blas_lapack.C ]
+     */
+  void _nonhermitian_eig_lapack(DenseVector<T>& dreal, DenseVector<T>& dimag,
+                                DenseMatrix<T>& vreal, DenseMatrix<T>& vimag);
+    
+    /**
    * Helper function that actually performs the SVD.
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
@@ -717,6 +743,35 @@ void DenseMatrix<T>::scale_column (const unsigned int col, const T factor)
         (*this)(i, col) *= factor;
 }
 
+    
+    
+template<typename T>
+inline
+void DenseMatrix<T>::get_column (const unsigned int col, DenseVector<T>& v)
+{
+    libmesh_assert_equal_to (this->m(), v.size());
+    for (unsigned int i=0; i<this->m(); i++)
+        v(i) = (*this)(i, col);
+}
+
+template<typename T>
+inline
+void DenseMatrix<T>::set_column (const unsigned int col, const DenseVector<T>& v)
+{
+    libmesh_assert_equal_to (this->m(), v.size());
+    for (unsigned int i=0; i<this->m(); i++)
+        (*this)(i, col) = v(i);
+}
+
+    
+template<typename T>
+inline
+void DenseMatrix<T>::add_column (const unsigned int col, T f, const DenseVector<T>& v)
+{
+    libmesh_assert_equal_to (this->m(), v.size());
+    for (unsigned int i=0; i<this->m(); i++)
+        (*this)(i, col) += v(i)*f;
+}
 
 
 template<typename T>
