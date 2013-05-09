@@ -1,10 +1,3 @@
-# generally we do not install contributed headers, but Moose and
-# some client apps expect exodusII.h to be there when libMesh
-# is present. since we've implicitly guaranteed this for ~10 years
-# no need to break that trust now.
-includedir      = $(prefix)/include/libmesh
-include_HEADERS =
-
 # the -Dqh_QHpointer is required for linking the C++ API
 pkg_cppflags = -I$(srcdir)/src -Dqh_QHpointer
 
