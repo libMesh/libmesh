@@ -171,6 +171,8 @@ user_eg3_CPPFLAGS = -I$(srcdir)/src \
                     -Dqh_QHpointer
 user_eg3_LDADD    = libqhullcpp.a libqhull_p.a
 
+# All these targets were pulled straight
+# from the upstream Makefile
 check-local:
 	@echo ==============================
 	@echo == Test qset.c with mem.c ====

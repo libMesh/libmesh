@@ -4862,6 +4862,8 @@ uninstall-am: uninstall-includeHEADERS
 # mode: makefile
 # End:
 
+# All these targets were pulled straight
+# from the upstream Makefile
 check-local:
 	@echo ==============================
 	@echo == Test qset.c with mem.c ====
