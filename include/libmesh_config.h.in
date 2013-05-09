@@ -316,6 +316,9 @@
 /* Have PTHREAD_PRIO_INHERIT. */
 #undef HAVE_PTHREAD_PRIO_INHERIT
 
+/* Flag indicating whether the library will be compiled with Qhull support */
+#undef HAVE_QHULL_API
+
 /* Define to 1 if you have the <rpc/rpc.h> header file. */
 #undef HAVE_RPC_RPC_H
 
