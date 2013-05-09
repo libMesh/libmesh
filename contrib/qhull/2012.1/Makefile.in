@@ -156,7 +156,22 @@ am_libqhull_p_a_OBJECTS = $(am__objects_2)
 libqhull_p_a_OBJECTS = $(am_libqhull_p_a_OBJECTS)
 libqhullcpp_a_AR = $(AR) $(ARFLAGS)
 libqhullcpp_a_LIBADD =
-am__objects_3 = src/libqhullcpp/libqhullcpp_a-Coordinates.$(OBJEXT) \
+am__objects_3 = src/libqhull/libqhullcpp_a-geom.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-geom2.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-global.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-io.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-libqhull.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-mem.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-merge.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-poly.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-poly2.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-qset.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-random.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-rboxlib.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-stat.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-user.$(OBJEXT) \
+	src/libqhull/libqhullcpp_a-usermem.$(OBJEXT) \
+	src/libqhullcpp/libqhullcpp_a-Coordinates.$(OBJEXT) \
 	src/libqhullcpp/libqhullcpp_a-PointCoordinates.$(OBJEXT) \
 	src/libqhullcpp/libqhullcpp_a-Qhull.$(OBJEXT) \
 	src/libqhullcpp/libqhullcpp_a-QhullFacet.$(OBJEXT) \
@@ -190,8 +205,7 @@ am__libdbg_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhull/merge.c src/libqhull/poly.c src/libqhull/poly2.c \
 	src/libqhull/qset.c src/libqhull/random.c \
 	src/libqhull/rboxlib.c src/libqhull/stat.c src/libqhull/user.c \
-	src/libqhull/usermem.c src/libqhull/userprintf.c \
-	src/libqhull/userprintf_rbox.c src/libqhullcpp/Coordinates.h \
+	src/libqhull/usermem.c src/libqhullcpp/Coordinates.h \
 	src/libqhullcpp/functionObjects.h \
 	src/libqhullcpp/PointCoordinates.h src/libqhullcpp/Qhull.h \
 	src/libqhullcpp/QhullError.h src/libqhullcpp/QhullFacet.h \
@@ -232,9 +246,7 @@ am__objects_4 = src/libqhull/libdbg_la-geom.lo \
 	src/libqhull/libdbg_la-rboxlib.lo \
 	src/libqhull/libdbg_la-stat.lo src/libqhull/libdbg_la-user.lo \
 	src/libqhull/libdbg_la-usermem.lo \
-	src/libqhull/libdbg_la-userprintf.lo \
-	src/libqhull/libdbg_la-userprintf_rbox.lo
-am__objects_5 = src/libqhullcpp/libdbg_la-Coordinates.lo \
+	src/libqhullcpp/libdbg_la-Coordinates.lo \
 	src/libqhullcpp/libdbg_la-PointCoordinates.lo \
 	src/libqhullcpp/libdbg_la-Qhull.lo \
 	src/libqhullcpp/libdbg_la-QhullFacet.lo \
@@ -254,8 +266,8 @@ am__objects_5 = src/libqhullcpp/libdbg_la-Coordinates.lo \
 	src/libqhullcpp/libdbg_la-RoadError.lo \
 	src/libqhullcpp/libdbg_la-RoadLogEvent.lo \
 	src/libqhullcpp/libdbg_la-UsingLibQhull.lo
-am__objects_6 = $(am__objects_4) $(am__objects_5)
-@LIBMESH_DBG_MODE_TRUE@am_libdbg_la_OBJECTS = $(am__objects_6)
+am__objects_5 = $(am__objects_4)
+@LIBMESH_DBG_MODE_TRUE@am_libdbg_la_OBJECTS = $(am__objects_5)
 libdbg_la_OBJECTS = $(am_libdbg_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -276,8 +288,7 @@ am__libdevel_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhull/merge.c src/libqhull/poly.c src/libqhull/poly2.c \
 	src/libqhull/qset.c src/libqhull/random.c \
 	src/libqhull/rboxlib.c src/libqhull/stat.c src/libqhull/user.c \
-	src/libqhull/usermem.c src/libqhull/userprintf.c \
-	src/libqhull/userprintf_rbox.c src/libqhullcpp/Coordinates.h \
+	src/libqhull/usermem.c src/libqhullcpp/Coordinates.h \
 	src/libqhullcpp/functionObjects.h \
 	src/libqhullcpp/PointCoordinates.h src/libqhullcpp/Qhull.h \
 	src/libqhullcpp/QhullError.h src/libqhullcpp/QhullFacet.h \
@@ -307,7 +318,7 @@ am__libdevel_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhullcpp/RboxPoints.cpp src/libqhullcpp/RoadError.cpp \
 	src/libqhullcpp/RoadLogEvent.cpp \
 	src/libqhullcpp/UsingLibQhull.cpp
-am__objects_7 = src/libqhull/libdevel_la-geom.lo \
+am__objects_6 = src/libqhull/libdevel_la-geom.lo \
 	src/libqhull/libdevel_la-geom2.lo \
 	src/libqhull/libdevel_la-global.lo \
 	src/libqhull/libdevel_la-io.lo \
@@ -322,9 +333,7 @@ am__objects_7 = src/libqhull/libdevel_la-geom.lo \
 	src/libqhull/libdevel_la-stat.lo \
 	src/libqhull/libdevel_la-user.lo \
 	src/libqhull/libdevel_la-usermem.lo \
-	src/libqhull/libdevel_la-userprintf.lo \
-	src/libqhull/libdevel_la-userprintf_rbox.lo
-am__objects_8 = src/libqhullcpp/libdevel_la-Coordinates.lo \
+	src/libqhullcpp/libdevel_la-Coordinates.lo \
 	src/libqhullcpp/libdevel_la-PointCoordinates.lo \
 	src/libqhullcpp/libdevel_la-Qhull.lo \
 	src/libqhullcpp/libdevel_la-QhullFacet.lo \
@@ -344,8 +353,8 @@ am__objects_8 = src/libqhullcpp/libdevel_la-Coordinates.lo \
 	src/libqhullcpp/libdevel_la-RoadError.lo \
 	src/libqhullcpp/libdevel_la-RoadLogEvent.lo \
 	src/libqhullcpp/libdevel_la-UsingLibQhull.lo
-am__objects_9 = $(am__objects_7) $(am__objects_8)
-@LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_OBJECTS = $(am__objects_9)
+am__objects_7 = $(am__objects_6)
+@LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_OBJECTS = $(am__objects_7)
 libdevel_la_OBJECTS = $(am_libdevel_la_OBJECTS)
 libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libdevel_la_CXXFLAGS) \
@@ -362,8 +371,7 @@ am__liboprof_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhull/merge.c src/libqhull/poly.c src/libqhull/poly2.c \
 	src/libqhull/qset.c src/libqhull/random.c \
 	src/libqhull/rboxlib.c src/libqhull/stat.c src/libqhull/user.c \
-	src/libqhull/usermem.c src/libqhull/userprintf.c \
-	src/libqhull/userprintf_rbox.c src/libqhullcpp/Coordinates.h \
+	src/libqhull/usermem.c src/libqhullcpp/Coordinates.h \
 	src/libqhullcpp/functionObjects.h \
 	src/libqhullcpp/PointCoordinates.h src/libqhullcpp/Qhull.h \
 	src/libqhullcpp/QhullError.h src/libqhullcpp/QhullFacet.h \
@@ -393,7 +401,7 @@ am__liboprof_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhullcpp/RboxPoints.cpp src/libqhullcpp/RoadError.cpp \
 	src/libqhullcpp/RoadLogEvent.cpp \
 	src/libqhullcpp/UsingLibQhull.cpp
-am__objects_10 = src/libqhull/liboprof_la-geom.lo \
+am__objects_8 = src/libqhull/liboprof_la-geom.lo \
 	src/libqhull/liboprof_la-geom2.lo \
 	src/libqhull/liboprof_la-global.lo \
 	src/libqhull/liboprof_la-io.lo \
@@ -408,9 +416,7 @@ am__objects_10 = src/libqhull/liboprof_la-geom.lo \
 	src/libqhull/liboprof_la-stat.lo \
 	src/libqhull/liboprof_la-user.lo \
 	src/libqhull/liboprof_la-usermem.lo \
-	src/libqhull/liboprof_la-userprintf.lo \
-	src/libqhull/liboprof_la-userprintf_rbox.lo
-am__objects_11 = src/libqhullcpp/liboprof_la-Coordinates.lo \
+	src/libqhullcpp/liboprof_la-Coordinates.lo \
 	src/libqhullcpp/liboprof_la-PointCoordinates.lo \
 	src/libqhullcpp/liboprof_la-Qhull.lo \
 	src/libqhullcpp/liboprof_la-QhullFacet.lo \
@@ -430,8 +436,8 @@ am__objects_11 = src/libqhullcpp/liboprof_la-Coordinates.lo \
 	src/libqhullcpp/liboprof_la-RoadError.lo \
 	src/libqhullcpp/liboprof_la-RoadLogEvent.lo \
 	src/libqhullcpp/liboprof_la-UsingLibQhull.lo
-am__objects_12 = $(am__objects_10) $(am__objects_11)
-@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_OBJECTS = $(am__objects_12)
+am__objects_9 = $(am__objects_8)
+@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_OBJECTS = $(am__objects_9)
 liboprof_la_OBJECTS = $(am_liboprof_la_OBJECTS)
 liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(liboprof_la_CXXFLAGS) \
@@ -448,8 +454,7 @@ am__libopt_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhull/merge.c src/libqhull/poly.c src/libqhull/poly2.c \
 	src/libqhull/qset.c src/libqhull/random.c \
 	src/libqhull/rboxlib.c src/libqhull/stat.c src/libqhull/user.c \
-	src/libqhull/usermem.c src/libqhull/userprintf.c \
-	src/libqhull/userprintf_rbox.c src/libqhullcpp/Coordinates.h \
+	src/libqhull/usermem.c src/libqhullcpp/Coordinates.h \
 	src/libqhullcpp/functionObjects.h \
 	src/libqhullcpp/PointCoordinates.h src/libqhullcpp/Qhull.h \
 	src/libqhullcpp/QhullError.h src/libqhullcpp/QhullFacet.h \
@@ -479,7 +484,7 @@ am__libopt_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhullcpp/RboxPoints.cpp src/libqhullcpp/RoadError.cpp \
 	src/libqhullcpp/RoadLogEvent.cpp \
 	src/libqhullcpp/UsingLibQhull.cpp
-am__objects_13 = src/libqhull/libopt_la-geom.lo \
+am__objects_10 = src/libqhull/libopt_la-geom.lo \
 	src/libqhull/libopt_la-geom2.lo \
 	src/libqhull/libopt_la-global.lo src/libqhull/libopt_la-io.lo \
 	src/libqhull/libopt_la-libqhull.lo \
@@ -490,9 +495,7 @@ am__objects_13 = src/libqhull/libopt_la-geom.lo \
 	src/libqhull/libopt_la-rboxlib.lo \
 	src/libqhull/libopt_la-stat.lo src/libqhull/libopt_la-user.lo \
 	src/libqhull/libopt_la-usermem.lo \
-	src/libqhull/libopt_la-userprintf.lo \
-	src/libqhull/libopt_la-userprintf_rbox.lo
-am__objects_14 = src/libqhullcpp/libopt_la-Coordinates.lo \
+	src/libqhullcpp/libopt_la-Coordinates.lo \
 	src/libqhullcpp/libopt_la-PointCoordinates.lo \
 	src/libqhullcpp/libopt_la-Qhull.lo \
 	src/libqhullcpp/libopt_la-QhullFacet.lo \
@@ -512,8 +515,8 @@ am__objects_14 = src/libqhullcpp/libopt_la-Coordinates.lo \
 	src/libqhullcpp/libopt_la-RoadError.lo \
 	src/libqhullcpp/libopt_la-RoadLogEvent.lo \
 	src/libqhullcpp/libopt_la-UsingLibQhull.lo
-am__objects_15 = $(am__objects_13) $(am__objects_14)
-@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_15)
+am__objects_11 = $(am__objects_10)
+@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_11)
 libopt_la_OBJECTS = $(am_libopt_la_OBJECTS)
 libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libopt_la_CXXFLAGS) \
@@ -530,8 +533,7 @@ am__libprof_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhull/merge.c src/libqhull/poly.c src/libqhull/poly2.c \
 	src/libqhull/qset.c src/libqhull/random.c \
 	src/libqhull/rboxlib.c src/libqhull/stat.c src/libqhull/user.c \
-	src/libqhull/usermem.c src/libqhull/userprintf.c \
-	src/libqhull/userprintf_rbox.c src/libqhullcpp/Coordinates.h \
+	src/libqhull/usermem.c src/libqhullcpp/Coordinates.h \
 	src/libqhullcpp/functionObjects.h \
 	src/libqhullcpp/PointCoordinates.h src/libqhullcpp/Qhull.h \
 	src/libqhullcpp/QhullError.h src/libqhullcpp/QhullFacet.h \
@@ -561,7 +563,7 @@ am__libprof_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhullcpp/RboxPoints.cpp src/libqhullcpp/RoadError.cpp \
 	src/libqhullcpp/RoadLogEvent.cpp \
 	src/libqhullcpp/UsingLibQhull.cpp
-am__objects_16 = src/libqhull/libprof_la-geom.lo \
+am__objects_12 = src/libqhull/libprof_la-geom.lo \
 	src/libqhull/libprof_la-geom2.lo \
 	src/libqhull/libprof_la-global.lo \
 	src/libqhull/libprof_la-io.lo \
@@ -576,9 +578,7 @@ am__objects_16 = src/libqhull/libprof_la-geom.lo \
 	src/libqhull/libprof_la-stat.lo \
 	src/libqhull/libprof_la-user.lo \
 	src/libqhull/libprof_la-usermem.lo \
-	src/libqhull/libprof_la-userprintf.lo \
-	src/libqhull/libprof_la-userprintf_rbox.lo
-am__objects_17 = src/libqhullcpp/libprof_la-Coordinates.lo \
+	src/libqhullcpp/libprof_la-Coordinates.lo \
 	src/libqhullcpp/libprof_la-PointCoordinates.lo \
 	src/libqhullcpp/libprof_la-Qhull.lo \
 	src/libqhullcpp/libprof_la-QhullFacet.lo \
@@ -598,8 +598,8 @@ am__objects_17 = src/libqhullcpp/libprof_la-Coordinates.lo \
 	src/libqhullcpp/libprof_la-RoadError.lo \
 	src/libqhullcpp/libprof_la-RoadLogEvent.lo \
 	src/libqhullcpp/libprof_la-UsingLibQhull.lo
-am__objects_18 = $(am__objects_16) $(am__objects_17)
-@LIBMESH_PROF_MODE_TRUE@am_libprof_la_OBJECTS = $(am__objects_18)
+am__objects_13 = $(am__objects_12)
+@LIBMESH_PROF_MODE_TRUE@am_libprof_la_OBJECTS = $(am__objects_13)
 libprof_la_OBJECTS = $(am_libprof_la_OBJECTS)
 libprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libprof_la_CXXFLAGS) \
@@ -1031,6 +1031,32 @@ libqhull_sources = \
 
 # libqhull c++ sources
 libqhullcpp_sources = \
+     src/libqhull/geom.h \
+     src/libqhull/io.h \
+     src/libqhull/libqhull.h \
+     src/libqhull/mem.h \
+     src/libqhull/merge.h \
+     src/libqhull/poly.h \
+     src/libqhull/qhull_a.h \
+     src/libqhull/qset.h \
+     src/libqhull/random.h \
+     src/libqhull/stat.h \
+     src/libqhull/user.h \
+     src/libqhull/geom.c \
+     src/libqhull/geom2.c \
+     src/libqhull/global.c \
+     src/libqhull/io.c \
+     src/libqhull/libqhull.c \
+     src/libqhull/mem.c \
+     src/libqhull/merge.c \
+     src/libqhull/poly.c \
+     src/libqhull/poly2.c \
+     src/libqhull/qset.c \
+     src/libqhull/random.c \
+     src/libqhull/rboxlib.c \
+     src/libqhull/stat.c \
+     src/libqhull/user.c \
+     src/libqhull/usermem.c \
      src/libqhullcpp/Coordinates.h \
      src/libqhullcpp/functionObjects.h \
      src/libqhullcpp/PointCoordinates.h \
@@ -1077,7 +1103,7 @@ libqhullcpp_sources = \
      src/libqhullcpp/RoadLogEvent.cpp \
      src/libqhullcpp/UsingLibQhull.cpp
 
-pkg_sources = $(libqhull_sources) $(libqhullcpp_sources)
+pkg_sources = $(libqhullcpp_sources)
 
 ######################################################################
 #
@@ -1317,6 +1343,50 @@ libqhull_p.a: $(libqhull_p_a_OBJECTS) $(libqhull_p_a_DEPENDENCIES) $(EXTRA_libqh
 	$(AM_V_at)-rm -f libqhull_p.a
 	$(AM_V_AR)$(libqhull_p_a_AR) libqhull_p.a $(libqhull_p_a_OBJECTS) $(libqhull_p_a_LIBADD)
 	$(AM_V_at)$(RANLIB) libqhull_p.a
+src/libqhull/libqhullcpp_a-geom.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-geom2.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-global.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-io.$(OBJEXT): src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-libqhull.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-mem.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-merge.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-poly.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-poly2.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-qset.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-random.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-rboxlib.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-stat.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-user.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
+src/libqhull/libqhullcpp_a-usermem.$(OBJEXT):  \
+	src/libqhull/$(am__dirstamp) \
+	src/libqhull/$(DEPDIR)/$(am__dirstamp)
 src/libqhullcpp/$(am__dirstamp):
 	@$(MKDIR_P) src/libqhullcpp
 	@: > src/libqhullcpp/$(am__dirstamp)
@@ -1428,11 +1498,6 @@ src/libqhull/libdbg_la-user.lo: src/libqhull/$(am__dirstamp) \
 	src/libqhull/$(DEPDIR)/$(am__dirstamp)
 src/libqhull/libdbg_la-usermem.lo: src/libqhull/$(am__dirstamp) \
 	src/libqhull/$(DEPDIR)/$(am__dirstamp)
-src/libqhull/libdbg_la-userprintf.lo: src/libqhull/$(am__dirstamp) \
-	src/libqhull/$(DEPDIR)/$(am__dirstamp)
-src/libqhull/libdbg_la-userprintf_rbox.lo:  \
-	src/libqhull/$(am__dirstamp) \
-	src/libqhull/$(DEPDIR)/$(am__dirstamp)
 src/libqhullcpp/libdbg_la-Coordinates.lo:  \
 	src/libqhullcpp/$(am__dirstamp) \
 	src/libqhullcpp/$(DEPDIR)/$(am__dirstamp)
@@ -1522,11 +1587,6 @@ src/libqhull/libdevel_la-stat.lo: src/libqhull/$(am__dirstamp) \
 src/libqhull/libdevel_la-user.lo: src/libqhull/$(am__dirstamp) \
 	src/libqhull/$(DEPDIR)/$(am__dirstamp)
 src/libqhull/libdevel_la-usermem.lo: src/libqhull/$(am__dirstamp) \
-	src/libqhull/$(DEPDIR)/$(am__dirstamp)
-src/libqhull/libdevel_la-userprintf.lo: src/libqhull/$(am__dirstamp) \
-	src/libqhull/$(DEPDIR)/$(am__dirstamp)
-src/libqhull/libdevel_la-userprintf_rbox.lo:  \
-	src/libqhull/$(am__dirstamp) \
 	src/libqhull/$(DEPDIR)/$(am__dirstamp)
 src/libqhullcpp/libdevel_la-Coordinates.lo:  \
 	src/libqhullcpp/$(am__dirstamp) \
@@ -1619,11 +1679,6 @@ src/libqhull/liboprof_la-user.lo: src/libqhull/$(am__dirstamp) \
 	src/libqhull/$(DEPDIR)/$(am__dirstamp)
 src/libqhull/liboprof_la-usermem.lo: src/libqhull/$(am__dirstamp) \
 	src/libqhull/$(DEPDIR)/$(am__dirstamp)
-src/libqhull/liboprof_la-userprintf.lo: src/libqhull/$(am__dirstamp) \
-	src/libqhull/$(DEPDIR)/$(am__dirstamp)
-src/libqhull/liboprof_la-userprintf_rbox.lo:  \
-	src/libqhull/$(am__dirstamp) \
-	src/libqhull/$(DEPDIR)/$(am__dirstamp)
 src/libqhullcpp/liboprof_la-Coordinates.lo:  \
 	src/libqhullcpp/$(am__dirstamp) \
 	src/libqhullcpp/$(DEPDIR)/$(am__dirstamp)
@@ -1715,11 +1770,6 @@ src/libqhull/libopt_la-user.lo: src/libqhull/$(am__dirstamp) \
 	src/libqhull/$(DEPDIR)/$(am__dirstamp)
 src/libqhull/libopt_la-usermem.lo: src/libqhull/$(am__dirstamp) \
 	src/libqhull/$(DEPDIR)/$(am__dirstamp)
-src/libqhull/libopt_la-userprintf.lo: src/libqhull/$(am__dirstamp) \
-	src/libqhull/$(DEPDIR)/$(am__dirstamp)
-src/libqhull/libopt_la-userprintf_rbox.lo:  \
-	src/libqhull/$(am__dirstamp) \
-	src/libqhull/$(DEPDIR)/$(am__dirstamp)
 src/libqhullcpp/libopt_la-Coordinates.lo:  \
 	src/libqhullcpp/$(am__dirstamp) \
 	src/libqhullcpp/$(DEPDIR)/$(am__dirstamp)
@@ -1809,11 +1859,6 @@ src/libqhull/libprof_la-stat.lo: src/libqhull/$(am__dirstamp) \
 src/libqhull/libprof_la-user.lo: src/libqhull/$(am__dirstamp) \
 	src/libqhull/$(DEPDIR)/$(am__dirstamp)
 src/libqhull/libprof_la-usermem.lo: src/libqhull/$(am__dirstamp) \
-	src/libqhull/$(DEPDIR)/$(am__dirstamp)
-src/libqhull/libprof_la-userprintf.lo: src/libqhull/$(am__dirstamp) \
-	src/libqhull/$(DEPDIR)/$(am__dirstamp)
-src/libqhull/libprof_la-userprintf_rbox.lo:  \
-	src/libqhull/$(am__dirstamp) \
 	src/libqhull/$(DEPDIR)/$(am__dirstamp)
 src/libqhullcpp/libprof_la-Coordinates.lo:  \
 	src/libqhullcpp/$(am__dirstamp) \
@@ -2040,8 +2085,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdbg_la-stat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdbg_la-user.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdbg_la-usermem.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdbg_la-userprintf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdbg_la-userprintf_rbox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdevel_la-geom.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdevel_la-geom2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdevel_la-global.Plo@am__quote@
@@ -2057,8 +2100,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdevel_la-stat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdevel_la-user.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdevel_la-usermem.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdevel_la-userprintf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libdevel_la-userprintf_rbox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/liboprof_la-geom.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/liboprof_la-geom2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/liboprof_la-global.Plo@am__quote@
@@ -2074,8 +2115,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/liboprof_la-stat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/liboprof_la-user.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/liboprof_la-usermem.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/liboprof_la-userprintf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/liboprof_la-userprintf_rbox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libopt_la-geom.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libopt_la-geom2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libopt_la-global.Plo@am__quote@
@@ -2091,8 +2130,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libopt_la-stat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libopt_la-user.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libopt_la-usermem.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libopt_la-userprintf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libopt_la-userprintf_rbox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libprof_la-geom.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libprof_la-geom2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libprof_la-global.Plo@am__quote@
@@ -2108,8 +2145,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libprof_la-stat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libprof_la-user.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libprof_la-usermem.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libprof_la-userprintf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libprof_la-userprintf_rbox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhull_a-geom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhull_a-geom2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhull_a-global.Po@am__quote@
@@ -2144,6 +2179,21 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhull_p_a-usermem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhull_p_a-userprintf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhull_p_a-userprintf_rbox.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-geom.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-geom2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-global.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-io.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-libqhull.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-mem.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-merge.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-poly.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-poly2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-qset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-random.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-rboxlib.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-stat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-user.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/libqhullcpp_a-usermem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/testqset-mem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhull/$(DEPDIR)/testqset-qset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/libqhullcpp/$(DEPDIR)/libdbg_la-Coordinates.Plo@am__quote@
@@ -2777,6 +2827,216 @@ src/libqhull/libqhull_p_a-userprintf_rbox.obj: src/libqhull/userprintf_rbox.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhull_p_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhull_p_a-userprintf_rbox.obj `if test -f 'src/libqhull/userprintf_rbox.c'; then $(CYGPATH_W) 'src/libqhull/userprintf_rbox.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/userprintf_rbox.c'; fi`
 
+src/libqhull/libqhullcpp_a-geom.o: src/libqhull/geom.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-geom.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-geom.Tpo -c -o src/libqhull/libqhullcpp_a-geom.o `test -f 'src/libqhull/geom.c' || echo '$(srcdir)/'`src/libqhull/geom.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-geom.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-geom.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/geom.c' object='src/libqhull/libqhullcpp_a-geom.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-geom.o `test -f 'src/libqhull/geom.c' || echo '$(srcdir)/'`src/libqhull/geom.c
+
+src/libqhull/libqhullcpp_a-geom.obj: src/libqhull/geom.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-geom.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-geom.Tpo -c -o src/libqhull/libqhullcpp_a-geom.obj `if test -f 'src/libqhull/geom.c'; then $(CYGPATH_W) 'src/libqhull/geom.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/geom.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-geom.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-geom.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/geom.c' object='src/libqhull/libqhullcpp_a-geom.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-geom.obj `if test -f 'src/libqhull/geom.c'; then $(CYGPATH_W) 'src/libqhull/geom.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/geom.c'; fi`
+
+src/libqhull/libqhullcpp_a-geom2.o: src/libqhull/geom2.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-geom2.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-geom2.Tpo -c -o src/libqhull/libqhullcpp_a-geom2.o `test -f 'src/libqhull/geom2.c' || echo '$(srcdir)/'`src/libqhull/geom2.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-geom2.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-geom2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/geom2.c' object='src/libqhull/libqhullcpp_a-geom2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-geom2.o `test -f 'src/libqhull/geom2.c' || echo '$(srcdir)/'`src/libqhull/geom2.c
+
+src/libqhull/libqhullcpp_a-geom2.obj: src/libqhull/geom2.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-geom2.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-geom2.Tpo -c -o src/libqhull/libqhullcpp_a-geom2.obj `if test -f 'src/libqhull/geom2.c'; then $(CYGPATH_W) 'src/libqhull/geom2.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/geom2.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-geom2.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-geom2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/geom2.c' object='src/libqhull/libqhullcpp_a-geom2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-geom2.obj `if test -f 'src/libqhull/geom2.c'; then $(CYGPATH_W) 'src/libqhull/geom2.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/geom2.c'; fi`
+
+src/libqhull/libqhullcpp_a-global.o: src/libqhull/global.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-global.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-global.Tpo -c -o src/libqhull/libqhullcpp_a-global.o `test -f 'src/libqhull/global.c' || echo '$(srcdir)/'`src/libqhull/global.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-global.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-global.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/global.c' object='src/libqhull/libqhullcpp_a-global.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-global.o `test -f 'src/libqhull/global.c' || echo '$(srcdir)/'`src/libqhull/global.c
+
+src/libqhull/libqhullcpp_a-global.obj: src/libqhull/global.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-global.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-global.Tpo -c -o src/libqhull/libqhullcpp_a-global.obj `if test -f 'src/libqhull/global.c'; then $(CYGPATH_W) 'src/libqhull/global.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/global.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-global.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-global.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/global.c' object='src/libqhull/libqhullcpp_a-global.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-global.obj `if test -f 'src/libqhull/global.c'; then $(CYGPATH_W) 'src/libqhull/global.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/global.c'; fi`
+
+src/libqhull/libqhullcpp_a-io.o: src/libqhull/io.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-io.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-io.Tpo -c -o src/libqhull/libqhullcpp_a-io.o `test -f 'src/libqhull/io.c' || echo '$(srcdir)/'`src/libqhull/io.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-io.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-io.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/io.c' object='src/libqhull/libqhullcpp_a-io.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-io.o `test -f 'src/libqhull/io.c' || echo '$(srcdir)/'`src/libqhull/io.c
+
+src/libqhull/libqhullcpp_a-io.obj: src/libqhull/io.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-io.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-io.Tpo -c -o src/libqhull/libqhullcpp_a-io.obj `if test -f 'src/libqhull/io.c'; then $(CYGPATH_W) 'src/libqhull/io.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/io.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-io.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-io.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/io.c' object='src/libqhull/libqhullcpp_a-io.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-io.obj `if test -f 'src/libqhull/io.c'; then $(CYGPATH_W) 'src/libqhull/io.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/io.c'; fi`
+
+src/libqhull/libqhullcpp_a-libqhull.o: src/libqhull/libqhull.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-libqhull.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-libqhull.Tpo -c -o src/libqhull/libqhullcpp_a-libqhull.o `test -f 'src/libqhull/libqhull.c' || echo '$(srcdir)/'`src/libqhull/libqhull.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-libqhull.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-libqhull.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/libqhull.c' object='src/libqhull/libqhullcpp_a-libqhull.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-libqhull.o `test -f 'src/libqhull/libqhull.c' || echo '$(srcdir)/'`src/libqhull/libqhull.c
+
+src/libqhull/libqhullcpp_a-libqhull.obj: src/libqhull/libqhull.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-libqhull.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-libqhull.Tpo -c -o src/libqhull/libqhullcpp_a-libqhull.obj `if test -f 'src/libqhull/libqhull.c'; then $(CYGPATH_W) 'src/libqhull/libqhull.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/libqhull.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-libqhull.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-libqhull.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/libqhull.c' object='src/libqhull/libqhullcpp_a-libqhull.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-libqhull.obj `if test -f 'src/libqhull/libqhull.c'; then $(CYGPATH_W) 'src/libqhull/libqhull.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/libqhull.c'; fi`
+
+src/libqhull/libqhullcpp_a-mem.o: src/libqhull/mem.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-mem.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-mem.Tpo -c -o src/libqhull/libqhullcpp_a-mem.o `test -f 'src/libqhull/mem.c' || echo '$(srcdir)/'`src/libqhull/mem.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-mem.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-mem.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/mem.c' object='src/libqhull/libqhullcpp_a-mem.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-mem.o `test -f 'src/libqhull/mem.c' || echo '$(srcdir)/'`src/libqhull/mem.c
+
+src/libqhull/libqhullcpp_a-mem.obj: src/libqhull/mem.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-mem.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-mem.Tpo -c -o src/libqhull/libqhullcpp_a-mem.obj `if test -f 'src/libqhull/mem.c'; then $(CYGPATH_W) 'src/libqhull/mem.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/mem.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-mem.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-mem.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/mem.c' object='src/libqhull/libqhullcpp_a-mem.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-mem.obj `if test -f 'src/libqhull/mem.c'; then $(CYGPATH_W) 'src/libqhull/mem.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/mem.c'; fi`
+
+src/libqhull/libqhullcpp_a-merge.o: src/libqhull/merge.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-merge.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-merge.Tpo -c -o src/libqhull/libqhullcpp_a-merge.o `test -f 'src/libqhull/merge.c' || echo '$(srcdir)/'`src/libqhull/merge.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-merge.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-merge.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/merge.c' object='src/libqhull/libqhullcpp_a-merge.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-merge.o `test -f 'src/libqhull/merge.c' || echo '$(srcdir)/'`src/libqhull/merge.c
+
+src/libqhull/libqhullcpp_a-merge.obj: src/libqhull/merge.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-merge.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-merge.Tpo -c -o src/libqhull/libqhullcpp_a-merge.obj `if test -f 'src/libqhull/merge.c'; then $(CYGPATH_W) 'src/libqhull/merge.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/merge.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-merge.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-merge.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/merge.c' object='src/libqhull/libqhullcpp_a-merge.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-merge.obj `if test -f 'src/libqhull/merge.c'; then $(CYGPATH_W) 'src/libqhull/merge.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/merge.c'; fi`
+
+src/libqhull/libqhullcpp_a-poly.o: src/libqhull/poly.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-poly.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-poly.Tpo -c -o src/libqhull/libqhullcpp_a-poly.o `test -f 'src/libqhull/poly.c' || echo '$(srcdir)/'`src/libqhull/poly.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-poly.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-poly.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/poly.c' object='src/libqhull/libqhullcpp_a-poly.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-poly.o `test -f 'src/libqhull/poly.c' || echo '$(srcdir)/'`src/libqhull/poly.c
+
+src/libqhull/libqhullcpp_a-poly.obj: src/libqhull/poly.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-poly.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-poly.Tpo -c -o src/libqhull/libqhullcpp_a-poly.obj `if test -f 'src/libqhull/poly.c'; then $(CYGPATH_W) 'src/libqhull/poly.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/poly.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-poly.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-poly.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/poly.c' object='src/libqhull/libqhullcpp_a-poly.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-poly.obj `if test -f 'src/libqhull/poly.c'; then $(CYGPATH_W) 'src/libqhull/poly.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/poly.c'; fi`
+
+src/libqhull/libqhullcpp_a-poly2.o: src/libqhull/poly2.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-poly2.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-poly2.Tpo -c -o src/libqhull/libqhullcpp_a-poly2.o `test -f 'src/libqhull/poly2.c' || echo '$(srcdir)/'`src/libqhull/poly2.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-poly2.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-poly2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/poly2.c' object='src/libqhull/libqhullcpp_a-poly2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-poly2.o `test -f 'src/libqhull/poly2.c' || echo '$(srcdir)/'`src/libqhull/poly2.c
+
+src/libqhull/libqhullcpp_a-poly2.obj: src/libqhull/poly2.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-poly2.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-poly2.Tpo -c -o src/libqhull/libqhullcpp_a-poly2.obj `if test -f 'src/libqhull/poly2.c'; then $(CYGPATH_W) 'src/libqhull/poly2.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/poly2.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-poly2.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-poly2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/poly2.c' object='src/libqhull/libqhullcpp_a-poly2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-poly2.obj `if test -f 'src/libqhull/poly2.c'; then $(CYGPATH_W) 'src/libqhull/poly2.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/poly2.c'; fi`
+
+src/libqhull/libqhullcpp_a-qset.o: src/libqhull/qset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-qset.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-qset.Tpo -c -o src/libqhull/libqhullcpp_a-qset.o `test -f 'src/libqhull/qset.c' || echo '$(srcdir)/'`src/libqhull/qset.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-qset.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-qset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/qset.c' object='src/libqhull/libqhullcpp_a-qset.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-qset.o `test -f 'src/libqhull/qset.c' || echo '$(srcdir)/'`src/libqhull/qset.c
+
+src/libqhull/libqhullcpp_a-qset.obj: src/libqhull/qset.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-qset.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-qset.Tpo -c -o src/libqhull/libqhullcpp_a-qset.obj `if test -f 'src/libqhull/qset.c'; then $(CYGPATH_W) 'src/libqhull/qset.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/qset.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-qset.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-qset.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/qset.c' object='src/libqhull/libqhullcpp_a-qset.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-qset.obj `if test -f 'src/libqhull/qset.c'; then $(CYGPATH_W) 'src/libqhull/qset.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/qset.c'; fi`
+
+src/libqhull/libqhullcpp_a-random.o: src/libqhull/random.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-random.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-random.Tpo -c -o src/libqhull/libqhullcpp_a-random.o `test -f 'src/libqhull/random.c' || echo '$(srcdir)/'`src/libqhull/random.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-random.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-random.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/random.c' object='src/libqhull/libqhullcpp_a-random.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-random.o `test -f 'src/libqhull/random.c' || echo '$(srcdir)/'`src/libqhull/random.c
+
+src/libqhull/libqhullcpp_a-random.obj: src/libqhull/random.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-random.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-random.Tpo -c -o src/libqhull/libqhullcpp_a-random.obj `if test -f 'src/libqhull/random.c'; then $(CYGPATH_W) 'src/libqhull/random.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/random.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-random.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-random.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/random.c' object='src/libqhull/libqhullcpp_a-random.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-random.obj `if test -f 'src/libqhull/random.c'; then $(CYGPATH_W) 'src/libqhull/random.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/random.c'; fi`
+
+src/libqhull/libqhullcpp_a-rboxlib.o: src/libqhull/rboxlib.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-rboxlib.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-rboxlib.Tpo -c -o src/libqhull/libqhullcpp_a-rboxlib.o `test -f 'src/libqhull/rboxlib.c' || echo '$(srcdir)/'`src/libqhull/rboxlib.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-rboxlib.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-rboxlib.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/rboxlib.c' object='src/libqhull/libqhullcpp_a-rboxlib.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-rboxlib.o `test -f 'src/libqhull/rboxlib.c' || echo '$(srcdir)/'`src/libqhull/rboxlib.c
+
+src/libqhull/libqhullcpp_a-rboxlib.obj: src/libqhull/rboxlib.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-rboxlib.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-rboxlib.Tpo -c -o src/libqhull/libqhullcpp_a-rboxlib.obj `if test -f 'src/libqhull/rboxlib.c'; then $(CYGPATH_W) 'src/libqhull/rboxlib.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/rboxlib.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-rboxlib.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-rboxlib.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/rboxlib.c' object='src/libqhull/libqhullcpp_a-rboxlib.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-rboxlib.obj `if test -f 'src/libqhull/rboxlib.c'; then $(CYGPATH_W) 'src/libqhull/rboxlib.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/rboxlib.c'; fi`
+
+src/libqhull/libqhullcpp_a-stat.o: src/libqhull/stat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-stat.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-stat.Tpo -c -o src/libqhull/libqhullcpp_a-stat.o `test -f 'src/libqhull/stat.c' || echo '$(srcdir)/'`src/libqhull/stat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-stat.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-stat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/stat.c' object='src/libqhull/libqhullcpp_a-stat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-stat.o `test -f 'src/libqhull/stat.c' || echo '$(srcdir)/'`src/libqhull/stat.c
+
+src/libqhull/libqhullcpp_a-stat.obj: src/libqhull/stat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-stat.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-stat.Tpo -c -o src/libqhull/libqhullcpp_a-stat.obj `if test -f 'src/libqhull/stat.c'; then $(CYGPATH_W) 'src/libqhull/stat.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/stat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-stat.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-stat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/stat.c' object='src/libqhull/libqhullcpp_a-stat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-stat.obj `if test -f 'src/libqhull/stat.c'; then $(CYGPATH_W) 'src/libqhull/stat.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/stat.c'; fi`
+
+src/libqhull/libqhullcpp_a-user.o: src/libqhull/user.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-user.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-user.Tpo -c -o src/libqhull/libqhullcpp_a-user.o `test -f 'src/libqhull/user.c' || echo '$(srcdir)/'`src/libqhull/user.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-user.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-user.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/user.c' object='src/libqhull/libqhullcpp_a-user.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-user.o `test -f 'src/libqhull/user.c' || echo '$(srcdir)/'`src/libqhull/user.c
+
+src/libqhull/libqhullcpp_a-user.obj: src/libqhull/user.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-user.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-user.Tpo -c -o src/libqhull/libqhullcpp_a-user.obj `if test -f 'src/libqhull/user.c'; then $(CYGPATH_W) 'src/libqhull/user.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/user.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-user.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-user.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/user.c' object='src/libqhull/libqhullcpp_a-user.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-user.obj `if test -f 'src/libqhull/user.c'; then $(CYGPATH_W) 'src/libqhull/user.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/user.c'; fi`
+
+src/libqhull/libqhullcpp_a-usermem.o: src/libqhull/usermem.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-usermem.o -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-usermem.Tpo -c -o src/libqhull/libqhullcpp_a-usermem.o `test -f 'src/libqhull/usermem.c' || echo '$(srcdir)/'`src/libqhull/usermem.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-usermem.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-usermem.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/usermem.c' object='src/libqhull/libqhullcpp_a-usermem.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-usermem.o `test -f 'src/libqhull/usermem.c' || echo '$(srcdir)/'`src/libqhull/usermem.c
+
+src/libqhull/libqhullcpp_a-usermem.obj: src/libqhull/usermem.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/libqhull/libqhullcpp_a-usermem.obj -MD -MP -MF src/libqhull/$(DEPDIR)/libqhullcpp_a-usermem.Tpo -c -o src/libqhull/libqhullcpp_a-usermem.obj `if test -f 'src/libqhull/usermem.c'; then $(CYGPATH_W) 'src/libqhull/usermem.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/usermem.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libqhullcpp_a-usermem.Tpo src/libqhull/$(DEPDIR)/libqhullcpp_a-usermem.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/usermem.c' object='src/libqhull/libqhullcpp_a-usermem.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libqhullcpp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/libqhull/libqhullcpp_a-usermem.obj `if test -f 'src/libqhull/usermem.c'; then $(CYGPATH_W) 'src/libqhull/usermem.c'; else $(CYGPATH_W) '$(srcdir)/src/libqhull/usermem.c'; fi`
+
 src/libqhull/libdbg_la-geom.lo: src/libqhull/geom.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT src/libqhull/libdbg_la-geom.lo -MD -MP -MF src/libqhull/$(DEPDIR)/libdbg_la-geom.Tpo -c -o src/libqhull/libdbg_la-geom.lo `test -f 'src/libqhull/geom.c' || echo '$(srcdir)/'`src/libqhull/geom.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libdbg_la-geom.Tpo src/libqhull/$(DEPDIR)/libdbg_la-geom.Plo
@@ -2881,20 +3141,6 @@ src/libqhull/libdbg_la-usermem.lo: src/libqhull/usermem.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/usermem.c' object='src/libqhull/libdbg_la-usermem.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/libdbg_la-usermem.lo `test -f 'src/libqhull/usermem.c' || echo '$(srcdir)/'`src/libqhull/usermem.c
-
-src/libqhull/libdbg_la-userprintf.lo: src/libqhull/userprintf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT src/libqhull/libdbg_la-userprintf.lo -MD -MP -MF src/libqhull/$(DEPDIR)/libdbg_la-userprintf.Tpo -c -o src/libqhull/libdbg_la-userprintf.lo `test -f 'src/libqhull/userprintf.c' || echo '$(srcdir)/'`src/libqhull/userprintf.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libdbg_la-userprintf.Tpo src/libqhull/$(DEPDIR)/libdbg_la-userprintf.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/userprintf.c' object='src/libqhull/libdbg_la-userprintf.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/libdbg_la-userprintf.lo `test -f 'src/libqhull/userprintf.c' || echo '$(srcdir)/'`src/libqhull/userprintf.c
-
-src/libqhull/libdbg_la-userprintf_rbox.lo: src/libqhull/userprintf_rbox.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -MT src/libqhull/libdbg_la-userprintf_rbox.lo -MD -MP -MF src/libqhull/$(DEPDIR)/libdbg_la-userprintf_rbox.Tpo -c -o src/libqhull/libdbg_la-userprintf_rbox.lo `test -f 'src/libqhull/userprintf_rbox.c' || echo '$(srcdir)/'`src/libqhull/userprintf_rbox.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libdbg_la-userprintf_rbox.Tpo src/libqhull/$(DEPDIR)/libdbg_la-userprintf_rbox.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/userprintf_rbox.c' object='src/libqhull/libdbg_la-userprintf_rbox.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/libdbg_la-userprintf_rbox.lo `test -f 'src/libqhull/userprintf_rbox.c' || echo '$(srcdir)/'`src/libqhull/userprintf_rbox.c
 
 src/libqhull/libdevel_la-geom.lo: src/libqhull/geom.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT src/libqhull/libdevel_la-geom.lo -MD -MP -MF src/libqhull/$(DEPDIR)/libdevel_la-geom.Tpo -c -o src/libqhull/libdevel_la-geom.lo `test -f 'src/libqhull/geom.c' || echo '$(srcdir)/'`src/libqhull/geom.c
@@ -3001,20 +3247,6 @@ src/libqhull/libdevel_la-usermem.lo: src/libqhull/usermem.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/libdevel_la-usermem.lo `test -f 'src/libqhull/usermem.c' || echo '$(srcdir)/'`src/libqhull/usermem.c
 
-src/libqhull/libdevel_la-userprintf.lo: src/libqhull/userprintf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT src/libqhull/libdevel_la-userprintf.lo -MD -MP -MF src/libqhull/$(DEPDIR)/libdevel_la-userprintf.Tpo -c -o src/libqhull/libdevel_la-userprintf.lo `test -f 'src/libqhull/userprintf.c' || echo '$(srcdir)/'`src/libqhull/userprintf.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libdevel_la-userprintf.Tpo src/libqhull/$(DEPDIR)/libdevel_la-userprintf.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/userprintf.c' object='src/libqhull/libdevel_la-userprintf.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/libdevel_la-userprintf.lo `test -f 'src/libqhull/userprintf.c' || echo '$(srcdir)/'`src/libqhull/userprintf.c
-
-src/libqhull/libdevel_la-userprintf_rbox.lo: src/libqhull/userprintf_rbox.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -MT src/libqhull/libdevel_la-userprintf_rbox.lo -MD -MP -MF src/libqhull/$(DEPDIR)/libdevel_la-userprintf_rbox.Tpo -c -o src/libqhull/libdevel_la-userprintf_rbox.lo `test -f 'src/libqhull/userprintf_rbox.c' || echo '$(srcdir)/'`src/libqhull/userprintf_rbox.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libdevel_la-userprintf_rbox.Tpo src/libqhull/$(DEPDIR)/libdevel_la-userprintf_rbox.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/userprintf_rbox.c' object='src/libqhull/libdevel_la-userprintf_rbox.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/libdevel_la-userprintf_rbox.lo `test -f 'src/libqhull/userprintf_rbox.c' || echo '$(srcdir)/'`src/libqhull/userprintf_rbox.c
-
 src/libqhull/liboprof_la-geom.lo: src/libqhull/geom.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT src/libqhull/liboprof_la-geom.lo -MD -MP -MF src/libqhull/$(DEPDIR)/liboprof_la-geom.Tpo -c -o src/libqhull/liboprof_la-geom.lo `test -f 'src/libqhull/geom.c' || echo '$(srcdir)/'`src/libqhull/geom.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/liboprof_la-geom.Tpo src/libqhull/$(DEPDIR)/liboprof_la-geom.Plo
@@ -3119,20 +3351,6 @@ src/libqhull/liboprof_la-usermem.lo: src/libqhull/usermem.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/usermem.c' object='src/libqhull/liboprof_la-usermem.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/liboprof_la-usermem.lo `test -f 'src/libqhull/usermem.c' || echo '$(srcdir)/'`src/libqhull/usermem.c
-
-src/libqhull/liboprof_la-userprintf.lo: src/libqhull/userprintf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT src/libqhull/liboprof_la-userprintf.lo -MD -MP -MF src/libqhull/$(DEPDIR)/liboprof_la-userprintf.Tpo -c -o src/libqhull/liboprof_la-userprintf.lo `test -f 'src/libqhull/userprintf.c' || echo '$(srcdir)/'`src/libqhull/userprintf.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/liboprof_la-userprintf.Tpo src/libqhull/$(DEPDIR)/liboprof_la-userprintf.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/userprintf.c' object='src/libqhull/liboprof_la-userprintf.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/liboprof_la-userprintf.lo `test -f 'src/libqhull/userprintf.c' || echo '$(srcdir)/'`src/libqhull/userprintf.c
-
-src/libqhull/liboprof_la-userprintf_rbox.lo: src/libqhull/userprintf_rbox.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT src/libqhull/liboprof_la-userprintf_rbox.lo -MD -MP -MF src/libqhull/$(DEPDIR)/liboprof_la-userprintf_rbox.Tpo -c -o src/libqhull/liboprof_la-userprintf_rbox.lo `test -f 'src/libqhull/userprintf_rbox.c' || echo '$(srcdir)/'`src/libqhull/userprintf_rbox.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/liboprof_la-userprintf_rbox.Tpo src/libqhull/$(DEPDIR)/liboprof_la-userprintf_rbox.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/userprintf_rbox.c' object='src/libqhull/liboprof_la-userprintf_rbox.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/liboprof_la-userprintf_rbox.lo `test -f 'src/libqhull/userprintf_rbox.c' || echo '$(srcdir)/'`src/libqhull/userprintf_rbox.c
 
 src/libqhull/libopt_la-geom.lo: src/libqhull/geom.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT src/libqhull/libopt_la-geom.lo -MD -MP -MF src/libqhull/$(DEPDIR)/libopt_la-geom.Tpo -c -o src/libqhull/libopt_la-geom.lo `test -f 'src/libqhull/geom.c' || echo '$(srcdir)/'`src/libqhull/geom.c
@@ -3239,20 +3457,6 @@ src/libqhull/libopt_la-usermem.lo: src/libqhull/usermem.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/libopt_la-usermem.lo `test -f 'src/libqhull/usermem.c' || echo '$(srcdir)/'`src/libqhull/usermem.c
 
-src/libqhull/libopt_la-userprintf.lo: src/libqhull/userprintf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT src/libqhull/libopt_la-userprintf.lo -MD -MP -MF src/libqhull/$(DEPDIR)/libopt_la-userprintf.Tpo -c -o src/libqhull/libopt_la-userprintf.lo `test -f 'src/libqhull/userprintf.c' || echo '$(srcdir)/'`src/libqhull/userprintf.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libopt_la-userprintf.Tpo src/libqhull/$(DEPDIR)/libopt_la-userprintf.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/userprintf.c' object='src/libqhull/libopt_la-userprintf.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/libopt_la-userprintf.lo `test -f 'src/libqhull/userprintf.c' || echo '$(srcdir)/'`src/libqhull/userprintf.c
-
-src/libqhull/libopt_la-userprintf_rbox.lo: src/libqhull/userprintf_rbox.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT src/libqhull/libopt_la-userprintf_rbox.lo -MD -MP -MF src/libqhull/$(DEPDIR)/libopt_la-userprintf_rbox.Tpo -c -o src/libqhull/libopt_la-userprintf_rbox.lo `test -f 'src/libqhull/userprintf_rbox.c' || echo '$(srcdir)/'`src/libqhull/userprintf_rbox.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libopt_la-userprintf_rbox.Tpo src/libqhull/$(DEPDIR)/libopt_la-userprintf_rbox.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/userprintf_rbox.c' object='src/libqhull/libopt_la-userprintf_rbox.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/libopt_la-userprintf_rbox.lo `test -f 'src/libqhull/userprintf_rbox.c' || echo '$(srcdir)/'`src/libqhull/userprintf_rbox.c
-
 src/libqhull/libprof_la-geom.lo: src/libqhull/geom.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT src/libqhull/libprof_la-geom.lo -MD -MP -MF src/libqhull/$(DEPDIR)/libprof_la-geom.Tpo -c -o src/libqhull/libprof_la-geom.lo `test -f 'src/libqhull/geom.c' || echo '$(srcdir)/'`src/libqhull/geom.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libprof_la-geom.Tpo src/libqhull/$(DEPDIR)/libprof_la-geom.Plo
@@ -3357,20 +3561,6 @@ src/libqhull/libprof_la-usermem.lo: src/libqhull/usermem.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/usermem.c' object='src/libqhull/libprof_la-usermem.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/libprof_la-usermem.lo `test -f 'src/libqhull/usermem.c' || echo '$(srcdir)/'`src/libqhull/usermem.c
-
-src/libqhull/libprof_la-userprintf.lo: src/libqhull/userprintf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT src/libqhull/libprof_la-userprintf.lo -MD -MP -MF src/libqhull/$(DEPDIR)/libprof_la-userprintf.Tpo -c -o src/libqhull/libprof_la-userprintf.lo `test -f 'src/libqhull/userprintf.c' || echo '$(srcdir)/'`src/libqhull/userprintf.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libprof_la-userprintf.Tpo src/libqhull/$(DEPDIR)/libprof_la-userprintf.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/userprintf.c' object='src/libqhull/libprof_la-userprintf.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/libprof_la-userprintf.lo `test -f 'src/libqhull/userprintf.c' || echo '$(srcdir)/'`src/libqhull/userprintf.c
-
-src/libqhull/libprof_la-userprintf_rbox.lo: src/libqhull/userprintf_rbox.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT src/libqhull/libprof_la-userprintf_rbox.lo -MD -MP -MF src/libqhull/$(DEPDIR)/libprof_la-userprintf_rbox.Tpo -c -o src/libqhull/libprof_la-userprintf_rbox.lo `test -f 'src/libqhull/userprintf_rbox.c' || echo '$(srcdir)/'`src/libqhull/userprintf_rbox.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/libqhull/$(DEPDIR)/libprof_la-userprintf_rbox.Tpo src/libqhull/$(DEPDIR)/libprof_la-userprintf_rbox.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/libqhull/userprintf_rbox.c' object='src/libqhull/libprof_la-userprintf_rbox.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o src/libqhull/libprof_la-userprintf_rbox.lo `test -f 'src/libqhull/userprintf_rbox.c' || echo '$(srcdir)/'`src/libqhull/userprintf_rbox.c
 
 src/qconvex/qconvex-qconvex.o: src/qconvex/qconvex.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(qconvex_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/qconvex/qconvex-qconvex.o -MD -MP -MF src/qconvex/$(DEPDIR)/qconvex-qconvex.Tpo -c -o src/qconvex/qconvex-qconvex.o `test -f 'src/qconvex/qconvex.c' || echo '$(srcdir)/'`src/qconvex/qconvex.c

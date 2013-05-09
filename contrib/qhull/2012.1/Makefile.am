@@ -34,6 +34,32 @@ libqhull_sources = \
 
 # libqhull c++ sources
 libqhullcpp_sources = \
+     src/libqhull/geom.h \
+     src/libqhull/io.h \
+     src/libqhull/libqhull.h \
+     src/libqhull/mem.h \
+     src/libqhull/merge.h \
+     src/libqhull/poly.h \
+     src/libqhull/qhull_a.h \
+     src/libqhull/qset.h \
+     src/libqhull/random.h \
+     src/libqhull/stat.h \
+     src/libqhull/user.h \
+     src/libqhull/geom.c \
+     src/libqhull/geom2.c \
+     src/libqhull/global.c \
+     src/libqhull/io.c \
+     src/libqhull/libqhull.c \
+     src/libqhull/mem.c \
+     src/libqhull/merge.c \
+     src/libqhull/poly.c \
+     src/libqhull/poly2.c \
+     src/libqhull/qset.c \
+     src/libqhull/random.c \
+     src/libqhull/rboxlib.c \
+     src/libqhull/stat.c \
+     src/libqhull/user.c \
+     src/libqhull/usermem.c \
      src/libqhullcpp/Coordinates.h \
      src/libqhullcpp/functionObjects.h \
      src/libqhullcpp/PointCoordinates.h \
@@ -80,7 +106,7 @@ libqhullcpp_sources = \
      src/libqhullcpp/RoadLogEvent.cpp \
      src/libqhullcpp/UsingLibQhull.cpp
 
-pkg_sources = $(libqhull_sources) $(libqhullcpp_sources)
+pkg_sources = $(libqhullcpp_sources)
 
 # import as much commonality as possible
 include $(top_srcdir)/contrib/Make.common
