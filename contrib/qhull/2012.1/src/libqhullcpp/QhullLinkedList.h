@@ -67,7 +67,7 @@ private:
                         //!disabled since a sentinel must be allocated as the private type
                         QhullLinkedList<T>() {}
                         //!disabled since qs= qs2 is ambiguous (pointer vs. contents)
-    QhullLinkedList<T> &operator=(const QhullLinkedList<T> &l) {}
+  QhullLinkedList<T> &operator=(const QhullLinkedList<T> & /* l */) {}
 public:
 
 #//Conversions
@@ -374,4 +374,3 @@ operator<<(std::ostream &os, const orgQhull::QhullLinkedList<T> &qs)
 }//operator<<
 
 #endif // QHULLLINKEDLIST_H
-
