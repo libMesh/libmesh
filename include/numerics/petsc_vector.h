@@ -698,7 +698,7 @@ PetscVector<T>::PetscVector (Vec v,
   // Get the vector type from PETSc.
   // As of Petsc 3.0.0, the VecType #define lost its const-ness, so we
   // need to have it in the code
-#if PETSC_VERSION_LESS_THAN(3,0,0) || !PETSC_VERSION_RELEASE
+#if PETSC_VERSION_LESS_THAN(3,0,0) || !PETSC_VERSION_LESS_THAN(3,4,0)
   // Pre-3.0 and petsc-dev (as of October 2012) use non-const versions
   VecType ptype;
 #else
