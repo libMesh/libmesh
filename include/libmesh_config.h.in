@@ -353,7 +353,7 @@
    Building Blocks */
 #undef HAVE_TBB_API
 
-/* define if the compiler supports std::thread */
+/* define if the compiler supports tbb::tbb_thread */
 #undef HAVE_TBB_CXX_THREAD
 
 /* Flag indicating whether the library shall be compiled to use the Tecplot
