@@ -52,8 +52,8 @@ namespace libMesh
      * Constructor. Requires a reference to the communicator
      * that defines the object's parallel decomposition.
      */
-    ParallelObject (const Parallel::Communicator &comm) :
-      _communicator(comm)
+    ParallelObject (const Parallel::Communicator &comm_in) :
+      _communicator(comm_in)
     {}
 
     /**
