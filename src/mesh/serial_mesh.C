@@ -91,16 +91,16 @@ namespace
       return (*this)(lhs.first, rhs.first);
     }
 
-    // Comparsion function where lhs is a Point and rhs is a pair<Point,unsigned>.
+    // Comparsion function where lhs is a Point and rhs is a pair<Point,dof_id_type>.
     // This is used in routines like lower_bound, where a specific value is being
     // searched for.
-    bool operator()(const Point& lhs, std::pair<Point, unsigned int>& rhs)
+    bool operator()(const Point& lhs, std::pair<Point, dof_id_type>& rhs)
     {
       return (*this)(lhs, rhs.first);
     }
 
     // And the other way around...
-    bool operator()(std::pair<Point, unsigned int>& lhs, const Point& rhs)
+    bool operator()(std::pair<Point, dof_id_type>& lhs, const Point& rhs)
     {
       return (*this)(lhs.first, rhs);
     }
