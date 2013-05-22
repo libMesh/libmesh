@@ -424,6 +424,12 @@ public:
    */
   unsigned char& node_level_mismatch_limit();
 
+  /**
+   * Copy refinement flags on ghost elements from their
+   * local processors.  Return true if any flags changed.
+   */
+  bool make_flags_parallel_consistent ();
+
 private:
 
   /**
@@ -614,12 +620,6 @@ private:
    * so that level-one dependency is satisfied.
    */
   bool make_refinement_compatible (const bool);
-
-  /**
-   * Copy refinement flags on ghost elements from their
-   * local processors.  Return true if any flags changed.
-   */
-  bool make_flags_parallel_consistent ();
 
   /**
    * Local dispatch function for getting the correct topological
