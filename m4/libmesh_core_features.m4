@@ -8,6 +8,22 @@ AC_MSG_RESULT(---------------------------------------------)
 
 
 # --------------------------------------------------------------
+# blocked matrix/vector storage - enabled by default
+# --------------------------------------------------------------
+AC_ARG_ENABLE(blocked-storage,
+              [AC_HELP_STRING([--enable-blocked-storage],[Support for blocked matrix/vector storage])],
+              enableblockedstorage=$enableval,
+              enableblockedstorage=yes)
+
+if test "$enableblockedstorage" != no ; then
+  AC_MSG_RESULT([<<< Configuring library to use blocked storage data structures >>>])
+  AC_DEFINE(ENABLE_BLOCKED_STORAGE, 1,
+           [Flag indicating if the library should use blocked matrix/vector storage])
+fi
+# --------------------------------------------------------------
+
+
+# --------------------------------------------------------------
 # default comm_world - enabled by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(default-comm-world,

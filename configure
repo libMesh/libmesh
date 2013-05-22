@@ -1047,6 +1047,7 @@ enable_getpwuid
 enable_exceptions
 enable_unordered_containers
 enable_openmp
+enable_blocked_storage
 enable_default_comm_world
 enable_legacy_include_paths
 enable_legacy_using_namespace
@@ -1808,6 +1809,8 @@ Optional Features:
   --enable-unordered-containers
                           Use unordered_map/unordered_set if available
   --enable-openmp         Build with OpenMP Support
+  --enable-blocked-storage
+                          Support for blocked matrix/vector storage
   --enable-default-comm-world
                           Provide global libMesh::CommWorld
   --enable-legacy-include-paths
@@ -26367,6 +26370,27 @@ $as_echo "---------------------------------------------" >&6; }
 
 
 # --------------------------------------------------------------
+# blocked matrix/vector storage - enabled by default
+# --------------------------------------------------------------
+# Check whether --enable-blocked-storage was given.
+if test "${enable_blocked_storage+set}" = set; then :
+  enableval=$enable_blocked_storage; enableblockedstorage=$enableval
+else
+  enableblockedstorage=yes
+fi
+
+
+if test "$enableblockedstorage" != no ; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library to use blocked storage data structures >>>" >&5
+$as_echo "<<< Configuring library to use blocked storage data structures >>>" >&6; }
+
+$as_echo "#define ENABLE_BLOCKED_STORAGE 1" >>confdefs.h
+
+fi
+# --------------------------------------------------------------
+
+
+# --------------------------------------------------------------
 # default comm_world - enabled by default
 # --------------------------------------------------------------
 # Check whether --enable-default-comm-world was given.
@@ -37009,6 +37033,7 @@ echo Git revision....................... : $BUILD_VERSION
 echo
 echo Library Features:
 echo '  adaptive mesh refinement......... :' $enableamr
+echo '  blocked matrix/vector storage.... :' $enableblockedstorage
 echo '  complex variables................ :' $enablecomplex
 echo '  example suite.................... :' $enableexamples
 echo '  ghosted vectors.................. :' $enableghosted
