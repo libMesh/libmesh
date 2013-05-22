@@ -9,6 +9,7 @@ ac_cv_cxx_thread,
  AC_LANG_CPLUSPLUS
  AC_TRY_COMPILE([#include <thread>],
 [
+  thread_local int i;
   std::thread t;
   t.join();
 ],
