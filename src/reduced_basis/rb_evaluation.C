@@ -39,9 +39,9 @@
 namespace libMesh
 {
 
-RBEvaluation::RBEvaluation (const Parallel::Communicator &comm)
+RBEvaluation::RBEvaluation (const Parallel::Communicator &comm_in)
   :
-  ParallelObject(comm),
+  ParallelObject(comm_in),
   evaluate_RB_error_bound(true),
   compute_RB_inner_product(false),
   rb_theta_expansion(NULL)

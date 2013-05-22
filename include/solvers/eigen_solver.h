@@ -244,8 +244,8 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-EigenSolver<T>::EigenSolver (const Parallel::Communicator &comm) :
-  ParallelObject(comm),
+EigenSolver<T>::EigenSolver (const Parallel::Communicator &comm_in) :
+  ParallelObject(comm_in),
   _eigen_solver_type    (ARNOLDI),
   _eigen_problem_type   (NHEP),
   _position_of_spectrum (LARGEST_MAGNITUDE),

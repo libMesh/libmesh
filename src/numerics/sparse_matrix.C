@@ -40,8 +40,8 @@ namespace libMesh
 
 // Constructor
 template <typename T>
-SparseMatrix<T>::SparseMatrix (const Parallel::Communicator &comm) :
-  ParallelObject(comm),
+SparseMatrix<T>::SparseMatrix (const Parallel::Communicator &comm_in) :
+  ParallelObject(comm_in),
   _dof_map(NULL),
   _is_initialized(false)
 {}

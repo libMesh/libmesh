@@ -154,8 +154,8 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-Preconditioner<T>::Preconditioner (const libMesh::Parallel::Communicator &comm) :
-  ParallelObject(comm),
+Preconditioner<T>::Preconditioner (const libMesh::Parallel::Communicator &comm_in) :
+  ParallelObject(comm_in),
   _matrix(NULL),
   _preconditioner_type (ILU_PRECOND),
   _is_initialized      (false)
