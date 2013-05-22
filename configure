@@ -30086,6 +30086,7 @@ int
 main ()
 {
 
+  thread_local int i;
   std::thread t;
   t.join();
 
