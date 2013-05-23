@@ -37,9 +37,9 @@ namespace libMesh
 namespace Parallel {
 
 template <typename KeyType, typename IdxType>
-BinSorter<KeyType,IdxType>::BinSorter (const Parallel::Communicator &comm,
+BinSorter<KeyType,IdxType>::BinSorter (const Parallel::Communicator &comm_in,
 				       const std::vector<KeyType>& d) :
-  ParallelObject(comm),
+  ParallelObject(comm_in),
   data(d)
 {
   // Assume (& libmesh_assert) we are working with a sorted range

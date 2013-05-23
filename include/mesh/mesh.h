@@ -57,9 +57,9 @@ class Mesh : public DefaultMesh
    * changed by mesh generation/loading) later.
    */
   explicit
-  Mesh (const Parallel::Communicator &comm,
+  Mesh (const Parallel::Communicator &comm_in,
 	unsigned int dim=1)
-    : DefaultMesh(comm,dim) {}
+    : DefaultMesh(comm_in,dim) {}
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**

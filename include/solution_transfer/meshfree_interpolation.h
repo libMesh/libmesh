@@ -69,9 +69,9 @@ public:
   /**
    * Constructor.
    */
-  MeshfreeInterpolation (const libMesh::Parallel::Communicator &comm
+  MeshfreeInterpolation (const libMesh::Parallel::Communicator &comm_in
 			 LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
-    ParallelObject(comm),
+    ParallelObject(comm_in),
     _parallelization_strategy (SYNC_SOURCES)
   {}
 

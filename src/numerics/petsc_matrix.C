@@ -30,6 +30,20 @@
 #include "libmesh/petsc_vector.h"
 
 
+
+// For some reason, the blocked matrix API calls below seem to break with PETSC 3.2 & presumably earier.
+// For example:
+// [0]PETSC ERROR: --------------------- Error Message ------------------------------------
+// [0]PETSC ERROR: Nonconforming object sizes!
+// [0]PETSC ERROR: Attempt to set block size 3 with BAIJ 1!
+// [0]PETSC ERROR: ------------------------------------------------------------------------
+// so as a cowardly workaround disable the functionality in this translation unit for older PETSc's
+#if PETSC_VERSION_LESS_THAN(3,3,0)
+#  undef LIBMESH_ENABLE_BLOCKED_STORAGE
+#endif
+
+
+
 namespace
 {
   using namespace libMesh;

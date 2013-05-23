@@ -51,7 +51,7 @@ public:
   /**
    * Constructor; does nothing.
    */
-  ShellMatrix (const Parallel::Communicator &comm
+  ShellMatrix (const Parallel::Communicator &comm_in
 	       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -97,8 +97,8 @@ public:
 // ShellMatrix inline members
 template <typename T>
 inline
-ShellMatrix<T>::ShellMatrix (const Parallel::Communicator &comm) :
-  ParallelObject(comm)
+ShellMatrix<T>::ShellMatrix (const Parallel::Communicator &comm_in) :
+  ParallelObject(comm_in)
 {}
 
 

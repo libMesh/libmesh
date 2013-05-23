@@ -34,9 +34,9 @@ namespace libMesh
 
 namespace Parallel {
 template <typename KeyType, typename IdxType>
-Histogram<KeyType,IdxType>::Histogram (const Parallel::Communicator &comm,
+Histogram<KeyType,IdxType>::Histogram (const Parallel::Communicator &comm_in,
 				       const std::vector<KeyType>& d) :
-  ParallelObject(comm),
+  ParallelObject(comm_in),
   data(d)
 {
   libmesh_assert (Parallel::Utils::is_sorted (data));

@@ -252,7 +252,7 @@ public:
 				 const std::vector<numeric_index_type> &bcols);
 
   /**
-   * Same as \padd_block_matrix , but assumes the row and column maps are the same.
+   * Same as \p add_block_matrix , but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
   virtual void add_block_matrix (const DenseMatrix<T> &dm,
