@@ -218,9 +218,11 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
 
 
 
-template<typename T>
-void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
-                                  const DenseVector<T>& arg) const
+template <typename T>
+template <typename T2>
+typename boostcopy::enable_if_c<ScalarTraits<T2>::value, void >::type
+DenseMatrix<T>::vector_mult (DenseVector<T2>& dest,
+                             const DenseVector<T2>& arg) const
 {
   // Make sure the input sizes are compatible
   libmesh_assert_equal_to (this->n(), arg.size());
@@ -249,9 +251,11 @@ void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
 
 
 
-template<typename T>
-void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest,
-                                            const DenseVector<T>& arg) const
+template <typename T>
+template <typename T2>
+typename boostcopy::enable_if_c<ScalarTraits<T2>::value, void >::type
+DenseMatrix<T>::vector_mult_transpose (DenseVector<T2>& dest,
+                                       const DenseVector<T2>& arg) const
 {
   // Make sure the input sizes are compatible
   libmesh_assert_equal_to (this->m(), arg.size());
@@ -287,10 +291,12 @@ void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest,
 
 
 
-template<typename T>
-void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest,
-                                      const T factor,
-                                      const DenseVector<T>& arg) const
+template <typename T>
+template <typename T2, typename T3>
+typename boostcopy::enable_if_c<ScalarTraits<T2>::value, void >::type
+DenseMatrix<T>::vector_mult_add (DenseVector<typename CompareTypes<T2, T3>::supertype>& dest,
+                                 const T2 factor,
+                                 const DenseVector<T3>& arg) const
 {
   // Short-circuit if the matrix is empty
   if(this->m() == 0)
@@ -303,7 +309,8 @@ void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest,
     this->_matvec_blas(factor, 1., dest, arg);
   else
     {
-      DenseVector<T> temp(arg.size());
+      DenseVector<typename CompareTypes<T2, T3>::supertype>
+        temp(arg.size());
       this->vector_mult(temp, arg);
       dest.add(factor, temp);
     }
