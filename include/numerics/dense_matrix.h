@@ -542,9 +542,10 @@ private:
    *
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
-  void _matvec_blas(T alpha, T beta,
-		    DenseVector<T>& dest,
-		    const DenseVector<T>& arg,
+  template <typename T2>
+  void _matvec_blas(T2 alpha, T2 beta,
+		    DenseVector<T2>& dest,
+		    const DenseVector<T2>& arg,
 		    bool trans=false) const;
 };
 
