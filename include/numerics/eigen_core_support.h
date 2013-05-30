@@ -54,9 +54,13 @@ namespace libMesh
 
   // must be a signed type!!
 #if LIBMESH_DOF_ID_BYTES == 1
-  typedef int8_t eigen_idx_type;
+  // Workaround for Eigen bug
+  // typedef int8_t eigen_idx_type;
+  typedef int32_t eigen_idx_type;
 #elif LIBMESH_DOF_ID_BYTES == 2
-  typedef int16_t eigen_idx_type;
+  // Workaround for Eigen bug
+  // typedef int16_t eigen_idx_type;
+  typedef int32_t eigen_idx_type;
 #elif LIBMESH_DOF_ID_BYTES == 8
   typedef int64_t eigen_idx_type;
 #else // LIBMESH_DOF_ID_BYTES = 4 (default)
