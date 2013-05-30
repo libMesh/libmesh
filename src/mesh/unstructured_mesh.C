@@ -1000,7 +1000,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
 
   std::fill (new_node_numbers.begin(),
 	     new_node_numbers.end(),
-	     libMesh::invalid_uint);
+	     DofObject::invalid_id);
 
 
 
@@ -1026,7 +1026,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
 	{
 	  libmesh_assert_less (old_elem->node(n), new_node_numbers.size());
 
-	  if (new_node_numbers[old_elem->node(n)] == libMesh::invalid_uint)
+	  if (new_node_numbers[old_elem->node(n)] == DofObject::invalid_id)
 	    {
 	      new_node_numbers[old_elem->node(n)] = n_new_nodes;
 

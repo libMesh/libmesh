@@ -923,7 +923,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem)
 	    if (level)
 	      io.data_stream (&input_buffer[1], 1);
 	    else
-	      input_buffer[1] = libMesh::invalid_uint;
+	      input_buffer[1] = DofObject::invalid_id;
 
 	    // maybe the processor id
 	    if (read_partitioning)
@@ -969,7 +969,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem)
 #endif
 	  ++it;
 
-	  Elem *parent = (parent_id == libMesh::invalid_uint) ? NULL : mesh.elem(parent_id);
+	  Elem *parent = (parent_id == DofObject::invalid_id) ? NULL : mesh.elem(parent_id);
 
 	  Elem *elem = Elem::build (elem_type, parent).release();
 
@@ -1176,10 +1176,10 @@ void XdrIO::pack_element (std::vector<dof_id_type> &conn, const Elem *elem,
   conn.push_back (elem->type());
   conn.push_back (elem->id());
 
-  if (parent_id != libMesh::invalid_uint)
+  if (parent_id != DofObject::invalid_id)
     {
       conn.push_back (parent_id);
-      libmesh_assert_not_equal_to (parent_pid, libMesh::invalid_uint);
+      libmesh_assert_not_equal_to (parent_pid, DofObject::invalid_id);
       conn.push_back (parent_pid);
     }
 

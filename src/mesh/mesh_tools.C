@@ -208,7 +208,7 @@ namespace {
             for (unsigned int v = 0; v != n_vars[s]; ++v, ++i)
               {
                 n_comp[i] = d->n_comp(s,v);
-                first_dof[i] = n_comp[i] ? d->dof_number(s,v,0) : libMesh::invalid_uint;
+                first_dof[i] = n_comp[i] ? d->dof_number(s,v,0) : DofObject::invalid_id;
               }
 
           libmesh_assert(communicator.semiverify(&n_sys));
