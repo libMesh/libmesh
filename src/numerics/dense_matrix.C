@@ -218,9 +218,11 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
 
 
 
-template<typename T>
-void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
-                                  const DenseVector<T>& arg) const
+template <typename T>
+template <typename T2>
+typename boostcopy::enable_if_c<ScalarTraits<T2>::value, void >::type
+DenseMatrix<T>::vector_mult (DenseVector<T2>& dest,
+                             const DenseVector<T2>& arg) const
 {
   // Make sure the input sizes are compatible
   libmesh_assert_equal_to (this->n(), arg.size());
@@ -234,7 +236,7 @@ void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
     return;
 
   if (this->use_blas_lapack)
-    this->_matvec_blas(1., 0., dest, arg);
+    this->_matvec_blas(T2(1.), T2(0.), dest, arg);
   else
     {
       const unsigned int n_rows = this->m();
@@ -249,9 +251,11 @@ void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
 
 
 
-template<typename T>
-void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest,
-                                            const DenseVector<T>& arg) const
+template <typename T>
+template <typename T2>
+typename boostcopy::enable_if_c<ScalarTraits<T2>::value, void >::type
+DenseMatrix<T>::vector_mult_transpose (DenseVector<T2>& dest,
+                                       const DenseVector<T2>& arg) const
 {
   // Make sure the input sizes are compatible
   libmesh_assert_equal_to (this->m(), arg.size());
@@ -266,7 +270,7 @@ void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest,
 
   if (this->use_blas_lapack)
     {
-      this->_matvec_blas(1., 0., dest, arg, /*trans=*/true);
+      this->_matvec_blas(T2(1.), T2(0.), dest, arg, /*trans=*/true);
     }
   else
     {
@@ -287,10 +291,12 @@ void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest,
 
 
 
-template<typename T>
-void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest,
-                                      const T factor,
-                                      const DenseVector<T>& arg) const
+template <typename T>
+template <typename T2, typename T3>
+typename boostcopy::enable_if_c<ScalarTraits<T2>::value, void >::type
+DenseMatrix<T>::vector_mult_add (DenseVector<typename CompareTypes<T2, T3>::supertype>& dest,
+                                 const T2 factor,
+                                 const DenseVector<T3>& arg) const
 {
   // Short-circuit if the matrix is empty
   if(this->m() == 0)
@@ -300,10 +306,11 @@ void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest,
   }
 
   if (this->use_blas_lapack)
-    this->_matvec_blas(factor, 1., dest, arg);
+    this->_matvec_blas(T2(factor), T2(1.), dest, arg);
   else
     {
-      DenseVector<T> temp(arg.size());
+      DenseVector<typename CompareTypes<T2, T3>::supertype>
+        temp(arg.size());
       this->vector_mult(temp, arg);
       dest.add(factor, temp);
     }
@@ -811,11 +818,22 @@ template void DenseMatrix<Real>::cholesky_solve(const DenseVector<Real>&, DenseV
 template void DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<Real>&, DenseVector<Real>&) const;
 template void DenseMatrix<Real>::cholesky_solve(const DenseVector<Complex>&, DenseVector<Complex>&);
 template void DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<Complex>&, DenseVector<Complex>&) const;
+template void DenseMatrix<Real>::vector_mult(DenseVector<Real>& dest, const DenseVector<Real>& arg) const;
+template void DenseMatrix<Real>::vector_mult_transpose(DenseVector<Real>& dest, const DenseVector<Real>& arg) const;
+template void DenseMatrix<Real>::vector_mult_add(DenseVector<Real>& dest, const Real factor, const DenseVector<Real>& arg) const;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseMatrix<Complex>;
 template void DenseMatrix<Complex>::cholesky_solve(const DenseVector<Complex>&,DenseVector<Complex>&);
 template void DenseMatrix<Complex>::_cholesky_back_substitute(const DenseVector<Complex>&, DenseVector<Complex>&) const;
+
+template void DenseMatrix<Real>::vector_mult(DenseVector<Complex>& dest, const DenseVector<Complex>& arg) const;
+template void DenseMatrix<Real>::vector_mult_transpose(DenseVector<Complex>& dest, const DenseVector<Complex>& arg) const;
+template void DenseMatrix<Real>::vector_mult_add(DenseVector<Complex>& dest, const Complex factor, const DenseVector<Complex>& arg) const;
+
+template void DenseMatrix<Complex>::vector_mult(DenseVector<Complex>& dest, const DenseVector<Complex>& arg) const;
+template void DenseMatrix<Complex>::vector_mult_transpose(DenseVector<Complex>& dest, const DenseVector<Complex>& arg) const;
+template void DenseMatrix<Complex>::vector_mult_add(DenseVector<Complex>& dest, const Complex factor, const DenseVector<Complex>& arg) const;
 #endif
 
 } // namespace libMesh
