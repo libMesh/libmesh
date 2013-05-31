@@ -30,7 +30,7 @@ namespace
 {
   using namespace libMesh;
 
-  static dof_id_type old_elem_id = libMesh::invalid_uint;
+  static dof_id_type old_elem_id = DofObject::invalid_id;
   // Coefficient naming: d(1)d(2n) is the coefficient of the
   // global shape function corresponding to value 1 in terms of the
   // local shape function corresponding to normal derivative 2

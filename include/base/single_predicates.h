@@ -158,7 +158,7 @@ namespace Predicates
   struct pid : predicate<T>
   {
     // Constructor
-    pid(const unsigned int p) : _pid(p) {}
+    pid(const processor_id_type p) : _pid(p) {}
     virtual ~pid() {}
 
     // op()
@@ -166,7 +166,7 @@ namespace Predicates
 
   protected:
     virtual predicate<T>* clone() const { return new pid<T>(*this); }
-    const unsigned int _pid;
+    const processor_id_type _pid;
   };
 
 
@@ -176,7 +176,7 @@ namespace Predicates
   template <typename T>
   struct not_pid : pid<T>
   {
-    not_pid(const unsigned int p) : pid<T>(p) {}
+    not_pid(const processor_id_type p) : pid<T>(p) {}
 
     virtual bool operator()(const T& it) const { return !pid<T>::operator()(it); }
 

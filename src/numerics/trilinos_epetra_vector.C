@@ -126,7 +126,7 @@ EpetraVector<T>::operator -= (const NumericVector<T>& v)
 
 
 template <typename T>
-void EpetraVector<T>::set (const unsigned int i_in, const T value_in)
+void EpetraVector<T>::set (const numeric_index_type i_in, const T value_in)
 {
   int i = static_cast<int> (i_in);
   T value = value_in;
@@ -172,7 +172,7 @@ void EpetraVector<T>::reciprocal()
 
 
 template <typename T>
-void EpetraVector<T>::add (const unsigned int i_in, const T value_in)
+void EpetraVector<T>::add (const numeric_index_type i_in, const T value_in)
 {
   int i = static_cast<int> (i_in);
   T value = value_in;
@@ -188,9 +188,10 @@ void EpetraVector<T>::add (const unsigned int i_in, const T value_in)
 
 template <typename T>
 void EpetraVector<T>::add_vector (const std::vector<T>& v,
-				  const std::vector<unsigned int>& dof_indices)
+				  const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (v.size(), dof_indices.size());
+  libmesh_assert_equal_to (sizeof(numeric_index_type), sizeof(int));
 
   SumIntoGlobalValues (v.size(),
                        (int*) &dof_indices[0],
@@ -201,7 +202,7 @@ void EpetraVector<T>::add_vector (const std::vector<T>& v,
 
 template <typename T>
 void EpetraVector<T>::add_vector (const NumericVector<T>& V,
-				 const std::vector<unsigned int>& dof_indices)
+				 const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
@@ -230,9 +231,10 @@ void EpetraVector<T>::add_vector (const NumericVector<T>& V_in,
 
 template <typename T>
 void EpetraVector<T>::add_vector (const DenseVector<T>& V_in,
-				  const std::vector<unsigned int>& dof_indices)
+				  const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V_in.size(), dof_indices.size());
+  libmesh_assert_equal_to (sizeof(numeric_index_type), sizeof(int));
 
   SumIntoGlobalValues(dof_indices.size(),
                       (int *)&dof_indices[0],
@@ -285,9 +287,10 @@ void EpetraVector<T>::add (const T a_in, const NumericVector<T>& v_in)
 
 template <typename T>
 void EpetraVector<T>::insert (const std::vector<T>& v,
-			      const std::vector<unsigned int>& dof_indices)
+			      const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (v.size(), dof_indices.size());
+  libmesh_assert_equal_to (sizeof(numeric_index_type), sizeof(int));
 
   ReplaceGlobalValues (v.size(),
                        (int*) &dof_indices[0],
@@ -298,7 +301,7 @@ void EpetraVector<T>::insert (const std::vector<T>& v,
 
 template <typename T>
 void EpetraVector<T>::insert (const NumericVector<T>& V,
-			      const std::vector<unsigned int>& dof_indices)
+			      const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
@@ -311,9 +314,10 @@ void EpetraVector<T>::insert (const NumericVector<T>& V,
 
 template <typename T>
 void EpetraVector<T>::insert (const DenseVector<T>& v,
-			      const std::vector<unsigned int>& dof_indices)
+			      const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (v.size(), dof_indices.size());
+  libmesh_assert_equal_to (sizeof(numeric_index_type), sizeof(int));
 
   std::vector<T> &vals = const_cast<DenseVector<T>&>(v).get_values();
 
@@ -326,7 +330,7 @@ void EpetraVector<T>::insert (const DenseVector<T>& v,
 
 template <typename T>
 void EpetraVector<T>::insert (const DenseSubVector<T>& v,
-			      const std::vector<unsigned int>& dof_indices)
+			      const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (v.size(), dof_indices.size());
 
@@ -464,7 +468,7 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in) const
 
 template <typename T>
 void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
-				const std::vector<unsigned int>& /* send_list */) const
+				const std::vector<numeric_index_type>& /* send_list */) const
 {
   // TODO: optimize to sync only the send list values
   this->localize(v_local_in);
@@ -484,9 +488,9 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
 
 
 template <typename T>
-void EpetraVector<T>::localize (const unsigned int first_local_idx,
-				const unsigned int last_local_idx,
-				const std::vector<unsigned int>& send_list)
+void EpetraVector<T>::localize (const numeric_index_type first_local_idx,
+				const numeric_index_type last_local_idx,
+				const std::vector<numeric_index_type>& send_list)
 {
   // Only good for serial vectors.
   libmesh_assert_equal_to (this->size(), this->local_size());
@@ -581,7 +585,7 @@ void EpetraVector<T>::print_matlab (const std::string /* name */) const
 
 template <typename T>
 void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
-				       const std::vector<unsigned int>& /* rows */) const
+				       const std::vector<numeric_index_type>& /* rows */) const
 {
   libmesh_not_implemented();
 }
