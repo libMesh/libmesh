@@ -703,9 +703,10 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& ,
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 
 template<typename T>
-void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
-				  DenseVector<T>& dest,
-				  const DenseVector<T>& arg,
+template <typename T2>
+void DenseMatrix<T>::_matvec_blas(T2 alpha, T2 beta,
+				  DenseVector<T2>& dest,
+				  const DenseVector<T2>& arg,
                                   bool trans) const
 {
   // Ensure that dest and arg sizes are compatible
@@ -817,9 +818,10 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
 
 
 template<typename T>
-void DenseMatrix<T>::_matvec_blas(T , T,
-				  DenseVector<T>& ,
-				  const DenseVector<T>&,
+template <typename T2>
+void DenseMatrix<T>::_matvec_blas(T2 , T2,
+				  DenseVector<T2>& ,
+				  const DenseVector<T2>&,
                                   bool ) const
 {
   libMesh::err << "No PETSc-provided BLAS/LAPACK available!" << std::endl;
@@ -855,6 +857,10 @@ template void DenseMatrix<Number>::_matvec_blas(Number, Number,
 					        DenseVector<Number>& ,
 					        const DenseVector<Number>&,
 						bool ) const;
+template void DenseMatrix<Real>::_matvec_blas(Complex, Complex,
+                                              DenseVector<Complex>& ,
+                                              const DenseVector<Complex>&,
+                                              bool ) const;
 template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number>&);
 template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number>&, DenseMatrix<Number>&, DenseMatrix<Number>&);
 template void DenseMatrix<Number>::_svd_helper (char, char, std::vector<Number>&,
