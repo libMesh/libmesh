@@ -701,7 +701,7 @@ void PetscMatrix<T>::add_block_matrix(const DenseMatrix<T>& dm,
   PetscInt petsc_blocksize;
   ierr = MatGetBlockSize(_mat, &petsc_blocksize);
   LIBMESH_CHKERRABORT(ierr);
-  libmesh_assert_equal_to (blocksize, petsc_blocksize);
+  libmesh_assert_equal_to (blocksize, static_cast<numeric_index_type>(petsc_blocksize));
 #endif
 
   // These casts are required for PETSc <= 2.1.5
