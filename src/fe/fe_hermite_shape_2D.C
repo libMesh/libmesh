@@ -36,7 +36,7 @@ namespace
   using namespace libMesh;
 
 #ifndef LIBMESH_HAVE_TBB_API
-  static dof_id_type old_elem_id = libMesh::invalid_uint;
+  static dof_id_type old_elem_id = DofObject::invalid_id;
   // Mapping functions - derivatives at each dofpt
   std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
 #else //LIBMESH_HAVE_TBB_API
@@ -62,7 +62,7 @@ namespace
     dof_id_type & old_elem_id = old_elem_id_tls.local(old_elem_id_exists);
 
     if(!old_elem_id_exists)
-      old_elem_id = libMesh::invalid_uint;
+      old_elem_id = DofObject::invalid_id;
 
     // Coefficients are cached from old elements
     // ... except that we can't be sure that a renumbering didn't
