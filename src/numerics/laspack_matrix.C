@@ -129,6 +129,7 @@ void LaspackMatrix<T>::init (const numeric_index_type libmesh_dbg_var(m_in),
 			     const numeric_index_type libmesh_dbg_var(m_l),
 			     const numeric_index_type libmesh_dbg_var(n_l),
 			     const numeric_index_type libmesh_dbg_var(nnz),
+			     const numeric_index_type,
 			     const numeric_index_type)
 {
   // noz ignored...  only used for multiple processors!

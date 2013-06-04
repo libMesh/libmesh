@@ -70,27 +70,27 @@ namespace
         // QUAD4 equivalences
         element_equivalence_map["QUAD"]   = QUAD4;
         element_equivalence_map["QUAD4"]  = QUAD4;
-        element_equivalence_map["SHELL"]  = QUAD4;
-        element_equivalence_map["SHELL4"] = QUAD4;
+        // element_equivalence_map["SHELL"]  = QUAD4;
+        // element_equivalence_map["SHELL4"] = QUAD4;
 
         // QUAD8 equivalences
         element_equivalence_map["QUAD8"]  = QUAD8;
-        element_equivalence_map["SHELL8"] = QUAD8;
+        // element_equivalence_map["SHELL8"] = QUAD8;
 
         // QUAD9 equivalences
         element_equivalence_map["QUAD9"]  = QUAD9;
-        element_equivalence_map["SHELL9"] = QUAD9;
+        // element_equivalence_map["SHELL9"] = QUAD9;
 
         // TRI3 equivalences
         element_equivalence_map["TRI"]       = TRI3;
         element_equivalence_map["TRI3"]      = TRI3;
         element_equivalence_map["TRIANGLE"]  = TRI3;
-        element_equivalence_map["TRISHELL"]  = TRI3;
-        element_equivalence_map["TRISHELL3"] = TRI3;
+        // element_equivalence_map["TRISHELL"]  = TRI3;
+        // element_equivalence_map["TRISHELL3"] = TRI3;
 
         // TRI6 equivalences
         element_equivalence_map["TRI6"]      = TRI6;
-        element_equivalence_map["TRISHELL6"] = TRI6;
+        // element_equivalence_map["TRISHELL6"] = TRI6;
 
         // HEX8 equivalences
         element_equivalence_map["HEX"]  = HEX8;

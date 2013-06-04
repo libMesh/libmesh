@@ -45,6 +45,22 @@
 #endif
 
 
+// Thread-Local-Storage macros
+
+#ifdef LIBMESH_HAVE_STD_THREAD
+#  define LIBMESH_TLS_TYPE(type)  thread_local type
+#  define LIBMESH_TLS_REF(value)  (value)
+#else
+#  ifdef LIBMESH_HAVE_TBB_API
+#    include "tbb/enumerable_thread_specific.h"
+#    define LIBMESH_TLS_TYPE(type)  tbb::enumerable_thread_specific<type>
+#    define LIBMESH_TLS_REF(value)  (value).local()
+#  else // Maybe support gcc __thread eventually?
+#    define LIBMESH_TLS_TYPE(type)  type
+#    define LIBMESH_TLS_REF(value)  (value)
+#  endif
+#endif
+
 
 namespace libMesh
 {

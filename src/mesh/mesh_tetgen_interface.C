@@ -222,9 +222,9 @@ namespace libMesh
 		sequential_index = std::distance(_sequential_to_libmesh_node_map.begin(), node_iter);
 
 	      // Debugging:
-	      //	    std::cout << "libmesh_node_id=" << libmesh_node_id
-	      //		      << ", sequential_index=" << sequential_index
-	      //		      << std::endl;
+	      //	    libMesh::out << "libmesh_node_id=" << libmesh_node_id
+	      //		         << ", sequential_index=" << sequential_index
+	      //		         << std::endl;
 
 	      tetgen_wrapper.set_vertex(insertnum, // facet number
 					0,         // polygon (always 0)
@@ -276,8 +276,8 @@ namespace libMesh
     const unsigned int num_nodes = tetgen_wrapper.get_numberofpoints();
 
     // Debugging:
-    // std::cout << "Original mesh had " << old_nodesnum << " nodes." << std::endl;
-    // std::cout << "Reserving space for " << num_nodes << " total nodes." << std::endl;
+    // libMesh::out << "Original mesh had " << old_nodesnum << " nodes." << std::endl;
+    // libMesh::out << "Reserving space for " << num_nodes << " total nodes." << std::endl;
 
     // Reserve space for additional nodes in the node map
     _sequential_to_libmesh_node_map.reserve(num_nodes);
@@ -377,7 +377,7 @@ namespace libMesh
 
 	if (current_node == NULL)
 	  {
-	    std::cerr << "Error! Mesh returned NULL node pointer!" << std::endl;
+	    libMesh::err << "Error! Mesh returned NULL node pointer!" << std::endl;
 	    libmesh_error();
 	  }
 

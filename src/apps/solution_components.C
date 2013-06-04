@@ -37,8 +37,8 @@ int main(int argc, char** argv)
   Mesh mesh1(init.comm(), dim);
   EquationSystems es1(mesh1);
 
-  std::cout << "Usage: " << argv[0]
-            << " mesh oldsolution newsolution system1 variable1 [sys2 var2...]" << std::endl;
+  libMesh::out << "Usage: " << argv[0]
+               << " mesh oldsolution newsolution system1 variable1 [sys2 var2...]" << std::endl;
 
   // We should have one system name for each variable name, and those
   // get preceded by an even number of arguments.
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
   libmesh_assert_greater_equal (argc, 6);
 
   mesh1.read(argv[1]);
-  std::cout << "Loaded mesh " << argv[1] << std::endl;
+  libMesh::out << "Loaded mesh " << argv[1] << std::endl;
   Mesh mesh2(mesh1);
   EquationSystems es2(mesh2);
 
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
            EquationSystems::READ_DATA |
            EquationSystems::READ_ADDITIONAL_DATA |
            EquationSystems::READ_BASIC_ONLY);
-  std::cout << "Loaded solution " << argv[2] << std::endl;
+  libMesh::out << "Loaded solution " << argv[2] << std::endl;
 
   std::vector<unsigned int> old_sys_num((argc-4)/2),
                             new_sys_num((argc-4)/2),

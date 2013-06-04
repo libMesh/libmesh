@@ -41,11 +41,11 @@ namespace Parallel {
 // a Parallel::Sort object takes O(nlogn) time,
 // where n is the length of _data.
 template <typename KeyType, typename IdxType>
-Sort<KeyType,IdxType>::Sort(const Parallel::Communicator &comm,
+Sort<KeyType,IdxType>::Sort(const Parallel::Communicator &comm_in,
 			    std::vector<KeyType>& d) :
-  ParallelObject(comm),
-  _n_procs(comm.size()),
-  _proc_id(comm.rank()),
+  ParallelObject(comm_in),
+  _n_procs(comm_in.size()),
+  _proc_id(comm_in.rank()),
   _bin_is_sorted(false),
   _data(d)
 {

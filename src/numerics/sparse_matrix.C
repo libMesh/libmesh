@@ -21,6 +21,7 @@
 
 // Local Includes
 #include "libmesh/dof_map.h"
+#include "libmesh/dense_matrix.h"
 #include "libmesh/laspack_matrix.h"
 #include "libmesh/eigen_sparse_matrix.h"
 #include "libmesh/parallel.h"
@@ -39,8 +40,8 @@ namespace libMesh
 
 // Constructor
 template <typename T>
-SparseMatrix<T>::SparseMatrix (const Parallel::Communicator &comm) :
-  ParallelObject(comm),
+SparseMatrix<T>::SparseMatrix (const Parallel::Communicator &comm_in) :
+  ParallelObject(comm_in),
   _dof_map(NULL),
   _is_initialized(false)
 {}
@@ -51,6 +52,46 @@ SparseMatrix<T>::SparseMatrix (const Parallel::Communicator &comm) :
 template <typename T>
 SparseMatrix<T>::~SparseMatrix ()
 {}
+
+
+
+
+// default implementation is to fall back to non-blocked method
+template <typename T>
+void SparseMatrix<T>::add_block_matrix (const DenseMatrix<T> &dm,
+					const std::vector<numeric_index_type> &brows,
+					const std::vector<numeric_index_type> &bcols)
+{
+  libmesh_assert_equal_to (dm.m() / brows.size(), dm.n() / bcols.size());
+
+  const numeric_index_type blocksize = dm.m() / brows.size();
+
+  libmesh_assert_equal_to (dm.m()%blocksize, 0);
+  libmesh_assert_equal_to (dm.n()%blocksize, 0);
+
+  std::vector<numeric_index_type> rows, cols;
+
+  rows.reserve(blocksize*brows.size());
+  cols.reserve(blocksize*bcols.size());
+
+  for (unsigned int ib=0; ib<brows.size(); ib++)
+    {
+      numeric_index_type i=brows[ib]*blocksize;
+
+      for (unsigned int v=0; v<blocksize; v++)
+	rows.push_back(i++);
+    }
+
+  for (unsigned int jb=0; jb<bcols.size(); jb++)
+    {
+      numeric_index_type j=bcols[jb]*blocksize;
+
+      for (unsigned int v=0; v<blocksize; v++)
+	cols.push_back(j++);
+    }
+
+  this->add_matrix (dm, rows, cols);
+}
 
 
 

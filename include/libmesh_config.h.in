@@ -95,6 +95,9 @@
 /* Flag indicating if the library should be built with AMR support */
 #undef ENABLE_AMR
 
+/* Flag indicating if the library should use blocked matrix/vector storage */
+#undef ENABLE_BLOCKED_STORAGE
+
 /* Flag indicating if the library should be built with Dirichlet boundary
    constraint support */
 #undef ENABLE_DIRICHLET
@@ -353,7 +356,7 @@
    Building Blocks */
 #undef HAVE_TBB_API
 
-/* define if the compiler supports std::thread */
+/* define if the compiler supports tbb::tbb_thread */
 #undef HAVE_TBB_CXX_THREAD
 
 /* Flag indicating whether the library shall be compiled to use the Tecplot

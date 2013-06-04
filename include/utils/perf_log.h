@@ -393,13 +393,13 @@ void PerfLog::pop (const std::string &libmesh_dbg_var(label),
       PerfData *perf_data = &(log[std::make_pair(header,label)]);
       if (perf_data != log_stack.top())
         {
-          std::cerr << "PerfLog can't pop (" << header << ',' << label << ')' << std::endl;
-          std::cerr << "From top of stack of running logs:" << std::endl;
+          libMesh::err << "PerfLog can't pop (" << header << ',' << label << ')' << std::endl;
+          libMesh::err << "From top of stack of running logs:" << std::endl;
           std::map<std::pair<std::string, std::string>, PerfData>::iterator
             i = log.begin(), endi = log.end();
           for (; i != endi; ++i)
             if (&(i->second) == log_stack.top())
-              std::cerr << '(' << i->first.first << ',' << i->first.second << ')' << std::endl;
+              libMesh::err << '(' << i->first.first << ',' << i->first.second << ')' << std::endl;
 
           libmesh_assert_equal_to (perf_data, log_stack.top());
         }

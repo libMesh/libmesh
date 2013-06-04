@@ -4,7 +4,7 @@
 
 \date   Started 3/27/2007
 \author George
-\version\verbatim $Id$ \endverbatim
+\version\verbatim $Id: gk_proto.h 12591 2012-09-01 19:03:15Z karypis $ \endverbatim
 */
 
 #ifndef _GK_PROTO_H_
@@ -17,14 +17,14 @@ extern "C" {
 /*-------------------------------------------------------------
  * blas.c 
  *-------------------------------------------------------------*/
-GK_MKBLAS_PROTO(gk_c,   char,     intmax_t)
-GK_MKBLAS_PROTO(gk_i,   int,      intmax_t)
-GK_MKBLAS_PROTO(gk_i32, int32_t,  intmax_t)
-GK_MKBLAS_PROTO(gk_i64, int64_t,  intmax_t)
+GK_MKBLAS_PROTO(gk_c,   char,     int)
+GK_MKBLAS_PROTO(gk_i,   int,      int)
+GK_MKBLAS_PROTO(gk_i32, int32_t,  int32_t)
+GK_MKBLAS_PROTO(gk_i64, int64_t,  int64_t)
 GK_MKBLAS_PROTO(gk_z,   ssize_t,  ssize_t)
 GK_MKBLAS_PROTO(gk_f,   float,    float)
 GK_MKBLAS_PROTO(gk_d,   double,   double)
-GK_MKBLAS_PROTO(gk_idx, gk_idx_t, intmax_t)
+GK_MKBLAS_PROTO(gk_idx, gk_idx_t, gk_idx_t)
 
 
 
@@ -38,6 +38,11 @@ gk_idx_t gk_getline(char **lineptr, size_t *n, FILE *stream);
 char **gk_readfile(char *fname, gk_idx_t *r_nlines);
 int32_t *gk_i32readfile(char *fname, gk_idx_t *r_nlines);
 int64_t *gk_i64readfile(char *fname, gk_idx_t *r_nlines);
+int32_t *gk_i32readfilebin(char *fname, ssize_t *r_nelmnts);
+int64_t *gk_i64readfilebin(char *fname, ssize_t *r_nelmnts);
+float *gk_freadfilebin(char *fname, ssize_t *r_nelmnts);
+size_t gk_fwritefilebin(char *fname, size_t n, float *a);
+double *gk_dreadfilebin(char *fname, ssize_t *r_nelmnts);
 
 
 
@@ -254,6 +259,7 @@ GK_MKRANDOM_PROTO(gk_i,   size_t, int)
 GK_MKRANDOM_PROTO(gk_f,   size_t, float)
 GK_MKRANDOM_PROTO(gk_d,   size_t, double)
 GK_MKRANDOM_PROTO(gk_idx, size_t, gk_idx_t)
+GK_MKRANDOM_PROTO(gk_z,   size_t, ssize_t)
 void gk_randinit(uint64_t);
 uint64_t gk_randint64(void);
 uint32_t gk_randint32(void);
@@ -309,7 +315,7 @@ int gk_csr_GetSimilarRows(gk_csr_t *mat, int nqterms, int *qind, float *qval,
 
 
 /* itemsets.c */
-void gk_find_frequent_itemsets(int ntrans, int *tranptr, int *tranind,
+void gk_find_frequent_itemsets(int ntrans, ssize_t *tranptr, int *tranind,
         int minfreq, int maxfreq, int minlen, int maxlen,
         void (*process_itemset)(void *stateptr, int nitems, int *itemind,
                                 int ntrans, int *tranind),
@@ -338,6 +344,32 @@ void gk_mcoreAdd(gk_mcore_t *mcore, int type, size_t nbytes, void *ptr);
 void gk_gkmcoreAdd(gk_mcore_t *mcore, int type, size_t nbytes, void *ptr);
 void gk_mcoreDel(gk_mcore_t *mcore, void *ptr);
 void gk_gkmcoreDel(gk_mcore_t *mcore, void *ptr);
+
+/* rw.c */
+int gk_rw_PageRank(gk_csr_t *mat, float lamda, float eps, int max_niter, float *pr);
+
+
+/* graph.c */
+gk_graph_t *gk_graph_Create();
+void gk_graph_Init(gk_graph_t *graph);
+void gk_graph_Free(gk_graph_t **graph);
+void gk_graph_FreeContents(gk_graph_t *graph);
+gk_graph_t *gk_graph_Read(char *filename, int format, int isfewgts,
+                    int isfvwgts, int isfvsizes);
+void gk_graph_Write(gk_graph_t *graph, char *filename, int format);
+gk_graph_t *gk_graph_Dup(gk_graph_t *graph);
+gk_graph_t *gk_graph_ExtractSubgraph(gk_graph_t *graph, int vstart, int nvtxs);
+gk_graph_t *gk_graph_Reorder(gk_graph_t *graph, int32_t *perm, int32_t *iperm);
+int gk_graph_FindComponents(gk_graph_t *graph, int32_t *cptr, int32_t *cind);
+void gk_graph_ComputeBFSOrdering(gk_graph_t *graph, int v, int32_t **r_perm, 
+         int32_t **r_iperm);
+void gk_graph_ComputeBestFOrdering0(gk_graph_t *graph, int v, int type,
+              int32_t **r_perm, int32_t **r_iperm);
+void gk_graph_ComputeBestFOrdering(gk_graph_t *graph, int v, int type,
+              int32_t **r_perm, int32_t **r_iperm);
+void gk_graph_SingleSourceShortestPaths(gk_graph_t *graph, int v, void **r_sps);
+
+
 
 
 #ifdef __cplusplus

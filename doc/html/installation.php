@@ -17,7 +17,7 @@
 <a name="getsoftware"></a><h2>Getting the Software</h2>
 
 The <code>libMesh</code> source can be <a href="https://sourceforge.net/projects/libmesh/files/libmesh">downloaded from our SourceForge release page</a>.
-Stable releases are located there as compressed tar archives. 
+Stable releases are located there as compressed tar archives.
 
 You may also access the Git source tree for the latest code. You can get read-only access
 to the Git repository via:
@@ -75,7 +75,7 @@ The library is continuously tested with the following compilers:
       <li><code>clang++</code> 3.0</li>
       <li><code>clang++</code> 3.1</li>
       <li><code>clang++</code> 3.2</li>
-    </ul>     
+    </ul>
   <li>Sun Studio/Oracle</li>
     <ul>
       <li><code>CC</code> 12.3</li>
@@ -85,7 +85,8 @@ The library is continuously tested with the following compilers:
     <ul>
       <li><code>pgi</code> 11.7</li>
       <li><code>pgi</code> 12.9</li>
-      <tt>  $ ./configure --disable-unordered-containers --disable-fparser --enable-static --disable-shared --disable-tecplot --enable-tecio</tt>
+      <li><code>pgi</code> 13.4</li>
+      <tt>  $ ./configure --disable-unordered-containers --disable-fparser --enable-static --disable-shared</tt>
     </ul>
 </ul>
 
@@ -142,10 +143,10 @@ as listed in the <a href="installation.php#compilers">Compiler</a> section. Afte
 is configured simply type <code>make</code> to build the library.
 
 <br>
-The <code>./configure</code> script distributed with the library looks at the shell 
-environment variable <code>METHODS</code> to determine what modes the library should be built in. 
-Valid values for <code>METHOD</code> are <code>opt</code> (optimized mode), <code>dbg</code> (build with debug symbols), 
-and <code>pro</code> (build with profiling support for use with <code>gprof)</code>. 
+The <code>./configure</code> script distributed with the library looks at the shell
+environment variable <code>METHODS</code> to determine what modes the library should be built in.
+Valid values for <code>METHOD</code> are <code>opt</code> (optimized mode), <code>dbg</code> (build with debug symbols),
+and <code>pro</code> (build with profiling support for use with <code>gprof)</code>.
 Once the library is configured you can build it simply by typing
 
 <div class="fragment">
@@ -156,7 +157,7 @@ Once the library is configured you can build it simply by typing
 <a name="test"></a><h2>Testing the Library</h2>
 <h3>Running the Examples</h3>
 <code>libMesh</code> includes a number of examples in the <code>examples</code>
-directory. From the top-level directory you can build and run the example programs 
+directory. From the top-level directory you can build and run the example programs
 by typing
 <div class="fragment">
 <pre>make check</pre>
@@ -178,7 +179,7 @@ in the example to write a different formats, however.
 <h3>Unit Tests</h3>
 The source tree contains a <code>tests</code> entry in the main trunk
 that contains a series of unit tests which can be used to validate a <code>libMesh</code>
-installation.  These unit tests require <a href="https://sourceforge.net/apps/mediawiki/cppunit/index.php?title=Main_Page">CPPUnit</a> 
+installation.  These unit tests require <a href="https://sourceforge.net/apps/mediawiki/cppunit/index.php?title=Main_Page">CPPUnit</a>
 to run properly.  To run the unit test suite, simply do
 
 <pre>make -C test check </pre>
@@ -203,7 +204,7 @@ used by <code>libMesh</code>. For example, you could build the application <code
 </div>
 
 
-<br> 
+<br>
 
 
 </div>

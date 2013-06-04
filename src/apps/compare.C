@@ -130,8 +130,8 @@ void process_cmd_line(int argc, char **argv,
               names.push_back(optarg);
             else
               {
-                std::cout << "ERROR: Mesh file name must preceed left file name!"
-                          << std::endl;
+                libMesh::out << "ERROR: Mesh file name must preceed left file name!"
+                             << std::endl;
                 exit(1);
               }
             break;
@@ -158,8 +158,8 @@ void process_cmd_line(int argc, char **argv,
               }
             else
               {
-                std::cout << "ERROR: Mesh file name must preceed right file name!"
-                          << std::endl;
+                libMesh::out << "ERROR: Mesh file name must preceed right file name!"
+                             << std::endl;
                 exit(1);
               }
             break;
@@ -174,9 +174,9 @@ void process_cmd_line(int argc, char **argv,
               names.push_back(optarg);
             else
               {
-                std::cout << "ERROR: Mesh file name and left file name must preceed "
-                          << "right file name!"
-                          << std::endl;
+                libMesh::out << "ERROR: Mesh file name and left file name must preceed "
+                             << "right file name!"
+                             << std::endl;
                 exit(1);
               }
             break;
@@ -198,8 +198,8 @@ void process_cmd_line(int argc, char **argv,
           {
             if (format_set)
               {
-                std::cout << "ERROR: Equation system file format already set!"
-                          << std::endl;
+                libMesh::out << "ERROR: Equation system file format already set!"
+                             << std::endl;
                 exit(1);
               }
             else
@@ -217,8 +217,8 @@ void process_cmd_line(int argc, char **argv,
           {
             if (format_set)
               {
-                std::cout << "ERROR: Equation system file format already set!"
-                          << std::endl;
+                libMesh::out << "ERROR: Equation system file format already set!"
+                             << std::endl;
                 exit(1);
               }
             else
@@ -276,11 +276,11 @@ bool do_compare (EquationSystems& les,
 
   if (verbose)
     {
-      std::cout        << "*********   LEFT SYSTEM    *********" << std::endl;
+      libMesh::out        << "*********   LEFT SYSTEM    *********" << std::endl;
       les.print_info  ();
-      std::cout << "*********   RIGHT SYSTEM   *********" << std::endl;
+      libMesh::out << "*********   RIGHT SYSTEM   *********" << std::endl;
       res.print_info ();
-      std::cout << "********* COMPARISON PHASE *********" << std::endl
+      libMesh::out << "********* COMPARISON PHASE *********" << std::endl
                 << std::endl;
     }
 
@@ -290,7 +290,7 @@ bool do_compare (EquationSystems& les,
   bool result = les.compare(res, threshold, verbose);
   if (verbose)
     {
-      std::cout        << "*********     FINISHED     *********" << std::endl;
+      libMesh::out        << "*********     FINISHED     *********" << std::endl;
     }
   return result;
 }
@@ -333,7 +333,7 @@ int main (int argc, char** argv)
 
   if (dim == static_cast<unsigned int>(-1))
     {
-      std::cout << "ERROR:  you must specify the dimension on "
+      libMesh::out << "ERROR:  you must specify the dimension on "
                 << "the command line!\n\n"
                 << argv[0] << " -d 3 ... for example\n\n";
       libmesh_error();
@@ -344,14 +344,14 @@ int main (int argc, char** argv)
 
   if (verbose)
     {
-        std::cout << "Settings:" << std::endl
-                  << " dimensionality = " << dim << std::endl
-                  << " mesh           = " << names[0] << std::endl
-                  << " left system    = " << names[1] << std::endl
-                  << " right system   = " << names[2] << std::endl
-                  << " threshold      = " << threshold << std::endl
-                  << " read format    = " << format << std::endl
-                  << std::endl;
+        libMesh::out << "Settings:" << std::endl
+                     << " dimensionality = " << dim << std::endl
+                     << " mesh           = " << names[0] << std::endl
+                     << " left system    = " << names[1] << std::endl
+                     << " right system   = " << names[2] << std::endl
+                     << " threshold      = " << threshold << std::endl
+                     << " read format    = " << format << std::endl
+                     << std::endl;
     }
 
 
@@ -372,7 +372,7 @@ int main (int argc, char** argv)
     }
   else
     {
-      std::cout << "No input specified." << std::endl;
+      libMesh::out << "No input specified." << std::endl;
       return 1;
     }
 
@@ -390,7 +390,7 @@ int main (int argc, char** argv)
     }
   else
     {
-      std::cout << "Bad input specified." << std::endl;
+      libMesh::out << "Bad input specified." << std::endl;
       libmesh_error();
     }
 
@@ -405,21 +405,21 @@ int main (int argc, char** argv)
   if (are_equal)
     {
       if (!quiet)
-          std::cout << std::endl
-                    << " Congrat's, up to the defined threshold, the two"
-                    << std::endl
-                    << " are identical."
-                    << std::endl;
+          libMesh::out << std::endl
+                       << " Congrat's, up to the defined threshold, the two"
+                       << std::endl
+                       << " are identical."
+                       << std::endl;
       our_result=0;
     }
   else
     {
       if (!quiet)
-          std::cout << std::endl
-                    << " Oops, differences occured!"
-                    << std::endl
-                    << " Use -v to obtain more information where differences occured."
-                    << std::endl;
+          libMesh::out << std::endl
+                       << " Oops, differences occured!"
+                       << std::endl
+                       << " Use -v to obtain more information where differences occured."
+                       << std::endl;
       our_result=1;
     }
 

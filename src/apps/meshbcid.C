@@ -37,9 +37,9 @@ using namespace libMesh;
 
 void usage_error(const char *progname)
 {
-  std::cout << "Usage: " << progname
-            << " --dim d --input inputmesh --output outputmesh --newbcid idnum --tests --moretests"
-            << std::endl;
+  libMesh::out << "Usage: " << progname
+               << " --dim d --input inputmesh --output outputmesh --newbcid idnum --tests --moretests"
+               << std::endl;
 
   exit(1);
 }
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
   int dim = -1;
   if (!cl.search("--dim"))
     {
-      std::cerr << "No --dim argument found!" << std::endl;
+      libMesh::err << "No --dim argument found!" << std::endl;
       usage_error(argv[0]);
     }
   dim = cl.next(dim);
@@ -62,17 +62,17 @@ int main(int argc, char** argv)
 
   if(!cl.search("--input"))
     {
-      std::cerr << "No --input argument found!" << std::endl;
+      libMesh::err << "No --input argument found!" << std::endl;
       usage_error(argv[0]);
     }
   const char* meshname = cl.next("mesh.xda");
 
   mesh.read(meshname);
-  std::cout << "Loaded mesh " << meshname << std::endl;
+  libMesh::out << "Loaded mesh " << meshname << std::endl;
 
   if(!cl.search("--newbcid"))
     {
-      std::cerr << "No --bcid argument found!" << std::endl;
+      libMesh::err << "No --bcid argument found!" << std::endl;
       usage_error(argv[0]);
     }
   boundary_id_type bcid = 0;
@@ -119,10 +119,10 @@ int main(int argc, char** argv)
   if (cl.search("--maxpointz"))
     maxpoint(2) = cl.next(maxpoint(2));
 
-std::cout << "min point = " << minpoint << std::endl;
-std::cout << "max point = " << maxpoint << std::endl;
-std::cout << "min normal = " << minnormal << std::endl;
-std::cout << "max normal = " << maxnormal << std::endl;
+libMesh::out << "min point = " << minpoint << std::endl;
+libMesh::out << "max point = " << maxpoint << std::endl;
+libMesh::out << "min normal = " << minnormal << std::endl;
+libMesh::out << "max normal = " << maxnormal << std::endl;
 
   bool matcholdbcid = false;
   boundary_id_type oldbcid = 0;
@@ -155,10 +155,10 @@ std::cout << "max normal = " << maxnormal << std::endl;
           const Point &p = face_points[0];
           const Point &n = face_normals[0];
 
-//std::cout << "elem = " << elem->id() << std::endl;
-//std::cout << "centroid = " << elem->centroid() << std::endl;
-//std::cout << "p = " << p << std::endl;
-//std::cout << "n = " << n << std::endl;
+//libMesh::out << "elem = " << elem->id() << std::endl;
+//libMesh::out << "centroid = " << elem->centroid() << std::endl;
+//libMesh::out << "p = " << p << std::endl;
+//libMesh::out << "n = " << n << std::endl;
 
           if (p(0) > minpoint(0) && p(0) < maxpoint(0) &&
               p(1) > minpoint(1) && p(1) < maxpoint(1) &&
@@ -172,8 +172,8 @@ std::cout << "max normal = " << maxnormal << std::endl;
                 continue;
               mesh.boundary_info->remove_side(elem, s);
               mesh.boundary_info->add_side(elem, s, bcid);
-//std::cout << "Set element " << elem->id() << " side " << s <<
-//             " to boundary " << bcid << std::endl;
+//libMesh::out << "Set element " << elem->id() << " side " << s <<
+//                " to boundary " << bcid << std::endl;
             }
         }
     }
@@ -191,7 +191,7 @@ std::cout << "max normal = " << maxnormal << std::endl;
 
 
   mesh.write(outputname.c_str());
-  std::cout << "Wrote mesh " << outputname << std::endl;
+  libMesh::out << "Wrote mesh " << outputname << std::endl;
 
   return 0;
 }

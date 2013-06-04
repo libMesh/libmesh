@@ -105,48 +105,48 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
   if(this->processor_id() == 1)
     sleep(1);
 
-  std::cout<<"n_nodes_per_elem: "<<n_nodes_per_elem<<std::endl;
+  libMesh::out<<"n_nodes_per_elem: "<<n_nodes_per_elem<<std::endl;
 
-  std::cout<<"Dim: "<<dim<<std::endl;
+  libMesh::out<<"Dim: "<<dim<<std::endl;
 
-  std::cerr<<"Vertices size: "<<vertices.size()<<std::endl;
+  libMesh::err<<"Vertices size: "<<vertices.size()<<std::endl;
   {
-    std::cerr<<this->processor_id()<<" Vertices: ";
+    libMesh::err<<this->processor_id()<<" Vertices: ";
 
     for(unsigned int i=0; i<vertices.size(); i++)
-      std::cerr<<vertices[i]<<" ";
+      libMesh::err<<vertices[i]<<" ";
 
-    std::cerr<<std::endl;
+    libMesh::err<<std::endl;
   }
 
-  std::cerr<<"Coordinates size: "<<coordinates.size()<<std::endl;
+  libMesh::err<<"Coordinates size: "<<coordinates.size()<<std::endl;
   {
-    std::cerr<<this->processor_id()<<" Coordinates: ";
+    libMesh::err<<this->processor_id()<<" Coordinates: ";
 
     for(unsigned int i=0; i<coordinates.size(); i++)
-      std::cerr<<coordinates[i]<<" ";
+      libMesh::err<<coordinates[i]<<" ";
 
-    std::cerr<<std::endl;
+    libMesh::err<<std::endl;
   }
 
-  std::cerr<<"Connectivity size: "<<connectivity.size()<<std::endl;
+  libMesh::err<<"Connectivity size: "<<connectivity.size()<<std::endl;
   {
-    std::cerr<<this->processor_id()<<" Connectivity: ";
+    libMesh::err<<this->processor_id()<<" Connectivity: ";
 
     for(unsigned int i=0; i<connectivity.size(); i++)
-      std::cerr<<connectivity[i]<<" ";
+      libMesh::err<<connectivity[i]<<" ";
 
-    std::cerr<<std::endl;
+    libMesh::err<<std::endl;
   }
 
-  std::cerr<<"Permutation_List size: "<<permutation_list.size()<<std::endl;
+  libMesh::err<<"Permutation_List size: "<<permutation_list.size()<<std::endl;
   {
-    std::cerr<<this->processor_id()<<" Permutation_List: ";
+    libMesh::err<<this->processor_id()<<" Permutation_List: ";
 
     for(unsigned int i=0; i<permutation_list.size(); i++)
-      std::cerr<<permutation_list[i]<<" ";
+      libMesh::err<<permutation_list[i]<<" ";
 
-    std::cerr<<std::endl;
+    libMesh::err<<std::endl;
   }
 
   */

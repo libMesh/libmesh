@@ -569,7 +569,7 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
 		    var_names[var_num++] = var_name+"_z";
 		    break;
 		  default:
-		    std::cerr << "Invalid dim in build_variable_names" << std::endl;
+		    libMesh::err << "Invalid dim in build_variable_names" << std::endl;
 		    libmesh_error();
 		  }
 	      }

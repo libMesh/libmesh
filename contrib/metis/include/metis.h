@@ -1,5 +1,5 @@
 /*!
-\file metis.h 
+\file metis.h
 \brief This file contains function prototypes and constant definitions for METIS
  *
 \author George
@@ -8,7 +8,7 @@
 */
 
 #ifndef _METIS_H_
-#define _METIS_H_ 
+#define _METIS_H_
 
 /****************************************************************************
 * A set of defines that can be modified by the user
@@ -152,12 +152,12 @@ typedef __int64 int64_t;
 
 
 /*------------------------------------------------------------------------
-* Constant definitions 
+* Constant definitions
 *-------------------------------------------------------------------------*/
 /* Metis's version number */
 #define METIS_VER_MAJOR         5
-#define METIS_VER_MINOR         0
-#define METIS_VER_SUBMINOR      2
+#define METIS_VER_MINOR         1
+#define METIS_VER_SUBMINOR      0
 
 /* The maximum length of the options[] array */
 #define METIS_NOPTIONS          40
@@ -165,7 +165,7 @@ typedef __int64 int64_t;
 
 
 /*------------------------------------------------------------------------
-* Function prototypes 
+* Function prototypes
 *-------------------------------------------------------------------------*/
 
 #ifdef _WINDLL
@@ -182,29 +182,29 @@ typedef __int64 int64_t;
 extern "C" {
 #endif
 
-METIS_API(int) METIS_PartGraphRecursive(idx_t *nvtxs, idx_t *ncon, idx_t *xadj, 
-                  idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt, 
-                  idx_t *nparts, real_t *tpwgts, real_t *ubvec, idx_t *options, 
+METIS_API(int) METIS_PartGraphRecursive(idx_t *nvtxs, idx_t *ncon, idx_t *xadj,
+                  idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt,
+                  idx_t *nparts, real_t *tpwgts, real_t *ubvec, idx_t *options,
                   idx_t *edgecut, idx_t *part);
 
-METIS_API(int) METIS_PartGraphKway(idx_t *nvtxs, idx_t *ncon, idx_t *xadj, 
-                  idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt, 
-                  idx_t *nparts, real_t *tpwgts, real_t *ubvec, idx_t *options, 
+METIS_API(int) METIS_PartGraphKway(idx_t *nvtxs, idx_t *ncon, idx_t *xadj,
+                  idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt,
+                  idx_t *nparts, real_t *tpwgts, real_t *ubvec, idx_t *options,
                   idx_t *edgecut, idx_t *part);
 
-METIS_API(int) METIS_MeshToDual(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind, 
+METIS_API(int) METIS_MeshToDual(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind,
                   idx_t *ncommon, idx_t *numflag, idx_t **r_xadj, idx_t **r_adjncy);
 
-METIS_API(int) METIS_MeshToNodal(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind, 
+METIS_API(int) METIS_MeshToNodal(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind,
                   idx_t *numflag, idx_t **r_xadj, idx_t **r_adjncy);
 
 METIS_API(int) METIS_PartMeshNodal(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind,
-                  idx_t *vwgt, idx_t *vsize, idx_t *nparts, real_t *tpwgts, 
+                  idx_t *vwgt, idx_t *vsize, idx_t *nparts, real_t *tpwgts,
                   idx_t *options, idx_t *objval, idx_t *epart, idx_t *npart);
 
 METIS_API(int) METIS_PartMeshDual(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind,
-                  idx_t *vwgt, idx_t *vsize, idx_t *ncommon, idx_t *nparts, 
-                  real_t *tpwgts, idx_t *options, idx_t *objval, idx_t *epart, 
+                  idx_t *vwgt, idx_t *vsize, idx_t *ncommon, idx_t *nparts,
+                  real_t *tpwgts, idx_t *options, idx_t *objval, idx_t *epart,
                   idx_t *npart);
 
 METIS_API(int) METIS_NodeND(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
@@ -218,10 +218,10 @@ METIS_API(int) METIS_SetDefaultOptions(idx_t *options);
 /* These functions are used by ParMETIS */
 
 METIS_API(int) METIS_NodeNDP(idx_t nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
-                   idx_t npes, idx_t *options, idx_t *perm, idx_t *iperm, 
+                   idx_t npes, idx_t *options, idx_t *perm, idx_t *iperm,
                    idx_t *sizes);
 
-METIS_API(int) METIS_ComputeVertexSeparator(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy, 
+METIS_API(int) METIS_ComputeVertexSeparator(idx_t *nvtxs, idx_t *xadj, idx_t *adjncy,
                    idx_t *vwgt, idx_t *options, idx_t *sepsize, idx_t *part);
 
 METIS_API(int) METIS_NodeRefine(idx_t nvtxs, idx_t *xadj, idx_t *vwgt, idx_t *adjncy,
@@ -235,7 +235,7 @@ METIS_API(int) METIS_NodeRefine(idx_t nvtxs, idx_t *xadj, idx_t *vwgt, idx_t *ad
 
 
 /*------------------------------------------------------------------------
-* Enum type definitions 
+* Enum type definitions
 *-------------------------------------------------------------------------*/
 /*! Return codes */
 typedef enum {
@@ -243,12 +243,12 @@ typedef enum {
   METIS_ERROR_INPUT     = -2,   /*!< Returned due to erroneous inputs and/or options */
   METIS_ERROR_MEMORY    = -3,   /*!< Returned due to insufficient memory */
   METIS_ERROR           = -4    /*!< Some other errors */
-} rstatus_et; 
+} rstatus_et;
 
 
 /*! Operation type codes */
 typedef enum {
-  METIS_OP_PMETIS,       
+  METIS_OP_PMETIS,
   METIS_OP_KMETIS,
   METIS_OP_OMETIS
 } moptype_et;
@@ -265,6 +265,7 @@ typedef enum {
   METIS_OPTION_NITER,
   METIS_OPTION_NCUTS,
   METIS_OPTION_SEED,
+  METIS_OPTION_NO2HOP,
   METIS_OPTION_MINCONN,
   METIS_OPTION_CONTIG,
   METIS_OPTION_COMPRESS,
@@ -287,14 +288,14 @@ typedef enum {
 
 /*! Partitioning Schemes */
 typedef enum {
-  METIS_PTYPE_RB, 
-  METIS_PTYPE_KWAY                
+  METIS_PTYPE_RB,
+  METIS_PTYPE_KWAY
 } mptype_et;
 
 /*! Graph types for meshes */
 typedef enum {
   METIS_GTYPE_DUAL,
-  METIS_GTYPE_NODAL               
+  METIS_GTYPE_NODAL
 } mgtype_et;
 
 /*! Coarsening Schemes */
@@ -332,7 +333,7 @@ typedef enum {
   METIS_DBG_MOVEINFO   = 32, 	  /*!< Show info on vertex moves during refinement */
   METIS_DBG_SEPINFO    = 64, 	  /*!< Show info on vertex moves during sep refinement */
   METIS_DBG_CONNINFO   = 128,     /*!< Show info on minimization of subdomain connectivity */
-  METIS_DBG_CONTIGINFO = 256,     /*!< Show info on elimination of connected components */ 
+  METIS_DBG_CONTIGINFO = 256,     /*!< Show info on elimination of connected components */
   METIS_DBG_MEMORY     = 2048     /*!< Show info related to wspace allocation */
 } mdbglvl_et;
 

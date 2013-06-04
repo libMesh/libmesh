@@ -12,7 +12,7 @@ which is used for code generation.
 
 \date   Started 9/28/95
 \author George
-\version\verbatim $Id$ \endverbatim
+\version\verbatim $Id: blas.c 11848 2012-04-20 13:47:37Z karypis $ \endverbatim
 */
 
 #include <GKlib.h>
@@ -22,14 +22,14 @@ which is used for code generation.
 /*************************************************************************/
 /*! Use the templates to generate BLAS routines for the scalar data types */
 /*************************************************************************/
-GK_MKBLAS(gk_c,   char,     intmax_t)
-GK_MKBLAS(gk_i,   int,      intmax_t)
-GK_MKBLAS(gk_i32, int32_t,  intmax_t)
-GK_MKBLAS(gk_i64, int64_t,  intmax_t)
+GK_MKBLAS(gk_c,   char,     int)
+GK_MKBLAS(gk_i,   int,      int)
+GK_MKBLAS(gk_i32, int32_t,  int32_t)
+GK_MKBLAS(gk_i64, int64_t,  int64_t)
 GK_MKBLAS(gk_z,   ssize_t,  ssize_t)
 GK_MKBLAS(gk_f,   float,    float)
 GK_MKBLAS(gk_d,   double,   double)
-GK_MKBLAS(gk_idx, gk_idx_t, intmax_t)
+GK_MKBLAS(gk_idx, gk_idx_t, gk_idx_t)
 
 
 

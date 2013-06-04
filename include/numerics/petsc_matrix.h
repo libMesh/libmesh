@@ -122,13 +122,16 @@ public:
    * nonzeros per row (defaults to 30).
    * \p noz is the number of on-processor
    * nonzeros per row (defaults to 30).
+   * Optionally supports a block size, which indicates dense coupled blocks
+   * for systems with multiple variables all of the same type.
    */
   void init (const numeric_index_type m,
 	     const numeric_index_type n,
 	     const numeric_index_type m_l,
 	     const numeric_index_type n_l,
 	     const numeric_index_type nnz=30,
-	     const numeric_index_type noz=10);
+	     const numeric_index_type noz=10,
+	     const numeric_index_type blocksize=1);
 
   /**
    * Initialize a Petsc matrix that is of global
@@ -137,13 +140,16 @@ public:
    * nonzeros per row.
    * \p noz is the number of off-processor
    * nonzeros per row.
+   * Optionally supports a block size, which indicates dense coupled blocks
+   * for systems with multiple variables all of the same type.
    */
   void init (const numeric_index_type m,
 	     const numeric_index_type n,
 	     const numeric_index_type m_l,
 	     const numeric_index_type n_l,
 	     const std::vector<numeric_index_type>& n_nz,
-	     const std::vector<numeric_index_type>& n_oz);
+	     const std::vector<numeric_index_type>& n_oz,
+	     const numeric_index_type blocksize=1);
 
   /**
    * Initialize using sparsity structure computed by \p dof_map.
@@ -234,11 +240,30 @@ public:
 		   const std::vector<numeric_index_type> &cols);
 
   /**
-   * Same, but assumes the row and column maps are the same.
+   * Same as \p add_matrix, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
   void add_matrix (const DenseMatrix<T> &dm,
 		   const std::vector<numeric_index_type> &dof_indices);
+
+  /**
+   * Add the full matrix \p dm to the
+   * Sparse matrix.  This is useful
+   * for adding an element matrix
+   * at assembly time.  The matrix is assumed blocked, and \p brow, \p bcol
+   * correspond to the *block* row, columm indices.
+   */
+  virtual void add_block_matrix (const DenseMatrix<T> &dm,
+				 const std::vector<numeric_index_type> &brows,
+				 const std::vector<numeric_index_type> &bcols);
+
+  /**
+   * Same as \p add_block_matrix , but assumes the row and column maps are the same.
+   * Thus the matrix \p dm must be square.
+   */
+  virtual void add_block_matrix (const DenseMatrix<T> &dm,
+				 const std::vector<numeric_index_type> &dof_indices)
+  { this->add_block_matrix (dm, dof_indices, dof_indices); }
 
   /**
    * Add a Sparse matrix \p X, scaled with \p a, to \p this,

@@ -78,7 +78,7 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
   // the forward_map maps the active element id
   // into a contiguous block of indices
   std::vector<dof_id_type>
-    forward_map (n_elem, libMesh::invalid_uint);
+    forward_map (n_elem, DofObject::invalid_id);
 
   // the reverse_map maps the contiguous ids back
   // to active elements

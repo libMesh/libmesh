@@ -121,7 +121,8 @@ void EpetraMatrix<T>::init (const numeric_index_type m,
 			    const numeric_index_type m_l,
 			    const numeric_index_type n_l,
 			    const numeric_index_type nnz,
-			    const numeric_index_type noz)
+			    const numeric_index_type noz,
+			    const numeric_index_type /* blocksize */)
 {
   if ((m==0) || (n==0))
     return;

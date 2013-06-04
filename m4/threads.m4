@@ -9,6 +9,7 @@ ac_cv_cxx_thread,
  AC_LANG_CPLUSPLUS
  AC_TRY_COMPILE([#include <thread>],
 [
+  thread_local int i;
   std::thread t;
   t.join();
 ],
@@ -55,7 +56,7 @@ fi
 
 if test "$ac_cv_tbb_cxx_thread" = yes; then
   AC_DEFINE(HAVE_TBB_CXX_THREAD,1,
-            [define if the compiler supports std::thread])
+            [define if the compiler supports tbb::tbb_thread])
   [$1]
 else
   false

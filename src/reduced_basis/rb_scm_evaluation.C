@@ -48,8 +48,8 @@
 namespace libMesh
 {
 
-RBSCMEvaluation::RBSCMEvaluation (const Parallel::Communicator &comm) :
-  ParallelObject(comm)
+RBSCMEvaluation::RBSCMEvaluation (const Parallel::Communicator &comm_in) :
+  ParallelObject(comm_in)
 {
   // Clear SCM data vectors
   B_min.clear();

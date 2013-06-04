@@ -28,6 +28,8 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/tensor_value.h"  // May be necessary if destructors
+				   // get instantiated here
 
 namespace libMesh
 {

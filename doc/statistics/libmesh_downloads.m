@@ -15,6 +15,8 @@ hold on
 
 % Month, number of d/l, and number of MB served
 cell_data = {
+{'May', '2013',  	248, 0.0}
+{'Apr', '2013',  	282, 0.0}
 {'Mar', '2013',  	259, 0.0}
 {'Feb', '2013',  	250, 0.0}
 {'Jan', '2013',  	108, 0.0}

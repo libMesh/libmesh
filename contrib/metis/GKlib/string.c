@@ -1,34 +1,31 @@
 /************************************************************************/
-/*! \file 
+/*! \file
 
 \brief Functions for manipulating strings.
 
-Various functions for manipulating strings. Some of these functions 
+Various functions for manipulating strings. Some of these functions
 provide new functionality, whereas others are drop-in replacements
 of standard functions (but with enhanced functionality).
 
 \date Started 11/1/99
 \author George
-\version $Id$
+\version $Id: string.c 10711 2011-08-31 22:23:04Z karypis $
 */
 /************************************************************************/
 
-#define _XOPEN_SOURCE 
-#include <stddef.h>
-#include <time.h>
 #include <GKlib.h>
 
 
 
 /************************************************************************/
 /*! \brief Replaces certain characters in a string.
- 
+
 This function takes a string and replaces all the characters in the
-\c fromlist with the corresponding characters from the \c tolist. 
-That is, each occurence of <tt>fromlist[i]</tt> is replaced by 
-<tt>tolist[i]</tt>. 
-If the \c tolist is shorter than \c fromlist, then the corresponding 
-characters are deleted. The modifications on \c str are done in place. 
+\c fromlist with the corresponding characters from the \c tolist.
+That is, each occurence of <tt>fromlist[i]</tt> is replaced by
+<tt>tolist[i]</tt>.
+If the \c tolist is shorter than \c fromlist, then the corresponding
+characters are deleted. The modifications on \c str are done in place.
 It tries to provide a functionality similar to Perl's \b tr// function.
 
 \param str is the string whose characters will be replaced.
@@ -39,7 +36,7 @@ It tries to provide a functionality similar to Perl's \b tr// function.
 /************************************************************************/
 char *gk_strchr_replace(char *str, char *fromlist, char *tolist)
 {
-  gk_idx_t i, j, k; 
+  gk_idx_t i, j, k;
   size_t len, fromlen, tolen;
 
   len     = strlen(str);
@@ -49,7 +46,7 @@ char *gk_strchr_replace(char *str, char *fromlist, char *tolist)
   for (i=j=0; i<len; i++) {
     for (k=0; k<fromlen; k++) {
       if (str[i] == fromlist[k]) {
-        if (k < tolen) 
+        if (k < tolen)
           str[j++] = tolist[k];
         break;
       }
@@ -66,11 +63,11 @@ char *gk_strchr_replace(char *str, char *fromlist, char *tolist)
 
 /************************************************************************/
 /*! \brief Regex-based search-and-replace function
- 
+
 This function is a C implementation of Perl's <tt> s//</tt> regular-expression
 based substitution function.
 
-\param str 
+\param str
   is the input string on which the operation will be performed.
 \param pattern
   is the regular expression for the pattern to be matched for substitution.
@@ -80,30 +77,30 @@ based substitution function.
   to as $0.
 \param options
   is a string specified options for the substitution operation. Currently the
-  <tt>"i"</tt> (case insensitive) and <tt>"g"</tt> (global substitution) are 
+  <tt>"i"</tt> (case insensitive) and <tt>"g"</tt> (global substitution) are
   supported.
-\param new_str 
-  is a reference to a pointer that will store a pointer to the newly created 
-  string that results from the substitutions. This string is allocated via 
-  gk_malloc() and needs to be freed using gk_free(). The string is returned 
+\param new_str
+  is a reference to a pointer that will store a pointer to the newly created
+  string that results from the substitutions. This string is allocated via
+  gk_malloc() and needs to be freed using gk_free(). The string is returned
   even if no substitutions were performed.
 \returns
   If successful, it returns 1 + the number of substitutions that were performed.
   Thus, if no substitutions were performed, the returned value will be 1.
-  Otherwise it returns 0. In case of error, a meaningful error message is 
+  Otherwise it returns 0. In case of error, a meaningful error message is
   returned in <tt>newstr</tt>, which also needs to be freed afterwards.
 */
 /************************************************************************/
 int gk_strstr_replace(char *str, char *pattern, char *replacement, char *options,
       char **new_str)
 {
-  gk_idx_t i; 
+  gk_idx_t i;
   int j, rc, flags, global, nmatches;
   size_t len, rlen, nlen, offset, noffset;
   regex_t re;
   regmatch_t matches[10];
 
-  
+
   /* Parse the options */
   flags = REG_EXTENDED;
   if (strchr(options, 'i') != NULL)
@@ -112,7 +109,7 @@ int gk_strstr_replace(char *str, char *pattern, char *replacement, char *options
 
 
   /* Compile the regex */
-  if ((rc = regcomp(&re, pattern, flags)) != 0) { 
+  if ((rc = regcomp(&re, pattern, flags)) != 0) {
     len = regerror(rc, &re, NULL, 0);
     *new_str = gk_cmalloc(len, "gk_strstr_replace: new_str");
     regerror(rc, &re, *new_str, len);
@@ -243,8 +240,8 @@ int gk_strstr_replace(char *str, char *pattern, char *replacement, char *options
 /*! \brief Prunes characters from the end of the string.
 
 This function removes any trailing characters that are included in the
-\c rmlist. The trimming stops at the last character (i.e., first character 
-from the end) that is not in \c rmlist.  
+\c rmlist. The trimming stops at the last character (i.e., first character
+from the end) that is not in \c rmlist.
 This function can be used to removed trailing spaces, newlines, etc.
 This is a distructive operation as it modifies the string.
 
@@ -280,7 +277,7 @@ char *gk_strtprune(char *str, char *rmlist)
 /*! \brief Prunes characters from the beginning of the string.
 
 This function removes any starting characters that are included in the
-\c rmlist. The trimming stops at the first character that is not in 
+\c rmlist. The trimming stops at the first character that is not in
 \c rmlist.
 This function can be used to removed leading spaces, tabs, etc.
 This is a distructive operation as it modifies the string.
@@ -320,7 +317,7 @@ char *gk_strhprune(char *str, char *rmlist)
 /************************************************************************/
 /*! \brief Converts a string to upper case.
 
-This function converts a string to upper case. This operation modifies the 
+This function converts a string to upper case. This operation modifies the
 string itself.
 
 \param str is the string whose case will be changed.
@@ -332,7 +329,7 @@ char *gk_strtoupper(char *str)
 {
   int i;
 
-  for (i=0; str[i]!='\0'; str[i]=toupper(str[i]), i++); 
+  for (i=0; str[i]!='\0'; str[i]=toupper(str[i]), i++);
   return str;
 }
 
@@ -340,7 +337,7 @@ char *gk_strtoupper(char *str)
 /************************************************************************/
 /*! \brief Converts a string to lower case.
 
-This function converts a string to lower case. This operation modifies the 
+This function converts a string to lower case. This operation modifies the
 string itself.
 
 \param str is the string whose case will be changed.
@@ -352,7 +349,7 @@ char *gk_strtolower(char *str)
 {
   int i;
 
-  for (i=0; str[i]!='\0'; str[i]=tolower(str[i]), i++); 
+  for (i=0; str[i]!='\0'; str[i]=tolower(str[i]), i++);
   return str;
 }
 
@@ -362,7 +359,7 @@ char *gk_strtolower(char *str)
 
 This function is a replacement for C's standard <em>strdup()</em> function.
 The key differences between the two are that gk_strdup():
-  - uses the dynamic memory allocation routines of \e GKlib. 
+  - uses the dynamic memory allocation routines of \e GKlib.
   - it correctly handles NULL input strings.
 
 The string that is returned must be freed by gk_free().
@@ -391,10 +388,10 @@ char *gk_strdup(char *orgstr)
 /*! \brief Case insensitive string comparison.
 
 This function compares two strings for equality by ignoring the case of the
-strings. 
+strings.
 
-\warning This function is \b not equivalent to a case-insensitive 
-         <em>strcmp()</em> function, as it does not return ordering 
+\warning This function is \b not equivalent to a case-insensitive
+         <em>strcmp()</em> function, as it does not return ordering
          information.
 
 \todo Remove the above warning.
@@ -457,15 +454,15 @@ int gk_strrcmp(char *s1, char *s2)
 
 
 /************************************************************************/
-/*! \brief Converts a time_t time into a string 
+/*! \brief Converts a time_t time into a string
 
 This function takes a time_t-specified time and returns a string-formated
 representation of the corresponding time. The format of the string is
 <em>mm/dd/yyyy hh:mm:ss</em>, in which the hours are in military time.
 
 \param time is the time to be converted.
-\return It returns a pointer to a statically allocated string that is 
-        over-written in successive calls of this function. If the 
+\return It returns a pointer to a statically allocated string that is
+        over-written in successive calls of this function. If the
         conversion failed, it returns NULL.
 
 */
@@ -495,7 +492,7 @@ strptime() function. The format that gk_str2time() understands is
 <em>mm/dd/yyyy hh:mm:ss</em>, in which the hours are in military time.
 
 \param str is the date/time string to be converted.
-\return If the conversion was successful it returns the time, otherwise 
+\return If the conversion was successful it returns the time, otherwise
         it returns -1.
 */
 /*************************************************************************/
@@ -505,8 +502,8 @@ time_t gk_str2time(char *str)
   time_t rtime;
 
   memset(&time, '\0', sizeof(time));
-  
-  if (strptime(str, "%m/%d/%Y %H:%M:%S", &time) == NULL)
+
+  if (!strptime(str, "%m/%d/%Y %H:%M:%S", &time))
     return -1;
 
   rtime = mktime(&time);
@@ -516,7 +513,7 @@ time_t gk_str2time(char *str)
 
 
 /*************************************************************************
-* This function returns the ID of a particular string based on the 
+* This function returns the ID of a particular string based on the
 * supplied StringMap array
 **************************************************************************/
 int gk_GetStringID(gk_StringMap_t *strmap, char *key)

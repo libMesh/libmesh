@@ -493,7 +493,6 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   // verify at the library level if it's being done by user code, and
   // we don't want to abort large parallel runs in opt mode... but we
   // do want to warn that they should be fixed.
-  libmesh_assert(flags_were_consistent);
   if (!flags_were_consistent)
     {
       libMesh::out << "Refinement flags were not consistent between processors!\n"

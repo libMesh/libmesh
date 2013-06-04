@@ -23,6 +23,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/metis_partitioner.h"
 #include "libmesh/serial_mesh.h"
+#include "libmesh/utility.h"
 
 #include LIBMESH_INCLUDE_UNORDERED_SET
 LIBMESH_DEFINE_HASH_POINTERS
@@ -83,50 +84,27 @@ namespace
       return false;
     }
 
-    // Help for the vector< pair<Point,id> > case
+    // Needed by std::sort on vector< pair<Point,id> >
     bool operator()(const std::pair<Point, dof_id_type>& lhs,
                     const std::pair<Point, dof_id_type>& rhs)
     {
       return (*this)(lhs.first, rhs.first);
     }
+
+    // Comparsion function where lhs is a Point and rhs is a pair<Point,dof_id_type>.
+    // This is used in routines like lower_bound, where a specific value is being
+    // searched for.
+    bool operator()(const Point& lhs, std::pair<Point, dof_id_type>& rhs)
+    {
+      return (*this)(lhs, rhs.first);
+    }
+
+    // And the other way around...
+    bool operator()(std::pair<Point, dof_id_type>& lhs, const Point& rhs)
+    {
+      return (*this)(lhs.first, rhs);
+    }
   };
-
-
-  typedef std::vector< std::pair<Point, dof_id_type> > PointVector;
-
-  PointVector::iterator fuzzy_binary_find(PointVector::iterator cur,
-                                          PointVector::iterator last,
-                                          Point val,
-                                          Real tol)
-  {
-    PointVector::iterator it;
-    std::iterator_traits<PointVector::iterator>::difference_type count, step;
-    count = std::distance(cur, last);
-
-    // Object we'll use to make comparisons
-    FuzzyPointCompare comp(tol);
-
-    while (count>0)
-      {
-        it = cur;
-        step = count/2;
-        std::advance (it, step);
-
-        if ( comp(it->first,val) )
-          {
-            cur = ++it;
-            count -= step+1;
-          }
-        else
-          count = step;
-      }
-
-    if ( comp(val,cur->first) )
-      return last;
-    else
-      return cur;
-  }
-
 }
 
 
@@ -770,7 +748,12 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   if( (this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
       (other_mesh_boundary_id != BoundaryInfo::invalid_id) )
   {
-    // Loop below fills in these arrays for the two meshes.
+    // While finding nodes on the boundary, also find the minimum edge length
+    // of all faces on both boundaries.  This will later be used in relative
+    // distance checks when stitching nodes.
+    Real h_min = std::numeric_limits<Real>::max();
+
+    // Loop below fills in these sets for the two meshes.
     std::set<dof_id_type> this_boundary_node_ids, other_boundary_node_ids;
     {
       // Make temporary fixed-size arrays for loop
@@ -798,6 +781,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
                         AutoPtr<Elem> side (el->build_side(side_id));
                         for (unsigned int node_id=0; node_id<side->n_nodes(); ++node_id)
                           set_array[i]->insert( side->node(node_id) );
+
+                        h_min = std::min(h_min, side->hmin());
                       }
                   }
             }
@@ -809,6 +794,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
         libMesh::out << "In SerialMesh::stitch_meshes:\n"
                      << "This mesh has "  << this_boundary_node_ids.size()  << " nodes on boundary " << this_mesh_boundary_id  << ".\n"
                      << "Other mesh has " << other_boundary_node_ids.size() << " nodes on boundary " << other_mesh_boundary_id << ".\n"
+                     << "Minimum edge length on both surfaces is " << h_min << ".\n"
                      << std::endl;
       }
 
@@ -818,6 +804,11 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     PointVector
       this_sorted_bndry_nodes(this_boundary_node_ids.size()),
       other_sorted_bndry_nodes(other_boundary_node_ids.size());
+
+    // Comparison object that will be used later.  We control the tolerance
+    // used in this sorting, not the user.  So far, I've had reasonable success
+    // with TOLERANCE...
+    FuzzyPointCompare mein_comp(TOLERANCE);
 
     // Create and sort the vectors we will use to do the geometric searching
     {
@@ -835,11 +826,11 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
           for (unsigned ctr=0; set_it != set_it_end; ++set_it, ++ctr)
             {
               (*vec_array[i])[ctr] = std::make_pair( mesh_array[i]->point(*set_it), // The geometric point
-                                                     *set_it );                     // It's ID
+                                                     *set_it );                     // Its ID
             }
 
           // Sort the vectors based on the FuzzyPointCompare struct op()
-          std::sort(vec_array[i]->begin(), vec_array[i]->end(), FuzzyPointCompare(tol));
+          std::sort(vec_array[i]->begin(), vec_array[i]->end(), mein_comp);
         }
     }
 
@@ -851,25 +842,24 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
         // Current point we're working on
         Point this_point = this_sorted_bndry_nodes[i].first;
 
-        // fuzzy_binary_find does a fuzzy equality comparison internally to handle
+        // FuzzyPointCompare does a fuzzy equality comparison internally to handle
         // slight differences between the list of nodes on each mesh.
-        PointVector::iterator other_iter = fuzzy_binary_find(other_sorted_bndry_nodes.begin(),
-                                                             other_sorted_bndry_nodes.end(),
-                                                             this_point,
-                                                             tol);
+        PointVector::iterator other_iter = Utility::binary_find(other_sorted_bndry_nodes.begin(),
+								other_sorted_bndry_nodes.end(),
+								this_point,
+								mein_comp);
 
 	// Not every node on this_sorted_bndry_nodes will necessarily be stitched, so
 	// if its pair is not found on other_mesh, just continue.
         if (other_iter != other_sorted_bndry_nodes.end())
           {
 	    // Check that the points do indeed match - should not be necessary unless something
-	    // is wrong with fuzzy_binary_find.  To be on the safe side, we'll check.  Use the
-	    // same comparison used by the sorting algorithm.
+	    // is wrong with binary_find.  To be on the safe side, we'll check.
 	    {
 	      // Grab the other point from the iterator
 	      Point other_point = other_iter->first;
 
-	      if (!this_point.relative_fuzzy_equals(other_point, tol))
+	      if (!this_point.absolute_fuzzy_equals(other_point, tol*h_min))
 		{
 		  libMesh::out << "Error: mismatched points: " << this_point << " and " << other_point << std::endl;
 		  libmesh_error();

@@ -64,14 +64,14 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  NumericVector (const Parallel::Communicator &comm,
+  NumericVector (const Parallel::Communicator &comm_in,
 		 const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
-  NumericVector (const Parallel::Communicator &comm,
+  NumericVector (const Parallel::Communicator &comm_in,
 		 const numeric_index_type n,
                  const ParallelType ptype = AUTOMATIC);
 
@@ -79,7 +79,7 @@ public:
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  NumericVector (const Parallel::Communicator &comm,
+  NumericVector (const Parallel::Communicator &comm_in,
 		 const numeric_index_type n,
 		 const numeric_index_type n_local,
                  const ParallelType ptype = AUTOMATIC);
@@ -89,7 +89,7 @@ public:
    * dimension to \p n, but additionally reserve memory for the
    * indices specified by the \p ghost argument.
    */
-  NumericVector (const Parallel::Communicator &comm,
+  NumericVector (const Parallel::Communicator &comm_in,
 		 const numeric_index_type N,
 		 const numeric_index_type n_local,
 		 const std::vector<numeric_index_type>& ghost,
@@ -664,9 +664,9 @@ protected:
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const Parallel::Communicator &comm,
+NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
 				 const ParallelType ptype) :
-  ParallelObject(comm),
+  ParallelObject(comm_in),
   _is_closed(false),
   _is_initialized(false),
   _type(ptype)
@@ -677,10 +677,10 @@ NumericVector<T>::NumericVector (const Parallel::Communicator &comm,
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const Parallel::Communicator &comm,
+NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
 				 const numeric_index_type /*n*/,
                                  const ParallelType ptype) :
-  ParallelObject(comm),
+  ParallelObject(comm_in),
   _is_closed(false),
   _is_initialized(false),
   _type(ptype)
@@ -693,11 +693,11 @@ NumericVector<T>::NumericVector (const Parallel::Communicator &comm,
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const Parallel::Communicator &comm,
+NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
 				 const numeric_index_type /*n*/,
 				 const numeric_index_type /*n_local*/,
                                  const ParallelType ptype) :
-  ParallelObject(comm),
+  ParallelObject(comm_in),
   _is_closed(false),
   _is_initialized(false),
   _type(ptype)
@@ -710,12 +710,12 @@ NumericVector<T>::NumericVector (const Parallel::Communicator &comm,
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const Parallel::Communicator &comm,
+NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
 				 const numeric_index_type /*n*/,
 				 const numeric_index_type /*n_local*/,
 				 const std::vector<numeric_index_type>& /*ghost*/,
                                  const ParallelType ptype) :
-  ParallelObject(comm),
+  ParallelObject(comm_in),
   _is_closed(false),
   _is_initialized(false),
   _type(ptype)
