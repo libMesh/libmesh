@@ -792,7 +792,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &,
 					     const MeshTools::BoundingBox &,
 					     const ForwardIterator &begin,
 					     const ForwardIterator &end,
-					     std::vector<unsigned int> &index_map) const
+					     std::vector<dof_id_type> &index_map) const
 {
   index_map.clear();
   index_map.reserve(std::distance (begin, end));
