@@ -210,17 +210,18 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
       if (!this->is_time_evolving(var))
         continue;
 
-      const std::vector<Real> &JxW =
-        context.element_fe_var[var]->get_JxW();
+      FEBase* elem_fe = NULL;
+      context.get_element_fe( var, elem_fe );
 
-      const std::vector<std::vector<Real> > &phi =
-        context.element_fe_var[var]->get_phi();
+      const std::vector<Real> &JxW = elem_fe->get_JxW();
+
+      const std::vector<std::vector<Real> > &phi = elem_fe->get_phi();
 
       const unsigned int n_dofs = libmesh_cast_int<unsigned int>
-	(context.dof_indices_var[var].size());
+	(context.get_dof_indices(var).size());
 
-      DenseSubVector<Number> &Fu = *context.elem_subresiduals[var];
-      DenseSubMatrix<Number> &Kuu = *context.elem_subjacobians[var][var];
+      DenseSubVector<Number> &Fu = context.get_elem_residual(var);
+      DenseSubMatrix<Number> &Kuu = context.get_elem_jacobian( var, var );
 
       for (unsigned int qp = 0; qp != n_qpoints; ++qp)
         {
