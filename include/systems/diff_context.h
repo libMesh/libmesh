@@ -108,6 +108,12 @@ public:
   { return elem_solution; }
 
   /**
+   * Non-const accessor for element solution.
+   */
+  DenseVector<Number>& get_elem_solution()
+  { return elem_solution; }
+
+  /**
    * Accessor for element solution of a particular variable corresponding
    * to the variable index argument.
    */
@@ -118,6 +124,12 @@ public:
    * Accessor for element fixed solution.
    */
   const DenseVector<Number>& get_elem_fixed_solution() const
+  { return elem_fixed_solution; }
+
+  /**
+   * Non-const accessor for element fixed solution.
+   */
+  DenseVector<Number>& get_elem_fixed_solution()
   { return elem_fixed_solution; }
 
   /**
