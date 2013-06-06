@@ -598,6 +598,12 @@ public:
   { return *elem; }
 
   /**
+   * Accessor for current Elem object
+   */
+  Elem& get_elem()
+  { return *(const_cast<Elem*>(elem)); }
+
+  /**
    * Accessor for current side of Elem object
    */
   unsigned char get_side() const
