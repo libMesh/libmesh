@@ -224,6 +224,12 @@ public:
   { return dof_indices; }
 
   /**
+   * Non-const accessor for element dof indices
+   */
+  std::vector<dof_id_type>& get_dof_indices()
+  { return dof_indices; }
+
+  /**
    * Accessor for element dof indices of a particular variable corresponding
    * to the index argument.
    */
