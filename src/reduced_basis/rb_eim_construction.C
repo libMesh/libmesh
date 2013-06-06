@@ -308,7 +308,7 @@ void RBEIMConstruction::enrich_RB_space()
 
     for(unsigned int var=0; var<n_vars(); var++)
     {
-      unsigned int n_qpoints = context.element_qrule->n_points();
+      unsigned int n_qpoints = context.get_element_qrule().n_points();
 
       for(unsigned int qp=0; qp<n_qpoints; qp++)
       {
@@ -520,7 +520,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
         const std::vector<Point> &xyz = elem_fe->get_xyz();
 
-        unsigned int n_qpoints = context.element_qrule->n_points();
+        unsigned int n_qpoints = context.get_element_qrule().n_points();
         unsigned int n_var_dofs = libmesh_cast_int<unsigned int>
 	  (context.get_dof_indices( var ).size());
 

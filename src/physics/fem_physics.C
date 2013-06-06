@@ -203,7 +203,7 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
 {
   FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
 
-  unsigned int n_qpoints = (context.get_element_qrule())->n_points();
+  unsigned int n_qpoints = context.get_element_qrule().n_points();
 
   for (unsigned int var = 0; var != context.n_vars(); ++var)
     {

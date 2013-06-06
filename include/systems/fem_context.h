@@ -511,20 +511,20 @@ public:
   /**
    * Accessor for element interior quadrature rule.
    */
-  const QBase* get_element_qrule() const
-  { return this->element_qrule; }
+  const QBase& get_element_qrule() const
+  { return *(this->element_qrule); }
 
   /**
    * Accessor for element side quadrature rule.
    */
-  const QBase* get_side_qrule() const
-  { return this->side_qrule; }
+  const QBase& get_side_qrule() const
+  { return *(this->side_qrule); }
 
   /**
    * Accessor for element edge quadrature rule.
    */
-  const QBase* get_edge_qrule() const
-  { return this->edge_qrule; }
+  const QBase& get_edge_qrule() const
+  { return *(this->edge_qrule); }
 
   /**
    * Tells the FEMContext that system \p sys contains the
