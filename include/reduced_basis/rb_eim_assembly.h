@@ -89,27 +89,4 @@ private:
 
 };
 
-/**
- * This class extends RBEIMAssembly to provide access to the RBConstruction object.
- * The RBConstruction object is often needed, e.g. it provides access to the mesh.
- */
-class RBEIMAssemblyWithConstruction : public RBEIMAssembly
-{
-public:
-
-  // Constructor
-  RBEIMAssemblyWithConstruction(RBConstruction& rb_sys_in,
-                                RBEIMConstruction& rb_eim_con_in,
-                                unsigned int basis_function_index_in)
-    : RBEIMAssembly(rb_eim_con_in,
-                    basis_function_index_in),
-      rb_sys(rb_sys_in)
-  {}
-
-  // The RBConstruction object that will use this assembly.
-  RBConstruction& rb_sys;
-};
-
-}
-
 #endif // LIBMESH_RB_EIM_ASSEMBLY_H
