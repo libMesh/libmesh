@@ -62,21 +62,22 @@ void AssemblyA0::interior_assembly(FEMContext &c)
   const unsigned int v_var = rb_sys.v_var;
   const unsigned int w_var = rb_sys.w_var;
 
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
+  FEBase* elem_fe = NULL;
+  c.get_element_fe(u_var, elem_fe);
+
+  const std::vector<Real> &JxW = elem_fe->get_JxW();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi =
-    c.element_fe_var[u_var]->get_dphi();
+  const std::vector<std::vector<RealGradient> >& dphi = elem_fe->get_dphi();
 
   // Now we will build the affine operator
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   std::vector<unsigned int> n_var_dofs(n_components);
-  n_var_dofs[u_var] = c.dof_indices_var[u_var].size();
-  n_var_dofs[v_var] = c.dof_indices_var[v_var].size();
-  n_var_dofs[w_var] = c.dof_indices_var[w_var].size();
+  n_var_dofs[u_var] = c.get_dof_indices(u_var).size();
+  n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
+  n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
 
   for (unsigned int C_i = 0; C_i < n_components; C_i++)
   {
@@ -141,21 +142,22 @@ void AssemblyA1::interior_assembly(FEMContext &c)
   const unsigned int v_var = rb_sys.v_var;
   const unsigned int w_var = rb_sys.w_var;
 
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
+  FEBase* elem_fe = NULL;
+  c.get_element_fe(u_var, elem_fe);
+
+  const std::vector<Real> &JxW = elem_fe->get_JxW();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi =
-    c.element_fe_var[u_var]->get_dphi();
+  const std::vector<std::vector<RealGradient> >& dphi = elem_fe->get_dphi();
 
   // Now we will build the affine operator
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   std::vector<unsigned int> n_var_dofs(n_components);
-  n_var_dofs[u_var] = c.dof_indices_var[u_var].size();
-  n_var_dofs[v_var] = c.dof_indices_var[v_var].size();
-  n_var_dofs[w_var] = c.dof_indices_var[w_var].size();
+  n_var_dofs[u_var] = c.get_dof_indices(u_var).size();
+  n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
+  n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
 
   for (unsigned int C_i = 0; C_i < n_components; C_i++)
   {
@@ -196,21 +198,22 @@ void AssemblyA2::interior_assembly(FEMContext &c)
   const unsigned int v_var = rb_sys.v_var;
   const unsigned int w_var = rb_sys.w_var;
 
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
+  FEBase* elem_fe = NULL;
+  c.get_element_fe(u_var, elem_fe);
+
+  const std::vector<Real> &JxW = elem_fe->get_JxW();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi =
-    c.element_fe_var[u_var]->get_dphi();
+  const std::vector<std::vector<RealGradient> >& dphi = elem_fe->get_dphi();
 
   // Now we will build the affine operator
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   std::vector<unsigned int> n_var_dofs(n_components);
-  n_var_dofs[u_var] = c.dof_indices_var[u_var].size();
-  n_var_dofs[v_var] = c.dof_indices_var[v_var].size();
-  n_var_dofs[w_var] = c.dof_indices_var[w_var].size();
+  n_var_dofs[u_var] = c.get_dof_indices(u_var).size();
+  n_var_dofs[v_var] = c.get_dof_indices(v_var).size();
+  n_var_dofs[w_var] = c.get_dof_indices(w_var).size();
 
   for (unsigned int C_i = 0; C_i < n_components; C_i++)
   {
@@ -239,21 +242,22 @@ void AssemblyA2::interior_assembly(FEMContext &c)
 
 void AssemblyF0::boundary_assembly(FEMContext &c)
 {
-  if(rb_sys.get_mesh().boundary_info->has_boundary_id(c.elem, c.side, BOUNDARY_ID_MAX_X) )
+  if(rb_sys.get_mesh().boundary_info->has_boundary_id(&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
   {
     const unsigned int u_var = 0;
 
-    const std::vector<Real> &JxW_side =
-      c.side_fe_var[u_var]->get_JxW();
+    FEBase* side_fe = NULL;
+    c.get_side_fe(u_var, side_fe);
 
-    const std::vector<std::vector<Real> >& phi_side =
-      c.side_fe_var[u_var]->get_phi();
+    const std::vector<Real> &JxW_side = side_fe->get_JxW();
+
+    const std::vector<std::vector<Real> >& phi_side = side_fe->get_phi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+    const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.side_qrule->n_points();
+    unsigned int n_qpoints = c.get_side_qrule().n_points();
     DenseSubVector<Number>& Fu = c.get_elem_residual(u_var);
 
     for (unsigned int qp=0; qp < n_qpoints; qp++)
@@ -266,22 +270,23 @@ void AssemblyF0::boundary_assembly(FEMContext &c)
 
 void AssemblyF1::boundary_assembly(FEMContext &c)
 {
-  if(rb_sys.get_mesh().boundary_info->has_boundary_id(c.elem, c.side, BOUNDARY_ID_MAX_X) )
+  if(rb_sys.get_mesh().boundary_info->has_boundary_id(&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
   {
     const unsigned int u_var = 0;
     const unsigned int v_var = 1;
 
-    const std::vector<Real> &JxW_side =
-      c.side_fe_var[u_var]->get_JxW();
+    FEBase* side_fe = NULL;
+    c.get_side_fe(u_var, side_fe);
 
-    const std::vector<std::vector<Real> >& phi_side =
-      c.side_fe_var[u_var]->get_phi();
+    const std::vector<Real> &JxW_side = side_fe->get_JxW();
+
+    const std::vector<std::vector<Real> >& phi_side = side_fe->get_phi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_v_dofs = c.dof_indices_var[v_var].size();
+    const unsigned int n_v_dofs = c.get_dof_indices(u_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.side_qrule->n_points();
+    unsigned int n_qpoints = c.get_side_qrule().n_points();
     DenseSubVector<Number>& Fv = c.get_elem_residual(v_var);
 
     for (unsigned int qp=0; qp < n_qpoints; qp++)
@@ -294,22 +299,23 @@ void AssemblyF1::boundary_assembly(FEMContext &c)
 
 void AssemblyF2::boundary_assembly(FEMContext &c)
 {
-  if(rb_sys.get_mesh().boundary_info->has_boundary_id(c.elem, c.side, BOUNDARY_ID_MAX_X) )
+  if(rb_sys.get_mesh().boundary_info->has_boundary_id(&c.get_elem(), c.side, BOUNDARY_ID_MAX_X) )
   {
     const unsigned int u_var = 0;
     const unsigned int w_var = 2;
 
-    const std::vector<Real> &JxW_side =
-      c.side_fe_var[u_var]->get_JxW();
+    FEBase* side_fe = NULL;
+    c.get_side_fe(u_var, side_fe);
 
-    const std::vector<std::vector<Real> >& phi_side =
-      c.side_fe_var[u_var]->get_phi();
+    const std::vector<Real> &JxW_side = side_fe->get_JxW();
+
+    const std::vector<std::vector<Real> >& phi_side = side_fe->get_phi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_w_dofs = c.dof_indices_var[w_var].size();
+    const unsigned int n_w_dofs = c.get_dof_indices(w_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.side_qrule->n_points();
+    unsigned int n_qpoints = c.get_side_qrule().n_points();
     DenseSubVector<Number>& Fw = c.get_elem_residual(w_var);
 
     for (unsigned int qp=0; qp < n_qpoints; qp++)
@@ -326,21 +332,22 @@ void InnerProductAssembly::interior_assembly(FEMContext &c)
   const unsigned int v_var = rb_sys.v_var;
   const unsigned int w_var = rb_sys.w_var;
 
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
+  FEBase* elem_fe = NULL;
+  c.get_element_fe(u_var, elem_fe);
+
+  const std::vector<Real> &JxW = elem_fe->get_JxW();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi =
-    c.element_fe_var[u_var]->get_dphi();
+  const std::vector<std::vector<RealGradient> >& dphi = elem_fe->get_dphi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-  const unsigned int n_v_dofs = c.dof_indices_var[v_var].size();
-  const unsigned int n_w_dofs = c.dof_indices_var[w_var].size();
+  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+  const unsigned int n_v_dofs = c.get_dof_indices(v_var).size();
+  const unsigned int n_w_dofs = c.get_dof_indices(w_var).size();
 
   // Now we will build the affine operator
-  unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   DenseSubMatrix<Number>& Kuu = c.get_elem_jacobian(u_var,u_var);
   DenseSubMatrix<Number>& Kvv = c.get_elem_jacobian(v_var,v_var);
