@@ -758,6 +758,7 @@ include_HEADERS = \
         quadrature/quadrature_trap.h \
         reduced_basis/derived_rb_construction.h \
         reduced_basis/derived_rb_evaluation.h \
+        reduced_basis/elem_assembly_with_construction.h \
         reduced_basis/rb_assembly_expansion.h \
         reduced_basis/rb_construction.h \
         reduced_basis/rb_construction_base.h \
