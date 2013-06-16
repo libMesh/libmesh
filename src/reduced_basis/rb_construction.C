@@ -35,7 +35,7 @@
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/timestamp.h"
 #include "libmesh/petsc_linear_solver.h"
-#include "libmesh/fem_context.h"
+#include "libmesh/dg_fem_context.h"
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/zero_function.h"
 #include "libmesh/coupling_matrix.h"
@@ -553,9 +553,9 @@ void RBConstruction::allocate_data_structures()
   truth_outputs.resize(this->get_rb_theta_expansion().get_n_outputs());
 }
 
-AutoPtr<FEMContext> RBConstruction::build_context ()
+AutoPtr<DGFEMContext> RBConstruction::build_context ()
 {
-  return AutoPtr<FEMContext>(new FEMContext(*this));
+  return AutoPtr<DGFEMContext>(new DGFEMContext(*this));
 }
 
 void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
@@ -575,8 +575,8 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 
   const MeshBase& mesh = this->get_mesh();
 
-  AutoPtr<FEMContext> c = this->build_context();
-  FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
+  AutoPtr<DGFEMContext> c = this->build_context();
+  DGFEMContext &context  = libmesh_cast_ref<DGFEMContext&>(*c);
 
   this->init_context(context);
 
@@ -675,7 +675,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 void RBConstruction::set_context_solution_vec(NumericVector<Number>& vec)
 {
   // Set current_local_solution = vec so that we can access
-  // vec from FEMContext during assembly
+  // vec from DGFEMContext during assembly
   vec.localize
     (*current_local_solution, this->get_dof_map().get_send_list());
 }
@@ -690,15 +690,15 @@ void RBConstruction::assemble_scaled_matvec(Number scalar,
   dest.zero();
 
   // Set current_local_solution to be arg so that we
-  // can access it from the FEMContext. Do this in a
+  // can access it from the DGFEMContext. Do this in a
   // function call so that it can be overloaded as
   // necessary in subclasses
   this->set_context_solution_vec(arg);
 
   const MeshBase& mesh = this->get_mesh();
 
-  AutoPtr<FEMContext> c = this->build_context();
-  FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
+  AutoPtr<DGFEMContext> c = this->build_context();
+  DGFEMContext &context  = libmesh_cast_ref<DGFEMContext&>(*c);
 
   this->init_context(context);
 
@@ -787,14 +787,14 @@ void RBConstruction::truth_assembly()
 
     const MeshBase& mesh = this->get_mesh();
 
-    std::vector<FEMContext*> Aq_context(get_rb_theta_expansion().get_n_A_terms());
+    std::vector<DGFEMContext*> Aq_context(get_rb_theta_expansion().get_n_A_terms());
     for(unsigned int q_a=0; q_a<Aq_context.size(); q_a++)
     {
       Aq_context[q_a] = this->build_context().release();
       this->init_context(*Aq_context[q_a]);
     }
 
-    std::vector<FEMContext*> Fq_context(get_rb_theta_expansion().get_n_F_terms());
+    std::vector<DGFEMContext*> Fq_context(get_rb_theta_expansion().get_n_F_terms());
     for(unsigned int q_f=0; q_f<Fq_context.size(); q_f++)
     {
       Fq_context[q_f] = this->build_context().release();
@@ -883,7 +883,7 @@ void RBConstruction::truth_assembly()
     if(constrained_problem)
       add_scaled_matrix_and_vector(1., constraint_assembly, matrix, NULL);
 
-    // Delete all the ptrs to FEMContexts!
+    // Delete all the ptrs to DGFEMContexts!
     for(unsigned int q_a=0; q_a<Aq_context.size(); q_a++)
     {
       delete Aq_context[q_a];

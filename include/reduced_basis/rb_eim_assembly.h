@@ -34,7 +34,6 @@ namespace libMesh
 class Elem;
 class RBParameters;
 class RBEIMConstruction;
-class RBConstruction;
 
 /**
  * This class provides functionality required to define an assembly
@@ -88,5 +87,7 @@ private:
   AutoPtr< NumericVector<Number> > _ghosted_basis_function;
 
 };
+
+}
 
 #endif // LIBMESH_RB_EIM_ASSEMBLY_H

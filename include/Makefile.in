@@ -758,7 +758,6 @@ include_HEADERS = \
         quadrature/quadrature_trap.h \
         reduced_basis/derived_rb_construction.h \
         reduced_basis/derived_rb_evaluation.h \
-        reduced_basis/elem_assembly_with_construction.h \
         reduced_basis/rb_assembly_expansion.h \
         reduced_basis/rb_construction.h \
         reduced_basis/rb_construction_base.h \
@@ -819,6 +818,7 @@ include_HEADERS = \
         solvers/unsteady_solver.h \
         systems/condensed_eigen_system.h \
         systems/continuation_system.h \
+        systems/dg_fem_context.h \
         systems/diff_context.h \
         systems/diff_system.h \
         systems/eigen_system.h \
