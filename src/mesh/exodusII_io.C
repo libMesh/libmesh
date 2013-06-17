@@ -31,6 +31,16 @@
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/exodusII_io_helper.h"
+#include "libmesh/nemesis_io_helper.h"
+
+// Include the ParMETIS header files
+namespace Parmetis {
+    extern "C" {
+#     include "libmesh/ignore_warnings.h"
+#     include "parmetis.h"
+#     include "libmesh/restore_warnings.h"
+    }
+}
 
 namespace libMesh
 {
@@ -286,6 +296,160 @@ void ExodusII_IO::read (const std::string& fname)
 #endif
 }
 
+
+    
+    
+    void ExodusII_IO::read_parallel (const std::string& base_filename)
+    {
+        // On one processor, Nemesis and ExodusII should be equivalent, so
+        // let's cowardly defer to that implementation...
+        if (this->n_processors() == 1)
+        {
+            // We can do this in one line but if the verbose flag was set in this
+            // object, it will no longer be set... thus no extra print-outs for serial runs.
+            // ExodusII_IO(this->mesh()).read (base_filename); // ambiguous when Nemesis_IO is multiply-inherited
+            
+            this->read (base_filename);
+            return;
+        }
+        
+        START_LOG ("read()","Nemesis_IO");
+        
+        
+        libMesh::out << "getting into read" << std::endl;
+        
+        // This function must be run on all processors at once
+        parallel_object_only();
+        
+        // Open the Exodus file
+        this->exio_helper->open(base_filename.c_str()); // just to avoid error from within this class
+        ExodusII_IO_Helper ex_helper(this->comm(), true, false);
+        ex_helper.open(base_filename.c_str());
+        
+        // Get a reference to the mesh.  We need to be specific
+        // since Nemesis_IO is multiply-inherited
+        // MeshBase& mesh = this->mesh();
+        MeshBase& mesh = MeshInput<MeshBase>::mesh();
+        
+        // Local information: Read the following information from the standard Exodus header
+        //  title[0]
+        //  num_dim
+        //  num_nodes
+        //  num_elem
+        //  num_elem_blk
+        //  num_node_sets
+        //  num_side_sets
+        ex_helper.read_header();
+        ex_helper.print_header();
+        
+        libMesh::out << "after header" << std::endl;
+        
+        ex_helper.read_block_info();
+        
+        libMesh::out << "after read block info" << std::endl;
+        
+        //    // Get global information: number of nodes, elems, blocks, nodesets and sidesets
+        //    ex_helper.get_init_global();
+        
+        // the approach is to partition the elements based on a space-filling approach.
+        // So, the centroid information of each element is obtained using the nodal information.
+        // First, each processor reads in its chunk of the elements
+        
+        // beginning and end of elem_ids on each processor
+        std::vector<int> proc_elems(this->n_processors()+1, 0);
+        unsigned int n_remaining_elems = ex_helper.num_elem,
+        n_elems_per_proc = ex_helper.num_elem / this->n_processors();
+        
+        proc_elems[0] = 1; // exodus numbering starts from 1
+        for (unsigned int i=0; i<this->n_processors(); i++)
+        {
+            proc_elems[i+1] = proc_elems[i] + std::min( n_elems_per_proc, n_remaining_elems)+1;
+            n_remaining_elems -= (proc_elems[i+1]-proc_elems[i]);
+        }
+        
+        proc_elems[this->n_processors()] += n_remaining_elems; // in case any elements were left unassigned
+        
+        unsigned int n_local_elems =
+        proc_elems[this->processor_id()+1] - proc_elems[this->processor_id()];
+        std::vector<char> elem_type(10);
+        int n_elem_in_block=0, n_nodes_per_elem=0, n_attr=0;
+        
+        libMesh::out << "Elem range on proc: " << this->processor_id() << "  "
+        << proc_elems[this->processor_id()] << "  " << proc_elems[this->processor_id()+1]
+        << " n elem on proc: " << n_local_elems << std::endl;
+        
+        exII::ex_get_elem_block(ex_helper.ex_id, ex_helper.block_ids[0], &elem_type[0],
+                                &n_elem_in_block,
+                                &n_nodes_per_elem,
+                                &n_attr);
+        
+        libMesh::out << "after block elem info" << std::endl;
+        
+        std::vector<int> elem_conn(n_local_elems * n_nodes_per_elem, 0);
+        std::vector<float> elem_xyz(n_local_elems*ex_helper.num_dim, 0.);
+        
+        int err = Nemesis::ne_get_n_elem_conn(ex_helper.ex_id, ex_helper.block_ids[0], proc_elems[this->processor_id()],
+                                              n_local_elems, &elem_conn[0]);
+        
+        libMesh::out << "after elem conn" << std::endl;
+        
+        // find the first and last nodes
+        unsigned int first_node=ex_helper.num_nodes, last_node=0;
+        for (unsigned int i=0; i<elem_conn.size(); i++)
+        {
+            if (first_node > elem_conn[i])
+                first_node = elem_conn[i];
+            if (last_node < elem_conn[i])
+                last_node = elem_conn[i];
+        }
+        
+        libMesh::out << "Node range on proc: " << this->processor_id() << "  " << first_node << "  " << last_node << std::endl;
+        
+        // now read in the detail for each node specified in the connectivity list for each element, and calculate
+        // the centroid information
+        // hopefully the size of these vectors will not be too huge
+        std::vector<Real> node_x(last_node-first_node+1, 0.),
+        node_y(last_node-first_node+1, 0.), node_z(last_node-first_node+1, 0.);
+        err = Nemesis::ne_get_n_coord(ex_helper.ex_id, first_node, last_node-first_node+1,
+                                      &node_x[0], &node_y[0], &node_z[0]);
+        
+        unsigned int node_pos_in_vector;
+        for (unsigned int i_elem=0; i_elem<n_local_elems; i_elem++)
+        {
+            for (unsigned int i_node=0; i_node<n_nodes_per_elem; i_node++)
+            {
+                node_pos_in_vector = elem_conn[i_elem*n_nodes_per_elem+i_node]-first_node;
+                elem_xyz[i_elem*ex_helper.num_dim+0] += node_x[node_pos_in_vector];
+                elem_xyz[i_elem*ex_helper.num_dim+1] += node_y[node_pos_in_vector];
+                elem_xyz[i_elem*ex_helper.num_dim+2] += node_z[node_pos_in_vector];
+            }
+            elem_xyz[i_elem*ex_helper.num_dim+0] /= n_nodes_per_elem;
+            elem_xyz[i_elem*ex_helper.num_dim+1] /= n_nodes_per_elem;
+            elem_xyz[i_elem*ex_helper.num_dim+2] /= n_nodes_per_elem;
+        }
+        
+        // now call the partitioner
+        std::vector<int> part(n_local_elems, 0);
+        MPI_Comm mpi_comm = this->comm().get();
+        
+        libMesh::out << "getting into Parmetis" << std::endl;
+        
+        err = Parmetis::ParMETIS_V3_PartGeom(&proc_elems[0], &ex_helper.num_dim, &elem_xyz[0],
+                                             &part[0], &mpi_comm);
+        
+        libMesh::out << "after Parmetis" << std::endl;
+        
+        // now, this partitioning needs to be communicated to the respective processors
+        
+        
+        
+        err = exII::ex_close(ex_helper.ex_id);
+        
+        STOP_LOG ("read()","Nemesis_IO");
+        
+        return; /****** this is only till the portion of the code so far is tested *********/
+    }
+    
 
 
 #ifndef LIBMESH_HAVE_EXODUS_API
