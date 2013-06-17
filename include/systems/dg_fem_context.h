@@ -52,10 +52,31 @@ public:
   virtual ~DGFEMContext ();
 
   /**
-   * Override pre_fe_reinit to set a boolean flag so that by
-   * default DG terms are assumed to be inactive.
+   * Override side_fe_reinit to set a boolean flag so that by
+   * default DG terms are assumed to be inactive. DG terms are
+   * only active if neighbor_side_fe_reinit is called.
    */
-  virtual void pre_fe_reinit(const System& sys, const Elem *e);
+  virtual void side_fe_reinit ();
+
+  /**
+   * Initialize neighbor side data needed to assemble DG terms.
+   * The neighbor element is determined by the current value of
+   * get_neighbor().
+   */
+  void neighbor_side_fe_reinit ();
+
+  /**
+   * Accessor for neighbor dof indices
+   */
+  const std::vector<dof_id_type>& get_neighbor_dof_indices() const
+  { return _neighbor_dof_indices; }
+
+  /**
+   * Accessor for element dof indices of a particular variable corresponding
+   * to the index argument.
+   */
+  const std::vector<dof_id_type>& get_neighbor_dof_indices( unsigned int var ) const
+  { return _neighbor_dof_indices_var[var]; }
 
   /**
    * Const accessor for neighbor residual.
@@ -74,25 +95,51 @@ public:
    * to the variable index argument.
    */
   const DenseSubVector<Number>& get_neighbor_residual( unsigned int var ) const
-  { return *(_neighbor_residuals[var]); }
+  { return *(_neighbor_subresiduals[var]); }
 
   /**
    * Non-const accessor for neighbor residual of a particular variable corresponding
    * to the variable index argument.
    */
-  DenseSubVector<Number>& get_neighborresidual( unsigned int var )
-  { return *(_neighbor_residuals[var]); }
+  DenseSubVector<Number>& get_neighbor_residual( unsigned int var )
+  { return *(_neighbor_subresiduals[var]); }
+
+  /**
+   * Const accessor for element-element Jacobian.
+   */
+  const DenseMatrix<Number>& get_elem_elem_jacobian() const
+  { return _elem_elem_jacobian; }
+
+  /**
+   * Non-const accessor for element-element Jacobian.
+   */
+  DenseMatrix<Number>& get_elem_elem_jacobian()
+  { return _elem_elem_jacobian; }
+
+  /**
+   * Const accessor for element-element Jacobian of particular variables corresponding
+   * to the variable index arguments.
+   */
+  const DenseSubMatrix<Number>& get_elem_elem_jacobian( unsigned int var1, unsigned int var2 ) const
+  { return *(_elem_elem_subjacobians[var1][var2]); }
+
+  /**
+   * Non-const accessor for element-element Jacobian of particular variables corresponding
+   * to the variable index arguments.
+   */
+  DenseSubMatrix<Number>& get_elem_elem_jacobian( unsigned int var1, unsigned int var2 )
+  { return *(_elem_elem_subjacobians[var1][var2]); }
 
   /**
    * Const accessor for element-neighbor Jacobian.
    */
-  const DenseVector<Number>& get_elem_neighbor_jacobian() const
+  const DenseMatrix<Number>& get_elem_neighbor_jacobian() const
   { return _elem_neighbor_jacobian; }
 
   /**
-   * Non-const accessor for element Jacobian.
+   * Non-const accessor for element -neighborJacobian.
    */
-  DenseVector<Number>& get_elem_neighbor_jacobian()
+  DenseMatrix<Number>& get_elem_neighbor_jacobian()
   { return _elem_neighbor_jacobian; }
 
   /**
@@ -112,13 +159,13 @@ public:
   /**
    * Const accessor for element-neighbor Jacobian.
    */
-  const DenseVector<Number>& get_neighbor_elem_jacobian() const
+  const DenseMatrix<Number>& get_neighbor_elem_jacobian() const
   { return _neighbor_elem_jacobian; }
 
   /**
    * Non-const accessor for element Jacobian.
    */
-  DenseVector<Number>& get_neighbor_elem_jacobian()
+  DenseMatrix<Number>& get_neighbor_elem_jacobian()
   { return _neighbor_elem_jacobian; }
 
   /**
@@ -126,7 +173,7 @@ public:
    * to the variable index arguments.
    */
   const DenseSubMatrix<Number>& get_neighbor_elem_jacobian( unsigned int var1, unsigned int var2 ) const
-  { return *(neighbor_elem_subjacobians[var1][var2]); }
+  { return *(_neighbor_elem_subjacobians[var1][var2]); }
 
   /**
    * Non-const accessor for neighbor-element Jacobian of particular variables corresponding
@@ -138,13 +185,13 @@ public:
   /**
    * Const accessor for element-neighbor Jacobian.
    */
-  const DenseVector<Number>& get_neighbor_neighbor_jacobian() const
+  const DenseMatrix<Number>& get_neighbor_neighbor_jacobian() const
   { return _neighbor_neighbor_jacobian; }
 
   /**
    * Non-const accessor for element Jacobian.
    */
-  DenseVector<Number>& get_neighbor_neighbor_jacobian()
+  DenseMatrix<Number>& get_neighbor_neighbor_jacobian()
   { return _neighbor_neighbor_jacobian; }
 
   /**
@@ -167,8 +214,9 @@ public:
    * because we also need to be able to handle the special case of DG terms on
    * "cracks" in a mesh to model certain types of interface conditions. In this
    * case, we need to be able to specify the neighbor element manually.
+   * Also, this should give us more flexibility to handle non-conforming meshes.
    */
-  void set_neighbor(Elem& neighbor)
+  void set_neighbor(const Elem& neighbor)
   { _neighbor = &neighbor; }
 
   /**
@@ -180,8 +228,14 @@ public:
   /**
    * Are the DG terms active, i.e. have they been assembled?
    */
-  bool are_dg_terms_active() const
+  bool dg_terms_are_active() const
   { return _dg_terms_active; }
+  
+  /**
+   * Accessor for neighbor edge/face (2D/3D) finite element object for variable var.
+   */
+  template<typename OutputShape>
+  void get_neighbor_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
 
 private:
 
@@ -196,27 +250,19 @@ private:
   DenseVector<Number> _neighbor_residual;
 
   /**
-   * The element-neighbor Jacobian terms.
-   * Test functions are from "element", trial functions are from "neighbor".
+   * The DG Jacobian terms.
+   * Trial and test functions come from either element or neighbor.
    */
+  DenseMatrix<Number> _elem_elem_jacobian;
   DenseMatrix<Number> _elem_neighbor_jacobian;
-
-  /**
-   * The neighbor-element Jacobian terms.
-   * Test functions are from "neighbor", trial functions are from "element".
-   */
   DenseMatrix<Number> _neighbor_elem_jacobian;
-  
-  /**
-   * The neighbor-neighbor Jacobian terms.
-   * Both trial and test functions are from "neighbor".
-   */
   DenseMatrix<Number> _neighbor_neighbor_jacobian;
 
   /**
    * Element residual subvectors and Jacobian submatrices
    */
   std::vector<DenseSubVector<Number> *> _neighbor_subresiduals;
+  std::vector<std::vector<DenseSubMatrix<Number> *> > _elem_elem_subjacobians;
   std::vector<std::vector<DenseSubMatrix<Number> *> > _elem_neighbor_subjacobians;
   std::vector<std::vector<DenseSubMatrix<Number> *> > _neighbor_elem_subjacobians;
   std::vector<std::vector<DenseSubMatrix<Number> *> > _neighbor_neighbor_subjacobians;
@@ -234,19 +280,13 @@ private:
    * interior since we just need to handle DG interface
    * terms here.
    */
-  std::map<FEType, FEBase *> _neighbor_side_fe;
+  std::map<FEType, FEAbstract *> _neighbor_side_fe;
 
   /**
    * Pointers to the same finite element objects on the neighbor element,
    * but indexed by variable number
    */
-  std::vector<FEBase *> _neighbor_side_fe_var;
-
-  /**
-   * Quadrature rules for neighbor sides
-   * Analogous to side_qrule in FEMContext.
-   */
-  QBase *_neighbor_side_qrule;
+  std::vector<FEAbstract *> _neighbor_side_fe_var;
 
   /**
    * Boolean flag to indicate whether or not the DG terms have been
@@ -255,6 +295,13 @@ private:
   bool _dg_terms_active;
 };
 
+template<typename OutputShape>
+inline
+void DGFEMContext::get_neighbor_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
+{
+  libmesh_assert_less ( var, _neighbor_side_fe_var.size() );
+  fe = libmesh_cast_ptr<FEGenericBase<OutputShape>*>( _neighbor_side_fe_var[var] );
+}
 
 } // namespace libMesh
 

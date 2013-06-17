@@ -15,99 +15,130 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
-
-#include "libmesh/boundary_info.h"
+#include "libmesh/dg_fem_context.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
-#include "libmesh/dg_fem_context.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/system.h"
 
 namespace libMesh
 {
 
-DGFEMContext::DGEMContext (const System &sys)
+DGFEMContext::DGFEMContext (const System &sys)
   : FEMContext(sys),
     _neighbor(NULL),
-    _neighbor_side_qrule(NULL),
     _dg_terms_active(false)
 {
-  // Create neighbor_side_qrule to match the type of side_qrule
-  // We on't actually use this quadrature rule, since we reinit
-  // _neighbor_side_fe objects based on inverse mapping the
-  // quadrature points on elem's side
-//  _neighbor_side_qrule = QBase::build(side_qrule.type(),
-//                                      side_qrule.get_dim(),
-//                                      side_qrule.get_order()).release();
-
   unsigned int nv = sys.n_vars();
   libmesh_assert (nv);
-  
+
+  _neighbor_subresiduals.reserve(nv);
+  _elem_elem_subjacobians.resize(nv);
+  _elem_neighbor_subjacobians.resize(nv);
+  _neighbor_elem_subjacobians.resize(nv);
+  _neighbor_neighbor_subjacobians.resize(nv);
+
+  for (unsigned int i=0; i != nv; ++i)
+  {
+    _neighbor_subresiduals.push_back(new DenseSubVector<Number>(_neighbor_residual));
+    _elem_elem_subjacobians[i].reserve(nv);
+    _elem_neighbor_subjacobians[i].reserve(nv);
+    _neighbor_elem_subjacobians[i].reserve(nv);
+    _neighbor_neighbor_subjacobians[i].reserve(nv);
+
+    for (unsigned int j=0; j != nv; ++j)
+    {
+      _elem_elem_subjacobians[i].push_back
+        (new DenseSubMatrix<Number>(_elem_elem_jacobian));
+      _elem_neighbor_subjacobians[i].push_back
+        (new DenseSubMatrix<Number>(_elem_neighbor_jacobian));
+      _neighbor_elem_subjacobians[i].push_back
+        (new DenseSubMatrix<Number>(_neighbor_elem_jacobian));
+      _neighbor_neighbor_subjacobians[i].push_back
+        (new DenseSubMatrix<Number>(_neighbor_neighbor_jacobian));
+    }
+  }
+
   _neighbor_side_fe_var.resize(nv);
   for (unsigned int i=0; i != nv; ++i)
-    {
-      FEType fe_type = sys.variable_type(i);
+  {
+    FEType fe_type = sys.variable_type(i);
 
-      if ( _neighbor_side_fe[fe_type] == NULL )
-	{
-	  _neighbor_side_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
-//	  _neighbor_side_fe[fe_type]->attach_quadrature_rule(_neighbor_side_qrule);
-	}
-      _neighbor_side_fe_var[i] = _neighbor_side_fe[fe_type];
+    if ( _neighbor_side_fe[fe_type] == NULL )
+    {
+      _neighbor_side_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
     }
+    _neighbor_side_fe_var[i] = _neighbor_side_fe[fe_type];
+  }
 }
 
 DGFEMContext::~DGFEMContext()
 {
-  for (std::map<FEType, FEBase *>::iterator i = _neighbor_side_fe.begin();
+
+  for (std::size_t i=0; i != _neighbor_subresiduals.size(); ++i)
+  {
+    delete _neighbor_subresiduals[i];
+
+    for (std::size_t j=0; j != _elem_elem_subjacobians[i].size(); ++j)
+    {
+      delete _elem_elem_subjacobians[i][j];
+      delete _elem_neighbor_subjacobians[i][j];
+      delete _neighbor_elem_subjacobians[i][j];
+      delete _neighbor_neighbor_subjacobians[i][j];
+    }
+  }
+
+  // Delete the FE objects
+  for (std::map<FEType, FEAbstract *>::iterator i = _neighbor_side_fe.begin();
        i != _neighbor_side_fe.end(); ++i)
     delete i->second;
   _neighbor_side_fe.clear();
-  
-  if(_neighbor_side_qrule)
-  {
-    delete _neighbor_side_qrule;
-  }
-  _neighbor_side_qrule = NULL;
 }
 
-void DGEMContext::pre_fe_reinit(const System& sys, const Elem *e)
+void DGFEMContext::side_fe_reinit()
 {
-  FEMContext::pre_fe_reinit(sys, e);
+  FEMContext::side_fe_reinit();
 
   // By default we assume that the DG terms are inactive
   // They are only active if neighbor_side_fe_reinit is called
   _dg_terms_active = false;
 }
 
-void DGEMContext::neighbor_side_fe_reinit ()
+void DGFEMContext::neighbor_side_fe_reinit ()
 {
   // Call this *after* side_fe_reinit
 
   // Initialize all the neighbor side FE objects based on inverse mapping
   // the quadrature points on the current side
+  std::vector<Point> qface_side_points;
   std::vector<Point> qface_neighbor_points;
   std::map<FEType, FEAbstract *>::iterator local_fe_end = _neighbor_side_fe.end();
   for (std::map<FEType, FEAbstract *>::iterator i = _neighbor_side_fe.begin();
        i != local_fe_end; ++i)
     {
+      FEType neighbor_side_fe_type = i->first;
+      FEAbstract* side_fe = _side_fe[neighbor_side_fe_type];
+      qface_side_points = side_fe->get_xyz();
+      
       FEInterface::inverse_map (dim,
-                                i->first,
-                                get_neighbor(),
-                                get_side_qrule().get_xyz(),
+                                neighbor_side_fe_type,
+                                &get_neighbor(),
+                                qface_side_points,
                                 qface_neighbor_points);
 
-      i->second->reinit(get_neighbor(), &qface_neighbor_points);
+      i->second->reinit(&get_neighbor(), &qface_neighbor_points);
     }
+  
+  // Set boolean flag to indicate that the DG terms are active on this element
+  _dg_terms_active = true;
 
-  // Also, initialize data required for DG assembly. In FEMContext the analogue of this is
-  // in pre_fe_reinit. In the DG context, it makes sense to resize data structures here,
-  // since we may not always need to assemble DG terms. That is, this should enable us to use
-  // DGFEMContext in a continuous Galerkin context without a significant performance hit.
+  // Also, initialize data required for DG assembly on the current side,
+  // analogously to FEMContext::pre_fe_reinit
 
   // Initialize the per-element data for elem.
-  sys.get_dof_map().dof_indices (get_neighbor(), _neighbor_dof_indices);
+  get_system().get_dof_map().dof_indices (&get_neighbor(), _neighbor_dof_indices);
   
   const unsigned int n_dofs = dof_indices.size();
   const unsigned int n_neighbor_dofs = libmesh_cast_int<unsigned int>
@@ -122,9 +153,9 @@ void DGEMContext::neighbor_side_fe_reinit ()
   // Initialize the per-variable data for elem.
   {
     unsigned int sub_dofs = 0;
-    for (unsigned int i=0; i != sys.n_vars(); ++i)
+    for (unsigned int i=0; i != get_system().n_vars(); ++i)
       {
-        sys.get_dof_map().dof_indices (get_neighbor(), _neighbor_dof_indices_var[i], i);
+        get_system().get_dof_map().dof_indices (&get_neighbor(), _neighbor_dof_indices_var[i], i);
 
         const unsigned int n_dofs_var = libmesh_cast_int<unsigned int>
           (_neighbor_dof_indices_var[i].size());
@@ -175,9 +206,7 @@ void DGEMContext::neighbor_side_fe_reinit ()
       }
     libmesh_assert_equal_to (sub_dofs, n_dofs);
   }
-  
-  // Set boolean flag to indicate that the DG terms are active on this element
-  _dg_terms_active = true;
+
 }
 
 }
