@@ -298,8 +298,8 @@ void RBEIMConstruction::enrich_RB_space()
   // Compute truth representation via projection
   const MeshBase& mesh = this->get_mesh();
 
-  AutoPtr<FEMContext> c = this->build_context();
-  FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
+  AutoPtr<DGFEMContext> c = this->build_context();
+  DGFEMContext &context  = libmesh_cast_ref<DGFEMContext&>(*c);
 
   this->init_context(context);
 
@@ -509,8 +509,8 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
     // Compute truth representation via projection
     const MeshBase& mesh = this->get_mesh();
 
-    AutoPtr<FEMContext> c = this->build_context();
-    FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
+    AutoPtr<DGFEMContext> c = this->build_context();
+    DGFEMContext &context  = libmesh_cast_ref<DGFEMContext&>(*c);
 
     this->init_context(context);
 

@@ -600,6 +600,25 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
       // Impose boundary (e.g. Neumann) term
       context.side_fe_reinit();
       elem_assembly->boundary_assembly(context);
+      
+      if(context.dg_terms_are_active())
+      {
+        input_matrix->add_matrix (context.get_elem_elem_jacobian(),
+                                  context.get_dof_indices(),
+                                  context.get_dof_indices());
+
+        input_matrix->add_matrix (context.get_elem_neighbor_jacobian(),
+                                  context.get_dof_indices(),
+                                  context.get_neighbor_dof_indices());
+
+        input_matrix->add_matrix (context.get_neighbor_elem_jacobian(),
+                                  context.get_neighbor_dof_indices(),
+                                  context.get_dof_indices());
+
+        input_matrix->add_matrix (context.get_neighbor_neighbor_jacobian(),
+                                  context.get_neighbor_dof_indices(),
+                                  context.get_neighbor_dof_indices());
+      }
     }
 
     // Need to symmetrize before imposing
@@ -686,6 +705,10 @@ void RBConstruction::assemble_scaled_matvec(Number scalar,
                                             NumericVector<Number>& arg)
 {
   START_LOG("assemble_scaled_matvec()", "RBConstruction");
+  
+  // This function isn't well tested lately, let's mark it as deprecated
+  // In particular, it probably wouldn't work properly with DG terms
+  libmesh_deprecated();
 
   dest.zero();
 
@@ -836,6 +859,25 @@ void RBConstruction::truth_assembly()
 
           Aq_context[q_a]->side_fe_reinit();
           rb_assembly_expansion->perform_A_boundary_assembly(q_a, *Aq_context[q_a]);
+          
+          if(Aq_context[q_a]->dg_terms_are_active())
+          {
+            this->matrix->add_matrix (Aq_context[q_a]->get_elem_elem_jacobian(),
+                                      Aq_context[q_a]->get_dof_indices(),
+                                      Aq_context[q_a]->get_dof_indices());
+
+            this->matrix->add_matrix (Aq_context[q_a]->get_elem_neighbor_jacobian(),
+                                      Aq_context[q_a]->get_dof_indices(),
+                                      Aq_context[q_a]->get_neighbor_dof_indices());
+
+            this->matrix->add_matrix (Aq_context[q_a]->get_neighbor_elem_jacobian(),
+                                      Aq_context[q_a]->get_neighbor_dof_indices(),
+                                      Aq_context[q_a]->get_dof_indices());
+
+            this->matrix->add_matrix (Aq_context[q_a]->get_neighbor_neighbor_jacobian(),
+                                      Aq_context[q_a]->get_neighbor_dof_indices(),
+                                      Aq_context[q_a]->get_neighbor_dof_indices());
+          }
         }
 
         // Impose boundary terms, e.g. Neuman BCs
@@ -847,6 +889,7 @@ void RBConstruction::truth_assembly()
           Fq_context[q_f]->side_fe_reinit();
           rb_assembly_expansion->perform_F_boundary_assembly(q_f, *Fq_context[q_f]);
         }
+
       }
 
       // Constrain the dofs to impose Dirichlet BCs, hanging node or periodic constraints
