@@ -35,7 +35,7 @@ namespace
   using namespace libMesh;
 
 #ifndef LIBMESH_HAVE_TBB_API
-  static dof_id_type old_elem_id = libMesh::invalid_uint;
+  static dof_id_type old_elem_id = DofObject::invalid_id;
   static std::vector<std::vector<Real> > dxdxi(3, std::vector<Real>(2, 0));
 #ifdef DEBUG
   static std::vector<Real> dydxi(2), dzdeta(2), dxdzeta(2);
@@ -70,7 +70,7 @@ static tbb::enumerable_thread_specific< std::vector<Real> > dzdxi_tls, dxdeta_tl
     dof_id_type & old_elem_id = old_elem_id_tls.local(old_elem_id_exists);
 
     if(!old_elem_id_exists)
-      old_elem_id = libMesh::invalid_uint;
+      old_elem_id = DofObject::invalid_id;
 
     // Coefficients are cached from old elements
     // ... except that we can't be sure that a renumbering didn't

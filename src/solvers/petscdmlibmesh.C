@@ -233,7 +233,7 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt *len, 
   if(dmlist)   {ierr = PetscMalloc(*len*sizeof(DM),    dmlist);    CHKERRQ(ierr);}
   DofMap& dofmap = dlm->sys->get_dof_map();
   for(unsigned int d = 0; d < dlm->decomposition->size(); ++d) {
-    std::set<unsigned int>               dindices;
+    std::set<numeric_index_type>         dindices;
     std::string                          dname;
     std::map<std::string, unsigned int>  dvarids;
     std::map<unsigned int, std::string>  dvarnames;
@@ -255,11 +255,11 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt *len, 
 	for ( ; el != end_el; ++el) {
 	  const Elem* elem = *el;
 	  //unsigned int e_subdomain = elem->subdomain_id();
-	  std::vector<unsigned int> evindices;
+	  std::vector<numeric_index_type> evindices;
 	  // Get the degree of freedom indices for the given variable off the current element.
 	  dofmap.dof_indices(elem, evindices, v);
 	  for(unsigned int i = 0; i < evindices.size(); ++i) {
-	    unsigned int dof = evindices[i];
+	    numeric_index_type dof = evindices[i];
 	    if(dof >= dofmap.first_dof() && dof < dofmap.end_dof()) /* might want to use variable_first/last_local_dof instead */
 	      dindices.insert(dof);
 	  }
@@ -273,8 +273,8 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt *len, 
       IS dis;
       PetscInt *darray;
       ierr = PetscMalloc(sizeof(PetscInt)*dindices.size(), &darray); CHKERRQ(ierr);
-      unsigned int i = 0;
-      for(std::set<unsigned int>::const_iterator it = dindices.begin(); it != dindices.end(); ++it) {
+      numeric_index_type i = 0;
+      for(std::set<numeric_index_type>::const_iterator it = dindices.begin(); it != dindices.end(); ++it) {
 	darray[i] = *it;
 	++i;
       }
@@ -338,7 +338,7 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt *len,
   if(outerislist)   *outerislist = PETSC_NULL; /* FIX: allow mesh-based overlap. */
   if(dmlist)        {ierr = PetscMalloc(*len*sizeof(DM),    dmlist);    CHKERRQ(ierr);}
   for(unsigned int d = 0; d < dlm->decomposition->size(); ++d) {
-    std::set<unsigned int>               dindices;
+    std::set<numeric_index_type>               dindices;
     std::string                          dname;
     std::map<std::string, unsigned int>  dblockids;
     std::map<unsigned int,std::string>   dblocknames;
@@ -356,14 +356,14 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt *len,
       const MeshBase::const_element_iterator end_el = sys->get_mesh().active_local_subdomain_elements_end(b);
       for ( ; el != end_el; ++el) {
 	const Elem* elem = *el;
-	std::vector<unsigned int> evindices;
+	std::vector<numeric_index_type> evindices;
 	/* Iterate only over this DM's variables. */
 	for(std::map<std::string, unsigned int>::const_iterator vit = dlm->varids->begin(); vit != dlm->varids->end(); ++vit) {
 	  unsigned int v = vit->second;
 	  // Get the degree of freedom indices for the given variable off the current element.
 	  sys->get_dof_map().dof_indices(elem, evindices, v);
 	  for(unsigned int i = 0; i < evindices.size(); ++i) {
-	    unsigned int dof = evindices[i];
+	    numeric_index_type dof = evindices[i];
 	    if(dof >= sys->get_dof_map().first_dof() && dof < sys->get_dof_map().end_dof()) /* might want to use variable_first/last_local_dof instead */
 	      dindices.insert(dof);
 	  }
@@ -377,8 +377,8 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt *len,
       PetscInt *darray;
       IS dis;
       ierr = PetscMalloc(sizeof(PetscInt)*dindices.size(), &darray); CHKERRQ(ierr);
-      unsigned int i = 0;
-      for(std::set<unsigned int>::const_iterator it = dindices.begin(); it != dindices.end(); ++it) {
+      numeric_index_type i = 0;
+      for(std::set<numeric_index_type>::const_iterator it = dindices.begin(); it != dindices.end(); ++it) {
 	darray[i] = *it;
 	++i;
       }
