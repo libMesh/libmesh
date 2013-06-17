@@ -197,6 +197,11 @@ public:
      */
     void scale_column (const unsigned int col, const T factor);
 
+    /**
+     * Multiplies every element in the row \p row matrix by \p factor.
+     */
+    void scale_row (const unsigned int row, const T factor);
+
   /**
    * Multiplies every element in the matrix by \p factor.
    */
@@ -747,6 +752,15 @@ void DenseMatrix<T>::scale_column (const unsigned int col, const T factor)
 {
     for (unsigned int i=0; i<this->m(); i++)
         (*this)(i, col) *= factor;
+}
+
+    
+template<typename T>
+inline
+void DenseMatrix<T>::scale_row (const unsigned int row, const T factor)
+{
+    for (unsigned int i=0; i<this->n(); i++)
+        (*this)(row, i) *= factor;
 }
 
     
