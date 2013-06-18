@@ -1,10 +1,14 @@
 
 #!/bin/sh
 
+
+#
+# TODO - could we grab the version number from include/libmesh_config.h?
+#
+
 #
 # Define the usage() function
 #
-
 usage ()
 {
   echo "usage: $0 release-id-string"
@@ -20,49 +24,34 @@ if [ "$#" != "1" ] ; then
     usage $0
 fi
 
+# Need to run this from a configured directory
+if [ ! -f Makefile -o ! -f config.log ] ; then
+    echo "error: no Makefile/config.log, please run from a configured directory tree!"
+    exit
+fi
+
 #
 # Get the user-specified release string
 #
 release=$1
-#echo "release  = $release"
-
-cvs_rtag=`echo $release | sed -e "s/[.]/_/g"`
-#echo "cvs_rtag = $cvs_rtag"
+tagname=$release #`echo $release | sed -e "s/[.]/_/g"`
+#echo "tagname = $tagname"
 
 #
-# CVS tags cannot contain '.', so replace any '.' with '_'
-# and use that to tag the current libmesh CVS repository for this release
+# create tarballs via 'make dist'
 #
 echo ""
-echo "Tagging current CVS repository as \"$cvs_rtag\""
-(cd @PWD@ ; cvs rtag $cvs_rtag libmesh)
+echo "Creating distribution files..."
+make dist >/dev/null || exit 
+ls -l libmesh*.tar.*
 
 #
-# Checkout a clean copy of libmesh from the CVS server,
-# use it to create the release...
-#
-cvsroot=`cat @PWD@/CVS/Root`
-echo ""
-echo "Checking out a fresh copy of the newly tagged code"
-cvs -Q -d $cvsroot co -r $cvs_rtag -d $release libmesh
-
-#
-# Remove the CVS-associated files & directories from
-# the source tree
+# tag the current libmesh/master git repository for this release
 #
 echo ""
-echo "Pruning CVS files & directories from directory $release"
-rm -rf `find $release -name CVS`
-rm -rf `find $release -name .cvsignore`
-
-
-#
-# Create a gzip'ed tar file for the requested release
-#
-echo ""
-echo "Creating $release.tar.gz"
-tar zcf $release.tar.gz $release
-rm -rf $release
+echo "Tagging master git repository as \"$tagname\""
+git tag -a $tagname -m 'tagging libMesh $tagname'
+#git push origin $tagname
 
 #
 # Possibly upload the file to sourceforge
@@ -74,7 +63,15 @@ echo "so you can put the file in the /incoming directory?"
 echo -n "Y or N? "
 read ans
 if [ "$ans" = "Y" -o "$ans" = "y" -o "$ans" = "Yes" -o "$ans" = "yes" ]; then
-    exec ftp upload.sourceforge.net
+    echo "**************************************"
+    echo " once you are in, type:"
+    echo " cd /home/frs/project/libmesh/libmesh "
+    echo " and go about your business, e.g."
+    echo " $ mkdir foo"
+    echo " $ cd foo"
+    echo " $ put libmesh*.tar.*"
+    echo "**************************************"
+    exec sftp frs.sourceforge.net
 fi
 
 
