@@ -58,7 +58,7 @@ git tag -a $tagname -m 'tagging libMesh $tagname'
 #
 echo ""
 echo "Done."
-echo "Would you like to open an FTP connection to upload.sourceforge.net"
+echo "Would you like to open an SFTP connection to frs.sourceforge.net"
 echo "so you can put the file in the /incoming directory?"
 echo -n "Y or N? "
 read ans
