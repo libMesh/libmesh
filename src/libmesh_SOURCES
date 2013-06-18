@@ -359,6 +359,7 @@ libmesh_SOURCES =  \
         src/solvers/unsteady_solver.C \
         src/systems/condensed_eigen_system.C \
         src/systems/continuation_system.C \
+        src/systems/dg_fem_context.C \
         src/systems/diff_context.C \
         src/systems/diff_system.C \
         src/systems/eigen_system.C \

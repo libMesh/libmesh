@@ -1072,7 +1072,8 @@ numeric_index_type PetscVector<T>::size () const
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr=0, petsc_size=0;
+  PetscErrorCode ierr=0;
+  PetscInt petsc_size=0;
 
   if (!this->initialized())
     return 0;
@@ -1091,7 +1092,8 @@ numeric_index_type PetscVector<T>::local_size () const
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr=0, petsc_size=0;
+  PetscErrorCode ierr=0;
+  PetscInt petsc_size=0;
 
   ierr = VecGetLocalSize(_vec, &petsc_size);
          LIBMESH_CHKERRABORT(ierr);
@@ -1107,7 +1109,8 @@ numeric_index_type PetscVector<T>::first_local_index () const
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr=0, petsc_first=0, petsc_last=0;
+  PetscErrorCode ierr=0;
+  PetscInt petsc_first=0, petsc_last=0;
 
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
          LIBMESH_CHKERRABORT(ierr);
@@ -1123,7 +1126,8 @@ numeric_index_type PetscVector<T>::last_local_index () const
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr=0, petsc_first=0, petsc_last=0;
+  PetscErrorCode ierr=0;
+  PetscInt petsc_first=0, petsc_last=0;
 
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
          LIBMESH_CHKERRABORT(ierr);
@@ -1139,7 +1143,8 @@ numeric_index_type PetscVector<T>::map_global_to_local_index (const numeric_inde
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr=0, petsc_first=0, petsc_last=0;
+  PetscErrorCode ierr=0;
+  PetscInt petsc_first=0, petsc_last=0;
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
   LIBMESH_CHKERRABORT(ierr);
   const numeric_index_type first = static_cast<numeric_index_type>(petsc_first);
