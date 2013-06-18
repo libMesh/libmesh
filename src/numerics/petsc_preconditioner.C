@@ -256,7 +256,7 @@ template <typename T>
   KSP* subksps;
 
   // the number of blocks on this processor
-  int n_local;
+  PetscInt n_local;
 
   // The global number of the first block on this processor.
   // This is not used, so we just pass PETSC_NULL instead.
@@ -267,7 +267,7 @@ template <typename T>
   CHKERRABORT(comm,ierr);
 
   // Loop over sub-ksp objects, set ILU preconditioner
-  for (int i=0; i<n_local; ++i)
+  for (PetscInt i=0; i<n_local; ++i)
     {
       // Get pointer to sub KSP object's PC
       PC subpc;
