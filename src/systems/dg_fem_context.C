@@ -29,6 +29,7 @@ namespace libMesh
 DGFEMContext::DGFEMContext (const System &sys)
   : FEMContext(sys),
     _neighbor(NULL),
+    _neighbor_dof_indices_var(sys.n_vars()),
     _dg_terms_active(false)
 {
   libmesh_experimental();
@@ -148,6 +149,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
 
   // These resize calls also zero out the residual and jacobian
   _neighbor_residual.resize(n_neighbor_dofs);
+  _elem_elem_jacobian.resize(n_dofs, n_dofs);
   _elem_neighbor_jacobian.resize(n_dofs, n_neighbor_dofs);
   _neighbor_elem_jacobian.resize(n_neighbor_dofs, n_dofs);
   _neighbor_neighbor_jacobian.resize(n_neighbor_dofs, n_neighbor_dofs);
@@ -171,6 +173,13 @@ void DGFEMContext::neighbor_side_fe_reinit ()
 	      libmesh_cast_int<unsigned int>
                 (dof_indices_var[j].size());
 
+            _elem_elem_subjacobians[i][j]->reposition
+              (sub_dofs, _neighbor_subresiduals[j]->i_off(),
+               n_dofs_var, n_dofs_var_j);
+            _elem_elem_subjacobians[j][i]->reposition
+              (_neighbor_subresiduals[j]->i_off(), sub_dofs,
+               n_dofs_var_j, n_dofs_var);
+
             _elem_neighbor_subjacobians[i][j]->reposition
               (sub_dofs, _neighbor_subresiduals[j]->i_off(),
                n_dofs_var, n_dofs_var_j);
@@ -192,6 +201,10 @@ void DGFEMContext::neighbor_side_fe_reinit ()
               (_neighbor_subresiduals[j]->i_off(), sub_dofs,
                n_dofs_var_j, n_dofs_var);
           }
+        _elem_elem_subjacobians[i][i]->reposition
+          (sub_dofs, sub_dofs,
+           n_dofs_var,
+           n_dofs_var);
         _elem_neighbor_subjacobians[i][i]->reposition
           (sub_dofs, sub_dofs,
            n_dofs_var,
