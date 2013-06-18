@@ -31,6 +31,8 @@ DGFEMContext::DGFEMContext (const System &sys)
     _neighbor(NULL),
     _dg_terms_active(false)
 {
+  libmesh_experimental();
+
   unsigned int nv = sys.n_vars();
   libmesh_assert (nv);
 
