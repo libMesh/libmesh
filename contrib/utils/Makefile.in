@@ -46,7 +46,7 @@ dust:
 	@rm -f out*.m job_output.txt output.txt* *.gmv.* *.plt.* out*.xdr* out*.xda* PI* complete
 
 clean: dust
-	@rm -f $(objects) *.$(obj-suffix)
+	@rm -f $(objects) *.$(obj-suffix) *.lo
 
 clobber: clean 
 	@rm -f $(target)
@@ -80,7 +80,7 @@ gmv:
 	@for file in out.mesh.*; do ${LIBMESH_RUN} $(LIBMESH_DIR)/roy/meshplot/meshplot-$(METHOD) $$file out.soln.$${file##out.mesh.} out.gmv.$${file:9:4}; done
 
 # include the dependency list
-include .depend
+-include .depend
 
 #
 # Dependencies
