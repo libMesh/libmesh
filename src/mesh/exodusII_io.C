@@ -32,6 +32,8 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/exodusII_io_helper.h"
 #include "libmesh/nemesis_io_helper.h"
+#include "libmesh/mesh_communication.h"
+#include "libmesh/parallel_mesh.h"
 
 // Include the ParMETIS header files
 namespace Parmetis {
@@ -313,7 +315,7 @@ void ExodusII_IO::read (const std::string& fname)
             return;
         }
         
-        START_LOG ("read()","Nemesis_IO");
+        START_LOG ("read()","Exodus_IO");
         
         
         libMesh::out << "getting into read" << std::endl;
@@ -323,8 +325,8 @@ void ExodusII_IO::read (const std::string& fname)
         
         // Open the Exodus file
         this->exio_helper->open(base_filename.c_str()); // just to avoid error from within this class
-        ExodusII_IO_Helper ex_helper(this->comm(), true, false);
-        ex_helper.open(base_filename.c_str());
+        ExodusII_IO_Helper ex_io_helper(this->comm(), true, false);
+        ex_io_helper.open(base_filename.c_str());
         
         // Get a reference to the mesh.  We need to be specific
         // since Nemesis_IO is multiply-inherited
@@ -339,12 +341,19 @@ void ExodusII_IO::read (const std::string& fname)
         //  num_elem_blk
         //  num_node_sets
         //  num_side_sets
-        ex_helper.read_header();
-        ex_helper.print_header();
+        ex_io_helper.read_header();
+        ex_io_helper.print_header();
         
         libMesh::out << "after header" << std::endl;
         
-        ex_helper.read_block_info();
+        ex_io_helper.read_block_info();
+
+        exII::ex_get_elem_block(ex_io_helper.ex_id,
+                                ex_io_helper.block_ids[0],
+                                &ex_io_helper.elem_type[0],
+                                &ex_io_helper.num_elem_this_blk,
+                                &ex_io_helper.num_nodes_per_elem,
+                                &ex_io_helper.num_attr);
         
         libMesh::out << "after read block info" << std::endl;
         
@@ -357,8 +366,8 @@ void ExodusII_IO::read (const std::string& fname)
         
         // beginning and end of elem_ids on each processor
         std::vector<int> proc_elems(this->n_processors()+1, 0);
-        unsigned int n_remaining_elems = ex_helper.num_elem,
-        n_elems_per_proc = ex_helper.num_elem / this->n_processors();
+        int n_remaining_elems = ex_io_helper.num_elem,
+        n_elems_per_proc = ex_io_helper.num_elem / this->n_processors();
         
         proc_elems[0] = 1; // exodus numbering starts from 1
         for (unsigned int i=0; i<this->n_processors(); i++)
@@ -378,7 +387,7 @@ void ExodusII_IO::read (const std::string& fname)
         << proc_elems[this->processor_id()] << "  " << proc_elems[this->processor_id()+1]
         << " n elem on proc: " << n_local_elems << std::endl;
         
-        exII::ex_get_elem_block(ex_helper.ex_id, ex_helper.block_ids[0], &elem_type[0],
+        exII::ex_get_elem_block(ex_io_helper.ex_id, ex_io_helper.block_ids[0], &elem_type[0],
                                 &n_elem_in_block,
                                 &n_nodes_per_elem,
                                 &n_attr);
@@ -386,16 +395,16 @@ void ExodusII_IO::read (const std::string& fname)
         libMesh::out << "after block elem info" << std::endl;
         
         std::vector<int> elem_conn(n_local_elems * n_nodes_per_elem, 0);
-        std::vector<float> elem_xyz(n_local_elems*ex_helper.num_dim, 0.);
+        std::vector<float> elem_xyz(n_local_elems*ex_io_helper.num_dim, 0.);
         
-        int err = Nemesis::ne_get_n_elem_conn(ex_helper.ex_id, ex_helper.block_ids[0], proc_elems[this->processor_id()],
+        int err = Nemesis::ne_get_n_elem_conn(ex_io_helper.ex_id, ex_io_helper.block_ids[0], proc_elems[this->processor_id()],
                                               n_local_elems, &elem_conn[0]);
         
         libMesh::out << "after elem conn" << std::endl;
         
         // find the first and last nodes
-        unsigned int first_node=ex_helper.num_nodes, last_node=0;
-        for (unsigned int i=0; i<elem_conn.size(); i++)
+        dof_id_type first_node=ex_io_helper.num_nodes, last_node=0;
+        for (dof_id_type i=0; i<elem_conn.size(); i++)
         {
             if (first_node > elem_conn[i])
                 first_node = elem_conn[i];
@@ -410,7 +419,7 @@ void ExodusII_IO::read (const std::string& fname)
         // hopefully the size of these vectors will not be too huge
         std::vector<Real> node_x(last_node-first_node+1, 0.),
         node_y(last_node-first_node+1, 0.), node_z(last_node-first_node+1, 0.);
-        err = Nemesis::ne_get_n_coord(ex_helper.ex_id, first_node, last_node-first_node+1,
+        err = Nemesis::ne_get_n_coord(ex_io_helper.ex_id, first_node, last_node-first_node+1,
                                       &node_x[0], &node_y[0], &node_z[0]);
         
         unsigned int node_pos_in_vector;
@@ -419,14 +428,17 @@ void ExodusII_IO::read (const std::string& fname)
             for (unsigned int i_node=0; i_node<n_nodes_per_elem; i_node++)
             {
                 node_pos_in_vector = elem_conn[i_elem*n_nodes_per_elem+i_node]-first_node;
-                elem_xyz[i_elem*ex_helper.num_dim+0] += node_x[node_pos_in_vector];
-                elem_xyz[i_elem*ex_helper.num_dim+1] += node_y[node_pos_in_vector];
-                elem_xyz[i_elem*ex_helper.num_dim+2] += node_z[node_pos_in_vector];
+                elem_xyz[i_elem*ex_io_helper.num_dim+0] += node_x[node_pos_in_vector];
+                elem_xyz[i_elem*ex_io_helper.num_dim+1] += node_y[node_pos_in_vector];
+                elem_xyz[i_elem*ex_io_helper.num_dim+2] += node_z[node_pos_in_vector];
             }
-            elem_xyz[i_elem*ex_helper.num_dim+0] /= n_nodes_per_elem;
-            elem_xyz[i_elem*ex_helper.num_dim+1] /= n_nodes_per_elem;
-            elem_xyz[i_elem*ex_helper.num_dim+2] /= n_nodes_per_elem;
+            elem_xyz[i_elem*ex_io_helper.num_dim+0] /= n_nodes_per_elem;
+            elem_xyz[i_elem*ex_io_helper.num_dim+1] /= n_nodes_per_elem;
+            elem_xyz[i_elem*ex_io_helper.num_dim+2] /= n_nodes_per_elem;
         }
+        
+        // clear unneeded storage
+        node_x.clear(); node_y.clear(); node_z.clear();
         
         // now call the partitioner
         std::vector<int> part(n_local_elems, 0);
@@ -434,20 +446,252 @@ void ExodusII_IO::read (const std::string& fname)
         
         libMesh::out << "getting into Parmetis" << std::endl;
         
-        err = Parmetis::ParMETIS_V3_PartGeom(&proc_elems[0], &ex_helper.num_dim, &elem_xyz[0],
+        err = Parmetis::ParMETIS_V3_PartGeom(&proc_elems[0], &ex_io_helper.num_dim, &elem_xyz[0],
                                              &part[0], &mpi_comm);
         
         libMesh::out << "after Parmetis" << std::endl;
         
+        // clear unneeded storage
+        elem_xyz.clear();
+        
         // now, this partitioning needs to be communicated to the respective processors
+        std::vector<dof_id_type> collected_elems_on_proc, elems_for_comm;
+
+        // add elements from the local processor
+        unsigned int n_elems_for_comm = 0;
+        elems_for_comm.resize(n_local_elems);
         
+        // iterate over the elements locally and create the list of
+        // elements that belong to proc dest
+        for (unsigned int i=0; i<n_local_elems; i++)
+            if (part[i] == this->processor_id())
+            {
+                elems_for_comm[n_elems_for_comm] = proc_elems[this->processor_id()]+i;
+                n_elems_for_comm++;
+            }
+        collected_elems_on_proc.insert(collected_elems_on_proc.end(),
+                                       elems_for_comm.begin(),
+                                       elems_for_comm.begin()+n_elems_for_comm);
+
         
+        for (processor_id_type pid=0; pid<mesh.n_processors(); pid++) // pid received data from others
+        {
+            if (pid == this->processor_id()) // receive from others
+            {
+                std::cout << "***** Receiving for pid: " << pid << std::endl;
+                for (processor_id_type source=0; source<mesh.n_processors(); source++)
+                    if (source != this->processor_id()) // don't send to self
+                    {
+                        elems_for_comm.clear();
+                        this->comm().receive(source, elems_for_comm);
+                        std::cout << "Received: " << elems_for_comm.size() << " elems from proc: " << source << std::endl;
+                        collected_elems_on_proc.insert(collected_elems_on_proc.end(),
+                                                       elems_for_comm.begin(), elems_for_comm.end());
+                    }
+                std::cout << "Total: " << collected_elems_on_proc.size() << " elems on proc: " << pid << std::endl;
+            }
+            else // send data to pid
+            {
+                std::cout << "***** Sending from pid: " << this->processor_id() << std::endl;
+                elems_for_comm.resize(n_local_elems); // upper limit of the size for this vector
+
+                n_elems_for_comm = 0;
+                
+                // iterate over the elements locally and create the list of
+                // elements that belong to proc dest
+                for (unsigned int i=0; i<n_local_elems; i++)
+                    if (part[i] == pid)
+                    {
+                        elems_for_comm[n_elems_for_comm] = proc_elems[this->processor_id()]+i;
+                        n_elems_for_comm++;
+                    }
+                
+                std::vector<dof_id_type> elem_send_list;
+                elem_send_list.insert(elem_send_list.end(),
+                                      elems_for_comm.begin(),
+                                      elems_for_comm.begin()+n_elems_for_comm);
+                
+                std::cout << "Sending: " << elem_send_list.size() << " elems to proc: " << pid << std::endl;
+                this->comm().send(pid, elem_send_list);
+            }
+        }
         
-        err = exII::ex_close(ex_helper.ex_id);
+        // clear the unneeded storage
+        elems_for_comm.clear(); part.clear();
+
+        // find the range of element ids
+        unsigned int first_elem=ex_io_helper.num_elem, last_elem=0;
+        for (std::vector<unsigned int>::const_iterator elem_it=collected_elems_on_proc.begin();
+             elem_it != collected_elems_on_proc.end(); elem_it++)
+        {
+            if (*elem_it > last_elem)
+                last_elem = *elem_it;
+            if (*elem_it < first_elem)
+                first_elem = *elem_it;
+        }
         
-        STOP_LOG ("read()","Nemesis_IO");
+        // now, get the node details for this element range
+        n_local_elems = collected_elems_on_proc.size();
+        elem_conn.resize((last_elem-first_elem+1) * n_nodes_per_elem); // this stores the connectivity for the entire range
+
+        libMesh::out << "Elem range: " << first_elem << "  --  "  << last_elem << "  : with total elems:  " << n_local_elems << std::endl;
         
-        return; /****** this is only till the portion of the code so far is tested *********/
+
+        libMesh::out << "Reading updated element connectivity " << std::endl;
+        
+        err = Nemesis::ne_get_n_elem_conn(ex_io_helper.ex_id, ex_io_helper.block_ids[0], first_elem,
+                                          (last_elem-first_elem+1), &elem_conn[0]);
+
+        libMesh::out << "Done reading updated element connectivity: Preparing node process ids" << std::endl;
+
+        // find the node ownership and the range of node ids on this processor.
+        // If a node lies on multiple processors, then the smallest processor id would take ownership of the node
+
+        std::map<dof_id_type, processor_id_type> node_processor_id_map;
+
+        unsigned int elem_offset, node_offset;
+        for (std::vector<unsigned int>::const_iterator elem_it=collected_elems_on_proc.begin();
+             elem_it != collected_elems_on_proc.end(); elem_it++)
+        {
+            elem_offset = (*elem_it-first_elem)*n_nodes_per_elem; // offset for connectivity data
+            
+            for (unsigned int j=0; j<n_nodes_per_elem; j++)
+                // start by identify each node to be on this processor
+                // this will be changed later
+                node_processor_id_map[elem_conn[elem_offset+j]] = this->processor_id();
+        }
+        
+        // get the first and last node ids from the map
+        first_node = node_processor_id_map.begin()->first;
+        last_node = node_processor_id_map.rbegin()->first;
+
+        libMesh::out << "Done preparing node process ids: communicating IDs to processors" << std::endl;
+
+        // now each processor communicates to the higher rank processors about the ownership
+        for (processor_id_type pid=0; pid<mesh.n_processors(); pid++) // pid sends data to higher ranked processors
+        {
+            //prepare the node vector and send it to higher ranked processors
+            if (pid == this->processor_id())
+            {
+                std::vector<dof_id_type> locally_owned_nodes(node_processor_id_map.size());
+                dof_id_type index=0;
+                for (std::map<dof_id_type, processor_id_type>::const_iterator map_it=node_processor_id_map.begin();
+                     map_it != node_processor_id_map.end(); map_it++)
+                {
+                    if (map_it->second == pid) // pid == this->processor_id() here
+                        locally_owned_nodes[index++] = map_it->first;
+                }
+                
+                // send the data to the processor in a vector that is
+                // sized for the number of locally owned nodes
+                std::vector<dof_id_type> data_to_send;
+                data_to_send.insert(data_to_send.end(), locally_owned_nodes.begin(), locally_owned_nodes.end());
+                locally_owned_nodes.clear();
+                
+                // send this to all processors of higher rank
+                std::cout << "Sending nodes to processors: n_nodes = " << data_to_send.size() << " : from pid = " <<  pid << std::endl;
+                for (processor_id_type dest=pid+1; dest<mesh.n_processors(); dest++)
+                    this->comm().send(dest, data_to_send);
+            }
+            else if (pid < this->processor_id()) // receive from lower ranked processors
+            {
+                // get the remote node ids
+                std::vector<dof_id_type> remote_nodes;
+                this->comm().receive(pid, remote_nodes);
+
+                libMesh::out << "Received from : " << pid << " by " << this->processor_id() << " n_nodes : " << remote_nodes.size()  << std::endl;
+                
+                // now iterate over these nodes and set their processor ids
+                std::map<dof_id_type, processor_id_type>::iterator map_it;
+                std::map<dof_id_type, processor_id_type>::const_iterator map_end = node_processor_id_map.end();
+                for (std::vector<dof_id_type>::const_iterator node_it=remote_nodes.begin();
+                     node_it != remote_nodes.end(); node_it++)
+                {
+                    // check if the node also lies on this processor
+                    map_it = node_processor_id_map.find(*node_it);
+                    if (map_it != map_end)
+                        map_it->second = pid;
+                }
+            }
+        }
+                
+        libMesh::out << "Node range on proc: " << this->processor_id() << "  " << first_node << "  " << last_node << std::endl;
+        
+        // now read in the detail for each node specified in the connectivity list for each element, and calculate
+        // the centroid information
+        // hopefully the size of these vectors will not be too huge
+        node_x.resize(last_node-first_node+1, 0.);
+        node_y.resize(last_node-first_node+1, 0.);
+        node_z.resize(last_node-first_node+1, 0.);
+        
+        libMesh::out << "Reading node coordinates " << std::endl;
+
+        err = Nemesis::ne_get_n_coord(ex_io_helper.ex_id, first_node, last_node-first_node+1,
+                                      &node_x[0], &node_y[0], &node_z[0]);
+
+        libMesh::out << "Done reading node coordinates: Now adding nodes and elements to mesh " << std::endl;
+
+        // add the nodes and elements
+        ExodusII_IO_Helper::ElementMaps em;     // Instantiate the ElementMaps interface
+        const std::string type_str (ex_io_helper.get_elem_type());
+        const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(type_str);
+
+        Node* node_ptr;
+        std::map<dof_id_type, processor_id_type>::const_iterator map_it,
+        map_end = node_processor_id_map.end();
+        // Loop over all the elements in this block
+        for (std::vector<unsigned int>::const_iterator elem_it=collected_elems_on_proc.begin();
+             elem_it != collected_elems_on_proc.end(); elem_it++)
+        {
+            elem_offset = (*elem_it-first_elem)*n_nodes_per_elem; // offset for connectivity data
+
+            Elem* elem = Elem::build (conv.get_canonical_type()).release(); // create the element
+            elem->processor_id(this->processor_id()); // only add locally
+            elem->set_id(*elem_it); // prescribe the elem id
+            
+            for (unsigned int j=0; j<n_nodes_per_elem; j++)
+            {
+                node_ptr = mesh.query_node_ptr(elem_conn[elem_offset+j]);
+                if (node_ptr == NULL)
+                {
+                    node_offset = elem_conn[elem_offset+j] - first_node;
+                    
+                    // local map should certainly have this node id
+                    map_it = node_processor_id_map.find(elem_conn[elem_offset+j]);
+                    libmesh_assert(map_it != map_end);
+                    
+                    // use the node id, add processor id identified earlies
+                    node_ptr = mesh.add_point(Point(node_x[node_offset],
+                                                    node_y[node_offset],
+                                                    node_z[node_offset]),
+                                              elem_conn[elem_offset+j],
+                                              map_it->second);
+                }
+                
+                elem->set_node(j) = node_ptr;
+            }
+
+            mesh.add_elem(elem);
+        }
+        
+        // clear unneeded storage
+        collected_elems_on_proc.clear(); elem_conn.clear();
+        node_x.clear(); node_y.clear(); node_z.clear();
+        node_processor_id_map.clear();
+        
+        libMesh::out << "Done adding elements to mesh: Now preparing for use " << std::endl;
+        
+        err = exII::ex_close(ex_io_helper.ex_id);
+
+        // now prepare for use
+        MeshCommunication().gather_neighboring_elements(libmesh_cast_ref<ParallelMesh&>(mesh));
+        mesh.prepare_for_use();
+        
+        libMesh::out << "Done " << std::endl;
+
+        STOP_LOG ("read()","Exodus_IO");
+        
+        return;
     }
     
 
