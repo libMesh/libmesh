@@ -683,9 +683,14 @@ void ExodusII_IO::read (const std::string& fname)
         
         err = exII::ex_close(ex_io_helper.ex_id);
 
+        
+        // For ParallelMesh, it seems that _is_serial is true by default.  A hack to
+        // make the Mesh think it's parallel might be to call:
+        mesh.update_post_partitioning();
+        mesh.delete_remote_elements();
+
         // now prepare for use
         MeshCommunication().gather_neighboring_elements(libmesh_cast_ref<ParallelMesh&>(mesh));
-        mesh.prepare_for_use();
         
         libMesh::out << "Done " << std::endl;
 
