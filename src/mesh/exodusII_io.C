@@ -679,6 +679,76 @@ void ExodusII_IO::read (const std::string& fname)
         node_x.clear(); node_y.clear(); node_z.clear();
         node_processor_id_map.clear();
         
+
+        unsigned int n_side_sets = 0;
+        // Read in sideset information -- this is useful for applying boundary conditions
+        {
+            ex_io_helper.read_sideset_info(); // Get basic information about ALL sidesets
+            int offset=0;
+            for (int i=0; i<ex_io_helper.get_num_side_sets(); i++)
+            {
+                offset += (i > 0 ? ex_io_helper.get_num_sides_per_set(i-1) : 0); // Compute new offset
+                ex_io_helper.read_sideset (i, offset);
+                
+                mesh.boundary_info->sideset_name(ex_io_helper.get_side_set_id(i)) =
+                ex_io_helper.get_side_set_name(i);
+            }
+            
+            const std::vector<int>& elem_list = ex_io_helper.get_elem_list();
+            const std::vector<int>& side_list = ex_io_helper.get_side_list();
+            const std::vector<int>& id_list   = ex_io_helper.get_id_list();
+            
+            for (unsigned int e=0; e<elem_list.size(); e++)
+            {
+                // Set any relevant node/edge maps for this element
+                
+                Elem * elem = mesh.query_elem(elem_list[e]);
+                
+                if (elem != NULL) // proceed only if this processor contains this elemid
+                {
+                    
+                    const ExodusII_IO_Helper::Conversion conv =
+                    em.assign_conversion(elem->type());
+                    
+                    mesh.boundary_info->add_side (elem_list[e],
+                                                  conv.get_side_map(side_list[e]-1),
+                                                  id_list[e]);
+                    n_side_sets++;
+                }
+            }
+        }
+        
+        
+        std::cout << "Done adding side set: on pid: " << this->processor_id() << " : n_side_sets : " << n_side_sets << std::endl;
+        this->comm().sum(n_side_sets);
+        std::cout << "Total side sets: " << n_side_sets << std::endl;
+        
+        // Read nodeset info
+        {
+            ex_io_helper.read_nodeset_info();
+            
+            for (int nodeset=0; nodeset<ex_io_helper.get_num_node_sets(); nodeset++)
+            {
+                int nodeset_id = ex_io_helper.get_nodeset_id(nodeset);
+                
+                mesh.boundary_info->nodeset_name(nodeset_id) =
+                ex_io_helper.get_node_set_name(nodeset);
+                
+                ex_io_helper.read_nodeset(nodeset);
+                
+                const std::vector<int>& node_list = ex_io_helper.get_node_list();
+                
+                for(unsigned int node=0; node<node_list.size(); node++)
+                {
+                    Node * node_ptr = mesh.query_node_ptr(node_list[node]);
+                    if (node_ptr != NULL)
+                        mesh.boundary_info->add_node(node_list[node], nodeset_id);
+                }
+            }
+        }
+
+        
+        
         libMesh::out << "Done adding elements to mesh: Now preparing for use " << std::endl;
         
         err = exII::ex_close(ex_io_helper.ex_id);
