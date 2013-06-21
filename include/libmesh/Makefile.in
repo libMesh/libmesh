@@ -525,11 +525,11 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	solution_history.h solver.h steady_solver.h time_solver.h \
 	trilinos_aztec_linear_solver.h trilinos_nox_nonlinear_solver.h \
 	twostep_time_solver.h unsteady_solver.h \
-	condensed_eigen_system.h continuation_system.h diff_context.h \
-	diff_system.h eigen_system.h elem_assembly.h \
-	equation_systems.h explicit_system.h fem_context.h \
-	fem_system.h frequency_system.h implicit_system.h \
-	linear_implicit_system.h newmark_system.h \
+	condensed_eigen_system.h continuation_system.h \
+	dg_fem_context.h diff_context.h diff_system.h eigen_system.h \
+	elem_assembly.h equation_systems.h explicit_system.h \
+	fem_context.h fem_system.h frequency_system.h \
+	implicit_system.h linear_implicit_system.h newmark_system.h \
 	nonlinear_implicit_system.h parameter_vector.h qoi_set.h \
 	sensitivity_data.h steady_system.h system.h system_norm.h \
 	system_subset.h system_subset_by_subdomain.h \
@@ -1751,6 +1751,9 @@ condensed_eigen_system.h: $(top_srcdir)/include/systems/condensed_eigen_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 continuation_system.h: $(top_srcdir)/include/systems/continuation_system.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+dg_fem_context.h: $(top_srcdir)/include/systems/dg_fem_context.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 diff_context.h: $(top_srcdir)/include/systems/diff_context.h

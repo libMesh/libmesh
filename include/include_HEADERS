@@ -336,6 +336,7 @@ include_HEADERS =  \
         solvers/unsteady_solver.h \
         systems/condensed_eigen_system.h \
         systems/continuation_system.h \
+        systems/dg_fem_context.h \
         systems/diff_context.h \
         systems/diff_system.h \
         systems/eigen_system.h \

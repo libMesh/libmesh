@@ -501,7 +501,7 @@ public:
   /**
    * Reinitializes side FE objects on the current geometric element
    */
-  void side_fe_reinit();
+  virtual void side_fe_reinit();
 
   /**
    * Reinitializes edge FE objects on the current geometric element
