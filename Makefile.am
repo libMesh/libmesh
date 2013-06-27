@@ -81,6 +81,7 @@ libmesh_config_SCRIPTS = contrib/bin/libmesh-config
 #  when doing 'make install prefix=/other/path', update generated files
 #  when doing 'make install', symlik etc/libmesh/Make.common
 #  when doing 'make install', update libmesh_config
+#  fix up buggy libtool postdeps under specific compiler/mpi configurations
 install-data-hook:
 	@if (test "x$(prefix)" != "x@prefix@") ; then \
 	  oldprefix="@prefix@" ; \
@@ -98,6 +99,8 @@ install-data-hook:
 	cd $(DESTDIR)$(prefix) && rm -f Make.common && $(LN_S) etc/libmesh/Make.common Make.common
 	cat $(DESTDIR)$(libmesh_configdir)/libmesh-config | $(SED) "s/has_been_installed=no/has_been_installed=yes/g" > $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed
 	mv $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed $(DESTDIR)$(libmesh_configdir)/libmesh-config && chmod +x $(DESTDIR)$(libmesh_configdir)/libmesh-config
+	cat $(DESTDIR)$(prefix)/contrib/bin/libtool | $(SED) "s/-l -l //g" > $(DESTDIR)$(prefix)/contrib/bin/libtool.fixed
+	mv $(DESTDIR)$(prefix)/contrib/bin/libtool.fixed $(DESTDIR)$(prefix)/contrib/bin/libtool && chmod +x $(DESTDIR)$(prefix)/contrib/bin/libtool
 
 
 # this rule invokes emacs on each source file to remove trailing whitespace.
