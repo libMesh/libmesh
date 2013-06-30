@@ -44,6 +44,13 @@
 #  include "tbb/tbb_thread.h"
 #endif
 
+#ifdef LIBMESH_HAVE_PTHREAD
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <algorithm>
+#include <vector>
+#endif
 
 // Thread-Local-Storage macros
 
@@ -310,9 +317,349 @@ namespace Threads
   template <typename T>
   class atomic : public tbb::atomic<T> {};
 
-
-
 #else //LIBMESH_HAVE_TBB_API
+#ifdef LIBMESH_HAVE_PTHREAD
+  template <typename Range>
+  unsigned int num_pthreads(Range & range)
+  {
+    return std::min((unsigned long)libMesh::n_threads(), range.size());
+  }
+
+  template <typename Range, typename Body>
+  class RangeBody
+  {
+  public:
+    Range * range;
+    Body * body;
+  };
+
+  template <typename Range, typename Body>
+  void * run_body(void * args)
+  {
+
+    RangeBody<Range, Body> * range_body = (RangeBody<Range, Body>*)args;
+
+    Body & body = *range_body->body;
+    Range & range = *range_body->range;
+
+    body(range);
+
+    return NULL;
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Scheduler to manage threads.
+   */
+  class task_scheduler_init
+  {
+  public:
+    static const int automatic = -1;
+    explicit task_scheduler_init (int = automatic) {}
+    void initialize (int = automatic) {}
+    void terminate () {}
+  };
+
+  //-------------------------------------------------------------------
+  /**
+   * Dummy "splitting object" used to distinguish splitting constructors
+   * from copy constructors.
+   */
+  class split {};
+
+  //-------------------------------------------------------------------
+  /**
+   * Exectue the provided function object in parallel on the specified
+   * range.
+   */
+  template <typename Range, typename Body>
+  inline
+  void parallel_for (const Range &range, const Body &body)
+  {
+    Threads::BoolAcquire b(Threads::in_threads);
+
+    unsigned int n_threads = num_pthreads(range);
+
+    std::vector<Range *> ranges(n_threads);
+    std::vector<RangeBody<const Range, const Body> > range_bodies(n_threads);
+    std::vector<pthread_t> threads(n_threads);
+
+    // Create the ranges for each thread
+    unsigned int range_size = range.size() / n_threads;
+
+    typename Range::const_iterator current_beginning = range.begin();
+
+    for(unsigned int i=0; i<n_threads; i++)
+    {
+      unsigned int this_range_size = range_size;
+
+      if(i+1 == n_threads)
+        this_range_size += range.size() % n_threads; // Give the last one the remaining work to do
+
+      ranges[i] = new Range(range, current_beginning, current_beginning + this_range_size);
+
+      current_beginning = current_beginning + this_range_size;
+    }
+
+    // Create the RangeBody arguments
+    for(unsigned int i=0; i<n_threads; i++)
+    {
+      range_bodies[i].range = ranges[i];
+      range_bodies[i].body = &body;
+    }
+
+    // Create the threads
+    for(unsigned int i=0; i<n_threads; i++)
+      pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void*)&range_bodies[i]);
+
+    // Wait for them to finish
+    for(unsigned int i=0; i<n_threads; i++)
+      pthread_join(threads[i], NULL);
+
+    // Clean up
+    for(unsigned int i=0; i<n_threads; i++)
+      delete ranges[i];
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Exectue the provided function object in parallel on the specified
+   * range with the specified partitioner.
+   */
+  template <typename Range, typename Body, typename Partitioner>
+  inline
+  void parallel_for (const Range &range, const Body &body, const Partitioner &)
+  {
+    parallel_for(range, body);
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Exectue the provided reduction operation in parallel on the specified
+   * range.
+   */
+  template <typename Range, typename Body>
+  inline
+  void parallel_reduce (const Range &range, Body &body)
+  {
+    Threads::BoolAcquire b(Threads::in_threads);
+
+    unsigned int n_threads = num_pthreads(range);
+
+    std::vector<Range *> ranges(n_threads);
+    std::vector<Body *> bodies(n_threads);
+    std::vector<RangeBody<Range, Body> > range_bodies(n_threads);
+
+    // Create copies of the body for each thread
+    bodies[0] = &body; // Use the original body for the first one
+    for(unsigned int i=1; i<n_threads; i++)
+      bodies[i] = new Body(body, Threads::split());
+
+    // Create the ranges for each thread
+    unsigned int range_size = range.size() / n_threads;
+
+    typename Range::const_iterator current_beginning = range.begin();
+
+    for(unsigned int i=0; i<n_threads; i++)
+    {
+      unsigned int this_range_size = range_size;
+
+      if(i+1 == n_threads)
+        this_range_size += range.size() % n_threads; // Give the last one the remaining work to do
+
+      ranges[i] = new Range(range, current_beginning, current_beginning + this_range_size);
+
+      current_beginning = current_beginning + this_range_size;
+    }
+
+    // Create the RangeBody arguments
+    for(unsigned int i=0; i<n_threads; i++)
+    {
+      range_bodies[i].range = ranges[i];
+      range_bodies[i].body = bodies[i];
+    }
+
+    // Create the threads
+    std::vector<pthread_t> threads(n_threads);
+    for(unsigned int i=0; i<n_threads; i++)
+      pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void*)&range_bodies[i]);
+
+    // Wait for them to finish
+    for(unsigned int i=0; i<n_threads; i++)
+      pthread_join(threads[i], NULL);
+
+    // Join them all down to the original Body
+    for(unsigned int i=n_threads-1; i != 0; i--)
+      bodies[i-1]->join(*bodies[i]);
+
+    // Clean up
+    for(unsigned int i=1; i<n_threads; i++)
+      delete bodies[i];
+    for(unsigned int i=0; i<n_threads; i++)
+      delete ranges[i];
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Exectue the provided reduction operation in parallel on the specified
+   * range with the specified partitioner.
+   */
+  template <typename Range, typename Body, typename Partitioner>
+  inline
+  void parallel_reduce (const Range &range, Body &body, const Partitioner &)
+  {
+    parallel_reduce(range, body);
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Spin mutex.  Implements mutual exclusion by busy-waiting in user
+   * space for the lock to be acquired.
+   */
+  class spin_mutex
+  {
+  public:
+    // Might want to use PTHREAD_MUTEX_ADAPTIVE_NP on Linux, but it's not available on OSX.
+    spin_mutex() { pthread_mutex_init(&mutex, NULL); }
+    ~spin_mutex() { pthread_mutex_destroy(&mutex); }
+
+    void lock () { pthread_mutex_lock(&mutex); }
+    void unlock () { pthread_mutex_unlock(&mutex); }
+
+    class scoped_lock
+    {
+    public:
+      scoped_lock () : smutex(NULL) {}
+      explicit scoped_lock ( spin_mutex& in_smutex ) : smutex(&in_smutex) { smutex->lock(); }
+
+      ~scoped_lock () { release(); }
+
+      void acquire ( spin_mutex& in_smutex ) { smutex = &in_smutex; smutex->lock(); }
+      void release () { if(smutex) smutex->unlock(); smutex = NULL; }
+
+    private:
+      spin_mutex * smutex;
+    };
+
+  private:
+    pthread_mutex_t mutex;
+  };
+
+  //-------------------------------------------------------------------
+  /**
+   * Recursive mutex.  Implements mutual exclusion by busy-waiting in user
+   * space for the lock to be acquired.
+   */
+  class recursive_mutex
+  {
+  public:
+    // Might want to use PTHREAD_MUTEX_ADAPTIVE_NP on Linux, but it's not available on OSX.
+    recursive_mutex()
+    {
+      pthread_mutexattr_init(&attr);
+      pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+      pthread_mutex_init(&mutex, &attr);
+    }
+    ~recursive_mutex() { pthread_mutex_destroy(&mutex); }
+
+    void lock () { pthread_mutex_lock(&mutex); }
+    void unlock () { pthread_mutex_unlock(&mutex); }
+
+    class scoped_lock
+    {
+    public:
+      scoped_lock () : rmutex(NULL) {}
+      explicit scoped_lock ( recursive_mutex& in_rmutex ) : rmutex(&in_rmutex) { rmutex->lock(); }
+
+      ~scoped_lock () { release(); }
+
+      void acquire ( recursive_mutex& in_rmutex ) { rmutex = &in_rmutex; rmutex->lock(); }
+      void release () { if(rmutex) rmutex->unlock(); rmutex = NULL; }
+
+    private:
+      recursive_mutex * rmutex;
+    };
+
+  private:
+    pthread_mutex_t mutex;
+    pthread_mutexattr_t attr;
+  };
+
+  //-------------------------------------------------------------------
+  /**
+   * Defines atomic operations which can only be executed on a
+   * single thread at a time.
+   */
+  template <typename T>
+  class atomic
+  {
+  public:
+    atomic () : val(0) {}
+    operator T () { return val; }
+
+    T operator=( T value )
+    {
+      spin_mutex::scoped_lock lock(smutex);
+      val = value;
+      return val;
+    }
+
+    atomic<T>& operator=( const atomic<T>& value )
+    {
+      spin_mutex::scoped_lock lock(smutex);
+      val = value;
+      return *this;
+    }
+
+
+    T operator+=(T value)
+    {
+      spin_mutex::scoped_lock lock(smutex);
+      val += value;
+      return val;
+    }
+
+    T operator-=(T value)
+    {
+      spin_mutex::scoped_lock lock(smutex);
+      val -= value;
+      return val;
+    }
+
+    T operator++()
+    {
+      spin_mutex::scoped_lock lock(smutex);
+      val++;
+      return val;
+    }
+
+    T operator++(int)
+    {
+      spin_mutex::scoped_lock lock(smutex);
+      val++;
+      return val;
+    }
+
+    T operator--()
+    {
+      spin_mutex::scoped_lock lock(smutex);
+      val--;
+      return val;
+    }
+
+    T operator--(int)
+    {
+      spin_mutex::scoped_lock lock(smutex);
+      val--;
+      return val;
+    }
+
+  private:
+    T val;
+    spin_mutex smutex;
+  };
+
+#else //LIBMESH_HAVE_PTHREAD
 
   //-------------------------------------------------------------------
   /**
@@ -443,7 +790,7 @@ namespace Threads
     T _val;
   };
 
-
+#endif // LIBMESH_HAVE_PTHREAD
 #endif // #ifdef LIBMESH_HAVE_TBB_API
 
 

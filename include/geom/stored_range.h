@@ -114,6 +114,39 @@ public:
   }
 
   /**
+   * NOTE: When using pthreads this constructor is MANDATORY!!!
+   *
+   * Copy constructor.  The \p StoredRange can be copied into
+   * subranges for parallel execution.  In this way the
+   * initial \p StoredRange can be thought of as the root of
+   * a binary tree.  The root element is the only element
+   * which interacts with the user.  It takes a specified
+   * range of objects and packs it into a contiguous vector
+   * which can be split efficiently. However, there is no need
+   * for the child ranges to contain this vector, so long as
+   * the parent outlives the children.  So we implement
+   * the copy constructor to specifically omit the \p _objs
+   * vector. This version allows you to set the beginning and
+   * ending of this new range to be different from that of the
+   * one we're copying.
+   */
+  StoredRange (const StoredRange<iterator_type,object_type> &er,
+               const const_iterator &begin,
+               const const_iterator &end):
+    _end(end),
+    _begin(begin),
+    _last(0), // Initialize these in a moment
+    _first(0),
+    _grainsize(er._grainsize),
+    _objs()
+  {
+    // specifically, do *not* copy the vector
+
+    _first = std::distance(er._begin, _begin);
+    _last = _first + std::distance(_begin, _end);
+  }
+
+  /**
    * Splits the range \p r.  The first half
    * of the range is left in place, the second
    * half of the range is placed in *this.
