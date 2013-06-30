@@ -439,13 +439,6 @@ public:
   bool constrained_problem;
 
   /**
-   * Boolean flag to indicate whether we store just one matrix in order
-   * to conserve memory. If single_matrix_mode=false then we store
-   * each matrix that is required for the affine decomposition of the PDE.
-   */
-  bool single_matrix_mode;
-
-  /**
    * Boolean flag to indicate whether we reuse the preconditioner
    * on consecutive Offline solves for updating residual data.
    */

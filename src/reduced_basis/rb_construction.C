@@ -59,7 +59,6 @@ RBConstruction::RBConstruction (EquationSystems& es,
     non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
     constraint_matrix(SparseMatrix<Number>::build(es.comm())),
     constrained_problem(false),
-    single_matrix_mode(false),
     reuse_preconditioner(true),
     use_relative_bound_in_greedy(false),
     exit_on_repeated_greedy_parameters(true),
@@ -228,10 +227,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   // the Stokes inner product matrix to compute Riesz representors)
   constrained_problem = (constraint_assembly != NULL);
 
-  // Tell the system if we're in single-matrix mode
-  single_matrix_mode = infile("single_matrix_mode",
-                              single_matrix_mode);
-
   // Tell the system to reuse the preconditioner on consecutive
   // Offline solves to update residual data
   reuse_preconditioner = infile("reuse_preconditioner",
@@ -331,7 +326,6 @@ void RBConstruction::print_info()
   {
     libMesh::out << "using partially random training set, deterministic parameter is: " << get_deterministic_training_parameter_name() << std::endl;
   }
-  libMesh::out << "single-matrix mode? " << single_matrix_mode << std::endl;
   libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
   libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
@@ -421,14 +415,11 @@ void RBConstruction::initialize_rb_construction()
 
 void RBConstruction::assemble_affine_expansion()
 {
-  // Assemble and store all of the matrices if we're
-  // not in single-matrix mode
-  if(!single_matrix_mode)
-  {
-    this->assemble_misc_matrices();
-    this->assemble_all_affine_operators();
-  }
-
+  // Assemble and store all of the matrices
+  this->assemble_misc_matrices();
+  this->assemble_all_affine_operators();
+  
+  // Assemble and store all of the vectors
   this->assemble_all_affine_vectors();
   this->assemble_all_output_vectors();
 }
@@ -462,8 +453,6 @@ void RBConstruction::allocate_data_structures()
     output_dual_innerprods[n].resize(Q_l_hat);
   }
 
-  // Only initialize matrices if we're not in single-matrix mode
-  if(!single_matrix_mode)
   {
     DofMap& dof_map = this->get_dof_map();
 
@@ -776,7 +765,6 @@ void RBConstruction::truth_assembly()
   this->matrix->close();
   this->rhs->close();
 
-  if(!single_matrix_mode)
   {
     // We should have already assembled the matrices
     // and vectors in the affine expansion, so
@@ -798,148 +786,6 @@ void RBConstruction::truth_assembly()
 
     if(constrained_problem)
       matrix->add(1., *constraint_matrix);
-  }
-  else
-  {
-    // In low memory mode we do not store the matrices
-    // from the affine expansion, so need to assemble
-
-    // For efficiency (i.e. to avoid doing Q_a+Q_f loops
-    // over the mesh) we do not use add_scaled_matrix_and_vector
-    // here
-
-    const MeshBase& mesh = this->get_mesh();
-
-    std::vector<DGFEMContext*> Aq_context(get_rb_theta_expansion().get_n_A_terms());
-    for(unsigned int q_a=0; q_a<Aq_context.size(); q_a++)
-    {
-      Aq_context[q_a] = this->build_context().release();
-      this->init_context(*Aq_context[q_a]);
-    }
-
-    std::vector<DGFEMContext*> Fq_context(get_rb_theta_expansion().get_n_F_terms());
-    for(unsigned int q_f=0; q_f<Fq_context.size(); q_f++)
-    {
-      Fq_context[q_f] = this->build_context().release();
-      this->init_context(*Fq_context[q_f]);
-    }
-
-    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-    for ( ; el != end_el; ++el)
-    {
-      for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
-      {
-        Aq_context[q_a]->pre_fe_reinit(*this, *el);
-        Aq_context[q_a]->elem_fe_reinit();
-        rb_assembly_expansion->perform_A_interior_assembly(q_a, *Aq_context[q_a]);
-      }
-
-      for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
-      {
-        Fq_context[q_f]->pre_fe_reinit(*this, *el);
-        Fq_context[q_f]->elem_fe_reinit();
-        rb_assembly_expansion->perform_F_interior_assembly(q_f, *Fq_context[q_f]);
-      }
-
-      for (Aq_context[0]->side = 0;
-            Aq_context[0]->side != Aq_context[0]->elem->n_sides();
-            ++Aq_context[0]->side)
-      {
-        // May not need to apply fluxes on non-boundary elements
-        if( (Aq_context[0]->elem->neighbor(Aq_context[0]->side) != NULL) && !impose_internal_fluxes )
-          continue;
-
-        // Update the side information for all contexts
-        for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
-        {
-          // Update the side information for all contexts
-          Aq_context[q_a]->side = Aq_context[0]->side;
-
-          Aq_context[q_a]->side_fe_reinit();
-          rb_assembly_expansion->perform_A_boundary_assembly(q_a, *Aq_context[q_a]);
-          
-          if(Aq_context[q_a]->dg_terms_are_active())
-          {
-            this->matrix->add_matrix (Aq_context[q_a]->get_elem_elem_jacobian(),
-                                      Aq_context[q_a]->get_dof_indices(),
-                                      Aq_context[q_a]->get_dof_indices());
-
-            this->matrix->add_matrix (Aq_context[q_a]->get_elem_neighbor_jacobian(),
-                                      Aq_context[q_a]->get_dof_indices(),
-                                      Aq_context[q_a]->get_neighbor_dof_indices());
-
-            this->matrix->add_matrix (Aq_context[q_a]->get_neighbor_elem_jacobian(),
-                                      Aq_context[q_a]->get_neighbor_dof_indices(),
-                                      Aq_context[q_a]->get_dof_indices());
-
-            this->matrix->add_matrix (Aq_context[q_a]->get_neighbor_neighbor_jacobian(),
-                                      Aq_context[q_a]->get_neighbor_dof_indices(),
-                                      Aq_context[q_a]->get_neighbor_dof_indices());
-          }
-        }
-
-        // Impose boundary terms, e.g. Neuman BCs
-        for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
-        {
-          // Update the side information for all contexts
-          Fq_context[q_f]->side = Aq_context[0]->side;
-
-          Fq_context[q_f]->side_fe_reinit();
-          rb_assembly_expansion->perform_F_boundary_assembly(q_f, *Fq_context[q_f]);
-        }
-
-      }
-
-      // Constrain the dofs to impose Dirichlet BCs, hanging node or periodic constraints
-      for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
-      {
-        this->get_dof_map().constrain_element_matrix
-          (Aq_context[q_a]->elem_jacobian, Aq_context[q_a]->dof_indices);
-      }
-
-      for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
-      {
-        this->get_dof_map().constrain_element_vector
-          (Fq_context[q_f]->get_elem_residual(), Fq_context[q_f]->dof_indices);
-      }
-
-      // Finally add local matrices/vectors to global system
-      for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
-      {
-        // Scale by theta_q_a
-        Aq_context[q_a]->elem_jacobian *= get_rb_theta_expansion().eval_A_theta(q_a, mu);
-        this->matrix->add_matrix (Aq_context[q_a]->elem_jacobian,
-                                  Aq_context[q_a]->dof_indices);
-      }
-
-      for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
-      {
-        // Scale by theta_q_f
-        Fq_context[q_f]->get_elem_residual() *= get_rb_theta_expansion().eval_F_theta(q_f, mu);
-        this->rhs->add_vector (Fq_context[q_f]->get_elem_residual(),
-                              Fq_context[q_f]->dof_indices);
-      }
-    }
-
-    if(constrained_problem)
-      add_scaled_matrix_and_vector(1., constraint_assembly, matrix, NULL);
-
-    // Delete all the ptrs to DGFEMContexts!
-    for(unsigned int q_a=0; q_a<Aq_context.size(); q_a++)
-    {
-      delete Aq_context[q_a];
-      Aq_context[q_a] = NULL;
-    }
-    Aq_context.clear();
-
-    for(unsigned int q_f=0; q_f<Fq_context.size(); q_f++)
-    {
-      delete Fq_context[q_f];
-      Fq_context[q_f];
-    }
-    Fq_context.clear();
   }
 
   this->matrix->close();
@@ -1000,7 +846,7 @@ void RBConstruction::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix
     libmesh_error();
   }
 
-  if(!single_matrix_mode && !symmetrize)
+  if(!symmetrize)
   {
     input_matrix->add(scalar, *get_Aq(q_a));
     input_matrix->close();
@@ -1019,12 +865,6 @@ void RBConstruction::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix
 
 void RBConstruction::assemble_misc_matrices()
 {
-  if(single_matrix_mode)
-  {
-    libMesh::out << "Error: Cannot store misc matrices in single-matrix mode." << std::endl;
-    libmesh_error();
-  }
-
   assemble_inner_product_matrix(inner_product_matrix.get());
 
   if(store_non_dirichlet_operators)
@@ -1040,12 +880,6 @@ void RBConstruction::assemble_misc_matrices()
 
 void RBConstruction::assemble_all_affine_operators()
 {
-  if(single_matrix_mode)
-  {
-    libMesh::out << "Error: Cannot store affine matrices in single-matrix mode." << std::endl;
-    libmesh_error();
-  }
-
   for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
     assemble_Aq_matrix(q_a, get_Aq(q_a));
 
@@ -1306,16 +1140,7 @@ Real RBConstruction::truth_solve(int plot_solution)
 
   // Get the X norm of the truth solution
   // Useful for normalizing our true error data
-  if(!single_matrix_mode)
-  {
-    inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
-  }
-  else
-  {
-    assemble_inner_product_matrix(matrix);
-    matrix->vector_mult(*inner_product_storage_vector, *solution);
-  }
-
+  inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
   Number truth_X_norm = std::sqrt(inner_product_storage_vector->dot(*solution));
 
   STOP_LOG("truth_solve()", "RBConstruction");
@@ -1353,35 +1178,18 @@ void RBConstruction::enrich_RB_space()
   AutoPtr< NumericVector<Number> > proj_index = NumericVector<Number>::build(this->comm());
   proj_index->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
-  if(single_matrix_mode)
-    assemble_inner_product_matrix(matrix);
-
   for(unsigned int index=0; index<get_rb_evaluation().get_n_basis_functions(); index++)
   {
     // invoke copy constructor for NumericVector
     *proj_index = get_rb_evaluation().get_basis_function(index);
-    if(!single_matrix_mode)
-    {
-      inner_product_matrix->vector_mult(*inner_product_storage_vector,*proj_index);
-    }
-    else
-    {
-      matrix->vector_mult(*inner_product_storage_vector,*proj_index);
-    }
+    inner_product_matrix->vector_mult(*inner_product_storage_vector,*proj_index);
 
     Number scalar = inner_product_storage_vector->dot(*new_bf);
     new_bf->add(-scalar,*proj_index);
   }
 
   // Normalize new_bf
-  if(!single_matrix_mode)
-  {
-    inner_product_matrix->vector_mult(*inner_product_storage_vector,*new_bf);
-  }
-  else
-  {
-    matrix->vector_mult(*inner_product_storage_vector,*new_bf);
-  }
+  inner_product_matrix->vector_mult(*inner_product_storage_vector,*new_bf);
   Number new_bf_norm = std::sqrt( inner_product_storage_vector->dot(*new_bf) );
 
   if(new_bf_norm == 0.)
@@ -1565,15 +1373,7 @@ void RBConstruction::update_RB_system_matrices()
       {
         // Compute reduced inner_product_matrix
         temp->zero();
-        if(!single_matrix_mode)
-        {
-          inner_product_matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
-        }
-        else
-        {
-          assemble_inner_product_matrix(matrix);
-          matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
-        }
+        inner_product_matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
 
         value = get_rb_evaluation().get_basis_function(i).dot(*temp);
         get_rb_evaluation().RB_inner_product_matrix(i,j) = value;
@@ -1589,15 +1389,7 @@ void RBConstruction::update_RB_system_matrices()
       {
         // Compute reduced Aq matrix
         temp->zero();
-        if(!single_matrix_mode)
-        {
-          get_Aq(q_a)->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
-        }
-        else
-        {
-          assemble_Aq_matrix(q_a,matrix);
-          matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
-        }
+        get_Aq(q_a)->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
 
         value = (*temp).dot(get_rb_evaluation().get_basis_function(i));
         get_rb_evaluation().RB_Aq_vector[q_a](i,j) = value;
@@ -1605,15 +1397,7 @@ void RBConstruction::update_RB_system_matrices()
         if(i!=j)
         {
           temp->zero();
-          if(!single_matrix_mode)
-          {
-            get_Aq(q_a)->vector_mult(*temp, get_rb_evaluation().get_basis_function(i));
-          }
-          else
-          {
-            // matrix should still hold affine matrix q_a
-            matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(i));
-          }
+          get_Aq(q_a)->vector_mult(*temp, get_rb_evaluation().get_basis_function(i));
 
           value = (*temp).dot(get_rb_evaluation().get_basis_function(j));
           get_rb_evaluation().RB_Aq_vector[q_a](j,i) = value;
@@ -1632,19 +1416,11 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-  if(!single_matrix_mode)
   {
     matrix->zero();
     matrix->add(1., *inner_product_matrix);
     if(constrained_problem)
       matrix->add(1., *constraint_matrix);
-  }
-
-  if(single_matrix_mode)
-  {
-    assemble_inner_product_matrix(matrix);
-    if(constrained_problem)
-      add_scaled_matrix_and_vector(1., constraint_assembly, matrix, NULL);
   }
 
   if(reuse_preconditioner)
@@ -1668,17 +1444,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
                      get_rb_evaluation().Aq_representor[q_a][i]->local_size() == this->n_local_dofs() );
 
       rhs->zero();
-      if(!single_matrix_mode)
-      {
-        get_Aq(q_a)->vector_mult(*rhs, get_rb_evaluation().get_basis_function(i));
-      }
-      else
-      {
-        assemble_scaled_matvec(1.,
-                               &rb_assembly_expansion->get_A_assembly(q_a),
-                               *rhs,
-                               get_rb_evaluation().get_basis_function(i));
-      }
+      get_Aq(q_a)->vector_mult(*rhs, get_rb_evaluation().get_basis_function(i));
       rhs->scale(-1.);
 //      zero_dirichlet_dofs_on_rhs();
 
@@ -1731,19 +1497,10 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
   // Now compute and store the inner products (if requested)
   if (compute_inner_products)
   {
-    if(single_matrix_mode && constrained_problem)
-      assemble_inner_product_matrix(matrix);
 
     for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
     {
-      if(!single_matrix_mode)
-      {
-        inner_product_matrix->vector_mult(*inner_product_storage_vector,*Fq_representor[q_f]);
-      }
-      else
-      {
-        matrix->vector_mult(*inner_product_storage_vector,*Fq_representor[q_f]);
-      }
+      inner_product_matrix->vector_mult(*inner_product_storage_vector,*Fq_representor[q_f]);
 
       for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
       {
@@ -1764,27 +1521,13 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
         {
           for(unsigned int j=0; j<RB_size; j++)
             {
-              if(!single_matrix_mode)
-              {
-                inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][j]);
-              }
-              else
-              {
-                matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][j]);
-              }
+              inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][j]);
               get_rb_evaluation().Aq_Aq_representor_innerprods[q][i][j] =
                 inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a1][i]);
 
               if(i != j)
               {
-                if(!single_matrix_mode)
-                {
-                  inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][i]);
-                }
-                else
-                {
-                  matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][i]);
-                }
+                inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][i]);
                 get_rb_evaluation().Aq_Aq_representor_innerprods[q][j][i] =
                   inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a1][j]);
               }
@@ -1802,16 +1545,12 @@ void RBConstruction::assemble_matrix_for_output_dual_solves()
 {
   // By default we use the inner product matrix for steady problems
 
-  if(!single_matrix_mode)
   {
     matrix->zero();
     matrix->close();
     matrix->add(1., *inner_product_matrix);
   }
-  else
-  {
-    assemble_inner_product_matrix(matrix);
-  }
+
 }
 
 void RBConstruction::compute_output_dual_innerprods()
@@ -1864,14 +1603,7 @@ void RBConstruction::compute_output_dual_innerprods()
 
         if(constrained_problem)
         {
-          if(!single_matrix_mode)
-          {
-            matrix->add(1., *constraint_matrix);
-          }
-          else
-          {
-            add_scaled_matrix_and_vector(1., constraint_assembly, matrix, NULL);
-          }
+          matrix->add(1., *constraint_matrix);
         }
       }
 
@@ -1980,20 +1712,12 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
     // Only log if we get to here
     START_LOG("compute_Fq_representor_innerprods()", "RBConstruction");
 
-    if(!single_matrix_mode)
     {
       matrix->zero();
       matrix->close();
       matrix->add(1., *inner_product_matrix);
       if(constrained_problem)
         matrix->add(1., *constraint_matrix);
-    }
-
-    if(single_matrix_mode)
-    {
-      assemble_inner_product_matrix(matrix);
-      if(constrained_problem)
-        add_scaled_matrix_and_vector(1., constraint_assembly, matrix, NULL);
     }
 
     if(reuse_preconditioner)
@@ -2068,19 +1792,10 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
     if (compute_inner_products)
     {
       unsigned int q=0;
-      if(single_matrix_mode && constrained_problem)
-        assemble_inner_product_matrix(matrix);
 
       for(unsigned int q_f1=0; q_f1<get_rb_theta_expansion().get_n_F_terms(); q_f1++)
       {
-        if(!single_matrix_mode)
-        {
-          inner_product_matrix->vector_mult(*inner_product_storage_vector, *Fq_representor[q_f1]);
-        }
-        else
-        {
-          matrix->vector_mult(*inner_product_storage_vector, *Fq_representor[q_f1]);
-        }
+        inner_product_matrix->vector_mult(*inner_product_storage_vector, *Fq_representor[q_f1]);
 
         for(unsigned int q_f2=q_f1; q_f2<get_rb_theta_expansion().get_n_F_terms(); q_f2++)
         {
@@ -2168,15 +1883,7 @@ void RBConstruction::load_rb_solution()
 // //     libmesh_error();
 //   }
 //
-//   if(!single_matrix_mode)
-//   {
-//     inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
-//   }
-//   else
-//   {
-//     assemble_inner_product_matrix(matrix);
-//     matrix->vector_mult(*inner_product_storage_vector, *solution);
-//   }
+//   inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
 //
 //   Real slow_residual_norm_sq = solution->dot(*inner_product_storage_vector);
 //
@@ -2187,12 +1894,6 @@ void RBConstruction::load_rb_solution()
 
 SparseMatrix<Number>* RBConstruction::get_inner_product_matrix()
 {
-  if(single_matrix_mode)
-  {
-    libMesh::err << "Error: The inner-product matrix is not stored in single-matrix mode." << std::endl;
-    libmesh_error();
-  }
-
   return inner_product_matrix.get();
 }
 
@@ -2204,23 +1905,12 @@ SparseMatrix<Number>* RBConstruction::get_non_dirichlet_inner_product_matrix()
                  << "to access non_dirichlet_inner_product_matrix." << std::endl;
     libmesh_error();
   }
-  if(single_matrix_mode)
-  {
-    libMesh::err << "Error: The non-Dirichlet inner-product matrix is not stored in single-matrix mode." << std::endl;
-    libmesh_error();
-  }
 
   return non_dirichlet_inner_product_matrix.get();
 }
 
 SparseMatrix<Number>* RBConstruction::get_Aq(unsigned int q)
 {
-  if(single_matrix_mode)
-  {
-    libMesh::err << "Error: The affine matrices are not stored in single-matrix mode." << std::endl;
-    libmesh_error();
-  }
-
   if(q >= get_rb_theta_expansion().get_n_A_terms())
   {
     libMesh::err << "Error: We must have q < Q_a in get_Aq."
@@ -2236,12 +1926,6 @@ SparseMatrix<Number>* RBConstruction::get_non_dirichlet_Aq(unsigned int q)
   if(!store_non_dirichlet_operators)
   {
     libMesh::err << "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_Aq." << std::endl;
-    libmesh_error();
-  }
-
-  if(single_matrix_mode)
-  {
-    libMesh::err << "Error: The affine matrices are not stored in single-matrix mode." << std::endl;
     libmesh_error();
   }
 

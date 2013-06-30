@@ -184,15 +184,10 @@ void RBEIMConstruction::initialize_rb_construction()
   // Load up the inner product matrix
   // We only need one matrix in this class, so we
   // can set matrix to inner_product_matrix here
-  if(!single_matrix_mode)
   {
     matrix->zero();
     matrix->close();
     matrix->add(1., *inner_product_matrix);
-  }
-  else
-  {
-    assemble_inner_product_matrix(matrix);
   }
 
 }
@@ -413,14 +408,8 @@ Real RBEIMConstruction::compute_best_fit_error()
       DenseVector<Number> best_fit_rhs(RB_size);
       for(unsigned int i=0; i<RB_size; i++)
       {
-        if(!single_matrix_mode)
-        {
-          inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
-        }
-        else // In low memory mode we loaded the inner-product matrix into matrix during initialization
-        {
-          matrix->vector_mult(*inner_product_storage_vector, *solution);
-        }
+        inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
+        
         best_fit_rhs(i) = inner_product_storage_vector->dot(get_rb_evaluation().get_basis_function(i));
       }
 
@@ -468,14 +457,9 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
   START_LOG("truth_solve()", "RBEIMConstruction");
 
 //  matrix should have been set to inner_product_matrix during initialization
-//  if(!single_matrix_mode)
 //  {
 //    matrix->zero();
 //    matrix->add(1., *inner_product_matrix);
-//  }
-//  else
-//  {
-//    assemble_inner_product_matrix(matrix);
 //  }
 
   int training_parameters_found_index = -1;
