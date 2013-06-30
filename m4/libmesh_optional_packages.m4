@@ -129,6 +129,25 @@ if (test $enabletbb = yes); then
 fi
 # -------------------------------------------------------------
 
+# -------------------------------------------------------------
+# Pthread support -- enabled by default
+# -------------------------------------------------------------
+AC_ARG_ENABLE(pthreads,
+             AC_HELP_STRING([--enable-pthreads],
+                            [Build with pthread support]),
+             enablepthreads=$enableval,
+             enablepthreads=yes)
+
+if (test "$enablepthreads" != no) ; then
+  AX_PTHREAD
+fi
+
+if (test $ax_pthread_ok = yes); then
+  AC_MSG_RESULT(<<< Configuring library with pthread support >>>)
+  libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
+fi
+# -------------------------------------------------------------
 
 
 # -------------------------------------------------------------

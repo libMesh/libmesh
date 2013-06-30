@@ -295,6 +295,12 @@
 /* Flag indicating whether or not PETSc was compiled with Hypre support */
 #undef HAVE_PETSC_HYPRE
 
+/* Define if you have POSIX threads libraries and header files. */
+#undef HAVE_PTHREAD
+
+/* Have PTHREAD_PRIO_INHERIT. */
+#undef HAVE_PTHREAD_PRIO_INHERIT
+
 /* Define to 1 if you have the <rpc/rpc.h> header file. */
 #undef HAVE_RPC_RPC_H
 
@@ -462,6 +468,10 @@
 
 /* size of processor_id */
 #undef PROCESSOR_ID_BYTES
+
+/* Define to necessary symbol if this constant uses a non-standard name on
+   your system. */
+#undef PTHREAD_CREATE_JOINABLE
 
 /* Flag indicating if the library should keep names in libMesh namespace */
 #undef REQUIRE_SEPARATE_NAMESPACE
