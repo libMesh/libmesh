@@ -45,11 +45,10 @@
 #endif
 
 #ifdef LIBMESH_HAVE_PTHREAD
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <algorithm>
-#include <vector>
+#  include "libmesh/libmesh_logging.h" // only mess with the perflog if we are really multithreaded
+#  include <pthread.h>
+#  include <algorithm>
+#  include <vector>
 #endif
 
 // Thread-Local-Storage macros
@@ -322,7 +321,8 @@ namespace Threads
   template <typename Range>
   unsigned int num_pthreads(Range & range)
   {
-    return std::min((unsigned long)libMesh::n_threads(), range.size());
+    unsigned int min = std::min((unsigned long)libMesh::n_threads(), range.size());
+    return min > 0 ? min : 1;
   }
 
   template <typename Range, typename Body>
@@ -378,6 +378,13 @@ namespace Threads
   {
     Threads::BoolAcquire b(Threads::in_threads);
 
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+    const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+
+    if (libMesh::n_threads() > 1)
+      libMesh::perflog.disable_logging();
+#endif
+
     unsigned int n_threads = num_pthreads(range);
 
     std::vector<Range *> ranges(n_threads);
@@ -419,6 +426,11 @@ namespace Threads
     // Clean up
     for(unsigned int i=0; i<n_threads; i++)
       delete ranges[i];
+
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+    if (libMesh::n_threads() > 1 && logging_was_enabled)
+      libMesh::perflog.enable_logging();
+#endif
   }
 
   //-------------------------------------------------------------------
@@ -443,6 +455,13 @@ namespace Threads
   void parallel_reduce (const Range &range, Body &body)
   {
     Threads::BoolAcquire b(Threads::in_threads);
+
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+    const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+
+    if (libMesh::n_threads() > 1)
+      libMesh::perflog.disable_logging();
+#endif
 
     unsigned int n_threads = num_pthreads(range);
 
@@ -497,6 +516,11 @@ namespace Threads
       delete bodies[i];
     for(unsigned int i=0; i<n_threads; i++)
       delete ranges[i];
+
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+    if (libMesh::n_threads() > 1 && logging_was_enabled)
+      libMesh::perflog.enable_logging();
+#endif
   }
 
   //-------------------------------------------------------------------
