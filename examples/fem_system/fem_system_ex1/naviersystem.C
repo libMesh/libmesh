@@ -262,7 +262,7 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
   // calculated at each quadrature point by summing the
   // solution degree-of-freedom values by the appropriate
   // weight functions.
-  unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
@@ -419,7 +419,8 @@ bool NavierSystem::element_constraint (bool request_jacobian,
   DenseSubVector<Number> &Fp = c.get_elem_residual( p_var );
 
   // Add the constraint given by the continuity equation
-  unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
+
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       // Compute the velocity gradient at the old Newton iterate
@@ -469,7 +470,7 @@ bool NavierSystem::side_constraint (bool request_jacobian,
   // Pin p = 0 at the origin
   const Point zero(0.,0.);
 
-  if (c.elem->contains_point(zero))
+  if( c.get_elem().contains_point(zero))
     {
       // The pressure penalty value.  \f$ \frac{1}{\epsilon} \f$
       const Real penalty = 1.e9;
@@ -483,12 +484,12 @@ bool NavierSystem::side_constraint (bool request_jacobian,
 
       unsigned int dim = get_mesh().mesh_dimension();
       FEType fe_type = p_elem_fe->get_fe_type();
-      Point p_master = FEInterface::inverse_map(dim, fe_type, c.elem, zero);
+      Point p_master = FEInterface::inverse_map(dim, fe_type, &c.get_elem(), zero);
 
       std::vector<Real> point_phi(n_p_dofs);
       for (unsigned int i=0; i != n_p_dofs; i++)
         {
-          point_phi[i] = FEInterface::shape(dim, fe_type, c.elem, i, p_master);
+          point_phi[i] = FEInterface::shape(dim, fe_type, &c.get_elem(), i, p_master);
         }
 
       for (unsigned int i=0; i != n_p_dofs; i++)
@@ -544,7 +545,7 @@ bool NavierSystem::mass_residual (bool request_jacobian,
   // The number of local degrees of freedom in velocity
   const unsigned int n_u_dofs = c.get_dof_indices( u_var ).size();
 
-  unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   for (unsigned int qp = 0; qp != n_qpoints; ++qp)
     {

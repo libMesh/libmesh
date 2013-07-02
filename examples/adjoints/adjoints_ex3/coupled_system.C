@@ -178,16 +178,23 @@ void CoupledSystem::init_context(DiffContext &context)
   // we will need to build the linear system.
   // Note that the concentration and velocity components
   // use the same basis.
-  c.element_fe_var[u_var]->get_JxW();
-  c.element_fe_var[u_var]->get_phi();
-  c.element_fe_var[u_var]->get_dphi();
-  c.element_fe_var[u_var]->get_xyz();
+  FEBase* u_elem_fe = NULL;
+  c.get_element_fe( u_var, u_elem_fe );
+  u_elem_fe->get_JxW();
+  u_elem_fe->get_phi();
+  u_elem_fe->get_dphi();
+  u_elem_fe->get_xyz();
 
-  c.element_fe_var[p_var]->get_phi();
+  FEBase* p_elem_fe = NULL;
+  c.get_element_fe( p_var, p_elem_fe );
+  p_elem_fe->get_phi();
 
-  c.side_fe_var[u_var]->get_JxW();
-  c.side_fe_var[u_var]->get_phi();
-  c.side_fe_var[u_var]->get_xyz();
+  FEBase* side_fe = NULL;
+  c.get_side_fe( u_var, side_fe );
+
+  side_fe->get_JxW();
+  side_fe->get_phi();
+  side_fe->get_dphi();
 }
 
 
@@ -198,43 +205,44 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
+  FEBase* u_elem_fe = NULL;
+  c.get_element_fe( u_var, u_elem_fe );
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW =
-    c.element_fe_var[u_var]->get_JxW();
+  const std::vector<Real> &JxW = u_elem_fe->get_JxW();
 
   // The velocity shape functions at interior quadrature points.
-  const std::vector<std::vector<Real> >& phi =
-    c.element_fe_var[u_var]->get_phi();
+  const std::vector<std::vector<Real> >& phi = u_elem_fe->get_phi();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi =
-    c.element_fe_var[u_var]->get_dphi();
+  const std::vector<std::vector<RealGradient> >& dphi = u_elem_fe->get_dphi();
 
   // The pressure shape functions at interior
   // quadrature points.
-  const std::vector<std::vector<Real> >& psi =
-    c.element_fe_var[p_var]->get_phi();
+  FEBase* p_elem_fe = NULL;
+  c.get_element_fe( p_var, p_elem_fe );
+
+  const std::vector<std::vector<Real> >& psi = p_elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-  libmesh_assert_equal_to (n_u_dofs, c.dof_indices_var[v_var].size());
+  const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
+  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+  libmesh_assert_equal_to (n_u_dofs, c.get_dof_indices(v_var).size());
 
   // The subvectors and submatrices we need to fill:
-  DenseSubMatrix<Number> &Kuu = *c.elem_subjacobians[u_var][u_var];
-  DenseSubMatrix<Number> &Kup = *c.elem_subjacobians[u_var][p_var];
-  DenseSubVector<Number> &Fu = *c.elem_subresiduals[u_var];
+  DenseSubMatrix<Number> &Kuu = c.get_elem_jacobian(u_var,u_var);
+  DenseSubMatrix<Number> &Kup = c.get_elem_jacobian(u_var,p_var);
+  DenseSubVector<Number> &Fu = c.get_elem_residual(u_var);
 
-  DenseSubMatrix<Number> &Kvv = *c.elem_subjacobians[v_var][v_var];
-  DenseSubMatrix<Number> &Kvp = *c.elem_subjacobians[v_var][p_var];
-  DenseSubVector<Number> &Fv = *c.elem_subresiduals[v_var];
+  DenseSubMatrix<Number> &Kvv = c.get_elem_jacobian(v_var,v_var);
+  DenseSubMatrix<Number> &Kvp = c.get_elem_jacobian(v_var,p_var);
+  DenseSubVector<Number> &Fv = c.get_elem_residual(v_var);
 
-  DenseSubMatrix<Number> &KCu = *c.elem_subjacobians[C_var][u_var];
-  DenseSubMatrix<Number> &KCv = *c.elem_subjacobians[C_var][v_var];
-  DenseSubMatrix<Number> &KCC = *c.elem_subjacobians[C_var][C_var];
-  DenseSubVector<Number> &FC = *c.elem_subresiduals[C_var];
+  DenseSubMatrix<Number> &KCu = c.get_elem_jacobian(C_var,u_var);
+  DenseSubMatrix<Number> &KCv = c.get_elem_jacobian(C_var,v_var);
+  DenseSubMatrix<Number> &KCC = c.get_elem_jacobian(C_var,C_var);
+  DenseSubVector<Number> &FC = c.get_elem_residual(C_var);
 
   // Now we will build the element Jacobian and residual.
   // Constructing the residual requires the solution and its
@@ -242,7 +250,7 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
   // calculated at each quadrature point by summing the
   // solution degree-of-freedom values by the appropriate
   // weight functions.
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
@@ -324,31 +332,31 @@ bool CoupledSystem::element_constraint (bool request_jacobian,
 
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
+  FEBase* u_elem_fe = NULL;
+  c.get_element_fe( u_var, u_elem_fe );
 
   // Element Jacobian * quadrature weight for interior integration
-  const std::vector<Real> &JxW = c.element_fe_var[u_var]->get_JxW();
+  const std::vector<Real> &JxW = u_elem_fe->get_JxW();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi =
-    c.element_fe_var[u_var]->get_dphi();
+  const std::vector<std::vector<RealGradient> >& dphi = u_elem_fe->get_dphi();
 
   // The pressure shape functions at interior
   // quadrature points.
-  const std::vector<std::vector<Real> >& psi =
-    c.element_fe_var[p_var]->get_phi();
+  const std::vector<std::vector<Real> >& psi = u_elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-  const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
+  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+  const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
   // The subvectors and submatrices we need to fill:
-  DenseSubMatrix<Number> &Kpu = *c.elem_subjacobians[p_var][u_var];
-  DenseSubMatrix<Number> &Kpv = *c.elem_subjacobians[p_var][v_var];
-  DenseSubVector<Number> &Fp = *c.elem_subresiduals[p_var];
+  DenseSubMatrix<Number> &Kpu = c.get_elem_jacobian(p_var,u_var);
+  DenseSubMatrix<Number> &Kpv = c.get_elem_jacobian(p_var,v_var);
+  DenseSubVector<Number> &Fp = c.get_elem_residual(p_var);
 
   // Add the constraint given by the continuity equation
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       // Compute the velocity gradient at the old Newton iterate

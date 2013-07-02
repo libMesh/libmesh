@@ -308,7 +308,7 @@ void RBEIMConstruction::enrich_RB_space()
 
     for(unsigned int var=0; var<n_vars(); var++)
     {
-      unsigned int n_qpoints = context.element_qrule->n_points();
+      unsigned int n_qpoints = context.get_element_qrule().n_points();
 
       for(unsigned int qp=0; qp<n_qpoints; qp++)
       {
@@ -316,8 +316,10 @@ void RBEIMConstruction::enrich_RB_space()
 
         if( std::abs(value) > std::abs(optimal_value) )
         {
+          FEBase* elem_fe = NULL;
+          context.get_element_fe( var, elem_fe );
           optimal_value = value;
-          optimal_point = context.element_fe_var[var]->get_xyz()[qp];
+          optimal_point = elem_fe->get_xyz()[qp];
           optimal_var = var;
         }
 
@@ -510,20 +512,19 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
       for(unsigned int var=0; var<n_vars(); var++)
       {
-        const std::vector<Real> &JxW =
-          context.element_fe_var[var]->get_JxW();
+        FEBase* elem_fe = NULL;
+        context.get_element_fe( var, elem_fe );
+        const std::vector<Real> &JxW = elem_fe->get_JxW();
 
-        const std::vector<std::vector<Real> >& phi =
-          context.element_fe_var[var]->get_phi();
+        const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
 
-        const std::vector<Point> &xyz =
-          context.element_fe_var[var]->get_xyz();
+        const std::vector<Point> &xyz = elem_fe->get_xyz();
 
-        unsigned int n_qpoints = context.element_qrule->n_points();
+        unsigned int n_qpoints = context.get_element_qrule().n_points();
         unsigned int n_var_dofs = libmesh_cast_int<unsigned int>
-	  (context.dof_indices_var[var].size());
+	  (context.get_dof_indices( var ).size());
 
-        DenseSubVector<Number>& subresidual_var = *context.elem_subresiduals[var];
+        DenseSubVector<Number>& subresidual_var = context.get_elem_residual( var );
 
         for(unsigned int qp=0; qp<n_qpoints; qp++)
           for(unsigned int i=0; i != n_var_dofs; i++)
@@ -531,10 +532,10 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       }
 
       // Apply constraints, e.g. periodic constraints
-      this->get_dof_map().constrain_element_vector(context.get_elem_residual(), context.dof_indices);
+      this->get_dof_map().constrain_element_vector(context.get_elem_residual(), context.get_dof_indices() );
 
       // Add element vector to global vector
-      rhs->add_vector(context.get_elem_residual(), context.dof_indices);
+      rhs->add_vector(context.get_elem_residual(), context.get_dof_indices() );
     }
 
     // Solve to find the best fit, then solution stores the truth representation
@@ -580,9 +581,11 @@ void RBEIMConstruction::init_context(FEMContext &c)
   // for compute_best_fit
   for(unsigned int var=0; var<n_vars(); var++)
   {
-    c.element_fe_var[var]->get_JxW();
-    c.element_fe_var[var]->get_phi();
-    c.element_fe_var[var]->get_xyz();
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( var, elem_fe );
+    elem_fe->get_JxW();
+    elem_fe->get_phi();
+    elem_fe->get_xyz();
   }
 }
 

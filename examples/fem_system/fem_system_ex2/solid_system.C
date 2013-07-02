@@ -150,14 +150,20 @@ void SolidSystem::init_context(DiffContext &context) {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
   // Pre-request all the data needed
-  c.element_fe_var[var[0]]->get_JxW();
-  c.element_fe_var[var[0]]->get_phi();
-  c.element_fe_var[var[0]]->get_dphi();
-  c.element_fe_var[var[0]]->get_xyz();
+  FEBase* elem_fe = NULL;
+  c.get_element_fe( 0, elem_fe );
 
-  c.side_fe_var[var[0]]->get_JxW();
-  c.side_fe_var[var[0]]->get_phi();
-  c.side_fe_var[var[0]]->get_xyz();
+  elem_fe->get_JxW();
+  elem_fe->get_phi();
+  elem_fe->get_dphi();
+  elem_fe->get_xyz();
+
+  FEBase* side_fe = NULL;
+  c.get_side_fe( 0, side_fe );
+
+  side_fe->get_JxW();
+  side_fe->get_phi();
+  side_fe->get_xyz();
 }
 
 /**
@@ -170,26 +176,26 @@ bool SolidSystem::element_time_derivative(bool request_jacobian,
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
+FEBase* elem_fe = NULL;
+  c.get_element_fe( 0, elem_fe );
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = c.element_fe_var[var[0]]->get_JxW();
+  const std::vector<Real> &JxW = elem_fe->get_JxW();
 
-  // The gradients of the shape functions at interior
-  // quadrature points.
-  const std::vector<std::vector<RealGradient> >& dphi =
-      c.element_fe_var[var[0]]->get_dphi();
+  // Element basis functions
+  const std::vector<std::vector<RealGradient> > &dphi = elem_fe->get_dphi();
 
   // Dimension of the mesh
   const unsigned int dim = this->get_mesh().mesh_dimension();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[var[0]].size();
-  libmesh_assert(n_u_dofs == c.dof_indices_var[var[1]].size());
+  const unsigned int n_u_dofs = c.get_dof_indices(var[0]).size();
+  libmesh_assert(n_u_dofs ==  c.get_dof_indices(var[1]).size());
   if (dim == 3) {
-    libmesh_assert(n_u_dofs == c.dof_indices_var[var[2]].size());
+    libmesh_assert(n_u_dofs ==  c.get_dof_indices(var[2]).size());
   }
 
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   // Some matrices and vectors for storing the results of the constitutive
   // law
@@ -224,7 +230,7 @@ bool SolidSystem::element_time_derivative(bool request_jacobian,
     grad_u(0) = grad_u(1) = grad_u(2) = 0;
     for (unsigned int d = 0; d < dim; ++d) {
       std::vector<Number> u_undefo;
-      aux_system.get_dof_map().dof_indices(c.elem, undefo_index, undefo_var[d]);
+      aux_system.get_dof_map().dof_indices(&c.get_elem(), undefo_index, undefo_var[d]);
       aux_system.current_local_solution->get(undefo_index, u_undefo);
       for (unsigned int l = 0; l != n_u_dofs; l++)
         grad_u(d).add_scaled(dphi[l][qp], u_undefo[l]); // u_current(l)); // -
@@ -240,7 +246,7 @@ bool SolidSystem::element_time_derivative(bool request_jacobian,
       material.get_residual(res, i);
       res.scale(JxW[qp]);
       for (unsigned int ii = 0; ii < dim; ++ii) {
-        c.elem_subresiduals[ii]->operator ()(i) += res(ii);
+        (c.get_elem_residual(ii))(i) += res(ii);
       }
 
       if (request_jacobian && c.elem_solution_derivative) {
@@ -250,9 +256,9 @@ bool SolidSystem::element_time_derivative(bool request_jacobian,
           stiff.scale(JxW[qp]);
           for (unsigned int ii = 0; ii < dim; ++ii) {
             for (unsigned int jj = 0; jj < dim; ++jj) {
-              c.elem_subjacobians[ii][jj]->operator ()(i, j) += stiff(ii, jj);
+              (c.get_elem_jacobian(ii,jj))(i, j) += stiff(ii, jj);
               if (use_symmetry && i != j) {
-                c.elem_subjacobians[ii][jj]->operator ()(j, i) += stiff(jj, ii);
+                (c.get_elem_jacobian(ii,jj))(j, i) += stiff(jj, ii);
               }
             }
           }
@@ -296,12 +302,12 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
 
     // The current side may not be on the boundary to be restricted
     if (!this->get_mesh().boundary_info->has_boundary_id
-	  (c.elem,c.side,positive_boundary_id))
+        (&c.get_elem(),c.get_side(),positive_boundary_id))
       continue;
 
     // Read values from configuration file
     Point diff_value;
-    for (unsigned int d = 0; d < c.dim; ++d) {
+    for (unsigned int d = 0; d < c.get_dim(); ++d) {
       diff_value(d) = args("bc/displacement", NAN, nbc * 4 + 1 + d);
     }
     // Scale according to current load step
@@ -309,27 +315,29 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
 
     Real penalty_number = args("bc/displacement_penalty", 1e7);
 
-    FEBase * fe = c.side_fe_var[var[0]];
+    FEBase* fe = NULL;
+    c.get_side_fe( 0, fe );
+  
     const std::vector<std::vector<Real> > & phi = fe->get_phi();
     const std::vector<Real>& JxW = fe->get_JxW();
     const std::vector<Point>& coords = fe->get_xyz();
 
-    unsigned int n_x_dofs = c.dof_indices_var[this->var[0]].size();
+    unsigned int n_x_dofs = c.get_dof_indices(this->var[0]).size();
 
     // get mappings for dofs for auxiliary system for original mesh positions
     const System & auxsys = this->get_equation_systems().get_system(
         "auxiliary");
     const DofMap & auxmap = auxsys.get_dof_map();
     std::vector<dof_id_type> undefo_dofs[3];
-    for (unsigned int d = 0; d < c.dim; ++d) {
-      auxmap.dof_indices(c.elem, undefo_dofs[d], undefo_var[d]);
+    for (unsigned int d = 0; d < c.get_dim(); ++d) {
+      auxmap.dof_indices(&c.get_elem(), undefo_dofs[d], undefo_var[d]);
     }
 
-    for (unsigned int qp = 0; qp < c.side_qrule->n_points(); ++qp) {
+    for (unsigned int qp = 0; qp < c.get_side_qrule().n_points(); ++qp) {
       // calculate coordinates of qp on undeformed mesh
       Point orig_point;
       for (unsigned int i = 0; i < n_x_dofs; ++i) {
-        for (unsigned int d = 0; d < c.dim; ++d) {
+        for (unsigned int d = 0; d < c.get_dim(); ++d) {
           Number orig_val = auxsys.current_solution(undefo_dofs[d][i]);
 
 #if LIBMESH_USE_COMPLEX_NUMBERS
@@ -345,19 +353,19 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
 
       // Assemble
       for (unsigned int i = 0; i < n_x_dofs; ++i) {
-        for (unsigned int d1 = 0; d1 < c.dim; ++d1) {
+        for (unsigned int d1 = 0; d1 < c.get_dim(); ++d1) {
           if (libmesh_isnan(diff(d1)))
             continue;
           Real val = JxW[qp] * phi[i][qp] * diff(d1) * penalty_number;
-          c.elem_subresiduals[var[d1]]->operator ()(i) += val;
+          (c.get_elem_residual(var[d1]))(i) += val;
         }
         if (request_jacobian) {
           for (unsigned int j = 0; j < n_x_dofs; ++j) {
-            for (unsigned int d1 = 0; d1 < c.dim; ++d1) {
+            for (unsigned int d1 = 0; d1 < c.get_dim(); ++d1) {
               if (libmesh_isnan(diff(d1)))
                 continue;
               Real val = JxW[qp] * phi[i][qp] * phi[j][qp] * penalty_number;
-              c.elem_subjacobians[var[d1]][var[d1]]->operator ()(i, j) += val;
+              (c.get_elem_jacobian(var[d1],var[d1]))(i, j) += val;
             }
           }
         }

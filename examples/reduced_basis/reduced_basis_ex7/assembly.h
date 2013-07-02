@@ -34,7 +34,6 @@ using libMesh::RBThetaExpansion;
 using libMesh::Real;
 using libMesh::RealGradient;
 using libMesh::MeshBase;
-using libMesh::libmesh_conj;
 
 // Functors for the parameter-dependent part of the affine decomposition of the PDE
 struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& mu) { Number val(1., mu.get_value("frequency")*damping_epsilon); return val; } };
@@ -52,27 +51,30 @@ struct AcousticsInnerProduct : ElemAssembly
   {
     const unsigned int p_var = 0;
 
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( p_var, elem_fe );
+
     const std::vector<Real> &JxW =
-      c.element_fe_var[p_var]->get_JxW();
+      elem_fe->get_JxW();
 
     const std::vector<std::vector<Real> >& phi =
-      c.element_fe_var[p_var]->get_phi();
+      elem_fe->get_phi();
 
     const std::vector<std::vector<RealGradient> >& dphi =
-      c.element_fe_var[p_var]->get_dphi();
+      elem_fe->get_dphi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
+    const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
+    // We don't need to conjudate phi or dphi, since basis functions are real-valued
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_p_dofs; i++)
         for (unsigned int j=0; j != n_p_dofs; j++)
-          c.elem_jacobian(i,j) += JxW[qp] * (dphi[j][qp](0)*libmesh_conj(dphi[i][qp](0)) +
-                                             dphi[j][qp](1)*libmesh_conj(dphi[i][qp](1)) +
-                                             (phi[j][qp]*libmesh_conj(phi[i][qp])) );
+          c.get_elem_jacobian()(i,j) += JxW[qp] * ( (dphi[j][qp]*dphi[i][qp]) +
+                                               (phi[j][qp]*phi[i][qp]) );
   }
 };
 
@@ -81,26 +83,28 @@ struct A0 : ElemAssembly
   virtual void interior_assembly(FEMContext &c)
   {
     const unsigned int p_var = 0;
+    
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( p_var, elem_fe );
 
     const std::vector<Real> &JxW =
-      c.element_fe_var[p_var]->get_JxW();
+      elem_fe->get_JxW();
 
     // The velocity shape function gradients at interior
     // quadrature points.
     const std::vector<std::vector<RealGradient> >& dphi =
-      c.element_fe_var[p_var]->get_dphi();
+      elem_fe->get_dphi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
+    const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_p_dofs; i++)
         for (unsigned int j=0; j != n_p_dofs; j++)
-          c.elem_jacobian(i,j) += JxW[qp] * (dphi[j][qp](0)*libmesh_conj(dphi[i][qp](0)) +
-                                             dphi[j][qp](1)*libmesh_conj(dphi[i][qp](1)));
+          c.get_elem_jacobian()(i,j) += JxW[qp] * (dphi[j][qp]*dphi[i][qp]);
   }
 };
 
@@ -110,23 +114,26 @@ struct A1 : ElemAssembly
   virtual void interior_assembly(FEMContext &c)
   {
     const unsigned int p_var = 0;
+    
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( p_var, elem_fe );
 
     const std::vector<Real> &JxW =
-      c.element_fe_var[p_var]->get_JxW();
+      elem_fe->get_JxW();
 
     const std::vector<std::vector<Real> >& phi =
-      c.element_fe_var[p_var]->get_phi();
+      elem_fe->get_phi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
+    const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_p_dofs; i++)
         for (unsigned int j=0; j != n_p_dofs; j++)
-          c.elem_jacobian(i,j) += JxW[qp] * (phi[j][qp]*libmesh_conj(phi[i][qp]));
+          c.get_elem_jacobian()(i,j) += JxW[qp] * (phi[j][qp]*phi[i][qp]);
   }
 };
 
@@ -134,118 +141,122 @@ struct A2 : ElemAssembly
 {
   virtual void boundary_assembly(FEMContext &c)
   {
-    if( mesh->boundary_info->has_boundary_id (c.elem, c.side, 1) ) // Forcing on the horn "inlet"
+    if( c.has_side_boundary_id(1) ) // Forcing on the horn "inlet"
     {
       const unsigned int p_var = 0;
+      
+      FEBase* side_fe = NULL;
+      c.get_side_fe( p_var, side_fe );
 
       const std::vector<Real> &JxW_face =
-        c.side_fe_var[p_var]->get_JxW();
+        side_fe->get_JxW();
 
       const std::vector<std::vector<Real> >& phi_face =
-        c.side_fe_var[p_var]->get_phi();
+        side_fe->get_phi();
 
       // The number of local degrees of freedom in each variable
-      const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
+      const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
       // Now we will build the affine operator
-      unsigned int n_sidepoints = (c.side_qrule)->n_points();
+      unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
       for (unsigned int qp=0; qp != n_sidepoints; qp++)
         for (unsigned int i=0; i != n_p_dofs; i++)
           for (unsigned int j=0; j != n_p_dofs; j++)
-            c.elem_jacobian(i,j) += JxW_face[qp] * phi_face[j][qp] * libmesh_conj(phi_face[i][qp]);
+            c.get_elem_jacobian()(i,j) += JxW_face[qp] * phi_face[j][qp] * phi_face[i][qp];
     }
   }
-
-  MeshBase* mesh;
 };
 
 struct A3 : ElemAssembly
 {
   virtual void boundary_assembly(FEMContext &c)
   {
-    if( mesh->boundary_info->has_boundary_id (c.elem, c.side, 2) ) // Radiation condition on the "bubble"
+    if( c.has_side_boundary_id(2) ) // Radiation condition on the "bubble"
     {
       const unsigned int p_var = 0;
+      
+      FEBase* side_fe = NULL;
+      c.get_side_fe( p_var, side_fe );
 
       const std::vector<Real> &JxW_face =
-        c.side_fe_var[p_var]->get_JxW();
+        side_fe->get_JxW();
 
       const std::vector<std::vector<Real> >& phi_face =
-        c.side_fe_var[p_var]->get_phi();
+        side_fe->get_phi();
 
       // The number of local degrees of freedom in each variable
-      const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
+      const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
       // Now we will build the affine operator
-      unsigned int n_sidepoints = (c.side_qrule)->n_points();
+      unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
       for (unsigned int qp=0; qp != n_sidepoints; qp++)
         for (unsigned int i=0; i != n_p_dofs; i++)
           for (unsigned int j=0; j != n_p_dofs; j++)
-            c.elem_jacobian(i,j) += JxW_face[qp] * phi_face[j][qp] * libmesh_conj(phi_face[i][qp]);
+            c.get_elem_jacobian()(i,j) += JxW_face[qp] * phi_face[j][qp] * phi_face[i][qp];
     }
   }
-
-  MeshBase* mesh;
 };
 
 struct F0 : ElemAssembly
 {
   virtual void boundary_assembly(FEMContext &c)
   {
-    if( mesh->boundary_info->has_boundary_id (c.elem, c.side, 1) ) // Output is calculated on the horn "inlet"
+    if( c.has_side_boundary_id(1) ) // Output is calculated on the horn "inlet"
     {
       const unsigned int p_var = 0;
+      
+      FEBase* side_fe = NULL;
+      c.get_side_fe( p_var, side_fe );
 
       const std::vector<Real> &JxW_face =
-        c.side_fe_var[p_var]->get_JxW();
+        side_fe->get_JxW();
 
       const std::vector<std::vector<Real> >& phi_face =
-        c.side_fe_var[p_var]->get_phi();
+        side_fe->get_phi();
 
       // The number of local degrees of freedom in each variable
-      const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
+      const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
       // Now we will build the affine operator
-      unsigned int n_sidepoints = (c.side_qrule)->n_points();
+      unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
       for (unsigned int qp=0; qp != n_sidepoints; qp++)
         for (unsigned int i=0; i != n_p_dofs; i++)
-            c.elem_residual(i) += JxW_face[qp] * libmesh_conj(phi_face[i][qp]);
+            c.get_elem_residual()(i) += JxW_face[qp] * phi_face[i][qp];
     }
   }
-
-  MeshBase* mesh;
 };
 
 struct Output0 : ElemAssembly
 {
   virtual void boundary_assembly(FEMContext &c)
   {
-    if( mesh->boundary_info->has_boundary_id (c.elem, c.side, 1) ) // Forcing on the horn "inlet"
+    if( c.has_side_boundary_id(1) ) // Forcing on the horn "inlet"
     {
       const unsigned int p_var = 0;
+      
+      FEBase* side_fe = NULL;
+      c.get_side_fe( p_var, side_fe );
 
       const std::vector<Real> &JxW_face =
-        c.side_fe_var[p_var]->get_JxW();
+        side_fe->get_JxW();
 
       const std::vector<std::vector<Real> >& phi_face =
-        c.side_fe_var[p_var]->get_phi();
+        side_fe->get_phi();
 
       // The number of local degrees of freedom in each variable
-      const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
+      const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
       // Now we will build the affine operator
-      unsigned int n_sidepoints = (c.side_qrule)->n_points();
+      unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
       for (unsigned int qp=0; qp != n_sidepoints; qp++)
         for (unsigned int i=0; i != n_p_dofs; i++)
-            c.elem_residual(i) += JxW_face[qp] * libmesh_conj(phi_face[i][qp]);
+            c.get_elem_residual()(i) += JxW_face[qp] * phi_face[i][qp];
     }
   }
-
-  MeshBase* mesh;
 };
 
 struct AcousticsRBThetaExpansion : RBThetaExpansion
@@ -283,13 +294,8 @@ struct AcousticsRBAssemblyExpansion : RBAssemblyExpansion
   /**
    * Constructor.
    */
-  AcousticsRBAssemblyExpansion(MeshBase& mesh_in)
+  AcousticsRBAssemblyExpansion()
   {
-    A2_assembly.mesh = &mesh_in;
-    A3_assembly.mesh = &mesh_in;
-    F0_assembly.mesh = &mesh_in;
-    Output0_assembly.mesh = &mesh_in;
-
     // And set up the RBAssemblyExpansion object
     attach_A_assembly(&A0_assembly); // Attach the lhs assembly
     attach_A_assembly(&A1_assembly);

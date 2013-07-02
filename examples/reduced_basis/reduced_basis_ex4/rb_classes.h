@@ -115,9 +115,12 @@ public:
     // For efficiency, we should prerequest all
     // the data we will need to build the
     // linear system before doing an element loop.
-    c.element_fe_var[u_var]->get_JxW();
-    c.element_fe_var[u_var]->get_phi();
-    c.element_fe_var[u_var]->get_dphi();
+    FEBase* elem_fe = NULL;
+    c.get_element_fe(u_var, elem_fe);
+
+    elem_fe->get_JxW();
+    elem_fe->get_phi();
+    elem_fe->get_dphi();
   }
 
   /**

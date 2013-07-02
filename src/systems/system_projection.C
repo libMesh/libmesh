@@ -2128,8 +2128,8 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
           // In 3D, project any edge values next
           if (dim > 2 && cont != DISCONTINUOUS)
 	    {
-	      const QBase* qedgerule = context.get_edge_qrule();
-	      const unsigned int n_qp = qedgerule->n_points();
+	      const QBase& qedgerule = context.get_edge_qrule();
+	      const unsigned int n_qp = qedgerule.n_points();
 	      const std::vector<Point>& xyz_values = edge_fe->get_xyz();
 	      const std::vector<Real>& JxW = edge_fe->get_JxW();
 
@@ -2235,8 +2235,8 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 	  // Project any side values (edges in 2D, faces in 3D)
           if (dim > 1 && cont != DISCONTINUOUS)
 	    {
-	      const QBase* qsiderule = context.get_side_qrule();
-	      const unsigned int n_qp = qsiderule->n_points();
+	      const QBase& qsiderule = context.get_side_qrule();
+	      const unsigned int n_qp = qsiderule.n_points();
 	      const std::vector<Point>& xyz_values = side_fe->get_xyz();
 	      const std::vector<Real>& JxW = side_fe->get_JxW();
 
@@ -2353,8 +2353,8 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
             {
 	      context.elem_fe_reinit();
 
-	      const QBase* qrule = context.get_element_qrule();
-	      const unsigned int n_qp = qrule->n_points();
+	      const QBase& qrule = context.get_element_qrule();
+	      const unsigned int n_qp = qrule.n_points();
 	      const std::vector<Point>& xyz_values = fe->get_xyz();
 	      const std::vector<Real>& JxW = fe->get_JxW();
 
