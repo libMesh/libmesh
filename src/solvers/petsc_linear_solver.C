@@ -115,21 +115,21 @@ void PetscLinearSolver<T>::clear ()
 	 be removed and the subset index set destroyed.  */
       if(_restrict_solve_to_is!=NULL)
 	{
-	  int ierr = LibMeshISDestroy(&_restrict_solve_to_is);
+	  PetscErrorCode ierr = LibMeshISDestroy(&_restrict_solve_to_is);
 	  LIBMESH_CHKERRABORT(ierr);
 	  _restrict_solve_to_is = NULL;
 	}
 
       if(_restrict_solve_to_is_complement!=NULL)
 	{
-	  int ierr = LibMeshISDestroy(&_restrict_solve_to_is_complement);
+	  PetscErrorCode ierr = LibMeshISDestroy(&_restrict_solve_to_is_complement);
 	  LIBMESH_CHKERRABORT(ierr);
 	  _restrict_solve_to_is_complement = NULL;
 	}
 
       this->_is_initialized = false;
 
-      int ierr=0;
+      PetscErrorCode ierr=0;
 
 #if PETSC_VERSION_LESS_THAN(2,2,0)
 
@@ -169,7 +169,7 @@ void PetscLinearSolver<T>::init ()
     {
       this->_is_initialized = true;
 
-      int ierr=0;
+      PetscErrorCode ierr=0;
 
 // 2.1.x & earlier style
 #if PETSC_VERSION_LESS_THAN(2,2,0)
@@ -281,7 +281,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
     {
       this->_is_initialized = true;
 
-      int ierr=0;
+      PetscErrorCode ierr=0;
 
 // 2.1.x & earlier style
 #if PETSC_VERSION_LESS_THAN(2,2,0)
@@ -397,7 +397,7 @@ void
 PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int>* const dofs,
 					 const SubsetSolveMode subset_solve_mode)
 {
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   /* The preconditioner (in particular if a default preconditioner)
      will have to be reset.  We call this->clear() to do that.  This
@@ -444,8 +444,8 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 
   this->init (matrix);
 
-  int ierr=0;
-  int its=0, max_its = static_cast<int>(m_its);
+  PetscErrorCode ierr=0;
+  PetscInt its=0, max_its = static_cast<PetscInt>(m_its);
   PetscReal final_resid=0.;
 
   // Close the matrices and vectors in case this wasn't already done.
@@ -781,8 +781,8 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
 
   this->init (matrix);
 
-  int ierr=0;
-  int its=0, max_its = static_cast<int>(m_its);
+  PetscErrorCode ierr=0;
+  PetscInt its=0, max_its = static_cast<PetscInt>(m_its);
   PetscReal final_resid=0.;
 
   // Close the matrices and vectors in case this wasn't already done.
@@ -1142,8 +1142,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
   this->init ();
 
-  int ierr=0;
-  int its=0, max_its = static_cast<int>(m_its);
+  PetscErrorCode ierr=0;
+  PetscInt its=0, max_its = static_cast<PetscInt>(m_its);
   PetscReal final_resid=0.;
 
   Mat submat = NULL;
@@ -1419,8 +1419,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
   this->init ();
 
-  int ierr=0;
-  int its=0, max_its = static_cast<int>(m_its);
+  PetscErrorCode ierr=0;
+  PetscInt its=0, max_its = static_cast<PetscInt>(m_its);
   PetscReal final_resid=0.;
 
   Mat submat = NULL;
@@ -1688,8 +1688,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 template <typename T>
 void PetscLinearSolver<T>::get_residual_history(std::vector<double>& hist)
 {
-  int ierr = 0;
-  int its  = 0;
+  PetscErrorCode ierr = 0;
+  PetscInt its  = 0;
 
   // Fill the residual history vector with the residual norms
   // Note that GetResidualHistory() does not copy any values, it
@@ -1708,7 +1708,7 @@ void PetscLinearSolver<T>::get_residual_history(std::vector<double>& hist)
   hist.resize(its);
 
   // Copy history into the vector provided by the user.
-  for (int i=0; i<its; ++i)
+  for (PetscInt i=0; i<its; ++i)
     {
       hist[i] = *p;
       p++;
@@ -1721,8 +1721,8 @@ void PetscLinearSolver<T>::get_residual_history(std::vector<double>& hist)
 template <typename T>
 Real PetscLinearSolver<T>::get_initial_residual()
 {
-  int ierr = 0;
-  int its  = 0;
+  PetscErrorCode ierr = 0;
+  PetscInt its  = 0;
 
   // Fill the residual history vector with the residual norms
   // Note that GetResidualHistory() does not copy any values, it
@@ -1751,7 +1751,7 @@ Real PetscLinearSolver<T>::get_initial_residual()
 template <typename T>
 void PetscLinearSolver<T>::set_petsc_solver_type()
 {
-  int ierr = 0;
+  PetscErrorCode ierr = 0;
 
   switch (this->_solver_type)
     {
@@ -1818,7 +1818,7 @@ template <typename T>
 PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest)
 {
   /* Get the matrix context.  */
-  int ierr=0;
+  PetscErrorCode ierr=0;
   void* ctx;
   ierr = MatShellGetContext(mat,&ctx);
 
@@ -1842,7 +1842,7 @@ template <typename T>
 PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult_add(Mat mat, Vec arg, Vec add, Vec dest)
 {
   /* Get the matrix context.  */
-  int ierr=0;
+  PetscErrorCode ierr=0;
   void* ctx;
   ierr = MatShellGetContext(mat,&ctx);
 
@@ -1872,7 +1872,7 @@ template <typename T>
 PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Vec dest)
 {
   /* Get the matrix context.  */
-  int ierr=0;
+  PetscErrorCode ierr=0;
   void* ctx;
   ierr = MatShellGetContext(mat,&ctx);
 
