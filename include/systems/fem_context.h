@@ -621,43 +621,6 @@ public:
   unsigned char get_dim() const
   { return dim; }
 
-// should be protected?:
-  /**
-   * Finite element objects for each variable's interior, sides and edges.
-   */
-  std::map<FEType, FEBase *> element_fe;
-  std::map<FEType, FEBase *> side_fe;
-  std::map<FEType, FEBase *> edge_fe;
-
-  /**
-   * Pointers to the same finite element objects, but indexed
-   * by variable number
-   */
-  std::vector<FEBase *> element_fe_var;
-  std::vector<FEBase *> side_fe_var;
-  std::vector<FEBase *> edge_fe_var;
-
-  /**
-   * Quadrature rule for element interior.
-   * The FEM context will try to find a quadrature rule that
-   * correctly integrates all variables
-   */
-  QBase *element_qrule;
-
-  /**
-   * Quadrature rules for element sides
-   * The FEM context will try to find a quadrature rule that
-   * correctly integrates all variables
-   */
-  QBase *side_qrule;
-
-  /**
-   * Quadrature rules for element edges.  If the FEM context is told
-   * to prepare for edge integration on 3D elements, it will try to
-   * find a quadrature rule that correctly integrates all variables
-   */
-  QBase *edge_qrule;
-
   /**
    * Uses the coordinate data specified by mesh_*_position configuration
    * to set the geometry of \p elem to the value it would take after a fraction
@@ -682,11 +645,6 @@ public:
   unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
 
   /**
-   * Current element for element_* to examine
-   */
-  const Elem *elem;
-
-  /**
    * Current side for side_* to examine
    */
   unsigned char side;
@@ -695,11 +653,6 @@ public:
    * Current edge for edge_* to examine
    */
   unsigned char edge;
-
-  /**
-   * Cached dimension of elements in this mesh
-   */
-  unsigned char dim;
 
 protected:
 
@@ -730,6 +683,37 @@ protected:
    * to answer boundary id requests.
    */
   BoundaryInfo* _boundary_info;
+
+  /**
+   * Current element for element_* to examine
+   */
+  const Elem *elem;
+
+  /**
+   * Cached dimension of elements in this mesh
+   */
+  unsigned char dim;
+
+  /**
+   * Quadrature rule for element interior.
+   * The FEM context will try to find a quadrature rule that
+   * correctly integrates all variables
+   */
+  QBase *element_qrule;
+
+  /**
+   * Quadrature rules for element sides
+   * The FEM context will try to find a quadrature rule that
+   * correctly integrates all variables
+   */
+  QBase *side_qrule;
+
+  /**
+   * Quadrature rules for element edges.  If the FEM context is told
+   * to prepare for edge integration on 3D elements, it will try to
+   * find a quadrature rule that correctly integrates all variables
+   */
+  QBase *edge_qrule;
 
 private:
   /**
