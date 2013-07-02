@@ -318,6 +318,14 @@ namespace Threads
 
 #else //LIBMESH_HAVE_TBB_API
 #ifdef LIBMESH_HAVE_PTHREAD
+  extern std::map<pthread_t, unsigned int> _pthread_unique_ids;
+
+  /**
+   * When called by a thread this will return a unique number from 0 to num_pthreads-1
+   * Very useful for creating long-lived thread local storage
+   */
+  unsigned int pthread_unique_id();
+
   template <typename Range>
   unsigned int num_pthreads(Range & range)
   {
@@ -417,11 +425,17 @@ namespace Threads
 
     // Create the threads
     for(unsigned int i=0; i<n_threads; i++)
+    {
       pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void*)&range_bodies[i]);
+      _pthread_unique_ids[threads[i]] = i;
+    }
 
     // Wait for them to finish
     for(unsigned int i=0; i<n_threads; i++)
+    {
       pthread_join(threads[i], NULL);
+      _pthread_unique_ids.erase(threads[i]);
+    }
 
     // Clean up
     for(unsigned int i=0; i<n_threads; i++)
@@ -501,11 +515,17 @@ namespace Threads
     // Create the threads
     std::vector<pthread_t> threads(n_threads);
     for(unsigned int i=0; i<n_threads; i++)
+    {
       pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void*)&range_bodies[i]);
+      _pthread_unique_ids[threads[i]] = i;
+    }
 
     // Wait for them to finish
     for(unsigned int i=0; i<n_threads; i++)
+    {
       pthread_join(threads[i], NULL);
+      _pthread_unique_ids.erase(threads[i]);
+    }
 
     // Join them all down to the original Body
     for(unsigned int i=n_threads-1; i != 0; i--)
