@@ -35,16 +35,15 @@ namespace libMesh
 
 FEMContext::FEMContext (const System &sys)
   : DiffContext(sys),
+    element_qrule(NULL), side_qrule(NULL),
+    edge_qrule(NULL),
     _mesh_sys(NULL),
     _mesh_x_var(0),
     _mesh_y_var(0),
     _mesh_z_var(0),
-    side(0), edge(0),
-    _boundary_info(sys.get_mesh().boundary_info.get()),
     elem(NULL),
-    dim(sys.get_mesh().mesh_dimension()),
-    element_qrule(NULL), side_qrule(NULL),
-    edge_qrule(NULL)
+    side(0), edge(0), dim(sys.get_mesh().mesh_dimension()),
+    _boundary_info(sys.get_mesh().boundary_info.get())
 {
   // We need to know which of our variables has the hardest
   // shape functions to numerically integrate.
@@ -78,6 +77,11 @@ FEMContext::FEMContext (const System &sys)
   // Next, create finite element objects
   // Preserving backward compatibility here for now
   // Should move to the protected/FEAbstract interface
+  element_fe_var.resize(nv);
+  side_fe_var.resize(nv);
+  if (dim == 3)
+    edge_fe_var.resize(nv);
+
   _element_fe_var.resize(nv);
   _side_fe_var.resize(nv);
   if (dim == 3)
@@ -86,6 +90,29 @@ FEMContext::FEMContext (const System &sys)
   for (unsigned int i=0; i != nv; ++i)
     {
       FEType fe_type = sys.variable_type(i);
+
+      // Preserving backward compatibility here for now
+      // Should move to the protected/FEAbstract interface
+      if( FEInterface::field_type( fe_type ) == TYPE_SCALAR )
+	{
+	  if( element_fe[fe_type] == NULL )
+	    {
+	      element_fe[fe_type] = FEBase::build(dim, fe_type).release();
+	      element_fe[fe_type]->attach_quadrature_rule(element_qrule);
+	      side_fe[fe_type] = FEBase::build(dim, fe_type).release();
+	      side_fe[fe_type]->attach_quadrature_rule(side_qrule);
+
+	      if (dim == 3)
+		{
+		  edge_fe[fe_type] = FEBase::build(dim, fe_type).release();
+		  edge_fe[fe_type]->attach_quadrature_rule(edge_qrule);
+		}
+	    }
+	  element_fe_var[i] = element_fe[fe_type];
+	  side_fe_var[i] = side_fe[fe_type];
+	  if (dim == 3)
+	    edge_fe_var[i] = edge_fe[fe_type];
+	}
 
       if ( _element_fe[fe_type] == NULL )
 	{
@@ -113,6 +140,24 @@ FEMContext::~FEMContext()
 {
   // We don't want to store AutoPtrs in STL containers, but we don't
   // want to leak memory either
+  // Preserving backward compatibility here for now
+  // Should move to the protected/FEAbstract interface
+  for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
+       i != element_fe.end(); ++i)
+    delete i->second;
+  element_fe.clear();
+
+  for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
+       i != side_fe.end(); ++i)
+    delete i->second;
+  side_fe.clear();
+
+  for (std::map<FEType, FEBase *>::iterator i = edge_fe.begin();
+       i != edge_fe.end(); ++i)
+    delete i->second;
+  edge_fe.clear();
+
+
   for (std::map<FEType, FEAbstract *>::iterator i = _element_fe.begin();
        i != _element_fe.end(); ++i)
     delete i->second;
@@ -127,6 +172,7 @@ FEMContext::~FEMContext()
        i != _edge_fe.end(); ++i)
     delete i->second;
   _edge_fe.clear();
+
 
   delete element_qrule;
   element_qrule = NULL;
@@ -1412,6 +1458,14 @@ void FEMContext::elem_fe_reinit ()
 {
   // Initialize all the interior FE objects on elem.
   // Logging of FE::reinit is done in the FE functions
+  std::map<FEType, FEBase *>::iterator fe_end = element_fe.end();
+  for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
+       i != fe_end; ++i)
+    {
+      i->second->reinit(elem);
+    }
+
+
   std::map<FEType, FEAbstract *>::iterator local_fe_end = _element_fe.end();
   for (std::map<FEType, FEAbstract *>::iterator i = _element_fe.begin();
        i != local_fe_end; ++i)
@@ -1425,6 +1479,13 @@ void FEMContext::side_fe_reinit ()
 {
   // Initialize all the side FE objects on elem/side.
   // Logging of FE::reinit is done in the FE functions
+  std::map<FEType, FEBase *>::iterator fe_end = side_fe.end();
+  for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
+       i != fe_end; ++i)
+    {
+      i->second->reinit(elem, side);
+    }
+
   std::map<FEType, FEAbstract *>::iterator local_fe_end = _side_fe.end();
   for (std::map<FEType, FEAbstract *>::iterator i = _side_fe.begin();
        i != local_fe_end; ++i)
@@ -1441,6 +1502,13 @@ void FEMContext::edge_fe_reinit ()
 
   // Initialize all the interior FE objects on elem/edge.
   // Logging of FE::reinit is done in the FE functions
+  std::map<FEType, FEBase *>::iterator fe_end = edge_fe.end();
+  for (std::map<FEType, FEBase *>::iterator i = edge_fe.begin();
+       i != fe_end; ++i)
+    {
+      i->second->edge_reinit(elem, edge);
+    }
+
   std::map<FEType, FEAbstract *>::iterator local_fe_end = _edge_fe.end();
   for (std::map<FEType, FEAbstract *>::iterator i = _edge_fe.begin();
        i != local_fe_end; ++i)

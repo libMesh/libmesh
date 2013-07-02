@@ -303,6 +303,21 @@ public:
   const Real system_time;
 
   /**
+   * Element by element components of nonlinear_solution
+   * as adjusted by a time_solver
+   */
+  DenseVector<Number> elem_solution;
+  std::vector<DenseSubVector<Number> *> elem_subsolutions;
+
+  /**
+   * Element by element components of nonlinear_solution
+   * at a fixed point in a timestep, for optional use by e.g.
+   * stabilized methods
+   */
+  DenseVector<Number> elem_fixed_solution;
+  std::vector<DenseSubVector<Number> *> elem_fixed_subsolutions;
+
+  /**
    * The derivative of elem_solution with respect to the nonlinear solution,
    * for use by systems constructing jacobians with elem_fixed_solution
    * based methods
@@ -315,6 +330,40 @@ public:
    * elem_fixed_solution based methods
    */
   Real fixed_solution_derivative;
+
+  /**
+   * Element residual vector
+   */
+  DenseVector<Number> elem_residual;
+
+  /**
+   * Element jacobian: derivatives of elem_residual with respect to
+   * elem_solution
+   */
+  DenseMatrix<Number> elem_jacobian;
+
+  /**
+   * Element quantity of interest contributions
+   */
+  std::vector<Number> elem_qoi;
+
+  /**
+   * Element quantity of interest derivative contributions
+   */
+  std::vector<DenseVector<Number> > elem_qoi_derivative;
+  std::vector<std::vector<DenseSubVector<Number> *> > elem_qoi_subderivatives;
+
+  /**
+   * Element residual subvectors and Jacobian submatrices
+   */
+  std::vector<DenseSubVector<Number> *> elem_subresiduals;
+  std::vector<std::vector<DenseSubMatrix<Number> *> > elem_subjacobians;
+
+  /**
+   * Global Degree of freedom index lists
+   */
+  std::vector<dof_id_type> dof_indices;
+  std::vector<std::vector<dof_id_type> > dof_indices_var;
 
   /**
    * Points the _deltat member of this class at a timestep value
@@ -361,65 +410,7 @@ public:
    */
   const DenseSubVector<Number> & get_localized_subvector (const NumericVector<Number> & _localized_vector, unsigned int _var) const;
 
- protected:
-
-  /**
-   * Contains pointers to vectors the user has asked to be localized, keyed with
-   * pairs of element localized versions of that vector and per variable views
-   */
-
-  std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > > localized_vectors;
-
-  /**
-   * Element by element components of nonlinear_solution
-   * as adjusted by a time_solver
-   */
-  DenseVector<Number> elem_solution;
-  std::vector<DenseSubVector<Number> *> elem_subsolutions;
-
-  /**
-   * Element by element components of nonlinear_solution
-   * at a fixed point in a timestep, for optional use by e.g.
-   * stabilized methods
-   */
-  DenseVector<Number> elem_fixed_solution;
-  std::vector<DenseSubVector<Number> *> elem_fixed_subsolutions;
-
-  /**
-   * Element residual vector
-   */
-  DenseVector<Number> elem_residual;
-
-  /**
-   * Element jacobian: derivatives of elem_residual with respect to
-   * elem_solution
-   */
-  DenseMatrix<Number> elem_jacobian;
-
-  /**
-   * Element quantity of interest contributions
-   */
-  std::vector<Number> elem_qoi;
-
-  /**
-   * Element quantity of interest derivative contributions
-   */
-  std::vector<DenseVector<Number> > elem_qoi_derivative;
-  std::vector<std::vector<DenseSubVector<Number> *> > elem_qoi_subderivatives;
-
-  /**
-   * Element residual subvectors and Jacobian submatrices
-   */
-  std::vector<DenseSubVector<Number> *> elem_subresiduals;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > elem_subjacobians;
-
-  /**
-   * Global Degree of freedom index lists
-   */
-  std::vector<dof_id_type> dof_indices;
-  std::vector<std::vector<dof_id_type> > dof_indices_var;
-
-private:
+ private:
 
   /**
    * Default NULL, can optionally be used to point to a timestep value
@@ -443,6 +434,15 @@ private:
    * Is this context to be used for a primal or adjoint solve?
    */
   bool _is_adjoint;
+
+ protected:
+
+  /**
+   * Contains pointers to vectors the user has asked to be localized, keyed with
+   * pairs of element localized versions of that vector and per variable views
+   */
+
+  std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > > localized_vectors;
 
 };
 
