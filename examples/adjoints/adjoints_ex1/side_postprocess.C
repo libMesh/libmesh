@@ -22,15 +22,17 @@ void LaplaceSystem::side_postprocess(DiffContext &context)
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
+  FEBase* side_fe = NULL;
+  c.get_side_fe( 0, side_fe );
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = c.side_fe_var[0]->get_JxW();
+  const std::vector<Real> &JxW = side_fe->get_JxW();
 
-  const std::vector<Point > &q_point = c.side_fe_var[0]->get_xyz();
+  const std::vector<Point > &q_point = side_fe->get_xyz();
 
-  const std::vector<Point> &face_normals = c.side_fe_var[0]->get_normals();
+  const std::vector<Point> &face_normals = side_fe->get_normals();
 
-  unsigned int n_qpoints = (c.get_side_qrule())->n_points();
+  unsigned int n_qpoints = c.get_side_qrule().n_points();
 
   Number dQoI_1 = 0. ;
 

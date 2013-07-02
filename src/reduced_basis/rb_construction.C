@@ -579,11 +579,11 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
     elem_assembly->interior_assembly(context);
 
     for (context.side = 0;
-          context.side != context.elem->n_sides();
-          ++context.side)
+         context.side != context.get_elem().n_sides();
+         ++context.side )
     {
       // May not need to apply fluxes on non-boundary elements
-      if( (context.elem->neighbor(context.side) != NULL) && !impose_internal_fluxes )
+      if( (context.get_elem().neighbor(context.get_side()) != NULL) && !impose_internal_fluxes )
         continue;
 
       // Impose boundary (e.g. Neumann) term
@@ -624,7 +624,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
     {
       // Apply constraints, e.g. Dirichlet and periodic constraints
       this->get_dof_map().constrain_element_matrix_and_vector
-        (context.get_elem_jacobian(), context.get_elem_residual(), context.dof_indices);
+        (context.get_elem_jacobian(), context.get_elem_residual(), context.get_dof_indices() );
     }
 
     // Scale and add to global matrix and/or vector
@@ -640,7 +640,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
         // If we haven't defined a _dof_coupling matrix then just add
         // the whole matrix
         input_matrix->add_matrix (context.get_elem_jacobian(),
-                                  context.dof_indices);
+                                  context.get_dof_indices() );
       }
       else
       {
@@ -650,17 +650,17 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
           {
             if( coupling_matrix->operator()(var1,var2) )
             {
-              unsigned int sub_m = context.elem_subjacobians[var1][var2]->m();
-              unsigned int sub_n = context.elem_subjacobians[var1][var2]->n();
+              unsigned int sub_m = context.get_elem_jacobian( var1, var2 ).m();
+              unsigned int sub_n = context.get_elem_jacobian( var1, var2 ).n();
               DenseMatrix<Number> sub_jac(sub_m, sub_n);
               for(unsigned int row=0; row<sub_m; row++)
                 for(unsigned int col=0; col<sub_n; col++)
                 {
-                  sub_jac(row,col) = context.elem_subjacobians[var1][var2]->el(row,col);
+                  sub_jac(row,col) = context.get_elem_jacobian( var1, var2 ).el(row,col);
                 }
               input_matrix->add_matrix (sub_jac,
-                                        context.dof_indices_var[var1],
-                                        context.dof_indices_var[var2]);
+                                        context.get_dof_indices(var1),
+                                        context.get_dof_indices(var2) );
             }
           }
       }
@@ -669,7 +669,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 
     if(assemble_vector)
       input_vector->add_vector (context.get_elem_residual(),
-                                context.dof_indices);
+                                context.get_dof_indices() );
   }
 
   if(assemble_matrix)
@@ -724,11 +724,11 @@ void RBConstruction::assemble_scaled_matvec(Number scalar,
     elem_assembly->interior_assembly(context);
 
     for (context.side = 0;
-         context.side != context.elem->n_sides();
+         context.side != context.get_elem().n_sides();
          ++context.side)
     {
       // May not need to apply fluxes on non-boundary elements
-      if( (context.elem->neighbor(context.side) != NULL) && !impose_internal_fluxes )
+      if( (context.get_elem().neighbor(context.side) != NULL) && !impose_internal_fluxes )
         continue;
 
       context.side_fe_reinit();
@@ -742,10 +742,10 @@ void RBConstruction::assemble_scaled_matvec(Number scalar,
 
     // Apply dof constraints, e.g. Dirichlet or periodic constraints
     this->get_dof_map().constrain_element_matrix_and_vector
-      (context.get_elem_jacobian(), context.get_elem_residual(), context.dof_indices);
+      (context.get_elem_jacobian(), context.get_elem_residual(), context.get_dof_indices() );
 
     dest.add_vector (context.get_elem_residual(),
-                     context.dof_indices);
+                     context.get_dof_indices() );
   }
 
   dest.close();

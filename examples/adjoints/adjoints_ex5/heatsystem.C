@@ -80,10 +80,13 @@ void HeatSystem::init_context(DiffContext &context)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
+  FEBase* elem_fe = NULL;
+  c.get_element_fe( 0, elem_fe );
+
   // Now make sure we have requested all the data
   // we need to build the linear system.
-  c.element_fe_var[0]->get_JxW();
-  c.element_fe_var[0]->get_dphi();
+  elem_fe->get_JxW();
+  elem_fe->get_dphi();
 
   // We'll have a more automatic solution to preparing adjoint
   // solutions for time integration, eventually...
@@ -115,22 +118,24 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
+FEBase* elem_fe = NULL;
+  c.get_element_fe( 0, elem_fe );
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = c.element_fe_var[0]->get_JxW();
+  const std::vector<Real> &JxW = elem_fe->get_JxW();
 
-//  const std::vector<std::vector<Real> >          &phi = c.element_fe_var[0]->get_phi();
-  const std::vector<std::vector<RealGradient> > &dphi = c.element_fe_var[0]->get_dphi();
+  // Element basis functions
+  const std::vector<std::vector<RealGradient> > &dphi = elem_fe->get_dphi();
 
   // Workaround for weird FC6 bug
-  optassert(c.dof_indices_var.size() > 0);
+  optassert(c.get_dof_indices().size() > 0);
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[0].size();
+  const unsigned int n_u_dofs = c.get_dof_indices(0).size();
 
   // The subvectors and submatrices we need to fill:
-  DenseSubMatrix<Number> &K = *c.elem_subjacobians[0][0];
-  DenseSubVector<Number> &F = *c.elem_subresiduals[0];
+  DenseSubMatrix<Number> &K = c.get_elem_jacobian(0,0);
+  DenseSubVector<Number> &F = c.get_elem_residual(0);
 
   // Now we will build the element Jacobian and residual.
   // Constructing the residual requires the solution and its
@@ -138,7 +143,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
   // calculated at each quadrature point by summing the
   // solution degree-of-freedom values by the appropriate
   // weight functions.
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {

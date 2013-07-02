@@ -130,11 +130,11 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
   const std::vector<Point>& qpoint = fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
-  DenseSubMatrix<Number> &Kuu = *c.elem_subjacobians[u_var][u_var];
+  DenseSubMatrix<Number> &Kuu = c.get_elem_jacobian(u_var,u_var);
 
-  DenseSubVector<Number> &Fu = *c.elem_subresiduals[u_var];
+  DenseSubVector<Number> &Fu = c.get_elem_residual(u_var);
 
   // Now we will build the element Jacobian and residual.
   // Constructing the residual requires the solution and its
@@ -142,7 +142,7 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
   // calculated at each quadrature point by summing the
   // solution degree-of-freedom values by the appropriate
   // weight functions.
-  const unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+  const unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   // Loop over quadrature points
   for (unsigned int qp=0; qp != n_qpoints; qp++)
@@ -199,7 +199,7 @@ bool CurlCurlSystem::side_time_derivative (bool request_jacobian,
   const std::vector<std::vector<RealGradient> >& phi = side_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
   const std::vector<Point>& normals = side_fe->get_normals();
 
@@ -209,10 +209,10 @@ bool CurlCurlSystem::side_time_derivative (bool request_jacobian,
   // in the discussion above.
   const Real penalty = 1.e10;
 
-  DenseSubMatrix<Number> &Kuu = *c.elem_subjacobians[u_var][u_var];
-  DenseSubVector<Number> &Fu = *c.elem_subresiduals[u_var];
+  DenseSubMatrix<Number> &Kuu = c.get_elem_jacobian(u_var,u_var);
+  DenseSubVector<Number> &Fu = c.get_elem_residual(u_var);
 
-  const unsigned int n_qpoints = (c.get_side_qrule())->n_points();
+  const unsigned int n_qpoints = c.get_side_qrule().n_points();
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {

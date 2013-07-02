@@ -22,14 +22,17 @@ void LaplaceSystem::element_postprocess (DiffContext &context)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
-  // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = c.element_fe_var[0]->get_JxW();
+  FEBase* elem_fe = NULL;
+  c.get_element_fe( 0, elem_fe );
 
-  const std::vector<Point> &xyz = c.element_fe_var[0]->get_xyz();
+  // Element Jacobian * quadrature weights for interior integration
+  const std::vector<Real> &JxW = elem_fe->get_JxW();
+
+  const std::vector<Point> &xyz = elem_fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
 
-  unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   // The function R = int_{omega} T dR
   // omega is a subset of Omega (the whole domain), omega = [0.75, 1.0] x [0.0, 0.25]

@@ -50,16 +50,16 @@ Real EulerSolver::error_order() const
 bool EulerSolver::element_residual (bool request_jacobian,
                                     DiffContext &context)
 {
-  unsigned int n_dofs = context.elem_solution.size();
+  unsigned int n_dofs = context.get_elem_solution().size();
 
   // Local nonlinear solution at old timestep
   DenseVector<Number> old_elem_solution(n_dofs);
   for (unsigned int i=0; i != n_dofs; ++i)
     old_elem_solution(i) =
-      old_nonlinear_solution(context.dof_indices[i]);
+      old_nonlinear_solution(context.get_dof_indices()[i]);
 
   // Local nonlinear solution at time t_theta
-  DenseVector<Number> theta_solution(context.elem_solution);
+  DenseVector<Number> theta_solution(context.get_elem_solution());
   theta_solution *= theta;
   theta_solution.add(1. - theta, old_elem_solution);
 
@@ -75,24 +75,24 @@ bool EulerSolver::element_residual (bool request_jacobian,
 
   // If a fixed solution is requested, we'll use theta_solution
   if (_system.use_fixed_solution)
-    context.elem_fixed_solution = theta_solution;
+    context.get_elem_fixed_solution() = theta_solution;
 
   // Move theta_->elem_, elem_->theta_
-  context.elem_solution.swap(theta_solution);
+  context.get_elem_solution().swap(theta_solution);
 
   // Move the mesh into place first if necessary
   context.elem_reinit(theta);
 
   // We're going to compute just the change in elem_residual
   // (and possibly elem_jacobian), then add back the old values
-  DenseVector<Number> old_elem_residual(context.elem_residual);
+  DenseVector<Number> old_elem_residual(context.get_elem_residual());
   DenseMatrix<Number> old_elem_jacobian;
   if (request_jacobian)
     {
-      old_elem_jacobian = context.elem_jacobian;
-      context.elem_jacobian.zero();
+      old_elem_jacobian = context.get_elem_jacobian();
+      context.get_elem_jacobian().zero();
     }
-  context.elem_residual.zero();
+  context.get_elem_residual().zero();
 
   // Get the time derivative at t_theta
   bool jacobian_computed =
@@ -103,9 +103,9 @@ bool EulerSolver::element_residual (bool request_jacobian,
     _system.eulerian_residual(jacobian_computed, context) && jacobian_computed;
 
   // Scale the time-dependent residual and jacobian correctly
-  context.elem_residual *= _system.deltat;
+  context.get_elem_residual() *= _system.deltat;
   if (jacobian_computed)
-    context.elem_jacobian *= (theta * _system.deltat);
+    context.get_elem_jacobian() *= (theta * _system.deltat);
 
   // The fixed_solution_derivative is always theta,
   // and now we're done scaling jacobians
@@ -119,17 +119,17 @@ bool EulerSolver::element_residual (bool request_jacobian,
   old_elem_solution -= theta_solution;
 
   // Move old_->elem_, theta_->old_
-  context.elem_solution.swap(old_elem_solution);
+  context.get_elem_solution().swap(old_elem_solution);
 
   // We do a trick here to avoid using a non-1
   // elem_solution_derivative:
-  context.elem_jacobian *= -1.0;
+  context.get_elem_jacobian() *= -1.0;
   jacobian_computed = _system.mass_residual(jacobian_computed, context) &&
     jacobian_computed;
-  context.elem_jacobian *= -1.0;
+  context.get_elem_jacobian() *= -1.0;
 
   // Move elem_->elem_, old_->theta_
-  context.elem_solution.swap(theta_solution);
+  context.get_elem_solution().swap(theta_solution);
 
   // Restore the elem position if necessary
   context.elem_reinit(1.);
@@ -139,13 +139,13 @@ bool EulerSolver::element_residual (bool request_jacobian,
     jacobian_computed;
 
   // Add back the old residual and jacobian
-  context.elem_residual += old_elem_residual;
+  context.get_elem_residual() += old_elem_residual;
   if (request_jacobian)
     {
       if (jacobian_computed)
-        context.elem_jacobian += old_elem_jacobian;
+        context.get_elem_jacobian() += old_elem_jacobian;
       else
-        context.elem_jacobian.swap(old_elem_jacobian);
+        context.get_elem_jacobian().swap(old_elem_jacobian);
     }
 
   return jacobian_computed;
@@ -156,16 +156,16 @@ bool EulerSolver::element_residual (bool request_jacobian,
 bool EulerSolver::side_residual (bool request_jacobian,
                                  DiffContext &context)
 {
-  unsigned int n_dofs = context.elem_solution.size();
+  unsigned int n_dofs = context.get_elem_solution().size();
 
   // Local nonlinear solution at old timestep
   DenseVector<Number> old_elem_solution(n_dofs);
   for (unsigned int i=0; i != n_dofs; ++i)
     old_elem_solution(i) =
-      old_nonlinear_solution(context.dof_indices[i]);
+      old_nonlinear_solution(context.get_dof_indices()[i]);
 
   // Local nonlinear solution at time t_theta
-  DenseVector<Number> theta_solution(context.elem_solution);
+  DenseVector<Number> theta_solution(context.get_elem_solution());
   theta_solution *= theta;
   theta_solution.add(1. - theta, old_elem_solution);
 
@@ -181,33 +181,33 @@ bool EulerSolver::side_residual (bool request_jacobian,
 
   // If a fixed solution is requested, we'll use theta_solution
   if (_system.use_fixed_solution)
-    context.elem_fixed_solution = theta_solution;
+    context.get_elem_fixed_solution() = theta_solution;
 
   // Move theta_->elem_, elem_->theta_
-  context.elem_solution.swap(theta_solution);
+  context.get_elem_solution().swap(theta_solution);
 
   // Move the mesh into place first if necessary
   context.elem_side_reinit(theta);
 
   // We're going to compute just the change in elem_residual
   // (and possibly elem_jacobian), then add back the old values
-  DenseVector<Number> old_elem_residual(context.elem_residual);
+  DenseVector<Number> old_elem_residual(context.get_elem_residual());
   DenseMatrix<Number> old_elem_jacobian;
   if (request_jacobian)
     {
-      old_elem_jacobian = context.elem_jacobian;
-      context.elem_jacobian.zero();
+      old_elem_jacobian = context.get_elem_jacobian();
+      context.get_elem_jacobian().zero();
     }
-  context.elem_residual.zero();
+  context.get_elem_residual().zero();
 
   // Get the time derivative at t_theta
   bool jacobian_computed =
     _system.side_time_derivative(request_jacobian, context);
 
   // Scale the time-dependent residual and jacobian correctly
-  context.elem_residual *= _system.deltat;
+  context.get_elem_residual() *= _system.deltat;
   if (jacobian_computed)
-    context.elem_jacobian *= (theta * _system.deltat);
+    context.get_elem_jacobian() *= (theta * _system.deltat);
 
   // The fixed_solution_derivative is always theta,
   // and now we're done scaling jacobians
@@ -221,17 +221,17 @@ bool EulerSolver::side_residual (bool request_jacobian,
   old_elem_solution -= theta_solution;
 
   // Move old_->elem_, theta_->old_
-  context.elem_solution.swap(old_elem_solution);
+  context.get_elem_solution().swap(old_elem_solution);
 
   // We do a trick here to avoid using a non-1
   // elem_solution_derivative:
-  context.elem_jacobian *= -1.0;
+  context.get_elem_jacobian() *= -1.0;
   jacobian_computed = _system.side_mass_residual(jacobian_computed, context) &&
     jacobian_computed;
-  context.elem_jacobian *= -1.0;
+  context.get_elem_jacobian() *= -1.0;
 
   // Move elem_->elem_, old_->theta_
-  context.elem_solution.swap(theta_solution);
+  context.get_elem_solution().swap(theta_solution);
 
   // Restore the elem position if necessary
   context.elem_side_reinit(1.);
@@ -241,13 +241,13 @@ bool EulerSolver::side_residual (bool request_jacobian,
     jacobian_computed;
 
   // Add back the old residual and jacobian
-  context.elem_residual += old_elem_residual;
+  context.get_elem_residual() += old_elem_residual;
   if (request_jacobian)
     {
       if (jacobian_computed)
-        context.elem_jacobian += old_elem_jacobian;
+        context.get_elem_jacobian() += old_elem_jacobian;
       else
-        context.elem_jacobian.swap(old_elem_jacobian);
+        context.get_elem_jacobian().swap(old_elem_jacobian);
     }
 
   return jacobian_computed;
