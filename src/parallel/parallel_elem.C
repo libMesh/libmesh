@@ -33,7 +33,7 @@ namespace
 {
   static const unsigned int header_size = 10;
 
-  static const int elem_magic_header = 987654321;
+  static const largest_id_type elem_magic_header = 987654321;
 }
 
 
@@ -47,10 +47,10 @@ namespace Parallel
 
 template <>
 unsigned int packed_size (const Elem*,
-			  std::vector<int>::const_iterator in)
+			  std::vector<largest_id_type>::const_iterator in)
 {
 #ifndef NDEBUG
-  const int packed_header = *in++;
+  const largest_id_type packed_header = *in++;
   libmesh_assert_equal_to (packed_header, elem_magic_header);
 #endif
 
@@ -100,6 +100,15 @@ unsigned int packed_size (const Elem*,
 
 
 template <>
+unsigned int packed_size (const Elem* e,
+			  std::vector<largest_id_type>::iterator in)
+{
+  return packed_size(e, std::vector<largest_id_type>::const_iterator(in));
+}
+
+
+
+template <>
 unsigned int packable_size (const Elem* elem, const MeshBase* mesh)
 {
   unsigned int total_packed_bcs = 0;
@@ -131,7 +140,7 @@ unsigned int packable_size (const Elem* elem, const ParallelMesh* mesh)
 
 template <>
 void pack (const Elem* elem,
-           std::vector<int>& data,
+           std::vector<largest_id_type>& data,
            const MeshBase* mesh)
 {
   libmesh_assert(elem);
@@ -144,17 +153,17 @@ void pack (const Elem* elem,
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
-  data.push_back (static_cast<int>(elem->level()));
-  data.push_back (static_cast<int>(elem->p_level()));
-  data.push_back (static_cast<int>(elem->refinement_flag()));
-  data.push_back (static_cast<int>(elem->p_refinement_flag()));
+  data.push_back (static_cast<largest_id_type>(elem->level()));
+  data.push_back (static_cast<largest_id_type>(elem->p_level()));
+  data.push_back (static_cast<largest_id_type>(elem->refinement_flag()));
+  data.push_back (static_cast<largest_id_type>(elem->p_refinement_flag()));
 #else
   data.push_back (0);
   data.push_back (0);
   data.push_back (0);
   data.push_back (0);
 #endif
-  data.push_back (static_cast<int>(elem->type()));
+  data.push_back (static_cast<largest_id_type>(elem->type()));
   data.push_back (elem->processor_id());
   data.push_back (elem->subdomain_id());
   data.push_back (elem->id());
@@ -189,7 +198,7 @@ void pack (const Elem* elem,
     }
 
 #ifndef NDEBUG
-  const int start_indices = data.size();
+  const std::size_t start_indices = data.size();
 #endif
   // Add any DofObject indices
   elem->pack_indexing(std::back_inserter(data));
@@ -221,7 +230,7 @@ void pack (const Elem* elem,
 
 template <>
 void pack (const Elem* elem,
-           std::vector<int>& data,
+           std::vector<largest_id_type>& data,
            const ParallelMesh* mesh)
 {
   pack(elem, data, static_cast<const MeshBase*>(mesh));
@@ -231,14 +240,14 @@ void pack (const Elem* elem,
 
 // FIXME - this needs serious work to be 64-bit compatible
 template <>
-void unpack(std::vector<int>::const_iterator in,
+void unpack(std::vector<largest_id_type>::const_iterator in,
             Elem** out,
             MeshBase* mesh)
 {
 #ifndef NDEBUG
-  const std::vector<int>::const_iterator original_in = in;
+  const std::vector<largest_id_type>::const_iterator original_in = in;
 
-  const int incoming_header = *in++;
+  const largest_id_type incoming_header = *in++;
   libmesh_assert_equal_to (incoming_header, elem_magic_header);
 #endif
 
@@ -279,14 +288,14 @@ void unpack(std::vector<int>::const_iterator in,
     Elem::type_to_n_nodes_map[type];
 
   // int 5: processor id
-  const unsigned int processor_id =
-    static_cast<unsigned int>(*in++);
+  const processor_id_type processor_id =
+    static_cast<processor_id_type>(*in++);
   libmesh_assert (processor_id < mesh->n_processors() ||
                   processor_id == DofObject::invalid_processor_id);
 
   // int 6: subdomain id
-  const unsigned int subdomain_id =
-    static_cast<unsigned int>(*in++);
+  const subdomain_id_type subdomain_id =
+    static_cast<subdomain_id_type>(*in++);
 
   // int 7: dof object id
   const dof_id_type id =
@@ -329,7 +338,7 @@ void unpack(std::vector<int>::const_iterator in,
       // All our nodes should be correct
       for (unsigned int i=0; i != n_nodes; ++i)
         libmesh_assert(elem->node(i) ==
-                       static_cast<unsigned int>(*in++));
+                       static_cast<dof_id_type>(*in++));
 #else
       in += n_nodes;
 #endif
@@ -419,7 +428,7 @@ void unpack(std::vector<int>::const_iterator in,
         }
       // Or assert that the sending processor sees no parent
       else
-        libmesh_assert_equal_to (parent_id, static_cast<unsigned int>(-1));
+        libmesh_assert_equal_to (parent_id, static_cast<dof_id_type>(-1));
 #else
       // No non-level-0 elements without AMR
       libmesh_assert_equal_to (level, 0);
@@ -464,7 +473,7 @@ void unpack(std::vector<int>::const_iterator in,
       for (unsigned int n=0; n != n_nodes; n++)
         elem->set_node(n) =
           mesh->node_ptr
-	    (static_cast<unsigned int>(*in++));
+	    (static_cast<dof_id_type>(*in++));
 
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
         {
@@ -526,7 +535,7 @@ void unpack(std::vector<int>::const_iterator in,
 
 
 template <>
-void unpack(std::vector<int>::const_iterator in,
+void unpack(std::vector<largest_id_type>::const_iterator in,
             Elem** out,
             ParallelMesh* mesh)
 {
