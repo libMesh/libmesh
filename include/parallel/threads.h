@@ -49,6 +49,11 @@
 #  include <pthread.h>
 #  include <algorithm>
 #  include <vector>
+
+#ifdef __APPLE__
+#include <libkern/OSAtomic.h>
+#endif
+
 #endif
 
 // Thread-Local-Storage macros
@@ -560,6 +565,35 @@ namespace Threads
    * Spin mutex.  Implements mutual exclusion by busy-waiting in user
    * space for the lock to be acquired.
    */
+#ifdef __APPLE__
+  class spin_mutex
+  {
+  public:
+    spin_mutex() : slock(0) {} // The convention is that the lock being zero is _unlocked_
+    ~spin_mutex() {}
+
+    void lock () { OSSpinLockLock(&slock); }
+    void unlock () { OSSpinLockUnlock(&slock); }
+
+    class scoped_lock
+    {
+    public:
+      scoped_lock () : smutex(NULL) {}
+      explicit scoped_lock ( spin_mutex& in_smutex ) : smutex(&in_smutex) { smutex->lock(); }
+
+      ~scoped_lock () { release(); }
+
+      void acquire ( spin_mutex& in_smutex ) { smutex = &in_smutex; smutex->lock(); }
+      void release () { if(smutex) smutex->unlock(); smutex = NULL; }
+
+    private:
+      spin_mutex * smutex;
+    };
+
+  private:
+    OSSpinLock slock;
+  };
+#else
   class spin_mutex
   {
   public:
@@ -588,6 +622,7 @@ namespace Threads
   private:
     pthread_mutex_t mutex;
   };
+#endif
 
   //-------------------------------------------------------------------
   /**
