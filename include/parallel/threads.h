@@ -598,7 +598,7 @@ namespace Threads
   {
   public:
     // Might want to use PTHREAD_MUTEX_ADAPTIVE_NP on Linux, but it's not available on OSX.
-    spin_mutex() { pthread_spin_init(&slock, NULL); }
+    spin_mutex() { pthread_spin_init(&slock, PTHREAD_PROCESS_PRIVATE); }
     ~spin_mutex() { pthread_spin_destroy(&slock); }
 
     void lock () { pthread_spin_lock(&slock); }
