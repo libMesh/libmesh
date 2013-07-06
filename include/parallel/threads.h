@@ -598,11 +598,11 @@ namespace Threads
   {
   public:
     // Might want to use PTHREAD_MUTEX_ADAPTIVE_NP on Linux, but it's not available on OSX.
-    spin_mutex() { pthread_mutex_init(&mutex, NULL); }
-    ~spin_mutex() { pthread_mutex_destroy(&mutex); }
+    spin_mutex() { pthread_spin_init(&slock, NULL); }
+    ~spin_mutex() { pthread_spin_destroy(&slock); }
 
-    void lock () { pthread_mutex_lock(&mutex); }
-    void unlock () { pthread_mutex_unlock(&mutex); }
+    void lock () { pthread_spin_lock(&slock); }
+    void unlock () { pthread_spin_unlock(&slock); }
 
     class scoped_lock
     {
@@ -620,7 +620,7 @@ namespace Threads
     };
 
   private:
-    pthread_mutex_t mutex;
+    pthread_spinlock_t slock;
   };
 #endif
 
