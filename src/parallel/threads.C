@@ -26,7 +26,13 @@ namespace libMesh
 
 #if !defined(LIBMESH_HAVE_TBB_API) && defined(LIBMESH_HAVE_PTHREAD)
   std::map<pthread_t, unsigned int> Threads::_pthread_unique_ids;
-  unsigned int Threads::pthread_unique_id() { return _pthread_unique_ids[pthread_self()]; }
+  Threads::spin_mutex Threads::_pthread_unique_id_mutex;
+
+  unsigned int Threads::pthread_unique_id()
+  {
+    spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
+    return _pthread_unique_ids[pthread_self()];
+  }
 #endif
 
 //-------------------------------------------------------------------------

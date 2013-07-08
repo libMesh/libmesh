@@ -323,242 +323,6 @@ namespace Threads
 
 #else //LIBMESH_HAVE_TBB_API
 #ifdef LIBMESH_HAVE_PTHREAD
-  extern std::map<pthread_t, unsigned int> _pthread_unique_ids;
-
-  /**
-   * When called by a thread this will return a unique number from 0 to num_pthreads-1
-   * Very useful for creating long-lived thread local storage
-   */
-  unsigned int pthread_unique_id();
-
-  template <typename Range>
-  unsigned int num_pthreads(Range & range)
-  {
-    unsigned int min = std::min((unsigned long)libMesh::n_threads(), range.size());
-    return min > 0 ? min : 1;
-  }
-
-  template <typename Range, typename Body>
-  class RangeBody
-  {
-  public:
-    Range * range;
-    Body * body;
-  };
-
-  template <typename Range, typename Body>
-  void * run_body(void * args)
-  {
-
-    RangeBody<Range, Body> * range_body = (RangeBody<Range, Body>*)args;
-
-    Body & body = *range_body->body;
-    Range & range = *range_body->range;
-
-    body(range);
-
-    return NULL;
-  }
-
-  //-------------------------------------------------------------------
-  /**
-   * Scheduler to manage threads.
-   */
-  class task_scheduler_init
-  {
-  public:
-    static const int automatic = -1;
-    explicit task_scheduler_init (int = automatic) {}
-    void initialize (int = automatic) {}
-    void terminate () {}
-  };
-
-  //-------------------------------------------------------------------
-  /**
-   * Dummy "splitting object" used to distinguish splitting constructors
-   * from copy constructors.
-   */
-  class split {};
-
-  //-------------------------------------------------------------------
-  /**
-   * Exectue the provided function object in parallel on the specified
-   * range.
-   */
-  template <typename Range, typename Body>
-  inline
-  void parallel_for (const Range &range, const Body &body)
-  {
-    Threads::BoolAcquire b(Threads::in_threads);
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-    const bool logging_was_enabled = libMesh::perflog.logging_enabled();
-
-    if (libMesh::n_threads() > 1)
-      libMesh::perflog.disable_logging();
-#endif
-
-    unsigned int n_threads = num_pthreads(range);
-
-    std::vector<Range *> ranges(n_threads);
-    std::vector<RangeBody<const Range, const Body> > range_bodies(n_threads);
-    std::vector<pthread_t> threads(n_threads);
-
-    // Create the ranges for each thread
-    unsigned int range_size = range.size() / n_threads;
-
-    typename Range::const_iterator current_beginning = range.begin();
-
-    for(unsigned int i=0; i<n_threads; i++)
-    {
-      unsigned int this_range_size = range_size;
-
-      if(i+1 == n_threads)
-        this_range_size += range.size() % n_threads; // Give the last one the remaining work to do
-
-      ranges[i] = new Range(range, current_beginning, current_beginning + this_range_size);
-
-      current_beginning = current_beginning + this_range_size;
-    }
-
-    // Create the RangeBody arguments
-    for(unsigned int i=0; i<n_threads; i++)
-    {
-      range_bodies[i].range = ranges[i];
-      range_bodies[i].body = &body;
-    }
-
-    // Create the threads
-    for(unsigned int i=0; i<n_threads; i++)
-    {
-      pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void*)&range_bodies[i]);
-      _pthread_unique_ids[threads[i]] = i;
-    }
-
-    // Wait for them to finish
-    for(unsigned int i=0; i<n_threads; i++)
-    {
-      pthread_join(threads[i], NULL);
-      _pthread_unique_ids.erase(threads[i]);
-    }
-
-    // Clean up
-    for(unsigned int i=0; i<n_threads; i++)
-      delete ranges[i];
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-    if (libMesh::n_threads() > 1 && logging_was_enabled)
-      libMesh::perflog.enable_logging();
-#endif
-  }
-
-  //-------------------------------------------------------------------
-  /**
-   * Exectue the provided function object in parallel on the specified
-   * range with the specified partitioner.
-   */
-  template <typename Range, typename Body, typename Partitioner>
-  inline
-  void parallel_for (const Range &range, const Body &body, const Partitioner &)
-  {
-    parallel_for(range, body);
-  }
-
-  //-------------------------------------------------------------------
-  /**
-   * Exectue the provided reduction operation in parallel on the specified
-   * range.
-   */
-  template <typename Range, typename Body>
-  inline
-  void parallel_reduce (const Range &range, Body &body)
-  {
-    Threads::BoolAcquire b(Threads::in_threads);
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-    const bool logging_was_enabled = libMesh::perflog.logging_enabled();
-
-    if (libMesh::n_threads() > 1)
-      libMesh::perflog.disable_logging();
-#endif
-
-    unsigned int n_threads = num_pthreads(range);
-
-    std::vector<Range *> ranges(n_threads);
-    std::vector<Body *> bodies(n_threads);
-    std::vector<RangeBody<Range, Body> > range_bodies(n_threads);
-
-    // Create copies of the body for each thread
-    bodies[0] = &body; // Use the original body for the first one
-    for(unsigned int i=1; i<n_threads; i++)
-      bodies[i] = new Body(body, Threads::split());
-
-    // Create the ranges for each thread
-    unsigned int range_size = range.size() / n_threads;
-
-    typename Range::const_iterator current_beginning = range.begin();
-
-    for(unsigned int i=0; i<n_threads; i++)
-    {
-      unsigned int this_range_size = range_size;
-
-      if(i+1 == n_threads)
-        this_range_size += range.size() % n_threads; // Give the last one the remaining work to do
-
-      ranges[i] = new Range(range, current_beginning, current_beginning + this_range_size);
-
-      current_beginning = current_beginning + this_range_size;
-    }
-
-    // Create the RangeBody arguments
-    for(unsigned int i=0; i<n_threads; i++)
-    {
-      range_bodies[i].range = ranges[i];
-      range_bodies[i].body = bodies[i];
-    }
-
-    // Create the threads
-    std::vector<pthread_t> threads(n_threads);
-    for(unsigned int i=0; i<n_threads; i++)
-    {
-      pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void*)&range_bodies[i]);
-      _pthread_unique_ids[threads[i]] = i;
-    }
-
-    // Wait for them to finish
-    for(unsigned int i=0; i<n_threads; i++)
-    {
-      pthread_join(threads[i], NULL);
-      _pthread_unique_ids.erase(threads[i]);
-    }
-
-    // Join them all down to the original Body
-    for(unsigned int i=n_threads-1; i != 0; i--)
-      bodies[i-1]->join(*bodies[i]);
-
-    // Clean up
-    for(unsigned int i=1; i<n_threads; i++)
-      delete bodies[i];
-    for(unsigned int i=0; i<n_threads; i++)
-      delete ranges[i];
-
-#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-    if (libMesh::n_threads() > 1 && logging_was_enabled)
-      libMesh::perflog.enable_logging();
-#endif
-  }
-
-  //-------------------------------------------------------------------
-  /**
-   * Exectue the provided reduction operation in parallel on the specified
-   * range with the specified partitioner.
-   */
-  template <typename Range, typename Body, typename Partitioner>
-  inline
-  void parallel_reduce (const Range &range, Body &body, const Partitioner &)
-  {
-    parallel_reduce(range, body);
-  }
 
   //-------------------------------------------------------------------
   /**
@@ -663,6 +427,252 @@ namespace Threads
     pthread_mutex_t mutex;
     pthread_mutexattr_t attr;
   };
+
+  extern std::map<pthread_t, unsigned int> _pthread_unique_ids;
+  extern spin_mutex _pthread_unique_id_mutex;
+
+  /**
+   * When called by a thread this will return a unique number from 0 to num_pthreads-1
+   * Very useful for creating long-lived thread local storage
+   */
+  unsigned int pthread_unique_id();
+
+  template <typename Range>
+  unsigned int num_pthreads(Range & range)
+  {
+    unsigned int min = std::min((unsigned long)libMesh::n_threads(), range.size());
+    return min > 0 ? min : 1;
+  }
+
+  template <typename Range, typename Body>
+  class RangeBody
+  {
+  public:
+    Range * range;
+    Body * body;
+  };
+
+  template <typename Range, typename Body>
+  void * run_body(void * args)
+  {
+
+    RangeBody<Range, Body> * range_body = (RangeBody<Range, Body>*)args;
+
+    Body & body = *range_body->body;
+    Range & range = *range_body->range;
+
+    body(range);
+
+    return NULL;
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Scheduler to manage threads.
+   */
+  class task_scheduler_init
+  {
+  public:
+    static const int automatic = -1;
+    explicit task_scheduler_init (int = automatic) {}
+    void initialize (int = automatic) {}
+    void terminate () {}
+  };
+
+  //-------------------------------------------------------------------
+  /**
+   * Dummy "splitting object" used to distinguish splitting constructors
+   * from copy constructors.
+   */
+  class split {};
+
+
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Exectue the provided function object in parallel on the specified
+   * range.
+   */
+  template <typename Range, typename Body>
+  inline
+  void parallel_for (const Range &range, const Body &body)
+  {
+    Threads::BoolAcquire b(Threads::in_threads);
+
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+    const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+
+    if (libMesh::n_threads() > 1)
+      libMesh::perflog.disable_logging();
+#endif
+
+    unsigned int n_threads = num_pthreads(range);
+
+    std::vector<Range *> ranges(n_threads);
+    std::vector<RangeBody<const Range, const Body> > range_bodies(n_threads);
+    std::vector<pthread_t> threads(n_threads);
+
+    // Create the ranges for each thread
+    unsigned int range_size = range.size() / n_threads;
+
+    typename Range::const_iterator current_beginning = range.begin();
+
+    for(unsigned int i=0; i<n_threads; i++)
+    {
+      unsigned int this_range_size = range_size;
+
+      if(i+1 == n_threads)
+        this_range_size += range.size() % n_threads; // Give the last one the remaining work to do
+
+      ranges[i] = new Range(range, current_beginning, current_beginning + this_range_size);
+
+      current_beginning = current_beginning + this_range_size;
+    }
+
+    // Create the RangeBody arguments
+    for(unsigned int i=0; i<n_threads; i++)
+    {
+      range_bodies[i].range = ranges[i];
+      range_bodies[i].body = &body;
+    }
+
+    // Create the threads
+    for(unsigned int i=0; i<n_threads; i++)
+    {
+      spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
+      pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void*)&range_bodies[i]);
+      _pthread_unique_ids[threads[i]] = i;
+    }
+
+    // Wait for them to finish
+    for(unsigned int i=0; i<n_threads; i++)
+    {
+      pthread_join(threads[i], NULL);
+      spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
+      _pthread_unique_ids.erase(threads[i]);
+    }
+
+    // Clean up
+    for(unsigned int i=0; i<n_threads; i++)
+      delete ranges[i];
+
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+    if (libMesh::n_threads() > 1 && logging_was_enabled)
+      libMesh::perflog.enable_logging();
+#endif
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Exectue the provided function object in parallel on the specified
+   * range with the specified partitioner.
+   */
+  template <typename Range, typename Body, typename Partitioner>
+  inline
+  void parallel_for (const Range &range, const Body &body, const Partitioner &)
+  {
+    parallel_for(range, body);
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Exectue the provided reduction operation in parallel on the specified
+   * range.
+   */
+  template <typename Range, typename Body>
+  inline
+  void parallel_reduce (const Range &range, Body &body)
+  {
+    Threads::BoolAcquire b(Threads::in_threads);
+
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+    const bool logging_was_enabled = libMesh::perflog.logging_enabled();
+
+    if (libMesh::n_threads() > 1)
+      libMesh::perflog.disable_logging();
+#endif
+
+    unsigned int n_threads = num_pthreads(range);
+
+    std::vector<Range *> ranges(n_threads);
+    std::vector<Body *> bodies(n_threads);
+    std::vector<RangeBody<Range, Body> > range_bodies(n_threads);
+
+    // Create copies of the body for each thread
+    bodies[0] = &body; // Use the original body for the first one
+    for(unsigned int i=1; i<n_threads; i++)
+      bodies[i] = new Body(body, Threads::split());
+
+    // Create the ranges for each thread
+    unsigned int range_size = range.size() / n_threads;
+
+    typename Range::const_iterator current_beginning = range.begin();
+
+    for(unsigned int i=0; i<n_threads; i++)
+    {
+      unsigned int this_range_size = range_size;
+
+      if(i+1 == n_threads)
+        this_range_size += range.size() % n_threads; // Give the last one the remaining work to do
+
+      ranges[i] = new Range(range, current_beginning, current_beginning + this_range_size);
+
+      current_beginning = current_beginning + this_range_size;
+    }
+
+    // Create the RangeBody arguments
+    for(unsigned int i=0; i<n_threads; i++)
+    {
+      range_bodies[i].range = ranges[i];
+      range_bodies[i].body = bodies[i];
+    }
+
+    // Create the threads
+    std::vector<pthread_t> threads(n_threads);
+    for(unsigned int i=0; i<n_threads; i++)
+    {
+      spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
+      pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void*)&range_bodies[i]);
+      _pthread_unique_ids[threads[i]] = i;
+    }
+
+    // Wait for them to finish
+    for(unsigned int i=0; i<n_threads; i++)
+    {
+      pthread_join(threads[i], NULL);
+      spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
+      _pthread_unique_ids.erase(threads[i]);
+    }
+
+    // Join them all down to the original Body
+    for(unsigned int i=n_threads-1; i != 0; i--)
+      bodies[i-1]->join(*bodies[i]);
+
+    // Clean up
+    for(unsigned int i=1; i<n_threads; i++)
+      delete bodies[i];
+    for(unsigned int i=0; i<n_threads; i++)
+      delete ranges[i];
+
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
+    if (libMesh::n_threads() > 1 && logging_was_enabled)
+      libMesh::perflog.enable_logging();
+#endif
+  }
+
+  //-------------------------------------------------------------------
+  /**
+   * Exectue the provided reduction operation in parallel on the specified
+   * range with the specified partitioner.
+   */
+  template <typename Range, typename Body, typename Partitioner>
+  inline
+  void parallel_reduce (const Range &range, Body &body, const Partitioner &)
+  {
+    parallel_reduce(range, body);
+  }
+
 
   //-------------------------------------------------------------------
   /**
