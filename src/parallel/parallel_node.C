@@ -35,10 +35,10 @@ namespace
   static const unsigned int header_size = 2;
 
   // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int ints_per_Real =
-    (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
+  static const unsigned int idtypes_per_Real =
+    (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
 
-  static const int node_magic_header = 1234567890;
+  static const largest_id_type node_magic_header = 1234567890;
 }
 
 
@@ -57,7 +57,7 @@ unsigned int packable_size (const Node* node, const MeshBase* mesh)
 #ifndef NDEBUG
          1 + // add an int for the magic header when testing
 #endif
-	 header_size + LIBMESH_DIM*ints_per_Real +
+	 header_size + LIBMESH_DIM*idtypes_per_Real +
          node->packed_indexing_size() +
          1 + mesh->boundary_info->n_boundary_ids(node);
 }
@@ -66,13 +66,13 @@ unsigned int packable_size (const Node* node, const MeshBase* mesh)
 
 template <>
 unsigned int packed_size (const Node*,
-			  std::vector<int>::const_iterator in)
+			  const std::vector<largest_id_type>::const_iterator in)
 {
   const unsigned int pre_indexing_size =
 #ifndef NDEBUG
     1 + // add an int for the magic header when testing
 #endif
-    header_size + LIBMESH_DIM*ints_per_Real;
+    header_size + LIBMESH_DIM*idtypes_per_Real;
 
   const unsigned int indexing_size =
     DofObject::unpackable_indexing_size(in+pre_indexing_size);
@@ -87,6 +87,15 @@ unsigned int packed_size (const Node*,
 
 
 template <>
+unsigned int packed_size (const Node* n,
+			  const std::vector<largest_id_type>::iterator in)
+{
+  return packed_size(n, std::vector<largest_id_type>::const_iterator(in));
+}
+
+
+
+template <>
 unsigned int packable_size (const Node* node, const ParallelMesh* mesh)
 {
   return packable_size(node, static_cast<const MeshBase*>(mesh));
@@ -96,7 +105,7 @@ unsigned int packable_size (const Node* node, const ParallelMesh* mesh)
 
 template <>
 void pack (const Node* node,
-           std::vector<int>& data,
+           std::vector<largest_id_type>& data,
            const MeshBase* mesh)
 {
   libmesh_assert(node);
@@ -108,24 +117,25 @@ void pack (const Node* node,
   data.push_back (node_magic_header);
 #endif
 
-  data.push_back (static_cast<int>(node->processor_id()));
-  data.push_back (static_cast<int>(node->id()));
+  data.push_back (static_cast<largest_id_type>(node->processor_id()));
+  data.push_back (static_cast<largest_id_type>(node->id()));
 
   // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int ints_per_Real =
-    (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
+  static const unsigned int idtypes_per_Real =
+    (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
 
   for (unsigned int i=0; i != LIBMESH_DIM; ++i)
     {
-      const int* Real_as_ints = reinterpret_cast<const int*>(&((*node)(i)));
-      for (unsigned int j=0; j != ints_per_Real; ++j)
+      const largest_id_type* Real_as_idtypes =
+        reinterpret_cast<const largest_id_type*>(&((*node)(i)));
+      for (unsigned int j=0; j != idtypes_per_Real; ++j)
         {
-          data.push_back(Real_as_ints[j]);
+          data.push_back(Real_as_idtypes[j]);
         }
     }
 
 #ifndef NDEBUG
-  const int start_indices = data.size();
+  const std::size_t start_indices = data.size();
 #endif
   // Add any DofObject indices
   node->pack_indexing(std::back_inserter(data));
@@ -141,9 +151,11 @@ void pack (const Node* node,
   std::vector<boundary_id_type> bcs =
     mesh->boundary_info->boundary_ids(node);
 
+  libmesh_assert(bcs.size() < std::numeric_limits<largest_id_type>::max());
+
   data.push_back(bcs.size());
 
-  for(unsigned int bc_it=0; bc_it < bcs.size(); bc_it++)
+  for (std::size_t bc_it=0; bc_it < bcs.size(); bc_it++)
     data.push_back(bcs[bc_it]);
 }
 
@@ -151,7 +163,7 @@ void pack (const Node* node,
 
 template <>
 void pack (const Node* node,
-           std::vector<int>& data,
+           std::vector<largest_id_type>& data,
            const ParallelMesh* mesh)
 {
   pack(node, data, static_cast<const MeshBase*>(mesh));
@@ -160,21 +172,21 @@ void pack (const Node* node,
 
 
 template <>
-void unpack (std::vector<int>::const_iterator in,
+void unpack (std::vector<largest_id_type>::const_iterator in,
              Node** out,
              MeshBase* mesh)
 {
 #ifndef NDEBUG
-  const std::vector<int>::const_iterator original_in = in;
-  const int incoming_header = *in++;
+  const std::vector<largest_id_type>::const_iterator original_in = in;
+  const largest_id_type incoming_header = *in++;
   libmesh_assert_equal_to (incoming_header, node_magic_header);
 #endif
 
-  const unsigned int processor_id = static_cast<unsigned int>(*in++);
+  const processor_id_type processor_id = static_cast<processor_id_type>(*in++);
   libmesh_assert(processor_id == DofObject::invalid_processor_id ||
                  processor_id < mesh->n_processors());
 
-  const unsigned int id = static_cast<unsigned int>(*in++);
+  const dof_id_type id = static_cast<dof_id_type>(*in++);
 
   Node *node = mesh->query_node_ptr(id);
 
@@ -188,12 +200,12 @@ void unpack (std::vector<int>::const_iterator in,
 #ifndef NDEBUG
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         {
-          const Real* ints_as_Real = reinterpret_cast<const Real*>(&(*in));
-          libmesh_assert_equal_to ((*node)(i), *ints_as_Real);
-          in += ints_per_Real;
+          const Real* idtypes_as_Real = reinterpret_cast<const Real*>(&(*in));
+          libmesh_assert_equal_to ((*node)(i), *idtypes_as_Real);
+          in += idtypes_per_Real;
         }
 #else
-      in += LIBMESH_DIM * ints_per_Real;
+      in += LIBMESH_DIM * idtypes_per_Real;
 #endif // !NDEBUG
 
       if (!node->has_dofs())
@@ -219,9 +231,9 @@ void unpack (std::vector<int>::const_iterator in,
 
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         {
-          const Real* ints_as_Real = reinterpret_cast<const Real*>(&(*in));
-          (*node)(i) = *ints_as_Real;
-          in += ints_per_Real;
+          const Real* idtypes_as_Real = reinterpret_cast<const Real*>(&(*in));
+          (*node)(i) = *idtypes_as_Real;
+          in += idtypes_per_Real;
         }
 
       node->set_id() = id;
@@ -237,10 +249,10 @@ void unpack (std::vector<int>::const_iterator in,
   // encoded boundary conditions are consistent
 
   // Add any nodal boundary condition ids
-  const int num_bcs = *in++;
-  libmesh_assert_greater_equal (num_bcs, 0);
+  const largest_id_type num_bcs = *in++;
+  // libmesh_assert_greater_equal (num_bcs, 0);
 
-  for(int bc_it=0; bc_it < num_bcs; bc_it++)
+  for(largest_id_type bc_it=0; bc_it < num_bcs; bc_it++)
     mesh->boundary_info->add_node (node, *in++);
 
   *out = node;
@@ -255,7 +267,7 @@ void unpack (std::vector<int>::const_iterator in,
 
 
 template <>
-void unpack (std::vector<int>::const_iterator in,
+void unpack (std::vector<largest_id_type>::const_iterator in,
              Node** out,
              ParallelMesh* mesh)
 {

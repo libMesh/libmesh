@@ -103,25 +103,25 @@ MPI_Datatype Node::PackedNode::create_mpi_datatype ()
 }
 
 
-void Node::PackedNode::pack (std::vector<int> &conn, const Node* node)
+void Node::PackedNode::pack (std::vector<largest_id_type> &conn, const Node* node)
 {
   libmesh_assert(node);
 
   conn.reserve (conn.size() + node->packed_size());
 
-  conn.push_back (static_cast<int>(node->processor_id()));
-  conn.push_back (static_cast<int>(node->id()));
+  conn.push_back (static_cast<largest_id_type>(node->processor_id()));
+  conn.push_back (static_cast<largest_id_type>(node->id()));
 
   // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int ints_per_Real =
-    (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
+  static const unsigned int idtypes_per_Real =
+    (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
 
   for (unsigned int i=0; i != LIBMESH_DIM; ++i)
     {
-      const int* Real_as_ints = reinterpret_cast<const int*>(&((*node)(i)));
-      for (unsigned int j=0; j != ints_per_Real; ++j)
+      const largest_id_type* Real_as_idtypes = reinterpret_cast<const largest_id_type*>(&((*node)(i)));
+      for (unsigned int j=0; j != idtypes_per_Real; ++j)
         {
-          conn.push_back(Real_as_ints[j]);
+          conn.push_back(Real_as_idtypes[j]);
         }
     }
 
@@ -129,17 +129,17 @@ void Node::PackedNode::pack (std::vector<int> &conn, const Node* node)
 }
 
 
-void Node::PackedNode::unpack (std::vector<int>::const_iterator start, Node& node)
+void Node::PackedNode::unpack (std::vector<largest_id_type>::const_iterator start, Node& node)
 {
-  unsigned int processor_id = static_cast<unsigned int>(*start++);
+  processor_id_type processor_id = static_cast<processor_id_type>(*start++);
   libmesh_assert(processor_id == DofObject::invalid_processor_id ||
                  processor_id < libMesh::n_processors());
 
-  unsigned int id = static_cast<unsigned int>(*start++);
+  dof_id_type id = static_cast<dof_id_type>(*start++);
 
   // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int ints_per_Real =
-    (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
+  static const unsigned int idtypes_per_Real =
+    (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
 
   std::vector<Real> xyz(3,0.);
 
@@ -147,7 +147,7 @@ void Node::PackedNode::unpack (std::vector<int>::const_iterator start, Node& nod
     {
       const Real* ints_as_Real = reinterpret_cast<const Real*>(&(*start));
       node(i) = *ints_as_Real;
-      start += ints_per_Real;
+      start += idtypes_per_Real;
     }
 
   node.set_id() = id;
