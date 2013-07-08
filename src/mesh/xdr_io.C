@@ -1165,10 +1165,11 @@ void XdrIO::read_serialized_bcs (Xdr &io)
 	             std::vector<ElemBCData>::iterator> pos; it!=end; ++it)
 #if defined(__SUNPRO_CC) || defined(__PGI)
 	for (pos = std::equal_range (elem_bc_data.begin(), elem_bc_data.end(), (*it)->id(), CompareIntElemBCData());
+	     pos.first != pos.second; ++pos.first)
 #else
 	for (pos = std::equal_range (elem_bc_data.begin(), elem_bc_data.end(), (*it)->id());
-#endif
 	     pos.first != pos.second; ++pos.first)
+#endif
 	  {
 	    libmesh_assert_equal_to (pos.first->elem_id, (*it)->id());
 	    libmesh_assert_less (pos.first->side, (*it)->n_sides());
