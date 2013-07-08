@@ -489,47 +489,48 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	type_n_tensor.h type_tensor.h type_vector.h vector_value.h \
 	wrapped_function.h zero_function.h parallel.h \
 	parallel_algebra.h parallel_bin_sorter.h \
-	parallel_conversion_utils.h parallel_ghost_sync.h \
-	parallel_hilbert.h parallel_histogram.h \
-	parallel_implementation.h parallel_object.h parallel_sort.h \
-	threads.h threads_allocators.h centroid_partitioner.h \
-	hilbert_sfc_partitioner.h linear_partitioner.h \
-	metis_partitioner.h morton_sfc_partitioner.h \
-	parmetis_partitioner.h partitioner.h sfc_partitioner.h \
-	diff_physics.h diff_qoi.h fem_physics.h quadrature.h \
-	quadrature_clough.h quadrature_conical.h quadrature_gauss.h \
-	quadrature_gm.h quadrature_grid.h quadrature_jacobi.h \
-	quadrature_monomial.h quadrature_rules.h quadrature_simpson.h \
-	quadrature_trap.h derived_rb_construction.h \
-	derived_rb_evaluation.h rb_assembly_expansion.h \
-	rb_construction.h rb_construction_base.h rb_eim_assembly.h \
-	rb_eim_construction.h rb_eim_evaluation.h rb_eim_theta.h \
-	rb_evaluation.h rb_parameters.h rb_parametrized.h \
-	rb_parametrized_function.h rb_scm_construction.h \
-	rb_scm_evaluation.h rb_temporal_discretization.h rb_theta.h \
-	rb_theta_expansion.h transient_rb_assembly_expansion.h \
-	transient_rb_construction.h transient_rb_evaluation.h \
-	transient_rb_theta_expansion.h direct_solution_transfer.h \
-	dtk_adapter.h dtk_evaluator.h dtk_solution_transfer.h \
-	meshfree_interpolation.h meshfree_solution_transfer.h \
-	meshfunction_solution_transfer.h radial_basis_functions.h \
-	radial_basis_interpolation.h solution_transfer.h \
-	adaptive_time_solver.h diff_solver.h eigen_solver.h \
-	eigen_sparse_linear_solver.h eigen_time_solver.h \
-	euler2_solver.h euler_solver.h laspack_linear_solver.h \
-	linear.h linear_solver.h memory_solution_history.h \
-	newton_solver.h no_solution_history.h nonlinear_solver.h \
-	petsc_diff_solver.h petsc_dm_nonlinear_solver.h \
-	petsc_linear_solver.h petsc_nonlinear_solver.h \
-	petscdmlibmesh.h slepc_eigen_solver.h slepc_macro.h \
-	solution_history.h solver.h steady_solver.h time_solver.h \
-	trilinos_aztec_linear_solver.h trilinos_nox_nonlinear_solver.h \
-	twostep_time_solver.h unsteady_solver.h \
-	condensed_eigen_system.h continuation_system.h \
-	dg_fem_context.h diff_context.h diff_system.h eigen_system.h \
-	elem_assembly.h equation_systems.h explicit_system.h \
-	fem_context.h fem_system.h frequency_system.h \
-	implicit_system.h linear_implicit_system.h newmark_system.h \
+	parallel_conversion_utils.h parallel_elem.h \
+	parallel_ghost_sync.h parallel_hilbert.h parallel_histogram.h \
+	parallel_implementation.h parallel_node.h parallel_object.h \
+	parallel_sort.h threads.h threads_allocators.h \
+	centroid_partitioner.h hilbert_sfc_partitioner.h \
+	linear_partitioner.h metis_partitioner.h \
+	morton_sfc_partitioner.h parmetis_partitioner.h partitioner.h \
+	sfc_partitioner.h diff_physics.h diff_qoi.h fem_physics.h \
+	quadrature.h quadrature_clough.h quadrature_conical.h \
+	quadrature_gauss.h quadrature_gm.h quadrature_grid.h \
+	quadrature_jacobi.h quadrature_monomial.h quadrature_rules.h \
+	quadrature_simpson.h quadrature_trap.h \
+	derived_rb_construction.h derived_rb_evaluation.h \
+	rb_assembly_expansion.h rb_construction.h \
+	rb_construction_base.h rb_eim_assembly.h rb_eim_construction.h \
+	rb_eim_evaluation.h rb_eim_theta.h rb_evaluation.h \
+	rb_parameters.h rb_parametrized.h rb_parametrized_function.h \
+	rb_scm_construction.h rb_scm_evaluation.h \
+	rb_temporal_discretization.h rb_theta.h rb_theta_expansion.h \
+	transient_rb_assembly_expansion.h transient_rb_construction.h \
+	transient_rb_evaluation.h transient_rb_theta_expansion.h \
+	direct_solution_transfer.h dtk_adapter.h dtk_evaluator.h \
+	dtk_solution_transfer.h meshfree_interpolation.h \
+	meshfree_solution_transfer.h meshfunction_solution_transfer.h \
+	radial_basis_functions.h radial_basis_interpolation.h \
+	solution_transfer.h adaptive_time_solver.h diff_solver.h \
+	eigen_solver.h eigen_sparse_linear_solver.h \
+	eigen_time_solver.h euler2_solver.h euler_solver.h \
+	laspack_linear_solver.h linear.h linear_solver.h \
+	memory_solution_history.h newton_solver.h \
+	no_solution_history.h nonlinear_solver.h petsc_diff_solver.h \
+	petsc_dm_nonlinear_solver.h petsc_linear_solver.h \
+	petsc_nonlinear_solver.h petscdmlibmesh.h slepc_eigen_solver.h \
+	slepc_macro.h solution_history.h solver.h steady_solver.h \
+	time_solver.h trilinos_aztec_linear_solver.h \
+	trilinos_nox_nonlinear_solver.h twostep_time_solver.h \
+	unsteady_solver.h condensed_eigen_system.h \
+	continuation_system.h dg_fem_context.h diff_context.h \
+	diff_system.h eigen_system.h elem_assembly.h \
+	equation_systems.h explicit_system.h fem_context.h \
+	fem_system.h frequency_system.h implicit_system.h \
+	linear_implicit_system.h newmark_system.h \
 	nonlinear_implicit_system.h parameter_vector.h qoi_set.h \
 	sensitivity_data.h steady_system.h system.h system_norm.h \
 	system_subset.h system_subset_by_subdomain.h \
@@ -1474,6 +1475,9 @@ parallel_bin_sorter.h: $(top_srcdir)/include/parallel/parallel_bin_sorter.h
 parallel_conversion_utils.h: $(top_srcdir)/include/parallel/parallel_conversion_utils.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
+parallel_elem.h: $(top_srcdir)/include/parallel/parallel_elem.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
 parallel_ghost_sync.h: $(top_srcdir)/include/parallel/parallel_ghost_sync.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
@@ -1484,6 +1488,9 @@ parallel_histogram.h: $(top_srcdir)/include/parallel/parallel_histogram.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 parallel_implementation.h: $(top_srcdir)/include/parallel/parallel_implementation.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+parallel_node.h: $(top_srcdir)/include/parallel/parallel_node.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 parallel_object.h: $(top_srcdir)/include/parallel/parallel_object.h

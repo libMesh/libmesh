@@ -103,6 +103,19 @@ typedef int64_t subdomain_id_type;
 typedef uint16_t subdomain_id_type;
 #endif
 
+#if (LIBMESH_BOUNDARY_ID_BYTES > 4) || (LIBMESH_DOF_ID_BYTES > 4) || \
+    (LIBMESH_PROCESSOR_ID_BYTES > 4) || (LIBMESH_SUBDOMAIN_ID_BYTES > 4)
+typedef uint64_t largest_id_type;
+#elif (LIBMESH_BOUNDARY_ID_BYTES > 2) || (LIBMESH_DOF_ID_BYTES > 2) || \
+      (LIBMESH_PROCESSOR_ID_BYTES > 2) || (LIBMESH_SUBDOMAIN_ID_BYTES > 2)
+typedef uint32_t largest_id_type;
+#elif (LIBMESH_BOUNDARY_ID_BYTES > 1) || (LIBMESH_DOF_ID_BYTES > 1) || \
+      (LIBMESH_PROCESSOR_ID_BYTES > 1) || (LIBMESH_SUBDOMAIN_ID_BYTES > 1)
+typedef uint16_t largest_id_type;
+#else
+typedef uint8_t largest_id_type;
+#endif
+
 } // namespace libMesh
 
 #endif // LIBMESH_ID_TYPES_H
