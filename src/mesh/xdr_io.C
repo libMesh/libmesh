@@ -974,7 +974,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem)
       for (dof_id_type e=first_elem; e<last_elem; e++)
 	{
 	  const ElemType elem_type        = static_cast<ElemType>(*it); ++it;
-	  const dof_id_type parent_id    = *it; ++it;
+	  const xdr_id_type parent_id    = *it; ++it;
 	  const processor_id_type processor_id = *it; ++it;
 	  const subdomain_id_type subdomain_id = *it; ++it;
 #ifdef LIBMESH_ENABLE_AMR
