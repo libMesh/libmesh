@@ -122,6 +122,9 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 			   const numeric_index_type noz,
 			   const numeric_index_type blocksize_in)
 {
+  // So compilers don't warn when !LIBMESH_ENABLE_BLOCKED_STORAGE
+  libmesh_ignore(blocksize_in);
+
   // Clear initialized matrices
   if (this->initialized())
     this->clear();
@@ -136,7 +139,6 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   PetscInt n_local    = static_cast<PetscInt>(n_l);
   PetscInt n_nz       = static_cast<PetscInt>(nnz);
   PetscInt n_oz       = static_cast<PetscInt>(noz);
-  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
 
   ierr = MatCreate(this->comm().get(), &_mat);
   LIBMESH_CHKERRABORT(ierr);
@@ -144,6 +146,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   LIBMESH_CHKERRABORT(ierr);
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
+  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
   if (blocksize > 1)
     {
       // specified blocksize, bs>1.
@@ -204,6 +207,9 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 			   const std::vector<numeric_index_type>& n_oz,
 			   const numeric_index_type blocksize_in)
 {
+  // So compilers don't warn when !LIBMESH_ENABLE_BLOCKED_STORAGE
+  libmesh_ignore(blocksize_in);
+
   // Clear initialized matrices
   if (this->initialized())
     this->clear();
@@ -219,7 +225,6 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   PetscInt n_global   = static_cast<PetscInt>(n_in);
   PetscInt m_local    = static_cast<PetscInt>(m_l);
   PetscInt n_local    = static_cast<PetscInt>(n_l);
-  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
 
   ierr = MatCreate(this->comm().get(), &_mat);
   LIBMESH_CHKERRABORT(ierr);
@@ -227,6 +232,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   LIBMESH_CHKERRABORT(ierr);
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
+  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
   if (blocksize > 1)
     {
       // specified blocksize, bs>1.
@@ -310,7 +316,6 @@ void PetscMatrix<T>::init ()
   PetscInt n_global   = static_cast<PetscInt>(my_n);
   PetscInt m_local    = static_cast<PetscInt>(m_l);
   PetscInt n_local    = static_cast<PetscInt>(n_l);
-  PetscInt blocksize  = static_cast<PetscInt>(this->_dof_map->block_size());
 
   ierr = MatCreate(this->comm().get(), &_mat);
   LIBMESH_CHKERRABORT(ierr);
@@ -318,6 +323,7 @@ void PetscMatrix<T>::init ()
   LIBMESH_CHKERRABORT(ierr);
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
+  PetscInt blocksize  = static_cast<PetscInt>(this->_dof_map->block_size());
   if (blocksize > 1)
     {
       // specified blocksize, bs>1.
