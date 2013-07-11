@@ -303,11 +303,11 @@ std::string MeshBase::get_info() const
 #ifdef LIBMESH_ENABLE_AMR
       << "    n_active_elem()="   << this->n_active_elem()     << '\n'
 #endif
-      << "  n_subdomains()="      << this->n_subdomains()      << '\n'
-      << "  n_partitions()="      << this->n_partitions()      << '\n'
-      << "  n_processors()="      << this->n_processors()      << '\n'
-      << "  n_threads()="         << libMesh::n_threads()      << '\n'
-      << "  processor_id()="      << this->processor_id()      << '\n';
+      << "  n_subdomains()="      << static_cast<std::size_t>(this->n_subdomains()) << '\n'
+      << "  n_partitions()="      << static_cast<std::size_t>(this->n_partitions()) << '\n'
+      << "  n_processors()="      << static_cast<std::size_t>(this->n_processors()) << '\n'
+      << "  n_threads()="         << static_cast<std::size_t>(libMesh::n_threads()) << '\n'
+      << "  processor_id()="      << static_cast<std::size_t>(this->processor_id()) << '\n';
 
   return oss.str();
 }

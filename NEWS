@@ -3,6 +3,7 @@
   * PETSc BAIJ matrix support for blocked matrices
   * Refreshed packaged METIS and ParMETIS to latest versions
   * Experimental support for DGFEMContext
+  * New accessor API for FEMContext objects. Public members deprecated.
   * Assorted bugfixes:
     * for nonstandard index sizes
   

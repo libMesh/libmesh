@@ -201,18 +201,18 @@ public:
      * There may be 1 or 3 or 4 ints per coordinate depending on
      * machine architecture.
      */
-    static void pack (std::vector<int> &conn, const Node* node);
+    static void pack (std::vector<largest_id_type> &conn, const Node* node);
 
-    static void unpack (std::vector<int>::const_iterator start, Node& node);
+    static void unpack (std::vector<largest_id_type>::const_iterator start, Node& node);
   };
 
 unsigned int packed_size() const
 {
   // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int ints_per_Real =
-    (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
+  static const unsigned int idtypes_per_Real =
+    (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
 
-  return PackedNode::header_size + LIBMESH_DIM*ints_per_Real +
+  return PackedNode::header_size + LIBMESH_DIM*idtypes_per_Real +
          this->packed_indexing_size();
 }
 

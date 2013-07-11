@@ -2032,7 +2032,7 @@ private:
   /**
    * Iterator pointing to the beginning of this packed element's index buffer.
    */
-  const std::vector<int>::const_iterator _buf_begin;
+  const std::vector<largest_id_type>::const_iterator _buf_begin;
 
 public:
 
@@ -2040,7 +2040,7 @@ public:
    * Constructor.  Takes an input iterator pointing to the
    * beginning of the connectivity block for this element.
    */
-  PackedElem (const std::vector<int>::const_iterator _buf_in) :
+  PackedElem (const std::vector<largest_id_type>::const_iterator _buf_in) :
     _buf_begin(_buf_in)
   {}
 
@@ -2057,7 +2057,7 @@ public:
    *  dof_object_buffer_1 ...]
    * We cannot use unsigned int because parent_ID can be negative
    */
-  static void pack (std::vector<int> &conn, const Elem* elem);
+  static void pack (std::vector<largest_id_type> &conn, const Elem* elem);
 
   /**
    * Unpacks this packed element.  Returns a pointer to the new element.
@@ -2088,7 +2088,7 @@ public:
    */
   Elem::RefinementState refinement_flag () const
   {
-    libmesh_assert_greater_equal (*(_buf_begin+2), 0);
+    // libmesh_assert_greater_equal (*(_buf_begin+2), 0);
     libmesh_assert_less (*(_buf_begin+2), INVALID_REFINEMENTSTATE);
     return static_cast<Elem::RefinementState>(*(_buf_begin+2));
   }
@@ -2098,7 +2098,7 @@ public:
    */
   Elem::RefinementState p_refinement_flag () const
   {
-    libmesh_assert_greater_equal (*(_buf_begin+3), 0);
+    // libmesh_assert_greater_equal (*(_buf_begin+3), 0);
     libmesh_assert_less (*(_buf_begin+3), INVALID_REFINEMENTSTATE);
     return static_cast<Elem::RefinementState>(*(_buf_begin+3));
   }
@@ -2109,7 +2109,7 @@ public:
    */
   ElemType type () const
   {
-    libmesh_assert_greater_equal (*(_buf_begin+4), 0);
+    // libmesh_assert_greater_equal (*(_buf_begin+4), 0);
     libmesh_assert_less (*(_buf_begin+4), INVALID_ELEM);
     return static_cast<ElemType>(*(_buf_begin+4));
   }
@@ -2119,7 +2119,7 @@ public:
    */
   processor_id_type processor_id () const
   {
-    libmesh_assert_greater_equal (*(_buf_begin+5), 0);
+    // libmesh_assert_greater_equal (*(_buf_begin+5), 0);
     libmesh_assert_less (static_cast<unsigned int>(*(_buf_begin+5)),
                    libMesh::n_processors() ||
                    static_cast<processor_id_type>(*(_buf_begin+5)) == DofObject::invalid_processor_id);
@@ -2192,7 +2192,7 @@ public:
   }
 
 
-  std::vector<int>::const_iterator indices() const
+  std::vector<largest_id_type>::const_iterator indices() const
   {
     return _buf_begin + header_size + this->n_nodes() +
            this->n_neighbors();

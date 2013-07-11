@@ -21,27 +21,29 @@ void LaplaceSystem::side_qoi_derivative (DiffContext &context,
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
+  FEBase* side_fe = NULL;
+  c.get_side_fe( 0, side_fe );
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = c.side_fe_var[0]->get_JxW();
+  const std::vector<Real> &JxW = side_fe->get_JxW();
 
   // The basis functions for the side
-  const std::vector<std::vector<RealGradient> > &dphi = c.side_fe_var[0]->get_dphi();
+  const std::vector<std::vector<RealGradient> > &dphi = side_fe->get_dphi();
 
   // The side quadrature points
-  const std::vector<Point > &q_point = c.side_fe_var[0]->get_xyz();
+  const std::vector<Point > &q_point = side_fe->get_xyz();
 
   // Get the normal to the side at each qp
-  const std::vector<Point> &face_normals = c.side_fe_var[0]->get_normals();
+  const std::vector<Point> &face_normals = side_fe->get_normals();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs = c.dof_indices_var[0].size();
-  unsigned int n_qpoints = (c.get_side_qrule())->n_points();
+  const unsigned int n_T_dofs = c.get_dof_indices(0).size();
+  unsigned int n_qpoints = c.get_side_qrule().n_points();
 
   // Fill the QoI RHS corresponding to this QoI. Since this is QoI 1
   // we fill in the [1][i] subderivatives, i corresponding to the variable index.
   // Our system has only one variable, so we only have to fill the [1][0] subderivative
-  DenseSubVector<Number> &Q = *c.elem_qoi_subderivatives[1][0];
+  DenseSubVector<Number> &Q = c.get_qoi_derivatives(1,0);
 
   const Real TOL = 1.e-5;
 

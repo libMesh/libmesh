@@ -452,7 +452,8 @@ unsigned int DofObject::packed_indexing_size() const
 
 
 // FIXME: it'll be tricky getting this to work with 64-bit dof_id_type
-unsigned int DofObject::unpackable_indexing_size(std::vector<int>::const_iterator begin)
+unsigned int DofObject::unpackable_indexing_size
+  (std::vector<largest_id_type>::const_iterator begin)
 {
 #ifdef LIBMESH_ENABLE_AMR
   const int has_old_dof_object = *begin++;
@@ -474,7 +475,7 @@ unsigned int DofObject::unpackable_indexing_size(std::vector<int>::const_iterato
 
 
 // FIXME: it'll be tricky getting this to work with 64-bit dof_id_type
-void DofObject::unpack_indexing(std::vector<int>::const_iterator begin)
+void DofObject::unpack_indexing(std::vector<largest_id_type>::const_iterator begin)
 {
   _idx_buf.clear();
 
@@ -513,7 +514,8 @@ void DofObject::unpack_indexing(std::vector<int>::const_iterator begin)
 
 
 // FIXME: it'll be tricky getting this to work with 64-bit dof_id_type
-void DofObject::pack_indexing(std::back_insert_iterator<std::vector<int> > target) const
+void DofObject::pack_indexing
+  (std::back_insert_iterator<std::vector<largest_id_type> > target) const
 {
 #ifdef LIBMESH_ENABLE_AMR
   // We might need to pack old_dof_object too

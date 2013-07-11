@@ -35,6 +35,17 @@
 namespace libMesh
 {
 
+extern "C"
+{
+  // Older versions of PETSc do not have the different int typedefs.
+  // On 64-bit machines, PetscInt may actually be a long long int.
+  // This change occurred in Petsc-2.2.1.
+#if PETSC_VERSION_LESS_THAN(2,2,1)
+  typedef int PetscErrorCode;
+  typedef int PetscInt;
+#endif
+}
+
 
 /*----------------------- functions ----------------------------------*/
 template <typename T>
@@ -44,7 +55,7 @@ void SlepcEigenSolver<T>::clear ()
     {
       this->_is_initialized = false;
 
-      int ierr=0;
+      PetscErrorCode ierr=0;
 
       ierr = LibMeshEPSDestroy(&_eps);
              LIBMESH_CHKERRABORT(ierr);
@@ -65,7 +76,7 @@ template <typename T>
 void SlepcEigenSolver<T>::init ()
 {
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   // Initialize the data structures if not done so already.
   if (!this->initialized())
@@ -123,7 +134,7 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
 {
   this->init ();
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   // Prepare the matrix.
   Mat mat;
@@ -160,11 +171,11 @@ SlepcEigenSolver<T>::_solve_standard_helper
 {
   START_LOG("solve_standard()", "SlepcEigenSolver");
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   // converged eigen pairs and number of iterations
-  int nconv=0;
-  int its=0;
+  PetscInt nconv=0;
+  PetscInt its=0;
 
 #ifdef  DEBUG
   // The relative error.
@@ -225,7 +236,7 @@ SlepcEigenSolver<T>::_solve_standard_helper
 		     "   ----------------- -----------------\n" );
          LIBMESH_CHKERRABORT(ierr);
 
-  for(int i=0; i<nconv; i++ )
+  for(PetscInt i=0; i<nconv; i++ )
     {
       ierr = EPSGetEigenpair(_eps, i, &kr, &ki, PETSC_NULL, PETSC_NULL);
              LIBMESH_CHKERRABORT(ierr);
@@ -304,7 +315,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 {
   this->init ();
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   // Prepare the matrix.
   Mat mat_A;
@@ -345,7 +356,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 {
   this->init ();
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   PetscMatrix<T>* matrix_A = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_A_in);
 
@@ -387,7 +398,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 {
   this->init ();
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   // Prepare the matrix.
   Mat mat_A;
@@ -439,11 +450,11 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 {
   START_LOG("solve_generalized()", "SlepcEigenSolver");
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   // converged eigen pairs and number of iterations
-  int nconv=0;
-  int its=0;
+  PetscInt nconv=0;
+  PetscInt its=0;
 
 #ifdef  DEBUG
   // The relative error.
@@ -506,7 +517,7 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 		     "   ----------------- -----------------\n" );
          LIBMESH_CHKERRABORT(ierr);
 
-  for(int i=0; i<nconv; i++ )
+  for(PetscInt i=0; i<nconv; i++ )
     {
       ierr = EPSGetEigenpair(_eps, i, &kr, &ki, PETSC_NULL, PETSC_NULL);
              LIBMESH_CHKERRABORT(ierr);
@@ -559,7 +570,7 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 template <typename T>
 void SlepcEigenSolver<T>::set_slepc_solver_type()
 {
-  int ierr = 0;
+  PetscErrorCode ierr = 0;
 
   switch (this->_eigen_solver_type)
     {
@@ -594,7 +605,7 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
 template <typename T>
 void SlepcEigenSolver<T>:: set_slepc_problem_type()
 {
-  int ierr = 0;
+  PetscErrorCode ierr = 0;
 
   switch (this->_eigen_problem_type)
     {
@@ -619,7 +630,7 @@ void SlepcEigenSolver<T>:: set_slepc_problem_type()
 template <typename T>
 void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
 {
-  int ierr = 0;
+  PetscErrorCode ierr = 0;
 
   switch (this->_position_of_spectrum)
     {
@@ -653,7 +664,7 @@ template <typename T>
 std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
 							 NumericVector<T> &solution_in)
 {
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   PetscReal re, im;
 
@@ -683,7 +694,7 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
 template <typename T>
 std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenvalue(unsigned int i)
 {
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   PetscReal re, im;
 
@@ -708,7 +719,7 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenvalue(unsigned int i)
 template <typename T>
 Real SlepcEigenSolver<T>::get_relative_error(unsigned int i)
 {
-  int ierr=0;
+  PetscErrorCode ierr=0;
   PetscReal error;
 
   ierr = EPSComputeRelativeError(_eps, i, &error);
@@ -723,7 +734,7 @@ void SlepcEigenSolver<T>::attach_deflation_space(NumericVector<T>& deflation_vec
 {
   this->init();
 
-  int ierr = 0;
+  PetscErrorCode ierr = 0;
   Vec deflation_vector = (libmesh_cast_ptr<PetscVector<T>*>(&deflation_vector_in))->vec();
   Vec* deflation_space = &deflation_vector;
 #if SLEPC_VERSION_LESS_THAN(3,1,0)
@@ -738,7 +749,7 @@ template <typename T>
 PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest)
 {
   /* Get the matrix context.  */
-  int ierr=0;
+  PetscErrorCode ierr=0;
   void* ctx;
   ierr = MatShellGetContext(mat,&ctx);
 
@@ -763,7 +774,7 @@ template <typename T>
 PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Vec dest)
 {
   /* Get the matrix context.  */
-  int ierr=0;
+  PetscErrorCode ierr=0;
   void* ctx;
   ierr = MatShellGetContext(mat,&ctx);
 

@@ -20,19 +20,21 @@ void CoupledSystemQoI::side_qoi_derivative (DiffContext &context,
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
+  FEBase* side_fe = NULL;
+  c.get_side_fe( 0, side_fe );
+
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = c.side_fe_var[0]->get_JxW();
+  const std::vector<Real> &JxW = side_fe->get_JxW();
 
-  // Get velocity basis functions phi
-  const std::vector<std::vector<Real> > &phi = c.side_fe_var[0]->get_phi();
-
-  const std::vector<Point > &q_point = c.side_fe_var[0]->get_xyz();
+  // Side basis functions
+  const std::vector<std::vector<Real> > &phi = side_fe->get_phi();
+  const std::vector<Point > &q_point = side_fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[1].size();
+  const unsigned int n_u_dofs = c.get_dof_indices(1).size();
 
-  DenseSubVector<Number> &Qu = *c.elem_qoi_subderivatives[0][0];
-  DenseSubVector<Number> &QC = *c.elem_qoi_subderivatives[0][3];
+  DenseSubVector<Number> &Qu = c.get_qoi_derivatives(0,0);
+  DenseSubVector<Number> &QC = c.get_qoi_derivatives(0,3);
 
   // Now we will build the element Jacobian and residual.
   // Constructing the residual requires the solution and its
@@ -40,7 +42,7 @@ void CoupledSystemQoI::side_qoi_derivative (DiffContext &context,
   // calculated at each quadrature point by summing the
   // solution degree-of-freedom values by the appropriate
   // weight functions.
-  unsigned int n_qpoints = c.side_qrule->n_points();
+  unsigned int n_qpoints = c.get_side_qrule().n_points();
 
   Number u = 0. ;
   Number C = 0. ;
@@ -82,15 +84,18 @@ void CoupledSystemQoI::side_qoi(DiffContext &context, const QoISet & /* qois */)
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
 
-  // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = c.side_fe_var[0]->get_JxW();
+  FEBase* side_fe = NULL;
+  c.get_side_fe( 0, side_fe );
 
-  const std::vector<Point > &q_point = c.side_fe_var[0]->get_xyz();
+  // Element Jacobian * quadrature weights for interior integration
+  const std::vector<Real> &JxW = side_fe->get_JxW();
+
+  const std::vector<Point > &q_point = side_fe->get_xyz();
 
   // Loop over qp's, compute the function at each qp and add
   // to get the QoI
 
-  unsigned int n_qpoints = c.side_qrule->n_points();
+  unsigned int n_qpoints = c.get_side_qrule().n_points();
 
   Number dQoI_0 = 0. ;
   Number u = 0. ;
@@ -117,6 +122,6 @@ void CoupledSystemQoI::side_qoi(DiffContext &context, const QoISet & /* qois */)
 
     } // end if on bdry
 
-  c.elem_qoi[0] += dQoI_0;
+  c.get_qois()[0] += dQoI_0;
 
 }

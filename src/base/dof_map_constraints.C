@@ -39,6 +39,8 @@
 #include "libmesh/numeric_vector.h" // for enforce_constraints_exactly()
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
+#include "libmesh/parallel_elem.h"
+#include "libmesh/parallel_node.h"
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
 #include "libmesh/periodic_boundary_base.h"
