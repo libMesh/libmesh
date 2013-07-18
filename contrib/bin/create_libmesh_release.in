@@ -1,4 +1,3 @@
-
 #!/bin/sh
 
 
@@ -42,7 +41,7 @@ tagname=$release #`echo $release | sed -e "s/[.]/_/g"`
 #
 echo ""
 echo "Creating distribution files..."
-make dist >/dev/null || exit 
+make dist >/dev/null || exit
 ls -l libmesh*.tar.*
 
 #
@@ -50,7 +49,7 @@ ls -l libmesh*.tar.*
 #
 echo ""
 echo "Tagging master git repository as \"$tagname\""
-git tag -a $tagname -m 'tagging libMesh $tagname'
+git tag -a $tagname -m "tagging libMesh $tagname"
 #git push origin $tagname
 
 #
