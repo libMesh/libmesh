@@ -1,12 +1,15 @@
 0.9.1 -> 0.9.2
   * PETSc 3.4 support
   * PETSc BAIJ matrix support for blocked matrices
+    * opt-in for this with './configure --enable-blocked-storage ...'
+    * may cause issues with preallocation in Reduced Basis code -
+      see http://sourceforge.net/mailarchive/forum.php?thread_name=B4613A7D-0033-43C7-A9DF-5A801217A097%40nasa.gov&forum_name=libmesh-devel
   * Refreshed packaged METIS and ParMETIS to latest versions
   * Experimental support for DGFEMContext
   * New accessor API for FEMContext objects. Public members deprecated.
   * Assorted bugfixes:
     * for nonstandard index sizes
-  
+
 0.9.0 -> 0.9.1
   * Multi-communicator-capable objects
     * Communicator-using ParallelObject subclasses can be initialized
@@ -28,7 +31,7 @@
   * Complex-valued libMesh builds can new read real-valued restarts
   * Interface to and contrib copy of Eigen linear algebra package
   * Interface to and contrib copy of newer Nemesis/ExodusII/NetCDF
-  * build Tecplot binary I/O library from source, 
+  * build Tecplot binary I/O library from source,
     * old behavior can be restored via --disable-tecio --enable-tecplot
   * Assorted bugfixes:
     * UnsteadySolver is now more robust inside AMR loops
@@ -76,8 +79,8 @@
      o fem_system_ex2: Nonlinear elasticity, courtesy Robert Weidlich.
      o adjoints_ex5: Unsteady Adjoints.
      o miscellaneous_ex8: meshfree, inverse distance interpolation.
-       
-    
+
+
 0.7.3 -> 0.8.0
   * Vector-valued finite elements & related examples
   * Entirely refactored Parallel namespace implementation
@@ -109,7 +112,7 @@
      o reduced_basis_ex5: 3D linear elasticity with the Reduced Basis method
      o reduced_basis_ex6: Empirical interpolation method for a geometrically parametrized domain in 3D
      o reduced_basis_ex7: Complex-valued Reduced Basis problem modeling an acoustic horn
-  
+
 
 0.7.2 -> 0.7.3
   * Templated FunctionBase and subclass functors
