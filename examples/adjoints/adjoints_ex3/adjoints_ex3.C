@@ -531,6 +531,7 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
       solver->max_nonlinear_iterations    = param.max_nonlinear_iterations;
       solver->minsteplength               = param.min_step_length;
       solver->relative_step_tolerance     = param.relative_step_tolerance;
+      solver->absolute_residual_tolerance = param.absolute_residual_tolerance;
       solver->relative_residual_tolerance = param.relative_residual_tolerance;
       solver->require_residual_reduction  = param.require_residual_reduction;
       solver->linear_tolerance_multiplier = param.linear_tolerance_multiplier;

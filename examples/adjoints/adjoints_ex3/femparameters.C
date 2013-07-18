@@ -82,6 +82,7 @@ void FEMParameters::read(GetPot &input)
     GETPOT_INT_INPUT(max_linear_iterations);
     GETPOT_INT_INPUT(max_nonlinear_iterations);
     GETPOT_INPUT(relative_step_tolerance);
+    GETPOT_INPUT(absolute_residual_tolerance);
     GETPOT_INPUT(relative_residual_tolerance);
     GETPOT_INPUT(initial_linear_tolerance);
     GETPOT_INPUT(minimum_linear_tolerance);
