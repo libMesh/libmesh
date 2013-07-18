@@ -1,3 +1,7 @@
+0.9.2 -> 0.9.3
+  * FEMContext public members now private, must use API pushed in 0.9.2.
+    Breaks backward compatiblity of FEMContext.
+
 0.9.1 -> 0.9.2
   * PETSc 3.4 support
   * PETSc BAIJ matrix support for blocked matrices
