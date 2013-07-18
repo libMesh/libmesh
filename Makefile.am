@@ -105,7 +105,7 @@ install-data-hook:
 
 # this rule invokes emacs on each source file to remove trailing whitespace.
 beautify:
-	for file in `find $(srcdir)/{src,include,examples} -name "*.C" -o -name "*.h" -o -name Makefile.am -type f` ; do \
+	for file in `find $(srcdir)/{src,include,examples,tests} -name "*.C" -o -name "*.h" -o -name Makefile.am -type f` ; do \
 	  echo $$file ; \
 	  emacs -batch $$file --eval '(delete-trailing-whitespace)' -f save-buffer 2>/dev/null ; \
 	done

@@ -65,6 +65,7 @@ max_nonlinear_iterations = 10
 relative_step_tolerance = 1.e-5
 
 # How much residual reduction should indicate convergence?
+absolute_residual_tolerance = 1.e-5
 relative_residual_tolerance = 1.e-5
 
 # What should the largest relative linear tolerance be?

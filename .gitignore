@@ -79,10 +79,12 @@ config.cache
 
 libmesh-?.?.?.tar.*
 libtool
+
 tests/*/.deps/
 tests/*/.dirstamp
 tests/.deps/
 tests/.dirstamp
+tests/reduced_basis
 
 doc/html/doxygen/*.php
 doc/html/doxygen/*.png
@@ -212,3 +214,12 @@ contrib/autotools/lib
 contrib/autotools/share
 
 lib
+
+# build directories
+barebones
+build
+clang
+complex
+single
+trilinos_only
+xcode

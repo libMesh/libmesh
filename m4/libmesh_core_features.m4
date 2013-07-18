@@ -8,12 +8,13 @@ AC_MSG_RESULT(---------------------------------------------)
 
 
 # --------------------------------------------------------------
-# blocked matrix/vector storage - enabled by default
+# blocked matrix/vector storage - disabled by default.
+#   See http://sourceforge.net/mailarchive/forum.php?thread_name=B4613A7D-0033-43C7-A9DF-5A801217A097%40nasa.gov&forum_name=libmesh-devel
 # --------------------------------------------------------------
 AC_ARG_ENABLE(blocked-storage,
               [AC_HELP_STRING([--enable-blocked-storage],[Support for blocked matrix/vector storage])],
               enableblockedstorage=$enableval,
-              enableblockedstorage=yes)
+              enableblockedstorage=no)
 
 if test "$enableblockedstorage" != no ; then
   AC_MSG_RESULT([<<< Configuring library to use blocked storage data structures >>>])

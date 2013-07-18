@@ -371,7 +371,7 @@ void ExodusII_IO_Helper::read_block_info()
     check_err(ex_err, "Error getting block name.");
     id_to_block_names[block_ids[i]] = name_buffer;
   }
-  message("All block mames retrieved successfully.");
+  message("All block names retrieved successfully.");
 }
 
 
@@ -532,7 +532,7 @@ void ExodusII_IO_Helper::read_sideset_info()
     check_err(ex_err, "Error getting side set name.");
     id_to_ss_names[ss_ids[i]] = name_buffer;
   }
-  message("All side set mames retrieved successfully.");
+  message("All side set names retrieved successfully.");
 }
 
 void ExodusII_IO_Helper::read_nodeset_info()
@@ -558,7 +558,7 @@ void ExodusII_IO_Helper::read_nodeset_info()
     check_err(ex_err, "Error getting node set name.");
     id_to_ns_names[nodeset_ids[i]] = name_buffer;
   }
-  message("All node set mames retrieved successfully.");
+  message("All node set names retrieved successfully.");
 }
 
 

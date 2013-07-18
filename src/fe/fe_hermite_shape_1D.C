@@ -23,62 +23,13 @@
 #include "libmesh/elem.h"
 #include "libmesh/utility.h"
 
-#ifdef LIBMESH_HAVE_TBB_API
-#include "tbb/enumerable_thread_specific.h"
-#endif
-
-
-// Anonymous namespace for persistant variables.
-// This allows us to cache the global-to-local mapping transformation
-// This caching is turned off when TBB is enabled...
 namespace
 {
-  using namespace libMesh;
+using namespace libMesh;
 
-#ifndef LIBMESH_HAVE_TBB_API
-  static dof_id_type old_elem_id = DofObject::invalid_id;
-  // Coefficient naming: d(1)d(2n) is the coefficient of the
-  // global shape function corresponding to value 1 in terms of the
-  // local shape function corresponding to normal derivative 2
-  static Real d1xd1x, d2xd2x;
-#else //LIBMESH_HAVE_TBB_API
-  static tbb::enumerable_thread_specific< dof_id_type > old_elem_id_tls;
-  static tbb::enumerable_thread_specific< Real > d1xd1x_tls;
-  static tbb::enumerable_thread_specific< Real > d2xd2x_tls;
-#endif //LIBMESH_HAVE_TBB_API
-
-  // Compute the static coefficients for an element
-  void hermite_compute_coefs(const Elem* elem)
-  {
-#ifndef LIBMESH_HAVE_TBB_API
-    // Coefficients are cached from old elements
-    // ... except that we can't be sure that a renumbering didn't
-    // cause the first element id in a new assembly to match the
-    // last element id in an old assembly ...
-//    if (elem->id() == old_elem_id)
-//      return;
-
-    old_elem_id = elem->id();
-#else
-    bool old_elem_id_exists = false;
-    dof_id_type & old_elem_id = old_elem_id_tls.local(old_elem_id_exists);
-
-    if(!old_elem_id_exists)
-      old_elem_id = DofObject::invalid_id;
-
-    // Coefficients are cached from old elements
-    // ... except that we can't be sure that a renumbering didn't
-    // cause the first element id in a new assembly to match the
-    // last element id in an old assembly ...
-//    if (elem->id() == old_elem_id)
-//      return;
-
-    old_elem_id = elem->id();
-
-    Real & d1xd1x = d1xd1x_tls.local();
-    Real & d2xd2x = d2xd2x_tls.local();
-#endif //LIBMESH_HAVE_TBB_API
-
+// Compute the static coefficients for an element
+void hermite_compute_coefs(const Elem* elem, Real & d1xd1x, Real & d2xd2x)
+{
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
   const int n_mapping_shape_functions =
@@ -256,12 +207,12 @@ Real FE<1,HERMITE>::shape(const Elem* elem,
 {
   libmesh_assert(elem);
 
-  hermite_compute_coefs(elem);
+  // Coefficient naming: d(1)d(2n) is the coefficient of the
+  // global shape function corresponding to value 1 in terms of the
+  // local shape function corresponding to normal derivative 2
+  Real d1xd1x, d2xd2x;
 
-#ifdef LIBMESH_HAVE_TBB_API
-  Real & d1xd1x = d1xd1x_tls.local();
-  Real & d2xd2x = d2xd2x_tls.local();
-#endif //LIBMESH_HAVE_TBB_API
+  hermite_compute_coefs(elem, d1xd1x, d2xd2x);
 
   const ElemType type = elem->type();
 
@@ -337,12 +288,12 @@ Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
 {
   libmesh_assert(elem);
 
-  hermite_compute_coefs(elem);
+  // Coefficient naming: d(1)d(2n) is the coefficient of the
+  // global shape function corresponding to value 1 in terms of the
+  // local shape function corresponding to normal derivative 2
+  Real d1xd1x, d2xd2x;
 
-#ifdef LIBMESH_HAVE_TBB_API
-  Real & d1xd1x = d1xd1x_tls.local();
-  Real & d2xd2x = d2xd2x_tls.local();
-#endif //LIBMESH_HAVE_TBB_API
+  hermite_compute_coefs(elem, d1xd1x, d2xd2x);
 
   const ElemType type = elem->type();
 
@@ -399,12 +350,12 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
 {
   libmesh_assert(elem);
 
-  hermite_compute_coefs(elem);
+  // Coefficient naming: d(1)d(2n) is the coefficient of the
+  // global shape function corresponding to value 1 in terms of the
+  // local shape function corresponding to normal derivative 2
+  Real d1xd1x, d2xd2x;
 
-#ifdef LIBMESH_HAVE_TBB_API
-  Real & d1xd1x = d1xd1x_tls.local();
-  Real & d2xd2x = d2xd2x_tls.local();
-#endif //LIBMESH_HAVE_TBB_API
+  hermite_compute_coefs(elem, d1xd1x, d2xd2x);
 
   const ElemType type = elem->type();
 
