@@ -527,6 +527,7 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
       system.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver);
 
       solver->quiet                       = param.solver_quiet;
+      solver->verbose                     = !param.solver_quiet;
       solver->max_nonlinear_iterations    = param.max_nonlinear_iterations;
       solver->minsteplength               = param.min_step_length;
       solver->relative_step_tolerance     = param.relative_step_tolerance;
