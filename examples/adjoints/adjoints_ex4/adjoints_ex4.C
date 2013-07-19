@@ -399,9 +399,9 @@ int main (int argc, char** argv)
         // For refinement purposes we need to sort by error
 	// *magnitudes*, but AdjointRefinement gives us signed errors.
 	if (!param.refine_uniformly)
-          for (std::size_t i=0; i<error_per_cell.size(); i++)
-            if (error_per_cell[i] != 0.)
-              error_per_cell[i] = std::abs(error_per_cell[i]);
+          for (std::size_t i=0; i<QoI_elementwise_error.size(); i++)
+            if (QoI_elementwise_error[i] != 0.)
+              QoI_elementwise_error[i] = std::abs(QoI_elementwise_error[i]);
 
 	// We have to refine either based on reaching an error tolerance or
 	// a number of elements target, which should be verified above
