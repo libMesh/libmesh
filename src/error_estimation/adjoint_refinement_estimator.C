@@ -401,10 +401,18 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
       // The (string) name of this vector
       const std::string& var_name = vec->first;
 
-      system.get_vector(var_name) = *coarse_vectors[var_name];
+      // If it's a vector we already had (and not a newly created
+      // vector like an adjoint rhs), we need to restore it.
+      std::map<std::string, NumericVector<Number> *>::iterator it =
+        coarse_vectors.find(var_name);
+      if (it != coarse_vectors.end())
+        {
+          NumericVector<Number> *coarsevec = it->second;
+          system.get_vector(var_name) = *coarsevec;
 
-      coarse_vectors[var_name]->clear();
-      delete coarse_vectors[var_name];
+          coarsevec->clear();
+          delete coarsevec;
+        }
     }
 
   // Restore old partitioner and renumbering settings
