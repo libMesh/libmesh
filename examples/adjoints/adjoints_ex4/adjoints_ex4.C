@@ -396,6 +396,13 @@ int main (int argc, char** argv)
                  << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) /
 	  std::abs(QoI_1_computed - QoI_1_exact) << std::endl << std::endl;
 
+        // For refinement purposes we need to sort by error
+	// *magnitudes*, but AdjointRefinement gives us signed errors.
+	if (!param.refine_uniformly)
+          for (std::size_t i=0; i<error_per_cell.size(); i++)
+            if (error_per_cell[i] != 0.)
+              error_per_cell[i] = std::abs(error_per_cell[i]);
+
 	// We have to refine either based on reaching an error tolerance or
 	// a number of elements target, which should be verified above
 	// Otherwise we flag elements by error tolerance or nelem target
