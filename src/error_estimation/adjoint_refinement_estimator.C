@@ -40,6 +40,7 @@
 #include "libmesh/adjoint_refinement_estimator.h"
 
 #include LIBMESH_INCLUDE_UNORDERED_MAP
+#include LIBMESH_INCLUDE_UNORDERED_SET
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -188,10 +189,6 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // belongs to We first obtain the number of elements each node
   // belongs to
 
-  bool split_shared_dofs = false;
-
-  if (split_shared_dofs) {
-
   // A map that relates a node id to an int that will tell us how many elements it is a node of
   LIBMESH_BEST_UNORDERED_MAP<dof_id_type, unsigned int>shared_element_count;
 
@@ -205,7 +202,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
   // Keep track of which nodes we have already dealt with
-  std::vector<dof_id_type> processed_node_ids;
+  LIBMESH_BEST_UNORDERED_SET<dof_id_type> processed_node_ids;
 
   // Start loop over elems
   for(; elem_it != elem_end; ++elem_it)
@@ -222,21 +219,8 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	  // Get the id of this node
 	  dof_id_type node_id = node->id();
 
-	  // A processed node flag
-	  bool processed_node = false;
-
-	  // Loop over existing processed nodes and see if
-	  // we have already done this one
-	  for(std::size_t i = 0; i != processed_node_ids.size(); i++)
-	    {
-	      if(node_id == processed_node_ids[i])
-		{
-		  processed_node = true;
-		}
-	    }
-
 	  // If we havent already processed this node, do so now
-	  if(!processed_node)
+	  if(processed_node_ids.find(node_id) == processed_node_ids.end())
 	    {
 	      // Declare a neighbor_set to be filled by the find_point_neighbors
 	      std::set<const Elem *> fine_grid_neighbor_set;
@@ -294,15 +278,13 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	        libmesh_cast_int<unsigned int>(coarse_grid_neighbors.size());
 
 	      // Add this node to processed_node_ids vector
-	      processed_node_ids.push_back(node_id);
+	      processed_node_ids.insert(node_id);
 
-	    } // End if processed node
+	    } // End if not processed node
 
 	} // End loop over nodes
 
     }  // End loop over elems
-
-  } // if (split_shared_dofs)
 
   // Get a DoF map, will be used to get the nodal dof_indices for each element
   DofMap &dof_map = system.get_dof_map();
@@ -429,6 +411,11 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   mesh.partitioner() = old_partitioner;
   mesh.allow_renumbering(old_renumbering_setting);
 
+  // Fiinally sum the vector of estimated error values.
+  this->reduce_error(error_per_cell, system.comm());
+
+  // We don't take a square root here; this is a goal-oriented
+  // estimate not a Hilbert norm estimate.
 } // end estimate_error function
 
 }// namespace libMesh
