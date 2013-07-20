@@ -264,6 +264,11 @@ using namespace libMesh;
 	{
 	  const Elem* elem = *elem_it;
 
+          // We only calculate Dirichlet constraints on active
+          // elements
+          if (!elem->active())
+            continue;
+
 	  // Per-subdomain variables don't need to be projected on
 	  // elements where they're not active
 	  if (!variable.active_on_subdomain(elem->subdomain_id()))
