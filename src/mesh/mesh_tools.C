@@ -77,7 +77,7 @@ namespace {
 
 // If we don't have threads we never need a join, and icpc yells a
 // warning if it sees an anonymous function that's never used
-#if defined(LIBMESH_HAVE_PTHREAD) || defined(LIBMESH_HAVE_TBB_API)
+#if LIBMESH_USING_THREADS
     void join (const SumElemWeight &other)
     { _weight += other.weight(); }
 #endif
@@ -146,7 +146,7 @@ namespace {
 
 // If we don't have threads we never need a join, and icpc yells a
 // warning if it sees an anonymous function that's never used
-#if defined(LIBMESH_HAVE_PTHREAD) || defined(LIBMESH_HAVE_TBB_API)
+#if LIBMESH_USING_THREADS
     void join (const FindBBox &other)
     {
       for (unsigned int i=0; i<LIBMESH_DIM; i++)
