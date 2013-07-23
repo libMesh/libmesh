@@ -92,6 +92,11 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // This example uses an ExodusII input file
+#ifndef LIBMESH_HAVE_EXODUS_API
+  libmesh_example_assert(false, "--enable-exodus");
+#endif
+
   GetPot command_line (argc, argv);
   
   Real R = 2.;
