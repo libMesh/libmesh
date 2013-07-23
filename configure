@@ -1852,7 +1852,8 @@ Optional Features:
   --enable-trilinos       build with Trilinos support
   --enable-tbb            build with threading support via Threading Building
                           Blocks
-  --enable-pthreads       Build with pthread support
+  --enable-pthreads       build with threading support via POSIX threads
+                          (pthreads)
   --enable-cppthreads     Build with C++ std::thread support
   --enable-laspack        build with LASPACK iterative solver suppport
   --enable-sfc            build with space-filling curves suppport
@@ -30065,9 +30066,13 @@ fi
 # -------------------------------------------------------------
 # Check whether --enable-pthreads was given.
 if test "${enable_pthreads+set}" = set; then :
-  enableval=$enable_pthreads; enablepthreads=$enableval
+  enableval=$enable_pthreads; case "${enableval}" in
+		  yes)  enablepthreads=yes ;;
+		   no)  enablepthreads=no ;;
+ 		    *)  as_fn_error $? "bad value ${enableval} for --enable-pthreads" "$LINENO" 5 ;;
+		 esac
 else
-  enablepthreads=yes
+  enablepthreads=$enableoptional
 fi
 
 
@@ -30485,11 +30490,13 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 fi
 
-if (test $ax_pthread_ok = yes); then
+if (test x$ax_pthread_ok = xyes); then
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with pthread support >>>" >&5
 $as_echo "<<< Configuring library with pthread support >>>" >&6; }
   libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
   libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
+else
+  enablepthreads=no
 fi
 # -------------------------------------------------------------
 
@@ -37551,6 +37558,7 @@ if (test "x$enableoptional" = "xyes"); then
   if (test "x$enablepetsc" = "xyes"); then
   echo '     'version....................... : $petscversion
   fi
+  echo '  'pthreads......................... : $enablepthreads
   echo '  'sfcurves......................... : $enablesfc
   echo '  'slepc............................ : $enableslepc
   echo '  'tbb.............................. : $enabletbb
