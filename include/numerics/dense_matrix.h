@@ -107,7 +107,7 @@ public:
    * Left multipliess by the matrix \p M2 of different type
    */
   template <typename T2>
-  virtual void left_multiply (const DenseMatrixBase<T2>& M2);
+  void left_multiply (const DenseMatrixBase<T2>& M2);
 
   /**
    * Right multiplies by the matrix \p M2.
@@ -118,7 +118,7 @@ public:
    * Right multiplies by the matrix \p M2 of different type
    */
   template <typename T2>
-  virtual void right_multiply (const DenseMatrixBase<T2>& M2);
+  void right_multiply (const DenseMatrixBase<T2>& M2);
 
   /**
    * Performs the matrix-vector multiplication,
