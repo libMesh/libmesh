@@ -133,19 +133,25 @@ fi
 # Pthread support -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(pthreads,
-             AC_HELP_STRING([--enable-pthreads],
-                            [Build with pthread support]),
-             enablepthreads=$enableval,
-             enablepthreads=yes)
+              AC_HELP_STRING([--enable-pthreads],
+                             [build with threading support via POSIX threads (pthreads)]),
+		[case "${enableval}" in
+		  yes)  enablepthreads=yes ;;
+		   no)  enablepthreads=no ;;
+ 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-pthreads) ;;
+		 esac],
+		 [enablepthreads=$enableoptional])
 
 if (test "$enablepthreads" != no) ; then
   AX_PTHREAD
 fi
 
-if (test $ax_pthread_ok = yes); then
+if (test x$ax_pthread_ok = xyes); then
   AC_MSG_RESULT(<<< Configuring library with pthread support >>>)
   libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
   libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
+else
+  enablepthreads=no
 fi
 # -------------------------------------------------------------
 
