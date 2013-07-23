@@ -97,6 +97,9 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--enable-exodus");
 #endif
 
+  // Skip this 3D example if libMesh was compiled as 1D or 2D-only.
+  libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
+
   GetPot command_line (argc, argv);
   
   Real R = 2.;
