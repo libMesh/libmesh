@@ -156,6 +156,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i,
   else
     {
       AutoPtr<Elem> face(new Quad8);
+      face->subdomain_id() = this->subdomain_id();
 
       // Think of a unit cube: (-1,1) x (-1,1)x (1,1)
       switch (i)

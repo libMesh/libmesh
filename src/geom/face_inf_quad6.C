@@ -135,46 +135,51 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
 
   else
     {
+      // Create NULL pointer to be initialized, returned later.
+      AutoPtr<Elem> edge(NULL);
+
       switch (i)
 	{
 	case 0:
 	  {
-	    Edge3* edge = new Edge3;
+            edge.reset(new Edge3);
 
 	    edge->set_node(0) = this->get_node(0);
 	    edge->set_node(1) = this->get_node(1);
 	    edge->set_node(2) = this->get_node(4);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+	    break;
 	  }
 
 	case 1:
 	  {
 	    // adjacent to another infinite element
-	    InfEdge2* edge = new InfEdge2;
+            edge.reset(new InfEdge2);
 
 	    edge->set_node(0) = this->get_node(1);
 	    edge->set_node(1) = this->get_node(3);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+	    break;
 	  }
 
 	case 2:
 	  {
 	    // adjacent to another infinite element
-	    InfEdge2* edge = new InfEdge2;
+            edge.reset(new InfEdge2);
 
 	    edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
 	    edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+	    break;
 	  }
 	default:
 	  {
 	    libmesh_error();
-	    AutoPtr<Elem> ap(NULL);  return ap;
 	  }
 	}
+
+      edge->subdomain_id() = this->subdomain_id();
+      return edge;
     }
 
   // We will never get here...

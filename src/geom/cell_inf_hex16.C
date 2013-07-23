@@ -135,12 +135,15 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
 
   else
     {
-      // Think of a unit cube: (-1,1) x (-1,1)x (1,1)
+      // Create NULL pointer to be initialized, returned later.
+      AutoPtr<Elem> face(NULL);
+
+      // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
       switch (i)
 	{
 	case 0: // the base face
 	  {
-	    AutoPtr<Elem> face(new Quad8);
+            face.reset(new Quad8);
 
 	    // Only here, the face element's normal points inward
 	    face->set_node(0) = this->get_node(0);
@@ -152,12 +155,12 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
 	    face->set_node(6) = this->get_node(10);
 	    face->set_node(7) = this->get_node(11);
 
-	    return face;
+	    break;
 	  }
 
 	case 1:  // connecting to another infinite element
 	  {
-	    AutoPtr<Elem> face(new InfQuad6);
+            face.reset(new InfQuad6);
 
 	    face->set_node(0) = this->get_node(0);
 	    face->set_node(1) = this->get_node(1);
@@ -166,12 +169,12 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
 	    face->set_node(4) = this->get_node(8);
 	    face->set_node(5) = this->get_node(12);
 
-	    return face;
+	    break;
 	  }
 
 	case 2:  // connecting to another infinite element
 	  {
-	    AutoPtr<Elem> face(new InfQuad6);
+            face.reset(new InfQuad6);
 
 	    face->set_node(0) = this->get_node(1);
 	    face->set_node(1) = this->get_node(2);
@@ -180,12 +183,12 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
 	    face->set_node(4) = this->get_node(9);
 	    face->set_node(5) = this->get_node(13);
 
-	    return face;
+	    break;
 	  }
 
 	case 3:  // connecting to another infinite element
 	  {
-	    AutoPtr<Elem> face(new InfQuad6);
+            face.reset(new InfQuad6);
 
 	    face->set_node(0) = this->get_node(2);
 	    face->set_node(1) = this->get_node(3);
@@ -194,12 +197,12 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
 	    face->set_node(4) = this->get_node(10);
 	    face->set_node(5) = this->get_node(14);
 
-	    return face;
+	    break;
 	  }
 
 	case 4:  // connecting to another infinite element
 	  {
-	    AutoPtr<Elem> face(new InfQuad6);
+            face.reset(new InfQuad6);
 
 	    face->set_node(0) = this->get_node(3);
 	    face->set_node(1) = this->get_node(0);
@@ -208,15 +211,17 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
 	    face->set_node(4) = this->get_node(11);
 	    face->set_node(5) = this->get_node(15);
 
-	    return face;
+	    break;
 	  }
 
 	default:
 	  {
 	    libmesh_error();
-	    AutoPtr<Elem> ap(NULL);  return ap;
 	  }
 	}
+
+      face->subdomain_id() = this->subdomain_id();
+      return face;
     }
 
 

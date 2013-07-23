@@ -140,6 +140,7 @@ AutoPtr<Elem> Tet4::build_side (const unsigned int i,
   else
     {
       AutoPtr<Elem> face(new Tri3);
+      face->subdomain_id() = this->subdomain_id();
 
       switch (i)
 	{
