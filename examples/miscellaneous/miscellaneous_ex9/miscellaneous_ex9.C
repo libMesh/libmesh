@@ -201,7 +201,7 @@ void assemble_poisson(EquationSystems& es,
   DenseMatrix<Number> Kee;
   DenseMatrix<Number> Knn;
 
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
@@ -257,7 +257,7 @@ void assemble_poisson(EquationSystems& es,
                 
                 ElementIdMap::const_iterator ltu_it =
                   lower_to_upper.find(std::make_pair(elem->id(),side));
-                unsigned int upper_elem_id = ltu_it->second;
+                dof_id_type upper_elem_id = ltu_it->second;
                 const Elem* neighbor = mesh.elem(upper_elem_id);
                 
                 std::vector<Point> qface_neighbor_points;
