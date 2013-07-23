@@ -59,7 +59,8 @@ void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
 
 
 
-template<typename T, typename T2>
+template<typename T>
+template<typename T2>
 void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T2>& M2)
 {
   // (*this) <- M2 * (*this)
@@ -145,7 +146,8 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
 
 
 
-template<typename T, typename T2>
+template<typename T>
+template<typename T2>
 void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T2>& A)
 {
   //Check to see if we are doing (A^T)*A
@@ -229,7 +231,8 @@ void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
 
 
 
-template<typename T, typename T2>
+template<typename T>
+template<typename T2>
 void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T2>& M3)
 {
   // (*this) <- M3 * (*this)
@@ -314,7 +317,8 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
 
 
 
-template<typename T, typename T2>
+template<typename T>
+template<typename T2>
 void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T2>& B)
 {
   //Check to see if we are doing B*(B^T)
@@ -405,7 +409,8 @@ void DenseMatrix<T>::vector_mult
 
 
 
-template<typename T, typename T2>
+template<typename T>
+template<typename T2>
 void DenseMatrix<T>::vector_mult
   (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
    const DenseVector<T2>& arg) const
@@ -470,7 +475,8 @@ void DenseMatrix<T>::vector_mult_transpose
 
 
 
-template<typename T, typename T2>
+template<typename T>
+template<typename T2>
 void DenseMatrix<T>::vector_mult_transpose
   (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
    const DenseVector<T2>& arg) const
@@ -527,7 +533,8 @@ void DenseMatrix<T>::vector_mult_add
 
 
 
-template<typename T, typename T2, typename T3>
+template<typename T>
+template<typename T2, typename T3>
 void DenseMatrix<T>::vector_mult_add
   (DenseVector<
      typename CompareTypes<T,
