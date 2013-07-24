@@ -160,6 +160,7 @@ DofMap::DofMap(const unsigned int number,
 #endif
 #ifdef LIBMESH_ENABLE_DIRICHLET
   , _dirichlet_boundaries(new DirichletBoundaries)
+  , _adjoint_dirichlet_boundaries()
 #endif
 {
   _matrices.clear();
@@ -176,6 +177,8 @@ DofMap::~DofMap()
 #endif
 #ifdef LIBMESH_ENABLE_DIRICHLET
   delete _dirichlet_boundaries;
+  for (unsigned int q = 0; q != _adjoint_dirichlet_boundaries.size(); ++q)
+    delete _adjoint_dirichlet_boundaries[q];
 #endif
 }
 

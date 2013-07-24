@@ -99,6 +99,21 @@ class DofConstraints : public std::map<dof_id_type,
 {
 };
 
+class AdjointDofConstraintMap : 
+  public std::map<dof_id_type, Number,
+                  std::less<dof_id_type>,
+                  Threads::scalable_allocator<std::pair<const dof_id_type, Number> > >
+{
+};
+
+class AdjointDofConstraintValues : 
+  public std::map<unsigned int, AdjointDofConstraintMap,
+                  std::less<unsigned int>,
+                  Threads::scalable_allocator
+	            <std::pair<const unsigned int, AdjointDofConstraintMap> > >
+{
+};
+
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
 /**
  * A row of the Node constraint mapping.  Currently this just
@@ -827,13 +842,34 @@ public:
   void add_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary);
 
   /**
+   * Adds a copy of the specified Dirichlet boundary to the system,
+   * corresponding to the adjoint problem defined by Quantity of
+   * Interest \p q.
+   */
+  void add_adjoint_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary, 
+				       unsigned int q);
+
+  /**
    * Removes the specified Dirichlet boundary from the system.
    */
   void remove_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary);
 
+  /**
+   * Removes from the system the specified Dirichlet boundary for the
+   * adjoint equation defined by Quantity of interest index q
+   */
+  void remove_adjoint_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary,
+					  unsigned int q);
+
   DirichletBoundaries * get_dirichlet_boundaries()
     {
       return _dirichlet_boundaries;
+    }
+
+  DirichletBoundaries * get_adjoint_dirichlet_boundaries(unsigned int q)
+    {
+      libmesh_assert_greater(_adjoint_dirichlet_boundaries.size(),q);
+      return _adjoint_dirichlet_boundaries[q];
     }
 
 #endif // LIBMESH_ENABLE_DIRICHLET
@@ -1198,6 +1234,12 @@ private:
    * entry is the constraint matrix row for boundaryid i.
    */
   DirichletBoundaries *_dirichlet_boundaries;
+
+  /**
+   * Data structure containing Dirichlet functions.  The ith
+   * entry is the constraint matrix row for boundaryid i.
+   */
+  std::vector<DirichletBoundaries *> _adjoint_dirichlet_boundaries;
 #endif
 
   friend class SparsityPattern::Build;

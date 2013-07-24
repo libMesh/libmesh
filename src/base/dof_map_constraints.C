@@ -3083,6 +3083,17 @@ void DofMap::add_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary
 }
 
 
+void DofMap::add_adjoint_dirichlet_boundary 
+  (const DirichletBoundary& dirichlet_boundary,
+   unsigned int qoi_index)
+{
+  if (_adjoint_dirichlet_boundaries.size() <= qoi_index)
+    _adjoint_dirichlet_boundaries.resize(qoi_index+1, new DirichletBoundaries());
+
+  _adjoint_dirichlet_boundaries[qoi_index]->push_back(new DirichletBoundary(dirichlet_boundary));
+}
+
+
 void DofMap::remove_dirichlet_boundary (const DirichletBoundary& boundary_to_remove)
 {
   // Find a boundary condition matching the one to be removed
@@ -3101,6 +3112,33 @@ void DofMap::remove_dirichlet_boundary (const DirichletBoundary& boundary_to_rem
   libmesh_assert (it != end);
   delete *it;
   _dirichlet_boundaries->erase(it);
+}
+
+
+void DofMap::remove_adjoint_dirichlet_boundary (const DirichletBoundary& boundary_to_remove,
+						unsigned int qoi_index)
+{
+  libmesh_assert_greater(_adjoint_dirichlet_boundaries.size(),
+			 qoi_index);
+
+  // Find a boundary condition matching the one to be removed
+  std::vector<DirichletBoundary *>::iterator it =
+    _adjoint_dirichlet_boundaries[qoi_index]->begin();
+  std::vector<DirichletBoundary *>::iterator end =
+    _adjoint_dirichlet_boundaries[qoi_index]->end();
+  for (; it != end; ++it)
+    {
+      DirichletBoundary *bdy = *it;
+
+      if ((bdy->b == boundary_to_remove.b) &&
+	   bdy->variables == boundary_to_remove.variables)
+	break;
+    }
+
+  // Delete it and remove it
+  libmesh_assert (it != end);
+  delete *it;
+  _adjoint_dirichlet_boundaries[qoi_index]->erase(it);
 }
 
 
