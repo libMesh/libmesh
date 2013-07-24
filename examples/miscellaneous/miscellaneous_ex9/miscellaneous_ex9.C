@@ -48,7 +48,7 @@
 
 // libMesh includes
 #include "libmesh/libmesh.h"
-#include "libmesh/mesh.h"
+#include "libmesh/serial_mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/exodusII_io.h"
@@ -110,7 +110,9 @@ int main (int argc, char** argv)
   if ( command_line.search(1, "-R") )
     R = command_line.next(R);
 
-  Mesh mesh;
+  // Maintaining the right ghost elements on a ParallelMesh is
+  // trickier.
+  SerialMesh mesh;
   mesh.read("miscellaneous_ex9.exo");
   
   EquationSystems equation_systems (mesh);
