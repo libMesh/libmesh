@@ -734,6 +734,8 @@ LIBMESH_ENABLE_GMV_FALSE
 LIBMESH_ENABLE_GMV_TRUE
 GMV_LIBRARY
 GMV_INCLUDE
+LIBMESH_ENABLE_QHULL_FALSE
+LIBMESH_ENABLE_QHULL_TRUE
 LIBMESH_ENABLE_TRIANGLE_FALSE
 LIBMESH_ENABLE_TRIANGLE_TRUE
 TRIANGLE_LIBRARY
@@ -1121,6 +1123,7 @@ with_metis
 enable_parmetis
 enable_tetgen
 enable_triangle
+enable_qhull
 enable_gmv
 enable_vtk
 with_vtk_include
@@ -1891,6 +1894,7 @@ Optional Features:
                           support
   --disable-triangle      build without Triangle Delaunay triangulation
                           library support
+  --enable-qhull          build with Qhull API support
   --disable-gmv           build without GMV file I/O support
   --disable-vtk           build without VTK file I/O support
   --disable-eigen         build without Eigen linear algebra support
@@ -32115,6 +32119,53 @@ ac_config_files="$ac_config_files contrib/triangle/Makefile"
 
 
 # -------------------------------------------------------------
+# Qhull -- enabled by default
+# -------------------------------------------------------------
+
+  # Check whether --enable-qhull was given.
+if test "${enable_qhull+set}" = set; then :
+  enableval=$enable_qhull; case "${enableval}" in
+		  yes)  enableqhull=yes;;
+		   no)  enableqhull=no;;
+ 		    *)  as_fn_error $? "bad value ${enableval} for --enable-qhull" "$LINENO" 5 ;;
+		 esac
+else
+  enableqhull=$enableoptional
+fi
+ # if unspecified, depend on enableoptional
+
+  QHULL_INCLUDE=""
+
+  # fix for --disable-optional
+  if (test "x$enableqhull" = "xyes"); then
+      # The QHULL API is distributed with libmesh, so we don't have to guess
+      # where it might be installed...
+      QHULL_INCLUDE="-I\$(top_srcdir)/contrib/qhull/qhull/src/libqhull -I\$(top_srcdir)/contrib/qhull/qhull/src/libqhullcpp"
+
+$as_echo "#define HAVE_QHULL_API 1" >>confdefs.h
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Qhull version 2012.1 support >>>" >&5
+$as_echo "<<< Configuring library with Qhull version 2012.1 support >>>" >&6; }
+  fi
+
+if (test $enableqhull = yes); then
+  libmesh_contrib_INCLUDES="$QHULL_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+ if test x$enableqhull = xyes; then
+  LIBMESH_ENABLE_QHULL_TRUE=
+  LIBMESH_ENABLE_QHULL_FALSE='#'
+else
+  LIBMESH_ENABLE_QHULL_TRUE='#'
+  LIBMESH_ENABLE_QHULL_FALSE=
+fi
+
+ac_config_files="$ac_config_files contrib/qhull/qhull/Makefile"
+
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
 # GMV -- file I/O API is enabled by default (it is distributed in contrib)
 # -------------------------------------------------------------
 
@@ -34538,6 +34589,10 @@ if test -z "${LIBMESH_ENABLE_TRIANGLE_TRUE}" && test -z "${LIBMESH_ENABLE_TRIANG
   as_fn_error $? "conditional \"LIBMESH_ENABLE_TRIANGLE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${LIBMESH_ENABLE_QHULL_TRUE}" && test -z "${LIBMESH_ENABLE_QHULL_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_QHULL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${LIBMESH_ENABLE_GMV_TRUE}" && test -z "${LIBMESH_ENABLE_GMV_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_GMV\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -35815,6 +35870,7 @@ do
     "contrib/parmetis/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/parmetis/Makefile" ;;
     "contrib/tetgen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/tetgen/Makefile" ;;
     "contrib/triangle/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/triangle/Makefile" ;;
+    "contrib/qhull/qhull/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/qhull/qhull/Makefile" ;;
     "contrib/gmv/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/gmv/Makefile" ;;
     "contrib/eigen/eigen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/eigen/eigen/Makefile" ;;
     "contrib/netcdf/v3/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/netcdf/v3/Makefile" ;;
@@ -38092,6 +38148,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo '     'version....................... : $petscversion
   fi
   echo '  'pthreads......................... : $enablepthreads
+  echo '  'qhull............................ : $enableqhull
   echo '  'sfcurves......................... : $enablesfc
   echo '  'slepc............................ : $enableslepc
   echo '  'tbb.............................. : $enabletbb
