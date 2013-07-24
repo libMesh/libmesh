@@ -32,7 +32,10 @@ AC_DEFUN([CONFIGURE_METIS],
      METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext) \$(EXTERNAL_LIBDIR)/libGK\$(libext)"
      AC_DEFINE(HAVE_METIS, 1, [Flag indicating whether the library will be compiled with Metis support])
      AC_MSG_RESULT(<<< Configuring library with Metis support >>>)
-  else
+
+     dnl look for thread-local storage
+     AX_TLS
+ else
      METIS_INCLUDE=""
      METIS_LIB=""
      enablemetis=no

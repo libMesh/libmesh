@@ -1852,7 +1852,8 @@ Optional Features:
   --enable-trilinos       build with Trilinos support
   --enable-tbb            build with threading support via Threading Building
                           Blocks
-  --enable-pthreads       Build with pthread support
+  --enable-pthreads       build with threading support via POSIX threads
+                          (pthreads)
   --enable-cppthreads     Build with C++ std::thread support
   --enable-laspack        build with LASPACK iterative solver suppport
   --enable-sfc            build with space-filling curves suppport
@@ -30065,9 +30066,13 @@ fi
 # -------------------------------------------------------------
 # Check whether --enable-pthreads was given.
 if test "${enable_pthreads+set}" = set; then :
-  enableval=$enable_pthreads; enablepthreads=$enableval
+  enableval=$enable_pthreads; case "${enableval}" in
+		  yes)  enablepthreads=yes ;;
+		   no)  enablepthreads=no ;;
+ 		    *)  as_fn_error $? "bad value ${enableval} for --enable-pthreads" "$LINENO" 5 ;;
+		 esac
 else
-  enablepthreads=yes
+  enablepthreads=$enableoptional
 fi
 
 
@@ -30485,11 +30490,13 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 fi
 
-if (test $ax_pthread_ok = yes); then
+if (test x$ax_pthread_ok = xyes); then
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with pthread support >>>" >&5
 $as_echo "<<< Configuring library with pthread support >>>" >&6; }
   libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
   libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
+else
+  enablepthreads=no
 fi
 # -------------------------------------------------------------
 
@@ -31322,7 +31329,59 @@ $as_echo "#define HAVE_METIS 1" >>confdefs.h
 
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Metis support >>>" >&5
 $as_echo "<<< Configuring library with Metis support >>>" >&6; }
-  else
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for thread local storage (TLS) class" >&5
+$as_echo_n "checking for thread local storage (TLS) class... " >&6; }
+  if ${ac_cv_tls+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    ax_tls_keywords="__thread __declspec(thread) none"
+    for ax_tls_keyword in $ax_tls_keywords; do
+       case $ax_tls_keyword in
+          none) ac_cv_tls=none ; break ;;
+	  *)
+             cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdlib.h>
+                 static void
+                 foo(void) {
+                 static  $ax_tls_keyword  int bar;
+                 exit(1);
+                 }
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_tls=$ax_tls_keyword ; break
+else
+  ac_cv_tls=none
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+	  esac
+    done
+
+fi
+
+
+  if test "$ac_cv_tls" != "none"; then
+
+cat >>confdefs.h <<_ACEOF
+#define TLS $ac_cv_tls
+_ACEOF
+
+  fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_tls" >&5
+$as_echo "$ac_cv_tls" >&6; }
+
+ else
      METIS_INCLUDE=""
      METIS_LIB=""
      enablemetis=no
@@ -37551,6 +37610,7 @@ if (test "x$enableoptional" = "xyes"); then
   if (test "x$enablepetsc" = "xyes"); then
   echo '     'version....................... : $petscversion
   fi
+  echo '  'pthreads......................... : $enablepthreads
   echo '  'sfcurves......................... : $enablesfc
   echo '  'slepc............................ : $enableslepc
   echo '  'tbb.............................. : $enabletbb
