@@ -193,8 +193,50 @@ AutoPtr<Elem> InfQuad4::build_side (const unsigned int i,
 
   else
     {
-      // FIXME: Find out how to return non-proxy side
-      libmesh_error();
+      // Create NULL pointer to be initialized, returned later.
+      AutoPtr<Elem> edge(NULL);
+
+      switch (i)
+	{
+	case 0:
+	  {
+            edge.reset(new Edge2);
+
+	    edge->set_node(0) = this->get_node(0);
+	    edge->set_node(1) = this->get_node(1);
+
+	    break;
+	  }
+
+	case 1:
+	  {
+	    // adjacent to another infinite element
+            edge.reset(new InfEdge2);
+
+	    edge->set_node(0) = this->get_node(1);
+	    edge->set_node(1) = this->get_node(3);
+
+	    break;
+	  }
+
+	case 2:
+	  {
+	    // adjacent to another infinite element
+            edge.reset(new InfEdge2);
+
+	    edge->set_node(0) = this->get_node(0);
+	    edge->set_node(1) = this->get_node(2);
+
+	    break;
+	  }
+	default:
+	  {
+	    libmesh_error();
+	  }
+	}
+
+      edge->subdomain_id() = this->subdomain_id();
+      return edge;
     }
 
   // How did we get here

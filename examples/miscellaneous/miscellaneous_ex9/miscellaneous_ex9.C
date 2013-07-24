@@ -92,6 +92,14 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // This example uses an ExodusII input file
+#ifndef LIBMESH_HAVE_EXODUS_API
+  libmesh_example_assert(false, "--enable-exodus");
+#endif
+
+  // Skip this 3D example if libMesh was compiled as 1D or 2D-only.
+  libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
+
   GetPot command_line (argc, argv);
   
   Real R = 2.;
@@ -193,7 +201,7 @@ void assemble_poisson(EquationSystems& es,
   DenseMatrix<Number> Kee;
   DenseMatrix<Number> Knn;
 
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
@@ -249,7 +257,7 @@ void assemble_poisson(EquationSystems& es,
                 
                 ElementIdMap::const_iterator ltu_it =
                   lower_to_upper.find(std::make_pair(elem->id(),side));
-                unsigned int upper_elem_id = ltu_it->second;
+                dof_id_type upper_elem_id = ltu_it->second;
                 const Elem* neighbor = mesh.elem(upper_elem_id);
                 
                 std::vector<Point> qface_neighbor_points;

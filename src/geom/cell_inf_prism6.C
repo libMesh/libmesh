@@ -130,8 +130,67 @@ AutoPtr<Elem> InfPrism6::build_side (const unsigned int i,
 
   else
     {
-      // FIXME: Find out how to return non-proxy side
-      libmesh_error();
+      // Create NULL pointer to be initialized, returned later.
+      AutoPtr<Elem> face(NULL);
+
+      switch (i)
+	{
+	case 0:  // the triangular face at z=-1, base face
+	  {
+            face.reset(new Tri3);
+
+	    // Note that for this face element, the normal points inward
+	    face->set_node(0) = this->get_node(0);
+	    face->set_node(1) = this->get_node(1);
+	    face->set_node(2) = this->get_node(2);
+
+	    break;
+	  }
+
+	case 1:  // the quad face at y=0
+	  {
+            face.reset(new InfQuad4);
+
+	    face->set_node(0) = this->get_node(0);
+	    face->set_node(1) = this->get_node(1);
+	    face->set_node(2) = this->get_node(3);
+	    face->set_node(3) = this->get_node(4);
+
+	    break;
+	  }
+
+	case 2:  // the other quad face
+	  {
+            face.reset(new InfQuad4);
+
+	    face->set_node(0) = this->get_node(1);
+	    face->set_node(1) = this->get_node(2);
+	    face->set_node(2) = this->get_node(4);
+	    face->set_node(3) = this->get_node(5);
+
+	    break;
+	  }
+
+	case 3: // the quad face at x=0
+	  {
+            face.reset(new InfQuad4);
+
+	    face->set_node(0) = this->get_node(2);
+	    face->set_node(1) = this->get_node(0);
+	    face->set_node(2) = this->get_node(5);
+	    face->set_node(3) = this->get_node(3);
+
+	    break;
+	  }
+
+	default:
+	  {
+	    libmesh_error();
+	  }
+	}
+
+      face->subdomain_id() = this->subdomain_id();
+      return face;
     }
 
 

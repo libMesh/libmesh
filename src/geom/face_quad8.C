@@ -202,7 +202,8 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i,
 
   else
     {
-      Edge3* edge = new Edge3;
+      AutoPtr<Elem> edge(new Edge3);
+      edge->subdomain_id() = this->subdomain_id();
 
       switch (i)
 	{
@@ -212,7 +213,7 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i,
 	    edge->set_node(1) = this->get_node(1);
 	    edge->set_node(2) = this->get_node(4);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+            return edge;
 	  }
 	case 1:
 	  {
@@ -220,7 +221,7 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i,
 	    edge->set_node(1) = this->get_node(2);
 	    edge->set_node(2) = this->get_node(5);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+	    return edge;
 	  }
 	case 2:
 	  {
@@ -228,7 +229,7 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i,
 	    edge->set_node(1) = this->get_node(3);
 	    edge->set_node(2) = this->get_node(6);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+	    return edge;
 	  }
 	case 3:
 	  {
@@ -236,7 +237,7 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i,
 	    edge->set_node(1) = this->get_node(0);
 	    edge->set_node(2) = this->get_node(7);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+	    return edge;
 	  }
 	default:
 	  {

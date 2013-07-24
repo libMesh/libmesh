@@ -137,44 +137,38 @@ AutoPtr<Elem> Quad4::build_side (const unsigned int i,
 
   else
     {
+      AutoPtr<Elem> edge(new Edge2);
+      edge->subdomain_id() = this->subdomain_id();
 
       switch (i)
 	{
 	case 0:
 	  {
-	    Edge2* edge = new Edge2;
-
 	    edge->set_node(0) = this->get_node(0);
 	    edge->set_node(1) = this->get_node(1);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+            return edge;
 	  }
 	case 1:
 	  {
-	    Edge2* edge = new Edge2;
-
 	    edge->set_node(0) = this->get_node(1);
 	    edge->set_node(1) = this->get_node(2);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+	    return edge;
 	  }
 	case 2:
 	  {
-	    Edge2* edge = new Edge2;
-
 	    edge->set_node(0) = this->get_node(2);
 	    edge->set_node(1) = this->get_node(3);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+	    return edge;
 	  }
 	case 3:
 	  {
-	    Edge2* edge = new Edge2;
-
 	    edge->set_node(0) = this->get_node(3);
 	    edge->set_node(1) = this->get_node(0);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+	    return edge;
 	  }
 	default:
 	  {

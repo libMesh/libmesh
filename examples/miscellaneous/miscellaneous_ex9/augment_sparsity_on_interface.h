@@ -5,7 +5,7 @@
 #include "libmesh/equation_systems.h"
 
 // Convenient typedef for a map for (element id,side id) --> element neighbor id
-typedef std::map< std::pair<unsigned int,unsigned int>, unsigned int > ElementIdMap;
+typedef std::map< std::pair<dof_id_type,unsigned char>, dof_id_type> ElementIdMap;
 
 class AugmentSparsityOnInterface : public DofMap::AugmentSparsityPattern
 {
