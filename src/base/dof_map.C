@@ -154,6 +154,8 @@ DofMap::DofMap(const unsigned int number,
 #endif
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   , _dof_constraints()
+  , _primal_constraint_values()
+  , _adjoint_constraint_values()
 #endif
 #ifdef LIBMESH_ENABLE_PERIODIC
   , _periodic_boundaries(new PeriodicBoundaries)
@@ -818,6 +820,8 @@ void DofMap::clear()
 #ifdef LIBMESH_ENABLE_AMR
 
   _dof_constraints.clear();
+  _primal_constraint_values.clear();
+  _adjoint_constraint_values.clear();
   _n_old_dfs = 0;
   _first_old_df.clear();
   _end_old_df.clear();
@@ -2141,7 +2145,7 @@ void DofMap::find_connected_dofs (std::vector<dof_id_type>& elem_dofs) const
 
 	libmesh_assert (pos != _dof_constraints.end());
 
-	const DofConstraintRow& constraint_row = pos->second.first;
+	const DofConstraintRow& constraint_row = pos->second;
 
 // adaptive p refinement currently gives us lots of empty constraint
 // rows - we should optimize those DoFs away in the future.  [RHS]
@@ -2903,7 +2907,7 @@ std::string DofMap::get_info() const
           constrained_dof >= this->end_dof())
         continue;
 
-      const DofConstraintRow& row = it->second.first;
+      const DofConstraintRow& row = it->second;
       std::size_t rowsize = row.size();
 
       max_constraint_length = std::max(max_constraint_length,
@@ -2911,7 +2915,7 @@ std::string DofMap::get_info() const
       avg_constraint_length += rowsize;
       n_constraints++;
 
-      if (it->second.second != Number(0))
+      if (_primal_constraint_values.count(constrained_dof))
         n_rhss++;
     }
 

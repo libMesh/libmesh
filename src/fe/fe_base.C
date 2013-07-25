@@ -1815,9 +1815,8 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
                   if (dof_map.is_constrained_dof(my_dof_g))
                     continue;
 
-		  constraint_row = &(constraints[my_dof_g].first);
+		  constraint_row = &(constraints[my_dof_g]);
                   libmesh_assert(constraint_row->empty());
-		  constraints[my_dof_g].second = 0;
                 }
 
 	        for (unsigned int is = 0; is != n_side_dofs; ++is)
@@ -2518,9 +2517,8 @@ compute_periodic_constraints (DofConstraints &constraints,
                         if (dof_map.is_constrained_dof(my_dof_g))
                           continue;
 
-		        constraint_row = &(constraints[my_dof_g].first);
+		        constraint_row = &(constraints[my_dof_g]);
                         libmesh_assert(constraint_row->empty());
-		        constraints[my_dof_g].second = 0;
                       }
 
 	              for (unsigned int is = 0; is != n_side_dofs; ++is)

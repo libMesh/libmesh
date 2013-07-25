@@ -93,18 +93,18 @@ typedef std::map<dof_id_type, Real,
  * a pointer-to-std::map; the destructor isn't virtual!
  */
 class DofConstraints : public std::map<dof_id_type,
-                                       std::pair<DofConstraintRow,Number>,
+                                       DofConstraintRow,
                                        std::less<dof_id_type>,
-                                       Threads::scalable_allocator<std::pair<const dof_id_type, std::pair<DofConstraintRow,Number> > > >
+                                       Threads::scalable_allocator<std::pair<const dof_id_type, Number> > >
 {
 };
 
 /**
- * Storage for DofConstraint right hand sides for a particular adjoint
- * problem.  Each dof id with a non-zero adjoint constraint value
- * stores it here.
+ * Storage for DofConstraint right hand sides for a particular
+ * problem.  Each dof id with a non-zero constraint offset
+ * stores it in such a structure.
  */
-class AdjointDofConstraintMap : 
+class DofConstraintValueMap : 
   public std::map<dof_id_type, Number,
                   std::less<dof_id_type>,
                   Threads::scalable_allocator<std::pair<const dof_id_type, Number> > >
@@ -116,10 +116,10 @@ class AdjointDofConstraintMap :
  * problems.
  */
 class AdjointDofConstraintValues : 
-  public std::map<unsigned int, AdjointDofConstraintMap,
+  public std::map<unsigned int, DofConstraintValueMap,
                   std::less<unsigned int>,
                   Threads::scalable_allocator
-	            <std::pair<const unsigned int, AdjointDofConstraintMap> > >
+	            <std::pair<const unsigned int, DofConstraintValueMap> > >
 {
 };
 
@@ -1228,7 +1228,9 @@ private:
    * Data structure containing DOF constraints.  The ith
    * entry is the constraint matrix row for DOF i.
    */
-  DofConstraints _dof_constraints;
+  DofConstraints             _dof_constraints;
+
+  DofConstraintValueMap      _primal_constraint_values;
 
   AdjointDofConstraintValues _adjoint_constraint_values;
 #endif
