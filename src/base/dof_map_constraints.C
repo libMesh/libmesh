@@ -1646,6 +1646,118 @@ void DofMap::enforce_constraints_exactly (const System &system,
 
 
 
+void DofMap::enforce_adjoint_constraints_exactly
+  (NumericVector<Number> *v,
+   unsigned int q) const
+{
+  parallel_object_only();
+
+  if (!this->n_constrained_dofs())
+    return;
+
+  START_LOG("enforce_adjoint_constraints_exactly()","DofMap");
+
+  libmesh_assert(v);
+
+  NumericVector<Number> *v_local  = NULL; // will be initialized below
+  NumericVector<Number> *v_global = NULL; // will be initialized below
+  AutoPtr<NumericVector<Number> > v_built;
+  if (v->type() == SERIAL)
+    {
+      v_built = NumericVector<Number>::build(this->comm());
+      v_built->init(this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
+      v_built->close();
+
+      for (dof_id_type i=v_built->first_local_index();
+           i<v_built->last_local_index(); i++)
+        v_built->set(i, (*v)(i));
+      v_built->close();
+      v_global = v_built.get();
+
+      v_local = v;
+      libmesh_assert (v_local->closed());
+    }
+  else if (v->type() == PARALLEL)
+    {
+      v_built = NumericVector<Number>::build(this->comm());
+      v_built->init (v->size(), v->size(), true, SERIAL);
+      v->localize(*v_built);
+      v_built->close();
+      v_local = v_built.get();
+
+      v_global = v;
+    }
+  else if (v->type() == GHOSTED)
+    {
+      v_local = v;
+      v_global = v;
+    }
+  else // unknown v->type()
+    {
+      libMesh::err << "ERROR: Unknown v->type() == " << v->type()
+		    << std::endl;
+      libmesh_error();
+    }
+
+  // We should never hit these asserts because we should error-out in
+  // else clause above.  Just to be sure we don't try to use v_local
+  // and v_global uninitialized...
+  libmesh_assert(v_local);
+  libmesh_assert(v_global);
+
+  // Do we have any non_homogeneous constraints?
+  const AdjointDofConstraintValues::const_iterator
+    adjoint_constraint_map_it = _adjoint_constraint_values.find(q);
+  const AdjointDofConstraintMap *constraint_map =
+    (adjoint_constraint_map_it == _adjoint_constraint_values.end()) ?
+      NULL : &adjoint_constraint_map_it->second;
+
+  DofConstraints::const_iterator c_it = _dof_constraints.begin();
+  const DofConstraints::const_iterator c_end = _dof_constraints.end();
+
+  for ( ; c_it != c_end; ++c_it)
+    {
+      dof_id_type constrained_dof = c_it->first;
+      if (constrained_dof < this->first_dof() ||
+          constrained_dof >= this->end_dof())
+        continue;
+
+      const DofConstraintRow constraint_row = c_it->second.first;
+
+      Number exact_value = 0;
+      if (constraint_map) 
+        {
+          const AdjointDofConstraintMap::const_iterator
+            adjoint_constraint_it =
+	      constraint_map->find(constrained_dof);
+	  if (adjoint_constraint_it != constraint_map->end())
+            exact_value = adjoint_constraint_it->second;
+        }
+	
+      for (DofConstraintRow::const_iterator
+	   j=constraint_row.begin(); j != constraint_row.end();
+	   ++j)
+        exact_value += j->second * (*v_local)(j->first);
+
+      v_global->set(constrained_dof, exact_value);
+    }
+
+  // If the old vector was serial, we probably need to send our values
+  // to other processors
+  if (v->type() == SERIAL)
+    {
+#ifndef NDEBUG
+      v_global->close();
+#endif
+      v_global->localize (*v);
+    }
+  v->close();
+
+  STOP_LOG("enforce_adjoint_constraints_exactly()","DofMap");
+}
+
+
+
 std::pair<Real, Real>
 DofMap::max_constraint_error (const System &system,
                               NumericVector<Number> *v) const

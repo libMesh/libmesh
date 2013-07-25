@@ -99,6 +99,11 @@ class DofConstraints : public std::map<dof_id_type,
 {
 };
 
+/**
+ * Storage for DofConstraint right hand sides for a particular adjoint
+ * problem.  Each dof id with a non-zero adjoint constraint value
+ * stores it here.
+ */
 class AdjointDofConstraintMap : 
   public std::map<dof_id_type, Number,
                   std::less<dof_id_type>,
@@ -106,6 +111,10 @@ class AdjointDofConstraintMap :
 {
 };
 
+/**
+ * Storage for DofConstraint right hand sides for all adjoint
+ * problems.
+ */
 class AdjointDofConstraintValues : 
   public std::map<unsigned int, AdjointDofConstraintMap,
                   std::less<unsigned int>,
@@ -798,6 +807,16 @@ public:
 				    NumericVector<Number> *v = NULL,
                                     bool homogeneous = false) const;
 
+  /**
+   * Heterogenously constrains the numeric vector \p v, which
+   * represents an adjoint solution defined on the mesh for quantity
+   * fo interest \p q.  For homogeneous constraints, use \p
+   * enforce_constraints_exactly instead
+   */
+  void enforce_adjoint_constraints_exactly (NumericVector<Number> *v,
+                                            unsigned int q) const;
+
+
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
@@ -1210,6 +1229,8 @@ private:
    * entry is the constraint matrix row for DOF i.
    */
   DofConstraints _dof_constraints;
+
+  AdjointDofConstraintValues _adjoint_constraint_values;
 #endif
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -1375,6 +1396,9 @@ inline void DofMap::constrain_element_dyad_matrix (DenseVector<Number>&,
 inline void DofMap::enforce_constraints_exactly (const System &,
 				                 NumericVector<Number> *,
                                                  bool = false) const {}
+
+inline void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> *,
+                                                         unsigned int) const {}
 
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 
