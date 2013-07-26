@@ -144,10 +144,10 @@ public:
    * Performs the scaled matrix-vector multiplication,
    * \p dest += \p factor * (*this) * \p arg.
    */
-    template <typename T2, typename T3>
+    template <typename T2>
     typename boostcopy::enable_if_c<ScalarTraits<T2>::value, void >::type
-    vector_mult_add(DenseVector<typename CompareTypes<T2, T3>::supertype >& dest,
-                    const T2 factor, const DenseVector<T3>& arg) const;
+    vector_mult_add(DenseVector<typename CompareTypes<T, T2>::supertype >& dest,
+                    const T2 factor, const DenseVector<T2>& arg) const;
 
   /**
    * Put the \p sub_m x \p sub_n principal submatrix into \p dest.
@@ -196,6 +196,11 @@ public:
      * Multiplies every element in the column \p col matrix by \p factor.
      */
     void scale_column (const unsigned int col, const T factor);
+
+    /**
+     * Multiplies every element in the row \p row matrix by \p factor.
+     */
+    void scale_row (const unsigned int row, const T factor);
 
   /**
    * Multiplies every element in the matrix by \p factor.
@@ -747,6 +752,15 @@ void DenseMatrix<T>::scale_column (const unsigned int col, const T factor)
 {
     for (unsigned int i=0; i<this->m(); i++)
         (*this)(i, col) *= factor;
+}
+
+    
+template<typename T>
+inline
+void DenseMatrix<T>::scale_row (const unsigned int row, const T factor)
+{
+    for (unsigned int i=0; i<this->n(); i++)
+        (*this)(row, i) *= factor;
 }
 
     

@@ -4,7 +4,7 @@
 
 
 
-AC_INIT([libmesh], [0.9.2pre], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
+AC_INIT([libmesh], [0.9.3-pre], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
 AC_PREREQ([2.61]) # require autoconf 2.61 - I havent tried anything older
 
 # by default CFLAGS and CXXFLAGS are set to '-g -O2' on systems that support them.
@@ -298,6 +298,7 @@ if (test "x$enableexamples" = "xyes"); then
   		examples/miscellaneous/miscellaneous_ex6/Makefile
   		examples/miscellaneous/miscellaneous_ex7/Makefile
   		examples/miscellaneous/miscellaneous_ex8/Makefile
+  		examples/miscellaneous/miscellaneous_ex9/Makefile
   		examples/subdomains/subdomains_ex1/Makefile
   		examples/subdomains/subdomains_ex2/Makefile
   		examples/systems_of_equations/systems_of_equations_ex1/Makefile

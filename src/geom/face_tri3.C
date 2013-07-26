@@ -119,7 +119,8 @@ AutoPtr<Elem> Tri3::build_side (const unsigned int i,
 
   else
     {
-      Edge2* edge = new Edge2;
+      AutoPtr<Elem> edge(new Edge2);
+      edge->subdomain_id() = this->subdomain_id();
 
       switch (i)
 	{
@@ -128,21 +129,21 @@ AutoPtr<Elem> Tri3::build_side (const unsigned int i,
 	    edge->set_node(0) = this->get_node(0);
 	    edge->set_node(1) = this->get_node(1);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+            return edge;
 	  }
 	case 1:
 	  {
 	    edge->set_node(0) = this->get_node(1);
 	    edge->set_node(1) = this->get_node(2);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+            return edge;
 	  }
 	case 2:
 	  {
 	    edge->set_node(0) = this->get_node(2);
 	    edge->set_node(1) = this->get_node(0);
 
-	    AutoPtr<Elem> ap(edge);  return ap;
+            return edge;
 	  }
 	default:
 	  {

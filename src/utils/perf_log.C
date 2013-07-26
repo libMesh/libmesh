@@ -255,7 +255,7 @@ std::string PerfLog::get_perf_info() const
       // Figure out the formatting required based on the event names
       // Unsigned ints for each of the column widths
       unsigned int event_col_width            = 30;
-      const unsigned int ncalls_col_width     = 10;
+      const unsigned int ncalls_col_width     = 11;
       const unsigned int tot_time_col_width   = 12;
       const unsigned int avg_time_col_width   = 12;
       const unsigned int tot_time_incl_sub_col_width   = 12;

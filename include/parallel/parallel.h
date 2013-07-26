@@ -443,6 +443,22 @@ namespace Parallel
   { for (unsigned int i=0; i<r.size(); i++) r[i].wait(); }
 
 
+  /**
+   * Define the data type to be used for data arrays whne encoding
+   * a potentially-variable-size object of type T.
+   */
+  template <typename T>
+  struct BufferType;
+
+  /**
+   * Encoding non-const T* always uses the same buffer type as
+   * encoding const T*, so other classes only have to specialize the
+   * latter.
+   */
+  template <typename T>
+  struct BufferType<T*> {
+    typedef typename BufferType<const T*>::type type;
+  };
 
   /**
    * Encode a potentially-variable-size object at the end of a data
@@ -452,9 +468,9 @@ namespace Parallel
    * specialized for each class which is to be communicated via packed
    * ranges.
    */
-  template <typename T, typename Context>
+  template <typename T, typename buffertype, typename Context>
   void pack(const T* object,
-	    std::vector<int>& data,
+	    typename std::vector<buffertype>& data,
 	    const Context* context);
 
   /**
@@ -479,9 +495,9 @@ namespace Parallel
    * The output of this method should be based *only* on the data
    * array; the T* argument is solely for function specialization.
    */
-  template <typename T>
+  template <typename T, typename BufferIter>
   unsigned int packed_size(const T*,
-			   const std::vector<int>::const_iterator);
+			   BufferIter);
 
   /**
    * Decode a potentially-variable-size object from a subsequence of a
@@ -491,15 +507,15 @@ namespace Parallel
    * specialized for each class which is to be communicated via packed
    * ranges.
    */
-  template <typename T, typename Context>
-  void unpack(std::vector<int>::const_iterator in, T** out, Context*);
+  template <typename T, typename BufferIter, typename Context>
+  void unpack(BufferIter in, T** out, Context* ctx);
 
   /**
    * Decode a range of potentially-variable-size objects from a data
    * array.
    */
-  template <typename Context, typename OutputIter>
-  inline void unpack_range (const std::vector<int>& buffer,
+  template <typename Context, typename buffertype, typename OutputIter>
+  inline void unpack_range (const typename std::vector<buffertype>& buffer,
 		            Context *context,
 		            OutputIter out);
 
@@ -507,11 +523,11 @@ namespace Parallel
    * Encode a range of potentially-variable-size objects to a data
    * array.
    */
-  template <typename Context, typename Iter>
+  template <typename Context, typename buffertype, typename Iter>
   inline void pack_range (const Context *context,
 		          Iter range_begin,
 		          const Iter range_end,
-                          std::vector<int>& buffer);
+                          typename std::vector<buffertype>& buffer);
 
   //-------------------------------------------------------------------
   /**

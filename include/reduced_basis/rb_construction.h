@@ -28,7 +28,7 @@
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/dense_matrix.h"
-#include "libmesh/fem_context.h"
+#include "libmesh/dg_fem_context.h"
 #include "libmesh/elem_assembly.h"
 #include "libmesh/dirichlet_boundaries.h"
 
@@ -439,13 +439,6 @@ public:
   bool constrained_problem;
 
   /**
-   * Boolean flag to indicate whether we store just one matrix in order
-   * to conserve memory. If single_matrix_mode=false then we store
-   * each matrix that is required for the affine decomposition of the PDE.
-   */
-  bool single_matrix_mode;
-
-  /**
    * Boolean flag to indicate whether we reuse the preconditioner
    * on consecutive Offline solves for updating residual data.
    */
@@ -540,10 +533,11 @@ protected:
   virtual void truth_assembly();
 
   /**
-   * Builds a FEMContext object with enough information to do
-   * evaluations on each element.
+   * Builds a DGFEMContext object with enough information to do
+   * evaluations on each element. We use DGFEMContext since it
+   * allows for both DG and continuous Galerkin formulations.
    */
-  virtual AutoPtr<FEMContext> build_context();
+  virtual AutoPtr<DGFEMContext> build_context();
 
   /**
    * Define the matrix assembly for the output residual dual

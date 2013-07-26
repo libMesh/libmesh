@@ -23,6 +23,9 @@
 #include "parallel.h"
 #include "libmesh_logging.h"
 
+// C++ includes
+#include <iterator> // iterator_traits
+
 
 // First declare StandardType specializations so we can use them in anonymous
 // helper functions later
@@ -358,14 +361,14 @@ extern Communicator& Communicator_World;
 /**
  * Helper function for range packing
  */
-template <typename Context, typename Iter>
+template <typename Context, typename buffertype, typename Iter>
 inline void pack_range (const Context *context,
                         Iter range_begin,
                         const Iter range_end,
-                        std::vector<int>& buffer)
+                        std::vector<buffertype>& buffer)
 {
   // Count the total size of and preallocate buffer for efficiency
-  unsigned int buffer_size = 0;
+  std::size_t buffer_size = 0;
   for (Iter range_count = range_begin;
        range_count != range_end;
        ++range_count)
@@ -400,8 +403,8 @@ inline void pack_range (const Context *context,
 /**
  * Helper function for range unpacking
  */
-template <typename Context, typename OutputIter>
-inline void unpack_range (const std::vector<int>& buffer,
+template <typename Context, typename buffertype, typename OutputIter>
+inline void unpack_range (const std::vector<buffertype>& buffer,
                           Context *context,
                           OutputIter out)
 {
@@ -411,7 +414,8 @@ inline void unpack_range (const std::vector<int>& buffer,
 
   // Loop through the buffer and unpack each object, returning the
   // object pointer via the output iterator
-  std::vector<int>::const_iterator next_object_start = buffer.begin();
+  typename std::vector<buffertype>::const_iterator 
+    next_object_start = buffer.begin();
 
   while (next_object_start < buffer.end())
     {
@@ -2117,8 +2121,9 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
                                              const MessageTag &tag) const
 {
   // We will serialize variable size objects from *range_begin to
-  // *range_end as a sequence of ints in this buffer
-  std::vector<int> buffer;
+  // *range_end as a sequence of plain data (e.g. ints) in this buffer
+  typedef typename std::iterator_traits<Iter>::value_type T;
+  std::vector<typename Parallel::BufferType<T>::type> buffer;
 
   Parallel::pack_range(context, range_begin, range_end, buffer);
 
@@ -2137,13 +2142,16 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
 {
   // Allocate a buffer on the heap so we don't have to free it until
   // after the Request::wait()
-  std::vector<int> *buffer = new std::vector<int>();
+  typedef typename std::iterator_traits<Iter>::value_type T;
+  typedef typename Parallel::BufferType<T>::type buffer_t;
+  std::vector<buffer_t> *buffer = new std::vector<buffer_t>();
 
   Parallel::pack_range(context, range_begin, range_end, *buffer);
 
   // Make the Request::wait() handle deleting the buffer
   req.add_post_wait_work
-    (new Parallel::PostWaitDeleteBuffer<std::vector<int> >(buffer));
+    (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t> >
+       (buffer));
 
   // Non-blocking send of the buffer
   this->send(dest_processor_id, *buffer, req, tag);
@@ -2419,8 +2427,11 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
                                                 OutputIter out,
                                                 const MessageTag &tag) const
 {
+  typedef typename std::iterator_traits<OutputIter>::value_type T;
+  typedef typename Parallel::BufferType<T>::type buffer_t;
+
   // Receive serialized variable size objects as a sequence of ints
-  std::vector<int> buffer;
+  std::vector<buffer_t> buffer;
   this->receive(src_processor_id, buffer, tag);
   Parallel::unpack_range(buffer, context, out);
 }
@@ -2434,20 +2445,24 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
                                                 Request &req,
                                                 const MessageTag &tag) const
 {
-  // Receive serialized variable size objects as a sequence of ints.
+  typedef typename std::iterator_traits<OutputIter>::value_type T;
+  typedef typename Parallel::BufferType<T>::type buffer_t;
+
+  // Receive serialized variable size objects as a sequence of
+  // buffer_t.
   // Allocate a buffer on the heap so we don't have to free it until
   // after the Request::wait()
-  std::vector<int> *buffer = new std::vector<int>();
+  std::vector<buffer_t> *buffer = new std::vector<buffer_t>();
   this->receive(src_processor_id, *buffer, req, tag);
 
   // Make the Request::wait() handle unpacking the buffer
   req.add_post_wait_work
-    (new Parallel::PostWaitUnpackBuffer<std::vector<int>, Context, OutputIter>
+    (new Parallel::PostWaitUnpackBuffer<std::vector<buffer_t>, Context, OutputIter>
       (buffer, context, out));
 
   // Make the Request::wait() then handle deleting the buffer
   req.add_post_wait_work
-    (new Parallel::PostWaitDeleteBuffer<std::vector<int> >(buffer));
+    (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t> >(buffer));
 }
 
 
@@ -2846,9 +2861,12 @@ inline void Communicator::allgather_packed_range
    const Iter range_end,
    OutputIter out) const
 {
+  typedef typename std::iterator_traits<Iter>::value_type T;
+  typedef typename Parallel::BufferType<T>::type buffer_t;
+
   // We will serialize variable size objects from *range_begin to
   // *range_end as a sequence of ints in this buffer
-  std::vector<int> buffer;
+  std::vector<buffer_t> buffer;
 
   Parallel::pack_range(context, range_begin, range_end, buffer);
 
@@ -3160,9 +3178,12 @@ inline void Communicator::broadcast_packed_range
    OutputIter out,
    const unsigned int root_id) const
 {
+  typedef typename std::iterator_traits<Iter>::value_type T;
+  typedef typename Parallel::BufferType<T>::type buffer_t;
+
   // We will serialize variable size objects from *range_begin to
   // *range_end as a sequence of ints in this buffer
-  std::vector<int> buffer;
+  std::vector<buffer_t> buffer;
 
   if (this->rank() == root_id)
     Parallel::pack_range(context1, range_begin, range_end, buffer);

@@ -26,6 +26,33 @@ else
 fi
 ])
 
+# ------------------------------------------------------------------------------
+# Check to see if the compiler can compile a test program using
+# pthreads
+# ------------------------------------------------------------------------------
+AC_DEFUN([ACX_PTHREAD],
+[AC_CACHE_CHECK(whether the compiler supports pthreads,
+ac_cv_pthread_thread,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([#include <pthread.h>],
+[
+  pthread_t thread;
+  pthread_join(thread, NULL);
+],
+ ac_cv_pthread_thread=yes, ac_cv_pthread_thread=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_pthread_thread" = yes; then
+  AC_DEFINE(HAVE_PTHREAD_THREAD,1,
+            [define if the compiler supports pthreads])
+  [$1]
+else
+  false
+  [$2]
+fi
+])
+
 
 # ------------------------------------------------------------------------------
 # Check to see if the compiler can invoke the TBB to compile a

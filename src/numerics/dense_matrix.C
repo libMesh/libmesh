@@ -292,11 +292,11 @@ DenseMatrix<T>::vector_mult_transpose (DenseVector<T2>& dest,
 
 
 template <typename T>
-template <typename T2, typename T3>
+template <typename T2>
 typename boostcopy::enable_if_c<ScalarTraits<T2>::value, void >::type
-DenseMatrix<T>::vector_mult_add (DenseVector<typename CompareTypes<T2, T3>::supertype>& dest,
+DenseMatrix<T>::vector_mult_add (DenseVector<typename CompareTypes<T, T2>::supertype>& dest,
                                  const T2 factor,
-                                 const DenseVector<T3>& arg) const
+                                 const DenseVector<T2>& arg) const
 {
   // Short-circuit if the matrix is empty
   if(this->m() == 0)
@@ -309,7 +309,7 @@ DenseMatrix<T>::vector_mult_add (DenseVector<typename CompareTypes<T2, T3>::supe
     this->_matvec_blas(T2(factor), T2(1.), dest, arg);
   else
     {
-      DenseVector<typename CompareTypes<T2, T3>::supertype>
+      DenseVector<typename CompareTypes<T, T2>::supertype>
         temp(arg.size());
       this->vector_mult(temp, arg);
       dest.add(factor, temp);
@@ -834,6 +834,7 @@ template void DenseMatrix<Real>::vector_mult_add(DenseVector<Complex>& dest, con
 template void DenseMatrix<Complex>::vector_mult(DenseVector<Complex>& dest, const DenseVector<Complex>& arg) const;
 template void DenseMatrix<Complex>::vector_mult_transpose(DenseVector<Complex>& dest, const DenseVector<Complex>& arg) const;
 template void DenseMatrix<Complex>::vector_mult_add(DenseVector<Complex>& dest, const Complex factor, const DenseVector<Complex>& arg) const;
+
 #endif
 
 } // namespace libMesh

@@ -133,8 +133,81 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
 
   else
     {
-      // FIXME: Find out how to return non-proxy side
-      libmesh_error();
+      // Create NULL pointer to be initialized, returned later.
+      AutoPtr<Elem> face(NULL);
+
+      // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
+      switch (i)
+	{
+	case 0: // the base face
+	  {
+            face.reset(new Quad4);
+
+	    // Only here, the face element's normal points inward
+	    face->set_node(0) = this->get_node(0);
+	    face->set_node(1) = this->get_node(1);
+	    face->set_node(2) = this->get_node(2);
+	    face->set_node(3) = this->get_node(3);
+
+	    break;
+	  }
+
+	case 1:  // connecting to another infinite element
+	  {
+            face.reset(new InfQuad4);
+
+	    face->set_node(0) = this->get_node(0);
+	    face->set_node(1) = this->get_node(1);
+	    face->set_node(2) = this->get_node(4);
+	    face->set_node(3) = this->get_node(5);
+
+	    break;
+	  }
+
+	case 2:  // connecting to another infinite element
+	  {
+            face.reset(new InfQuad4);
+
+	    face->set_node(0) = this->get_node(1);
+	    face->set_node(1) = this->get_node(2);
+	    face->set_node(2) = this->get_node(5);
+	    face->set_node(3) = this->get_node(6);
+
+	    break;
+	  }
+
+	case 3:  // connecting to another infinite element
+	  {
+            face.reset(new InfQuad4);
+
+	    face->set_node(0) = this->get_node(2);
+	    face->set_node(1) = this->get_node(3);
+	    face->set_node(2) = this->get_node(6);
+	    face->set_node(3) = this->get_node(7);
+
+	    break;
+	  }
+
+	case 4:  // connecting to another infinite element
+	  {
+            face.reset(new InfQuad4);
+
+	    face->set_node(0) = this->get_node(3);
+	    face->set_node(1) = this->get_node(0);
+	    face->set_node(2) = this->get_node(7);
+	    face->set_node(3) = this->get_node(4);
+
+	    break;
+	  }
+
+	default:
+	  {
+	    libmesh_error();
+	  }
+	}
+
+      face->subdomain_id() = this->subdomain_id();
+      return face;
     }
 
 

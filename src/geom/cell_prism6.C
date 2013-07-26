@@ -149,66 +149,72 @@ AutoPtr<Elem> Prism6::build_side (const unsigned int i,
 
   else
     {
+      // Create NULL pointer to be initialized, returned later.
+      AutoPtr<Elem> face(NULL);
+
       switch (i)
 	{
 	case 0:  // the triangular face at z=-1
 	  {
-	    AutoPtr<Elem> face(new Tri3);
+            face.reset(new Tri3);
 
 	    face->set_node(0) = this->get_node(0);
 	    face->set_node(1) = this->get_node(2);
 	    face->set_node(2) = this->get_node(1);
 
-	    return face;
+	    break;
 	  }
 	case 1:  // the quad face at y=0
 	  {
-	    AutoPtr<Elem> face(new Quad4);
+            face.reset(new Quad4);
 
 	    face->set_node(0) = this->get_node(0);
 	    face->set_node(1) = this->get_node(1);
 	    face->set_node(2) = this->get_node(4);
 	    face->set_node(3) = this->get_node(3);
 
-	    return face;
+	    break;
 	  }
 	case 2:  // the other quad face
 	  {
-	    AutoPtr<Elem> face(new Quad4);
+            face.reset(new Quad4);
 
 	    face->set_node(0) = this->get_node(1);
 	    face->set_node(1) = this->get_node(2);
 	    face->set_node(2) = this->get_node(5);
 	    face->set_node(3) = this->get_node(4);
 
-	    return face;
+	    break;
 	  }
 	case 3: // the quad face at x=0
 	  {
-	    AutoPtr<Elem> face(new Quad4);
+            face.reset(new Quad4);
 
 	    face->set_node(0) = this->get_node(2);
 	    face->set_node(1) = this->get_node(0);
 	    face->set_node(2) = this->get_node(3);
 	    face->set_node(3) = this->get_node(5);
 
-	    return face;
+	    break;
 	  }
 	case 4: // the triangular face at z=1
 	  {
-	    AutoPtr<Elem> face(new Tri3);
+            face.reset(new Tri3);
 
 	    face->set_node(0) = this->get_node(3);
 	    face->set_node(1) = this->get_node(4);
 	    face->set_node(2) = this->get_node(5);
 
-	    return face;
+	    break;
 	  }
 	default:
 	  {
 	    libmesh_error();
 	  }
 	}
+
+      face->subdomain_id() = this->subdomain_id();
+      return face;
     }
 
   // We'll never get here.

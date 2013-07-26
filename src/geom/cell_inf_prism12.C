@@ -131,11 +131,14 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
 
   else
     {
+      // Create NULL pointer to be initialized, returned later.
+      AutoPtr<Elem> face(NULL);
+
       switch (i)
 	{
 	case 0:  // the triangular face at z=-1, base face
 	  {
-	    AutoPtr<Elem> face(new Tri6);
+            face.reset(new Tri6);
 
 	    // Note that for this face element, the normal points inward
 	    face->set_node(0) = this->get_node(0);
@@ -145,12 +148,12 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
 	    face->set_node(4) = this->get_node(7);
 	    face->set_node(5) = this->get_node(8);
 
-	    return face;
+	    break;
 	  }
 
 	case 1:  // the quad face at y=0
 	  {
-	    AutoPtr<Elem> face(new InfQuad6);
+            face.reset(new InfQuad6);
 
 	    face->set_node(0) = this->get_node(0);
 	    face->set_node(1) = this->get_node(1);
@@ -159,12 +162,12 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
 	    face->set_node(4) = this->get_node(6);
 	    face->set_node(5) = this->get_node(9);
 
-	    return face;
+	    break;
 	  }
 
 	case 2:  // the other quad face
 	  {
-	    AutoPtr<Elem> face(new InfQuad6);
+            face.reset(new InfQuad6);
 
 	    face->set_node(0) = this->get_node(1);
 	    face->set_node(1) = this->get_node(2);
@@ -173,12 +176,12 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
 	    face->set_node(4) = this->get_node(7);
 	    face->set_node(5) = this->get_node(10);
 
-	    return face;
+	    break;
 	  }
 
 	case 3: // the quad face at x=0
 	  {
-	    AutoPtr<Elem> face(new InfQuad6);
+            face.reset(new InfQuad6);
 
 	    face->set_node(0) = this->get_node(2);
 	    face->set_node(1) = this->get_node(0);
@@ -187,15 +190,17 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
 	    face->set_node(4) = this->get_node(8);
 	    face->set_node(5) = this->get_node(11);
 
-	    return face;
+	    break;
 	  }
 
 	default:
 	  {
 	    libmesh_error();
-	    AutoPtr<Elem> ap(NULL);  return ap;
 	  }
 	}
+
+      face->subdomain_id() = this->subdomain_id();
+      return face;
     }
 
 

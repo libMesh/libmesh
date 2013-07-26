@@ -138,64 +138,70 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
 
   else
     {
+      // Create NULL pointer to be initialized, returned later.
+      AutoPtr<Elem> face(NULL);
+
       switch (i)
 	{
 	case 0:  // triangular face 1
 	  {
-	    AutoPtr<Elem> face(new Tri3);
+            face.reset(new Tri3);
 
 	    face->set_node(0) = this->get_node(0);
 	    face->set_node(1) = this->get_node(1);
 	    face->set_node(2) = this->get_node(4);
 
-	    return face;
+	    break;
 	  }
 	case 1:  // triangular face 2
 	  {
-	    AutoPtr<Elem> face(new Tri3);
+            face.reset(new Tri3);
 
 	    face->set_node(0) = this->get_node(1);
 	    face->set_node(1) = this->get_node(2);
 	    face->set_node(2) = this->get_node(4);
 
-	    return face;
+	    break;
 	  }
 	case 2:  // triangular face 3
 	  {
-	    AutoPtr<Elem> face(new Tri3);
+            face.reset(new Tri3);
 
 	    face->set_node(0) = this->get_node(2);
 	    face->set_node(1) = this->get_node(3);
 	    face->set_node(2) = this->get_node(4);
 
-	    return face;
+	    break;
 	  }
 	case 3:  // triangular face 4
 	  {
-	    AutoPtr<Elem> face(new Tri3);
+            face.reset(new Tri3);
 
 	    face->set_node(0) = this->get_node(3);
 	    face->set_node(1) = this->get_node(0);
 	    face->set_node(2) = this->get_node(4);
 
-	    return face;
+	    break;
 	  }
 	case 4:  // the quad face at z=0
 	  {
-	    AutoPtr<Elem> face(new Quad4);
+            face.reset(new Quad4);
 
 	    face->set_node(0) = this->get_node(0);
 	    face->set_node(1) = this->get_node(3);
 	    face->set_node(2) = this->get_node(2);
 	    face->set_node(3) = this->get_node(1);
 
-	    return face;
+	    break;
 	  }
 	default:
 	  {
 	    libmesh_error();
 	  }
 	}
+
+      face->subdomain_id() = this->subdomain_id();
+      return face;
     }
 
 

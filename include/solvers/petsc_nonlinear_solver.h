@@ -149,7 +149,7 @@ public:
   /**
    * Stores the total number of linear iterations from the last solve.
    */
-  int _n_linear_iterations;
+  PetscInt _n_linear_iterations;
 
   /**
    * Stores the current nonlinear iteration number

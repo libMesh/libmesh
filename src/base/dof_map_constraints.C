@@ -39,6 +39,8 @@
 #include "libmesh/numeric_vector.h" // for enforce_constraints_exactly()
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
+#include "libmesh/parallel_elem.h"
+#include "libmesh/parallel_node.h"
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
 #include "libmesh/periodic_boundary_base.h"
@@ -261,6 +263,11 @@ using namespace libMesh;
       for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
 	{
 	  const Elem* elem = *elem_it;
+
+          // We only calculate Dirichlet constraints on active
+          // elements
+          if (!elem->active())
+            continue;
 
 	  // Per-subdomain variables don't need to be projected on
 	  // elements where they're not active
@@ -1954,7 +1961,7 @@ void DofMap::build_constraint_matrix_and_vector
 
           // If x = Cy + h and y = Dz + g
           // Then x = (CD)z + (Cg + h)
-          C.vector_mult_add(H, 1, Hnew);
+          C.vector_mult_add(H, (Number)1., Hnew);
         }
 
       libmesh_assert_equal_to (C.n(), elem_dofs.size());

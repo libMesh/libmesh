@@ -102,6 +102,16 @@ dev_table_entry("images/pbauman.jpg",
 ?>
 
 
+<?php
+dev_table_entry("images/vikramgarg.jpg",
+                "Dr. Vikram V. Garg",
+                "http://web.mit.edu/vikramvg/www/",
+                "",
+		"Developer",
+		"<a href=\"http://www.mit.edu\">Massachusetts Institute of Technology</a>");
+?>
+
+
 <br>
 <br>
 

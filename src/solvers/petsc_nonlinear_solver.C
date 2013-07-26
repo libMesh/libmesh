@@ -57,7 +57,7 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *)
   {
-    //int ierr=0;
+    //PetscErrorCode ierr=0;
 
     //if (its > 0)
       libMesh::out << "  NL step "
@@ -79,7 +79,7 @@ extern "C"
   {
     START_LOG("residual()", "PetscNonlinearSolver");
 
-    int ierr=0;
+    PetscErrorCode ierr=0;
 
     libmesh_assert(x);
     libmesh_assert(r);
@@ -92,7 +92,7 @@ extern "C"
     // store it in the PetscNonlinearSolver object for possible use
     // by the user's residual function.
     {
-      int n_iterations = 0;
+      PetscInt n_iterations = 0;
       ierr = SNESGetIterationNumber(snes, &n_iterations);
       CHKERRABORT(solver->comm().get(),ierr);
       solver->set_current_nonlinear_iteration_number( static_cast<unsigned>(n_iterations) );
@@ -157,7 +157,7 @@ extern "C"
   {
     START_LOG("jacobian()", "PetscNonlinearSolver");
 
-    int ierr=0;
+    PetscErrorCode ierr=0;
 
     libmesh_assert(ctx);
 
@@ -168,7 +168,7 @@ extern "C"
     // store it in the PetscNonlinearSolver object for possible use
     // by the user's Jacobian function.
     {
-      int n_iterations = 0;
+      PetscInt n_iterations = 0;
       ierr = SNESGetIterationNumber(snes, &n_iterations);
       CHKERRABORT(solver->comm().get(),ierr);
       solver->set_current_nonlinear_iteration_number( static_cast<unsigned>(n_iterations) );
@@ -264,7 +264,7 @@ void PetscNonlinearSolver<T>::clear ()
     {
       this->_is_initialized = false;
 
-      int ierr=0;
+      PetscErrorCode ierr=0;
 
       ierr = LibMeshSNESDestroy(&_snes);
              LIBMESH_CHKERRABORT(ierr);
@@ -286,7 +286,7 @@ void PetscNonlinearSolver<T>::init ()
     {
       this->_is_initialized = true;
 
-      int ierr=0;
+      PetscErrorCode ierr=0;
 
 #if PETSC_VERSION_LESS_THAN(2,1,2)
       // At least until Petsc 2.1.1, the SNESCreate had a different calling syntax.
@@ -428,8 +428,8 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   PetscVector<T>* x   = libmesh_cast_ptr<PetscVector<T>*>(&x_in);
   PetscVector<T>* r   = libmesh_cast_ptr<PetscVector<T>*>(&r_in);
 
-  int ierr=0;
-  int n_iterations =0;
+  PetscErrorCode ierr=0;
+  PetscInt n_iterations =0;
   // Should actually be a PetscReal, but I don't know which version of PETSc first introduced PetscReal
   Real final_residual_norm=0.;
 
@@ -566,7 +566,7 @@ void PetscNonlinearSolver<T>::print_converged_reason()
 template <typename T>
 SNESConvergedReason PetscNonlinearSolver<T>::get_converged_reason()
 {
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   if (this->initialized())
     {
