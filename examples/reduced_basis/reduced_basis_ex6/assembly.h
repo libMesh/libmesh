@@ -90,24 +90,25 @@ struct AssemblyA0 : ElemAssemblyWithConstruction
   virtual void boundary_assembly(FEMContext &c)
   {
     const std::vector<boundary_id_type> bc_ids =
-      rb_con->get_mesh().boundary_info->boundary_ids (c.elem,c.side);
+      rb_con->get_mesh().boundary_info->boundary_ids (&c.get_elem(),c.side);
     for (std::vector<boundary_id_type>::const_iterator b =
          bc_ids.begin(); b != bc_ids.end(); ++b)
       if( *b == 1 || *b == 2 || *b == 3 || *b == 4 )
         {
           const unsigned int u_var = 0;
 
-          const std::vector<Real> &JxW_side =
-            c.side_fe_var[u_var]->get_JxW();
+          FEBase* side_fe = NULL;
+          c.get_side_fe( u_var, side_fe );
 
-          const std::vector<std::vector<Real> >& phi_side =
-            c.side_fe_var[u_var]->get_phi();
+          const std::vector<Real> &JxW_side = side_fe->get_JxW();
+
+          const std::vector<std::vector<Real> >& phi_side = side_fe->get_phi();
 
           // The number of local degrees of freedom in each variable
-          const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+          const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
           // Now we will build the affine operator
-          unsigned int n_sidepoints = c.side_qrule->n_points();
+          unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
           for (unsigned int qp=0; qp != n_sidepoints; qp++)
             for (unsigned int i=0; i != n_u_dofs; i++)
@@ -130,27 +131,27 @@ struct AssemblyA1 : ElemAssemblyWithConstruction
   virtual void boundary_assembly(FEMContext &c)
   {
     const std::vector<boundary_id_type> bc_ids =
-      rb_con->get_mesh().boundary_info->boundary_ids (c.elem,c.side);
+      rb_con->get_mesh().boundary_info->boundary_ids (&c.get_elem(),c.side);
     for (std::vector<boundary_id_type>::const_iterator b =
          bc_ids.begin(); b != bc_ids.end(); ++b)
       if( *b == 1 || *b == 3 ) // y == -0.2, y == 0.2
         {
           const unsigned int u_var = 0;
 
-          const std::vector<Real> &JxW_side =
-            c.side_fe_var[u_var]->get_JxW();
+          FEBase* side_fe = NULL;
+          c.get_side_fe( u_var, side_fe );
 
-          const std::vector<std::vector<Real> >& phi_side =
-            c.side_fe_var[u_var]->get_phi();
+          const std::vector<Real> &JxW_side = side_fe->get_JxW();
 
-          const std::vector<Point>& xyz =
-            c.side_fe_var[u_var]->get_xyz();
+          const std::vector<std::vector<Real> >& phi_side = side_fe->get_phi();
+
+          const std::vector<Point>& xyz = side_fe->get_xyz();
 
           // The number of local degrees of freedom in each variable
-          const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+          const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
           // Now we will build the affine operator
-          unsigned int n_sidepoints = c.side_qrule->n_points();
+          unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
           for (unsigned int qp=0; qp != n_sidepoints; qp++)
           {
@@ -177,24 +178,25 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
   virtual void boundary_assembly(FEMContext &c)
   {
     const std::vector<boundary_id_type> bc_ids =
-      rb_con->get_mesh().boundary_info->boundary_ids (c.elem,c.side);
+      rb_con->get_mesh().boundary_info->boundary_ids (&c.get_elem(),c.side);
     for (std::vector<boundary_id_type>::const_iterator b =
          bc_ids.begin(); b != bc_ids.end(); ++b)
       if( *b == 2 || *b == 4) // x == 0.2, x == -0.2
         {
           const unsigned int u_var = 0;
 
-          const std::vector<Real> &JxW_side =
-            c.side_fe_var[u_var]->get_JxW();
+          FEBase* side_fe = NULL;
+          c.get_side_fe( u_var, side_fe );
 
-          const std::vector<std::vector<Real> >& phi_side =
-            c.side_fe_var[u_var]->get_phi();
+          const std::vector<Real> &JxW_side = side_fe->get_JxW();
+
+          const std::vector<std::vector<Real> >& phi_side = side_fe->get_phi();
 
           // The number of local degrees of freedom in each variable
-          const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+          const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
           // Now we will build the affine operator
-          unsigned int n_sidepoints = c.side_qrule->n_points();
+          unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
           if(*b==2)
           {
@@ -250,36 +252,36 @@ struct AssemblyEIM : RBEIMAssembly
     const unsigned int Gy_var = 1;
     const unsigned int Gz_var = 2;
 
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( u_var, elem_fe );
 
-    const std::vector<std::vector<RealGradient> >& dphi =
-      c.element_fe_var[u_var]->get_dphi();
+    const std::vector<Real> &JxW = elem_fe->get_JxW();
 
-    const std::vector<Point>& qpoints =
-      c.element_fe_var[u_var]->get_xyz();
+    const std::vector<std::vector<RealGradient> >& dphi = elem_fe->get_dphi();
+
+    const std::vector<Point>& qpoints = elem_fe->get_xyz();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+    const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     std::vector<Number> eim_values_Gx;
     evaluate_basis_function(Gx_var,
-                            *c.elem,
+                            c.get_elem(),
                             qpoints,
                             eim_values_Gx);
 
     std::vector<Number> eim_values_Gy;
     evaluate_basis_function(Gy_var,
-                            *c.elem,
+                            c.get_elem(),
                             qpoints,
                             eim_values_Gy);
 
     std::vector<Number> eim_values_Gz;
     evaluate_basis_function(Gz_var,
-                            *c.elem,
+                            c.get_elem(),
                             qpoints,
                             eim_values_Gz);
 
@@ -306,17 +308,18 @@ struct AssemblyF0 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( u_var, elem_fe );
 
-    const std::vector<std::vector<Real> >& phi =
-      c.element_fe_var[u_var]->get_phi();
+    const std::vector<Real> &JxW = elem_fe->get_JxW();
+
+    const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+    const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -332,20 +335,20 @@ struct AssemblyF1 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( u_var, elem_fe );
 
-    const std::vector<std::vector<Real> >& phi =
-      c.element_fe_var[u_var]->get_phi();
+    const std::vector<Real> &JxW = elem_fe->get_JxW();
 
-    const std::vector<Point>& xyz =
-      c.element_fe_var[u_var]->get_xyz();
+    const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
+
+    const std::vector<Point>& xyz = elem_fe->get_xyz();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+    const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
@@ -364,19 +367,18 @@ struct Ex6InnerProduct : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( u_var, elem_fe );
 
-    // The velocity shape function gradients at interior
-    // quadrature points.
-    const std::vector<std::vector<RealGradient> >& dphi =
-      c.element_fe_var[u_var]->get_dphi();
+    const std::vector<Real> &JxW = elem_fe->get_JxW();
+
+    const std::vector<std::vector<RealGradient> >& dphi = elem_fe->get_dphi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+    const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -395,15 +397,16 @@ struct Ex6EIMInnerProduct : ElemAssembly
     const unsigned int Gy_var = 1;
     const unsigned int Gz_var = 2;
 
-    const std::vector<Real> &JxW =
-      c.element_fe_var[Gx_var]->get_JxW();
+    FEBase* elem_fe = NULL;
+    c.get_element_fe( Gx_var, elem_fe );
 
-    const std::vector<std::vector<Real> >& phi =
-      c.element_fe_var[Gx_var]->get_phi();
+    const std::vector<Real> &JxW = elem_fe->get_JxW();
 
-    const unsigned int n_u_dofs = c.dof_indices_var[Gx_var].size();
+    const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
 
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    const unsigned int n_u_dofs = c.get_dof_indices(Gx_var).size();
+
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     DenseSubMatrix<Number>& Kxx = c.get_elem_jacobian(Gx_var,Gx_var);
     DenseSubMatrix<Number>& Kyy = c.get_elem_jacobian(Gy_var,Gy_var);

@@ -198,7 +198,7 @@ extern OStreamProxy err;
 // If you want to make sure you are accessing a section of code just
 // stick a libmesh_here(); in it, for example
 
-#define libmesh_here()     do { libMesh::err << "[" << libMesh::processor_id() << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; } while (0)
+#define libmesh_here()     do { libMesh::err << "[" << static_cast<std::size_t>(libMesh::processor_id()) << "] " << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << std::endl; } while (0)
 
 // the libmesh_stop() macro will stop the code until a SIGCONT signal
 // is recieved.  This is useful, for example, when determining the
@@ -253,7 +253,7 @@ extern OStreamProxy err;
 // The libmesh_write_traceout() macro writes stack trace files, if
 // that feature has been configured.
 #ifdef LIBMESH_ENABLE_TRACEFILES
-  #define libmesh_write_traceout()   do { std::stringstream outname; outname << "traceout_" << libMesh::processor_id() << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); libMesh::print_trace(traceout); } while(0)
+  #define libmesh_write_traceout()   do { std::stringstream outname; outname << "traceout_" << static_cast<std::size_t>(libMesh::processor_id()) << '_' << getpid() << ".txt"; std::ofstream traceout(outname.str().c_str()); libMesh::print_trace(traceout); } while(0)
 #else
   #define libmesh_write_traceout()   do { } while (0)
 #endif

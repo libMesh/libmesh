@@ -199,7 +199,7 @@ L.&nbsp;Nagler.
   structures</em>.
  PhD thesis, Graz University of Technology, Institute of Applied
   Mechanics, February 2011.
- 
+
   <a href="http://fmysql.tu-graz.ac.at/~karl/verlagspdf/nagler_buch_13052011.pdf">http://fmysql.tu-graz.ac.at/~karl/verlagspdf/nagler_buch_13052011.pdf</a>.
 <a name="Nagler_dissertation"></a><pre>
 @phdthesis{Nagler_dissertation,
@@ -468,27 +468,27 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Satou_2013">1</a>]
+[<a name="Corsini_2013">1</a>]
 </td>
 <td class="bibtexitem">
-A.&nbsp;Satou, V.&nbsp;Ryzhii, F.&nbsp;T. Vasko, V.&nbsp;V. Mitin, and T.&nbsp;Otsuji.
- Numerical simulation of terahertz plasmons in gated graphene
-  structures.
- In L.&nbsp;P. Sadwick and C.&nbsp;M. O'Sullivan, editors, <em>Terahertz, RF,
-  Millimeter, and Submillimeter-Wave Technology and Applications VI,
-  Vol.&nbsp;8624</em>. International Society for Optics and Photonics (SPIE),
-  February&nbsp;20, 2013.
- <a href="http://dx.doi.org/10.1117/12.2003611">http://dx.doi.org/10.1117/12.2003611</a>.
-<a name="Satou_2013"></a><pre>
-@inproceedings{Satou_2013,
-  author = {A.~Satou and V.~Ryzhii and F.~T.~Vasko and V.~V.~Mitin and T.~Otsuji},
-  title = {{Numerical simulation of terahertz plasmons in gated graphene structures}},
-  booktitle = {{Terahertz, RF, Millimeter, and Submillimeter-Wave Technology and Applications VI, Vol.~8624}},
-  editor = {L.~P.~Sadwick and C.~M.~O'Sullivan},
-  publisher = {International Society for Optics and Photonics (SPIE)},
-  month = feb # {~20,},
-  year = {2013},
-  note = {\url{http://dx.doi.org/10.1117/12.2003611}}
+A.&nbsp;Corsini, F.&nbsp;Rispoli, A.&nbsp;G. Sheard, and P.&nbsp;Venturini.
+ Numerical simulation of coal fly-ash erosion in an induced draft
+  fan.
+ <em>Journal of Fluids Engineering</em>, 135(8):081303 (12 pages), June
+  2013.
+
+  <a href="http://fluidsengineering.asmedigitalcollection.asme.org/article.aspx?articleid=1695855">http://fluidsengineering.asmedigitalcollection.asme.org/article.aspx?articleid=1695855</a>.
+<a name="Corsini_2013"></a><pre>
+@article{Corsini_2013,
+  author = {A.~Corsini and F.~Rispoli and A.~G.~Sheard and P.~Venturini},
+  title = {{Numerical simulation of coal fly-ash erosion in an induced draft fan}},
+  journal = {Journal of Fluids Engineering},
+  year = 2013,
+  month = jun,
+  volume = 135,
+  number = 8,
+  pages = {081303 (12 pages)},
+  note = {\url{http://fluidsengineering.asmedigitalcollection.asme.org/article.aspx?articleid=1695855}}
 }
 </pre>
 
@@ -553,21 +553,23 @@ P.&nbsp;Rong, O.&nbsp;von Estorff, L.&nbsp;Nagler, and M.&nbsp;Schanz.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Millett_2013">4</a>]
+[<a name="Widmer_2013">4</a>]
 </td>
 <td class="bibtexitem">
-P.&nbsp;C. Millett, M.&nbsp;R. Tonks, K.&nbsp;Chockalingam, Y.&nbsp;Zhang, and S.&nbsp;B. Biner.
- Three dimensional calculations of the effective Kapitza resistance
-  of UO<sub>2</sub> grain boundaries containing intergranular bubbles.
- <em>Journal of Nuclear Materials</em>, 2013.
- <a href="http://dx.doi.org/10.1016/j.jnucmat.2013.02.039">http://dx.doi.org/10.1016/j.jnucmat.2013.02.039</a>.
-<a name="Millett_2013"></a><pre>
-@article{Millett_2013,
-  author = {P.~C.~Millett and M.~R.~Tonks and K.~Chockalingam and Y.~Zhang and S.~B.~Biner},
-  title = {{Three dimensional calculations of the effective Kapitza resistance of UO$_2$ grain boundaries containing intergranular bubbles}},
-  journal = {Journal of Nuclear Materials},
+R.&nbsp;P.&nbsp;Widmer Soyka, A.&nbsp;L&oacute;pez, C.&nbsp;Persson, L.&nbsp;Cristofolini, and S.&nbsp;J.
+  Ferguson.
+ Numerical description and experimental validation of a rheology
+  model for non-Newtonian fluid flow in cancellous bone.
+ <em>Journal of the Mechanical Behavior of Biomedical Materials</em>,
+  2013.
+ <a href="http://dx.doi.org/10.1016/j.jmbbm.2013.06.007">http://dx.doi.org/10.1016/j.jmbbm.2013.06.007</a>.
+<a name="Widmer_2013"></a><pre>
+@article{Widmer_2013,
+  author = {R.~P.~Widmer Soyka and A.~L\'{o}pez and C.~Persson and L.~Cristofolini and S.~J.~Ferguson},
+  title = {{Numerical description and experimental validation of a rheology model for non-Newtonian fluid flow in cancellous bone}},
+  journal = {Journal of the Mechanical Behavior of Biomedical Materials},
   year = 2013,
-  note = {\url{http://dx.doi.org/10.1016/j.jnucmat.2013.02.039}}
+  note = {\url{http://dx.doi.org/10.1016/j.jmbbm.2013.06.007}}
 }
 </pre>
 
@@ -578,7 +580,32 @@ P.&nbsp;C. Millett, M.&nbsp;R. Tonks, K.&nbsp;Chockalingam, Y.&nbsp;Zhang, and S
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2013">5</a>]
+[<a name="Rossa_2013">5</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;L. Rossa and A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
+ Parallel adaptive simulation of gravity currents on the
+  lock-exchange problem.
+ <em>Computers &amp; Fluids</em>, 2013.
+ <a href="http://dx.doi.org/10.1016/j.compfluid.2013.06.008">http://dx.doi.org/10.1016/j.compfluid.2013.06.008</a>.
+<a name="Rossa_2013"></a><pre>
+@article{Rossa_2013,
+  author = {A.~L.~Rossa and A.~L.~G.~A.~Coutinho},
+  title = {{Parallel adaptive simulation of gravity currents on the lock-exchange problem}},
+  journal = {Computers \& Fluids},
+  year = 2013,
+  note = {\url{http://dx.doi.org/10.1016/j.compfluid.2013.06.008}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Fuentes_2013">6</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, J.&nbsp;T. Oden, K.&nbsp;R. Diller, A.&nbsp;Elliot, Y.&nbsp;Feng, J.&nbsp;D. Hazle,
@@ -605,58 +632,7 @@ D.&nbsp;Fuentes, J.&nbsp;T. Oden, K.&nbsp;R. Diller, A.&nbsp;Elliot, Y.&nbsp;Fen
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bhalla_2013b">6</a>]
-</td>
-<td class="bibtexitem">
-A.&nbsp;P.&nbsp;S. Bhalla, R.&nbsp;Bale, B.&nbsp;E. Griffith, and N.&nbsp;A. Patankar.
- Fully resolved immersed electrohydrodynamics for particle motion,
-  electrolocation, and self-propulsion.
- <em>PREPRINT, Submitted to Elsevier Science</em>, 2013.
- <a href="http://www.cims.nyu.edu/~griffith/docs/bhalla_EHD.pdf">http://www.cims.nyu.edu/~griffith/docs/bhalla_EHD.pdf</a>.
-<a name="Bhalla_2013b"></a><pre>
-@article{Bhalla_2013b,
-  author = {A.~P.~S.~Bhalla and R.~Bale and B.~E.~Griffith and N.~A.~Patankar},
-  title = {{Fully resolved immersed electrohydrodynamics for particle motion, electrolocation, and self-propulsion}},
-  journal = {PREPRINT, Submitted to Elsevier Science},
-  year = 2013,
-  note = {\url{http://www.cims.nyu.edu/~griffith/docs/bhalla_EHD.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Bhalla_2013">7</a>]
-</td>
-<td class="bibtexitem">
-A.&nbsp;P.&nbsp;S. Bhalla, R.&nbsp;Bale, B.&nbsp;E. Griffith, and N.&nbsp;A. Patankar.
- A unified mathematical framework and an adaptive numerical method
-  for fluid-structure interaction with rigid, deforming, and elastic bodies.
- <em>PREPRINT, Submitted to Elsevier Science</em>, 2013.
- 
-  <a href="http://www.math.nyu.edu/~griffith/docs/bhalla_constraint_ib.pdf">http://www.math.nyu.edu/~griffith/docs/bhalla_constraint_ib.pdf</a>.
-<a name="Bhalla_2013"></a><pre>
-@article{Bhalla_2013,
-  author = {A.~P.~S.~Bhalla and R.~Bale and B.~E.~Griffith and N.~A.~Patankar},
-  title = {{A unified mathematical framework and an adaptive numerical method for fluid-structure interaction with rigid, deforming, and elastic bodies}},
-  journal = {PREPRINT, Submitted to Elsevier Science},
-  year = 2013,
-  note = {\url{http://www.math.nyu.edu/~griffith/docs/bhalla_constraint_ib.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Gunther_2012">8</a>]
+[<a name="Gunther_2012">7</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;G&uuml;nther, H.&nbsp;Lamecker, and M.&nbsp;Weiser.
@@ -681,7 +657,7 @@ A.&nbsp;G&uuml;nther, H.&nbsp;Lamecker, and M.&nbsp;Weiser.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gonzalez_2012">9</a>]
+[<a name="Gonzalez_2012">8</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;G. Gonz&aacute;lez and J.&nbsp;R.&nbsp;R. Galv&aacute;n.
@@ -709,32 +685,7 @@ F.&nbsp;G. Gonz&aacute;lez and J.&nbsp;R.&nbsp;R. Galv&aacute;n.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bittl_2012">10</a>]
-</td>
-<td class="bibtexitem">
-M.&nbsp;Bittl and D.&nbsp;Kuzmin.
- An <em>hp</em>-adaptive flux-corrected transport algorithm for continuous
-  finite elements.
- <em>Computing</em>, 2012.
- <a href="http://dx.doi.org/10.1007/s00607-012-0223-y">http://dx.doi.org/10.1007/s00607-012-0223-y</a>.
-<a name="Bittl_2012"></a><pre>
-@article{Bittl_2012,
-  author = {M.~Bittl and D.~Kuzmin},
-  title = {{An $hp$-adaptive flux-corrected transport algorithm for continuous finite elements}},
-  journal = {Computing},
-  year = 2012,
-  note = {\url{http://dx.doi.org/10.1007/s00607-012-0223-y}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2012">11</a>]
+[<a name="Vavourakis_2012">9</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekaterinaris.
@@ -760,7 +711,7 @@ V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekater
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vallaghe_2012">12</a>]
+[<a name="Vallaghe_2012">10</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
@@ -786,7 +737,7 @@ S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffith_2012">13</a>]
+[<a name="Griffith_2012">11</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -820,7 +771,120 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Oden_2013">1</a>]
+[<a name="Tahir_2013">1</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;M. Tahir, G.&nbsp;Amberg, and M.&nbsp;Do-Quang.
+ Initial rapid wetting in metallic systems.
+ <em>Acta Materialia</em>, 61(14):5375-5386, August 2013.
+ <a href="http://dx.doi.org/10.1016/j.actamat.2013.05.026">http://dx.doi.org/10.1016/j.actamat.2013.05.026</a>.
+<a name="Tahir_2013"></a><pre>
+@article{Tahir_2013,
+  author = {A.~M.~Tahir and G.~Amberg and M.~Do-Quang},
+  title = {{Initial rapid wetting in metallic systems}},
+  journal = {Acta Materialia},
+  month = aug,
+  year = 2013,
+  volume = 61,
+  number = 14,
+  pages = {5375--5386},
+  note = {\url{http://dx.doi.org/10.1016/j.actamat.2013.05.026}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Millett_2013">2</a>]
+</td>
+<td class="bibtexitem">
+P.&nbsp;C. Millett, M.&nbsp;R. Tonks, K.&nbsp;Chockalingam, Y.&nbsp;Zhang, and S.&nbsp;B. Biner.
+ Three dimensional calculations of the effective Kapitza resistance
+  of UO<sub>2</sub> grain boundaries containing intergranular bubbles.
+ <em>Journal of Nuclear Materials</em>, 439(1-3):117-122, August 2013.
+ <a href="http://dx.doi.org/10.1016/j.jnucmat.2013.02.039">http://dx.doi.org/10.1016/j.jnucmat.2013.02.039</a>.
+<a name="Millett_2013"></a><pre>
+@article{Millett_2013,
+  author = {P.~C.~Millett and M.~R.~Tonks and K.~Chockalingam and Y.~Zhang and S.~B.~Biner},
+  title = {{Three dimensional calculations of the effective Kapitza resistance of UO$_2$ grain boundaries containing intergranular bubbles}},
+  journal = {Journal of Nuclear Materials},
+  year = 2013,
+  volume = 439,
+  number = {1--3},
+  month = aug,
+  pages = {117--122},
+  note = {\url{http://dx.doi.org/10.1016/j.jnucmat.2013.02.039}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Kirk_2013b">3</a>]
+</td>
+<td class="bibtexitem">
+B.&nbsp;S. Kirk, R.&nbsp;H. Stogner, T.&nbsp;A. Oliver, and P.&nbsp;T. Bauman.
+ Recent advancements in fully-implicit numerical methods for
+  hypersonic reacting flows.
+ In <em>21st AIAA Computational Fluid Dynamics Conference</em>,
+  June&nbsp;24-27, 2013.
+ <a href="http://dx.doi.org/10.2514/6.2013-2559">http://dx.doi.org/10.2514/6.2013-2559</a>.
+<a name="Kirk_2013b"></a><pre>
+@inproceedings{Kirk_2013b,
+  author = {B.~S.~Kirk and R.~H.~Stogner and T.~A.~Oliver and P.~T.~Bauman},
+  title = {{Recent advancements in fully-implicit numerical methods for hypersonic reacting flows}},
+  booktitle = {{21st AIAA Computational Fluid Dynamics Conference}},
+  month = jun # {~24--27,},
+  year = {2013},
+  note = {\url{http://dx.doi.org/10.2514/6.2013-2559}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Fahrenholtz_2013">4</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;J. Fahrenholtz, R.&nbsp;J. Stafford, F.&nbsp;Maier, J.&nbsp;D. Hazle, and D.&nbsp;Fuentes.
+ Generalised polynomial chaos-based uncertainty quantification for
+  planning MRgLITT procedures.
+ <em>International Journal of Hyperthermia</em>, (4):324-335, June 2013.
+ <a href="http://dx.doi.org/10.3109/02656736.2013.798036">http://dx.doi.org/10.3109/02656736.2013.798036</a>.
+<a name="Fahrenholtz_2013"></a><pre>
+@article{Fahrenholtz_2013,
+  author = {S.~J.~Fahrenholtz and R.~J.~Stafford and F.~Maier and J.~D.~Hazle and D.~Fuentes},
+  title = {{Generalised polynomial chaos-based uncertainty quantification for planning MRgLITT procedures}},
+  journal = {International Journal of Hyperthermia},
+  month = jun,
+  year = 2013,
+  vol = 29,
+  number = 4,
+  pages = {324--335},
+  note = {\url{http://dx.doi.org/10.3109/02656736.2013.798036}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Oden_2013">5</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, and A.&nbsp;Hawkins-Daarud.
@@ -850,7 +914,400 @@ J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, and A.&nbsp;Hawkins-Daarud.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Chockalingam_2013">2</a>]
+[<a name="Delchini_2013">6</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;O. Delchini, J.&nbsp;C. Ragusa, and R.&nbsp;A. Berry.
+ Entropy viscosity method applied to Euler equations.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="Delchini_2013"></a><pre>
+@inproceedings{Delchini_2013,
+  author = {M.~O.~Delchini and J.~C.~Ragusa and R.~A.~Berry},
+  title = {{Entropy viscosity method applied to Euler equations}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Alfonsi_2013">7</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;Alfonsi, C.&nbsp;Rabiti, D.&nbsp;Mandelli, J.&nbsp;J. Cogliati, and R.&nbsp;A. Kinoshita.
+ RAVEN as a tool for dynamic probabilistic risk assessment: software
+  overview.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="Alfonsi_2013"></a><pre>
+@inproceedings{Alfonsi_2013,
+  author = {A.~Alfonsi and C.~Rabiti and D.~Mandelli and J.~J.~Cogliati and R.~A.~Kinoshita},
+  title = {{RAVEN as a tool for dynamic probabilistic risk assessment: software overview}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Rabiti_2013">8</a>]
+</td>
+<td class="bibtexitem">
+C.&nbsp;Rabiti, D.&nbsp;Mandelli, A.&nbsp;Alfonsi, J.&nbsp;J. Cogliati, and R.&nbsp;A. Kinoshita.
+ Mathematical framework for the analysis of dynamic stochastic
+  systems with the RAVEN code.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="Rabiti_2013"></a><pre>
+@inproceedings{Rabiti_2013,
+  author = {C.~Rabiti and D.~Mandelli and A.~Alfonsi and J.~J.~Cogliati and R.~A.~Kinoshita},
+  title = {{Mathematical framework for the analysis of dynamic stochastic systems with the RAVEN code}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Wang_2013">9</a>]
+</td>
+<td class="bibtexitem">
+Y.&nbsp;Wang.
+ Nonlinear diffusion acceleration for the multigroup transport
+  equation discretized with <em>S</em><sub>N</sub> and continuous FEM with Rattle<em>S</em><sub>N</sub>ake.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="Wang_2013"></a><pre>
+@inproceedings{Wang_2013,
+  author = {Y.~Wang},
+  title = {{Nonlinear diffusion acceleration for the multigroup transport equation discretized with $S_N$ and continuous FEM with Rattle$S_N$ake}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Johnson_2013">10</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;Johnson and H.&nbsp;Zhao.
+ Extended forward sensitivity analysis of one-dimensional isothermal
+  flow.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="Johnson_2013"></a><pre>
+@inproceedings{Johnson_2013,
+  author = {M.~Johnson and H.~Zhao},
+  title = {{Extended forward sensitivity analysis of one-dimensional isothermal flow}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gleicher_2013">11</a>]
+</td>
+<td class="bibtexitem">
+F.&nbsp;N. Gleicher, B.&nbsp;W. Spencer, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, R.&nbsp;C.
+  Martineau, M.&nbsp;Rose, T.&nbsp;J. Downar, and B.&nbsp;Collins.
+ Coupling the core analysis program DeCART to the fuel performance
+  application BISON.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="Gleicher_2013"></a><pre>
+@inproceedings{Gleicher_2013,
+  author = {F.~N.~Gleicher and B.~W.~Spencer and S.~R.~Novascone and R.~L.~Williamson and R.~C.~Martineau and M.~Rose and T.~J.~Downar and B.~Collins},
+  title = {{Coupling the core analysis program DeCART to the fuel performance application BISON}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="HZhang_2013">12</a>]
+</td>
+<td class="bibtexitem">
+H.&nbsp;Zhang, L.&nbsp;Zou, D.&nbsp;Andrs, H.&nbsp;Zhao, and R.&nbsp;C. Martineau.
+ Point kinetics calculations with fully coupled thermal fluids
+  reactivity feedback.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="HZhang_2013"></a><pre>
+@inproceedings{HZhang_2013,
+  author = {H.~Zhang and L.~Zou and D.~Andrs and H.~Zhao and R.~C.~Martineau},
+  title = {{Point kinetics calculations with fully coupled thermal fluids reactivity feedback}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Tonks_2013">13</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;R. Tonks, S.&nbsp;B. Biner, P.&nbsp;C. Millett, and D.&nbsp;A. Andersson.
+ Comparison between phase field simulations and experimental data
+  from intragranular bubble growth in UO<sub>2</sub>.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="Tonks_2013"></a><pre>
+@inproceedings{Tonks_2013,
+  author = {M.~R.~Tonks and S.~B.~Biner and P.~C.~Millett and D.~A.~Andersson},
+  title = {{Comparison between phase field simulations and experimental data from intragranular bubble growth in UO$_2$}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Zou_2013">14</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Zou, J.&nbsp;W. Peterson, H.&nbsp;Zhao, H.&nbsp;Zhang, D.&nbsp;Andrs, and R.&nbsp;C. Martineau.
+ Solving implicit multi-mesh flow and conjugate heat transfer
+  problems with RELAP-7.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="Zou_2013"></a><pre>
+@inproceedings{Zou_2013,
+  author = {L.~Zou and J.~W.~Peterson and H.~Zhao and H.~Zhang and D.~Andrs and R.~C.~Martineau},
+  title = {{Solving implicit multi-mesh flow and conjugate heat transfer problems with RELAP-7}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Novascone_2013">15</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;R. Novascone, B.&nbsp;W. Spencer, D.&nbsp;Andrs, R.&nbsp;L. Williamson, J.&nbsp;D. Hales, and
+  D.&nbsp;M. Perez.
+ Results from tight and loose coupled multiphysics in nuclear fuels.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="Novascone_2013"></a><pre>
+@inproceedings{Novascone_2013,
+  author = {S.~R.~Novascone and B.~W.~Spencer and D.~Andrs and R.~L.~Williamson and J.~D.~Hales and D.~M.~Perez},
+  title = {{Results from tight and loose coupled multiphysics in nuclear fuels}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Perez_2013">16</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;M. Perez, R.&nbsp;L. Williamson, S.&nbsp;R. Novascone, T.&nbsp;K. Larson, J.&nbsp;D. Hales,
+  B.&nbsp;W. Spencer, and G.&nbsp;Pastore.
+ An evaluation of the nuclear fuel performance code BISON.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="Perez_2013"></a><pre>
+@inproceedings{Perez_2013,
+  author = {D.~M.~Perez and R.~L.~Williamson and S.~R.~Novascone and T.~K.~Larson and J.~D.~Hales and B.~W.~Spencer and G.~Pastore},
+  title = {{An evaluation of the nuclear fuel performance code BISON}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Hales_2013">17</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;D. Hales, D.&nbsp;R. Gaston, and D.&nbsp;Andrs.
+ Algorithms for thermal and mechanical contact in nuclear fuel
+  performance analysis.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="Hales_2013"></a><pre>
+@inproceedings{Hales_2013,
+  author = {J.~D.~Hales and D.~R.~Gaston and D.~Andrs},
+  title = {{Algorithms for thermal and mechanical contact in nuclear fuel performance analysis}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gaston_2013">18</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;R. Gaston, C.&nbsp;J. Permann, D.&nbsp;Andrs, and J.&nbsp;W. Peterson.
+ Massive hybrid parallelism for fully implicit multiphysics.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+<a name="Gaston_2013"></a><pre>
+@inproceedings{Gaston_2013,
+  author = {D.~R.~Gaston and C.~J.~Permann and D.~Andrs and J.~W.~Peterson},
+  title = {{Massive hybrid parallelism for fully implicit multiphysics}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Swiler_2013">19</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;P. Swiler, R.&nbsp;L. Williamson, and D.&nbsp;M. Perez.
+ Calibration of a fuel relocation model in BISON.
+ In <em>Proceedings of the International Conference on Mathematics
+  and Computational Methods Applied to Nuclear Science &amp; Engineering (M&amp;C
+  2013)</em>, May&nbsp;5-9, 2013.
+ <a href="https://cfwebprod.sandia.gov/cfdocs/CCIM/docs/mc13_swiler.pdf">https://cfwebprod.sandia.gov/cfdocs/CCIM/docs/mc13_swiler.pdf</a>.
+<a name="Swiler_2013"></a><pre>
+@inproceedings{Swiler_2013,
+  author = {L.~P.~Swiler and R.~L.~Williamson and D.~M.~Perez},
+  title = {{Calibration of a fuel relocation model in BISON}},
+  booktitle = {{Proceedings of the International Conference on Mathematics and Computational Methods Applied to Nuclear Science \& Engineering (M\&C 2013)}},
+  month = may # {~5--9,},
+  year = {2013},
+  note = {\url{https://cfwebprod.sandia.gov/cfdocs/CCIM/docs/mc13_swiler.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Bittl_2012">20</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;Bittl and D.&nbsp;Kuzmin.
+ An <em>hp</em>-adaptive flux-corrected transport algorithm for continuous
+  finite elements.
+ <em>Computing</em>, 95(1, Supplement):27-48, May 2013.
+ <a href="http://dx.doi.org/10.1007/s00607-012-0223-y">http://dx.doi.org/10.1007/s00607-012-0223-y</a>.
+<a name="Bittl_2012"></a><pre>
+@article{Bittl_2012,
+  author = {M.~Bittl and D.~Kuzmin},
+  title = {{An $hp$-adaptive flux-corrected transport algorithm for continuous finite elements}},
+  journal = {Computing},
+  year = 2013,
+  month = may,
+  volume = 95,
+  number = {1, Supplement},
+  pages = {27--48},
+  note = {\url{http://dx.doi.org/10.1007/s00607-012-0223-y}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Chockalingam_2013">21</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;Chockalingam, M.&nbsp;R. Tonks, J.&nbsp;D. Hales, D.&nbsp;R. Gaston, P.&nbsp;C. Millett, and
@@ -879,7 +1336,7 @@ K.&nbsp;Chockalingam, M.&nbsp;R. Tonks, J.&nbsp;D. Hales, D.&nbsp;R. Gaston, P.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lee_2013">3</a>]
+[<a name="Lee_2013">22</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;Lee and K.&nbsp;Willcox.
@@ -906,7 +1363,7 @@ K.&nbsp;Lee and K.&nbsp;Willcox.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bhatia_2013">4</a>]
+[<a name="Bhatia_2013">23</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Bhatia and P.&nbsp;Beran.
@@ -933,7 +1390,7 @@ M.&nbsp;Bhatia and P.&nbsp;Beran.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Opstal_2013">5</a>]
+[<a name="Opstal_2013">24</a>]
 </td>
 <td class="bibtexitem">
 T.&nbsp;M. van Opstal, P.&nbsp;T. Bauman, S.&nbsp;Prudhomme, and E.&nbsp;H. Brummelen.
@@ -961,7 +1418,35 @@ T.&nbsp;M. van Opstal, P.&nbsp;T. Bauman, S.&nbsp;Prudhomme, and E.&nbsp;H. Brum
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Guo_2013">6</a>]
+[<a name="Hu_2013">25</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;Hu, J.&nbsp;W. Thomas, and T.&nbsp;H. Fanning.
+ Strategy for multi-scale single-phase flow coupling.
+ Technical Report ANL/NE-13/4, Argonne National Laboratory, March
+  2013.
+ <a href="http://www.ipd.anl.gov/anlpubs/2013/05/76182.pdf">http://www.ipd.anl.gov/anlpubs/2013/05/76182.pdf</a>.
+<a name="Hu_2013"></a><pre>
+@techreport{Hu_2013,
+  author = {R.~Hu and J.~W.~Thomas and T.~H.~Fanning},
+  title = {{Strategy for multi-scale single-phase flow coupling}},
+  institution = {Argonne National Laboratory},
+  day = {31},
+  month = mar,
+  year = {2013},
+  number = {ANL/NE-13/4},
+  note = {\url{http://www.ipd.anl.gov/anlpubs/2013/05/76182.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Guo_2013">26</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Guo, H.&nbsp;Huang, D.&nbsp;R. Gaston, C.&nbsp;J. Permann, D.&nbsp;Andrs, G.&nbsp;D. Redden, C.&nbsp;Lu,
@@ -991,7 +1476,7 @@ L.&nbsp;Guo, H.&nbsp;Huang, D.&nbsp;R. Gaston, C.&nbsp;J. Permann, D.&nbsp;Andrs
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhang_2013">7</a>]
+[<a name="Zhang_2013">27</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Zhang, M.&nbsp;R. Tonks, D.&nbsp;Gaston, J.&nbsp;W. Peterson, D.&nbsp;Andrs, P.&nbsp;C. Millett, and
@@ -1020,7 +1505,93 @@ L.&nbsp;Zhang, M.&nbsp;R. Tonks, D.&nbsp;Gaston, J.&nbsp;W. Peterson, D.&nbsp;An
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2013">8</a>]
+[<a name="Satou_2013">28</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;Satou, V.&nbsp;Ryzhii, F.&nbsp;T. Vasko, V.&nbsp;V. Mitin, and T.&nbsp;Otsuji.
+ Numerical simulation of terahertz plasmons in gated graphene
+  structures.
+ In L.&nbsp;P. Sadwick and C.&nbsp;M. O'Sullivan, editors, <em>Terahertz, RF,
+  Millimeter, and Submillimeter-Wave Technology and Applications VI,
+  Vol.&nbsp;8624</em>. International Society for Optics and Photonics (SPIE),
+  February&nbsp;20, 2013.
+ <a href="http://dx.doi.org/10.1117/12.2003611">http://dx.doi.org/10.1117/12.2003611</a>.
+<a name="Satou_2013"></a><pre>
+@inproceedings{Satou_2013,
+  author = {A.~Satou and V.~Ryzhii and F.~T.~Vasko and V.~V.~Mitin and T.~Otsuji},
+  title = {{Numerical simulation of terahertz plasmons in gated graphene structures}},
+  booktitle = {{Terahertz, RF, Millimeter, and Submillimeter-Wave Technology and Applications VI, Vol.~8624}},
+  editor = {L.~P.~Sadwick and C.~M.~O'Sullivan},
+  publisher = {International Society for Optics and Photonics (SPIE)},
+  month = feb # {~20,},
+  year = {2013},
+  note = {\url{http://dx.doi.org/10.1117/12.2003611}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Kirk_2013">29</a>]
+</td>
+<td class="bibtexitem">
+B.&nbsp;S. Kirk and T.&nbsp;A. Oliver.
+ Validation of SUPG finite element simulations of shockwave/turbulent
+  boundary layer interactions in hypersonic flows.
+ In <em>51st AIAA Aerospace Sciences Meeting</em>, January&nbsp;7-10, 2013.
+ <a href="http://dx.doi.org/10.2514/6.2013-306">http://dx.doi.org/10.2514/6.2013-306</a>.
+<a name="Kirk_2013"></a><pre>
+@inproceedings{Kirk_2013,
+  author = {B.~S.~Kirk and T.~A.~Oliver},
+  title = {{Validation of SUPG finite element simulations of shockwave/turbulent boundary layer interactions in hypersonic flows}},
+  booktitle = {{51st AIAA Aerospace Sciences Meeting}},
+  month = jan # {~7--10,},
+  year = {2013},
+  note = {\url{http://dx.doi.org/10.2514/6.2013-306}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Widmer_2013">30</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
+ A comparison and verification of computational methods to determine
+  the permeability of vertebral trabecular bone.
+ <em>Proceedings of the Institution of Mechanical Engineers, Part H:
+  Journal of Engineering in Medicine</em>, 227(6):617-628, 2013.
+ <a href="http://dx.doi.org/10.1177/0954411912462814">http://dx.doi.org/10.1177/0954411912462814</a>.
+<a name="Widmer_2013"></a><pre>
+@article{Widmer_2013,
+  author = {R.~P.~Widmer and S.~J.~Ferguson},
+  title = {{A comparison and verification of computational methods to determine the permeability of vertebral trabecular bone}},
+  journal = {Proceedings of the Institution of Mechanical Engineers, Part H: Journal of Engineering in Medicine},
+  year = 2013,
+  volume = 227,
+  number = 6,
+  pages = {617--628},
+  note = {\url{http://dx.doi.org/10.1177/0954411912462814}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Fuentes_2013">31</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;S. Weinberg, A.&nbsp;Shetty, J.&nbsp;D. Hazle, and R.&nbsp;J.
@@ -1052,7 +1623,7 @@ D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;S. Weinberg, A.&nbsp;Shetty, J.&nbsp;D
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2013">9</a>]
+[<a name="Huynh_2013">32</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -1083,7 +1654,7 @@ D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2013">10</a>]
+[<a name="Vavourakis_2013">33</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanastasiou.
@@ -1111,7 +1682,7 @@ V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanasta
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2013">11</a>]
+[<a name="Zhu_2013">34</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
@@ -1139,7 +1710,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berr
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vetter_2013">12</a>]
+[<a name="Vetter_2013">35</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
@@ -1351,34 +1922,7 @@ S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bhalla_2012">7</a>]
-</td>
-<td class="bibtexitem">
-A.&nbsp;P.&nbsp;S. Bhalla, R.&nbsp;Bale, B.&nbsp;E. Griffith, and N.&nbsp;A. Patankar.
- Fully resolved immersed electrohydrodynamics for particle motion,
-  electrolocation, and self-propulsion.
- In <em>65th Annual Meeting of the APS Division of Fluid Dynamics
-  Volume 57, Number 17</em>, November&nbsp;20, 2012.
- <a href="http://meetings.aps.org/link/BAPS.2012.DFD.M5.4">http://meetings.aps.org/link/BAPS.2012.DFD.M5.4</a>.
-<a name="Bhalla_2012"></a><pre>
-@inproceedings{Bhalla_2012,
-  author = {A.~P.~S.~Bhalla and R.~Bale and B.~E.~Griffith and N.~A.~Patankar},
-  title = {{Fully resolved immersed electrohydrodynamics for particle motion, electrolocation, and self-propulsion}},
-  booktitle = {{65th Annual Meeting of the APS Division of Fluid Dynamics Volume 57, Number 17}},
-  year = {2012},
-  month = nov # {~20,},
-  note = {\url{http://meetings.aps.org/link/BAPS.2012.DFD.M5.4}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Trepanier_2012">8</a>]
+[<a name="Trepanier_2012">7</a>]
 </td>
 <td class="bibtexitem">
 P.-Y. Tr&eacute;panier, I.&nbsp;Fortin, C.&nbsp;Lambert, and F.&nbsp;Lacroix.
@@ -1409,7 +1953,7 @@ P.-Y. Tr&eacute;panier, I.&nbsp;Fortin, C.&nbsp;Lambert, and F.&nbsp;Lacroix.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Clarno_2012">9</a>]
+[<a name="Clarno_2012">8</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;T. Clarno et&nbsp;al.
@@ -1436,7 +1980,7 @@ K.&nbsp;T. Clarno et&nbsp;al.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Amaziane_2012">10</a>]
+[<a name="Amaziane_2012">9</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;Amaziane, M.&nbsp;Jurak, and A.&nbsp;Keko.
@@ -1469,7 +2013,7 @@ B.&nbsp;Amaziane, M.&nbsp;Jurak, and A.&nbsp;Keko.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Stull_2012">11</a>]
+[<a name="Stull_2012">10</a>]
 </td>
 <td class="bibtexitem">
 C.&nbsp;J. Stull, B.&nbsp;J. Williams, and C.&nbsp;Unal.
@@ -1498,7 +2042,7 @@ C.&nbsp;J. Stull, B.&nbsp;J. Williams, and C.&nbsp;Unal.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Ortensi_2012">12</a>]
+[<a name="Ortensi_2012">11</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;Ortensi, A.&nbsp;A. Bingham, D.&nbsp;Andrs, and R.&nbsp;C. Martineau.
@@ -1525,7 +2069,7 @@ J.&nbsp;Ortensi, A.&nbsp;A. Bingham, D.&nbsp;Andrs, and R.&nbsp;C. Martineau.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Short_2012">13</a>]
+[<a name="Short_2012">12</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;P. Short.
@@ -1554,7 +2098,7 @@ M.&nbsp;P. Short.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Novascone_2012">14</a>]
+[<a name="Novascone_2012">13</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;R. Novascone, J.&nbsp;D. Hales, B.&nbsp;W. Spencer, and R.&nbsp;L. Williamson.
@@ -1582,7 +2126,7 @@ S.&nbsp;R. Novascone, J.&nbsp;D. Hales, B.&nbsp;W. Spencer, and R.&nbsp;L. Willi
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Spencer_2012">15</a>]
+[<a name="Spencer_2012">14</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;W. Spencer, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, and R.&nbsp;L. Williamson.
@@ -1610,7 +2154,7 @@ B.&nbsp;W. Spencer, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, and R.&nbsp;L. Willi
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bingham_2012">16</a>]
+[<a name="Bingham_2012">15</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;A. Bingham, J.&nbsp;Ortensi, R.&nbsp;Jain, I.&nbsp;Grindeanu, and T.&nbsp;Tautges.
@@ -1637,7 +2181,7 @@ A.&nbsp;A. Bingham, J.&nbsp;Ortensi, R.&nbsp;Jain, I.&nbsp;Grindeanu, and T.&nbs
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gaston_2012">17</a>]
+[<a name="Gaston_2012">16</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Gaston, L.&nbsp;Guo, G.&nbsp;Hansen, H.&nbsp;Huang, R.&nbsp;Johnson, D.&nbsp;Knoll, C.&nbsp;Newman, H.&nbsp;K.
@@ -1670,7 +2214,7 @@ D.&nbsp;Gaston, L.&nbsp;Guo, G.&nbsp;Hansen, H.&nbsp;Huang, R.&nbsp;Johnson, D.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gerner_2012c">18</a>]
+[<a name="Gerner_2012c">17</a>]
 </td>
 <td class="bibtexitem">
 A.-L. Gerner and K.&nbsp;Veroy.
@@ -1695,7 +2239,7 @@ A.-L. Gerner and K.&nbsp;Veroy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gerner_2012b">19</a>]
+[<a name="Gerner_2012b">18</a>]
 </td>
 <td class="bibtexitem">
 A.-L. Gerner, A.&nbsp;Reusken, and K.&nbsp;Veroy.
@@ -1720,7 +2264,7 @@ A.-L. Gerner, A.&nbsp;Reusken, and K.&nbsp;Veroy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bauman_2012">20</a>]
+[<a name="Bauman_2012">19</a>]
 </td>
 <td class="bibtexitem">
 P.&nbsp;T. Bauman, J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, S.&nbsp;Prudhomme, and K.&nbsp;Ravi-Chandar.
@@ -1748,7 +2292,7 @@ P.&nbsp;T. Bauman, J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, S.&nbsp;Prudhomme, and
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kalashnikova_2012">21</a>]
+[<a name="Kalashnikova_2012">20</a>]
 </td>
 <td class="bibtexitem">
 I.&nbsp;Kalashnikova and S.&nbsp;Arunajatesan.
@@ -1774,7 +2318,7 @@ I.&nbsp;Kalashnikova and S.&nbsp;Arunajatesan.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Guo_2012">22</a>]
+[<a name="Guo_2012">21</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Guo, C.&nbsp;Lu, H.&nbsp;Huang, and D.&nbsp;R. Gaston.
@@ -1802,7 +2346,7 @@ L.&nbsp;Guo, C.&nbsp;Lu, H.&nbsp;Huang, and D.&nbsp;R. Gaston.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gleicher_2012">23</a>]
+[<a name="Gleicher_2012">22</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;N. Gleicher, Y.&nbsp;Wang, D.&nbsp;R. Gaston, and R.&nbsp;Martineau.
@@ -1830,7 +2374,7 @@ F.&nbsp;N. Gleicher, Y.&nbsp;Wang, D.&nbsp;R. Gaston, and R.&nbsp;Martineau.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2012b">24</a>]
+[<a name="Podgorney_2012b">23</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, H.&nbsp;Huang, M.&nbsp;Plummer, and D.&nbsp;Gaston.
@@ -1861,7 +2405,7 @@ R.&nbsp;Podgorney, H.&nbsp;Huang, M.&nbsp;Plummer, and D.&nbsp;Gaston.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Camata_2012">25</a>]
+[<a name="Camata_2012">24</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga, G.&nbsp;F. Carey, and
@@ -1892,7 +2436,7 @@ J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="NEMO5">26</a>]
+[<a name="NEMO5">25</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Steiger.
@@ -1921,7 +2465,7 @@ S.&nbsp;Steiger.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Schulz_2012">27</a>]
+[<a name="Schulz_2012">26</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;W. Schulz, R.&nbsp;Ulerich, N.&nbsp;Malaya, P.&nbsp;T. Bauman, R.&nbsp;Stogner, and C.&nbsp;Simmons.
@@ -1949,7 +2493,7 @@ K.&nbsp;W. Schulz, R.&nbsp;Ulerich, N.&nbsp;Malaya, P.&nbsp;T. Bauman, R.&nbsp;S
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Williamson_2012b">28</a>]
+[<a name="Williamson_2012b">27</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;L. Williamson and S.&nbsp;R. Novascone.
@@ -1977,7 +2521,7 @@ R.&nbsp;L. Williamson and S.&nbsp;R. Novascone.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhang_2012">29</a>]
+[<a name="Zhang_2012">28</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Zhang, M.&nbsp;R. Tonks, P.&nbsp;C. Millett, Y.&nbsp;Zhang, K.&nbsp;Chockalingam, and B.&nbsp;Biner.
@@ -2005,7 +2549,7 @@ L.&nbsp;Zhang, M.&nbsp;R. Tonks, P.&nbsp;C. Millett, Y.&nbsp;Zhang, K.&nbsp;Choc
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Corsini_2012">30</a>]
+[<a name="Corsini_2012">29</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Corsini, A.&nbsp;Marchegiani, F.&nbsp;Rispoli, P.&nbsp;Venturini, and A.&nbsp;G. Sheard.
@@ -2034,7 +2578,7 @@ A.&nbsp;Corsini, A.&nbsp;Marchegiani, F.&nbsp;Rispoli, P.&nbsp;Venturini, and A.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2012">31</a>]
+[<a name="Zhu_2012">30</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;F. Zhu, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
@@ -2064,7 +2608,7 @@ Y.&nbsp;F. Zhu, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Akkoyun_2012">32</a>]
+[<a name="Akkoyun_2012">31</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Akkoyun et&nbsp;al.
@@ -2093,7 +2637,7 @@ S.&nbsp;Akkoyun et&nbsp;al.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Mahadevan_2012">33</a>]
+[<a name="Mahadevan_2012">32</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
@@ -2121,7 +2665,7 @@ V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2012">34</a>]
+[<a name="Podgorney_2012">33</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, C.&nbsp;Lu, and H.&nbsp;Huang.
@@ -2151,7 +2695,7 @@ R.&nbsp;Podgorney, C.&nbsp;Lu, and H.&nbsp;Huang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Tonks_2012">35</a>]
+[<a name="Tonks_2012">34</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;R. Tonks, D.&nbsp;R. Gaston, P.&nbsp;C. Millett, D.&nbsp;Andrs, and P.&nbsp;Talbot.
@@ -2180,7 +2724,7 @@ M.&nbsp;R. Tonks, D.&nbsp;R. Gaston, P.&nbsp;C. Millett, D.&nbsp;Andrs, and P.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Slaughter_2012">36</a>]
+[<a name="Slaughter_2012">35</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;E. Slaughter and N.&nbsp;Zabaras.
@@ -2207,7 +2751,7 @@ A.&nbsp;E. Slaughter and N.&nbsp;Zabaras.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bordas_2012">37</a>]
+[<a name="Bordas_2012">36</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;M. Bordas, K.&nbsp;Gillow, D.&nbsp;Gavaghan, B.&nbsp;Rodriguez, and D.&nbsp;Kay.
@@ -2235,7 +2779,7 @@ R.&nbsp;M. Bordas, K.&nbsp;Gillow, D.&nbsp;Gavaghan, B.&nbsp;Rodriguez, and D.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hales_2012">38</a>]
+[<a name="Hales_2012">37</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;D. Hales, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, D.&nbsp;R. Gaston, and M.&nbsp;R. Tonks.
@@ -2264,7 +2808,7 @@ J.&nbsp;D. Hales, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, D.&nbsp;R. Gaston
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bassi_2012">39</a>]
+[<a name="Bassi_2012">38</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;Bassi, L.&nbsp;Botti, A.&nbsp;Colombo, D.&nbsp;A.&nbsp;Di Pietro, and P.&nbsp;Tesini.
@@ -2293,7 +2837,7 @@ F.&nbsp;Bassi, L.&nbsp;Botti, A.&nbsp;Colombo, D.&nbsp;A.&nbsp;Di Pietro, and P.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Andrijauskas_2012">40</a>]
+[<a name="Andrijauskas_2012">39</a>]
 </td>
 <td class="bibtexitem">
 T.&nbsp;Andrijauskas, A.&nbsp;A. Shylau, and I.&nbsp;V. Zozoulenko.
@@ -2321,7 +2865,7 @@ T.&nbsp;Andrijauskas, A.&nbsp;A. Shylau, and I.&nbsp;V. Zozoulenko.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Williamson_2012">41</a>]
+[<a name="Williamson_2012">40</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;L. Williamson, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, M.&nbsp;R. Tonks, D.&nbsp;R. Gaston,
@@ -2349,7 +2893,7 @@ R.&nbsp;L. Williamson, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, M.&nbsp;R. Tonks,
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2012">42</a>]
+[<a name="Eftang_2012">41</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -2376,7 +2920,7 @@ J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gerner_2012">43</a>]
+[<a name="Gerner_2012">42</a>]
 </td>
 <td class="bibtexitem">
 A.-L. Gerner and K.&nbsp;Veroy.
@@ -2407,7 +2951,7 @@ A.-L. Gerner and K.&nbsp;Veroy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brummelen_2012">44</a>]
+[<a name="Brummelen_2012">43</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&nbsp;Prudhomme.
@@ -2436,7 +2980,7 @@ E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2012">45</a>]
+[<a name="Huynh_2012">44</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -2465,7 +3009,7 @@ D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Wang_2012">46</a>]
+[<a name="Wang_2012">45</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Wang, A.&nbsp;A. Bingham, J.&nbsp;Ortensi, and C.&nbsp;J. Permann.
@@ -2490,7 +3034,7 @@ Y.&nbsp;Wang, A.&nbsp;A. Bingham, J.&nbsp;Ortensi, and C.&nbsp;J. Permann.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rabiti_2012">47</a>]
+[<a name="Rabiti_2012">46</a>]
 </td>
 <td class="bibtexitem">
 C.&nbsp;Rabiti, A.&nbsp;Alfonsi, D.&nbsp;Mandelli, J.&nbsp;Cogliati, and R.&nbsp;Martineau.

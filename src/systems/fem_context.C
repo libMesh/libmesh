@@ -1536,19 +1536,19 @@ void FEMContext::elem_position_get()
       // For simplicity we demand that mesh coordinates be stored
       // in a format that allows a direct copy
       libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
-		     (element_fe_var[_mesh_x_var]->get_fe_type().family
+		     (_element_fe_var[_mesh_x_var]->get_fe_type().family
                       == LAGRANGE &&
-                      element_fe_var[_mesh_x_var]->get_fe_type().order
+                      _element_fe_var[_mesh_x_var]->get_fe_type().order
                       == elem->default_order()));
       libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
-                     (element_fe_var[_mesh_y_var]->get_fe_type().family
+                     (_element_fe_var[_mesh_y_var]->get_fe_type().family
                       == LAGRANGE &&
-                      element_fe_var[_mesh_y_var]->get_fe_type().order
+                      _element_fe_var[_mesh_y_var]->get_fe_type().order
                       == elem->default_order()));
       libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
-                     (element_fe_var[_mesh_z_var]->get_fe_type().family
+                     (_element_fe_var[_mesh_z_var]->get_fe_type().family
                       == LAGRANGE &&
-                      element_fe_var[_mesh_z_var]->get_fe_type().order
+                      _element_fe_var[_mesh_z_var]->get_fe_type().order
                       == elem->default_order()));
 
       // Get degree of freedom coefficients from point coordinates
@@ -1596,15 +1596,15 @@ void FEMContext::_do_elem_position_set(Real)
       // For simplicity we demand that mesh coordinates be stored
       // in a format that allows a direct copy
       libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
-                     (element_fe_var[_mesh_x_var]->get_fe_type().family
+                     (_element_fe_var[_mesh_x_var]->get_fe_type().family
                       == LAGRANGE &&
                       elem_subsolutions[_mesh_x_var]->size() == n_nodes));
       libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
-                     (element_fe_var[_mesh_y_var]->get_fe_type().family
+                     (_element_fe_var[_mesh_y_var]->get_fe_type().family
                       == LAGRANGE &&
                       elem_subsolutions[_mesh_y_var]->size() == n_nodes));
       libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
-                     (element_fe_var[_mesh_z_var]->get_fe_type().family
+                     (_element_fe_var[_mesh_z_var]->get_fe_type().family
                       == LAGRANGE &&
                       elem_subsolutions[_mesh_z_var]->size() == n_nodes));
 

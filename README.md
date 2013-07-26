@@ -1,7 +1,7 @@
 libMesh-specific configuration options
 ======================================
 
-For generic installation instructions refer also to the file INSTALL.
+For generic installation instructions, refer also to the INSTALL file.
 
 Build Process
 -------------

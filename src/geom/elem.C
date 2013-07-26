@@ -2167,7 +2167,7 @@ const unsigned int Elem::PackedElem::header_size = 10;
 
 
 // Elem::PackedElem member funcions
-void Elem::PackedElem::pack (std::vector<int> &conn, const Elem* elem)
+void Elem::PackedElem::pack (std::vector<largest_id_type> &conn, const Elem* elem)
 {
   libmesh_assert(elem);
 
@@ -2177,17 +2177,17 @@ void Elem::PackedElem::pack (std::vector<int> &conn, const Elem* elem)
   conn.reserve (conn.size() + elem->packed_size());
 
 #ifdef LIBMESH_ENABLE_AMR
-  conn.push_back (static_cast<int>(elem->level()));
-  conn.push_back (static_cast<int>(elem->p_level()));
-  conn.push_back (static_cast<int>(elem->refinement_flag()));
-  conn.push_back (static_cast<int>(elem->p_refinement_flag()));
+  conn.push_back (static_cast<largest_id_type>(elem->level()));
+  conn.push_back (static_cast<largest_id_type>(elem->p_level()));
+  conn.push_back (static_cast<largest_id_type>(elem->refinement_flag()));
+  conn.push_back (static_cast<largest_id_type>(elem->p_refinement_flag()));
 #else
   conn.push_back (0);
   conn.push_back (0);
   conn.push_back (0);
   conn.push_back (0);
 #endif
-  conn.push_back (static_cast<int>(elem->type()));
+  conn.push_back (static_cast<largest_id_type>(elem->type()));
   conn.push_back (elem->processor_id());
   conn.push_back (elem->subdomain_id());
   conn.push_back (elem->id());

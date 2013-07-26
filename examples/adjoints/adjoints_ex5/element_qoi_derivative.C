@@ -34,27 +34,29 @@ using namespace libMesh;
 // We only have one QoI, so we don't bother checking the qois argument
 // to see if it was requested from us
 void HeatSystem::element_qoi_derivative (DiffContext &context,
-                                            const QoISet & /* qois */)
+                                         const QoISet & /* qois */)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
+  FEBase* elem_fe = NULL;
+  c.get_element_fe( 0, elem_fe );
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = c.element_fe_var[0]->get_JxW();
+  const std::vector<Real> &JxW = elem_fe->get_JxW();
 
   // The basis functions for the element
-  const std::vector<std::vector<Real> >          &phi = c.element_fe_var[0]->get_phi();
+  const std::vector<std::vector<Real> > &phi = elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs = c.dof_indices_var[0].size();
-  unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+  const unsigned int n_T_dofs = c.get_dof_indices(0).size();
+  unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   // Fill the QoI RHS corresponding to this QoI. Since this is the 0th QoI
   // we fill in the [0][i] subderivatives, i corresponding to the variable index.
   // Our system has only one variable, so we only have to fill the [0][0] subderivative
-  DenseSubVector<Number> &Q = *c.elem_qoi_subderivatives[0][0];
+  DenseSubVector<Number> &Q = c.get_qoi_derivatives(0,0);
 
   // A reference to the system context is built with
   const System & sys = c.get_system();

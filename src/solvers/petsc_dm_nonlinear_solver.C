@@ -31,6 +31,14 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/preconditioner.h"
 
+extern "C"
+{
+#if PETSC_VERSION_LESS_THAN(2,2,1)
+  typedef int PetscErrorCode;
+  typedef int PetscInt;
+#endif
+}
+
 // PETSc extern definition
 EXTERN_C_BEGIN
 PetscErrorCode DMCreate_libMesh(DM);
@@ -125,8 +133,8 @@ namespace libMesh {
     // Extract solution vector
     PetscVector<T>* x = libmesh_cast_ptr<PetscVector<T>*>(&x_in);
 
-    int ierr=0;
-    int n_iterations =0;
+    PetscErrorCode ierr=0;
+    PetscInt n_iterations =0;
 
 
     PetscReal final_residual_norm=0.;

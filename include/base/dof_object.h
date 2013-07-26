@@ -334,21 +334,22 @@ public:
    * If we have indices packed into an buffer for communications, how
    * much of that buffer applies to this dof object?
    */
-  static unsigned int unpackable_indexing_size(std::vector<int>::const_iterator begin);
+  static unsigned int unpackable_indexing_size
+    (std::vector<largest_id_type>::const_iterator begin);
 
   /**
    * A method for creating our index buffer from packed data -
    * basically with our current implementation we investigate the size
    * term and then copy.
    */
-  void unpack_indexing(std::vector<int>::const_iterator begin);
+  void unpack_indexing(std::vector<largest_id_type>::const_iterator begin);
 
   /**
    * A method for creating packed data from our index buffer -
    * basically a copy with prepended size with our current
    * implementation.
    */
-  void pack_indexing(std::back_insert_iterator<std::vector<int> > target) const;
+  void pack_indexing(std::back_insert_iterator<std::vector<largest_id_type> > target) const;
 
   /**
    * Print our buffer for debugging.

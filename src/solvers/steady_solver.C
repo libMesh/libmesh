@@ -38,7 +38,7 @@ bool SteadySolver::element_residual(bool request_jacobian,
   // solution
   if (_system.use_fixed_solution)
     {
-      context.elem_fixed_solution = context.elem_solution;
+      context.get_elem_fixed_solution() = context.get_elem_solution();
       context.fixed_solution_derivative = 1.0;
     }
 
@@ -66,7 +66,7 @@ bool SteadySolver::side_residual(bool request_jacobian,
   // solution
   if (_system.use_fixed_solution)
     {
-      context.elem_fixed_solution = context.elem_solution;
+      context.get_elem_fixed_solution() = context.get_elem_solution();
       context.fixed_solution_derivative = 1.0;
     }
 

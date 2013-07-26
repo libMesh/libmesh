@@ -44,17 +44,18 @@ struct M0 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
+    FEBase* elem_fe = NULL;
+    c.get_element_fe(u_var, elem_fe);
 
-    const std::vector<std::vector<Real> >& phi =
-      c.element_fe_var[u_var]->get_phi();
+    const std::vector<Real> &JxW = elem_fe->get_JxW();
+
+    const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+    const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -70,19 +71,20 @@ struct A0 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
+    FEBase* elem_fe = NULL;
+    c.get_element_fe(u_var, elem_fe);
+
+    const std::vector<Real> &JxW = elem_fe->get_JxW();
 
     // The velocity shape function gradients at interior
     // quadrature points.
-    const std::vector<std::vector<RealGradient> >& dphi =
-      c.element_fe_var[u_var]->get_dphi();
+    const std::vector<std::vector<RealGradient> >& dphi = elem_fe->get_dphi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+    const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -99,20 +101,20 @@ struct A1 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
+    FEBase* elem_fe = NULL;
+    c.get_element_fe(u_var, elem_fe);
 
-    const std::vector<std::vector<Real> >& phi =
-      c.element_fe_var[u_var]->get_phi();
+    const std::vector<Real> &JxW = elem_fe->get_JxW();
 
-    const std::vector<std::vector<RealGradient> >& dphi =
-      c.element_fe_var[u_var]->get_dphi();
+    const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
+
+    const std::vector<std::vector<RealGradient> >& dphi = elem_fe->get_dphi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+    const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -128,20 +130,20 @@ struct A2 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
+     FEBase* elem_fe = NULL;
+    c.get_element_fe(u_var, elem_fe);
 
-    const std::vector<std::vector<Real> >& phi =
-      c.element_fe_var[u_var]->get_phi();
+    const std::vector<Real> &JxW = elem_fe->get_JxW();
 
-    const std::vector<std::vector<RealGradient> >& dphi =
-      c.element_fe_var[u_var]->get_dphi();
+    const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
+
+    const std::vector<std::vector<RealGradient> >& dphi = elem_fe->get_dphi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+    const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -157,17 +159,18 @@ struct F0 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
+    FEBase* elem_fe = NULL;
+    c.get_element_fe(u_var, elem_fe);
 
-    const std::vector<std::vector<Real> >& phi =
-      c.element_fe_var[u_var]->get_phi();
+    const std::vector<Real> &JxW = elem_fe->get_JxW();
+
+    const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+    const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -191,21 +194,22 @@ struct OutputAssembly : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
+    FEBase* elem_fe = NULL;
+    c.get_element_fe(u_var, elem_fe);
 
-    const std::vector<std::vector<Real> >& phi =
-      c.element_fe_var[u_var]->get_phi();
+    const std::vector<Real> &JxW = elem_fe->get_JxW();
+
+    const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
 
     // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+    const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     Real output_area = (max_x-min_x) * (max_y-min_y);
 
-    Point centroid = c.elem->centroid();
+    Point centroid = c.get_elem().centroid();
     if( (min_x <= centroid(0)) && (centroid(0) <= max_x) &&
         (min_y <= centroid(1)) && (centroid(1) <= max_y) )
       for (unsigned int qp=0; qp != n_qpoints; qp++)
