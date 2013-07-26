@@ -144,10 +144,10 @@ public:
    * Performs the scaled matrix-vector multiplication,
    * \p dest += \p factor * (*this) * \p arg.
    */
-    template <typename T2, typename T3>
+    template <typename T2>
     typename boostcopy::enable_if_c<ScalarTraits<T2>::value, void >::type
-    vector_mult_add(DenseVector<typename CompareTypes<T2, T3>::supertype >& dest,
-                    const T2 factor, const DenseVector<T3>& arg) const;
+    vector_mult_add(DenseVector<typename CompareTypes<T, T2>::supertype >& dest,
+                    const T2 factor, const DenseVector<T2>& arg) const;
 
   /**
    * Put the \p sub_m x \p sub_n principal submatrix into \p dest.
