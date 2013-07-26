@@ -1954,7 +1954,7 @@ void DofMap::build_constraint_matrix_and_vector
 
           // If x = Cy + h and y = Dz + g
           // Then x = (CD)z + (Cg + h)
-          C.vector_mult_add(H, 1., Hnew);
+          C.vector_mult_add(H, (Number)1., Hnew);
         }
 
       libmesh_assert_equal_to (C.n(), elem_dofs.size());
