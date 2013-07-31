@@ -126,12 +126,16 @@ public:
   virtual unsigned get_current_nonlinear_iteration_number() const { return _current_nonlinear_iteration_number; }
 
   /**
-   * This public setter is necessary since the value is computed in the
-   * __libmesh_petsc_snes_residual()/jacobian() function and must be stored
-   * somehow.
+   * Set if the residual should be zeroed out in the callback
    */
-  void set_current_nonlinear_iteration_number(unsigned num) { _current_nonlinear_iteration_number = num; }
+  void set_residual_zero_out(bool state) { _zero_out_residual = state; }
 
+  /**
+   * Set if the jacobian should be zeroed out in the callback
+   */
+  void set_jacobian_zero_out(bool state) { _zero_out_jacobian = state; }
+
+protected:
   /**
    * Nonlinear solver context
    */
@@ -156,12 +160,25 @@ public:
    */
   unsigned _current_nonlinear_iteration_number;
 
+  /**
+   * true to zero out residual before going into application level call-back, otherwise false
+   */
+  bool _zero_out_residual;
+
+  /**
+   * true to zero out jacobian before going into application level call-back, otherwise false
+   */
+  bool _zero_out_jacobian;
+
  private:
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
   void build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject,
                             void (*)(std::vector<NumericVector<Number>*>&, sys_type&),
                             MatNullSpace*);
 #endif
+
+  friend PetscErrorCode __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void *ctx);
+  friend PetscErrorCode __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx);
 };
 
 
