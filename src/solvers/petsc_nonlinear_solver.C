@@ -203,13 +203,13 @@ extern "C"
     // will be used, so catch that as an error
     if (solver->jacobian && solver->jacobian_object)
       {
-	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Jacobian!" << std::endl;
+	libMesh::err << "ERROR: cannot specify both a function and object to compute the Jacobian!" << std::endl;
 	libmesh_error();
       }
 
     if (solver->matvec && solver->residual_and_jacobian_object)
       {
-	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
+	libMesh::err << "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!" << std::endl;
 	libmesh_error();
       }
     //-----------------------------------------------------------------------------
