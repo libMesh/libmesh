@@ -10,6 +10,7 @@
       see http://sourceforge.net/mailarchive/forum.php?thread_name=B4613A7D-0033-43C7-A9DF-5A801217A097%40nasa.gov&forum_name=libmesh-devel
   * Refreshed packaged METIS and ParMETIS to latest versions
   * Experimental support for DGFEMContext
+  * New accessor API for FEMContext objects. Public members deprecated.
   * Assorted bugfixes:
     * for nonstandard index sizes
 
