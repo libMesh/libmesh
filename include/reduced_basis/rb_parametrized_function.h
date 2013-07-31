@@ -48,7 +48,7 @@ public:
    * Evaluate this parametrized function for the parameter value
    * \p mu at the point \p p.
    */
-  virtual Number evaluate(const RBParameters& , const Point& , subdomain_id_type) { return 0.; }
+  virtual Number evaluate(const RBParameters& , const Point& , const subdomain_id_type) { return 0.; }
 
 };
 
