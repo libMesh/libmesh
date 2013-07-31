@@ -95,7 +95,7 @@ extern "C"
       PetscInt n_iterations = 0;
       ierr = SNESGetIterationNumber(snes, &n_iterations);
       CHKERRABORT(solver->comm().get(),ierr);
-      solver->set_current_nonlinear_iteration_number( static_cast<unsigned>(n_iterations) );
+      solver->_current_nonlinear_iteration_number = static_cast<unsigned>(n_iterations);
     }
 
     NonlinearImplicitSystem &sys = solver->system();
@@ -172,7 +172,7 @@ extern "C"
       PetscInt n_iterations = 0;
       ierr = SNESGetIterationNumber(snes, &n_iterations);
       CHKERRABORT(solver->comm().get(),ierr);
-      solver->set_current_nonlinear_iteration_number( static_cast<unsigned>(n_iterations) );
+      solver->_current_nonlinear_iteration_number = static_cast<unsigned>(n_iterations);
     }
 
     NonlinearImplicitSystem &sys = solver->system();
