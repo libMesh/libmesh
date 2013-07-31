@@ -37,7 +37,8 @@ using libMesh::RealGradient;
 struct ShiftedGaussian : public RBParametrizedFunction
 {
   virtual Number evaluate(const RBParameters& mu,
-                          const Point& p)
+                          const Point& p,
+                          const subdomain_id_type )
   {
     Real center_x = mu.get_value("center_x");
     Real center_y = mu.get_value("center_y");

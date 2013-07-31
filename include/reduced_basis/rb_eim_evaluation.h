@@ -94,10 +94,15 @@ public:
 
   /**
    * @return the value of the parametrized function that is being
-   * approximated at the point \p p. \p var_index specifies the
+   * approximated at the point \p p.
+   * \p var_index specifies the
    * variable (i.e. the parametrized function index) to be evaluated.
+   * \p subdomain_id specifies which subdomain of the mesh the
+   * evaluation is on.
    */
-  Number evaluate_parametrized_function(unsigned int var_index, const Point& p);
+  Number evaluate_parametrized_function(unsigned int var_index,
+                                        const Point& p,
+                                        subdomain_id_type subdomain_id);
 
   /**
    * Calculate the EIM approximation to parametrized_function
@@ -167,6 +172,12 @@ public:
    * the interpolation points were identified.
    */
   std::vector<unsigned int> interpolation_points_var;
+  
+  /**
+   * The corresponding list of subdomain ids at which
+   * the interpolation points were identified.
+   */
+  std::vector<subdomain_id_type> interpolation_points_subdomain;
 
   /**
    * We also need an extra interpolation point and associated
@@ -175,6 +186,7 @@ public:
    */
   Point extra_interpolation_point;
   unsigned int extra_interpolation_point_var;
+  unsigned int extra_interpolation_point_subdomain;
 
   /**
    * We also need a DenseVector to represent the corresponding

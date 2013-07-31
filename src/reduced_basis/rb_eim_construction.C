@@ -289,6 +289,7 @@ void RBEIMConstruction::enrich_RB_space()
   Point optimal_point;
   Number optimal_value = 0.;
   unsigned int optimal_var;
+  subdomain_id_type optimal_subdomain;
 
   // Compute truth representation via projection
   const MeshBase& mesh = this->get_mesh();
@@ -321,6 +322,7 @@ void RBEIMConstruction::enrich_RB_space()
           optimal_value = value;
           optimal_point = elem_fe->get_xyz()[qp];
           optimal_var = var;
+          optimal_subdomain = (*el)->subdomain_id();
         }
 
       }
@@ -334,9 +336,10 @@ void RBEIMConstruction::enrich_RB_space()
   // Broadcast the optimal point from proc_ID_index
   this->comm().broadcast(optimal_point, proc_ID_index);
 
-  // Also broadcast the corresponding optimal_var and optimal_value
+  // Also broadcast the corresponding optimal_var, optimal_value, and optimal_subdomain
   this->comm().broadcast(optimal_var, proc_ID_index);
   this->comm().broadcast(optimal_value, proc_ID_index);
+  this->comm().broadcast(optimal_subdomain, proc_ID_index);
 
   // Scale the solution
   solution->scale(1./optimal_value);
@@ -346,6 +349,7 @@ void RBEIMConstruction::enrich_RB_space()
   {
     eim_eval.interpolation_points.push_back(optimal_point);
     eim_eval.interpolation_points_var.push_back(optimal_var);
+    eim_eval.interpolation_points_subdomain.push_back(optimal_subdomain);
 
     NumericVector<Number>* new_bf = NumericVector<Number>::build(this->comm()).release();
     new_bf->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
@@ -356,6 +360,7 @@ void RBEIMConstruction::enrich_RB_space()
   {
     eim_eval.extra_interpolation_point = optimal_point;
     eim_eval.extra_interpolation_point_var = optimal_var;
+    eim_eval.extra_interpolation_point_subdomain = optimal_subdomain;
   }
 
   STOP_LOG("enrich_RB_space()", "RBEIMConstruction");
@@ -528,7 +533,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
         for(unsigned int qp=0; qp<n_qpoints; qp++)
           for(unsigned int i=0; i != n_var_dofs; i++)
-            subresidual_var(i) += JxW[qp] * eim_eval.evaluate_parametrized_function(var, xyz[qp]) * phi[i][qp];
+            subresidual_var(i) += JxW[qp] * eim_eval.evaluate_parametrized_function(var, xyz[qp], (*el)->subdomain_id()) * phi[i][qp];
       }
 
       // Apply constraints, e.g. periodic constraints
