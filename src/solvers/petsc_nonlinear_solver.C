@@ -116,7 +116,8 @@ extern "C"
     X_global.swap(X_sys);
     R.swap(R_sys);
 
-    R.zero();
+    if (solver->_zero_out_residual)
+      R.zero();
 
     //-----------------------------------------------------------------------------
     // if the user has provided both function pointers and objects only the pointer
@@ -196,7 +197,8 @@ extern "C"
     X_global.swap(X_sys);
     Jac.swap(Jac_sys);
 
-    PC.zero();
+    if (solver->_zero_out_jacobian)
+      PC.zero();
 
     //-----------------------------------------------------------------------------
     // if the user has provided both function pointers and objects only the pointer
@@ -243,7 +245,9 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type& system_in) :
     NonlinearSolver<T>(system_in),
     _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
     _n_linear_iterations(0),
-    _current_nonlinear_iteration_number(0)
+    _current_nonlinear_iteration_number(0),
+    _zero_out_residual(true),
+    _zero_out_jacobian(true)
 {
 }
 

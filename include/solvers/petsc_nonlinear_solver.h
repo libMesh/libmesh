@@ -156,6 +156,16 @@ public:
    */
   unsigned _current_nonlinear_iteration_number;
 
+  /**
+   * true to zero out residual before going into application level call-back, otherwise false
+   */
+  bool _zero_out_residual;
+
+  /**
+   * true to zero out jacobian before going into application level call-back, otherwise false
+   */
+  bool _zero_out_jacobian;
+
  private:
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
   void build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject,
