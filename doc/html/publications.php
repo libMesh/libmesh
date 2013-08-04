@@ -468,38 +468,7 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Corsini_2013">1</a>]
-</td>
-<td class="bibtexitem">
-A.&nbsp;Corsini, F.&nbsp;Rispoli, A.&nbsp;G. Sheard, and P.&nbsp;Venturini.
- Numerical simulation of coal fly-ash erosion in an induced draft
-  fan.
- <em>Journal of Fluids Engineering</em>, 135(8):081303 (12 pages), June
-  2013.
-
-  <a href="http://fluidsengineering.asmedigitalcollection.asme.org/article.aspx?articleid=1695855">http://fluidsengineering.asmedigitalcollection.asme.org/article.aspx?articleid=1695855</a>.
-<a name="Corsini_2013"></a><pre>
-@article{Corsini_2013,
-  author = {A.~Corsini and F.~Rispoli and A.~G.~Sheard and P.~Venturini},
-  title = {{Numerical simulation of coal fly-ash erosion in an induced draft fan}},
-  journal = {Journal of Fluids Engineering},
-  year = 2013,
-  month = jun,
-  volume = 135,
-  number = 8,
-  pages = {081303 (12 pages)},
-  note = {\url{http://fluidsengineering.asmedigitalcollection.asme.org/article.aspx?articleid=1695855}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Nagler_2013">2</a>]
+[<a name="Nagler_2013">1</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Nagler, P.&nbsp;Rong, M.&nbsp;Schanz, and O.&nbsp;von Estorff.
@@ -525,7 +494,7 @@ L.&nbsp;Nagler, P.&nbsp;Rong, M.&nbsp;Schanz, and O.&nbsp;von Estorff.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rong_2013">3</a>]
+[<a name="Rong_2013">2</a>]
 </td>
 <td class="bibtexitem">
 P.&nbsp;Rong, O.&nbsp;von Estorff, L.&nbsp;Nagler, and M.&nbsp;Schanz.
@@ -543,6 +512,33 @@ P.&nbsp;Rong, O.&nbsp;von Estorff, L.&nbsp;Nagler, and M.&nbsp;Schanz.
   year = 2013,
   month = feb,
   note = {\url{http://portal.tugraz.at/portal/page/portal/Files/i2610/files/Forschung/Veroeffentl/Preprint_2012_02.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Toader_2013">3</a>]
+</td>
+<td class="bibtexitem">
+A.-M. Toader and C.&nbsp;Barbarosie.
+ Optimization of bodies with locally periodic microstructure by
+  varying the periodicity pattern.
+ In <em>Centro de Matem&aacute;tica e Aplica&ccedil;&otilde;es Fundamentais
+  (CMAF) Preprint Pre-010</em>, 2013.
+
+  <a href="http://ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2013/preprint_010.pdf">http://ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2013/preprint_010.pdf</a>.
+<a name="Toader_2013"></a><pre>
+@inproceedings{Toader_2013,
+  author = {A.-M.~Toader and C.~Barbarosie},
+  title = {{Optimization of bodies with locally periodic microstructure by varying the periodicity pattern}},
+  booktitle = {{Centro de Matem\'{a}tica e Aplica\c{c}\~{o}es Fundamentais (CMAF) Preprint Pre-010}},
+  year = {2013},
+  note = {\url{http://ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2013/preprint_010.pdf}}
 }
 </pre>
 
@@ -855,7 +851,66 @@ B.&nbsp;S. Kirk, R.&nbsp;H. Stogner, T.&nbsp;A. Oliver, and P.&nbsp;T. Bauman.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fahrenholtz_2013">4</a>]
+[<a name="Corsini_2013">4</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;Corsini, F.&nbsp;Rispoli, A.&nbsp;G. Sheard, and P.&nbsp;Venturini.
+ Numerical simulation of coal fly-ash erosion in an induced draft
+  fan.
+ <em>Journal of Fluids Engineering</em>, 135(8):081303 (12 pages), June
+  2013.
+ <a href="http://dx.doi.org/10.1115/1.4024127">http://dx.doi.org/10.1115/1.4024127</a>.
+<a name="Corsini_2013"></a><pre>
+@article{Corsini_2013,
+  author = {A.~Corsini and F.~Rispoli and A.~G.~Sheard and P.~Venturini},
+  title = {{Numerical simulation of coal fly-ash erosion in an induced draft fan}},
+  journal = {Journal of Fluids Engineering},
+  year = 2013,
+  month = jun,
+  volume = 135,
+  number = 8,
+  pages = {081303 (12 pages)},
+  note = {\url{http://dx.doi.org/10.1115/1.4024127}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Dickson_2013">5</a>]
+</td>
+<td class="bibtexitem">
+T.&nbsp;L. Dickson, P.&nbsp;T. Williams, S.&nbsp;Yin, H.&nbsp;B. Klasky, S.&nbsp;K. Tadinada, and B.&nbsp;R.
+  Bass.
+ Grizzly/FAVOR Interface Project Report.
+ Technical Report ORNL/TM-2013/44094, Oak Ridge National Laboratory,
+  June 2013.
+
+  <a href="https://inlportal.inl.gov/portal/server.pt/gateway/PTARGS_0_4791_129412_0_0_18/GRIZZLY-FAVOR_InterfaceProjectReport_ORN_TM_2013_44094.pdf">https://inlportal.inl.gov/portal/server.pt/gateway/PTARGS_0_4791_129412_0_0_18/GRIZZLY-FAVOR_InterfaceProjectReport_ORN_TM_2013_44094.pdf</a>.
+<a name="Dickson_2013"></a><pre>
+@techreport{Dickson_2013,
+  author = {T.~L.~Dickson and P.~T.~Williams and S.~Yin and H.~B.~Klasky and S.~K.~Tadinada and B.~R.~Bass},
+  title = {{Grizzly/FAVOR Interface Project Report}},
+  institution = {Oak Ridge National Laboratory},
+  month = jun,
+  year = {2013},
+  number = {ORNL/TM-2013/44094},
+  note = {\url{https://inlportal.inl.gov/portal/server.pt/gateway/PTARGS_0_4791_129412_0_0_18/GRIZZLY-FAVOR_InterfaceProjectReport_ORN_TM_2013_44094.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Fahrenholtz_2013">6</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;J. Fahrenholtz, R.&nbsp;J. Stafford, F.&nbsp;Maier, J.&nbsp;D. Hazle, and D.&nbsp;Fuentes.
@@ -884,7 +939,7 @@ S.&nbsp;J. Fahrenholtz, R.&nbsp;J. Stafford, F.&nbsp;Maier, J.&nbsp;D. Hazle, an
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Oden_2013">5</a>]
+[<a name="Oden_2013">7</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, and A.&nbsp;Hawkins-Daarud.
@@ -914,7 +969,7 @@ J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, and A.&nbsp;Hawkins-Daarud.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Delchini_2013">6</a>]
+[<a name="Delchini_2013">8</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;O. Delchini, J.&nbsp;C. Ragusa, and R.&nbsp;A. Berry.
@@ -939,7 +994,7 @@ M.&nbsp;O. Delchini, J.&nbsp;C. Ragusa, and R.&nbsp;A. Berry.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Alfonsi_2013">7</a>]
+[<a name="Alfonsi_2013">9</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Alfonsi, C.&nbsp;Rabiti, D.&nbsp;Mandelli, J.&nbsp;J. Cogliati, and R.&nbsp;A. Kinoshita.
@@ -965,7 +1020,7 @@ A.&nbsp;Alfonsi, C.&nbsp;Rabiti, D.&nbsp;Mandelli, J.&nbsp;J. Cogliati, and R.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rabiti_2013">8</a>]
+[<a name="Rabiti_2013">10</a>]
 </td>
 <td class="bibtexitem">
 C.&nbsp;Rabiti, D.&nbsp;Mandelli, A.&nbsp;Alfonsi, J.&nbsp;J. Cogliati, and R.&nbsp;A. Kinoshita.
@@ -991,7 +1046,7 @@ C.&nbsp;Rabiti, D.&nbsp;Mandelli, A.&nbsp;Alfonsi, J.&nbsp;J. Cogliati, and R.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Wang_2013">9</a>]
+[<a name="Wang_2013">11</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Wang.
@@ -1017,7 +1072,7 @@ Y.&nbsp;Wang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Johnson_2013">10</a>]
+[<a name="Johnson_2013">12</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Johnson and H.&nbsp;Zhao.
@@ -1043,7 +1098,7 @@ M.&nbsp;Johnson and H.&nbsp;Zhao.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gleicher_2013">11</a>]
+[<a name="Gleicher_2013">13</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;N. Gleicher, B.&nbsp;W. Spencer, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, R.&nbsp;C.
@@ -1070,7 +1125,7 @@ F.&nbsp;N. Gleicher, B.&nbsp;W. Spencer, S.&nbsp;R. Novascone, R.&nbsp;L. Willia
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="HZhang_2013">12</a>]
+[<a name="HZhang_2013">14</a>]
 </td>
 <td class="bibtexitem">
 H.&nbsp;Zhang, L.&nbsp;Zou, D.&nbsp;Andrs, H.&nbsp;Zhao, and R.&nbsp;C. Martineau.
@@ -1096,7 +1151,7 @@ H.&nbsp;Zhang, L.&nbsp;Zou, D.&nbsp;Andrs, H.&nbsp;Zhao, and R.&nbsp;C. Martinea
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Tonks_2013">13</a>]
+[<a name="Tonks_2013">15</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;R. Tonks, S.&nbsp;B. Biner, P.&nbsp;C. Millett, and D.&nbsp;A. Andersson.
@@ -1122,7 +1177,7 @@ M.&nbsp;R. Tonks, S.&nbsp;B. Biner, P.&nbsp;C. Millett, and D.&nbsp;A. Andersson
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zou_2013">14</a>]
+[<a name="Zou_2013">16</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Zou, J.&nbsp;W. Peterson, H.&nbsp;Zhao, H.&nbsp;Zhang, D.&nbsp;Andrs, and R.&nbsp;C. Martineau.
@@ -1148,7 +1203,7 @@ L.&nbsp;Zou, J.&nbsp;W. Peterson, H.&nbsp;Zhao, H.&nbsp;Zhang, D.&nbsp;Andrs, an
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Novascone_2013">15</a>]
+[<a name="Novascone_2013">17</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;R. Novascone, B.&nbsp;W. Spencer, D.&nbsp;Andrs, R.&nbsp;L. Williamson, J.&nbsp;D. Hales, and
@@ -1174,7 +1229,7 @@ S.&nbsp;R. Novascone, B.&nbsp;W. Spencer, D.&nbsp;Andrs, R.&nbsp;L. Williamson, 
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Perez_2013">16</a>]
+[<a name="Perez_2013">18</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;M. Perez, R.&nbsp;L. Williamson, S.&nbsp;R. Novascone, T.&nbsp;K. Larson, J.&nbsp;D. Hales,
@@ -1200,7 +1255,7 @@ D.&nbsp;M. Perez, R.&nbsp;L. Williamson, S.&nbsp;R. Novascone, T.&nbsp;K. Larson
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hales_2013">17</a>]
+[<a name="Hales_2013">19</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;D. Hales, D.&nbsp;R. Gaston, and D.&nbsp;Andrs.
@@ -1226,7 +1281,7 @@ J.&nbsp;D. Hales, D.&nbsp;R. Gaston, and D.&nbsp;Andrs.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gaston_2013">18</a>]
+[<a name="Gaston_2013">20</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;R. Gaston, C.&nbsp;J. Permann, D.&nbsp;Andrs, and J.&nbsp;W. Peterson.
@@ -1251,7 +1306,7 @@ D.&nbsp;R. Gaston, C.&nbsp;J. Permann, D.&nbsp;Andrs, and J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Swiler_2013">19</a>]
+[<a name="Swiler_2013">21</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;P. Swiler, R.&nbsp;L. Williamson, and D.&nbsp;M. Perez.
@@ -1278,7 +1333,7 @@ L.&nbsp;P. Swiler, R.&nbsp;L. Williamson, and D.&nbsp;M. Perez.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bittl_2012">20</a>]
+[<a name="Bittl_2012">22</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Bittl and D.&nbsp;Kuzmin.
@@ -1307,7 +1362,7 @@ M.&nbsp;Bittl and D.&nbsp;Kuzmin.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Chockalingam_2013">21</a>]
+[<a name="Chockalingam_2013">23</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;Chockalingam, M.&nbsp;R. Tonks, J.&nbsp;D. Hales, D.&nbsp;R. Gaston, P.&nbsp;C. Millett, and
@@ -1336,7 +1391,7 @@ K.&nbsp;Chockalingam, M.&nbsp;R. Tonks, J.&nbsp;D. Hales, D.&nbsp;R. Gaston, P.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lee_2013">22</a>]
+[<a name="Lee_2013">24</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;Lee and K.&nbsp;Willcox.
@@ -1363,7 +1418,7 @@ K.&nbsp;Lee and K.&nbsp;Willcox.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bhatia_2013">23</a>]
+[<a name="Bhatia_2013">25</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Bhatia and P.&nbsp;Beran.
@@ -1390,7 +1445,7 @@ M.&nbsp;Bhatia and P.&nbsp;Beran.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Opstal_2013">24</a>]
+[<a name="Opstal_2013">26</a>]
 </td>
 <td class="bibtexitem">
 T.&nbsp;M. van Opstal, P.&nbsp;T. Bauman, S.&nbsp;Prudhomme, and E.&nbsp;H. Brummelen.
@@ -1418,7 +1473,7 @@ T.&nbsp;M. van Opstal, P.&nbsp;T. Bauman, S.&nbsp;Prudhomme, and E.&nbsp;H. Brum
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hu_2013">25</a>]
+[<a name="Hu_2013">27</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Hu, J.&nbsp;W. Thomas, and T.&nbsp;H. Fanning.
@@ -1446,7 +1501,7 @@ R.&nbsp;Hu, J.&nbsp;W. Thomas, and T.&nbsp;H. Fanning.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Guo_2013">26</a>]
+[<a name="Guo_2013">28</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Guo, H.&nbsp;Huang, D.&nbsp;R. Gaston, C.&nbsp;J. Permann, D.&nbsp;Andrs, G.&nbsp;D. Redden, C.&nbsp;Lu,
@@ -1476,7 +1531,7 @@ L.&nbsp;Guo, H.&nbsp;Huang, D.&nbsp;R. Gaston, C.&nbsp;J. Permann, D.&nbsp;Andrs
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhang_2013">27</a>]
+[<a name="Zhang_2013">29</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Zhang, M.&nbsp;R. Tonks, D.&nbsp;Gaston, J.&nbsp;W. Peterson, D.&nbsp;Andrs, P.&nbsp;C. Millett, and
@@ -1505,7 +1560,7 @@ L.&nbsp;Zhang, M.&nbsp;R. Tonks, D.&nbsp;Gaston, J.&nbsp;W. Peterson, D.&nbsp;An
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Satou_2013">28</a>]
+[<a name="Satou_2013">30</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Satou, V.&nbsp;Ryzhii, F.&nbsp;T. Vasko, V.&nbsp;V. Mitin, and T.&nbsp;Otsuji.
@@ -1536,7 +1591,7 @@ A.&nbsp;Satou, V.&nbsp;Ryzhii, F.&nbsp;T. Vasko, V.&nbsp;V. Mitin, and T.&nbsp;O
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2013">29</a>]
+[<a name="Kirk_2013">31</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk and T.&nbsp;A. Oliver.
@@ -1562,7 +1617,7 @@ B.&nbsp;S. Kirk and T.&nbsp;A. Oliver.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Widmer_2013">30</a>]
+[<a name="Widmer_2013">32</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
@@ -1591,7 +1646,7 @@ R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2013">31</a>]
+[<a name="Fuentes_2013">33</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;S. Weinberg, A.&nbsp;Shetty, J.&nbsp;D. Hazle, and R.&nbsp;J.
@@ -1623,7 +1678,7 @@ D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;S. Weinberg, A.&nbsp;Shetty, J.&nbsp;D
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2013">32</a>]
+[<a name="Huynh_2013">34</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -1654,7 +1709,7 @@ D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2013">33</a>]
+[<a name="Vavourakis_2013">35</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanastasiou.
@@ -1682,7 +1737,7 @@ V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanasta
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2013">34</a>]
+[<a name="Zhu_2013">36</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
@@ -1710,7 +1765,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berr
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vetter_2013">35</a>]
+[<a name="Vetter_2013">37</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
