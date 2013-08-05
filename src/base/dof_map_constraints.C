@@ -3263,8 +3263,9 @@ void DofMap::add_adjoint_dirichlet_boundary
   (const DirichletBoundary& dirichlet_boundary,
    unsigned int qoi_index)
 {
-  if (_adjoint_dirichlet_boundaries.size() <= qoi_index)
-    _adjoint_dirichlet_boundaries.resize(qoi_index+1, new DirichletBoundaries());
+  std::size_t old_size = _adjoint_dirichlet_boundaries.size();
+  for (i = old_size; i <= qoi_index; ++i)
+    _adjoint_dirichlet_boundaries.push_back(new DirichletBoundaries());
 
   _adjoint_dirichlet_boundaries[qoi_index]->push_back(new DirichletBoundary(dirichlet_boundary));
 }
