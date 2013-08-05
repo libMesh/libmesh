@@ -108,6 +108,22 @@ public:
   void reposition(const unsigned int ioff,
 		  const unsigned int n);
 
+    /**
+     * Adds \p factor times \p vec to this vector.
+     * This should only work if T += T2 * T3 is valid C++ and
+     * if T2 is scalar.  Return type is void
+     */
+    template <typename T2, typename T3>
+    void add (const T2 factor,
+              const DenseVector<T3>& vec);
+
+    /**
+     * Evaluate dot product with \p vec. In the complex-valued case, use the
+     * complex conjugate of vec.
+     */
+    template <typename T2>
+    typename CompareTypes<T, T2>::supertype dot (const DenseVector<T2> &vec) const;
+
   /**
    * @returns the minimum element in the vector.
    * In case of complex numbers, this returns the minimum
@@ -222,6 +238,34 @@ T & DenseSubVector<T>::operator () (const unsigned int i)
   return _parent_vector (i + this->i_off());
 }
 
+
+    template<typename T>
+    template <typename T2, typename T3>
+    void
+    DenseSubVector<T>::add (const T2 factor,
+                            const DenseVector<T3>& vec)
+    {
+        libmesh_assert_equal_to (_n, vec.size());
+
+        for (unsigned int i=0; i<_n; i++)
+            _parent_vector (i+this->i_off()) += factor * vec(i);
+    }
+    
+    
+    template<typename T>
+    template <typename T2>
+    typename CompareTypes<T, T2>::supertype
+    DenseSubVector<T>::dot (const DenseVector<T2> &vec) const
+    {
+        libmesh_assert_equal_to (_n, vec.size());
+        
+        typename CompareTypes<T, T2>::supertype val = 0.;
+        
+        for (unsigned int i=0; i<_n; i++)
+            val += _parent_vector (i+this->i_off()) * vec(i);
+    }
+
+    
 template<typename T>
 inline
 Real DenseSubVector<T>::min () const
