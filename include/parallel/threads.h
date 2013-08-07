@@ -72,10 +72,7 @@
 #  endif
 #endif
 
-// Communicate to fparser that threads are being utilized
-#ifdef LIBMESH_USING_THREADS
-#  define FP_USE_THREAD_SAFE_EVAL
-#endif
+
 
 namespace libMesh
 {

@@ -10,7 +10,12 @@
 
 #include "fpconfig.hh"
 #include "fparser.hh"
-#include "libmesh/threads.h"
+
+#include "libmesh_config.h"
+// Communicate to fparser that threads are being utilized
+#ifdef LIBMESH_USING_THREADS
+#  define FP_USE_THREAD_SAFE_EVAL
+#endif
 
 #include <set>
 #include <cstdlib>
