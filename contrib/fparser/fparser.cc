@@ -10,6 +10,7 @@
 
 #include "fpconfig.hh"
 #include "fparser.hh"
+#include "libmesh/threads.h"
 
 #include <set>
 #include <cstdlib>
