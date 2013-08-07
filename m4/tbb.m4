@@ -44,6 +44,8 @@ AC_DEFUN([CONFIGURE_TBB],
       TBB_INCLUDE=-I$TBB_INCLUDE_PATH
       AC_SUBST(TBB_LIBRARY)
       AC_SUBST(TBB_INCLUDE)
+      AC_DEFINE(USING_THREADS, 1,
+                [Flag indicating whether the library shall be compiled to use any particular thread API.])
       AC_DEFINE(HAVE_TBB_API, 1,
                 [Flag indicating whether the library shall be compiled to use the Threading Building Blocks])
       AC_MSG_RESULT(<<< Configuring library with Intel TBB threading support >>>)

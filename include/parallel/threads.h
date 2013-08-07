@@ -72,9 +72,6 @@
 #  endif
 #endif
 
-// Helper macro for knowing whether or not threaded regions are enabled
-#define LIBMESH_USING_THREADS defined(LIBMESH_HAVE_PTHREAD) || defined(LIBMESH_HAVE_TBB_API)
-
 // Communicate to fparser that threads are being utilized
 #ifdef LIBMESH_USING_THREADS
 #  define FP_USE_THREAD_SAFE_EVAL
