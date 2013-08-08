@@ -1090,7 +1090,7 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
       DofConstraintValueMap::const_iterator rhsit =
         _primal_constraint_values.find(i);
       const Number rhs = (rhsit == _primal_constraint_values.end()) ?
-		         rhsit->second : 0;
+		         0 : rhsit->second;
 
       os << "Constraints for DoF " << i
 	 << ": \t";
@@ -2495,7 +2495,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                   DofConstraintValueMap::const_iterator rhsit =
                     _primal_constraint_values.find(constrained);
                   dof_row_rhss[i] = (rhsit == _primal_constraint_values.end()) ?
-		                     rhsit->second : 0;
+		                     0 : rhsit->second;
                 }
             }
 
@@ -2656,7 +2656,7 @@ void DofMap::process_constraints (MeshBase& mesh)
         DofConstraintValueMap::iterator rhsit =
           _primal_constraint_values.find(*i);
         Number constraint_rhs = (rhsit == _primal_constraint_values.end()) ?
-		                 rhsit->second : 0;
+		                 0 : rhsit->second;
 
 	std::vector<dof_id_type> constraints_to_expand;
 
@@ -2697,11 +2697,6 @@ void DofMap::process_constraints (MeshBase& mesh)
 	    constraint_row.erase(expandable);
           }
 
-	if (constraints_to_expand.empty())
-	  unexpanded_set.erase(i++);
-	else
-	  i++;
-
         if (rhsit == _primal_constraint_values.end())
 	  {
             if (constraint_rhs)
@@ -2716,6 +2711,11 @@ void DofMap::process_constraints (MeshBase& mesh)
 	    else
 	      _primal_constraint_values.erase(rhsit);
           } 
+
+	if (constraints_to_expand.empty())
+	  unexpanded_set.erase(i++);
+	else
+	  i++;
       }
 
   // In parallel we can't guarantee that nodes/dofs which constrain
@@ -2848,7 +2848,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
           DofConstraintValueMap::const_iterator rhsit =
             _primal_constraint_values.find(constrained);
           pushed_rhss[push_i] = (rhsit == _primal_constraint_values.end()) ?
-		                rhsit->second : 0;
+		                0 : rhsit->second;
         }
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -3089,7 +3089,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
           DofConstraintValueMap::const_iterator rhsit =
             _primal_constraint_values.find(constrained);
           pushed_rhss[push_i] = (rhsit == _primal_constraint_values.end()) ?
-	                        rhsit->second : 0;
+	                        0 : rhsit->second;
         }
 
       // Trade pushed dof constraint rows
