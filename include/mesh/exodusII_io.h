@@ -105,6 +105,12 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   void copy_nodal_solution(System& es, std::string system_var_name, std::string exodus_var_name, unsigned int timestep=1);
 
   /**
+   * If we read in a elemental solution while reading in a mesh, we can attempt
+   * to copy that elemental solution into an EquationSystems object.
+   */
+  void copy_elemental_solution(System& es, std::string system_var_name, std::string exodus_var_name, unsigned int timestep=1);
+
+  /**
    * Writes a exodusII file with discontinuous data
    */
   void write_discontinuous_exodusII (const std::string& name,

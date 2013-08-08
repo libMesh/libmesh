@@ -331,6 +331,14 @@ void ExodusII_IO::copy_nodal_solution(System&, std::string, std::string, unsigne
 
 void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
 {
+  if (!exio_helper->created())
+    {
+      libMesh::err << "ERROR, ExodusII file must be opened "
+                   << "before copying nodal solutions.\n"
+                   << std::endl;
+      libmesh_error();
+    }
+
   // FIXME: Do we need to call get_time_steps() at all?
   /*const std::vector<double>& time_steps = */
   exio_helper->get_time_steps();
@@ -363,6 +371,63 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_nam
 #endif
 
 
+#ifndef LIBMESH_HAVE_EXODUS_API
+
+void ExodusII_IO::copy_elemental_solution(System&, std::string, std::string, unsigned int)
+{
+
+  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+            << std::endl;
+  libmesh_error();
+}
+
+#else
+
+void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
+{
+  if (!exio_helper->created())
+    {
+      libMesh::err << "ERROR, ExodusII file must be opened "
+                   << "before copying elemental solutions.\n"
+                   << std::endl;
+      libmesh_error();
+    }
+
+  // FIXME: Do we need to call get_time_steps() at all?
+  /*const std::vector<double>& time_steps = */
+  exio_helper->get_time_steps();
+
+  const std::vector<Real> & elemental_values = exio_helper->get_elemental_var_values(exodus_var_name, timestep);
+
+  const unsigned int var_num = system.variable_number(system_var_name);
+  if (system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL))
+  {
+    libMesh::err << "Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL type. " << std::endl;
+    libmesh_error();
+  }
+
+  for (unsigned int i=0; i<elemental_values.size(); ++i)
+    {
+      const Elem * elem = MeshInput<MeshBase>::mesh().elem(i);
+
+      if (!elem)
+        {
+          libMesh::err << "Error! Mesh returned NULL pointer for elem " << i << std::endl;
+          libmesh_error();
+        }
+
+      dof_id_type dof_index = elem->dof_number(system.number(), var_num, 0);
+
+      // If the dof_index is local to this processor, set the value
+      if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
+    system.solution->set (dof_index, elemental_values[i]);
+    }
+
+  system.solution->close();
+  system.update();
+}
+
+#endif
 
 
 #ifndef LIBMESH_HAVE_EXODUS_API
