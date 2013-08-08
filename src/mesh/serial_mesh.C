@@ -742,8 +742,42 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
                                 bool clear_stitched_boundary_ids,
                                 bool verbose)
 {
+  stitching_helper(&other_mesh,
+                   this_mesh_boundary_id,
+                   other_mesh_boundary_id,
+                   tol,
+                   clear_stitched_boundary_ids,
+                   verbose);
+}
+
+void SerialMesh::stitch_surfaces (boundary_id_type boundary_id_1,
+                                  boundary_id_type boundary_id_2,
+                                  Real tol,
+                                  bool clear_stitched_boundary_ids,
+                                  bool verbose)
+{
+  stitching_helper(NULL,
+                   boundary_id_1,
+                   boundary_id_2,
+                   tol,
+                   clear_stitched_boundary_ids,
+                   verbose);
+}
+
+void SerialMesh::stitching_helper (SerialMesh* other_mesh,
+                                   boundary_id_type this_mesh_boundary_id,
+                                   boundary_id_type other_mesh_boundary_id,
+                                   Real tol,
+                                   bool clear_stitched_boundary_ids,
+                                   bool verbose)
+{
   std::map<dof_id_type, dof_id_type> node_to_node_map, other_to_this_node_map; // The second is the inverse map of the first
   std::map<dof_id_type, std::vector<dof_id_type> > node_to_elems_map;
+  // If there is only one mesh (i.e. other_mesh==NULL), then loop over this mesh twice
+  if(!other_mesh)
+  {
+    other_mesh = this;
+  }
 
   if( (this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
       (other_mesh_boundary_id != BoundaryInfo::invalid_id) )
@@ -759,8 +793,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
       // Make temporary fixed-size arrays for loop
       boundary_id_type id_array[2]        = {this_mesh_boundary_id, other_mesh_boundary_id};
       std::set<dof_id_type>* set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
-      SerialMesh* mesh_array[2]           = {this, &other_mesh};
-
+      SerialMesh* mesh_array[2]           = {this, other_mesh};
+      
       for (unsigned i=0; i<2; ++i)
         {
           MeshBase::element_iterator elem_it  = mesh_array[i]->elements_begin();
@@ -813,9 +847,9 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     // Create and sort the vectors we will use to do the geometric searching
     {
       std::set<dof_id_type>* set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
-      SerialMesh* mesh_array[2]           = {this, &other_mesh};
+      SerialMesh* mesh_array[2]           = {this, other_mesh};
       PointVector* vec_array[2]           = {&this_sorted_bndry_nodes, &other_sorted_bndry_nodes};
-
+      
       for (unsigned i=0; i<2; ++i)
         {
           std::set<dof_id_type>::iterator
@@ -880,8 +914,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
 
     // Build up the node_to_elems_map, using only one loop over other_mesh
     {
-      MeshBase::element_iterator other_elem_it  = other_mesh.elements_begin();
-      MeshBase::element_iterator other_elem_end = other_mesh.elements_end();
+      MeshBase::element_iterator other_elem_it  = other_mesh->elements_begin();
+      MeshBase::element_iterator other_elem_end = other_mesh->elements_end();
       for (; other_elem_it != other_elem_end; ++other_elem_it)
         {
           Elem *el = *other_elem_it;
@@ -926,69 +960,73 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   dof_id_type node_delta = this->n_nodes();
   dof_id_type elem_delta = this->n_elem();
 
-  // need to increment node and element IDs of other_mesh before copying to this mesh
-  MeshBase::node_iterator node_it  = other_mesh.nodes_begin();
-  MeshBase::node_iterator node_end = other_mesh.nodes_end();
-  for (; node_it != node_end; ++node_it)
+  // If other_mesh!=NULL, then we have to do a bunch of work
+  // in order to copy it to this mesh
+  if(this!=other_mesh)
   {
-    Node *nd = *node_it;
-    dof_id_type new_id = nd->id() + node_delta;
-    nd->set_id(new_id);
-  }
-
-  MeshBase::element_iterator elem_it  = other_mesh.elements_begin();
-  MeshBase::element_iterator elem_end = other_mesh.elements_end();
-  for (; elem_it != elem_end; ++elem_it)
-  {
-    Elem *el = *elem_it;
-    dof_id_type new_id = el->id() + elem_delta;
-    el->set_id(new_id);
-  }
-
-  // Also, increment the node_to_node_map and node_to_elems_map
-  std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
-  std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
-  for( ; node_map_it != node_map_it_end; ++node_map_it)
-  {
-    node_map_it->second += node_delta;
-  }
-  std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
-  std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
-  for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
-  {
-    dof_id_type n_elems = elem_map_it->second.size();
-    for(dof_id_type i=0; i<n_elems; i++)
+    // need to increment node and element IDs of other_mesh before copying to this mesh
+    MeshBase::node_iterator node_it  = other_mesh->nodes_begin();
+    MeshBase::node_iterator node_end = other_mesh->nodes_end();
+    for (; node_it != node_end; ++node_it)
     {
-      (elem_map_it->second)[i] += elem_delta;
+      Node *nd = *node_it;
+      dof_id_type new_id = nd->id() + node_delta;
+      nd->set_id(new_id);
     }
-  }
 
-  // Copy mesh data
-  this->copy_nodes_and_elements(other_mesh);
+    MeshBase::element_iterator elem_it  = other_mesh->elements_begin();
+    MeshBase::element_iterator elem_end = other_mesh->elements_end();
+    for (; elem_it != elem_end; ++elem_it)
+    {
+      Elem *el = *elem_it;
+      dof_id_type new_id = el->id() + elem_delta;
+      el->set_id(new_id);
+    }
 
-  // then decrement node and element IDs of mesh_i to return to original state
-  node_it  = other_mesh.nodes_begin();
-  node_end = other_mesh.nodes_end();
-  for (; node_it != node_end; ++node_it)
-  {
-    Node *nd = *node_it;
-    dof_id_type new_id = nd->id() - node_delta;
-    nd->set_id(new_id);
-  }
+    // Also, increment the node_to_node_map and node_to_elems_map
+    std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
+    std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
+    for( ; node_map_it != node_map_it_end; ++node_map_it)
+    {
+      node_map_it->second += node_delta;
+    }
+    std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
+    std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
+    for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+    {
+      dof_id_type n_elems = elem_map_it->second.size();
+      for(dof_id_type i=0; i<n_elems; i++)
+      {
+        (elem_map_it->second)[i] += elem_delta;
+      }
+    }
 
-  elem_it  = other_mesh.elements_begin();
-  elem_end = other_mesh.elements_end();
-  for (; elem_it != elem_end; ++elem_it)
-  {
-    Elem *el = *elem_it;
+    // Copy mesh data
+    this->copy_nodes_and_elements(*other_mesh);
 
-    // First copy boundary info to the stitched mesh.  Note that other_mesh may
-    // contain interior sidesets as well, so don't *just* copy boundary info for
-    // elements on the boundary, copy it for all elements!
-    for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
+    // then decrement node and element IDs of mesh_i to return to original state
+    node_it  = other_mesh->nodes_begin();
+    node_end = other_mesh->nodes_end();
+    for (; node_it != node_end; ++node_it)
+    {
+      Node *nd = *node_it;
+      dof_id_type new_id = nd->id() - node_delta;
+      nd->set_id(new_id);
+    }
+
+    elem_it  = other_mesh->elements_begin();
+    elem_end = other_mesh->elements_end();
+    for (; elem_it != elem_end; ++elem_it)
+    {
+      Elem *el = *elem_it;
+
+      // First copy boundary info to the stitched mesh.  Note that other_mesh may
+      // contain interior sidesets as well, so don't *just* copy boundary info for
+      // elements on the boundary, copy it for all elements!
+      for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
       {
         // There could be multiple boundary IDs on this side, so add them all.
-        std::vector<boundary_id_type> bc_ids = other_mesh.boundary_info->boundary_ids (el, side_id);
+        std::vector<boundary_id_type> bc_ids = other_mesh->boundary_info->boundary_ids (el, side_id);
         for (unsigned i=0; i<bc_ids.size(); ++i)
           {
             if (bc_ids[i] != BoundaryInfo::invalid_id)
@@ -996,10 +1034,11 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
           }
       }
 
-    // Then decrement
-    dof_id_type new_id = el->id() - elem_delta;
-    el->set_id(new_id);
-  }
+      // Then decrement
+      dof_id_type new_id = el->id() - elem_delta;
+      el->set_id(new_id);
+    }  
+  } // end if(other_mesh)
 
   // Finally, we need to "merge" the overlapping nodes
   // We do this by iterating over node_to_elems_map and updating
@@ -1007,8 +1046,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   // from this mesh, rather than from other_mesh.
   // Then we iterate over node_to_node_map and delete the
   // duplicate nodes that came from other_mesh.
-  elem_map_it     = node_to_elems_map.begin();
-  elem_map_it_end = node_to_elems_map.end();
+  std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
+  std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
   for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
   {
     dof_id_type target_node_id = elem_map_it->first;
@@ -1028,8 +1067,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     }
   }
 
-  node_map_it     = node_to_node_map.begin();
-  node_map_it_end = node_to_node_map.end();
+  std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
+  std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
   for( ; node_map_it != node_map_it_end; ++node_map_it)
   {
     dof_id_type node_id = node_map_it->second;
@@ -1042,8 +1081,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   // faces that are now internal to the mesh
   if(clear_stitched_boundary_ids)
   {
-    elem_it  = this->elements_begin();
-    elem_end = this->elements_end();
+    MeshBase::element_iterator elem_it  = this->elements_begin();
+    MeshBase::element_iterator elem_end = this->elements_end();
     for (; elem_it != elem_end; ++elem_it)
     {
       Elem *el = *elem_it;
