@@ -302,13 +302,26 @@ std::terminate_handler old_terminate_handler;
 void libmesh_terminate_handler()
 {
   // If this got called then we're probably crashing; let's print a
-  // stack trace.
+  // stack trace.  This stack trace may not be useful if the
+  // implementation has already unwound the stack by the time you
+  // reach the terminate_handler...
   libmesh_write_traceout();
 
-  // The system terminate_handler may do useful things like printing
-  // uncaught exception information, or the user may have created
-  // their own terminate handler that we want to call.
-  old_terminate_handler();
+  // If we have MPI and it has been initialized, we need to be sure
+  // and call MPI_Abort instead of std::abort, so that the parallel
+  // job can die nicely.
+#if defined(LIBMESH_HAVE_MPI)
+  int mpi_initialized;
+  MPI_Initialized (&mpi_initialized);
+
+  if (mpi_initialized)
+    MPI_Abort(libMesh::COMM_WORLD, 1);
+  else
+#endif
+    // The system terminate_handler may do useful things like printing
+    // uncaught exception information, or the user may have created
+    // their own terminate handler that we want to call.
+    old_terminate_handler();
 }
 #endif
 
@@ -552,25 +565,6 @@ LibMeshInit::~LibMeshInit()
 
   // Let's be sure we properly close on every processor at once:
   libmesh_parallel_only(this->comm());
-
-#if defined(LIBMESH_HAVE_MPI)
-  // We may be here in only one process,
-  // because an uncaught libmesh_error() exception
-  // called the LibMeshInit destructor.
-  //
-  // If that's the case, we need to MPI_Abort(),
-  // not just wait for other processes that
-  // might never get to MPI_Finalize()
-  if (libmesh_initialized_mpi &&
-      std::uncaught_exception())
-    {
-      libMesh::err << "Uncaught exception - aborting" << std::endl;
-      if (libMesh::on_command_line ("--disable-mpi"))
-        exit(1);
-      else
-        MPI_Abort(libMesh::COMM_WORLD,1);
-    }
-#endif
 
 #if defined(LIBMESH_HAVE_PETSC)
       // Allow the user to bypass PETSc finalization
