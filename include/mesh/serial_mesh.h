@@ -181,6 +181,15 @@ class SerialMesh : public UnstructuredMesh
                       bool clear_stitched_boundary_ids=false,
                       bool verbose=true);
 
+  /**
+   * Similar to stitch_meshes, except that we stitch two adjacent surfaces within this mesh.
+   */
+  void stitch_surfaces (boundary_id_type boundary_id_1,
+                        boundary_id_type boundary_id_2,
+                        Real tol=TOLERANCE,
+                        bool clear_stitched_boundary_ids=false,
+                        bool verbose=true);
+
 public:
   /**
    * Elem iterator accessor functions.
@@ -367,6 +376,17 @@ protected:
   std::vector<Elem*> _elements;
 
 private:
+
+  /**
+   * Helper function for stitch_meshes and stitch_surfaces
+   * that does the mesh stitching.
+   */
+  void stitching_helper (SerialMesh* other_mesh,
+                         boundary_id_type boundary_id_1,
+                         boundary_id_type boundary_id_2,
+                         Real tol=TOLERANCE,
+                         bool clear_stitched_boundary_ids=false,
+                         bool verbose=true);
 
   /**
    * Typedefs for the container implementation.  In this case,
