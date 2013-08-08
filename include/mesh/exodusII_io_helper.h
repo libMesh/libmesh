@@ -469,6 +469,17 @@ public:
    */
   const std::vector<Real>& get_nodal_var_values(std::string nodal_var_name, int time_step);
 
+  /*
+   * Returns an array containing the elemental var names in the file
+   */
+  const std::vector<std::string>& get_elemental_var_names();
+
+  /*
+   * Returns an array containing the elemental variable values
+   * at the specified time
+   */
+  const std::vector<Real>& get_elemental_var_values(std::string elemental_var_name, int time_step);
+
   // For Writing Solutions
   /**
    * Opens an \p ExodusII mesh
@@ -692,6 +703,8 @@ public:
   std::vector<Real> nodal_var_values;
 
   int num_elem_vars;
+  std::vector<std::string> elem_var_names;
+  std::vector<Real> elem_var_values;
 
   // A pair of containers used to emulate a char** data
   // structure without having to worry about dynamic memory
