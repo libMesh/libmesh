@@ -331,14 +331,6 @@ void ExodusII_IO::copy_nodal_solution(System&, std::string, std::string, unsigne
 
 void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
 {
-  if (!exio_helper->created())
-    {
-      libMesh::err << "ERROR, ExodusII file must be opened "
-                   << "before copying nodal solutions.\n"
-                   << std::endl;
-      libmesh_error();
-    }
-
   // FIXME: Do we need to call get_time_steps() at all?
   /*const std::vector<double>& time_steps = */
   exio_helper->get_time_steps();
@@ -385,14 +377,6 @@ void ExodusII_IO::copy_elemental_solution(System&, std::string, std::string, uns
 
 void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
 {
-  if (!exio_helper->created())
-    {
-      libMesh::err << "ERROR, ExodusII file must be opened "
-                   << "before copying elemental solutions.\n"
-                   << std::endl;
-      libmesh_error();
-    }
-
   // FIXME: Do we need to call get_time_steps() at all?
   /*const std::vector<double>& time_steps = */
   exio_helper->get_time_steps();
