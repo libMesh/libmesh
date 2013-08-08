@@ -849,7 +849,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
       std::set<dof_id_type>* set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
       SerialMesh* mesh_array[2]           = {this, other_mesh};
       PointVector* vec_array[2]           = {&this_sorted_bndry_nodes, &other_sorted_bndry_nodes};
-      
+
       for (unsigned i=0; i<2; ++i)
         {
           std::set<dof_id_type>::iterator
