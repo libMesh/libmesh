@@ -179,7 +179,8 @@ class SerialMesh : public UnstructuredMesh
                       boundary_id_type other_mesh_boundary,
                       Real tol=TOLERANCE,
                       bool clear_stitched_boundary_ids=false,
-                      bool verbose=true);
+                      bool verbose=true,
+                      bool use_binary_search=true);
 
   /**
    * Similar to stitch_meshes, except that we stitch two adjacent surfaces within this mesh.
@@ -188,7 +189,8 @@ class SerialMesh : public UnstructuredMesh
                         boundary_id_type boundary_id_2,
                         Real tol=TOLERANCE,
                         bool clear_stitched_boundary_ids=false,
-                        bool verbose=true);
+                        bool verbose=true,
+                        bool use_binary_search=true);
 
 public:
   /**
@@ -384,9 +386,10 @@ private:
   void stitching_helper (SerialMesh* other_mesh,
                          boundary_id_type boundary_id_1,
                          boundary_id_type boundary_id_2,
-                         Real tol=TOLERANCE,
-                         bool clear_stitched_boundary_ids=false,
-                         bool verbose=true);
+                         Real tol,
+                         bool clear_stitched_boundary_ids,
+                         bool verbose,
+                         bool use_binary_search);
 
   /**
    * Typedefs for the container implementation.  In this case,

@@ -740,28 +740,32 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
                                 boundary_id_type other_mesh_boundary_id,
                                 Real tol,
                                 bool clear_stitched_boundary_ids,
-                                bool verbose)
+                                bool verbose,
+                                bool use_binary_search)
 {
   stitching_helper(&other_mesh,
                    this_mesh_boundary_id,
                    other_mesh_boundary_id,
                    tol,
                    clear_stitched_boundary_ids,
-                   verbose);
+                   verbose,
+                   use_binary_search);
 }
 
 void SerialMesh::stitch_surfaces (boundary_id_type boundary_id_1,
                                   boundary_id_type boundary_id_2,
                                   Real tol,
                                   bool clear_stitched_boundary_ids,
-                                  bool verbose)
+                                  bool verbose,
+                                  bool use_binary_search)
 {
   stitching_helper(NULL,
                    boundary_id_1,
                    boundary_id_2,
                    tol,
                    clear_stitched_boundary_ids,
-                   verbose);
+                   verbose,
+                   use_binary_search);
 }
 
 void SerialMesh::stitching_helper (SerialMesh* other_mesh,
@@ -769,7 +773,8 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                                    boundary_id_type other_mesh_boundary_id,
                                    Real tol,
                                    bool clear_stitched_boundary_ids,
-                                   bool verbose)
+                                   bool verbose,
+                                   bool use_binary_search)
 {
   std::map<dof_id_type, dof_id_type> node_to_node_map, other_to_this_node_map; // The second is the inverse map of the first
   std::map<dof_id_type, std::vector<dof_id_type> > node_to_elems_map;
@@ -826,31 +831,35 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
     if (verbose)
       {
         libMesh::out << "In SerialMesh::stitch_meshes:\n"
-                     << "This mesh has "  << this_boundary_node_ids.size()  << " nodes on boundary " << this_mesh_boundary_id  << ".\n"
-                     << "Other mesh has " << other_boundary_node_ids.size() << " nodes on boundary " << other_mesh_boundary_id << ".\n"
+                     << "This mesh has "  << this_boundary_node_ids.size() 
+                     << " nodes on boundary " << this_mesh_boundary_id  << ".\n"
+                     << "Other mesh has " << other_boundary_node_ids.size()
+                     << " nodes on boundary " << other_mesh_boundary_id << ".\n"
                      << "Minimum edge length on both surfaces is " << h_min << ".\n"
                      << std::endl;
       }
+      
 
-    // Store points from both stitched faces in sorted vectors for faster
-    // searching later.
-    typedef std::vector< std::pair<Point, dof_id_type> > PointVector;
-    PointVector
-      this_sorted_bndry_nodes(this_boundary_node_ids.size()),
-      other_sorted_bndry_nodes(other_boundary_node_ids.size());
-
-    // Comparison object that will be used later.  We control the tolerance
-    // used in this sorting, not the user.  So far, I've had reasonable success
-    // with TOLERANCE...
-    FuzzyPointCompare mein_comp(TOLERANCE);
-
-    // Create and sort the vectors we will use to do the geometric searching
+    if(use_binary_search)
     {
-      std::set<dof_id_type>* set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
-      SerialMesh* mesh_array[2]           = {this, other_mesh};
-      PointVector* vec_array[2]           = {&this_sorted_bndry_nodes, &other_sorted_bndry_nodes};
+      // Store points from both stitched faces in sorted vectors for faster
+      // searching later.
+      typedef std::vector< std::pair<Point, dof_id_type> > PointVector;
+      PointVector
+        this_sorted_bndry_nodes(this_boundary_node_ids.size()),
+        other_sorted_bndry_nodes(other_boundary_node_ids.size());
 
-      for (unsigned i=0; i<2; ++i)
+      // Comparison object that will be used later. So far, I've had reasonable success
+      // with TOLERANCE...
+      FuzzyPointCompare mein_comp(TOLERANCE);
+
+      // Create and sort the vectors we will use to do the geometric searching
+      {
+        std::set<dof_id_type>* set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
+        SerialMesh* mesh_array[2]           = {this, other_mesh};
+        PointVector* vec_array[2]           = {&this_sorted_bndry_nodes, &other_sorted_bndry_nodes};
+
+        for (unsigned i=0; i<2; ++i)
         {
           std::set<dof_id_type>::iterator
             set_it     = set_array[i]->begin(),
@@ -866,12 +875,10 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
           // Sort the vectors based on the FuzzyPointCompare struct op()
           std::sort(vec_array[i]->begin(), vec_array[i]->end(), mein_comp);
         }
-    }
+      }
 
-
-
-    // Build up the node_to_node_map and node_to_elems_map using the sorted vectors of Points.
-    for (unsigned i=0; i<this_sorted_bndry_nodes.size(); ++i)
+      // Build up the node_to_node_map and node_to_elems_map using the sorted vectors of Points.
+      for (unsigned i=0; i<this_sorted_bndry_nodes.size(); ++i)
       {
         // Current point we're working on
         Point this_point = this_sorted_bndry_nodes[i].first;
@@ -910,33 +917,75 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
           }
 
       }
+    }
+    else
+    {
+      // Otherwise, use a simple N^2 search to find the closest matching points. This can be helpful
+      // in the case that we have tolerance issues which cause mismatch between the two surfaces
+      // that are being stitched.
 
+      std::set<dof_id_type>::iterator set_it     = this_boundary_node_ids.begin();
+      std::set<dof_id_type>::iterator set_it_end = this_boundary_node_ids.end();
+      for( ; set_it != set_it_end; ++set_it)
+      {
+        dof_id_type this_node_id = *set_it;
+        Node& this_node = this->node(this_node_id);
+
+        bool found_matching_nodes = false;
+
+        std::set<dof_id_type>::iterator other_set_it     = other_boundary_node_ids.begin();
+        std::set<dof_id_type>::iterator other_set_it_end = other_boundary_node_ids.end();
+        for( ; other_set_it != other_set_it_end; ++other_set_it)
+        {
+          dof_id_type other_node_id = *other_set_it;
+          Node& other_node = other_mesh->node(other_node_id);
+
+          Real node_distance = (this_node - other_node).size();
+
+          if(node_distance < tol*h_min)
+          {
+            // Make sure we didn't already find a matching node!
+            if(found_matching_nodes)
+            {
+              libMesh::out << "Error: Found multiple matching nodes in stitch_meshes" << std::endl;
+              libmesh_error();
+            }
+
+            node_to_node_map[this_node_id] = other_node_id;
+            other_to_this_node_map[other_node_id] = this_node_id;
+
+            found_matching_nodes = true;
+          }
+        }
+      }
+    }
 
     // Build up the node_to_elems_map, using only one loop over other_mesh
     {
       MeshBase::element_iterator other_elem_it  = other_mesh->elements_begin();
       MeshBase::element_iterator other_elem_end = other_mesh->elements_end();
       for (; other_elem_it != other_elem_end; ++other_elem_it)
+      {
+        Elem *el = *other_elem_it;
+
+        // For each node on the element, find the corresponding node
+        // on "this" Mesh, 'this_node_id', if it exists, and push
+        // the current element ID back onto node_to_elems_map[this_node_id].
+        // For that we will use the reverse mapping we created at
+        // the same time as the forward mapping.
+        for (unsigned n=0; n<el->n_nodes(); ++n)
         {
-          Elem *el = *other_elem_it;
+          dof_id_type other_node_id = el->node(n);
+          std::map<dof_id_type, dof_id_type>::iterator it =
+            other_to_this_node_map.find(other_node_id);
 
-          // For each node on the element, find the corresponding node
-          // on "this" Mesh, 'this_node_id', if it exists, and push
-          // the current element ID back onto node_to_elems_map[this_node_id].
-          // For that we will use the reverse mapping we created at
-          // the same time as the forward mapping.
-          for (unsigned n=0; n<el->n_nodes(); ++n)
-            {
-              dof_id_type other_node_id = el->node(n);
-              std::map<dof_id_type, dof_id_type>::iterator it = other_to_this_node_map.find(other_node_id);
-
-              if (it != other_to_this_node_map.end())
-                {
-                  dof_id_type this_node_id = it->second;
-                  node_to_elems_map[this_node_id].push_back( el->id() );
-                }
-            }
+          if (it != other_to_this_node_map.end())
+          {
+            dof_id_type this_node_id = it->second;
+            node_to_elems_map[this_node_id].push_back( el->id() );
+          }
         }
+      }
     }
 
     if(verbose)
