@@ -476,8 +476,10 @@ namespace {
               if (_qoi_indices.has_index(i))
                 {
                   _femcontext.get_dof_indices() = original_dofs;
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
                   _sys.get_dof_map().constrain_element_vector
                     (_femcontext.get_qoi_derivatives()[i], _femcontext.get_dof_indices(), false);
+#endif
 
                   _sys.get_adjoint_rhs(i).add_vector
                     (_femcontext.get_qoi_derivatives()[i], _femcontext.get_dof_indices());
