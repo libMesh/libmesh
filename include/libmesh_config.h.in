@@ -515,6 +515,10 @@
 /* Flag indicating if the library should be built using real numbers */
 #undef USE_REAL_NUMBERS
 
+/* Flag indicating whether the library shall be compiled to use any particular
+   thread API. */
+#undef USING_THREADS
+
 /* Version number of package */
 #undef VERSION
 

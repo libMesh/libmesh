@@ -283,6 +283,7 @@ void ExodusII_IO_Helper::read_header()
   num_time_steps = inquire(exII::EX_INQ_TIME, "Error retrieving time steps");
 
   exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
+  exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
 
   message("Exodus header info retrieved successfully.");
 }
@@ -758,7 +759,95 @@ const std::vector<Real>& ExodusII_IO_Helper::get_nodal_var_values(std::string no
   return nodal_var_values;
 }
 
+const std::vector<std::string>& ExodusII_IO_Helper::get_elemental_var_names()
+{
+  // Allocate enough space for our variable name strings.
+  elem_var_names.resize(num_elem_vars);
 
+  // Use the vvc and strings objects to emulate the behavior of
+  // a char** object.
+  vvc.resize(num_elem_vars);
+  strings.resize(num_elem_vars);
+  for (int i=0;i<num_elem_vars;i++)
+    vvc[i].resize(MAX_STR_LENGTH+1);
+
+  for (int i=0;i<num_elem_vars;i++)
+    strings[i]=&(vvc[i][0]); // set pointer into vvc only *after* all resizing is complete
+
+  exII::ex_get_var_names(ex_id,
+             "e",
+             num_elem_vars,
+             &strings[0]//var_names
+             );
+
+  if (_verbose)
+    {
+      libMesh::out << "Read the variable(s) from the file:" << std::endl;
+      for (int i=0; i<num_elem_vars; i++)
+    libMesh::out << "strings[" << i << "]=" << strings[i] << std::endl;
+    }
+
+
+  // Copy the char buffers into strings.
+  for (int i=0;i<num_elem_vars;i++)
+    elem_var_names[i]=strings[i]; // calls string::op=(const char*)
+
+
+  return elem_var_names;
+}
+
+
+const std::vector<Real>& ExodusII_IO_Helper::get_elemental_var_values(std::string elemental_var_name, int time_step)
+{
+  // CAUTION: this assumes that libMesh element numbering is identical to exodus block-by-block element numbering
+  // There is no way how to get the whole elemental field from the exodus file, so we have to go block by block
+
+  elem_var_values.resize(num_elem);
+
+  this->get_elemental_var_names();
+
+  // See if we can find the variable we are looking for
+  unsigned int var_index = 0;
+  bool found = false;
+
+  // Do a linear search for nodal_var_name in nodal_var_names
+  for (; var_index<elem_var_names.size(); ++var_index)
+    {
+      found = (elem_var_names[var_index] == elemental_var_name);
+      if (found)
+        break;
+    }
+
+  if (!found)
+    {
+      libMesh::err << "Unable to locate variable named: " << elemental_var_name << std::endl;
+      libMesh::err << "Available variables: " << std::endl;
+      for (unsigned int i=0; i<elem_var_names.size(); ++i)
+        libMesh::err << elem_var_names[i] << std::endl;
+
+      libmesh_error();
+    }
+
+  unsigned int ex_el_num = 0;
+  for (unsigned int i = 0; i < (unsigned int) num_elem_blk; i++)
+  {
+    int n_blk_elems = 0;
+    ex_err = exII::ex_get_elem_block(ex_id, block_ids[i], NULL, &n_blk_elems, NULL, NULL);
+    check_err(ex_err, "Error getting number of element in block.");
+
+    std::vector<Real> block_elem_var_values(num_elem, 0.);
+    ex_err = exII::ex_get_elem_var(ex_id, time_step, var_index+1, block_ids[i], n_blk_elems, &block_elem_var_values[0]);
+    check_err(ex_err, "Error getting elemental values.");
+
+    for (unsigned int j = 0; j < (unsigned int) n_blk_elems; j++)
+    {
+      elem_var_values[ex_el_num] = block_elem_var_values[j];
+      ex_el_num++;
+    }
+  }
+
+  return elem_var_values;
+}
 
 
 // For Writing Solutions

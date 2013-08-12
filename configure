@@ -29994,6 +29994,9 @@ fi
 
 
 
+$as_echo "#define USING_THREADS 1" >>confdefs.h
+
+
 $as_echo "#define HAVE_TBB_API 1" >>confdefs.h
 
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Intel TBB threading support >>>" >&5
@@ -30491,6 +30494,9 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 fi
 
 if (test x$ax_pthread_ok = xyes); then
+
+$as_echo "#define USING_THREADS 1" >>confdefs.h
+
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with pthread support >>>" >&5
 $as_echo "<<< Configuring library with pthread support >>>" >&6; }
   libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
