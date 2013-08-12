@@ -9,12 +9,11 @@
 \***************************************************************************/
 
 
-// temporarily disable this until adaptivity_ex5 is fixed.
-// #include "libmesh_config.h"
-// // Communicate to fparser that threads are being utilized
-// #ifdef LIBMESH_USING_THREADS
-// #  define FP_USE_THREAD_SAFE_EVAL
-// #endif
+#include "libmesh_config.h"
+// Communicate to fparser that threads are being utilized
+#ifdef LIBMESH_USING_THREADS
+#  define FP_USE_THREAD_SAFE_EVAL
+#endif
 
 #include "fpconfig.hh"
 #include "fparser.hh"
