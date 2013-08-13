@@ -824,7 +824,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_nam
 
   for (unsigned int i=0; i<nodal_values.size(); ++i)
     {
-      const Node* node = MeshInput<MeshBase>::mesh().node_ptr(i);
+      const Node* node = MeshInput<MeshBase>::mesh().query_node_ptr(i);
 
       if (!node)
         {
@@ -875,7 +875,7 @@ void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var
 
   for (unsigned int i=0; i<elemental_values.size(); ++i)
     {
-      const Elem * elem = MeshInput<MeshBase>::mesh().elem(i);
+      const Elem * elem = MeshInput<MeshBase>::mesh().query_elem(i);
 
       if (!elem)
         {
@@ -887,7 +887,7 @@ void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var
 
       // If the dof_index is local to this processor, set the value
       if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
-    system.solution->set (dof_index, elemental_values[i]);
+        system.solution->set (dof_index, elemental_values[i]);
     }
 
   system.solution->close();
