@@ -1397,19 +1397,25 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
   std::vector<dof_id_type>::iterator it_elem=bndry_elem_list.begin();
   std::vector<unsigned short>::iterator it_side=bndry_side_list.begin();
   std::vector<boundary_id_type>::iterator it_id=bndry_id_list.begin();
-  for ( ; it_elem != bndry_elem_list.end(); )
+
+  // New end iterators, to be updated as we find non-local IDs
+  std::vector<dof_id_type>::iterator new_bndry_elem_list_end = bndry_elem_list.end();
+  std::vector<unsigned short>::iterator new_bndry_side_list_end = bndry_side_list.end();
+  std::vector<boundary_id_type>::iterator new_bndry_id_list_end = bndry_id_list.end();
+
+  for ( ; it_elem != new_bndry_elem_list_end; )
     {
       if (pmesh.elem( *it_elem )->processor_id() != this->processor_id())
 	{
-	  // Get rid of this elem, but do it efficiently for a vector, by popping
-	  // it off the back.
-	  std::swap (*it_elem, bndry_elem_list.back() );
-	  std::swap (*it_side, bndry_side_list.back() );
-	  std::swap (*it_id, bndry_id_list.back() );
+	  // Back up the new end iterators to prepare for swap
+	  --new_bndry_elem_list_end;
+	  --new_bndry_side_list_end;
+	  --new_bndry_id_list_end;
 
-	  bndry_elem_list.pop_back();
-	  bndry_side_list.pop_back();
-	  bndry_id_list.pop_back();
+	  // Swap places, the non-local elem will now be "past-the-end"
+	  std::swap (*it_elem, *new_bndry_elem_list_end);
+	  std::swap (*it_side, *new_bndry_side_list_end);
+	  std::swap (*it_id, *new_bndry_id_list_end);
 	}
       else // elem is local, go to next
 	{
@@ -1418,6 +1424,11 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
 	  ++it_id;
 	}
     }
+
+  // Erase from "new" end to old end on each vector.
+  bndry_elem_list.erase(new_bndry_elem_list_end, bndry_elem_list.end());
+  bndry_side_list.erase(new_bndry_side_list_end, bndry_side_list.end());
+  bndry_id_list.erase(new_bndry_id_list_end, bndry_id_list.end());
 
   this->num_global_side_counts.clear(); // Make sure we don't have any leftover information
   this->num_global_side_counts.resize(this->global_sideset_ids.size());
@@ -1525,17 +1536,21 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
   // Start by getting rid of all non-local node entries from the vectors.
   std::vector<dof_id_type>::iterator it_node=boundary_node_list.begin();
   std::vector<boundary_id_type>::iterator it_id=boundary_node_boundary_id_list.begin();
-  for ( ; it_node != boundary_node_list.end(); )
+
+  // New end iterators, to be updated as we find non-local IDs
+  std::vector<dof_id_type>::iterator new_node_list_end = boundary_node_list.end();
+  std::vector<boundary_id_type>::iterator new_boundary_id_list_end = boundary_node_boundary_id_list.end();
+  for ( ; it_node != new_node_list_end; )
     {
       if (pmesh.node_ptr( *it_node )->processor_id() != this->processor_id())
 	{
-	  // Get rid of this node, but do it efficiently for a vector, by popping
-	  // it off the back.
-	  std::swap (*it_node, boundary_node_list.back() );
-	  std::swap (*it_id, boundary_node_boundary_id_list.back() );
+	  // Back up the new end iterators to prepare for swap
+	  --new_node_list_end;
+	  --new_boundary_id_list_end;
 
-	  boundary_node_list.pop_back();
-	  boundary_node_boundary_id_list.pop_back();
+	  // Swap places, the non-local node will now be "past-the-end"
+	  std::swap (*it_node, *new_node_list_end);
+	  std::swap (*it_id, *new_boundary_id_list_end);
 	}
       else // node is local, go to next
 	{
@@ -1543,6 +1558,10 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
 	  ++it_id;
 	}
     }
+
+  // Erase from "new" end to old end on each vector.
+  boundary_node_list.erase(new_node_list_end, boundary_node_list.end());
+  boundary_node_boundary_id_list.erase(new_boundary_id_list_end, boundary_node_boundary_id_list.end());
 
   // Now we can do the local count for each ID...
   for (unsigned i=0; i<global_nodeset_ids.size(); ++i)
