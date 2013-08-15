@@ -65,8 +65,7 @@ public:
                      bool v=false,
                      bool run_only_on_proc0=true);
   /**
-   * Destructor.  The only memory allocated is for \p title and \p
-   * elem_type.  This memory is freed in the destructor.
+   * Destructor.
    */
   virtual ~ExodusII_IO_Helper();
 
@@ -82,116 +81,10 @@ public:
   void verbose (bool set_verbosity);
 
   /**
-   * @returns the \p ExodusII mesh dimension.
-   */
-  int get_num_dim() const { return num_dim; }
-
-  /**
-   * @returns the total number of global variables.
-   */
-  int get_num_globals() const { return num_globals; }
-
-  /**
-   * @returns the total number of nodes in the \p ExodusII mesh.
-   */
-  int get_num_nodes() const { return num_nodes; }
-
-  /**
-   * @returns the total number of elements in the \p ExodusII mesh.
-   */
-  int get_num_elem() const { return num_elem; }
-
-  /**
-   * @returns the total number of element blocks in the \p ExodusII
-   * mesh.
-   */
-  int get_num_elem_blk() const { return num_elem_blk; }
-
-  /**
-   * For a given block, returns the total number of elements.
-   */
-  int get_num_elem_this_blk() const { return num_elem_this_blk; }
-
-  /**
-   * @returns the number of nodes per element in a given block. e.g.
-   * for HEX27 it returns 27.
-   */
-  int get_num_nodes_per_elem() const { return num_nodes_per_elem; }
-
-  /**
-   * @returns the total number of sidesets in the \p ExodusII mesh.
-   * Each sideset contains only one type of element.
-   */
-  int get_num_side_sets() const { return num_side_sets; }
-
-  /**
-   * @returns the total number of nodesets in the \p ExodusII mesh.
-   */
-  int get_num_node_sets() const { return num_node_sets; }
-
-  /**
-   * @returns the \f$ i^{th} \f$ node number in the element
-   * connectivity list for a given element.
-   */
-  int get_connect(int i) const { return connect[i]; }
-
-  /**
-   * For a single sideset, returns the total number of elements in the
-   * sideset.
-   */
-  int get_num_sides_per_set(int i) const { return num_sides_per_set[i]; }
-
-  /**
-   * For a single nodeset, returns the total number of nodes in the
-   * nodeset.
-   */
-  // int get_num_nodes_per_set(int i) const { return num_nodes_per_set[i]; }
-
-  /**
-   * @return a constant reference to the \p elem_list.
-   */
-  const std::vector<int>& get_elem_list() const { return elem_list; }
-
-  /**
-   * @return a constant reference to the \p side_list.
-   */
-  const std::vector<int>& get_side_list() const { return side_list; }
-
-  /**
-   * @return a constant reference to the \p node_list.
-   */
-  const std::vector<int>& get_node_list() const { return node_list; }
-
-  /**
-   * @return the nodeset id corresponding to the ith nodeset.
-   */
-  int get_nodeset_id(unsigned int i) const { return nodeset_ids[i]; }
-
-  /**
-   * @return a constant reference to the \p id_list.
-   */
-  const std::vector<int>& get_id_list() const { return id_list; }
-
-  /**
    * @returns the current element type.  Note: the default behavior is
    * for this value to be in all capital letters, e.g. \p HEX27.
    */
   const char* get_elem_type() const { return &elem_type[0]; }
-
-  /**
-   * @returns the \f$ i^{th} \f$ node's x-coordinate.
-   */
-  Real get_x(int i) const { return x[i]; }
-
-  /**
-   * @returns the \f$ i^{th} \f$ node's y-coordinate.
-   */
-  Real get_y(int i) const { return y[i]; }
-
-  /**
-   * @returns the \f$ i^{th} \f$ node's z-coordinate.
-   */
-  Real get_z(int i) const { return z[i]; }
 
   /**
    * Opens an \p ExodusII mesh file named \p filename for reading.
@@ -206,7 +99,7 @@ public:
   /**
    * Prints the \p ExodusII mesh file header, which includes the mesh
    * title, the number of nodes, number of elements, mesh dimension,
-   * number of sidesets, and number of nodesets
+   * number of sidesets, and number of nodesets.
    */
   void print_header();
 
@@ -326,11 +219,6 @@ public:
    * Returns an array containing the timesteps in the file
    */
   const std::vector<Real>& get_time_steps();
-
-  /*
-   * Number of Nodal variables defined.
-   */
-  // int get_num_nodal_vars() { return num_nodal_vars; }
 
   /*
    * Returns an array containing the nodal var names in the file
@@ -499,10 +387,12 @@ public:
    */
   void message(const std::string msg, int i);
 
-  // Word size in bytes of the floating point variables used in the application program (0, 4, or 8)
+  // Word size in bytes of the floating point variables used in the
+  // application program (0, 4, or 8)
   int comp_ws;
 
-  // Word size in bytes of the floating point data as they are stored in the ExodusII file
+  // Word size in bytes of the floating point data as they are stored
+  // in the ExodusII file
   int io_ws;
 
   // File identification flag
@@ -621,10 +511,8 @@ public:
   std::map<int, int> libmesh_elem_num_to_exodus;
   std::vector<int> exodus_elem_num_to_libmesh;
 
-  /**
-   * Map of all node numbers connected to local node numbers to their exodus numbering.
-   * The exodus numbers are stored in here starting with 1
-   */
+  // Map of all node numbers connected to local node numbers to their exodus numbering.
+  // The exodus numbers are stored in here starting with 1
   std::map<int, int> libmesh_node_num_to_exodus;
   std::vector<int> exodus_node_num_to_libmesh;
 
@@ -647,9 +535,7 @@ public:
   // vector of pointers into vvc
   std::vector<char*> strings;
 
-  /**
-   * Maps of Ids to named entities
-   */
+  // Maps of Ids to named entities
   std::map<int, std::string> id_to_block_names;
   std::map<int, std::string> id_to_ss_names;
   std::map<int, std::string> id_to_ns_names;
