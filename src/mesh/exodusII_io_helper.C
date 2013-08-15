@@ -216,6 +216,45 @@ const int ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map[5] = {-1,-1,
 
 // ------------------------------------------------------------
 // ExodusII_IO_Helper class members
+
+  ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject &parent,
+                                         bool v,
+                                         bool run_only_on_proc0) :
+    ParallelObject(parent),
+    comp_ws(sizeof(Real)),
+    io_ws(0),
+    ex_id(0),
+    ex_err(0),
+    num_dim(0),
+    num_globals(0),
+    num_nodes(0),
+    num_elem(0),
+    num_elem_blk(0),
+    num_node_sets(0),
+    num_side_sets(0),
+    num_elem_this_blk(0),
+    num_nodes_per_elem(0),
+    num_attr(0),
+    req_info(0),
+    ret_int(0),
+    num_elem_all_sidesets(0),
+    ex_version(0.0),
+    ret_float(0.0),
+    ret_char(0),
+    num_time_steps(0),
+    _created(false),
+    _verbose(v),
+    _run_only_on_proc0(run_only_on_proc0),
+    _elem_vars_initialized(false),
+    _global_vars_initialized(false),
+    _use_mesh_dimension_instead_of_spatial_dimension(false)
+  {
+    title.resize(MAX_LINE_LENGTH+1);
+    elem_type.resize(MAX_STR_LENGTH);
+  }
+
+
+
 ExodusII_IO_Helper::~ExodusII_IO_Helper()
 {
 }
