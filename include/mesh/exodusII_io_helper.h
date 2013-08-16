@@ -966,28 +966,36 @@ public:
 
 
 /**
- * This class is useful for managing the names for named entities in an ExodusII
- * fortmat
+ * This class is useful for managing anything that requires a char**
+ * input/output in ExodusII file.  You must know its size at the time
+ * you create it.
  */
 class ExodusII_IO_Helper::NamesData
 {
 public:
   explicit
   NamesData(size_t size);
-  ~NamesData();
 
   /**
-   * Adds another name to the current data table
+   * Adds another name to the current data table.
    */
   void push_back_entry(const std::string & name);
 
   /**
-   * Writes the datastructure to the specified ExodusII file
+   * Provide access to the underlying C data table
    */
-  int write_to_exodus(int ex_id, exII::ex_entity_type type);
+  char** get_char_star_star();
+
+  /**
+   * Provide access to the i'th underlying char*
+   */
+  char* get_char_star(int i);
 
 private:
-  char **data_table;
+  // C++ data structures for managing string memory
+  std::vector<std::vector<char> > data_table;
+  std::vector<char*> data_table_pointers;
+
   size_t counter;
   size_t table_size;
 };
