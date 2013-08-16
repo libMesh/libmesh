@@ -527,14 +527,6 @@ public:
   std::vector<std::string> elem_var_names;
   std::vector<Real> elem_var_values;
 
-  // A pair of containers used to emulate a char** data
-  // structure without having to worry about dynamic memory
-  // allocation ourselves.
-  std::vector<std::vector<char> > vvc;
-
-  // vector of pointers into vvc
-  std::vector<char*> strings;
-
   // Maps of Ids to named entities
   std::map<int, std::string> id_to_block_names;
   std::map<int, std::string> id_to_ss_names;

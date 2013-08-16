@@ -727,37 +727,27 @@ const std::vector<Real>& ExodusII_IO_Helper::get_time_steps()
 
 const std::vector<std::string>& ExodusII_IO_Helper::get_nodal_var_names()
 {
-  // Allocate enough space for our variable name strings.
-  nodal_var_names.resize(num_nodal_vars);
-
-  // Use the vvc and strings objects to emulate the behavior of
-  // a char** object.
-  vvc.resize(num_nodal_vars);
-  strings.resize(num_nodal_vars);
-  for (int i=0;i<num_nodal_vars;i++)
-    vvc[i].resize(MAX_STR_LENGTH+1);
-
-  for (int i=0;i<num_nodal_vars;i++)
-    strings[i]=&(vvc[i][0]); // set pointer into vvc only *after* all resizing is complete
+  NamesData names_table(num_nodal_vars);
 
   exII::ex_get_var_names(ex_id,
 			 "n",
 			 num_nodal_vars,
-			 &strings[0]//var_names
+			 names_table.get_char_star_star()
 			 );
 
   if (_verbose)
     {
       libMesh::out << "Read the variable(s) from the file:" << std::endl;
       for (int i=0; i<num_nodal_vars; i++)
-	libMesh::out << "strings[" << i << "]=" << strings[i] << std::endl;
+	libMesh::out << names_table.get_char_star(i) << std::endl;
     }
 
+  // Allocate enough space for our variable name strings.
+  nodal_var_names.resize(num_nodal_vars);
 
   // Copy the char buffers into strings.
-  for (int i=0;i<num_nodal_vars;i++)
-    nodal_var_names[i]=strings[i]; // calls string::op=(const char*)
-
+  for (int i=0; i<num_nodal_vars; i++)
+    nodal_var_names[i] = names_table.get_char_star(i); // calls string::op=(const char*)
 
   return nodal_var_names;
 }
@@ -800,37 +790,27 @@ const std::vector<Real>& ExodusII_IO_Helper::get_nodal_var_values(std::string no
 
 const std::vector<std::string>& ExodusII_IO_Helper::get_elemental_var_names()
 {
-  // Allocate enough space for our variable name strings.
-  elem_var_names.resize(num_elem_vars);
-
-  // Use the vvc and strings objects to emulate the behavior of
-  // a char** object.
-  vvc.resize(num_elem_vars);
-  strings.resize(num_elem_vars);
-  for (int i=0;i<num_elem_vars;i++)
-    vvc[i].resize(MAX_STR_LENGTH+1);
-
-  for (int i=0;i<num_elem_vars;i++)
-    strings[i]=&(vvc[i][0]); // set pointer into vvc only *after* all resizing is complete
+  NamesData names_table(num_elem_vars);
 
   exII::ex_get_var_names(ex_id,
-             "e",
-             num_elem_vars,
-             &strings[0]//var_names
-             );
+                         "e",
+                         num_elem_vars,
+                         names_table.get_char_star_star()
+                         );
 
   if (_verbose)
     {
       libMesh::out << "Read the variable(s) from the file:" << std::endl;
       for (int i=0; i<num_elem_vars; i++)
-    libMesh::out << "strings[" << i << "]=" << strings[i] << std::endl;
+        libMesh::out << names_table.get_char_star(i) << std::endl;
     }
 
+  // Allocate enough space for our variable name strings.
+  elem_var_names.resize(num_elem_vars);
 
   // Copy the char buffers into strings.
   for (int i=0;i<num_elem_vars;i++)
-    elem_var_names[i]=strings[i]; // calls string::op=(const char*)
-
+    elem_var_names[i] = names_table.get_char_star(i); // calls string::op=(const char*)
 
   return elem_var_names;
 }
@@ -1475,35 +1455,23 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
   ex_err = exII::ex_put_elem_var_tab(ex_id, num_elem_blk, num_elem_vars, &truth_tab[0]);
   check_err(ex_err, "Error writing element truth table.");
 
-  // Use the vvc and strings objects to emulate the behavior of
-  // a char** object.
-  vvc.resize(num_elem_vars);
-  strings.resize(num_elem_vars);
+  NamesData names_table(num_elem_vars);
 
-  // For each string in names, allocate enough space in vvc and copy from
-  // the C++ string into vvc for passing to the C interface.
+  // Store the input names in the format required by Exodus.
   for (int i=0; i<num_elem_vars; ++i)
-    {
-      // Note: the one additional character is to hold the trailing '\0'
-      vvc[i].resize(names[i].size() + 1);
-      //std::strcpy(&(vvc[i][0]), names[i].c_str());
-      vvc[i][ names[i].copy(&vvc[i][0], vvc[i].size()-1) ] = '\0';
-    }
-
-  for (int i=0; i<num_elem_vars; ++i)
-    strings[i] = &(vvc[i][0]); // set pointer into vvc only *after* all resizing is complete
+    names_table.push_back_entry(names[i]);
 
   if (_verbose)
     {
       libMesh::out << "Writing variable name(s) to file: " << std::endl;
-      for (int i=0; i < num_elem_vars; ++i)
-	libMesh::out << "strings[" << i << "]=" << strings[i] << std::endl;
+      for (int i=0; i<num_elem_vars; ++i)
+	libMesh::out << names_table.get_char_star(i) << std::endl;
     }
 
   ex_err = exII::ex_put_var_names(ex_id,
 				  "e",
 				  num_elem_vars,
-				  &strings[0]//var_names
+				  names_table.get_char_star_star()
 				  );
 
   check_err(ex_err, "Error setting element variable names.");
@@ -1521,37 +1489,28 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
   ex_err = exII::ex_put_var_param(ex_id, "n", num_nodal_vars);
   check_err(ex_err, "Error setting number of nodal vars.");
 
-  // Use the vvc and strings objects to emulate the behavior of
-  // a char** object.
-  vvc.resize(num_nodal_vars);
-  strings.resize(num_nodal_vars);
-
-  // For each string in names, allocate enough space in vvc and copy from
-  // the C++ string into vvc for passing to the C interface.
-  for (int i=0; i<num_nodal_vars; i++)
+  if (num_nodal_vars > 0)
     {
-      vvc[i].resize(names[i].size()+1);
-      //std::strcpy(&(vvc[i][0]), names[i].c_str());
-      vvc[i][ names[i].copy(&vvc[i][0], vvc[i].size()-1) ] = '\0';
+      NamesData names_table(num_nodal_vars);
+
+      for (int i=0; i<num_nodal_vars; i++)
+        names_table.push_back_entry(names[i]);
+
+      if (_verbose)
+        {
+          libMesh::out << "Writing variable name(s) to file: " << std::endl;
+          for (int i=0; i<num_nodal_vars; i++)
+            libMesh::out << names_table.get_char_star(i) << std::endl;
+        }
+
+      ex_err = exII::ex_put_var_names(ex_id,
+                                      "n",
+                                      num_nodal_vars,
+                                      names_table.get_char_star_star()
+                                      );
+
+      check_err(ex_err, "Error setting nodal variable names.");
     }
-
-  for (int i=0; i<num_nodal_vars; i++)
-    strings[i] = &(vvc[i][0]); // set pointer into vvc only *after* all resizing is complete
-
-  if (_verbose)
-    {
-      libMesh::out << "Writing variable name(s) to file: " << std::endl;
-      for (int i=0;i<num_nodal_vars;i++)
-	libMesh::out << "strings[" << i << "]=" << strings[i] << std::endl;
-    }
-
-  ex_err = exII::ex_put_var_names(ex_id,
-				  "n",
-				  num_nodal_vars,
-				  strings.empty() ? NULL : &strings[0]//var_names
-				  );
-
-  check_err(ex_err, "Error setting nodal variable names.");
 }
 
 
@@ -1562,9 +1521,8 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
     return;
 
   if (_global_vars_initialized)
-  {
     return;
-  }
+
   _global_vars_initialized = true;
 
   num_globals = names.size();
@@ -1572,37 +1530,28 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
   ex_err = exII::ex_put_var_param(ex_id, "g", num_globals);
   check_err(ex_err, "Error setting number of global vars.");
 
-  // Use the vvc and strings objects to emulate the behavior of
-  // a char** object.
-  vvc.resize(num_globals);
-  strings.resize(num_globals);
-
-  // For each string in names, allocate enough space in vvc and copy from
-  // the C++ string into vvc for passing to the C interface.
-  for (int i=0; i<num_globals; i++)
+  if (num_globals > 0)
     {
-      vvc[i].resize(names[i].size()+1);
-      // std::strcpy(&(vvc[i][0]), names[i].c_str());
-      vvc[i][ names[i].copy(&vvc[i][0], vvc[i].size()-1) ] = '\0';
+      NamesData names_table(num_globals);
+
+      for (int i=0; i<num_globals; i++)
+        names_table.push_back_entry(names[i]);
+
+      if (_verbose)
+        {
+          libMesh::out << "Writing variable name(s) to file: " << std::endl;
+          for (int i=0; i<num_globals; ++i)
+            libMesh::out << names_table.get_char_star(i) << std::endl;
+        }
+
+      ex_err = exII::ex_put_var_names(ex_id,
+                                      "g",
+                                      num_globals,
+                                      names_table.get_char_star_star()
+                                      );
+
+      check_err(ex_err, "Error setting global variable names.");
     }
-
-  for (int i=0; i<num_globals; i++)
-    strings[i] = &(vvc[i][0]); // set pointer into vvc only *after* all resizing is complete
-
-  if (_verbose)
-    {
-      libMesh::out << "Writing variable name(s) to file: " << std::endl;
-      for (int i=0; i < num_globals; ++i)
-	libMesh::out << "strings[" << i << "]=" << strings[i] << std::endl;
-    }
-
-  ex_err = exII::ex_put_var_names(ex_id,
-				  "g",
-				  num_globals,
-				  &strings[0]
-				  );
-
-  check_err(ex_err, "Error setting global variable names.");
 }
 
 
