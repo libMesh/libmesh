@@ -851,7 +851,7 @@ const std::vector<Real>& ExodusII_IO_Helper::get_elemental_var_values(std::strin
     }
 
   unsigned int ex_el_num = 0;
-  for (unsigned int i = 0; i < (unsigned int) num_elem_blk; i++)
+  for (unsigned int i = 0; i < static_cast<unsigned int>(num_elem_blk); i++)
   {
     int n_blk_elems = 0;
     ex_err = exII::ex_get_elem_block(ex_id, block_ids[i], NULL, &n_blk_elems, NULL, NULL);
@@ -861,7 +861,7 @@ const std::vector<Real>& ExodusII_IO_Helper::get_elemental_var_values(std::strin
     ex_err = exII::ex_get_elem_var(ex_id, time_step, var_index+1, block_ids[i], n_blk_elems, &block_elem_var_values[0]);
     check_err(ex_err, "Error getting elemental values.");
 
-    for (unsigned int j = 0; j < (unsigned int) n_blk_elems; j++)
+    for (unsigned int j = 0; j < static_cast<unsigned int>(n_blk_elems); j++)
     {
       elem_var_values[ex_el_num] = block_elem_var_values[j];
       ex_el_num++;
