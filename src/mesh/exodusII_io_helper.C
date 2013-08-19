@@ -1645,27 +1645,22 @@ void ExodusII_IO_Helper::write_information_records(const std::vector<std::string
     return;
 
   int num_records = records.size();
-  std::vector<char*> info(num_records);
 
-  // This is an abuse of the const char* returned by std::string, we trust that Exodus won't
-  // modify these when it's writing them out...
-  for (unsigned i=0; i<records.size(); ++i)
-  {
-    // Records cannot be longer than MAX_LINE_LENGTH, as defined in exodusII.h
-    if (records[i].size() > MAX_LINE_LENGTH)
-      {
-	libMesh::err << "Error, cannot write records longer than " << MAX_LINE_LENGTH << " characters!" << std::endl;
-	libmesh_error();
-      }
+  if (num_records > 0)
+    {
+      NamesData info(num_records, MAX_LINE_LENGTH);
 
-    info[i] = const_cast<char*>(records[i].c_str());
-  }
+      // If an entry is longer than MAX_LINE_LENGTH characters it's not an error, we just
+      // write the first MAX_LINE_LENGTH characters to the file.
+      for (unsigned i=0; i<records.size(); ++i)
+        info.push_back_entry(records[i]);
 
-  ex_err = exII::ex_put_info(ex_id, num_records, &info[0]);
-  check_err(ex_err, "Error writing global values.");
+      ex_err = exII::ex_put_info(ex_id, num_records, info.get_char_star_star());
+      check_err(ex_err, "Error writing global values.");
 
-  ex_err = exII::ex_update(ex_id);
-  check_err(ex_err, "Error flushing buffers to file.");
+      ex_err = exII::ex_update(ex_id);
+      check_err(ex_err, "Error flushing buffers to file.");
+    }
 }
 
 
