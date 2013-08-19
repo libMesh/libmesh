@@ -243,6 +243,7 @@ const int ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map[5] = {-1,-1,
     ret_char(0),
     num_time_steps(0),
     _created(false),
+    _opened(false),
     _verbose(v),
     _run_only_on_proc0(run_only_on_proc0),
     _elem_vars_initialized(false),
@@ -262,17 +263,6 @@ ExodusII_IO_Helper::~ExodusII_IO_Helper()
 void ExodusII_IO_Helper::verbose (bool set_verbosity)
 {
   _verbose = set_verbosity;
-}
-
-
-
-void ExodusII_IO_Helper::check_err(const int err_in, const std::string msg)
-{
-  if (err_in < 0)
-    {
-      libMesh::err << msg << std::endl;
-      libmesh_error();
-    }
 }
 
 
@@ -300,8 +290,10 @@ void ExodusII_IO_Helper::open(const char* filename)
 			&ex_version);
 
   std::string err_msg = std::string("Error opening ExodusII mesh file: ") + std::string(filename);
-  check_err(ex_id, err_msg);
+  EX_CHECK_ERR(ex_id, err_msg);
   if (_verbose) libMesh::out << "File opened successfully." << std::endl;
+
+  _opened = true;
 }
 
 
@@ -317,7 +309,7 @@ void ExodusII_IO_Helper::read_header()
 			     &num_node_sets,
 			     &num_side_sets);
 
-  check_err(ex_err, "Error retrieving header info.");
+  EX_CHECK_ERR(ex_err, "Error retrieving header info.");
 
   num_time_steps = inquire(exII::EX_INQ_TIME, "Error retrieving time steps");
 
@@ -355,7 +347,7 @@ void ExodusII_IO_Helper::read_nodes()
 			      static_cast<void*>(&y[0]),
 			      static_cast<void*>(&z[0]));
 
-  check_err(ex_err, "Error retrieving nodal data.");
+  EX_CHECK_ERR(ex_err, "Error retrieving nodal data.");
   message("Nodal data retrieved successfully.");
 }
 
@@ -368,13 +360,13 @@ void ExodusII_IO_Helper::read_node_num_map ()
   ex_err = exII::ex_get_node_num_map (ex_id,
 				      node_num_map.empty() ? NULL : &node_num_map[0]);
 
-  check_err(ex_err, "Error retrieving nodal number map.");
+  EX_CHECK_ERR(ex_err, "Error retrieving nodal number map.");
   message("Nodal numbering map retrieved successfully.");
 
   if (_verbose)
     {
       libMesh::out << "[" << this->processor_id() << "] node_num_map[i] = ";
-      for (unsigned int i=0; i< static_cast<unsigned int>(std::min(10, num_nodes-1)); ++i)
+      for (unsigned int i=0; i<static_cast<unsigned int>(std::min(10, num_nodes-1)); ++i)
         libMesh::out << node_num_map[i] << ", ";
       libMesh::out << "... " << node_num_map.back() << std::endl;
     }
@@ -400,7 +392,7 @@ void ExodusII_IO_Helper::read_block_info()
   // one type of element.
   // However, there could be more.
 
-  check_err(ex_err, "Error getting block IDs.");
+  EX_CHECK_ERR(ex_err, "Error getting block IDs.");
   message("All block IDs retrieved successfully.");
 
   char name_buffer[MAX_STR_LENGTH+1];
@@ -408,7 +400,7 @@ void ExodusII_IO_Helper::read_block_info()
   {
     ex_err = exII::ex_get_name(ex_id, exII::EX_ELEM_BLOCK,
                                block_ids[i], name_buffer);
-    check_err(ex_err, "Error getting block name.");
+    EX_CHECK_ERR(ex_err, "Error getting block name.");
     id_to_block_names[block_ids[i]] = name_buffer;
   }
   message("All block names retrieved successfully.");
@@ -487,7 +479,7 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
 	      << " having " << num_nodes_per_elem
 	      << " nodes per element." << std::endl;
 
-  check_err(ex_err, "Error getting block info.");
+  EX_CHECK_ERR(ex_err, "Error getting block info.");
   message("Info retrieved successfully for block: ", block);
 
 
@@ -503,7 +495,7 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
 				      block_ids[block],
 				      &connect[0]);
 
-      check_err(ex_err, "Error reading block connectivity.");
+      EX_CHECK_ERR(ex_err, "Error reading block connectivity.");
       message("Connectivity retrieved successfully for block: ", block);
     }
 }
@@ -518,14 +510,14 @@ void ExodusII_IO_Helper::read_elem_num_map ()
   ex_err = exII::ex_get_elem_num_map (ex_id,
 				      elem_num_map.empty() ? NULL : &elem_num_map[0]);
 
-  check_err(ex_err, "Error retrieving element number map.");
+  EX_CHECK_ERR(ex_err, "Error retrieving element number map.");
   message("Element numbering map retrieved successfully.");
 
 
   if (_verbose)
     {
       libMesh::out << "[" << this->processor_id() << "] elem_num_map[i] = ";
-      for (unsigned int i=0; i< static_cast<unsigned int>(std::min(10, num_elem-1)); ++i)
+      for (unsigned int i=0; i<static_cast<unsigned int>(std::min(10, num_elem-1)); ++i)
         libMesh::out << elem_num_map[i] << ", ";
       libMesh::out << "... " << elem_num_map.back() << std::endl;
     }
@@ -540,7 +532,7 @@ void ExodusII_IO_Helper::read_sideset_info()
     {
       ex_err = exII::ex_get_side_set_ids(ex_id,
 					 &ss_ids[0]);
-      check_err(ex_err, "Error retrieving sideset information.");
+      EX_CHECK_ERR(ex_err, "Error retrieving sideset information.");
       message("All sideset information retrieved successfully.");
 
       // Resize appropriate data structures -- only do this once outside the loop
@@ -555,7 +547,7 @@ void ExodusII_IO_Helper::read_sideset_info()
 				&ret_int,
 				&ret_float,
 				&ret_char);
-      check_err(ex_err, "Error inquiring about side set element list length.");
+      EX_CHECK_ERR(ex_err, "Error inquiring about side set element list length.");
 
       //libMesh::out << "Value returned by ex_inquire was: " << ret_int << std::endl;
       num_elem_all_sidesets = ret_int;
@@ -569,7 +561,7 @@ void ExodusII_IO_Helper::read_sideset_info()
   {
     ex_err = exII::ex_get_name(ex_id, exII::EX_SIDE_SET,
                                ss_ids[i], name_buffer);
-    check_err(ex_err, "Error getting side set name.");
+    EX_CHECK_ERR(ex_err, "Error getting side set name.");
     id_to_ss_names[ss_ids[i]] = name_buffer;
   }
   message("All side set names retrieved successfully.");
@@ -582,7 +574,7 @@ void ExodusII_IO_Helper::read_nodeset_info()
     {
       ex_err = exII::ex_get_node_set_ids(ex_id,
 					 &nodeset_ids[0]);
-      check_err(ex_err, "Error retrieving nodeset information.");
+      EX_CHECK_ERR(ex_err, "Error retrieving nodeset information.");
       message("All nodeset information retrieved successfully.");
 
       // Resize appropriate data structures -- only do this once outnode the loop
@@ -595,7 +587,7 @@ void ExodusII_IO_Helper::read_nodeset_info()
   {
     ex_err = exII::ex_get_name(ex_id, exII::EX_NODE_SET,
                                nodeset_ids[i], name_buffer);
-    check_err(ex_err, "Error getting node set name.");
+    EX_CHECK_ERR(ex_err, "Error getting node set name.");
     id_to_ns_names[nodeset_ids[i]] = name_buffer;
   }
   message("All node set names retrieved successfully.");
@@ -615,7 +607,7 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
 				       ss_ids[id],
 				       &num_sides_per_set[id],
 				       &num_df_per_set[id]);
-  check_err(ex_err, "Error retrieving sideset parameters.");
+  EX_CHECK_ERR(ex_err, "Error retrieving sideset parameters.");
   message("Parameters retrieved successfully for sideset: ", id);
 
 
@@ -636,7 +628,7 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
 				     ss_ids[id],
 				     &elem_list[offset],
 				     &side_list[offset]);
-      check_err(ex_err, "Error retrieving sideset data.");
+      EX_CHECK_ERR(ex_err, "Error retrieving sideset data.");
       message("Data retrieved successfully for sideset: ", id);
 
       for (int i=0; i<num_sides_per_set[id]; i++)
@@ -656,7 +648,7 @@ void ExodusII_IO_Helper::read_nodeset(int id)
 				       nodeset_ids[id],
 				       &num_nodes_per_set[id],
 				       &num_node_df_per_set[id]);
-  check_err(ex_err, "Error retrieving nodeset parameters.");
+  EX_CHECK_ERR(ex_err, "Error retrieving nodeset parameters.");
   message("Parameters retrieved successfully for nodeset: ", id);
 
   node_list.resize(num_nodes_per_set[id]);
@@ -669,7 +661,7 @@ void ExodusII_IO_Helper::read_nodeset(int id)
 				     nodeset_ids[id],
 				     &node_list[0]);
 
-      check_err(ex_err, "Error retrieving nodeset data.");
+      EX_CHECK_ERR(ex_err, "Error retrieving nodeset data.");
       message("Data retrieved successfully for nodeset: ", id);
     }
 }
@@ -694,7 +686,7 @@ void ExodusII_IO_Helper::close()
   if ((this->processor_id() == 0) || (!_run_only_on_proc0))
     {
       ex_err = exII::ex_close(ex_id);
-      check_err(ex_err, "Error closing Exodus file.");
+      EX_CHECK_ERR(ex_err, "Error closing Exodus file.");
       message("Exodus file closed successfully.");
     }
 }
@@ -709,7 +701,7 @@ int ExodusII_IO_Helper::inquire(int req_info_in, std::string error_msg)
 			    &ret_float,
 			    &ret_char);
 
-  check_err(ex_err, error_msg);
+  EX_CHECK_ERR(ex_err, error_msg);
 
   return ret_int;
 }
@@ -727,7 +719,7 @@ const std::vector<Real>& ExodusII_IO_Helper::get_time_steps()
 
 const std::vector<std::string>& ExodusII_IO_Helper::get_nodal_var_names()
 {
-  NamesData names_table(num_nodal_vars);
+  NamesData names_table(num_nodal_vars, MAX_STR_LENGTH);
 
   exII::ex_get_var_names(ex_id,
 			 "n",
@@ -790,7 +782,7 @@ const std::vector<Real>& ExodusII_IO_Helper::get_nodal_var_values(std::string no
 
 const std::vector<std::string>& ExodusII_IO_Helper::get_elemental_var_names()
 {
-  NamesData names_table(num_elem_vars);
+  NamesData names_table(num_elem_vars, MAX_STR_LENGTH);
 
   exII::ex_get_var_names(ex_id,
                          "e",
@@ -809,7 +801,7 @@ const std::vector<std::string>& ExodusII_IO_Helper::get_elemental_var_names()
   elem_var_names.resize(num_elem_vars);
 
   // Copy the char buffers into strings.
-  for (int i=0;i<num_elem_vars;i++)
+  for (int i=0; i<num_elem_vars; i++)
     elem_var_names[i] = names_table.get_char_star(i); // calls string::op=(const char*)
 
   return elem_var_names;
@@ -848,17 +840,17 @@ const std::vector<Real>& ExodusII_IO_Helper::get_elemental_var_values(std::strin
     }
 
   unsigned int ex_el_num = 0;
-  for (unsigned int i = 0; i < (unsigned int) num_elem_blk; i++)
+  for (unsigned int i=0; i<static_cast<unsigned int>(num_elem_blk); i++)
   {
     int n_blk_elems = 0;
     ex_err = exII::ex_get_elem_block(ex_id, block_ids[i], NULL, &n_blk_elems, NULL, NULL);
-    check_err(ex_err, "Error getting number of element in block.");
+    EX_CHECK_ERR(ex_err, "Error getting number of element in block.");
 
     std::vector<Real> block_elem_var_values(num_elem, 0.);
     ex_err = exII::ex_get_elem_var(ex_id, time_step, var_index+1, block_ids[i], n_blk_elems, &block_elem_var_values[0]);
-    check_err(ex_err, "Error getting elemental values.");
+    EX_CHECK_ERR(ex_err, "Error getting elemental values.");
 
-    for (unsigned int j = 0; j < (unsigned int) n_blk_elems; j++)
+    for (unsigned int j=0; j<static_cast<unsigned int>(n_blk_elems); j++)
     {
       elem_var_values[ex_el_num] = block_elem_var_values[j];
       ex_el_num++;
@@ -885,7 +877,7 @@ void ExodusII_IO_Helper::create(std::string filename)
 
       ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
 
-      check_err(ex_id, "Error creating ExodusII mesh file.");
+      EX_CHECK_ERR(ex_id, "Error creating ExodusII mesh file.");
 
       if (_verbose)
         libMesh::out << "File created successfully." << std::endl;
@@ -909,7 +901,7 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
 
   MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  for ( ; it != end; ++it)
+  for (; it!=end; ++it)
 	num_nodes += (*it)->n_nodes();
 
   num_elem = mesh.n_elem();
@@ -926,7 +918,7 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
   //loop through element and map between block and element vector
   std::map<subdomain_id_type, std::vector<unsigned int>  > subdomain_map;
 
-  for(it = mesh.active_elements_begin(); it != end; ++it)
+  for (it=mesh.active_elements_begin(); it!=end; ++it)
     {
       const Elem * elem = *it;
       subdomain_id_type cur_subdomain = elem->subdomain_id();
@@ -953,7 +945,7 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
 			     num_node_sets,
 			     num_side_sets);
 
-  check_err(ex_err, "Error initializing new Exodus file.");
+  EX_CHECK_ERR(ex_err, "Error initializing new Exodus file.");
 }
 
 
@@ -988,7 +980,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 
   MeshBase::const_element_iterator it = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  for (; it != end; ++it)
+  for (; it!=end; ++it)
   {
     const Elem * elem = *it;
     subdomain_id_type cur_subdomain = elem->subdomain_id();
@@ -1015,7 +1007,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 			     num_node_sets,
 			     num_side_sets);
 
-  check_err(ex_err, "Error initializing new Exodus file.");
+  EX_CHECK_ERR(ex_err, "Error initializing new Exodus file.");
 }
 
 
@@ -1034,7 +1026,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
     unsigned i = 0;
     MeshBase::const_node_iterator it = mesh.nodes_begin();
     const MeshBase::const_node_iterator end = mesh.nodes_end();
-    for ( ; it != end; ++it, ++i)
+    for (; it!=end; ++it, ++i)
       {
 	const Node* node = *it;
 
@@ -1058,7 +1050,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 			      y.empty() ? NULL : &y[0],
 			      z.empty() ? NULL : &z[0]);
 
-  check_err(ex_err, "Error writing coordinates to Exodus file.");
+  EX_CHECK_ERR(ex_err, "Error writing coordinates to Exodus file.");
 }
 
 
@@ -1076,8 +1068,8 @@ void ExodusII_IO_Helper::write_nodal_coordinates_discontinuous(const MeshBase & 
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
   unsigned int i = 0;
-  for ( ; it != end; ++it)
-	for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+  for (; it!=end; ++it)
+    for (unsigned int n=0; n<(*it)->n_nodes(); n++)
     {
       x[i]=(*it)->point(n)(0);
 #if LIBMESH_DIM > 1
@@ -1098,7 +1090,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates_discontinuous(const MeshBase & 
 			      y.empty() ? NULL : &y[0],
 			      z.empty() ? NULL : &z[0]);
 
-  check_err(ex_err, "Error writing coordinates to Exodus file.");
+  EX_CHECK_ERR(ex_err, "Error writing coordinates to Exodus file.");
 }
 
 
@@ -1116,7 +1108,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
   //loop through element and map between block and element vector
-  for (; mesh_it != end; ++mesh_it)
+  for (; mesh_it!=end; ++mesh_it)
   {
     const Elem * elem = *mesh_it;
 
@@ -1139,10 +1131,10 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   // the index returned from the ex_id_lkup is erronously used.  For now
   // the work around is to use the alternative function ex_put_names, but
   // this function requires a char** datastructure.
-  NamesData names_table(num_elem_blk);
+  NamesData names_table(num_elem_blk, MAX_STR_LENGTH);
 
   unsigned int counter=0;
-  for(it = subdomain_map.begin() ; it != subdomain_map.end(); it++)
+  for (it=subdomain_map.begin(); it!=subdomain_map.end(); it++)
     {
       block_ids[counter] = (*it).first;
       names_table.push_back_entry(mesh.subdomain_name((*it).first));
@@ -1159,7 +1151,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 
       ex_err = exII::ex_put_elem_block(ex_id, (*it).first, conv.exodus_elem_type().c_str(), tmp_vec.size(),num_nodes_per_elem,0);
 
-      check_err(ex_err, "Error writing element block.");
+      EX_CHECK_ERR(ex_err, "Error writing element block.");
 
       connect.resize(tmp_vec.size()*num_nodes_per_elem);
 
@@ -1178,7 +1170,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 	  // the same block...
           libmesh_assert_equal_to (elem->n_nodes(), Elem::build(conv.get_canonical_type(), NULL)->n_nodes());
 
-          for (unsigned int j=0; j < static_cast<unsigned int>(num_nodes_per_elem); j++)
+          for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); j++)
             {
               const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
               const unsigned int elem_node_index = conv.get_inverse_node_map(j); // inverse node map is for writing.
@@ -1191,24 +1183,24 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
             }
         }
     ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
-    check_err(ex_err, "Error writing element connectivities");
+    EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
     // write out the element number map
     curr_elem_map_end = std::transform(tmp_vec.begin(), tmp_vec.end(), curr_elem_map_end,
                    std::bind2nd(std::plus<unsigned int>(), 1));  // Add one to each id for exodus!
     ex_err = exII::ex_put_elem_num_map(ex_id, (int *)&elem_map[0]);
-    check_err(ex_err, "Error writing element map");
+    EX_CHECK_ERR(ex_err, "Error writing element map");
 
     counter++;
   }
 //  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map_out[0]);
-  check_err(ex_err, "Error writing element connectivities");
+  EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
   // Write out the block names
   if (num_elem_blk > 0)
     {
       ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_BLOCK, names_table.get_char_star_star());
-      check_err(ex_err, "Error writing element names");
+      EX_CHECK_ERR(ex_err, "Error writing element names");
     }
 }
 
@@ -1224,13 +1216,14 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
 
   MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  //loop through element and map between block and element vector
-  for(; mesh_it != end; ++mesh_it)
+
+  // loop through element and map between block and element vector
+  for (; mesh_it!=end; ++mesh_it)
     {
       const Elem * elem = *mesh_it;
 
-      //Only write out the active elements
-      if(elem->active())
+      // Only write out the active elements
+      if (elem->active())
       {
         unsigned int cur_subdomain = elem->subdomain_id();
 
@@ -1242,7 +1235,7 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
 
   std::map<unsigned int, std::vector<unsigned int>  >::iterator it;
 
-  for(it = subdomain_map.begin() ; it != subdomain_map.end(); it++)
+  for (it=subdomain_map.begin(); it!=subdomain_map.end(); it++)
     {
       std::vector<unsigned int> & tmp_vec = (*it).second;
 
@@ -1256,7 +1249,7 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
 
       ex_err = exII::ex_put_elem_block(ex_id, (*it).first, conv.exodus_elem_type().c_str(), tmp_vec.size(),num_nodes_per_elem,0);
 
-      check_err(ex_err, "Error writing element block.");
+      EX_CHECK_ERR(ex_err, "Error writing element block.");
 
       connect.resize(tmp_vec.size()*num_nodes_per_elem);
 
@@ -1266,7 +1259,7 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
           elem_num_map_out.push_back(elem_id);
           libmesh_elem_num_to_exodus[elem_id] = elem_num_map_out.size();
 
-          for (unsigned int j=0; j < static_cast<unsigned int>(num_nodes_per_elem); j++)
+          for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); j++)
             {
               const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
               const unsigned int elem_node_index = conv.get_inverse_node_map(j); // Inverse node map is for writing
@@ -1279,21 +1272,21 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
             }
         }
     ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
-    check_err(ex_err, "Error writing element connectivities");
+    EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
     // write out the element number map
     std::vector<unsigned int> elem_map(tmp_vec.size());
     std::transform(tmp_vec.begin(), tmp_vec.end(), elem_map.begin(),
                    std::bind2nd(std::plus<unsigned int>(), 1));  // Add one to each id for exodus!
     ex_err = exII::ex_put_elem_num_map(ex_id, (int *)&elem_map[0]);
-    check_err(ex_err, "Error writing element map");
+    EX_CHECK_ERR(ex_err, "Error writing element map");
   }
 
 //  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map_out[0]);
-  check_err(ex_err, "Error writing element connectivities");
+  EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
   ex_err = exII::ex_update(ex_id);
-  check_err(ex_err, "Error flushing buffers to file.");
+  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
 }
 
 
@@ -1311,12 +1304,12 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
   mesh.boundary_info->build_side_list(el, sl, il);
 
-  //Maps from sideset id to the element and sides
+  // Maps from sideset id to the element and sides
   std::map<int, std::vector<int> > elem;
   std::map<int, std::vector<int> > side;
 
-  //Accumulate the vectors to pass into ex_put_side_set
-  for(unsigned int i = 0; i < el.size(); i++)
+  // Accumulate the vectors to pass into ex_put_side_set
+  for (unsigned int i=0; i<el.size(); i++)
   {
     std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
@@ -1329,7 +1322,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     family.push_back(mesh.elem(el[i]));
 #endif
 
-    for(unsigned int j = 0; j < family.size(); ++j)
+    for (unsigned int j=0; j<family.size(); ++j)
     {
       const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(family[j]->id())->type());
 
@@ -1346,9 +1339,9 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   // Write out the sideset names, but only if there is something to write
   if (side_boundary_ids.size() > 0)
     {
-      NamesData names_table(side_boundary_ids.size());
+      NamesData names_table(side_boundary_ids.size(), MAX_STR_LENGTH);
 
-      for(unsigned int i = 0; i < side_boundary_ids.size(); i++)
+      for (unsigned int i=0; i<side_boundary_ids.size(); i++)
         {
           int ss_id = side_boundary_ids[i];
 
@@ -1357,14 +1350,14 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
           names_table.push_back_entry(mesh.boundary_info->sideset_name(ss_id));
 
           ex_err = exII::ex_put_side_set_param(ex_id, actual_id, elem[ss_id].size(), 0);
-          check_err(ex_err, "Error writing sideset parameters");
+          EX_CHECK_ERR(ex_err, "Error writing sideset parameters");
 
           ex_err = exII::ex_put_side_set(ex_id, actual_id, &elem[ss_id][0], &side[ss_id][0]);
-          check_err(ex_err, "Error writing sidesets");
+          EX_CHECK_ERR(ex_err, "Error writing sidesets");
         }
 
       ex_err = exII::ex_put_names(ex_id, exII::EX_SIDE_SET, names_table.get_char_star_star());
-      check_err(ex_err, "Error writing sideset names");
+      EX_CHECK_ERR(ex_err, "Error writing sideset names");
     }
 }
 
@@ -1375,19 +1368,16 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  // FIXME: This is not used, should it be?
-  ExodusII_IO_Helper::ElementMaps em;
-
   std::vector< dof_id_type > nl;
   std::vector< boundary_id_type > il;
 
   mesh.boundary_info->build_node_list(nl, il);
 
-  //Maps from nodeset id to the nodes
+  // Maps from nodeset id to the nodes
   std::map<boundary_id_type, std::vector<int> > node;
 
-  //Accumulate the vectors to pass into ex_put_node_set
-  for(unsigned int i = 0; i < nl.size(); i++)
+  // Accumulate the vectors to pass into ex_put_node_set
+  for (unsigned int i=0; i<nl.size(); i++)
     node[il[i]].push_back(nl[i]+1);
 
   std::vector<boundary_id_type> node_boundary_ids;
@@ -1396,9 +1386,9 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   // Write out the nodeset names, but only if there is something to write
   if (node_boundary_ids.size() > 0)
     {
-      NamesData names_table(node_boundary_ids.size());
+      NamesData names_table(node_boundary_ids.size(), MAX_STR_LENGTH);
 
-      for(unsigned int i = 0; i < node_boundary_ids.size(); i++)
+      for (unsigned int i=0; i<node_boundary_ids.size(); i++)
         {
           int nodeset_id = node_boundary_ids[i];
 
@@ -1407,15 +1397,15 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
           names_table.push_back_entry(mesh.boundary_info->nodeset_name(nodeset_id));
 
           ex_err = exII::ex_put_node_set_param(ex_id, actual_id, node[nodeset_id].size(), 0);
-          check_err(ex_err, "Error writing nodeset parameters");
+          EX_CHECK_ERR(ex_err, "Error writing nodeset parameters");
 
           ex_err = exII::ex_put_node_set(ex_id, actual_id, &node[nodeset_id][0]);
-          check_err(ex_err, "Error writing nodesets");
+          EX_CHECK_ERR(ex_err, "Error writing nodesets");
         }
 
       // Write out the nodeset names
       ex_err = exII::ex_put_names(ex_id, exII::EX_NODE_SET, names_table.get_char_star_star());
-      check_err(ex_err, "Error writing nodeset names");
+      EX_CHECK_ERR(ex_err, "Error writing nodeset names");
     }
 }
 
@@ -1429,15 +1419,20 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
 
   num_elem_vars = names.size();
 
-  if ( num_elem_vars == 0 )
+  if (num_elem_vars == 0)
     return;
 
   if (_elem_vars_initialized)
     return;
+
+  // Set the flag so we can skip this stuff on subsequent calls to
+  // initialize_element_variables()
   _elem_vars_initialized = true;
 
-  ex_err = exII::ex_put_var_param(ex_id, "e", num_elem_vars);
-  check_err(ex_err, "Error setting number of element vars.");
+  ex_err = exII::ex_put_var_param(ex_id,
+                                  "e",
+                                  num_elem_vars);
+  EX_CHECK_ERR(ex_err, "Error setting number of element vars.");
 
   // Form the element variable truth table and send to Exodus.
   // This tells which variables are written to which blocks,
@@ -1451,11 +1446,14 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
   // they aren't defined.  To be consistent with that, fill
   // the truth table with ones.
 
-  std::vector<int> truth_tab(num_elem_blk*num_elem_vars,1);
-  ex_err = exII::ex_put_elem_var_tab(ex_id, num_elem_blk, num_elem_vars, &truth_tab[0]);
-  check_err(ex_err, "Error writing element truth table.");
+  std::vector<int> truth_tab(num_elem_blk*num_elem_vars, 1);
+  ex_err = exII::ex_put_elem_var_tab(ex_id,
+                                     num_elem_blk,
+                                     num_elem_vars,
+                                     &truth_tab[0]);
+  EX_CHECK_ERR(ex_err, "Error writing element truth table.");
 
-  NamesData names_table(num_elem_vars);
+  NamesData names_table(num_elem_vars, MAX_STR_LENGTH);
 
   // Store the input names in the format required by Exodus.
   for (int i=0; i<num_elem_vars; ++i)
@@ -1474,7 +1472,7 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
 				  names_table.get_char_star_star()
 				  );
 
-  check_err(ex_err, "Error setting element variable names.");
+  EX_CHECK_ERR(ex_err, "Error setting element variable names.");
 }
 
 
@@ -1487,11 +1485,11 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
   num_nodal_vars = names.size();
 
   ex_err = exII::ex_put_var_param(ex_id, "n", num_nodal_vars);
-  check_err(ex_err, "Error setting number of nodal vars.");
+  EX_CHECK_ERR(ex_err, "Error setting number of nodal vars.");
 
   if (num_nodal_vars > 0)
     {
-      NamesData names_table(num_nodal_vars);
+      NamesData names_table(num_nodal_vars, MAX_STR_LENGTH);
 
       for (int i=0; i<num_nodal_vars; i++)
         names_table.push_back_entry(names[i]);
@@ -1509,7 +1507,7 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
                                       names_table.get_char_star_star()
                                       );
 
-      check_err(ex_err, "Error setting nodal variable names.");
+      EX_CHECK_ERR(ex_err, "Error setting nodal variable names.");
     }
 }
 
@@ -1528,11 +1526,11 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
   num_globals = names.size();
 
   ex_err = exII::ex_put_var_param(ex_id, "g", num_globals);
-  check_err(ex_err, "Error setting number of global vars.");
+  EX_CHECK_ERR(ex_err, "Error setting number of global vars.");
 
   if (num_globals > 0)
     {
-      NamesData names_table(num_globals);
+      NamesData names_table(num_globals, MAX_STR_LENGTH);
 
       for (int i=0; i<num_globals; i++)
         names_table.push_back_entry(names[i]);
@@ -1550,7 +1548,7 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
                                       names_table.get_char_star_star()
                                       );
 
-      check_err(ex_err, "Error setting global variable names.");
+      EX_CHECK_ERR(ex_err, "Error setting global variable names.");
     }
 }
 
@@ -1562,10 +1560,10 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
     return;
 
   ex_err = exII::ex_put_time(ex_id, timestep, &time);
-  check_err(ex_err, "Error writing timestep.");
+  EX_CHECK_ERR(ex_err, "Error writing timestep.");
 
   ex_err = exII::ex_update(ex_id);
-  check_err(ex_err, "Error flushing buffers to file.");
+  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
 }
 
 
@@ -1576,49 +1574,49 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
     return;
 
   // Loop over the element blocks and write the data one block at a time
-  std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
+  std::map<unsigned int, std::vector<unsigned int> > subdomain_map;
 
   const unsigned int num_vars = values.size() / num_elem;
 
   MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  //loop through element and map between block and element vector
-  for( ; mesh_it != end; ++mesh_it)
+
+  // loop through element and map between block and element vector
+  for (; mesh_it!=end; ++mesh_it)
     {
       const Elem * elem = *mesh_it;
-
-      //Only write out the active elements
-      if(elem->active())
-      {
-        unsigned int cur_subdomain = elem->subdomain_id();
-
-        subdomain_map[cur_subdomain].push_back(elem->id());
-      }
+      subdomain_map[elem->subdomain_id()].push_back(elem->id());
     }
 
-  for (unsigned int l=0; l < num_vars; ++l)
-  {
-    // The size of the subdomain map is the number of blocks.
-    std::map<unsigned int, std::vector<unsigned int>  >::iterator it( subdomain_map.begin() );
-
-    for(unsigned int j=0; it != subdomain_map.end(); ++it, ++j)
+  // For each variable, create a 'data' array which holds all the elemental variable
+  // values *for a given block* on this processor, then write that data vector to file
+  // before moving onto the next block.
+  for (unsigned int i=0; i<num_vars; ++i)
     {
-      const std::vector<unsigned int> & elem_nums = (*it).second;
-      const unsigned int num_elems_this_block = elem_nums.size();
-      std::vector<Number> data( num_elems_this_block );
-      for (unsigned int k=0; k < num_elems_this_block; ++k)
-      {
-        data[k] = values[l*num_elem+elem_nums[k]];
-      }
+      // The size of the subdomain map is the number of blocks.
+      std::map<unsigned int, std::vector<unsigned int> >::iterator it = subdomain_map.begin();
 
-      ex_err = exII::ex_put_elem_var(ex_id, timestep, l+1, get_block_id(j), num_elems_this_block, &data[0]);
-      check_err(ex_err, "Error writing element values.");
+      for (unsigned int j=0; it!=subdomain_map.end(); ++it, ++j)
+        {
+          const std::vector<unsigned int> & elem_nums = (*it).second;
+          const unsigned int num_elems_this_block = elem_nums.size();
+          std::vector<Number> data(num_elems_this_block);
 
+          for (unsigned int k=0; k<num_elems_this_block; ++k)
+            data[k] = values[i*num_elem + elem_nums[k]];
+
+          ex_err = exII::ex_put_elem_var(ex_id,
+                                         timestep,
+                                         i+1,
+                                         this->get_block_id(j),
+                                         num_elems_this_block,
+                                         &data[0]);
+          EX_CHECK_ERR(ex_err, "Error writing element values.");
+        }
     }
-  }
 
   ex_err = exII::ex_update(ex_id);
-  check_err(ex_err, "Error flushing buffers to file.");
+  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
 }
 
 
@@ -1629,10 +1627,10 @@ void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Number
     return;
 
   ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &values[0]);
-  check_err(ex_err, "Error writing nodal values.");
+  EX_CHECK_ERR(ex_err, "Error writing nodal values.");
 
   ex_err = exII::ex_update(ex_id);
-  check_err(ex_err, "Error flushing buffers to file.");
+  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
 }
 
 
@@ -1643,27 +1641,22 @@ void ExodusII_IO_Helper::write_information_records(const std::vector<std::string
     return;
 
   int num_records = records.size();
-  std::vector<char*> info(num_records);
 
-  // This is an abuse of the const char* returned by std::string, we trust that Exodus won't
-  // modify these when it's writing them out...
-  for (unsigned i=0; i<records.size(); ++i)
-  {
-    // Records cannot be longer than MAX_LINE_LENGTH, as defined in exodusII.h
-    if (records[i].size() > MAX_LINE_LENGTH)
-      {
-	libMesh::err << "Error, cannot write records longer than " << MAX_LINE_LENGTH << " characters!" << std::endl;
-	libmesh_error();
-      }
+  if (num_records > 0)
+    {
+      NamesData info(num_records, MAX_LINE_LENGTH);
 
-    info[i] = const_cast<char*>(records[i].c_str());
-  }
+      // If an entry is longer than MAX_LINE_LENGTH characters it's not an error, we just
+      // write the first MAX_LINE_LENGTH characters to the file.
+      for (unsigned i=0; i<records.size(); ++i)
+        info.push_back_entry(records[i]);
 
-  ex_err = exII::ex_put_info(ex_id, num_records, &info[0]);
-  check_err(ex_err, "Error writing global values.");
+      ex_err = exII::ex_put_info(ex_id, num_records, info.get_char_star_star());
+      EX_CHECK_ERR(ex_err, "Error writing global values.");
 
-  ex_err = exII::ex_update(ex_id);
-  check_err(ex_err, "Error flushing buffers to file.");
+      ex_err = exII::ex_update(ex_id);
+      EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+    }
 }
 
 
@@ -1674,10 +1667,10 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Number> & values,
     return;
 
   ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_globals, &values[0]);
-  check_err(ex_err, "Error writing global values.");
+  EX_CHECK_ERR(ex_err, "Error writing global values.");
 
   ex_err = exII::ex_update(ex_id);
-  check_err(ex_err, "Error flushing buffers to file.");
+  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
 }
 
 
@@ -1696,6 +1689,13 @@ void ExodusII_IO_Helper::set_coordinate_offset(Point p)
 bool ExodusII_IO_Helper::created()
 {
   return _created;
+}
+
+
+
+bool ExodusII_IO_Helper::opened()
+{
+  return _opened;
 }
 
 
@@ -1990,15 +1990,15 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
 
 
-ExodusII_IO_Helper::NamesData::NamesData(size_t size) :
-    data_table(size),
-    data_table_pointers(size),
+ExodusII_IO_Helper::NamesData::NamesData(size_t n_strings, size_t string_length) :
+    data_table(n_strings),
+    data_table_pointers(n_strings),
     counter(0),
-    table_size(size)
+    table_size(n_strings)
 {
-  for (size_t i=0; i<size; ++i)
+  for (size_t i=0; i<n_strings; ++i)
     {
-      data_table[i].resize(MAX_STR_LENGTH+1);
+      data_table[i].resize(string_length + 1);
 
       // NULL-terminate these strings, just to be safe.
       data_table[i][0] = '\0';

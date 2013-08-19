@@ -293,6 +293,12 @@ const std::vector<Real>& ExodusII_IO::get_time_steps()
 
 const std::vector<Real>& ExodusII_IO::get_time_steps()
 {
+  if (!exio_helper->opened())
+    {
+      libMesh::err << "ERROR, ExodusII file must be opened for reading before calling ExodusII_IO::get_time_steps()!" << std::endl;
+      libmesh_error();
+    }
+
   return exio_helper->get_time_steps();
 }
 
@@ -323,9 +329,11 @@ void ExodusII_IO::copy_nodal_solution(System&, std::string, std::string, unsigne
 
 void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
 {
-  // FIXME: Do we need to call get_time_steps() at all?
-  /*const std::vector<double>& time_steps = */
-  exio_helper->get_time_steps();
+  if (!exio_helper->opened())
+    {
+      libMesh::err << "ERROR, ExodusII file must be opened for reading before copying a nodal solution!" << std::endl;
+      libmesh_error();
+    }
 
   const std::vector<Real> & nodal_values = exio_helper->get_nodal_var_values(exodus_var_name, timestep);
 
@@ -369,9 +377,11 @@ void ExodusII_IO::copy_elemental_solution(System&, std::string, std::string, uns
 
 void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
 {
-  // FIXME: Do we need to call get_time_steps() at all?
-  /*const std::vector<double>& time_steps = */
-  exio_helper->get_time_steps();
+  if (!exio_helper->opened())
+    {
+      libMesh::err << "ERROR, ExodusII file must be opened for reading before copying an elemental solution!" << std::endl;
+      libmesh_error();
+    }
 
   const std::vector<Real> & elemental_values = exio_helper->get_elemental_var_values(exodus_var_name, timestep);
 
@@ -420,30 +430,7 @@ void ExodusII_IO::write_element_data (const EquationSystems& es)
 
 void ExodusII_IO::write_element_data (const EquationSystems & es)
 {
-  // The first step is to collect the element data onto this processor.
-  // We want the constant monomial data.
-
-  std::vector<Number> soln;
-  std::vector<std::string> names;
-
-  // If _output_variables is populated we need to filter the monomials we output
-  if (_output_variables.size())
-  {
-    std::vector<std::string> monomials;
-    const FEType type(CONSTANT, MONOMIAL);
-    es.build_variable_names(monomials, &type);
-
-    for (std::vector<std::string>::iterator it = monomials.begin(); it != monomials.end(); ++it)
-      if (std::find(_output_variables.begin(), _output_variables.end(), *it) != _output_variables.end())
-        names.push_back(*it);
-  }
-
-  // If we pass in a list of names to "get_solution" it'll filter the variables comming back
-  es.get_solution( soln, names );
-
-  // The data must ultimately be written block by block.  This means that this data
-  // must be sorted appropriately.
-
+  // Be sure the file has been opened for writing!
   if (!exio_helper->created())
     {
       libMesh::err << "ERROR, ExodusII file must be initialized "
@@ -452,10 +439,48 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
       libmesh_error();
     }
 
+  // This function currently only works on SerialMeshes. We rely on
+  // having a reference to a non-const MeshBase object from our
+  // MeshInput parent class to construct a MeshSerializer object,
+  // similar to what is done in ExodusII_IO::write().  Note that
+  // calling ExodusII_IO::write_timestep() followed by
+  // ExodusII_IO::write_element_data() when the underlying Mesh is a
+  // ParallelMesh will result in an unnecessary additional
+  // serialization/re-parallelization step.
+  MeshSerializer serialize(MeshInput<MeshBase>::mesh(), !MeshOutput<MeshBase>::_is_parallel_format);
+
+  // To be (possibly) filled with a filtered list of variable names to output.
+  std::vector<std::string> names;
+
+  // If _output_variables is populated, only output the monomials which are
+  // also in the _output_variables vector.
+  if (_output_variables.size() > 0)
+    {
+      std::vector<std::string> monomials;
+      const FEType type(CONSTANT, MONOMIAL);
+
+      // Create a list of monomial variable names
+      es.build_variable_names(monomials, &type);
+
+      // Filter that list against the _output_variables list.  Note: if names is still empty after
+      // all this filtering, all the monomial variables will be gathered
+      std::vector<std::string>::iterator it = monomials.begin();
+      for (; it!=monomials.end(); ++it)
+        if (std::find(_output_variables.begin(), _output_variables.end(), *it) != _output_variables.end())
+          names.push_back(*it);
+    }
+
+  // If we pass in a list of names to "get_solution" it'll filter the variables coming back
+  std::vector<Number> soln;
+  es.get_solution(soln, names);
+
+  // The data must ultimately be written block by block.  This means that this data
+  // must be sorted appropriately.
+
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  exio_helper->initialize_element_variables( mesh, names );
-  exio_helper->write_element_values(mesh,soln,_timestep);
+  exio_helper->initialize_element_variables(mesh, names);
+  exio_helper->write_element_values(mesh, soln, _timestep);
 }
 
 #endif
@@ -503,8 +528,8 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
   for ( ; it != end; ++it)
     num_nodes += (*it)->n_nodes();
 
-  // FIXME: Will we ever _not_ need to do this?
-  // DRG: Yes... when writing multiple timesteps to the same file.
+  // This function can be called multiple times, we only want to create
+  // the ExodusII file the first time it's called.
   if (!exio_helper->created())
     {
       exio_helper->create(fname);
@@ -519,11 +544,11 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
   if (this->processor_id() == 0)
     for (int c=0; c<num_vars; c++)
       {
-        //Copy out this variable's solution
+        // Copy out this variable's solution
         std::vector<Number> cur_soln(num_nodes);
 
         for(int i=0; i<num_nodes; i++)
-          cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+          cur_soln[i] = soln[i*num_vars + c];
 
         exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
       }
@@ -550,8 +575,8 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   else
     output_names = names;
 
-  // FIXME: Will we ever _not_ need to do this?
-  // DRG: Yes... when writing multiple timesteps to the same file.
+  // This function can be called multiple times, we only want to create
+  // the ExodusII file the first time it's called.
   if (!exio_helper->created())
     {
       exio_helper->create(fname);
@@ -576,9 +601,9 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 
       std::vector<Number> cur_soln(num_nodes);
 
-      //Copy out this variable's solution
+      // Copy out this variable's solution
       for(dof_id_type i=0; i<num_nodes; i++)
-        cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+        cur_soln[i] = soln[i*num_vars + c];
 
       exio_helper->write_nodal_values(variable_name_position+1,cur_soln,_timestep);
     }

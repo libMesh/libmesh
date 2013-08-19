@@ -33,6 +33,15 @@
 #include <vector>
 #include <map>
 
+// Macro to simplify checking Exodus error codes
+#define EX_CHECK_ERR(code, msg) \
+  do { \
+    if ((code) < 0) { \
+      libMesh::err << (msg) << std::endl; \
+      libmesh_error(); \
+    } } while(0)
+
+
 namespace libMesh
 {
 
@@ -42,7 +51,6 @@ namespace exII {
 #include "exodusII.h" // defines MAX_LINE_LENGTH, MAX_STR_LENGTH used later
   }
 }
-
 
 /**
  * This is the \p ExodusII_IO_Helper class.  This class hides the implementation
@@ -71,9 +79,16 @@ public:
 
   /**
    * Returns true once create() has been successfully called, and
-   * false otherwise.
+   * false otherwise.  create() is called to open a new file for
+   * _writing_.
    */
   bool created();
+
+  /**
+   * Returns true once open() has been successfully called, and false
+   * otherwise.  open() is called to open an existing for _reading_.
+   */
+  bool opened();
 
   /**
    * Get/set flag telling whether message printing is on or off.
@@ -368,13 +383,6 @@ public:
   class NamesData;
 
   /**
-   * All of the \p ExodusII API functions return an \p int error
-   * value.  This function checks to see if the error has been set,
-   * and if it has, prints the error message contained in \p msg.
-   */
-  void check_err(const int error, const std::string msg);
-
-  /**
    * Prints the message defined in \p msg. Can be turned off if
    * verbosity is set to 0.
    */
@@ -533,8 +541,13 @@ public:
   std::map<int, std::string> id_to_ns_names;
 
  protected:
-  // This flag gets set after the the create() function has been successfully called.
+  // This flag gets set after the create() function has been successfully called.
+  // We call create() to open an ExodusII file for writing.
   bool _created;
+
+  // This flag gets set after the open() function has been successfully called.
+  // We call open() to open an ExodusII file for reading.
+  bool _opened;
 
   // On/Off message flag
   bool _verbose;
@@ -959,14 +972,19 @@ public:
 
 /**
  * This class is useful for managing anything that requires a char**
- * input/output in ExodusII file.  You must know its size at the time
- * you create it.
+ * input/output in ExodusII file.  You must know the number of strings
+ * and the length of each one at the time you create it.
  */
 class ExodusII_IO_Helper::NamesData
 {
 public:
+  /**
+   * Constructor.  Allocates enough storage to hold n_strings of
+   * length string_length.  (Actually allocates string_length+1 characters
+   * per string to account for the trailing NULL character.)
+   */
   explicit
-  NamesData(size_t size);
+  NamesData(size_t n_strings, size_t string_length);
 
   /**
    * Adds another name to the current data table.
