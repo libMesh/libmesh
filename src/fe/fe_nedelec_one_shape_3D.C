@@ -94,16 +94,16 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem* elem,
 		case 2:
 		  {
 		    if( elem->point(2) > elem->point(3) )
-		      return RealGradient( -0.125*(1.0+eta-zeta-eta*zeta), 0.0, 0.0 );
+		      return RealGradient(  0.125*(1.0+eta-zeta-eta*zeta), 0.0, 0.0 );
 		    else
-		      return RealGradient( 0.125*(1.0+eta-zeta-eta*zeta), 0.0, 0.0 );
+		      return RealGradient( -0.125*(1.0+eta-zeta-eta*zeta), 0.0, 0.0 );
 		  }
 		case 3:
 		  {
 		    if( elem->point(3) > elem->point(0) )
-		      return RealGradient( 0.0, -0.125*(1.0-xi-zeta+xi*zeta), 0.0 );
-		    else
 		      return RealGradient( 0.0,  0.125*(1.0-xi-zeta+xi*zeta), 0.0 );
+		    else
+		      return RealGradient( 0.0, -0.125*(1.0-xi-zeta+xi*zeta), 0.0 );
 		  }
                 case 4:
 		  {
@@ -276,9 +276,9 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
 		      case 3:
 			{
 			  if( elem->point(3) > elem->point(0) )
-			    return RealGradient( 0.0, -0.125*(-1.0+zeta) );
-			  else
 			    return RealGradient( 0.0, 0.125*(-1.0+zeta) );
+			  else
+			    return RealGradient( 0.0, -0.125*(-1.0+zeta) );
 			}
                       case 4:
                         {
@@ -348,9 +348,9 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
 		      case 2:
                         {
                           if( elem->point(2) > elem->point(3) )
-                            return RealGradient( -0.125*(1.0-zeta), 0.0, 0.0 );
-                          else
                             return RealGradient( 0.125*(1.0-zeta), 0.0, 0.0 );
+                          else
+                            return RealGradient( -0.125*(1.0-zeta), 0.0, 0.0 );
                         }
                       case 4:
                         {
@@ -428,16 +428,16 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
                       case 2:
                         {
                           if( elem->point(2) > elem->point(3) )
-                            return RealGradient( -0.125*(-1.0-eta), 0.0, 0.0 );
-                          else
                             return RealGradient( 0.125*(-1.0-eta), 0.0, 0.0 );
+                          else
+                            return RealGradient( -0.125*(-1.0-eta), 0.0, 0.0 );
                         }
                       case 3:
                         {
                           if( elem->point(3) > elem->point(0) )
-                            return RealGradient( 0.0, -0.125*(-1.0+xi), 0.0 );
+                            return RealGradient( 0.0, 0.125*(-1.0+xi), 0.0 );
                           else
-                            return RealGradient( 0.0,  0.125*(-1.0+xi), 0.0 );
+                            return RealGradient( 0.0,  -0.125*(-1.0+xi), 0.0 );
                         }
                       case 8:
                         {
