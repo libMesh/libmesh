@@ -71,9 +71,16 @@ public:
 
   /**
    * Returns true once create() has been successfully called, and
-   * false otherwise.
+   * false otherwise.  create() is called to open a new file for
+   * _writing_.
    */
   bool created();
+
+  /**
+   * Returns true once open() has been successfully called, and false
+   * otherwise.  open() is called to open an existing for _reading_.
+   */
+  bool opened();
 
   /**
    * Get/set flag telling whether message printing is on or off.
@@ -533,8 +540,13 @@ public:
   std::map<int, std::string> id_to_ns_names;
 
  protected:
-  // This flag gets set after the the create() function has been successfully called.
+  // This flag gets set after the create() function has been successfully called.
+  // We call create() to open an ExodusII file for writing.
   bool _created;
+
+  // This flag gets set after the open() function has been successfully called.
+  // We call open() to open an ExodusII file for reading.
+  bool _opened;
 
   // On/Off message flag
   bool _verbose;

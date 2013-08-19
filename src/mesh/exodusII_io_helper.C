@@ -243,6 +243,7 @@ const int ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map[5] = {-1,-1,
     ret_char(0),
     num_time_steps(0),
     _created(false),
+    _opened(false),
     _verbose(v),
     _run_only_on_proc0(run_only_on_proc0),
     _elem_vars_initialized(false),
@@ -302,6 +303,8 @@ void ExodusII_IO_Helper::open(const char* filename)
   std::string err_msg = std::string("Error opening ExodusII mesh file: ") + std::string(filename);
   check_err(ex_id, err_msg);
   if (_verbose) libMesh::out << "File opened successfully." << std::endl;
+
+  _opened = true;
 }
 
 
@@ -1696,6 +1699,13 @@ void ExodusII_IO_Helper::set_coordinate_offset(Point p)
 bool ExodusII_IO_Helper::created()
 {
   return _created;
+}
+
+
+
+bool ExodusII_IO_Helper::opened()
+{
+  return _opened;
 }
 
 

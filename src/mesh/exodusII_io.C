@@ -293,6 +293,12 @@ const std::vector<Real>& ExodusII_IO::get_time_steps()
 
 const std::vector<Real>& ExodusII_IO::get_time_steps()
 {
+  if (!exio_helper->opened())
+    {
+      libMesh::err << "ERROR, ExodusII file must be opened for reading before calling ExodusII_IO::get_time_steps()!" << std::endl;
+      libmesh_error();
+    }
+
   return exio_helper->get_time_steps();
 }
 
@@ -323,6 +329,12 @@ void ExodusII_IO::copy_nodal_solution(System&, std::string, std::string, unsigne
 
 void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
 {
+  if (!exio_helper->opened())
+    {
+      libMesh::err << "ERROR, ExodusII file must be opened for reading before copying a nodal solution!" << std::endl;
+      libmesh_error();
+    }
+
   // FIXME: Do we need to call get_time_steps() at all?
   /*const std::vector<double>& time_steps = */
   exio_helper->get_time_steps();
@@ -369,6 +381,12 @@ void ExodusII_IO::copy_elemental_solution(System&, std::string, std::string, uns
 
 void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
 {
+  if (!exio_helper->opened())
+    {
+      libMesh::err << "ERROR, ExodusII file must be opened for reading before copying an elemental solution!" << std::endl;
+      libmesh_error();
+    }
+
   // FIXME: Do we need to call get_time_steps() at all?
   /*const std::vector<double>& time_steps = */
   exio_helper->get_time_steps();
