@@ -513,8 +513,8 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
   for ( ; it != end; ++it)
     num_nodes += (*it)->n_nodes();
 
-  // FIXME: Will we ever _not_ need to do this?
-  // DRG: Yes... when writing multiple timesteps to the same file.
+  // This function can be called multiple times, we only want to create
+  // the ExodusII file the first time it's called.
   if (!exio_helper->created())
     {
       exio_helper->create(fname);
@@ -529,11 +529,11 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
   if (this->processor_id() == 0)
     for (int c=0; c<num_vars; c++)
       {
-        //Copy out this variable's solution
+        // Copy out this variable's solution
         std::vector<Number> cur_soln(num_nodes);
 
         for(int i=0; i<num_nodes; i++)
-          cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+          cur_soln[i] = soln[i*num_vars + c];
 
         exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
       }
@@ -560,8 +560,8 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   else
     output_names = names;
 
-  // FIXME: Will we ever _not_ need to do this?
-  // DRG: Yes... when writing multiple timesteps to the same file.
+  // This function can be called multiple times, we only want to create
+  // the ExodusII file the first time it's called.
   if (!exio_helper->created())
     {
       exio_helper->create(fname);
@@ -586,9 +586,9 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 
       std::vector<Number> cur_soln(num_nodes);
 
-      //Copy out this variable's solution
+      // Copy out this variable's solution
       for(dof_id_type i=0; i<num_nodes; i++)
-        cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
+        cur_soln[i] = soln[i*num_vars + c];
 
       exio_helper->write_nodal_values(variable_name_position+1,cur_soln,_timestep);
     }

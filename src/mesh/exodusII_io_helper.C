@@ -1379,9 +1379,6 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  // FIXME: This is not used, should it be?
-  ExodusII_IO_Helper::ElementMaps em;
-
   std::vector< dof_id_type > nl;
   std::vector< boundary_id_type > il;
 
