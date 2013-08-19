@@ -971,14 +971,19 @@ public:
 
 /**
  * This class is useful for managing anything that requires a char**
- * input/output in ExodusII file.  You must know its size at the time
- * you create it.
+ * input/output in ExodusII file.  You must know the number of strings
+ * and the length of each one at the time you create it.
  */
 class ExodusII_IO_Helper::NamesData
 {
 public:
+  /**
+   * Constructor.  Allocates enough storage to hold n_strings of
+   * length string_length.  (Actually allocates string_length+1 characters
+   * per string to account for the trailing NULL character.)
+   */
   explicit
-  NamesData(size_t size);
+  NamesData(size_t n_strings, size_t string_length);
 
   /**
    * Adds another name to the current data table.

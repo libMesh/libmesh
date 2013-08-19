@@ -730,7 +730,7 @@ const std::vector<Real>& ExodusII_IO_Helper::get_time_steps()
 
 const std::vector<std::string>& ExodusII_IO_Helper::get_nodal_var_names()
 {
-  NamesData names_table(num_nodal_vars);
+  NamesData names_table(num_nodal_vars, MAX_STR_LENGTH);
 
   exII::ex_get_var_names(ex_id,
 			 "n",
@@ -793,7 +793,7 @@ const std::vector<Real>& ExodusII_IO_Helper::get_nodal_var_values(std::string no
 
 const std::vector<std::string>& ExodusII_IO_Helper::get_elemental_var_names()
 {
-  NamesData names_table(num_elem_vars);
+  NamesData names_table(num_elem_vars, MAX_STR_LENGTH);
 
   exII::ex_get_var_names(ex_id,
                          "e",
@@ -1142,7 +1142,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   // the index returned from the ex_id_lkup is erronously used.  For now
   // the work around is to use the alternative function ex_put_names, but
   // this function requires a char** datastructure.
-  NamesData names_table(num_elem_blk);
+  NamesData names_table(num_elem_blk, MAX_STR_LENGTH);
 
   unsigned int counter=0;
   for (it=subdomain_map.begin(); it!=subdomain_map.end(); it++)
@@ -1350,7 +1350,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   // Write out the sideset names, but only if there is something to write
   if (side_boundary_ids.size() > 0)
     {
-      NamesData names_table(side_boundary_ids.size());
+      NamesData names_table(side_boundary_ids.size(), MAX_STR_LENGTH);
 
       for (unsigned int i=0; i<side_boundary_ids.size(); i++)
         {
@@ -1397,7 +1397,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   // Write out the nodeset names, but only if there is something to write
   if (node_boundary_ids.size() > 0)
     {
-      NamesData names_table(node_boundary_ids.size());
+      NamesData names_table(node_boundary_ids.size(), MAX_STR_LENGTH);
 
       for (unsigned int i=0; i<node_boundary_ids.size(); i++)
         {
@@ -1456,7 +1456,7 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
   ex_err = exII::ex_put_elem_var_tab(ex_id, num_elem_blk, num_elem_vars, &truth_tab[0]);
   check_err(ex_err, "Error writing element truth table.");
 
-  NamesData names_table(num_elem_vars);
+  NamesData names_table(num_elem_vars, MAX_STR_LENGTH);
 
   // Store the input names in the format required by Exodus.
   for (int i=0; i<num_elem_vars; ++i)
@@ -1492,7 +1492,7 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
 
   if (num_nodal_vars > 0)
     {
-      NamesData names_table(num_nodal_vars);
+      NamesData names_table(num_nodal_vars, MAX_STR_LENGTH);
 
       for (int i=0; i<num_nodal_vars; i++)
         names_table.push_back_entry(names[i]);
@@ -1533,7 +1533,7 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
 
   if (num_globals > 0)
     {
-      NamesData names_table(num_globals);
+      NamesData names_table(num_globals, MAX_STR_LENGTH);
 
       for (int i=0; i<num_globals; i++)
         names_table.push_back_entry(names[i]);
@@ -1999,15 +1999,15 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
 
 
-ExodusII_IO_Helper::NamesData::NamesData(size_t size) :
-    data_table(size),
-    data_table_pointers(size),
+ExodusII_IO_Helper::NamesData::NamesData(size_t n_strings, size_t string_length) :
+    data_table(n_strings),
+    data_table_pointers(n_strings),
     counter(0),
-    table_size(size)
+    table_size(n_strings)
 {
-  for (size_t i=0; i<size; ++i)
+  for (size_t i=0; i<n_strings; ++i)
     {
-      data_table[i].resize(MAX_STR_LENGTH+1);
+      data_table[i].resize(string_length + 1);
 
       // NULL-terminate these strings, just to be safe.
       data_table[i][0] = '\0';
