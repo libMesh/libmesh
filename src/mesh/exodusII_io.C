@@ -430,30 +430,7 @@ void ExodusII_IO::write_element_data (const EquationSystems& es)
 
 void ExodusII_IO::write_element_data (const EquationSystems & es)
 {
-  // The first step is to collect the element data onto this processor.
-  // We want the constant monomial data.
-
-  std::vector<Number> soln;
-  std::vector<std::string> names;
-
-  // If _output_variables is populated we need to filter the monomials we output
-  if (_output_variables.size())
-  {
-    std::vector<std::string> monomials;
-    const FEType type(CONSTANT, MONOMIAL);
-    es.build_variable_names(monomials, &type);
-
-    for (std::vector<std::string>::iterator it = monomials.begin(); it != monomials.end(); ++it)
-      if (std::find(_output_variables.begin(), _output_variables.end(), *it) != _output_variables.end())
-        names.push_back(*it);
-  }
-
-  // If we pass in a list of names to "get_solution" it'll filter the variables comming back
-  es.get_solution( soln, names );
-
-  // The data must ultimately be written block by block.  This means that this data
-  // must be sorted appropriately.
-
+  // Be sure the file has been opened for writing!
   if (!exio_helper->created())
     {
       libMesh::err << "ERROR, ExodusII file must be initialized "
@@ -462,10 +439,38 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
       libmesh_error();
     }
 
+  // To be (possibly) filled with a filtered list of variable names to output.
+  std::vector<std::string> names;
+
+  // If _output_variables is populated, only output the monomials which are
+  // also in the _output_variables vector.
+  if (_output_variables.size() > 0)
+    {
+      std::vector<std::string> monomials;
+      const FEType type(CONSTANT, MONOMIAL);
+
+      // Create a list of monomial variable names
+      es.build_variable_names(monomials, &type);
+
+      // Filter that list against the _output_variables list.  Note: if names is still empty after
+      // all this filtering, all the monomial variables will be gathered
+      std::vector<std::string>::iterator it = monomials.begin();
+      for (; it!=monomials.end(); ++it)
+        if (std::find(_output_variables.begin(), _output_variables.end(), *it) != _output_variables.end())
+          names.push_back(*it);
+    }
+
+  // If we pass in a list of names to "get_solution" it'll filter the variables coming back
+  std::vector<Number> soln;
+  es.get_solution(soln, names);
+
+  // The data must ultimately be written block by block.  This means that this data
+  // must be sorted appropriately.
+
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  exio_helper->initialize_element_variables( mesh, names );
-  exio_helper->write_element_values(mesh,soln,_timestep);
+  exio_helper->initialize_element_variables(mesh, names);
+  exio_helper->write_element_values(mesh, soln, _timestep);
 }
 
 #endif

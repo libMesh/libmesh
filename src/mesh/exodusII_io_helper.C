@@ -1435,9 +1435,14 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
 
   if (_elem_vars_initialized)
     return;
+
+  // Set the flag so we can skip this stuff on subsequent calls to
+  // initialize_element_variables()
   _elem_vars_initialized = true;
 
-  ex_err = exII::ex_put_var_param(ex_id, "e", num_elem_vars);
+  ex_err = exII::ex_put_var_param(ex_id,
+                                  "e",
+                                  num_elem_vars);
   check_err(ex_err, "Error setting number of element vars.");
 
   // Form the element variable truth table and send to Exodus.
@@ -1452,8 +1457,11 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
   // they aren't defined.  To be consistent with that, fill
   // the truth table with ones.
 
-  std::vector<int> truth_tab(num_elem_blk*num_elem_vars,1);
-  ex_err = exII::ex_put_elem_var_tab(ex_id, num_elem_blk, num_elem_vars, &truth_tab[0]);
+  std::vector<int> truth_tab(num_elem_blk*num_elem_vars, 1);
+  ex_err = exII::ex_put_elem_var_tab(ex_id,
+                                     num_elem_blk,
+                                     num_elem_vars,
+                                     &truth_tab[0]);
   check_err(ex_err, "Error writing element truth table.");
 
   NamesData names_table(num_elem_vars, MAX_STR_LENGTH);
@@ -1577,7 +1585,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
     return;
 
   // Loop over the element blocks and write the data one block at a time
-  std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
+  std::map<unsigned int, std::vector<unsigned int> > subdomain_map;
 
   const unsigned int num_vars = values.size() / num_elem;
 
@@ -1588,36 +1596,35 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
   for (; mesh_it!=end; ++mesh_it)
     {
       const Elem * elem = *mesh_it;
-
-      // Only write out the active elements
-      if (elem->active())
-      {
-        unsigned int cur_subdomain = elem->subdomain_id();
-
-        subdomain_map[cur_subdomain].push_back(elem->id());
-      }
+      subdomain_map[elem->subdomain_id()].push_back(elem->id());
     }
 
-  for (unsigned int l=0; l<num_vars; ++l)
-  {
-    // The size of the subdomain map is the number of blocks.
-    std::map<unsigned int, std::vector<unsigned int>  >::iterator it( subdomain_map.begin() );
-
-    for (unsigned int j=0; it!=subdomain_map.end(); ++it, ++j)
+  // For each variable, create a 'data' array which holds all the elemental variable
+  // values *for a given block* on this processor, then write that data vector to file
+  // before moving onto the next block.
+  for (unsigned int i=0; i<num_vars; ++i)
     {
-      const std::vector<unsigned int> & elem_nums = (*it).second;
-      const unsigned int num_elems_this_block = elem_nums.size();
-      std::vector<Number> data( num_elems_this_block );
-      for (unsigned int k=0; k<num_elems_this_block; ++k)
-      {
-        data[k] = values[l*num_elem+elem_nums[k]];
-      }
+      // The size of the subdomain map is the number of blocks.
+      std::map<unsigned int, std::vector<unsigned int> >::iterator it = subdomain_map.begin();
 
-      ex_err = exII::ex_put_elem_var(ex_id, timestep, l+1, get_block_id(j), num_elems_this_block, &data[0]);
-      check_err(ex_err, "Error writing element values.");
+      for (unsigned int j=0; it!=subdomain_map.end(); ++it, ++j)
+        {
+          const std::vector<unsigned int> & elem_nums = (*it).second;
+          const unsigned int num_elems_this_block = elem_nums.size();
+          std::vector<Number> data(num_elems_this_block);
 
+          for (unsigned int k=0; k<num_elems_this_block; ++k)
+            data[k] = values[i*num_elem + elem_nums[k]];
+
+          ex_err = exII::ex_put_elem_var(ex_id,
+                                         timestep,
+                                         i+1,
+                                         this->get_block_id(j),
+                                         num_elems_this_block,
+                                         &data[0]);
+          check_err(ex_err, "Error writing element values.");
+        }
     }
-  }
 
   ex_err = exII::ex_update(ex_id);
   check_err(ex_err, "Error flushing buffers to file.");
