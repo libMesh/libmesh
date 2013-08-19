@@ -33,6 +33,15 @@
 #include <vector>
 #include <map>
 
+// Macro to simplify checking Exodus error codes
+#define EX_CHECK_ERR(code, msg) \
+  do { \
+    if ((code) < 0) { \
+      libMesh::err << (msg) << std::endl; \
+      libmesh_error(); \
+    } } while(0)
+
+
 namespace libMesh
 {
 
@@ -42,7 +51,6 @@ namespace exII {
 #include "exodusII.h" // defines MAX_LINE_LENGTH, MAX_STR_LENGTH used later
   }
 }
-
 
 /**
  * This is the \p ExodusII_IO_Helper class.  This class hides the implementation
@@ -373,13 +381,6 @@ public:
    * entities to ExodusII files.
    */
   class NamesData;
-
-  /**
-   * All of the \p ExodusII API functions return an \p int error
-   * value.  This function checks to see if the error has been set,
-   * and if it has, prints the error message contained in \p msg.
-   */
-  void check_err(const int error, const std::string msg);
 
   /**
    * Prints the message defined in \p msg. Can be turned off if
