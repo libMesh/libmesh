@@ -335,10 +335,6 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_nam
       libmesh_error();
     }
 
-  // FIXME: Do we need to call get_time_steps() at all?
-  /*const std::vector<double>& time_steps = */
-  exio_helper->get_time_steps();
-
   const std::vector<Real> & nodal_values = exio_helper->get_nodal_var_values(exodus_var_name, timestep);
 
   const unsigned int var_num = system.variable_number(system_var_name);
@@ -386,10 +382,6 @@ void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var
       libMesh::err << "ERROR, ExodusII file must be opened for reading before copying an elemental solution!" << std::endl;
       libmesh_error();
     }
-
-  // FIXME: Do we need to call get_time_steps() at all?
-  /*const std::vector<double>& time_steps = */
-  exio_helper->get_time_steps();
 
   const std::vector<Real> & elemental_values = exio_helper->get_elemental_var_values(exodus_var_name, timestep);
 
