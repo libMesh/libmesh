@@ -439,6 +439,16 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
       libmesh_error();
     }
 
+  // This function currently only works on SerialMeshes. We rely on
+  // having a reference to a non-const MeshBase object from our
+  // MeshInput parent class to construct a MeshSerializer object,
+  // similar to what is done in ExodusII_IO::write().  Note that
+  // calling ExodusII_IO::write_timestep() followed by
+  // ExodusII_IO::write_element_data() when the underlying Mesh is a
+  // ParallelMesh will result in an unnecessary additional
+  // serialization/re-parallelization step.
+  MeshSerializer serialize(MeshInput<MeshBase>::mesh(), !MeshOutput<MeshBase>::_is_parallel_format);
+
   // To be (possibly) filled with a filtered list of variable names to output.
   std::vector<std::string> names;
 
