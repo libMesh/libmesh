@@ -60,7 +60,7 @@ namespace {
   // - If the library exhausts memory during IO you might reduce this
   // parameter.
 
-  const dof_id_type max_io_blksize = 256000;
+  const std::size_t max_io_blksize = 256000;
 
 
   /**
@@ -810,8 +810,9 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
     sys_num    = this->number(),
     num_vecs   = libmesh_cast_int<unsigned int>(vecs.size()),
     num_vars   = _written_var_indices.size(); // must be <= current number of variables!
-  const dof_id_type
-    io_blksize = std::min(max_io_blksize, n_objs),
+  const std::size_t
+    io_blksize = std::min(max_io_blksize, 
+			  static_cast<std::size_t>(n_objs)),
     num_blks   = std::ceil(static_cast<double>(n_objs)/static_cast<double>(io_blksize));
 
   libmesh_assert_less_equal (num_vars, this->n_vars());
@@ -864,10 +865,10 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
     {
       // Each processor should build up its transfer buffers for its
       // local objects in [first_object,last_object).
-      const dof_id_type
+      const std::size_t
 	first_object = blk*io_blksize,
-	last_object  = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
-				n_objs);
+	last_object  = std::min((blk+1)*io_blksize,
+				static_cast<std::size_t>(n_objs));
 
       // convenience
       std::vector<dof_id_type> &ids  (xfer_ids[blk]);
@@ -923,10 +924,10 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
     {
       // Each processor should build up its transfer buffers for its
       // local objects in [first_object,last_object).
-      const dof_id_type
+      const std::size_t
 	first_object  = blk*io_blksize,
-	last_object   = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
-				 n_objs),
+	last_object   = std::min((blk+1)*io_blksize,
+				 static_cast<std::size_t>(n_objs)),
 	n_objects_blk = last_object - first_object;
 
       // Processor 0 has a special job.  It needs to gather the requested indices
@@ -1814,8 +1815,9 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	vars_to_write.push_back(var);
     }
 
-  const dof_id_type
-    io_blksize = std::min(max_io_blksize, n_objs);
+  const std::size_t
+    io_blksize = std::min(max_io_blksize,
+			  static_cast<std::size_t>(n_objs));
 
   const unsigned int
     sys_num    = this->number(),
@@ -1870,10 +1872,10 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 
       // Each processor should build up its transfer buffers for its
       // local objects in [first_object,last_object).
-      const dof_id_type
+      const std::size_t
 	first_object = blk*io_blksize,
-	last_object  = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
-				n_objs);
+	last_object  = std::min((blk+1)*io_blksize, 
+				static_cast<std::size_t>(n_objs));
 
       // convenience
       std::vector<dof_id_type> &ids  (xfer_ids[blk]);
@@ -1948,10 +1950,10 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	{
 	  // Each processor should build up its transfer buffers for its
 	  // local objects in [first_object,last_object).
-	  const dof_id_type
+	  const std::size_t
 	    first_object  = blk*io_blksize,
-	    last_object   = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
-				     n_objs),
+	    last_object   = std::min((blk+1)*io_blksize, 
+				     std::size_t(n_objs)),
 	    n_objects_blk = last_object - first_object;
 
 	  // offset array. this will define where each object's values
