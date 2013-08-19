@@ -772,7 +772,7 @@ void System::read_serialized_data (Xdr& io,
 
 
 template <typename iterator_type, typename InValType>
-dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_objs,
+std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_objs,
 							 const iterator_type begin,
 							 const iterator_type end,
                              const InValType ,
@@ -817,7 +817,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
   libmesh_assert_less_equal (num_vars, this->n_vars());
 
-  unsigned int n_read_values=0;
+  std::size_t n_read_values=0;
 
   std::vector<std::vector<dof_id_type> > xfer_ids(num_blks);  // The global IDs and # of components for the local objects in all blocks
   std::vector<std::vector<Number> >      recv_vals(num_blks); // The raw values for the local objects in all blocks
@@ -1004,8 +1004,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       for (unsigned int i_val=0; i_val<input_vals.size(); i_val++)
           input_vals[i_val] = input_vals_tmp[i_val];
 
-	  n_read_values +=
-	    libmesh_cast_int<dof_id_type>(input_vals.size());
+	  n_read_values += input_vals.size();
 
 	  // pack data replies for each processor
  	  for (processor_id_type proc=0; proc<this->n_processors(); proc++)
@@ -1152,7 +1151,8 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
   libmesh_assert (io.reading());
 
   // vector length
-  unsigned int vector_length=0, n_assigned_vals=0;
+  unsigned int vector_length=0; // FIXME?  size_t would break binary compatibility...
+  std::size_t n_assigned_vals=0;
 
   // Get the buffer size
   if (this->processor_id() == 0)
@@ -2176,7 +2176,7 @@ dof_id_type System::write_serialized_vector (Xdr& io, const NumericVector<Number
 
 
 template <typename InValType>
-dof_id_type System::read_serialized_vectors (Xdr &io,
+std::size_t System::read_serialized_vectors (Xdr &io,
 					     const std::vector<NumericVector<Number>*> &vectors) const
 {
   parallel_object_only();
@@ -2223,7 +2223,7 @@ dof_id_type System::read_serialized_vectors (Xdr &io,
     n_nodes = this->get_mesh().n_nodes(),
     n_elem  = this->get_mesh().n_elem();
 
-  dof_id_type read_length = 0.;
+  std::size_t read_length = 0.;
 
   //---------------------------------
   // Collect the values for all nodes
@@ -2336,10 +2336,10 @@ dof_id_type System::write_serialized_vectors (Xdr &io,
 template void System::read_parallel_data<Number> (Xdr &io, const bool read_additional_data);
 template void System::read_serialized_data<Number> (Xdr& io, const bool read_additional_data);
 template numeric_index_type System::read_serialized_vector<Number> (Xdr& io, NumericVector<Number>& vec);
-template dof_id_type System::read_serialized_vectors<Number> (Xdr &io, const std::vector<NumericVector<Number>*> &vectors) const;
+template std::size_t System::read_serialized_vectors<Number> (Xdr &io, const std::vector<NumericVector<Number>*> &vectors) const;
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template void System::read_parallel_data<Real> (Xdr &io, const bool read_additional_data);
 template void System::read_serialized_data<Real> (Xdr& io, const bool read_additional_data);
 template numeric_index_type System::read_serialized_vector<Real> (Xdr& io, NumericVector<Number>& vec);
-template dof_id_type System::read_serialized_vectors<Real> (Xdr &io, const std::vector<NumericVector<Number>*> &vectors) const;
+template std::size_t System::read_serialized_vectors<Real> (Xdr &io, const std::vector<NumericVector<Number>*> &vectors) const;
 #endif
