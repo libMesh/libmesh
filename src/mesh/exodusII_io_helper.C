@@ -221,8 +221,6 @@ const int ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map[5] = {-1,-1,
                                          bool v,
                                          bool run_only_on_proc0) :
     ParallelObject(parent),
-    comp_ws(sizeof(Real)),
-    io_ws(0),
     ex_id(0),
     ex_err(0),
     num_dim(0),
@@ -235,13 +233,10 @@ const int ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map[5] = {-1,-1,
     num_elem_this_blk(0),
     num_nodes_per_elem(0),
     num_attr(0),
-    req_info(0),
-    ret_int(0),
     num_elem_all_sidesets(0),
-    ex_version(0.0),
-    ret_float(0.0),
-    ret_char(0),
     num_time_steps(0),
+    num_nodal_vars(0),
+    num_elem_vars(0),
     _created(false),
     _opened(false),
     _verbose(v),
@@ -260,9 +255,18 @@ ExodusII_IO_Helper::~ExodusII_IO_Helper()
 {
 }
 
+
+
 void ExodusII_IO_Helper::verbose (bool set_verbosity)
 {
   _verbose = set_verbosity;
+}
+
+
+
+const char* ExodusII_IO_Helper::get_elem_type() const
+{
+  return &elem_type[0];
 }
 
 
@@ -283,6 +287,17 @@ void ExodusII_IO_Helper::message(const std::string msg, int i)
 
 void ExodusII_IO_Helper::open(const char* filename)
 {
+  // Version of Exodus you are using
+  float ex_version = 0.;
+
+  // Word size in bytes of the floating point variables used in the
+  // application program (0, 4, or 8)
+  int comp_ws = sizeof(Real);
+
+  // Word size in bytes of the floating point data as they are stored
+  // in the ExodusII file
+  int io_ws = 0;
+
   ex_id = exII::ex_open(filename,
 			EX_READ,
 			&comp_ws,
@@ -301,7 +316,7 @@ void ExodusII_IO_Helper::open(const char* filename)
 void ExodusII_IO_Helper::read_header()
 {
   ex_err = exII::ex_get_init(ex_id,
-			     title.empty() ? NULL : &title[0],
+                             &title[0],
 			     &num_dim,
 			     &num_nodes,
 			     &num_elem,
@@ -313,8 +328,11 @@ void ExodusII_IO_Helper::read_header()
 
   num_time_steps = inquire(exII::EX_INQ_TIME, "Error retrieving time steps");
 
-  exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
-  exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  ex_err = exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
+  EX_CHECK_ERR(ex_err, "Error reading number of nodal variables.");
+
+  ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
   message("Exodus header info retrieved successfully.");
 }
@@ -539,18 +557,9 @@ void ExodusII_IO_Helper::read_sideset_info()
       num_sides_per_set.resize(num_side_sets);
       num_df_per_set.resize(num_side_sets);
 
-      // Inquire about the length of the
-      // concatenated side sets element list
-      req_info = exII::EX_INQ_SS_ELEM_LEN;
-      ex_err = exII::ex_inquire(ex_id,
-				req_info,
-				&ret_int,
-				&ret_float,
-				&ret_char);
-      EX_CHECK_ERR(ex_err, "Error inquiring about side set element list length.");
+      // Inquire about the length of the concatenated side sets element list
+      num_elem_all_sidesets = inquire(exII::EX_INQ_SS_ELEM_LEN, "Error retrieving length of the concatenated side sets element list!");
 
-      //libMesh::out << "Value returned by ex_inquire was: " << ret_int << std::endl;
-      num_elem_all_sidesets = ret_int;
       elem_list.resize (num_elem_all_sidesets);
       side_list.resize (num_elem_all_sidesets);
       id_list.resize   (num_elem_all_sidesets);
@@ -668,16 +677,6 @@ void ExodusII_IO_Helper::read_nodeset(int id)
 
 
 
-void ExodusII_IO_Helper::print_sideset_info()
-{
-  for (int i=0; i<num_elem_all_sidesets; i++)
-    {
-      libMesh::out << elem_list[i] << " " << side_list[i] << std::endl;
-    }
-}
-
-
-
 void ExodusII_IO_Helper::close()
 {
   // Always call close on processor 0.
@@ -695,6 +694,10 @@ void ExodusII_IO_Helper::close()
 
 int ExodusII_IO_Helper::inquire(int req_info_in, std::string error_msg)
 {
+  int ret_int = 0;
+  char ret_char = 0;
+  float ret_float = 0.;
+
   ex_err = exII::ex_inquire(ex_id,
 			    req_info_in,
 			    &ret_int,
@@ -889,10 +892,10 @@ void ExodusII_IO_Helper::create(std::string filename)
   // call create there.
   if ((this->processor_id() == 0) || (!_run_only_on_proc0))
     {
-      //Fall back on double precision when necessary since ExodusII
-      //doesn't seem to support long double
-      comp_ws = std::min(sizeof(Real),sizeof(double));
-      io_ws = std::min(sizeof(Real),sizeof(double));
+      // Fall back on double precision when necessary since ExodusII
+      // doesn't seem to support long double
+      int comp_ws = std::min(sizeof(Real), sizeof(double));
+      int io_ws = std::min(sizeof(Real), sizeof(double));
 
       ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
 
@@ -1213,7 +1216,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
     counter++;
   }
 //  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map_out[0]);
-  EX_CHECK_ERR(ex_err, "Error writing element connectivities");
+//  EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
   // Write out the block names
   if (num_elem_blk > 0)
@@ -1293,16 +1296,22 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
     ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
     EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
-    // write out the element number map
-    std::vector<unsigned int> elem_map(tmp_vec.size());
-    std::transform(tmp_vec.begin(), tmp_vec.end(), elem_map.begin(),
-                   std::bind2nd(std::plus<unsigned int>(), 1));  // Add one to each id for exodus!
-    ex_err = exII::ex_put_elem_num_map(ex_id, (int *)&elem_map[0]);
+    // Create temporary integer storage for the element number map
+    std::vector<int> elem_map(tmp_vec.size());
+
+    // Add one to each id for exodus!
+    std::transform(tmp_vec.begin(),
+                   tmp_vec.end(),
+                   elem_map.begin(),
+                   std::bind2nd(std::plus<int>(), 1));
+
+    // And write to file
+    ex_err = exII::ex_put_elem_num_map(ex_id, &elem_map[0]);
     EX_CHECK_ERR(ex_err, "Error writing element map");
   }
 
 //  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map_out[0]);
-  EX_CHECK_ERR(ex_err, "Error writing element connectivities");
+//  EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
   ex_err = exII::ex_update(ex_id);
   EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");

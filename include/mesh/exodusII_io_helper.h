@@ -99,7 +99,7 @@ public:
    * @returns the current element type.  Note: the default behavior is
    * for this value to be in all capital letters, e.g. \p HEX27.
    */
-  const char* get_elem_type() const { return &elem_type[0]; }
+  const char* get_elem_type() const;
 
   /**
    * Opens an \p ExodusII mesh file named \p filename for reading.
@@ -209,16 +209,6 @@ public:
    * global nodeset array at the position \p offset.
    */
   void read_nodeset(int id);
-
-  /**
-   * Prints information about all the sidesets.
-   */
-  void print_sideset_info();
-
-  /**
-   * Prints information about all the nodesets.
-   */
-  void print_nodeset_info();
 
   /**
    * Closes the \p ExodusII mesh file.
@@ -395,14 +385,6 @@ public:
    */
   void message(const std::string msg, int i);
 
-  // Word size in bytes of the floating point variables used in the
-  // application program (0, 4, or 8)
-  int comp_ws;
-
-  // Word size in bytes of the floating point data as they are stored
-  // in the ExodusII file
-  int io_ws;
-
   // File identification flag
   int ex_id;
 
@@ -438,12 +420,6 @@ public:
 
   // Number of attributes for a given block
   int num_attr;
-
-  // Generic required info tag
-  int req_info;
-
-  // Generic int returned by ex_inquire
-  int ret_int;
 
   // Total number of elements in all side sets
   int num_elem_all_sidesets;
@@ -490,12 +466,6 @@ public:
   // Optional mapping from internal [0,num_elem) to arbitrary indices
   std::vector<int> elem_num_map;
 
-  // Version of Exodus you are using
-  float ex_version;
-
-  // Generic float returned by ex_inquire
-  float ret_float;
-
   // x locations of node points
   std::vector<Real> x;
 
@@ -504,9 +474,6 @@ public:
 
   // z locations of node points
   std::vector<Real> z;
-
-  // Generic char returned by ex_inquire
-  char ret_char;
 
   //  Problem title (Use vector<char> to emulate a char*)
   std::vector<char> title;
