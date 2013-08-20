@@ -708,24 +708,29 @@ int ExodusII_IO_Helper::inquire(int req_info_in, std::string error_msg)
 
 
 
-const std::vector<Real>& ExodusII_IO_Helper::get_time_steps()
+void ExodusII_IO_Helper::read_time_steps()
 {
-  time_steps.resize(num_time_steps);
-  exII::ex_get_all_times(ex_id, time_steps.empty() ? NULL : &time_steps[0]);
-  return time_steps;
+  if (num_time_steps > 0)
+    {
+      time_steps.resize(num_time_steps);
+      ex_err = exII::ex_get_all_times(ex_id, &time_steps[0]);
+      EX_CHECK_ERR(ex_err, "Error reading timesteps!");
+    }
 }
 
 
 
-const std::vector<std::string>& ExodusII_IO_Helper::get_nodal_var_names()
+void ExodusII_IO_Helper::read_nodal_var_names()
 {
   NamesData names_table(num_nodal_vars, MAX_STR_LENGTH);
 
-  exII::ex_get_var_names(ex_id,
-			 "n",
-			 num_nodal_vars,
-			 names_table.get_char_star_star()
-			 );
+  ex_err = exII::ex_get_var_names(ex_id,
+                                  "n",
+                                  num_nodal_vars,
+                                  names_table.get_char_star_star()
+                                  );
+  EX_CHECK_ERR(ex_err, "Error reading nodal variable names!");
+
 
   if (_verbose)
     {
@@ -740,18 +745,15 @@ const std::vector<std::string>& ExodusII_IO_Helper::get_nodal_var_names()
   // Copy the char buffers into strings.
   for (int i=0; i<num_nodal_vars; i++)
     nodal_var_names[i] = names_table.get_char_star(i); // calls string::op=(const char*)
-
-  return nodal_var_names;
 }
 
 
 
 
-const std::vector<Real>& ExodusII_IO_Helper::get_nodal_var_values(std::string nodal_var_name, int time_step)
+void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int time_step)
 {
-  nodal_var_values.resize(num_nodes);
-
-  this->get_nodal_var_names();
+  // Read the nodal variable names from file, so we can see if we have the one we're looking for
+  this->read_nodal_var_names();
 
   // See if we can find the variable we are looking for
   unsigned int var_index = 0;
@@ -775,20 +777,30 @@ const std::vector<Real>& ExodusII_IO_Helper::get_nodal_var_values(std::string no
       libmesh_error();
     }
 
-  exII::ex_get_nodal_var(ex_id, time_step, var_index+1, num_nodes, &nodal_var_values[0]);
+  // Allocate enough space to store the nodal variable values
+  nodal_var_values.resize(num_nodes);
 
-  return nodal_var_values;
+  // Call the Exodus API to read the nodal variable values
+  ex_err = exII::ex_get_nodal_var(ex_id,
+                                  time_step,
+                                  var_index+1,
+                                  num_nodes,
+                                  &nodal_var_values[0]);
+  EX_CHECK_ERR(ex_err, "Error reading nodal variable values!");
 }
 
-const std::vector<std::string>& ExodusII_IO_Helper::get_elemental_var_names()
+
+
+void ExodusII_IO_Helper::read_elemental_var_names()
 {
   NamesData names_table(num_elem_vars, MAX_STR_LENGTH);
 
-  exII::ex_get_var_names(ex_id,
-                         "e",
-                         num_elem_vars,
-                         names_table.get_char_star_star()
-                         );
+  ex_err = exII::ex_get_var_names(ex_id,
+                                  "e",
+                                  num_elem_vars,
+                                  names_table.get_char_star_star()
+                                  );
+  EX_CHECK_ERR(ex_err, "Error reading elemental variable names!");
 
   if (_verbose)
     {
@@ -803,19 +815,18 @@ const std::vector<std::string>& ExodusII_IO_Helper::get_elemental_var_names()
   // Copy the char buffers into strings.
   for (int i=0; i<num_elem_vars; i++)
     elem_var_names[i] = names_table.get_char_star(i); // calls string::op=(const char*)
-
-  return elem_var_names;
 }
 
 
-const std::vector<Real>& ExodusII_IO_Helper::get_elemental_var_values(std::string elemental_var_name, int time_step)
+
+void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_name, int time_step)
 {
   // CAUTION: this assumes that libMesh element numbering is identical to exodus block-by-block element numbering
   // There is no way how to get the whole elemental field from the exodus file, so we have to go block by block
 
   elem_var_values.resize(num_elem);
 
-  this->get_elemental_var_names();
+  this->read_elemental_var_names();
 
   // See if we can find the variable we are looking for
   unsigned int var_index = 0;
@@ -841,23 +852,31 @@ const std::vector<Real>& ExodusII_IO_Helper::get_elemental_var_values(std::strin
 
   unsigned int ex_el_num = 0;
   for (unsigned int i=0; i<static_cast<unsigned int>(num_elem_blk); i++)
-  {
-    int n_blk_elems = 0;
-    ex_err = exII::ex_get_elem_block(ex_id, block_ids[i], NULL, &n_blk_elems, NULL, NULL);
-    EX_CHECK_ERR(ex_err, "Error getting number of element in block.");
-
-    std::vector<Real> block_elem_var_values(num_elem, 0.);
-    ex_err = exII::ex_get_elem_var(ex_id, time_step, var_index+1, block_ids[i], n_blk_elems, &block_elem_var_values[0]);
-    EX_CHECK_ERR(ex_err, "Error getting elemental values.");
-
-    for (unsigned int j=0; j<static_cast<unsigned int>(n_blk_elems); j++)
     {
-      elem_var_values[ex_el_num] = block_elem_var_values[j];
-      ex_el_num++;
-    }
-  }
+      int n_blk_elems = 0;
+      ex_err = exII::ex_get_elem_block(ex_id,
+                                       block_ids[i],
+                                       NULL,
+                                       &n_blk_elems,
+                                       NULL,
+                                       NULL);
+      EX_CHECK_ERR(ex_err, "Error getting number of elements in block.");
 
-  return elem_var_values;
+      std::vector<Real> block_elem_var_values(num_elem);
+      ex_err = exII::ex_get_elem_var(ex_id,
+                                     time_step,
+                                     var_index+1,
+                                     block_ids[i],
+                                     n_blk_elems,
+                                     &block_elem_var_values[0]);
+      EX_CHECK_ERR(ex_err, "Error getting elemental values.");
+
+      for (unsigned int j=0; j<static_cast<unsigned int>(n_blk_elems); j++)
+        {
+          elem_var_values[ex_el_num] = block_elem_var_values[j];
+          ex_el_num++;
+        }
+    }
 }
 
 

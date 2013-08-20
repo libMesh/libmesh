@@ -230,32 +230,32 @@ public:
    */
   int inquire(int req_info, std::string error_msg="");
 
-  /*
-   * Returns an array containing the timesteps in the file
+  /**
+   * Reads and stores the timesteps in the 'time_steps' array.
    */
-  const std::vector<Real>& get_time_steps();
+  void read_time_steps();
 
-  /*
-   * Returns an array containing the nodal var names in the file
+  /**
+   * Reads the nodal variable names and stores them in the 'nodal_var_names' array.
    */
-  const std::vector<std::string>& get_nodal_var_names();
+  void read_nodal_var_names();
 
-  /*
-   * Returns an array containing the nodal variable values
-   * at the specified time
+  /**
+   * Reads the nodal values for the variable 'nodal_var_name' at the
+   * specified time into the 'nodal_var_values' array.
    */
-  const std::vector<Real>& get_nodal_var_values(std::string nodal_var_name, int time_step);
+  void read_nodal_var_values(std::string nodal_var_name, int time_step);
 
-  /*
-   * Returns an array containing the elemental var names in the file
+  /**
+   * Reads the elemental variable names and stores them in the 'elem_var_names' array.
    */
-  const std::vector<std::string>& get_elemental_var_names();
+  void read_elemental_var_names();
 
-  /*
-   * Returns an array containing the elemental variable values
-   * at the specified time
+  /**
+   * Reads elemental values for the variable 'elemental_var_name' at the
+   * specified timestep into the 'elem_var_values' array.
    */
-  const std::vector<Real>& get_elemental_var_values(std::string elemental_var_name, int time_step);
+  void read_elemental_var_values(std::string elemental_var_name, int time_step);
 
   /**
    * Opens an \p ExodusII mesh file named \p filename for writing.
@@ -527,7 +527,7 @@ public:
   // The number of timesteps in the file, as returned by ex_inquire
   int num_time_steps;
 
-  // The timesteps stored in the solution file, filled by get_time_steps()
+  // The timesteps stored in the solution file, filled by read_time_steps()
   std::vector<Real> time_steps;
 
   // The number of nodal variables in the Exodus file

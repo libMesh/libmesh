@@ -285,7 +285,8 @@ const std::vector<Real>& ExodusII_IO::get_time_steps()
       libmesh_error();
     }
 
-  return exio_helper->get_time_steps();
+  exio_helper->read_time_steps();
+  return exio_helper->time_steps;
 }
 
 
@@ -298,11 +299,11 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_nam
       libmesh_error();
     }
 
-  const std::vector<Real> & nodal_values = exio_helper->get_nodal_var_values(exodus_var_name, timestep);
+  exio_helper->read_nodal_var_values(exodus_var_name, timestep);
 
   const unsigned int var_num = system.variable_number(system_var_name);
 
-  for (unsigned int i=0; i<nodal_values.size(); ++i)
+  for (unsigned int i=0; i<exio_helper->nodal_var_values.size(); ++i)
     {
       const Node* node = MeshInput<MeshBase>::mesh().query_node_ptr(i);
 
@@ -316,7 +317,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_nam
 
       // If the dof_index is local to this processor, set the value
       if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
-	system.solution->set (dof_index, nodal_values[i]);
+	system.solution->set (dof_index, exio_helper->nodal_var_values[i]);
     }
 
   system.solution->close();
@@ -333,7 +334,7 @@ void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var
       libmesh_error();
     }
 
-  const std::vector<Real> & elemental_values = exio_helper->get_elemental_var_values(exodus_var_name, timestep);
+  exio_helper->read_elemental_var_values(exodus_var_name, timestep);
 
   const unsigned int var_num = system.variable_number(system_var_name);
   if (system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL))
@@ -342,7 +343,7 @@ void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var
     libmesh_error();
   }
 
-  for (unsigned int i=0; i<elemental_values.size(); ++i)
+  for (unsigned int i=0; i<exio_helper->elem_var_values.size(); ++i)
     {
       const Elem * elem = MeshInput<MeshBase>::mesh().query_elem(i);
 
@@ -356,7 +357,7 @@ void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var
 
       // If the dof_index is local to this processor, set the value
       if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
-        system.solution->set (dof_index, elemental_values[i]);
+        system.solution->set (dof_index, exio_helper->elem_var_values[i]);
     }
 
   system.solution->close();
