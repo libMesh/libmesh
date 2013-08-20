@@ -524,15 +524,28 @@ public:
   std::map<int, int> libmesh_node_num_to_exodus;
   std::vector<int> exodus_node_num_to_libmesh;
 
-  // Solution Data
+  // The number of timesteps in the file, as returned by ex_inquire
   int num_time_steps;
+
+  // The timesteps stored in the solution file, filled by get_time_steps()
   std::vector<Real> time_steps;
+
+  // The number of nodal variables in the Exodus file
   int num_nodal_vars;
+
+  // The names of the nodal variables stored in the Exodus file
   std::vector<std::string> nodal_var_names;
+
+  // Holds the nodal variable values for a given variable, one value per node
   std::vector<Real> nodal_var_values;
 
+  // The number of elemental variables in the Exodus file
   int num_elem_vars;
+
+  // The names of the elemental variables stored in the Exodus file
   std::vector<std::string> elem_var_names;
+
+  // Holds the elemental variable values for a given variable, one value per element
   std::vector<Real> elem_var_values;
 
   // Maps of Ids to named entities
