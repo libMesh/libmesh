@@ -35,10 +35,6 @@
 namespace libMesh
 {
 
-
-
-
-
 // ------------------------------------------------------------
 // ExodusII_IO class members
 ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
@@ -49,76 +45,54 @@ ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
   exio_helper(new ExodusII_IO_Helper(*this)),
 #endif
   _timestep(1),
-  _verbose (false)
+  _verbose(false)
 {
 }
 
 
+void ExodusII_IO::set_output_variables(const std::vector<std::string> & output_variables)
+{
+  _output_variables = output_variables;
+}
+
+
+
+void ExodusII_IO::copy_nodal_solution(System& system, std::string var_name, unsigned int timestep)
+{
+  libmesh_deprecated();
+  copy_nodal_solution(system, var_name, var_name, timestep);
+}
+
+
+
+void ExodusII_IO::write_discontinuous_exodusII(const std::string& name, const EquationSystems& es)
+{
+  std::vector<std::string> solution_names;
+  std::vector<Number>      v;
+
+  es.build_variable_names  (solution_names);
+  es.build_discontinuous_solution_vector (v);
+
+  this->write_nodal_data_discontinuous(name, v, solution_names);
+}
+
+
+
+
+// ------------------------------------------------------------
+// When the Exodus API is present...
+#ifdef LIBMESH_HAVE_EXODUS_API
 
 ExodusII_IO::~ExodusII_IO ()
 {
-#ifndef LIBMESH_HAVE_EXODUS_API
-
-  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
-	        << std::endl;
-  libmesh_error();
-
-#else
-
   exio_helper->close();
-
   delete exio_helper;
-
-#endif
 }
 
-
-
-void ExodusII_IO::verbose (bool set_verbosity)
-{
-  _verbose = set_verbosity;
-
-#ifdef LIBMESH_HAVE_EXODUS_API
-  // Set the verbose flag in the helper object
-  // as well.
-  exio_helper->verbose(_verbose);
-#endif
-}
-
-
-
-  void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool val)
-  {
-#ifdef LIBMESH_HAVE_EXODUS_API
-    exio_helper->use_mesh_dimension_instead_of_spatial_dimension(val);
-#endif
-  }
-
-void ExodusII_IO::set_coordinate_offset(Point p)
-{
-#ifdef LIBMESH_HAVE_EXODUS_API
-  libmesh_deprecated();
-  exio_helper->set_coordinate_offset(p);
-#endif
-}
 
 
 void ExodusII_IO::read (const std::string& fname)
 {
-  // This is a serial-only process for now;
-  // the Mesh should be read on processor 0 and
-  // broadcast later
-//  libmesh_assert_equal_to (this->processor_id(), 0);
-
-#ifndef LIBMESH_HAVE_EXODUS_API
-
-  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
-	        << "Input file " << fname << " cannot be read"
-	        << std::endl;
-  libmesh_error();
-
-#else
-
   // Get a reference to the mesh we are reading
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
@@ -274,22 +248,34 @@ void ExodusII_IO::read (const std::string& fname)
       libmesh_error();
     }
 #endif
-
-#endif
 }
 
 
 
-#ifndef LIBMESH_HAVE_EXODUS_API
-
-const std::vector<Real>& ExodusII_IO::get_time_steps()
+void ExodusII_IO::verbose (bool set_verbosity)
 {
-  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
-	        << std::endl;
-  libmesh_error();
+  _verbose = set_verbosity;
+
+  // Set the verbose flag in the helper object as well.
+  exio_helper->verbose(_verbose);
 }
 
-#else
+
+
+void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool val)
+{
+  exio_helper->use_mesh_dimension_instead_of_spatial_dimension(val);
+}
+
+
+
+void ExodusII_IO::set_coordinate_offset(Point p)
+{
+  libmesh_deprecated();
+  exio_helper->set_coordinate_offset(p);
+}
+
+
 
 const std::vector<Real>& ExodusII_IO::get_time_steps()
 {
@@ -302,30 +288,7 @@ const std::vector<Real>& ExodusII_IO::get_time_steps()
   return exio_helper->get_time_steps();
 }
 
-#endif
 
-
-
-
-void ExodusII_IO::copy_nodal_solution(System& system, std::string var_name, unsigned int timestep)
-{
-  libmesh_deprecated();
-  copy_nodal_solution(system, var_name, var_name, timestep);
-}
-
-
-
-#ifndef LIBMESH_HAVE_EXODUS_API
-
-void ExodusII_IO::copy_nodal_solution(System&, std::string, std::string, unsigned int)
-{
-
-  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
-	        << std::endl;
-  libmesh_error();
-}
-
-#else
 
 void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
 {
@@ -360,20 +323,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_nam
   system.update();
 }
 
-#endif
 
-
-#ifndef LIBMESH_HAVE_EXODUS_API
-
-void ExodusII_IO::copy_elemental_solution(System&, std::string, std::string, unsigned int)
-{
-
-  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
-            << std::endl;
-  libmesh_error();
-}
-
-#else
 
 void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
 {
@@ -413,20 +363,7 @@ void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var
   system.update();
 }
 
-#endif
 
-
-#ifndef LIBMESH_HAVE_EXODUS_API
-
-void ExodusII_IO::write_element_data (const EquationSystems& es)
-{
-
-  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
-	        << std::endl;
-  libmesh_error();
-}
-
-#else
 
 void ExodusII_IO::write_element_data (const EquationSystems & es)
 {
@@ -483,78 +420,7 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   exio_helper->write_element_values(mesh, soln, _timestep);
 }
 
-#endif
 
-
-
-#ifndef LIBMESH_HAVE_EXODUS_API
-
-void ExodusII_IO::write_nodal_data (const std::string& ,
-				    const std::vector<Number>& ,
-				    const std::vector<std::string>& )
-{
-
-  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
-	        << std::endl;
-  libmesh_error();
-}
-
-#else
-void ExodusII_IO::write_discontinuous_exodusII (const std::string& name,
-				     const EquationSystems& es)
-{
-  std::vector<std::string> solution_names;
-  std::vector<Number>      v;
-
-  es.build_variable_names  (solution_names);
-  es.build_discontinuous_solution_vector (v);
-
-  this->write_nodal_data_discontinuous(name, v, solution_names);
-}
-
-
-void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
-				    const std::vector<Number>& soln,
-				    const std::vector<std::string>& names)
-{
-  START_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
-
-  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-
-  int num_vars = libmesh_cast_int<int>(names.size());
-  int num_nodes = 0;
-  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  for ( ; it != end; ++it)
-    num_nodes += (*it)->n_nodes();
-
-  // This function can be called multiple times, we only want to create
-  // the ExodusII file the first time it's called.
-  if (!exio_helper->created())
-    {
-      exio_helper->create(fname);
-      exio_helper->initialize_discontinuous(fname,mesh);
-      exio_helper->write_nodal_coordinates_discontinuous(mesh);
-      exio_helper->write_elements_discontinuous(mesh);
-      exio_helper->write_sidesets(mesh);
-      exio_helper->write_nodesets(mesh);
-      exio_helper->initialize_nodal_variables(names);
-    }
-
-  if (this->processor_id() == 0)
-    for (int c=0; c<num_vars; c++)
-      {
-        // Copy out this variable's solution
-        std::vector<Number> cur_soln(num_nodes);
-
-        for(int i=0; i<num_nodes; i++)
-          cur_soln[i] = soln[i*num_vars + c];
-
-        exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
-      }
-
-  STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
-}
 
 void ExodusII_IO::write_nodal_data (const std::string& fname,
 				    const std::vector<Number>& soln,
@@ -611,19 +477,8 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   STOP_LOG("write_nodal_data()", "ExodusII_IO");
 }
 
-#endif
 
-#ifndef LIBMESH_HAVE_EXODUS_API
 
-void ExodusII_IO::write_information_records ( const std::vector<std::string>& )
-{
-
-  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
-	        << std::endl;
-  libmesh_error();
-}
-
-#else
 
 void ExodusII_IO::write_information_records (const std::vector<std::string>& records)
 {
@@ -635,23 +490,10 @@ void ExodusII_IO::write_information_records (const std::vector<std::string>& rec
       libmesh_error();
     }
 
-  exio_helper->write_information_records( records );
+  exio_helper->write_information_records(records);
 }
 
-#endif
 
-#ifndef LIBMESH_HAVE_EXODUS_API
-
-void ExodusII_IO::write_global_data (const std::vector<Number>& ,
-				    const std::vector<std::string>& )
-{
-
-  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
-	        << std::endl;
-  libmesh_error();
-}
-
-#else
 
 void ExodusII_IO::write_global_data (const std::vector<Number>& soln,
                                      const std::vector<std::string>& names)
@@ -664,54 +506,23 @@ void ExodusII_IO::write_global_data (const std::vector<Number>& soln,
       libmesh_error();
     }
 
-  exio_helper->initialize_global_variables( names );
-  exio_helper->write_global_values( soln, _timestep );
+  exio_helper->initialize_global_variables(names);
+  exio_helper->write_global_values(soln, _timestep);
 }
 
-#endif
 
-
-#ifndef LIBMESH_HAVE_EXODUS_API
-
-void ExodusII_IO::write_timestep (const std::string& ,
-				  const EquationSystems& ,
-				  const int ,
-				  const Real )
-{
-
-  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
-	        << std::endl;
-  libmesh_error();
-}
-
-#else
 
 void ExodusII_IO::write_timestep (const std::string& fname,
 				  const EquationSystems& es,
 				  const int timestep,
 				  const Real time)
 {
-  _timestep=timestep;
+  _timestep = timestep;
   write_equation_systems(fname,es);
-
   exio_helper->write_timestep(timestep, time);
 }
 
-#endif
 
-
-
-#ifndef LIBMESH_HAVE_EXODUS_API
-
-void ExodusII_IO::write (const std::string& )
-{
-  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
-	        << std::endl;
-  libmesh_error();
-}
-
-
-#else
 
 void ExodusII_IO::write (const std::string& fname)
 {
@@ -732,6 +543,177 @@ void ExodusII_IO::write (const std::string& fname)
   // Note: the file is closed automatically by the ExodusII_IO destructor.
 }
 
-#endif
 
+
+void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
+                                                  const std::vector<Number>& soln,
+                                                  const std::vector<std::string>& names)
+{
+  START_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
+
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+
+  int num_vars = libmesh_cast_int<int>(names.size());
+  int num_nodes = 0;
+  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end = mesh.active_elements_end();
+  for ( ; it != end; ++it)
+    num_nodes += (*it)->n_nodes();
+
+  // This function can be called multiple times, we only want to create
+  // the ExodusII file the first time it's called.
+  if (!exio_helper->created())
+    {
+      exio_helper->create(fname);
+      exio_helper->initialize_discontinuous(fname,mesh);
+      exio_helper->write_nodal_coordinates_discontinuous(mesh);
+      exio_helper->write_elements_discontinuous(mesh);
+      exio_helper->write_sidesets(mesh);
+      exio_helper->write_nodesets(mesh);
+      exio_helper->initialize_nodal_variables(names);
+    }
+
+  if (this->processor_id() == 0)
+    for (int c=0; c<num_vars; c++)
+      {
+        // Copy out this variable's solution
+        std::vector<Number> cur_soln(num_nodes);
+
+        for(int i=0; i<num_nodes; i++)
+          cur_soln[i] = soln[i*num_vars + c];
+
+        exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
+      }
+
+  STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
+}
+
+
+
+// LIBMESH_HAVE_EXODUS_API is not defined, declare error() versions of functions...
+#else
+
+
+
+ExodusII_IO::~ExodusII_IO ()
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::read (const std::string&)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::verbose (bool)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::set_coordinate_offset(Point)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+const std::vector<Real>& ExodusII_IO::get_time_steps()
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::copy_nodal_solution(System&, std::string, std::string, unsigned int)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::copy_elemental_solution(System&, std::string, std::string, unsigned int)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::write_element_data (const EquationSystems& es)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::write_nodal_data (const std::string&, const std::vector<Number>&, const std::vector<std::string>&)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::write_information_records (const std::vector<std::string>&)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::write_global_data (const std::vector<Number>&, const std::vector<std::string>&)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::write_timestep (const std::string&, const EquationSystems&, const int, const Real)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::write (const std::string&)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::write_nodal_data_discontinuous (const std::string&, const std::vector<Number>&, const std::vector<std::string>&)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+#endif // LIBMESH_HAVE_EXODUS_API
 } // namespace libMesh
