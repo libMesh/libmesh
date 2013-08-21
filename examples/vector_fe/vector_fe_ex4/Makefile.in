@@ -51,7 +51,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = vector_fe_ex3.in .linkstamp
+@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = vector_fe_ex4.in .linkstamp
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/examples/Make.common
@@ -62,7 +62,7 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @LIBMESH_OPT_MODE_TRUE@am__append_4 = example-opt
 @LIBMESH_PROF_MODE_TRUE@am__append_5 = example-prof
 @LIBMESH_OPROF_MODE_TRUE@am__append_6 = example-oprof
-subdir = examples/vector_fe/vector_fe_ex3
+subdir = examples/vector_fe/vector_fe_ex4
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
@@ -111,10 +111,10 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = example-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = example-oprof$(EXEEXT)
 am__example_dbg_SOURCES_DIST = curl_curl_exact_solution.h \
-	vector_fe_ex3.in curl_curl_system.C solution_function.h \
-	curl_curl_system.h vector_fe_ex3.C run.sh
+	vector_fe_ex4.in curl_curl_system.C solution_function.h \
+	curl_curl_system.h vector_fe_ex4.C run.sh
 am__objects_1 = example_dbg-curl_curl_system.$(OBJEXT) \
-	example_dbg-vector_fe_ex3.$(OBJEXT)
+	example_dbg-vector_fe_ex4.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
 @LIBMESH_DBG_MODE_TRUE@am_example_dbg_OBJECTS = $(am__objects_2)
 example_dbg_OBJECTS = $(am_example_dbg_OBJECTS)
@@ -128,10 +128,10 @@ example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_dbg_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_devel_SOURCES_DIST = curl_curl_exact_solution.h \
-	vector_fe_ex3.in curl_curl_system.C solution_function.h \
-	curl_curl_system.h vector_fe_ex3.C run.sh
+	vector_fe_ex4.in curl_curl_system.C solution_function.h \
+	curl_curl_system.h vector_fe_ex4.C run.sh
 am__objects_3 = example_devel-curl_curl_system.$(OBJEXT) \
-	example_devel-vector_fe_ex3.$(OBJEXT)
+	example_devel-vector_fe_ex4.$(OBJEXT)
 am__objects_4 = $(am__objects_3)
 @LIBMESH_DEVEL_MODE_TRUE@am_example_devel_OBJECTS = $(am__objects_4)
 example_devel_OBJECTS = $(am_example_devel_OBJECTS)
@@ -142,10 +142,10 @@ example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_oprof_SOURCES_DIST = curl_curl_exact_solution.h \
-	vector_fe_ex3.in curl_curl_system.C solution_function.h \
-	curl_curl_system.h vector_fe_ex3.C run.sh
+	vector_fe_ex4.in curl_curl_system.C solution_function.h \
+	curl_curl_system.h vector_fe_ex4.C run.sh
 am__objects_5 = example_oprof-curl_curl_system.$(OBJEXT) \
-	example_oprof-vector_fe_ex3.$(OBJEXT)
+	example_oprof-vector_fe_ex4.$(OBJEXT)
 am__objects_6 = $(am__objects_5)
 @LIBMESH_OPROF_MODE_TRUE@am_example_oprof_OBJECTS = $(am__objects_6)
 example_oprof_OBJECTS = $(am_example_oprof_OBJECTS)
@@ -156,10 +156,10 @@ example_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_opt_SOURCES_DIST = curl_curl_exact_solution.h \
-	vector_fe_ex3.in curl_curl_system.C solution_function.h \
-	curl_curl_system.h vector_fe_ex3.C run.sh
+	vector_fe_ex4.in curl_curl_system.C solution_function.h \
+	curl_curl_system.h vector_fe_ex4.C run.sh
 am__objects_7 = example_opt-curl_curl_system.$(OBJEXT) \
-	example_opt-vector_fe_ex3.$(OBJEXT)
+	example_opt-vector_fe_ex4.$(OBJEXT)
 am__objects_8 = $(am__objects_7)
 @LIBMESH_OPT_MODE_TRUE@am_example_opt_OBJECTS = $(am__objects_8)
 example_opt_OBJECTS = $(am_example_opt_OBJECTS)
@@ -169,10 +169,10 @@ example_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_opt_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_prof_SOURCES_DIST = curl_curl_exact_solution.h \
-	vector_fe_ex3.in curl_curl_system.C solution_function.h \
-	curl_curl_system.h vector_fe_ex3.C run.sh
+	vector_fe_ex4.in curl_curl_system.C solution_function.h \
+	curl_curl_system.h vector_fe_ex4.C run.sh
 am__objects_9 = example_prof-curl_curl_system.$(OBJEXT) \
-	example_prof-vector_fe_ex3.$(OBJEXT)
+	example_prof-vector_fe_ex4.$(OBJEXT)
 am__objects_10 = $(am__objects_9)
 @LIBMESH_PROF_MODE_TRUE@am_example_prof_OBJECTS = $(am__objects_10)
 example_prof_OBJECTS = $(am_example_prof_OBJECTS)
@@ -585,10 +585,10 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-example_name = vector_fe_ex3
+example_name = vector_fe_ex4
 check_SCRIPTS = run.sh # Convergence too poor with default solvers
-install_dir = $(examples_install_path)/vector_fe/ex3
-data = curl_curl_exact_solution.h vector_fe_ex3.in curl_curl_system.C solution_function.h curl_curl_system.h vector_fe_ex3.C run.sh
+install_dir = $(examples_install_path)/vector_fe/ex4
+data = curl_curl_exact_solution.h vector_fe_ex4.in curl_curl_system.C solution_function.h curl_curl_system.h vector_fe_ex4.C run.sh
 sources = $(data) run.sh
 
 ######################################################################
@@ -671,9 +671,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu examples/vector_fe/vector_fe_ex3/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu examples/vector_fe/vector_fe_ex4/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu examples/vector_fe/vector_fe_ex3/Makefile
+	  $(AUTOMAKE) --gnu examples/vector_fe/vector_fe_ex4/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -725,15 +725,15 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_dbg-curl_curl_system.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_dbg-vector_fe_ex3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_dbg-vector_fe_ex4.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_devel-curl_curl_system.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_devel-vector_fe_ex3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_devel-vector_fe_ex4.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_oprof-curl_curl_system.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_oprof-vector_fe_ex3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_oprof-vector_fe_ex4.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_opt-curl_curl_system.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_opt-vector_fe_ex3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_opt-vector_fe_ex4.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_prof-curl_curl_system.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_prof-vector_fe_ex3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_prof-vector_fe_ex4.Po@am__quote@
 
 .C.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -773,19 +773,19 @@ example_dbg-curl_curl_system.obj: curl_curl_system.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-curl_curl_system.obj `if test -f 'curl_curl_system.C'; then $(CYGPATH_W) 'curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/curl_curl_system.C'; fi`
 
-example_dbg-vector_fe_ex3.o: vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-vector_fe_ex3.o -MD -MP -MF $(DEPDIR)/example_dbg-vector_fe_ex3.Tpo -c -o example_dbg-vector_fe_ex3.o `test -f 'vector_fe_ex3.C' || echo '$(srcdir)/'`vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-vector_fe_ex3.Tpo $(DEPDIR)/example_dbg-vector_fe_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex3.C' object='example_dbg-vector_fe_ex3.o' libtool=no @AMDEPBACKSLASH@
+example_dbg-vector_fe_ex4.o: vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-vector_fe_ex4.o -MD -MP -MF $(DEPDIR)/example_dbg-vector_fe_ex4.Tpo -c -o example_dbg-vector_fe_ex4.o `test -f 'vector_fe_ex4.C' || echo '$(srcdir)/'`vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-vector_fe_ex4.Tpo $(DEPDIR)/example_dbg-vector_fe_ex4.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex4.C' object='example_dbg-vector_fe_ex4.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-vector_fe_ex3.o `test -f 'vector_fe_ex3.C' || echo '$(srcdir)/'`vector_fe_ex3.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-vector_fe_ex4.o `test -f 'vector_fe_ex4.C' || echo '$(srcdir)/'`vector_fe_ex4.C
 
-example_dbg-vector_fe_ex3.obj: vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-vector_fe_ex3.obj -MD -MP -MF $(DEPDIR)/example_dbg-vector_fe_ex3.Tpo -c -o example_dbg-vector_fe_ex3.obj `if test -f 'vector_fe_ex3.C'; then $(CYGPATH_W) 'vector_fe_ex3.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex3.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-vector_fe_ex3.Tpo $(DEPDIR)/example_dbg-vector_fe_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex3.C' object='example_dbg-vector_fe_ex3.obj' libtool=no @AMDEPBACKSLASH@
+example_dbg-vector_fe_ex4.obj: vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-vector_fe_ex4.obj -MD -MP -MF $(DEPDIR)/example_dbg-vector_fe_ex4.Tpo -c -o example_dbg-vector_fe_ex4.obj `if test -f 'vector_fe_ex4.C'; then $(CYGPATH_W) 'vector_fe_ex4.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex4.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-vector_fe_ex4.Tpo $(DEPDIR)/example_dbg-vector_fe_ex4.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex4.C' object='example_dbg-vector_fe_ex4.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-vector_fe_ex3.obj `if test -f 'vector_fe_ex3.C'; then $(CYGPATH_W) 'vector_fe_ex3.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex3.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-vector_fe_ex4.obj `if test -f 'vector_fe_ex4.C'; then $(CYGPATH_W) 'vector_fe_ex4.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex4.C'; fi`
 
 example_devel-curl_curl_system.o: curl_curl_system.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-curl_curl_system.o -MD -MP -MF $(DEPDIR)/example_devel-curl_curl_system.Tpo -c -o example_devel-curl_curl_system.o `test -f 'curl_curl_system.C' || echo '$(srcdir)/'`curl_curl_system.C
@@ -801,19 +801,19 @@ example_devel-curl_curl_system.obj: curl_curl_system.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-curl_curl_system.obj `if test -f 'curl_curl_system.C'; then $(CYGPATH_W) 'curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/curl_curl_system.C'; fi`
 
-example_devel-vector_fe_ex3.o: vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-vector_fe_ex3.o -MD -MP -MF $(DEPDIR)/example_devel-vector_fe_ex3.Tpo -c -o example_devel-vector_fe_ex3.o `test -f 'vector_fe_ex3.C' || echo '$(srcdir)/'`vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_devel-vector_fe_ex3.Tpo $(DEPDIR)/example_devel-vector_fe_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex3.C' object='example_devel-vector_fe_ex3.o' libtool=no @AMDEPBACKSLASH@
+example_devel-vector_fe_ex4.o: vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-vector_fe_ex4.o -MD -MP -MF $(DEPDIR)/example_devel-vector_fe_ex4.Tpo -c -o example_devel-vector_fe_ex4.o `test -f 'vector_fe_ex4.C' || echo '$(srcdir)/'`vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_devel-vector_fe_ex4.Tpo $(DEPDIR)/example_devel-vector_fe_ex4.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex4.C' object='example_devel-vector_fe_ex4.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-vector_fe_ex3.o `test -f 'vector_fe_ex3.C' || echo '$(srcdir)/'`vector_fe_ex3.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-vector_fe_ex4.o `test -f 'vector_fe_ex4.C' || echo '$(srcdir)/'`vector_fe_ex4.C
 
-example_devel-vector_fe_ex3.obj: vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-vector_fe_ex3.obj -MD -MP -MF $(DEPDIR)/example_devel-vector_fe_ex3.Tpo -c -o example_devel-vector_fe_ex3.obj `if test -f 'vector_fe_ex3.C'; then $(CYGPATH_W) 'vector_fe_ex3.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex3.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_devel-vector_fe_ex3.Tpo $(DEPDIR)/example_devel-vector_fe_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex3.C' object='example_devel-vector_fe_ex3.obj' libtool=no @AMDEPBACKSLASH@
+example_devel-vector_fe_ex4.obj: vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-vector_fe_ex4.obj -MD -MP -MF $(DEPDIR)/example_devel-vector_fe_ex4.Tpo -c -o example_devel-vector_fe_ex4.obj `if test -f 'vector_fe_ex4.C'; then $(CYGPATH_W) 'vector_fe_ex4.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex4.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_devel-vector_fe_ex4.Tpo $(DEPDIR)/example_devel-vector_fe_ex4.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex4.C' object='example_devel-vector_fe_ex4.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-vector_fe_ex3.obj `if test -f 'vector_fe_ex3.C'; then $(CYGPATH_W) 'vector_fe_ex3.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex3.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-vector_fe_ex4.obj `if test -f 'vector_fe_ex4.C'; then $(CYGPATH_W) 'vector_fe_ex4.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex4.C'; fi`
 
 example_oprof-curl_curl_system.o: curl_curl_system.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-curl_curl_system.o -MD -MP -MF $(DEPDIR)/example_oprof-curl_curl_system.Tpo -c -o example_oprof-curl_curl_system.o `test -f 'curl_curl_system.C' || echo '$(srcdir)/'`curl_curl_system.C
@@ -829,19 +829,19 @@ example_oprof-curl_curl_system.obj: curl_curl_system.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-curl_curl_system.obj `if test -f 'curl_curl_system.C'; then $(CYGPATH_W) 'curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/curl_curl_system.C'; fi`
 
-example_oprof-vector_fe_ex3.o: vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-vector_fe_ex3.o -MD -MP -MF $(DEPDIR)/example_oprof-vector_fe_ex3.Tpo -c -o example_oprof-vector_fe_ex3.o `test -f 'vector_fe_ex3.C' || echo '$(srcdir)/'`vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-vector_fe_ex3.Tpo $(DEPDIR)/example_oprof-vector_fe_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex3.C' object='example_oprof-vector_fe_ex3.o' libtool=no @AMDEPBACKSLASH@
+example_oprof-vector_fe_ex4.o: vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-vector_fe_ex4.o -MD -MP -MF $(DEPDIR)/example_oprof-vector_fe_ex4.Tpo -c -o example_oprof-vector_fe_ex4.o `test -f 'vector_fe_ex4.C' || echo '$(srcdir)/'`vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-vector_fe_ex4.Tpo $(DEPDIR)/example_oprof-vector_fe_ex4.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex4.C' object='example_oprof-vector_fe_ex4.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-vector_fe_ex3.o `test -f 'vector_fe_ex3.C' || echo '$(srcdir)/'`vector_fe_ex3.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-vector_fe_ex4.o `test -f 'vector_fe_ex4.C' || echo '$(srcdir)/'`vector_fe_ex4.C
 
-example_oprof-vector_fe_ex3.obj: vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-vector_fe_ex3.obj -MD -MP -MF $(DEPDIR)/example_oprof-vector_fe_ex3.Tpo -c -o example_oprof-vector_fe_ex3.obj `if test -f 'vector_fe_ex3.C'; then $(CYGPATH_W) 'vector_fe_ex3.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex3.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-vector_fe_ex3.Tpo $(DEPDIR)/example_oprof-vector_fe_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex3.C' object='example_oprof-vector_fe_ex3.obj' libtool=no @AMDEPBACKSLASH@
+example_oprof-vector_fe_ex4.obj: vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-vector_fe_ex4.obj -MD -MP -MF $(DEPDIR)/example_oprof-vector_fe_ex4.Tpo -c -o example_oprof-vector_fe_ex4.obj `if test -f 'vector_fe_ex4.C'; then $(CYGPATH_W) 'vector_fe_ex4.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex4.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-vector_fe_ex4.Tpo $(DEPDIR)/example_oprof-vector_fe_ex4.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex4.C' object='example_oprof-vector_fe_ex4.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-vector_fe_ex3.obj `if test -f 'vector_fe_ex3.C'; then $(CYGPATH_W) 'vector_fe_ex3.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex3.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-vector_fe_ex4.obj `if test -f 'vector_fe_ex4.C'; then $(CYGPATH_W) 'vector_fe_ex4.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex4.C'; fi`
 
 example_opt-curl_curl_system.o: curl_curl_system.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-curl_curl_system.o -MD -MP -MF $(DEPDIR)/example_opt-curl_curl_system.Tpo -c -o example_opt-curl_curl_system.o `test -f 'curl_curl_system.C' || echo '$(srcdir)/'`curl_curl_system.C
@@ -857,19 +857,19 @@ example_opt-curl_curl_system.obj: curl_curl_system.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-curl_curl_system.obj `if test -f 'curl_curl_system.C'; then $(CYGPATH_W) 'curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/curl_curl_system.C'; fi`
 
-example_opt-vector_fe_ex3.o: vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-vector_fe_ex3.o -MD -MP -MF $(DEPDIR)/example_opt-vector_fe_ex3.Tpo -c -o example_opt-vector_fe_ex3.o `test -f 'vector_fe_ex3.C' || echo '$(srcdir)/'`vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-vector_fe_ex3.Tpo $(DEPDIR)/example_opt-vector_fe_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex3.C' object='example_opt-vector_fe_ex3.o' libtool=no @AMDEPBACKSLASH@
+example_opt-vector_fe_ex4.o: vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-vector_fe_ex4.o -MD -MP -MF $(DEPDIR)/example_opt-vector_fe_ex4.Tpo -c -o example_opt-vector_fe_ex4.o `test -f 'vector_fe_ex4.C' || echo '$(srcdir)/'`vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-vector_fe_ex4.Tpo $(DEPDIR)/example_opt-vector_fe_ex4.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex4.C' object='example_opt-vector_fe_ex4.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-vector_fe_ex3.o `test -f 'vector_fe_ex3.C' || echo '$(srcdir)/'`vector_fe_ex3.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-vector_fe_ex4.o `test -f 'vector_fe_ex4.C' || echo '$(srcdir)/'`vector_fe_ex4.C
 
-example_opt-vector_fe_ex3.obj: vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-vector_fe_ex3.obj -MD -MP -MF $(DEPDIR)/example_opt-vector_fe_ex3.Tpo -c -o example_opt-vector_fe_ex3.obj `if test -f 'vector_fe_ex3.C'; then $(CYGPATH_W) 'vector_fe_ex3.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex3.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-vector_fe_ex3.Tpo $(DEPDIR)/example_opt-vector_fe_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex3.C' object='example_opt-vector_fe_ex3.obj' libtool=no @AMDEPBACKSLASH@
+example_opt-vector_fe_ex4.obj: vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-vector_fe_ex4.obj -MD -MP -MF $(DEPDIR)/example_opt-vector_fe_ex4.Tpo -c -o example_opt-vector_fe_ex4.obj `if test -f 'vector_fe_ex4.C'; then $(CYGPATH_W) 'vector_fe_ex4.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex4.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-vector_fe_ex4.Tpo $(DEPDIR)/example_opt-vector_fe_ex4.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex4.C' object='example_opt-vector_fe_ex4.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-vector_fe_ex3.obj `if test -f 'vector_fe_ex3.C'; then $(CYGPATH_W) 'vector_fe_ex3.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex3.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-vector_fe_ex4.obj `if test -f 'vector_fe_ex4.C'; then $(CYGPATH_W) 'vector_fe_ex4.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex4.C'; fi`
 
 example_prof-curl_curl_system.o: curl_curl_system.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-curl_curl_system.o -MD -MP -MF $(DEPDIR)/example_prof-curl_curl_system.Tpo -c -o example_prof-curl_curl_system.o `test -f 'curl_curl_system.C' || echo '$(srcdir)/'`curl_curl_system.C
@@ -885,19 +885,19 @@ example_prof-curl_curl_system.obj: curl_curl_system.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-curl_curl_system.obj `if test -f 'curl_curl_system.C'; then $(CYGPATH_W) 'curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/curl_curl_system.C'; fi`
 
-example_prof-vector_fe_ex3.o: vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-vector_fe_ex3.o -MD -MP -MF $(DEPDIR)/example_prof-vector_fe_ex3.Tpo -c -o example_prof-vector_fe_ex3.o `test -f 'vector_fe_ex3.C' || echo '$(srcdir)/'`vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_prof-vector_fe_ex3.Tpo $(DEPDIR)/example_prof-vector_fe_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex3.C' object='example_prof-vector_fe_ex3.o' libtool=no @AMDEPBACKSLASH@
+example_prof-vector_fe_ex4.o: vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-vector_fe_ex4.o -MD -MP -MF $(DEPDIR)/example_prof-vector_fe_ex4.Tpo -c -o example_prof-vector_fe_ex4.o `test -f 'vector_fe_ex4.C' || echo '$(srcdir)/'`vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_prof-vector_fe_ex4.Tpo $(DEPDIR)/example_prof-vector_fe_ex4.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex4.C' object='example_prof-vector_fe_ex4.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-vector_fe_ex3.o `test -f 'vector_fe_ex3.C' || echo '$(srcdir)/'`vector_fe_ex3.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-vector_fe_ex4.o `test -f 'vector_fe_ex4.C' || echo '$(srcdir)/'`vector_fe_ex4.C
 
-example_prof-vector_fe_ex3.obj: vector_fe_ex3.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-vector_fe_ex3.obj -MD -MP -MF $(DEPDIR)/example_prof-vector_fe_ex3.Tpo -c -o example_prof-vector_fe_ex3.obj `if test -f 'vector_fe_ex3.C'; then $(CYGPATH_W) 'vector_fe_ex3.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex3.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_prof-vector_fe_ex3.Tpo $(DEPDIR)/example_prof-vector_fe_ex3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex3.C' object='example_prof-vector_fe_ex3.obj' libtool=no @AMDEPBACKSLASH@
+example_prof-vector_fe_ex4.obj: vector_fe_ex4.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-vector_fe_ex4.obj -MD -MP -MF $(DEPDIR)/example_prof-vector_fe_ex4.Tpo -c -o example_prof-vector_fe_ex4.obj `if test -f 'vector_fe_ex4.C'; then $(CYGPATH_W) 'vector_fe_ex4.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex4.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_prof-vector_fe_ex4.Tpo $(DEPDIR)/example_prof-vector_fe_ex4.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='vector_fe_ex4.C' object='example_prof-vector_fe_ex4.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-vector_fe_ex3.obj `if test -f 'vector_fe_ex3.C'; then $(CYGPATH_W) 'vector_fe_ex3.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex3.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-vector_fe_ex4.obj `if test -f 'vector_fe_ex4.C'; then $(CYGPATH_W) 'vector_fe_ex4.C'; else $(CYGPATH_W) '$(srcdir)/vector_fe_ex4.C'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1244,7 +1244,7 @@ uninstall-am: uninstall-dataDATA
 	tags uninstall uninstall-am uninstall-dataDATA
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
-@LIBMESH_VPATH_BUILD_TRUE@	-rm -f vector_fe_ex3.in && $(LN_S) $(srcdir)/vector_fe_ex3.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f vector_fe_ex3.in && $(LN_S) $(srcdir)/vector_fe_ex4.in .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'
