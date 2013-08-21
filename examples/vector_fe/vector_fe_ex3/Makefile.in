@@ -62,7 +62,6 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @LIBMESH_OPT_MODE_TRUE@am__append_4 = example-opt
 @LIBMESH_PROF_MODE_TRUE@am__append_5 = example-prof
 @LIBMESH_OPROF_MODE_TRUE@am__append_6 = example-oprof
-TESTS =
 subdir = examples/vector_fe/vector_fe_ex3
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -587,7 +586,7 @@ vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 example_name = vector_fe_ex3
-#check_SCRIPTS = run.sh # Convergence too poor with default solvers
+check_SCRIPTS = run.sh # Convergence too poor with default solvers
 install_dir = $(examples_install_path)/vector_fe/ex3
 data = curl_curl_exact_solution.h vector_fe_ex3.in curl_curl_system.C solution_function.h curl_curl_system.h vector_fe_ex3.C run.sh
 sources = $(data) run.sh
@@ -657,6 +656,7 @@ data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile
 # Running the tests
 #
 TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir) METHODS="$(METHODS)"
+TESTS = $(check_SCRIPTS)
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -1116,7 +1116,7 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
+	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS) $(check_SCRIPTS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
