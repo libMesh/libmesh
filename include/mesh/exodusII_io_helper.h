@@ -99,7 +99,7 @@ public:
    * @returns the current element type.  Note: the default behavior is
    * for this value to be in all capital letters, e.g. \p HEX27.
    */
-  const char* get_elem_type() const { return &elem_type[0]; }
+  const char* get_elem_type() const;
 
   /**
    * Opens an \p ExodusII mesh file named \p filename for reading.
@@ -211,16 +211,6 @@ public:
   void read_nodeset(int id);
 
   /**
-   * Prints information about all the sidesets.
-   */
-  void print_sideset_info();
-
-  /**
-   * Prints information about all the nodesets.
-   */
-  void print_nodeset_info();
-
-  /**
    * Closes the \p ExodusII mesh file.
    */
   void close();
@@ -230,32 +220,32 @@ public:
    */
   int inquire(int req_info, std::string error_msg="");
 
-  /*
-   * Returns an array containing the timesteps in the file
+  /**
+   * Reads and stores the timesteps in the 'time_steps' array.
    */
-  const std::vector<Real>& get_time_steps();
+  void read_time_steps();
 
-  /*
-   * Returns an array containing the nodal var names in the file
+  /**
+   * Reads the nodal variable names and stores them in the 'nodal_var_names' array.
    */
-  const std::vector<std::string>& get_nodal_var_names();
+  void read_nodal_var_names();
 
-  /*
-   * Returns an array containing the nodal variable values
-   * at the specified time
+  /**
+   * Reads the nodal values for the variable 'nodal_var_name' at the
+   * specified time into the 'nodal_var_values' array.
    */
-  const std::vector<Real>& get_nodal_var_values(std::string nodal_var_name, int time_step);
+  void read_nodal_var_values(std::string nodal_var_name, int time_step);
 
-  /*
-   * Returns an array containing the elemental var names in the file
+  /**
+   * Reads the elemental variable names and stores them in the 'elem_var_names' array.
    */
-  const std::vector<std::string>& get_elemental_var_names();
+  void read_elemental_var_names();
 
-  /*
-   * Returns an array containing the elemental variable values
-   * at the specified time
+  /**
+   * Reads elemental values for the variable 'elemental_var_name' at the
+   * specified timestep into the 'elem_var_values' array.
    */
-  const std::vector<Real>& get_elemental_var_values(std::string elemental_var_name, int time_step);
+  void read_elemental_var_values(std::string elemental_var_name, int time_step);
 
   /**
    * Opens an \p ExodusII mesh file named \p filename for writing.
@@ -395,14 +385,6 @@ public:
    */
   void message(const std::string msg, int i);
 
-  // Word size in bytes of the floating point variables used in the
-  // application program (0, 4, or 8)
-  int comp_ws;
-
-  // Word size in bytes of the floating point data as they are stored
-  // in the ExodusII file
-  int io_ws;
-
   // File identification flag
   int ex_id;
 
@@ -438,12 +420,6 @@ public:
 
   // Number of attributes for a given block
   int num_attr;
-
-  // Generic required info tag
-  int req_info;
-
-  // Generic int returned by ex_inquire
-  int ret_int;
 
   // Total number of elements in all side sets
   int num_elem_all_sidesets;
@@ -490,12 +466,6 @@ public:
   // Optional mapping from internal [0,num_elem) to arbitrary indices
   std::vector<int> elem_num_map;
 
-  // Version of Exodus you are using
-  float ex_version;
-
-  // Generic float returned by ex_inquire
-  float ret_float;
-
   // x locations of node points
   std::vector<Real> x;
 
@@ -504,9 +474,6 @@ public:
 
   // z locations of node points
   std::vector<Real> z;
-
-  // Generic char returned by ex_inquire
-  char ret_char;
 
   //  Problem title (Use vector<char> to emulate a char*)
   std::vector<char> title;
@@ -524,15 +491,28 @@ public:
   std::map<int, int> libmesh_node_num_to_exodus;
   std::vector<int> exodus_node_num_to_libmesh;
 
-  // Solution Data
+  // The number of timesteps in the file, as returned by ex_inquire
   int num_time_steps;
+
+  // The timesteps stored in the solution file, filled by read_time_steps()
   std::vector<Real> time_steps;
+
+  // The number of nodal variables in the Exodus file
   int num_nodal_vars;
+
+  // The names of the nodal variables stored in the Exodus file
   std::vector<std::string> nodal_var_names;
+
+  // Holds the nodal variable values for a given variable, one value per node
   std::vector<Real> nodal_var_values;
 
+  // The number of elemental variables in the Exodus file
   int num_elem_vars;
+
+  // The names of the elemental variables stored in the Exodus file
   std::vector<std::string> elem_var_names;
+
+  // Holds the elemental variable values for a given variable, one value per element
   std::vector<Real> elem_var_values;
 
   // Maps of Ids to named entities

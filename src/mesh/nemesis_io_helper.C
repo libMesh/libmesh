@@ -720,10 +720,8 @@ void Nemesis_IO_Helper::create(std::string filename)
 {
   // Fall back on double precision when necessary since ExodusII
   // doesn't seem to support long double
-  comp_ws = libmesh_cast_int<int>
-    (std::min(sizeof(Real),sizeof(double)));
-  io_ws = libmesh_cast_int<int>
-    (std::min(sizeof(Real),sizeof(double)));
+  int comp_ws = libmesh_cast_int<int>(std::min(sizeof(Real),sizeof(double)));
+  int io_ws = libmesh_cast_int<int>(std::min(sizeof(Real),sizeof(double)));
 
   this->ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
 

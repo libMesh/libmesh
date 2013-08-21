@@ -53,7 +53,6 @@ class ExodusII_IO : public MeshInput<MeshBase>,
 		    public MeshOutput<MeshBase>,
 		    public ParallelObject
 {
-
  public:
 
   /**
@@ -81,7 +80,6 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * This method implements writing a mesh to a specified file.
    */
   virtual void write (const std::string& fname);
-
 
   /**
    * Set the flag indicating if we should be verbose.
@@ -113,9 +111,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   /**
    * Writes a exodusII file with discontinuous data
    */
-  void write_discontinuous_exodusII (const std::string& name,
-				const EquationSystems& es);
-
+  void write_discontinuous_exodusII (const std::string& name, const EquationSystems& es);
 
   /**
    * Write out element solution.
@@ -133,8 +129,8 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * Write out a discontinuous nodal solution.
    */
   void write_nodal_data_discontinuous (const std::string&,
-			 const std::vector<Number>&,
-			 const std::vector<std::string>&);
+                                       const std::vector<Number>&,
+                                       const std::vector<std::string>&);
 
   /**
    * Write out global variables.
@@ -161,7 +157,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * This is _optional_.  If this is never called then all variables
    * will be present.
    */
-  void set_output_variables(const std::vector<std::string> & output_variables) { _output_variables = output_variables; }
+  void set_output_variables(const std::vector<std::string> & output_variables);
 
   /**
    * In the general case, meshes containing 2D elements can be
@@ -193,7 +189,8 @@ class ExodusII_IO : public MeshInput<MeshBase>,
 #endif
 
   /**
-   *
+   * Stores the current value of the timestep when calling
+   * ExodusII_IO::write_timestep().
    */
   int _timestep;
 
