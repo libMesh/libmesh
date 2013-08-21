@@ -48,7 +48,8 @@ SUBDIRS = \
 	transient/transient_ex2 \
 	vector_fe/vector_fe_ex1 \
 	vector_fe/vector_fe_ex2 \
-	vector_fe/vector_fe_ex3
+	vector_fe/vector_fe_ex3 \
+        vector_fe/vector_fe_ex4
 
 AUTOMAKE_OPTIONS = subdir-objects
 
