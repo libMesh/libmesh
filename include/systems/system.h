@@ -1201,8 +1201,8 @@ public:
    * allows for optimization for the multiple vector case by only communicating
    * the metadata once.
    */
-    template <typename InValType>
-  dof_id_type read_serialized_vectors (Xdr &io,
+  template <typename InValType>
+  std::size_t read_serialized_vectors (Xdr &io,
 				       const std::vector<NumericVector<Number>*> &vectors) const;
 
   /**
@@ -1212,7 +1212,7 @@ public:
    * allows for optimization for the multiple vector case by only communicating
    * the metadata once.
    */
-  dof_id_type read_serialized_vectors (Xdr &io,
+  std::size_t read_serialized_vectors (Xdr &io,
 				       const std::vector<NumericVector<Number>*> &vectors) const
     { return read_serialized_vectors<Number>(io, vectors); }
 
@@ -1614,7 +1614,7 @@ private:
    * Unless otherwise specified, all variables are read.
    */
   template <typename iterator_type, typename InValType>
-  dof_id_type read_serialized_blocked_dof_objects (const dof_id_type n_objects,
+  std::size_t read_serialized_blocked_dof_objects (const dof_id_type n_objects,
 						   const iterator_type begin,
 						   const iterator_type end,
                            const InValType dummy,
