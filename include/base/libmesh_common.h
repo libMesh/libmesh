@@ -319,13 +319,31 @@ extern OStreamProxy err;
 #endif
 
 // The libmesh_write_traceout() macro writes stack trace files, if
-// that feature has been configured.
+// that feature has been configured.  Note that we append to the trace
+// file rather than overwriting it.  The trace files that are
+// ultimately written depend on:
+// 1.) Who throws the exception.
+// 2.) Whether the C++ runtime unwinds the stack before the
+//     terminate_handler is called (this is implementation defined).
+//
+// The various cases can are summarized in the table below:
+//
+//                        | libmesh exception | other exception
+//                        -------------------------------------
+// stack unwinds          |        A          |       B
+// stack does not unwind  |        C          |       D
+//
+// Case A: There will be two stack traces in the file: one "useful"
+//         one, and one nearly empty one due to stack unwinding.
+// Case B: You will get one nearly empty stack trace (not great, Bob!)
+// Case C: You will get two nearly identical stack traces, ignore one of them.
+// Case D: You will get one useful stack trace.
 #ifdef LIBMESH_ENABLE_TRACEFILES
   #define libmesh_write_traceout() \
     do { \
       std::stringstream outname; \
       outname << "traceout_" << static_cast<std::size_t>(libMesh::processor_id()) << '_' << getpid() << ".txt"; \
-      std::ofstream traceout(outname.str().c_str()); \
+      std::ofstream traceout(outname.str().c_str(), std::ofstream::app); \
       libMesh::print_trace(traceout); \
     } while(0)
 #else
@@ -344,14 +362,12 @@ extern OStreamProxy err;
 //
 // The libmesh_convergence_failure() macro
 // throws a ConvergenceFailure exception
-//
-// These macros no longer write traceout files themselves, but if the
-// exceptions they throw are uncaught then the
-// libmesh_terminate_handler will write such files.
 #define libmesh_error() \
   do { \
     if (libMesh::n_processors() == 1) \
       libMesh::print_trace(); \
+    else \
+      libmesh_write_traceout(); \
     libmesh_here(); \
     LIBMESH_THROW(libMesh::LogicError()); \
   } while(0)
@@ -360,6 +376,8 @@ extern OStreamProxy err;
   do { \
     if (libMesh::n_processors() == 1) \
       libMesh::print_trace(); \
+    else \
+      libmesh_write_traceout(); \
     libmesh_here(); \
     libMesh::err << msg << std::endl; \
     LIBMESH_THROW(libMesh::LogicError()); \
@@ -369,6 +387,8 @@ extern OStreamProxy err;
   do { \
     if (libMesh::n_processors() == 1) \
       libMesh::print_trace(); \
+    else \
+      libmesh_write_traceout(); \
     libmesh_here(); \
     LIBMESH_THROW(libMesh::NotImplemented()); \
   } while(0)
@@ -377,6 +397,8 @@ extern OStreamProxy err;
   do { \
     if (libMesh::n_processors() == 1) \
       libMesh::print_trace(); \
+    else \
+      libmesh_write_traceout(); \
     libmesh_here(); \
     libMesh::err << msg << std::endl; \
     LIBMESH_THROW(libMesh::NotImplemented()); \
@@ -386,6 +408,8 @@ extern OStreamProxy err;
   do { \
     if (libMesh::n_processors() == 1) \
       libMesh::print_trace(); \
+    else \
+      libmesh_write_traceout(); \
     libmesh_here(); \
     LIBMESH_THROW(libMesh::FileError(filename)); \
   } while(0)
@@ -394,6 +418,8 @@ extern OStreamProxy err;
   do { \
     if (libMesh::n_processors() == 1) \
       libMesh::print_trace(); \
+    else \
+      libmesh_write_traceout(); \
     libmesh_here(); \
     libMesh:err << msg << std::endl; \
     LIBMESH_THROW(libMesh::FileError(filename)); \
