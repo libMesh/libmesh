@@ -132,9 +132,6 @@ void LaspackVector<T>::conjugate()
     {
       T v = (*this)(i);
 
-      // Don't divide by zero!
-      libmesh_assert_not_equal_to (v, T(0));
-
       this->set(i, libmesh_conj(v) );
     }
 }
