@@ -595,7 +595,7 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = $(am__append_1) $(example_name).php stdout.log
+CLEANFILES = out.e $(am__append_1) $(example_name).php stdout.log
 
 # also need to link files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
