@@ -142,6 +142,9 @@
    on unexpected errors */
 #undef ENABLE_TRACEFILES
 
+/* Flag indicating if the library should be built with unique id support */
+#undef ENABLE_UNIQUE_ID
+
 /* Flag indicating if the library should be built with variational smoother
    support */
 #undef ENABLE_VSMOOTHER
@@ -508,6 +511,9 @@
 
 /* If the compiler supports a TLS storage class define it to that here */
 #undef TLS
+
+/* size of unique_id */
+#undef UNIQUE_ID_BYTES
 
 /* Flag indicating if the library should be built using complxex numbers */
 #undef USE_COMPLEX_NUMBERS

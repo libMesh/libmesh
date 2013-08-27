@@ -52,6 +52,9 @@ MeshBase::MeshBase (const Parallel::Communicator &comm,
   _is_prepared   (false),
   _point_locator (NULL),
   _partitioner   (NULL),
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unique_id(DofObject::invalid_unique_id),
+#endif
   _skip_partitioning(false),
   _skip_renumber_nodes_and_elements(false)
 {
@@ -70,6 +73,9 @@ MeshBase::MeshBase (unsigned int d) :
   _is_prepared   (false),
   _point_locator (NULL),
   _partitioner   (NULL),
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unique_id(DofObject::invalid_unique_id),
+#endif
   _skip_partitioning(false),
   _skip_renumber_nodes_and_elements(false)
 {
@@ -89,6 +95,9 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _is_prepared   (other_mesh._is_prepared),
   _point_locator (NULL),
   _partitioner   (NULL),
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unique_id(other_mesh._next_unique_id),
+#endif
   _skip_partitioning(other_mesh._skip_partitioning),
   _skip_renumber_nodes_and_elements(false)
 {
@@ -162,6 +171,11 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 
   if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  // Assign DOF object unique ids
+  this->assign_unique_ids();
+#endif
 
   // Reset our PointLocator.  This needs to happen any time the elements
   // in the underlying elements in the mesh have changed, so we do it here.

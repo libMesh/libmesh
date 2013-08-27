@@ -146,6 +146,16 @@ public:
   dof_id_type & set_id ();
 
   /**
+   * \returns the globally \p unique_id for this \p DofObject
+   */
+  unique_id_type unique_id () const;
+
+  /**
+   * \returns the globally \p unique_id for this \p DofObject as a writeable reference.
+   */
+  unique_id_type & set_unique_id ();
+
+  /**
    * Sets the \p id for this \p DofObject
    */
   void set_id (const dof_id_type dofid)
@@ -156,6 +166,12 @@ public:
    * \p false otherwise.
    */
   bool valid_id () const;
+
+  /**
+   * @returns \p true if this \p DofObject has a valid \p unique_id set,
+   * \p false otherwise.
+   */
+  bool valid_unique_id () const;
 
   /**
    * @returns the processor that this DofObject belongs to.
@@ -319,6 +335,11 @@ public:
   static const dof_id_type invalid_id = static_cast<dof_id_type>(-1);
 
   /**
+   * An invaild \p unique_id to distinguish an uninitialized \p DofObject
+   */
+  static const unique_id_type invalid_unique_id = static_cast<unique_id_type>(-1);
+
+  /**
    * An invalid \p processor_id to distinguish DoFs that have
    * not been assigned to a processor.
    */
@@ -377,6 +398,14 @@ private:
    * The \p id of the \p DofObject
    */
   dof_id_type _id;
+
+
+  /**
+   * A globally unique id, guarenteed not to change as the mesh is repartioned or adapted
+   */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  unique_id_type _unique_id;
+#endif
 
   /**
    * The \p processor_id of the \p DofObject.
@@ -474,6 +503,9 @@ DofObject::DofObject () :
   old_dof_object(NULL),
 #endif
   _id (invalid_id),
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _unique_id (invalid_unique_id),
+#endif
   _processor_id (invalid_processor_id)
 {
   this->invalidate();
@@ -593,10 +625,48 @@ dof_id_type & DofObject::set_id ()
 
 
 inline
+unique_id_type DofObject::unique_id () const
+{
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  libmesh_assert (this->valid_unique_id());
+  return _unique_id;
+#else
+  return invalid_unique_id;
+#endif
+}
+
+
+
+inline
+unique_id_type & DofObject::set_unique_id ()
+{
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  return _unique_id;
+#else
+  libmesh_error();
+#endif
+}
+
+
+
+inline
 bool DofObject::valid_id () const
 {
   return (DofObject::invalid_id != _id);
 }
+
+
+
+inline
+bool DofObject::valid_unique_id () const
+{
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  return (DofObject::invalid_unique_id != _unique_id);
+#else
+  return false;
+#endif
+}
+
 
 
 inline

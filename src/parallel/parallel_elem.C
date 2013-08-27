@@ -31,7 +31,11 @@
 
 namespace
 {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  static const unsigned int header_size = 11;
+#else
   static const unsigned int header_size = 10;
+#endif
 
   static const largest_id_type elem_magic_header = 987654321;
 }
@@ -168,6 +172,14 @@ void pack (const Elem* elem,
   data.push_back (elem->subdomain_id());
   data.push_back (elem->id());
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (elem->valid_unique_id())
+    data.push_back (static_cast<largest_id_type>(elem->unique_id()));
+  else
+    // OK to send invalid unique id, we must not own this DOF
+    data.push_back (static_cast<largest_id_type>(DofObject::invalid_unique_id));
+#endif
+
 #ifdef LIBMESH_ENABLE_AMR
   // use parent_ID of -1 to indicate a level 0 element
   if (elem->level() == 0)
@@ -302,14 +314,20 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
     static_cast<dof_id_type>(*in++);
   libmesh_assert_not_equal_to (id, DofObject::invalid_id);
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  // int 8: dof object unique id
+  const unique_id_type unique_id =
+    static_cast<unique_id_type>(*in++);
+#endif
+
 #ifdef LIBMESH_ENABLE_AMR
-  // int 8: parent dof object id
+  // int 9: parent dof object id
   const dof_id_type parent_id =
     static_cast<dof_id_type>(*in++);
   libmesh_assert (level == 0 || parent_id != DofObject::invalid_id);
   libmesh_assert (level != 0 || parent_id == DofObject::invalid_id);
 
-  // int 9: local child id
+  // int 10: local child id
   const unsigned int which_child_am_i =
     static_cast<unsigned int>(*in++);
 #else
@@ -329,6 +347,9 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
     {
       libmesh_assert_equal_to (elem->level(), level);
       libmesh_assert_equal_to (elem->id(), id);
+//#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      // No check for unqiue id sanity
+//#endif
       libmesh_assert_equal_to (elem->processor_id(), processor_id);
       libmesh_assert_equal_to (elem->subdomain_id(), subdomain_id);
       libmesh_assert_equal_to (elem->type(), type);
@@ -463,9 +484,12 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
 #endif // LIBMESH_ENABLE_AMR
 
       // Assign the IDs
-      elem->subdomain_id() = subdomain_id;
-      elem->processor_id() = processor_id;
-      elem->set_id()       = id;
+      elem->subdomain_id()  = subdomain_id;
+      elem->processor_id()  = processor_id;
+      elem->set_id()        = id;
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      elem->set_unique_id() = unique_id;
+#endif
 
       // Assign the connectivity
       libmesh_assert_equal_to (elem->n_nodes(), n_nodes);

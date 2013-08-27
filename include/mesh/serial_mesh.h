@@ -375,6 +375,15 @@ public:
   const_node_iterator pid_nodes_end   (const processor_id_type proc_id) const;
 
 protected:
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  /**
+   * Assign globally unique IDs to all DOF objects (Elements and Nodes)
+   * if the library has been configured with unique_id support.
+   */
+  virtual void assign_unique_ids();
+#endif
+
   /**
    * The verices (spatial coordinates) of the mesh.
    */
