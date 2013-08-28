@@ -508,8 +508,8 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
   // stdout.processor.####
   if (libMesh::on_command_line ("--redirect-stdout"))
     {
-      std::stringstream filename("stdout.processor.");
-      filename << libMesh::processor_id();
+      std::ostringstream filename;
+      filename << "stdout.processor." << libMesh::processor_id();
       _ofstream.reset (new std::ofstream (filename.str().c_str()));
       // Redirect, saving the original streambufs!
       out_buf = libMesh::out.rdbuf (_ofstream->rdbuf());
