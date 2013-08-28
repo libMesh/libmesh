@@ -960,9 +960,9 @@ void Nemesis_IO::read (const std::string& base_filename)
   // Note that exodus stores sidesets in separate vectors but we want to pack
   // them all into a single vector.  So when we call read_sideset(), we pass an offset
   // into the single vector of all IDs
-  for (int offset=0, i=0; i<nemhelper->get_num_side_sets(); i++)
+  for (int offset=0, i=0; i<nemhelper->num_side_sets; i++)
     {
-      offset += (i > 0 ? nemhelper->get_num_sides_per_set(i-1) : 0); // Compute new offset
+      offset += (i > 0 ? nemhelper->num_sides_per_set[i-1] : 0); // Compute new offset
       nemhelper->read_sideset (i, offset);
     }
 
@@ -973,37 +973,29 @@ void Nemesis_IO::read (const std::string& base_filename)
   // entry in BoundaryInfo.  This offset should be given by my_elem_offset determined in
   // this function...
 
-  // Get references to the elem, side, and ID lists for this processor.  We should be
-  // able to get pointers to these elements on the local processor, and add them to the
-  // BoundaryInfo object
-  const std::vector<int>& elem_list = nemhelper->get_elem_list();
-  const std::vector<int>& side_list = nemhelper->get_side_list();
-  const std::vector<int>& id_list   = nemhelper->get_id_list();
-
-
   // Debugging:
   // Print entries of elem_list
   // libMesh::out << "[" << this->processor_id() << "] "
   // 	       << "elem_list = ";
-  // for (unsigned int e=0; e<elem_list.size(); e++)
+  // for (unsigned int e=0; e<nemhelper->elem_list.size(); e++)
   //   {
-  //     libMesh::out << elem_list[e] << ", ";
+  //     libMesh::out << nemhelper->elem_list[e] << ", ";
   //   }
   // libMesh::out << std::endl;
 
   // Print entries of side_list
   // libMesh::out << "[" << this->processor_id() << "] "
   // 	       << "side_list = ";
-  // for (unsigned int e=0; e<side_list.size(); e++)
+  // for (unsigned int e=0; e<nemhelper->side_list.size(); e++)
   //   {
-  //     libMesh::out << side_list[e] << ", ";
+  //     libMesh::out << nemhelper->side_list[e] << ", ";
   //   }
   // libMesh::out << std::endl;
 
 
   // Loop over the entries of the elem_list, get their pointers from the
   // Mesh data structure, and assign the appropriate side to the BoundaryInfo object.
-  for (unsigned int e=0; e<elem_list.size(); e++)
+  for (unsigned int e=0; e<nemhelper->elem_list.size(); e++)
     {
       // Calling mesh.elem() feels wrong, for example, in
       // ParallelMesh, Mesh::elem() can return NULL so we have to check for this...
@@ -1013,12 +1005,12 @@ void Nemesis_IO::read (const std::string& base_filename)
       // not necessarily in order, so if we did instead loop over the
       // mesh, we would have to search the (unsorted) elem_list vector
       // for each entry!  We'll settle for doing some error checking instead.
-      Elem* elem = mesh.elem(my_elem_offset + (elem_list[e]-1)/*Exodus numbering is 1-based!*/);
+      Elem* elem = mesh.elem(my_elem_offset + (nemhelper->elem_list[e]-1)/*Exodus numbering is 1-based!*/);
 
       if (elem == NULL)
 	{
 	  libMesh::err << "Mesh returned a NULL pointer when asked for element "
-		       << my_elem_offset << " + " << elem_list[e] << " = " << my_elem_offset+elem_list[e] << std::endl;
+		       << my_elem_offset << " + " << nemhelper->elem_list[e] << " = " << my_elem_offset+nemhelper->elem_list[e] << std::endl;
 	  libmesh_error();
 	}
 
@@ -1032,24 +1024,24 @@ void Nemesis_IO::read (const std::string& base_filename)
       // Call the version of add_side which takes a pointer, since we have already gone to
       // the trouble of getting said pointer...
       mesh.boundary_info->add_side (elem,
-				    conv.get_side_map(side_list[e]-1/*Exodus numbering is 1-based*/),
-				    id_list[e]);
+				    conv.get_side_map(nemhelper->side_list[e]-1/*Exodus numbering is 1-based*/),
+				    nemhelper->id_list[e]);
     }
 
   // Debugging: make sure there are as many boundary conditions in the
   // boundary ID object as expected.  Note that, at this point, the
   // mesh still thinks it's serial, so n_boundary_conds() returns the
   // local number of boundary conditions (and is therefore cheap)
-  // which should match elem_list.size().
+  // which should match nemhelper->elem_list.size().
   {
     std::size_t nbcs = mesh.boundary_info->n_boundary_conds();
-    if (nbcs != elem_list.size())
+    if (nbcs != nemhelper->elem_list.size())
       {
 	libMesh::err << "[" << this->processor_id() << "] ";
 	libMesh::err << "BoundaryInfo contains "
 		     << nbcs
 		     << " boundary conditions, while the Exodus file had "
-		     << elem_list.size()
+		     << nemhelper->elem_list.size()
 		     << std::endl;
 	libmesh_error();
       }
@@ -1077,28 +1069,25 @@ void Nemesis_IO::read (const std::string& base_filename)
 //  libMesh::out << std::endl;
 
   // For each nodeset,
-  for (int nodeset=0; nodeset<nemhelper->get_num_node_sets(); nodeset++)
+  for (int nodeset=0; nodeset<nemhelper->num_node_sets; nodeset++)
     {
       // Get the user-defined ID associcated with the nodeset
-      int nodeset_id = nemhelper->get_nodeset_id(nodeset);
+      int nodeset_id = nemhelper->nodeset_ids[nodeset];
 
       if (_verbose)
 	{
 	  libMesh::out << "[" << this->processor_id() << "] ";
-	  libMesh::out << "nemhelper->get_nodeset_id(" << nodeset << ")=" << nodeset_id << std::endl;
+	  libMesh::out << "nemhelper->nodeset_ids[" << nodeset << "]=" << nodeset_id << std::endl;
 	}
 
       // Read the nodeset from file, store them in a vector
       nemhelper->read_nodeset(nodeset);
 
-      // Get access to that vector
-      const std::vector<int>& node_list = nemhelper->get_node_list();
-
       // Add nodes from the node_list to the BoundaryInfo object
-      for(unsigned int node=0; node<node_list.size(); node++)
+      for(unsigned int node=0; node<nemhelper->node_list.size(); node++)
 	{
 	  // Don't run past the end of our node map!
-	  if (to_uint(node_list[node]-1) >= nemhelper->node_num_map.size())
+	  if (to_uint(nemhelper->node_list[node]-1) >= nemhelper->node_num_map.size())
 	    {
 	      libMesh::err << "Error, index is past the end of node_num_map array!" << std::endl;
 	      libmesh_error();
@@ -1106,13 +1095,13 @@ void Nemesis_IO::read (const std::string& base_filename)
 
 	  // We should be able to use the node_num_map data structure set up previously to determine
 	  // the proper global node index.
-	  unsigned global_node_id = nemhelper->node_num_map[ node_list[node]-1 /*Exodus is 1-based!*/ ];
+	  unsigned global_node_id = nemhelper->node_num_map[ nemhelper->node_list[node]-1 /*Exodus is 1-based!*/ ];
 
 	  if (_verbose)
 	    {
 	      libMesh::out << "[" << this->processor_id() << "] "
 			   << "nodeset " << nodeset
-			   << ", local node number: " << node_list[node]-1
+			   << ", local node number: " << nemhelper->node_list[node]-1
 			   << ", global node id: " << global_node_id
 			   << std::endl;
 	    }
