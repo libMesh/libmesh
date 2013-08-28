@@ -72,8 +72,7 @@
 #  endif
 #endif
 
-// Helper macro for knowing whether or not threaded regions are enabled
-#define LIBMESH_USING_THREADS defined(LIBMESH_HAVE_PTHREAD) || defined(LIBMESH_HAVE_TBB_API)
+
 
 namespace libMesh
 {

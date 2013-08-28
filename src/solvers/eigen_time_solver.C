@@ -96,6 +96,8 @@ void EigenTimeSolver::solve ()
   _system.matrix =   &( _system.get_matrix ("System Matrix") );
   this->now_assembling = Matrix_A;
   _system.assembly(true, true);
+  _system.rhs->close();
+  _system.matrix->close();
   //_system.matrix->print_matlab("matrix_A.m");
 
   // Point the system's matrix at B, call assembly again.
@@ -104,6 +106,8 @@ void EigenTimeSolver::solve ()
   _system.matrix =   &( _system.get_matrix ("B") );
   this->now_assembling = Matrix_B;
   _system.assembly(true, true);
+  _system.rhs->close();
+  _system.matrix->close();
   //_system.matrix->print_matlab("matrix_B.m");
 
   // Send matrices A, B to Steffen's SlepcEigenSolver interface

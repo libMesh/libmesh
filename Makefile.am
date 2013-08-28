@@ -12,7 +12,7 @@ AM_CFLAGS        = $(libmesh_CFLAGS)
 # codes.  These will be augmented with method-specific
 # cppflags later on
 AM_CPPFLAGS      = -DLIBMESH_IS_COMPILING_ITSELF \
-		   $(libmesh_contrib_INCLUDES) \
+                   $(libmesh_contrib_INCLUDES) \
                    $(libmesh_optional_INCLUDES) \
                    -I$(top_builddir)/include # required for libmesh_version.h
 
@@ -21,28 +21,28 @@ LIBS             = $(libmesh_optional_LIBS)
 # additional files which must be included in 'make dist'
 EXTRA_DIST = reference_elements \
              include/include_HEADERS \
-	     include/rebuild_include_HEADERS.sh \
-	     src/libmesh_SOURCES \
-	     src/rebuild_libmesh_SOURCES.sh \
+             include/rebuild_include_HEADERS.sh \
+             src/libmesh_SOURCES \
+             src/rebuild_libmesh_SOURCES.sh \
              contrib/tecplot/README \
-	     contrib/bin/strip_dup_incl_paths.pl \
-	     contrib/bin/strip_dup_libs.pl
+             contrib/bin/strip_dup_incl_paths.pl \
+             contrib/bin/strip_dup_libs.pl
 
 nobase_data_DATA = \
-	reference_elements/2D/one_quad.xda \
-	reference_elements/2D/one_quad8.xda \
-	reference_elements/2D/one_quad9.xda \
-	reference_elements/2D/one_tri.xda \
-	reference_elements/2D/one_tri6.xda \
-	reference_elements/3D/one_hex.xda \
-	reference_elements/3D/one_hex20.xda \
-	reference_elements/3D/one_hex27.xda \
-	reference_elements/3D/one_prism.xda \
-	reference_elements/3D/one_prism15.xda \
-	reference_elements/3D/one_prism18.xda \
-	reference_elements/3D/one_pyramid.xda \
-	reference_elements/3D/one_tet.xda \
-	reference_elements/3D/one_tet10.xda
+        reference_elements/2D/one_quad.xda \
+        reference_elements/2D/one_quad8.xda \
+        reference_elements/2D/one_quad9.xda \
+        reference_elements/2D/one_tri.xda \
+        reference_elements/2D/one_tri6.xda \
+        reference_elements/3D/one_hex.xda \
+        reference_elements/3D/one_hex20.xda \
+        reference_elements/3D/one_hex27.xda \
+        reference_elements/3D/one_prism.xda \
+        reference_elements/3D/one_prism15.xda \
+        reference_elements/3D/one_prism18.xda \
+        reference_elements/3D/one_pyramid.xda \
+        reference_elements/3D/one_tet.xda \
+        reference_elements/3D/one_tet10.xda
 
 # Tools in the auxillary directory
 AUX_DIST = build-aux/install-sh \
@@ -84,18 +84,18 @@ libmesh_config_SCRIPTS = contrib/bin/libmesh-config
 #  fix up buggy libtool postdeps under specific compiler/mpi configurations
 install-data-hook:
 	@if (test "x$(prefix)" != "x@prefix@") ; then \
-	  oldprefix="@prefix@" ; \
-	  newprefix="$(prefix)" ; \
-	  for genfile in `find $(DESTDIR)$(prefix) -name "*.pc" -o -name Make.common -o -name libmesh-config -type f` ; do \
-	    echo " " ; \
-	    echo " *** replacing $$oldprefix" ; \
-	    echo " ***      with $$newprefix" ; \
-	    echo " *** in generated file $$genfile" ; \
-	    echo " " ; \
-	    cd $(DESTDIR)$(prefix) && cat $$genfile | $(SED) "s,$$oldprefix,$$newprefix,g" > $$genfile.replaced ; \
-	    cd $(DESTDIR)$(prefix) && mv $$genfile.replaced $$genfile ; \
+          oldprefix="@prefix@" ; \
+          newprefix="$(prefix)" ; \
+          for genfile in `find $(DESTDIR)$(prefix) -name "*.pc" -o -name Make.common -o -name libmesh-config -type f` ; do \
+            echo " " ; \
+            echo " *** replacing $$oldprefix" ; \
+            echo " ***      with $$newprefix" ; \
+            echo " *** in generated file $$genfile" ; \
+            echo " " ; \
+            cd $(DESTDIR)$(prefix) && cat $$genfile | $(SED) "s,$$oldprefix,$$newprefix,g" > $$genfile.replaced ; \
+            cd $(DESTDIR)$(prefix) && mv $$genfile.replaced $$genfile ; \
           done ; \
-	fi
+        fi
 	cd $(DESTDIR)$(prefix) && rm -f Make.common && $(LN_S) etc/libmesh/Make.common Make.common
 	cat $(DESTDIR)$(libmesh_configdir)/libmesh-config | $(SED) "s/has_been_installed=no/has_been_installed=yes/g" > $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed
 	mv $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed $(DESTDIR)$(libmesh_configdir)/libmesh-config && chmod +x $(DESTDIR)$(libmesh_configdir)/libmesh-config
@@ -106,36 +106,36 @@ install-data-hook:
 # this rule invokes emacs on each source file to remove trailing whitespace.
 beautify:
 	for file in `find $(srcdir)/{src,include,examples,tests} -name "*.C" -o -name "*.h" -o -name Makefile.am -type f` ; do \
-	  echo $$file ; \
-	  emacs -batch $$file --eval '(delete-trailing-whitespace)' -f save-buffer 2>/dev/null ; \
-	done
+          echo $$file ; \
+          emacs -batch $$file --eval '(delete-trailing-whitespace)' -f save-buffer 2>/dev/null ; \
+        done
 
 
 # Additional files to be deleted by 'make distclean'
 # _configs.sed seems to be leftover by prefix_config
 DISTCLEANFILES =  \
-	   _configs.sed
+           _configs.sed
 
 # # Additional files to be deleted by 'make maintainer-clean'
 # MAINTAINERCLEANFILES =  \
-# 	   $(AUX_DIST)                              \
-# 	   Makefile.in                              \
-# 	   aclocal.m4                               \
-# 	   aminclude.am                             \
-# 	   autom4te.cache/*                         \
-# 	   config.h	                            \
-# 	   config.h.in	                            \
-# 	   config.log                               \
-# 	   config.status                            \
-# 	   config.sub                               \
-# 	   configure                                \
-# 	   data/Makefile.in                         \
-# 	   src/Makefile.in                          \
-# 	   src/physics/properties/Makefile.in       \
-# 	   test/Makefile.in                         \
-# 	   test/common/Makefile.in 		    \
-# 	   test/comp_ns/Makefile.in		    \
-# 	   test/unit/Makefile.in
+#          $(AUX_DIST)                              \
+#          Makefile.in                              \
+#          aclocal.m4                               \
+#          aminclude.am                             \
+#          autom4te.cache/*                         \
+#          config.h                                 \
+#          config.h.in                              \
+#          config.log                               \
+#          config.status                            \
+#          config.sub                               \
+#          configure                                \
+#          data/Makefile.in                         \
+#          src/Makefile.in                          \
+#          src/physics/properties/Makefile.in       \
+#          test/Makefile.in                         \
+#          test/common/Makefile.in                  \
+#          test/comp_ns/Makefile.in                 \
+#          test/unit/Makefile.in
 
 
 
