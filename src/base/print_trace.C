@@ -29,6 +29,8 @@
 #include "libmesh/print_trace.h"
 #include "libmesh/libmesh.h"
 
+#include <unistd.h>  // needed for getpid()
+
 #if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE) && defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
 
 #include <iostream>

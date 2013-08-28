@@ -15,8 +15,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh/libmesh_common.h"
 
+// C/C++ includes
+#include <unistd.h>  // needed for getpid()
+
+// libmesh includes
+#include "libmesh/libmesh_common.h"
 
 namespace libMesh
 {
@@ -32,6 +36,21 @@ namespace MacroFunctions
                  << " at " << time
                  << std::endl;
   }
-}
 
-}
+  void stop(const char* file, int line, const char* date, const char* time)
+  {
+    if (libMesh::n_processors() == 1)
+      {
+        libMesh::MacroFunctions::here(file, line, date, time);
+#ifdef LIBMESH_HAVE_CSIGNAL
+        libMesh::out << "Stopping process " << getpid() << "..." << std::endl;
+        std::raise(SIGSTOP);
+        libMesh::out << "Continuing process " << getpid() << "..." << std::endl;
+#else
+        libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl;
+#endif
+      }
+  }
+
+} // namespace MacroFunctions
+} // namespace libMesh

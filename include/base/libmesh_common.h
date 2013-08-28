@@ -32,7 +32,6 @@
 #endif
 
 // C/C++ includes everyone should know about
-#include <unistd.h>  // needed for getpid()
 #include <complex>
 // #include <cassert>  // Use libmesh_assert() now
 #ifdef LIBMESH_HAVE_CSIGNAL
@@ -72,15 +71,13 @@ namespace libMesh
 
 
 // A namespace for functions used in the bodies of the macros below.
-// These should not be called by users directly!
+// The macros generally call these functions with __FILE__, __LINE__,
+// __DATE__, and __TIME__ in the appropriate order.  These should not
+// be called by users directly!
 namespace MacroFunctions
 {
-  /**
-   * Implementation of the libmesh_here() macro.  Users should not call this directly.
-   * The libmesh_here() macro calls this function with __FILE__, __LINE__, __DATE__,
-   * and __TIME__ in the appropriate order.
-   */
   void here(const char* file, int line, const char* date, const char* time);
+  void stop(const char* file, int line, const char* date, const char* time);
 }
 
 // Undefine any existing macros
@@ -212,7 +209,7 @@ extern OStreamProxy err;
 #define libmesh_here() \
   do { \
     libMesh::MacroFunctions::here(__FILE__, __LINE__, __DATE__, __TIME__); \
-  } while (0)
+  } while(0)
 
 // the libmesh_stop() macro will stop the code until a SIGCONT signal
 // is recieved.  This is useful, for example, when determining the
@@ -220,23 +217,10 @@ extern OStreamProxy err;
 // instered before and after a questionable operation and the delta
 // memory can be obtained from a ps or top.  This macro only works for
 // serial cases.
-#ifdef LIBMESH_HAVE_CSIGNAL
 #define libmesh_stop() \
   do { \
-    if (libMesh::n_processors() == 1) { \
-      libmesh_here(); \
-      libMesh::out << "Stopping process " << getpid() << "..." << std::endl; \
-      std::raise(SIGSTOP); \
-      libMesh::out << "Continuing process " << getpid() << "..." << std::endl; \
-    } } while(0)
-#else
-#define libmesh_stop() \
-  do { \
-    if (libMesh::n_processors() == 1) { \
-      libmesh_here(); \
-      libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl; \
-    } } while(0)
-#endif
+    libMesh::MacroFunctions::stop(__FILE__, __LINE__, __DATE__, __TIME__); \
+  } while(0)
 
 // The libmesh_dbg_var() macro indicates that an argument to a function
 // is used only in debug mode (i.e., when NDEBUG is not defined).
