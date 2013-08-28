@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_singleton.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/threads.h"
+#include "libmesh/print_trace.h"
 
 
 // C/C++ includes
@@ -302,10 +303,31 @@ std::terminate_handler old_terminate_handler;
 void libmesh_terminate_handler()
 {
   // If this got called then we're probably crashing; let's print a
-  // stack trace.  This stack trace may not be useful if the
-  // implementation has already unwound the stack by the time you
-  // reach the terminate_handler...
-  libmesh_write_traceout();
+  // stack trace.  The trace files that are ultimately written depend on:
+  // 1.) Who throws the exception.
+  // 2.) Whether the C++ runtime unwinds the stack before the
+  //     terminate_handler is called (this is implementation defined).
+  //
+  // The various cases are summarized in the table below:
+  //
+  //                        | libmesh exception | other exception
+  //                        -------------------------------------
+  // stack unwinds          |        A          |       B
+  // stack does not unwind  |        C          |       D
+  //
+  // Case A: There will be two stack traces in the file: one "useful"
+  //         one, and one nearly empty one due to stack unwinding.
+  // Case B: You will get one nearly empty stack trace (not great, Bob!)
+  // Case C: You will get two nearly identical stack traces, ignore one of them.
+  // Case D: You will get one useful stack trace.
+  //
+  // Cases A and B (where the stack unwinds when an exception leaves
+  // main) appear to be non-existent in practice.  I don't have a
+  // definitive list, but the stack does not unwind for GCC on either
+  // Mac or Linux.  I think there's good reasons for this behavior too:
+  // it's much easier to get a stack trace when the stack doesn't
+  // unwind, for example.
+  libMesh::write_traceout();
 
   // If we have MPI and it has been initialized, we need to be sure
   // and call MPI_Abort instead of std::abort, so that the parallel
