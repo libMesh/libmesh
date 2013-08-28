@@ -33,10 +33,6 @@
 
 // C/C++ includes everyone should know about
 #include <complex>
-// #include <cassert>  // Use libmesh_assert() now
-#ifdef LIBMESH_HAVE_CSIGNAL
-#  include <csignal>
-#endif
 #ifdef LIBMESH_HAVE_STDLIB_H
 # include <cstdlib>
 #endif

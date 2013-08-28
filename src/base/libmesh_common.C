@@ -16,12 +16,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C/C++ includes
-#include <unistd.h>  // needed for getpid()
-
 // libmesh includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/print_trace.h"
+
+// C/C++ includes
+#include <unistd.h>  // needed for getpid()
+
+#ifdef LIBMESH_HAVE_CSIGNAL
+#  include <csignal>
+#endif
 
 namespace libMesh
 {
