@@ -223,6 +223,20 @@ void DistributedVector<T>::reciprocal()
 
 
 template <typename T>
+void DistributedVector<T>::conjugate()
+{
+  for (numeric_index_type i=0; i<local_size(); i++)
+    {
+      // Replace values by complex conjugate
+      _values[i] = libmesh_conj(_values[i]);
+    }
+}
+
+
+
+
+
+template <typename T>
 void DistributedVector<T>::add (const T v)
 {
   libmesh_assert (this->initialized());

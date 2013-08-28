@@ -122,6 +122,13 @@ void EigenSparseVector<T>::reciprocal()
 
 
 
+template <typename T>
+void EigenSparseVector<T>::conjugate()
+{
+  _vec = _vec.conjugate();
+}
+
+
 
 template <typename T>
 void EigenSparseVector<T>::add (const T v)

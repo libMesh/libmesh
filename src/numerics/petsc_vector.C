@@ -176,6 +176,18 @@ void PetscVector<T>::reciprocal()
 
 
 template <typename T>
+void PetscVector<T>::conjugate()
+{
+  PetscErrorCode ierr = 0;
+
+  // We just call the PETSc VecConjugate
+  ierr = VecConjugate(_vec);
+         LIBMESH_CHKERRABORT(ierr);
+}
+
+
+
+template <typename T>
 void PetscVector<T>::add (const numeric_index_type i, const T value)
 {
   this->_restore_array();
