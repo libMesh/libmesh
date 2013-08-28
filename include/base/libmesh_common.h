@@ -70,6 +70,19 @@ extern "C" {
 namespace libMesh
 {
 
+
+// A namespace for functions used in the bodies of the macros below.
+// These should not be called by users directly!
+namespace MacroFunctions
+{
+  /**
+   * Implementation of the libmesh_here() macro.  Users should not call this directly.
+   * The libmesh_here() macro calls this function with __FILE__, __LINE__, __DATE__,
+   * and __TIME__ in the appropriate order.
+   */
+  void here(const char* file, int line, const char* date, const char* time);
+}
+
 // Undefine any existing macros
 #ifdef Real
 #  undef Real
@@ -196,12 +209,9 @@ extern OStreamProxy err;
 // These are useful macros that behave like functions in the code.
 // If you want to make sure you are accessing a section of code just
 // stick a libmesh_here(); in it, for example
-
 #define libmesh_here() \
   do { \
-    libMesh::err << "[" << static_cast<std::size_t>(libMesh::processor_id()) << "] " \
-                 << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ \
-                 << " at " << __TIME__ << std::endl; \
+    libMesh::MacroFunctions::here(__FILE__, __LINE__, __DATE__, __TIME__); \
   } while (0)
 
 // the libmesh_stop() macro will stop the code until a SIGCONT signal
