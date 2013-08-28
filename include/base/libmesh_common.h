@@ -327,7 +327,7 @@ extern OStreamProxy err;
 // 2.) Whether the C++ runtime unwinds the stack before the
 //     terminate_handler is called (this is implementation defined).
 //
-// The various cases can are summarized in the table below:
+// The various cases are summarized in the table below:
 //
 //                        | libmesh exception | other exception
 //                        -------------------------------------
@@ -339,6 +339,13 @@ extern OStreamProxy err;
 // Case B: You will get one nearly empty stack trace (not great, Bob!)
 // Case C: You will get two nearly identical stack traces, ignore one of them.
 // Case D: You will get one useful stack trace.
+//
+// Cases A and B (where the stack unwinds when an exception leaves
+// main) appear to be non-existent in practice.  I don't have a
+// definitive list, but the stack does not unwind for GCC on either
+// Mac or Linux.  I think there's good reasons for this behavior too:
+// it's much easier to get a stack trace when the stack doesn't
+// unwind, for example.
 #ifdef LIBMESH_ENABLE_TRACEFILES
   #define libmesh_write_traceout() \
     do { \
