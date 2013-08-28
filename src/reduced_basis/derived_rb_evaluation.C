@@ -19,6 +19,7 @@
 
 // C++ includes
 #include <sstream>
+#include <fstream>
 #include <sys/stat.h>
 
 #include "libmesh/derived_rb_evaluation.h"

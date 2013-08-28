@@ -32,7 +32,6 @@
 #endif
 
 // C/C++ includes everyone should know about
-#include <fstream> // needed for argument to print_trace()
 #include <unistd.h>  // needed for getpid()
 #include <complex>
 // #include <cassert>  // Use libmesh_assert() now
