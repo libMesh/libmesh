@@ -123,6 +123,19 @@ void LaspackVector<T>::reciprocal()
 
 
 
+template <typename T>
+void LaspackVector<T>::conjugate()
+{
+  const numeric_index_type n = this->size();
+
+  for (numeric_index_type i=0; i<n; i++)
+    {
+      T v = (*this)(i);
+
+      this->set(i, libmesh_conj(v) );
+    }
+}
+
 
 template <typename T>
 void LaspackVector<T>::add (const T v)
