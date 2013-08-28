@@ -43,6 +43,7 @@
 # include <cstdlib>
 #endif
 #include <typeinfo> // std::bad_cast
+#include <sstream> // for std::stringstream used in libmesh_write_traceout()
 
 // _basic_ library functionality
 #include "libmesh/libmesh_base.h"
