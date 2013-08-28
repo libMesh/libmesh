@@ -27,11 +27,14 @@
 
 #include "libmesh/libmesh_config.h"
 #include "libmesh/print_trace.h"
+#include "libmesh/libmesh.h"
 
 #if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE) && defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
 
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <sstream>
 #include <execinfo.h>
 #include <cxxabi.h>
 #include <cstdlib>
@@ -125,3 +128,17 @@ std::string demangle(const char *name) { return std::string(name); }
 }
 
 #endif
+
+
+namespace libMesh
+{
+  void write_traceout()
+  {
+#ifdef LIBMESH_ENABLE_TRACEFILES
+    std::stringstream outname;
+    outname << "traceout_" << static_cast<std::size_t>(libMesh::processor_id()) << '_' << getpid() << ".txt";
+    std::ofstream traceout(outname.str().c_str(), std::ofstream::app);
+    libMesh::print_trace(traceout);
+#endif
+  }
+}
