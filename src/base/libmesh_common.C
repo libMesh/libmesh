@@ -21,6 +21,7 @@
 
 // libmesh includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/print_trace.h"
 
 namespace libMesh
 {
@@ -37,6 +38,8 @@ namespace MacroFunctions
                  << std::endl;
   }
 
+
+
   void stop(const char* file, int line, const char* date, const char* time)
   {
     if (libMesh::n_processors() == 1)
@@ -50,6 +53,16 @@ namespace MacroFunctions
         libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl;
 #endif
       }
+  }
+
+
+  void report_error(const char* file, int line, const char* date, const char* time)
+  {
+    if (libMesh::n_processors() == 1)
+      libMesh::print_trace();
+    else
+      libMesh::write_traceout();
+    libMesh::MacroFunctions::here(file, line, date, time);
   }
 
 } // namespace MacroFunctions

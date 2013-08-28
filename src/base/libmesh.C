@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_singleton.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/threads.h"
+#include "libmesh/print_trace.h"
 
 
 // C/C++ includes

@@ -51,7 +51,6 @@ extern "C" {
 
 // Proxy class for libMesh::out/err output
 #include "libmesh/ostream_proxy.h"
-#include "libmesh/print_trace.h"
 
 // Here we add missing types to the standard namespace.  For example,
 // std::max(double, float) etc... are well behaved but not defined
@@ -73,11 +72,13 @@ namespace libMesh
 // A namespace for functions used in the bodies of the macros below.
 // The macros generally call these functions with __FILE__, __LINE__,
 // __DATE__, and __TIME__ in the appropriate order.  These should not
-// be called by users directly!
+// be called by users directly!  The implementations can be found in
+// libmesh_common.C.
 namespace MacroFunctions
 {
   void here(const char* file, int line, const char* date, const char* time);
   void stop(const char* file, int line, const char* date, const char* time);
+  void report_error(const char* file, int line, const char* date, const char* time);
 }
 
 // Undefine any existing macros
@@ -324,63 +325,39 @@ extern OStreamProxy err;
 // throws a ConvergenceFailure exception
 #define libmesh_error() \
   do { \
-    if (libMesh::n_processors() == 1) \
-      libMesh::print_trace(); \
-    else \
-      libMesh::write_traceout(); \
-    libmesh_here(); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
     LIBMESH_THROW(libMesh::LogicError()); \
   } while(0)
 
 #define libmesh_error_msg(msg) \
   do { \
-    if (libMesh::n_processors() == 1) \
-      libMesh::print_trace(); \
-    else \
-      libMesh::write_traceout(); \
-    libmesh_here(); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
     libMesh::err << msg << std::endl; \
     LIBMESH_THROW(libMesh::LogicError()); \
   } while(0)
 
 #define libmesh_not_implemented() \
   do { \
-    if (libMesh::n_processors() == 1) \
-      libMesh::print_trace(); \
-    else \
-      libMesh::write_traceout(); \
-    libmesh_here(); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
     LIBMESH_THROW(libMesh::NotImplemented()); \
   } while(0)
 
 #define libmesh_not_implemented_msg(msg) \
   do { \
-    if (libMesh::n_processors() == 1) \
-      libMesh::print_trace(); \
-    else \
-      libMesh::write_traceout(); \
-    libmesh_here(); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
     libMesh::err << msg << std::endl; \
     LIBMESH_THROW(libMesh::NotImplemented()); \
   } while(0)
 
 #define libmesh_file_error(filename) \
   do { \
-    if (libMesh::n_processors() == 1) \
-      libMesh::print_trace(); \
-    else \
-      libMesh::write_traceout(); \
-    libmesh_here(); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
     LIBMESH_THROW(libMesh::FileError(filename)); \
   } while(0)
 
 #define libmesh_file_error_msg(filename, msg) \
   do { \
-    if (libMesh::n_processors() == 1) \
-      libMesh::print_trace(); \
-    else \
-      libMesh::write_traceout(); \
-    libmesh_here(); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
     libMesh:err << msg << std::endl; \
     LIBMESH_THROW(libMesh::FileError(filename)); \
   } while(0)
