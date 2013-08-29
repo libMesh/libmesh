@@ -649,18 +649,18 @@ void ExodusII_IO::read (const std::string& fname)
         {
             ex_io_helper.read_sideset_info(); // Get basic information about ALL sidesets
             int offset=0;
-            for (int i=0; i<ex_io_helper.get_num_side_sets(); i++)
+            for (int i=0; i<ex_io_helper.num_side_sets; i++)
             {
-                offset += (i > 0 ? ex_io_helper.get_num_sides_per_set(i-1) : 0); // Compute new offset
+                offset += (i > 0 ? ex_io_helper.num_sides_per_set[i-1] : 0); // Compute new offset
                 ex_io_helper.read_sideset (i, offset);
                 
                 mesh.boundary_info->sideset_name(ex_io_helper.get_side_set_id(i)) =
                 ex_io_helper.get_side_set_name(i);
             }
             
-            const std::vector<int>& elem_list = ex_io_helper.get_elem_list();
-            const std::vector<int>& side_list = ex_io_helper.get_side_list();
-            const std::vector<int>& id_list   = ex_io_helper.get_id_list();
+            const std::vector<int>& elem_list = ex_io_helper.elem_list;
+            const std::vector<int>& side_list = ex_io_helper.side_list;
+            const std::vector<int>& id_list   = ex_io_helper.id_list;
             
             for (unsigned int e=0; e<elem_list.size(); e++)
             {
@@ -691,16 +691,16 @@ void ExodusII_IO::read (const std::string& fname)
         {
             ex_io_helper.read_nodeset_info();
             
-            for (int nodeset=0; nodeset<ex_io_helper.get_num_node_sets(); nodeset++)
+            for (int nodeset=0; nodeset<ex_io_helper.num_node_sets; nodeset++)
             {
-                int nodeset_id = ex_io_helper.get_nodeset_id(nodeset);
+                int nodeset_id = ex_io_helper.get_node_set_id(nodeset);
                 
                 mesh.boundary_info->nodeset_name(nodeset_id) =
                 ex_io_helper.get_node_set_name(nodeset);
                 
                 ex_io_helper.read_nodeset(nodeset);
                 
-                const std::vector<int>& node_list = ex_io_helper.get_node_list();
+                const std::vector<int>& node_list = ex_io_helper.node_list;
                 
                 for(unsigned int node=0; node<node_list.size(); node++)
                 {
