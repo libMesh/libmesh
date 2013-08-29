@@ -127,13 +127,19 @@ void DenseMatrixBase<T>::print_scientific (std::ostream& os) const
 template<typename T>
 void DenseMatrixBase<T>::print (std::ostream& os) const
 {
-  for (unsigned int i=0; i<this->m(); i++)
+    unsigned int width = 17, precision = 9;
+    
+    out << "Size: " << this->m() << ",  " << this->n() << std::endl;
+    for (unsigned int i=0; i< this->m(); i++)
     {
-      for (unsigned int j=0; j<this->n(); j++)
-	os << std::setw(8)
-	   << this->el(i,j) << " ";
-
-      os << std::endl;
+        for (unsigned int j=0; j < this->n(); j++)
+            if (this->el(i,j) == 0.0)
+                out << std::setw(width) << this->el(i,j);
+            else if (log10(fabs(this->el(i,j))) >= -1)
+                out << std::setw(width) << std::setprecision(precision) << this->el(i,j);
+            else
+                out << std::setw(width) << std::showpoint << std::setprecision(precision) << this->el(i,j);
+        out << std::endl;
     }
 
   return;
