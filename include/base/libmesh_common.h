@@ -32,18 +32,11 @@
 #endif
 
 // C/C++ includes everyone should know about
-#include <fstream> // needed for argument to print_trace()
-#include <unistd.h>  // needed for getpid()
 #include <complex>
-// #include <cassert>  // Use libmesh_assert() now
-#ifdef LIBMESH_HAVE_CSIGNAL
-#  include <csignal>
-#endif
 #ifdef LIBMESH_HAVE_STDLIB_H
 # include <cstdlib>
 #endif
 #include <typeinfo> // std::bad_cast
-#include <sstream> // for std::stringstream used in libmesh_write_traceout()
 
 // _basic_ library functionality
 #include "libmesh/libmesh_base.h"
@@ -54,7 +47,6 @@ extern "C" {
 
 // Proxy class for libMesh::out/err output
 #include "libmesh/ostream_proxy.h"
-#include "libmesh/print_trace.h"
 
 // Here we add missing types to the standard namespace.  For example,
 // std::max(double, float) etc... are well behaved but not defined
@@ -71,6 +63,19 @@ extern "C" {
 
 namespace libMesh
 {
+
+
+// A namespace for functions used in the bodies of the macros below.
+// The macros generally call these functions with __FILE__, __LINE__,
+// __DATE__, and __TIME__ in the appropriate order.  These should not
+// be called by users directly!  The implementations can be found in
+// libmesh_common.C.
+namespace MacroFunctions
+{
+  void here(const char* file, int line, const char* date, const char* time);
+  void stop(const char* file, int line, const char* date, const char* time);
+  void report_error(const char* file, int line, const char* date, const char* time);
+}
 
 // Undefine any existing macros
 #ifdef Real
@@ -198,13 +203,10 @@ extern OStreamProxy err;
 // These are useful macros that behave like functions in the code.
 // If you want to make sure you are accessing a section of code just
 // stick a libmesh_here(); in it, for example
-
 #define libmesh_here() \
   do { \
-    libMesh::err << "[" << static_cast<std::size_t>(libMesh::processor_id()) << "] " \
-                 << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ \
-                 << " at " << __TIME__ << std::endl; \
-  } while (0)
+    libMesh::MacroFunctions::here(__FILE__, __LINE__, __DATE__, __TIME__); \
+  } while(0)
 
 // the libmesh_stop() macro will stop the code until a SIGCONT signal
 // is recieved.  This is useful, for example, when determining the
@@ -212,23 +214,10 @@ extern OStreamProxy err;
 // instered before and after a questionable operation and the delta
 // memory can be obtained from a ps or top.  This macro only works for
 // serial cases.
-#ifdef LIBMESH_HAVE_CSIGNAL
 #define libmesh_stop() \
   do { \
-    if (libMesh::n_processors() == 1) { \
-      libmesh_here(); \
-      libMesh::out << "Stopping process " << getpid() << "..." << std::endl; \
-      std::raise(SIGSTOP); \
-      libMesh::out << "Continuing process " << getpid() << "..." << std::endl; \
-    } } while(0)
-#else
-#define libmesh_stop() \
-  do { \
-    if (libMesh::n_processors() == 1) { \
-      libmesh_here(); \
-      libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl; \
-    } } while(0)
-#endif
+    libMesh::MacroFunctions::stop(__FILE__, __LINE__, __DATE__, __TIME__); \
+  } while(0)
 
 // The libmesh_dbg_var() macro indicates that an argument to a function
 // is used only in debug mode (i.e., when NDEBUG is not defined).
@@ -319,46 +308,6 @@ extern OStreamProxy err;
 
 #endif
 
-// The libmesh_write_traceout() macro writes stack trace files, if
-// that feature has been configured.  Note that we append to the trace
-// file rather than overwriting it.  The trace files that are
-// ultimately written depend on:
-// 1.) Who throws the exception.
-// 2.) Whether the C++ runtime unwinds the stack before the
-//     terminate_handler is called (this is implementation defined).
-//
-// The various cases are summarized in the table below:
-//
-//                        | libmesh exception | other exception
-//                        -------------------------------------
-// stack unwinds          |        A          |       B
-// stack does not unwind  |        C          |       D
-//
-// Case A: There will be two stack traces in the file: one "useful"
-//         one, and one nearly empty one due to stack unwinding.
-// Case B: You will get one nearly empty stack trace (not great, Bob!)
-// Case C: You will get two nearly identical stack traces, ignore one of them.
-// Case D: You will get one useful stack trace.
-//
-// Cases A and B (where the stack unwinds when an exception leaves
-// main) appear to be non-existent in practice.  I don't have a
-// definitive list, but the stack does not unwind for GCC on either
-// Mac or Linux.  I think there's good reasons for this behavior too:
-// it's much easier to get a stack trace when the stack doesn't
-// unwind, for example.
-#ifdef LIBMESH_ENABLE_TRACEFILES
-  #define libmesh_write_traceout() \
-    do { \
-      std::stringstream outname; \
-      outname << "traceout_" << static_cast<std::size_t>(libMesh::processor_id()) << '_' << getpid() << ".txt"; \
-      std::ofstream traceout(outname.str().c_str(), std::ofstream::app); \
-      libMesh::print_trace(traceout); \
-    } while(0)
-#else
-  #define libmesh_write_traceout() \
-    do { } while (0)
-#endif
-
 // The libmesh_error() macro prints a message and throws a LogicError
 // exception
 //
@@ -372,63 +321,39 @@ extern OStreamProxy err;
 // throws a ConvergenceFailure exception
 #define libmesh_error() \
   do { \
-    if (libMesh::n_processors() == 1) \
-      libMesh::print_trace(); \
-    else \
-      libmesh_write_traceout(); \
-    libmesh_here(); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
     LIBMESH_THROW(libMesh::LogicError()); \
   } while(0)
 
 #define libmesh_error_msg(msg) \
   do { \
-    if (libMesh::n_processors() == 1) \
-      libMesh::print_trace(); \
-    else \
-      libmesh_write_traceout(); \
-    libmesh_here(); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
     libMesh::err << msg << std::endl; \
     LIBMESH_THROW(libMesh::LogicError()); \
   } while(0)
 
 #define libmesh_not_implemented() \
   do { \
-    if (libMesh::n_processors() == 1) \
-      libMesh::print_trace(); \
-    else \
-      libmesh_write_traceout(); \
-    libmesh_here(); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
     LIBMESH_THROW(libMesh::NotImplemented()); \
   } while(0)
 
 #define libmesh_not_implemented_msg(msg) \
   do { \
-    if (libMesh::n_processors() == 1) \
-      libMesh::print_trace(); \
-    else \
-      libmesh_write_traceout(); \
-    libmesh_here(); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
     libMesh::err << msg << std::endl; \
     LIBMESH_THROW(libMesh::NotImplemented()); \
   } while(0)
 
 #define libmesh_file_error(filename) \
   do { \
-    if (libMesh::n_processors() == 1) \
-      libMesh::print_trace(); \
-    else \
-      libmesh_write_traceout(); \
-    libmesh_here(); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
     LIBMESH_THROW(libMesh::FileError(filename)); \
   } while(0)
 
 #define libmesh_file_error_msg(filename, msg) \
   do { \
-    if (libMesh::n_processors() == 1) \
-      libMesh::print_trace(); \
-    else \
-      libmesh_write_traceout(); \
-    libmesh_here(); \
+    libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
     libMesh:err << msg << std::endl; \
     LIBMESH_THROW(libMesh::FileError(filename)); \
   } while(0)

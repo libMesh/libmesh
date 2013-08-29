@@ -4,6 +4,7 @@ libmesh_SOURCES =  \
         src/base/dof_map_constraints.C \
         src/base/dof_object.C \
         src/base/libmesh.C \
+        src/base/libmesh_common.C \
         src/base/libmesh_isnan.c \
         src/base/libmesh_singleton.C \
         src/base/periodic_boundaries.C \
