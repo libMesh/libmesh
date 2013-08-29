@@ -172,6 +172,14 @@ void EpetraVector<T>::reciprocal()
 
 
 template <typename T>
+void EpetraVector<T>::conjugate()
+{
+  // EPetra is real, rendering this a no-op.
+}
+
+
+
+template <typename T>
 void EpetraVector<T>::add (const numeric_index_type i_in, const T value_in)
 {
   int i = static_cast<int> (i_in);
