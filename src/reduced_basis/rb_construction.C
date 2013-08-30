@@ -28,6 +28,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/exodusII_io.h"
+#include "libmesh/gmv_io.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/getpot.h"
 #include "libmesh/mesh_base.h"
@@ -1150,9 +1151,14 @@ Real RBConstruction::truth_solve(int plot_solution)
 
   if(plot_solution > 0)
   {
+#if defined(LIBMESH_USE_COMPLEX_NUMBERS)
+    GMVIO(get_mesh()).write_equation_systems ("truth.gmv",
+      this->get_equation_systems());
+#else
 #ifdef LIBMESH_HAVE_EXODUS_API
     ExodusII_IO(get_mesh()).write_equation_systems ("truth.e",
-                                              this->get_equation_systems());
+      this->get_equation_systems());
+#endif
 #endif
   }
 
