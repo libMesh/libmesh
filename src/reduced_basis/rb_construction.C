@@ -1375,7 +1375,8 @@ void RBConstruction::update_RB_system_matrices()
     for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
       for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
       {
-        get_rb_evaluation().RB_output_vectors[n][q_l](i) = get_output_vector(n,q_l)->dot(get_rb_evaluation().get_basis_function(i));
+        get_rb_evaluation().RB_output_vectors[n][q_l](i) =
+          get_output_vector(n,q_l)->dot(get_rb_evaluation().get_basis_function(i));
       }
 
     for(unsigned int j=0; j<RB_size; j++)
@@ -1388,13 +1389,13 @@ void RBConstruction::update_RB_system_matrices()
         temp->zero();
         inner_product_matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
 
-        value = get_rb_evaluation().get_basis_function(i).dot(*temp);
+        value = temp->dot( get_rb_evaluation().get_basis_function(i) );
         get_rb_evaluation().RB_inner_product_matrix(i,j) = value;
         if(i!=j)
         {
           // The inner product matrix is assumed
-          // to be symmetric
-          get_rb_evaluation().RB_inner_product_matrix(j,i) = value;
+          // to be hermitian
+          get_rb_evaluation().RB_inner_product_matrix(j,i) = libmesh_conj(value);
         }
       }
 
