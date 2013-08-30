@@ -19,7 +19,6 @@
 #include <string>
 #include <cstdlib> // std::strtol
 #include <sstream>
-#include <fstream>
 
 // Local includes
 #include "libmesh/abaqus_io.h"

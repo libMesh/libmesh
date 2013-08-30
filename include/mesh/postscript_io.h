@@ -27,8 +27,9 @@
 #include "libmesh/point.h"
 
 // C++ includes
-#include <vector>
+#include <fstream>
 #include <sstream>
+#include <vector>
 
 namespace libMesh
 {
