@@ -333,6 +333,24 @@ void RBConstruction::print_info()
   libMesh::out << std::endl;
 }
 
+void RBConstruction::print_basis_function_orthogonality()
+{
+  AutoPtr< NumericVector<Number> > temp = solution->clone();
+
+  for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
+  {
+    for(unsigned int j=0; j<get_rb_evaluation().get_n_basis_functions(); j++)
+    {
+      inner_product_matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
+      Number value = temp->dot( get_rb_evaluation().get_basis_function(i) );
+      
+      libMesh::out << value << " ";
+    }
+    libMesh::out << std::endl;
+  }
+  libMesh::out << std::endl;
+}
+
 void RBConstruction::set_rb_assembly_expansion(RBAssemblyExpansion& rb_assembly_expansion_in)
 {
   rb_assembly_expansion = &rb_assembly_expansion_in;
@@ -1174,22 +1192,17 @@ void RBConstruction::enrich_RB_space()
   new_bf->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
   *new_bf = *solution;
 
-  // compute orthogonalization
-  AutoPtr< NumericVector<Number> > proj_index = NumericVector<Number>::build(this->comm());
-  proj_index->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-
   for(unsigned int index=0; index<get_rb_evaluation().get_n_basis_functions(); index++)
   {
-    // invoke copy constructor for NumericVector
-    *proj_index = get_rb_evaluation().get_basis_function(index);
-    inner_product_matrix->vector_mult(*inner_product_storage_vector,*proj_index);
+    inner_product_matrix->vector_mult(*inner_product_storage_vector, *new_bf);
 
-    Number scalar = inner_product_storage_vector->dot(*new_bf);
-    new_bf->add(-scalar,*proj_index);
+    Number scalar =
+      inner_product_storage_vector->dot(get_rb_evaluation().get_basis_function(index));
+    new_bf->add(-scalar, get_rb_evaluation().get_basis_function(index));
   }
 
   // Normalize new_bf
-  inner_product_matrix->vector_mult(*inner_product_storage_vector,*new_bf);
+  inner_product_matrix->vector_mult(*inner_product_storage_vector, *new_bf);
   Number new_bf_norm = std::sqrt( inner_product_storage_vector->dot(*new_bf) );
 
   if(new_bf_norm == 0.)
