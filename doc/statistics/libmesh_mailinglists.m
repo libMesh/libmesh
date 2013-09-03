@@ -45,6 +45,7 @@ membership_data = {
     {'Jun 2013', 113, 237}
     {'Jul 2013', 114, 240}
     {'Aug 2013', 114, 242}
+    {'Sep 2013', 113, 241}
                   }; % remember to update the indices below!
 
 % The early membership data is spotty, so set indices which are meaningful
@@ -52,7 +53,7 @@ membership_data = {
 membership_indices = [1];                                        % 2010
 membership_indices = [membership_indices, 12+[7, 8, 9, 11, 12]]; % 2011
 membership_indices = [membership_indices, 24+linspace(1,12,12)]; % 2012
-membership_indices = [membership_indices, 36+linspace(1,8,8)]; % 2013 <-- Update me
+membership_indices = [membership_indices, 36+linspace(1,9,9)]; % 2013 <-- Update me
 
 % libmesh-devel
 % https://sourceforge.net/mailarchive/forum.php?forum_name=libmesh-devel
@@ -68,7 +69,7 @@ devel_data = {
     {'2010', 24,        36,     98,     45,     25,     60,     17,     36,     48,     45,     65,     39}
     {'2011', 26,        48,     151,    108,    61,     108,    27,     50,     43,     43,     27,     37}
     {'2012', 56,        120,    72,     57,     82,     66,     51,     75,    166,    232,    284,    105} % Dec 10, 2012 libmesh moved to github
-    {'2013', 168,       151,    30,     145,    26,     53,     76}
+    {'2013', 168,       151,    30,     145,    26,     53,     76,     33}
     };
 
 
@@ -86,7 +87,7 @@ users_data = {
     {'2010',    84,     60,     184,    112,    60,     90,     23,     70,     119,    27,     47,     54}
     {'2011',    22,     19,     92,     93,     35,     91,     32,     61,     7,      69,     81,     23}
     {'2012',    64,     95,     35,     36,     63,     98,     70,     171,    149,    64,     67,    126} % Dec 10, 2012 libmesh moved to github
-    {'2013',    108,    104,   171,     133,   108,    100,     93}
+    {'2013',    108,    104,   171,     133,   108,    100,     93,     126}
     };
 
 

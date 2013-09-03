@@ -16,6 +16,7 @@ hold on
 % The first month with statistics is October 2007
 %               Read    Write   Total files updated
 cell_data = {
+{'Aug', '2013',  2      ,0      ,0}
 {'Jul', '2013',  6      ,0      ,0}
 {'Jun', '2013', 34      ,0      ,0}
 {'May', '2013', 68      ,0      ,0}
