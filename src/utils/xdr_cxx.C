@@ -21,6 +21,7 @@
 #include <limits>
 #include <iomanip>
 #include <sstream>
+#include <fstream>
 
 // Local includes
 #include "libmesh/xdr_cxx.h"

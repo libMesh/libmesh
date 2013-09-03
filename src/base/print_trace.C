@@ -30,13 +30,13 @@
 #include "libmesh/libmesh.h"
 
 #include <unistd.h>  // needed for getpid()
+#include <fstream>
+#include <sstream>
 
 #if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE) && defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
 
 #include <iostream>
 #include <string>
-#include <fstream>
-#include <sstream>
 #include <execinfo.h>
 #include <cxxabi.h>
 #include <cstdlib>
