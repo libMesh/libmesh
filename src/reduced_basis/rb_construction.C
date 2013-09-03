@@ -1145,7 +1145,7 @@ Real RBConstruction::truth_solve(int plot_solution)
   {
     truth_outputs[n] = 0.;
     for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
-      truth_outputs[n] += libmesh_conj(get_rb_theta_expansion().eval_output_theta(n, q_l, mu))*
+      truth_outputs[n] += get_rb_theta_expansion().eval_output_theta(n, q_l, mu)*
                           get_output_vector(n,q_l)->dot(*solution);
   }
 
