@@ -569,7 +569,7 @@ namespace Utility {
   template <> \
   ENUM_NAME string_to_enum<ENUM_NAME> (const std::string& s) \
   { \
-    void init_##VAR_NAME##_to_enum(); \
+    init_##VAR_NAME##_to_enum(); \
  \
     std::string upper(s); \
     std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper); \
