@@ -20,7 +20,6 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <fstream>
 
 // Local includes
 #include "libmesh/postscript_io.h"

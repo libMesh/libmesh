@@ -333,6 +333,13 @@ public:
    * Print out info that describes the current setup of this RBConstruction.
    */
   virtual void print_info();
+  
+  /**
+   * Print out a matrix that shows the orthogonality of the RB basis functions.
+   * This is a helpful debugging tool, e.g. orthogonality can be degraded
+   * due to finite precision arithmetic.
+   */
+  void print_basis_function_orthogonality();
 
   /**
    * Get delta_N, the number of basis functions we

@@ -28,6 +28,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/exodusII_io.h"
+#include "libmesh/gmv_io.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/getpot.h"
 #include "libmesh/mesh_base.h"
@@ -330,6 +331,24 @@ void RBConstruction::print_info()
   libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
+  libMesh::out << std::endl;
+}
+
+void RBConstruction::print_basis_function_orthogonality()
+{
+  AutoPtr< NumericVector<Number> > temp = solution->clone();
+
+  for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
+  {
+    for(unsigned int j=0; j<get_rb_evaluation().get_n_basis_functions(); j++)
+    {
+      inner_product_matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
+      Number value = temp->dot( get_rb_evaluation().get_basis_function(i) );
+      
+      libMesh::out << value << " ";
+    }
+    libMesh::out << std::endl;
+  }
   libMesh::out << std::endl;
 }
 
@@ -1126,15 +1145,20 @@ Real RBConstruction::truth_solve(int plot_solution)
   {
     truth_outputs[n] = 0.;
     for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
-      truth_outputs[n] += libmesh_conj(get_rb_theta_expansion().eval_output_theta(n, q_l, mu))*
+      truth_outputs[n] += get_rb_theta_expansion().eval_output_theta(n, q_l, mu)*
                           get_output_vector(n,q_l)->dot(*solution);
   }
 
   if(plot_solution > 0)
   {
+#if defined(LIBMESH_USE_COMPLEX_NUMBERS)
+    GMVIO(get_mesh()).write_equation_systems ("truth.gmv",
+      this->get_equation_systems());
+#else
 #ifdef LIBMESH_HAVE_EXODUS_API
     ExodusII_IO(get_mesh()).write_equation_systems ("truth.e",
-                                              this->get_equation_systems());
+      this->get_equation_systems());
+#endif
 #endif
   }
 
@@ -1174,22 +1198,17 @@ void RBConstruction::enrich_RB_space()
   new_bf->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
   *new_bf = *solution;
 
-  // compute orthogonalization
-  AutoPtr< NumericVector<Number> > proj_index = NumericVector<Number>::build(this->comm());
-  proj_index->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-
   for(unsigned int index=0; index<get_rb_evaluation().get_n_basis_functions(); index++)
   {
-    // invoke copy constructor for NumericVector
-    *proj_index = get_rb_evaluation().get_basis_function(index);
-    inner_product_matrix->vector_mult(*inner_product_storage_vector,*proj_index);
+    inner_product_matrix->vector_mult(*inner_product_storage_vector, *new_bf);
 
-    Number scalar = inner_product_storage_vector->dot(*new_bf);
-    new_bf->add(-scalar,*proj_index);
+    Number scalar =
+      inner_product_storage_vector->dot(get_rb_evaluation().get_basis_function(index));
+    new_bf->add(-scalar, get_rb_evaluation().get_basis_function(index));
   }
 
   // Normalize new_bf
-  inner_product_matrix->vector_mult(*inner_product_storage_vector,*new_bf);
+  inner_product_matrix->vector_mult(*inner_product_storage_vector, *new_bf);
   Number new_bf_norm = std::sqrt( inner_product_storage_vector->dot(*new_bf) );
 
   if(new_bf_norm == 0.)
@@ -1362,7 +1381,8 @@ void RBConstruction::update_RB_system_matrices()
     for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
       for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
       {
-        get_rb_evaluation().RB_output_vectors[n][q_l](i) = get_output_vector(n,q_l)->dot(get_rb_evaluation().get_basis_function(i));
+        get_rb_evaluation().RB_output_vectors[n][q_l](i) =
+          get_output_vector(n,q_l)->dot(get_rb_evaluation().get_basis_function(i));
       }
 
     for(unsigned int j=0; j<RB_size; j++)
@@ -1375,13 +1395,13 @@ void RBConstruction::update_RB_system_matrices()
         temp->zero();
         inner_product_matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
 
-        value = get_rb_evaluation().get_basis_function(i).dot(*temp);
+        value = temp->dot( get_rb_evaluation().get_basis_function(i) );
         get_rb_evaluation().RB_inner_product_matrix(i,j) = value;
         if(i!=j)
         {
           // The inner product matrix is assumed
-          // to be symmetric
-          get_rb_evaluation().RB_inner_product_matrix(j,i) = value;
+          // to be hermitian
+          get_rb_evaluation().RB_inner_product_matrix(j,i) = libmesh_conj(value);
         }
       }
 

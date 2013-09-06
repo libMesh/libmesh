@@ -24,6 +24,7 @@
 #include "libmesh/mesh_input.h"
 
 // C++ includes
+#include <fstream>
 #include <set>
 
 namespace libMesh
