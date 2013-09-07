@@ -225,16 +225,31 @@ public:
   void get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
 
   /**
+   * Accessor for interior finite element object for scalar-valued variable var.
+   */
+  FEBase* get_element_fe( unsigned int var ) const;
+
+  /**
    * Accessor for edge/face (2D/3D) finite element object for variable var.
    */
   template<typename OutputShape>
   void get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
 
   /**
+   * Accessor for side finite element object for scalar-valued variable var.
+   */
+  FEBase* get_side_fe( unsigned int var ) const;
+
+  /**
    * Accessor for edge (3D only!) finite element object for variable var.
    */
   template<typename OutputShape>
   void get_edge_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
+
+  /**
+   * Accessor for edge finite element object for scalar-valued variable var.
+   */
+  FEBase* get_edge_fe( unsigned int var ) const;
 
   /**
    * Returns the value of the solution variable \p var at the quadrature
@@ -754,6 +769,13 @@ void FEMContext::get_element_fe( unsigned int var, FEGenericBase<OutputShape> *&
   fe = libmesh_cast_ptr<FEGenericBase<OutputShape>*>( _element_fe_var[var] );
 }
 
+inline
+FEBase* FEMContext::get_element_fe( unsigned int var ) const
+{
+  libmesh_assert_less ( var, _element_fe_var.size() );
+  return libmesh_cast_ptr<FEBase*>( _element_fe_var[var] );
+}
+
 template<typename OutputShape>
 inline
 void FEMContext::get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
@@ -762,12 +784,26 @@ void FEMContext::get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe
   fe = libmesh_cast_ptr<FEGenericBase<OutputShape>*>( _side_fe_var[var] );
 }
 
+inline
+FEBase* FEMContext::get_side_fe( unsigned int var ) const
+{
+  libmesh_assert_less ( var, _side_fe_var.size() );
+  return libmesh_cast_ptr<FEBase*>( _side_fe_var[var] );
+}
+
 template<typename OutputShape>
 inline
 void FEMContext::get_edge_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
 {
   libmesh_assert_less ( var, _edge_fe_var.size() );
   fe = libmesh_cast_ptr<FEGenericBase<OutputShape>*>( _edge_fe_var[var] );
+}
+
+inline
+FEBase* FEMContext::get_edge_fe( unsigned int var ) const
+{
+  libmesh_assert_less ( var, _edge_fe_var.size() );
+  return libmesh_cast_ptr<FEBase*>( _edge_fe_var[var] );
 }
 
 
