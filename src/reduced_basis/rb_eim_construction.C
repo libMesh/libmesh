@@ -110,7 +110,11 @@ void RBEIMConstruction::process_parameters_file (const std::string& parameters_f
   GetPot infile(parameters_filename);
 
   std::string best_fit_type_string = infile("best_fit_type","projection");
+  set_best_fit_type_flag(best_fit_type_string);
+}
 
+void RBEIMConstruction::set_best_fit_type_flag (const std::string& best_fit_type_string)
+{
   if(best_fit_type_string == "projection")
   {
     best_fit_type_flag = PROJECTION_BEST_FIT;

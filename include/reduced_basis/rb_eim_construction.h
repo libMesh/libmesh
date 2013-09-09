@@ -89,6 +89,12 @@ public:
   virtual void process_parameters_file (const std::string& parameters_filename);
 
   /**
+   * Specify which type of "best fit" we use to guide the EIM
+   * greedy algorithm.
+   */
+  void set_best_fit_type_flag (const std::string& best_fit_type_string);
+
+  /**
    * Print out info that describes the current setup of this RBConstruction.
    */
   virtual void print_info();
