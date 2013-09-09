@@ -21,7 +21,7 @@
 #define LIBMESH_ENUM_NORM_TYPE_H
 
 // ------------------------------------------------------------
-// enum NormType definition
+// enum FEMNormType definition
 namespace libMeshEnums {
 
   /**
