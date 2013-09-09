@@ -24,14 +24,22 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/enum_elem_quality.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_eigen_solver_type.h"
-#include "libmesh/enum_order.h"
 #include "libmesh/enum_fe_family.h"
 #include "libmesh/enum_inf_map_type.h"
-#include "libmesh/enum_quadrature_type.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_norm_type.h"
+#include "libmesh/enum_order.h"
+#include "libmesh/enum_parallel_type.h"
+#include "libmesh/enum_point_locator_type.h"
 #include "libmesh/enum_preconditioner_type.h"
+#include "libmesh/enum_quadrature_type.h"
+#include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_solver_type.h"
+#include "libmesh/enum_subset_solve_mode.h"
+#include "libmesh/enum_xdr_mode.h"
 #include "libmesh/elem.h"
 
 namespace libMesh
@@ -65,9 +73,31 @@ namespace {
       }
   }
 
+#define INSTANTIATE_ENUM_MAPS(ENUM_NAME,VAR_NAME) \
+  std::map<std::string, ENUM_NAME> VAR_NAME##_to_enum; \
+ \
+  std::map<ENUM_NAME, std::string> enum_to_##VAR_NAME; \
+ \
+  void init_##VAR_NAME##_to_enum (); \
+ \
+  /* Initialize the enum_to_elem_type on first call */ \
+  void init_enum_to_##VAR_NAME () \
+  { \
+    /* Build reverse map */ \
+    if (enum_to_##VAR_NAME .empty()) \
+      { \
+	/* Initialize elem_type_to_enum on first call */ \
+	init_##VAR_NAME##_to_enum(); \
+ \
+	build_reverse_map (VAR_NAME##_to_enum.begin(), \
+			   VAR_NAME##_to_enum.end(), \
+			   enum_to_##VAR_NAME); \
+      } \
+  }
+
+INSTANTIATE_ENUM_MAPS(ElemType, elem_type)
 
   //----------------------------------------------------
-  std::map<std::string, ElemType> elem_type_to_enum;
 
   // Initialize elem_type_to_enum on first call
   void init_elem_type_to_enum ()
@@ -127,29 +157,7 @@ namespace {
   }
 
 
-
-  std::map<ElemType, std::string> enum_to_elem_type;
-
-  // Initialize the enum_to_elem_type on first call
-  void init_enum_to_elem_type ()
-  {
-    // Build reverse map
-    if (enum_to_elem_type.empty())
-      {
-	// Initialize elem_type_to_enum on first call
-	init_elem_type_to_enum();
-
-	build_reverse_map (elem_type_to_enum.begin(),
-			   elem_type_to_enum.end(),
-			   enum_to_elem_type);
-      }
-  }
-
-
-
-
-  //---------------------------------------------
-  std::map<std::string, Order> order_to_enum;
+INSTANTIATE_ENUM_MAPS(Order, order)
 
   // Initialize order_to_enum on first call
   void init_order_to_enum ()
@@ -209,27 +217,7 @@ namespace {
 
 
 
-  std::map<Order, std::string> enum_to_order;
-
-  // Initialize the enum_to_order on first call
-  void init_enum_to_order ()
-  {
-    // Build reverse map
-    if (enum_to_order.empty())
-      {
-	// Initialize order_to_enum on first call
-	init_order_to_enum();
-
-	build_reverse_map (order_to_enum.begin(),
-			   order_to_enum.end(),
-			   enum_to_order);
-      }
-  }
-
-
-
-  //---------------------------------------------------
-  std::map<std::string, FEFamily> fefamily_to_enum;
+INSTANTIATE_ENUM_MAPS(FEFamily, fefamily)
 
   // Initialize fefamily_to_enum on first call
   void init_fefamily_to_enum ()
@@ -258,27 +246,8 @@ namespace {
   }
 
 
-  std::map<FEFamily, std::string> enum_to_fefamily;
 
-  // Initialize the enum_to_fefamily on first call
-  void init_enum_to_fefamily ()
-  {
-    // Build reverse map
-    if (enum_to_fefamily.empty())
-      {
-	// Initialize fefamily_to_enum on first call
-	init_fefamily_to_enum();
-
-	build_reverse_map (fefamily_to_enum.begin(),
-			   fefamily_to_enum.end(),
-			   enum_to_fefamily);
-      }
-  }
-
-
-
-  //---------------------------------------------------
-  std::map<std::string, InfMapType> inf_map_type_to_enum;
+INSTANTIATE_ENUM_MAPS(InfMapType, inf_map_type)
 
   // Initialize inf_map_type_to_enum on first call
   void init_inf_map_type_to_enum ()
@@ -292,27 +261,7 @@ namespace {
   }
 
 
-  std::map<InfMapType, std::string> enum_to_inf_map_type;
-
-  // Initialize the enum_to_inf_map_type on first call
-  void init_enum_to_inf_map_type ()
-  {
-    // Build reverse map
-    if (enum_to_inf_map_type.empty())
-      {
-	// Initialize inf_map_type_to_enum on first call
-	init_inf_map_type_to_enum();
-
-	build_reverse_map (inf_map_type_to_enum.begin(),
-			   inf_map_type_to_enum.end(),
-			   enum_to_inf_map_type);
-      }
-  }
-
-
-
-  //---------------------------------------------------
-  std::map<std::string, QuadratureType> quadrature_type_to_enum;
+INSTANTIATE_ENUM_MAPS(QuadratureType, quadrature_type)
 
   // Initialize quadrature_type_to_enum on first call
   void init_quadrature_type_to_enum ()
@@ -330,26 +279,7 @@ namespace {
   }
 
 
-  std::map<QuadratureType, std::string> enum_to_quadrature_type;
-
-  // Initialize the enum_to_quadrature_type on first call
-  void init_enum_to_quadrature_type ()
-  {
-    // Build reverse map
-    if (enum_to_quadrature_type.empty())
-      {
-	// Initialize inf_map_type_to_enum on first call
-	init_quadrature_type_to_enum();
-
-	build_reverse_map (quadrature_type_to_enum.begin(),
-			   quadrature_type_to_enum.end(),
-			   enum_to_quadrature_type);
-      }
-  }
-
-
-  //---------------------------------------------------
-  std::map<std::string, PreconditionerType> preconditioner_type_to_enum;
+INSTANTIATE_ENUM_MAPS(PreconditionerType, preconditioner_type)
 
   // Initialize preconditioner_type_to_enum on first call
   void init_preconditioner_type_to_enum ()
@@ -392,28 +322,9 @@ namespace {
   }
 
 
-  std::map<PreconditionerType, std::string> enum_to_preconditioner_type;
-
-  // Initialize the enum_to_preconditioner_type on first call
-  void init_enum_to_preconditioner_type ()
-  {
-    // Build reverse map
-    if (enum_to_preconditioner_type.empty())
-      {
-	// Initialize inf_map_type_to_enum on first call
-	init_preconditioner_type_to_enum();
-
-	build_reverse_map (preconditioner_type_to_enum.begin(),
-			   preconditioner_type_to_enum.end(),
-			   enum_to_preconditioner_type);
-      }
-  }
-
-
-
 #ifdef LIBMESH_ENABLE_AMR
-  //---------------------------------------------------
-  std::map<std::string, Elem::RefinementState> refinementstate_type_to_enum;
+
+INSTANTIATE_ENUM_MAPS(Elem::RefinementState, refinementstate_type)
 
   // Initialize refinementstate_type_to_enum on first call
   void init_refinementstate_type_to_enum ()
@@ -430,29 +341,10 @@ namespace {
 	refinementstate_type_to_enum["INVALID_REFINEMENTSTATE"]=Elem::INVALID_REFINEMENTSTATE;
       }
   }
-
-
-  std::map<Elem::RefinementState, std::string> enum_to_refinementstate_type;
-
-  // Initialize the enum_to_refinementstate_type on first call
-  void init_enum_to_refinementstate_type ()
-  {
-    // Build reverse map
-    if (enum_to_refinementstate_type.empty())
-      {
-	// Initialize refinementstate_type_to_enum on first call
-	init_refinementstate_type_to_enum();
-
-	build_reverse_map (refinementstate_type_to_enum.begin(),
-			   refinementstate_type_to_enum.end(),
-			   enum_to_refinementstate_type);
-      }
-  }
 #endif // LIBMESH_ENABLE_AMR
 
 
-  //---------------------------------------------------
-  std::map<std::string, EigenSolverType> eigensolvertype_to_enum;
+INSTANTIATE_ENUM_MAPS(EigenSolverType, eigensolvertype)
 
   // Initialize eigensolvertype_to_enum on first call
   void init_eigensolvertype_to_enum ()
@@ -470,26 +362,7 @@ namespace {
   }
 
 
-  std::map<EigenSolverType, std::string> enum_to_eigensolvertype;
-
-  // Initialize the enum_to_eigensolvertype on first call
-  void init_enum_to_eigensolvertype ()
-  {
-    // Build reverse map
-    if (enum_to_eigensolvertype.empty())
-      {
-	// Initialize eigensolvertype_to_enum on first call
-	init_eigensolvertype_to_enum();
-
-	build_reverse_map (eigensolvertype_to_enum.begin(),
-			   eigensolvertype_to_enum.end(),
-			   enum_to_eigensolvertype);
-      }
-  }
-
-
-  //---------------------------------------------------
-  std::map<std::string, SolverType> solvertype_to_enum;
+INSTANTIATE_ENUM_MAPS(SolverType, solvertype)
 
   // Initialize solvertype_to_enum on first call
   void init_solvertype_to_enum ()
@@ -518,24 +391,170 @@ namespace {
   }
 
 
-  std::map<SolverType, std::string> enum_to_solvertype;
+INSTANTIATE_ENUM_MAPS(ElemQuality, elemquality)
 
-  // Initialize the enum_to_solvertype on first call
-  void init_enum_to_solvertype ()
+  // Initialize elemquality_to_enum on first call
+  void init_elemquality_to_enum ()
   {
-    // Build reverse map
-    if (enum_to_solvertype.empty())
+    if (elemquality_to_enum.empty())
       {
-	// Initialize solvertype_to_enum on first call
-	init_solvertype_to_enum();
-
-	build_reverse_map (solvertype_to_enum.begin(),
-			   solvertype_to_enum.end(),
-			   enum_to_solvertype);
+	    elemquality_to_enum["ASPECT_RATIO"       ]=ASPECT_RATIO;
+	    elemquality_to_enum["SKEW"               ]=SKEW;
+	    elemquality_to_enum["SHEAR"              ]=SHEAR;
+	    elemquality_to_enum["SHAPE"              ]=SHAPE;
+	    elemquality_to_enum["MAX_ANGLE"          ]=MAX_ANGLE;
+	    elemquality_to_enum["MIN_ANGLE"          ]=MIN_ANGLE;
+	    elemquality_to_enum["CONDITION"          ]=CONDITION;
+	    elemquality_to_enum["DISTORTION"         ]=DISTORTION;
+	    elemquality_to_enum["TAPER"              ]=TAPER;
+	    elemquality_to_enum["WARP"               ]=WARP;
+	    elemquality_to_enum["STRETCH"            ]=STRETCH;
+	    elemquality_to_enum["DIAGONAL"           ]=DIAGONAL;
+	    elemquality_to_enum["ASPECT_RATIO_BETA"  ]=ASPECT_RATIO_BETA;
+	    elemquality_to_enum["ASPECT_RATIO_GAMMA" ]=ASPECT_RATIO_GAMMA;
+	    elemquality_to_enum["SIZE"               ]=SIZE;
+	    elemquality_to_enum["JACOBIAN"           ]=JACOBIAN;
       }
   }
 
 
+INSTANTIATE_ENUM_MAPS(IOPackage, iopackage)
+
+  // Initialize iopackage_to_enum on first call
+  void init_iopackage_to_enum ()
+  {
+    if (iopackage_to_enum.empty())
+      {
+	    iopackage_to_enum["TECPLOT" ]=TECPLOT;
+	    iopackage_to_enum["GMV"     ]=GMV;
+	    iopackage_to_enum["GMSH"    ]=GMSH;
+	    iopackage_to_enum["VTK"     ]=VTK;
+	    iopackage_to_enum["DIVA"    ]=DIVA;
+	    iopackage_to_enum["TETGEN"  ]=TETGEN;
+	    iopackage_to_enum["UCD"     ]=UCD;
+	    iopackage_to_enum["LIBMESH" ]=LIBMESH;
+      }
+  }
+
+
+INSTANTIATE_ENUM_MAPS(FEMNormType, norm_type)
+
+  // Initialize norm_type_to_enum on first call
+  void init_norm_type_to_enum ()
+  {
+    if (norm_type_to_enum.empty())
+      {
+	    norm_type_to_enum["L2" ]=L2;
+	    norm_type_to_enum["H1" ]=H1;
+	    norm_type_to_enum["H2" ]=H2;
+	    norm_type_to_enum["HCURL" ]=HCURL;
+	    norm_type_to_enum["HDIV" ]=HDIV;
+
+	    norm_type_to_enum["L1" ]=L1;
+	    norm_type_to_enum["L_INF" ]=L_INF;
+
+	    norm_type_to_enum["H1_SEMINORM" ]=H1_SEMINORM;
+	    norm_type_to_enum["H2_SEMINORM" ]=H2_SEMINORM;
+	    norm_type_to_enum["HCURL_SEMINORM" ]=HCURL_SEMINORM;
+	    norm_type_to_enum["HDIV_SEMINORM" ]=HDIV_SEMINORM;
+
+	    norm_type_to_enum["W1_INF_SEMINORM" ]=W1_INF_SEMINORM;
+	    norm_type_to_enum["W2_INF_SEMINORM" ]=W2_INF_SEMINORM;
+
+	    norm_type_to_enum["DISCRETE_L1" ]=DISCRETE_L1;
+	    norm_type_to_enum["DISCRETE_L2" ]=DISCRETE_L2;
+	    norm_type_to_enum["DISCRETE_L_INF" ]=DISCRETE_L_INF;
+
+	    norm_type_to_enum["H1_X_SEMINORM" ]=H1_X_SEMINORM;
+	    norm_type_to_enum["H1_Y_SEMINORM" ]=H1_Y_SEMINORM;
+	    norm_type_to_enum["H1_Z_SEMINORM" ]=H1_Z_SEMINORM;
+
+	    norm_type_to_enum["INVALID_NORM" ]=INVALID_NORM;
+      }
+  }
+
+
+INSTANTIATE_ENUM_MAPS(ParallelType, parallel_type)
+
+  // Initialize parallel_type_to_enum on first call
+  void init_parallel_type_to_enum ()
+  {
+    if (parallel_type_to_enum.empty())
+      {
+	parallel_type_to_enum["AUTOMATIC" ]=AUTOMATIC;
+	parallel_type_to_enum["SERIAL"    ]=SERIAL;
+	parallel_type_to_enum["PARALLEL"  ]=PARALLEL;
+	parallel_type_to_enum["GHOSTED"   ]=GHOSTED;
+	parallel_type_to_enum["INVALID_PARALLELIZATION" ]=INVALID_PARALLELIZATION;
+      }
+  }
+
+
+INSTANTIATE_ENUM_MAPS(PointLocatorType, point_locator_type)
+
+  // Initialize point_locator_type_to_enum on first call
+  void init_point_locator_type_to_enum ()
+  {
+    if (point_locator_type_to_enum.empty())
+      {
+	point_locator_type_to_enum["TREE" ]=TREE;
+	point_locator_type_to_enum["LIST" ]=LIST;
+	point_locator_type_to_enum["INVALID_LOCATOR" ]=INVALID_LOCATOR;
+      }
+  }
+
+
+INSTANTIATE_ENUM_MAPS(SolverPackage, solverpackage_type)
+
+  // Initialize solverpackage_type_to_enum on first call
+  void init_solverpackage_type_to_enum ()
+  {
+    if (solverpackage_type_to_enum.empty())
+      {
+	solverpackage_type_to_enum["PETSC_SOLVERS"    ]=PETSC_SOLVERS;
+	solverpackage_type_to_enum["TRILINOS_SOLVERS" ]=TRILINOS_SOLVERS;
+	solverpackage_type_to_enum["LASPACK_SOLVERS"  ]=LASPACK_SOLVERS;
+	solverpackage_type_to_enum["SLEPC_SOLVERS"    ]=SLEPC_SOLVERS;
+	solverpackage_type_to_enum["EIGEN_SOLVERS"    ]=EIGEN_SOLVERS;
+	solverpackage_type_to_enum["INVALID_SOLVER_PACKAGE" ]=INVALID_SOLVER_PACKAGE;
+      }
+  }
+
+
+INSTANTIATE_ENUM_MAPS(SubsetSolveMode, subset_solve_mode)
+
+  // Initialize subset_solve_mode_to_enum on first call
+  void init_subset_solve_mode_to_enum ()
+  {
+    if (subset_solve_mode_to_enum.empty())
+      {
+	subset_solve_mode_to_enum["SUBSET_ZERO" ]=SUBSET_ZERO;
+	subset_solve_mode_to_enum["SUBSET_COPY_RHS" ]=SUBSET_COPY_RHS;
+	subset_solve_mode_to_enum["SUBSET_DONT_TOUCH" ]=SUBSET_DONT_TOUCH;
+      }
+  }
+
+
+INSTANTIATE_ENUM_MAPS(XdrMODE, xdr_mode)
+
+  // Initialize xdr_mode_to_enum on first call
+  void init_xdr_mode_to_enum ()
+  {
+    if (xdr_mode_to_enum.empty())
+      {
+	xdr_mode_to_enum["UNKNOWN" ]=UNKNOWN;
+	xdr_mode_to_enum["ENCODE"  ]=ENCODE;
+	xdr_mode_to_enum["DECODE"  ]=DECODE;
+	xdr_mode_to_enum["WRITE"   ]=WRITE;
+	xdr_mode_to_enum["READ"    ]=READ;
+      }
+  }
+
+
+
+
+
+#undef INSTANTIATE_ENUM_MAPS
 
 } // end anonymous namespace
 
@@ -546,285 +565,58 @@ namespace {
 // full specializations
 namespace Utility {
 
-  //------------------------------------------------------
-  // ElemType specialization
-  template <>
-  ElemType string_to_enum<ElemType> (const std::string& s)
-  {
-    init_elem_type_to_enum();
-
-    std::string upper(s);
-    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
-
-    if (!elem_type_to_enum.count(upper))
-      libmesh_error();
-
-    return elem_type_to_enum[upper];
+#define INSTANTIATE_STRING_TO_ENUM(ENUM_NAME,VAR_NAME) \
+  template <> \
+  ENUM_NAME string_to_enum<ENUM_NAME> (const std::string& s) \
+  { \
+    init_##VAR_NAME##_to_enum(); \
+ \
+    std::string upper(s); \
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper); \
+ \
+    if (!VAR_NAME##_to_enum.count(upper)) \
+      { \
+        libmesh_error_msg("No " #ENUM_NAME " named " + s + " found."); \
+      } \
+ \
+    return VAR_NAME##_to_enum[upper]; \
+  } \
+ \
+  template <> \
+  std::string enum_to_string<ENUM_NAME> (const ENUM_NAME e) \
+  { \
+    init_enum_to_##VAR_NAME (); \
+ \
+    if (!enum_to_##VAR_NAME .count(e)) \
+      libmesh_error(); \
+ \
+    return enum_to_##VAR_NAME [e]; \
   }
 
 
-
-  template <>
-  std::string enum_to_string<ElemType> (const ElemType e)
-  {
-    init_enum_to_elem_type();
-
-    if (!enum_to_elem_type.count(e))
-      libmesh_error();
-
-    return enum_to_elem_type[e];
-  }
-
-
-
-  //------------------------------------------------
-  // Order specialization
-  template <>
-  Order string_to_enum<Order> (const std::string& s)
-  {
-    init_order_to_enum();
-
-    std::string upper(s);
-    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
-
-    if (!order_to_enum.count(upper))
-      libmesh_error();
-
-    return order_to_enum[upper];
-  }
-
-
-
-  template <>
-  std::string enum_to_string<Order> (const Order o)
-  {
-    init_enum_to_order();
-
-    if (!enum_to_order.count(o))
-      libmesh_error();
-
-    return enum_to_order[o];
-  }
-
-
-
-  //------------------------------------------------------
-  // FEFamily specialization
-  template <>
-  FEFamily string_to_enum<FEFamily> (const std::string& s)
-  {
-    init_fefamily_to_enum();
-
-    std::string upper(s);
-    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
-
-    if (!fefamily_to_enum.count(upper))
-      {
-	libMesh::err << "ERROR: could not convert '" << upper << "' to enum." << std::endl;
-	libmesh_error();
-      }
-
-    return fefamily_to_enum[upper];
-  }
-
-
-
-  template <>
-  std::string enum_to_string<FEFamily> (const FEFamily f)
-  {
-    init_enum_to_fefamily();
-
-    if (!enum_to_fefamily.count(f))
-      libmesh_error();
-
-    return enum_to_fefamily[f];
-  }
-
-
-
-  //------------------------------------------------------
-  // InfMapType specialization
-  template <>
-  InfMapType string_to_enum<InfMapType> (const std::string& s)
-  {
-    init_inf_map_type_to_enum();
-
-    std::string upper(s);
-    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
-
-    if (!inf_map_type_to_enum.count(upper))
-      libmesh_error();
-
-    return inf_map_type_to_enum[upper];
-  }
-
-
-
-  template <>
-  std::string enum_to_string<InfMapType> (const InfMapType i)
-  {
-    init_enum_to_inf_map_type();
-
-    if (!enum_to_inf_map_type.count(i))
-      libmesh_error();
-
-    return enum_to_inf_map_type[i];
-  }
-
-
-
-  //------------------------------------------------------
-  // QuadratureType specialization
-  template <>
-  QuadratureType string_to_enum<QuadratureType> (const std::string& s)
-  {
-    init_quadrature_type_to_enum();
-
-    std::string upper(s);
-    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
-
-    if (!quadrature_type_to_enum.count(upper))
-      libmesh_error();
-
-    return quadrature_type_to_enum[upper];
-  }
-
-
-
-  template <>
-  std::string enum_to_string<QuadratureType> (const QuadratureType i)
-  {
-    init_enum_to_quadrature_type();
-
-    if (!enum_to_quadrature_type.count(i))
-      libmesh_error();
-
-    return enum_to_quadrature_type[i];
-  }
-
-
-  //------------------------------------------------------
-  // PreconditionerType specialization
-  template <>
-  PreconditionerType string_to_enum<PreconditionerType> (const std::string& s)
-  {
-    init_preconditioner_type_to_enum();
-
-    std::string upper(s);
-    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
-
-    if (!preconditioner_type_to_enum.count(upper))
-      libmesh_error();
-
-    return preconditioner_type_to_enum[upper];
-  }
-
-
-
-  template <>
-  std::string enum_to_string<PreconditionerType> (const PreconditionerType i)
-  {
-    init_enum_to_preconditioner_type();
-
-    if (!enum_to_preconditioner_type.count(i))
-      libmesh_error();
-
-    return enum_to_preconditioner_type[i];
-  }
-
+INSTANTIATE_STRING_TO_ENUM(ElemType,elem_type)
+INSTANTIATE_STRING_TO_ENUM(Order,order)
+INSTANTIATE_STRING_TO_ENUM(FEFamily,fefamily)
+INSTANTIATE_STRING_TO_ENUM(InfMapType,inf_map_type)
+INSTANTIATE_STRING_TO_ENUM(QuadratureType,quadrature_type)
+INSTANTIATE_STRING_TO_ENUM(PreconditionerType,preconditioner_type)
 
 #ifdef LIBMESH_ENABLE_AMR
-  //------------------------------------------------------
-  // Elem::RefinementState specialization
-  template <>
-  Elem::RefinementState string_to_enum<Elem::RefinementState> (const std::string& s)
-  {
-    init_refinementstate_type_to_enum();
-
-    std::string upper(s);
-    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
-
-    if (!refinementstate_type_to_enum.count(upper))
-      libmesh_error();
-
-    return refinementstate_type_to_enum[upper];
-  }
-
-
-
-  template <>
-  std::string enum_to_string<Elem::RefinementState> (const Elem::RefinementState i)
-  {
-    init_enum_to_refinementstate_type();
-
-    if (!enum_to_refinementstate_type.count(i))
-      libmesh_error();
-
-    return enum_to_refinementstate_type[i];
-  }
+INSTANTIATE_STRING_TO_ENUM(Elem::RefinementState,refinementstate_type)
 #endif // LIBMESH_ENABLE_AMR
 
+INSTANTIATE_STRING_TO_ENUM(SolverType,solvertype)
+INSTANTIATE_STRING_TO_ENUM(EigenSolverType,eigensolvertype)
+INSTANTIATE_STRING_TO_ENUM(ElemQuality,elemquality)
+INSTANTIATE_STRING_TO_ENUM(IOPackage,iopackage)
+INSTANTIATE_STRING_TO_ENUM(FEMNormType, norm_type)
+INSTANTIATE_STRING_TO_ENUM(ParallelType, parallel_type)
+INSTANTIATE_STRING_TO_ENUM(PointLocatorType, point_locator_type)
+INSTANTIATE_STRING_TO_ENUM(SolverPackage,solverpackage_type)
+INSTANTIATE_STRING_TO_ENUM(SubsetSolveMode,subset_solve_mode)
+INSTANTIATE_STRING_TO_ENUM(XdrMODE,xdr_mode)
 
-  //------------------------------------------------------
-  // SolverType specialization
-  template <>
-  SolverType string_to_enum<SolverType> (const std::string& s)
-  {
-    init_solvertype_to_enum();
-
-    std::string upper(s);
-    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
-
-    if (!solvertype_to_enum.count(upper))
-      libmesh_error();
-
-    return solvertype_to_enum[upper];
-  }
-
-
-
-  template <>
-  std::string enum_to_string<SolverType> (const SolverType i)
-  {
-    init_enum_to_solvertype();
-
-    if (!enum_to_solvertype.count(i))
-      libmesh_error();
-
-    return enum_to_solvertype[i];
-  }
-
-
-
-  //------------------------------------------------------
-  // EigenSolverType specialization
-  template <>
-  EigenSolverType string_to_enum<EigenSolverType> (const std::string& s)
-  {
-    init_eigensolvertype_to_enum();
-
-    std::string upper(s);
-    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
-
-    if (!eigensolvertype_to_enum.count(upper))
-      libmesh_error();
-
-    return eigensolvertype_to_enum[upper];
-  }
-
-
-
-  template <>
-  std::string enum_to_string<EigenSolverType> (const EigenSolverType i)
-  {
-    init_enum_to_eigensolvertype();
-
-    if (!enum_to_eigensolvertype.count(i))
-      libmesh_error();
-
-    return enum_to_eigensolvertype[i];
-  }
-
+#undef INSTANTIATE_STRING_TO_ENUM
 
 } // namespace Utility
 
