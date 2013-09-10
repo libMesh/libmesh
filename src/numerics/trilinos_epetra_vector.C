@@ -804,7 +804,7 @@ int EpetraVector<T>::inputNonlocalValues(int GID, int numValues,
     if (numValues != nonlocalElementSize_[offset]) {
       libMesh::err << "Epetra_FEVector ERROR: block-size for GID " << GID << " is "
 	           << numValues<<" which doesn't match previously set block-size of "
-	           << nonlocalElementSize_[offset] << endl;
+	           << nonlocalElementSize_[offset] << std::endl;
       return(-1);
     }
 
