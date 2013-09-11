@@ -125,7 +125,10 @@ LIBMESH_SET_METHODS
 #-----------------------------------------------------
 LT_INIT([disable-static])
 
-
+#-----------------------------------------------------
+# See if the user requested --enable-all-static
+#-----------------------------------------------------
+AX_ALL_STATIC
 
 # --------------------------------------------------------------
 # Release versioning - after we find the C++ compiler
