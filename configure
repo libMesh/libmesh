@@ -852,6 +852,7 @@ OPENMP_CFLAGS
 OPENMP_CXXFLAGS
 PKG_CONFIG
 PERL
+libmesh_LDFLAGS
 CXXCPP
 CPP
 OTOOL64
@@ -1044,6 +1045,7 @@ enable_fast_install
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
+enable_all_static
 enable_singleprecision
 enable_tripleprecision
 enable_quadrupleprecision
@@ -1803,6 +1805,7 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --enable-all-static     Pass -all-static to libtool's link mode
   --enable-singleprecision
                           Use single-precision scalars
   --enable-tripleprecision
@@ -23657,6 +23660,30 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
+#-----------------------------------------------------
+# See if the user requested --enable-all-static
+#-----------------------------------------------------
+
+  # Check whether --enable-all-static was given.
+if test "${enable_all_static+set}" = set; then :
+  enableval=$enable_all_static; enableallstatic=$enableval
+else
+  enableallstatic=no
+fi
+
+
+  if (test $enableallstatic = yes); then
+    if (test "x$libmesh_LDFLAGS" != x) ; then
+      # Append to whatever the user has for libmesh_LDFLAGS in their environment
+      libmesh_LDFLAGS="$libmesh_LDFLAGS -all-static"
+    else
+      # Set libmesh_LDFLAGS to -all-static
+      libmesh_LDFLAGS=-all-static
+    fi
+
+    # Substitute into Makefiles where relevant.
+
+  fi
 
 
 # --------------------------------------------------------------
