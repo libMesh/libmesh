@@ -1263,6 +1263,67 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 
 
 
+void DofMap::heterogenously_constrain_adjoint_rhs
+  (DenseMatrix<Number>& matrix,
+   NumericVector<Number>& rhs,
+   bool asymmetric_constraint_rows) const
+{
+  libmesh_assert_equal_to (this->n_dofs(), matrix.m());
+  libmesh_assert_equal_to (this->n_dofs(), matrix.n());
+
+  // check for easy return
+  if (this->_dof_constraints.empty())
+    {
+      libmesh_assert(_adjoint_constraint_values.empty());
+      return;
+    }
+
+  if (_adjoint_constraint_values.empty())
+    return;
+
+  START_LOG("hetero_cnstrn_adjoint_rhs()", "DofMap");
+
+  // The constrained RHS needs C^T * K * H subtracted
+  AutoPtr<NumericVector<Number> > H = rhs.zero_clone();
+
+  for (DofConstraintValueMap::const_iterator it =
+       _adjoint_constraint_values[qoi_index].begin();
+       it != _adjoint_constraint_values[qoi_index].begin();
+       ++it)
+    {
+      H.set(it->first, it->second);
+    }
+  H.close();
+
+  AutoPtr<NumericVector<Number> > KH = rhs.zero_clone();
+  matrix.vector_mult(KH, H);
+
+  // Left multiply by C^T while subtracting from F
+  for (DofConstraints::const_iterator it =
+       this->constraint_rows_begin();
+       it != this->constraint_rows_end();
+       ++it)
+    {
+      const numeric_index_type i = it->first;
+      if (KH->first_local_index() > i ||
+          KH->last_local_index() <= i)
+        continue;
+
+      const DofConstraintRow& constraint_row = it->second;
+      for (DofConstraintRow::const_iterator
+             jt=constraint_row.begin(); jt != constraint_row.end();
+           ++jt)
+        {
+          rhs.add(jt->first, -(jt->second)*KH(it->first);
+        }
+    }
+
+  rhs.close();
+
+  STOP_LOG("hetero_cnstrn_adjoint_rhs()", "DofMap");
+}
+
+
 void DofMap::heterogenously_constrain_element_matrix_and_vector
   (DenseMatrix<Number>& matrix,
    DenseVector<Number>& rhs,

@@ -746,6 +746,7 @@ public:
 					    DenseVector<Number>& rhs,
 					    std::vector<dof_id_type>& elem_dofs,
 					    bool asymmetric_constraint_rows = true) const;
+
   /**
    * Constrains the element matrix and vector.  This method requires
    * the element matrix to be square, in which case the elem_dofs
@@ -768,6 +769,31 @@ public:
                                                            DenseVector<Number>& rhs,
                                                            std::vector<dof_id_type>& elem_dofs,
                                                            bool asymmetric_constraint_rows = true) const;
+
+  /**
+   * Constrains the given adjoint problem right hand side, using the
+   * given sparse matrix.  This method requires the sparse matrix to
+   * be square.
+   *
+   * For an adjoint problem K^T*z=f which is also required to satisfy
+   * z = C*y+h, we want to solve
+   * C^T*K^T*C*y = C^T*f-C^T*K*h
+   *
+   * The C^T*K^T*C term will be calculated in the matrix assembly
+   * (where it is just the transpose of the constraint equation
+   * application to the primal problem) elementwise.  The C^T*f term
+   * is also naturally applied elementwise during
+   * assemble_qoi_derivative().  The C^T*K*h term, however, cannot be
+   * easily applied elementwise because at the time of
+   * assemble_qoi_derivative() the global Jacobian has already been
+   * assembled and the element Jacobians have been discarded.
+   *
+   * So we instead apply this term globally, using this method.
+   */
+  void heterogenously_constrain_adjoint_rhs (SparseMatrix<Number>& matrix,
+                                             NumericVector<Number>& rhs,
+                                             unsigned int qoi_index,
+                                             bool asymmetric_constraint_rows = true) const;
 
   /**
    * Constrains a dyadic element matrix B = v w'.  This method
