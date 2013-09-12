@@ -47,6 +47,7 @@
 #include "libmesh/point_locator_base.h"
 #include "libmesh/quadrature.h" // for dirichlet constraints
 #include "libmesh/raw_accessor.h"
+#include "libmesh/sparse_matrix.h" // needed to constrain adjoint rhs
 #include "libmesh/system.h" // needed by enforce_constraints_exactly()
 #include "libmesh/threads.h"
 #include "libmesh/tensor_tools.h"
@@ -858,6 +859,7 @@ dof_id_type DofMap::n_local_constrained_dofs() const
 }
 
 
+
 void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 {
   parallel_object_only();
@@ -1264,8 +1266,9 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 
 
 void DofMap::heterogenously_constrain_adjoint_rhs
-  (DenseMatrix<Number>& matrix,
+  (SparseMatrix<Number>& matrix,
    NumericVector<Number>& rhs,
+   unsigned int qoi_index,
    bool asymmetric_constraint_rows) const
 {
   libmesh_assert_equal_to (this->n_dofs(), matrix.m());
@@ -1286,17 +1289,23 @@ void DofMap::heterogenously_constrain_adjoint_rhs
   // The constrained RHS needs C^T * K * H subtracted
   AutoPtr<NumericVector<Number> > H = rhs.zero_clone();
 
+  AdjointDofConstraintValues::const_iterator adjoint_values_map_it = 
+    _adjoint_constraint_values.find(qoi_index);
+
+  libmesh_assert (adjoint_values_map_it != _adjoint_constraint_values.end());
+    
   for (DofConstraintValueMap::const_iterator it =
-       _adjoint_constraint_values[qoi_index].begin();
-       it != _adjoint_constraint_values[qoi_index].begin();
+       adjoint_values_map_it->second.begin();
+       it != adjoint_values_map_it->second.end();
        ++it)
     {
-      H.set(it->first, it->second);
+      H->set(it->first, it->second);
     }
-  H.close();
+
+  H->close();
 
   AutoPtr<NumericVector<Number> > KH = rhs.zero_clone();
-  matrix.vector_mult(KH, H);
+  matrix.vector_mult(*KH, *H);
 
   // Left multiply by C^T while subtracting from F
   for (DofConstraints::const_iterator it =
@@ -1314,7 +1323,7 @@ void DofMap::heterogenously_constrain_adjoint_rhs
              jt=constraint_row.begin(); jt != constraint_row.end();
            ++jt)
         {
-          rhs.add(jt->first, -(jt->second)*KH(it->first);
+          rhs.add(jt->first, -(jt->second)*(*KH)(it->first));
         }
     }
 
@@ -3325,11 +3334,39 @@ void DofMap::add_adjoint_dirichlet_boundary
    unsigned int qoi_index)
 {
   std::size_t old_size = _adjoint_dirichlet_boundaries.size();
-  for (i = old_size; i <= qoi_index; ++i)
+  for (std::size_t i = old_size; i <= qoi_index; ++i)
     _adjoint_dirichlet_boundaries.push_back(new DirichletBoundaries());
 
   _adjoint_dirichlet_boundaries[qoi_index]->push_back(new DirichletBoundary(dirichlet_boundary));
 }
+
+
+bool DofMap::has_adjoint_dirichlet_boundaries(unsigned int q) const
+  {
+    if (_adjoint_dirichlet_boundaries.size() > q)
+      return true;
+
+    return false;
+  }
+
+
+const DirichletBoundaries * 
+DofMap::get_adjoint_dirichlet_boundaries(unsigned int q) const
+  {
+    libmesh_assert_greater(_adjoint_dirichlet_boundaries.size(),q);
+    return _adjoint_dirichlet_boundaries[q];
+  }
+
+
+DirichletBoundaries *
+DofMap::get_adjoint_dirichlet_boundaries(unsigned int q)
+  {
+    std::size_t old_size = _adjoint_dirichlet_boundaries.size();
+    for (std::size_t i = old_size; i <= q; ++i)
+      _adjoint_dirichlet_boundaries.push_back(new DirichletBoundaries());
+
+    return _adjoint_dirichlet_boundaries[q];
+  }
 
 
 void DofMap::remove_dirichlet_boundary (const DirichletBoundary& boundary_to_remove)

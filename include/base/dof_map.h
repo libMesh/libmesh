@@ -916,28 +916,13 @@ public:
       return _dirichlet_boundaries;
     }
 
-  const DirichletBoundaries * has_adjoint_dirichlet_boundaries(unsigned int q) const
-    {
-      if (_adjoint_dirichlet_boundaries.size() > q)
-        return _adjoint_dirichlet_boundaries[q];
+  bool has_adjoint_dirichlet_boundaries(unsigned int q) const;
 
-      return NULL;
-    }
+  const DirichletBoundaries * 
+  get_adjoint_dirichlet_boundaries(unsigned int q) const;
 
-  const DirichletBoundaries * get_adjoint_dirichlet_boundaries(unsigned int q) const
-    {
-      libmesh_assert_greater(_adjoint_dirichlet_boundaries.size(),q);
-      return _adjoint_dirichlet_boundaries[q];
-    }
-
-  DirichletBoundaries * get_adjoint_dirichlet_boundaries(unsigned int q)
-    {
-      std::size_t old_size = _adjoint_dirichlet_boundaries.size();
-      for (i = old_size; i <= q; ++i)
-        _adjoint_dirichlet_boundaries.push_back(new DirichletBoundaries());
-
-      return _adjoint_dirichlet_boundaries[q];
-    }
+  DirichletBoundaries *
+  get_adjoint_dirichlet_boundaries(unsigned int q);
 
 #endif // LIBMESH_ENABLE_DIRICHLET
 
