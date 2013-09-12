@@ -778,6 +778,11 @@ void FEMSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
                         QoIDerivativeContributions(*this, qoi_indices,
 						   *(this->diff_qoi)));
 
+  for (unsigned int i=0; i != qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      this->get_dof_map().heterogenously_constrain_adjoint_rhs
+        (*this->matrix, this->get_adjoint_rhs(i), i);
+
   STOP_LOG("assemble_qoi_derivative()", "FEMSystem");
 }
 
