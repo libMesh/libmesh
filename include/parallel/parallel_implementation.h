@@ -131,8 +131,13 @@ public:
     int blocklengths[] = {1,1};
 
     MPI_Aint displs[2];
+#if MPI_VERSION > 1
     MPI_Address (const_cast<T1*>(&example->first), &displs[0]);
     MPI_Address (const_cast<T2*>(&example->second), &displs[1]);
+#else
+    MPI_Get_address (const_cast<T1*>(&example->first), &displs[0]);
+    MPI_Get_address (const_cast<T2*>(&example->second), &displs[1]);
+#endif
     displs[1] -= displs[0];
     displs[0] = 0;
 
@@ -414,7 +419,7 @@ inline void unpack_range (const std::vector<buffertype>& buffer,
 
   // Loop through the buffer and unpack each object, returning the
   // object pointer via the output iterator
-  typename std::vector<buffertype>::const_iterator 
+  typename std::vector<buffertype>::const_iterator
     next_object_start = buffer.begin();
 
   while (next_object_start < buffer.end())
