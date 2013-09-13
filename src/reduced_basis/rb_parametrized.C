@@ -18,7 +18,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // libMesh includes
-#include "libmesh/getpot.h"
 #include "libmesh/xdr_cxx.h"
 
 // rbOOmit includes
@@ -97,43 +96,6 @@ void RBParametrized::initialize_parameters(const RBParametrized& rb_parametrized
   initialize_parameters(rb_parametrized.get_parameters_min(),
                         rb_parametrized.get_parameters_max(),
                         rb_parametrized.get_parameters());
-}
-
-void RBParametrized::initialize_parameters (const std::string& parameters_filename)
-{
-  GetPot infile(parameters_filename);
-
-  const unsigned int n_parameters = infile("n_parameters",1);
-  RBParameters mu_min_in;
-  RBParameters mu_max_in;
-  RBParameters initial_mu_in;
-  for(unsigned int i=0; i<n_parameters; i++)
-  {
-    // Read in the parameter names
-    std::string param_name = infile("parameter_names", "NONE", i);
-
-    for(unsigned int j=0; j<3; j++)
-    {
-      if(j==0)
-      {
-        Real min_val = infile(param_name, 0., j);
-        mu_min_in.set_value(param_name, min_val);
-      }
-      else if(j==1)
-      {
-        Real max_val = infile(param_name, 0., j);
-        mu_max_in.set_value(param_name, max_val);
-      }
-      else
-      {
-        Real init_val = infile(param_name, 0., j);
-        initial_mu_in.set_value(param_name, init_val);
-      }
-    }
-  }
-
-  // Initialize the parameter ranges and set the parameters to mu_min_vector
-  initialize_parameters(mu_min_in, mu_max_in, initial_mu_in);
 }
 
 unsigned int RBParametrized::get_n_params() const

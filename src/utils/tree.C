@@ -35,10 +35,10 @@ namespace libMesh
 // constructor
 template <unsigned int N>
 Tree<N>::Tree (const MeshBase& m,
-	       const unsigned int level,
+	       const unsigned int target_bin_size,
 	       const Trees::BuildType bt) :
   TreeBase(m),
-  root(m,level),
+  root(m,target_bin_size),
   build_type(bt)
 {
   // Set the root node bounding box equal to the bounding

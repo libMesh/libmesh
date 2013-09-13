@@ -64,6 +64,7 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 subdir = examples/eigenproblems/eigenproblems_ex2
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
+	$(top_srcdir)/m4/all_static.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/m4/ax_pthread.m4 \
 	$(top_srcdir)/m4/ax_split_version.m4 \
@@ -518,6 +519,7 @@ libexecdir = @libexecdir@
 libmesh_CFLAGS = @libmesh_CFLAGS@
 libmesh_CPPFLAGS = @libmesh_CPPFLAGS@
 libmesh_CXXFLAGS = @libmesh_CXXFLAGS@
+libmesh_LDFLAGS = @libmesh_LDFLAGS@
 libmesh_contrib_INCLUDES = @libmesh_contrib_INCLUDES@
 libmesh_installed_LIBS = @libmesh_installed_LIBS@
 libmesh_optional_INCLUDES = @libmesh_optional_INCLUDES@
@@ -577,6 +579,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
+AM_LDFLAGS = $(libmesh_LDFLAGS)
 examples_source_path = $(top_srcdir)/examples
 examples_install_path = $(prefix)/examples
 data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile

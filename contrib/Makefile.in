@@ -179,6 +179,7 @@ DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
+	$(top_srcdir)/m4/all_static.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/m4/ax_pthread.m4 \
 	$(top_srcdir)/m4/ax_split_version.m4 \
@@ -621,6 +622,7 @@ libexecdir = @libexecdir@
 libmesh_CFLAGS = @libmesh_CFLAGS@
 libmesh_CPPFLAGS = @libmesh_CPPFLAGS@
 libmesh_CXXFLAGS = @libmesh_CXXFLAGS@
+libmesh_LDFLAGS = @libmesh_LDFLAGS@
 libmesh_contrib_INCLUDES = @libmesh_contrib_INCLUDES@
 libmesh_installed_LIBS = @libmesh_installed_LIBS@
 libmesh_optional_INCLUDES = @libmesh_optional_INCLUDES@
@@ -695,6 +697,10 @@ oprof_libs = $(am__append_8) $(am__append_14) $(am__append_20) \
 	$(am__append_62) $(am__append_68) $(am__append_74) \
 	$(am__append_80) $(am__append_86) $(am__append_92) \
 	$(am__append_98) $(am__append_104) $(am__append_110)
+
+# Doesn't seem to be used directly in this Makefile; add
+# it in case someone includes this Makefile?
+AM_LDFLAGS = $(libmesh_LDFLAGS)
 
 ######################################################################
 #

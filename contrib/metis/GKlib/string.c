@@ -14,7 +14,7 @@ of standard functions (but with enhanced functionality).
 /************************************************************************/
 
 #include <GKlib.h>
-
+#include <time.h> // strptime
 
 
 /************************************************************************/

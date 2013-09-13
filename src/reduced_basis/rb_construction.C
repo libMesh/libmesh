@@ -204,16 +204,112 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
 {
   // First read in data from input_filename
   GetPot infile(parameters_filename);
-
+  
   const unsigned int n_training_samples = infile("n_training_samples",0);
   const bool deterministic_training = infile("deterministic_training",false);
+  std::string deterministic_training_parameter_name_in =
+    infile("deterministic_training_parameter_name","NONE");
+  const unsigned int deterministic_training_parameter_repeats_in =
+    infile("deterministic_training_parameter_repeats",1);
+  const std::string alternative_solver_in =
+    infile("rb_alternative_solver",alternative_solver);
+  const bool reuse_preconditioner_in = infile("reuse_preconditioner",
+                                              reuse_preconditioner);
+  const bool use_relative_bound_in_greedy_in = infile("use_relative_bound_in_greedy",
+                                                      use_relative_bound_in_greedy);
+  const bool write_data_during_training_in = infile("write_data_during_training",
+                                                    write_data_during_training);
+  unsigned int training_parameters_random_seed_in =
+    static_cast<int>(-1);
+  training_parameters_random_seed_in = infile("training_parameters_random_seed",
+					   training_parameters_random_seed_in);
+  const bool quiet_mode_in = infile("quiet_mode", quiet_mode);
+  const unsigned int Nmax_in = infile("Nmax", Nmax);
+  const Real training_tolerance_in = infile("training_tolerance",
+                                            training_tolerance);
 
-  // Also, even if deterministic_training==false, we may specify one deterministic parameter
-  std::string deterministic_training_parameter_name_in = infile("deterministic_training_parameter_name","NONE");
+  // Read in the parameters from the input file too
+  const unsigned int n_parameters = infile("n_parameters",1);
+  RBParameters mu_min_in;
+  RBParameters mu_max_in;
+  RBParameters initial_mu_in;
+  for(unsigned int i=0; i<n_parameters; i++)
+  {
+    // Read in the parameter names
+    std::string param_name = infile("parameter_names", "NONE", i);
+
+    for(unsigned int j=0; j<3; j++)
+    {
+      if(j==0)
+      {
+        Real min_val = infile(param_name, 0., j);
+        mu_min_in.set_value(param_name, min_val);
+      }
+      else if(j==1)
+      {
+        Real max_val = infile(param_name, 0., j);
+        mu_max_in.set_value(param_name, max_val);
+      }
+      else
+      {
+        Real init_val = infile(param_name, 0., j);
+        initial_mu_in.set_value(param_name, init_val);
+      }
+    }
+  }
+  
+  std::map<std::string,bool> log_scaling_in;
+  RBParameters::const_iterator it     = mu_min_in.begin();
+  RBParameters::const_iterator it_end = mu_min_in.end();
+  unsigned int i=0;
+  for( ; it != it_end; ++it)
+  {
+    std::string param_name = it->first;
+    log_scaling_in[param_name] = static_cast<bool>(infile("log_scaling", 0, i));
+    i++;
+  }
+
+  // Set the parameters that have been read in
+  set_rb_construction_parameters(n_training_samples,
+                                 deterministic_training,
+                                 deterministic_training_parameter_name_in,
+                                 deterministic_training_parameter_repeats_in,
+                                 alternative_solver_in,
+                                 reuse_preconditioner_in,
+                                 use_relative_bound_in_greedy_in,
+                                 write_data_during_training_in,
+                                 training_parameters_random_seed_in,
+                                 quiet_mode_in,
+                                 Nmax_in,
+                                 training_tolerance_in,
+                                 mu_min_in,
+                                 mu_max_in,
+                                 initial_mu_in,
+                                 log_scaling_in);
+}
+
+void RBConstruction::set_rb_construction_parameters(
+                                 unsigned int n_training_samples_in,
+                                 bool deterministic_training_in,
+                                 std::string deterministic_training_parameter_name_in,
+                                 unsigned int deterministic_training_parameter_repeats_in,
+                                 std::string alternative_solver_in,
+                                 bool reuse_preconditioner_in,
+                                 bool use_relative_bound_in_greedy_in,
+                                 bool write_data_during_training_in,
+                                 unsigned int training_parameters_random_seed_in,
+                                 bool quiet_mode_in,
+                                 unsigned int Nmax_in,
+                                 Real training_tolerance_in,
+                                 RBParameters mu_min_in,
+                                 RBParameters mu_max_in,
+                                 RBParameters initial_mu_in,
+                                 std::map<std::string,bool> log_scaling_in)
+{
+  // Even if deterministic_training==false, we may specify one deterministic parameter
   set_deterministic_training_parameter_name(deterministic_training_parameter_name_in);
 
   // We also need to specify how many times each sample of the deterministic parameter is "repeated"
-  const unsigned int deterministic_training_parameter_repeats_in = infile("deterministic_training_parameter_repeats",1);
   set_deterministic_training_parameter_repeats(deterministic_training_parameter_repeats_in);
 
   // String which selects an alternate pc/solver combo for the update_residual_terms solves.
@@ -222,7 +318,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   // "amg" -- Use Boomeramg from Hypre.  DO NOT use on indefinite (Stokes) problems
   // "mumps" -- Use the sparse
   //update_residual_terms_solver = infile("update_residual_terms_solver",update_residual_terms_solver);
-  alternative_solver = infile("rb_alternative_solver",alternative_solver);
+  alternative_solver = alternative_solver_in;
 
   // Tell the system that it is constrained (i.e. we want to use
   // the Stokes inner product matrix to compute Riesz representors)
@@ -230,64 +326,38 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
 
   // Tell the system to reuse the preconditioner on consecutive
   // Offline solves to update residual data
-  reuse_preconditioner = infile("reuse_preconditioner",
-                                reuse_preconditioner);
+  reuse_preconditioner = reuse_preconditioner_in;
 
   // Tell the system whether or not to use a relative error bound
   // in the Greedy algorithm
-  use_relative_bound_in_greedy = infile("use_relative_bound_in_greedy",
-                                        use_relative_bound_in_greedy);
+  use_relative_bound_in_greedy = use_relative_bound_in_greedy_in;
 
   // Tell the system whether or not to write out offline data during
   // train_reduced_basis. This allows us to continue from where the
   // training left off in case the computation stops for some reason.
-  write_data_during_training = infile("write_data_during_training",
-                                      write_data_during_training);
+  write_data_during_training = write_data_during_training_in;
 
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
   // value is -1, which means use std::time to seed the RNG.
-  unsigned int training_parameters_random_seed_in = static_cast<unsigned int>(-1);
-  training_parameters_random_seed_in = infile("training_parameters_random_seed",
-					   training_parameters_random_seed_in);
   set_training_random_seed(training_parameters_random_seed_in);
 
   // Set quiet mode
-  const bool quiet_mode_in = infile("quiet_mode", quiet_mode);
   set_quiet_mode(quiet_mode_in);
 
   // Initialize RB parameters
-  const unsigned int Nmax_in = infile("Nmax", Nmax);
   set_Nmax(Nmax_in);
 
-  const Real training_tolerance_in = infile("training_tolerance",
-                                            training_tolerance);
   set_training_tolerance(training_tolerance_in);
 
   // Initialize the parameter ranges and the parameters themselves
-  initialize_parameters(parameters_filename);
-
-  std::map<std::string,bool> log_scaling;
-  const RBParameters& mu = get_parameters();
-  RBParameters::const_iterator it     = mu.begin();
-  RBParameters::const_iterator it_end = mu.end();
-  unsigned int i=0;
-  for( ; it != it_end; ++it)
-  {
-    // Read vector-based log scaling values.  Note the intermediate conversion to
-    // int... this implies log_scaling = '1 1 1...' in the input file.
-//    log_scaling[i] = static_cast<bool>(infile("log_scaling", static_cast<int>(log_scaling[i]), i));
-
-    std::string param_name = it->first;
-    log_scaling[param_name] = static_cast<bool>(infile("log_scaling", 0, i));
-    i++;
-  }
+  initialize_parameters(mu_min_in, mu_max_in, initial_mu_in);
 
   initialize_training_parameters(this->get_parameters_min(),
                                  this->get_parameters_max(),
-                                 n_training_samples,
-                                 log_scaling,
-                                 deterministic_training);   // use deterministic parameters
+                                 n_training_samples_in,
+                                 log_scaling_in,
+                                 deterministic_training_in);   // use deterministic parameters
 }
 
 void RBConstruction::print_info()

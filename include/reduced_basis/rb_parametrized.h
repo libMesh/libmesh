@@ -75,12 +75,6 @@ public:
   void initialize_parameters(const RBParametrized& rb_parametrized);
 
   /**
-   * Initialize the parameter ranges and set current_parameters by
-   * reading in data from the file \p input_filename
-   */
-  virtual void initialize_parameters(const std::string& parameters_filename);
-
-  /**
    * Get the number of parameters.
    */
   unsigned int get_n_params() const;

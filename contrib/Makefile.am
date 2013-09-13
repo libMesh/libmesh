@@ -9,6 +9,10 @@ devel_libs =
 prof_libs  =
 oprof_libs =
 
+# Doesn't seem to be used directly in this Makefile; add
+# it in case someone includes this Makefile?
+AM_LDFLAGS   = $(libmesh_LDFLAGS)
+
 if LIBMESH_INSTALL_INTERNAL_BOOST
    SUBDIRS += boost/include
 endif

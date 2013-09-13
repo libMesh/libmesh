@@ -6,6 +6,7 @@ SUBDIRS = include #src
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS  = -I m4
 AM_CFLAGS        = $(libmesh_CFLAGS)
+AM_LDFLAGS       = $(libmesh_LDFLAGS)
 
 # AM_CPPFLAGS are method-independent cppflags that
 # we use when compiling libmesh proper, or its utility
