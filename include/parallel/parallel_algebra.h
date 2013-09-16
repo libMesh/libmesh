@@ -80,18 +80,30 @@ namespace Parallel {
           MPI_Datatype types[LIBMESH_DIM+2];
           MPI_Aint start, later;
 
+#if MPI_VERSION > 1
+          MPI_Get_address(ex, &start);
+#else
           MPI_Address(ex, &start);
+#endif // #if MPI_VERSION > 1
           blocklengths[0] = 1;
           displs[0] = 0;
           types[0] = MPI_LB;
           for (unsigned int i=0; i != LIBMESH_DIM; ++i)
             {
+#if MPI_VERSION > 1
+              MPI_Get_address(&((*ex)(i)), &later);
+#else
               MPI_Address(&((*ex)(i)), &later);
+#endif // #if MPI_VERSION > 1
               blocklengths[i+1] = 1;
               displs[i+1] = later - start;
               types[i+1] = T_type;
             }
+#if MPI_VERSION > 1
+          MPI_Get_address((ex+1), &later);
+#else
           MPI_Address((ex+1), &later);
+#endif // #if MPI_VERSION > 1
           blocklengths[LIBMESH_DIM+1] = 1;
           displs[LIBMESH_DIM+1] = later - start;
           types[LIBMESH_DIM+1] = MPI_UB;
@@ -140,18 +152,30 @@ namespace Parallel {
           MPI_Datatype types[LIBMESH_DIM+2];
           MPI_Aint start, later;
 
+#if MPI_VERSION > 1
+          MPI_Get_address(ex, &start);
+#else
           MPI_Address(ex, &start);
+#endif // #if MPI_VERSION > 1
           blocklengths[0] = 1;
           displs[0] = 0;
           types[0] = MPI_LB;
           for (unsigned int i=0; i != LIBMESH_DIM; ++i)
             {
+#if MPI_VERSION > 1
+              MPI_Get_address(&((*ex)(i)), &later);
+#else
               MPI_Address(&((*ex)(i)), &later);
+#endif // #if MPI_VERSION > 1
               blocklengths[i+1] = 1;
               displs[i+1] = later - start;
               types[i+1] = T_type;
             }
+#if MPI_VERSION > 1
+          MPI_Get_address((ex+1), &later);
+#else
           MPI_Address((ex+1), &later);
+#endif // #if MPI_VERSION > 1
           blocklengths[LIBMESH_DIM+1] = 1;
           displs[LIBMESH_DIM+1] = later - start;
           types[LIBMESH_DIM+1] = MPI_UB;
@@ -200,18 +224,30 @@ namespace Parallel {
           MPI_Datatype types[LIBMESH_DIM+2];
           MPI_Aint start, later;
 
+#if MPI_VERSION > 1
+          MPI_Get_address(ex, &start);
+#else
           MPI_Address(ex, &start);
+#endif // #if MPI_VERSION > 1
           blocklengths[0] = 1;
           displs[0] = 0;
           types[0] = MPI_LB;
           for (unsigned int i=0; i != LIBMESH_DIM; ++i)
             {
+#if MPI_VERSION > 1
+              MPI_Get_address(&((*ex)(i)), &later);
+#else
               MPI_Address(&((*ex)(i)), &later);
+#endif // #if MPI_VERSION > 1
               blocklengths[i+1] = 1;
               displs[i+1] = later - start;
               types[i+1] = T_type;
             }
+#if MPI_VERSION > 1
+          MPI_Get_address((ex+1), &later);
+#else
           MPI_Address((ex+1), &later);
+#endif // #if MPI_VERSION > 1
           blocklengths[LIBMESH_DIM+1] = 1;
           displs[LIBMESH_DIM+1] = later - start;
           types[LIBMESH_DIM+1] = MPI_UB;
