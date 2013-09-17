@@ -132,11 +132,11 @@ public:
 
     MPI_Aint displs[2];
 #if MPI_VERSION > 1
-    MPI_Address (const_cast<T1*>(&example->first), &displs[0]);
-    MPI_Address (const_cast<T2*>(&example->second), &displs[1]);
-#else
     MPI_Get_address (const_cast<T1*>(&example->first), &displs[0]);
     MPI_Get_address (const_cast<T2*>(&example->second), &displs[1]);
+#else
+    MPI_Address (const_cast<T1*>(&example->first), &displs[0]);
+    MPI_Address (const_cast<T2*>(&example->second), &displs[1]);
 #endif
     displs[1] -= displs[0];
     displs[0] = 0;

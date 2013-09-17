@@ -429,9 +429,15 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
       // into a debugger with a proper stack when an MPI error occurs.
       if (libMesh::on_command_line ("--handle-mpi-errors"))
         {
+#if MPI_VERSION > 1
+	  MPI_Comm_create_errhandler(libMesh_MPI_Handler, &libmesh_errhandler);
+	  MPI_Comm_set_errhandler(libMesh::COMM_WORLD, libmesh_errhandler);
+	  MPI_Comm_set_errhandler(MPI_COMM_WORLD, libmesh_errhandler);
+#else
 	  MPI_Errhandler_create(libMesh_MPI_Handler, &libmesh_errhandler);
 	  MPI_Errhandler_set(libMesh::COMM_WORLD, libmesh_errhandler);
 	  MPI_Errhandler_set(MPI_COMM_WORLD, libmesh_errhandler);
+#endif // #if MPI_VERSION > 1
         }
     }
 
