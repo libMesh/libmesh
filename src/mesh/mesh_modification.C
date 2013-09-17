@@ -26,6 +26,8 @@
 
 // Local includes
 #include "libmesh/boundary_info.h"
+#include "libmesh/cell_tet4.h"
+#include "libmesh/cell_tet10.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/libmesh_logging.h"
@@ -697,9 +699,9 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
   std::vector<Elem*> new_elements;
 
   unsigned int max_subelems = 1;  // in 1D nothing needs to change
-  if (mesh.dim() == 2) // in 2D quads can split into 2 tris
+  if (mesh.mesh_dimension() == 2) // in 2D quads can split into 2 tris
     max_subelems = 2;
-  if (mesh.dim() == 3) // in 3D hexes can split into 6 tets
+  if (mesh.mesh_dimension() == 3) // in 3D hexes can split into 6 tets
     max_subelems = 6;
 
   new_elements.reserve (max_subelems*n_orig_elem);
@@ -738,7 +740,8 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
 	// The new elements we will split the quad into.
         // In 3D we may need as many as 6 tets per hex
-	Elem* subelem[max_subelems];
+	Elem* subelem[6];
+
         for (unsigned int i = 0; i != max_subelems; ++i)
           subelem[i] = NULL;
 
@@ -896,56 +899,56 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                           (elem->node(5) > elem->node(2) &&
                            elem->node(5) > elem->node(4)))
                         {
-                          subelem[0]->set_node(0) = elem->get_node(0)
-                          subelem[0]->set_node(1) = elem->get_node(4)
-                          subelem[0]->set_node(2) = elem->get_node(5)
-                          subelem[0]->set_node(3) = elem->get_node(3)
+                          subelem[0]->set_node(0) = elem->get_node(0);
+                          subelem[0]->set_node(1) = elem->get_node(4);
+                          subelem[0]->set_node(2) = elem->get_node(5);
+                          subelem[0]->set_node(3) = elem->get_node(3);
 
-                          subelem[1]->set_node(0) = elem->get_node(0)
-                          subelem[1]->set_node(1) = elem->get_node(4)
-                          subelem[1]->set_node(2) = elem->get_node(1)
-                          subelem[1]->set_node(3) = elem->get_node(5)
+                          subelem[1]->set_node(0) = elem->get_node(0);
+                          subelem[1]->set_node(1) = elem->get_node(4);
+                          subelem[1]->set_node(2) = elem->get_node(1);
+                          subelem[1]->set_node(3) = elem->get_node(5);
 
-                          subelem[2]->set_node(0) = elem->get_node(0)
-                          subelem[2]->set_node(1) = elem->get_node(1)
-                          subelem[2]->set_node(2) = elem->get_node(2)
-                          subelem[2]->set_node(3) = elem->get_node(5)
+                          subelem[2]->set_node(0) = elem->get_node(0);
+                          subelem[2]->set_node(1) = elem->get_node(1);
+                          subelem[2]->set_node(2) = elem->get_node(2);
+                          subelem[2]->set_node(3) = elem->get_node(5);
                         }
                       else // Split on 2-4 diagonal
                         {
-                          subelem[0]->set_node(0) = elem->get_node(0)
-                          subelem[0]->set_node(1) = elem->get_node(4)
-                          subelem[0]->set_node(2) = elem->get_node(5)
-                          subelem[0]->set_node(3) = elem->get_node(3)
+                          subelem[0]->set_node(0) = elem->get_node(0);
+                          subelem[0]->set_node(1) = elem->get_node(4);
+                          subelem[0]->set_node(2) = elem->get_node(5);
+                          subelem[0]->set_node(3) = elem->get_node(3);
 
-                          subelem[1]->set_node(0) = elem->get_node(0)
-                          subelem[1]->set_node(1) = elem->get_node(4)
-                          subelem[1]->set_node(2) = elem->get_node(2)
-                          subelem[1]->set_node(3) = elem->get_node(5)
+                          subelem[1]->set_node(0) = elem->get_node(0);
+                          subelem[1]->set_node(1) = elem->get_node(4);
+                          subelem[1]->set_node(2) = elem->get_node(2);
+                          subelem[1]->set_node(3) = elem->get_node(5);
 
-                          subelem[2]->set_node(0) = elem->get_node(0)
-                          subelem[2]->set_node(1) = elem->get_node(1)
-                          subelem[2]->set_node(2) = elem->get_node(2)
-                          subelem[2]->set_node(3) = elem->get_node(4)
+                          subelem[2]->set_node(0) = elem->get_node(0);
+                          subelem[2]->set_node(1) = elem->get_node(1);
+                          subelem[2]->set_node(2) = elem->get_node(2);
+                          subelem[2]->set_node(3) = elem->get_node(4);
                         }
                     }
                   else // Split on 2-3 diagonal
                     {
                       // 0-4 and 2-3 split implies 2-4 split
-                      subelem[0]->set_node(0) = elem->get_node(0)
-                      subelem[0]->set_node(1) = elem->get_node(4)
-                      subelem[0]->set_node(2) = elem->get_node(2)
-                      subelem[0]->set_node(3) = elem->get_node(3)
+                      subelem[0]->set_node(0) = elem->get_node(0);
+                      subelem[0]->set_node(1) = elem->get_node(4);
+                      subelem[0]->set_node(2) = elem->get_node(2);
+                      subelem[0]->set_node(3) = elem->get_node(3);
 
-                      subelem[1]->set_node(0) = elem->get_node(3)
-                      subelem[1]->set_node(1) = elem->get_node(4)
-                      subelem[1]->set_node(2) = elem->get_node(2)
-                      subelem[1]->set_node(3) = elem->get_node(5)
+                      subelem[1]->set_node(0) = elem->get_node(3);
+                      subelem[1]->set_node(1) = elem->get_node(4);
+                      subelem[1]->set_node(2) = elem->get_node(2);
+                      subelem[1]->set_node(3) = elem->get_node(5);
 
-                      subelem[2]->set_node(0) = elem->get_node(0)
-                      subelem[2]->set_node(1) = elem->get_node(1)
-                      subelem[2]->set_node(2) = elem->get_node(2)
-                      subelem[2]->set_node(3) = elem->get_node(4)
+                      subelem[2]->set_node(0) = elem->get_node(0);
+                      subelem[2]->set_node(1) = elem->get_node(1);
+                      subelem[2]->set_node(2) = elem->get_node(2);
+                      subelem[2]->set_node(3) = elem->get_node(4);
                     }
                 }
               else // Split on 1-3 diagonal
@@ -957,20 +960,20 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                        elem->node(5) > elem->node(3)))
                     {
                       // 1-3 and 0-5 split implies 1-5 split
-                      subelem[0]->set_node(0) = elem->get_node(1)
-                      subelem[0]->set_node(1) = elem->get_node(3)
-                      subelem[0]->set_node(2) = elem->get_node(4)
-                      subelem[0]->set_node(3) = elem->get_node(5)
+                      subelem[0]->set_node(0) = elem->get_node(1);
+                      subelem[0]->set_node(1) = elem->get_node(3);
+                      subelem[0]->set_node(2) = elem->get_node(4);
+                      subelem[0]->set_node(3) = elem->get_node(5);
 
-                      subelem[1]->set_node(0) = elem->get_node(1)
-                      subelem[1]->set_node(1) = elem->get_node(0)
-                      subelem[1]->set_node(2) = elem->get_node(3)
-                      subelem[1]->set_node(3) = elem->get_node(5)
+                      subelem[1]->set_node(0) = elem->get_node(1);
+                      subelem[1]->set_node(1) = elem->get_node(0);
+                      subelem[1]->set_node(2) = elem->get_node(3);
+                      subelem[1]->set_node(3) = elem->get_node(5);
 
-                      subelem[2]->set_node(0) = elem->get_node(0)
-                      subelem[2]->set_node(1) = elem->get_node(1)
-                      subelem[2]->set_node(2) = elem->get_node(2)
-                      subelem[2]->set_node(3) = elem->get_node(5)
+                      subelem[2]->set_node(0) = elem->get_node(0);
+                      subelem[2]->set_node(1) = elem->get_node(1);
+                      subelem[2]->set_node(2) = elem->get_node(2);
+                      subelem[2]->set_node(3) = elem->get_node(5);
                     }
                   else // Split on 2-3 diagonal
                     {
@@ -980,37 +983,37 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                           (elem->node(5) > elem->node(2) &&
                            elem->node(5) > elem->node(4)))
                         {
-                          subelem[0]->set_node(0) = elem->get_node(0)
-                          subelem[0]->set_node(1) = elem->get_node(1)
-                          subelem[0]->set_node(2) = elem->get_node(2)
-                          subelem[0]->set_node(3) = elem->get_node(3)
+                          subelem[0]->set_node(0) = elem->get_node(0);
+                          subelem[0]->set_node(1) = elem->get_node(1);
+                          subelem[0]->set_node(2) = elem->get_node(2);
+                          subelem[0]->set_node(3) = elem->get_node(3);
 
-                          subelem[1]->set_node(0) = elem->get_node(3)
-                          subelem[1]->set_node(1) = elem->get_node(1)
-                          subelem[1]->set_node(2) = elem->get_node(2)
-                          subelem[1]->set_node(3) = elem->get_node(5)
+                          subelem[1]->set_node(0) = elem->get_node(3);
+                          subelem[1]->set_node(1) = elem->get_node(1);
+                          subelem[1]->set_node(2) = elem->get_node(2);
+                          subelem[1]->set_node(3) = elem->get_node(5);
 
-                          subelem[2]->set_node(0) = elem->get_node(1)
-                          subelem[2]->set_node(1) = elem->get_node(3)
-                          subelem[2]->set_node(2) = elem->get_node(4)
-                          subelem[2]->set_node(3) = elem->get_node(5)
+                          subelem[2]->set_node(0) = elem->get_node(1);
+                          subelem[2]->set_node(1) = elem->get_node(3);
+                          subelem[2]->set_node(2) = elem->get_node(4);
+                          subelem[2]->set_node(3) = elem->get_node(5);
                         }
                       else // Split on 2-4 diagonal
                         {
-                          subelem[0]->set_node(0) = elem->get_node(0)
-                          subelem[0]->set_node(1) = elem->get_node(1)
-                          subelem[0]->set_node(2) = elem->get_node(2)
-                          subelem[0]->set_node(3) = elem->get_node(3)
+                          subelem[0]->set_node(0) = elem->get_node(0);
+                          subelem[0]->set_node(1) = elem->get_node(1);
+                          subelem[0]->set_node(2) = elem->get_node(2);
+                          subelem[0]->set_node(3) = elem->get_node(3);
 
-                          subelem[1]->set_node(0) = elem->get_node(2)
-                          subelem[1]->set_node(1) = elem->get_node(3)
-                          subelem[1]->set_node(2) = elem->get_node(4)
-                          subelem[1]->set_node(3) = elem->get_node(5)
+                          subelem[1]->set_node(0) = elem->get_node(2);
+                          subelem[1]->set_node(1) = elem->get_node(3);
+                          subelem[1]->set_node(2) = elem->get_node(4);
+                          subelem[1]->set_node(3) = elem->get_node(5);
 
-                          subelem[2]->set_node(0) = elem->get_node(3)
-                          subelem[2]->set_node(1) = elem->get_node(1)
-                          subelem[2]->set_node(2) = elem->get_node(2)
-                          subelem[2]->set_node(3) = elem->get_node(4)
+                          subelem[2]->set_node(0) = elem->get_node(3);
+                          subelem[2]->set_node(1) = elem->get_node(1);
+                          subelem[2]->set_node(2) = elem->get_node(2);
+                          subelem[2]->set_node(3) = elem->get_node(4);
                         }
                     }
                 }
@@ -1042,119 +1045,119 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                           (elem->node(5) > elem->node(2) &&
                            elem->node(5) > elem->node(4)))
                         {
-                          subelem[0]->set_node(0) = elem->get_node(0)
-                          subelem[0]->set_node(1) = elem->get_node(4)
-                          subelem[0]->set_node(2) = elem->get_node(5)
-                          subelem[0]->set_node(3) = elem->get_node(3)
+                          subelem[0]->set_node(0) = elem->get_node(0);
+                          subelem[0]->set_node(1) = elem->get_node(4);
+                          subelem[0]->set_node(2) = elem->get_node(5);
+                          subelem[0]->set_node(3) = elem->get_node(3);
 
-                          subelem[0]->set_node(4) = elem->get_node(15)
-                          subelem[0]->set_node(5) = elem->get_node(13)
-                          subelem[0]->set_node(6) = elem->get_node(17)
-                          subelem[0]->set_node(7) = elem->get_node(9)
-                          subelem[0]->set_node(8) = elem->get_node(12)
-                          subelem[0]->set_node(9) = elem->get_node(14)
+                          subelem[0]->set_node(4) = elem->get_node(15);
+                          subelem[0]->set_node(5) = elem->get_node(13);
+                          subelem[0]->set_node(6) = elem->get_node(17);
+                          subelem[0]->set_node(7) = elem->get_node(9);
+                          subelem[0]->set_node(8) = elem->get_node(12);
+                          subelem[0]->set_node(9) = elem->get_node(14);
 
-                          subelem[1]->set_node(0) = elem->get_node(0)
-                          subelem[1]->set_node(1) = elem->get_node(4)
-                          subelem[1]->set_node(2) = elem->get_node(1)
-                          subelem[1]->set_node(3) = elem->get_node(5)
+                          subelem[1]->set_node(0) = elem->get_node(0);
+                          subelem[1]->set_node(1) = elem->get_node(4);
+                          subelem[1]->set_node(2) = elem->get_node(1);
+                          subelem[1]->set_node(3) = elem->get_node(5);
 
-                          subelem[1]->set_node(4) = elem->get_node(15)
-                          subelem[1]->set_node(5) = elem->get_node(10)
-                          subelem[1]->set_node(6) = elem->get_node(6)
-                          subelem[1]->set_node(7) = elem->get_node(17)
-                          subelem[1]->set_node(8) = elem->get_node(13)
-                          subelem[1]->set_node(9) = elem->get_node(16)
+                          subelem[1]->set_node(4) = elem->get_node(15);
+                          subelem[1]->set_node(5) = elem->get_node(10);
+                          subelem[1]->set_node(6) = elem->get_node(6);
+                          subelem[1]->set_node(7) = elem->get_node(17);
+                          subelem[1]->set_node(8) = elem->get_node(13);
+                          subelem[1]->set_node(9) = elem->get_node(16);
 
-                          subelem[2]->set_node(0) = elem->get_node(0)
-                          subelem[2]->set_node(1) = elem->get_node(1)
-                          subelem[2]->set_node(2) = elem->get_node(2)
-                          subelem[2]->set_node(3) = elem->get_node(5)
+                          subelem[2]->set_node(0) = elem->get_node(0);
+                          subelem[2]->set_node(1) = elem->get_node(1);
+                          subelem[2]->set_node(2) = elem->get_node(2);
+                          subelem[2]->set_node(3) = elem->get_node(5);
 
-                          subelem[2]->set_node(4) = elem->get_node(6)
-                          subelem[2]->set_node(5) = elem->get_node(7)
-                          subelem[2]->set_node(6) = elem->get_node(8)
-                          subelem[2]->set_node(7) = elem->get_node(17)
-                          subelem[2]->set_node(8) = elem->get_node(16)
-                          subelem[2]->set_node(9) = elem->get_node(11)
+                          subelem[2]->set_node(4) = elem->get_node(6);
+                          subelem[2]->set_node(5) = elem->get_node(7);
+                          subelem[2]->set_node(6) = elem->get_node(8);
+                          subelem[2]->set_node(7) = elem->get_node(17);
+                          subelem[2]->set_node(8) = elem->get_node(16);
+                          subelem[2]->set_node(9) = elem->get_node(11);
                         }
                       else // Split on 2-4 diagonal
                         {
-                          subelem[0]->set_node(0) = elem->get_node(0)
-                          subelem[0]->set_node(1) = elem->get_node(4)
-                          subelem[0]->set_node(2) = elem->get_node(5)
-                          subelem[0]->set_node(3) = elem->get_node(3)
+                          subelem[0]->set_node(0) = elem->get_node(0);
+                          subelem[0]->set_node(1) = elem->get_node(4);
+                          subelem[0]->set_node(2) = elem->get_node(5);
+                          subelem[0]->set_node(3) = elem->get_node(3);
 
-                          subelem[0]->set_node(4) = elem->get_node(15)
-                          subelem[0]->set_node(5) = elem->get_node(13)
-                          subelem[0]->set_node(6) = elem->get_node(17)
-                          subelem[0]->set_node(7) = elem->get_node(9)
-                          subelem[0]->set_node(8) = elem->get_node(12)
-                          subelem[0]->set_node(9) = elem->get_node(14)
+                          subelem[0]->set_node(4) = elem->get_node(15);
+                          subelem[0]->set_node(5) = elem->get_node(13);
+                          subelem[0]->set_node(6) = elem->get_node(17);
+                          subelem[0]->set_node(7) = elem->get_node(9);
+                          subelem[0]->set_node(8) = elem->get_node(12);
+                          subelem[0]->set_node(9) = elem->get_node(14);
 
-                          subelem[1]->set_node(0) = elem->get_node(0)
-                          subelem[1]->set_node(1) = elem->get_node(4)
-                          subelem[1]->set_node(2) = elem->get_node(2)
-                          subelem[1]->set_node(3) = elem->get_node(5)
+                          subelem[1]->set_node(0) = elem->get_node(0);
+                          subelem[1]->set_node(1) = elem->get_node(4);
+                          subelem[1]->set_node(2) = elem->get_node(2);
+                          subelem[1]->set_node(3) = elem->get_node(5);
 
-                          subelem[1]->set_node(4) = elem->get_node(15)
-                          subelem[1]->set_node(5) = elem->get_node(16)
-                          subelem[1]->set_node(6) = elem->get_node(8)
-                          subelem[1]->set_node(7) = elem->get_node(17)
-                          subelem[1]->set_node(8) = elem->get_node(13)
-                          subelem[1]->set_node(9) = elem->get_node(11)
+                          subelem[1]->set_node(4) = elem->get_node(15);
+                          subelem[1]->set_node(5) = elem->get_node(16);
+                          subelem[1]->set_node(6) = elem->get_node(8);
+                          subelem[1]->set_node(7) = elem->get_node(17);
+                          subelem[1]->set_node(8) = elem->get_node(13);
+                          subelem[1]->set_node(9) = elem->get_node(11);
 
-                          subelem[2]->set_node(0) = elem->get_node(0)
-                          subelem[2]->set_node(1) = elem->get_node(1)
-                          subelem[2]->set_node(2) = elem->get_node(2)
-                          subelem[2]->set_node(3) = elem->get_node(4)
+                          subelem[2]->set_node(0) = elem->get_node(0);
+                          subelem[2]->set_node(1) = elem->get_node(1);
+                          subelem[2]->set_node(2) = elem->get_node(2);
+                          subelem[2]->set_node(3) = elem->get_node(4);
 
-                          subelem[2]->set_node(4) = elem->get_node(6)
-                          subelem[2]->set_node(5) = elem->get_node(7)
-                          subelem[2]->set_node(6) = elem->get_node(8)
-                          subelem[2]->set_node(7) = elem->get_node(15)
-                          subelem[2]->set_node(8) = elem->get_node(10)
-                          subelem[2]->set_node(9) = elem->get_node(16)
+                          subelem[2]->set_node(4) = elem->get_node(6);
+                          subelem[2]->set_node(5) = elem->get_node(7);
+                          subelem[2]->set_node(6) = elem->get_node(8);
+                          subelem[2]->set_node(7) = elem->get_node(15);
+                          subelem[2]->set_node(8) = elem->get_node(10);
+                          subelem[2]->set_node(9) = elem->get_node(16);
                         }
                     }
                   else // Split on 2-3 diagonal
                     {
                       // 0-4 and 2-3 split implies 2-4 split
-                      subelem[0]->set_node(0) = elem->get_node(0)
-                      subelem[0]->set_node(1) = elem->get_node(4)
-                      subelem[0]->set_node(2) = elem->get_node(2)
-                      subelem[0]->set_node(3) = elem->get_node(3)
+                      subelem[0]->set_node(0) = elem->get_node(0);
+                      subelem[0]->set_node(1) = elem->get_node(4);
+                      subelem[0]->set_node(2) = elem->get_node(2);
+                      subelem[0]->set_node(3) = elem->get_node(3);
 
-                      subelem[0]->set_node(4) = elem->get_node(15)
-                      subelem[0]->set_node(5) = elem->get_node(16)
-                      subelem[0]->set_node(6) = elem->get_node(8)
-                      subelem[0]->set_node(7) = elem->get_node(9)
-                      subelem[0]->set_node(8) = elem->get_node(12)
-                      subelem[0]->set_node(9) = elem->get_node(17)
+                      subelem[0]->set_node(4) = elem->get_node(15);
+                      subelem[0]->set_node(5) = elem->get_node(16);
+                      subelem[0]->set_node(6) = elem->get_node(8);
+                      subelem[0]->set_node(7) = elem->get_node(9);
+                      subelem[0]->set_node(8) = elem->get_node(12);
+                      subelem[0]->set_node(9) = elem->get_node(17);
 
-                      subelem[1]->set_node(0) = elem->get_node(3)
-                      subelem[1]->set_node(1) = elem->get_node(4)
-                      subelem[1]->set_node(2) = elem->get_node(2)
-                      subelem[1]->set_node(3) = elem->get_node(5)
+                      subelem[1]->set_node(0) = elem->get_node(3);
+                      subelem[1]->set_node(1) = elem->get_node(4);
+                      subelem[1]->set_node(2) = elem->get_node(2);
+                      subelem[1]->set_node(3) = elem->get_node(5);
 
-                      subelem[1]->set_node(4) = elem->get_node(12)
-                      subelem[1]->set_node(5) = elem->get_node(16)
-                      subelem[1]->set_node(6) = elem->get_node(17)
-                      subelem[1]->set_node(7) = elem->get_node(14)
-                      subelem[1]->set_node(8) = elem->get_node(13)
-                      subelem[1]->set_node(9) = elem->get_node(11)
+                      subelem[1]->set_node(4) = elem->get_node(12);
+                      subelem[1]->set_node(5) = elem->get_node(16);
+                      subelem[1]->set_node(6) = elem->get_node(17);
+                      subelem[1]->set_node(7) = elem->get_node(14);
+                      subelem[1]->set_node(8) = elem->get_node(13);
+                      subelem[1]->set_node(9) = elem->get_node(11);
 
-                      subelem[2]->set_node(0) = elem->get_node(0)
-                      subelem[2]->set_node(1) = elem->get_node(1)
-                      subelem[2]->set_node(2) = elem->get_node(2)
-                      subelem[2]->set_node(3) = elem->get_node(4)
+                      subelem[2]->set_node(0) = elem->get_node(0);
+                      subelem[2]->set_node(1) = elem->get_node(1);
+                      subelem[2]->set_node(2) = elem->get_node(2);
+                      subelem[2]->set_node(3) = elem->get_node(4);
 
-                      subelem[2]->set_node(4) = elem->get_node(6)
-                      subelem[2]->set_node(5) = elem->get_node(7)
-                      subelem[2]->set_node(6) = elem->get_node(8)
-                      subelem[2]->set_node(7) = elem->get_node(15)
-                      subelem[2]->set_node(8) = elem->get_node(10)
-                      subelem[2]->set_node(9) = elem->get_node(16)
+                      subelem[2]->set_node(4) = elem->get_node(6);
+                      subelem[2]->set_node(5) = elem->get_node(7);
+                      subelem[2]->set_node(6) = elem->get_node(8);
+                      subelem[2]->set_node(7) = elem->get_node(15);
+                      subelem[2]->set_node(8) = elem->get_node(10);
+                      subelem[2]->set_node(9) = elem->get_node(16);
                     }
                 }
               else // Split on 1-3 diagonal
@@ -1166,41 +1169,41 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                        elem->node(5) > elem->node(3)))
                     {
                       // 1-3 and 0-5 split implies 1-5 split
-                      subelem[0]->set_node(0) = elem->get_node(1)
-                      subelem[0]->set_node(1) = elem->get_node(3)
-                      subelem[0]->set_node(2) = elem->get_node(4)
-                      subelem[0]->set_node(3) = elem->get_node(5)
+                      subelem[0]->set_node(0) = elem->get_node(1);
+                      subelem[0]->set_node(1) = elem->get_node(3);
+                      subelem[0]->set_node(2) = elem->get_node(4);
+                      subelem[0]->set_node(3) = elem->get_node(5);
 
-                      subelem[0]->set_node(4) = elem->get_node(15)
-                      subelem[0]->set_node(5) = elem->get_node(12)
-                      subelem[0]->set_node(6) = elem->get_node(10)
-                      subelem[0]->set_node(7) = elem->get_node(16)
-                      subelem[0]->set_node(8) = elem->get_node(14)
-                      subelem[0]->set_node(9) = elem->get_node(13)
+                      subelem[0]->set_node(4) = elem->get_node(15);
+                      subelem[0]->set_node(5) = elem->get_node(12);
+                      subelem[0]->set_node(6) = elem->get_node(10);
+                      subelem[0]->set_node(7) = elem->get_node(16);
+                      subelem[0]->set_node(8) = elem->get_node(14);
+                      subelem[0]->set_node(9) = elem->get_node(13);
 
-                      subelem[1]->set_node(0) = elem->get_node(1)
-                      subelem[1]->set_node(1) = elem->get_node(0)
-                      subelem[1]->set_node(2) = elem->get_node(3)
-                      subelem[1]->set_node(3) = elem->get_node(5)
+                      subelem[1]->set_node(0) = elem->get_node(1);
+                      subelem[1]->set_node(1) = elem->get_node(0);
+                      subelem[1]->set_node(2) = elem->get_node(3);
+                      subelem[1]->set_node(3) = elem->get_node(5);
 
-                      subelem[1]->set_node(4) = elem->get_node(6)
-                      subelem[1]->set_node(5) = elem->get_node(9)
-                      subelem[1]->set_node(6) = elem->get_node(15)
-                      subelem[1]->set_node(7) = elem->get_node(16)
-                      subelem[1]->set_node(8) = elem->get_node(17)
-                      subelem[1]->set_node(9) = elem->get_node(14)
+                      subelem[1]->set_node(4) = elem->get_node(6);
+                      subelem[1]->set_node(5) = elem->get_node(9);
+                      subelem[1]->set_node(6) = elem->get_node(15);
+                      subelem[1]->set_node(7) = elem->get_node(16);
+                      subelem[1]->set_node(8) = elem->get_node(17);
+                      subelem[1]->set_node(9) = elem->get_node(14);
 
-                      subelem[2]->set_node(0) = elem->get_node(0)
-                      subelem[2]->set_node(1) = elem->get_node(1)
-                      subelem[2]->set_node(2) = elem->get_node(2)
-                      subelem[2]->set_node(3) = elem->get_node(5)
+                      subelem[2]->set_node(0) = elem->get_node(0);
+                      subelem[2]->set_node(1) = elem->get_node(1);
+                      subelem[2]->set_node(2) = elem->get_node(2);
+                      subelem[2]->set_node(3) = elem->get_node(5);
 
-                      subelem[2]->set_node(4) = elem->get_node(6)
-                      subelem[2]->set_node(5) = elem->get_node(7)
-                      subelem[2]->set_node(6) = elem->get_node(8)
-                      subelem[2]->set_node(7) = elem->get_node(17)
-                      subelem[2]->set_node(8) = elem->get_node(16)
-                      subelem[2]->set_node(9) = elem->get_node(11)
+                      subelem[2]->set_node(4) = elem->get_node(6);
+                      subelem[2]->set_node(5) = elem->get_node(7);
+                      subelem[2]->set_node(6) = elem->get_node(8);
+                      subelem[2]->set_node(7) = elem->get_node(17);
+                      subelem[2]->set_node(8) = elem->get_node(16);
+                      subelem[2]->set_node(9) = elem->get_node(11);
                     }
                   else // Split on 2-3 diagonal
                     {
@@ -1210,79 +1213,79 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                           (elem->node(5) > elem->node(2) &&
                            elem->node(5) > elem->node(4)))
                         {
-                          subelem[0]->set_node(0) = elem->get_node(0)
-                          subelem[0]->set_node(1) = elem->get_node(1)
-                          subelem[0]->set_node(2) = elem->get_node(2)
-                          subelem[0]->set_node(3) = elem->get_node(3)
+                          subelem[0]->set_node(0) = elem->get_node(0);
+                          subelem[0]->set_node(1) = elem->get_node(1);
+                          subelem[0]->set_node(2) = elem->get_node(2);
+                          subelem[0]->set_node(3) = elem->get_node(3);
 
-                          subelem[0]->set_node(4) = elem->get_node(6)
-                          subelem[0]->set_node(5) = elem->get_node(7)
-                          subelem[0]->set_node(6) = elem->get_node(8)
-                          subelem[0]->set_node(7) = elem->get_node(9)
-                          subelem[0]->set_node(8) = elem->get_node(15)
-                          subelem[0]->set_node(9) = elem->get_node(17)
+                          subelem[0]->set_node(4) = elem->get_node(6);
+                          subelem[0]->set_node(5) = elem->get_node(7);
+                          subelem[0]->set_node(6) = elem->get_node(8);
+                          subelem[0]->set_node(7) = elem->get_node(9);
+                          subelem[0]->set_node(8) = elem->get_node(15);
+                          subelem[0]->set_node(9) = elem->get_node(17);
 
-                          subelem[1]->set_node(0) = elem->get_node(3)
-                          subelem[1]->set_node(1) = elem->get_node(1)
-                          subelem[1]->set_node(2) = elem->get_node(2)
-                          subelem[1]->set_node(3) = elem->get_node(5)
+                          subelem[1]->set_node(0) = elem->get_node(3);
+                          subelem[1]->set_node(1) = elem->get_node(1);
+                          subelem[1]->set_node(2) = elem->get_node(2);
+                          subelem[1]->set_node(3) = elem->get_node(5);
 
-                          subelem[1]->set_node(4) = elem->get_node(15)
-                          subelem[1]->set_node(5) = elem->get_node(7)
-                          subelem[1]->set_node(6) = elem->get_node(17)
-                          subelem[1]->set_node(7) = elem->get_node(14)
-                          subelem[1]->set_node(8) = elem->get_node(16)
-                          subelem[1]->set_node(9) = elem->get_node(11)
+                          subelem[1]->set_node(4) = elem->get_node(15);
+                          subelem[1]->set_node(5) = elem->get_node(7);
+                          subelem[1]->set_node(6) = elem->get_node(17);
+                          subelem[1]->set_node(7) = elem->get_node(14);
+                          subelem[1]->set_node(8) = elem->get_node(16);
+                          subelem[1]->set_node(9) = elem->get_node(11);
 
-                          subelem[2]->set_node(0) = elem->get_node(1)
-                          subelem[2]->set_node(1) = elem->get_node(3)
-                          subelem[2]->set_node(2) = elem->get_node(4)
-                          subelem[2]->set_node(3) = elem->get_node(5)
+                          subelem[2]->set_node(0) = elem->get_node(1);
+                          subelem[2]->set_node(1) = elem->get_node(3);
+                          subelem[2]->set_node(2) = elem->get_node(4);
+                          subelem[2]->set_node(3) = elem->get_node(5);
 
-                          subelem[2]->set_node(4) = elem->get_node(15)
-                          subelem[2]->set_node(5) = elem->get_node(12)
-                          subelem[2]->set_node(6) = elem->get_node(10)
-                          subelem[2]->set_node(7) = elem->get_node(16)
-                          subelem[2]->set_node(8) = elem->get_node(14)
-                          subelem[2]->set_node(9) = elem->get_node(13)
+                          subelem[2]->set_node(4) = elem->get_node(15);
+                          subelem[2]->set_node(5) = elem->get_node(12);
+                          subelem[2]->set_node(6) = elem->get_node(10);
+                          subelem[2]->set_node(7) = elem->get_node(16);
+                          subelem[2]->set_node(8) = elem->get_node(14);
+                          subelem[2]->set_node(9) = elem->get_node(13);
                         }
                       else // Split on 2-4 diagonal
                         {
-                          subelem[0]->set_node(0) = elem->get_node(0)
-                          subelem[0]->set_node(1) = elem->get_node(1)
-                          subelem[0]->set_node(2) = elem->get_node(2)
-                          subelem[0]->set_node(3) = elem->get_node(3)
+                          subelem[0]->set_node(0) = elem->get_node(0);
+                          subelem[0]->set_node(1) = elem->get_node(1);
+                          subelem[0]->set_node(2) = elem->get_node(2);
+                          subelem[0]->set_node(3) = elem->get_node(3);
 
-                          subelem[0]->set_node(4) = elem->get_node(6)
-                          subelem[0]->set_node(5) = elem->get_node(7)
-                          subelem[0]->set_node(6) = elem->get_node(8)
-                          subelem[0]->set_node(7) = elem->get_node(9)
-                          subelem[0]->set_node(8) = elem->get_node(15)
-                          subelem[0]->set_node(9) = elem->get_node(17)
+                          subelem[0]->set_node(4) = elem->get_node(6);
+                          subelem[0]->set_node(5) = elem->get_node(7);
+                          subelem[0]->set_node(6) = elem->get_node(8);
+                          subelem[0]->set_node(7) = elem->get_node(9);
+                          subelem[0]->set_node(8) = elem->get_node(15);
+                          subelem[0]->set_node(9) = elem->get_node(17);
 
-                          subelem[1]->set_node(0) = elem->get_node(2)
-                          subelem[1]->set_node(1) = elem->get_node(3)
-                          subelem[1]->set_node(2) = elem->get_node(4)
-                          subelem[1]->set_node(3) = elem->get_node(5)
+                          subelem[1]->set_node(0) = elem->get_node(2);
+                          subelem[1]->set_node(1) = elem->get_node(3);
+                          subelem[1]->set_node(2) = elem->get_node(4);
+                          subelem[1]->set_node(3) = elem->get_node(5);
 
-                          subelem[1]->set_node(4) = elem->get_node(17)
-                          subelem[1]->set_node(5) = elem->get_node(12)
-                          subelem[1]->set_node(6) = elem->get_node(16)
-                          subelem[1]->set_node(7) = elem->get_node(11)
-                          subelem[1]->set_node(8) = elem->get_node(14)
-                          subelem[1]->set_node(9) = elem->get_node(13)
+                          subelem[1]->set_node(4) = elem->get_node(17);
+                          subelem[1]->set_node(5) = elem->get_node(12);
+                          subelem[1]->set_node(6) = elem->get_node(16);
+                          subelem[1]->set_node(7) = elem->get_node(11);
+                          subelem[1]->set_node(8) = elem->get_node(14);
+                          subelem[1]->set_node(9) = elem->get_node(13);
 
-                          subelem[2]->set_node(0) = elem->get_node(3)
-                          subelem[2]->set_node(1) = elem->get_node(1)
-                          subelem[2]->set_node(2) = elem->get_node(2)
-                          subelem[2]->set_node(3) = elem->get_node(4)
+                          subelem[2]->set_node(0) = elem->get_node(3);
+                          subelem[2]->set_node(1) = elem->get_node(1);
+                          subelem[2]->set_node(2) = elem->get_node(2);
+                          subelem[2]->set_node(3) = elem->get_node(4);
 
-                          subelem[2]->set_node(4) = elem->get_node(15)
-                          subelem[2]->set_node(5) = elem->get_node(7)
-                          subelem[2]->set_node(6) = elem->get_node(17)
-                          subelem[2]->set_node(7) = elem->get_node(12)
-                          subelem[2]->set_node(8) = elem->get_node(10)
-                          subelem[2]->set_node(9) = elem->get_node(16)
+                          subelem[2]->set_node(4) = elem->get_node(15);
+                          subelem[2]->set_node(5) = elem->get_node(7);
+                          subelem[2]->set_node(6) = elem->get_node(17);
+                          subelem[2]->set_node(7) = elem->get_node(12);
+                          subelem[2]->set_node(8) = elem->get_node(10);
+                          subelem[2]->set_node(9) = elem->get_node(16);
                         }
                     }
                 }
@@ -1322,7 +1325,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
         // Be sure the correct ID's are also set for subelem[0] and
         // subelem[1].
-        for (unsigned int i=0; i != 6; ++i)
+        for (unsigned int i=0; i != max_subelems; ++i)
           if (subelem[i]) {
             subelem[i]->processor_id() = elem->processor_id();
             subelem[i]->subdomain_id() = elem->subdomain_id();
@@ -1347,7 +1350,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                     if (mesh_is_serial && b_id == BoundaryInfo::invalid_id)
                       continue;
 
-                    for (unsigned int i=0; i != 6; ++i)
+                    for (unsigned int i=0; i != max_subelems; ++i)
                       if (subelem[i])
                         {
                           for (unsigned int subside=0;
@@ -1392,7 +1395,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
             // the same on all processors, therefore keeping the Mesh
             // in sync.  Note: we offset the new IDs by max_orig_id to
             // avoid overwriting any of the original IDs.
-            for (unsigned int i=0; i != 6; ++i)
+            for (unsigned int i=0; i != max_subelems; ++i)
               if (subelem[i])
                 {
                   subelem[i]->set_id( max_orig_id + 6*elem->id() + i );
