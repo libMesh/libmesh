@@ -176,26 +176,19 @@ namespace Parallel {
 
 #else // MPI_VERSION >= 2
 
-          int blocklengths[LIBMESH_DIM];
-          MPI_Aint displs[LIBMESH_DIM];
-          MPI_Datatype types[LIBMESH_DIM], tmptype;
-	  MPI_Aint start, later;
+          int blocklength = LIBMESH_DIM;
+          MPI_Aint displs, start;
+          MPI_Datatype tmptype, type = T_type;
 
 	  MPI_Get_address (ex,   &start);
-	  MPI_Get_address (ex+1, &later);
+	  MPI_Get_address (&((*ex)(0)), &displs);
 
-          for (unsigned int i=0; i != LIBMESH_DIM; ++i)
-            {
-              MPI_Get_address(&((*ex)(i)), &displs[i]);
-              // subtract off offset
-	      displs[i] -= start;
-              blocklengths[i] = 1;
-              types[i] = T_type;
-            }
+	  // subtract off offset to first value from the beginning of the structure
+	  displs -= start;
 
-	  MPI_Type_create_struct (LIBMESH_DIM, blocklengths, displs, types, &tmptype);
+	  MPI_Type_create_struct (1, &blocklength, &displs, &type, &tmptype);
 
-	  MPI_Type_create_resized (tmptype, 0, (later-start), &_static_type);
+	  MPI_Type_create_resized (tmptype, 0, sizeof(VectorValue<T>), &_static_type);
 #endif
 
           MPI_Type_commit (&_static_type);
