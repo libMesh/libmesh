@@ -16,6 +16,7 @@ public:
   CPPUNIT_TEST( testBroadcast );
   CPPUNIT_TEST( testBroadcastVectorValueInt );
   CPPUNIT_TEST( testBroadcastVectorValueReal );
+  CPPUNIT_TEST( testBroadcastPoint );
   CPPUNIT_TEST( testBarrier );
   CPPUNIT_TEST( testMin );
   CPPUNIT_TEST( testMax );
@@ -113,6 +114,29 @@ public:
   void testBroadcastVectorValueReal()
   {
     this->testBroadcastVectorValue<Real>();
+  }
+
+
+
+  void testBroadcastPoint()
+  {
+    std::vector<Point> src(3), dest(3);
+
+    {
+      Real val=0.;
+      for (unsigned int i=0; i<3; i++)
+	for (unsigned int j=0; j<LIBMESH_DIM; j++)
+	  src[i](j) = val++;
+
+      if (libMesh::processor_id() == 0)
+	dest = src;
+    }
+
+    CommWorld.broadcast(dest);
+
+    for (unsigned int i=0; i<3; i++)
+      for (unsigned int j=0; j<LIBMESH_DIM; j++)
+	CPPUNIT_ASSERT_EQUAL (src[i](j), dest[i](j) );
   }
 
 
