@@ -1362,7 +1362,9 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                                    v != subelem[i]->n_vertices();
                                    ++v)
                                 {
-                                  if (!elem->is_node_on_side(elem->get_node_index(subelem->get_node(v), sn))
+                                  if (!elem->is_node_on_side
+                                       (elem->get_node_index
+                                         (subelem[i]->get_node(v)), sn))
                                     subside_is_on_sn = false;
                                 }
 
