@@ -93,8 +93,6 @@ namespace libMesh
 		  else
 		    libmesh_assert_equal_to (nodal_soln.size(), 27*3);
 
-		  libmesh_not_implemented();
-
 		  break;
 		}
 
@@ -128,14 +126,18 @@ namespace libMesh
 		libmesh_assert_equal_to (elem_soln.size(), n_sf);
 
 		// Zero before summation
-		nodal_soln[2*n] = 0;
-		nodal_soln[2*n+1] = 0;
+                for( int d = 0; d < dim; d++ )
+                  {
+                    nodal_soln[dim*n+d] = 0;
+                  }
 
 		// u = Sum (u_i phi_i)
 		for (unsigned int i=0; i<n_sf; i++)
 		  {
-		    nodal_soln[2*n]   += elem_soln[i]*(vis_phi[i][n](0));
-		    nodal_soln[2*n+1] += elem_soln[i]*(vis_phi[i][n](1));
+                    for( int d = 0; d < dim; d++ )
+                      {
+                        nodal_soln[dim*n+d]   += elem_soln[i]*(vis_phi[i][n](d));
+                      }
 		  }
 	      }
 

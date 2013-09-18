@@ -88,8 +88,14 @@ MPI_Datatype Node::PackedNode::create_mpi_datatype ()
   // in which case id and x may not be 2*sizeof(unsigned int) apart.
   Node::PackedNode pn;
 
-  MPI_Address (&pn.id, &displs[0]);
-  MPI_Address (&pn.x,  &displs[1]);
+#if MPI_VERSION > 1
+  MPI_Get_address (&pn.id, &displs[0]);
+  MPI_Get_address (&pn.x,  &displs[1]);
+#else
+  MPI_Address     (&pn.id, &displs[0]);
+  MPI_Address     (&pn.x,  &displs[1]);
+#endif // #if MPI_VERSION > 1
+
   displs[1] -= displs[0];
   displs[0] = 0;
 

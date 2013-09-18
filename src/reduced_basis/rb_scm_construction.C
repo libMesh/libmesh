@@ -102,7 +102,7 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
   // value is -1, which means use std::time to seed the RNG.
-  unsigned int training_parameters_random_seed_in = static_cast<unsigned int>(-1);
+  unsigned int training_parameters_random_seed_in = static_cast<int>(-1);
   training_parameters_random_seed_in = infile("training_parameters_random_seed",
 					   training_parameters_random_seed_in);
   set_training_random_seed(training_parameters_random_seed_in);
@@ -112,7 +112,35 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
   set_SCM_training_tolerance(SCM_training_tolerance_in);
 
   // Initialize the parameter ranges and the parameters themselves
-  initialize_parameters(parameters_filename);
+  const unsigned int n_parameters = infile("n_parameters",1);
+  RBParameters mu_min_in;
+  RBParameters mu_max_in;
+  RBParameters initial_mu_in;
+  for(unsigned int i=0; i<n_parameters; i++)
+  {
+    // Read in the parameter names
+    std::string param_name = infile("parameter_names", "NONE", i);
+
+    for(unsigned int j=0; j<3; j++)
+    {
+      if(j==0)
+      {
+        Real min_val = infile(param_name, 0., j);
+        mu_min_in.set_value(param_name, min_val);
+      }
+      else if(j==1)
+      {
+        Real max_val = infile(param_name, 0., j);
+        mu_max_in.set_value(param_name, max_val);
+      }
+      else
+      {
+        Real init_val = infile(param_name, 0., j);
+        initial_mu_in.set_value(param_name, init_val);
+      }
+    }
+  }
+  initialize_parameters(mu_min_in, mu_max_in, initial_mu_in);
 
   std::map<std::string,bool> log_scaling;
   const RBParameters& mu = get_parameters();
@@ -121,10 +149,6 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
   unsigned int i=0;
   for( ; it != it_end; ++it)
   {
-    // Read vector-based log scaling values.  Note the intermediate conversion to
-    // int... this implies log_scaling = '1 1 1...' in the input file.
-//    log_scaling[i] = static_cast<bool>(infile("log_scaling", static_cast<int>(log_scaling[i]), i));
-
     std::string param_name = it->first;
     log_scaling[param_name] = static_cast<bool>(infile("log_scaling", 0, i));
     i++;

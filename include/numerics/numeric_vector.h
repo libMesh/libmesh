@@ -379,6 +379,12 @@ public:
   virtual void reciprocal() = 0;
 
   /**
+   * Replace each entry v_i = real(v_i) + imag(v_i)
+   * of this vector by its complex conjugate, real(v_i) - imag(v_i)
+   */
+  virtual void conjugate() = 0;
+
+  /**
    * v(i) = value
    */
   virtual void set (const numeric_index_type i, const T value) = 0;

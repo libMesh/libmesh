@@ -147,6 +147,8 @@ if (test "$enablepthreads" != no) ; then
 fi
 
 if (test x$ax_pthread_ok = xyes); then
+  AC_DEFINE(USING_THREADS, 1,
+            [Flag indicating whether the library shall be compiled to use any particular thread API.])
   AC_MSG_RESULT(<<< Configuring library with pthread support >>>)
   libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
   libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"

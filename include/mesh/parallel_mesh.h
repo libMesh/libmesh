@@ -171,7 +171,12 @@ class ParallelMesh : public UnstructuredMesh
    * get deleted by delete_remote_elements.  This is handy for inserting
    * off-processor elements that you want to keep track of on this processor.
    */
-  virtual void insert_extra_ghost_elem(Elem* e);
+  virtual void add_extra_ghost_elem(Elem* e);
+
+  /**
+   * Clears extra ghost elements.
+   */
+  virtual void clear_extra_ghost_elems() { _extra_ghost_elems.clear(); }
 
   // Cached methods that can be called in serial
   virtual dof_id_type n_nodes () const { return _n_nodes; }

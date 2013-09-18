@@ -81,7 +81,7 @@ public:
   /**
    * Release all memory and clear data structures.
    */
-  virtual void clear () {}
+  virtual void clear ();
 
   /**
    * Initialize data structures if not done so already.

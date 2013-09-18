@@ -669,8 +669,11 @@ QVector *GMRESIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 
             /* GMRES iteration */
             i = 0;
-            while ((PrecondProc != NULL ? _LPTrue : !RTCResult(Iter, _LPfabs(s[i+1]),
-                bNorm, GMRESIterId)) && i < GMRESSteps && Iter < MaxIter) {
+            while (((PrecondProc != NULL) ?
+                    _LPTrue :
+                    (_LPBoolean)(!RTCResult(Iter, _LPfabs(s[i+1]), bNorm, GMRESIterId)))
+                   && (i < GMRESSteps)
+                   && (Iter < MaxIter)) {
  	        i++;
 		Iter++;
                 /* w = v[i+1] */

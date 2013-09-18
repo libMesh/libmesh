@@ -57,6 +57,7 @@ void RBEIMEvaluation::clear()
 
   interpolation_points.clear();
   interpolation_points_var.clear();
+  interpolation_points_subdomain.clear();
 
   // Delete any RBTheta objects that were created
   for(unsigned int i=0; i<_rb_eim_theta_objects.size(); i++)
@@ -74,6 +75,7 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax,
   // Resize the data structures relevant to the EIM system
   interpolation_points.clear();
   interpolation_points_var.clear();
+  interpolation_points_subdomain.clear();
   interpolation_matrix.resize(Nmax,Nmax);
 
   // Resize the "extra" row due to the "extra Greedy step"
@@ -91,7 +93,9 @@ unsigned int RBEIMEvaluation::get_n_parametrized_functions() const
     (_parametrized_functions.size());
 }
 
-Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index, const Point& p)
+Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index,
+                                                       const Point& p,
+                                                       subdomain_id_type subdomain_id)
 {
   if(var_index >= get_n_parametrized_functions())
   {
@@ -100,7 +104,7 @@ Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index, c
     libmesh_error();
   }
 
-  return _parametrized_functions[var_index]->evaluate(get_parameters(), p);
+  return _parametrized_functions[var_index]->evaluate(get_parameters(), p, subdomain_id);
 }
 
 Real RBEIMEvaluation::rb_solve(unsigned int N)
@@ -135,7 +139,9 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
   DenseVector<Number> EIM_rhs(N);
   for(unsigned int i=0; i<N; i++)
   {
-    EIM_rhs(i) = evaluate_parametrized_function(interpolation_points_var[i], interpolation_points[i]);
+    EIM_rhs(i) = evaluate_parametrized_function(interpolation_points_var[i],
+                                                interpolation_points[i],
+                                                interpolation_points_subdomain[i]);
   }
 
 
@@ -152,9 +158,13 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
     // First, sample the parametrized function at x_{N+1}
     Number g_at_next_x;
     if(N == get_n_basis_functions())
-      g_at_next_x = evaluate_parametrized_function(extra_interpolation_point_var, extra_interpolation_point);
+      g_at_next_x = evaluate_parametrized_function(extra_interpolation_point_var,
+                                                   extra_interpolation_point,
+                                                   extra_interpolation_point_subdomain);
     else
-      g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N], interpolation_points[N]);
+      g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N],
+                                                   interpolation_points[N],
+                                                   interpolation_points_subdomain[N]);
 
     // Next, evaluate the EIM approximation at x_{N+1}
     Number EIM_approx_at_next_x = 0.;
@@ -318,6 +328,17 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
     }
     interpolation_points_var_out.close();
 
+    // Next write out interpolation_points_subdomain
+    file_name.str("");
+    file_name << directory_name << "/interpolation_points_subdomain" << suffix;
+    Xdr interpolation_points_subdomain_out(file_name.str(), mode);
+
+    for(unsigned int i=0; i<n_bfs; i++)
+    {
+      interpolation_points_subdomain_out << interpolation_points_subdomain[i];
+    }
+    interpolation_points_subdomain_out.close();
+
     // Also, write out the "extra" interpolation variable
     file_name.str("");
     file_name << directory_name << "/extra_interpolation_point_var" << suffix;
@@ -325,6 +346,14 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
 
     extra_interpolation_point_var_out << extra_interpolation_point_var;
     extra_interpolation_point_var_out.close();
+
+    // Also, write out the "extra" interpolation subdomain
+    file_name.str("");
+    file_name << directory_name << "/extra_interpolation_point_subdomain" << suffix;
+    Xdr extra_interpolation_point_subdomain_out(file_name.str(), mode);
+
+    extra_interpolation_point_subdomain_out << extra_interpolation_point_subdomain;
+    extra_interpolation_point_subdomain_out.close();
   }
 
   STOP_LOG("write_offline_data_to_files()", "RBEIMEvaluation");
@@ -448,6 +477,32 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
     extra_interpolation_point_var = var;
   }
   extra_interpolation_point_var_in.close();
+
+  // Next read in interpolation_points_subdomain
+  file_name.str("");
+  file_name << directory_name << "/interpolation_points_subdomain" << suffix;
+  Xdr interpolation_points_subdomain_in(file_name.str(), mode);
+
+  for(unsigned int i=0; i<=n_bfs; i++)
+  {
+    subdomain_id_type subdomain;
+    interpolation_points_subdomain_in >> subdomain;
+    interpolation_points_subdomain.push_back(subdomain);
+  }
+  interpolation_points_subdomain_in.close();
+
+  // Also, read in extra_interpolation_point_subdomain
+  file_name.str("");
+  file_name << directory_name << "/extra_interpolation_point_subdomain" << suffix;
+  Xdr extra_interpolation_point_subdomain_in(file_name.str(), mode);
+
+  for(unsigned int i=0; i<=n_bfs; i++)
+  {
+    unsigned int subdomain;
+    extra_interpolation_point_subdomain_in >> subdomain;
+    extra_interpolation_point_subdomain = subdomain;
+  }
+  extra_interpolation_point_subdomain_in.close();
 
   STOP_LOG("read_offline_data_from_files()", "RBEIMEvaluation");
 }

@@ -48,7 +48,8 @@ SUBDIRS = \
 	transient/transient_ex2 \
 	vector_fe/vector_fe_ex1 \
 	vector_fe/vector_fe_ex2 \
-	vector_fe/vector_fe_ex3
+	vector_fe/vector_fe_ex3 \
+        vector_fe/vector_fe_ex4
 
 AUTOMAKE_OPTIONS = subdir-objects
 
@@ -56,6 +57,7 @@ AM_CPPFLAGS  = $(libmesh_CPPFLAGS)
 AM_CFLAGS    = $(libmesh_CFLAGS)
 AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
 AM_CPPFLAGS += $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
+AM_LDFLAGS   = $(libmesh_LDFLAGS)
 LIBS         = $(libmesh_optional_LIBS)
 
 examples_source_path  = $(top_srcdir)/examples

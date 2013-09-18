@@ -47,9 +47,9 @@ class Tree : public TreeBase
 public:
 
   /**
-   * Constructor.
+   * Constructor. Requires a mesh and the target bin size. Optionally takes the build method.
    */
-  Tree (const MeshBase& m, const unsigned int level, Trees::BuildType bt=Trees::NODES);
+  Tree (const MeshBase& m, const unsigned int target_bin_size, Trees::BuildType bt=Trees::NODES);
 
   /**
    * Copy-constructor.

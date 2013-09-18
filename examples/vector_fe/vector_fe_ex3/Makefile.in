@@ -62,10 +62,10 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @LIBMESH_OPT_MODE_TRUE@am__append_4 = example-opt
 @LIBMESH_PROF_MODE_TRUE@am__append_5 = example-prof
 @LIBMESH_OPROF_MODE_TRUE@am__append_6 = example-oprof
-TESTS =
 subdir = examples/vector_fe/vector_fe_ex3
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
+	$(top_srcdir)/m4/all_static.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/m4/ax_pthread.m4 \
 	$(top_srcdir)/m4/ax_split_version.m4 \
@@ -553,6 +553,7 @@ libexecdir = @libexecdir@
 libmesh_CFLAGS = @libmesh_CFLAGS@
 libmesh_CPPFLAGS = @libmesh_CPPFLAGS@
 libmesh_CXXFLAGS = @libmesh_CXXFLAGS@
+libmesh_LDFLAGS = @libmesh_LDFLAGS@
 libmesh_contrib_INCLUDES = @libmesh_contrib_INCLUDES@
 libmesh_installed_LIBS = @libmesh_installed_LIBS@
 libmesh_optional_INCLUDES = @libmesh_optional_INCLUDES@
@@ -587,7 +588,7 @@ vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 example_name = vector_fe_ex3
-#check_SCRIPTS = run.sh # Convergence too poor with default solvers
+check_SCRIPTS = run.sh # Convergence too poor with default solvers
 install_dir = $(examples_install_path)/vector_fe/ex3
 data = curl_curl_exact_solution.h vector_fe_ex3.in curl_curl_system.C solution_function.h curl_curl_system.h vector_fe_ex3.C run.sh
 sources = $(data) run.sh
@@ -596,7 +597,7 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = $(am__append_1) $(example_name).php stdout.log
+CLEANFILES = out.e $(am__append_1) $(example_name).php stdout.log
 
 # also need to link files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
@@ -613,6 +614,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
+AM_LDFLAGS = $(libmesh_LDFLAGS)
 examples_source_path = $(top_srcdir)/examples
 examples_install_path = $(prefix)/examples
 data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile
@@ -657,6 +659,7 @@ data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile
 # Running the tests
 #
 TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir) METHODS="$(METHODS)"
+TESTS = $(check_SCRIPTS)
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -1116,7 +1119,7 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
+	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS) $(check_SCRIPTS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am

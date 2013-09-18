@@ -70,3 +70,7 @@ run_example() {
 	message_done_running $example_name $executable $options
     done
 }
+
+run_example_no_extra_options() {
+  LIBMESH_OPTIONS='' run_example $@
+}

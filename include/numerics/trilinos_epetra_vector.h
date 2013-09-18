@@ -304,6 +304,13 @@ public:
   virtual void reciprocal();
 
   /**
+   * Replace each entry v_i = real(v_i) + imag(v_i)
+   * of this vector by its complex conjugate, real(v_i) - imag(v_i).
+   * Epetra is real-valued only, rendering this a no-op.
+   */
+  virtual void conjugate();
+
+  /**
    * v(i) = value
    */
   void set (const numeric_index_type i, const T value);

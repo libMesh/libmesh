@@ -172,6 +172,14 @@ void EpetraVector<T>::reciprocal()
 
 
 template <typename T>
+void EpetraVector<T>::conjugate()
+{
+  // EPetra is real, rendering this a no-op.
+}
+
+
+
+template <typename T>
 void EpetraVector<T>::add (const numeric_index_type i_in, const T value_in)
 {
   int i = static_cast<int> (i_in);
@@ -796,7 +804,7 @@ int EpetraVector<T>::inputNonlocalValues(int GID, int numValues,
     if (numValues != nonlocalElementSize_[offset]) {
       libMesh::err << "Epetra_FEVector ERROR: block-size for GID " << GID << " is "
 	           << numValues<<" which doesn't match previously set block-size of "
-	           << nonlocalElementSize_[offset] << endl;
+	           << nonlocalElementSize_[offset] << std::endl;
       return(-1);
     }
 

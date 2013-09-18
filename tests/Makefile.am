@@ -5,6 +5,7 @@ AM_CFLAGS    = $(libmesh_CFLAGS)
 AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
                $(libmesh_contrib_INCLUDES) $(CPPUNIT_CFLAGS) \
 	       -DLIBMESH_IS_UNIT_TESTING
+AM_LDFLAGS   = $(libmesh_LDFLAGS)
 LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
 
 unit_tests_sources = \

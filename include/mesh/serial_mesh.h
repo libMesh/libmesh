@@ -173,13 +173,32 @@ class SerialMesh : public UnstructuredMesh
    * being stitched) to determine whether or not nodes are overlapping.
    * If \p clear_stitched_boundary_ids==true, this function clears boundary_info IDs in this
    * mesh associated \p this_mesh_boundary and \p other_mesh_boundary.
+   * If \p use_binary_search is true, we use an optimized "sort then binary search" algorithm
+   * for finding matching nodes. Otherwise we use a N^2 algorithm (which can be more reliable
+   * at dealing with slightly misaligned meshes).
+   * If enforce_all_nodes_match_on_boundaries is true, we throw an error if the number of
+   * nodes on the specified boundaries don't match the number of nodes that were merged.
+   * This is a helpful error check in some cases.
    */
   void stitch_meshes (SerialMesh& other_mesh,
                       boundary_id_type this_mesh_boundary,
                       boundary_id_type other_mesh_boundary,
                       Real tol=TOLERANCE,
                       bool clear_stitched_boundary_ids=false,
-                      bool verbose=true);
+                      bool verbose=true,
+                      bool use_binary_search=true,
+                      bool enforce_all_nodes_match_on_boundaries=false);
+
+  /**
+   * Similar to stitch_meshes, except that we stitch two adjacent surfaces within this mesh.
+   */
+  void stitch_surfaces (boundary_id_type boundary_id_1,
+                        boundary_id_type boundary_id_2,
+                        Real tol=TOLERANCE,
+                        bool clear_stitched_boundary_ids=false,
+                        bool verbose=true,
+                        bool use_binary_search=true,
+                        bool enforce_all_nodes_match_on_boundaries=false);
 
 public:
   /**
@@ -367,6 +386,19 @@ protected:
   std::vector<Elem*> _elements;
 
 private:
+
+  /**
+   * Helper function for stitch_meshes and stitch_surfaces
+   * that does the mesh stitching.
+   */
+  void stitching_helper (SerialMesh* other_mesh,
+                         boundary_id_type boundary_id_1,
+                         boundary_id_type boundary_id_2,
+                         Real tol,
+                         bool clear_stitched_boundary_ids,
+                         bool verbose,
+                         bool use_binary_search,
+                         bool enforce_all_nodes_match_on_boundaries);
 
   /**
    * Typedefs for the container implementation.  In this case,

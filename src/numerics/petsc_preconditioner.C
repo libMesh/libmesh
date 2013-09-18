@@ -100,6 +100,18 @@ void PetscPreconditioner<T>::init ()
 
 
 
+template <typename T>
+void PetscPreconditioner<T>::clear()
+{
+  if (_pc)
+  {
+    int ierr = LibMeshPCDestroy(&_pc);
+    LIBMESH_CHKERRABORT(ierr);
+  }
+}
+
+
+
 
 template <typename T>
 void PetscPreconditioner<T>::set_petsc_preconditioner_type (const PreconditionerType & preconditioner_type, PC & pc)

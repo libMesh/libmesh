@@ -1234,10 +1234,10 @@ void ParallelMesh::delete_remote_elements()
 }
 
 
-void ParallelMesh::insert_extra_ghost_elem(Elem* e)
+void ParallelMesh::add_extra_ghost_elem(Elem* e)
 {
-  // First insert the elem like normal
-  insert_elem(e);
+  // First add the elem like normal
+  add_elem(e);
 
   // Now add it to the set that won't be deleted when we call
   // delete_remote_elements()
