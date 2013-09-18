@@ -1723,7 +1723,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
 
 
 void DofMap::enforce_adjoint_constraints_exactly
-  (NumericVector<Number> *v,
+  (NumericVector<Number> &v,
    unsigned int q) const
 {
   parallel_object_only();
@@ -1733,12 +1733,10 @@ void DofMap::enforce_adjoint_constraints_exactly
 
   START_LOG("enforce_adjoint_constraints_exactly()","DofMap");
 
-  libmesh_assert(v);
-
   NumericVector<Number> *v_local  = NULL; // will be initialized below
   NumericVector<Number> *v_global = NULL; // will be initialized below
   AutoPtr<NumericVector<Number> > v_built;
-  if (v->type() == SERIAL)
+  if (v.type() == SERIAL)
     {
       v_built = NumericVector<Number>::build(this->comm());
       v_built->init(this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
@@ -1746,31 +1744,31 @@ void DofMap::enforce_adjoint_constraints_exactly
 
       for (dof_id_type i=v_built->first_local_index();
            i<v_built->last_local_index(); i++)
-        v_built->set(i, (*v)(i));
+        v_built->set(i, v(i));
       v_built->close();
       v_global = v_built.get();
 
-      v_local = v;
+      v_local = &v;
       libmesh_assert (v_local->closed());
     }
-  else if (v->type() == PARALLEL)
+  else if (v.type() == PARALLEL)
     {
       v_built = NumericVector<Number>::build(this->comm());
-      v_built->init (v->size(), v->size(), true, SERIAL);
-      v->localize(*v_built);
+      v_built->init (v.size(), v.size(), true, SERIAL);
+      v.localize(*v_built);
       v_built->close();
       v_local = v_built.get();
 
-      v_global = v;
+      v_global = &v;
     }
-  else if (v->type() == GHOSTED)
+  else if (v.type() == GHOSTED)
     {
-      v_local = v;
-      v_global = v;
+      v_local = &v;
+      v_global = &v;
     }
-  else // unknown v->type()
+  else // unknown v.type()
     {
-      libMesh::err << "ERROR: Unknown v->type() == " << v->type()
+      libMesh::err << "ERROR: Unknown v.type() == " << v.type()
 		    << std::endl;
       libmesh_error();
     }
@@ -1820,14 +1818,14 @@ void DofMap::enforce_adjoint_constraints_exactly
 
   // If the old vector was serial, we probably need to send our values
   // to other processors
-  if (v->type() == SERIAL)
+  if (v.type() == SERIAL)
     {
 #ifndef NDEBUG
       v_global->close();
 #endif
-      v_global->localize (*v);
+      v_global->localize (v);
     }
-  v->close();
+  v.close();
 
   STOP_LOG("enforce_adjoint_constraints_exactly()","DofMap");
 }

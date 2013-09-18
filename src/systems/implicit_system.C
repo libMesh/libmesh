@@ -453,7 +453,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
   // conditions into account.
   for (unsigned int i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
-      libmesh_assert(!this->get_dof_map()->has_adjoint_dirichlet_boundaries(i));
+      libmesh_assert(!this->get_dof_map().has_adjoint_dirichlet_boundaries(i));
 
   // We'll assemble the rhs first, because the R'' term will require
   // perturbing the jacobian
@@ -782,10 +782,10 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
         if (qoi_indices.has_index(i))
           {
             
-            if (this->get_dof_map()->has_adjoint_dirichlet_boundaries(i))
+            if (this->get_dof_map().has_adjoint_dirichlet_boundaries(i))
 	      {
                 AutoPtr<NumericVector<Number> > adjoint_minus_lift =
-		  this->get_adjoint_solution(i)->clone();
+		  this->get_adjoint_solution(i).clone();
                 this->get_dof_map().enforce_constraints_exactly
 		  (*this, &this->get_adjoint_solution(i),
 		   /* homogeneous = */ true);

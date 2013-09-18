@@ -839,7 +839,7 @@ public:
    * fo interest \p q.  For homogeneous constraints, use \p
    * enforce_constraints_exactly instead
    */
-  void enforce_adjoint_constraints_exactly (NumericVector<Number> *v,
+  void enforce_adjoint_constraints_exactly (NumericVector<Number> &v,
                                             unsigned int q) const;
 
 
