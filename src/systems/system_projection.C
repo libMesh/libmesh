@@ -904,8 +904,9 @@ void ProjectVector::operator()(const ConstElemRange &range) const
 
               if (elem->p_refinement_flag() == Elem::DO_NOTHING)
 	        libmesh_assert_equal_to (old_dof_indices.size(), new_n_dofs);
-              if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
-	        libmesh_assert (elem->has_children());
+
+              // if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
+	      //   libmesh_assert (elem->has_children());
 	    }
 
 	  unsigned int old_n_dofs =
@@ -1085,7 +1086,8 @@ void ProjectVector::operator()(const ConstElemRange &range) const
 
 		already_done[new_global_dof] = true;
 
-	        if (elem->refinement_flag() == Elem::JUST_REFINED)
+	        if (elem->refinement_flag() == Elem::JUST_REFINED ||
+	            elem->p_refinement_flag() == Elem::JUST_REFINED)
 		  {
 		    // The location of the child's node on the parent element
 		    const Point point =
@@ -1104,7 +1106,7 @@ void ProjectVector::operator()(const ConstElemRange &range) const
 
 		        Ue(new_local_dof) +=
                           (old_vector(old_global_dof)*
-			  FEInterface::shape(dim, fe_type, parent,
+			  FEInterface::shape(dim, base_fe_type, parent,
 					     old_local_dof, point));
 		      }
 		  }
