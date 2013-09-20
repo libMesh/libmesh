@@ -895,6 +895,12 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 
   if (!possible_global_constraints)
     {
+      // Clear out any old constraints; maybe the user just deleted
+      // their last remaining dirichlet/periodic/user constraint?
+      _node_constraints.clear();
+      _dof_constraints.clear();
+      _primal_constraint_values.clear();
+
       // make sure we stop logging though
       STOP_LOG("create_dof_constraints()", "DofMap");
       return;
@@ -953,6 +959,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 
   // recalculate dof constraints from scratch
   _dof_constraints.clear();
+  _primal_constraint_values.clear();
 
   // Look at all the variables in the system.  Reset the element
   // range at each iteration -- there is no need to reconstruct it.
