@@ -75,47 +75,54 @@ namespace Parallel {
         {
 #ifdef LIBMESH_HAVE_MPI
           StandardType<T> T_type(&((*ex)(0)));
+
+#if MPI_VERSION == 1
+
           int blocklengths[LIBMESH_DIM+2];
           MPI_Aint displs[LIBMESH_DIM+2];
           MPI_Datatype types[LIBMESH_DIM+2];
           MPI_Aint start, later;
 
-#if MPI_VERSION > 1
-          MPI_Get_address(ex, &start);
-#else
           MPI_Address(ex, &start);
-#endif // #if MPI_VERSION > 1
           blocklengths[0] = 1;
           displs[0] = 0;
           types[0] = MPI_LB;
           for (unsigned int i=0; i != LIBMESH_DIM; ++i)
             {
-#if MPI_VERSION > 1
-              MPI_Get_address(&((*ex)(i)), &later);
-#else
               MPI_Address(&((*ex)(i)), &later);
-#endif // #if MPI_VERSION > 1
               blocklengths[i+1] = 1;
               displs[i+1] = later - start;
               types[i+1] = T_type;
             }
-#if MPI_VERSION > 1
-          MPI_Get_address((ex+1), &later);
-#else
           MPI_Address((ex+1), &later);
-#endif // #if MPI_VERSION > 1
           blocklengths[LIBMESH_DIM+1] = 1;
           displs[LIBMESH_DIM+1] = later - start;
           types[LIBMESH_DIM+1] = MPI_UB;
 
-#if MPI_VERSION > 1
-          MPI_Type_create_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
-#else
           MPI_Type_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
-#endif // #if MPI_VERSION > 1
+
+#else // MPI_VERSION >= 2
+
+          int blocklength = LIBMESH_DIM;
+          MPI_Aint displs, start;
+          MPI_Datatype tmptype, type = T_type;
+
+	  MPI_Get_address (ex,   &start);
+	  MPI_Get_address (&((*ex)(0)), &displs);
+
+	  // subtract off offset to first value from the beginning of the structure
+	  displs -= start;
+
+	  // create a prototype structure
+	  MPI_Type_create_struct (1, &blocklength, &displs, &type, &tmptype);
+
+	  // resize the structure type to account for padding, if any
+	  MPI_Type_create_resized (tmptype, 0, sizeof(TypeVector<T>), &_static_type);
+#endif
 
           MPI_Type_commit (&_static_type);
-#endif
+#endif // #ifdef LIBMESH_HAVE_MPI
+
           _is_initialized = true;
         }
       _datatype = _static_type;
@@ -147,47 +154,54 @@ namespace Parallel {
         {
 #ifdef LIBMESH_HAVE_MPI
           StandardType<T> T_type(&((*ex)(0)));
+
+#if MPI_VERSION == 1
+
           int blocklengths[LIBMESH_DIM+2];
           MPI_Aint displs[LIBMESH_DIM+2];
           MPI_Datatype types[LIBMESH_DIM+2];
           MPI_Aint start, later;
 
-#if MPI_VERSION > 1
-          MPI_Get_address(ex, &start);
-#else
           MPI_Address(ex, &start);
-#endif // #if MPI_VERSION > 1
           blocklengths[0] = 1;
           displs[0] = 0;
           types[0] = MPI_LB;
           for (unsigned int i=0; i != LIBMESH_DIM; ++i)
             {
-#if MPI_VERSION > 1
-              MPI_Get_address(&((*ex)(i)), &later);
-#else
               MPI_Address(&((*ex)(i)), &later);
-#endif // #if MPI_VERSION > 1
               blocklengths[i+1] = 1;
               displs[i+1] = later - start;
               types[i+1] = T_type;
             }
-#if MPI_VERSION > 1
-          MPI_Get_address((ex+1), &later);
-#else
           MPI_Address((ex+1), &later);
-#endif // #if MPI_VERSION > 1
           blocklengths[LIBMESH_DIM+1] = 1;
           displs[LIBMESH_DIM+1] = later - start;
           types[LIBMESH_DIM+1] = MPI_UB;
 
-#if MPI_VERSION > 1
-          MPI_Type_create_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
-#else
           MPI_Type_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
-#endif // #if MPI_VERSION > 1
+
+#else // MPI_VERSION >= 2
+
+          int blocklength = LIBMESH_DIM;
+          MPI_Aint displs, start;
+          MPI_Datatype tmptype, type = T_type;
+
+	  MPI_Get_address (ex,   &start);
+	  MPI_Get_address (&((*ex)(0)), &displs);
+
+	  // subtract off offset to first value from the beginning of the structure
+	  displs -= start;
+
+	  // create a prototype structure
+	  MPI_Type_create_struct (1, &blocklength, &displs, &type, &tmptype);
+
+	  // resize the structure type to account for padding, if any
+	  MPI_Type_create_resized (tmptype, 0, sizeof(VectorValue<T>), &_static_type);
+#endif
 
           MPI_Type_commit (&_static_type);
-#endif
+#endif // #ifdef LIBMESH_HAVE_MPI
+
           _is_initialized = true;
         }
       _datatype = _static_type;
@@ -219,47 +233,54 @@ namespace Parallel {
         {
 #ifdef LIBMESH_HAVE_MPI
           StandardType<Real> T_type(&((*ex)(0)));
+
+#if MPI_VERSION == 1
+
           int blocklengths[LIBMESH_DIM+2];
           MPI_Aint displs[LIBMESH_DIM+2];
           MPI_Datatype types[LIBMESH_DIM+2];
           MPI_Aint start, later;
 
-#if MPI_VERSION > 1
-          MPI_Get_address(ex, &start);
-#else
           MPI_Address(ex, &start);
-#endif // #if MPI_VERSION > 1
           blocklengths[0] = 1;
           displs[0] = 0;
           types[0] = MPI_LB;
           for (unsigned int i=0; i != LIBMESH_DIM; ++i)
             {
-#if MPI_VERSION > 1
-              MPI_Get_address(&((*ex)(i)), &later);
-#else
               MPI_Address(&((*ex)(i)), &later);
-#endif // #if MPI_VERSION > 1
               blocklengths[i+1] = 1;
               displs[i+1] = later - start;
               types[i+1] = T_type;
             }
-#if MPI_VERSION > 1
-          MPI_Get_address((ex+1), &later);
-#else
           MPI_Address((ex+1), &later);
-#endif // #if MPI_VERSION > 1
           blocklengths[LIBMESH_DIM+1] = 1;
           displs[LIBMESH_DIM+1] = later - start;
           types[LIBMESH_DIM+1] = MPI_UB;
 
-#if MPI_VERSION > 1
-          MPI_Type_create_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
-#else
           MPI_Type_struct (LIBMESH_DIM+2, blocklengths, displs, types, &_static_type);
-#endif // #if MPI_VERSION > 1
+
+#else // MPI_VERSION >= 2
+
+          int blocklength = LIBMESH_DIM;
+          MPI_Aint displs, start;
+          MPI_Datatype tmptype, type = T_type;
+
+	  MPI_Get_address (ex,   &start);
+	  MPI_Get_address (&((*ex)(0)), &displs);
+
+	  // subtract off offset to first value from the beginning of the structure
+	  displs -= start;
+
+	  // create a prototype structure
+	  MPI_Type_create_struct (1, &blocklength, &displs, &type, &tmptype);
+
+	  // resize the structure type to account for padding, if any
+	  MPI_Type_create_resized (tmptype, 0, sizeof(Point), &_static_type);
+#endif
 
           MPI_Type_commit (&_static_type);
-#endif
+#endif // #ifdef LIBMESH_HAVE_MPI
+
           _is_initialized = true;
         }
       _datatype = _static_type;
