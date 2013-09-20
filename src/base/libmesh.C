@@ -612,19 +612,6 @@ LibMeshInit::~LibMeshInit()
     }
 #endif
 
-#if defined(LIBMESH_HAVE_MPI)
-  // Allow the user to bypass MPI finalization
-  if (!libMesh::on_command_line ("--disable-mpi"))
-    {
-      this->_comm.clear();
-#ifndef LIBMESH_DISABLE_COMMWORLD
-      Parallel::Communicator_World.clear();
-#endif
-
-      if (libmesh_initialized_mpi)
-	MPI_Finalize();
-    }
-#endif
 
   // Force the \p ReferenceCounter to print
   // its reference count information.  This allows
@@ -661,7 +648,7 @@ LibMeshInit::~LibMeshInit()
   // Set the initialized() flag to false
   libMeshPrivateData::_is_initialized = false;
 
-  if (libMesh::on_command_line ("--redirect-stdout"))
+    //if (libMesh::on_command_line ("--redirect-stdout"))
     {
       // Before handing back the std stream buffers, print the
       // perflog to the individual processor's files.
@@ -695,6 +682,21 @@ LibMeshInit::~LibMeshInit()
 
   if (libMesh::on_command_line("--enable-fpe"))
     enableFPE(false);
+
+    
+#if defined(LIBMESH_HAVE_MPI)
+    // Allow the user to bypass MPI finalization
+    if (!libMesh::on_command_line ("--disable-mpi"))
+    {
+        this->_comm.clear();
+#ifndef LIBMESH_DISABLE_COMMWORLD
+        Parallel::Communicator_World.clear();
+#endif
+        
+        if (libmesh_initialized_mpi)
+            MPI_Finalize();
+    }
+#endif
 }
 
 
