@@ -594,24 +594,6 @@ LibMeshInit::~LibMeshInit()
   // Let's be sure we properly close on every processor at once:
   libmesh_parallel_only(this->comm());
 
-#if defined(LIBMESH_HAVE_PETSC)
-      // Allow the user to bypass PETSc finalization
-  if (!libMesh::on_command_line ("--disable-petsc")
-#if defined(LIBMESH_HAVE_MPI)
-      && !libMesh::on_command_line ("--disable-mpi")
-#endif
-     )
-    {
-# if defined(LIBMESH_HAVE_SLEPC)
-      if (libmesh_initialized_slepc)
-        SlepcFinalize();
-# else
-      if (libmesh_initialized_petsc)
-        PetscFinalize();
-# endif
-    }
-#endif
-
 
   // Force the \p ReferenceCounter to print
   // its reference count information.  This allows
@@ -682,6 +664,24 @@ LibMeshInit::~LibMeshInit()
 
   if (libMesh::on_command_line("--enable-fpe"))
     enableFPE(false);
+
+#if defined(LIBMESH_HAVE_PETSC)
+    // Allow the user to bypass PETSc finalization
+    if (!libMesh::on_command_line ("--disable-petsc")
+#if defined(LIBMESH_HAVE_MPI)
+        && !libMesh::on_command_line ("--disable-mpi")
+#endif
+        )
+    {
+# if defined(LIBMESH_HAVE_SLEPC)
+        if (libmesh_initialized_slepc)
+            SlepcFinalize();
+# else
+        if (libmesh_initialized_petsc)
+            PetscFinalize();
+# endif
+    }
+#endif
 
     
 #if defined(LIBMESH_HAVE_MPI)
