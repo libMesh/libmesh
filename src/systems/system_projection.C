@@ -2128,8 +2128,6 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
           // In 3D, project any edge values next
           if (dim > 2 && cont != DISCONTINUOUS)
 	    {
-	      const QBase& qedgerule = context.get_edge_qrule();
-	      const unsigned int n_qp = qedgerule.n_points();
 	      const std::vector<Point>& xyz_values = edge_fe->get_xyz();
 	      const std::vector<Real>& JxW = edge_fe->get_JxW();
 
@@ -2142,6 +2140,9 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 		{
 		  context.edge = e;
 		  context.edge_fe_reinit();
+
+                  const QBase& qedgerule = context.get_edge_qrule();
+                  const unsigned int n_qp = qedgerule.n_points();
 
 		  FEInterface::dofs_on_edge(elem, dim, fe_type, e,
 					    side_dofs);
@@ -2235,8 +2236,6 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 	  // Project any side values (edges in 2D, faces in 3D)
           if (dim > 1 && cont != DISCONTINUOUS)
 	    {
-	      const QBase& qsiderule = context.get_side_qrule();
-	      const unsigned int n_qp = qsiderule.n_points();
 	      const std::vector<Point>& xyz_values = side_fe->get_xyz();
 	      const std::vector<Real>& JxW = side_fe->get_JxW();
 
@@ -2268,6 +2267,9 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 
 		  context.side = s;
 		  context.side_fe_reinit();
+
+                  const QBase& qsiderule = context.get_side_qrule();
+                  const unsigned int n_qp = qsiderule.n_points();
 
 		  // Loop over the quadrature points
 		  for (unsigned int qp=0; qp<n_qp; qp++)
