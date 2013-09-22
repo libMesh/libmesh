@@ -14,6 +14,11 @@
 #include <hdf5.h>
 #include <H5DSpublic.h>
 
+/* BSK - compatibility fix for at least hdf5-1.8.5.patch1-5.el6.x86_64 */
+#ifndef H5F_LIBVER_18
+#  define H5F_LIBVER_18 H5F_LIBVER_LATEST
+#endif
+
 #define MAX_LEN 30
 #define TMP_FILE_NAME "tst_files2_tmp.out"
 #define FILE_NAME "tst_files2_1.nc"

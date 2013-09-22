@@ -13,6 +13,11 @@
 #include <nc_tests.h>
 #include <hdf5.h>
 
+/* BSK - compatibility fix for at least hdf5-1.8.5.patch1-5.el6.x86_64 */
+#ifndef H5F_LIBVER_18
+#  define H5F_LIBVER_18 H5F_LIBVER_LATEST
+#endif
+
 /* Defining USE_MPE causes the MPE trace library to be used (and you
  * must also relink with -llmpe -lmpe). This causes clog2 output to be
  * written, which can be converted to slog2 (by the program

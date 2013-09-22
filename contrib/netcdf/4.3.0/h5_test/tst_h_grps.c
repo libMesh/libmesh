@@ -8,6 +8,11 @@
 #include "h5_err_macros.h"
 #include <hdf5.h>
 
+/* BSK - compatibility fix for at least hdf5-1.8.5.patch1-5.el6.x86_64 */
+#ifndef H5F_LIBVER_18
+#  define H5F_LIBVER_18 H5F_LIBVER_LATEST
+#endif
+
 #define FILE_NAME "tst_h_grps.h5"
 #define GRP_NAME "Bubba-Joe"
 #define SUB_GRP_NAME "Billy-Bob"

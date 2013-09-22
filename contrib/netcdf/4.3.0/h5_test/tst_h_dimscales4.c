@@ -13,6 +13,11 @@
 #include <H5DSpublic.h>
 #include <ncdimscale.h>
 
+/* BSK - compatibility fix for at least hdf5-1.8.5.patch1-5.el6.x86_64 */
+#ifndef H5F_LIBVER_18
+#  define H5F_LIBVER_18 H5F_LIBVER_LATEST
+#endif
+
 #define FILE_NAME "tst_h_dimscales4.h5"
 #define DIMSCALE_NAME "AAA_dimscale"
 #define VAR1_NAME "Watson"

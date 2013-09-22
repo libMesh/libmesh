@@ -11,6 +11,11 @@
 #include <hdf5.h>
 #include <H5DSpublic.h>
 
+/* BSK - compatibility fix for at least hdf5-1.8.5.patch1-5.el6.x86_64 */
+#ifndef H5F_LIBVER_18
+#  define H5F_LIBVER_18 H5F_LIBVER_LATEST
+#endif
+
 #define FILE_NAME "tst_h_files.h5"
 #define GRP_NAME "Dectectives"
 #define STR_LEN 255
