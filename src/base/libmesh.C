@@ -594,37 +594,6 @@ LibMeshInit::~LibMeshInit()
   // Let's be sure we properly close on every processor at once:
   libmesh_parallel_only(this->comm());
 
-#if defined(LIBMESH_HAVE_PETSC)
-      // Allow the user to bypass PETSc finalization
-  if (!libMesh::on_command_line ("--disable-petsc")
-#if defined(LIBMESH_HAVE_MPI)
-      && !libMesh::on_command_line ("--disable-mpi")
-#endif
-     )
-    {
-# if defined(LIBMESH_HAVE_SLEPC)
-      if (libmesh_initialized_slepc)
-        SlepcFinalize();
-# else
-      if (libmesh_initialized_petsc)
-        PetscFinalize();
-# endif
-    }
-#endif
-
-#if defined(LIBMESH_HAVE_MPI)
-  // Allow the user to bypass MPI finalization
-  if (!libMesh::on_command_line ("--disable-mpi"))
-    {
-      this->_comm.clear();
-#ifndef LIBMESH_DISABLE_COMMWORLD
-      Parallel::Communicator_World.clear();
-#endif
-
-      if (libmesh_initialized_mpi)
-	MPI_Finalize();
-    }
-#endif
 
   // Force the \p ReferenceCounter to print
   // its reference count information.  This allows
@@ -661,7 +630,7 @@ LibMeshInit::~LibMeshInit()
   // Set the initialized() flag to false
   libMeshPrivateData::_is_initialized = false;
 
-  if (libMesh::on_command_line ("--redirect-stdout"))
+    //if (libMesh::on_command_line ("--redirect-stdout"))
     {
       // Before handing back the std stream buffers, print the
       // perflog to the individual processor's files.
@@ -695,6 +664,39 @@ LibMeshInit::~LibMeshInit()
 
   if (libMesh::on_command_line("--enable-fpe"))
     enableFPE(false);
+
+#if defined(LIBMESH_HAVE_PETSC)
+    // Allow the user to bypass PETSc finalization
+    if (!libMesh::on_command_line ("--disable-petsc")
+#if defined(LIBMESH_HAVE_MPI)
+        && !libMesh::on_command_line ("--disable-mpi")
+#endif
+        )
+    {
+# if defined(LIBMESH_HAVE_SLEPC)
+        if (libmesh_initialized_slepc)
+            SlepcFinalize();
+# else
+        if (libmesh_initialized_petsc)
+            PetscFinalize();
+# endif
+    }
+#endif
+
+    
+#if defined(LIBMESH_HAVE_MPI)
+    // Allow the user to bypass MPI finalization
+    if (!libMesh::on_command_line ("--disable-mpi"))
+    {
+        this->_comm.clear();
+#ifndef LIBMESH_DISABLE_COMMWORLD
+        Parallel::Communicator_World.clear();
+#endif
+        
+        if (libmesh_initialized_mpi)
+            MPI_Finalize();
+    }
+#endif
 }
 
 
