@@ -1,0 +1,11 @@
+netcdf ncf199 {
+dimensions:
+        F1 = 3 ;
+	R1 = UNLIMITED ;
+variables:
+	int fr(F1,R1);
+data:
+// This causes assertion violation: 
+// assertion failure: (dimindex < lastunlimited && (dimset->dimsyms[dimindex]->dim.isunlimited))
+	fr = {1,2}, {3,4}, {5,6} ;
+}
