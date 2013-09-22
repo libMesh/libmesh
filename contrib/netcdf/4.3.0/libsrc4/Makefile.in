@@ -94,19 +94,44 @@ am_libnetcdf4_la_OBJECTS = libnetcdf4_la-nc4dispatch.lo \
 	libnetcdf4_la-ncfunc.lo libnetcdf4_la-nc4internal.lo \
 	libnetcdf4_la-nc4hdf.lo libnetcdf4_la-error4.lo
 libnetcdf4_la_OBJECTS = $(am_libnetcdf4_la_OBJECTS)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
+AM_V_P = $(am__v_P_@AM_V@)
+am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
+am__v_P_0 = false
+am__v_P_1 = :
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN     " $@;
+am__v_GEN_1 = 
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
+am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
 SOURCES = $(libnetcdf4_la_SOURCES)
 DIST_SOURCES = $(libnetcdf4_la_SOURCES)
 am__can_run_installinfo = \
@@ -120,6 +145,7 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -305,7 +331,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 libnetcdf4.la: $(libnetcdf4_la_OBJECTS) $(libnetcdf4_la_DEPENDENCIES) $(EXTRA_libnetcdf4_la_DEPENDENCIES) 
-	$(LINK)  $(libnetcdf4_la_OBJECTS) $(libnetcdf4_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK)  $(libnetcdf4_la_OBJECTS) $(libnetcdf4_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -326,105 +352,105 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnetcdf4_la-ncfunc.Plo@am__quote@
 
 .c.o:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
 @am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
 libnetcdf4_la-nc4dispatch.lo: nc4dispatch.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4dispatch.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4dispatch.Tpo -c -o libnetcdf4_la-nc4dispatch.lo `test -f 'nc4dispatch.c' || echo '$(srcdir)/'`nc4dispatch.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4dispatch.Tpo $(DEPDIR)/libnetcdf4_la-nc4dispatch.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nc4dispatch.c' object='libnetcdf4_la-nc4dispatch.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4dispatch.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4dispatch.Tpo -c -o libnetcdf4_la-nc4dispatch.lo `test -f 'nc4dispatch.c' || echo '$(srcdir)/'`nc4dispatch.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4dispatch.Tpo $(DEPDIR)/libnetcdf4_la-nc4dispatch.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nc4dispatch.c' object='libnetcdf4_la-nc4dispatch.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4dispatch.lo `test -f 'nc4dispatch.c' || echo '$(srcdir)/'`nc4dispatch.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4dispatch.lo `test -f 'nc4dispatch.c' || echo '$(srcdir)/'`nc4dispatch.c
 
 libnetcdf4_la-nc4attr.lo: nc4attr.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4attr.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4attr.Tpo -c -o libnetcdf4_la-nc4attr.lo `test -f 'nc4attr.c' || echo '$(srcdir)/'`nc4attr.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4attr.Tpo $(DEPDIR)/libnetcdf4_la-nc4attr.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nc4attr.c' object='libnetcdf4_la-nc4attr.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4attr.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4attr.Tpo -c -o libnetcdf4_la-nc4attr.lo `test -f 'nc4attr.c' || echo '$(srcdir)/'`nc4attr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4attr.Tpo $(DEPDIR)/libnetcdf4_la-nc4attr.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nc4attr.c' object='libnetcdf4_la-nc4attr.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4attr.lo `test -f 'nc4attr.c' || echo '$(srcdir)/'`nc4attr.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4attr.lo `test -f 'nc4attr.c' || echo '$(srcdir)/'`nc4attr.c
 
 libnetcdf4_la-nc4dim.lo: nc4dim.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4dim.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4dim.Tpo -c -o libnetcdf4_la-nc4dim.lo `test -f 'nc4dim.c' || echo '$(srcdir)/'`nc4dim.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4dim.Tpo $(DEPDIR)/libnetcdf4_la-nc4dim.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nc4dim.c' object='libnetcdf4_la-nc4dim.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4dim.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4dim.Tpo -c -o libnetcdf4_la-nc4dim.lo `test -f 'nc4dim.c' || echo '$(srcdir)/'`nc4dim.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4dim.Tpo $(DEPDIR)/libnetcdf4_la-nc4dim.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nc4dim.c' object='libnetcdf4_la-nc4dim.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4dim.lo `test -f 'nc4dim.c' || echo '$(srcdir)/'`nc4dim.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4dim.lo `test -f 'nc4dim.c' || echo '$(srcdir)/'`nc4dim.c
 
 libnetcdf4_la-nc4file.lo: nc4file.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4file.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4file.Tpo -c -o libnetcdf4_la-nc4file.lo `test -f 'nc4file.c' || echo '$(srcdir)/'`nc4file.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4file.Tpo $(DEPDIR)/libnetcdf4_la-nc4file.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nc4file.c' object='libnetcdf4_la-nc4file.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4file.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4file.Tpo -c -o libnetcdf4_la-nc4file.lo `test -f 'nc4file.c' || echo '$(srcdir)/'`nc4file.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4file.Tpo $(DEPDIR)/libnetcdf4_la-nc4file.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nc4file.c' object='libnetcdf4_la-nc4file.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4file.lo `test -f 'nc4file.c' || echo '$(srcdir)/'`nc4file.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4file.lo `test -f 'nc4file.c' || echo '$(srcdir)/'`nc4file.c
 
 libnetcdf4_la-nc4grp.lo: nc4grp.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4grp.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4grp.Tpo -c -o libnetcdf4_la-nc4grp.lo `test -f 'nc4grp.c' || echo '$(srcdir)/'`nc4grp.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4grp.Tpo $(DEPDIR)/libnetcdf4_la-nc4grp.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nc4grp.c' object='libnetcdf4_la-nc4grp.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4grp.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4grp.Tpo -c -o libnetcdf4_la-nc4grp.lo `test -f 'nc4grp.c' || echo '$(srcdir)/'`nc4grp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4grp.Tpo $(DEPDIR)/libnetcdf4_la-nc4grp.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nc4grp.c' object='libnetcdf4_la-nc4grp.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4grp.lo `test -f 'nc4grp.c' || echo '$(srcdir)/'`nc4grp.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4grp.lo `test -f 'nc4grp.c' || echo '$(srcdir)/'`nc4grp.c
 
 libnetcdf4_la-nc4type.lo: nc4type.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4type.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4type.Tpo -c -o libnetcdf4_la-nc4type.lo `test -f 'nc4type.c' || echo '$(srcdir)/'`nc4type.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4type.Tpo $(DEPDIR)/libnetcdf4_la-nc4type.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nc4type.c' object='libnetcdf4_la-nc4type.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4type.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4type.Tpo -c -o libnetcdf4_la-nc4type.lo `test -f 'nc4type.c' || echo '$(srcdir)/'`nc4type.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4type.Tpo $(DEPDIR)/libnetcdf4_la-nc4type.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nc4type.c' object='libnetcdf4_la-nc4type.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4type.lo `test -f 'nc4type.c' || echo '$(srcdir)/'`nc4type.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4type.lo `test -f 'nc4type.c' || echo '$(srcdir)/'`nc4type.c
 
 libnetcdf4_la-nc4var.lo: nc4var.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4var.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4var.Tpo -c -o libnetcdf4_la-nc4var.lo `test -f 'nc4var.c' || echo '$(srcdir)/'`nc4var.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4var.Tpo $(DEPDIR)/libnetcdf4_la-nc4var.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nc4var.c' object='libnetcdf4_la-nc4var.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4var.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4var.Tpo -c -o libnetcdf4_la-nc4var.lo `test -f 'nc4var.c' || echo '$(srcdir)/'`nc4var.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4var.Tpo $(DEPDIR)/libnetcdf4_la-nc4var.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nc4var.c' object='libnetcdf4_la-nc4var.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4var.lo `test -f 'nc4var.c' || echo '$(srcdir)/'`nc4var.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4var.lo `test -f 'nc4var.c' || echo '$(srcdir)/'`nc4var.c
 
 libnetcdf4_la-ncfunc.lo: ncfunc.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-ncfunc.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-ncfunc.Tpo -c -o libnetcdf4_la-ncfunc.lo `test -f 'ncfunc.c' || echo '$(srcdir)/'`ncfunc.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnetcdf4_la-ncfunc.Tpo $(DEPDIR)/libnetcdf4_la-ncfunc.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ncfunc.c' object='libnetcdf4_la-ncfunc.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-ncfunc.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-ncfunc.Tpo -c -o libnetcdf4_la-ncfunc.lo `test -f 'ncfunc.c' || echo '$(srcdir)/'`ncfunc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnetcdf4_la-ncfunc.Tpo $(DEPDIR)/libnetcdf4_la-ncfunc.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ncfunc.c' object='libnetcdf4_la-ncfunc.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-ncfunc.lo `test -f 'ncfunc.c' || echo '$(srcdir)/'`ncfunc.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-ncfunc.lo `test -f 'ncfunc.c' || echo '$(srcdir)/'`ncfunc.c
 
 libnetcdf4_la-nc4internal.lo: nc4internal.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4internal.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4internal.Tpo -c -o libnetcdf4_la-nc4internal.lo `test -f 'nc4internal.c' || echo '$(srcdir)/'`nc4internal.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4internal.Tpo $(DEPDIR)/libnetcdf4_la-nc4internal.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nc4internal.c' object='libnetcdf4_la-nc4internal.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4internal.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4internal.Tpo -c -o libnetcdf4_la-nc4internal.lo `test -f 'nc4internal.c' || echo '$(srcdir)/'`nc4internal.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4internal.Tpo $(DEPDIR)/libnetcdf4_la-nc4internal.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nc4internal.c' object='libnetcdf4_la-nc4internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4internal.lo `test -f 'nc4internal.c' || echo '$(srcdir)/'`nc4internal.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4internal.lo `test -f 'nc4internal.c' || echo '$(srcdir)/'`nc4internal.c
 
 libnetcdf4_la-nc4hdf.lo: nc4hdf.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4hdf.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4hdf.Tpo -c -o libnetcdf4_la-nc4hdf.lo `test -f 'nc4hdf.c' || echo '$(srcdir)/'`nc4hdf.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4hdf.Tpo $(DEPDIR)/libnetcdf4_la-nc4hdf.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nc4hdf.c' object='libnetcdf4_la-nc4hdf.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-nc4hdf.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-nc4hdf.Tpo -c -o libnetcdf4_la-nc4hdf.lo `test -f 'nc4hdf.c' || echo '$(srcdir)/'`nc4hdf.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnetcdf4_la-nc4hdf.Tpo $(DEPDIR)/libnetcdf4_la-nc4hdf.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nc4hdf.c' object='libnetcdf4_la-nc4hdf.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4hdf.lo `test -f 'nc4hdf.c' || echo '$(srcdir)/'`nc4hdf.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-nc4hdf.lo `test -f 'nc4hdf.c' || echo '$(srcdir)/'`nc4hdf.c
 
 libnetcdf4_la-error4.lo: error4.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-error4.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-error4.Tpo -c -o libnetcdf4_la-error4.lo `test -f 'error4.c' || echo '$(srcdir)/'`error4.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnetcdf4_la-error4.Tpo $(DEPDIR)/libnetcdf4_la-error4.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='error4.c' object='libnetcdf4_la-error4.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf4_la-error4.lo -MD -MP -MF $(DEPDIR)/libnetcdf4_la-error4.Tpo -c -o libnetcdf4_la-error4.lo `test -f 'error4.c' || echo '$(srcdir)/'`error4.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnetcdf4_la-error4.Tpo $(DEPDIR)/libnetcdf4_la-error4.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='error4.c' object='libnetcdf4_la-error4.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-error4.lo `test -f 'error4.c' || echo '$(srcdir)/'`error4.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf4_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf4_la-error4.lo `test -f 'error4.c' || echo '$(srcdir)/'`error4.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
