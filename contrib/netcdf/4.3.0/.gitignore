@@ -16,6 +16,24 @@ ncdump/ctest.c
 ncdump/ctest64.c
 
 # 'make check' produces these
+examples/C/pres_temp_4D.nc
+examples/C/pres_temp_4D_rd
+examples/C/pres_temp_4D_wr
+examples/C/sfc_pres_temp.nc
+examples/C/sfc_pres_temp_rd
+examples/C/sfc_pres_temp_wr
+examples/C/simple_nc4.nc
+examples/C/simple_nc4_rd
+examples/C/simple_nc4_wr
+examples/C/simple_xy.nc
+examples/C/simple_xy_nc4.nc
+examples/C/simple_xy_nc4_rd
+examples/C/simple_xy_nc4_wr
+examples/C/simple_xy_rd
+examples/C/simple_xy_wr
+examples/CDL/pres_temp_4D.nc
+examples/CDL/sfc_pres_temp.nc
+examples/CDL/simple_xy.nc
 h5_test/tst_h_atts
 h5_test/tst_h_atts.h5
 h5_test/tst_h_atts3
@@ -190,6 +208,8 @@ nc_test4/tst_grps
 nc_test4/tst_grps.nc
 nc_test4/tst_grps2
 nc_test4/tst_h_atts2
+nc_test4/tst_h_refs
+nc_test4/tst_h_refs.h5
 nc_test4/tst_h_strbug
 nc_test4/tst_h_strbug.h5
 nc_test4/tst_interops
@@ -240,6 +260,7 @@ ncdap_test/nctestserver
 ncdap_test/results/
 ncdap_test/t_dap3a
 ncdap_test/test_cvt3
+ncdap_test/test_nstride_cached
 ncdap_test/test_partvar
 ncdap_test/test_vara
 ncdap_test/test_varm3
@@ -291,6 +312,8 @@ ncdump/tst_group_data.nc
 ncdump/tst_h_rdc0
 ncdump/tst_mslp.nc
 ncdump/tst_mslp_64.nc
+ncdump/tst_mud4.cdl
+ncdump/tst_mud4.nc
 ncdump/tst_nans
 ncdump/tst_nans.cdl
 ncdump/tst_nans.nc
@@ -327,6 +350,7 @@ ncgen/c0.nc
 ncgen/c0_4.nc
 ncgen/c0_4c.nc
 ncgen/c0_64.nc
+ncgen/ncf199.nc
 ncgen/ref_camrun.c
 ncgen3/c0.nc
 ncgen3/c0_4.nc
@@ -340,21 +364,3 @@ nctest/temp.tmp
 nctest/test2.nc
 nctest/tst_rename
 nctest/tst_rename.nc
-examples/C/pres_temp_4D.nc
-examples/C/pres_temp_4D_rd
-examples/C/pres_temp_4D_wr
-examples/C/sfc_pres_temp.nc
-examples/C/sfc_pres_temp_rd
-examples/C/sfc_pres_temp_wr
-examples/C/simple_nc4.nc
-examples/C/simple_nc4_rd
-examples/C/simple_nc4_wr
-examples/C/simple_xy.nc
-examples/C/simple_xy_nc4.nc
-examples/C/simple_xy_nc4_rd
-examples/C/simple_xy_nc4_wr
-examples/C/simple_xy_rd
-examples/C/simple_xy_wr
-examples/CDL/pres_temp_4D.nc
-examples/CDL/sfc_pres_temp.nc
-examples/CDL/simple_xy.nc
