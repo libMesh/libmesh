@@ -40,6 +40,22 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/unstructured_mesh.h"
 
+namespace 
+{
+  bool split_first_diagonal(const Elem* elem,
+                            unsigned int diag_1_node_1,
+                            unsigned int diag_1_node_2,
+                            unsigned int diag_2_node_1,
+                            unsigned int diag_2_node_2)
+    {
+      return ((elem->node(diag_1_node_1) > elem->node(diag_2_node_1) &&
+               elem->node(diag_1_node_1) > elem->node(diag_2_node_2)) ||
+              (elem->node(diag_1_node_2) > elem->node(diag_2_node_1) &&
+               elem->node(diag_1_node_2) > elem->node(diag_2_node_2)));
+    }
+
+}
+
 namespace libMesh
 {
 
@@ -877,27 +893,34 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
           case PRISM6:
 	    {
+              // Prisms all split into three tetrahedra
 	      subelem[0] = new Tet4;
 	      subelem[1] = new Tet4;
 	      subelem[2] = new Tet4;
 
+              // Triangular faces are not split.
+
+              // On quad faces, we choose the node with the highest
+              // global id, and we split on the diagonal which
+              // includes that node.  This ensures that (even in
+              // parallel, even on distributed meshes) the same
+              // diagonal split will be chosen for elements on either
+              // side of the same quad face.  It also ensures that we
+              // always have a mix of "clockwise" and
+              // "counterclockwise" split faces (two of one and one
+              // of the other on each prism; this is useful since the
+              // alternative all-clockwise or all-counterclockwise
+              // face splittings can't be turned into tets without
+              // adding more nodes
+
               // Split on 0-4 diagonal
-              if ((elem->node(0) > elem->node(1) &&
-                   elem->node(0) > elem->node(3)) ||
-                  (elem->node(4) > elem->node(1) &&
-                   elem->node(4) > elem->node(3)))
+              if (split_first_diagonal(elem, 0,4, 1,3))
                 {
                   // Split on 0-5 diagonal
-                  if ((elem->node(0) > elem->node(2) &&
-                       elem->node(0) > elem->node(3)) ||
-                      (elem->node(5) > elem->node(2) &&
-                       elem->node(5) > elem->node(3)))
+                  if (split_first_diagonal(elem, 0,5, 2,3))
                     {
                       // Split on 1-5 diagonal
-                      if ((elem->node(1) > elem->node(2) &&
-                           elem->node(1) > elem->node(4)) ||
-                          (elem->node(5) > elem->node(2) &&
-                           elem->node(5) > elem->node(4)))
+                      if (split_first_diagonal(elem, 1,5, 2,4))
                         {
                           subelem[0]->set_node(0) = elem->get_node(0);
                           subelem[0]->set_node(1) = elem->get_node(4);
@@ -916,6 +939,8 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                         }
                       else // Split on 2-4 diagonal
                         {
+                          libmesh_assert (split_first_diagonal(elem, 2,4, 1,5));
+
                           subelem[0]->set_node(0) = elem->get_node(0);
                           subelem[0]->set_node(1) = elem->get_node(4);
                           subelem[0]->set_node(2) = elem->get_node(5);
@@ -934,7 +959,11 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                     }
                   else // Split on 2-3 diagonal
                     {
+                      libmesh_assert (split_first_diagonal(elem, 2,3, 0,5));
+
                       // 0-4 and 2-3 split implies 2-4 split
+                      libmesh_assert (split_first_diagonal(elem, 2,4, 1,5));
+
                       subelem[0]->set_node(0) = elem->get_node(0);
                       subelem[0]->set_node(1) = elem->get_node(4);
                       subelem[0]->set_node(2) = elem->get_node(2);
@@ -953,13 +982,14 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                 }
               else // Split on 1-3 diagonal
                 {
+                  libmesh_assert (split_first_diagonal(elem, 1,3, 0,4));
+
                   // Split on 0-5 diagonal
-                  if ((elem->node(0) > elem->node(2) &&
-                       elem->node(0) > elem->node(3)) ||
-                      (elem->node(5) > elem->node(2) &&
-                       elem->node(5) > elem->node(3)))
+                  if (split_first_diagonal(elem, 0,5, 2,3))
                     {
                       // 1-3 and 0-5 split implies 1-5 split
+                      libmesh_assert (split_first_diagonal(elem, 1,5, 2,4));
+
                       subelem[0]->set_node(0) = elem->get_node(1);
                       subelem[0]->set_node(1) = elem->get_node(3);
                       subelem[0]->set_node(2) = elem->get_node(4);
@@ -977,11 +1007,10 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                     }
                   else // Split on 2-3 diagonal
                     {
+                      libmesh_assert (split_first_diagonal(elem, 2,3, 0,5));
+
                       // Split on 1-5 diagonal
-                      if ((elem->node(1) > elem->node(2) &&
-                           elem->node(1) > elem->node(4)) ||
-                          (elem->node(5) > elem->node(2) &&
-                           elem->node(5) > elem->node(4)))
+                      if (split_first_diagonal(elem, 1,5, 2,4))
                         {
                           subelem[0]->set_node(0) = elem->get_node(0);
                           subelem[0]->set_node(1) = elem->get_node(1);
@@ -1000,6 +1029,8 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                         }
                       else // Split on 2-4 diagonal
                         {
+                          libmesh_assert (split_first_diagonal(elem, 2,4, 1,5));
+
                           subelem[0]->set_node(0) = elem->get_node(0);
                           subelem[0]->set_node(1) = elem->get_node(1);
                           subelem[0]->set_node(2) = elem->get_node(2);
@@ -1028,22 +1059,13 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	      subelem[2] = new Tet10;
 
               // Split on 0-4 diagonal
-              if ((elem->node(0) > elem->node(1) &&
-                   elem->node(0) > elem->node(3)) ||
-                  (elem->node(4) > elem->node(1) &&
-                   elem->node(4) > elem->node(3)))
+              if (split_first_diagonal(elem, 0,4, 1,3))
                 {
                   // Split on 0-5 diagonal
-                  if ((elem->node(0) > elem->node(2) &&
-                       elem->node(0) > elem->node(3)) ||
-                      (elem->node(5) > elem->node(2) &&
-                       elem->node(5) > elem->node(3)))
+                  if (split_first_diagonal(elem, 0,5, 2,3))
                     {
                       // Split on 1-5 diagonal
-                      if ((elem->node(1) > elem->node(2) &&
-                           elem->node(1) > elem->node(4)) ||
-                          (elem->node(5) > elem->node(2) &&
-                           elem->node(5) > elem->node(4)))
+                      if (split_first_diagonal(elem, 1,5, 2,4))
                         {
                           subelem[0]->set_node(0) = elem->get_node(0);
                           subelem[0]->set_node(1) = elem->get_node(4);
@@ -1083,6 +1105,8 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                         }
                       else // Split on 2-4 diagonal
                         {
+                          libmesh_assert (split_first_diagonal(elem, 2,4, 1,5));
+
                           subelem[0]->set_node(0) = elem->get_node(0);
                           subelem[0]->set_node(1) = elem->get_node(4);
                           subelem[0]->set_node(2) = elem->get_node(5);
@@ -1122,7 +1146,11 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                     }
                   else // Split on 2-3 diagonal
                     {
+                      libmesh_assert (split_first_diagonal(elem, 2,3, 0,5));
+
                       // 0-4 and 2-3 split implies 2-4 split
+                      libmesh_assert (split_first_diagonal(elem, 2,4, 1,5));
+
                       subelem[0]->set_node(0) = elem->get_node(0);
                       subelem[0]->set_node(1) = elem->get_node(4);
                       subelem[0]->set_node(2) = elem->get_node(2);
@@ -1162,13 +1190,14 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                 }
               else // Split on 1-3 diagonal
                 {
+                  libmesh_assert (split_first_diagonal(elem, 1,3, 0,4));
+
                   // Split on 0-5 diagonal
-                  if ((elem->node(0) > elem->node(2) &&
-                       elem->node(0) > elem->node(3)) ||
-                      (elem->node(5) > elem->node(2) &&
-                       elem->node(5) > elem->node(3)))
+                  if (split_first_diagonal(elem, 0,5, 2,3))
                     {
                       // 1-3 and 0-5 split implies 1-5 split
+                      libmesh_assert (split_first_diagonal(elem, 1,5, 2,4));
+
                       subelem[0]->set_node(0) = elem->get_node(1);
                       subelem[0]->set_node(1) = elem->get_node(3);
                       subelem[0]->set_node(2) = elem->get_node(4);
@@ -1207,11 +1236,10 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                     }
                   else // Split on 2-3 diagonal
                     {
+                      libmesh_assert (split_first_diagonal(elem, 2,3, 0,5));
+
                       // Split on 1-5 diagonal
-                      if ((elem->node(1) > elem->node(2) &&
-                           elem->node(1) > elem->node(4)) ||
-                          (elem->node(5) > elem->node(2) &&
-                           elem->node(5) > elem->node(4)))
+                      if (split_first_diagonal(elem, 1,5, 2,4))
                         {
                           subelem[0]->set_node(0) = elem->get_node(0);
                           subelem[0]->set_node(1) = elem->get_node(1);
@@ -1251,6 +1279,8 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                         }
                       else // Split on 2-4 diagonal
                         {
+                          libmesh_assert (split_first_diagonal(elem, 2,4, 1,5));
+
                           subelem[0]->set_node(0) = elem->get_node(0);
                           subelem[0]->set_node(1) = elem->get_node(1);
                           subelem[0]->set_node(2) = elem->get_node(2);
