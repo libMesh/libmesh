@@ -630,16 +630,17 @@ LibMeshInit::~LibMeshInit()
   // Set the initialized() flag to false
   libMeshPrivateData::_is_initialized = false;
 
-    //if (libMesh::on_command_line ("--redirect-stdout"))
+    // Before handing back the std stream buffers, print the
+    // perflog to the individual processor's files.
+    libMesh::perflog.print_log();
+1
+    // Now clear the logging object, we don't want it to print
+    // a second time during the PerfLog destructor.
+    libMesh::perflog.clear();
+    
+
+    if (libMesh::on_command_line ("--redirect-stdout"))
     {
-      // Before handing back the std stream buffers, print the
-      // perflog to the individual processor's files.
-      libMesh::perflog.print_log();
-
-      // Now clear the logging object, we don't want it to print
-      // a second time during the PerfLog destructor.
-      libMesh::perflog.clear();
-
       // If stdout/stderr were redirected to files, reset them now.
       libMesh::out.rdbuf (out_buf);
       libMesh::err.rdbuf (err_buf);
