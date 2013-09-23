@@ -1,0 +1,9 @@
+netcdf synth9 {
+dimensions:
+	lat = 2 ;
+	long = 2 ;
+variables:
+	int lat(lat) ;
+	int long(long) ;
+	float G1(lat, long) ;
+}
