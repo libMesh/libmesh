@@ -84,7 +84,8 @@ System::System (EquationSystems& es,
   _basic_system_only                (false),
   _can_add_vectors                  (true),
   _identify_variable_groups         (true),
-  _additional_data_written          (false)
+  _additional_data_written          (false),
+  adjoint_already_solved            (false)
 {
 }
 
