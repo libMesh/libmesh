@@ -633,7 +633,7 @@ LibMeshInit::~LibMeshInit()
     // Before handing back the std stream buffers, print the
     // perflog to the individual processor's files.
     libMesh::perflog.print_log();
-1
+    
     // Now clear the logging object, we don't want it to print
     // a second time during the PerfLog destructor.
     libMesh::perflog.clear();
