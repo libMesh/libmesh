@@ -620,7 +620,13 @@ LibMeshInit::~LibMeshInit()
 
     }
 
-
+  //  print the perflog to individual processor's file.
+  libMesh::perflog.print_log();
+  
+  // Now clear the logging object, we don't want it to print
+  // a second time during the PerfLog destructor.
+  libMesh::perflog.clear();
+  
   // Reconnect the output streams
   // (don't do this, or we will get messages from objects
   //  that go out of scope after the following return)
@@ -630,21 +636,13 @@ LibMeshInit::~LibMeshInit()
   // Set the initialized() flag to false
   libMeshPrivateData::_is_initialized = false;
 
-    //if (libMesh::on_command_line ("--redirect-stdout"))
+  if (libMesh::on_command_line ("--redirect-stdout"))
     {
-      // Before handing back the std stream buffers, print the
-      // perflog to the individual processor's files.
-      libMesh::perflog.print_log();
-
-      // Now clear the logging object, we don't want it to print
-      // a second time during the PerfLog destructor.
-      libMesh::perflog.clear();
-
       // If stdout/stderr were redirected to files, reset them now.
       libMesh::out.rdbuf (out_buf);
       libMesh::err.rdbuf (err_buf);
     }
-
+  
   // If we built our own output streams, we want to clean them up.
   if (libMesh::on_command_line ("--separate-libmeshout"))
     {
