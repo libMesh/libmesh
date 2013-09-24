@@ -615,6 +615,22 @@ public:
                            const bool forbid_constraint_overwrite);
 
   /**
+   * Adds a copy of the user-defined row to the constraint matrix,
+   * using an inhomogeneous right-hand-side for the adjoint constraint
+   * equation.
+   *
+   * \p forbid_constraint_overwrite here only tests for overwriting
+   * the rhs.  This method should only be used when an equivalent
+   * constraint (with a potentially different rhs) already exists for
+   * the primal problem.
+   */
+  void add_adjoint_constraint_row (const unsigned int qoi_index,
+                                   const dof_id_type dof_number,
+                                   const DofConstraintRow& constraint_row,
+                                   const Number constraint_rhs,
+                                   const bool forbid_constraint_overwrite);
+
+  /**
    * Adds a copy of the user-defined row to the constraint matrix, using
    * a homogeneous right-hand-side for the constraint equation.
    * By default, produces an error if the DOF was already constrained.

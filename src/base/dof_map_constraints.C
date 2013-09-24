@@ -183,6 +183,58 @@ using namespace libMesh;
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
   /**
+   * This functor class hierarchy adds a constraint row to a DofMap
+   */
+  class AddConstraint
+  {
+  protected:
+    DofMap                  &dof_map;
+
+  public:
+    AddConstraint(DofMap &dof_map_in) : dof_map(dof_map_in) {}
+
+    virtual void operator()(dof_id_type dof_number,
+                            const DofConstraintRow& constraint_row,
+                            const Number constraint_rhs) const = 0;
+  };
+
+  class AddPrimalConstraint : public AddConstraint
+  {
+  public:
+    AddPrimalConstraint(DofMap &dof_map_in) : AddConstraint(dof_map_in) {}
+
+    virtual void operator()(dof_id_type dof_number,
+                            const DofConstraintRow& constraint_row,
+                            const Number constraint_rhs) const
+      {
+        if (!dof_map.is_constrained_dof(dof_number))
+          dof_map.add_constraint_row (dof_number, constraint_row,
+                                      constraint_rhs, true);
+      }
+  };
+
+  class AddAdjointConstraint : public AddConstraint
+  {
+  private:
+    const unsigned int qoi_index;
+
+  public:
+    AddAdjointConstraint(DofMap &dof_map_in, unsigned int qoi_index_in)
+      : AddConstraint(dof_map_in), qoi_index(qoi_index_in) {}
+
+    virtual void operator()(dof_id_type dof_number,
+                            const DofConstraintRow& constraint_row,
+                            const Number constraint_rhs) const
+      {
+        dof_map.add_adjoint_constraint_row
+          (qoi_index, dof_number, constraint_row, constraint_rhs,
+           true);
+      }
+  };
+
+
+
+  /**
    * This class implements turning an arbitrary
    * boundary function into Dirichlet constraints.  It
    * may be executed in parallel on multiple threads.
@@ -194,6 +246,8 @@ using namespace libMesh;
     const MeshBase          &mesh;
     const Real               time;
     const DirichletBoundary  dirichlet;
+
+    const AddConstraint     &add_fn;
 
     template<typename OutputType>
     void apply_dirichlet_impl( const ConstElemRange &range,
@@ -753,11 +807,8 @@ using namespace libMesh;
 	    for (unsigned int i = 0; i < n_dofs; i++)
 	      {
 		DofConstraintRow empty_row;
-		if (dof_is_fixed[i] &&
-		    !dof_map.is_constrained_dof(dof_indices[i]))
-		  dof_map.add_constraint_row
-		    (dof_indices[i], empty_row,
-		     Ue(i), /* forbid_constraint_overwrite = */ true);
+		if (dof_is_fixed[i])
+		  add_fn (dof_indices[i], empty_row, Ue(i));
 	      }
 	  }
 	}
@@ -768,17 +819,20 @@ using namespace libMesh;
     ConstrainDirichlet (DofMap &dof_map_in,
 		        const MeshBase &mesh_in,
 		        const Real time_in,
-		        const DirichletBoundary &dirichlet_in) :
+		        const DirichletBoundary &dirichlet_in,
+                        const AddConstraint& add_in) :
     dof_map(dof_map_in),
     mesh(mesh_in),
     time(time_in),
-    dirichlet(dirichlet_in) { }
+    dirichlet(dirichlet_in),
+    add_fn(add_in) { }
 
     ConstrainDirichlet (const ConstrainDirichlet &in) :
     dof_map(in.dof_map),
     mesh(in.mesh),
     time(in.time),
-    dirichlet(in.dirichlet) { }
+    dirichlet(in.dirichlet),
+    add_fn(in.add_fn) { }
 
     void operator()(const ConstElemRange &range) const
     {
@@ -981,9 +1035,28 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
     {
       Threads::parallel_for
 	(range,
-	 ConstrainDirichlet(*this, mesh, time, **i)
+	 ConstrainDirichlet(*this, mesh, time, **i,
+                            AddPrimalConstraint(*this))
 	 );
     }
+
+  for (unsigned int qoi_index = 0;
+       qoi_index != _adjoint_dirichlet_boundaries.size();
+       ++qoi_index)
+    {
+      for (DirichletBoundaries::iterator
+             i = _adjoint_dirichlet_boundaries[qoi_index]->begin();
+           i != _adjoint_dirichlet_boundaries[qoi_index]->end();
+           ++i, range.reset())
+        {
+          Threads::parallel_for
+	    (range,
+	     ConstrainDirichlet(*this, mesh, time, **i,
+                                AddAdjointConstraint(*this, qoi_index))
+	     );
+        }
+    }
+
 #endif // LIBMESH_ENABLE_DIRICHLET
 
   STOP_LOG("create_dof_constraints()", "DofMap");
@@ -1008,6 +1081,44 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
   _dof_constraints.insert(std::make_pair(dof_number, constraint_row));
   _primal_constraint_values.insert(std::make_pair(dof_number, constraint_rhs));
 }
+
+
+void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
+                                         const dof_id_type dof_number,
+				         const DofConstraintRow& constraint_row,
+                                         const Number constraint_rhs,
+				         const bool forbid_constraint_overwrite)
+{
+  // Optionally allow the user to overwrite constraints.  Defaults to false.
+  if (forbid_constraint_overwrite)
+    {
+      if (!this->is_constrained_dof(dof_number))
+        {
+	  libMesh::err << "ERROR: DOF " << dof_number << " has no corresponding primal constraint!"
+		       << std::endl;
+	  libmesh_error();
+        }
+#ifndef NDEBUG
+      // If the user passed in more than just the rhs, let's check the
+      // coefficients for consistency
+      if (!constraint_row.empty())
+        {
+          DofConstraintRow row = _dof_constraints[dof_number];
+          for (DofConstraintRow::const_iterator pos=row.begin();
+	       pos != row.end(); ++pos)
+            {
+              libmesh_assert(constraint_row.find(pos->first)->second
+                             == pos->second);
+            }
+        }
+#endif
+    }
+
+  // Creates the map of rhs values if it doesn't already exist; then
+  // adds the current value to that map
+  _adjoint_constraint_values[qoi_index].insert(std::make_pair(dof_number, constraint_rhs));
+}
+
 
 
 
@@ -1291,16 +1402,17 @@ void DofMap::heterogenously_constrain_adjoint_rhs
   if (_adjoint_constraint_values.empty())
     return;
 
+  AdjointDofConstraintValues::const_iterator adjoint_values_map_it = 
+    _adjoint_constraint_values.find(qoi_index);
+
+  if (adjoint_values_map_it == _adjoint_constraint_values.end())
+    return;
+    
   START_LOG("hetero_cnstrn_adjoint_rhs()", "DofMap");
 
   // The constrained RHS needs C^T * K * H subtracted
   AutoPtr<NumericVector<Number> > H = rhs.zero_clone();
 
-  AdjointDofConstraintValues::const_iterator adjoint_values_map_it = 
-    _adjoint_constraint_values.find(qoi_index);
-
-  libmesh_assert (adjoint_values_map_it != _adjoint_constraint_values.end());
-    
   for (DofConstraintValueMap::const_iterator it =
        adjoint_values_map_it->second.begin();
        it != adjoint_values_map_it->second.end();
