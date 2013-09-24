@@ -1099,6 +1099,8 @@ void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
 	  libmesh_error();
         }
 #ifndef NDEBUG
+      // No way to do this without a non-normalized tolerance?
+      /*
       // If the user passed in more than just the rhs, let's check the
       // coefficients for consistency
       if (!constraint_row.empty())
@@ -1111,6 +1113,13 @@ void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
                              == pos->second);
             }
         }
+
+      if (_adjoint_constraint_values[qoi_index].find(dof_number) !=
+          _adjoint_constraint_values[qoi_index].end())
+        libmesh_assert_equal_to
+          (_adjoint_constraint_values[qoi_index][dof_number],
+           constraint_rhs);
+       */
 #endif
     }
 
@@ -1223,6 +1232,38 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
       os << "rhs: " << rhs;
 
       os << std::endl;
+    }
+
+  for (unsigned int qoi_index = 0;
+       qoi_index != _adjoint_dirichlet_boundaries.size();
+       ++qoi_index)
+    {
+      os << "Adjoint " << qoi_index << " DoF rhs values:"
+         << std::endl;
+
+      AdjointDofConstraintValues::const_iterator adjoint_map_it =
+        _adjoint_constraint_values.find(qoi_index);
+
+      if (adjoint_map_it != _adjoint_constraint_values.end())
+        for (DofConstraintValueMap::const_iterator
+             it=adjoint_map_it->second.begin();
+             it != adjoint_map_it->second.end(); ++it)
+          {
+            const dof_id_type i = it->first;
+
+            // Skip non-local dofs if requested
+            if (!print_nonlocal &&
+                ((i < this->first_dof()) ||
+                 (i >= this->end_dof())))
+              continue;
+
+            const Number rhs = it->second;
+
+            os << "RHS for DoF " << i
+	       << ": " << rhs;
+
+            os << std::endl;
+          }
     }
 
   return os.str();
