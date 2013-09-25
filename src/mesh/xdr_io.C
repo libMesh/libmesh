@@ -372,10 +372,10 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 	  libmesh_assert (!recv_conn.empty());
 
           {
-	  const largest_id_type n_elem_received = recv_conn.back();
-	  std::vector<largest_id_type>::const_iterator recv_conn_iter = recv_conn.begin();
+	  const dof_id_type n_elem_received = recv_conn.back();
+	  std::vector<dof_id_type>::const_iterator recv_conn_iter = recv_conn.begin();
 
-	  for (largest_id_type elem=0; elem<n_elem_received; elem++, next_global_elem++)
+	  for (dof_id_type elem=0; elem<n_elem_received; elem++, next_global_elem++)
 	    {
 	      output_buffer.clear();
 	      const dof_id_type n_nodes = *recv_conn_iter; ++recv_conn_iter;
@@ -983,7 +983,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem)
 	  ++it;
 
 	  Elem *parent =
-            (parent_id == static_cast<xdr_id_type>(-1)) ? 
+            (parent_id == static_cast<xdr_id_type>(-1)) ?
               NULL : mesh.elem(parent_id);
 
 	  Elem *elem = Elem::build (elem_type, parent).release();
