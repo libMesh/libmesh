@@ -214,7 +214,7 @@ dbg_programs   = # empty, append below
 prof_programs  = # empty, append below
 oprof_programs = # empty, append below
 
-# meshtool
+# getpot_parse
 opt_programs               += getpot_parse-opt
 getpot_parse_opt_SOURCES    = src/apps/getpot_parse.C
 getpot_parse_opt_CPPFLAGS   = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
@@ -308,6 +308,25 @@ meshid_dbg_SOURCES    = src/apps/meshid.C
 meshid_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 meshid_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
 meshid_dbg_LDADD      = libmesh_dbg.la
+
+# meshdiff
+opt_programs           += meshdiff-opt
+meshdiff_opt_SOURCES    = src/apps/meshdiff.C
+meshdiff_opt_CPPFLAGS   = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+meshdiff_opt_CXXFLAGS   = $(CXXFLAGS_OPT)
+meshdiff_opt_LDADD      = libmesh_opt.la
+
+devel_programs         += meshdiff-devel
+meshdiff_devel_SOURCES  = src/apps/meshdiff.C
+meshdiff_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+meshdiff_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+meshdiff_devel_LDADD    = libmesh_devel.la
+
+dbg_programs           += meshdiff-dbg
+meshdiff_dbg_SOURCES    = src/apps/meshdiff.C
+meshdiff_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+meshdiff_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
+meshdiff_dbg_LDADD      = libmesh_dbg.la
 
 # meshnorm
 opt_programs           += meshnorm-opt
