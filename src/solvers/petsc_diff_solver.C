@@ -231,7 +231,31 @@ void PetscDiffSolver::reinit()
   Parent::reinit();
 }
 
-
+DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r) {
+	switch (r) {
+		case SNES_CONVERGED_FNORM_ABS:
+			return DiffSolver::CONVERGED_ABSOLUTE_RESIDUAL;
+		case SNES_CONVERGED_FNORM_RELATIVE:
+			return DiffSolver::CONVERGED_RELATIVE_RESIDUAL;
+		case SNES_CONVERGED_SNORM_RELATIVE:
+			return DiffSolver::CONVERGED_RELATIVE_STEP;
+		case SNES_CONVERGED_ITS:
+		case SNES_CONVERGED_TR_DELTA:
+			return DiffSolver::CONVERGED_NO_REASON;
+		case SNES_DIVERGED_FUNCTION_DOMAIN:
+		case SNES_DIVERGED_FUNCTION_COUNT:
+		case SNES_DIVERGED_FNORM_NAN:
+		case SNES_DIVERGED_INNER:
+		case SNES_DIVERGED_LINEAR_SOLVE:
+		case SNES_DIVERGED_LOCAL_MIN:
+			return DiffSolver::DIVERGED_NO_REASON;
+		case SNES_DIVERGED_MAX_IT:
+			return DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
+		case SNES_DIVERGED_LINE_SEARCH:
+			return DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
+	}
+	return DiffSolver::INVALID_SOLVE_RESULT;
+}
 
 unsigned int PetscDiffSolver::solve()
 {
@@ -281,12 +305,14 @@ unsigned int PetscDiffSolver::solve()
 
   STOP_LOG("solve()", "PetscDiffSolver");
 
+  SNESConvergedReason reason;
+  SNESGetConvergedReason(_snes, &reason);
+
   this->clear();
 
-  // FIXME - We'll worry about getting the solve result right later...
-
-  return DiffSolver::CONVERGED_RELATIVE_RESIDUAL;
+  return convert_solve_result(reason);
 }
+
 
 } // namespace libMesh
 
