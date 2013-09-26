@@ -55,6 +55,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkGenericGeometryFilter.h"
 #include "vtkCellArray.h"
+#include "vtkCellData.h"
 #include "vtkConfigure.h"
 #include "vtkDoubleArray.h"
 #include "vtkPointData.h"
@@ -213,6 +214,10 @@ void VTKIO::cells_to_vtk()
   std::vector<int> types(mesh.n_active_local_elem());
   unsigned active_element_counter = 0;
 
+  vtkSmartPointer<vtkIntArray> elem_id = vtkSmartPointer<vtkIntArray>::New();
+  elem_id->SetName("libmesh_elem_id");
+  elem_id->SetNumberOfComponents(1);
+
   MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
   for (; it != end; ++it, ++active_element_counter)
@@ -262,12 +267,14 @@ void VTKIO::cells_to_vtk()
           pts->InsertId(i, _local_node_map[conn[i]]);
         }
 
-      cells->InsertNextCell(pts);
+      vtkIdType vtkcellid = cells->InsertNextCell(pts);
       types[active_element_counter] = this->get_elem_type(elem->type());
+      elem_id->InsertTuple1(vtkcellid, elem->id());
     } // end loop over active elements
 
   pts->Delete();
   _vtk_grid->SetCells(&types[0], cells);
+  _vtk_grid->GetCellData()->AddArray(elem_id);
   cells->Delete();
 }
 
