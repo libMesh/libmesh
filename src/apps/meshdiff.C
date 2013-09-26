@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 {
   LibMeshInit init(argc, argv);
 
-  Mesh mesh1(dim, init.comm()), mesh2(dim, init.comm());
+  Mesh mesh1(init.comm(), dim), mesh2(init.comm(), dim);
   EquationSystems es1(mesh1), es2(mesh2);
 
   libMesh::out << "Usage: " << argv[0]
