@@ -47,7 +47,7 @@ extern "C"
 // Function to hand to PETSc's SNES,
 // which monitors convergence at X
 PetscErrorCode
-__libmesh_petsc_diff_solver_monitor (SNES, PetscInt its,
+__libmesh_petsc_diff_solver_monitor (SNES snes, PetscInt its,
                                      PetscReal fnorm, void *ctx)
 {
   PetscDiffSolver& solver =
@@ -56,7 +56,25 @@ __libmesh_petsc_diff_solver_monitor (SNES, PetscInt its,
   if (solver.verbose)
     libMesh::out << "  PetscDiffSolver step " << its
                  << ", |residual|_2 = " << fnorm << std::endl;
+  if (solver.linear_solution_monitor.get()) {
+    int ierr = 0;
 
+    Vec petsc_delta_u;
+    ierr = SNESGetSolutionUpdate(snes, &petsc_delta_u);
+    CHKERRABORT(libMesh::COMM_WORLD, ierr);
+    PetscVector<Number> delta_u(petsc_delta_u);
+    delta_u.close();
+
+    Vec petsc_u;
+    ierr = SNESGetSolution(snes, &petsc_u);
+    CHKERRABORT(libMesh::COMM_WORLD, ierr);
+    PetscVector<Number> u(petsc_u);
+    u.close();
+
+    (*solver.linear_solution_monitor)(
+            delta_u, delta_u.l2_norm(),
+            u, u.l2_norm());
+  }
   return 0;
 }
 
