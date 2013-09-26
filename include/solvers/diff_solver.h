@@ -44,7 +44,9 @@ template <typename T> class NumericVector;
 class LinearSolutionMonitor {
 public:
 	virtual void operator() (const NumericVector<Number>& delta_u, const double &norm_delta_u,
-			const NumericVector<Number>& u, const double &norm_u) = 0;
+			const NumericVector<Number>& u, const double &norm_u,
+			const NumericVector<Number>& res, const double &norm_res,
+			const unsigned int iteration) = 0;
 	virtual ~LinearSolutionMonitor();
 };
 

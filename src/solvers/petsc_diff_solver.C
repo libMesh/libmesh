@@ -71,9 +71,16 @@ __libmesh_petsc_diff_solver_monitor (SNES snes, PetscInt its,
     PetscVector<Number> u(petsc_u);
     u.close();
 
+    Vec petsc_res;
+    ierr = SNESGetFunction(snes, &petsc_res, NULL, NULL);
+    CHKERRABORT(libMesh::COMM_WORLD, ierr);
+    PetscVector<Number> res(petsc_res);
+    res.close();
+
     (*solver.linear_solution_monitor)(
             delta_u, delta_u.l2_norm(),
-            u, u.l2_norm());
+            u, u.l2_norm(),
+            res, res.l2_norm(), its);
   }
   return 0;
 }
