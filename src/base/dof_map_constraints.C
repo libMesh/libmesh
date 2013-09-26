@@ -1459,7 +1459,10 @@ void DofMap::heterogenously_constrain_adjoint_rhs
        it != adjoint_values_map_it->second.end();
        ++it)
     {
-      H->set(it->first, it->second);
+      unsigned int i = it->first;
+      if (H->first_local_index() <= i &&
+          H->last_local_index() > i)
+        H->set(i, it->second);
     }
 
   H->close();
