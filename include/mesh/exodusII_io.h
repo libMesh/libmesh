@@ -178,6 +178,13 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    */
   void set_coordinate_offset(Point p);
 
+  /**
+   * If true, this flag will cause the ExodusII_IO object to attempt to
+   * open an existing file for writing, rather than creating a new file.
+   * Obviously this will only work if the file already exists.
+   */
+  void append(bool val);
+
  private:
   /**
    * Only attempt to instantiate an ExodusII helper class
@@ -204,6 +211,12 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * If this is empty then all variables are output.
    */
   std::vector<std::string> _output_variables;
+
+  /**
+   * Default false.  If true, files will be opened with EX_WRITE
+   * rather than created from scratch when writing.
+   */
+  bool _append;
 };
 
 

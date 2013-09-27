@@ -78,33 +78,17 @@ public:
   virtual ~ExodusII_IO_Helper();
 
   /**
-   * Returns true once create() has been successfully called, and
-   * false otherwise.  create() is called to open a new file for
-   * _writing_.
-   */
-  bool created();
-
-  /**
-   * Returns true once open() has been successfully called, and false
-   * otherwise.  open() is called to open an existing for _reading_.
-   */
-  bool opened();
-
-  /**
-   * Get/set flag telling whether message printing is on or off.
-   */
-  void verbose (bool set_verbosity);
-
-  /**
    * @returns the current element type.  Note: the default behavior is
    * for this value to be in all capital letters, e.g. \p HEX27.
    */
   const char* get_elem_type() const;
 
   /**
-   * Opens an \p ExodusII mesh file named \p filename for reading.
+   * Opens an \p ExodusII mesh file named \p filename.  If
+   * read_only==true, the file will be opened with the EX_READ flag,
+   * otherwise it will be opened with the EX_WRITE flag.
    */
-  void open(const char* filename);
+  void open(const char* filename, bool read_only);
 
   /**
    * Reads an \p ExodusII mesh file header.
@@ -520,18 +504,18 @@ public:
   std::map<int, std::string> id_to_ss_names;
   std::map<int, std::string> id_to_ns_names;
 
- protected:
-  // This flag gets set after the create() function has been successfully called.
-  // We call create() to open an ExodusII file for writing.
-  bool _created;
+  // On/Off message flag
+  bool verbose;
+
+  // This flag gets set after the Exodus file has been successfully opened for writing.
+  // Both the create() and open() (if called with EX_WRITE) functions may set this flag.
+  bool opened_for_writing;
 
   // This flag gets set after the open() function has been successfully called.
   // We call open() to open an ExodusII file for reading.
-  bool _opened;
+  bool opened_for_reading;
 
-  // On/Off message flag
-  bool _verbose;
-
+protected:
   // If true, whenever there is an I/O operation, only perform if if we are on processor 0.
   bool _run_only_on_proc0;
 
@@ -541,13 +525,12 @@ public:
   // True once the global vars are initialized
   bool _global_vars_initialized;
 
-  /**
-   * If true, use the Mesh's dimension (as determined by the dimension
-   * of the elements comprising the mesh) instead of the mesh's
-   * spatial dimension, when writing.  By default this is false.
-   */
+  // If true, use the Mesh's dimension (as determined by the dimension
+  // of the elements comprising the mesh) instead of the mesh's
+  // spatial dimension, when writing.  By default this is false.
   bool _use_mesh_dimension_instead_of_spatial_dimension;
 
+  // On output, shift every point by _coordinate_offset
   Point _coordinate_offset;
 };
 

@@ -237,9 +237,9 @@ const int ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map[5] = {-1,-1,
     num_time_steps(0),
     num_nodal_vars(0),
     num_elem_vars(0),
-    _created(false),
-    _opened(false),
-    _verbose(v),
+    verbose(v),
+    opened_for_writing(false),
+    opened_for_reading(false),
     _run_only_on_proc0(run_only_on_proc0),
     _elem_vars_initialized(false),
     _global_vars_initialized(false),
@@ -257,13 +257,6 @@ ExodusII_IO_Helper::~ExodusII_IO_Helper()
 
 
 
-void ExodusII_IO_Helper::verbose (bool set_verbosity)
-{
-  _verbose = set_verbosity;
-}
-
-
-
 const char* ExodusII_IO_Helper::get_elem_type() const
 {
   return &elem_type[0];
@@ -273,19 +266,19 @@ const char* ExodusII_IO_Helper::get_elem_type() const
 
 void ExodusII_IO_Helper::message(const std::string msg)
 {
-  if (_verbose) libMesh::out << msg << std::endl;
+  if (verbose) libMesh::out << msg << std::endl;
 }
 
 
 
 void ExodusII_IO_Helper::message(const std::string msg, int i)
 {
-  if (_verbose) libMesh::out << msg << i << "." << std::endl;
+  if (verbose) libMesh::out << msg << i << "." << std::endl;
 }
 
 
 
-void ExodusII_IO_Helper::open(const char* filename)
+void ExodusII_IO_Helper::open(const char* filename, bool read_only)
 {
   // Version of Exodus you are using
   float ex_version = 0.;
@@ -295,20 +288,24 @@ void ExodusII_IO_Helper::open(const char* filename)
   int comp_ws = sizeof(Real);
 
   // Word size in bytes of the floating point data as they are stored
-  // in the ExodusII file
+  // in the ExodusII file.  "If this argument is 0, the word size of the
+  // floating point data already stored in the file is returned"
   int io_ws = 0;
 
   ex_id = exII::ex_open(filename,
-			EX_READ,
+			read_only ? EX_READ : EX_WRITE,
 			&comp_ws,
 			&io_ws,
 			&ex_version);
 
   std::string err_msg = std::string("Error opening ExodusII mesh file: ") + std::string(filename);
   EX_CHECK_ERR(ex_id, err_msg);
-  if (_verbose) libMesh::out << "File opened successfully." << std::endl;
+  if (verbose) libMesh::out << "File opened successfully." << std::endl;
 
-  _opened = true;
+  if (read_only)
+    opened_for_reading = true;
+  else
+    opened_for_writing = true;
 }
 
 
@@ -342,7 +339,7 @@ void ExodusII_IO_Helper::read_header()
 
 void ExodusII_IO_Helper::print_header()
 {
-  if (_verbose)
+  if (verbose)
     libMesh::out << "Title: \t" << &title[0] << std::endl
 	          << "Mesh Dimension: \t"   << num_dim << std::endl
 	          << "Number of Nodes: \t" << num_nodes << std::endl
@@ -381,7 +378,7 @@ void ExodusII_IO_Helper::read_node_num_map ()
   EX_CHECK_ERR(ex_err, "Error retrieving nodal number map.");
   message("Nodal numbering map retrieved successfully.");
 
-  if (_verbose)
+  if (verbose)
     {
       libMesh::out << "[" << this->processor_id() << "] node_num_map[i] = ";
       for (unsigned int i=0; i<static_cast<unsigned int>(std::min(10, num_nodes-1)); ++i)
@@ -491,7 +488,7 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
 				   &num_elem_this_blk,
 				   &num_nodes_per_elem,
 				   &num_attr);
-  if (_verbose)
+  if (verbose)
     libMesh::out << "Reading a block of " << num_elem_this_blk
 	      << " " << &elem_type[0] << "(s)"
 	      << " having " << num_nodes_per_elem
@@ -532,7 +529,7 @@ void ExodusII_IO_Helper::read_elem_num_map ()
   message("Element numbering map retrieved successfully.");
 
 
-  if (_verbose)
+  if (verbose)
     {
       libMesh::out << "[" << this->processor_id() << "] elem_num_map[i] = ";
       for (unsigned int i=0; i<static_cast<unsigned int>(std::min(10, num_elem-1)); ++i)
@@ -735,7 +732,7 @@ void ExodusII_IO_Helper::read_nodal_var_names()
   EX_CHECK_ERR(ex_err, "Error reading nodal variable names!");
 
 
-  if (_verbose)
+  if (verbose)
     {
       libMesh::out << "Read the variable(s) from the file:" << std::endl;
       for (int i=0; i<num_nodal_vars; i++)
@@ -805,7 +802,7 @@ void ExodusII_IO_Helper::read_elemental_var_names()
                                   );
   EX_CHECK_ERR(ex_err, "Error reading elemental variable names!");
 
-  if (_verbose)
+  if (verbose)
     {
       libMesh::out << "Read the variable(s) from the file:" << std::endl;
       for (int i=0; i<num_elem_vars; i++)
@@ -901,11 +898,11 @@ void ExodusII_IO_Helper::create(std::string filename)
 
       EX_CHECK_ERR(ex_id, "Error creating ExodusII mesh file.");
 
-      if (_verbose)
+      if (verbose)
         libMesh::out << "File created successfully." << std::endl;
     }
 
-  _created = true;
+  opened_for_writing = true;
 }
 
 
@@ -1196,7 +1193,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
             {
               const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
               const unsigned int elem_node_index = conv.get_inverse_node_map(j); // inverse node map is for writing.
-              if (_verbose)
+              if (verbose)
                 {
                   libMesh::out << "Exodus node index: " << j
                                 << "=LibMesh node index " << elem_node_index << std::endl;
@@ -1285,7 +1282,7 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
             {
               const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
               const unsigned int elem_node_index = conv.get_inverse_node_map(j); // Inverse node map is for writing
-              if (_verbose)
+              if (verbose)
                 {
                   libMesh::out << "Exodus node index: " << j
                                 << "=LibMesh node index " << elem_node_index << std::endl;
@@ -1487,7 +1484,7 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
   for (int i=0; i<num_elem_vars; ++i)
     names_table.push_back_entry(names[i]);
 
-  if (_verbose)
+  if (verbose)
     {
       libMesh::out << "Writing variable name(s) to file: " << std::endl;
       for (int i=0; i<num_elem_vars; ++i)
@@ -1522,7 +1519,7 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
       for (int i=0; i<num_nodal_vars; i++)
         names_table.push_back_entry(names[i]);
 
-      if (_verbose)
+      if (verbose)
         {
           libMesh::out << "Writing variable name(s) to file: " << std::endl;
           for (int i=0; i<num_nodal_vars; i++)
@@ -1563,7 +1560,7 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
       for (int i=0; i<num_globals; i++)
         names_table.push_back_entry(names[i]);
 
-      if (_verbose)
+      if (verbose)
         {
           libMesh::out << "Writing variable name(s) to file: " << std::endl;
           for (int i=0; i<num_globals; ++i)
@@ -1711,19 +1708,6 @@ void ExodusII_IO_Helper::use_mesh_dimension_instead_of_spatial_dimension(bool va
 void ExodusII_IO_Helper::set_coordinate_offset(Point p)
 {
   _coordinate_offset = p;
-}
-
-
-bool ExodusII_IO_Helper::created()
-{
-  return _created;
-}
-
-
-
-bool ExodusII_IO_Helper::opened()
-{
-  return _opened;
 }
 
 
