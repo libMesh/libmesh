@@ -169,8 +169,8 @@ void VTKIO::nodes_to_vtk()
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
   // containers for points and coordinates of points
-  vtkSmartPointer<vtkPoints> points = vtkPoints::New();
-  vtkSmartPointer<vtkDoubleArray> pcoords = vtkDoubleArray::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+  vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
   pcoords->SetNumberOfComponents(LIBMESH_DIM);
   points->SetNumberOfPoints(mesh.n_local_nodes()); // it seems that it needs this to prevent a segfault
 
@@ -195,11 +195,9 @@ void VTKIO::nodes_to_vtk()
 
   // add coordinates to points
   points->SetData(pcoords);
-  pcoords->Delete();
 
   // add points to grid
   _vtk_grid->SetPoints(points);
-  points->Delete();
 }
 
 
@@ -208,8 +206,8 @@ void VTKIO::cells_to_vtk()
 {
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
-  vtkSmartPointer<vtkCellArray> cells = vtkCellArray::New();
-  vtkSmartPointer<vtkIdList> pts = vtkIdList::New();
+  vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+  vtkSmartPointer<vtkIdList> pts = vtkSmartPointer<vtkIdList>::New();
 
   std::vector<int> types(mesh.n_active_local_elem());
   unsigned active_element_counter = 0;
@@ -272,10 +270,8 @@ void VTKIO::cells_to_vtk()
       elem_id->InsertTuple1(vtkcellid, elem->id());
     } // end loop over active elements
 
-  pts->Delete();
   _vtk_grid->SetCells(&types[0], cells);
   _vtk_grid->GetCellData()->AddArray(elem_id);
-  cells->Delete();
 }
 
 
@@ -310,7 +306,7 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es, vtkUnstructuredGrid
 
       for (; it!=vecs.end(); ++it)
         {
-          vtkDoubleArray *data = vtkDoubleArray::New();
+          vtkSmartPointer<vtkDoubleArray> data = vtkSmartPointer<vtkDoubleArray>::New();
           data->SetName(it->first.c_str());
           libmesh_assert_equal_to (it->second.size(), es.get_mesh().n_nodes());
           data->SetNumberOfValues(it->second.size());
@@ -328,7 +324,6 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es, vtkUnstructuredGrid
 
             }
           grid->GetPointData()->AddArray(data);
-          data->Delete();
         }
     }
 }
@@ -584,7 +579,7 @@ void VTKIO::write_nodal_data (const std::string& fname,
 
   // we only use Unstructured grids
   _vtk_grid = vtkUnstructuredGrid::New();
-  vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkXMLPUnstructuredGridWriter::New();
+  vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
 
   // add nodes to the grid and update _local_node_map
   _local_node_map.clear();
@@ -601,7 +596,7 @@ void VTKIO::write_nodal_data (const std::string& fname,
 
       for (std::size_t variable=0; variable<num_vars; ++variable)
         {
-          vtkSmartPointer<vtkDoubleArray> data = vtkDoubleArray::New();
+          vtkSmartPointer<vtkDoubleArray> data = vtkSmartPointer<vtkDoubleArray>::New();
           data->SetName(names[variable].c_str());
 
           // number of local and ghost nodes
@@ -624,7 +619,6 @@ void VTKIO::write_nodal_data (const std::string& fname,
 #endif
             }
           _vtk_grid->GetPointData()->AddArray(data);
-          data->Delete();
         }
     }
 
@@ -657,7 +651,6 @@ void VTKIO::write_nodal_data (const std::string& fname,
   writer->Write();
 
   _vtk_grid->Delete();
-  writer->Delete();
 #endif
 }
 
