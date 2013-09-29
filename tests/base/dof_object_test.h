@@ -22,7 +22,7 @@ class DofObjectTest {
 
 private:
   DerivedClass * instance;
-  
+
 public:
   void setUp(DerivedClass * derived_instance)
   {
@@ -36,7 +36,7 @@ public:
     aobject.set_id(1);
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)1 , aobject.id() );
   }
-  
+
   void testValidId()
   {
     DofObject aobject(*instance);
@@ -72,7 +72,7 @@ public:
 
     aobject.processor_id(libMesh::processor_id());
     CPPUNIT_ASSERT(aobject.valid_processor_id());
-    
+
     aobject.processor_id(DofObject::invalid_processor_id);
     CPPUNIT_ASSERT(!aobject.valid_processor_id());
   }
@@ -89,28 +89,28 @@ public:
 
   void testSetNSystems()
   {
-    DofObject aobject(*instance);    
-    
+    DofObject aobject(*instance);
+
     aobject.set_n_systems (10);
-    
+
     CPPUNIT_ASSERT_EQUAL( (unsigned int) 10, aobject.n_systems() );
   }
 
   void testSetNVariableGroups()
   {
-    DofObject aobject(*instance);    
-    
+    DofObject aobject(*instance);
+
     aobject.set_n_systems (2);
-    
+
     std::vector<unsigned int> nvpg;
-    
+
     nvpg.push_back(10);
     nvpg.push_back(20);
     nvpg.push_back(30);
 
     aobject.set_n_vars_per_group (0, nvpg);
     aobject.set_n_vars_per_group (1, nvpg);
-    
+
     for (unsigned int s=0; s<2; s++)
       {
 	CPPUNIT_ASSERT_EQUAL( (unsigned int) 60, aobject.n_vars(s) );
@@ -123,11 +123,10 @@ public:
 
   void testJensEftangBug()
   {
-    libmesh_here();
     std::cout << "Debugging DofObject buffer\n"
 	      << " https://sourceforge.net/mailarchive/forum.php?thread_name=50C8EE7C.8090405%40gmail.com&forum_name=libmesh-users\n";
 
-    DofObject aobject(*instance);    
+    DofObject aobject(*instance);
     dof_id_type buf0[] = {2, 8, 257, 0, 257, 96, 257, 192, 257, 0};
     aobject.set_buffer(std::vector<dof_id_type>(buf0, buf0+10));
     aobject.debug_buffer();
