@@ -442,6 +442,7 @@ inline Communicator::Communicator () :
 #endif
       _rank(0),
       _size(1),
+      _send_mode(DEFAULT),
       used_tag_values(),
       _I_duped_it(false) {}
 
@@ -451,6 +452,7 @@ inline Communicator::Communicator (const communicator &comm) :
 #endif
       _rank(0),
       _size(1),
+      _send_mode(DEFAULT),
       used_tag_values(),
       _I_duped_it(false)
 {
@@ -464,6 +466,7 @@ inline Communicator::~Communicator () {
 #ifdef LIBMESH_HAVE_MPI
 inline void Communicator::split(int color, int key, Communicator &target) {
   MPI_Comm_split(this->get(), color, key, &target.get());
+  target.send_mode(this->send_mode());
 }
 #else
 inline void Communicator::split(int, int, Communicator &target) {
@@ -473,6 +476,7 @@ inline void Communicator::split(int, int, Communicator &target) {
 
 inline void Communicator::duplicate(const Communicator &comm) {
   this->duplicate(comm._communicator);
+  this->send_mode(comm.send_mode());
 }
 
 #ifdef LIBMESH_HAVE_MPI
@@ -513,6 +517,7 @@ inline Communicator::Communicator (const Communicator &) :
 #endif
   _rank(0),
   _size(1),
+  _send_mode(DEFAULT),
   used_tag_values(),
   _I_duped_it(false)
 {
@@ -540,6 +545,7 @@ inline void Communicator::assign(const communicator &comm)
       _size = 1;
     }
 #endif
+  _send_mode = DEFAULT;
 }
 
 
@@ -1881,12 +1887,13 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   // Only catch the return value when asserts are active.
   const int ierr =
 #endif
-    MPI_Send (dataptr,
-              libmesh_cast_int<int>(buf.size()),
-              StandardType<T>(dataptr),
-              dest_processor_id,
-              tag.value(),
-              this->get());
+    ((this->send_mode() == SYNCHRONOUS) ?
+     MPI_Ssend : MPI_Send) (dataptr,
+			    libmesh_cast_int<int>(buf.size()),
+			    StandardType<T>(dataptr),
+			    dest_processor_id,
+			    tag.value(),
+			    this->get());
 
   libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -1909,13 +1916,15 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   // Only catch the return value when asserts are active.
   const int ierr =
 #endif
-    MPI_Isend (dataptr,
-               libmesh_cast_int<int>(buf.size()),
-               StandardType<T>(dataptr),
-               dest_processor_id,
-               tag.value(),
-               this->get(),
-               req.get());
+    ((this->send_mode() == SYNCHRONOUS) ?
+     MPI_Issend : MPI_Isend) (dataptr,
+			      libmesh_cast_int<int>(buf.size()),
+			      StandardType<T>(dataptr),
+			      dest_processor_id,
+			      tag.value(),
+			      this->get(),
+			      req.get());
+
   libmesh_assert (ierr == MPI_SUCCESS);
 
   STOP_LOG("send()", "Parallel");
@@ -1936,12 +1945,13 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   // Only catch the return value when asserts are active.
   const int ierr =
 #endif
-    MPI_Send (dataptr,
-              1,
-              StandardType<T>(dataptr),
-              dest_processor_id,
-              tag.value(),
-              this->get());
+    ((this->send_mode() == SYNCHRONOUS) ?
+     MPI_Ssend : MPI_Send) (dataptr,
+			    1,
+			    StandardType<T>(dataptr),
+			    dest_processor_id,
+			    tag.value(),
+			    this->get());
 
   libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -1964,13 +1974,14 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   // Only catch the return value when asserts are active.
   const int ierr =
 #endif
-    MPI_Isend (dataptr,
-              1,
-              StandardType<T>(dataptr),
-              dest_processor_id,
-              tag.value(),
-              this->get(),
-              req.get());
+    ((this->send_mode() == SYNCHRONOUS) ?
+     MPI_Issend : MPI_Isend) (dataptr,
+			      1,
+			      StandardType<T>(dataptr),
+			      dest_processor_id,
+			      tag.value(),
+			      this->get(),
+			      req.get());
 
   libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -2078,12 +2089,13 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   // Only catch the return value when asserts are active.
   const int ierr =
 #endif
-    MPI_Send (buf.empty() ? NULL : &buf[0],
-              libmesh_cast_int<int>(buf.size()),
-              type,
-              dest_processor_id,
-              tag.value(),
-              this->get());
+    ((this->send_mode() == SYNCHRONOUS) ?
+     MPI_Ssend : MPI_Send) (buf.empty() ? NULL : &buf[0],
+			    libmesh_cast_int<int>(buf.size()),
+			    type,
+			    dest_processor_id,
+			    tag.value(),
+			    this->get());
 
   libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -2105,13 +2117,15 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   // Only catch the return value when asserts are active.
   const int ierr =
 #endif
-    MPI_Isend (buf.empty() ? NULL : &buf[0],
-               libmesh_cast_int<int>(buf.size()),
-               type,
-               dest_processor_id,
-               tag.value(),
-               this->get(),
-               req.get());
+    ((this->send_mode() == SYNCHRONOUS) ?
+     MPI_Issend : MPI_Isend) (buf.empty() ? NULL : &buf[0],
+			      libmesh_cast_int<int>(buf.size()),
+			      type,
+			      dest_processor_id,
+			      tag.value(),
+			      this->get(),
+			      req.get());
+
   libmesh_assert (ierr == MPI_SUCCESS);
 
   STOP_LOG("send()", "Parallel");
