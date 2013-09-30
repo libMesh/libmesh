@@ -29,6 +29,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/string_to_enum.h"
 
 #ifdef DEBUG
 #include "libmesh/mesh_tools.h"  // for elem_types warning
@@ -1182,12 +1183,27 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 
           const Elem* elem = mesh.elem(elem_id);
 
-          // Exodus/Nemesis want every block to have the same element type
-          // libmesh_assert_equal_to (elem->type(), conv.get_canonical_type());
+          // We *might* be able to get away with writing mixed element
+          // types which happen to have the same number of nodes, but
+          // do we actually *want* to get away with that?
+          // .) No visualization software would be able to handle it.
+          // .) There'd be no way for us to read it back in reliably.
+          // .) Even elements with the same number of nodes may have different connectivities (?)
 
-	  // But we can get away with writing e.g. HEX8 and INFHEX8 in
-	  // the same block...
-          libmesh_assert_equal_to (elem->n_nodes(), Elem::build(conv.get_canonical_type(), NULL)->n_nodes());
+          // This needs to be more than an assert so we don't fail
+          // with a mysterious segfault while trying to write mixed
+          // element meshes in optimized mode.
+          if (elem->type() != conv.get_canonical_type())
+            {
+              libMesh::err << "Error: Exodus requires all elements with a given subdomain ID to be the same type.\n"
+                           << "Can't write both "
+                           << Utility::enum_to_string(elem->type())
+                           << " and "
+                           << Utility::enum_to_string(conv.get_canonical_type())
+                           << " in the same block!"
+                           << std::endl;
+              libmesh_error();
+            }
 
           for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); j++)
             {
