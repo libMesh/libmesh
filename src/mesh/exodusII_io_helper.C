@@ -307,6 +307,8 @@ void ExodusII_IO_Helper::open(const char* filename, bool read_only)
     opened_for_reading = true;
   else
     opened_for_writing = true;
+
+  current_filename = std::string(filename);
 }
 
 
@@ -904,6 +906,7 @@ void ExodusII_IO_Helper::create(std::string filename)
     }
 
   opened_for_writing = true;
+  current_filename = filename;
 }
 
 

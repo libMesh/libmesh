@@ -482,6 +482,21 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
           exio_helper->initialize_nodal_variables(output_names);
         }
     }
+  else
+    {
+      // We are already open for writing, so check that the filename
+      // passed to this function matches the filename currently in use
+      // by the helper.
+      if (fname != exio_helper->current_filename)
+        {
+          libMesh::err << "Error! This ExodusII_IO object is already associated with file: "
+                       << exio_helper->current_filename
+                       << ", cannot use it with requested file: "
+                       << fname
+                       << std::endl;
+          libmesh_error();
+        }
+    }
 
   // This will count the number of variables actually output
   for (int c=0; c<num_vars; c++)
@@ -622,6 +637,21 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
           exio_helper->write_sidesets(mesh);
           exio_helper->write_nodesets(mesh);
           exio_helper->initialize_nodal_variables(names);
+        }
+    }
+  else
+    {
+      // We are already open for writing, so check that the filename
+      // passed to this function matches the filename currently in use
+      // by the helper.
+      if (fname != exio_helper->current_filename)
+        {
+          libMesh::err << "Error! This ExodusII_IO object is already associated with file: "
+                       << exio_helper->current_filename
+                       << ", cannot use it with requested file: "
+                       << fname
+                       << std::endl;
+          libmesh_error();
         }
     }
 

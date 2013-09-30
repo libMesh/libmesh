@@ -515,6 +515,16 @@ public:
   // We call open() to open an ExodusII file for reading.
   bool opened_for_reading;
 
+  // When either create() or open() is called, the Helper stores the
+  // name of the opened file as current_filename.  This way, the
+  // ExodusII_IO object can check to see if, on subsequent writes, the
+  // user is asking to write to a *different* filename from the one
+  // that is currently open, and signal an error.  The current
+  // ExodusII_IO implementation is designed to work with a single file
+  // only, so if you want to write to multiple Exodus files, use a
+  // different ExodusII_IO object for each one.
+  std::string current_filename;
+
 protected:
   // If true, whenever there is an I/O operation, only perform if if we are on processor 0.
   bool _run_only_on_proc0;
