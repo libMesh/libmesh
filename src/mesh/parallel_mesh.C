@@ -40,6 +40,10 @@ ParallelMesh::ParallelMesh (const Parallel::Communicator &comm,
   _next_free_unpartitioned_node_id(this->n_processors()),
   _next_free_unpartitioned_elem_id(this->n_processors())
 {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unique_id = this->processor_id();
+#endif
+
   // FIXME: give parmetis the communicator!
   _partitioner = AutoPtr<Partitioner>(new ParmetisPartitioner());
 }
@@ -56,6 +60,10 @@ ParallelMesh::ParallelMesh (unsigned int d) :
   _next_free_unpartitioned_node_id(this->n_processors()),
   _next_free_unpartitioned_elem_id(this->n_processors())
 {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unique_id = this->processor_id();
+#endif
+
   // FIXME: give parmetis the communicator!
   _partitioner = AutoPtr<Partitioner>(new ParmetisPartitioner());
 }
@@ -1274,5 +1282,35 @@ void ParallelMesh::allgather()
   this->libmesh_assert_valid_parallel_flags();
 #endif
 }
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+void ParallelMesh::assign_unique_ids()
+{
+  {
+    elem_iterator_imp        it = _elements.begin();
+    const elem_iterator_imp end = _elements.end();
+
+    for (; it != end; ++it)
+      if ((*it) && ! (*it)->valid_unique_id() && libMesh::processor_id() == (*it)->processor_id())
+      {
+        (*it)->set_unique_id() = _next_unique_id;
+        _next_unique_id += this->n_processors();
+      }
+  }
+
+  {
+    node_iterator_imp it  = _nodes.begin();
+    node_iterator_imp end = _nodes.end();
+
+    for (; it != end; ++it)
+      if ((*it) && ! (*it)->valid_unique_id() && libMesh::processor_id() == (*it)->processor_id())
+      {
+        (*it)->set_unique_id() = _next_unique_id;
+        _next_unique_id += this->n_processors();
+      }
+  }
+}
+#endif
+
 
 } // namespace libMesh

@@ -72,8 +72,12 @@ echo '  complex variables................ :' $enablecomplex
 echo '  example suite.................... :' $enableexamples
 echo '  ghosted vectors.................. :' $enableghosted
 echo '  high-order shape functions....... :' $enablepfem
+echo '  unique-id support................ :' $enableuniqueid
 echo '  id size (boundaries)............. :' $boundary_bytes bytes
 echo '  id size (dofs)................... :' $dof_bytes bytes
+if (test "x$enableuniqueid" = "xyes"); then
+echo '  id size (unique)................. :' $unique_bytes bytes
+fi
 echo '  id size (processors)............. :' $processor_bytes bytes
 echo '  id size (subdomains)............. :' $subdomain_bytes bytes
 echo '  infinite elements................ :' $enableifem

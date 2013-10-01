@@ -1062,6 +1062,8 @@ with_dof_id_bytes
 with_processor_id_bytes
 with_subdomain_id_bytes
 enable_everything
+enable_unique_id
+with_unique_id_bytes
 enable_tracefiles
 enable_amr
 enable_vsmoother
@@ -1827,6 +1829,7 @@ Optional Features:
   --enable-legacy-using-namespace
                           add "using namespace libMesh" to libMesh headers
   --enable-everything     treat all applicable options as enabled
+  --enable-unique-id      build with unique id suppport
   --enable-tracefiles     write stack trace files on unexpected errors
   --enable-amr            build with adaptive mesh refinement (AMR) suppport
   --enable-vsmoother      build with variational smoother suppport
@@ -1911,6 +1914,8 @@ Optional Packages:
   --with-subdomain-id-bytes=<1|2|4|8>
                           bytes of storage per element used to store the
                           subdomain_id
+  --with-unique-id-bytes=<1|2|4|8>
+                          bytes used per unique id
   --with-boost[=ARG]      use Boost library from a standard location
                           (ARG=yes), from the specified location (ARG=<path>),
                           or disable it (ARG=no) [ARG=yes]
@@ -26717,6 +26722,84 @@ fi
 
 
 
+
+# -------------------------------------------------------------
+# unique_id -- disable by default
+# -------------------------------------------------------------
+# Check whether --enable-unique-id was given.
+if test "${enable_unique_id+set}" = set; then :
+  enableval=$enable_unique_id; case "${enableval}" in
+	          yes)  enableuniqueid=yes ;;
+		   no)	enableuniqueid=no ;;
+		    *)  as_fn_error $? "bad value ${enableval} for --enable-unique-id" "$LINENO" 5 ;;
+	       esac
+else
+  enableuniqueid=$enableeverything
+fi
+
+
+if test "$enableuniqueid" = yes ; then
+
+$as_echo "#define ENABLE_UNIQUE_ID 1" >>confdefs.h
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with unique id support >>>" >&5
+$as_echo "<<< Configuring library with unique id support >>>" >&6; }
+fi
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# size of unique_id_type -- default 8 bytes
+# -------------------------------------------------------------
+
+# Check whether --with-unique_id_bytes was given.
+if test "${with_unique_id_bytes+set}" = set; then :
+  withval=$with_unique_id_bytes; unique_bytes="$withval"
+else
+  unique_bytes=8
+fi
+
+
+case "$unique_bytes" in
+    1)
+
+$as_echo "#define UNIQUE_ID_BYTES 1" >>confdefs.h
+
+	;;
+    2)
+
+$as_echo "#define UNIQUE_ID_BYTES 2" >>confdefs.h
+
+	;;
+    4)
+
+$as_echo "#define UNIQUE_ID_BYTES 4" >>confdefs.h
+
+	;;
+    8)
+
+$as_echo "#define UNIQUE_ID_BYTES 8" >>confdefs.h
+
+	;;
+    *)
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized unique_id size: $unique_bytes - configuring size...8" >&5
+$as_echo ">>> unrecognized unique_id size: $unique_bytes - configuring size...8" >&6; }
+
+$as_echo "#define UNIQUE_ID_BYTES 8" >>confdefs.h
+
+	unique_bytes=8
+	;;
+esac
+
+if test "$enableuniqueid" = yes ; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: configuring size of unique_id... $unique_bytes" >&5
+$as_echo "configuring size of unique_id... $unique_bytes" >&6; }
+fi
+# -------------------------------------------------------------
+
+
+
 # --------------------------------------------------------------
 # Write stack trace output files on error() - disabled by default
 # --------------------------------------------------------------
@@ -37572,8 +37655,12 @@ echo '  complex variables................ :' $enablecomplex
 echo '  example suite.................... :' $enableexamples
 echo '  ghosted vectors.................. :' $enableghosted
 echo '  high-order shape functions....... :' $enablepfem
+echo '  unique-id support................ :' $enableuniqueid
 echo '  id size (boundaries)............. :' $boundary_bytes bytes
 echo '  id size (dofs)................... :' $dof_bytes bytes
+if (test "x$enableuniqueid" = "xyes"); then
+echo '  id size (unique)................. :' $unique_bytes bytes
+fi
 echo '  id size (processors)............. :' $processor_bytes bytes
 echo '  id size (subdomains)............. :' $subdomain_bytes bytes
 echo '  infinite elements................ :' $enableifem
