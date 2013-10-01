@@ -118,6 +118,11 @@ SerialMesh::SerialMesh (const Parallel::Communicator &comm,
 			unsigned int d) :
   UnstructuredMesh (comm,d)
 {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  // In serial we just need to reset the next unique id to zero
+  // here in the constructor.
+  _next_unique_id = 0;
+#endif
   _partitioner = AutoPtr<Partitioner>(new MetisPartitioner());
 }
 
@@ -127,6 +132,11 @@ SerialMesh::SerialMesh (const Parallel::Communicator &comm,
 SerialMesh::SerialMesh (unsigned int d) :
   UnstructuredMesh (d)
 {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  // In serial we just need to reset the next unique id to zero
+  // here in the constructor.
+  _next_unique_id = 0;
+#endif
   _partitioner = AutoPtr<Partitioner>(new MetisPartitioner());
 }
 #endif
@@ -804,7 +814,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
       boundary_id_type id_array[2]        = {this_mesh_boundary_id, other_mesh_boundary_id};
       std::set<dof_id_type>* set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
       SerialMesh* mesh_array[2]           = {this, other_mesh};
-      
+
       for (unsigned i=0; i<2; ++i)
         {
           MeshBase::element_iterator elem_it  = mesh_array[i]->elements_begin();
@@ -836,14 +846,14 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
     if (verbose)
       {
         libMesh::out << "In SerialMesh::stitch_meshes:\n"
-                     << "This mesh has "  << this_boundary_node_ids.size() 
+                     << "This mesh has "  << this_boundary_node_ids.size()
                      << " nodes on boundary " << this_mesh_boundary_id  << ".\n"
                      << "Other mesh has " << other_boundary_node_ids.size()
                      << " nodes on boundary " << other_mesh_boundary_id << ".\n"
                      << "Minimum edge length on both surfaces is " << h_min << ".\n"
                      << std::endl;
       }
-      
+
 
     if(use_binary_search)
     {
@@ -1000,7 +1010,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                    << " matching nodes.\n"
                    << std::endl;
     }
-    
+
     if(enforce_all_nodes_match_on_boundaries)
     {
       unsigned int n_matching_nodes = node_to_node_map.size();
@@ -1105,7 +1115,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
       // Then decrement
       dof_id_type new_id = el->id() - elem_delta;
       el->set_id(new_id);
-    }  
+    }
   } // end if(other_mesh)
 
   // Finally, we need to "merge" the overlapping nodes
@@ -1179,5 +1189,20 @@ dof_id_type SerialMesh::n_active_elem () const
   return static_cast<dof_id_type>(std::distance (this->active_elements_begin(),
 						 this->active_elements_end()));
 }
+
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+void SerialMesh::assign_unique_ids()
+{
+  for (dof_id_type i=0; i<_elements.size(); ++i)
+    if (_elements[i] && ! _elements[i]->valid_unique_id())
+      _elements[i]->set_unique_id() = _next_unique_id++;
+
+  for (dof_id_type i=0; i<_nodes.size(); ++i)
+    if (_nodes[i] && ! _nodes[i]->valid_unique_id())
+      _nodes[i]->set_unique_id() = _next_unique_id++;
+}
+#endif
+
 
 } // namespace libMesh

@@ -32,7 +32,11 @@ namespace
 {
   using namespace libMesh;
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  static const unsigned int header_size = 3;
+#else
   static const unsigned int header_size = 2;
+#endif
 
   // use "(a+b-1)/b" trick to get a/b to round up
   static const unsigned int idtypes_per_Real =
@@ -120,6 +124,14 @@ void pack (const Node* node,
   data.push_back (static_cast<largest_id_type>(node->processor_id()));
   data.push_back (static_cast<largest_id_type>(node->id()));
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (node->valid_unique_id())
+    data.push_back (static_cast<largest_id_type>(node->unique_id()));
+  else
+    // OK to send invalid unique id, we must not own this DOF
+    data.push_back (static_cast<largest_id_type>(DofObject::invalid_unique_id));
+#endif
+
   // use "(a+b-1)/b" trick to get a/b to round up
   static const unsigned int idtypes_per_Real =
     (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
@@ -188,6 +200,10 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
 
   const dof_id_type id = static_cast<dof_id_type>(*in++);
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  const unique_id_type unique_id = static_cast<unique_id_type>(*in++);
+#endif
+
   Node *node = mesh->query_node_ptr(id);
 
   if (node)
@@ -237,6 +253,9 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
         }
 
       node->set_id() = id;
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      node->set_unique_id() = unique_id;
+#endif
       node->processor_id() = processor_id;
 
       node->unpack_indexing(in);

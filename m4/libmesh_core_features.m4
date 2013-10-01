@@ -234,6 +234,65 @@ AC_ARG_ENABLE(everything,
               enableeverything=no)
 
 
+
+# -------------------------------------------------------------
+# unique_id -- disable by default
+# -------------------------------------------------------------
+AC_ARG_ENABLE(unique-id,
+              AC_HELP_STRING([--enable-unique-id],
+                             [build with unique id suppport]),
+	      [case "${enableval}" in
+	          yes)  enableuniqueid=yes ;;
+		   no)	enableuniqueid=no ;;
+		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-unique-id) ;;
+	       esac],
+	       [enableuniqueid=$enableeverything])
+
+if test "$enableuniqueid" = yes ; then
+  AC_DEFINE(ENABLE_UNIQUE_ID, 1,
+           [Flag indicating if the library should be built with unique id support])
+  AC_MSG_RESULT(<<< Configuring library with unique id support >>>)
+fi
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# size of unique_id_type -- default 8 bytes
+# -------------------------------------------------------------
+AC_ARG_WITH([unique_id_bytes],
+	    AC_HELP_STRING([--with-unique-id-bytes=<1|2|4|8>],
+                           [bytes used per unique id]),
+	    [unique_bytes="$withval"],
+	    [unique_bytes=8])
+
+case "$unique_bytes" in
+    1)
+	AC_DEFINE(UNIQUE_ID_BYTES, 1, [size of unique_id])
+	;;
+    2)
+	AC_DEFINE(UNIQUE_ID_BYTES, 2, [size of unique_id])
+	;;
+    4)
+	AC_DEFINE(UNIQUE_ID_BYTES, 4, [size of unique_id])
+	;;
+    8)
+	AC_DEFINE(UNIQUE_ID_BYTES, 8, [size of unique_id])
+	;;
+    *)
+	AC_MSG_RESULT([>>> unrecognized unique_id size: $unique_bytes - configuring size...8])
+	AC_DEFINE(UNIQUE_ID_BYTES, 8, [size of unique_id])
+	unique_bytes=8
+	;;
+esac
+
+if test "$enableuniqueid" = yes ; then
+   AC_MSG_RESULT([configuring size of unique_id... $unique_bytes])
+fi
+# -------------------------------------------------------------
+
+
+
 # --------------------------------------------------------------
 # Write stack trace output files on error() - disabled by default
 # --------------------------------------------------------------
