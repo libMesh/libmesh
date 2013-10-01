@@ -217,6 +217,14 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * rather than created from scratch when writing.
    */
   bool _append;
+
+  /**
+   * This function factors out a bunch of code which is common to the
+   * write_nodal_data() and write_nodal_data_discontinuous() functions
+   */
+  void write_nodal_data_common(std::string fname,
+                               const std::vector<std::string>& names,
+                               bool continuous=true);
 };
 
 

@@ -455,48 +455,8 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   else
     output_names = names;
 
-  // This function can be called multiple times, we only want to open
-  // the ExodusII file the first time it's called.
-  if (!exio_helper->opened_for_writing)
-    {
-      // If we're appending, open() the file with read_only=false,
-      // otherwise create() it and write the contents of the mesh to
-      // it.
-      if (_append)
-        {
-          exio_helper->open(fname.c_str(), /*read_only=*/false);
-          // If we're appending, it's not valid to call exio_helper->initialize()
-          // or exio_helper->initialize_nodal_variables(), but we do need to set up
-          // certain aspects of the Helper object itself, such as the number of nodes
-          // and elements.  We do that by reading the header...
-          exio_helper->read_header();
-        }
-      else
-        {
-          exio_helper->create(fname);
-          exio_helper->initialize(fname,mesh);
-          exio_helper->write_nodal_coordinates(mesh);
-          exio_helper->write_elements(mesh);
-          exio_helper->write_sidesets(mesh);
-          exio_helper->write_nodesets(mesh);
-          exio_helper->initialize_nodal_variables(output_names);
-        }
-    }
-  else
-    {
-      // We are already open for writing, so check that the filename
-      // passed to this function matches the filename currently in use
-      // by the helper.
-      if (fname != exio_helper->current_filename)
-        {
-          libMesh::err << "Error! This ExodusII_IO object is already associated with file: "
-                       << exio_helper->current_filename
-                       << ", cannot use it with requested file: "
-                       << fname
-                       << std::endl;
-          libmesh_error();
-        }
-    }
+  // Call helper function for opening/initializing data
+  this->write_nodal_data_common(fname, output_names, /*continuous=*/true);
 
   // This will count the number of variables actually output
   for (int c=0; c<num_vars; c++)
@@ -612,7 +572,33 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
   for ( ; it != end; ++it)
     num_nodes += (*it)->n_nodes();
 
-  // This function can be called multiple times, we only want to create
+  // Call helper function for opening/initializing data
+  this->write_nodal_data_common(fname, names, /*continuous=*/false);
+
+  if (this->processor_id() == 0)
+    for (int c=0; c<num_vars; c++)
+      {
+        // Copy out this variable's solution
+        std::vector<Number> cur_soln(num_nodes);
+
+        for(int i=0; i<num_nodes; i++)
+          cur_soln[i] = soln[i*num_vars + c];
+
+        exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
+      }
+
+  STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
+}
+
+
+
+void ExodusII_IO::write_nodal_data_common(std::string fname,
+                                          const std::vector<std::string>& names,
+                                          bool continuous)
+{
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+
+  // This function can be called multiple times, we only want to open
   // the ExodusII file the first time it's called.
   if (!exio_helper->opened_for_writing)
     {
@@ -631,9 +617,19 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
       else
         {
           exio_helper->create(fname);
-          exio_helper->initialize_discontinuous(fname,mesh);
-          exio_helper->write_nodal_coordinates_discontinuous(mesh);
-          exio_helper->write_elements_discontinuous(mesh);
+
+          if (continuous)
+            {
+              exio_helper->initialize(fname,mesh);
+              exio_helper->write_nodal_coordinates(mesh);
+              exio_helper->write_elements(mesh);
+            }
+          else
+            {
+              exio_helper->initialize_discontinuous(fname,mesh);
+              exio_helper->write_nodal_coordinates_discontinuous(mesh);
+              exio_helper->write_elements_discontinuous(mesh);
+            }
           exio_helper->write_sidesets(mesh);
           exio_helper->write_nodesets(mesh);
           exio_helper->initialize_nodal_variables(names);
@@ -654,20 +650,6 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
           libmesh_error();
         }
     }
-
-  if (this->processor_id() == 0)
-    for (int c=0; c<num_vars; c++)
-      {
-        // Copy out this variable's solution
-        std::vector<Number> cur_soln(num_nodes);
-
-        for(int i=0; i<num_nodes; i++)
-          cur_soln[i] = soln[i*num_vars + c];
-
-        exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
-      }
-
-  STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
 }
 
 
@@ -804,6 +786,12 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string&, const std:
 }
 
 
+
+void ExodusII_IO::write_nodal_data_common()
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
 
 #endif // LIBMESH_HAVE_EXODUS_API
 } // namespace libMesh
