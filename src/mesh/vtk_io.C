@@ -204,7 +204,7 @@ void VTKIO::nodes_to_vtk()
 void VTKIO::update_vtk_data(const MeshBase& mesh, Elem* elem,
                             vtkIdList* pts, vtkCellArray* cells,
                             std::vector<int>& types, unsigned int active_element_counter,
-			    vtkIDType& vtkcellid)
+			    vtkIdType& vtkcellid)
     {
         pts->SetNumberOfIds(elem->n_nodes());
         
