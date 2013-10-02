@@ -21,7 +21,8 @@
 #include <algorithm> // for std::sort
 #include <iterator>  // for std::ostream_iterator
 #include <sstream>
-
+#include <limits>    // for std::numeric_limits<>
+#include <cmath>     // for std::sqrt()
 
 // Local includes
 #include "libmesh/elem.h"
@@ -344,17 +345,17 @@ Point Elem::centroid() const
 
 Real Elem::hmin() const
 {
-  Real h_min=1.e30;
+  Real h_min=std::numeric_limits<Real>::max();
 
   for (unsigned int n_outer=0; n_outer<this->n_vertices(); n_outer++)
     for (unsigned int n_inner=n_outer+1; n_inner<this->n_vertices(); n_inner++)
       {
 	const Point diff = (this->point(n_outer) - this->point(n_inner));
 
-	h_min = std::min(h_min,diff.size());
+	h_min = std::min(h_min,diff.size_sq());
       }
 
-  return h_min;
+  return std::sqrt(h_min);
 }
 
 
@@ -368,10 +369,10 @@ Real Elem::hmax() const
       {
 	const Point diff = (this->point(n_outer) - this->point(n_inner));
 
-	h_max = std::max(h_max,diff.size());
+	h_max = std::max(h_max,diff.size_sq());
       }
 
-  return h_max;
+  return std::sqrt(h_max);
 }
 
 

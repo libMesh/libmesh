@@ -3573,22 +3573,22 @@ libmesh_prof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @LIBMESH_PROF_MODE_TRUE@am_libmesh_prof_la_rpath = -rpath $(libdir)
 am__EXEEXT_1 = getpot_parse-opt$(EXEEXT) meshtool-opt$(EXEEXT) \
 	compare-opt$(EXEEXT) meshbcid-opt$(EXEEXT) meshid-opt$(EXEEXT) \
-	meshnorm-opt$(EXEEXT) projection-opt$(EXEEXT) \
-	output_libmesh_version-opt$(EXEEXT) meshplot-opt$(EXEEXT) \
-	solution_components-opt$(EXEEXT)
+	meshdiff-opt$(EXEEXT) meshnorm-opt$(EXEEXT) \
+	projection-opt$(EXEEXT) output_libmesh_version-opt$(EXEEXT) \
+	meshplot-opt$(EXEEXT) solution_components-opt$(EXEEXT)
 @LIBMESH_OPT_MODE_TRUE@am__EXEEXT_2 = $(am__EXEEXT_1)
 am__EXEEXT_3 = getpot_parse-devel$(EXEEXT) meshtool-devel$(EXEEXT) \
 	compare-devel$(EXEEXT) meshbcid-devel$(EXEEXT) \
-	meshid-devel$(EXEEXT) meshnorm-devel$(EXEEXT) \
-	projection-devel$(EXEEXT) \
+	meshid-devel$(EXEEXT) meshdiff-devel$(EXEEXT) \
+	meshnorm-devel$(EXEEXT) projection-devel$(EXEEXT) \
 	output_libmesh_version-devel$(EXEEXT) meshplot-devel$(EXEEXT) \
 	solution_components-devel$(EXEEXT)
 @LIBMESH_DEVEL_MODE_TRUE@am__EXEEXT_4 = $(am__EXEEXT_3)
 am__EXEEXT_5 = getpot_parse-dbg$(EXEEXT) meshtool-dbg$(EXEEXT) \
 	compare-dbg$(EXEEXT) meshbcid-dbg$(EXEEXT) meshid-dbg$(EXEEXT) \
-	meshnorm-dbg$(EXEEXT) projection-dbg$(EXEEXT) \
-	output_libmesh_version-dbg$(EXEEXT) meshplot-dbg$(EXEEXT) \
-	solution_components-dbg$(EXEEXT)
+	meshdiff-dbg$(EXEEXT) meshnorm-dbg$(EXEEXT) \
+	projection-dbg$(EXEEXT) output_libmesh_version-dbg$(EXEEXT) \
+	meshplot-dbg$(EXEEXT) solution_components-dbg$(EXEEXT)
 @LIBMESH_DBG_MODE_TRUE@am__EXEEXT_6 = $(am__EXEEXT_5)
 PROGRAMS = $(bin_PROGRAMS)
 am_compare_dbg_OBJECTS = src/apps/compare_dbg-compare.$(OBJEXT)
@@ -3653,6 +3653,26 @@ meshbcid_opt_OBJECTS = $(am_meshbcid_opt_OBJECTS)
 meshbcid_opt_DEPENDENCIES = libmesh_opt.la
 meshbcid_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(meshbcid_opt_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+am_meshdiff_dbg_OBJECTS = src/apps/meshdiff_dbg-meshdiff.$(OBJEXT)
+meshdiff_dbg_OBJECTS = $(am_meshdiff_dbg_OBJECTS)
+meshdiff_dbg_DEPENDENCIES = libmesh_dbg.la
+meshdiff_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(meshdiff_dbg_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+am_meshdiff_devel_OBJECTS =  \
+	src/apps/meshdiff_devel-meshdiff.$(OBJEXT)
+meshdiff_devel_OBJECTS = $(am_meshdiff_devel_OBJECTS)
+meshdiff_devel_DEPENDENCIES = libmesh_devel.la
+meshdiff_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(meshdiff_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+am_meshdiff_opt_OBJECTS = src/apps/meshdiff_opt-meshdiff.$(OBJEXT)
+meshdiff_opt_OBJECTS = $(am_meshdiff_opt_OBJECTS)
+meshdiff_opt_DEPENDENCIES = libmesh_opt.la
+meshdiff_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(meshdiff_opt_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am_meshid_dbg_OBJECTS = src/apps/meshid_dbg-meshid.$(OBJEXT)
 meshid_dbg_OBJECTS = $(am_meshid_dbg_OBJECTS)
@@ -3865,13 +3885,14 @@ SOURCES = $(libmesh_dbg_la_SOURCES) $(libmesh_devel_la_SOURCES) \
 	$(getpot_parse_dbg_SOURCES) $(getpot_parse_devel_SOURCES) \
 	$(getpot_parse_opt_SOURCES) $(meshbcid_dbg_SOURCES) \
 	$(meshbcid_devel_SOURCES) $(meshbcid_opt_SOURCES) \
-	$(meshid_dbg_SOURCES) $(meshid_devel_SOURCES) \
-	$(meshid_opt_SOURCES) $(meshnorm_dbg_SOURCES) \
-	$(meshnorm_devel_SOURCES) $(meshnorm_opt_SOURCES) \
-	$(meshplot_dbg_SOURCES) $(meshplot_devel_SOURCES) \
-	$(meshplot_opt_SOURCES) $(meshtool_dbg_SOURCES) \
-	$(meshtool_devel_SOURCES) $(meshtool_opt_SOURCES) \
-	$(output_libmesh_version_dbg_SOURCES) \
+	$(meshdiff_dbg_SOURCES) $(meshdiff_devel_SOURCES) \
+	$(meshdiff_opt_SOURCES) $(meshid_dbg_SOURCES) \
+	$(meshid_devel_SOURCES) $(meshid_opt_SOURCES) \
+	$(meshnorm_dbg_SOURCES) $(meshnorm_devel_SOURCES) \
+	$(meshnorm_opt_SOURCES) $(meshplot_dbg_SOURCES) \
+	$(meshplot_devel_SOURCES) $(meshplot_opt_SOURCES) \
+	$(meshtool_dbg_SOURCES) $(meshtool_devel_SOURCES) \
+	$(meshtool_opt_SOURCES) $(output_libmesh_version_dbg_SOURCES) \
 	$(output_libmesh_version_devel_SOURCES) \
 	$(output_libmesh_version_opt_SOURCES) \
 	$(projection_dbg_SOURCES) $(projection_devel_SOURCES) \
@@ -3887,13 +3908,14 @@ DIST_SOURCES = $(am__libmesh_dbg_la_SOURCES_DIST) \
 	$(getpot_parse_dbg_SOURCES) $(getpot_parse_devel_SOURCES) \
 	$(getpot_parse_opt_SOURCES) $(meshbcid_dbg_SOURCES) \
 	$(meshbcid_devel_SOURCES) $(meshbcid_opt_SOURCES) \
-	$(meshid_dbg_SOURCES) $(meshid_devel_SOURCES) \
-	$(meshid_opt_SOURCES) $(meshnorm_dbg_SOURCES) \
-	$(meshnorm_devel_SOURCES) $(meshnorm_opt_SOURCES) \
-	$(meshplot_dbg_SOURCES) $(meshplot_devel_SOURCES) \
-	$(meshplot_opt_SOURCES) $(meshtool_dbg_SOURCES) \
-	$(meshtool_devel_SOURCES) $(meshtool_opt_SOURCES) \
-	$(output_libmesh_version_dbg_SOURCES) \
+	$(meshdiff_dbg_SOURCES) $(meshdiff_devel_SOURCES) \
+	$(meshdiff_opt_SOURCES) $(meshid_dbg_SOURCES) \
+	$(meshid_devel_SOURCES) $(meshid_opt_SOURCES) \
+	$(meshnorm_dbg_SOURCES) $(meshnorm_devel_SOURCES) \
+	$(meshnorm_opt_SOURCES) $(meshplot_dbg_SOURCES) \
+	$(meshplot_devel_SOURCES) $(meshplot_opt_SOURCES) \
+	$(meshtool_dbg_SOURCES) $(meshtool_devel_SOURCES) \
+	$(meshtool_opt_SOURCES) $(output_libmesh_version_dbg_SOURCES) \
 	$(output_libmesh_version_devel_SOURCES) \
 	$(output_libmesh_version_opt_SOURCES) \
 	$(projection_dbg_SOURCES) $(projection_devel_SOURCES) \
@@ -4791,7 +4813,7 @@ CLEANFILES = $(am__append_11)
 ###########################################################
 # Utility programs
 
-# meshtool
+# getpot_parse
 
 # meshtool
 
@@ -4800,6 +4822,8 @@ CLEANFILES = $(am__append_11)
 # meshbcid
 
 # meshid
+
+# meshdiff
 
 # meshnorm
 
@@ -4811,15 +4835,15 @@ CLEANFILES = $(am__append_11)
 
 # solution_components
 opt_programs = getpot_parse-opt meshtool-opt compare-opt meshbcid-opt \
-	meshid-opt meshnorm-opt projection-opt \
+	meshid-opt meshdiff-opt meshnorm-opt projection-opt \
 	output_libmesh_version-opt meshplot-opt \
 	solution_components-opt
 devel_programs = getpot_parse-devel meshtool-devel compare-devel \
-	meshbcid-devel meshid-devel meshnorm-devel projection-devel \
-	output_libmesh_version-devel meshplot-devel \
+	meshbcid-devel meshid-devel meshdiff-devel meshnorm-devel \
+	projection-devel output_libmesh_version-devel meshplot-devel \
 	solution_components-devel
 dbg_programs = getpot_parse-dbg meshtool-dbg compare-dbg meshbcid-dbg \
-	meshid-dbg meshnorm-dbg projection-dbg \
+	meshid-dbg meshdiff-dbg meshnorm-dbg projection-dbg \
 	output_libmesh_version-dbg meshplot-dbg \
 	solution_components-dbg
 prof_programs = # empty, append below
@@ -4884,6 +4908,18 @@ meshid_dbg_SOURCES = src/apps/meshid.C
 meshid_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 meshid_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
 meshid_dbg_LDADD = libmesh_dbg.la
+meshdiff_opt_SOURCES = src/apps/meshdiff.C
+meshdiff_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+meshdiff_opt_CXXFLAGS = $(CXXFLAGS_OPT)
+meshdiff_opt_LDADD = libmesh_opt.la
+meshdiff_devel_SOURCES = src/apps/meshdiff.C
+meshdiff_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+meshdiff_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+meshdiff_devel_LDADD = libmesh_devel.la
+meshdiff_dbg_SOURCES = src/apps/meshdiff.C
+meshdiff_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+meshdiff_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
+meshdiff_dbg_LDADD = libmesh_dbg.la
 meshnorm_opt_SOURCES = src/apps/meshnorm.C
 meshnorm_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 meshnorm_opt_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -10113,6 +10149,21 @@ src/apps/meshbcid_opt-meshbcid.$(OBJEXT): src/apps/$(am__dirstamp) \
 meshbcid-opt$(EXEEXT): $(meshbcid_opt_OBJECTS) $(meshbcid_opt_DEPENDENCIES) $(EXTRA_meshbcid_opt_DEPENDENCIES) 
 	@rm -f meshbcid-opt$(EXEEXT)
 	$(AM_V_CXXLD)$(meshbcid_opt_LINK) $(meshbcid_opt_OBJECTS) $(meshbcid_opt_LDADD) $(LIBS)
+src/apps/meshdiff_dbg-meshdiff.$(OBJEXT): src/apps/$(am__dirstamp) \
+	src/apps/$(DEPDIR)/$(am__dirstamp)
+meshdiff-dbg$(EXEEXT): $(meshdiff_dbg_OBJECTS) $(meshdiff_dbg_DEPENDENCIES) $(EXTRA_meshdiff_dbg_DEPENDENCIES) 
+	@rm -f meshdiff-dbg$(EXEEXT)
+	$(AM_V_CXXLD)$(meshdiff_dbg_LINK) $(meshdiff_dbg_OBJECTS) $(meshdiff_dbg_LDADD) $(LIBS)
+src/apps/meshdiff_devel-meshdiff.$(OBJEXT): src/apps/$(am__dirstamp) \
+	src/apps/$(DEPDIR)/$(am__dirstamp)
+meshdiff-devel$(EXEEXT): $(meshdiff_devel_OBJECTS) $(meshdiff_devel_DEPENDENCIES) $(EXTRA_meshdiff_devel_DEPENDENCIES) 
+	@rm -f meshdiff-devel$(EXEEXT)
+	$(AM_V_CXXLD)$(meshdiff_devel_LINK) $(meshdiff_devel_OBJECTS) $(meshdiff_devel_LDADD) $(LIBS)
+src/apps/meshdiff_opt-meshdiff.$(OBJEXT): src/apps/$(am__dirstamp) \
+	src/apps/$(DEPDIR)/$(am__dirstamp)
+meshdiff-opt$(EXEEXT): $(meshdiff_opt_OBJECTS) $(meshdiff_opt_DEPENDENCIES) $(EXTRA_meshdiff_opt_DEPENDENCIES) 
+	@rm -f meshdiff-opt$(EXEEXT)
+	$(AM_V_CXXLD)$(meshdiff_opt_LINK) $(meshdiff_opt_OBJECTS) $(meshdiff_opt_LDADD) $(LIBS)
 src/apps/meshid_dbg-meshid.$(OBJEXT): src/apps/$(am__dirstamp) \
 	src/apps/$(DEPDIR)/$(am__dirstamp)
 meshid-dbg$(EXEEXT): $(meshid_dbg_OBJECTS) $(meshid_dbg_DEPENDENCIES) $(EXTRA_meshid_dbg_DEPENDENCIES) 
@@ -10370,6 +10421,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshbcid_dbg-meshbcid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshbcid_devel-meshbcid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshbcid_opt-meshbcid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshdiff_dbg-meshdiff.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshdiff_devel-meshdiff.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshdiff_opt-meshdiff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshid_dbg-meshid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshid_devel-meshid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshid_opt-meshid.Po@am__quote@
@@ -26546,6 +26600,48 @@ src/apps/meshbcid_opt-meshbcid.obj: src/apps/meshbcid.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshbcid.C' object='src/apps/meshbcid_opt-meshbcid.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshbcid_opt_CPPFLAGS) $(CPPFLAGS) $(meshbcid_opt_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshbcid_opt-meshbcid.obj `if test -f 'src/apps/meshbcid.C'; then $(CYGPATH_W) 'src/apps/meshbcid.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshbcid.C'; fi`
+
+src/apps/meshdiff_dbg-meshdiff.o: src/apps/meshdiff.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshdiff_dbg_CPPFLAGS) $(CPPFLAGS) $(meshdiff_dbg_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshdiff_dbg-meshdiff.o -MD -MP -MF src/apps/$(DEPDIR)/meshdiff_dbg-meshdiff.Tpo -c -o src/apps/meshdiff_dbg-meshdiff.o `test -f 'src/apps/meshdiff.C' || echo '$(srcdir)/'`src/apps/meshdiff.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/meshdiff_dbg-meshdiff.Tpo src/apps/$(DEPDIR)/meshdiff_dbg-meshdiff.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshdiff.C' object='src/apps/meshdiff_dbg-meshdiff.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshdiff_dbg_CPPFLAGS) $(CPPFLAGS) $(meshdiff_dbg_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshdiff_dbg-meshdiff.o `test -f 'src/apps/meshdiff.C' || echo '$(srcdir)/'`src/apps/meshdiff.C
+
+src/apps/meshdiff_dbg-meshdiff.obj: src/apps/meshdiff.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshdiff_dbg_CPPFLAGS) $(CPPFLAGS) $(meshdiff_dbg_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshdiff_dbg-meshdiff.obj -MD -MP -MF src/apps/$(DEPDIR)/meshdiff_dbg-meshdiff.Tpo -c -o src/apps/meshdiff_dbg-meshdiff.obj `if test -f 'src/apps/meshdiff.C'; then $(CYGPATH_W) 'src/apps/meshdiff.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshdiff.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/meshdiff_dbg-meshdiff.Tpo src/apps/$(DEPDIR)/meshdiff_dbg-meshdiff.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshdiff.C' object='src/apps/meshdiff_dbg-meshdiff.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshdiff_dbg_CPPFLAGS) $(CPPFLAGS) $(meshdiff_dbg_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshdiff_dbg-meshdiff.obj `if test -f 'src/apps/meshdiff.C'; then $(CYGPATH_W) 'src/apps/meshdiff.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshdiff.C'; fi`
+
+src/apps/meshdiff_devel-meshdiff.o: src/apps/meshdiff.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshdiff_devel_CPPFLAGS) $(CPPFLAGS) $(meshdiff_devel_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshdiff_devel-meshdiff.o -MD -MP -MF src/apps/$(DEPDIR)/meshdiff_devel-meshdiff.Tpo -c -o src/apps/meshdiff_devel-meshdiff.o `test -f 'src/apps/meshdiff.C' || echo '$(srcdir)/'`src/apps/meshdiff.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/meshdiff_devel-meshdiff.Tpo src/apps/$(DEPDIR)/meshdiff_devel-meshdiff.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshdiff.C' object='src/apps/meshdiff_devel-meshdiff.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshdiff_devel_CPPFLAGS) $(CPPFLAGS) $(meshdiff_devel_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshdiff_devel-meshdiff.o `test -f 'src/apps/meshdiff.C' || echo '$(srcdir)/'`src/apps/meshdiff.C
+
+src/apps/meshdiff_devel-meshdiff.obj: src/apps/meshdiff.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshdiff_devel_CPPFLAGS) $(CPPFLAGS) $(meshdiff_devel_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshdiff_devel-meshdiff.obj -MD -MP -MF src/apps/$(DEPDIR)/meshdiff_devel-meshdiff.Tpo -c -o src/apps/meshdiff_devel-meshdiff.obj `if test -f 'src/apps/meshdiff.C'; then $(CYGPATH_W) 'src/apps/meshdiff.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshdiff.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/meshdiff_devel-meshdiff.Tpo src/apps/$(DEPDIR)/meshdiff_devel-meshdiff.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshdiff.C' object='src/apps/meshdiff_devel-meshdiff.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshdiff_devel_CPPFLAGS) $(CPPFLAGS) $(meshdiff_devel_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshdiff_devel-meshdiff.obj `if test -f 'src/apps/meshdiff.C'; then $(CYGPATH_W) 'src/apps/meshdiff.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshdiff.C'; fi`
+
+src/apps/meshdiff_opt-meshdiff.o: src/apps/meshdiff.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshdiff_opt_CPPFLAGS) $(CPPFLAGS) $(meshdiff_opt_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshdiff_opt-meshdiff.o -MD -MP -MF src/apps/$(DEPDIR)/meshdiff_opt-meshdiff.Tpo -c -o src/apps/meshdiff_opt-meshdiff.o `test -f 'src/apps/meshdiff.C' || echo '$(srcdir)/'`src/apps/meshdiff.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/meshdiff_opt-meshdiff.Tpo src/apps/$(DEPDIR)/meshdiff_opt-meshdiff.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshdiff.C' object='src/apps/meshdiff_opt-meshdiff.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshdiff_opt_CPPFLAGS) $(CPPFLAGS) $(meshdiff_opt_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshdiff_opt-meshdiff.o `test -f 'src/apps/meshdiff.C' || echo '$(srcdir)/'`src/apps/meshdiff.C
+
+src/apps/meshdiff_opt-meshdiff.obj: src/apps/meshdiff.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshdiff_opt_CPPFLAGS) $(CPPFLAGS) $(meshdiff_opt_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshdiff_opt-meshdiff.obj -MD -MP -MF src/apps/$(DEPDIR)/meshdiff_opt-meshdiff.Tpo -c -o src/apps/meshdiff_opt-meshdiff.obj `if test -f 'src/apps/meshdiff.C'; then $(CYGPATH_W) 'src/apps/meshdiff.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshdiff.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/meshdiff_opt-meshdiff.Tpo src/apps/$(DEPDIR)/meshdiff_opt-meshdiff.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/meshdiff.C' object='src/apps/meshdiff_opt-meshdiff.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshdiff_opt_CPPFLAGS) $(CPPFLAGS) $(meshdiff_opt_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/meshdiff_opt-meshdiff.obj `if test -f 'src/apps/meshdiff.C'; then $(CYGPATH_W) 'src/apps/meshdiff.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/meshdiff.C'; fi`
 
 src/apps/meshid_dbg-meshid.o: src/apps/meshid.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(meshid_dbg_CPPFLAGS) $(CPPFLAGS) $(meshid_dbg_CXXFLAGS) $(CXXFLAGS) -MT src/apps/meshid_dbg-meshid.o -MD -MP -MF src/apps/$(DEPDIR)/meshid_dbg-meshid.Tpo -c -o src/apps/meshid_dbg-meshid.o `test -f 'src/apps/meshid.C' || echo '$(srcdir)/'`src/apps/meshid.C

@@ -620,6 +620,12 @@ LibMeshInit::~LibMeshInit()
 
     }
 
+  //  print the perflog to individual processor's file.
+  libMesh::perflog.print_log();
+
+  // Now clear the logging object, we don't want it to print
+  // a second time during the PerfLog destructor.
+  libMesh::perflog.clear();
 
   // Reconnect the output streams
   // (don't do this, or we will get messages from objects
@@ -630,16 +636,7 @@ LibMeshInit::~LibMeshInit()
   // Set the initialized() flag to false
   libMeshPrivateData::_is_initialized = false;
 
-    // Before handing back the std stream buffers, print the
-    // perflog to the individual processor's files.
-    libMesh::perflog.print_log();
-    
-    // Now clear the logging object, we don't want it to print
-    // a second time during the PerfLog destructor.
-    libMesh::perflog.clear();
-    
-
-    if (libMesh::on_command_line ("--redirect-stdout"))
+  if (libMesh::on_command_line ("--redirect-stdout"))
     {
       // If stdout/stderr were redirected to files, reset them now.
       libMesh::out.rdbuf (out_buf);
@@ -684,7 +681,6 @@ LibMeshInit::~LibMeshInit()
     }
 #endif
 
-    
 #if defined(LIBMESH_HAVE_MPI)
     // Allow the user to bypass MPI finalization
     if (!libMesh::on_command_line ("--disable-mpi"))
@@ -693,7 +689,6 @@ LibMeshInit::~LibMeshInit()
 #ifndef LIBMESH_DISABLE_COMMWORLD
         Parallel::Communicator_World.clear();
 #endif
-        
         if (libmesh_initialized_mpi)
             MPI_Finalize();
     }

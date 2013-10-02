@@ -822,8 +822,13 @@ public:
 
 protected:
 
-
-
+  /**
+   * Assign globally unique IDs to all DOF objects (Elements and Nodes)
+   * if the library has been configured with unique_id support.
+   */
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  virtual void assign_unique_ids() = 0;
+#endif
 
   /**
    * Returns a writeable reference to the number of partitions.
@@ -868,6 +873,13 @@ protected:
    * can be replaced by the user through the partitioner() accessor.
    */
   AutoPtr<Partitioner> _partitioner;
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  /**
+   * The next available unique id for assigning ids to DOF objects
+   */
+  unique_id_type _next_unique_id;
+#endif
 
   /**
    * If this is true then no partitioning should be done.

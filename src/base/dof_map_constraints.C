@@ -203,10 +203,10 @@ using namespace libMesh;
     {
       typedef OutputType                                                      OutputShape;
       typedef typename TensorTools::IncrementRank<OutputShape>::type          OutputGradient;
-      typedef typename TensorTools::IncrementRank<OutputGradient>::type       OutputTensor;
+      //typedef typename TensorTools::IncrementRank<OutputGradient>::type       OutputTensor;
       typedef typename TensorTools::MakeNumber<OutputShape>::type             OutputNumber;
       typedef typename TensorTools::IncrementRank<OutputNumber>::type         OutputNumberGradient;
-      typedef typename TensorTools::IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
+      //typedef typename TensorTools::IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
 
       // The dimensionality of the current mesh
       const unsigned int dim = mesh.mesh_dimension();

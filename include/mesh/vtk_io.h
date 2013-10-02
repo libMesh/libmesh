@@ -127,7 +127,8 @@ private:
 
   void update_vtk_data(const MeshBase& mesh, Elem* elem,
                      vtkIdList* pts, vtkCellArray* cells, std::vector<int>& types,
-                     unsigned int active_element_counter);
+		       unsigned int active_element_counter,
+		       vtkIdType& vtkcellid);
     
 
     /**

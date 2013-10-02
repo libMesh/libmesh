@@ -103,7 +103,7 @@ namespace libMesh
 
     // Construct the projection Matrix
     typedef Eigen::Matrix<Number, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> DynamicMatrix;
-    typedef Eigen::Matrix<Number, Eigen::Dynamic,              1, Eigen::ColMajor> DynamicVector;
+    //typedef Eigen::Matrix<Number, Eigen::Dynamic,              1, Eigen::ColMajor> DynamicVector;
 
     DynamicMatrix A(n_src_pts, n_src_pts), x(n_src_pts,n_vars), b(n_src_pts,n_vars);
 
