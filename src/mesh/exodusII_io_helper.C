@@ -1684,6 +1684,19 @@ void ExodusII_IO_Helper::write_information_records(const std::vector<std::string
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
+  // There may already be information records in the file (for
+  // example, if we're appending) and in that case, according to the
+  // Exodus documentation, writing more information records is not
+  // supported.
+  int num_info = inquire(exII::EX_INQ_INFO, "Error retrieving the number of information records from file!");
+  if (num_info > 0)
+    {
+      libMesh::err << "Warning! The Exodus file already contains information records.\n"
+                   << "Exodus does not support writing additional records in this situation."
+                   << std::endl;
+      return;
+    }
+
   int num_records = records.size();
 
   if (num_records > 0)
