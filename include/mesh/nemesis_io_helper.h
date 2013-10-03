@@ -72,11 +72,6 @@ public:
    */
   virtual ~Nemesis_IO_Helper();
 
-//   /**
-//    * Set the flag indicationg if we should be verbose.
-//    */
-//   void verbose (bool set_verbosity);
-
   /**
    * Reading functions.  These just allocate memory for you and call the Nemesis
    * routines of the same name.  They also handle error checking for the Nemesis
@@ -524,8 +519,6 @@ public:
 
 
 private:
-  //  bool _verbose;
-
   /**
    * This map keeps track of the number of elements in each subdomain
    * (block) for *this* processor.

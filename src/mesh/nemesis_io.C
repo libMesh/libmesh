@@ -85,7 +85,8 @@ Nemesis_IO::Nemesis_IO (MeshBase& mesh) :
   nemhelper(new Nemesis_IO_Helper(*this)),
 #endif
   _timestep(1),
-  _verbose (false)
+  _verbose (false),
+  _append(false)
 {
 }
 
@@ -107,8 +108,15 @@ void Nemesis_IO::verbose (bool set_verbosity)
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   // Set the verbose flag in the helper object
   // as well.
-  nemhelper->verbose(_verbose);
+  nemhelper->verbose = _verbose;
 #endif
+}
+
+
+
+void Nemesis_IO::append(bool val)
+{
+  _append = val;
 }
 
 
@@ -147,8 +155,8 @@ void Nemesis_IO::read (const std::string& base_filename)
   if (_verbose)
     libMesh::out << "Opening file: " << nemesis_filename << std::endl;
 
-  // Open the Exodus file
-  nemhelper->open(nemesis_filename.c_str());
+  // Open the Exodus file in EX_READ mode
+  nemhelper->open(nemesis_filename.c_str(), /*read_only=*/true);
 
   // Get a reference to the mesh.  We need to be specific
   // since Nemesis_IO is multiply-inherited
@@ -1163,6 +1171,15 @@ void Nemesis_IO::write (const std::string& base_filename)
   // Create the filename for this processor given the base_filename passed in.
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
 
+  // If the user has set the append flag here, it doesn't really make
+  // sense: the intent of this function is to write a Mesh with no
+  // data, while "appending" is really intended to add data to an
+  // existing file.  If we're verbose, print a message to this effect.
+  if (_append && _verbose)
+    libMesh::out << "Warning: Appending in Nemesis_IO::write() does not make sense.\n"
+                 << "Creating a new file instead!"
+                 << std::endl;
+
   nemhelper->create(nemesis_filename);
 
   // Initialize data structures and write some global Nemesis-specifc data, such as
@@ -1238,20 +1255,35 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
 
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
 
-  if (!nemhelper->created())
-  {
-    nemhelper->create(nemesis_filename);
-    nemhelper->initialize(nemesis_filename,mesh);
-    nemhelper->write_nodal_coordinates(mesh);
-    nemhelper->write_elements(mesh);
-    nemhelper->write_nodesets(mesh);
-    nemhelper->write_sidesets(mesh);
+  if (!nemhelper->opened_for_writing)
+    {
+      // If we're appending, open() the file with read_only=false,
+      // otherwise create() it and write the contents of the mesh to
+      // it.
+      if (_append)
+        {
+          nemhelper->open(nemesis_filename.c_str(), /*read_only=*/false);
+          // After opening the file, read the header so that certain
+          // fields, such as the number of nodes and the number of
+          // elements, are correctly initialized for the subsequent
+          // call to write the nodal solution.
+          nemhelper->read_header();
+        }
+      else
+        {
+          nemhelper->create(nemesis_filename);
+          nemhelper->initialize(nemesis_filename,mesh);
+          nemhelper->write_nodal_coordinates(mesh);
+          nemhelper->write_elements(mesh);
+          nemhelper->write_nodesets(mesh);
+          nemhelper->write_sidesets(mesh);
 
-    // If we don't have any nodes written out on this processor,
-    // Exodus seems to like us better if we don't try to write out any
-    // variable names too...
-    nemhelper->initialize_nodal_variables(names);
-  }
+          // If we don't have any nodes written out on this processor,
+          // Exodus seems to like us better if we don't try to write out any
+          // variable names too...
+          nemhelper->initialize_nodal_variables(names);
+        }
+    }
 
   nemhelper->write_nodal_solution(soln, names, _timestep);
 
@@ -1282,7 +1314,7 @@ void Nemesis_IO::write_nodal_data (const std::string& ,
 void Nemesis_IO::write_global_data (const std::vector<Number>& soln,
 				    const std::vector<std::string>& names)
 {
-  if (!nemhelper->created())
+  if (!nemhelper->opened_for_writing)
     {
       libMesh::err << "ERROR, Nemesis file must be initialized "
 		   << "before outputting global variables.\n"
@@ -1313,7 +1345,7 @@ void Nemesis_IO::write_global_data (const std::vector<Number>&,
 
 void Nemesis_IO::write_information_records (const std::vector<std::string>& records)
 {
-  if (!nemhelper->created())
+  if (!nemhelper->opened_for_writing)
     {
       libMesh::err << "ERROR, Nemesis file must be initialized "
                    << "before outputting information records.\n"
