@@ -51,7 +51,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = general.in lshaped.xda .linkstamp
+@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = general.in lshaped.xda l-shaped.in .linkstamp
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/examples/Make.common
@@ -1655,6 +1655,7 @@ uninstall-am: uninstall-dataDATA
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f general.in  && $(LN_S) $(srcdir)/general.in .
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f lshaped.xda && $(LN_S) $(srcdir)/lshaped.xda .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f l-shaped.in && $(LN_S) $(srcdir)/l-shaped.in .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'
