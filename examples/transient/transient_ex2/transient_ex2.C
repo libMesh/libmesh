@@ -303,21 +303,28 @@ int main (int argc, char** argv)
       if (time_step == 30 || time_step == 60 ||
           time_step == 90 || time_step == 120 )
         {
-          char buf[14];
+          std::ostringstream file_name;
 
-		  if (!libMesh::on_command_line("--vtk")){
-			  sprintf (buf, "out.%03d.gmv", time_step);
-
-	          GMVIO(mesh).write_equation_systems (buf,equation_systems);
-
-		  }else{
 #ifdef LIBMESH_HAVE_VTK
-			  // VTK viewers are generally not happy with two dots in a filename
-			  sprintf (buf, "out_%03d.exd", time_step);
+          file_name << "out_"
+                    << std::setw(3)
+                    << std::setfill('0')
+                    << std::right
+                    << time_step
+                    << ".pvtu";
 
-	          VTKIO(mesh).write_equation_systems (buf,equation_systems);
-#endif // #ifdef LIBMESH_HAVE_VTK
-		  }
+          VTKIO(mesh).write_equation_systems (file_name.str(), equation_systems);
+#else
+
+          file_name << "out."
+                    << std::setw(3)
+                    << std::setfill('0')
+                    << std::right
+                    << time_step
+                    << ".gmv";
+
+          GMVIO(mesh).write_equation_systems (file_name.str(), equation_systems);
+#endif
         }
 
       // Update the p, v and a.

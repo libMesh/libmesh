@@ -45,7 +45,8 @@ ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
   exio_helper(new ExodusII_IO_Helper(*this)),
 #endif
   _timestep(1),
-  _verbose(false)
+  _verbose(false),
+  _append(false)
 {
 }
 
@@ -107,12 +108,17 @@ void ExodusII_IO::read (const std::string& fname)
   this->verbose(true);
 #endif
 
+  // Instantiate the ElementMaps interface
+  ExodusII_IO_Helper::ElementMaps em;
 
-  ExodusII_IO_Helper::ElementMaps em;     // Instantiate the ElementMaps interface
+  // Open the exodus file in EX_READ mode
+  exio_helper->open(fname.c_str(), /*read_only=*/true);
 
-  exio_helper->open(fname.c_str());       // Open the exodus file, if possible
-  exio_helper->read_header();             // Get header information from exodus file
-  exio_helper->print_header();            // Print header information
+  // Get header information from exodus file
+  exio_helper->read_header();
+
+  // Print header information
+  exio_helper->print_header();
 
   // assertion fails due to inconsistent mesh dimension
   // libmesh_assert_equal_to (static_cast<unsigned int>(exio_helper->num_dim), mesh.mesh_dimension());
@@ -257,7 +263,7 @@ void ExodusII_IO::verbose (bool set_verbosity)
   _verbose = set_verbosity;
 
   // Set the verbose flag in the helper object as well.
-  exio_helper->verbose(_verbose);
+  exio_helper->verbose = _verbose;
 }
 
 
@@ -277,9 +283,16 @@ void ExodusII_IO::set_coordinate_offset(Point p)
 
 
 
+void ExodusII_IO::append(bool val)
+{
+  _append = val;
+}
+
+
+
 const std::vector<Real>& ExodusII_IO::get_time_steps()
 {
-  if (!exio_helper->opened())
+  if (!exio_helper->opened_for_reading)
     {
       libMesh::err << "ERROR, ExodusII file must be opened for reading before calling ExodusII_IO::get_time_steps()!" << std::endl;
       libmesh_error();
@@ -293,7 +306,7 @@ const std::vector<Real>& ExodusII_IO::get_time_steps()
 
 void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
 {
-  if (!exio_helper->opened())
+  if (!exio_helper->opened_for_reading)
     {
       libMesh::err << "ERROR, ExodusII file must be opened for reading before copying a nodal solution!" << std::endl;
       libmesh_error();
@@ -328,7 +341,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_nam
 
 void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
 {
-  if (!exio_helper->opened())
+  if (!exio_helper->opened_for_reading)
     {
       libMesh::err << "ERROR, ExodusII file must be opened for reading before copying an elemental solution!" << std::endl;
       libmesh_error();
@@ -369,7 +382,7 @@ void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var
 void ExodusII_IO::write_element_data (const EquationSystems & es)
 {
   // Be sure the file has been opened for writing!
-  if (!exio_helper->created())
+  if (!exio_helper->opened_for_writing)
     {
       libMesh::err << "ERROR, ExodusII file must be initialized "
                    << "before outputting element variables.\n"
@@ -442,18 +455,8 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   else
     output_names = names;
 
-  // This function can be called multiple times, we only want to create
-  // the ExodusII file the first time it's called.
-  if (!exio_helper->created())
-    {
-      exio_helper->create(fname);
-      exio_helper->initialize(fname,mesh);
-      exio_helper->write_nodal_coordinates(mesh);
-      exio_helper->write_elements(mesh);
-      exio_helper->write_sidesets(mesh);
-      exio_helper->write_nodesets(mesh);
-      exio_helper->initialize_nodal_variables(output_names);
-    }
+  // Call helper function for opening/initializing data
+  this->write_nodal_data_common(fname, output_names, /*continuous=*/true);
 
   // This will count the number of variables actually output
   for (int c=0; c<num_vars; c++)
@@ -483,7 +486,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 
 void ExodusII_IO::write_information_records (const std::vector<std::string>& records)
 {
-  if (!exio_helper->created())
+  if (!exio_helper->opened_for_writing)
     {
       libMesh::err << "ERROR, ExodusII file must be initialized "
                    << "before outputting information records.\n"
@@ -499,7 +502,7 @@ void ExodusII_IO::write_information_records (const std::vector<std::string>& rec
 void ExodusII_IO::write_global_data (const std::vector<Number>& soln,
                                      const std::vector<std::string>& names)
 {
-  if (!exio_helper->created())
+  if (!exio_helper->opened_for_writing)
     {
       libMesh::err << "ERROR, ExodusII file must be initialized "
                    << "before outputting global variables.\n"
@@ -533,7 +536,16 @@ void ExodusII_IO::write (const std::string& fname)
   // const qualifier in our constructor a dirty lie
   MeshSerializer serialize(const_cast<MeshBase&>(mesh), !MeshOutput<MeshBase>::_is_parallel_format);
 
-  libmesh_assert( !exio_helper->created() );
+  libmesh_assert( !exio_helper->opened_for_writing );
+
+  // If the user has set the append flag here, it doesn't really make
+  // sense: the intent of this function is to write a Mesh with no
+  // data, while "appending" is really intended to add data to an
+  // existing file.  If we're verbose, print a message to this effect.
+  if (_append && _verbose)
+    libMesh::out << "Warning: Appending in ExodusII_IO::write() does not make sense.\n"
+                 << "Creating a new file instead!"
+                 << std::endl;
 
   exio_helper->create(fname);
   exio_helper->initialize(fname,mesh);
@@ -541,7 +553,6 @@ void ExodusII_IO::write (const std::string& fname)
   exio_helper->write_elements(mesh);
   exio_helper->write_sidesets(mesh);
   exio_helper->write_nodesets(mesh);
-  // Note: the file is closed automatically by the ExodusII_IO destructor.
 }
 
 
@@ -561,18 +572,8 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
   for ( ; it != end; ++it)
     num_nodes += (*it)->n_nodes();
 
-  // This function can be called multiple times, we only want to create
-  // the ExodusII file the first time it's called.
-  if (!exio_helper->created())
-    {
-      exio_helper->create(fname);
-      exio_helper->initialize_discontinuous(fname,mesh);
-      exio_helper->write_nodal_coordinates_discontinuous(mesh);
-      exio_helper->write_elements_discontinuous(mesh);
-      exio_helper->write_sidesets(mesh);
-      exio_helper->write_nodesets(mesh);
-      exio_helper->initialize_nodal_variables(names);
-    }
+  // Call helper function for opening/initializing data
+  this->write_nodal_data_common(fname, names, /*continuous=*/false);
 
   if (this->processor_id() == 0)
     for (int c=0; c<num_vars; c++)
@@ -587,6 +588,68 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
       }
 
   STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
+}
+
+
+
+void ExodusII_IO::write_nodal_data_common(std::string fname,
+                                          const std::vector<std::string>& names,
+                                          bool continuous)
+{
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+
+  // This function can be called multiple times, we only want to open
+  // the ExodusII file the first time it's called.
+  if (!exio_helper->opened_for_writing)
+    {
+      // If we're appending, open() the file with read_only=false,
+      // otherwise create() it and write the contents of the mesh to
+      // it.
+      if (_append)
+        {
+          exio_helper->open(fname.c_str(), /*read_only=*/false);
+          // If we're appending, it's not valid to call exio_helper->initialize()
+          // or exio_helper->initialize_nodal_variables(), but we do need to set up
+          // certain aspects of the Helper object itself, such as the number of nodes
+          // and elements.  We do that by reading the header...
+          exio_helper->read_header();
+        }
+      else
+        {
+          exio_helper->create(fname);
+
+          if (continuous)
+            {
+              exio_helper->initialize(fname,mesh);
+              exio_helper->write_nodal_coordinates(mesh);
+              exio_helper->write_elements(mesh);
+            }
+          else
+            {
+              exio_helper->initialize_discontinuous(fname,mesh);
+              exio_helper->write_nodal_coordinates_discontinuous(mesh);
+              exio_helper->write_elements_discontinuous(mesh);
+            }
+          exio_helper->write_sidesets(mesh);
+          exio_helper->write_nodesets(mesh);
+          exio_helper->initialize_nodal_variables(names);
+        }
+    }
+  else
+    {
+      // We are already open for writing, so check that the filename
+      // passed to this function matches the filename currently in use
+      // by the helper.
+      if (fname != exio_helper->current_filename)
+        {
+          libMesh::err << "Error! This ExodusII_IO object is already associated with file: "
+                       << exio_helper->current_filename
+                       << ", cannot use it with requested file: "
+                       << fname
+                       << std::endl;
+          libmesh_error();
+        }
+    }
 }
 
 
@@ -629,6 +692,14 @@ void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool)
 
 
 void ExodusII_IO::set_coordinate_offset(Point)
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
+
+
+
+void ExodusII_IO::append(bool val)
 {
   libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
   libmesh_error();
@@ -715,6 +786,12 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string&, const std:
 }
 
 
+
+void ExodusII_IO::write_nodal_data_common()
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
 
 #endif // LIBMESH_HAVE_EXODUS_API
 } // namespace libMesh

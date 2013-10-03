@@ -45,6 +45,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
+#include "libmesh/exodusII_io.h"
 
 // This example will solve a linear transient system,
 // so we need to include the \p TransientLinearImplicitSystem definition.
@@ -159,8 +160,14 @@ int main (int argc, char** argv)
   equation_systems.print_info();
 
   // Write out the initial conditions.
-  GMVIO(mesh).write_equation_systems ("out_000.gmv",
-                                      equation_systems);
+#ifdef LIBMESH_HAVE_EXODUS_API
+  // If Exodus is available, we'll write all timesteps to the same file
+  // rather than one file per timestep.
+  std::string exodus_filename = "transient_ex1.e";
+  ExodusII_IO(mesh).write_equation_systems (exodus_filename, equation_systems);
+#else
+  GMVIO(mesh).write_equation_systems ("out_000.gmv", equation_systems);
+#endif
 
   // The Convection-Diffusion system requires that we specify
   // the flow velocity.  We will specify it as a RealVectorValue
@@ -227,8 +234,14 @@ int main (int argc, char** argv)
       equation_systems.get_system("Convection-Diffusion").solve();
 
       // Output evey 10 timesteps to file.
-      if ( (t_step+1)%10 == 0)
+      if ((t_step+1)%10 == 0)
         {
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+          ExodusII_IO exo(mesh);
+          exo.append(true);
+          exo.write_timestep (exodus_filename, equation_systems, t_step+1, system.time);
+#else
           std::ostringstream file_name;
 
           file_name << "out_"
@@ -238,8 +251,10 @@ int main (int argc, char** argv)
                     << t_step+1
                     << ".gmv";
 
+
           GMVIO(mesh).write_equation_systems (file_name.str(),
                                               equation_systems);
+#endif
         }
     }
 #endif // #ifdef LIBMESH_ENABLE_AMR

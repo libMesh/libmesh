@@ -107,6 +107,13 @@ class Nemesis_IO_Helper;
    */
   void write_information_records (const std::vector<std::string>&);
 
+  /**
+   * If true, this flag will cause the Nemesis_IO object to attempt to
+   * open an existing file for writing, rather than creating a new file.
+   * Obviously this will only work if the file already exists.
+   */
+  void append(bool val);
+
 private:
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   Nemesis_IO_Helper *nemhelper;
@@ -114,6 +121,12 @@ private:
   int _timestep;
 
   bool _verbose;
+
+  /**
+   * Default false.  If true, files will be opened with EX_WRITE
+   * rather than created from scratch when writing.
+   */
+  bool _append;
 };
 
 
