@@ -75,6 +75,7 @@ extern "C" {
 
 #define getpot_cerr libMesh::err
 #define getpot_error() libmesh_error()
+#define getpot_file_error(filename) libmesh_file_error(filename)
 #define getpot_cast_int libMesh::libmesh_cast_int
 
 #else // USE_LIBMESH
@@ -84,6 +85,7 @@ extern "C" {
 
 #define getpot_cerr std::cerr
 #define getpot_error() throw std::runtime_error(std::string("GetPot Error"))
+#define getpot_file_error(filename) getpot_error()
 #define getpot_cast_int static_cast
 
 #endif
@@ -893,7 +895,12 @@ inline STRING_VECTOR
 GetPot::_read_in_file(const std::string& FileName)
 {
     std::ifstream  i(FileName.c_str());
-    if( ! i ) return STRING_VECTOR();
+
+    // if( ! i ) return STRING_VECTOR();
+
+    if (!i)
+      libmesh_file_error(FileName);
+
     // argv[0] == the filename of the file that was read in
     return _read_in_stream(i);
 }
