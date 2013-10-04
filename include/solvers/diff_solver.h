@@ -36,6 +36,21 @@ namespace libMesh
 class DiffSolver;
 class ImplicitSystem;
 class ParameterVector;
+template <typename T> class NumericVector;
+
+/**
+ * Functor for use as callback in solve of nonlinear solver.
+ */
+class LinearSolutionMonitor {
+public:
+	virtual void operator() (const NumericVector<Number>& delta_u, const double &norm_delta_u,
+			const NumericVector<Number>& u, const double &norm_u,
+			const NumericVector<Number>& res, const double &norm_res,
+			const unsigned int iteration) = 0;
+	virtual ~LinearSolutionMonitor();
+};
+
+inline LinearSolutionMonitor::~LinearSolutionMonitor() {}
 
 /**
  * This is a generic class that defines a solver to handle
@@ -258,6 +273,11 @@ public:
      */
     DIVERGED_BACKTRACKING_FAILURE = 128
   };
+
+  /**
+   * Pointer to functor which is called right after each linear solve
+   */
+  AutoPtr<LinearSolutionMonitor> linear_solution_monitor;
 
 protected:
 
