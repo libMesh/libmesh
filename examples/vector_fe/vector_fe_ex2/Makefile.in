@@ -51,7 +51,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = vector_fe_ex2.in .linkstamp
+@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = vector_fe_ex2.in laplace.in .linkstamp
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/examples/Make.common
@@ -1249,6 +1249,7 @@ uninstall-am: uninstall-dataDATA
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f vector_fe_ex2.in && $(LN_S) $(srcdir)/vector_fe_ex2.in .
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f laplace.in && $(LN_S) $(srcdir)/laplace.in .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'

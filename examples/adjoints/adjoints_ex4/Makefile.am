@@ -12,9 +12,10 @@ if LIBMESH_VPATH_BUILD
 .linkstamp:
 	-rm -f general.in  && $(LN_S) $(srcdir)/general.in .
 	-rm -f lshaped.xda && $(LN_S) $(srcdir)/lshaped.xda .
+	-rm -f l-shaped.in && $(LN_S) $(srcdir)/l-shaped.in .
 	$(AM_V_GEN)touch .linkstamp
 
-  CLEANFILES += general.in lshaped.xda .linkstamp
+  CLEANFILES += general.in lshaped.xda l-shaped.in .linkstamp
 endif
 
 ##############################################

@@ -6,6 +6,17 @@ sources       = $(data) run.sh
 
 CLEANFILES = 2D_hermite_adaptive.m 2D_hermite_adaptive.e
 
+# need to link files for VPATH builds
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+.linkstamp:
+	-rm -f adaptivity_ex4.in && $(LN_S) $(srcdir)/adaptivity_ex4.in .
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += adaptivity_ex4.in .linkstamp
+endif
+
+
 ##############################################
 # include common example environment
 include $(top_srcdir)/examples/Make.common
