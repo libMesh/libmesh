@@ -382,7 +382,11 @@ unsigned int NewtonSolver::solve()
       if (this->linear_solution_monitor.get()) {
           // Compute the l2 norm of the whole solution
           norm_total = newton_iterate.l2_norm();
-    	  (*this->linear_solution_monitor)(linear_solution, norm_delta, newton_iterate, norm_total);
+          rhs.close();
+          (*this->linear_solution_monitor)(
+                  linear_solution, norm_delta,
+                  newton_iterate, norm_total,
+                  rhs, rhs.l2_norm(), _outer_iterations);
       }
 
       // Check residual with full Newton step, if that's useful for determining
