@@ -225,6 +225,13 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   void write_nodal_data_common(std::string fname,
                                const std::vector<std::string>& names,
                                bool continuous=true);
+
+  /**
+   * Use an _offset to avoid overwriting data when a user asks to
+   * write a timestep which already exists in the file.  This
+   * sometimes happens during appending, for example.
+   */
+  int _timestep_offset;
 };
 
 

@@ -369,6 +369,19 @@ public:
    */
   void message(const std::string msg, int i);
 
+  /**
+   * Mainly useful when appending, this function computes and returns
+   * an "offset" which should be used by any subsequent calls that
+   * write data.  The offset is not _stored_ by the Helper, but it is
+   * _computed_ by the Helper since the Helper has all the necessary
+   * information.  When the file is only open on processor 0, such as
+   * in parallel runs, the offset will only be properly computed on
+   * processor 0 (other processors will compute an offset of zero).
+   * The offset is computed such that:
+   * requested_timestep + timestep_offset = current_n_timesteps + 1
+   */
+  int compute_timestep_offset(int requested_timestep);
+
   // File identification flag
   int ex_id;
 
