@@ -673,6 +673,13 @@ public:
   bool is_constrained_dof (const dof_id_type dof) const;
 
   /**
+   * @returns true if the degree of freedom \p dof has a heterogenous
+   * constraint for adjoint solution \p qoi_num, false otherwise.
+   */
+  bool has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
+                                            const dof_id_type dof) const;
+
+  /**
    * @returns true if the Node is constrained,
    * false otherwise.
    */
@@ -786,30 +793,6 @@ public:
                                                            std::vector<dof_id_type>& elem_dofs,
                                                            bool asymmetric_constraint_rows = true) const;
 
-  /**
-   * Constrains the given adjoint problem right hand side, using the
-   * given sparse matrix.  This method requires the sparse matrix to
-   * be square.
-   *
-   * For an adjoint problem K^T*z=f which is also required to satisfy
-   * z = C*y+h, we want to solve
-   * C^T*K^T*C*y = C^T*f-C^T*K*h
-   *
-   * The C^T*K^T*C term will be calculated in the matrix assembly
-   * (where it is just the transpose of the constraint equation
-   * application to the primal problem) elementwise.  The C^T*f term
-   * is also naturally applied elementwise during
-   * assemble_qoi_derivative().  The C^T*K*h term, however, cannot be
-   * easily applied elementwise because at the time of
-   * assemble_qoi_derivative() the global Jacobian has already been
-   * assembled and the element Jacobians have been discarded.
-   *
-   * So we instead apply this term globally, using this method.
-   */
-  void heterogenously_constrain_adjoint_rhs (SparseMatrix<Number>& matrix,
-                                             NumericVector<Number>& rhs,
-                                             unsigned int qoi_index,
-                                             bool asymmetric_constraint_rows = true) const;
 
   /**
    * Constrains a dyadic element matrix B = v w'.  This method
@@ -1413,6 +1396,20 @@ bool DofMap::is_constrained_dof (const dof_id_type dof) const
 
   return false;
 }
+
+inline
+bool DofMap::has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
+                                                  const dof_id_type dof) const
+{
+  AdjointDofConstraintValues::const_iterator it =
+    _adjoint_constraint_values.find(qoi_num);
+  if (it != _adjoint_constraint_values.end() &&
+      it->second.count(dof))
+    return true;
+
+  return false;
+}
+
 
 #else
 

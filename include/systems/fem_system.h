@@ -200,21 +200,21 @@ public:
    * to numerically differentiate the corresponding jacobian.
    */
   void numerical_jacobian (TimeSolverResPtr res,
-                           FEMContext &context);
+                           FEMContext &context) const;
 
   /**
    * Uses the results of multiple element_residual() calls
    * to numerically differentiate the corresponding jacobian
    * on an element.
    */
-  void numerical_elem_jacobian (FEMContext &context);
+  void numerical_elem_jacobian (FEMContext &context) const;
 
   /**
    * Uses the results of multiple side_residual() calls
    * to numerically differentiate the corresponding jacobian
    * on an element's side.
    */
-  void numerical_side_jacobian (FEMContext &context);
+  void numerical_side_jacobian (FEMContext &context) const;
 
 protected:
   /**
