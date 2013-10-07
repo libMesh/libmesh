@@ -369,7 +369,36 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
 
       if (!flag)
         {
+#if MPI_VERSION > 1
+          int mpi_thread_provided;
+          const int mpi_thread_requested = libMesh::n_threads() > 1 ?
+                                           MPI_THREAD_FUNNELED :
+                                           MPI_THREAD_SINGLE;
+
+          MPI_Init_thread (&argc, const_cast<char***>(&argv),
+                           mpi_thread_requested, &mpi_thread_provided);
+
+          if ((libMesh::n_threads() > 1) &&
+              (mpi_thread_provided < MPI_THREAD_FUNNELED))
+            {
+              std::cerr << "Warning: MPI failed to provide MPI_THREAD_FUNNELED.\n" <<
+                           "Now running single-threaded to be safe." <<
+                           std::endl;
+
+              libMesh::libMeshPrivateData::_n_threads = 1;
+
+              task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
+            }
+#else
+          if (libMesh::libMeshPrivateData::_n_threads > 1)
+            {
+              std::cerr << "Warning: using MPI1 for threaded use.\n" <<
+                           "Be sure your library is thread-safe..." <<
+                           std::endl;
+            }
+
           MPI_Init (&argc, const_cast<char***>(&argv));
+#endif
           libmesh_initialized_mpi = true;
         }
 
