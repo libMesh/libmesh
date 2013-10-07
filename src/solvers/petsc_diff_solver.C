@@ -294,6 +294,13 @@ DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r)
     case SNES_DIVERGED_LINE_SEARCH:
       return DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
 #endif
+      // In PETSc, SNES_CONVERGED_ITERATING means
+      // the solve is still iterating, but by the
+      // time we get here, we must have either
+      // converged or diverged, so
+      // SNES_CONVERGED_ITERATING is invalid.
+    case SNES_CONVERGED_ITERATING:
+      return DiffSolver::INVALID_SOLVE_RESULT;
     }
   return DiffSolver::INVALID_SOLVE_RESULT;
 }
