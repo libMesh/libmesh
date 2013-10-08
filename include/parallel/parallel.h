@@ -542,6 +542,9 @@ namespace Parallel
   // Basic operations:
   public:
 
+    /**
+     * Default Constructor.
+     */
     Communicator ();
 
     /*
@@ -604,6 +607,11 @@ namespace Parallel
 
     unsigned int size() const { return _size; }
 
+    /**
+     * Whether to use default or synchronous sends?
+     */
+    enum SendMode { DEFAULT=0, SYNCHRONOUS };
+
   private:
 
     // Don't use the copy constructor, just copy by reference or
@@ -619,6 +627,7 @@ namespace Parallel
 
     communicator  _communicator;
     unsigned int  _rank, _size;
+    SendMode _send_mode;
 
     // mutable used_tag_values - not thread-safe, but then Parallel::
     // isn't thread-safe in general.
@@ -627,6 +636,16 @@ namespace Parallel
 
   // Communication operations:
   public:
+
+    /**
+     * Explicitly sets the \p SendMode type used for send operations.
+     */
+    void send_mode (const SendMode sm) { _send_mode = sm; }
+
+    /**
+     * Gets the user-requested SendMode.
+     */
+    SendMode send_mode() const { return _send_mode; }
 
     /**
      * Pause execution until all processors reach a certain point.
