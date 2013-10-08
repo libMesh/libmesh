@@ -41,14 +41,6 @@
 namespace libMesh
 {
 
-//#define LIBMESH_USE_64BIT_XDR
-#ifdef LIBMESH_USE_64BIT_XDR
-  typedef uint64_t xdr_id_type;
-#else
-  typedef uint32_t xdr_id_type;
-#endif
-
-
 //-----------------------------------------------
 // anonymous namespace for implementation details
 namespace {
@@ -131,7 +123,13 @@ XdrIO::XdrIO (MeshBase& mesh, const bool binary_in) :
   _legacy             (false),
   _write_serial       (false),
   _write_parallel     (false),
-  _version            ("libMesh-0.7.0+"),
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _write_unique_id    (true),
+#else
+  _write_unique_id    (false),
+#endif
+  _field_width        (4),   // In 0.7.0, all fields are 4 bytes, in 0.9.2 they can vary
+  _version            ("libMesh-0.9.2+"),
   _bc_file_name       ("n/a"),
   _partition_map_file ("n/a"),
   _subdomain_map_file ("n/a"),
@@ -176,7 +174,7 @@ void XdrIO::write (const std::string& name)
   // convenient reference to our mesh
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
 
-  xdr_id_type
+  header_id_type
     n_elem     = mesh.n_elem(),
     n_nodes    = mesh.n_nodes();
 
@@ -227,6 +225,25 @@ void XdrIO::write (const std::string& name)
       io.data (this->subdomain_map_file_name(),      "# subdomain id specification file");
       io.data (this->partition_map_file_name(),      "# processor id specification file");
       io.data (this->polynomial_level_file_name(),   "# p-level specification file");
+
+      // Version 0.9.2+ introduces sizes for each type
+      header_id_type write_size = sizeof(xdr_id_type), zero_size = 0;
+
+      const bool
+        write_p_level      = ("." == this->polynomial_level_file_name()),
+        write_partitioning = ("." == this->partition_map_file_name()),
+        write_subdomain_id = ("." == this->subdomain_map_file_name()),
+        write_bcs          = ("." == this->boundary_condition_file_name());
+
+      io.data (write_size, "# type size");
+      io.data (_write_unique_id   ? write_size : zero_size, "# uid size");
+      io.data (write_partitioning ? write_size : zero_size, "# pid size");
+      io.data (write_subdomain_id ? write_size : zero_size, "# sid size");
+      io.data (write_p_level      ? write_size : zero_size, "# p-level size");
+      // Boundary Condition sizes
+      io.data (write_bcs          ? write_size : zero_size, "# eid size");   // elem id
+      io.data (write_bcs          ? write_size : zero_size, "# side size "); // side number
+      io.data (write_bcs          ? write_size : zero_size, "# bid size");   // boundary id
     }
 
   if (write_parallel_files)
@@ -235,6 +252,9 @@ void XdrIO::write (const std::string& name)
       // are we'll just warn the user and write a serial file.
       libMesh::out << "Warning!  Parallel xda/xdr is not yet implemented.\n";
       libMesh::out << "Writing a serialized file instead." << std::endl;
+
+      // write subdomain names
+      this->write_serialized_subdomain_names(io);
 
       // write connectivity
       this->write_serialized_connectivity (io, n_elem);
@@ -247,6 +267,9 @@ void XdrIO::write (const std::string& name)
     }
   else
     {
+      // write subdomain names
+      this->write_serialized_subdomain_names(io);
+
       // write connectivity
       this->write_serialized_connectivity (io, n_elem);
 
@@ -269,7 +292,38 @@ void XdrIO::write (const std::string& name)
 
 
 
-// FIXME - this still needs lots of work to be 64-bit compliant
+void XdrIO::write_serialized_subdomain_names(Xdr &io) const
+{
+  if (this->processor_id() == 0)
+  {
+    const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
+
+    const std::map<subdomain_id_type, std::string> & subdomain_map = mesh.get_subdomain_name_map();
+
+    header_id_type n_subdomain_names = subdomain_map.size();
+    io.data(n_subdomain_names, "# subdomain id to name map");
+
+    std::vector<header_id_type> subdomain_ids;   subdomain_ids.reserve(n_subdomain_names);
+    std::vector<std::string>  subdomain_names; subdomain_names.reserve(n_subdomain_names);
+
+    std::map<subdomain_id_type, std::string>::const_iterator it_end = subdomain_map.end();
+    for (std::map<subdomain_id_type, std::string>::const_iterator it = subdomain_map.begin(); it != it_end; ++it)
+    {
+      subdomain_ids.push_back(it->first);
+      subdomain_names.push_back(it->second);
+    }
+
+    // Write out the ids and names in two vectors
+    if (n_subdomain_names)
+    {
+      io.data(subdomain_ids);
+      io.data(subdomain_names);
+    }
+  }
+}
+
+
+
 void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_dbg_var(n_elem)) const
 {
   libmesh_assert (io.writing());
@@ -309,10 +363,10 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
       libmesh_assert_less_equal (tot_n_elem, n_elem);
     }
 
+  std::vector<xdr_id_type>
+    xfer_conn, recv_conn;
   std::vector<dof_id_type>
-    xfer_conn, recv_conn,
-    n_elem_on_proc(this->n_processors()),
-    processor_offsets(this->n_processors());
+    n_elem_on_proc(this->n_processors()), processor_offsets(this->n_processors());
   std::vector<xdr_id_type> output_buffer;
   std::vector<std::size_t>
     xfer_buf_sizes(this->n_processors());
@@ -349,6 +403,8 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
       // Write the number of elements at this level.
       {
 	std::string comment = "# n_elem at level 0", legend  = ", [ type ";
+        if (_write_unique_id)
+          legend += "uid ";
 	if (write_partitioning)
 	  legend += "pid ";
 	if (write_subdomain_id)
@@ -373,15 +429,17 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 	  libmesh_assert (!recv_conn.empty());
 
           {
-	  const dof_id_type n_elem_received = recv_conn.back();
-	  std::vector<dof_id_type>::const_iterator recv_conn_iter = recv_conn.begin();
+	  const xdr_id_type n_elem_received = recv_conn.back();
+	  std::vector<xdr_id_type>::const_iterator recv_conn_iter = recv_conn.begin();
 
-	  for (dof_id_type elem=0; elem<n_elem_received; elem++, next_global_elem++)
+	  for (xdr_id_type elem=0; elem<n_elem_received; elem++, next_global_elem++)
 	    {
 	      output_buffer.clear();
-	      const dof_id_type n_nodes = *recv_conn_iter; ++recv_conn_iter;
+	      const xdr_id_type n_nodes = *recv_conn_iter; ++recv_conn_iter;
 	      output_buffer.push_back(*recv_conn_iter);     /* type       */ ++recv_conn_iter;
-	      /*output_buffer.push_back(*recv_conn_iter);*/ /* id         */ ++recv_conn_iter;
+
+              if (_write_unique_id)
+                output_buffer.push_back(*recv_conn_iter);   /* unique_id  */ ++recv_conn_iter;
 
 	      if (write_partitioning)
 		output_buffer.push_back(*recv_conn_iter); /* processor id */ ++recv_conn_iter;
@@ -450,9 +508,12 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 	  {
 	    char buf[80];
 	    std::sprintf(buf, "# n_elem at level %d", level);
-	    std::string comment(buf), legend  = ", [ type parent ";
+	    std::string comment(buf), legend  = ", [ type ";
 
-	    if (write_partitioning)
+            if (_write_unique_id)
+              legend += "uid ";
+            legend += "parent ";
+            if (write_partitioning)
 	      legend += "pid ";
 	    if (write_subdomain_id)
 	      legend += "sid ";
@@ -476,18 +537,19 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 	      libmesh_assert (!recv_conn.empty());
 
               {
-	      const dof_id_type n_elem_received = recv_conn.back();
-	      std::vector<dof_id_type>::const_iterator recv_conn_iter = recv_conn.begin();
+	      const xdr_id_type n_elem_received = recv_conn.back();
+	      std::vector<xdr_id_type>::const_iterator recv_conn_iter = recv_conn.begin();
 
-	      for (dof_id_type elem=0; elem<n_elem_received; elem++, next_global_elem++)
+	      for (xdr_id_type elem=0; elem<n_elem_received; elem++, next_global_elem++)
 		{
 		  output_buffer.clear();
-		  const dof_id_type n_nodes = *recv_conn_iter; ++recv_conn_iter;
+		  const xdr_id_type n_nodes = *recv_conn_iter; ++recv_conn_iter;
 		  output_buffer.push_back(*recv_conn_iter);                   /* type          */ ++recv_conn_iter;
-		  /*output_buffer.push_back(*recv_conn_iter);*/               /* id            */ ++recv_conn_iter;
+                  if (_write_unique_id)
+                    output_buffer.push_back(*recv_conn_iter);                 /* unique_id     */ ++recv_conn_iter;
 
-		  const dof_id_type parent_local_id = *recv_conn_iter; ++recv_conn_iter;
-		  const dof_id_type parent_pid      = *recv_conn_iter; ++recv_conn_iter;
+                  const xdr_id_type parent_local_id = *recv_conn_iter; ++recv_conn_iter;
+		  const xdr_id_type parent_pid      = *recv_conn_iter; ++recv_conn_iter;
 
 		  output_buffer.push_back (parent_local_id+processor_offsets[parent_pid]);
 
@@ -500,7 +562,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 		  if (write_p_level)
 		    output_buffer.push_back(*recv_conn_iter); /* p level       */ ++recv_conn_iter;
 
-		  for (dof_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
+		  for (xdr_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
 		    output_buffer.push_back(*recv_conn_iter);
 
 		  io.data_stream (&output_buffer[0], output_buffer.size(), output_buffer.size());
@@ -746,7 +808,11 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
   // and our boundary info object
   const BoundaryInfo &boundary_info = *mesh.boundary_info;
 
-  xdr_id_type n_bcs_out = n_bcs;
+  // Version 0.9.2+ introduces entity names
+  write_serialized_bc_names(io, boundary_info, true);  // sideset names
+  write_serialized_bc_names(io, boundary_info, false); // nodeset names
+
+  header_id_type n_bcs_out = n_bcs;
   if (this->processor_id() == 0)
     io.data (n_bcs_out, "# number of boundary conditions");
   n_bcs_out = 0;
@@ -817,6 +883,41 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
 
 
 
+void XdrIO::write_serialized_bc_names (Xdr &io, const BoundaryInfo & info, bool is_sideset) const
+{
+  if (this->processor_id() == 0)
+  {
+    const std::map<boundary_id_type, std::string> & boundary_map = is_sideset ?
+      info.get_sideset_name_map() : info.get_nodeset_name_map();
+
+    header_id_type n_boundary_names = boundary_map.size();
+    if (is_sideset)
+      io.data(n_boundary_names, "# sideset id to name map");
+    else
+      io.data(n_boundary_names, "# nodeset id to name map");
+
+    // TODO: Change boundary_id type
+    std::vector<header_id_type> boundary_ids;   boundary_ids.reserve(n_boundary_names);
+    std::vector<std::string>  boundary_names; boundary_names.reserve(n_boundary_names);
+
+    std::map<boundary_id_type, std::string>::const_iterator it_end = boundary_map.end();
+    for (std::map<boundary_id_type, std::string>::const_iterator it = boundary_map.begin(); it != it_end; ++it)
+    {
+      boundary_ids.push_back(it->first);
+      boundary_names.push_back(it->second);
+    }
+
+    // Write out the ids and names in two vectors
+    if (n_boundary_names)
+    {
+      io.data(boundary_ids);
+      io.data(boundary_names);
+    }
+  }
+}
+
+
+
 void XdrIO::read (const std::string& name)
 {
   // Only open the file on processor 0 -- this is especially important because
@@ -846,20 +947,38 @@ void XdrIO::read (const std::string& name)
 
   START_LOG("read()","XdrIO");
 
-  xdr_id_type n_elem, n_nodes;
+  std::vector<header_id_type> meta_data(10, sizeof(xdr_id_type));
+  // type_size, uid_size, pid_size, sid_size, p_level_size, eid_size, side_size, bid_size;
+  header_id_type pos=0;
+
+  const bool read_size_info = this->version().find("0.9.2") != std::string::npos ? true : false;
+
   if (this->processor_id() == 0)
     {
-      io.data (n_elem);
-      io.data (n_nodes);
+      io.data (meta_data[pos++]);
+      io.data (meta_data[pos++]);
       io.data (this->boundary_condition_file_name()); // libMesh::out << "bc_file="  << this->boundary_condition_file_name() << std::endl;
       io.data (this->subdomain_map_file_name());      // libMesh::out << "sid_file=" << this->subdomain_map_file_name()      << std::endl;
       io.data (this->partition_map_file_name());      // libMesh::out << "pid_file=" << this->partition_map_file_name()      << std::endl;
       io.data (this->polynomial_level_file_name());   // libMesh::out << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
+
+      if (read_size_info)
+      {
+        io.data (meta_data[pos++], "# type size");
+        io.data (meta_data[pos++], "# uid size");
+        io.data (meta_data[pos++], "# pid size");
+        io.data (meta_data[pos++], "# sid size");
+        io.data (meta_data[pos++], "# p-level size");
+        // Boundary Condition sizes
+        io.data (meta_data[pos++], "# eid size");   // elem id
+        io.data (meta_data[pos++], "# side size "); // side number
+        io.data (meta_data[pos++], "# bid size");   // boundary id
+      }
     }
 
-  //TODO:[BSK] a little extra effort here could change this to two broadcasts...
-  this->comm().broadcast (n_elem);
-  this->comm().broadcast (n_nodes);
+  // broadcast the n_elems, n_nodes, and size information
+  this->comm().broadcast (meta_data);
+
   this->comm().broadcast (this->boundary_condition_file_name());
   this->comm().broadcast (this->subdomain_map_file_name());
   this->comm().broadcast (this->partition_map_file_name());
@@ -867,17 +986,53 @@ void XdrIO::read (const std::string& name)
 
   // Tell the mesh how many nodes/elements to expect. Depending on the mesh type,
   // this may allow for efficient adding of nodes/elements.
+  header_id_type n_elem = meta_data[0];
+  header_id_type n_nodes = meta_data[1];
+
   mesh.reserve_elem(n_elem);
   mesh.reserve_nodes(n_nodes);
 
-  // read connectivity
-  this->read_serialized_connectivity (io, n_elem);
+  /**
+   * We are future proofing the layout of this file by adding in size information for all stored types.
+   * TODO: All types are stored as the same size. Use the size information to pack things efficiently.
+   * For now we will assume that "type size" is how the entire file will be encoded.
+   */
+  if (read_size_info)
+    _field_width = meta_data[2];
 
-  // read the nodal locations
-  this->read_serialized_nodes (io, n_nodes);
+  if (_field_width == 4)
+    {
+      uint32_t type_size = 0;
 
-  // read the boundary conditions
-  this->read_serialized_bcs (io);
+      // read subdomain names
+      this->read_serialized_subdomain_names(io);
+
+      // read connectivity
+      this->read_serialized_connectivity (io, n_elem, type_size);
+
+      // read the nodal locations
+      this->read_serialized_nodes (io, n_nodes);
+
+      // read the boundary conditions
+      this->read_serialized_bcs (io, type_size);
+    }
+  else if (_field_width == 8)
+    {
+      uint64_t type_size = 0;
+
+      // read subdomain names
+      this->read_serialized_subdomain_names(io);
+
+      // read connectivity
+      this->read_serialized_connectivity (io, n_elem, type_size);
+
+      // read the nodal locations
+      this->read_serialized_nodes (io, n_nodes);
+
+      // read the boundary conditions
+      this->read_serialized_bcs (io, type_size);
+    }
+
 
   STOP_LOG("read()","XdrIO");
 
@@ -887,7 +1042,53 @@ void XdrIO::read (const std::string& name)
 
 
 
-void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem)
+void XdrIO::read_serialized_subdomain_names(Xdr &io)
+{
+  const bool read_entity_info = this->version().find("0.9.2") != std::string::npos ? true : false;
+  if (read_entity_info)
+  {
+    MeshBase &mesh = MeshInput<MeshBase>::mesh();
+
+    unsigned int n_subdomain_names = 0;
+    std::vector<header_id_type> subdomain_ids;
+    std::vector<std::string>  subdomain_names;
+
+    // Read the sideset names
+    if (this->processor_id() == 0)
+    {
+      io.data(n_subdomain_names);
+
+      subdomain_ids.resize(n_subdomain_names);
+      subdomain_names.resize(n_subdomain_names);
+
+      if (n_subdomain_names)
+      {
+        io.data(subdomain_ids);
+        io.data(subdomain_names);
+      }
+    }
+
+    if (n_subdomain_names == 0)
+      return;
+
+    // Broadcast the subdomain names to all processors
+    this->comm().broadcast(n_subdomain_names);
+    subdomain_ids.resize(n_subdomain_names);
+    subdomain_names.resize(n_subdomain_names);
+    this->comm().broadcast(subdomain_ids);
+    this->comm().broadcast(subdomain_names);
+
+    // Reassemble the named subdomain information
+    std::map<subdomain_id_type, std::string> & subdomain_map = mesh.set_subdomain_name_map();
+
+    for (unsigned int i=0; i<n_subdomain_names; ++i)
+      subdomain_map.insert(std::make_pair(subdomain_ids[i], subdomain_names[i]));
+  }
+}
+
+
+template <typename T>
+void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, T)
 {
   libmesh_assert (io.reading());
 
@@ -905,12 +1106,16 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem)
   elems_of_dimension.clear();
   elems_of_dimension.resize(4, false);
 
-  std::vector<xdr_id_type> conn, input_buffer(100 /* oversized ! */);
+  std::vector<T> conn, input_buffer(100 /* oversized ! */);
 
   int level=-1;
 
-  xdr_id_type n_elem_at_level=0, n_processed_at_level=0;
-  for (std::size_t blk=0, first_elem=0, last_elem=0; last_elem<n_elem; blk++)
+  // Version 0.9.2+ introduces unique ids
+  const bool read_unique_id = this->version().find("0.9.2") != std::string::npos && _write_unique_id ? true : false;
+
+  T n_elem_at_level=0, n_processed_at_level=0;
+  for (std::size_t blk=0, first_elem=0, last_elem=0;
+       last_elem<n_elem; blk++)
     {
       first_elem = blk*io_blksize;
       last_elem  = std::min((blk+1)*io_blksize, std::size_t(n_elem));
@@ -928,41 +1133,46 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem)
 		level++;
 	      }
 
+            unsigned int pos = 0;
 	    // get the element type,
-	    io.data_stream (&input_buffer[0], 1);
+	    io.data_stream (&input_buffer[pos++], 1);
+
+            if (read_unique_id)
+              io.data_stream (&input_buffer[pos++], 1);
+            // Older versions won't have this field at all (no increment on pos)
 
 	    // maybe the parent
 	    if (level)
-	      io.data_stream (&input_buffer[1], 1);
+	      io.data_stream (&input_buffer[pos++], 1);
 	    else
 	      // We can't always fit DofObject::invalid_id in an
 	      // xdr_id_type
-	      input_buffer[1] = static_cast<xdr_id_type>(-1);
+	      input_buffer[pos++] = static_cast<dof_id_type>(-1);
 
 	    // maybe the processor id
 	    if (read_partitioning)
-	      io.data_stream (&input_buffer[2], 1);
+	      io.data_stream (&input_buffer[pos++], 1);
 	    else
-	      input_buffer[2] = 0;
+	      input_buffer[pos++] = 0;
 
 	    // maybe the subdomain id
 	    if (read_subdomain_id)
-	      io.data_stream (&input_buffer[3], 1);
+	      io.data_stream (&input_buffer[pos++], 1);
 	    else
-	      input_buffer[3] = 0;
+	      input_buffer[pos++] = 0;
 
 	    // maybe the p level
 	    if (read_p_level)
-	      io.data_stream (&input_buffer[4], 1);
+	      io.data_stream (&input_buffer[pos++], 1);
 	    else
-	      input_buffer[4] = 0;
+	      input_buffer[pos++] = 0;
 
 	    // and all the nodes
-	    libmesh_assert_less (5+Elem::type_to_n_nodes_map[input_buffer[0]], input_buffer.size());
-	    io.data_stream (&input_buffer[5], Elem::type_to_n_nodes_map[input_buffer[0]]);
+	    libmesh_assert_less (pos+Elem::type_to_n_nodes_map[input_buffer[0]], input_buffer.size());
+	    io.data_stream (&input_buffer[pos], Elem::type_to_n_nodes_map[input_buffer[0]]);
 	    conn.insert (conn.end(),
 			 input_buffer.begin(),
-			 input_buffer.begin() + 5 + Elem::type_to_n_nodes_map[input_buffer[0]]);
+			 input_buffer.begin() + pos + Elem::type_to_n_nodes_map[input_buffer[0]]);
 	  }
 
       std::size_t conn_size = conn.size();
@@ -971,11 +1181,13 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem)
       this->comm().broadcast (conn);
 
       // All processors now have the connectivity for this block.
-      std::vector<xdr_id_type>::const_iterator it = conn.begin();
+      typename std::vector<T>::const_iterator it = conn.begin();
       for (dof_id_type e=first_elem; e<last_elem; e++)
 	{
 	  const ElemType elem_type        = static_cast<ElemType>(*it); ++it;
-	  const xdr_id_type parent_id    = *it; ++it;
+          unique_id_type unique_id = 0;
+          if (read_unique_id) {unique_id  = *it; ++it;}
+          const dof_id_type parent_id     = *it; ++it;
 	  const processor_id_type processor_id = *it; ++it;
 	  const subdomain_id_type subdomain_id = *it; ++it;
 #ifdef LIBMESH_ENABLE_AMR
@@ -984,12 +1196,14 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem)
 	  ++it;
 
 	  Elem *parent =
-            (parent_id == static_cast<xdr_id_type>(-1)) ?
-              NULL : mesh.elem(parent_id);
+            (parent_id == static_cast<dof_id_type>(-1)) ? NULL : mesh.elem(parent_id);
 
 	  Elem *elem = Elem::build (elem_type, parent).release();
 
 	  elem->set_id() = e;
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          elem->set_unique_id() = unique_id;
+#endif
 	  elem->processor_id() = processor_id;
 	  elem->subdomain_id() = subdomain_id;
 #ifdef LIBMESH_ENABLE_AMR
@@ -1110,7 +1324,8 @@ void XdrIO::read_serialized_nodes (Xdr &io, const dof_id_type n_nodes)
 
 
 
-void XdrIO::read_serialized_bcs (Xdr &io)
+template <typename T>
+void XdrIO::read_serialized_bcs (Xdr &io, T)
 {
   if (this->boundary_condition_file_name() == "n/a") return;
 
@@ -1122,10 +1337,14 @@ void XdrIO::read_serialized_bcs (Xdr &io)
   // and our boundary info object
   BoundaryInfo &boundary_info = *mesh.boundary_info;
 
-  std::vector<ElemBCData> elem_bc_data;
-  std::vector<xdr_id_type> input_buffer;
+  // Version 0.9.2+ introduces unique ids
+  read_serialized_bc_names(io, boundary_info, true);  // sideset names
+  read_serialized_bc_names(io, boundary_info, false); // nodeset names
 
-  xdr_id_type n_bcs=0;
+  std::vector<ElemBCData> elem_bc_data;
+  std::vector<T> input_buffer;
+
+  header_id_type n_bcs=0;
   if (this->processor_id() == 0)
     io.data (n_bcs);
   this->comm().broadcast (n_bcs);
@@ -1182,7 +1401,52 @@ void XdrIO::read_serialized_bcs (Xdr &io)
 
 
 
-void XdrIO::pack_element (std::vector<dof_id_type> &conn, const Elem *elem,
+void XdrIO::read_serialized_bc_names(Xdr &io, BoundaryInfo & info, bool is_sideset)
+{
+  const bool read_entity_info = this->version().find("0.9.2") != std::string::npos ? true : false;
+  if (read_entity_info)
+  {
+    header_id_type n_boundary_names = 0;
+    std::vector<header_id_type> boundary_ids;
+    std::vector<std::string>  boundary_names;
+
+    // Read the sideset names
+    if (this->processor_id() == 0)
+    {
+      io.data(n_boundary_names);
+
+      boundary_ids.resize(n_boundary_names);
+      boundary_names.resize(n_boundary_names);
+
+      if (n_boundary_names)
+      {
+        io.data(boundary_ids);
+        io.data(boundary_names);
+      }
+    }
+
+    if (n_boundary_names == 0)
+      return;
+
+    // Broadcast the boundary names to all processors
+    this->comm().broadcast(n_boundary_names);
+    boundary_ids.resize(n_boundary_names);
+    boundary_names.resize(n_boundary_names);
+    this->comm().broadcast(boundary_ids);
+    this->comm().broadcast(boundary_names);
+
+    // Reassemble the named boundary information
+    std::map<boundary_id_type, std::string> & boundary_map = is_sideset ?
+      info.set_sideset_name_map() : info.set_nodeset_name_map();
+
+    for (unsigned int i=0; i<n_boundary_names; ++i)
+      boundary_map.insert(std::make_pair(boundary_ids[i], boundary_names[i]));
+  }
+}
+
+
+
+void XdrIO::pack_element (std::vector<xdr_id_type> &conn, const Elem *elem,
 			  const dof_id_type parent_id, const dof_id_type parent_pid) const
 {
   libmesh_assert(elem);
@@ -1191,7 +1455,11 @@ void XdrIO::pack_element (std::vector<dof_id_type> &conn, const Elem *elem,
   conn.push_back(elem->n_nodes());
 
   conn.push_back (elem->type());
-  conn.push_back (elem->id());
+
+  // In version 0.7.0+ "id" is stored but it not used.  In version 0.9.2+
+  // we will store unique_id instead, therefore there is no need to
+  // check for the older version when writing the unique_id.
+  conn.push_back (elem->unique_id());
 
   if (parent_id != DofObject::invalid_id)
     {
