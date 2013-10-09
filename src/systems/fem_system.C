@@ -483,7 +483,8 @@ namespace {
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
             // We'll need to see if any heterogenous constraints apply
-            // to the QoIs on this element
+            // to the QoI dofs on this element *or* to any of the dofs
+            // they depend on, so let's get those dependencies
             _sys.get_dof_map().constrain_nothing(_femcontext.get_dof_indices());
 #endif
 
@@ -501,19 +502,27 @@ namespace {
                         break;
                       }
 
+                  _femcontext.get_dof_indices() = original_dofs;
+
                   // If we're going to need K to impose a heterogenous
                   // constraint then we either already have it or we
                   // need to compute it
                   if (has_heterogenous_constraint)
-                    assemble_unconstrained_element_system
-                      (_sys, true, _femcontext);
+                    {
+                      assemble_unconstrained_element_system
+                        (_sys, true, _femcontext);
 
-                  // FIXME
-
-                  _femcontext.get_dof_indices() = original_dofs;
-
-                  _sys.get_dof_map().constrain_element_vector
-                    (_femcontext.get_qoi_derivatives()[i], _femcontext.get_dof_indices(), false);
+                      _sys.get_dof_map().heterogenously_constrain_element_vector
+                        (_femcontext.get_elem_jacobian(),
+                         _femcontext.get_qoi_derivatives()[i],
+                         _femcontext.get_dof_indices(), false);
+                    }
+                  else
+                    {
+                      _sys.get_dof_map().constrain_element_vector
+                        (_femcontext.get_qoi_derivatives()[i],
+                         _femcontext.get_dof_indices(), false);
+                    }
 #endif
 
                   _sys.get_adjoint_rhs(i).add_vector
