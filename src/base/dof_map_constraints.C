@@ -2438,7 +2438,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                 {
                   row[pushed_keys_to_me[i][j]] = pushed_vals_to_me[i][j];
                 }
-	      if (pushed_rhss_to_me[i] != 0)
+	      if (pushed_rhss_to_me[i] != Number(0))
                 _primal_constraint_values[constrained] = pushed_rhss_to_me[i];
 	      else
                 _primal_constraint_values.erase(constrained);
@@ -2741,7 +2741,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                   DofConstraintRow &row = _dof_constraints[constrained];
                   for (std::size_t j = 0; j != dof_filled_keys[i].size(); ++j)
                     row[dof_filled_keys[i][j]] = dof_filled_vals[i][j];
-		  if (dof_filled_rhss[i] != 0)
+		  if (dof_filled_rhss[i] != Number(0))
                     _primal_constraint_values[constrained] = dof_filled_rhss[i];
 	          else
                     _primal_constraint_values.erase(constrained);
@@ -2860,14 +2860,14 @@ void DofMap::process_constraints (MeshBase& mesh)
 
         if (rhsit == _primal_constraint_values.end())
 	  {
-            if (constraint_rhs != 0)
+            if (constraint_rhs != Number(0))
 	      _primal_constraint_values[*i] = constraint_rhs;
 	    else
               _primal_constraint_values.erase(*i);
           } 
 	else
 	  {
-            if (constraint_rhs != 0)
+            if (constraint_rhs != Number(0))
 	      rhsit->second = constraint_rhs;
 	    else
 	      _primal_constraint_values.erase(rhsit);
@@ -3110,7 +3110,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
                 {
                   row[pushed_keys_to_me[i][j]] = pushed_vals_to_me[i][j];
                 }
-	      if (pushed_rhss_to_me[i] != 0)
+	      if (pushed_rhss_to_me[i] != Number(0))
                 _primal_constraint_values[constrained] = pushed_rhss_to_me[i];
 	      else
                 _primal_constraint_values.erase(constrained);
@@ -3289,7 +3289,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
                   row[pushed_keys_to_me[i][j]] = pushed_vals_to_me[i][j];
                 }
 
-	      if (pushed_rhss_to_me[i] != 0)
+	      if (pushed_rhss_to_me[i] != Number(0))
                 _primal_constraint_values[constrained] = pushed_rhss_to_me[i];
 	      else
                 _primal_constraint_values.erase(constrained);
