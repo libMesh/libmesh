@@ -1471,52 +1471,117 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector
       libmesh_assert_equal_to (matrix.n(), elem_dofs.size());
 
       for (unsigned int i=0; i<elem_dofs.size(); i++)
-	if (this->is_constrained_dof(elem_dofs[i]))
-	  {
-	    for (unsigned int j=0; j<matrix.n(); j++)
-	      matrix(i,j) = 0.;
-
-	    // If the DOF is constrained
-	    matrix(i,i) = 1.;
-
-            // This will put a nonsymmetric entry in the constraint
-            // row to ensure that the linear system produces the
-            // correct value for the constrained DOF.
-            if (asymmetric_constraint_rows)
-              {
-	        DofConstraints::const_iterator
-	          pos = _dof_constraints.find(elem_dofs[i]);
-
-	        libmesh_assert (pos != _dof_constraints.end());
-
-	        const DofConstraintRow& constraint_row = pos->second;
-
-// p refinement creates empty constraint rows
-//	    libmesh_assert (!constraint_row.empty());
-
-	        for (DofConstraintRow::const_iterator
-		       it=constraint_row.begin(); it != constraint_row.end();
-		     ++it)
-	          for (unsigned int j=0; j<elem_dofs.size(); j++)
-		    if (elem_dofs[j] == it->first)
-		      matrix(i,j) = -it->second;
-
-		const dof_id_type dof_id = pos->first;
+        {
+	  const dof_id_type dof_id = elem_dofs[i];
 		
-		const DofConstraintValueMap::const_iterator valpos =
-		  _primal_constraint_values.find(dof_id);
+	  if (this->is_constrained_dof(dof_id))
+	    {
+	      for (unsigned int j=0; j<matrix.n(); j++)
+	        matrix(i,j) = 0.;
 
-		rhs(i) = (valpos == _primal_constraint_values.end()) ?
-			 0 : valpos->second;
-              }
-	    else
-              rhs(i) = 0.;
-	  }
+	        // If the DOF is constrained
+	        matrix(i,i) = 1.;
+
+                // This will put a nonsymmetric entry in the constraint
+                // row to ensure that the linear system produces the
+                // correct value for the constrained DOF.
+                if (asymmetric_constraint_rows)
+                  {
+	            DofConstraints::const_iterator
+	              pos = _dof_constraints.find(dof_id);
+
+	            libmesh_assert (pos != _dof_constraints.end());
+
+	            const DofConstraintRow& constraint_row = pos->second;
+
+	            for (DofConstraintRow::const_iterator
+		           it=constraint_row.begin(); it != constraint_row.end();
+		         ++it)
+	              for (unsigned int j=0; j<elem_dofs.size(); j++)
+		        if (elem_dofs[j] == it->first)
+		          matrix(i,j) = -it->second;
+
+		    const DofConstraintValueMap::const_iterator valpos =
+		      _primal_constraint_values.find(dof_id);
+
+		    rhs(i) = (valpos == _primal_constraint_values.end()) ?
+			     0 : valpos->second;
+                  }
+	        else
+                  rhs(i) = 0.;
+	    }
+        }
 
     } // end if is constrained...
 
   STOP_LOG("hetero_cnstrn_elem_mat_vec()", "DofMap");
 }
+
+
+
+void DofMap::heterogenously_constrain_element_vector
+  (const DenseMatrix<Number>& matrix,
+   DenseVector<Number>& rhs,
+   std::vector<dof_id_type>& elem_dofs,
+   bool asymmetric_constraint_rows) const
+{
+  libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
+  libmesh_assert_equal_to (elem_dofs.size(), matrix.n());
+  libmesh_assert_equal_to (elem_dofs.size(), rhs.size());
+
+  // check for easy return
+  if (this->_dof_constraints.empty())
+    return;
+
+  // The constrained matrix is built up as C^T K C.
+  // The constrained RHS is built up as C^T (F - K H)
+  DenseMatrix<Number> C;
+  DenseVector<Number> H;
+
+  this->build_constraint_matrix_and_vector (C, H, elem_dofs);
+
+  START_LOG("hetero_cnstrn_elem_vec()", "DofMap");
+
+  // It is possible that the matrix is not constrained at all.
+  if ((C.m() == matrix.m()) &&
+      (C.n() == elem_dofs.size())) // It the matrix is constrained
+    {
+      // Compute matrix/vector product K H
+      DenseVector<Number> KH;
+      matrix.vector_mult(KH, H);
+
+      // Compute the matrix-vector product C^T (F - KH)
+      DenseVector<Number> F_minus_KH(rhs);
+      F_minus_KH -= KH;
+      C.vector_mult_transpose(rhs, F_minus_KH);
+
+      for (unsigned int i=0; i<elem_dofs.size(); i++)
+        {
+	  const dof_id_type dof_id = elem_dofs[i];
+
+	  if (this->is_constrained_dof(dof_id))
+	    {
+              // This will put a nonsymmetric entry in the constraint
+              // row to ensure that the linear system produces the
+              // correct value for the constrained DOF.
+              if (asymmetric_constraint_rows)
+                {
+		  const DofConstraintValueMap::const_iterator valpos =
+		    _primal_constraint_values.find(dof_id);
+
+		  rhs(i) = (valpos == _primal_constraint_values.end()) ?
+			   0 : valpos->second;
+                }
+	      else
+                rhs(i) = 0.;
+	    }
+        }
+
+    } // end if is constrained...
+
+  STOP_LOG("hetero_cnstrn_elem_vec()", "DofMap");
+}
+
 
 
 

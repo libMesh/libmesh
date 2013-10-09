@@ -793,6 +793,28 @@ public:
                                                            std::vector<dof_id_type>& elem_dofs,
                                                            bool asymmetric_constraint_rows = true) const;
 
+  /**
+   * Constrains the element vector.  This method requires
+   * the element matrix to be square and not-yet-constrained, in which
+   * case the elem_dofs correspond to the global DOF indices of both
+   * the rows and columns of the element matrix.
+   *
+   * The heterogenous version of this method creates linear systems in
+   * which heterogenously constrained degrees of freedom will solve to
+   * their correct offset values, as would be appropriate for finding
+   * a solution to a linear problem in a single algebraic solve.  The
+   * non-heterogenous version of this method creates linear systems in
+   * which even heterogenously constrained degrees of freedom are
+   * solved without offset values taken into account, as would be
+   * appropriate for finding linearized updates to a solution in which
+   * heterogenous constraints are already satisfied.
+   */
+  void heterogenously_constrain_element_vector (const DenseMatrix<Number>& matrix,
+                                                DenseVector<Number>& rhs,
+                                                std::vector<dof_id_type>& elem_dofs,
+                                                bool asymmetric_constraint_rows = true) const;
+
+
 
   /**
    * Constrains a dyadic element matrix B = v w'.  This method
