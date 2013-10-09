@@ -796,7 +796,9 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string&, const std:
 
 
 
-void ExodusII_IO::write_nodal_data_common()
+  void ExodusII_IO::write_nodal_data_common(std::string,
+					    const std::vector<std::string>&,
+					    bool)
 {
   libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
   libmesh_error();
