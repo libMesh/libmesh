@@ -1430,7 +1430,8 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector
   (DenseMatrix<Number>& matrix,
    DenseVector<Number>& rhs,
    std::vector<dof_id_type>& elem_dofs,
-   bool asymmetric_constraint_rows) const
+   bool asymmetric_constraint_rows,
+   int qoi_index) const
 {
   libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
   libmesh_assert_equal_to (elem_dofs.size(), matrix.n());
@@ -1453,6 +1454,18 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector
   if ((C.m() == matrix.m()) &&
       (C.n() == elem_dofs.size())) // It the matrix is constrained
     {
+      // We may have rhs values to use later
+      DofConstraintValueMap *rhs_values = NULL;
+      if (qoi_index < 0)
+        rhs_values = _primal_constraint_values;
+      else
+        {
+          const AdjointDofConstraintValues::const_iterator
+            it = _adjoint_constraint_values.find(qoi_index);
+          if (adjoint_constraint_map_it != _adjoint_constraint_values.end())
+            rhs_values = &adjoint_constraint_map_it->second;
+        }
+
       // Compute matrix/vector product K H
       DenseVector<Number> KH;
       matrix.vector_mult(KH, H);
@@ -1501,11 +1514,14 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector
 		        if (elem_dofs[j] == it->first)
 		          matrix(i,j) = -it->second;
 
-		    const DofConstraintValueMap::const_iterator valpos =
-		      _primal_constraint_values.find(dof_id);
+                    if (rhs_values)
+                      {
+		        const DofConstraintValueMap::const_iterator valpos =
+		          rhs_values->find(dof_id);
 
-		    rhs(i) = (valpos == _primal_constraint_values.end()) ?
-			     0 : valpos->second;
+		          rhs(i) = (valpos == rhs_values->end()) ?
+			           0 : valpos->second;
+                      }
                   }
 	        else
                   rhs(i) = 0.;
@@ -1523,7 +1539,8 @@ void DofMap::heterogenously_constrain_element_vector
   (const DenseMatrix<Number>& matrix,
    DenseVector<Number>& rhs,
    std::vector<dof_id_type>& elem_dofs,
-   bool asymmetric_constraint_rows) const
+   bool asymmetric_constraint_rows,
+   int qoi_index) const
 {
   libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
   libmesh_assert_equal_to (elem_dofs.size(), matrix.n());
@@ -1538,7 +1555,7 @@ void DofMap::heterogenously_constrain_element_vector
   DenseMatrix<Number> C;
   DenseVector<Number> H;
 
-  this->build_constraint_matrix_and_vector (C, H, elem_dofs);
+  this->build_constraint_matrix_and_vector (C, H, elem_dofs, qoi_index);
 
   START_LOG("hetero_cnstrn_elem_vec()", "DofMap");
 
@@ -1546,6 +1563,18 @@ void DofMap::heterogenously_constrain_element_vector
   if ((C.m() == matrix.m()) &&
       (C.n() == elem_dofs.size())) // It the matrix is constrained
     {
+      // We may have rhs values to use later
+      DofConstraintValueMap *rhs_values = NULL;
+      if (qoi_index < 0)
+        rhs_values = _primal_constraint_values;
+      else
+        {
+          const AdjointDofConstraintValues::const_iterator
+            it = _adjoint_constraint_values.find(qoi_index);
+          if (adjoint_constraint_map_it != _adjoint_constraint_values.end())
+            rhs_values = &adjoint_constraint_map_it->second;
+        }
+
       // Compute matrix/vector product K H
       DenseVector<Number> KH;
       matrix.vector_mult(KH, H);
@@ -1564,12 +1593,12 @@ void DofMap::heterogenously_constrain_element_vector
               // This will put a nonsymmetric entry in the constraint
               // row to ensure that the linear system produces the
               // correct value for the constrained DOF.
-              if (asymmetric_constraint_rows)
+              if (asymmetric_constraint_rows && rhs_values)
                 {
 		  const DofConstraintValueMap::const_iterator valpos =
-		    _primal_constraint_values.find(dof_id);
+		    rhs_values->find(dof_id);
 
-		  rhs(i) = (valpos == _primal_constraint_values.end()) ?
+		  rhs(i) = (valpos == rhs_values->end()) ?
 			   0 : valpos->second;
                 }
 	      else
@@ -2195,6 +2224,7 @@ void DofMap::build_constraint_matrix_and_vector
   (DenseMatrix<Number>& C,
    DenseVector<Number>& H,
    std::vector<dof_id_type>& elem_dofs,
+   int qoi_index,
    const bool called_recursively) const
 {
   if (!called_recursively)
@@ -2253,6 +2283,17 @@ void DofMap::build_constraint_matrix_and_vector
   if (!dof_set.empty() ||  // case 1: constrained in terms of other DOFs
       !called_recursively) // case 2: constrained in terms of our own DOFs
     {
+      DofConstraintValueMap *rhs_values = NULL;
+      if (qoi_index < 0)
+        rhs_values = _primal_constraint_values;
+      else
+        {
+          const AdjointDofConstraintValues::const_iterator
+            it = _adjoint_constraint_values.find(qoi_index);
+          if (adjoint_constraint_map_it != _adjoint_constraint_values.end())
+            rhs_values = &adjoint_constraint_map_it->second;
+        }
+
       const unsigned int old_size =
         libmesh_cast_int<unsigned int>(elem_dofs.size());
 
@@ -2288,10 +2329,13 @@ void DofMap::build_constraint_matrix_and_vector
 		if (elem_dofs[j] == it->first)
 		  C(i,j) = it->second;
 
-            DofConstraintValueMap::const_iterator rhsit =
-              _primal_constraint_values.find(elem_dofs[i]);
-	    if (rhsit != _primal_constraint_values.end())
-              H(i) = rhsit->second;
+            if (rhs_values)
+              {
+                DofConstraintValueMap::const_iterator rhsit =
+                  rhs_values->find(elem_dofs[i]);
+	        if (rhsit != rhs_values->end())
+                  H(i) = rhsit->second;
+              }
 	  }
 	else
 	  {

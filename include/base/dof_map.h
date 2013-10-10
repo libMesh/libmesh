@@ -787,11 +787,17 @@ public:
    * solved without offset values taken into account, as would be
    * appropriate for finding linearized updates to a solution in which
    * heterogenous constraints are already satisfied.
+   *
+   * By default, the constraints for the primal solution of this
+   * system are used.  If a non-negative \p qoi_index is passed in,
+   * then the constraints for the corresponding adjoint solution are
+   * used instead.
    */
   void heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
                                                            DenseVector<Number>& rhs,
                                                            std::vector<dof_id_type>& elem_dofs,
-                                                           bool asymmetric_constraint_rows = true) const;
+                                                           bool asymmetric_constraint_rows = true,
+                                                           int qoi_index = -1) const;
 
   /**
    * Constrains the element vector.  This method requires
@@ -808,11 +814,17 @@ public:
    * solved without offset values taken into account, as would be
    * appropriate for finding linearized updates to a solution in which
    * heterogenous constraints are already satisfied.
+   *
+   * By default, the constraints for the primal solution of this
+   * system are used.  If a non-negative \p qoi_index is passed in,
+   * then the constraints for the corresponding adjoint solution are
+   * used instead.
    */
   void heterogenously_constrain_element_vector (const DenseMatrix<Number>& matrix,
                                                 DenseVector<Number>& rhs,
                                                 std::vector<dof_id_type>& elem_dofs,
-                                                bool asymmetric_constraint_rows = true) const;
+                                                bool asymmetric_constraint_rows = true,
+                                                int qoi_index = -1) const;
 
 
 
@@ -1124,10 +1136,16 @@ private:
    * terms of other, local degrees of freedom.  The usual case is for
    * an elements DOFs to be constrained by some other, external DOFs
    * and/or Dirichlet conditions.
+   *
+   * The forcing vector will depend on which solution's heterogenous
+   * constraints are being applied.  For the default \p qoi_index this
+   * will be the primal solutoin; for \p qoi_index >= 0 the
+   * corresponding adjoint solution's constraints will be used.
    */
   void build_constraint_matrix_and_vector (DenseMatrix<Number>& C,
                                            DenseVector<Number>& H,
                                            std::vector<dof_id_type>& elem_dofs,
+                                           int qoi_index = -1,
                                            const bool called_recursively=false) const;
 
   /**
