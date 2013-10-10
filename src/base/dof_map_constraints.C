@@ -1455,15 +1455,15 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector
       (C.n() == elem_dofs.size())) // It the matrix is constrained
     {
       // We may have rhs values to use later
-      DofConstraintValueMap *rhs_values = NULL;
+      const DofConstraintValueMap *rhs_values = NULL;
       if (qoi_index < 0)
-        rhs_values = _primal_constraint_values;
+        rhs_values = &_primal_constraint_values;
       else
         {
           const AdjointDofConstraintValues::const_iterator
             it = _adjoint_constraint_values.find(qoi_index);
-          if (adjoint_constraint_map_it != _adjoint_constraint_values.end())
-            rhs_values = &adjoint_constraint_map_it->second;
+          if (it != _adjoint_constraint_values.end())
+            rhs_values = &it->second;
         }
 
       // Compute matrix/vector product K H
@@ -1564,15 +1564,15 @@ void DofMap::heterogenously_constrain_element_vector
       (C.n() == elem_dofs.size())) // It the matrix is constrained
     {
       // We may have rhs values to use later
-      DofConstraintValueMap *rhs_values = NULL;
+      const DofConstraintValueMap *rhs_values = NULL;
       if (qoi_index < 0)
-        rhs_values = _primal_constraint_values;
+        rhs_values = &_primal_constraint_values;
       else
         {
           const AdjointDofConstraintValues::const_iterator
             it = _adjoint_constraint_values.find(qoi_index);
-          if (adjoint_constraint_map_it != _adjoint_constraint_values.end())
-            rhs_values = &adjoint_constraint_map_it->second;
+          if (it != _adjoint_constraint_values.end())
+            rhs_values = &it->second;
         }
 
       // Compute matrix/vector product K H
@@ -2283,15 +2283,15 @@ void DofMap::build_constraint_matrix_and_vector
   if (!dof_set.empty() ||  // case 1: constrained in terms of other DOFs
       !called_recursively) // case 2: constrained in terms of our own DOFs
     {
-      DofConstraintValueMap *rhs_values = NULL;
+      const DofConstraintValueMap *rhs_values = NULL;
       if (qoi_index < 0)
-        rhs_values = _primal_constraint_values;
+        rhs_values = &_primal_constraint_values;
       else
         {
           const AdjointDofConstraintValues::const_iterator
             it = _adjoint_constraint_values.find(qoi_index);
-          if (adjoint_constraint_map_it != _adjoint_constraint_values.end())
-            rhs_values = &adjoint_constraint_map_it->second;
+          if (it != _adjoint_constraint_values.end())
+            rhs_values = &it->second;
         }
 
       const unsigned int old_size =
