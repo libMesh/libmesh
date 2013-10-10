@@ -379,7 +379,7 @@ using namespace libMesh;
           for (unsigned int n=0; n != elem->n_nodes(); ++n)
           {
             const std::vector<boundary_id_type>& bc_ids =
-		boundary_info.boundary_ids (elem->node(n));
+		boundary_info.boundary_ids (elem->get_node(n));
             
             for (std::size_t i=0; i != bc_ids.size(); ++i)
               if (b.count(bc_ids[i]))
