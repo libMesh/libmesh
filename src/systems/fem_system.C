@@ -515,13 +515,13 @@ namespace {
                       _sys.get_dof_map().heterogenously_constrain_element_vector
                         (_femcontext.get_elem_jacobian(),
                          _femcontext.get_qoi_derivatives()[i],
-                         _femcontext.get_dof_indices(), false);
+                         _femcontext.get_dof_indices(), false, i);
                     }
                   else
                     {
                       _sys.get_dof_map().constrain_element_vector
                         (_femcontext.get_qoi_derivatives()[i],
-                         _femcontext.get_dof_indices(), false);
+                         _femcontext.get_dof_indices(), false, i);
                     }
 #endif
 
