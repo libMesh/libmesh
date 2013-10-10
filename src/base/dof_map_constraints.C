@@ -1446,7 +1446,7 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector
   DenseMatrix<Number> C;
   DenseVector<Number> H;
 
-  this->build_constraint_matrix_and_vector (C, H, elem_dofs);
+  this->build_constraint_matrix_and_vector (C, H, elem_dofs, qoi_index);
 
   START_LOG("hetero_cnstrn_elem_mat_vec()", "DofMap");
 
@@ -2348,7 +2348,8 @@ void DofMap::build_constraint_matrix_and_vector
       DenseMatrix<Number> Cnew;
       DenseVector<Number> Hnew;
 
-      this->build_constraint_matrix_and_vector (Cnew, Hnew, elem_dofs, true);
+      this->build_constraint_matrix_and_vector (Cnew, Hnew, elem_dofs,
+                                                qoi_index, true);
 
       if ((C.n() == Cnew.m()) &&          // If the constraint matrix
 	  (Cnew.n() == elem_dofs.size())) // is constrained...
