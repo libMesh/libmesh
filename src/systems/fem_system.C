@@ -521,7 +521,7 @@ namespace {
                     {
                       _sys.get_dof_map().constrain_element_vector
                         (_femcontext.get_qoi_derivatives()[i],
-                         _femcontext.get_dof_indices(), false, i);
+                         _femcontext.get_dof_indices(), false);
                     }
 #endif
 
