@@ -187,7 +187,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
           // *homogeneous* constraints on the adjoint solutions
 
           system.get_dof_map().enforce_constraints_exactly
-            (system, system.get_adjoint_solution(j), true);
+            (system, &system.get_adjoint_solution(j), true);
 
           computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));
         }
