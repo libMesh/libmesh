@@ -340,6 +340,8 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         dxyzdxi_map[p].zero();
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         d2xyzdxi2_map[p].zero();
+        // Inverse map second derivatives
+        d2xidxyz2_map[p].assign(6, 0.);
 #endif
 
         // compute x, dx, d2x at the quadrature point
@@ -414,6 +416,9 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         d2xyzdxi2_map[p].zero();
         d2xyzdxideta_map[p].zero();
         d2xyzdeta2_map[p].zero();
+        // Inverse map second derivatives
+        d2xidxyz2_map[p].assign(6, 0.);
+        d2etadxyz2_map[p].assign(6, 0.);
 #endif
 
 
@@ -560,6 +565,10 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         d2xyzdeta2_map[p].zero();
         d2xyzdetadzeta_map[p].zero();
         d2xyzdzeta2_map[p].zero();
+        // Inverse map second derivatives
+        d2xidxyz2_map[p].assign(6, 0.);
+        d2etadxyz2_map[p].assign(6, 0.);
+        d2zetadxyz2_map[p].assign(6, 0.);
 #endif
 
 
@@ -656,6 +665,12 @@ void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n
   dxidz_map.resize(n_qp); // ... or 3D
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   d2xyzdxi2_map.resize(n_qp);
+
+  // Inverse map second derivatives
+  d2xidxyz2_map.resize(n_qp);
+  for (unsigned i=0; i<d2xidxyz2_map.size(); ++i)
+    d2xidxyz2_map[i].assign(6, 0.);
+
 #endif
   if (dim > 1)
     {
@@ -666,6 +681,11 @@ void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       d2xyzdxideta_map.resize(n_qp);
       d2xyzdeta2_map.resize(n_qp);
+
+      // Inverse map second derivatives
+      d2etadxyz2_map.resize(n_qp);
+      for (unsigned i=0; i<d2etadxyz2_map.size(); ++i)
+        d2etadxyz2_map[i].assign(6, 0.);
 #endif
       if (dim > 2)
         {
@@ -677,6 +697,11 @@ void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n
           d2xyzdxidzeta_map.resize(n_qp);
           d2xyzdetadzeta_map.resize(n_qp);
           d2xyzdzeta2_map.resize(n_qp);
+
+          // Inverse map second derivatives
+          d2zetadxyz2_map.resize(n_qp);
+          for (unsigned i=0; i<d2zetadxyz2_map.size(); ++i)
+            d2zetadxyz2_map[i].assign(6, 0.);
 #endif
         }
     }

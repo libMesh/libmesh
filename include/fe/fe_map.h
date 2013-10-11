@@ -266,6 +266,26 @@ public:
   const std::vector<Real>& get_dzetadz() const
   { return dzetadz_map; }
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  /**
+   * Second derivatives of "xi" reference coordinate wrt physical coordinates.
+   */
+  const std::vector<std::vector<Real> >& get_d2xidxyz2() const
+  { return d2xidxyz2_map; }
+
+  /**
+   * Second derivatives of "eta" reference coordinate wrt physical coordinates.
+   */
+  const std::vector<std::vector<Real> >& get_d2etadxyz2() const
+  { return d2etadxyz2_map; }
+
+  /**
+   * Second derivatives of "zeta" reference coordinate wrt physical coordinates.
+   */
+  const std::vector<std::vector<Real> >& get_d2zetadxyz2() const
+  { return d2zetadxyz2_map; }
+#endif
+
   /**
    * @returns the reference to physical map for the side/edge
    */
@@ -624,6 +644,26 @@ protected:
    * d(zeta)/d(z). Needed for the Jacobian.
    */
   std::vector<Real> dzetadz_map;
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  /**
+   * Second derivatives of "xi" reference coordinate wrt physical coordinates.
+   * At each qp: (xi_{xx}, xi_{xy}, xi_{xz}, xi_{yy}, xi_{yz}, xi_{zz})
+   */
+  std::vector<std::vector<Real> > d2xidxyz2_map;
+
+  /**
+   * Second derivatives of "eta" reference coordinate wrt physical coordinates.
+   * At each qp: (eta_{xx}, eta_{xy}, eta_{xz}, eta_{yy}, eta_{yz}, eta_{zz})
+   */
+  std::vector<std::vector<Real> > d2etadxyz2_map;
+
+  /**
+   * Second derivatives of "zeta" reference coordinate wrt physical coordinates.
+   * At each qp: (zeta_{xx}, zeta_{xy}, zeta_{xz}, zeta_{yy}, zeta_{yz}, zeta_{zz})
+   */
+  std::vector<std::vector<Real> > d2zetadxyz2_map;
+#endif
 
   /**
    * Map for the shape function phi.
