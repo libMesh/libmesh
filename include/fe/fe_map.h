@@ -40,20 +40,20 @@ class Elem;
     FEMap();
     virtual ~FEMap(){}
 
-    static AutoPtr<FEMap> build( FEType fe_type );
+    static AutoPtr<FEMap> build(FEType fe_type);
 
     template<unsigned int Dim>
-    void init_reference_to_physical_map( const std::vector<Point>& qp,
-					 const Elem* elem );
+    void init_reference_to_physical_map(const std::vector<Point>& qp,
+                                        const Elem* elem);
 
     /**
      * Compute the jacobian and some other additional
      * data fields at the single point with index p.
      */
-    void compute_single_point_map( const unsigned int dim,
-				   const std::vector<Real>& qw,
-				   const Elem* elem,
-				   unsigned int p );
+    void compute_single_point_map(const unsigned int dim,
+                                  const std::vector<Real>& qw,
+                                  const Elem* elem,
+                                  unsigned int p);
 
     /**
      * Compute the jacobian and some other additional
@@ -61,29 +61,31 @@ class Elem;
      * as input, along with a pointer to the element.
      * The element is assumed to have a constant Jacobian
      */
-    virtual void compute_affine_map( const unsigned int dim,
-				     const std::vector<Real>& qw,
-				     const Elem* elem );
+    virtual void compute_affine_map(const unsigned int dim,
+                                    const std::vector<Real>& qw,
+                                    const Elem* elem);
 
     /**
      * Compute the jacobian and some other additional
      * data fields. Takes the integration weights
      * as input, along with a pointer to the element.
      */
-    virtual void compute_map( const unsigned int dim,
-			      const std::vector<Real>& qw,
-			      const Elem* elem );
+    virtual void compute_map(const unsigned int dim,
+                             const std::vector<Real>& qw,
+                             const Elem* elem);
 
     /**
      * Same as compute_map, but for a side.  Useful for boundary integration.
      */
-    virtual void compute_face_map(int dim, const std::vector<Real>& qw,
+    virtual void compute_face_map(int dim,
+                                  const std::vector<Real>& qw,
 				  const Elem* side);
 
     /**
      * Same as before, but for an edge.  Useful for some projections.
      */
-    void compute_edge_map(int dim, const std::vector<Real>& qw,
+    void compute_edge_map(int dim,
+                          const std::vector<Real>& qw,
 			  const Elem* side);
 
     /**
@@ -557,128 +559,128 @@ class Elem;
      * Map for partial derivatives:
      * d(xi)/d(x). Needed for the Jacobian.
      */
-    std::vector<Real>  dxidx_map;
+    std::vector<Real> dxidx_map;
 
     /**
      * Map for partial derivatives:
      * d(xi)/d(y). Needed for the Jacobian.
      */
-    std::vector<Real>  dxidy_map;
+    std::vector<Real> dxidy_map;
 
     /**
      * Map for partial derivatives:
      * d(xi)/d(z). Needed for the Jacobian.
      */
-    std::vector<Real>  dxidz_map;
+    std::vector<Real> dxidz_map;
 
 
     /**
      * Map for partial derivatives:
      * d(eta)/d(x). Needed for the Jacobian.
      */
-    std::vector<Real>  detadx_map;
+    std::vector<Real> detadx_map;
 
     /**
      * Map for partial derivatives:
      * d(eta)/d(y). Needed for the Jacobian.
      */
-    std::vector<Real>  detady_map;
+    std::vector<Real> detady_map;
 
     /**
      * Map for partial derivatives:
      * d(eta)/d(z). Needed for the Jacobian.
      */
-    std::vector<Real>  detadz_map;
+    std::vector<Real> detadz_map;
 
 
     /**
      * Map for partial derivatives:
      * d(zeta)/d(x). Needed for the Jacobian.
      */
-    std::vector<Real>  dzetadx_map;
+    std::vector<Real> dzetadx_map;
 
     /**
      * Map for partial derivatives:
      * d(zeta)/d(y). Needed for the Jacobian.
      */
-    std::vector<Real>  dzetady_map;
+    std::vector<Real> dzetady_map;
 
     /**
      * Map for partial derivatives:
      * d(zeta)/d(z). Needed for the Jacobian.
      */
-    std::vector<Real>  dzetadz_map;
+    std::vector<Real> dzetadz_map;
 
     /**
      * Map for the shape function phi.
      */
-    std::vector<std::vector<Real> >   phi_map;
+    std::vector<std::vector<Real> > phi_map;
 
     /**
      * Map for the derivative, d(phi)/d(xi).
      */
-    std::vector<std::vector<Real> >   dphidxi_map;
+    std::vector<std::vector<Real> > dphidxi_map;
 
     /**
      * Map for the derivative, d(phi)/d(eta).
      */
-    std::vector<std::vector<Real> >   dphideta_map;
+    std::vector<std::vector<Real> > dphideta_map;
 
     /**
      * Map for the derivative, d(phi)/d(zeta).
      */
-    std::vector<std::vector<Real> >   dphidzeta_map;
+    std::vector<std::vector<Real> > dphidzeta_map;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
     /**
      * Map for the second derivative, d^2(phi)/d(xi)^2.
      */
-    std::vector<std::vector<Real> >   d2phidxi2_map;
+    std::vector<std::vector<Real> > d2phidxi2_map;
 
     /**
      * Map for the second derivative, d^2(phi)/d(xi)d(eta).
      */
-    std::vector<std::vector<Real> >   d2phidxideta_map;
+    std::vector<std::vector<Real> > d2phidxideta_map;
 
     /**
      * Map for the second derivative, d^2(phi)/d(xi)d(zeta).
      */
-    std::vector<std::vector<Real> >   d2phidxidzeta_map;
+    std::vector<std::vector<Real> > d2phidxidzeta_map;
 
     /**
      * Map for the second derivative, d^2(phi)/d(eta)^2.
      */
-    std::vector<std::vector<Real> >   d2phideta2_map;
+    std::vector<std::vector<Real> > d2phideta2_map;
 
     /**
      * Map for the second derivative, d^2(phi)/d(eta)d(zeta).
      */
-    std::vector<std::vector<Real> >   d2phidetadzeta_map;
+    std::vector<std::vector<Real> > d2phidetadzeta_map;
 
     /**
      * Map for the second derivative, d^2(phi)/d(zeta)^2.
      */
-    std::vector<std::vector<Real> >   d2phidzeta2_map;
+    std::vector<std::vector<Real> > d2phidzeta2_map;
 
 #endif
 
     /**
      * Map for the side shape functions, psi.
      */
-    std::vector<std::vector<Real> >   psi_map;
+    std::vector<std::vector<Real> > psi_map;
 
     /**
      * Map for the derivative of the side functions,
      * d(psi)/d(xi).
      */
-    std::vector<std::vector<Real> >   dpsidxi_map;
+    std::vector<std::vector<Real> > dpsidxi_map;
 
     /**
      * Map for the derivative of the side function,
      * d(psi)/d(eta).
      */
-    std::vector<std::vector<Real> >   dpsideta_map;
+    std::vector<std::vector<Real> > dpsideta_map;
 
     /**
      * Map for the second derivatives (in xi) of the
@@ -704,29 +706,29 @@ class Elem;
     /**
      * Tangent vectors on boundary at quadrature points.
      */
-    std::vector<std::vector<Point> >  tangents;
+    std::vector<std::vector<Point> > tangents;
 
     /**
      * Normal vectors on boundary at quadrature points
      */
-    std::vector<Point>                normals;
+    std::vector<Point> normals;
 
     /**
      * The mean curvature (= one half the sum of the principal
      * curvatures) on the boundary at the quadrature points.
      * The mean curvature is a scalar value.
      */
-    std::vector<Real>                 curvatures;
+    std::vector<Real> curvatures;
 
     /**
      * Jacobian values at quadrature points
      */
-    std::vector<Real>                 jac;
+    std::vector<Real> jac;
 
     /**
      * Jacobian*Weight values at quadrature points
      */
-    std::vector<Real>                 JxW;
+    std::vector<Real> JxW;
   };
 
 }

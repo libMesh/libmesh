@@ -59,6 +59,8 @@ AutoPtr<FEMap> FEMap::build( FEType fe_type )
   return AutoPtr<FEMap>();
 }
 
+
+
 template<unsigned int Dim>
 void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
 					    const Elem* elem)
@@ -309,6 +311,8 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
   STOP_LOG("init_reference_to_physical_map()", "FEMap");
   return;
 }
+
+
 
 void FEMap::compute_single_point_map(const unsigned int dim,
 				     const std::vector<Real>& qw,
@@ -667,6 +671,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 }
 
 
+
 void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n_qp)
 {
   // Resize the vectors to hold data at the quadrature points
@@ -705,6 +710,8 @@ void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n
   jac.resize(n_qp);
   JxW.resize(n_qp);
 }
+
+
 
 void FEMap::compute_affine_map( const unsigned int dim,
 				const std::vector<Real>& qw,
@@ -803,6 +810,7 @@ void FEMap::compute_map(const unsigned int dim,
 }
 
 
+
 void FEMap::print_JxW(std::ostream& os) const
 {
   for (unsigned int i=0; i<JxW.size(); ++i)
@@ -816,6 +824,7 @@ void FEMap::print_xyz(std::ostream& os) const
   for (unsigned int i=0; i<xyz.size(); ++i)
     os << " [" << i << "]: " << xyz[i];
 }
+
 
 
 // TODO: PB: We should consider moving this to the FEMap class
@@ -1208,6 +1217,8 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
   return p;
 }
 
+
+
 // TODO: PB: We should consider moving this to the FEMap class
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::inverse_map (const Elem* elem,
@@ -1230,6 +1241,8 @@ void FE<Dim,T>::inverse_map (const Elem* elem,
     reference_points[p] =
       FE<Dim,T>::inverse_map (elem, physical_points[p], tolerance, secure);
 }
+
+
 
 // TODO: PB: We should consider moving this to the FEMap class
 template <unsigned int Dim, FEFamily T>
@@ -1255,6 +1268,7 @@ Point FE<Dim,T>::map (const Elem* elem,
 
   return p;
 }
+
 
 
 // TODO: PB: We should consider moving this to the FEMap class
@@ -1283,6 +1297,8 @@ Point FE<Dim,T>::map_xi (const Elem* elem,
   return p;
 }
 
+
+
 // TODO: PB: We should consider moving this to the FEMap class
 template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map_eta (const Elem* elem,
@@ -1309,6 +1325,8 @@ Point FE<Dim,T>::map_eta (const Elem* elem,
   return p;
 }
 
+
+
 // TODO: PB: We should consider moving this to the FEMap class
 template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map_zeta (const Elem* elem,
@@ -1334,6 +1352,8 @@ Point FE<Dim,T>::map_zeta (const Elem* elem,
 
   return p;
 }
+
+
 
 // Explicit instantiation of FEMap member functions
 template void FEMap::init_reference_to_physical_map<0>( const std::vector<Point>&, const Elem*);
