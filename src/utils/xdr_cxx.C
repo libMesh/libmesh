@@ -491,6 +491,9 @@ template <>
 xdrproc_t xdr_translator<unsigned long int>() { return (xdrproc_t)(xdr_u_long); }
 
 template <>
+xdrproc_t xdr_translator<unsigned long long>() { return (xdrproc_t)(xdr_u_longlong_t); }
+
+template <>
 xdrproc_t xdr_translator<short int>() { return (xdrproc_t)(xdr_short); }
 
 template <>
@@ -683,12 +686,24 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 
 	libmesh_assert (this->is_open());
 
+        size_t size_of_type = sizeof(T);
 
-	xdr_vector(xdrs,
-		   (char*) val,
-		   len,
-		   sizeof(unsigned int),
-		   (xdrproc_t) xdr_u_int);
+        if (size_of_type <= 4) // 32-bit types
+        {
+          xdr_vector(xdrs,
+                     (char*) val,
+                     len,
+                     size_of_type,
+                     (xdrproc_t) xdr_u_int);
+        }
+        else // 64-bit types
+        {
+          xdr_vector(xdrs,
+                     (char*) val,
+                     len,
+                     size_of_type,
+                     (xdrproc_t) xdr_u_hyper);
+        }
 
 #else
 
@@ -710,12 +725,27 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 
 	libmesh_assert (this->is_open());
 
-	if (len > 0)
-	  xdr_vector(xdrs,
-		     (char*) val,
-		     len,
-		     sizeof(unsigned int),
-		     (xdrproc_t) xdr_u_int);
+        size_t size_of_type = sizeof(T);
+
+        if (size_of_type <= 4) // 32-bit types
+        {
+          if (len > 0)
+            xdr_vector(xdrs,
+                       (char*) val,
+                       len,
+                       size_of_type,
+                       (xdrproc_t) xdr_u_int);
+        }
+        else // 64-bit types
+        {
+          if (len > 0)
+            xdr_vector(xdrs,
+                       (char*) val,
+                       len,
+                       size_of_type,
+                       (xdrproc_t) xdr_u_hyper);
+
+        }
 
 #else
 
@@ -1401,6 +1431,7 @@ template void Xdr::data<unsigned int>                     (unsigned int&,       
 template void Xdr::data<unsigned short int>               (unsigned short int&,              const char*);
 template void Xdr::data<short int>                        (short int&,                       const char*);
 template void Xdr::data<unsigned long int>                (unsigned long int&,               const char*);
+template void Xdr::data<unsigned long long>               (unsigned long long&,              const char*);
 template void Xdr::data<long int>                         (long int&,                        const char*);
 template void Xdr::data<char>                             (char&,                            const char*);
 template void Xdr::data<signed char>                      (signed char&,                     const char*);
@@ -1418,6 +1449,7 @@ template void Xdr::data<std::vector<short int> >          (std::vector<short int
 template void Xdr::data<std::vector<unsigned short int> > (std::vector<unsigned short int>&, const char*);
 template void Xdr::data<std::vector<long int> >           (std::vector<long int>&,           const char*);
 template void Xdr::data<std::vector<unsigned long int> >  (std::vector<unsigned long int>&,  const char*);
+template void Xdr::data<std::vector<unsigned long long> > (std::vector<unsigned long long>&, const char*);
 template void Xdr::data<std::vector<char> >               (std::vector<char>&,               const char*);
 template void Xdr::data<std::vector<signed char> >        (std::vector<signed char>&,        const char*);
 template void Xdr::data<std::vector<unsigned char> >      (std::vector<unsigned char>&,      const char*);
@@ -1431,6 +1463,7 @@ template void Xdr::data_stream<int>                (int *val,                con
 template void Xdr::data_stream<unsigned short int> (unsigned short int *val, const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned int>       (unsigned int *val,       const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned long int>  (unsigned long int *val,  const unsigned int len, const unsigned int line_break);
+template void Xdr::data_stream<unsigned long long> (unsigned long long *val, const unsigned int len, const unsigned int line_break);
 
 
 } // namespace libMesh

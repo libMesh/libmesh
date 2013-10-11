@@ -41,6 +41,7 @@
 namespace libMesh
 {
 
+//#define LIBMESH_USE_64BIT_XDR
 #ifdef LIBMESH_USE_64BIT_XDR
   typedef uint64_t xdr_id_type;
 #else
@@ -908,8 +909,8 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem)
 
   int level=-1;
 
-  for (xdr_id_type blk=0, first_elem=0, last_elem=0, n_elem_at_level=0, n_processed_at_level=0;
-       last_elem<n_elem; blk++)
+  xdr_id_type n_elem_at_level=0, n_processed_at_level=0;
+  for (std::size_t blk=0, first_elem=0, last_elem=0; last_elem<n_elem; blk++)
     {
       first_elem = blk*io_blksize;
       last_elem  = std::min((blk+1)*io_blksize, std::size_t(n_elem));
