@@ -727,61 +727,7 @@ class Elem;
      * Jacobian*Weight values at quadrature points
      */
     std::vector<Real>                 JxW;
-
-
-  private:
-
   };
-
-  // ------------------------------------------------------------
-  // FEMap class inline members
-  inline
-  FEMap::FEMap()
-    :xyz(),
-     dxyzdxi_map(),
-     dxyzdeta_map(),
-     dxyzdzeta_map(),
-     d2xyzdxi2_map(),
-     d2xyzdxideta_map(),
-     d2xyzdeta2_map(),
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-     d2xyzdxidzeta_map(),
-     d2xyzdetadzeta_map(),
-     d2xyzdzeta2_map(),
-#endif
-     dxidx_map(),
-     dxidy_map(),
-     dxidz_map(),
-     detadx_map(),
-     detady_map(),
-     detadz_map(),
-     dzetadx_map(),
-     dzetady_map(),
-     dzetadz_map(),
-     phi_map(),
-     dphidxi_map(),
-     dphideta_map(),
-     dphidzeta_map(),
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-     d2phidxi2_map(),
-     d2phidxideta_map(),
-     d2phidxidzeta_map(),
-     d2phideta2_map(),
-     d2phidetadzeta_map(),
-     d2phidzeta2_map(),
-#endif
-     psi_map(),
-     dpsidxi_map(),
-     dpsideta_map(),
-     d2psidxi2_map(),
-     d2psidxideta_map(),
-     d2psideta2_map(),
-     tangents(),
-     normals(),
-     curvatures(),
-     jac(),
-     JxW()
-  {}
 
 }
 

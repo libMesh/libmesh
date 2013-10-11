@@ -33,6 +33,11 @@
 namespace libMesh
 {
 
+  // Constructor (empty)
+FEMap::FEMap() {}
+
+
+
 AutoPtr<FEMap> FEMap::build( FEType fe_type )
 {
   switch( fe_type.family )
