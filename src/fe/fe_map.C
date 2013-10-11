@@ -474,7 +474,10 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         detady_map[p] =  dx_dxi* inv_jac; //deta/dy =  (1/J)*dx/dxi
 
         dxidz_map[p] = detadz_map[p] = 0.;
-#else
+
+        this->compute_inverse_map_second_derivs(p);
+
+#else // LIBMESH_DIM == 3
 
         const Real dz_dxi = dzdxi_map(p),
           dz_deta = dzdeta_map(p);
@@ -643,6 +646,8 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         dzetadx_map[p] = (dy_dxi*dz_deta   - dz_dxi*dy_deta  )*inv_jac;
         dzetady_map[p] = (dz_dxi*dx_deta   - dx_dxi*dz_deta  )*inv_jac;
         dzetadz_map[p] = (dx_dxi*dy_deta   - dy_dxi*dx_deta  )*inv_jac;
+
+        this->compute_inverse_map_second_derivs(p);
 
         // done computing the map
         break;
@@ -905,6 +910,129 @@ void FEMap::print_xyz(std::ostream& os) const
 {
   for (unsigned int i=0; i<xyz.size(); ++i)
     os << " [" << i << "]: " << xyz[i];
+}
+
+
+
+void FEMap::compute_inverse_map_second_derivs(unsigned p)
+{
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  // Only certain second derivatives are valid depending on the
+  // dimension...
+  std::set<unsigned> valid_indices;
+
+  // Construct J^{-1}, A, and B matrices (see JWP's notes for details)
+  // for cases in which the element dimension matches LIBMESH_DIM.
+#if LIBMESH_DIM==1
+  RealTensor
+    Jinv(dxidx_map[p],  0.,  0.,
+         0.,            0.,  0.,
+         0.,            0.,  0.),
+
+    A(d2xyzdxi2_map[p](0), 0., 0.,
+      0.,                  0., 0.,
+      0.,                  0., 0.),
+
+    B(0., 0., 0.,
+      0., 0., 0.,
+      0., 0., 0.);
+
+  RealVectorValue
+    dxi  (dxidx_map[p], 0., 0.),
+    deta (0.,           0., 0.),
+    dzeta(0.,           0., 0.);
+
+  // In 1D, we have only the xx second derivative
+  valid_indices.insert(0);
+
+#elif LIBMESH_DIM==2
+  RealTensor
+    Jinv(dxidx_map[p],  dxidy_map[p],  0.,
+         detadx_map[p], detady_map[p], 0.,
+         0.,            0.,            0.),
+
+    A(d2xyzdxi2_map[p](0), d2xyzdeta2_map[p](0), 0.,
+      d2xyzdxi2_map[p](1), d2xyzdeta2_map[p](1), 0.,
+      0.,                  0.,                   0.),
+
+    B(d2xyzdxideta_map[p](0), 0., 0.,
+      d2xyzdxideta_map[p](1), 0., 0.,
+      0.,                     0., 0.);
+
+  RealVectorValue
+    dxi  (dxidx_map[p],  dxidy_map[p],  0.),
+    deta (detadx_map[p], detady_map[p], 0.),
+    dzeta(0.,            0.,            0.);
+
+  // In 2D, we have xx, xy, and yy second derivatives
+  valid_indices.insert(0);
+  valid_indices.insert(1);
+  valid_indices.insert(3);
+
+#elif LIBMESH_DIM==3
+  RealTensor
+    Jinv(dxidx_map[p],   dxidy_map[p],   dxidz_map[p],
+         detadx_map[p],  detady_map[p],  detadz_map[p],
+         dzetadx_map[p], dzetady_map[p], dzetadz_map[p]),
+
+    A(d2xyzdxi2_map[p](0), d2xyzdeta2_map[p](0), d2xyzdzeta2_map[p](0),
+      d2xyzdxi2_map[p](1), d2xyzdeta2_map[p](1), d2xyzdzeta2_map[p](1),
+      d2xyzdxi2_map[p](2), d2xyzdeta2_map[p](2), d2xyzdzeta2_map[p](2)),
+
+    B(d2xyzdxideta_map[p](0), d2xyzdxidzeta_map[p](0), d2xyzdetadzeta_map[p](0),
+      d2xyzdxideta_map[p](1), d2xyzdxidzeta_map[p](1), d2xyzdetadzeta_map[p](1),
+      d2xyzdxideta_map[p](2), d2xyzdxidzeta_map[p](2), d2xyzdetadzeta_map[p](2));
+
+  RealVectorValue
+    dxi  (dxidx_map[p],   dxidy_map[p],   dxidz_map[p]),
+    deta (detadx_map[p],  detady_map[p],  detadz_map[p]),
+    dzeta(dzetadx_map[p], dzetady_map[p], dzetadz_map[p]);
+
+  // In 3D, we have xx, xy, xz, yy, yz, and zz second derivatives
+  valid_indices.insert(0);
+  valid_indices.insert(1);
+  valid_indices.insert(2);
+  valid_indices.insert(3);
+  valid_indices.insert(4);
+  valid_indices.insert(5);
+
+#endif
+
+  // For (s,t) in {(x,x), (x,y), (x,z), (y,y), (y,z), (z,z)}, compute the
+  // vector of inverse map second derivatives [xi_{s t}, eta_{s t}, zeta_{s t}]
+  unsigned ctr=0;
+  for (unsigned s=0; s<3; ++s)
+    for (unsigned t=s; t<3; ++t)
+      {
+        if (std::find(valid_indices.begin(), valid_indices.end(), ctr) != valid_indices.end())
+          {
+            RealVectorValue
+              v1(dxi(s)*dxi(t),
+                 deta(s)*deta(t),
+                 dzeta(s)*dzeta(t)),
+
+              v2(dxi(s)*deta(t) + deta(s)*dxi(t),
+                 dxi(s)*dzeta(t) + dzeta(s)*dxi(t),
+                 deta(s)*dzeta(t) + dzeta(s)*deta(t));
+
+            // Compute the inverse map second derivatives
+            RealVectorValue v3 = -Jinv*(A*v1 + B*v2);
+
+            // Store them in the appropriate locations in the class data structures
+            d2xidxyz2_map[p][ctr] = v3(0);
+
+            if (LIBMESH_DIM > 1)
+              d2etadxyz2_map[p][ctr] = v3(1);
+
+            if (LIBMESH_DIM > 2)
+              d2zetadxyz2_map[p][ctr] = v3(2);
+          }
+
+        // Increment the counter
+        ctr++;
+      }
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 }
 
 
