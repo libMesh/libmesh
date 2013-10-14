@@ -247,7 +247,8 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type& system_in) :
     _n_linear_iterations(0),
     _current_nonlinear_iteration_number(0),
     _zero_out_residual(true),
-    _zero_out_jacobian(true)
+    _zero_out_jacobian(true),
+    _default_monitor(true)
 {
 }
 
@@ -306,16 +307,18 @@ void PetscNonlinearSolver<T>::init ()
 
 #endif
 
-
+      if (_default_monitor)
+      {
 #if PETSC_VERSION_LESS_THAN(2,3,3)
-      ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
-			     this, PETSC_NULL);
+        ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
+			       this, PETSC_NULL);
 #else
-      // API name change in PETSc 2.3.3
-      ierr = SNESMonitorSet (_snes, __libmesh_petsc_snes_monitor,
-			     this, PETSC_NULL);
+        // API name change in PETSc 2.3.3
+        ierr = SNESMonitorSet (_snes, __libmesh_petsc_snes_monitor,
+			       this, PETSC_NULL);
 #endif
-      LIBMESH_CHKERRABORT(ierr);
+        LIBMESH_CHKERRABORT(ierr);
+      }
 
 #if PETSC_VERSION_LESS_THAN(3,1,0)
       // Cannot call SNESSetOptions before SNESSetFunction when using
