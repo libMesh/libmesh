@@ -742,6 +742,18 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
   // Leading to our final formula:
   // dq/dp = (partial q / partial p) - z * (partial R / partial p)
 
+  // In the case of adjoints with heterogenous Dirichlet boundary
+  // function phi, where
+  // q := R(u,phi) + S(u)
+  // the final formula works out to:
+  // dq/dp = (partial S / partial p) - z * (partial R / partial p)
+  // Because we currently have no direct access to
+  // (partial S / partial p), we use the identity
+  // (partial S / partial p) = (partial q / partial p) -
+  //                           phi * (partial R / partial p)
+  // to derive an equivalent equation:
+  // dq/dp = (partial q / partial p) - (z+phi) * (partial R / partial p)
+
   for (unsigned int j=0; j != Np; ++j)
     {
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
@@ -784,13 +796,14 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
             
             if (this->get_dof_map().has_adjoint_dirichlet_boundaries(i))
 	      {
-                AutoPtr<NumericVector<Number> > adjoint_minus_lift =
-		  this->get_adjoint_solution(i).clone();
+                AutoPtr<NumericVector<Number> > lift_func =
+		  this->get_adjoint_solution(i).zero_clone();
                 this->get_dof_map().enforce_constraints_exactly
-		  (*this, &this->get_adjoint_solution(i),
-		   /* homogeneous = */ true);
+		  (*this, lift_func.get(),
+		   /* homogeneous = */ false);
                 sensitivities[i][j] = partialq_partialp[i] -
-                  partialR_partialp->dot(*adjoint_minus_lift);
+                  partialR_partialp->dot(*lift_func) -
+                  partialR_partialp->dot(this->get_adjoint_solution(i));
               }
 	    else
               sensitivities[i][j] = partialq_partialp[i] -
