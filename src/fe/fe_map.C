@@ -395,6 +395,77 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
         JxW[p] = jac[p]*qw[p];
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+#if LIBMESH_DIM == 1
+        // Compute inverse map second derivatives for 1D-element-living-in-1D case
+        this->compute_inverse_map_second_derivs(p);
+#elif LIBMESH_DIM == 2
+        // Compute inverse map second derivatives for 1D-element-living-in-2D case
+        // See JWP notes for details
+
+        // numer = x_xi*x_{xi xi} + y_xi*y_{xi xi}
+        Real numer =
+          dxyzdxi_map[p](0)*d2xyzdxi2_map[p](0) +
+          dxyzdxi_map[p](1)*d2xyzdxi2_map[p](1);
+
+        // denom = (x_xi)^2 + (y_xi)^2 must be >= 0.0
+        Real denom =
+          dxyzdxi_map[p](0)*dxyzdxi_map[p](0) +
+          dxyzdxi_map[p](1)*dxyzdxi_map[p](1);
+
+        if (denom <= 0.0)
+          libmesh_error_msg("Encountered invalid 1D element!");
+
+        // xi_{x x}
+        d2xidxyz2_map[p][0] = -numer * dxidx_map[p]*dxidx_map[p] / denom;
+
+        // xi_{x y}
+        d2xidxyz2_map[p][1] = -numer * dxidx_map[p]*dxidy_map[p] / denom;
+
+        // xi_{y y}
+        d2xidxyz2_map[p][3] = -numer * dxidy_map[p]*dxidy_map[p] / denom;
+
+#elif LIBMESH_DIM == 3
+        // Compute inverse map second derivatives for 1D-element-living-in-3D case
+        // See JWP notes for details
+
+        // numer = x_xi*x_{xi xi} + y_xi*y_{xi xi} + z_xi*z_{xi xi}
+        Real numer =
+          dxyzdxi_map[p](0)*d2xyzdxi2_map[p](0) +
+          dxyzdxi_map[p](1)*d2xyzdxi2_map[p](1) +
+          dxyzdxi_map[p](2)*d2xyzdxi2_map[p](2);
+
+        // denom = (x_xi)^2 + (y_xi)^2 + (z_xi)^2 must be >= 0.0
+        Real denom =
+          dxyzdxi_map[p](0)*dxyzdxi_map[p](0) +
+          dxyzdxi_map[p](1)*dxyzdxi_map[p](1) +
+          dxyzdxi_map[p](2)*dxyzdxi_map[p](2);
+
+        if (denom <= 0.0)
+          libmesh_error_msg("Encountered invalid 1D element!");
+
+        // xi_{x x}
+        d2xidxyz2_map[p][0] = -numer * dxidx_map[p]*dxidx_map[p] / denom;
+
+        // xi_{x y}
+        d2xidxyz2_map[p][1] = -numer * dxidx_map[p]*dxidy_map[p] / denom;
+
+        // xi_{x z}
+        d2xidxyz2_map[p][2] = -numer * dxidx_map[p]*dxidz_map[p] / denom;
+
+        // xi_{y y}
+        d2xidxyz2_map[p][3] = -numer * dxidy_map[p]*dxidy_map[p] / denom;
+
+        // xi_{y z}
+        d2xidxyz2_map[p][4] = -numer * dxidy_map[p]*dxidz_map[p] / denom;
+
+        // xi_{z z}
+        d2xidxyz2_map[p][5] = -numer * dxidz_map[p]*dxidz_map[p] / denom;
+#endif
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
         // done computing the map
         break;
       }
