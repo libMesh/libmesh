@@ -71,9 +71,12 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem* elem,
 	      const Real eta  = p(1);
               const Real zeta = p(2);
 
-	      libmesh_assert_less_equal ( std::fabs(xi),   1.0 );
-	      libmesh_assert_less_equal ( std::fabs(eta),  1.0 );
-              libmesh_assert_less_equal ( std::fabs(zeta), 1.0 );
+              // Even with a loose inverse_map tolerance we ought to
+              // be nearly on the element interior in master
+              // coordinates
+	      libmesh_assert_less_equal ( std::fabs(xi),   1.0+10*TOLERANCE );
+	      libmesh_assert_less_equal ( std::fabs(eta),  1.0+10*TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(zeta), 1.0+10*TOLERANCE );
 
               switch(i)
 		{
@@ -250,9 +253,12 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
 	      const Real eta  = p(1);
               const Real zeta = p(2);
 
-	      libmesh_assert_less_equal ( std::fabs(xi),   1.0 );
-	      libmesh_assert_less_equal ( std::fabs(eta),  1.0 );
-              libmesh_assert_less_equal ( std::fabs(zeta), 1.0 );
+              // Even with a loose inverse_map tolerance we ought to
+              // be nearly on the element interior in master
+              // coordinates
+	      libmesh_assert_less_equal ( std::fabs(xi),   1.0+TOLERANCE );
+	      libmesh_assert_less_equal ( std::fabs(eta),  1.0+TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(zeta), 1.0+TOLERANCE );
 
 	      switch (j)
 		{
@@ -571,9 +577,9 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
 	      const Real eta  = p(1);
               const Real zeta = p(2);
 
-	      libmesh_assert_less_equal ( std::fabs(xi),   1.0 );
-	      libmesh_assert_less_equal ( std::fabs(eta),  1.0 );
-              libmesh_assert_less_equal ( std::fabs(zeta), 1.0 );
+	      libmesh_assert_less_equal ( std::fabs(xi),   1.0+TOLERANCE );
+	      libmesh_assert_less_equal ( std::fabs(eta),  1.0+TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(zeta), 1.0+TOLERANCE );
 
 	      switch (j)
 		{
