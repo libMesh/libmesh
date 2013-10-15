@@ -324,6 +324,11 @@ Elem* SerialMesh::add_elem (Elem* e)
   if (!e->valid_id())
     e->set_id (_elements.size());
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (!e->valid_unique_id())
+    e->set_unique_id() = _next_unique_id++;
+#endif
+
   const dof_id_type id = e->id();
 
   if (id < _elements.size())
@@ -473,6 +478,11 @@ Node* SerialMesh::add_node (Node* n)
   libmesh_assert(!n->valid_id() || n->id() == _nodes.size());
 
   n->set_id (_nodes.size());
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (!n->valid_unique_id())
+    n->set_unique_id() = _next_unique_id++;
+#endif
 
   _nodes.push_back(n);
 
