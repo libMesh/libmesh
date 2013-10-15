@@ -819,6 +819,8 @@ public:
    */
   std::map<subdomain_id_type, std::string>& set_subdomain_name_map ()
   { return _block_id_to_name; }
+  const std::map<subdomain_id_type, std::string>& get_subdomain_name_map () const
+  { return _block_id_to_name; }
 
 protected:
 

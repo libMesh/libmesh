@@ -368,11 +368,15 @@ public:
    */
   std::map<boundary_id_type, std::string>& set_sideset_name_map ()
   { return _ss_id_to_name; }
+  const std::map<boundary_id_type, std::string>& get_sideset_name_map () const
+  { return _ss_id_to_name; }
 
   /**
    * Return a writeable reference to the whole nodeset name map
    */
   std::map<boundary_id_type, std::string>& set_nodeset_name_map ()
+  { return _ns_id_to_name; }
+  const std::map<boundary_id_type, std::string>& get_nodeset_name_map () const
   { return _ns_id_to_name; }
 
   /**

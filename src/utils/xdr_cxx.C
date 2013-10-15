@@ -479,6 +479,18 @@ bool xdr_translate(XDR* x, std::vector<std::complex<T> >& a) {
 }
 
 template <>
+bool xdr_translate(XDR* x, std::vector<std::string>& s) {
+  unsigned int length = libmesh_cast_int<unsigned int>(s.size());
+  bool b = xdr_u_int(x, &length);
+  s.resize(length);
+  std::vector<std::string>::iterator iter = s.begin();
+  for (; iter != s.end(); ++iter)
+    if (!xdr_translate(x, *iter))
+      b = false;
+  return b;
+}
+
+template <>
 xdrproc_t xdr_translator<int>() { return (xdrproc_t)(xdr_int); }
 
 template <>
@@ -1459,11 +1471,11 @@ template void Xdr::data<std::vector<long double> >        (std::vector<long doub
 template void Xdr::data<std::vector<std::complex<float> > >  (std::vector<std::complex<float> >&,  const char*);
 template void Xdr::data<std::vector<std::complex<double> > > (std::vector<std::complex<double> >&, const char*);
 template void Xdr::data<std::vector<std::complex<long double> > > (std::vector<std::complex<long double> >&, const char*);
+template void Xdr::data<std::vector<std::string> >        (std::vector<std::string>&,        const char*);
 template void Xdr::data_stream<int>                (int *val,                const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned short int> (unsigned short int *val, const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned int>       (unsigned int *val,       const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned long int>  (unsigned long int *val,  const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned long long> (unsigned long long *val, const unsigned int len, const unsigned int line_break);
-
 
 } // namespace libMesh
