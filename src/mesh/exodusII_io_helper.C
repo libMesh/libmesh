@@ -356,6 +356,9 @@ void ExodusII_IO_Helper::read_header()
   ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
+  ex_err = exII::ex_get_var_param(ex_id, "g", &num_globals);
+  EX_CHECK_ERR(ex_err, "Error reading number of global variables.");
+
   message("Exodus header info retrieved successfully.");
 }
 
@@ -1586,6 +1589,20 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
 
   if (_global_vars_initialized)
     return;
+
+  // There may already be global variables in the file (for example,
+  // if we're appending) and in that case, according to the Exodus
+  // documentation, writing more information records is not supported.
+  // Since we read the number of global variables when we read the
+  // header, we can check if there are already global variables
+  // present in the file and return.
+  if (num_globals > 0)
+    {
+      libMesh::err << "Warning! The Exodus file already contains global variables.\n"
+                   << "Exodus does not support writing additional global variables in this situation."
+                   << std::endl;
+      return;
+    }
 
   _global_vars_initialized = true;
 
