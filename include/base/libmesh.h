@@ -96,6 +96,11 @@ private:
   bool closed ();
 
   /**
+   * Toggle hardware trap floating point exceptions
+   */
+  void enableFPE(bool on);
+
+  /**
    * @returns true if the argument \p arg was specified on the command line,
    * \p false otherwise.
    */

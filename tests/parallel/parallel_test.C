@@ -189,6 +189,9 @@ public:
 
     if (libMesh::n_processors() > 1)
       {
+	// Default communication
+	CommWorld.send_mode(Parallel::Communicator::DEFAULT);
+
         CommWorld.send (procup,
 		        src_val,
 		        request);
@@ -202,6 +205,28 @@ public:
 
         for (unsigned int i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
+
+
+	// Synchronous communication
+	CommWorld.send_mode(Parallel::Communicator::SYNCHRONOUS);
+	std::fill (recv_val.begin(), recv_val.end(), 0);
+
+        CommWorld.send (procup,
+		        src_val,
+		        request);
+
+        CommWorld.receive (procdown,
+		           recv_val);
+
+        Parallel::wait (request);
+
+        CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
+
+        for (unsigned int i=0; i<src_val.size(); i++)
+          CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
+
+	// Restore default communication
+	CommWorld.send_mode(Parallel::Communicator::DEFAULT);
       }
   }
 
@@ -225,6 +250,9 @@ public:
 
     if (libMesh::n_processors() > 1)
       {
+	// Default communication
+	CommWorld.send_mode(Parallel::Communicator::DEFAULT);
+
         CommWorld.receive (procdown,
 		           recv_val,
 		           request);
@@ -238,6 +266,28 @@ public:
 
         for (unsigned int i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
+
+	// Synchronous communication
+	CommWorld.send_mode(Parallel::Communicator::SYNCHRONOUS);
+	std::fill (recv_val.begin(), recv_val.end(), 0);
+
+
+        CommWorld.receive (procdown,
+		           recv_val,
+		           request);
+
+        CommWorld.send (procup,
+		        src_val);
+
+        Parallel::wait (request);
+
+        CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
+
+        for (unsigned int i=0; i<src_val.size(); i++)
+          CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
+
+	// Restore default communication
+	CommWorld.send_mode(Parallel::Communicator::DEFAULT);
       }
   }
 #endif // !LIBMESH_DISABLE_COMMWORLD

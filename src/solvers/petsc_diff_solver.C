@@ -47,7 +47,7 @@ extern "C"
 // Function to hand to PETSc's SNES,
 // which monitors convergence at X
 PetscErrorCode
-__libmesh_petsc_diff_solver_monitor (SNES, PetscInt its,
+__libmesh_petsc_diff_solver_monitor (SNES snes, PetscInt its,
                                      PetscReal fnorm, void *ctx)
 {
   PetscDiffSolver& solver =
@@ -56,7 +56,32 @@ __libmesh_petsc_diff_solver_monitor (SNES, PetscInt its,
   if (solver.verbose)
     libMesh::out << "  PetscDiffSolver step " << its
                  << ", |residual|_2 = " << fnorm << std::endl;
+  if (solver.linear_solution_monitor.get()) {
+    int ierr = 0;
 
+    Vec petsc_delta_u;
+    ierr = SNESGetSolutionUpdate(snes, &petsc_delta_u);
+    CHKERRABORT(libMesh::COMM_WORLD, ierr);
+    PetscVector<Number> delta_u(petsc_delta_u);
+    delta_u.close();
+
+    Vec petsc_u;
+    ierr = SNESGetSolution(snes, &petsc_u);
+    CHKERRABORT(libMesh::COMM_WORLD, ierr);
+    PetscVector<Number> u(petsc_u);
+    u.close();
+
+    Vec petsc_res;
+    ierr = SNESGetFunction(snes, &petsc_res, NULL, NULL);
+    CHKERRABORT(libMesh::COMM_WORLD, ierr);
+    PetscVector<Number> res(petsc_res);
+    res.close();
+
+    (*solver.linear_solution_monitor)(
+            delta_u, delta_u.l2_norm(),
+            u, u.l2_norm(),
+            res, res.l2_norm(), its);
+  }
   return 0;
 }
 
@@ -233,6 +258,55 @@ void PetscDiffSolver::reinit()
 
 
 
+DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r)
+{
+  switch (r)
+    {
+    case SNES_CONVERGED_FNORM_ABS:
+      return DiffSolver::CONVERGED_ABSOLUTE_RESIDUAL;
+    case SNES_CONVERGED_FNORM_RELATIVE:
+      return DiffSolver::CONVERGED_RELATIVE_RESIDUAL;
+#if PETSC_VERSION_LESS_THAN(3,2,1)
+    case SNES_CONVERGED_PNORM_RELATIVE:
+#else
+    case SNES_CONVERGED_SNORM_RELATIVE:
+#endif
+      return DiffSolver::CONVERGED_RELATIVE_STEP;
+#if !PETSC_VERSION_LESS_THAN(2,3,3)
+    case SNES_CONVERGED_ITS:
+#endif
+    case SNES_CONVERGED_TR_DELTA:
+      return DiffSolver::CONVERGED_NO_REASON;
+    case SNES_DIVERGED_FUNCTION_DOMAIN:
+    case SNES_DIVERGED_FUNCTION_COUNT:
+    case SNES_DIVERGED_FNORM_NAN:
+#if !PETSC_VERSION_LESS_THAN(3,3,0)
+    case SNES_DIVERGED_INNER:
+#endif
+#if !PETSC_VERSION_LESS_THAN(2,3,2)
+    case SNES_DIVERGED_LINEAR_SOLVE:
+#endif
+    case SNES_DIVERGED_LOCAL_MIN:
+      return DiffSolver::DIVERGED_NO_REASON;
+    case SNES_DIVERGED_MAX_IT:
+      return DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
+#if !PETSC_VERSION_LESS_THAN(3,2,0)
+    case SNES_DIVERGED_LINE_SEARCH:
+      return DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
+#endif
+      // In PETSc, SNES_CONVERGED_ITERATING means
+      // the solve is still iterating, but by the
+      // time we get here, we must have either
+      // converged or diverged, so
+      // SNES_CONVERGED_ITERATING is invalid.
+    case SNES_CONVERGED_ITERATING:
+      return DiffSolver::INVALID_SOLVE_RESULT;
+    }
+  return DiffSolver::INVALID_SOLVE_RESULT;
+}
+
+
+
 unsigned int PetscDiffSolver::solve()
 {
   this->init();
@@ -281,12 +355,14 @@ unsigned int PetscDiffSolver::solve()
 
   STOP_LOG("solve()", "PetscDiffSolver");
 
+  SNESConvergedReason reason;
+  SNESGetConvergedReason(_snes, &reason);
+
   this->clear();
 
-  // FIXME - We'll worry about getting the solve result right later...
-
-  return DiffSolver::CONVERGED_RELATIVE_RESIDUAL;
+  return convert_solve_result(reason);
 }
+
 
 } // namespace libMesh
 

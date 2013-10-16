@@ -135,6 +135,11 @@ public:
    */
   void set_jacobian_zero_out(bool state) { _zero_out_jacobian = state; }
 
+  /**
+   * Set to true to use the libMeash's default monitor, set to false to use your own
+   */
+  void use_default_monitor(bool state) { _default_monitor = state; }
+
 protected:
   /**
    * Nonlinear solver context
@@ -169,6 +174,11 @@ protected:
    * true to zero out jacobian before going into application level call-back, otherwise false
    */
   bool _zero_out_jacobian;
+
+  /**
+   * true if we want the default monitor to be set, false for no monitor (i.e. user code can use their own)
+   */
+  bool _default_monitor;
 
  private:
 #if !PETSC_VERSION_LESS_THAN(3,3,0)

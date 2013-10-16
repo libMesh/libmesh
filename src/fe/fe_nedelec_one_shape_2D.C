@@ -70,8 +70,11 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 
-	      libmesh_assert_less_equal ( std::fabs(xi), 1.0 );
-	      libmesh_assert_less_equal ( std::fabs(eta), 1.0 );
+              // Even with a loose inverse_map tolerance we ought to
+              // be nearly on the element interior in master
+              // coordinates
+	      libmesh_assert_less_equal ( std::fabs(xi), 1.0+10*TOLERANCE );
+	      libmesh_assert_less_equal ( std::fabs(eta), 1.0+10*TOLERANCE );
 
 	      switch(i)
 		{

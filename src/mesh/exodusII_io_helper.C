@@ -272,6 +272,28 @@ void ExodusII_IO_Helper::message(const std::string msg)
 
 
 
+int ExodusII_IO_Helper::compute_timestep_offset(int requested_timestep)
+{
+  // Eventual return value
+  int timestep_offset = 0;
+
+  // If we're processor 0, or if we are running on all procs, e.g. as
+  // one of several Nemesis files, we can compute a timestep offset,
+  // otherwise just return 0.
+  if ((this->processor_id() == 0) || (!_run_only_on_proc0))
+    {
+      int current_n_timesteps =
+        this->inquire(exII::EX_INQ_TIME, "Error retrieving number of time steps");
+
+      if (requested_timestep <= current_n_timesteps)
+        timestep_offset = current_n_timesteps + 1 - requested_timestep;
+    }
+
+  return timestep_offset;
+}
+
+
+
 void ExodusII_IO_Helper::message(const std::string msg, int i)
 {
   if (verbose) libMesh::out << msg << i << "." << std::endl;

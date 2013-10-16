@@ -58,7 +58,8 @@ ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
 #endif
   _timestep(1),
   _verbose(false),
-  _append(false)
+  _append(false),
+  _timestep_offset(0)
 {
 }
 
@@ -914,7 +915,7 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   exio_helper->initialize_element_variables(mesh, names);
-  exio_helper->write_element_values(mesh, soln, _timestep);
+  exio_helper->write_element_values(mesh, soln, _timestep + _timestep_offset);
 }
 
 
@@ -958,7 +959,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
       for(dof_id_type i=0; i<num_nodes; i++)
         cur_soln[i] = soln[i*num_vars + c];
 
-      exio_helper->write_nodal_values(variable_name_position+1,cur_soln,_timestep);
+      exio_helper->write_nodal_values(variable_name_position+1, cur_soln, _timestep + _timestep_offset);
     }
 
   STOP_LOG("write_nodal_data()", "ExodusII_IO");
@@ -994,7 +995,7 @@ void ExodusII_IO::write_global_data (const std::vector<Number>& soln,
     }
 
   exio_helper->initialize_global_variables(names);
-  exio_helper->write_global_values(soln, _timestep);
+  exio_helper->write_global_values(soln, _timestep + _timestep_offset);
 }
 
 
@@ -1006,7 +1007,7 @@ void ExodusII_IO::write_timestep (const std::string& fname,
 {
   _timestep = timestep;
   write_equation_systems(fname,es);
-  exio_helper->write_timestep(timestep, time);
+  exio_helper->write_timestep(_timestep + _timestep_offset, time);
 }
 
 
@@ -1067,7 +1068,7 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
         for(int i=0; i<num_nodes; i++)
           cur_soln[i] = soln[i*num_vars + c];
 
-        exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
+        exio_helper->write_nodal_values(c+1, cur_soln, _timestep + _timestep_offset);
       }
 
   STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
@@ -1133,6 +1134,14 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
           libmesh_error();
         }
     }
+
+  // Prevent codes from accidentally overwriting timesteps by using an
+  // offset.  This sometimes happens when attempting to append...
+  // Note: if the file is only open on processor 0, for example when
+  // calling create, we will only compute a correct offset on
+  // processor 0: that's OK as long as that's the only processor we
+  // are actually writing from.
+  _timestep_offset = exio_helper->compute_timestep_offset(_timestep);
 }
 
 
@@ -1270,7 +1279,9 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string&, const std:
 
 
 
-void ExodusII_IO::write_nodal_data_common()
+  void ExodusII_IO::write_nodal_data_common(std::string,
+					    const std::vector<std::string>&,
+					    bool)
 {
   libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
   libmesh_error();
