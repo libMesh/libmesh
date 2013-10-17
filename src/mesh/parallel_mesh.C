@@ -419,6 +419,14 @@ Elem* ParallelMesh::add_elem (Elem *e)
       elem_procid == DofObject::invalid_processor_id)
     _n_elem++;
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (!e->valid_unique_id() && libMesh::processor_id() == e->processor_id())
+    {
+      e->set_unique_id() = _next_unique_id;
+      _next_unique_id += this->n_processors();
+    }
+#endif
+
 // Unpartitioned elems should be added on every processor
 // And shouldn't be added in the same batch as ghost elems
 // But we might be just adding on processor 0 to
@@ -574,6 +582,15 @@ Node* ParallelMesh::add_node (Node *n)
   if (node_procid == this->processor_id() ||
       node_procid == DofObject::invalid_processor_id)
     _n_nodes++;
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (!n->valid_unique_id() && libMesh::processor_id() == n->processor_id())
+    {
+      n->set_unique_id() = _next_unique_id;
+      _next_unique_id += this->n_processors();
+    }
+#endif
+
 
 // Unpartitioned nodes should be added on every processor
 // And shouldn't be added in the same batch as ghost nodes
@@ -932,7 +949,9 @@ dof_id_type ParallelMesh::renumber_dof_objects
       {
         requested_ids[obj->processor_id()].push_back(obj->id());
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-        requested_unique_ids[obj->processor_id()].push_back(obj->unique_id());
+        // It's possible to have an invalid id for dofs not owned by this process.
+        // We'll assert that they match on the receiving end.
+        requested_unique_ids[obj->processor_id()].push_back(obj->set_unique_id());
 #endif
       }
     }
@@ -968,7 +987,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
               libmesh_assert_equal_to (obj->processor_id(), this->processor_id());
               new_ids[i] = obj->id();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              new_unique_ids[i] = obj->unique_id();
+              new_unique_ids[i] = obj->set_unique_id();
 #endif
 
               libmesh_assert_greater_equal (new_ids[i],
@@ -1003,7 +1022,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
               obj->set_id(filled_request[i]);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              libmesh_assert (!obj->valid_unique_id());
+              libmesh_assert(!obj->valid_unique_id() || obj->unique_id() == unique_filled_request[i]);
               obj->set_unique_id() = unique_filled_request[i];
 #endif
             }
