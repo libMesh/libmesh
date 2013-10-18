@@ -4,7 +4,7 @@ install_dir   = $(examples_install_path)/transient/ex2
 data          = transient_ex2.C pipe-mesh.unv run.sh
 sources       = $(data) run.sh
 
-CLEANFILES = pressure_node.res out.*.gmv
+CLEANFILES = pressure_node.res out.*.gmv out_*.vtu  out_*.pvtu
 
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
