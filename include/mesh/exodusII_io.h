@@ -92,6 +92,15 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   const std::vector<Real>& get_time_steps();
 
   /**
+   * Returns the number of timesteps currently stored in the Exodus
+   * file.  Knowing the number of time steps currently stored in the
+   * file is sometimes necessary when appending, so we can know where
+   * to start writing new data.  Throws an error if the file is not
+   * currently open for reading or writing.
+   */
+  int get_num_time_steps();
+
+  /**
    * Backward compatibility version of function that takes a single variable name
    */
   void copy_nodal_solution(System& system, std::string var_name, unsigned int timestep=1);

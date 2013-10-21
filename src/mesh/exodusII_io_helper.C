@@ -326,7 +326,7 @@ void ExodusII_IO_Helper::read_header()
 
   EX_CHECK_ERR(ex_err, "Error retrieving header info.");
 
-  num_time_steps = inquire(exII::EX_INQ_TIME, "Error retrieving time steps");
+  this->read_num_time_steps();
 
   ex_err = exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of nodal variables.");
@@ -716,12 +716,23 @@ int ExodusII_IO_Helper::inquire(int req_info_in, std::string error_msg)
 
 void ExodusII_IO_Helper::read_time_steps()
 {
+  // Make sure we have an up-to-date count of the number of time steps in the file.
+  this->read_num_time_steps();
+
   if (num_time_steps > 0)
     {
       time_steps.resize(num_time_steps);
       ex_err = exII::ex_get_all_times(ex_id, &time_steps[0]);
       EX_CHECK_ERR(ex_err, "Error reading timesteps!");
     }
+}
+
+
+
+void ExodusII_IO_Helper::read_num_time_steps()
+{
+  num_time_steps =
+    this->inquire(exII::EX_INQ_TIME, "Error retrieving number of time steps");
 }
 
 

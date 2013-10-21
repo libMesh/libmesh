@@ -307,6 +307,20 @@ const std::vector<Real>& ExodusII_IO::get_time_steps()
 
 
 
+int ExodusII_IO::get_num_time_steps()
+{
+  if (!exio_helper->opened_for_reading && !exio_helper->opened_for_writing)
+    {
+      libMesh::err << "ERROR, ExodusII file must be opened for reading or writing before calling ExodusII_IO::get_num_time_steps()!" << std::endl;
+      libmesh_error();
+    }
+
+  exio_helper->read_num_time_steps();
+  return exio_helper->num_time_steps;
+}
+
+
+
 void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
 {
   if (!exio_helper->opened_for_reading)
@@ -716,6 +730,13 @@ const std::vector<Real>& ExodusII_IO::get_time_steps()
   libmesh_error();
 }
 
+
+
+int ExodusII_IO::get_num_time_steps()
+{
+  libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
+  libmesh_error();
+}
 
 
 void ExodusII_IO::copy_nodal_solution(System&, std::string, std::string, unsigned int)
