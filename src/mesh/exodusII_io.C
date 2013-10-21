@@ -151,8 +151,9 @@ void ExodusII_IO::read (const std::string& fname)
       int subdomain_id = exio_helper->get_block_id(i);
 
       // populate the map of names
-      mesh.subdomain_name(static_cast<subdomain_id_type>(subdomain_id)) =
-        exio_helper->get_block_name(i);
+      std::string subdomain_name = exio_helper->get_block_name(i);
+      if (!subdomain_name.empty())
+        mesh.subdomain_name(static_cast<subdomain_id_type>(subdomain_id)) = subdomain_name;
 
       // Set any relevant node/edge maps for this element
       const std::string type_str (exio_helper->get_elem_type());
@@ -206,8 +207,9 @@ void ExodusII_IO::read (const std::string& fname)
 	offset += (i > 0 ? exio_helper->num_sides_per_set[i-1] : 0); // Compute new offset
 	exio_helper->read_sideset (i, offset);
 
-        mesh.boundary_info->sideset_name(exio_helper->get_side_set_id(i)) =
-          exio_helper->get_side_set_name(i);
+        std::string sideset_name = exio_helper->get_side_set_name(i);
+        if (!sideset_name.empty())
+          mesh.boundary_info->sideset_name(exio_helper->get_side_set_id(i)) = sideset_name;
       }
 
     for (unsigned int e=0; e<exio_helper->elem_list.size(); e++)
@@ -233,8 +235,9 @@ void ExodusII_IO::read (const std::string& fname)
       {
         int nodeset_id = exio_helper->nodeset_ids[nodeset];
 
-        mesh.boundary_info->nodeset_name(nodeset_id) =
-          exio_helper->get_node_set_name(nodeset);
+        std::string nodeset_name = exio_helper->get_node_set_name(nodeset);
+        if (!nodeset_name.empty())
+          mesh.boundary_info->nodeset_name(nodeset_id) = nodeset_name;
 
         exio_helper->read_nodeset(nodeset);
 

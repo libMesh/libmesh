@@ -300,19 +300,25 @@ void XdrIO::write_serialized_subdomain_names(Xdr &io) const
 
     const std::map<subdomain_id_type, std::string> & subdomain_map = mesh.get_subdomain_name_map();
 
-    header_id_type n_subdomain_names = subdomain_map.size();
-    io.data(n_subdomain_names, "# subdomain id to name map");
+    std::vector<header_id_type> subdomain_ids;   subdomain_ids.reserve(subdomain_map.size());
+    std::vector<std::string>  subdomain_names; subdomain_names.reserve(subdomain_map.size());
 
-    std::vector<header_id_type> subdomain_ids;   subdomain_ids.reserve(n_subdomain_names);
-    std::vector<std::string>  subdomain_names; subdomain_names.reserve(n_subdomain_names);
-
+    // We need to loop over the map and make sure that there aren't any invalid entries.  Since we
+    // return writable references in mesh_base, it's possible for the user to leave some entity names
+    // blank.  We can't write those to the XDA file.
+    header_id_type n_subdomain_names = 0;
     std::map<subdomain_id_type, std::string>::const_iterator it_end = subdomain_map.end();
     for (std::map<subdomain_id_type, std::string>::const_iterator it = subdomain_map.begin(); it != it_end; ++it)
     {
-      subdomain_ids.push_back(it->first);
-      subdomain_names.push_back(it->second);
+      if (!it->second.empty())
+      {
+        n_subdomain_names++;
+        subdomain_ids.push_back(it->first);
+        subdomain_names.push_back(it->second);
+      }
     }
 
+    io.data(n_subdomain_names, "# subdomain id to name map");
     // Write out the ids and names in two vectors
     if (n_subdomain_names)
     {
@@ -890,23 +896,28 @@ void XdrIO::write_serialized_bc_names (Xdr &io, const BoundaryInfo & info, bool 
     const std::map<boundary_id_type, std::string> & boundary_map = is_sideset ?
       info.get_sideset_name_map() : info.get_nodeset_name_map();
 
-    header_id_type n_boundary_names = boundary_map.size();
+    std::vector<header_id_type> boundary_ids;   boundary_ids.reserve(boundary_map.size());
+    std::vector<std::string>  boundary_names; boundary_names.reserve(boundary_map.size());
+
+    // We need to loop over the map and make sure that there aren't any invalid entries.  Since we
+    // return writable references in boundary_info, it's possible for the user to leave some entity names
+    // blank.  We can't write those to the XDA file.
+    header_id_type n_boundary_names = 0;
+    std::map<boundary_id_type, std::string>::const_iterator it_end = boundary_map.end();
+    for (std::map<boundary_id_type, std::string>::const_iterator it = boundary_map.begin(); it != it_end; ++it)
+    {
+      if (!it->second.empty())
+      {
+        n_boundary_names++;
+        boundary_ids.push_back(it->first);
+        boundary_names.push_back(it->second);
+      }
+    }
+
     if (is_sideset)
       io.data(n_boundary_names, "# sideset id to name map");
     else
       io.data(n_boundary_names, "# nodeset id to name map");
-
-    // TODO: Change boundary_id type
-    std::vector<header_id_type> boundary_ids;   boundary_ids.reserve(n_boundary_names);
-    std::vector<std::string>  boundary_names; boundary_names.reserve(n_boundary_names);
-
-    std::map<boundary_id_type, std::string>::const_iterator it_end = boundary_map.end();
-    for (std::map<boundary_id_type, std::string>::const_iterator it = boundary_map.begin(); it != it_end; ++it)
-    {
-      boundary_ids.push_back(it->first);
-      boundary_names.push_back(it->second);
-    }
-
     // Write out the ids and names in two vectors
     if (n_boundary_names)
     {

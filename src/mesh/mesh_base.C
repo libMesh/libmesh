@@ -34,7 +34,7 @@
 #include "libmesh/partitioner.h"
 #include "libmesh/point_locator_base.h"
 #include "libmesh/threads.h"
-
+#include "libmesh/print_trace.h"
 
 namespace libMesh
 {
@@ -421,6 +421,7 @@ void MeshBase::clear_point_locator ()
 
 std::string& MeshBase::subdomain_name(subdomain_id_type id)
 {
+  libMesh::print_trace();
   return _block_id_to_name[id];
 }
 
