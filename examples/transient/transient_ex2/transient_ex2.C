@@ -34,6 +34,7 @@
 // C++ include files that we need
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <algorithm>
 #include <stdio.h>
 #include <math.h>

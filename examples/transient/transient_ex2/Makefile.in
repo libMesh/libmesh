@@ -564,8 +564,8 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = pressure_node.res out.*.gmv $(am__append_1) \
-	$(example_name).php stdout.log
+CLEANFILES = pressure_node.res out.*.gmv out_*.vtu out_*.pvtu \
+	$(am__append_1) $(example_name).php stdout.log
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
 
 ######################################################################

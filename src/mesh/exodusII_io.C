@@ -58,8 +58,7 @@ ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
 #endif
   _timestep(1),
   _verbose(false),
-  _append(false),
-  _timestep_offset(0)
+  _append(false)
 {
 }
 
@@ -164,8 +163,9 @@ void ExodusII_IO::read (const std::string& fname)
       int subdomain_id = exio_helper->get_block_id(i);
 
       // populate the map of names
-      mesh.subdomain_name(static_cast<subdomain_id_type>(subdomain_id)) =
-        exio_helper->get_block_name(i);
+      std::string subdomain_name = exio_helper->get_block_name(i);
+      if (!subdomain_name.empty())
+        mesh.subdomain_name(static_cast<subdomain_id_type>(subdomain_id)) = subdomain_name;
 
       // Set any relevant node/edge maps for this element
       const std::string type_str (exio_helper->get_elem_type());
@@ -219,8 +219,9 @@ void ExodusII_IO::read (const std::string& fname)
 	offset += (i > 0 ? exio_helper->num_sides_per_set[i-1] : 0); // Compute new offset
 	exio_helper->read_sideset (i, offset);
 
-        mesh.boundary_info->sideset_name(exio_helper->get_side_set_id(i)) =
-          exio_helper->get_side_set_name(i);
+        std::string sideset_name = exio_helper->get_side_set_name(i);
+        if (!sideset_name.empty())
+          mesh.boundary_info->sideset_name(exio_helper->get_side_set_id(i)) = sideset_name;
       }
 
     for (unsigned int e=0; e<exio_helper->elem_list.size(); e++)
@@ -246,8 +247,9 @@ void ExodusII_IO::read (const std::string& fname)
       {
         int nodeset_id = exio_helper->nodeset_ids[nodeset];
 
-        mesh.boundary_info->nodeset_name(nodeset_id) =
-          exio_helper->get_node_set_name(nodeset);
+        std::string nodeset_name = exio_helper->get_node_set_name(nodeset);
+        if (!nodeset_name.empty())
+          mesh.boundary_info->nodeset_name(nodeset_id) = nodeset_name;
 
         exio_helper->read_nodeset(nodeset);
 
@@ -915,7 +917,7 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   exio_helper->initialize_element_variables(mesh, names);
-  exio_helper->write_element_values(mesh, soln, _timestep + _timestep_offset);
+  exio_helper->write_element_values(mesh, soln, _timestep);
 }
 
 
@@ -959,7 +961,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
       for(dof_id_type i=0; i<num_nodes; i++)
         cur_soln[i] = soln[i*num_vars + c];
 
-      exio_helper->write_nodal_values(variable_name_position+1, cur_soln, _timestep + _timestep_offset);
+      exio_helper->write_nodal_values(variable_name_position+1,cur_soln,_timestep);
     }
 
   STOP_LOG("write_nodal_data()", "ExodusII_IO");
@@ -995,7 +997,7 @@ void ExodusII_IO::write_global_data (const std::vector<Number>& soln,
     }
 
   exio_helper->initialize_global_variables(names);
-  exio_helper->write_global_values(soln, _timestep + _timestep_offset);
+  exio_helper->write_global_values(soln, _timestep);
 }
 
 
@@ -1007,7 +1009,7 @@ void ExodusII_IO::write_timestep (const std::string& fname,
 {
   _timestep = timestep;
   write_equation_systems(fname,es);
-  exio_helper->write_timestep(_timestep + _timestep_offset, time);
+  exio_helper->write_timestep(timestep, time);
 }
 
 
@@ -1068,7 +1070,7 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
         for(int i=0; i<num_nodes; i++)
           cur_soln[i] = soln[i*num_vars + c];
 
-        exio_helper->write_nodal_values(c+1, cur_soln, _timestep + _timestep_offset);
+        exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
       }
 
   STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
@@ -1134,14 +1136,6 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
           libmesh_error();
         }
     }
-
-  // Prevent codes from accidentally overwriting timesteps by using an
-  // offset.  This sometimes happens when attempting to append...
-  // Note: if the file is only open on processor 0, for example when
-  // calling create, we will only compute a correct offset on
-  // processor 0: that's OK as long as that's the only processor we
-  // are actually writing from.
-  _timestep_offset = exio_helper->compute_timestep_offset(_timestep);
 }
 
 

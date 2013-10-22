@@ -5,7 +5,7 @@ data          = introduction_ex1.C run.sh
 sources       = $(data) run.sh
 
 check_SCRIPTS = run.sh
-CLEANFILES    = output.xda
+CLEANFILES    = output.xda output.xdr
 
 
 ##############################################

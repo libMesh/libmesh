@@ -10,11 +10,12 @@ CLEANFILES = primal.out.gmv.000.05 primal.out.gmv.000.04 primal.out.gmv.000.03 p
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 .linkstamp:
-	-rm -f general.in  && $(LN_S) $(srcdir)/general.in .
+	-rm -f general.in          && $(LN_S) $(srcdir)/general.in .
+	-rm -f coupled_system.in   && $(LN_S) $(srcdir)/coupled_system.in .
 	-rm -f H_channel_quads.xda && $(LN_S) $(srcdir)/H_channel_quads.xda .
 	$(AM_V_GEN)touch .linkstamp
 
-  CLEANFILES += general.in H_channel_quads.xda .linkstamp
+  CLEANFILES += general.in coupled_system.in H_channel_quads.xda .linkstamp
 endif
 
 ##############################################

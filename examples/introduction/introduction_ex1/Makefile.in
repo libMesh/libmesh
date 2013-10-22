@@ -563,7 +563,7 @@ check_SCRIPTS = run.sh
 #
 # how to make documentation
 #
-CLEANFILES = output.xda $(example_name).php stdout.log
+CLEANFILES = output.xda output.xdr $(example_name).php stdout.log
 
 ######################################################################
 #

@@ -575,7 +575,7 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = out_*.gmv $(example_name).php stdout.log
+CLEANFILES = out_*.gmv transient_ex1.e $(example_name).php stdout.log
 
 ######################################################################
 #
