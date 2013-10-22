@@ -1019,7 +1019,7 @@ void XdrIO::read (const std::string& name)
       this->read_serialized_subdomain_names(io);
 
       // read connectivity
-      this->read_serialized_connectivity (io, n_elem, type_size);
+      this->read_serialized_connectivity (io, n_elem, meta_data, type_size);
 
       // read the nodal locations
       this->read_serialized_nodes (io, n_nodes);
@@ -1035,7 +1035,7 @@ void XdrIO::read (const std::string& name)
       this->read_serialized_subdomain_names(io);
 
       // read connectivity
-      this->read_serialized_connectivity (io, n_elem, type_size);
+      this->read_serialized_connectivity (io, n_elem, meta_data, type_size);
 
       // read the nodal locations
       this->read_serialized_nodes (io, n_nodes);
@@ -1099,7 +1099,7 @@ void XdrIO::read_serialized_subdomain_names(Xdr &io)
 
 
 template <typename T>
-void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, T)
+void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std::vector<header_id_type> & sizes, T)
 {
   libmesh_assert (io.reading());
 
@@ -1122,7 +1122,9 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, T)
   int level=-1;
 
   // Version 0.9.2+ introduces unique ids
-  const bool read_unique_id = this->version().find("0.9.2") != std::string::npos && _write_unique_id ? true : false;
+  const size_t unique_id_size_index = 3;
+  const bool read_unique_id = this->version().find("0.9.2") != std::string::npos &&
+    sizes[unique_id_size_index] ? true : false;
 
   T n_elem_at_level=0, n_processed_at_level=0;
   for (std::size_t blk=0, first_elem=0, last_elem=0;
@@ -1196,8 +1198,16 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, T)
       for (dof_id_type e=first_elem; e<last_elem; e++)
 	{
 	  const ElemType elem_type        = static_cast<ElemType>(*it); ++it;
+#ifdef LIBMESH_ENABLE_AMR
           unique_id_type unique_id = 0;
-          if (read_unique_id) {unique_id  = *it; ++it;}
+#endif
+          if (read_unique_id)
+          {
+#ifdef LIBMESH_ENABLE_AMR
+            unique_id  = *it;
+#endif
+            ++it;
+          }
           const dof_id_type parent_id     = *it; ++it;
 	  const processor_id_type processor_id = *it; ++it;
 	  const subdomain_id_type subdomain_id = *it; ++it;
