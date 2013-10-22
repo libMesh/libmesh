@@ -1475,17 +1475,31 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  num_elem_vars = names.size();
-
-  if (num_elem_vars == 0)
+  // Quick return if there are no element variables to write
+  if (names.size() == 0)
     return;
 
+  // Quick return if we have already called this function
   if (_elem_vars_initialized)
     return;
+
+  // There may already be element variables in the file (for example,
+  // if we're appending) and in that case, we don't want to try to
+  // initialize them again.
+  if (num_elem_vars > 0)
+    {
+      libMesh::err << "Warning! The Exodus file already contains elemental variables, skipping element variable initialization.\n"
+                   << std::endl;
+      return;
+    }
 
   // Set the flag so we can skip this stuff on subsequent calls to
   // initialize_element_variables()
   _elem_vars_initialized = true;
+
+  // Record the number of elemental vars that will be written to file
+  // in the class variable.
+  num_elem_vars = names.size();
 
   ex_err = exII::ex_put_var_param(ex_id,
                                   "e",
