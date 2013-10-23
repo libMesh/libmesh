@@ -224,16 +224,6 @@ void H1FETransformation<OutputShape>::map_d2phi( const unsigned int dim,
                                                  std::vector<std::vector<OutputShape> >& d2phidydz,
                                                  std::vector<std::vector<OutputShape> >& d2phidz2  ) const
 {
-  libmesh_do_once(
-                  if (!elem->has_affine_map())
-                    {
-                      libMesh::err << "WARNING: Second derivatives are not currently "
-                                   << "correctly calculated on non-affine elements!"
-                                   << std::endl;
-                    }
-                  );
-
-
   switch (dim)
     {
     case 0: // No derivatives in 0D
