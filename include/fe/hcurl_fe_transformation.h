@@ -73,7 +73,6 @@ public:
    * finite element transformation.
    */
   virtual void map_d2phi( const unsigned int /*dim*/,
-                          const Elem* const /*elem*/,
                           const std::vector<Point>& /*qp*/,
                           const FEGenericBase<OutputShape>& /*fe*/,
                           std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >& /*d2phi*/,

@@ -726,7 +726,7 @@ void FEGenericBase<OutputType> ::compute_shape_functions (const Elem* elem,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   if( calculate_d2phi )
-    this->_fe_trans->map_d2phi( this->dim, elem, qp, (*this), this->d2phi,
+    this->_fe_trans->map_d2phi( this->dim, qp, (*this), this->d2phi,
                                 this->d2phidx2, this->d2phidxdy, this->d2phidxdz,
                                 this->d2phidy2, this->d2phidydz, this->d2phidz2 );
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
