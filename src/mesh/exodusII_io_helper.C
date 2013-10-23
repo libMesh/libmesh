@@ -326,7 +326,7 @@ void ExodusII_IO_Helper::read_header()
 
   EX_CHECK_ERR(ex_err, "Error retrieving header info.");
 
-  num_time_steps = inquire(exII::EX_INQ_TIME, "Error retrieving time steps");
+  this->read_num_time_steps();
 
   ex_err = exII::ex_get_var_param(ex_id, "n", &num_nodal_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of nodal variables.");
@@ -716,12 +716,23 @@ int ExodusII_IO_Helper::inquire(int req_info_in, std::string error_msg)
 
 void ExodusII_IO_Helper::read_time_steps()
 {
+  // Make sure we have an up-to-date count of the number of time steps in the file.
+  this->read_num_time_steps();
+
   if (num_time_steps > 0)
     {
       time_steps.resize(num_time_steps);
       ex_err = exII::ex_get_all_times(ex_id, &time_steps[0]);
       EX_CHECK_ERR(ex_err, "Error reading timesteps!");
     }
+}
+
+
+
+void ExodusII_IO_Helper::read_num_time_steps()
+{
+  num_time_steps =
+    this->inquire(exII::EX_INQ_TIME, "Error retrieving number of time steps");
 }
 
 
@@ -1464,17 +1475,31 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  num_elem_vars = names.size();
-
-  if (num_elem_vars == 0)
+  // Quick return if there are no element variables to write
+  if (names.size() == 0)
     return;
 
+  // Quick return if we have already called this function
   if (_elem_vars_initialized)
     return;
+
+  // There may already be element variables in the file (for example,
+  // if we're appending) and in that case, we don't want to try to
+  // initialize them again.
+  if (num_elem_vars > 0)
+    {
+      libMesh::err << "Warning! The Exodus file already contains elemental variables, skipping element variable initialization.\n"
+                   << std::endl;
+      return;
+    }
 
   // Set the flag so we can skip this stuff on subsequent calls to
   // initialize_element_variables()
   _elem_vars_initialized = true;
+
+  // Record the number of elemental vars that will be written to file
+  // in the class variable.
+  num_elem_vars = names.size();
 
   ex_err = exII::ex_put_var_param(ex_id,
                                   "e",

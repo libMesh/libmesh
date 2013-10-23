@@ -205,7 +205,7 @@ class XdrIO : public MeshInput<MeshBase>,
    * Read the connectivity for a parallel, distributed mesh
    */
   template <typename T>
-  void read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, T);
+  void read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std::vector<header_id_type> & sizes, T);
 
   /**
    * Read the nodal locations for a parallel, distributed mesh

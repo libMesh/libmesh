@@ -210,6 +210,12 @@ public:
   void read_time_steps();
 
   /**
+   * Reads the number of timesteps currently stored in the Exodus file
+   * and stores it in the num_time_steps variable.
+   */
+  void read_num_time_steps();
+
+  /**
    * Reads the nodal variable names and stores them in the 'nodal_var_names' array.
    */
   void read_nodal_var_names();
