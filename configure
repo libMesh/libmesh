@@ -835,6 +835,7 @@ LIBMESH_ENABLE_INFINITE_ELEMENTS_FALSE
 LIBMESH_ENABLE_INFINITE_ELEMENTS_TRUE
 enablelegacyincludepaths
 enabledefaultcommworld
+enablewarnings
 PWD
 MPCXX
 METHOD
@@ -1053,6 +1054,7 @@ enable_getpwuid
 enable_exceptions
 enable_unordered_containers
 enable_openmp
+enable_warnings
 enable_blocked_storage
 enable_default_comm_world
 enable_legacy_include_paths
@@ -1819,6 +1821,8 @@ Optional Features:
   --enable-unordered-containers
                           Use unordered_map/unordered_set if available
   --enable-openmp         Build with OpenMP Support
+  --enable-warnings       Display warnings when using deprecated or
+                          experimental codes
   --enable-blocked-storage
                           Support for blocked matrix/vector storage
   --enable-default-comm-world
@@ -26409,6 +26413,33 @@ $as_echo "---------------------------------------------" >&6; }
 
 
 # --------------------------------------------------------------
+# library warnings - enable by default
+# --------------------------------------------------------------
+# Check whether --enable-warnings was given.
+if test "${enable_warnings+set}" = set; then :
+  enableval=$enable_warnings; enablewarnings=$enableval
+else
+  enablewarnings=yes
+fi
+
+
+
+if test "$enablewarnings" != yes ; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> INFO: Disabling library warnings <<<" >&5
+$as_echo ">>> INFO: Disabling library warnings <<<" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Configuring library without warnings <<<" >&5
+$as_echo ">>> Configuring library without warnings <<<" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with warnings >>>" >&5
+$as_echo "<<< Configuring library with warnings >>>" >&6; }
+
+$as_echo "#define ENABLE_WARNINGS 1" >>confdefs.h
+
+fi
+# --------------------------------------------------------------
+
+
+# --------------------------------------------------------------
 # blocked matrix/vector storage - disabled by default.
 #   See http://sourceforge.net/mailarchive/forum.php?thread_name=B4613A7D-0033-43C7-A9DF-5A801217A097%40nasa.gov&forum_name=libmesh-devel
 # --------------------------------------------------------------
@@ -37649,6 +37680,7 @@ echo Git revision....................... : $BUILD_VERSION
 ######################################################################################
 echo
 echo Library Features:
+echo '  library warnings................. :' $enablewarnings
 echo '  adaptive mesh refinement......... :' $enableamr
 echo '  blocked matrix/vector storage.... :' $enableblockedstorage
 echo '  complex variables................ :' $enablecomplex

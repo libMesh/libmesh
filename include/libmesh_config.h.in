@@ -149,6 +149,9 @@
    support */
 #undef ENABLE_VSMOOTHER
 
+/* Flag indicating if the library should have warnings enabled */
+#undef ENABLE_WARNINGS
+
 /* Flag indicating whether the library shall be compiled to use the Trilinos
    solver collection */
 #undef HAVE_AZTECOO
