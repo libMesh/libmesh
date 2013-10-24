@@ -630,6 +630,9 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
           // certain aspects of the Helper object itself, such as the number of nodes
           // and elements.  We do that by reading the header...
           exio_helper->read_header();
+
+          // ...and reading the block info
+          exio_helper->read_block_info();
         }
       else
         {
