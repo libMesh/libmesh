@@ -8,6 +8,26 @@ AC_MSG_RESULT(---------------------------------------------)
 
 
 # --------------------------------------------------------------
+# library warnings - enable by default
+# --------------------------------------------------------------
+AC_ARG_ENABLE(warnings,
+              [AC_HELP_STRING([--enable-warnings],[Display warnings when using deprecated or experimental codes])],
+              enablewarnings=$enableval,
+              enablewarnings=yes)
+
+AC_SUBST(enablewarnings)
+if test "$enablewarnings" != yes ; then
+  AC_MSG_RESULT([>>> INFO: Disabling library warnings <<<])
+  AC_MSG_RESULT([>>> Configuring library without warnings <<<])
+else
+  AC_MSG_RESULT([<<< Configuring library with warnings >>>])
+  AC_DEFINE(ENABLE_WARNINGS, 1,
+           [Flag indicating if the library should have warnings enabled])
+fi
+# --------------------------------------------------------------
+
+
+# --------------------------------------------------------------
 # blocked matrix/vector storage - disabled by default.
 #   See http://sourceforge.net/mailarchive/forum.php?thread_name=B4613A7D-0033-43C7-A9DF-5A801217A097%40nasa.gov&forum_name=libmesh-devel
 # --------------------------------------------------------------

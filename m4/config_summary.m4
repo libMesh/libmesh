@@ -66,6 +66,7 @@ echo Git revision....................... : $BUILD_VERSION
 ######################################################################################
 echo
 echo Library Features:
+echo '  library warnings................. :' $enablewarnings
 echo '  adaptive mesh refinement......... :' $enableamr
 echo '  blocked matrix/vector storage.... :' $enableblockedstorage
 echo '  complex variables................ :' $enablecomplex

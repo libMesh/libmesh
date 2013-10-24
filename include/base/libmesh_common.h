@@ -469,18 +469,24 @@ inline Tnew libmesh_cast_int (Told oldvar)
 // The libmesh_experimental macro warns that you are using
 // bleeding-edge code
 #undef libmesh_experimental
+#ifdef LIBMESH_ENABLE_WARNINGS
 #define libmesh_experimental() \
   libmesh_do_once(libMesh::out << "*** Warning, This code is untested, experimental, or likely to see future API changes: " \
                                << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
+#else
+#define libmesh_experimental()  ((void) 0)
+#endif
 
 
 // The libmesh_deprecated macro warns that you are using obsoleted code
 #undef libmesh_deprecated
+#ifdef LIBMESH_ENABLE_WARNINGS
 #define libmesh_deprecated() \
   libmesh_do_once(libMesh::out << "*** Warning, This code is deprecated, and likely to be removed in future library versions! " \
                                << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
-
-
+#else
+#define libmesh_deprecated()  ((void) 0)
+#endif
 
 
 // 3D spatial dimension unless otherwise specified
