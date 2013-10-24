@@ -424,7 +424,7 @@ template <typename T>
 xdrproc_t xdr_translator();
 
 template <typename T>
-bool xdr_translate(XDR* x, T& a) {return (xdr_translator<T>())(x, &a); }
+bool xdr_translate(XDR* x, T& a) {return (xdr_translator<T>())(x, &a, 0); }
 
 template <>
 bool xdr_translate(XDR* x, std::string& s) {
