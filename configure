@@ -5344,6 +5344,11 @@ $as_echo "<<< C++ compiler is Intel Itanium ICC 7.0 >>>" >&6; }
           if test "x$is_intel_icc" != "x" ; then
             GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
             case "$GXX_VERSION_STRING" in
+              *14.*)
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 14 >>>" >&5
+$as_echo "<<< C++ compiler is Intel(R) icc 14 >>>" >&6; }
+                GXX_VERSION=intel_icc_v14.x
+                ;;
               *13.*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 13 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 13 >>>" >&6; }
@@ -6695,7 +6700,7 @@ fi
         case "$GXX_VERSION" in
 
           # Intel ICC >= v11.x
- 	  intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x)
+ 	  intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x | intel_icc_v14.x)
               # Disable some warning messages:
               # #175: 'subscript out of range'
               #       FIN-S application code causes many false
