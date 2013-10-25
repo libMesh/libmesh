@@ -605,6 +605,7 @@ dvidir = @dvidir@
 enabledefaultcommworld = @enabledefaultcommworld@
 enablelegacyincludepaths = @enablelegacyincludepaths@
 enablepetsc = @enablepetsc@
+enablewarnings = @enablewarnings@
 exec_prefix = @exec_prefix@
 gitquery = @gitquery@
 have_gcov = @have_gcov@
