@@ -1,20 +1,8 @@
 bib_files := $(wildcard *.bib)
 
-libmesh_refs: libmesh_refs.tex libmesh.bib
+libmesh_refs: libmesh_refs.tex $(bib_files)
 	pdflatex libmesh_refs.tex
-	bibtex libmesh
-	bibtex theses
-	bibtex preprints
-	bibtex thirteen
-	bibtex twelve
-	bibtex eleven
-	bibtex ten
-	bibtex nine
-	bibtex eight
-	bibtex seven
-	bibtex six
-	bibtex five
-	bibtex four
+	bibtex libmesh_refs
 	pdflatex libmesh_refs.tex
 	pdflatex libmesh_refs.tex
 
