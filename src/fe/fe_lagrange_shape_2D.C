@@ -633,7 +633,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 		  // d^2() / dxi deta
 		case 1:
 		  return (FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i0[i], 0, xi)*
-			  FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i1[1], 0, eta));
+			  FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i1[i], 0, eta));
 
 		  // d^2() / deta^2
 		case 2:
