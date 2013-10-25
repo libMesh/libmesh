@@ -58,6 +58,32 @@ public:
         g->init();
     }
 
+  DirichletBoundary(const std::set<boundary_id_type> &b_in,
+                    const std::vector<unsigned int>& variables_in,
+                    const FunctionBase<Number> &f_in) :
+    b(b_in),
+    variables(variables_in),
+    f(f_in.clone()),
+    g(AutoPtr<FunctionBase<Gradient> >(NULL))
+    {
+      f->init();
+    }
+
+
+  DirichletBoundary(const std::set<boundary_id_type> &b_in,
+                    const std::vector<unsigned int>& variables_in,
+                    const FunctionBase<Number> &f_in,
+                    const FunctionBase<Gradient> &g_in) :
+    b(b_in),
+    variables(variables_in),
+    f(f_in.clone()),
+    g(g_in.clone())
+    {
+      f->init();
+      g->init();
+    }
+
+
   DirichletBoundary (const DirichletBoundary &dirichlet_in) :
     b(dirichlet_in.b),
     variables(dirichlet_in.variables),
