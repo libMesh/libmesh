@@ -482,6 +482,8 @@ GetPot::_basic_initialization()
     _field_separator = " \t\n";
 }
 
+
+
 inline
 GetPot::GetPot() :
   prefix(),
@@ -508,6 +510,8 @@ GetPot::GetPot() :
 {
     _basic_initialization();
 }
+
+
 
 inline
 GetPot::GetPot(const int argc_, const char * const * argv_,
@@ -539,6 +543,7 @@ GetPot::GetPot(const int argc_, const char * const * argv_,
 }
 
 
+
 inline void
 GetPot::parse_command_line(const int argc_, const char * const * argv_,
                            const char* FieldSeparator /* =0x0 */)
@@ -566,6 +571,7 @@ GetPot::parse_command_line(const int argc_, const char * const * argv_,
       }
     _parse_argument_vector(_apriori_argv);
 }
+
 
 
 inline
@@ -661,6 +667,8 @@ GetPot::parse_input_file(const std::string& FileName,
     _parse_argument_vector(_apriori_argv);
 }
 
+
+
 inline
 GetPot::GetPot(const GetPot& Other) :
   prefix(Other.prefix),
@@ -701,6 +709,8 @@ GetPot::GetPot(const GetPot& Other) :
       }
 }
 
+
+
 inline
 GetPot::~GetPot()
 {
@@ -710,6 +720,8 @@ GetPot::~GetPot()
     for (; it != end; ++it)
         delete [] *it;
 }
+
+
 
 inline GetPot&
 GetPot::operator=(const GetPot& Other)
@@ -766,6 +778,7 @@ GetPot::operator=(const GetPot& Other)
 }
 
 
+
 inline void
 GetPot::absorb(const GetPot& Other)
 {
@@ -795,6 +808,8 @@ GetPot::absorb(const GetPot& Other)
 
 }
 
+
+
 inline void
 GetPot::clear_requests()
 {
@@ -805,6 +820,8 @@ GetPot::clear_requests()
     _requested_variables.clear();
     _requested_sections.clear();
 }
+
+
 
 inline void
 GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
@@ -908,6 +925,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 }
 
 
+
 inline STRING_VECTOR
 GetPot::_read_in_file(const std::string& FileName)
 {
@@ -921,6 +939,8 @@ GetPot::_read_in_file(const std::string& FileName)
     // argv[0] == the filename of the file that was read in
     return _read_in_stream(i);
 }
+
+
 
 inline STRING_VECTOR
 GetPot::_read_in_stream(std::istream& istr)
@@ -992,6 +1012,8 @@ GetPot::_read_in_stream(std::istream& istr)
     return arglist;
 }
 
+
+
 inline void
 GetPot::_skip_whitespace(std::istream& istr)
 {
@@ -1052,6 +1074,8 @@ GetPot::_skip_whitespace(std::istream& istr)
     istr.unget();
 }
 
+
+
 inline const std::string
 GetPot::_get_next_token(std::istream& istr)
 {
@@ -1107,6 +1131,8 @@ GetPot::_get_next_token(std::istream& istr)
       }
 }
 
+
+
 inline const std::string
 GetPot::_get_string(std::istream& istr)
 {
@@ -1130,6 +1156,8 @@ GetPot::_get_string(std::istream& istr)
       str += getpot_cast_int<char>(tmp);
     }
 }
+
+
 
 inline const std::string
 GetPot::_get_until_closing_bracket(std::istream& istr)
@@ -1163,6 +1191,7 @@ GetPot::_get_until_closing_bracket(std::istream& istr)
 }
 
 
+
 inline const std::string
 GetPot::_get_until_closing_square_bracket(std::istream& istr)
 {
@@ -1189,6 +1218,8 @@ GetPot::_get_until_closing_square_bracket(std::istream& istr)
 	str += getpot_cast_int<char>(tmp);
       }
 }
+
+
 
 inline std::string
 GetPot::_process_section_label(const std::string& Section,
@@ -1243,6 +1274,8 @@ GetPot::_process_section_label(const std::string& Section,
     return section_label;
 }
 
+
+
 // Use C++ istream/ostream to handle most type conversions.
 template <typename T>
 inline T
@@ -1256,6 +1289,8 @@ GetPot::_convert_to_type(const std::string& String, const T& Default) const
   return retval;
 }
 
+
+
 // copy string - operator>> would have stopped upon seeing whitespace!
 template <>
 inline std::string
@@ -1264,12 +1299,16 @@ GetPot::_convert_to_type(const std::string& String, const std::string&) const
   return String;
 }
 
+
+
 // copy string
 inline std::string
 GetPot::_convert_to_type(const std::string& String, const char*) const
 {
   return String;
 }
+
+
 
 // be more liberal than std C++ in what we interpret as a boolean
 template<>
@@ -1302,6 +1341,8 @@ GetPot::_convert_to_type<bool>(const std::string& String, const bool& Default) c
   return retval;
 }
 
+
+
 // Use C++ istream/ostream to handle most type conversions.
 template <typename T>
 inline T
@@ -1319,6 +1360,8 @@ GetPot::_convert_to_type_no_default(const char* VarName, const std::string& Stri
   return retval;
 }
 
+
+
 // copy string - operator>> would have stopped upon seeing whitespace!
 template <>
 inline std::string
@@ -1327,12 +1370,16 @@ GetPot::_convert_to_type_no_default(const char*, const std::string& String, cons
     return String;
 }
 
+
+
 // copy string
 inline std::string
 GetPot::_convert_to_type_no_default(const char*, const std::string& String, const char*) const
 {
     return String;
 }
+
+
 
 // be more liberal than std C++ in what we interpret as a boolean
 template<>
@@ -1369,6 +1416,8 @@ GetPot::_convert_to_type_no_default<bool>(const char* VarName, const std::string
   return retval;
 }
 
+
+
 inline const char*
 GetPot::_internal_managed_copy(const std::string& Arg) const
 {
@@ -1392,6 +1441,8 @@ GetPot::_internal_managed_copy(const std::string& Arg) const
     return newcopy;
 }
 
+
+
 //////////////////////////////////////////////////////////////////////////////
 // (*) cursor oriented functions
 //.............................................................................
@@ -1412,12 +1463,16 @@ GetPot::_get_remaining_string(const std::string& String, const std::string& Star
       return "";
 }
 
+
+
 //     -- search for a certain argument and set cursor to position
 inline bool
 GetPot::search(const std::string &Option)
 {
   return search(Option.c_str());
 }
+
+
 
 //     -- search for a certain argument and set cursor to position
 inline bool
@@ -1460,6 +1515,7 @@ GetPot::search(const char* Option)
     // in case nothing is found the cursor stays where it was
     return false;
 }
+
 
 
 inline bool
@@ -1506,12 +1562,16 @@ GetPot::search(unsigned No, const char* P, ...)
     return false;
 }
 
+
+
 inline void
 GetPot::reset_cursor()
 {
   search_failed_f = false;
   cursor = 0;
 }
+
+
 
 inline void
 GetPot::init_multiple_occurrence()
@@ -1532,6 +1592,8 @@ GetPot::operator[](unsigned idx) const
   return idx<argv.size() ? argv[idx].c_str() : 0;
 }
 
+
+
 template <typename T>
 inline T
 GetPot::get(unsigned int Idx, const T& Default) const
@@ -1541,6 +1603,8 @@ GetPot::get(unsigned int Idx, const T& Default) const
     return _convert_to_type(argv[Idx], Default);
 }
 
+
+
 inline const char*
 GetPot::get(unsigned int Idx, const char* Default) const
 {
@@ -1549,11 +1613,14 @@ GetPot::get(unsigned int Idx, const char* Default) const
     return argv[Idx].c_str();
 }
 
+
+
 inline unsigned
 GetPot::size() const
 {
   return getpot_cast_int<unsigned>(argv.size());
 }
+
 
 
 //     -- next() function group
@@ -1578,11 +1645,15 @@ GetPot::next(const T& Default)
     return Remain != "" ? _convert_to_type(Remain, Default) : Default;
 }
 
+
+
 inline const char*
 GetPot::next(const char* Default)
 {
   return _internal_managed_copy(next(std::string(Default)));
 }
+
+
 
 //     -- follow() function group
 //        distinct option to be searched for
@@ -1597,11 +1668,15 @@ GetPot::follow(const T& Default, const char* Option)
     return next(Default);
 }
 
+
+
 inline const char*
 GetPot::follow(const char* Default, const char* Option)
 {
     return _internal_managed_copy(follow(std::string(Default), Option));
 }
+
+
 
 //     -- second follow() function group
 //        multiple option to be searched for
@@ -1631,6 +1706,8 @@ GetPot::follow(const T& Default, unsigned int No, const char* P, ...)
     return Default;
 }
 
+
+
 inline const char*
 GetPot::follow(const char* Default, unsigned No, const char* P, ...)
 {
@@ -1656,6 +1733,8 @@ GetPot::follow(const char* Default, unsigned No, const char* P, ...)
     return Default;
 }
 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // (*) directly connected options
 //.............................................................................
@@ -1677,11 +1756,15 @@ GetPot::direct_follow(const T& Default, const char* Option)
     return _convert_to_type(FollowStr, Default);
 }
 
+
+
 inline const char*
 GetPot::direct_follow(const char* Default, const char* Option)
 {
     return _internal_managed_copy(direct_follow(std::string(Default), Option));
 }
+
+
 
 inline const char*
 GetPot::_match_starting_string(const char* StartString)
@@ -1745,6 +1828,8 @@ GetPot::options_contain(const char* FlagList) const
     return false;
 }
 
+
+
 inline bool
 GetPot::argument_contains(unsigned Idx, const char* FlagList) const
 {
@@ -1778,6 +1863,8 @@ GetPot::argument_contains(unsigned Idx, const char* FlagList) const
     return false;
 }
 
+
+
 inline bool
 GetPot::_check_flags(const std::string& Str, const char* FlagList) const
 {
@@ -1786,6 +1873,8 @@ GetPot::_check_flags(const std::string& Str, const char* FlagList) const
           return true; // found something
     return false;
 }
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // (*) nominus arguments
@@ -1807,6 +1896,8 @@ GetPot::nominus_vector() const
     return nv;
 }
 
+
+
 inline const char*
 GetPot::next_nominus()
 {
@@ -1822,6 +1913,8 @@ GetPot::next_nominus()
 
     return 0;
 }
+
+
 
 inline void
 GetPot::reset_nominus_cursor()
@@ -1846,11 +1939,15 @@ GetPot::have_variable(const char* VarName) const
     return true;
 }
 
+
+
 inline bool
 GetPot::have_variable(const std::string& VarName) const
 {
     return have_variable(VarName.c_str());
 }
+
+
 
 template <typename T>
 inline T
@@ -1865,6 +1962,8 @@ GetPot::operator()(const char* VarName, const T& Default) const
     return _convert_to_type(sv->original, Default);
 }
 
+
+
 template <typename T>
 inline T
 GetPot::operator()(const std::string& VarName, const T& Default) const
@@ -1872,17 +1971,23 @@ GetPot::operator()(const std::string& VarName, const T& Default) const
     return operator()(VarName.c_str(), Default);
 }
 
+
+
 inline const char*
 GetPot::operator()(const char* VarName, const char* Default) const
 {
   return _internal_managed_copy(operator()(VarName, std::string(Default)));
 }
 
+
+
 inline const char*
 GetPot::operator()(const std::string& VarName, const char* Default) const
 {
   return operator()(VarName.c_str(), Default);
 }
+
+
 
 template <typename T>
 inline T
@@ -1899,6 +2004,8 @@ GetPot::operator()(const char* VarName, const T& Default, unsigned int Idx) cons
     return _convert_to_type(*element, Default);
 }
 
+
+
 template <typename T>
 inline T
 GetPot::operator()(const std::string& VarName, const T& Default, unsigned int Idx) const
@@ -1906,17 +2013,23 @@ GetPot::operator()(const std::string& VarName, const T& Default, unsigned int Id
     return operator()(VarName.c_str(), Default, Idx);
 }
 
+
+
 inline const char*
 GetPot::operator()(const char* VarName, const char* Default, unsigned int Idx) const
 {
     return _internal_managed_copy(operator()(VarName, std::string(Default), Idx));
 }
 
+
+
 inline const char*
 GetPot::operator()(const std::string& VarName, const char* Default, unsigned int Idx) const
 {
     return operator()(VarName.c_str(), Default, Idx);
 }
+
+
 
 template <typename T>
 inline T
@@ -1932,6 +2045,8 @@ GetPot::get_value_no_default(const char* VarName, const T& Default) const
     return _convert_to_type_no_default(VarName, sv->original, Default);
 }
 
+
+
 template <typename T>
 inline T
 GetPot::get_value_no_default(const std::string& VarName, const T& Default) const
@@ -1939,17 +2054,23 @@ GetPot::get_value_no_default(const std::string& VarName, const T& Default) const
     return get_value_no_default(VarName.c_str(),Default);
 }
 
+
+
 inline const char*
 GetPot::get_value_no_default(const char* VarName, const char* Default) const
 {
     return _internal_managed_copy(get_value_no_default(VarName, Default));
 }
 
+
+
 inline const char*
 GetPot::get_value_no_default(const std::string& VarName, const char* Default) const
 {
     return get_value_no_default(VarName.c_str(),Default);
 }
+
+
 
 template <typename T>
 inline T
@@ -1972,6 +2093,8 @@ GetPot::get_value_no_default(const char* VarName, const T& Default, unsigned int
     return _convert_to_type_no_default(VarName, *element, Default);
 }
 
+
+
 template <typename T>
 inline T
 GetPot::get_value_no_default(const std::string& VarName, const T& Default, unsigned int Idx) const
@@ -1979,17 +2102,23 @@ GetPot::get_value_no_default(const std::string& VarName, const T& Default, unsig
   return get_value_no_default(VarName.c_str(), Default, Idx);
 }
 
+
+
 inline const char*
 GetPot::get_value_no_default(const char* VarName, const char* Default, unsigned int Idx) const
 {
     return _internal_managed_copy(get_value_no_default(VarName, std::string(Default), Idx));
 }
 
+
+
 inline const char*
 GetPot::get_value_no_default(const std::string& VarName, const char* Default, unsigned int Idx) const
 {
     return get_value_no_default(VarName.c_str(), Default, Idx);
 }
+
+
 
 inline void
 GetPot::_record_argument_request(const std::string& Name) const
@@ -2011,6 +2140,8 @@ GetPot::_record_argument_request(const std::string& Name) const
               _requested_sections.insert(*it);
 }
 
+
+
 inline void
 GetPot::_record_variable_request(const std::string& Name) const
 {
@@ -2031,6 +2162,8 @@ GetPot::_record_variable_request(const std::string& Name) const
               _requested_sections.insert(*it);
 }
 
+
+
 // (*) following functions are to be used from 'outside', after getpot has parsed its
 //     arguments => append an argument in the argument vector that reflects the addition
 inline void
@@ -2049,6 +2182,8 @@ GetPot::_set_variable(const std::string& VarName,
       }
 }
 
+
+
 template <typename T>
 inline void
 GetPot::set(const char* VarName, const T& Value, const bool Requested /* = true */)
@@ -2058,6 +2193,8 @@ GetPot::set(const char* VarName, const T& Value, const bool Requested /* = true 
   _set_variable(VarName, string_value.str().c_str(), Requested);
 }
 
+
+
 template <typename T>
 inline void
 GetPot::set(const std::string& VarName, const T& Value, const bool Requested /* = true */)
@@ -2065,17 +2202,23 @@ GetPot::set(const std::string& VarName, const T& Value, const bool Requested /* 
     set(VarName.c_str(), Value, Requested);
 }
 
+
+
 inline void
 GetPot::set(const char* VarName, const char* Value, const bool Requested /* = true */)
 {
   _set_variable(VarName, Value, Requested);
 }
 
+
+
 inline void
 GetPot::set(const std::string& VarName, const char* Value, const bool Requested /* = true */)
 {
     set(VarName.c_str(), Value, Requested);
 }
+
+
 
 inline unsigned
 GetPot::vector_variable_size(const char* VarName) const
@@ -2086,11 +2229,15 @@ GetPot::vector_variable_size(const char* VarName) const
     return (unsigned)(sv->value.size());
 }
 
+
+
 inline unsigned
 GetPot::vector_variable_size(const std::string& VarName) const
 {
     return vector_variable_size(VarName.c_str());
 }
+
+
 
 inline STRING_VECTOR
 GetPot::get_variable_names() const
@@ -2106,13 +2253,19 @@ GetPot::get_variable_names() const
     return result;
 }
 
+
+
 inline STRING_VECTOR
 GetPot::get_section_names() const
 { return section_list; }
 
+
+
 inline std::set<std::string>
 GetPot::get_overridden_variables() const
 { return overridden_vars; }
+
+
 
 inline const GetPot::variable*
 GetPot::_find_variable(const char* VarName) const
@@ -2128,6 +2281,8 @@ GetPot::_find_variable(const char* VarName) const
     return 0;
 }
 
+
+
 inline const GetPot::variable*
 GetPot::_request_variable(const char* VarName) const
 {
@@ -2136,6 +2291,8 @@ GetPot::_request_variable(const char* VarName) const
 
     return this->_find_variable(VarName);
 }
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // (*) ouput (basically for debugging reasons
@@ -2152,12 +2309,13 @@ GetPot::print(std::ostream &out_stream) const
     return 1;
 }
 
+
+
 // PECOS/HPCT Addition - add option to prepend output with a delimiter
 // while also disabling argc print and skipping first print (the name
 // of the input file)
 //
 // PECOS Development Team: (ks. 4/16/09)
-
 inline int
 GetPot::print(const char* custom_prefix, std::ostream &out_stream, unsigned int skip_count) const
 {
@@ -2171,6 +2329,7 @@ GetPot::print(const char* custom_prefix, std::ostream &out_stream, unsigned int 
     out_stream << std::endl;
     return 1;
 }
+
 
 
 // (*) dollar bracket expressions (DBEs) ------------------------------------
@@ -2251,6 +2410,8 @@ GetPot::_DBE_expand_string(const std::string& str)
       }
     return new_string;
 }
+
+
 
 inline STRING_VECTOR
 GetPot::_DBE_get_expr_list(const std::string& str_, const unsigned ExpectedNumber)
@@ -2341,6 +2502,8 @@ GetPot::_DBE_get_expr_list(const std::string& str_, const unsigned ExpectedNumbe
     return expr_list;
 }
 
+
+
 inline const GetPot::variable*
 GetPot::_DBE_get_variable(const std::string& VarName)
 {
@@ -2372,6 +2535,8 @@ GetPot::_DBE_get_variable(const std::string& VarName)
     ev.original += VarName + "' undefined>>";
     return &ev;
 }
+
+
 
 inline std::string
 GetPot::_DBE_expand(const std::string& expr)
@@ -2834,6 +2999,7 @@ GetPot::_DBE_expand(const std::string& expr)
 }
 
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // (*) unidentified flying objects
 //.............................................................................
@@ -2848,6 +3014,8 @@ GetPot::_search_string_vector(const STRING_VECTOR& VecStr, const std::string& St
     }
   return false;
 }
+
+
 
 inline STRING_VECTOR
 GetPot::unidentified_arguments(unsigned Number,
@@ -2869,11 +3037,15 @@ GetPot::unidentified_arguments(unsigned Number,
     return unidentified_arguments(known_arguments);
 }
 
+
+
 inline STRING_VECTOR
 GetPot::unidentified_arguments() const
 {
   return unidentified_arguments(_requested_arguments);
 }
+
+
 
 inline STRING_VECTOR
 GetPot::unidentified_arguments(const std::vector<std::string>& Knowns) const
@@ -2882,6 +3054,8 @@ GetPot::unidentified_arguments(const std::vector<std::string>& Knowns) const
     // backwards compatibility.
     return unidentified_arguments(std::set<std::string> (Knowns.begin(), Knowns.end()));
 }
+
+
 
 inline STRING_VECTOR
 GetPot::unidentified_arguments(const std::set<std::string>& Knowns) const
@@ -2903,6 +3077,8 @@ GetPot::unidentified_arguments(const std::set<std::string>& Knowns) const
     return ufos;
 }
 
+
+
 inline STRING_VECTOR
 GetPot::unidentified_options(unsigned Number,
 			     const char* KnownOption1, ...) const
@@ -2923,6 +3099,8 @@ GetPot::unidentified_options(unsigned Number,
     return unidentified_options(known_options);
 }
 
+
+
 inline STRING_VECTOR
 GetPot::unidentified_options() const
 {
@@ -2935,6 +3113,8 @@ GetPot::unidentified_options() const
     return unidentified_arguments(_requested_arguments);
 }
 
+
+
 inline STRING_VECTOR
 GetPot::unidentified_options(const std::vector<std::string>& Knowns) const
 {
@@ -2942,6 +3122,8 @@ GetPot::unidentified_options(const std::vector<std::string>& Knowns) const
     // backwards compatibility.
     return unidentified_options(std::set<std::string> (Knowns.begin(), Knowns.end()));
 }
+
+
 
 inline STRING_VECTOR
 GetPot::unidentified_options(const std::set<std::string>& Knowns) const
@@ -2966,6 +3148,8 @@ GetPot::unidentified_options(const std::set<std::string>& Knowns) const
 
     return ufos;
 }
+
+
 
 inline std::string
 GetPot::unidentified_flags(const char* KnownFlagList, int ArgumentNumber=-1) const
@@ -3033,6 +3217,8 @@ GetPot::unidentified_flags(const char* KnownFlagList, int ArgumentNumber=-1) con
     return ufos;
 }
 
+
+
 inline STRING_VECTOR
 GetPot::unidentified_variables(unsigned Number,
 			       const char* KnownVariable1, ...) const
@@ -3053,6 +3239,8 @@ GetPot::unidentified_variables(unsigned Number,
     return unidentified_variables(known_variables);
 }
 
+
+
 inline STRING_VECTOR
 GetPot::unidentified_variables(const std::vector<std::string>& Knowns) const
 {
@@ -3060,6 +3248,8 @@ GetPot::unidentified_variables(const std::vector<std::string>& Knowns) const
     // backwards compatibility.
     return unidentified_variables(std::set<std::string> (Knowns.begin(), Knowns.end()));
 }
+
+
 
 inline STRING_VECTOR
 GetPot::unidentified_variables(const std::set<std::string>& Knowns) const
@@ -3080,11 +3270,14 @@ GetPot::unidentified_variables(const std::set<std::string>& Knowns) const
     return ufos;
 }
 
+
+
 inline STRING_VECTOR
 GetPot::unidentified_variables() const
 {
   return unidentified_variables(_requested_variables);
 }
+
 
 
 inline STRING_VECTOR
@@ -3117,11 +3310,15 @@ GetPot::unidentified_sections(unsigned Number,
     return unidentified_sections(known_sections);
 }
 
+
+
 inline STRING_VECTOR
 GetPot::unidentified_sections() const
 {
   return unidentified_sections(_requested_sections);
 }
+
+
 
 inline STRING_VECTOR
 GetPot::unidentified_sections(const std::vector<std::string>& Knowns) const
@@ -3130,6 +3327,8 @@ GetPot::unidentified_sections(const std::vector<std::string>& Knowns) const
     // backwards compatibility.
     return unidentified_sections(std::set<std::string> (Knowns.begin(), Knowns.end()));
 }
+
+
 
 inline STRING_VECTOR
 GetPot::unidentified_sections(const std::set<std::string>& Knowns) const
@@ -3150,6 +3349,7 @@ GetPot::unidentified_sections(const std::set<std::string>& Knowns) const
 
     return ufos;
 }
+
 
 
 inline STRING_VECTOR
@@ -3176,6 +3376,8 @@ GetPot::unidentified_nominuses(unsigned Number, const char* Known, ...) const
     return unidentified_nominuses(known_nominuses);
 }
 
+
+
 inline STRING_VECTOR
 GetPot::unidentified_nominuses() const
 {
@@ -3189,6 +3391,8 @@ GetPot::unidentified_nominuses() const
     return unidentified_nominuses(_requested_arguments);
 }
 
+
+
 inline STRING_VECTOR
 GetPot::unidentified_nominuses(const std::vector<std::string>& Knowns) const
 {
@@ -3196,6 +3400,8 @@ GetPot::unidentified_nominuses(const std::vector<std::string>& Knowns) const
     // backwards compatibility.
     return unidentified_nominuses(std::set<std::string> (Knowns.begin(), Knowns.end()));
 }
+
+
 
 inline STRING_VECTOR
 GetPot::unidentified_nominuses(const std::set<std::string>& Knowns) const
@@ -3243,6 +3449,7 @@ GetPot::unidentified_nominuses(const std::set<std::string>& Knowns) const
 }
 
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // (*) variable class
 //.............................................................................
@@ -3253,6 +3460,8 @@ GetPot::variable::variable()
    value(),
    original()
 {}
+
+
 
 inline
 GetPot::variable::variable(const variable& Other)
@@ -3265,6 +3474,7 @@ GetPot::variable::variable(const variable& Other)
 }
 
 
+
 inline
 GetPot::variable::variable(const char* Name, const char* Value, const char* FieldSeparator)
     : name(Name)
@@ -3272,6 +3482,8 @@ GetPot::variable::variable(const char* Name, const char* Value, const char* Fiel
     // make a copy of the 'Value'
     take(Value, FieldSeparator);
 }
+
+
 
 inline const std::string*
 GetPot::variable::get_element(unsigned Idx) const
@@ -3281,6 +3493,8 @@ GetPot::variable::get_element(unsigned Idx) const
   else
     return &(value[Idx]);
 }
+
+
 
 inline void
 GetPot::variable::take(const char* Value, const char* FieldSeparator)
@@ -3340,6 +3554,8 @@ GetPot::variable::take(const char* Value, const char* FieldSeparator)
 inline
 GetPot::variable::~variable()
 {}
+
+
 
 inline GetPot::variable&
 GetPot::variable::operator=(const GetPot::variable& Other)
