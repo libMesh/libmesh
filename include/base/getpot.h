@@ -549,10 +549,10 @@ GetPot::GetPot(const int argc_, const char * const * argv_,
 
 
 
+// leave 'char**' non-const to honor less capable compilers ...
 inline void
 GetPot::parse_command_line(const int argc_, const char * const * argv_,
                            const char* FieldSeparator /* =0x0 */)
-// leave 'char**' non-const to honor less capable compilers ...
 {
   _basic_initialization();
 
@@ -1448,10 +1448,11 @@ GetPot::_internal_managed_copy(const std::string& Arg) const
 //////////////////////////////////////////////////////////////////////////////
 // (*) cursor oriented functions
 //.............................................................................
-inline const std::string
-GetPot::_get_remaining_string(const std::string& String, const std::string& Start) const
+
 // Checks if 'String' begins with 'Start' and returns the remaining String.
 // Returns None if String does not begin with Start.
+inline const std::string
+GetPot::_get_remaining_string(const std::string& String, const std::string& Start) const
 {
   if (Start == "")
     return String;
@@ -1768,11 +1769,11 @@ GetPot::direct_follow(const char* Default, const char* Option)
 
 
 
-inline const char*
-GetPot::_match_starting_string(const char* StartString)
 // pointer  to the place where the string after
 //          the match inside the found argument starts.
 // 0        no argument matches the starting string.
+inline const char*
+GetPot::_match_starting_string(const char* StartString)
 {
   const unsigned N =
     getpot_cast_int<unsigned>(strlen(StartString));
@@ -1882,9 +1883,10 @@ GetPot::_check_flags(const std::string& Str, const char* FlagList) const
 
 ///////////////////////////////////////////////////////////////////////////////
 // (*) nominus arguments
+
+// return vector of nominus arguments
 inline STRING_VECTOR
 GetPot::nominus_vector() const
-// return vector of nominus arguments
 {
   STRING_VECTOR nv;
   std::vector<unsigned>::const_iterator it = idx_nominus.begin();
@@ -3159,12 +3161,12 @@ GetPot::unidentified_options(const std::set<std::string>& Knowns) const
 
 
 
-inline std::string
-GetPot::unidentified_flags(const char* KnownFlagList, int ArgumentNumber=-1) const
 // Two modes:
 //  ArgumentNumber >= 0 check specific argument
 //  ArgumentNumber == -1 check all options starting with one '-'
 //                       for flags
+inline std::string
+GetPot::unidentified_flags(const char* KnownFlagList, int ArgumentNumber=-1) const
 {
   std::string         ufos;
   STRING_VECTOR known_arguments;
