@@ -558,8 +558,7 @@ GetPot::parse_command_line(const int argc_, const char * const * argv_,
     //    in many functions. Also the user will be able to retrieve
     //    the name of his application or input file by "get[0]"
     _apriori_argv.push_back(std::string(argv_[0]));
-    int i=1;
-    for(; i<argc_; i++) {
+    for(int i=1; i<argc_; i++) {
 	std::string tmp(argv_[i]);   // recall the problem with temporaries,
 	_apriori_argv.push_back(tmp);       // reference counting in arguement lists ...
     }
@@ -981,8 +980,7 @@ GetPot::_skip_whitespace(std::istream& istr)
 	}
 
 	// -- look if characters match the comment starter string
-	unsigned    i=0;
-	for(; i<_comment_start.length() ; i++) {
+	for(unsigned i=0; i<_comment_start.length() ; i++) {
 	    if( tmp != _comment_start[i] ) {
 		// -- one step more backwards, since 'tmp' already at non-whitespace
 		istr.unget();
@@ -1351,15 +1349,14 @@ GetPot::search(const char* Option)
     search_failed_f = true;
 
     // (*) first loop from cursor position until end
-    unsigned  c = cursor;
-    for(; c < argv.size(); c++) {
+    for(unsigned c = cursor; c < argv.size(); c++) {
 	if( argv[c] == SearchTerm )
 	{ cursor = c; search_failed_f = false; return true; }
     }
     if( ! search_loop_f ) return false;
 
     // (*) second loop from 0 to old cursor position
-    for(c = 1; c < OldCursor; c++) {
+    for(unsigned c = 1; c < OldCursor; c++) {
 	if( argv[c] == SearchTerm )
 	{ cursor = c; search_failed_f = false; return true; }
     }
@@ -1494,8 +1491,7 @@ GetPot::follow(const T& Default, unsigned int No, const char* P, ...)
 
     va_list ap;
     va_start(ap, P);
-    unsigned i=1;
-    for(; i<No; i++) {
+    for(unsigned i=1; i<No; i++) {
 	char* Opt = va_arg(ap, char *);
 	if( search(Opt) == true ) {
 	    va_end(ap);
@@ -1515,8 +1511,7 @@ GetPot::follow(const char* Default, unsigned No, const char* P, ...)
 
     va_list ap;
     va_start(ap, P);
-    unsigned i=1;
-    for(; i<No; i++) {
+    for(unsigned i=1; i<No; i++) {
 	char* Opt = va_arg(ap, char *);
 	if( search(Opt) == true ) {
 	    va_end(ap);
@@ -1567,8 +1562,7 @@ GetPot::_match_starting_string(const char* StartString)
     search_failed_f = true;
 
     // (*) first loop from cursor position until end
-    unsigned c = cursor;
-    for(; c < argv.size(); c++) {
+    for(unsigned c = cursor; c < argv.size(); c++) {
 	if( strncmp(StartString, argv[c].c_str(), N) == 0)
 	{ cursor = c; search_failed_f = false; return &(argv[c].c_str()[N]); }
     }
@@ -1576,7 +1570,7 @@ GetPot::_match_starting_string(const char* StartString)
     if( ! search_loop_f ) return NULL;
 
     // (*) second loop from 0 to old cursor position
-    for(c = 1; c < OldCursor; c++) {
+    for(unsigned c = 1; c < OldCursor; c++) {
 	if( strncmp(StartString, argv[c].c_str(), N) == 0)
 	{ cursor = c; search_failed_f = false; return &(argv[c].c_str()[N]); }
     }
@@ -1619,8 +1613,7 @@ GetPot::argument_contains(unsigned Idx, const char* FlagList) const
     //   inside the 'namespace'
     // => only check list of arguments that start with prefix
     unsigned no_matches = 0;
-    unsigned i=0;
-    for(; i<argv.size(); i++) {
+    for(unsigned i=0; i<argv.size(); i++) {
 	const std::string Remain = _get_remaining_string(argv[i], prefix);
 	if( Remain != "") {
 	    no_matches += 1;
@@ -1635,8 +1628,7 @@ GetPot::argument_contains(unsigned Idx, const char* FlagList) const
 inline bool
 GetPot::_check_flags(const std::string& Str, const char* FlagList) const
 {
-    const char* p=FlagList;
-    for(; *p != '\0' ; p++)
+    for(const char* p=FlagList; *p != '\0' ; p++)
 	if( Str.find(*p) != std::string::npos ) return true; // found something
     return false;
 }
@@ -2053,8 +2045,7 @@ GetPot::_DBE_expand_string(const std::string& str)
     std::string   new_string = "";
     unsigned open_brackets = 0;
     unsigned first = 0;
-    unsigned i = 0;
-    for(;  i<str.size(); i++) {
+    for(unsigned i = 0;  i<str.size(); i++) {
 	if( i < str.size() - 2 && str.substr(i, 2) == "${" ) {
 	    if( open_brackets == 0 ) first = i+2;
 	    open_brackets++;
@@ -2539,8 +2530,7 @@ GetPot::_DBE_expand(const std::string& expr)
 		return "<<2nd index out of range>>";
 
 	    std::string result = *(Var->get_element(begin));
-	    int i = begin+1;
-	    for(; i < end; i++)
+	    for(int i = begin+1; i < end; i++)
 		result += std::string(" ") + *(Var->get_element(i));
 	    return result;
 	}
@@ -2585,8 +2575,7 @@ GetPot::unidentified_arguments(unsigned Number,
     va_list ap;
     va_start(ap, KnownArgument1);
     known_arguments.insert(std::string(KnownArgument1));
-    unsigned i=1;
-    for(; i<Number; i++)
+    for(unsigned i=1; i<Number; i++)
 	known_arguments.insert(std::string(va_arg(ap, char *)));
     va_end(ap);
 
@@ -2635,8 +2624,7 @@ GetPot::unidentified_options(unsigned Number,
     va_list ap;
     va_start(ap, KnownOption1);
     known_options.insert(std::string(KnownOption1));
-    unsigned i=1;
-    for(; i<Number; i++)
+    for(unsigned i=1; i<Number; i++)
 	known_options.insert(std::string(va_arg(ap, char *)));
     va_end(ap);
 
@@ -2720,8 +2708,7 @@ GetPot::unidentified_flags(const char* KnownFlagList, int ArgumentNumber=-1) con
     else {
 	// -- only check arguments that start with prefix
 	int no_matches = 0;
-	unsigned i=1;
-	for(; i<argv.size(); i++) {
+	for(unsigned i=1; i<argv.size(); i++) {
 	    const std::string Remain = _get_remaining_string(argv[i], prefix);
 	    if( Remain != "") {
 		no_matches++;
@@ -2752,8 +2739,7 @@ GetPot::unidentified_variables(unsigned Number,
     va_list ap;
     va_start(ap, KnownVariable1);
     known_variables.insert(std::string(KnownVariable1));
-    unsigned i=1;
-    for(; i<Number; i++)
+    for(unsigned i=1; i<Number; i++)
 	known_variables.insert(std::string(va_arg(ap, char *)));
     va_end(ap);
 
@@ -2802,8 +2788,7 @@ GetPot::unidentified_sections(unsigned Number,
     va_list ap;
     va_start(ap, KnownSection1);
     known_sections.insert(std::string(KnownSection1));
-    unsigned i=1;
-    for(; i<Number; i++) {
+    for(unsigned i=1; i<Number; i++) {
 	std::string tmp = std::string(va_arg(ap, char *));
 	if( tmp.length() == 0 ) continue;
 	if( tmp[tmp.length()-1] != '/' ) tmp += '/';
@@ -2856,8 +2841,7 @@ GetPot::unidentified_nominuses(unsigned Number, const char* Known, ...) const
     va_list ap;
     va_start(ap, Known);
     known_nominuses.insert(std::string(Known));
-    unsigned i=1;
-    for(; i<Number; i++) {
+    for(unsigned i=1; i<Number; i++) {
 	std::string tmp = std::string(va_arg(ap, char *));
 	if( tmp.length() == 0 ) continue;
 	known_nominuses.insert(tmp);
@@ -2907,8 +2891,7 @@ GetPot::unidentified_nominuses(const std::set<std::string>& Knowns) const
 	if( arg[0] == '[' && arg[arg.length()-1] == ']' )       continue;
 	// variable definition ? --> not a real nominus
 	bool continue_f = false;
-	unsigned i=0;
-	for(; i<arg.length() ; i++)
+	for(unsigned i=0; i<arg.length() ; i++)
 	    if( arg[i] == '=' ) { continue_f = true; break; }
 	if( continue_f )                                        continue;
 
