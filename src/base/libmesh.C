@@ -381,13 +381,23 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
           if ((libMesh::n_threads() > 1) &&
               (mpi_thread_provided < MPI_THREAD_FUNNELED))
             {
-              std::cerr << "Warning: MPI failed to provide MPI_THREAD_FUNNELED.\n" <<
-                           "Now running single-threaded to be safe." <<
+              std::cerr << "Warning: MPI failed to guarantee MPI_THREAD_FUNNELED\n" << 
+                           "for a threaded run.\n" <<
+                           "Be sure your library is thread-safe..." <<
                            std::endl;
 
-              libMesh::libMeshPrivateData::_n_threads = 1;
+              // Ideally, if an MPI stack tells us it's unsafe for us
+              // to use threads, we shouldn't use threads.
+              // In practice, we've encountered one MPI stack (an
+              // mvapich2 configuration) that returned
+              // MPI_THREAD_SINGLE as a proper warning, two stacks
+              // that handle MPI_THREAD_FUNNELED properly, and two
+              // current stacks plus a couple old stacks that return
+              // MPI_THREAD_SINGLE but support libMesh threaded runs
+              // anyway.
 
-              task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
+              // libMesh::libMeshPrivateData::_n_threads = 1;
+              // task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
             }
 #else
           if (libMesh::libMeshPrivateData::_n_threads > 1)
