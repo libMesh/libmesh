@@ -895,7 +895,7 @@ GetPot::_read_in_file(const std::string& FileName)
 {
     std::ifstream  i(FileName.c_str());
 
-    // if( ! i ) return STRING_VECTOR();
+    // if( !i ) return STRING_VECTOR();
 
     if (!i)
       libmesh_file_error(FileName);
@@ -976,7 +976,7 @@ GetPot::_skip_whitespace(std::istream& istr)
 	// -- search a non whitespace
 	while( isspace(tmp) ) {
 	    tmp = istr.get();
-	    if( ! istr ) return;
+	    if( !istr ) return;
 	}
 
 	// -- look if characters match the comment starter string
@@ -989,7 +989,7 @@ GetPot::_skip_whitespace(std::istream& istr)
 
 // RHS: Why is this here?  It breaks on empty comments
 //	    tmp = istr.get();
-//	    if( ! istr ) { istr.unget(); return; }
+//	    if( !istr ) { istr.unget(); return; }
 	}
 	// 'tmp' contains last character of _comment_starter
 
@@ -997,7 +997,7 @@ GetPot::_skip_whitespace(std::istream& istr)
 	unsigned match_no=0;
 	while(true) {
 	    tmp = istr.get();
-	    if( ! istr ) { istr.unget(); return; }
+	    if( !istr ) { istr.unget(); return; }
 
 	    if( tmp == _comment_end[match_no] ) {
 		match_no++;
@@ -1353,7 +1353,7 @@ GetPot::search(const char* Option)
 	if( argv[c] == SearchTerm )
 	{ cursor = c; search_failed_f = false; return true; }
     }
-    if( ! search_loop_f ) return false;
+    if( !search_loop_f ) return false;
 
     // (*) second loop from 0 to old cursor position
     for(unsigned c = 1; c < OldCursor; c++) {
@@ -1567,7 +1567,7 @@ GetPot::_match_starting_string(const char* StartString)
 	{ cursor = c; search_failed_f = false; return &(argv[c].c_str()[N]); }
     }
 
-    if( ! search_loop_f ) return NULL;
+    if( !search_loop_f ) return NULL;
 
     // (*) second loop from 0 to old cursor position
     for(unsigned c = 1; c < OldCursor; c++) {
@@ -1820,7 +1820,7 @@ GetPot::get_value_no_default(const std::string& VarName, const char* Default, un
 inline void
 GetPot::_record_argument_request(const std::string& Name) const
 {
-    if( ! request_recording_f ) return;
+    if( !request_recording_f ) return;
 
     // Get a lock before touching anything mutable
     SCOPED_MUTEX;
@@ -1838,7 +1838,7 @@ GetPot::_record_argument_request(const std::string& Name) const
 inline void
 GetPot::_record_variable_request(const std::string& Name) const
 {
-    if( ! request_recording_f ) return;
+    if( !request_recording_f ) return;
 
     // Get a lock before touching anything mutable
     SCOPED_MUTEX;
@@ -2075,7 +2075,7 @@ GetPot::_DBE_get_expr_list(const std::string& str_, const unsigned ExpectedNumbe
     unsigned i=0;
     // (1) eat initial whitespaces
     for(; i < str.size(); i++)
-	if( ! isspace(str[i]) ) break;
+	if( !isspace(str[i]) ) break;
 
     STRING_VECTOR   expr_list;
     unsigned         open_brackets = 0;
@@ -2091,7 +2091,7 @@ GetPot::_DBE_get_expr_list(const std::string& str_, const unsigned ExpectedNumbe
 	    expr_list.push_back(str.substr(start_new_string, i - start_new_string));
 	    bool no_breakout_f = true;
 	    for(i++; i < l ; i++) {
-		if( ! isspace(str[i]) )
+		if( !isspace(str[i]) )
 		{ no_breakout_f = false; start_new_string = i; break; }
 	    }
 	    if( no_breakout_f ) {
