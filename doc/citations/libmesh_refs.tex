@@ -1,16 +1,7 @@
 \documentclass[12pt]{article}
 \usepackage{url}
 \renewcommand{\rmdefault}{ptm} % What does it do? Somehow resets the default font...
-%\usepackage{times}
 \usepackage{helvet}
-
-% Pass option resetlabels to start each bibliography with [1]
-\usepackage{multibib}
-\newcites
-{libmesh,theses,preprints,thirteen,twelve,eleven,ten,nine,eight,seven,six,five,four}
-{LibMesh Paper,Dissertations \& Theses,Preprints,2013,2012,2011,2010,2009,2008,2007,2006,2005,2004}
-
-
 
 \title{Papers by people using LibMesh}
 \author{Various}
@@ -18,81 +9,13 @@
 \maketitle
 
 % Cite everything
-% \nocite*
+\nocite*
 
-% Cite everything from 2009
-% \cite{Barone_2009b,Blome_2009,Kirk_2009b,Class_2009,
-%       Knezevic_2009d,Lu_2009b,AufderMaur_2009b,
-%       AufderMaur_2009,Antiga_2009,Knezevic_2009,Lu_2009,
-%       Barbarosie_2009,Xu_2009,Polidori_2009,Gaston_2009b,
-%       Jones_2009,Mahadevan_2009,Gaston_2009,Luethi2009,
-%       Valli_2009,Barone_2009,Biermann_2009,Kirk_2009}
-
-% \bibliographystyle{ieeetr}
-% \bibliography{libmesh}
-
-
-% In the ieeetr format, if you specify a month and an issue number,
-% it prints only the month!
-
-% The unsrt format, on the other hand, prints both, like this:
-% International Journal of Blah, 13(4):999-1016,November 2009.
-
-% Multiple-bibliography files
-\nocitelibmesh*
-\bibliographystylelibmesh{plain}
-\bibliographylibmesh{libmesh}
-
-\nocitetheses*
-\bibliographystyletheses{plain}
-\bibliographytheses{theses}
-
-\nocitepreprints*
-\bibliographystylepreprints{plain}
-\bibliographypreprints{preprints}
-
-% Apparently these names cannot have numbers in them?
-\nocitethirteen*
-\bibliographystylethirteen{plain}
-\bibliographythirteen{thirteen}
-
-\nocitetwelve*                     % for new year, change number here
-\bibliographystyletwelve{plain}    % ... and here
-\bibliographytwelve{twelve}        % ... and here
-
-\nociteeleven*
-\bibliographystyleeleven{plain}
-\bibliographyeleven{eleven}
-
-\nociteten*
-\bibliographystyleten{plain}
-\bibliographyten{ten}
-
-\nocitenine*
-\bibliographystylenine{plain}
-\bibliographynine{nine}
-
-\nociteeight*
-\bibliographystyleeight{plain}
-\bibliographyeight{eight}
-
-\nociteseven*
-\bibliographystyleseven{plain}
-\bibliographyseven{seven}
-
-\nocitesix*
-\bibliographystylesix{plain}
-\bibliographysix{six}
-
-\nocitefive*
-\bibliographystylefive{plain}
-\bibliographyfive{five}
-
-\nocitefour*
-\bibliographystylefour{plain}
-\bibliographyfour{four}
-
-
-
+%% In the ieeetr format, if you specify a month and an issue number,
+%% it prints only the month!
+%% The unsrt format, on the other hand, prints both, like this:
+%% International Journal of Blah, 13(4):999-1016,November 2009.
+\bibliographystyle{ieeetr}
+\bibliography{libmesh,theses,preprints,fourteen,thirteen,twelve,eleven,ten,nine,eight,seven,six,five,four}
 
 \end{document}

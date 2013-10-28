@@ -1246,7 +1246,86 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
       // linear Lagrange shape functions
     case FIRST:
       {
-	return 0.;
+        switch (type)
+          {
+            // Linear tets have all second derivatives = 0
+          case TET4:
+          case TET10:
+            {
+              return 0.;
+            }
+
+            // The following elements use either tensor product or
+            // rational basis functions, and therefore probably have
+            // second derivatives, but we have not implemented them
+            // yet...
+          case PRISM6:
+          case PRISM15:
+          case PRISM18:
+          case PYRAMID5:
+            {
+              libmesh_do_once(libMesh::err << "Second derivatives not yet implemented for linear LAGRANGE FE on "
+                                           << "PRISM6, PRISM15, and PYRAMID5 elements!  Returning 0." << std::endl);
+              return 0.;
+            }
+
+            // Trilinear shape functions on HEX8s have nonzero mixed second derivatives
+          case HEX8:
+          case HEX20:
+          case HEX27:
+            {
+	      libmesh_assert_less (i, 8);
+
+	      // Compute hex shape functions as a tensor-product
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
+
+	      static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
+	      static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
+	      static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
+
+              switch (j)
+                {
+                  // All repeated second derivatives are zero on HEX8
+                case 0: // d^2()/dxi^2
+                case 2: // d^2()/deta^2
+                case 5: // d^2()/dzeta^2
+                  {
+                    return 0.;
+                  }
+
+                case 1: // d^2()/dxideta
+		  return (FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i0[i], 0, xi)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i1[i], 0, eta)*
+			  FE<1,LAGRANGE>::shape      (EDGE2, FIRST, i2[i], zeta));
+
+                case 3: // d^2()/dxidzeta
+		  return (FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i0[i], 0, xi)*
+			  FE<1,LAGRANGE>::shape      (EDGE2, FIRST, i1[i], eta)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i2[i], 0, zeta));
+
+                case 4: // d^2()/detadzeta
+		  return (FE<1,LAGRANGE>::shape      (EDGE2, FIRST, i0[i], xi)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i1[i], 0, eta)*
+			  FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i2[i], 0, zeta));
+
+                default:
+                  {
+                    // Unrecognized index
+                    libmesh_error();
+                  }
+                }
+              return 0.;
+            }
+
+          default:
+            {
+	      libMesh::err << "ERROR: Unsupported 3D element type!: " << type << std::endl;
+              libmesh_error();
+            }
+          }
+
       }
 
       // quadratic Lagrange shape functions
