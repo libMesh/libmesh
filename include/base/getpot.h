@@ -997,7 +997,7 @@ GetPot::_skip_whitespace(std::istream& istr)
 
 	// -- comment starter found -> search for comment ender
 	unsigned match_no=0;
-	while(1+1 == 2) {
+	while(true) {
 	    tmp = istr.get();
 	    if( ! istr ) { istr.unget(); return; }
 
@@ -1026,7 +1026,7 @@ GetPot::_get_next_token(std::istream& istr)
     std::string token;
     int    tmp = 0;
     int    last_letter = 0;
-    while(1+1 == 2) {
+    while(true) {
 	last_letter = tmp; tmp = istr.get();
         if( tmp == '=' )
         {
@@ -1069,7 +1069,7 @@ GetPot::_get_string(std::istream& istr)
     std::string str;
     int    tmp = 0;
     int    last_letter = 0;
-    while(1 + 1 == 2) {
+    while(true) {
 	last_letter = tmp; tmp = istr.get();
 	if( tmp == EOF)  return str;
 	// un-backslashed quotes => it's the end of the string
@@ -1088,7 +1088,7 @@ GetPot::_get_until_closing_bracket(std::istream& istr)
     int    tmp = 0;
     int    last_letter = 0;
     int    brackets = 1;
-    while(1 + 1 == 2) {
+    while(true) {
 	last_letter = tmp; tmp = istr.get();
 	if( tmp == EOF) return str;
 	else if( tmp == '{' && last_letter == '$') brackets += 1;
@@ -1111,7 +1111,7 @@ GetPot::_get_until_closing_square_bracket(std::istream& istr)
     std::string str = "";
     int    tmp = 0;
     int    brackets = 1;
-    while(1 + 1 == 2) {
+    while(true) {
 	tmp = istr.get();
 	if( tmp == EOF) return str;
 	else if( tmp == '[') {
