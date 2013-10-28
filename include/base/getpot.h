@@ -146,29 +146,31 @@ public:
   /**
    * absorbing contents of another GetPot object
    */
-  inline void            absorb(const GetPot& Other);
+  inline void absorb(const GetPot& Other);
 
   /**
    * for ufo detection: recording requested arguments, options etc.
    */
-  inline void            clear_requests();
-  inline void            disable_request_recording() { request_recording_f = false; }
-  inline void            enable_request_recording()  { request_recording_f = true; }
+  inline void clear_requests();
+  inline void disable_request_recording() { request_recording_f = false; }
+  inline void enable_request_recording() { request_recording_f = true; }
 
   /**
    * direct access to command line arguments
    */
-  inline const char*     operator[](unsigned Idx) const;
+  inline const char* operator[](unsigned Idx) const;
+
   template <typename T>
-  inline T               get(unsigned Idx, const T&    Default) const;
-  inline const char*     get(unsigned Idx, const char* Default) const;
-  inline unsigned        size() const;
+  inline T get(unsigned Idx, const T& Default) const;
+
+  inline const char* get(unsigned Idx, const char* Default) const;
+  inline unsigned size() const;
 
   /**
    * flags
    */
-  inline bool            options_contain(const char* FlagList) const;
-  inline bool            argument_contains(unsigned Idx, const char* FlagList) const;
+  inline bool options_contain(const char* FlagList) const;
+  inline bool argument_contains(unsigned Idx, const char* FlagList) const;
 
   /**
    * variables
@@ -177,49 +179,57 @@ public:
   /**
    * check for a variable
    */
-  inline bool            have_variable(const char* VarName) const;
-  inline bool            have_variable(const std::string& VarName) const;
+  inline bool have_variable(const char* VarName) const;
+  inline bool have_variable(const std::string& VarName) const;
 
   /**
    * scalar values
    */
   template<typename T>
-  inline T               operator()(const char* VarName, const T&    Default) const;
+  inline T operator()(const char* VarName, const T& Default) const;
+
   template<typename T>
-  inline T               operator()(const std::string& VarName, const T&    Default) const;
-  inline const char*     operator()(const char* VarName, const char* Default) const;
-  inline const char*     operator()(const std::string& VarName, const char* Default) const;
+  inline T operator()(const std::string& VarName, const T& Default) const;
+
+  inline const char* operator()(const char* VarName, const char* Default) const;
+  inline const char* operator()(const std::string& VarName, const char* Default) const;
 
   /**
    * vectors
    */
   template<typename T>
-  inline T               operator()(const char* VarName, const T&    Default, unsigned Idx) const;
+  inline T operator()(const char* VarName, const T& Default, unsigned Idx) const;
+
   template<typename T>
-  inline T               operator()(const std::string& VarName, const T&    Default, unsigned Idx) const;
-  inline const char*     operator()(const char* VarName, const char* Default, unsigned Idx) const;
-  inline const char*     operator()(const std::string& VarName, const char* Default, unsigned Idx) const;
+  inline T operator()(const std::string& VarName, const T& Default, unsigned Idx) const;
+
+  inline const char* operator()(const char* VarName, const char* Default, unsigned Idx) const;
+  inline const char* operator()(const std::string& VarName, const char* Default, unsigned Idx) const;
 
   /**
    * access varibles, but error out if not present
    * scalar values
    */
   template<typename T>
-  inline T               get_value_no_default(const char* VarName, const T& Default) const;
+  inline T get_value_no_default(const char* VarName, const T& Default) const;
+
   template<typename T>
-  inline T               get_value_no_default(const std::string& VarName, const T& Default) const;
-  inline const char*     get_value_no_default(const char* VarName, const char* Default) const;
-  inline const char*     get_value_no_default(const std::string& VarName, const char* Default) const;
+  inline T get_value_no_default(const std::string& VarName, const T& Default) const;
+
+  inline const char* get_value_no_default(const char* VarName, const char* Default) const;
+  inline const char* get_value_no_default(const std::string& VarName, const char* Default) const;
 
   /**
    * vectors
    */
   template<typename T>
-  inline T               get_value_no_default(const char* VarName, const T&    Default, unsigned Idx) const;
+  inline T get_value_no_default(const char* VarName, const T& Default, unsigned Idx) const;
+
   template<typename T>
-  inline T               get_value_no_default(const std::string& VarName, const T&    Default, unsigned Idx) const;
-  inline const char*     get_value_no_default(const char* VarName, const char* Default, unsigned Idx) const;
-  inline const char*     get_value_no_default(const std::string& VarName, const char* Default, unsigned Idx) const;
+  inline T get_value_no_default(const std::string& VarName, const T& Default, unsigned Idx) const;
+
+  inline const char* get_value_no_default(const char* VarName, const char* Default, unsigned Idx) const;
+  inline const char* get_value_no_default(const std::string& VarName, const char* Default, unsigned Idx) const;
 
   /**
    * setting variables
@@ -227,110 +237,114 @@ public:
    *   ii) from inside, use '_set_variable()' below
    */
   template<typename T>
-  inline void            set(const char* VarName, const T& Value, const bool Requested = true);
-  template<typename T>
-  inline void            set(const std::string& VarName, const T& Value, const bool Requested = true);
-  inline void            set(const char* VarName, const char* Value, const bool Requested = true);
-  inline void            set(const std::string& VarName, const char* Value, const bool Requested = true);
+  inline void set(const char* VarName, const T& Value, const bool Requested = true);
 
-  inline unsigned        vector_variable_size(const char* VarName) const;
-  inline unsigned        vector_variable_size(const std::string& VarName) const;
-  inline STRING_VECTOR   get_variable_names() const;
-  inline STRING_VECTOR   get_section_names() const;
-  inline
-  std::set<std::string>  get_overridden_variables() const;
+  template<typename T>
+  inline void set(const std::string& VarName, const T& Value, const bool Requested = true);
+
+  inline void set(const char* VarName, const char* Value, const bool Requested = true);
+  inline void set(const std::string& VarName, const char* Value, const bool Requested = true);
+
+  inline unsigned vector_variable_size(const char* VarName) const;
+  inline unsigned vector_variable_size(const std::string& VarName) const;
+  inline STRING_VECTOR get_variable_names() const;
+  inline STRING_VECTOR get_section_names() const;
+  inline std::set<std::string> get_overridden_variables() const;
 
   /**
    * cursor oriented functions
    */
-  inline void            set_prefix(const char* Prefix) { prefix = std::string(Prefix); }
-  inline bool            search_failed() const { return search_failed_f; }
+  inline void set_prefix(const char* Prefix) { prefix = std::string(Prefix); }
+  inline bool search_failed() const { return search_failed_f; }
 
   /**
    * enable/disable search for an option in loop
    */
-  inline void            disable_loop() { search_loop_f = false; }
-  inline void            enable_loop()  { search_loop_f = true; }
+  inline void disable_loop() { search_loop_f = false; }
+  inline void enable_loop()  { search_loop_f = true; }
 
   /**
    * reset cursor to position '1'
    */
-  inline void            reset_cursor();
-  inline void            init_multiple_occurrence();
+  inline void reset_cursor();
+  inline void init_multiple_occurrence();
 
   /**
    * search for a certain option and set cursor to position
    */
-  inline bool            search(const char* option);
-  inline bool            search(const std::string& option);
-  inline bool            search(unsigned No, const char* P, ...);
+  inline bool search(const char* option);
+  inline bool search(const std::string& option);
+  inline bool search(unsigned No, const char* P, ...);
 
   /**
    * get argument at cursor++
    */
   template<typename T>
-  inline T               next(const T&    Default);
-  inline const char*     next(const char* Default);
+  inline T next(const T& Default);
+
+  inline const char* next(const char* Default);
 
   /**
    * search for option and get argument at cursor++
    */
   template<typename T>
-  inline T               follow(const T&    Default, const char* Option);
-  inline const char*     follow(const char* Default, const char* Option);
+  inline T follow(const T& Default, const char* Option);
+
+  inline const char* follow(const char* Default, const char* Option);
 
   /**
    * search for one of the given options and get argument that follows it
    */
   template<typename T>
-  inline T               follow(const T&    Default, unsigned No, const char* Option, ...);
-  inline const char*     follow(const char* Default, unsigned No, const char* Option, ...);
+  inline T follow(const T& Default, unsigned No, const char* Option, ...);
+
+  inline const char* follow(const char* Default, unsigned No, const char* Option, ...);
 
   /**
    * directly followed arguments
    */
   template<typename T>
-  inline T               direct_follow(const T&    Default, const char* Option);
-  inline const char*     direct_follow(const char* Default, const char* Option);
+  inline T direct_follow(const T& Default, const char* Option);
+
+  inline const char* direct_follow(const char* Default, const char* Option);
 
   /**
    * nominus arguments
    */
-  inline void            reset_nominus_cursor();
-  inline STRING_VECTOR   nominus_vector() const;
-  inline unsigned        nominus_size() const { return getpot_cast_int<unsigned>(idx_nominus.size()); }
-  inline const char*     next_nominus();
+  inline void reset_nominus_cursor();
+  inline STRING_VECTOR nominus_vector() const;
+  inline unsigned nominus_size() const { return getpot_cast_int<unsigned>(idx_nominus.size()); }
+  inline const char* next_nominus();
 
   /**
    * unidentified flying objects
    */
-  inline STRING_VECTOR   unidentified_arguments(unsigned Number, const char* Known, ...) const;
-  inline STRING_VECTOR   unidentified_arguments(const std::set<std::string>& Knowns) const;
-  inline STRING_VECTOR   unidentified_arguments(const std::vector<std::string>& Knowns) const;
-  inline STRING_VECTOR   unidentified_arguments() const;
+  inline STRING_VECTOR unidentified_arguments(unsigned Number, const char* Known, ...) const;
+  inline STRING_VECTOR unidentified_arguments(const std::set<std::string>& Knowns) const;
+  inline STRING_VECTOR unidentified_arguments(const std::vector<std::string>& Knowns) const;
+  inline STRING_VECTOR unidentified_arguments() const;
 
-  inline STRING_VECTOR   unidentified_options(unsigned Number, const char* Known, ...) const;
-  inline STRING_VECTOR   unidentified_options(const std::set<std::string>& Knowns) const;
-  inline STRING_VECTOR   unidentified_options(const std::vector<std::string>& Knowns) const;
-  inline STRING_VECTOR   unidentified_options() const;
+  inline STRING_VECTOR unidentified_options(unsigned Number, const char* Known, ...) const;
+  inline STRING_VECTOR unidentified_options(const std::set<std::string>& Knowns) const;
+  inline STRING_VECTOR unidentified_options(const std::vector<std::string>& Knowns) const;
+  inline STRING_VECTOR unidentified_options() const;
 
-  inline std::string     unidentified_flags(const char* Known,
-                                            int ArgumentNumber /* =-1 */) const;
+  inline std::string unidentified_flags(const char* Known, int ArgumentNumber /* =-1 */) const;
 
-  inline STRING_VECTOR   unidentified_variables(unsigned Number, const char* Known, ...) const;
-  inline STRING_VECTOR   unidentified_variables(const std::set<std::string>& Knowns) const;
-  inline STRING_VECTOR   unidentified_variables(const std::vector<std::string>& Knowns) const;
-  inline STRING_VECTOR   unidentified_variables() const;
+  inline STRING_VECTOR unidentified_variables(unsigned Number, const char* Known, ...) const;
+  inline STRING_VECTOR unidentified_variables(const std::set<std::string>& Knowns) const;
+  inline STRING_VECTOR unidentified_variables(const std::vector<std::string>& Knowns) const;
+  inline STRING_VECTOR unidentified_variables() const;
 
-  inline STRING_VECTOR   unidentified_sections(unsigned Number, const char* Known, ...) const;
-  inline STRING_VECTOR   unidentified_sections(const std::set<std::string>& Knowns) const;
-  inline STRING_VECTOR   unidentified_sections(const std::vector<std::string>& Knowns) const;
-  inline STRING_VECTOR   unidentified_sections() const;
+  inline STRING_VECTOR unidentified_sections(unsigned Number, const char* Known, ...) const;
+  inline STRING_VECTOR unidentified_sections(const std::set<std::string>& Knowns) const;
+  inline STRING_VECTOR unidentified_sections(const std::vector<std::string>& Knowns) const;
+  inline STRING_VECTOR unidentified_sections() const;
 
-  inline STRING_VECTOR   unidentified_nominuses(unsigned Number, const char* Known, ...) const;
-  inline STRING_VECTOR   unidentified_nominuses(const std::set<std::string>& Knowns) const;
-  inline STRING_VECTOR   unidentified_nominuses(const std::vector<std::string>& Knowns) const;
-  inline STRING_VECTOR   unidentified_nominuses() const;
+  inline STRING_VECTOR unidentified_nominuses(unsigned Number, const char* Known, ...) const;
+  inline STRING_VECTOR unidentified_nominuses(const std::set<std::string>& Knowns) const;
+  inline STRING_VECTOR unidentified_nominuses(const std::vector<std::string>& Knowns) const;
+  inline STRING_VECTOR unidentified_nominuses() const;
 
   /**
    * output
@@ -367,42 +381,42 @@ private:
     ~variable();
     variable& operator=(const variable& Other);
 
-    void      take(const char* Value, const char* FieldSeparator);
+    void take(const char* Value, const char* FieldSeparator);
 
     /**
      * get a specific element in the string vector
      * (return 0 if not present)
      */
-    const std::string*  get_element(unsigned Idx) const;
+    const std::string* get_element(unsigned Idx) const;
 
     /**
      * data memebers
      */
-    std::string       name;      // identifier of variable
-    STRING_VECTOR     value;     // value of variable stored in vector
-    std::string       original;  // value of variable as given on command line
+    std::string name;      // identifier of variable
+    STRING_VECTOR value;     // value of variable stored in vector
+    std::string original;  // value of variable as given on command line
   };
 
   /**
    * member variables
    */
-  std::string           prefix;          // prefix automatically added in queries
-  std::string           section;         // (for dollar bracket parsing)
-  STRING_VECTOR         section_list;    // list of all parsed sections
+  std::string prefix;          // prefix automatically added in queries
+  std::string section;         // (for dollar bracket parsing)
+  STRING_VECTOR section_list;    // list of all parsed sections
 
   /**
    * argument vector
    */
-  STRING_VECTOR         argv;            // vector of command line arguments stored as strings
-  unsigned              cursor;          // cursor for argv
-  bool                  search_loop_f;   // shall search start at beginning after reaching end of arg array ?
-  bool                  search_failed_f; // flag indicating a failed search() operation (e.g. next() functions react with 'missed')
+  STRING_VECTOR argv; // vector of command line arguments stored as strings
+  unsigned cursor; // cursor for argv
+  bool search_loop_f; // shall search start at beginning after reaching end of arg array ?
+  bool search_failed_f; // flag indicating a failed search() operation (e.g. next() functions react with 'missed')
   std::set<std::string> overridden_vars; // vector of variables that were supplied more than once during parsing
 
   /**
    * nominus vector
    */
-  int                   nominus_cursor;  // cursor for nominus_pointers
+  int nominus_cursor;  // cursor for nominus_pointers
   std::vector<unsigned> idx_nominus;     // indecies of 'no minus' arguments
 
   /**
@@ -413,13 +427,13 @@ private:
   /**
    * comment delimiters
    */
-  std::string           _comment_start;
-  std::string           _comment_end;
+  std::string _comment_start;
+  std::string _comment_end;
 
   /**
    * field separator (separating elements of a vector)
    */
-  std::string           _field_separator;
+  std::string _field_separator;
 
   /**
    * helper functor for creating sets of C-style strings
@@ -453,7 +467,7 @@ private:
    * some functions return a char pointer to a temporarily existing string
    * this function adds them to our container
    */
-  const char*    _internal_managed_copy(const std::string& Arg) const;
+  const char* _internal_managed_copy(const std::string& Arg) const;
 
   /**
    * keeping track about arguments that are requested, so that the UFO detection
@@ -463,7 +477,7 @@ private:
   mutable std::set<std::string> _requested_variables;
   mutable std::set<std::string> _requested_sections;
 
-  bool            request_recording_f;   // speed: request recording can be turned off
+  bool request_recording_f;   // speed: request recording can be turned off
 
   /**
    * if an argument is requested record it and the 'tag' the section branch to which
@@ -471,8 +485,8 @@ private:
    * These are "const" functions but they do modify the
    * mutable _requested_* members
    */
-  void                      _record_argument_request(const std::string& Arg) const;
-  void                      _record_variable_request(const std::string& Arg) const;
+  void _record_argument_request(const std::string& Arg) const;
+  void _record_variable_request(const std::string& Arg) const;
 
   /**
    * helper functions
@@ -481,9 +495,9 @@ private:
   /**
    * set variable from inside GetPot (no prefix considered)
    */
-  inline void               _set_variable(const std::string& VarName,
-                                          const std::string& Value,
-                                          const bool Requested);
+  inline void _set_variable(const std::string& VarName,
+                            const std::string& Value,
+                            const bool Requested);
 
   /**
    * produce three basic data vectors:
@@ -491,7 +505,7 @@ private:
    *   - nominus vector
    *   - variable dictionary
    */
-  inline void               _parse_argument_vector(const STRING_VECTOR& ARGV);
+  inline void _parse_argument_vector(const STRING_VECTOR& ARGV);
 
   /**
    * helpers for argument list processing
@@ -500,43 +514,46 @@ private:
   /**
    * search for a variable in 'variables' array
    */
-  inline const variable*    _find_variable(const char*) const;
+  inline const variable* _find_variable(const char*) const;
 
   /**
    * search (and record request) for a variable in 'variables' array
    */
-  inline const variable*    _request_variable(const char*) const;
+  inline const variable* _request_variable(const char*) const;
 
   /**
    * support finding directly followed arguments
    */
-  inline const char*        _match_starting_string(const char* StartString);
+  inline const char* _match_starting_string(const char* StartString);
 
   /**
    * support search for flags in a specific argument
    */
-  inline bool               _check_flags(const std::string& Str, const char* FlagList) const;
+  inline bool _check_flags(const std::string& Str, const char* FlagList) const;
 
   /**
    * type conversion if possible
    */
   template<typename T>
-  inline T                  _convert_to_type(const std::string& String, const T& Default) const;
-  inline std::string        _convert_to_type(const std::string& String, const char* Default) const;
+  inline T _convert_to_type(const std::string& String, const T& Default) const;
+
+  inline std::string _convert_to_type(const std::string& String, const char* Default) const;
+
   template<typename T>
-  inline T                  _convert_to_type_no_default(const char* VarName, const std::string& String, const T& Default) const;
-  inline std::string        _convert_to_type_no_default(const char* VarName, const std::string& String, const char* Default) const;
+  inline T _convert_to_type_no_default(const char* VarName, const std::string& String, const T& Default) const;
+
+  inline std::string _convert_to_type_no_default(const char* VarName, const std::string& String, const char* Default) const;
 
   /**
    * prefix extraction
    */
-  const std::string         _get_remaining_string(const std::string& String,
-                                                  const std::string& Start) const;
+  const std::string _get_remaining_string(const std::string& String,
+                                          const std::string& Start) const;
   /**
    * search for a specific string
    */
-  inline bool               _search_string_vector(const STRING_VECTOR& Vec,
-                                                  const std::string& Str) const;
+  inline bool _search_string_vector(const STRING_VECTOR& Vec,
+                                    const std::string& Str) const;
 
   /**
    * helpers to parse input file
@@ -548,24 +565,24 @@ private:
    *            my-variable='007 J. B.'
    *    3) interprete sections like '[../my-section]' etc.
    */
-  inline void               _skip_whitespace(std::istream& istr);
-  inline const std::string  _get_next_token(std::istream& istr);
-  inline const std::string  _get_string(std::istream& istr);
-  inline const std::string  _get_until_closing_bracket(std::istream& istr);
-  inline const std::string  _get_until_closing_square_bracket(std::istream& istr);
+  inline void _skip_whitespace(std::istream& istr);
+  inline const std::string _get_next_token(std::istream& istr);
+  inline const std::string _get_string(std::istream& istr);
+  inline const std::string _get_until_closing_bracket(std::istream& istr);
+  inline const std::string _get_until_closing_square_bracket(std::istream& istr);
 
-  inline STRING_VECTOR      _read_in_stream(std::istream& istr);
-  inline STRING_VECTOR      _read_in_file(const std::string& FileName);
-  inline std::string        _process_section_label(const std::string& Section,
+  inline STRING_VECTOR _read_in_stream(std::istream& istr);
+  inline STRING_VECTOR _read_in_file(const std::string& FileName);
+  inline std::string _process_section_label(const std::string& Section,
                                                    STRING_VECTOR& section_stack);
 
   /**
    * dollar bracket expressions
    */
-  std::string               _DBE_expand_string(const std::string& str);
-  std::string               _DBE_expand(const std::string& str);
-  const GetPot::variable*   _DBE_get_variable(const std::string& str);
-  STRING_VECTOR             _DBE_get_expr_list(const std::string& str, const unsigned ExpectedNumber);
+  std::string _DBE_expand_string(const std::string& str);
+  std::string _DBE_expand(const std::string& str);
+  const GetPot::variable* _DBE_get_variable(const std::string& str);
+  STRING_VECTOR _DBE_get_expr_list(const std::string& str, const unsigned ExpectedNumber);
 
   template <typename T>
   static std::string _convert_from_type(const T& Value)
