@@ -981,11 +981,9 @@ GetPot::_skip_whitespace(std::istream& istr)
 	}
 
 	// -- look if characters match the comment starter string
-	const std::istream::pos_type  Pos = istr.tellg();
 	unsigned    i=0;
 	for(; i<_comment_start.length() ; i++) {
 	    if( tmp != _comment_start[i] ) {
-		istr.seekg(Pos);
 		// -- one step more backwards, since 'tmp' already at non-whitespace
 		istr.unget();
 		return;
