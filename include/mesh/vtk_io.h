@@ -123,13 +123,13 @@ private:
    * Map libMesh element types to VTK element types
    */
   vtkIdType get_elem_type(ElemType type);
-#endif
 
   void update_vtk_data(const MeshBase& mesh, Elem* elem,
                      vtkIdList* pts, vtkCellArray* cells, std::vector<int>& types,
 		       unsigned int active_element_counter,
 		       vtkIdType& vtkcellid);
     
+#endif
 
     /**
    * write the nodes from the mesh into a vtkUnstructuredGrid
