@@ -5,3 +5,5 @@
 *.pdf
 *.html
 *.php
+*.out
+*.toc
