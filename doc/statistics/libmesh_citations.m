@@ -35,10 +35,11 @@ cell_data = {
     {'''09', 28}
     {'''10', 24}
     {'''11', 35}
-    {'''12', 47}
-    {'''13', 45}
+    {'''12', 48}
+    {'''13', 52}
+    {'''14', 1}
     {'P', 12} % Preprints
-    {'T', 17} % Theses
+    {'T', 19} % Theses
     };
 
 % Strip numerical data from cell_data
@@ -48,8 +49,12 @@ for i=1:N
   y(i) = cell_data{i}{2};
 end
 
-% Make bar plot of number of citations
-plot_handle = bar( y, .8 );
+% Make bar plot of number of citations.  Plot numbers of preprints/theses separately so we can color them differently
+plot_handle1 = bar( linspace(1,N-2,N-2), y(1:N-2), .8 );
+plot_handle2 = bar( linspace(N-1,N,2),   y(N-1:N), .8 );
+
+% Sets color all bars in the plot
+set(plot_handle2(1), 'facecolor', 'g');
 
 % Sum up total
 total_papers = sum(y);
