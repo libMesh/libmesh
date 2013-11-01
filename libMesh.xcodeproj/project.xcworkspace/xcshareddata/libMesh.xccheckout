@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>1E415CDA-DF7C-4F35-9D21-6B3560449EF2</string>
+	<key>IDESourceControlProjectName</key>
+	<string>libMesh</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>8753C389-1C70-4586-BDAE-7A3DCF547357</key>
+		<string>ssh://10.131.6.58//usr/local/repos/libmesh</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>libMesh.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>8753C389-1C70-4586-BDAE-7A3DCF547357</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://10.131.6.58//usr/local/repos/libmesh</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>8753C389-1C70-4586-BDAE-7A3DCF547357</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>8753C389-1C70-4586-BDAE-7A3DCF547357</string>
+			<key>IDESourceControlWCCName</key>
+			<string>libmesh</string>
+		</dict>
+	</array>
+</dict>
+</plist>
