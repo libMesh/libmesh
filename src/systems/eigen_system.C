@@ -31,6 +31,9 @@
 #include "libmesh/eigen_solver.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/parameter_vector.h"
+#include "libmesh/numeric_vector.h"
+
 
 namespace libMesh
 {
@@ -247,6 +250,56 @@ void EigenSystem::solve ()
 
 }
 
+  
+std::pair<unsigned int, Real>
+EigenSystem::sensitivity_solve (const ParameterVector& parameters)
+  {
+    // make sure that eigensolution is already available
+    libmesh_assert(_n_converged_eigenpairs);
+    
+    // the sensitivity is calculated based on the inner product of the left and
+    // right eigen vectors.
+    //
+    //    y^T [A] x - lambda y^T [B] x = 0
+    //    where y and x are the left and right eigenvectors
+    //    d lambda/dp = (y^T (d[A]/dp - lambda d[B]/dp) x) / (y^T [B] x)
+    //
+    //    the denominator remain constant for all sensitivity calculations.
+    //
+    Number num, sens;
+    
+    AutoPtr< NumericVector<Number> > x_right = NumericVector<Number>::build(this->comm()),
+    x_left = NumericVector<Number>::build(this->comm());
+    x_right->init(*solution); x_left->init(*solution);
+    
+    std::vector<Number> denom(_n_converged_eigenpairs, 0.);
+    
+    for (unsigned int i=0; i<_n_converged_eigenpairs; i++)
+    {
+      this->eigen_solver->get_eigenpair(i, *x_right);
+      switch (_eigen_problem_type) {
+        case HEP:
+          // right and left eigenvectors are same
+          denom[i] = x_right->dot(*x_right);
+          break;
+          
+        default:
+          break;
+      }
+      //
+    }
+    
+    for (unsigned int p=0; p<parameters.size(); p++)
+    {
+      this->assemble_eigensystem_sensitivity(parameters, p);
+
+      
+    }
+    
+    return std::pair<unsigned int, Real> (0, 0.);
+  }
+
+  
 
 void EigenSystem::assemble ()
 {

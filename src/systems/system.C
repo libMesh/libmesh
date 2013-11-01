@@ -56,35 +56,39 @@ System::System (EquationSystems& es,
 		const std::string& name_in,
 		const unsigned int number_in) :
 
-  ParallelObject                    (es),
-  assemble_before_solve             (true),
-  use_fixed_solution                (false),
-  extra_quadrature_order            (0),
-  solution                          (NumericVector<Number>::build(this->comm())),
-  current_local_solution            (NumericVector<Number>::build(this->comm())),
-  time                              (0.),
-  qoi                               (0),
-  _init_system_function             (NULL),
-  _init_system_object               (NULL),
-  _assemble_system_function         (NULL),
-  _assemble_system_object           (NULL),
-  _constrain_system_function        (NULL),
-  _constrain_system_object          (NULL),
-  _qoi_evaluate_function            (NULL),
-  _qoi_evaluate_object              (NULL),
-  _qoi_evaluate_derivative_function (NULL),
-  _qoi_evaluate_derivative_object   (NULL),
-  _dof_map                          (new DofMap(number_in, *this)),
-  _equation_systems                 (es),
-  _mesh                             (es.get_mesh()),
-  _sys_name                         (name_in),
-  _sys_number                       (number_in),
-  _active                           (true),
-  _solution_projection              (true),
-  _basic_system_only                (false),
-  _can_add_vectors                  (true),
-  _identify_variable_groups         (true),
-  _additional_data_written          (false)
+  ParallelObject                               (es),
+  assemble_before_solve                        (true),
+  use_fixed_solution                           (false),
+  extra_quadrature_order                       (0),
+  solution                                     (NumericVector<Number>::build(this->comm())),
+  current_local_solution                       (NumericVector<Number>::build(this->comm())),
+  time                                         (0.),
+  qoi                                          (0),
+  _init_system_function                        (NULL),
+  _init_system_object                          (NULL),
+  _assemble_system_function                    (NULL),
+  _sensitivity_assemble_system_function        (NULL),
+  _assemble_system_object                      (NULL),
+  _sensitivity_assemble_system_object          (NULL),
+  _constrain_system_function                   (NULL),
+  _constrain_system_object                     (NULL),
+  _qoi_evaluate_function                       (NULL),
+  _qoi_evaluate_object                         (NULL),
+  _qoi_evaluate_derivative_function            (NULL),
+  _qoi_evaluate_derivative_object              (NULL),
+  _qoi_evaluate_parameter_sensitivity_function (NULL),
+  _qoi_evaluate_parameter_sensitivity_object   (NULL),
+  _dof_map                                     (new DofMap(number_in, *this)),
+  _equation_systems                            (es),
+  _mesh                                        (es.get_mesh()),
+  _sys_name                                    (name_in),
+  _sys_number                                  (number_in),
+  _active                                      (true),
+  _solution_projection                         (true),
+  _basic_system_only                           (false),
+  _can_add_vectors                             (true),
+  _identify_variable_groups                    (true),
+  _additional_data_written                     (false)
 {
 }
 
@@ -1783,6 +1787,45 @@ void System::attach_assemble_object (System::Assembly& assemble_in)
   _assemble_system_object = &assemble_in;
 }
 
+    
+    
+    
+void System::attach_sensitivity_assemble_function (bool fptr(EquationSystems& es,
+                                                             const std::string& name,
+                                                             const ParameterVector& parameters,
+                                                             const unsigned int i,
+                                                             NumericVector<Number>& sensitivity_rhs))
+{
+    libmesh_assert(fptr);
+    
+    if (_sensitivity_assemble_system_object != NULL)
+    {
+        libmesh_here();
+        libMesh::out << "WARNING:  Cannot specify both assembly sensitivity function and object!"
+        << std::endl;
+        
+        _sensitivity_assemble_system_object = NULL;
+    }
+    
+    _sensitivity_assemble_system_function = fptr;
+}
+
+
+
+void System::attach_sensitivity_assemble_object (System::SensitivityAssembly& assemble_in)
+{
+    if (_sensitivity_assemble_system_function != NULL)
+    {
+        libmesh_here();
+        libMesh::out << "WARNING:  Cannot specify both assembly object and function!"
+        << std::endl;
+        
+        _sensitivity_assemble_system_function = NULL;
+    }
+    
+    _sensitivity_assemble_system_object = &assemble_in;
+}
+
 
 
 void System::attach_constraint_function(void fptr(EquationSystems& es,
@@ -1890,6 +1933,46 @@ void System::attach_QOI_derivative_object (QOIDerivative& qoi_derivative)
   _qoi_evaluate_derivative_object = &qoi_derivative;
 }
 
+  
+  
+  
+void System::attach_QOI_parameter_sensitivity(bool (*fptr)(libMesh::EquationSystems &,
+                                                           const std::string &,
+                                                           const libMesh::QoISet &,
+                                                           const libMesh::ParameterVector &,
+                                                           const unsigned int,
+                                                           std::vector<Number> &))
+{
+  libmesh_assert(fptr);
+  
+  if (_qoi_evaluate_parameter_sensitivity_object != NULL)
+  {
+    libmesh_here();
+    libMesh::out << "WARNING:  Cannot specify both QOI derivative function and object!"
+    << std::endl;
+    
+    _qoi_evaluate_parameter_sensitivity_object = NULL;
+  }
+  
+  _qoi_evaluate_parameter_sensitivity_function = fptr;
+}
+
+
+
+void System::attach_QOI_parameter_sensitivity_object (QOIParameterSensitivity& qoi_sensitivity)
+{
+  if (_qoi_evaluate_parameter_sensitivity_function != NULL)
+  {
+    libmesh_here();
+    libMesh::out << "WARNING:  Cannot specify both QOI derivative object and function!"
+    << std::endl;
+    
+    _qoi_evaluate_parameter_sensitivity_function = NULL;
+  }
+  
+  _qoi_evaluate_parameter_sensitivity_object = &qoi_sensitivity;
+}
+
 
 
 void System::user_initialization ()
@@ -1916,6 +1999,31 @@ void System::user_assembly ()
   // ...or the user-provided assembly object.
   else if (_assemble_system_object != NULL)
     this->_assemble_system_object->assemble();
+}
+
+    
+    
+bool System::user_sensitivity_assembly (const ParameterVector& parameters,
+                                        const unsigned int i,
+                                        NumericVector<Number>& sensitivity_rhs)
+{
+    bool rval = false;
+    
+    // Call the user-provided assembly function,
+    // if it was provided
+    if (_sensitivity_assemble_system_function != NULL)
+        rval = this->_sensitivity_assemble_system_function (_equation_systems,
+                                                            this->name(),
+                                                            parameters,
+                                                            i,
+                                                            sensitivity_rhs);
+    
+    // ...or the user-provided assembly object.
+    else if (_sensitivity_assemble_system_object != NULL)
+        rval = this->_sensitivity_assemble_system_object->sensitivity_assemble
+        (parameters, i, sensitivity_rhs);
+    
+    return rval;
 }
 
 
@@ -1961,6 +2069,32 @@ void System::user_QOI_derivative (const QoISet& qoi_indices)
 }
 
 
+bool System::user_QOI_parameter_sensitivity(const libMesh::QoISet &qoi_indices,
+                                            const libMesh::ParameterVector &parameters,
+                                            const unsigned int p,
+                                            std::vector<Number> &partialq_partialp)
+{
+  bool rval = false;
+
+  // Call the user-provided quantity of interest derivative,
+  // if it was provided
+  if (_qoi_evaluate_parameter_sensitivity_function != NULL)
+    rval = this->_qoi_evaluate_parameter_sensitivity_function(_equation_systems,
+                                                              this->name(),
+                                                              qoi_indices,
+                                                              parameters, p,
+                                                              partialq_partialp);
+  
+  // ...or the user-provided QOI derivative function object.
+  else if (_qoi_evaluate_parameter_sensitivity_object != NULL)
+    rval = this->_qoi_evaluate_parameter_sensitivity_object->qoi_parameter_sensitivity
+    (qoi_indices, parameters, p, partialq_partialp);
+  
+  return rval;
+}
+  
+
+  
 
 Number System::point_value(unsigned int var, const Point &p, const bool insist_on_success) const
 {

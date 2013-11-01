@@ -150,17 +150,29 @@ public:
     { libmesh_error(); }
 
   /**
-   * Residual parameter derivative function.
-   *
-   * Uses finite differences by default.
+   * Residual parameter derivative function using finite differencing.
    *
    * This will assemble the sensitivity rhs vectors to hold
-   * -(partial R / partial p_i), making them ready to solve
-   * the forward sensitivity equation.
-   *
-   * @e Can be overloaded in derived classes.
+   * -(partial R / partial p_i), for the \par i ^th parameter in \par v.
    */
-  virtual void assemble_residual_derivatives (const ParameterVector& parameters);
+  virtual void assemble_residual_derivative (const ParameterVector& parameters,
+                                             const unsigned int p,
+                                             NumericVector<Number>& sensitivity_rhs);
+  
+  
+  /*!
+   * Solves for the derivative of each of the system's quantities of
+   * interest q in \p qoi[qoi_indices] with respect to \p j ^th parameter in
+   * \p parameters, placing the result for qoi \p i into
+   * \p partialq_partialp[i][j].
+   *
+   * First checks if the user provided assembly objects can provide this data, 
+   * otherwise, uses finite differences.
+   */
+  virtual void assemble_qoi_parameter_partial_derivative(const QoISet&          qoi_indices,
+                                                         const ParameterVector& parameters,
+                                                         const unsigned int j,
+                                                         std::vector<Number>& partialq_partialp);
 
   /**
    * Assembles & solves the linear system(s) (dR/du)*u_p = -dR/dp, for

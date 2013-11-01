@@ -137,6 +137,39 @@ public:
 
 
 
+  
+  
+  /**
+   * Abstract base class to be used for assembly of sensitivity 
+   * data. A user class derived from this class may be used to
+   * assemble the sensitivity of system by attaching an object
+   * with the method \p attach_sensitivity_assemble_object.
+   */
+  class SensitivityAssembly
+  {
+  public:
+    /**
+     * Destructor.  Virtual because we will have virtual functions.
+     */
+    virtual ~SensitivityAssembly () {}
+    
+    /**
+     * Assembly function.  This function will be called
+     * to assemble the sensitivity of system residual prior to a solve and must
+     * be provided by the user in a derived class. The method provides dR/dp_i
+     * for \par i ^th parameter in the vector \par parameters.
+     *
+     * If the routine is not able to provide sensitivity for this parameter, 
+     * then it should return false, and the system will attempt to use 
+     * finite differencing.
+     */
+    virtual bool sensitivity_assemble (const ParameterVector& parameters,
+                                       const unsigned int i,
+                                       NumericVector<Number>& sensitivity_rhs) = 0;
+  };
+  
+  
+  
   /**
    * Abstract base class to be used for sysem constraints.
    * A user class derived from this class may be used to
@@ -205,6 +238,35 @@ public:
      * must be provided by the user in a derived class.
      */
     virtual void qoi_derivative (const QoISet& qoi_indices) = 0;
+  };
+
+  
+  /**
+   * Abstract base class to be used for parameter sensitivities of quantities
+   * of interest, partial q/ partial p. A user class derived from 
+   * this class may be used to compute quantities of interest by attaching
+   * an object with the method \p attach_QOI_parameter_sensitivity_object.
+   */
+  class QOIParameterSensitivity
+  {
+  public:
+    /**
+     * Destructor.  Virtual because we will have virtual functions.
+     */
+    virtual ~QOIParameterSensitivity () {}
+    
+    /**
+     * Quantitiy of interest derivative function. This function will
+     * be called to compute derivatived of quantities of interest and
+     * must be provided by the user in a derived class. 
+     *
+     * Return true if the method provides sensitivity for the specified parameter, 
+     * otherwise, return false and the system will use finite differencing.
+     */
+    virtual bool qoi_parameter_sensitivity (const QoISet& qoi_indices,
+                                            const ParameterVector& parameters,
+                                            const unsigned int p,
+                                            std::vector<Number>& partialq_partialp) = 0;
   };
 
 
@@ -283,7 +345,23 @@ public:
    *
    * This method is only implemented in some derived classes.
    */
-  virtual void assemble_residual_derivatives (const ParameterVector& parameters);
+  virtual void assemble_residual_derivative (const ParameterVector& parameters,
+                                              const unsigned int p,
+                                              NumericVector<Number>& sensitivity_rhs);
+
+  /*!
+   * Solves for the derivative of each of the system's quantities of
+   * interest q in \p qoi[qoi_indices] with respect to \p j ^th parameter in
+   * \p parameters, placing the result for qoi \p i into
+   * \p partialq_partialp[i][j].
+   *
+   * First checks if the user provided assembly objects can provide this data,
+   * otherwise, uses finite differences.
+   */
+  virtual void assemble_qoi_parameter_partial_derivative(const QoISet&          qoi_indices,
+                                                         const ParameterVector& parameters,
+                                                         const unsigned int j,
+                                                         std::vector<Number>& partialq_partialp);
 
   /**
    * After calling this method, any solve will be restricted to the
@@ -1301,6 +1379,23 @@ public:
   void attach_assemble_object (Assembly& assemble);
 
   /**
+   * Register a user function to use in assembling the system
+   * RHS sensitivity. If the routine is unable to provide sensitivity for this
+   * parameter, then it should return false.
+   */
+  void attach_sensitivity_assemble_function (bool fptr(EquationSystems& es,
+                                                       const std::string& name,
+                                                       const ParameterVector& parameters,
+                                                       const unsigned int i,
+                                                       NumericVector<Number>& sensitivity_rhs));
+  
+  /**
+   * Register a user object to use in assembling the system
+   * RHS sensitivity.
+   */
+  void attach_sensitivity_assemble_object (SensitivityAssembly& assemble);
+
+  /**
    * Register a user function for imposing constraints.
    */
   void attach_constraint_function (void fptr(EquationSystems& es,
@@ -1341,6 +1436,25 @@ public:
    */
   void attach_QOI_derivative_object (QOIDerivative& qoi_derivative);
 
+  
+  /**
+   * Register a user function for evaluating partial derivatives of a quantity
+   * of interest with respect to specified parameter
+   */
+  void attach_QOI_parameter_sensitivity (bool fptr(EquationSystems& es,
+                                                   const std::string& name,
+                                                   const QoISet& qoi_indices,
+                                                   const ParameterVector& parameters,
+                                                   const unsigned int p,
+                                                   std::vector<Number>& partialq_partialp));
+  
+  /**
+   * Register a user object for evaluating derivatives of a quantity
+   * of interest with respect to test functions, whose values should
+   * be placed in \p System::rhs
+   */
+  void attach_QOI_parameter_sensitivity_object (QOIParameterSensitivity& qoi_sensitivity);
+
   /**
    * Calls user's attached initialization function, or is overloaded by
    * the user in derived classes.
@@ -1352,6 +1466,15 @@ public:
    * the user in derived classes.
    */
   virtual void user_assembly ();
+
+  /**
+   *  returs true if a user provided function or object is able to provide
+   *  the sensitivity data for the \par i ^th parameter in the vector
+   *  \par parameters.
+   */
+  bool user_sensitivity_assembly(const ParameterVector& parameters,
+                                 const unsigned int i,
+                                 NumericVector<Number>& sensitivity_rhs);
 
   /**
    * Calls user's attached constraint function, or is overloaded by
@@ -1370,6 +1493,15 @@ public:
    * or is overloaded by the user in derived classes.
    */
   virtual void user_QOI_derivative (const QoISet& qoi_indices);
+
+  /**
+   * Calls user's attached quantity of interest derivative function,
+   * or is overloaded by the user in derived classes.
+   */
+  virtual bool user_QOI_parameter_sensitivity (const QoISet& qoi_indices,
+                                               const ParameterVector& parameters,
+                                               const unsigned int p,
+                                               std::vector<Number>& partialq_partialp);
 
   /**
    * Re-update the local values when the mesh has changed.
@@ -1708,6 +1840,22 @@ private:
    */
   Assembly * _assemble_system_object;
 
+
+  /**
+   * Function that assembles the sensitivity of system.
+   */
+  bool (* _sensitivity_assemble_system_function) (EquationSystems& es,
+                                                  const std::string& name,
+                                                  const ParameterVector& parameter,
+                                                  const unsigned int i,
+                                                  NumericVector<Number>& sensitivity_rhs);
+  
+  /**
+   * Object that assembles the sensitivity of system.
+   */
+  SensitivityAssembly * _sensitivity_assemble_system_object;
+
+
   /**
    * Function to impose constraints.
    */
@@ -1739,9 +1887,24 @@ private:
 					      const QoISet& qoi_indices);
 
   /**
+   * Function to evaluate quantity of interest partial derivative wrt parameter
+   */
+  bool (* _qoi_evaluate_parameter_sensitivity_function) (EquationSystems& es,
+                                                         const std::string& name,
+                                                         const QoISet& qoi_indices,
+                                                         const ParameterVector& parameters,
+                                                         const unsigned int p,
+                                                         std::vector<Number>& partialq_partialp);
+
+  /**
    * Object to compute derivatives of quantities of interest.
    */
   QOIDerivative *_qoi_evaluate_derivative_object;
+
+  /**
+   * Object to compute partial sensitivity of quantities of interest wrt parameter.
+   */
+  QOIParameterSensitivity *_qoi_evaluate_parameter_sensitivity_object;
 
   /**
    * Data structure describing the relationship between
@@ -2112,7 +2275,18 @@ System::const_vectors_iterator System::vectors_end () const
 }
 
 inline
-void System::assemble_residual_derivatives (const ParameterVector&)
+void System::assemble_residual_derivative (const ParameterVector&,
+                                           const unsigned int ,
+                                           NumericVector<Number>& )
+{
+  libmesh_not_implemented();
+}
+
+inline
+void System::assemble_qoi_parameter_partial_derivative(const QoISet& ,
+                                                         const ParameterVector& ,
+                                                         const unsigned int ,
+                                                         std::vector<Number>& )
 {
   libmesh_not_implemented();
 }

@@ -100,6 +100,16 @@ public:
   virtual void solve ();
 
   /**
+   * Solves the sensitivity system, for the provided parameters. The return
+   * parameters are irrelevant for EigenSystem.
+   *
+   * This method is only implemented in some derived classes.
+   */
+  virtual std::pair<unsigned int, Real>
+  sensitivity_solve (const ParameterVector& parameters);
+
+  
+  /**
    * Assembles the system matrix.
    */
   virtual void assemble ();
