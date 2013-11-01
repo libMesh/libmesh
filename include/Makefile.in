@@ -875,6 +875,7 @@ include_HEADERS = \
         utils/tree_base.h \
         utils/tree_node.h \
         utils/utility.h \
+        utils/vectormap.h \
         utils/xdr_cxx.h 
 
 

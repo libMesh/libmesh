@@ -548,10 +548,10 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	point_locator_base.h point_locator_list.h point_locator_tree.h \
 	pool_allocator.h restore_warnings.h statistics.h \
 	string_to_enum.h timestamp.h tree.h tree_base.h tree_node.h \
-	utility.h xdr_cxx.h parallel_communicator_specializations \
-	$(am__append_1) $(am__append_3) $(am__append_5) \
-	$(am__append_7) $(am__append_9) $(am__append_11) \
-	libmesh_config.h
+	utility.h vectormap.h xdr_cxx.h \
+	parallel_communicator_specializations $(am__append_1) \
+	$(am__append_3) $(am__append_5) $(am__append_7) \
+	$(am__append_9) $(am__append_11) libmesh_config.h
 DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) $(am__append_4) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
 	$(am__append_12) libmesh_config.h
@@ -1909,6 +1909,9 @@ tree_node.h: $(top_srcdir)/include/utils/tree_node.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 utility.h: $(top_srcdir)/include/utils/utility.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+vectormap.h: $(top_srcdir)/include/utils/vectormap.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 xdr_cxx.h: $(top_srcdir)/include/utils/xdr_cxx.h
