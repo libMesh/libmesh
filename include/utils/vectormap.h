@@ -29,17 +29,32 @@
 namespace libMesh
 {
 
-/**
- * This \p vectormap templated class is intended to provide the
- * performance characteristics of a sorted std::vector with an
- * interface more closely resembling that of a std::map, for use in
- * particular when memory is tight.
- *
- * \author  Benjamin S. Kirk
- */
+  /**
+   * This \p vectormap templated class is intended to provide the
+   * performance characteristics of a sorted std::vector with an
+   * interface more closely resembling that of a std::map, for use in
+   * particular when memory is tight.
+   *
+   * This class is limited in its applicability.  The typical use case is:
+   *
+   \verbatim
+   vectormap<KeyType,ValType> vmap;
+   for ( ; ;)
+   vmap.insert (std::make_pair(key,val));
 
-
-
+   val1 = vmap[key1];
+   val2 = vmap[key2];
+   \endverbatim
+   *
+   * Note in particular the two-phase usage.  It is not advised to do
+   * intermediate insert/lookups, as each time an insertion is done the
+   * sort is invalidated, and must be reperformed. Additionally, during
+   * the insersion phase, there is no accounting for duplicate keys.
+   * Each insertion is accepted regardless of key value, and then
+   * duplicate keys are removed later.
+   *
+   * \author  Benjamin S. Kirk
+   */
   template <typename Key, typename Tp>
   class vectormap : public std::vector<std::pair<Key, Tp> >
   {
@@ -53,6 +68,9 @@ namespace libMesh
 
   private:
 
+    /**
+     * Strict weak ordering, based solely on first element in a pair.
+     */
     struct FirstOrder
     {
       bool operator()(const value_type &lhs,
@@ -60,6 +78,9 @@ namespace libMesh
       { return lhs.first < rhs.first; }
     };
 
+    /**
+     * Equality comparison, based solely on first element in a pair.
+     */
     struct FirstCompare
     {
       bool operator()(const value_type &lhs,
@@ -100,11 +121,10 @@ namespace libMesh
     {
       FirstOrder   order;
       FirstCompare comp;
-      std::sort (this->begin(),
-		 this->end(),
-		 order);
 
-      this->erase(std::unique (this->begin(), this->end(), comp), this->end());
+      std::sort (this->begin(), this->end(), order);
+
+      this->erase (std::unique (this->begin(), this->end(), comp), this->end());
 
       _sorted = true;
     }
@@ -124,15 +144,38 @@ namespace libMesh
 
       FirstOrder order;
 
+      typename vectormap<Key,Tp>::const_iterator
+	lower_bound = std::lower_bound (this->begin(), this->end(), to_find, order);
+
+      libmesh_assert (lower_bound != this->end());
+      libmesh_assert_equal_to (lower_bound->first, key);
+
+      return lower_bound->second;
+    }
+
+    /**
+     * *returns the number of occurances of \p key.  For a map-like object, this should
+     * be 1 or 0.
+     */
+    unsigned int count (const key_type &key) const
+    {
+      if (!_sorted)
+	const_cast<vectormap<Key, Tp>*>(this)->sort();
+
+      libmesh_assert (_sorted);
+
+      value_type to_find;
+      to_find.first = key;
+
+      FirstOrder order;
+
       std::pair<typename vectormap<Key,Tp>::const_iterator,
 		typename vectormap<Key,Tp>::const_iterator>
-      bounds = std::equal_range (this->begin(), this->end(), to_find, order);
+	bounds = std::equal_range (this->begin(), this->end(), to_find, order);
 
-      libmesh_assert (bounds.first != bounds.second);
-      libmesh_assert_equal_to (bounds.first->first, key);
-
-      return bounds.first->second;
+      return std::distance (bounds.first, bounds.second);
     }
+
 
   private:
 
