@@ -28,6 +28,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/error_vector.h"
+#include "libmesh/vectormap.h"
 
 #ifdef LIBMESH_HAVE_METIS
 // MIPSPro 7.4.2 gets confused about these nested namespaces
@@ -108,7 +109,9 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   // independednt of the element ordering, otherwise a circular dependency
   // can result in which the partitioning depends on the ordering which
   // depends on the partitioning...
-  std::map<const Elem*, dof_id_type> global_index_map;
+  vectormap<const Elem*, dof_id_type> global_index_map;
+  global_index_map.reserve (n_active_elem);
+
   {
     std::vector<dof_id_type> global_index;
 
@@ -126,7 +129,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 	const Elem *elem = *it;
 	libmesh_assert (!global_index_map.count(elem));
 
-	global_index_map[elem]  = global_index[cnt++];
+	global_index_map.insert (std::make_pair(elem, global_index[cnt++]));
       }
     libmesh_assert_equal_to (global_index_map.size(), n_active_elem);
   }
