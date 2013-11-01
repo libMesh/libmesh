@@ -22,6 +22,7 @@
 
 // C++ Includes   -----------------------------------
 #include <vector>
+#include <algorithm>
 
 
 
@@ -39,24 +40,48 @@ namespace libMesh
 
 
 
-  template <typename Key, typename Tp,
-	    typename Compare = std::less<Key>,
-	    typename Alloc = std::allocator<std::pair<const Key, Tp> > >
-  class vectormap : public std::vector<std::pair<Key, Tp>, Alloc >
+  template <typename Key, typename Tp>
+  class vectormap : public std::vector<std::pair<Key, Tp> >
   {
+
   public:
 
-    typedef Key                      key_type;
-    typedef Tp                       mapped_type;
-    typedef std::pair<const Key, Tp> value_type;
-    typedef Compare                  key_compare;
-    typedef Alloc                    allocator_type;
+    typedef Key                     key_type;
+    typedef Tp                      mapped_type;
+    typedef std::pair<Key, Tp>      value_type;
+    typedef std::vector<value_type> vector_type;
+
+  private:
+
+    struct FirstOrder
+    {
+      bool operator()(const value_type &lhs,
+		      const value_type &rhs) const
+      { return lhs.first < rhs.first; }
+    };
+
+    struct FirstCompare
+    {
+      bool operator()(const value_type &lhs,
+		      const value_type &rhs) const
+      { return lhs.first == rhs.first; }
+    };
+
+  public:
 
     /**
      * Default constructor.  Initializes sorted member to false.
      */
-    vectormap () :
-      _is_sorted(false)
+    vectormap() :
+      _sorted(false)
+    {}
+
+    /**
+     * Copy constructor.
+     */
+    vectormap(const vectormap<Key,Tp> &other) :
+      std::vector<std::pair<Key, Tp> > (other),
+      _sorted(other._sorted)
     {}
 
     /**
@@ -64,119 +89,55 @@ namespace libMesh
      */
     void insert (const value_type &x)
     {
-      _is_sorted = false;
+      _sorted = false;
       this->push_back(x);
+    }
+
+    /**
+     * Sort & unique the vectormap, preparing for use.
+     */
+    void sort()
+    {
+      FirstOrder   order;
+      FirstCompare comp;
+      std::sort (this->begin(),
+		 this->end(),
+		 order);
+
+      this->erase(std::unique (this->begin(), this->end(), comp), this->end());
+
+      _sorted = true;
+    }
+
+    /**
+     * @returns the value corresponding to \p key
+     */
+    const Tp & operator[](const key_type &key) const
+    {
+      if (!_sorted)
+	const_cast<vectormap<Key, Tp>*>(this)->sort();
+
+      libmesh_assert (_sorted);
+
+      value_type to_find;
+      to_find.first = key;
+
+      FirstOrder order;
+
+      std::pair<typename vectormap<Key,Tp>::const_iterator,
+		typename vectormap<Key,Tp>::const_iterator>
+      bounds = std::equal_range (this->begin(), this->end(), to_find, order);
+
+      libmesh_assert (bounds.first != bounds.second);
+      libmesh_assert_equal_to (bounds.first->first, key);
+
+      return bounds.first->second;
     }
 
   private:
 
-    bool _is_sorted;
+    bool _sorted;
   };
-
-
-// template <typename Val, typename index_t=unsigned int>
-// class mapvector : public std::map<index_t, Val>
-// {
-// public:
-//   typedef std::map<index_t, Val> maptype;
-
-//   Val& operator[] (const index_t &k)
-//   {
-//     return maptype::operator[](k);
-//   }
-//   Val operator[] (const index_t &k) const
-//   {
-//     typename maptype::const_iterator it = this->find(k);
-//       return it == this->end().it? Val() : it->second;
-//   }
-
-//   class veclike_iterator
-//   {
-//   public:
-//     veclike_iterator(const typename maptype::iterator &i)
-//       : it(i) {}
-
-//     veclike_iterator(const veclike_iterator &i)
-//       : it(i.it) {}
-
-//     Val& operator*() const { return it->second; }
-
-//     veclike_iterator& operator++() { ++it; return *this; }
-
-//     veclike_iterator operator++(int) {
-//       veclike_iterator i = *this;
-//       ++(*this);
-//       return i;
-//     }
-
-//     bool operator==(const veclike_iterator &other) const {
-//       return it == other.it;
-//     }
-
-//     bool operator!=(const veclike_iterator &other) const {
-//       return it != other.it;
-//     }
-
-//     typename maptype::iterator it;
-//   };
-
-//   class const_veclike_iterator
-//   {
-//   public:
-//     const_veclike_iterator(const typename maptype::const_iterator &i)
-//       : it(i) {}
-
-//     const_veclike_iterator(const const_veclike_iterator &i)
-//       : it(i.it) {}
-
-//     const_veclike_iterator(const veclike_iterator &i)
-//       : it(i.it) {}
-
-//     const Val& operator*() const { return it->second; }
-
-//     const_veclike_iterator& operator++() { ++it; return *this; }
-
-//     const_veclike_iterator operator++(int) {
-//       veclike_iterator i = *this;
-//       ++(*this);
-//       return i;
-//     }
-
-//     bool operator==(const const_veclike_iterator &other) const {
-//       return it == other.it;
-//     }
-
-//     bool operator!=(const const_veclike_iterator &other) const {
-//       return it != other.it;
-//     }
-
-//     typename maptype::const_iterator it;
-//   };
-
-//   void erase(index_t i) {
-//       maptype::erase(i);
-//   }
-
-//   void erase(const veclike_iterator &pos) {
-//       maptype::erase(pos.it);
-//   }
-
-//   veclike_iterator begin() {
-//     return veclike_iterator(maptype::begin());
-//   }
-
-//   const_veclike_iterator begin() const {
-//     return const_veclike_iterator(maptype::begin());
-//   }
-
-//   veclike_iterator end() {
-//     return veclike_iterator(maptype::end());
-//   }
-
-//   const_veclike_iterator end() const {
-//     return const_veclike_iterator(maptype::end());
-//   }
-// };
 
 } // namespace libMesh
 
