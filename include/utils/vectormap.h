@@ -39,11 +39,38 @@ namespace libMesh
 
 
 
-  template <typename Key, typename Val,
+  template <typename Key, typename Tp,
 	    typename Compare = std::less<Key>,
-	    typename Alloc = std::allocator<std::pair<const Key, Val> > >
-  class vectormap : public std::vector<std::pair<Key, Val>, Alloc >
+	    typename Alloc = std::allocator<std::pair<const Key, Tp> > >
+  class vectormap : public std::vector<std::pair<Key, Tp>, Alloc >
   {
+  public:
+
+    typedef Key                      key_type;
+    typedef Tp                       mapped_type;
+    typedef std::pair<const Key, Tp> value_type;
+    typedef Compare                  key_compare;
+    typedef Alloc                    allocator_type;
+
+    /**
+     * Default constructor.  Initializes sorted member to false.
+     */
+    vectormap () :
+      _is_sorted(false)
+    {}
+
+    /**
+     * Inserts \p x into the vectormap.
+     */
+    void insert (const value_type &x)
+    {
+      _is_sorted = false;
+      this->push_back(x);
+    }
+
+  private:
+
+    bool _is_sorted;
   };
 
 
