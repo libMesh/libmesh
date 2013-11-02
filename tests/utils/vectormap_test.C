@@ -14,6 +14,7 @@ public:
 
   CPPUNIT_TEST( testCreate );
   CPPUNIT_TEST( testInsert );
+  CPPUNIT_TEST( testIterate );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -34,6 +35,32 @@ private:
 
     for (Key key=1; key<32; key*=2)
       vm.insert (std::make_pair(key,val));
+
+    vm.sort();
+  }
+
+  template <typename Key, typename Val>
+  void iterate(const Val &default_value=0)
+  {
+    vectormap<Key,Val> vm;
+
+    Val val(default_value); // requires default constructor for val type.
+
+    for (Key key=1; key<32; key*=2)
+      vm.insert (std::make_pair(key,val));
+
+    vm.sort();
+
+    for (typename vectormap<Key,Val>::const_iterator it=vm.begin();
+	 it != vm.end(); ++it)
+      {
+	const Key &ikey = it->first;
+	const Val &ival = it->second;
+
+	CPPUNIT_ASSERT       ( vm.count(ikey) == 1 );
+	CPPUNIT_ASSERT_EQUAL (vm[ikey], ival);
+	CPPUNIT_ASSERT_EQUAL (ival, val);
+      }
   }
 
 public:
@@ -59,6 +86,14 @@ public:
     insert<char,int> ();
     insert<long,int*>();
     insert<int, std::vector<int> >();
+  }
+
+  void testIterate()
+  {
+    iterate<int, int> ();
+    iterate<char,int> ();
+    iterate<long,int*>();
+    iterate<int, std::string>("test_string");
   }
 };
 
