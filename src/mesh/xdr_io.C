@@ -1079,11 +1079,11 @@ void XdrIO::read_serialized_subdomain_names(Xdr &io)
       }
     }
 
+    // Broadcast the subdomain names to all processors
+    this->comm().broadcast(n_subdomain_names);
     if (n_subdomain_names == 0)
       return;
 
-    // Broadcast the subdomain names to all processors
-    this->comm().broadcast(n_subdomain_names);
     subdomain_ids.resize(n_subdomain_names);
     subdomain_names.resize(n_subdomain_names);
     this->comm().broadcast(subdomain_ids);
@@ -1446,11 +1446,11 @@ void XdrIO::read_serialized_bc_names(Xdr &io, BoundaryInfo & info, bool is_sides
       }
     }
 
+    // Broadcast the boundary names to all processors
+    this->comm().broadcast(n_boundary_names);
     if (n_boundary_names == 0)
       return;
 
-    // Broadcast the boundary names to all processors
-    this->comm().broadcast(n_boundary_names);
     boundary_ids.resize(n_boundary_names);
     boundary_names.resize(n_boundary_names);
     this->comm().broadcast(boundary_ids);
