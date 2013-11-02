@@ -135,150 +135,160 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   }
 
 
-  // build the graph in CSR format.  Note that
-  // the edges in the graph will correspond to
-  // face neighbors
-  std::vector<int> xadj, adjncy;
-  {
-    std::vector<const Elem*> neighbors_offspring;
+  // Invoke METIS, but only on processor 0.
+  // Then broadcast the resulting decomposition
+  if (mesh.processor_id() == 0)
+    {
+      std::vector<int> xadj, adjncy;
 
-    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.active_elements_end();
-
-    // This will be exact when there is no refinement and all the
-    // elements are of the same type.
-    std::size_t graph_size=0;
-    std::vector<std::vector<dof_id_type> > graph(n_active_elem);
-
-    for (; elem_it != elem_end; ++elem_it)
+      // Local scope for these
       {
-	const Elem* elem = *elem_it;
+	// build the graph in CSR format.  Note that
+	// the edges in the graph will correspond to
+	// face neighbors
+	std::vector<const Elem*> neighbors_offspring;
 
-	libmesh_assert (global_index_map.count(elem));
+	MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+	const MeshBase::element_iterator elem_end = mesh.active_elements_end();
 
-	const dof_id_type elem_global_index =
-	  global_index_map[elem];
+	// This will be exact when there is no refinement and all the
+	// elements are of the same type.
+	std::size_t graph_size=0;
+	std::vector<std::vector<dof_id_type> > graph(n_active_elem);
 
-	libmesh_assert_less (elem_global_index, vwgt.size());
-	libmesh_assert_less (elem_global_index, graph.size());
-
-	// maybe there is a better weight?
-	// The weight is used to define what a balanced graph is
-        if(!_weights)
-          vwgt[elem_global_index] = elem->n_nodes();
-        else
-          vwgt[elem_global_index] = static_cast<int>((*_weights)[elem->id()]);
-
-	// Loop over the element's neighbors.  An element
-	// adjacency corresponds to a face neighbor
-	for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
+	for (; elem_it != elem_end; ++elem_it)
 	  {
-	    const Elem* neighbor = elem->neighbor(ms);
+	    const Elem* elem = *elem_it;
 
-	    if (neighbor != NULL)
+	    libmesh_assert (global_index_map.count(elem));
+
+	    const dof_id_type elem_global_index =
+	      global_index_map[elem];
+
+	    libmesh_assert_less (elem_global_index, vwgt.size());
+	    libmesh_assert_less (elem_global_index, graph.size());
+
+	    // maybe there is a better weight?
+	    // The weight is used to define what a balanced graph is
+	    if(!_weights)
+	      vwgt[elem_global_index] = elem->n_nodes();
+	    else
+	      vwgt[elem_global_index] = static_cast<int>((*_weights)[elem->id()]);
+
+	    // Loop over the element's neighbors.  An element
+	    // adjacency corresponds to a face neighbor
+	    for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
 	      {
-		// If the neighbor is active treat it
-		// as a connection
-		if (neighbor->active())
+		const Elem* neighbor = elem->neighbor(ms);
+
+		if (neighbor != NULL)
 		  {
-		    libmesh_assert (global_index_map.count(neighbor));
+		    // If the neighbor is active treat it
+		    // as a connection
+		    if (neighbor->active())
+		      {
+			libmesh_assert (global_index_map.count(neighbor));
 
-		    const dof_id_type neighbor_global_index =
-		      global_index_map[neighbor];
+			const dof_id_type neighbor_global_index =
+			  global_index_map[neighbor];
 
-		    graph[elem_global_index].push_back(neighbor_global_index);
-		    graph_size++;
-		  }
+			graph[elem_global_index].push_back(neighbor_global_index);
+			graph_size++;
+		      }
 
 #ifdef LIBMESH_ENABLE_AMR
 
-		// Otherwise we need to find all of the
-		// neighbor's children that are connected to
-		// us and add them
-		else
-		  {
-		    // The side of the neighbor to which
-		    // we are connected
-		    const unsigned int ns =
-		      neighbor->which_neighbor_am_i (elem);
-                    libmesh_assert_less (ns, neighbor->n_neighbors());
-
-		    // Get all the active children (& grandchildren, etc...)
-		    // of the neighbor.
-		    neighbor->active_family_tree (neighbors_offspring);
-
-		    // Get all the neighbor's children that
-		    // live on that side and are thus connected
-		    // to us
-		    for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
+		    // Otherwise we need to find all of the
+		    // neighbor's children that are connected to
+		    // us and add them
+		    else
 		      {
-			const Elem* child =
-			  neighbors_offspring[nc];
+			// The side of the neighbor to which
+			// we are connected
+			const unsigned int ns =
+			  neighbor->which_neighbor_am_i (elem);
+			libmesh_assert_less (ns, neighbor->n_neighbors());
 
-			// This does not assume a level-1 mesh.
-			// Note that since children have sides numbered
-			// coincident with the parent then this is a sufficient test.
-			if (child->neighbor(ns) == elem)
+			// Get all the active children (& grandchildren, etc...)
+			// of the neighbor.
+			neighbor->active_family_tree (neighbors_offspring);
+
+			// Get all the neighbor's children that
+			// live on that side and are thus connected
+			// to us
+			for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
 			  {
-			    libmesh_assert (child->active());
-			    libmesh_assert (global_index_map.count(child));
+			    const Elem* child =
+			      neighbors_offspring[nc];
 
-			    const dof_id_type child_global_index =
-			      global_index_map[child];
+			    // This does not assume a level-1 mesh.
+			    // Note that since children have sides numbered
+			    // coincident with the parent then this is a sufficient test.
+			    if (child->neighbor(ns) == elem)
+			      {
+				libmesh_assert (child->active());
+				libmesh_assert (global_index_map.count(child));
 
-			    graph[elem_global_index].push_back(child_global_index);
-			    graph_size++;
+				const dof_id_type child_global_index =
+				  global_index_map[child];
+
+				graph[elem_global_index].push_back(child_global_index);
+				graph_size++;
+			      }
 			  }
 		      }
-		  }
 
 #endif /* ifdef LIBMESH_ENABLE_AMR */
 
+		  }
 	      }
 	  }
-      }
 
-    // Convert the graph into the format Metis wants
-    xadj.reserve(n_active_elem+1);
-    adjncy.reserve(graph_size);
+	// Convert the graph into the format Metis wants
+	xadj.reserve(n_active_elem+1);
+	adjncy.reserve(graph_size);
 
-    for (std::size_t r=0; r<graph.size(); r++)
-      {
+	for (std::size_t r=0; r<graph.size(); r++)
+	  {
+	    xadj.push_back(adjncy.size());
+	    std::vector<dof_id_type> graph_row; // build this emtpy
+	    graph_row.swap(graph[r]); // this will deallocate at the end of scope
+	    adjncy.insert(adjncy.end(),
+			  graph_row.begin(),
+			  graph_row.end());
+	  }
+
+	// The end of the adjacency array for the last elem
 	xadj.push_back(adjncy.size());
-	std::vector<dof_id_type> graph_row; // build this emtpy
-	graph_row.swap(graph[r]); // this will deallocate at the end of scope
-	adjncy.insert(adjncy.end(),
-		      graph_row.begin(),
-		      graph_row.end());
-      }
 
-    // The end of the adjacency array for the last elem
-    xadj.push_back(adjncy.size());
-
-    libmesh_assert_equal_to (adjncy.size(), graph_size);
-    libmesh_assert_equal_to (xadj.size(), n_active_elem+1);
-  } // done building the graph
+	libmesh_assert_equal_to (adjncy.size(), graph_size);
+	libmesh_assert_equal_to (xadj.size(), n_active_elem+1);
+      } // done building the graph
 
 
-  if (adjncy.empty())
-    adjncy.push_back(0);
+      if (adjncy.empty())
+	adjncy.push_back(0);
 
-  int ncon = 1;
+      int ncon = 1;
 
-  // Select which type of partitioning to create
+      // Select which type of partitioning to create
 
-  // Use recursive if the number of partitions is less than or equal to 8
-  if (n_pieces <= 8)
-    Metis::METIS_PartGraphRecursive(&n, &ncon, &xadj[0], &adjncy[0], &vwgt[0], NULL,
-				    NULL, &nparts, NULL, NULL, NULL,
-				    &edgecut, &part[0]);
+      // Use recursive if the number of partitions is less than or equal to 8
+      if (n_pieces <= 8)
+	Metis::METIS_PartGraphRecursive(&n, &ncon, &xadj[0], &adjncy[0], &vwgt[0], NULL,
+					NULL, &nparts, NULL, NULL, NULL,
+					&edgecut, &part[0]);
 
-  // Otherwise  use kway
-  else
-    Metis::METIS_PartGraphKway(&n, &ncon, &xadj[0], &adjncy[0], &vwgt[0], NULL,
-			       NULL, &nparts, NULL, NULL, NULL,
-			       &edgecut, &part[0]);
+      // Otherwise  use kway
+      else
+	Metis::METIS_PartGraphKway(&n, &ncon, &xadj[0], &adjncy[0], &vwgt[0], NULL,
+				   NULL, &nparts, NULL, NULL, NULL,
+				   &edgecut, &part[0]);
 
+    } // end processor 0 part
+
+  // Broadcase the resutling partition
+  mesh.comm().broadcast(part);
 
   // Assign the returned processor ids.  The part array contains
   // the processor id for each active element, but in terms of
@@ -300,7 +310,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 	const processor_id_type elem_procid =
 	  static_cast<processor_id_type>(part[elem_global_index]);
 
-        elem->processor_id() = elem_procid;
+	elem->processor_id() = elem_procid;
       }
   }
 
