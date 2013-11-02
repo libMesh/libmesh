@@ -24,6 +24,8 @@
 #include <vector>
 #include <algorithm>
 
+// libMesh includes
+#include "libmesh/libmesh_common.h"
 
 
 namespace libMesh
