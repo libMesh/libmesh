@@ -109,7 +109,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   // independednt of the element ordering, otherwise a circular dependency
   // can result in which the partitioning depends on the ordering which
   // depends on the partitioning...
-  vectormap<const Elem*, dof_id_type> global_index_map;
+  vectormap<dof_id_type, dof_id_type> global_index_map;
   global_index_map.reserve (n_active_elem);
 
   {
@@ -127,9 +127,8 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
     for (std::size_t cnt=0; it != end; ++it)
       {
 	const Elem *elem = *it;
-	libmesh_assert (!global_index_map.count(elem));
 
-	global_index_map.insert (std::make_pair(elem, global_index[cnt++]));
+	global_index_map.insert (std::make_pair(elem->id(), global_index[cnt++]));
       }
     libmesh_assert_equal_to (global_index_map.size(), n_active_elem);
   }
@@ -160,10 +159,10 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 	  {
 	    const Elem* elem = *elem_it;
 
-	    libmesh_assert (global_index_map.count(elem));
+	    libmesh_assert (global_index_map.count(elem->id()));
 
 	    const dof_id_type elem_global_index =
-	      global_index_map[elem];
+	      global_index_map[elem->id()];
 
 	    libmesh_assert_less (elem_global_index, vwgt.size());
 	    libmesh_assert_less (elem_global_index, graph.size());
@@ -187,10 +186,10 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 		    // as a connection
 		    if (neighbor->active())
 		      {
-			libmesh_assert (global_index_map.count(neighbor));
+			libmesh_assert (global_index_map.count(neighbor->id()));
 
 			const dof_id_type neighbor_global_index =
-			  global_index_map[neighbor];
+			  global_index_map[neighbor->id()];
 
 			graph[elem_global_index].push_back(neighbor_global_index);
 			graph_size++;
@@ -227,10 +226,10 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 			    if (child->neighbor(ns) == elem)
 			      {
 				libmesh_assert (child->active());
-				libmesh_assert (global_index_map.count(child));
+				libmesh_assert (global_index_map.count(child->id()));
 
 				const dof_id_type child_global_index =
-				  global_index_map[child];
+				  global_index_map[child->id()];
 
 				graph[elem_global_index].push_back(child_global_index);
 				graph_size++;
@@ -301,10 +300,10 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
       {
 	Elem* elem = *it;
 
-	libmesh_assert (global_index_map.count(elem));
+	libmesh_assert (global_index_map.count(elem->id()));
 
 	const dof_id_type elem_global_index =
-	  global_index_map[elem];
+	  global_index_map[elem->id()];
 
 	libmesh_assert_less (elem_global_index, part.size());
 	const processor_id_type elem_procid =
