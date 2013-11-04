@@ -47,6 +47,62 @@
 #endif
 
 
+
+
+namespace
+{
+  class CSRGraph
+  {
+  public:
+    std::vector<int> offsets, vals;
+
+    void prep_n_nonzeros(const libMesh::dof_id_type row, const libMesh::dof_id_type n_nonzeros)
+    {
+      libmesh_assert_less (row+1, offsets.size());
+      offsets[row+1] = n_nonzeros;
+    }
+
+
+
+    libMesh::dof_id_type n_nonzeros (const libMesh::dof_id_type row) const
+    {
+      libmesh_assert_less (row+1, offsets.size());
+      return (offsets[row+1] - offsets[row]);
+    }
+
+
+    void prepare_for_use()
+    {
+      std::partial_sum (offsets.begin(), offsets.end(), offsets.begin());
+      libmesh_assert (!offsets.empty());
+      vals.resize(offsets.back());
+
+      if (vals.empty())
+	vals.push_back(0);
+    }
+
+
+
+    int& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero)
+    {
+      libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
+
+      return vals[offsets[row]+nonzero];
+    }
+
+
+
+    const int& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero) const
+    {
+      libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
+
+      return vals[offsets[row]+nonzero];
+    }
+
+  };
+}
+
+
 namespace libMesh
 {
 
@@ -138,7 +194,9 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   // Then broadcast the resulting decomposition
   if (mesh.processor_id() == 0)
     {
-      std::vector<int> xadj, adjncy;
+      CSRGraph csr_graph;
+
+      csr_graph.offsets.resize(n_active_elem+1, 0);
 
       // Local scope for these
       {
@@ -150,22 +208,18 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 	MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
 	const MeshBase::element_iterator elem_end = mesh.active_elements_end();
 
-	// This will be exact when there is no refinement and all the
-	// elements are of the same type.
 	std::size_t graph_size=0;
-	std::vector<std::vector<dof_id_type> > graph(n_active_elem);
 
+	// (1) first pass - get the row sizes for each element by counting the number
+	// of face neighbors.  Also populate the vwght array if necessary
 	for (; elem_it != elem_end; ++elem_it)
 	  {
 	    const Elem* elem = *elem_it;
-
-	    libmesh_assert (global_index_map.count(elem->id()));
 
 	    const dof_id_type elem_global_index =
 	      global_index_map[elem->id()];
 
 	    libmesh_assert_less (elem_global_index, vwgt.size());
-	    libmesh_assert_less (elem_global_index, graph.size());
 
 	    // maybe there is a better weight?
 	    // The weight is used to define what a balanced graph is
@@ -173,6 +227,8 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 	      vwgt[elem_global_index] = elem->n_nodes();
 	    else
 	      vwgt[elem_global_index] = static_cast<int>((*_weights)[elem->id()]);
+
+	    unsigned int num_neighbors = 0;
 
 	    // Loop over the element's neighbors.  An element
 	    // adjacency corresponds to a face neighbor
@@ -185,15 +241,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 		    // If the neighbor is active treat it
 		    // as a connection
 		    if (neighbor->active())
-		      {
-			libmesh_assert (global_index_map.count(neighbor->id()));
-
-			const dof_id_type neighbor_global_index =
-			  global_index_map[neighbor->id()];
-
-			graph[elem_global_index].push_back(neighbor_global_index);
-			graph_size++;
-		      }
+		      num_neighbors++;
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -226,13 +274,80 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 			    if (child->neighbor(ns) == elem)
 			      {
 				libmesh_assert (child->active());
-				libmesh_assert (global_index_map.count(child->id()));
+				num_neighbors++;
+			      }
+			  }
+		      }
 
-				const dof_id_type child_global_index =
-				  global_index_map[child->id()];
+#endif /* ifdef LIBMESH_ENABLE_AMR */
 
-				graph[elem_global_index].push_back(child_global_index);
-				graph_size++;
+		  }
+	      }
+
+	    csr_graph.prep_n_nonzeros(elem_global_index, num_neighbors);
+	    graph_size += num_neighbors;
+	  }
+
+	csr_graph.prepare_for_use();
+
+	// (2) second pass - fill the compressed adjacency array
+	elem_it  = mesh.active_elements_begin();
+
+	for (; elem_it != elem_end; ++elem_it)
+	  {
+	    const Elem* elem = *elem_it;
+
+	    const dof_id_type elem_global_index =
+	      global_index_map[elem->id()];
+
+	    unsigned int connection=0;
+
+	    // Loop over the element's neighbors.  An element
+	    // adjacency corresponds to a face neighbor
+	    for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
+	      {
+		const Elem* neighbor = elem->neighbor(ms);
+
+		if (neighbor != NULL)
+		  {
+		    // If the neighbor is active treat it
+		    // as a connection
+		    if (neighbor->active())
+		      csr_graph(elem_global_index, connection++) = global_index_map[neighbor->id()];
+
+#ifdef LIBMESH_ENABLE_AMR
+
+		    // Otherwise we need to find all of the
+		    // neighbor's children that are connected to
+		    // us and add them
+		    else
+		      {
+			// The side of the neighbor to which
+			// we are connected
+			const unsigned int ns =
+			  neighbor->which_neighbor_am_i (elem);
+			libmesh_assert_less (ns, neighbor->n_neighbors());
+
+			// Get all the active children (& grandchildren, etc...)
+			// of the neighbor.
+			neighbor->active_family_tree (neighbors_offspring);
+
+			// Get all the neighbor's children that
+			// live on that side and are thus connected
+			// to us
+			for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
+			  {
+			    const Elem* child =
+			      neighbors_offspring[nc];
+
+			    // This does not assume a level-1 mesh.
+			    // Note that since children have sides numbered
+			    // coincident with the parent then this is a sufficient test.
+			    if (child->neighbor(ns) == elem)
+			      {
+				libmesh_assert (child->active());
+
+				csr_graph(elem_global_index, connection++) = global_index_map[child->id()];
 			      }
 			  }
 		      }
@@ -243,30 +358,8 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 	      }
 	  }
 
-	// Convert the graph into the format Metis wants
-	xadj.reserve(n_active_elem+1);
-	adjncy.reserve(graph_size);
-
-	for (std::size_t r=0; r<graph.size(); r++)
-	  {
-	    xadj.push_back(adjncy.size());
-	    std::vector<dof_id_type> graph_row; // build this emtpy
-	    graph_row.swap(graph[r]); // this will deallocate at the end of scope
-	    adjncy.insert(adjncy.end(),
-			  graph_row.begin(),
-			  graph_row.end());
-	  }
-
-	// The end of the adjacency array for the last elem
-	xadj.push_back(adjncy.size());
-
-	libmesh_assert_equal_to (adjncy.size(), graph_size);
-	libmesh_assert_equal_to (xadj.size(), n_active_elem+1);
+	libmesh_assert_equal_to (csr_graph.vals.size(), graph_size);
       } // done building the graph
-
-
-      if (adjncy.empty())
-	adjncy.push_back(0);
 
       int ncon = 1;
 
@@ -274,13 +367,13 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 
       // Use recursive if the number of partitions is less than or equal to 8
       if (n_pieces <= 8)
-	Metis::METIS_PartGraphRecursive(&n, &ncon, &xadj[0], &adjncy[0], &vwgt[0], NULL,
+	Metis::METIS_PartGraphRecursive(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], NULL,
 					NULL, &nparts, NULL, NULL, NULL,
 					&edgecut, &part[0]);
 
       // Otherwise  use kway
       else
-	Metis::METIS_PartGraphKway(&n, &ncon, &xadj[0], &adjncy[0], &vwgt[0], NULL,
+	Metis::METIS_PartGraphKway(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], NULL,
 				   NULL, &nparts, NULL, NULL, NULL,
 				   &edgecut, &part[0]);
 
