@@ -18,7 +18,6 @@
 
 
 // C++ Includes   -----------------------------------
-#include <map>
 
 // Local Includes -----------------------------------
 #include "libmesh/libmesh_config.h"
