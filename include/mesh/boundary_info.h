@@ -290,6 +290,11 @@ public:
   std::size_t n_boundary_conds () const;
 
   /**
+   * @returns the number of node-based boundary conditions.
+   */
+  std::size_t n_nodeset_conds () const;
+
+  /**
    * Creates a list of nodes and ids for those nodes.
    */
   void build_node_list (std::vector<dof_id_type>&      node_id_list,

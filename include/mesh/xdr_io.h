@@ -189,6 +189,11 @@ class XdrIO : public MeshInput<MeshBase>,
   void write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const;
 
   /**
+   * Write the boundary conditions for a parallel, distributed mesh
+   */
+  void write_serialized_nodesets (Xdr &io, const std::size_t n_nodesets) const;
+
+  /**
    * Write boundary names information (sideset and nodeset) - NEW in 0.9.2 format
    */
   void write_serialized_bc_names (Xdr &io, const BoundaryInfo & info, bool is_sideset) const;
@@ -214,9 +219,17 @@ class XdrIO : public MeshInput<MeshBase>,
 
   /**
    * Read the boundary conditions for a parallel, distributed mesh
+   * @return the number of bcs read
    */
   template <typename T>
   void read_serialized_bcs (Xdr &io, T);
+
+  /**
+   * Read the nodeset conditions for a parallel, distributed mesh
+   * @return the number of nodesets read
+   */
+  template <typename T>
+  void read_serialized_nodesets (Xdr &io, T);
 
   /**
    * Read boundary names information (sideset and nodeset) - NEW in 0.9.2 format
