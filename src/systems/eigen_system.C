@@ -52,7 +52,9 @@ EigenSystem::EigenSystem (EquationSystems& es,
   _n_converged_eigenpairs (0),
   _n_iterations           (0),
   _is_generalized_eigenproblem (false),
-  _eigen_problem_type (NHEP)
+  _eigen_problem_type (NHEP),
+  _eigenproblem_sensitivity_assemble_system_function(NULL),
+  _eigenproblem_sensitivity_assemble_system_object(NULL)
 {
 }
 
@@ -266,34 +268,69 @@ EigenSystem::sensitivity_solve (const ParameterVector& parameters)
     //
     //    the denominator remain constant for all sensitivity calculations.
     //
-    Number num, sens;
+    std::vector<Number> denom(_n_converged_eigenpairs, 0.),
+    sens(_n_converged_eigenpairs, 0.);
+    std::pair<Real, Real> eig_val;
     
     AutoPtr< NumericVector<Number> > x_right = NumericVector<Number>::build(this->comm()),
-    x_left = NumericVector<Number>::build(this->comm());
-    x_right->init(*solution); x_left->init(*solution);
-    
-    std::vector<Number> denom(_n_converged_eigenpairs, 0.);
+    x_left = NumericVector<Number>::build(this->comm()),
+    tmp = NumericVector<Number>::build(this->comm());
+    x_right->init(*solution); x_left->init(*solution); tmp->init(*solution);
     
     for (unsigned int i=0; i<_n_converged_eigenpairs; i++)
     {
-      this->eigen_solver->get_eigenpair(i, *x_right);
       switch (_eigen_problem_type) {
         case HEP:
           // right and left eigenvectors are same
-          denom[i] = x_right->dot(*x_right);
+          // imaginary part of eigenvector for real matrices is zero
+          this->eigen_solver->get_eigenpair(i, *x_right, NULL);
+          denom[i] = x_right->dot(*x_right);               // x^H x
           break;
           
+        case GHEP:
+          // imaginary part of eigenvector for real matrices is zero
+          this->eigen_solver->get_eigenpair(i, *x_right, NULL);
+          matrix_B->vector_mult(*tmp, *x_right);
+          denom[i] = x_right->dot(*tmp);                  // x^H B x
+          
         default:
+          // to be implemented for the non-Hermitian problems
+          libmesh_error();
           break;
       }
-      //
     }
     
     for (unsigned int p=0; p<parameters.size(); p++)
     {
+      // calculate sensitivity of matrix quantities
       this->assemble_eigensystem_sensitivity(parameters, p);
-
       
+      // now calculate sensitivity of each eigenvalue for the parameter
+      for (unsigned int i=0; i<_n_converged_eigenpairs; i++)
+      {
+        eig_val = this->eigen_solver->get_eigenpair(i, *x_right);
+        switch (_eigen_problem_type)
+        {
+          case HEP:
+            matrix_A->vector_mult(*tmp, *x_right);
+            sens[i] = x_right->dot(*tmp);            // x^H A' x
+            sens[i] /= denom[i];                     // x^H x
+            break;
+
+          case GHEP:
+            matrix_A->vector_mult(*tmp, *x_right);
+            sens[i] = x_right->dot(*tmp);                 // x^H A' x
+            matrix_B->vector_mult(*tmp, *x_right);
+            sens[i]-= eig_val.first * x_right->dot(*tmp); // - lambda x^H B' x
+            sens[i] /= denom[i];                          // x^H B x
+            break;
+            
+          default:
+            // to be implemented for the non-Hermitian problems
+            libmesh_error();
+            break;
+        }
+      }
     }
     
     return std::pair<unsigned int, Real> (0, 0.);
@@ -316,6 +353,86 @@ std::pair<Real, Real> EigenSystem::get_eigenpair (unsigned int i)
   return eigen_solver->get_eigenpair (i, *solution);
 }
 
+  
+  
+bool EigenSystem::user_eigensystem_sensitivity_assemble(const ParameterVector& parameters,
+                                                        const unsigned int p)
+{
+  bool rval = false;
+  
+  // Call the user-provided assembly function,
+  // if it was provided
+  if (_eigenproblem_sensitivity_assemble_system_function != NULL)
+    rval = this->_eigenproblem_sensitivity_assemble_system_function (this->get_equation_systems(),
+                                                                     this->name(),
+                                                                     parameters,
+                                                                     p,
+                                                                     matrix_A,
+                                                                     matrix_B);
+  
+  // ...or the user-provided assembly object.
+  else if (_eigenproblem_sensitivity_assemble_system_object != NULL)
+    rval = this->_eigenproblem_sensitivity_assemble_system_object->sensitivity_assemble
+    (parameters, p, matrix_A, matrix_B);
+  
+
+  return rval;
+}
+
+  
+
+  
+void EigenSystem::assemble_eigensystem_sensitivity(const ParameterVector& parameters,
+                                                   const unsigned int p)
+{
+  // if this has not been calculated by the use provided routines, then
+  // use central differencing to calculate the sensitivity matrices
+  if (!this->user_eigensystem_sensitivity_assemble(parameters, p))
+  {
+    libMesh::err << "Error: EigenSystem is currently not setup to calculate matrix "
+    << "sensitivity using finite differencing!";
+    libmesh_error();
+  }
+}
+
+  
+void EigenSystem::attach_sensitivity_assemble_function (bool fptr(EquationSystems& es,
+                                                                  const std::string& name,
+                                                                  const ParameterVector& parameters,
+                                                                  const unsigned int i,
+                                                                  SparseMatrix<Number>* sensitivity_A,
+                                                                  SparseMatrix<Number>* sensitivity_B))
+{
+  libmesh_assert(fptr);
+  
+  if (_eigenproblem_sensitivity_assemble_system_object != NULL)
+  {
+    libmesh_here();
+    libMesh::out << "WARNING:  Cannot specify both assembly sensitivity function and object!"
+    << std::endl;
+    
+    _eigenproblem_sensitivity_assemble_system_object = NULL;
+  }
+  
+  _eigenproblem_sensitivity_assemble_system_function = fptr;
+}
+  
+
+void EigenSystem::attach_sensitivity_assemble_object (EigenproblemSensitivityAssembly& assemble)
+{
+  if (_eigenproblem_sensitivity_assemble_system_function != NULL)
+  {
+    libmesh_here();
+    libMesh::out << "WARNING:  Cannot specify both assembly object and function!"
+    << std::endl;
+    
+    _eigenproblem_sensitivity_assemble_system_function = NULL;
+  }
+  
+  _eigenproblem_sensitivity_assemble_system_object = &assemble;
+}
+
+  
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_SLEPC

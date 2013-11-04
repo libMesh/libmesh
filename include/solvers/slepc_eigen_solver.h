@@ -175,10 +175,48 @@ public:
    * This function returns the real and imaginary part of the
    * ith eigenvalue and copies the respective eigenvector to the
    * solution vector. Note that also in case of purely real matrix
-   * entries the eigenpair may be complex values.
+   * entries the eigenpair may be complex values. 
+   *
+   * For real matrices, first vector will store only the real part of the 
+   * eigenvector. The second vector \p eig_vec_im can be provided to 
+   * get the imaginary part of the eigenvector. 
+   *
+   * For complex matrices, the second vector is not needed, and should be 
+   * NULL.
    */
   std::pair<Real, Real> get_eigenpair (unsigned int i,
-				       NumericVector<T> &solution_in);
+                                       NumericVector<T> &eig_vec,
+                                       NumericVector<T>* eig_vec_im);
+
+  /**
+   * This function copies the respective RIGHT eigenvector to the
+   * provided vector(s).
+   *
+   * For real matrices, first vector will store only the real part of the
+   * eigenvector. The second vector \p eig_vec_im can be provided to
+   * get the imaginary part of the eigenvector.
+   *
+   * For complex matrices, the second vector is not needed, and should be
+   * NULL.
+   */
+  virtual void get_right_eigenvector (unsigned int i,
+                                      NumericVector<T> &eig_vec,
+                                      NumericVector<T>* eig_vec_im = NULL);
+  
+  /**
+   * This function copies the respective LEFT eigenvector to the
+   * provided vector(s).
+   *
+   * For real matrices, first vector will store only the real part of the
+   * eigenvector. The second vector \p eig_vec_im can be provided to
+   * get the imaginary part of the eigenvector.
+   *
+   * For complex matrices, the second vector is not needed, and should be
+   * NULL.
+   */
+  virtual void get_left_eigenvector (unsigned int i,
+                                     NumericVector<T> &eig_vec,
+                                     NumericVector<T>* eig_vec_im = NULL);
 
   /**
    * Same as above, but does not copy the eigenvector.
