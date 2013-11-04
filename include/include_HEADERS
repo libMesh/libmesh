@@ -257,6 +257,7 @@ include_HEADERS =  \
         partitioning/centroid_partitioner.h \
         partitioning/hilbert_sfc_partitioner.h \
         partitioning/linear_partitioner.h \
+        partitioning/metis_csr_graph.h \
         partitioning/metis_partitioner.h \
         partitioning/morton_sfc_partitioner.h \
         partitioning/parmetis_partitioner.h \

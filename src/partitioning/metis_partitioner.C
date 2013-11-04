@@ -29,6 +29,7 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/error_vector.h"
 #include "libmesh/vectormap.h"
+#include "libmesh/metis_csr_graph.h"
 
 #ifdef LIBMESH_HAVE_METIS
 // MIPSPro 7.4.2 gets confused about these nested namespaces
@@ -47,60 +48,6 @@
 #endif
 
 
-
-
-namespace
-{
-  class CSRGraph
-  {
-  public:
-    std::vector<int> offsets, vals;
-
-    void prep_n_nonzeros(const libMesh::dof_id_type row, const libMesh::dof_id_type n_nonzeros)
-    {
-      libmesh_assert_less (row+1, offsets.size());
-      offsets[row+1] = n_nonzeros;
-    }
-
-
-
-    libMesh::dof_id_type n_nonzeros (const libMesh::dof_id_type row) const
-    {
-      libmesh_assert_less (row+1, offsets.size());
-      return (offsets[row+1] - offsets[row]);
-    }
-
-
-    void prepare_for_use()
-    {
-      std::partial_sum (offsets.begin(), offsets.end(), offsets.begin());
-      libmesh_assert (!offsets.empty());
-      vals.resize(offsets.back());
-
-      if (vals.empty())
-	vals.push_back(0);
-    }
-
-
-
-    int& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero)
-    {
-      libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
-
-      return vals[offsets[row]+nonzero];
-    }
-
-
-
-    const int& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero) const
-    {
-      libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
-
-      return vals[offsets[row]+nonzero];
-    }
-
-  };
-}
 
 
 namespace libMesh
@@ -194,7 +141,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   // Then broadcast the resulting decomposition
   if (mesh.processor_id() == 0)
     {
-      CSRGraph csr_graph;
+      METIS_CSR_Graph csr_graph;
 
       csr_graph.offsets.resize(n_active_elem+1, 0);
 
