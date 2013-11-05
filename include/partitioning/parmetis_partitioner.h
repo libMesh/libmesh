@@ -23,10 +23,10 @@
 // Local Includes -----------------------------------
 #include "libmesh/id_types.h"
 #include "libmesh/partitioner.h"
+#include "libmesh/vectormap.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>
-#include <map>
 #include <vector>
 
 namespace libMesh
@@ -109,7 +109,7 @@ private:
   /**
    * Maps active element ids into a contiguous range, as needed by ParMETIS.
    */
-  std::map<dof_id_type, dof_id_type> _global_index_by_pid_map;
+  vectormap<dof_id_type, dof_id_type> _global_index_by_pid_map;
 
   /**
    * Data structures used by ParMETIS to describe the connectivity graph

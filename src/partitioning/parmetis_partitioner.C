@@ -247,7 +247,7 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
 
   // Maps active element ids into a contiguous range independent of partitioning.
   // (only needs local scope)
-  std::map<dof_id_type, dof_id_type> global_index_map;
+  vectormap<dof_id_type, dof_id_type> global_index_map;
 
   {
     std::vector<dof_id_type> global_index;
@@ -273,7 +273,7 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
 	    libmesh_assert_less (cnt, global_index.size());
 	    libmesh_assert_less (global_index[cnt], _n_active_elem_on_proc[pid]);
 
-	    _global_index_by_pid_map[elem->id()]  = global_index[cnt++] + pid_offset;
+	    _global_index_by_pid_map.insert(std::make_pair(elem->id(), global_index[cnt++] + pid_offset));
 	  }
 
 	pid_offset += _n_active_elem_on_proc[pid];
@@ -297,7 +297,7 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
 	  libmesh_assert_less (cnt, global_index.size());
 	  libmesh_assert_less (global_index[cnt], n_active_elem);
 
-	  global_index_map[elem->id()]  = global_index[cnt++];
+	  global_index_map.insert(std::make_pair(elem->id(), global_index[cnt++]));
 	}
       }
     // really, shouldn't be close!
