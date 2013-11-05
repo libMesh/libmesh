@@ -806,8 +806,6 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
 {
   libmesh_assert (io.writing());
 
-  if (!n_bcs) return;
-
   // convenient reference to our mesh
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
 
@@ -822,6 +820,8 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
   if (this->processor_id() == 0)
     io.data (n_bcs_out, "# number of boundary conditions");
   n_bcs_out = 0;
+
+  if (!n_bcs) return;
 
   std::vector<xdr_id_type> xfer_bcs, recv_bcs;
   std::vector<std::size_t> bc_sizes(this->n_processors());;
