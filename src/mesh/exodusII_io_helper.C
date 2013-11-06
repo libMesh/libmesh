@@ -1606,6 +1606,10 @@ void ExodusII_IO_Helper::initialize_global_variables(std::vector<std::string> na
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
+  // Quick return if there are no global variables to write
+  if (names.size() == 0)
+    return;
+
   if (_global_vars_initialized)
     return;
 
