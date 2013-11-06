@@ -219,9 +219,9 @@ public:
    * Wraps calls to exII::ex_get_var_names() and exII:ex_get_var_param().
    * The enumeration controls whether nodal, elemental, or global
    * variable names are read and which class members are filled in.
-   * NODAL:     num_nodal_vars nodal_var_names
-   * ELEMENTAL: num_elem_vars  elem_var_names
-   * GLOBAL:    num_globals    global_var_names
+   * NODAL:     num_nodal_vars  nodal_var_names
+   * ELEMENTAL: num_elem_vars   elem_var_names
+   * GLOBAL:    num_global_vars global_var_names
    */
   enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2};
   void read_var_names(ExodusVarType type);
@@ -386,7 +386,7 @@ public:
   int num_dim;
 
   // Number of global variables
-  int num_globals;
+  int num_global_vars;
 
   // Total number of nodes in the mesh
   int num_nodes;

@@ -225,7 +225,7 @@ const int ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map[5] = {-1,-1,
     ex_id(0),
     ex_err(0),
     num_dim(0),
-    num_globals(0),
+    num_global_vars(0),
     num_nodes(0),
     num_elem(0),
     num_elem_blk(0),
@@ -334,7 +334,7 @@ void ExodusII_IO_Helper::read_header()
   ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "g", &num_globals);
+  ex_err = exII::ex_get_var_param(ex_id, "g", &num_global_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of global variables.");
 
   message("Exodus header info retrieved successfully.");
@@ -789,7 +789,7 @@ void ExodusII_IO_Helper::read_var_names(ExodusVarType type)
       this->read_var_names_impl("e", num_elem_vars, elem_var_names);
       break;
     case GLOBAL:
-      this->read_var_names_impl("g", num_globals, global_var_names);
+      this->read_var_names_impl("g", num_global_vars, global_var_names);
       break;
     default:
       libMesh::err << "Unrecognized ExodusVarType " << type << std::endl;
@@ -1611,7 +1611,7 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
   // if we're appending) and in that case, we
   // 1.) Cannot initialize them again.
   // 2.) Should check to be sure that the global variable names are the same.
-  if (num_globals > 0)
+  if (num_global_vars > 0)
     {
       // Fills in global_var_names vector of strings
       this->read_var_names(GLOBAL);
@@ -1634,28 +1634,28 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
 
   _global_vars_initialized = true;
 
-  num_globals = names.size();
+  num_global_vars = names.size();
 
-  ex_err = exII::ex_put_var_param(ex_id, "g", num_globals);
+  ex_err = exII::ex_put_var_param(ex_id, "g", num_global_vars);
   EX_CHECK_ERR(ex_err, "Error setting number of global vars.");
 
-  if (num_globals > 0)
+  if (num_global_vars > 0)
     {
-      NamesData names_table(num_globals, MAX_STR_LENGTH);
+      NamesData names_table(num_global_vars, MAX_STR_LENGTH);
 
-      for (int i=0; i<num_globals; i++)
+      for (int i=0; i<num_global_vars; i++)
         names_table.push_back_entry(names[i]);
 
       if (verbose)
         {
           libMesh::out << "Writing variable name(s) to file: " << std::endl;
-          for (int i=0; i<num_globals; ++i)
+          for (int i=0; i<num_global_vars; ++i)
             libMesh::out << names_table.get_char_star(i) << std::endl;
         }
 
       ex_err = exII::ex_put_var_names(ex_id,
                                       "g",
-                                      num_globals,
+                                      num_global_vars,
                                       names_table.get_char_star_star()
                                       );
 
@@ -1790,7 +1790,7 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Number> & values,
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_globals, &values[0]);
+  ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_global_vars, &values[0]);
   EX_CHECK_ERR(ex_err, "Error writing global values.");
 
   ex_err = exII::ex_update(ex_id);
