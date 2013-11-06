@@ -1328,7 +1328,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
 #endif
               ++it;
             }
-          const dof_id_type parent_id =
+          const T parent_id =
             (*it == static_cast<T>(-1)) ?
             DofObject::invalid_id :
             cast_int<dof_id_type>(*it);
@@ -1346,7 +1346,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
           ++it;
 
           Elem *parent =
-            (parent_id == DofObject::invalid_id) ? NULL : mesh.elem(parent_id);
+            (parent_id == static_cast<T>(-1)) ? NULL : mesh.elem(parent_id);
 
           Elem *elem = Elem::build (elem_type, parent).release();
 
