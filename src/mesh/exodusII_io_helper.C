@@ -1614,9 +1614,22 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
   // 2.) Should check to be sure that the global variable names are the same.
   if (num_globals > 0)
     {
-      libMesh::err << "Warning! The Exodus file already contains global variables.\n"
-                   << "Exodus does not support writing additional global variables in this situation."
-                   << std::endl;
+      // Fills in global_var_names vector of strings
+      this->read_global_var_names();
+
+      // Both the names of the global variables and their order must match
+      if (this->global_var_names != names)
+        {
+          libMesh::err << "Error! The Exodus file already contains the global variables:" << std::endl;
+          for (unsigned i=0; i<global_var_names.size(); ++i)
+            libMesh::out << global_var_names[i] << std::endl;
+
+          libMesh::err << "And you asked to write:" << std::endl;
+          for (unsigned i=0; i<names.size(); ++i)
+            libMesh::out << names[i] << std::endl;
+
+          libmesh_error();
+        }
       return;
     }
 
