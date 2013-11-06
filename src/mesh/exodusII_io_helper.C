@@ -836,6 +836,63 @@ void ExodusII_IO_Helper::read_elemental_var_names()
 
 
 
+void ExodusII_IO_Helper::read_var_names(ExodusVarType type)
+{
+  switch (type)
+    {
+    case NODAL:
+      this->read_var_names_impl("n", num_nodal_vars, nodal_var_names);
+      break;
+    case ELEMENTAL:
+      this->read_var_names_impl("e", num_elem_vars, elem_var_names);
+      break;
+    case GLOBAL:
+      this->read_var_names_impl("g", num_globals, global_var_names);
+      break;
+    default:
+      libMesh::err << "Unrecognized ExodusVarType " << type << std::endl;
+      libmesh_error();
+    }
+}
+
+
+
+void ExodusII_IO_Helper::read_var_names_impl(const char* var_type,
+                                             int& count,
+                                             std::vector<std::string>& result)
+{
+  // First read and store the number of names we have
+  ex_err = exII::ex_get_var_param(ex_id, var_type, &count);
+  EX_CHECK_ERR(ex_err, "Error reading number of variables.");
+
+  // Second read the actual names and convert them into a format we can use
+  NamesData names_table(count, MAX_STR_LENGTH);
+
+  ex_err = exII::ex_get_var_names(ex_id,
+                                  var_type,
+                                  count,
+                                  names_table.get_char_star_star()
+                                  );
+  EX_CHECK_ERR(ex_err, "Error reading variable names!");
+
+  if (verbose)
+    {
+      libMesh::out << "Read the variable(s) from the file:" << std::endl;
+      for (int i=0; i<count; i++)
+        libMesh::out << names_table.get_char_star(i) << std::endl;
+    }
+
+  // Allocate enough space for our variable name strings.
+  result.resize(count);
+
+  // Copy the char buffers into strings.
+  for (int i=0; i<count; i++)
+    result[i] = names_table.get_char_star(i); // calls string::op=(const char*)
+}
+
+
+
+
 void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_name, int time_step)
 {
   // CAUTION: this assumes that libMesh element numbering is identical to exodus block-by-block element numbering

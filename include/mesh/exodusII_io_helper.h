@@ -216,6 +216,17 @@ public:
   void read_num_time_steps();
 
   /**
+   * Wraps calls to exII::ex_get_var_names() and exII:ex_get_var_param().
+   * The enumeration controls whether nodal, elemental, or global
+   * variable names are read and which class members are filled in.
+   * NODAL:     num_nodal_vars nodal_var_names
+   * ELEMENTAL: num_elem_vars  elem_var_names
+   * GLOBAL:    num_globals    global_var_names
+   */
+  enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2};
+  void read_var_names(ExodusVarType type);
+
+  /**
    * Reads the nodal variable names and stores them in the 'nodal_var_names' array.
    */
   void read_nodal_var_names();
@@ -556,6 +567,13 @@ protected:
 
   // On output, shift every point by _coordinate_offset
   Point _coordinate_offset;
+
+private:
+  /**
+   * Private implementation of the read_var_names() function.  Should
+   * not be called by clients of the class.
+   */
+  void read_var_names_impl(const char* var_type, int& count, std::vector<std::string>& result);
 };
 
 
