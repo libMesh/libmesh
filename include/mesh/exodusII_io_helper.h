@@ -216,30 +216,6 @@ public:
   void read_num_time_steps();
 
   /**
-   * Wraps calls to exII::ex_get_var_names() and exII::ex_get_var_param().
-   * The enumeration controls whether nodal, elemental, or global
-   * variable names are read and which class members are filled in.
-   * NODAL:     num_nodal_vars  nodal_var_names
-   * ELEMENTAL: num_elem_vars   elem_var_names
-   * GLOBAL:    num_global_vars global_var_names
-   */
-  enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2};
-  void read_var_names(ExodusVarType type);
-
-  /**
-   * Wraps calls to exII::ex_put_var_names() and exII::ex_put_var_param().
-   * The enumeration controls whether nodal, elemental, or global
-   * variable names are read and which class members are filled in.
-   */
-  void write_var_names(ExodusVarType type, std::vector<std::string>& names);
-
-  /**
-   * When appending: during initialization, check that variable names
-   * in the file match those you attempt to initialize with.
-   */
-  void check_existing_vars(ExodusVarType type, std::vector<std::string>& names, std::vector<std::string>& names_from_file);
-
-  /**
    * Reads the nodal values for the variable 'nodal_var_name' at the
    * specified time into the 'nodal_var_values' array.
    */
@@ -571,14 +547,36 @@ protected:
 
 private:
   /**
-   * Private implementation of the read_var_names() function.  Should
-   * not be called by clients of the class.
+   * Wraps calls to exII::ex_get_var_names() and exII::ex_get_var_param().
+   * The enumeration controls whether nodal, elemental, or global
+   * variable names are read and which class members are filled in.
+   * NODAL:     num_nodal_vars  nodal_var_names
+   * ELEMENTAL: num_elem_vars   elem_var_names
+   * GLOBAL:    num_global_vars global_var_names
+   */
+  enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2};
+  void read_var_names(ExodusVarType type);
+
+  /**
+   * Wraps calls to exII::ex_put_var_names() and exII::ex_put_var_param().
+   * The enumeration controls whether nodal, elemental, or global
+   * variable names are read and which class members are filled in.
+   */
+  void write_var_names(ExodusVarType type, std::vector<std::string>& names);
+
+  /**
+   * When appending: during initialization, check that variable names
+   * in the file match those you attempt to initialize with.
+   */
+  void check_existing_vars(ExodusVarType type, std::vector<std::string>& names, std::vector<std::string>& names_from_file);
+
+  /**
+   * read_var_names() dispatches to this function.
    */
   void read_var_names_impl(const char* var_type, int& count, std::vector<std::string>& result);
 
   /**
-   * Private implementation of the write_var_names() function.  Should
-   * not be called by clients of the class.
+   * write_var_names() dispatches to this function.
    */
   void write_var_names_impl(const char* var_type, int& count, std::vector<std::string>& names);
 };
