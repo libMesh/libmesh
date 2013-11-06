@@ -1484,12 +1484,28 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
     return;
 
   // There may already be element variables in the file (for example,
-  // if we're appending) and in that case, we don't want to try to
-  // initialize them again.
+  // if we're appending) and in that case, we
+  // 1.) Cannot initialize them again.
+  // 2.) Should check to be sure that the names we've asked to
+  //     initialize match what is already in the file.
   if (num_elem_vars > 0)
     {
-      libMesh::err << "Warning! The Exodus file already contains elemental variables, skipping element variable initialization.\n"
-                   << std::endl;
+      // Fills in elem_var_names vector of strings
+      this->read_elemental_var_names();
+
+      // Both the names of the elemental variables and their order must match
+      if (this->elem_var_names != names)
+        {
+          libMesh::err << "Error! The Exodus file already contains the elemental variables:" << std::endl;
+          for (unsigned i=0; i<elem_var_names.size(); ++i)
+            libMesh::out << elem_var_names[i] << std::endl;
+
+          libMesh::err << "And you asked to write:" << std::endl;
+          for (unsigned i=0; i<names.size(); ++i)
+            libMesh::out << names[i] << std::endl;
+
+          libmesh_error();
+        }
       return;
     }
 
@@ -1509,7 +1525,7 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
   // Form the element variable truth table and send to Exodus.
   // This tells which variables are written to which blocks,
   // and can dramatically speed up writing element variables
-
+  //
   // We really should initialize all entries in the truth table to 0
   // and then loop over all subdomains, setting their entries to 1
   // if a given variable exists on that subdomain.  However,
@@ -1517,7 +1533,6 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
   // passed to us are padded with zeroes for the blocks where
   // they aren't defined.  To be consistent with that, fill
   // the truth table with ones.
-
   std::vector<int> truth_tab(num_elem_blk*num_elem_vars, 1);
   ex_err = exII::ex_put_elem_var_tab(ex_id,
                                      num_elem_blk,
