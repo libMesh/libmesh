@@ -840,13 +840,13 @@ void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::st
   switch (type)
     {
     case NODAL:
-      this->write_var_names_impl("n", names);
+      this->write_var_names_impl("n", num_nodal_vars, names);
       break;
     case ELEMENTAL:
-      this->write_var_names_impl("e", names);
+      this->write_var_names_impl("e", num_elem_vars, names);
       break;
     case GLOBAL:
-      this->write_var_names_impl("g", names);
+      this->write_var_names_impl("g", num_global_vars, names);
       break;
     default:
       libMesh::err << "Unrecognized ExodusVarType " << type << std::endl;
@@ -856,8 +856,15 @@ void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::st
 
 
 
-void ExodusII_IO_Helper::write_var_names_impl(const char* var_type, std::vector<std::string>& names)
+void ExodusII_IO_Helper::write_var_names_impl(const char* var_type, int& count, std::vector<std::string>& names)
 {
+  // Update the count variable so that it's available to other parts of the class.
+  count = names.size();
+
+  // Write that number of variables to the file.
+  ex_err = exII::ex_put_var_param(ex_id, var_type, count);
+  EX_CHECK_ERR(ex_err, "Error setting number of vars.");
+
   if (names.size() > 0)
     {
       NamesData names_table(names.size(), MAX_STR_LENGTH);
@@ -1561,14 +1568,7 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
   // initialize_element_variables()
   _elem_vars_initialized = true;
 
-  // Record the number of elemental vars that will be written to file
-  // in the class variable.
-  num_elem_vars = names.size();
-
-  ex_err = exII::ex_put_var_param(ex_id,
-                                  "e",
-                                  num_elem_vars);
-  EX_CHECK_ERR(ex_err, "Error setting number of element vars.");
+  this->write_var_names(ELEMENTAL, names);
 
   // Form the element variable truth table and send to Exodus.
   // This tells which variables are written to which blocks,
@@ -1587,8 +1587,6 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
                                      num_elem_vars,
                                      &truth_tab[0]);
   EX_CHECK_ERR(ex_err, "Error writing element truth table.");
-
-  this->write_var_names(ELEMENTAL, names);
 }
 
 
@@ -1597,11 +1595,6 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
-
-  num_nodal_vars = names.size();
-
-  ex_err = exII::ex_put_var_param(ex_id, "n", num_nodal_vars);
-  EX_CHECK_ERR(ex_err, "Error setting number of nodal vars.");
 
   this->write_var_names(NODAL, names);
 }
@@ -1642,11 +1635,6 @@ void ExodusII_IO_Helper::initialize_global_variables(std::vector<std::string> na
     }
 
   _global_vars_initialized = true;
-
-  num_global_vars = names.size();
-
-  ex_err = exII::ex_put_var_param(ex_id, "g", num_global_vars);
-  EX_CHECK_ERR(ex_err, "Error setting number of global vars.");
 
   this->write_var_names(GLOBAL, names);
 }

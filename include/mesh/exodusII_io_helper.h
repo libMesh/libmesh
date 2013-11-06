@@ -216,7 +216,7 @@ public:
   void read_num_time_steps();
 
   /**
-   * Wraps calls to exII::ex_get_var_names() and exII:ex_get_var_param().
+   * Wraps calls to exII::ex_get_var_names() and exII::ex_get_var_param().
    * The enumeration controls whether nodal, elemental, or global
    * variable names are read and which class members are filled in.
    * NODAL:     num_nodal_vars  nodal_var_names
@@ -227,7 +227,7 @@ public:
   void read_var_names(ExodusVarType type);
 
   /**
-   * Wraps calls to exII::ex_put_var_names().
+   * Wraps calls to exII::ex_put_var_names() and exII::ex_put_var_param().
    * The enumeration controls whether nodal, elemental, or global
    * variable names are read and which class members are filled in.
    */
@@ -571,7 +571,7 @@ private:
    * Private implementation of the write_var_names() function.  Should
    * not be called by clients of the class.
    */
-  void write_var_names_impl(const char* var_type, std::vector<std::string>& names);
+  void write_var_names_impl(const char* var_type, int& count, std::vector<std::string>& names);
 };
 
 
