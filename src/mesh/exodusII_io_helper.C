@@ -737,40 +737,10 @@ void ExodusII_IO_Helper::read_num_time_steps()
 
 
 
-void ExodusII_IO_Helper::read_nodal_var_names()
-{
-  NamesData names_table(num_nodal_vars, MAX_STR_LENGTH);
-
-  ex_err = exII::ex_get_var_names(ex_id,
-                                  "n",
-                                  num_nodal_vars,
-                                  names_table.get_char_star_star()
-                                  );
-  EX_CHECK_ERR(ex_err, "Error reading nodal variable names!");
-
-
-  if (verbose)
-    {
-      libMesh::out << "Read the variable(s) from the file:" << std::endl;
-      for (int i=0; i<num_nodal_vars; i++)
-	libMesh::out << names_table.get_char_star(i) << std::endl;
-    }
-
-  // Allocate enough space for our variable name strings.
-  nodal_var_names.resize(num_nodal_vars);
-
-  // Copy the char buffers into strings.
-  for (int i=0; i<num_nodal_vars; i++)
-    nodal_var_names[i] = names_table.get_char_star(i); // calls string::op=(const char*)
-}
-
-
-
-
 void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int time_step)
 {
   // Read the nodal variable names from file, so we can see if we have the one we're looking for
-  this->read_nodal_var_names();
+  this->read_var_names(NODAL);
 
   // See if we can find the variable we are looking for
   unsigned int var_index = 0;
@@ -804,34 +774,6 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
                                   num_nodes,
                                   &nodal_var_values[0]);
   EX_CHECK_ERR(ex_err, "Error reading nodal variable values!");
-}
-
-
-
-void ExodusII_IO_Helper::read_elemental_var_names()
-{
-  NamesData names_table(num_elem_vars, MAX_STR_LENGTH);
-
-  ex_err = exII::ex_get_var_names(ex_id,
-                                  "e",
-                                  num_elem_vars,
-                                  names_table.get_char_star_star()
-                                  );
-  EX_CHECK_ERR(ex_err, "Error reading elemental variable names!");
-
-  if (verbose)
-    {
-      libMesh::out << "Read the variable(s) from the file:" << std::endl;
-      for (int i=0; i<num_elem_vars; i++)
-        libMesh::out << names_table.get_char_star(i) << std::endl;
-    }
-
-  // Allocate enough space for our variable name strings.
-  elem_var_names.resize(num_elem_vars);
-
-  // Copy the char buffers into strings.
-  for (int i=0; i<num_elem_vars; i++)
-    elem_var_names[i] = names_table.get_char_star(i); // calls string::op=(const char*)
 }
 
 
@@ -900,7 +842,7 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
   elem_var_values.resize(num_elem);
 
-  this->read_elemental_var_names();
+  this->read_var_names(ELEMENTAL);
 
   // See if we can find the variable we are looking for
   unsigned int var_index = 0;
@@ -1548,7 +1490,7 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
   if (num_elem_vars > 0)
     {
       // Fills in elem_var_names vector of strings
-      this->read_elemental_var_names();
+      this->read_var_names(ELEMENTAL);
 
       // Both the names of the elemental variables and their order must match
       if (this->elem_var_names != names)
@@ -1672,7 +1614,7 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
   if (num_globals > 0)
     {
       // Fills in global_var_names vector of strings
-      this->read_global_var_names();
+      this->read_var_names(GLOBAL);
 
       // Both the names of the global variables and their order must match
       if (this->global_var_names != names)
@@ -1853,34 +1795,6 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Number> & values,
 
   ex_err = exII::ex_update(ex_id);
   EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
-}
-
-
-
-void ExodusII_IO_Helper::read_global_var_names()
-{
-  NamesData names_table(num_globals, MAX_STR_LENGTH);
-
-  ex_err = exII::ex_get_var_names(ex_id,
-                                  "g",
-                                  num_globals,
-                                  names_table.get_char_star_star()
-                                  );
-  EX_CHECK_ERR(ex_err, "Error reading global variable names!");
-
-  if (verbose)
-    {
-      libMesh::out << "Read the global variable(s) from the file:" << std::endl;
-      for (int i=0; i<num_globals; i++)
-        libMesh::out << names_table.get_char_star(i) << std::endl;
-    }
-
-  // Allocate enough space for our variable name strings.
-  global_var_names.resize(num_globals);
-
-  // Copy the char buffers into strings.
-  for (int i=0; i<num_globals; i++)
-    global_var_names[i] = names_table.get_char_star(i); // calls string::op=(const char*)
 }
 
 

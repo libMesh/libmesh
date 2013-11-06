@@ -227,20 +227,10 @@ public:
   void read_var_names(ExodusVarType type);
 
   /**
-   * Reads the nodal variable names and stores them in the 'nodal_var_names' array.
-   */
-  void read_nodal_var_names();
-
-  /**
    * Reads the nodal values for the variable 'nodal_var_name' at the
    * specified time into the 'nodal_var_values' array.
    */
   void read_nodal_var_values(std::string nodal_var_name, int time_step);
-
-  /**
-   * Reads the elemental variable names and stores them in the 'elem_var_names' array.
-   */
-  void read_elemental_var_names();
 
   /**
    * Reads elemental values for the variable 'elemental_var_name' at the
@@ -334,11 +324,6 @@ public:
    * Writes the vector of global variables.
    */
   void write_global_values(const std::vector<Number> & values, int timestep);
-
-  /**
-   * Reads the global variable names and stores them in the 'global_var_names' array.
-   */
-  void read_global_var_names();
 
   /**
    * Sets the underlying value of the boolean flag
