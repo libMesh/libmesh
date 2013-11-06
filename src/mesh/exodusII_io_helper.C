@@ -835,6 +835,56 @@ void ExodusII_IO_Helper::read_var_names_impl(const char* var_type,
 
 
 
+void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::string>& names)
+{
+  switch (type)
+    {
+    case NODAL:
+      this->write_var_names_impl("n", names);
+      break;
+    case ELEMENTAL:
+      this->write_var_names_impl("e", names);
+      break;
+    case GLOBAL:
+      this->write_var_names_impl("g", names);
+      break;
+    default:
+      libMesh::err << "Unrecognized ExodusVarType " << type << std::endl;
+      libmesh_error();
+    }
+}
+
+
+
+void ExodusII_IO_Helper::write_var_names_impl(const char* var_type, std::vector<std::string>& names)
+{
+  if (names.size() > 0)
+    {
+      NamesData names_table(names.size(), MAX_STR_LENGTH);
+
+      // Store the input names in the format required by Exodus.
+      for (unsigned i=0; i<names.size(); ++i)
+        names_table.push_back_entry(names[i]);
+
+      if (verbose)
+        {
+          libMesh::out << "Writing variable name(s) to file: " << std::endl;
+          for (unsigned i=0; i<names.size(); ++i)
+            libMesh::out << names_table.get_char_star(i) << std::endl;
+        }
+
+      ex_err = exII::ex_put_var_names(ex_id,
+                                      var_type,
+                                      names.size(),
+                                      names_table.get_char_star_star()
+                                      );
+
+      EX_CHECK_ERR(ex_err, "Error writing variable names.");
+    }
+}
+
+
+
 void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_name, int time_step)
 {
   // CAUTION: this assumes that libMesh element numbering is identical to exodus block-by-block element numbering

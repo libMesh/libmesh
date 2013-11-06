@@ -227,6 +227,13 @@ public:
   void read_var_names(ExodusVarType type);
 
   /**
+   * Wraps calls to exII::ex_put_var_names().
+   * The enumeration controls whether nodal, elemental, or global
+   * variable names are read and which class members are filled in.
+   */
+  void write_var_names(ExodusVarType type, std::vector<std::string>& names);
+
+  /**
    * Reads the nodal values for the variable 'nodal_var_name' at the
    * specified time into the 'nodal_var_values' array.
    */
@@ -559,6 +566,12 @@ private:
    * not be called by clients of the class.
    */
   void read_var_names_impl(const char* var_type, int& count, std::vector<std::string>& result);
+
+  /**
+   * Private implementation of the write_var_names() function.  Should
+   * not be called by clients of the class.
+   */
+  void write_var_names_impl(const char* var_type, std::vector<std::string>& names);
 };
 
 
