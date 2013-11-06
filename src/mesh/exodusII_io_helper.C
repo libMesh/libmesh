@@ -244,6 +244,7 @@ const int ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map[5] = {-1,-1,
     _run_only_on_proc0(run_only_on_proc0),
     _elem_vars_initialized(false),
     _global_vars_initialized(false),
+    _nodal_vars_initialized(false),
     _use_mesh_dimension_instead_of_spatial_dimension(false)
   {
     title.resize(MAX_LINE_LENGTH+1);
@@ -1599,6 +1600,13 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
   // Quick return if there are no nodal variables to write
   if (names.size() == 0)
     return;
+
+  // Quick return if we have already called this function
+  if (_nodal_vars_initialized)
+    return;
+
+  // Set the flag so we can skip the rest of this function on subsequent calls.
+  _nodal_vars_initialized = true;
 
   this->write_var_names(NODAL, names);
 }

@@ -552,6 +552,9 @@ protected:
   // True once the global vars are initialized
   bool _global_vars_initialized;
 
+  // True once the nodal vars are initialized
+  bool _nodal_vars_initialized;
+
   // If true, use the Mesh's dimension (as determined by the dimension
   // of the elements comprising the mesh) instead of the mesh's
   // spatial dimension, when writing.  By default this is false.
