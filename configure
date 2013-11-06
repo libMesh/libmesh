@@ -27042,6 +27042,10 @@ $as_echo "#define DIM 1" >>confdefs.h
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library for 1D meshes only >>>" >&5
 $as_echo "<<< Configuring library for 1D meshes only >>>" >&6; }
+else
+
+$as_echo "#define DIM 3" >>confdefs.h
+
 fi
 # -------------------------------------------------------------
 

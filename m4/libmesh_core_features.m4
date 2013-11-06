@@ -474,12 +474,15 @@ AC_ARG_ENABLE(2D-only,
 
 if test "$enable2D" != no ; then
   AC_DEFINE(DIM, 2,
-           [Integer indicating the highest spatial dimensionality supported by libMesh])
+           [Integer indicating the highest spatial dimension supported by libMesh])
   AC_MSG_RESULT(<<< Configuring library for 1D/2D meshes only >>>)
 elif test "$enable1D" != no ; then
   AC_DEFINE(DIM, 1,
-           [Integer indicating the highest spatial dimensionality supported by libMesh])
+           [Integer indicating the highest spatial dimension supported by libMesh])
   AC_MSG_RESULT(<<< Configuring library for 1D meshes only >>>)
+else
+  AC_DEFINE(DIM, 3,
+           [Integer indicating the highest spatial dimension supported by libMesh])
 fi
 # -------------------------------------------------------------
 

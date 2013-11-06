@@ -82,8 +82,7 @@
 /* VTK's subminor version number, as detected by vtk.m4 */
 #undef DETECTED_VTK_VERSION_SUBMINOR
 
-/* Integer indicating the highest spatial dimensionality supported by libMesh
-   */
+/* Integer indicating the highest spatial dimension supported by libMesh */
 #undef DIM
 
 /* Flag indicating if the library should disable libMesh::CommWorld */
