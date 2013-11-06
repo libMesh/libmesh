@@ -216,20 +216,10 @@ public:
   void read_num_time_steps();
 
   /**
-   * Reads the nodal variable names and stores them in the 'nodal_var_names' array.
-   */
-  void read_nodal_var_names();
-
-  /**
    * Reads the nodal values for the variable 'nodal_var_name' at the
    * specified time into the 'nodal_var_values' array.
    */
   void read_nodal_var_values(std::string nodal_var_name, int time_step);
-
-  /**
-   * Reads the elemental variable names and stores them in the 'elem_var_names' array.
-   */
-  void read_elemental_var_names();
 
   /**
    * Reads elemental values for the variable 'elemental_var_name' at the
@@ -287,7 +277,7 @@ public:
   /**
    * Sets up the nodal variables
    */
-  void initialize_element_variables(const MeshBase & mesh, std::vector<std::string> names);
+  void initialize_element_variables(std::vector<std::string> names);
 
   /**
    * Sets up the nodal variables
@@ -297,7 +287,7 @@ public:
   /**
    * Sets up the global variables
    */
-  void initialize_global_variables(const std::vector<std::string> & names);
+  void initialize_global_variables(std::vector<std::string> names);
 
   /**
    * Writes the time for the timestep
@@ -323,11 +313,6 @@ public:
    * Writes the vector of global variables.
    */
   void write_global_values(const std::vector<Number> & values, int timestep);
-
-  /**
-   * Reads the global variable names and stores them in the 'global_var_names' array.
-   */
-  void read_global_var_names();
 
   /**
    * Sets the underlying value of the boolean flag
@@ -390,7 +375,7 @@ public:
   int num_dim;
 
   // Number of global variables
-  int num_globals;
+  int num_global_vars;
 
   // Total number of nodes in the mesh
   int num_nodes;
@@ -549,6 +534,9 @@ protected:
   // True once the global vars are initialized
   bool _global_vars_initialized;
 
+  // True once the nodal vars are initialized
+  bool _nodal_vars_initialized;
+
   // If true, use the Mesh's dimension (as determined by the dimension
   // of the elements comprising the mesh) instead of the mesh's
   // spatial dimension, when writing.  By default this is false.
@@ -556,6 +544,41 @@ protected:
 
   // On output, shift every point by _coordinate_offset
   Point _coordinate_offset;
+
+private:
+  /**
+   * Wraps calls to exII::ex_get_var_names() and exII::ex_get_var_param().
+   * The enumeration controls whether nodal, elemental, or global
+   * variable names are read and which class members are filled in.
+   * NODAL:     num_nodal_vars  nodal_var_names
+   * ELEMENTAL: num_elem_vars   elem_var_names
+   * GLOBAL:    num_global_vars global_var_names
+   */
+  enum ExodusVarType {NODAL=0, ELEMENTAL=1, GLOBAL=2};
+  void read_var_names(ExodusVarType type);
+
+  /**
+   * Wraps calls to exII::ex_put_var_names() and exII::ex_put_var_param().
+   * The enumeration controls whether nodal, elemental, or global
+   * variable names are read and which class members are filled in.
+   */
+  void write_var_names(ExodusVarType type, std::vector<std::string>& names);
+
+  /**
+   * When appending: during initialization, check that variable names
+   * in the file match those you attempt to initialize with.
+   */
+  void check_existing_vars(ExodusVarType type, std::vector<std::string>& names, std::vector<std::string>& names_from_file);
+
+  /**
+   * read_var_names() dispatches to this function.
+   */
+  void read_var_names_impl(const char* var_type, int& count, std::vector<std::string>& result);
+
+  /**
+   * write_var_names() dispatches to this function.
+   */
+  void write_var_names_impl(const char* var_type, int& count, std::vector<std::string>& names);
 };
 
 

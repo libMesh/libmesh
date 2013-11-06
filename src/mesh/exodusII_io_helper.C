@@ -225,7 +225,7 @@ const int ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map[5] = {-1,-1,
     ex_id(0),
     ex_err(0),
     num_dim(0),
-    num_globals(0),
+    num_global_vars(0),
     num_nodes(0),
     num_elem(0),
     num_elem_blk(0),
@@ -244,6 +244,7 @@ const int ExodusII_IO_Helper::ElementMaps::pyramid_inverse_face_map[5] = {-1,-1,
     _run_only_on_proc0(run_only_on_proc0),
     _elem_vars_initialized(false),
     _global_vars_initialized(false),
+    _nodal_vars_initialized(false),
     _use_mesh_dimension_instead_of_spatial_dimension(false)
   {
     title.resize(MAX_LINE_LENGTH+1);
@@ -334,7 +335,7 @@ void ExodusII_IO_Helper::read_header()
   ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
-  ex_err = exII::ex_get_var_param(ex_id, "g", &num_globals);
+  ex_err = exII::ex_get_var_param(ex_id, "g", &num_global_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of global variables.");
 
   message("Exodus header info retrieved successfully.");
@@ -737,40 +738,10 @@ void ExodusII_IO_Helper::read_num_time_steps()
 
 
 
-void ExodusII_IO_Helper::read_nodal_var_names()
-{
-  NamesData names_table(num_nodal_vars, MAX_STR_LENGTH);
-
-  ex_err = exII::ex_get_var_names(ex_id,
-                                  "n",
-                                  num_nodal_vars,
-                                  names_table.get_char_star_star()
-                                  );
-  EX_CHECK_ERR(ex_err, "Error reading nodal variable names!");
-
-
-  if (verbose)
-    {
-      libMesh::out << "Read the variable(s) from the file:" << std::endl;
-      for (int i=0; i<num_nodal_vars; i++)
-	libMesh::out << names_table.get_char_star(i) << std::endl;
-    }
-
-  // Allocate enough space for our variable name strings.
-  nodal_var_names.resize(num_nodal_vars);
-
-  // Copy the char buffers into strings.
-  for (int i=0; i<num_nodal_vars; i++)
-    nodal_var_names[i] = names_table.get_char_star(i); // calls string::op=(const char*)
-}
-
-
-
-
 void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int time_step)
 {
   // Read the nodal variable names from file, so we can see if we have the one we're looking for
-  this->read_nodal_var_names();
+  this->read_var_names(NODAL);
 
   // See if we can find the variable we are looking for
   unsigned int var_index = 0;
@@ -808,30 +779,116 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
 
 
 
-void ExodusII_IO_Helper::read_elemental_var_names()
+void ExodusII_IO_Helper::read_var_names(ExodusVarType type)
 {
-  NamesData names_table(num_elem_vars, MAX_STR_LENGTH);
+  switch (type)
+    {
+    case NODAL:
+      this->read_var_names_impl("n", num_nodal_vars, nodal_var_names);
+      break;
+    case ELEMENTAL:
+      this->read_var_names_impl("e", num_elem_vars, elem_var_names);
+      break;
+    case GLOBAL:
+      this->read_var_names_impl("g", num_global_vars, global_var_names);
+      break;
+    default:
+      libMesh::err << "Unrecognized ExodusVarType " << type << std::endl;
+      libmesh_error();
+    }
+}
+
+
+
+void ExodusII_IO_Helper::read_var_names_impl(const char* var_type,
+                                             int& count,
+                                             std::vector<std::string>& result)
+{
+  // First read and store the number of names we have
+  ex_err = exII::ex_get_var_param(ex_id, var_type, &count);
+  EX_CHECK_ERR(ex_err, "Error reading number of variables.");
+
+  // Second read the actual names and convert them into a format we can use
+  NamesData names_table(count, MAX_STR_LENGTH);
 
   ex_err = exII::ex_get_var_names(ex_id,
-                                  "e",
-                                  num_elem_vars,
+                                  var_type,
+                                  count,
                                   names_table.get_char_star_star()
                                   );
-  EX_CHECK_ERR(ex_err, "Error reading elemental variable names!");
+  EX_CHECK_ERR(ex_err, "Error reading variable names!");
 
   if (verbose)
     {
       libMesh::out << "Read the variable(s) from the file:" << std::endl;
-      for (int i=0; i<num_elem_vars; i++)
+      for (int i=0; i<count; i++)
         libMesh::out << names_table.get_char_star(i) << std::endl;
     }
 
   // Allocate enough space for our variable name strings.
-  elem_var_names.resize(num_elem_vars);
+  result.resize(count);
 
   // Copy the char buffers into strings.
-  for (int i=0; i<num_elem_vars; i++)
-    elem_var_names[i] = names_table.get_char_star(i); // calls string::op=(const char*)
+  for (int i=0; i<count; i++)
+    result[i] = names_table.get_char_star(i); // calls string::op=(const char*)
+}
+
+
+
+
+void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::string>& names)
+{
+  switch (type)
+    {
+    case NODAL:
+      this->write_var_names_impl("n", num_nodal_vars, names);
+      break;
+    case ELEMENTAL:
+      this->write_var_names_impl("e", num_elem_vars, names);
+      break;
+    case GLOBAL:
+      this->write_var_names_impl("g", num_global_vars, names);
+      break;
+    default:
+      libMesh::err << "Unrecognized ExodusVarType " << type << std::endl;
+      libmesh_error();
+    }
+}
+
+
+
+void ExodusII_IO_Helper::write_var_names_impl(const char* var_type, int& count, std::vector<std::string>& names)
+{
+  // Update the count variable so that it's available to other parts of the class.
+  count = names.size();
+
+  // Write that number of variables to the file.
+  ex_err = exII::ex_put_var_param(ex_id, var_type, count);
+  EX_CHECK_ERR(ex_err, "Error setting number of vars.");
+
+  if (names.size() > 0)
+    {
+      NamesData names_table(names.size(), MAX_STR_LENGTH);
+
+      // Store the input names in the format required by Exodus.
+      for (unsigned i=0; i<names.size(); ++i)
+        names_table.push_back_entry(names[i]);
+
+      if (verbose)
+        {
+          libMesh::out << "Writing variable name(s) to file: " << std::endl;
+          for (unsigned i=0; i<names.size(); ++i)
+            libMesh::out << names_table.get_char_star(i) << std::endl;
+        }
+
+      ex_err = exII::ex_put_var_names(ex_id,
+                                      var_type,
+                                      names.size(),
+                                      names_table.get_char_star_star()
+                                      );
+
+      EX_CHECK_ERR(ex_err, "Error writing variable names.");
+    }
 }
 
 
@@ -843,7 +900,7 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
   elem_var_values.resize(num_elem);
 
-  this->read_elemental_var_names();
+  this->read_var_names(ELEMENTAL);
 
   // See if we can find the variable we are looking for
   unsigned int var_index = 0;
@@ -1469,8 +1526,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 
 
 
-void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh */,
-                                                      std::vector<std::string> names)
+void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> names)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
@@ -1483,29 +1539,10 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
   if (_elem_vars_initialized)
     return;
 
-  // There may already be element variables in the file (for example,
-  // if we're appending) and in that case, we
-  // 1.) Cannot initialize them again.
-  // 2.) Should check to be sure that the names we've asked to
-  //     initialize match what is already in the file.
+  // Be sure that variables in the file match what we are asking for
   if (num_elem_vars > 0)
     {
-      // Fills in elem_var_names vector of strings
-      this->read_elemental_var_names();
-
-      // Both the names of the elemental variables and their order must match
-      if (this->elem_var_names != names)
-        {
-          libMesh::err << "Error! The Exodus file already contains the elemental variables:" << std::endl;
-          for (unsigned i=0; i<elem_var_names.size(); ++i)
-            libMesh::out << elem_var_names[i] << std::endl;
-
-          libMesh::err << "And you asked to write:" << std::endl;
-          for (unsigned i=0; i<names.size(); ++i)
-            libMesh::out << names[i] << std::endl;
-
-          libmesh_error();
-        }
+      this->check_existing_vars(ELEMENTAL, names, this->elem_var_names);
       return;
     }
 
@@ -1513,14 +1550,7 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
   // initialize_element_variables()
   _elem_vars_initialized = true;
 
-  // Record the number of elemental vars that will be written to file
-  // in the class variable.
-  num_elem_vars = names.size();
-
-  ex_err = exII::ex_put_var_param(ex_id,
-                                  "e",
-                                  num_elem_vars);
-  EX_CHECK_ERR(ex_err, "Error setting number of element vars.");
+  this->write_var_names(ELEMENTAL, names);
 
   // Form the element variable truth table and send to Exodus.
   // This tells which variables are written to which blocks,
@@ -1539,27 +1569,6 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
                                      num_elem_vars,
                                      &truth_tab[0]);
   EX_CHECK_ERR(ex_err, "Error writing element truth table.");
-
-  NamesData names_table(num_elem_vars, MAX_STR_LENGTH);
-
-  // Store the input names in the format required by Exodus.
-  for (int i=0; i<num_elem_vars; ++i)
-    names_table.push_back_entry(names[i]);
-
-  if (verbose)
-    {
-      libMesh::out << "Writing variable name(s) to file: " << std::endl;
-      for (int i=0; i<num_elem_vars; ++i)
-	libMesh::out << names_table.get_char_star(i) << std::endl;
-    }
-
-  ex_err = exII::ex_put_var_names(ex_id,
-				  "e",
-				  num_elem_vars,
-				  names_table.get_char_star_star()
-				  );
-
-  EX_CHECK_ERR(ex_err, "Error setting element variable names.");
 }
 
 
@@ -1569,98 +1578,79 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  num_nodal_vars = names.size();
+  // Quick return if there are no nodal variables to write
+  if (names.size() == 0)
+    return;
 
-  ex_err = exII::ex_put_var_param(ex_id, "n", num_nodal_vars);
-  EX_CHECK_ERR(ex_err, "Error setting number of nodal vars.");
+  // Quick return if we have already called this function
+  if (_nodal_vars_initialized)
+    return;
 
+  // Be sure that variables in the file match what we are asking for
   if (num_nodal_vars > 0)
     {
-      NamesData names_table(num_nodal_vars, MAX_STR_LENGTH);
-
-      for (int i=0; i<num_nodal_vars; i++)
-        names_table.push_back_entry(names[i]);
-
-      if (verbose)
-        {
-          libMesh::out << "Writing variable name(s) to file: " << std::endl;
-          for (int i=0; i<num_nodal_vars; i++)
-            libMesh::out << names_table.get_char_star(i) << std::endl;
-        }
-
-      ex_err = exII::ex_put_var_names(ex_id,
-                                      "n",
-                                      num_nodal_vars,
-                                      names_table.get_char_star_star()
-                                      );
-
-      EX_CHECK_ERR(ex_err, "Error setting nodal variable names.");
+      this->check_existing_vars(NODAL, names, this->nodal_var_names);
+      return;
     }
+
+  // Set the flag so we can skip the rest of this function on subsequent calls.
+  _nodal_vars_initialized = true;
+
+  this->write_var_names(NODAL, names);
 }
 
 
 
-void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::string> & names)
+void ExodusII_IO_Helper::initialize_global_variables(std::vector<std::string> names)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
+    return;
+
+  // Quick return if there are no global variables to write
+  if (names.size() == 0)
     return;
 
   if (_global_vars_initialized)
     return;
 
-  // There may already be global variables in the file (for example,
-  // if we're appending) and in that case, we
-  // 1.) Cannot initialize them again.
-  // 2.) Should check to be sure that the global variable names are the same.
-  if (num_globals > 0)
+  // Be sure that variables in the file match what we are asking for
+  if (num_global_vars > 0)
     {
-      // Fills in global_var_names vector of strings
-      this->read_global_var_names();
-
-      // Both the names of the global variables and their order must match
-      if (this->global_var_names != names)
-        {
-          libMesh::err << "Error! The Exodus file already contains the global variables:" << std::endl;
-          for (unsigned i=0; i<global_var_names.size(); ++i)
-            libMesh::out << global_var_names[i] << std::endl;
-
-          libMesh::err << "And you asked to write:" << std::endl;
-          for (unsigned i=0; i<names.size(); ++i)
-            libMesh::out << names[i] << std::endl;
-
-          libmesh_error();
-        }
+      this->check_existing_vars(GLOBAL, names, this->global_var_names);
       return;
     }
 
   _global_vars_initialized = true;
 
-  num_globals = names.size();
+  this->write_var_names(GLOBAL, names);
+}
 
-  ex_err = exII::ex_put_var_param(ex_id, "g", num_globals);
-  EX_CHECK_ERR(ex_err, "Error setting number of global vars.");
 
-  if (num_globals > 0)
+
+void ExodusII_IO_Helper::check_existing_vars(ExodusVarType type,
+                                             std::vector<std::string>& names,
+                                             std::vector<std::string>& names_from_file)
+{
+  // There may already be global variables in the file (for example,
+  // if we're appending) and in that case, we
+  // 1.) Cannot initialize them again.
+  // 2.) Should check to be sure that the global variable names are the same.
+
+  // Fills up names_from_file for us
+  this->read_var_names(type);
+
+  // Both the names of the global variables and their order must match
+  if (names_from_file != names)
     {
-      NamesData names_table(num_globals, MAX_STR_LENGTH);
+      libMesh::err << "Error! The Exodus file already contains the variables:" << std::endl;
+      for (unsigned i=0; i<names_from_file.size(); ++i)
+        libMesh::out << names_from_file[i] << std::endl;
 
-      for (int i=0; i<num_globals; i++)
-        names_table.push_back_entry(names[i]);
+      libMesh::err << "And you asked to write:" << std::endl;
+      for (unsigned i=0; i<names.size(); ++i)
+        libMesh::out << names[i] << std::endl;
 
-      if (verbose)
-        {
-          libMesh::out << "Writing variable name(s) to file: " << std::endl;
-          for (int i=0; i<num_globals; ++i)
-            libMesh::out << names_table.get_char_star(i) << std::endl;
-        }
-
-      ex_err = exII::ex_put_var_names(ex_id,
-                                      "g",
-                                      num_globals,
-                                      names_table.get_char_star_star()
-                                      );
-
-      EX_CHECK_ERR(ex_err, "Error setting global variable names.");
+      libmesh_error();
     }
 }
 
@@ -1791,39 +1781,11 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Number> & values,
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_globals, &values[0]);
+  ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_global_vars, &values[0]);
   EX_CHECK_ERR(ex_err, "Error writing global values.");
 
   ex_err = exII::ex_update(ex_id);
   EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
-}
-
-
-
-void ExodusII_IO_Helper::read_global_var_names()
-{
-  NamesData names_table(num_globals, MAX_STR_LENGTH);
-
-  ex_err = exII::ex_get_var_names(ex_id,
-                                  "g",
-                                  num_globals,
-                                  names_table.get_char_star_star()
-                                  );
-  EX_CHECK_ERR(ex_err, "Error reading global variable names!");
-
-  if (verbose)
-    {
-      libMesh::out << "Read the global variable(s) from the file:" << std::endl;
-      for (int i=0; i<num_globals; i++)
-        libMesh::out << names_table.get_char_star(i) << std::endl;
-    }
-
-  // Allocate enough space for our variable name strings.
-  global_var_names.resize(num_globals);
-
-  // Copy the char buffers into strings.
-  for (int i=0; i<num_globals; i++)
-    global_var_names[i] = names_table.get_char_star(i); // calls string::op=(const char*)
 }
 
 
