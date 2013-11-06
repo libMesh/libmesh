@@ -1609,11 +1609,9 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
     return;
 
   // There may already be global variables in the file (for example,
-  // if we're appending) and in that case, according to the Exodus
-  // documentation, writing more information records is not supported.
-  // Since we read the number of global variables when we read the
-  // header, we can check if there are already global variables
-  // present in the file and return.
+  // if we're appending) and in that case, we
+  // 1.) Cannot initialize them again.
+  // 2.) Should check to be sure that the global variable names are the same.
   if (num_globals > 0)
     {
       libMesh::err << "Warning! The Exodus file already contains global variables.\n"
@@ -1785,6 +1783,34 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Number> & values,
 
   ex_err = exII::ex_update(ex_id);
   EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+}
+
+
+
+void ExodusII_IO_Helper::read_global_var_names()
+{
+  NamesData names_table(num_globals, MAX_STR_LENGTH);
+
+  ex_err = exII::ex_get_var_names(ex_id,
+                                  "g",
+                                  num_globals,
+                                  names_table.get_char_star_star()
+                                  );
+  EX_CHECK_ERR(ex_err, "Error reading global variable names!");
+
+  if (verbose)
+    {
+      libMesh::out << "Read the global variable(s) from the file:" << std::endl;
+      for (int i=0; i<num_globals; i++)
+        libMesh::out << names_table.get_char_star(i) << std::endl;
+    }
+
+  // Allocate enough space for our variable name strings.
+  global_var_names.resize(num_globals);
+
+  // Copy the char buffers into strings.
+  for (int i=0; i<num_globals; i++)
+    global_var_names[i] = names_table.get_char_star(i); // calls string::op=(const char*)
 }
 
 

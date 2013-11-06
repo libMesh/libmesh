@@ -325,6 +325,11 @@ public:
   void write_global_values(const std::vector<Number> & values, int timestep);
 
   /**
+   * Reads the global variable names and stores them in the 'global_var_names' array.
+   */
+  void read_global_var_names();
+
+  /**
    * Sets the underlying value of the boolean flag
    * _use_mesh_dimension_instead_of_spatial_dimension.  By default,
    * the value of this flag is false.
@@ -504,6 +509,9 @@ public:
 
   // Holds the elemental variable values for a given variable, one value per element
   std::vector<Real> elem_var_values;
+
+  // The names of the global variables stored in the Exodus file
+  std::vector<std::string> global_var_names;
 
   // Maps of Ids to named entities
   std::map<int, std::string> id_to_block_names;
