@@ -1146,6 +1146,31 @@ std::size_t BoundaryInfo::n_boundary_conds () const
 
 
 
+std::size_t BoundaryInfo::n_nodeset_conds () const
+{
+  // in serial we know the number of nodesets from the
+  // size of the container
+  if (_mesh.is_serial())
+    return _boundary_node_id.size();
+
+  // in parallel we need to sum the number of local nodesets
+  parallel_object_only();
+
+  std::size_t n_nodesets=0;
+
+  std::multimap<const Node*, boundary_id_type>::const_iterator pos;
+
+  for (pos=_boundary_node_id.begin(); pos != _boundary_node_id.end(); ++pos)
+    if (pos->first->processor_id() == this->processor_id())
+      n_nodesets++;
+
+  this->comm().sum (n_nodesets);
+
+  return n_nodesets;
+}
+
+
+
 void BoundaryInfo::build_node_list (std::vector<dof_id_type>& nl,
 				    std::vector<boundary_id_type>&    il) const
 {

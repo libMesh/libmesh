@@ -44,43 +44,43 @@ namespace libMesh
 //-----------------------------------------------
 // anonymous namespace for implementation details
 namespace {
-  struct ElemBCData
+  struct DofBCData
   {
-    unsigned int       elem_id;
+    unsigned int       dof_id;
     unsigned short int side;
     boundary_id_type   bc_id;
 
     // Default constructor
-    ElemBCData (unsigned int       elem_id_in=0,
-		unsigned short int side_in=0,
-		boundary_id_type   bc_id_in=0) :
-      elem_id(elem_id_in),
+    DofBCData (unsigned int       dof_id_in=0,
+               unsigned short int side_in=0,
+               boundary_id_type   bc_id_in=0) :
+      dof_id(dof_id_in),
       side(side_in),
       bc_id(bc_id_in)
     {}
 
     // comparison operator
-    bool operator < (const ElemBCData &other) const
+    bool operator < (const DofBCData &other) const
     {
-      if (this->elem_id == other.elem_id)
+      if (this->dof_id == other.dof_id)
 	return (this->side < other.side);
 
-      return this->elem_id < other.elem_id;
+      return this->dof_id < other.dof_id;
     }
   };
 
   // comparison operator
-  bool operator < (const unsigned int &other_elem_id,
-		   const ElemBCData &elem_bc)
+  bool operator < (const unsigned int &other_dof_id,
+		   const DofBCData &dof_bc)
   {
-    return other_elem_id < elem_bc.elem_id;
+    return other_dof_id < dof_bc.dof_id;
   }
 
-  bool operator < (const ElemBCData &elem_bc,
-		   const unsigned int &other_elem_id)
+  bool operator < (const DofBCData &dof_bc,
+		   const unsigned int &other_dof_id)
 
   {
-    return elem_bc.elem_id < other_elem_id;
+    return dof_bc.dof_id < other_dof_id;
   }
 
 
@@ -88,18 +88,18 @@ namespace {
   // comparison functions for use in
   // std::equal_range (ElemBCData::iterator, ElemBCData::iterator, unsigned int);
 #if defined(__SUNPRO_CC) || defined(__PGI)
-  struct CompareIntElemBCData
+  struct CompareIntDofBCData
   {
-    bool operator()(const unsigned int &other_elem_id,
-		    const ElemBCData &elem_bc)
+    bool operator()(const unsigned int &other_dof_id,
+		    const DofBCData &dof_bc)
     {
-      return other_elem_id < elem_bc.elem_id;
+      return other_dof_id < dof_bc.dof_id;
     }
 
-    bool operator()(const ElemBCData &elem_bc,
-		    const unsigned int &other_elem_id)
+    bool operator()(const DofBCData &dof_bc,
+		    const unsigned int &other_dof_id)
     {
-      return elem_bc.elem_id < other_elem_id;
+      return dof_bc.dof_id < other_dof_id;
     }
   };
 #endif
@@ -183,6 +183,8 @@ void XdrIO::write (const std::string& name)
 
   std::size_t
     n_bcs      = mesh.boundary_info->n_boundary_conds();
+  std::size_t
+    n_nodesets = mesh.boundary_info->n_nodeset_conds();
   unsigned int
     n_p_levels = MeshTools::n_p_levels (mesh);
 
@@ -194,7 +196,7 @@ void XdrIO::write (const std::string& name)
 
   // If there are BCs and the user has not already provided a
   // file name then write to "."
-  if (n_bcs &&
+  if ((n_bcs || n_nodesets) &&
       this->boundary_condition_file_name() == "n/a")
     this->boundary_condition_file_name() = ".";
 
@@ -264,6 +266,9 @@ void XdrIO::write (const std::string& name)
 
       // write the boundary condition information
       this->write_serialized_bcs (io, n_bcs);
+
+      // write the nodeset information
+      this->write_serialized_nodesets (io, n_nodesets);
     }
   else
     {
@@ -278,6 +283,9 @@ void XdrIO::write (const std::string& name)
 
       // write the boundary condition information
       this->write_serialized_bcs (io, n_bcs);
+
+      // write the nodeset information
+      this->write_serialized_nodesets (io, n_nodesets);
     }
 
   STOP_LOG("write()","XdrIO");
@@ -806,8 +814,6 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
 {
   libmesh_assert (io.writing());
 
-  if (!n_bcs) return;
-
   // convenient reference to our mesh
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
 
@@ -816,15 +822,16 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
 
   // Version 0.9.2+ introduces entity names
   write_serialized_bc_names(io, boundary_info, true);  // sideset names
-  write_serialized_bc_names(io, boundary_info, false); // nodeset names
 
   header_id_type n_bcs_out = n_bcs;
   if (this->processor_id() == 0)
     io.data (n_bcs_out, "# number of boundary conditions");
   n_bcs_out = 0;
 
+  if (!n_bcs) return;
+
   std::vector<xdr_id_type> xfer_bcs, recv_bcs;
-  std::vector<std::size_t> bc_sizes(this->n_processors());;
+  std::vector<std::size_t> bc_sizes(this->n_processors());
 
   // Boundary conditions are only specified for level-0 elements
   MeshBase::const_element_iterator
@@ -882,6 +889,84 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
 	  elem_offset += my_n_local_level_0_elem;
 	}
       libmesh_assert_equal_to (n_bcs, n_bcs_out);
+    }
+  else
+    this->comm().send (0, xfer_bcs);
+}
+
+
+
+void XdrIO::write_serialized_nodesets (Xdr &io, const std::size_t n_nodesets) const
+{
+  libmesh_assert (io.writing());
+
+  // convenient reference to our mesh
+  const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
+
+  // and our boundary info object
+  const BoundaryInfo &boundary_info = *mesh.boundary_info;
+
+  // Version 0.9.2+ introduces entity names
+  write_serialized_bc_names(io, boundary_info, false);  // nodeset names
+
+  header_id_type n_nodesets_out = n_nodesets;
+  if (this->processor_id() == 0)
+    io.data (n_nodesets_out, "# number of nodesets");
+  n_nodesets_out = 0;
+
+  if (!n_nodesets) return;
+
+  std::vector<xdr_id_type> xfer_bcs, recv_bcs;
+  std::vector<std::size_t> bc_sizes(this->n_processors());
+
+  MeshBase::const_node_iterator
+    it  = mesh.local_nodes_begin(),
+    end = mesh.local_nodes_end();
+
+  dof_id_type n_node=0;
+  for (; it!=end; ++it)
+    {
+      const Node *node = *it;
+      const std::vector<boundary_id_type>& nodeset_ids =
+        boundary_info.boundary_ids (node);
+      for (std::vector<boundary_id_type>::const_iterator id_it=nodeset_ids.begin(); id_it!=nodeset_ids.end(); ++id_it)
+        {
+          const boundary_id_type bc_id = *id_it;
+          if (bc_id != BoundaryInfo::invalid_id)
+            {
+              xfer_bcs.push_back ((*it)->id());
+              xfer_bcs.push_back (bc_id);
+            }
+        }
+    }
+
+  xfer_bcs.push_back(n_node);
+  std::size_t my_size = xfer_bcs.size();
+  this->comm().gather (0, my_size, bc_sizes);
+
+  // All processors send their xfer buffers to processor 0
+  // Processor 0 will receive all buffers and write out the bcs
+  if (this->processor_id() == 0)
+    {
+      dof_id_type node_offset = 0;
+      for (unsigned int pid=0; pid<this->n_processors(); pid++)
+	{
+	  recv_bcs.resize(bc_sizes[pid]);
+          if (pid == 0)
+	    recv_bcs = xfer_bcs;
+          else
+	    this->comm().receive (pid, recv_bcs);
+
+	  const dof_id_type my_n_node
+	    = recv_bcs.back(); recv_bcs.pop_back();
+
+	  for (std::size_t idx=0; idx<recv_bcs.size(); idx += 2, n_nodesets_out++)
+	    recv_bcs[idx+0] += node_offset;
+
+	  io.data_stream (recv_bcs.empty() ? NULL : &recv_bcs[0], recv_bcs.size(), 2);
+	  node_offset += my_n_node;
+	}
+      libmesh_assert_equal_to (n_nodesets, n_nodesets_out);
     }
   else
     this->comm().send (0, xfer_bcs);
@@ -962,7 +1047,7 @@ void XdrIO::read (const std::string& name)
   // type_size, uid_size, pid_size, sid_size, p_level_size, eid_size, side_size, bid_size;
   header_id_type pos=0;
 
-  const bool read_size_info = this->version().find("0.9.2") != std::string::npos ? true : false;
+  const bool is_version_0_9_2 = this->version().find("0.9.2") != std::string::npos ? true : false;
 
   if (this->processor_id() == 0)
     {
@@ -973,7 +1058,7 @@ void XdrIO::read (const std::string& name)
       io.data (this->partition_map_file_name());      // libMesh::out << "pid_file=" << this->partition_map_file_name()      << std::endl;
       io.data (this->polynomial_level_file_name());   // libMesh::out << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
 
-      if (read_size_info)
+      if (is_version_0_9_2)
       {
         io.data (meta_data[pos++], "# type size");
         io.data (meta_data[pos++], "# uid size");
@@ -1008,7 +1093,7 @@ void XdrIO::read (const std::string& name)
    * TODO: All types are stored as the same size. Use the size information to pack things efficiently.
    * For now we will assume that "type size" is how the entire file will be encoded.
    */
-  if (read_size_info)
+  if (is_version_0_9_2)
     _field_width = meta_data[2];
 
   if (_field_width == 4)
@@ -1026,6 +1111,10 @@ void XdrIO::read (const std::string& name)
 
       // read the boundary conditions
       this->read_serialized_bcs (io, type_size);
+
+      if (is_version_0_9_2)
+        // read the nodesets
+        this->read_serialized_nodesets (io, type_size);
     }
   else if (_field_width == 8)
     {
@@ -1042,6 +1131,10 @@ void XdrIO::read (const std::string& name)
 
       // read the boundary conditions
       this->read_serialized_bcs (io, type_size);
+
+      if (is_version_0_9_2)
+        // read the nodesets
+        this->read_serialized_nodesets (io, type_size);
     }
 
 
@@ -1360,9 +1453,8 @@ void XdrIO::read_serialized_bcs (Xdr &io, T)
 
   // Version 0.9.2+ introduces unique ids
   read_serialized_bc_names(io, boundary_info, true);  // sideset names
-  read_serialized_bc_names(io, boundary_info, false); // nodeset names
 
-  std::vector<ElemBCData> elem_bc_data;
+  std::vector<DofBCData> dof_bc_data;
   std::vector<T> input_buffer;
 
   header_id_type n_bcs=0;
@@ -1381,17 +1473,17 @@ void XdrIO::read_serialized_bcs (Xdr &io, T)
 	io.data_stream (input_buffer.empty() ? NULL : &input_buffer[0], input_buffer.size());
 
       this->comm().broadcast (input_buffer);
-      elem_bc_data.clear(); /**/ elem_bc_data.reserve (input_buffer.size()/3);
+      dof_bc_data.clear(); /**/ dof_bc_data.reserve (input_buffer.size()/3);
 
-      // convert the input_buffer to ElemBCData to facilitate searching
+      // convert the input_buffer to DofBCData to facilitate searching
       for (std::size_t idx=0; idx<input_buffer.size(); idx+=3)
-	elem_bc_data.push_back (ElemBCData(input_buffer[idx+0],
-					   input_buffer[idx+1],
-					   input_buffer[idx+2]));
+	dof_bc_data.push_back (DofBCData(input_buffer[idx+0],
+                                          input_buffer[idx+1],
+                                          input_buffer[idx+2]));
       input_buffer.clear();
       // note that while the files *we* write should already be sorted by
       // element id this is not necessarily guaranteed.
-      std::sort (elem_bc_data.begin(), elem_bc_data.end());
+      std::sort (dof_bc_data.begin(), dof_bc_data.end());
 
       MeshBase::const_element_iterator
 	it  = mesh.level_elements_begin(0),
@@ -1399,23 +1491,98 @@ void XdrIO::read_serialized_bcs (Xdr &io, T)
 
       // Look for BCs in this block for all the level-0 elements we have
       // (not just local ones).  Do this by finding all the entries
-      // in elem_bc_data whose elem_id match the ID of the current element.
+      // in dof_bc_data whose elem_id match the ID of the current element.
       // We cannot rely on NULL neighbors at this point since the neighbor
       // data structure has not been initialized.
-      for (std::pair<std::vector<ElemBCData>::iterator,
-	             std::vector<ElemBCData>::iterator> pos; it!=end; ++it)
+      for (std::pair<std::vector<DofBCData>::iterator,
+	             std::vector<DofBCData>::iterator> pos; it!=end; ++it)
 #if defined(__SUNPRO_CC) || defined(__PGI)
-	for (pos = std::equal_range (elem_bc_data.begin(), elem_bc_data.end(), (*it)->id(), CompareIntElemBCData());
+	for (pos = std::equal_range (dof_bc_data.begin(), dof_bc_data.end(), (*it)->id(), CompareIntDofBCData());
 	     pos.first != pos.second; ++pos.first)
 #else
-	for (pos = std::equal_range (elem_bc_data.begin(), elem_bc_data.end(), (*it)->id());
+	for (pos = std::equal_range (dof_bc_data.begin(), dof_bc_data.end(), (*it)->id());
 	     pos.first != pos.second; ++pos.first)
 #endif
 	  {
-	    libmesh_assert_equal_to (pos.first->elem_id, (*it)->id());
+	    libmesh_assert_equal_to (pos.first->dof_id, (*it)->id());
 	    libmesh_assert_less (pos.first->side, (*it)->n_sides());
 
 	    boundary_info.add_side (*it, pos.first->side, pos.first->bc_id);
+	  }
+    }
+}
+
+
+
+template <typename T>
+void XdrIO::read_serialized_nodesets (Xdr &io, T)
+{
+  if (this->boundary_condition_file_name() == "n/a") return;
+
+  libmesh_assert (io.reading());
+
+  // convenient reference to our mesh
+  MeshBase &mesh = MeshInput<MeshBase>::mesh();
+
+  // and our boundary info object
+  BoundaryInfo &boundary_info = *mesh.boundary_info;
+
+  // Version 0.9.2+ introduces unique ids
+  read_serialized_bc_names(io, boundary_info, false); // nodeset names
+
+  // TODO: Make a data object that works with both the element and nodal bcs
+  std::vector<DofBCData> node_bc_data;
+  std::vector<T> input_buffer;
+
+  header_id_type n_nodesets=0;
+  if (this->processor_id() == 0)
+    io.data (n_nodesets);
+  this->comm().broadcast (n_nodesets);
+
+  for (std::size_t blk=0, first_bc=0, last_bc=0; last_bc<n_nodesets; blk++)
+    {
+      first_bc = blk*io_blksize;
+      last_bc  = std::min((blk+1)*io_blksize, std::size_t(n_nodesets));
+
+      input_buffer.resize (2*(last_bc - first_bc));
+
+      if (this->processor_id() == 0)
+	io.data_stream (input_buffer.empty() ? NULL : &input_buffer[0], input_buffer.size());
+
+      this->comm().broadcast (input_buffer);
+      node_bc_data.clear(); /**/ node_bc_data.reserve (input_buffer.size()/2);
+
+      // convert the input_buffer to DofBCData to facilitate searching
+      for (std::size_t idx=0; idx<input_buffer.size(); idx+=2)
+	node_bc_data.push_back (DofBCData(input_buffer[idx+0],
+					   0,
+					   input_buffer[idx+1]));
+      input_buffer.clear();
+      // note that while the files *we* write should already be sorted by
+      // node id this is not necessarily guaranteed.
+      std::sort (node_bc_data.begin(), node_bc_data.end());
+
+      MeshBase::const_node_iterator
+	it  = mesh.nodes_begin(),
+	end = mesh.nodes_end();
+
+      // Look for BCs in this block for all nodes we have
+      // (not just local ones).  Do this by finding all the entries
+      // in node_bc_data whose dof_id(node_id)  match the ID of the current node.
+      for (std::pair<std::vector<DofBCData>::iterator,
+	             std::vector<DofBCData>::iterator> pos; it!=end; ++it)
+#if defined(__SUNPRO_CC) || defined(__PGI)
+	for (pos = std::equal_range (node_bc_data.begin(), node_bc_data.end(), (*it)->id(), CompareIntDofBCData());
+	     pos.first != pos.second; ++pos.first)
+#else
+	for (pos = std::equal_range (node_bc_data.begin(), node_bc_data.end(), (*it)->id());
+	     pos.first != pos.second; ++pos.first)
+#endif
+	  {
+            // Note: dof_id from ElmeBCData is being used to hold node_id here
+	    libmesh_assert_equal_to (pos.first->dof_id, (*it)->id());
+
+	    boundary_info.add_node (*it, pos.first->bc_id);
 	  }
     }
 }
