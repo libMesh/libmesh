@@ -1596,6 +1596,10 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
+  // Quick return if there are no nodal variables to write
+  if (names.size() == 0)
+    return;
+
   this->write_var_names(NODAL, names);
 }
 
