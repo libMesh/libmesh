@@ -275,7 +275,9 @@ EigenSystem::sensitivity_solve (const ParameterVector& parameters)
     AutoPtr< NumericVector<Number> > x_right = NumericVector<Number>::build(this->comm()),
     x_left = NumericVector<Number>::build(this->comm()),
     tmp = NumericVector<Number>::build(this->comm());
-    x_right->init(*solution); x_left->init(*solution); tmp->init(*solution);
+    x_right->init(this->n_dofs(), this->n_local_dofs(), false, solution->type());
+    x_left->init(this->n_dofs(), this->n_local_dofs(), false, solution->type());
+    tmp->init(this->n_dofs(), this->n_local_dofs(), false, solution->type());
     
     for (unsigned int i=0; i<_n_converged_eigenpairs; i++)
     {
@@ -283,15 +285,16 @@ EigenSystem::sensitivity_solve (const ParameterVector& parameters)
         case HEP:
           // right and left eigenvectors are same
           // imaginary part of eigenvector for real matrices is zero
-          this->eigen_solver->get_eigenpair(i, *x_right, NULL);
+          this->get_eigenpair(i, x_right.get(), NULL);
           denom[i] = x_right->dot(*x_right);               // x^H x
           break;
           
         case GHEP:
           // imaginary part of eigenvector for real matrices is zero
-          this->eigen_solver->get_eigenpair(i, *x_right, NULL);
+          this->get_eigenpair(i, x_right.get(), NULL);
           matrix_B->vector_mult(*tmp, *x_right);
           denom[i] = x_right->dot(*tmp);                  // x^H B x
+          break;
           
         default:
           // to be implemented for the non-Hermitian problems
@@ -308,7 +311,7 @@ EigenSystem::sensitivity_solve (const ParameterVector& parameters)
       // now calculate sensitivity of each eigenvalue for the parameter
       for (unsigned int i=0; i<_n_converged_eigenpairs; i++)
       {
-        eig_val = this->eigen_solver->get_eigenpair(i, *x_right);
+        eig_val = this->get_eigenpair(i, x_right.get());
         switch (_eigen_problem_type)
         {
           case HEP:
@@ -347,10 +350,26 @@ void EigenSystem::assemble ()
 }
 
 
-std::pair<Real, Real> EigenSystem::get_eigenpair (unsigned int i)
+std::pair<Real, Real> EigenSystem::get_eigenpair (unsigned int i,
+                                                  NumericVector<Number>* vec_re,
+                                                  NumericVector<Number>* vec_im)
 {
+  NumericVector<Number>* sol_re = NULL;
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  libmesh_assert (vec_im == NULL);
+#else
+  if (_eigen_problem_type == HEP ||
+      _eigen_problem_type == GHEP)
+    libmesh_assert (vec_im == NULL);
+#endif
+  
+  sol_re = vec_re;
+  
+  if (sol_re == NULL)
+    sol_re = this->solution.get();
+  
   // call the eigen_solver get_eigenpair method
-  return eigen_solver->get_eigenpair (i, *solution);
+  return eigen_solver->get_eigenpair (i, *sol_re, vec_im);
 }
 
   
@@ -396,12 +415,13 @@ void EigenSystem::assemble_eigensystem_sensitivity(const ParameterVector& parame
 }
 
   
-void EigenSystem::attach_sensitivity_assemble_function (bool fptr(EquationSystems& es,
-                                                                  const std::string& name,
-                                                                  const ParameterVector& parameters,
-                                                                  const unsigned int i,
-                                                                  SparseMatrix<Number>* sensitivity_A,
-                                                                  SparseMatrix<Number>* sensitivity_B))
+void EigenSystem::attach_eigenproblem_sensitivity_assemble_function
+  (bool fptr(EquationSystems& es,
+             const std::string& name,
+             const ParameterVector& parameters,
+             const unsigned int i,
+             SparseMatrix<Number>* sensitivity_A,
+             SparseMatrix<Number>* sensitivity_B))
 {
   libmesh_assert(fptr);
   
@@ -418,7 +438,7 @@ void EigenSystem::attach_sensitivity_assemble_function (bool fptr(EquationSystem
 }
   
 
-void EigenSystem::attach_sensitivity_assemble_object (EigenproblemSensitivityAssembly& assemble)
+void EigenSystem::attach_eigenproblem_sensitivity_assemble_object (EigenproblemSensitivityAssembly& assemble)
 {
   if (_eigenproblem_sensitivity_assemble_system_function != NULL)
   {

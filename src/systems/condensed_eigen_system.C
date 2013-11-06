@@ -175,7 +175,9 @@ void CondensedEigenSystem::solve()
 
 
 
-std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
+std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i,
+                                                          NumericVector<Number>* vec_re,
+                                                          NumericVector<Number>* vec_im)
 {
   START_LOG("get_eigenpair()", "CondensedEigenSystem");
 
@@ -184,32 +186,69 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
   if(!condensed_dofs_initialized)
   {
     STOP_LOG("get_eigenpair()", "CondensedEigenSystem");
-    return Parent::get_eigenpair(i);
+    return Parent::get_eigenpair(i, vec_re, vec_im);
   }
 
   // If we reach here, then there should be some non-condensed dofs
   libmesh_assert(!local_non_condensed_dofs_vector.empty());
 
+  
+  NumericVector<Number>* sol_re = NULL;
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  libmesh_assert (vec_im == NULL);
+#else
+  if (this->get_eigenproblem_type() == HEP ||
+      this->get_eigenproblem_type() == GHEP)
+    libmesh_assert (vec_im == NULL);
+#endif
+  
+  sol_re = vec_re;
+  
+  if (sol_re == NULL)
+    sol_re = this->solution.get();
+
+  
   // This function assumes that condensed_solve has just been called.
   // If this is not the case, then we will trip an asset in get_eigenpair
-  AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->comm());
+  AutoPtr< NumericVector<Number> > temp_re = NumericVector<Number>::build(this->comm()),
+  temp_im;
+  
   unsigned int n_local = local_non_condensed_dofs_vector.size();
   unsigned int n       = n_local;
   this->comm().sum(n);
+  
+  temp_re->init (n, n_local, false, libMeshEnums::PARALLEL);
 
-  temp->init (n, n_local, false, libMeshEnums::PARALLEL);
+  if (vec_im)
+  {
+    temp_im.reset(NumericVector<Number>::build(this->comm()).release());
+    temp_im->init (n, n_local, false, libMeshEnums::PARALLEL);
+  }
 
-  std::pair<Real, Real> eval = eigen_solver->get_eigenpair (i, *temp);
+  std::pair<Real, Real> eval = eigen_solver->get_eigenpair (i, *temp_re, temp_im.get());
 
   // Now map temp to solution. Loop over local entries of local_non_condensed_dofs_vector
-  this->solution->zero();
+  // the real part
+  sol_re->zero();
   for (unsigned int j=0; j<local_non_condensed_dofs_vector.size(); j++)
   {
     unsigned int index = local_non_condensed_dofs_vector[j];
-    solution->set(index,(*temp)(temp->first_local_index()+j));
+    sol_re->set(index,(*temp_re)(temp_re->first_local_index()+j));
+  }
+  sol_re->close();
+  
+  // now the imaginary part if it was provided
+  if (vec_im)
+  {
+    vec_im->zero();
+    for (unsigned int j=0; j<local_non_condensed_dofs_vector.size(); j++)
+    {
+      unsigned int index = local_non_condensed_dofs_vector[j];
+      vec_im->set(index,(*temp_im)(temp_im->first_local_index()+j));
+    }
+    vec_im->close();
   }
 
-  solution->close();
   this->update();
 
   STOP_LOG("get_eigenpair()", "CondensedEigenSystem");

@@ -152,10 +152,22 @@ public:
                                                 const unsigned int p);
   
   /**
-   * Returns real and imaginary part of the ith eigenvalue and copies
-   * the respective eigen vector to the solution vector.
+   * Returns real and imaginary part of the ith eigenvalue. If the vectors are
+   * provided in the function argument through \p vec_re and \p vec_im, this
+   * method copies the eigenvector in the given vector(s), else copies the
+   * vector to System::solution.
+   *
+   * Note that with Number = Complex, \p vec_im must be NULL, and for 
+   * Number = Real and eigen problem type HEP or GHEP, \p vec_im must be NULL.
+   * For Number = Real and eigenproblem type NHEP or GNHEP, the real and imag.
+   * parts of the eigenvector are copied to \p vec_re and \p vec_im,
+   * respectively. If \p vec_im is not provided, then only the real part will be 
+   * copied to either \p vec_re or System::solution depending on the second
+   * argument.
    */
-  virtual std::pair<Real, Real> get_eigenpair (unsigned int i);
+  virtual std::pair<Real, Real> get_eigenpair (unsigned int i,
+                                               NumericVector<Number>* vec_re = NULL,
+                                               NumericVector<Number>* vec_im = NULL);
 
   /**
    * @returns \p "Eigen".  Helps in identifying
@@ -199,18 +211,19 @@ public:
    * RHS sensitivity. If the routine is unable to provide sensitivity for this
    * parameter, then it should return false.
    */
-  void attach_sensitivity_assemble_function (bool fptr(EquationSystems& es,
-                                                       const std::string& name,
-                                                       const ParameterVector& parameters,
-                                                       const unsigned int i,
-                                                       SparseMatrix<Number>* sensitivity_A,
-                                                       SparseMatrix<Number>* sensitivity_B));
-
+  void attach_eigenproblem_sensitivity_assemble_function
+  (bool fptr(EquationSystems& es,
+             const std::string& name,
+             const ParameterVector& parameters,
+             const unsigned int i,
+             SparseMatrix<Number>* sensitivity_A,
+             SparseMatrix<Number>* sensitivity_B));
+  
   /**
    * Register a user object to use in assembling the system
    * RHS sensitivity.
    */
-  void attach_sensitivity_assemble_object (EigenproblemSensitivityAssembly& assemble);
+  void attach_eigenproblem_sensitivity_assemble_object (EigenproblemSensitivityAssembly& assemble);
 
   /**
    * The system matrix for standard eigenvalue problems.
