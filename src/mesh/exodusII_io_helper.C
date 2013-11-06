@@ -1588,26 +1588,7 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
                                      &truth_tab[0]);
   EX_CHECK_ERR(ex_err, "Error writing element truth table.");
 
-  NamesData names_table(num_elem_vars, MAX_STR_LENGTH);
-
-  // Store the input names in the format required by Exodus.
-  for (int i=0; i<num_elem_vars; ++i)
-    names_table.push_back_entry(names[i]);
-
-  if (verbose)
-    {
-      libMesh::out << "Writing variable name(s) to file: " << std::endl;
-      for (int i=0; i<num_elem_vars; ++i)
-	libMesh::out << names_table.get_char_star(i) << std::endl;
-    }
-
-  ex_err = exII::ex_put_var_names(ex_id,
-				  "e",
-				  num_elem_vars,
-				  names_table.get_char_star_star()
-				  );
-
-  EX_CHECK_ERR(ex_err, "Error setting element variable names.");
+  this->write_var_names(ELEMENTAL, names);
 }
 
 
@@ -1622,28 +1603,7 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
   ex_err = exII::ex_put_var_param(ex_id, "n", num_nodal_vars);
   EX_CHECK_ERR(ex_err, "Error setting number of nodal vars.");
 
-  if (num_nodal_vars > 0)
-    {
-      NamesData names_table(num_nodal_vars, MAX_STR_LENGTH);
-
-      for (int i=0; i<num_nodal_vars; i++)
-        names_table.push_back_entry(names[i]);
-
-      if (verbose)
-        {
-          libMesh::out << "Writing variable name(s) to file: " << std::endl;
-          for (int i=0; i<num_nodal_vars; i++)
-            libMesh::out << names_table.get_char_star(i) << std::endl;
-        }
-
-      ex_err = exII::ex_put_var_names(ex_id,
-                                      "n",
-                                      num_nodal_vars,
-                                      names_table.get_char_star_star()
-                                      );
-
-      EX_CHECK_ERR(ex_err, "Error setting nodal variable names.");
-    }
+  this->write_var_names(NODAL, names);
 }
 
 
@@ -1688,28 +1648,7 @@ void ExodusII_IO_Helper::initialize_global_variables(std::vector<std::string> na
   ex_err = exII::ex_put_var_param(ex_id, "g", num_global_vars);
   EX_CHECK_ERR(ex_err, "Error setting number of global vars.");
 
-  if (num_global_vars > 0)
-    {
-      NamesData names_table(num_global_vars, MAX_STR_LENGTH);
-
-      for (int i=0; i<num_global_vars; i++)
-        names_table.push_back_entry(names[i]);
-
-      if (verbose)
-        {
-          libMesh::out << "Writing variable name(s) to file: " << std::endl;
-          for (int i=0; i<num_global_vars; ++i)
-            libMesh::out << names_table.get_char_star(i) << std::endl;
-        }
-
-      ex_err = exII::ex_put_var_names(ex_id,
-                                      "g",
-                                      num_global_vars,
-                                      names_table.get_char_star_star()
-                                      );
-
-      EX_CHECK_ERR(ex_err, "Error setting global variable names.");
-    }
+  this->write_var_names(GLOBAL, names);
 }
 
 
