@@ -1539,29 +1539,10 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
   if (_elem_vars_initialized)
     return;
 
-  // There may already be element variables in the file (for example,
-  // if we're appending) and in that case, we
-  // 1.) Cannot initialize them again.
-  // 2.) Should check to be sure that the names we've asked to
-  //     initialize match what is already in the file.
+  // Be sure that variables in the file match what we are asking for
   if (num_elem_vars > 0)
     {
-      // Fills in elem_var_names vector of strings
-      this->read_var_names(ELEMENTAL);
-
-      // Both the names of the elemental variables and their order must match
-      if (this->elem_var_names != names)
-        {
-          libMesh::err << "Error! The Exodus file already contains the elemental variables:" << std::endl;
-          for (unsigned i=0; i<elem_var_names.size(); ++i)
-            libMesh::out << elem_var_names[i] << std::endl;
-
-          libMesh::err << "And you asked to write:" << std::endl;
-          for (unsigned i=0; i<names.size(); ++i)
-            libMesh::out << names[i] << std::endl;
-
-          libmesh_error();
-        }
+      this->check_existing_vars(ELEMENTAL, names, this->elem_var_names);
       return;
     }
 
@@ -1605,6 +1586,13 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
   if (_nodal_vars_initialized)
     return;
 
+  // Be sure that variables in the file match what we are asking for
+  if (num_nodal_vars > 0)
+    {
+      this->check_existing_vars(NODAL, names, this->nodal_var_names);
+      return;
+    }
+
   // Set the flag so we can skip the rest of this function on subsequent calls.
   _nodal_vars_initialized = true;
 
@@ -1625,28 +1613,10 @@ void ExodusII_IO_Helper::initialize_global_variables(std::vector<std::string> na
   if (_global_vars_initialized)
     return;
 
-  // There may already be global variables in the file (for example,
-  // if we're appending) and in that case, we
-  // 1.) Cannot initialize them again.
-  // 2.) Should check to be sure that the global variable names are the same.
+  // Be sure that variables in the file match what we are asking for
   if (num_global_vars > 0)
     {
-      // Fills in global_var_names vector of strings
-      this->read_var_names(GLOBAL);
-
-      // Both the names of the global variables and their order must match
-      if (this->global_var_names != names)
-        {
-          libMesh::err << "Error! The Exodus file already contains the global variables:" << std::endl;
-          for (unsigned i=0; i<global_var_names.size(); ++i)
-            libMesh::out << global_var_names[i] << std::endl;
-
-          libMesh::err << "And you asked to write:" << std::endl;
-          for (unsigned i=0; i<names.size(); ++i)
-            libMesh::out << names[i] << std::endl;
-
-          libmesh_error();
-        }
+      this->check_existing_vars(GLOBAL, names, this->global_var_names);
       return;
     }
 
@@ -1661,6 +1631,11 @@ void ExodusII_IO_Helper::check_existing_vars(ExodusVarType type,
                                              std::vector<std::string>& names,
                                              std::vector<std::string>& names_from_file)
 {
+  // There may already be global variables in the file (for example,
+  // if we're appending) and in that case, we
+  // 1.) Cannot initialize them again.
+  // 2.) Should check to be sure that the global variable names are the same.
+
   // Fills up names_from_file for us
   this->read_var_names(type);
 
