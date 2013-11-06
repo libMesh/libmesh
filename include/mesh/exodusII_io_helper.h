@@ -288,7 +288,7 @@ public:
   /**
    * Sets up the nodal variables
    */
-  void initialize_element_variables(const MeshBase & mesh, std::vector<std::string> names);
+  void initialize_element_variables(std::vector<std::string> names);
 
   /**
    * Sets up the nodal variables
@@ -298,7 +298,7 @@ public:
   /**
    * Sets up the global variables
    */
-  void initialize_global_variables(const std::vector<std::string> & names);
+  void initialize_global_variables(std::vector<std::string> names);
 
   /**
    * Writes the time for the timestep
