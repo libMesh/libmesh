@@ -234,6 +234,12 @@ public:
   void write_var_names(ExodusVarType type, std::vector<std::string>& names);
 
   /**
+   * When appending: during initialization, check that variable names
+   * in the file match those you attempt to initialize with.
+   */
+  void check_existing_vars(ExodusVarType type, std::vector<std::string>& names, std::vector<std::string>& names_from_file);
+
+  /**
    * Reads the nodal values for the variable 'nodal_var_name' at the
    * specified time into the 'nodal_var_values' array.
    */

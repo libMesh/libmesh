@@ -1657,6 +1657,30 @@ void ExodusII_IO_Helper::initialize_global_variables(std::vector<std::string> na
 
 
 
+void ExodusII_IO_Helper::check_existing_vars(ExodusVarType type,
+                                             std::vector<std::string>& names,
+                                             std::vector<std::string>& names_from_file)
+{
+  // Fills up names_from_file for us
+  this->read_var_names(type);
+
+  // Both the names of the global variables and their order must match
+  if (names_from_file != names)
+    {
+      libMesh::err << "Error! The Exodus file already contains the variables:" << std::endl;
+      for (unsigned i=0; i<names_from_file.size(); ++i)
+        libMesh::out << names_from_file[i] << std::endl;
+
+      libMesh::err << "And you asked to write:" << std::endl;
+      for (unsigned i=0; i<names.size(); ++i)
+        libMesh::out << names[i] << std::endl;
+
+      libmesh_error();
+    }
+}
+
+
+
 void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
