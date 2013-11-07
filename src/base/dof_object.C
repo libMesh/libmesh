@@ -45,6 +45,9 @@ DofObject::DofObject (const DofObject& dof_obj) :
   old_dof_object (NULL),
 #endif
   _id            (dof_obj._id),
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _unique_id     (dof_obj._unique_id),
+#endif
   _processor_id  (dof_obj._processor_id),
   _idx_buf       (dof_obj._idx_buf)
 {
@@ -85,6 +88,9 @@ DofObject& DofObject::operator= (const DofObject& dof_obj)
 #endif
 
   _id           = dof_obj._id;
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _unique_id    = dof_obj._unique_id;
+#endif
   _processor_id = dof_obj._processor_id;
   _idx_buf      = dof_obj._idx_buf;
 
