@@ -1337,32 +1337,24 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
+  typedef std::map<subdomain_id_type, std::vector<dof_id_type> > subdomain_map_type;
+  subdomain_map_type subdomain_map;
 
   MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
   // loop through element and map between block and element vector
   for (; mesh_it!=end; ++mesh_it)
     {
       const Elem * elem = *mesh_it;
-
-      // Only write out the active elements
-      if (elem->active())
-      {
-        unsigned int cur_subdomain = elem->subdomain_id();
-
-        subdomain_map[cur_subdomain].push_back(elem->id());
-      }
+      subdomain_map[ elem->subdomain_id() ].push_back(elem->id());
     }
 
-  std::vector<int> elem_num_map_out;
+  // This counter is used to fill up the libmesh_elem_num_to_exodus map in the loop below.
+  unsigned libmesh_elem_num_to_exodus_counter = 0;
 
-  std::map<unsigned int, std::vector<unsigned int>  >::iterator it;
-
-  for (it=subdomain_map.begin(); it!=subdomain_map.end(); it++)
+  for (subdomain_map_type::iterator it=subdomain_map.begin(); it!=subdomain_map.end(); ++it)
     {
-      std::vector<unsigned int> & tmp_vec = (*it).second;
+      subdomain_map_type::mapped_type& tmp_vec = (*it).second;
 
       ExodusII_IO_Helper::ElementMaps em;
 
@@ -1372,7 +1364,12 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
       const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(tmp_vec[0])->type());
       num_nodes_per_elem = mesh.elem(tmp_vec[0])->n_nodes();
 
-      ex_err = exII::ex_put_elem_block(ex_id, (*it).first, conv.exodus_elem_type().c_str(), tmp_vec.size(),num_nodes_per_elem,0);
+      ex_err = exII::ex_put_elem_block(ex_id,
+                                       (*it).first,
+                                       conv.exodus_elem_type().c_str(),
+                                       tmp_vec.size(),
+                                       num_nodes_per_elem,
+                                       /*num_attr=*/0);
 
       EX_CHECK_ERR(ex_err, "Error writing element block.");
 
@@ -1381,8 +1378,7 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
       for (unsigned int i=0; i<tmp_vec.size(); i++)
         {
           unsigned int elem_id = tmp_vec[i];
-          elem_num_map_out.push_back(elem_id);
-          libmesh_elem_num_to_exodus[elem_id] = elem_num_map_out.size();
+          libmesh_elem_num_to_exodus[elem_id] = ++libmesh_elem_num_to_exodus_counter; // 1-based indexing for Exodus
 
           for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); j++)
             {
@@ -1399,22 +1395,16 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
     ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
     EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
-    // Create temporary integer storage for the element number map
-    std::vector<int> elem_map(tmp_vec.size());
+    // Create space in elem_num_map
+    elem_num_map.resize(tmp_vec.size());
 
-    // Add one to each id for exodus!
-    std::transform(tmp_vec.begin(),
-                   tmp_vec.end(),
-                   elem_map.begin(),
-                   std::bind2nd(std::plus<int>(), 1));
+    // copy the contents of tmp_vec into the elem_map vector
+    std::copy(tmp_vec.begin(), tmp_vec.end(), elem_num_map.begin());
 
     // And write to file
-    ex_err = exII::ex_put_elem_num_map(ex_id, &elem_map[0]);
+    ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map[0]);
     EX_CHECK_ERR(ex_err, "Error writing element map");
   }
-
-//  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map_out[0]);
-//  EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
   ex_err = exII::ex_update(ex_id);
   EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
