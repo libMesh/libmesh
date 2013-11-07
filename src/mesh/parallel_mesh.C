@@ -951,7 +951,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
         // It's possible to have an invalid id for dofs not owned by this process.
         // We'll assert that they match on the receiving end.
-        requested_unique_ids[obj->processor_id()].push_back(obj->set_unique_id());
+        requested_unique_ids[obj->processor_id()].push_back(obj->valid_unique_id() ? obj-> unique_id() : DofObject::invalid_unique_id);
 #endif
       }
     }
@@ -987,7 +987,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
               libmesh_assert_equal_to (obj->processor_id(), this->processor_id());
               new_ids[i] = obj->id();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              new_unique_ids[i] = obj->set_unique_id();
+              new_unique_ids[i] = obj->valid_unique_id() ? obj->unique_id() : DofObject::invalid_unique_id;
 #endif
 
               libmesh_assert_greater_equal (new_ids[i],
@@ -1022,8 +1022,8 @@ dof_id_type ParallelMesh::renumber_dof_objects
               obj->set_id(filled_request[i]);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              libmesh_assert(!obj->valid_unique_id() || obj->unique_id() == unique_filled_request[i]);
-              obj->set_unique_id() = unique_filled_request[i];
+              if (!obj->valid_unique_id() && unique_filled_request[i] != DofObject::invalid_unique_id)
+                obj->set_unique_id() = unique_filled_request[i];
 #endif
             }
         }
