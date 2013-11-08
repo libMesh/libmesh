@@ -148,6 +148,7 @@ include_HEADERS =  \
         mesh/abaqus_io.h \
         mesh/boundary_info.h \
         mesh/boundary_mesh.h \
+        mesh/checkpoint_io.h \
         mesh/diva_io.h \
         mesh/ensight_io.h \
         mesh/exodusII_io.h \

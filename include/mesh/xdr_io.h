@@ -34,11 +34,6 @@
 namespace libMesh
 {
 
-// The size used for encoding all id types in this file
-typedef largest_id_type xdr_id_type;
-// The size type used to read header sizes (meta data information)
-typedef uint32_t header_id_type;
-
 // Forward declarations
 class MeshBase;
 class MeshData;
@@ -57,8 +52,12 @@ class XdrIO : public MeshInput<MeshBase>,
 	      public MeshOutput<MeshBase>,
 	      public ParallelObject
 {
-
  public:
+  // The size used for encoding all id types in this file
+  typedef largest_id_type xdr_id_type;
+
+  // The size type used to read header sizes (meta data information)
+  typedef uint32_t header_id_type;
 
   /**
    * Constructor.  Takes a writeable reference to a mesh object.

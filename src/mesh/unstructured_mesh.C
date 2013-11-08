@@ -51,6 +51,7 @@
 #include "libmesh/legacy_xdr_io.h"
 #include "libmesh/vtk_io.h"
 #include "libmesh/abaqus_io.h"
+#include "libmesh/checkpoint_io.h"
 
 #include LIBMESH_INCLUDE_UNORDERED_MAP
 
@@ -66,7 +67,8 @@ namespace {
     return ((name.rfind(".xda") < name.size()) ||
 	    (name.rfind(".xdr") < name.size()) ||
 	    (name.rfind(".nem") < name.size()) ||
-	    (name.rfind(".n") < name.size())
+	    (name.rfind(".n") < name.size())   ||
+            (name.rfind(".cp") < name.size())
 	    );
   }
 }
@@ -502,6 +504,7 @@ void UnstructuredMesh::read (const std::string& name,
 	  libmesh_error();
         }
     }
+  else if(name.rfind(".cp")) {} // Do error checking in the reader
   else
     {
       std::ifstream in (name.c_str());
@@ -575,7 +578,13 @@ void UnstructuredMesh::read (const std::string& name,
       else if (name.rfind(".nem") < name.size() ||
 	       name.rfind(".n")   < name.size())
         Nemesis_IO(*this).read (name);
-
+      else if (name.rfind(".cp") < name.size())
+      {
+        if(name.rfind(".cpa") < name.size())
+          CheckpointIO(*this, false).read(name);
+        else
+          CheckpointIO(*this, true).read(name);
+      }
     }
 
   // Serial mesh formats
@@ -693,6 +702,8 @@ void UnstructuredMesh::read (const std::string& name,
 			<< "     *.gz   -- any above format gzipped\n"
 			<< "     *.bz2  -- any above format bzip2'ed\n"
 			<< "     *.xz   -- any above format xzipped\n"
+                        << "     *.cpa  -- libMesh Checkpoint ASCII format\n"
+                        << "     *.cpr  -- libMesh Checkpoint binary format\n"
 
 			<< std::endl;
 	      libmesh_error();
