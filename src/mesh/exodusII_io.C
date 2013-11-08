@@ -120,11 +120,11 @@ void ExodusII_IO::read (const std::string& fname)
   // Print header information
   exio_helper->print_header();
 
-  // assertion fails due to inconsistent mesh dimension
-  // libmesh_assert_equal_to (static_cast<unsigned int>(exio_helper->num_dim), mesh.mesh_dimension());
+  // Read nodes from the exodus file
+  exio_helper->read_nodes();
 
-  exio_helper->read_nodes();                        // Read nodes from the exodus file
-  mesh.reserve_nodes(exio_helper->num_nodes); // Reserve space for the nodes.
+  // Reserve space for the nodes.
+  mesh.reserve_nodes(exio_helper->num_nodes);
 
   // Read the node number map from the Exodus file.  This is
   // required if we want to preserve the numbering of nodes as it
@@ -159,8 +159,11 @@ void ExodusII_IO::read (const std::string& fname)
   // sequentially starting from 1 in the Exodus file.
   // libmesh_assert_equal_to (static_cast<unsigned int>(exio_helper->num_nodes), mesh.n_nodes());
 
-  exio_helper->read_block_info();                 // Get information about all the blocks
-  mesh.reserve_elem(exio_helper->num_elem); // Reserve space for the elements
+  // Get information about all the blocks
+  exio_helper->read_block_info();
+
+  // Reserve space for the elements
+  mesh.reserve_elem(exio_helper->num_elem);
 
   // Read the element number map from the Exodus file.  This is
   // required if we want to preserve the numbering of elements as it
@@ -186,8 +189,6 @@ void ExodusII_IO::read (const std::string& fname)
       // Set any relevant node/edge maps for this element
       const std::string type_str (exio_helper->get_elem_type());
       const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(type_str);
-      //if (_verbose)
-      //libMesh::out << "Reading a block of " << type_str << " elements." << std::endl;
 
       // Loop over all the faces in this block
       int jmax = nelem_last_block+exio_helper->num_elem_this_blk;
@@ -265,11 +266,13 @@ void ExodusII_IO::read (const std::string& fname)
 
   // Read in sideset information -- this is useful for applying boundary conditions
   {
-    exio_helper->read_sideset_info(); // Get basic information about ALL sidesets
+    // Get basic information about all sidesets
+    exio_helper->read_sideset_info();
     int offset=0;
     for (int i=0; i<exio_helper->num_side_sets; i++)
       {
-	offset += (i > 0 ? exio_helper->num_sides_per_set[i-1] : 0); // Compute new offset
+        // Compute new offset
+	offset += (i > 0 ? exio_helper->num_sides_per_set[i-1] : 0);
 	exio_helper->read_sideset (i, offset);
 
         std::string sideset_name = exio_helper->get_side_set_name(i);
