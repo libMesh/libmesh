@@ -131,12 +131,14 @@ public:
 
   /**
    * Solves the sensitivity system, for the provided parameters. The return
-   * parameters are irrelevant for EigenSystem.
+   * parameters are irrelevant for EigenSystem. Sensitivity of eigenvalues
+   * are returned in \p sens.
    *
    * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
-  sensitivity_solve (const ParameterVector& parameters);
+  sensitivity_solve (const ParameterVector& parameters,
+                     std::vector<Number>& sens);
 
   
   /**

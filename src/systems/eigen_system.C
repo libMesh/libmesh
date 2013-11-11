@@ -254,7 +254,8 @@ void EigenSystem::solve ()
 
   
 std::pair<unsigned int, Real>
-EigenSystem::sensitivity_solve (const ParameterVector& parameters)
+EigenSystem::sensitivity_solve (const ParameterVector& parameters,
+                                std::vector<Number>& sens)
   {
     // make sure that eigensolution is already available
     libmesh_assert(_n_converged_eigenpairs);
@@ -268,8 +269,8 @@ EigenSystem::sensitivity_solve (const ParameterVector& parameters)
     //
     //    the denominator remain constant for all sensitivity calculations.
     //
-    std::vector<Number> denom(_n_converged_eigenpairs, 0.),
-    sens(_n_converged_eigenpairs, 0.);
+    std::vector<Number> denom(_n_converged_eigenpairs, 0.);
+    sens.resize(_n_converged_eigenpairs, 0.);
     std::pair<Real, Real> eig_val;
     
     AutoPtr< NumericVector<Number> > x_right = NumericVector<Number>::build(this->comm()),
