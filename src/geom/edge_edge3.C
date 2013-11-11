@@ -32,7 +32,7 @@ const float Edge3::_embedding_matrix[2][3][3] =
     // 0    1    2
     {1.0, 0.0, 0.0}, // left
     {0.0, 0.0, 1.0}, // right
-    {3./8.,-1./8.,0.75} // middle
+    {0.375,-0.125,0.75} // middle
   },
 
   // embedding matrix for child 1
@@ -40,7 +40,7 @@ const float Edge3::_embedding_matrix[2][3][3] =
     // 0    1    2
     {0.0, 0.0, 1.0}, // left
     {0.0, 1.0, 0.0},  // right
-    {-1./8.,3./8.,0.75} // middle
+    {-0.125,0.375,0.75} // middle
   }
 };
 
