@@ -10,7 +10,6 @@
 #include <sys/time.h>
 #endif
 
-#include "oc.h"
 extern int oc_dumpnode(OClink, OCddsnode);
 
 #include "ncdap3.h"
