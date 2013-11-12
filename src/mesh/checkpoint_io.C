@@ -211,7 +211,7 @@ void CheckpointIO::write_nodes (Xdr &io) const
     io.data_stream(&id_pid[0], 2, 2);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-    largest_id_type unique_id = node.unqiue_id();
+    largest_id_type unique_id = node.unique_id();
 
     io.data(unique_id, "# unique id");
 #endif
@@ -294,7 +294,7 @@ void CheckpointIO::write_connectivity (Xdr &io) const
       io.data_stream(&elem_data[0], elem_data.size(), elem_data.size());
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      largest_id_type unique_id = elem.unqiue_id();
+      largest_id_type unique_id = elem.unique_id();
 
       io.data(unique_id, "# unique id");
 #endif

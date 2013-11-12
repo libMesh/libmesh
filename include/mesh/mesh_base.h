@@ -218,7 +218,7 @@ public:
   /**
    * Sets the next unique id to be used.
    */
-  unique_id_type set_next_unique_id(unique_id_type id) { _next_unique_id = id; }
+  void set_next_unique_id(unique_id_type id) { _next_unique_id = id; }
 #endif
 
   /**
