@@ -209,6 +209,18 @@ public:
    */
   virtual dof_id_type max_node_id () const = 0;
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  /**
+   * Returns the next unique id to be used.
+   */
+  unique_id_type next_unique_id() { return _next_unique_id; }
+
+  /**
+   * Sets the next unique id to be used.
+   */
+  unique_id_type set_next_unique_id(unique_id_type id) { _next_unique_id = id; }
+#endif
+
   /**
    * Reserves space for a known number of nodes.
    * Note that this method may or may not do anything, depending
