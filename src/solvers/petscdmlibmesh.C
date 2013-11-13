@@ -1073,8 +1073,7 @@ static PetscErrorCode  DMDestroy_libMesh(DM dm)
   delete dlm->varnames;
   delete dlm->blockids;
   delete dlm->blocknames;
-  if(dlm->decomposition)
-    delete dlm->decomposition;
+  delete dlm->decomposition;
   ierr = ISDestroy(&dlm->embedding); CHKERRQ(ierr);
   ierr = PetscFree(dm->data); CHKERRQ(ierr);
 
