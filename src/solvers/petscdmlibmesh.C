@@ -934,7 +934,11 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
 
 #undef __FUNCT__
 #define __FUNCT__ "DMCreateMatrix_libMesh"
+#if PETSC_VERSION_LT(3,5,0)
 static PetscErrorCode DMCreateMatrix_libMesh(DM dm, const MatType, Mat *A)
+#else
+static PetscErrorCode DMCreateMatrix_libMesh(DM dm, Mat *A)
+#endif
 {
   PetscFunctionBegin;
   PetscErrorCode ierr;
