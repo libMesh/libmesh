@@ -1091,7 +1091,7 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
 
 void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
                                          const dof_id_type dof_number,
-				         const DofConstraintRow& constraint_row,
+				         const DofConstraintRow& /*constraint_row*/,
                                          const Number constraint_rhs,
 				         const bool forbid_constraint_overwrite)
 {
