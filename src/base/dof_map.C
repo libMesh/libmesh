@@ -157,6 +157,9 @@ DofMap::DofMap(const unsigned int number,
   , _primal_constraint_values()
   , _adjoint_constraint_values()
 #endif
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+  , _node_constraints()
+#endif
 #ifdef LIBMESH_ENABLE_PERIODIC
   , _periodic_boundaries(new PeriodicBoundaries)
 #endif
