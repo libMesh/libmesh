@@ -20,6 +20,7 @@
 // C++ includes
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 // C includes
 #include <unistd.h>  // for unlink()
@@ -492,7 +493,18 @@ void UnstructuredMesh::read (const std::string& name,
       name.rfind(".n") + 2 == name.size())
     {
       std::ostringstream full_name;
-      full_name << name << '.' << this->n_processors() << '.' << this->processor_id();
+
+      // Find the length of a string which represents the highest processor ID
+      full_name << (this->n_processors());
+      unsigned field_width = full_name.str().size();
+
+      // reset the string stream
+      full_name.str("");
+
+      // And build up the full filename
+      full_name << name
+                << '.' << this->n_processors()
+                << '.' << std::setfill('0') << std::setw(field_width) << this->processor_id();
 
       std::ifstream in (full_name.str().c_str());
 
