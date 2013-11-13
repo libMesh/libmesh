@@ -10,6 +10,12 @@
 #include <sys/time.h>
 #endif
 
+#ifdef __APPLE__
+#  include <Availability.h>
+#  if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED > 1060
+#    include "oc.h"
+#  endif
+#endif
 extern int oc_dumpnode(OClink, OCddsnode);
 
 #include "ncdap3.h"
