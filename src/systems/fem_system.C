@@ -46,6 +46,176 @@ namespace {
   typedef Threads::spin_mutex femsystem_mutex;
   femsystem_mutex assembly_mutex;
 
+  void assemble_unconstrained_element_system
+    (const FEMSystem& _sys,
+     const bool _get_jacobian,
+     FEMContext &_femcontext)
+    {
+      bool jacobian_computed =
+	_sys.time_solver->element_residual(_get_jacobian, _femcontext);
+
+      // Compute a numeric jacobian if we have to
+      if (_get_jacobian && !jacobian_computed)
+        {
+          // Make sure we didn't compute a jacobian and lie about it
+          libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
+          // Logging of numerical jacobians is done separately
+          _sys.numerical_elem_jacobian(_femcontext);
+        }
+
+      // Compute a numeric jacobian if we're asked to verify the
+      // analytic jacobian we got
+      if (_get_jacobian && jacobian_computed &&
+          _sys.verify_analytic_jacobians != 0.0)
+        {
+          DenseMatrix<Number> analytic_jacobian(_femcontext.get_elem_jacobian());
+
+          _femcontext.get_elem_jacobian().zero();
+          // Logging of numerical jacobians is done separately
+          _sys.numerical_elem_jacobian(_femcontext);
+
+          Real analytic_norm = analytic_jacobian.l1_norm();
+          Real numerical_norm = _femcontext.get_elem_jacobian().l1_norm();
+
+          // If we can continue, we'll probably prefer the analytic jacobian
+          analytic_jacobian.swap(_femcontext.get_elem_jacobian());
+
+          // The matrix "analytic_jacobian" will now hold the error matrix
+          analytic_jacobian.add(-1.0, _femcontext.get_elem_jacobian());
+          Real error_norm = analytic_jacobian.l1_norm();
+
+          Real relative_error = error_norm /
+                                std::max(analytic_norm, numerical_norm);
+
+          if (relative_error > _sys.verify_analytic_jacobians)
+            {
+              libMesh::err << "Relative error " << relative_error
+                           << " detected in analytic jacobian on element "
+                           << _femcontext.get_elem().id() << '!' << std::endl;
+
+	      std::streamsize old_precision = libMesh::out.precision();
+              libMesh::out.precision(16);
+	      libMesh::out << "J_analytic " << _femcontext.get_elem().id() << " = "
+                           << _femcontext.get_elem_jacobian() << std::endl;
+              analytic_jacobian.add(1.0, _femcontext.get_elem_jacobian());
+	      libMesh::out << "J_numeric " << _femcontext.get_elem().id() << " = "
+                           << analytic_jacobian << std::endl;
+
+              libMesh::out.precision(old_precision);
+
+              libmesh_error();
+            }
+        }
+
+      for (_femcontext.side = 0;
+           _femcontext.side != _femcontext.get_elem().n_sides();
+           ++_femcontext.side)
+        {
+          // Don't compute on non-boundary sides unless requested
+          if (!_sys.get_physics()->compute_internal_sides &&
+              _femcontext.get_elem().neighbor(_femcontext.side) != NULL)
+            continue;
+
+          // Any mesh movement has already been done (and restored,
+          // if the TimeSolver isn't broken), but
+          // reinitializing the side FE objects is still necessary
+          _femcontext.side_fe_reinit();
+
+          DenseMatrix<Number> old_jacobian;
+          // If we're in DEBUG mode, we should always verify that the
+	  // user's side_residual function doesn't alter our existing
+          // jacobian and then lie about it
+#ifndef DEBUG
+	  // Even if we're not in DEBUG mode, when we're verifying
+	  // analytic jacobians we'll want to verify each side's
+          // jacobian contribution separately.
+	  /* PB: We also need to account for the case when the user wants to
+		 use numerical Jacobians and not analytic Jacobians */
+          if ( (_sys.verify_analytic_jacobians != 0.0 && _get_jacobian) ||
+	       (!jacobian_computed && _get_jacobian) )
+#endif // ifndef DEBUG
+            {
+              old_jacobian = _femcontext.get_elem_jacobian();
+              _femcontext.get_elem_jacobian().zero();
+            }
+	  jacobian_computed =
+            _sys.time_solver->side_residual(_get_jacobian, _femcontext);
+
+          // Compute a numeric jacobian if we have to
+          if (_get_jacobian && !jacobian_computed)
+            {
+	      // In DEBUG mode, we've already set elem_jacobian == 0,
+	      // so we can make sure side_residual didn't compute a
+              // jacobian and lie about it
+#ifdef DEBUG
+              libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
+#endif
+              // Logging of numerical jacobians is done separately
+              _sys.numerical_side_jacobian(_femcontext);
+
+	      // Add back in element interior numerical Jacobian
+	      _femcontext.get_elem_jacobian() += old_jacobian;
+            }
+
+          // Compute a numeric jacobian if we're asked to verify the
+          // analytic jacobian we got
+	  if (_get_jacobian && jacobian_computed &&
+              _sys.verify_analytic_jacobians != 0.0)
+            {
+	      DenseMatrix<Number> analytic_jacobian(_femcontext.get_elem_jacobian());
+
+              _femcontext.get_elem_jacobian().zero();
+              // Logging of numerical jacobians is done separately
+              _sys.numerical_side_jacobian(_femcontext);
+
+              Real analytic_norm = analytic_jacobian.l1_norm();
+              Real numerical_norm = _femcontext.get_elem_jacobian().l1_norm();
+
+              // If we can continue, we'll probably prefer the analytic jacobian
+              analytic_jacobian.swap(_femcontext.get_elem_jacobian());
+
+              // The matrix "analytic_jacobian" will now hold the error matrix
+              analytic_jacobian.add(-1.0, _femcontext.get_elem_jacobian());
+              Real error_norm = analytic_jacobian.l1_norm();
+
+              Real relative_error = error_norm /
+                                    std::max(analytic_norm, numerical_norm);
+
+              if (relative_error > _sys.verify_analytic_jacobians)
+                {
+                  libMesh::err << "Relative error " << relative_error
+                               << " detected in analytic jacobian on element "
+                               << _femcontext.get_elem().id()
+			       << ", side "
+                               << static_cast<unsigned int>(_femcontext.side) << '!' << std::endl;
+
+		  std::streamsize old_precision = libMesh::out.precision();
+                  libMesh::out.precision(16);
+	          libMesh::out << "J_analytic " << _femcontext.get_elem().id() << " = "
+                               << _femcontext.get_elem_jacobian() << std::endl;
+                  analytic_jacobian.add(1.0, _femcontext.get_elem_jacobian());
+	          libMesh::out << "J_numeric " << _femcontext.get_elem().id() << " = "
+                               << analytic_jacobian << std::endl;
+                  libMesh::out.precision(old_precision);
+
+                  libmesh_error();
+                }
+              // Once we've verified a side, we'll want to add back the
+              // rest of the accumulated jacobian
+              _femcontext.get_elem_jacobian() += old_jacobian;
+            }
+	  // In DEBUG mode, we've set elem_jacobian == 0, and we
+          // may still need to add the old jacobian back
+#ifdef DEBUG
+	  if (_get_jacobian && jacobian_computed &&
+              _sys.verify_analytic_jacobians == 0.0)
+            {
+              _femcontext.get_elem_jacobian() += old_jacobian;
+            }
+#endif // ifdef DEBUG
+        }
+    }
+
   class AssemblyContributions
   {
   public:
@@ -76,169 +246,8 @@ namespace {
           _femcontext.pre_fe_reinit(_sys, el);
           _femcontext.elem_fe_reinit();
 
-          bool jacobian_computed =
-	    _sys.time_solver->element_residual(_get_jacobian, _femcontext);
-
-          // Compute a numeric jacobian if we have to
-          if (_get_jacobian && !jacobian_computed)
-            {
-              // Make sure we didn't compute a jacobian and lie about it
-              libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
-              // Logging of numerical jacobians is done separately
-              _sys.numerical_elem_jacobian(_femcontext);
-            }
-
-          // Compute a numeric jacobian if we're asked to verify the
-          // analytic jacobian we got
-          if (_get_jacobian && jacobian_computed &&
-              _sys.verify_analytic_jacobians != 0.0)
-            {
-              DenseMatrix<Number> analytic_jacobian(_femcontext.get_elem_jacobian());
-
-              _femcontext.get_elem_jacobian().zero();
-              // Logging of numerical jacobians is done separately
-              _sys.numerical_elem_jacobian(_femcontext);
-
-              Real analytic_norm = analytic_jacobian.l1_norm();
-              Real numerical_norm = _femcontext.get_elem_jacobian().l1_norm();
-
-              // If we can continue, we'll probably prefer the analytic jacobian
-              analytic_jacobian.swap(_femcontext.get_elem_jacobian());
-
-              // The matrix "analytic_jacobian" will now hold the error matrix
-              analytic_jacobian.add(-1.0, _femcontext.get_elem_jacobian());
-              Real error_norm = analytic_jacobian.l1_norm();
-
-              Real relative_error = error_norm /
-                                    std::max(analytic_norm, numerical_norm);
-
-              if (relative_error > _sys.verify_analytic_jacobians)
-                {
-                  libMesh::err << "Relative error " << relative_error
-                               << " detected in analytic jacobian on element "
-                               << _femcontext.get_elem().id() << '!' << std::endl;
-
-		  std::streamsize old_precision = libMesh::out.precision();
-                  libMesh::out.precision(16);
-	          libMesh::out << "J_analytic " << _femcontext.get_elem().id() << " = "
-                               << _femcontext.get_elem_jacobian() << std::endl;
-                  analytic_jacobian.add(1.0, _femcontext.get_elem_jacobian());
-	          libMesh::out << "J_numeric " << _femcontext.get_elem().id() << " = "
-                               << analytic_jacobian << std::endl;
-
-                  libMesh::out.precision(old_precision);
-
-                  libmesh_error();
-                }
-            }
-
-          for (_femcontext.side = 0;
-               _femcontext.side != _femcontext.get_elem().n_sides();
-               ++_femcontext.side)
-            {
-              // Don't compute on non-boundary sides unless requested
-              if (!_sys.get_physics()->compute_internal_sides &&
-                  _femcontext.get_elem().neighbor(_femcontext.side) != NULL)
-                continue;
-
-              // Any mesh movement has already been done (and restored,
-              // if the TimeSolver isn't broken), but
-              // reinitializing the side FE objects is still necessary
-              _femcontext.side_fe_reinit();
-
-              DenseMatrix<Number> old_jacobian;
-              // If we're in DEBUG mode, we should always verify that the
-	      // user's side_residual function doesn't alter our existing
-              // jacobian and then lie about it
-#ifndef DEBUG
-	      // Even if we're not in DEBUG mode, when we're verifying
-	      // analytic jacobians we'll want to verify each side's
-              // jacobian contribution separately.
-	      /* PB: We also need to account for the case when the user wants to
-		 use numerical Jacobians and not analytic Jacobians */
-              if ( (_sys.verify_analytic_jacobians != 0.0 && _get_jacobian) ||
-		   (!jacobian_computed && _get_jacobian) )
-#endif // ifndef DEBUG
-                {
-                  old_jacobian = _femcontext.get_elem_jacobian();
-                  _femcontext.get_elem_jacobian().zero();
-                }
-	      jacobian_computed =
-                _sys.time_solver->side_residual(_get_jacobian, _femcontext);
-
-              // Compute a numeric jacobian if we have to
-              if (_get_jacobian && !jacobian_computed)
-                {
-	          // In DEBUG mode, we've already set elem_jacobian == 0,
-	          // so we can make sure side_residual didn't compute a
-                  // jacobian and lie about it
-#ifdef DEBUG
-                  libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
-#endif
-                  // Logging of numerical jacobians is done separately
-                  _sys.numerical_side_jacobian(_femcontext);
-
-		  // Add back in element interior numerical Jacobian
-		  _femcontext.get_elem_jacobian() += old_jacobian;
-                }
-
-              // Compute a numeric jacobian if we're asked to verify the
-              // analytic jacobian we got
-	      if (_get_jacobian && jacobian_computed &&
-                  _sys.verify_analytic_jacobians != 0.0)
-                {
-	          DenseMatrix<Number> analytic_jacobian(_femcontext.get_elem_jacobian());
-
-                  _femcontext.get_elem_jacobian().zero();
-                  // Logging of numerical jacobians is done separately
-                  _sys.numerical_side_jacobian(_femcontext);
-
-                  Real analytic_norm = analytic_jacobian.l1_norm();
-                  Real numerical_norm = _femcontext.get_elem_jacobian().l1_norm();
-
-                  // If we can continue, we'll probably prefer the analytic jacobian
-                  analytic_jacobian.swap(_femcontext.get_elem_jacobian());
-
-                  // The matrix "analytic_jacobian" will now hold the error matrix
-                  analytic_jacobian.add(-1.0, _femcontext.get_elem_jacobian());
-                  Real error_norm = analytic_jacobian.l1_norm();
-
-                  Real relative_error = error_norm /
-                                        std::max(analytic_norm, numerical_norm);
-
-                  if (relative_error > _sys.verify_analytic_jacobians)
-                    {
-                      libMesh::err << "Relative error " << relative_error
-                                   << " detected in analytic jacobian on element "
-                                   << _femcontext.get_elem().id()
-			           << ", side "
-                                   << static_cast<unsigned int>(_femcontext.side) << '!' << std::endl;
-
-		      std::streamsize old_precision = libMesh::out.precision();
-                      libMesh::out.precision(16);
-	              libMesh::out << "J_analytic " << _femcontext.get_elem().id() << " = "
-                                   << _femcontext.get_elem_jacobian() << std::endl;
-                      analytic_jacobian.add(1.0, _femcontext.get_elem_jacobian());
-	              libMesh::out << "J_numeric " << _femcontext.get_elem().id() << " = "
-                                   << analytic_jacobian << std::endl;
-                      libMesh::out.precision(old_precision);
-
-                      libmesh_error();
-                    }
-                  // Once we've verified a side, we'll want to add back the
-                  // rest of the accumulated jacobian
-                  _femcontext.get_elem_jacobian() += old_jacobian;
-                }
-	      // In DEBUG mode, we've set elem_jacobian == 0, and we
-              // may still need to add the old jacobian back
-#ifdef DEBUG
-	      if (_get_jacobian && jacobian_computed &&
-                  _sys.verify_analytic_jacobians == 0.0)
-                {
-                  _femcontext.get_elem_jacobian() += old_jacobian;
-                }
-#endif // ifdef DEBUG
-            }
+          assemble_unconstrained_element_system
+            (_sys, _get_jacobian, _femcontext);
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
           // We turn off the asymmetric constraint application;
@@ -472,12 +481,49 @@ namespace {
           { // A lock is necessary around access to the global system
             femsystem_mutex::scoped_lock lock(assembly_mutex);
 
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+            // We'll need to see if any heterogenous constraints apply
+            // to the QoI dofs on this element *or* to any of the dofs
+            // they depend on, so let's get those dependencies
+            _sys.get_dof_map().constrain_nothing(_femcontext.get_dof_indices());
+#endif
+
             for (unsigned int i=0; i != _sys.qoi.size(); ++i)
               if (_qoi_indices.has_index(i))
                 {
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+                  bool has_heterogenous_constraint = false;
+                  for (unsigned int d=0; 
+                       d != _femcontext.get_dof_indices().size(); ++d)
+                    if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
+                        (i, _femcontext.get_dof_indices()[d]))
+                      {
+                        has_heterogenous_constraint = true;
+                        break;
+                      }
+
                   _femcontext.get_dof_indices() = original_dofs;
-                  _sys.get_dof_map().constrain_element_vector
-                    (_femcontext.get_qoi_derivatives()[i], _femcontext.get_dof_indices(), false);
+
+                  // If we're going to need K to impose a heterogenous
+                  // constraint then we either already have it or we
+                  // need to compute it
+                  if (has_heterogenous_constraint)
+                    {
+                      assemble_unconstrained_element_system
+                        (_sys, true, _femcontext);
+
+                      _sys.get_dof_map().heterogenously_constrain_element_vector
+                        (_femcontext.get_elem_jacobian(),
+                         _femcontext.get_qoi_derivatives()[i],
+                         _femcontext.get_dof_indices(), false, i);
+                    }
+                  else
+                    {
+                      _sys.get_dof_map().constrain_element_vector
+                        (_femcontext.get_qoi_derivatives()[i],
+                         _femcontext.get_dof_indices(), false);
+                    }
+#endif
 
                   _sys.get_adjoint_rhs(i).add_vector
                     (_femcontext.get_qoi_derivatives()[i], _femcontext.get_dof_indices());
@@ -782,7 +828,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
 
 
 void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
-                                    FEMContext &context)
+                                    FEMContext &context) const
 {
   // Logging is done by numerical_elem_jacobian
   // or numerical_side_jacobian
@@ -884,7 +930,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
 
 
 
-void FEMSystem::numerical_elem_jacobian (FEMContext &context)
+void FEMSystem::numerical_elem_jacobian (FEMContext &context) const
 {
   START_LOG("numerical_elem_jacobian()", "FEMSystem");
   this->numerical_jacobian(&TimeSolver::element_residual, context);
@@ -893,7 +939,7 @@ void FEMSystem::numerical_elem_jacobian (FEMContext &context)
 
 
 
-void FEMSystem::numerical_side_jacobian (FEMContext &context)
+void FEMSystem::numerical_side_jacobian (FEMContext &context) const
 {
   START_LOG("numerical_side_jacobian()", "FEMSystem");
   this->numerical_jacobian(&TimeSolver::side_residual, context);

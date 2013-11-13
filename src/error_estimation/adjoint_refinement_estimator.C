@@ -174,10 +174,23 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   computed_global_QoI_errors.resize(system.qoi.size());
 
   // Loop over all the adjoint solutions and get the QoI error
-  // contributions from all of them
+  // contributions from all of them.  While we're looping anyway we'll
+  // handle heterogenous adjoint BCs
   for (unsigned int j=0; j != system.qoi.size(); j++)
     {
-      computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));
+      // Skip this QoI if not in the QoI Set
+      if (_qoi_set.has_index(j))
+	{
+          // If the adjoint solution has heterogeneous dirichlet
+          // values, then to get a proper error estimate here we need
+          // to subtract off a lift function.  We do so by enforcing
+          // *homogeneous* constraints on the adjoint solutions
+
+          system.get_dof_map().enforce_constraints_exactly
+            (system, &system.get_adjoint_solution(j), true);
+
+          computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));
+        }
     }
 
   // Done with the global error estimates, now construct the element wise error indicators
