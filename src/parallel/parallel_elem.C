@@ -257,7 +257,7 @@ void pack (const Elem* elem,
       for (unsigned int e = 0; e != elem->n_edges(); ++e)
         {
           std::vector<boundary_id_type> bcs =
-            mesh->boundary_info->edge_boundary_ids(elem, s);
+            mesh->boundary_info->edge_boundary_ids(elem, e);
 
           data.push_back(bcs.size());
 
