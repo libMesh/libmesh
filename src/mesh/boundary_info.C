@@ -1426,6 +1426,30 @@ std::size_t BoundaryInfo::n_boundary_conds () const
   return nbcs;
 }
 
+std::size_t BoundaryInfo::n_edge_conds () const
+{
+  // in serial we know the number of nodesets from the
+  // size of the container
+  if (_mesh.is_serial())
+    return _boundary_edge_id.size();
+
+  // in parallel we need to sum the number of local nodesets
+  parallel_object_only();
+
+  std::size_t n_edge_bcs=0;
+
+  std::multimap<const Elem*,
+                std::pair<unsigned short int,
+                          boundary_id_type> >::const_iterator pos;
+
+  for (pos=_boundary_edge_id.begin(); pos != _boundary_edge_id.end(); ++pos)
+    if (pos->first->processor_id() == this->processor_id())
+      n_edge_bcs++;
+
+  this->comm().sum (n_edge_bcs);
+
+  return n_edge_bcs;
+}
 
 
 std::size_t BoundaryInfo::n_nodeset_conds () const

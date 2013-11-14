@@ -352,6 +352,11 @@ public:
   std::size_t n_boundary_conds () const;
 
   /**
+   * @returns the number of edge-based boundary conditions.
+   */
+  std::size_t n_edge_conds () const;
+
+  /**
    * @returns the number of node-based boundary conditions.
    */
   std::size_t n_nodeset_conds () const;
