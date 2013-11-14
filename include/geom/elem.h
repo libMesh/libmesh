@@ -439,6 +439,12 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual unsigned int n_edges () const = 0;
 
   /**
+   * This array maps the integer representation of the \p ElemType enum
+   * to the number of edges on the element.
+   */
+  static const unsigned int type_to_n_edges_map[INVALID_ELEM];
+
+  /**
    * @returns the number of faces the element that has been derived
    * from this class has.
    */
