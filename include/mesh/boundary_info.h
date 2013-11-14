@@ -153,6 +153,7 @@ public:
   /**
    * Add edge \p edge of element number \p elem with boundary id \p id
    * to the boundary information data structure.
+   * Edge-based boundary IDs should only be used in 3D.
    */
   void add_edge (const dof_id_type elem,
 		 const unsigned short int edge,
@@ -161,6 +162,7 @@ public:
   /**
    * Add edge \p edge of element \p elem with boundary id \p id
    * to the boundary information data structure.
+   * Edge-based boundary IDs should only be used in 3D.
    */
   void add_edge (const Elem* elem,
 		 const unsigned short int edge,
@@ -169,6 +171,7 @@ public:
   /**
    * Add edge \p edge of element \p elem with boundary ids \p ids
    * to the boundary information data structure.
+   * Edge-based boundary IDs should only be used in 3D.
    */
   void add_edge (const Elem* elem,
 		 const unsigned short int edge,
@@ -264,6 +267,7 @@ public:
   /**
    * Returns the number of boundary ids associated with the \p edge
    * edge of element \p elem.
+   * Edge-based boundary IDs should only be used in 3D.
    */
   unsigned int n_edge_boundary_ids (const Elem* const elem,
                                     const unsigned short int edge) const;
@@ -271,6 +275,7 @@ public:
   /**
    * Returns the list of boundary ids associated with the \p edge edge of
    * element \p elem.
+   * Edge-based boundary IDs should only be used in 3D.
    */
   std::vector<boundary_id_type> edge_boundary_ids (const Elem* const elem,
                                                    const unsigned short int edge) const;
@@ -280,6 +285,7 @@ public:
    * edge of element \p elem.  These ids are ``raw'' because they
    * exclude ids which are implicit, such as a child's inheritance of
    * its ancestors' boundary id.
+   * Edge-based boundary IDs should only be used in 3D.
    */
   std::vector<boundary_id_type> raw_edge_boundary_ids (const Elem* const elem,
                                                        const unsigned short int edge) const;
@@ -347,12 +353,13 @@ public:
   void build_side_boundary_ids(std::vector<boundary_id_type> &b_ids);
 
   /**
-   * @returns the number of element-based boundary conditions.
+   * @returns the number of element-side-based boundary conditions.
    */
   std::size_t n_boundary_conds () const;
 
   /**
    * @returns the number of edge-based boundary conditions.
+   * Edge-based boundary IDs should only be used in 3D.
    */
   std::size_t n_edge_conds () const;
 
@@ -402,6 +409,7 @@ public:
   /**
    * Returns a reference to the set of all boundary IDs
    * specified on edges.
+   * Edge-based boundary IDs should only be used in 3D.
    */
   const std::set<boundary_id_type>& get_edge_boundary_ids () const
   { return _edge_boundary_ids; }

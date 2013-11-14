@@ -1404,9 +1404,7 @@ std::size_t BoundaryInfo::n_boundary_conds () const
   // in serial we know the number of bcs from the
   // size of the container
   if (_mesh.is_serial())
-    return (_boundary_node_id.size() +
-            _boundary_edge_id.size() +
-            _boundary_side_id.size() );
+    return _boundary_side_id.size();
 
   // in parallel we need to sum the number of local bcs
   parallel_object_only();
