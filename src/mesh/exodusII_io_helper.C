@@ -1197,25 +1197,29 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  // Map from block ID to a vector of element IDs in that block.  Element
-  // IDs are now of type dof_id_type, subdomain IDs are of type subdomain_id_type.
-  typedef std::map<subdomain_id_type, std::vector<dof_id_type> > subdomain_map_type;
-  subdomain_map_type subdomain_map;
+  std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
 
   MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
   //loop through element and map between block and element vector
   for (; mesh_it!=end; ++mesh_it)
-    {
-      const Elem * elem = *mesh_it;
-      subdomain_map[ elem->subdomain_id() ].push_back(elem->id());
-    }
+  {
+    const Elem * elem = *mesh_it;
+
+    unsigned int cur_subdomain = elem->subdomain_id();
+
+    subdomain_map[cur_subdomain].push_back(elem->id());
+  }
+
+  std::vector<int> elem_num_map_out;
+
+  std::map<unsigned int, std::vector<unsigned int>  >::iterator it;
 
   // element map vector
   num_elem_blk = subdomain_map.size();
   block_ids.resize(num_elem_blk);
-  elem_num_map.resize(n_active_elem);
-  std::vector<int>::iterator curr_elem_map_end = elem_num_map.begin();
+  std::vector<unsigned int> elem_map(n_active_elem);
+  std::vector<unsigned int>::iterator curr_elem_map_end = elem_map.begin();
 
   // Note: It appears that there is a bug in exodusII::ex_put_name where
   // the index returned from the ex_id_lkup is erronously used.  For now
@@ -1223,19 +1227,13 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   // this function requires a char** datastructure.
   NamesData names_table(num_elem_blk, MAX_STR_LENGTH);
 
-  // This counter is used to fill up the libmesh_elem_num_to_exodus map in the loop below.
-  unsigned libmesh_elem_num_to_exodus_counter = 0;
-
-  // counter indexes into the block_ids vector
-  unsigned int counter = 0;
-
-  for (subdomain_map_type::iterator it=subdomain_map.begin(); it!=subdomain_map.end(); ++it)
+  unsigned int counter=0;
+  for (it=subdomain_map.begin(); it!=subdomain_map.end(); it++)
     {
       block_ids[counter] = (*it).first;
       names_table.push_back_entry(mesh.subdomain_name((*it).first));
 
-      // Get a reference to a vector of element IDs for this subdomain.
-      subdomain_map_type::mapped_type& tmp_vec = (*it).second;
+      std::vector<unsigned int> & tmp_vec = (*it).second;
 
       ExodusII_IO_Helper::ElementMaps em;
 
@@ -1245,12 +1243,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
       const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(tmp_vec[0])->type());
       num_nodes_per_elem = mesh.elem(tmp_vec[0])->n_nodes();
 
-      ex_err = exII::ex_put_elem_block(ex_id,
-                                       (*it).first,
-                                       conv.exodus_elem_type().c_str(),
-                                       tmp_vec.size(),
-                                       num_nodes_per_elem,
-                                       /*num_attr=*/0);
+      ex_err = exII::ex_put_elem_block(ex_id, (*it).first, conv.exodus_elem_type().c_str(), tmp_vec.size(),num_nodes_per_elem,0);
 
       EX_CHECK_ERR(ex_err, "Error writing element block.");
 
@@ -1259,7 +1252,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
       for (unsigned int i=0; i<tmp_vec.size(); i++)
         {
           unsigned int elem_id = tmp_vec[i];
-          libmesh_elem_num_to_exodus[elem_id] = ++libmesh_elem_num_to_exodus_counter; // 1-based indexing for Exodus
+          elem_num_map_out.push_back(elem_id);
+          libmesh_elem_num_to_exodus[elem_id] = elem_num_map_out.size();
 
           const Elem* elem = mesh.elem(elem_id);
 
@@ -1285,41 +1279,31 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
               libmesh_error();
             }
 
-          for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); ++j)
+          for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); j++)
             {
-              unsigned connect_index   = (i*num_nodes_per_elem)+j;
-              unsigned elem_node_index = conv.get_inverse_node_map(j); // inverse node map is for writing.
+              const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
+              const unsigned int elem_node_index = conv.get_inverse_node_map(j); // inverse node map is for writing.
               if (verbose)
                 {
                   libMesh::out << "Exodus node index: " << j
-                               << "=LibMesh node index " << elem_node_index << std::endl;
+                                << "=LibMesh node index " << elem_node_index << std::endl;
                 }
-
-              // FIXME: We are hard-coding the 1-based node numbering assumption here.
               connect[connect_index] = elem->node(elem_node_index)+1;
             }
         }
     ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
     EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
-    // This transform command stores its result in a range that begins at the third argument,
-    // so this command is adding values to the elem_num_map vector starting from curr_elem_map_end.
-    curr_elem_map_end = std::transform(tmp_vec.begin(),
-                                       tmp_vec.end(),
-                                       curr_elem_map_end,
-                                       std::bind2nd(std::plus<subdomain_map_type::mapped_type::value_type>(), 1));  // Adds one to each id to make a 1-based exodus file!
-
-    // But if we don't want to add one, we just want to put the values
-    // of tmp_vec into elem_map in the right location, we can use
-    // std::copy().
-    // curr_elem_map_end = std::copy(tmp_vec.begin(), tmp_vec.end(), curr_elem_map_end);
+    // write out the element number map
+    curr_elem_map_end = std::transform(tmp_vec.begin(), tmp_vec.end(), curr_elem_map_end,
+                   std::bind2nd(std::plus<unsigned int>(), 1));  // Add one to each id for exodus!
+    ex_err = exII::ex_put_elem_num_map(ex_id, (int *)&elem_map[0]);
+    EX_CHECK_ERR(ex_err, "Error writing element map");
 
     counter++;
   }
-
-  // write out the element number map that we created
-  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map[0]);
-  EX_CHECK_ERR(ex_err, "Error writing element map");
+//  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map_out[0]);
+//  EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
   // Write out the block names
   if (num_elem_blk > 0)
