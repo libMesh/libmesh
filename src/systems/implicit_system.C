@@ -744,7 +744,8 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
 
   AutoPtr<NumericVector<Number> >
   partialR_partialp(NumericVector<Number>::build(this->rhs->comm()).release());
-
+  partialR_partialp->init(*this->solution);
+    
   for (unsigned int j=0; j != Np; ++j)
     {
       std::vector<Number> partialq_partialp(Nq, 0);
