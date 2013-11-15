@@ -405,6 +405,15 @@ public:
   virtual Node* add_node (Node* n) = 0;
 
   /**
+   * Insert \p Node \p n into the Mesh at a location consistent with
+   * n->id(), allocating extra storage if necessary.  Will error
+   * rather than overwriting an existing Node.  Primarily intended for
+   * use with the mesh_inserter_iterator, only use if you know what
+   * you are doing...
+   */
+  virtual Node* insert_node(Node* n) = 0;
+
+  /**
    * Removes the Node n from the mesh.
    */
   virtual void delete_node (Node* n) = 0;
