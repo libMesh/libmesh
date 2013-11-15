@@ -126,38 +126,13 @@ void ExodusII_IO::read (const std::string& fname)
   // Reserve space for the nodes.
   mesh.reserve_nodes(exio_helper->num_nodes);
 
-  // Read the node number map from the Exodus file.  This is
-  // required if we want to preserve the numbering of nodes as it
-  // exists in the Exodus file.  If the Exodus file does not contain
-  // a node_num_map, the identity map is returned by this call.
-  exio_helper->read_node_num_map();
-
   // Loop over the nodes, create Nodes with local processor_id 0.
   for (int i=0; i<exio_helper->num_nodes; i++)
-    {
-      // Use the node_num_map to get the correct ID for Exodus
-      int exodus_id = exio_helper->node_num_map[i];
+    mesh.add_point (Point(exio_helper->x[i],
+			  exio_helper->y[i],
+			  exio_helper->z[i]), i);
 
-      // Catch the node that was added to the mesh
-      Node* added_node = mesh.add_point (Point(exio_helper->x[i], exio_helper->y[i], exio_helper->z[i]), exodus_id-1);
-
-      // If the Mesh assigned an ID different from what is in the
-      // Exodus file, we should probably error.
-      if (added_node->id() != static_cast<unsigned>(exodus_id-1))
-        {
-          libMesh::err << "Error!  Mesh assigned node ID "
-                       << added_node->id()
-                       << " which is different from the (zero-based) Exodus ID "
-                       << exodus_id-1
-                       << "!"
-                       << std::endl;
-          libmesh_error();
-        }
-    }
-
-  // This assert is no longer valid if the nodes are not numbered
-  // sequentially starting from 1 in the Exodus file.
-  // libmesh_assert_equal_to (static_cast<unsigned int>(exio_helper->num_nodes), mesh.n_nodes());
+  libmesh_assert_equal_to (static_cast<unsigned int>(exio_helper->num_nodes), mesh.n_nodes());
 
   // Get information about all the blocks
   exio_helper->read_block_info();
@@ -230,20 +205,11 @@ void ExodusII_IO::read (const std::string& fname)
 	  // Set all the nodes for this element
 	  for (int k=0; k<exio_helper->num_nodes_per_elem; k++)
 	    {
-              // global index
-              int gi = (j-nelem_last_block)*exio_helper->num_nodes_per_elem + conv.get_node_map(k);
-
-              // The entries in 'connect' are actually (1-based)
-              // indices into the node_num_map, so to get the right
-              // node ID we:
-              // 1.) Subtract 1 from connect[gi]
-              // 2.) Pass it through node_num_map to get the corresponding Exodus ID
-              // 3.) Subtract 1 from that, since libmesh node numbering is "zero"-based,
-              //     even when the Exodus node numbering doesn't start with 1.
-              int libmesh_node_id = exio_helper->node_num_map[exio_helper->connect[gi] - 1] - 1;
-
-              // Set the node pointer in the Elem
-              elem->set_node(k) = mesh.node_ptr(libmesh_node_id);
+	      int gi = (j-nelem_last_block)*exio_helper->num_nodes_per_elem + conv.get_node_map(k); // global index
+	      int node_number   = exio_helper->connect[gi];             // Global node number (1-based)
+	      elem->set_node(k) = mesh.node_ptr((node_number-1)); // Set node number
+	                                                          // Subtract 1 since
+		                                                  // exodus is internally 1-based
 	    }
 	}
 
@@ -317,14 +283,8 @@ void ExodusII_IO::read (const std::string& fname)
 
         exio_helper->read_nodeset(nodeset);
 
-        for (unsigned int node=0; node<exio_helper->node_list.size(); node++)
-          {
-            // As before, the entries in 'node_list' are 1-based
-            // indcies into the node_num_map array, so we have to map
-            // them.  See comment above.
-            int libmesh_node_id = exio_helper->node_num_map[exio_helper->node_list[node] - 1] - 1;
-            mesh.boundary_info->add_node(libmesh_node_id, nodeset_id);
-          }
+        for(unsigned int node=0; node<exio_helper->node_list.size(); node++)
+          mesh.boundary_info->add_node(exio_helper->node_list[node]-1, nodeset_id);
       }
   }
 

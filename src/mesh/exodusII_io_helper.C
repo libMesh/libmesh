@@ -1111,23 +1111,16 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  // Make room in the coordinate vectors
   x.resize(num_nodes);
   y.resize(num_nodes);
   z.resize(num_nodes);
 
-  // And in the node_num_map - since the nodes aren't organized in
-  // blocks, libmesh will always write out the identity map
-  // here... unless there has been some refinement and coarsening. If
-  // the nodes aren't renumbered after refinement and coarsening,
-  // there may be 'holes' in the numbering, so we write out the node
-  // map just to be on the safe side.
-  node_num_map.resize(num_nodes);
-
+  // Use a node iterator instead of looping over i!
   {
+    unsigned i = 0;
     MeshBase::const_node_iterator it = mesh.nodes_begin();
     const MeshBase::const_node_iterator end = mesh.nodes_end();
-    for (unsigned i = 0; it != end; ++it, ++i)
+    for (; it!=end; ++it, ++i)
       {
 	const Node* node = *it;
 
@@ -1143,9 +1136,6 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 #else
 	z[i]=0.;
 #endif
-
-        // Fill in node_num_map entry with the proper (1-based) node id
-        node_num_map[i] = node->id() + 1;
       }
   }
 
@@ -1155,10 +1145,6 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 			      z.empty() ? NULL : &z[0]);
 
   EX_CHECK_ERR(ex_err, "Error writing coordinates to Exodus file.");
-
-  // Also write the (1-based) node_num_map to the file.
-  ex_err = exII::ex_put_node_num_map(ex_id, &node_num_map[0]);
-  EX_CHECK_ERR(ex_err, "Error writing node_num_map");
 }
 
 
