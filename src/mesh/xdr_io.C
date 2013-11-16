@@ -288,6 +288,13 @@ void XdrIO::write (const std::string& name)
       this->write_serialized_nodesets (io, n_nodesets);
     }
 
+  if(mesh.boundary_info->n_edge_conds() > 0)
+  {
+    libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
+                 << "are not supported by the XDR format."
+                 << std::endl;
+  }
+
   STOP_LOG("write()","XdrIO");
 
   // pause all processes until the writing ends -- this will

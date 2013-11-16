@@ -1204,6 +1204,14 @@ void Nemesis_IO::write (const std::string& base_filename)
   // Not sure if this is really necessary, but go ahead and flush the file
   // once we have written all this stuff.
   nemhelper->ex_err = exII::ex_update(nemhelper->ex_id);
+
+  if( (mesh.boundary_info->n_edge_conds() > 0) &&
+       _verbose )
+  {
+    libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
+                 << "are not supported by the Nemesis format."
+                 << std::endl;
+  }
 }
 
 #else
@@ -1277,6 +1285,14 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
           nemhelper->write_elements(mesh);
           nemhelper->write_nodesets(mesh);
           nemhelper->write_sidesets(mesh);
+
+          if( (mesh.boundary_info->n_edge_conds() > 0) &&
+               _verbose )
+          {
+            libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
+                         << "are not supported by the ExodusII format."
+                         << std::endl;
+          }
 
           // If we don't have any nodes written out on this processor,
           // Exodus seems to like us better if we don't try to write out any

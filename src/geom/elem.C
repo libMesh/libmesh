@@ -152,6 +152,46 @@ const unsigned int Elem::type_to_n_sides_map [] =
     0,  // NODEELEM
   };
 
+const unsigned int Elem::type_to_n_edges_map [] =
+  {
+    0,  // EDGE2
+    0,  // EDGE3
+    0,  // EDGE4
+
+    3,  // TRI3
+    3,  // TRI6
+
+    4,  // QUAD4
+    4,  // QUAD8
+    4,  // QUAD9
+
+    6,  // TET4
+    6,  // TET10
+
+    12, // HEX8
+    12, // HEX20
+    12, // HEX27
+
+    9,  // PRISM6
+    9,  // PRISM15
+    9,  // PRISM18
+
+    8,  // PYRAMID5
+
+    0,  // INFEDGE2
+
+    4,  // INFQUAD4
+    4,  // INFQUAD6
+
+    8,  // INFHEX8
+    8,  // INFHEX16
+    8,  // INFHEX18
+
+    6,  // INFPRISM6
+    6,  // INFPRISM12
+
+    0,  // NODEELEM
+  };
 
 // ------------------------------------------------------------
 // Elem class member funcions

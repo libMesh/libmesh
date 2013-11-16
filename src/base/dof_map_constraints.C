@@ -374,6 +374,30 @@ using namespace libMesh;
 		  is_boundary_edge[e] = true;
 	    }
 
+          // We can also impose Dirichlet boundary conditions on nodes, so we should
+          // also independently check whether the nodes have been requested
+          for (unsigned int n=0; n != elem->n_nodes(); ++n)
+          {
+            const std::vector<boundary_id_type>& bc_ids =
+		boundary_info.boundary_ids (elem->get_node(n));
+            
+            for (std::size_t i=0; i != bc_ids.size(); ++i)
+              if (b.count(bc_ids[i]))
+                is_boundary_node[n] = true;
+          }
+
+          // We can also impose Dirichlet boundary conditions on edges, so we should
+          // also independently check whether the edges have been requested
+          for (unsigned int e=0; e != elem->n_edges(); ++e)
+          {
+            const std::vector<boundary_id_type>& bc_ids =
+		boundary_info.edge_boundary_ids (elem, e);
+            
+            for (std::size_t i=0; i != bc_ids.size(); ++i)
+              if (b.count(bc_ids[i]))
+                is_boundary_edge[e] = true;
+          }
+
 	  // Update the DOF indices for this element based on
 	  // the current mesh
 	  dof_map.dof_indices (elem, dof_indices, var);

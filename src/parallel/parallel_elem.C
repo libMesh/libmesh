@@ -75,6 +75,9 @@ unsigned int packed_size (const Elem*,
   const unsigned int n_sides =
     Elem::type_to_n_sides_map[type];
 
+  const unsigned int n_edges =
+    Elem::type_to_n_edges_map[type];
+
   const unsigned int pre_indexing_size =
     header_size + n_nodes + n_sides;
 
@@ -85,6 +88,15 @@ unsigned int packed_size (const Elem*,
   if (level == 0)
     {
       for (unsigned int s = 0; s != n_sides; ++s)
+        {
+	  const int n_bcs =
+	    *(in + pre_indexing_size + indexing_size +
+	      total_packed_bc_data++);
+	  libmesh_assert_greater_equal (n_bcs, 0);
+          total_packed_bc_data += n_bcs;
+        }
+
+      for (unsigned int e = 0; e != n_edges; ++e)
         {
 	  const int n_bcs =
 	    *(in + pre_indexing_size + indexing_size +
@@ -121,6 +133,10 @@ unsigned int packable_size (const Elem* elem, const MeshBase* mesh)
       total_packed_bcs += elem->n_sides();
       for (unsigned int s = 0; s != elem->n_sides(); ++s)
         total_packed_bcs += mesh->boundary_info->n_boundary_ids(elem,s);
+
+      total_packed_bcs += elem->n_edges();
+      for (unsigned int e = 0; e != elem->n_edges(); ++e)
+        total_packed_bcs += mesh->boundary_info->n_edge_boundary_ids(elem,e);
     }
 
   return
@@ -226,16 +242,29 @@ void pack (const Elem* elem,
   // If this is a coarse element,
   // Add any element side boundary condition ids
   if (elem->level() == 0)
-    for (unsigned int s = 0; s != elem->n_sides(); ++s)
-      {
-        std::vector<boundary_id_type> bcs =
-          mesh->boundary_info->boundary_ids(elem, s);
+    {
+      for (unsigned int s = 0; s != elem->n_sides(); ++s)
+        {
+          std::vector<boundary_id_type> bcs =
+            mesh->boundary_info->boundary_ids(elem, s);
 
-        data.push_back(bcs.size());
+          data.push_back(bcs.size());
 
-        for(unsigned int bc_it=0; bc_it < bcs.size(); bc_it++)
-          data.push_back(bcs[bc_it]);
-      }
+          for(unsigned int bc_it=0; bc_it < bcs.size(); bc_it++)
+            data.push_back(bcs[bc_it]);
+        }
+
+      for (unsigned int e = 0; e != elem->n_edges(); ++e)
+        {
+          std::vector<boundary_id_type> bcs =
+            mesh->boundary_info->edge_boundary_ids(elem, e);
+
+          data.push_back(bcs.size());
+
+          for(unsigned int bc_it=0; bc_it < bcs.size(); bc_it++)
+            data.push_back(bcs[bc_it]);
+        }
+    }
 }
 
 
@@ -541,16 +570,27 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
   in += elem->packed_indexing_size();
 
   // If this is a coarse element,
-  // add any element side boundary condition ids
+  // add any element side or edge boundary condition ids
   if (level == 0)
-    for (unsigned int s = 0; s != elem->n_sides(); ++s)
-      {
-        const int num_bcs = *in++;
-        libmesh_assert_greater_equal (num_bcs, 0);
+    {
+      for (unsigned int s = 0; s != elem->n_sides(); ++s)
+        {
+          const int num_bcs = *in++;
+          libmesh_assert_greater_equal (num_bcs, 0);
 
-        for(int bc_it=0; bc_it < num_bcs; bc_it++)
-          mesh->boundary_info->add_side (elem, s, *in++);
-      }
+          for(int bc_it=0; bc_it < num_bcs; bc_it++)
+            mesh->boundary_info->add_side (elem, s, *in++);
+        }
+
+      for (unsigned int e = 0; e != elem->n_edges(); ++e)
+        {
+          const int num_bcs = *in++;
+          libmesh_assert_greater_equal (num_bcs, 0);
+
+          for(int bc_it=0; bc_it < num_bcs; bc_it++)
+            mesh->boundary_info->add_edge (elem, e, *in++);
+        }
+    }
 
   // Return the new element
   *out = elem;

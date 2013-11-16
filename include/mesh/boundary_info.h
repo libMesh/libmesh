@@ -151,6 +151,33 @@ public:
   void clear_boundary_node_ids();
 
   /**
+   * Add edge \p edge of element number \p elem with boundary id \p id
+   * to the boundary information data structure.
+   * Edge-based boundary IDs should only be used in 3D.
+   */
+  void add_edge (const dof_id_type elem,
+		 const unsigned short int edge,
+		 const boundary_id_type id);
+
+  /**
+   * Add edge \p edge of element \p elem with boundary id \p id
+   * to the boundary information data structure.
+   * Edge-based boundary IDs should only be used in 3D.
+   */
+  void add_edge (const Elem* elem,
+		 const unsigned short int edge,
+		 const boundary_id_type id);
+
+  /**
+   * Add edge \p edge of element \p elem with boundary ids \p ids
+   * to the boundary information data structure.
+   * Edge-based boundary IDs should only be used in 3D.
+   */
+  void add_edge (const Elem* elem,
+		 const unsigned short int edge,
+		 const std::vector<boundary_id_type>& ids);
+
+  /**
    * Add side \p side of element number \p elem with boundary id \p id
    * to the boundary information data structure.
    */
@@ -187,6 +214,21 @@ public:
   void remove (const Elem* elem);
 
   /**
+   * Removes all boundary conditions associated with edge \p edge of
+   * element \p elem, if any exist.
+   */
+  void remove_edge (const Elem* elem,
+                    const unsigned short int edge);
+
+  /**
+   * Removes the boundary id \p id from edge \p edge of element \p
+   * elem, if it exists.
+   */
+  void remove_edge (const Elem* elem,
+                    const unsigned short int edge,
+                    const boundary_id_type id);
+
+  /**
    * Removes all boundary conditions associated with side \p side of
    * element \p elem, if any exist.
    */
@@ -221,6 +263,32 @@ public:
    * Returns the number of boundary ids associated with \p Node \p node.
    */
   unsigned int n_boundary_ids (const Node* node) const;
+
+  /**
+   * Returns the number of boundary ids associated with the \p edge
+   * edge of element \p elem.
+   * Edge-based boundary IDs should only be used in 3D.
+   */
+  unsigned int n_edge_boundary_ids (const Elem* const elem,
+                                    const unsigned short int edge) const;
+
+  /**
+   * Returns the list of boundary ids associated with the \p edge edge of
+   * element \p elem.
+   * Edge-based boundary IDs should only be used in 3D.
+   */
+  std::vector<boundary_id_type> edge_boundary_ids (const Elem* const elem,
+                                                   const unsigned short int edge) const;
+
+  /**
+   * Returns the list of raw boundary ids associated with the \p edge
+   * edge of element \p elem.  These ids are ``raw'' because they
+   * exclude ids which are implicit, such as a child's inheritance of
+   * its ancestors' boundary id.
+   * Edge-based boundary IDs should only be used in 3D.
+   */
+  std::vector<boundary_id_type> raw_edge_boundary_ids (const Elem* const elem,
+                                                       const unsigned short int edge) const;
 
   /**
    * Returns true iff the given side of the given element is
@@ -285,9 +353,15 @@ public:
   void build_side_boundary_ids(std::vector<boundary_id_type> &b_ids);
 
   /**
-   * @returns the number of element-based boundary conditions.
+   * @returns the number of element-side-based boundary conditions.
    */
   std::size_t n_boundary_conds () const;
+
+  /**
+   * @returns the number of edge-based boundary conditions.
+   * Edge-based boundary IDs should only be used in 3D.
+   */
+  std::size_t n_edge_conds () const;
 
   /**
    * @returns the number of node-based boundary conditions.
@@ -331,6 +405,14 @@ public:
    */
   const std::set<boundary_id_type>& get_side_boundary_ids () const
   { return _side_boundary_ids; }
+
+  /**
+   * Returns a reference to the set of all boundary IDs
+   * specified on edges.
+   * Edge-based boundary IDs should only be used in 3D.
+   */
+  const std::set<boundary_id_type>& get_edge_boundary_ids () const
+  { return _edge_boundary_ids; }
 
   /**
    * Returns a reference to the set of all boundary IDs
@@ -407,6 +489,14 @@ public:
                 boundary_id_type> _boundary_node_id;
 
   /**
+   * Data structure that maps edges of elements
+   * to boundary ids. This is only relevant in 3D.
+   */
+  std::multimap<const Elem*,
+                std::pair<unsigned short int, boundary_id_type> >
+                                             _boundary_edge_id;
+
+  /**
    * Data structure that maps sides of elements
    * to boundary ids.
    */
@@ -415,21 +505,29 @@ public:
                                              _boundary_side_id;
 
   /**
-   * A collection of user-specified boundary ids for *both* sides and nodes.
-   * See _side_boundary_ids and _node_boundary_ids for sets containing IDs
-   * for only sides and only nodes, respectively.
+   * A collection of user-specified boundary ids for sides, edges and nodes.
+   * See _side_boundary_ids, _edge_boundary_ids and _node_boundary_ids
+   * for sets containing IDs for only sides and only nodes, respectively.
    */
   std::set<boundary_id_type> _boundary_ids;
 
   /**
    * Set of user-specified boundary IDs for sides *only*.  Note: _boundary_ids
-   * is the union of this set and _node_boundary_ids.
+   * is the union of this set, _edge_boundary_ids and _node_boundary_ids.
    */
   std::set<boundary_id_type> _side_boundary_ids;
 
   /**
+   * Set of user-specified boundary IDs for edges *only*.
+   * This is only relevant in 3D. Note: _boundary_ids
+   * is the union of this set, _side_boundary_ids
+   * and _node_boundary_ids.
+   */
+  std::set<boundary_id_type> _edge_boundary_ids;
+
+  /**
    * Set of user-specified boundary IDs for nodes *only*.  Note: _boundary_ids
-   * is the union of this set and _side_boundary_ids.
+   * is the union of this set, _edge_boundary_ids and _side_boundary_ids.
    */
   std::set<boundary_id_type> _node_boundary_ids;
 
@@ -539,6 +637,7 @@ void BoundaryInfo::remove (const Elem* elem)
   libmesh_assert(elem);
 
   // Erase everything associated with elem
+  _boundary_edge_id.erase (elem);
   _boundary_side_id.erase (elem);
 }
 
