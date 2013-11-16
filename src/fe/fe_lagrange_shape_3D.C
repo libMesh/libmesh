@@ -1262,10 +1262,51 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
           case PRISM6:
           case PRISM15:
           case PRISM18:
+            {
+	      libmesh_assert_less (i, 6);
+
+	      // Compute prism shape functions as a tensor-product
+	      // of a triangle and an edge
+
+	      Point p2d(p(0),p(1));
+	      Point p1d(p(2));
+
+              //                                0  1  2  3  4  5
+              static const unsigned int i0[] = {0, 0, 0, 1, 1, 1};
+              static const unsigned int i1[] = {0, 1, 2, 0, 1, 2};
+
+              switch (j)
+                {
+                  // All repeated second derivatives and the xi-eta derivative are zero on PRISMs
+                case 0: // d^2()/dxi^2
+                case 1: // d^2()/dxideta
+                case 2: // d^2()/deta^2
+                case 5: // d^2()/dzeta^2
+                  {
+                    return 0.;
+                  }
+
+                case 3: // d^2()/dxidzeta
+                  return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, i1[i], 0, p2d)*
+                          FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i0[i], 0, p1d));
+
+                case 4: // d^2()/detadzeta
+                  return (FE<2,LAGRANGE>::shape_deriv(TRI3,  FIRST, i1[i], 1, p2d)*
+                          FE<1,LAGRANGE>::shape_deriv(EDGE2, FIRST, i0[i], 0, p1d));
+
+                default:
+                  {
+                    // Unrecognized index
+                    libmesh_error();
+                  }
+                }
+              return 0.;
+            }
+
           case PYRAMID5:
             {
               libmesh_do_once(libMesh::err << "Second derivatives not yet implemented for linear LAGRANGE FE on "
-                                           << "PRISM6, PRISM15, and PYRAMID5 elements!  Returning 0." << std::endl);
+                                           << "PYRAMID5 elements!  Returning 0." << std::endl);
               return 0.;
             }
 
