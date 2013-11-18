@@ -729,7 +729,6 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 		    case 0:
 		      return .5*(1. - y)*(1. - z)*((1. - x)*(-2.) +
 						   (-1.)*(1. - 2.*x - 2.*y - 2.*z));
-		      libmesh_error(); // done to here
 
 		    case 1:
 		      return .5*(1. - y)*(1. - z)*(x*(2.) +
