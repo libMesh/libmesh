@@ -1260,7 +1260,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
 	    else
 	      // We can't always fit DofObject::invalid_id in an
 	      // xdr_id_type
-	      input_buffer[pos++] = static_cast<dof_id_type>(-1);
+	      input_buffer[pos++] = static_cast<T>(-1);
 
 	    // maybe the processor id
 	    if (read_partitioning)
@@ -1317,7 +1317,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
 	  ++it;
 
 	  Elem *parent =
-            (parent_id == static_cast<dof_id_type>(-1)) ? NULL : mesh.elem(parent_id);
+            (parent_id == static_cast<T>(-1)) ? NULL : mesh.elem(parent_id);
 
 	  Elem *elem = Elem::build (elem_type, parent).release();
 
