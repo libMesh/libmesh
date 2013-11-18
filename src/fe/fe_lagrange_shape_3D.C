@@ -1377,13 +1377,270 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
 	    // serendipity hexahedral quadratic shape functions
 	  case HEX20:
 	    {
-              static bool warning_given_HEX20 = false;
+	      libmesh_assert_less (i, 20);
 
-              if (!warning_given_HEX20)
-              libMesh::err << "Second derivatives for 3D Lagrangian HEX20"
-                            << " elements are not yet implemented!"
-                            << std::endl;
-              warning_given_HEX20 = true;
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
+
+	      // these functions are defined for (x,y,z) in [0,1]^3
+	      // so transform the locations
+	      const Real x = .5*(xi   + 1.);
+	      const Real y = .5*(eta  + 1.);
+	      const Real z = .5*(zeta + 1.);
+
+              switch(j)
+                {
+                case 0: // d^2()/dxi^2
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                      case 1:
+                        return (1. - y) * (1. - z);
+                      case 2:
+                      case 3:
+                        return y * (1. - z);
+                      case 4:
+                      case 5:
+                        return (1. - y) * z;
+                      case 6:
+                      case 7:
+                        return y * z;
+                      case 8:
+                        return -2. * (1. - y) * (1. - z);
+                      case 10:
+                        return -2. * y * (1. - z);
+                      case 16:
+                        return -2. * (1. - y) * z;
+                      case 18:
+                        return -2. * y * z;
+                      case 9:
+                      case 11:
+                      case 12:
+                      case 13:
+                      case 14:
+                      case 15:
+                      case 17:
+                      case 19:
+                        return 0;
+                      default:
+                        libmesh_error();
+                      }
+                  }
+                case 1: // d^2()/dxideta
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                        return (1.25 - x - y - .5*z) * (1. - z);
+                      case 1:
+                        return (-x + y + .5*z - .25) * (1. - z);
+                      case 2:
+                        return (x + y - .5*z - .75) * (1. - z);
+                      case 3:
+                        return (-y + x + .5*z - .25) * (1. - z);
+                      case 4:
+                        return -.25*z * (4.*x + 4.*y - 2.*z - 3);
+                      case 5:
+                        return -.25*z * (-4.*y + 4.*x + 2.*z - 1.);
+                      case 6:
+                        return .25*z * (-5 + 4.*x + 4.*y + 2.*z);
+                      case 7:
+                        return .25*z * (4.*x - 4.*y - 2.*z + 1.);
+                      case 8:
+                        return (-1. + 2.*x) * (1. - z);
+                      case 9:
+                        return (1. - 2.*y) * (1. - z);
+                      case 10:
+                        return (1. - 2.*x) * (1. - z);
+                      case 11:
+                        return (-1. + 2.*y) * (1. - z);
+                      case 12:
+                        return z * (1. - z);
+                      case 13:
+                        return -z * (1. - z);
+                      case 14:
+                        return z * (1. - z);
+                      case 15:
+                        return -z * (1. - z);
+                      case 16:
+                        return (-1. + 2.*x) * z;
+                      case 17:
+                        return (1. - 2.*y) * z;
+                      case 18:
+                        return (1. - 2.*x) * z;
+                      case 19:
+                        return (-1. + 2.*y) * z;
+                      default:
+                        libmesh_error();
+                      }
+                  }
+                case 2: // d^2()/deta^2
+                  switch(i)
+                    {
+                    case 0:
+                    case 3:
+                        return (1. - x) * (1. - z);
+                    case 1:
+                    case 2:
+                      return x * (1. - z);
+                    case 4:
+                    case 7:
+                      return (1. - x) * z;
+                    case 5:
+                    case 6:
+                      return x * z;
+                    case 9:
+                      return -2. * x * (1. - z);
+                    case 11:
+                      return -2. * (1. - x) * (1. - z);
+                    case 17:
+                      return -2. * x * z;
+                    case 19:
+                      return -2. * (1. - x) * z;
+                    case 8:
+                    case 10:
+                    case 12:
+                    case 13:
+                    case 14:
+                    case 15:
+                    case 16:
+                    case 18:
+                      return 0.;
+                    default:
+                      libmesh_error();
+                    }
+                case 3: // d^2()/dxidzeta
+                  switch(i)
+                    {
+                    case 0:
+                      return (1.25 - x - .5*y - z) * (1. - y);
+                    case 1:
+                      return (-x + .5*y + z - .25) * (1. - y);
+                    case 2:
+                      return -.25*y * (2.*y + 4.*x - 4.*z - 1.);
+                    case 3:
+                      return -.25*y * (-2.*y + 4.*x + 4.*z - 3);
+                    case 4:
+                      return (-z + x + .5*y - .25) * (1. - y);
+                    case 5:
+                      return (x - .5*y + z - .75) * (1. - y);
+                    case 6:
+                      return .25*y * (2.*y + 4.*x + 4.*z - 5);
+                    case 7:
+                      return .25*y * (-2.*y + 4.*x - 4.*z + 1.);
+                    case 8:
+                      return (-1. + 2.*x) * (1. - y);
+                    case 9:
+                      return -y * (1. - y);
+                    case 10:
+                      return (-1. + 2.*x) * y;
+                    case 11:
+                      return y * (1. - y);
+                    case 12:
+                      return (-1. + 2.*z) * (1. - y);
+                    case 13:
+                      return (1. - 2.*z) * (1. - y);
+                    case 14:
+                      return (1. - 2.*z) * y;
+                    case 15:
+                      return (-1. + 2.*z) * y;
+                    case 16:
+                      return (1. - 2.*x) * (1. - y);
+                    case 17:
+                      return y * (1. - y);
+                    case 18:
+                      return (1. - 2.*x) * y;
+                    case 19:
+                      return -y * (1. - y);
+                    default:
+                      libmesh_error();
+                    }
+                case 4: // d^2()/detadzeta
+                  switch(i)
+                    {
+                    case 0:
+                      return (1.25 - .5*x - y - z) * (1. - x);
+                    case 1:
+                      return .25*x * (2.*x - 4.*y - 4.*z + 3.);
+                    case 2:
+                      return -.25*x * (2.*x + 4.*y - 4.*z - 1.);
+                    case 3:
+                      return (-y + .5*x + z - .25) * (1. - x);
+                    case 4:
+                      return (-z + .5*x + y - .25) * (1. - x);
+                    case 5:
+                      return -.25*x * (2.*x - 4.*y + 4.*z - 1.);
+                    case 6:
+                      return .25*x * (2.*x + 4.*y + 4.*z - 5);
+                    case 7:
+                      return (y - .5*x + z - .75) * (1. - x);
+                    case 8:
+                      return x * (1. - x);
+                    case 9:
+                      return (-1. + 2.*y) * x;
+                    case 10:
+                      return -x * (1. - x);
+                    case 11:
+                      return (-1. + 2.*y) * (1. - x);
+                    case 12:
+                      return (-1. + 2.*z) * (1. - x);
+                    case 13:
+                      return (-1. + 2.*z) * x;
+                    case 14:
+                      return (1. - 2.*z) * x;
+                    case 15:
+                      return (1. - 2.*z) * (1. - x);
+                    case 16:
+                      return -x * (1. - x);
+                    case 17:
+                      return (1. - 2.*y) * x;
+                    case 18:
+                      return x * (1. - x);
+                    case 19:
+                      return (1. - 2.*y) * (1. - x);
+                    default:
+                      libmesh_error();
+                    }
+                case 5: // d^2()/dzeta^2
+                  switch(i)
+                    {
+                    case 0:
+                    case 4:
+                      return (1. - x) * (1. - y);
+                    case 1:
+                    case 5:
+                      return x * (1. - y);
+                    case 2:
+                    case 6:
+                      return x * y;
+                    case 3:
+                    case 7:
+                      return (1. - x) * y;
+                    case 12:
+                      return -2. * (1. - x) * (1. - y);
+                    case 13:
+                      return -2. * x * (1. - y);
+                    case 14:
+                      return -2. * x * y;
+                    case 15:
+                      return -2. * (1. - x) * y;
+                    case 8:
+                    case 9:
+                    case 10:
+                    case 11:
+                    case 16:
+                    case 17:
+                    case 18:
+                    case 19:
+                      return 0.;
+                    default:
+                      libmesh_error();
+                    }
+                default:
+                  libmesh_error();
+                }
 	    }
 
 	    // triquadraic hexahedral shape funcions
