@@ -859,13 +859,39 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
   const Elem* searched_elem = elem;
   if (elem->level() != 0)
   {
-    while (searched_elem->parent() != NULL)
+    // Find all the sides that contain edge. If one of those is a boundary
+    // side, then this must be a boundary edge. In that case, we just use the
+    // top-level parent.
+    bool found_boundary_edge = false;
+    for(unsigned int side=0; side<elem->n_sides(); side++)
     {
-      const Elem * parent = searched_elem->parent();
-      if (parent->is_child_on_edge(parent->which_child_am_i(searched_elem), edge) == false)
-        return ids;
-      searched_elem = parent;
+      if(elem->is_edge_on_side(edge,side))
+      {
+        if (elem->neighbor(side) == NULL)
+        {
+          searched_elem = elem->top_parent ();
+          found_boundary_edge = true;
+          break;
+        }
+      }
     }
+  
+#ifdef LIBMESH_ENABLE_AMR
+    if(!found_boundary_edge)
+    {
+      // Child element is not on external edge, but it may have internal
+      // "boundary" IDs.  We will walk up the tree, at each level checking that
+      // the current child is actually on the same edge of the parent that is
+      // currently being searched for (i.e. that was passed in as "edge").
+      while (searched_elem->parent() != NULL)
+      {
+        const Elem * parent = searched_elem->parent();
+        if (parent->is_child_on_edge(parent->which_child_am_i(searched_elem), edge) == false)
+          return ids;
+        searched_elem = parent;
+      }
+    }
+#endif
   }
 
   std::pair<std::multimap<const Elem*,
@@ -895,19 +921,45 @@ unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem* const elem,
                                                 const unsigned short int edge) const
 {
   libmesh_assert(elem);
-
+  
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
   const Elem* searched_elem = elem;
   if (elem->level() != 0)
   {
-    while (searched_elem->parent() != NULL)
+    // Find all the sides that contain edge. If one of those is a boundary
+    // side, then this must be a boundary edge. In that case, we just use the
+    // top-level parent.
+    bool found_boundary_edge = false;
+    for(unsigned int side=0; side<elem->n_sides(); side++)
     {
-      const Elem * parent = searched_elem->parent();
-      if (parent->is_child_on_edge(parent->which_child_am_i(searched_elem), edge) == false)
-        return 0;
-      searched_elem = parent;
+      if(elem->is_edge_on_side(edge,side))
+      {
+        if (elem->neighbor(side) == NULL)
+        {
+          searched_elem = elem->top_parent ();
+          found_boundary_edge = true;
+          break;
+        }
+      }
     }
+  
+#ifdef LIBMESH_ENABLE_AMR
+    if(!found_boundary_edge)
+    {
+      // Child element is not on external edge, but it may have internal
+      // "boundary" IDs.  We will walk up the tree, at each level checking that
+      // the current child is actually on the same edge of the parent that is
+      // currently being searched for (i.e. that was passed in as "edge").
+      while (searched_elem->parent() != NULL)
+      {
+        const Elem * parent = searched_elem->parent();
+        if (parent->is_child_on_edge(parent->which_child_am_i(searched_elem), edge) == false)
+          return 0;
+        searched_elem = parent;
+      }
+    }
+#endif
   }
 
   std::pair<std::multimap<const Elem*,
