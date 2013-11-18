@@ -1308,7 +1308,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
 #endif
             ++it;
           }
-          const dof_id_type parent_id     = *it; ++it;
+          const T parent_id     = *it; ++it;
 	  const processor_id_type processor_id = *it; ++it;
 	  const subdomain_id_type subdomain_id = *it; ++it;
 #ifdef LIBMESH_ENABLE_AMR
@@ -1317,7 +1317,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
 	  ++it;
 
 	  Elem *parent =
-            (parent_id == static_cast<T>(-1)) ? NULL : mesh.elem(parent_id);
+            (parent_id == static_cast<T>(-1)) ? NULL : mesh.elem(static_cast<dof_id_type>(parent_id));
 
 	  Elem *elem = Elem::build (elem_type, parent).release();
 
