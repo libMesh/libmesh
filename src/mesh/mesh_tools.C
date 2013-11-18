@@ -220,11 +220,12 @@ namespace {
         {
           const unsigned int* p_ui = NULL;
           const std::vector<unsigned int>* p_vui = NULL;
+          const std::vector<dof_id_type>* p_vdid = NULL;
 
           libmesh_assert(communicator.semiverify(p_ui));
           libmesh_assert(communicator.semiverify(p_vui));
           libmesh_assert(communicator.semiverify(p_vui));
-          libmesh_assert(communicator.semiverify(p_vui));
+          libmesh_assert(communicator.semiverify(p_vdid));
         }
     }
 #endif // DEBUG
