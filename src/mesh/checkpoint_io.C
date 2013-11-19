@@ -75,6 +75,8 @@ CheckpointIO::~CheckpointIO ()
 
 void CheckpointIO::write (const std::string& name)
 {
+  START_LOG("write()","CheckpointIO");
+
   // convenient reference to our mesh
   const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
 
@@ -94,8 +96,6 @@ void CheckpointIO::write (const std::string& name)
       file_name_stream << "-" << this->processor_id();
 
     Xdr io (file_name_stream.str(), this->binary() ? ENCODE : WRITE);
-
-    START_LOG("write()","CheckpointIO");
 
     // write the version
     io.data(_version, "# version");
@@ -129,8 +129,6 @@ void CheckpointIO::write (const std::string& name)
     // write the nodeset information
     this->write_nodesets (io);
 
-    STOP_LOG("write()","CheckpointIO");
-
     // pause all processes until the writing ends -- this will
     // protect for the pathological case where a write is
     // followed immediately by a read.  The write must be
@@ -139,6 +137,8 @@ void CheckpointIO::write (const std::string& name)
   }
 
   this->comm().barrier();
+
+  STOP_LOG("write()","CheckpointIO");
 }
 
 
@@ -399,6 +399,8 @@ void CheckpointIO::write_bc_names (Xdr &io, const BoundaryInfo & info, bool is_s
 
 void CheckpointIO::read (const std::string& name)
 {
+  START_LOG("read()","CheckpointIO");
+
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
   // Try to dynamic cast the mesh to see if it's a ParallelMesh object
@@ -429,8 +431,6 @@ void CheckpointIO::read (const std::string& name)
     }
 
     Xdr io (file_name_stream.str(), this->binary() ? DECODE : READ);
-
-    START_LOG("read()","CheckpointIO");
 
     // read the version
     io.data (_version);
