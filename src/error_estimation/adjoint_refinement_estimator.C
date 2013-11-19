@@ -20,6 +20,7 @@
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>    // for sqrt
 #include <set>
+#include <sstream> // for ostringstream
 
 // Local Includes
 #include "libmesh/dof_map.h"

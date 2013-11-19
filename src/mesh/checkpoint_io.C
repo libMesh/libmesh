@@ -24,6 +24,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <sstream> // for ostringstream
 
 // Local includes
 #include "libmesh/xdr_io.h"
