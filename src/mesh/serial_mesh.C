@@ -1092,7 +1092,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
     // Copy mesh data
     this->copy_nodes_and_elements(*other_mesh);
 
-    // then decrement node and element IDs of mesh_i to return to original state
+    // Decrement node IDs of mesh to return to original state
     node_it  = other_mesh->nodes_begin();
     node_end = other_mesh->nodes_end();
     for (; node_it != node_end; ++node_it)
@@ -1106,26 +1106,51 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
     elem_end = other_mesh->elements_end();
     for (; elem_it != elem_end; ++elem_it)
     {
-      Elem *el = *elem_it;
+      Elem *other_elem = *elem_it;
 
-      // First copy boundary info to the stitched mesh.  Note that other_mesh may
-      // contain interior sidesets as well, so don't *just* copy boundary info for
-      // elements on the boundary, copy it for all elements!
-      for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
-      {
-        // There could be multiple boundary IDs on this side, so add them all.
-        std::vector<boundary_id_type> bc_ids = other_mesh->boundary_info->boundary_ids (el, side_id);
-        for (unsigned i=0; i<bc_ids.size(); ++i)
-          {
-            if (bc_ids[i] != BoundaryInfo::invalid_id)
-              this->boundary_info->add_side(el->id(), side_id, bc_ids[i]);
-          }
-      }
+      // Find the corresponding element on this mesh
+      Elem* this_elem = this->elem(other_elem->id());
 
-      // Then decrement
-      dof_id_type new_id = el->id() - elem_delta;
-      el->set_id(new_id);
+      // Decrement elem IDs of other_mesh to return it to original state
+      dof_id_type new_id = other_elem->id() - elem_delta;
+      other_elem->set_id(new_id);
+
+      unsigned int n_nodes = other_elem->n_nodes();
+      for (unsigned int n=0; n != n_nodes; ++n)
+        {
+          const std::vector<boundary_id_type>& ids =
+            other_mesh->boundary_info->boundary_ids(other_elem->get_node(n));
+          if (!ids.empty())
+            {
+              this->boundary_info->add_node(this_elem->get_node(n), ids);
+            }
+        }
+
+      // Copy edge boundary info
+      unsigned int n_edges = other_elem->n_edges();
+      for (unsigned int edge=0; edge != n_edges; ++edge)
+        {
+          const std::vector<boundary_id_type>& ids =
+            other_mesh->boundary_info->edge_boundary_ids(other_elem, edge);
+          if (!ids.empty())
+            {
+              this->boundary_info->add_edge( this_elem, edge, ids);
+            }
+        }
+
+      unsigned int n_sides = other_elem->n_sides();
+      for (unsigned int s=0; s != n_sides; ++s)
+        {
+          const std::vector<boundary_id_type>& ids =
+            other_mesh->boundary_info->boundary_ids(other_elem, s);
+          if (!ids.empty())
+            {
+              this->boundary_info->add_side( this_elem, s, ids);
+            }
+        }
+
     }
+
   } // end if(other_mesh)
 
   // Finally, we need to "merge" the overlapping nodes

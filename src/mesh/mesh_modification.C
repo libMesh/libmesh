@@ -1470,6 +1470,33 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
   for (; el != end_el; ++el)
     {
       Elem *elem = *el;
+
+      unsigned int n_nodes = elem->n_nodes();
+      for (unsigned int n=0; n != n_nodes; ++n)
+        {
+          const std::vector<boundary_id_type>& old_ids = mesh.boundary_info->boundary_ids(elem->get_node(n));
+          if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
+            {
+              std::vector<boundary_id_type> new_ids(old_ids);
+              std::replace(new_ids.begin(), new_ids.end(), old_id, new_id);
+              mesh.boundary_info->remove(elem->get_node(n));
+              mesh.boundary_info->add_node(elem->get_node(n), new_ids);
+            }
+        }
+
+      unsigned int n_edges = elem->n_edges();
+      for (unsigned int edge=0; edge != n_edges; ++edge)
+        {
+          const std::vector<boundary_id_type>& old_ids = mesh.boundary_info->edge_boundary_ids(elem, edge);
+          if (std::find(old_ids.begin(), old_ids.end(), old_id) != old_ids.end())
+            {
+              std::vector<boundary_id_type> new_ids(old_ids);
+              std::replace(new_ids.begin(), new_ids.end(), old_id, new_id);
+              mesh.boundary_info->remove_edge(elem, edge);
+              mesh.boundary_info->add_edge(elem, edge, new_ids);
+            }
+        }
+
       unsigned int n_sides = elem->n_sides();
       for (unsigned int s=0; s != n_sides; ++s)
         {

@@ -57,6 +57,7 @@ BoundaryInfo& BoundaryInfo::operator=(const BoundaryInfo& other_boundary_info)
    * _or_ was constructed in exactly the same way (or constructed as a copy).
    */
 
+  // Copy node boundary info
   {
     std::multimap<const Node*, boundary_id_type>::const_iterator it = other_boundary_info._boundary_node_id.begin();
     const std::multimap<const Node*, boundary_id_type>::const_iterator end = other_boundary_info._boundary_node_id.end();
@@ -70,7 +71,23 @@ BoundaryInfo& BoundaryInfo::operator=(const BoundaryInfo& other_boundary_info)
     }
   }
 
+  // Copy edge boundary info
+  {
+    std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
+      const_iterator it = other_boundary_info._boundary_edge_id.begin();
+    const std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
+      const_iterator end = other_boundary_info._boundary_edge_id.end();
 
+    for(; it != end; ++it)
+    {
+      const Elem * other_elem = it->first;
+      _boundary_edge_id.insert
+        (std::pair<const Elem*, std::pair<unsigned short int, boundary_id_type> >
+          (_mesh.elem(other_elem->id()), it->second) );
+    }
+  }
+
+  // Copy side boundary info
   {
     std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
       const_iterator it = other_boundary_info._boundary_side_id.begin();
