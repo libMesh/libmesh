@@ -1004,8 +1004,8 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case HEX27:
 	      return 2;
 	    case PRISM6:
-	    case PRISM15:
 	      return 1;
+	    case PRISM15:
 	    case PRISM18:
 	      return 2;
 	    case PYRAMID5:

@@ -320,6 +320,12 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 		}
 	    }
 
+            // "serendipity" prism
+          case PRISM15:
+            {
+              libmesh_not_implemented();
+            }
+
 	    // quadradic prism shape functions
 	  case PRISM18:
 	    {
@@ -1150,6 +1156,13 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 	    }
 
 
+            // "serendipity" prism
+          case PRISM15:
+            {
+              libmesh_not_implemented();
+            }
+
+
 
 	    // quadradic prism shape functions
 	  case PRISM18:
@@ -1776,6 +1789,15 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
 		  libmesh_error();
 		}
 	    }
+
+
+
+            // "serendipity" prism
+          case PRISM15:
+            {
+              libmesh_not_implemented();
+            }
+
 
 
 	    // quadradic prism shape functions
