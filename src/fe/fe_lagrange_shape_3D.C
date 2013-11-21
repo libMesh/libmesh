@@ -323,7 +323,62 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
             // "serendipity" prism
           case PRISM15:
             {
-              libmesh_not_implemented();
+	      libmesh_assert_less (i, 15);
+
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
+
+	      switch(i)
+		{
+		case 0:
+		  return (1. - zeta)*(xi + eta - 1.)*(xi + eta + 0.5*zeta);
+
+		case 1:
+		  return (1. - zeta)*xi*(xi - 1. - 0.5*zeta);
+
+		case 2: // phi1 with xi <- eta
+		  return (1. - zeta)*eta*(eta - 1. - 0.5*zeta);
+
+		case 3: // phi0 with zeta <- (-zeta)
+		  return (1. + zeta)*(xi + eta - 1.)*(xi + eta - 0.5*zeta);
+
+		case 4: // phi1 with zeta <- (-zeta)
+		  return (1. + zeta)*xi*(xi - 1. + 0.5*zeta);
+
+		case 5: // phi4 with xi <- eta
+		  return (1. + zeta)*eta*(eta - 1. + 0.5*zeta);
+
+		case 6:
+		  return 2.*(1. - zeta)*xi*(1. - xi - eta);
+
+		case 7:
+		  return 2.*(1. - zeta)*xi*eta;
+
+		case 8:
+		  return 2.*(1. - zeta)*eta*(1. - xi - eta);
+
+		case 9:
+		  return (1. - zeta)*(1. + zeta)*(1. - xi - eta);
+
+		case 10:
+		  return (1. - zeta)*(1. + zeta)*xi;
+
+		case 11: // phi10 with xi <-> eta
+		  return (1. - zeta)*(1. + zeta)*eta;
+
+		case 12: // phi6 with zeta <- (-zeta)
+		  return 2.*(1. + zeta)*xi*(1. - xi - eta);
+
+		case 13: // phi7 with zeta <- (-zeta)
+		  return 2.*(1. + zeta)*xi*eta;
+
+		case 14: // phi8 with zeta <- (-zeta)
+		  return 2.*(1. + zeta)*eta*(1. - xi - eta);
+
+		default:
+		  libmesh_error();
+		}
             }
 
 	    // quadradic prism shape functions
