@@ -1214,7 +1214,139 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
             // "serendipity" prism
           case PRISM15:
             {
-              libmesh_not_implemented();
+	      libmesh_assert_less (i, 15);
+
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
+
+	      switch (j)
+		{
+		  // d()/dxi
+		case 0:
+		  {
+		    switch(i)
+		      {
+		      case 0:
+                        return (2.*xi + 2.*eta + 0.5*zeta - 1.)*(1. - zeta);
+		      case 1:
+                        return (2.*xi - 1. - 0.5*zeta)*(1. - zeta);
+		      case 2:
+                        return 0.;
+		      case 3:
+                        return (2.*xi + 2.*eta - 0.5*zeta - 1.)*(1. + zeta);
+		      case 4:
+                        return (2.*xi - 1. + 0.5*zeta)*(1. + zeta);
+		      case 5:
+                        return 0.;
+		      case 6:
+                        return (4.*xi + 2.*eta - 2.)*(zeta - 1.);
+		      case 7:
+                        return -2.*(zeta - 1.)*eta;
+		      case 8:
+                        return 2.*(zeta - 1.)*eta;
+		      case 9:
+                        return (zeta - 1.)*(1. + zeta);
+		      case 10:
+                        return (1. - zeta)*(1. + zeta);
+		      case 11:
+                        return 0.;
+		      case 12:
+                        return (-4.*xi - 2.*eta + 2.)*(1. + zeta);
+		      case 13:
+                        return 2.*(1. + zeta)*eta;
+		      case 14:
+                        return -2.*(1. + zeta)*eta;
+		      default:
+			libmesh_error();
+		      }
+		  }
+
+		  // d()/deta
+		case 1:
+		  {
+		    switch(i)
+		      {
+		      case 0:
+                        return (2.*xi + 2.*eta + 0.5*zeta - 1.)*(1. - zeta);
+		      case 1:
+                        return 0.;
+		      case 2:
+                        return (2.*eta - 1. - 0.5*zeta)*(1. - zeta);
+		      case 3:
+                        return (2.*xi + 2.*eta - 0.5*zeta - 1.)*(1. + zeta);
+		      case 4:
+                        return 0.;
+		      case 5:
+                        return (2.*eta - 1. + 0.5*zeta)*(1. + zeta);
+		      case 6:
+                        return 2.*(zeta - 1.)*xi;
+		      case 7:
+                        return 2.*(1. - zeta)*xi;
+		      case 8:
+                        return (2.*xi + 4.*eta - 2.)*(zeta - 1.);
+		      case 9:
+                        return (zeta - 1.)*(1. + zeta);
+		      case 10:
+                        return 0.;
+		      case 11:
+                        return (1. - zeta)*(1. + zeta);
+		      case 12:
+                        return -2.*(1. + zeta)*xi;
+		      case 13:
+                        return 2.*(1. + zeta)*xi;
+		      case 14:
+                        return (-2.*xi - 4.*eta + 2.)*(1. + zeta);
+
+		      default:
+			libmesh_error();
+		      }
+		  }
+
+		  // d()/dzeta
+		case 2:
+		  {
+		    switch(i)
+		      {
+		      case 0:
+                        return (-xi - eta - zeta + 0.5)*(xi + eta - 1.);
+		      case 1:
+                        return -0.5*xi*(2.*xi - 1. - 2.*zeta);
+		      case 2:
+                        return -0.5*eta*(2.*eta - 1. - 2.*zeta);
+		      case 3:
+                        return (xi + eta - zeta - 0.5)*(xi + eta - 1.);
+		      case 4:
+                        return 0.5*xi*(2.*xi - 1. + 2.*zeta);
+		      case 5:
+                        return 0.5*eta*(2.*eta - 1. + 2.*zeta);
+		      case 6:
+                        return 2.*xi*(xi + eta - 1.);
+		      case 7:
+                        return -2.*xi*eta;
+		      case 8:
+                        return 2.*eta*(xi + eta - 1.);
+		      case 9:
+                        return 2.*zeta*(xi + eta - 1.);
+		      case 10:
+                        return -2.*xi*zeta;
+		      case 11:
+                        return -2.*eta*zeta;
+		      case 12:
+                        return 2.*xi*(1. - xi - eta);
+		      case 13:
+                        return 2.*xi*eta;
+		      case 14:
+                        return 2.*eta*(1. - xi - eta);
+
+		      default:
+			libmesh_error();
+		      }
+		  }
+
+		default:
+		  libmesh_error();
+		}
             }
 
 
