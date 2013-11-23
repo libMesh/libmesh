@@ -691,55 +691,30 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 
 		  // d/dzeta
 		case 2:
-		  switch(i)
-		    {
-		    case 0:
-		      {
-			const Real a=1.;
-			const Real b=1.;
+                  {
+                    // We computed the derivatives with general eps and
+                    // then let eps tend to zero in the numerators...
+                    Real
+                      num = zeta*(2. - zeta) - 1.,
+                      den = (1. - zeta + eps)*(1. - zeta + eps);
 
-			return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
-				     (1. - zeta)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
-				    ((1. - zeta)*(1. - zeta) + eps));
-		      }
+                    switch(i)
+                      {
+                      case 0:
+                      case 2:
+                        return .25*(num + xi*eta)/den;
 
-		    case 1:
-		      {
-			const Real a=-1.;
-			const Real b=1.;
+                      case 1:
+                      case 3:
+                        return .25*(num - xi*eta)/den;
 
-			return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
-				     (1. - zeta)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
-				    ((1. - zeta)*(1. - zeta) + eps));
-		      }
+                      case 4:
+                        return 1.;
 
-		    case 2:
-		      {
-			const Real a=-1.;
-			const Real b=-1.;
-
-			return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
-				     (1. - zeta)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
-				    ((1. - zeta)*(1. - zeta) + eps));
-		      }
-
-		    case 3:
-		      {
-			const Real a=1.;
-			const Real b=-1.;
-
-			return .25*(((zeta + a*xi - 1.)*(zeta + b*eta - 1.) +
-				     (1. - zeta)*((zeta + a*xi -1.) + (zeta + b*eta - 1.)))/
-				    ((1. - zeta)*(1. - zeta) + eps));
-		      }
-
-		    case 4:
-		      return 1.;
-
-		    default:
-		      libmesh_error();
-		    }
-
+                      default:
+                        libmesh_error();
+                      }
+                  }
 
 		default:
 		  libmesh_error();
