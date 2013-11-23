@@ -1479,9 +1479,100 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
 
           case PYRAMID5:
             {
-              libmesh_do_once(libMesh::err << "Second derivatives not yet implemented for linear LAGRANGE FE on "
-                                           << "PYRAMID5 elements!  Returning 0." << std::endl);
-              return 0.;
+	      libmesh_assert_less (i, 5);
+
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
+	      const Real eps  = 1.e-35;
+
+              switch (j)
+                {
+                  // xi-xi and eta-eta derivatives are all zero for PYRAMID5.
+                case 0: // d^2()/dxi^2
+                case 2: // d^2()/deta^2
+                  return 0.;
+
+                case 1: // d^2()/dxideta
+                  {
+                    switch (i)
+                      {
+                      case 0:
+                      case 2:
+                        return 0.25/(1. - zeta + eps);
+                      case 1:
+                      case 3:
+                        return -0.25/(1. - zeta + eps);
+                      case 4:
+                        return 0.;
+                      default:
+                        libmesh_error();
+                      }
+                  }
+
+                case 3: // d^2()/dxidzeta
+                  {
+                    Real den = (1. - zeta + eps)*(1. - zeta + eps);
+
+                    switch (i)
+                      {
+                      case 0:
+                      case 2:
+                        return 0.25*eta/den;
+                      case 1:
+                      case 3:
+                        return -0.25*eta/den;
+                      case 4:
+                        return 0.;
+                      default:
+                        libmesh_error();
+                      }
+                  }
+
+                case 4: // d^2()/detadzeta
+                  {
+                    Real den = (1. - zeta + eps)*(1. - zeta + eps);
+
+                    switch (i)
+                      {
+                      case 0:
+                      case 2:
+                        return 0.25*xi/den;
+                      case 1:
+                      case 3:
+                        return -0.25*xi/den;
+                      case 4:
+                        return 0.;
+                      default:
+                        libmesh_error();
+                      }
+                  }
+
+                case 5: // d^2()/dzeta^2
+                  {
+                    Real den = (1. - zeta + eps)*(1. - zeta + eps)*(1. - zeta + eps);
+
+                    switch (i)
+                      {
+                      case 0:
+                      case 2:
+                        return 0.5*xi*eta/den;
+                      case 1:
+                      case 3:
+                        return -0.5*xi*eta/den;
+                      case 4:
+                        return 0.;
+                      default:
+                        libmesh_error();
+                      }
+                  }
+
+                default:
+                  {
+                    // Unrecognized index
+                    libmesh_error();
+                  }
+                }
             }
 
             // Trilinear shape functions on HEX8s have nonzero mixed second derivatives
