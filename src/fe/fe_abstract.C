@@ -641,7 +641,7 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point>&
        nodes[1] = Point (1.,-1.,0.);
        nodes[2] = Point (1.,1.,0.);
        nodes[3] = Point (-1.,1.,0.);
-       nodes[4] = Point (-1.,-1.,1.);
+       nodes[4] = Point (0.,0.,1.);
        return;
     }
     default:
