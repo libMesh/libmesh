@@ -782,9 +782,20 @@ bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Re
 
     case PYRAMID5:
       {
-	libMesh::err << "BEN: Implement this you lazy bastard!"
-		      << std::endl;
-	libmesh_error();
+        // Check that the point is on the same side of all the faces
+        // by testing whether:
+        //
+        // n_i.(x - x_i) <= 0
+        //
+        // for each i, where:
+        //   n_i is the outward normal of face i,
+        //   x_i is a point on face i.
+        if ((-eta - 1. + zeta <= 0.+eps) &&
+            (  xi - 1. + zeta <= 0.+eps) &&
+            ( eta - 1. + zeta <= 0.+eps) &&
+            ( -xi - 1. + zeta <= 0.+eps) &&
+            (            zeta >= 0.-eps))
+          return true;
 
 	return false;
       }
