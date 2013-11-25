@@ -207,14 +207,18 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	{
           // If the adjoint solution has heterogeneous dirichlet
           // values, then to get a proper error estimate here we need
-          // to subtract off a lift function.  We won't need the lift
-          // function afterward.
-          std::ostringstream liftfunc_name;
-          liftfunc_name << "adjoint_lift_function" << j;
-          system.get_adjoint_solution(j) -=
-            system.get_vector(liftfunc_name.str());
+          // to subtract off a coarse grid lift function.  We won't
+          // need the lift function afterward.  We won't even need the
+          // fine adjoint solution afterward, so we'll modify it here.
+          if (system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+            {
+              std::ostringstream liftfunc_name;
+              liftfunc_name << "adjoint_lift_function" << j;
+              system.get_adjoint_solution(j) -=
+                system.get_vector(liftfunc_name.str());
 
-          system.remove_vector(liftfunc_name.str());
+              system.remove_vector(liftfunc_name.str());
+            }
 
           computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));
         }
