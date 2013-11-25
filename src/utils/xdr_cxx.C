@@ -23,6 +23,8 @@
 #include <sstream>
 #include <fstream>
 
+#include <unistd.h> // for getpid()
+
 // Local includes
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/libmesh_logging.h"
