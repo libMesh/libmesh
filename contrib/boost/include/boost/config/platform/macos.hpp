@@ -1,8 +1,8 @@
-//  (C) Copyright John Maddock 2001 - 2003. 
-//  (C) Copyright Darin Adler 2001 - 2002. 
-//  (C) Copyright Bill Kempf 2002. 
-//  Use, modification and distribution are subject to the 
-//  Boost Software License, Version 1.0. (See accompanying file 
+//  (C) Copyright John Maddock 2001 - 2003.
+//  (C) Copyright Darin Adler 2001 - 2002.
+//  (C) Copyright Bill Kempf 2002.
+//  Use, modification and distribution are subject to the
+//  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org for most recent version.
@@ -32,7 +32,7 @@
 
 //
 // BSD runtime has pthreads, sigaction, sched_yield and gettimeofday,
-// of these only pthreads are advertised in <unistd.h>, so set the 
+// of these only pthreads are advertised in <unistd.h>, so set the
 // other options explicitly:
 //
 #  define BOOST_HAS_SCHED_YIELD
@@ -49,7 +49,7 @@
 
 #  if (__GNUC__ == 4)
 
-// Both gcc and intel require these.  
+// Both gcc and intel require these.
 #    define BOOST_HAS_PTHREAD_MUTEXATTR_SETTYPE
 #    define BOOST_HAS_NANOSLEEP
 
@@ -64,16 +64,17 @@
 #  if ( defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON ) || ( defined(TARGET_CARBON) && TARGET_CARBON )
 
 #  if !defined(BOOST_HAS_PTHREADS)
-#    define BOOST_HAS_MPTASKS
+// MPTasks support is deprecated/removed from Boost:
+//#    define BOOST_HAS_MPTASKS
 #  elif ( __dest_os == __mac_os_x )
 // We are doing a Carbon/Mach-O/MSL build which has pthreads, but only the
 // gettimeofday and no posix.
 #  define BOOST_HAS_GETTIMEOFDAY
 #  endif
 
-// The MP task implementation of Boost Threads aims to replace MP-unsafe
-// parts of the MSL, so we turn on threads unconditionally.
-#    define BOOST_HAS_THREADS
+#ifdef BOOST_HAS_PTHREADS
+#  define BOOST_HAS_THREADS
+#endif
 
 // The remote call manager depends on this.
 #    define BOOST_BIND_ENABLE_PASCAL

@@ -1,6 +1,6 @@
 
 //  (C) Copyright Dave Abrahams, Steve Cleary, Beman Dawes, Howard
-//  Hinnant & John Maddock 2000.  
+//  Hinnant & John Maddock 2000.
 //  Use, modification and distribution are subject to the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt).
@@ -22,7 +22,7 @@
 #include <boost/type_traits/is_function.hpp>
 #endif
 #include <boost/type_traits/config.hpp>
-#if defined(BOOST_TT_HAS_CONFORMING_IS_CLASS_IMPLEMENTATION) 
+#if defined(BOOST_TT_HAS_CONFORMING_IS_CLASS_IMPLEMENTATION)
 #  include <boost/type_traits/is_class.hpp>
 #  include <boost/type_traits/is_union.hpp>
 #endif
@@ -38,7 +38,7 @@ namespace boost {
 
 namespace detail {
 
-#if defined(BOOST_TT_HAS_CONFORMING_IS_CLASS_IMPLEMENTATION) 
+#if defined(BOOST_TT_HAS_CONFORMING_IS_CLASS_IMPLEMENTATION)
 
 template <typename T>
 struct is_class_or_union
@@ -95,7 +95,7 @@ template <>
 struct is_enum_helper<false>
 {
     template <typename T> struct type
-       : ::boost::is_convertible<typename boost::add_reference<T>::type,::boost::detail::int_convertible>
+       : public ::boost::is_convertible<typename boost::add_reference<T>::type,::boost::detail::int_convertible>
     {
     };
 };
@@ -108,7 +108,7 @@ template <typename T> struct is_enum_impl
 #if defined(__GNUC__)
 
 #ifdef BOOST_TT_HAS_CONFORMING_IS_CLASS_IMPLEMENTATION
-    
+
    // We MUST check for is_class_or_union on conforming compilers in
    // order to correctly deduce that noncopyable types are not enums
    // (dwa 2002/04/15)...
@@ -133,7 +133,7 @@ template <typename T> struct is_enum_impl
 #endif // BOOST_TT_HAS_CONFORMING_IS_CLASS_IMPLEMENTATION
 
 #else // !defined(__GNUC__):
-    
+
    BOOST_STATIC_CONSTANT(bool, selector =
       (::boost::type_traits::ice_or<
            ::boost::is_arithmetic<T>::value
@@ -141,7 +141,7 @@ template <typename T> struct is_enum_impl
          , is_class_or_union<T>::value
          , is_array<T>::value
       >::value));
-    
+
 #endif
 
 #if BOOST_WORKAROUND(__BORLANDC__, < 0x600)

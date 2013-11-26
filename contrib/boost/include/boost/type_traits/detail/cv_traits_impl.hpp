@@ -1,6 +1,6 @@
 
 //  (C) Copyright Dave Abrahams, Steve Cleary, Beman Dawes, Howard
-//  Hinnant & John Maddock 2000.  
+//  Hinnant & John Maddock 2000.
 //  Use, modification and distribution are subject to the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt).
@@ -64,7 +64,7 @@ struct cv_traits_imp<const volatile T*>
 };
 
 #if BOOST_WORKAROUND(__GNUC__,== 3) && BOOST_WORKAROUND(__GNUC_MINOR__, <= 2)
-// We have to exclude function pointers 
+// We have to exclude function pointers
 // (see http://gcc.gnu.org/bugzilla/show_bug.cgi?8503)
 yes_type mini_funcptr_tester(...);
 no_type  mini_funcptr_tester(const volatile void*);
@@ -75,9 +75,9 @@ no_type  mini_funcptr_tester(const volatile void*);
 namespace detail {
 
 // Use the implementation above for non function pointers
-template <typename T, unsigned Select 
+template <typename T, unsigned Select
   = (unsigned)sizeof(::boost::type_traits::gcc8503::mini_funcptr_tester((T)0)) >
-struct cv_traits_imp : ::boost::type_traits::gcc8503::cv_traits_imp<T> { };
+struct cv_traits_imp : public ::boost::type_traits::gcc8503::cv_traits_imp<T> { };
 
 // Functions are never cv-qualified
 template <typename T> struct cv_traits_imp<T*,1>
@@ -90,7 +90,7 @@ template <typename T> struct cv_traits_imp<T*,1>
 #endif
 
 } // namespace detail
-} // namespace boost 
+} // namespace boost
 
 #endif // BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
 
