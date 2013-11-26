@@ -21,6 +21,9 @@
 #include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_BOOST
+// See: http://stackoverflow.com/questions/17000542/boost-pool-can-i-wean-it-from-boost-system
+#define BOOST_POOL_NO_MT       // disable multi-threading
+#define BOOST_THREAD_MUTEX_HPP // define the #include-guard to disable the header
 #  include <boost/pool/pool.hpp>
 #  include <boost/pool/object_pool.hpp>
 #  include <boost/pool/pool_alloc.hpp>
