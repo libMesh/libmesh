@@ -45,7 +45,7 @@ struct mesh_inserter_iterator
 
   void operator=(Elem* e) { mesh.add_elem(e); }
 
-  void operator=(Node* n) { mesh.add_node(n); }
+  void operator=(Node* n) { mesh.insert_node(n); }
 
   void operator=(Point* p) { mesh.add_point(*p); }
 

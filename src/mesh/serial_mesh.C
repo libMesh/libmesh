@@ -491,6 +491,49 @@ Node* SerialMesh::add_node (Node* n)
 
 
 
+Node* SerialMesh::insert_node(Node* n)
+{
+  if (!n)
+    {
+      libMesh::err << "Error, attempting to insert NULL node." << std::endl;
+      libmesh_error();
+    }
+
+  if (n->id() == DofObject::invalid_id)
+    {
+      libMesh::err << "Error, cannot insert node with invalid id." << std::endl;
+      libmesh_error();
+    }
+
+  if (n->id() < _nodes.size())
+    {
+      // Don't allow inserting on top of an existing Node.
+      if (_nodes[ n->id() ] != NULL)
+        {
+          libMesh::err << "Error, cannot insert node on top of existing node." << std::endl;
+          libmesh_error();
+        }
+    }
+  else
+    {
+      // Allocate just enough space to store the new node.  This will
+      // cause highly non-ideal memory allocation behavior if called
+      // repeatedly...
+      _nodes.resize(n->id() + 1);
+    }
+
+
+  // We have enough space and this spot isn't already occupied by
+  // another node, so go ahead and add it.
+  _nodes[ n->id() ] = n;
+
+  // If we made it this far, we just inserted the node the user handed
+  // us, so we can give it right back.
+  return n;
+}
+
+
+
 void SerialMesh::delete_node(Node* n)
 {
   libmesh_assert(n);
