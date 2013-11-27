@@ -12,15 +12,24 @@ with libmesh:
    the headers from the boost distro that are required to build the subset of
    boost used by libmesh, plus several system headers.
 
+.) Remove the existing boost headers
+   git rm -r contrib/boost/include/boost
+   git ci -a -m"Updating boost."
+
 .) Copy all the required boost header filenames (with relative paths)
    into the script below on the 'files=' line, and then run the script
    to actually copy files out of the boost distribution and into libmesh's
-   contrib directory.
+   contrib/boost/include/boost directory.
+
+.) Commit the new headers, squash with the previous removal patch.
+   git add contrib/boost/include/boost
+   git ci --amend
 
 .) Update contrib/boost/include/Makefile.am with the list of files from foo.d
-   as well.
+   as well.  Commit Makefile.am.
 
-.) Run boostrap in the top level of the libmesh source distribution.
+.) Run boostrap in the top level of the libmesh source distribution to
+   regenerate Makefile.in.  Commit Makefile.in.
 
 .) Follow the normal instructions to make and install libmesh, and verify that
    test_boost.cc can be built against the boost installed with libmesh.
