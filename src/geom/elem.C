@@ -53,6 +53,7 @@
 #include "libmesh/cell_inf_prism6.h"
 #include "libmesh/cell_inf_prism12.h"
 #include "libmesh/cell_pyramid5.h"
+#include "libmesh/cell_pyramid14.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/quadrature_gauss.h"
@@ -95,6 +96,7 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     18, // PRISM18
 
     5,  // PYRAMID5
+    14, // PYRAMID14
 
     2,  // INFEDGE2
 
@@ -136,6 +138,7 @@ const unsigned int Elem::type_to_n_sides_map [] =
     5,  // PRISM18
 
     5,  // PYRAMID5
+    5,  // PYRAMID14
 
     2,  // INFEDGE2
 
@@ -177,6 +180,7 @@ const unsigned int Elem::type_to_n_edges_map [] =
     9,  // PRISM18
 
     8,  // PYRAMID5
+    8,  // PYRAMID14
 
     0,  // INFEDGE2
 
@@ -293,6 +297,11 @@ AutoPtr<Elem> Elem::build(const ElemType type,
     case PYRAMID5:
       {
 	elem = new Pyramid5(p);
+	break;
+      }
+    case PYRAMID14:
+      {
+	elem = new Pyramid14(p);
 	break;
       }
 
@@ -2021,6 +2030,9 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
     case PRISM15:
     case PRISM18:
       return PRISM6;
+    case PYRAMID5:
+    case PYRAMID14:
+      return PYRAMID5;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -2100,7 +2112,11 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
 
     case PYRAMID5:
       {
-	// libmesh_error();
+	if (full_ordered)
+	  return PYRAMID14;
+	else // PYRAMID13 to be added...
+	  libmesh_error();
+
 	return INVALID_ELEM;
       }
 
