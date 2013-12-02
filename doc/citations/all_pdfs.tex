@@ -1,0 +1,37 @@
+\documentclass{article}
+\usepackage{pdfpages}
+\usepackage{hyperref}
+
+% TODO: Make TOC and hyperlinks for each included file?
+\begin{document}
+% No page numbers in this document
+\pagestyle{empty}
+
+% Insert table of contents into document
+\tableofcontents
+
+% The addtotoc command adds TOC entries for each page we include and
+% makes it possible to jump to those sections of the PDF.
+% Arguments to addtotoc command:
+% Page number relative to the first page of the included document
+% Level for the TOC entry
+% Not sure – who knows?
+% TOC entry
+% Label for the entry
+
+% The "pages=-" optional argument ensures that all pages get included
+\includepdf[pages=-,addtotoc={1,section,1,LibMesh Paper,libmesh}]{libmesh}
+\includepdf[pages=-,addtotoc={1,section,1,Dissertations \& Theses,theses}]{theses}
+\includepdf[pages=-,addtotoc={1,section,1,Preprints,preprints}]{preprints}
+\includepdf[pages=-,addtotoc={1,section,1,2014,fourteen}]{fourteen}
+\includepdf[pages=-,addtotoc={1,section,1,2013,thirteen}]{thirteen}
+\includepdf[pages=-,addtotoc={1,section,1,2012,twelve}]{twelve}
+\includepdf[pages=-,addtotoc={1,section,1,2011,eleven}]{eleven}
+\includepdf[pages=-,addtotoc={1,section,1,2010,ten}]{ten}
+\includepdf[pages=-,addtotoc={1,section,1,2009,nine}]{nine}
+\includepdf[pages=-,addtotoc={1,section,1,2008,eight}]{eight}
+\includepdf[pages=-,addtotoc={1,section,1,2007,seven}]{seven}
+\includepdf[pages=-,addtotoc={1,section,1,2006,six}]{six}
+\includepdf[pages=-,addtotoc={1,section,1,2005,five}]{five}
+\includepdf[pages=-,addtotoc={1,section,1,2004,four}]{four}
+\end{document}

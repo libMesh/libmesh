@@ -489,12 +489,6 @@ inline Tnew libmesh_cast_int (Told oldvar)
 #endif
 
 
-// 3D spatial dimension unless otherwise specified
-#ifndef LIBMESH_DIM
-#  define LIBMESH_DIM 3
-#endif
-
-
 // A function template for ignoring unused variables.  This is a way
 // to shut up unused variable compiler warnings on a case by case
 // basis.

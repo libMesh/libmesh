@@ -33,9 +33,9 @@ namespace libMesh
 // Transformation map between monomial (physical space) and Bezier bases.
 const float PostscriptIO::_bezier_transform[3][3] =
 {
-  {-1./6., 1./6.,    1.},
-  {-1./6.,   0.5, 1./6.},
-  {    0.,    1.,    0.}
+  {-1.f/6.f, 1.f/6.f, 1.},
+  {-1.f/6.f, 0.5,     1.f/6.f},
+  {0.,       1.,      0.}
 };
 
 

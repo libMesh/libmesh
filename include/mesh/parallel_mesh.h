@@ -217,7 +217,12 @@ class ParallelMesh : public UnstructuredMesh
 			   const processor_id_type proc_id =
 			     DofObject::invalid_processor_id);
   virtual Node* add_node (Node* n) ;
-  virtual Node* insert_node (Node* n);
+
+  /**
+   * Calls add_node().
+   */
+  virtual Node* insert_node(Node* n);
+
   virtual void delete_node (Node* n) ;
   virtual void renumber_node (dof_id_type old_id, dof_id_type new_id);
   virtual Elem* add_elem (Elem* e) ;

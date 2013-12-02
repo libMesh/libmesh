@@ -10,8 +10,7 @@
 #include <sys/time.h>
 #endif
 
-#include "oc.h"
-extern int oc_dumpnode(OClink, OCddsnode);
+extern int oc_dumpnode(void*, void*);
 
 #include "ncdap3.h"
 #include "dapalign.h"

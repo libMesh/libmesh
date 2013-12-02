@@ -209,6 +209,18 @@ public:
    */
   virtual dof_id_type max_node_id () const = 0;
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  /**
+   * Returns the next unique id to be used.
+   */
+  unique_id_type next_unique_id() { return _next_unique_id; }
+
+  /**
+   * Sets the next unique id to be used.
+   */
+  void set_next_unique_id(unique_id_type id) { _next_unique_id = id; }
+#endif
+
   /**
    * Reserves space for a known number of nodes.
    * Note that this method may or may not do anything, depending
@@ -391,6 +403,15 @@ public:
    * Add \p Node \p n to the end of the vertex array.
    */
   virtual Node* add_node (Node* n) = 0;
+
+  /**
+   * Insert \p Node \p n into the Mesh at a location consistent with
+   * n->id(), allocating extra storage if necessary.  Will error
+   * rather than overwriting an existing Node.  Primarily intended for
+   * use with the mesh_inserter_iterator, only use if you know what
+   * you are doing...
+   */
+  virtual Node* insert_node(Node* n) = 0;
 
   /**
    * Removes the Node n from the mesh.

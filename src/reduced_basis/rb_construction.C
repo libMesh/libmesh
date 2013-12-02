@@ -100,25 +100,18 @@ void RBConstruction::clear()
 
   for(unsigned int q=0; q<Aq_vector.size(); q++)
   {
-    if(Aq_vector[q])
-    {
-      delete Aq_vector[q];
-      Aq_vector[q] = NULL;
-    }
+    delete Aq_vector[q];
+    Aq_vector[q] = NULL;
   }
 
   for(unsigned int q=0; q<Fq_vector.size(); q++)
   {
-    if(Fq_vector[q])
-    {
-      delete Fq_vector[q];
-      Fq_vector[q] = NULL;
-    }
+    delete Fq_vector[q];
+    Fq_vector[q] = NULL;
   }
 
   for(unsigned int i=0; i<outputs_vector.size(); i++)
     for(unsigned int q_l=0; q_l<outputs_vector[i].size(); q_l++)
-      if(outputs_vector[i][q_l])
       {
         delete outputs_vector[i][q_l];
         outputs_vector[i][q_l] = NULL;
@@ -128,25 +121,18 @@ void RBConstruction::clear()
   {
     for(unsigned int q=0; q<non_dirichlet_Aq_vector.size(); q++)
     {
-      if(non_dirichlet_Aq_vector[q])
-      {
-        delete non_dirichlet_Aq_vector[q];
-        non_dirichlet_Aq_vector[q] = NULL;
-      }
+      delete non_dirichlet_Aq_vector[q];
+      non_dirichlet_Aq_vector[q] = NULL;
     }
 
     for(unsigned int q=0; q<non_dirichlet_Fq_vector.size(); q++)
     {
-      if(non_dirichlet_Fq_vector[q])
-      {
-        delete non_dirichlet_Fq_vector[q];
-        non_dirichlet_Fq_vector[q] = NULL;
-      }
+      delete non_dirichlet_Fq_vector[q];
+      non_dirichlet_Fq_vector[q] = NULL;
     }
 
     for(unsigned int i=0; i<non_dirichlet_outputs_vector.size(); i++)
       for(unsigned int q_l=0; q_l<non_dirichlet_outputs_vector[i].size(); q_l++)
-        if(non_dirichlet_outputs_vector[i][q_l])
         {
           delete non_dirichlet_outputs_vector[i][q_l];
           non_dirichlet_outputs_vector[i][q_l] = NULL;
@@ -156,11 +142,8 @@ void RBConstruction::clear()
   // Also delete the Fq representors
   for(unsigned int q_f=0; q_f<Fq_representor.size(); q_f++)
   {
-    if(Fq_representor[q_f])
-    {
-      delete Fq_representor[q_f];
-      Fq_representor[q_f] = NULL;
-    }
+    delete Fq_representor[q_f];
+    Fq_representor[q_f] = NULL;
   }
   // Set Fq_representor_innerprods_computed flag to false now
   // that we've cleared the Fq representors

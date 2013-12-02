@@ -150,6 +150,20 @@ class SerialMesh : public UnstructuredMesh
 			   const processor_id_type proc_id =
 			     DofObject::invalid_processor_id);
   virtual Node* add_node (Node* n) ;
+
+  /**
+   * Insert \p Node \p n into the Mesh at a location consistent with
+   * n->id(), allocating extra storage if necessary.  Throws an error if:
+   * .) n==NULL
+   * .) n->id() == DofObject::invalid_id
+   * .) A node already exists in position n->id().
+   *
+   * This function differs from the SerialMesh::add_node() function,
+   * which is only capable of appending nodes at the end of the nodes
+   * storage.
+   */
+  virtual Node* insert_node(Node* n);
+
   virtual void delete_node (Node* n) ;
   virtual void renumber_node (dof_id_type old_id, dof_id_type new_id);
   virtual Elem* add_elem (Elem* e) ;

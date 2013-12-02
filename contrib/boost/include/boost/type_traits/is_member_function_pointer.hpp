@@ -1,6 +1,6 @@
 
 //  (C) Copyright Dave Abrahams, Steve Cleary, Beman Dawes, Howard
-//  Hinnant & John Maddock 2000.  
+//  Hinnant & John Maddock 2000.
 //  Use, modification and distribution are subject to the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt).
@@ -17,7 +17,7 @@
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) \
    && !BOOST_WORKAROUND(__BORLANDC__, < 0x600) && !defined(BOOST_TT_TEST_MS_FUNC_SIGS)
    //
-   // Note: we use the "workaround" version for MSVC because it works for 
+   // Note: we use the "workaround" version for MSVC because it works for
    // __stdcall etc function types, where as the partial specialisation
    // version does not do so.
    //
@@ -55,7 +55,7 @@ namespace detail {
 
 template <bool>
 struct is_mem_fun_pointer_select
-    : ::boost::type_traits::false_result
+    : public ::boost::type_traits::false_result
 {
 };
 
@@ -83,7 +83,7 @@ struct is_mem_fun_pointer_select<false>
 
 template <typename T>
 struct is_member_function_pointer_impl
-    : is_mem_fun_pointer_select<
+    : public is_mem_fun_pointer_select<
           ::boost::type_traits::ice_or<
               ::boost::is_reference<T>::value
             , ::boost::is_array<T>::value

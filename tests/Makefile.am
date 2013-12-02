@@ -1,4 +1,4 @@
-AUTOMAKE_OPTIONS = subdir-objects 
+AUTOMAKE_OPTIONS = subdir-objects
 
 AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
 AM_CFLAGS    = $(libmesh_CFLAGS)
@@ -21,7 +21,8 @@ unit_tests_sources = \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h \
 	parallel/parallel_test.C \
-	quadrature/quadrature_test.C
+	quadrature/quadrature_test.C \
+	utils/vectormap_test.C
 
 check_PROGRAMS = # empty, append below
 
@@ -76,4 +77,3 @@ TESTS = $(check_PROGRAMS)
 if CODE_COVERAGE_ENABLED
   CLEANFILES = */*.gcda */*.gcno
 endif
-

@@ -1,0 +1,20 @@
+\documentclass[12pt]{article}
+\usepackage{url}
+\renewcommand{\rmdefault}{ptm} % What does it do? Somehow resets the default font...
+\usepackage{helvet}
+
+% Call "References" section something else
+\renewcommand{\refname}{2009}
+
+\begin{document}
+
+% Don't use page numbers
+\pagestyle{empty}
+
+% Cite everything
+\nocite*
+
+\bibliographystyle{ieeetr}
+\bibliography{nine}
+
+\end{document}

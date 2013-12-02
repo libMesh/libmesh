@@ -1,0 +1,55 @@
+Instructions for upgrading the subset of Boost headers distributed
+with libmesh:
+
+.) Download and unpack the newest boost source distribution to e.g.
+   /path/to/unpacked/boost/boost_1_XY_Z
+
+.) Using the test_boost.cc file located in this directory, run
+
+   g++ -M -MF foo.d -I/path/to/unpacked/boost/boost_1_XY_Z test_boost.cc
+
+.) Inspect the contents of the foo.d dependency file. It should contain all
+   the headers from the boost distro that are required to build the subset of
+   boost used by libmesh, plus several system headers.
+
+.) Remove the existing boost headers
+   git rm -r contrib/boost/include/boost
+   git ci -a -m"Updating boost."
+
+.) Copy all the required boost header filenames (with relative paths)
+   into the script below on the 'files=' line, and then run the script
+   to actually copy files out of the boost distribution and into libmesh's
+   contrib/boost/include/boost directory.
+
+.) Commit the new headers, squash with the previous removal patch.
+   git add contrib/boost/include/boost
+   git ci --amend
+
+.) Update contrib/boost/include/Makefile.am with the list of files from foo.d
+   as well.  Commit Makefile.am.
+
+.) Run boostrap in the top level of the libmesh source distribution to
+   regenerate Makefile.in.  Commit Makefile.in.
+
+.) Follow the normal instructions to make and install libmesh, and verify that
+   test_boost.cc can be built against the boost installed with libmesh.
+
+
+#!/bin/bash
+
+# Where to copy files from
+from_dir=/path/to/unpacked/boost/boost_1_XY_Z/boost
+
+# Where to copy files to
+to_dir=/home/username/projects/libmesh_git/contrib/boost/include/boost
+
+# List of files to copy
+files=(assert.hpp config.hpp ...)
+
+for i in "${files[@]}"
+do
+    # Create the directory if it doesn't already exist                                                                                                                                                                                          if [ ! -d $to_dir/`dirname $i` ]; then
+        mkdir -p $to_dir/`dirname $i`;
+    fi
+    cp $from_dir/$i $to_dir/$i
+done

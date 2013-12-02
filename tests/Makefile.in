@@ -117,7 +117,7 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C base/dof_object_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h parallel/parallel_test.C \
-	quadrature/quadrature_test.C
+	quadrature/quadrature_test.C utils/vectormap_test.C
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = unit_tests_dbg-driver.$(OBJEXT) \
 	geom/unit_tests_dbg-node_test.$(OBJEXT) \
@@ -127,7 +127,8 @@ am__objects_1 = unit_tests_dbg-driver.$(OBJEXT) \
 	numerics/unit_tests_dbg-petsc_vector_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-trilinos_epetra_vector_test.$(OBJEXT) \
 	parallel/unit_tests_dbg-parallel_test.$(OBJEXT) \
-	quadrature/unit_tests_dbg-quadrature_test.$(OBJEXT)
+	quadrature/unit_tests_dbg-quadrature_test.$(OBJEXT) \
+	utils/unit_tests_dbg-vectormap_test.$(OBJEXT)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am_unit_tests_dbg_OBJECTS = $(am__objects_1)
 unit_tests_dbg_OBJECTS = $(am_unit_tests_dbg_OBJECTS)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@unit_tests_dbg_DEPENDENCIES = $(top_builddir)/libmesh_dbg.la
@@ -146,7 +147,7 @@ am__unit_tests_devel_SOURCES_DIST = driver.C base/dof_object_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h parallel/parallel_test.C \
-	quadrature/quadrature_test.C
+	quadrature/quadrature_test.C utils/vectormap_test.C
 am__objects_2 = unit_tests_devel-driver.$(OBJEXT) \
 	geom/unit_tests_devel-node_test.$(OBJEXT) \
 	geom/unit_tests_devel-point_test.$(OBJEXT) \
@@ -155,7 +156,8 @@ am__objects_2 = unit_tests_devel-driver.$(OBJEXT) \
 	numerics/unit_tests_devel-petsc_vector_test.$(OBJEXT) \
 	numerics/unit_tests_devel-trilinos_epetra_vector_test.$(OBJEXT) \
 	parallel/unit_tests_devel-parallel_test.$(OBJEXT) \
-	quadrature/unit_tests_devel-quadrature_test.$(OBJEXT)
+	quadrature/unit_tests_devel-quadrature_test.$(OBJEXT) \
+	utils/unit_tests_devel-vectormap_test.$(OBJEXT)
 @LIBMESH_DEVEL_MODE_TRUE@am_unit_tests_devel_OBJECTS =  \
 @LIBMESH_DEVEL_MODE_TRUE@	$(am__objects_2)
 unit_tests_devel_OBJECTS = $(am_unit_tests_devel_OBJECTS)
@@ -172,7 +174,7 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C base/dof_object_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h parallel/parallel_test.C \
-	quadrature/quadrature_test.C
+	quadrature/quadrature_test.C utils/vectormap_test.C
 am__objects_3 = unit_tests_oprof-driver.$(OBJEXT) \
 	geom/unit_tests_oprof-node_test.$(OBJEXT) \
 	geom/unit_tests_oprof-point_test.$(OBJEXT) \
@@ -181,7 +183,8 @@ am__objects_3 = unit_tests_oprof-driver.$(OBJEXT) \
 	numerics/unit_tests_oprof-petsc_vector_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-trilinos_epetra_vector_test.$(OBJEXT) \
 	parallel/unit_tests_oprof-parallel_test.$(OBJEXT) \
-	quadrature/unit_tests_oprof-quadrature_test.$(OBJEXT)
+	quadrature/unit_tests_oprof-quadrature_test.$(OBJEXT) \
+	utils/unit_tests_oprof-vectormap_test.$(OBJEXT)
 @LIBMESH_OPROF_MODE_TRUE@am_unit_tests_oprof_OBJECTS =  \
 @LIBMESH_OPROF_MODE_TRUE@	$(am__objects_3)
 unit_tests_oprof_OBJECTS = $(am_unit_tests_oprof_OBJECTS)
@@ -198,7 +201,7 @@ am__unit_tests_opt_SOURCES_DIST = driver.C base/dof_object_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h parallel/parallel_test.C \
-	quadrature/quadrature_test.C
+	quadrature/quadrature_test.C utils/vectormap_test.C
 am__objects_4 = unit_tests_opt-driver.$(OBJEXT) \
 	geom/unit_tests_opt-node_test.$(OBJEXT) \
 	geom/unit_tests_opt-point_test.$(OBJEXT) \
@@ -207,7 +210,8 @@ am__objects_4 = unit_tests_opt-driver.$(OBJEXT) \
 	numerics/unit_tests_opt-petsc_vector_test.$(OBJEXT) \
 	numerics/unit_tests_opt-trilinos_epetra_vector_test.$(OBJEXT) \
 	parallel/unit_tests_opt-parallel_test.$(OBJEXT) \
-	quadrature/unit_tests_opt-quadrature_test.$(OBJEXT)
+	quadrature/unit_tests_opt-quadrature_test.$(OBJEXT) \
+	utils/unit_tests_opt-vectormap_test.$(OBJEXT)
 @LIBMESH_OPT_MODE_TRUE@am_unit_tests_opt_OBJECTS = $(am__objects_4)
 unit_tests_opt_OBJECTS = $(am_unit_tests_opt_OBJECTS)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_DEPENDENCIES =  \
@@ -223,7 +227,7 @@ am__unit_tests_prof_SOURCES_DIST = driver.C base/dof_object_test.h \
 	numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h parallel/parallel_test.C \
-	quadrature/quadrature_test.C
+	quadrature/quadrature_test.C utils/vectormap_test.C
 am__objects_5 = unit_tests_prof-driver.$(OBJEXT) \
 	geom/unit_tests_prof-node_test.$(OBJEXT) \
 	geom/unit_tests_prof-point_test.$(OBJEXT) \
@@ -232,7 +236,8 @@ am__objects_5 = unit_tests_prof-driver.$(OBJEXT) \
 	numerics/unit_tests_prof-petsc_vector_test.$(OBJEXT) \
 	numerics/unit_tests_prof-trilinos_epetra_vector_test.$(OBJEXT) \
 	parallel/unit_tests_prof-parallel_test.$(OBJEXT) \
-	quadrature/unit_tests_prof-quadrature_test.$(OBJEXT)
+	quadrature/unit_tests_prof-quadrature_test.$(OBJEXT) \
+	utils/unit_tests_prof-vectormap_test.$(OBJEXT)
 @LIBMESH_PROF_MODE_TRUE@am_unit_tests_prof_OBJECTS = $(am__objects_5)
 unit_tests_prof_OBJECTS = $(am_unit_tests_prof_OBJECTS)
 @LIBMESH_PROF_MODE_TRUE@unit_tests_prof_DEPENDENCIES =  \
@@ -618,7 +623,7 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-AUTOMAKE_OPTIONS = subdir-objects 
+AUTOMAKE_OPTIONS = subdir-objects
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
@@ -639,7 +644,8 @@ unit_tests_sources = \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h \
 	parallel/parallel_test.C \
-	quadrature/quadrature_test.C
+	quadrature/quadrature_test.C \
+	utils/vectormap_test.C
 
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_SOURCES = $(unit_tests_sources)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
@@ -751,6 +757,14 @@ quadrature/$(DEPDIR)/$(am__dirstamp):
 quadrature/unit_tests_dbg-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
 	quadrature/$(DEPDIR)/$(am__dirstamp)
+utils/$(am__dirstamp):
+	@$(MKDIR_P) utils
+	@: > utils/$(am__dirstamp)
+utils/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) utils/$(DEPDIR)
+	@: > utils/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_dbg-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
+	utils/$(DEPDIR)/$(am__dirstamp)
 unit_tests-dbg$(EXEEXT): $(unit_tests_dbg_OBJECTS) $(unit_tests_dbg_DEPENDENCIES) $(EXTRA_unit_tests_dbg_DEPENDENCIES) 
 	@rm -f unit_tests-dbg$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_dbg_LINK) $(unit_tests_dbg_OBJECTS) $(unit_tests_dbg_LDADD) $(LIBS)
@@ -771,6 +785,8 @@ parallel/unit_tests_devel-parallel_test.$(OBJEXT):  \
 quadrature/unit_tests_devel-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
 	quadrature/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_devel-vectormap_test.$(OBJEXT):  \
+	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 unit_tests-devel$(EXEEXT): $(unit_tests_devel_OBJECTS) $(unit_tests_devel_DEPENDENCIES) $(EXTRA_unit_tests_devel_DEPENDENCIES) 
 	@rm -f unit_tests-devel$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_devel_LINK) $(unit_tests_devel_OBJECTS) $(unit_tests_devel_LDADD) $(LIBS)
@@ -791,6 +807,8 @@ parallel/unit_tests_oprof-parallel_test.$(OBJEXT):  \
 quadrature/unit_tests_oprof-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
 	quadrature/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_oprof-vectormap_test.$(OBJEXT):  \
+	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 unit_tests-oprof$(EXEEXT): $(unit_tests_oprof_OBJECTS) $(unit_tests_oprof_DEPENDENCIES) $(EXTRA_unit_tests_oprof_DEPENDENCIES) 
 	@rm -f unit_tests-oprof$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_oprof_LINK) $(unit_tests_oprof_OBJECTS) $(unit_tests_oprof_LDADD) $(LIBS)
@@ -811,6 +829,8 @@ parallel/unit_tests_opt-parallel_test.$(OBJEXT):  \
 quadrature/unit_tests_opt-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
 	quadrature/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_opt-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
+	utils/$(DEPDIR)/$(am__dirstamp)
 unit_tests-opt$(EXEEXT): $(unit_tests_opt_OBJECTS) $(unit_tests_opt_DEPENDENCIES) $(EXTRA_unit_tests_opt_DEPENDENCIES) 
 	@rm -f unit_tests-opt$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_opt_LINK) $(unit_tests_opt_OBJECTS) $(unit_tests_opt_LDADD) $(LIBS)
@@ -831,6 +851,8 @@ parallel/unit_tests_prof-parallel_test.$(OBJEXT):  \
 quadrature/unit_tests_prof-quadrature_test.$(OBJEXT):  \
 	quadrature/$(am__dirstamp) \
 	quadrature/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_prof-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
+	utils/$(DEPDIR)/$(am__dirstamp)
 unit_tests-prof$(EXEEXT): $(unit_tests_prof_OBJECTS) $(unit_tests_prof_DEPENDENCIES) $(EXTRA_unit_tests_prof_DEPENDENCIES) 
 	@rm -f unit_tests-prof$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_prof_LINK) $(unit_tests_prof_OBJECTS) $(unit_tests_prof_LDADD) $(LIBS)
@@ -841,6 +863,7 @@ mostlyclean-compile:
 	-rm -f numerics/*.$(OBJEXT)
 	-rm -f parallel/*.$(OBJEXT)
 	-rm -f quadrature/*.$(OBJEXT)
+	-rm -f utils/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -890,6 +913,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_oprof-quadrature_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_prof-quadrature_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po@am__quote@
 
 .C.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -1041,6 +1069,20 @@ quadrature/unit_tests_dbg-quadrature_test.obj: quadrature/quadrature_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_dbg-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
 
+utils/unit_tests_dbg-vectormap_test.o: utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_dbg-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Tpo -c -o utils/unit_tests_dbg-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Tpo utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_dbg-vectormap_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_dbg-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
+
+utils/unit_tests_dbg-vectormap_test.obj: utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_dbg-vectormap_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Tpo -c -o utils/unit_tests_dbg-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Tpo utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_dbg-vectormap_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_dbg-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+
 unit_tests_devel-driver.o: driver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT unit_tests_devel-driver.o -MD -MP -MF $(DEPDIR)/unit_tests_devel-driver.Tpo -c -o unit_tests_devel-driver.o `test -f 'driver.C' || echo '$(srcdir)/'`driver.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unit_tests_devel-driver.Tpo $(DEPDIR)/unit_tests_devel-driver.Po
@@ -1166,6 +1208,20 @@ quadrature/unit_tests_devel-quadrature_test.obj: quadrature/quadrature_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='quadrature/quadrature_test.C' object='quadrature/unit_tests_devel-quadrature_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_devel-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
+
+utils/unit_tests_devel-vectormap_test.o: utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_devel-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Tpo -c -o utils/unit_tests_devel-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Tpo utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_devel-vectormap_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_devel-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
+
+utils/unit_tests_devel-vectormap_test.obj: utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_devel-vectormap_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Tpo -c -o utils/unit_tests_devel-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Tpo utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_devel-vectormap_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_devel-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
 
 unit_tests_oprof-driver.o: driver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT unit_tests_oprof-driver.o -MD -MP -MF $(DEPDIR)/unit_tests_oprof-driver.Tpo -c -o unit_tests_oprof-driver.o `test -f 'driver.C' || echo '$(srcdir)/'`driver.C
@@ -1293,6 +1349,20 @@ quadrature/unit_tests_oprof-quadrature_test.obj: quadrature/quadrature_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_oprof-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
 
+utils/unit_tests_oprof-vectormap_test.o: utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_oprof-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Tpo -c -o utils/unit_tests_oprof-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Tpo utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_oprof-vectormap_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_oprof-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
+
+utils/unit_tests_oprof-vectormap_test.obj: utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_oprof-vectormap_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Tpo -c -o utils/unit_tests_oprof-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Tpo utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_oprof-vectormap_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_oprof-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+
 unit_tests_opt-driver.o: driver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT unit_tests_opt-driver.o -MD -MP -MF $(DEPDIR)/unit_tests_opt-driver.Tpo -c -o unit_tests_opt-driver.o `test -f 'driver.C' || echo '$(srcdir)/'`driver.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unit_tests_opt-driver.Tpo $(DEPDIR)/unit_tests_opt-driver.Po
@@ -1419,6 +1489,20 @@ quadrature/unit_tests_opt-quadrature_test.obj: quadrature/quadrature_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_opt-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
 
+utils/unit_tests_opt-vectormap_test.o: utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_opt-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Tpo -c -o utils/unit_tests_opt-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Tpo utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_opt-vectormap_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_opt-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
+
+utils/unit_tests_opt-vectormap_test.obj: utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_opt-vectormap_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Tpo -c -o utils/unit_tests_opt-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Tpo utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_opt-vectormap_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_opt-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+
 unit_tests_prof-driver.o: driver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT unit_tests_prof-driver.o -MD -MP -MF $(DEPDIR)/unit_tests_prof-driver.Tpo -c -o unit_tests_prof-driver.o `test -f 'driver.C' || echo '$(srcdir)/'`driver.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unit_tests_prof-driver.Tpo $(DEPDIR)/unit_tests_prof-driver.Po
@@ -1544,6 +1628,20 @@ quadrature/unit_tests_prof-quadrature_test.obj: quadrature/quadrature_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='quadrature/quadrature_test.C' object='quadrature/unit_tests_prof-quadrature_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_prof-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
+
+utils/unit_tests_prof-vectormap_test.o: utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_prof-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Tpo -c -o utils/unit_tests_prof-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Tpo utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_prof-vectormap_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_prof-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
+
+utils/unit_tests_prof-vectormap_test.obj: utils/vectormap_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_prof-vectormap_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Tpo -c -o utils/unit_tests_prof-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Tpo utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/vectormap_test.C' object='utils/unit_tests_prof-vectormap_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_prof-vectormap_test.obj `if test -f 'utils/vectormap_test.C'; then $(CYGPATH_W) 'utils/vectormap_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/vectormap_test.C'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1781,6 +1879,8 @@ distclean-generic:
 	-rm -f parallel/$(am__dirstamp)
 	-rm -f quadrature/$(DEPDIR)/$(am__dirstamp)
 	-rm -f quadrature/$(am__dirstamp)
+	-rm -f utils/$(DEPDIR)/$(am__dirstamp)
+	-rm -f utils/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1791,7 +1891,7 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR) geom/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) geom/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) utils/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1837,7 +1937,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR) geom/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) geom/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) utils/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

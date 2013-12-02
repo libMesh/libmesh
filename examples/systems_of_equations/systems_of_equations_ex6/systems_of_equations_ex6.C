@@ -66,6 +66,8 @@
 #define BOUNDARY_ID_MAX_Y 3
 #define BOUNDARY_ID_MIN_X 4
 #define BOUNDARY_ID_MAX_Z 5
+#define NODE_BOUNDARY_ID 10
+#define EDGE_BOUNDARY_ID 20
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -104,8 +106,8 @@ int main (int argc, char** argv)
   Mesh mesh(init.comm(), dim);
   MeshTools::Generation::build_cube (mesh,
                                      40,
-                                     8,
-                                     4,
+                                     10,
+                                     5,
                                      0., 1.*x_scaling,
                                      0., 0.3,
                                      0., 0.1,
@@ -115,6 +117,76 @@ int main (int argc, char** argv)
   // Print information about the mesh to the screen.
   mesh.print_info();
 
+  // Let's add some node and edge boundary conditions
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  for ( ; el != end_el; ++el)
+  {
+    const Elem* elem = *el;
+    
+    unsigned int side_max_x = 0, side_min_y = 0,
+                 side_max_y = 0, side_max_z = 0;
+    bool found_side_max_x = false, found_side_max_y = false,
+         found_side_min_y = false, found_side_max_z = false;
+    for(unsigned int side=0; side<elem->n_sides(); side++)
+    {
+      if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+      {
+        side_max_x = side;
+        found_side_max_x = true;
+      }
+
+      if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
+      {
+        side_min_y = side;
+        found_side_min_y = true;
+      }
+
+      if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+      {
+        side_max_y = side;
+        found_side_max_y = true;
+      }
+      
+      if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+      {
+        side_max_z = side;
+        found_side_max_z = true;
+      }
+    }
+    
+    // If elem has sides on boundaries
+    // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
+    // then let's set a node boundary condition
+    if(found_side_max_x && found_side_max_y && found_side_max_z)
+    {
+      for(unsigned int n=0; n<elem->n_nodes(); n++)
+      {
+        if (elem->is_node_on_side(n, side_max_x) &&
+            elem->is_node_on_side(n, side_max_y) &&
+            elem->is_node_on_side(n, side_max_z) )
+        {
+          mesh.boundary_info->add_node(elem->get_node(n), NODE_BOUNDARY_ID);
+        }
+      }
+    }
+    
+    
+    // If elem has sides on boundaries
+    // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Y
+    // then let's set an edge boundary condition
+    if(found_side_max_x && found_side_min_y)
+    {
+      for(unsigned int e=0; e<elem->n_edges(); e++)
+      {
+        if (elem->is_edge_on_side(e, side_max_x) &&
+            elem->is_edge_on_side(e, side_min_y) )
+        {
+          mesh.boundary_info->add_edge(elem, e, EDGE_BOUNDARY_ID);
+        }
+      }
+    }
+  }
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
@@ -134,6 +206,8 @@ int main (int argc, char** argv)
 
   std::set<boundary_id_type> boundary_ids;
   boundary_ids.insert(BOUNDARY_ID_MIN_X);
+  boundary_ids.insert(NODE_BOUNDARY_ID);
+  boundary_ids.insert(EDGE_BOUNDARY_ID);
 
   // Create a vector storing the variable numbers which the BC applies to
   std::vector<unsigned int> variables;
@@ -216,6 +290,7 @@ void assemble_elasticity(EquationSystems& es,
   fe_face->attach_quadrature_rule (&qface);
 
   const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<std::vector<Real> >& phi = fe->get_phi();
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
   DenseMatrix<Number> Ke;
@@ -392,6 +467,12 @@ void assemble_elasticity(EquationSystems& es,
                   Kww(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
                 }
             }
+            
+          // Volumetric load
+          for (unsigned int i=0; i<n_w_dofs; i++)
+          {
+            Fw(i) -= JxW[qp] * phi[i][qp];
+          }
       }
 
       {

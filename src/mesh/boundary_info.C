@@ -57,6 +57,7 @@ BoundaryInfo& BoundaryInfo::operator=(const BoundaryInfo& other_boundary_info)
    * _or_ was constructed in exactly the same way (or constructed as a copy).
    */
 
+  // Copy node boundary info
   {
     std::multimap<const Node*, boundary_id_type>::const_iterator it = other_boundary_info._boundary_node_id.begin();
     const std::multimap<const Node*, boundary_id_type>::const_iterator end = other_boundary_info._boundary_node_id.end();
@@ -70,7 +71,23 @@ BoundaryInfo& BoundaryInfo::operator=(const BoundaryInfo& other_boundary_info)
     }
   }
 
+  // Copy edge boundary info
+  {
+    std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
+      const_iterator it = other_boundary_info._boundary_edge_id.begin();
+    const std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
+      const_iterator end = other_boundary_info._boundary_edge_id.end();
 
+    for(; it != end; ++it)
+    {
+      const Elem * other_elem = it->first;
+      _boundary_edge_id.insert
+        (std::pair<const Elem*, std::pair<unsigned short int, boundary_id_type> >
+          (_mesh.elem(other_elem->id()), it->second) );
+    }
+  }
+
+  // Copy side boundary info
   {
     std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
       const_iterator it = other_boundary_info._boundary_side_id.begin();
@@ -588,6 +605,111 @@ void BoundaryInfo::clear_boundary_node_ids()
   _boundary_node_id.clear();
 }
 
+void BoundaryInfo::add_edge(const dof_id_type e,
+			    const unsigned short int edge,
+			    const boundary_id_type id)
+{
+  this->add_edge (_mesh.elem(e), edge, id);
+}
+
+
+
+void BoundaryInfo::add_edge(const Elem* elem,
+			    const unsigned short int edge,
+			    const boundary_id_type id)
+{
+  libmesh_assert(elem);
+
+  // Only add BCs for level-0 elements.
+  libmesh_assert_equal_to (elem->level(), 0);
+
+  if (id == invalid_id)
+    {
+      libMesh::err << "ERROR: You may not set a boundary ID of "
+		    << invalid_id << std::endl
+		    << " That is reserved for internal use.\n"
+		    << std::endl;
+
+      libmesh_error();
+    }
+
+  // A convenient typedef
+  typedef std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
+    const_iterator Iter;
+
+  // Don't add the same ID twice
+  std::pair<Iter, Iter> pos = _boundary_edge_id.equal_range(elem);
+
+  for (;pos.first != pos.second; ++pos.first)
+    if (pos.first->second.first == edge &&
+        pos.first->second.second == id)
+      return;
+
+  std::pair<unsigned short int, boundary_id_type> p(edge,id);
+  std::pair<const Elem*, std::pair<unsigned short int, boundary_id_type> >
+    kv (elem, p);
+
+  _boundary_edge_id.insert(kv);
+  _boundary_ids.insert(id);
+  _edge_boundary_ids.insert(id); // Also add this ID to the set of edge boundary IDs
+}
+
+
+
+void BoundaryInfo::add_edge(const Elem* elem,
+			    const unsigned short int edge,
+			    const std::vector<boundary_id_type>& ids)
+{
+  if (ids.empty())
+    return;
+
+  libmesh_assert(elem);
+
+  // Only add BCs for level-0 elements.
+  libmesh_assert_equal_to (elem->level(), 0);
+
+  // A convenient typedef
+  typedef std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
+    const_iterator Iter;
+
+  // Don't add the same ID twice
+  std::pair<Iter, Iter> pos = _boundary_edge_id.equal_range(elem);
+
+  for (unsigned int i=0; i!= ids.size(); ++i)
+    {
+      boundary_id_type id=ids[i];
+
+      if (id == invalid_id)
+        {
+          libMesh::err << "ERROR: You may not set a boundary ID of "
+		        << invalid_id << std::endl
+		        << " That is reserved for internal use.\n"
+		        << std::endl;
+
+          libmesh_error();
+        }
+
+      bool already_inserted = false;
+      for (Iter p = pos.first;p != pos.second; ++p)
+        if (p->second.first == edge &&
+            p->second.second == id)
+          {
+            already_inserted = true;
+            break;
+          }
+      if (already_inserted)
+        continue;
+
+      std::pair<unsigned short int, boundary_id_type> p(edge,id);
+      std::pair<const Elem*, std::pair<unsigned short int, boundary_id_type> >
+        kv (elem, p);
+
+      _boundary_edge_id.insert(kv);
+      _boundary_ids.insert(id);
+      _edge_boundary_ids.insert(id); // Also add this ID to the set of edge boundary IDs
+    }
+}
+
 void BoundaryInfo::add_side(const dof_id_type e,
 			    const unsigned short int side,
 			    const boundary_id_type id)
@@ -742,6 +864,170 @@ unsigned int BoundaryInfo::n_boundary_ids(const Node* node) const
 
 
 
+std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const elem,
+                                                               const unsigned short int edge) const
+{
+  libmesh_assert(elem);
+
+  std::vector<boundary_id_type> ids;
+
+  // Only level-0 elements store BCs.  If this is not a level-0
+  // element get its level-0 parent and infer the BCs.
+  const Elem* searched_elem = elem;
+  if (elem->level() != 0)
+  {
+    // Find all the sides that contain edge. If one of those is a boundary
+    // side, then this must be a boundary edge. In that case, we just use the
+    // top-level parent.
+    bool found_boundary_edge = false;
+    for(unsigned int side=0; side<elem->n_sides(); side++)
+    {
+      if(elem->is_edge_on_side(edge,side))
+      {
+        if (elem->neighbor(side) == NULL)
+        {
+          searched_elem = elem->top_parent ();
+          found_boundary_edge = true;
+          break;
+        }
+      }
+    }
+  
+#ifdef LIBMESH_ENABLE_AMR
+    if(!found_boundary_edge)
+    {
+      // Child element is not on external edge, but it may have internal
+      // "boundary" IDs.  We will walk up the tree, at each level checking that
+      // the current child is actually on the same edge of the parent that is
+      // currently being searched for (i.e. that was passed in as "edge").
+      while (searched_elem->parent() != NULL)
+      {
+        const Elem * parent = searched_elem->parent();
+        if (parent->is_child_on_edge(parent->which_child_am_i(searched_elem), edge) == false)
+          return ids;
+        searched_elem = parent;
+      }
+    }
+#endif
+  }
+
+  std::pair<std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+    e = _boundary_edge_id.equal_range(searched_elem);
+
+  // elem not in the data structure
+  if (e.first == e.second)
+    return ids;
+
+  // elem is there, maybe multiple occurrences
+  for (; e.first != e.second; ++e.first)
+    // if this is true we found the requested edge of the element
+    if (e.first->second.first == edge)
+      ids.push_back(e.first->second.second);
+
+  // Whether or not we found anything, return "ids".  If it's empty, it
+  // means no valid bounary IDs were found for "edge"
+  return ids;
+}
+
+
+
+unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem* const elem,
+                                                const unsigned short int edge) const
+{
+  libmesh_assert(elem);
+  
+  // Only level-0 elements store BCs.  If this is not a level-0
+  // element get its level-0 parent and infer the BCs.
+  const Elem* searched_elem = elem;
+  if (elem->level() != 0)
+  {
+    // Find all the sides that contain edge. If one of those is a boundary
+    // side, then this must be a boundary edge. In that case, we just use the
+    // top-level parent.
+    bool found_boundary_edge = false;
+    for(unsigned int side=0; side<elem->n_sides(); side++)
+    {
+      if(elem->is_edge_on_side(edge,side))
+      {
+        if (elem->neighbor(side) == NULL)
+        {
+          searched_elem = elem->top_parent ();
+          found_boundary_edge = true;
+          break;
+        }
+      }
+    }
+  
+#ifdef LIBMESH_ENABLE_AMR
+    if(!found_boundary_edge)
+    {
+      // Child element is not on external edge, but it may have internal
+      // "boundary" IDs.  We will walk up the tree, at each level checking that
+      // the current child is actually on the same edge of the parent that is
+      // currently being searched for (i.e. that was passed in as "edge").
+      while (searched_elem->parent() != NULL)
+      {
+        const Elem * parent = searched_elem->parent();
+        if (parent->is_child_on_edge(parent->which_child_am_i(searched_elem), edge) == false)
+          return 0;
+        searched_elem = parent;
+      }
+    }
+#endif
+  }
+
+  std::pair<std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+    e = _boundary_edge_id.equal_range(searched_elem);
+
+  unsigned int n_ids = 0;
+
+  // elem is there, maybe multiple occurrences
+  for (; e.first != e.second; ++e.first)
+    // if this is true we found the requested edge of the element
+    if (e.first->second.first == edge)
+      n_ids++;
+
+  return n_ids;
+}
+
+
+
+std::vector<boundary_id_type> BoundaryInfo::raw_edge_boundary_ids (const Elem* const elem,
+                                                                   const unsigned short int edge) const
+{
+  libmesh_assert(elem);
+
+  std::vector<boundary_id_type> ids;
+
+  // Only level-0 elements store BCs.
+  if (elem->parent())
+    return ids;
+
+  std::pair<std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+    e = _boundary_edge_id.equal_range(elem);
+
+  // Check any occurrences
+  for (; e.first != e.second; ++e.first)
+    // if this is true we found the requested edge of the element
+    if (e.first->second.first == edge)
+      ids.push_back(e.first->second.second);
+
+  // if nothing got pushed back, we didn't find elem in the data
+  // structure with the requested edge, so return the default empty
+  // vector
+  return ids;
+}
+
+
 boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
 				           const unsigned short int side) const
 {
@@ -789,7 +1075,7 @@ boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
   if (e.first == e.second)
     return invalid_id;
 
-  // elem is there, maybe multiple occurances
+  // elem is there, maybe multiple occurrences
   for (; e.first != e.second; ++e.first)
       // if this is true we found the requested side
       // of the element and want to return the id
@@ -834,7 +1120,7 @@ bool BoundaryInfo::has_boundary_id(const Elem* const elem,
                           std::pair<unsigned short int, boundary_id_type> >::const_iterator >
     e = _boundary_side_id.equal_range(searched_elem);
 
-  // elem is there, maybe multiple occurances
+  // elem is there, maybe multiple occurrences
   for (; e.first != e.second; ++e.first)
     // if this is true we found the requested id on this side of the element
     if (e.first->second.first == side &&
@@ -882,7 +1168,7 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem* const elem
   if (e.first == e.second)
     return ids;
 
-  // elem is there, maybe multiple occurances
+  // elem is there, maybe multiple occurrences
   for (; e.first != e.second; ++e.first)
     // if this is true we found the requested side of the element
     if (e.first->second.first == side)
@@ -927,7 +1213,7 @@ unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
 
   unsigned int n_ids = 0;
 
-  // elem is there, maybe multiple occurances
+  // elem is there, maybe multiple occurrences
   for (; e.first != e.second; ++e.first)
     // if this is true we found the requested side of the element
     if (e.first->second.first == side)
@@ -955,7 +1241,7 @@ std::vector<boundary_id_type> BoundaryInfo::raw_boundary_ids (const Elem* const 
                           std::pair<unsigned short int, boundary_id_type> >::const_iterator >
     e = _boundary_side_id.equal_range(elem);
 
-  // Check any occurances
+  // Check any occurrences
   for (; e.first != e.second; ++e.first)
     // if this is true we found the requested side of the element
     if (e.first->second.first == side)
@@ -968,6 +1254,69 @@ std::vector<boundary_id_type> BoundaryInfo::raw_boundary_ids (const Elem* const 
 }
 
 
+void BoundaryInfo::remove_edge (const Elem* elem,
+                                const unsigned short int edge)
+{
+  libmesh_assert(elem);
+
+  // The user shouldn't be trying to remove only one child's boundary
+  // id
+  libmesh_assert_equal_to (elem->level(), 0);
+
+  std::pair<std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::iterator >
+    e = _boundary_edge_id.equal_range(elem);
+
+  // elem may be there, maybe multiple occurrences
+  while (e.first != e.second)
+    {
+      // if this is true we found the requested edge
+      // of the element and want to erase the id
+      if (e.first->second.first == edge)
+	{
+	  // (postfix++ - increment the iterator before it's invalid)
+          _boundary_edge_id.erase(e.first++);
+        }
+      else
+        ++e.first;
+    }
+}
+
+
+
+void BoundaryInfo::remove_edge (const Elem* elem,
+                                const unsigned short int edge,
+                                const boundary_id_type id)
+{
+  libmesh_assert(elem);
+
+  // The user shouldn't be trying to remove only one child's boundary
+  // id
+  libmesh_assert_equal_to (elem->level(), 0);
+
+  std::pair<std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::iterator >
+    e = _boundary_edge_id.equal_range(elem);
+
+  // elem may be there, maybe multiple occurrences
+  while (e.first != e.second)
+    {
+      // if this is true we found the requested edge
+      // of the element and want to erase the requested id
+      if (e.first->second.first == edge &&
+          e.first->second.second == id)
+	{
+	  // (postfix++ - increment the iterator before it's invalid)
+          _boundary_edge_id.erase(e.first++);
+        }
+      else
+        ++e.first;
+    }
+}
 
 void BoundaryInfo::remove_side (const Elem* elem,
                                 const unsigned short int side)
@@ -984,7 +1333,7 @@ void BoundaryInfo::remove_side (const Elem* elem,
                           std::pair<unsigned short int, boundary_id_type> >::iterator >
     e = _boundary_side_id.equal_range(elem);
 
-  // elem may be there, maybe multiple occurances
+  // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
     {
       // if this is true we found the requested side
@@ -1017,7 +1366,7 @@ void BoundaryInfo::remove_side (const Elem* elem,
                           std::pair<unsigned short int, boundary_id_type> >::iterator >
     e = _boundary_side_id.equal_range(elem);
 
-  // elem may be there, maybe multiple occurances
+  // elem may be there, maybe multiple occurrences
   while (e.first != e.second)
     {
       // if this is true we found the requested side
@@ -1048,7 +1397,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
                           std::pair<unsigned short int, boundary_id_type> >::const_iterator >
     e = _boundary_side_id.equal_range(searched_elem);
 
-  // elem may have zero or multiple occurances
+  // elem may have zero or multiple occurrences
   for (; e.first != e.second; ++e.first)
     {
       // if this is true we found the requested boundary_id
@@ -1142,6 +1491,55 @@ std::size_t BoundaryInfo::n_boundary_conds () const
   this->comm().sum (nbcs);
 
   return nbcs;
+}
+
+std::size_t BoundaryInfo::n_edge_conds () const
+{
+  // in serial we know the number of nodesets from the
+  // size of the container
+  if (_mesh.is_serial())
+    return _boundary_edge_id.size();
+
+  // in parallel we need to sum the number of local nodesets
+  parallel_object_only();
+
+  std::size_t n_edge_bcs=0;
+
+  std::multimap<const Elem*,
+                std::pair<unsigned short int,
+                          boundary_id_type> >::const_iterator pos;
+
+  for (pos=_boundary_edge_id.begin(); pos != _boundary_edge_id.end(); ++pos)
+    if (pos->first->processor_id() == this->processor_id())
+      n_edge_bcs++;
+
+  this->comm().sum (n_edge_bcs);
+
+  return n_edge_bcs;
+}
+
+
+std::size_t BoundaryInfo::n_nodeset_conds () const
+{
+  // in serial we know the number of nodesets from the
+  // size of the container
+  if (_mesh.is_serial())
+    return _boundary_node_id.size();
+
+  // in parallel we need to sum the number of local nodesets
+  parallel_object_only();
+
+  std::size_t n_nodesets=0;
+
+  std::multimap<const Node*, boundary_id_type>::const_iterator pos;
+
+  for (pos=_boundary_node_id.begin(); pos != _boundary_node_id.end(); ++pos)
+    if (pos->first->processor_id() == this->processor_id())
+      n_nodesets++;
+
+  this->comm().sum (n_nodesets);
+
+  return n_nodesets;
 }
 
 
@@ -1311,7 +1709,31 @@ void BoundaryInfo::print_info(std::ostream& out_stream) const
 	    << ")"  << std::endl;
     }
 
-  // Print out the element BCs
+  // Print out the element edge BCs
+  if (!_boundary_edge_id.empty())
+    {
+      out_stream << std::endl
+	  << "Edge Boundary conditions:" << std::endl
+	  << "-------------------------" << std::endl
+	  << "  (Elem No., Edge No., ID)      " << std::endl;
+
+//       std::for_each(_boundary_edge_id.begin(),
+//		    _boundary_edge_id.end(),
+//		    PrintSideInfo());
+
+      std::multimap<const Elem*,
+	std::pair<unsigned short int, boundary_id_type> >::const_iterator it = _boundary_edge_id.begin();
+      const std::multimap<const Elem*,
+	std::pair<unsigned short int, boundary_id_type> >::const_iterator end = _boundary_edge_id.end();
+
+      for (; it != end; ++it)
+        out_stream << "  (" << (*it).first->id()
+	    << ", "  << (*it).second.first
+	    << ", "  << (*it).second.second
+	    << ")"   << std::endl;
+    }
+
+  // Print out the element side BCs
   if (!_boundary_side_id.empty())
     {
       out_stream << std::endl
@@ -1364,7 +1786,34 @@ void BoundaryInfo::print_summary(std::ostream& out_stream) const
 	    << ")"  << std::endl;
     }
 
-  // Print out the element BCs
+  // Print out the element edge BCs
+  if (!_boundary_edge_id.empty())
+    {
+      out_stream << std::endl
+	  << "Edge Boundary conditions:" << std::endl
+	  << "-------------------------" << std::endl
+	  << "  (ID, number of edges)   " << std::endl;
+
+      std::map<boundary_id_type, std::size_t> ID_counts;
+
+      std::multimap<const Elem*,
+	std::pair<unsigned short int, boundary_id_type> >::const_iterator it = _boundary_edge_id.begin();
+      const std::multimap<const Elem*,
+	std::pair<unsigned short int, boundary_id_type> >::const_iterator end = _boundary_edge_id.end();
+
+      for (; it != end; ++it)
+        ID_counts[(*it).second.second]++;
+
+      std::map<boundary_id_type, std::size_t>::const_iterator ID_it        = ID_counts.begin();
+      const std::map<boundary_id_type, std::size_t>::const_iterator ID_end = ID_counts.end();
+
+      for (; ID_it != ID_end; ++ID_it)
+	out_stream << "  (" << (*ID_it).first
+	    << ", "  << (*ID_it).second
+	    << ")"  << std::endl;
+    }
+
+  // Print out the element side BCs
   if (!_boundary_side_id.empty())
     {
       out_stream << std::endl

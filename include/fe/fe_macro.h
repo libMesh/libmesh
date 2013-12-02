@@ -33,7 +33,9 @@
   template Point FE<_dim,_type>::map_xi(const Elem*,const Point&);\
   template Point FE<_dim,_type>::map_eta(const Elem*,const Point&);\
   template Point FE<_dim,_type>::map_zeta(const Elem*,const Point&); \
-  template void  FE<_dim,_type>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool)
+  template void  FE<_dim,_type>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool); \
+  template Point FE<_dim,_type>::inverse_map(const Elem*,const Point&,Real,bool)
+
 
 #ifndef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 

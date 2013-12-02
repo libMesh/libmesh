@@ -82,29 +82,17 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 InfFE<Dim,T_radial,T_map>::~InfFE ()
 {
   // delete pointers, if necessary
-  if (base_qrule != NULL)
-    {
-      delete base_qrule;
-      base_qrule = NULL;
-    }
+  delete base_qrule;
+  base_qrule = NULL;
 
-  if (radial_qrule != NULL)
-    {
-      delete radial_qrule;
-      radial_qrule = NULL;
-    }
+  delete radial_qrule;
+  radial_qrule = NULL;
 
-  if (base_elem != NULL)
-    {
-      delete base_elem;
-      base_elem = NULL;
-    }
+  delete base_elem;
+  base_elem = NULL;
 
-  if (base_fe != NULL)
-    {
-      delete base_fe;
-      base_fe = NULL;
-    }
+  delete base_fe;
+  base_fe = NULL;
 }
 
 

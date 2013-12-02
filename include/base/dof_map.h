@@ -93,9 +93,33 @@ typedef std::map<dof_id_type, Real,
  * a pointer-to-std::map; the destructor isn't virtual!
  */
 class DofConstraints : public std::map<dof_id_type,
-                                       std::pair<DofConstraintRow,Number>,
+                                       DofConstraintRow,
                                        std::less<dof_id_type>,
-                                       Threads::scalable_allocator<std::pair<const dof_id_type, std::pair<DofConstraintRow,Number> > > >
+                                       Threads::scalable_allocator<std::pair<const dof_id_type, Number> > >
+{
+};
+
+/**
+ * Storage for DofConstraint right hand sides for a particular
+ * problem.  Each dof id with a non-zero constraint offset
+ * stores it in such a structure.
+ */
+class DofConstraintValueMap : 
+  public std::map<dof_id_type, Number,
+                  std::less<dof_id_type>,
+                  Threads::scalable_allocator<std::pair<const dof_id_type, Number> > >
+{
+};
+
+/**
+ * Storage for DofConstraint right hand sides for all adjoint
+ * problems.
+ */
+class AdjointDofConstraintValues : 
+  public std::map<unsigned int, DofConstraintValueMap,
+                  std::less<unsigned int>,
+                  Threads::scalable_allocator
+	            <std::pair<const unsigned int, DofConstraintValueMap> > >
 {
 };
 
@@ -591,6 +615,22 @@ public:
                            const bool forbid_constraint_overwrite);
 
   /**
+   * Adds a copy of the user-defined row to the constraint matrix,
+   * using an inhomogeneous right-hand-side for the adjoint constraint
+   * equation.
+   *
+   * \p forbid_constraint_overwrite here only tests for overwriting
+   * the rhs.  This method should only be used when an equivalent
+   * constraint (with a potentially different rhs) already exists for
+   * the primal problem.
+   */
+  void add_adjoint_constraint_row (const unsigned int qoi_index,
+                                   const dof_id_type dof_number,
+                                   const DofConstraintRow& constraint_row,
+                                   const Number constraint_rhs,
+                                   const bool forbid_constraint_overwrite);
+
+  /**
    * Adds a copy of the user-defined row to the constraint matrix, using
    * a homogeneous right-hand-side for the constraint equation.
    * By default, produces an error if the DOF was already constrained.
@@ -631,6 +671,13 @@ public:
    * false otherwise.
    */
   bool is_constrained_dof (const dof_id_type dof) const;
+
+  /**
+   * @returns true if the degree of freedom \p dof has a heterogenous
+   * constraint for adjoint solution \p qoi_num, false otherwise.
+   */
+  bool has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
+                                            const dof_id_type dof) const;
 
   /**
    * @returns true if the Node is constrained,
@@ -722,6 +769,7 @@ public:
 					    DenseVector<Number>& rhs,
 					    std::vector<dof_id_type>& elem_dofs,
 					    bool asymmetric_constraint_rows = true) const;
+
   /**
    * Constrains the element matrix and vector.  This method requires
    * the element matrix to be square, in which case the elem_dofs
@@ -739,11 +787,46 @@ public:
    * solved without offset values taken into account, as would be
    * appropriate for finding linearized updates to a solution in which
    * heterogenous constraints are already satisfied.
+   *
+   * By default, the constraints for the primal solution of this
+   * system are used.  If a non-negative \p qoi_index is passed in,
+   * then the constraints for the corresponding adjoint solution are
+   * used instead.
    */
   void heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
                                                            DenseVector<Number>& rhs,
                                                            std::vector<dof_id_type>& elem_dofs,
-                                                           bool asymmetric_constraint_rows = true) const;
+                                                           bool asymmetric_constraint_rows = true,
+                                                           int qoi_index = -1) const;
+
+  /**
+   * Constrains the element vector.  This method requires
+   * the element matrix to be square and not-yet-constrained, in which
+   * case the elem_dofs correspond to the global DOF indices of both
+   * the rows and columns of the element matrix.
+   *
+   * The heterogenous version of this method creates linear systems in
+   * which heterogenously constrained degrees of freedom will solve to
+   * their correct offset values, as would be appropriate for finding
+   * a solution to a linear problem in a single algebraic solve.  The
+   * non-heterogenous version of this method creates linear systems in
+   * which even heterogenously constrained degrees of freedom are
+   * solved without offset values taken into account, as would be
+   * appropriate for finding linearized updates to a solution in which
+   * heterogenous constraints are already satisfied.
+   *
+   * By default, the constraints for the primal solution of this
+   * system are used.  If a non-negative \p qoi_index is passed in,
+   * then the constraints for the corresponding adjoint solution are
+   * used instead.
+   */
+  void heterogenously_constrain_element_vector (const DenseMatrix<Number>& matrix,
+                                                DenseVector<Number>& rhs,
+                                                std::vector<dof_id_type>& elem_dofs,
+                                                bool asymmetric_constraint_rows = true,
+                                                int qoi_index = -1) const;
+
+
 
   /**
    * Constrains a dyadic element matrix B = v w'.  This method
@@ -782,6 +865,16 @@ public:
   void enforce_constraints_exactly (const System &system,
 				    NumericVector<Number> *v = NULL,
                                     bool homogeneous = false) const;
+
+  /**
+   * Heterogenously constrains the numeric vector \p v, which
+   * represents an adjoint solution defined on the mesh for quantity
+   * fo interest \p q.  For homogeneous constraints, use \p
+   * enforce_constraints_exactly instead
+   */
+  void enforce_adjoint_constraints_exactly (NumericVector<Number> &v,
+                                            unsigned int q) const;
+
 
 
 #ifdef LIBMESH_ENABLE_PERIODIC
@@ -827,14 +920,42 @@ public:
   void add_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary);
 
   /**
+   * Adds a copy of the specified Dirichlet boundary to the system,
+   * corresponding to the adjoint problem defined by Quantity of
+   * Interest \p q.
+   */
+  void add_adjoint_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary, 
+				       unsigned int q);
+
+  /**
    * Removes the specified Dirichlet boundary from the system.
    */
   void remove_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary);
+
+  /**
+   * Removes from the system the specified Dirichlet boundary for the
+   * adjoint equation defined by Quantity of interest index q
+   */
+  void remove_adjoint_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary,
+					  unsigned int q);
+
+  const DirichletBoundaries * get_dirichlet_boundaries() const
+    {
+      return _dirichlet_boundaries;
+    }
 
   DirichletBoundaries * get_dirichlet_boundaries()
     {
       return _dirichlet_boundaries;
     }
+
+  bool has_adjoint_dirichlet_boundaries(unsigned int q) const;
+
+  const DirichletBoundaries * 
+  get_adjoint_dirichlet_boundaries(unsigned int q) const;
+
+  DirichletBoundaries *
+  get_adjoint_dirichlet_boundaries(unsigned int q);
 
 #endif // LIBMESH_ENABLE_DIRICHLET
 
@@ -1015,10 +1136,16 @@ private:
    * terms of other, local degrees of freedom.  The usual case is for
    * an elements DOFs to be constrained by some other, external DOFs
    * and/or Dirichlet conditions.
+   *
+   * The forcing vector will depend on which solution's heterogenous
+   * constraints are being applied.  For the default \p qoi_index this
+   * will be the primal solutoin; for \p qoi_index >= 0 the
+   * corresponding adjoint solution's constraints will be used.
    */
   void build_constraint_matrix_and_vector (DenseMatrix<Number>& C,
                                            DenseVector<Number>& H,
                                            std::vector<dof_id_type>& elem_dofs,
+                                           int qoi_index = -1,
                                            const bool called_recursively=false) const;
 
   /**
@@ -1173,7 +1300,11 @@ private:
    * Data structure containing DOF constraints.  The ith
    * entry is the constraint matrix row for DOF i.
    */
-  DofConstraints _dof_constraints;
+  DofConstraints             _dof_constraints;
+
+  DofConstraintValueMap      _primal_constraint_values;
+
+  AdjointDofConstraintValues _adjoint_constraint_values;
 #endif
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -1198,6 +1329,12 @@ private:
    * entry is the constraint matrix row for boundaryid i.
    */
   DirichletBoundaries *_dirichlet_boundaries;
+
+  /**
+   * Data structure containing Dirichlet functions.  The ith
+   * entry is the constraint matrix row for boundaryid i.
+   */
+  std::vector<DirichletBoundaries *> _adjoint_dirichlet_boundaries;
 #endif
 
   friend class SparsityPattern::Build;
@@ -1300,6 +1437,20 @@ bool DofMap::is_constrained_dof (const dof_id_type dof) const
   return false;
 }
 
+inline
+bool DofMap::has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
+                                                  const dof_id_type dof) const
+{
+  AdjointDofConstraintValues::const_iterator it =
+    _adjoint_constraint_values.find(qoi_num);
+  if (it != _adjoint_constraint_values.end() &&
+      it->second.count(dof))
+    return true;
+
+  return false;
+}
+
+
 #else
 
   //--------------------------------------------------------------------
@@ -1333,6 +1484,9 @@ inline void DofMap::constrain_element_dyad_matrix (DenseVector<Number>&,
 inline void DofMap::enforce_constraints_exactly (const System &,
 				                 NumericVector<Number> *,
                                                  bool = false) const {}
+
+inline void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> *,
+                                                         unsigned int) const {}
 
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 

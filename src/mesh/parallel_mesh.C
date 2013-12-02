@@ -612,28 +612,9 @@ Node* ParallelMesh::add_node (Node *n)
 
 
 
-Node* ParallelMesh::insert_node (Node* n)
+Node* ParallelMesh::insert_node(Node* n)
 {
-  // If we already have this node we cannot
-  // simply delete it, because we may have elements
-  // which are attached to its address.
-  //
-  // Instead, call the Node = Point assignment operator
-  // to overwrite the spatial coordinates (but keep its
-  // address), delete the provided node, and return the
-  // address of the one we already had.
-  if (_nodes.count(n->id()))
-    {
-      Node *my_n = _nodes[n->id()];
-
-      *my_n = static_cast<Point>(*n);
-      delete n;
-      n = my_n;
-    }
-  else
-    _nodes[n->id()] = n;
-
-  return n;
+  return ParallelMesh::add_node(n);
 }
 
 
@@ -951,7 +932,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
         // It's possible to have an invalid id for dofs not owned by this process.
         // We'll assert that they match on the receiving end.
-        requested_unique_ids[obj->processor_id()].push_back(obj->set_unique_id());
+        requested_unique_ids[obj->processor_id()].push_back(obj->valid_unique_id() ? obj-> unique_id() : DofObject::invalid_unique_id);
 #endif
       }
     }
@@ -987,7 +968,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
               libmesh_assert_equal_to (obj->processor_id(), this->processor_id());
               new_ids[i] = obj->id();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              new_unique_ids[i] = obj->set_unique_id();
+              new_unique_ids[i] = obj->valid_unique_id() ? obj->unique_id() : DofObject::invalid_unique_id;
 #endif
 
               libmesh_assert_greater_equal (new_ids[i],
@@ -1022,8 +1003,8 @@ dof_id_type ParallelMesh::renumber_dof_objects
               obj->set_id(filled_request[i]);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-              libmesh_assert(!obj->valid_unique_id() || obj->unique_id() == unique_filled_request[i]);
-              obj->set_unique_id() = unique_filled_request[i];
+              if (!obj->valid_unique_id() && unique_filled_request[i] != DofObject::invalid_unique_id)
+                obj->set_unique_id() = unique_filled_request[i];
 #endif
             }
         }

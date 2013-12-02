@@ -20,6 +20,7 @@
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>    // for sqrt
 #include <set>
+#include <sstream> // for ostringstream
 
 // Local Includes
 #include "libmesh/dof_map.h"
@@ -126,6 +127,29 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
       system.update();
     }
 
+  // Loop over all the adjoint problems and, if any have heterogenous
+  // Dirichlet conditions, get the corresponding coarse lift
+  // function(s)
+  for (unsigned int j=0; j != system.qoi.size(); j++)
+    {
+      // Skip this QoI if it is not in the QoI Set or if there are no
+      // heterogeneous Dirichlet boundaries for it
+      if (_qoi_set.has_index(j) &&
+          system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+	{
+          std::ostringstream liftfunc_name;
+          liftfunc_name << "adjoint_lift_function" << j;
+          NumericVector<Number> &liftvec =
+            system.add_vector(liftfunc_name.str());
+
+          system.get_dof_map().enforce_constraints_exactly
+            (system, &liftvec, true);
+        }
+    }
+
+
+
+
 #ifndef NDEBUG
   // n_coarse_elem is only used in an assertion later so
   // avoid declaring it unless asserts are active.
@@ -164,8 +188,8 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem&>(system)).get_vector("RHS Vector");
   projected_residual.close();
 
-  // Solve the adjoint problem on the refined FE space
-  system.adjoint_solve();
+  // Solve the adjoint problem(s) on the refined FE space
+  system.adjoint_solve(_qoi_set);
 
   // Now that we have the refined adjoint solution and the projected primal solution,
   // we first compute the global QoI error estimate
@@ -174,10 +198,30 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   computed_global_QoI_errors.resize(system.qoi.size());
 
   // Loop over all the adjoint solutions and get the QoI error
-  // contributions from all of them
+  // contributions from all of them.  While we're looping anyway we'll
+  // handle heterogenous adjoint BCs
   for (unsigned int j=0; j != system.qoi.size(); j++)
     {
-      computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));
+      // Skip this QoI if not in the QoI Set
+      if (_qoi_set.has_index(j))
+	{
+          // If the adjoint solution has heterogeneous dirichlet
+          // values, then to get a proper error estimate here we need
+          // to subtract off a coarse grid lift function.  We won't
+          // need the lift function afterward.  We won't even need the
+          // fine adjoint solution afterward, so we'll modify it here.
+          if (system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+            {
+              std::ostringstream liftfunc_name;
+              liftfunc_name << "adjoint_lift_function" << j;
+              system.get_adjoint_solution(j) -=
+                system.get_vector(liftfunc_name.str());
+
+              system.remove_vector(liftfunc_name.str());
+            }
+
+          computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));
+        }
     }
 
   // Done with the global error estimates, now construct the element wise error indicators
