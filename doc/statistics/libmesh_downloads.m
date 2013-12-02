@@ -15,6 +15,7 @@ hold on
 
 % Month, number of d/l, and number of MB served
 cell_data = {
+{'Nov', '2013',  	166, 0.0} % All downloadable files removed November 12th
 {'Oct', '2013',  	336, 0.0}
 {'Sep', '2013',  	179, 0.0}
 {'Aug', '2013',  	162, 0.0}
