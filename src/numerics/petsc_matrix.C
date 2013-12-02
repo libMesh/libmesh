@@ -45,6 +45,8 @@
 
 
 
+#ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
+
 namespace
 {
   using namespace libMesh;
@@ -72,6 +74,8 @@ namespace
       }
   }
 }
+
+#endif
 
 
 
