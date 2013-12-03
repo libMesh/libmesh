@@ -707,6 +707,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 
 	    // linear pyramid shape functions
 	  case PYRAMID5:
+          case PYRAMID14:
 	    {
 	      libmesh_assert_less (i, 5);
 
@@ -1435,6 +1436,234 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 			  FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, p1d));
 		}
 	    }
+
+            // Quadratic shape functions, as defined in R. Graglia, "Higher order
+            // bases on pyramidal elements", IEEE Trans Antennas and Propagation,
+            // vol 47, no 5, May 1999.
+          case PYRAMID14:
+	    {
+	      libmesh_assert_less (i, 14);
+
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
+	      const Real eps  = 1.e-35;
+
+              // The "normalized coordinates" defined by Graglia.  These are
+              // the planes which define the faces of the pyramid.
+              Real
+                p1 = 0.5*(1. - eta - zeta), // back
+                p2 = 0.5*(1. + xi  - zeta), // left
+                p3 = 0.5*(1. + eta - zeta), // front
+                p4 = 0.5*(1. - xi  - zeta); // right
+
+              // Denominators are perturbed by epsilon to avoid
+              // divide-by-zero issues.
+              Real
+                den = (-1. + zeta + eps),
+                den2 = den*den,
+                den3 = den2*den;
+
+	      switch (j)
+		{
+		  // d/dxi
+		case 0:
+		  switch(i)
+		    {
+		    case 0:
+		      return 0.5*p1*(-xi*eta + zeta - zeta*zeta + 2.*p4*eta)/den2;
+
+		    case 1:
+		      return -0.5*p1*(xi*eta + zeta - zeta*zeta + 2.*p2*eta)/den2;
+
+		    case 2:
+		      return 0.5*p3*(xi*eta - zeta + zeta*zeta + 2.*p2*eta)/den2;
+
+		    case 3:
+		      return -0.5*p3*(-xi*eta - zeta + zeta*zeta + 2.*p4*eta)/den2;
+
+		    case 4:
+		      return 0.;
+
+		    case 5:
+		      return 2.*p1*eta*xi/den2;
+
+		    case 6:
+		      return 2.*p1*p3*(xi + 2.*p2)/den2;
+
+		    case 7:
+		      return -2.*p3*eta*xi/den2;
+
+		    case 8:
+		      return -2.*p1*p3*(-xi + 2.*p4)/den2;
+
+		    case 9:
+		      return 2.*p1*zeta/den;
+
+		    case 10:
+		      return -2.*p1*zeta/den;
+
+		    case 11:
+		      return -2.*p3*zeta/den;
+
+		    case 12:
+		      return 2.*p3*zeta/den;
+
+		    case 13:
+		      return -8.*p1*p3*xi/den2;
+
+		    default:
+		      libmesh_error();
+		    }
+
+		  // d/deta
+		case 1:
+		  switch(i)
+		    {
+		    case 0:
+		      return -0.5*p4*(xi*eta - zeta + zeta*zeta - 2.*p1*xi)/den2;
+
+		    case 1:
+		      return 0.5*p2*(xi*eta + zeta - zeta*zeta - 2.*p1*xi)/den2;
+
+		    case 2:
+		      return 0.5*p2*(xi*eta - zeta + zeta*zeta + 2.*p3*xi)/den2;
+
+		    case 3:
+		      return -0.5*p4*(xi*eta + zeta - zeta*zeta + 2.*p3*xi)/den2;
+
+		    case 4:
+		      return 0.;
+
+		    case 5:
+		      return 2.*p2*p4*(eta - 2.*p1)/den2;
+
+		    case 6:
+		      return -2.*p2*xi*eta/den2;
+
+		    case 7:
+		      return 2.*p2*p4*(eta + 2.*p3)/den2;
+
+		    case 8:
+		      return 2.*p4*xi*eta/den2;
+
+		    case 9:
+		      return 2.*p4*zeta/den;
+
+		    case 10:
+		      return 2.*p2*zeta/den;
+
+		    case 11:
+		      return -2.*p2*zeta/den;
+
+		    case 12:
+		      return -2.*p4*zeta/den;
+
+		    case 13:
+		      return -8.*p2*p4*eta/den2;
+
+		    default:
+		      libmesh_error();
+		    }
+
+
+		  // d/dzeta
+		case 2:
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                        return -0.5*p1*(xi*eta - zeta + zeta*zeta)/den2
+                          - 0.5*p4*(xi*eta - zeta + zeta*zeta)/den2
+                          + p4*p1*(2.*zeta - 1)/den2
+                          - 2.*p4*p1*(xi*eta - zeta + zeta*zeta)/den3;
+
+                      case 1:
+                        return 0.5*p2*(xi*eta + zeta - zeta*zeta)/den2
+                          + 0.5*p1*(xi*eta + zeta - zeta*zeta)/den2
+                          - p1*p2*(1 - 2.*zeta)/den2
+                          + 2.*p1*p2*(xi*eta + zeta - zeta*zeta)/den3;
+
+                      case 2:
+                        return -0.5*p3*(xi*eta - zeta + zeta*zeta)/den2
+                          - 0.5*p2*(xi*eta - zeta + zeta*zeta)/den2
+                          + p2*p3*(2.*zeta - 1)/den2
+                          - 2.*p2*p3*(xi*eta - zeta + zeta*zeta)/den3;
+
+                      case 3:
+                        return 0.5*p4*(xi*eta + zeta - zeta*zeta)/den2
+                          + 0.5*p3*(xi*eta + zeta - zeta*zeta)/den2
+                          - p3*p4*(1 - 2.*zeta)/den2
+                          + 2.*p3*p4*(xi*eta + zeta - zeta*zeta)/den3;
+
+                      case 4:
+                        return 4.*zeta - 1.;
+
+                      case 5:
+                        return 2.*p4*p1*eta/den2
+                          + 2.*p2*p4*eta/den2
+                          + 2.*p1*p2*eta/den2
+                          + 8.*p2*p1*p4*eta/den3;
+
+                      case 6:
+                        return -2.*p2*p3*xi/den2
+                          - 2.*p1*p3*xi/den2
+                          - 2.*p1*p2*xi/den2
+                          - 8.*p1*p2*p3*xi/den3;
+
+                      case 7:
+                        return -2.*p3*p4*eta/den2
+                          - 2.*p2*p4*eta/den2
+                          - 2.*p2*p3*eta/den2
+                          - 8.*p2*p3*p4*eta/den3;
+
+                      case 8:
+                        return 2.*p4*p1*xi/den2
+                          + 2.*p1*p3*xi/den2
+                          + 2.*p3*p4*xi/den2
+                          + 8.*p3*p4*p1*xi/den3;
+
+                      case 9:
+                        return 2.*p4*zeta/den
+                          + 2.*p1*zeta/den
+                          - 4.*p1*p4/den
+                          + 4.*p1*p4*zeta/den2;
+
+                      case 10:
+                        return 2.*p1*zeta/den
+                          + 2.*p2*zeta/den
+                          - 4.*p2*p1/den
+                          + 4.*p2*p1*zeta/den2;
+
+                      case 11:
+                        return 2.*p2*zeta/den
+                          + 2.*p3*zeta/den
+                          - 4.*p3*p2/den
+                          + 4.*p3*p2*zeta/den2;
+
+                      case 12:
+                        return 2.*p3*zeta/den
+                          + 2.*p4*zeta/den
+                          - 4.*p4*p3/den
+                          + 4.*p4*p3*zeta/den2;
+
+                      case 13:
+                        return -8.*p2*p3*p4/den2
+                          - 8.*p3*p4*p1/den2
+                          - 8.*p2*p1*p4/den2
+                          - 8.*p1*p2*p3/den2
+                          - 32.*p1*p2*p3*p4/den3;
+
+                      default:
+                        libmesh_error();
+                      }
+                  }
+
+		default:
+		  libmesh_error();
+		}
+	    }
+
 
 
 
