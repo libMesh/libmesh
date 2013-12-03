@@ -1783,6 +1783,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
             }
 
           case PYRAMID5:
+          case PYRAMID14:
             {
 	      libmesh_assert_less (i, 5);
 
@@ -2616,6 +2617,525 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
 	    }
 
 
+            // Quadratic shape functions, as defined in R. Graglia, "Higher order
+            // bases on pyramidal elements", IEEE Trans Antennas and Propagation,
+            // vol 47, no 5, May 1999.
+          case PYRAMID14:
+            {
+	      libmesh_assert_less (i, 14);
+
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
+	      const Real eps  = 1.e-35;
+
+              // The "normalized coordinates" defined by Graglia.  These are
+              // the planes which define the faces of the pyramid.
+              Real
+                p1 = 0.5*(1. - eta - zeta), // back
+                p2 = 0.5*(1. + xi  - zeta), // left
+                p3 = 0.5*(1. + eta - zeta), // front
+                p4 = 0.5*(1. - xi  - zeta); // right
+
+              // Denominators are perturbed by epsilon to avoid
+              // divide-by-zero issues.
+              Real
+                den = (-1. + zeta + eps),
+                den2 = den*den,
+                den3 = den2*den,
+                den4 = den2*den2;
+
+              // These terms are used in several of the derivatives
+              Real
+                numer_mp = xi*eta - zeta + zeta*zeta,
+                numer_pm = xi*eta + zeta - zeta*zeta;
+
+              switch (j)
+                {
+                case 0: // d^2()/dxi^2
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                      case 1:
+                        return -p1*eta/den2;
+                      case 2:
+                      case 3:
+                        return p3*eta/den2;
+                      case 4:
+                      case 9:
+                      case 10:
+                      case 11:
+                      case 12:
+                        return 0.;
+                      case 5:
+                        return 2.*p1*eta/den2;
+                      case 6:
+                      case 8:
+                        return 4.*p1*p3/den2;
+                      case 7:
+                        return -2.*p3*eta/den2;
+                      case 13:
+                        return -8.*p1*p3/den2;
+                      default:
+                        libmesh_error();
+                      }
+                  }
+
+                case 1: // d^2()/dxideta
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                        return 0.25*numer_mp/den2
+                          - 0.5*p1*xi/den2
+                          - 0.5*p4*eta/den2
+                          + p4*p1/den2;
+
+                      case 1:
+                        return 0.25*numer_pm/den2
+                          - 0.5*p1*xi/den2
+                          + 0.5*p2*eta/den2
+                          - p1*p2/den2;
+
+                      case 2:
+                        return 0.25*numer_mp/den2
+                          + 0.5*p3*xi/den2
+                          + 0.5*p2*eta/den2
+                          + p2*p3/den2;
+
+                      case 3:
+                        return 0.25*numer_pm/den2
+                          + 0.5*p3*xi/den2
+                          - 0.5*p4*eta/den2
+                          - p3*p4/den2;
+
+                      case 4:
+                        return 0.;
+
+                      case 5:
+                        return p4*eta/den2
+                          - 2.*p4*p1/den2
+                          - p2*eta/den2
+                          + 2.*p1*p2/den2;
+
+                      case 6:
+                        return -p3*xi/den2
+                          + p1*xi/den2
+                          - 2.*p2*p3/den2
+                          + 2.*p1*p2/den2;
+
+                      case 7:
+                        return p4*eta/den2
+                          + 2.*p3*p4/den2
+                          - p2*eta/den2
+                          - 2.*p2*p3/den2;
+
+                      case 8:
+                        return -p3*xi/den2
+                          + p1*xi/den2
+                          - 2.*p4*p1/den2
+                          + 2.*p3*p4/den2;
+
+                      case 9:
+                      case 11:
+                        return -zeta/den;
+
+                      case 10:
+                      case 12:
+                        return zeta/den;
+
+                      case 13:
+                        return 4.*p4*p1/den2
+                          - 4.*p3*p4/den2
+                          + 4.*p2*p3/den2
+                          - 4.*p1*p2/den2;
+
+                      default:
+                        libmesh_error();
+                      }
+                  }
+
+
+                case 2: // d^2()/deta^2
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                      case 3:
+                        return -p4*xi/den2;
+                      case 1:
+                      case 2:
+                        return p2*xi/den2;
+                      case 4:
+                      case 9:
+                      case 10:
+                      case 11:
+                      case 12:
+                        return 0.;
+                      case 5:
+                      case 7:
+                        return 4.*p2*p4/den2;
+                      case 6:
+                        return -2.*p2*xi/den2;
+                      case 8:
+                        return 2.*p4*xi/den2;
+                      case 13:
+                        return -8.*p2*p4/den2;
+                      default:
+                        libmesh_error();
+                      }
+                  }
+
+
+                case 3: // d^2()/dxidzeta
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                        return 0.25*numer_mp/den2
+                          - 0.5*p1*(2.*zeta - 1.)/den2
+                          + p1*numer_mp/den3
+                          - 0.5*p1*eta/den2
+                          - 0.5*p4*eta/den2
+                          - 2.*p4*p1*eta/den3;
+
+                      case 1:
+                        return 0.25*numer_pm/den2
+                          - 0.5*p1*(1 - 2.*zeta)/den2
+                          + p1*numer_pm/den3
+                          + 0.5*p2*eta/den2
+                          + 0.5*p1*eta/den2
+                          + 2.*p1*p2*eta/den3;
+
+                      case 2:
+                        return -0.25*numer_mp/den2
+                          + 0.5*p3*(2.*zeta - 1.)/den2
+                          - p3*numer_mp/den3
+                          - 0.5*p3*eta/den2
+                          - 0.5*p2*eta/den2
+                          - 2.*p2*p3*eta/den3;
+
+                      case 3:
+                        return -0.25*numer_pm/den2
+                          + 0.5*p3*(1 - 2.*zeta)/den2
+                          - p3*numer_pm/den3
+                          + 0.5*p4*eta/den2
+                          + 0.5*p3*eta/den2
+                          + 2.*p3*p4*eta/den3;
+
+                      case 4:
+                        return 0.;
+
+                      case 5:
+                        return p4*eta/den2
+                          + 4.*p4*p1*eta/den3
+                          - p2*eta/den2
+                          - 4.*p1*p2*eta/den3;
+
+                      case 6:
+                        return -p3*xi/den2
+                          - p1*xi/den2
+                          - 4.*p1*p3*xi/den3
+                          - 2.*p2*p3/den2
+                          - 2.*p1*p3/den2
+                          - 2.*p1*p2/den2
+                          - 8.*p1*p2*p3/den3;
+
+                      case 7:
+                        return -p4*eta/den2
+                          - 4.*p3*p4*eta/den3
+                          + p2*eta/den2
+                          + 4.*p2*p3*eta/den3;
+
+                      case 8:
+                        return -p3*xi/den2
+                          - p1*xi/den2
+                          - 4.*p1*p3*xi/den3
+                          + 2.*p4*p1/den2
+                          + 2.*p1*p3/den2
+                          + 2.*p3*p4/den2
+                          + 8.*p3*p4*p1/den3;
+
+                      case 9:
+                        return -zeta/den
+                          + 2.*p1/den
+                          - 2.*p1*zeta/den2;
+
+                      case 10:
+                        return zeta/den
+                          - 2.*p1/den
+                          + 2.*p1*zeta/den2;
+
+                      case 11:
+                        return zeta/den
+                          - 2.*p3/den
+                          + 2.*p3*zeta/den2;
+
+                      case 12:
+                        return -zeta/den
+                          + 2.*p3/den
+                          - 2.*p3*zeta/den2;
+
+                      case 13:
+                        return -4.*p4*p1/den2
+                          - 4.*p3*p4/den2
+                          - 16.*p3*p4*p1/den3
+                          + 4.*p2*p3/den2
+                          + 4.*p1*p2/den2
+                          + 16.*p1*p2*p3/den3;
+
+                      default:
+                        libmesh_error();
+                      }
+                  }
+
+                case 4: // d^2()/detadzeta
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                        return 0.25*numer_mp/den2
+                          - 0.5*p4*(2.*zeta - 1.)/den2
+                          + p4*numer_mp/den3
+                          - 0.5*p1*xi/den2
+                          - 0.5*p4*xi/den2
+                          - 2.*p4*p1*xi/den3;
+
+                      case 1:
+                        return -0.25*numer_pm/den2
+                          + 0.5*p2*(1. - 2.*zeta)/den2
+                          - p2*numer_pm/den3
+                          + 0.5*p2*xi/den2
+                          + 0.5*p1*xi/den2
+                          + 2.*p1*p2*xi/den3;
+
+                      case 2:
+                        return -0.25*numer_mp/den2
+                          + 0.5*p2*(2.*zeta - 1.)/den2
+                          - p2*numer_mp/den3
+                          - 0.5*p3*xi/den2
+                          - 0.5*p2*xi/den2
+                          - 2.*p2*p3*xi/den3;
+
+                      case 3:
+                        return 0.25*numer_pm/den2
+                          - 0.5*p4*(1. - 2.*zeta)/den2
+                          + p4*numer_pm/den3
+                          + 0.5*p4*xi/den2
+                          + 0.5*p3*xi/den2
+                          + 2.*p3*p4*xi/den3;
+
+                      case 4:
+                        return 0.;
+
+                      case 5:
+                        return -p4*eta/den2
+                          - p2*eta/den2
+                          - 4.*p2*p4*eta/den3
+                          + 2.*p4*p1/den2
+                          + 2.*p2*p4/den2
+                          + 2.*p1*p2/den2
+                          + 8.*p2*p1*p4/den3;
+
+                      case 6:
+                        return p3*xi/den2
+                          + 4.*p2*p3*xi/den3
+                          - p1*xi/den2
+                          - 4.*p1*p2*xi/den3;
+
+                      case 7:
+                        return -p4*eta/den2
+                          - p2*eta/den2
+                          - 4.*p2*p4*eta/den3
+                          - 2.*p3*p4/den2
+                          - 2.*p2*p4/den2
+                          - 2.*p2*p3/den2
+                          - 8.*p2*p3*p4/den3;
+
+                      case 8:
+                        return p1*xi/den2
+                          + 4.*p4*p1*xi/den3
+                          - p3*xi/den2
+                          - 4.*p3*p4*xi/den3;
+
+                      case 9:
+                        return -zeta/den
+                          + 2.*p4/den
+                          - 2.*p4*zeta/den2;
+
+                      case 10:
+                        return -zeta/den
+                          + 2.*p2/den
+                          - 2.*p2*zeta/den2;
+
+                      case 11:
+                        return zeta/den
+                          - 2.*p2/den
+                          + 2.*p2*zeta/den2;
+
+                      case 12:
+                        return zeta/den
+                          - 2.*p4/den
+                          + 2.*p4*zeta/den2;
+
+                      case 13:
+                        return 4.*p3*p4/den2
+                          + 4.*p2*p3/den2
+                          + 16.*p2*p3*p4/den3
+                          - 4.*p4*p1/den2
+                          - 4.*p1*p2/den2
+                          - 16.*p2*p1*p4/den3;
+
+                      default:
+                        libmesh_error();
+                      }
+                  }
+
+                case 5: // d^2()/dzeta^2
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                        return 0.5*numer_mp/den2
+                          - p1*(2.*zeta - 1.)/den2
+                          + 2.*p1*numer_mp/den3
+                          - p4*(2.*zeta - 1.)/den2
+                          + 2.*p4*numer_mp/den3
+                          + 2.*p4*p1/den2
+                          - 4.*p4*p1*(2.*zeta - 1.)/den3
+                          + 6.*p4*p1*numer_mp/den4;
+
+                      case 1:
+                        return -0.5*numer_pm/den2
+                          + p2*(1 - 2.*zeta)/den2
+                          - 2.*p2*numer_pm/den3
+                          + p1*(1 - 2.*zeta)/den2
+                          - 2.*p1*numer_pm/den3
+                          + 2.*p1*p2/den2
+                          + 4.*p1*p2*(1 - 2.*zeta)/den3
+                          - 6.*p1*p2*numer_pm/den4;
+
+                      case 2:
+                        return 0.5*numer_mp/den2
+                          - p3*(2.*zeta - 1.)/den2
+                          + 2.*p3*numer_mp/den3
+                          - p2*(2.*zeta - 1.)/den2
+                          + 2.*p2*numer_mp/den3
+                          + 2.*p2*p3/den2
+                          - 4.*p2*p3*(2.*zeta - 1.)/den3
+                          + 6.*p2*p3*numer_mp/den4;
+
+                      case 3:
+                        return -0.5*numer_pm/den2
+                          + p4*(1 - 2.*zeta)/den2
+                          - 2.*p4*numer_pm/den3
+                          + p3*(1 - 2.*zeta)/den2
+                          - 2.*p3*numer_pm/den3
+                          + 2.*p3*p4/den2
+                          + 4.*p3*p4*(1 - 2.*zeta)/den3
+                          - 6.*p3*p4*numer_pm/den4;
+
+                      case 4:
+                        return 4.;
+
+                      case 5:
+                        return -2.*p1*eta/den2
+                          - 2.*p4*eta/den2
+                          - 8.*p4*p1*eta/den3
+                          - 2.*p2*eta/den2
+                          - 8.*p2*p4*eta/den3
+                          - 8.*p1*p2*eta/den3
+                          - 24.*p2*p1*p4*eta/den4;
+
+                      case 6:
+                        return 2.*p3*xi/den2
+                          + 2.*p2*xi/den2
+                          + 8.*p2*p3*xi/den3
+                          + 2.*p1*xi/den2
+                          + 8.*p1*p3*xi/den3
+                          + 8.*p1*p2*xi/den3
+                          + 24.*p1*p2*p3*xi/den4;
+
+                      case 7:
+                        return 2.*p4*eta/den2
+                          + 2.*p3*eta/den2
+                          + 8.*p3*p4*eta/den3
+                          + 2.*p2*eta/den2
+                          + 8.*p2*p4*eta/den3
+                          + 8.*p2*p3*eta/den3
+                          + 24.*p2*p3*p4*eta/den4;
+
+                      case 8:
+                        return -2.*p1*xi/den2
+                          - 2.*p4*xi/den2
+                          - 8.*p4*p1*xi/den3
+                          - 2.*p3*xi/den2
+                          - 8.*p1*p3*xi/den3
+                          - 8.*p3*p4*xi/den3
+                          - 24.*p3*p4*p1*xi/den4;
+
+                      case 9:
+                        return -2.*zeta/den
+                          + 4.*p4/den
+                          - 4.*p4*zeta/den2
+                          + 4.*p1/den
+                          - 4.*p1*zeta/den2
+                          + 8.*p4*p1/den2
+                          - 8.*p1*p4*zeta/den3;
+
+                      case 10:
+                        return -2.*zeta/den
+                          + 4.*p1/den
+                          - 4.*p1*zeta/den2
+                          + 4.*p2/den
+                          - 4.*p2*zeta/den2
+                          + 8.*p1*p2/den2
+                          - 8.*p2*p1*zeta/den3;
+
+                      case 11:
+                        return -2.*zeta/den
+                          + 4.*p2/den
+                          - 4.*p2*zeta/den2
+                          + 4.*p3/den
+                          - 4.*p3*zeta/den2
+                          + 8.*p2*p3/den2
+                          - 8.*p3*p2*zeta/den3;
+
+                      case 12:
+                        return -2.*zeta/den
+                          + 4.*p3/den
+                          - 4.*p3*zeta/den2
+                          + 4.*p4/den
+                          - 4.*p4*zeta/den2
+                          + 8.*p3*p4/den2
+                          - 8.*p4*p3*zeta/den3;
+
+                      case 13:
+                        return 8.*p3*p4/den2
+                          + 8.*p2*p4/den2
+                          + 8.*p2*p3/den2
+                          + 32.*p2*p3*p4/den3
+                          + 8.*p4*p1/den2
+                          + 8.*p1*p3/den2
+                          + 32.*p3*p4*p1/den3
+                          + 8.*p1*p2/den2
+                          + 32.*p2*p1*p4/den3
+                          + 32.*p1*p2*p3/den3
+                          + 96.*p1*p2*p3*p4/den4;
+
+                      default:
+                        libmesh_error();
+                      }
+                  }
+
+                default:
+                  {
+                    // Unrecognized index
+                    libmesh_error();
+                  }
+                }
+            }
 
 	  default:
 	    {
