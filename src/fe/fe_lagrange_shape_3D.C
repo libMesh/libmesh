@@ -120,6 +120,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 
 	    // linear pyramid shape functions
 	  case PYRAMID5:
+	  case PYRAMID14:
 	    {
 	      libmesh_assert_less (i, 5);
 
@@ -399,6 +400,81 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	      return (FE<2,LAGRANGE>::shape(TRI6,  SECOND, i1[i], p2d)*
 		      FE<1,LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
 	    }
+
+            // Quadratic shape functions, as defined in R. Graglia, "Higher order
+            // bases on pyramidal elements", IEEE Trans Antennas and Propagation,
+            // vol 47, no 5, May 1999.
+	  case PYRAMID14:
+            {
+	      libmesh_assert_less (i, 14);
+
+	      const Real xi   = p(0);
+	      const Real eta  = p(1);
+	      const Real zeta = p(2);
+	      const Real eps  = 1.e-35;
+
+              // The "normalized coordinates" defined by Graglia.  These are
+              // the planes which define the faces of the pyramid.
+              Real
+                p1 = 0.5*(1. - eta - zeta), // back
+                p2 = 0.5*(1. + xi  - zeta), // left
+                p3 = 0.5*(1. + eta - zeta), // front
+                p4 = 0.5*(1. - xi  - zeta); // right
+
+              // Denominators are perturbed by epsilon to avoid
+              // divide-by-zero issues.
+              Real
+                den = (-1. + zeta + eps),
+                den2 = den*den;
+
+	      switch(i)
+		{
+		case 0:
+		  return p4*p1*(xi*eta - zeta + zeta*zeta)/den2;
+
+		case 1:
+		  return -p1*p2*(xi*eta + zeta - zeta*zeta)/den2;
+
+		case 2:
+		  return p2*p3*(xi*eta - zeta + zeta*zeta)/den2;
+
+		case 3:
+		  return -p3*p4*(xi*eta + zeta - zeta*zeta)/den2;
+
+		case 4:
+		  return zeta*(2.*zeta - 1.);
+
+		case 5:
+		  return -4.*p2*p1*p4*eta/den2;
+
+		case 6:
+		  return 4.*p1*p2*p3*xi/den2;
+
+		case 7:
+		  return 4.*p2*p3*p4*eta/den2;
+
+		case 8:
+		  return -4.*p3*p4*p1*xi/den2;
+
+		case 9:
+		  return -4.*p1*p4*zeta/den;
+
+		case 10:
+		  return -4.*p2*p1*zeta/den;
+
+		case 11:
+		  return -4.*p3*p2*zeta/den;
+
+		case 12:
+		  return -4.*p4*p3*zeta/den;
+
+		case 13:
+		  return 16.*p1*p2*p3*p4/den2;
+
+		default:
+		  libmesh_error();
+		}
+            }
 
 
 	  default:
