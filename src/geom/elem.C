@@ -1307,13 +1307,13 @@ Real Elem::quality (const ElemQuality q) const
        */
     default:
       {
-	libmesh_here();
+	 libmesh_do_once( libmesh_here();
 
-	libMesh::err << "ERROR:  unknown quality metric: "
-		      << q
+         libMesh::err << "ERROR:  unknown quality metric: "
+		      << Utility::enum_to_string(q)
 		      << std::endl
 		      << "Cowardly returning 1."
-		      << std::endl;
+		      << std::endl; );
 
 	return 1.;
       }
