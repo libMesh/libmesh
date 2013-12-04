@@ -51,6 +51,7 @@
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/perfmon.h"
 #include "libmesh/statistics.h"
+#include "libmesh/string_to_enum.h"
 
 
 using namespace libMesh;
@@ -87,6 +88,7 @@ void usage(char *progName)
     "                                  (allows to write .unv file of the\n"
     "                                  boundary with the correct node ids)\n"
     "    -v                            Verbose\n"
+    "    -q <metric>                   Evaluates the named element quality metric\n"
     "    -2                            Converts a mesh of linear elements\n"
     "                                  to their second-order counterparts:\n"
     "                                  Quad4 -> Quad8, Tet4 -> Tet10 etc\n"
@@ -195,6 +197,8 @@ void process_cmd_line(int argc, char **argv,
                       BoundaryMeshWriteMode& write_bndry,
                       unsigned int& convert_second_order,
                       bool& triangulate,
+                      bool& do_quality,
+                      ElemQuality& quality_type,
                       bool& addinfelems,
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -216,6 +220,8 @@ void process_cmd_line(int argc, char **argv,
    * so that the compiler does not complain
    */
   triangulate     = false;
+  do_quality      = false;
+  quality_type    = DIAGONAL;
   addinfelems     = false;
   x_sym           = y_sym           = z_sym           = false;
 
@@ -225,7 +231,7 @@ void process_cmd_line(int argc, char **argv,
 #else
 
   char optionStr[] =
-    "i:o:s:d:D:r:p:tbB23a::x:y:z:XYZvlLm?h";
+    "i:o:q:s:d:D:r:p:tbB23a::x:y:z:XYZvlLm?h";
 
 #endif
 
@@ -338,6 +344,16 @@ void process_cmd_line(int argc, char **argv,
             break;
           }
 
+          /**
+           * Calculate element qualities
+           */
+        case 'q':
+          {
+            do_quality = true;
+            quality_type = Utility::string_to_enum<ElemQuality>(optarg);
+            break;
+          }
+ 
           /**
            * Be verbose
            */
@@ -505,6 +521,8 @@ int main (int argc, char** argv)
   unsigned int convert_second_order = 0;
   bool addinfelems = false;
   bool triangulate = false;
+  bool do_quality = false;
+  ElemQuality quality_type = DIAGONAL;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   InfElemBuilder::InfElemOriginValue origin_x(false, 0.);
@@ -527,6 +545,9 @@ int main (int argc, char** argv)
                    convert_second_order,
 
                    triangulate,
+
+                   do_quality,
+                   quality_type,
 
                    addinfelems,
 
@@ -670,26 +691,25 @@ int main (int argc, char** argv)
   /**
    * Compute Shape quality metrics
    */
-  const bool do_quality = false;
-
   if (do_quality)
     {
       StatisticsVector<Real> sv;
-      sv.resize(mesh.n_elem());
+      sv.reserve(mesh.n_elem());
 
-      const ElemQuality q = DIAGONAL;
-
-      libMesh::out << "Quality type is: " << Quality::name(q) << std::endl;
+      libMesh::out << "Quality type is: " << Quality::name(quality_type) << std::endl;
 
       // What are the quality bounds for this element?
-      std::pair<Real, Real> bounds = mesh.elem(0)->qual_bounds(q);
+      std::pair<Real, Real> bounds = mesh.elem(0)->qual_bounds(quality_type);
       libMesh::out << "Quality bounds for this element type are: (" << bounds.first
                    << ", " << bounds.second << ") "
                    << std::endl;
 
-      for (unsigned int e=0; e<mesh.n_elem(); e++)
+      MeshBase::const_element_iterator it  = mesh.active_elements_begin(),
+                                       end = mesh.active_elements_end();
+      for (; it != end; ++it)
         {
-          sv[e] = mesh.elem(e)->quality(q);
+          Elem *e = *it;
+          sv.push_back(e->quality(quality_type));
         }
 
       const unsigned int n_bins = 10;
@@ -749,7 +769,7 @@ int main (int argc, char** argv)
           out << "ylabel('Percentage of elements in each bin');" << std::endl;
           out << "axis([" << min << "," << max << ",0, max(bin_members)]);" << std::endl;
 
-          out << "title('" << Quality::name(q) << "');" << std::endl;
+          out << "title('" << Quality::name(quality_type) << "');" << std::endl;
 
         }
     }
