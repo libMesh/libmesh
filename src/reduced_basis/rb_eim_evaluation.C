@@ -19,6 +19,7 @@
 
 // C++ includes
 #include <sstream>
+#include <fstream>
 
 // rbOOmit includes
 #include "libmesh/rb_eim_evaluation.h"
@@ -46,6 +47,9 @@ namespace libMesh
 
   // initialize to the empty RBThetaExpansion object
   set_rb_theta_expansion(_empty_rb_theta_expansion);
+
+  // Let's not renumber the _interpolation_points_mesh
+  _interpolation_points_mesh.allow_renumbering(false);
 }
 
 RBEIMEvaluation::~RBEIMEvaluation()
@@ -60,6 +64,7 @@ void RBEIMEvaluation::clear()
   interpolation_points.clear();
   interpolation_points_var.clear();
   interpolation_points_elem.clear();
+  _interpolation_points_mesh.clear();
 
   // Delete any RBTheta objects that were created
   for(unsigned int i=0; i<_rb_eim_theta_objects.size(); i++)
@@ -387,10 +392,12 @@ void RBEIMEvaluation::write_out_interpolation_points_elem(const std::string dire
     }
   }
 
-  // Maintain a set of elem IDs to make sure we don't insert
+  // Maintain a map of elem IDs to make sure we don't insert
   // the same elem into _interpolation_points_mesh more than once
-  std::set<dof_id_type> elem_ids;
-  for(unsigned int i=0; i<(interpolation_points_elem.size()+1); i++)
+  std::map<dof_id_type,dof_id_type> elem_id_map;
+  std::vector<dof_id_type> interpolation_elem_ids(interpolation_points_elem.size()+1);
+  dof_id_type new_elem_id = 0;
+  for(unsigned int i=0; i<interpolation_elem_ids.size(); i++)
   {
     Elem* old_elem = NULL;
     if(i < interpolation_points_elem.size())
@@ -402,34 +409,61 @@ void RBEIMEvaluation::write_out_interpolation_points_elem(const std::string dire
       old_elem = extra_interpolation_point_elem;
     }
     
-    if(elem_ids.find(old_elem->id()) != elem_ids.end())
-    {
-      libMesh::out << "Error: Repeated element. This isn't handled properly yet." << std::endl;
-      libmesh_error();
-    }
-    elem_ids.insert(old_elem->id());
-
-    Elem* new_elem = Elem::build(old_elem->type(), /*parent*/ NULL).release();
-    new_elem->subdomain_id() = old_elem->subdomain_id();
+    dof_id_type old_elem_id = old_elem->id();
     
-    // Assign all the nodes
-    for(unsigned int n=0; n<new_elem->n_nodes(); n++)
+    // Only insert the element into the mesh if it hasn't already been inserted
+    std::map<dof_id_type,dof_id_type>::iterator id_it = elem_id_map.find(old_elem_id);
+    if(id_it == elem_id_map.end())
     {
-      dof_id_type old_node_id = old_elem->node(n);
-      new_elem->set_node(n) = &_interpolation_points_mesh.node( node_id_map[old_node_id] );
+      Elem* new_elem = Elem::build(old_elem->type(), /*parent*/ NULL).release();
+      new_elem->subdomain_id() = old_elem->subdomain_id();
+    
+      // Assign all the nodes
+      for(unsigned int n=0; n<new_elem->n_nodes(); n++)
+      {
+        dof_id_type old_node_id = old_elem->node(n);
+        new_elem->set_node(n) = &_interpolation_points_mesh.node( node_id_map[old_node_id] );
+      }
+
+      // Just set all proc_ids to 0
+      new_elem->processor_id() = 0;
+
+      // Add the element to the mesh
+      _interpolation_points_mesh.add_elem(new_elem);
+
+      // Set the id of new_elem appropriately
+      new_elem->set_id(new_elem_id);
+      interpolation_elem_ids[i] = new_elem->id();
+      elem_id_map[old_elem_id] = new_elem->id();
+      
+      new_elem_id++;
+    }
+    else
+    {
+      interpolation_elem_ids[i] = id_it->second;
     }
 
-    // Just set all proc_ids to 0
-    new_elem->processor_id() = 0;
-
-    // Set the id of new_elem appropriately
-    new_elem->set_id(i);
-
-    // Add the element to the mesh
-    _interpolation_points_mesh.add_elem(new_elem);
   }
 
+  libmesh_assert(new_elem_id == _interpolation_points_mesh.n_elem());
+
   _interpolation_points_mesh.write(directory_name + "/interpolation_points_mesh.xda");
+
+  // Also, write out the vector that tells us which element each entry
+  // of interpolation_points_elem corresponds to. This allows us to handle
+  // the case in which elements are repeated in interpolation_points_elem.
+  if(libMesh::processor_id() == 0)
+  {
+    // These are just integers, so no need for a binary format here
+    std::ofstream interpolation_elem_ids_out
+      ((directory_name + "/interpolation_elem_ids.dat").c_str(), std::ofstream::out);
+
+    for(unsigned int i=0; i<interpolation_elem_ids.size(); i++)
+    {
+      interpolation_elem_ids_out << interpolation_elem_ids[i] << std::endl;
+    }
+    interpolation_elem_ids_out.close();
+  }
 }
 
 void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_name,
@@ -561,19 +595,34 @@ void RBEIMEvaluation::read_in_interpolation_points_elem(const std::string direct
 {
   _interpolation_points_mesh.read(directory_name + "/interpolation_points_mesh.xda");
 
-  // The mesh stores one element per interpolation point (plus one "extra")
-  unsigned int n_interpolation_points = _interpolation_points_mesh.n_elem()-1;
+  unsigned int n_interpolation_points = _interpolation_points_mesh.n_elem();
+
+  std::vector<dof_id_type> interpolation_elem_ids;
+  {
+    // These are just integers, so no need for a binary format here
+    std::ifstream interpolation_elem_ids_in
+      ((directory_name + "/interpolation_elem_ids.dat").c_str(), std::ifstream::in);
+
+    for(unsigned int i=0; i<n_interpolation_points; i++)
+    {
+      dof_id_type elem_id;
+      interpolation_elem_ids_in >> elem_id;
+      interpolation_elem_ids.push_back(elem_id);
+    }
+    interpolation_elem_ids_in.close();
+  }
 
   interpolation_points_elem.resize(n_interpolation_points);
-  for(unsigned int i=0; i<n_interpolation_points; i++)
+  for(unsigned int i=0; i<(n_interpolation_points-1); i++)
   {
-    interpolation_points_elem[i] = _interpolation_points_mesh.elem(i);
+    interpolation_points_elem[i] =
+      _interpolation_points_mesh.elem(interpolation_elem_ids[i]);
   }
 
   // Get the extra interpolation point
   extra_interpolation_point_elem =
     _interpolation_points_mesh.elem(
-      n_interpolation_points );
+      (interpolation_elem_ids.back()) );
 }
 
 }
