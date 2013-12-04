@@ -28,6 +28,7 @@
 // libMesh includes
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/serial_mesh.h"
 
 namespace libMesh
 {
@@ -35,6 +36,7 @@ namespace libMesh
   RBEIMEvaluation::RBEIMEvaluation(const libMesh::Parallel::Communicator &comm)
   :
     RBEvaluation(comm),
+    extra_interpolation_point_elem(NULL),
     _previous_N(0),
     _previous_error_bound(-1)
 {
@@ -57,7 +59,7 @@ void RBEIMEvaluation::clear()
 
   interpolation_points.clear();
   interpolation_points_var.clear();
-  interpolation_points_subdomain.clear();
+  interpolation_points_elem.clear();
 
   // Delete any RBTheta objects that were created
   for(unsigned int i=0; i<_rb_eim_theta_objects.size(); i++)
@@ -75,7 +77,7 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax,
   // Resize the data structures relevant to the EIM system
   interpolation_points.clear();
   interpolation_points_var.clear();
-  interpolation_points_subdomain.clear();
+  interpolation_points_elem.clear();
   interpolation_matrix.resize(Nmax,Nmax);
 
   // Resize the "extra" row due to the "extra Greedy step"
@@ -95,7 +97,7 @@ unsigned int RBEIMEvaluation::get_n_parametrized_functions() const
 
 Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index,
                                                        const Point& p,
-                                                       subdomain_id_type subdomain_id)
+                                                       const Elem& elem)
 {
   if(var_index >= get_n_parametrized_functions())
   {
@@ -104,7 +106,7 @@ Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index,
     libmesh_error();
   }
 
-  return _parametrized_functions[var_index]->evaluate(get_parameters(), p, subdomain_id);
+  return _parametrized_functions[var_index]->evaluate(get_parameters(), p, elem);
 }
 
 Real RBEIMEvaluation::rb_solve(unsigned int N)
@@ -141,7 +143,7 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
   {
     EIM_rhs(i) = evaluate_parametrized_function(interpolation_points_var[i],
                                                 interpolation_points[i],
-                                                interpolation_points_subdomain[i]);
+                                                *interpolation_points_elem[i]);
   }
 
 
@@ -160,11 +162,11 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
     if(N == get_n_basis_functions())
       g_at_next_x = evaluate_parametrized_function(extra_interpolation_point_var,
                                                    extra_interpolation_point,
-                                                   extra_interpolation_point_subdomain);
+                                                   *extra_interpolation_point_elem);
     else
       g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N],
                                                    interpolation_points[N],
-                                                   interpolation_points_subdomain[N]);
+                                                   *interpolation_points_elem[N]);
 
     // Next, evaluate the EIM approximation at x_{N+1}
     Number EIM_approx_at_next_x = 0.;
@@ -328,17 +330,6 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
     }
     interpolation_points_var_out.close();
 
-    // Next write out interpolation_points_subdomain
-    file_name.str("");
-    file_name << directory_name << "/interpolation_points_subdomain" << suffix;
-    Xdr interpolation_points_subdomain_out(file_name.str(), mode);
-
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      interpolation_points_subdomain_out << interpolation_points_subdomain[i];
-    }
-    interpolation_points_subdomain_out.close();
-
     // Also, write out the "extra" interpolation variable
     file_name.str("");
     file_name << directory_name << "/extra_interpolation_point_var" << suffix;
@@ -346,17 +337,99 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
 
     extra_interpolation_point_var_out << extra_interpolation_point_var;
     extra_interpolation_point_var_out.close();
-
-    // Also, write out the "extra" interpolation subdomain
-    file_name.str("");
-    file_name << directory_name << "/extra_interpolation_point_subdomain" << suffix;
-    Xdr extra_interpolation_point_subdomain_out(file_name.str(), mode);
-
-    extra_interpolation_point_subdomain_out << extra_interpolation_point_subdomain;
-    extra_interpolation_point_subdomain_out.close();
   }
 
+  // Write out the elements associated with the interpolation points.
+  // This uses mesh I/O, hence we have to do it on all processors.
+  write_out_interpolation_points_elem(directory_name);
+
   STOP_LOG("write_offline_data_to_files()", "RBEIMEvaluation");
+}
+
+void RBEIMEvaluation::write_out_interpolation_points_elem(const std::string directory_name)
+{
+  _interpolation_points_mesh.clear();
+
+  // Maintain a set of node IDs to make sure we don't insert
+  // the same node into _interpolation_points_mesh more than once
+  std::set<dof_id_type> node_ids;
+  std::map<dof_id_type, dof_id_type> node_id_map;
+
+  unsigned int new_node_id = 0;
+  for(unsigned int i=0; i<(interpolation_points_elem.size()+1); i++)
+  {
+    Elem* old_elem = NULL;
+    if(i < interpolation_points_elem.size())
+    {
+      old_elem = interpolation_points_elem[i];
+    }
+    else
+    {
+      old_elem = extra_interpolation_point_elem;
+    }
+    
+    for(unsigned int n=0; n<old_elem->n_nodes(); n++)
+    {
+      Node* node_ptr = old_elem->get_node(n);
+      dof_id_type old_node_id = node_ptr->id();
+
+      // Check if this node has already been added. This
+      // could happen if some of the elements are neighbors.
+      if( node_ids.find(old_node_id) == node_ids.end() )
+      {
+        node_ids.insert(old_node_id);
+        _interpolation_points_mesh.add_point(*node_ptr, new_node_id, /* proc_id */ 0);
+        
+        node_id_map[old_node_id] = new_node_id;
+        
+        new_node_id++;
+      }
+    }
+  }
+
+  // Maintain a set of elem IDs to make sure we don't insert
+  // the same elem into _interpolation_points_mesh more than once
+  std::set<dof_id_type> elem_ids;
+  for(unsigned int i=0; i<(interpolation_points_elem.size()+1); i++)
+  {
+    Elem* old_elem = NULL;
+    if(i < interpolation_points_elem.size())
+    {
+      old_elem = interpolation_points_elem[i];
+    }
+    else
+    {
+      old_elem = extra_interpolation_point_elem;
+    }
+    
+    if(elem_ids.find(old_elem->id()) != elem_ids.end())
+    {
+      libMesh::out << "Error: Repeated element. This isn't handled properly yet." << std::endl;
+      libmesh_error();
+    }
+    elem_ids.insert(old_elem->id());
+
+    Elem* new_elem = Elem::build(old_elem->type(), /*parent*/ NULL).release();
+    new_elem->subdomain_id() = old_elem->subdomain_id();
+    
+    // Assign all the nodes
+    for(unsigned int n=0; n<new_elem->n_nodes(); n++)
+    {
+      dof_id_type old_node_id = old_elem->node(n);
+      new_elem->set_node(n) = &_interpolation_points_mesh.node( node_id_map[old_node_id] );
+    }
+
+    // Just set all proc_ids to 0
+    new_elem->processor_id() = 0;
+
+    // Set the id of new_elem appropriately
+    new_elem->set_id(i);
+
+    // Add the element to the mesh
+    _interpolation_points_mesh.add_elem(new_elem);
+  }
+
+  _interpolation_points_mesh.write(directory_name + "/interpolation_points_mesh.xda");
 }
 
 void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_name,
@@ -478,33 +551,29 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   }
   extra_interpolation_point_var_in.close();
 
-  // Next read in interpolation_points_subdomain
-  file_name.str("");
-  file_name << directory_name << "/interpolation_points_subdomain" << suffix;
-  Xdr interpolation_points_subdomain_in(file_name.str(), mode);
-
-  for(unsigned int i=0; i<=n_bfs; i++)
-  {
-    subdomain_id_type subdomain;
-    interpolation_points_subdomain_in >> subdomain;
-    interpolation_points_subdomain.push_back(subdomain);
-  }
-  interpolation_points_subdomain_in.close();
-
-  // Also, read in extra_interpolation_point_subdomain
-  file_name.str("");
-  file_name << directory_name << "/extra_interpolation_point_subdomain" << suffix;
-  Xdr extra_interpolation_point_subdomain_in(file_name.str(), mode);
-
-  for(unsigned int i=0; i<=n_bfs; i++)
-  {
-    unsigned int subdomain;
-    extra_interpolation_point_subdomain_in >> subdomain;
-    extra_interpolation_point_subdomain = subdomain;
-  }
-  extra_interpolation_point_subdomain_in.close();
+  // Read in the elements corresponding to the interpolation points
+  read_in_interpolation_points_elem(directory_name);
 
   STOP_LOG("read_offline_data_from_files()", "RBEIMEvaluation");
+}
+
+void RBEIMEvaluation::read_in_interpolation_points_elem(const std::string directory_name)
+{
+  _interpolation_points_mesh.read(directory_name + "/interpolation_points_mesh.xda");
+
+  // The mesh stores one element per interpolation point (plus one "extra")
+  unsigned int n_interpolation_points = _interpolation_points_mesh.n_elem()-1;
+
+  interpolation_points_elem.resize(n_interpolation_points);
+  for(unsigned int i=0; i<n_interpolation_points; i++)
+  {
+    interpolation_points_elem[i] = _interpolation_points_mesh.elem(i);
+  }
+
+  // Get the extra interpolation point
+  extra_interpolation_point_elem =
+    _interpolation_points_mesh.elem(
+      n_interpolation_points );
 }
 
 }
