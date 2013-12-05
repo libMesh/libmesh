@@ -216,6 +216,10 @@ void VTKIO::cells_to_vtk()
   elem_id->SetName("libmesh_elem_id");
   elem_id->SetNumberOfComponents(1);
 
+  vtkSmartPointer<vtkIntArray> subdomain_id = vtkSmartPointer<vtkIntArray>::New();
+  subdomain_id->SetName("subdomain_id");
+  subdomain_id->SetNumberOfComponents(1);
+
   MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
   for (; it != end; ++it, ++active_element_counter)
@@ -268,10 +272,12 @@ void VTKIO::cells_to_vtk()
       vtkIdType vtkcellid = cells->InsertNextCell(pts);
       types[active_element_counter] = this->get_elem_type(elem->type());
       elem_id->InsertTuple1(vtkcellid, elem->id());
+      subdomain_id->InsertTuple1(vtkcellid, elem->subdomain_id());
     } // end loop over active elements
 
   _vtk_grid->SetCells(&types[0], cells);
   _vtk_grid->GetCellData()->AddArray(elem_id);
+  _vtk_grid->GetCellData()->AddArray(subdomain_id);
 }
 
 
