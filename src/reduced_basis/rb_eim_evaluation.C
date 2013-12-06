@@ -39,7 +39,8 @@ namespace libMesh
     RBEvaluation(comm),
     extra_interpolation_point_elem(NULL),
     _previous_N(0),
-    _previous_error_bound(-1)
+    _previous_error_bound(-1),
+    _interpolation_points_mesh(comm)
 {
   // Indicate that we need to compute the RB
   // inner product matrix in this case
