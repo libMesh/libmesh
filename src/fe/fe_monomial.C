@@ -140,6 +140,7 @@ namespace libMesh
 	      case PRISM15:
 	      case PRISM18:
 	      case PYRAMID5:
+              case PYRAMID14:
 		return 4;
 
 	      default:
@@ -185,6 +186,7 @@ namespace libMesh
 	      case PRISM15:
 	      case PRISM18:
 	      case PYRAMID5:
+	      case PYRAMID14:
 		return 10;
 
 	      default:
@@ -230,6 +232,7 @@ namespace libMesh
 	      case PRISM15:
 	      case PRISM18:
 	      case PYRAMID5:
+	      case PYRAMID14:
 		return 20;
 
 	      default:
@@ -274,6 +277,7 @@ namespace libMesh
 	      case PRISM15:
 	      case PRISM18:
 	      case PYRAMID5:
+	      case PYRAMID14:
 		return 35;
 
 	      default:
@@ -317,6 +321,7 @@ namespace libMesh
 	      case PRISM15:
 	      case PRISM18:
 	      case PYRAMID5:
+	      case PYRAMID14:
 		return (order+1)*(order+2)*(order+3)/6;
 
 	      default:
