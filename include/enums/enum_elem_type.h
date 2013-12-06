@@ -55,24 +55,25 @@ namespace libMeshEnums {
 		 PRISM18,    // 15
 
 		 PYRAMID5,   // 16
+                 PYRAMID14,  // 17
 
-		 INFEDGE2,   // 17
+		 INFEDGE2,   // 18
 
-		 INFQUAD4,   // 18
-		 INFQUAD6,   // 19
+		 INFQUAD4,   // 19
+		 INFQUAD6,   // 20
 
-		 INFHEX8,    // 20
-		 INFHEX16,   // 21
-		 INFHEX18,   // 22
+		 INFHEX8,    // 21
+		 INFHEX16,   // 22
+		 INFHEX18,   // 23
 
-		 INFPRISM6,  // 23
-		 INFPRISM12, // 24
+		 INFPRISM6,  // 24
+		 INFPRISM12, // 25
 
-		 NODEELEM,   // 25
+		 NODEELEM,   // 26
 
-		 REMOTEELEM,   // 26
+		 REMOTEELEM,   // 27
 
-		 INVALID_ELEM};  // 27 - should always be last
+		 INVALID_ELEM};  // 28 - should always be last
 }
 
 using namespace libMeshEnums;

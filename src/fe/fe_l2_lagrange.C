@@ -329,6 +329,7 @@ namespace libMesh
 		return 6;
 
 	      case PYRAMID5:
+              case PYRAMID14:
 		return 5;
 
 	      default:

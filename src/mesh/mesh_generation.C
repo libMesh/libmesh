@@ -124,6 +124,7 @@ namespace MeshTools {
 	  case TET4:  // TET4's are created from an initial HEX27 discretization
 	  case TET10: // TET10's are created from an initial HEX27 discretization
 	  case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
+          case PYRAMID14:
 	  case PRISM15:
 	  case PRISM18:
 	    {
@@ -829,7 +830,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
       //---------------------------------------------------------------------
-      // Build a 3D mesh using hexahedral or prismatic elements.
+      // Build a 3D mesh using hexes, tets, prisms, or pyramids.
     case 3:
       {
 	libmesh_assert_not_equal_to (nx, 0);
@@ -851,6 +852,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  case TET4:  // TET4's are created from an initial HEX27 discretization
 	  case TET10: // TET10's are created from an initial HEX27 discretization
 	  case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
+          case PYRAMID14:
 	    {
 	      mesh.reserve_elem(nx*ny*nz);
 	      break;
@@ -891,6 +893,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  case TET4: // TET4's are created from an initial HEX27 discretization
 	  case TET10: // TET10's are created from an initial HEX27 discretization
 	  case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
+          case PYRAMID14:
 	  case PRISM15:
 	  case PRISM18:
 	    {
@@ -944,6 +947,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  case TET4: // TET4's are created from an initial HEX27 discretization
 	  case TET10: // TET10's are created from an initial HEX27 discretization
 	  case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
+          case PYRAMID14:
 	  case PRISM15:
 	  case PRISM18:
 	    {
@@ -1126,6 +1130,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	  case TET4: // TET4's are created from an initial HEX27 discretization
 	  case TET10: // TET10's are created from an initial HEX27 discretization
 	  case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
+          case PYRAMID14:
 	    {
 	      for (unsigned int k=0; k<(2*nz); k += 2)
 		for (unsigned int j=0; j<(2*ny); j += 2)
@@ -1155,7 +1160,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		      elem->set_node(17) = mesh.node_ptr(idx(type,nx,ny,i+2,j+1,k+2));
 		      elem->set_node(18) = mesh.node_ptr(idx(type,nx,ny,i+1,j+2,k+2));
 		      elem->set_node(19) = mesh.node_ptr(idx(type,nx,ny,i,  j+1,k+2));
-		      if ((type == HEX27) || (type == TET4) || (type == TET10) || (type == PYRAMID5))
+		      if ((type == HEX27) || (type == TET4) || (type == TET10) || (type == PYRAMID5) || (type == PYRAMID14))
 			{
 			  elem->set_node(20) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k)  );
 			  elem->set_node(21) = mesh.node_ptr(idx(type,nx,ny,i+1,j,  k+1));
@@ -1319,7 +1324,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	// the various elements.
 	if ((type == TET4) ||
 	    (type == TET10) ||
-	    (type == PYRAMID5))
+	    (type == PYRAMID5) ||
+            (type == PYRAMID14))
 	  {
 	    // Temporary storage for new elements. (24 tets per hex, 6 pyramids)
 	    std::vector<Elem*> new_elements;
@@ -1370,7 +1376,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			    }
 			} // end if ((type == TET4) || (type == TET10))
 
-		      else // type==PYRAMID5
+		      else // type==PYRAMID5 || type==PYRAMID14
 			{
 			  // Build 1 sub-pyramid per side.
 			  new_elements.push_back(new Pyramid5);
@@ -1391,7 +1397,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			  // 4 (the square base) with the same b_id.
 			  if (b_id != BoundaryInfo::invalid_id)
 			    mesh.boundary_info->add_side(sub_elem, 4, b_id);
-			} // end else type==PYRAMID5
+			} // end else type==PYRAMID5 || type==PYRAMID14
 		    }
 		}
 	    }
@@ -1413,11 +1419,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 	    for (unsigned int i=0; i<new_elements.size(); ++i)
 	      mesh.add_elem(new_elements[i]);
 
-	  } // end if (type == TET4,TET10,PYRAMID5
+	  } // end if (type == TET4,TET10,PYRAMID5,PYRAMID14
 
 
-	// Use all_second_order to convert the TET4's to TET10's
-	if (type == TET10)
+	// Use all_second_order to convert the TET4's to TET10's or PYRAMID5's to PYRAMID14's
+	if ((type == TET10) || (type == PYRAMID14))
 	  {
 	    mesh.all_second_order();
 	  }

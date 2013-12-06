@@ -134,6 +134,7 @@ INSTANTIATE_ENUM_MAPS(ElemType, elem_type)
 
 	elem_type_to_enum["PYRAMID"   ]=PYRAMID5;
 	elem_type_to_enum["PYRAMID5"  ]=PYRAMID5;
+	elem_type_to_enum["PYRAMID14" ]=PYRAMID14;
 
 	elem_type_to_enum["INFEDGE"   ]=INFEDGE2;
 	elem_type_to_enum["INFEDGE2"  ]=INFEDGE2;
