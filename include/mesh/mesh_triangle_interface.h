@@ -115,9 +115,21 @@ namespace libMesh
     ElemType& elem_type() {return _elem_type;}
 
     /**
-     * Sets and/or gets the desired triangle area.
+     * Sets and/or gets the desired triangle area. Set to zero to disable
+     * area constraint.
      */
     Real& desired_area() {return _desired_area;}
+
+    /**
+     * Sets and/or gets the minimum angle. Set to zero to disable area
+     * constraint.
+     */
+    Real& minimum_angle() {return _minimum_angle;}
+
+    /**
+     * Sets and/or gets additional flags to be passed to triangle
+     */
+    std::string& extra_flags() {return _extra_flags;}
 
     /**
      * Sets and/or gets the desired triangulation type.
@@ -176,6 +188,16 @@ namespace libMesh
      * The desired area for the elements in the resulting mesh.
      */
     Real _desired_area;
+
+    /**
+     * Minimum angle in triangles
+     */
+    Real _minimum_angle;
+
+    /**
+     * Additional flags to be passed to triangle
+     */
+    std::string _extra_flags;
 
     /**
      * The type of triangulation to perform: choices are:

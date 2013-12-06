@@ -51,7 +51,7 @@ struct Gx : public RBParametrizedFunction
 {
   virtual Number evaluate(const RBParameters& mu,
                           const Point& p,
-                          const subdomain_id_type)
+                          const Elem&)
   {
     Real curvature = mu.get_value("curvature");
     return 1. + curvature*p(0);
@@ -63,7 +63,7 @@ struct Gy : public RBParametrizedFunction
 {
   virtual Number evaluate(const RBParameters& mu,
                           const Point& p,
-                          const subdomain_id_type)
+                          const Elem&)
   {
     Real curvature = mu.get_value("curvature");
     return 1. + curvature*p(0);
@@ -75,7 +75,7 @@ struct Gz : public RBParametrizedFunction
 {
   virtual Number evaluate(const RBParameters& mu,
                           const Point& p,
-                          const subdomain_id_type)
+                          const Elem&)
   {
     Real curvature = mu.get_value("curvature");
     return 1./(1. + curvature*p(0));

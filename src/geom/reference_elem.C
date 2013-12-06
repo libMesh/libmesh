@@ -202,6 +202,7 @@ namespace
       ref_elem_file[PRISM18]  = ElemDataStrings::one_prism18;
 
       ref_elem_file[PYRAMID5] = ElemDataStrings::one_pyramid;
+      ref_elem_file[PYRAMID14] = ElemDataStrings::one_pyramid14;
     }
 
     // Read'em

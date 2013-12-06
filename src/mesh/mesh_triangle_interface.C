@@ -45,6 +45,8 @@ namespace libMesh
       _holes(NULL),
       _elem_type(TRI3),
       _desired_area(0.1),
+      _minimum_angle(20.0),
+      _extra_flags(""),
       _triangulation_type(GENERATE_CONVEX_HULL),
       _insert_extra_points(false),
       _smooth_after_generating(true),
@@ -255,7 +257,7 @@ namespace libMesh
     std::ostringstream flags;
 
     // Default flags always used
-    flags << "zBPQq";
+    flags << "zBPQ";
 
     // Flags which are specific to the type of triangulation
     switch (_triangulation_type)
@@ -314,7 +316,16 @@ namespace libMesh
       flags << "p";
 
     // Finally, add the area constraint
-    flags << "a" << std::fixed << _desired_area;
+    if (_desired_area > TOLERANCE)
+      flags << "a" << std::fixed << _desired_area;
+
+    // add minimum angle constraint
+    if (_minimum_angle > TOLERANCE)
+      flags << "q" << std::fixed << _minimum_angle;
+
+    // add user provided extra flags
+    if (_extra_flags.size() > 0)
+      flags << _extra_flags;
 
     // Refine the initial output to conform to the area constraint
     TriangleWrapper::triangulate(const_cast<char*>(flags.str().c_str()),

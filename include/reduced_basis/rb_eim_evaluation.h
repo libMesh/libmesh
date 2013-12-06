@@ -24,6 +24,8 @@
 #include "libmesh/auto_ptr.h"
 #include "libmesh/point.h"
 #include "libmesh/rb_evaluation.h"
+#include "libmesh/elem.h"
+#include "libmesh/serial_mesh.h"
 
 // C++ includes
 
@@ -97,12 +99,11 @@ public:
    * approximated at the point \p p.
    * \p var_index specifies the
    * variable (i.e. the parametrized function index) to be evaluated.
-   * \p subdomain_id specifies which subdomain of the mesh the
-   * evaluation is on.
+   * \p elem specifies the element of the mesh that contains p.
    */
   Number evaluate_parametrized_function(unsigned int var_index,
                                         const Point& p,
-                                        subdomain_id_type subdomain_id);
+                                        const Elem& elem);
 
   /**
    * Calculate the EIM approximation to parametrized_function
@@ -174,19 +175,19 @@ public:
   std::vector<unsigned int> interpolation_points_var;
   
   /**
-   * The corresponding list of subdomain ids at which
+   * The corresponding list of elements at which
    * the interpolation points were identified.
    */
-  std::vector<subdomain_id_type> interpolation_points_subdomain;
+  std::vector<Elem*> interpolation_points_elem;
 
   /**
    * We also need an extra interpolation point and associated
-   * variable for the "extra" solve we do at the end of
+   * variable and Elem for the "extra" solve we do at the end of
    * the Greedy algorithm.
    */
   Point extra_interpolation_point;
   unsigned int extra_interpolation_point_var;
-  unsigned int extra_interpolation_point_subdomain;
+  Elem* extra_interpolation_point_elem;
 
   /**
    * We also need a DenseVector to represent the corresponding
@@ -195,6 +196,17 @@ public:
   DenseVector<Number> extra_interpolation_matrix_row;
 
 private:
+
+  /**
+   * Write out interpolation_points_elem by putting the elements into
+   * a mesh and writing out the mesh.
+   */
+  void write_out_interpolation_points_elem(const std::string directory_name);
+
+  /**
+   * Read int interpolation_points_elem from a mesh.
+   */
+  void read_in_interpolation_points_elem(const std::string directory_name);
 
   /**
    * This vector stores the parametrized functions
@@ -231,6 +243,12 @@ private:
    * are avoiding an unnecessary repeat solve).
    */
   Real _previous_error_bound;
+
+  /**
+   * Mesh object that we use to store copies of the elements associated with
+   * interpolation points.
+   */
+  SerialMesh _interpolation_points_mesh;
 
 };
 

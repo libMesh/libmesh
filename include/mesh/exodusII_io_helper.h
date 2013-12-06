@@ -902,6 +902,12 @@ public:
    */
   static const int pyramid5_node_map[5];
 
+  /**
+   * The Pyramid5 node map.  Use this map for biquadratic pyramid elements
+   * in 3D.
+   */
+  static const int pyramid14_node_map[14];
+
 
   /**
    * 3D face maps.

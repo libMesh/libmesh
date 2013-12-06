@@ -1022,6 +1022,8 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	      return 2;
 	    case PYRAMID5:
 	      return 1;
+            case PYRAMID14:
+              return 2;
 	    default:
 	      return unknown;
 	  }
@@ -1046,6 +1048,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
+            case PYRAMID14:
 	      return unlimited;
 	    default:
 	      return unknown;
@@ -1082,6 +1085,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
+            case PYRAMID14:
 	      return 0;
 	    default:
 	      return unknown;
@@ -1112,6 +1116,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
+            case PYRAMID14:
 	      return 0;
 	    default:
 	      return unknown;
@@ -1138,6 +1143,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
+            case PYRAMID14:
 	      return unlimited;
 	    default:
 	      return unknown;
@@ -1166,6 +1172,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
+            case PYRAMID14:
 	      return 0;
 	    default:
 	      return unknown;
@@ -1198,6 +1205,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
+            case PYRAMID14:
 	      return 0;
 	    default:
 	      return unknown;
@@ -1231,6 +1239,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
+	    case PYRAMID14:
 	      return 0;
 	    default:
 	      return unknown;
@@ -1264,6 +1273,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	    case PRISM15:
 	    case PRISM18:
 	    case PYRAMID5:
+	    case PYRAMID14:
 	      return 0;
 	    default:
 	      return unknown;

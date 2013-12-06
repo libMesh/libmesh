@@ -227,7 +227,28 @@ namespace libMesh
 		  return;
 		}
 
+              case PYRAMID14:
+                {
+                  libmesh_assert_equal_to (elem_soln.size(), 5);
+                  libmesh_assert_equal_to (nodal_soln.size(), 14);
 
+                  nodal_soln[0]  = elem_soln[0];
+                  nodal_soln[1]  = elem_soln[1];
+                  nodal_soln[2]  = elem_soln[2];
+                  nodal_soln[3]  = elem_soln[3];
+                  nodal_soln[4]  = elem_soln[4];
+                  nodal_soln[5]  = .5*(elem_soln[0] + elem_soln[1]);
+                  nodal_soln[6]  = .5*(elem_soln[1] + elem_soln[2]);
+                  nodal_soln[7]  = .5*(elem_soln[2] + elem_soln[3]);
+                  nodal_soln[8]  = .5*(elem_soln[3] + elem_soln[0]);
+                  nodal_soln[9]  = .5*(elem_soln[0] + elem_soln[4]);
+                  nodal_soln[10] = .5*(elem_soln[1] + elem_soln[4]);
+                  nodal_soln[11] = .5*(elem_soln[2] + elem_soln[4]);
+                  nodal_soln[12] = .5*(elem_soln[3] + elem_soln[4]);
+                  nodal_soln[13] = .25*(elem_soln[0] + elem_soln[1] + elem_soln[2] + elem_soln[3]);
+
+                  return;
+                }
 
 	      default:
 		{
@@ -328,6 +349,7 @@ namespace libMesh
 		return 6;
 
 	      case PYRAMID5:
+              case PYRAMID14:
 		return 5;
 
 	      default:
@@ -377,6 +399,9 @@ namespace libMesh
 
 	      case PRISM18:
 		return 18;
+
+              case PYRAMID14:
+                return 14;
 
 	      default:
 		{
@@ -543,6 +568,7 @@ namespace libMesh
 		}
 
 	      case PYRAMID5:
+              case PYRAMID14:
 		{
 		  switch (n)
 		    {
@@ -586,6 +612,7 @@ namespace libMesh
 	      case HEX27:
 	      case PRISM15:
 	      case PRISM18:
+              case PYRAMID14:
 		return 1;
 
 	      default:
