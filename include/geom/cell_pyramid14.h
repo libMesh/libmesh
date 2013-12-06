@@ -35,8 +35,14 @@ namespace libMesh
 /**
  * The \p Pyramid14 is an element in 3D composed of 14 nodes, designed
  * to interface with a QUAD9 element on the base and a TRI6 element on
- * each of the triangular faces.  It is numbered with a
- * counter-clockwise base like this:
+ * each of the triangular faces.  Cubit will generate hybrid meshes
+ * with linear pyramids, but as of version 14 will not export
+ * quadratic pyramids.  Paraview may support 13-node pyramids, but
+ * does not render 14-node pyramids correctly.  So even if this
+ * element works in libmesh, we are curently limited in what we can do
+ * with it outside the library...
+ *
+ * The node numbering for the pyramid14 is given below:
    \verbatim
    PYRAMID14:
                        o 4
