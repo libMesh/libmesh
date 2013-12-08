@@ -456,9 +456,9 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	cell_inf_hex.h cell_inf_hex16.h cell_inf_hex18.h \
 	cell_inf_hex8.h cell_inf_prism.h cell_inf_prism12.h \
 	cell_inf_prism6.h cell_prism.h cell_prism15.h cell_prism18.h \
-	cell_prism6.h cell_pyramid.h cell_pyramid14.h cell_pyramid5.h \
-	cell_tet.h cell_tet10.h cell_tet4.h edge.h edge_edge2.h \
-	edge_edge3.h edge_edge4.h edge_inf_edge2.h elem.h \
+	cell_prism6.h cell_pyramid.h cell_pyramid13.h cell_pyramid14.h \
+	cell_pyramid5.h cell_tet.h cell_tet10.h cell_tet4.h edge.h \
+	edge_edge2.h edge_edge3.h edge_edge4.h edge_inf_edge2.h elem.h \
 	elem_quality.h elem_range.h elem_type.h face.h face_inf_quad.h \
 	face_inf_quad4.h face_inf_quad6.h face_quad.h face_quad4.h \
 	face_quad8.h face_quad9.h face_tri.h face_tri3.h face_tri6.h \
@@ -1063,6 +1063,9 @@ cell_prism6.h: $(top_srcdir)/include/geom/cell_prism6.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 cell_pyramid.h: $(top_srcdir)/include/geom/cell_pyramid.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+cell_pyramid13.h: $(top_srcdir)/include/geom/cell_pyramid13.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 cell_pyramid14.h: $(top_srcdir)/include/geom/cell_pyramid14.h
