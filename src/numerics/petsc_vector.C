@@ -212,8 +212,14 @@ void PetscVector<T>::add_vector (const std::vector<T>& v,
   this->_restore_array();
   libmesh_assert_equal_to (v.size(), dof_indices.size());
 
-  for (unsigned int i=0; i<v.size(); i++)
-    this->add (dof_indices[i], v[i]);
+  PetscErrorCode ierr=0;
+  const PetscInt * i_val = reinterpret_cast<const PetscInt*>(&dof_indices[0]);
+  const PetscScalar * petsc_value = static_cast<const PetscScalar*>(&v[0]);
+
+  ierr = VecSetValues (_vec, v.size(), i_val, petsc_value, ADD_VALUES);
+         LIBMESH_CHKERRABORT(ierr);
+
+  this->_is_closed = false;
 }
 
 
