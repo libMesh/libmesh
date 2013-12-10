@@ -92,7 +92,7 @@ bool Pyramid14::is_node_on_side(const unsigned int n,
                                 const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 4; ++i)
+  for (unsigned int i = 0; i != 9; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
   return false;
@@ -102,7 +102,7 @@ bool Pyramid14::is_node_on_edge(const unsigned int n,
                                 const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 2; ++i)
+  for (unsigned int i = 0; i != 3; ++i)
     if (edge_nodes_map[e][i] == n)
       return true;
   return false;
