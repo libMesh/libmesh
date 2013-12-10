@@ -16,7 +16,7 @@
 
 <a name="getsoftware"></a><h2>Getting the Software</h2>
 
-The <code>libMesh</code> source can be <a href="https://sourceforge.net/projects/libmesh/files/libmesh">downloaded from our SourceForge release page</a>.
+The <code>libMesh</code> source can be <a href="https://github.com/libMesh/libmesh/releases">downloaded from our GitHub release page</a>.
 Stable releases are located there as compressed tar archives.
 
 You may also access the Git source tree for the latest code. You can get read-only access
