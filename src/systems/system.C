@@ -2032,7 +2032,7 @@ Number System::point_value(unsigned int var, const Point &p, const Elem &e) cons
   const unsigned int num_dofs = libmesh_cast_int<unsigned int>
     (dof_indices.size());
 
-  FEType fe_type = dof_map.variable_type(0);
+  FEType fe_type = dof_map.variable_type(var);
 
   // Build a FE so we can calculate u(p)
   AutoPtr<FEBase> fe (FEBase::build(e.dim(), fe_type));
@@ -2130,7 +2130,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e)
   const unsigned int num_dofs = libmesh_cast_int<unsigned int>
     (dof_indices.size());
 
-  FEType fe_type = dof_map.variable_type(0);
+  FEType fe_type = dof_map.variable_type(var);
 
   // Build a FE again so we can calculate u(p)
   AutoPtr<FEBase> fe (FEBase::build(e.dim(), fe_type));
@@ -2228,7 +2228,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) co
   const unsigned int num_dofs = libmesh_cast_int<unsigned int>
     (dof_indices.size());
 
-  FEType fe_type = dof_map.variable_type(0);
+  FEType fe_type = dof_map.variable_type(var);
 
   // Build a FE again so we can calculate u(p)
   AutoPtr<FEBase> fe (FEBase::build(e.dim(), fe_type));
