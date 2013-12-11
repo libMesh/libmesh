@@ -539,7 +539,7 @@ namespace Threads
     }
 
     // Create the threads
-    #pragma omp parallel for
+    #pragma omp parallel for schedule (static)
     for(unsigned int i=0; i<n_threads; i++)
     {
 #if LIBMESH_HAVE_OPENMP
@@ -639,7 +639,7 @@ namespace Threads
     // Create the threads
     std::vector<pthread_t> threads(n_threads);
 
-    #pragma omp parallel for
+    #pragma omp parallel for schedule (static)
     for(unsigned int i=0; i<n_threads; i++)
     {
 #if LIBMESH_HAVE_OPENMP

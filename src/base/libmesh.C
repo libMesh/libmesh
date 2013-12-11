@@ -338,7 +338,6 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
 
     // Set the number of OpenMP threads to the same as the number of threads libMesh is going to use
 #ifdef LIBMESH_HAVE_OPENMP
-    omp_get_thread_num();
     omp_set_num_threads(libMesh::libMeshPrivateData::_n_threads);
 #endif
 
