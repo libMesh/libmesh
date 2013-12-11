@@ -36,6 +36,10 @@
 #include <exception>
 #endif
 
+#ifdef LIBMESH_HAVE_OPENMP
+#include <omp.h>
+#endif
+
 #include "signal.h"
 
 
@@ -331,6 +335,11 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
     n_threads[1] = "--n-threads";
     libMesh::libMeshPrivateData::_n_threads =
       libMesh::command_line_value (n_threads, 1);
+
+    // Set the number of OpenMP threads to the same as the number of threads libMesh is going to use
+#ifdef LIBMESH_HAVE_OPENMP
+    omp_set_num_threads(libMesh::libMeshPrivateData::_n_threads);
+#endif
 
     task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
   }
@@ -659,11 +668,11 @@ void enableFPE(bool on)
 #if !defined(LIBMESH_HAVE_FEENABLEEXCEPT) && defined(LIBMESH_HAVE_XMMINTRIN_H)
   static int flags = 0;
 #endif
-  
+
   if (on)
   {
     struct sigaction new_action, old_action;
-    
+
 #ifdef LIBMESH_HAVE_FEENABLEEXCEPT
     feenableexcept(FE_DIVBYZERO | FE_INVALID);
 #elif  LIBMESH_HAVE_XMMINTRIN_H
@@ -672,13 +681,13 @@ void enableFPE(bool on)
     _MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
 #  endif
 #endif
-    
-    
+
+
     // Set up the structure to specify the new action.
     new_action.sa_sigaction = libmesh_handleFPE;
     sigemptyset (&new_action.sa_mask);
     new_action.sa_flags = SA_SIGINFO;
-    
+
     sigaction (SIGFPE, NULL, &old_action);
     if (old_action.sa_handler != SIG_IGN)
       sigaction (SIGFPE, &new_action, NULL);
