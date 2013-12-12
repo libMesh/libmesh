@@ -209,6 +209,10 @@ template <typename T>
 void PetscVector<T>::add_vector (const std::vector<T>& v,
 				 const std::vector<numeric_index_type>& dof_indices)
 {
+  // If we aren't adding anything just return
+  if(v.empty() || dof_indices.empty())
+    return;
+
   this->_restore_array();
   libmesh_assert_equal_to (v.size(), dof_indices.size());
 
