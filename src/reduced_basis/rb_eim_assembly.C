@@ -93,4 +93,9 @@ RBEIMConstruction& RBEIMAssembly::get_rb_eim_construction()
   return _rb_eim_con;
 }
 
+NumericVector<Number>& RBEIMAssembly::get_ghosted_basis_function()
+{
+  return *_ghosted_basis_function;
+}
+
 }

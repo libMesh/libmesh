@@ -57,15 +57,20 @@ public:
    * Evaluate variable \p var_number of this object's EIM basis function
    * at the points \p qpoints. Fill \p values with the basis function values.
    */
-  void evaluate_basis_function(unsigned int var,
-                               const Elem& element,
-                               const std::vector<Point>& qpoints,
-                               std::vector<Number>& values);
+  virtual void evaluate_basis_function(unsigned int var,
+                                       const Elem& element,
+                                       const std::vector<Point>& qpoints,
+                                       std::vector<Number>& values);
 
   /**
    * Get a reference to the RBEIMConstruction object.
    */
   RBEIMConstruction& get_rb_eim_construction();
+
+  /**
+   * Get a reference to the ghosted_basis_function.
+   */
+  NumericVector<Number>& get_ghosted_basis_function();
 
 private:
 

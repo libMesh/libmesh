@@ -543,7 +543,6 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   file_name << directory_name << "/extra_interpolation_point" << suffix;
   Xdr extra_interpolation_point_in(file_name.str(), mode);
 
-  for(unsigned int i=0; i<n_bfs; i++)
   {
     Real x_val, y_val, z_val = 0.;
     extra_interpolation_point_in >> x_val;
@@ -565,7 +564,7 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   file_name << directory_name << "/interpolation_points_var" << suffix;
   Xdr interpolation_points_var_in(file_name.str(), mode);
 
-  for(unsigned int i=0; i<=n_bfs; i++)
+  for(unsigned int i=0; i<n_bfs; i++)
   {
     unsigned int var;
     interpolation_points_var_in >> var;
@@ -578,7 +577,6 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   file_name << directory_name << "/extra_interpolation_point_var" << suffix;
   Xdr extra_interpolation_point_var_in(file_name.str(), mode);
 
-  for(unsigned int i=0; i<=n_bfs; i++)
   {
     unsigned int var;
     extra_interpolation_point_var_in >> var;
@@ -596,25 +594,28 @@ void RBEIMEvaluation::read_in_interpolation_points_elem(const std::string direct
 {
   _interpolation_points_mesh.read(directory_name + "/interpolation_points_mesh.xda");
 
-  unsigned int n_interpolation_points = _interpolation_points_mesh.n_elem();
+  // We have an element for each EIM basis function (plus one extra element)
+  unsigned int n_bfs = this->get_n_basis_functions();
 
   std::vector<dof_id_type> interpolation_elem_ids;
+  dof_id_type extra_interpolation_elem_id;
   {
     // These are just integers, so no need for a binary format here
     std::ifstream interpolation_elem_ids_in
       ((directory_name + "/interpolation_elem_ids.dat").c_str(), std::ifstream::in);
 
-    for(unsigned int i=0; i<n_interpolation_points; i++)
+    for(unsigned int i=0; i<n_bfs; i++)
     {
       dof_id_type elem_id;
       interpolation_elem_ids_in >> elem_id;
       interpolation_elem_ids.push_back(elem_id);
     }
+    interpolation_elem_ids_in >> extra_interpolation_elem_id;
     interpolation_elem_ids_in.close();
   }
 
-  interpolation_points_elem.resize(n_interpolation_points);
-  for(unsigned int i=0; i<(n_interpolation_points-1); i++)
+  interpolation_points_elem.resize(n_bfs);
+  for(unsigned int i=0; i<n_bfs; i++)
   {
     interpolation_points_elem[i] =
       _interpolation_points_mesh.elem(interpolation_elem_ids[i]);
@@ -622,8 +623,7 @@ void RBEIMEvaluation::read_in_interpolation_points_elem(const std::string direct
 
   // Get the extra interpolation point
   extra_interpolation_point_elem =
-    _interpolation_points_mesh.elem(
-      (interpolation_elem_ids.back()) );
+    _interpolation_points_mesh.elem(extra_interpolation_elem_id);
 }
 
 }
