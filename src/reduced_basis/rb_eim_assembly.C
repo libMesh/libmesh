@@ -23,11 +23,9 @@
 
 // libMesh includes
 #include "libmesh/fem_context.h"
+#include "libmesh/dof_map.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/dof_map.h"
-#include "libmesh/fe_interface.h"
-#include "libmesh/fe_compute_data.h"
 
 namespace libMesh
 {
@@ -50,6 +48,38 @@ RBEIMAssembly::RBEIMAssembly(RBEIMConstruction& rb_eim_con_in,
   _rb_eim_con.get_rb_evaluation().get_basis_function(_basis_function_index).
       localize(*_ghosted_basis_function);
 #endif
+
+  initialize_fe_objects();
+
+  // Also, declare fe_qrule. Just set entries to NULL for now.
+  _fe_qrule.resize(_fe_var.size());
+  for(unsigned int var=0; var<_fe_qrule.size(); var++)
+  {
+    _fe_qrule[var] = NULL;
+  }
+}
+
+RBEIMAssembly::~RBEIMAssembly()
+{
+  for(unsigned int var=0; var<_fe_var.size(); var++)
+  {
+    if(_fe_var[var])
+    {
+      delete _fe_var[var];
+      _fe_var[var] = NULL;
+    }
+  }
+  _fe_var.clear();
+
+  for(unsigned int var=0; var<_fe_qrule.size(); var++)
+  {
+    if(_fe_qrule[var])
+    {
+      delete _fe_qrule[var];
+      _fe_qrule[var] = NULL;
+    }
+  }
+  _fe_qrule.clear();
 }
 
 void RBEIMAssembly::evaluate_basis_function(unsigned int var,
@@ -59,32 +89,46 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
 {
   START_LOG("evaluate_basis_function", "RBEIMAssembly");
 
-  // Make a copy of element_qrule, since FE::attach_quadrature_rule doesn't
-  // accept a const QBase
-  AutoPtr<QBase> element_qrule_copy =
-    QBase::build(element_qrule.type(),
-                 element_qrule.get_dim(),
-                 element_qrule.get_order());
-
-  DofMap& dof_map = get_rb_eim_construction().get_dof_map();
-
-  const unsigned int dim =
-    get_rb_eim_construction().get_mesh().mesh_dimension();
-
-  FEType fe_type = dof_map.variable_type(var);
-  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-  fe->attach_quadrature_rule (element_qrule_copy.get());
+  bool repeated_qrule = false;
+  if(_fe_qrule[var] != NULL)
+  {
+    repeated_qrule =
+     ( (element_qrule.type()      == _fe_qrule[var]->type()) &&
+       (element_qrule.get_dim()   == _fe_qrule[var]->get_dim()) &&
+       (element_qrule.get_order() == _fe_qrule[var]->get_order()) );
+  }
   
-  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  // If the qrule is not repeated, then we need to make a new copy of element_qrule.
+  if(!repeated_qrule)
+  {
+    // First, possibly delete the old qrule
+    if(_fe_qrule[var] != NULL)
+    {
+      delete _fe_qrule[var];
+    }
 
-  fe->reinit (&element);
+    _fe_qrule[var] =
+      QBase::build(element_qrule.type(),
+                   element_qrule.get_dim(),
+                   element_qrule.get_order()).release();
+
+    get_fe(var).attach_quadrature_rule (_fe_qrule[var]);
+  }
+
+  const std::vector<std::vector<Real> >& phi = get_fe(var).get_phi();
+
+  // The FE object caches data, hence we recompute as little as
+  // possible on the call to reinit.
+  get_fe(var).reinit (&element);
 
   std::vector<dof_id_type> dof_indices_var;
+
+  DofMap& dof_map = get_rb_eim_construction().get_dof_map();
   dof_map.dof_indices (&element, dof_indices_var, var);
 
   libmesh_assert(dof_indices_var.size() == phi.size());
 
-  unsigned int n_qpoints = element_qrule_copy->n_points();
+  unsigned int n_qpoints = _fe_qrule[var]->n_points();
   values.resize(n_qpoints);
 
   for(unsigned int qp=0; qp<n_qpoints; qp++)
@@ -105,6 +149,35 @@ RBEIMConstruction& RBEIMAssembly::get_rb_eim_construction()
 NumericVector<Number>& RBEIMAssembly::get_ghosted_basis_function()
 {
   return *_ghosted_basis_function;
+}
+
+FEBase& RBEIMAssembly::get_fe(unsigned int var)
+{
+  libmesh_assert_less(var, _fe_var.size());
+
+  return *_fe_var[var];
+}
+
+void RBEIMAssembly::initialize_fe_objects()
+{
+  libmesh_assert_equal_to(_fe_var.size(), 0);
+
+  DofMap& dof_map = get_rb_eim_construction().get_dof_map();
+
+  const unsigned int dim =
+    get_rb_eim_construction().get_mesh().mesh_dimension();
+
+  _fe_var.resize(get_rb_eim_construction().n_vars());
+  for(unsigned int var=0; var<get_rb_eim_construction().n_vars(); var++)
+  {
+    FEType fe_type = dof_map.variable_type(var);
+    FEBase* fe = (FEBase::build(dim, fe_type)).release();
+
+    _fe_var[var] = fe;
+
+    // Pre-request the shape function for efficieny's sake
+    fe->get_phi();
+  }
 }
 
 }

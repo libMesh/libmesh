@@ -27,7 +27,7 @@
 #include "libmesh/auto_ptr.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/point.h"
-#include "libmesh/quadrature.h"
+#include "libmesh/fe.h"
 
 namespace libMesh
 {
@@ -55,6 +55,11 @@ public:
                 unsigned int basis_function_index_in);
 
   /**
+   * Destructor.
+   */
+  virtual ~RBEIMAssembly();
+
+  /**
    * Evaluate variable \p var_number of this object's EIM basis function
    * at the points \p qpoints. Fill \p values with the basis function values.
    */
@@ -73,7 +78,17 @@ public:
    */
   NumericVector<Number>& get_ghosted_basis_function();
 
+  /**
+   * Retrieve the FE object associated with variable \p var.
+   */
+  FEBase& get_fe(unsigned int var);
+
 private:
+
+  /**
+   * Initialize the FE objects in _fe_var.
+   */
+  void initialize_fe_objects();
 
   /**
    * The RBEIMConstruction object that this RBEIMAssembly is based on.
@@ -91,6 +106,18 @@ private:
    * vector to facilitate interpolation in the case of multiple processors.
    */
   AutoPtr< NumericVector<Number> > _ghosted_basis_function;
+
+  /**
+   * We store an FE object for each variable in _rb_eim_con. This is used
+   * in evaluate_basis_function. Note that by storing the FE objects (rather
+   * than recreating them each time) we benefit from caching in fe.reinit().
+   */
+  std::vector< FEBase* > _fe_var;
+
+  /**
+   * We also store the quadrature rule associated with each FE object.
+   */
+  std::vector< QBase* > _fe_qrule;
 
 };
 
