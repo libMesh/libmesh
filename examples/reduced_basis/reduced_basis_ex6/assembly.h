@@ -273,19 +273,19 @@ struct AssemblyEIM : RBEIMAssembly
     std::vector<Number> eim_values_Gx;
     evaluate_basis_function(Gx_var,
                             c.get_elem(),
-                            qpoints,
+                            c.get_element_qrule(),
                             eim_values_Gx);
 
     std::vector<Number> eim_values_Gy;
     evaluate_basis_function(Gy_var,
                             c.get_elem(),
-                            qpoints,
+                            c.get_element_qrule(),
                             eim_values_Gy);
 
     std::vector<Number> eim_values_Gz;
     evaluate_basis_function(Gz_var,
                             c.get_elem(),
-                            qpoints,
+                            c.get_element_qrule(),
                             eim_values_Gz);
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)

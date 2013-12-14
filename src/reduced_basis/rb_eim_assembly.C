@@ -54,36 +54,42 @@ RBEIMAssembly::RBEIMAssembly(RBEIMConstruction& rb_eim_con_in,
 
 void RBEIMAssembly::evaluate_basis_function(unsigned int var,
                                             const Elem& element,
-                                            const std::vector<Point>& qpoints,
+                                            const QBase& element_qrule,
                                             std::vector<Number>& values)
 {
-  DofMap& dof_map = _rb_eim_con.get_dof_map();
+  // Make a copy of element_qrule, since FE::attach_quadrature_rule doesn't
+  // accept a const QBase
+  AutoPtr<QBase> element_qrule_copy =
+    QBase::build(element_qrule.type(),
+                 element_qrule.get_dim(),
+                 element_qrule.get_order());
 
-  // Get local coordinates to feed these into compute_data().
-  // Note that the fe_type can safely be used from the 0-variable,
-  // since the inverse mapping is the same for all FEFamilies
-  std::vector<Point> mapped_qpoints;
-  FEInterface::inverse_map (_rb_eim_con.get_mesh().mesh_dimension(),
-   		            dof_map.variable_type(0),
-                            &element,
-                            qpoints,
-                            mapped_qpoints);
+  DofMap& dof_map = get_rb_eim_construction().get_dof_map();
 
-  const FEType& fe_type = dof_map.variable_type(var);
+  const unsigned int dim =
+    get_rb_eim_construction().get_mesh().mesh_dimension();
+
+  FEType fe_type = dof_map.variable_type(var);
+  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+  fe->attach_quadrature_rule (element_qrule_copy.get());
+  
+  const std::vector<std::vector<Real> >& phi = fe->get_phi();
+  
+  fe->reinit (&element);
 
   std::vector<dof_id_type> dof_indices_var;
   dof_map.dof_indices (&element, dof_indices_var, var);
 
-  values.resize(mapped_qpoints.size());
+  libmesh_assert(dof_indices_var.size() == phi.size());
 
-  for(unsigned int qp=0; qp<mapped_qpoints.size(); qp++)
+  unsigned int n_qpoints = element_qrule_copy->n_points();
+  values.resize(n_qpoints);
+
+  for(unsigned int qp=0; qp<n_qpoints; qp++)
   {
-    FEComputeData data (_rb_eim_con.get_equation_systems(), mapped_qpoints[qp]);
-    FEInterface::compute_data (_rb_eim_con.get_mesh().mesh_dimension(), fe_type, &element, data);
-
     values[qp] = 0.;
     for (unsigned int i=0; i<dof_indices_var.size(); i++)
-      values[qp] += (*_ghosted_basis_function)(dof_indices_var[i]) * data.shape[i];
+      values[qp] += (*_ghosted_basis_function)(dof_indices_var[i]) * phi[i][qp];
   }
 
 }

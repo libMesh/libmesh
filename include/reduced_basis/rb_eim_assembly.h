@@ -27,6 +27,7 @@
 #include "libmesh/auto_ptr.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/point.h"
+#include "libmesh/quadrature.h"
 
 namespace libMesh
 {
@@ -59,7 +60,7 @@ public:
    */
   virtual void evaluate_basis_function(unsigned int var,
                                        const Elem& element,
-                                       const std::vector<Point>& qpoints,
+                                       const QBase& element_qrule,
                                        std::vector<Number>& values);
 
   /**

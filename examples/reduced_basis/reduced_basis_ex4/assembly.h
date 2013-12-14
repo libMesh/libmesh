@@ -140,7 +140,7 @@ struct EIM_F : RBEIMAssembly
     std::vector<Number> eim_values;
     evaluate_basis_function(eim_var,
                             c.get_elem(),
-                            qpoints,
+                            c.get_element_qrule(),
                             eim_values);
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
