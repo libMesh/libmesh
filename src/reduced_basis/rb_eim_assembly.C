@@ -57,6 +57,8 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
                                             const QBase& element_qrule,
                                             std::vector<Number>& values)
 {
+  START_LOG("evaluate_basis_function", "RBEIMAssembly");
+
   // Make a copy of element_qrule, since FE::attach_quadrature_rule doesn't
   // accept a const QBase
   AutoPtr<QBase> element_qrule_copy =
@@ -74,7 +76,7 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
   fe->attach_quadrature_rule (element_qrule_copy.get());
   
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
-  
+
   fe->reinit (&element);
 
   std::vector<dof_id_type> dof_indices_var;
@@ -92,6 +94,7 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
       values[qp] += (*_ghosted_basis_function)(dof_indices_var[i]) * phi[i][qp];
   }
 
+  STOP_LOG("evaluate_basis_function", "RBEIMAssembly");
 }
 
 RBEIMConstruction& RBEIMAssembly::get_rb_eim_construction()
