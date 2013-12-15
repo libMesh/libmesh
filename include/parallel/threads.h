@@ -539,13 +539,19 @@ namespace Threads
     }
 
     // Create the threads
+    #pragma omp parallel for schedule (static)
     for(unsigned int i=0; i<n_threads; i++)
     {
+#if LIBMESH_HAVE_OPENMP
+      run_body<Range, Body>((void*)&range_bodies[i]);
+#else // Just use Pthreads
       spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
       pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void*)&range_bodies[i]);
       _pthread_unique_ids[threads[i]] = i;
+#endif
     }
 
+#if !LIBMESH_HAVE_OPENMP
     // Wait for them to finish
     for(unsigned int i=0; i<n_threads; i++)
     {
@@ -553,6 +559,7 @@ namespace Threads
       spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
       _pthread_unique_ids.erase(threads[i]);
     }
+#endif
 
     // Clean up
     for(unsigned int i=0; i<n_threads; i++)
@@ -631,13 +638,20 @@ namespace Threads
 
     // Create the threads
     std::vector<pthread_t> threads(n_threads);
+
+    #pragma omp parallel for schedule (static)
     for(unsigned int i=0; i<n_threads; i++)
     {
+#if LIBMESH_HAVE_OPENMP
+      run_body<Range, Body>((void*)&range_bodies[i]);
+#else // Just use Pthreads
       spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
       pthread_create(&threads[i], NULL, &run_body<Range, Body>, (void*)&range_bodies[i]);
       _pthread_unique_ids[threads[i]] = i;
+#endif
     }
 
+#if !LIBMESH_HAVE_OPENMP
     // Wait for them to finish
     for(unsigned int i=0; i<n_threads; i++)
     {
@@ -645,6 +659,7 @@ namespace Threads
       spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
       _pthread_unique_ids.erase(threads[i]);
     }
+#endif
 
     // Join them all down to the original Body
     for(unsigned int i=n_threads-1; i != 0; i--)
