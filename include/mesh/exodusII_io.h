@@ -169,6 +169,12 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   void set_output_variables(const std::vector<std::string> & output_variables);
 
   /**
+   * If true, this will override the default behavior of outputing all variables if _output_variables
+   * is an empty. Thus, this allows the possibility for writting output files without nodal variables
+   */
+  void allow_empty_output_variables(bool tf_value);
+  
+  /**
    * In the general case, meshes containing 2D elements can be
    * manifolds living in 3D space, thus by default we write all
    * meshes with the Exodus dimension set to LIBMESH_DIM =
@@ -234,6 +240,14 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   void write_nodal_data_common(std::string fname,
                                const std::vector<std::string>& names,
                                bool continuous=true);
+
+  /**
+   * By default this flag is false, which will populate the _output_variables
+   * list to all possible variables if it is empty. True will allow this list
+   * of variables to remain empty.
+   */ 
+  bool _allow_empty_output;
+  
 };
 
 
