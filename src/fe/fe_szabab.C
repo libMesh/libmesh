@@ -1260,7 +1260,7 @@ namespace libMesh
   template <> FEContinuity FE<2,SZABAB>::get_continuity() const { return C_ZERO; }
   template <> FEContinuity FE<3,SZABAB>::get_continuity() const { return C_ZERO; }
 
-  // Szabab FEMs are not hierarchic
+  // Szabab FEMs are hierarchic
   template <> bool FE<0,SZABAB>::is_hierarchic() const { return true; }
   template <> bool FE<1,SZABAB>::is_hierarchic() const { return true; }
   template <> bool FE<2,SZABAB>::is_hierarchic() const { return true; }
