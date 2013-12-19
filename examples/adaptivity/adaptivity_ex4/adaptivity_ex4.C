@@ -181,8 +181,6 @@ int main(int argc, char** argv)
   else
     output_file += "uniform";
 
-  std::string exd_file = output_file;
-  exd_file += ".e";
   output_file += ".m";
 
   std::ofstream out (output_file.c_str());
@@ -358,6 +356,9 @@ int main(int argc, char** argv)
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // Write out the solution
+  std::string exd_file = output_file;
+  exd_file += ".e";
+
   // After solving the system write the solution
   // to a ExodusII-formatted plot file.
   ExodusII_IO (mesh).write_equation_systems (exd_file,
