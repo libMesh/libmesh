@@ -431,6 +431,23 @@ namespace libMesh
   template <> bool FE<2,BERNSTEIN>::is_hierarchic() const { return false; }
   template <> bool FE<3,BERNSTEIN>::is_hierarchic() const { return false; }
 
+#ifdef LIBMESH_ENABLE_AMR
+  // compute_constraints() specializations are only needed for 2 and 3D
+  template <>
+  void FE<2,BERNSTEIN>::compute_constraints (DofConstraints &constraints,
+					      DofMap &dof_map,
+					      const unsigned int variable_number,
+					      const Elem* elem)
+  { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
+
+  template <>
+  void FE<3,BERNSTEIN>::compute_constraints (DofConstraints &constraints,
+					      DofMap &dof_map,
+					      const unsigned int variable_number,
+					      const Elem* elem)
+  { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
+#endif // #ifdef LIBMESH_ENABLE_AMR
+
   // Bernstein shapes need reinit only for approximation orders >= 3,
   // but we might reach that with p refinement
   template <> bool FE<0,BERNSTEIN>::shapes_need_reinit() const { return true; }

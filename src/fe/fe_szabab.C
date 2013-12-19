@@ -1261,10 +1261,27 @@ namespace libMesh
   template <> FEContinuity FE<3,SZABAB>::get_continuity() const { return C_ZERO; }
 
   // Szabab FEMs are not hierarchic
-  template <> bool FE<0,SZABAB>::is_hierarchic() const { return false; }
-  template <> bool FE<1,SZABAB>::is_hierarchic() const { return false; }
-  template <> bool FE<2,SZABAB>::is_hierarchic() const { return false; }
-  template <> bool FE<3,SZABAB>::is_hierarchic() const { return false; }
+  template <> bool FE<0,SZABAB>::is_hierarchic() const { return true; }
+  template <> bool FE<1,SZABAB>::is_hierarchic() const { return true; }
+  template <> bool FE<2,SZABAB>::is_hierarchic() const { return true; }
+  template <> bool FE<3,SZABAB>::is_hierarchic() const { return true; }
+
+#ifdef LIBMESH_ENABLE_AMR
+  // compute_constraints() specializations are only needed for 2 and 3D
+  template <>
+  void FE<2,SZABAB>::compute_constraints (DofConstraints &constraints,
+					      DofMap &dof_map,
+					      const unsigned int variable_number,
+					      const Elem* elem)
+  { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
+
+  template <>
+  void FE<3,SZABAB>::compute_constraints (DofConstraints &constraints,
+					      DofMap &dof_map,
+					      const unsigned int variable_number,
+					      const Elem* elem)
+  { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
   // Szabab shapes need reinit only for approximation orders >= 3,
   // but we might reach that with p refinement
