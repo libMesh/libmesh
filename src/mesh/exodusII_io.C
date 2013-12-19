@@ -46,8 +46,9 @@ ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
 #endif
   _timestep(1),
   _verbose(false),
-  _append(false)
-{
+  _append(false),
+  _allow_empty_output(false)
+{  
 }
 
 
@@ -58,12 +59,18 @@ void ExodusII_IO::set_output_variables(const std::vector<std::string> & output_v
 
 
 
+void ExodusII_IO::allow_empty_output_variables(bool tf_value)
+{
+  _allow_empty_output = tf_value;
+}
+
+
+
 void ExodusII_IO::copy_nodal_solution(System& system, std::string var_name, unsigned int timestep)
 {
   libmesh_deprecated();
   copy_nodal_solution(system, var_name, var_name, timestep);
 }
-
 
 
 void ExodusII_IO::write_discontinuous_exodusII(const std::string& name, const EquationSystems& es)
@@ -549,7 +556,9 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   // The names of the variables to be output
   std::vector<std::string> output_names;
 
-  if(_output_variables.size())
+  // If _allow_empty_output = true, then _output_names may be empty, otherwise
+  // if it is empty it will be populated with all possible variables
+  if(_allow_empty_output || !_output_variables.empty())
     output_names = _output_variables;
   else
     output_names = names;
