@@ -210,7 +210,6 @@ void System::read_header (Xdr& io,
             this->comm().broadcast(rad_order);
           }
 
-
         // Read the finite element type of the var-th variable
         int fam=0;
         if (this->processor_id() == 0)
@@ -726,12 +725,12 @@ void System::read_serialized_data (Xdr& io,
 
   // PerfLog pl("IO Performance",false);
   // pl.push("read_serialized_data");
-  std::size_t total_read_size = 0;
+  // std::size_t total_read_size = 0;
 
   // 10.)
   // Read the global solution vector
   {
-    total_read_size +=
+    // total_read_size +=
       this->read_serialized_vector<InValType>(io, *this->solution);
 
     // get the comment
@@ -748,7 +747,7 @@ void System::read_serialized_data (Xdr& io,
 
       for(; pos != this->_vectors.end(); ++pos)
         {
-          total_read_size +=
+	  // total_read_size +=
             this->read_serialized_vector<InValType>(io, *pos->second);
 
           // get the comment
@@ -1152,7 +1151,9 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
 
   // vector length
   unsigned int vector_length=0; // FIXME?  size_t would break binary compatibility...
+#ifndef NDEBUG
   std::size_t n_assigned_vals=0;
+#endif
 
   // Get the buffer size
   if (this->processor_id() == 0)
@@ -1172,7 +1173,9 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
     {
       //---------------------------------
       // Collect the values for all nodes
+#ifndef NDEBUG
       n_assigned_vals +=
+#endif
         this->read_serialized_blocked_dof_objects (n_nodes,
                                                    this->get_mesh().local_nodes_begin(),
                                                    this->get_mesh().local_nodes_end(),
@@ -1183,7 +1186,9 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
 
       //------------------------------------
       // Collect the values for all elements
+#ifndef NDEBUG
       n_assigned_vals +=
+#endif
         this->read_serialized_blocked_dof_objects (n_elem,
                                                    this->get_mesh().local_elements_begin(),
                                                    this->get_mesh().local_elements_end(),
@@ -1203,7 +1208,9 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
             {
               //---------------------------------
               // Collect the values for all nodes
+#ifndef NDEBUG
               n_assigned_vals +=
+#endif
                 this->read_serialized_blocked_dof_objects (n_nodes,
                                                            this->get_mesh().local_nodes_begin(),
                                                            this->get_mesh().local_nodes_end(),
@@ -1215,7 +1222,9 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
 
               //------------------------------------
               // Collect the values for all elements
+#ifndef NDEBUG
               n_assigned_vals +=
+#endif
                 this->read_serialized_blocked_dof_objects (n_elem,
                                                            this->get_mesh().local_elements_begin(),
                                                            this->get_mesh().local_elements_end(),
@@ -1234,7 +1243,9 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
       const unsigned int var = _written_var_indices[data_var];
       if(this->variable(var).type().family == SCALAR)
         {
+#ifndef NDEBUG
           n_assigned_vals +=
+#endif
             this->read_SCALAR_dofs (var, io, vec);
         }
     }
@@ -1320,7 +1331,7 @@ void System::write_header (Xdr& io,
       {
         // set up the comment
         comment  = "#   Name, Variable No. ";
-        std::sprintf(buf, "%d", var);
+	std::sprintf(buf, "%u", var);
         comment += buf;
         comment += ", System \"";
         comment += this->name();
@@ -1483,7 +1494,7 @@ void System::write_parallel_data (Xdr &io,
    */
   // PerfLog pl("IO Performance",false);
   // pl.push("write_parallel_data");
-  std::size_t total_written_size = 0;
+  // std::size_t total_written_size = 0;
 
   std::string comment;
 
@@ -1581,7 +1592,7 @@ void System::write_parallel_data (Xdr &io,
 
   io.data (io_buffer, comment.c_str());
 
-  total_written_size += io_buffer.size();
+  // total_written_size += io_buffer.size();
 
   // Only write additional vectors if wanted
   if (write_additional_data)
@@ -1653,7 +1664,7 @@ void System::write_parallel_data (Xdr &io,
 
           io.data (io_buffer, comment.c_str());
 
-          total_written_size += io_buffer.size();
+	  // total_written_size += io_buffer.size();
         }
     }
 
@@ -1691,9 +1702,9 @@ void System::write_serialized_data (Xdr& io,
 
   // PerfLog pl("IO Performance",false);
   // pl.push("write_serialized_data");
-  std::size_t total_written_size = 0;
+  // std::size_t total_written_size = 0;
 
-  total_written_size +=
+  // total_written_size +=
     this->write_serialized_vector(io, *this->solution);
 
   // set up the comment
@@ -1714,7 +1725,7 @@ void System::write_serialized_data (Xdr& io,
 
       for(; pos != this->_vectors.end(); ++pos)
         {
-          total_written_size +=
+	  // total_written_size +=
             this->write_serialized_vector(io, *pos->second);
 
           // set up the comment
@@ -2194,12 +2205,12 @@ std::size_t System::read_serialized_vectors (Xdr &io,
 
   libmesh_assert (io.reading());
 
+  if (this->processor_id() == 0)
+    {
   // sizes
   unsigned int num_vecs=0;
   dof_id_type vector_length=0;
 
-  if (this->processor_id() == 0)
-    {
       // Get the number of vectors
       io.data(num_vecs);
       // Get the buffer size

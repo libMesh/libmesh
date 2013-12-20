@@ -551,9 +551,6 @@ void AbaqusIO::read_elements(std::string upper)
   // Insert the elem type we detected into the set of all elem types for this mesh
   _elem_types.insert(elem_type);
 
-  // For reading in line endings
-  std::string dummy;
-
   // Grab a reference to the element definition for this element type
   const ElementDefinition& eledef = eletypes[elem_type];
 

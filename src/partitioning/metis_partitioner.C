@@ -149,7 +149,10 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
         // build the graph in CSR format.  Note that
         // the edges in the graph will correspond to
         // face neighbors
+
+#ifdef LIBMESH_ENABLE_AMR
         std::vector<const Elem*> neighbors_offspring;
+#endif
 
         MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
         const MeshBase::element_iterator elem_end = mesh.active_elements_end();

@@ -31,11 +31,6 @@ namespace libMesh
 // XdrSOLN members
 int XdrSOLN::header(XdrSHEAD *hd)
 {
-  // Temporary variables to facilitate stream reading
-  const int comm_len= 80;
-  char comment[comm_len];
-
-
 
   switch (m_type)
     {
@@ -77,16 +72,14 @@ int XdrSOLN::header(XdrSHEAD *hd)
 
         if (m_type == XdrMGF::DECODE)
           {
-            int tempSize = 0;
             xdr_string(mp_xdr_handle, &tempTitle, hd->m_strSize*m_wrtVar);
             int olen= std::strlen(tempTitle);
-            char *p;
             char *top = tempTitle;
             for (int ivar = 0; ivar < m_wrtVar; ++ivar)
               {
-                p = strchr(tempTitle,' ');
+		char *p = strchr(tempTitle,' ');
                 *p = '\0';
-                tempSize = std::strlen(tempTitle) ;
+		int tempSize = std::strlen(tempTitle) ;
                 tempTitle+=tempSize+1;
               }
             tempTitle = top;
@@ -118,6 +111,10 @@ int XdrSOLN::header(XdrSHEAD *hd)
 
     case (XdrMGF::R_ASCII):
       {
+        // Temporary variables to facilitate stream reading
+        const int comm_len= 80;
+        char comment[comm_len];
+
         libmesh_assert (mp_in.good());
 
         mp_in >> hd->m_numNodes ; mp_in.getline(comment, comm_len);

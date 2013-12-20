@@ -727,7 +727,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase&, const Node& n,
   //node lives on in the element
   //next, look for the _other_ node on that side
   //That other node is a "nodal_neighbor"... save it
-  for(;el != end_el;el++)
+  for(;el != end_el;++el)
     {
       //We only care about active elements...
       if((*el)->active())

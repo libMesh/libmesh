@@ -222,8 +222,8 @@ void UCDIO::read_implementation (std::istream& in)
         libMesh::err << "Cannot open dimension " <<
           mesh.mesh_dimension() <<
           " mesh file when configured without " <<
-          mesh.mesh_dimension() << "D support." <<
-          std::endl;
+                        mesh.mesh_dimension() << "D support." <<
+                        std::endl;
         libmesh_error();
       }
 #endif
@@ -266,13 +266,13 @@ void UCDIO::write_header(std::ostream& out_stream, const MeshBase& mesh,
   libmesh_assert (out_stream.good());
   // TODO: We used to print out the SVN revision here when we did keyword expansions...
   out_stream << "# For a description of the UCD format see the AVS Developer's guide.\n"
-             << "#\n";
+      << "#\n";
 
   // Write the mesh info
   out_stream << mesh.n_nodes() << " "
-             << n_elems  << " "
-             << n_vars << " "
-             << " 0 0\n";
+      << n_elems  << " "
+      << n_vars << " "
+      << " 0 0\n";
   return;
 }
 
@@ -387,7 +387,7 @@ void UCDIO::write_soln(std::ostream& out_stream, const MeshBase& mesh,
   // We just write out dummy.
   for( std::vector<std::string>::const_iterator var = names.begin();
        var != names.end();
-       var++)
+       ++var)
     {
       libmesh_assert (out_stream.good());
       out_stream << (*var) << ", dummy" << std::endl;

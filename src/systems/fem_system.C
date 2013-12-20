@@ -476,7 +476,9 @@ public:
         // multiple vector
         // FIXME - there should be a DofMap::constrain_element_vectors
         // to do this more efficiently
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
         std::vector<dof_id_type> original_dofs = _femcontext.get_dof_indices();
+#endif
 
         { // A lock is necessary around access to the global system
           femsystem_mutex::scoped_lock lock(assembly_mutex);

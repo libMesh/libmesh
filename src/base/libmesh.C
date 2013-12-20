@@ -672,7 +672,7 @@ LibMeshInit::~LibMeshInit()
  */
 void enableFPE(bool on)
 {
-#if !defined(LIBMESH_HAVE_FEENABLEEXCEPT) && defined(LIBMESH_HAVE_XMMINTRIN_H)
+#if !defined(LIBMESH_HAVE_FEENABLEEXCEPT) && defined(LIBMESH_HAVE_XMMINTRIN_H) && !defined(__SUNPRO_CC)
   static int flags = 0;
 #endif
 

@@ -392,8 +392,10 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
   std::vector<std::size_t>
     xfer_buf_sizes(this->n_processors());
 
+#ifdef LIBMESH_ENABLE_AMR
   typedef std::map<dof_id_type, std::pair<processor_id_type, dof_id_type> > id_map_type;
   id_map_type parent_id_map, child_id_map;
+#endif
 
   dof_id_type my_next_elem=0, next_global_elem=0;
 
@@ -404,8 +406,10 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
   for (; it != end; ++it)
     {
       pack_element (xfer_conn, *it);
+#ifdef LIBMESH_ENABLE_AMR
       parent_id_map[(*it)->id()] = std::make_pair(this->processor_id(),
                                                   my_next_elem++);
+#endif
     }
   xfer_conn.push_back(my_next_elem); // toss in the number of elements transferred.
 
@@ -528,7 +532,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
           // Write the number of elements at this level.
           {
             char buf[80];
-            std::sprintf(buf, "# n_elem at level %d", level);
+	    std::sprintf(buf, "# n_elem at level %u", level);
             std::string comment(buf), legend  = ", [ type ";
 
             if (_write_unique_id)

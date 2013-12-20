@@ -808,7 +808,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       std::map<std::string, NumericVector<Number>*>::iterator new_it = training_parameters_in.begin();
 
       NumericVector<Number>* training_vector_0 = new_it->second;
-      new_it++;
+    ++new_it;
       NumericVector<Number>* training_vector_1 = new_it->second;
 
       for(unsigned int index1=0; index1<n_training_parameters_per_var; index1++)
@@ -872,12 +872,11 @@ RBConstructionBase<Base>::set_alternative_solver
   const PCType orig_petsc_pc_type;
   const KSPType orig_petsc_ksp_type;
 #endif
-  int ierr = 0;
 
   if (petsc_linear_solver)
     {
       PC pc = petsc_linear_solver->pc();
-      ierr = PCGetType(pc, &orig_petsc_pc_type); LIBMESH_CHKERRABORT(ierr);
+      int ierr = PCGetType(pc, &orig_petsc_pc_type); LIBMESH_CHKERRABORT(ierr);
 
       KSP ksp = petsc_linear_solver->ksp();
       ierr = KSPGetType(ksp, &orig_petsc_ksp_type); LIBMESH_CHKERRABORT(ierr);

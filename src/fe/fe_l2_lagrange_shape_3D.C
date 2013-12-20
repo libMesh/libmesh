@@ -729,7 +729,6 @@ Real FE<3,L2_LAGRANGE>::shape_deriv(const ElemType type,
                     case 0:
                       return .5*(1. - y)*(1. - z)*((1. - x)*(-2.) +
                                                    (-1.)*(1. - 2.*x - 2.*y - 2.*z));
-                      libmesh_error(); // done to here
 
                     case 1:
                       return .5*(1. - y)*(1. - z)*(x*(2.) +
@@ -1261,9 +1260,9 @@ Real FE<3,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
               static bool warning_given_HEX20 = false;
 
               if (!warning_given_HEX20)
-                libMesh::err << "Second derivatives for 3D Lagrangian HEX20"
-                             << " elements are not yet implemented!"
-                             << std::endl;
+              libMesh::err << "Second derivatives for 3D Lagrangian HEX20"
+                            << " elements are not yet implemented!"
+                            << std::endl;
               warning_given_HEX20 = true;
             }
 
@@ -1287,37 +1286,37 @@ Real FE<3,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
 
               switch(j)
                 {
-                  // d^2()/dxi^2
+                // d^2()/dxi^2
                 case 0:
                   return (FE<1,L2_LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i0[i], 0, xi)*
                           FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i1[i], eta)*
                           FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i2[i], zeta));
 
-                  // d^2()/dxideta
+                // d^2()/dxideta
                 case 1:
                   return (FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, xi)*
                           FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i1[i], 0, eta)*
                           FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i2[i], zeta));
 
-                  // d^2()/deta^2
+                // d^2()/deta^2
                 case 2:
                   return (FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i0[i], xi)*
                           FE<1,L2_LAGRANGE>::shape_second_deriv(EDGE3, SECOND, i1[i], 0, eta)*
                           FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i2[i], zeta));
 
-                  // d^2()/dxidzeta
+                // d^2()/dxidzeta
                 case 3:
                   return (FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, xi)*
                           FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i1[i], eta)*
                           FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i2[i], 0, zeta));
 
-                  // d^2()/detadzeta
+                // d^2()/detadzeta
                 case 4:
                   return (FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i0[i], xi)*
                           FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i1[i], 0, eta)*
                           FE<1,L2_LAGRANGE>::shape_deriv(EDGE3, SECOND, i2[i], 0, zeta));
 
-                  // d^2()/dzeta^2
+                // d^2()/dzeta^2
                 case 5:
                   return (FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i0[i], xi)*
                           FE<1,L2_LAGRANGE>::shape      (EDGE3, SECOND, i1[i], eta)*

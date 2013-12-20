@@ -60,7 +60,7 @@ void setup(EquationSystems& systems, Mesh& mesh, GetPot& args)
   double sizey = args("mesh/generation/size", 2.0, 1);
   double sizez = args("mesh/generation/size", 2.0, 2);
   MeshTools::Generation::build_cube(mesh, nx, ny, nz,
-                                    origx, origx+sizex, origy, origy+sizey, origz, origz+sizez, eltype);
+      origx, origx+sizex, origy, origy+sizey, origz, origz+sizez, eltype);
 
   // Creating Systems
   SolidSystem& imms = systems.add_system<SolidSystem> ("solid");
@@ -119,12 +119,10 @@ void run_timestepping(EquationSystems& systems, GetPot& args)
     systems.reinit();
 
     if (t_step % args("output/frequency", 1) == 0) {
-      std::string result;
       std::stringstream file_name;
       file_name << args("results_directory", "./") << "fem_";
       file_name << std::setw(6) << std::setfill('0') << t_step;
       file_name << ".pvtu";
-
 
       io->write_equation_systems(file_name.str(), systems);
     }

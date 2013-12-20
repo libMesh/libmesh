@@ -637,7 +637,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
           // seminorm, otherwise just compute it for the current element
 
           // Loop over every element in the patch
-          for (unsigned int e = 0 ; patch_re_it != patch_re_end; patch_re_it++, ++e)
+	  for (unsigned int e = 0 ; patch_re_it != patch_re_end; ++patch_re_it, ++e)
             {
               // Build the Finite Element for the current element
 

@@ -574,7 +574,7 @@ void MeshData::write_unv_implementation (std::ostream& out_file)
       const Node* node = (*nit).first;
 
       unsigned int f_n_id = node_to_foreign_id (node);
-      std::sprintf(buf, "%10i\n", f_n_id);
+      std::sprintf(buf, "%10u\n", f_n_id);
       out_file << buf;
 
       /* since we are iterating over our own map, this libmesh_assert

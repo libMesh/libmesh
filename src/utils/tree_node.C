@@ -198,7 +198,7 @@ bool TreeNode<N>::bounds_point (const Point& p) const
       && (p(2) >= min(2))
       && (p(2) <= max(2))
 #endif
-      )
+     )
     return true;
 
   return false;
@@ -237,7 +237,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
               const Point min(xmin, ymin, zmin);
               const Point max(xc,   yc,   zc);
               return std::make_pair (min, max);
-              break;
             }
 
           case 1:
@@ -245,7 +244,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
               const Point min(xc,   ymin, zmin);
               const Point max(xmax, yc,   zc);
               return std::make_pair (min, max);
-              break;
             }
 
           case 2:
@@ -253,7 +251,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
               const Point min(xmin, yc,   zmin);
               const Point max(xc,   ymax, zc);
               return std::make_pair (min, max);
-              break;
             }
 
           case 3:
@@ -261,7 +258,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
               const Point min(xc,   yc,   zmin);
               const Point max(xmax, ymax, zc);
               return std::make_pair (min, max);
-              break;
             }
 
           case 4:
@@ -269,7 +265,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
               const Point min(xmin, ymin, zc);
               const Point max(xc,   yc,   zmax);
               return std::make_pair (min, max);
-              break;
             }
 
           case 5:
@@ -277,7 +272,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
               const Point min(xc,   ymin, zc);
               const Point max(xmax, yc,   zmax);
               return std::make_pair (min, max);
-              break;
             }
 
           case 6:
@@ -285,7 +279,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
               const Point min(xmin, yc,   zc);
               const Point max(xc,   ymax, zmax);
               return std::make_pair (min, max);
-              break;
             }
 
           case 7:
@@ -293,7 +286,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
               const Point min(xc,   yc,   zc);
               const Point max(xmax, ymax, zmax);
               return std::make_pair (min, max);
-              break;
             }
 
           default:
@@ -326,7 +318,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
               const Point min(xmin, ymin);
               const Point max(xc,   yc);
               return std::make_pair (min, max);
-              break;
             }
 
           case 1:
@@ -334,7 +325,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
               const Point min(xc,   ymin);
               const Point max(xmax, yc);
               return std::make_pair (min, max);
-              break;
             }
 
           case 2:
@@ -342,7 +332,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
               const Point min(xmin, yc);
               const Point max(xc,   ymax);
               return std::make_pair (min, max);
-              break;
             }
 
           case 3:
@@ -350,7 +339,6 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
               const Point min(xc,   yc);
               const Point max(xmax, ymax);
               return std::make_pair (min, max);
-              break;
             }
 
           default:
@@ -376,13 +364,11 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
           case 0:
             {
               return std::make_pair (Point(xmin), Point(xc));
-              break;
             }
 
           case 1:
             {
               return std::make_pair (Point(xc), Point(xmax));
-              break;
             }
 
           default:
@@ -456,7 +442,7 @@ void TreeNode<N>::print_elements(std::ostream& out_stream) const
 template <unsigned int N>
 void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Elem*> >& nodes_to_elem)
 {
-  if (this->active())
+   if (this->active())
     {
       elements.clear();
 

@@ -1375,7 +1375,7 @@ void GMVIO::write_binary (const std::string& fname,
 
           for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
             {
-              std::sprintf(buf, "proc_%d", proc);
+	      std::sprintf(buf, "proc_%u", proc);
               out_stream.write(buf, 8);
             }
 

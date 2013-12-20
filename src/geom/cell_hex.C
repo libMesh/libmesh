@@ -387,7 +387,6 @@ Real Hex::quality (const ElemQuality q) const
 
         const Real min_edge = *(std::min_element(edges.begin(), edges.end()));
         return sqrt3 * min_edge / max_diag ;
-        break;
       }
 
 

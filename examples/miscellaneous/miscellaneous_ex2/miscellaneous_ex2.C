@@ -253,7 +253,7 @@ int main (int argc, char** argv)
       // to an ExodusII-formatted plot file, for every frequency.
 #ifdef LIBMESH_HAVE_EXODUS_API
       char buf[14];
-      sprintf (buf, "out%04d.exd", n);
+      sprintf (buf, "out%04u.exd", n);
 
       ExodusII_IO(mesh).write_equation_systems (buf,
                                                 equation_systems);

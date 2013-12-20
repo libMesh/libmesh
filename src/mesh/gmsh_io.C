@@ -347,8 +347,8 @@ void GmshIO::read_mesh(std::istream& in)
   // note the the nodes can be non-consecutive
   std::map<unsigned int, unsigned int> nodetrans;
 
+  while (!in.eof())
   {
-    while (!in.eof()) {
       in >> buf;
 
       if (!std::strncmp(buf,"$MeshFormat",11))
@@ -560,7 +560,7 @@ void GmshIO::read_mesh(std::istream& in)
                 {
                   boundaryElementInfo binfo = boundary_elem[i];
                   std::set<dof_id_type>::iterator iter = binfo.nodes.begin();
-                  for (;iter!= binfo.nodes.end(); iter++)
+                  for (;iter!= binfo.nodes.end(); ++iter)
                     node_index[*iter].push_back(i);
                 }
 
@@ -608,8 +608,6 @@ void GmshIO::read_mesh(std::istream& in)
         } // if $ELM
 
     } // while !in.eof()
-
-  }
 
 }
 
