@@ -36,12 +36,7 @@ public:
   CoupledSystem(EquationSystems& es,
                 const std::string& name_in,
                 const unsigned int number_in)
-    : FEMSystem(es, name_in, number_in), 
-    p_var(libMesh::invalid_uint),
-    u_var(libMesh::invalid_uint),
-    v_var(libMesh::invalid_uint),
-    C_var(libMesh::invalid_uint),
-    Peclet(1.) {qoi.resize(1);}
+    : FEMSystem(es, name_in, number_in), Peclet(1.) {qoi.resize(1);}
 
   // Function to get computed QoI values
 
