@@ -24,6 +24,7 @@ usage ()
   echo "       $0 --fflags"
   echo "       $0 --version"
   echo "       $0 --host"
+  echo "       $0 --ldflags"
   exit
 }
 
@@ -130,10 +131,14 @@ while [ "x$1" != "x" ]; do
                         $return_val"
 	    ;;
 	
-	"--ldflags" | "--libs")
+	"--libs")
 	    return_val="@libmesh_optional_LIBS@ 
                         -Wl,-rpath,${libdir} -L${libdir} -lmesh${libext} 
                         $return_val"
+	    ;;
+
+	"--ldflags")
+	    return_val="@libmesh_LDFLAGS@ $return_val"
 	    ;;
 
 	"--version")

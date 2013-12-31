@@ -21,6 +21,10 @@
 // Local Includes
 #include "libmesh/threads.h"
 
+#if LIBMESH_HAVE_OPENMP
+#include <omp.h>
+#endif
+
 namespace libMesh
 {
 
@@ -30,8 +34,12 @@ namespace libMesh
 
   unsigned int Threads::pthread_unique_id()
   {
+#if LIBMESH_HAVE_OPENMP
+    return omp_get_thread_num();
+#else
     spin_mutex::scoped_lock lock(_pthread_unique_id_mutex);
     return _pthread_unique_ids[pthread_self()];
+#endif
   }
 #endif
 

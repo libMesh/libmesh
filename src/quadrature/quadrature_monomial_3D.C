@@ -54,7 +54,7 @@ void QMonomial::init_3D(const ElemType type_in,
 	      // would be a 2x2x2 Gauss product rule.
 	      const Real data[1][4] =
 		{
-		  {1.0L, 0.0L, 0.0L, 4.0L/3.0L}
+		  {1.0L, 0.0L, 0.0L, static_cast<Real>(4.0L/3.0L)}
 		};
 
 	      const unsigned int rule_id[1] = {
