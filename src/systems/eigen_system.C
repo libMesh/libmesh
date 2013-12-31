@@ -270,7 +270,7 @@ EigenSystem::sensitivity_solve (const ParameterVector& parameters,
     //    the denominator remain constant for all sensitivity calculations.
     //
     std::vector<Number> denom(_n_converged_eigenpairs, 0.);
-    sens.resize(_n_converged_eigenpairs, 0.);
+    sens.resize(_n_converged_eigenpairs*parameters.size(), 0.);
     std::pair<Real, Real> eig_val;
     
     AutoPtr< NumericVector<Number> > x_right = NumericVector<Number>::build(this->comm()),
@@ -304,29 +304,34 @@ EigenSystem::sensitivity_solve (const ParameterVector& parameters,
       }
     }
     
+    unsigned int num;
     for (unsigned int p=0; p<parameters.size(); p++)
     {
       // calculate sensitivity of matrix quantities
+      this->solution->zero();
       this->assemble_eigensystem_sensitivity(parameters, p);
       
       // now calculate sensitivity of each eigenvalue for the parameter
       for (unsigned int i=0; i<_n_converged_eigenpairs; i++)
       {
-        eig_val = this->get_eigenpair(i, x_right.get());
+        num = p*_n_converged_eigenpairs+i;
         switch (_eigen_problem_type)
         {
           case HEP:
+            eig_val = this->get_eigenpair(i, x_right.get());
             matrix_A->vector_mult(*tmp, *x_right);
-            sens[i] = x_right->dot(*tmp);            // x^H A' x
-            sens[i] /= denom[i];                     // x^H x
+            sens[num] = x_right->dot(*tmp);                     // x^H A' x
+            sens[num]-= eig_val.first * x_right->dot(*x_right); // - lambda x^H x
+            sens[num] /= denom[i];                              // x^H x
             break;
 
           case GHEP:
+            eig_val = this->get_eigenpair(i, x_right.get());
             matrix_A->vector_mult(*tmp, *x_right);
-            sens[i] = x_right->dot(*tmp);                 // x^H A' x
+            sens[num] = x_right->dot(*tmp);                 // x^H A' x
             matrix_B->vector_mult(*tmp, *x_right);
-            sens[i]-= eig_val.first * x_right->dot(*tmp); // - lambda x^H B' x
-            sens[i] /= denom[i];                          // x^H B x
+            sens[num]-= eig_val.first * x_right->dot(*tmp); // - lambda x^H B' x
+            sens[num] /= denom[i];                          // x^H B x
             break;
             
           default:
