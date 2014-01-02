@@ -100,8 +100,9 @@ public:
   explicit
   BoolAcquire(bool& b) : _b(b) { libmesh_assert(!_b); _b = true; }
 
-  ~BoolAcquire() { libmesh_assert(_b); _b = false; }
-private:
+  // Can't use exceptions or libmesh_assert() in a destructor
+  ~BoolAcquire() { assert(_b); _b = false; }
+  private:
   bool& _b;
 };
 

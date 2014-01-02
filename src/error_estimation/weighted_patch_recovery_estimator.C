@@ -568,7 +568,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           error_estimator.weight_functions[var]->init_context(femcontext);
 
           // Loop over every element in the patch
-          for (unsigned int e = 0 ; patch_re_it != patch_re_end; patch_re_it++, ++e)
+	  for (unsigned int e = 0 ; patch_re_it != patch_re_end; ++patch_re_it, ++e)
             {
               // Build the Finite Element for the current element
 

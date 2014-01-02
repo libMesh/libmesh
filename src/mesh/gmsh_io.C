@@ -428,7 +428,7 @@ void GmshIO::read_mesh(std::istream& in)
           for (unsigned int iel=0; iel<numElem; ++iel)
             {
               unsigned int id, type, physical, elementary,
-                /* partition = 1,*/ nnodes, ntags;
+                /* partition = 1,*/ nnodes;
               // note - partition was assigned but never used - BSK
               if(version <= 1.0)
                 {
@@ -436,6 +436,7 @@ void GmshIO::read_mesh(std::istream& in)
                 }
               else
                 {
+                  unsigned int ntags;
                   in >> id >> type >> ntags;
                   elementary = physical = /* partition = */ 1;
                   for(unsigned int j = 0; j < ntags; j++)

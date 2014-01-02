@@ -340,8 +340,9 @@ inline
 Parameters& Parameters::operator= (const Parameters& source)
 {
   this->clear();
+  *this += source;
 
-  return (*this += source);
+  return *this;
 }
 
 inline
