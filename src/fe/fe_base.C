@@ -1567,12 +1567,18 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
       libmesh_assert(std::abs(ui) < TOLERANCE ||
                      std::abs(ui - Uint(i)) < TOLERANCE);
       ui = Uint(i);
+      // We should be fixing all dofs by now; no need to keep track of
+      // that unless we're debugging
+#ifndef NDEBUG
       dof_is_fixed[free_dof[i]] = true;
+#endif
     }
 
+#ifndef NDEBUG
   // Make sure every DoF got reached!
   for (unsigned int i=0; i != new_n_dofs; ++i)
     libmesh_assert(dof_is_fixed[i]);
+#endif
 }
 
 

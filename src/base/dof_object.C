@@ -81,6 +81,9 @@ DofObject::DofObject (const DofObject& dof_obj) :
 // Deep-copying assignment operator
 DofObject& DofObject::operator= (const DofObject& dof_obj)
 {
+  if (&dof_obj == this)
+    return *this;
+
 #ifdef LIBMESH_ENABLE_AMR
   this->clear_old_dof_object();
 
@@ -415,7 +418,9 @@ void DofObject::set_dof_number(const unsigned int s,
 
   const unsigned int
     vg            = this->var_to_vg(s,var),
+#ifndef NDEBUG
     ncg           = this->n_comp_group(s,vg),
+#endif
     vig           = this->system_var_to_vg_var(s,vg,var),
     start_idx_sys = this->start_idx(s);
 

@@ -551,7 +551,7 @@ LibMeshInit::~LibMeshInit()
 {
   // We can't delete, finalize, etc. more than once without
   // reinitializing in between
-  libmesh_assert(!libMesh::closed());
+  libmesh_exceptionless_assert(!libMesh::closed());
 
   // Delete reference counted singleton(s)
   Singleton::cleanup();
