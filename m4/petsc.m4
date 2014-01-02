@@ -57,6 +57,7 @@ AC_DEFUN([CONFIGURE_PETSC],
       petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
       petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
       petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
+      petscrelease=`grep "define PETSC_VERSION_RELEASE" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_RELEASE[ ]*//g"`
       petscversion=$petscmajor.$petscminor.$petscsubminor
       petscmajorminor=$petscmajor.$petscminor.x
 
@@ -72,6 +73,9 @@ AC_DEFUN([CONFIGURE_PETSC],
 
       AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_SUBMINOR, [$petscsubminor],
         [PETSc's subminor version number, as detected by petsc.m4])
+
+      AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_RELEASE, [$petscrelease],
+        [PETSc release (1) or petsc-dev (0), as detected by petsc.m4])
 
       if test $petscmajor = 2; then
         if test "x$PETSC_ARCH" = x ; then
