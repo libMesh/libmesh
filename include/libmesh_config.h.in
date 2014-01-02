@@ -70,6 +70,9 @@
 /* PETSc's minor version number, as detected by petsc.m4 */
 #undef DETECTED_PETSC_VERSION_MINOR
 
+/* PETSc release (1) or petsc-dev (0), as detected by petsc.m4 */
+#undef DETECTED_PETSC_VERSION_RELEASE
+
 /* PETSc's subminor version number, as detected by petsc.m4 */
 #undef DETECTED_PETSC_VERSION_SUBMINOR
 
