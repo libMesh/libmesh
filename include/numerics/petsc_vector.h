@@ -520,7 +520,7 @@ public:
    * matrix to the file named \p name.  If \p name
    * is not specified it is dumped to the screen.
    */
-  void print_matlab(const std::string name="NULL") const;
+  void print_matlab(const std::string& name) const;
 
   /**
    * Creates a "subvector" from this vector using the rows indices
@@ -632,14 +632,14 @@ private:
 template <typename T>
 inline
 PetscVector<T>::PetscVector (const Parallel::Communicator &comm, const ParallelType ptype)
-  : NumericVector<T>(comm, ptype),
-    _array_is_present(false),
-    _first(0),
-    _last(0),
-    _local_form(NULL),
-    _values(NULL),
-    _global_to_local_map(),
-    _destroy_vec_on_exit(true)
+    : NumericVector<T>(comm, ptype),
+      _array_is_present(false),
+      _first(0),
+      _last(0),
+      _local_form(NULL),
+      _values(NULL),
+      _global_to_local_map(),
+      _destroy_vec_on_exit(true)
 {
   this->_type = ptype;
 }
@@ -737,46 +737,46 @@ PetscVector<T>::PetscVector (Vec v,
   LIBMESH_CHKERRABORT(ierr);
 
   if((std::strcmp(ptype,VECSHARED) == 0) || (std::strcmp(ptype,VECMPI) == 0))
-    {
+  {
 #if PETSC_RELEASE_LESS_THAN(3,1,1)
-      ISLocalToGlobalMapping mapping = _vec->mapping;
+    ISLocalToGlobalMapping mapping = _vec->mapping;
 #else
-      ISLocalToGlobalMapping mapping;
-      ierr = VecGetLocalToGlobalMapping(_vec, &mapping);
-      LIBMESH_CHKERRABORT(ierr);
+    ISLocalToGlobalMapping mapping;
+    ierr = VecGetLocalToGlobalMapping(_vec, &mapping);
+    LIBMESH_CHKERRABORT(ierr);
 #endif
 
-      // If is a sparsely stored vector, set up our new mapping
-      if (mapping)
-        {
-          const numeric_index_type my_local_size = static_cast<numeric_index_type>(petsc_local_size);
-          const numeric_index_type ghost_begin = static_cast<numeric_index_type>(petsc_local_size);
+    // If is a sparsely stored vector, set up our new mapping
+    if (mapping)
+    {
+      const numeric_index_type my_local_size = static_cast<numeric_index_type>(petsc_local_size);
+      const numeric_index_type ghost_begin = static_cast<numeric_index_type>(petsc_local_size);
 #if PETSC_RELEASE_LESS_THAN(3,4,0)
-          const numeric_index_type ghost_end = static_cast<numeric_index_type>(mapping->n);
+      const numeric_index_type ghost_end = static_cast<numeric_index_type>(mapping->n);
 #else
-          PetscInt n;
-          ierr = ISLocalToGlobalMappingGetSize(mapping, &n);
-          LIBMESH_CHKERRABORT(ierr);
-          const numeric_index_type ghost_end = static_cast<numeric_index_type>(n);
+      PetscInt n;
+      ierr = ISLocalToGlobalMappingGetSize(mapping, &n);
+      LIBMESH_CHKERRABORT(ierr);
+      const numeric_index_type ghost_end = static_cast<numeric_index_type>(n);
 #endif
 #if PETSC_RELEASE_LESS_THAN(3,1,1)
-          const PetscInt *indices = mapping->indices;
+      const PetscInt *indices = mapping->indices;
 #else
-          const PetscInt *indices;
-          ierr = ISLocalToGlobalMappingGetIndices(mapping,&indices);
-          LIBMESH_CHKERRABORT(ierr);
+      const PetscInt *indices;
+      ierr = ISLocalToGlobalMappingGetIndices(mapping,&indices);
+      LIBMESH_CHKERRABORT(ierr);
 #endif
-          for(numeric_index_type i=ghost_begin; i<ghost_end; i++)
-            _global_to_local_map[indices[i]] = i-my_local_size;
-          this->_type = GHOSTED;
+      for(numeric_index_type i=ghost_begin; i<ghost_end; i++)
+        _global_to_local_map[indices[i]] = i-my_local_size;
+      this->_type = GHOSTED;
 #if !PETSC_RELEASE_LESS_THAN(3,1,1)
-          ierr = ISLocalToGlobalMappingRestoreIndices(mapping, &indices);
-          LIBMESH_CHKERRABORT(ierr);
+      ierr = ISLocalToGlobalMappingRestoreIndices(mapping, &indices);
+      LIBMESH_CHKERRABORT(ierr);
 #endif
-        }
-      else
-        this->_type = PARALLEL;
     }
+    else
+      this->_type = PARALLEL;
+  }
   else
     this->_type = SERIAL;
 
@@ -828,10 +828,10 @@ void PetscVector<T>::init (const numeric_index_type n,
   if (this->_type == SERIAL)
     {
       ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
-      CHKERRABORT(PETSC_COMM_SELF,ierr);
+             CHKERRABORT(PETSC_COMM_SELF,ierr);
 
       ierr = VecSetFromOptions (_vec);
-      CHKERRABORT(PETSC_COMM_SELF,ierr);
+             CHKERRABORT(PETSC_COMM_SELF,ierr);
     }
   // otherwise create an MPI-enabled vector
   else if (this->_type == PARALLEL)
@@ -840,15 +840,15 @@ void PetscVector<T>::init (const numeric_index_type n,
       libmesh_assert_less_equal (n_local, n);
       ierr = VecCreateMPI (this->comm().get(), petsc_n_local, petsc_n,
                            &_vec);
-      LIBMESH_CHKERRABORT(ierr);
+             LIBMESH_CHKERRABORT(ierr);
 #else
       libmesh_assert_equal_to (n_local, n);
       ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
-      CHKERRABORT(PETSC_COMM_SELF,ierr);
+             CHKERRABORT(PETSC_COMM_SELF,ierr);
 #endif
 
       ierr = VecSetFromOptions (_vec);
-      LIBMESH_CHKERRABORT(ierr);
+             LIBMESH_CHKERRABORT(ierr);
     }
   else
     libmesh_error();
@@ -1013,7 +1013,7 @@ void PetscVector<T>::clear ()
       PetscErrorCode ierr=0;
 
       ierr = LibMeshVecDestroy(&_vec);
-      LIBMESH_CHKERRABORT(ierr);
+             LIBMESH_CHKERRABORT(ierr);
     }
 
   this->_is_closed = this->_is_initialized = false;
@@ -1113,7 +1113,7 @@ numeric_index_type PetscVector<T>::size () const
     return 0;
 
   ierr = VecGetSize(_vec, &petsc_size);
-  LIBMESH_CHKERRABORT(ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   return static_cast<numeric_index_type>(petsc_size);
 }
@@ -1130,7 +1130,7 @@ numeric_index_type PetscVector<T>::local_size () const
   PetscInt petsc_size=0;
 
   ierr = VecGetLocalSize(_vec, &petsc_size);
-  LIBMESH_CHKERRABORT(ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   return static_cast<numeric_index_type>(petsc_size);
 }
@@ -1146,7 +1146,7 @@ numeric_index_type PetscVector<T>::first_local_index () const
   numeric_index_type first = 0;
 
   if(_array_is_present) // Can we use cached values?
-    first = _first;
+      first = _first;
   else
     {
       PetscErrorCode ierr=0;
@@ -1170,7 +1170,7 @@ numeric_index_type PetscVector<T>::last_local_index () const
   numeric_index_type last = 0;
 
   if(_array_is_present) // Can we use cached values?
-    last = _last;
+      last = _last;
   else
     {
       PetscErrorCode ierr=0;
@@ -1302,7 +1302,7 @@ Real PetscVector<T>::min () const
   PetscReal returnval=0.;
 
   ierr = VecMin (_vec, &index, &returnval);
-  LIBMESH_CHKERRABORT(ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // this return value is correct: VecMin returns a PetscReal
   return static_cast<Real>(returnval);
@@ -1321,7 +1321,7 @@ Real PetscVector<T>::max() const
   PetscReal returnval=0.;
 
   ierr = VecMax (_vec, &index, &returnval);
-  LIBMESH_CHKERRABORT(ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // this return value is correct: VecMax returns a PetscReal
   return static_cast<Real>(returnval);
@@ -1374,14 +1374,14 @@ void PetscVector<T>::_get_array(void) const
 #endif
         }
 
-      { // cache ownership range
-        PetscErrorCode ierr=0;
-        PetscInt petsc_first=0, petsc_last=0;
-        ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
-        LIBMESH_CHKERRABORT(ierr);
-        _first = static_cast<numeric_index_type>(petsc_first);
-        _last = static_cast<numeric_index_type>(petsc_last);
-      }
+        { // cache ownership range
+          PetscErrorCode ierr=0;
+          PetscInt petsc_first=0, petsc_last=0;
+          ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
+          LIBMESH_CHKERRABORT(ierr);
+          _first = static_cast<numeric_index_type>(petsc_first);
+          _last = static_cast<numeric_index_type>(petsc_last);
+        }
 
       _array_is_present = true;
     }

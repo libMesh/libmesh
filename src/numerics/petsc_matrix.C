@@ -498,7 +498,7 @@ Real PetscMatrix<T>::linfty_norm () const
 
 
 template <typename T>
-void PetscMatrix<T>::print_matlab (const std::string name) const
+void PetscMatrix<T>::print_matlab (const std::string& name) const
 {
   libmesh_assert (this->initialized());
 
