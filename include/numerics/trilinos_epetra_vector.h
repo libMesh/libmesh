@@ -482,14 +482,6 @@ public:
                                const NumericVector<T>& vec2);
 
   /**
-   * Print the contents of the vector in Matlab
-   * format. Optionally prints the
-   * matrix to the file named \p name.  If \p name
-   * is not specified it is dumped to the screen.
-   */
-  void print_matlab (const std::string name="NULL") const;
-
-  /**
    * Creates a "subvector" from this vector using the rows indices
    * of the "rows" array.
    */

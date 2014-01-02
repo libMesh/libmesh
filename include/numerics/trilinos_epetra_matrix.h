@@ -274,14 +274,6 @@ public:
   void print_personal(std::ostream& os=libMesh::out) const;
 
   /**
-   * Print the contents of the matrix in Matlab's
-   * sparse matrix format. Optionally prints the
-   * matrix to the file named \p name.  If \p name
-   * is not specified it is dumped to the screen.
-   */
-  void print_matlab(const std::string name="NULL") const;
-
-  /**
    * Copies the diagonal part of the matrix into \p dest.
    */
   void get_diagonal (NumericVector<T>& dest) const;

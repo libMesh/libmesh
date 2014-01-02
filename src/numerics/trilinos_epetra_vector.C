@@ -596,16 +596,6 @@ void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
 
 
 template <typename T>
-void EpetraVector<T>::print_matlab (const std::string /* name */) const
-{
-  libmesh_not_implemented();
-}
-
-
-
-
-
-template <typename T>
 void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
                                        const std::vector<numeric_index_type>& /* rows */) const
 {
