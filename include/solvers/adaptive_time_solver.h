@@ -117,22 +117,36 @@ public:
   std::vector<float> component_scale;
 
   /**
-   * This tolerance is the target relative error between double-deltat
-   * and single-deltat timesteps, scaled by deltat.  If this error tolerance
-   * is exceeded or not met, future timesteps will be run with deltat shrunk
-   * or grown to compensate.
+   * This tolerance is the target relative error between an exact
+   * time integration and a single time step output, scaled by deltat.
+   * integrator, scaled by deltat.  If the estimated error exceeds or
+   * undershoots the target error tolerance, future timesteps will be
+   * run with deltat shrunk or grown to compensate.
    *
    * The default value is 1.0e-2; obviously users should select their
    * own tolerance.
+   *
+   * If a *negative* target_tolerance is specified, then its absolute
+   * value is used to scale the estimated error from the first
+   * simulation time step, and this becomes the target tolerance of
+   * all future time steps.
    */
   Real target_tolerance;
 
   /**
-   * This tolerance is the maximum relative error between double-deltat and
-   * single-deltat timesteps, scaled by deltat.  If this error tolerance is
-   * exceeded, the current timestep will be repeated with a smaller deltat.
+   * This tolerance is the maximum relative error between an exact
+   * time integration and a single time step output, scaled by deltat.
+   * If this error tolerance is exceeded by the estimated error of the
+   * current time step, that time step will be repeated with a smaller
+   * deltat.
    *
-   * If you use the default upper_tolerance=0.0,
+   * If you use the default upper_tolerance=0.0, then the current
+   * time step will not be repeated regardless of estimated error.
+   *
+   * If a *negative* upper_tolerance is specified, then its absolute
+   * value is used to scale the estimated error from the first
+   * simulation time step, and this becomes the upper tolerance of
+   * all future time steps.
    */
   Real upper_tolerance;
 
