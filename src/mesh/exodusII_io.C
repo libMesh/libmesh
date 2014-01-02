@@ -46,14 +46,16 @@ ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
 #endif
   _timestep(1),
   _verbose(false),
-  _append(false)
+  _append(false),
+  _allow_empty_variables(false)
 {
 }
 
 
-void ExodusII_IO::set_output_variables(const std::vector<std::string> & output_variables)
+void ExodusII_IO::set_output_variables(const std::vector<std::string> & output_variables, bool allow_empty)
 {
   _output_variables = output_variables;
+  _allow_empty_variables = allow_empty;
 }
 
 
@@ -549,7 +551,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   // The names of the variables to be output
   std::vector<std::string> output_names;
 
-  if(_output_variables.size())
+  if(_allow_empty_variables || !_output_variables.empty())
     output_names = _output_variables;
   else
     output_names = names;

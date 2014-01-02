@@ -164,9 +164,12 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   /**
    * Sets the list of variable names to be included in the output.
    * This is _optional_.  If this is never called then all variables
-   * will be present.
+   * will be present. If this is called and an empty vector is supplied
+   * no variables will be output. Setting the allow_empty = false will
+   * result in empty vectors supplied here to also be populated with all
+   * variables.
    */
-  void set_output_variables(const std::vector<std::string> & output_variables);
+  void set_output_variables(const std::vector<std::string> & output_variables, bool allow_empty = true);
 
   /**
    * In the general case, meshes containing 2D elements can be
@@ -234,6 +237,14 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   void write_nodal_data_common(std::string fname,
                                const std::vector<std::string>& names,
                                bool continuous=true);
+
+  /**
+   * If true, _output_variables is allowed to remain empty.
+   * If false, if _output_variables is empty it will be populated with a complete list of all variables
+   * By default, calling set_output_variables() sets this flag to true, but it provides an override.
+   */
+  bool _allow_empty_variables;
+  
 };
 
 
