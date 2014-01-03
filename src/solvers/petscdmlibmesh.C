@@ -599,12 +599,20 @@ static PetscErrorCode  DMLibMeshParseDecompositionDescriptor_Private(DM dm, cons
       */
       if(*ss == ';') {
 	/* Create a break token: a token with a null string. */
-	ierr = PetscNew(struct token, &br); CHKERRQ(ierr);
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
+	ierr = PetscNew(struct token,&br);CHKERRQ(ierr);
+#else
+	ierr = PetscNew(&br);CHKERRQ(ierr);
+#endif
       }
       *ss = 0;
       if(s != ss) {
 	/* A nonempty string. */
-	ierr = PetscNew(struct token, &st); CHKERRQ(ierr);
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
+	ierr = PetscNew(struct token, &st);CHKERRQ(ierr);
+#else
+	ierr = PetscNew(&st);CHKERRQ(ierr);
+#endif
 	st->s = s; /* The string will be properly copied below. */
       }
       /* Add the new tokens to the list. */
@@ -1103,7 +1111,11 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
 
   PetscFunctionBegin;
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
   ierr = PetscNewLog(dm,DM_libMesh,&dlm);CHKERRQ(ierr);
+#else
+  ierr = PetscNewLog(dm,&dlm);CHKERRQ(ierr);
+#endif
   dm->data = dlm;
 
   dlm->varids     = new(std::map<std::string, unsigned int>);
