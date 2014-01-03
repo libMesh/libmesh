@@ -414,7 +414,7 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
 
   PetscErrorCode ierr=0;
 
-#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+#if PETSC_RELEASE_LESS_THAN(3,1,1)
   if(!rows.empty())
     ierr = MatZeroRows(_mat, rows.size(), (PetscInt*)&rows[0], diag_value);
   else
@@ -762,20 +762,14 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
 			 &iscol); LIBMESH_CHKERRABORT(ierr);
 
   // Extract submatrix
-#if !PETSC_VERSION_LESS_THAN(3,0,1) || !PETSC_VERSION_RELEASE
   ierr = MatGetSubMatrix(_mat,
 			 isrow,
 			 iscol,
-			 (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
-			 &(petsc_submatrix->_mat));  LIBMESH_CHKERRABORT(ierr);
-#else
-  ierr = MatGetSubMatrix(_mat,
-			 isrow,
-			 iscol,
+#if PETSC_RELEASE_LESS_THAN(3,0,1)
 			 PETSC_DECIDE,
+#endif
 			 (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
 			 &(petsc_submatrix->_mat));  LIBMESH_CHKERRABORT(ierr);
-#endif
 
   // Specify that the new submatrix is initialized and close it.
   petsc_submatrix->_is_initialized = true;

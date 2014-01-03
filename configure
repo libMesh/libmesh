@@ -28131,6 +28131,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
       petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
       petscminor=`grep "define PETSC_VERSION_MINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MINOR[ ]*//g"`
       petscsubminor=`grep "define PETSC_VERSION_SUBMINOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_SUBMINOR[ ]*//g"`
+      petscrelease=`grep "define PETSC_VERSION_RELEASE" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_RELEASE[ ]*//g"`
       petscversion=$petscmajor.$petscminor.$petscsubminor
       petscmajorminor=$petscmajor.$petscminor.x
 
@@ -28153,6 +28154,12 @@ _ACEOF
 
 cat >>confdefs.h <<_ACEOF
 #define DETECTED_PETSC_VERSION_SUBMINOR $petscsubminor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_PETSC_VERSION_RELEASE $petscrelease
 _ACEOF
 
 

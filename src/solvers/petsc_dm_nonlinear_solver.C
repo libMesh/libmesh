@@ -54,7 +54,7 @@ namespace libMesh {
       return;
 
     PetscErrorCode ierr;
-#if PETSC_VERSION_LESS_THAN(3,4,0) && PETSC_VERSION_RELEASE
+#if PETSC_RELEASE_LESS_THAN(3,4,0)
     ierr = DMRegister(DMLIBMESH, PETSC_NULL, "DMCreate_libMesh", DMCreate_libMesh); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
     ierr = DMRegister(DMLIBMESH, DMCreate_libMesh); CHKERRABORT(libMesh::COMM_WORLD,ierr);
