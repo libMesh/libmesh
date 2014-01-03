@@ -304,7 +304,10 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 	      }
 	  }
 
-	libmesh_assert_equal_to (csr_graph.vals.size(), graph_size);
+        // We create a non-empty vals for a disconnected graph, to
+        // work around a segfault from METIS.
+	libmesh_assert_equal_to (csr_graph.vals.size(),
+                                 std::max(graph_size,std::size_t(1)));
       } // done building the graph
 
       int ncon = 1;
