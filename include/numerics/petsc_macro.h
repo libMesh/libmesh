@@ -36,7 +36,9 @@
 				  (LIBMESH_DETECTED_PETSC_VERSION_MINOR == (minor) &&		                    \
 				   LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
 
-
+// Shorthand for PETSC_VERSION_LESS_THAN(major,minor,subminor) && PETSC_VERSION_RELEASE
+#define PETSC_RELEASE_LESS_THAN(major,minor,subminor)                   \
+  (PETSC_VERSION_LESS_THAN(major,minor,subminor) && LIBMESH_DETECTED_PETSC_VERSION_RELEASE)
 
 // In case the configure test some day fails, we can fall back on including petscversion.h.
 // In order to support PETSc 2.3.1, however, we need to use a few hacks that allow us to
@@ -129,6 +131,7 @@ typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCop
 #else // LIBMESH_HAVE_PETSC
 
 #define PETSC_VERSION_LESS_THAN(major,minor,subminor) 1
+#define PETSC_RELEASE_LESS_THAN(major,minor,subminor) 1
 
 #endif // LIBMESH_HAVE_PETSC
 
