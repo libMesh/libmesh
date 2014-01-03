@@ -83,11 +83,11 @@ EXTERN_C_FOR_PETSC_BEGIN
 #include <petsc.h>
 EXTERN_C_FOR_PETSC_END
 
-#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+#if PETSC_RELEASE_LESS_THAN(3,1,1)
 typedef PetscTruth PetscBool;
 #endif
 
-#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+#if PETSC_RELEASE_LESS_THAN(3,1,1)
 #  define LibMeshVecDestroy(x)         VecDestroy(*(x))
 #  define LibMeshVecScatterDestroy(x)  VecScatterDestroy(*(x))
 #  define LibMeshMatDestroy(x)         MatDestroy(*(x))
@@ -114,7 +114,7 @@ typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCop
   ((mode) == PETSC_OWN_POINTER                                          \
    ? (ISCreateGeneral((comm),(n),(idx),(is)) || PetscFree(idx) || (*(idx) = PETSC_NULL)) \
    : (ISCreateGeneral((comm),(n),(idx),(is))))
-#elif PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+#elif PETSC_RELEASE_LESS_THAN(3,1,1)
 typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCopyMode;
 #  define ISCreateLibMesh(comm,n,idx,mode,is)           \
   ((mode) == PETSC_USE_POINTER                          \

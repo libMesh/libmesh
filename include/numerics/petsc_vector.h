@@ -715,7 +715,7 @@ PetscVector<T>::PetscVector (Vec v,
 
   if((std::strcmp(ptype,VECSHARED) == 0) || (std::strcmp(ptype,VECMPI) == 0))
   {
-#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+#if PETSC_RELEASE_LESS_THAN(3,1,1)
     ISLocalToGlobalMapping mapping = _vec->mapping;
 #else
     ISLocalToGlobalMapping mapping;
@@ -728,7 +728,7 @@ PetscVector<T>::PetscVector (Vec v,
     {
       const numeric_index_type my_local_size = static_cast<numeric_index_type>(petsc_local_size);
       const numeric_index_type ghost_begin = static_cast<numeric_index_type>(petsc_local_size);
-#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,4,0)
+#if PETSC_RELEASE_LESS_THAN(3,4,0)
       const numeric_index_type ghost_end = static_cast<numeric_index_type>(mapping->n);
 #else
       PetscInt n;
@@ -736,7 +736,7 @@ PetscVector<T>::PetscVector (Vec v,
       LIBMESH_CHKERRABORT(ierr);
       const numeric_index_type ghost_end = static_cast<numeric_index_type>(n);
 #endif
-#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+#if PETSC_RELEASE_LESS_THAN(3,1,1)
       const PetscInt *indices = mapping->indices;
 #else
       const PetscInt *indices;
@@ -746,7 +746,7 @@ PetscVector<T>::PetscVector (Vec v,
       for(numeric_index_type i=ghost_begin; i<ghost_end; i++)
         _global_to_local_map[indices[i]] = i-my_local_size;
       this->_type = GHOSTED;
-#if !PETSC_VERSION_RELEASE || !PETSC_VERSION_LESS_THAN(3,1,1)
+#if !PETSC_RELEASE_LESS_THAN(3,1,1)
       ierr = ISLocalToGlobalMappingRestoreIndices(mapping, &indices);
       LIBMESH_CHKERRABORT(ierr);
 #endif

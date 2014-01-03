@@ -61,7 +61,7 @@ extern "C"
   typedef int PetscInt;
 #endif
 
-#if PETSC_VERSION_LESS_THAN(3,0,1) && PETSC_VERSION_RELEASE
+#if PETSC_RELEASE_LESS_THAN(3,0,1)
   /**
    * This function is called by PETSc to initialize the preconditioner.
    * ctx will hold the Preconditioner.

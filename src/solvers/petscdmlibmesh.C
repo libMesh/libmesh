@@ -281,7 +281,7 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt *len, 
       ierr = ISCreateGeneral(((PetscObject)dm)->comm, dindices.size(),darray, PETSC_OWN_POINTER, &dis); CHKERRQ(ierr);
       if(dlm->embedding) {
 	/* Create a relative embedding into the parent's index space. */
-#if PETSC_VERSION_LE(3,3,0) && PETSC_VERSION_RELEASE
+#if PETSC_RELEASE_LESS_THAN(3,3,1)
 	ierr = ISMapFactorRight(dis,dlm->embedding, PETSC_TRUE, &emb); CHKERRQ(ierr);
 #else
 	ierr = ISEmbed(dis,dlm->embedding, PETSC_TRUE, &emb); CHKERRQ(ierr);
@@ -385,7 +385,7 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt *len,
       ierr = ISCreateGeneral(((PetscObject)dm)->comm, dindices.size(),darray, PETSC_OWN_POINTER, &dis); CHKERRQ(ierr);
       if(dlm->embedding) {
 	/* Create a relative embedding into the parent's index space. */
-#if PETSC_VERSION_LE(3,3,0) && PETSC_VERSION_RELEASE
+#if PETSC_RELEASE_LESS_THAN(3,3,1)
 	ierr = ISMapFactorRight(dis,dlm->embedding, PETSC_TRUE, &emb); CHKERRQ(ierr);
 #else
 	ierr = ISEmbed(dis,dlm->embedding, PETSC_TRUE, &emb); CHKERRQ(ierr);
@@ -770,7 +770,7 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
   PetscFunctionReturn(0);
 }
 
-#if !PETSC_VERSION_LE(3,3,0) || !PETSC_VERSION_RELEASE
+#if !PETSC_RELEASE_LESS_THAN(3,3,1)
 #undef __FUNCT__
 #define __FUNCT__ "SNESFunction_DMlibMesh"
 static PetscErrorCode SNESFunction_DMlibMesh(SNES, Vec x, Vec r, void *ctx)
@@ -853,7 +853,7 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc, MatStruct
   PetscFunctionReturn(0);
 }
 
-#if !PETSC_VERSION_LE(3,3,0) || !PETSC_VERSION_RELEASE
+#if !PETSC_RELEASE_LESS_THAN(3,3,1)
 #undef  __FUNCT__
 #define __FUNCT__ "SNESJacobian_DMlibMesh"
 static PetscErrorCode SNESJacobian_DMlibMesh(SNES,Vec x,Mat *jac,Mat *pc, MatStructure* flag, void* ctx)
@@ -1038,7 +1038,7 @@ static PetscErrorCode  DMSetUp_libMesh(DM dm)
      Do not evaluate function, Jacobian or bounds for an embedded DM -- the subproblem might not have enough information for that.
   */
   if(!dlm->embedding) {
-#if PETSC_VERSION_LE(3,3,0) && PETSC_VERSION_RELEASE
+#if PETSC_RELEASE_LESS_THAN(3,3,1)
     ierr = DMSetFunction(dm, DMlibMeshFunction); CHKERRQ(ierr);
     ierr = DMSetJacobian(dm, DMlibMeshJacobian); CHKERRQ(ierr);
 #else
@@ -1124,7 +1124,7 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
   dm->ops->getinjection       = 0; // DMGetInjection_libMesh;
   dm->ops->getaggregates      = 0; // DMGetAggregates_libMesh;
 
-#if PETSC_VERSION_LE(3,3,0) && PETSC_VERSION_RELEASE
+#if PETSC_RELEASE_LESS_THAN(3,3,1)
   dm->ops->createfielddecompositiondm  = DMCreateFieldDecompositionDM_libMesh;
   dm->ops->createdomaindecompositiondm = DMCreateDomainDecompositionDM_libMesh;
 #endif
