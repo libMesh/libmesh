@@ -369,8 +369,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
       PetscScalar *dots;
       PetscInt nmodes = sp.size();
 
-#if PETSC_VERSION_LESS_THAN(3,5,0) && PETSC_VERSION_RELEASE
-      // emulate PETSC_VERSION_LT(3,5,0)
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
       ierr = PetscMalloc2(nmodes,Vec,&modes,nmodes,PetscScalar,&dots);
 #else
       ierr = PetscMalloc2(nmodes,&modes,nmodes,&dots);

@@ -599,7 +599,7 @@ static PetscErrorCode  DMLibMeshParseDecompositionDescriptor_Private(DM dm, cons
       */
       if(*ss == ';') {
 	/* Create a break token: a token with a null string. */
-#if PETSC_VERSION_LESS_THAN(3,5,0) && PETSC_VERSION_RELEASE
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
 	ierr = PetscNew(struct token,&br);CHKERRQ(ierr);
 #else
 	ierr = PetscNew(&br);CHKERRQ(ierr);
@@ -608,7 +608,7 @@ static PetscErrorCode  DMLibMeshParseDecompositionDescriptor_Private(DM dm, cons
       *ss = 0;
       if(s != ss) {
 	/* A nonempty string. */
-#if PETSC_VERSION_LESS_THAN(3,5,0) && PETSC_VERSION_RELEASE
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
 	ierr = PetscNew(struct token, &st);CHKERRQ(ierr);
 #else
 	ierr = PetscNew(&st);CHKERRQ(ierr);
@@ -1111,7 +1111,7 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
 
   PetscFunctionBegin;
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);
-#if PETSC_VERSION_LESS_THAN(3,5,0) && PETSC_VERSION_RELEASE
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
   ierr = PetscNewLog(dm,DM_libMesh,&dlm);CHKERRQ(ierr);
 #else
   ierr = PetscNewLog(dm,&dlm);CHKERRQ(ierr);
