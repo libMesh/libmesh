@@ -146,6 +146,11 @@ void TwostepTimeSolver::solve()
           libMesh::out << "old delta t = " << _system.deltat << std::endl;
         }
 
+      // If our upper tolerance is negative, that means we want to set
+      // it based on the first successful time step
+      if (this->upper_tolerance < 0)
+        this->upper_tolerance = -this->upper_tolerance * relative_error;
+
       // If we haven't met our upper error tolerance, we'll have to
       // repeat this timestep entirely
       if (this->upper_tolerance && relative_error > this->upper_tolerance)
@@ -173,6 +178,11 @@ void TwostepTimeSolver::solve()
   // Otherwise, compare the relative error to the tolerance
   // and adjust deltat
   last_deltat = _system.deltat;
+
+  // If our target tolerance is negative, that means we want to set
+  // it based on the first successful time step
+  if (this->target_tolerance < 0)
+    this->target_tolerance = -this->target_tolerance * relative_error;
 
   const Real global_shrink_or_growth_factor =
     std::pow(this->target_tolerance / relative_error,

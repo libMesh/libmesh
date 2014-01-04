@@ -894,7 +894,21 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 						     variable_number,
 						     elem); return;
 
+        
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+	  case SZABAB:
+	    FE<2,SZABAB>::compute_constraints (constraints,
+					       dof_map,
+					       variable_number,
+					       elem); return;
 
+	  case BERNSTEIN:
+	    FE<2,BERNSTEIN>::compute_constraints (constraints,
+						  dof_map,
+						  variable_number,
+						  elem); return;
+
+#endif
 	  default:
 	    return;
 	  }
@@ -934,6 +948,20 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 						     dof_map,
 						     variable_number,
 						     elem); return;
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+	  case SZABAB:
+	    FE<3,SZABAB>::compute_constraints (constraints,
+					       dof_map,
+					       variable_number,
+					       elem); return;
+
+	  case BERNSTEIN:
+	    FE<3,BERNSTEIN>::compute_constraints (constraints,
+						  dof_map,
+						  variable_number,
+						  elem); return;
+
+#endif
 	  default:
 	    return;
 	  }

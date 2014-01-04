@@ -36,7 +36,19 @@
 				  (LIBMESH_DETECTED_PETSC_VERSION_MINOR == (minor) &&		                    \
 				   LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
 
+// The PETSC_VERSION_RELEASE constant was introduced just prior to 2.3.0 (ca. Apr 22 2005),
+// so fall back to using PETSC_VERSION_LESS_THAN in case it doesn't exist.
+#ifdef LIBMESH_DETECTED_PETSC_VERSION_RELEASE
 
+#define PETSC_RELEASE_LESS_THAN(major,minor,subminor)                   \
+  (PETSC_VERSION_LESS_THAN(major,minor,subminor) && LIBMESH_DETECTED_PETSC_VERSION_RELEASE)
+
+#else
+
+#define PETSC_RELEASE_LESS_THAN(major,minor,subminor)   \
+  (PETSC_VERSION_LESS_THAN(major,minor,subminor))
+
+#endif
 
 // In case the configure test some day fails, we can fall back on including petscversion.h.
 // In order to support PETSc 2.3.1, however, we need to use a few hacks that allow us to
@@ -81,11 +93,11 @@ EXTERN_C_FOR_PETSC_BEGIN
 #include <petsc.h>
 EXTERN_C_FOR_PETSC_END
 
-#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+#if PETSC_RELEASE_LESS_THAN(3,1,1)
 typedef PetscTruth PetscBool;
 #endif
 
-#if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+#if PETSC_RELEASE_LESS_THAN(3,1,1)
 #  define LibMeshVecDestroy(x)         VecDestroy(*(x))
 #  define LibMeshVecScatterDestroy(x)  VecScatterDestroy(*(x))
 #  define LibMeshMatDestroy(x)         MatDestroy(*(x))
@@ -112,7 +124,7 @@ typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCop
   ((mode) == PETSC_OWN_POINTER                                          \
    ? (ISCreateGeneral((comm),(n),(idx),(is)) || PetscFree(idx) || (*(idx) = PETSC_NULL)) \
    : (ISCreateGeneral((comm),(n),(idx),(is))))
-#elif PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
+#elif PETSC_RELEASE_LESS_THAN(3,1,1)
 typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCopyMode;
 #  define ISCreateLibMesh(comm,n,idx,mode,is)           \
   ((mode) == PETSC_USE_POINTER                          \
@@ -129,6 +141,7 @@ typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCop
 #else // LIBMESH_HAVE_PETSC
 
 #define PETSC_VERSION_LESS_THAN(major,minor,subminor) 1
+#define PETSC_RELEASE_LESS_THAN(major,minor,subminor) 1
 
 #endif // LIBMESH_HAVE_PETSC
 

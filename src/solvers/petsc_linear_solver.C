@@ -43,7 +43,7 @@ extern "C"
 #endif
 
 
-#if PETSC_VERSION_LESS_THAN(3,0,1) && PETSC_VERSION_RELEASE
+#if PETSC_RELEASE_LESS_THAN(3,0,1)
   PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx)
   {
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
@@ -232,7 +232,7 @@ void PetscLinearSolver<T>::init ()
       // Have the Krylov subspace method use our good initial guess
       // rather than 0, unless the user requested a KSPType of
       // preonly, which complains if asked to use initial guesses.
-#if PETSC_VERSION_LESS_THAN(3,0,0) || !PETSC_VERSION_LESS_THAN(3,4,0) || !PETSC_VERSION_RELEASE
+#if PETSC_VERSION_LESS_THAN(3,0,0) || !PETSC_RELEASE_LESS_THAN(3,4,0)
       // Pre-3.0 and petsc-dev (as of October 2012) use non-const versions
       KSPType ksp_type;
 #else
@@ -352,7 +352,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       // Have the Krylov subspace method use our good initial guess
       // rather than 0, unless the user requested a KSPType of
       // preonly, which complains if asked to use initial guesses.
-#if PETSC_VERSION_LESS_THAN(3,0,0) || !PETSC_VERSION_LESS_THAN(3,4,0) || !PETSC_VERSION_RELEASE
+#if PETSC_VERSION_LESS_THAN(3,0,0) || !PETSC_RELEASE_LESS_THAN(3,4,0)
       KSPType ksp_type;
 #else
       const KSPType ksp_type;

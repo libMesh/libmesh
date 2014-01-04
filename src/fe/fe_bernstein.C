@@ -435,16 +435,16 @@ namespace libMesh
   // compute_constraints() specializations are only needed for 2 and 3D
   template <>
   void FE<2,BERNSTEIN>::compute_constraints (DofConstraints &constraints,
-                                          DofMap &dof_map,
-                                          const unsigned int variable_number,
-                                          const Elem* elem)
+					      DofMap &dof_map,
+					      const unsigned int variable_number,
+					      const Elem* elem)
   { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
-  
+
   template <>
   void FE<3,BERNSTEIN>::compute_constraints (DofConstraints &constraints,
-                                          DofMap &dof_map,
-                                          const unsigned int variable_number,
-                                          const Elem* elem)
+					      DofMap &dof_map,
+					      const unsigned int variable_number,
+					      const Elem* elem)
   { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
