@@ -58,8 +58,8 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
 {
   std::vector<Real> psi;
   psi.reserve(matsize);
-  std::vector<Real> xpow(npows,1.), ypow, zpow;
   unsigned int npows = order+1;
+  std::vector<Real> xpow(npows,1.), ypow, zpow;
     {
       Real x = p(0);
   for (unsigned int i=1; i != npows; ++i)

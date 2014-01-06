@@ -573,9 +573,11 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
             {
               libmesh_assert_less (i, 12);
 
+#ifndef NDEBUG
               const Real xi   = p(0);
               const Real eta  = p(1);
               const Real zeta = p(2);
+#endif
 
               libmesh_assert_less_equal ( std::fabs(xi),   1.0+TOLERANCE );
               libmesh_assert_less_equal ( std::fabs(eta),  1.0+TOLERANCE );

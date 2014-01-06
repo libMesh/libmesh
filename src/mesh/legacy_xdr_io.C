@@ -440,14 +440,14 @@ void LegacyXdrIO::read_mesh (const std::string& name,
   // the elements. BSK, 1/13/2003)
   if ((m.get_orig_flag() == LegacyXdrIO::DEAL) || (m.get_orig_flag() == LegacyXdrIO::LIBM))
     {
-      {
-      unsigned int lastConnIndex = 0;
-      unsigned int lastFaceIndex = 0;
-
       // This map keeps track of elements we've previously
       // constructed, to avoid O(n) lookup times for parent pointers
       // and to enable elements to be added in ascending ID order
       std::map<unsigned int, Elem*> parents;
+
+      {
+      unsigned int lastConnIndex = 0;
+      unsigned int lastFaceIndex = 0;
 
       // Keep track of Element ids in MGF-style meshes;
       unsigned int next_elem_id = 0;
