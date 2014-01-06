@@ -273,14 +273,14 @@ const char* ExodusII_IO_Helper::get_elem_type() const
 
 
 
-void ExodusII_IO_Helper::message(const std::string msg)
+void ExodusII_IO_Helper::message(const std::string& msg)
 {
   if (verbose) libMesh::out << msg << std::endl;
 }
 
 
 
-void ExodusII_IO_Helper::message(const std::string msg, int i)
+void ExodusII_IO_Helper::message(const std::string& msg, int i)
 {
   if (verbose) libMesh::out << msg << i << "." << std::endl;
 }
