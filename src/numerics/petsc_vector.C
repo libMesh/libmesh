@@ -1346,7 +1346,7 @@ void PetscVector<T>::print_matlab (const std::string& name) const
    * Create an ASCII file containing the matrix
    * if a filename was provided.
    */
-  if (name != "NULL")
+  if (name != "")
     {
       ierr = PetscViewerASCIIOpen( this->comm().get(),
                                    name.c_str(),

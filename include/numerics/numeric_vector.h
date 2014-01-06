@@ -621,14 +621,9 @@ public:
    * matrix to the file named \p name.  If \p name
    * is not specified it is dumped to the screen.
    */
-  virtual void print_matlab(const std::string& /*name*/) const
+  virtual void print_matlab(const std::string& /*name*/ = "") const
   {
     libmesh_not_implemented();
-  }
-
-  virtual void print_matlab()
-  {
-    this->print_matlab("NULL");
   }
 
   /**
