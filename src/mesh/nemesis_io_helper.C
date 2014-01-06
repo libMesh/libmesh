@@ -2413,7 +2413,10 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh)
 
 
 
-void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values, const std::vector<std::string> names, int timestep)
+void Nemesis_IO_Helper::write_nodal_solution
+  (const std::vector<Number>& values,
+   const std::vector<std::string>& names,
+   int timestep)
 {
   int num_vars = names.size();
   //int num_values = values.size(); // Not used?

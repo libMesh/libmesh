@@ -415,8 +415,6 @@ void AbaqusIO::read_nodes()
   // The z-coordinate will only be present for 3D meshes
 
   // Temporary variables for parsing lines of text
-  dof_id_type abaqus_node_id=0;
-  Real x=0, y=0, z=0;
   char c;
   std::string dummy;
 
@@ -429,8 +427,8 @@ void AbaqusIO::read_nodes()
   while (_in.peek() != '*' && _in.peek() != EOF)
     {
       // Re-Initialize variables to be read in from file
-      abaqus_node_id=0;
-      x = y = z = 0.;
+	dof_id_type abaqus_node_id=0;
+        Real x=0, y=0, z=0;
 
       // Note: we assume *at least* 2D points here, should we worry about
       // trying to read 1D Abaqus meshes?

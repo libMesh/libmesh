@@ -922,7 +922,7 @@ void GmshIO::write_post (const std::string& fname,
                 {
                   for (unsigned int n=0; n < elem->n_vertices(); n++)   // loop over vertices
                     {
-                      const Point vertex = elem->point(n);
+                      const Point& vertex = elem->point(n);
                       if (this->binary())
                         {
                           double tmp = vertex(d);
