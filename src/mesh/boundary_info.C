@@ -167,7 +167,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
    * every processor we'll serialize the interior mesh.  Use a
    * temporary serializer here.
    */
-  MeshSerializer(const_cast<MeshBase&>(_mesh), boundary_mesh.is_serial());
+  MeshSerializer serializer
+    (const_cast<MeshBase&>(_mesh), boundary_mesh.is_serial());
 
   /**
    * The boundary mesh elements will be one lower dimension than the
