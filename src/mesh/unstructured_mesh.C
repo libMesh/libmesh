@@ -241,7 +241,7 @@ UnstructuredMesh::~UnstructuredMesh ()
 {
   //  this->clear ();  // Nothing to clear at this level
 
-  libmesh_assert (!libMesh::closed());
+  libmesh_exceptionless_assert (!libMesh::closed());
 }
 
 

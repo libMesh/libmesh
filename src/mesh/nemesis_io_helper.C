@@ -69,7 +69,7 @@ Nemesis_IO_Helper::~Nemesis_IO_Helper()
   // Our destructor is called from Nemesis_IO.  We close the Exodus file here since we have
   // responsibility for managing the file's lifetime.
   this->ex_err = exII::ex_update(this->ex_id);
-  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+  EX_EXCEPTIONLESS_CHECK_ERR(ex_err, "Error flushing buffers to file.");
   this->close();
 }
 

@@ -1020,7 +1020,9 @@ void RBConstructionBase<Base>::set_training_random_seed(unsigned int seed)
 }
 
 template <class Base>
-void RBConstructionBase<Base>::set_deterministic_training_parameter_name(const std::string name_in)
+void
+RBConstructionBase<Base>::set_deterministic_training_parameter_name
+  (const std::string& name_in)
 {
   this->_deterministic_training_parameter_name = name_in;
 }

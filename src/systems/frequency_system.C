@@ -424,7 +424,7 @@ std::string FrequencySystem::form_freq_param_name(const unsigned int n) const
 {
   libmesh_assert_less (n, 9999);
   char buf[15];
-  sprintf(buf, "frequency %04d", n);
+  sprintf(buf, "frequency %04u", n);
   return (buf);
 }
 
@@ -434,7 +434,7 @@ std::string FrequencySystem::form_solu_vec_name(const unsigned int n) const
 {
   libmesh_assert_less (n, 9999);
   char buf[15];
-  sprintf(buf, "solution %04d", n);
+  sprintf(buf, "solution %04u", n);
   return (buf);
 }
 

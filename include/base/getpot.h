@@ -3341,7 +3341,7 @@ GetPot::unidentified_flags(const char* KnownFlagList, int ArgumentNumber=-1) con
   if (ArgumentNumber == -1)
     {
       STRING_VECTOR::const_iterator it = argv.begin();
-      it++; // forget about argv[0] (application or filename)
+      ++it; // forget about argv[0] (application or filename)
       for (; it != argv.end(); ++it)
         {
           // -- argument belongs to prefixed section ?

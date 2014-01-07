@@ -807,14 +807,13 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
   const unsigned int
     sys_num    = this->number(),
-    num_vecs   = libmesh_cast_int<unsigned int>(vecs.size()),
-    num_vars   = _written_var_indices.size(); // must be <= current number of variables!
+    num_vecs   = libmesh_cast_int<unsigned int>(vecs.size());
   const std::size_t
     io_blksize = std::min(max_io_blksize,
                           static_cast<std::size_t>(n_objs)),
     num_blks   = std::ceil(static_cast<double>(n_objs)/static_cast<double>(io_blksize));
 
-  libmesh_assert_less_equal (num_vars, this->n_vars());
+  libmesh_assert_less_equal (_written_var_indices.size(), this->n_vars());
 
   std::size_t n_read_values=0;
 
@@ -951,7 +950,9 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
           obj_val_offsets.resize (n_objects_blk); /**/ std::fill (obj_val_offsets.begin(), obj_val_offsets.end(), 0);
           recv_vals_size.resize(this->n_processors()); // reuse this to count how many values are going to each processor
 
+#ifndef NDEBUG
           unsigned int n_vals_blk = 0;
+#endif
 
           // loop over all processors and process their index request
           for (unsigned int comm_step=0; comm_step<this->n_processors(); comm_step++)
@@ -985,7 +986,9 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
                   n_vals_proc += n_vals_tot_allvecs;
                 }
 
+#ifndef NDEBUG
               n_vals_blk += n_vals_proc;
+#endif
             }
 
           // We need the offests into the input_vals vector for each object.

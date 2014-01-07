@@ -157,7 +157,9 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
         MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
         const MeshBase::element_iterator elem_end = mesh.active_elements_end();
 
+#ifndef NDEBUG
         std::size_t graph_size=0;
+#endif
 
         // (1) first pass - get the row sizes for each element by counting the number
         // of face neighbors.  Also populate the vwght array if necessary
@@ -234,7 +236,9 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
               }
 
             csr_graph.prep_n_nonzeros(elem_global_index, num_neighbors);
+#ifndef NDEBUG
             graph_size += num_neighbors;
+#endif
           }
 
         csr_graph.prepare_for_use();

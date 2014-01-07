@@ -1231,7 +1231,7 @@ numeric_index_type PetscVector<T>::map_global_to_local_index (const numeric_inde
       else
         {
           error_message << "And ghost array {" << b->first;
-          for (b++; b != end; b++)
+          for (++b; b != end; ++b)
             error_message << ',' << b->first;
           error_message << "}\n";
         }

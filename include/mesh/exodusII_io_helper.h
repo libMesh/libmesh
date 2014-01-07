@@ -33,13 +33,21 @@
 #include <vector>
 #include <map>
 
-// Macro to simplify checking Exodus error codes
+// Macros to simplify checking Exodus error codes
 #define EX_CHECK_ERR(code, msg)                 \
   do {                                          \
     if ((code) < 0) {                           \
       libMesh::err << (msg) << std::endl;       \
       libmesh_error();                          \
     } } while(0)
+
+#define EX_EXCEPTIONLESS_CHECK_ERR(code, msg) \
+  do { \
+    if ((code) < 0) { \
+      libMesh::err << (msg) << std::endl; \
+      libmesh_exceptionless_error(); \
+    } } while(0)
+
 
 
 namespace libMesh

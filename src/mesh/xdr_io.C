@@ -778,11 +778,16 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
           Parallel::wait (coord_request_handles);
 
           // Write the coordinates in this block.
-          std::size_t tot_id_size=0, tot_coord_size=0;
+	  std::size_t tot_id_size=0;
+#ifndef NDEBUG
+          std::size_t tot_coord_size=0;
+#endif
           for (unsigned int pid=0; pid<this->n_processors(); pid++)
             {
               tot_id_size    += recv_ids[pid].size();
+#ifndef NDEBUG
               tot_coord_size += recv_coords[pid].size();
+#endif
             }
 
           libmesh_assert_less_equal
