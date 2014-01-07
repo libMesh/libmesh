@@ -70,9 +70,10 @@ int main (int argc, char** argv)
 
   // We may need XDR support compiled in to read binary .xdr files
   std::string input_filename = argv[3];
-  libmesh_example_assert(LIBMESH_HAVE_XDR ||
-                         input_filename.rfind(".xdr") >=
+#ifndef LIBMESH_HAVE_XDR
+  libmesh_example_assert(input_filename.rfind(".xdr") >=
                          input_filename.size(), "XDR support");
+#endif
 
   // Read the input mesh.
   mesh.read (argv[3]);
@@ -86,9 +87,10 @@ int main (int argc, char** argv)
     {
       // We may need XDR support compiled in to read binary .xdr files
       std::string output_filename = argv[5];
-      libmesh_example_assert(LIBMESH_HAVE_XDR ||
-                             output_filename.rfind(".xdr") >=
+#ifndef LIBMESH_HAVE_XDR
+      libmesh_example_assert(output_filename.rfind(".xdr") >=
                              output_filename.size(), "XDR support");
+#endif
 
       mesh.write (argv[5]);
     }
