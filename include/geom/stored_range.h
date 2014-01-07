@@ -131,10 +131,10 @@ public:
    * one we're copying.
    */
   StoredRange (const StoredRange<iterator_type,object_type> &er,
-               const const_iterator &begin,
-               const const_iterator &end):
-    _end(end),
-    _begin(begin),
+               const const_iterator &begin_range,
+               const const_iterator &end_range):
+    _end(end_range),
+    _begin(begin_range),
     _last(0), // Initialize these in a moment
     _first(0),
     _grainsize(er._grainsize),
