@@ -141,6 +141,9 @@ SUPERTYPE(float, double);
 SUPERTYPE(float, long double);
 SUPERTYPE(double, long double);
 
+#undef CompareTypes_super
+#undef SUPERTYPE
+
 // gcc can't tell which of the following is the most specialized?  Weak.
 /*
 template<typename S, typename T>
