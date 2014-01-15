@@ -162,8 +162,8 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
     libmesh_assert_equal_to (Dim, 3);
 
     AutoPtr<FEBase> ap_fb(FEBase::build(Dim-2, this->fe_type));
-    if (base_fe != NULL)
-      delete base_fe;
+
+    delete base_fe;
     base_fe = ap_fb.release();
     base_fe->attach_quadrature_rule(base_qrule);
   }

@@ -430,11 +430,8 @@ void RBEvaluation::clear_riesz_representors()
     {
       for(unsigned int i=0; i<Aq_representor[q_a].size(); i++)
         {
-          if(Aq_representor[q_a][i])
-            {
-              delete Aq_representor[q_a][i];
-              Aq_representor[q_a][i] = NULL;
-            }
+          delete Aq_representor[q_a][i];
+          Aq_representor[q_a][i] = NULL;
         }
     }
 
