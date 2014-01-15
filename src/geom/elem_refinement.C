@@ -218,11 +218,9 @@ void Elem::contract()
   libmesh_assert (this->active());
 
   // Active contracted elements no longer can have children
-  if (_children)
-    {
-      delete [] _children;
-      _children = NULL;
-    }
+  delete [] _children;
+  _children = NULL;
+
   if (this->refinement_flag() == Elem::JUST_COARSENED)
     this->set_refinement_flag(Elem::DO_NOTHING);
 }
