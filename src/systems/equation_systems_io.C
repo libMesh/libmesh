@@ -72,12 +72,13 @@ namespace {
 // EquationSystem class implementation
     template <typename InValType>
 void EquationSystems::read (const std::string& name,
-                            const unsigned int read_flags)
+                            const unsigned int read_flags,
+                            bool partition_agnostic)
 {
   libMeshEnums::XdrMODE mode = READ;
   if (name.find(".xdr") != std::string::npos)
     mode = DECODE;
-  this->read(name, mode, read_flags);
+  this->read(name, mode, read_flags, partition_agnostic);
 
 #ifdef LIBMESH_ENABLE_AMR
   MeshRefinement mesh_refine(_mesh);
@@ -90,7 +91,8 @@ void EquationSystems::read (const std::string& name,
 template <typename InValType>
 void EquationSystems::read (const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
-                            const unsigned int read_flags)
+                            const unsigned int read_flags,
+                            bool partition_agnostic)
 {
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
 
@@ -102,7 +104,7 @@ void EquationSystems::read (const std::string& name,
   // First try the read the user requested
   try
     {
-      this->_read_impl<InValType> (name, mode, read_flags);
+      this->_read_impl<InValType> (name, mode, read_flags, partition_agnostic);
     }
 
   // If that fails, try it again but explicitly request we look for infinite element info
@@ -118,7 +120,7 @@ void EquationSystems::read (const std::string& name,
 
       try
 	{
-	  this->_read_impl<InValType> (name, mode, read_flags | EquationSystems::TRY_READ_IFEMS);
+	  this->_read_impl<InValType> (name, mode, read_flags | EquationSystems::TRY_READ_IFEMS, partition_agnostic);
 	}
 
       // If all that failed, we are out of ideas here...
@@ -136,7 +138,7 @@ void EquationSystems::read (const std::string& name,
 #else
 
   // no exceptions - cross your fingers...
-  this->_read_impl<InValType> (name, mode, read_flags);
+  this->_read_impl<InValType> (name, mode, read_flags, partition_agnostic);
 
 #endif // #ifdef LIBMESH_ENABLE_EXCEPTIONS
 
@@ -151,7 +153,8 @@ void EquationSystems::read (const std::string& name,
     template <typename InValType>
 void EquationSystems::_read_impl (const std::string& name,
 				  const libMeshEnums::XdrMODE mode,
-				  const unsigned int read_flags)
+				  const unsigned int read_flags,
+                                  bool partition_agnostic)
 {
   /**
    * This program implements the output of an
@@ -250,7 +253,7 @@ void EquationSystems::_read_impl (const std::string& name,
 
 	    // Recursively call this read() function but with the
 	    // EquationSystems::READ_LEGACY_FORMAT bit set.
-	    this->read (name, mode, (read_flags | EquationSystems::READ_LEGACY_FORMAT));
+	    this->read (name, mode, (read_flags | EquationSystems::READ_LEGACY_FORMAT), partition_agnostic);
 	    return;
 	  }
 
@@ -334,7 +337,7 @@ void EquationSystems::_read_impl (const std::string& name,
       // the EquationSystems::read() method should look constant from the mesh
       // perspective, but we need to assign a temporary numbering to the nodes
       // and elements in the mesh, which requires that we abuse const_cast
-      if (!read_legacy_format)
+      if (!read_legacy_format && partition_agnostic)
 	{
 	  MeshBase &mesh = const_cast<MeshBase&>(this->get_mesh());
 	  MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
@@ -359,7 +362,7 @@ void EquationSystems::_read_impl (const std::string& name,
 
 
       // Undo the temporary numbering.
-      if (!read_legacy_format)
+      if (!read_legacy_format && partition_agnostic)
         _mesh.fix_broken_node_and_element_numbering();
     }
 
@@ -372,19 +375,21 @@ void EquationSystems::_read_impl (const std::string& name,
 
 
 void EquationSystems::write(const std::string& name,
-                            const unsigned int write_flags) const
+                            const unsigned int write_flags,
+                            bool partition_agnostic) const
 {
   libMeshEnums::XdrMODE mode = WRITE;
   if (name.find(".xdr") != std::string::npos)
     mode = ENCODE;
-  this->write(name, mode, write_flags);
+  this->write(name, mode, write_flags, partition_agnostic);
 }
 
 
 
 void EquationSystems::write(const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
-                            const unsigned int write_flags) const
+                            const unsigned int write_flags,
+                            bool partition_agnostic) const
 {
   /**
    * This program implements the output of an
@@ -452,6 +457,7 @@ void EquationSystems::write(const std::string& name,
   // the EquationSystems::write() method should look constant,
   // but we need to assign a temporary numbering to the nodes
   // and elements in the mesh, which requires that we abuse const_cast
+  if(partition_agnostic)
   {
     MeshBase &mesh = const_cast<MeshBase&>(this->get_mesh());
     MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
@@ -568,20 +574,21 @@ void EquationSystems::write(const std::string& name,
   // the EquationSystems::write() method should look constant,
   // but we need to undo the temporary numbering of the nodes
   // and elements in the mesh, which requires that we abuse const_cast
-  const_cast<MeshBase&>(_mesh).fix_broken_node_and_element_numbering();
+  if(partition_agnostic)
+    const_cast<MeshBase&>(_mesh).fix_broken_node_and_element_numbering();
 }
 
 
 
 // template specialization
 
-template void EquationSystems::read<Number> (const std::string& name, const unsigned int read_flags);
-template void EquationSystems::read<Number> (const std::string& name, const libMeshEnums::XdrMODE mode, const unsigned int read_flags);
-template void EquationSystems::_read_impl<Number> (const std::string& name, const libMeshEnums::XdrMODE mode, const unsigned int read_flags);
+template void EquationSystems::read<Number> (const std::string& name, const unsigned int read_flags, bool partition_agnostic);
+template void EquationSystems::read<Number> (const std::string& name, const libMeshEnums::XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template void EquationSystems::_read_impl<Number> (const std::string& name, const libMeshEnums::XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-template void EquationSystems::read<Real> (const std::string& name, const unsigned int read_flags);
-template void EquationSystems::read<Real> (const std::string& name, const libMeshEnums::XdrMODE mode, const unsigned int read_flags);
-template void EquationSystems::_read_impl<Real> (const std::string& name, const libMeshEnums::XdrMODE mode, const unsigned int read_flags);
+template void EquationSystems::read<Real> (const std::string& name, const unsigned int read_flags, bool partition_agnostic);
+template void EquationSystems::read<Real> (const std::string& name, const libMeshEnums::XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
+template void EquationSystems::_read_impl<Real> (const std::string& name, const libMeshEnums::XdrMODE mode, const unsigned int read_flags, bool partition_agnostic);
 #endif
 
 } // namespace libMesh

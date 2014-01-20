@@ -316,24 +316,34 @@ public:
    *
    * If XdrMODE is omitted, it will be inferred as READ for filenames
    * containing .xda or as DECODE for filenames containing .xdr
+   *
+   * @param partition_agnostic If true then the mesh and degrees of freedom
+   * will be temporarily renumbered in a partition agnostic way so that
+   * files written using "n" mpi processes can be re-read on "m" mpi
+   * processes.  Note that this renumbering is not compatible with meshes
+   * that have two nodes in exactly the same position!
    */
     template <typename InValType>
   void read (const std::string& name,
 	     const libMeshEnums::XdrMODE,
-             const unsigned int read_flags=(READ_HEADER | READ_DATA));
+             const unsigned int read_flags=(READ_HEADER | READ_DATA),
+             bool partition_agnostic = true);
 
   void read (const std::string& name,
 	     const libMeshEnums::XdrMODE mode,
-             const unsigned int read_flags=(READ_HEADER | READ_DATA))
-    { read<Number>(name, mode, read_flags); }
+             const unsigned int read_flags=(READ_HEADER | READ_DATA),
+             bool partition_agnostic = true)
+    { read<Number>(name, mode, read_flags, partition_agnostic); }
 
     template <typename InValType>
   void read (const std::string& name,
-             const unsigned int read_flags=(READ_HEADER | READ_DATA));
+             const unsigned int read_flags=(READ_HEADER | READ_DATA),
+             bool partition_agnostic = true);
 
   void read (const std::string& name,
-             const unsigned int read_flags=(READ_HEADER | READ_DATA))
-    { read<Number>(name, read_flags); }
+             const unsigned int read_flags=(READ_HEADER | READ_DATA),
+             bool partition_agnostic = true)
+    { read<Number>(name, read_flags, partition_agnostic); }
 
 
   /**
@@ -350,13 +360,21 @@ public:
    *
    * If XdrMODE is omitted, it will be inferred as WRITE for filenames
    * containing .xda or as ENCODE for filenames containing .xdr
+   *
+   * @param partition_agnostic If true then the mesh and degrees of freedom
+   * will be temporarily renumbered in a partition agnostic way so that
+   * files written using "n" mpi processes can be re-read on "m" mpi
+   * processes.  Note that this renumbering is not compatible with meshes
+   * that have two nodes in exactly the same position!
    */
   void write (const std::string& name,
 	      const libMeshEnums::XdrMODE,
-              const unsigned int write_flags=(WRITE_DATA)) const;
+              const unsigned int write_flags=(WRITE_DATA),
+              bool partition_agnostic = true) const;
 
   void write (const std::string& name,
-              const unsigned int write_flags=(WRITE_DATA)) const;
+              const unsigned int write_flags=(WRITE_DATA),
+              bool partition_agnostic = true) const;
 
   /**
    * @returns \p true when this equation system contains
@@ -458,11 +476,18 @@ private:
   /**
    * Actual read implementation.  This can be called repeatedly
    * inside a try-catch block in an attempt to read broken files.
+   *
+   * @param partition_agnostic If true then the mesh and degrees of freedom
+   * will be temporarily renumbered in a partition agnostic way so that
+   * files written using "n" mpi processes can be re-read on "m" mpi
+   * processes.  Note that this renumbering is not compatible with meshes
+   * that have two nodes in exactly the same position!
    */
     template <typename InValType>
   void _read_impl (const std::string& name,
 		   const libMeshEnums::XdrMODE,
-		   const unsigned int read_flags);
+		   const unsigned int read_flags,
+                   bool partition_agnostic = true);
 
   /**
    * This function is used in the implementation of add_system,
