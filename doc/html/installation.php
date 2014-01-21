@@ -61,6 +61,7 @@ The library is continuously tested with the following compilers:
       <li><code>gcc</code> 4.5</li>
       <li><code>gcc</code> 4.6</li>
       <li><code>gcc</code> 4.7</li>
+      <li><code>gcc</code> 4.8</li>
     </ul>
   <li>Intel ICC</li>
     <ul>
