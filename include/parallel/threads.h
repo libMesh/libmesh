@@ -441,7 +441,7 @@ namespace Threads
   template <typename Range>
   unsigned int num_pthreads(Range & range)
   {
-    unsigned int min = std::min((unsigned long)libMesh::n_threads(), range.size());
+    unsigned int min = std::min((std::size_t)libMesh::n_threads(), range.size());
     return min > 0 ? min : 1;
   }
 
