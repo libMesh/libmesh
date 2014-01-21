@@ -76,9 +76,10 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/contrib/utils/libmesh-opt.pc.in \
 	$(top_srcdir)/contrib/utils/libmesh-prof.pc.in \
 	$(top_srcdir)/doc/Doxyfile.in $(top_srcdir)/doc/dot.in AUTHORS \
-	COPYING ChangeLog INSTALL NEWS build-aux/config.guess \
-	build-aux/config.sub build-aux/depcomp build-aux/install-sh \
-	build-aux/ltmain.sh build-aux/missing build-aux/ylwrap
+	COPYING ChangeLog INSTALL NEWS build-aux/compile \
+	build-aux/config.guess build-aux/config.sub build-aux/depcomp \
+	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
+	build-aux/ylwrap
 @LIBMESH_DBG_MODE_TRUE@am__append_1 = libmesh_dbg.la
 @LIBMESH_DEVEL_MODE_TRUE@am__append_2 = libmesh_devel.la
 @LIBMESH_OPT_MODE_TRUE@am__append_3 = libmesh_opt.la

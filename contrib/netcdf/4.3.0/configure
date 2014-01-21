@@ -2913,6 +2913,7 @@ ac_config_headers="$ac_config_headers config.h"
 
 
 # This call is required by automake.
+# AM_INIT_AUTOMAKE([foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11])
 am__api_version='1.12'
 
 # Find a good install program.  We prefer a C program (faster),
