@@ -22,6 +22,7 @@
 
 #include "Hilbert/FixBitVec.hpp"
 #include "Hilbert/BigBitVec.hpp"
+#include "Hilbert/Algorithm.hpp"
 
 
 // Description of parameters:
