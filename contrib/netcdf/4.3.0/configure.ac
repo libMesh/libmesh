@@ -5,16 +5,16 @@
 # the COPYRIGHT file for more information.
 
 # Recall that ${VAR-exp} expands to $VAR if var is set (even to null),
-# and to exp otherwise. 
+# and to exp otherwise.
 
 ## This puts the cvs ID tag in the output configure script.
 AC_REVISION([$Id: configure.ac,v 1.450 2010/05/28 19:42:47 dmh Exp $])
 
-# Running autoconf on this file will trigger a warning if 
+# Running autoconf on this file will trigger a warning if
 # autoconf is not at least the specified version.
 AC_PREREQ([2.59])
 
-# Initialize with name, version, and support email address. 
+# Initialize with name, version, and support email address.
 AC_INIT([netCDF], [4.3.0], [support-netcdf@unidata.ucar.edu])
 
 # Create the VERSION file, which contains the package version from
@@ -36,7 +36,11 @@ AC_CANONICAL_TARGET
 AC_CONFIG_HEADERS([config.h])
 
 # This call is required by automake.
-AM_INIT_AUTOMAKE([foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11])
+# AM_INIT_AUTOMAKE([foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11])
+AM_INIT_AUTOMAKE(m4_esyscmd([case `automake --version | head -n 1` in
+                             *1.11*) echo foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11;;
+                             *)      echo foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11 serial-tests;;
+                             esac]))
 
 # use silent rules - automake 1.11
 AM_SILENT_RULES(yes)
@@ -73,13 +77,13 @@ AC_ARG_ENABLE([doxygen],
   [AS_HELP_STRING([--enable-doxygen],
     [Enable generation of documentation.])])
 test "x$enable_doxygen" = xyes || enable_doxygen=no
-AM_CONDITIONAL([BUILD_DOCS], [test "x$enable_doxygen" = xyes]) 
+AM_CONDITIONAL([BUILD_DOCS], [test "x$enable_doxygen" = xyes])
 
 AC_ARG_ENABLE([internal-docs],
   [AS_HELP_STRING([--enable-internal-docs],
     [Include documentation of library internals. This is of interest only to those developing the netCDF library.])])
 test "x$enable_internal_docs" = xyes || enable_internal_docs=no
-AC_SUBST([BUILD_INTERNAL_DOCS], [$enable_internal_docs]) 
+AC_SUBST([BUILD_INTERNAL_DOCS], [$enable_internal_docs])
 
 AC_MSG_CHECKING([if fsync support is enabled])
 AC_ARG_ENABLE([fsync],
@@ -94,7 +98,7 @@ AC_DEFINE([USE_FSYNC], [1], [if true, include experimental fsync code])
 fi
 
 # Does the user want to run extra tests with valgrind?
-AC_MSG_CHECKING([whether extra valgrind tests should be run])	
+AC_MSG_CHECKING([whether extra valgrind tests should be run])
 AC_ARG_ENABLE([valgrind-tests],
               [AS_HELP_STRING([--enable-valgrind-tests],
                               [build with valgrind-tests (valgrind is required, static builds only)])])
@@ -219,7 +223,7 @@ AC_ARG_ENABLE([logging],
               [AS_HELP_STRING([--enable-logging],
                               [enable logging capability (only applies when netCDF-4 is built). \
 			      This debugging features is only of interest to netCDF developers. \
-			      Ignored if netCDF-4 is not enabled.])])   
+			      Ignored if netCDF-4 is not enabled.])])
 test "x$enable_logging" = xyes || enable_logging=no
 AC_MSG_RESULT([$enable_logging])
 
@@ -370,8 +374,8 @@ AM_CONDITIONAL(USE_FFIO, [test x$enable_ffio = xyes])
 dnl AC_MSG_CHECKING([whether netCDF NEC-SX vectorization patch is enabled])
 dnl AC_ARG_ENABLE([sx-vectorization],
 dnl               [AS_HELP_STRING([--enable-sx-vectorization],
-dnl                               [enable a user-provided performance patch to allow \	
-dnl 			      vectorization of type conversions on NEC SX machines.])])   
+dnl                               [enable a user-provided performance patch to allow \
+dnl 			      vectorization of type conversions on NEC SX machines.])])
 dnl test "x$enable_sx_vectorization" = xyes || enable_sx_vectorization=no
 dnl AC_MSG_RESULT([$enable_sx_vectorization])
 dnl if test "x$enable_sx_vectorization" = xyes; then
@@ -444,8 +448,8 @@ fi
 AC_MSG_CHECKING([whether benchmaks should be run (experimental)])
 AC_ARG_ENABLE([benchmarks],
               [AS_HELP_STRING([--enable-benchmarks],
-                              [Run benchmarks. This is an experimental feature. You must fetch 
-                              sample data files from the Unidata ftp site to use these benchmarks. 
+                              [Run benchmarks. This is an experimental feature. You must fetch
+                              sample data files from the Unidata ftp site to use these benchmarks.
                               The benchmarks are a bunch of extra tests, which are timed. We use these
 			      tests to check netCDF performance.])])
 test "x$enable_benchmarks" = xyes || enable_benchmarks=no
@@ -464,7 +468,7 @@ case "$host_cpu $host_os" in
      *)
         test "x$enable_extreme_numbers" = xno || enable_extreme_numbers=yes
         ;;
-esac     
+esac
 AC_MSG_RESULT($enable_extreme_numbers)
 
 if test "x$enable_extreme_numbers" = xyes; then
@@ -532,7 +536,7 @@ AC_MSG_NOTICE([finding other utilities])
 
 # Is doxygen installed? If so, have configure construct the Doxyfile.
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
-if test -z "$DOXYGEN"; then 
+if test -z "$DOXYGEN"; then
    AC_MSG_WARN([Doxygen not found - documentation will not be built])
 fi
 # If we have doxygen, and it's enabled, then process the file.
@@ -658,7 +662,7 @@ if test "x$enable_netcdf_4" = xyes || test "x$enable_dap" = xyes; then
 fi
 
 # We need the math library
-AC_CHECK_LIB([m], [floor], [], 
+AC_CHECK_LIB([m], [floor], [],
 [AC_MSG_ERROR([Can't find or link to the math library.])])
 
 if test "x$enable_netcdf_4" = xyes; then
@@ -669,11 +673,11 @@ if test "x$enable_netcdf_4" = xyes; then
 
    # Check for the main hdf5 and hdf5_hl library.
 
-   AC_SEARCH_LIBS([H5Fflush], [hdf5dll hdf5], [], 
+   AC_SEARCH_LIBS([H5Fflush], [hdf5dll hdf5], [],
    [AC_MSG_ERROR([Can't find or link to the hdf5 library. Use --disable-netcdf-4, or see config.log for errors.])])
-   AC_SEARCH_LIBS([H5DSis_scale], [hdf5_hldll hdf5_hl], [], 
+   AC_SEARCH_LIBS([H5DSis_scale], [hdf5_hldll hdf5_hl], [],
    [AC_MSG_ERROR([Can't find or link to the hdf5 high-level. Use --disable-netcdf-4, or see config.log for errors.])])
-	
+
    AC_CHECK_HEADERS([hdf5.h], [], [AC_MSG_ERROR([Compiling a test with HDF5 failed.  Either hdf5.h cannot be found, or config.log should be checked for other reason.])])
    AC_CHECK_FUNCS([H5Pget_fapl_mpiposix H5Pget_fapl_mpio H5Pset_deflate H5Z_SZIP])
 
@@ -681,7 +685,7 @@ if test "x$enable_netcdf_4" = xyes; then
    if test "x$ac_cv_func_H5Pget_fapl_mpiposix" = xyes; then
       AC_DEFINE([USE_PARALLEL_POSIX], [1], [if true, compile in parallel netCDF-4 based on MPI/POSIX])
    fi
-   
+
    # The user may have parallel HDF5 based on MPI mumble mumble.
    if test "x$ac_cv_func_H5Pget_fapl_mpio" = xyes; then
       AC_DEFINE([USE_PARALLEL_MPIO], [1], [if true, compile in parallel netCDF-4 based on MPI/IO])
@@ -695,24 +699,24 @@ if test "x$enable_netcdf_4" = xyes; then
 
       # Using pnetcdf for classic parallel I/O?
       if test "x$enable_pnetcdf" = xyes; then
-         AC_CHECK_LIB([pnetcdf], [ncmpi_create], [], 
+         AC_CHECK_LIB([pnetcdf], [ncmpi_create], [],
 	 [AC_MSG_ERROR([Cannot link to pnetcdf library, yet --enable-pnetcdf was used.])])
 
-dnl          AC_CHECK_HEADERS([pnetcdf.h], [], [nc4_pnetcdf_h_missing=yes)	   
+dnl          AC_CHECK_HEADERS([pnetcdf.h], [], [nc4_pnetcdf_h_missing=yes)
 dnl 	 if test ! "x$HAVE_PNETCDF" = x1; then
 dnl             AC_MSG_ERROR([Cannot find pnetcdf header, yet --enable-pnetcdf was used.])
 dnl 	 fi
-         AC_DEFINE([USE_PNETCDF], [1], [if true, parallel netCDF is used])      	 
+         AC_DEFINE([USE_PNETCDF], [1], [if true, parallel netCDF is used])
       fi
    fi
-   
+
    AC_MSG_CHECKING([whether parallel I/O features are to be included])
-   AC_MSG_RESULT([$enable_parallel])         
-   
+   AC_MSG_RESULT([$enable_parallel])
+
    # The user must have built HDF5 with the ZLIB library.
    if test "x$ac_cv_func_H5Pset_deflate" = xyes; then
       AC_DEFINE([USE_ZLIB], [1], [if true, compile in zlib compression in netCDF-4 variables])
-   else		    
+   else
       AC_MSG_ERROR([HDF5 must be built with zlib for netCDF-4])
    fi
 
@@ -724,10 +728,10 @@ dnl 	 fi
 
    # If the user wants hdf4 built in, check it out.
    if test "x$enable_hdf4" = xyes; then
-      AC_CHECK_HEADERS([mfhdf.h], [], [nc_mfhdf_h_missing=yes])	   
+      AC_CHECK_HEADERS([mfhdf.h], [], [nc_mfhdf_h_missing=yes])
       if test "x$nc_mfhdf_h_missing" = xyes; then
          AC_MSG_ERROR([Cannot find mfhdf.h, yet --enable-hdf4 was used.])
-      fi		      
+      fi
       AC_CHECK_LIB([df], [Hclose], [], [])
       AC_CHECK_LIB([mfhdf], [SDcreate], [], [])
       #AC_SEARCH_LIBS([Hclose],[df], [], [AC_MSG_ERROR([Can't find or link to the hdf4 df library. See config.log for errors.])])
@@ -792,7 +796,7 @@ AM_CONDITIONAL(USE_PNETCDF, [test x$enable_pnetcdf = xyes])
 AM_CONDITIONAL(USE_DISPATCH, [test x$enable_dispatch = xyes])
 AM_CONDITIONAL(BUILD_CDMREMOTE, [test "x$enable_cdmremote" = xyes]) # Alias
 AM_CONDITIONAL(BUILD_RPC, [test "x$enable_rpc" = xyes])
-AM_CONDITIONAL(BUILD_DISKLESS, [test x$enable_diskless = xyes]) 
+AM_CONDITIONAL(BUILD_DISKLESS, [test x$enable_diskless = xyes])
 AM_CONDITIONAL(BUILD_MMAP, [test x$enable_mmap = xyes])
 
 # If the machine doesn't have a long long, and we want netCDF-4, then
@@ -827,17 +831,17 @@ AC_MSG_RESULT([$LIBS])
 # Flags for nc-config script; by design $prefix, $includir, $libdir,
 # etc.  are left as shell variables in the script so as to facilitate
 # relocation
-if test "x$with_netcdf_c_lib" = x ; then 
+if test "x$with_netcdf_c_lib" = x ; then
    NC_LIBS="-lnetcdf"
 else
    NC_LIBS="$with_netcdf_c_lib"
 fi
 if test "x$enable_shared" != xyes; then
    NC_LIBS="$LDFLAGS $NC_LIBS $LIBS"
-fi	 
+fi
 
 case "x$target_os" in
-xsolaris*) 
+xsolaris*)
   NEWNCLIBS=""
   for x in $NC_LIBS ; do
     case "$x" in
