@@ -35,6 +35,7 @@
 #  endif
 #endif
 
+#include <cstdio> // FILE
 #include <iosfwd>
 #include <vector>
 #include <string>
