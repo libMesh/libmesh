@@ -4,7 +4,7 @@
 
 
 
-AC_INIT([libmesh], [0.9.3-rc1], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
+AC_INIT([libmesh], [1.0.0-pre], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
 AC_PREREQ([2.61]) # require autoconf 2.61 - I havent tried anything older
 
 # by default CFLAGS and CXXFLAGS are set to '-g -O2' on systems that support them.
