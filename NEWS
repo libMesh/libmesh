@@ -1,6 +1,15 @@
 0.9.2 -> 0.9.3
   * FEMContext public members now private, must use API pushed in 0.9.2.
-    Breaks backward compatiblity of FEMContext.
+    Breaks backward compatibility of FEMContext.
+  * Intel 14.0 Compatibility.
+  * Preliminary checkpoint/restart capability.
+  * new --disable-warnings option.
+  * OSX 10.9 XDR compatibility.
+  * Memory optimizations for Metis/Parmetis partitioning auxillary
+    data structures
+  * HEX20, PRISM15, PYRAMID5, PYRAMID14 shape functions
+  * Upgraded bundled Boost to v1.55
+  * Expanded ExodusII API
 
 0.9.1 -> 0.9.2
   * PETSc 3.4 support
