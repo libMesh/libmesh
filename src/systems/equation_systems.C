@@ -735,8 +735,6 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
   // Zero out the soln vector
   std::fill (soln.begin(), soln.end(), libMesh::zero);
 
-  std::vector<Number>  sys_soln;
-
   // (Note that we use an unsigned short int here even though an
   // unsigned char would be more that sufficient.  The MPI 1.1
   // standard does not require that MPI_SUM, MPI_PROD etc... be
@@ -799,7 +797,14 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
       // as the mesh dimension. Will break for mixed dimension meshes.
       unsigned int nv_sys_split = n_scalar_vars + dim*n_vector_vars;
 
-      system.update_global_solution (sys_soln);
+      // Update the current_local_solution
+      {
+        System & non_const_sys = const_cast<System &>(system);
+        non_const_sys.solution->close();
+        non_const_sys.update();
+      }
+
+      NumericVector<Number> & sys_soln(*system.current_local_solution);
 
       std::vector<Number>      elem_soln;   // The finite element solution
       std::vector<Number>      nodal_soln;  // The FE solution interpolated to the nodes
@@ -828,7 +833,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 		elem_soln.resize(dof_indices.size());
 
 		for (unsigned int i=0; i<dof_indices.size(); i++)
-		  elem_soln[i] = sys_soln[dof_indices[i]];
+		  elem_soln[i] = sys_soln(dof_indices[i]);
 
 		FEInterface::nodal_soln (dim,
 					 fe_type,
