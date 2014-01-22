@@ -2,23 +2,23 @@
   * FEMContext public members now private, must use API pushed in 0.9.2.
     Breaks backward compatibility of FEMContext.
   * Intel 14.0 Compatibility.
-  * Preliminary checkpoint/restart capability.
+  * Streamlined checkpoint/restart capability for ephemeral usage.
   * new --disable-warnings option.
-  * Added heterogenous Dirichlet adjoint constraints
-  * Added edge Dirichlet constraints
-  * Improved support for non-32-bit IDs
-  * PETSc 3.5 support
+  * Added heterogeneous Dirichlet adjoint constraints.
+  * Added edge Dirichlet constraints.
+  * Improved support for non-32-bit IDs.
+  * PETSc 3.5 support.
   * OSX 10.9 XDR compatibility.
-  * Memory optimizations for Metis/Parmetis partitioning auxillary
-    data structures
-  * HEX20, PRISM15, PYRAMID5, PYRAMID14 shape functions
-  * Nedelec elements
-  * Upgraded bundled Boost to v1.55
-  * Expanded ExodusII API
-  * Additional enum/string conversion utility functions
+  * Memory optimizations for Metis/Parmetis partitioning auxiliary
+    data structures.
+  * HEX20, PRISM15, PYRAMID5, PYRAMID14 shape functions.
+  * Nedelec elements.
+  * Upgraded bundled Boost to v1.55.
+  * Expanded ExodusII API.
+  * Additional enum/string conversion utility functions.
   * Assorted bugfixes:
-    * for SzaBab and Bernstein h-adaptivity
-    * for p-adaptivity
+    * for SzaBab and Bernstein h-adaptivity.
+    * for p-adaptivity.
 
 0.9.1 -> 0.9.2
   * PETSc 3.4 support
