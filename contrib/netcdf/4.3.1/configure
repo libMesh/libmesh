@@ -5185,7 +5185,10 @@ $as_echo_n "checking whether test should be built and run... " >&6; }
 # Check whether --enable-testsets was given.
 if test "${enable_testsets+set}" = set; then :
   enableval=$enable_testsets;
+else
+  enable_testsets=no
 fi
+ # BSK - disabled by default
 
 test "x$enable_testsets" = xno || enable_testsets=yes
 nc_build_tests=$enable_testsets

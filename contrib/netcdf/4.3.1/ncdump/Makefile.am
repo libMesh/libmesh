@@ -44,11 +44,18 @@ tst_enum_data tst_opaque_data tst_string_data tst_vlen_data tst_comp	\
 tst_comp2 tst_nans tst_special_atts tst_unicode tst_fillbug tst_compress \
 tst_chunking tst_h_scalar
 
+# BSK
+# TESTS += tst_create_files tst_group_data tst_enum_data tst_opaque_data	\
+# tst_string_data tst_vlen_data tst_comp tst_comp2 tst_nans		\
+# tst_special_atts tst_netcdf4.sh tst_h_rdc0 tst_unicode tst_fillbug	\
+# tst_fillbug.sh tst_netcdf4_4.sh tst_compress tst_nccopy4.sh             \
+# tst_grp_spec.sh tst_mud.sh tst_h_scalar tst_h_scalar.sh tst_formatx4.sh
+
 TESTS += tst_create_files tst_group_data tst_enum_data tst_opaque_data	\
 tst_string_data tst_vlen_data tst_comp tst_comp2 tst_nans		\
 tst_special_atts tst_netcdf4.sh tst_h_rdc0 tst_unicode tst_fillbug	\
 tst_fillbug.sh tst_netcdf4_4.sh tst_compress tst_nccopy4.sh             \
-tst_grp_spec.sh tst_mud.sh tst_h_scalar tst_h_scalar.sh tst_formatx4.sh
+tst_grp_spec.sh tst_mud.sh tst_formatx4.sh
 
 if EXTRA_TESTS
 TESTS += run_back_comp_tests.sh
@@ -82,7 +89,15 @@ TESTS += tst_ncgen4.sh
 endif
 #endif
 
-endif BUILD_TESTSETS
+
+else # when BUILD_TESTSETS is false, we still need this rule
+ctest.c:
+	cp $(top_srcdir)/ncdump/ref_ctest.c $(top_srcdir)/ncdump/ctest.c
+
+ctest64.c:
+	cp $(top_srcdir)/ncdump/ref_ctest64.c $(top_srcdir)/ncdump/ctest64.c
+
+endif BUILD_TESTSETS_FALSE
 
 CLEANFILES = test0.nc test1.cdl test1.nc test2.cdl ctest1.cdl	\
 ctest0.nc ctest0_64.nc c1.cdl c1_4.cdl ctest1_64.cdl c0.nc c0_4.nc small.nc	\

@@ -429,7 +429,10 @@ AM_CONDITIONAL(BUILD_UTILITIES, [test x$nc_build_utilities = xyes])
 AC_MSG_CHECKING([whether test should be built and run])
 AC_ARG_ENABLE([testsets],
               [AS_HELP_STRING([--disable-testsets],
-                              [don't build or run netCDF tests])])
+                              [don't build or run netCDF tests])],
+              [],
+	      enable_testsets=no) # BSK - disabled by default
+
 test "x$enable_testsets" = xno || enable_testsets=yes
 nc_build_tests=$enable_testsets
 AC_MSG_RESULT($nc_build_tests)
