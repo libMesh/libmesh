@@ -221,7 +221,7 @@ void
 srcsplice(Datasrc* ds, Datalist* list)
 {
     srcpushlist(ds,list);
-    ds->spliced = 1;    
+    ds->spliced = 1;
 }
 
 void
@@ -387,7 +387,7 @@ commifyr(char* p, Bytebuffer* buf)
 	    bbAppend(buf,c);
 	    p=word(p,buf);
 	}
-    }    
+    }
     return p;
 }
 
@@ -402,8 +402,8 @@ word(char* p, Bytebuffer* buf)
 	    c=*p++;
 	    if(!c) break;
 	}
-	bbAppend(buf,(char)c);	
-    }	
+	bbAppend(buf,(char)c);
+    }
     p--; /* leave terminator for parent */
     return p;
 }
@@ -413,7 +413,7 @@ wordstring(char* p, Bytebuffer* buf, int quote)
 {
     int c;
     bbAppend(buf,quote);
-    while((c=*p++)) {	    
+    while((c=*p++)) {
 	if(c == '\\') {
 	    bbAppend(buf,c);
 	    c = *p++;
@@ -530,7 +530,7 @@ retry:	    switch ((c=*p++)) {
 		hcount++;
 		while((c=*p) && (c == 'h')) {hcount++; p++;}
 		if(hcount > 2) hcount = 2;
-		goto retry;	        
+		goto retry;
 	    case 'l':
 		lcount++;
 		while((c=*p) && (c == 'l')) {
@@ -538,7 +538,7 @@ retry:	    switch ((c=*p++)) {
 		    p++;
 		}
 		if(lcount > 2) lcount = 2;
-		goto retry;	        
+		goto retry;
 	    case 'u':
 		if(hcount == 2) {
    	            snprintf(tmp,sizeof(tmp),"%hhu",
@@ -590,16 +590,16 @@ retry:	    switch ((c=*p++)) {
 	    case 's':
 		text = va_arg(argv,char*);
 		bbCat(buf,text);
-		break;		
+		break;
 	    case 'c':
 		c = va_arg(argv,int);
 		bbAppend(buf,(char)c);
-		break;		
+		break;
             default:
 		PANIC1("vbbprintf: unknown specifier: %c",(char)c);
 	    }
 	    break;
-	default: 
+	default:
 	    bbAppend(buf,c);
 	}
     }
@@ -641,7 +641,7 @@ emptycompoundconst(int lineno, NCConstant* c)
     c->nctype = NC_COMPOUND;
     c->value.compoundv = builddatalist(0);
     c->filled = 0;
-    return c;    
+    return c;
 }
 
 NCConstant*
@@ -653,7 +653,7 @@ emptystringconst(int lineno, NCConstant* c)
     c->value.stringv.len = 0;
     c->value.stringv.stringv = NULL;
     c->filled = 0;
-    return c;    
+    return c;
 }
 
 #define INDENTMAX 256
@@ -666,7 +666,7 @@ indented(int n)
     if(dent == NULL) {
 	dent = (char*)emalloc(INDENTMAX+1);
 	memset((void*)dent,' ',INDENTMAX);
-	dent[INDENTMAX] = '\0';	
+	dent[INDENTMAX] = '\0';
     }
     if(n*4 >= INDENTMAX) n = INDENTMAX/4;
     indentation = dent+(INDENTMAX - 4*n);

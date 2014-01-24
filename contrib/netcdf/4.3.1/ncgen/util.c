@@ -84,7 +84,7 @@ tztrim(
     )
 {
     char *cp, *ep;
-    
+
     cp = ss;
     if (*cp == '-')
       cp++;
@@ -138,7 +138,7 @@ freeSymbol(Symbol* sym)
     case NG_FIELD:
     case NG_OPAQUE:
     default: break;
-    }    
+    }
     efree(sym->name);
     efree(sym);
 #endif
@@ -169,15 +169,15 @@ nctypename(nc_type nctype)
 	return nctypenamesextend[(nctype - NC_GRP)];
     if(nctype == NC_FILLVALUE) return "NC_FILL";
     if(nctype == NC_NIL) return "NC_NIL";
-    s = poolalloc(128);    
+    s = poolalloc(128);
     sprintf(s,"NC_<%d>",nctype);
     return s;
 }
 
 /* These are the augmented NC_ values (0 based from NC_GRP)*/
-char* ncclassnames[9] = { 
-"NC_GRP", "NC_DIM", "NC_VAR", "NC_ATT", 
-"NC_TYP", "NC_ECONST", "NC_FIELD", "NC_ARRAY", 
+char* ncclassnames[9] = {
+"NC_GRP", "NC_DIM", "NC_VAR", "NC_ATT",
+"NC_TYP", "NC_ECONST", "NC_FIELD", "NC_ARRAY",
 "NC_PRIM"
 };
 
@@ -190,7 +190,7 @@ ncclassname(nc_class ncc)
     if(ncc == NC_FILLVALUE) return "NC_FILL";
     if(ncc >= NC_GRP && ncc <= NC_PRIM)
 	return ncclassnames[ncc - NC_GRP];
-    s = poolalloc(128);    
+    s = poolalloc(128);
     sprintf(s,"NC_<%d>",ncc);
     return s;
 }
@@ -331,7 +331,7 @@ prefixtostring(List* prefix, char* separator)
             strcat(result,separator);
 	    strcat(result,sym->name); /* append "/<prefix[i]>"*/
 	}
-    }    
+    }
     return result;
 }
 #endif
@@ -340,7 +340,7 @@ prefixtostring(List* prefix, char* separator)
 char*
 fullname(Symbol* sym)
 {
-#ifdef USE_NETCDF4    
+#ifdef USE_NETCDF4
     char* s1;
     char* result;
     char* prefix;
@@ -357,7 +357,7 @@ int
 prefixeq(List* x1, List* x2)
 {
     Symbol** l1;
-    Symbol** l2;    
+    Symbol** l2;
     int len,i;
     if((len=listlength(x1)) != listlength(x2)) return 0;
     l1=(Symbol**)listcontents(x1);
@@ -377,7 +377,7 @@ prefixdup(List* prefix)
     dupseq = listnew();
     listsetalloc(dupseq,listlength(prefix));
     for(i=0;i<listlength(prefix);i++) listpush(dupseq,listget(prefix,i));
-    return dupseq;    
+    return dupseq;
 }
 
 /*
@@ -445,14 +445,14 @@ makebytestring(char* s, size_t* lenp)
     int i;
 
     ASSERT((slen%2) == 0);
-    ASSERT(blen > 0); 
+    ASSERT(blen > 0);
     bytes = (unsigned char*)emalloc(blen);
     b = bytes;
     for(i=0;i<slen;i+=2) {
 	unsigned int digit1 = chartohex(*s++);
 	unsigned int digit2 = chartohex(*s++);
 	unsigned int byte = (digit1 << 4) | digit2;
-	*b++ = byte;				
+	*b++ = byte;
     }
     if(lenp) *lenp = blen;
     return bytes;
@@ -525,7 +525,7 @@ builddatasublist(Datalist* dl)
   d.value.compoundv = dl;
   d.filled = 0;
   return d;
- 
+
 }
 
 static void
@@ -534,7 +534,7 @@ constantFree(NCConstant* con)
     switch(con->nctype) {
     case NC_COMPOUND:
 	/* do nothing; ReclaimDatalists below will take care of the datalist	*/
-	break;	
+	break;
     case NC_STRING:
 	if(con->value.stringv.len > 0 && con->value.stringv.stringv != NULL)
 	    efree(con->value.stringv.stringv);
@@ -560,7 +560,7 @@ reclaimDatalists(void)
 	    for(i=0,con=list->data;i<list->length;i++,con++)
 	        constantFree(con);
 	    list->data = NULL;
-	}	
+	}
     }
     /* Step 2: free up the datalist itself*/
     for(list=alldatalists;list != NULL;) {
@@ -600,7 +600,7 @@ crossproduct(Dimset* dimset, int start, int stop)
     for(i=start;i<stop;i++) {
 	totalsize = totalsize * dimset->dimsyms[i]->dim.declsize;
     }
-    return totalsize;    
+    return totalsize;
 }
 
 /* Do the "complement" of crossproduct;
@@ -618,7 +618,7 @@ prefixarraylength(Dimset* dimset, int last)
 
 #ifdef USE_NETCDF4
 extern int H5Eprint1(FILE * stream);
-#endif   
+#endif
 
 void
 check_err(const int stat, const int line, const char* file) {
@@ -627,7 +627,7 @@ check_err(const int stat, const int line, const char* file) {
 	fprintf(stderr, "\t(%s:%d)\n", file,line);
 #ifdef USE_NETCDF4
 	H5Eprint1(stderr);
-#endif   
+#endif
 	fflush(stderr);
 	exit(1);
     }

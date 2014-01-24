@@ -2,7 +2,7 @@
    Corporation for Atmospheric Research/Unidata See COPYRIGHT file for
    conditions of use. See www.unidata.ucar.edu for more info.
 
-   Test netcdf-4 dimensions. 
+   Test netcdf-4 dimensions.
 
    $Id: tst_dims.c,v 1.30 2010/05/25 13:53:04 ed Exp $
 */
@@ -35,7 +35,7 @@
 #define BUBBA "Bubba"
 
 #define MAX_DIMS 5
-      
+
 int
 main(int argc, char **argv)
 {
@@ -340,7 +340,7 @@ main(int argc, char **argv)
       if (unlimdimid_in != 0) ERR;
       if (nc_inq_unlimdims(ncid, &nunlimdims_in, &unlimdimid_in)) ERR;
       if (nunlimdims_in != 1 || unlimdimid_in != 0) ERR;
-      
+
       /* Automatically enddef and close. */
       if (nc_close(ncid)) ERR;
 
@@ -361,7 +361,7 @@ main(int argc, char **argv)
    SUMMARIZE_ERR;
 #define ROMULUS "Romulus"
 #define REMUS "Remus"
-#define DIMS2 2   
+#define DIMS2 2
    printf("*** Testing file with two unlimited dimensions...");
    {
       int ncid, dimid[DIMS2];
@@ -387,7 +387,7 @@ main(int argc, char **argv)
       if (unlimdimid_in[0] != 0) ERR;
       if (nc_inq_unlimdims(ncid, &nunlimdims_in, unlimdimid_in)) ERR;
       if (nunlimdims_in != 2 || unlimdimid_in[0] != 0 || unlimdimid_in[1] != 1) ERR;
-      
+
       /* Automatically enddef and close. */
       if (nc_close(ncid)) ERR;
 
@@ -726,7 +726,7 @@ main(int argc, char **argv)
       for (i = 0; i < LAT_LEN; i++)
 	 for (j = 0; j < LON_LEN; j++)
 	    pres[i][j] = 1013.1 + j;
-   
+
       /* Create a file. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
 
@@ -763,7 +763,7 @@ main(int argc, char **argv)
 		     dimids_in, &natts_in)) ERR;
       if (strcmp(name_in, PRES_NAME) || xtype_in != NC_DOUBLE || ndims_in != 2 ||
 	  dimids_in[0] != lat_dimid || dimids_in[1] != lon_dimid || natts_in != 0) ERR;
-      
+
       /* Write our latitude and longitude values. This writes all
        * metadata to disk too. */
       if (nc_put_var_float(ncid, lat_varid, lat)) ERR;
@@ -811,7 +811,7 @@ main(int argc, char **argv)
 		     dimids_in, &natts_in)) ERR;
       if (strcmp(name_in, PRES_NAME) || xtype_in != NC_DOUBLE || ndims_in != 2 ||
 	  dimids_in[0] != lat_dimid || dimids_in[1] != lon_dimid || natts_in != 0) ERR;
-      
+
       /* Check our latitude and longitude values. */
       if (nc_get_var(ncid, lat_varid, lat_in)) ERR;
       for (i = 0; i < LAT_LEN; i++)
@@ -857,13 +857,13 @@ main(int argc, char **argv)
 	    for (k = 0; k < LEVEL_LEN; k++)
 	       for (l = 0; l <TIME_LEN; l++)
 		  pres[i][j][k][l] = 1013.1 + j;
-   
+
       /* Some phony 3D hp data. */
       for (i = 0; i < LAT_LEN; i++)
 	 for (j = 0; j < LON_LEN; j++)
 	    for (l = 0; l <TIME_LEN; l++)
 	       hp[i][j][l] = 100 + l;
-   
+
       /* Some phony 2D elevaton data. */
       for (i = 0; i < LAT_LEN; i++)
 	 for (j = 0; j < LON_LEN; j++)
@@ -908,7 +908,7 @@ main(int argc, char **argv)
        * Center. */
       if (nc_def_var(ncid, ELEV_NAME, NC_INT64, 2, dimids, &elev_varid)) ERR;
       if (elev_varid != ELEV_VARID) ERR;
-      
+
       /* Define a 3D NC_USHORT variable to store the number of Harry
        * Potter books in this grid square at this time (ignore HP
        * books in airplanes, dirigibles, hot air balloons, space
@@ -956,7 +956,7 @@ main(int argc, char **argv)
       if (strcmp(name_in, HP_NAME) || xtype_in != NC_USHORT || ndims_in != 3 ||
 	  dimids_in[0] != LAT_DIMID || dimids_in[1] != LON_DIMID ||
 	  dimids_in[2] != TIME_DIMID || natts_in != 0) ERR;
-      
+
       /* Write our latitude and longitude values. This writes all
        * metadata to disk too. */
       if (nc_put_var_float(ncid, lat_varid, lat)) ERR;
@@ -1016,7 +1016,7 @@ main(int argc, char **argv)
       count[1] = LON_LEN;
       count[2] = LEVEL_LEN;
       count[3] = TIME_LEN;
-      if (nc_put_vara(ncid, pres_varid, start, count, 
+      if (nc_put_vara(ncid, pres_varid, start, count,
 		      (double *)pres)) ERR;
       count[2] = TIME_LEN;
       if (nc_put_vara(ncid, hp_varid, start, count,
@@ -1147,7 +1147,7 @@ main(int argc, char **argv)
 
 	 /* Check it out. */
 	 if (nc_inq_dim(ncid, dimid, name_in, &len_in)) ERR;
-	 if (len_in != ((SIZEOF_SIZE_T == 8) ? VERY_LONG_LEN : NC_MAX_UINT) || 
+	 if (len_in != ((SIZEOF_SIZE_T == 8) ? VERY_LONG_LEN : NC_MAX_UINT) ||
 	     strcmp(name_in, LAT_NAME)) ERR;
 	 if (nc_inq_dimids(ncid, &ndims_in, dimids_in, 0)) ERR;
 	 if (ndims_in != 1) ERR;
@@ -1165,7 +1165,7 @@ main(int argc, char **argv)
 	 if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
 	 /* Check it out. */
 	 if (nc_inq_dim(ncid, dimid, name_in, &len_in)) ERR;
-	 if (len_in != ((SIZEOF_SIZE_T == 8) ? VERY_LONG_LEN : NC_MAX_UINT) || 
+	 if (len_in != ((SIZEOF_SIZE_T == 8) ? VERY_LONG_LEN : NC_MAX_UINT) ||
 	     strcmp(name_in, LAT_NAME)) ERR;
 	 if (nc_inq_dimids(ncid, &ndims_in, dimids_in, 0)) ERR;
 	 if (ndims_in != 1) ERR;
@@ -1197,7 +1197,7 @@ main(int argc, char **argv)
       {
 	 strcat(file_in, getenv("srcdir"));
 	 strcat(file_in, "/");
-      } 
+      }
       strcat(file_in, REF_FILE_NAME);
 
       /* Reopen and check it out again. */

@@ -67,7 +67,7 @@ nc4_check_name(const char *name, char *norm_name)
       return NC_EINVAL;
    strcpy(norm_name, temp);
    free(temp);
-      
+
    return NC_NOERR;
 }
 
@@ -83,7 +83,7 @@ find_var_dim_max_length(NC_GRP_INFO_T *grp, int varid, int dimid, size_t *maxlen
    int retval = NC_NOERR;
 
    *maxlen = 0;
-   
+
    /* Find this var. */
    for (var = grp->var; var; var = var->l.next)
       if (var->varid == varid)
@@ -123,10 +123,10 @@ find_var_dim_max_length(NC_GRP_INFO_T *grp, int varid, int dimid, size_t *maxlen
 	 BAIL(NC_ENOMEM);
        if (!(h5dimlenmax = malloc(dataset_ndims * sizeof(hsize_t))))
 	 BAIL(NC_ENOMEM);
-       if ((dataset_ndims = H5Sget_simple_extent_dims(spaceid, 
+       if ((dataset_ndims = H5Sget_simple_extent_dims(spaceid,
 						      h5dimlen, h5dimlenmax)) < 0)
 	 BAIL(NC_EHDFERR);
-       LOG((5, "find_var_dim_max_length: varid %d len %d max: %d", 
+       LOG((5, "find_var_dim_max_length: varid %d len %d max: %d",
 	    varid, (int)h5dimlen[0], (int)h5dimlenmax[0]));
        for (d=0; d<dataset_ndims; d++) {
 	 if (var->dimids[d] == dimid) {
@@ -173,7 +173,7 @@ nc4_nc4f_list_add(NC *nc, const char *path, int mode)
    /* There's always at least one open group - the root
     * group. Allocate space for one group's worth of information. Set
     * its hdf id, name, and a pointer to it's file structure. */
-   return nc4_grp_list_add(&(h5->root_grp), h5->next_nc_grpid++, 
+   return nc4_grp_list_add(&(h5->root_grp), h5->next_nc_grpid++,
 			   NULL, nc, NC_GROUP_NAME, NULL);
 }
 
@@ -247,7 +247,7 @@ nc4_find_nc_grp_h5(int ncid, NC **nc, NC_GRP_INFO_T **grpp,
     }
 #endif
 #endif
-    
+
     if (h5) {
 	assert(h5->root_grp);
 	/* If we can't find it, the grp id part of ncid is bad. */
@@ -272,7 +272,7 @@ nc4_rec_find_grp(NC_GRP_INFO_T *start_grp, int target_nc_grpid)
    NC_GRP_INFO_T *g, *res;
 
    assert(start_grp);
-   
+
    /* Is this the group we are searching for? */
    if (start_grp->nc_grpid == target_nc_grpid)
       return start_grp;
@@ -290,7 +290,7 @@ nc4_rec_find_grp(NC_GRP_INFO_T *start_grp, int target_nc_grpid)
 /* Given an ncid and varid, get pointers to the group and var
  * metadata. */
 int
-nc4_find_g_var_nc(NC *nc, int ncid, int varid, 
+nc4_find_g_var_nc(NC *nc, int ncid, int varid,
 		  NC_GRP_INFO_T **grp, NC_VAR_INFO_T **var)
 {
    NC_HDF5_FILE_INFO_T* h5 = NC4_DATA(nc);
@@ -301,9 +301,9 @@ nc4_find_g_var_nc(NC *nc, int ncid, int varid,
 
    /* It is possible for *grp to be NULL. If it is,
       return an error. */
-   if(*grp == NULL) 
+   if(*grp == NULL)
      return NC_ENOTVAR;
-   
+
    /* Find the var info. */
    for ((*var) = (*grp)->var; (*var); (*var) = (*var)->l.next)
      if ((*var)->varid == varid)
@@ -320,8 +320,8 @@ nc4_find_dim(NC_GRP_INFO_T *grp, int dimid, NC_DIM_INFO_T **dim,
 	     NC_GRP_INFO_T **dim_grp)
 {
    NC_GRP_INFO_T *g, *dg = NULL;
-   int finished = 0; 
-   
+   int finished = 0;
+
    assert(grp && dim);
 
    /* Find the dim info. */
@@ -337,7 +337,7 @@ nc4_find_dim(NC_GRP_INFO_T *grp, int dimid, NC_DIM_INFO_T **dim,
    /* If we didn't find it, return an error. */
    if (!(*dim))
      return NC_EBADDIM;
-   
+
    /* Give the caller the group the dimension is in. */
    if (dim_grp)
       *dim_grp = dg;
@@ -368,7 +368,7 @@ nc4_rec_find_hdf_type(NC_GRP_INFO_T *start_grp, hid_t target_hdf_typeid)
    htri_t equal;
 
    assert(start_grp);
-   
+
    /* Does this group have the type we are searching for? */
    for (type = start_grp->type; type; type = type->l.next)
    {
@@ -396,7 +396,7 @@ nc4_rec_find_nc_type(NC_GRP_INFO_T *start_grp, nc_type target_nc_typeid)
    NC_TYPE_INFO_T *type, *res;
 
    assert(start_grp);
-   
+
    /* Does this group have the type we are searching for? */
    for (type = start_grp->type; type; type = type->l.next)
       if (type->nc_typeid == target_nc_typeid)
@@ -420,7 +420,7 @@ nc4_rec_find_named_type(NC_GRP_INFO_T *start_grp, char *name)
    NC_TYPE_INFO_T *type, *res;
 
    assert(start_grp);
-   
+
    /* Does this group have the type we are searching for? */
    for (type = start_grp->type; type; type = type->l.next)
       if (!strcmp(type->name, name))
@@ -465,11 +465,11 @@ nc4_find_dim_len(NC_GRP_INFO_T *grp, int dimid, size_t **len)
    NC_GRP_INFO_T *g;
    NC_VAR_INFO_T *var;
    int d, ndims;
-   int retval; 
-   
+   int retval;
+
    size_t mylen;
    int curmax = 0;
-   
+
    assert(grp && len);
    LOG((3, "nc4_find_dim_len: grp->name %s dimid %d", grp->name, dimid));
 
@@ -486,10 +486,10 @@ nc4_find_dim_len(NC_GRP_INFO_T *grp, int dimid, size_t **len)
      /* Find max length of dim in this variable... */
      if ((retval = find_var_dim_max_length(grp, var->varid, dimid, &mylen)))
        return retval;
-     
+
      **len = **len > mylen ? **len : mylen;
    }
-   
+
    return NC_NOERR;
 }
 
@@ -502,7 +502,7 @@ nc4_find_grp_att(NC_GRP_INFO_T *grp, int varid, const char *name, int attnum,
    NC_ATT_INFO_T *attlist = NULL;
 
    assert(grp && grp->name);
-   LOG((4, "nc4_find_grp_att: grp->name %s varid %d name %s attnum %d", 
+   LOG((4, "nc4_find_grp_att: grp->name %s varid %d name %s attnum %d",
 	grp->name, varid, name, attnum));
 
    /* Get either the global or a variable attribute list. */
@@ -545,7 +545,7 @@ nc4_find_nc_att(int ncid, int varid, const char *name, int attnum,
    NC_ATT_INFO_T *attlist = NULL;
    int retval;
 
-   LOG((4, "nc4_find_nc_att: ncid 0x%x varid %d name %s attnum %d", 
+   LOG((4, "nc4_find_nc_att: ncid 0x%x varid %d name %s attnum %d",
 	ncid, varid, name, attnum));
 
    /* Find info for this file and group, and set pointer to each. */
@@ -592,10 +592,10 @@ nc4_find_nc_file(int ext_ncid, NC_HDF5_FILE_INFO_T** h5p)
    stat = NC_check_id(ext_ncid,&nc);
    if(stat != NC_NOERR)
 	nc = NULL;
-   
+
    if(nc)
      if(h5p) *h5p = (NC_HDF5_FILE_INFO_T*)nc->dispatchdata;
-   
+
    return nc;
 }
 
@@ -614,7 +614,7 @@ obj_list_add(NC_LIST_NODE_T **list, NC_LIST_NODE_T *obj)
 	    break;
       o->next = obj;
       obj->prev = o;
-   }      
+   }
    else
       *list = obj;
 }
@@ -700,8 +700,8 @@ nc4_att_list_add(NC_ATT_INFO_T **list, NC_ATT_INFO_T **att)
 /* Add to the end of a group list. Can't use 0 as a new_nc_grpid -
  * it's reserverd for the root group. */
 int
-nc4_grp_list_add(NC_GRP_INFO_T **list, int new_nc_grpid, 
-		 NC_GRP_INFO_T *parent_grp, NC *nc, 
+nc4_grp_list_add(NC_GRP_INFO_T **list, int new_nc_grpid,
+		 NC_GRP_INFO_T *parent_grp, NC *nc,
 		 char *name, NC_GRP_INFO_T **grp)
 {
    NC_GRP_INFO_T *new_grp;
@@ -782,7 +782,7 @@ nc4_type_list_add(NC_TYPE_INFO_T **list, NC_TYPE_INFO_T **type)
 /* Add to the end of a compound field list. */
 int
 nc4_field_list_add(NC_FIELD_INFO_T **list, int fieldid, const char *name,
-		   size_t offset, hid_t field_hdf_typeid, hid_t native_typeid, 
+		   size_t offset, hid_t field_hdf_typeid, hid_t native_typeid,
 		   nc_type xtype, int ndims, const int *dim_sizesp)
 {
    NC_FIELD_INFO_T *field;
@@ -829,7 +829,7 @@ nc4_field_list_add(NC_FIELD_INFO_T **list, int fieldid, const char *name,
 
 /* Add a member to an enum type. */
 int
-nc4_enum_member_add(NC_ENUM_MEMBER_INFO_T **list, size_t size, 
+nc4_enum_member_add(NC_ENUM_MEMBER_INFO_T **list, size_t size,
 		    const char *name, const void *value)
 {
    NC_ENUM_MEMBER_INFO_T *member;
@@ -884,18 +884,18 @@ nc4_var_list_del(NC_VAR_INFO_T **list, NC_VAR_INFO_T *var)
    }
 
    /* Free some things that may be allocated. */
-   if (var->chunksizes) 
+   if (var->chunksizes)
      {free(var->chunksizes);var->chunksizes = NULL;}
-   
+
    if (var->hdf5_name)
      {free(var->hdf5_name); var->hdf5_name = NULL;}
- 
+
    if (var->name)
      {free(var->name); var->name = NULL;}
 
    if (var->dimids)
      {free(var->dimids); var->dimids = NULL;}
-   
+
    if (var->dim)
      {free(var->dim); var->dim = NULL;}
 
@@ -932,11 +932,11 @@ nc4_var_list_del(NC_VAR_INFO_T **list, NC_VAR_INFO_T *var)
 	 free(var->type_info->name);
 	 var->type_info->name = NULL;
       }
-      
+
       free(var->type_info);
       var->type_info = NULL;
    }
-   
+
    /* Delete any HDF5 dimscale objid information. */
    if (var->dimscale_hdf5_objids)
       free(var->dimscale_hdf5_objids);
@@ -983,7 +983,7 @@ type_list_del(NC_TYPE_INFO_T **list, NC_TYPE_INFO_T *type)
    {
       if (H5Tclose(type->hdf_typeid) < 0)
 	 return NC_EHDFERR;
-   }   
+   }
    if (type->native_typeid)
    {
       if (H5Tclose(type->native_typeid) < 0)
@@ -1017,7 +1017,7 @@ type_list_del(NC_TYPE_INFO_T **list, NC_TYPE_INFO_T *type)
 
    /* Nc_Free the memory. */
    free(type);
-   
+
    return NC_NOERR;
 }
 
@@ -1049,8 +1049,8 @@ grp_list_del(NC_GRP_INFO_T **list, NC_GRP_INFO_T *grp)
 
 /* Recursively delete the data for a group (and everything it
  * contains) in our internal metadata store. */
-int 
-nc4_rec_grp_del(NC_GRP_INFO_T **list, NC_GRP_INFO_T *grp) 
+int
+nc4_rec_grp_del(NC_GRP_INFO_T **list, NC_GRP_INFO_T *grp)
 {
    NC_GRP_INFO_T *g, *c;
    NC_VAR_INFO_T *v, *var;
@@ -1099,7 +1099,7 @@ nc4_rec_grp_del(NC_GRP_INFO_T **list, NC_GRP_INFO_T *grp)
 	 return retval;
       var = v;
    }
-   
+
    /* Delete all dims. */
    dim = grp->dim;
    while (dim)
@@ -1115,7 +1115,7 @@ nc4_rec_grp_del(NC_GRP_INFO_T **list, NC_GRP_INFO_T *grp)
    }
 
    /* Delete all types. */
-   type = grp->type; 
+   type = grp->type;
    while (type)
    {
       LOG((4, "%s: deleting type %s", __func__, type->name));
@@ -1125,9 +1125,9 @@ nc4_rec_grp_del(NC_GRP_INFO_T **list, NC_GRP_INFO_T *grp)
       type = t;
    }
 
-   /* Tell HDF5 we're closing this group. */ 
+   /* Tell HDF5 we're closing this group. */
    LOG((4, "%s: closing group %s", __func__, grp->name));
-   if (grp->hdf_grpid && H5Gclose(grp->hdf_grpid) < 0) 
+   if (grp->hdf_grpid && H5Gclose(grp->hdf_grpid) < 0)
       return NC_EHDFERR;
 
    /* Free the name. */
@@ -1204,7 +1204,7 @@ nc4_break_coord_var(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *coord_var, NC_DIM_INFO_T 
 
    /* If we're replacing an existing dimscale dataset, go to
     * every var in the file and detach this dimension scale. */
-   if ((retval = rec_detach_scales(grp->nc4_info->root_grp, 
+   if ((retval = rec_detach_scales(grp->nc4_info->root_grp,
                                    dim->dimid, coord_var->hdf_datasetid)))
       return retval;
 
@@ -1251,16 +1251,16 @@ nc4_reform_coord_var(NC_GRP_INFO_T *grp, NC_VAR_INFO_T *var, NC_DIM_INFO_T *dim)
          if(var->dimscale_attached[d])
          {
             NC_GRP_INFO_T *g;
-         
+
             for (g = grp; g && !finished; g = g->parent)
             {
                NC_DIM_INFO_T *dim1;
-         
+
                for (dim1 = g->dim; dim1 && !finished; dim1 = dim1->l.next)
                   if (var->dimids[d] == dim1->dimid)
                   {
                      hid_t dim_datasetid;  /* Dataset ID for dimension */
-         
+
                      /* Find dataset ID for dimension */
                      if (dim1->coord_var)
                          dim_datasetid = dim1->coord_var->hdf_datasetid;
@@ -1323,7 +1323,7 @@ nc4_normalize_name(const char *name, char *norm_name)
 /* Use this to set the global log level. Set it to NC_TURN_OFF_LOGGING
    (-1) to turn off all logging. Set it to 0 to show only errors, and
    to higher numbers to show more and more logging details. */
-int 
+int
 nc_set_log_level(int new_level)
 {
    /* If the user wants to completely turn off logging, turn off HDF5
@@ -1336,7 +1336,7 @@ nc_set_log_level(int new_level)
    }
 
    /* Do we need to turn HDF5 logging back on? */
-   if (new_level > NC_TURN_OFF_LOGGING && 
+   if (new_level > NC_TURN_OFF_LOGGING &&
        nc_log_level <= NC_TURN_OFF_LOGGING)
    {
       if (H5Eset_auto((H5E_auto_t)&H5Eprint, stderr) < 0)
@@ -1348,7 +1348,7 @@ nc_set_log_level(int new_level)
    nc_log_level = new_level;
    LOG((4, "log_level changed to %d", nc_log_level));
    return 0;
-} 
+}
 
 /* Recursively print the metadata of a group. */
 #define MAX_NESTS 10
@@ -1372,7 +1372,7 @@ rec_print_metadata(NC_GRP_INFO_T *grp, int *tab_count)
 
    LOG((2, "%s GROUP - %s nc_grpid: %d nvars: %d natts: %d",
 	tabs, grp->name, grp->nc_grpid, grp->nvars, grp->natts));
-   
+
    for(att = grp->att; att; att = att->l.next)
       LOG((2, "%s GROUP ATTRIBUTE - attnum: %d name: %s type: %d len: %d",
 	   tabs, att->attnum, att->name, att->xtype, att->len));
@@ -1380,7 +1380,7 @@ rec_print_metadata(NC_GRP_INFO_T *grp, int *tab_count)
    for(dim = grp->dim; dim; dim = dim->l.next)
       LOG((2, "%s DIMENSION - dimid: %d name: %s len: %d unlimited: %d",
 	   tabs, dim->dimid, dim->name, dim->len, dim->unlimited));
-   
+
    for(var = grp->var; var; var = var->l.next)
    {
       if(var->ndims > 0)
@@ -1394,7 +1394,7 @@ rec_print_metadata(NC_GRP_INFO_T *grp, int *tab_count)
            }
       }
       LOG((2, "%s VARIABLE - varid: %d name: %s type: %d ndims: %d dimscale: %d dimids:%s",
-	   tabs, var->varid, var->name, var->xtype, var->ndims, var->dimscale, 
+	   tabs, var->varid, var->name, var->xtype, var->ndims, var->dimscale,
 	   (dims_string ? dims_string : " -")));
       for(att = var->att; att; att = att->l.next)
 	 LOG((2, "%s VAR ATTRIBUTE - attnum: %d name: %s type: %d len: %d",
@@ -1405,19 +1405,19 @@ rec_print_metadata(NC_GRP_INFO_T *grp, int *tab_count)
          dims_string = NULL;
       }
    }
-   
+
    for (type = grp->type; type; type = type->l.next)
    {
       LOG((2, "%s TYPE - nc_typeid: %d hdf_typeid: 0x%x size: %d committed: %d "
-	   "name: %s num_fields: %d base_nc_type: %d", tabs, type->nc_typeid, 
-	   type->hdf_typeid, type->size, type->committed, type->name, 
+	   "name: %s num_fields: %d base_nc_type: %d", tabs, type->nc_typeid,
+	   type->hdf_typeid, type->size, type->committed, type->name,
 	   type->num_fields, type->base_nc_type));
       /* Is this a compound type? */
       if (type->class == NC_COMPOUND)
       {
 	 LOG((3, "compound type"));
 	 for (field = type->field; field; field = field->l.next)
-	    LOG((4, "field %s offset %d nctype %d ndims %d", field->name, 
+	    LOG((4, "field %s offset %d nctype %d ndims %d", field->name,
 		 field->offset, field->nctype, field->ndims));
       }
       else if (type->class == NC_VLEN)
@@ -1432,7 +1432,7 @@ rec_print_metadata(NC_GRP_INFO_T *grp, int *tab_count)
 	 return NC_EBADTYPE;
       }
    }
-   
+
    /* Call self for each child of this group. */
    if (grp->children)
    {
@@ -1442,7 +1442,7 @@ rec_print_metadata(NC_GRP_INFO_T *grp, int *tab_count)
 	    return retval;
       (*tab_count)--;
    }
-   
+
    return NC_NOERR;
 }
 
@@ -1455,7 +1455,7 @@ log_metadata_nc(NC *nc)
    NC_HDF5_FILE_INFO_T *h5 = NC4_DATA(nc);
    int tab_count = 0;
 
-   LOG((2, "*** NetCDF-4 Internal Metadata: int_ncid 0x%x ext_ncid 0x%x", 
+   LOG((2, "*** NetCDF-4 Internal Metadata: int_ncid 0x%x ext_ncid 0x%x",
 	nc->int_ncid, nc->ext_ncid));
    if (!h5)
    {
@@ -1463,8 +1463,8 @@ log_metadata_nc(NC *nc)
       return NC_NOERR;
    }
    LOG((2, "FILE - hdfid: 0x%x path: %s cmode: 0x%x parallel: %d redef: %d "
-	"fill_mode: %d no_write: %d next_nc_grpid: %d",	h5->hdfid, nc->path, 
-	h5->cmode, h5->parallel, h5->redef, h5->fill_mode, h5->no_write, 
+	"fill_mode: %d no_write: %d next_nc_grpid: %d",	h5->hdfid, nc->path,
+	h5->cmode, h5->parallel, h5->redef, h5->fill_mode, h5->no_write,
 	h5->next_nc_grpid));
    return rec_print_metadata(h5->root_grp, &tab_count);
 }
@@ -1479,7 +1479,7 @@ NC4_show_metadata(int ncid)
 #ifdef LOGGING
    NC *nc;
    int old_log_level = nc_log_level;
-   
+
    /* Find file metadata. */
    if (!(nc = nc4_find_nc_file(ncid,NULL)))
       return NC_EBADID;

@@ -2,7 +2,7 @@
    Corporation for Atmospheric Research/Unidata See COPYRIGHT file for
    conditions of use. See www.unidata.ucar.edu for more info.
 
-   Utility to rename a group 
+   Utility to rename a group
 */
 
 #include <stdlib.h>

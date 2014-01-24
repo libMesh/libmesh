@@ -13,14 +13,14 @@ Research/Unidata. See COPYRIGHT file for more info.
 
 /* This function creates a file for use with parallel I/O. */
 int
-nc_create_par(const char *path, int cmode, MPI_Comm comm, 
+nc_create_par(const char *path, int cmode, MPI_Comm comm,
 	      MPI_Info info, int *ncidp)
 {
 #ifndef USE_PARALLEL
    return NC_ENOPAR;
-#else   
+#else
    NC_MPI_INFO data;
-   
+
    /* One of these two parallel IO modes must be chosen by the user,
     * or else pnetcdf must be in use. */
    if (!(cmode & NC_MPIIO || cmode & NC_MPIPOSIX) &&
@@ -35,7 +35,7 @@ nc_create_par(const char *path, int cmode, MPI_Comm comm,
 
 /* This function opens a file for parallel I/O. */
 int
-nc_open_par(const char *path, int mode, MPI_Comm comm, 
+nc_open_par(const char *path, int mode, MPI_Comm comm,
 	    MPI_Info info, int *ncidp)
 {
 #ifndef USE_PARALLEL
@@ -61,7 +61,7 @@ nc_open_par(const char *path, int mode, MPI_Comm comm,
 
 /* Fortran needs to pass MPI comm/info as integers. */
 int
-nc_open_par_fortran(const char *path, int mode, int comm, 
+nc_open_par_fortran(const char *path, int mode, int comm,
 		    int info, int *ncidp)
 {
 #ifndef USE_PARALLEL
@@ -90,7 +90,7 @@ int
 nc_var_par_access(int ncid, int varid, int par_access)
 {
     NC* ncp;
-    
+
     int stat = NC_NOERR;
 
     if ((stat = NC_check_id(ncid, &ncp)))
@@ -105,7 +105,7 @@ nc_var_par_access(int ncid, int varid, int par_access)
 
 /* when calling from fortran: convert MPI_Comm and MPI_Info to C */
 int
-nc_create_par_fortran(const char *path, int cmode, int comm, 
+nc_create_par_fortran(const char *path, int cmode, int comm,
 		      int info, int *ncidp)
 {
 #ifndef USE_PARALLEL

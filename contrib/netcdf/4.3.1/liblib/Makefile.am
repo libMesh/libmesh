@@ -16,8 +16,8 @@ lib_LTLIBRARIES = libnetcdf.la
 # Note: version-info of "9:0:2" results in soname of libnetcdf.so.7 -> libnetcdf.so.7.2.0
 libnetcdf_la_LDFLAGS = -version-info 9:0:2
 libnetcdf_la_CPPFLAGS = ${AM_CPPFLAGS}
-libnetcdf_la_LIBADD = 
-CLEANFILES = 
+libnetcdf_la_LIBADD =
+CLEANFILES =
 
 # Turn on some extra stuff when building a DLL for windows.
 if BUILD_DLL
@@ -67,4 +67,4 @@ endif #USE_NETCDF4
 
 # We need at least one source file
 libnetcdf_la_SOURCES = stub.c
-EXTRA_DIST=CMakeLists.txt 
+EXTRA_DIST=CMakeLists.txt

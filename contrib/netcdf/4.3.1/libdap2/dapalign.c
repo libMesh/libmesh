@@ -150,7 +150,7 @@ compute_nccalignments(void)
 
     /* Then the vector*/
     COMP_ALIGNMENT(vec[NCCTYPECHAR],char);
-    COMP_ALIGNMENT(vec[NCCTYPEUCHAR],unsigned char); 
+    COMP_ALIGNMENT(vec[NCCTYPEUCHAR],unsigned char);
     COMP_ALIGNMENT(vec[NCCTYPESHORT],short);
     COMP_ALIGNMENT(vec[NCCTYPEUSHORT],unsigned short);
     COMP_ALIGNMENT(vec[NCCTYPEINT],int);

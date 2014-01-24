@@ -32,7 +32,7 @@
 #define DIM1 1000
 #define DIM2 2000		/* DIM0*DIM1*DIM2 > 2**32 */
 
-/* 
+/*
  * This program tests the fix for a large file bug in versions
  * previous to netCDF-4.1.2 for 32-bit platforms, writing to a
  * variable with more than 1 dimension and more than 2**32 values,
@@ -41,7 +41,7 @@
  * as well, but that's not tested here.
  */
 static int
-test_big_var(const char *testfile) 
+test_big_var(const char *testfile)
 {
     int ncid, varid, dimids[NUMDIMS];
     size_t index[NUMDIMS];
@@ -91,7 +91,7 @@ test_big_var(const char *testfile)
 	{
 	    if (data[i][j] != 42 )
 	    {
-		printf("error on start[0]: %d i: %d j: %d expected %d got %d\n", 
+		printf("error on start[0]: %d i: %d j: %d expected %d got %d\n",
 		       start[0], i, j, 42, data[i][j]);
 		ERR;
 		if(nerrs++ > 1)
@@ -105,7 +105,7 @@ test_big_var(const char *testfile)
 	{
 	    if (data[i][j] != 19 )
 	    {
-	      printf("error on start[0]: %d i: %d j: %d expected %d got %d\n", 
+	      printf("error on start[0]: %d i: %d j: %d expected %d got %d\n",
 		     start[0], i, j, 19, data[i][j]);
 	      ERR;
 		if(nerrs++ > 1)
@@ -132,6 +132,6 @@ main(int argc, char **argv) {
        (void) remove(testfile);
        SUMMARIZE_ERR;
    }
-    
+
     FINAL_RESULTS;
 }

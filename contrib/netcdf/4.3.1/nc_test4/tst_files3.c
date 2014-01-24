@@ -2,7 +2,7 @@
    Copyright 2005 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test internal netcdf-4 file code. 
+   Test internal netcdf-4 file code.
    $Id: tst_files3.c,v 1.5 2010/02/02 17:19:28 ed Exp $
 */
 
@@ -17,7 +17,7 @@
 #include <string.h>
 
 #define NDIMS1 1
-#define NDIMS 3   
+#define NDIMS 3
 #define FILE_NAME "tst_files3.nc"
 #define X_LEN 120
 #define Y_LEN 64
@@ -38,7 +38,7 @@ int dump_file2(const float *data, int docompression, int usedefdim)
    if (nc_def_dim(ncid, "lat", Y_LEN, &dimids[1])) ERR_RET;
    if (nc_def_dim(ncid, "lon", Z_LEN, &dimids[2])) ERR_RET;
    if (nc_def_var(ncid, "test", NC_FLOAT, NDIMS, dimids, &var)) ERR_RET;
-   if (docompression) 
+   if (docompression)
      if (nc_def_var_deflate(ncid, var, 1, 1, 1)) ERR_RET;
    if (nc_enddef(ncid)) ERR_RET;
    for (start[0] = 0; start[0] < X_LEN; start[0]++)
@@ -62,7 +62,7 @@ int dump_file(const float *data, int docompression, int usedefdim)
    if (nc_def_dim(ncid, "lat", Y_LEN, &dimids[1])) ERR_RET;
    if (nc_def_dim(ncid, "lon", Z_LEN, &dimids[2])) ERR_RET;
    if (nc_def_var(ncid, "test", NC_FLOAT, NDIMS, dimids, &var)) ERR_RET;
-   if (docompression) 
+   if (docompression)
       if (nc_def_var_deflate(ncid, var, 1, 1, 1)) ERR_RET;
    if (nc_enddef(ncid)) ERR_RET;
    if (nc_put_vars_float(ncid, var, start, count, stride, data)) ERR_RET;
@@ -84,7 +84,7 @@ int dump_file3(const float *data, int docompression, int usedefdim)
    if (nc_def_dim(ncid, "lat", Y_LEN, &dimids[1])) ERR_RET;
    if (nc_def_dim(ncid, "lon", Z_LEN, &dimids[2])) ERR_RET;
    if (nc_def_var(ncid, "test", NC_FLOAT, NDIMS, dimids, &var)) ERR_RET;
-   if (docompression) 
+   if (docompression)
       if (nc_def_var_deflate(ncid, var, 1, 1, 1)) ERR_RET;
    if (nc_enddef(ncid)) ERR_RET;
    if (nc_put_vars_float(ncid, var, start, count, stride, data)) ERR_RET;
@@ -109,7 +109,7 @@ int dump_hdf_file(const float *data, int docompression)
    /* create property for dataset */
    propid = H5Pcreate(H5P_DATASET_CREATE);
 
-   if (docompression) 
+   if (docompression)
    {
       if (H5Pset_layout(propid, H5D_CHUNKED) < 0) ERR;
       if (H5Pset_chunk(propid, NDIMS, dims) < 0) ERR;
@@ -127,7 +127,7 @@ int dump_hdf_file(const float *data, int docompression)
 			  CHUNK_CACHE_SIZE, CHUNK_CACHE_PREEMPTION) < 0) ERR;
 
    /* Create the dataset. */
-   if ((dataset_id = H5Dcreate2(file_id, "dset", H5T_NATIVE_FLOAT, file_spaceid, 
+   if ((dataset_id = H5Dcreate2(file_id, "dset", H5T_NATIVE_FLOAT, file_spaceid,
 				H5P_DEFAULT, propid, access_plistid)) < 0) ERR;
 
 /*   if ((file_spaceid = H5Dget_space(dataset_id)) < 0) ERR;*/
@@ -138,9 +138,9 @@ int dump_hdf_file(const float *data, int docompression)
    for (start[0] = 0; start[0] < X_LEN; start[0]++)
       for (start[1] = 0; start[1] < Y_LEN; start[1]++)
       {
-	 if (H5Sselect_hyperslab(file_spaceid, H5S_SELECT_SET, start, NULL, 
+	 if (H5Sselect_hyperslab(file_spaceid, H5S_SELECT_SET, start, NULL,
 				 count, NULL) < 0) ERR_RET;
-	 if (H5Dwrite(dataset_id, H5T_NATIVE_FLOAT, mem_spaceid, file_spaceid, 
+	 if (H5Dwrite(dataset_id, H5T_NATIVE_FLOAT, mem_spaceid, file_spaceid,
 		      xfer_plistid, data) < 0) ERR_RET;
       }
 
@@ -166,7 +166,7 @@ get_mem_used2(int *mem_used)
 {
    char buf[30];
    FILE *pf;
-   
+
    snprintf(buf, 30, "/proc/%u/statm", (unsigned)getpid());
    pf = fopen(buf, "r");
    if (pf) {
@@ -177,7 +177,7 @@ get_mem_used2(int *mem_used)
       unsigned lib;/*        library */
       unsigned data;/*       data/stack */
       /*unsigned dt;          dirty pages (unused in Linux 2.6)*/
-      fscanf(pf, "%u %u %u %u %u %u", &size, &resident, &share, 
+      fscanf(pf, "%u %u %u %u %u %u", &size, &resident, &share,
 	     &text, &lib, &data);
       *mem_used = data;
    }
@@ -190,7 +190,7 @@ int main(void)
 {
    float data[X_LEN * Y_LEN * Z_LEN];
    int i;
- 
+
    printf("\n*** Testing netcdf-4 file functions with caching.\n");
 
   /* Initialize data. */
@@ -201,7 +201,7 @@ int main(void)
       int mem_used, mem_used1;
 
       printf("*** testing netcdf-4 writes...\n");
-      for (i = 0; i < NUM_TRIES; i++) 
+      for (i = 0; i < NUM_TRIES; i++)
       {
 	 get_mem_used2(&mem_used);
 	 if (dump_file3(data, 1, 0)) ERR_RET;

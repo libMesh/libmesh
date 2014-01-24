@@ -21,7 +21,7 @@
 #define VAR2_NAME "var2"
 
 /* This is handy for print statements. */
-static char *format_name[] = {"", "classic", "64-bit offset", "netCDF-4", 
+static char *format_name[] = {"", "classic", "64-bit offset", "netCDF-4",
 			      "netCDF-4 classic model"};
 
 int check_file(int format, unsigned char *uchar_out);
@@ -32,7 +32,7 @@ main(int argc, char **argv)
 {
    unsigned char uchar_out[DIM1_LEN] = {0, 128, 255};
    int format;
- 
+
    printf("\n*** Testing netcdf data conversion.\n");
 
    for (format = 1; format < 5; format++)
@@ -94,7 +94,7 @@ check_file(int format, unsigned char *uchar_out)
    /* Read it back in, and check conversions. */
    if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
    if (nc_inq_var(ncid, 0, var_name, &var_type, &ndims, dimids_var, &natts)) ERR;
-   if (strcmp(var_name, VAR1_NAME) || natts !=0 || ndims != 1 || 
+   if (strcmp(var_name, VAR1_NAME) || natts !=0 || ndims != 1 ||
        dimids_var[0] != 0 || var_type != NC_BYTE) ERR;
 
    /* This is actually an NC_BYTE, with some negatives, so this should
@@ -107,7 +107,7 @@ check_file(int format, unsigned char *uchar_out)
       if (res != NC_ERANGE) ERR;
    }
    else if (res) ERR;
-       
+
    for (i=0; i<DIM1_LEN; i++)
       if (uchar_in[i] != uchar_out[i]) ERR;
 
@@ -147,7 +147,7 @@ check_file(int format, unsigned char *uchar_out)
 	 if (int64_in[i] != (signed char)uchar_out[i]) ERR;
 
    }
-   
+
    if (nc_close(ncid)) ERR;
    return 0;
 }

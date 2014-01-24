@@ -18,17 +18,17 @@
 #undef max
 #define max(A, B)	((A) > (B) ? (A) : (B))
 
-/* 
- * For every variable in open netcdf, puts and gets three hypercubes 
- * of data of the appropriate type, comparing values from get to 
- * values put to check that both ncvarputg and ncvargetg worked.  The 
+/*
+ * For every variable in open netcdf, puts and gets three hypercubes
+ * of data of the appropriate type, comparing values from get to
+ * values put to check that both ncvarputg and ncvargetg worked.  The
  * three hypercubes are
- *    - a large hypercube from (0, 0, ...) to the far corner (diagonally 
+ *    - a large hypercube from (0, 0, ...) to the far corner (diagonally
  *      opposite (0, 0, ...), trivial strides and index mapping vector;
- *    - a size 1 hypercube from the far corner with edge lengths of 1 
+ *    - a size 1 hypercube from the far corner with edge lengths of 1
  *      in every direction, trivial strides and index mapping vector; and
  *    - a hypercube starting about 1/3 of the way along the diagonal
- *      from (0,0,...) extending 1/3 of the way in every direction 
+ *      from (0,0,...) extending 1/3 of the way in every direction
  *      toward the far corner, dimension-dependent strides and inverted
  *	index mapping vector rooted at the "upper-left" corned.
  */
@@ -117,8 +117,8 @@ test_varputgetg(cdfid)
 	    /* fill allocated space with different values of right type */
 	    val_fill(test.vars[iv].type, nel[ie], hc[ie].vals);
 
-	    if(ncvarputg (cdfid, iv, hc[ie].cor, hc[ie].npts, 
-			  hc[ie].strd, hc[ie].imap, 
+	    if(ncvarputg (cdfid, iv, hc[ie].cor, hc[ie].npts,
+			  hc[ie].strd, hc[ie].imap,
 			  (char*)hc[ie].vals+hc[ie].offset)
 	       == -1) {
 		error("%s: ncvarputg failed for point %d, variable %s",
@@ -152,7 +152,7 @@ test_varputgetg(cdfid)
 		    dsize[id]	= EXTNPTS(iv, id);
 		add_data(&test, iv, hc[ie].cor, dsize);
 						    /* keep test in sync */
-		if(ncvargetg (cdfid, iv, hc[ie].cor, hc[ie].npts, 
+		if(ncvargetg (cdfid, iv, hc[ie].cor, hc[ie].npts,
 			      hc[ie].strd, hc[ie].imap,
 			      (char*)tmp.vals+hc[ie].offset)
 		   == -1) {

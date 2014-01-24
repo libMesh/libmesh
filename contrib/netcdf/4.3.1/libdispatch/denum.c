@@ -37,7 +37,7 @@ will be placed there.
 \returns ::NC_EMAXNAME Name exceeds max length NC_MAX_NAME.
 \returns ::NC_EBADNAME Name contains illegal characters.
 \returns ::NC_EPERM Attempt to write to a read-only file.
-\returns ::NC_ENOTINDEFINE Not in define mode. 
+\returns ::NC_ENOTINDEFINE Not in define mode.
  */
 int
 nc_def_enum(int ncid, nc_type base_typeid, const char *name, nc_type *typeidp)
@@ -49,12 +49,12 @@ nc_def_enum(int ncid, nc_type base_typeid, const char *name, nc_type *typeidp)
 }
 
 /** \ingroup user_types
-Insert a named member into a enum type. 
+Insert a named member into a enum type.
 
 \param ncid \ref ncid
 \param xtype
-\param name The identifier (\ref object_name) of the new member. 
-\param value The value that is to be associated with this member. 
+\param name The identifier (\ref object_name) of the new member.
+\param value The value that is to be associated with this member.
 
 \returns ::NC_NOERR No error.
 \returns ::NC_EBADID Bad \ref ncid.
@@ -65,10 +65,10 @@ Insert a named member into a enum type.
 \returns ::NC_EMAXNAME Name exceeds max length NC_MAX_NAME.
 \returns ::NC_EBADNAME Name contains illegal characters.
 \returns ::NC_EPERM Attempt to write to a read-only file.
-\returns ::NC_ENOTINDEFINE Not in define mode. 
+\returns ::NC_ENOTINDEFINE Not in define mode.
  */
 int
-nc_insert_enum(int ncid, nc_type xtype, const char *name, 
+nc_insert_enum(int ncid, nc_type xtype, const char *name,
 	       const void *value)
 {
     NC *ncp;
@@ -79,7 +79,7 @@ nc_insert_enum(int ncid, nc_type xtype, const char *name,
 }
 
 /** \ingroup user_types
-Learn about a user-define enumeration type. 
+Learn about a user-define enumeration type.
 
 \param ncid \ref ncid
 
@@ -104,11 +104,11 @@ defined for this enum type. \ref ignored_if_null.
 \returns ::NC_EHDFERR An error was reported by the HDF5 layer.
  */
 int
-nc_inq_enum(int ncid, nc_type xtype, char *name, nc_type *base_nc_typep, 
+nc_inq_enum(int ncid, nc_type xtype, char *name, nc_type *base_nc_typep,
 	    size_t *base_sizep, size_t *num_membersp)
 {
     int class = 0;
-    int stat = nc_inq_user_type(ncid, xtype, name, base_sizep, 
+    int stat = nc_inq_user_type(ncid, xtype, name, base_sizep,
 				base_nc_typep, num_membersp, &class);
     if(stat != NC_NOERR) return stat;
     if(class != NC_ENUM) stat = NC_EBADTYPE;
@@ -116,7 +116,7 @@ nc_inq_enum(int ncid, nc_type xtype, char *name, nc_type *base_nc_typep,
 }
 
 /** \ingroup user_types
-Learn about a about a member of an enum type. 
+Learn about a about a member of an enum type.
 
 \param ncid \ref ncid
 
@@ -137,7 +137,7 @@ ignored_if_null.
 \returns ::NC_EHDFERR An error was reported by the HDF5 layer.
  */
 int
-nc_inq_enum_member(int ncid, nc_type xtype, int idx, char *name, 
+nc_inq_enum_member(int ncid, nc_type xtype, int idx, char *name,
 		   void *value)
 {
     NC *ncp;
@@ -147,7 +147,7 @@ nc_inq_enum_member(int ncid, nc_type xtype, int idx, char *name,
 }
 
 /** \ingroup user_types
-Get the name which is associated with an enum member value. 
+Get the name which is associated with an enum member value.
 
 \param ncid \ref ncid
 
@@ -165,7 +165,7 @@ be copied here. \ref ignored_if_null.
 \returns ::NC_EHDFERR An error was reported by the HDF5 layer.
  */
 int
-nc_inq_enum_ident(int ncid, nc_type xtype, long long value, 
+nc_inq_enum_ident(int ncid, nc_type xtype, long long value,
 		  char *identifier)
 {
     NC* ncp;

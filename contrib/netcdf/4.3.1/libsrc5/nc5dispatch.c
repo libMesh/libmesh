@@ -38,7 +38,7 @@ typedef struct NC5_INFO
 
 static int
 NC5_create(const char *path, int cmode,
-	  size_t initialsz, int basepe, size_t *chunksizehintp, 
+	  size_t initialsz, int basepe, size_t *chunksizehintp,
 	  int use_parallel, void* mpidata,
 	  struct NC_Dispatch* table, NC* nc)
 {
@@ -59,8 +59,8 @@ NC5_create(const char *path, int cmode,
     if(cmode & (NC_64BIT_OFFSET))
 	return NC_EINVAL;
 
-    comm = ((NC_MPI_INFO *)mpidata)->comm; 
-    info = ((NC_MPI_INFO *)mpidata)->info;	
+    comm = ((NC_MPI_INFO *)mpidata)->comm;
+    info = ((NC_MPI_INFO *)mpidata)->info;
 
     /* Create our specific NC5_INFO instance */
     nc5 = (NC5_INFO*)calloc(1,sizeof(NC5_INFO));
@@ -84,7 +84,7 @@ NC5_create(const char *path, int cmode,
        In any case, this flag must be set.
     */
     cmode |= (NC_NETCDF4);
-    res = ncmpi_create(comm, path, cmode, info, &(nc->int_ncid));      
+    res = ncmpi_create(comm, path, cmode, info, &(nc->int_ncid));
 
     if(res && nc5 != NULL) free(nc5); /* reclaim allocated space */
     return res;
@@ -114,8 +114,8 @@ NC5_open(const char *path, int cmode,
 	return NC_EINVAL;
 
     if(mpidata != NULL) {
-        comm = ((NC_MPI_INFO *)mpidata)->comm; 
-        info = ((NC_MPI_INFO *)mpidata)->info;	
+        comm = ((NC_MPI_INFO *)mpidata)->comm;
+        info = ((NC_MPI_INFO *)mpidata)->info;
     } else {
 	comm = MPI_COMM_WORLD;
 	info = MPI_INFO_NULL;
@@ -234,7 +234,7 @@ NC5_set_fill(int ncid, int fillmode, int *old_mode_ptr)
     return ncmpi_set_fill(nc->int_ncid,fillmode,old_mode_ptr);
 }
 
-static int 
+static int
 NC5_inq_base_pe(int ncid, int* pep)
 {
     if(pep) *pep = 0;
@@ -288,8 +288,8 @@ static char
 atomic_name[6][NC_MAX_NAME + 1] = {
 "byte", "char", "short","int", "float", "double"
 };
-   
-static int 
+
+static int
 NC5_inq_type(int ncid, nc_type typeid, char* name, size_t* size)
 {
    if(typeid < NC_BYTE || typeid > NC_DOUBLE)
@@ -473,7 +473,7 @@ NC5_put_att(
 
     /* The length needs to be positive (cast needed for braindead
        systems with signed size_t). */
-    if(((unsigned long) len) > X_INT_MAX) 
+    if(((unsigned long) len) > X_INT_MAX)
 	return NC_EINVAL;
 
     status = NC_check_id(ncid, &nc);
@@ -505,7 +505,7 @@ NC5_put_att(
 }
 
 static int
-NC5_def_var(int ncid, const char *name, nc_type xtype, 
+NC5_def_var(int ncid, const char *name, nc_type xtype,
 	    int ndims, const int *dimidsp, int *varidp)
 {
     NC* nc;
@@ -556,14 +556,14 @@ NC5_get_vara(int ncid,
 
     status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) return status;
- 
+
     nc5 = NC5_DATA(nc);
     assert(nc5);
 
     /* No NC_LONG for parallel-netcdf library! */
     if(memtype == NC_INT64)
 	 return NC_EINVAL;
-      
+
     /* get variable's rank */
     status= ncmpi_inq_varndims(nc->int_ncid, varid, &rank);
     if(status) return status;
@@ -637,14 +637,14 @@ NC5_put_vara(int ncid,
 
     status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) return status;
- 
+
     nc5 = NC5_DATA(nc);
     assert(nc5);
 
     /* No NC_LONG for parallel-netcdf library! */
     if(memtype == NC_INT64)
 	 return NC_EINVAL;
-      
+
     /* get variable's rank */
     status = ncmpi_inq_varndims(nc->int_ncid, varid, &rank);
     if(status) return status;
@@ -702,11 +702,11 @@ NC5_put_vara(int ncid,
 }
 
 static int
-NC5_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep, 
-               int *ndimsp, int *dimidsp, int *nattsp, 
+NC5_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep,
+               int *ndimsp, int *dimidsp, int *nattsp,
                int *shufflep, int *deflatep, int *deflate_levelp,
-               int *fletcher32p, int *contiguousp, size_t *chunksizesp, 
-               int *no_fill, void *fill_valuep, int *endiannessp, 
+               int *fletcher32p, int *contiguousp, size_t *chunksizesp,
+               int *no_fill, void *fill_valuep, int *endiannessp,
 	       int *options_maskp, int *pixels_per_blockp)
 {
     int status;
@@ -730,7 +730,7 @@ NC5_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep,
 static int
 NC5_var_par_access(int ncid, int varid, int par_access)
 {
-    NC *nc; 
+    NC *nc;
     NC5_INFO* nc5;
     int status;
 
@@ -751,7 +751,7 @@ NC5_var_par_access(int ncid, int varid, int par_access)
     else
 	return ncmpi_end_indep_data(nc->int_ncid);
 }
-    
+
 #ifdef USE_NETCDF4
 
 static int
@@ -782,19 +782,19 @@ NC5_inq_type_equal(int ncid1, nc_type typeid1, int ncid2, nc_type typeid2, int* 
 {
     /* Check input. */
     if(equalp == NULL) return NC_NOERR;
-    
+
     if (typeid1 <= NC_NAT || typeid2 <= NC_NAT)
        return NC_EINVAL;
-    
+
     *equalp = 0; /* assume */
-    
+
     /* If one is atomic, and the other user-defined, the types are not equal */
     if ((typeid1 <= NC_STRING && typeid2 > NC_STRING) ||
         (typeid2 <= NC_STRING && typeid1 > NC_STRING)) {
         if (equalp) *equalp = 0;
         return NC_NOERR;
     }
-    
+
     /* If both are atomic types, the answer is easy. */
     if (typeid1 <= ATOMICTYPEMAX) {
         if (equalp) {
@@ -944,7 +944,7 @@ NC5_insert_array_compound(int ncid, nc_type typeid, const char *name,
 
 static int
 NC5_inq_compound_field(int ncid, nc_type typeid, int fieldid, char *name,
-		      size_t *offsetp, nc_type *field_typeidp, int *ndimsp, 
+		      size_t *offsetp, nc_type *field_typeidp, int *ndimsp,
 		      int *dim_sizesp)
 {
     return NC_ENOTNC4;

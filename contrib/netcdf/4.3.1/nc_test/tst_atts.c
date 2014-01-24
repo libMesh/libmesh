@@ -2348,7 +2348,7 @@ main(int argc, char **argv)
 #define A1_NAME "a"
 #define B1_NAME "b"
 #define VAR_NAME "var"
-      
+
       int ncid, nvars, v, natts, varid;
       char name_in[NC_MAX_NAME + 1];
       char char_data = 'a';
@@ -2358,7 +2358,7 @@ main(int argc, char **argv)
       if (nc_def_var(ncid, VAR_NAME, NC_INT, 0, NULL, &varid)) ERR;
       if (nc_put_att(ncid, varid, A1_NAME, NC_CHAR, 1, &char_data)) ERR;
       if (nc_put_att(ncid, varid, B1_NAME, NC_CHAR, 1, &char_data)) ERR;
-      
+
       /* Add a global attribute A1_NAME. */
       if (nc_put_att(ncid, NC_GLOBAL, A1_NAME, NC_CHAR, 1, &char_data)) ERR;
 
@@ -2378,10 +2378,10 @@ main(int argc, char **argv)
 	  static const int var_FillValue_atts[] = {42, -99} ;
 	  float var_FillValue_att = -99 ;
 	  /* This should return error, because attribute has too many values */
-	  if (nc_put_att_int(ncid, varid, "_FillValue", NC_INT, 2, var_FillValue_atts) 
+	  if (nc_put_att_int(ncid, varid, "_FillValue", NC_INT, 2, var_FillValue_atts)
 	      != NC_EINVAL) ERR;
 	  /* This also should return error, because types don't match */
-	  if (nc_put_att_float(ncid, varid, "_FillValue", NC_FLOAT, 1, &var_FillValue_att) 
+	  if (nc_put_att_float(ncid, varid, "_FillValue", NC_FLOAT, 1, &var_FillValue_att)
 	      != NC_EBADTYPE) ERR;
 	  /* This should succeed, _FillValue is valid */
 	  if (nc_put_att_int(ncid, varid, "_FillValue", NC_INT, 1, var_FillValue_atts)) ERR;

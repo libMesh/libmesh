@@ -75,7 +75,7 @@ main(int argc, char **argv)
        }
    }
    array[4][0] = missing_value; /* overwrite last row with missing for equality test */
-   
+
    for (i = 0; i < DIM5_LEN; i++) {
        ragged_data[i].p = array[i];
        ragged_data[i].len = NROWS - i;
@@ -88,21 +88,21 @@ main(int argc, char **argv)
    if (nc_close(ncid)) ERR;
 
    /* Check it out. */
-   
+
    /* Reopen the file. */
    if (nc_open(FILE5_NAME, NC_NOWRITE, &ncid)) ERR;
 
    /* Get info with the generic inquire for user-defined types */
-   if (nc_inq_user_type(ncid, typeid, name_in, &base_size_in, &base_typeid, 
+   if (nc_inq_user_type(ncid, typeid, name_in, &base_size_in, &base_typeid,
 			NULL, &class_in)) ERR;
-   if (strcmp(name_in, TYPE5_NAME) || 
+   if (strcmp(name_in, TYPE5_NAME) ||
        base_size_in != sizeof(nc_vlen_t) ||
        base_typeid != NC_FLOAT ||
        class_in != NC_VLEN) ERR;
 
    /* Get the same info with the vlen-specific inquire function */
    if (nc_inq_vlen(ncid, typeid, name_in, &base_size_in, &base_typeid)) ERR;
-   if (strcmp(name_in, TYPE5_NAME) || 
+   if (strcmp(name_in, TYPE5_NAME) ||
        base_size_in != sizeof(nc_vlen_t) ||
        base_typeid != NC_FLOAT) ERR;
 
@@ -148,13 +148,13 @@ main(int argc, char **argv)
    }
 
 
-   if (nc_close(ncid)) ERR; 
-   
+   if (nc_close(ncid)) ERR;
+
    /* Free space used for sample data. */
-   for (i = 0; i < NROWS; i++) 
+   for (i = 0; i < NROWS; i++)
       free(array[i]);
    free(array);
-      
+
    SUMMARIZE_ERR;
    FINAL_RESULTS;
 }

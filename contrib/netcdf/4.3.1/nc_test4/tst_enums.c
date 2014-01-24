@@ -35,7 +35,7 @@ main(int argc, char **argv)
    {
       int value_in;
       /* Can't use the same name twice! */
-      char member_name[NUM_MEMBERS][NC_MAX_NAME + 1] = {"Mene1", "Mene2", 
+      char member_name[NUM_MEMBERS][NC_MAX_NAME + 1] = {"Mene1", "Mene2",
 							"Tekel", "Upharsin"};
       int member_value[NUM_MEMBERS] = {0, 99, 81232, 12};
 
@@ -45,7 +45,7 @@ main(int argc, char **argv)
       /* Create an enum type. */
       if (nc_def_enum(ncid, NC_INT, TYPE_NAME, &typeid)) ERR;
       for (i = 0; i < NUM_MEMBERS; i++)
-	 if (nc_insert_enum(ncid, typeid, member_name[i], 
+	 if (nc_insert_enum(ncid, typeid, member_name[i],
 			    &member_value[i])) ERR;
 
       /* Check it out. */
@@ -54,7 +54,7 @@ main(int argc, char **argv)
       if (strcmp(name_in, TYPE_NAME) || base_size_in != sizeof(int) ||
 	  base_nc_type_in != NC_INT || nfields_in != NUM_MEMBERS || class_in != NC_ENUM) ERR;
       if (nc_inq_enum(ncid, typeid, name_in, &base_nc_type, &base_size_in, &num_members)) ERR;
-      if (strcmp(name_in, TYPE_NAME) || base_nc_type != NC_INT || 
+      if (strcmp(name_in, TYPE_NAME) || base_nc_type != NC_INT ||
 	  num_members != NUM_MEMBERS) ERR;
       for (i = 0; i < NUM_MEMBERS; i++)
       {
@@ -91,7 +91,7 @@ main(int argc, char **argv)
 	 if (strcmp(name_in, member_name[i])) ERR;
       }
 
-      if (nc_close(ncid)) ERR; 
+      if (nc_close(ncid)) ERR;
    }
 
    SUMMARIZE_ERR;
@@ -109,14 +109,14 @@ main(int argc, char **argv)
       unsigned char brady_value[NUM_BRADYS] = {8, 7, 6 , 5, 4, 3, 2, 1, 0};
       unsigned char data[BRADY_DIM_LEN] = {0, 4, 8};
       unsigned char value_in;
-      
+
       /* Create a file. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
 
       /* Create an enum type based on unsigned bytes. */
       if (nc_def_enum(ncid, NC_UBYTE, BRADYS, &typeid)) ERR;
       for (i = 0; i < NUM_BRADYS; i++)
-	 if (nc_insert_enum(ncid, typeid, brady_name[i], 
+	 if (nc_insert_enum(ncid, typeid, brady_name[i],
 			    &brady_value[i])) ERR;
 
       /* Check it out. */
@@ -137,7 +137,7 @@ main(int argc, char **argv)
 
       /* Write an att of this enum type. */
       if (nc_put_att(ncid, NC_GLOBAL, ATT_NAME, typeid, BRADY_DIM_LEN, data)) ERR;
-      
+
       /* Close the file. */
       if (nc_close(ncid)) ERR;
 
@@ -160,7 +160,7 @@ main(int argc, char **argv)
 	 if (strcmp(name_in, brady_name[i])) ERR;
       }
 
-      if (nc_close(ncid)) ERR; 
+      if (nc_close(ncid)) ERR;
    }
 
    SUMMARIZE_ERR;
@@ -199,17 +199,17 @@ main(int argc, char **argv)
 	   char *name;
 	   unsigned char value;
        } cloud_types[] = {
-	   {"Clear", CLEAR}, 
-	   {"Cumulonimbus", CUMULONIMBUS}, 
-	   {"Stratus", STRATUS}, 
-	   {"Stratocumulus", STRATOCUMULUS}, 
-	   {"Cumulus", CUMULUS}, 
-	   {"Altostratus", ALTOSTRATUS}, 
-	   {"Nimbostratus", NIMBOSTRATUS}, 
-	   {"Altocumulus", ALTOCUMULUS}, 
-	   {"Cirrostratus", CIRROSTRATUS}, 
-	   {"Cirrocumulus", CIRROCUMULUS}, 
-	   {"Cirrus", CIRRUS}, 
+	   {"Clear", CLEAR},
+	   {"Cumulonimbus", CUMULONIMBUS},
+	   {"Stratus", STRATUS},
+	   {"Stratocumulus", STRATOCUMULUS},
+	   {"Cumulus", CUMULUS},
+	   {"Altostratus", ALTOSTRATUS},
+	   {"Nimbostratus", NIMBOSTRATUS},
+	   {"Altocumulus", ALTOCUMULUS},
+	   {"Cirrostratus", CIRROSTRATUS},
+	   {"Cirrocumulus", CIRROCUMULUS},
+	   {"Cirrus", CIRRUS},
 	   {"Missing", MISSING}
        };
        int var_dims[VAR2_RANK];
@@ -242,28 +242,28 @@ main(int argc, char **argv)
        if (nc_close(ncid)) ERR;
 
        /* Check it out. */
-   
+
        /* Reopen the file. */
        if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
 
        if (nc_inq_user_type(ncid, typeid, name_in, &base_size_in, &base_nc_type_in,
 			    &nfields_in, &class_in)) ERR;
-       if (strcmp(name_in, TYPE2_NAME) || 
+       if (strcmp(name_in, TYPE2_NAME) ||
 	   base_size_in != sizeof(unsigned char) ||
-	   base_nc_type_in != NC_UBYTE || 
-	   nfields_in != num_members || 
+	   base_nc_type_in != NC_UBYTE ||
+	   nfields_in != num_members ||
 	   class_in != NC_ENUM) ERR;
-       if (nc_inq_enum(ncid, typeid, name_in, 
+       if (nc_inq_enum(ncid, typeid, name_in,
 		       &base_nc_type_in, &base_size_in, &num_members_in)) ERR;
-       if (strcmp(name_in, TYPE2_NAME) || 
-	   base_nc_type_in !=  NC_UBYTE || 
+       if (strcmp(name_in, TYPE2_NAME) ||
+	   base_nc_type_in !=  NC_UBYTE ||
 	   num_members_in != num_members) ERR;
        for (i = 0; i < num_members; i++)
        {
 	   if (nc_inq_enum_member(ncid, typeid, i, name_in, &value_in)) ERR;
-	   if (strcmp(name_in, cloud_types[i].name) || 
+	   if (strcmp(name_in, cloud_types[i].name) ||
 	       value_in != cloud_types[i].value) ERR;
-	   if (nc_inq_enum_ident(ncid, typeid, cloud_types[i].value, 
+	   if (nc_inq_enum_ident(ncid, typeid, cloud_types[i].value,
 				 name_in)) ERR;
 	   if (strcmp(name_in, cloud_types[i].name)) ERR;
        }
@@ -276,15 +276,15 @@ main(int argc, char **argv)
        for (i = 0; i < DIM2_LEN; i++) {
 	   if (cloud_data_in[i] != cloud_data[i]) ERR;
        }
-   
-       if (nc_close(ncid)) ERR; 
+
+       if (nc_close(ncid)) ERR;
    }
 
    SUMMARIZE_ERR;
    printf("*** testing enum interuptus...");
    {
 #define GEEKY_NAME "Galadriel"
-      
+
       /* Create a file. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
 

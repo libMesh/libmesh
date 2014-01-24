@@ -21,7 +21,7 @@ static struct {
 /*
  * Parse chunkspec string and convert into chunkspec_t structure.
  *   ncid: location ID of open netCDF file or group in an open file
- *   spec: string of form 
+ *   spec: string of form
  *           dim1/n1,dim2/n2,...,dimk/nk
  *
  *         specifying chunk size (ni) to be used for dimension named
@@ -46,7 +46,7 @@ chunkspec_parse(int ncid, const char *spec) {
 
     chunkspecs.ndims = 0;
     if (!spec || *spec == '\0')
-	return NC_NOERR; 
+	return NC_NOERR;
     /* Count unescaped commas, handle consecutive unescaped commas as error */
     for(cp = spec; *cp; cp++) {
 	if(*cp == ',' && *pp != '\\') {
@@ -74,7 +74,7 @@ chunkspec_parse(int ncid, const char *spec) {
 	    char *dp;
 	    int dimid;
 	    size_t chunksize;
-	 
+
 	    for(; pp > np && *pp != '/'; pp--) { /* look backwards for "/" */
 		continue;
 	    }
@@ -128,7 +128,7 @@ chunkspec_size(int dimid) {
     for(idim = 0; idim < chunkspecs.ndims; idim++) {
 	if(dimid == chunkspecs.dimids[idim]) {
 	    return chunkspecs.chunksizes[idim];
-	}	
+	}
     }
     return 0;
 }

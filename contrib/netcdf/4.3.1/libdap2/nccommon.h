@@ -105,7 +105,7 @@ struct NCTMODEL {
 /* Detail information about each cache item */
 typedef struct NCcachenode {
     int wholevariable; /* does this cache node only have wholevariables? */
-    int isprefetch; 
+    int isprefetch;
     off_t xdrsize;
     DCEconstraint* constraint; /* as used to create this node */
     NClist* vars; /* vars potentially covered by this cache node */

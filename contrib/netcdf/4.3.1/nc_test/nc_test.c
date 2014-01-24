@@ -15,16 +15,16 @@
  * The read-only tests read files:
  *     test.nc (see below)
  *     tests.h (used merely as an example of a non-netCDF file)
- * 
- * The write tests 
- *     read test.nc (see below) 
+ *
+ * The write tests
+ *     read test.nc (see below)
  *     write scratch.nc (deleted after each test)
- * 
+ *
  * The file test.nc is created by running nc_test with the -c (create) option.
  * It is described by the following global variables.
  */
 
-/* 
+/*
  * global variables (defined by function init_gvars) describing file test.nc
  */
 char dim_name[NDIMS][3];
@@ -43,13 +43,13 @@ nc_type gatt_type[NGATTS];
 size_t att_len[NVARS][MAX_NATTS];
 size_t gatt_len[NGATTS];
 
-/* 
+/*
  * command-line options
  */
 int  verbose;		/* if 1, print details of tests */
 int  max_nmpt;		/* max. number of messages per test */
 
-/* 
+/*
  * Misc. global variables
  */
 int  nfails;		/* number of failures in specific test */
@@ -114,7 +114,7 @@ main(int argc, char *argv[])
      * output of this program. */
     for (i = 1; i <= NUM_FORMATS; i++)
     {
-       switch (i) 
+       switch (i)
        {
 	  case NC_FORMAT_CLASSIC:
 	     nc_set_default_format(NC_FORMAT_CLASSIC, NULL);

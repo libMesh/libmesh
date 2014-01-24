@@ -6,7 +6,7 @@
 
 #include <config.h>
 #undef PROTO
-#ifndef NO_HAVE_PROTOTYPES 
+#ifndef NO_HAVE_PROTOTYPES
 #   define	PROTO(x)	x
 #else
 #   define	PROTO(x)	()
@@ -30,8 +30,8 @@ extern	void	val_fill_zero	PROTO((
 				       void *
 				       ));
 
-/* 
- * compare two typed value blocks, return 0 if equal, 1+n otherwise, 
+/*
+ * compare two typed value blocks, return 0 if equal, 1+n otherwise,
  * where n is the index of the first differing element.
  */
 extern	int	val_cmp		PROTO((

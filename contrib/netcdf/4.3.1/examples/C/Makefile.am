@@ -9,13 +9,13 @@ LDADD = -lm
 AM_CPPFLAGS = -I$(top_srcdir)/include
 AM_LDFLAGS =
 
-# These are the netCDF-3 examples. 
+# These are the netCDF-3 examples.
 TESTPROGRAMS = simple_xy_wr simple_xy_rd sfc_pres_temp_wr	\
 sfc_pres_temp_rd pres_temp_4D_wr pres_temp_4D_rd
 
 # To build netcdf-4, or not to build netcdf-4, that is the question...
 if USE_NETCDF4
-# These are the extra netCDF-4 examples. 
+# These are the extra netCDF-4 examples.
 TESTPROGRAMS += simple_nc4_wr simple_nc4_rd simple_xy_nc4_wr	\
 simple_xy_nc4_rd
 endif #USE_NETCDF4

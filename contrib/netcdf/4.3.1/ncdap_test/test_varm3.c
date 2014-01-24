@@ -3,7 +3,7 @@
 /* ansley.b.manke@noaa.gov */
 /* test nc_get_varm_float with calls similar to Ferret calls */
 /* local file is correct results with stride: every second value */
-/* remote url; incorrect results with stride 
+/* remote url; incorrect results with stride
 
 linked with:
  cc varm_test.c -g -o varm_test /home/nstout/ansley/local/lib/libnetcdf.a -L/usr/lib64 -lc -lm -lcurl
@@ -181,7 +181,7 @@ main()
     for(i=0;i<ndim;i++) printf(" %d",(int)imap[i]);
     printf("\n");
 
-    check(err = nc_get_vars_float(ncid, varid, start, count, stride, 
+    check(err = nc_get_vars_float(ncid, varid, start, count, stride,
                              (float*) dat),__FILE__,__LINE__);
     printf("strided.vars: %s =",VAR);
     for(i=0;i<6;i++) printf(" %f",dat[i]);
@@ -226,7 +226,7 @@ main()
     for(i=0;i<ndim;i++) printf(" %d",(int)imap[i]);
     printf("\n");
 
-    check(err = nc_get_vars_float(ncid, varid, start, count, stride, 
+    check(err = nc_get_vars_float(ncid, varid, start, count, stride,
                              (float*) dat),__FILE__,__LINE__);
     printf("strided.vars: %s =",VAR);
     for(i=0;i<3;i++) printf(" %f",dat[i]);

@@ -14,7 +14,7 @@ NetCDF-4 has added support for four different user defined data
 types. User defined type may only be used in files created with the
 ::NC_NETCDF4 and without ::NC_CLASSIC_MODEL.
 - compound type: like a C struct, a compound type is a collection of
-types, including other user defined types, in one package.  
+types, including other user defined types, in one package.
 - variable length array type: used to store ragged arrays.
 - opaque type: This type has only a size per element, and no other
   type information.
@@ -35,9 +35,9 @@ Create attributes of the new type with nc_put_att (see nc_put_att_
 type). Read attributes of the new type with nc_get_att (see
 \ref attributes).
 */
-/** \{ */ 
+/** \{ */
 
-/** \} */ 
+/** \} */
 
 /** \defgroup groups Groups
 
@@ -68,7 +68,7 @@ with the netCDF classic data model, so files created with the
 ::NC_CLASSIC_MODEL file cannot contain groups (except the root group).
 
  */
-/** \{ */ 
+/** \{ */
 int
 nc_inq_ncid(int ncid, const char *name, int *grp_ncid)
 {
@@ -108,7 +108,7 @@ nc_inq_grpname_full(int ncid, size_t *lenp, char *full_name)
 int
 nc_inq_grpname_len(int ncid, size_t *lenp)
 {
-    int stat = nc_inq_grpname_full(ncid,lenp,NULL);    
+    int stat = nc_inq_grpname_full(ncid,lenp,NULL);
     return stat;
 }
 
@@ -121,11 +121,11 @@ nc_inq_grp_parent(int ncid, int *parent_ncid)
     return ncp->dispatch->inq_grp_parent(ncid,parent_ncid);
 }
 
-/* This has same semantics as nc_inq_ncid */ 
+/* This has same semantics as nc_inq_ncid */
 int
 nc_inq_grp_ncid(int ncid, const char *grp_name, int *grp_ncid)
 {
-    return nc_inq_ncid(ncid,grp_name,grp_ncid);    
+    return nc_inq_ncid(ncid,grp_name,grp_ncid);
 }
 
 int
@@ -137,7 +137,7 @@ nc_inq_grp_full_ncid(int ncid, const char *full_name, int *grp_ncid)
     return ncp->dispatch->inq_grp_full_ncid(ncid,full_name,grp_ncid);
 }
 
-int 
+int
 nc_inq_varids(int ncid, int *nvars, int *varids)
 {
     NC* ncp;
@@ -146,7 +146,7 @@ nc_inq_varids(int ncid, int *nvars, int *varids)
     return ncp->dispatch->inq_varids(ncid,nvars,varids);
 }
 
-int 
+int
 nc_inq_dimids(int ncid, int *ndims, int *dimids, int include_parents)
 {
     NC* ncp;
@@ -155,7 +155,7 @@ nc_inq_dimids(int ncid, int *ndims, int *dimids, int include_parents)
     return ncp->dispatch->inq_dimids(ncid,ndims,dimids,include_parents);
 }
 
-int 
+int
 nc_inq_typeids(int ncid, int *ntypes, int *typeids)
 {
     NC* ncp;
@@ -182,7 +182,7 @@ nc_rename_grp(int grpid, const char *name)
     return ncp->dispatch->rename_grp(grpid,name);
 }
 
-int 
+int
 nc_show_metadata(int ncid)
 {
     NC* ncp;
@@ -191,4 +191,4 @@ nc_show_metadata(int ncid)
     return ncp->dispatch->show_metadata(ncid);
 }
 
-/** \} */ 
+/** \} */

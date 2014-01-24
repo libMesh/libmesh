@@ -41,7 +41,7 @@ main()
    int x, y, retval;
 
    /* The following struct is written as a compound type. */
-   struct s1 
+   struct s1
    {
          int i1;
          int i2;
@@ -61,7 +61,7 @@ main()
 
    /* Get the varid of the uint64 data variable, based on its name, in
     * grp1. */
-   if ((retval = nc_inq_varid(grp1id, "data", &varid1))) 
+   if ((retval = nc_inq_varid(grp1id, "data", &varid1)))
       ERR(retval);
 
    /* Read the data. */
@@ -70,7 +70,7 @@ main()
 
    /* Get the varid of the compound data variable, based on its name,
     * in grp2. */
-   if ((retval = nc_inq_varid(grp2id, "data", &varid2))) 
+   if ((retval = nc_inq_varid(grp2id, "data", &varid2)))
       ERR(retval);
 
    /* Read the data. */

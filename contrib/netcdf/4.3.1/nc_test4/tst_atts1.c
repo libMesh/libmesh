@@ -2,7 +2,7 @@
    Corporation for Atmospheric Research/Unidata. See COPYRIGHT file
    for conditions of use.
 
-   Test attributes. 
+   Test attributes.
 
    $Id$
 */
@@ -80,7 +80,7 @@ int
 tst_att_ordering(int cmode)
 {
    int ncid;
-   char name[NUM_ATTS][ATT_MAX_NAME + 1] = {"Gc", "Gb", "Gs", "Gi", "Gf", 
+   char name[NUM_ATTS][ATT_MAX_NAME + 1] = {"Gc", "Gb", "Gs", "Gi", "Gf",
 					    "Gd", "Gatt-name-dashes", "Gatt.name.dots"};
    int len[NUM_ATTS] = {0, 2, 3, 3, 3, 3, 1, 1};
    signed char b[2] = {-128, 127};
@@ -94,16 +94,16 @@ tst_att_ordering(int cmode)
 
    /* Create a file with some global atts. */
    if (nc_create(FILE_NAME, cmode, &ncid)) ERR;
-   if (nc_put_att_text(ncid, NC_GLOBAL, name[0], len[0], NULL)) ERR;      
-   if (nc_put_att_schar(ncid, NC_GLOBAL, name[1], NC_BYTE, len[1], b)) ERR;      
-   if (nc_put_att_short(ncid, NC_GLOBAL, name[2], NC_SHORT, len[2], s)) ERR;      
-   if (nc_put_att_int(ncid, NC_GLOBAL, name[3], NC_INT, len[3], i)) ERR;       
-   if (nc_put_att_float(ncid, NC_GLOBAL, name[4], NC_FLOAT, len[4], f)) ERR;       
-   if (nc_put_att_double(ncid, NC_GLOBAL, name[5], NC_DOUBLE, len[5], d)) ERR;       
-   if (nc_put_att_int(ncid, NC_GLOBAL, name[6], NC_INT, len[6], &att_name_dashes)) ERR;       
-   if (nc_put_att_int(ncid, NC_GLOBAL, name[7], NC_INT, len[7], &att_name_dots)) ERR;       
+   if (nc_put_att_text(ncid, NC_GLOBAL, name[0], len[0], NULL)) ERR;
+   if (nc_put_att_schar(ncid, NC_GLOBAL, name[1], NC_BYTE, len[1], b)) ERR;
+   if (nc_put_att_short(ncid, NC_GLOBAL, name[2], NC_SHORT, len[2], s)) ERR;
+   if (nc_put_att_int(ncid, NC_GLOBAL, name[3], NC_INT, len[3], i)) ERR;
+   if (nc_put_att_float(ncid, NC_GLOBAL, name[4], NC_FLOAT, len[4], f)) ERR;
+   if (nc_put_att_double(ncid, NC_GLOBAL, name[5], NC_DOUBLE, len[5], d)) ERR;
+   if (nc_put_att_int(ncid, NC_GLOBAL, name[6], NC_INT, len[6], &att_name_dashes)) ERR;
+   if (nc_put_att_int(ncid, NC_GLOBAL, name[7], NC_INT, len[7], &att_name_dots)) ERR;
    if (nc_close(ncid)) ERR;
-      
+
    /* Reopen the file and check the order. */
    if (nc_open(FILE_NAME, 0, &ncid)) ERR;
    for (j = 0; j < NUM_ATTS; j++)
@@ -132,14 +132,14 @@ main(int argc, char **argv)
     double double_in[ATT_LEN], double_out[ATT_LEN] = {-0.25, .5, 0.125};
     long long longlong_in[ATT_LEN], longlong_out[ATT_LEN] = {-3123456789LL, 128LL, 3123456789LL};
     unsigned long long ulonglong_in[ATT_LEN], ulonglong_out[ATT_LEN] = {0LL, 128LL, 3123456789LL};
-	
+
    (void) signal(SIGFPE, SIG_IGN);
    printf("\n*** Testing netcdf-4 attribute functions.\n");
    printf("*** testing really simple global atts...");
 #define NUM_SIMPLE_ATTS 9
    {
       int ncid;
-      char name[NUM_SIMPLE_ATTS][ATT_MAX_NAME + 1] = {"Gc", "Gb", "Gs", "Gi", "Gf", 
+      char name[NUM_SIMPLE_ATTS][ATT_MAX_NAME + 1] = {"Gc", "Gb", "Gs", "Gi", "Gf",
 						      "Gd", "G7", "G8", "G9"};
       char name_in[NC_MAX_NAME];
       int j;
@@ -147,9 +147,9 @@ main(int argc, char **argv)
       /* Create a file with some global atts. */
       if (nc_create(FILE_NAME, NC_NETCDF4|NC_CLOBBER, &ncid)) ERR;
       for (j = 0; j < NUM_SIMPLE_ATTS; j++)
-	 if (nc_put_att_int(ncid, NC_GLOBAL, name[j], NC_INT, 0, NULL)) ERR;      
+	 if (nc_put_att_int(ncid, NC_GLOBAL, name[j], NC_INT, 0, NULL)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Reopen the file and check the order. */
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
       for (j = 0; j < NUM_SIMPLE_ATTS; j++)
@@ -163,7 +163,7 @@ main(int argc, char **argv)
    }
    SUMMARIZE_ERR;
    printf("*** testing simple global atts...");
-   {      
+   {
       int ncid;
       nc_type att_type;
       size_t att_len;
@@ -173,28 +173,28 @@ main(int argc, char **argv)
 
       /* This won't work, because classic files can't create these types. */
       if (nc_create(FILE_NAME, NC_NETCDF4|NC_CLASSIC_MODEL, &ncid)) ERR;
-      if (nc_put_att_ushort(ncid, NC_GLOBAL, ATT_USHORT_NAME, NC_USHORT, ATT_LEN, 
-			    ushort_out) != NC_ESTRICTNC3) ERR;      
-      if (nc_put_att_uint(ncid, NC_GLOBAL, ATT_UINT_NAME, NC_UINT, ATT_LEN, 
-			  uint_out) != NC_ESTRICTNC3) ERR;      
-      if (nc_put_att_longlong(ncid, NC_GLOBAL, ATT_INT64_NAME, NC_INT64, ATT_LEN, 
-			      longlong_out) != NC_ESTRICTNC3) ERR;      
-      if (nc_put_att_ulonglong(ncid, NC_GLOBAL, ATT_UINT64_NAME, NC_UINT64, ATT_LEN, 
-			       ulonglong_out) != NC_ESTRICTNC3) ERR;      
+      if (nc_put_att_ushort(ncid, NC_GLOBAL, ATT_USHORT_NAME, NC_USHORT, ATT_LEN,
+			    ushort_out) != NC_ESTRICTNC3) ERR;
+      if (nc_put_att_uint(ncid, NC_GLOBAL, ATT_UINT_NAME, NC_UINT, ATT_LEN,
+			  uint_out) != NC_ESTRICTNC3) ERR;
+      if (nc_put_att_longlong(ncid, NC_GLOBAL, ATT_INT64_NAME, NC_INT64, ATT_LEN,
+			      longlong_out) != NC_ESTRICTNC3) ERR;
+      if (nc_put_att_ulonglong(ncid, NC_GLOBAL, ATT_UINT64_NAME, NC_UINT64, ATT_LEN,
+			       ulonglong_out) != NC_ESTRICTNC3) ERR;
       /* But it's OK to put classic types like NC_INT converted from
        * supported C types, though there may be out-of-range errrors
        * for some values */
-      if (nc_put_att_uint(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN, 
+      if (nc_put_att_uint(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN,
 			  uint_out) != NC_ERANGE) ERR;
-      if (nc_put_att_longlong(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN, 
+      if (nc_put_att_longlong(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN,
 			      longlong_out) != NC_ERANGE) ERR;
-      if (nc_put_att_ulonglong(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN, 
+      if (nc_put_att_ulonglong(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN,
 			       ulonglong_out) != NC_ERANGE) ERR;
-      if (nc_put_att_ushort(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN, 
-			    ushort_out)) ERR;      
+      if (nc_put_att_ushort(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN,
+			    ushort_out)) ERR;
       /* restore to intended values for subsequent tests */
-      if (nc_put_att_int(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN, 
-			    int_out)) ERR;      
+      if (nc_put_att_int(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN,
+			    int_out)) ERR;
       /* It should also be OK to read classic types converted into
        * supported C types. though the conversion may encounter
        * out-of-range values */
@@ -208,17 +208,17 @@ main(int argc, char **argv)
 
       /* Create a file with a global attribute of each type. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
-      if (nc_put_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, strlen(speech)+1, speech)) ERR;      
-      if (nc_put_att_schar(ncid, NC_GLOBAL, ATT_SCHAR_NAME, NC_BYTE, ATT_LEN, schar_out)) ERR;      
+      if (nc_put_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, strlen(speech)+1, speech)) ERR;
+      if (nc_put_att_schar(ncid, NC_GLOBAL, ATT_SCHAR_NAME, NC_BYTE, ATT_LEN, schar_out)) ERR;
       if (nc_put_att_uchar(ncid, NC_GLOBAL, ATT_UCHAR_NAME, NC_UBYTE, ATT_LEN, uchar_out)) ERR;
-      if (nc_put_att_short(ncid, NC_GLOBAL, ATT_SHORT_NAME, NC_SHORT, ATT_LEN, short_out)) ERR;      
-      if (nc_put_att_int(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN, int_out)) ERR;      
-      if (nc_put_att_float(ncid, NC_GLOBAL, ATT_FLOAT_NAME, NC_FLOAT, ATT_LEN, float_out)) ERR;      
-      if (nc_put_att_double(ncid, NC_GLOBAL, ATT_DOUBLE_NAME, NC_DOUBLE, ATT_LEN, double_out)) ERR;      
-      if (nc_put_att_ushort(ncid, NC_GLOBAL, ATT_USHORT_NAME, NC_USHORT, ATT_LEN, ushort_out)) ERR;      
-      if (nc_put_att_uint(ncid, NC_GLOBAL, ATT_UINT_NAME, NC_UINT, ATT_LEN, uint_out)) ERR;      
-      if (nc_put_att_longlong(ncid, NC_GLOBAL, ATT_INT64_NAME, NC_INT64, ATT_LEN, longlong_out)) ERR;      
-      if (nc_put_att_ulonglong(ncid, NC_GLOBAL, ATT_UINT64_NAME, NC_UINT64, ATT_LEN, ulonglong_out)) ERR;      
+      if (nc_put_att_short(ncid, NC_GLOBAL, ATT_SHORT_NAME, NC_SHORT, ATT_LEN, short_out)) ERR;
+      if (nc_put_att_int(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN, int_out)) ERR;
+      if (nc_put_att_float(ncid, NC_GLOBAL, ATT_FLOAT_NAME, NC_FLOAT, ATT_LEN, float_out)) ERR;
+      if (nc_put_att_double(ncid, NC_GLOBAL, ATT_DOUBLE_NAME, NC_DOUBLE, ATT_LEN, double_out)) ERR;
+      if (nc_put_att_ushort(ncid, NC_GLOBAL, ATT_USHORT_NAME, NC_USHORT, ATT_LEN, ushort_out)) ERR;
+      if (nc_put_att_uint(ncid, NC_GLOBAL, ATT_UINT_NAME, NC_UINT, ATT_LEN, uint_out)) ERR;
+      if (nc_put_att_longlong(ncid, NC_GLOBAL, ATT_INT64_NAME, NC_INT64, ATT_LEN, longlong_out)) ERR;
+      if (nc_put_att_ulonglong(ncid, NC_GLOBAL, ATT_UINT64_NAME, NC_UINT64, ATT_LEN, ulonglong_out)) ERR;
       if (nc_close(ncid)) ERR;
 
       /* Open the file and check attributes. */
@@ -228,38 +228,38 @@ main(int argc, char **argv)
 	 ERR;
       if (att_type != NC_CHAR || att_len != strlen(speech) + 1) ERR;
       if (!(speech_in = malloc(att_len + 1))) ERR;
-      if (nc_get_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, speech_in)) ERR;      
+      if (nc_get_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, speech_in)) ERR;
       if (strcmp(speech, speech_in)) ERR;
       free(speech_in);
       /* Check numeric values. */
-      if (nc_get_att_schar(ncid, NC_GLOBAL, ATT_SCHAR_NAME, schar_in)) ERR;      
+      if (nc_get_att_schar(ncid, NC_GLOBAL, ATT_SCHAR_NAME, schar_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (schar_in[i] != schar_out[i]) ERR;
-      if (nc_get_att_uchar(ncid, NC_GLOBAL, ATT_UCHAR_NAME, uchar_in)) ERR;      
+      if (nc_get_att_uchar(ncid, NC_GLOBAL, ATT_UCHAR_NAME, uchar_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (uchar_in[i] != uchar_out[i]) ERR;
-      if (nc_get_att_short(ncid, NC_GLOBAL, ATT_SHORT_NAME, short_in)) ERR;      
+      if (nc_get_att_short(ncid, NC_GLOBAL, ATT_SHORT_NAME, short_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (short_in[i] != short_out[i]) ERR;
-      if (nc_get_att_int(ncid, NC_GLOBAL, ATT_INT_NAME, int_in)) ERR;      
+      if (nc_get_att_int(ncid, NC_GLOBAL, ATT_INT_NAME, int_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (int_in[i] != int_out[i]) ERR;
-      if (nc_get_att_float(ncid, NC_GLOBAL, ATT_FLOAT_NAME, float_in)) ERR;      
+      if (nc_get_att_float(ncid, NC_GLOBAL, ATT_FLOAT_NAME, float_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (float_in[i] != float_out[i]) ERR;
-      if (nc_get_att_double(ncid, NC_GLOBAL, ATT_DOUBLE_NAME, double_in)) ERR;      
+      if (nc_get_att_double(ncid, NC_GLOBAL, ATT_DOUBLE_NAME, double_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (double_in[i] != double_out[i]) ERR;
-      if (nc_get_att_ushort(ncid, NC_GLOBAL, ATT_USHORT_NAME, ushort_in)) ERR;      
+      if (nc_get_att_ushort(ncid, NC_GLOBAL, ATT_USHORT_NAME, ushort_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (ushort_in[i] != ushort_out[i]) ERR;
-      if (nc_get_att_uint(ncid, NC_GLOBAL, ATT_UINT_NAME, uint_in)) ERR;      
+      if (nc_get_att_uint(ncid, NC_GLOBAL, ATT_UINT_NAME, uint_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (uint_in[i] != uint_out[i]) ERR;
-      if (nc_get_att_longlong(ncid, NC_GLOBAL, ATT_INT64_NAME, longlong_in)) ERR;      
+      if (nc_get_att_longlong(ncid, NC_GLOBAL, ATT_INT64_NAME, longlong_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (longlong_in[i] != longlong_out[i]) ERR;
-      if (nc_get_att_ulonglong(ncid, NC_GLOBAL, ATT_UINT64_NAME, ulonglong_in)) ERR;      
+      if (nc_get_att_ulonglong(ncid, NC_GLOBAL, ATT_UINT64_NAME, ulonglong_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (ulonglong_in[i] != ulonglong_out[i]) ERR;
       if (nc_close(ncid)) ERR;
@@ -351,7 +351,7 @@ main(int argc, char **argv)
       /* for (i = 0; i < ATT_LEN; i++) */
       /* 	  if (float_in[i] != (float) longlong_out[i]) ERR; */
       if (nc_get_att_float(ncid, NC_GLOBAL, ATT_UINT64_NAME, float_in)) ERR;
-#if !defined(_WIN32) && !defined(_WIN64) 
+#if !defined(_WIN32) && !defined(_WIN64)
 	  for (i = 0; i < ATT_LEN; i++)
 	  if (float_in[i] != (float) ulonglong_out[i]) ERR;
 #endif
@@ -635,19 +635,19 @@ main(int argc, char **argv)
       if (nc_def_dim(ncid, DIM1_NAME, DIM1_LEN, &dimids[0])) ERR;
       if (nc_def_dim(ncid, DIM2_NAME, DIM2_LEN, &dimids[1])) ERR;
       if (nc_def_var(ncid, VAR1_NAME, NC_INT, 2, dimids, &varid)) ERR;
-      if (nc_put_att_text(ncid, varid, ATT_TEXT_NAME, strlen(speech)+1, speech)) ERR;      
-      if (nc_put_att_schar(ncid, varid, ATT_SCHAR_NAME, NC_BYTE, ATT_LEN, schar_out)) ERR;      
-      if (nc_put_att_short(ncid, varid, ATT_SHORT_NAME, NC_SHORT, 3, short_out)) ERR;      
-      if (nc_put_att_int(ncid, varid, ATT_INT_NAME, NC_INT, 3, int_out)) ERR;      
-      if (nc_put_att_float(ncid, varid, ATT_FLOAT_NAME, NC_FLOAT, 3, float_out)) ERR;      
-      if (nc_put_att_double(ncid, varid, ATT_DOUBLE_NAME, NC_DOUBLE, 3, double_out)) ERR;      
+      if (nc_put_att_text(ncid, varid, ATT_TEXT_NAME, strlen(speech)+1, speech)) ERR;
+      if (nc_put_att_schar(ncid, varid, ATT_SCHAR_NAME, NC_BYTE, ATT_LEN, schar_out)) ERR;
+      if (nc_put_att_short(ncid, varid, ATT_SHORT_NAME, NC_SHORT, 3, short_out)) ERR;
+      if (nc_put_att_int(ncid, varid, ATT_INT_NAME, NC_INT, 3, int_out)) ERR;
+      if (nc_put_att_float(ncid, varid, ATT_FLOAT_NAME, NC_FLOAT, 3, float_out)) ERR;
+      if (nc_put_att_double(ncid, varid, ATT_DOUBLE_NAME, NC_DOUBLE, 3, double_out)) ERR;
       if (nc_def_var(ncid, VAR2_NAME, NC_UINT, 2, dimids, &varid)) ERR;
-      if (nc_put_att_text(ncid, varid, ATT_TEXT_NAME, strlen(speech)+1, speech)) ERR;      
-      if (nc_put_att_schar(ncid, varid, ATT_SCHAR_NAME, NC_BYTE, ATT_LEN, schar_out)) ERR; 
-      if (nc_put_att_short(ncid, varid, ATT_SHORT_NAME, NC_SHORT, 3, short_out)) ERR;           
-      if (nc_put_att_int(ncid, varid, ATT_INT_NAME, NC_INT, 3, int_out)) ERR;      
-      if (nc_put_att_float(ncid, varid, ATT_FLOAT_NAME, NC_FLOAT, 3, float_out)) ERR;      
-      if (nc_put_att_double(ncid, varid, ATT_DOUBLE_NAME, NC_DOUBLE, 3, double_out)) ERR;      
+      if (nc_put_att_text(ncid, varid, ATT_TEXT_NAME, strlen(speech)+1, speech)) ERR;
+      if (nc_put_att_schar(ncid, varid, ATT_SCHAR_NAME, NC_BYTE, ATT_LEN, schar_out)) ERR;
+      if (nc_put_att_short(ncid, varid, ATT_SHORT_NAME, NC_SHORT, 3, short_out)) ERR;
+      if (nc_put_att_int(ncid, varid, ATT_INT_NAME, NC_INT, 3, int_out)) ERR;
+      if (nc_put_att_float(ncid, varid, ATT_FLOAT_NAME, NC_FLOAT, 3, float_out)) ERR;
+      if (nc_put_att_double(ncid, varid, ATT_DOUBLE_NAME, NC_DOUBLE, 3, double_out)) ERR;
       if (nc_close(ncid)) ERR;
 
       /* Open the file and check attributes. */
@@ -657,22 +657,22 @@ main(int argc, char **argv)
 	 if (nc_inq_att(ncid, v, ATT_TEXT_NAME, &att_type, &att_len)) ERR;
 	 if (att_type != NC_CHAR || att_len != strlen(speech) + 1) ERR;
 	 if (!(speech_in = malloc(att_len + 1))) ERR;
-	 if (nc_get_att_text(ncid, v, ATT_TEXT_NAME, speech_in)) ERR;      
+	 if (nc_get_att_text(ncid, v, ATT_TEXT_NAME, speech_in)) ERR;
 	 if (strcmp(speech, speech_in)) ERR;
 	 free(speech_in);
-	 if (nc_get_att_schar(ncid, v, ATT_SCHAR_NAME, schar_in)) ERR;      
+	 if (nc_get_att_schar(ncid, v, ATT_SCHAR_NAME, schar_in)) ERR;
 	 for (i = 0; i < ATT_LEN; i++)
 	    if (schar_in[i] != schar_out[i]) ERR;
-	 if (nc_get_att_short(ncid, v, ATT_SHORT_NAME, short_in)) ERR;      
+	 if (nc_get_att_short(ncid, v, ATT_SHORT_NAME, short_in)) ERR;
 	 for (i = 0; i < ATT_LEN; i++)
 	    if (short_in[i] != short_out[i]) ERR;
-	 if (nc_get_att_int(ncid, v, ATT_INT_NAME, int_in)) ERR;      
+	 if (nc_get_att_int(ncid, v, ATT_INT_NAME, int_in)) ERR;
 	 for (i = 0; i < ATT_LEN; i++)
 	    if (int_in[i] != int_out[i]) ERR;
-	 if (nc_get_att_float(ncid, v, ATT_FLOAT_NAME, float_in)) ERR;      
+	 if (nc_get_att_float(ncid, v, ATT_FLOAT_NAME, float_in)) ERR;
 	 for (i = 0; i < ATT_LEN; i++)
 	    if (float_in[i] != float_out[i]) ERR;
-	 if (nc_get_att_double(ncid, v, ATT_DOUBLE_NAME, double_in)) ERR;      
+	 if (nc_get_att_double(ncid, v, ATT_DOUBLE_NAME, double_in)) ERR;
 	 for (i = 0; i < ATT_LEN; i++)
 	    if (double_in[i] != double_out[i]) ERR;
       }
@@ -793,17 +793,17 @@ main(int argc, char **argv)
 
       /* Create a file with a global attribute. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
-      if (nc_put_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, strlen(speech)+1, 
-			  speech)) ERR;      
+      if (nc_put_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, strlen(speech)+1,
+			  speech)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Rename it. */
       if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
       if (nc_inq_attid(ncid, NC_GLOBAL, ATT_TEXT_NAME, &attid_in)) ERR;
       if (attid_in != 0) ERR;
       if (nc_inq_attname(ncid, NC_GLOBAL, attid_in, name_in)) ERR;
       if (strcmp(name_in, ATT_TEXT_NAME)) ERR;
-      if (nc_rename_att(ncid, NC_GLOBAL, ATT_TEXT_NAME, ATT_TEXT_NAME2)) ERR;      
+      if (nc_rename_att(ncid, NC_GLOBAL, ATT_TEXT_NAME, ATT_TEXT_NAME2)) ERR;
       if (nc_inq_attname(ncid, NC_GLOBAL, attid_in, name_in)) ERR;
       if (strcmp(name_in, ATT_TEXT_NAME2)) ERR;
       if (nc_close(ncid)) ERR;
@@ -812,10 +812,10 @@ main(int argc, char **argv)
       if (nc_inq_att(ncid, NC_GLOBAL, ATT_TEXT_NAME2, &att_type, &att_len)) ERR;
       if (att_type != NC_CHAR || att_len != strlen(speech) + 1) ERR;
       if (!(speech_in = malloc(att_len + 1))) ERR;
-      if (nc_get_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME2, speech_in)) ERR;      
+      if (nc_get_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME2, speech_in)) ERR;
       if (strcmp(speech, speech_in)) ERR;
       free(speech_in);
-      if (nc_get_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, speech_in) != NC_ENOTATT) ERR;      
+      if (nc_get_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, speech_in) != NC_ENOTATT) ERR;
       if (nc_close(ncid)) ERR;
 
       /* Now delete the att. */
@@ -825,13 +825,13 @@ main(int argc, char **argv)
 
       /* Now create a file with a variable, which has an att. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
-      if (nc_put_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, strlen(speech)+1, speech)) ERR;      
+      if (nc_put_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, strlen(speech)+1, speech)) ERR;
       if (nc_def_dim(ncid, DIM1_NAME, DIM1_LEN, &dimids[0])) ERR;
       if (nc_def_dim(ncid, DIM2_NAME, DIM2_LEN, &dimids[1])) ERR;
       if (nc_def_var(ncid, VAR1_NAME, NC_INT, 2, dimids, &varid)) ERR;
-      if (nc_put_att_int(ncid, varid, ATT_INT_NAME, NC_INT, 3, int_out)) ERR;      
+      if (nc_put_att_int(ncid, varid, ATT_INT_NAME, NC_INT, 3, int_out)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Reopen the file and delete it. Make sure it's gone. */
       if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
       if (nc_del_att(ncid, 0, ATT_INT_NAME)) ERR;
@@ -840,7 +840,7 @@ main(int argc, char **argv)
       /* Reopen the file and readd the attribute. Enddef and redef,
        * and delete it, then check to make sure it's gone. */
       if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
-      if (nc_put_att_int(ncid, varid, ATT_INT_NAME, NC_INT, 3, int_out)) ERR;      
+      if (nc_put_att_int(ncid, varid, ATT_INT_NAME, NC_INT, 3, int_out)) ERR;
       if (nc_enddef(ncid)) ERR;
       if (nc_redef(ncid)) ERR;
       if (nc_del_att(ncid, 0, ATT_INT_NAME)) ERR;
@@ -864,7 +864,7 @@ main(int argc, char **argv)
       if (nc_put_att_int(ncid, NC_GLOBAL, ATT0, NC_INT, 1, &number)) ERR;
       if (nc_put_att_int(ncid, NC_GLOBAL, ATT1, NC_INT, 1, &number)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Open it and check the order. */
       if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
       if (nc_inq_attid(ncid, NC_GLOBAL, ATT0, &attid_in)) ERR;
@@ -881,7 +881,7 @@ main(int argc, char **argv)
       if (nc_put_att_int(ncid, varid, ATT0, NC_INT, 1, &number)) ERR;
       if (nc_put_att_int(ncid, varid, ATT1, NC_INT, 1, &number)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Reopen the file and check the order of the attributes on the var. */
       if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
       if (nc_inq_attid(ncid, 0, ATT0, &attid_in)) ERR;
@@ -895,9 +895,9 @@ main(int argc, char **argv)
    printf("*** testing attribute ordering some more...");
 
 #define VAR_NAME "i"
-#define A1_NAME "i"      
-#define A2_NAME "f"      
-#define A3_NAME "d"      
+#define A1_NAME "i"
+#define A2_NAME "f"
+#define A3_NAME "d"
 #define A1_LEN 3
 #define A2_LEN 4
 #define A3_LEN 5
@@ -911,11 +911,11 @@ main(int argc, char **argv)
       /* Create a file with one var, and attach three atts to it. */
       if (nc_create(FILE_NAME, NC_NETCDF4|NC_CLASSIC_MODEL, &ncid)) ERR;
       if (nc_def_var(ncid, VAR_NAME, NC_INT, 0, NULL, &varid)) ERR;
-      if (nc_put_att_double(ncid, varid, A1_NAME, NC_INT, A1_LEN, dvalue)) ERR;      
-      if (nc_put_att_double(ncid, varid, A2_NAME, NC_INT, A2_LEN, dvalue)) ERR;      
-      if (nc_put_att_double(ncid, varid, A3_NAME, NC_INT, A3_LEN, dvalue)) ERR;      
+      if (nc_put_att_double(ncid, varid, A1_NAME, NC_INT, A1_LEN, dvalue)) ERR;
+      if (nc_put_att_double(ncid, varid, A2_NAME, NC_INT, A2_LEN, dvalue)) ERR;
+      if (nc_put_att_double(ncid, varid, A3_NAME, NC_INT, A3_LEN, dvalue)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Reopen the file and check. */
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
       if (nc_inq_varids(ncid, &nvars, varids)) ERR;
@@ -966,7 +966,7 @@ main(int argc, char **argv)
 
    SUMMARIZE_ERR;
    printf("*** testing copy of simple global atts...");
-   {      
+   {
       int ncid, ncid2;
       nc_type att_type;
       size_t att_len;
@@ -986,20 +986,20 @@ main(int argc, char **argv)
 
       /* Create a file with a global attribute of each type. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
-      if (nc_put_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, strlen(speech)+1, speech)) ERR;      
-      if (nc_put_att_schar(ncid, NC_GLOBAL, ATT_SCHAR_NAME, NC_BYTE, ATT_LEN, schar_out)) ERR;      
+      if (nc_put_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, strlen(speech)+1, speech)) ERR;
+      if (nc_put_att_schar(ncid, NC_GLOBAL, ATT_SCHAR_NAME, NC_BYTE, ATT_LEN, schar_out)) ERR;
       if (nc_put_att_uchar(ncid, NC_GLOBAL, ATT_UCHAR_NAME, NC_UBYTE, ATT_LEN, uchar_out)) ERR;
-      if (nc_put_att_short(ncid, NC_GLOBAL, ATT_SHORT_NAME, NC_SHORT, ATT_LEN, short_out)) ERR;      
-      if (nc_put_att_int(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN, int_out)) ERR;      
-      if (nc_put_att_float(ncid, NC_GLOBAL, ATT_FLOAT_NAME, NC_FLOAT, ATT_LEN, float_out)) ERR;      
-      if (nc_put_att_double(ncid, NC_GLOBAL, ATT_DOUBLE_NAME, NC_DOUBLE, ATT_LEN, double_out)) ERR;      
-      if (nc_put_att_ushort(ncid, NC_GLOBAL, ATT_USHORT_NAME, NC_USHORT, ATT_LEN, ushort_out)) ERR;      
-      if (nc_put_att_uint(ncid, NC_GLOBAL, ATT_UINT_NAME, NC_UINT, ATT_LEN, uint_out)) ERR;      
-      if (nc_put_att_longlong(ncid, NC_GLOBAL, ATT_INT64_NAME, NC_INT64, ATT_LEN, longlong_out)) ERR;      
-      if (nc_put_att_ulonglong(ncid, NC_GLOBAL, ATT_UINT64_NAME, NC_UINT64, ATT_LEN, ulonglong_out)) ERR;      
+      if (nc_put_att_short(ncid, NC_GLOBAL, ATT_SHORT_NAME, NC_SHORT, ATT_LEN, short_out)) ERR;
+      if (nc_put_att_int(ncid, NC_GLOBAL, ATT_INT_NAME, NC_INT, ATT_LEN, int_out)) ERR;
+      if (nc_put_att_float(ncid, NC_GLOBAL, ATT_FLOAT_NAME, NC_FLOAT, ATT_LEN, float_out)) ERR;
+      if (nc_put_att_double(ncid, NC_GLOBAL, ATT_DOUBLE_NAME, NC_DOUBLE, ATT_LEN, double_out)) ERR;
+      if (nc_put_att_ushort(ncid, NC_GLOBAL, ATT_USHORT_NAME, NC_USHORT, ATT_LEN, ushort_out)) ERR;
+      if (nc_put_att_uint(ncid, NC_GLOBAL, ATT_UINT_NAME, NC_UINT, ATT_LEN, uint_out)) ERR;
+      if (nc_put_att_longlong(ncid, NC_GLOBAL, ATT_INT64_NAME, NC_INT64, ATT_LEN, longlong_out)) ERR;
+      if (nc_put_att_ulonglong(ncid, NC_GLOBAL, ATT_UINT64_NAME, NC_UINT64, ATT_LEN, ulonglong_out)) ERR;
 
       /* Create another file and copy all the attributes. */
-      if (nc_create(FILE_NAME2, NC_NETCDF4, &ncid2)) ERR;      
+      if (nc_create(FILE_NAME2, NC_NETCDF4, &ncid2)) ERR;
       if (nc_copy_att(ncid, NC_GLOBAL, ATT_TEXT_NAME, ncid2, NC_GLOBAL)) ERR;
       if (nc_copy_att(ncid, NC_GLOBAL, ATT_SCHAR_NAME, ncid2, NC_GLOBAL)) ERR;
       if (nc_copy_att(ncid, NC_GLOBAL, ATT_UCHAR_NAME, ncid2, NC_GLOBAL)) ERR;
@@ -1022,26 +1022,26 @@ main(int argc, char **argv)
       if (nc_inq_att(ncid, NC_GLOBAL, ATT_TEXT_NAME, &att_type, &att_len)) ERR;
       if (att_type != NC_CHAR || att_len != strlen(speech) + 1) ERR;
       if (!(speech_in = malloc(att_len + 1))) ERR;
-      if (nc_get_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, speech_in)) ERR;      
+      if (nc_get_att_text(ncid, NC_GLOBAL, ATT_TEXT_NAME, speech_in)) ERR;
       if (strcmp(speech, speech_in)) ERR;
       free(speech_in);
       /* Check numeric values. */
-      if (nc_get_att_schar(ncid, NC_GLOBAL, ATT_SCHAR_NAME, schar_in)) ERR;      
+      if (nc_get_att_schar(ncid, NC_GLOBAL, ATT_SCHAR_NAME, schar_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (schar_in[i] != schar_out[i]) ERR;
       if (nc_get_att_uchar(ncid, NC_GLOBAL, ATT_UCHAR_NAME, uchar_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (uchar_in[i] != uchar_out[i]) ERR;
-      if (nc_get_att_short(ncid, NC_GLOBAL, ATT_SHORT_NAME, short_in)) ERR;      
+      if (nc_get_att_short(ncid, NC_GLOBAL, ATT_SHORT_NAME, short_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (short_in[i] != short_out[i]) ERR;
-      if (nc_get_att_int(ncid, NC_GLOBAL, ATT_INT_NAME, int_in)) ERR;      
+      if (nc_get_att_int(ncid, NC_GLOBAL, ATT_INT_NAME, int_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (int_in[i] != int_out[i]) ERR;
-      if (nc_get_att_float(ncid, NC_GLOBAL, ATT_FLOAT_NAME, float_in)) ERR;      
+      if (nc_get_att_float(ncid, NC_GLOBAL, ATT_FLOAT_NAME, float_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (float_in[i] != float_out[i]) ERR;
-      if (nc_get_att_double(ncid, NC_GLOBAL, ATT_DOUBLE_NAME, double_in)) ERR;      
+      if (nc_get_att_double(ncid, NC_GLOBAL, ATT_DOUBLE_NAME, double_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (double_in[i] != double_out[i]) ERR;
       if (nc_get_att_ushort(ncid, NC_GLOBAL, ATT_USHORT_NAME, ushort_in)) ERR;

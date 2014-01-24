@@ -294,7 +294,7 @@ extern OCerror oc_dds_dimensionsizes(OClink,OCddsnode,size_t* dimsizes);
    must do any required conversion based on the octype.
    The strings vector must be allocated and freed by caller,
    The contents of the strings vector must also be reclaimed
-   using oc_attr_reclaim(see below). 
+   using oc_attr_reclaim(see below).
    Standard practice is to call twice, once with the strings
    argument == NULL so we get the number of values,
    then the second time with an allocated char** vector.
@@ -446,7 +446,7 @@ extern int oc_data_indexed(OClink link, OCdatanode datanode);
 extern int oc_data_indexable(OClink, OCdatanode);
 
 /**************************************************/
-/* 
+/*
 For top-level, atomic variables, it is possible to directly
 read the associated data without having to use the oc_data_XXX
 procedures. Provide special procedures to support this.

@@ -179,7 +179,7 @@ ARM(ncdouble,NC_DOUBLE,double,ncint64,NC_INT64,long long)
 ARM(ncdouble,NC_DOUBLE,double,ncuint64,NC_UINT64,unsigned long long)
 ARM(ncdouble,NC_DOUBLE,double,ncfloat,NC_FLOAT,float)
 ARM(ncdouble,NC_DOUBLE,double,ncdouble,NC_DOUBLE,double)
-	
+
         default: ncstat = NC_EINVAL; THROWCHK(ncstat); goto fail;
         }
         value += nctypesizeof(srctype);

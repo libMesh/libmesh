@@ -150,7 +150,7 @@ compute_alignments(void)
 
     /* Then the vector*/
     COMP_ALIGNMENT(vec[CHARINDEX],char);
-    COMP_ALIGNMENT(vec[UCHARINDEX],unsigned char); 
+    COMP_ALIGNMENT(vec[UCHARINDEX],unsigned char);
     COMP_ALIGNMENT(vec[SHORTINDEX],short);
     COMP_ALIGNMENT(vec[USHORTINDEX],unsigned short);
     COMP_ALIGNMENT(vec[INTINDEX],int);

@@ -119,7 +119,7 @@ escapify(char* s0, int quote, size_t len)
 	escapifychar((unsigned int)s0[i],tmp,quote);
         strcat(result,tmp);
     }
-    return result;        
+    return result;
 }
 
 char*
@@ -234,7 +234,7 @@ initcodify(void)
 }
 
 /*
-Convert a name to a 
+Convert a name to a
 form suitable for use in a
 language file.
 Conversion depends on l_flag.
@@ -354,7 +354,7 @@ xescapify(char* s0, int quote, size_t len)
     }
     result = pooldup(bbContents(escaped));
     bbFree(escaped);
-    return result;        
+    return result;
 }
 
 /**************************************************/
@@ -437,17 +437,17 @@ jescapify(char* s0, int quote, size_t len)
     status = ConvertUTF8toUTF16((const UTF8**)&s8,s8+len,&tmp16,tmp16+len,lenientConversion);
     if(status != conversionOK) {
 	derror("Cannot convert UTF8 string to UTF16: %s",s0);
-	return NULL;	
+	return NULL;
     }
     /* Get the length of the utf16 string */
     len16 = (tmp16 - s16);
     for(i=0;i<len16;i++) {
 	jescapifychar(s16[i],quote,escaped);
     }
-    efree(s16);    
+    efree(s16);
     result = pooldup(bbContents(escaped));
     bbFree(escaped);
-    return result;        
+    return result;
 }
 
 char*
@@ -484,7 +484,7 @@ f77escapifychar(unsigned int c, char* s0)
 	*s++ = (char)c;
     } else {
 	char tmp[32];
-	nprintf(tmp,sizeof(tmp),"//char(%u)",c);	
+	nprintf(tmp,sizeof(tmp),"//char(%u)",c);
 	strcat(s,tmp);
 	s += strlen(tmp);
     }
@@ -511,7 +511,7 @@ f77quotestring(Bytebuffer* databuf)
     s[slen] = '\0';
     bbClear(databuf);
 
-    lastcharescaped = 0;    
+    lastcharescaped = 0;
     for(i=0;i<slen;i++) {
 	char tmp[32];
 	unsigned int c = s[i];
@@ -618,7 +618,7 @@ unescapehex(const char* s)
 
 /*
  * Given a pointer to a string of the form
- * 'ddd', return the corresponding 
+ * 'ddd', return the corresponding
  * unsigned octal byte
  */
 

@@ -13,7 +13,7 @@
 
 /* Define the common "supertype */
 typedef struct DCEnode {
-    CEsort sort;    
+    CEsort sort;
 } DCEnode;
 
 /* The slice structure is assumed common to all uses.
@@ -21,7 +21,7 @@ typedef struct DCEnode {
 */
 typedef struct DCEslice {
     DCEnode node;
-    size_t first; 
+    size_t first;
     size_t stride;
     size_t length;
     size_t last;   /* first + length - 1*/
@@ -31,17 +31,17 @@ typedef struct DCEslice {
 
 typedef struct DCEsegment {
     DCEnode node;
-    char* name; 
+    char* name;
     int slicesdefined; /*1=>slice counts defined, except declsize*/
     int slicesdeclized; /*1=>slice declsize defined */
     size_t rank;
-    DCEslice slices[NC_MAX_VAR_DIMS];    
+    DCEslice slices[NC_MAX_VAR_DIMS];
     void* annotation;
 } DCEsegment;
 
 typedef struct DCEfcn {
     DCEnode node;
-    char* name; 
+    char* name;
     NClist* args;
 } DCEfcn;
 
@@ -134,7 +134,7 @@ extern void dcesegment_transpose(DCEsegment* seg,
    satisfy dceiswholeslice
 */
 extern size_t dcesafeindex(DCEsegment* seg, size_t start, size_t stop);
-   
+
 /* Compute segment size for start upto stop */
 extern size_t dcesegmentsize(DCEsegment*, size_t start, size_t stop);
 

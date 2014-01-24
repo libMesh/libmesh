@@ -11,9 +11,9 @@
     Functions to create and learn about VLEN types. */
 /*! \{ */ /* All these functions are part of this named group... */
 
-/** 
-\ingroup user_types 
-Free memory in a VLEN object. 
+/**
+\ingroup user_types
+Free memory in a VLEN object.
 
 When you read VLEN type the library will actually allocate the storage
 space for the data. This storage space must be freed, so pass the
@@ -38,9 +38,9 @@ nc_free_vlen(nc_vlen_t *vl)
    return NC_NOERR;
 }
 
-/** 
-\ingroup user_types 
-Free an array of vlens given the number of elements and an array. 
+/**
+\ingroup user_types
+Free an array of vlens given the number of elements and an array.
 
 When you read VLEN type the library will actually allocate the storage
 space for the data. This storage space must be freed, so pass the
@@ -55,21 +55,21 @@ will free the vlen memory.
 \returns ::NC_EBADTYPE Bad type id.
 \returns ::NC_ENOTNC4 Not an netCDF-4 file, or classic model enabled.
 \returns ::NC_EHDFERR An error was reported by the HDF5 layer.
-*/ 
+*/
 int
 nc_free_vlens(size_t len, nc_vlen_t vlens[])
 {
    int ret;
    size_t i;
 
-   for(i = 0; i < len; i++) 
+   for(i = 0; i < len; i++)
       if ((ret = nc_free_vlen(&vlens[i])))
 	 return ret;
 
    return NC_NOERR;
 }
 
-/** 
+/**
 \ingroup user_types
 Use this function to define a variable length array type.
 
@@ -92,7 +92,7 @@ VLEN type will be set here.
 \returns ::NC_EMAXNAME Name exceeds max length NC_MAX_NAME.
 \returns ::NC_EBADNAME Name contains illegal characters.
 \returns ::NC_EPERM Attempt to write to a read-only file.
-\returns ::NC_ENOTINDEFINE Not in define mode. 
+\returns ::NC_ENOTINDEFINE Not in define mode.
  */
 int
 nc_def_vlen(int ncid, const char *name, nc_type base_typeid, nc_type *xtypep)
@@ -107,7 +107,7 @@ nc_def_vlen(int ncid, const char *name, nc_type base_typeid, nc_type *xtypep)
 Learn about a VLEN type.
 
 \param ncid \ref ncid
-\param xtype The type of the VLEN to inquire about. 
+\param xtype The type of the VLEN to inquire about.
 \param name \ref object_name of the type. \ref ignored_if_null.
 
 \param datum_sizep A pointer to a size_t, this will get the size of
@@ -161,7 +161,7 @@ nc_put_vlen_element(int ncid, int typeid1, void *vlen_element, size_t len, const
     return ncp->dispatch->put_vlen_element(ncid,typeid1,vlen_element,len,data);
 }
 
-/** 
+/**
 \internal
 \ingroup user_types
 
@@ -181,12 +181,12 @@ Fortran APIs.
 \returns ::NC_EHDFERR An error was reported by the HDF5 layer.
  */
 int
-nc_get_vlen_element(int ncid, int typeid1, const void *vlen_element, 
+nc_get_vlen_element(int ncid, int typeid1, const void *vlen_element,
 		    size_t *len, void *data)
 {
     NC *ncp;
     int stat = NC_check_id(ncid,&ncp);
     if(stat != NC_NOERR) return stat;
-    return ncp->dispatch->get_vlen_element(ncid, typeid1, vlen_element, 
+    return ncp->dispatch->get_vlen_element(ncid, typeid1, vlen_element,
 					   len, data);
 }

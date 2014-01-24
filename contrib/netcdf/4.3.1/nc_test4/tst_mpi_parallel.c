@@ -1,5 +1,5 @@
-/* This is a quickie tester for netcdf-4. 
-   
+/* This is a quickie tester for netcdf-4.
+
    This just excersizes MPI file I/O to make sure everything's working
    properly. If this doesn't work, netcdf/HDF5 parallel I/O also won't
    work.
@@ -26,7 +26,7 @@ main(int argc, char **argv)
    MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
    /*MPI_Get_processor_name(mpi_name, &mpi_namelen);*/
-   /*printf("mpi_name: %s size: %d rank: %d\n", mpi_name, 
+   /*printf("mpi_name: %s size: %d rank: %d\n", mpi_name,
      mpi_size, my_rank);*/
 
    if (my_rank == 0)

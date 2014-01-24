@@ -52,7 +52,7 @@ Operations supported on variables are:
 - Get a subsampled or mapped array-section of values from a variable,
   given variable ID, corner indices, edge lengths, stride vector, and
   index mapping vector.
-- Rename a variable. 
+- Rename a variable.
 
 \section language_types Language Types Corresponding to netCDF
 External Data Types
@@ -131,13 +131,13 @@ Use these functions to define variables.
 \ingroup variables
 Define a new variable.
 
-This function adds a new variable to an open netCDF dataset or group. 
+This function adds a new variable to an open netCDF dataset or group.
 It returns (as an argument) a variable ID, given the netCDF ID,
 the variable name, the variable type, the number of dimensions, and a
 list of the dimension IDs.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param name Variable \ref object_name.
@@ -160,13 +160,13 @@ element of the dimids array.
 
 \returns ::NC_NOERR No error.
 \returns ::NC_EBADID Bad ncid.
-\returns ::NC_ENOTINDEFINE Not in define mode. 
+\returns ::NC_ENOTINDEFINE Not in define mode.
 \returns ::NC_ESTRICTNC3 Attempting netcdf-4 operation on strict nc3 netcdf-4 file.
 \returns ::NC_EMAXVARS NC_MAX_VARS exceeded
 \returns ::NC_EBADTYPE Bad type.
 \returns ::NC_EINVAL Invalid input.
 \returns ::NC_ENAMEINUSE Name already in use.
-\returns ::NC_EPERM Attempt to create object in read-only file. 
+\returns ::NC_EPERM Attempt to create object in read-only file.
 
 \section Example
 
@@ -177,11 +177,11 @@ dataset named foo.nc:
 \code
      #include <netcdf.h>
         ...
-     int  status;       
-     int  ncid;          
-     int  lat_dim, lon_dim, time_dim;  
-     int  rh_id;                       
-     int  rh_dimids[3];                
+     int  status;
+     int  ncid;
+     int  lat_dim, lon_dim, time_dim;
+     int  rh_id;
+     int  rh_dimids[3];
         ...
      status = nc_create("foo.nc", NC_NOCLOBBER, &ncid);
      if (status != NC_NOERR) handle_error(status);
@@ -204,7 +204,7 @@ dataset named foo.nc:
 
  */
 int
-nc_def_var(int ncid, const char *name, nc_type xtype, 
+nc_def_var(int ncid, const char *name, nc_type xtype,
 	   int ndims,  const int *dimidsp, int *varidp)
 {
    NC* ncp;
@@ -232,10 +232,10 @@ variable.
 
 For classic format, 64-bit offset format, and netCDF-4/HDF5 with
 classic mode, if the new name is longer than the old name, the netCDF
-dataset must be in define mode. 
+dataset must be in define mode.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -258,14 +258,14 @@ rel_hum in an existing netCDF dataset named foo.nc:
 \code
      #include <netcdf.h>
         ...
-     int  status; 
-     int  ncid;   
-     int  rh_id;  
+     int  status;
+     int  ncid;
+     int  rh_id;
         ...
      status = nc_open("foo.nc", NC_WRITE, &ncid);
      if (status != NC_NOERR) handle_error(status);
         ...
-     status = nc_redef(ncid); 
+     status = nc_redef(ncid);
      if (status != NC_NOERR) handle_error(status);
      status = nc_inq_varid (ncid, "rh", &rh_id);
      if (status != NC_NOERR) handle_error(status);
@@ -296,7 +296,7 @@ NC_is_recvar(int ncid, int varid, size_t* nrecs)
    int unlimid;
    int ndims;
    int dimset[NC_MAX_VAR_DIMS];
-    
+
    status = nc_inq_unlimdim(ncid,&unlimid);
    if(status != NC_NOERR) return 0; /* no unlimited defined */
    status = nc_inq_varndims(ncid,varid,&ndims);
@@ -325,7 +325,7 @@ ncvarget(cdfid, varid, cor, edg, vals);
 \endcode
  */
 int
-nctypelen(nc_type type) 
+nctypelen(nc_type type)
 {
    switch(type){
       case NC_CHAR :
@@ -338,10 +338,10 @@ nctypelen(nc_type type)
 	 return((int)sizeof(int));
       case NC_FLOAT :
 	 return((int)sizeof(float));
-      case NC_DOUBLE : 
+      case NC_DOUBLE :
 	 return((int)sizeof(double));
 
-	 /* These can occur in netcdf-3 code */ 
+	 /* These can occur in netcdf-3 code */
       case NC_UBYTE :
 	 return((int)sizeof(unsigned char));
       case NC_USHORT :
@@ -386,7 +386,7 @@ NC_atomictypelen(nc_type xtype)
       case NC_STRING: sz = sizeof(char*); break;
 #endif
       default: break;
-   }	
+   }
    return sz;
 }
 
@@ -414,13 +414,13 @@ NC_atomictypename(nc_type xtype)
       case NC_STRING: nm = "string"; break;
 #endif
       default: break;
-   }	
+   }
    return nm;
 }
 
 /** \internal
 \ingroup variables
-Get the shape of a variable.    
+Get the shape of a variable.
  */
 int
 NC_getshape(int ncid, int varid, int ndims, size_t* shape)
@@ -431,7 +431,7 @@ NC_getshape(int ncid, int varid, int ndims, size_t* shape)
 
    if ((status = nc_inq_vardimid(ncid, varid, dimids)))
       return status;
-   for(i = 0; i < ndims; i++) 
+   for(i = 0; i < ndims; i++)
       if ((status = nc_inq_dimlen(ncid, dimids[i], &shape[i])))
 	 break;
 
@@ -442,7 +442,7 @@ NC_getshape(int ncid, int varid, int ndims, size_t* shape)
 /** \ingroup variables
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -465,20 +465,20 @@ chunks.
 \returns ::NC_EINVAL Invalid input
  */
 int
-nc_set_var_chunk_cache(int ncid, int varid, size_t size, size_t nelems, 
+nc_set_var_chunk_cache(int ncid, int varid, size_t size, size_t nelems,
 		       float preemption)
 {
     NC* ncp;
     int stat = NC_check_id(ncid, &ncp);
     if(stat != NC_NOERR) return stat;
-    return ncp->dispatch->set_var_chunk_cache(ncid, varid, size, 
+    return ncp->dispatch->set_var_chunk_cache(ncid, varid, size,
 					      nelems, preemption);
 }
 
 /** \ingroup variables
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -503,7 +503,7 @@ chunks are always preempted before other chunks. \ref ignored_if_null.
 \returns ::NC_EINVAL Invalid input
 */
 int
-nc_get_var_chunk_cache(int ncid, int varid, size_t *sizep, size_t *nelemsp, 
+nc_get_var_chunk_cache(int ncid, int varid, size_t *sizep, size_t *nelemsp,
 		       float *preemptionp)
 {
     NC* ncp;
@@ -519,10 +519,10 @@ Free string space allocated by the library.
 When you read string type the library will allocate the storage space
 for the data. This storage space must be freed, so pass the pointer
 back to this function, when you're done with the data, and it will
-free the string memory. 
+free the string memory.
 
-\param len The number of character arrays in the array. 
-\param data The pointer to the data array. 
+\param len The number of character arrays in the array.
+\param data The pointer to the data array.
 
 \returns ::NC_NOERR No error.
 */
@@ -554,13 +554,13 @@ nc_def_var_fletcher32(int ncid, int varid, int fletcher32)
 }
 
 int
-nc_def_var_chunking(int ncid, int varid, int storage, 
+nc_def_var_chunking(int ncid, int varid, int storage,
 		    const size_t *chunksizesp)
 {
     NC* ncp;
     int stat = NC_check_id(ncid, &ncp);
     if(stat != NC_NOERR) return stat;
-    return ncp->dispatch->def_var_chunking(ncid, varid, storage, 
+    return ncp->dispatch->def_var_chunking(ncid, varid, storage,
 					   chunksizesp);
 }
 

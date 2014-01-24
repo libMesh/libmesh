@@ -1,5 +1,5 @@
 ## This is a automake file, part of Unidata's netCDF package.
-# Copyright 2006, see the COPYRIGHT file for more information.  
+# Copyright 2006, see the COPYRIGHT file for more information.
 
 # This file builds CDL examples.
 

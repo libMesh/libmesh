@@ -46,12 +46,12 @@ main(int argc, char **argv)
 
    obs_t obsdata[DIM6_LEN] = {
        {15, 2, 1, 0.5, 3600.01, 0, 0, 0, 0LL},
-       {-99, -99, -99, -99.0f, -99.0, 255, 65535, 4294967295U, 
+       {-99, -99, -99, -99.0f, -99.0, 255, 65535, 4294967295U,
 	-9223372036854775806LL},
        {20, 6, 3, 0.75, 5000.01, 200, 64000, 4220002000U, 9000000000000000000LL }
    };
 
-   obs_t missing_val = {-99, -99, -99, -99, -99, 255, 65535, 4294967295U, 
+   obs_t missing_val = {-99, -99, -99, -99, -99, 255, 65535, 4294967295U,
 			-9223372036854775806LL};
    obs_t val_in;
    size_t size_in;
@@ -64,29 +64,29 @@ main(int argc, char **argv)
 
    /* Create a compound type. */
    if (nc_def_compound(ncid, sizeof(obs_t), TYPE6_NAME, &typeid)) ERR;
-   if (nc_insert_compound(ncid, typeid, "day", 
+   if (nc_insert_compound(ncid, typeid, "day",
 			  NC_COMPOUND_OFFSET(struct obs_t, day), NC_BYTE)) ERR;
-   if (nc_insert_compound(ncid, typeid, "elev", 
+   if (nc_insert_compound(ncid, typeid, "elev",
 			  NC_COMPOUND_OFFSET(struct obs_t, elev), NC_SHORT)) ERR;
-   if (nc_insert_compound(ncid, typeid, "count", 
+   if (nc_insert_compound(ncid, typeid, "count",
 			  NC_COMPOUND_OFFSET(struct obs_t, count), NC_INT)) ERR;
-   if (nc_insert_compound(ncid, typeid, "relhum", 
-			  NC_COMPOUND_OFFSET(struct obs_t, relhum), 
+   if (nc_insert_compound(ncid, typeid, "relhum",
+			  NC_COMPOUND_OFFSET(struct obs_t, relhum),
 			  NC_FLOAT)) ERR;
-   if (nc_insert_compound(ncid, typeid, "time", 
-			  NC_COMPOUND_OFFSET(struct obs_t, time), 
+   if (nc_insert_compound(ncid, typeid, "time",
+			  NC_COMPOUND_OFFSET(struct obs_t, time),
 			  NC_DOUBLE)) ERR;
-   if (nc_insert_compound(ncid, typeid, "category", 
-			  NC_COMPOUND_OFFSET(struct obs_t, category), 
+   if (nc_insert_compound(ncid, typeid, "category",
+			  NC_COMPOUND_OFFSET(struct obs_t, category),
 			  NC_UBYTE)) ERR;
-   if (nc_insert_compound(ncid, typeid, "id", 
-			  NC_COMPOUND_OFFSET(struct obs_t, id), 
+   if (nc_insert_compound(ncid, typeid, "id",
+			  NC_COMPOUND_OFFSET(struct obs_t, id),
 			  NC_USHORT)) ERR;
-   if (nc_insert_compound(ncid, typeid, "particularity", 
-			  NC_COMPOUND_OFFSET(struct obs_t, particularity), 
+   if (nc_insert_compound(ncid, typeid, "particularity",
+			  NC_COMPOUND_OFFSET(struct obs_t, particularity),
 			  NC_UINT)) ERR;
-   if (nc_insert_compound(ncid, typeid, "attention_span", 
-			  NC_COMPOUND_OFFSET(struct obs_t, attention_span), 
+   if (nc_insert_compound(ncid, typeid, "attention_span",
+			  NC_COMPOUND_OFFSET(struct obs_t, attention_span),
 			  NC_INT64)) ERR;
 
    /* Declare a dimension for number of obs */
@@ -107,19 +107,19 @@ main(int argc, char **argv)
    if (nc_close(ncid)) ERR;
 
    /* Check it out. */
-   
+
    /* Reopen the file. */
    if (nc_open(FILE6_NAME, NC_NOWRITE, &ncid)) ERR;
 
    /* Get info with the generic inquire for user-defined types */
-   if (nc_inq_user_type(ncid, typeid, name_in, NULL, NULL, 
+   if (nc_inq_user_type(ncid, typeid, name_in, NULL, NULL,
 			NULL, &class_in)) ERR;
-   if (strcmp(name_in, TYPE6_NAME) || 
+   if (strcmp(name_in, TYPE6_NAME) ||
        class_in != NC_COMPOUND) ERR;
 
    /* Get the same info with the compound-specific inquire function */
    if (nc_inq_compound(ncid, typeid, name_in, &size_in, &nfields_in)) ERR;
-   if (strcmp(name_in, TYPE6_NAME) || 
+   if (strcmp(name_in, TYPE6_NAME) ||
        size_in != sizeof(obs_t) ||
        nfields_in != 9) ERR;
 
@@ -130,7 +130,7 @@ main(int argc, char **argv)
    if (val_in.day != missing_val.day ||
        val_in.elev != missing_val.elev ||
        val_in.count != missing_val.count ||
-       val_in.relhum != missing_val.relhum || 
+       val_in.relhum != missing_val.relhum ||
        val_in.time != missing_val.time ||
        val_in.category != missing_val.category ||
        val_in.id != missing_val.id ||
@@ -152,9 +152,9 @@ main(int argc, char **argv)
        if (val_in.particularity != obsdata[i].particularity) ERR;
        if (val_in.attention_span != obsdata[i].attention_span) ERR;
    }
-   
-   if (nc_close(ncid)) ERR; 
-   
+
+   if (nc_close(ncid)) ERR;
+
    SUMMARIZE_ERR;
    FINAL_RESULTS;
 }

@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     int err = 0;
     int ecode = 0;
     int ncid;
-    int cmode, format;   
+    int cmode, format;
     int nprocs, rank;
     MPI_Comm comm=MPI_COMM_SELF;
     MPI_Info info=MPI_INFO_NULL;

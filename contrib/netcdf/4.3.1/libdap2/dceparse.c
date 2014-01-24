@@ -203,7 +203,7 @@ array_indices(DCEparsestate* state, Object list0, Object indexno)
     if(start < 0) {
     	dceerror(state,"Illegal array index");
 	start = 1;
-    }    
+    }
     slice = (DCEslice*)dcecreate(CES_SLICE);
     slice->first = start;
     slice->stride = 1;
@@ -221,13 +221,13 @@ indexer(DCEparsestate* state, Object name, Object indices)
     NClist* list = (NClist*)indices;
     DCEsegment* seg = (DCEsegment*)dcecreate(CES_SEGMENT);
     seg->name = strdup((char*)name);
-    for(i=0;i<nclistlength(list);i++) {    
+    for(i=0;i<nclistlength(list);i++) {
 	DCEslice* slice = (DCEslice*)nclistget(list,i);
         seg->slices[i] = *slice;
 	free(slice);
     }
     nclistfree(indices);
-    return seg;    
+    return seg;
 }
 
 Object
@@ -271,7 +271,7 @@ Object
 var(DCEparsestate* state, Object indexpath)
 {
     DCEvar* v = (DCEvar*)dcecreate(CES_VAR);
-    v->segments = (NClist*)indexpath;        
+    v->segments = (NClist*)indexpath;
     return v;
 }
 

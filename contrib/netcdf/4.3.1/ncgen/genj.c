@@ -107,7 +107,7 @@ gen_ncjava(const char *filename)
 		 indented(1),filename,(nofill_flag?"false":"true"));
     codedump(stmt);
     codeflush();
-    
+
     /* define dimensions from info in dims array */
     if(ndims > 0) {
 	codeline("");
@@ -156,19 +156,19 @@ gen_ncjava(const char *filename)
         }
         codeflush();
     }
-        
+
     /* Define the global attributes*/
     if(ngatts > 0) {
         codeline("");
         codelined(1,"/* assign global attributes */");
         for(iatt = 0; iatt < ngatts; iatt++) {
             Symbol* gasym = (Symbol*)listget(gattdefs,iatt);
-            genj_defineattr(gasym);            
+            genj_defineattr(gasym);
         }
         codeline("");
         codeflush();
     }
-    
+
     /* Define the variable specific attributes*/
     if(natts > 0) {
         codeline("");
@@ -213,7 +213,7 @@ cl_java(void)
     codeflush();
 }
 
-const char* 
+const char*
 jtypeallcaps(nc_type type)
 {
     switch (type) {
@@ -234,7 +234,7 @@ jtypeallcaps(nc_type type)
     return 0;
 }
 
-static const char* 
+static const char*
 jtypecap(nc_type type)
 {
     switch (type) {
@@ -283,7 +283,7 @@ jname(Symbol* sym)
 /*
  * Return java type name for netCDF type, given type code.
  */
-static const char* 
+static const char*
 jtype(nc_type type)
 {
     switch (type) {
@@ -310,7 +310,7 @@ jtype(nc_type type)
  * Return a type name and dimensions for constant arrays
  * for netCDF type, given type code.
  */
-static const char* 
+static const char*
 jarraytype(nc_type type)
 {
     switch (type) {
@@ -351,7 +351,7 @@ jarraytype(nc_type type)
 /*
  * Return netcdf interface type name for netCDF type suffix, given type code.
  */
-const char* 
+const char*
 jstype(nc_type nctype)
 {
     switch (nctype) {

@@ -3,7 +3,7 @@
   See COPYRIGHT file for copying and redistribution conditions.
 
   This is part of netCDF.
-   
+
   This program also takes a long time to run - it writes some data in
   a very large file, and then reads it all back to be sure it's
   correct.
@@ -160,11 +160,11 @@ main(int argc, char **argv) {
          avar1_start[1] = i;
          stat = nc_get_vara_float(ncid, var1_id, avar1_start, avar1_count, avar1);
          check_err(stat,__LINE__,__FILE__);
-         for(j=0; j<J_LEN; j++) 
+         for(j=0; j<J_LEN; j++)
          {
            if (avar1[j] != (float)(j + (rec + 1) * i)) {
              printf("Error on read, var1[%d, %d, %d] = %g wrong, "
-                    "should be %g !\n", rec, i, j, avar1[j], (float) (j + (rec + 1)* i)); 
+                    "should be %g !\n", rec, i, j, avar1[j], (float) (j + (rec + 1)* i));
              return 1;
            }
          }

@@ -221,7 +221,7 @@ fgrow2(const int fd, const off_t len)
    posp - pointer to current position in file, updated after write.
 */
 static int
-px_pgout(ncio *const nciop, 
+px_pgout(ncio *const nciop,
 	off_t const offset,  const size_t extent,
 	void *const vp, off_t *posp)
 {
@@ -252,7 +252,7 @@ px_pgout(ncio *const nciop,
 	while((partial = write(nciop->fd, nvp, nextent)) != -1) {
 	    if(partial == nextent)
 		break;
-	    nvp += partial;		
+	    nvp += partial;
 	    nextent -= partial;
 	}
 	if(partial == -1)
@@ -262,7 +262,7 @@ px_pgout(ncio *const nciop,
 	return ENOERR;
 }
 
-/* Read in a page of data. 
+/* Read in a page of data.
 
    nciop - a pointer to the ncio struct for this file.
    offset - byte offset in file where read starts.
@@ -331,7 +331,7 @@ typedef struct ncio_px {
 	size_t blksz;
 	off_t pos;
 	/* buffer */
-	off_t	bf_offset; 
+	off_t	bf_offset;
 	size_t	bf_extent;
 	size_t	bf_cnt;
 	void	*bf_base;
@@ -404,7 +404,7 @@ ncio_px_rel(ncio *const nciop, off_t offset, int rflags)
 /* POSIX get. This will "make a region available." Since we're using
    buffered IO, this means that if needed, we'll fetch a new page from
    the file, otherwise, just return a pointer to what's in memory
-   already. 
+   already.
 
    nciop - pointer to ncio struct, containing file info.
    pxp - pointer to ncio_px struct, which contains special metadate
@@ -414,7 +414,7 @@ ncio_px_rel(ncio *const nciop, off_t offset, int rflags)
    rflags - One of the RGN_* flags defined in ncio.h.
    vpp - pointer to pointer that will recieve data.
 
-   NOTES: 
+   NOTES:
 
    * For blkoffset round offset down to the nearest pxp->blksz. This
    provides the offset (in bytes) to the beginning of the block that
@@ -434,7 +434,7 @@ ncio_px_rel(ncio *const nciop, off_t offset, int rflags)
 
    * If this is called on a newly opened file, pxp->bf_offset will be
    OFF_NONE and we'll jump to label pgin to immediately read in a
-   page. 
+   page.
 */
 static int
 px_get(ncio *const nciop, ncio_px *const pxp,
@@ -447,7 +447,7 @@ px_get(ncio *const nciop, ncio_px *const pxp,
 	const off_t blkoffset = _RNDDOWN(offset, (off_t)pxp->blksz);
 	off_t diff = (size_t)(offset - blkoffset);
 	off_t blkextent = _RNDUP(diff + extent, pxp->blksz);
-	
+
 	assert(extent != 0);
 	assert(extent < X_INT_MAX); /* sanity check */
 	assert(offset >= 0); /* sanity check */
@@ -473,7 +473,7 @@ px_get(ncio *const nciop, ncio_px *const pxp,
 	if(blkoffset == pxp->bf_offset)
 	{
 		/* hit */
- 		if(blkextent > pxp->bf_extent) 
+ 		if(blkextent > pxp->bf_extent)
 		{
 			/* page in upper */
 			void *const middle =
@@ -667,7 +667,7 @@ done:
    corresponding call to rel().
 
    For POSIX systems, without NC_SHARE. This function gets a page of
-   size extent? 
+   size extent?
 
    This is a wrapper for the function px_get, which does all the heavy
    lifting.
@@ -680,13 +680,13 @@ done:
    vpp - handle to point at data when it's been read.
 */
 static int
-ncio_px_get(ncio *const nciop, 
+ncio_px_get(ncio *const nciop,
 		off_t offset, size_t extent,
 		int rflags,
 		void **const vpp)
 {
 	ncio_px *const pxp = (ncio_px *)nciop->pvt;
-	
+
 	if(fIsSet(rflags, RGN_WRITE) && !fIsSet(nciop->ioflags, NC_WRITE))
 		return EPERM; /* attempt to write readonly file */
 
@@ -716,7 +716,7 @@ px_double_buffer(ncio *const nciop, off_t to, off_t from,
 	int status = ENOERR;
 	void *src;
 	void *dest;
-	
+
 #if INSTRUMENT
 fprintf(stderr, "\tdouble_buffr %ld %ld %ld\n",
 		 (long)to, (long)from, (long)nbytes);
@@ -734,7 +734,7 @@ fprintf(stderr, "\tdouble_buffr %ld %ld %ld\n",
 
 		pxp->slave->blksz = pxp->blksz;
 		/* pos done below */
-		pxp->slave->bf_offset = pxp->bf_offset; 
+		pxp->slave->bf_offset = pxp->bf_offset;
 		pxp->slave->bf_extent = pxp->bf_extent;
 		pxp->slave->bf_cnt = pxp->bf_cnt;
 		pxp->slave->bf_base = malloc(2 * pxp->blksz);
@@ -746,7 +746,7 @@ fprintf(stderr, "\tdouble_buffr %ld %ld %ld\n",
 		pxp->slave->bf_refcount = 0;
 		pxp->slave->slave = NULL;
 	}
-	
+
 	pxp->slave->pos = pxp->pos;
 	status = px_get(nciop, pxp->slave, from, nbytes, 0,
 			&src);
@@ -762,7 +762,7 @@ fprintf(stderr, "\tdouble_buffr %ld %ld %ld\n",
 
 	(void)px_rel(pxp->slave, from, 0);
 	(void)px_rel(pxp, to, RGN_MODIFIED);
-	
+
 	return status;
 }
 
@@ -786,7 +786,7 @@ ncio_px_move(ncio *const nciop, off_t to, off_t from,
 {
 	ncio_px *const pxp = (ncio_px *)nciop->pvt;
 	int status = ENOERR;
-	off_t lower;	
+	off_t lower;
 	off_t upper;
 	char *base;
 	size_t diff;
@@ -794,7 +794,7 @@ ncio_px_move(ncio *const nciop, off_t to, off_t from,
 
 	if(to == from)
 		return ENOERR; /* NOOP */
-	
+
 	if(fIsSet(rflags, RGN_WRITE) && !fIsSet(nciop->ioflags, NC_WRITE))
 		return EPERM; /* attempt to write readonly file */
 
@@ -803,7 +803,7 @@ ncio_px_move(ncio *const nciop, off_t to, off_t from,
 	if(to > from)
 	{
 		/* growing */
-		lower = from;	
+		lower = from;
 		upper = to;
 	}
 	else
@@ -863,7 +863,7 @@ else
 }
 		return ENOERR;
 	}
-	
+
 #if INSTRUMENT
 fprintf(stderr, "\tncio_px_move small\n");
 #endif
@@ -874,10 +874,10 @@ fprintf(stderr, "\tncio_px_move small\n");
 		return status;
 
 	if(to > from)
-		(void) memmove(base + diff, base, nbytes); 
+		(void) memmove(base + diff, base, nbytes);
 	else
-		(void) memmove(base, base + diff, nbytes); 
-		
+		(void) memmove(base, base + diff, nbytes);
+
 	(void) px_rel(pxp, lower, RGN_MODIFIED);
 
 	return status;
@@ -936,7 +936,7 @@ ncio_px_freepvt(void *const pvt)
 		free(pxp->slave);
 		pxp->slave = NULL;
 	}
-		
+
 	if(pxp->bf_base != NULL)
 	{
 		free(pxp->bf_base);
@@ -1034,7 +1034,7 @@ ncio_px_init(ncio *const nciop)
 typedef struct ncio_spx {
 	off_t pos;
 	/* buffer */
-	off_t	bf_offset; 
+	off_t	bf_offset;
 	size_t	bf_extent;
 	size_t	bf_cnt;
 	void	*bf_base;
@@ -1115,7 +1115,7 @@ ncio_spx_get(ncio *const nciop,
 #ifdef X_ALIGN
 	size_t rem;
 #endif
-	
+
 	if(fIsSet(rflags, RGN_WRITE) && !fIsSet(nciop->ioflags, NC_WRITE))
 		return EPERM; /* attempt to write readonly file */
 
@@ -1189,7 +1189,7 @@ strategy(ncio *const nciop, off_t to, off_t offset,
 #ifdef X_ALIGN
 	size_t rem;
 #endif
-	
+
 	assert(extent != 0);
 	assert(extent < X_INT_MAX); /* sanity check */
 #if INSTRUMENT
@@ -1239,7 +1239,7 @@ fprintf(stderr, "strategy %ld at %ld to %ld\n",
 		return status;
 
 	pxp->bf_offset = to; /* TODO: XALIGN */
-	
+
 	if(pxp->bf_cnt < extent)
 		pxp->bf_cnt = extent;
 
@@ -1269,7 +1269,7 @@ ncio_spx_move(ncio *const nciop, off_t to, off_t from,
 			size_t nbytes, int rflags)
 {
 	int status = ENOERR;
-	off_t lower = from;	
+	off_t lower = from;
 	off_t upper = to;
 	char *base;
 	size_t diff;
@@ -1279,11 +1279,11 @@ ncio_spx_move(ncio *const nciop, off_t to, off_t from,
 
 	if(to == from)
 		return ENOERR; /* NOOP */
-	
+
 	if(to > from)
 	{
 		/* growing */
-		lower = from;	
+		lower = from;
 		upper = to;
 	}
 	else
@@ -1303,10 +1303,10 @@ ncio_spx_move(ncio *const nciop, off_t to, off_t from,
 		return status;
 
 	if(to > from)
-		(void) memmove(base + diff, base, nbytes); 
+		(void) memmove(base + diff, base, nbytes);
 	else
-		(void) memmove(base, base + diff, nbytes); 
-		
+		(void) memmove(base, base + diff, nbytes);
+
 	(void) ncio_spx_rel(nciop, lower, RGN_MODIFIED);
 
 	return status;
@@ -1342,12 +1342,12 @@ ncio_spx_freepvt(void *const pvt)
 
 
 /* This does the second half of the ncio_spx struct initialization for
-   POSIX systems, with NC_SHARE on. 
+   POSIX systems, with NC_SHARE on.
 
    nciop - pointer to ncio struct for this file. File has been opened.
    sizehintp - pointer to a size which will be rounded up to the
    nearest 8-byt boundary and then used as the max size "chunk" (or
-   page) to read from the file. 
+   page) to read from the file.
 */
 static int
 ncio_spx_init2(ncio *const nciop, const size_t *const sizehintp)
@@ -1437,7 +1437,7 @@ ncio_px_new(const char *path, int ioflags)
 	size_t sz_path = M_RNDUP(strlen(path) +1);
 	size_t sz_ncio_pvt;
 	ncio *nciop;
- 
+
 #if ALWAYS_NC_SHARE /* DEBUG */
 	fSet(ioflags, NC_SHARE);
 #endif
@@ -1450,7 +1450,7 @@ ncio_px_new(const char *path, int ioflags)
 	nciop = (ncio *) malloc(sz_ncio + sz_path + sz_ncio_pvt);
 	if(nciop == NULL)
 		return NULL;
-	
+
 	nciop->ioflags = ioflags;
 	*((int *)&nciop->fd) = -1; /* cast away const */
 
@@ -1492,8 +1492,8 @@ ncio_px_new(const char *path, int ioflags)
    ioflags - flags from nc_create
    initialsz - From the netcdf man page: "The argument
    Iinitialsize sets the initial size of the file at creation time."
-   igeto - 
-   igetsz - 
+   igeto -
+   igetsz -
    sizehintp - this eventually goes into pxp->blksz and is the size of
    a page of data for buffered reads and writes.
    nciopp - pointer to a pointer that will get location of newly
@@ -1606,17 +1606,17 @@ unwind_new:
    path - path of data file.
 
    ioflags - flags passed into nc_open.
-   
+
    igeto - looks like this function can do an initial page get, and
    igeto is going to be the offset for that. But it appears to be
-   unused 
+   unused
 
    igetsz - the size in bytes of initial page get (a.k.a. extent). Not
    ever used in the library.
-   
+
    sizehintp - pointer to sizehint parameter from nc__open or
-   nc__create. This is used to set pxp->blksz. 
-   
+   nc__create. This is used to set pxp->blksz.
+
    Here's what the man page has to say:
 
    "The argument referenced by chunksize controls a space versus time
@@ -1721,7 +1721,7 @@ unwind_new:
 	return status;
 }
 
-/* 
+/*
  * Get file size in bytes.
  */
 static int
@@ -1730,7 +1730,7 @@ ncio_px_filesize(ncio *nciop, off_t *filesizep)
 
 
 	/* There is a problem with fstat on Windows based systems
-		which manifests (so far) when Config RELEASE is built. 
+		which manifests (so far) when Config RELEASE is built.
 		Use _filelengthi64 isntead. */
 #ifdef HAVE_FILE_LENGTH_I64
 
@@ -1786,12 +1786,12 @@ ncio_px_pad_length(ncio *nciop, off_t length)
 
    Sync any changes, then close the open file associated with the ncio
    struct, and free its memory.
-   
+
    nciop - pointer to ncio to close.
 
    doUnlink - if true, unlink file
 */
-static int 
+static int
 ncio_px_close(ncio *nciop, int doUnlink)
 {
 	int status = ENOERR;
@@ -1800,14 +1800,14 @@ ncio_px_close(ncio *nciop, int doUnlink)
 	if(nciop->fd > 0) {
 	    status = nciop->sync(nciop);
 	    (void) close(nciop->fd);
-	}	
+	}
 	if(doUnlink)
 		(void) unlink(nciop->path);
 	ncio_px_free(nciop);
 	return status;
 }
 
-static int 
+static int
 ncio_spx_close(ncio *nciop, int doUnlink)
 {
 	int status = ENOERR;

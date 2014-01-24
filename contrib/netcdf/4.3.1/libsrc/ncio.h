@@ -77,9 +77,9 @@ typedef int ncio_syncfunc(ncio *const nciop);
   */
 typedef int ncio_pad_lengthfunc(ncio* nciop, off_t length);
 
-/* 
+/*
  *  Get file size in bytes.
- */ 
+ */
 typedef int ncio_filesizefunc(ncio *nciop, off_t *filesizep);
 
 /* Write out any dirty buffers and
@@ -127,7 +127,7 @@ struct ncio {
 	ncio_pad_lengthfunc *NCIO_CONST pad_length;
 
 	ncio_filesizefunc *NCIO_CONST filesize;
-  
+
 	ncio_closefunc *NCIO_CONST close;
 
 	/*

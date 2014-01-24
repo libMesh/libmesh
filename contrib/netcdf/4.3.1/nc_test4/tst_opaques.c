@@ -47,14 +47,14 @@ main(int argc, char **argv)
       if (nc_create(FILE_NAME, NC_NETCDF4|NC_CLOBBER, &ncid)) ERR;
       if (nc_def_opaque(ncid, BASE_SIZE, TYPE_NAME, &xtype)) ERR;
       if (nc_inq_user_type(ncid, xtype, name_in, &base_size_in, &base_nc_type_in, &nfields_in, &class_in)) ERR;
-      if (strcmp(name_in, TYPE_NAME) || base_size_in != BASE_SIZE || 
+      if (strcmp(name_in, TYPE_NAME) || base_size_in != BASE_SIZE ||
 	  base_nc_type_in != 0 || nfields_in != 0 || class_in != NC_OPAQUE) ERR;
       if (nc_inq_opaque(ncid, xtype, name_in, &base_size_in)) ERR;
       if (strcmp(name_in, TYPE_NAME) || base_size_in != BASE_SIZE) ERR;
-      if (nc_def_var(ncid, VAR_NAME, xtype, 0, NULL, &varid)) ERR; 
-      if (nc_put_var(ncid, varid, &data[0])) ERR; 
+      if (nc_def_var(ncid, VAR_NAME, xtype, 0, NULL, &varid)) ERR;
+      if (nc_put_var(ncid, varid, &data[0])) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
@@ -89,7 +89,7 @@ main(int argc, char **argv)
       if (nc_def_var(ncid, VAR_NAME, xtype, 1, dimids, &varid)) ERR;
       if (nc_put_var(ncid, varid, data)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
@@ -193,7 +193,7 @@ main(int argc, char **argv)
 	 if (strcmp(name_in, type_name[i]) || base_size_in != TYPE_SIZE1) ERR;
       }
       if (nc_close(ncid)) ERR;
-      
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;

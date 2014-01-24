@@ -21,7 +21,7 @@ $Id: nc4dim.c,v 1.41 2010/05/25 17:54:23 dmh Exp $
 /* Netcdf-4 files might have more than one unlimited dimension, but
    return the first one anyway. */
 /* Note that this code is inconsistent with nc_inq */
-int 
+int
 NC4_inq_unlimdim(int ncid, int *unlimdimidp)
 {
    NC *nc;
@@ -30,7 +30,7 @@ NC4_inq_unlimdim(int ncid, int *unlimdimidp)
    NC_DIM_INFO_T *dim;
    int found = 0;
    int retval;
- 
+
    LOG((2, "%s: called", __func__));
 
    if ((retval = nc4_find_nc_grp_h5(ncid, &nc, &grp, &h5)))
@@ -74,7 +74,7 @@ NC4_def_dim(int ncid, const char *name, size_t len, int *idp)
    char norm_name[NC_MAX_NAME + 1];
    int retval = NC_NOERR;
 
-   LOG((2, "%s: ncid 0x%x name %s len %d", __func__, ncid, name, 
+   LOG((2, "%s: ncid 0x%x name %s len %d", __func__, ncid, name,
 	(int)len));
 
    /* Find our global metadata structure. */
@@ -105,7 +105,7 @@ NC4_def_dim(int ncid, const char *name, size_t len, int *idp)
       /* Must be in define mode for stict nc3. */
       if (!(h5->flags & NC_INDEF))
 	 return NC_ENOTINDEFINE;
-   }   
+   }
 
    /* If it's not in define mode, enter define mode. */
    if (!(h5->flags & NC_INDEF))
@@ -207,7 +207,7 @@ NC4_inq_dim(int ncid, int dimid, char *name, size_t *lenp)
    /* Find our global metadata structure. */
    if ((ret = nc4_find_nc_grp_h5(ncid, &nc, &grp, &h5)))
       return ret;
-   
+
    assert(h5);
    assert(nc && grp);
 
@@ -230,9 +230,9 @@ NC4_inq_dim(int ncid, int dimid, char *name, size_t *lenp)
    assert(dim);
 
    /* Return the dimension name, if the caller wants it. */
-   if (name && dim->name) 
-      strcpy(name, dim->name);	    
-   
+   if (name && dim->name)
+      strcpy(name, dim->name);
+
    /* Return the dimension length, if the caller wants it. */
    if (lenp)
    {
@@ -275,16 +275,16 @@ NC4_rename_dim(int ncid, int dimid, const char *name)
    if (!name)
       return NC_EINVAL;
 
-   LOG((2, "%s: ncid 0x%x dimid %d name %s", __func__, ncid, 
+   LOG((2, "%s: ncid 0x%x dimid %d name %s", __func__, ncid,
 	dimid, name));
 
    /* Find info for this file and group, and set pointer to each. */
-   if ((retval = nc4_find_nc_grp_h5(ncid, &nc, &grp, &h5)))      
+   if ((retval = nc4_find_nc_grp_h5(ncid, &nc, &grp, &h5)))
       return retval;
 
    assert(nc);
    assert(h5 && grp);
-   
+
    /* Trying to write to a read-only file? No way, Jose! */
    if (h5->no_write)
       return NC_EPERM;
@@ -318,10 +318,10 @@ NC4_rename_dim(int ncid, int dimid, const char *name)
       assert(!dim->coord_var);
 
       /* Close the HDF5 dataset */
-      if (H5Dclose(dim->hdf_dimscaleid) < 0) 
+      if (H5Dclose(dim->hdf_dimscaleid) < 0)
          return NC_EHDFERR;
       dim->hdf_dimscaleid = 0;
-            
+
       /* Now delete the dataset (it will be recreated later, if necessary) */
       if (H5Gunlink(grp->hdf_grpid, dim->name) < 0)
          return NC_EDIMMETA;
@@ -373,8 +373,8 @@ NC4_rename_dim(int ncid, int dimid, const char *name)
    number of unlimited dimensions by first calling this with NULL for
    the second pointer.
 */
-int 
-NC4_inq_unlimdims(int ncid, int *nunlimdimsp, int *unlimdimidsp) 
+int
+NC4_inq_unlimdims(int ncid, int *nunlimdimsp, int *unlimdimidsp)
 {
   NC_DIM_INFO_T *dim;
   NC_GRP_INFO_T *grp;
@@ -388,7 +388,7 @@ NC4_inq_unlimdims(int ncid, int *nunlimdimsp, int *unlimdimidsp)
   /* Find info for this file and group, and set pointer to each. */
   if ((retval = nc4_find_nc_grp_h5(ncid, &nc, &grp, &h5)))
     return retval;
-  
+
    /* Get our dim info. */
    assert(h5);
    {

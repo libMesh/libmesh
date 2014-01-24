@@ -2,7 +2,7 @@
    Copyright 2005 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test netcdf-4 variables. 
+   Test netcdf-4 variables.
    $Id: tst_vars.c,v 1.49 2009/12/30 12:03:48 ed Exp $
 */
 
@@ -69,7 +69,7 @@
 #define MAX_ATT_LEN 80
 
 int
-create_4D_example(char *file_name, int cmode) 
+create_4D_example(char *file_name, int cmode)
 {
    /* IDs for the netCDF file, dimensions, and variables. */
    int ncid, lon_dimid, lat_dimid, lvl_dimid, rec_dimid;
@@ -90,7 +90,7 @@ create_4D_example(char *file_name, int cmode)
 
    /* Loop indexes. */
    int lvl, lat, lon, rec, i = 0;
-   
+
    /* Create some pretend data. If this wasn't an example program, we
     * would have some real data to write, for example, model
     * output. */
@@ -98,7 +98,7 @@ create_4D_example(char *file_name, int cmode)
       lats[lat] = START_LAT + 5.*lat;
    for (lon = 0; lon < NLON; lon++)
       lons[lon] = START_LON + 5.*lon;
-   
+
    for (lvl = 0; lvl < NLVL; lvl++)
       for (lat = 0; lat < NLAT; lat++)
 	 for (lon = 0; lon < NLON; lon++)
@@ -124,15 +124,15 @@ create_4D_example(char *file_name, int cmode)
       since coordinate variables only have one dimension, we can
       simply provide the address of that dimension ID (&lat_dimid) and
       similarly for (&lon_dimid). */
-   if (nc_def_var(ncid, LAT_NAME, NC_FLOAT, 1, &lat_dimid, 
+   if (nc_def_var(ncid, LAT_NAME, NC_FLOAT, 1, &lat_dimid,
 			    &lat_varid)) ERR;
-   if (nc_def_var(ncid, LON_NAME, NC_FLOAT, 1, &lon_dimid, 
+   if (nc_def_var(ncid, LON_NAME, NC_FLOAT, 1, &lon_dimid,
 			    &lon_varid)) ERR;
 
    /* Assign units attributes to coordinate variables. */
-   if (nc_put_att_text(ncid, lat_varid, UNITS, 
+   if (nc_put_att_text(ncid, lat_varid, UNITS,
 				 strlen(DEGREES_NORTH), DEGREES_NORTH)) ERR;
-   if (nc_put_att_text(ncid, lon_varid, UNITS, 
+   if (nc_put_att_text(ncid, lon_varid, UNITS,
 				 strlen(DEGREES_EAST), DEGREES_EAST)) ERR;
 
    /* The dimids array is used to pass the dimids of the dimensions of
@@ -146,15 +146,15 @@ create_4D_example(char *file_name, int cmode)
 
    /* Define the netCDF variables for the pressure and temperature
     * data. */
-   if (nc_def_var(ncid, PRES_NAME, NC_FLOAT, NDIMS_EX, 
+   if (nc_def_var(ncid, PRES_NAME, NC_FLOAT, NDIMS_EX,
 			    dimids, &pres_varid)) ERR;
-   if (nc_def_var(ncid, TEMP_NAME, NC_FLOAT, NDIMS_EX, 
+   if (nc_def_var(ncid, TEMP_NAME, NC_FLOAT, NDIMS_EX,
 			    dimids, &temp_varid)) ERR;
 
    /* Assign units attributes to the netCDF variables. */
-   if (nc_put_att_text(ncid, pres_varid, UNITS, 
+   if (nc_put_att_text(ncid, pres_varid, UNITS,
 				 strlen(PRES_UNITS), PRES_UNITS)) ERR;
-   if (nc_put_att_text(ncid, temp_varid, UNITS, 
+   if (nc_put_att_text(ncid, temp_varid, UNITS,
 				 strlen(TEMP_UNITS), TEMP_UNITS)) ERR;
 
    /* End define mode. */
@@ -183,9 +183,9 @@ create_4D_example(char *file_name, int cmode)
    for (rec = 0; rec < NREC; rec++)
    {
       start[0] = rec;
-      if (nc_put_vara_float(ncid, pres_varid, start, count, 
+      if (nc_put_vara_float(ncid, pres_varid, start, count,
 				      &pres_out[0][0][0])) ERR;
-      if (nc_put_vara_float(ncid, temp_varid, start, count, 
+      if (nc_put_vara_float(ncid, temp_varid, start, count,
 				      &temp_out[0][0][0])) ERR;
    }
 
@@ -247,18 +247,18 @@ check_4D_example(char *file_name, int expected_format)
        strcmp(var_name_in[2], PRES_NAME) || strcmp(var_name_in[3], TEMP_NAME)) ERR;
 
    if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims_in, dimid, &natts_in)) ERR;
-   if (strcmp(name_in, LAT_NAME) || xtype_in != NC_FLOAT || ndims_in != 1 || 
+   if (strcmp(name_in, LAT_NAME) || xtype_in != NC_FLOAT || ndims_in != 1 ||
        dimid[0] != 1 || natts_in != 1) ERR;
    if (nc_inq_var(ncid, 1, name_in, &xtype_in, &ndims_in, dimid, &natts_in)) ERR;
-   if (strcmp(name_in, LON_NAME) || xtype_in != NC_FLOAT || ndims_in != 1 || 
+   if (strcmp(name_in, LON_NAME) || xtype_in != NC_FLOAT || ndims_in != 1 ||
        dimid[0] != 2 || natts_in != 1) ERR;
    if (nc_inq_var(ncid, 2, name_in, &xtype_in, &ndims_in, dimid, &natts_in)) ERR;
-   if (strcmp(name_in, PRES_NAME) || xtype_in != NC_FLOAT || ndims_in != 4 || 
-       dimid[0] != 3 || dimid[1] != 0 || dimid[2] != 1 || dimid[3] != 2 || 
+   if (strcmp(name_in, PRES_NAME) || xtype_in != NC_FLOAT || ndims_in != 4 ||
+       dimid[0] != 3 || dimid[1] != 0 || dimid[2] != 1 || dimid[3] != 2 ||
        natts_in != 1) ERR;
    if (nc_inq_var(ncid, 3, name_in, &xtype_in, &ndims_in, dimid, &natts_in)) ERR;
-   if (strcmp(name_in, TEMP_NAME) || xtype_in != NC_FLOAT || ndims_in != 4 || 
-       dimid[0] != 3 || dimid[1] != 0 || dimid[2] != 1 || dimid[3] != 2 || 
+   if (strcmp(name_in, TEMP_NAME) || xtype_in != NC_FLOAT || ndims_in != 4 ||
+       dimid[0] != 3 || dimid[1] != 0 || dimid[2] != 1 || dimid[3] != 2 ||
        natts_in != 1) ERR;
 
    /* Check variable atts. */
@@ -333,7 +333,7 @@ main(int argc, char **argv)
    SUMMARIZE_ERR;
    printf("*** testing simple variables...");
 
-   {      
+   {
       /* Create a file with a variable of each type. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_def_dim(ncid, DIM1_NAME, DIM1_LEN, &dimids[0])) ERR;
@@ -371,9 +371,9 @@ main(int argc, char **argv)
 	 size_t size_in;
 
 	 if (nc_open(FILE_NAME, 0, &ncid)) ERR;
-	 if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims_in, dimids_in, 
+	 if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims_in, dimids_in,
 			&natts_in)) ERR;
-	 if (strcmp(name_in, VAR_BYTE_NAME) || xtype_in != NC_BYTE || 
+	 if (strcmp(name_in, VAR_BYTE_NAME) || xtype_in != NC_BYTE ||
 	     ndims_in != 2 || natts_in != 0 || dimids_in[0] != dimids[0] ||
 	     dimids_in[1] != dimids[1]) ERR;
 	 if (nc_inq_varid(ncid, VAR_BYTE_NAME, &varid_in)) ERR;
@@ -388,11 +388,11 @@ main(int argc, char **argv)
 	 if (strcmp(name_in, VAR_CHAR_NAME)) ERR;
 	 if (nc_inq_varname(ncid, 2, name_in)) ERR;
 	 if (strcmp(name_in, VAR_SHORT_NAME)) ERR;
-	 if (nc_inq_vartype(ncid, 0, &xtype_in)) ERR;      
+	 if (nc_inq_vartype(ncid, 0, &xtype_in)) ERR;
 	 if (xtype_in != NC_BYTE) ERR;
-	 if (nc_inq_vartype(ncid, 1, &xtype_in)) ERR;      
+	 if (nc_inq_vartype(ncid, 1, &xtype_in)) ERR;
 	 if (xtype_in != NC_CHAR) ERR;
-	 if (nc_inq_vartype(ncid, 2, &xtype_in)) ERR;      
+	 if (nc_inq_vartype(ncid, 2, &xtype_in)) ERR;
 	 if (xtype_in != NC_SHORT) ERR;
 
 	 /* Check inquire of atomic types */
@@ -451,43 +451,43 @@ main(int argc, char **argv)
 
       /* Open the file and check data. */
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
-      if (nc_get_var_schar(ncid, byte_varid, (signed char *)byte_in)) ERR;   
+      if (nc_get_var_schar(ncid, byte_varid, (signed char *)byte_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != byte_out[i][j]) ERR;
-      if (nc_get_var_short(ncid, short_varid, (short *)short_in)) ERR;   
+      if (nc_get_var_short(ncid, short_varid, (short *)short_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (short_in[i][j] != short_out[i][j]) ERR;
-      if (nc_get_var_int(ncid, int_varid, (int *)int_in)) ERR;   
+      if (nc_get_var_int(ncid, int_varid, (int *)int_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (int_in[i][j] != int_out[i][j]) ERR;
-      if (nc_get_var_float(ncid, float_varid, (float *)float_in)) ERR;   
+      if (nc_get_var_float(ncid, float_varid, (float *)float_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (float_in[i][j] != float_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, double_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, double_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != double_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, double_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, double_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != double_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, double_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, double_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != double_out[i][j]) ERR;
-      if (nc_get_var_uint(ncid, uint_varid, (unsigned int *)uint_in)) ERR;   
+      if (nc_get_var_uint(ncid, uint_varid, (unsigned int *)uint_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (uint_in[i][j] != uint_out[i][j]) ERR;
-      if (nc_get_var_longlong(ncid, int64_varid, (long long *)int64_in)) ERR;   
+      if (nc_get_var_longlong(ncid, int64_varid, (long long *)int64_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (int64_in[i][j] != int64_out[i][j]) ERR;
-      if (nc_get_var_ulonglong(ncid, uint64_varid, (unsigned long long *)uint64_in)) ERR;   
+      if (nc_get_var_ulonglong(ncid, uint64_varid, (unsigned long long *)uint64_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (uint64_in[i][j] != uint64_out[i][j]) ERR;
@@ -495,39 +495,39 @@ main(int argc, char **argv)
 
       /* Open the file and read everything as double. */
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
-      if (nc_get_var_double(ncid, byte_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, byte_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)byte_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, ubyte_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, ubyte_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)ubyte_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, short_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, short_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)short_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, ushort_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, ushort_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)ushort_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, int_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, int_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)int_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, uint_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, uint_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)uint_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, float_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, float_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)float_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, int64_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, int64_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)int64_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, uint64_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, uint64_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)uint64_out[i][j]) ERR;
@@ -535,39 +535,39 @@ main(int argc, char **argv)
 
       /* Open the file and read everything as NC_BYTE. */
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
-      if (nc_get_var_schar(ncid, byte_varid, (signed char *)byte_in)) ERR;   
+      if (nc_get_var_schar(ncid, byte_varid, (signed char *)byte_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)byte_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, ubyte_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, ubyte_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)ubyte_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, short_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, short_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)short_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, ushort_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, ushort_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)ushort_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, int_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, int_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)int_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, uint_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, uint_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)uint_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, float_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, float_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)float_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, int64_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, int64_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)int64_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, uint64_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, uint64_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)uint64_out[i][j]) ERR;
@@ -627,9 +627,9 @@ main(int argc, char **argv)
 	 char name_in[NC_MAX_NAME+1];
 
 	 if (nc_open(FILE_NAME, 0, &ncid)) ERR;
-	 if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims_in, dimids_in, 
+	 if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims_in, dimids_in,
 			&natts_in)) ERR;
-	 if (strcmp(name_in, VAR_BYTE_NAME) || xtype_in != NC_BYTE || 
+	 if (strcmp(name_in, VAR_BYTE_NAME) || xtype_in != NC_BYTE ||
 	     ndims_in != 2 || natts_in != 0 || dimids_in[0] != dimids[0] ||
 	     dimids_in[1] != dimids[1]) ERR;
 	 if (nc_inq_varid(ncid, VAR_BYTE_NAME, &varid_in)) ERR;
@@ -644,54 +644,54 @@ main(int argc, char **argv)
 	 if (strcmp(name_in, VAR_CHAR_NAME)) ERR;
 	 if (nc_inq_varname(ncid, 2, name_in)) ERR;
 	 if (strcmp(name_in, VAR_SHORT_NAME)) ERR;
-	 if (nc_inq_vartype(ncid, 0, &xtype_in)) ERR;      
+	 if (nc_inq_vartype(ncid, 0, &xtype_in)) ERR;
 	 if (xtype_in != NC_BYTE) ERR;
-	 if (nc_inq_vartype(ncid, 1, &xtype_in)) ERR;      
+	 if (nc_inq_vartype(ncid, 1, &xtype_in)) ERR;
 	 if (xtype_in != NC_CHAR) ERR;
-	 if (nc_inq_vartype(ncid, 2, &xtype_in)) ERR;      
+	 if (nc_inq_vartype(ncid, 2, &xtype_in)) ERR;
 	 if (xtype_in != NC_SHORT) ERR;
 	 if (nc_close(ncid)) ERR;
       }
 
       /* Open the file and check data. */
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
-      if (nc_get_var_schar(ncid, byte_varid, (signed char *)byte_in)) ERR;   
+      if (nc_get_var_schar(ncid, byte_varid, (signed char *)byte_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != byte_out[i][j]) ERR;
-      if (nc_get_var_short(ncid, short_varid, (short *)short_in)) ERR;   
+      if (nc_get_var_short(ncid, short_varid, (short *)short_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (short_in[i][j] != short_out[i][j]) ERR;
-      if (nc_get_var_int(ncid, int_varid, (int *)int_in)) ERR;   
+      if (nc_get_var_int(ncid, int_varid, (int *)int_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (int_in[i][j] != int_out[i][j]) ERR;
-      if (nc_get_var_float(ncid, float_varid, (float *)float_in)) ERR;   
+      if (nc_get_var_float(ncid, float_varid, (float *)float_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (float_in[i][j] != float_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, double_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, double_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != double_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, double_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, double_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != double_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, double_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, double_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != double_out[i][j]) ERR;
-      if (nc_get_var_uint(ncid, uint_varid, (unsigned int *)uint_in)) ERR;   
+      if (nc_get_var_uint(ncid, uint_varid, (unsigned int *)uint_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (uint_in[i][j] != uint_out[i][j]) ERR;
-      if (nc_get_var_longlong(ncid, int64_varid, (long long *)int64_in)) ERR;   
+      if (nc_get_var_longlong(ncid, int64_varid, (long long *)int64_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (int64_in[i][j] != int64_out[i][j]) ERR;
-      if (nc_get_var_ulonglong(ncid, uint64_varid, (unsigned long long *)uint64_in)) ERR;   
+      if (nc_get_var_ulonglong(ncid, uint64_varid, (unsigned long long *)uint64_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (uint64_in[i][j] != uint64_out[i][j]) ERR;
@@ -699,39 +699,39 @@ main(int argc, char **argv)
 
       /* Open the file and read everything as double. */
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
-      if (nc_get_var_double(ncid, byte_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, byte_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)byte_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, ubyte_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, ubyte_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)ubyte_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, short_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, short_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)short_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, ushort_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, ushort_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)ushort_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, int_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, int_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)int_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, uint_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, uint_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)uint_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, float_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, float_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)float_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, int64_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, int64_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)int64_out[i][j]) ERR;
-      if (nc_get_var_double(ncid, uint64_varid, (double *)double_in)) ERR;   
+      if (nc_get_var_double(ncid, uint64_varid, (double *)double_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (double_in[i][j] != (double)uint64_out[i][j]) ERR;
@@ -739,39 +739,39 @@ main(int argc, char **argv)
 
       /* Open the file and read everything as NC_BYTE. */
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
-      if (nc_get_var_schar(ncid, byte_varid, (signed char *)byte_in)) ERR;   
+      if (nc_get_var_schar(ncid, byte_varid, (signed char *)byte_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)byte_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, ubyte_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, ubyte_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)ubyte_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, short_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, short_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)short_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, ushort_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, ushort_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)ushort_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, int_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, int_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)int_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, uint_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, uint_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)uint_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, float_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, float_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)float_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, int64_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, int64_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)int64_out[i][j]) ERR;
-      if (nc_get_var_schar(ncid, uint64_varid, (signed char *)byte_in) != NC_ERANGE) ERR;   
+      if (nc_get_var_schar(ncid, uint64_varid, (signed char *)byte_in) != NC_ERANGE) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (byte_in[i][j] != (signed char)uint64_out[i][j]) ERR;
@@ -815,9 +815,9 @@ main(int argc, char **argv)
 		     dimids_in, &natts)) ERR;
       if (strcmp(name_in, VAR_NAME4) || xtype_in != NC_INT64 ||
 	  ndims != 1 || natts != 0 || dimids_in[0] != 0) ERR;
-      if (nc_inq_var_deflate(ncid, 0, &shuffle_in, &deflate_in, 
+      if (nc_inq_var_deflate(ncid, 0, &shuffle_in, &deflate_in,
 			     &deflate_level)) ERR;
-      if (shuffle_in != NC_NOSHUFFLE ||!deflate_in || 
+      if (shuffle_in != NC_NOSHUFFLE ||!deflate_in ||
 	  deflate_level != DEFLATE_LEVEL) ERR;
 
       if (nc_close(ncid)) ERR;
@@ -835,9 +835,9 @@ main(int argc, char **argv)
 		     dimids_in, &natts)) ERR;
       if (strcmp(name_in, VAR_NAME4) || xtype_in != NC_INT64 ||
 	  ndims != 1 || natts != 0 || dimids_in[0] != 0) ERR;
-      if (nc_inq_var_deflate(ncid, 0, &shuffle_in, &deflate_in, 
+      if (nc_inq_var_deflate(ncid, 0, &shuffle_in, &deflate_in,
 			     &deflate_level)) ERR;
-      if (shuffle_in != NC_NOSHUFFLE ||!deflate_in || 
+      if (shuffle_in != NC_NOSHUFFLE ||!deflate_in ||
 	  deflate_level != DEFLATE_LEVEL) ERR;
 
       if (nc_close(ncid)) ERR;
@@ -874,7 +874,7 @@ main(int argc, char **argv)
       if (dimids[0] != 0) ERR;
       for (i = 0; i < NVARS5; i++)
       {
-	 if (nc_def_var(ncid, var_name[i], NC_INT64, NDIMS5, dimids, 
+	 if (nc_def_var(ncid, var_name[i], NC_INT64, NDIMS5, dimids,
 			&varid[i])) ERR;
 	 if (varid[i] != i) ERR;
 	 if (nc_def_var_deflate(ncid, varid[i], NC_SHUFFLE, 1, deflate_level[i])) ERR;
@@ -893,9 +893,9 @@ main(int argc, char **argv)
 			dimids_in, &natts)) ERR;
 	 if (strcmp(name_in, var_name[i]) || xtype_in != NC_INT64 ||
 	     ndims != 1 || natts != 0 || dimids_in[0] != 0) ERR;
-	 if (nc_inq_var_deflate(ncid, varid[i], &shuffle_in, &deflate_in, 
+	 if (nc_inq_var_deflate(ncid, varid[i], &shuffle_in, &deflate_in,
 				&deflate_level_in)) ERR;
-	 if (shuffle_in != NC_SHUFFLE || !deflate_in || 
+	 if (shuffle_in != NC_SHUFFLE || !deflate_in ||
 	     deflate_level_in != deflate_level[i]) ERR;
       }
 
@@ -916,9 +916,9 @@ main(int argc, char **argv)
 			dimids_in, &natts)) ERR;
 	 if (strcmp(name_in, var_name[i]) || xtype_in != NC_INT64 ||
 	     ndims != 1 || natts != 0 || dimids_in[0] != 0) ERR;
-	 if (nc_inq_var_deflate(ncid, varid[i], &shuffle_in, &deflate_in, 
+	 if (nc_inq_var_deflate(ncid, varid[i], &shuffle_in, &deflate_in,
 				&deflate_level_in)) ERR;
-	 if (shuffle_in != NC_SHUFFLE || !deflate_in || 
+	 if (shuffle_in != NC_SHUFFLE || !deflate_in ||
 	     deflate_level_in != deflate_level[i]) ERR;
       }
 
@@ -978,7 +978,7 @@ main(int argc, char **argv)
 			dimids_in, &natts)) ERR;
 	 if (strcmp(name_in, var_name[i]) || xtype_in != NC_DOUBLE ||
 	     ndims != 1 || natts != 0 || dimids_in[0] != 0) ERR;
-	 if (nc_inq_var_deflate(ncid, varid[i], &shuffle_in, &deflate_in, 
+	 if (nc_inq_var_deflate(ncid, varid[i], &shuffle_in, &deflate_in,
 				&deflate_level_in)) ERR;
 	 if (shuffle_in != NC_NOSHUFFLE || !deflate_in || deflate_level_in != 0) ERR;
 	 if (nc_inq_var_fletcher32(ncid, varid[i], &checksum_in)) ERR;
@@ -1002,9 +1002,9 @@ main(int argc, char **argv)
 			dimids_in, &natts)) ERR;
 	 if (strcmp(name_in, var_name[i]) || xtype_in != NC_DOUBLE ||
 	     ndims != 1 || natts != 0 || dimids_in[0] != 0) ERR;
-	 if (nc_inq_var_deflate(ncid, varid[i], &shuffle_in, &deflate_in, 
+	 if (nc_inq_var_deflate(ncid, varid[i], &shuffle_in, &deflate_in,
 				&deflate_level_in)) ERR;
-	 if (shuffle_in != NC_NOSHUFFLE || !deflate_in || 
+	 if (shuffle_in != NC_NOSHUFFLE || !deflate_in ||
 	     deflate_level_in != 0) ERR;
 	 if (nc_inq_var_fletcher32(ncid, varid[i], &checksum_in)) ERR;
 	 if (checksum_in != NC_FLETCHER32) ERR;
@@ -1041,7 +1041,7 @@ main(int argc, char **argv)
 		     dimids_in, &natts)) ERR;
       if (strcmp(name_in, VAR7_NAME) || xtype_in != NC_USHORT ||
 	  ndims != 1 || natts != 0 || dimids_in[0] != 0) ERR;
-      if (nc_inq_var_deflate(ncid, 0, &shuffle_in, &deflate_in, 
+      if (nc_inq_var_deflate(ncid, 0, &shuffle_in, &deflate_in,
 			     &deflate_level_in)) ERR;
       if (shuffle_in != NC_NOSHUFFLE || deflate_in) ERR;
       if (nc_inq_var_fletcher32(ncid, 0, &checksum_in)) ERR;
@@ -1069,7 +1069,7 @@ main(int argc, char **argv)
 		     dimids_in, &natts)) ERR;
       if (strcmp(name_in, VAR7_NAME) || xtype_in != NC_USHORT ||
 	  ndims != 1 || natts != 0 || dimids_in[0] != 0) ERR;
-      if (nc_inq_var_deflate(ncid, 0, &shuffle_in, &deflate_in, 
+      if (nc_inq_var_deflate(ncid, 0, &shuffle_in, &deflate_in,
 			     &deflate_level_in)) ERR;
       if (shuffle_in != NC_NOSHUFFLE || deflate_in) ERR;
       if (nc_inq_var_fletcher32(ncid, 0, &checksum_in)) ERR;
@@ -1123,13 +1123,13 @@ main(int argc, char **argv)
    printf("*** testing fill values for 2D unlimited dimension variable...");
    {
 #define D1_NAME "unlimited"
-#define D1_TARGET 3      
+#define D1_TARGET 3
 #define D2_NAME "fixed"
 #define D2_LEN 3
 #define D2_TARGET 2
 #define V1_NAME "var1"
 #define ND1 2
-#define TARGET_VALUE 42      
+#define TARGET_VALUE 42
 
       int dimids[ND1];
       size_t index[ND1];
@@ -1212,22 +1212,22 @@ main(int argc, char **argv)
 
    printf("*** testing 4D example file in classic format...");
    if (create_4D_example(NC3_CLASSIC_FILE, NC_CLOBBER)) ERR;
-   if (check_4D_example(NC3_CLASSIC_FILE, NC_FORMAT_CLASSIC)) ERR;      
+   if (check_4D_example(NC3_CLASSIC_FILE, NC_FORMAT_CLASSIC)) ERR;
    SUMMARIZE_ERR;
 
    printf("*** testing 4D example file in 64-bit offset format...");
    if (create_4D_example(NC3_64BIT_OFFSET_FILE, NC_CLOBBER|NC_64BIT_OFFSET)) ERR;
-   if (check_4D_example(NC3_64BIT_OFFSET_FILE, NC_FORMAT_64BIT)) ERR;      
+   if (check_4D_example(NC3_64BIT_OFFSET_FILE, NC_FORMAT_64BIT)) ERR;
    SUMMARIZE_ERR;
 
    printf("*** testing 4D example file in netCDF-4/HDF5 format...");
    if (create_4D_example(NC3_NETCDF4_FILE, NC_CLOBBER|NC_NETCDF4)) ERR;
-   if (check_4D_example(NC3_NETCDF4_FILE, NC_FORMAT_NETCDF4)) ERR;      
+   if (check_4D_example(NC3_NETCDF4_FILE, NC_FORMAT_NETCDF4)) ERR;
    SUMMARIZE_ERR;
 
    printf("*** testing 4D example file in netCDF-4/HDF5 format with classic model rules...");
    if (create_4D_example(NC3_NETCDF4_CLASSIC_FILE, NC_CLOBBER|NC_NETCDF4|NC_CLASSIC_MODEL)) ERR;
-   if (check_4D_example(NC3_NETCDF4_CLASSIC_FILE, NC_FORMAT_NETCDF4_CLASSIC)) ERR;      
+   if (check_4D_example(NC3_NETCDF4_CLASSIC_FILE, NC_FORMAT_NETCDF4_CLASSIC)) ERR;
    SUMMARIZE_ERR;
 
    FINAL_RESULTS;

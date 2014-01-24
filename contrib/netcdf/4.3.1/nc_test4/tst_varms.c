@@ -2,9 +2,9 @@
    Corporation for Atmospheric Research/Unidata. See COPYRIGHT file
    for conditions of use.
 
-   Test netcdf-4 mapped var operations. 
+   Test netcdf-4 mapped var operations.
 
-   Remember, in C, last dimension of an array varies fastest in memory. 
+   Remember, in C, last dimension of an array varies fastest in memory.
    int data[2][3] is order in memory (0,0), (0,1), (0,2), (1,0), (1,1), (1,2).
    applying map of (1,2) will reorder them in the following way:
    (0,0), (1,0), (0,1), (1,1), (0,2), (1,2)
@@ -50,7 +50,7 @@ main(int argc, char **argv)
       for (i = 0; i < 2; i++)
 	 for (j = 0; j < 2; j++)
 	    data_2d[i][j] = k++;
-      
+
       /* Create a file with one 2D variable of type int and write our
        * data. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
@@ -60,10 +60,10 @@ main(int argc, char **argv)
       if (nc_enddef(ncid)) ERR;
       if (nc_put_var_int(ncid, varid, (int *)data_2d)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Open the file and check. */
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
-      if (nc_get_var_int(ncid, varid, (int *)data_2d_in)) ERR;   
+      if (nc_get_var_int(ncid, varid, (int *)data_2d_in)) ERR;
       for (i = 0; i < 2; i++)
 	 for (j = 0; j < 2; j++)
 	    if (data_2d_in[i][j] != data_2d[i][j]) ERR;
@@ -75,8 +75,8 @@ main(int argc, char **argv)
       stride[0] = stride[1] = 1;
       map[0] = 1;
       map[1] = 2;
-      if (nc_get_varm_int(ncid, varid, start, count, stride, map, 
-			  (int *)data_2d_in)) ERR;   
+      if (nc_get_varm_int(ncid, varid, start, count, stride, map,
+			  (int *)data_2d_in)) ERR;
       for (i = 0; i < 2; i++)
 	 for (j = 0; j < 2; j++)
 	    if (data_2d_in[j][i] != data_2d[i][j]) ERR;
@@ -85,8 +85,8 @@ main(int argc, char **argv)
        * what these numbers mean. */
       map[0] = 2;
       map[1] = 1;
-      if (nc_get_varm_int(ncid, varid, start, count, stride, map, 
-			  (int *)data_2d_in)) ERR;   
+      if (nc_get_varm_int(ncid, varid, start, count, stride, map,
+			  (int *)data_2d_in)) ERR;
       for (i = 0; i < 2; i++)
 	 for (j = 0; j < 2; j++)
 	    if (data_2d_in[i][j] != data_2d[i][j]) ERR;
@@ -105,7 +105,7 @@ main(int argc, char **argv)
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    data[i][j] = k++;
-      
+
       /* Create a file with one variable of type int. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_def_dim(ncid, DIM1_NAME, DIM1_LEN, &dimids[0])) ERR;
@@ -114,15 +114,15 @@ main(int argc, char **argv)
       if (nc_enddef(ncid)) ERR;
       if (nc_put_var_int(ncid, varid, (int *)data)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Open the file and check. */
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
-      if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims_in, dimids_in, 
+      if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims_in, dimids_in,
 		     &natts_in)) ERR;
-      if (strcmp(name_in, VAR_NAME) || xtype_in != NC_INT || 
+      if (strcmp(name_in, VAR_NAME) || xtype_in != NC_INT ||
 	  ndims_in != 2 || natts_in != 0 || dimids_in[0] != dimids[0] ||
 	  dimids_in[1] != dimids[1]) ERR;
-      if (nc_get_var_int(ncid, varid, (int *)data_in)) ERR;   
+      if (nc_get_var_int(ncid, varid, (int *)data_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (data_in[i][j] != data[i][j]) ERR;
@@ -134,8 +134,8 @@ main(int argc, char **argv)
       stride[0] = stride[1] = 1;
       map[0] = 1;
       map[1] = 2;
-      if (nc_get_varm_int(ncid, varid, start, count, stride, map, 
-			  (int *)data_in_t)) ERR;   
+      if (nc_get_varm_int(ncid, varid, start, count, stride, map,
+			  (int *)data_in_t)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 for (j = 0; j < DIM2_LEN; j++)
 	    if (data_in_t[j][i] != data[i][j]) ERR;
@@ -150,7 +150,7 @@ main(int argc, char **argv)
    {
 #define D0 4
 #define D1 3
-#define D2 2     
+#define D2 2
 
       /* netCDF dimension       inter-element distance */
       /* ----------------       ---------------------- */
@@ -161,7 +161,7 @@ main(int argc, char **argv)
       size_t start[3] = {0, 0, 0}, count[3] = {D0, D1, D2};
       int ncid, varid, dimids[3];
       float data[D0][D1][D2], data_in[D0][D1][D2];
-   
+
       for (i = 0; i < D0; i++)
 	 for (j = 0; j < D1; j++)
 	    for (k = 0; k < D2; k++)
@@ -181,7 +181,7 @@ main(int argc, char **argv)
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
       if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
       if (ndims != 3 || nvars != 1 || natts != 0 || unlimdimid != -1) ERR;
-      if (nc_get_var_float(ncid, 0, (float *)data_in)) ERR;   
+      if (nc_get_var_float(ncid, 0, (float *)data_in)) ERR;
       for (i = 0; i < D0; i++)
 	 for (j = 0; j < D1; j++)
 	    for (k = 0; k < D2; k++)
@@ -189,8 +189,8 @@ main(int argc, char **argv)
 
       /* Using the imap above I should get identical results
        * (according to the manual). */
-      if (nc_get_varm_float(ncid, 0, start, count, stride, imap, 
-			    (float *)data_in)) ERR;   
+      if (nc_get_varm_float(ncid, 0, start, count, stride, imap,
+			    (float *)data_in)) ERR;
       for (i = 0; i < D0; i++)
 	 for (j = 0; j < D1; j++)
 	    for (k = 0; k < D2; k++)
@@ -221,7 +221,7 @@ main(int argc, char **argv)
       int ncid, varid, dimids[3];
       float data[4][6], data_in[6][4];
       int k=0;
-   
+
       /* Phoney data. */
       for (i = 0; i < 4; i++)
 	 for (j = 0; j < 6; j++)
@@ -240,11 +240,11 @@ main(int argc, char **argv)
       dimids[1] = 0;
       if (nc_def_var(ncid, "rh2", NC_FLOAT, 2, dimids, &varid)) ERR;
       if (nc_enddef(ncid)) ERR;
-      if (nc_put_varm_float(ncid, 0, start, count, stride, imap, 
+      if (nc_put_varm_float(ncid, 0, start, count, stride, imap,
 			    (float *)data)) ERR;
       count[0] = 4;
       count[1] = 6;
-      if (nc_put_vara_float(ncid, 1, start, count, 
+      if (nc_put_vara_float(ncid, 1, start, count,
 			    (float *)data_in)) ERR;
       if (nc_close(ncid)) ERR;
 
@@ -252,7 +252,7 @@ main(int argc, char **argv)
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
       if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
       if (ndims != 2 || nvars != 2 || natts != 0 || unlimdimid != -1) ERR;
-      if (nc_get_var_float(ncid, 0, (float *)data_in)) ERR;   
+      if (nc_get_var_float(ncid, 0, (float *)data_in)) ERR;
 /*       for (i = 0; i < 4; i++) */
 /* 	 for (j = 0; j < 6; j++) */
 /* 	    if (data_in[i][j] != data[j][i]) ERR; */

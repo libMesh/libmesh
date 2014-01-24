@@ -109,7 +109,7 @@ dcelex(YYSTYPE* lvalp, DCEparsestate* state)
 	            isnumber = 1; /* maybe */
 	    }
 	    /* A number followed by an id char is assumed to just be
-	       a funny id */	       
+	       a funny id */
 	    if(isnumber && (*p == '\0' || strchr(wordcharsn,*p) == NULL))  {
 	        token = SCAN_NUMBERCONST;
 	    } else {

@@ -2,7 +2,7 @@
    Copyright 2005 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test netcdf-4 variables. 
+   Test netcdf-4 variables.
    $Id: tst_files2.c,v 1.11 2010/01/31 19:00:44 ed Exp $
 */
 
@@ -53,7 +53,7 @@ get_mem_used2(int *mem_used)
 {
    char buf[30];
    FILE *pf;
-   
+
    snprintf(buf, 30, "/proc/%u/statm", (unsigned)getpid());
    pf = fopen(buf, "r");
    if (pf) {
@@ -64,7 +64,7 @@ get_mem_used2(int *mem_used)
       unsigned lib;/*        library */
       unsigned data;/*       data/stack */
       /*unsigned dt;          dirty pages (unused in Linux 2.6)*/
-      fscanf(pf, "%u %u %u %u %u %u", &size, &resident, &share, 
+      fscanf(pf, "%u %u %u %u %u %u", &size, &resident, &share,
 	     &text, &lib, &data);
       *mem_used = data;
    }
@@ -85,7 +85,7 @@ get_mem_used3(int *mem_used)
  * lens of dim_len size. */
 #define MAX_DIMS 4
 int
-create_sample_file(char *file_name, int ndims, int *dim_len, 
+create_sample_file(char *file_name, int ndims, int *dim_len,
 		   int num_vars, int mode, int num_recs)
 {
    int ncid, dimids[MAX_DIMS], *varids;
@@ -124,10 +124,10 @@ create_sample_file(char *file_name, int ndims, int *dim_len,
    for (i = 0; i < num_vars; i++)
    {
       sprintf(varname, "a_%d", i);
-      if (nc_def_var(ncid, varname, NC_FLOAT, ndims, dimids, 
+      if (nc_def_var(ncid, varname, NC_FLOAT, ndims, dimids,
 		     &varids[i])) ERR_RET;
    }
-   
+
    /* Enddef required for classic files. */
    if (nc_enddef(ncid)) ERR;
 
@@ -150,13 +150,13 @@ create_sample_file(char *file_name, int ndims, int *dim_len,
       {
 	 for (start[0] = 0; start[0] < (dim_len[0] ? dim_len[0] : num_recs); start[0]++)
 	    for (start[1] = 0; start[1] < dim_len[1]; start[1]++)
-	       if (nc_put_vara_float(ncid, varids[i], start, count, 
+	       if (nc_put_vara_float(ncid, varids[i], start, count,
 				     data_out)) ERR_RET;
       }
       else
       {
 	 for (start[0] = 0; start[0] < (dim_len[0] ? dim_len[0] : num_recs); start[0]++)
-	    if (nc_put_vara_float(ncid, varids[i], start, count, 
+	    if (nc_put_vara_float(ncid, varids[i], start, count,
 				  data_out)) ERR_RET;
       }
    }
@@ -213,7 +213,7 @@ main(int argc, char **argv)
 	 ndims[t] = 4;
 	 for (d = 0; d < ndims[t]; d++)
 	    dim_len[t][d] = dim_4d[d];
-	 
+
 	 /* Create sample file (unless it already exists). */
 	 if (gettimeofday(&start_time, NULL)) ERR;
 	 if (create_sample_file(file_name[t], ndims[t], dim_len[t], num_vars[t],
@@ -226,7 +226,7 @@ main(int argc, char **argv)
 
 	 /* Change the cache settings. */
 	 if (nc_set_chunk_cache(cache_size[t], 20000, .75)) ERR;
-	 
+
 	 /* We need storage for an array of ncids. */
 	 if (!(ncid_in = malloc(num_files[t] * sizeof(int)))) ERR;
 
@@ -234,7 +234,7 @@ main(int argc, char **argv)
  	 if (get_mem_used1(&mem_used)) ERR;
 /* 	 get_mem_used2(&mem_used);
 	 get_mem_used3(&mem_used);*/
-	 
+
 	 /* Open the first file to get chunksizes. */
 	 if (gettimeofday(&start_time, NULL)) ERR;
 	 if (nc_open(file_name[t], 0, &ncid_in[0])) ERR;
@@ -305,7 +305,7 @@ main(int argc, char **argv)
       get_mem_used2(&mem_used);
       mem_used1 = mem_used;
       mem_used2 = mem_used;
-      printf("start: memuse= %d\t%d\t%d \n",mem_used, mem_used1,  
+      printf("start: memuse= %d\t%d\t%d \n",mem_used, mem_used1,
 	     mem_used2);
 
       printf("bef_open\taft_open\taft_close\tused_open\tused_closed\n");
@@ -325,8 +325,8 @@ main(int argc, char **argv)
 	 get_mem_used2(&mem_used2);
 
 	 if (mem_used2 - mem_used)
-	    printf("try %d - %d\t\t%d\t\t%d\t\t%d\t\t%d \n", i, 
-		   mem_used, mem_used1, mem_used2, mem_used1 - mem_used, 
+	    printf("try %d - %d\t\t%d\t\t%d\t\t%d\t\t%d \n", i,
+		   mem_used, mem_used1, mem_used2, mem_used1 - mem_used,
 		   mem_used2 - mem_used);
       }
    }

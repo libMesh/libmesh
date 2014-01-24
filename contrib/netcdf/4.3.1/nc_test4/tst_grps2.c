@@ -56,7 +56,7 @@ main(int argc, char **argv)
       if (nc_def_var(henry_vii_id, VAR_NAME1, NC_INT64, NDIMS_IN_VAR, &dimid1, &varid1)) ERR;
       if (nc_def_var(henry_vii_id, VAR_NAME2, NC_INT64, NDIMS_IN_VAR, &dimid1, &varid2)) ERR;
       if (nc_def_var(henry_vii_id, VAR_NAME3, NC_INT64, NDIMS_IN_VAR, &dimid2, &varid3)) ERR;
-      
+
       /* Check it out. Find the group by name. */
       if (nc_inq_ncid(ncid, HENRY_VII, &grpid_in)) ERR;
 

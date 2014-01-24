@@ -25,7 +25,7 @@ main(int argc, char **argv)
    int ndims, natts, int_in;
    long long_in;
    nc_type var_type;
- 
+
    printf("\n*** Testing more netcdf-4 data conversion.\n");
    printf ("*** Testing NC_BYTE conversions...");
    {
@@ -38,7 +38,7 @@ main(int argc, char **argv)
       /* Now open the file and check it. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_var(ncid, 0, var_name, &var_type, &ndims, NULL, &natts)) ERR;
-      if (strcmp(var_name, VAR_NAME) || natts !=0 || ndims != 0 || 
+      if (strcmp(var_name, VAR_NAME) || natts !=0 || ndims != 0 ||
 	  var_type != NC_BYTE) ERR;
       if (nc_get_var_schar(ncid, varid, &schar_in)) ERR;
       if (schar_in != schar) ERR;
@@ -75,16 +75,16 @@ main(int argc, char **argv)
       coord[0] = 2;
       if (nc_put_var1_float(ncid, varid, coord, &fval)) ERR;
       coord[0] = 3;
-      if (nc_put_var1_double(ncid, varid, coord, &dval)) ERR; 
+      if (nc_put_var1_double(ncid, varid, coord, &dval)) ERR;
       coord[0] = 4;
-      if (nc_put_var1_long(ncid, varid, coord, &lval)) ERR; 
+      if (nc_put_var1_long(ncid, varid, coord, &lval)) ERR;
 
       if (nc_close(ncid)) ERR;
 
       /* Now open the file and check it. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_var(ncid, 0, var_name, &var_type, &ndims, NULL, &natts)) ERR;
-      if (strcmp(var_name, VAR_NAME) || natts !=0 || ndims != 1 || 
+      if (strcmp(var_name, VAR_NAME) || natts !=0 || ndims != 1 ||
 	  var_type != NC_USHORT) ERR;
       coord[0] = 0;
       if (nc_get_var1_ushort(ncid, varid, coord, &ushort_in)) ERR;
@@ -135,16 +135,16 @@ main(int argc, char **argv)
       coord[0] = 2;
       if (nc_put_var1_float(ncid, varid, coord, &fval)) ERR;
       coord[0] = 3;
-      if (nc_put_var1_double(ncid, varid, coord, &dval)) ERR; 
+      if (nc_put_var1_double(ncid, varid, coord, &dval)) ERR;
       coord[0] = 4;
-      if (nc_put_var1_long(ncid, varid, coord, &lval)) ERR; 
+      if (nc_put_var1_long(ncid, varid, coord, &lval)) ERR;
 
       if (nc_close(ncid)) ERR;
 
       /* Now open the file and check it. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_var(ncid, 0, var_name, &var_type, &ndims, NULL, &natts)) ERR;
-      if (strcmp(var_name, VAR_NAME) || natts !=0 || ndims != 1 || 
+      if (strcmp(var_name, VAR_NAME) || natts !=0 || ndims != 1 ||
 	  var_type != NC_USHORT) ERR;
       coord[0] = 0;
       if (nc_get_var1_ushort(ncid, varid, coord, &ushort_in)) ERR;
@@ -164,7 +164,7 @@ main(int argc, char **argv)
 
       /* This should fail. */
       coord[0] = 5;
-      if (nc_get_var1_ushort(ncid, varid, coord, 
+      if (nc_get_var1_ushort(ncid, varid, coord,
 			     &ushort_in) != NC_EINVALCOORDS) ERR;
 
       if (nc_close(ncid)) ERR;
@@ -182,7 +182,7 @@ main(int argc, char **argv)
       unsigned long long uint64_in;
       float float_in;
       double double_in;
-      
+
       /* Write a scalar NC_INT with value X_MAX_INT. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_def_var(ncid, VAR_NAME, NC_INT, 0, NULL, &varid)) ERR;
@@ -192,7 +192,7 @@ main(int argc, char **argv)
       /* Now open the file and check it. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_var(ncid, 0, var_name, &var_type, &ndims, NULL, &natts)) ERR;
-      if (strcmp(var_name, VAR_NAME) || natts !=0 || ndims != 0 || 
+      if (strcmp(var_name, VAR_NAME) || natts !=0 || ndims != 0 ||
 	  var_type != NC_INT) ERR;
       if (nc_get_var_schar(ncid, varid, &schar_in) != NC_ERANGE) ERR;
       if (schar_in != (signed char)ivalue) ERR;
@@ -213,9 +213,9 @@ main(int argc, char **argv)
       if (nc_get_var_ulonglong(ncid, varid, &uint64_in)) ERR;
       if (uint64_in != ivalue) ERR;
       if (nc_get_var_float(ncid, varid, &float_in)) ERR;
- 
+
       if(fabs( (float_in-X_INT_MAX) - ((float)ivalue - X_INT_MAX)) > 1) ERR;
-      
+
       if (nc_get_var_double(ncid, varid, &double_in)) ERR;
       if (double_in != (double)ivalue) ERR;
       if (nc_close(ncid)) ERR;

@@ -23,7 +23,7 @@ available in netCDF-4/HDF5 files, when ::NC_CLASSIC_MODEL has not been
 used in nc_create().
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID of the variable to which the attribute will
@@ -51,7 +51,7 @@ nc_put_att_string(int ncid, int varid, const char *name,
     NC* ncp;
     int stat = NC_check_id(ncid, &ncp);
     if(stat != NC_NOERR) return stat;
-    return ncp->dispatch->put_att(ncid, varid, name, NC_STRING, 
+    return ncp->dispatch->put_att(ncid, varid, name, NC_STRING,
 				  len, (void*)value, NC_STRING);
 }
 
@@ -61,7 +61,7 @@ Write a text attribute.
 
 Add or change a text attribute. If this attribute is new,
 or if the space required to store the attribute is greater than
-before, the netCDF dataset must be in define mode.  
+before, the netCDF dataset must be in define mode.
 
 Although it's possible to create attributes of all types, text and
 double attributes are adequate for most purposes.
@@ -71,7 +71,7 @@ including user-defined types. We recommend using the type safe
 versions of this function whenever possible.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID of the variable to which the attribute will
@@ -106,16 +106,16 @@ netCDF dataset named foo.nc:
 \code
      #include <netcdf.h>
         ...
-     int  status;        
-     int  ncid;          
-     int  rh_id;         
+     int  status;
+     int  ncid;
+     int  rh_id;
      static double rh_range[] = {0.0, 100.0};
      static char title[] = "example netCDF dataset";
         ...
      status = nc_open("foo.nc", NC_WRITE, &ncid);
      if (status != NC_NOERR) handle_error(status);
         ...
-     status = nc_redef(ncid);                
+     status = nc_redef(ncid);
      if (status != NC_NOERR) handle_error(status);
      status = nc_inq_varid (ncid, "rh", &rh_id);
      if (status != NC_NOERR) handle_error(status);
@@ -127,7 +127,7 @@ netCDF dataset named foo.nc:
                                strlen(title), title)
      if (status != NC_NOERR) handle_error(status);
         ...
-     status = nc_enddef(ncid);               
+     status = nc_enddef(ncid);
      if (status != NC_NOERR) handle_error(status);
 \endcode
 */
@@ -138,11 +138,11 @@ nc_put_att_text(int ncid, int varid, const char *name,
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return ncp->dispatch->put_att(ncid, varid, name, NC_CHAR, len, 
+   return ncp->dispatch->put_att(ncid, varid, name, NC_CHAR, len,
 				 (void *)value, NC_CHAR);
 }
 
-/*! \} */ 
+/*! \} */
 /*!
 \ingroup attributes
 Write an attribute.
@@ -150,7 +150,7 @@ Write an attribute.
 The function nc_put_att_ type adds or changes a variable attribute or
 global attribute of an open netCDF dataset. If this attribute is new,
 or if the space required to store the attribute is greater than
-before, the netCDF dataset must be in define mode.  
+before, the netCDF dataset must be in define mode.
 
 With netCDF-4 files, nc_put_att will notice if you are writing a
 _FillValue attribute, and will tell the HDF5 layer to use the
@@ -163,7 +163,7 @@ Although it's possible to create attributes of all types, text and
 double attributes are adequate for most purposes.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID of the variable to which the attribute will
@@ -196,16 +196,16 @@ netCDF dataset named foo.nc:
 \code
      #include <netcdf.h>
         ...
-     int  status;        
-     int  ncid;          
-     int  rh_id;         
+     int  status;
+     int  ncid;
+     int  rh_id;
      static double rh_range[] = {0.0, 100.0};
      static char title[] = "example netCDF dataset";
         ...
      status = nc_open("foo.nc", NC_WRITE, &ncid);
      if (status != NC_NOERR) handle_error(status);
         ...
-     status = nc_redef(ncid);                
+     status = nc_redef(ncid);
      if (status != NC_NOERR) handle_error(status);
      status = nc_inq_varid (ncid, "rh", &rh_id);
      if (status != NC_NOERR) handle_error(status);
@@ -217,7 +217,7 @@ netCDF dataset named foo.nc:
                                strlen(title), title)
      if (status != NC_NOERR) handle_error(status);
         ...
-     status = nc_enddef(ncid);               
+     status = nc_enddef(ncid);
      if (status != NC_NOERR) handle_error(status);
 \endcode
 */
@@ -229,7 +229,7 @@ nc_put_att(int ncid, int varid, const char *name, nc_type xtype,
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return ncp->dispatch->put_att(ncid, varid, name, xtype, len, 
+   return ncp->dispatch->put_att(ncid, varid, name, xtype, len,
 				 value, xtype);
 }
 
@@ -240,7 +240,7 @@ nc_put_att_schar(int ncid, int varid, const char *name,
    NC *ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return ncp->dispatch->put_att(ncid, varid, name, xtype, len, 
+   return ncp->dispatch->put_att(ncid, varid, name, xtype, len,
 				 (void *)value, NC_BYTE);
 }
 
@@ -262,7 +262,7 @@ nc_put_att_short(int ncid, int varid, const char *name,
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return ncp->dispatch->put_att(ncid, varid, name, xtype, len, 
+   return ncp->dispatch->put_att(ncid, varid, name, xtype, len,
 				 (void *)value, NC_SHORT);
 }
 
@@ -345,7 +345,7 @@ nc_put_att_uint(int ncid, int varid, const char *name,
 
 int
 nc_put_att_longlong(int ncid, int varid, const char *name,
-		    nc_type xtype, size_t len, 
+		    nc_type xtype, size_t len,
 		    const long long *value)
 {
    NC* ncp;
@@ -357,7 +357,7 @@ nc_put_att_longlong(int ncid, int varid, const char *name,
 
 int
 nc_put_att_ulonglong(int ncid, int varid, const char *name,
-		     nc_type xtype, size_t len, 
+		     nc_type xtype, size_t len,
 		     const unsigned long long *value)
 {
    NC* ncp;

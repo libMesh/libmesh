@@ -20,7 +20,7 @@
 #define DIMSCALE_LABEL "dimscale_label"
 #define STR_LEN 255
 
-herr_t alien_visitor(hid_t did, unsigned dim, hid_t dsid, 
+herr_t alien_visitor(hid_t did, unsigned dim, hid_t dsid,
 		     void *visitor_data)
 {
    char name1[STR_LEN];
@@ -31,7 +31,7 @@ herr_t alien_visitor(hid_t did, unsigned dim, hid_t dsid,
     * is attached to. */
    if (H5Iget_name(did, name1, STR_LEN) < 0) ERR;
    if (strcmp(&name1[1], VAR1_NAME)) ERR;
-   
+
    /* Get more info on the dimscale object.*/
    if (H5Gget_objinfo(dsid, ".", 1, &statbuf) < 0) ERR;
    objid->fileno[0] = statbuf.fileno[0];
@@ -63,7 +63,7 @@ main()
 {
    printf("\n*** Checking HDF5 dimscales some more.\n");
    printf("*** Creating a file with one var with one dimension scale...");
-   
+
    {
       hid_t fileid, spaceid, datasetid, dimscaleid, cparmsid;
       hsize_t dims[NDIMS] = {DIM1_LEN}, maxdims[NDIMS] = {H5S_UNLIMITED};
@@ -117,7 +117,7 @@ main()
 
       /* Open the file. */
       if ((fileid = H5Fopen(FILE_NAME, H5F_ACC_RDWR, H5P_DEFAULT)) < 0) ERR;
-      
+
       /* Loop through objects in the root group. */
       if (H5Gget_num_objs(fileid, &num_obj) < 0) ERR;
       for (i=0; i<num_obj; i++)
@@ -173,7 +173,7 @@ main()
 		      vars_dimscale_obj.objno[0] != dimscale_obj.objno[0] ||
 		      vars_dimscale_obj.fileno[1] != dimscale_obj.fileno[1] ||
 		      vars_dimscale_obj.objno[1] != dimscale_obj.objno[1]) ERR;
-		  
+
 		  /* There's also a label for dimension 0. */
 		  if (H5DSget_label(datasetid, 0, label, STR_LEN) < 0) ERR;
 	       }
@@ -195,7 +195,7 @@ main()
 
    SUMMARIZE_ERR;
    printf("*** Creating a file with one var with two dimension scales...");
-   
+
    {
 #define LAT_LEN 3
 #define LON_LEN 2
@@ -203,7 +203,7 @@ main()
 #define LAT_NAME "lat"
 #define LON_NAME "lon"
 #define PRES_NAME "pres"
-      
+
       hid_t fileid, lat_spaceid, lon_spaceid, pres_spaceid;
       hid_t pres_datasetid, lat_dimscaleid, lon_dimscaleid;
       hsize_t dims[DIMS_2];
@@ -266,7 +266,7 @@ main()
 
       /* Open the file. */
       if ((fileid = H5Fopen(FILE_NAME, H5F_ACC_RDWR, H5P_DEFAULT)) < 0) ERR;
-      
+
       /* Loop through objects in the root group. */
       if (H5Gget_num_objs(fileid, &num_obj) < 0) ERR;
       for (i=0; i<num_obj; i++)
@@ -352,7 +352,7 @@ main()
 #define U1_NAME "u1"
 #define U2_NAME "u2"
 #define VNAME "v1"
-      
+
       hid_t fapl_id, fcpl_id, grpid, plistid, plistid2;
       hid_t fileid, lat_spaceid, lon_spaceid, pres_spaceid;
       hid_t pres_datasetid, lat_dimscaleid, lon_dimscaleid;
@@ -371,7 +371,7 @@ main()
       /* Create file access and create property lists. */
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
-      
+
       /* Set latest_format in access propertly list. This ensures that
        * the latest, greatest, HDF5 versions are used in the file. */
       if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) ERR;
@@ -445,7 +445,7 @@ main()
       /* Open the file. */
       if ((fileid = H5Fopen(FILE_NAME, H5F_ACC_RDWR, H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gopen2(fileid, "/", H5P_DEFAULT)) < 0) ERR;
-      
+
       /* Loop through objects in the root group. */
       if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
 
@@ -543,7 +543,7 @@ main()
 	 if (dataset_ndims != 1 || h5dimlen[0] != 0 || h5dimlenmax[0] != H5S_UNLIMITED) ERR;
 	 if (H5Dclose(datasetid) ||
 	     H5Sclose(spaceid1)) ERR;
-	 
+
 	 /* Check V1. */
 	 if ((datasetid = H5Dopen1(grpid, VNAME)) < 0) ERR;
 	 if ((spaceid1 = H5Dget_space(datasetid)) < 0) ERR;
@@ -641,7 +641,7 @@ main()
    }
    SUMMARIZE_ERR;
    printf("*** Checking dimension scales with attached dimension scales...");
-   
+
    {
 #define LAT_LEN 3
 #define LON_LEN 2
@@ -654,7 +654,7 @@ main()
 #define PRES_NAME1 "z_pres"
 #define TIME_NAME "time"
 #define LEN_NAME "u_len"
-      
+
       hid_t fileid, lat_spaceid, lon_spaceid, time_spaceid, pres_spaceid, len_spaceid;
       hid_t pres_datasetid, lat_dimscaleid, lon_dimscaleid, time_dimscaleid, len_dimscaleid;
       hid_t fapl_id, fcpl_id;
@@ -674,7 +674,7 @@ main()
       /* Create file access and create property lists. */
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
-      
+
       /* Set latest_format in access propertly list. This ensures that
        * the latest, greatest, HDF5 versions are used in the file. */
       if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) ERR;
@@ -747,7 +747,7 @@ main()
 
       /* Open the file. */
       if ((fileid = H5Fopen(FILE_NAME, H5F_ACC_RDWR, H5P_DEFAULT)) < 0) ERR;
-      
+
       /* Loop through objects in the root group. */
       if (H5Gget_num_objs(fileid, &num_obj) < 0) ERR;
       for (i=0; i<num_obj; i++)
@@ -826,7 +826,7 @@ main()
 
    SUMMARIZE_ERR;
    printf("*** Checking cration ordering of datasets which are also dimension scales...");
-   
+
    {
 #define LAT_LEN 3
 #define LON_LEN 2
@@ -839,7 +839,7 @@ main()
 #define PRES_NAME1 "z_pres"
 #define TIME_NAME "time"
 #define LEN_NAME "u_len"
-      
+
       hid_t fileid, lat_spaceid, lon_spaceid, time_spaceid, pres_spaceid, len_spaceid;
       hid_t pres_datasetid, lat_dimscaleid, lon_dimscaleid, time_dimscaleid, len_dimscaleid;
       hid_t fapl_id, fcpl_id;
@@ -859,7 +859,7 @@ main()
       /* Create file access and create property lists. */
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
-      
+
       /* Set latest_format in access propertly list. This ensures that
        * the latest, greatest, HDF5 versions are used in the file. */
       if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) ERR;
@@ -932,7 +932,7 @@ main()
 
       /* Open the file. */
       if ((fileid = H5Fopen(FILE_NAME, H5F_ACC_RDWR, H5P_DEFAULT)) < 0) ERR;
-      
+
       /* Loop through objects in the root group. */
       if (H5Gget_num_objs(fileid, &num_obj) < 0) ERR;
       for (i=0; i<num_obj; i++)

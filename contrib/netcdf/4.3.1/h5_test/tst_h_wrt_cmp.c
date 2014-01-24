@@ -2,7 +2,7 @@
    Copyright 2007 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test HDF5 compound types. 
+   Test HDF5 compound types.
 */
 
 #include "h5_err_macros.h"
@@ -20,7 +20,7 @@ main()
    hid_t datasetid;
    hsize_t dims[1];
    char dummy[] = "                                 ";
-   struct s1 
+   struct s1
    {
       unsigned char c1;
       double d;
@@ -42,11 +42,11 @@ main()
 
    printf("\n*** Checking HDF5 compound types (even more so).\n");
    printf("*** Checking packing of HDF5 compound types...");
-   
+
    /* Open file and create group. */
    if ((access_plist = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
    if (H5Pset_fclose_degree(access_plist, H5F_CLOSE_STRONG)) ERR;
-   if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+   if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			   access_plist)) < 0) ERR;
 
    /* Create a simple compound type. */
@@ -60,11 +60,11 @@ main()
    if ((spaceid = H5Screate_simple(1, dims, dims)) < 0) ERR;
 
    /* Create a dataset of this compound type. */
-   if ((datasetid = H5Dcreate(fileid, VAR_NAME, typeid, spaceid, 
+   if ((datasetid = H5Dcreate(fileid, VAR_NAME, typeid, spaceid,
 			      H5P_DEFAULT)) < 0) ERR;
 
    /* Write some data. */
-   if (H5Dwrite(datasetid, typeid, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+   if (H5Dwrite(datasetid, typeid, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		data) < 0) ERR;
 
    /* Release all resources. */

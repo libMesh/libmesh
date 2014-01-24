@@ -2,7 +2,7 @@
    Copyright 2005 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test internal netcdf-4 file code. 
+   Test internal netcdf-4 file code.
    $Id: tst_files.c,v 1.42 2010/05/18 12:30:05 ed Exp $
 */
 
@@ -33,7 +33,7 @@ main(int argc, char **argv)
    printf("\n*** Testing netcdf-4 file functions.\n");
    {
       char str[NC_MAX_NAME+1];
-      
+
       /* Actually we never make any promises about the length of the
        * version string, but it is always smaller than NC_MAX_NAME. */
       if (strlen(nc_inq_libvers()) > NC_MAX_NAME) ERR;
@@ -47,7 +47,7 @@ main(int argc, char **argv)
 
       /* Make sure bad create mode causes failure. */
       /*if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;*/
-      
+
       /* Create an empty file. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_close(ncid)) ERR;
@@ -105,7 +105,7 @@ main(int argc, char **argv)
       if (nc_close(ncid)) ERR;
       if (nc_close(ncid2)) ERR;
       if (nc_close(ncid3)) ERR;
-      
+
       /* Open and close empty file. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_close(ncid)) ERR;
@@ -334,7 +334,7 @@ main(int argc, char **argv)
 	 if (nc_def_var(ncid[f], VAR_NAME, NC_CHAR, NDIMS, &dimid, &varid)) ERR;
 	 if (f % 2 == 0)
 	    if (nc_def_var_chunking(ncid[f], varid, 0, chunks)) ERR;
-	 
+
 	 /* Write one time to the coordinate variable. */
 	 count[0] = TEXT_LEN + 1;
 	 if (nc_put_vara_text(ncid[f], varid, index, count, ttext)) ERR;
@@ -377,7 +377,7 @@ main(int argc, char **argv)
 #define NEW_CACHE_PREEMPTION .75
 
 int
-test_redef(int format)   
+test_redef(int format)
 {
    int ncid, varid, dimids[REDEF_NDIMS], dimids_in[REDEF_NDIMS];
    int ndims, nvars, natts, unlimdimid;
@@ -403,14 +403,14 @@ test_redef(int format)
       cflags |= NC_NETCDF4;
 
    /* Change chunk cache. */
-   if (nc_set_chunk_cache(NEW_CACHE_SIZE, NEW_CACHE_NELEMS, 
+   if (nc_set_chunk_cache(NEW_CACHE_SIZE, NEW_CACHE_NELEMS,
 			  NEW_CACHE_PREEMPTION)) ERR;
 
    /* Create a file with two dims, two vars, and two atts. */
    if (nc_create(FILE_NAME, cflags|NC_CLOBBER, &ncid)) ERR;
 
    /* Retrieve the chunk cache settings, just for fun. */
-   if (nc_get_chunk_cache(&cache_size_in, &cache_nelems_in, 
+   if (nc_get_chunk_cache(&cache_size_in, &cache_nelems_in,
 			  &cache_preemption_in)) ERR;
    if (cache_size_in != NEW_CACHE_SIZE || cache_nelems_in != NEW_CACHE_NELEMS ||
        cache_preemption_in != NEW_CACHE_PREEMPTION) ERR;
@@ -418,7 +418,7 @@ test_redef(int format)
    /* This will fail, except for netcdf-4/hdf5, which permits any
     * name. */
    if (format != NC_FORMAT_NETCDF4)
-      if (nc_def_dim(ncid, REDEF_NAME_ILLEGAL, REDEF_DIM2_LEN, 
+      if (nc_def_dim(ncid, REDEF_NAME_ILLEGAL, REDEF_DIM2_LEN,
 			    &dimids[1]) != NC_EBADNAME) ERR;
 
    if (nc_def_dim(ncid, REDEF_DIM1_NAME, REDEF_DIM1_LEN, &dimids[0])) ERR;
@@ -432,10 +432,10 @@ test_redef(int format)
    if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
    if (ndims != REDEF_NDIMS || nvars != 2 || natts != 2 || unlimdimid != -1) ERR;
    if (nc_inq_var(ncid, 0, var_name, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-   if (strcmp(var_name, REDEF_VAR1_NAME) || xtype_in != NC_INT || ndims != REDEF_NDIMS || 
+   if (strcmp(var_name, REDEF_VAR1_NAME) || xtype_in != NC_INT || ndims != REDEF_NDIMS ||
        dimids_in[0] != dimids[0] || dimids_in[1] != dimids[1]) ERR;
    if (nc_inq_var(ncid, 1, var_name, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-   if (strcmp(var_name, REDEF_VAR2_NAME) || xtype_in != NC_BYTE || ndims != REDEF_NDIMS || 
+   if (strcmp(var_name, REDEF_VAR2_NAME) || xtype_in != NC_BYTE || ndims != REDEF_NDIMS ||
        dimids_in[0] != dimids[0] || dimids_in[1] != dimids[1]) ERR;
 
    /* Close it up. */
@@ -448,14 +448,14 @@ test_redef(int format)
    if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
    if (ndims != REDEF_NDIMS || nvars != 2 || natts != 2 || unlimdimid != -1) ERR;
    if (nc_inq_var(ncid, 0, var_name, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-   if (strcmp(var_name, REDEF_VAR1_NAME) || xtype_in != NC_INT || ndims != REDEF_NDIMS || 
+   if (strcmp(var_name, REDEF_VAR1_NAME) || xtype_in != NC_INT || ndims != REDEF_NDIMS ||
        dimids_in[0] != dimids[0] || dimids_in[1] != dimids[1]) ERR;
    if (nc_inq_var(ncid, 1, var_name, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-   if (strcmp(var_name, REDEF_VAR2_NAME) || xtype_in != NC_BYTE || ndims != REDEF_NDIMS || 
+   if (strcmp(var_name, REDEF_VAR2_NAME) || xtype_in != NC_BYTE || ndims != REDEF_NDIMS ||
        dimids_in[0] != dimids[0] || dimids_in[1] != dimids[1]) ERR;
 
    /* This will fail. */
-   ret = nc_def_var(ncid, REDEF_VAR3_NAME, NC_UBYTE, REDEF_NDIMS, 
+   ret = nc_def_var(ncid, REDEF_VAR3_NAME, NC_UBYTE, REDEF_NDIMS,
 			  dimids, &varid);
    if(format == NC_FORMAT_NETCDF4) {
 	if(ret != NC_EPERM) {
@@ -468,7 +468,7 @@ test_redef(int format)
    }
    /* This will fail. */
    if (!nc_put_att_uchar(ncid, NC_GLOBAL, REDEF_ATT3_NAME, NC_CHAR, 1, &uchar_out)) ERR;
-   if (nc_close(ncid)) ERR;      
+   if (nc_close(ncid)) ERR;
 
    /* Make sure we can't redef a file opened for NOWRITE. */
    if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
@@ -478,13 +478,13 @@ test_redef(int format)
    if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
    if (ndims != REDEF_NDIMS || nvars != 2 || natts != 2 || unlimdimid != -1) ERR;
    if (nc_inq_var(ncid, 0, var_name, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-   if (strcmp(var_name, REDEF_VAR1_NAME) || xtype_in != NC_INT || ndims != REDEF_NDIMS || 
+   if (strcmp(var_name, REDEF_VAR1_NAME) || xtype_in != NC_INT || ndims != REDEF_NDIMS ||
        dimids_in[0] != dimids[0] || dimids_in[1] != dimids[1]) ERR;
    if (nc_inq_var(ncid, 1, var_name, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-   if (strcmp(var_name, REDEF_VAR2_NAME) || xtype_in != NC_BYTE || ndims != REDEF_NDIMS || 
+   if (strcmp(var_name, REDEF_VAR2_NAME) || xtype_in != NC_BYTE || ndims != REDEF_NDIMS ||
        dimids_in[0] != dimids[0] || dimids_in[1] != dimids[1]) ERR;
 
-   if (nc_close(ncid)) ERR;      
+   if (nc_close(ncid)) ERR;
 
    /* Reopen the file and check it, add a variable and attribute. */
    if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
@@ -506,16 +506,16 @@ test_redef(int format)
    if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
    if (ndims != REDEF_NDIMS || nvars != 3 || natts != 3 || unlimdimid != -1) ERR;
    if (nc_inq_var(ncid, 0, var_name, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-   if (strcmp(var_name, REDEF_VAR1_NAME) || xtype_in != NC_INT || ndims != REDEF_NDIMS || 
+   if (strcmp(var_name, REDEF_VAR1_NAME) || xtype_in != NC_INT || ndims != REDEF_NDIMS ||
        dimids_in[0] != dimids[0] || dimids_in[1] != dimids[1]) ERR;
    if (nc_inq_var(ncid, 1, var_name, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-   if (strcmp(var_name, REDEF_VAR2_NAME) || xtype_in != NC_BYTE || ndims != REDEF_NDIMS || 
+   if (strcmp(var_name, REDEF_VAR2_NAME) || xtype_in != NC_BYTE || ndims != REDEF_NDIMS ||
        dimids_in[0] != dimids[0] || dimids_in[1] != dimids[1]) ERR;
    if (nc_inq_var(ncid, 2, var_name, &var_type, &ndims, dimids_var, &natts)) ERR;
    if (ndims != REDEF_NDIMS || strcmp(var_name, REDEF_VAR3_NAME) || var_type != NC_BYTE ||
        natts != 0) ERR;
 
-   if (nc_close(ncid)) ERR;      
+   if (nc_close(ncid)) ERR;
 
    /* Reopen it and check each dim, var, and att. */
    if (nc_open(FILE_NAME, 0, &ncid)) ERR;
@@ -541,9 +541,9 @@ test_redef(int format)
       if (ret != NC_ERANGE) ERR;
    }
    else if (ret) ERR;
-	 
+
    if (uchar_in != uchar_out) ERR;
-   if (nc_close(ncid)) ERR;      
+   if (nc_close(ncid)) ERR;
    return NC_NOERR;
 }
 

@@ -37,7 +37,7 @@ computecdfnodesets3(NCDAPCOMMON* nccomm, CDFtree* tree)
     NClist* allnodes;
 
     allnodes = tree->nodes;
-    varnodes = nclistnew(); 
+    varnodes = nclistnew();
 
     if(tree->seqnodes == NULL) tree->seqnodes = nclistnew();
     if(tree->gridnodes == NULL) tree->gridnodes = nclistnew();
@@ -229,7 +229,7 @@ NCerror
 sequencecheck3(NCDAPCOMMON* nccomm)
 {
     (void)sequencecheck3r(nccomm->cdf.ddsroot,
-                          nccomm->cdf.ddsroot->tree->varnodes,NULL);    
+                          nccomm->cdf.ddsroot->tree->varnodes,NULL);
     return NC_NOERR;
 }
 
@@ -487,7 +487,7 @@ findin(CDFnode* parent, CDFnode* child)
    this occurs because some servers (that means you ferret and you thredds!)
    do not adhere to the DAP2 protocol spec.
 */
-  
+
 static CDFnode*
 makenewstruct3(CDFnode* node, CDFnode* templatenode)
 {
@@ -533,7 +533,7 @@ mapnodes3r(CDFnode* connode, CDFnode* fullnode, int depth)
     NCerror ncstat = NC_NOERR;
 
     ASSERT((simplenodematch34(connode,fullnode)));
-    
+
 #ifdef DEBUG
   {
 char* path1 = makecdfpathstring3(fullnode,".");
@@ -601,7 +601,7 @@ unmap3(CDFnode* root)
     }
 }
 
-/* 
+/*
 Move dimension data from basenodes to nodes
 */
 
@@ -634,7 +634,7 @@ fprintf(stderr,"dimimprint %s/%d -> %s/%d\n",
         for(j=0;j<noderank;j++) {
 	    CDFnode* dim = (CDFnode*)nclistget(node->array.dimset0,j);
 	    CDFnode* basedim = (CDFnode*)nclistget(basenode->array.dimset0,j);
-	    dim->dim.declsize0 = basedim->dim.declsize;	
+	    dim->dim.declsize0 = basedim->dim.declsize;
 #ifdef DEBUG
 fprintf(stderr,"dimimprint: %d: %lu -> %lu\n",i,basedim->dim.declsize,dim->dim.declsize0);
 #endif
@@ -800,7 +800,7 @@ definedimsets3(NCDAPCOMMON* nccomm, CDFtree* tree)
 	ASSERT((rankednode->array.dimsetplus != NULL));
 	ncstat = definedimsetall3(nccomm,rankednode);
 	if(ncstat != NC_NOERR) return ncstat;
-    }     
+    }
     return NC_NOERR;
 }
 

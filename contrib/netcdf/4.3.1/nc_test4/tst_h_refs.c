@@ -4,7 +4,7 @@
 
    This program tests fixes for reading netCDF-4 files that contain
    datasets with reference datatypes.  The netCDF-4 library should ignore
-   the datasets & attributes that have reference datatypes and allow the 
+   the datasets & attributes that have reference datatypes and allow the
    rest of the file to be accessed.
 */
 
@@ -28,10 +28,10 @@ main()
 	hid_t attid, dsetid;
 
 	if ((scalar_spaceid = H5Screate(H5S_SCALAR)) < 0) ERR;
-	
+
 	/* Create new file, using default properties. */
 	if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) ERR;
-	
+
 
         /* Create dataset with reference datatype */
         if ((dsetid = H5Dcreate2(fileid, REF_VAR_NAME, H5T_STD_REF_OBJ, scalar_spaceid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) ERR;

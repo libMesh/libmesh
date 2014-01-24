@@ -198,7 +198,7 @@ ocset_ssl(OCstate* state)
             if(cstat != CURLE_OK) goto fail;
 	    OCDBG1(1,"CURLOPT_SSL_VERIFYPEER=%d",ssl->verifypeer);
         }
-    }    
+    }
     return OC_NOERR;
 
 fail:

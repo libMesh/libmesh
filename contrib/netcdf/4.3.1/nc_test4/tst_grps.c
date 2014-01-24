@@ -2,7 +2,7 @@
    Copyright 2005 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test netcdf-4 group code. 
+   Test netcdf-4 group code.
    $Id: tst_grps.c,v 1.37 2010/04/07 15:21:28 ed Exp $
 */
 
@@ -53,7 +53,7 @@ main(int argc, char **argv)
       if (ncid_in != henry_vii_id) ERR;
       if (nc_inq_ncid(ncid, MARGARET, &ncid_in) != NC_ENOGRP) ERR;
       if (nc_close(ncid)) ERR;
-   
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_grp_parent(ncid, &parent_ncid) != NC_ENOGRP) ERR;
@@ -119,7 +119,7 @@ main(int argc, char **argv)
       if (nc_def_var(henry_vii_id, VAR_NAME1, NC_INT64, NDIMS_IN_VAR, &dimid1, &varid1)) ERR;
       if (nc_def_var(henry_vii_id, VAR_NAME2, NC_INT64, NDIMS_IN_VAR, &dimid1, &varid2)) ERR;
       if (nc_def_var(henry_vii_id, VAR_NAME3, NC_INT64, NDIMS_IN_VAR, &dimid2, &varid3)) ERR;
-   
+
       /* Check it out. Find the group by name. */
       if (nc_inq_ncid(ncid, HENRY_VII, &grpid_in)) ERR;
 
@@ -404,7 +404,7 @@ main(int argc, char **argv)
       if (nc_close(ncid)) ERR;
    }
    SUMMARIZE_ERR;
-   
+
    printf("*** testing more group attributes...");
    {
       int ncid, num_grps, dynasty, ncid_in;
@@ -420,23 +420,23 @@ main(int argc, char **argv)
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_def_grp(ncid, DYNASTY, &tudor_id)) ERR;
       if (nc_def_grp(tudor_id, HENRY_VII, &henry_vii_id)) ERR;
-      if (nc_put_att_int(henry_vii_id, NC_GLOBAL, NUM_CASTLES_NAME, NC_INT, 
+      if (nc_put_att_int(henry_vii_id, NC_GLOBAL, NUM_CASTLES_NAME, NC_INT,
 			 1, &num_castles_henry_vii)) ERR;
       if (nc_def_grp(tudor_id, MARGARET, &margaret_id)) ERR;
-      if (nc_put_att_int(margaret_id, NC_GLOBAL, NUM_CASTLES_NAME, NC_INT, 
+      if (nc_put_att_int(margaret_id, NC_GLOBAL, NUM_CASTLES_NAME, NC_INT,
 			 1, &num_castles_margaret)) ERR;
       if (nc_def_grp(tudor_id, JAMES_V_OF_SCOTLAND, &james_v_of_scotland_id)) ERR;
-      if (nc_put_att_int(james_v_of_scotland_id, NC_GLOBAL, NUM_CASTLES_NAME, NC_INT, 
+      if (nc_put_att_int(james_v_of_scotland_id, NC_GLOBAL, NUM_CASTLES_NAME, NC_INT,
 			 1, &num_castles_james_v)) ERR;
       if (nc_def_grp(tudor_id, MARY_I_OF_SCOTLAND, &mary_i_of_scotland_id)) ERR;
-      if (nc_put_att_int(mary_i_of_scotland_id, NC_GLOBAL, NUM_CASTLES_NAME, NC_INT, 
+      if (nc_put_att_int(mary_i_of_scotland_id, NC_GLOBAL, NUM_CASTLES_NAME, NC_INT,
 			 1, &num_castles_mary_i)) ERR;
-      if (nc_def_grp(tudor_id, JAMES_VI_OF_SCOTLAND_AND_I_OF_ENGLAND, 
+      if (nc_def_grp(tudor_id, JAMES_VI_OF_SCOTLAND_AND_I_OF_ENGLAND,
 		     &james_i_of_england_id)) ERR;
-      if (nc_put_att_int(james_i_of_england_id, NC_GLOBAL, NUM_CASTLES_NAME, 
+      if (nc_put_att_int(james_i_of_england_id, NC_GLOBAL, NUM_CASTLES_NAME,
 			 NC_INT, 1, &num_castles_james_vi)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Make sure we've got all the tudors where we want them. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_grps(ncid, &num_grps, &dynasty)) ERR;
@@ -480,7 +480,7 @@ main(int argc, char **argv)
       if (nc_close(ncid)) ERR;
 
       /* Now check the file to see if the dimension is there. */
-      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;      
+      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_grps(ncid, &num_grps, &dynasty)) ERR;
       if (num_grps != 1) ERR;
       if (nc_inq_grpname(dynasty, name_in)) ERR;
@@ -518,12 +518,12 @@ main(int argc, char **argv)
 
       /* Now check the file to see if the dimension and variable are
        * there. */
-      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;      
+      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_grps(ncid, &num_grps, &dynasty)) ERR;
       if (num_grps != 1) ERR;
       if (nc_inq_dim(dynasty, 0, name_in, &len_in)) ERR;
       if (strcmp(name_in, DIM1_NAME) || len_in != DIM1_LEN) ERR;
-      if (nc_inq_var(dynasty, 0, name_in, &xtype_in, &ndims_in, dimids_in, 
+      if (nc_inq_var(dynasty, 0, name_in, &xtype_in, &ndims_in, dimids_in,
 		     &natts_in)) ERR;
       if (strcmp(name_in, VAR1_NAME) || xtype_in != NC_INT || ndims_in != 1 ||
 	  dimids_in[0] != 0 || natts_in != 0) ERR;
@@ -544,7 +544,7 @@ main(int argc, char **argv)
 
       /* Now check the file to see if the dimension and variable are
        * there. */
-      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;      
+      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_grps(ncid, &num_grps, NULL)) ERR;
       if (num_grps) ERR;
       if (nc_close(ncid)) ERR;
@@ -608,7 +608,7 @@ main(int argc, char **argv)
       {
 	 if (nc_inq_dim(grpids_in[i], i, name_in, &len_in)) ERR;
 	 if (strcmp(name_in, DIM1_NAME) || len_in != DIM1_LEN) ERR;
-	 if (nc_inq_var(grpids_in[i], 0, name_in, &xtype_in, &ndims_in, dimids_in, 
+	 if (nc_inq_var(grpids_in[i], 0, name_in, &xtype_in, &ndims_in, dimids_in,
 			&natts_in)) ERR;
 	 if (strcmp(name_in, VAR1_NAME) || xtype_in != NC_INT || ndims_in != 1 ||
 	     dimids_in[0] != i || natts_in != 0) ERR;
@@ -620,7 +620,7 @@ main(int argc, char **argv)
       if (nc_close(ncid)) ERR;
 
       /* Reopen. */
-      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;      
+      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
 
       /* Check it out. */
       if (nc_inq_grps(ncid, &num_grps, &dynasty)) ERR;
@@ -633,7 +633,7 @@ main(int argc, char **argv)
 	  * dimid is not i. */
 	 /*if (nc_inq_dim(grpids_in[i], i, name_in, &len_in)) ERR;
 	   if (strcmp(name_in, DIM1_NAME) || len_in != DIM1_LEN) ERR;*/
-	 if (nc_inq_var(grpids_in[i], 0, name_in, &xtype_in, &ndims_in, dimids_in, 
+	 if (nc_inq_var(grpids_in[i], 0, name_in, &xtype_in, &ndims_in, dimids_in,
 			&natts_in)) ERR;
 	 if (strcmp(name_in, VAR1_NAME) || xtype_in != NC_INT || ndims_in != 1 ||
 	     natts_in != 0) ERR;
@@ -673,12 +673,12 @@ main(int argc, char **argv)
       if (nc_def_grp(ncid, HENRY_VII, &henry_vii_id)) ERR;
       if (nc_def_var(henry_vii_id, VAR1_NAME, NC_INT, 1, &dimid, &varid)) ERR;
       if (nc_put_var_int(henry_vii_id, varid, data_out)) ERR;
-      
+
       /* Done! */
       if (nc_close(ncid)) ERR;
 
       /* Reopen the file. */
-      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;      
+      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
 
       /* Check the file. */
       if (nc_inq_grps(ncid, &num_grps, &henry_vii_id)) ERR;
@@ -687,7 +687,7 @@ main(int argc, char **argv)
       if (num_grps != 0) ERR;
       if (nc_inq(henry_vii_id, &ndims_in, &nvars_in, &natts_in, &unlimdimid_in)) ERR;
       if (ndims_in != 0 || nvars_in != 1 || natts_in != 0 || unlimdimid_in != -1) ERR;
-      if (nc_inq_var(henry_vii_id, 0, name_in, &xtype_in, &ndims_in, dimids_in, 
+      if (nc_inq_var(henry_vii_id, 0, name_in, &xtype_in, &ndims_in, dimids_in,
 		     &natts_in)) ERR;
       if (strcmp(name_in, VAR1_NAME) || xtype_in != NC_INT || ndims_in != 1 ||
 	  dimids_in[0] != dimid || natts_in != 0) ERR;
@@ -738,7 +738,7 @@ main(int argc, char **argv)
       if (nc_def_grp(tudor_id, HENRY_VII, &henry_vii_id)) ERR;
       if (nc_def_var(henry_vii_id, VAR1_NAME, NC_INT, 1, &dimid, &varid)) ERR;
       if (nc_put_var_int(henry_vii_id, varid, data_out)) ERR;
-      
+
       /* Define a MARGARET group. */
       if (nc_def_grp(tudor_id, MARGARET, &margaret_id)) ERR;
       if (nc_def_var(margaret_id, VAR1_NAME, NC_INT, 1, &dimid, &varid)) ERR;
@@ -763,7 +763,7 @@ main(int argc, char **argv)
       if (nc_close(ncid)) ERR;
 
       /* Reopen the file. */
-      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;      
+      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
 
       /* Check the file. */
       if (nc_inq_grps(ncid, &num_grps, &dynasty)) ERR;
@@ -774,7 +774,7 @@ main(int argc, char **argv)
       {
 	 if (nc_inq(grpids_in[i], &ndims_in, &nvars_in, &natts_in, &unlimdimid_in)) ERR;
 	 if (ndims_in != 0 || nvars_in != 1 || natts_in != 0 || unlimdimid_in != -1) ERR;
-	 if (nc_inq_var(grpids_in[i], 0, name_in, &xtype_in, &ndims_in, dimids_in, 
+	 if (nc_inq_var(grpids_in[i], 0, name_in, &xtype_in, &ndims_in, dimids_in,
 			&natts_in)) ERR;
 	 if (strcmp(name_in, VAR1_NAME) || xtype_in != NC_INT || ndims_in != 1 ||
 	     dimids_in[0] != dimid || natts_in != 0) ERR;
@@ -818,7 +818,7 @@ main(int argc, char **argv)
       dimids[0] = year_did;
       dimids[1] = kingdom_did;
       if (nc_def_var(henry_vii_id, VAR1_NAME, NC_UINT64, 2, dimids, &varid)) ERR;
-      if (nc_inq_var(henry_vii_id, varid, name_in, &xtype_in, &ndims_in, 
+      if (nc_inq_var(henry_vii_id, varid, name_in, &xtype_in, &ndims_in,
 		     dimids_in, &natts_in)) ERR;
       if (strcmp(name_in, VAR1_NAME) || xtype_in != NC_UINT64 || ndims_in != 2 ||
 	  dimids_in[0] != year_did || dimids_in[1] != kingdom_did ||
@@ -826,9 +826,9 @@ main(int argc, char **argv)
 
       /* Close the file. */
       if (nc_close(ncid)) ERR;
-      
+
       /* Reopen the file. */
-      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;      
+      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
 
       /* Find our group. */
       if (nc_inq_grps(ncid, &numgrps, grpids_in)) ERR;
@@ -837,14 +837,14 @@ main(int argc, char **argv)
       if (nc_inq_grps(parent_id, &numgrps, grpids_in)) ERR;
       if (numgrps != 1) ERR;
       henry_vii_id = grpids_in[0];
-      if (nc_inq_var(henry_vii_id, varid, name_in, &xtype_in, &ndims_in, 
+      if (nc_inq_var(henry_vii_id, varid, name_in, &xtype_in, &ndims_in,
 		     dimids_in, &natts_in)) ERR;
       if (strcmp(name_in, VAR1_NAME) || xtype_in != NC_UINT64 || ndims_in != 2 ||
 	  dimids_in[0] != year_did || dimids_in[1] != kingdom_did ||
 	  natts_in != 0) ERR;
       /* Close the file. */
       if (nc_close(ncid)) ERR;
-      
+
    }
    SUMMARIZE_ERR;
    printf("*** testing groups and unlimited dimensions...");
@@ -882,7 +882,7 @@ main(int argc, char **argv)
       if (num_grps != 1) ERR;
       if (nc_inq_dim(grpids_in[0], 0, name_in, &len_in)) ERR;
       if (strcmp(name_in, DIM1_NAME) || len_in != DIM1_LEN) ERR;
-      if (nc_inq_var(grpids_in[0], 0, name_in, &xtype_in, &ndims_in, dimids_in, 
+      if (nc_inq_var(grpids_in[0], 0, name_in, &xtype_in, &ndims_in, dimids_in,
 		     &natts_in)) ERR;
       if (strcmp(name_in, VAR1_NAME) || xtype_in != NC_INT || ndims_in != 1 ||
 	  dimids_in[0] != 0 || natts_in != 0) ERR;
@@ -910,7 +910,7 @@ main(int argc, char **argv)
       int dimid, varid;
       int var_dims[VAR_RANK];
       int g1id, g2id, g3id;
-    
+
       /* Create a file with nested groups. */
       if (nc_create(FILE_NAME, NC_CLOBBER | NC_NETCDF4, &ncid)) ERR;
       /* At root level define dim, var, atts */
@@ -918,16 +918,16 @@ main(int argc, char **argv)
       var_dims[0] = dimid;
       if (nc_def_var(ncid, VAR_NAME, NC_FLOAT, VAR_RANK, var_dims, &varid)) ERR;
       if (nc_put_att_text(ncid, varid, ATT_NAME, strlen(ATT_VAL), ATT_VAL)) ERR;
-      if (nc_put_att_text(ncid, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL), 
+      if (nc_put_att_text(ncid, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL),
 			  GATT_VAL)) ERR;
-    
+
       /* put dim, var, atts with same names in a group */
       if (nc_def_grp(ncid, G1_NAME, &g1id)) ERR;
       if (nc_def_dim(g1id, DIM_NAME, DIM_LEN, &dimid)) ERR;
       var_dims[0] = dimid;
       if (nc_def_var(g1id, VAR_NAME, NC_FLOAT, VAR_RANK, var_dims, &varid)) ERR;
       if (nc_put_att_text(g1id, varid, ATT_NAME, strlen(ATT_VAL), ATT_VAL)) ERR;
-      if (nc_put_att_text(g1id, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL), 
+      if (nc_put_att_text(g1id, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL),
 			  GATT_VAL)) ERR;
       if (nc_enddef(g1id)) ERR;
 
@@ -937,17 +937,17 @@ main(int argc, char **argv)
       var_dims[0] = dimid;
       if (nc_def_var(g2id, VAR_NAME, NC_FLOAT, VAR_RANK, var_dims, &varid)) ERR;
       if (nc_put_att_text(g2id, varid, ATT_NAME, strlen(ATT_VAL), ATT_VAL)) ERR;
-      if (nc_put_att_text(g2id, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL), 
+      if (nc_put_att_text(g2id, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL),
 			  GATT_VAL)) ERR;
       if (nc_enddef(g2id)) ERR;
-    
+
       /* put dim, var, atts with same names in a subgroup of second group */
       if (nc_def_grp(g2id, G3_NAME, &g3id)) ERR;
       if (nc_def_dim(g3id, DIM_NAME, DIM_LEN, &dimid)) ERR;
       var_dims[0] = dimid;
       if (nc_def_var(g3id, VAR_NAME, NC_FLOAT, VAR_RANK, var_dims, &varid)) ERR;
       if (nc_put_att_text(g3id, varid, ATT_NAME, strlen(ATT_VAL), ATT_VAL)) ERR;
-      if (nc_put_att_text(g3id, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL), 
+      if (nc_put_att_text(g3id, NC_GLOBAL, GATT_NAME, strlen(GATT_VAL),
 			  GATT_VAL)) ERR;
       if (nc_enddef(g3id)) ERR;
 
@@ -958,7 +958,7 @@ main(int argc, char **argv)
 
    printf("*** testing nested groups, user defined types, and enddef...");
    {
-#define SCI_FI "Science_Fiction"   
+#define SCI_FI "Science_Fiction"
 #define BASE_SIZE 2
 #define TYPE_NAME "The_Blob"
 #define DATE_MOVIE "data_movie"
@@ -966,7 +966,7 @@ main(int argc, char **argv)
       char name_in[NC_MAX_NAME + 1];
       size_t len_in;
       unsigned char data[BASE_SIZE] = {42, 43}, data_in[BASE_SIZE];
-    
+
       /* Create a file. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
 
@@ -992,7 +992,7 @@ main(int argc, char **argv)
       if (nc_close(ncid)) ERR;
 
       /* Reopen and recheck. */
-      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;      
+      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_grp_ncid(ncid, SCI_FI, &g1id)) ERR;
 
       if (nc_inq_user_type(g1id, xtype, name_in, &len_in, NULL, NULL, &class)) ERR;
@@ -1009,28 +1009,28 @@ main(int argc, char **argv)
    {
       int ncid, typeid;
       int g1id, g2id, g3id;
-    
+
       /* Create a file with nested groups. */
       if (nc_create(FILE_NAME, NC_CLOBBER | NC_NETCDF4, &ncid)) ERR;
       if (nc_def_opaque(ncid, 10, "opaque-1", &typeid)) ERR;
       if (nc_def_vlen(ncid, "vlen-1", NC_INT, &typeid)) ERR;
-      if (nc_enddef(ncid)) ERR; 
+      if (nc_enddef(ncid)) ERR;
 
       if (nc_def_grp(ncid, G1_NAME, &g1id)) ERR;
       if (nc_def_opaque(g1id, 7, "opaque-2", &typeid)) ERR;
       if (nc_def_vlen(g1id, "vlen-2", NC_BYTE, &typeid)) ERR;
-      if (nc_enddef(g1id)) ERR; 
+      if (nc_enddef(g1id)) ERR;
 
       if (nc_def_grp(ncid, G2_NAME, &g2id)) ERR;
       if (nc_def_opaque(g2id, 4, "opaque-3", &typeid)) ERR;
       if (nc_def_vlen(g2id, "vlen-3", NC_BYTE, &typeid)) ERR;
-      if (nc_enddef(g2id)) ERR; 
-    
+      if (nc_enddef(g2id)) ERR;
+
       /* put dim, var, atts with same names in a subgroup of second group */
       if (nc_def_grp(g2id, G3_NAME, &g3id)) ERR;
       if (nc_def_opaque(g3id, 13, "opaque-4", &typeid)) ERR;
       if (nc_def_vlen(g3id, "vlen-4", NC_BYTE, &typeid)) ERR;
-      if (nc_enddef(g3id)) ERR; 
+      if (nc_enddef(g3id)) ERR;
 
       if (nc_close(ncid)) ERR;
 
@@ -1044,11 +1044,11 @@ main(int argc, char **argv)
    printf("*** creating file with lots of groups...");
    {
 #define PARENT_NUM_GRPS 6
-#define SUB_NUM_GRPS 2  
+#define SUB_NUM_GRPS 2
 
       int ncid, g1id, sub_grpid, num_grps, g, s;
       char grp_name[NC_MAX_NAME + 1];
-    
+
       /* Create a file with lots of groups. */
       if (nc_create(FILE_NAME, NC_CLOBBER | NC_NETCDF4, &ncid)) ERR;
       for (g = 0; g < PARENT_NUM_GRPS; g++)
@@ -1084,12 +1084,12 @@ main(int argc, char **argv)
       size_t nfields;
       char name[NC_MAX_NAME + 1];
       size_t size;
-      struct s1 
+      struct s1
       {
          int i1;
          int i2;
       };
-      struct s2 
+      struct s2
       {
          int i3;
          double f1;
@@ -1097,7 +1097,7 @@ main(int argc, char **argv)
       struct s1 data;
       struct s2 data2;
 
-      /* Create some phony data. */   
+      /* Create some phony data. */
       data.i1 = 5;
       data.i2 = 10;
       data2.i3 = 50;
@@ -1110,9 +1110,9 @@ main(int argc, char **argv)
       if (nc_def_compound(ncid, sizeof(struct s1), CMP1_NAME, &typeid)) ERR;
       if (nc_inq_compound(ncid, typeid, name, &size, &nfields)) ERR;
       if (size != sizeof(struct s1) || strcmp(name, CMP1_NAME) || nfields) ERR;
-      if (nc_insert_compound(ncid, typeid, "i1", 
+      if (nc_insert_compound(ncid, typeid, "i1",
    			  NC_COMPOUND_OFFSET(struct s1, i1), NC_INT)) ERR;
-      if (nc_insert_compound(ncid, typeid, "i2", 
+      if (nc_insert_compound(ncid, typeid, "i2",
    			  NC_COMPOUND_OFFSET(struct s1, i2), NC_INT)) ERR;
 
       /* Create variable with compound datatype #1, in root group */
@@ -1132,9 +1132,9 @@ main(int argc, char **argv)
       if (nc_def_compound(ncid, sizeof(struct s2), CMP2_NAME, &typeid2)) ERR;
       if (nc_inq_compound(ncid, typeid2, name, &size, &nfields)) ERR;
       if (size != sizeof(struct s2) || strcmp(name, CMP2_NAME) || nfields) ERR;
-      if (nc_insert_compound(ncid, typeid2, "i3", 
+      if (nc_insert_compound(ncid, typeid2, "i3",
    			  NC_COMPOUND_OFFSET(struct s2, i3), NC_INT)) ERR;
-      if (nc_insert_compound(ncid, typeid2, "f1", 
+      if (nc_insert_compound(ncid, typeid2, "f1",
    			  NC_COMPOUND_OFFSET(struct s2, f1), NC_DOUBLE)) ERR;
 
       /* Create variable with compound datatype #2, in root group */

@@ -2,7 +2,7 @@
    Copyright 2005 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test netcdf-4 compound type feature, even more. 
+   Test netcdf-4 compound type feature, even more.
 
    $Id: tst_compounds3.c,v 1.8 2010/05/25 13:53:04 ed Exp $
 */
@@ -103,7 +103,7 @@ main(int argc, char **argv)
 				field_sizes)) ERR;
       if (strcmp(name_in, J_NAME) || offset != NC_COMPOUND_OFFSET(struct s1, j) ||
 	  field_xtype != NC_INT64) ERR;
-      
+
       /* Now check the data. */
       if (nc_get_var(ncid, varid, data_in)) ERR;
       for (i = 0; i < DIM_LEN; i++)

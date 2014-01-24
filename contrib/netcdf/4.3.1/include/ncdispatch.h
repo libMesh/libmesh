@@ -163,7 +163,7 @@ struct NC;
 
 
 int NC_create(const char *path, int cmode,
-	      size_t initialsz, int basepe, size_t *chunksizehintp, 
+	      size_t initialsz, int basepe, size_t *chunksizehintp,
 	      int useparallel,void* mpi_info,
 	      int *ncidp);
 int NC_open(const char *path, int cmode,
@@ -192,7 +192,7 @@ struct NC_Dispatch {
 int model; /* one of the NC_DISPATCH #'s above */
 
 int (*create)(const char *path, int cmode,
-	  size_t initialsz, int basepe, size_t *chunksizehintp, 
+	  size_t initialsz, int basepe, size_t *chunksizehintp,
 	  int use_parallel, void* parameters,
 	  struct NC_Dispatch* table, NC* ncp);
 int (*open)(const char *path, int mode,
@@ -243,11 +243,11 @@ int (*get_varm)(int, int, const size_t*, const size_t*, const ptrdiff_t*, const 
 int (*put_varm)(int, int, const size_t*, const size_t*, const ptrdiff_t*, const ptrdiff_t*, const void*, nc_type);
 
 
-int (*inq_var_all)(int ncid, int varid, char *name, nc_type *xtypep, 
-               int *ndimsp, int *dimidsp, int *nattsp, 
+int (*inq_var_all)(int ncid, int varid, char *name, nc_type *xtypep,
+               int *ndimsp, int *dimidsp, int *nattsp,
                int *shufflep, int *deflatep, int *deflate_levelp,
-               int *fletcher32p, int *contiguousp, size_t *chunksizesp, 
-               int *no_fill, void *fill_valuep, int *endiannessp, 
+               int *fletcher32p, int *contiguousp, size_t *chunksizesp,
+               int *no_fill, void *fill_valuep, int *endiannessp,
 	       int *options_maskp, int *pixels_per_blockp);
 
 int (*var_par_access)(int, int, int);
@@ -310,7 +310,7 @@ int(*nc_delete_mp)(const char*path,intbasepe);
 typedef struct NCcommon {
 	int ext_ncid; /* uid << 16 */
 	int int_ncid; /* unspecified other id */
-	struct NC_Dispatch* dispatch;	
+	struct NC_Dispatch* dispatch;
 	void* dispatchdata; /* per-protocol instance data */
 	char* path; /* as specified at open or create */
 	int   substrate; /* ncid for another protocol on which to build */

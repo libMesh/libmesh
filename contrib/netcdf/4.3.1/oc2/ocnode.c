@@ -33,7 +33,7 @@ occomputesemantics(OClist* ocnodes)
 	    node->array.sizes = (size_t*)malloc(node->array.rank*sizeof(size_t));
 	    for(j=0;j<node->array.rank;j++) {
 		OCnode* dim = (OCnode*)oclistget(node->array.dimensions,j);
-		node->array.sizes[j] = dim->dim.declsize;		
+		node->array.sizes[j] = dim->dim.declsize;
 	    }
 	}
     }
@@ -167,7 +167,7 @@ ocroot_free(OCnode* root)
 	if(root == node)
 	    oclistremove(state->trees,i);
     }
-    /* Note: it is ok if state->trees does not contain this root */    
+    /* Note: it is ok if state->trees does not contain this root */
     octree_free(tree);
 }
 
@@ -497,7 +497,7 @@ ocuncorrelate(OCnode* root)
     for(i=0;i<oclistlength(tree->nodes);i++) {
 	OCnode* node = (OCnode*)oclistget(tree->nodes,i);
 	node->datadds = NULL;
-    }        
+    }
 }
 
 static OCerror
@@ -551,8 +551,8 @@ occorrelater(OCnode* dds, OCnode* dxd)
 	    OCnode* ddsdim = (OCnode*)oclistget(dds->array.dimensions,i);
 	    OCnode* dxddim = (OCnode*)oclistget(dxd->array.dimensions,i);
 	    ocstat = occorrelater(ddsdim,dxddim);
-	    if(!ocstat) goto fail;	    
-	}	
+	    if(!ocstat) goto fail;
+	}
     }
 
 fail:
@@ -587,7 +587,7 @@ ocmarkcacheable(OCstate* state, OCnode* ddsroot)
 	if(node->etype != OC_String && node->etype != OC_URL) continue;
 	/* collect node path */
         oclistclear(path);
-        occollectpathtonode(node,path);	
+        occollectpathtonode(node,path);
 #if 0
         ok = 1;
 #endif
@@ -600,7 +600,7 @@ ocmarkcacheable(OCstate* state, OCnode* ddsroot)
 #endif
 	    break;
 	    }
-	}	
+	}
 #if 0
 	if(ok) {
    	    node->cache.cacheable = 1;

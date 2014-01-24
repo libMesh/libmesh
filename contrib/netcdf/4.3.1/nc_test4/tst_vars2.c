@@ -2,7 +2,7 @@
    Copyright 2005 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test netcdf-4 variables. 
+   Test netcdf-4 variables.
    $Id: tst_vars2.c,v 1.35 2010/01/25 21:01:08 ed Exp $
 */
 
@@ -14,7 +14,7 @@
 #define DIM1_LEN NC_UNLIMITED
 #define DIM1_NAME "Hoplites_Engaged"
 #define VAR_NAME "Battle_of_Marathon"
-#define LOSSES_NAME "Miltiades_Losses"   
+#define LOSSES_NAME "Miltiades_Losses"
 
 #define MAX_CNUM 4
 
@@ -35,7 +35,7 @@ main(int argc, char **argv)
    for (cnum = 0; cnum < MAX_CNUM; cnum++)
    {
       int cmode = 0;
-      
+
       switch(cnum)
       {
          case 0:
@@ -66,7 +66,7 @@ main(int argc, char **argv)
          if (nc_def_var(ncid, VAR_NAME, NC_BYTE, 0, NULL, &varid)) ERR;
          if (nc_enddef(ncid)) ERR;
          if (nc_redef(ncid)) ERR;
-         if (nc_put_att_schar(ncid, varid, _FillValue, NC_BYTE, 1, &fill_value)) ERR;              
+         if (nc_put_att_schar(ncid, varid, _FillValue, NC_BYTE, 1, &fill_value)) ERR;
          if (nc_close(ncid)) ERR;
 
          /* Open the file and check. */
@@ -95,7 +95,7 @@ main(int argc, char **argv)
          if (nc_def_var(ncid, VAR_NAME, NC_BYTE, NUM_DIMS, dimids, &varid)) ERR;
          if (nc_enddef(ncid)) ERR;
          if (nc_redef(ncid)) ERR;
-         if (nc_put_att_schar(ncid, varid, _FillValue, NC_BYTE, 1, &fill_value)) ERR;            
+         if (nc_put_att_schar(ncid, varid, _FillValue, NC_BYTE, 1, &fill_value)) ERR;
          if (nc_enddef(ncid)) ERR;
 
          /* Write the second record. */
@@ -113,7 +113,7 @@ main(int argc, char **argv)
          start[0] = 1;
          if (nc_get_vara_schar(ncid, varid, start, count, &data_in)) ERR;
          if (data_in != data) ERR;
-      
+
          /* Close up. */
          if (nc_close(ncid)) ERR;
 
@@ -142,7 +142,7 @@ main(int argc, char **argv)
          start[0] = 1;
          if (nc_get_vara_schar(ncid, varid, start, count, &data_in)) ERR;
          if (data_in != data) ERR;
-      
+
          if (nc_close(ncid)) ERR;
       }
 
@@ -158,7 +158,7 @@ main(int argc, char **argv)
          if (nc_def_dim(ncid, DIM1_NAME, DIM1_LEN, &dimids[0])) ERR;
          if (nc_def_var(ncid, VAR_NAME, NC_BYTE, NUM_DIMS, dimids, &varid)) ERR;
          if (nc_put_att_int(ncid, varid, LOSSES_NAME, NC_INT, 1, &losses_value)) ERR;
-         if (nc_put_att_schar(ncid, varid, _FillValue, NC_BYTE, 1, &fill_value)) ERR;            
+         if (nc_put_att_schar(ncid, varid, _FillValue, NC_BYTE, 1, &fill_value)) ERR;
          if (nc_close(ncid)) ERR;
 
          /* Open the file and check. */
@@ -182,8 +182,8 @@ main(int argc, char **argv)
       printf("**** testing fill value with three other attributes...");
       {
 #define NUM_LEADERS 3
-         char leader[NUM_LEADERS][NC_MAX_NAME + 1] = {"hair_length_of_strategoi", 
-                                                      "hair_length_of_Miltiades", 
+         char leader[NUM_LEADERS][NC_MAX_NAME + 1] = {"hair_length_of_strategoi",
+                                                      "hair_length_of_Miltiades",
                                                       "hair_length_of_Darius_I"};
          short hair_length[NUM_LEADERS] = {3, 11, 4};
          short short_in;
@@ -196,7 +196,7 @@ main(int argc, char **argv)
          if (nc_def_var(ncid, VAR_NAME, NC_BYTE, NUM_DIMS, dimids, &varid)) ERR;
          for (a = 0; a < NUM_LEADERS; a++)
             if (nc_put_att_short(ncid, varid, leader[a], NC_SHORT, 1, &hair_length[a])) ERR;
-         if (nc_put_att_schar(ncid, varid, _FillValue, NC_BYTE, 1, &fill_value)) ERR;            
+         if (nc_put_att_schar(ncid, varid, _FillValue, NC_BYTE, 1, &fill_value)) ERR;
          if (nc_close(ncid)) ERR;
 
          /* Open the file. */
@@ -257,13 +257,13 @@ main(int argc, char **argv)
          if (nc_def_dim(ncid, DIM_C, DIM_C_LEN, &dimid[2])) ERR;
 
          /* Create var. */
-         if (nc_def_var(ncid, CXX_VAR_NAME, NC_FLOAT, VAR_DIMS, 
+         if (nc_def_var(ncid, CXX_VAR_NAME, NC_FLOAT, VAR_DIMS,
                         var_dimids, &varid)) ERR;
          if (varid) ERR;
 
-         if (nc_put_att(ncid, varid, LONG_NAME, NC_CHAR, strlen(long_name) + 1, 
+         if (nc_put_att(ncid, varid, LONG_NAME, NC_CHAR, strlen(long_name) + 1,
                         long_name)) ERR;
-         if (nc_put_att(ncid, varid, UNITS, NC_CHAR, strlen(UNITS) + 1, 
+         if (nc_put_att(ncid, varid, UNITS, NC_CHAR, strlen(UNITS) + 1,
                         UNITS)) ERR;
 
          /* Check to ensure the atts have their expected attnums. */
@@ -275,7 +275,7 @@ main(int argc, char **argv)
          /* Now add a fill value. This will acutually cause HDF5 to
           * destroy the dataset and recreate it, recreating also the
           * three attributes that are attached to it. */
-         if (nc_put_att(ncid, varid, _FillValue, NC_FLOAT, 
+         if (nc_put_att(ncid, varid, _FillValue, NC_FLOAT,
                         1, &fill_value)) ERR;
 
          /* Check to ensure the atts have their expected attnums. */
@@ -441,7 +441,7 @@ main(int argc, char **argv)
       if (nc_close(ncid)) ERR;
    }
 
-   SUMMARIZE_ERR; 
+   SUMMARIZE_ERR;
    printf("**** testing dimension and variable renaming...");
    {
       /* This test contributed by Jeff Whitaker of NOAA - Thanks Jeff! */
@@ -481,7 +481,7 @@ main(int argc, char **argv)
       if (nc_rename_var(ncid, wind_id, "wind")) ERR;
       if (nc_close(ncid)) ERR;
    }
-   SUMMARIZE_ERR; 
+   SUMMARIZE_ERR;
 
 
 /*    printf("*** testing 2D array of NC_CHAR..."); */
@@ -685,7 +685,7 @@ main(int argc, char **argv)
       if (nvars != 1) ERR;
       if (varids_in[0] != 0) ERR;
       if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-      if (strcmp(name_in, VAR_NAME5) || xtype_in != NC_INT || ndims != 1 || natts != 0 || 
+      if (strcmp(name_in, VAR_NAME5) || xtype_in != NC_INT || ndims != 1 || natts != 0 ||
 	  dimids_in[0] != 0) ERR;
       if (nc_inq_var_chunking(ncid, 0, &storage_in, chunksize_in)) ERR;
       for (d = 0; d < NDIMS5; d++)
@@ -695,7 +695,7 @@ main(int argc, char **argv)
       for (i = 0; i < DIM5_LEN; i++)
          if (data[i] != data_in[i])
 	    ERR_RET;
-      if (nc_get_var_chunk_cache(ncid, varid, &cache_size_in, &cache_nelems_in, 
+      if (nc_get_var_chunk_cache(ncid, varid, &cache_size_in, &cache_nelems_in,
 				 &cache_preemption_in)) ERR;
       if (cache_size_in != CACHE_SIZE || cache_nelems_in != CACHE_NELEMS ||
 	  cache_preemption_in != CACHE_PREEMPTION) ERR;
@@ -712,7 +712,7 @@ main(int argc, char **argv)
       if (nvars != 1) ERR;
       if (varids_in[0] != 0) ERR;
       if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-      if (strcmp(name_in, VAR_NAME5) || xtype_in != NC_INT || ndims != 1 || natts != 0 || 
+      if (strcmp(name_in, VAR_NAME5) || xtype_in != NC_INT || ndims != 1 || natts != 0 ||
 	  dimids_in[0] != 0) ERR;
       if (nc_inq_var_chunking(ncid, 0, &storage_in, chunksize_in)) ERR;
       for (d = 0; d < NDIMS5; d++)
@@ -762,7 +762,7 @@ main(int argc, char **argv)
       if (nvars != 1) ERR;
       if (varids_in[0] != 0) ERR;
       if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-      if (strcmp(name_in, VAR_NAME6) || xtype_in != NC_INT || ndims != 1 || natts != 0 || 
+      if (strcmp(name_in, VAR_NAME6) || xtype_in != NC_INT || ndims != 1 || natts != 0 ||
 	  dimids_in[0] != 0) ERR;
       if (nc_inq_var_chunking(ncid, 0, &storage_in, chunksize_in)) ERR;
       if (storage_in != NC_CONTIGUOUS) ERR;
@@ -783,7 +783,7 @@ main(int argc, char **argv)
       if (nvars != 1) ERR;
       if (varids_in[0] != 0) ERR;
       if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-      if (strcmp(name_in, VAR_NAME6) || xtype_in != NC_INT || ndims != 1 || natts != 0 || 
+      if (strcmp(name_in, VAR_NAME6) || xtype_in != NC_INT || ndims != 1 || natts != 0 ||
 	  dimids_in[0] != 0) ERR;
       if (nc_inq_var_chunking(ncid, 0, &storage_in, chunksize_in)) ERR;
       if (storage_in != NC_CONTIGUOUS) ERR;
@@ -839,7 +839,7 @@ main(int argc, char **argv)
    SUMMARIZE_ERR;
    printf("**** testing error codes for name clashes...");
    {
-#define GENERIC_NAME "bob"      
+#define GENERIC_NAME "bob"
       int ncid, varid, numgrps, ntypes;
 
       /* Create a netcdf-4 file with one var. */
@@ -853,7 +853,7 @@ main(int argc, char **argv)
 
       /* Close it. */
       if (nc_close(ncid)) ERR;
-      
+
       /* Open the file and check. */
       if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
       if (nc_inq_varids(ncid, &nvars_in, varids_in)) ERR;
@@ -871,7 +871,7 @@ main(int argc, char **argv)
    printf("**** testing error codes for name clashes some more...");
 
    {
-#define GENERIC_NAME "bob"      
+#define GENERIC_NAME "bob"
       int ncid, varid, numgrps, ntypes;
 
       /* Create a netcdf-4 file with one type. */
@@ -885,7 +885,7 @@ main(int argc, char **argv)
 
       /* Close it. */
       if (nc_close(ncid)) ERR;
-      
+
       /* Open the file and check. */
       if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
       if (nc_inq_varids(ncid, &nvars_in, varids_in)) ERR;
@@ -900,7 +900,7 @@ main(int argc, char **argv)
    printf("**** testing error codes for name clashes even more...");
 
    {
-#define GENERIC_NAME "bob"      
+#define GENERIC_NAME "bob"
       int ncid, varid, numgrps, ntypes;
 
       /* Create a netcdf-4 file with one group. */
@@ -914,7 +914,7 @@ main(int argc, char **argv)
 
       /* Close it. */
       if (nc_close(ncid)) ERR;
-      
+
       /* Open the file and check. */
       if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
       if (nc_inq_varids(ncid, &nvars_in, varids_in)) ERR;
@@ -963,7 +963,7 @@ main(int argc, char **argv)
       if (nvars != 1) ERR;
       if (varids_in[0] != 0) ERR;
       if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-      if (strcmp(name_in, VAR_NAME17) || xtype_in != NC_UINT64 || ndims != 2 || natts != 0 || 
+      if (strcmp(name_in, VAR_NAME17) || xtype_in != NC_UINT64 || ndims != 2 || natts != 0 ||
 	  dimids_in[0] != 0 || dimids_in[1] != 1) ERR;
       if (nc_inq_var_chunking(ncid, 0, &storage_in, chunksize_in)) ERR;
       for (d = 0; d < NDIMS17; d++)
@@ -982,7 +982,7 @@ main(int argc, char **argv)
       if (nvars != 1) ERR;
       if (varids_in[0] != 0) ERR;
       if (nc_inq_var(ncid, 0, name_in, &xtype_in, &ndims, dimids_in, &natts)) ERR;
-      if (strcmp(name_in, VAR_NAME17) || xtype_in != NC_UINT64 || ndims != 2 || natts != 0 || 
+      if (strcmp(name_in, VAR_NAME17) || xtype_in != NC_UINT64 || ndims != 2 || natts != 0 ||
 	  dimids_in[0] != 0 || dimids_in[1] != 1) ERR;
       if (nc_inq_var_chunking(ncid, 0, &storage_in, chunksize_in)) ERR;
       for (d = 0; d < NDIMS17; d++)
@@ -1018,7 +1018,7 @@ main(int argc, char **argv)
 
       /* This won't work because of the deflate filter. */
       if (nc_def_var_chunking(ncid, varid2, NC_CONTIGUOUS, NULL) != NC_EINVAL) ERR;
-      
+
       /* Storage must be chunked because of unlimited dimension and
        * the deflate filter. */
       if (nc_inq_var_chunking(ncid, varid, &storage_in, chunksize_in)) ERR;
@@ -1056,7 +1056,7 @@ main(int argc, char **argv)
 
       /* This won't work because of the deflate filter. */
       if (nc_def_var_chunking(ncid, varid2, NC_CONTIGUOUS, NULL) != NC_EINVAL) ERR;
-      
+
       /* Storage must be chunked because of unlimited dimension and
        * the deflate filter. */
       if (nc_inq_var_chunking(ncid, varid, &storage_in, chunksize_in)) ERR;

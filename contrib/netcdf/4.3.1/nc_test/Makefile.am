@@ -27,15 +27,15 @@ TESTPROGRAMS += tst_parallel2 tst_pnetcdf tst_formatx_pnetcdf
 endif
 
 # if EXTRA_TESTS
-# TESTPROGRAMS += 
+# TESTPROGRAMS +=
 # endif # EXTRA_TESTS
 
 # These are the source files for the main workhorse test program,
 # nc_test. If you pass nc_test, you are doing well.
 nc_test_SOURCES = nc_test.c error.c test_get.c test_put.c \
-test_read.c test_write.c util.c error.h tests.h 
+test_read.c test_write.c util.c error.h tests.h
 
-LDADD = ${top_builddir}/liblib/libnetcdf.la 
+LDADD = ${top_builddir}/liblib/libnetcdf.la
 AM_CPPFLAGS += -I$(top_builddir)/liblib
 
 # If the user asked for large file tests, then add them.

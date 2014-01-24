@@ -29,7 +29,7 @@ convert1(NCConstant* src, NCConstant* dst)
     if(src->nctype == NC_FILLVALUE) {
 	if(dst->nctype != NC_FILLVALUE) {
 	    nc_getfill(dst);
-	} 
+	}
 	return;
     }
 
@@ -504,39 +504,39 @@ case CASE(NC_OPAQUE,NC_BYTE):
     tmp.uint8v	= *(unsigned char*)bytes;
     break;
 case CASE(NC_OPAQUE,NC_UBYTE):
-  if(bytes)  
+  if(bytes)
     tmp.uint8v	= *(unsigned char*)bytes;
   break;
 case CASE(NC_OPAQUE,NC_USHORT):
-  if(bytes)  
+  if(bytes)
     tmp.uint16v	= *(unsigned short*)bytes;
   break;
 case CASE(NC_OPAQUE,NC_UINT):
-  if(bytes) 
+  if(bytes)
     tmp.uint32v = *(unsigned int*)bytes;
   break;
 case CASE(NC_OPAQUE,NC_UINT64):
-  if(bytes)  
+  if(bytes)
     tmp.uint64v	 = *(unsigned long long*)bytes;
   break;
 case CASE(NC_OPAQUE,NC_SHORT):
-  if(bytes)  
+  if(bytes)
     tmp.int16v	= *(short*)bytes;
   break;
 case CASE(NC_OPAQUE,NC_INT):
-  if(bytes)  
+  if(bytes)
     tmp.int32v	= *(int*)bytes;
   break;
 case CASE(NC_OPAQUE,NC_INT64):
-  if(bytes)  
+  if(bytes)
     tmp.int64v	 = *(long long*)bytes;
   break;
 case CASE(NC_OPAQUE,NC_FLOAT):
-  if(bytes)  
+  if(bytes)
     tmp.floatv	= *(float*)bytes;
   break;
 case CASE(NC_OPAQUE,NC_DOUBLE):
-  if(bytes)  
+  if(bytes)
     tmp.doublev = *(double*)bytes;
   break;
 case CASE(NC_OPAQUE,NC_OPAQUE):
@@ -549,7 +549,7 @@ case CASE(NC_NIL,NC_NIL):
     break; /* probably will never happen */
 case CASE(NC_NIL,NC_STRING):
     tmp.stringv.len = 0;
-    tmp.stringv.stringv = NULL;    
+    tmp.stringv.stringv = NULL;
     break;
 
     /* We are missing all CASE(X,NC_ECONST) cases*/
@@ -593,7 +593,7 @@ setprimlength(Constant* prim, unsigned long len)
 	/* Note that expansion/contraction is in terms of whole
            bytes = 2 nibbles */
 	ASSERT((len % 2) == 0);
-        if(prim->value.opaquev.len == len) { 
+        if(prim->value.opaquev.len == len) {
 	    /* do nothing*/
         } else if(prim->value.opaquev.len > len) { /* truncate*/
 	    prim->value.opaquev.stringv[len] = '\0';

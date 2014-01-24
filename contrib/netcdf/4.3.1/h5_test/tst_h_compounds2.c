@@ -58,8 +58,8 @@ main()
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
       if (!(dummy = calloc(sizeof(struct s2), DIM_CMP_LEN))) ERR;
-      memcpy((void *)data_out, (void *)dummy, sizeof(struct s2) * DIM_CMP_LEN); 
-      free(dummy); 
+      memcpy((void *)data_out, (void *)dummy, sizeof(struct s2) * DIM_CMP_LEN);
+      free(dummy);
 
       /* Create some phony data. */
       for (i = 0; i < DIM_CMP_LEN; i++)
@@ -101,7 +101,7 @@ main()
 
       /* Write some data to the attribute. */
       if (H5Awrite(attid, typeid_outer, data_out) < 0) ERR;
-      
+
       /* Release all resources. */
       if (H5Aclose(attid) < 0 ||
           H5Tclose(typeid_outer) < 0 ||
@@ -131,25 +131,25 @@ main()
       if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
       for (i_obj = 0; i_obj < num_obj; i_obj++)
       {
-	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, 
+	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
 				i_obj, &obj_info, H5P_DEFAULT) < 0) ERR;
-	 if (H5Lget_name_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, 
+	 if (H5Lget_name_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
 				i_obj, obj_name, STR_LEN + 1, H5P_DEFAULT) < 0) ERR;
 
 	 /* Deal with groups and datasets. */
 	 if (obj_info.type == H5O_TYPE_NAMED_DATATYPE)
 	 {
 	    /* Learn about the user-defined type. */
-	    if ((obj_hdf_typeid[i_obj] = H5Topen2(grpid, obj_name, 
+	    if ((obj_hdf_typeid[i_obj] = H5Topen2(grpid, obj_name,
 						  H5P_DEFAULT)) < 0) ERR;
-	    if ((obj_native_typeid[i_obj] = H5Tget_native_type(obj_hdf_typeid[i_obj], 
+	    if ((obj_native_typeid[i_obj] = H5Tget_native_type(obj_hdf_typeid[i_obj],
 							       H5T_DIR_DEFAULT)) < 0) ERR;
 
 	    /* If this is the inner type, the obj_native_typeid
 	     * should be equal to the inner_type_native_typeid. */
 	    if (!strcmp(obj_name, INNER_TYPE_NAME))
 	    {
-	       if ((equal = H5Tequal(obj_native_typeid[i_obj], 
+	       if ((equal = H5Tequal(obj_native_typeid[i_obj],
 				     inner_type_native_typeid)) < 0) ERR;
 	       if (!equal) ERR;
 	    }
@@ -170,7 +170,7 @@ main()
          strcpy(file_in, getenv("srcdir"));
          strcat(file_in, "/");
          strcat(file_in, REF_FILE_IN);
-      } 
+      }
       else
          strcpy(file_in, REF_FILE_IN);
 
@@ -194,9 +194,9 @@ main()
       if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
       for (i_obj = 0; i_obj < num_obj; i_obj++)
       {
-	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, i_obj, &obj_info, 
+	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, i_obj, &obj_info,
 				H5P_DEFAULT) < 0) ERR;
-	 if (H5Lget_name_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, i_obj, obj_name, 
+	 if (H5Lget_name_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, i_obj, obj_name,
 				STR_LEN + 1, H5P_DEFAULT) < 0) ERR;
 
 	 /* Deal with groups and datasets. */
@@ -204,7 +204,7 @@ main()
 	 {
 	    /* Learn about the user-defined type. */
 	    if ((obj_hdf_typeid[i_obj] = H5Topen2(grpid, obj_name, H5P_DEFAULT)) < 0) ERR;
-	    if ((obj_native_typeid[i_obj] = H5Tget_native_type(obj_hdf_typeid[i_obj], 
+	    if ((obj_native_typeid[i_obj] = H5Tget_native_type(obj_hdf_typeid[i_obj],
 							       H5T_DIR_DEFAULT)) < 0) ERR;
 
 	    /* If this is the inner type, the obj_native_typeid

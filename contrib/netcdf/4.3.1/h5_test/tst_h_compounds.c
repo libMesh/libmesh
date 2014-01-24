@@ -42,11 +42,11 @@ main()
    /* REALLY initialize the data (even the gaps in the structs). This
     * is only needed to pass valgrind. */
    if (!(dummy = calloc(sizeof(struct s2), DIM1_LEN))) ERR;
-   memcpy((void *)data2, (void *)dummy, sizeof(struct s2) * DIM1_LEN); 
-   free(dummy); 
+   memcpy((void *)data2, (void *)dummy, sizeof(struct s2) * DIM1_LEN);
+   free(dummy);
    if (!(dummy = calloc(sizeof(struct s1), DIM1_LEN))) ERR;
-   memcpy((void *)data2, (void *)dummy, sizeof(struct s1) * DIM1_LEN); 
-   free(dummy); 
+   memcpy((void *)data2, (void *)dummy, sizeof(struct s1) * DIM1_LEN);
+   free(dummy);
 
    for (i=0; i<DIM1_LEN; i++)
    {
@@ -60,9 +60,9 @@ main()
    printf("\n*** Checking HDF5 compound types.\n");
    printf("*** Checking simple HDF5 compound types...");
    {
-   
+
       /* Open file and create group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
                               H5P_DEFAULT)) < 0) ERR;
       if ((osmonds_grpid = H5Gcreate(fileid, OSMONDS, 0)) < 0) ERR;
 
@@ -77,11 +77,11 @@ main()
       if ((spaceid = H5Screate_simple(1, dims, dims)) < 0) ERR;
 
       /* Create a dataset of this compound type. */
-      if ((datasetid = H5Dcreate(osmonds_grpid, BOOZE_VAR, typeid, 
+      if ((datasetid = H5Dcreate(osmonds_grpid, BOOZE_VAR, typeid,
                                  spaceid, H5P_DEFAULT)) < 0) ERR;
 
       /* Write some data. */
-      if (H5Dwrite(datasetid, typeid, H5S_ALL, H5S_ALL, 
+      if (H5Dwrite(datasetid, typeid, H5S_ALL, H5S_ALL,
                    H5P_DEFAULT, data) < 0) ERR;
 
       /* Release all resources. */
@@ -98,7 +98,7 @@ main()
       if ((typeid = H5Dget_type(datasetid)) < 0) ERR;
       if (H5Tget_class(typeid) != H5T_COMPOUND) ERR;
       if (H5Tget_nmembers(typeid) != 2) ERR;
-      /* This doesn't work because all I have is a reference to the type! 
+      /* This doesn't work because all I have is a reference to the type!
          if (H5Iget_name(typeid, type_name, STR_LEN) < 0) ERR;
          if (strcmp(type_name, COMPOUND_NAME)) ERR;*/
 
@@ -111,10 +111,10 @@ main()
 
    SUMMARIZE_ERR;
    printf("*** Checking HDF5 compound types and groups...");
-   
+
    {
       /* Open file and create two group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
                               H5P_DEFAULT)) < 0) ERR;
       if ((osmonds_grpid = H5Gcreate(fileid, OSMONDS, 0)) < 0) ERR;
       if ((who_grpid = H5Gcreate(fileid, WHO, 0)) < 0) ERR;
@@ -130,19 +130,19 @@ main()
       if ((spaceid = H5Screate_simple(1, dims, dims)) < 0) ERR;
 
       /* Create a dataset of this compound type in the same group. */
-      if ((datasetid = H5Dcreate(osmonds_grpid, BOOZE_VAR, typeid, 
+      if ((datasetid = H5Dcreate(osmonds_grpid, BOOZE_VAR, typeid,
                                  spaceid, H5P_DEFAULT)) < 0) ERR;
 
       /* Write some data. */
-      if (H5Dwrite(datasetid, typeid, H5S_ALL, H5S_ALL, 
+      if (H5Dwrite(datasetid, typeid, H5S_ALL, H5S_ALL,
                    H5P_DEFAULT, data) < 0) ERR;
 
       /* Create a dataset of this compound type in a different group. */
-      if ((datasetid1 = H5Dcreate(who_grpid, BOOZE_VAR, typeid, 
+      if ((datasetid1 = H5Dcreate(who_grpid, BOOZE_VAR, typeid,
                                   spaceid, H5P_DEFAULT)) < 0) ERR;
 
       /* Write some data. */
-      if (H5Dwrite(datasetid1, typeid, H5S_ALL, H5S_ALL, 
+      if (H5Dwrite(datasetid1, typeid, H5S_ALL, H5S_ALL,
                    H5P_DEFAULT, data) < 0) ERR;
 
       /* Release all resources. */
@@ -206,13 +206,13 @@ main()
 
    SUMMARIZE_ERR;
    printf("*** Checking HDF5 compound type which contains an array...");
-   
+
    {
       hsize_t array_dims[] = {ARRAY_LEN};
       hid_t array_typeid;
 
       /* Open file and create group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
                               H5P_DEFAULT)) < 0) ERR;
       if ((osmonds_grpid = H5Gcreate(fileid, OSMONDS, 0)) < 0) ERR;
 
@@ -230,13 +230,13 @@ main()
       if ((spaceid = H5Screate_simple(1, dims, dims)) < 0) ERR;
 
       /* Create a dataset of this compound type. */
-      if ((datasetid = H5Dcreate(osmonds_grpid, BOOZE_VAR, typeid, 
+      if ((datasetid = H5Dcreate(osmonds_grpid, BOOZE_VAR, typeid,
                                  spaceid, H5P_DEFAULT)) < 0) ERR;
 
       /* Write some data. */
-      if (H5Dwrite(datasetid, typeid, H5S_ALL, H5S_ALL, 
+      if (H5Dwrite(datasetid, typeid, H5S_ALL, H5S_ALL,
                    H5P_DEFAULT, data2) < 0) ERR;
-      
+
       /* Release all resources. */
       if (H5Dclose(datasetid) < 0 ||
           H5Tclose(typeid) < 0 ||
@@ -252,7 +252,7 @@ main()
       if ((typeid = H5Dget_type(datasetid)) < 0) ERR;
       if (H5Tget_class(typeid) != H5T_COMPOUND) ERR;
       if (H5Tget_nmembers(typeid) != 2) ERR;
-      /* This doesn't work because all I have is a reference to the type! 
+      /* This doesn't work because all I have is a reference to the type!
          if (H5Iget_name(typeid, type_name, STR_LEN) < 0) ERR;
          if (strcmp(type_name, COMPOUND_NAME)) ERR;*/
 
@@ -265,7 +265,7 @@ main()
 
    SUMMARIZE_ERR;
    printf("*** Checking HDF5 compound type 6 different types...");
-   
+
    {
 #define DAY "day"
 #define ELEV "elev"
@@ -275,7 +275,7 @@ main()
 #define OBS_T "obs_t"
 #define OBS_VAR "obs_var"
 #define DIM6_LEN 3
-      
+
       hid_t fileid, grpid, spaceid, typeid, native_typeid;
       hid_t datasetid, mem_type;
       hsize_t dims[1];
@@ -295,8 +295,8 @@ main()
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
       if (!(dummy = calloc(sizeof(struct obs_t), DIM6_LEN))) ERR;
-      memcpy((void *)obsdata, (void *)dummy, sizeof(struct obs_t) * DIM6_LEN); 
-      free(dummy); 
+      memcpy((void *)obsdata, (void *)dummy, sizeof(struct obs_t) * DIM6_LEN);
+      free(dummy);
 
       /* Initialize data. */
       for (i = 0; i < DIM6_LEN; i++)
@@ -330,7 +330,7 @@ main()
 
       /* Write some data. */
       if (H5Dwrite(datasetid, typeid, H5S_ALL, H5S_ALL, H5P_DEFAULT, obsdata) < 0) ERR;
-      
+
       /* Release all resources. */
       if (H5Dclose(datasetid) < 0 ||
           H5Tclose(typeid) < 0 ||
@@ -443,8 +443,8 @@ main()
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
       if (!(dummy = calloc(sizeof(struct hr_rec), DIM1_LEN))) ERR;
-      memcpy((void *)hr_data_out, (void *)dummy, sizeof(struct hr_rec) * DIM1_LEN); 
-      free(dummy); 
+      memcpy((void *)hr_data_out, (void *)dummy, sizeof(struct hr_rec) * DIM1_LEN);
+      free(dummy);
 
       /* Create some phony data. */
       for (i = 0; i < DIM1_LEN; i++)
@@ -489,7 +489,7 @@ main()
 
       /* Write some data. */
       if (H5Dwrite(datasetid, typeid, H5S_ALL, H5S_ALL, H5P_DEFAULT, hr_data_out) < 0) ERR;
-      
+
       /* Release all resources. */
       if (H5Dclose(datasetid) < 0 ||
           H5Tclose(array1_tid) < 0 ||
@@ -596,7 +596,7 @@ main()
 
       /* Write some data. */
       if (H5Dwrite(datasetid, typeid, H5S_ALL, H5S_ALL, H5P_DEFAULT, hr_data_out) < 0) ERR;
-      
+
       /* Release all resources. */
       if (H5Dclose(datasetid) < 0 ||
           H5Tclose(array1_tid) < 0 ||
@@ -702,7 +702,7 @@ main()
 
       /* Write some data to the attribute. */
       if (H5Awrite(attid, typeid, hr_data_out) < 0) ERR;
-      
+
       /* Release all resources. */
       if (H5Aclose(attid) < 0 ||
           H5Tclose(typeid) < 0 ||
@@ -785,7 +785,7 @@ main()
 
       /* Write some data. */
       if (H5Dwrite(datasetid, typeid, H5S_ALL, H5S_ALL, H5P_DEFAULT, hr_data_out) < 0) ERR;
-      
+
       /* Release all resources. */
       if (H5Dclose(datasetid) < 0 ||
           H5Tclose(array1_tid) < 0 ||
@@ -835,8 +835,8 @@ main()
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
       if (!(dummy = calloc(sizeof(struct hr_rec), DIM2_LEN))) ERR;
-      memcpy((void *)hr_data_out, (void *)dummy, sizeof(struct hr_rec) * DIM2_LEN); 
-      free(dummy); 
+      memcpy((void *)hr_data_out, (void *)dummy, sizeof(struct hr_rec) * DIM2_LEN);
+      free(dummy);
 
       /* Create some phony data. */
       for (i = 0; i < DIM2_LEN; i++)
@@ -869,7 +869,7 @@ main()
 
       /* Write some data. */
       if (H5Awrite(attid, typeid, hr_data_out) < 0) ERR;
-      
+
       /* Release all resources. */
       if (H5Aclose(attid) < 0 ||
           H5Tclose(array1_tid) < 0 ||
@@ -956,7 +956,7 @@ main()
 
       /* Write some data. */
       if (H5Awrite(attid, typeid, data_out) < 0) ERR;
-      
+
       /* Release all resources. */
       if (H5Aclose(attid) < 0 ||
 	  H5Tclose(array1_tid) < 0 ||
@@ -1018,8 +1018,8 @@ main()
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
       if (!(dummy = calloc(sizeof(struct s2), DIM_CMP_LEN))) ERR;
-      memcpy((void *)data_out, (void *)dummy, sizeof(struct s2) * DIM_CMP_LEN); 
-      free(dummy); 
+      memcpy((void *)data_out, (void *)dummy, sizeof(struct s2) * DIM_CMP_LEN);
+      free(dummy);
 
       /* Create some phony data. */
       for (i = 0; i < DIM_CMP_LEN; i++)
@@ -1061,7 +1061,7 @@ main()
 
       /* Write some data to the attribute. */
       if (H5Awrite(attid, typeid_outer, data_out) < 0) ERR;
-      
+
       /* Release all resources. */
       if (H5Aclose(attid) < 0 ||
           H5Tclose(typeid_outer) < 0 ||
@@ -1120,8 +1120,8 @@ main()
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
       if (!(dummy = calloc(sizeof(struct s2), DIM_CMP_LEN))) ERR;
-      memcpy((void *)data_out, (void *)dummy, sizeof(struct s2) * DIM_CMP_LEN); 
-      free(dummy); 
+      memcpy((void *)data_out, (void *)dummy, sizeof(struct s2) * DIM_CMP_LEN);
+      free(dummy);
 
       /* Create some phony data. */
       for (i = 0; i < DIM_CMP_LEN; i++)
@@ -1163,7 +1163,7 @@ main()
 
       /* Write some data to the attribute. */
       if (H5Awrite(attid, typeid_outer, data_out) < 0) ERR;
-      
+
       /* Release all resources. */
       if (H5Aclose(attid) < 0 ||
           H5Tclose(typeid_outer) < 0 ||

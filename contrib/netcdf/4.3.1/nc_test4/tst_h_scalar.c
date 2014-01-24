@@ -32,7 +32,7 @@ add_attrs(hid_t objid)
 
     /* Create scalar dataspace */
     if ((scalar_spaceid = H5Screate(H5S_SCALAR)) < 0) ERR_GOTO;
-    
+
     /* Create string datatypes */
     if ((vlstr_typeid = H5Tcreate(H5T_STRING, (size_t)H5T_VARIABLE)) < 0) ERR_GOTO;
     if ((fixstr_typeid = H5Tcreate(H5T_STRING, (size_t)10)) < 0) ERR_GOTO;
@@ -193,10 +193,10 @@ main()
         if ((fcplid = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
         if (H5Pset_link_creation_order(fcplid, H5P_CRT_ORDER_TRACKED) < 0) ERR;
         if (H5Pset_attr_creation_order(fcplid, H5P_CRT_ORDER_TRACKED) < 0) ERR;
-	
+
 	/* Create new file, using default properties */
 	if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, fcplid, H5P_DEFAULT)) < 0) ERR;
-	
+
         /* Close file creation property list */
         if (H5Pclose(fcplid) < 0) ERR;
 
@@ -212,7 +212,7 @@ main()
         if ((dcplid = H5Pcreate(H5P_DATASET_CREATE)) < 0) ERR;
         if (H5Pset_attr_creation_order(dcplid, H5P_CRT_ORDER_TRACKED) < 0) ERR;
 
-	
+
         /* Create scalar dataset with VL string datatype */
         if ((dsetid = H5Dcreate2(fileid, VSTR_VAR1_NAME, vlstr_typeid, scalar_spaceid, H5P_DEFAULT, dcplid, H5P_DEFAULT)) < 0) ERR;
 
@@ -328,7 +328,7 @@ main()
         char *vlstr;
 
 	if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
-        
+
         /* Write to the VL string variable */
 	if (nc_inq_varid(ncid, VSTR_VAR1_NAME, &varid)) ERR;
         vlstr = NULL;

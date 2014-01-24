@@ -2,7 +2,7 @@
    Corporation for Atmospheric Research/Unidata See COPYRIGHT file for
    conditions of use.
 
-   Test netcdf-4 coordinate variables and dimensions. 
+   Test netcdf-4 coordinate variables and dimensions.
 
    $Id: tst_coords.c,v 1.20 2010/03/30 16:25:41 ed Exp $
 */
@@ -33,7 +33,7 @@ main(int argc, char **argv)
    {
 #define NDIMS 2
 #define NLAT 10
-#define NLON 20 
+#define NLON 20
 #define LAT_NAME "lat"
 #define LON_NAME "lon"
 #define NVARS 2
@@ -54,7 +54,7 @@ main(int argc, char **argv)
 	    lats[lat] = START_LAT + 5. * lat;
 	 for (lon = 0; lon < NLON; lon++)
 	    lons[lon] = START_LON + 5. * lon;
-	 
+
 	 /* Create file with two dimensions. */
 	 if (nc_create(FILE_NAME, NC_NETCDF4 | NC_CLOBBER, &ncid)) ERR;
 	 if (nc_def_dim(ncid, LAT_NAME, NLAT, &lat_dimid)) ERR;
@@ -74,7 +74,7 @@ main(int argc, char **argv)
 	 if (nc_inq_varids(ncid, &nvars_in, varids_in)) ERR;
 	 if (nvars_in != 2 || varids_in[0] != 0 || varids_in[1] != 1) ERR;
 	 if (nc_inq_var(ncid, 0, var_name_in, &xtype_in, &ndims_in, dimids_in, &natts_in)) ERR;
-	 if (strcmp(var_name_in, LON_NAME) || xtype_in != NC_FLOAT || ndims_in != 1 || 
+	 if (strcmp(var_name_in, LON_NAME) || xtype_in != NC_FLOAT || ndims_in != 1 ||
 	     dimids_in[0] != 1 || natts_in != 0) ERR;
 
 	 /* Close the file. */
@@ -88,7 +88,7 @@ main(int argc, char **argv)
 	 if (nc_inq_varids(ncid, &nvars_in, varids_in)) ERR;
 	 if (nvars_in != 2 || varids_in[0] != 0 || varids_in[1] != 1) ERR;
 	 if (nc_inq_var(ncid, 0, var_name_in, &xtype_in, &ndims_in, dimids_in, &natts_in)) ERR;
-	 if (strcmp(var_name_in, LON_NAME) || xtype_in != NC_FLOAT || ndims_in != 1 || 
+	 if (strcmp(var_name_in, LON_NAME) || xtype_in != NC_FLOAT || ndims_in != 1 ||
 	 dimids_in[0] != 1 || natts_in != 0) ERR;
 
 	 if (nc_close(ncid)) ERR;
@@ -129,7 +129,7 @@ main(int argc, char **argv)
       int ncid_classic, ncid_nc4;
       /*int attid;*/
       char att_in_classic[NC_MAX_NAME + 1], att_in_nc4[NC_MAX_NAME + 1];
-      
+
 #define FILE_CLASSIC "tst_coords_classic_att.nc"
 #define FILE_NC4 "tst_coords_nc4_att.nc"
       /* Create a classic and a netcdf-4 file. */
@@ -154,7 +154,7 @@ main(int argc, char **argv)
       if (strcmp(att_in_classic, INSTITUTION) || strcmp(att_in_nc4, INSTITUTION) ||
 	  strcmp(att_in_classic, att_in_nc4)) ERR;
       if (memcmp(att_in_classic, att_in_nc4, strlen(INSTITUTION) + 1)) ERR;
-      
+
       /* Close them. */
       if (nc_close(ncid_classic)) ERR;
       if (nc_close(ncid_nc4)) ERR;
@@ -504,7 +504,7 @@ main(int argc, char **argv)
 
 	 if (nc_close(ncid)) ERR;
       }
-      
+
    }
    SUMMARIZE_ERR;
    printf("**** testing dim order when coord vars are defined in the wrong order...");

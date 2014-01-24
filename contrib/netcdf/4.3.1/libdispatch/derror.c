@@ -12,7 +12,7 @@ Research/Unidata. See COPYRIGHT file for more info.
 /* Tell the user the version of netCDF. */
 static const char nc_libvers[] = PACKAGE_VERSION " of "__DATE__" "__TIME__" $";
 
-/** \defgroup lib_version Library Version 
+/** \defgroup lib_version Library Version
 
 */
 
@@ -55,7 +55,7 @@ status value.
 
 /**
 \ingroup error
- Given an error number, return an error message. 
+ Given an error number, return an error message.
 
 This function returns a static reference to an error message string
 corresponding to an integer netCDF error status or to a system error
@@ -198,7 +198,7 @@ nc_strerror(int ncerr1)
 	 return "NetCDF: Can't create file";
       case NC_EFILEMETA:
 	 return "NetCDF: Can't add HDF5 file metadata";
-      case NC_EDIMMETA:      
+      case NC_EDIMMETA:
 	 return "NetCDF: Can't define dimensional metadata";
       case NC_EATTMETA:
 	 return "NetCDF: Can't open HDF5 attribute";

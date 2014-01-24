@@ -45,7 +45,7 @@ main(int argc, char **argv)
     float fvals[NVALS], fvals_in[NVALS];
     double dvals[NVALS], dvals_in[NVALS];
 
-    
+
     float fnan = NC_FNAN;//(NC_INFINITE-NC_INFINITE);//0.f/0.f;
     double dnan = NC_DNAN;//(NC_INFINITE-NC_INFINITE);//0.0/0.0;
     float fpinf = NC_FPINF;//NC_INFINITE;//1.0f/0.0f;
@@ -60,9 +60,9 @@ main(int argc, char **argv)
     printf("\n*** Testing NaN\n");
     printf("*** creating NaN test file %s...", FILE8_NAME);
     if (nc_create(FILE8_NAME, NC_CLOBBER, &ncid)) ERR;
-    
+
     if (nc_def_dim(ncid, DIM_NAME, NVALS, &dimid)) ERR;
-    
+
     if (nc_def_var(ncid, F_NAME, NC_FLOAT, NDIMS, &dimid, &fvarid)) ERR;
     if (nc_def_var(ncid, D_NAME, NC_DOUBLE, NDIMS, &dimid, &dvarid)) ERR;
 
@@ -72,23 +72,23 @@ main(int argc, char **argv)
     dvals[0] = dninf;
     dvals[1] = dnan;
     dvals[2] = dpinf;
-    
+
     /* Create float and double attributes */
     if (nc_put_att_float(ncid, fvarid, FV_NAME, NC_FLOAT, FV_NVALS, &fnan)) ERR;
     if (nc_put_att_float(ncid, fvarid, ATT_NAME, NC_FLOAT, NVALS, fvals)) ERR;
     if (nc_put_att_double(ncid, dvarid, FV_NAME, NC_DOUBLE, FV_NVALS, &dnan)) ERR;
     if (nc_put_att_double(ncid, dvarid, ATT_NAME, NC_DOUBLE, NVALS, dvals)) ERR;
-    
+
     if (nc_enddef(ncid)) ERR;
-   
+
     /* Write float and double data */
    if (nc_put_var_float(ncid, fvarid, fvals)) ERR;
    if (nc_put_var_double(ncid, dvarid, dvals)) ERR;
-   
+
    if (nc_close(ncid)) ERR;
-   
+
    /* Check it out. */
-   
+
    /* Reopen the file. */
    if (nc_open(FILE8_NAME, NC_NOWRITE, &ncid)) ERR;
    if (nc_inq_varid(ncid, F_NAME, &fvarid)) ERR;
@@ -123,7 +123,7 @@ main(int argc, char **argv)
    if (!(isinf(dvals_in[2]) && dvals_in[2] > 0)) ERR;
 
    if (nc_close(ncid)) ERR;
-   
+
    SUMMARIZE_ERR;
    FINAL_RESULTS;
 }

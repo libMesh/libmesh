@@ -27,7 +27,7 @@ Create an opaque type. Provide a size and a name.
 \returns ::NC_EMAXNAME Name exceeds max length NC_MAX_NAME.
 \returns ::NC_EBADNAME Name contains illegal characters.
 \returns ::NC_EPERM Attempt to write to a read-only file.
-\returns ::NC_ENOTINDEFINE Not in define mode. 
+\returns ::NC_ENOTINDEFINE Not in define mode.
  */
 int
 nc_def_opaque(int ncid, size_t size, const char *name, nc_type *xtypep)

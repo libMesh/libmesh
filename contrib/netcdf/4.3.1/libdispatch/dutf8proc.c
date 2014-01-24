@@ -584,7 +584,7 @@ uint8_t *utf8proc_NFKC(const uint8_t *str) {
 
 ssize_t utf8proc_check(const uint8_t *str) {
   ssize_t result;
-  result = utf8proc_decompose(str, 0, NULL, 0, 
+  result = utf8proc_decompose(str, 0, NULL, 0,
 			      UTF8PROC_NULLTERM | UTF8PROC_STABLE);
   return result;
 }

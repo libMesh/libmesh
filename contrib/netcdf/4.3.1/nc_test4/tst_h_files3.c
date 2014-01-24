@@ -2,7 +2,7 @@
    Copyright 2005 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test netcdf-4 variables. 
+   Test netcdf-4 variables.
    $Id: tst_h_files3.c,v 1.2 2010/02/05 17:06:28 ed Exp $
 */
 
@@ -26,7 +26,7 @@ get_mem_used2(int *mem_used)
 {
    char buf[30];
    FILE *pf;
-   
+
    snprintf(buf, 30, "/proc/%u/statm", (unsigned)getpid());
    pf = fopen(buf, "r");
    if (pf) {
@@ -37,7 +37,7 @@ get_mem_used2(int *mem_used)
       unsigned lib;/*        library */
       unsigned data;/*       data/stack */
       /*unsigned dt;          dirty pages (unused in Linux 2.6)*/
-      fscanf(pf, "%u %u %u %u %u %u", &size, &resident, &share, 
+      fscanf(pf, "%u %u %u %u %u %u", &size, &resident, &share,
 	     &text, &lib, &data);
       *mem_used = data;
    }
@@ -75,7 +75,7 @@ main(int argc, char **argv)
 /*  	 if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR; */
 /* 	 if ((fileid = H5Fopen(FILE_NAME2, H5F_ACC_RDONLY, H5P_DEFAULT)) < 0) ERR; */
 /* 	 if ((grpid = H5Gopen(fileid, "/")) < 0) ERR; */
-	 
+
 /* 	 if ((datasetid = H5Dopen2(grpid, obj_name2, H5P_DEFAULT)) < 0) ERR; */
 /* 	 num_scales = H5DSget_num_scales(datasetid, 0); */
 
@@ -143,7 +143,7 @@ main(int argc, char **argv)
 /* 				  H5F_LIBVER_LATEST) < 0) ERR; */
 /* 	 if ((fileid = H5Fopen(FILE_NAME2, H5F_ACC_RDONLY, fapl_id)) < 0) ERR; */
 /* 	 if ((grpid = H5Gopen(fileid, "/")) < 0) ERR; */
-	 
+
 /* 	 if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR; */
 /* 	 if (num_obj > MAX_OBJ) ERR; */
 /* 	 for (i = 0; i < num_obj; i++) */
@@ -195,7 +195,7 @@ main(int argc, char **argv)
 /* 	    if (H5Pclose(access_pid)) ERR; */
 /* 	    if (H5Sclose(spaceid)) ERR; */
 /* 	 } */
-	 
+
 /* 	 get_mem_used2(&mem_used1); */
 
 /* 	 /\* Close everything. *\/ */

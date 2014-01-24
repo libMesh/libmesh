@@ -63,11 +63,11 @@ test_nc_create(void)
 
 
 /*
- * Test nc_redef 
+ * Test nc_redef
  * (In fact also tests nc_enddef - called from test_nc_enddef)
  *    BAD_ID
  *    attempt redef (error) & enddef on read-only file
- *    create file, define dims & vars. 
+ *    create file, define dims & vars.
  *    attempt put var (error)
  *    attempt redef (error) & enddef.
  *    put vars
@@ -116,7 +116,7 @@ test_nc_redef(void)
     IF (err != NC_ENOTINDEFINE)
 	error("nc_redef in NC_NOWRITE mode: status = %d", err);
     err = nc_close(ncid);
-    IF (err) 
+    IF (err)
 	error("nc_close: %s", nc_strerror(err));
 
 	/* tests using scratch file */
@@ -132,7 +132,7 @@ test_nc_redef(void)
     def_vars(ncid);
     put_atts(ncid);
     err = nc_inq_varid(ncid, "d", &varid);
-    IF (err) 
+    IF (err)
 	error("nc_inq_varid: %s", nc_strerror(err));
     var = 1.0;
     err = nc_put_var1_double(ncid, varid, NULL, &var);
@@ -189,7 +189,7 @@ test_nc_redef(void)
     IF (err)
 	error("nc_inq_format: %s", nc_strerror(err));
     err = nc_close(ncid);
-    IF (err) 
+    IF (err)
 	error("nc_close: %s", nc_strerror(err));
 
     /* check scratch file written as expected */
@@ -197,11 +197,11 @@ test_nc_redef(void)
 
     IF ((err = nc_open(scratch, NC_NOWRITE, &ncid)))
         error("nc_open: %s", nc_strerror(err));
-    IF ((err = nc_inq_dim(ncid, dimid, name, &length))) 
+    IF ((err = nc_inq_dim(ncid, dimid, name, &length)))
 	error("nc_inq_dim: %s", nc_strerror(err));
-    IF (strcmp(name, "abc") != 0) 
+    IF (strcmp(name, "abc") != 0)
 	error("Unexpected dim name");
-    IF (length != sizehint) 
+    IF (length != sizehint)
 	error("Unexpected dim length");
     IF ((err = nc_get_var1_double(ncid, varid, NULL, &var)))
         error("nc_get_var1_double: %s", nc_strerror(err));
@@ -228,7 +228,7 @@ test_nc_redef(void)
     var = 2.0;
     IF ((err = nc_put_var1_double(ncid, varid, NULL, &var)))
         error("nc_put_var1_double: %s", nc_strerror(err));
-    IF ((err = nc_close(ncid))) 
+    IF ((err = nc_close(ncid)))
 	error("nc_close: %s", nc_strerror(err));
 
     /* check scratch file written as expected */
@@ -238,11 +238,11 @@ test_nc_redef(void)
     IF (err)
         error("nc_open: %s", nc_strerror(err));
     err = nc_inq_dim(ncid, dimid, name, &length);
-    IF (err) 
+    IF (err)
 	error("nc_inq_dim: %s", nc_strerror(err));
-    IF (strcmp(name, "def") != 0) 
+    IF (strcmp(name, "def") != 0)
 	error("Unexpected dim name");
-    IF (length != sizehint) 
+    IF (length != sizehint)
 	error("Unexpected dim length");
     err = nc_get_var1_double(ncid, varid, NULL, &var);
     IF (err)
@@ -265,7 +265,7 @@ test_nc_redef(void)
 
 
 /*
- * Test nc_enddef 
+ * Test nc_enddef
  * Simply calls test_nc_redef which tests both nc_redef & nc_enddef
  */
 void
@@ -380,12 +380,12 @@ test_nc_abort(void)
     IF (!err)
         error("file %s should not exist", scratch);
 
-        /* 
+        /*
          * create scratch file
 	 * do nc_enddef & nc_redef
 	 * define new dims, vars, atts
 	 * try nc_abort: should restore previous state (no dims, vars, atts)
-	 */ 
+	 */
     err = nc_create(scratch, NC_NOCLOBBER, &ncid);
     IF (err) {
         error("nc_create: %s", nc_strerror(err));
@@ -490,19 +490,19 @@ test_nc_def_dim(void)
     IF (err)
         error("nc_redef: %s", nc_strerror(err));
     err = nc_def_dim(ncid, dim_name[0], NC_UNLIMITED, &dimid);
-    IF (err) 
+    IF (err)
 	error("nc_def_dim: %s", nc_strerror(err));
-    IF (dimid != 0) 
+    IF (dimid != 0)
 	error("Unexpected dimid");
     err = nc_inq_unlimdim(ncid, &dimid);
-    IF (err) 
+    IF (err)
 	error("nc_inq_unlimdim: %s", nc_strerror(err));
-    IF (dimid != 0) 
+    IF (dimid != 0)
 	error("Unexpected recdim");
     err = nc_inq_dimlen(ncid, dimid, &length);
     IF (err)
 	error("nc_inq_dimlen: %s", nc_strerror(err));
-    IF (length != 0) 
+    IF (length != 0)
 	error("Unexpected length");
     err = nc_def_dim(ncid, "abc", NC_UNLIMITED, &dimid);
     IF (err != NC_EUNLIMIT)
@@ -522,9 +522,9 @@ test_nc_def_dim(void)
 	        error("bad size: status = %d", err);
 	}
         err = nc_def_dim(ncid, dim_name[i], dim_len[i], &dimid);
-        IF (err) 
+        IF (err)
 	    error("nc_def_dim: %s", nc_strerror(err));
-	IF (dimid != i) 
+	IF (dimid != i)
 	    error("Unexpected dimid");
     }
 
@@ -681,7 +681,7 @@ test_nc_def_var(void)
     for (i = 0; i < NVARS; i++) {
         err = nc_def_var(ncid, var_name[i], var_type[i], var_rank[i],
             var_dimid[i], &varid);
-        IF (err) 
+        IF (err)
 	    error("nc_def_var: %s", nc_strerror(err));
 	IF (varid != i)
 	    error("Unexpected varid");
@@ -1103,7 +1103,7 @@ test_nc_put_varm(void)
             stride[j] = 1;
         }
 	if (var_rank[i] > 0) {
-	    j = var_rank[i] - 1; 
+	    j = var_rank[i] - 1;
 	    imap[j] = nctypelen(var_type[i]);
 	    for (; j > 0; j--)
 		imap[j-1] = imap[j] * var_shape[i][j];
@@ -1441,7 +1441,7 @@ test_nc_copy_att(void)
         error("nc_open: %s", nc_strerror(err));
     check_atts(ncid_out);
 
-       /* 
+       /*
 	* change to define mode
 	* define single char. global att. ':a' with value 'A'
 	* This will be used as source for following copies
@@ -1453,7 +1453,7 @@ test_nc_copy_att(void)
     IF (err)
 	error("nc_put_att_text: %s", nc_strerror(err));
 
-       /* 
+       /*
 	* change to data mode
 	* Use scratch as both source & dest.
 	* try copy to existing att. change type & decrease length
@@ -1495,8 +1495,8 @@ test_nc_copy_att(void)
 		error("nc_get_att_text: %s", nc_strerror(err));
 	    IF (value != 'A')
 		error("Unexpected value");
-	}                                                   
-    }                                                   
+	}
+    }
 
     err = nc_close(ncid_out);
     IF (err)
@@ -1996,7 +1996,7 @@ nc_get_file_version(char *path, int *version)
    fclose(fp);
    if (strncmp(magic, "CDF", MAGIC_NUM_LEN-1)==0)
    {
-      if (magic[MAGIC_NUM_LEN-1] == NC_FORMAT_CLASSIC || 
+      if (magic[MAGIC_NUM_LEN-1] == NC_FORMAT_CLASSIC ||
 	  magic[MAGIC_NUM_LEN-1] == NC_FORMAT_64BIT)
 	 *version = magic[MAGIC_NUM_LEN-1];
       else
@@ -2044,7 +2044,7 @@ test_nc_set_default_format(void)
 	  error("setting classic format: status = %d", err);
        if ((err=nc_create(scratch, NC_CLOBBER, &ncid)))
 	  error("bad nc_create: status = %d", err);
-       if ((err=nc_put_att_text(ncid, NC_GLOBAL, "testatt", 
+       if ((err=nc_put_att_text(ncid, NC_GLOBAL, "testatt",
 				sizeof("blah"), "blah")))
 	  error("bad put_att: status = %d", err);
        if ((err=nc_close(ncid)))

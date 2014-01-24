@@ -69,19 +69,19 @@ main(int argc, char **argv)
    if (nc_close(ncid)) ERR;
 
    /* Check it out. */
-   
+
    /* Reopen the file. */
    if (nc_open(FILE3_NAME, NC_NOWRITE, &ncid)) ERR;
 
    /* Get info with the generic inquire for user-defined types */
    if (nc_inq_user_type(ncid, typeid, name_in, &size_in, NULL,
 			   NULL, &class_in)) ERR;
-   if (strcmp(name_in, TYPE3_NAME) || 
+   if (strcmp(name_in, TYPE3_NAME) ||
        size_in != TYPE3_SIZE ||
        class_in != NC_OPAQUE) ERR;
    /* Get the same info with the opaque-specific inquire function */
    if (nc_inq_opaque(ncid, typeid, name_in, &size_in)) ERR;
-   if (strcmp(name_in, TYPE3_NAME) || 
+   if (strcmp(name_in, TYPE3_NAME) ||
        size_in !=  TYPE3_SIZE) ERR;
 
    if (nc_inq_varid(ncid, VAR3_NAME, &varid)) ERR;
@@ -95,10 +95,10 @@ main(int argc, char **argv)
        if(nc_get_var1(ncid, varid, index, val_in)) ERR;
        if (memcmp(val_in, sensor_data[i], TYPE3_SIZE) != 0) ERR;
    }
-   
-   if (nc_close(ncid)) ERR; 
-   
-   
+
+   if (nc_close(ncid)) ERR;
+
+
    SUMMARIZE_ERR;
    FINAL_RESULTS;
 }

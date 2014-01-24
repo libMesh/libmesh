@@ -27,7 +27,7 @@
 
 /*
  * Fill typed array element with specified value, that is
- * 	
+ *
  * 	v[ii] = val;
  */
 static void
@@ -67,7 +67,7 @@ val_stuff(type, v, ii, val)	/* v[ii] = val */
  *
  * 	(v[ii] != val)
  *
- * returns 0 if equal, 1 if not equal 
+ * returns 0 if equal, 1 if not equal
  */
 
 static int
@@ -196,12 +196,12 @@ test_slabs(cdfid)
 		}
 	    }
 	}
-	
+
 	for (idim = 0; idim < NDIMS; idim++) {
 	    corner[idim] = 0;
 	    edge[idim] = dims[idim].size;
 	}
-      
+
 	/* ncvarput the whole variable */
 	if (ncvarput(cdfid, varid[iv], corner, edge, (void *) v) == -1) {
 	    error("%s: ncvarput failed", pname);
@@ -229,7 +229,7 @@ test_slabs(cdfid)
 	    error("%s: ncvarget got wrong value for point", pname);
 	    nerrs++;
 	}
-	
+
 	/* get an interior vector in each direction */
 	for (idim=0; idim < NDIMS; idim++) {
 	    for (jdim=0; jdim < NDIMS; jdim++) {
@@ -288,7 +288,7 @@ test_slabs(cdfid)
 		}
 	    }
 	}
-	
+
 	/* get an interior cube in each direction */
 	for (idim=0; idim < NDIMS; idim++) {
 	    for (jdim=idim+1; jdim < NDIMS; jdim++) {

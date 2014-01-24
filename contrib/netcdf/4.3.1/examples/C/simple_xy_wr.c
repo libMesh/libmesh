@@ -65,7 +65,7 @@ main()
 
    /* Define the variable. The type of the variable in this case is
     * NC_INT (4-byte integer). */
-   if ((retval = nc_def_var(ncid, "data", NC_INT, NDIMS, 
+   if ((retval = nc_def_var(ncid, "data", NC_INT, NDIMS,
 			    dimids, &varid)))
       ERR(retval);
 

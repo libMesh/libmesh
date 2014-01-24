@@ -27,7 +27,7 @@
 
 #define NDIMS1 2
 #define NDIMS2 4
-#define DIMSIZE /*4 */ 768*2 
+#define DIMSIZE /*4 */ 768*2
 #define DIMSIZE2 4
 #define DIMSIZE3 4
 #define TIMELEN 1
@@ -160,7 +160,7 @@ int main(int argc, char **argv)
       SUMMARIZE_ERR;
 
 /*     if(!getenv_all(MPI_COMM_WORLD,0,"NETCDF4_NOCLEANUP")) */
-   remove(file_name); 
+   remove(file_name);
    MPI_Finalize();
 
    if (mpi_rank == 0)
@@ -169,7 +169,7 @@ int main(int argc, char **argv)
 }
 
 /* Both read and write will be tested */
-int test_pio(int flag) 
+int test_pio(int flag)
 {
    /* MPI stuff. */
    int mpi_size, mpi_rank;
@@ -257,7 +257,7 @@ int test_pio(int flag)
    if (nc_def_var(ncid, "uv1", NC_INT, NDIMS2, dimuids, &uvid)) ERR;
 
    if (nc_enddef(ncid)) ERR;
- 
+
    /* Set up selection parameters */
    ustart[0] = 0;
    ustart[1] = 0;
@@ -270,7 +270,7 @@ int test_pio(int flag)
 
    /* Access parallel */
    if (nc_var_par_access(ncid, uvid, flag)) ERR;
-    
+
    /* Create phony data. */
    if (!(udata = malloc(ucount[0]*ucount[1]*ucount[2]*ucount[3]*sizeof(int)))) ERR;
    tempudata = udata;
@@ -309,14 +309,14 @@ int test_pio(int flag)
    if (nc_inq_varid(ncid, "v1", &rvid)) ERR;
 
    if (nc_var_par_access(ncid, rvid, flag)) ERR;
-    
+
    if (!(rdata = malloc(sizeof(int)*count[1]*count[0]))) ERR;
    if (nc_get_vara_int(ncid, rvid, start, count, rdata)) ERR;
 
    temprdata = rdata;
    for (j=0; j<count[0];j++){
       for (i=0; i<count[1]; i++){
-	 if(*temprdata != mpi_rank*(j+1)) 
+	 if(*temprdata != mpi_rank*(j+1))
 	 {
 	    ERR_RET;
 	    break;
@@ -337,12 +337,12 @@ int test_pio(int flag)
    ucount[1] = DIMSIZE3;
    ucount[2] = DIMSIZE2;
    ucount[3] = DIMSIZE/mpi_size;
- 
+
    /* Inquiry the data */
    /* (NOTE: This variable isn't written out, when access is independent) */
    if (NC_INDEPENDENT != flag) {
        if (nc_inq_varid(ncid, "uv1", &rvid)) ERR;
-        
+
        /* Access the parallel */
        if (nc_var_par_access(ncid, rvid, flag)) ERR;
 
@@ -374,7 +374,7 @@ int test_pio(int flag)
 
 /* Attributes: both read and write will be tested for parallel NetCDF*/
 
-int test_pio_attr(int flag) 
+int test_pio_attr(int flag)
 {
    /* MPI stuff. */
    int mpi_size, mpi_rank;
@@ -424,14 +424,14 @@ int test_pio_attr(int flag)
 
    /* Write attributes of a variable */
 
-   if (nc_put_att_double (ncid, nvid, "valid_range", NC_DOUBLE, 
+   if (nc_put_att_double (ncid, nvid, "valid_range", NC_DOUBLE,
 			  orivr_len, rh_range)) ERR;
 
-   if (nc_put_att_text (ncid, nvid, "title", strlen(title), 
+   if (nc_put_att_text (ncid, nvid, "title", strlen(title),
 			title)) ERR;
 
    /* Write global attributes */
-   if (nc_put_att_double (ncid, NC_GLOBAL, "g_valid_range", NC_DOUBLE, 
+   if (nc_put_att_double (ncid, NC_GLOBAL, "g_valid_range", NC_DOUBLE,
 			  orivr_len, rh_range)) ERR;
    if (nc_put_att_text (ncid, NC_GLOBAL, "g_title", strlen(title), title)) ERR;
 
@@ -442,10 +442,10 @@ int test_pio_attr(int flag)
    start[1] = mpi_rank * DIMSIZE/mpi_size;
    count[0] = DIMSIZE2;
    count[1] = DIMSIZE/mpi_size;
-   
+
    /* Access parallel */
    if (nc_var_par_access(ncid, nvid, flag)) ERR;
-   
+
    /* Allocating data */
    data      = malloc(sizeof(int)*count[1]*count[0]);
    tempdata  = data;
@@ -484,22 +484,22 @@ if (nc_open_par(file_name, facc_type_open, comm, info, &ncid)) ERR;
    if(vr_type != NC_DOUBLE || vr_len != orivr_len) ERR;
 
    vr_val = (double *) malloc(vr_len * sizeof(double));
-     
+
    /* Get variable attribute values */
    if (nc_get_att_double(ncid, nvid, "valid_range", vr_val)) ERR;
 
    /* Check variable attribute value */
    for(i = 0; i < vr_len; i++)
-      if (vr_val[i] != rh_range[i]) 
+      if (vr_val[i] != rh_range[i])
 	 ERR_RET;
    free(vr_val);
- 
+
    /* Inquiry global attribute */
    if (nc_inq_att (ncid, NC_GLOBAL, "g_valid_range", &vr_type, &vr_len)) ERR;
 
    /* Check stuff. */
    if(vr_type != NC_DOUBLE || vr_len != orivr_len) ERR;
-    
+
    /* Obtain global attribute value */
    vr_val = (double *) malloc(vr_len * sizeof(double));
    if (nc_get_att_double(ncid, NC_GLOBAL, "g_valid_range", vr_val)) ERR;
@@ -520,7 +520,7 @@ if (nc_open_par(file_name, facc_type_open, comm, info, &ncid)) ERR;
 
    /* Allocate meory for string attribute */
    st_val = (char *) malloc(st_len * (sizeof(char)));
- 
+
    /* Obtain variable string attribute value */
    if (nc_get_att_text(ncid, nvid,"title", st_val)) ERR;
 
@@ -559,7 +559,7 @@ if (nc_open_par(file_name, facc_type_open, comm, info, &ncid)) ERR;
 
 /* test different hyperslab settings */
 int test_pio_hyper(int flag){
-  
+
    /* MPI stuff. */
    int mpi_size, mpi_rank;
    int res = NC_NOERR;
@@ -606,7 +606,7 @@ int test_pio_hyper(int flag){
    if (nc_enddef(ncid)) ERR;
 
 
-   /* hyperslab illustration for 3-processor case 
+   /* hyperslab illustration for 3-processor case
 
       --------
       |aaaacccc|
@@ -618,7 +618,7 @@ int test_pio_hyper(int flag){
 
    /* odd number of processors should be treated differently */
    if(mpi_size%2 != 0) {
-      
+
       count_atom = DIMSIZE*2/(mpi_size+1);
       if(mpi_rank <= mpi_size/2) {
          start[0] = 0;
@@ -631,10 +631,10 @@ int test_pio_hyper(int flag){
          start[1] = (mpi_rank-mpi_size/2-1)*count_atom;
          count[0] = DIMSIZE2/2;
          count[1] = count_atom;
-      }  
+      }
    }
    else  {
-    
+
       count_atom = DIMSIZE*2/mpi_size;
       if(mpi_rank < mpi_size/2) {
          start[0] = 0;
@@ -647,7 +647,7 @@ int test_pio_hyper(int flag){
          start[1] = (mpi_rank-mpi_size/2)*count_atom;
          count[0] = DIMSIZE2/2;
          count[1] = count_atom;
-      }  
+      }
    }
 
    if (nc_var_par_access(ncid, nvid, flag)) ERR;
@@ -668,12 +668,12 @@ int test_pio_hyper(int flag){
    if (nc_close(ncid)) ERR;
 
    if (nc_open_par(file_name, facc_type_open, comm, info, &ncid)) ERR;
-  
+
    /* Inquiry the variable */
    if (nc_inq_varid(ncid, "v1", &rvid)) ERR;
 
    if (nc_var_par_access(ncid, rvid, flag)) ERR;
-    
+
    rdata      = malloc(sizeof(int)*count[1]*count[0]);
    /* Read the data with the same slab settings */
    if (nc_get_vara_int(ncid, rvid, start, count, rdata)) ERR;
@@ -681,7 +681,7 @@ int test_pio_hyper(int flag){
    temprdata = rdata;
    for (j=0; j<count[0];j++){
       for (i=0; i<count[1]; i++){
-	 if(*temprdata != mpi_rank*(j+1)) 
+	 if(*temprdata != mpi_rank*(j+1))
 	 {
 	    res = -1;
 	    break;
@@ -695,7 +695,7 @@ int test_pio_hyper(int flag){
 
    /* Close the netcdf file. */
    if (nc_close(ncid)) ERR;
-    
+
    return 0;
 }
 

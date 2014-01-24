@@ -37,7 +37,7 @@ typedef union Constvalue {
     double doublev;             /* NC_DOUBLE*/
     struct Stringv {		/* NC_STRING*/
 	int len;
-	char* stringv; 
+	char* stringv;
     } stringv;
     struct Opaquev {     /* NC_OPAQUE*/
 	int len; /* length as originally written (rounded to even number)*/
@@ -76,7 +76,7 @@ typedef struct Datalist {
    Push and pop of data sources is supported (see srcpush() below).*/
 typedef struct Datasrc {
     NCConstant*    data;     /* duplicate pointer; so do not free.*/
-    int index;        
+    int index;
     int length;
     int spliced;           /* Was this list spliced into our parent ? */
     struct Datasrc* prev; /* linked list for debugging */

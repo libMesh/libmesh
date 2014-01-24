@@ -114,7 +114,7 @@ NC_testurl(const char* path)
 	    if(strcmp(tmpurl->protocol,protolist->protocol) == 0) {
 	        isurl=1;
 		break;
-	    }		
+	    }
 	}
 	ncurifree(tmpurl);
 	return isurl;
@@ -157,10 +157,10 @@ NC_urlmodel(const char* path)
     	            if(tmpurl->protocol) free(tmpurl->protocol);
     		    tmpurl->protocol = strdup(protolist->substitute);
     	        }
-    	        break;	    
+    	        break;
 	    }
 	}
-    }	
+    }
 
     /* Force NC_DISPATCH_NC3 if necessary */
     if((model & NC_DISPATCH_NC4) == 0)

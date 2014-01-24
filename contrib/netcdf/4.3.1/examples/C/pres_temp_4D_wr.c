@@ -76,7 +76,7 @@ main()
 
    /* Loop indexes. */
    int lvl, lat, lon, rec, i = 0;
-   
+
    /* Error handling. */
    int retval;
 
@@ -87,7 +87,7 @@ main()
       lats[lat] = START_LAT + 5.*lat;
    for (lon = 0; lon < NLON; lon++)
       lons[lon] = START_LON + 5.*lon;
-   
+
    for (lvl = 0; lvl < NLVL; lvl++)
       for (lat = 0; lat < NLAT; lat++)
 	 for (lon = 0; lon < NLON; lon++)
@@ -118,18 +118,18 @@ main()
       since coordinate variables only have one dimension, we can
       simply provide the address of that dimension ID (&lat_dimid) and
       similarly for (&lon_dimid). */
-   if ((retval = nc_def_var(ncid, LAT_NAME, NC_FLOAT, 1, &lat_dimid, 
+   if ((retval = nc_def_var(ncid, LAT_NAME, NC_FLOAT, 1, &lat_dimid,
 			    &lat_varid)))
       ERR(retval);
-   if ((retval = nc_def_var(ncid, LON_NAME, NC_FLOAT, 1, &lon_dimid, 
+   if ((retval = nc_def_var(ncid, LON_NAME, NC_FLOAT, 1, &lon_dimid,
 			    &lon_varid)))
       ERR(retval);
 
    /* Assign units attributes to coordinate variables. */
-   if ((retval = nc_put_att_text(ncid, lat_varid, UNITS, 
+   if ((retval = nc_put_att_text(ncid, lat_varid, UNITS,
 				 strlen(DEGREES_NORTH), DEGREES_NORTH)))
       ERR(retval);
-   if ((retval = nc_put_att_text(ncid, lon_varid, UNITS, 
+   if ((retval = nc_put_att_text(ncid, lon_varid, UNITS,
 				 strlen(DEGREES_EAST), DEGREES_EAST)))
       ERR(retval);
 
@@ -144,18 +144,18 @@ main()
 
    /* Define the netCDF variables for the pressure and temperature
     * data. */
-   if ((retval = nc_def_var(ncid, PRES_NAME, NC_FLOAT, NDIMS, 
+   if ((retval = nc_def_var(ncid, PRES_NAME, NC_FLOAT, NDIMS,
 			    dimids, &pres_varid)))
       ERR(retval);
-   if ((retval = nc_def_var(ncid, TEMP_NAME, NC_FLOAT, NDIMS, 
+   if ((retval = nc_def_var(ncid, TEMP_NAME, NC_FLOAT, NDIMS,
 			    dimids, &temp_varid)))
       ERR(retval);
 
    /* Assign units attributes to the netCDF variables. */
-   if ((retval = nc_put_att_text(ncid, pres_varid, UNITS, 
+   if ((retval = nc_put_att_text(ncid, pres_varid, UNITS,
 				 strlen(PRES_UNITS), PRES_UNITS)))
       ERR(retval);
-   if ((retval = nc_put_att_text(ncid, temp_varid, UNITS, 
+   if ((retval = nc_put_att_text(ncid, temp_varid, UNITS,
 				 strlen(TEMP_UNITS), TEMP_UNITS)))
       ERR(retval);
 
@@ -188,10 +188,10 @@ main()
    for (rec = 0; rec < NREC; rec++)
    {
       start[0] = rec;
-      if ((retval = nc_put_vara_float(ncid, pres_varid, start, count, 
+      if ((retval = nc_put_vara_float(ncid, pres_varid, start, count,
 				      &pres_out[0][0][0])))
 	 ERR(retval);
-      if ((retval = nc_put_vara_float(ncid, temp_varid, start, count, 
+      if ((retval = nc_put_vara_float(ncid, temp_varid, start, count,
 				      &temp_out[0][0][0])))
 	 ERR(retval);
    }
@@ -199,7 +199,7 @@ main()
    /* Close the file. */
    if ((retval = nc_close(ncid)))
       ERR(retval);
-   
+
    printf("*** SUCCESS writing example file %s!\n", FILE_NAME);
    return 0;
 }

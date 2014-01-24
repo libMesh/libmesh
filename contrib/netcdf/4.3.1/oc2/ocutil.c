@@ -48,7 +48,7 @@ ocstrncmp(const char* s1, const char* s2, size_t len)
     for(p=s1,q=s2;len > 0;p++,q++,len--) {
 	if(*p == 0 && *q == 0) return 0; /* *p == *q == 0 */
 	if(*p != *q)
-	    return (*p - *q);	
+	    return (*p - *q);
     }
     /* 1st len chars are same */
     return 0;
@@ -136,14 +136,14 @@ ocfindbod(OCbytes* buffer, size_t* bodp, size_t* ddslenp)
     char* content;
     size_t len = ocbyteslength(buffer);
     char** marks;
-    
+
     content = ocbytescontents(buffer);
 
     for(marks = DDSdatamarks;*marks;marks++) {
 	char* mark = *marks;
         int tlen = strlen(mark);
         for(i=0;i<len;i++) {
-	    if((i+tlen) <= len 
+	    if((i+tlen) <= len
 	        && (ocstrncmp(content+i,mark,tlen)==0)) {
 	       *ddslenp = i;
 	        i += tlen;
@@ -369,7 +369,7 @@ ocerrstring(int err)
 	case OC_EBADVAR:
 	    return "OC_EBADVAR: no such variable";
 	case OC_EOPEN:
-	    return "OC_EOPEN: temporary file open failed";	
+	    return "OC_EOPEN: temporary file open failed";
 	case OC_EIO:
 	    return "OC_EIO: I/O failure";
 	case OC_ENODATA:
@@ -409,7 +409,7 @@ ocsvcerrordata(OCstate* state, char** codep, char** msgp, long* httpp)
     if(codep) *codep = state->error.code;
     if(msgp) *msgp = state->error.message;
     if(httpp) *httpp = state->error.httpcode;
-    return OC_NOERR;    
+    return OC_NOERR;
 }
 
 /* if we get OC_EDATADDS error, then try to capture any
@@ -421,7 +421,7 @@ ocdataddsmsg(OCstate* state, OCtree* tree)
 {
 #define ERRCHUNK 1024
 #define ERRFILL ' '
-#define ERRTAG "Error {" 
+#define ERRTAG "Error {"
     unsigned int i,j,len;
     XXDR* xdrs;
     char* contents;
@@ -591,7 +591,7 @@ occopycat(char* dst, size_t size, size_t n, ...)
 {
     va_list args;
     size_t avail = size - 1;
-    int i; 
+    int i;
     int status = 1; // assume ok
     char* p = dst;
 
@@ -600,7 +600,7 @@ occopycat(char* dst, size_t size, size_t n, ...)
 	    dst[0] = '\0';
 	return (size > 0 ? 1: 0);
     }
-	
+
     va_start(args,n);
     for(i=0;i<n;i++) {
 	char* q = va_arg(args, char*);
@@ -616,11 +616,11 @@ occopycat(char* dst, size_t size, size_t n, ...)
        note that since avail was size-1, there
        will always be room
     */
-    *p = '\0';    
+    *p = '\0';
 
 done:
     va_end(args);
-    return status;    
+    return status;
 }
 
 /*
@@ -638,7 +638,7 @@ occoncat(char* dst, size_t size, size_t n, ...)
     va_list args;
     int status = 1; // assume ok
     size_t avail;
-    int i; 
+    int i;
     char* p;
     size_t dstused;
     dstused = strlen(dst);
@@ -655,7 +655,7 @@ occoncat(char* dst, size_t size, size_t n, ...)
 	    p[0] = '\0';
 	return (size > 0 ? 1: 0);
     }
-	
+
     va_start(args,n);
     for(i=0;i<n;i++) {
 	char* q = va_arg(args, char*);
@@ -671,11 +671,11 @@ occoncat(char* dst, size_t size, size_t n, ...)
        note that since avail was size-1, there
        will always be room
     */
-    *p = '\0';    
+    *p = '\0';
 
 done:
     va_end(args);
-    return status;    
+    return status;
 }
 
 
@@ -721,7 +721,7 @@ ocmktmp(const char* base, char** tmpnamep, int* fdp)
 #  endif
     }
 #endif /* !HAVE_MKSTEMP */
-    if(tmpnamep) *tmpnamep = tmpname;    
+    if(tmpnamep) *tmpnamep = tmpname;
     if(fdp) *fdp = fd;
     return OC_NOERR;
 }

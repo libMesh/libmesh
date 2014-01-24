@@ -130,7 +130,7 @@ gen_ncc(const char *filename)
     bbprintf0(stmt,"%s() {/* create %s */\n", mainname, filename);
     codedump(stmt);
     /* create necessary declarations */
-    codeline("");    
+    codeline("");
     codelined(1,"int  stat;  /* return status */");
     codelined(1,"int  ncid;  /* netCDF id */");
     codeflush();
@@ -141,7 +141,7 @@ gen_ncc(const char *filename)
         codeline("");
         codelined(1,"/* group ids */");
     }
-    if(!usingclassic && ngrps > 0) {    
+    if(!usingclassic && ngrps > 0) {
         for(igrp = 0; igrp < ngrps; igrp++) {
 	    Symbol* gsym = (Symbol*)listget(grpdefs,igrp);
 	    bbprintf0(stmt,"%sint %s;\n",indented(1),groupncid(gsym));
@@ -240,7 +240,7 @@ gen_ncc(const char *filename)
     } else if (cmode_modifier & NC_CLASSIC_MODEL) {
 	cmode_string = "NC_CLOBBER|NC_NETCDF4|NC_CLASSIC_MODEL";
     } else if (cmode_modifier & NC_NETCDF4) {
-	cmode_string = "NC_CLOBBER|NC_NETCDF4";	
+	cmode_string = "NC_CLOBBER|NC_NETCDF4";
 #endif
     } else {
         derror("unknown cmode modifier");
@@ -251,7 +251,7 @@ gen_ncc(const char *filename)
     codedump(stmt);
     codelined(1,"check_err(stat,__LINE__,__FILE__);");
     codeflush();
-    
+
 #ifdef USE_NETCDF4
     /* Define the group structure */
     /* ncid created above is also root group*/
@@ -346,19 +346,19 @@ gen_ncc(const char *filename)
 	}
     }
     codeflush();
-    
+
     /* Define the global attributes*/
     if(ngatts > 0) {
 	codeline("");
 	codelined(1,"/* assign global attributes */");
 	for(iatt = 0; iatt < ngatts; iatt++) {
 	    Symbol* gasym = (Symbol*)listget(gattdefs,iatt);
-	    genc_defineattr(gasym);	    
+	    genc_defineattr(gasym);
 	}
 	codeline("");
     }
     codeflush();
-    
+
     /* Define the variable specific attributes*/
     if(natts > 0) {
 	codeline("");
@@ -419,11 +419,11 @@ genc_definespecialattributes(Symbol* vsym)
             codepartial("NULL");
         else {
             bbprintf0(stmt,"%s_chunksizes",cname(vsym));
-            codedump(stmt);                 
+            codedump(stmt);
         }
         codeline(");");
         codelined(1,"check_err(stat,__LINE__,__FILE__);");
-    }   
+    }
     if(special->flags & _FLETCHER32_FLAG) {
         bbprintf0(stmt,
                 "    stat = nc_def_var_fletcher32(%s, %s, %d);\n",
@@ -443,7 +443,7 @@ genc_definespecialattributes(Symbol* vsym)
                 (special->_DeflateLevel >= 0?special->_DeflateLevel:0));
         codedump(stmt);
         codelined(1,"check_err(stat,__LINE__,__FILE__);");
-    }   
+    }
     if(special->flags & _ENDIAN_FLAG) {
         bbprintf0(stmt,
                 "    stat = nc_def_var_endian(%s, %s, %s);\n",
@@ -454,7 +454,7 @@ genc_definespecialattributes(Symbol* vsym)
                 );
         codedump(stmt);
         codelined(1,"check_err(stat,__LINE__,__FILE__);");
-    }   
+    }
     if(special->flags & _NOFILL_FLAG) {
         bbprintf0(stmt,
                 "    stat = nc_def_var_fill(%s, %s, %s, NULL);\n",
@@ -464,7 +464,7 @@ genc_definespecialattributes(Symbol* vsym)
                 );
         codedump(stmt);
         codelined(1,"check_err(stat,__LINE__,__FILE__);");
-    }   
+    }
 }
 #endif /*USE_NETCDF4*/
 
@@ -516,7 +516,7 @@ nctype(nc_type type)
 /*
  * Return C type name for netCDF type, given type code.
  */
-const char* 
+const char*
 ncctype(nc_type type)
 {
     switch (type) {
@@ -553,7 +553,7 @@ ncctype(nc_type type)
 /*
  * Return C type name for netCDF type suffix, given type code.
  */
-const char* 
+const char*
 ncstype(nc_type nctype)
 {
     switch (nctype) {
@@ -824,7 +824,7 @@ genc_deftype(Symbol* tsym)
 	    int j;
 	    Symbol* efield = (Symbol*)listget(tsym->subnodes,i);
 	    ASSERT(efield->subclass == NC_FIELD);
-	    if(efield->typ.dimset.ndims == 0) continue;	    
+	    if(efield->typ.dimset.ndims == 0) continue;
 	    bbprintf0(stmt,"%sstatic int %s_dims[%d] = {\n",
 			indented(1),
 			cname(efield),efield->typ.dimset.ndims);
@@ -849,7 +849,7 @@ genc_deftype(Symbol* tsym)
 	    snprintf(tmp,sizeof(tmp),"NC_COMPOUND_OFFSET(%s,%s)",
 			ctypename(tsym), cname(efield));
 #endif
-	    if(efield->typ.dimset.ndims > 0){ 
+	    if(efield->typ.dimset.ndims > 0){
 	        bbprintf0(stmt,"%sstat = nc_insert_array_compound(%s, %s, \"%s\", %s, %s, %d, %s_dims);",
 		    indented(1),
 		    groupncid(tsym->container),
@@ -947,7 +947,7 @@ genc_writevar(Generator* generator, Symbol* vsym, Bytebuffer* code,
 	}
 	listfree(vlendecls);
 	generator_reset(generator,NULL);
-    }       
+    }
 
     if(rank == 0) {
 	codelined(1,"size_t count = 0;");
@@ -984,7 +984,7 @@ genc_writevar(Generator* generator, Symbol* vsym, Bytebuffer* code,
 	    codedump(code);
 	    codeline(" ;");
 	} else {
-	    /* Compute total size */ 
+	    /* Compute total size */
 	    length = 1;
     	    for(i=0;i<rank;i++) length *= count[i];
 	    /* generate data constant */
@@ -1000,7 +1000,7 @@ genc_writevar(Generator* generator, Symbol* vsym, Bytebuffer* code,
 	    codedump(code);
 	    codeline("} ;");
 	}
-	
+
 	/* generate constants for startset, countset*/
 	bbprintf0(stmt,"%ssize_t %s_startset[%lu] = {",
 			indented(1),
@@ -1011,7 +1011,7 @@ genc_writevar(Generator* generator, Symbol* vsym, Bytebuffer* code,
 	}
 	codedump(stmt);
 	codeline("} ;");
-	
+
 	bbprintf0(stmt,"%ssize_t %s_countset[%lu] = {",
 			indented(1),
 			cname(vsym),
@@ -1021,7 +1021,7 @@ genc_writevar(Generator* generator, Symbol* vsym, Bytebuffer* code,
 	}
 	codedump(stmt);
 	codeline("};");
-	
+
 	bbprintf0(stmt,"%sstat = nc_put_vara(%s, %s, %s_startset, %s_countset, %s_data);\n",
 			indented(1),
 			groupncid(vsym->container), varncid(vsym),
@@ -1030,13 +1030,13 @@ genc_writevar(Generator* generator, Symbol* vsym, Bytebuffer* code,
 			cname(vsym));
 	codedump(stmt);
 	codelined(1,"check_err(stat,__LINE__,__FILE__);");
-	
+
     }
     /* end defined block*/
     codelined(1,"}\n");
     codeflush();
 }
-	
+
 static void
 genc_writeattr(Generator* generator, Symbol* asym, Bytebuffer* code,
                int rank, size_t* start, size_t* count)
@@ -1069,7 +1069,7 @@ genc_writeattr(Generator* generator, Symbol* asym, Bytebuffer* code,
             }
             listfree(vlendecls);
             generator_reset(generator,NULL);
-        }       
+        }
         commify(code);
         bbprintf0(stmt,"%sstatic const %s %s_att[%ld] = ",
                         indented(1),
@@ -1099,7 +1099,7 @@ genc_writeattr(Generator* generator, Symbol* asym, Bytebuffer* code,
 		(asym->att.var == NULL?"NC_GLOBAL"
 			              :varncid(asym->att.var)),
 		escapifyname(asym->name),
-		typencid(basetype),		
+		typencid(basetype),
 	 	len,
 		cname(asym));
 	codedump(stmt);
@@ -1137,7 +1137,7 @@ genc_writeattr(Generator* generator, Symbol* asym, Bytebuffer* code,
 		(asym->att.var == NULL?"NC_GLOBAL"
 			              :varncid(asym->att.var)),
 		escapifyname(asym->name),
-		typencid(basetype),		
+		typencid(basetype),
 	 	len,
 		cname(asym));
 	codedump(stmt);
@@ -1200,7 +1200,7 @@ cname(Symbol* sym)
     if(sym->grp.is_root)
 	name = codify(sym->name);
     else
-	name = codify(sym->fqn);    
+	name = codify(sym->fqn);
     return name;
 }
 

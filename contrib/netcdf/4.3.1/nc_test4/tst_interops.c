@@ -28,11 +28,11 @@
 #define ATT_NAME "song"
 #define NEW_FLOAT 1.0
 
-void 
-printRes(const char *msg, int ires) 
+void
+printRes(const char *msg, int ires)
 {
    printf("%s: %d\n", msg, ires);
-   if (ires < 0) 
+   if (ires < 0)
    {
       printf("bad ires: %d\n", ires);
       /*H5Eprint2(ires, stdout);*/
@@ -170,7 +170,7 @@ main(int argc, char **argv)
       if ((typeid = H5Aget_type(attid)) < 0) ERR;
       if (H5Aread(attid, typeid, song_in) < 0) ERR;
       if (strcmp(song, song_in)) ERR;
-      
+
       /* Close up the shop. */
       if (H5Tclose(typeid) < 0 ||
 	  H5Aclose(attid) < 0 ||
@@ -208,7 +208,7 @@ main(int argc, char **argv)
       if ((pres_spaceid = H5Screate_simple(DIMS_2, dims, dims)) < 0) ERR;
 
       /* Create a variable. It will not have dimension scales. */
-      if ((pres_datasetid = H5Dcreate(fileid, PRES_NAME, H5T_NATIVE_FLOAT, 
+      if ((pres_datasetid = H5Dcreate(fileid, PRES_NAME, H5T_NATIVE_FLOAT,
 				      pres_spaceid, H5P_DEFAULT)) < 0) ERR;
 
       /* Ring down the curtain. */
@@ -235,7 +235,7 @@ main(int argc, char **argv)
       size_t len_in;
 
       /* Create file. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
 
       /* Create the space for the dataset. */
@@ -244,7 +244,7 @@ main(int argc, char **argv)
       if ((pres_spaceid = H5Screate_simple(DIMS_2, dims, dims)) < 0) ERR;
 
       /* Create a variable. It will not have dimension scales. */
-      if ((pres_datasetid = H5Dcreate(fileid, PRES_NAME, H5T_NATIVE_FLOAT, 
+      if ((pres_datasetid = H5Dcreate(fileid, PRES_NAME, H5T_NATIVE_FLOAT,
 				      pres_spaceid, H5P_DEFAULT)) < 0) ERR;
 
       /* Ring down the curtain. */
@@ -271,7 +271,7 @@ main(int argc, char **argv)
       size_t len_in;
 
       /* Create file. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
 
       /* Create the space for the datasets. */
@@ -280,9 +280,9 @@ main(int argc, char **argv)
       if ((spaceid = H5Screate_simple(DIMS_2, dims, dims)) < 0) ERR;
 
       /* Create two datasets. They will not have dimension scales. */
-      if ((pres_datasetid = H5Dcreate(fileid, PRES_NAME, H5T_NATIVE_FLOAT, 
+      if ((pres_datasetid = H5Dcreate(fileid, PRES_NAME, H5T_NATIVE_FLOAT,
 				      spaceid, H5P_DEFAULT)) < 0) ERR;
-      if ((temp_datasetid = H5Dcreate(fileid, TEMP_NAME, H5T_NATIVE_FLOAT, 
+      if ((temp_datasetid = H5Dcreate(fileid, TEMP_NAME, H5T_NATIVE_FLOAT,
 				      spaceid, H5P_DEFAULT)) < 0) ERR;
 
       /* Ring down the curtain. */
@@ -318,16 +318,16 @@ main(int argc, char **argv)
       int i;
 
       /* Create file. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
 
 
       if ((typeid =  H5Tcopy(H5T_C_S1)) < 0) ERR;
       if (H5Tset_size(typeid, MAX_LEN + 1) < 0) ERR;
-   
+
       /* Write an attribute of this (string) type. */
       if ((spaceid = H5Screate_simple(1, dims, NULL)) < 0) ERR;
-      if ((attid = H5Acreate(fileid, ATT_NAME2, typeid, spaceid, 
+      if ((attid = H5Acreate(fileid, ATT_NAME2, typeid, spaceid,
 			     H5P_DEFAULT)) < 0) ERR;
       if (H5Awrite(attid, typeid, data) < 0) ERR;
 
@@ -374,7 +374,7 @@ main(int argc, char **argv)
       if (H5Aclose(attid) < 0) ERR;
       if (H5Tclose(typeid) < 0) ERR;
       if (H5Fclose(fileid) < 0) ERR;
-      
+
       /* Read the data with netCDF. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq(ncid, &ndims_in, &nvars_in, &natts_in, &unlimdim_in)) ERR;

@@ -19,7 +19,7 @@
 #endif
 
 #define ATT_NAME "Atom"
-#define MAX_LEN 7   
+#define MAX_LEN 7
 
 static int
 test_small_atts(const char *testfile)
@@ -29,7 +29,7 @@ test_small_atts(const char *testfile)
    int ndims, nvars, natts, unlimdimid;
    size_t len_in;
    int t, f;
-   
+
    /* Run this with and without fill mode. */
    for (f = 0; f < 2; f++)
    {
@@ -39,13 +39,13 @@ test_small_atts(const char *testfile)
       {
 	 /* Create null-terminated text string of correct length. */
 	 strncpy(att, source, t);
-	 
+
 	 /* Create a file with one attribute. */
 	 if (nc_create(testfile, NC_CLOBBER, &ncid)) ERR;
 	 if (nc_put_att_text(ncid, NC_GLOBAL, ATT_NAME, t + 1, att)) ERR;
 	 if (f && nc_set_fill(ncid, NC_NOFILL, NULL)) ERR;
 	 if (nc_close(ncid)) ERR;
-	 
+
 	 /* Reopen the file and check it. */
 	 if (nc_open(testfile, NC_NOWRITE, &ncid)) ERR;
 	 if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
@@ -54,7 +54,7 @@ test_small_atts(const char *testfile)
 	 if (len_in != t + 1) ERR;
 	 if (nc_get_att_text(ncid, NC_GLOBAL, ATT_NAME, att_in)) ERR;
 	 if (strncmp(att_in, att, t)) ERR;
-	 if (nc_close(ncid)) ERR; 
+	 if (nc_close(ncid)) ERR;
       }
    }
    return 0;
@@ -86,7 +86,7 @@ test_small_unlim(const char *testfile)
      strcpy(data[i], source);*/
    strcpy(data[0], "2005-04-11_12:00:00");
    strcpy(data[1], "2005-04-11_13:00:00");
-   
+
    /* Create a file with two dimensions, one unlimited, and one
     * var, and a global att. */
    if (nc_create(testfile, NC_CLOBBER, &ncid)) ERR;
@@ -105,7 +105,7 @@ test_small_unlim(const char *testfile)
 
    /* We're done! */
    if (nc_close(ncid)) ERR;
-   
+
    /* Reopen the file and check it. */
    if (nc_open(testfile, NC_NOWRITE, &ncid)) ERR;
    if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
@@ -113,7 +113,7 @@ test_small_unlim(const char *testfile)
    if (nc_get_var_text(ncid, varid, (char *)data_in)) ERR;
    for (i = 0; i < NUM_VALS; i++)
       if (strncmp(data[i], data_in[i], STR_LEN)) ERR;
-   if (nc_close(ncid)) ERR; 
+   if (nc_close(ncid)) ERR;
    return 0;
 }
 
@@ -131,7 +131,7 @@ test_small_fixed(const char *testfile)
      strcpy(data[i], source);*/
    strcpy(data[0], "2005-04-11_12:00:00");
    strcpy(data[1], "2005-04-11_13:00:00");
-   
+
    /* Create a file with two dimensions, one unlimited, and one
     * var, and a global att. */
    if (nc_create(testfile, NC_CLOBBER, &ncid)) ERR;
@@ -150,7 +150,7 @@ test_small_fixed(const char *testfile)
 
    /* We're done! */
    if (nc_close(ncid)) ERR;
-   
+
    /* Reopen the file and check it. */
    if (nc_open(testfile, NC_NOWRITE, &ncid)) ERR;
    if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
@@ -158,7 +158,7 @@ test_small_fixed(const char *testfile)
    if (nc_get_var_text(ncid, varid, (char *)data_in)) ERR;
    for (i = 0; i < NUM_VALS; i++)
       if (strncmp(data[i], data_in[i], STR_LEN)) ERR;
-   if (nc_close(ncid)) ERR; 
+   if (nc_close(ncid)) ERR;
    return 0;
 }
 
@@ -184,14 +184,14 @@ test_small_one(const char *testfile)
 
    /* We're done! */
    if (nc_close(ncid)) ERR;
-   
+
    /* Reopen the file and check it. */
    if (nc_open(testfile, NC_NOWRITE, &ncid)) ERR;
    if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
    if (ndims != 1 && nvars != 1 && natts != 0 && unlimdimid != 0) ERR;
    if (nc_get_var_text(ncid, varid, &data_in)) ERR;
    if (data_in != data) ERR;
-   if (nc_close(ncid)) ERR; 
+   if (nc_close(ncid)) ERR;
    return 0;
 }
 
@@ -231,7 +231,7 @@ test_one_growing(const char *testfile)
 	 start[0] = r;
 	 if (nc_put_vara_text(ncid, varid, start, count, &data[r])) ERR;
 	 if (nc_close(ncid)) ERR;
-      
+
 	 /* Reopen the file and check it. */
 	 if (nc_open(testfile, NC_NOWRITE, &ncid)) ERR;
 	 if (nc_inq_dimlen(ncid, 0, &len_in)) ERR;
@@ -239,7 +239,7 @@ test_one_growing(const char *testfile)
 	 index[0] = r;
 	 if (nc_get_var1_text(ncid, 0, index, &data_in)) ERR;
 	 if (data_in != data[r]) ERR;
-	 if (nc_close(ncid)) ERR; 
+	 if (nc_close(ncid)) ERR;
       } /* Next record. */
    }
    return 0;
@@ -283,7 +283,7 @@ test_one_growing_with_att(const char *testfile)
       if (nc_redef(ncid)) ERR;
       if (nc_put_att_text(ncid, varid, att_name, 1, &data[r])) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Reopen the file and check it. */
       if (nc_open(testfile, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_dimlen(ncid, 0, &len_in)) ERR;
@@ -293,7 +293,7 @@ test_one_growing_with_att(const char *testfile)
       if (data_in != data[r]) ERR;
       if (nc_get_att_text(ncid, varid, att_name, &data_in)) ERR;
       if (data_in != data[r]) ERR;
-      if (nc_close(ncid)) ERR; 
+      if (nc_close(ncid)) ERR;
    } /* Next record. */
    return 0;
 }
@@ -341,7 +341,7 @@ test_two_growing_with_att(const char *testfile)
 	 if (nc_enddef(ncid)) ERR;
       }
       if (nc_close(ncid)) ERR;
-      
+
       /* Reopen the file and check it. */
       if (nc_open(testfile, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq_dimlen(ncid, 0, &len_in)) ERR;
@@ -352,7 +352,7 @@ test_two_growing_with_att(const char *testfile)
 	 if (nc_get_var1_text(ncid, varid[v], index, &data_in)) ERR;
 	 if (data_in != data[r]) ERR;
       }
-      if (nc_close(ncid)) ERR; 
+      if (nc_close(ncid)) ERR;
    } /* Next record. */
    return 0;
 }
@@ -380,7 +380,7 @@ test_one_with_att(const char *testfile)
 
    /* We're done! */
    if (nc_close(ncid)) ERR;
-   
+
    /* Reopen the file and check it. */
    if (nc_open(testfile, NC_NOWRITE, &ncid)) ERR;
    if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
@@ -389,7 +389,7 @@ test_one_with_att(const char *testfile)
    if (data_in != data) ERR;
    if (nc_get_att_text(ncid, NC_GLOBAL, ATT_NAME, &data_in)) ERR;
    if (data_in != data) ERR;
-   if (nc_close(ncid)) ERR; 
+   if (nc_close(ncid)) ERR;
    return 0;
 }
 
@@ -406,7 +406,7 @@ main(int argc, char **argv)
     * only builds), or 4 (for netCDF-4 builds) different formats. */
    for (i = NUM_FORMATS; i >= 1; i--)
    {
-      switch (i) 
+      switch (i)
       {
 	 case NC_FORMAT_CLASSIC:
 	    nc_set_default_format(NC_FORMAT_CLASSIC, NULL);
@@ -438,7 +438,7 @@ main(int argc, char **argv)
       printf("*** testing simple small file with a global attribute...");
       test_small_atts(testfile);
       SUMMARIZE_ERR;
-      
+
       printf("*** testing simple small file with fixed dimensions...");
       test_small_fixed(testfile);
       SUMMARIZE_ERR;
@@ -446,15 +446,15 @@ main(int argc, char **argv)
       printf("*** testing simple small file with an unlimited dimension...");
       test_small_unlim(testfile);
       SUMMARIZE_ERR;
-      
+
       printf("*** testing small file with one variable...");
       test_small_one(testfile);
       SUMMARIZE_ERR;
-      
+
       printf("*** testing small file with one variable and one att...");
       test_one_with_att(testfile);
       SUMMARIZE_ERR;
-      
+
       printf("*** testing small file with one record variable, which grows...");
       test_one_growing(testfile);
       SUMMARIZE_ERR;

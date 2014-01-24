@@ -2,7 +2,7 @@
    Copyright 2005 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test netcdf-4 variables. 
+   Test netcdf-4 variables.
    $Id: tst_vars3.c,v 1.29 2010/04/30 18:21:52 ed Exp $
 */
 
@@ -90,7 +90,7 @@ main(int argc, char **argv)
       for (y = 0; y < NY; y++)
      	 data_outy[y] = y;
 #endif
-     
+
       /* Create file with two dims, two 1D vars. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_def_dim(ncid, D1_NAME, NX, &x_dimid)) ERR;
@@ -107,7 +107,7 @@ main(int argc, char **argv)
       /* Check the file. */
       if (nc_inq(ncid, &ndims, &nvars, &ngatts, &unlimdimid)) ERR;
       if (nvars != 2 || ndims != 2 || ngatts != 0 || unlimdimid != -1) ERR;
-      
+
       /* Check the dimensions. */
       if (nc_inq_dimids(ncid, &ndims, dimids_in, 1)) ERR;
       if (ndims != 2 || dimids_in[0] != x_dimid || dimids_in[1] != y_dimid) ERR;
@@ -131,7 +131,7 @@ main(int argc, char **argv)
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq(ncid, &ndims, &nvars, &ngatts, &unlimdimid)) ERR;
       if (nvars != 2 || ndims != 2 || ngatts != 0 || unlimdimid != -1) ERR;
-      
+
       /* Check the dimensions. */
       if (nc_inq_dimids(ncid, &ndims, dimids_in, 1)) ERR;
       if (ndims != 2 || dimids_in[0] != x_dimid || dimids_in[1] != y_dimid) ERR;
@@ -233,7 +233,7 @@ main(int argc, char **argv)
 #define LEN 4
       int ncid, dimids[RANK_P], time_id, p_id;
       int ndims, dimids_in[RANK_P];
-      
+
       double data[1] = {3.14159};
       size_t start[1] = {0}, count[1] = {1};
       static float P_data[LEN];
@@ -321,7 +321,7 @@ main(int argc, char **argv)
 #define D_VARNAME "dd"
 #define E_VARNAME "ee"
       int ncid, grpid;
-      int timeDimId, bDimId, cDimId, dimidIn;  
+      int timeDimId, bDimId, cDimId, dimidIn;
       size_t timeDimSize = 2, bDimSize = 3, cDimSize = 1;
       int cNdims = 1, eeNdims = 1, ddNdims = 1 ;
       int cVarId, eeVarId, ddVarId ;
@@ -359,7 +359,7 @@ main(int argc, char **argv)
 #define DIMNAME "abc"
 #define SCALAR_VARNAME DIMNAME
       int ncid;
-      int dimid, varid;  
+      int dimid, varid;
       int ndims = 1;
       size_t dimsize = 3;
       char varname_in[NC_MAX_NAME];
@@ -440,7 +440,7 @@ main(int argc, char **argv)
 /*       if (nc_inq_var(ncid, 0, var_name_in, &xtype_in, &ndims_in, &dimids_in, &natts_in)) ERR; */
 /*       if (strcmp(var_name_in, V_SMALL) || xtype_in != NC_INT64 || ndims_in != 1 || */
 /* 	  natts_in != 0) ERR; */
-      
+
 /*       /\* Make sure we have the szip settings we expect. *\/ */
 /*       if (nc_inq_var_szip(ncid, small_varid, &options_mask_in, &bits_per_pixel_in)) ERR; */
 /*       if (options_mask_in != 0 || bits_per_pixel_in !=0) ERR; */

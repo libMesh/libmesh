@@ -67,7 +67,7 @@ fixgrid34(NCDAPCOMMON* nccomm, CDFnode* grid)
     CDFnode* array;
 
     glen = nclistlength(grid->subnodes);
-    array = (CDFnode*)nclistget(grid->subnodes,0);	        
+    array = (CDFnode*)nclistget(grid->subnodes,0);
     if(nccomm->controls.flags & (NCF_NC3)) {
         /* Rename grid Array: variable, but leave its oc base name alone */
         nullfree(array->ncbasename);
@@ -160,7 +160,7 @@ replacedims(NClist* dims)
  Two dimensions are equivalent if
  1. they have the same size
  2. neither are anonymous
- 3. they ave the same names. 
+ 3. they ave the same names.
  */
 static int
 equivalentdim(CDFnode* basedim, CDFnode* dupdim)
@@ -185,10 +185,10 @@ computecdfdimnames34(NCDAPCOMMON* nccomm)
     NClist* varnodes = nccomm->cdf.ddsroot->tree->varnodes;
     NClist* alldims;
     NClist* basedims;
-    
+
     /* Collect all dimension nodes from dimsetall lists */
 
-    alldims = getalldims34(nccomm,0);    
+    alldims = getalldims34(nccomm,0);
 
     /* Assign an index to all anonymous dimensions
        vis-a-vis its containing variable
@@ -425,7 +425,7 @@ buildcdftree34(NCDAPCOMMON* nccomm, OCddsnode ocroot, OCdxd occlass, CDFnode** c
 	if(cdfrootp) *cdfrootp = root;
     }
     return err;
-}        
+}
 
 static NCerror
 buildcdftree34r(NCDAPCOMMON* nccomm, OCddsnode ocnode, CDFnode* container,
@@ -464,7 +464,7 @@ buildcdftree34r(NCDAPCOMMON* nccomm, OCddsnode ocnode, CDFnode* container,
 	if(tree->root == NULL) {
 	    tree->root = cdfnode;
 	    cdfnode->tree = tree;
-	}		
+	}
 	break;
 
     case OC_Atomic:
@@ -473,13 +473,13 @@ buildcdftree34r(NCDAPCOMMON* nccomm, OCddsnode ocnode, CDFnode* container,
 	if(tree->root == NULL) {
 	    tree->root = cdfnode;
 	    cdfnode->tree = tree;
-	}		
+	}
 	break;
 
     case OC_Dimension:
     default: PANIC1("buildcdftree: unexpect OC node type: %d",(int)octype);
 
-    }    
+    }
     /* cross link */
     cdfnode->root = tree->root;
 
@@ -501,7 +501,7 @@ static void
 defdimensions(OCddsnode ocnode, CDFnode* cdfnode, NCDAPCOMMON* nccomm, CDFtree* tree)
 {
     size_t i,ocrank;
- 
+
     oc_dds_rank(nccomm->oc.conn,ocnode,&ocrank);
     assert(ocrank > 0);
     for(i=0;i<ocrank;i++) {
@@ -520,10 +520,10 @@ defdimensions(OCddsnode ocnode, CDFnode* cdfnode, NCDAPCOMMON* nccomm, CDFtree* 
 	/* Initially, constrained and unconstrained are same */
 	cdfdim->dim.declsize = declsize;
 	cdfdim->dim.array = cdfnode;
-	if(cdfnode->array.dimset0 == NULL) 
+	if(cdfnode->array.dimset0 == NULL)
 	    cdfnode->array.dimset0 = nclistnew();
 	nclistpush(cdfnode->array.dimset0,(void*)cdfdim);
-    }    
+    }
 }
 
 /* Note: this routine only applies some common
@@ -599,7 +599,7 @@ applyclientparams34(NCDAPCOMMON* nccomm)
 	pathstr = makeocpathstring3(conn,var->ocnode,".");
 	strncat(tmpname,pathstr,NC_MAX_NAME);
 	nullfree(pathstr);
-	value = oc_clientparam_get(conn,tmpname);	
+	value = oc_clientparam_get(conn,tmpname);
         if(value != NULL && strlen(value) != 0) {
             if(sscanf(value,"%d",&len) && len > 0) var->maxstringlength = len;
 	}
@@ -667,7 +667,7 @@ freecdfroot34(CDFnode* root)
 
 /* Free up a single node, but not any
    nodes it points to.
-*/  
+*/
 static void
 free1cdfnode34(CDFnode* node)
 {
@@ -798,7 +798,7 @@ fprintf(stderr,"attachdim: %s->%s\n",xdim->ocname,tdim->ocname);
     return NC_NOERR;
 }
 
-/* 
+/*
 Match a DATADDS node to a DDS node.
 It is assumed that both trees have been re-struct'ed if necessary.
 */
@@ -817,7 +817,7 @@ attach34r(CDFnode* xnode, NClist* templatepath, int depth)
     lastnode = (depth == (plen-1));
     templatepathnode = (CDFnode*)nclistget(templatepath,depth);
     ASSERT((simplenodematch34(xnode,templatepathnode)));
-    setattach(xnode,templatepathnode);    
+    setattach(xnode,templatepathnode);
 #ifdef DEBUG2
 fprintf(stderr,"attachnode: %s->%s\n",xnode->ocname,templatepathnode->ocname);
 #endif
@@ -872,10 +872,10 @@ done:
     return ncstat;
 }
 
-/* 
+/*
 Match nodes in template tree to nodes in target tree;
 template tree is typically a structural superset of target tree.
-WARNING: Dimensions are not attached 
+WARNING: Dimensions are not attached
 */
 
 NCerror

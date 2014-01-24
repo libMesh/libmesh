@@ -23,7 +23,7 @@ be used to get attributes of user-defined type. We recommend that they
 type safe versions of this function be used where possible.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID of the attribute's variable, or ::NC_GLOBAL
@@ -53,7 +53,7 @@ nc_get_att(int ncid, int varid, const char *name, void *value)
 
    return ncp->dispatch->get_att(ncid, varid, name, value, xtype);
 }
-/*! \} */ 
+/*! \} */
 
 /*!
 \ingroup attributes
@@ -67,7 +67,7 @@ file is opened with nc_open(). Getting an attribute copies the value
 from the in-memory store, and does not incure any file I/O penalties.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID of the attribute's variable, or ::NC_GLOBAL
@@ -96,14 +96,14 @@ the length of the attributes.
 \code
      #include <netcdf.h>
         ...
-     int  status;         
-     int  ncid;           
-     int  rh_id;          
-     int  vr_len, t_len;  
-     double *vr_val;      
-     char *title;         
+     int  status;
+     int  ncid;
+     int  rh_id;
+     int  vr_len, t_len;
+     double *vr_val;
+     char *title;
      extern char *malloc()
-     
+
         ...
      status = nc_open("foo.nc", NC_NOWRITE, &ncid);
      if (status != NC_NOERR) handle_error(status);
@@ -115,15 +115,15 @@ the length of the attributes.
      if (status != NC_NOERR) handle_error(status);
      status = nc_inq_attlen (ncid, NC_GLOBAL, "title", &t_len);
      if (status != NC_NOERR) handle_error(status);
-     
+
      vr_val = (double *) malloc(vr_len * sizeof(double));
-     title = (char *) malloc(t_len + 1); 
-     
+     title = (char *) malloc(t_len + 1);
+
      status = nc_get_att_double(ncid, rh_id, "valid_range", vr_val);
      if (status != NC_NOERR) handle_error(status);
      status = nc_get_att_text(ncid, NC_GLOBAL, "title", title);
      if (status != NC_NOERR) handle_error(status);
-     title[t_len] = '\0';  
+     title[t_len] = '\0';
         ...
 \endcode
 */
@@ -253,4 +253,4 @@ nc_get_att_string(int ncid, int varid, const char *name, char **value)
     if(stat != NC_NOERR) return stat;
     return ncp->dispatch->get_att(ncid,varid,name,(void*)value, NC_STRING);
 }
-/*! \} */ 
+/*! \} */

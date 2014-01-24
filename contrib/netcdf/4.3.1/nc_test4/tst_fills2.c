@@ -12,10 +12,10 @@
 #include <stdio.h>
 #include <netcdf.h>
 
-#define FILE_NAME "tst_fills2.nc" 
+#define FILE_NAME "tst_fills2.nc"
 
 int
-main(int argc, char **argv) 
+main(int argc, char **argv)
 {			/* create tst_classic_fills.nc */
    printf("\n*** Testing fill values.\n");
    printf("*** testing read of string record var with no data...");
@@ -43,7 +43,7 @@ main(int argc, char **argv)
        * empty string. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_def_dim(ncid, "sentence", NC_UNLIMITED, &dimid)) ERR;
-      if (nc_def_var(ncid, STRING_VAR_NAME, NC_STRING, NDIMS_STRING, 
+      if (nc_def_var(ncid, STRING_VAR_NAME, NC_STRING, NDIMS_STRING,
 		     &dimid, &varid)) ERR;
 
       /* Check it out. */
@@ -100,7 +100,7 @@ main(int argc, char **argv)
        * empty string. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_def_dim(ncid, "sentence", NC_UNLIMITED, &dimid)) ERR;
-      if (nc_def_var(ncid, STRING_VAR_NAME, NC_STRING, NDIMS_STRING, 
+      if (nc_def_var(ncid, STRING_VAR_NAME, NC_STRING, NDIMS_STRING,
 		     &dimid, &varid)) ERR;
       if (nc_put_att_string(ncid, varid, "_FillValue", FILLVALUE_LEN,
 	missing_val)) ERR;
@@ -310,7 +310,7 @@ main(int argc, char **argv)
 
 /*       /\* Get all the data from the variable. There is none! *\/ */
 /*       if (nc_get_var_string(ncid, varid_in, NULL)) ERR; */
-      
+
 /*       /\* Close file. *\/ */
 /*       if (nc_close(ncid)) ERR; */
 

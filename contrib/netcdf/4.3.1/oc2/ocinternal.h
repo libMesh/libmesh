@@ -90,7 +90,7 @@ typedef struct OCheader {
 #define OCDIR ".oc"
 
 /* Define infinity for memory size */
-#if SIZEOF_SIZE_T == 4 
+#if SIZEOF_SIZE_T == 4
 #define OCINFINITY ((size_t)0xffffffff)
 #else
 #define OCINFINITY ((size_t)0xffffffffffffffff)
@@ -150,7 +150,7 @@ struct OCstate {
 	char* key;
 	char* keypasswd;
         char* cainfo; /* certificate authority */
-	char* capath; 
+	char* capath;
 	int   verifypeer;
     } ssl;
     struct OCproxy {

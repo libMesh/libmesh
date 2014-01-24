@@ -2,7 +2,7 @@
    Corporation for Atmospheric Research/Unidata See COPYRIGHT file for
    conditions of use. See www.unidata.ucar.edu for more info.
 
-   Test netcdf-4 variable length code. 
+   Test netcdf-4 variable length code.
 
    $Id: tst_vl.c,v 1.30 2009/10/26 22:07:16 ed Exp $
 */
@@ -38,7 +38,7 @@ main(int argc, char **argv)
       int *phony, class_in;
       size_t len_in;
       int i, j;
-      
+
       /* Create phony data. */
       for (i=0; i<DIM_LEN; i++)
       {
@@ -49,7 +49,7 @@ main(int argc, char **argv)
 	 data[i].p = phony;
 	 data[i].len = i+1;
       }
-      
+
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_def_vlen(ncid, VLEN_NAME, NC_INT, &typeid)) ERR;
       if (nc_inq_vlen(ncid, typeid, name_in, &size_in, &base_nc_type_in)) ERR;
@@ -61,7 +61,7 @@ main(int argc, char **argv)
       if (nc_inq_compound(ncid, typeid, name_in, &size_in, NULL) != NC_EBADTYPE) ERR;
       if (nc_put_att(ncid, NC_GLOBAL, ATT_NAME, typeid, DIM_LEN, data)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Reset data to make sure it was really copied. */
       for (i=0; i<DIM_LEN; i++)
 	 for (j = 0; j < i + 1; j++)
@@ -110,7 +110,7 @@ main(int argc, char **argv)
       nc_vlen_t data[DIM_LEN], data_in[DIM_LEN];
       int *phony;
       int i, j;
-      
+
       /* Create phony data. */
       for (i=0; i<DIM_LEN; i++)
       {
@@ -128,7 +128,7 @@ main(int argc, char **argv)
       if (nc_def_var(ncid, VAR_NAME, typeid, 1, dimids, &varid)) ERR;
       if (nc_put_var(ncid, varid, data)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
@@ -164,7 +164,7 @@ main(int argc, char **argv)
       int *phony, class_in;
       size_t len_in;
       int i, j;
-      
+
       /* Create phony data. */
       for (i=0; i<DIM_LEN; i++)
       {
@@ -175,7 +175,7 @@ main(int argc, char **argv)
 	 data[i].p = phony;
 	 data[i].len = i+1;
       }
-      
+
       /* Create two files with the same vlen type. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid1)) ERR;
       if (nc_create(FILE_NAME2, NC_NETCDF4, &ncid2)) ERR;
@@ -185,7 +185,7 @@ main(int argc, char **argv)
       if (nc_copy_att(ncid1, NC_GLOBAL, ATT_NAME, ncid2, NC_GLOBAL)) ERR;
       if (nc_close(ncid1)) ERR;
       if (nc_close(ncid2)) ERR;
-      
+
       /* Reset data to make sure it was really copied. */
       for (i=0; i<DIM_LEN; i++)
 	 for (j = 0; j < i + 1; j++)

@@ -71,36 +71,36 @@ main(int argc, char **argv)
       if (nc_def_grp(ncid, SOLAR_SYSTEM, &solar_system_id)) ERR;
       if (nc_def_grp(solar_system_id, EARTH, &earth_id)) ERR;
       if (nc_def_grp(earth_id, LUNA, &luna_id)) ERR;
-      
+
       /* Put some attributes in the root group. */
       if (nc_put_att_uchar(ncid, NC_GLOBAL, UCHAR_ATT_NAME, NC_UBYTE,
 			   ATT_LEN, num_vogons)) ERR;
-      if (nc_put_att_ulonglong(ncid, NC_GLOBAL, ULONGLONG_ATT_NAME, 
+      if (nc_put_att_ulonglong(ncid, NC_GLOBAL, ULONGLONG_ATT_NAME,
 			       NC_UINT64, ATT_LEN, num_poems)) ERR;
-      
+
       /* Put a dimension in the root group. */
       if (nc_def_dim(ncid, DIM_NAME, DIM_LEN, &dimid)) ERR;
-      
+
       /* Put an attribute in the Earth group. */
       if (nc_put_att_longlong(earth_id, NC_GLOBAL, LONGLONG_ATT_NAME, NC_INT64,
 			      ATT_LEN, alien)) ERR;
-      
+
       /* Put an attribute in the bottom group. */
-      if (nc_put_att_text(luna_id, NC_GLOBAL, ATT_NAME, 
+      if (nc_put_att_text(luna_id, NC_GLOBAL, ATT_NAME,
 			  strlen(poem) + 1, poem)) ERR;
-      
+
       /* Put a variable in the bottom group. */
       if (nc_def_var(luna_id, VAR_NAME, NC_INT64, 1, &dimid, &varid)) ERR;
       if (nc_put_var_longlong(luna_id, varid, data)) ERR;
-      
+
       if (nc_close(ncid)) ERR;
 
    }
-   
+
    SUMMARIZE_ERR;
    printf("*** checking nested group file %s...", FILE_NAME_1);
 #define CHAR_ATT_MAX 3000
-   
+
    {
       int ncid, solar_system_id;
       int earth_id, luna_id;
@@ -116,8 +116,8 @@ main(int argc, char **argv)
 
       /* Oh well, might as well check this file. It will also be
        * checked by ncdump tests. */
-      if (nc_open(FILE_NAME_1, NC_NOWRITE, &ncid)) ERR;      
-      
+      if (nc_open(FILE_NAME_1, NC_NOWRITE, &ncid)) ERR;
+
       /* Check nested groups. */
       if (nc_inq_grps(ncid, &numgrps_in, &solar_system_id)) ERR;
       if (numgrps_in != 1) ERR;
@@ -148,12 +148,12 @@ main(int argc, char **argv)
       if (ndims_in != 1) ERR;
       if (nc_inq_dim(ncid, dimid_in, name_in, &len_in)) ERR;
       if (strcmp(name_in, DIM_NAME) || len_in != DIM_LEN) ERR;
-      
+
       /* Check an attribute in the Earth group. */
       if (nc_inq_att(earth_id, NC_GLOBAL, LONGLONG_ATT_NAME, &xtype_in,
 		     &len_in)) ERR;
       if (xtype_in != NC_INT64 || len_in != ATT_LEN) ERR;
-      if (nc_get_att_longlong(earth_id, NC_GLOBAL, LONGLONG_ATT_NAME, 
+      if (nc_get_att_longlong(earth_id, NC_GLOBAL, LONGLONG_ATT_NAME,
 			      longlong_in)) ERR;
       for (i = 0; i < ATT_LEN; i++)
 	 if (longlong_in[i] != alien[i]) ERR;
@@ -161,17 +161,17 @@ main(int argc, char **argv)
       /* Check an attribute in the bottom group. */
       if (nc_inq_att(luna_id, NC_GLOBAL, ATT_NAME, &xtype_in,
 		     &len_in)) ERR;
-      if (xtype_in != NC_CHAR || len_in != strlen(poem) + 1 || 
+      if (xtype_in != NC_CHAR || len_in != strlen(poem) + 1 ||
 	  len_in > CHAR_ATT_MAX) ERR;
       if (nc_get_att_text(luna_id, NC_GLOBAL, ATT_NAME, char_in)) ERR;
       char_in[len_in] = '\0';	/* null terminate, because nc_get_att_text doesn't */
       if (strcmp(char_in, poem)) ERR;
-      
+
       /* Check a variable in the bottom group. */
       if (nc_inq_varids(luna_id, &nvars_in, &varid_in)) ERR;
-      if (nc_inq_var(luna_id, varid_in, name_in, &xtype_in, &ndims_in, 
+      if (nc_inq_var(luna_id, varid_in, name_in, &xtype_in, &ndims_in,
 		     &dimid_in_2, &natts_in)) ERR;
-      if (strcmp(name_in, VAR_NAME) || xtype_in != NC_INT64 || 
+      if (strcmp(name_in, VAR_NAME) || xtype_in != NC_INT64 ||
 	  ndims_in != 1 || dimid_in_2 != dimid_in || natts_in != 0) ERR;
       if (nc_get_var_longlong(luna_id, varid_in, data_in)) ERR;
       for (i = 0; i < DIM_LEN; i++)
@@ -180,7 +180,7 @@ main(int argc, char **argv)
       if (nc_close(ncid)) ERR;
 
    }
-   
+
    SUMMARIZE_ERR;
    printf("*** creating file with VLEN %s...", FILE_NAME_2);
 #define ATT_NAME2 "equally_unimaginatively_named_attribute_YAWN"
@@ -206,7 +206,7 @@ main(int argc, char **argv)
 
       /* Create a file with a VLEN attribute. */
       if (nc_create(FILE_NAME_2, NC_NETCDF4, &ncid)) ERR;
-      
+
       if (nc_def_vlen(ncid, VLEN_TYPE_NAME, NC_INT, &typeid)) ERR;
       if (nc_put_att(ncid, NC_GLOBAL, ATT_NAME2, typeid, DIM_LEN, data)) ERR;
 
@@ -219,7 +219,7 @@ main(int argc, char **argv)
       for (i=0; i<DIM_LEN; i++)
 	 free(data[i].p);
    }
-   
+
    SUMMARIZE_ERR;
    printf("*** creating file with compound type %s...", FILE_NAME_CMP);
 #define ATT_NAME_CMP "my_favorite_wind_speeds"
@@ -232,7 +232,7 @@ main(int argc, char **argv)
       int ncid;
 
       /* Store winds as two floats: the u and v components of the wind. */
-      struct wind_vector 
+      struct wind_vector
       {
 	    float u, v;
       } favs[NUM_FAVS];
@@ -244,22 +244,22 @@ main(int argc, char **argv)
       {
 	 favs[fav].u = U_VALUE;
 	 favs[fav].v = V_VALUE;
-      } 
+      }
 
       /* Create a file with a compound attribute. */
       if (nc_create(FILE_NAME_CMP, NC_NETCDF4, &ncid)) ERR;
-      
-      if (nc_def_compound(ncid, sizeof(struct wind_vector), COMPOUND_NAME, 
+
+      if (nc_def_compound(ncid, sizeof(struct wind_vector), COMPOUND_NAME,
 			  &typeid)) ERR;
-      if (nc_insert_compound(ncid, typeid, "u", NC_COMPOUND_OFFSET(struct wind_vector, u), 
+      if (nc_insert_compound(ncid, typeid, "u", NC_COMPOUND_OFFSET(struct wind_vector, u),
 			     NC_FLOAT)) ERR;
-      if (nc_insert_compound(ncid, typeid, "v", NC_COMPOUND_OFFSET(struct wind_vector, v), 
+      if (nc_insert_compound(ncid, typeid, "v", NC_COMPOUND_OFFSET(struct wind_vector, v),
 			     NC_FLOAT)) ERR;
       if (nc_put_att(ncid, NC_GLOBAL, ATT_NAME_CMP, typeid, NUM_FAVS, favs)) ERR;
 
       if (nc_close(ncid)) ERR;
    }
-   
+
    SUMMARIZE_ERR;
 
    FINAL_RESULTS;

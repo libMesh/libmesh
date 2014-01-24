@@ -19,17 +19,17 @@
 #define max(A, B)	((A) > (B) ? (A) : (B))
 
 
-/* 
- * For every variable in open netcdf, puts and gets three hypercubes 
- * of data of the appropriate type, comparing values from get to 
- * values put to check that both ncvarput and ncvarget worked.  The 
+/*
+ * For every variable in open netcdf, puts and gets three hypercubes
+ * of data of the appropriate type, comparing values from get to
+ * values put to check that both ncvarput and ncvarget worked.  The
  * three hypercubes are
- *    - a large hypercube from (0, 0, ...) to the far corner (diagonally 
+ *    - a large hypercube from (0, 0, ...) to the far corner (diagonally
  *      opposite (0, 0, ...),
- *    - a size 1 hypercube from the far corner with edge lengths of 1 
+ *    - a size 1 hypercube from the far corner with edge lengths of 1
  *      in every direction, and
  *    - a hypercube starting about 1/3 of the way along the diagonal
- *      from (0,0,...) extending 1/3 of the way in every direction 
+ *      from (0,0,...) extending 1/3 of the way in every direction
  *      toward the far corner.
  */
 

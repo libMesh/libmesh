@@ -3,7 +3,7 @@
    See COPYRIGHT file for conditions of use.
 
    Test netcdf-4 variables with unlimited dimensions.
- 
+
    $Id: tst_unlim_vars.c,v 1.9 2010/05/25 13:53:04 ed Exp $
 */
 
@@ -42,7 +42,7 @@ main(int argc, char **argv)
 
    printf("\n*** Testing netcdf-4 variable with unlimited dimensions.\n");
    printf("*** Testing file with one var, one unlim dim...");
-      
+
    /* Create a file with a 3D surface temp variable. */
    if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
 

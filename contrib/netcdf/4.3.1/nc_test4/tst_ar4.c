@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright 2009, UCAR/Unidata
 See COPYRIGHT file for copying and redistribution conditions.
 
@@ -85,7 +85,7 @@ usage(void)
 #define TIME_LEN 1560
 #define NUM_TS 1
 
-int 
+int
 main(int argc, char **argv)
 {
    extern int optind;
@@ -106,7 +106,7 @@ main(int argc, char **argv)
    struct timeval start_time, end_time, diff_time;
 
    while ((c = getopt(argc, argv, "vhtc:")) != EOF)
-      switch(c) 
+      switch(c)
       {
 	 case 'v':
 	    verbose++;
@@ -124,17 +124,17 @@ main(int argc, char **argv)
 	    usage();
 	    return 1;
       }
-      
+
    argc -= optind;
    argv += optind;
-      
+
    /* If no file arguments left, report and exit */
    if (argc < 1)
    {
       printf("no file specified\n");
       return 0;
    }
-      
+
    /* Print the header if desired. */
    if (header)
    {
@@ -163,12 +163,12 @@ main(int argc, char **argv)
    if (nc_inq_dim(ncid, TIME_DIMID, name_in, &len)) ERR;
    if (strcmp(name_in, "time") || len != TIME_LEN) ERR;
    if (nc_inq_var(ncid, varid, NULL, NULL, &ndims, dimid, NULL)) ERR;
-   if (ndims != NDIMS3 || dimid[0] != TIME_DIMID || 
+   if (ndims != NDIMS3 || dimid[0] != TIME_DIMID ||
        dimid[1] != LAT_DIMID || dimid[2] != LON_DIMID) ERR;
 
    /* Get info about the main data var. */
    if (nc_inq_var_chunking(ncid, varid, &storage, cs)) ERR;
-   if (nc_inq_var_deflate(ncid, varid, &shuffle, &deflate, 
+   if (nc_inq_var_deflate(ncid, varid, &shuffle, &deflate,
 			  &deflate_level)) ERR;
 
    if (timeseries)
@@ -180,7 +180,7 @@ main(int argc, char **argv)
       count[0] = TIME_LEN;
       count[1] = 1;
       count[2] = 1;
-      
+
       /* Read the first timeseries. */
       if (gettimeofday(&start_time, NULL)) ERR;
       if (nc_get_vara_float(ncid, varid, start, count, ts_data)) ERR_RET;
@@ -195,7 +195,7 @@ main(int argc, char **argv)
 	    if (nc_get_vara_float(ncid, varid, start, count, ts_data)) ERR_RET;
       if (gettimeofday(&end_time, NULL)) ERR;
       if (nc4_timeval_subtract(&diff_time, &end_time, &start_time)) ERR;
-      avg_read_us = ((int)diff_time.tv_sec * MILLION + (int)diff_time.tv_usec + read_1_us) / 
+      avg_read_us = ((int)diff_time.tv_sec * MILLION + (int)diff_time.tv_usec + read_1_us) /
 	 (LAT_LEN * LON_LEN);
    }
    else
@@ -221,7 +221,7 @@ main(int argc, char **argv)
 	 if (nc_get_vara_float(ncid, varid, start, count, hor_data)) ERR_RET;
       if (gettimeofday(&end_time, NULL)) ERR;
       if (nc4_timeval_subtract(&diff_time, &end_time, &start_time)) ERR;
-      avg_read_us = ((int)diff_time.tv_sec * MILLION + (int)diff_time.tv_usec + 
+      avg_read_us = ((int)diff_time.tv_sec * MILLION + (int)diff_time.tv_usec +
 		     read_1_us) / TIME_LEN;
    }
 
@@ -230,8 +230,8 @@ main(int argc, char **argv)
 
    /* Print results. */
    printf("%d\t%d\t%d\t%.1f\t\t%d\t%d\t\t",
-	  (int)cs[0], (int)cs[1], (int)cs[2], 
-	  (storage == NC_CHUNKED) ? (cache/(float)MEGABYTE) : 0, 
+	  (int)cs[0], (int)cs[1], (int)cs[2],
+	  (storage == NC_CHUNKED) ? (cache/(float)MEGABYTE) : 0,
 	  deflate, shuffle);
    if (timeseries)
       printf("%d\t\t%d\n", (int)read_1_us, (int)avg_read_us);

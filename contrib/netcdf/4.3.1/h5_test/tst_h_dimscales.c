@@ -16,7 +16,7 @@
 #define STR_LEN 255
 #define MAX_DIMS 255
 
-herr_t alien_visitor(hid_t did, unsigned dim, hid_t dsid, 
+herr_t alien_visitor(hid_t did, unsigned dim, hid_t dsid,
 		     void *visitor_data)
 {
    char name1[STR_LEN], name2[STR_LEN];
@@ -30,9 +30,9 @@ herr_t alien_visitor(hid_t did, unsigned dim, hid_t dsid,
 /*    printf("name of dsid: %s\n", name2); */
 
    if (H5Gget_objinfo(did, ".", 1, &statbuf) < 0) ERR;
-/*   printf("statbuf.fileno = %d statbuf.objno = %d\n", 
+/*   printf("statbuf.fileno = %d statbuf.objno = %d\n",
      statbuf.fileno, statbuf.objno);*/
-   
+
    return 0;
 }
 
@@ -47,7 +47,7 @@ rec_scan_group(hid_t grpid)
    int num_scales;
    hsize_t dims[MAX_DIMS], max_dims[MAX_DIMS];
    int ndims, d;
-   
+
    /* Loop through datasets to find variables. */
    if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
    for (i=0; i<num_obj; i++)
@@ -56,7 +56,7 @@ rec_scan_group(hid_t grpid)
        * the object. */
       if ((obj_class = H5Gget_objtype_by_idx(grpid, i)) < 0) ERR;
       if (H5Gget_objname_by_idx(grpid, i, obj_name, STR_LEN) < 0) ERR;
-      /*printf("\nEncountered: HDF5 object obj_class %d obj_name %s\n", 
+      /*printf("\nEncountered: HDF5 object obj_class %d obj_name %s\n",
 	obj_class, obj_name);*/
 
       /* Deal with groups and datasets, ignore the rest. */
@@ -86,7 +86,7 @@ rec_scan_group(hid_t grpid)
 	    else
 	    {
 	       int visitor_data = 0;
-		  
+
 	       /* Here's how to get the number of scales attached
 		* to the dataset's dimension 0. */
 	       if ((num_scales = H5DSget_num_scales(datasetid, 0)) < 0) ERR;
@@ -136,34 +136,34 @@ main()
       hsize_t dimscale_dims[1] = {DIM1_LEN};
 
       /* Open file and create group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
-      
+
       /* Create our dimension scale. Use the built-in NAME attribute
        * on the dimscale. */
-      if ((dimscale_spaceid = H5Screate_simple(1, dimscale_dims, 
+      if ((dimscale_spaceid = H5Screate_simple(1, dimscale_dims,
 					       dimscale_dims)) < 0) ERR;
-      if ((dimscaleid = H5Dcreate(grpid, DIMSCALE_NAME, H5T_NATIVE_INT, 
+      if ((dimscaleid = H5Dcreate(grpid, DIMSCALE_NAME, H5T_NATIVE_INT,
 				  dimscale_spaceid, H5P_DEFAULT)) < 0) ERR;
       if (H5DSset_scale(dimscaleid, NAME_ATTRIBUTE) < 0) ERR;
 
       /* Create a 1D variable which uses the dimscale. Attach a label
        * to this scale. */
       if ((var1_spaceid = H5Screate_simple(1, dims, dims)) < 0) ERR;
-      if ((var1_datasetid = H5Dcreate(grpid, VAR1_NAME, H5T_NATIVE_INT, 
+      if ((var1_datasetid = H5Dcreate(grpid, VAR1_NAME, H5T_NATIVE_INT,
 				      var1_spaceid, H5P_DEFAULT)) < 0) ERR;
       if (H5DSattach_scale(var1_datasetid, dimscaleid, 0) < 0) ERR;
       if (H5DSset_label(var1_datasetid, 0, FIFTIES_SONG) < 0) ERR;
 
       /* Create a 1D variabls that doesn't use the dimension scale. */
-      if ((var2_datasetid = H5Dcreate(grpid, VAR2_NAME, H5T_NATIVE_INT, 
+      if ((var2_datasetid = H5Dcreate(grpid, VAR2_NAME, H5T_NATIVE_INT,
 				      var1_spaceid, H5P_DEFAULT)) < 0) ERR;
 
       /* Create a 2D dataset which uses the scale for one of its
        * dimensions. */
       if ((var3_spaceid = H5Screate_simple(2, dims, dims)) < 0) ERR;
-      if ((var3_datasetid = H5Dcreate(grpid, VAR3_NAME, H5T_NATIVE_INT, 
+      if ((var3_datasetid = H5Dcreate(grpid, VAR3_NAME, H5T_NATIVE_INT,
 				      var3_spaceid, H5P_DEFAULT)) < 0) ERR;
       if (H5DSattach_scale(var3_datasetid, dimscaleid, 0) < 0) ERR;
 
@@ -199,7 +199,7 @@ main()
       /* Reopen the file and group. */
       if ((fileid = H5Fopen(FILE_NAME, H5F_ACC_RDWR, H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gopen(fileid, GRP_NAME)) < 0) ERR;
-      
+
       /* Loop through datasets to find variables. */
       if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
       for (i=0; i<num_obj; i++)
@@ -224,7 +224,7 @@ main()
 	       {
 		  H5Dclose(datasetid);
 	       }
-	       
+
 	       if ((datasetid = H5Dopen(grpid, obj_name)) < 0) ERR;
 	       if ((is_scale = H5DSis_scale(datasetid)) < 0) ERR;
 	       if (is_scale && strcmp(obj_name, DIMSCALE_NAME)) ERR;
@@ -234,7 +234,7 @@ main()
 
 		  /* A dimscale comes with a NAME attribute, in
 		   * addition to its real name. */
-		  if (H5DSget_scale_name(datasetid, nom_de_quincey, 
+		  if (H5DSget_scale_name(datasetid, nom_de_quincey,
 					 STR_LEN) < 0) ERR;
 		  if (strcmp(nom_de_quincey, NAME_ATTRIBUTE)) ERR;
 
@@ -254,7 +254,7 @@ main()
 		  if (strcmp(obj_name, VAR1_NAME) == 0 && num_scales != 1) ERR;
 		  if (strcmp(obj_name, VAR2_NAME) == 0 && num_scales > 0) ERR;
 		  if (strcmp(obj_name, VAR3_NAME) == 0 && num_scales != 1) ERR;
-		  
+
 		  /* There's also a label for dimension 0 of var1. */
 		  if (strcmp(obj_name, VAR1_NAME) == 0)
 		  {
@@ -292,15 +292,15 @@ main()
       int v;
 
       /* Open file and create group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
-      
+
       /* Create our dimension scale. Use the built-in NAME attribute
        * on the dimscale. */
-      if ((dimscale_spaceid = H5Screate_simple(1, dimscale_dims, 
+      if ((dimscale_spaceid = H5Screate_simple(1, dimscale_dims,
 					       dimscale_dims)) < 0) ERR;
-      if ((dimscaleid = H5Dcreate(grpid, DIMSCALE_NAME, H5T_NATIVE_INT, 
+      if ((dimscaleid = H5Dcreate(grpid, DIMSCALE_NAME, H5T_NATIVE_INT,
 				  dimscale_spaceid, H5P_DEFAULT)) < 0) ERR;
       if (H5DSset_scale(dimscaleid, NAME_ATTRIBUTE) < 0) ERR;
 
@@ -309,7 +309,7 @@ main()
       for (v = 0; v < NUM_DATASETS; v++)
       {
 	 sprintf(var_name, "var_%d", v);
-	 if ((var1_datasetid[v] = H5Dcreate(grpid, var_name, H5T_NATIVE_INT, 
+	 if ((var1_datasetid[v] = H5Dcreate(grpid, var_name, H5T_NATIVE_INT,
 					    var1_spaceid, H5P_DEFAULT)) < 0) ERR;
 	 if (H5DSattach_scale(var1_datasetid[v], dimscaleid, 0) < 0) ERR;
       }
@@ -332,7 +332,7 @@ main()
       hsize_t dims[1] = {1}, maxdims[1] = {H5S_UNLIMITED};
 
       /* Create file and group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
 
@@ -343,12 +343,12 @@ main()
       if (H5Pset_chunk(cparmsid, 1, dims) < 0) ERR;
 
       /* Create our dimension scale, as an unlimited dataset. */
-      if ((dimscaleid = H5Dcreate(grpid, DIMSCALE_NAME, H5T_NATIVE_INT, 
+      if ((dimscaleid = H5Dcreate(grpid, DIMSCALE_NAME, H5T_NATIVE_INT,
 				  spaceid, cparmsid)) < 0) ERR;
       if (H5DSset_scale(dimscaleid, NAME_ATTRIBUTE) < 0) ERR;
 
       /* Create a variable which uses it. */
-      if ((datasetid = H5Dcreate(grpid, VAR1_NAME, H5T_NATIVE_INT, 
+      if ((datasetid = H5Dcreate(grpid, VAR1_NAME, H5T_NATIVE_INT,
 				 spaceid, cparmsid)) < 0) ERR;
       if (H5DSattach_scale(datasetid, dimscaleid, 0) < 0) ERR;
       if (H5DSset_label(datasetid, 0, "dimension label") < 0) ERR;
@@ -377,7 +377,7 @@ main()
       /* Reopen the file and group. */
       if ((fileid = H5Fopen(FILE_NAME, H5F_ACC_RDWR, H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gopen(fileid, GRP_NAME)) < 0) ERR;
-      
+
       /* Loop through datasets to find variables. */
       if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
       for (i=0; i<num_obj; i++)
@@ -401,7 +401,7 @@ main()
 		  H5Dclose(datasetid);
 		  datasetid = 0;
 	       }
-	       
+
 	       /* Open the dataset. */
 	       if ((datasetid = H5Dopen(grpid, obj_name)) < 0) ERR;
 
@@ -434,9 +434,9 @@ main()
 		  if (num_scales != 1) ERR;
 
 		  /* Go through all dimscales for this var and learn about them. */
-		  if (H5DSiterate_scales(datasetid, 0, NULL, alien_visitor, 
+		  if (H5DSiterate_scales(datasetid, 0, NULL, alien_visitor,
 					 &visitor_data) < 0) ERR;
-		  
+
 		  /* There's also a label for dimension 0. */
 		  if (H5DSget_label(datasetid, 0, label, STR_LEN) < 0) ERR;
 
@@ -464,7 +464,7 @@ main()
 
    {
 #define NDIMS 3
-#define TIME_DIM 0      
+#define TIME_DIM 0
 #define LAT_DIM 1
 #define LON_DIM 2
 #define LAT_LEN 2
@@ -569,7 +569,7 @@ main()
       /* Reopen the file and group. */
       if ((fileid = H5Fopen(FILE_NAME, H5F_ACC_RDWR, H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gopen(fileid, GRP_NAME)) < 0) ERR;
-      
+
       /* Loop through datasets to find variables. */
       if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
       for (i=0; i<num_obj; i++)
@@ -602,15 +602,15 @@ main()
 
 		  /* A dimscale comes with a NAME attribute, in
 		   * addition to its real name. */
-		  if (H5DSget_scale_name(datasetid, nom_de_quincey, 
+		  if (H5DSget_scale_name(datasetid, nom_de_quincey,
 					 STR_LEN) < 0) ERR;
-		  /*printf("found scale %s, NAME %s id 0x%x\n", obj_name, 
+		  /*printf("found scale %s, NAME %s id 0x%x\n", obj_name,
 		    nom_de_quincey, datasetid);*/
 
 		  /* Check size depending on name. */
 		  if ((!strcmp(obj_name, LAT_NAME) && dims[TIME_DIM] != LAT_LEN) ||
 		      (!strcmp(obj_name, LON_NAME) && dims[TIME_DIM] != LON_LEN) ||
-		      (!strcmp(obj_name, TIME_NAME) && 
+		      (!strcmp(obj_name, TIME_NAME) &&
 		       max_dims[TIME_DIM] != H5S_UNLIMITED)) ERR;
 
 	       }
@@ -618,9 +618,9 @@ main()
 	       {
 		  char label[STR_LEN+1];
 		  int visitor_data = 0;
-		  
+
 		  /* SHould have these dimensions... */
-		  if (dims[TIME_DIM] != 0 || dims[LAT_DIM] != LAT_LEN || 
+		  if (dims[TIME_DIM] != 0 || dims[LAT_DIM] != LAT_LEN ||
 		      dims[LON_DIM] != LON_LEN) ERR;
 		  if (max_dims[TIME_DIM] != H5S_UNLIMITED) ERR;
 
@@ -636,7 +636,7 @@ main()
 		     if (H5DSiterate_scales(datasetid, d, NULL, alien_visitor,
 					    &visitor_data) < 0) ERR;
 		  /*printf("visitor_data: 0x%x\n", visitor_data);*/
-		  
+
 		  /* There's also a label for each dimension. */
 		  if (H5DSget_label(datasetid, 0, label, STR_LEN) < 0) ERR;
 		  if (strcmp(label, TIME_NAME)) ERR;
@@ -673,7 +673,7 @@ main()
 #define SMELLINESS_NAME "Smelliness"
 #define DISTANCE_NAME "Distance"
 #define TIME_NAME "Time"
-#define TIME_DIM 0      
+#define TIME_DIM 0
 #define SMELLINESS_DIM 1
 #define DISTANCE_DIM 2
 #define GOAT_NAME "Billy_goat_gruff"
@@ -773,7 +773,7 @@ main()
       /* If we can't scan the group, crash into a flaming heap of
        * smoking, smoldering rubbish. */
       if (rec_scan_group(grpid)) ERR;
-      
+
       /* Close up the shop. */
       if (H5Gclose(grpid) < 0 ||
 	  H5Fclose(fileid) < 0) ERR;

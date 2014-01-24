@@ -29,7 +29,7 @@
 #include <mpi.h>
 #endif
 #include <nc_tests.h> /* The ERR macro is here... */
-#include <netcdf.h> 
+#include <netcdf.h>
 
 #define MILLION 1000000
 #define BAD -99
@@ -65,15 +65,15 @@ MPI_Error_string(e, err_buffer, &resultlen); \
 printf("MPI error, line %d, file %s: %s\n", __LINE__, __FILE__, err_buffer); \
 MPI_Finalize(); \
 return 2; \
-} while (0) 
+} while (0)
 #endif
 
 /* This function will fill the start and count arrays for the reads
  * and writes. */
-static int 
-get_starts_counts(int ndims, size_t *dimlen, int p, int my_rank, 
-		  int slow_count, int use_scs, VAR_OPTS_T *vo, 
-		  int *num_steps, int *start_inc, int *slice_len, 
+static int
+get_starts_counts(int ndims, size_t *dimlen, int p, int my_rank,
+		  int slow_count, int use_scs, VAR_OPTS_T *vo,
+		  int *num_steps, int *start_inc, int *slice_len,
 		  size_t *last_count, size_t *start, size_t *count)
 {
    int extra_step = 0;
@@ -140,7 +140,7 @@ get_starts_counts(int ndims, size_t *dimlen, int p, int my_rank,
       if (start[0] > dimlen[0])
       {
 	 fprintf(stderr, "slow_count too large for this many processors, "
-		 "start_inc=%d, slow_count=%d, p=%d, my_rank=%d start[0]=%ld\n", 
+		 "start_inc=%d, slow_count=%d, p=%d, my_rank=%d start[0]=%ld\n",
 		 *start_inc, slow_count, p, my_rank, start[0]);
 	 return 2;
       }
@@ -211,7 +211,7 @@ check_att(int ncid1, int ncid2, int varid, int a)
       return ret;
    if ((ret = nc_inq_att(ncid2, varid, name, &typeid2, &len2)))
       return ret;
-   if (len != len2 || typeid != typeid2) 
+   if (len != len2 || typeid != typeid2)
       return BAD;
    if ((ret = nc_inq_type(ncid1, typeid, NULL, &typelen)))
       return ret;
@@ -230,7 +230,7 @@ check_att(int ncid1, int ncid2, int varid, int a)
 	 goto exit;
       if ((ret = nc_get_att(ncid2, varid, name, d2)))
 	 goto exit;
-      
+
       /* Are they the same? */
       if (memcmp(d, d2, typelen * len))
 	 ret = BAD;
@@ -247,9 +247,9 @@ check_att(int ncid1, int ncid2, int varid, int a)
 }
 
 /* Do two files contain the same data and metadata? */
-static int 
+static int
 cmp_file(char *file1, char *file2, int *meta_read_us, int *data_read_us,
-	 int use_par, int par_access, int do_cmp, int p, int my_rank, 
+	 int use_par, int par_access, int do_cmp, int p, int my_rank,
 	 int slow_count, int verbose, int num_vo, VAR_OPTS_T *vo, int use_scs)
 {
    int ncid1, ncid2;
@@ -317,11 +317,11 @@ cmp_file(char *file1, char *file2, int *meta_read_us, int *data_read_us,
    /* Check dims. */
    for (d = 0; d < ndims; d++)
    {
-      if ((ret = nc_inq_dim(ncid1, d, name, &len))) 
+      if ((ret = nc_inq_dim(ncid1, d, name, &len)))
 	 ERR1(ret);
       if ((ret = nc_inq_dim(ncid2, d, name2, &len2)))
 	 ERR1(ret);
-      if (len != len2 || strcmp(name, name2)) 
+      if (len != len2 || strcmp(name, name2))
 	 ERR1(BAD);
    }
 
@@ -378,12 +378,12 @@ cmp_file(char *file1, char *file2, int *meta_read_us, int *data_read_us,
       if (ndims == 0)
 	 dimlen[0] = 1;
 
-      if ((ret = get_starts_counts(ndims, dimlen, p, my_rank, slow_count, use_scs, 
-				   &vo[v], &num_steps, &start_inc, &slice_len, 
+      if ((ret = get_starts_counts(ndims, dimlen, p, my_rank, slow_count, use_scs,
+				   &vo[v], &num_steps, &start_inc, &slice_len,
 				   &last_count, start, count)))
 	 return ret;
       if (verbose)
-	 printf("%d: num_steps=%d, start_inc=%d, slice_len=%d, last_count=%ld\n", 
+	 printf("%d: num_steps=%d, start_inc=%d, slice_len=%d, last_count=%ld\n",
 		my_rank, num_steps, start_inc, slice_len, last_count);
 
       /* If there are no records, we're done. */
@@ -400,7 +400,7 @@ cmp_file(char *file1, char *file2, int *meta_read_us, int *data_read_us,
 	 ERR1(NC_ENOMEM);
       if (!(data2 = malloc(slice_len * type_size)))
 	 ERR1(NC_ENOMEM);
-   
+
       /* Check the var data for each slice. */
 /*      for (step = 0; !ret && step < num_steps; step++)*/
       for (step = 0; !ret && step < num_steps; step++)
@@ -413,7 +413,7 @@ cmp_file(char *file1, char *file2, int *meta_read_us, int *data_read_us,
 
 	 /* Read data from file2. */
 #ifdef USE_PARALLEL
-	 ftime = MPI_Wtime();      
+	 ftime = MPI_Wtime();
 #else
 	 if (gettimeofday(&start_time, NULL)) ERR;
 #endif
@@ -438,7 +438,7 @@ cmp_file(char *file1, char *file2, int *meta_read_us, int *data_read_us,
 	  * dimension. */
 	 start[0] += start_inc;
       }
-      
+
      exit:
       if (data) free(data);
       if (data2) free(data2);
@@ -459,9 +459,9 @@ cmp_file(char *file1, char *file2, int *meta_read_us, int *data_read_us,
  * deflate, shuffle, and endianness parameters if desired. */
 static
 int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
-	      int num_vo, VAR_OPTS_T *vo, int *meta_read_us, int *meta_write_us, 
-	      int *data_read_us, int *data_write_us, int *in_format, int use_par, 
-	      int par_access, long long *num_bytes, int p, int my_rank, 
+	      int num_vo, VAR_OPTS_T *vo, int *meta_read_us, int *meta_write_us,
+	      int *data_read_us, int *data_write_us, int *in_format, int use_par,
+	      int par_access, long long *num_bytes, int p, int my_rank,
 	      int slow_count, int verbose, int use_scs, int endianness,
 	      int convert_unlim)
 {
@@ -480,7 +480,7 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
    if (use_par)
    {
 #ifdef USE_PARALLEL
-      ftime = MPI_Wtime();      
+      ftime = MPI_Wtime();
       if ((ret = nc_open_par(file_name_in, 0, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid_in)))
 	 ERR1(ret);
       *meta_read_us += (MPI_Wtime() - ftime) * MILLION;
@@ -511,7 +511,7 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
       if (use_par)
       {
 #ifdef USE_PARALLEL
-	 if ((ret = nc_create_par(file_name_out, cmode_out, MPI_COMM_WORLD, 
+	 if ((ret = nc_create_par(file_name_out, cmode_out, MPI_COMM_WORLD,
 				  MPI_INFO_NULL, &ncid_out)))
 	    ERR1(ret);
 #else
@@ -529,7 +529,7 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
 	    ERR1(ret);
       }
    }
-      
+
    if ((ret = nc_inq(ncid_in, &ndims, &nvars, &natts, &unlimdimid)))
       ERR1(ret);
 
@@ -538,7 +538,7 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
       /* Copy dims. */
       for (d = 0; d < ndims; d++)
       {
-	 if ((ret = nc_inq_dim(ncid_in, d, name, &len))) 
+	 if ((ret = nc_inq_dim(ncid_in, d, name, &len)))
 	    ERR1(ret);
 	 if (convert_unlim)
 	 {
@@ -547,20 +547,20 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
 	 }
 	 else
 	 {
-	    if ((ret = nc_def_dim(ncid_out, name, 
-				  (d == unlimdimid) ? NC_UNLIMITED : len, 
+	    if ((ret = nc_def_dim(ncid_out, name,
+				  (d == unlimdimid) ? NC_UNLIMITED : len,
 				  NULL)))
 	       ERR1(ret);
 	 }
       }
-      
+
       /* Copy global atts. */
       for (a = 0; a < natts; a++)
       {
 	 if (nc_inq_attname(ncid_in, NC_GLOBAL, a, name)) ERR;
 	 if (nc_copy_att(ncid_in, NC_GLOBAL, name, ncid_out, NC_GLOBAL)) ERR;
       }
-      
+
       /* Copy the variable metadata. */
       for (v = 0; v < nvars; v++)
       {
@@ -571,21 +571,21 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
 	 int varid_out;
 	 int a, o1;
 	 int ret = NC_NOERR;
-	 
+
 	 /* Learn about this var. */
 	 if ((ret = nc_inq_var(ncid_in, v, name, &xtype, &ndims, dimids, &natts)))
 	    return ret;
-	 
+
 	 /* Create the output var. */
 	 if (nc_def_var(ncid_out, name, xtype, ndims, dimids, &varid_out)) ERR;
-	 
+
 	 /* Set the output endianness. For simplicity in this program,
 	  * all vars get the same endianness. But there's no reason why
 	  * this couldn't be varied from var to var, though it is hard to
 	  * see why one would do so. */
 	 if (endianness)
 	    if (nc_def_var_endian(ncid_out, varid_out, endianness)) ERR;
-	 
+
 	 /* Sent chunking and compression if specified in the var options. */
 	 for (o1 = 0; o1 < num_vo; o1++)
 	    if (vo[o1].varid == v)
@@ -602,7 +602,7 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
 		  if (nc_def_var_deflate(ncid_out, v, vo[o1].shuffle, 1, vo[o1].deflate_num)) ERR;
 	       break;
 	    }
-	 
+
 	 /* Copy the attributes. */
 	 for (a=0; a<natts; a++)
 	 {
@@ -610,9 +610,9 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
 	    if (nc_copy_att(ncid_in, v, att_name, ncid_out, varid_out)) ERR;
 	 }
       }
-      
+
 #ifdef USE_PARALLEL
-      ftime = MPI_Wtime();      
+      ftime = MPI_Wtime();
 #else
       if (gettimeofday(&start_time, NULL)) ERR;
 #endif
@@ -625,7 +625,7 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
       if (nc4_timeval_subtract(&diff_time, &end_time, &start_time)) ERR;
       *meta_write_us += (int)diff_time.tv_sec * MILLION + (int)diff_time.tv_usec;
 #endif
-      
+
       if (verbose)
 	 printf("%d: copying %d vars, %d global atts, and %d dims took %d micro-seconds\n",
 		my_rank, nvars, natts, ndims, *meta_write_us);
@@ -687,12 +687,12 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
        * varying (i.e. the zeroth) dimension to read at one time. For
        * vars with an unlimited dimension, this is the number of
        * records to read at once. */
-      if ((ret = get_starts_counts(ndims, dimlen, p, my_rank, slow_count, use_scs, 
+      if ((ret = get_starts_counts(ndims, dimlen, p, my_rank, slow_count, use_scs,
 				   &vo[v], &num_steps, &start_inc, &slice_len,
 				   &last_count, start, count)))
 	 return ret;
       if (verbose)
-	 printf("%d: num_steps=%d, start_inc=%d, slice_len=%d, last_count=%ld\n", 
+	 printf("%d: num_steps=%d, start_inc=%d, slice_len=%d, last_count=%ld\n",
 		my_rank, num_steps, start_inc, slice_len, last_count);
 
       /* If there are no records, we're done. */
@@ -702,7 +702,7 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
       /* Allocate memory for one slice. */
       if (!(data = malloc(slice_len * type_size)))
 	 return NC_ENOMEM;
-   
+
       /* Copy the var data one slice at a time. */
       for (step = 0; !ret && step < num_steps; step++)
       {
@@ -716,7 +716,7 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
 
 	 /* Read input data. */
 #ifdef USE_PARALLEL
-	 ftime = MPI_Wtime();      
+	 ftime = MPI_Wtime();
 #else
 	 if (gettimeofday(&start_time, NULL)) ERR;
 #endif
@@ -755,16 +755,16 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
 	       printf("%d: writing step %d, var %d took %d micro-seconds\n",
 		      my_rank, step, v, *data_write_us);
 	 }
-	 
+
 	 /* Increment start index. */
 	 start[0] += start_inc;
       } /* next step */
-      
+
       /* Calculate the data read and write rates in MB/sec. */
       for (d = 0, var_num_bytes = type_size; d < ndims; d++)
 	 var_num_bytes *= dimlen[d];
       (*num_bytes) += var_num_bytes;
-      
+
      exit:
       if (data) free(data);
       if (dimlen) free(dimlen);
@@ -780,7 +780,7 @@ int copy_file(char *file_name_in, char *file_name_out, int cmode_out,
 }
 
 #define NDIMS 3
-#define MAX_DEFLATE 9      
+#define MAX_DEFLATE 9
 #define INPUT_FILE "/upc/share/testdata/nssl/mosaic3d_nc/tile1/20070803-2300.netcdf"
 #define COLON ":"
 #define COMMA ","
@@ -854,7 +854,7 @@ main(int argc, char **argv)
 	 vo[o1].chunksize[i] = 0;
 
    while ((c = getopt(argc, argv, "vo:f:hc:dpms:it:u:r:e:l")) != EOF)
-      switch(c) 
+      switch(c)
       {
 	 case 'v':
 	    verbose++;
@@ -886,14 +886,14 @@ main(int argc, char **argv)
 	    header++;
 	    break;
 	 case 'c':
-	    for (num_vo = 0, str1 = optarg; ; num_vo++, str1 = NULL) 
+	    for (num_vo = 0, str1 = optarg; ; num_vo++, str1 = NULL)
 	    {
 	       int got_z = 0, got_s = 0;
 	       if (num_vo > MAX_VO)
 		  return 1;
 	       if (!(token = strtok_r(str1, COMMA, &saveptr1)))
 		  break;
-               for (ndims = 0, str2 = token; ; str2 = NULL) 
+               for (ndims = 0, str2 = token; ; str2 = NULL)
 	       {
 		  int tmp_int;
 		  if (!(subtoken = strtok_r(str2, COLON, &saveptr2)))
@@ -914,13 +914,13 @@ main(int argc, char **argv)
 	    }
 	    break;
 	 case 't':
-	    for (num_vo = 0, str1 = optarg; ; num_vo++, str1 = NULL) 
+	    for (num_vo = 0, str1 = optarg; ; num_vo++, str1 = NULL)
 	    {
 	       if (num_vo > MAX_VO)
 		  return 1;
 	       if (!(token = strtok_r(str1, COMMA, &saveptr1)))
 		  break;
-               for (ndims = 0, str2 = token; ; str2 = NULL) 
+               for (ndims = 0, str2 = token; ; str2 = NULL)
 	       {
 		  if (!(subtoken = strtok_r(str2, COLON, &saveptr2)))
 		     break;
@@ -934,13 +934,13 @@ main(int argc, char **argv)
 	    use_scs++;
 	    break;
 	 case 'u':
-	    for (num_vo = 0, str1 = optarg; ; num_vo++, str1 = NULL) 
+	    for (num_vo = 0, str1 = optarg; ; num_vo++, str1 = NULL)
 	    {
 	       if (num_vo > MAX_VO)
 		  return 1;
 	       if (!(token = strtok_r(str1, COMMA, &saveptr1)))
 		  break;
-               for (ndims = 0, str2 = token; ; str2 = NULL) 
+               for (ndims = 0, str2 = token; ; str2 = NULL)
 	       {
 		  if (!(subtoken = strtok_r(str2, COLON, &saveptr2)))
 		     break;
@@ -953,13 +953,13 @@ main(int argc, char **argv)
 	    }
 	    break;
 	 case 'r':
-	    for (num_vo = 0, str1 = optarg; ; num_vo++, str1 = NULL) 
+	    for (num_vo = 0, str1 = optarg; ; num_vo++, str1 = NULL)
 	    {
 	       if (num_vo > MAX_VO)
 		  return 1;
 	       if (!(token = strtok_r(str1, COMMA, &saveptr1)))
 		  break;
-               for (ndims = 0, str2 = token; ; str2 = NULL) 
+               for (ndims = 0, str2 = token; ; str2 = NULL)
 	       {
 		  if (!(subtoken = strtok_r(str2, COLON, &saveptr2)))
 		     break;
@@ -1038,10 +1038,10 @@ main(int argc, char **argv)
     * anything else to figure out what the heck is going on. */
    if (verbose && !my_rank)
    {
-      printf("copying %s to %s on %d processors with endianness %d and...\n", 
+      printf("copying %s to %s on %d processors with endianness %d and...\n",
 	     file_in, file_out, p, endianness);
       if (use_scs)
-	 for (v = 0; v < num_vo; v++) 
+	 for (v = 0; v < num_vo; v++)
 	 {
 	    printf("options for var %d:\n", vo[v].varid);
 	    for (d = 0; d < vo[v].ndims; d++)
@@ -1053,8 +1053,8 @@ main(int argc, char **argv)
    }
 
    /* Copy the file, keeping track of the read and write times for metadata and data. */
-   if ((ret = copy_file(file_in, file_out, cmode, num_vo, vo, &meta_read_us, &meta_write_us, 
-			&data_read_us, &data_write_us, &in_format, use_par, par_access, 
+   if ((ret = copy_file(file_in, file_out, cmode, num_vo, vo, &meta_read_us, &meta_write_us,
+			&data_read_us, &data_write_us, &in_format, use_par, par_access,
 			&num_bytes, p, my_rank, slow_count, verbose, use_scs, endianness,
 			convert_unlim)))
       return ret;
@@ -1065,9 +1065,9 @@ main(int argc, char **argv)
    {
 #ifdef USE_PARALLEL
       MPI_Barrier(MPI_COMM_WORLD);
-#endif      
-      if ((ret = cmp_file(file_in, file_out, &meta_read2_us, &data_read2_us, 
-			  use_par, par_access, do_cmp, p, my_rank, slow_count, 
+#endif
+      if ((ret = cmp_file(file_in, file_out, &meta_read2_us, &data_read2_us,
+			  use_par, par_access, do_cmp, p, my_rank, slow_count,
 			  verbose, num_vo, vo, use_scs)))
 	 return ret;
    }
@@ -1101,7 +1101,7 @@ main(int argc, char **argv)
    write_rate = (float)num_bytes/((float)tdata_write_us/p);
    reread_rate = (float)num_bytes/((float)tdata_read2_us/p);
    if (verbose)
-      printf("%d: read rate %g, write rate %g, reread_rate %g\n", my_rank, read_rate, 
+      printf("%d: read rate %g, write rate %g, reread_rate %g\n", my_rank, read_rate,
 	     write_rate, reread_rate);
 
    /* Print some output. */
@@ -1123,11 +1123,11 @@ main(int argc, char **argv)
 		"chunksize[3]\n");
       }
 
-      printf("%d, %d, %ld, %ld, %d, %d, %d, %d, %d, ", in_format, out_format, file_size(file_in), 
+      printf("%d, %d, %ld, %ld, %d, %d, %d, %d, %d, ", in_format, out_format, file_size(file_in),
 	     file_size(file_out), tmeta_read_us, tmeta_write_us, tdata_read_us, tdata_write_us,
 	     endianness);
       if (doublecheck)
-	 printf("%d, %d, %g, %g, %g, ", tmeta_read2_us, tdata_read2_us, read_rate, write_rate, 
+	 printf("%d, %d, %g, %g, %g, ", tmeta_read2_us, tdata_read2_us, read_rate, write_rate,
 		reread_rate);
       else
 	 printf("%g, %g, ", read_rate, write_rate);
@@ -1135,7 +1135,7 @@ main(int argc, char **argv)
 	 printf("%d, ", p);
       for (o1 = 0; o1 < num_vo; o1++)
       {
-	 printf("%d, %d, %d, %d, %d, %d ", vo[o1].deflate_num, vo[o1].shuffle, 
+	 printf("%d, %d, %d, %d, %d, %d ", vo[o1].deflate_num, vo[o1].shuffle,
 	 (int)vo[o1].chunksize[0], (int)vo[o1].chunksize[1], (int)vo[o1].chunksize[2], (int)vo[o1].chunksize[3]);
 	 if (o1 != num_vo - 1)
 	    printf(", ");
@@ -1145,7 +1145,7 @@ main(int argc, char **argv)
 
 #ifdef USE_PARALLEL
    MPI_Finalize();
-#endif   
+#endif
 
    return 0;
 }

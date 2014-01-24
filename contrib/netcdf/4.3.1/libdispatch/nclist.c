@@ -118,7 +118,7 @@ void*
 nclistpop(NClist* l)
 {
   if(l == NULL || l->length == 0) return NULL;
-  l->length--;  
+  l->length--;
   return l->content[l->length];
 }
 
@@ -139,7 +139,7 @@ nclistremove(NClist* l, unsigned long i)
   elem = l->content[i];
   for(i+=1;i<len;i++) l->content[i-1] = l->content[i];
   l->length--;
-  return elem;  
+  return elem;
 }
 
 /* Duplicate and return the content (null terminate) */
@@ -185,7 +185,7 @@ nclistelemremove(NClist* l, void* elem)
 
 
 
-/* Extends nclist to include a unique operator 
+/* Extends nclist to include a unique operator
    which remove duplicate values; NULL values removed
    return value is always 1.
 */
@@ -202,7 +202,7 @@ nclistunique(NClist* l)
         for(j=i+1;j<len;j++) {
 	    if(content[i] == content[j]) {
 		/* compress out jth element */
-                for(k=j+1;k<len;k++) content[k-1] = content[k];	
+                for(k=j+1;k<len;k++) content[k-1] = content[k];
 		len--;
 	    }
 	}

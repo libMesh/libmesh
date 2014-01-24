@@ -36,7 +36,7 @@ endif # BUILD_DLL
 
 # Add V2 API convenience library if needed.
 if BUILD_V2
-noinst_LTLIBRARIES += libnetcdf2.la 
+noinst_LTLIBRARIES += libnetcdf2.la
 libnetcdf2_la_SOURCES = dv2i.c
 libnetcdf2_la_CPPFLAGS = ${AM_CPPFLAGS} -DDLL_EXPORT
 endif # BUILD_V2

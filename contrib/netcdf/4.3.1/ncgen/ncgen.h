@@ -190,10 +190,10 @@ typedef struct Symbol {  /* symbol table entry*/
         /* use more than one part*/
         Typeinfo  typ; /* type info for e.g. var, att, etc.*/
         Varinfo   var;
-        Attrinfo  att;        
+        Attrinfo  att;
         Diminfo   dim;
         Groupinfo grp;
- 	Reference ref; /* symbol is really a referene to another symbol*/ 
+ 	Reference ref; /* symbol is really a referene to another symbol*/
 	/* Misc pieces of info*/
 	int             lineno;  /* at point of creation*/
 	int		touched; /* for sorting*/

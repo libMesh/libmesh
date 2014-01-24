@@ -28,10 +28,10 @@
 #define DIM3 1024
 #define DIM4 2097153		/* DIM3*DIM4*sizeof(short)  > 2**32  */
 
-/* 
+/*
  * In netCDF-3.6.2, a divide by zero occurs on 32-bit platforms when
  * creating a variable for which the product of dimensions is exactly
- * 2**32.  Check that this bug has been fixed. 
+ * 2**32.  Check that this bug has been fixed.
  */
 static int
 test_big_var(const char *testfile) {
@@ -89,7 +89,7 @@ test_large_byte_var(const char *testfile) {
     count[0] = 1;
     count[1] = DIM2;
     for (start[0] = 0; start[0] < DIM1; start[0]++) {
-	if (nc_put_vara_schar(ncid, varid, start, count, vals)) 
+	if (nc_put_vara_schar(ncid, varid, start, count, vals))
 	{
 	    ERR;
 	    break;
@@ -151,15 +151,15 @@ main(int argc, char **argv) {
 	   testfile);
    /* Go thru formats and run all tests for each of two (for netCDF-3
     * only builds), or 4 (for netCDF-4 builds) different formats. */
-    for (i = NC_FORMAT_CLASSIC; i <= NUM_FORMATS; i++) 
+    for (i = NC_FORMAT_CLASSIC; i <= NUM_FORMATS; i++)
     {
        nc_set_default_format(i, NULL);
-       
+
        printf("*** testing format %d with a variable with 2**32 values...", i);
        test_big_var(testfile);
        (void) remove(testfile);
        SUMMARIZE_ERR;
-       
+
        printf("*** testing format %d with a byte variable with > 2**32 values...", i);
        test_large_byte_var(testfile);
        (void) remove(testfile);

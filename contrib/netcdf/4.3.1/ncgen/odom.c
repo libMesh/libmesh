@@ -33,7 +33,7 @@ newodometer(Dimset* dimset, size_t* startp, size_t* countp)
 	odom->index[i] = odom->start[i];
 	/* verify */
 	ASSERT(odom->start[i] + odom->count[i] <= odom->declsize[i]);
-    }    
+    }
     return odom;
 }
 
@@ -76,7 +76,7 @@ odometerprint(Odometer* odom)
 		(unsigned long)odom->origin->declsize[ioffset],
 		(unsigned long)odom->origin->count[ioffset]
 	       );
-	strcat(line,tmp);	
+	strcat(line,tmp);
     }
     return line;
 }
@@ -93,7 +93,7 @@ odometermore(Odometer* odom)
     if(index < start + count) return 1;
     /* reset the zero'th wheel before returning */
     odom->origin->index[offset] = odom->origin->start[offset];
-    return 0;    
+    return 0;
 }
 
 int
@@ -134,6 +134,6 @@ odometeroffset(Odometer* odom)
 	int ioffset = i+odom->offset;
 	if(i > 0) count *= odom->origin->declsize[ioffset];
 	count += odom->origin->index[ioffset];
-    } 
+    }
     return count;
 }

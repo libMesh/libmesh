@@ -2,7 +2,7 @@
    Copyright 2005 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test netcdf-4 compound type feature. 
+   Test netcdf-4 compound type feature.
 
    $Id: tst_compounds.c,v 1.45 2010/05/25 13:53:03 ed Exp $
 */
@@ -35,14 +35,14 @@ main(int argc, char **argv)
       int dimids[] = {0}, fieldid;
       int field_ndims, field_sizes[NC_MAX_DIMS];
       size_t offset;
-      struct s1 
+      struct s1
       {
 	    int i1;
 	    int i2;
       };
       struct s1 data, data_in;
 
-      /* Create some phony data. */   
+      /* Create some phony data. */
       data.i1 = 5;
       data.i2 = 10;
 
@@ -51,9 +51,9 @@ main(int argc, char **argv)
       if (nc_def_compound(ncid, sizeof(struct s1), SVC_REC, &typeid)) ERR;
       if (nc_inq_compound(ncid, typeid, name, &size, &nfields)) ERR;
       if (size != sizeof(struct s1) || strcmp(name, SVC_REC) || nfields) ERR;
-      if (nc_insert_compound(ncid, typeid, BATTLES_WITH_KLINGONS, 
+      if (nc_insert_compound(ncid, typeid, BATTLES_WITH_KLINGONS,
 			     NC_COMPOUND_OFFSET(struct s1, i1), NC_INT)) ERR;
-      if (nc_insert_compound(ncid, typeid, DATES_WITH_ALIENS, 
+      if (nc_insert_compound(ncid, typeid, DATES_WITH_ALIENS,
 			     NC_COMPOUND_OFFSET(struct s1, i2), NC_INT)) ERR;
       if (nc_def_var(ncid, SERVICE_RECORD, typeid, 0, NULL, &varid)) ERR;
       if (nc_put_var(ncid, varid, &data)) ERR;
@@ -109,7 +109,7 @@ main(int argc, char **argv)
       int field_ndims, field_sizes[NC_MAX_DIMS];
       size_t offset;
       int i;
-      struct s1 
+      struct s1
       {
 	    int i1;
 	    int i2;
@@ -119,12 +119,12 @@ main(int argc, char **argv)
 
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
-      if (!(dummy = calloc(sizeof(struct s1), DIM_LEN))) 
-	 return NC_ENOMEM; 
-      memcpy((void *)data, (void *)dummy, sizeof(struct s1) * DIM_LEN); 
-      free(dummy); 
+      if (!(dummy = calloc(sizeof(struct s1), DIM_LEN)))
+	 return NC_ENOMEM;
+      memcpy((void *)data, (void *)dummy, sizeof(struct s1) * DIM_LEN);
+      free(dummy);
 
-      /* Create some phony data. */   
+      /* Create some phony data. */
       for (i = 0; i < DIM_LEN; i++)
       {
 	 data[i].i1 = 5;
@@ -136,9 +136,9 @@ main(int argc, char **argv)
       if (nc_def_compound(ncid, sizeof(struct s1), SVC_REC, &typeid)) ERR;
       if (nc_inq_compound(ncid, typeid, name, &size, &nfields)) ERR;
       if (size != sizeof(struct s1) || strcmp(name, SVC_REC) || nfields) ERR;
-      if (nc_insert_compound(ncid, typeid, BATTLES_WITH_KLINGONS, 
+      if (nc_insert_compound(ncid, typeid, BATTLES_WITH_KLINGONS,
 			     NC_COMPOUND_OFFSET(struct s1, i1), NC_INT)) ERR;
-      if (nc_insert_compound(ncid, typeid, DATES_WITH_ALIENS, 
+      if (nc_insert_compound(ncid, typeid, DATES_WITH_ALIENS,
 			     NC_COMPOUND_OFFSET(struct s1, i2), NC_INT)) ERR;
       if (nc_def_dim(ncid, STARDATE, DIM_LEN, &dimid)) ERR;
       if (nc_def_var(ncid, SERVICE_RECORD, typeid, 1, dimids, &varid)) ERR;
@@ -204,7 +204,7 @@ main(int argc, char **argv)
         if (nc_get_vars(ncid, varid, start, edges, stride, data)) ERR;
         for (i=0; i<DIM_LEN_S; i++) {
 	  if(data[i].i1 != datas[i].i1 || data[i].i2 != datas[i].i2) ERR;
-	}	
+	}
       }
 
       if (nc_close(ncid)) ERR;
@@ -217,7 +217,7 @@ main(int argc, char **argv)
       nc_type xtype;
       size_t size_in, nfields_in;
       char name_in[NC_MAX_NAME + 1];
-      
+
       /* Create a file with a compound type. Write a little data. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_def_compound(ncid, sizeof(int), SVC_REC, &typeid)) ERR;
@@ -227,8 +227,8 @@ main(int argc, char **argv)
 
       /* Open the file and take a peek. */
       if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
-      if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR; 
-      if (ndims != 0 || nvars != 1 || natts != 0 || unlimdimid != -1) ERR; 
+      if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
+      if (ndims != 0 || nvars != 1 || natts != 0 || unlimdimid != -1) ERR;
       if (nc_inq_vartype(ncid, 0, &xtype)) ERR;
       if (nc_inq_compound(ncid, xtype, name_in, &size_in, &nfields_in)) ERR;
       if (strcmp(name_in, SVC_REC) || size_in != sizeof(int) || nfields_in != 1) ERR;
@@ -247,7 +247,7 @@ main(int argc, char **argv)
       int field_ndims, field_sizes[NC_MAX_DIMS];
       size_t offset;
       int i;
-      struct s1 
+      struct s1
       {
 	    int i1;
 	    int i2;
@@ -257,12 +257,12 @@ main(int argc, char **argv)
 
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
-      if (!(dummy = calloc(sizeof(struct s1), DIM_LEN))) 
-	 return NC_ENOMEM; 
-      memcpy((void *)data, (void *)dummy, sizeof(struct s1) * DIM_LEN); 
-      free(dummy); 
+      if (!(dummy = calloc(sizeof(struct s1), DIM_LEN)))
+	 return NC_ENOMEM;
+      memcpy((void *)data, (void *)dummy, sizeof(struct s1) * DIM_LEN);
+      free(dummy);
 
-      /* Create some phony data. */   
+      /* Create some phony data. */
       for (i=0; i<DIM_LEN; i++)
       {
 	 data[i].i1 = 5;
@@ -272,9 +272,9 @@ main(int argc, char **argv)
       /* Create a file with a global attribute of compound type. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_def_compound(ncid, sizeof(struct s1), SVC_REC, &typeid)) ERR;
-      if (nc_insert_compound(ncid, typeid, BATTLES_WITH_KLINGONS, 
+      if (nc_insert_compound(ncid, typeid, BATTLES_WITH_KLINGONS,
 			     NC_COMPOUND_OFFSET(struct s1, i1), NC_INT)) ERR;
-      if (nc_insert_compound(ncid, typeid, DATES_WITH_ALIENS, 
+      if (nc_insert_compound(ncid, typeid, DATES_WITH_ALIENS,
 			     NC_COMPOUND_OFFSET(struct s1, i2), NC_INT)) ERR;
       if (nc_put_att(ncid, NC_GLOBAL, SERVICE_RECORD, typeid, 3, data)) ERR;
       if (nc_close(ncid)) ERR;
@@ -338,12 +338,12 @@ main(int argc, char **argv)
 
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
-      if (!(dummy = calloc(sizeof(struct sf_med_rec), DIM_LEN))) 
-	 return NC_ENOMEM; 
-      memcpy((void *)med_data_out, (void *)dummy, sizeof(struct sf_med_rec) * DIM_LEN); 
-      free(dummy); 
+      if (!(dummy = calloc(sizeof(struct sf_med_rec), DIM_LEN)))
+	 return NC_ENOMEM;
+      memcpy((void *)med_data_out, (void *)dummy, sizeof(struct sf_med_rec) * DIM_LEN);
+      free(dummy);
 
-      /* Create some phony data. */   
+      /* Create some phony data. */
       for (i=0; i<DIM_LEN; i++)
       {
 	 /* medical data */
@@ -357,15 +357,15 @@ main(int argc, char **argv)
       /* Create a file with a compound type. Write a little data. */
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_def_compound(ncid, sizeof(struct sf_med_rec), "SFMedRec", &typeid)) ERR;
-      if (nc_insert_compound(ncid, typeid, "num_heads", 
+      if (nc_insert_compound(ncid, typeid, "num_heads",
 			     NC_COMPOUND_OFFSET(struct sf_med_rec, num_heads), NC_UBYTE)) ERR;
-      if (nc_insert_compound(ncid, typeid, "num_arms", 
+      if (nc_insert_compound(ncid, typeid, "num_arms",
 			     NC_COMPOUND_OFFSET(struct sf_med_rec, num_arms), NC_USHORT)) ERR;
-      if (nc_insert_compound(ncid, typeid, "num_toes", 
+      if (nc_insert_compound(ncid, typeid, "num_toes",
 			     NC_COMPOUND_OFFSET(struct sf_med_rec, num_toes), NC_UINT)) ERR;
-      if (nc_insert_compound(ncid, typeid, "ago", 
+      if (nc_insert_compound(ncid, typeid, "ago",
 			     NC_COMPOUND_OFFSET(struct sf_med_rec, ago), NC_INT64)) ERR;
-      if (nc_insert_compound(ncid, typeid, "num_hairs", 
+      if (nc_insert_compound(ncid, typeid, "num_hairs",
 			     NC_COMPOUND_OFFSET(struct sf_med_rec, num_hairs), NC_UINT64)) ERR;
       if (nc_def_dim(ncid, STARDATE, DIM_LEN, &dimid)) ERR;
       if (nc_def_var(ncid, "starbase_13", typeid, 1, dimids, &varid)) ERR;
@@ -382,20 +382,20 @@ main(int argc, char **argv)
 	 if (nc_inq_compound_field(ncid, xtype, 0, name, &offset, &field_xtype, &field_ndims, field_sizes)) ERR;
 	 if (strcmp(name, "num_heads") || offset != 0 || field_xtype != NC_UBYTE) ERR;
 	 if (nc_inq_compound_field(ncid, xtype, 1, name, &offset, &field_xtype, &field_ndims, field_sizes)) ERR;
-	 if (strcmp(name, "num_arms") || offset != NC_COMPOUND_OFFSET(struct sf_med_rec, num_arms) || 
+	 if (strcmp(name, "num_arms") || offset != NC_COMPOUND_OFFSET(struct sf_med_rec, num_arms) ||
 	     field_xtype != NC_USHORT) ERR;
 	 if (nc_inq_compound_field(ncid, xtype, 2, name, &offset, &field_xtype, &field_ndims, field_sizes)) ERR;
-	 if (strcmp(name, "num_toes") || offset != NC_COMPOUND_OFFSET(struct sf_med_rec, num_toes) || 
+	 if (strcmp(name, "num_toes") || offset != NC_COMPOUND_OFFSET(struct sf_med_rec, num_toes) ||
 	     field_xtype != NC_UINT) ERR;
 	 if (nc_inq_compound_field(ncid, xtype, 3, name, &offset, &field_xtype, &field_ndims, field_sizes)) ERR;
-	 if (strcmp(name, "ago") || offset != NC_COMPOUND_OFFSET(struct sf_med_rec, ago) || 
+	 if (strcmp(name, "ago") || offset != NC_COMPOUND_OFFSET(struct sf_med_rec, ago) ||
 	     field_xtype != NC_INT64) ERR;
 	 if (nc_inq_compound_field(ncid, xtype, 4, name, &offset, &field_xtype, &field_ndims, field_sizes)) ERR;
-	 if (strcmp(name, "num_hairs") || offset != NC_COMPOUND_OFFSET(struct sf_med_rec, num_hairs) || 
+	 if (strcmp(name, "num_hairs") || offset != NC_COMPOUND_OFFSET(struct sf_med_rec, num_hairs) ||
 	     field_xtype != NC_UINT64) ERR;
 	 if (nc_get_var(ncid, varid, med_data_in)) ERR;
 	 for (i=0; i<DIM_LEN; i++)
-	    if (med_data_in[i].num_heads != med_data_out[i].num_heads || 
+	    if (med_data_in[i].num_heads != med_data_out[i].num_heads ||
 		med_data_in[i].num_arms != med_data_out[i].num_arms ||
 		med_data_in[i].num_toes != med_data_out[i].num_toes ||
 		med_data_in[i].ago != med_data_out[i].ago ||
@@ -589,7 +589,7 @@ main(int argc, char **argv)
 	     hr_data_in[i].percent_transporter_errosion !=
 	     hr_data_out[i].percent_transporter_errosion) ERR;
       }
-      
+
       /* Use the inq functions to learn about nested compound type. */
       if (nc_inq_att(ncid, NC_GLOBAL, "HR_Records", &xtype, &len)) ERR;
       if (len != DIM_LEN) ERR;
@@ -600,7 +600,7 @@ main(int argc, char **argv)
       if (nc_inq_compound_field(ncid, xtype, 1, name, &offset, &field_xtype, &field_ndims, field_sizes)) ERR;
       if (strcmp(name, "Service_Record") || offset != NC_COMPOUND_OFFSET(struct hr_rec, svc_rec)) ERR;
       /* Check the internal compound type. */
-      
+
       /* Finish checking the containing compound type. */
       if (nc_close(ncid)) ERR;
    }
@@ -697,7 +697,7 @@ main(int argc, char **argv)
       if (nc_close(ncid)) ERR;
 
       /* Check it out. */
-   
+
       /* Reopen the file. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
 
@@ -737,7 +737,7 @@ main(int argc, char **argv)
 	 if (val_in.relhum != obsdata[i].relhum) ERR;
 	 if (val_in.time != obsdata[i].time) ERR;
       }
-   
+
       if (nc_close(ncid)) ERR;
 
    }
@@ -772,7 +772,7 @@ main(int argc, char **argv)
       nc_type class_in;
       int ntypes;
       char file_in[NC_MAX_NAME * 2];
-      
+
       if (getenv("srcdir"))
       {
 	 strcpy(file_in, getenv("srcdir"));
@@ -820,7 +820,7 @@ main(int argc, char **argv)
 	 if (val_in.relhum != obsdata[i].relhum) ERR;
 	 if (val_in.time != obsdata[i].time) ERR;
       }
-   
+
       if (nc_close(ncid)) ERR;
    }
 
@@ -847,10 +847,10 @@ main(int argc, char **argv)
 
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
-      if (!(dummy = calloc(sizeof(struct hr_rec), DIM1_LEN))) 
-	 return NC_ENOMEM; 
-      memcpy((void *)hr_data_out, (void *)dummy, sizeof(struct hr_rec) * DIM1_LEN); 
-      free(dummy); 
+      if (!(dummy = calloc(sizeof(struct hr_rec), DIM1_LEN)))
+	 return NC_ENOMEM;
+      memcpy((void *)hr_data_out, (void *)dummy, sizeof(struct hr_rec) * DIM1_LEN);
+      free(dummy);
 
       /* Create some phony data. */
       for (i = 0; i < DIM1_LEN; i++)
@@ -880,11 +880,11 @@ main(int argc, char **argv)
       for (i=0; i<DIM1_LEN; i++)
 	 if (strcmp(hr_data_in[i].name, hr_data_out[i].name) ||
 	     hr_data_in[i].max_temp != hr_data_out[i].max_temp) ERR;
-      
+
       /* Use the inq functions to learn about the compound type. */
       if (nc_inq_att(ncid, NC_GLOBAL, "HR_Records", &xtype, &len)) ERR;
       if (len != DIM1_LEN) ERR;
-      
+
       /* Finish checking the containing compound type. */
       if (nc_close(ncid)) ERR;
    }
@@ -912,10 +912,10 @@ main(int argc, char **argv)
 
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
-      if (!(dummy = calloc(sizeof(struct hr_rec), DIM1_LEN))) 
-	 return NC_ENOMEM; 
-      memcpy((void *)hr_data_out, (void *)dummy, sizeof(struct hr_rec) * DIM1_LEN); 
-      free(dummy); 
+      if (!(dummy = calloc(sizeof(struct hr_rec), DIM1_LEN)))
+	 return NC_ENOMEM;
+      memcpy((void *)hr_data_out, (void *)dummy, sizeof(struct hr_rec) * DIM1_LEN);
+      free(dummy);
 
       /* Create some phony data. */
       for (i = 0; i < DIM1_LEN; i++)
@@ -949,11 +949,11 @@ main(int argc, char **argv)
 	 for (j = 0; j < ARRAY_LEN; j++)
 	    if (hr_data_in[i].name[j] != hr_data_out[i].name[j]) ERR;
       }
-      
+
       /* Use the inq functions to learn about the compound type. */
       if (nc_inq_att(ncid, NC_GLOBAL, "HR_Records", &xtype, &len)) ERR;
       if (len != DIM1_LEN) ERR;
-      
+
       /* Finish checking the containing compound type. */
       if (nc_close(ncid)) ERR;
    }
@@ -974,10 +974,10 @@ main(int argc, char **argv)
 
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
-      if (!(dummy = calloc(sizeof(struct s1), DATA_LEN))) 
-	 return NC_ENOMEM; 
-      memcpy((void *)data_out, (void *)dummy, sizeof(struct s1) * DATA_LEN); 
-      free(dummy); 
+      if (!(dummy = calloc(sizeof(struct s1), DATA_LEN)))
+	 return NC_ENOMEM;
+      memcpy((void *)data_out, (void *)dummy, sizeof(struct s1) * DATA_LEN);
+      free(dummy);
 
       /* Create some phony data. */
       for (idx = 0; idx < DATA_LEN; idx++)

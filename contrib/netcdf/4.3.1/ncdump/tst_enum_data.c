@@ -52,17 +52,17 @@ main(int argc, char **argv)
        char *name;
        unsigned char value;
    } cloud_types[] = {
-       {"Clear", CLEAR}, 
-       {"Cumulonimbus", CUMULONIMBUS}, 
-       {"Stratus", STRATUS}, 
-       {"Stratocumulus", STRATOCUMULUS}, 
-       {"Cumulus", CUMULUS}, 
-       {"Altostratus", ALTOSTRATUS}, 
-       {"Nimbostratus", NIMBOSTRATUS}, 
-       {"Altocumulus", ALTOCUMULUS}, 
-       {"Cirrostratus", CIRROSTRATUS}, 
-       {"Cirrocumulus", CIRROCUMULUS}, 
-       {"Cirrus", CIRRUS}, 
+       {"Clear", CLEAR},
+       {"Cumulonimbus", CUMULONIMBUS},
+       {"Stratus", STRATUS},
+       {"Stratocumulus", STRATOCUMULUS},
+       {"Cumulus", CUMULUS},
+       {"Altostratus", ALTOSTRATUS},
+       {"Nimbostratus", NIMBOSTRATUS},
+       {"Altocumulus", ALTOCUMULUS},
+       {"Cirrostratus", CIRROSTRATUS},
+       {"Cirrocumulus", CIRROCUMULUS},
+       {"Cirrus", CIRRUS},
        {"Missing", MISSING}
    };
    int var_dims[VAR2_RANK];
@@ -81,7 +81,7 @@ main(int argc, char **argv)
    num_members = (sizeof cloud_types) / (sizeof cloud_types[0]);
    for (i = 0; i < num_members; i++) {
        if (nc_insert_enum(ncid, typeid, cloud_types[i].name,
-			  &cloud_types[i].value)) 
+			  &cloud_types[i].value))
 			  ERR;
    }
    /* Declare a station dimension */
@@ -99,28 +99,28 @@ main(int argc, char **argv)
    if (nc_close(ncid)) ERR;
 
    /* Check it out. */
-   
+
    /* Reopen the file. */
    if (nc_open(FILE2_NAME, NC_NOWRITE, &ncid)) ERR;
 
    if (nc_inq_user_type(ncid, typeid, name_in, &base_size_in, &base_nc_type_in,
 			   &nfields_in, &class_in)) ERR;
-   if (strcmp(name_in, TYPE2_NAME) || 
+   if (strcmp(name_in, TYPE2_NAME) ||
        base_size_in != sizeof(unsigned char) ||
-       base_nc_type_in != NC_UBYTE || 
-       nfields_in != num_members || 
+       base_nc_type_in != NC_UBYTE ||
+       nfields_in != num_members ||
        class_in != NC_ENUM) ERR;
-   if (nc_inq_enum(ncid, typeid, name_in, 
+   if (nc_inq_enum(ncid, typeid, name_in,
 		   &base_nc_type_in, &base_size_in, &num_members_in)) ERR;
-   if (strcmp(name_in, TYPE2_NAME) || 
-       base_nc_type_in !=  NC_UBYTE || 
+   if (strcmp(name_in, TYPE2_NAME) ||
+       base_nc_type_in !=  NC_UBYTE ||
        num_members_in != num_members) ERR;
    for (i = 0; i < num_members; i++)
    {
        if (nc_inq_enum_member(ncid, typeid, i, name_in, &value_in)) ERR;
-       if (strcmp(name_in, cloud_types[i].name) || 
+       if (strcmp(name_in, cloud_types[i].name) ||
 	   value_in != cloud_types[i].value) ERR;
-       if (nc_inq_enum_ident(ncid, typeid, cloud_types[i].value, 
+       if (nc_inq_enum_ident(ncid, typeid, cloud_types[i].value,
 			     name_in)) ERR;
        if (strcmp(name_in, cloud_types[i].name)) ERR;
    }
@@ -133,10 +133,10 @@ main(int argc, char **argv)
    for (i = 0; i < DIM2_LEN; i++) {
        if (cloud_data_in[i] != cloud_data[i]) ERR;
    }
-   
-   if (nc_close(ncid)) ERR; 
-   
-   
+
+   if (nc_close(ncid)) ERR;
+
+
    SUMMARIZE_ERR;
    FINAL_RESULTS;
 }

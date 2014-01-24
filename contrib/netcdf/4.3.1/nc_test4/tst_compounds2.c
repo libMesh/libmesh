@@ -2,7 +2,7 @@
    Copyright 2005 University Corporation for Atmospheric Research/Unidata
    See COPYRIGHT file for conditions of use.
 
-   Test netcdf-4 compound type feature. 
+   Test netcdf-4 compound type feature.
 
    $Id: tst_compounds2.c,v 1.15 2010/05/25 13:53:04 ed Exp $
 */
@@ -17,10 +17,10 @@ int
 main(int argc, char **argv)
 {
 
-    printf("\n*** Testing netcdf-4 user defined type functions, even more.\n"); 
-    printf("*** testing compound var containing byte arrays of various size..."); 
+    printf("\n*** Testing netcdf-4 user defined type functions, even more.\n");
+    printf("*** testing compound var containing byte arrays of various size...");
    {
-#define DIM1_LEN 1      
+#define DIM1_LEN 1
 #define ARRAY_LEN (NC_MAX_NAME + 1)
       int ncid;
       size_t len;
@@ -40,12 +40,12 @@ main(int argc, char **argv)
 
       /* REALLY initialize the data (even the gaps in the structs). This
        * is only needed to pass valgrind. */
-      if (!(dummy = calloc(sizeof(struct s1), DIM1_LEN))) 
-	 return NC_ENOMEM; 
-      memcpy((void *)data_out, (void *)dummy, sizeof(struct s1) * DIM1_LEN); 
-      free(dummy); 
+      if (!(dummy = calloc(sizeof(struct s1), DIM1_LEN)))
+	 return NC_ENOMEM;
+      memcpy((void *)data_out, (void *)dummy, sizeof(struct s1) * DIM1_LEN);
+      free(dummy);
 
-      /* Create some phony data. */   
+      /* Create some phony data. */
       for (i = 0; i < DIM1_LEN; i++)
       {
 	 data_out[i].y = 99.99;
@@ -54,7 +54,7 @@ main(int argc, char **argv)
       }
 
       /* Create a file with a nested compound type attribute and variable. */
-      if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR; 
+      if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
 
       /* Now define the compound type. */
       if (nc_def_compound(ncid, sizeof(struct s1), "c", &type_id)) ERR;
@@ -76,11 +76,11 @@ main(int argc, char **argv)
 	 for (j = 0; j < ARRAY_LEN; j++)
 	    if (data_in[i].x[j] != data_out[i].x[j]) ERR_RET;
       }
-      
+
       /* Use the inq functions to learn about the compound type. */
       if (nc_inq_att(ncid, NC_GLOBAL, "a1", &xtype, &len)) ERR;
       if (len != DIM1_LEN) ERR;
-      
+
       /* Finish checking the containing compound type. */
       if (nc_close(ncid)) ERR;
    }
@@ -141,7 +141,7 @@ main(int argc, char **argv)
       if (nc_get_att(ncid, NC_GLOBAL, "a1", data_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 if (data_in[i].x != data_out[i].x || data_in[i].y != data_out[i].y) ERR;
-      
+
       /* Use the inq functions to learn about the compound type. */
       if (nc_inq_att(ncid, NC_GLOBAL, "a1", &xtype, &len)) ERR;
       if (len != DIM1_LEN) ERR;
@@ -154,7 +154,7 @@ main(int argc, char **argv)
       if (strcmp(field_name_in, NAME2) || field_typeid != NC_DOUBLE || field_ndims) ERR;
       printf("offset y: %d NC_COMPOUND_OFFSET(struct s1, y): %d ", (int)offset_in,
       (int)NC_COMPOUND_OFFSET(struct s1, y));
-      
+
       /* Finish checking the containing compound type. */
       if (nc_close(ncid)) ERR;
    }
@@ -234,7 +234,7 @@ main(int argc, char **argv)
       if (nc_get_att(ncid, NC_GLOBAL, ATT_NAME, data_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 if (data_in[i].s1.x != data_out[i].s1.x || data_in[i].s1.y != data_out[i].s1.y) ERR;
-      
+
       /* Use the inq functions to learn about the compound type. */
       if (nc_inq_typeids(ncid, &ntypes, typeids)) ERR;
       if (ntypes != NUM_TYPES) ERR;
@@ -254,7 +254,7 @@ main(int argc, char **argv)
       if (nc_inq_compound_field(ncid, field_typeid, 1, field_name_in,
           &offset_in, &field_typeid, &field_ndims, NULL)) ERR;
       if (strcmp(field_name_in, S1_NAME_Y) || field_typeid != NC_DOUBLE || field_ndims) ERR;
-      
+
       /* Finish checking the containing compound type. */
       if (nc_close(ncid)) ERR;
    }

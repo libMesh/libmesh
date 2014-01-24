@@ -24,7 +24,7 @@ the two types are equal, a zero if they are not equal.
 \returns ::NC_EHDFERR An error was reported by the HDF5 layer.
  */
 int
-nc_inq_type_equal(int ncid1, nc_type typeid1, int ncid2, 
+nc_inq_type_equal(int ncid1, nc_type typeid1, int ncid2,
 		  nc_type typeid2, int *equal)
 {
     NC* ncp1;
@@ -38,7 +38,7 @@ nc_inq_type_equal(int ncid1, nc_type typeid1, int ncid2,
     Functions to learn about any kind of user-defined type. */
 /*! \{ */ /* All these functions are part of this named group... */
 
-/** \ingroup user_types 
+/** \ingroup user_types
 
 Find a type by name. Given a group ID and a type name, find the ID of
 the type. If the type is not found in the group, then the parents are
@@ -99,7 +99,7 @@ compound types. \ref ignored_if_null.
 \returns ::NC_EHDFERR An error was reported by the HDF5 layer.
  */
 int
-nc_inq_user_type(int ncid, nc_type xtype, char *name, size_t *size, 
+nc_inq_user_type(int ncid, nc_type xtype, char *name, size_t *size,
 		 nc_type *base_nc_typep, size_t *nfieldsp, int *classp)
 {
     NC *ncp;

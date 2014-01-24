@@ -31,7 +31,7 @@ main(int argc, char **argv)
       hsize_t yscaleDims[1];
       hid_t xdimSpaceId, spaceId;
       hid_t fileId;
-      hid_t fapl; 
+      hid_t fapl;
       hsize_t curDims[2];
       hsize_t maxDims[2];
       hid_t dataTypeId, dsPropertyId, grpaId, grpaPropId, dsId;
@@ -53,8 +53,8 @@ main(int argc, char **argv)
       if (H5Pset_fclose_degree(fapl, H5F_CLOSE_SEMI)) ERR;
 
       /* Create file */
-      if((fileId = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, 
-			     H5Pcreate(H5P_FILE_CREATE), fapl)) < 0) ERR;  
+      if((fileId = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC,
+			     H5Pcreate(H5P_FILE_CREATE), fapl)) < 0) ERR;
       if (H5Pclose(fapl) < 0) ERR;
 
       /* Create data space */
@@ -69,30 +69,30 @@ main(int argc, char **argv)
       if ((dsPropertyId = H5Pcreate(H5P_DATASET_CREATE)) < 0) ERR;
 
       if ((grpaPropId = H5Pcreate(H5P_GROUP_CREATE)) < 0) ERR;
-      if ((grpaId = H5Gcreate2(fileId, GRPA_NAME, H5P_DEFAULT, 
+      if ((grpaId = H5Gcreate2(fileId, GRPA_NAME, H5P_DEFAULT,
 			       grpaPropId, H5P_DEFAULT)) < 0) ERR;
       if (H5Pclose(grpaPropId) < 0) ERR;
 
       /* Create vara dataset */
-      if ((dsId = H5Dcreate2(fileId, varaName, dataTypeId, spaceId, 
-			     H5P_DEFAULT, dsPropertyId, 
-			     H5P_DEFAULT)) < 0) ERR;   
+      if ((dsId = H5Dcreate2(fileId, varaName, dataTypeId, spaceId,
+			     H5P_DEFAULT, dsPropertyId,
+			     H5P_DEFAULT)) < 0) ERR;
 
       if (H5Pclose(dsPropertyId) < 0) ERR;
       if (H5Tclose(dataTypeId) < 0) ERR;
-      if ((ydimSpaceId = H5Screate_simple(1, yscaleDims, NULL)) < 0) ERR; 
+      if ((ydimSpaceId = H5Screate_simple(1, yscaleDims, NULL)) < 0) ERR;
 
       /* Create xdim dimension dataset */
-      if ((xdimId = H5Dcreate2(fileId, "/xdim", H5T_IEEE_F32BE, 
+      if ((xdimId = H5Dcreate2(fileId, "/xdim", H5T_IEEE_F32BE,
 			       xdimSpaceId, H5P_DEFAULT, H5P_DEFAULT,
-			       H5P_DEFAULT)) < 0) ERR; 
+			       H5P_DEFAULT)) < 0) ERR;
 
       if (H5Sclose(xdimSpaceId) < 0) ERR;
 
       /* Create ydim dimension dataset */
       if ((ydimId = H5Dcreate2(fileId, "/ydim", H5T_IEEE_F32BE,
 			       ydimSpaceId, H5P_DEFAULT, H5P_DEFAULT,
-			       H5P_DEFAULT)) < 0) ERR; 
+			       H5P_DEFAULT)) < 0) ERR;
       if (H5Sclose(ydimSpaceId) < 0) ERR;
 
       /* Create xdim scale */
@@ -117,8 +117,8 @@ main(int argc, char **argv)
       if (H5Fclose(fileId) < 0) ERR;
 
       /* Create some data */
-      for (ii = 0; ii < nrowCur; ii++) 
-	 for (jj = 0; jj < ncolCur; jj++) 
+      for (ii = 0; ii < nrowCur; ii++)
+	 for (jj = 0; jj < ncolCur; jj++)
 	    amat[ii][jj] = 100 * ii + jj;
 
       /* Re-open file */
@@ -127,13 +127,13 @@ main(int argc, char **argv)
       if ((dsId = H5Dopen2(grpaId, varaName,  H5P_DEFAULT)) < 0) ERR;
 
       /* Write dataset */
-      if (H5Dwrite(dsId, H5T_NATIVE_SHORT, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+      if (H5Dwrite(dsId, H5T_NATIVE_SHORT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		   amat) < 0) ERR;
 
       /* Write dimension values for both xdim, ydim */
       {
       short xydimMat[ nrowCur >= ncolCur ? nrowCur : ncolCur];
-      for (ii = 0; ii < nrowCur; ii++) 
+      for (ii = 0; ii < nrowCur; ii++)
 	 xydimMat[ii] = 0;    /*#### 100 * ii; */
 
       /* Write xdim */
@@ -168,11 +168,11 @@ main(int argc, char **argv)
 	 if (nc_inq(grpid, &ndims, &nvars, &ngatts, &unlimdimid)) ERR;
 	 if (ndims != 0 || nvars != 1 || ngatts != 0 || unlimdimid != -1) ERR;
 
-	 if (nc_inq_var(grpid, 0, name_in, &xtype_in, &ndims_in, dimid_in, 
+	 if (nc_inq_var(grpid, 0, name_in, &xtype_in, &ndims_in, dimid_in,
 			&natts_in)) ERR;
 	 if (strcmp(name_in, VAR_NAME) || xtype_in != NC_SHORT || ndims_in != NDIMS ||
 	     dimid_in[0] != 0 || dimid_in[1] != 1 || natts_in != 0) ERR;
-      
+
 	 if (nc_close(ncid)) ERR;
       }
    }
@@ -182,7 +182,7 @@ main(int argc, char **argv)
    {
 
 #define DEFLATE_LEVEL 9
-#define MAX_NAME 100   
+#define MAX_NAME 100
 #define NUM_CD_ELEM 10
 /* HDF5 defines this... */
 #define DEFLATE_NAME "deflate"
@@ -208,21 +208,21 @@ main(int argc, char **argv)
 
       for (i = 0; i < DIM1_LEN; i++)
 	 data_out[i] = i;
-      
+
       /* Open file and create group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
-      
+
       /* Write an array of bools, with szip compression. */
       if ((propid = H5Pcreate(H5P_DATASET_CREATE)) < 0) ERR;
       if (H5Pset_layout(propid, H5D_CHUNKED)) ERR;
       if (H5Pset_chunk(propid, 1, dims)) ERR;
       if (H5Pset_szip(propid, H5_SZIP_EC_OPTION_MASK, 32)) ERR;
       if ((spaceid = H5Screate_simple(1, dims, dims)) < 0) ERR;
-      if ((datasetid = H5Dcreate(grpid, BATTLE_RECORD, H5T_NATIVE_INT, 
+      if ((datasetid = H5Dcreate(grpid, BATTLE_RECORD, H5T_NATIVE_INT,
 				 spaceid, propid)) < 0) ERR;
-      if (H5Dwrite(datasetid, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+      if (H5Dwrite(datasetid, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
 		   data_out) < 0) ERR;
       if (H5Dclose(datasetid) < 0 ||
 	  H5Pclose(propid) < 0 ||
@@ -250,7 +250,7 @@ main(int argc, char **argv)
       if (nc_get_var(grpid, 0, data_in)) ERR;
       for (i = 0; i < DIM1_LEN; i++)
 	 if (data_in[i] != data_out[i]) ERR;
-      
+
       if (nc_close(ncid)) ERR;
 
    }

@@ -10,12 +10,12 @@
 static int indent = 0;
 static int indent_increment = 2; /* blanks for each nesting level */
 
-void 
+void
 indent_init() {		/*  initialize output line indent */
     indent = 0;
 }
 
-void 
+void
 indent_out(){		/*  output current indent */
     /* Just does this, but we avoid looping for small indents:
 
@@ -26,15 +26,15 @@ indent_out(){		/*  output current indent */
     */
 
     int indent_small = 8;
-    char* indents[] = 
-                     {"", 
-		      " ", 
-		      "  ", 
-		      "   ", 
-		      "    ", 
-		      "     ", 
-		      "      ", 
-		      "       ", 
+    char* indents[] =
+                     {"",
+		      " ",
+		      "  ",
+		      "   ",
+		      "    ",
+		      "     ",
+		      "      ",
+		      "       ",
                       "        "
                      };
 
@@ -46,12 +46,12 @@ indent_out(){		/*  output current indent */
     (void) printf("%s", indents[ind]);
 }
 
-void 
+void
 indent_more(){		/*  increment current indent */
     indent += indent_increment;
 }
 
-void 
+void
 indent_less(){		/*  decrement current indent */
     indent -= indent_increment;
     if(indent < 0)

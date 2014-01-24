@@ -143,7 +143,7 @@ NCD3_initialize(void)
 {
     /* Create our dispatch table as the merge of NCD3 table and NCSUBSTRATE */
     /* watch the order because we want NCD3 to overwrite NCSUBSTRATE */
-    NC_dispatch_overlay(&NCD3_dispatch_base, NCSUBSTRATE_dispatch_table, &NCD3_dispatcher);    
+    NC_dispatch_overlay(&NCD3_dispatch_base, NCSUBSTRATE_dispatch_table, &NCD3_dispatcher);
     NCD3_dispatch_table = &NCD3_dispatcher;
     return NC_NOERR;
 }

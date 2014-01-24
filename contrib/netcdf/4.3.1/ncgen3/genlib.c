@@ -160,7 +160,7 @@ cstring(
 	*cp++ = '\'';
 	*cp = '\0';
 	return sp;
-	
+
       case NC_BYTE:
 	cp = (char *) emalloc (7);
 	bytep = (signed char *)valp;
@@ -340,7 +340,7 @@ gen_c(
     }
     cline(stmnt);
     cline("   check_err(stat,__LINE__,__FILE__);");
-    
+
     /* define dimensions from info in dims array */
     if (ndims > 0) {
 	cline("");
@@ -388,7 +388,7 @@ gen_c(
 	    cline("   check_err(stat,__LINE__,__FILE__);");
 	}
     }
-    
+
     /* define attributes from info in atts array */
     if (natts > 0) {
 	cline("");
@@ -412,12 +412,12 @@ gen_c(
 		    sprintf(stmnt, "   %s_%s[%d] = %s;",
 			    atts[iatt].var == -1 ? "cdf" : vars[atts[iatt].var].lname,
 			    atts[iatt].lname,
-			    jatt, 
+			    jatt,
 			    val_string);
 		    cline(stmnt);
 		    free (val_string);
 		}
-		
+
 		sprintf(stmnt,
 			"   stat = nc_put_att_%s(ncid, %s%s, \"%s\", %s, %lu, %s_%s);",
 			ncatype(atts[iatt].type),
@@ -630,7 +630,7 @@ gen_fortran(
 	    }
 	    fline(stmnt);
 	}
-	
+
     }
 
     maxdims = 0;		/* most dimensions of any variable */
@@ -655,7 +655,7 @@ gen_fortran(
 		    vars[ivar].ndims);
 	    fline(stmnt);
 	}
-	
+
 	fline("* variable shapes");
 	for (ivar = 0; ivar < nvars; ivar++) {
 	    if (vars[ivar].ndims > 0) {
@@ -744,7 +744,7 @@ gen_fortran(
     }
     fline(stmnt);
     fline("call check_err(iret)");
-    
+
     /* define dimensions from info in dims array */
     if (ndims > 0)
         fline("* define dimensions");
@@ -759,7 +759,7 @@ gen_fortran(
 	fline(stmnt);
 	fline("call check_err(iret)");
     }
-	  
+
     /* define variables from info in vars array */
     if (nvars > 0) {
 	fline("* define variables");
@@ -772,7 +772,7 @@ gen_fortran(
 		fline(stmnt);
 	    }
 	    if (vars[ivar].ndims > 0) {	/* a dimensioned variable */
-		sprintf(stmnt, 
+		sprintf(stmnt,
 			"iret = nf_def_var(ncid, \'%s\', %s, %s_rank, %s_dims, %s_id)",
 			vars[ivar].name,
 			ftypename(vars[ivar].type),
@@ -780,7 +780,7 @@ gen_fortran(
 			vars[ivar].lname,
 			vars[ivar].lname);
 	    } else {		/* a scalar */
-		sprintf(stmnt, 
+		sprintf(stmnt,
 			"iret = nf_def_var(ncid, \'%s\', %s, %s_rank, 0, %s_id)",
 			vars[ivar].name,
 			ftypename(vars[ivar].type),
@@ -798,7 +798,7 @@ gen_fortran(
 	for (iatt = 0; iatt < natts; iatt++) {
 	    if (atts[iatt].type == NC_CHAR) { /* string */
 		val_string = fstrstr((char *) atts[iatt].val, atts[iatt].len);
-		sprintf(stmnt, 
+		sprintf(stmnt,
 			"iret = nf_put_att_text(ncid, %s%s, \'%s\', %lu, %s)",
 			atts[iatt].var == -1 ? "NF_GLOBAL" : vars[atts[iatt].var].lname,
 			atts[iatt].var == -1 ? "" : "_id",
@@ -813,12 +813,12 @@ gen_fortran(
 		    val_string = fstring(atts[iatt].type,atts[iatt].val,jatt);
 		    sprintf(stmnt, "%sval(%d) = %s",
 			    nfstype(atts[iatt].type),
-			    jatt+1, 
+			    jatt+1,
 			    val_string);
 		    fline(stmnt);
 		    free (val_string);
 		}
-	    
+
 		sprintf(stmnt,
 			"iret = nf_put_att_%s(ncid, %s%s, \'%s\', %s, %lu, %sval)",
 			nfftype(atts[iatt].type),
@@ -854,7 +854,7 @@ cline(
      const char *stmnt)
 {
     FILE *cout = stdout;
-    
+
     fputs(stmnt, cout);
     fputs("\n", cout);
 }
@@ -876,7 +876,7 @@ fline(
 	' ', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 	'+', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 	'+', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    
+
     if(stmnt[0] == '*') {
 	fputs(stmnt, fout);
 	fputs("\n", fout);
@@ -1099,7 +1099,7 @@ cstrstr(
     char *cp;
     char *istr, *istr0;		/* for null-terminated copy */
     int ii;
-    
+
     if(4*len+3 != (unsigned)(4*len+3)) {
 	derror("too much character data!");
 	exit(9);
@@ -1179,7 +1179,7 @@ fstrstr(
 	istr[ii] = str[ii];
     }
     istr[ilen] = '\0';
-    
+
     if (*istr == '\0') {	/* empty string input, not legal in FORTRAN */
 	ostr = (char*) emalloc(strlen("char(0)") + 1);
 	strcpy(ostr, "char(0)");
@@ -1283,7 +1283,7 @@ used_in_rec_var(
     int idim			/* id of dimension */
     ) {
     int ivar;
-    
+
     for (ivar = 0; ivar < nvars; ivar++) {
 	if (vars[ivar].ndims > 0 && vars[ivar].dims[0] == rec_dim) {
 	    int jdim;
@@ -1333,7 +1333,7 @@ cl_fortran(void)
     char s2[FORT_MAX_STMNT];
     char*sp;
     int have_rec_var = 0;
-    
+
     /* do we have any record variables? */
     for (ivar = 0; ivar < nvars; ivar++) {
 	struct vars *v = &vars[ivar];
@@ -1341,7 +1341,7 @@ cl_fortran(void)
 	    have_rec_var = 1;
             break;
         }
-    }        
+    }
 
     if (have_rec_var) {
 	fline(" ");
@@ -1355,7 +1355,7 @@ cl_fortran(void)
                 sprintf(s2, "%s_id,", v->lname);
                 strcat(stmnt, s2);
             }
-        }        
+        }
         sp = strrchr(stmnt, ',');
         if(sp != NULL) {
             *sp = '\0';
@@ -1363,7 +1363,7 @@ cl_fortran(void)
         strcat(stmnt, ")");
         fline(stmnt);
     }
-    
+
     fline(" ");
     fline("iret = nf_close(ncid)");
     fline("call check_err(iret)");
@@ -1379,7 +1379,7 @@ cl_fortran(void)
                 sprintf(s2, "%s_id,", v->lname);
                 strcat(stmnt, s2);
             }
-        }        
+        }
         sp = strrchr(stmnt, ',');
         if(sp != NULL) {
             *sp = '\0';
@@ -1449,15 +1449,15 @@ cl_fortran(void)
 		fline(stmnt);
 	    }
 	}
-        
+
 	fline(" ");
 	fline("* data variables");
-        
+
         for (ivar = 0; ivar < nvars; ivar++) {
             struct vars *v = &vars[ivar];
             if (v->ndims > 0 && v->dims[0] == rec_dim) {
                 char *sp;
-	    
+
                 fline(" ");
                 sprintf(stmnt, "integer  %s_nr", v->lname);
                 fline(stmnt);
@@ -1509,7 +1509,7 @@ cl_fortran(void)
                     }
                     sprintf(stmnt,"data %s /%lu * %s/", v->lname,
 			(unsigned long) rec_len,
-                            f_fill_name(v->type));		
+                            f_fill_name(v->type));
                     fline(stmnt);
                 }
             }
@@ -1536,7 +1536,7 @@ cl_fortran(void)
                 sprintf(stmnt, "%s_count(%d) = %s_nr", v->lname,
                         v->ndims, v->lname);
 		fline(stmnt);
-		
+
 		if (v->type != NC_CHAR) {
 		    sprintf(stmnt,
 			    "iret = nf_put_vara_%s(ncid, %s_id, %s_start, %s_count, %s)",
@@ -1547,7 +1547,7 @@ cl_fortran(void)
 			    nfftype(v->type), v->lname, v->lname, v->lname,
 			    v->data_stmnt);
 		}
-		
+
 		fline(stmnt);
 		fline("call check_err(iret)");
 	    }
@@ -1578,7 +1578,7 @@ define_netcdf(
      const char *netcdfname)
 {
     char *filename;		/* output file name */
-    
+
     if (netcdf_name) {		/* name given on command line */
 	filename = netcdf_name;
     } else {			/* construct name from CDL name */
@@ -1638,7 +1638,7 @@ derror(fmt, va_alist)
 
     if (lineno == 1)
       (void) fprintf(stderr,"%s: %s: ", progname, cdlname);
-    else  
+    else
       (void) fprintf(stderr,"%s: %s line %d: ", progname, cdlname, lineno);
 
 #ifndef NO_STDARG

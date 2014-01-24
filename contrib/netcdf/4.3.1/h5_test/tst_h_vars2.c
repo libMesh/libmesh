@@ -132,7 +132,7 @@ main()
 	 if ((dimscaleid = H5Dcreate(fileid, names[i], H5T_NATIVE_INT,
 				     dimscale_spaceid, H5P_DEFAULT)) < 0) ERR;
 	 if (H5DSset_scale(dimscaleid, NAME_ATTRIBUTE) < 0) ERR;
-	 
+
 	 if (H5Dclose(dimscaleid) < 0) ERR;
       }
 
@@ -465,7 +465,7 @@ main()
       if (H5Aread(attid, native_typeid, &f2) < 0) ERR;
       if (f2.day != m.day || f2.elev != m.elev || f2.count != m.count ||
 	  f2.relhum != m.relhum || f2.time != m.time) ERR;
-      
+
       if (H5Dclose(datasetid) < 0 ||
 	  H5Aclose(attid) < 0 ||
 	  H5Tclose(native_typeid) < 0 ||

@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright 2009, UCAR/Unidata
 See COPYRIGHT file for copying and redistribution conditions.
 
@@ -23,7 +23,7 @@ $Id: tst_ar4_4d.c,v 1.2 2010/01/14 20:25:55 ed Exp $
 
 	 /* From the data file we are using:
 
-../ncdump/ncdump -h -s thetao_O1.SRESA1B_2.CCSM.ocnm.2000-01_cat_2099-12.nc 
+../ncdump/ncdump -h -s thetao_O1.SRESA1B_2.CCSM.ocnm.2000-01_cat_2099-12.nc
 netcdf thetao_O1.SRESA1B_2.CCSM.ocnm.2000-01_cat_2099-12 {
 dimensions:
 	lon = 320 ;
@@ -199,7 +199,7 @@ usage(void)
 #define NUM_TS 1
 #define MAX_READ_COUNT 100
 
-int 
+int
 main(int argc, char **argv)
 {
    extern int optind;
@@ -222,7 +222,7 @@ main(int argc, char **argv)
    int read_count = 0, num_reads;
 
    while ((c = getopt(argc, argv, "vhtc:")) != EOF)
-      switch(c) 
+      switch(c)
       {
 	 case 'v':
 	    vertical_profile++;
@@ -240,17 +240,17 @@ main(int argc, char **argv)
 	    usage();
 	    return 1;
       }
-      
+
    argc -= optind;
    argv += optind;
-      
+
    /* If no file arguments left, report and exit */
    if (argc < 1)
    {
       printf("no file specified\n");
       return 0;
    }
-      
+
    /* Print the header if desired. */
    if (header)
    {
@@ -283,13 +283,13 @@ main(int argc, char **argv)
    if (nc_inq_dim(ncid, TIME_DIMID, name_in, &len)) ERR;
    if (strcmp(name_in, "time") || len != TIME_LEN) ERR;
    if (nc_inq_var(ncid, varid, NULL, NULL, &ndims, dimid, NULL)) ERR;
-   if (ndims != NDIMS4 || dimid[0] != TIME_DIMID || 
-       dimid[1] != DEPTH_DIMID || dimid[2] != LAT_DIMID || 
+   if (ndims != NDIMS4 || dimid[0] != TIME_DIMID ||
+       dimid[1] != DEPTH_DIMID || dimid[2] != LAT_DIMID ||
        dimid[3] != LON_DIMID) ERR;
 
    /* Get info about the main data var. */
    if (nc_inq_var_chunking(ncid, varid, &storage, cs)) ERR;
-   if (nc_inq_var_deflate(ncid, varid, &shuffle, &deflate, 
+   if (nc_inq_var_deflate(ncid, varid, &shuffle, &deflate,
 			  &deflate_level)) ERR;
 
    if (timeseries)
@@ -303,7 +303,7 @@ main(int argc, char **argv)
       count[1] = 1;
       count[2] = 1;
       count[3] = 1;
-      
+
       /* Read the first timeseries. */
       if (gettimeofday(&start_time, NULL)) ERR;
       if (nc_get_vara_float(ncid, varid, start, count, ts_data)) ERR_RET;
@@ -323,7 +323,7 @@ main(int argc, char **argv)
       if (gettimeofday(&end_time, NULL)) ERR;
       if (timeval_subtract(&diff_time, &end_time, &start_time)) ERR;
       num_reads = (read_count == MAX_READ_COUNT) ? MAX_READ_COUNT : (LAT_LEN * LON_LEN * DEPTH_LEN);
-      avg_read_us = ((int)diff_time.tv_sec * MILLION + (int)diff_time.tv_usec + read_1_us) / 
+      avg_read_us = ((int)diff_time.tv_sec * MILLION + (int)diff_time.tv_usec + read_1_us) /
 	 num_reads;
    }
    else if (vertical_profile)
@@ -337,7 +337,7 @@ main(int argc, char **argv)
       count[1] = DEPTH_LEN;
       count[2] = 1;
       count[3] = 1;
-      
+
       /* Read the first vertical profile. */
       if (gettimeofday(&start_time, NULL)) ERR;
       if (nc_get_vara_float(ncid, varid, start, count, vert_data)) ERR_RET;
@@ -358,7 +358,7 @@ main(int argc, char **argv)
       if (gettimeofday(&end_time, NULL)) ERR;
       if (timeval_subtract(&diff_time, &end_time, &start_time)) ERR;
       num_reads = (read_count == MAX_READ_COUNT) ? MAX_READ_COUNT : (LAT_LEN * LON_LEN * DEPTH_LEN);
-      avg_read_us = ((int)diff_time.tv_sec * MILLION + (int)diff_time.tv_usec + read_1_us) / 
+      avg_read_us = ((int)diff_time.tv_sec * MILLION + (int)diff_time.tv_usec + read_1_us) /
 	 num_reads;
    }
    else
@@ -391,7 +391,7 @@ main(int argc, char **argv)
       if (gettimeofday(&end_time, NULL)) ERR;
       if (timeval_subtract(&diff_time, &end_time, &start_time)) ERR;
       num_reads = (read_count == MAX_READ_COUNT) ? MAX_READ_COUNT : TIME_LEN;
-      avg_read_us = ((int)diff_time.tv_sec * MILLION + (int)diff_time.tv_usec + 
+      avg_read_us = ((int)diff_time.tv_sec * MILLION + (int)diff_time.tv_usec +
 		     read_1_us) / num_reads;
    }
 
@@ -400,8 +400,8 @@ main(int argc, char **argv)
 
    /* Print results. */
    printf("%d\t%d\t%d\t%.1f\t\t%d\t%d\t\t",
-	  (int)cs[0], (int)cs[1], (int)cs[2], 
-	  (storage == NC_CHUNKED) ? (cache/(float)MEGABYTE) : 0, 
+	  (int)cs[0], (int)cs[1], (int)cs[2],
+	  (storage == NC_CHUNKED) ? (cache/(float)MEGABYTE) : 0,
 	  deflate, shuffle);
    if (timeseries)
       printf("%d\t\t%d\n", (int)read_1_us, (int)avg_read_us);

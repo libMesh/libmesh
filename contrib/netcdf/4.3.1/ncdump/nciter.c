@@ -56,7 +56,7 @@ nc_blkio_init(size_t bufsize, 	/* size in bytes of in-memory copy buffer */
 	iter->rows = dims[0];
 	iter->inc = 0;
 	return stat;
-    } 
+    }
     /* else, handle chunked case */
     for(i = 0; i < rank; i++) {
 	prod *= iter->chunksizes[i];
@@ -75,7 +75,7 @@ nc_blkio_init(size_t bufsize, 	/* size in bytes of in-memory copy buffer */
 static int
 inq_value_size(int igrp, nc_type vartype, size_t *value_sizep) {
     int stat = NC_NOERR;
-    
+
 #ifdef USE_NETCDF4
     NC_CHECK(nc_inq_type(igrp, vartype, NULL, value_sizep));
 #else
@@ -175,7 +175,7 @@ int
 nc_get_iter(int ncid,
 	     int varid,
 	     size_t bufsize,   /* size in bytes of memory buffer */
-	     nciter_t **iterpp /* returned opaque iteration state */) 
+	     nciter_t **iterpp /* returned opaque iteration state */)
 {
     int stat = NC_NOERR;
     nciter_t *iterp;
@@ -192,9 +192,9 @@ nc_get_iter(int ncid,
     memset((void*)iterp,0,sizeof(nciter_t)); /* make sure it is initialized */
 
     NC_CHECK(nc_inq_varndims(ncid, varid, &ndims));
-    
+
     dimids = (int *) emalloc((ndims + 1) * sizeof(int));
-    
+
     iterp->dimsizes = (size_t *) emalloc((ndims + 1) * sizeof(size_t));
     iterp->chunksizes = (size_t *) emalloc((ndims + 1) * sizeof(size_t));
 
@@ -207,7 +207,7 @@ nc_get_iter(int ncid,
     }
     NC_CHECK(nc_inq_vartype(ncid, varid, &vartype));
     NC_CHECK(inq_value_size(ncid, vartype, &value_size));
-#ifdef USE_NETCDF4    
+#ifdef USE_NETCDF4
     {
 	int contig = 1;
 	if(ndims > 0) {
@@ -229,11 +229,11 @@ nc_get_iter(int ncid,
 /* Iterate on blocks for variables, by updating start and count vector
  * for next vara call.  Assumes nc_get_iter called first.  Returns
  * number of variable values to get, 0 if done, negative number if
- * error, so use like this: 
+ * error, so use like this:
    size_t to_get;
-   while((to_get = nc_next_iter(&iter, start, count)) > 0) { 
-      ... iteration ... 
-   } 
+   while((to_get = nc_next_iter(&iter, start, count)) > 0) {
+      ... iteration ...
+   }
    if(to_get < 0) { ... handle error ... }
  */
 size_t
@@ -269,7 +269,7 @@ nc_next_iter(nciter_t *iter,	/* returned opaque iteration state */
 	iter->first = 0;
     } else {
 	if(!iter->chunked) { 	/* contiguous storage */
-	    iter->more = up_start(iter->rank, iter->dimsizes, iter->right_dim, 
+	    iter->more = up_start(iter->rank, iter->dimsizes, iter->right_dim,
 				  iter->inc, start);
 	    /* iterate on pieces of variable */
 	    if(iter->cur < iter->numrows) {
@@ -284,7 +284,7 @@ nc_next_iter(nciter_t *iter,	/* returned opaque iteration state */
 		}
 	    }
 	} else {		/* chunked storage */
-	    iter->more = up_start_by_chunks(iter->rank, iter->dimsizes, 
+	    iter->more = up_start_by_chunks(iter->rank, iter->dimsizes,
 					    iter->chunksizes, start);
 	    /* adjust count to stay in range of dimsizes */
 	    for(i = 0; i < iter->rank; i++) {
@@ -293,7 +293,7 @@ nc_next_iter(nciter_t *iter,	/* returned opaque iteration state */
 		    count[i] = iter->chunksizes[i];
 		else /* can happen for variables with only unlimited dimensions */
 		    count[i] = iter->dimsizes[i];
-		if(leftover < count[i]) 
+		if(leftover < count[i])
 		    count[i] = leftover;
 	    }
 	}

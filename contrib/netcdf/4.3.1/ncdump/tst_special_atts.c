@@ -49,11 +49,11 @@ main(int argc, char **argv)
    int data2_in[DIM1_LEN][DIM2_LEN];
    int data3[DIM1_LEN][DIM2_LEN][DIM3_LEN];
    int data3_in[DIM1_LEN][DIM2_LEN][DIM3_LEN];
-   
+
    printf("\n*** Testing '-s' option for special attributes.\n");
    printf("*** creating special attributes test file %s...", FILE_NAME);
    if (nc_create(FILE_NAME, NC_CLOBBER | NC_NETCDF4, &ncid)) ERR;
-   
+
    /* Declare dimensions and variables */
    if (nc_def_dim(ncid, DIM1_NAME, DIM1_LEN, &dimids[0])) ERR;
    if (nc_def_dim(ncid, DIM2_NAME, DIM2_LEN, &dimids[1])) ERR;
@@ -79,33 +79,33 @@ main(int argc, char **argv)
 
        /* Create a compound type. */
        if (nc_def_compound(ncid, sizeof(obs_t), TYPE6_NAME, &typeid)) ERR;
-       if (nc_insert_compound(ncid, typeid, "day", 
+       if (nc_insert_compound(ncid, typeid, "day",
 			      NC_COMPOUND_OFFSET(struct obs_t, day), NC_BYTE)) ERR;
-       if (nc_insert_compound(ncid, typeid, "elev", 
+       if (nc_insert_compound(ncid, typeid, "elev",
 			      NC_COMPOUND_OFFSET(struct obs_t, elev), NC_SHORT)) ERR;
-       if (nc_insert_compound(ncid, typeid, "count", 
+       if (nc_insert_compound(ncid, typeid, "count",
 			      NC_COMPOUND_OFFSET(struct obs_t, count), NC_INT)) ERR;
-       if (nc_insert_compound(ncid, typeid, "relhum", 
-			      NC_COMPOUND_OFFSET(struct obs_t, relhum), 
+       if (nc_insert_compound(ncid, typeid, "relhum",
+			      NC_COMPOUND_OFFSET(struct obs_t, relhum),
 			      NC_FLOAT)) ERR;
-       if (nc_insert_compound(ncid, typeid, "time", 
-			      NC_COMPOUND_OFFSET(struct obs_t, time), 
+       if (nc_insert_compound(ncid, typeid, "time",
+			      NC_COMPOUND_OFFSET(struct obs_t, time),
 			      NC_DOUBLE)) ERR;
-       if (nc_insert_compound(ncid, typeid, "category", 
-			      NC_COMPOUND_OFFSET(struct obs_t, category), 
+       if (nc_insert_compound(ncid, typeid, "category",
+			      NC_COMPOUND_OFFSET(struct obs_t, category),
 			      NC_UBYTE)) ERR;
-       if (nc_insert_compound(ncid, typeid, "id", 
-			      NC_COMPOUND_OFFSET(struct obs_t, id), 
+       if (nc_insert_compound(ncid, typeid, "id",
+			      NC_COMPOUND_OFFSET(struct obs_t, id),
 			      NC_USHORT)) ERR;
-       if (nc_insert_compound(ncid, typeid, "particularity", 
-			      NC_COMPOUND_OFFSET(struct obs_t, particularity), 
+       if (nc_insert_compound(ncid, typeid, "particularity",
+			      NC_COMPOUND_OFFSET(struct obs_t, particularity),
 			      NC_UINT)) ERR;
-       if (nc_insert_compound(ncid, typeid, "attention_span", 
-			      NC_COMPOUND_OFFSET(struct obs_t, attention_span), 
+       if (nc_insert_compound(ncid, typeid, "attention_span",
+			      NC_COMPOUND_OFFSET(struct obs_t, attention_span),
 			      NC_INT64)) ERR;
        /* create a variable of that compound type */
-       if (nc_def_var(ncid, "var5", typeid, VAR1_RANK, dimids, &var5id)) 
-	   ERR; 
+       if (nc_def_var(ncid, "var5", typeid, VAR1_RANK, dimids, &var5id))
+	   ERR;
    }
 
    /* Specify contiguous storage and endianness explicitly for var1. */
@@ -153,16 +153,16 @@ main(int argc, char **argv)
    if(nc_put_var(ncid, var2id, &data2[0][0])) ERR;
    if(nc_put_var(ncid, var3id, &data3[0][0][0])) ERR;
    if(nc_put_var(ncid, var4id, &data3[0][0][0])) ERR;
-   
+
    if (nc_close(ncid)) ERR;
-   
+
    /* Check it out. */
    if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
    if (nc_inq_varid(ncid, VAR1_NAME, &var1id)) ERR;
    if (nc_inq_varid(ncid, VAR2_NAME, &var2id)) ERR;
    if (nc_inq_varid(ncid, VAR3_NAME, &var3id)) ERR;
    if (nc_inq_varid(ncid, VAR4_NAME, &var4id)) ERR;
-   
+
    /* Check chunk sizes */
    {
        size_t chunks_in[VAR3_RANK];
@@ -179,18 +179,18 @@ main(int argc, char **argv)
    if(nc_get_var(ncid, var1id, &data1_in[0])) ERR;
    for(i = 0; i < DIM1_LEN; i++)
        if(data1_in[i] != data1[i]) ERR;
-   
+
    if(nc_get_var(ncid, var2id, &data2_in[0][0])) ERR;
    for(i = 0; i < DIM1_LEN; i++)
        for(j = 0; j < DIM2_LEN; j++)
 	   if(data2_in[i][j] != data2[i][j]) ERR;
-   
+
    if(nc_get_var(ncid, var3id, &data3_in[0][0][0])) ERR;
    for(i = 0; i < DIM1_LEN; i++)
        for(j = 0; j < DIM2_LEN; j++)
 	   for(k = 0; k < DIM3_LEN; k++)
 	       if(data3_in[i][j][k] != data3[i][j][k]) ERR;
-   
+
    if(nc_get_var(ncid, var4id, &data3_in[0][0][0])) ERR;
    for(i = 0; i < DIM1_LEN; i++)
        for(j = 0; j < DIM2_LEN; j++)

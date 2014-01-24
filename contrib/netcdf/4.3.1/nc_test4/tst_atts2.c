@@ -2,7 +2,7 @@
    Corporation for Atmospheric Research/Unidata. See COPYRIGHT file
    for conditions of use.
 
-   Test copy of attributes. 
+   Test copy of attributes.
 
    $Id: tst_atts2.c,v 1.7 2010/05/05 22:15:32 dmh Exp $
 */
@@ -29,7 +29,7 @@ main(int argc, char **argv)
       int ncid[NUM_FILES], typeid;
       char file_name[NUM_FILES][NC_MAX_NAME + 1] = {FILE_NAME1, FILE_NAME2};
       int i;
-      struct s1 
+      struct s1
       {
 	    int i1;
 	    int i2;
@@ -41,7 +41,7 @@ main(int argc, char **argv)
 	    int i2;
       };
 
-      /* Create some phony data. */   
+      /* Create some phony data. */
       for (i = 0; i < DIM_LEN; i++)
       {
 	 data[i].i1 = 32768;
@@ -54,26 +54,26 @@ main(int argc, char **argv)
 
       /* Define s1 in file 1. */
       if (nc_def_compound(ncid[0], sizeof(struct s1), CMP_NAME1, &typeid)) ERR;
-      if (nc_insert_compound(ncid[0], typeid, I1_NAME, 
+      if (nc_insert_compound(ncid[0], typeid, I1_NAME,
 			     NC_COMPOUND_OFFSET(struct s1, i1), NC_INT)) ERR;
-      if (nc_insert_compound(ncid[0], typeid, I2_NAME, 
+      if (nc_insert_compound(ncid[0], typeid, I2_NAME,
 			     NC_COMPOUND_OFFSET(struct s1, i2), NC_INT)) ERR;
 
       /* Define s2 in file 2, but named the same as s1. */
       if (nc_def_compound(ncid[1], sizeof(struct s2), CMP_NAME1, &typeid)) ERR;
-      if (nc_insert_compound(ncid[1], typeid, I1_NAME, 
+      if (nc_insert_compound(ncid[1], typeid, I1_NAME,
 			     NC_COMPOUND_OFFSET(struct s2, i1), NC_SHORT)) ERR;
-      if (nc_insert_compound(ncid[1], typeid, I2_NAME, 
+      if (nc_insert_compound(ncid[1], typeid, I2_NAME,
 			     NC_COMPOUND_OFFSET(struct s2, i2), NC_INT)) ERR;
 
 
       /* Write an att in one file. */
-      if (nc_put_att(ncid[0], NC_GLOBAL, ATT_NAME3, typeid, DIM_LEN, 
+      if (nc_put_att(ncid[0], NC_GLOBAL, ATT_NAME3, typeid, DIM_LEN,
 		     data)) ERR;
 
       /* Try to copy. It must fail, because the two types are not the
        * same. */
-      if (nc_copy_att(ncid[0], NC_GLOBAL, ATT_NAME3, ncid[1], 
+      if (nc_copy_att(ncid[0], NC_GLOBAL, ATT_NAME3, ncid[1],
 		      NC_GLOBAL) != NC_EBADTYPE) ERR;
 
       /* Close the files. */
@@ -84,7 +84,7 @@ main(int argc, char **argv)
    printf("*** testing string attribute copy...");
    {
 #define ATT_NAME "Irish_Leader"
-#define ATT_LEN 1      
+#define ATT_LEN 1
       int ncid1, ncid2;
       const char *mc[ATT_LEN] = {"Michael Collins"};
       char *mc_in;
@@ -92,12 +92,12 @@ main(int argc, char **argv)
       /* Create a file with a string att. */
       if (nc_create(FILE_NAME1, NC_NETCDF4, &ncid1)) ERR;
       if (nc_put_att_string(ncid1, NC_GLOBAL, ATT_NAME, ATT_LEN, mc)) ERR;
-      
+
       /* Create another file, and copy the att. */
       if (nc_create(FILE_NAME2, NC_NETCDF4, &ncid2)) ERR;
       if (nc_copy_att(ncid1, NC_GLOBAL, ATT_NAME, ncid2, NC_GLOBAL)) ERR;
 
-      /* Close up. */ 
+      /* Close up. */
       if (nc_close(ncid1)) ERR;
       if (nc_close(ncid2)) ERR;
 
@@ -112,7 +112,7 @@ main(int argc, char **argv)
    SUMMARIZE_ERR;
    printf("*** testing non-string atomic attribute copy...");
    {
-#define ATT_LEN 1      
+#define ATT_LEN 1
 #define NUM_ATT 5
       int ncid1, ncid2;
       char name[NUM_ATT][NC_MAX_NAME + 1];
@@ -124,16 +124,16 @@ main(int argc, char **argv)
       for (a = 0; a < NUM_ATT; a++)
       {
 	 sprintf(name[a], "atomic_att_type_%d", a + 1);
-	 nc_put_att(ncid1, NC_GLOBAL, name[a], a + 1, ATT_LEN, 
+	 nc_put_att(ncid1, NC_GLOBAL, name[a], a + 1, ATT_LEN,
 		    (void *)&data);
       }
-      
+
       /* Create another file, and copy the att. */
       if (nc_create(FILE_NAME2, NC_NETCDF4, &ncid2)) ERR;
       for (a = 0; a < NUM_ATT; a++)
 	 if (nc_copy_att(ncid1, NC_GLOBAL, name[a], ncid2, NC_GLOBAL)) ERR;
 
-      /* Close up. */ 
+      /* Close up. */
       if (nc_close(ncid1)) ERR;
       if (nc_close(ncid2)) ERR;
 
@@ -156,14 +156,14 @@ main(int argc, char **argv)
       int ncid[NUM_FILES], typeid;
       char file_name[NUM_FILES][NC_MAX_NAME + 1] = {FILE_NAME1, FILE_NAME2};
       int i;
-      struct s1 
+      struct s1
       {
 	    int i1;
 	    int i2;
       };
       struct s1 data[DIM_LEN], data_in[DIM_LEN];
 
-      /* Create some phony data. */   
+      /* Create some phony data. */
       for (i = 0; i < DIM_LEN; i++)
       {
 	 data[i].i1 = 5;
@@ -175,17 +175,17 @@ main(int argc, char **argv)
       {
 	 if (nc_create(file_name[i], NC_NETCDF4, &ncid[i])) ERR;
 	 if (nc_def_compound(ncid[i], sizeof(struct s1), CMP_NAME, &typeid)) ERR;
-	 if (nc_insert_compound(ncid[i], typeid, I1, 
+	 if (nc_insert_compound(ncid[i], typeid, I1,
 				NC_COMPOUND_OFFSET(struct s1, i1), NC_INT)) ERR;
-	 if (nc_insert_compound(ncid[i], typeid, I2, 
+	 if (nc_insert_compound(ncid[i], typeid, I2,
 				NC_COMPOUND_OFFSET(struct s1, i2), NC_INT)) ERR;
       }
 
       /* Write an att in one file and copy it. */
-      if (nc_put_att(ncid[0], NC_GLOBAL, ATT_NAME2, typeid, DIM_LEN, 
+      if (nc_put_att(ncid[0], NC_GLOBAL, ATT_NAME2, typeid, DIM_LEN,
 		     data)) ERR;
 
-      if (nc_copy_att(ncid[0], NC_GLOBAL, ATT_NAME2, ncid[1], 
+      if (nc_copy_att(ncid[0], NC_GLOBAL, ATT_NAME2, ncid[1],
 		      NC_GLOBAL)) ERR;
 
       /* Close the files. */
@@ -211,7 +211,7 @@ main(int argc, char **argv)
 
       int ncid[NUM_FILES], typeid;
       char file_name[NUM_FILES][NC_MAX_NAME + 1] = {FILE_NAME1, FILE_NAME2};
-      char member_name[NUM_MEMBERS][NC_MAX_NAME + 1] = {"Munster", "Connacht", 
+      char member_name[NUM_MEMBERS][NC_MAX_NAME + 1] = {"Munster", "Connacht",
 							"Leinster", "Ulster"};
       int member_value[NUM_MEMBERS] = {0, 1, 2, 3};
       int data_in[DIM_LEN_10], data[DIM_LEN_10] = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1};
@@ -223,15 +223,15 @@ main(int argc, char **argv)
 	 if (nc_create(file_name[i], NC_NETCDF4, &ncid[i])) ERR;
 	 if (nc_def_enum(ncid[i], NC_INT, TYPE_NAME, &typeid)) ERR;
 	 for (j = 0; j < NUM_MEMBERS; j++)
-	    if (nc_insert_enum(ncid[i], typeid, member_name[j], 
+	    if (nc_insert_enum(ncid[i], typeid, member_name[j],
 			       &member_value[j])) ERR;
       }
 
       /* Write an att in one file and copy it. */
-      if (nc_put_att(ncid[0], NC_GLOBAL, ATT_NAME2, typeid, DIM_LEN_10, 
+      if (nc_put_att(ncid[0], NC_GLOBAL, ATT_NAME2, typeid, DIM_LEN_10,
 		     data)) ERR;
 
-      if (nc_copy_att(ncid[0], NC_GLOBAL, ATT_NAME2, ncid[1], 
+      if (nc_copy_att(ncid[0], NC_GLOBAL, ATT_NAME2, ncid[1],
 		      NC_GLOBAL)) ERR;
 
       /* Close the files. */

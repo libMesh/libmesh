@@ -6,12 +6,12 @@
 # Put together AM_CPPFLAGS and AM_LDFLAGS.
 include $(top_srcdir)/lib_flags.am
 
-LDADD = ${top_builddir}/liblib/libnetcdf.la 
+LDADD = ${top_builddir}/liblib/libnetcdf.la
 AM_CPPFLAGS += -I$(top_builddir)/liblib
 
 # Set up the tests; do the .sh first, then .c
-check_PROGRAMS = 
-TESTS = 
+check_PROGRAMS =
+TESTS =
 TESTS_ENVIRONMENT=TOPSRCDIR=${abs_top_srcdir}
 
 # Make nctestserver be the first test to be built

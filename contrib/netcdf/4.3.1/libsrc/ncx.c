@@ -2,7 +2,7 @@
 /*
  *	Copyright 1996, University Corporation for Atmospheric Research
  *	See netcdf/COPYRIGHT file for copying and redistribution conditions.
- * 	
+ *
  * 	This file contains some routines derived from code
  *	which is copyrighted by Sun Microsystems, Inc.
  *	The "#ifdef vax" versions of
@@ -133,7 +133,7 @@ swapn2b(void *dst, const void *src, size_t nn)
  *	{
  *		*op++ = *(++ip);
  *		*op++ = *(ip++ -1);
- *	}                                       
+ *	}
  */
 	while(nn > 3)
 	{
@@ -367,7 +367,7 @@ get_ix_short(const void *xp, ix_short *ip)
 		*ip |= (~(0xffff)); /* N.B. Assumes "twos complement" */
 	}
 #endif
-	*ip |= *cp; 
+	*ip |= *cp;
 }
 
 static void
@@ -670,7 +670,7 @@ get_ix_int(const void *xp, ix_int *ip)
 #endif
 	*ip |= (*cp++ << 16);
 	*ip |= (*cp++ << 8);
-	*ip |= *cp; 
+	*ip |= *cp;
 }
 
 static void
@@ -930,7 +930,7 @@ ncx_put_int_double(void *xp, const double *ip)
 		return NC_ERANGE;
 	return ENOERR;
 }
- 
+
 
 /* x_float */
 
@@ -1684,7 +1684,7 @@ get_ix_double(const void *xp, double *ip)
 static void
 put_ix_double(void *xp, const double *ip)
 {
-	const struct vax_double *const vdp = 
+	const struct vax_double *const vdp =
 			(const struct vax_double *)ip;
 	struct ieee_double *const idp =
 			 (struct ieee_double *) xp;
@@ -1740,7 +1740,7 @@ put_ix_double(void *xp, const double *ip)
 		idp->exp_hi = exp >> 4;
 		idp->exp_lo = exp;
 	}
-		
+
 	shipit:
 		idp->sign = vdp->sign;
 
@@ -2070,7 +2070,7 @@ ncx_get_size_t(const void **xpp,  size_t *ulp)
 	*ulp = (unsigned)(*cp++ << 24);
 	*ulp |= (*cp++ << 16);
 	*ulp |= (*cp++ << 8);
-	*ulp |= *cp; 
+	*ulp |= *cp;
 
 	*xpp = (const void *)((const char *)(*xpp) + X_SIZEOF_SIZE_T);
 	return ENOERR;
@@ -2088,7 +2088,7 @@ ncx_put_off_t(void **xpp, const off_t *lp, size_t sizeof_off_t)
 	  /* Assume this is an overflow of a 32-bit int... */
 	  return ERANGE;
 	}
-	  
+
 	assert(sizeof_off_t == 4 || sizeof_off_t == 8);
 
 	if (sizeof_off_t == 4) {
@@ -2134,7 +2134,7 @@ ncx_get_off_t(const void **xpp, off_t *lp, size_t sizeof_off_t)
 		*lp = *cp++ << 24;
 		*lp |= (*cp++ << 16);
 		*lp |= (*cp++ <<  8);
-		*lp |= *cp; 
+		*lp |= *cp;
 	} else {
 #if SIZEOF_OFF_T == 4
 /* Read a 64-bit offset on a system with only a 32-bit offset */
@@ -2613,7 +2613,7 @@ ncx_pad_putn_schar_schar(void **xpp, size_t nelems, const schar *tp)
 		(void) memcpy(*xpp, nada, rndup);
 		*xpp = (void *)((char *)(*xpp) + rndup);
 	}
-	
+
 	return ENOERR;
 
 }
@@ -2633,7 +2633,7 @@ ncx_pad_putn_schar_uchar(void **xpp, size_t nelems, const uchar *tp)
 		(void) memcpy(*xpp, nada, rndup);
 		*xpp = (void *)((char *)(*xpp) + rndup);
 	}
-	
+
 	return ENOERR;
 
 }
@@ -3453,7 +3453,7 @@ ncx_pad_getn_short_schar(const void **xpp, size_t nelems, schar *tp)
 
 	if(rndup != 0)
 		xp += X_SIZEOF_SHORT;
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -3475,7 +3475,7 @@ ncx_pad_getn_short_uchar(const void **xpp, size_t nelems, uchar *tp)
 
 	if(rndup != 0)
 		xp += X_SIZEOF_SHORT;
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -3497,7 +3497,7 @@ ncx_pad_getn_short_short(const void **xpp, size_t nelems, short *tp)
 
 	if(rndup != 0)
 		xp += X_SIZEOF_SHORT;
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -3519,7 +3519,7 @@ ncx_pad_getn_short_int(const void **xpp, size_t nelems, int *tp)
 
 	if(rndup != 0)
 		xp += X_SIZEOF_SHORT;
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -3541,7 +3541,7 @@ ncx_pad_getn_short_float(const void **xpp, size_t nelems, float *tp)
 
 	if(rndup != 0)
 		xp += X_SIZEOF_SHORT;
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -3563,7 +3563,7 @@ ncx_pad_getn_short_double(const void **xpp, size_t nelems, double *tp)
 
 	if(rndup != 0)
 		xp += X_SIZEOF_SHORT;
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -3585,7 +3585,7 @@ ncx_pad_getn_short_uint(const void **xpp, size_t nelems, uint *tp)
 
 	if(rndup != 0)
 		xp += X_SIZEOF_SHORT;
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -3607,7 +3607,7 @@ ncx_pad_getn_short_longlong(const void **xpp, size_t nelems, longlong *tp)
 
 	if(rndup != 0)
 		xp += X_SIZEOF_SHORT;
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -3629,7 +3629,7 @@ ncx_pad_getn_short_ulonglong(const void **xpp, size_t nelems, ulonglong *tp)
 
 	if(rndup != 0)
 		xp += X_SIZEOF_SHORT;
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -3675,7 +3675,7 @@ ncx_putn_short_schar(void **xpp, size_t nelems, const schar *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_SHORT_MIN || tp[i] > X_SHORT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_SHORT);
       xp = (short *) *xpp;
@@ -3744,7 +3744,7 @@ ncx_putn_short_uchar(void **xpp, size_t nelems, const uchar *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_SHORT_MIN || tp[i] > X_SHORT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_SHORT);
       xp = (short *) *xpp;
@@ -3827,7 +3827,7 @@ ncx_putn_short_short(void **xpp, size_t nelems, const short *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_SHORT_MIN || tp[i] > X_SHORT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_SHORT);
       xp = (short *) *xpp;
@@ -3897,7 +3897,7 @@ ncx_putn_short_int(void **xpp, size_t nelems, const int *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_SHORT_MIN || tp[i] > X_SHORT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_SHORT);
       xp = (short *) *xpp;
@@ -3966,7 +3966,7 @@ ncx_putn_short_float(void **xpp, size_t nelems, const float *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_SHORT_MIN || tp[i] > X_SHORT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_SHORT);
       xp = (short *) *xpp;
@@ -4035,7 +4035,7 @@ ncx_putn_short_double(void **xpp, size_t nelems, const double *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_SHORT_MIN || tp[i] > X_SHORT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_SHORT);
       xp = (short *) *xpp;
@@ -4104,7 +4104,7 @@ ncx_putn_short_uint(void **xpp, size_t nelems, const uint *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_SHORT_MIN || tp[i] > X_SHORT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_SHORT);
       xp = (short *) *xpp;
@@ -4173,7 +4173,7 @@ ncx_putn_short_longlong(void **xpp, size_t nelems, const longlong *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_SHORT_MIN || tp[i] > X_SHORT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_SHORT);
       xp = (short *) *xpp;
@@ -4242,7 +4242,7 @@ ncx_putn_short_ulonglong(void **xpp, size_t nelems, const ulonglong *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_SHORT_MIN || tp[i] > X_SHORT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_SHORT);
       xp = (short *) *xpp;
@@ -4290,9 +4290,9 @@ ncx_pad_putn_short_schar(void **xpp, size_t nelems, const schar *tp)
 	if(rndup != 0)
 	{
 		(void) memcpy(xp, nada, X_SIZEOF_SHORT);
-		xp += X_SIZEOF_SHORT;	
+		xp += X_SIZEOF_SHORT;
 	}
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -4315,9 +4315,9 @@ ncx_pad_putn_short_uchar(void **xpp, size_t nelems, const uchar *tp)
 	if(rndup != 0)
 	{
 		(void) memcpy(xp, nada, X_SIZEOF_SHORT);
-		xp += X_SIZEOF_SHORT;	
+		xp += X_SIZEOF_SHORT;
 	}
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -4340,9 +4340,9 @@ ncx_pad_putn_short_short(void **xpp, size_t nelems, const short *tp)
 	if(rndup != 0)
 	{
 		(void) memcpy(xp, nada, X_SIZEOF_SHORT);
-		xp += X_SIZEOF_SHORT;	
+		xp += X_SIZEOF_SHORT;
 	}
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -4365,9 +4365,9 @@ ncx_pad_putn_short_int(void **xpp, size_t nelems, const int *tp)
 	if(rndup != 0)
 	{
 		(void) memcpy(xp, nada, X_SIZEOF_SHORT);
-		xp += X_SIZEOF_SHORT;	
+		xp += X_SIZEOF_SHORT;
 	}
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -4390,9 +4390,9 @@ ncx_pad_putn_short_float(void **xpp, size_t nelems, const float *tp)
 	if(rndup != 0)
 	{
 		(void) memcpy(xp, nada, X_SIZEOF_SHORT);
-		xp += X_SIZEOF_SHORT;	
+		xp += X_SIZEOF_SHORT;
 	}
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -4415,9 +4415,9 @@ ncx_pad_putn_short_double(void **xpp, size_t nelems, const double *tp)
 	if(rndup != 0)
 	{
 		(void) memcpy(xp, nada, X_SIZEOF_SHORT);
-		xp += X_SIZEOF_SHORT;	
+		xp += X_SIZEOF_SHORT;
 	}
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -4440,9 +4440,9 @@ ncx_pad_putn_short_uint(void **xpp, size_t nelems, const uint *tp)
 	if(rndup != 0)
 	{
 		(void) memcpy(xp, nada, X_SIZEOF_SHORT);
-		xp += X_SIZEOF_SHORT;	
+		xp += X_SIZEOF_SHORT;
 	}
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -4465,9 +4465,9 @@ ncx_pad_putn_short_longlong(void **xpp, size_t nelems, const longlong *tp)
 	if(rndup != 0)
 	{
 		(void) memcpy(xp, nada, X_SIZEOF_SHORT);
-		xp += X_SIZEOF_SHORT;	
+		xp += X_SIZEOF_SHORT;
 	}
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -4490,9 +4490,9 @@ ncx_pad_putn_short_ulonglong(void **xpp, size_t nelems, const ulonglong *tp)
 	if(rndup != 0)
 	{
 		(void) memcpy(xp, nada, X_SIZEOF_SHORT);
-		xp += X_SIZEOF_SHORT;	
+		xp += X_SIZEOF_SHORT;
 	}
-		
+
 	*xpp = (void *)xp;
 	return status;
 }
@@ -5146,7 +5146,7 @@ ncx_putn_int_schar(void **xpp, size_t nelems, const schar *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_INT_MIN || tp[i] > X_INT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_INT);
       xp = (int *) *xpp;
@@ -5215,7 +5215,7 @@ ncx_putn_int_uchar(void **xpp, size_t nelems, const uchar *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_INT_MIN || tp[i] > X_INT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_INT);
       xp = (int *) *xpp;
@@ -5284,7 +5284,7 @@ ncx_putn_int_short(void **xpp, size_t nelems, const short *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_INT_MIN || tp[i] > X_INT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_INT);
       xp = (int *) *xpp;
@@ -5378,7 +5378,7 @@ ncx_putn_int_int(void **xpp, size_t nelems, const int *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_INT_MIN || tp[i] > X_INT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_INT);
       xp = (int *) *xpp;
@@ -5447,7 +5447,7 @@ ncx_putn_int_uint(void **xpp, size_t nelems, const uint *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_INT_MIN || tp[i] > X_INT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_INT);
       xp = (int *) *xpp;
@@ -5518,7 +5518,7 @@ ncx_putn_int_longlong(void **xpp, size_t nelems, const longlong *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_INT_MIN || tp[i] > X_INT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_INT);
       xp = (int *) *xpp;
@@ -5587,7 +5587,7 @@ ncx_putn_int_ulonglong(void **xpp, size_t nelems, const ulonglong *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_INT_MIN || tp[i] > X_INT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_INT);
       xp = (int *) *xpp;
@@ -5652,12 +5652,12 @@ ncx_putn_int_float(void **xpp, size_t nelems, const float *tp)
 #pragma cdir loopcnt=LOOPCNT
 #pragma cdir shortloop
     for (i=0; i<ni; i++) {
-      /* for some reason int to float, for putn, requires a special case */ 
+      /* for some reason int to float, for putn, requires a special case */
       d = tp[i];
       xp[i] = (int) Max( X_INT_MIN, Min(X_INT_MAX, (int) d));
       nrange += d < X_INT_MIN || d > X_INT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_INT);
       xp = (int *) *xpp;
@@ -5726,7 +5726,7 @@ ncx_putn_int_double(void **xpp, size_t nelems, const double *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_INT_MIN || tp[i] > X_INT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_INT);
       xp = (int *) *xpp;
@@ -6404,7 +6404,7 @@ ncx_putn_float_schar(void **xpp, size_t nelems, const schar *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_FLOAT_MIN || tp[i] > X_FLOAT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_FLOAT);
       xp = (float *) *xpp;
@@ -6473,7 +6473,7 @@ ncx_putn_float_uchar(void **xpp, size_t nelems, const uchar *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_FLOAT_MIN || tp[i] > X_FLOAT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_FLOAT);
       xp = (float *) *xpp;
@@ -6542,7 +6542,7 @@ ncx_putn_float_short(void **xpp, size_t nelems, const short *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_FLOAT_MIN || tp[i] > X_FLOAT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_FLOAT);
       xp = (float *) *xpp;
@@ -6611,7 +6611,7 @@ ncx_putn_float_int(void **xpp, size_t nelems, const int *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_FLOAT_MIN || tp[i] > X_FLOAT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_FLOAT);
       xp = (float *) *xpp;
@@ -6706,7 +6706,7 @@ ncx_putn_float_float(void **xpp, size_t nfloats, const float *ip)
 
 		isp->sign = vsp->sign;
 
-	
+
 		ip++;
 		*xpp = (char *)(*xpp) + X_SIZEOF_FLOAT;
 	}
@@ -6771,7 +6771,7 @@ ncx_putn_float_double(void **xpp, size_t nelems, const double *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_FLOAT_MIN || tp[i] > X_FLOAT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_FLOAT);
       xp = (float *) *xpp;
@@ -6840,7 +6840,7 @@ ncx_putn_float_uint(void **xpp, size_t nelems, const uint *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_FLOAT_MIN || tp[i] > X_FLOAT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_FLOAT);
       xp = (float *) *xpp;
@@ -6909,7 +6909,7 @@ ncx_putn_float_longlong(void **xpp, size_t nelems, const longlong *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_FLOAT_MIN || tp[i] > X_FLOAT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_FLOAT);
       xp = (float *) *xpp;
@@ -6978,7 +6978,7 @@ ncx_putn_float_ulonglong(void **xpp, size_t nelems, const ulonglong *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_FLOAT_MIN || tp[i] > X_FLOAT_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_FLOAT);
       xp = (float *) *xpp;
@@ -7651,7 +7651,7 @@ ncx_putn_double_schar(void **xpp, size_t nelems, const schar *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_DOUBLE_MIN || tp[i] > X_DOUBLE_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_DOUBLE);
       xp = (double *) *xpp;
@@ -7720,7 +7720,7 @@ ncx_putn_double_uchar(void **xpp, size_t nelems, const uchar *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_DOUBLE_MIN || tp[i] > X_DOUBLE_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_DOUBLE);
       xp = (double *) *xpp;
@@ -7789,7 +7789,7 @@ ncx_putn_double_short(void **xpp, size_t nelems, const short *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_DOUBLE_MIN || tp[i] > X_DOUBLE_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_DOUBLE);
       xp = (double *) *xpp;
@@ -7858,7 +7858,7 @@ ncx_putn_double_int(void **xpp, size_t nelems, const int *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_DOUBLE_MIN || tp[i] > X_DOUBLE_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_DOUBLE);
       xp = (double *) *xpp;
@@ -7927,7 +7927,7 @@ ncx_putn_double_float(void **xpp, size_t nelems, const float *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_DOUBLE_MIN || tp[i] > X_DOUBLE_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_DOUBLE);
       xp = (double *) *xpp;
@@ -7996,7 +7996,7 @@ ncx_putn_double_uint(void **xpp, size_t nelems, const uint *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_DOUBLE_MIN || tp[i] > X_DOUBLE_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_DOUBLE);
       xp = (double *) *xpp;
@@ -8065,7 +8065,7 @@ ncx_putn_double_longlong(void **xpp, size_t nelems, const longlong *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_DOUBLE_MIN || tp[i] > X_DOUBLE_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_DOUBLE);
       xp = (double *) *xpp;
@@ -8134,7 +8134,7 @@ ncx_putn_double_ulonglong(void **xpp, size_t nelems, const ulonglong *tp)
      /* test for range errors (not always needed but do it anyway) */
       nrange += tp[i] < X_DOUBLE_MIN || tp[i] > X_DOUBLE_MAX;
     }
-   /* copy workspace back if necessary */ 
+   /* copy workspace back if necessary */
     if (realign) {
       memcpy(*xpp, tmp, ni*X_SIZEOF_DOUBLE);
       xp = (double *) *xpp;
@@ -8184,7 +8184,7 @@ ncx_putn_double_double(void **xpp, size_t ndoubles, const double *ip)
 
 	while(ip < end)
 	{
-	const struct vax_double *const vdp = 
+	const struct vax_double *const vdp =
 			(const struct vax_double *)ip;
 	struct ieee_double *const idp =
 			 (struct ieee_double *) (*xpp);
@@ -8240,7 +8240,7 @@ ncx_putn_double_double(void **xpp, size_t ndoubles, const double *ip)
 		idp->exp_hi = exp >> 4;
 		idp->exp_lo = exp;
 	}
-		
+
 	shipit:
 		idp->sign = vdp->sign;
 
@@ -8327,7 +8327,7 @@ ncx_pad_putn_text(void **xpp, size_t nelems, const char *tp)
 		(void) memcpy(*xpp, nada, rndup);
 		*xpp = (void *)((char *)(*xpp) + rndup);
 	}
-	
+
 	return ENOERR;
 
 }
@@ -8385,7 +8385,7 @@ ncx_pad_putn_void(void **xpp, size_t nelems, const void *tp)
 		(void) memcpy(*xpp, nada, rndup);
 		*xpp = (void *)((char *)(*xpp) + rndup);
 	}
-	
+
 	return ENOERR;
 
 }

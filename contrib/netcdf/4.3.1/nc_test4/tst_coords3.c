@@ -106,7 +106,7 @@ check_cf_data(int ncid)
 int
 check_cf_metadata(int ncid)
 {
- 
+
    int nvars_in, varids_in[NVARS];
    int nvars, ndims, ngatts, unlimdimid;
    int ndims_in, natts_in, dimids_in[NDIMS];
@@ -207,7 +207,7 @@ main(int argc, char **argv)
    printf("\n*** Testing with CF example http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.4/ch05s02.html....\n");
    printf("**** simple test with only metadata");
    {
-      int ncid, dimids[NDIMS], varids[NVARS], data_dimids[DATA_NDIMS]; 
+      int ncid, dimids[NDIMS], varids[NVARS], data_dimids[DATA_NDIMS];
       int coord_dimids[COORD_NDIMS];
 
       /* Create a netcdf-4 file. */
@@ -224,44 +224,44 @@ main(int argc, char **argv)
       data_dimids[2] = dimids[0];
       if (nc_def_var(ncid, T_NAME, NC_FLOAT, DATA_NDIMS, data_dimids, &varids[0])) ERR;
       if (nc_put_att_text(ncid, varids[0], LONG_NAME, strlen(TEMPERATURE),
-			  TEMPERATURE)) ERR;      
-      if (nc_put_att_text(ncid, varids[0], UNITS, strlen(KELVIN), KELVIN)) ERR;      
+			  TEMPERATURE)) ERR;
+      if (nc_put_att_text(ncid, varids[0], UNITS, strlen(KELVIN), KELVIN)) ERR;
       if (nc_put_att_text(ncid, varids[0], COORDINATES_NAME, strlen(LONLAT_COORDINATES),
-			  LONLAT_COORDINATES)) ERR;      
+			  LONLAT_COORDINATES)) ERR;
 
       /* Define xc variable. */
       if (nc_def_var(ncid, XC_NAME, NC_FLOAT, 1, &dimids[0], &varids[1])) ERR;
-      if (nc_put_att_text(ncid, varids[1], AXIS, strlen(X_NAME), X_NAME)) ERR;      
+      if (nc_put_att_text(ncid, varids[1], AXIS, strlen(X_NAME), X_NAME)) ERR;
       if (nc_put_att_text(ncid, varids[1], LONG_NAME, strlen(X_LONG_NAME),
-			  X_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[1], UNITS, strlen(METER), METER)) ERR;      
+			  X_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[1], UNITS, strlen(METER), METER)) ERR;
 
       /* Define yc variable. */
       if (nc_def_var(ncid, YC_NAME, NC_FLOAT, 1, &dimids[1], &varids[2])) ERR;
-      if (nc_put_att_text(ncid, varids[2], AXIS, strlen(Y_NAME), Y_NAME)) ERR;      
+      if (nc_put_att_text(ncid, varids[2], AXIS, strlen(Y_NAME), Y_NAME)) ERR;
       if (nc_put_att_text(ncid, varids[2], LONG_NAME, strlen(Y_LONG_NAME),
-			  Y_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[2], UNITS, strlen(METER), METER)) ERR;      
+			  Y_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[2], UNITS, strlen(METER), METER)) ERR;
 
       /* Define lev variable. */
       if (nc_def_var(ncid, LEV_NAME, NC_FLOAT, 1, &dimids[2], &varids[3])) ERR;
       if (nc_put_att_text(ncid, varids[3], LONG_NAME, strlen(LEV_LONG_NAME),
-			  LEV_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[3], UNITS, strlen(HPA), HPA)) ERR;      
+			  LEV_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[3], UNITS, strlen(HPA), HPA)) ERR;
 
       /* Define lon variable. */
       coord_dimids[0] = dimids[1];
       coord_dimids[1] = dimids[0];
       if (nc_def_var(ncid, LON_NAME, NC_FLOAT, COORD_NDIMS, coord_dimids, &varids[4])) ERR;
       if (nc_put_att_text(ncid, varids[4], LONG_NAME, strlen(LON_LONG_NAME),
-			  LON_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[4], UNITS, strlen(DEGREES_EAST), DEGREES_EAST)) ERR;      
+			  LON_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[4], UNITS, strlen(DEGREES_EAST), DEGREES_EAST)) ERR;
 
       /* Define lat variable. */
       if (nc_def_var(ncid, LAT_NAME, NC_FLOAT, COORD_NDIMS, coord_dimids, &varids[5])) ERR;
       if (nc_put_att_text(ncid, varids[5], LONG_NAME, strlen(LAT_LONG_NAME),
-			  LAT_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[5], UNITS, strlen(DEGREES_NORTH), DEGREES_NORTH)) ERR;      
+			  LAT_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[5], UNITS, strlen(DEGREES_NORTH), DEGREES_NORTH)) ERR;
 
       /* Check the metadata. */
       if (check_cf_metadata(ncid)) ERR;
@@ -281,7 +281,7 @@ main(int argc, char **argv)
    SUMMARIZE_ERR;
    printf("**** test with data writes...");
    {
-      int ncid, dimids[NDIMS], varids[NVARS], data_dimids[DATA_NDIMS]; 
+      int ncid, dimids[NDIMS], varids[NVARS], data_dimids[DATA_NDIMS];
       int coord_dimids[COORD_NDIMS];
       float temp[YC_LEN][XC_LEN], xc[XC_LEN], yc[YC_LEN];
       size_t start[DATA_NDIMS] = {0, 0, 0}, count[DATA_NDIMS] = {1, YC_LEN, XC_LEN};
@@ -310,44 +310,44 @@ main(int argc, char **argv)
       data_dimids[2] = dimids[0];
       if (nc_def_var(ncid, T_NAME, NC_FLOAT, DATA_NDIMS, data_dimids, &varids[0])) ERR;
       if (nc_put_att_text(ncid, varids[0], LONG_NAME, strlen(TEMPERATURE),
-			  TEMPERATURE)) ERR;      
-      if (nc_put_att_text(ncid, varids[0], UNITS, strlen(KELVIN), KELVIN)) ERR;      
+			  TEMPERATURE)) ERR;
+      if (nc_put_att_text(ncid, varids[0], UNITS, strlen(KELVIN), KELVIN)) ERR;
       if (nc_put_att_text(ncid, varids[0], COORDINATES_NAME, strlen(LONLAT_COORDINATES),
-			  LONLAT_COORDINATES)) ERR;      
+			  LONLAT_COORDINATES)) ERR;
 
       /* Define xc variable. */
       if (nc_def_var(ncid, XC_NAME, NC_FLOAT, 1, &dimids[0], &varids[1])) ERR;
-      if (nc_put_att_text(ncid, varids[1], AXIS, strlen(X_NAME), X_NAME)) ERR;      
+      if (nc_put_att_text(ncid, varids[1], AXIS, strlen(X_NAME), X_NAME)) ERR;
       if (nc_put_att_text(ncid, varids[1], LONG_NAME, strlen(X_LONG_NAME),
-			  X_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[1], UNITS, strlen(METER), METER)) ERR;      
+			  X_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[1], UNITS, strlen(METER), METER)) ERR;
 
       /* Define yc variable. */
       if (nc_def_var(ncid, YC_NAME, NC_FLOAT, 1, &dimids[1], &varids[2])) ERR;
-      if (nc_put_att_text(ncid, varids[2], AXIS, strlen(Y_NAME), Y_NAME)) ERR;      
+      if (nc_put_att_text(ncid, varids[2], AXIS, strlen(Y_NAME), Y_NAME)) ERR;
       if (nc_put_att_text(ncid, varids[2], LONG_NAME, strlen(Y_LONG_NAME),
-			  Y_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[2], UNITS, strlen(METER), METER)) ERR;      
+			  Y_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[2], UNITS, strlen(METER), METER)) ERR;
 
       /* Define lev variable. */
       if (nc_def_var(ncid, LEV_NAME, NC_FLOAT, 1, &dimids[2], &varids[3])) ERR;
       if (nc_put_att_text(ncid, varids[3], LONG_NAME, strlen(LEV_LONG_NAME),
-			  LEV_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[3], UNITS, strlen(HPA), HPA)) ERR;      
+			  LEV_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[3], UNITS, strlen(HPA), HPA)) ERR;
 
       /* Define lon variable. */
       coord_dimids[0] = dimids[1];
       coord_dimids[1] = dimids[0];
       if (nc_def_var(ncid, LON_NAME, NC_FLOAT, COORD_NDIMS, coord_dimids, &varids[4])) ERR;
       if (nc_put_att_text(ncid, varids[4], LONG_NAME, strlen(LON_LONG_NAME),
-			  LON_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[4], UNITS, strlen(DEGREES_EAST), DEGREES_EAST)) ERR;      
+			  LON_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[4], UNITS, strlen(DEGREES_EAST), DEGREES_EAST)) ERR;
 
       /* Define lat variable. */
       if (nc_def_var(ncid, LAT_NAME, NC_FLOAT, COORD_NDIMS, coord_dimids, &varids[5])) ERR;
       if (nc_put_att_text(ncid, varids[5], LONG_NAME, strlen(LAT_LONG_NAME),
-			  LAT_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[5], UNITS, strlen(DEGREES_NORTH), DEGREES_NORTH)) ERR;      
+			  LAT_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[5], UNITS, strlen(DEGREES_NORTH), DEGREES_NORTH)) ERR;
 
       /* Write some data to T. */
       if (nc_put_vara_float(ncid, 0, start, count, (const float *)temp)) ERR;
@@ -376,7 +376,7 @@ main(int argc, char **argv)
    SUMMARIZE_ERR;
    printf("**** test with data writes without enddefs...");
    {
-      int ncid, dimids[NDIMS], varids[NVARS], data_dimids[DATA_NDIMS]; 
+      int ncid, dimids[NDIMS], varids[NVARS], data_dimids[DATA_NDIMS];
       int coord_dimids[COORD_NDIMS];
       float temp[YC_LEN][XC_LEN], xc[XC_LEN], yc[YC_LEN];
       size_t start[DATA_NDIMS] = {0, 0, 0}, count[DATA_NDIMS] = {1, YC_LEN, XC_LEN};
@@ -405,30 +405,30 @@ main(int argc, char **argv)
       data_dimids[2] = dimids[0];
       if (nc_def_var(ncid, T_NAME, NC_FLOAT, DATA_NDIMS, data_dimids, &varids[0])) ERR;
       if (nc_put_att_text(ncid, varids[0], LONG_NAME, strlen(TEMPERATURE),
-			  TEMPERATURE)) ERR;      
-      if (nc_put_att_text(ncid, varids[0], UNITS, strlen(KELVIN), KELVIN)) ERR;      
+			  TEMPERATURE)) ERR;
+      if (nc_put_att_text(ncid, varids[0], UNITS, strlen(KELVIN), KELVIN)) ERR;
       if (nc_put_att_text(ncid, varids[0], COORDINATES_NAME, strlen(LONLAT_COORDINATES),
-			  LONLAT_COORDINATES)) ERR;      
+			  LONLAT_COORDINATES)) ERR;
 
       /* Write some data to T. */
       if (nc_put_vara_float(ncid, 0, start, count, (const float *)temp)) ERR;
 
       /* Define xc variable. */
       if (nc_def_var(ncid, XC_NAME, NC_FLOAT, 1, &dimids[0], &varids[1])) ERR;
-      if (nc_put_att_text(ncid, varids[1], AXIS, strlen(X_NAME), X_NAME)) ERR;      
+      if (nc_put_att_text(ncid, varids[1], AXIS, strlen(X_NAME), X_NAME)) ERR;
       if (nc_put_att_text(ncid, varids[1], LONG_NAME, strlen(X_LONG_NAME),
-			  X_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[1], UNITS, strlen(METER), METER)) ERR;      
+			  X_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[1], UNITS, strlen(METER), METER)) ERR;
 
       /* Write data to XC. */
       if (nc_put_var_float(ncid, 1, xc)) ERR;
 
       /* Define yc variable. */
       if (nc_def_var(ncid, YC_NAME, NC_FLOAT, 1, &dimids[1], &varids[2])) ERR;
-      if (nc_put_att_text(ncid, varids[2], AXIS, strlen(Y_NAME), Y_NAME)) ERR;      
+      if (nc_put_att_text(ncid, varids[2], AXIS, strlen(Y_NAME), Y_NAME)) ERR;
       if (nc_put_att_text(ncid, varids[2], LONG_NAME, strlen(Y_LONG_NAME),
-			  Y_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[2], UNITS, strlen(METER), METER)) ERR;      
+			  Y_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[2], UNITS, strlen(METER), METER)) ERR;
 
       /* Write data to YC. */
       if (nc_put_var_float(ncid, 2, yc)) ERR;
@@ -436,22 +436,22 @@ main(int argc, char **argv)
       /* Define lev variable. */
       if (nc_def_var(ncid, LEV_NAME, NC_FLOAT, 1, &dimids[2], &varids[3])) ERR;
       if (nc_put_att_text(ncid, varids[3], LONG_NAME, strlen(LEV_LONG_NAME),
-			  LEV_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[3], UNITS, strlen(HPA), HPA)) ERR;      
+			  LEV_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[3], UNITS, strlen(HPA), HPA)) ERR;
 
       /* Define lon variable. */
       coord_dimids[0] = dimids[1];
       coord_dimids[1] = dimids[0];
       if (nc_def_var(ncid, LON_NAME, NC_FLOAT, COORD_NDIMS, coord_dimids, &varids[4])) ERR;
       if (nc_put_att_text(ncid, varids[4], LONG_NAME, strlen(LON_LONG_NAME),
-			  LON_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[4], UNITS, strlen(DEGREES_EAST), DEGREES_EAST)) ERR;      
+			  LON_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[4], UNITS, strlen(DEGREES_EAST), DEGREES_EAST)) ERR;
 
       /* Define lat variable. */
       if (nc_def_var(ncid, LAT_NAME, NC_FLOAT, COORD_NDIMS, coord_dimids, &varids[5])) ERR;
       if (nc_put_att_text(ncid, varids[5], LONG_NAME, strlen(LAT_LONG_NAME),
-			  LAT_LONG_NAME)) ERR;      
-      if (nc_put_att_text(ncid, varids[5], UNITS, strlen(DEGREES_NORTH), DEGREES_NORTH)) ERR;      
+			  LAT_LONG_NAME)) ERR;
+      if (nc_put_att_text(ncid, varids[5], UNITS, strlen(DEGREES_NORTH), DEGREES_NORTH)) ERR;
 
       /* Check the metadata and data. */
       if (check_cf_metadata(ncid)) ERR;

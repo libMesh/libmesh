@@ -8,7 +8,7 @@
 static int count_udtypes(int ncid);
 
 int
-main(int argc, char **argv) 
+main(int argc, char **argv)
 {/* create file that caused seg fault in ncdump */
 
     int  ncid;  /* netCDF id */
@@ -74,8 +74,8 @@ main(int argc, char **argv)
      * made by ncdump, or an earlier ncdump bug masks the real problem
      * until a call is made into the netCDF-4 library ...  */
     if (nc_open(FILENAME, NC_NOWRITE, &ncid)) ERR;
-    
-    {   		
+
+    {
 	/* We declare local arrays with small constant sizes to avoid
 	 * all the mallocs and frees used in ncdump.  For the example
 	 * above, the fixed-size arrays are ample. */
@@ -105,7 +105,7 @@ main(int argc, char **argv)
 	for (v_grp = 0; v_grp < nvars_grp; v_grp++) {
 	    varid = varids_grp[v_grp];
 	    if ( nc_inq_varndims(ncid, varid, &varndims) ) ERR;
-	    if ( nc_inq_var(ncid, varid, varname, &vartype, 0, vardims, 
+	    if ( nc_inq_var(ncid, varid, varname, &vartype, 0, vardims,
 			    &varnatts) ) ERR;
 	    for (id = 0; id < varndims; id++) {
 		if ( nc_inq_dimname(ncid, vardims[id], dimname) ) ERR;
@@ -114,7 +114,7 @@ main(int argc, char **argv)
 	for (v_grp = 0; v_grp < nvars_grp; v_grp++) {
 	    varid = varids_grp[v_grp];
 	    if( nc_inq_varndims(ncid, varid, &varndims) ) ERR;
-	    if( nc_inq_var(ncid, varid, varname, &vartype, 0, vardims, 
+	    if( nc_inq_var(ncid, varid, varname, &vartype, 0, vardims,
 			   &varnatts) ) ERR;
 	    {
 		is_recvar = 0;
@@ -131,7 +131,7 @@ main(int argc, char **argv)
 			    if(dimids[dim] == recdimids[recdim]) {
 				is_recvar = 1;
 				break;
-			    }		
+			    }
 			}
 		    }
 		}
@@ -154,7 +154,7 @@ main(int argc, char **argv)
 
 		/* first slice retrieved OK */
 		if (nc_get_vara(ncid, varid, cor, edg, P_data)) ERR;
-		
+
 		/* In ncdump, reading second slice gets seg fault in
 		 * nc4_open_var_grp(), but this attempt to do all the
 		 * same netCDF calls as ncdump can't duplicate the
@@ -166,7 +166,7 @@ main(int argc, char **argv)
 	}
     }
     if (nc_close(ncid)) ERR;
-      
+
    SUMMARIZE_ERR;
    FINAL_RESULTS;
 }

@@ -434,7 +434,7 @@ ocreadfile(FILE* file, int datastart, char** memp, size_t* lenp)
     fstat(fileno(file),&stats);
     len = stats.st_size;
     len -= datastart;
-    
+
     mem = (char*)calloc(len+1,1);
     if(mem == NULL) return 0;
 
@@ -443,7 +443,7 @@ ocreadfile(FILE* file, int datastart, char** memp, size_t* lenp)
     if(red < len) {
 	fprintf(stderr,"ocreadfile: short file\n");
 	return 0;
-    }	
+    }
     fseek(file,pos,SEEK_SET); /* leave it as we found it*/
     if(memp) *memp = mem;
     if(lenp) *lenp = len;
@@ -553,12 +553,12 @@ ocdumpdatatree(OCstate* state, OCdata* data, OCbytes* buffer, int depth)
         snprintf(tmp,sizeof(tmp),"%04lu ",(unsigned long)data->index);
         ocbytescat(buffer,tmp);
     }
-   
+
     tabto(tabstops[++tabstop],buffer);
 
     /* Dump the mode flags in compact form */
     ocbytescat(buffer,ocdtmodestring(data->datamode,1));
-   
+
     tabto(tabstops[++tabstop],buffer);
 
     /* Dump the size or ninstances */
@@ -613,7 +613,7 @@ ocdumpdatapath(OCstate* state, OCdata* data, OCbytes* buffer)
 	OCdata* next = path[i-1];
 	if(next->container == NULL) break;
 	path[i] = next->container;
-    }    	        
+    }
     /* Path is in reverse order */
     for(i=i-1;i>=0;i--) {
 	pathdata = path[i];
@@ -657,5 +657,5 @@ ocdumpdatapath(OCstate* state, OCdata* data, OCbytes* buffer)
 	ocbytescat(buffer,octypetoddsstring(template->etype));
     }
     snprintf(tmp,sizeof(tmp),"->0x%0lx",(unsigned long)pathdata);
-    ocbytescat(buffer,tmp);	
+    ocbytescat(buffer,tmp);
 }

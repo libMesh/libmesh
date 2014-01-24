@@ -41,7 +41,7 @@ bbNew(void)
   bb->length=0;
   bb->content=NULL;
   bb->nonextendible = 0;
-  return bb;    
+  return bb;
 }
 
 int
@@ -87,7 +87,7 @@ bbFill(Bytebuffer* bb, const char fill)
 {
   unsigned int i;
   if(bb == NULL) return bbFail();
-  for(i=0;i<bb->length;i++) bb->content[i] = fill;  
+  for(i=0;i<bb->length;i++) bb->content[i] = fill;
   return TRUE;
 }
 
@@ -202,8 +202,8 @@ bbHeadpop(Bytebuffer* bb, char* pelem)
   *pelem = bb->content[0];
   memcpy((void*)&bb->content[0],(void*)&bb->content[1],
         sizeof(char)*(bb->length - 1));
-  bb->length--;  
-  return TRUE;  
+  bb->length--;
+  return TRUE;
 }
 
 int
@@ -212,8 +212,8 @@ bbTailpop(Bytebuffer* bb, char* pelem)
   if(bb == NULL) return bbFail();
   if(bb->length == 0) return bbFail();
   *pelem = bb->content[bb->length-1];
-  bb->length--;  
-  return TRUE;  
+  bb->length--;
+  return TRUE;
 }
 
 int
@@ -222,7 +222,7 @@ bbHeadpeek(Bytebuffer* bb, char* pelem)
   if(bb == NULL) return bbFail();
   if(bb->length == 0) return bbFail();
   *pelem = bb->content[0];
-  return TRUE;  
+  return TRUE;
 }
 
 int
@@ -231,7 +231,7 @@ bbTailpeek(Bytebuffer* bb, char* pelem)
   if(bb == NULL) return bbFail();
   if(bb->length == 0) return bbFail();
   *pelem = bb->content[bb->length - 1];
-  return TRUE;  
+  return TRUE;
 }
 
 char*

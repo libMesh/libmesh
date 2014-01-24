@@ -5,7 +5,7 @@ This example writes some surface pressure and temperatures. It is
 intended to illustrate the use of the netCDF C API. The companion
 program sfc_pres_temp_rd.c shows how to read the netCDF data file
 created by this program.
-   
+
 Copyright 2006 University Corporation for Atmospheric
 Research/Unidata.  See COPYRIGHT file for conditions of use.
 */
@@ -68,7 +68,7 @@ main()
 
    /* Loop indexes. */
    int lat, lon;
-   
+
    /* Error handling. */
    int retval;
 
@@ -79,7 +79,7 @@ main()
       lats[lat] = START_LAT + 5.*lat;
    for (lon = 0; lon < NLON; lon++)
       lons[lon] = START_LON + 5.*lon;
-   
+
    for (lat = 0; lat < NLAT; lat++)
       for (lon = 0; lon < NLON; lon++)
       {
@@ -100,10 +100,10 @@ main()
    /* Define coordinate netCDF variables. They will hold the
       coordinate information, that is, the latitudes and longitudes. A
       varid is returned for each.*/
-   if ((retval = nc_def_var(ncid, LAT_NAME, NC_FLOAT, 1, &lat_dimid, 
+   if ((retval = nc_def_var(ncid, LAT_NAME, NC_FLOAT, 1, &lat_dimid,
 			    &lat_varid)))
       ERR(retval);
-   if ((retval = nc_def_var(ncid, LON_NAME, NC_FLOAT, 1, &lon_dimid, 
+   if ((retval = nc_def_var(ncid, LON_NAME, NC_FLOAT, 1, &lon_dimid,
 			    &lon_varid)))
       ERR(retval);
 
@@ -114,10 +114,10 @@ main()
       not use null-terminated strings. In general it is up to the
       reading C program to ensure that it puts null-terminators on
       strings where necessary.*/
-   if ((retval = nc_put_att_text(ncid, lat_varid, UNITS, 
+   if ((retval = nc_put_att_text(ncid, lat_varid, UNITS,
 				 strlen(DEGREES_NORTH), DEGREES_NORTH)))
       ERR(retval);
-   if ((retval = nc_put_att_text(ncid, lon_varid, UNITS, 
+   if ((retval = nc_put_att_text(ncid, lon_varid, UNITS,
 				 strlen(DEGREES_EAST), DEGREES_EAST)))
       ERR(retval);
 
@@ -125,18 +125,18 @@ main()
       the dimids of the dimensions of the variables.*/
    dimids[0] = lat_dimid;
    dimids[1] = lon_dimid;
-   if ((retval = nc_def_var(ncid, PRES_NAME, NC_FLOAT, NDIMS, 
+   if ((retval = nc_def_var(ncid, PRES_NAME, NC_FLOAT, NDIMS,
 			    dimids, &pres_varid)))
       ERR(retval);
-   if ((retval = nc_def_var(ncid, TEMP_NAME, NC_FLOAT, NDIMS, 
+   if ((retval = nc_def_var(ncid, TEMP_NAME, NC_FLOAT, NDIMS,
 			    dimids, &temp_varid)))
       ERR(retval);
 
    /* Define units attributes for vars. */
-   if ((retval = nc_put_att_text(ncid, pres_varid, UNITS, 
+   if ((retval = nc_put_att_text(ncid, pres_varid, UNITS,
 				 strlen(pres_units), pres_units)))
       ERR(retval);
-   if ((retval = nc_put_att_text(ncid, temp_varid, UNITS, 
+   if ((retval = nc_put_att_text(ncid, temp_varid, UNITS,
 				 strlen(temp_units), temp_units)))
       ERR(retval);
 
@@ -162,7 +162,7 @@ main()
    /* Close the file. */
    if ((retval = nc_close(ncid)))
       ERR(retval);
-   
+
    printf("*** SUCCESS writing example file sfc_pres_temp.nc!\n");
    return 0;
 }

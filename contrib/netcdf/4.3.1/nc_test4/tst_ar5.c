@@ -50,7 +50,7 @@ main(int argc, char **argv)
 {
 
 #define BUFSIZE 1000000 /* access data in megabyte sized pieces */
-#define THETAU_FILE "/machine/downloads/AR5_sample_data/thetao_O1.SRESA1B_2.CCSM.ocnm.2000-01_cat_2099-12.nc"   
+#define THETAU_FILE "/machine/downloads/AR5_sample_data/thetao_O1.SRESA1B_2.CCSM.ocnm.2000-01_cat_2099-12.nc"
 #define NDIMS_DATA 4
    printf("\n*** Running some AR-5 benchmarks.\n");
    printf("*** testing various chunksizes for thetau file...\n");
@@ -89,7 +89,7 @@ main(int argc, char **argv)
 /* /\* 	 if (nc_out_vara_double(ncid, varid, start, count, data)) ERR; *\/ */
 /* /\*       } *\/ */
 /* /\*       if (nvals < 0) ERR; *\/ */
-      
+
 /*       if (nc_close(ncid)) ERR; */
 /*       if (nc_close(ncid_out)) ERR; */
    }

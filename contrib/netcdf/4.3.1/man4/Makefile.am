@@ -39,7 +39,7 @@ clean-local:
 	rm -rf $(top_builddir)/man4/man
 	rm -rf $(top_builddir)/man4/html
 	rm -rf $(top_builddir)/man4/latex
-endif 
+endif
 
 # Timestamp to prevent rebuilds.
 doxyfile.stamp:

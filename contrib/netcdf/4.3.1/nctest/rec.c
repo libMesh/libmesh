@@ -211,7 +211,7 @@ test_ncrecinq(path)
 	error("%s: ncrecinq failed to report bad handle", pname);
 	nerrs++;
     }
-    
+
     if (nerrs > 0)
       (void) fprintf(stderr,"FAILED! ***\n");
     else
@@ -276,7 +276,7 @@ recput(ncid, recnum, datap)
 	    if (ncvarput(ncid, rvids[iv], start, edges, datap[iv]) == -1)
 	      return -1;
 	}
-    }    
+    }
     return 0;
 }
 
@@ -313,7 +313,7 @@ recget(ncid, recnum, datap)
 	    if (ncvarget(ncid, rvids[iv], start, edges, datap[iv]) == -1)
 	      return -1;
 	}
-    }    
+    }
     return 0;
 }
 
@@ -400,7 +400,7 @@ test_ncrecput(path)
 	val_fill_zero(vartype[iv], recsize[iv], datar[iv]);
 	zeros[iv] = 0;
     }
-    
+
     if (nrvars > 0) {
 	void *datap0 = datap[0];
 
@@ -556,7 +556,7 @@ test_ncrecget(path)
 	val_fill_zero(vartype[iv], recsize[iv], datar[iv]);
 	zeros[iv] = 0;
     }
-    
+
     if (nrvars > 0) {
 	void *datap0 = datap[0];
 	void *datar0 = datar[0];
@@ -607,7 +607,7 @@ test_ncrecget(path)
       (void) fprintf(stderr,"FAILED! ***\n");
     else
       (void) fprintf(stderr,"ok ***\n");
-    
+
     return nerrs;
 }
 

@@ -20,7 +20,7 @@ Return information about a netCDF attribute.
 The function nc_inq_att returns the attribute's type and length.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID of the attribute's variable, or ::NC_GLOBAL
@@ -49,12 +49,12 @@ foo.nc:
 \code
      #include <netcdf.h>
         ...
-     int  status;             
-     int  ncid;               
-     int  rh_id;              
-     nc_type vr_type, t_type; 
-     size_t  vr_len, t_len;   
-     
+     int  status;
+     int  ncid;
+     int  rh_id;
+     nc_type vr_type, t_type;
+     size_t  vr_len, t_len;
+
         ...
      status = nc_open("foo.nc", NC_NOWRITE, &ncid);
      if (status != NC_NOERR) handle_error(status);
@@ -69,7 +69,7 @@ foo.nc:
 \endcode
 */
 int
-nc_inq_att(int ncid, int varid, const char *name, nc_type *xtypep, 
+nc_inq_att(int ncid, int varid, const char *name, nc_type *xtypep,
 	   size_t *lenp)
 {
    NC* ncp;
@@ -83,13 +83,13 @@ nc_inq_att(int ncid, int varid, const char *name, nc_type *xtypep,
 Find an attribute ID.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID of the attribute's variable, or ::NC_GLOBAL for
 a global attribute.
 
-\param name Attribute \ref object_name. 
+\param name Attribute \ref object_name.
 
 \param idp Pointer to location for returned attribute number that
 specifies which attribute this is for this variable (or which global
@@ -111,7 +111,7 @@ nc_inq_attid(int ncid, int varid, const char *name, int *idp)
 Find the name of an attribute.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID of the attribute's variable, or ::NC_GLOBAL
@@ -123,7 +123,7 @@ number of attributes for the variable, as returned from a call to
 nc_inq_varnatts().
 
 \param name Pointer to the location for the returned attribute \ref
-object_name.  
+object_name.
 */
 int
 nc_inq_attname(int ncid, int varid, int attnum, char *name)
@@ -139,7 +139,7 @@ nc_inq_attname(int ncid, int varid, int attnum, char *name)
 Find number of global or group attributes.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param nattsp Pointer where number of global or group attributes will be
@@ -160,13 +160,13 @@ nc_inq_natts(int ncid, int *nattsp)
 Find the type of an attribute.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID of the attribute's variable, or ::NC_GLOBAL
 for a global or group attribute.
 
-\param name Attribute \ref object_name. 
+\param name Attribute \ref object_name.
 
 \param xtypep Pointer to location for returned attribute \ref data_type.
 */
@@ -184,17 +184,17 @@ nc_inq_atttype(int ncid, int varid, const char *name, nc_type *xtypep)
 Find the length of an attribute.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID of the attribute's variable, or ::NC_GLOBAL
 for a global or group attribute.
 
-\param name Attribute \ref object_name. 
+\param name Attribute \ref object_name.
 
 \param lenp Pointer to location for returned number of values
 currently stored in the attribute. Before using the value as a C
-string, make sure it is null-terminated. \ref ignored_if_null.  
+string, make sure it is null-terminated. \ref ignored_if_null.
 */
 int
 nc_inq_attlen(int ncid, int varid, const char *name, size_t *lenp)

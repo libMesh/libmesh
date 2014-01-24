@@ -1,7 +1,7 @@
 /*********************************************************************
  *   Copyright 2011, University Corporation for Atmospheric Research
  *   See netcdf/COPYRIGHT file for copying and redistribution conditions.
- *   
+ *
  *   Stuff that's common to both ncdump and nccopy
  *
  *********************************************************************/
@@ -40,7 +40,7 @@ typedef struct grpnode {
     struct grpnode *next;
 } grpnode_t;
 
-/* 
+/*
  * The opaque structure to hold state of iteration over groups.
  * (Just implemented as a stack of group ids.)
  */
@@ -121,7 +121,7 @@ extern void make_lvars(char *optarg, int *nlvarsp, char ***lvarsp);
 /* Make list of groups from comma-delimited string */
 extern void make_lgrps(char *optarg, int *nlgrpsp, char*** lgrpsp, idnode_t **grpidsp);
 
-/* 
+/*
  * Simplest interface for group iteration: get total number of groups
  * (including all descendant groups, recursively) and all group ids
  * for start group and its descendants, in preorder.  Note that this
@@ -130,13 +130,13 @@ extern void make_lgrps(char *optarg, int *nlgrpsp, char*** lgrpsp, idnode_t **gr
  */
 extern int nc_inq_grps_full(int ncid, int *numgrps, int *ncids);
 
-/* 
+/*
  * More complex iterator interface: get group iterator for start group
  * ncid and all its descendant groups.
  */
 extern int nc_get_giter(int ncid, ncgiter_t **iterp);
 
-/* 
+/*
  * Get group id of next group.  On first call returns start group,
  * subsequently returns other subgroup ids in preorder.  Returns grpid
  * of 0 (never an actual group number) when no more groups.

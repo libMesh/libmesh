@@ -264,7 +264,7 @@ sorttriplestore(void)
 	nsorted++;
       if(ocdebug > 2)
             ocdodsrcdump("pass:",sorted,nsorted);
-    }    
+    }
 
     memcpy((void*)ocdodsrc->triples,(void*)sorted,sizeof(struct OCTriple)*nsorted);
     free(sorted);
@@ -305,7 +305,7 @@ ocdodsrc_read(char* basename, char* path)
 	if(linecount >= MAXRCLINES) {
 	    oclog(OCLOGERR, ".dodsrc has too many lines");
 	    return 0;
-	}	    	
+	}
 	line = line0;
 	/* check for comment */
         if (line[0] == '#') continue;
@@ -314,7 +314,7 @@ ocdodsrc_read(char* basename, char* path)
 	if(strlen(line) >= MAXRCLINESIZE) {
 	    oclog(OCLOGERR, "%s line too long: %s",basename,line0);
 	    return 0;
-	}	    	
+	}
         /* parse the line */
 	ocdodsrc->triples[ocdodsrc->ntriples].url[0] = '\0'; /*assume no url*/
 	if(line[0] == LTAG) {
@@ -323,7 +323,7 @@ ocdodsrc_read(char* basename, char* path)
 	    if(rtag == NULL) {
 		oclog(OCLOGERR, "Malformed [url] in %s entry: %s",basename,line);
 		continue;
-	    }	    
+	    }
 	    line = rtag + 1;
 	    *rtag = '\0';
 	    /* trim again */
@@ -469,13 +469,13 @@ ocdodsrc_process(OCstate* state)
         state->creds.password = strdup(TRIM(value));
         if(!state->creds.password) {stat = OC_ENOMEM; goto done;}
     }
-    /* else ignore */    
+    /* else ignore */
 
 done:
     if(url != NULL) free(url);
     return stat;
 }
-    
+
 char*
 ocdodsrc_lookup(char* key, char* url)
 {
@@ -501,7 +501,7 @@ ocdodsrc_lookup(char* key, char* url)
 	if(found) {
 	    fprintf(stderr,"lookup %s: [%s]%s = %s\n",url,triple->url,triple->key,triple->value);
 	}
-    }    
+    }
     return (found ? triple->value : NULL);
 }
 

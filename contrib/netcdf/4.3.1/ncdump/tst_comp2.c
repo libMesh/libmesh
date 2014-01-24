@@ -47,21 +47,21 @@ main(int argc, char **argv)
 
    struct vecmat_t data[DIM_LEN] = {
        {
-	   'S', 
+	   'S',
 	   "jan",
-	   {1, 2, 3}, 
+	   {1, 2, 3},
 	   {{4, 5, 6}, {7, 8, 9}}
        },
        {
-	   'M', 
+	   'M',
 	   "feb",
-	   {11, 12, 13}, 
+	   {11, 12, 13},
 	   {{4.25, 5.25, 6.25}, {7.25, 8.25, 9.25}}
        },
        {
-	   'T', 
+	   'T',
 	   "mar",
-	   {21, 22, 23}, 
+	   {21, 22, 23},
 	   {{4.5, 5.5, 6.5}, {7.5, 8.5, 9.5}}
        }
    };
@@ -69,7 +69,7 @@ main(int argc, char **argv)
    struct vecmat_t missing_val = {
        '?',
        "---",
-       {-1, -2, -3}, 
+       {-1, -2, -3},
        {{-4.0f, -5.0f, -6.0f}, {-7.0f, -8.0f, -9.0f}}
    };
    struct vecmat_t val_in;
@@ -93,10 +93,10 @@ main(int argc, char **argv)
 				NC_COMPOUND_OFFSET(struct vecmat_t, mon),
 				NC_CHAR, 1, mon_sizes)) ERR;
    if (nc_insert_array_compound(ncid, typeid, "vect",
-				NC_COMPOUND_OFFSET(struct vecmat_t, vec), 
+				NC_COMPOUND_OFFSET(struct vecmat_t, vec),
 				NC_SHORT, 1, vec_sizes)) ERR;
    if (nc_insert_array_compound(ncid, typeid, "matr",
-				NC_COMPOUND_OFFSET(struct vecmat_t, mat), 
+				NC_COMPOUND_OFFSET(struct vecmat_t, mat),
 				NC_FLOAT, 2, mat_sizes)) ERR;
 
    /* Declare a dimension for number of obs */
@@ -117,19 +117,19 @@ main(int argc, char **argv)
    if (nc_close(ncid)) ERR;
 
    /* Check it out. */
-   
+
    /* Reopen the file. */
    if (nc_open(FILE9_NAME, NC_NOWRITE, &ncid)) ERR;
 
    /* Get info with the generic inquire for user-defined types */
-   if (nc_inq_user_type(ncid, typeid, name_in, NULL, NULL, 
+   if (nc_inq_user_type(ncid, typeid, name_in, NULL, NULL,
 			NULL, &class_in)) ERR;
-   if (strcmp(name_in, TYPE_NAME) || 
+   if (strcmp(name_in, TYPE_NAME) ||
        class_in != NC_COMPOUND) ERR;
 
    /* Get the same info with the compound-specific inquire function */
    if (nc_inq_compound(ncid, typeid, name_in, &size_in, &nfields_in)) ERR;
-   if (strcmp(name_in, TYPE_NAME) || 
+   if (strcmp(name_in, TYPE_NAME) ||
        size_in != sizeof(struct vecmat_t) ||
        nfields_in != NFIELDS) ERR;
 
@@ -166,9 +166,9 @@ main(int argc, char **argv)
 	   }
        }
    }
-   
-   if (nc_close(ncid)) ERR; 
-   
+
+   if (nc_close(ncid)) ERR;
+
    SUMMARIZE_ERR;
    FINAL_RESULTS;
 }

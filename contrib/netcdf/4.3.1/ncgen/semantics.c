@@ -99,7 +99,7 @@ locate(Symbol* refsym)
 		if(sym != NULL) break;
 		parent = parent->container;
 	    }
-	}		
+	}
 	break;
     case NC_TYPE:
 	if(refsym->is_prefixed) {
@@ -130,7 +130,7 @@ locate(Symbol* refsym)
 	    if(sym == NULL) {
 	        sym = uniquetreelocate(refsym,rootgroup); /* want unique */
 	    }
-	}		
+	}
 	break;
     case NC_VAR:
 	if(refsym->is_prefixed) {
@@ -140,7 +140,7 @@ locate(Symbol* refsym)
 	    Symbol* parent = lookupgroup(refsym->prefix);/*get group for refsym*/
    	    /* search this parent for matching name and type*/
 	    sym = lookupingroup(NC_VAR,refsym->name,parent);
-	}		
+	}
         break;
     case NC_GRP:
 	if(refsym->is_prefixed) {
@@ -150,7 +150,7 @@ locate(Symbol* refsym)
  	    Symbol* parent = lookupgroup(refsym->prefix);/*get group for refsym*/
    	    /* search this parent for matching name and type*/
 	    sym = lookupingroup(NC_GRP,refsym->name,parent);
-	}		
+	}
 	break;
 
     default: PANIC1("locate: bad refsym type: %d",refsym->objectclass);
@@ -163,7 +163,7 @@ locate(Symbol* refsym)
 	    ncname = ncclassname(refsym->objectclass);
 	fdebug("locate: %s: %s -> %s\n",
 		ncname,fullname(refsym),(sym?fullname(sym):"NULL"));
-    }   
+    }
     return sym;
 }
 
@@ -184,7 +184,7 @@ uniquetreelocate(Symbol* refsym, Symbol* root)
 	    if(grp->objectclass == NC_GRP && !grp->ref.is_ref) {
 		Symbol* nextsym = uniquetreelocate(refsym,grp);
 		if(nextsym != NULL) {
-		    if(sym != NULL) return NULL; /* not unique */	
+		    if(sym != NULL) return NULL; /* not unique */
 		    sym = nextsym;
 		}
 	    }
@@ -277,14 +277,14 @@ processtypes(void)
 	    break;
         case NC_VLEN: /* keep if its basetype is primitive*/
 	    if(sym->typ.basetype->subclass == NC_PRIM) keep=1;
-	    break;	    	
+	    break;
 	case NC_COMPOUND: /* keep if all fields are primitive*/
 	    keep=1; /*assume all fields are primitive*/
 	    for(j=0;j<listlength(sym->subnodes);j++) {
 		Symbol* field = (Symbol*)listget(sym->subnodes,j);
 		ASSERT(field->subclass == NC_FIELD);
 		if(field->typ.basetype->subclass != NC_PRIM) {keep=0;break;}
-	    }	  
+	    }
 	    break;
 	default: break;/* ignore*/
 	}
@@ -292,7 +292,7 @@ processtypes(void)
 	    sym->touched = 1;
 	    listpush(sorted,(void*)sym);
 	}
-    }	
+    }
     /* 2. repeated walk to collect level i types*/
     do {
         added=0;
@@ -301,29 +301,29 @@ processtypes(void)
 	    if(sym->touched) continue; /* ignore already processed types*/
 	    keep=0; /* assume not addable yet.*/
 	    switch (sym->subclass) {
-	    case NC_PRIM: 
+	    case NC_PRIM:
 	    case NC_OPAQUE:
 	    case NC_ENUM:
 		PANIC("type re-touched"); /* should never happen*/
 	        break;
             case NC_VLEN: /* keep if its basetype is already processed*/
 	        if(sym->typ.basetype->touched) keep=1;
-	        break;	    	
+	        break;
 	    case NC_COMPOUND: /* keep if all fields are processed*/
 	        keep=1; /*assume all fields are touched*/
 	        for(j=0;j<listlength(sym->subnodes);j++) {
 		    Symbol* field = (Symbol*)listget(sym->subnodes,j);
 		    ASSERT(field->subclass == NC_FIELD);
 		    if(!field->typ.basetype->touched) {keep=1;break;}
-	        }	  
+	        }
 	        break;
-	    default: break;				
+	    default: break;
 	    }
 	    if(keep) {
 		listpush(sorted,(void*)sym);
 		sym->touched = 1;
 		added++;
-	    }	    
+	    }
 	}
     } while(added > 0);
     /* Any untouched type => circular dependency*/
@@ -354,16 +354,16 @@ tagvlentypes(Symbol* tsym)
     int tagged = 0;
     int j;
     switch (tsym->subclass) {
-        case NC_VLEN: 
+        case NC_VLEN:
 	    tagged = 1;
 	    tagvlentypes(tsym->typ.basetype);
-	    break;	    	
+	    break;
 	case NC_COMPOUND: /* keep if all fields are primitive*/
 	    for(j=0;j<listlength(tsym->subnodes);j++) {
 		Symbol* field = (Symbol*)listget(tsym->subnodes,j);
 		ASSERT(field->subclass == NC_FIELD);
 		if(tagvlentypes(field->typ.basetype)) tagged = 1;
-	    }	  
+	    }
 	    break;
 	default: break;/* ignore*/
     }
@@ -376,7 +376,7 @@ static void
 filltypecodes(void)
 {
     Symbol* sym;
-    for(sym=symlist;sym != NULL;sym = sym->next) {    
+    for(sym=symlist;sym != NULL;sym = sym->next) {
 	if(sym->typ.basetype != NULL && sym->typ.typecode == NC_NAT)
 	    sym->typ.typecode = sym->typ.basetype->typ.typecode;
     }
@@ -396,7 +396,7 @@ processenums(void)
 	    ASSERT(esym->subclass == NC_ECONST);
 	    listpush(enumids,(void*)esym);
 	}
-    }	    
+    }
     /* Convert enum values to match enum type*/
     for(i=0;i<listlength(typdefs);i++) {
 	Symbol* tsym = (Symbol*)listget(typdefs,i);
@@ -409,7 +409,7 @@ processenums(void)
 	    newec.nctype = esym->typ.typecode;
 	    convert1(&esym->typ.econst,&newec);
 	    esym->typ.econst = newec;
-	}	
+	}
     }
 }
 
@@ -539,7 +539,7 @@ findecmatches(char* ident)
 	ec = checkeconst(en,ident);
 	if(ec != NULL)
 	    listpush(matches,ec);
-	/* Second, do the prefix check */	
+	/* Second, do the prefix check */
 	len = strlen(en->name);
 	if(strncmp(ident,en->name,len) == 0) {
 		Symbol *ec;
@@ -554,7 +554,7 @@ findecmatches(char* ident)
 	listfree(matches);
         matches = NULL;
     }
-    return matches;    
+    return matches;
 }
 
 static List*
@@ -632,7 +632,7 @@ computesize(Symbol* tsym)
 		computesize(field);
 		/* alignment of struct is same as alignment of first field*/
 		if(i==0) tsym->typ.alignment = field->typ.alignment;
-	    }	  
+	    }
 	    /* now compute the size of the compound based on*/
 	    /* what user specified*/
 	    offset = 0;
@@ -683,7 +683,7 @@ processvars(void)
 	        if(usingclassic && j != 0)
 		    semerror(vsym->lineno,"Variable: %s: UNLIMITED must be in first dimension only",fullname(vsym));
 	    }
-	}	
+	}
     }
 }
 
@@ -759,7 +759,7 @@ processattributes(void)
         for(j=0;j<listlength(attdefs);j++) {
 	    Symbol* asym = (Symbol*)listget(attdefs,j);
 	    ASSERT(asym->att.var != NULL);
-	    if(asym->att.var != vsym) continue;	    
+	    if(asym->att.var != vsym) continue;
             listpush(list,(void*)asym);
 	}
 	vsym->var.attributes = list;
@@ -785,7 +785,7 @@ inferattributetype1(Datasrc* src)
 	    srcpush(src);
 	    result = inferattributetype1(src);
 	    srcpop(src);
-	} else {	
+	} else {
 	    NCConstant* con = srcnext(src);
 	    if(isprimplus(con->nctype)) result = con->nctype;
 	    /* else keep looking*/
@@ -808,7 +808,7 @@ inferattributetype(Symbol* asym)
 	return;
     }
     src = datalist2src(datalist);
-    nctype = inferattributetype1(src);    
+    nctype = inferattributetype1(src);
     freedatasrc(src);
     /* get the corresponding primitive type built-in symbol*/
     /* special case for string*/
@@ -820,7 +820,7 @@ inferattributetype(Symbol* asym)
 	switch (nctype) {
 	case NC_UBYTE:
 	    nctype = NC_SHORT;
-	    break;	
+	    break;
 	case NC_USHORT:
 	case NC_UINT:
 	case NC_INT64:
@@ -992,7 +992,7 @@ computeunlimitedsizes(Dimset* dimset, int dimindex, Datalist* data, int ischar)
     int nextunlim,lastunlim;
     Symbol* thisunlim = dimset->dimsyms[dimindex];
     size_t length;
-    
+
     ASSERT(thisunlim->dim.isunlimited);
     nextunlim = findunlimited(dimset,dimindex+1);
     lastunlim = (nextunlim == dimset->ndims);

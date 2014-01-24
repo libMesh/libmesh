@@ -14,7 +14,7 @@
 #define NUM_DIMS 1
 #define NUM_ATTS 20
 #define NUM_VARS 20
-#define ATT_LEN 30      
+#define ATT_LEN 30
 #define VAR_LEN 4
 
 int att_data[ATT_LEN];
@@ -29,7 +29,7 @@ write_atts(int ncid, int varid)
    for (a = 0; a < NUM_ATTS; a++)
    {
       sprintf(att_name, "att_%d", a);
-      if (nc_put_att_int(ncid, varid, att_name, NC_INT, 
+      if (nc_put_att_int(ncid, varid, att_name, NC_INT,
 			 ATT_LEN, att_data)) ERR_RET;
    }
    return NC_NOERR;
@@ -45,11 +45,11 @@ read_atts(int ncid, int varid)
    for (a = 0; a < NUM_ATTS; a++)
    {
       sprintf(att_name, "att_%d", a);
-      if (nc_get_att_int(ncid, varid, att_name, 
+      if (nc_get_att_int(ncid, varid, att_name,
 			 att_data_in)) ERR_RET;
       for (i = 0; i < ATT_LEN; i++)
 	 if (att_data_in[i] != att_data[i]) ERR_RET;
-      
+
    }
    return NC_NOERR;
 }
@@ -67,10 +67,10 @@ write_vars(int ncid)
    for (v = 0; v < NUM_VARS; v++)
    {
       sprintf(var_name, "var_%d", v);
-      if (nc_def_var(ncid, var_name, NC_INT, NUM_DIMS, 
+      if (nc_def_var(ncid, var_name, NC_INT, NUM_DIMS,
 		     dimid, NULL)) ERR_RET;
       write_atts(ncid, v);
-      if (nc_put_var_int(ncid, v, var_data)) ERR;      
+      if (nc_put_var_int(ncid, v, var_data)) ERR;
    }
    return NC_NOERR;
 }
@@ -86,16 +86,16 @@ read_vars(int ncid)
 
    for (v = 0; v < NUM_VARS; v++)
    {
-      if (nc_inq_var(ncid, v, var_name_in, &xtype_in, &ndims_in, 
+      if (nc_inq_var(ncid, v, var_name_in, &xtype_in, &ndims_in,
 		     NULL, &natts_in)) ERR_RET;
       sprintf(var_name, "var_%d", v);
-      if (strcmp(var_name, var_name_in) || xtype_in != NC_INT || 
+      if (strcmp(var_name, var_name_in) || xtype_in != NC_INT ||
 		 ndims_in != NUM_DIMS || natts_in != NUM_ATTS) ERR_RET;
       read_atts(ncid, v);
       if (nc_get_var_int(ncid, v, var_data_in)) ERR;
       for (i = 0; i < VAR_LEN; i++)
 	 if (var_data_in[i] != var_data[i]) ERR_RET;
-      
+
    }
    return NC_NOERR;
 }
@@ -115,7 +115,7 @@ main(int argc, char **argv)
 	 att_data[i] = i;
       for (i = 0; i < VAR_LEN; i++)
 	 var_data[i] = i;
-      
+
       /* Create a file that will activate the bug in HDF5 1.8.4. */
       if (nc_create(FILE_NAME, NC_CLOBBER|NC_NETCDF4, &ncid)) ERR;
       if (write_atts(ncid, NC_GLOBAL)) ERR;
@@ -125,7 +125,7 @@ main(int argc, char **argv)
       /* Open the file and check it. */
       if (nc_open(FILE_NAME, 0, &ncid)) ERR;
       if (nc_inq(ncid, &ndims_in, &nvars_in, &natts_in, &unlimdim_in)) ERR;
-      if (ndims_in != NUM_DIMS || nvars_in != NUM_VARS || 
+      if (ndims_in != NUM_DIMS || nvars_in != NUM_VARS ||
 	  natts_in != NUM_ATTS || unlimdim_in != -1) ERR;
       if (read_atts(ncid, NC_GLOBAL)) ERR;
       if (read_vars(ncid)) ERR;
@@ -152,7 +152,7 @@ main(int argc, char **argv)
       printf("*** testing with file %s...", file_in);
       if (nc_open(file_in, 0, &ncid)) ERR;
       if (nc_inq(ncid, &ndims_in, &nvars_in, &natts_in, &unlimdim_in)) ERR;
-      if (ndims_in != NUM_DIMS || nvars_in != NUM_VARS || 
+      if (ndims_in != NUM_DIMS || nvars_in != NUM_VARS ||
 	  natts_in != NUM_ATTS || unlimdim_in != -1) ERR;
       if (read_atts(ncid, NC_GLOBAL)) ERR;
       if (read_vars(ncid)) ERR;

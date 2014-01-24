@@ -54,10 +54,10 @@ int   filelike; /* 1=>this protocol has no host, user+pwd, or port */
 };
 
 /* Allowable character sets for encode */
-static char* fileallow = 
+static char* fileallow =
 "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$&'()*+,-./:;=?@_~";
 
-static char* queryallow = 
+static char* queryallow =
 "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$&'()*+,-./:;=?@_~";
 
 /* Forward */
@@ -95,7 +95,7 @@ ncuriparse(const char* uri0, NCURI** durip)
     duri = (NCURI*)calloc(1,sizeof(NCURI));
     if(duri == NULL)
 	{THROW(2); goto fail;}
-	
+
     /* save original uri */
     duri->uri = nulldup(uri0);
 
@@ -109,7 +109,7 @@ ncuriparse(const char* uri0, NCURI** durip)
        first char is guaranteed to be '\0' */
 
     duri->strings = uri;
-    uri++; 
+    uri++;
 
     /* dup the incoming url */
     strcpy(uri,uri0);
@@ -122,7 +122,7 @@ ncuriparse(const char* uri0, NCURI** durip)
     for(p=uri;*p;p++) {
 	if(*p == '\\' || *p < ' ')
 	    nclshift1(p); /* compress out */
-    }	
+    }
 
     p = uri;
 
@@ -149,7 +149,7 @@ ncuriparse(const char* uri0, NCURI** durip)
     }
 
     /* Tag the protocol */
-    protocol = p;    
+    protocol = p;
     p = strchr(p,':');
     if(!p)
 	{THROW(5); goto fail;}
@@ -162,7 +162,7 @@ ncuriparse(const char* uri0, NCURI** durip)
     for(i=0;i<nprotos;i++) {
         if(strcmp(protocol,legalprotocols[i].name)==0) {
 	    proto = &legalprotocols[i];
-	    break;	    
+	    break;
 	}
     }
     if(proto == NULL)
@@ -195,7 +195,7 @@ ncuriparse(const char* uri0, NCURI** durip)
 	    file = p+1; /* +1 becauseof the shift */
 	}
     }
-    
+
     /* If you shift in the code below, you must reset file beginning */
 
     if(host != NULL) {/* Parse the host section */
@@ -246,7 +246,7 @@ ncuriparse(const char* uri0, NCURI** durip)
     p = nclocate(p,"?#");
     if(p != NULL) { /* we have constraint and/or suffixparams */
 	char* fileend = p; /* save the end of the file section */
-	char* constraintend = NULL; 
+	char* constraintend = NULL;
 	if(*p == '?')
             constraint = p+1;
 	else
@@ -295,7 +295,7 @@ ncuriparse(const char* uri0, NCURI** durip)
     }
 
     /* do last minute empty check */
-    
+
     if(protocol != NULL && *protocol == EOFCHAR) protocol = NULL;
     if(user != NULL && *user == EOFCHAR) user = NULL;
     if(pwd != NULL && *pwd == EOFCHAR) pwd = NULL;
@@ -344,7 +344,7 @@ ncuriparse(const char* uri0, NCURI** durip)
         fprintf(stderr,"\n");
     }
 #endif
-    if(durip != NULL) 
+    if(durip != NULL)
       *durip = duri;
     else
       ncurifree(duri);
@@ -383,8 +383,8 @@ ncurisetconstraints(NCURI* duri,const char* constraints)
     if(duri->constraint != NULL) free(duri->constraint);
     if(duri->projection != NULL) free(duri->projection);
     if(duri->selection != NULL) free(duri->selection);
-    duri->constraint = NULL;	
-    duri->projection = NULL;	
+    duri->constraint = NULL;
+    duri->projection = NULL;
     duri->selection = NULL;
 
     if(constraints == NULL || strlen(constraints)==0) return;
@@ -457,7 +457,7 @@ ncuribuild(NCURI* duri, const char* prefix, const char* suffix, int flags)
     if(duri->port != NULL) {
 	len += (NILLEN(":")+NILLEN(duri->port));
     }
-    
+
     tmpfile = duri->file;
     if(encode)
 	tmpfile = ncuriencode(tmpfile,fileallow);
@@ -481,7 +481,7 @@ ncuribuild(NCURI* duri, const char* prefix, const char* suffix, int flags)
 	char** p;
 	if(duri->paramlist == NULL)
 	    if(!ncuridecodeparams(duri))
-		return NULL;		
+		return NULL;
 	for(paramslen=0,nparams=0,p=duri->paramlist;*p;p++) {
 	    nparams++;
 	    paramslen += NILLEN(*p);
@@ -496,7 +496,7 @@ ncuribuild(NCURI* duri, const char* prefix, const char* suffix, int flags)
     }
 
     len += 1; /* null terminator */
-    
+
     newuri = (char*)malloc(len);
     if(newuri == NULL) return NULL;
 
@@ -511,11 +511,11 @@ ncuribuild(NCURI* duri, const char* prefix, const char* suffix, int flags)
     if(withuserpwd) {
         strcat(newuri,duri->user);
         strcat(newuri,":");
-        strcat(newuri,duri->password);	
+        strcat(newuri,duri->password);
         strcat(newuri,"@");
     }
     if(duri->host != NULL) { /* may be null if using file: protocol */
-        strcat(newuri,duri->host);	
+        strcat(newuri,duri->host);
     }
     if(duri->port != NULL) {
         strcat(newuri,":");
@@ -609,7 +609,7 @@ ncuridecodeparams(NCURI* ncuri)
 	/*break up the ith param*/
 	vp = strchr(cp,'=');
 	if(vp != NULL) {*vp = EOFCHAR; vp++;} else {vp = "";}
-	plist[2*i] = nulldup(cp);	
+	plist[2*i] = nulldup(cp);
 	plist[2*i+1] = nulldup(vp);
 	cp = next;
     }
@@ -799,7 +799,7 @@ ncuridecodeonly(char* s, char* only)
     char* outptr;
     char* inptr;
     unsigned int c;
-    
+
     if (s == NULL) return NULL;
 
     slen = strlen(s);

@@ -52,7 +52,7 @@
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types. 
+ * if you want the limit (max/min) macros for int types.
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -69,7 +69,7 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t; 
+typedef unsigned char flex_uint8_t;
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 #endif /* ! C99 */
@@ -180,7 +180,7 @@ extern FILE *ncgin, *ncgout;
 #define EOB_ACT_LAST_MATCH 2
 
     #define YY_LESS_LINENO(n)
-    
+
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
 	do \
@@ -242,7 +242,7 @@ struct yy_buffer_state
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
-    
+
 	/* Whether to try to fill the input buffer when we reach the
 	 * end of it.
 	 */
@@ -866,7 +866,7 @@ char errstr[100];		/* for short error messages */
 #include "ncgentab.h"
 
 #define YY_BREAK                /* defining as nothing eliminates unreachable
-				   statement warnings from flex output, 
+				   statement warnings from flex output,
                                    but make sure every action ends with
                                    "return" or "break"! */
 
@@ -969,7 +969,7 @@ extern int ncgwrap (void );
 #endif
 
     static void yyunput (int c,char *buf_ptr  );
-    
+
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char *,yyconst char *,int );
 #endif
@@ -1090,7 +1090,7 @@ YY_DECL
 	register yy_state_type yy_current_state;
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
-    
+
 #line 107 "ncgen.l"
 
 #line 1097 "lex.ncg.c"
@@ -1179,7 +1179,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 108 "ncgen.l"
-{ /* comment */ 
+{ /* comment */
                           break;
                         }
 	YY_BREAK
@@ -1454,8 +1454,8 @@ YY_RULE_SETUP
 case 28:
 YY_RULE_SETUP
 #line 278 "ncgen.l"
-{ /* whitespace */ 
-		  break;        
+{ /* whitespace */
+		  break;
 		}
 	YY_BREAK
 case 29:
@@ -1748,7 +1748,7 @@ static int yy_get_next_buffer (void)
 {
 	register yy_state_type yy_current_state;
 	register char *yy_cp;
-    
+
 	yy_current_state = (yy_start);
 
 	for ( yy_cp = (yytext_ptr) + YY_MORE_ADJ; yy_cp < (yy_c_buf_p); ++yy_cp )
@@ -1802,7 +1802,7 @@ static int yy_get_next_buffer (void)
     static void yyunput (int c, register char * yy_bp )
 {
 	register char *yy_cp;
-    
+
     yy_cp = (yy_c_buf_p);
 
 	/* undo effects of setting up ncgtext */
@@ -1845,7 +1845,7 @@ static int yy_get_next_buffer (void)
 
 {
 	int c;
-    
+
 	*(yy_c_buf_p) = (yy_hold_char);
 
 	if ( *(yy_c_buf_p) == YY_END_OF_BUFFER_CHAR )
@@ -1912,12 +1912,12 @@ static int yy_get_next_buffer (void)
 
 /** Immediately switch to a different input stream.
  * @param input_file A readable stream.
- * 
+ *
  * @note This function does not reset the start condition to @c INITIAL .
  */
     void ncgrestart  (FILE * input_file )
 {
-    
+
 	if ( ! YY_CURRENT_BUFFER ){
         ncgensure_buffer_stack ();
 		YY_CURRENT_BUFFER_LVALUE =
@@ -1930,11 +1930,11 @@ static int yy_get_next_buffer (void)
 
 /** Switch to a different input buffer.
  * @param new_buffer The new input buffer.
- * 
+ *
  */
     void ncg_switch_to_buffer  (YY_BUFFER_STATE  new_buffer )
 {
-    
+
 	/* TODO. We should be able to replace this entire function body
 	 * with
 	 *		ncgpop_buffer_state();
@@ -1974,13 +1974,13 @@ static void ncg_load_buffer_state  (void)
 /** Allocate and initialize an input buffer state.
  * @param file A readable stream.
  * @param size The character buffer size in bytes. When in doubt, use @c YY_BUF_SIZE.
- * 
+ *
  * @return the allocated buffer state.
  */
     YY_BUFFER_STATE ncg_create_buffer  (FILE * file, int  size )
 {
 	YY_BUFFER_STATE b;
-    
+
 	b = (YY_BUFFER_STATE) ncgalloc(sizeof( struct yy_buffer_state )  );
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in ncg_create_buffer()" );
@@ -2003,11 +2003,11 @@ static void ncg_load_buffer_state  (void)
 
 /** Destroy the buffer.
  * @param b a buffer created with ncg_create_buffer()
- * 
+ *
  */
     void ncg_delete_buffer (YY_BUFFER_STATE  b )
 {
-    
+
 	if ( ! b )
 		return;
 
@@ -2023,7 +2023,7 @@ static void ncg_load_buffer_state  (void)
 #ifndef __cplusplus
 extern int isatty (int );
 #endif /* __cplusplus */
-    
+
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a ncgrestart() or at EOF.
@@ -2032,7 +2032,7 @@ extern int isatty (int );
 
 {
 	int oerrno = errno;
-    
+
 	ncg_flush_buffer(b );
 
 	b->yy_input_file = file;
@@ -2048,13 +2048,13 @@ extern int isatty (int );
     }
 
         b->yy_is_interactive = file ? (isatty( fileno(file) ) > 0) : 0;
-    
+
 	errno = oerrno;
 }
 
 /** Discard all buffered characters. On the next scan, YY_INPUT will be called.
  * @param b the buffer state to be flushed, usually @c YY_CURRENT_BUFFER.
- * 
+ *
  */
     void ncg_flush_buffer (YY_BUFFER_STATE  b )
 {
@@ -2083,7 +2083,7 @@ extern int isatty (int );
  *  the current state. This function will allocate the stack
  *  if necessary.
  *  @param new_buffer The new state.
- *  
+ *
  */
 void ncgpush_buffer_state (YY_BUFFER_STATE new_buffer )
 {
@@ -2113,7 +2113,7 @@ void ncgpush_buffer_state (YY_BUFFER_STATE new_buffer )
 
 /** Removes and deletes the top of the stack, if present.
  *  The next element becomes the new top.
- *  
+ *
  */
 void ncgpop_buffer_state (void)
 {
@@ -2137,7 +2137,7 @@ void ncgpop_buffer_state (void)
 static void ncgensure_buffer_stack (void)
 {
 	int num_to_alloc;
-    
+
 	if (!(yy_buffer_stack)) {
 
 		/* First allocation is just for 2 elements, since we don't know if this
@@ -2150,9 +2150,9 @@ static void ncgensure_buffer_stack (void)
 								);
 		if ( ! (yy_buffer_stack) )
 			YY_FATAL_ERROR( "out of dynamic memory in ncgensure_buffer_stack()" );
-								  
+
 		memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state*));
-				
+
 		(yy_buffer_stack_max) = num_to_alloc;
 		(yy_buffer_stack_top) = 0;
 		return;
@@ -2180,13 +2180,13 @@ static void ncgensure_buffer_stack (void)
 /** Setup the input buffer state to scan directly from a user-specified character buffer.
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
- * 
- * @return the newly allocated buffer state object. 
+ *
+ * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE ncg_scan_buffer  (char * base, yy_size_t  size )
 {
 	YY_BUFFER_STATE b;
-    
+
 	if ( size < 2 ||
 	     base[size-2] != YY_END_OF_BUFFER_CHAR ||
 	     base[size-1] != YY_END_OF_BUFFER_CHAR )
@@ -2215,14 +2215,14 @@ YY_BUFFER_STATE ncg_scan_buffer  (char * base, yy_size_t  size )
 /** Setup the input buffer state to scan a string. The next call to ncglex() will
  * scan from a @e copy of @a str.
  * @param yystr a NUL-terminated string to scan
- * 
+ *
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
  *       ncg_scan_bytes() instead.
  */
 YY_BUFFER_STATE ncg_scan_string (yyconst char * yystr )
 {
-    
+
 	return ncg_scan_bytes(yystr,strlen(yystr) );
 }
 
@@ -2230,7 +2230,7 @@ YY_BUFFER_STATE ncg_scan_string (yyconst char * yystr )
  * scan from a @e copy of @a bytes.
  * @param bytes the byte buffer to scan
  * @param len the number of bytes in the buffer pointed to by @a bytes.
- * 
+ *
  * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE ncg_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
@@ -2239,7 +2239,7 @@ YY_BUFFER_STATE ncg_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
 	char *buf;
 	yy_size_t n;
 	int i;
-    
+
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
 	buf = (char *) ncgalloc(n  );
@@ -2293,16 +2293,16 @@ static void yy_fatal_error (yyconst char* msg )
 /* Accessor  methods (get/set functions) to struct members. */
 
 /** Get the current line number.
- * 
+ *
  */
 int ncgget_lineno  (void)
 {
-        
+
     return ncglineno;
 }
 
 /** Get the input stream.
- * 
+ *
  */
 FILE *ncgget_in  (void)
 {
@@ -2310,7 +2310,7 @@ FILE *ncgget_in  (void)
 }
 
 /** Get the output stream.
- * 
+ *
  */
 FILE *ncgget_out  (void)
 {
@@ -2318,7 +2318,7 @@ FILE *ncgget_out  (void)
 }
 
 /** Get the length of the current token.
- * 
+ *
  */
 int ncgget_leng  (void)
 {
@@ -2326,7 +2326,7 @@ int ncgget_leng  (void)
 }
 
 /** Get the current token.
- * 
+ *
  */
 
 char *ncgget_text  (void)
@@ -2336,18 +2336,18 @@ char *ncgget_text  (void)
 
 /** Set the current line number.
  * @param line_number
- * 
+ *
  */
 void ncgset_lineno (int  line_number )
 {
-    
+
     ncglineno = line_number;
 }
 
 /** Set the input stream. This does not discard the current
  * input buffer.
  * @param in_str A readable stream.
- * 
+ *
  * @see ncg_switch_to_buffer
  */
 void ncgset_in (FILE *  in_str )
@@ -2401,7 +2401,7 @@ static int yy_init_globals (void)
 /* ncglex_destroy is for both reentrant and non-reentrant scanners. */
 int ncglex_destroy  (void)
 {
-    
+
     /* Pop the buffer stack, destroying each element. */
 	while(YY_CURRENT_BUFFER){
 		ncg_delete_buffer(YY_CURRENT_BUFFER  );

@@ -1,19 +1,19 @@
 /* A Bison parser, made by GNU Bison 2.6.4.  */
 
 /* Bison implementation for Yacc-like parsers in C
-   
+
       Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
-   
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -26,7 +26,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -1622,7 +1622,7 @@ yyreduce:
   case 14:
 /* Line 1813 of yacc.c  */
 #line 165 "ncgen.y"
-    { 
+    {
 		    if ((yyvsp[(1) - (1)])->is_dim == 1) {
 		        derror( "duplicate dimension declaration for %s",
 		                (yyvsp[(1) - (1)])->name);
@@ -2074,7 +2074,7 @@ yyreduce:
 
 			   if(valnum + len > var_len) {
 			       if (vars[varnum].dims[0] != rec_dim) {
-				   derror("too many values for this variable, %d>%d", 
+				   derror("too many values for this variable, %d>%d",
 					  valnum+len, var_len);
 				   exit (5);
 			       } else {/* a record variable so grow it */
@@ -2176,7 +2176,7 @@ yyreduce:
 			 case NC_DOUBLE:
 			   *double_valp++ = short_val;
 			   break;
-			 default: break;			
+			 default: break;
 		       }
 		       valnum++;
 		   }
@@ -2630,7 +2630,7 @@ YYSTYPE lookup(char *sname)
 {
     YYSTYPE sp;
     deescapify(sname);		/* delete escape chars from names,
-				 * e.g. 'ab\:cd\ ef' becomes 
+				 * e.g. 'ab\:cd\ ef' becomes
 				 * 'ab:cd ef' */
     for (sp = symlist; sp != (YYSTYPE) 0; sp = sp -> next)
 	if (STREQ(sp -> name, sname)) {

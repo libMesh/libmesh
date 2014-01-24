@@ -1598,7 +1598,7 @@ yyreduce:
     {
 		Symbol* id = (yyvsp[-1].sym);
                 markcdf4("Group specification");
-		if(creategroup(id) == NULL) 
+		if(creategroup(id) == NULL)
                     yyerror("duplicate group declaration within parent group for %s",
                                 id->name);
             }
@@ -1672,7 +1672,7 @@ yyreduce:
                    listpush((yyvsp[-3].sym)->subnodes,(void*)eid);
                    eid->container = (yyvsp[-3].sym);
 		   eid->typ.basetype = (yyvsp[-3].sym)->typ.basetype;
-                }               
+                }
                 listsetlength(stack,stackbase);/* remove stack nodes*/
               }
 #line 1679 "ncgentab.c" /* yacc.c:1646  */
@@ -1697,7 +1697,7 @@ yyreduce:
 		      if(strcmp((yyvsp[0].sym)->name,elem->name)==0)
   	                yyerror("duplicate enum declaration for %s",
         	                 elem->name);
-		    }    	    
+		    }
 		    listpush(stack,(void*)(yyvsp[0].sym));
 		}
 #line 1704 "ncgentab.c" /* yacc.c:1646  */
@@ -1772,7 +1772,7 @@ yyreduce:
 	        Symbol* fsym = (Symbol*)listget(stack,i);
 		fsym->container = (yyvsp[-3].sym);
  	        listpush((yyvsp[-3].sym)->subnodes,(void*)fsym);
-	    }    	    
+	    }
 	    listsetlength(stack,stackbase);/* remove stack nodes*/
           }
 #line 1779 "ncgentab.c" /* yacc.c:1646  */
@@ -1953,7 +1953,7 @@ fprintf(stderr,"dimension: %s = UNLIMITED\n",(yyvsp[-2].sym)->name);
 
   case 59:
 #line 483 "ncgen.y" /* yacc.c:1646  */
-    { 
+    {
                      (yyvsp[0].sym)->objectclass=NC_DIM;
                      if(dupobjectcheck(NC_DIM,(yyvsp[0].sym)))
                         yyerror( "Duplicate dimension declaration for %s",
@@ -2934,7 +2934,7 @@ install(const char *sname)
 {
     Symbol* sp;
     sp = (Symbol*) emalloc (sizeof (struct Symbol));
-    memset((void*)sp,0,sizeof(struct Symbol));    
+    memset((void*)sp,0,sizeof(struct Symbol));
     sp->name = nulldup(sname);
     sp->next = symlist;
     sp->lineno = lineno;
@@ -3006,7 +3006,7 @@ makeconstdata(nc_type nctype)
 	    len = bbLength(lextext);
 	    con.value.stringv.len = len;
 	    con.value.stringv.stringv = bbDup(lextext);
-	    bbClear(lextext);	    
+	    bbClear(lextext);
 	    }
 	    break;
 
@@ -3039,7 +3039,7 @@ makeconstdata(nc_type nctype)
 	default:
 	    yyerror("Data constant: unexpected NC type: %s",
 		    nctypename(nctype));
-	    con.value.stringv.stringv = NULL;    
+	    con.value.stringv.stringv = NULL;
 	    con.value.stringv.len = 0;
     }
     return con;
@@ -3206,7 +3206,7 @@ makespecial(int tag, Symbol* vsym, Symbol* tsym, void* data, int isconst)
 	break;
     default: PANIC1("unexpected special tag: %d",tag);
     }
-    
+
     if(vsym != NULL) special = &vsym->var.special;
     if(tag == _FORMAT_FLAG) {
 	struct Kvalues* kvalue;
@@ -3337,8 +3337,8 @@ containsfills(Datalist* list)
         NCConstant* con = list->data;
         for(i=0;i<list->length;i++,con++) {
 	    if(con->nctype == NC_COMPOUND) {
-	        if(containsfills(con->value.compoundv)) return 1;	
-	    } else if(con->nctype == NC_FILLVALUE) return 1;	
+	        if(containsfills(con->value.compoundv)) return 1;
+	    } else if(con->nctype == NC_FILLVALUE) return 1;
 	}
     }
     return 0;
@@ -3407,7 +3407,7 @@ evaluate(Symbol* fcn, Datalist* arglist)
 	    }
 	    break;
 	case 0:
-	default: 
+	default:
 	    derror("Expected function signature: time([string,]string)");
 	    goto done;
 	}
@@ -3422,9 +3422,9 @@ evaluate(Symbol* fcn, Datalist* arglist)
 	    cdCalenType timetype = cdStandard;
 	    cdChar2Comp(timetype,timevalue,&comptime);
 	    /* convert comptime to cdTime */
-	    cdtime.year = comptime.year;	    
+	    cdtime.year = comptime.year;
 	    cdtime.month = comptime.month;
-	    cdtime.day = comptime.day;    
+	    cdtime.day = comptime.day;
 	    cdtime.hour = comptime.hour;
 	    cdtime.baseYear = 1970;
 	    cdtime.timeType = CdChron;

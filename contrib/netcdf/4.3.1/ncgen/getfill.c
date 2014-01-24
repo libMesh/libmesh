@@ -44,7 +44,7 @@ getfiller(Symbol* tvsym)
     } else if(tvsym->objectclass == NC_TYPE) {
         tvsym->typ._Fillvalue = filler; /* cache value*/
     }
-    return filler;        
+    return filler;
 }
 
 static void
@@ -64,11 +64,11 @@ fill(Symbol* tsym, Datalist* filler)
 	sublist = builddatalist(listlength(tsym->subnodes));
         for(i=0;i<listlength(tsym->subnodes);i++) {
 	    Symbol* field = (Symbol*)listget(tsym->subnodes,i);
-	    if(field->typ.dimset.ndims > 0) {	
+	    if(field->typ.dimset.ndims > 0) {
                 fillarray(field->typ.basetype,&field->typ.dimset,0,filler);
 	    } else
 		filllist(field->typ.basetype,sublist);
-        }	  
+        }
 	con = builddatasublist(sublist);
 	break;
     case NC_VLEN:
@@ -100,7 +100,7 @@ filllist(Symbol* tsym, Datalist* dl)
         for(i=0;i<listlength(tsym->subnodes);i++) {
 	    Symbol* field = (Symbol*)listget(tsym->subnodes,i);
 	    filllist(field->typ.basetype,sublist);
-        }	  
+        }
 	con = builddatasublist(sublist);
 	dlappend(dl,&con);
 	break;
@@ -179,7 +179,7 @@ nc_getfill(NCConstant* value)
     }
 }
 
-char* 
+char*
 nc_dfaltfillname(nc_type nctype)
 {
     switch (nctype) {

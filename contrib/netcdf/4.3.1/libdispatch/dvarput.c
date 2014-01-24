@@ -1,4 +1,4 @@
-/*! 
+/*!
 Functions for writing data to variables.
 
 Copyright 2010 University Corporation for Atmospheric
@@ -33,7 +33,7 @@ odom_init(struct PUTodometer* odom,
 	odom->stride[i] = (stride != NULL ? stride[i] : 1);
 	odom->stop[i] = odom->start[i] + (odom->edges[i]*odom->stride[i]);
 	odom->index[i] = odom->start[i];
-    }    
+    }
 }
 
 static int
@@ -61,7 +61,7 @@ odom_next(struct PUTodometer* odom)
 \ingroup variables
 */
 static int
-NC_put_vara(int ncid, int varid, const size_t *start, 
+NC_put_vara(int ncid, int varid, const size_t *start,
 	    const size_t *edges, const void *value, nc_type memtype)
 {
    NC* ncp;
@@ -70,7 +70,7 @@ NC_put_vara(int ncid, int varid, const size_t *start,
    if(edges == NULL) {
       size_t shape[NC_MAX_VAR_DIMS];
       int ndims;
-      stat = nc_inq_varndims(ncid, varid, &ndims); 
+      stat = nc_inq_varndims(ncid, varid, &ndims);
       if(stat != NC_NOERR) return stat;
       stat = NC_getshape(ncid, varid, ndims, shape);
       if(stat != NC_NOERR) return stat;
@@ -98,7 +98,7 @@ NC_put_var(int ncid, int varid, const void *value, nc_type memtype)
 \ingroup variables
 */
 static int
-NC_put_var1(int ncid, int varid, const size_t *coord, const void* value, 
+NC_put_var1(int ncid, int varid, const size_t *coord, const void* value,
 	    nc_type memtype)
 {
    return NC_put_vara(ncid, varid, coord, NC_coord_one, value, memtype);
@@ -120,7 +120,7 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
    return ncp->dispatch->put_varm(ncid,varid,start,edges,stride,NULL,value0,memtype);
 #else
   /* Rebuilt put_vars code to simplify and avoid use of put_varm */
-  
+
    int status = NC_NOERR;
    int i,simplestride,rank,isrecvar;
    struct PUTodometer odom;
@@ -139,7 +139,7 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
    status = NC_check_id (ncid, &ncp);
    if(status != NC_NOERR) return status;
 
-   status = nc_inq_vartype(ncid, varid, &vartype); 
+   status = nc_inq_vartype(ncid, varid, &vartype);
    if(status != NC_NOERR) return status;
 
    if(memtype == NC_NAT) memtype = vartype;
@@ -165,12 +165,12 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
    }
 
    /* Get the variable rank */
-   status = nc_inq_varndims(ncid, varid, &rank); 
+   status = nc_inq_varndims(ncid, varid, &rank);
    if(status != NC_NOERR) return status;
 
    /* Get variable dimension sizes */
    isrecvar = NC_is_recvar(ncid,varid,&numrecs);
-   NC_getshape(ncid,varid,rank,varshape);	
+   NC_getshape(ncid,varid,rank,varshape);
 
    /* Optimize out using various checks */
    if (rank == 0) {
@@ -202,7 +202,7 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
 	   /* cast needed for braindead systems with signed size_t */
            || ((unsigned long) mystride[i] >= X_INT_MAX))
            return NC_ESTRIDE;
-  	if(mystride[i] != 1) simplestride = 0;	
+  	if(mystride[i] != 1) simplestride = 0;
         /* illegal value checks */
 	dimlen = (i == 0 && isrecvar ? numrecs : varshape[i]);
 	if(i == 0 && isrecvar) {/*do nothing*/}
@@ -211,7 +211,7 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
 	  //if(mystart[i] < 0 || mystart[i] > dimlen)
 	  if(mystart[i] > dimlen)
 	    return NC_EINVALCOORDS;
-          /* myediges is unsigned, will never be < 0 */ 
+          /* myediges is unsigned, will never be < 0 */
 	  //if(myedges[i] < 0 || (mystart[i] + myedges[i] > dimlen))
 	  if(mystart[i] + myedges[i] > dimlen)
 	    return NC_EEDGE;
@@ -280,13 +280,13 @@ NCDEFAULT_put_varm(
 */
 
    /* mid body */
-   status = nc_inq_vartype(ncid, varid, &vartype); 
+   status = nc_inq_vartype(ncid, varid, &vartype);
    if(status != NC_NOERR) return status;
    /* Check that this is an atomic type */
    if(vartype > NC_MAX_ATOMIC_TYPE)
 	return NC_EMAPTYPE;
 
-   status = nc_inq_varndims(ncid, varid, &varndims); 
+   status = nc_inq_varndims(ncid, varid, &varndims);
    if(status != NC_NOERR) return status;
 
    if(memtype == NC_NAT) {
@@ -310,7 +310,7 @@ NCDEFAULT_put_varm(
 
    if(memtype == NC_CHAR && vartype != NC_CHAR)
       return NC_ECHAR;
-   else if(memtype != NC_CHAR && vartype == NC_CHAR)  
+   else if(memtype != NC_CHAR && vartype == NC_CHAR)
       return NC_ECHAR;
 
    memtypelen = nctypelen(memtype);
@@ -371,7 +371,7 @@ NCDEFAULT_put_varm(
 
       /* Compute some dimension related values */
       isrecvar = NC_is_recvar(ncid,varid,&numrecs);
-      NC_getshape(ncid,varid,varndims,varshape);	
+      NC_getshape(ncid,varid,varndims,varshape);
 
       /* assert(sizeof(ptrdiff_t) >= sizeof(size_t)); */
       mystart = (size_t *)calloc(varndims * 7, sizeof(ptrdiff_t));
@@ -436,7 +436,7 @@ NCDEFAULT_put_varm(
 
       /* Lower body */
       /*
-       * As an optimization, adjust I/O parameters when the fastest 
+       * As an optimization, adjust I/O parameters when the fastest
        * dimension has unity stride both externally and internally.
        * In this case, the user could have called a simpler routine
        * (i.e. ncvar$1()
@@ -460,7 +460,7 @@ NCDEFAULT_put_varm(
 	 if (lstatus != NC_NOERR) {
 	    if(status == NC_NOERR || lstatus != NC_ERANGE)
 	       status = lstatus;
-	 }	    
+	 }
 
 	 /*
 	  * The following code permutes through the variable s
@@ -509,7 +509,7 @@ NC_put_vars(int ncid, int varid, const size_t *start,
 \ingroup variables
 */
 static int
-NC_put_varm(int ncid, int varid, const size_t *start, 
+NC_put_varm(int ncid, int varid, const size_t *start,
 	    const size_t *edges, const ptrdiff_t *stride, const ptrdiff_t* map,
 	    const void *value, nc_type memtype)
 {
@@ -529,7 +529,7 @@ Functions to write data from variables. */
 /*! \{ */ /* All these functions are part of this named group... */
 
 /** \ingroup variables
-Write an array of values to a variable. 
+Write an array of values to a variable.
 
 The values to be written are associated with the netCDF variable by
 assuming that the last dimension of the netCDF variable varies fastest
@@ -545,7 +545,7 @@ user defined type. For this function, the type of the data in memory
 must match the type of the variable - no data conversion is done.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -569,7 +569,7 @@ allocated by the user before this function is called.
  */
 /**@{*/
 int
-nc_put_vara(int ncid, int varid, const size_t *startp, 
+nc_put_vara(int ncid, int varid, const size_t *startp,
 	    const size_t *countp, const void *op)
 {
    NC* ncp;
@@ -582,59 +582,59 @@ nc_put_vara(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_put_vara_text(int ncid, int varid, const size_t *startp, 
+nc_put_vara_text(int ncid, int varid, const size_t *startp,
 		 const size_t *countp, const char *op)
 {
-   return NC_put_vara(ncid, varid, startp, countp, 
+   return NC_put_vara(ncid, varid, startp, countp,
 		      (void*)op, NC_CHAR);
 }
 
 int
-nc_put_vara_schar(int ncid, int varid, const size_t *startp, 
+nc_put_vara_schar(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, const signed char *op)
 {
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return NC_put_vara(ncid, varid, startp, countp, (void *)op, 
+   return NC_put_vara(ncid, varid, startp, countp, (void *)op,
 		      NC_BYTE);
 }
 
 int
-nc_put_vara_uchar(int ncid, int varid, const size_t *startp, 
+nc_put_vara_uchar(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, const unsigned char *op)
 {
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return NC_put_vara(ncid, varid, startp, countp, (void *)op, 
+   return NC_put_vara(ncid, varid, startp, countp, (void *)op,
 		      T_uchar);
 }
 
 int
-nc_put_vara_short(int ncid, int varid, const size_t *startp, 
+nc_put_vara_short(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, const short *op)
 {
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return NC_put_vara(ncid, varid, startp, countp, (void *)op, 
+   return NC_put_vara(ncid, varid, startp, countp, (void *)op,
 		      NC_SHORT);
 }
 
 int
-nc_put_vara_int(int ncid, int varid, const size_t *startp, 
+nc_put_vara_int(int ncid, int varid, const size_t *startp,
 		const size_t *countp, const int *op)
 {
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return NC_put_vara(ncid, varid, startp, countp, (void *)op, 
+   return NC_put_vara(ncid, varid, startp, countp, (void *)op,
 		      NC_INT);
 }
 
 int
-nc_put_vara_long(int ncid, int varid, const size_t *startp, 
+nc_put_vara_long(int ncid, int varid, const size_t *startp,
 		 const size_t *countp, const long *op)
 {
    NC* ncp;
@@ -645,7 +645,7 @@ nc_put_vara_long(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_put_vara_float(int ncid, int varid, const size_t *startp, 
+nc_put_vara_float(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, const float *op)
 {
    NC* ncp;
@@ -656,7 +656,7 @@ nc_put_vara_float(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_put_vara_double(int ncid, int varid, const size_t *startp, 
+nc_put_vara_double(int ncid, int varid, const size_t *startp,
 		   const size_t *countp, const double *op)
 {
    NC* ncp;
@@ -667,7 +667,7 @@ nc_put_vara_double(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_put_vara_ubyte(int ncid, int varid, const size_t *startp, 
+nc_put_vara_ubyte(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, const unsigned char *op)
 {
    NC* ncp;
@@ -678,7 +678,7 @@ nc_put_vara_ubyte(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_put_vara_ushort(int ncid, int varid, const size_t *startp, 
+nc_put_vara_ushort(int ncid, int varid, const size_t *startp,
 		   const size_t *countp, const unsigned short *op)
 {
    NC* ncp;
@@ -689,7 +689,7 @@ nc_put_vara_ushort(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_put_vara_uint(int ncid, int varid, const size_t *startp, 
+nc_put_vara_uint(int ncid, int varid, const size_t *startp,
 		 const size_t *countp, const unsigned int *op)
 {
    NC* ncp;
@@ -700,7 +700,7 @@ nc_put_vara_uint(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_put_vara_longlong(int ncid, int varid, const size_t *startp, 
+nc_put_vara_longlong(int ncid, int varid, const size_t *startp,
 		     const size_t *countp, const long long *op)
 {
    NC* ncp;
@@ -711,7 +711,7 @@ nc_put_vara_longlong(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_put_vara_ulonglong(int ncid, int varid, const size_t *startp, 
+nc_put_vara_ulonglong(int ncid, int varid, const size_t *startp,
 		      const size_t *countp, const unsigned long long *op)
 {
    NC* ncp;
@@ -723,7 +723,7 @@ nc_put_vara_ulonglong(int ncid, int varid, const size_t *startp,
 
 #ifdef USE_NETCDF4
 int
-nc_put_vara_string(int ncid, int varid, const size_t *startp, 
+nc_put_vara_string(int ncid, int varid, const size_t *startp,
 		   const size_t *countp, const char* *op)
 {
    NC* ncp;
@@ -737,10 +737,10 @@ nc_put_vara_string(int ncid, int varid, const size_t *startp,
 /**@}*/
 
 /** \ingroup variables
-Write one datum. 
+Write one datum.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -894,7 +894,7 @@ nc_put_var1_string(int ncid, int varid, const size_t *indexp, const char* *op)
 /**@}*/
 
 /** \ingroup variables
-Write an entire variable with one call. 
+Write an entire variable with one call.
 
 The nc_put_var_ type family of functions write all the values of a
 variable into a netCDF variable of an open netCDF dataset. This is the
@@ -913,7 +913,7 @@ try to write all the values of a record variable but there are more
 records in the file than you assume, more in-memory data will be
 accessed than you supply, which may result in a segmentation
 violation. To avoid such problems, it is better to use the nc_put_vara
-interfaces for variables that use the ::NC_UNLIMITED dimension. 
+interfaces for variables that use the ::NC_UNLIMITED dimension.
 
 The functions for types ubyte, ushort, uint, longlong, ulonglong, and
 string are only available for netCDF-4/HDF5 files.
@@ -923,7 +923,7 @@ user defined type. For this function, the type of the data in memory
 must match the type of the variable - no data conversion is done.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -1075,10 +1075,10 @@ nc_put_var_string(int ncid, int varid, const char* *op)
 /**\} */
 
 /** \ingroup variables
-Write a strided array of values to a variable. 
+Write a strided array of values to a variable.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -1114,12 +1114,12 @@ nc_put_vars (int ncid, int varid, const size_t *startp,
 
    if ((stat = NC_check_id(ncid, &ncp)))
        return stat;
-   return ncp->dispatch->put_vars(ncid, varid, startp, countp, 
+   return ncp->dispatch->put_vars(ncid, varid, startp, countp,
 				  stridep, op, NC_NAT);
 }
 
 int
-nc_put_vars_text(int ncid, int varid, const size_t *startp, 
+nc_put_vars_text(int ncid, int varid, const size_t *startp,
 		 const size_t *countp, const ptrdiff_t *stridep,
 		 const char *op)
 {
@@ -1131,14 +1131,14 @@ nc_put_vars_text(int ncid, int varid, const size_t *startp,
 }
 
 int
-nc_put_vars_schar(int ncid, int varid, const size_t *startp, 
+nc_put_vars_schar(int ncid, int varid, const size_t *startp,
 		  const size_t *countp, const ptrdiff_t *stridep,
 		  const signed char *op)
 {
    NC *ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
-   return NC_put_vars(ncid, varid, startp, countp, 
+   return NC_put_vars(ncid, varid, startp, countp,
 		      stridep,(void*)op,NC_BYTE);
 }
 
@@ -1302,7 +1302,7 @@ nc_put_vars_string(int ncid, int varid,
 /**\} */
 
 /** \ingroup variables
-Write a mapped array of values to a variable. 
+Write a mapped array of values to a variable.
 
 The nc_put_varm() function will only write a variable of an
 atomic type; it will not write user defined types. For this
@@ -1314,7 +1314,7 @@ formally deprecated. The reason is the complexity of the
 algorithm makes its use difficult for users to properly use.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param varid Variable ID
@@ -1353,13 +1353,13 @@ nc_put_varm (int ncid, int varid, const size_t *startp,
 
    if ((stat = NC_check_id(ncid, &ncp)))
        return stat;
-   return ncp->dispatch->put_varm(ncid, varid, startp, countp, 
+   return ncp->dispatch->put_varm(ncid, varid, startp, countp,
 				  stridep, imapp, op, NC_NAT);
 }
 
 int
-nc_put_varm_text(int ncid, int varid, const size_t *startp, 
-		 const size_t *countp, const ptrdiff_t *stridep, 
+nc_put_varm_text(int ncid, int varid, const size_t *startp,
+		 const size_t *countp, const ptrdiff_t *stridep,
 		 const ptrdiff_t *imapp, const char *op)
 {
    NC *ncp;

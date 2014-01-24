@@ -119,13 +119,13 @@ int main()
     /* location of our target url: use file:// to avoid remote
 	server downtime issues
      */
-    
+
     /* Assume that TESTS_ENVIRONMENT was set */
     topsrcdir = getenv("TOPSRCDIR");
     if(topsrcdir == NULL) {
         fprintf(stderr,"*** FAIL: $abs_top_srcdir not defined: location= %s:%d\n",__FILE__,__LINE__);
         exit(1);
-    }    
+    }
     len = strlen("file://") + strlen(topsrcdir) + strlen("/ncdap_test/testdata3/test.02") + 1;
 #ifdef DEBUG
     len += strlen("[log][show=fetch]");
@@ -145,7 +145,7 @@ int main()
 
     /* open file, get varid */
     CHECK(nc_open(url, NC_NOWRITE, &ncid));
-    
+
     /* extract the string case for netcdf-3*/
 #ifndef USE_NETCDF4
     CHECK(nc_inq_varid(ncid, "s", &varid));
@@ -376,7 +376,7 @@ compare(nc_type t1, nc_type t2, void* v0, void* vdata0, char* tag,
     default: {
 	printf("unexpected compare:  %d %d\n",(int)t1,(int)t2);
 	abort();
-    }    
+    }
 
 case CASE(NC_CHAR,NC_CHAR): {
     setup(char);

@@ -31,7 +31,7 @@ main(int argc, char **argv)
       int ncid, i;
       char *data_in[ATT_LEN_1] = {NULL};
       char *data[ATT_LEN_1] = {"R"};
-   
+
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_put_att(ncid, NC_GLOBAL, MOUNTAIN_RANGE, NC_STRING, ATT_LEN_1, data)) ERR;
       if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
@@ -39,7 +39,7 @@ main(int argc, char **argv)
       if (nc_inq_att(ncid, NC_GLOBAL, MOUNTAIN_RANGE, &att_type, &att_len)) ERR;
       if (att_type != NC_STRING || att_len != ATT_LEN_1) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
@@ -70,7 +70,7 @@ main(int argc, char **argv)
 			     "Whether you had not sometime in your life",
 			     "Err'd in this point which now you censure him",
 			     "And pull'd the law upon you."};
-   
+
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_put_att(ncid, NC_GLOBAL, ATT_NAME, NC_STRING, ATT_LEN, data)) ERR;
       if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
@@ -78,7 +78,7 @@ main(int argc, char **argv)
       if (nc_inq_att(ncid, NC_GLOBAL, ATT_NAME, &att_type, &att_len)) ERR;
       if (att_type != NC_STRING || att_len != ATT_LEN) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
@@ -120,7 +120,7 @@ main(int argc, char **argv)
       if (nc_def_var(ncid, VAR_NAME, NC_STRING, NDIMS, dimids, &varid)) ERR;
       if (nc_put_var_string(ncid, varid, (const char **)data)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Check it out. */
      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
      if (nc_get_var_string(ncid, varid, data_in)) ERR;
@@ -147,13 +147,13 @@ main(int argc, char **argv)
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_put_att_string(ncid, NC_GLOBAL, ATT2_NAME, SOME_PRES, (const char **)data)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_get_att_string(ncid, NC_GLOBAL, ATT2_NAME, (char **)data_in)) ERR;
       for (i=0; i < SOME_PRES; i++)
 	 if (strcmp(data_in[i], data[i])) ERR;
-      
+
       /* Must free your data! */
       if (nc_free_string(SOME_PRES, (char **)data_in)) ERR;
 
@@ -183,7 +183,7 @@ main(int argc, char **argv)
       count[0] = SOME_PRES;
       if (nc_put_vara_string(ncid, varid, start, count, (const char **)data)) ERR;
       if (nc_close(ncid)) ERR;
-      
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_get_var_string(ncid, varid, data_in)) ERR;
@@ -192,7 +192,7 @@ main(int argc, char **argv)
 	 if (i < SOME_PRES && strcmp(data_in[i], data[i])) ERR;
 	 if (i >= SOME_PRES && strcmp(data_in[i], "")) ERR;
       }
-      
+
       /* Must free your data! */
       if (nc_free_string(NUM_PRES, (char **)data_in)) ERR;
 
@@ -227,7 +227,7 @@ main(int argc, char **argv)
       if(status != NC_NOERR)
 	  fprintf(stderr,"%s\n",nc_strerror(status));
       if (nc_close(ncid)) ERR;
-      
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_get_vars_string(ncid, varid, start, count, stride, data_in)) ERR;
@@ -235,7 +235,7 @@ main(int argc, char **argv)
       {
 	 if (i < SOME_PRES && strcmp(data_in[i], data[i])) ERR;
       }
-      
+
       /* Must free your data! */
       if (nc_free_string(SOME_PRES, (char **)data_in)) ERR;
 
@@ -425,7 +425,7 @@ main(int argc, char **argv)
 	 "any of the rights and freedoms set forth herein."
       };
       char *empty_string[] = {""};
-   
+
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
 
       /* Create an array of strings for the Universal Declaraion of Human Rights. */
@@ -452,12 +452,12 @@ main(int argc, char **argv)
 
       /* Close the file. */
       if (nc_close(ncid)) ERR;
-      
+
       /* Check it out. */
       if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
       if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
       if (ndims != NDIMS || nvars != 2 || natts != 0 || unlimdimid != -1) ERR;
-      
+
       /* Check declaration. */
       if (nc_inq_varid(ncid, VAR_NAME1, &varid)) ERR;
       if (nc_inq_var(ncid, varid, var_name, &var_type, &var_ndims,

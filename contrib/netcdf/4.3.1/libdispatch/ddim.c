@@ -1,4 +1,4 @@
-/** \file 
+/** \file
 Dimension functions
 
 These functions define and inquire about dimensions.
@@ -9,7 +9,7 @@ Research/Unidata. See COPYRIGHT file for more info.
 
 #include "ncdispatch.h"
 
-/*! \defgroup dimensions Dimensions 
+/*! \defgroup dimensions Dimensions
 
 Dimensions are used to define the shape of data in netCDF.
 
@@ -57,7 +57,7 @@ Operations supported on dimensions are:
 - Create a dimension, given its name and length.
 - Get a dimension ID from its name.
 - Get a dimension's name and length from its ID.
-- Rename a dimension. 
+- Rename a dimension.
 */
 /**@{*/
 
@@ -70,7 +70,7 @@ netCDF dataset. NetCDF-4 datasets may have multiple unlimited
 dimensions.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param name Name of the dimension to be created.
@@ -129,7 +129,7 @@ dimensions defined for a netCDF dataset, each dimension has an ID
 between 0 and ndims-1.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param name Name of the dimension.
@@ -156,7 +156,7 @@ The length for the unlimited dimension, if any, is the number of
 records written so far.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param dimid Dimension ID, from a previous call to nc_inq_dimid() or
@@ -189,7 +189,7 @@ unlimited dimension for an existing netCDF dataset named foo.nc:
      size_t latlength, recs;
      char recname[NC_MAX_NAME+1];
         ...
-     status = nc_open("foo.nc", NC_NOWRITE, &ncid); 
+     status = nc_open("foo.nc", NC_NOWRITE, &ncid);
      if (status != NC_NOERR) handle_error(status);
      status = nc_inq_unlimdim(ncid, &recid);
      if (status != NC_NOERR) handle_error(status);
@@ -226,7 +226,7 @@ For netCDF-4 files the dataset is switched to define more for the
 rename, regardless of the name length.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param dimid Dimension ID, from a previous call to nc_inq_dimid() or
@@ -251,10 +251,10 @@ latitude in an existing netCDF dataset named foo.nc:
         ...
      int status, ncid, latid;
         ...
-     status = nc_open("foo.nc", NC_WRITE, &ncid); 
+     status = nc_open("foo.nc", NC_WRITE, &ncid);
      if (status != NC_NOERR) handle_error(status);
         ...
-     status = nc_redef(ncid); 
+     status = nc_redef(ncid);
      if (status != NC_NOERR) handle_error(status);
      status = nc_inq_dimid(ncid, "lat", &latid);
      if (status != NC_NOERR) handle_error(status);
@@ -284,7 +284,7 @@ netCDF-4/HDF5 file, dimensions are in all sub-groups, sub-sub-groups,
 etc.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param ndimsp Pointer where number of dimensions will be
@@ -313,7 +313,7 @@ dimension), the ID of the first unlimited dimesnion is returned. For
 these files, nc_inq_unlimdims() will return all the unlimited dimension IDs.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param unlimdimidp Pointer where unlimited dimension ID will be
@@ -337,7 +337,7 @@ nc_inq_unlimdim(int ncid, int *unlimdimidp)
 Find out the name of a dimension.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param dimid Dimension ID, from a previous call to nc_inq_dimid() or
@@ -369,7 +369,7 @@ unlimited dimension for an existing netCDF dataset named foo.nc:
         ...
      status = nc_open("foo.nc", NC_NOWRITE, &ncid);
      if (status != NC_NOERR) handle_error(status);
-     status = nc_inq_unlimdim(ncid, &recid); 
+     status = nc_inq_unlimdim(ncid, &recid);
      if (status != NC_NOERR) handle_error(status);
         ...
      status = nc_inq_dimid(ncid, "lat", &latid);
@@ -399,7 +399,7 @@ The length for the unlimited dimension, if any, is the number of
 records written so far.
 
 \param ncid NetCDF or group ID, from a previous call to nc_open(),
-nc_create(), nc_def_grp(), or associated inquiry functions such as 
+nc_create(), nc_def_grp(), or associated inquiry functions such as
 nc_inq_ncid().
 
 \param dimid Dimension ID, from a previous call to nc_inq_dimid() or
@@ -426,12 +426,12 @@ unlimited dimension for an existing netCDF dataset named foo.nc:
         ...
      status = nc_open("foo.nc", NC_NOWRITE, &ncid);
      if (status != NC_NOERR) handle_error(status);
-     status = nc_inq_unlimdim(ncid, &recid); 
+     status = nc_inq_unlimdim(ncid, &recid);
      if (status != NC_NOERR) handle_error(status);
         ...
-     status = nc_inq_dimid(ncid, "lat", &latid);  
+     status = nc_inq_dimid(ncid, "lat", &latid);
      if (status != NC_NOERR) handle_error(status);
-     status = nc_inq_dimlen(ncid, latid, &latlength); 
+     status = nc_inq_dimlen(ncid, latid, &latlength);
      if (status != NC_NOERR) handle_error(status);
 
      status = nc_inq_dim(ncid, recid, recname, &recs);

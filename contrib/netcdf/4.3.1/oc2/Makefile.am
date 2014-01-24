@@ -34,7 +34,7 @@ EXTRA_DIST = dap.y CMakeLists.txt
 
 if BUILD_DAP
 noinst_LTLIBRARIES = liboc.la
-liboc_la_SOURCES = $(SRC) $(HDRS) 
+liboc_la_SOURCES = $(SRC) $(HDRS)
 liboc_la_CPPFLAGS = $(AM_CPPFLAGS)
 endif
 

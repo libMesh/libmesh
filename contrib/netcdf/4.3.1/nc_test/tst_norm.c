@@ -2,7 +2,7 @@
    Copyright 2006 University Corporation for Atmospheric Research/Unidata.
    See COPYRIGHT file for conditions of use.
 
-   This is a very simple example which tests NFC normalization of 
+   This is a very simple example which tests NFC normalization of
    Unicode names encoded with UTF-8.
 
    $Id: tst_norm.c,v 1.8 2008/10/20 01:48:08 ed Exp $
@@ -124,9 +124,9 @@ main(int argc, char **argv)
     * version of same name.  These should fail, as unnormalized name
     * should have been normalized in library, so these are attempts to
     * create duplicate netCDF objects. */
-   if ((res = nc_def_dim(ncid, NNAME, NX, &dimid)) 
+   if ((res = nc_def_dim(ncid, NNAME, NX, &dimid))
        != NC_ENAMEINUSE) ERR;
-   if ((res = nc_def_var(ncid, NNAME, NC_CHAR, NDIMS, dimids, &varid)) 
+   if ((res = nc_def_var(ncid, NNAME, NC_CHAR, NDIMS, dimids, &varid))
        != NC_ENAMEINUSE) ERR;
    if ((res = nc_enddef(ncid)))
        ERR;

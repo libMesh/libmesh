@@ -25,10 +25,10 @@
 #define X_NAME "x"
 #define Y_NAME "y"
 #define S1_NAME "s1"
-#define VLEN_TYPE_NAME "Magna_Carta_VLEN"      
+#define VLEN_TYPE_NAME "Magna_Carta_VLEN"
 #define S3_ATT_NAME "King_John"
 #define S3_TYPE_NAME "barons"
-#define VL_NAME "No scutage or aid may be levied in our kingdom without its general consent"      
+#define VL_NAME "No scutage or aid may be levied in our kingdom without its general consent"
 #define ATT_LEN 1
 
 int
@@ -68,7 +68,7 @@ main()
       for (i = 0; i < ATT_LEN; i++)
 	 for (j = 0; j < NUM_VL; j++)
 	 {
-	    cvc_out[i].data[j].len = i + 1; 
+	    cvc_out[i].data[j].len = i + 1;
 	    if (!(cvc_out[i].data[j].p = calloc(sizeof(struct s1), cvc_out[i].data[j].len))) ERR;
 	    for (k = 0; k < cvc_out[i].data[j].len; k++)
 	    {
@@ -81,14 +81,14 @@ main()
        * all the timmings. */
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if (H5Pset_fclose_degree(fapl_id, H5F_CLOSE_STRONG)) ERR;
-      if (H5Pset_cache(fapl_id, 0, chunk_cache_nelems, chunk_cache_size, 
+      if (H5Pset_cache(fapl_id, 0, chunk_cache_nelems, chunk_cache_size,
 		       chunk_cache_preemption) < 0) ERR;
-      if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, 
+      if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST,
 			       H5F_LIBVER_LATEST) < 0) ERR;
       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
-      if (H5Pset_link_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED | 
+      if (H5Pset_link_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED |
 					       H5P_CRT_ORDER_INDEXED)) < 0) ERR;
-      if (H5Pset_attr_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED | 
+      if (H5Pset_attr_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED |
 					       H5P_CRT_ORDER_INDEXED)) < 0) ERR;
       if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, fcpl_id, fapl_id)) < 0) ERR;
       if (H5Pclose(fapl_id) < 0) ERR;
@@ -99,9 +99,9 @@ main()
 
       /* Create the compound type for struct s1. */
       if ((s1_typeid = H5Tcreate(H5T_COMPOUND, sizeof(struct s1))) < 0) ERR;
-      if (H5Tinsert(s1_typeid, X_NAME, offsetof(struct s1, x), 
+      if (H5Tinsert(s1_typeid, X_NAME, offsetof(struct s1, x),
 		    H5T_NATIVE_FLOAT) < 0) ERR;
-      if (H5Tinsert(s1_typeid, Y_NAME, offsetof(struct s1, y), 
+      if (H5Tinsert(s1_typeid, Y_NAME, offsetof(struct s1, y),
 		    H5T_NATIVE_DOUBLE) < 0) ERR;
       if (H5Tcommit(grpid, S1_TYPE_NAME, s1_typeid) < 0) ERR;
 
@@ -111,13 +111,13 @@ main()
 
       /* Create the struct s3 type, which contains the vlen. */
       if ((s3_typeid = H5Tcreate(H5T_COMPOUND, sizeof(struct s3))) < 0) ERR;
-      if (H5Tinsert(s3_typeid, VL_NAME, offsetof(struct s3, data), 
+      if (H5Tinsert(s3_typeid, VL_NAME, offsetof(struct s3, data),
 		    vlen_typeid) < 0) ERR;
       if (H5Tcommit(grpid, S3_TYPE_NAME, s3_typeid) < 0) ERR;
 
       /* Create an attribute of this new type. */
       if ((spaceid = H5Screate_simple(1, dims, NULL)) < 0) ERR;
-      if ((attid = H5Acreate(grpid, S3_ATT_NAME, s3_typeid, spaceid, 
+      if ((attid = H5Acreate(grpid, S3_ATT_NAME, s3_typeid, spaceid,
 			     H5P_DEFAULT)) < 0) ERR;
       if (H5Awrite(attid, s3_typeid, cvc_out) < 0) ERR;
 
@@ -128,7 +128,7 @@ main()
 
       /* Close the att. */
       if (H5Aclose(attid) < 0) ERR;
-      
+
       /* Close the space. */
       if (H5Sclose(spaceid) < 0) ERR;
 
@@ -157,7 +157,7 @@ main()
 
 	 /* Get the typeid and native typeid. */
 	 if ((file_typeid1[i] = H5Topen2(grpid, obj_name, H5P_DEFAULT)) < 0) ERR;
-	 if ((native_typeid1[i] = H5Tget_native_type(file_typeid1[i], 
+	 if ((native_typeid1[i] = H5Tget_native_type(file_typeid1[i],
 						     H5T_DIR_DEFAULT)) < 0) ERR;
       }
 
@@ -212,42 +212,42 @@ main()
        * int. */
       for (i = 0; i < ATT_LEN; i++)
       {
-	 vc_out[i].len = i + 1; 
+	 vc_out[i].len = i + 1;
 	 if (!(vc_out[i].p = calloc(sizeof(int), vc_out[i].len))) ERR;
 	 for (k = 0; k < vc_out[i].len; k++)
 	    ((int *)vc_out[i].p)[k] = 42;
       }
-      
+
       /* Create the HDF5 file with creation order. */
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
-      if (H5Pset_link_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED | 
+      if (H5Pset_link_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED |
 					       H5P_CRT_ORDER_INDEXED)) < 0) ERR;
-      if (H5Pset_attr_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED | 
+      if (H5Pset_attr_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED |
 					       H5P_CRT_ORDER_INDEXED)) < 0) ERR;
       if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, fcpl_id, fapl_id)) < 0) ERR;
       if (H5Pclose(fapl_id) < 0) ERR;
       if (H5Pclose(fcpl_id) < 0) ERR;
-      
+
       /* Open the root group. */
       if ((grpid = H5Gopen2(fileid, "/", H5P_DEFAULT)) < 0) ERR;
-      
+
       /* Create a vlen type. Its a vlen of int. */
       if ((vlen_typeid = H5Tvlen_create(H5T_NATIVE_INT)) < 0) ERR;
       if (H5Tcommit(grpid, VLEN_TYPE_NAME, vlen_typeid) < 0) ERR;
-      
+
       /* Create an attribute of this new type. */
       if ((spaceid = H5Screate_simple(1, dims, NULL)) < 0) ERR;
-      if ((attid = H5Acreate(grpid, ATT_NAME, vlen_typeid, spaceid, 
+      if ((attid = H5Acreate(grpid, ATT_NAME, vlen_typeid, spaceid,
 			     H5P_DEFAULT)) < 0) ERR;
       if (H5Awrite(attid, vlen_typeid, vc_out) < 0) ERR;
-      
+
       /* Close the type. */
       if (H5Tclose(vlen_typeid) < 0) ERR;
-	  
+
       /* Close the att. */
       if (H5Aclose(attid) < 0) ERR;
-      
+
       /* Close the space. */
       if (H5Sclose(spaceid) < 0) ERR;
 

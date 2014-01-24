@@ -36,34 +36,34 @@ main()
       hsize_t dimscale_dims[1] = {DIM1_LEN};
 
       /* Open file and create group. */
-      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, 
+      if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT,
 			      H5P_DEFAULT)) < 0) ERR;
       if ((grpid = H5Gcreate(fileid, GRP_NAME, 0)) < 0) ERR;
-      
+
       /* Create our dimension scale. Use the built-in NAME attribute
        * on the dimscale. */
-      if ((dimscale_spaceid = H5Screate_simple(1, dimscale_dims, 
+      if ((dimscale_spaceid = H5Screate_simple(1, dimscale_dims,
 					       dimscale_dims)) < 0) ERR;
-      if ((dimscaleid = H5Dcreate(grpid, DIMSCALE_NAME, H5T_NATIVE_INT, 
+      if ((dimscaleid = H5Dcreate(grpid, DIMSCALE_NAME, H5T_NATIVE_INT,
 				  dimscale_spaceid, H5P_DEFAULT)) < 0) ERR;
       if (H5DSset_scale(dimscaleid, NAME_ATTRIBUTE) < 0) ERR;
 
       /* Create a 1D variable which uses the dimscale. Attach a label
        * to this scale. */
       if ((var1_spaceid = H5Screate_simple(1, dims, dims)) < 0) ERR;
-      if ((var1_datasetid = H5Dcreate(grpid, VAR1_NAME, H5T_NATIVE_INT, 
+      if ((var1_datasetid = H5Dcreate(grpid, VAR1_NAME, H5T_NATIVE_INT,
 				      var1_spaceid, H5P_DEFAULT)) < 0) ERR;
       if (H5DSattach_scale(var1_datasetid, dimscaleid, 0) < 0) ERR;
       if (H5DSset_label(var1_datasetid, 0, FIFTIES_SONG) < 0) ERR;
 
       /* Create a 1D variabls that doesn't use the dimension scale. */
-      if ((var2_datasetid = H5Dcreate(grpid, VAR2_NAME, H5T_NATIVE_INT, 
+      if ((var2_datasetid = H5Dcreate(grpid, VAR2_NAME, H5T_NATIVE_INT,
 				      var1_spaceid, H5P_DEFAULT)) < 0) ERR;
 
       /* Create a 2D dataset which uses the scale for one of its
        * dimensions. */
       if ((var3_spaceid = H5Screate_simple(2, dims, dims)) < 0) ERR;
-      if ((var3_datasetid = H5Dcreate(grpid, VAR3_NAME, H5T_NATIVE_INT, 
+      if ((var3_datasetid = H5Dcreate(grpid, VAR3_NAME, H5T_NATIVE_INT,
 				      var3_spaceid, H5P_DEFAULT)) < 0) ERR;
       if (H5DSattach_scale(var3_datasetid, dimscaleid, 0) < 0) ERR;
 

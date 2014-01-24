@@ -79,7 +79,7 @@ main()
 
    /* Loop indexes. */
    int lvl, lat, lon, rec, i = 0;
-   
+
    /* Error handling. */
    int retval;
 
@@ -130,7 +130,7 @@ main()
    for (rec = 0; rec < NREC; rec++)
    {
       start[0] = rec;
-      if ((retval = nc_get_vara_float(ncid, pres_varid, start, 
+      if ((retval = nc_get_vara_float(ncid, pres_varid, start,
 				      count, &pres_in[0][0][0])))
 	 ERR(retval);
       if ((retval = nc_get_vara_float(ncid, temp_varid, start,
@@ -143,9 +143,9 @@ main()
 	 for (lat = 0; lat < NLAT; lat++)
 	    for (lon = 0; lon < NLON; lon++)
 	    {
-	       if (pres_in[lvl][lat][lon] != SAMPLE_PRESSURE + i) 
+	       if (pres_in[lvl][lat][lon] != SAMPLE_PRESSURE + i)
 		  return 2;
-	       if (temp_in[lvl][lat][lon] != SAMPLE_TEMP + i) 
+	       if (temp_in[lvl][lat][lon] != SAMPLE_TEMP + i)
 		  return 2;
 	       i++;
 	    }

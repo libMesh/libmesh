@@ -2,7 +2,7 @@
    Corporation for Atmospheric Research/Unidata See COPYRIGHT file for
    conditions of use.
 
-   Test netcdf-4 coordinate variables and dimensions. 
+   Test netcdf-4 coordinate variables and dimensions.
 
    $Id: tst_coords2.c,v 1.3 2010/06/01 15:34:51 ed Exp $
 */
@@ -83,7 +83,7 @@ main(int argc, char **argv)
       if (nc_inq(ncid, &ndims, &nvars, &ngatts, &unlimdimid)) ERR;
       if (nvars != NVARS || ndims != NDIMS || ngatts != 0 || unlimdimid != -1) ERR;
       if (nc_inq_varids(ncid, &nvars_in, varids_in)) ERR;
-      if (nvars_in != NVARS || varids_in[0] != 0 || varids_in[1] != 1 || 
+      if (nvars_in != NVARS || varids_in[0] != 0 || varids_in[1] != 1 ||
 	  varids_in[2] != 2 || varids_in[3] != 3) ERR;
       if (nc_inq_var(ncid, 0, var_name_in, &xtype_in, &ndims_in, dimids_in, &natts_in)) ERR;
       if (strcmp(var_name_in, TIME_NAME) || xtype_in != NC_CHAR || ndims_in != TIME_NDIMS ||
@@ -111,7 +111,7 @@ main(int argc, char **argv)
       if (nc_inq(ncid, &ndims, &nvars, &ngatts, &unlimdimid)) ERR;
       if (nvars != NVARS || ndims != NDIMS || ngatts != 0 || unlimdimid != -1) ERR;
       if (nc_inq_varids(ncid, &nvars_in, varids_in)) ERR;
-      if (nvars_in != NVARS || varids_in[0] != 0 || varids_in[1] != 1 || 
+      if (nvars_in != NVARS || varids_in[0] != 0 || varids_in[1] != 1 ||
 	  varids_in[2] != 2 || varids_in[3] != 3) ERR;
       if (nc_inq_var(ncid, 0, var_name_in, &xtype_in, &ndims_in, dimids_in, &natts_in)) ERR;
       if (strcmp(var_name_in, TIME_NAME) || xtype_in != NC_CHAR || ndims_in != TIME_NDIMS ||
@@ -155,7 +155,7 @@ main(int argc, char **argv)
 
        if (nc_create(FILE_NAME, NC_CLOBBER|NC_NETCDF4, &ncid)) ERR;
        if (nc_def_grp(ncid, GRPNAME, &grpid)) ERR;
-       
+
        if (nc_def_dim(ncid, DIM0NAME, dim0_len, &dim0_dim)) ERR;
        if (nc_def_dim(ncid, DIM1NAME, dim1_len, &dim1_dim)) ERR;
        if (nc_def_dim(grpid, DIM2NAME, dim2_len, &dim2_dim)) ERR;
@@ -164,13 +164,13 @@ main(int argc, char **argv)
        var_dims[0] = dim2_dim;
        var_dims[1] = dim3_dim;
        if (nc_def_var(grpid, VARNAME, NC_INT, VARRANK, var_dims, &varid)) ERR;
-    
+
        if (nc_close(ncid)) ERR;
-    
+
        if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
-    
+
        if (nc_inq_grp_ncid(ncid, GRPNAME, &grpid)) ERR;
-    
+
        if (nc_inq_varid(grpid, VARNAME, &varid)) ERR;
        if (nc_inq_vardimid(grpid, varid, var_dims_in)) ERR;
        if (nc_inq_dimname(grpid, var_dims_in[0], name2)) ERR;

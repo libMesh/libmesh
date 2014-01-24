@@ -28,10 +28,10 @@
 
 #define DIM1_LEN 5
 #define DIM2_LEN 3
-#define VLEN_NAME "Magna_Carta_VLEN"      
+#define VLEN_NAME "Magna_Carta_VLEN"
 #define VLEN_ATT_NAME "We_will_sell_to_no_man_we_will_not_deny_or_defer_to_any_man_either_Justice_or_Right"
 #define TWO_TYPES 2
-#define NUM_S1 4    
+#define NUM_S1 4
 
 #define DIM3_LEN 1
 #define DIM3_NAME "DIMENSION->The city of London shall enjoy all its ancient liberties and free customs, both by land and by water."
@@ -40,7 +40,7 @@
 #define NUM_VL 1
 #define S3_ATT_NAME "King_John"
 #define S3_TYPE_NAME "barons"
-#define VL_NAME "No scutage or aid may be levied in our kingdom without its general consent"      
+#define VL_NAME "No scutage or aid may be levied in our kingdom without its general consent"
 #define THREE_TYPES 3
 
 struct s1
@@ -86,7 +86,7 @@ check_file_1(int ncid, nc_vlen_t *data_out)
 
    /* How does the vlen type look? */
    if (nc_inq_vlen(ncid, typeids_in[1], name_in, &size_in, &base_nc_type_in)) ERR;
-   if (strcmp(name_in, VLEN_NAME) || size_in != sizeof(nc_vlen_t) || 
+   if (strcmp(name_in, VLEN_NAME) || size_in != sizeof(nc_vlen_t) ||
        base_nc_type_in != typeids_in[0]) ERR;
 
    /* Now read the attribute. */
@@ -108,7 +108,7 @@ check_file_1(int ncid, nc_vlen_t *data_out)
    /* We're done! */
    return NC_NOERR;
 }
-   
+
 int
 check_file_2(int ncid, struct s2 *data_out)
 {
@@ -139,9 +139,9 @@ check_file_2(int ncid, struct s2 *data_out)
 
    /* How does the containing compound type look? */
    if (nc_inq_compound(ncid, typeids_in[1], name_in, &size_in, &nfields_in)) ERR;
-   if (strcmp(name_in, S2_TYPE_NAME) || size_in != sizeof(struct s2) || 
+   if (strcmp(name_in, S2_TYPE_NAME) || size_in != sizeof(struct s2) ||
        nfields_in != 1) ERR;
-   if (nc_inq_compound_field(ncid, typeids_in[1], 0, name_in, &offset_in, &field_type_in, 
+   if (nc_inq_compound_field(ncid, typeids_in[1], 0, name_in, &offset_in, &field_type_in,
 			     &ndims_in, field_dims_in)) ERR;
    if (strcmp(name_in, S1_NAME) || offset_in != NC_COMPOUND_OFFSET(struct s2, data) ||
        field_type_in != typeids_in[0] || ndims_in != 1 || field_dims_in[0] != NUM_S1) ERR;
@@ -154,11 +154,11 @@ check_file_2(int ncid, struct s2 *data_out)
       for (j = 0; j < NUM_S1; j++)
 	 if (data_out[i].data[j].x != data_in[i].data[j].x ||
 	     data_out[i].data[j].y != data_in[i].data[j].y) ERR;
-   
+
    /* We're done! */
    return NC_NOERR;
 }
-   
+
 int
 check_file_3(int ncid, struct s3 *data_out)
 {
@@ -189,14 +189,14 @@ check_file_3(int ncid, struct s3 *data_out)
 
    /* How does the vlen type look? */
    if (nc_inq_vlen(ncid, typeids_in[1], name_in, &size_in, &base_nc_type_in)) ERR;
-   if (strcmp(name_in, VLEN_NAME) || size_in != sizeof(nc_vlen_t) || 
+   if (strcmp(name_in, VLEN_NAME) || size_in != sizeof(nc_vlen_t) ||
        base_nc_type_in != typeids_in[0]) ERR;
 
    /* How does the containing compound type look? */
    if (nc_inq_compound(ncid, typeids_in[2], name_in, &size_in, &nfields_in)) ERR;
-   if (strcmp(name_in, S3_TYPE_NAME) || size_in != sizeof(struct s3) || 
+   if (strcmp(name_in, S3_TYPE_NAME) || size_in != sizeof(struct s3) ||
        nfields_in != 1) ERR;
-   if (nc_inq_compound_field(ncid, typeids_in[2], 0, name_in, &offset_in, &field_type_in, 
+   if (nc_inq_compound_field(ncid, typeids_in[2], 0, name_in, &offset_in, &field_type_in,
 			     &ndims_in, field_dims_in)) ERR;
    if (strcmp(name_in, VL_NAME) || offset_in != NC_COMPOUND_OFFSET(struct s3, data) ||
        field_type_in != typeids_in[1] || ndims_in != 1 || field_dims_in[0] != NUM_VL) ERR;
@@ -222,7 +222,7 @@ check_file_3(int ncid, struct s3 *data_out)
    /* We're done! */
    return NC_NOERR;
 }
-   
+
 int
 check_file_4(int ncid, struct s3 *data_out)
 {
@@ -253,14 +253,14 @@ check_file_4(int ncid, struct s3 *data_out)
 
    /* How does the vlen type look? */
    if (nc_inq_vlen(ncid, typeids_in[1], name_in, &size_in, &base_nc_type_in)) ERR;
-   if (strcmp(name_in, VLEN_NAME) || size_in != sizeof(nc_vlen_t) || 
+   if (strcmp(name_in, VLEN_NAME) || size_in != sizeof(nc_vlen_t) ||
        base_nc_type_in != typeids_in[0]) ERR;
 
    /* How does the containing compound type look? */
    if (nc_inq_compound(ncid, typeids_in[2], name_in, &size_in, &nfields_in)) ERR;
-   if (strcmp(name_in, S3_TYPE_NAME) || size_in != sizeof(struct s3) || 
+   if (strcmp(name_in, S3_TYPE_NAME) || size_in != sizeof(struct s3) ||
        nfields_in != 1) ERR;
-   if (nc_inq_compound_field(ncid, typeids_in[2], 0, name_in, &offset_in, &field_type_in, 
+   if (nc_inq_compound_field(ncid, typeids_in[2], 0, name_in, &offset_in, &field_type_in,
 			     &ndims_in, field_dims_in)) ERR;
    if (strcmp(name_in, VL_NAME) || offset_in != NC_COMPOUND_OFFSET(struct s3, data) ||
        field_type_in != typeids_in[1] || ndims_in != 1 || field_dims_in[0] != NUM_VL) ERR;
@@ -286,7 +286,7 @@ check_file_4(int ncid, struct s3 *data_out)
    /* We're done! */
    return NC_NOERR;
 }
-   
+
 int
 main(int argc, char **argv)
 {

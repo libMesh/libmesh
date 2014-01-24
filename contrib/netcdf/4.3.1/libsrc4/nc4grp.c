@@ -51,13 +51,13 @@ NC4_def_grp(int parent_ncid, const char *name, int *new_ncid)
    /* Update internal lists to reflect new group. The actual HDF5
     * group creation will be done when metadata is written by a
     * sync. */
-   if ((retval = nc4_grp_list_add(&(grp->children), h5->next_nc_grpid, 
+   if ((retval = nc4_grp_list_add(&(grp->children), h5->next_nc_grpid,
 				  grp, grp->nc4_info->controller, norm_name, NULL)))
       return retval;
    if (new_ncid)
       *new_ncid = grp->nc4_info->controller->ext_ncid | h5->next_nc_grpid;
    h5->next_nc_grpid++;
-   
+
    return NC_NOERR;
 }
 
@@ -140,7 +140,7 @@ NC4_inq_ncid(int ncid, const char *name, int *grp_ncid)
    int retval;
 
    LOG((2, "nc_inq_ncid: ncid 0x%x name %s", ncid, name));
-   
+
    /* Find info for this file and group, and set pointer to each. */
    if ((retval = nc4_find_grp_h5(ncid, &grp, &h5)))
       return retval;
@@ -161,7 +161,7 @@ NC4_inq_ncid(int ncid, const char *name, int *grp_ncid)
 	    *grp_ncid = grp->nc4_info->controller->ext_ncid | g->nc_grpid;
 	 return NC_NOERR;
       }
-   
+
    /* If we got here, we didn't find the named group. */
    return NC_ENOGRP;
 }
@@ -203,7 +203,7 @@ NC4_inq_grps(int ncid, int *numgrps, int *ncids)
       }
       num++;
    }
-   
+
    if (numgrps)
       *numgrps = num;
 
@@ -320,7 +320,7 @@ NC4_inq_grp_parent(int ncid, int *parent_ncid)
    }
    else
       return NC_ENOGRP;
-   
+
    return NC_NOERR;
 }
 
@@ -436,15 +436,15 @@ NC4_inq_varids(int ncid, int *nvars, int *varids)
    comparison: returns negative if b > a and positive if a > b. */
 int int_cmp(const void *a, const void *b)
 {
-   const int *ia = (const int *)a; 
+   const int *ia = (const int *)a;
    const int *ib = (const int *)b;
-   return *ia  - *ib; 
+   return *ia  - *ib;
 }
 
 /* Find all dimids for a location. This finds all dimensions in a
  * group, with or without any of its parents, depending on last
  * parameter. */
-int 
+int
 NC4_inq_dimids(int ncid, int *ndims, int *dimids, int include_parents)
 {
    NC_GRP_INFO_T *grp, *g;
@@ -453,7 +453,7 @@ NC4_inq_dimids(int ncid, int *ndims, int *dimids, int include_parents)
    int d, num = 0;
    int retval;
 
-   LOG((2, "nc_inq_dimids: ncid 0x%x include_parents: %d", ncid, 
+   LOG((2, "nc_inq_dimids: ncid 0x%x include_parents: %d", ncid,
 	include_parents));
 
    /* Find info for this file and group, and set pointer to each. */
@@ -479,7 +479,7 @@ NC4_inq_dimids(int ncid, int *ndims, int *dimids, int include_parents)
 	 for (g = grp->parent; g; g = g->parent)
 	    for (dim = g->dim; dim; dim = dim->l.next)
 	       num++;
-      
+
       /* If the user wants the dimension ids, get them. */
       if (dimids)
       {
@@ -494,7 +494,7 @@ NC4_inq_dimids(int ncid, int *ndims, int *dimids, int include_parents)
 	    for (g = grp->parent; g; g = g->parent)
 	       for (dim = g->dim; dim; dim = dim->l.next)
 		  dimids[n++] = dim->dimid;
-	 
+
 	 qsort(dimids, num, sizeof(int), int_cmp);
       }
    }

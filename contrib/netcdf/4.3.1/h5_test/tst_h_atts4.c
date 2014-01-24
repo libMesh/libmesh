@@ -26,10 +26,10 @@
 #define X_NAME "x"
 #define Y_NAME "y"
 #define S1_NAME "s1"
-#define VLEN_TYPE_NAME "Percy_Jackson_VLEN"      
+#define VLEN_TYPE_NAME "Percy_Jackson_VLEN"
 #define ATT_NAME "Poseidon"
 #define S3_TYPE_NAME "Olympus"
-#define VL_NAME "Trident"      
+#define VL_NAME "Trident"
 #define ATT_LEN 1
 
 int
@@ -68,7 +68,7 @@ main()
       if (!(vc_out = calloc(sizeof(hvl_t), ATT_LEN))) ERR;
       for (i = 0; i < ATT_LEN; i++)
       {
-	 vc_out[i].len = i + 1; 
+	 vc_out[i].len = i + 1;
 	 if (!(vc_out[i].p = calloc(sizeof(struct s1), vc_out[i].len))) ERR;
 	 for (k = 0; k < vc_out[i].len; k++)
 	 {
@@ -76,50 +76,50 @@ main()
 	    ((struct s1 *)vc_out[i].p)[k].y = 2.0;
 	 }
       }
-      
+
       /* Create the HDF5 file, with cache control, creation order, and
        * all the timmings. */
       if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) ERR;
       if (H5Pset_fclose_degree(fapl_id, H5F_CLOSE_STRONG)) ERR;
-      if (H5Pset_cache(fapl_id, 0, chunk_cache_nelems, chunk_cache_size, 
+      if (H5Pset_cache(fapl_id, 0, chunk_cache_nelems, chunk_cache_size,
 		       chunk_cache_preemption) < 0) ERR;
       if ((fcpl_id = H5Pcreate(H5P_FILE_CREATE)) < 0) ERR;
-      if (H5Pset_link_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED | 
+      if (H5Pset_link_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED |
 					       H5P_CRT_ORDER_INDEXED)) < 0) ERR;
-      if (H5Pset_attr_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED | 
+      if (H5Pset_attr_creation_order(fcpl_id, (H5P_CRT_ORDER_TRACKED |
 					       H5P_CRT_ORDER_INDEXED)) < 0) ERR;
       if ((fileid = H5Fcreate(FILE_NAME, H5F_ACC_TRUNC, fcpl_id, fapl_id)) < 0) ERR;
       if (H5Pclose(fapl_id) < 0) ERR;
       if (H5Pclose(fcpl_id) < 0) ERR;
-      
+
       /* Open the root group. */
       if ((grpid = H5Gopen2(fileid, "/", H5P_DEFAULT)) < 0) ERR;
-      
+
       /* Create the compound type for struct s1. */
       if ((s1_typeid = H5Tcreate(H5T_COMPOUND, sizeof(struct s1))) < 0) ERR;
-      if (H5Tinsert(s1_typeid, X_NAME, offsetof(struct s1, x), 
+      if (H5Tinsert(s1_typeid, X_NAME, offsetof(struct s1, x),
 		    H5T_NATIVE_FLOAT) < 0) ERR;
-      if (H5Tinsert(s1_typeid, Y_NAME, offsetof(struct s1, y), 
+      if (H5Tinsert(s1_typeid, Y_NAME, offsetof(struct s1, y),
 		    H5T_NATIVE_DOUBLE) < 0) ERR;
       if (H5Tcommit(grpid, S1_TYPE_NAME, s1_typeid) < 0) ERR;
-      
+
       /* Create a vlen type. Its a vlen of stuct s1. */
       if ((vlen_typeid = H5Tvlen_create(s1_typeid)) < 0) ERR;
       if (H5Tcommit(grpid, VLEN_TYPE_NAME, vlen_typeid) < 0) ERR;
-      
+
       /* Create an attribute of this new type. */
       if ((spaceid = H5Screate_simple(1, dims, NULL)) < 0) ERR;
-      if ((attid = H5Acreate(grpid, ATT_NAME, vlen_typeid, spaceid, 
+      if ((attid = H5Acreate(grpid, ATT_NAME, vlen_typeid, spaceid,
 			     H5P_DEFAULT)) < 0) ERR;
       if (H5Awrite(attid, vlen_typeid, vc_out) < 0) ERR;
-      
+
       /* Close the types. */
       if (H5Tclose(s1_typeid) < 0 ||
 	  H5Tclose(vlen_typeid) < 0) ERR;
-	  
+
       /* Close the att. */
       if (H5Aclose(attid) < 0) ERR;
-      
+
       /* Close the space. */
       if (H5Sclose(spaceid) < 0) ERR;
 

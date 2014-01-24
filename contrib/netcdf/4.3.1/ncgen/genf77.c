@@ -226,7 +226,7 @@ gen_ncf77(const char *filename)
     codedump(stmt);
     codeline("call check_err(stat)");
     f77flush();
-    
+
     /* define dimensions from info in dims array */
     if (ndims > 0) {
 	f77skip();
@@ -276,19 +276,19 @@ gen_ncf77(const char *filename)
 	}
     }
     f77flush();
-    
+
     /* Define the global attributes*/
     if(ngatts > 0) {
 	f77skip();
 	f77comment("assign global attributes");
 	for(iatt = 0; iatt < ngatts; iatt++) {
 	    Symbol* gasym = (Symbol*)listget(gattdefs,iatt);
-	    genf77_defineattr(gasym);	    
+	    genf77_defineattr(gasym);
 	}
 	f77skip();
     }
     f77flush();
-    
+
     /* Define the variable specific attributes*/
     if(natts > 0) {
 	f77skip();
@@ -328,7 +328,7 @@ gen_ncf77(const char *filename)
             }
             f77skip();
         }
-    
+
         /* Invoke write procedures */
         if(nvars > 0) {
             List* calllist;
@@ -349,11 +349,11 @@ gen_ncf77(const char *filename)
                 for(i=0;i<listlength(calllist);i++) {
                     char* callstmt = (char*)listget(calllist,i);
                     codeline(callstmt);
-                }       
+                }
                 listclear(calllist);
             }
         }
-    
+
         /* Close the file */
         codeline("stat = nf_close(ncid)");
         codeline("call check_err(stat)");
@@ -505,7 +505,7 @@ f77fold(Bytebuffer* lines)
 	    bbAppendn(lines,line0,linelen);
 	    line0 = linen;
 	    continue;
-	}	 
+	}
 	/* We need to fold */
         bbCat(lines,"      "); /*indent first line */
 	while(linelen > F77_MAX_STMT) {
@@ -566,7 +566,7 @@ f77attrifyr(Symbol* asym, char* p, Bytebuffer* buf)
         p=word(p,buf);
         bbCat(buf,"\n");
 	index++;
-    }    
+    }
     return p;
 }
 
@@ -600,7 +600,7 @@ f77prefixed(List* prefix, char* suffix, char* separator)
 	Symbol* sym = (Symbol*)listget(prefix,i);
         strcat(result,sym->name); /* append "<prefix[i]/>"*/
 	strcat(result,separator);
-    }    
+    }
     strcat(result,suffix); /* append "<suffix>"*/
     return result;
 }
@@ -642,7 +642,7 @@ nfdtype(nc_type type)
 /*
  * Return proper _put_var_ suffix for given nc_type
  */
-static const char* 
+static const char*
 nfstype(nc_type nctype)
 {
     switch (nctype) {
@@ -667,7 +667,7 @@ nfstype(nc_type nctype)
 /*
  * Return FORTRAN type name for netCDF attribute type
  */
-static const char* 
+static const char*
 ncftype(nc_type type)
 {
     switch (type) {
@@ -877,7 +877,7 @@ genf77_writeattr(Generator* generator, Symbol* asym, Bytebuffer* code,
 		(asym->att.var == NULL?"NF_GLOBAL"
 				      :f77varncid(asym->att.var)),
 		codify(asym->name),
-		nftype(basetype->typ.typecode),		
+		nftype(basetype->typ.typecode),
 		len,
 		ncftype(basetype->typ.typecode));
 	codedump(stmt);
@@ -885,7 +885,7 @@ genf77_writeattr(Generator* generator, Symbol* asym, Bytebuffer* code,
 
     case NC_CHAR:
 	len = bbLength(code);
-	f77quotestring(code);	
+	f77quotestring(code);
 	if(len==0) len++;
 	bbprintf0(stmt,"stat = nf_put_att_text(ncid, %s, %s, %lu, ",
 		(asym->att.var == NULL?"NF_GLOBAL"

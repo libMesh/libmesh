@@ -111,7 +111,7 @@ NCD3_open(const char * path, int mode,
     /* set the compile flag by default */
     dapcomm->oc.rawurltext = (char*)emalloc(strlen(path)+strlen("[compile]")+1);
     strcpy(dapcomm->oc.rawurltext,"[compile]");
-    strcat(dapcomm->oc.rawurltext, path);    
+    strcat(dapcomm->oc.rawurltext, path);
 #else
     dapcomm->oc.rawurltext = strdup(path);
 #endif
@@ -134,7 +134,7 @@ NCD3_open(const char * path, int mode,
 		    SETFLAG(dapcomm->controls,NCF_COLUMBIA);
 	    }
 	}
-    } 
+    }
 #endif
 
     /* fail if we are unconstrainable but have constraints */
@@ -167,7 +167,7 @@ NCD3_open(const char * path, int mode,
     dapcomm->oc.dapconstraint = (DCEconstraint*)dcecreate(CES_CONSTRAINT);
     dapcomm->oc.dapconstraint->projections = nclistnew();
     dapcomm->oc.dapconstraint->selections = nclistnew();
-    
+
     if(dapcomm->oc.url != NULL) {
         /* Parse constraints to make sure they are syntactically correct */
         ncstat = parsedapconstraints(dapcomm,dapcomm->oc.url->constraint,dapcomm->oc.dapconstraint);
@@ -282,7 +282,7 @@ fprintf(stderr,"constrained dds: %s\n",dumptree(dapcomm->cdf.ddsroot));
     if(dapcomm->cdf.recorddimname != NULL
        && nclistlength(dapcomm->cdf.ddsroot->tree->seqnodes) > 0) {
 	/*nclog(NCLOGWARN,"unlimited dimension specified, but sequences exist in DDS");*/
-	PANIC("unlimited dimension specified, but sequences exist in DDS");	
+	PANIC("unlimited dimension specified, but sequences exist in DDS");
     }
 
     /* Re-compute the var names*/
@@ -342,7 +342,7 @@ fprintf(stderr,"ncdap3: final constraint: %s\n",dapcomm->oc.url->constraint);
     if(ncstat != NC_NOERR && ncstat != NC_EVARSIZE)
         {THROWCHK(ncstat); goto done;}
 #endif
-	
+
     {
         NC* ncsub;
         NC* drno = dapcomm->controller;
@@ -362,7 +362,7 @@ fprintf(stderr,"ncdap3: final constraint: %s\n",dapcomm->oc.url->constraint);
 
         /* Pretend the substrate is read-only */
 	NC_set_readonly(nc3i);
-	
+
     }
 
     /* Do any necessary data prefetch */
@@ -390,7 +390,7 @@ NCD3_close(int ncid)
     NCDAPCOMMON* dapcomm;
     int ncstatus = NC_NOERR;
 
-    ncstatus = NC_check_id(ncid, (NC**)&drno); 
+    ncstatus = NC_check_id(ncid, (NC**)&drno);
     if(ncstatus != NC_NOERR) return THROW(ncstatus);
     dapcomm = (NCDAPCOMMON*)drno->dispatchdata;
 
@@ -459,7 +459,7 @@ builddims(NCDAPCOMMON* dapcomm)
 	if(!swap) break;
     }
 
-    /* Define unlimited only if needed */ 
+    /* Define unlimited only if needed */
     if(dapcomm->cdf.recorddim != NULL) {
 	CDFnode* unlimited = dapcomm->cdf.recorddim;
 	definename = getdefinename(unlimited);
@@ -544,7 +544,7 @@ fprintf(stderr,"buildvars.candidate=|%s|\n",var->ncfullname);
                 CDFnode* dim = (CDFnode*)nclistget(vardims,j);
                 dimids[j] = dim->ncid;
  	    }
-        }   
+        }
 
 
 
@@ -584,7 +584,7 @@ fprintf(stderr,"\n");
 	/* Tag the variable with its DAP path */
 	if(paramcheck34(dapcomm,"show","projection"))
 	    showprojection3(dapcomm,var);
-    }    
+    }
 done:
     return THROW(ncstat);
 }
@@ -746,7 +746,7 @@ getdefinename(CDFnode* node)
 
     case NC_Dimension:
 	/* Return just the node's ncname */
-	spath = nulldup(node->ncbasename);	
+	spath = nulldup(node->ncbasename);
 	break;
 
     default:

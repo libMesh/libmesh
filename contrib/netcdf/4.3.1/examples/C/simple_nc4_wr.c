@@ -45,7 +45,7 @@ main()
    int x, y, retval;
 
    /* The following struct is written as a compound type. */
-   struct s1 
+   struct s1
    {
          int i1;
          int i2;
@@ -85,7 +85,7 @@ main()
 
    /* Define an unsigned 64bit integer variable in grp1, using dimensions
     * in the root group. */
-   if ((retval = nc_def_var(grp1id, "data", NC_UINT64, NDIMS, 
+   if ((retval = nc_def_var(grp1id, "data", NC_UINT64, NDIMS,
                             dimids, &varid1)))
       ERR(retval);
 
@@ -95,19 +95,19 @@ main()
       ERR(retval);
 
    /* Create a compound type. This will cause nc_reddef to be called. */
-   if (nc_def_compound(grp2id, sizeof(struct s1), "sample_compound_type", 
+   if (nc_def_compound(grp2id, sizeof(struct s1), "sample_compound_type",
                        &typeid))
       ERR(retval);
-   if (nc_insert_compound(grp2id, typeid, "i1", 
+   if (nc_insert_compound(grp2id, typeid, "i1",
                           offsetof(struct s1, i1), NC_INT))
       ERR(retval);
-   if (nc_insert_compound(grp2id, typeid, "i2", 
+   if (nc_insert_compound(grp2id, typeid, "i2",
                           offsetof(struct s1, i2), NC_INT))
       ERR(retval);
 
    /* Define a compound type variable in grp2, using dimensions
     * in the root group. */
-   if ((retval = nc_def_var(grp2id, "data", typeid, NDIMS, 
+   if ((retval = nc_def_var(grp2id, "data", typeid, NDIMS,
                             dimids, &varid2)))
       ERR(retval);
 

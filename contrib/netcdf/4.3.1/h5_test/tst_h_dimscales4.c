@@ -27,13 +27,13 @@
 #define NC_EHDFERR 255
 #define DIM_WITHOUT_VARIABLE "This is a netCDF dimension but not a netCDF variable."
 
-struct nc_hdf5_link_info 
+struct nc_hdf5_link_info
 {
    char name[STR_LEN];
-   H5I_type_t obj_type;   
-};   
+   H5I_type_t obj_type;
+};
 
-herr_t alien_visitor(hid_t did, unsigned dim, hid_t dsid, 
+herr_t alien_visitor(hid_t did, unsigned dim, hid_t dsid,
 		     void *visitor_data)
 {
    H5G_stat_t statbuf;
@@ -99,7 +99,7 @@ main()
       if (H5Pset_attr_creation_order(create_propid, H5P_CRT_ORDER_TRACKED|
 				     H5P_CRT_ORDER_INDEXED) < 0) ERR;
       if ((spaceid = H5Screate_simple(NDIMS, dims, dims)) < 0) ERR;
-      if ((var1_id = H5Dcreate2(grpid, VAR1_NAME, H5T_NATIVE_FLOAT, spaceid, 
+      if ((var1_id = H5Dcreate2(grpid, VAR1_NAME, H5T_NATIVE_FLOAT, spaceid,
 				H5P_DEFAULT, create_propid, access_propid)) < 0) ERR;
       if (H5Pclose(create_propid) < 0) ERR;
       if (H5Pclose(access_propid) < 0) ERR;
@@ -116,7 +116,7 @@ main()
       if (H5Pset_attr_creation_order(create_propid, H5P_CRT_ORDER_TRACKED|
 				     H5P_CRT_ORDER_INDEXED) < 0) ERR;
       if ((spaceid = H5Screate_simple(NDIMS, dims, dims)) < 0) ERR;
-      if ((var2_id = H5Dcreate2(grpid, VAR2_NAME, H5T_NATIVE_FLOAT, spaceid, 
+      if ((var2_id = H5Dcreate2(grpid, VAR2_NAME, H5T_NATIVE_FLOAT, spaceid,
 				H5P_DEFAULT, create_propid, access_propid)) < 0) ERR;
       if (H5Pclose(create_propid) < 0) ERR;
       if (H5Pclose(access_propid) < 0) ERR;
@@ -125,8 +125,8 @@ main()
 
       /* Now detach the scales and remove the dimscale. This doesn't
        * work if I reverse the order of the statements. */
-      if (H5DSdetach_scale(var2_id, dimscaleid, 0) < 0) ERR;     
-      if (H5DSdetach_scale(var1_id, dimscaleid, 0) < 0) ERR;      
+      if (H5DSdetach_scale(var2_id, dimscaleid, 0) < 0) ERR;
+      if (H5DSdetach_scale(var1_id, dimscaleid, 0) < 0) ERR;
 
       /* Fold up our tents. */
       if (H5Dclose(var1_id) < 0) ERR;

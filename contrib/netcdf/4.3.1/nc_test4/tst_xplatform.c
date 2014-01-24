@@ -40,9 +40,9 @@ main(int argc, char **argv)
 
       if (nc_create(FILE_NAME, NC_NETCDF4, &ncid)) ERR;
       if (nc_def_compound(ncid, sizeof(struct s1), CMP_TYPE_NAME, &cmp_typeid)) ERR;
-      if (nc_insert_compound(ncid, cmp_typeid, X_NAME, 
+      if (nc_insert_compound(ncid, cmp_typeid, X_NAME,
           NC_COMPOUND_OFFSET(struct s1, x), NC_FLOAT)) ERR;
-      if (nc_insert_compound(ncid, cmp_typeid, Y_NAME, 
+      if (nc_insert_compound(ncid, cmp_typeid, Y_NAME,
           NC_COMPOUND_OFFSET(struct s1, y), NC_DOUBLE)) ERR;
       if (nc_close(ncid)) ERR;
 
@@ -52,13 +52,13 @@ main(int argc, char **argv)
       if (ntypes_in != 1) ERR;
       if (nc_inq_compound(ncid, cmp_typeid, name_in, &size_in, &nfields_in)) ERR;
       if (nfields_in != 2 || strcmp(name_in, CMP_TYPE_NAME) || size_in != sizeof(struct s1)) ERR;
-      if (nc_inq_compound_field(ncid, cmp_typeid, 0, name_in, &offset_in, 
+      if (nc_inq_compound_field(ncid, cmp_typeid, 0, name_in, &offset_in,
           &field_type_in, &ndims_in, NULL)) ERR;
-      if (strcmp(name_in, X_NAME) || offset_in != 0 || field_type_in != NC_FLOAT || 
+      if (strcmp(name_in, X_NAME) || offset_in != 0 || field_type_in != NC_FLOAT ||
           ndims_in) ERR;
-      if (nc_inq_compound_field(ncid, cmp_typeid, 1, name_in, &offset_in, 
+      if (nc_inq_compound_field(ncid, cmp_typeid, 1, name_in, &offset_in,
           &field_type_in, &ndims_in, NULL)) ERR;
-      if (strcmp(name_in, Y_NAME) || offset_in != NC_COMPOUND_OFFSET(struct s1, y) || 
+      if (strcmp(name_in, Y_NAME) || offset_in != NC_COMPOUND_OFFSET(struct s1, y) ||
           field_type_in != NC_DOUBLE || ndims_in) ERR;
       if (nc_close(ncid)) ERR;
    }
@@ -80,7 +80,7 @@ main(int argc, char **argv)
       var = {1, -2} ;
      }
       */
-      
+
       int ncid, cmp_typeid, ntypes_in, ndims_in, dimids_in[1], natts_in;
       int nvars_in, unlimdimid;
       char name_in[NC_MAX_NAME + 1];
@@ -94,7 +94,7 @@ main(int argc, char **argv)
       {
 	 strcat(file_in, getenv("srcdir"));
 	 strcat(file_in, "/");
-      } 
+      }
       strcat(file_in, "../ncdump/");
       strcat(file_in, IN_FILE_NAME_3);
 
@@ -111,13 +111,13 @@ main(int argc, char **argv)
       if (ntypes_in != 1) ERR;
       if (nc_inq_compound(ncid, cmp_typeid, name_in, &size_in, &nfields_in)) ERR;
       if (nfields_in != 2 || strcmp(name_in, CMP_TYPE_NAME) || size_in != sizeof(struct s1)) ERR;
-      if (nc_inq_compound_field(ncid, cmp_typeid, 0, name_in, &offset_in, 
+      if (nc_inq_compound_field(ncid, cmp_typeid, 0, name_in, &offset_in,
           &field_type_in, &ndims_in, NULL)) ERR;
-      if (strcmp(name_in, X_NAME) || offset_in != 0 || field_type_in != NC_FLOAT || 
+      if (strcmp(name_in, X_NAME) || offset_in != 0 || field_type_in != NC_FLOAT ||
           ndims_in) ERR;
-      if (nc_inq_compound_field(ncid, cmp_typeid, 1, name_in, &offset_in, 
+      if (nc_inq_compound_field(ncid, cmp_typeid, 1, name_in, &offset_in,
           &field_type_in, &ndims_in, NULL)) ERR;
-      if (strcmp(name_in, Y_NAME) || offset_in != NC_COMPOUND_OFFSET(struct s1, y) || field_type_in != NC_DOUBLE || 
+      if (strcmp(name_in, Y_NAME) || offset_in != NC_COMPOUND_OFFSET(struct s1, y) || field_type_in != NC_DOUBLE ||
           ndims_in) ERR;
 
       /* Read the data. */
@@ -165,7 +165,7 @@ main(int argc, char **argv)
       {
 	 strcat(file_in, getenv("srcdir"));
 	 strcat(file_in, "/");
-      } 
+      }
       strcat(file_in, "../ncdump/");
       strcat(file_in, IN_FILE_NAME_4);
 

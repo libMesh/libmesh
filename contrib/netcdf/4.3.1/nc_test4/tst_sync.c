@@ -2,7 +2,7 @@
    Corporation for Atmospheric Research/Unidata See COPYRIGHT file for
    conditions of use.
 
-   Test netcdf-4 syncs. 
+   Test netcdf-4 syncs.
 */
 
 #include <nc_tests.h>
@@ -30,7 +30,7 @@ main(int argc, char **argv)
       if (nc_def_var(ncid, VAR1_NAME, NC_FLOAT, 1, &dimid, &var1_id)) ERR;
       if (nc_sync(ncid)) ERR;
       if (nc_def_var(ncid, VAR2_NAME, NC_FLOAT, 1, &dimid, &var2_id)) ERR;
-      
+
       /* Now define a coordinate variable for the dimension. */
       if (nc_def_var(ncid, DIM_NAME, NC_FLOAT, 1, &dimid, &var3_id)) ERR;
       if (nc_close(ncid)) ERR;
@@ -40,7 +40,7 @@ main(int argc, char **argv)
       if (nc_inq(ncid, &ndims, &nvars, &natts, &unlimdimid)) ERR;
       if (ndims != 1 || nvars != 3 || natts != 0 || unlimdimid != -1) ERR;
       if (nc_inq_var(ncid, 2, name_in, &xtype_in, &ndims, &dimid_in, &natts)) ERR;
-      if (strcmp(name_in, DIM_NAME) || xtype_in != NC_FLOAT || ndims != 1 || 
+      if (strcmp(name_in, DIM_NAME) || xtype_in != NC_FLOAT || ndims != 1 ||
 	  dimid_in != 0 || natts != 0) ERR;
       if (nc_close(ncid)) ERR;
    }

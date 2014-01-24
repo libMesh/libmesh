@@ -37,7 +37,7 @@ static void dcedumprawlist(NClist* list, NCbytes* buf);
 #if 0 /*not currently used */
 /* Parse incoming url constraints, if any,
    to check for syntactic correctness
-*/ 
+*/
 int
 dapparseconstraints(char* constraints, DCEconstraint* dapconstraint)
 {
@@ -244,11 +244,11 @@ fprintf(stderr,"dapmergeprojection: src = %s\n",dcetostring((DCEnode*)src));
     for(i=0;i<nclistlength(dst);i++) {
 	DCEprojection* p = (DCEprojection*)nclistget(dst,i);
 	nclistpush(cat,(void*)p);
-    }    
+    }
     for(i=0;i<nclistlength(src);i++) {
 	DCEprojection* p = (DCEprojection*)nclistget(src,i);
 	nclistpush(cat,(void*)dceclone((DCEnode*)p));
-    }    
+    }
 
     nclistclear(dst);
 
@@ -269,12 +269,12 @@ fprintf(stderr,"dapmergeprojection: src = %s\n",dcetostring((DCEnode*)src));
 	    /* This entry matches our current target; merge  */
 	    ncstat = dcemergeprojections(target,p2);
 	    /* null out this merged entry and release it */
-	    nclistset(cat,i,(void*)NULL);	    
-	    dcefree((DCEnode*)p2);	    
-	}		    
+	    nclistset(cat,i,(void*)NULL);
+	    dcefree((DCEnode*)p2);
+	}
 	/* Capture the clone */
 	nclistpush(dst,(void*)target);
-    }	    
+    }
     nclistfree(cat);
     return ncstat;
 }
@@ -287,7 +287,7 @@ dcemergeprojections(DCEprojection* merged, DCEprojection* addition)
     int i,j;
 
     ASSERT((merged->discrim == CES_VAR && addition->discrim == CES_VAR));
-    ASSERT((nclistlength(merged->var->segments) == nclistlength(addition->var->segments)));    
+    ASSERT((nclistlength(merged->var->segments) == nclistlength(addition->var->segments)));
     for(i=0;i<nclistlength(merged->var->segments);i++) {
 	DCEsegment* mergedseg = (DCEsegment*)nclistget(merged->var->segments,i);
 	DCEsegment* addedseg = (DCEsegment*)nclistget(addition->var->segments,i);
@@ -360,7 +360,7 @@ dceclone(DCEnode* node)
     case CES_SEGMENT: {
 	DCEsegment* clone = (DCEsegment*)result;
 	DCEsegment* orig = (DCEsegment*)node;
-	*clone = *orig;	
+	*clone = *orig;
         clone->name = nulldup(orig->name);
 	if(orig->rank > 0)
 	    memcpy(clone->slices,orig->slices,orig->rank*sizeof(DCEslice));
@@ -407,7 +407,7 @@ dceclone(DCEnode* node)
     case CES_PROJECT: {
 	DCEprojection* clone = (DCEprojection*)result;
 	DCEprojection* orig = (DCEprojection*)node;
-	*clone = *orig;	
+	*clone = *orig;
 	switch (orig->discrim) {
 	case CES_VAR:
             clone->var = (DCEvar*)dceclone((DCEnode*)orig->var); break;
@@ -420,7 +420,7 @@ dceclone(DCEnode* node)
     case CES_SELECT: {
 	DCEselection* clone = (DCEselection*)result;
 	DCEselection* orig = (DCEselection*)node;
-	*clone = *orig;	
+	*clone = *orig;
 	clone->lhs = (DCEvalue*)dceclone((DCEnode*)orig->lhs);
 	clone->rhs = dceclonelist(orig->rhs);
     } break;
@@ -428,8 +428,8 @@ dceclone(DCEnode* node)
     case CES_CONSTRAINT: {
 	DCEconstraint* clone = (DCEconstraint*)result;
 	DCEconstraint* orig = (DCEconstraint*)node;
-	*clone = *orig;	
-	clone->projections = dceclonelist(orig->projections);	
+	*clone = *orig;
+	clone->projections = dceclonelist(orig->projections);
 	clone->selections = dceclonelist(orig->selections);
     } break;
 
@@ -465,12 +465,12 @@ dcefree(DCEnode* node)
 
     case CES_VAR: {
 	DCEvar* target = (DCEvar*)node;
-	dcefreelist(target->segments);	
+	dcefreelist(target->segments);
     } break;
 
     case CES_FCN: {
 	DCEfcn* target = (DCEfcn*)node;
-	dcefreelist(target->args);	
+	dcefreelist(target->args);
         nullfree(target->name);
     } break;
 
@@ -483,9 +483,9 @@ dcefree(DCEnode* node)
     case CES_VALUE: {
 	DCEvalue* target = (DCEvalue*)node;
 	switch(target->discrim) {
-        case CES_CONST: dcefree((DCEnode*)target->constant); break;    
-        case CES_VAR: dcefree((DCEnode*)target->var); break;    
-        case CES_FCN: dcefree((DCEnode*)target->fcn); break;    
+        case CES_CONST: dcefree((DCEnode*)target->constant); break;
+        case CES_VAR: dcefree((DCEnode*)target->var); break;
+        case CES_FCN: dcefree((DCEnode*)target->fcn); break;
         default: assert(0);
         }
     } break;
@@ -581,7 +581,7 @@ dimdecl(size_t declsize)
 {
     static char tag[16];
     tag[0] = '\0';
-    if(dceverbose) 
+    if(dceverbose)
         snprintf(tag,sizeof(tag),"/%lu",(unsigned long)declsize);
     return tag;
 }
@@ -666,7 +666,7 @@ dcedump(DCEnode* node, NCbytes* buf)
         switch (value->discrim) {
         case CES_STR:
 	    ncbytescat(buf,value->text);
-	    break;		
+	    break;
         case CES_INT:
             snprintf(tmp,sizeof(tmp),"%lld",value->intvalue);
             ncbytescat(buf,tmp);
@@ -684,7 +684,7 @@ dcedump(DCEnode* node, NCbytes* buf)
         switch (value->discrim) {
         case CES_CONST:
     	    dcetobuffer((DCEnode*)value->constant,buf);
-      	    break;		
+      	    break;
         case CES_VAR:
     	    dcetobuffer((DCEnode*)value->var,buf);
     	    break;
@@ -849,7 +849,7 @@ dcecreate(CEsort sort)
 	if(target == NULL) return NULL;
 	/* Initialize the sort of the slices */
 	for(i=0;i<NC_MAX_VAR_DIMS;i++)
-	    target->slices[i].node.sort = CES_SLICE;		
+	    target->slices[i].node.sort = CES_SLICE;
 	node = (DCEnode*)target;
     } break;
 
@@ -920,11 +920,11 @@ int
 dceiswholesegment(DCEsegment* seg)
 {
     int i,whole;
-    
+
     if(!seg->slicesdefined) return 0; /* actually, we don't know */
     whole = 1; /* assume so */
     for(i=0;i<seg->rank;i++) {
-	if(!dceiswholeslice(&seg->slices[i])) {whole = 0; break;}	
+	if(!dceiswholeslice(&seg->slices[i])) {whole = 0; break;}
     }
     return whole;
 }
@@ -949,7 +949,7 @@ dcemakewholeprojection(DCEprojection* p)
         int lastindex = nclistlength(p->var->segments) - 1;
         DCEsegment* lastseg = (DCEsegment*)nclistget(p->var->segments,lastindex);
         lastseg->rank = 0;
-    }   
+    }
 }
 
 int
@@ -982,7 +982,7 @@ dcesegment_transpose(DCEsegment* segment,
 	    if(stride != NULL) stride[i] = (size_t)segment->slices[i].stride;
 	    if(sizes != NULL) sizes[i] = segment->slices[i].declsize;
 	}
-    }	
+    }
 }
 
 /* Compute segment size for subset of slices */
@@ -1113,7 +1113,7 @@ dcedumpraw(DCEnode* node, NCbytes* buf)
 	    ncbytescat(buf,"|");
 	    ncbytescat(buf,value->text);
 	    ncbytescat(buf,"|");
-	    break;		
+	    break;
         case CES_INT:
             snprintf(tmp,sizeof(tmp),"%lld",value->intvalue);
             ncbytescat(buf,tmp);
@@ -1133,7 +1133,7 @@ dcedumpraw(DCEnode* node, NCbytes* buf)
         switch (value->discrim) {
         case CES_CONST:
     	    dcedumpraw((DCEnode*)value->constant,buf);
-      	    break;		
+      	    break;
         case CES_VAR:
     	    dcedumpraw((DCEnode*)value->var,buf);
     	    break;
@@ -1175,11 +1175,11 @@ dcedumpraw(DCEnode* node, NCbytes* buf)
     case CES_CONSTRAINT: {
 	DCEconstraint* con = (DCEconstraint*)node;
         if(con->projections != NULL && nclistlength(con->projections) > 0) {
-	    ncbytescat(buf,"projections=");	
+	    ncbytescat(buf,"projections=");
             dcedumprawlist(con->projections,buf);
 	}
         if(con->selections != NULL && nclistlength(con->selections) > 0) {
-	    ncbytescat(buf,"selections=");	
+	    ncbytescat(buf,"selections=");
             dcedumprawlist(con->selections,buf);
 	}
     } break;

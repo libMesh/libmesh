@@ -29,13 +29,13 @@
 #define DIM1 2048
 #define DIM2 2097153		/* DIM1*DIM2*sizeof(char)   > 2**32 */
 
-/* 
+/*
  * In netCDF-3.6.2, an assertion failure occurs on 32-bit platforms
  * when creating a byte variable for which the product of dimensions
  * is greater than 2**32.  Check that this bug has been fixed.
  */
 static int
-test_big_var(const char *testfile) 
+test_big_var(const char *testfile)
 {
     int ncid, varid, dimids[NUMDIMS];
     size_t index[NUMDIMS];
@@ -78,6 +78,6 @@ main(int argc, char **argv) {
        (void) remove(testfile);
        SUMMARIZE_ERR;
    }
-    
+
     FINAL_RESULTS;
 }

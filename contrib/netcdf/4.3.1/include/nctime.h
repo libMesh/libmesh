@@ -14,7 +14,7 @@ struct bounds_node{
 
 typedef struct bounds_node bounds_node_t;
 
-/* 
+/*
  * This code was extracted with permission from the CDMS time
  * conversion and arithmetic routines developed by Bob Drach, Lawrence
  * Livermore National Laboratory as part of the cdtime library.

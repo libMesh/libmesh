@@ -105,7 +105,7 @@ main()
       /* Now getting another copy of the native typeid will fail! WTF? */
       if ((file_typeid2 = H5Aget_type(attid)) < 0) ERR;
       if ((native_typeid2 = H5Tget_native_type(file_typeid, H5T_DIR_DEFAULT)) < 0) ERR;
-      
+
       /* Close the attribute. */
       if (H5Aclose(attid) < 0) ERR;
 

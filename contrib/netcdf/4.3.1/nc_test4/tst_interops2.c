@@ -47,14 +47,14 @@ main(int argc, char **argv)
       if (SDend(sd_id)) ERR;
 
       /* Now open with netCDF and check the contents. */
-      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR; 
-      if (nc_inq(ncid, &ndims_in, &nvars_in, &natts_in, &unlimdim_in)) ERR; 
+      if (nc_open(FILE_NAME, NC_NOWRITE, &ncid)) ERR;
+      if (nc_inq(ncid, &ndims_in, &nvars_in, &natts_in, &unlimdim_in)) ERR;
       if (ndims_in != 2 || nvars_in != 1 || natts_in != 0 || unlimdim_in != -1) ERR;
       if (nc_inq_dim(ncid, 0, NULL, &len_in)) ERR;
       if (len_in != LAT_LEN) ERR;
       if (nc_inq_dim(ncid, 1, NULL, &len_in)) ERR;
       if (len_in != LON_LEN) ERR;
-      
+
       /* Read the data through a vara function from the netCDF API. */
       if (nc_get_vara(ncid, 0, nstart, ncount, data_in)) ERR;
       for (i = 0; i < LAT_LEN; i++)
@@ -96,7 +96,7 @@ main(int argc, char **argv)
 	    if (scalar_data_in != data_out[i][j]) ERR;
 	 }
 
-      if (nc_close(ncid)) ERR; 
+      if (nc_close(ncid)) ERR;
    }
    SUMMARIZE_ERR;
    printf("*** testing with a more complex HDF4 file...");
@@ -113,11 +113,11 @@ main(int argc, char **argv)
       int ncid, nvars_in, ndims_in, natts_in, unlimdim_in;
       size_t len_in;
       nc_type type_in;
-      int hdf4_type[NUM_TYPES] = {DFNT_FLOAT32, DFNT_FLOAT64, 
-				  DFNT_INT8, DFNT_UINT8, DFNT_INT16, 
+      int hdf4_type[NUM_TYPES] = {DFNT_FLOAT32, DFNT_FLOAT64,
+				  DFNT_INT8, DFNT_UINT8, DFNT_INT16,
 				  DFNT_UINT16, DFNT_INT32, DFNT_UINT32};
-      int netcdf_type[NUM_TYPES] = {NC_FLOAT, NC_DOUBLE, 
-				  NC_BYTE, NC_UBYTE, NC_SHORT, 
+      int netcdf_type[NUM_TYPES] = {NC_FLOAT, NC_DOUBLE,
+				  NC_BYTE, NC_UBYTE, NC_SHORT,
 				  NC_USHORT, NC_INT, NC_UINT};
       char tmp_name[NC_MAX_NAME + 1], name_in[NC_MAX_NAME + 1];
       char dim_name[NC_MAX_NAME + 1][DIMS_3] = {"z", "y", "x"};
@@ -130,8 +130,8 @@ main(int argc, char **argv)
       for (t = 0; t < NUM_TYPES; t++)
       {
 	 sprintf(tmp_name, "hdf4_dataset_type_%d", t);
-	 if ((sds_id = SDcreate(sd_id, tmp_name, hdf4_type[t], 
-				DIMS_3, dim_size)) == FAIL) ERR;	    
+	 if ((sds_id = SDcreate(sd_id, tmp_name, hdf4_type[t],
+				DIMS_3, dim_size)) == FAIL) ERR;
 	 /* Set up dimensions. By giving them the same names for each
 	  * dataset, I am specifying that they are shared
 	  * dimensions. */
@@ -157,13 +157,13 @@ main(int argc, char **argv)
       if (len_in != X_LEN) ERR;
       for (t = 0; t < NUM_TYPES; t++)
       {
-	 if (nc_inq_var(ncid, t, name_in, &type_in, &ndims_in, 
+	 if (nc_inq_var(ncid, t, name_in, &type_in, &ndims_in,
 			dimids_in, &natts_in)) ERR;
 	 if (type_in != netcdf_type[t] || ndims_in != DIMS_3 ||
-	     dimids_in[0] != 0 || dimids_in[2] != 2 || dimids_in[2] != 2 || 
+	     dimids_in[0] != 0 || dimids_in[2] != 2 || dimids_in[2] != 2 ||
 	     natts_in != 0) ERR;
       }
-      
+
       if (nc_close(ncid)) ERR;
    }
    SUMMARIZE_ERR;

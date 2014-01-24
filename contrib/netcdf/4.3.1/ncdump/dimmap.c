@@ -68,6 +68,6 @@ dimmap_ounlim(int odimid) {
 int
 dimmap_iunlim(int idimid) {
     return dimmap.iunlims[idimid];
-   
+
 }
 

@@ -37,7 +37,7 @@
 
 
 static int
-test_big_var(const char *testfile) 
+test_big_var(const char *testfile)
 {
     int ncid, varid, dimids[NUMDIMS];
     size_t index[NUMDIMS];
@@ -48,7 +48,7 @@ test_big_var(const char *testfile)
     signed char data[DIM2][DIM3];
     int i, j;
     int nerrs = 0;
-    
+
     /* Create a file with one big record variable. */
     if (nc_create(testfile, NC_CLOBBER, &ncid)) ERR;
     if (nc_set_fill(ncid, NC_NOFILL, NULL)) ERR;
@@ -81,9 +81,9 @@ test_big_var(const char *testfile)
     for (i = 0; i < DIM2; i++)
 	for (j = 0; j < DIM3; j++)
 	{
-	    if (data[i][j] != (signed char)((i + j) % 16)) 
+	    if (data[i][j] != (signed char)((i + j) % 16))
 	    {
-		printf("error on start[0]: %d i: %d j: %d expected %d got %d\n", 
+		printf("error on start[0]: %d i: %d j: %d expected %d got %d\n",
 		       start[0], i, j, (i + j) % 16, data[i][j]);
 		ERR;
 		if(nerrs++ > 2)
@@ -95,9 +95,9 @@ test_big_var(const char *testfile)
     for (i = 0; i < DIM2; i++)
 	for (j = 0; j < DIM3; j++)
 	{
-	    if (data[i][j] != (signed char)((i + j) % 16)) 
+	    if (data[i][j] != (signed char)((i + j) % 16))
 	    {
-		printf("error on start[0]: %d i: %d j: %d expected %d got %d\n", 
+		printf("error on start[0]: %d i: %d j: %d expected %d got %d\n",
 		       start[0], i, j, (i + j) % 16, data[i][j]);
 		ERR;
 		if(nerrs++ > 2)
@@ -123,6 +123,6 @@ main(int argc, char **argv) {
        (void) remove(testfile);
        SUMMARIZE_ERR;
    }
-    
+
     FINAL_RESULTS;
 }

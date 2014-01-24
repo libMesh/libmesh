@@ -1,5 +1,5 @@
 ## This is a automake file, part of Unidata's netCDF package.
-# Copyright 2005, see the COPYRIGHT file for more information.  
+# Copyright 2005, see the COPYRIGHT file for more information.
 
 # This file builds and runs the nctest program, which tests the netCDF
 # version 2 interface.
@@ -7,7 +7,7 @@
 # Put together AM_CPPFLAGS and AM_LDFLAGS.
 include $(top_srcdir)/lib_flags.am
 
-AM_LDFLAGS += ${top_builddir}/liblib/libnetcdf.la 
+AM_LDFLAGS += ${top_builddir}/liblib/libnetcdf.la
 
 # Running nctest results in a file testfile.nc, which is then checked
 # to make sure it matches testfile_nc.sav, which was generated under

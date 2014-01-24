@@ -84,7 +84,7 @@ typedef unsigned char _Bool;
 #include <stdint.h>
 #else /* HAVE_INTTYPES_H */
 #include <pstdint.h>
-#endif /* HAVE_INTTYPES_H */ 
+#endif /* HAVE_INTTYPES_H */
 #include <limits.h>
 
 #ifndef HAVE_SSIZE_T
