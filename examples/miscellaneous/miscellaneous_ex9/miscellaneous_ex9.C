@@ -40,7 +40,7 @@
  // which is handled by the class AugmentSparsityPatternOnInterface. (We do not need to augment the
  // send-list in this case since the PDE is linear and hence there is no need to broadcast non-local
  // solution values).
- 
+
 
 // C++ include files that we need
 #include <iostream>
@@ -105,26 +105,26 @@ int main (int argc, char** argv)
   libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
 
   GetPot command_line (argc, argv);
-  
+
   Real R = 2.;
   if ( command_line.search(1, "-R") )
     R = command_line.next(R);
 
   // Maintaining the right ghost elements on a ParallelMesh is
   // trickier.
-  SerialMesh mesh;
+  SerialMesh mesh(init.comm());
   mesh.read("miscellaneous_ex9.exo");
-  
+
   EquationSystems equation_systems (mesh);
 
   LinearImplicitSystem& system =
     equation_systems.add_system<LinearImplicitSystem> ("Poisson");
   system.add_variable("u", FIRST, LAGRANGE);
-  
-  // We want to call assemble_poisson "manually" so that we can pass in 
+
+  // We want to call assemble_poisson "manually" so that we can pass in
   // lower_to_upper, hence set assemble_before_solve = false
   system.assemble_before_solve = false;
-  
+
   // Impose zero Dirichlet boundary condition on MAX_Z_BOUNDARY
   std::set<boundary_id_type> boundary_ids;
   boundary_ids.insert(MAX_Z_BOUNDARY);
@@ -135,7 +135,7 @@ int main (int argc, char** argv)
                                  variables,
                                  &zf);
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
-  
+
   // Attach an object to the DofMap that will augment the sparsity pattern
   // due to the degrees-of-freedom on the "crack"
   AugmentSparsityOnInterface augment_sparsity(equation_systems,
@@ -145,10 +145,10 @@ int main (int argc, char** argv)
 
   equation_systems.init();
   equation_systems.print_info();
-  
+
   // Set the jump term coefficient, it will be used in assemble_poisson
   equation_systems.parameters.set<Real>("R") = R;
-  
+
   // Assemble and then solve
   assemble_poisson(equation_systems,
                    augment_sparsity.get_lower_to_upper());
@@ -159,7 +159,7 @@ int main (int argc, char** argv)
   ExodusII_IO (mesh).write_equation_systems ("solution.exo",
                                              equation_systems);
 #endif
-  
+
   return 0;
 }
 
@@ -168,7 +168,7 @@ void assemble_poisson(EquationSystems& es,
 {
   const MeshBase& mesh = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
-  
+
   Real R = es.parameters.get<Real>("R");
 
   LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Poisson");
@@ -180,10 +180,10 @@ void assemble_poisson(EquationSystems& es,
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
   AutoPtr<FEBase> fe_elem_face (FEBase::build(dim, fe_type));
   AutoPtr<FEBase> fe_neighbor_face (FEBase::build(dim, fe_type));
-  
+
   QGauss qrule (dim, fe_type.default_quadrature_order());
   QGauss qface(dim-1, fe_type.default_quadrature_order());
-  
+
   fe->attach_quadrature_rule (&qrule);
   fe_elem_face->attach_quadrature_rule (&qface);
   fe_neighbor_face->attach_quadrature_rule (&qface);
@@ -191,17 +191,17 @@ void assemble_poisson(EquationSystems& es,
   const std::vector<Real>& JxW = fe->get_JxW();
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
-  
+
   const std::vector<Real>& JxW_face = fe_elem_face->get_JxW();
 
   const std::vector<Point>& qface_points = fe_elem_face->get_xyz();
-  
+
   const std::vector<std::vector<Real> >&  phi_face          = fe_elem_face->get_phi();
   const std::vector<std::vector<Real> >&  phi_neighbor_face = fe_neighbor_face->get_phi();
 
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
-  
+
   DenseMatrix<Number> Kne;
   DenseMatrix<Number> Ken;
   DenseMatrix<Number> Kee;
@@ -218,7 +218,7 @@ void assemble_poisson(EquationSystems& es,
 
       dof_map.dof_indices (elem, dof_indices);
       const unsigned int n_dofs = dof_indices.size();
-      
+
       fe->reinit (elem);
 
       Ke.resize (n_dofs, n_dofs);
@@ -247,10 +247,10 @@ void assemble_poisson(EquationSystems& es,
                   }
                 }
               }
-              
+
             }
       }
-      
+
       // Add boundary terms on the crack
       {
         for (unsigned int side=0; side<elem->n_sides(); side++)
@@ -260,21 +260,21 @@ void assemble_poisson(EquationSystems& es,
               if( mesh.boundary_info->has_boundary_id (elem,side,CRACK_BOUNDARY_LOWER) )
               {
                 fe_elem_face->reinit(elem, side);
-                
+
                 ElementIdMap::const_iterator ltu_it =
                   lower_to_upper.find(std::make_pair(elem->id(),side));
                 dof_id_type upper_elem_id = ltu_it->second;
                 const Elem* neighbor = mesh.elem(upper_elem_id);
-                
+
                 std::vector<Point> qface_neighbor_points;
                 FEInterface::inverse_map (elem->dim(), fe->get_fe_type(),
                                           neighbor, qface_points, qface_neighbor_points);
                 fe_neighbor_face->reinit(neighbor, &qface_neighbor_points);
-                
+
                 std::vector<dof_id_type> neighbor_dof_indices;
                 dof_map.dof_indices (neighbor, neighbor_dof_indices);
                 const unsigned int n_neighbor_dofs = neighbor_dof_indices.size();
-                
+
                 Kne.resize (n_neighbor_dofs, n_dofs);
                 Ken.resize (n_dofs, n_neighbor_dofs);
                 Kee.resize (n_dofs, n_dofs);
@@ -289,7 +289,7 @@ void assemble_poisson(EquationSystems& es,
                       Kee(i,j) -= JxW_face[qp] * (1./R)*(phi_face[i][qp] * phi_face[j][qp]);
                     }
                 }
-                
+
                 // Lower-to-upper coupling term
                 for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
@@ -299,7 +299,7 @@ void assemble_poisson(EquationSystems& es,
                       Ken(i,j) += JxW_face[qp] * (1./R)*(phi_face[i][qp] * phi_neighbor_face[j][qp]);
                     }
                 }
-                
+
                 // Upper-to-upper coupling term
                 for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
@@ -309,7 +309,7 @@ void assemble_poisson(EquationSystems& es,
                       Knn(i,j) -= JxW_face[qp] * (1./R)*(phi_neighbor_face[i][qp] * phi_neighbor_face[j][qp]);
                     }
                 }
-                
+
                 // Upper-to-lower coupling term
                 for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
@@ -319,7 +319,7 @@ void assemble_poisson(EquationSystems& es,
                       Kne(i,j) += JxW_face[qp] * (1./R)*(phi_neighbor_face[i][qp] * phi_face[j][qp]);
                     }
                 }
-                
+
                 system.matrix->add_matrix(Kne,neighbor_dof_indices,dof_indices);
                 system.matrix->add_matrix(Ken,dof_indices,neighbor_dof_indices);
                 system.matrix->add_matrix(Kee,dof_indices);
@@ -327,9 +327,9 @@ void assemble_poisson(EquationSystems& es,
               }
             }
       }
-      
+
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-      
+
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
