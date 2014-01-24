@@ -1,0 +1,11 @@
+INCLUDE(BundleUtilities)
+
+# Set bundle to the full path name of the executable
+
+SET (BUNDLE "${CMAKE_INSTALL_PREFIX}/ncdump@CMAKE_EXECUTABLE_SUFFIX@")
+
+SET (OTHER_LIBS "")
+
+SET (DIRS "@LIBRARY_OUTPUT_PATH@")
+
+fixup_bundle("${BUNDLE}" "${OTHER_LIBS}" "${DIRS}")
