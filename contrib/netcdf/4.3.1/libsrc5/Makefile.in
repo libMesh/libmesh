@@ -253,7 +253,7 @@ libnetcdf5_la_CPPFLAGS = ${AM_CPPFLAGS} $(am__append_3)
 # These files comprise the pnetcdf dispatch library code.
 libnetcdf5_la_SOURCES = nc5dispatch.c
 noinst_LTLIBRARIES = libnetcdf5.la
-EXTRA_DIST = CMakeLists.txt 
+EXTRA_DIST = CMakeLists.txt
 all: all-am
 
 .SUFFIXES:

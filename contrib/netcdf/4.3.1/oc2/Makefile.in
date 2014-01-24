@@ -276,7 +276,7 @@ xxdr.h
 
 EXTRA_DIST = dap.y CMakeLists.txt
 @BUILD_DAP_TRUE@noinst_LTLIBRARIES = liboc.la
-@BUILD_DAP_TRUE@liboc_la_SOURCES = $(SRC) $(HDRS) 
+@BUILD_DAP_TRUE@liboc_la_SOURCES = $(SRC) $(HDRS)
 @BUILD_DAP_TRUE@liboc_la_CPPFLAGS = $(AM_CPPFLAGS)
 all: all-am
 

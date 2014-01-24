@@ -59,7 +59,7 @@ host_triplet = @host@
 target_triplet = @target@
 
 # To build netcdf-4, or not to build netcdf-4, that is the question...
-# These are the extra netCDF-4 examples. 
+# These are the extra netCDF-4 examples.
 @USE_NETCDF4_TRUE@am__append_1 = simple_nc4_wr simple_nc4_rd simple_xy_nc4_wr	\
 @USE_NETCDF4_TRUE@simple_xy_nc4_rd
 
@@ -300,7 +300,7 @@ LDADD = -lm
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_builddir)/liblib
 AM_LDFLAGS = ${top_builddir}/liblib/libnetcdf.la
 
-# These are the netCDF-3 examples. 
+# These are the netCDF-3 examples.
 TESTPROGRAMS = simple_xy_wr simple_xy_rd sfc_pres_temp_wr \
 	sfc_pres_temp_rd pres_temp_4D_wr pres_temp_4D_rd \
 	$(am__append_1)

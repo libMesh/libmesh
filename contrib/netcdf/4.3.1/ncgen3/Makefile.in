@@ -284,7 +284,7 @@ AM_LDFLAGS =
 # Put together AM_CPPFLAGS and AM_LDFLAGS.
 
 # Link to the netCDF library.
-ncgen3_LDADD = ${top_builddir}/liblib/libnetcdf.la 
+ncgen3_LDADD = ${top_builddir}/liblib/libnetcdf.la
 ncgen3_SOURCES = main.c load.c escapes.c getfill.c init.c	\
 genlib.c generic.h ncgen.h genlib.h ncgentab.h ncgentab.c
 

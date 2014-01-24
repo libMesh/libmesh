@@ -17,7 +17,7 @@
 # This is part of the netCDF package.
 # Copyright 2005 University Corporation for Atmospheric Research/Unidata
 # See COPYRIGHT file for conditions of use.
-# 
+#
 # This entire directory will be skipped if netCDF-4 is not enabled.
 #
 
@@ -83,7 +83,7 @@ TESTS = $(am__EXEEXT_1) run_grp_rename.sh $(am__EXEEXT_3) \
 	$(am__append_16) $(am__append_18)
 
 # If the v2 API was built, add its test program.
-@BUILD_V2_TRUE@am__append_4 = tst_v2 
+@BUILD_V2_TRUE@am__append_4 = tst_v2
 @BUILD_V2_TRUE@am__append_5 = tst_v2
 @LARGE_FILE_TESTS_TRUE@am__append_6 = tst_large
 @LARGE_FILE_TESTS_TRUE@am__append_7 = tst_large
@@ -672,7 +672,7 @@ tst_chunks tst_chunks2 tst_utf8 tst_fills tst_fills2 tst_fillbug	\
 tst_xplatform tst_xplatform2 tst_h_atts2 tst_endian_fill tst_atts	\
 t_type cdm_sea_soundings tst_camrun tst_vl tst_atts1 tst_atts2		\
 tst_vars2 tst_files5 tst_files6 tst_sync tst_h_strbug tst_h_refs        \
-tst_h_scalar 
+tst_h_scalar
 
 @BUILD_BENCHMARKS_TRUE@bm_netcdf4_recs_SOURCES = bm_netcdf4_recs.c tst_utils.c
 @BUILD_BENCHMARKS_TRUE@bm_many_atts_SOURCES = bm_many_atts.c tst_utils.c
@@ -1425,8 +1425,8 @@ uninstall-am:
 
 
 @BUILD_BENCHMARKS_TRUE@benchmarks: check
-@BUILD_BENCHMARKS_TRUE@	./run_bm_radar_2D.sh	
-@BUILD_BENCHMARKS_TRUE@	./run_bm_radar_2D_compression1.sh	
+@BUILD_BENCHMARKS_TRUE@	./run_bm_radar_2D.sh
+@BUILD_BENCHMARKS_TRUE@	./run_bm_radar_2D_compression1.sh
 @BUILD_BENCHMARKS_TRUE@	./run_bm.sh
 @BUILD_BENCHMARKS_TRUE@	./run_tst_chunks.sh
 @BUILD_BENCHMARKS_TRUE@	./run_bm_ar4.sh

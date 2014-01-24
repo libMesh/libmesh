@@ -83,7 +83,7 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 @BUILD_DLL_TRUE@am__append_4 = -DDLL_EXPORT
 
 # Add V2 API convenience library if needed.
-@BUILD_V2_TRUE@am__append_5 = libnetcdf2.la 
+@BUILD_V2_TRUE@am__append_5 = libnetcdf2.la
 subdir = libdispatch
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \

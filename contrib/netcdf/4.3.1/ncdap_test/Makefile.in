@@ -354,7 +354,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/include $(am__append_1) $(am__append_2) \
 AM_LDFLAGS = 
 
 # Put together AM_CPPFLAGS and AM_LDFLAGS.
-LDADD = ${top_builddir}/liblib/libnetcdf.la 
+LDADD = ${top_builddir}/liblib/libnetcdf.la
 TESTS_ENVIRONMENT = TOPSRCDIR=${abs_top_srcdir}
 nctestserver_SOURCES = nctestserver.c
 @ENABLE_DAP_REMOTE_TESTS_TRUE@test_cvt3_SOURCES = test_cvt.c

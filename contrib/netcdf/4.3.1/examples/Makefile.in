@@ -252,7 +252,7 @@ top_srcdir = @top_srcdir@
 # Build ncgen/ncdump.
 @BUILD_UTILITIES_TRUE@CDL_DIR = CDL
 
-# These are the subdirectories that will be built. 
+# These are the subdirectories that will be built.
 SUBDIRS = C $(CDL_DIR)
 EXTRA_DIST = CMakeLists.txt
 all: all-recursive

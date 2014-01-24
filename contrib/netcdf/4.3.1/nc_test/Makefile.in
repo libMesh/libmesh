@@ -421,15 +421,15 @@ TESTPROGRAMS = t_nc tst_small nc_test tst_misc tst_norm tst_names \
 	$(am__append_4) $(am__append_5) $(am__append_6)
 
 # if EXTRA_TESTS
-# TESTPROGRAMS += 
+# TESTPROGRAMS +=
 # endif # EXTRA_TESTS
 
 # These are the source files for the main workhorse test program,
 # nc_test. If you pass nc_test, you are doing well.
 nc_test_SOURCES = nc_test.c error.c test_get.c test_put.c \
-test_read.c test_write.c util.c error.h tests.h 
+test_read.c test_write.c util.c error.h tests.h
 
-LDADD = ${top_builddir}/liblib/libnetcdf.la 
+LDADD = ${top_builddir}/liblib/libnetcdf.la
 @BUILD_BENCHMARKS_TRUE@testnc3perf_SOURCES = testnc3perf.c
 @USE_NETCDF4_FALSE@@USE_VALGRIND_TESTS_TRUE@TESTS_ENVIRONMENT = USE_NETCDF4=0
 

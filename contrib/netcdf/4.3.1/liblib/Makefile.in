@@ -326,7 +326,7 @@ CLEANFILES =
 
 # We need at least one source file
 libnetcdf_la_SOURCES = stub.c
-EXTRA_DIST = CMakeLists.txt 
+EXTRA_DIST = CMakeLists.txt
 all: all-am
 
 .SUFFIXES:

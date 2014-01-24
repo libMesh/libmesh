@@ -17,7 +17,7 @@
 # This is part of the netCDF package.
 # Copyright 2011 University Corporation for Atmospheric Research/Unidata
 # See COPYRIGHT file for conditions of use.
-# 
+#
 # This entire directory will be skipped, unless the configure script
 # is run with --enable-netcdf-4. This directory contains tests that
 # only use HDF5; these tests don't use netCDF at all.
@@ -86,7 +86,7 @@ TESTS = $(am__EXEEXT_2) $(am__append_5) $(am__append_6)
 
 # This will run a bunch of the test programs with valgrind, the memory
 # checking tool. (Valgrind must be present for this to work.)
-@USE_VALGRIND_TESTS_TRUE@am__append_6 = run_valgrind_tests.sh 
+@USE_VALGRIND_TESTS_TRUE@am__append_6 = run_valgrind_tests.sh
 subdir = h5_test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \

@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-# Copyright 2005, see the COPYRIGHT file for more information.  
+# Copyright 2005, see the COPYRIGHT file for more information.
 
 # This file builds and runs the nctest program, which tests the netCDF
 # version 2 interface.

@@ -313,10 +313,10 @@ noinst_LTLIBRARIES = libnetcdf3.la
 # with m4), but they are included in the distribution so that the user
 # does not have to have m4.
 MAINTAINERCLEANFILES = $(man_MANS) attrx.c putgetx.c
-EXTRA_DIST = attr.m4 ncx.m4 putget.m4 $(man_MANS) CMakeLists.txt XGetopt.c 
+EXTRA_DIST = attr.m4 ncx.m4 putget.m4 $(man_MANS) CMakeLists.txt XGetopt.c
 
 # The C API man page.
-man_MANS = netcdf.3 
+man_MANS = netcdf.3
 
 # Decide what goes in the man page, based on user configure options.
 ARGS_MANPAGE = -DAPI=C $(am__append_8) $(am__append_9) \
@@ -804,7 +804,7 @@ uninstall-man: uninstall-man3
 	m4 $(AM_M4FLAGS) $(M4FLAGS) $< >$@
 
 # This rule generates the C manpage.
-netcdf.3: $(top_srcdir)/man4/netcdf.m4 
+netcdf.3: $(top_srcdir)/man4/netcdf.m4
 	m4 $(M4FLAGS) $(ARGS_MANPAGE) $? >$@  || rm $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
