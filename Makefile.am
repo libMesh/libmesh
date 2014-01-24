@@ -116,7 +116,8 @@ beautify:
 # Additional files to be deleted by 'make distclean'
 # _configs.sed seems to be leftover by prefix_config
 DISTCLEANFILES =  \
-           _configs.sed
+           _configs.sed \
+	   a.out  # intel-14.0 seems to leave an a.out from configure with mpich, clean that up for distclean
 
 # # Additional files to be deleted by 'make maintainer-clean'
 # MAINTAINERCLEANFILES =  \
