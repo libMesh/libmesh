@@ -483,7 +483,7 @@ void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var
 void ExodusII_IO::write_element_data (const EquationSystems & es)
 {
   // Be sure the file has been opened for writing!
-  if (!exio_helper->opened_for_writing)
+  if (MeshOutput<MeshBase>::mesh().processor_id() == 0 && !exio_helper->opened_for_writing)
     {
       libMesh::err << "ERROR, ExodusII file must be initialized "
                    << "before outputting element variables.\n"
@@ -528,6 +528,8 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
 
   // The data must ultimately be written block by block.  This means that this data
   // must be sorted appropriately.
+  if(MeshOutput<MeshBase>::mesh().processor_id())
+    return;
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
@@ -559,6 +561,9 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   // Call helper function for opening/initializing data
   this->write_nodal_data_common(fname, output_names, /*continuous=*/true);
 
+  if(mesh.processor_id())
+    return;
+
   // This will count the number of variables actually output
   for (int c=0; c<num_vars; c++)
     {
@@ -587,6 +592,9 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 
 void ExodusII_IO::write_information_records (const std::vector<std::string>& records)
 {
+  if(MeshOutput<MeshBase>::mesh().processor_id())
+    return;
+
   if (!exio_helper->opened_for_writing)
     {
       libMesh::err << "ERROR, ExodusII file must be initialized "
@@ -603,6 +611,9 @@ void ExodusII_IO::write_information_records (const std::vector<std::string>& rec
 void ExodusII_IO::write_global_data (const std::vector<Number>& soln,
                                      const std::vector<std::string>& names)
 {
+  if(MeshOutput<MeshBase>::mesh().processor_id())
+    return;
+
   if (!exio_helper->opened_for_writing)
     {
       libMesh::err << "ERROR, ExodusII file must be initialized "
@@ -624,6 +635,10 @@ void ExodusII_IO::write_timestep (const std::string& fname,
 {
   _timestep = timestep;
   write_equation_systems(fname,es);
+
+  if(MeshOutput<MeshBase>::mesh().processor_id())
+    return;
+
   exio_helper->write_timestep(timestep, time);
 }
 
@@ -648,6 +663,9 @@ void ExodusII_IO::write (const std::string& fname)
                  << "Creating a new file instead!"
                  << std::endl;
 
+  if(MeshOutput<MeshBase>::mesh().processor_id())
+    return;
+
   exio_helper->create(fname);
   exio_helper->initialize(fname,mesh);
   exio_helper->write_nodal_coordinates(mesh);
@@ -671,6 +689,9 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
                                                   const std::vector<std::string>& names)
 {
   START_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
+
+  if(MeshOutput<MeshBase>::mesh().processor_id())
+    return;
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
