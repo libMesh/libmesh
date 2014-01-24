@@ -877,6 +877,10 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 
   parallel_soln.localize_to_one(soln);
 
+  // cleanup
+  delete &parallel_soln;
+  delete &repeat_count;
+
   STOP_LOG("build_solution_vector()", "EquationSystems");
 }
 
