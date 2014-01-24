@@ -683,7 +683,6 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 
   const unsigned int dim = _mesh.mesh_dimension();
   const dof_id_type nn   = _mesh.n_nodes();
-  const unsigned short int one = 1;
 
   // We'd better have a contiguous node numbering
   libmesh_assert_equal_to (nn, _mesh.max_node_id());
@@ -730,30 +729,25 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
     nv = n_scalar_vars + dim*n_vector_vars;
   }
 
-  soln.resize(nn*nv);
-
-  // Zero out the soln vector
-  std::fill (soln.begin(), soln.end(), libMesh::zero);
-
-  // (Note that we use an unsigned short int here even though an
-  // unsigned char would be more that sufficient.  The MPI 1.1
-  // standard does not require that MPI_SUM, MPI_PROD etc... be
-  // implemented for char data types. 12/23/2003 - BSK)
-  std::vector<unsigned short int> node_conn(nn), repeat_count(nn);
-
   // Get the number of elements that share each node.  We will
   // compute the average value at each node.  This is particularly
   // useful for plotting discontinuous data.
   MeshBase::element_iterator       e_it  = _mesh.active_local_elements_begin();
   const MeshBase::element_iterator e_end = _mesh.active_local_elements_end();
 
-  for ( ; e_it != e_end; ++e_it)
-    for (unsigned int n=0; n<(*e_it)->n_nodes(); n++)
-      node_conn[(*e_it)->node(n)]++;
+  // Get the number of local nodes
+  dof_id_type n_local_nodes = std::distance(_mesh.local_nodes_begin(), _mesh.local_nodes_end());
 
-  // Gather the distributed node_conn arrays in the case of
-  // multiple processors.
-  this->comm().sum(node_conn);
+  // Create a NumericVector to hold the parallel solution
+  NumericVector<Number> & parallel_soln = *(NumericVector<Number>::build().release());
+  parallel_soln.init(nn*nv, n_local_nodes*nv, false, PARALLEL);
+
+  // Create a NumericVector to hold the "repeat_count" for each node - this is essentially
+  // the number of elements contributing to that node's value
+  NumericVector<Number> & repeat_count = *(NumericVector<Number>::build().release());
+  repeat_count.init(nn*nv, n_local_nodes*nv, false, PARALLEL);
+
+  repeat_count.close();
 
   unsigned int var_num=0;
 
@@ -780,6 +774,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 
       const System& system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
+      const unsigned int sys_num = system.number();
 
       //Could this be replaced by a/some convenience methods?[PB]
       unsigned int n_scalar_vars = 0;
@@ -818,16 +813,15 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 
 	  unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type );
 
-	  std::fill (repeat_count.begin(), repeat_count.end(), 0);
-
 	  MeshBase::element_iterator       it       = _mesh.active_local_elements_begin();
 	  const MeshBase::element_iterator end_elem = _mesh.active_local_elements_end();
 
 	  for ( ; it != end_elem; ++it)
+          {
+            const Elem* elem = *it;
+
 	    if (var_description.active_on_subdomain((*it)->subdomain_id()))
 	      {
-		const Elem* elem = *it;
-
 		dof_map.dof_indices (elem, dof_indices, var);
 
 		elem_soln.resize(dof_indices.size());
@@ -850,39 +844,38 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 
 		    for (unsigned int n=0; n<elem->n_nodes(); n++)
 		      {
-			repeat_count[elem->node(n)]++;
 			for( unsigned int d=0; d < n_vec_dim; d++ )
 			  {
 			    // For vector-valued elements, all components are in nodal_soln. For each
 			    // node, the components are stored in order, i.e. node_0 -> s0_x, s0_y, s0_z
-			    soln[nv*(elem->node(n)) + (var+d + var_num)] += nodal_soln[n_vec_dim*n+d];
+			    parallel_soln.add(nv*(elem->node(n)) + (var+d + var_num), nodal_soln[n_vec_dim*n+d]);
+
+                            // Increment the repeat count for this position
+                            repeat_count.add(nv*(elem->node(n)) + (var+d + var_num), 1);
 			  }
 		      }
 		  }
-	      } // end loop over elements
+              }
+            else // If this variable doesn't exist on this subdomain we have to still increment repeat_count so that we won't divide by 0 later:
+              for (unsigned int n=0; n<elem->n_nodes(); n++)
+                // Only do this if this variable has NO DoFs at this node... it might have some from an ajoining element...
+                if(!elem->get_node(n)->n_dofs(sys_num, var))
+                  for( unsigned int d=0; d < n_vec_dim; d++ )
+                    repeat_count.add(nv*(elem->node(n)) + (var+d + var_num), 1);
 
-	  // when a variable is active everywhere the repeat_count
-	  // and node_conn arrays should be identical, so let's
-	  // use that information to avoid unnecessary communication
-	  if (var_description.implicitly_active())
-	    repeat_count = node_conn;
-
-	  else
-	    this->comm().sum (repeat_count);
-
-	    for (unsigned int n=0; n<nn; n++)
-	      for( unsigned int d=0; d < n_vec_dim; d++ )
-		soln[nv*n + (var+d + var_num)] /=
-		  static_cast<Real>(std::max (repeat_count[n], one));
-
+          } // end loop over elements
 	} // end loop on variables in this system
 
       var_num += nv_sys_split;
     } // end loop over systems
 
-  // Now each processor has computed contriburions to the
-  // soln vector.  Gather them all up.
-  this->comm().sum(soln);
+  parallel_soln.close();
+  repeat_count.close();
+
+  // Divide to get the average value at the nodes
+  parallel_soln /= repeat_count;
+
+  parallel_soln.localize_to_one(soln);
 
   STOP_LOG("build_solution_vector()", "EquationSystems");
 }

@@ -549,6 +549,19 @@ void PetscVector<T>::scale (const T factor_in)
 }
 
 template <typename T>
+NumericVector<T> & PetscVector<T>::operator /= (NumericVector<T> & v)
+{
+  PetscErrorCode ierr = 0;
+
+  const PetscVector<T>* v_vec = libmesh_cast_ptr<const PetscVector<T>*>(&v);
+
+  ierr = VecPointwiseDivide(_vec, _vec, v_vec->_vec);
+  LIBMESH_CHKERRABORT(ierr);
+
+  return *this;
+}
+
+template <typename T>
 void PetscVector<T>::abs()
 {
   this->_restore_array();
