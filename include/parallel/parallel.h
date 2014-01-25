@@ -1075,9 +1075,19 @@ namespace Parallel
     //-------------------------------------------------------------------
     /**
      * Take a range of local variables, combine it with ranges from all
+     * processors, and write the output to the output iterator on rank root.
+     */
+    template <typename Context, typename Iter, typename OutputIter>
+    inline void gather_packed_range (const unsigned int root_id,
+				     Context *context,
+				     Iter range_begin,
+				     const Iter range_end,
+				     OutputIter out) const;
+
+    /**
+     * Take a range of local variables, combine it with ranges from all
      * processors, and write the output to the output iterator.
      */
-
     template <typename Context, typename Iter, typename OutputIter>
     inline void allgather_packed_range (Context *context,
                                         Iter range_begin,

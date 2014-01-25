@@ -1044,6 +1044,15 @@ inline void allgather(std::vector<T> &r,
 { comm.allgather(r, identical_buffer_sizes); }
 
 template <typename Context, typename Iter, typename OutputIter>
+inline void gather_packed_range (const unsigned int root_id,
+				 Context *context,
+				 Iter range_begin,
+				 const Iter range_end,
+				 OutputIter out,
+				 const Communicator &comm = Communicator_World)
+{ comm.gather_packed_range(root_id, context, range_begin, range_end, out); }
+
+template <typename Context, typename Iter, typename OutputIter>
 inline void allgather_packed_range (Context *context,
                                     Iter range_begin,
                                     const Iter range_end,
@@ -2871,6 +2880,29 @@ inline void Communicator::allgather
   libmesh_assert (ierr == MPI_SUCCESS);
 
   STOP_LOG("allgather()", "Parallel");
+}
+
+
+template <typename Context, typename Iter, typename OutputIter>
+inline void Communicator::gather_packed_range
+  (const unsigned int root_id,
+   Context *context,
+   Iter range_begin,
+   const Iter range_end,
+   OutputIter out) const
+{
+  typedef typename std::iterator_traits<Iter>::value_type T;
+  typedef typename Parallel::BufferType<T>::type buffer_t;
+
+  // We will serialize variable size objects from *range_begin to
+  // *range_end as a sequence of ints in this buffer
+  std::vector<buffer_t> buffer;
+
+  Parallel::pack_range(context, range_begin, range_end, buffer);
+
+  this->gather(root_id, buffer);
+
+  Parallel::unpack_range(buffer, context, out);
 }
 
 
