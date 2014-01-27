@@ -37,7 +37,10 @@ AC_CONFIG_HEADERS([config.h])
 
 # This call is required by automake.
 AM_INIT_AUTOMAKE([foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11])
-# use silent rules - automake 1.11
+AM_INIT_AUTOMAKE(m4_esyscmd([case `automake --version | head -n 1` in
+                             *1.11*) echo foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11;;
+                             *)      echo foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11 serial-tests;;
+                             esac]))# use silent rules - automake 1.11
 AM_SILENT_RULES(yes)
 
 AM_MAINTAINER_MODE()
