@@ -90,7 +90,8 @@ man4 $(EXAMPLES) \
 $(UDUNITS) $(LIBCF)
 
 # Remove these generated files, for a distclean.
-DISTCLEANFILES = VERSION comps.txt test_prog
+DISTCLEANFILES = VERSION comps.txt test_prog \
+	         a.out # BSK - intel-14.0 seems to leave these from ./configure
 
 # The nc-config script helps the user build programs with netCDF.
 bin_SCRIPTS = nc-config
