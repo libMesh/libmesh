@@ -1104,7 +1104,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
 
 
   // only one processor
-  if (n == nl)
+  if (n_processors() == 1)
     {
       v_local.resize(n);
 
@@ -1125,7 +1125,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
       {
         Vec vout;
         VecScatter ctx;
-        
+
         ierr = VecScatterCreateToZero(_vec, &ctx, &vout);
         LIBMESH_CHKERRABORT(ierr);
 
@@ -1137,7 +1137,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
         if(processor_id() == 0)
         {
           v_local.resize(n);
-          
+
           ierr = VecGetArray (vout, &values);
           LIBMESH_CHKERRABORT(ierr);
 
@@ -1147,7 +1147,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
           ierr = VecRestoreArray (vout, &values);
           LIBMESH_CHKERRABORT(ierr);
         }
-        
+
         ierr = VecScatterDestroy(&ctx);
         LIBMESH_CHKERRABORT(ierr);
         ierr = VecDestroy(&vout);
@@ -1155,9 +1155,9 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
 
       }
       else
-      {        
+      {
         v_local.resize(n);
-        
+
         numeric_index_type ioff = this->first_local_index();
         std::vector<Real> local_values (n, 0.);
 
