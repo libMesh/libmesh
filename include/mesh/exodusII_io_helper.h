@@ -71,7 +71,8 @@ public:
    */
   ExodusII_IO_Helper(const ParallelObject &parent,
                      bool v=false,
-                     bool run_only_on_proc0=true);
+                     bool run_only_on_proc0=true,
+                     bool single_precision=false);
   /**
    * Destructor.
    */
@@ -297,13 +298,13 @@ public:
   /**
    * Writes the vector of values to the element variables.
    */
-  void write_element_values(const MeshBase & mesh, const std::vector<Number> & values, int timestep);
-
+  void write_element_values(const MeshBase & mesh, const std::vector<Real> & values, int timestep);
+  
   /**
    * Writes the vector of values to a nodal variable.
    */
-  void write_nodal_values(int var_id, const std::vector<Number> & values, int timestep);
-
+  void write_nodal_values(int var_id, const std::vector<Real> & values, int timestep);
+  
   /**
    * Writes the vector of information records.
    */
@@ -312,7 +313,7 @@ public:
   /**
    * Writes the vector of global variables.
    */
-  void write_global_values(const std::vector<Number> & values, int timestep);
+  void write_global_values(const std::vector<Real> & values, int timestep);
 
   /**
    * Sets the underlying value of the boolean flag
@@ -330,6 +331,12 @@ public:
    */
   void set_coordinate_offset(Point p);
 
+  /**
+   * Returns a vector with three copies of each element in the provided name vector,
+   * starting with r_, i_ and a_ respectively.
+   */ 
+  std::vector<std::string> get_complex_names(const std::vector<std::string>& names) const;
+  
   /**
    * This is the \p ExodusII_IO_Helper Conversion class.  It provides
    * a data structure which contains \p ExodusII node/edge maps and
@@ -544,6 +551,9 @@ protected:
 
   // On output, shift every point by _coordinate_offset
   Point _coordinate_offset;
+  
+  // If true, forces single precision I/O
+  bool _single_precision;
 
 private:
   /**

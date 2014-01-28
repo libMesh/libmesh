@@ -40,8 +40,8 @@ namespace libMesh
 // flag set to false, so that we can make use of its functionality
 // on multiple processors.
   Nemesis_IO_Helper::Nemesis_IO_Helper(const ParallelObject &parent,
-				       bool verbose_in) :
-  ExodusII_IO_Helper(parent, verbose_in, /*run_only_on_proc0=*/false),
+				       bool verbose_in, bool single_precision) :
+  ExodusII_IO_Helper(parent, verbose_in, /*run_only_on_proc0=*/false, /*single_precision=*/single_precision),
   nemesis_err_flag(0),
   num_nodes_global(0),
   num_elems_global(0),
@@ -710,8 +710,18 @@ void Nemesis_IO_Helper::create(std::string filename)
 {
   // Fall back on double precision when necessary since ExodusII
   // doesn't seem to support long double
-  int comp_ws = libmesh_cast_int<int>(std::min(sizeof(Real),sizeof(double)));
-  int io_ws = libmesh_cast_int<int>(std::min(sizeof(Real),sizeof(double)));
+  int comp_ws(0), io_ws(0);
+  
+  if(_single_precision)
+  {
+    comp_ws = sizeof(float);
+    io_ws = sizeof(float);
+  }
+  else
+  {
+    comp_ws = libmesh_cast_int<int>(std::min(sizeof(Real), sizeof(double)));
+    io_ws = libmesh_cast_int<int>(std::min(sizeof(Real), sizeof(double)));
+  }
 
   this->ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
 
@@ -2304,23 +2314,38 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
   }
 
   if (local_num_nodes)
+  {
+    if(_single_precision)
+    {
+      std::vector<float> x_single(local_num_nodes), y_single(local_num_nodes), z_single(local_num_nodes);
+      for(unsigned int i(0); i < local_num_nodes; ++i)
+      {
+        x_single[i] = static_cast<float>(x[i]);
+        y_single[i] = static_cast<float>(y[i]);
+        z_single[i] = static_cast<float>(z[i]);
+      }
+      
+      ex_err = exII::ex_put_coord(ex_id, &x_single[0], &y_single[0], &z_single[0]);
+    }
+    else
     {
       // Call Exodus API to write nodal coordinates...
       ex_err = exII::ex_put_coord(ex_id, &x[0], &y[0], &z[0]);
-      EX_CHECK_ERR(ex_err, "Error writing node coordinates");
-
-      // And write the nodal map we created for them
-      ex_err = exII::ex_put_node_num_map(ex_id, &(this->exodus_node_num_to_libmesh[0]));
-      EX_CHECK_ERR(ex_err, "Error writing node num map");
     }
+    EX_CHECK_ERR(ex_err, "Error writing node coordinates");
+
+    // And write the nodal map we created for them
+    ex_err = exII::ex_put_node_num_map(ex_id, &(this->exodus_node_num_to_libmesh[0]));
+    EX_CHECK_ERR(ex_err, "Error writing node num map");
+  }
   else // Does the Exodus API want us to write empty nodal coordinates?
-    {
-      ex_err = exII::ex_put_coord(ex_id, NULL, NULL, NULL);
-      EX_CHECK_ERR(ex_err, "Error writing empty node coordinates");
+  {
+    ex_err = exII::ex_put_coord(ex_id, NULL, NULL, NULL);
+    EX_CHECK_ERR(ex_err, "Error writing empty node coordinates");
 
-      ex_err = exII::ex_put_node_num_map(ex_id, NULL);
-      EX_CHECK_ERR(ex_err, "Error writing empty node num map");
-    }
+    ex_err = exII::ex_put_node_num_map(ex_id, NULL);
+    EX_CHECK_ERR(ex_err, "Error writing empty node num map");
+  }
 }
 
 
@@ -2400,6 +2425,22 @@ void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values,
 
   for (int c=0; c<num_vars; c++)
   {
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+    std::vector<Real> real_parts(num_nodes);
+    std::vector<Real> imag_parts(num_nodes);
+    std::vector<Real> magnitudes(num_nodes);
+
+    for(int i(0); i < num_nodes; ++i)
+    {
+      Number value = values[this->exodus_node_num_to_libmesh[i]*num_vars + c];
+      real_parts[i] = value.real();
+      imag_parts[i] = value.imag();
+      magnitudes[i] = std::abs(value);
+    }
+    write_nodal_values(3*c+1,real_parts,timestep);
+    write_nodal_values(3*c+2,imag_parts,timestep);
+    write_nodal_values(3*c+3,magnitudes,timestep);
+#else
     std::vector<Number> cur_soln(num_nodes);
 
     //Copy out this variable's solution
@@ -2407,6 +2448,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values,
       cur_soln[i] = values[this->exodus_node_num_to_libmesh[i]*num_vars + c];
 
     write_nodal_values(c+1,cur_soln,timestep);
+#endif    
   }
 }
 

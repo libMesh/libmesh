@@ -170,7 +170,14 @@ int main (int argc, char** argv)
       // Plot the solution
       rb_con.load_rb_solution();
 
+      //Output the variable in GMV format
       GMVIO(mesh).write_equation_systems ("RB_sol.gmv",equation_systems);
+      
+      //Output the variable in ExodusII format
+      ExodusII_IO(mesh).write_equation_systems ("RB_sol_double.exo", equation_systems);
+      
+      //Output the variable in ExodusII format (single precision)
+      ExodusII_IO(mesh, /*single_precision=*/true).write_equation_systems ("RB_sol_float.exo", equation_systems);
     }
 
     // Now do a sweep over frequencies and write out the reflection coefficient for each frequency

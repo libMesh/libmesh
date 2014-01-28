@@ -62,7 +62,7 @@ class Nemesis_IO_Helper;
    * This is the constructor required to read a mesh.
    */
   explicit
-  Nemesis_IO (MeshBase& mesh);
+  Nemesis_IO (MeshBase& mesh, bool single_precision=false);
 
   /**
    * Destructor.

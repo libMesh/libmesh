@@ -19,6 +19,8 @@
 // C++ includes
 #include <fstream>
 #include <cstring>
+#include <sstream>
+#include <map>
 
 // Local includes
 #include "libmesh/exodusII_io.h"
@@ -37,12 +39,12 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // ExodusII_IO class members
-ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
+ExodusII_IO::ExodusII_IO (MeshBase& mesh, bool single_precision) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase> (mesh),
   ParallelObject(mesh),
 #ifdef LIBMESH_HAVE_EXODUS_API
-  exio_helper(new ExodusII_IO_Helper(*this)),
+  exio_helper(new ExodusII_IO_Helper(*this, false, true, single_precision)),
 #endif
   _timestep(1),
   _verbose(false),
@@ -535,9 +537,47 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
     return;
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-
+  
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  
+  std::vector<std::string> complex_names = exio_helper->get_complex_names(names);
+  
+  exio_helper->initialize_element_variables(complex_names);
+  
+  unsigned int num_values = soln.size();
+  unsigned int num_vars = names.size();
+  unsigned int num_elems = num_values / num_vars;
+  
+  // This will contain the real and imaginary parts and the magnitude
+  // of the values in soln
+  std::vector<Real> complex_soln(3*num_values);
+     
+  for(unsigned i(0); i < num_vars; ++i)
+  {
+  
+    for(unsigned int j(0); j < num_elems; ++j)
+    {
+      Number value = soln[i*num_vars + j];
+      complex_soln[3*i*num_elems + j] = value.real();   
+    }
+    for(unsigned int j(0); j < num_elems; ++j)
+    {
+      Number value = soln[i*num_vars + j];
+      complex_soln[3*i*num_elems + num_elems +j] = value.imag();
+    }      
+    for(unsigned int j(0); j < num_elems; ++j)
+    {
+      Number value = soln[i*num_vars + j];
+      complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);  
+    }
+  }
+   
+  exio_helper->write_element_values(mesh, complex_soln, _timestep);
+  
+#else  
   exio_helper->initialize_element_variables(names);
   exio_helper->write_element_values(mesh, soln, _timestep);
+#endif  
 }
 
 
@@ -561,8 +601,17 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   else
     output_names = names;
 
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+    
+  std::vector<std::string> complex_names = exio_helper->get_complex_names(names);
+  
+  // Call helper function for opening/initializing data, giving it the
+  // complex variable names
+  this->write_nodal_data_common(fname, complex_names, /*continuous=*/true);
+#else
   // Call helper function for opening/initializing data
   this->write_nodal_data_common(fname, output_names, /*continuous=*/true);
+#endif  
 
   if(mesh.processor_id())
   {
@@ -573,21 +622,39 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   // This will count the number of variables actually output
   for (int c=0; c<num_vars; c++)
     {
+      std::stringstream name_to_find;
+   
       std::vector<std::string>::iterator pos =
         std::find(output_names.begin(), output_names.end(), names[c]);
       if (pos == output_names.end())
         continue;
 
       unsigned int variable_name_position =
-	libmesh_cast_int<unsigned int>(pos - output_names.begin());
-
+        libmesh_cast_int<unsigned int>(pos - output_names.begin());
+        
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+      std::vector<Real> real_parts(num_nodes);
+      std::vector<Real> imag_parts(num_nodes);
+      std::vector<Real> magnitudes(num_nodes);
+      
+      for(unsigned int i(0); i < num_nodes; ++i)
+      {
+        real_parts[i] = soln[i*num_vars + c].real();
+        imag_parts[i] = soln[i*num_vars + c].imag();
+        magnitudes[i] = std::abs(soln[i*num_vars + c]);
+      }
+      exio_helper->write_nodal_values(3*variable_name_position+1,real_parts,_timestep);
+      exio_helper->write_nodal_values(3*variable_name_position+2,imag_parts,_timestep);
+      exio_helper->write_nodal_values(3*variable_name_position+3,magnitudes,_timestep);
+#else
       std::vector<Number> cur_soln(num_nodes);
 
       // Copy out this variable's solution
       for(dof_id_type i=0; i<num_nodes; i++)
         cur_soln[i] = soln[i*num_vars + c];
-
       exio_helper->write_nodal_values(variable_name_position+1,cur_soln,_timestep);
+#endif    
+    
     }
 
   STOP_LOG("write_nodal_data()", "ExodusII_IO");
@@ -627,9 +694,47 @@ void ExodusII_IO::write_global_data (const std::vector<Number>& soln,
                    << std::endl;
       libmesh_error();
     }
-
+    
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  
+  std::vector<std::string> complex_names = exio_helper->get_complex_names(names);
+  
+  exio_helper->initialize_global_variables(complex_names);
+  
+  unsigned int num_values = soln.size();
+  unsigned int num_vars = names.size();
+  unsigned int num_elems = num_values / num_vars;
+  
+  // This will contain the real and imaginary parts and the magnitude
+  // of the values in soln
+  std::vector<Real> complex_soln(3*num_values);
+     
+  for(unsigned i(0); i < num_vars; ++i)
+  {
+  
+    for(unsigned int j(0); j < num_elems; ++j)
+    {
+      Number value = soln[i*num_vars + j];
+      complex_soln[3*i*num_elems + j] = value.real();   
+    }
+    for(unsigned int j(0); j < num_elems; ++j)
+    {
+      Number value = soln[i*num_vars + j];
+      complex_soln[3*i*num_elems + num_elems +j] = value.imag();
+    }      
+    for(unsigned int j(0); j < num_elems; ++j)
+    {
+      Number value = soln[i*num_vars + j];
+      complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);  
+    }
+  }
+   
+  exio_helper->write_global_values(complex_soln, _timestep);
+  
+#else  
   exio_helper->initialize_global_variables(names);
   exio_helper->write_global_values(soln, _timestep);
+#endif  
 }
 
 
@@ -694,6 +799,7 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
                                                   const std::vector<Number>& soln,
                                                   const std::vector<std::string>& names)
 {
+
   START_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
@@ -705,8 +811,17 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
   for ( ; it != end; ++it)
     num_nodes += (*it)->n_nodes();
 
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  
+  std::vector<std::string> complex_names = exio_helper->get_complex_names(names);
+
+  // Call helper function for opening/initializing data, giving it the
+  // complex variable names
+  this->write_nodal_data_common(fname, complex_names, /*continuous=*/false);
+#else
   // Call helper function for opening/initializing data
   this->write_nodal_data_common(fname, names, /*continuous=*/false);
+#endif  
 
   if (mesh.processor_id())
   {
@@ -715,16 +830,31 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
   }
 
   for (int c=0; c<num_vars; c++)
-    {
-      // Copy out this variable's solution
-      std::vector<Number> cur_soln(num_nodes);
+  {  
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+      std::vector<Real> real_parts(num_nodes);
+      std::vector<Real> imag_parts(num_nodes);
+      std::vector<Real> magnitudes(num_nodes);
+      
+      for(int i(0); i < num_nodes; ++i)
+      {
+        real_parts[i] = soln[i*num_vars + c].real();
+        imag_parts[i] = soln[i*num_vars + c].imag();
+        magnitudes[i] = std::abs(soln[i*num_vars + c]);
+      }
+      exio_helper->write_nodal_values(3*c+1,real_parts,_timestep);
+      exio_helper->write_nodal_values(3*c+2,imag_parts,_timestep);
+      exio_helper->write_nodal_values(3*c+3,magnitudes,_timestep);
+#else      
+    // Copy out this variable's solution
+    std::vector<Number> cur_soln(num_nodes);
 
-      for(int i=0; i<num_nodes; i++)
-        cur_soln[i] = soln[i*num_vars + c];
+    for(int i=0; i<num_nodes; i++)
+      cur_soln[i] = soln[i*num_vars + c];
 
-      exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
-    }
-
+    exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
+  }
+#endif
   STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
 }
 

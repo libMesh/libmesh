@@ -60,7 +60,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * This is the constructor required to read a mesh.
    */
   explicit
-  ExodusII_IO (MeshBase& mesh);
+  ExodusII_IO (MeshBase& mesh, bool single_precision=false);
 
   /**
    * Destructor.
