@@ -897,6 +897,9 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
 
   libmesh_assert_equal_to (ne, _mesh.max_elem_id());
 
+  // Get the number of local elements
+  dof_id_type n_local_elems = std::distance(_mesh.local_elements_begin(), _mesh.local_elements_end());
+
   // If the names vector has entries, we will only populate the soln vector
   // with names included in that list.  Note: The names vector may be
   // reordered upon exiting this function
@@ -906,9 +909,39 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
   soln.clear();
   names.clear();
 
-  std::vector<Number>  sys_soln;
-
   const FEType type(CONSTANT, MONOMIAL);
+
+  dof_id_type nv = 0;
+
+  // Find the total number of variables to output
+  {
+    const_system_iterator       pos = _systems.begin();
+    const const_system_iterator end = _systems.end();
+
+    for (; pos != end; ++pos)
+    {
+      const System& system  = *(pos->second);
+      const unsigned int nv_sys = system.n_vars();
+
+      for (unsigned int var=0; var < nv_sys; ++var)
+      {
+        if ( system.variable_type( var ) != type ||
+             ( is_filter_names && std::find(filter_names.begin(), filter_names.end(), system.variable_name( var )) == filter_names.end()) )
+          continue;
+
+        nv++;
+      }
+    }
+  }
+
+  if(!nv) // If there are no variables to write out don't do anything...
+    return;
+
+  // Create a NumericVector to hold the parallel solution
+  NumericVector<Number> & parallel_soln = *(NumericVector<Number>::build().release());
+  parallel_soln.init(ne*nv, n_local_elems*nv, false, PARALLEL);
+
+  dof_id_type var_num = 0;
 
   // For each system in this EquationSystems object,
   // update the global solution and collect the
@@ -922,7 +955,14 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
       const System& system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
 
-      system.update_global_solution (sys_soln);
+      // Update the current_local_solution
+      {
+        System & non_const_sys = const_cast<System &>(system);
+        non_const_sys.solution->close();
+        non_const_sys.update();
+      }
+
+      NumericVector<Number> & sys_soln(*system.current_local_solution);
 
       std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
 
@@ -934,11 +974,6 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
           continue;
 
         names.push_back( system.variable_name( var ) );
-
-        // Record the offset for the first element for this variable.
-        const std::size_t offset = soln.size();
-        // Increase size of soln for this variable.
-        soln.resize( offset + ne );
 
         const Variable & variable = system.variable(var);
         const DofMap & dof_map = system.get_dof_map();
@@ -956,17 +991,17 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
 
             libmesh_assert_equal_to ( 1, dof_indices.size() );
 
-            soln[offset+elem->id()] = sys_soln[dof_indices[0]];
+            parallel_soln.set((ne*var_num)+elem->id(), sys_soln(dof_indices[0]));
           }
         }
 
+        var_num++;
       } // end loop on variables in this system
-
     } // end loop over systems
 
-  // Now each processor has computed contributions to the
-  // soln vector.  Gather them all up.
-  this->comm().sum(soln);
+  parallel_soln.close();
+
+  parallel_soln.localize_to_one(soln);
 }
 
 

@@ -526,6 +526,9 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   std::vector<Number> soln;
   es.get_solution(soln, names);
 
+  if(soln.empty()) // If there is nothing to write just return
+    return;
+
   // The data must ultimately be written block by block.  This means that this data
   // must be sorted appropriately.
   if(MeshOutput<MeshBase>::mesh().processor_id())
