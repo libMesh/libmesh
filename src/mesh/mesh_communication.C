@@ -729,14 +729,14 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
 
 #ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
 // ------------------------------------------------------------
-void MeshCommunication::allgather (ParallelMesh&) const
+  void MeshCommunication::gather (const processor_id_type, ParallelMesh&) const
 {
   // no MPI == one processor, no need for this method...
   return;
 }
 #else
 // ------------------------------------------------------------
-void MeshCommunication::allgather (ParallelMesh& mesh) const
+void MeshCommunication::gather (const processor_id_type root_id, ParallelMesh& mesh) const
 {
   // The mesh should know it's about to be serialized
   libmesh_assert (mesh.is_serial());
@@ -748,33 +748,59 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
-  START_LOG("allgather()","MeshCommunication");
+  START_LOG("(all)gather()","MeshCommunication");
 
-  mesh.comm().allgather_packed_range (&mesh,
-					      mesh.nodes_begin(),
-					      mesh.nodes_end(),
-					      mesh_inserter_iterator<Node>(mesh));
+  (root_id == DofObject::invalid_processor_id) ?
+
+    mesh.comm().allgather_packed_range (&mesh,
+					mesh.nodes_begin(),
+					mesh.nodes_end(),
+					mesh_inserter_iterator<Node>(mesh)) :
+
+    mesh.comm().gather_packed_range (root_id,
+				     &mesh,
+				     mesh.nodes_begin(),
+				     mesh.nodes_end(),
+				     mesh_inserter_iterator<Node>(mesh));
 
   // Gather elements from coarsest to finest, so that child
   // elements will see their parents already in place.
+  // rank 0 should know n_levels regardless, so this is
+  // safe independent of root_id
   unsigned int n_levels = MeshTools::n_levels(mesh);
   mesh.comm().broadcast(n_levels);
 
   for (unsigned int l=0; l != n_levels; ++l)
-    mesh.comm().allgather_packed_range (&mesh,
-						mesh.level_elements_begin(l),
-						mesh.level_elements_end(l),
-						mesh_inserter_iterator<Elem>(mesh));
+    (root_id == DofObject::invalid_processor_id) ?
 
-  libmesh_assert (mesh.comm().verify(mesh.n_elem()));
-  libmesh_assert (mesh.comm().verify(mesh.n_nodes()));
+      mesh.comm().allgather_packed_range (&mesh,
+					  mesh.level_elements_begin(l),
+					  mesh.level_elements_end(l),
+					  mesh_inserter_iterator<Elem>(mesh)) :
+
+      mesh.comm().gather_packed_range (root_id,
+				       &mesh,
+				       mesh.level_elements_begin(l),
+				       mesh.level_elements_end(l),
+				       mesh_inserter_iterator<Elem>(mesh));
+
+
+  // If we are doing an allgather(), perform sanity check on the result.
+  if (root_id == DofObject::invalid_processor_id)
+    {
+      libmesh_assert (mesh.comm().verify(mesh.n_elem()));
+      libmesh_assert (mesh.comm().verify(mesh.n_nodes()));
+    }
 
   // Inform new elements of their neighbors,
-  // while resetting all remote_elem links
-  mesh.find_neighbors(true);
+  // while resetting all remote_elem links on
+  // the appropriate ranks.
+  if ((root_id == DofObject::invalid_processor_id) ||
+      (mesh.comm().rank() == root_id))
+    mesh.find_neighbors(true);
 
   // All done!
-  STOP_LOG("allgather()","MeshCommunication");
+  STOP_LOG("(all)gather()","MeshCommunication");
 }
 #endif // LIBMESH_HAVE_MPI
 

@@ -108,12 +108,25 @@ public:
   /**
    * This method takes an input \p ParallelMesh which may be
    * distributed among all the processors.  Each processor then
+   * sends its local nodes and elements to processor \p root_id.
+   * The end result is that a previously distributed \p ParallelMesh
+   * will be serialized on processor \p root_id.  Since this method is
+   * collective it must be called by all processors. For the special
+   * case of \p root_id equal to \p DofObject::invalid_processor_id
+   * this function performs an allgather.
+   */
+  void gather (const processor_id_type root_id, ParallelMesh &) const;
+
+  /**
+   * This method takes an input \p ParallelMesh which may be
+   * distributed among all the processors.  Each processor then
    * sends its local nodes and elements to the other processors.
    * The end result is that a previously distributed \p ParallelMesh
    * will be serialized on each processor.  Since this method is
    * collective it must be called by all processors.
    */
-  void allgather (ParallelMesh &) const;
+  void allgather (ParallelMesh &mesh) const
+  { MeshCommunication::gather(DofObject::invalid_processor_id, mesh); }
 
   /**
    * This method takes an input \p ParallelMesh which may be
