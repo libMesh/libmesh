@@ -1002,6 +1002,8 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
   parallel_soln.close();
 
   parallel_soln.localize_to_one(soln);
+
+  delete &parallel_soln;
 }
 
 
