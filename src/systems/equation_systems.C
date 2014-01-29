@@ -739,12 +739,14 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
   dof_id_type n_local_nodes = std::distance(_mesh.local_nodes_begin(), _mesh.local_nodes_end());
 
   // Create a NumericVector to hold the parallel solution
-  NumericVector<Number> & parallel_soln = *(NumericVector<Number>::build().release());
+  AutoPtr<NumericVector<Number> > parallel_soln_ptr = NumericVector<Number>::build();
+  NumericVector<Number> &parallel_soln = *parallel_soln_ptr;
   parallel_soln.init(nn*nv, n_local_nodes*nv, false, PARALLEL);
 
   // Create a NumericVector to hold the "repeat_count" for each node - this is essentially
   // the number of elements contributing to that node's value
-  NumericVector<Number> & repeat_count = *(NumericVector<Number>::build().release());
+  AutoPtr<NumericVector<Number> > repeat_count_ptr = NumericVector<Number>::build();
+  NumericVector<Number> &repeat_count = *repeat_count_ptr;
   repeat_count.init(nn*nv, n_local_nodes*nv, false, PARALLEL);
 
   repeat_count.close();
@@ -877,10 +879,6 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 
   parallel_soln.localize_to_one(soln);
 
-  // cleanup
-  delete &parallel_soln;
-  delete &repeat_count;
-
   STOP_LOG("build_solution_vector()", "EquationSystems");
 }
 
@@ -938,7 +936,8 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
     return;
 
   // Create a NumericVector to hold the parallel solution
-  NumericVector<Number> & parallel_soln = *(NumericVector<Number>::build().release());
+  AutoPtr<NumericVector<Number> > parallel_soln_ptr = NumericVector<Number>::build();
+  NumericVector<Number> &parallel_soln = *parallel_soln_ptr;
   parallel_soln.init(ne*nv, n_local_elems*nv, false, PARALLEL);
 
   dof_id_type var_num = 0;
@@ -1002,8 +1001,6 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
   parallel_soln.close();
 
   parallel_soln.localize_to_one(soln);
-
-  delete &parallel_soln;
 }
 
 
