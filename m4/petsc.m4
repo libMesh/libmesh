@@ -13,6 +13,10 @@ AC_DEFUN([CONFIGURE_PETSC],
 		 esac],
 		 [enablepetsc=$enableoptional])
 
+  # Trump --enable-petsc with --disable-mpi
+  if (test "x$enablempi" = xno); then
+    enablepetsc=no
+  fi
 
   AC_ARG_VAR([PETSC_DIR],  [path to PETSc installation])
   AC_ARG_VAR([PETSC_ARCH], [PETSc build architecture])

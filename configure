@@ -28030,6 +28030,10 @@ else
 fi
 
 
+  # Trump --enable-petsc with --disable-mpi
+  if (test "x$enablempi" = xno); then
+    enablepetsc=no
+  fi
 
 
 
