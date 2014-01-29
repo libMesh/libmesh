@@ -124,6 +124,20 @@ EpetraVector<T>::operator -= (const NumericVector<T>& v)
 }
 
 
+template <typename T>
+NumericVector<T> &
+EpetraVector<T>::operator /= (NumericVector<T> & v)
+{
+  libmesh_assert(this->closed());
+  libmesh_assert_equal_to(size(), v.size());
+
+  EpetraVector<T> & v_vec = libmesh_cast_ref<EpetraVector<T>&>(v);
+
+  _vec->ReciprocalMultiply(1.0, *v_vec._vec, *_vec, 0.0);
+}
+
+
+
 
 template <typename T>
 void EpetraVector<T>::set (const numeric_index_type i_in, const T value_in)

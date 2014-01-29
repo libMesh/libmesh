@@ -376,7 +376,7 @@ public:
   /**
    * Pointwise Division operator. ie divide every entry in this vector by the entry in v
    */
-  virtual NumericVector<T> & operator /= (NumericVector<T> & /*v*/) { libMesh::err<<"operator/= not implemented!"; libmesh_error(); }
+  virtual NumericVector<T> & operator /= (NumericVector<T> & /*v*/) = 0;
 
   /**
    * Replace each entry v_i of this vector by its reciprocal, 1/v_i.
