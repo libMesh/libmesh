@@ -2127,7 +2127,7 @@ public:
   {
     // libmesh_assert_greater_equal (*(_buf_begin+5), 0);
     libmesh_assert_less (static_cast<unsigned int>(*(_buf_begin+5)),
-                   libMesh::n_processors() ||
+                         libMesh::global_n_processors() ||
                    static_cast<processor_id_type>(*(_buf_begin+5)) == DofObject::invalid_processor_id);
     return static_cast<processor_id_type>(*(_buf_begin+5));
   }

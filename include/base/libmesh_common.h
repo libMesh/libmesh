@@ -178,16 +178,31 @@ typedef float ErrorVectorReal;
 
 
 #ifdef LIBMESH_HAVE_MPI
+  #ifndef LIBMESH_DISABLE_COMMWORLD
+    /**
+     * MPI Communicator to be used in the library.
+     */
+    extern MPI_Comm COMM_WORLD;
+  #endif
+
   /**
-   * MPI Communicator to be used in the library.
+   * MPI Communicator used to initialize libMesh.
    */
-  extern MPI_Comm COMM_WORLD;
+  extern MPI_Comm GLOBAL_COMM_WORLD;
 #else
-  /**
+  #ifndef LIBMESH_DISABLE_COMMWORLD
+    /**
+     * Something to use with CHKERRABORT if we're just using PETSc's MPI
+     * "uni" stub.
+     */
+    extern int COMM_WORLD;
+  #endif
+
+/**
    * Something to use with CHKERRABORT if we're just using PETSc's MPI
    * "uni" stub.
    */
-  extern int COMM_WORLD;
+  extern int GLOBAL_COMM_WORLD;
 #endif
 
 // Let's define a couple output streams - these will default
