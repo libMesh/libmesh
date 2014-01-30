@@ -107,6 +107,22 @@ NumericVector<T>& EigenSparseVector<T>::operator -= (const NumericVector<T>& v_i
 
 
 template <typename T>
+NumericVector<T> & EigenSparseVector<T>::operator /= (NumericVector<T> & v_in)
+{
+  libmesh_assert (this->closed());
+  libmesh_assert_equal_to(size(), v_in.size());
+
+  const EigenSparseVector<T>& v = libmesh_cast_ref<const EigenSparseVector<T>&>(v_in);
+
+  _vec = _vec.cwiseQuotient(v._vec);
+
+  return *this;
+}
+
+
+
+
+template <typename T>
 void EigenSparseVector<T>::reciprocal()
 {
 #ifndef NDEBUG

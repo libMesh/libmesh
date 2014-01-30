@@ -446,6 +446,11 @@ public:
   void scale (const T factor);
 
   /**
+   * Pointwise Division operator. ie divide every entry in this vector by the entry in v
+   */
+  virtual NumericVector<T> & operator /= (NumericVector<T> & v);
+
+  /**
    * v = abs(v)... that is, each entry in v is replaced
    * by its absolute value.
    */

@@ -41,6 +41,21 @@ _build_variable_names_and_solution_vector (const EquationSystems& es,
 
   es.build_variable_names  (names, NULL, system_names);
   es.build_solution_vector (soln, system_names);
+
+  // For now, if we're doing a parallel format we're going to broadcast the vector from processor 0
+  // to all of the processors to mimic what build_solution_vector used to do.
+  // this is TERRIBLE and WASTEFUL but it's only temporary until we redesign the output of build_solution_vector
+  // and the inputs to the I/O... both of which should actually be NumericVectors....
+  if(_is_parallel_format)
+  {
+    size_t size = soln.size();
+    _obj->comm().broadcast(size);
+
+    if(_obj->comm().rank())
+      soln.resize(size);
+
+    _obj->comm().broadcast(soln);
+  }
 }
 
 
