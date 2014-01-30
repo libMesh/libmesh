@@ -56,11 +56,13 @@ The library is continuously tested with the following compilers:
 <ul>
   <li>GNU GCC</li>
     <ul>
+      <li><code>gcc</code> 3.4</li>
       <li><code>gcc</code> 4.2</li>
       <li><code>gcc</code> 4.4</li>
       <li><code>gcc</code> 4.5</li>
       <li><code>gcc</code> 4.6</li>
       <li><code>gcc</code> 4.7</li>
+      <li><code>gcc</code> 4.8</li>
     </ul>
   <li>Intel ICC</li>
     <ul>

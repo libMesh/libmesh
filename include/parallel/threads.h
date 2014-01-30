@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2014 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -441,7 +441,7 @@ namespace Threads
   template <typename Range>
   unsigned int num_pthreads(Range & range)
   {
-    unsigned int min = std::min((unsigned long)libMesh::n_threads(), range.size());
+    unsigned int min = std::min((std::size_t)libMesh::n_threads(), range.size());
     return min > 0 ? min : 1;
   }
 

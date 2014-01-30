@@ -50,7 +50,7 @@ fi
 AC_ARG_ENABLE(default-comm-world,
               [AC_HELP_STRING([--enable-default-comm-world],[Provide global libMesh::CommWorld])],
               enabledefaultcommworld=$enableval,
-              enabledefaultcommworld=yes)
+              enabledefaultcommworld=no)
 
 AC_SUBST(enabledefaultcommworld)
 if test "$enabledefaultcommworld" != no ; then
