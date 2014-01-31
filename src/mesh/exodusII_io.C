@@ -669,15 +669,15 @@ void ExodusII_IO::write (const std::string& fname)
                  << "Creating a new file instead!"
                  << std::endl;
 
-  if(MeshOutput<MeshBase>::mesh().processor_id())
-    return;
-
   exio_helper->create(fname);
   exio_helper->initialize(fname,mesh);
   exio_helper->write_nodal_coordinates(mesh);
   exio_helper->write_elements(mesh);
   exio_helper->write_sidesets(mesh);
   exio_helper->write_nodesets(mesh);
+
+  if(MeshOutput<MeshBase>::mesh().processor_id())
+    return;
 
   if( (mesh.boundary_info->n_edge_conds() > 0) &&
        _verbose )
