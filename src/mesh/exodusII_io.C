@@ -696,12 +696,6 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
 {
   START_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
 
-  if(MeshOutput<MeshBase>::mesh().processor_id())
-  {
-    STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
-    return;
-  }
-
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   int num_vars = libmesh_cast_int<int>(names.size());
@@ -714,17 +708,22 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
   // Call helper function for opening/initializing data
   this->write_nodal_data_common(fname, names, /*continuous=*/false);
 
-  if (this->processor_id() == 0)
-    for (int c=0; c<num_vars; c++)
-      {
-        // Copy out this variable's solution
-        std::vector<Number> cur_soln(num_nodes);
+  if (mesh.processor_id())
+  {
+    STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
+    return;
+  }
 
-        for(int i=0; i<num_nodes; i++)
-          cur_soln[i] = soln[i*num_vars + c];
+  for (int c=0; c<num_vars; c++)
+    {
+      // Copy out this variable's solution
+      std::vector<Number> cur_soln(num_nodes);
 
-        exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
-      }
+      for(int i=0; i<num_nodes; i++)
+        cur_soln[i] = soln[i*num_vars + c];
+
+      exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
+    }
 
   STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
 }
