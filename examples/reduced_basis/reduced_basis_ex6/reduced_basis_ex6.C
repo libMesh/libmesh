@@ -124,8 +124,10 @@ int main (int argc, char** argv)
     online_mode = command_line.next(online_mode);
 
   // Create a mesh, with dimension to be overridden by build_cube, on
-  // the default MPI communicator.
-  Mesh mesh(init.comm());
+  // the default MPI communicator.  We currently have to create a
+  // SerialMesh here due to a reduced_basis regression with
+  // ParallelMesh
+  SerialMesh mesh(init.comm());
 
   MeshTools::Generation::build_cube (mesh,
                                      n_elem_xy, n_elem_xy, n_elem_z,
