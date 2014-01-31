@@ -565,7 +565,10 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   this->write_nodal_data_common(fname, output_names, /*continuous=*/true);
 
   if(mesh.processor_id())
+  {
+    STOP_LOG("write_nodal_data()", "ExodusII_IO");
     return;
+  }
 
   // This will count the number of variables actually output
   for (int c=0; c<num_vars; c++)
@@ -694,7 +697,10 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
   START_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
 
   if(MeshOutput<MeshBase>::mesh().processor_id())
+  {
+    STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
     return;
+  }
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
