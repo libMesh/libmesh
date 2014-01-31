@@ -615,14 +615,21 @@ void VTKIO::write_nodal_data (const std::string& fname,
               if (_local_node_map.find(k) == _local_node_map.end())
                 continue; // not a local node
 
+              if (!soln.empty())
+                {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-	      libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
-					    << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
-					    << std::endl);
-	      data->SetValue(_local_node_map[k], soln[k*num_vars + variable].real());
+	          libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
+					        << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
+					        << std::endl);
+	          data->SetValue(_local_node_map[k], soln[k*num_vars + variable].real());
 #else
-              data->SetValue(_local_node_map[k], soln[k*num_vars + variable]);
+                  data->SetValue(_local_node_map[k], soln[k*num_vars + variable]);
 #endif
+                }
+              else
+                {
+                  data->SetValue(_local_node_map[k], 0);
+                }
             }
           _vtk_grid->GetPointData()->AddArray(data);
         }
