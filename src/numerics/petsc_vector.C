@@ -723,7 +723,7 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
     /* In all other cases, we assert that both vectors are of equal
        type.  */
     libmesh_assert_equal_to (this->_type, v._type);
-    libmesh_assert (this->_global_to_local_map == v._global_to_local_map);
+//    libmesh_assert (this->_global_to_local_map == v._global_to_local_map);
 
     if (v.size() != 0)
     {

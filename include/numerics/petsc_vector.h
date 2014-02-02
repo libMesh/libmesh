@@ -29,6 +29,8 @@
 // Local includes
 #include "libmesh/numeric_vector.h"
 #include "libmesh/petsc_macro.h"
+#include "libmesh/libmesh_common.h"
+#include LIBMESH_INCLUDE_UNORDERED_MAP
 
 /**
  * Petsc include files.
@@ -556,6 +558,20 @@ private:
    */
   mutable bool _array_is_present;
 
+  /**
+   * First local index.
+   *
+   * Only valid when _array_is_present
+   */
+  mutable numeric_index_type _first;
+
+  /**
+   * Last local index.
+   *
+   * Only valid when _array_is_present
+   */
+  mutable numeric_index_type _last;
+
 #ifndef NDEBUG
   /**
    * Size of the local form, for being used in assertations.  The
@@ -593,7 +609,7 @@ private:
   /**
    * Type for map that maps global to local ghost cells.
    */
-  typedef std::map<numeric_index_type,numeric_index_type> GlobalToLocalMap;
+  typedef LIBMESH_BEST_UNORDERED_MAP<numeric_index_type,numeric_index_type> GlobalToLocalMap;
 
   /**
    * Map that maps global to local ghost cells (will be empty if not
@@ -618,6 +634,8 @@ inline
 PetscVector<T>::PetscVector (const Parallel::Communicator &comm, const ParallelType ptype)
     : NumericVector<T>(comm, ptype),
       _array_is_present(false),
+      _first(0),
+      _last(0),
       _local_form(NULL),
       _values(NULL),
       _global_to_local_map(),
@@ -1125,13 +1143,20 @@ numeric_index_type PetscVector<T>::first_local_index () const
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr=0;
-  PetscInt petsc_first=0, petsc_last=0;
+  numeric_index_type first = 0;
 
-  ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
-         LIBMESH_CHKERRABORT(ierr);
+  if(_array_is_present) // Can we use cached values?
+      first = _first;
+  else
+    {
+      PetscErrorCode ierr=0;
+      PetscInt petsc_first=0, petsc_last=0;
+      ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
+      LIBMESH_CHKERRABORT(ierr);
+      first = static_cast<numeric_index_type>(petsc_first);
+    }
 
-  return static_cast<numeric_index_type>(petsc_first);
+  return first;
 }
 
 
@@ -1142,13 +1167,21 @@ numeric_index_type PetscVector<T>::last_local_index () const
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr=0;
-  PetscInt petsc_first=0, petsc_last=0;
+  numeric_index_type first = 0;
+  numeric_index_type last = 0;
 
-  ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
-         LIBMESH_CHKERRABORT(ierr);
+  if(_array_is_present) // Can we use cached values?
+      last = _last;
+  else
+    {
+      PetscErrorCode ierr=0;
+      PetscInt petsc_first=0, petsc_last=0;
+      ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
+      LIBMESH_CHKERRABORT(ierr);
+      last = static_cast<numeric_index_type>(petsc_last);
+    }
 
-  return static_cast<numeric_index_type>(petsc_last);
+  return last;
 }
 
 
@@ -1159,12 +1192,24 @@ numeric_index_type PetscVector<T>::map_global_to_local_index (const numeric_inde
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr=0;
-  PetscInt petsc_first=0, petsc_last=0;
-  ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
-  LIBMESH_CHKERRABORT(ierr);
-  const numeric_index_type first = static_cast<numeric_index_type>(petsc_first);
-  const numeric_index_type last = static_cast<numeric_index_type>(petsc_last);
+  numeric_index_type first=0;
+  numeric_index_type last=0;
+
+  if(_array_is_present) // Can we use cached values?
+    {
+      first = _first;
+      last = _last;
+    }
+  else
+    {
+      PetscErrorCode ierr=0;
+      PetscInt petsc_first=0, petsc_last=0;
+      ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
+      LIBMESH_CHKERRABORT(ierr);
+      first = static_cast<numeric_index_type>(petsc_first);
+      last = static_cast<numeric_index_type>(petsc_last);
+    }
+
 
   if((i>=first) && (i<last))
     {
@@ -1329,6 +1374,16 @@ void PetscVector<T>::_get_array(void) const
 	  _local_size = static_cast<numeric_index_type>(my_local_size);
 #endif
 	}
+
+        { // cache ownership range
+          PetscErrorCode ierr=0;
+          PetscInt petsc_first=0, petsc_last=0;
+          ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
+          LIBMESH_CHKERRABORT(ierr);
+          _first = static_cast<numeric_index_type>(petsc_first);
+          _last = static_cast<numeric_index_type>(petsc_last);
+        }
+
       _array_is_present = true;
     }
 }
@@ -1364,7 +1419,6 @@ void PetscVector<T>::_restore_array(void) const
       _array_is_present = false;
     }
 }
-
 
 } // namespace libMesh
 
