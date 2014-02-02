@@ -124,9 +124,11 @@ bool EulerSolver::element_residual (bool request_jacobian,
   // We do a trick here to avoid using a non-1
   // elem_solution_derivative:
   context.get_elem_jacobian() *= -1.0;
+  context.fixed_solution_derivative *= -1.0;
   jacobian_computed = _system.mass_residual(jacobian_computed, context) &&
     jacobian_computed;
   context.get_elem_jacobian() *= -1.0;
+  context.fixed_solution_derivative *= -1.0;
 
   // Move elem_->elem_, old_->theta_
   context.get_elem_solution().swap(theta_solution);

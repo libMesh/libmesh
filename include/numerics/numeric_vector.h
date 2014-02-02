@@ -374,6 +374,11 @@ public:
   NumericVector<T> & operator /= (const T a) { this->scale(1./a); return *this; }
 
   /**
+   * Pointwise Division operator. ie divide every entry in this vector by the entry in v
+   */
+  virtual NumericVector<T> & operator /= (NumericVector<T> & /*v*/) = 0;
+
+  /**
    * Replace each entry v_i of this vector by its reciprocal, 1/v_i.
    */
   virtual void reciprocal() = 0;

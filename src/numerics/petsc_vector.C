@@ -549,6 +549,19 @@ void PetscVector<T>::scale (const T factor_in)
 }
 
 template <typename T>
+NumericVector<T> & PetscVector<T>::operator /= (NumericVector<T> & v)
+{
+  PetscErrorCode ierr = 0;
+
+  const PetscVector<T>* v_vec = libmesh_cast_ptr<const PetscVector<T>*>(&v);
+
+  ierr = VecPointwiseDivide(_vec, _vec, v_vec->_vec);
+  LIBMESH_CHKERRABORT(ierr);
+
+  return *this;
+}
+
+template <typename T>
 void PetscVector<T>::abs()
 {
   this->_restore_array();
@@ -1090,12 +1103,11 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
   PetscScalar *values;
 
 
-  v_local.resize(n);
-
-
   // only one processor
-  if (n == nl)
+  if (n_processors() == 1)
     {
+      v_local.resize(n);
+
       ierr = VecGetArray (_vec, &values);
 	     LIBMESH_CHKERRABORT(ierr);
 
@@ -1109,23 +1121,61 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
   // otherwise multiple processors
   else
     {
-      numeric_index_type ioff = this->first_local_index();
-      std::vector<Real> local_values (n, 0.);
-
+      if(pid == 0) // optimized version for localizing to 0
       {
-	ierr = VecGetArray (_vec, &values);
-	       LIBMESH_CHKERRABORT(ierr);
+        Vec vout;
+        VecScatter ctx;
 
-	for (PetscInt i=0; i<nl; i++)
-	  local_values[i+ioff] = static_cast<Real>(values[i]);
+        ierr = VecScatterCreateToZero(_vec, &ctx, &vout);
+        LIBMESH_CHKERRABORT(ierr);
 
-	ierr = VecRestoreArray (_vec, &values);
-	       LIBMESH_CHKERRABORT(ierr);
+        ierr = VecScatterBegin(ctx, _vec, vout, INSERT_VALUES, SCATTER_FORWARD);
+        LIBMESH_CHKERRABORT(ierr);
+        ierr = VecScatterEnd(ctx, _vec, vout, INSERT_VALUES, SCATTER_FORWARD);
+        LIBMESH_CHKERRABORT(ierr);
+
+        if(processor_id() == 0)
+        {
+          v_local.resize(n);
+
+          ierr = VecGetArray (vout, &values);
+          LIBMESH_CHKERRABORT(ierr);
+
+          for (PetscInt i=0; i<n; i++)
+            v_local[i] = static_cast<Real>(values[i]);
+
+          ierr = VecRestoreArray (vout, &values);
+          LIBMESH_CHKERRABORT(ierr);
+        }
+
+        ierr = VecScatterDestroy(&ctx);
+        LIBMESH_CHKERRABORT(ierr);
+        ierr = VecDestroy(&vout);
+        LIBMESH_CHKERRABORT(ierr);
+
       }
+      else
+      {
+        v_local.resize(n);
+
+        numeric_index_type ioff = this->first_local_index();
+        std::vector<Real> local_values (n, 0.);
+
+        {
+          ierr = VecGetArray (_vec, &values);
+          LIBMESH_CHKERRABORT(ierr);
+
+          for (PetscInt i=0; i<nl; i++)
+            local_values[i+ioff] = static_cast<Real>(values[i]);
+
+          ierr = VecRestoreArray (_vec, &values);
+          LIBMESH_CHKERRABORT(ierr);
+        }
 
 
-      MPI_Reduce (&local_values[0], &v_local[0], n, MPI_REAL, MPI_SUM,
-		  pid, this->comm().get());
+        MPI_Reduce (&local_values[0], &v_local[0], n, MPI_REAL, MPI_SUM,
+                    pid, this->comm().get());
+      }
     }
 }
 

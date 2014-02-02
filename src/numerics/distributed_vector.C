@@ -161,6 +161,24 @@ NumericVector<T>& DistributedVector<T>::operator -= (const NumericVector<T>& v)
 
 
 template <typename T>
+NumericVector<T> & DistributedVector<T>::operator /= (NumericVector<T> & v)
+{
+  libmesh_assert_equal_to(size(), v.size());
+
+  DistributedVector<T> & v_vec = libmesh_cast_ref<DistributedVector<T>&>(v);
+
+  std::size_t size = _values.size();
+
+  for(std::size_t i=0; i<size; i++)
+    _values[i] = _values[i] / v_vec._values[i];
+
+  return *this;
+}
+
+
+
+
+template <typename T>
 void DistributedVector<T>::add_vector (const std::vector<T>& v,
 				       const std::vector<numeric_index_type>& dof_indices)
 {

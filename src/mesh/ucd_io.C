@@ -339,15 +339,21 @@ void UCDIO::write_nodal_data(const std::string& fname,
 			     const std::vector<Number>&soln,
 			     const std::vector<std::string>& names)
 {
-  std::ofstream out_stream(fname.c_str());
-
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+  const dof_id_type n_elem = mesh.n_elem();
+
+  // Only processor 0 does the writing
+  if (mesh.processor_id())
+    return;
+
+  std::ofstream out_stream(fname.c_str());
 
   // UCD doesn't work in 1D
   libmesh_assert (mesh.mesh_dimension() != 1);
 
   // Write header
-  this->write_header(out_stream,mesh,mesh.n_elem(),names.size());
+  this->write_header(out_stream,mesh,n_elem,names.size());
 
   // Write the node coordinates
   this->write_nodes(out_stream,mesh);

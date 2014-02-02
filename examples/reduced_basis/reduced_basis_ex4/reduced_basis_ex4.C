@@ -76,8 +76,9 @@ int main (int argc, char** argv)
     online_mode = command_line.next(online_mode);
 
   // Create a mesh (just a simple square) on the default MPI
-  // communicator
-  Mesh mesh (init.comm(), dim);
+  // communicator.  We currently have to create a SerialMesh here due
+  // to a reduced_basis regression with ParallelMesh
+  SerialMesh mesh (init.comm(), dim);
   MeshTools::Generation::build_square (mesh,
                                        n_elem, n_elem,
                                        -1., 1.,

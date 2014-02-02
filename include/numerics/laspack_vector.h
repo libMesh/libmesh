@@ -273,6 +273,11 @@ class LaspackVector : public NumericVector<T>
   NumericVector<T> & operator -= (const NumericVector<T> &V);
 
   /**
+   * Pointwise Division operator. ie divide every entry in this vector by the entry in v
+   */
+  virtual NumericVector<T> & operator /= (NumericVector<T> & v);
+
+  /**
    * Replace each entry v_i of this vector by its reciprocal, 1/v_i.
    */
   virtual void reciprocal();
