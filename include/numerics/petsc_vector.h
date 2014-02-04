@@ -1167,7 +1167,6 @@ numeric_index_type PetscVector<T>::last_local_index () const
 {
   libmesh_assert (this->initialized());
 
-  numeric_index_type first = 0;
   numeric_index_type last = 0;
 
   if(_array_is_present) // Can we use cached values?

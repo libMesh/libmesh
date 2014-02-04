@@ -1636,26 +1636,16 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 }
 
 void DofMap::dof_indices (const Elem* const elem,
-			  std::vector<dof_id_type>& di,
-			  const unsigned int vn) const
+			  std::vector<dof_id_type>& di) const
 {
   START_LOG("dof_indices()", "DofMap");
 
   libmesh_assert(elem);
 
-  const unsigned int n_nodes = elem->n_nodes();
-  const ElemType type        = elem->type();
-  const unsigned int sys_num = this->sys_number();
   const unsigned int n_vars  = this->n_variables();
-  const unsigned int dim     = elem->dim();
 
   // Clear the DOF indices vector
   di.clear();
-
-#ifdef DEBUG
-  // Check that sizes match in DEBUG mode
-  unsigned int tot_size = 0;
-#endif
 
   // Create a vector to indicate which
   // SCALAR variables have been requested
@@ -1664,117 +1654,12 @@ void DofMap::dof_indices (const Elem* const elem,
 
   // Get the dof numbers
   for (unsigned int v=0; v<n_vars; v++)
-    if ((v == vn) || (vn == libMesh::invalid_uint))
-    {
-      if(this->variable(v).type().family == SCALAR)
-      {
-        // We asked for this variable, so add it to the vector.
-        SCALAR_var_numbers.push_back(v);
-
-#ifdef DEBUG
-        FEType fe_type = this->variable_type(v);
-        tot_size += FEInterface::n_dofs(dim,
-                                        fe_type,
-					type);
-#endif
-      }
-      else
-      if (this->variable(v).active_on_subdomain(elem->subdomain_id()))
-	{ // Do this for all the variables if one was not specified
-	  // or just for the specified variable
-
-	  // Increase the polynomial order on p refined elements
-	  FEType fe_type = this->variable_type(v);
-	  fe_type.order = static_cast<Order>(fe_type.order +
-					     elem->p_level());
-
-	  const bool extra_hanging_dofs =
-	    FEInterface::extra_hanging_dofs(fe_type);
-
-#ifdef DEBUG
-	  tot_size += FEInterface::n_dofs(dim,
-					  fe_type,
-					  type);
-#endif
-
-	  // Get the node-based DOF numbers
-	  for (unsigned int n=0; n<n_nodes; n++)
-	    {
-	      const Node* node      = elem->get_node(n);
-
-	      // There is a potential problem with h refinement.  Imagine a
-	      // quad9 that has a linear FE on it.  Then, on the hanging side,
-	      // it can falsely identify a DOF at the mid-edge node. This is why
-	      // we call FEInterface instead of node->n_comp() directly.
-	      const unsigned int nc = FEInterface::n_dofs_at_node (dim,
-								   fe_type,
-								   type,
-								   n);
-
-	      // If this is a non-vertex on a hanging node with extra
-	      // degrees of freedom, we use the non-vertex dofs (which
-	      // come in reverse order starting from the end, to
-	      // simplify p refinement)
-	      if (extra_hanging_dofs && !elem->is_vertex(n))
-		{
-		  const int dof_offset = node->n_comp(sys_num,v) - nc;
-
-		  // We should never have fewer dofs than necessary on a
-		  // node unless we're getting indices on a parent element,
-		  // and we should never need the indices on such a node
-		  if (dof_offset < 0)
-		    {
-		      libmesh_assert(!elem->active());
-		      di.resize(di.size() + nc, DofObject::invalid_id);
-		    }
-		  else
-		    for (int i=node->n_comp(sys_num,v)-1; i>=dof_offset; i--)
-		      {
-			libmesh_assert_not_equal_to (node->dof_number(sys_num,v,i),
-					             DofObject::invalid_id);
-			di.push_back(node->dof_number(sys_num,v,i));
-		      }
-		}
-	      // If this is a vertex or an element without extra hanging
-	      // dofs, our dofs come in forward order coming from the
-	      // beginning
-	      else
-		for (unsigned int i=0; i<nc; i++)
-		  {
-		    libmesh_assert_not_equal_to (node->dof_number(sys_num,v,i),
-				                 DofObject::invalid_id);
-		    di.push_back(node->dof_number(sys_num,v,i));
-		  }
-	    }
-
-	  // If there are any element-based DOF numbers, get them
-	  const unsigned int nc = FEInterface::n_dofs_per_elem(dim,
-							       fe_type,
-							       type);
-	  // We should never have fewer dofs than necessary on an
-	  // element unless we're getting indices on a parent element,
-	  // and we should never need those indices
-	  if (nc != 0)
-	    {
-	      if (elem->n_systems() > sys_num &&
-		  nc <= elem->n_comp(sys_num,v))
-		{
-		  for (unsigned int i=0; i<nc; i++)
-		    {
-		      libmesh_assert_not_equal_to (elem->dof_number(sys_num,v,i),
-				                   DofObject::invalid_id);
-
-		      di.push_back(elem->dof_number(sys_num,v,i));
-		    }
-		}
-	      else
-		{
-		  libmesh_assert(!elem->active() || fe_type.family == LAGRANGE);
-		  di.resize(di.size() + nc, DofObject::invalid_id);
-		}
-	    }
-	}
-      } // end loop over variables
+  {
+    if(this->variable(v).type().family == SCALAR)
+      SCALAR_var_numbers.push_back(v);
+    else
+      _dof_indices(elem, di, v);
+  }
 
   // Finally append any SCALAR dofs that we asked for.
   std::vector<dof_id_type> di_new;
@@ -1786,9 +1671,144 @@ void DofMap::dof_indices (const Elem* const elem,
     di.insert( di.end(), di_new.begin(), di_new.end());
   }
 
-#ifdef DEBUG
-    libmesh_assert_equal_to (tot_size, di.size());
-#endif
+  STOP_LOG("dof_indices()", "DofMap");
+}
+
+
+void DofMap::dof_indices (const Elem* const elem,
+			  std::vector<dof_id_type>& di,
+			  const unsigned int vn) const
+{
+  START_LOG("dof_indices()", "DofMap");
+
+  libmesh_assert(elem);
+
+  // Clear the DOF indices vector
+  di.clear();
+
+  // Create a vector to indicate which
+  // SCALAR variables have been requested
+  std::vector<unsigned int> SCALAR_var_numbers;
+  SCALAR_var_numbers.clear();
+
+  // Get the dof numbers
+  if(this->variable(vn).type().family == SCALAR)
+    SCALAR_var_numbers.push_back(vn);
+  else
+    _dof_indices(elem, di, vn);
+
+  // Finally append any SCALAR dofs that we asked for.
+  std::vector<dof_id_type> di_new;
+  std::vector<unsigned int>::iterator it           = SCALAR_var_numbers.begin();
+  std::vector<unsigned int>::const_iterator it_end = SCALAR_var_numbers.end();
+  for( ; it != it_end; ++it)
+  {
+    this->SCALAR_dof_indices(di_new,*it);
+    di.insert( di.end(), di_new.begin(), di_new.end());
+  }
+
+  STOP_LOG("dof_indices()", "DofMap");
+}
+
+
+void DofMap::_dof_indices (const Elem* const elem,
+                          std::vector<dof_id_type>& di,
+                          const unsigned int v) const
+{
+  const unsigned int n_nodes = elem->n_nodes();
+  const ElemType type        = elem->type();
+  const unsigned int sys_num = this->sys_number();
+  const unsigned int dim     = elem->dim();
+
+  if (this->variable(v).active_on_subdomain(elem->subdomain_id()))
+  { // Do this for all the variables if one was not specified
+    // or just for the specified variable
+
+    // Increase the polynomial order on p refined elements
+    FEType fe_type = this->variable_type(v);
+    fe_type.order = static_cast<Order>(fe_type.order +
+                                       elem->p_level());
+
+    const bool extra_hanging_dofs =
+      FEInterface::extra_hanging_dofs(fe_type);
+
+    // Get the node-based DOF numbers
+    for (unsigned int n=0; n<n_nodes; n++)
+    {
+      const Node* node      = elem->get_node(n);
+
+      // There is a potential problem with h refinement.  Imagine a
+      // quad9 that has a linear FE on it.  Then, on the hanging side,
+      // it can falsely identify a DOF at the mid-edge node. This is why
+      // we call FEInterface instead of node->n_comp() directly.
+      const unsigned int nc = FEInterface::n_dofs_at_node (dim,
+                                                           fe_type,
+                                                           type,
+                                                           n);
+
+      // If this is a non-vertex on a hanging node with extra
+      // degrees of freedom, we use the non-vertex dofs (which
+      // come in reverse order starting from the end, to
+      // simplify p refinement)
+      if (extra_hanging_dofs && !elem->is_vertex(n))
+      {
+        const int dof_offset = node->n_comp(sys_num,v) - nc;
+
+        // We should never have fewer dofs than necessary on a
+        // node unless we're getting indices on a parent element,
+        // and we should never need the indices on such a node
+        if (dof_offset < 0)
+        {
+          libmesh_assert(!elem->active());
+          di.resize(di.size() + nc, DofObject::invalid_id);
+        }
+        else
+          for (int i=node->n_comp(sys_num,v)-1; i>=dof_offset; i--)
+          {
+            libmesh_assert_not_equal_to (node->dof_number(sys_num,v,i),
+                                         DofObject::invalid_id);
+            di.push_back(node->dof_number(sys_num,v,i));
+          }
+      }
+      // If this is a vertex or an element without extra hanging
+      // dofs, our dofs come in forward order coming from the
+      // beginning
+      else
+        for (unsigned int i=0; i<nc; i++)
+        {
+          libmesh_assert_not_equal_to (node->dof_number(sys_num,v,i),
+                                       DofObject::invalid_id);
+          di.push_back(node->dof_number(sys_num,v,i));
+        }
+    }
+
+    // If there are any element-based DOF numbers, get them
+    const unsigned int nc = FEInterface::n_dofs_per_elem(dim,
+                                                         fe_type,
+                                                         type);
+    // We should never have fewer dofs than necessary on an
+    // element unless we're getting indices on a parent element,
+    // and we should never need those indices
+    if (nc != 0)
+    {
+      if (elem->n_systems() > sys_num &&
+          nc <= elem->n_comp(sys_num,v))
+      {
+        for (unsigned int i=0; i<nc; i++)
+        {
+          libmesh_assert_not_equal_to (elem->dof_number(sys_num,v,i),
+                                       DofObject::invalid_id);
+
+          di.push_back(elem->dof_number(sys_num,v,i));
+        }
+      }
+      else
+      {
+        libmesh_assert(!elem->active() || fe_type.family == LAGRANGE);
+        di.resize(di.size() + nc, DofObject::invalid_id);
+      }
+    }
+  }
 
   STOP_LOG("dof_indices()", "DofMap");
 }
@@ -1902,11 +1922,6 @@ void DofMap::old_dof_indices (const Elem* const elem,
   // Clear the DOF indices vector.
   di.clear();
 
-#ifdef DEBUG
-  // Check that sizes match
-  unsigned int tot_size = 0;
-#endif
-
   // Create a vector to indicate which
   // SCALAR variables have been requested
   std::vector<unsigned int> SCALAR_var_numbers;
@@ -1920,13 +1935,6 @@ void DofMap::old_dof_indices (const Elem* const elem,
         {
           // We asked for this variable, so add it to the vector.
           SCALAR_var_numbers.push_back(v);
-
-#ifdef DEBUG
-	  FEType fe_type = this->variable_type(v);
-	  tot_size += FEInterface::n_dofs(dim,
-				          fe_type,
-					  type);
-#endif
         }
       else
       if (this->variable(v).active_on_subdomain(elem->subdomain_id()))
@@ -1953,12 +1961,6 @@ void DofMap::old_dof_indices (const Elem* const elem,
 
 	  const bool extra_hanging_dofs =
 	    FEInterface::extra_hanging_dofs(fe_type);
-
-#ifdef DEBUG
-	  tot_size += FEInterface::n_dofs(dim,
-					  fe_type,
-					  type);
-#endif
 
 	  // Get the node-based DOF numbers
 	  for (unsigned int n=0; n<n_nodes; n++)
@@ -2056,10 +2058,6 @@ void DofMap::old_dof_indices (const Elem* const elem,
     this->SCALAR_dof_indices(di_new,*it,true);
     di.insert( di.end(), di_new.begin(), di_new.end());
   }
-
-#ifdef DEBUG
-  libmesh_assert_equal_to (tot_size, di.size());
-#endif
 
   STOP_LOG("old_dof_indices()", "DofMap");
 }
