@@ -19,6 +19,7 @@ hold on
 % The first month with statistics is October 2007
 %               Read    Write   Total files updated
 cell_data = {
+{'Jan', '2014',  0      ,0      ,0}
 {'Dec', '2013',  0      ,0      ,0}
 {'Nov', '2013',  0      ,0      ,0} % SVN repository deleted from sf.net Nov 11, 2013
 {'Oct', '2013',  0      ,0      ,0}
