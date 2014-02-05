@@ -1148,9 +1148,9 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
           LIBMESH_CHKERRABORT(ierr);
         }
 
-        ierr = VecScatterDestroy(&ctx);
+        ierr = LibMeshVecScatterDestroy(&ctx);
         LIBMESH_CHKERRABORT(ierr);
-        ierr = VecDestroy(&vout);
+        ierr = LibMeshVecDestroy(&vout);
         LIBMESH_CHKERRABORT(ierr);
 
       }

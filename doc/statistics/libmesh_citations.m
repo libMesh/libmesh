@@ -37,9 +37,9 @@ cell_data = {
     {'''11', 35}
     {'''12', 48}
     {'''13', 57}
-    {'''14', 2}
+    {'''14', 3}
     {'P', 10} % Preprints
-    {'T', 20} % Theses
+    {'T', 21} % Theses
     };
 
 % Strip numerical data from cell_data
