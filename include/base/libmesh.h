@@ -117,6 +117,13 @@ private:
   T command_line_value (const std::vector<std::string> &, T);
 
   /**
+   * Use GetPot's search()/next() functions to get following arguments
+   * from the command line.
+   */
+  template <typename T>
+  T command_line_next (const std::string &, T);
+
+  /**
    * \returns the array of values associated with name on the command line if it is specified,
    * otherwise return the default, provided array.
    */

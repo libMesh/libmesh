@@ -749,6 +749,19 @@ T command_line_value (const std::vector<std::string> &name, T value)
 
 
 
+template <typename T>
+T command_line_next (const std::string &name, T value)
+{
+  // Make sure the command line parser is ready for use
+  libmesh_assert(command_line.get());
+
+  if (command_line->search(1, name.c_str()))
+    value = command_line->next(value);
+
+  return value;
+}
+
+
 
 template <typename T>
 void command_line_vector (const std::string &name, std::vector<T>& vec)
@@ -837,6 +850,12 @@ template float        command_line_value<float>       (const std::string&, float
 template double       command_line_value<double>      (const std::string&, double);
 template long double  command_line_value<long double> (const std::string&, long double);
 template std::string  command_line_value<std::string> (const std::string&, std::string);
+
+template int          command_line_next<int>         (const std::string&, int);
+template float        command_line_next<float>       (const std::string&, float);
+template double       command_line_next<double>      (const std::string&, double);
+template long double  command_line_next<long double> (const std::string&, long double);
+template std::string  command_line_next<std::string> (const std::string&, std::string);
 
 template void         command_line_vector<int>         (const std::string&, std::vector<int>&);
 template void         command_line_vector<float>       (const std::string&, std::vector<float>&);

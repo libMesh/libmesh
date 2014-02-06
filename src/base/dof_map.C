@@ -1471,6 +1471,24 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase& mesh) const
   bool implicit_neighbor_dofs =
     libMesh::on_command_line ("--implicit_neighbor_dofs");
 
+  // If the user specifies --implicit_neighbor_dofs 0, then
+  // presumably he knows what he is doing and we won't try to
+  // automatically turn it on even when all the variables are
+  // discontinuous.
+  if (implicit_neighbor_dofs)
+    {
+      // No flag provided defaults to 'true'
+      int flag = 1;
+      flag = libMesh::command_line_next ("--implicit_neighbor_dofs", flag);
+
+      if (!flag)
+        {
+          // The user said --implicit_neighbor_dofs 0, so he knows
+          // what he is doing and really doesn't want it.
+          return false;
+        }
+    }
+
   // look at all the variables in this system.  If every one is
   // discontinuous then the user must be doing DG/FVM, so be nice
   // and  force implicit_neighbor_dofs=true
