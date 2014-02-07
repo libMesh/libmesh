@@ -1053,8 +1053,15 @@ private:
   /**
    * Helper function that gets the dof indices on the current element
    * for a non-SCALAR type variable.
+   *
+   * @param tot_size In DEBUG mode this will add up the total number of
+   * dof indices that should have been added to di.
    */
-  void _dof_indices (const Elem* const elem, std::vector<dof_id_type>& di, const unsigned int v) const;
+  void _dof_indices (const Elem* const elem, std::vector<dof_id_type>& di, const unsigned int v
+#ifdef DEBUG
+                           ,unsigned int & tot_size
+#endif
+    ) const;
 
   /**
    * Builds a sparsity pattern

@@ -1644,6 +1644,11 @@ void DofMap::dof_indices (const Elem* const elem,
 
   const unsigned int n_vars  = this->n_variables();
 
+#ifdef DEBUG
+  // Check that sizes match in DEBUG mode
+  unsigned int tot_size = 0;
+#endif
+
   // Clear the DOF indices vector
   di.clear();
 
@@ -1656,9 +1661,22 @@ void DofMap::dof_indices (const Elem* const elem,
   for (unsigned int v=0; v<n_vars; v++)
   {
     if(this->variable(v).type().family == SCALAR)
+    {
       SCALAR_var_numbers.push_back(v);
+
+#ifdef DEBUG
+      tot_size += FEInterface::n_dofs(elem->dim(),
+                                      this->variable_type(v),
+                                      elem->type());
+#endif
+
+    }
     else
-      _dof_indices(elem, di, v);
+      _dof_indices(elem, di, v
+#ifdef DEBUG
+                   , tot_size
+#endif
+                             );
   }
 
   // Finally append any SCALAR dofs that we asked for.
@@ -1670,6 +1688,10 @@ void DofMap::dof_indices (const Elem* const elem,
     this->SCALAR_dof_indices(di_new,*it);
     di.insert( di.end(), di_new.begin(), di_new.end());
   }
+
+#ifdef DEBUG
+  libmesh_assert_equal_to (tot_size, di.size());
+#endif
 
   STOP_LOG("dof_indices()", "DofMap");
 }
@@ -1686,6 +1708,11 @@ void DofMap::dof_indices (const Elem* const elem,
   // Clear the DOF indices vector
   di.clear();
 
+#ifdef DEBUG
+  // Check that sizes match in DEBUG mode
+  unsigned int tot_size = 0;
+#endif
+
   // Create a vector to indicate which
   // SCALAR variables have been requested
   std::vector<unsigned int> SCALAR_var_numbers;
@@ -1693,9 +1720,20 @@ void DofMap::dof_indices (const Elem* const elem,
 
   // Get the dof numbers
   if(this->variable(vn).type().family == SCALAR)
+  {
     SCALAR_var_numbers.push_back(vn);
+#ifdef DEBUG
+    tot_size += FEInterface::n_dofs(elem->dim(),
+                                    this->variable_type(vn),
+                                    elem->type());
+#endif
+  }
   else
-    _dof_indices(elem, di, vn);
+      _dof_indices(elem, di, vn
+#ifdef DEBUG
+                   , tot_size
+#endif
+                             );
 
   // Finally append any SCALAR dofs that we asked for.
   std::vector<dof_id_type> di_new;
@@ -1707,13 +1745,21 @@ void DofMap::dof_indices (const Elem* const elem,
     di.insert( di.end(), di_new.begin(), di_new.end());
   }
 
+#ifdef DEBUG
+  libmesh_assert_equal_to (tot_size, di.size());
+#endif
+
   STOP_LOG("dof_indices()", "DofMap");
 }
 
 
 void DofMap::_dof_indices (const Elem* const elem,
                           std::vector<dof_id_type>& di,
-                          const unsigned int v) const
+                          const unsigned int v
+#ifdef DEBUG
+                           ,unsigned int & tot_size
+#endif
+  ) const
 {
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
@@ -1731,6 +1777,10 @@ void DofMap::_dof_indices (const Elem* const elem,
 
     const bool extra_hanging_dofs =
       FEInterface::extra_hanging_dofs(fe_type);
+
+#ifdef DEBUG
+    tot_size += FEInterface::n_dofs(dim,fe_type,type);
+#endif
 
     // Get the node-based DOF numbers
     for (unsigned int n=0; n<n_nodes; n++)
