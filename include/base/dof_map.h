@@ -104,7 +104,7 @@ class DofConstraints : public std::map<dof_id_type,
  * problem.  Each dof id with a non-zero constraint offset
  * stores it in such a structure.
  */
-class DofConstraintValueMap : 
+class DofConstraintValueMap :
   public std::map<dof_id_type, Number,
                   std::less<dof_id_type>,
                   Threads::scalable_allocator<std::pair<const dof_id_type, Number> > >
@@ -115,7 +115,7 @@ class DofConstraintValueMap :
  * Storage for DofConstraint right hand sides for all adjoint
  * problems.
  */
-class AdjointDofConstraintValues : 
+class AdjointDofConstraintValues :
   public std::map<unsigned int, DofConstraintValueMap,
                   std::less<unsigned int>,
                   Threads::scalable_allocator
@@ -506,12 +506,18 @@ public:
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
-   * for the element. If no variable number is specified then all
-   * variables are returned.
+   * for the element.
+   */
+  void dof_indices (const Elem* const elem,
+		    std::vector<dof_id_type>& di) const;
+
+  /**
+   * Fills the vector \p di with the global degree of freedom indices
+   * for the element.  For one variable
    */
   void dof_indices (const Elem* const elem,
 		    std::vector<dof_id_type>& di,
-		    const unsigned int vn = libMesh::invalid_uint) const;
+		    const unsigned int vn) const;
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
@@ -924,7 +930,7 @@ public:
    * corresponding to the adjoint problem defined by Quantity of
    * Interest \p q.
    */
-  void add_adjoint_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary, 
+  void add_adjoint_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary,
 				       unsigned int q);
 
   /**
@@ -951,7 +957,7 @@ public:
 
   bool has_adjoint_dirichlet_boundaries(unsigned int q) const;
 
-  const DirichletBoundaries * 
+  const DirichletBoundaries *
   get_adjoint_dirichlet_boundaries(unsigned int q) const;
 
   DirichletBoundaries *
@@ -1043,6 +1049,19 @@ public:
   unsigned int sys_number() const;
 
 private:
+
+  /**
+   * Helper function that gets the dof indices on the current element
+   * for a non-SCALAR type variable.
+   *
+   * @param tot_size In DEBUG mode this will add up the total number of
+   * dof indices that should have been added to di.
+   */
+  void _dof_indices (const Elem* const elem, std::vector<dof_id_type>& di, const unsigned int v
+#ifdef DEBUG
+                           ,unsigned int & tot_size
+#endif
+    ) const;
 
   /**
    * Builds a sparsity pattern
