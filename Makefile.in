@@ -27758,6 +27758,7 @@ doc html:
 # other than $USER when connecting to sourceforge servers... Please set the
 # environment variable: $LIBMESH_SVN_USER.
 upload:
+	if [ x$(LIBMESH_SVN_USER) = x ]; then echo "Set LIBMESH_SVN_USER environment variable"; false; fi
 	chmod -R g+w $(top_builddir)/doc/html/* $(top_srcdir)/doc/html/* $(top_srcdir)/doc/latex/*/*
 	rsync -rltzve ssh --exclude '.svn' $(top_srcdir)/doc/html/ $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
 	rsync -rltzve ssh --exclude '.svn' $(top_builddir)/doc/html/ $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
