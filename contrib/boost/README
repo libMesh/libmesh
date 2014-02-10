@@ -52,28 +52,3 @@ with libmesh:
    Makefile.test_boost included in this directory by typing:
 
    make -f Makefile.test_boost test_boost
-
-
-================================================================================
-Shell script for copying boost header files manually
-================================================================================
-
-#!/bin/bash
-
-# Where to copy files from
-from_dir=/path/to/unpacked/boost/boost_1_XY_Z/boost
-
-# Where to copy files to
-to_dir=/home/username/projects/libmesh_git/contrib/boost/include/boost
-
-# List of files to copy
-files=(assert.hpp config.hpp ...)
-
-for i in "${files[@]}"
-do
-    # Create the directory if it doesn't already exist
-    if [ ! -d $to_dir/`dirname $i` ]; then
-        mkdir -p $to_dir/`dirname $i`;
-    fi
-    cp $from_dir/$i $to_dir/$i
-done
