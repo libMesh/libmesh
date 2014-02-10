@@ -8,6 +8,7 @@ if LIBMESH_INSTALL_INTERNAL_BOOST
         boost/config.hpp \
         boost/config/user.hpp \
         boost/config/select_compiler_config.hpp \
+	boost/config/compiler/clang.hpp \
         boost/config/compiler/gcc.hpp \
         boost/config/compiler/intel.hpp \
         boost/config/select_stdlib_config.hpp \
@@ -69,6 +70,7 @@ if LIBMESH_INSTALL_INTERNAL_BOOST
         boost/type_traits/alignment_of.hpp \
         boost/type_traits/intrinsics.hpp \
         boost/type_traits/config.hpp \
+	boost/type_traits/is_abstract.hpp \
         boost/type_traits/is_same.hpp \
         boost/type_traits/detail/bool_trait_def.hpp \
         boost/type_traits/detail/template_arity_spec.hpp \
