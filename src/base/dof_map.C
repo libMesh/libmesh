@@ -1877,8 +1877,6 @@ void DofMap::_dof_indices (const Elem* const elem,
       }
     }
   }
-
-  STOP_LOG("dof_indices()", "DofMap");
 }
 
 
