@@ -9,6 +9,7 @@ if LIBMESH_INSTALL_INTERNAL_BOOST
         boost/config/user.hpp \
         boost/config/select_compiler_config.hpp \
         boost/config/compiler/gcc.hpp \
+        boost/config/compiler/intel.hpp \
         boost/config/select_stdlib_config.hpp \
         boost/config/no_tr1/utility.hpp \
         boost/config/stdlib/libstdcpp3.hpp \
