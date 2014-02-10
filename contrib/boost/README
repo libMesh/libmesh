@@ -6,13 +6,24 @@ with libmesh:
 
 .) Using the test_boost.cc file located in this directory, run
 
-   g++ -M -MF foo.d -I/path/to/unpacked/boost/boost_1_XY_Z test_boost.cc
+   $CXX -MM -MF foo.d -I/path/to/unpacked/boost/boost_1_XY_Z test_boost.cc
+
+   where $CXX is the C++ compiler you want to use to build boost
+   dependencies.  Note that different compilers will generate
+   different subsets of boost headers, and therefore the process
+   described here must be repeated with any new compiler you wish to
+   use with libmesh.  If your compiler does not support -MM, you will
+   need to figure out which dependency generation flag it uses that
+   skips system headers.
 
 .) Inspect the contents of the foo.d dependency file. It should contain all
    the headers from the boost distro that are required to build the subset of
-   boost used by libmesh, plus several system headers.
+   boost used by libmesh.
 
-.) Remove the existing boost headers
+.) If you are updating to a brand new version of Boost, remove all the
+   existing boost headers.  Otherwise, if you are just generating
+   dependencies for a new compiler, skip this step and continue with
+   copying files in the next step.
    git rm -r contrib/boost/include/boost
    git ci -a -m"Updating boost."
 
