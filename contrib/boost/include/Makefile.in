@@ -120,7 +120,7 @@ am__can_run_installinfo = \
   esac
 am__nobase_include_HEADERS_DIST = boost/assert.hpp boost/config.hpp \
 	boost/config/user.hpp boost/config/select_compiler_config.hpp \
-	boost/config/compiler/gcc.hpp \
+	boost/config/compiler/gcc.hpp boost/config/compiler/intel.hpp \
 	boost/config/select_stdlib_config.hpp \
 	boost/config/no_tr1/utility.hpp \
 	boost/config/stdlib/libstdcpp3.hpp \
@@ -592,6 +592,7 @@ vtkversion = @vtkversion@
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/config/user.hpp \
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/config/select_compiler_config.hpp \
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/config/compiler/gcc.hpp \
+@LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/config/compiler/intel.hpp \
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/config/select_stdlib_config.hpp \
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/config/no_tr1/utility.hpp \
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/config/stdlib/libstdcpp3.hpp \
