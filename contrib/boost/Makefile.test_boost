@@ -22,19 +22,7 @@ libmesh_CPPFLAGS := $(shell METHOD=$(METHOD) $(libmesh_config) --cppflags)
 libmesh_CXXFLAGS := $(shell METHOD=$(METHOD) $(libmesh_config) --cxxflags)
 libmesh_LIBS     := $(shell METHOD=$(METHOD) $(libmesh_config) --libs)
 
-###############################################################################
-# File management.  This is where the source, header, and object files are
-# defined
-
-#
-# source files
-srcfiles 	:= $(wildcard *.cc)
-
-###############################################################################
-
-
-
-.PHONY: clean clobber distclean
+.PHONY: clean
 
 # How to build executables.
 # Note: this directory does not compute dependencies, so this target
