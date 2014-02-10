@@ -25,15 +25,27 @@ with libmesh:
    git add contrib/boost/include/boost
    git ci --amend
 
-.) Update contrib/boost/include/Makefile.am with the list of files from foo.d
-   as well.  Commit Makefile.am.
+.) Update contrib/boost/include/Makefile.am with the list of files
+   from foo.d as well.  Commit Makefile.am.  You can get a list of
+   candidate files to install by doing:
+
+   cd $LIBMESH_ROOT/contrib/boost/include
+   find . -name "*.hpp"
 
 .) Run boostrap in the top level of the libmesh source distribution to
    regenerate Makefile.in.  Commit Makefile.in.
 
-.) Follow the normal instructions to make and install libmesh, and verify that
-   test_boost.cc can be built against the boost installed with libmesh.
+.) Follow the normal instructions to make and install libmesh, and
+   verify that test_boost.cc can be built against the boost installed
+   with libmesh.  You can do this, for example, with the
+   Makefile.test_boost included in this directory by typing:
 
+   make -f Makefile.test_boost test_boost
+
+
+================================================================================
+Shell script for copying boost header files manually
+================================================================================
 
 #!/bin/bash
 
@@ -48,7 +60,8 @@ files=(assert.hpp config.hpp ...)
 
 for i in "${files[@]}"
 do
-    # Create the directory if it doesn't already exist                                                                                                                                                                                          if [ ! -d $to_dir/`dirname $i` ]; then
+    # Create the directory if it doesn't already exist
+    if [ ! -d $to_dir/`dirname $i` ]; then
         mkdir -p $to_dir/`dirname $i`;
     fi
     cp $from_dir/$i $to_dir/$i
