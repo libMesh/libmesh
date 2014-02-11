@@ -420,7 +420,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
     _n_elem++;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  if (!e->valid_unique_id() && libMesh::processor_id() == e->processor_id())
+  if (!e->valid_unique_id() && processor_id() == e->processor_id())
     {
       e->set_unique_id() = _next_unique_id;
       _next_unique_id += this->n_processors();
@@ -584,7 +584,7 @@ Node* ParallelMesh::add_node (Node *n)
     _n_nodes++;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  if (!n->valid_unique_id() && libMesh::processor_id() == n->processor_id())
+  if (!n->valid_unique_id() && processor_id() == n->processor_id())
     {
       n->set_unique_id() = _next_unique_id;
       _next_unique_id += this->n_processors();
@@ -1328,7 +1328,7 @@ void ParallelMesh::assign_unique_ids()
     const elem_iterator_imp end = _elements.end();
 
     for (; it != end; ++it)
-      if ((*it) && ! (*it)->valid_unique_id() && libMesh::processor_id() == (*it)->processor_id())
+      if ((*it) && ! (*it)->valid_unique_id() && processor_id() == (*it)->processor_id())
       {
         (*it)->set_unique_id() = _next_unique_id;
         _next_unique_id += this->n_processors();
@@ -1340,7 +1340,7 @@ void ParallelMesh::assign_unique_ids()
     node_iterator_imp end = _nodes.end();
 
     for (; it != end; ++it)
-      if ((*it) && ! (*it)->valid_unique_id() && libMesh::processor_id() == (*it)->processor_id())
+      if ((*it) && ! (*it)->valid_unique_id() && processor_id() == (*it)->processor_id())
       {
         (*it)->set_unique_id() = _next_unique_id;
         _next_unique_id += this->n_processors();

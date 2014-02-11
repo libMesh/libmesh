@@ -35,6 +35,17 @@ namespace libMesh {
   processor_id_type processor_id();
 
   /**
+   * @returns the number of processors libMesh was initialized with.
+   */
+  processor_id_type global_n_processors();
+
+  /**
+   * @returns the index of the local processor with respect to the
+   * original MPI pool libMesh was initialized with.
+   */
+  processor_id_type global_processor_id();
+
+  /**
    * @returns the maximum number of threads used in the simulation.
    */
   unsigned int n_threads();
@@ -73,6 +84,21 @@ namespace libMesh {
 inline
 libMesh::processor_id_type libMesh::n_processors()
 {
+  return libMesh::global_n_processors();
+}
+
+
+
+inline
+libMesh::processor_id_type libMesh::processor_id()
+{
+  return libMesh::global_processor_id();
+}
+
+
+inline
+libMesh::processor_id_type libMesh::global_n_processors()
+{
 #ifdef LIBMESH_HAVE_MPI
   return libMeshPrivateData::_n_processors;
 #else
@@ -80,10 +106,8 @@ libMesh::processor_id_type libMesh::n_processors()
 #endif
 }
 
-
-
 inline
-libMesh::processor_id_type libMesh::processor_id()
+libMesh::processor_id_type libMesh::global_processor_id()
 {
 #ifdef LIBMESH_HAVE_MPI
   return libMeshPrivateData::_processor_id;

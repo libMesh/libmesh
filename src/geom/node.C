@@ -139,7 +139,7 @@ void Node::PackedNode::unpack (std::vector<largest_id_type>::const_iterator star
 {
   processor_id_type processor_id = static_cast<processor_id_type>(*start++);
   libmesh_assert(processor_id == DofObject::invalid_processor_id ||
-                 processor_id < libMesh::n_processors());
+                 processor_id < libMesh::global_n_processors());
 
   dof_id_type id = static_cast<dof_id_type>(*start++);
 
