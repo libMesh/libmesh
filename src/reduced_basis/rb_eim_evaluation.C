@@ -453,7 +453,7 @@ void RBEIMEvaluation::write_out_interpolation_points_elem(const std::string dire
   // Also, write out the vector that tells us which element each entry
   // of interpolation_points_elem corresponds to. This allows us to handle
   // the case in which elements are repeated in interpolation_points_elem.
-  if(libMesh::processor_id() == 0)
+  if(processor_id() == 0)
   {
     // These are just integers, so no need for a binary format here
     std::ofstream interpolation_elem_ids_out
