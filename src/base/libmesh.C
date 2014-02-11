@@ -169,10 +169,14 @@ namespace libMesh
 // ------------------------------------------------------------
 // libMeshdata initialization
 #ifdef LIBMESH_HAVE_MPI
+  #ifndef LIBMESH_DISABLE_COMMWORLD
     MPI_Comm           COMM_WORLD = MPI_COMM_NULL;
+  #endif
     MPI_Comm           GLOBAL_COMM_WORLD = MPI_COMM_NULL;
 #else
+  #ifndef LIBMESH_DISABLE_COMMWORLD
     int                COMM_WORLD = 0;
+  #endif
     int                GLOBAL_COMM_WORLD = 0;
 #endif
 
