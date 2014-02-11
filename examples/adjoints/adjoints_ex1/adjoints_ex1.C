@@ -249,7 +249,7 @@ int main (int argc, char** argv)
     std::ifstream i("general.in");
     if (!i)
       {
-        std::cerr << '[' << libMesh::processor_id()
+        std::cerr << '[' << init.comm().rank()
                   << "] Can't find general.in; exiting early."
                   << std::endl;
         libmesh_error();
@@ -515,7 +515,7 @@ int main (int argc, char** argv)
       }
   }
 
-  std::cerr << '[' << libMesh::processor_id()
+  std::cerr << '[' << mesh.processor_id()
             << "] Completing output." << std::endl;
 
 #endif // #ifndef LIBMESH_ENABLE_AMR

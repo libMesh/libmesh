@@ -392,7 +392,7 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
 #if !defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_HAVE_TRILINOS)
-  if (libMesh::processor_id() == 0)
+  if (init.comm().rank() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
               << "compiled with nonlinear solver support from\n"
               << "PETSc or Trilinos!"
@@ -401,7 +401,7 @@ int main (int argc, char** argv)
 #endif
 
 #ifndef LIBMESH_ENABLE_AMR
-  if (libMesh::processor_id() == 0)
+  if (init.comm().rank() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
               << "compiled with AMR support!"
               << std::endl;
@@ -414,7 +414,7 @@ int main (int argc, char** argv)
   // Check for proper calling arguments.
   if (argc < 3)
     {
-      if (libMesh::processor_id() == 0)
+      if (init.comm().rank() == 0)
         std::cerr << "Usage:\n"
                   <<"\t " << argv[0] << " -r 2"
                   << std::endl;

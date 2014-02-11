@@ -122,16 +122,16 @@ int main (int argc, char** argv)
   // Check for proper usage.
   if (argc < 3)
     {
-      if (libMesh::processor_id() == 0)
+      if (init.comm().rank() == 0)
         std::cerr << "Usage: " << argv[0] << " -f [frequency]"
                   << std::endl;
 
       libmesh_error();
     }
 
-  if (libMesh::n_processors() > 1)
+  if (init.comm().size() > 1)
     {
-      if (libMesh::processor_id() == 0)
+      if (init.comm().rank() == 0)
         {
           std::cerr << "ERROR: Skipping example 7. " << std::endl;
           std::cerr << "MeshData objects currently only work in serial." << std::endl;

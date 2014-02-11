@@ -197,7 +197,7 @@ void write_output(EquationSystems &es,
 void write_output_headers(FEMParameters &param)
 {
   // Only one processor needs to take care of headers.
-  if (libMesh::processor_id() != 0)
+  if (libMesh::global_processor_id() != 0)
     return;
 
   start_output(param.initial_timestep, "out_clocktime.m", "vector_clocktime");
@@ -228,7 +228,7 @@ void write_output_solvedata(EquationSystems &es,
   unsigned int n_active_elem = mesh.n_active_elem();
   unsigned int n_active_dofs = es.n_active_dofs();
 
-  if (libMesh::processor_id() == 0)
+  if (mesh.processor_id() == 0)
     {
       // Write out the number of elements/dofs used
       std::ofstream activemesh ("out_activemesh.m",
@@ -256,7 +256,7 @@ void write_output_solvedata(EquationSystems &es,
 void write_output_footers(FEMParameters &param)
 {
   // Write footers on output .m files
-  if (libMesh::processor_id() == 0)
+  if (libMesh::global_processor_id() == 0)
     {
       std::ofstream clocktime ("out_clocktime.m",
         std::ios_base::app | std::ios_base::out);
@@ -717,7 +717,7 @@ int main (int argc, char** argv)
     std::ifstream i("general.in");
     if (!i)
       {
-        std::cerr << '[' << libMesh::processor_id()
+        std::cerr << '[' << init.comm().rank()
                   << "] Can't find general.in; exiting early."
                   << std::endl;
         libmesh_error();
