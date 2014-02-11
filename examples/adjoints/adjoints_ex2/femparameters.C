@@ -63,7 +63,7 @@ void FEMParameters::read(GetPot &input)
   std::vector<std::string> bad_variables =
     input.unidentified_arguments(variable_names);
 
-  if (libMesh::processor_id() == 0 && !bad_variables.empty())
+  if (libMesh::global_processor_id() == 0 && !bad_variables.empty())
     {
       std::cerr << "ERROR: Unrecognized variables:" << std::endl;
       for (unsigned int i = 0; i != bad_variables.size(); ++i)

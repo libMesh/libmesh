@@ -76,7 +76,7 @@ int main (int argc, char** argv)
   // Check for proper usage.
   if (argc < 3)
     {
-      if (libMesh::processor_id() == 0)
+      if (init.comm().rank() == 0)
         std::cerr << "\nUsage: " << argv[0]
                   << " -n <number of eigen values>"
                   << std::endl;

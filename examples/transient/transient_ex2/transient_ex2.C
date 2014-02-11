@@ -108,7 +108,7 @@ int main (int argc, char** argv)
   // Check for proper usage.
   if (argc < 2)
     {
-      if (libMesh::processor_id() == 0)
+      if (init.comm().rank() == 0)
         std::cerr << "Usage: " << argv[0] << " [meshfile]"
                   << std::endl;
 

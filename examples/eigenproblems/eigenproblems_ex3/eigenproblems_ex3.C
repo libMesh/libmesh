@@ -92,7 +92,7 @@ int main (int argc, char** argv)
 
   // This example is designed for the SLEPc eigen solver interface.
 #ifndef LIBMESH_HAVE_SLEPC
-  if (libMesh::processor_id() == 0)
+  if (init.comm().rank() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
               << "compiled with SLEPc eigen solvers support!"
               << std::endl;

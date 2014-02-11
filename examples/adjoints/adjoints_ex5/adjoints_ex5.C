@@ -259,7 +259,7 @@ int main (int argc, char** argv)
     std::ifstream i("general.in");
     if (!i)
       {
-        std::cerr << '[' << libMesh::processor_id()
+        std::cerr << '[' << init.comm().rank()
                   << "] Can't find general.in; exiting early."
                   << std::endl;
         libmesh_error();
@@ -527,12 +527,12 @@ int main (int argc, char** argv)
 }
   catch (...)
   {
-    std::cerr << '[' << libMesh::processor_id()
+    std::cerr << '[' << mesh.processor_id()
               << "] Caught exception; exiting early." << std::endl;
   }
 #endif
 
-  std::cerr << '[' << libMesh::processor_id()
+  std::cerr << '[' << mesh.processor_id()
             << "] Completing output." << std::endl;
 
   // All done.

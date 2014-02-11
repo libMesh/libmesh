@@ -125,7 +125,7 @@ int main (int argc, char** argv)
   // Check for proper calling arguments.
   if (argc < 3)
     {
-      if (libMesh::processor_id() == 0)
+      if (init.comm().rank() == 0)
         std::cerr << "Usage:\n"
                   <<"\t " << argv[0] << " -d 2(3)" << " -n 15"
                   << std::endl;
@@ -178,7 +178,7 @@ int main (int argc, char** argv)
   // Cannot use discontinuous basis.
   if ((family == "MONOMIAL") || (family == "XYZ"))
     {
-      if (libMesh::processor_id() == 0)
+      if (init.comm().rank() == 0)
         std::cerr << "ex4 currently requires a C^0 (or higher) FE basis." << std::endl;
       libmesh_error();
     }
