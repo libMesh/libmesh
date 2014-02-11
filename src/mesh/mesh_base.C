@@ -117,7 +117,7 @@ MeshBase::~MeshBase()
 
 
 
-void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
+void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
 {
   parallel_object_only();
 
@@ -160,7 +160,8 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
     this->update_parallel_id_counts();
 
   // Let all the elements find their neighbors
-  this->find_neighbors();
+  if(!skip_find_neighbors)
+    this->find_neighbors();
 
   // Partition the mesh.
   this->partition();

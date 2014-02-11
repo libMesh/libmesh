@@ -807,6 +807,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
                                 bool use_binary_search,
                                 bool enforce_all_nodes_match_on_boundaries)
 {
+  START_LOG("stitch_meshes()", "SerialMesh");
   stitching_helper(&other_mesh,
                    this_mesh_boundary_id,
                    other_mesh_boundary_id,
@@ -814,7 +815,9 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
                    clear_stitched_boundary_ids,
                    verbose,
                    use_binary_search,
-                   enforce_all_nodes_match_on_boundaries);
+                   enforce_all_nodes_match_on_boundaries,
+                   true);
+  STOP_LOG("stitch_meshes()", "SerialMesh");
 }
 
 void SerialMesh::stitch_surfaces (boundary_id_type boundary_id_1,
@@ -832,7 +835,8 @@ void SerialMesh::stitch_surfaces (boundary_id_type boundary_id_1,
                    clear_stitched_boundary_ids,
                    verbose,
                    use_binary_search,
-                   enforce_all_nodes_match_on_boundaries);
+                   enforce_all_nodes_match_on_boundaries,
+                   true);
 }
 
 void SerialMesh::stitching_helper (SerialMesh* other_mesh,
@@ -842,10 +846,18 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                                    bool clear_stitched_boundary_ids,
                                    bool verbose,
                                    bool use_binary_search,
-                                   bool enforce_all_nodes_match_on_boundaries)
+                                   bool enforce_all_nodes_match_on_boundaries,
+                                   bool skip_find_neighbors)
 {
   std::map<dof_id_type, dof_id_type> node_to_node_map, other_to_this_node_map; // The second is the inverse map of the first
   std::map<dof_id_type, std::vector<dof_id_type> > node_to_elems_map;
+
+  typedef dof_id_type                     key_type;
+  typedef std::pair<Elem*, unsigned char> val_type;
+  typedef std::pair<key_type, val_type>   key_val_pair;
+  // Mapping between all side keys in this mesh and elements+side numbers relevant to the boundary in this mesh as well.
+  std::map<key_type, val_type>            side_to_elem_map;
+  
   // If there is only one mesh (i.e. other_mesh==NULL), then loop over this mesh twice
   if(!other_mesh)
   {
@@ -890,6 +902,16 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                           set_array[i]->insert( side->node(node_id) );
 
                         h_min = std::min(h_min, side->hmin());
+                        
+                        // This side is on the boundary, add its information to side_to_elem
+                        if(skip_find_neighbors)
+                        {
+                          key_type key = el->key(side_id);
+                          val_type val;
+                          val.first = el;
+                          val.second = side_id;
+                          side_to_elem_map[key] = val;
+                        }
                       }
                   }
             }
@@ -1132,8 +1154,9 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
       }
     }
 
-    // Copy mesh data
-    this->copy_nodes_and_elements(*other_mesh);
+    // Copy mesh data. If we skip the call to find_neighbors(), the lists
+    // of neighbors will be copied verbatim from the other mesh
+    this->copy_nodes_and_elements(*other_mesh, skip_find_neighbors);
 
     // Decrement node IDs of mesh to return to original state
     node_it  = other_mesh->nodes_begin();
@@ -1231,7 +1254,51 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
     this->delete_node( this->node_ptr(node_id) );
   }
 
-  this->prepare_for_use( /*skip_renumber_nodes_and_elements= */ false);
+  this->prepare_for_use( /*skip_renumber_nodes_and_elements= */ false, skip_find_neighbors);
+
+  // If find_neighbors() wasn't called in prepare_for_use(), we need to
+  // manually loop once more over all elements adjacent to the stitched boundary
+  // and fix their lists of neighbors.
+  // This is done according to the following steps:
+  //   1. Loop over all copied elements adjacent to the boundary using node_to_elems_map (trying to avoid duplicates)
+  //   2. Look at all their sides with a NULL neighbor and update them using side_to_elem_map if necessary
+  //   3. Update the corresponding side in side_to_elem_map as well
+  if(skip_find_neighbors)
+  {
+    elem_map_it     = node_to_elems_map.begin();
+    elem_map_it_end = node_to_elems_map.end();
+    std::set<dof_id_type> fixed_elems;
+    for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+    {
+      dof_id_type n_elems = elem_map_it->second.size();
+      for(dof_id_type i=0; i<n_elems; i++)
+      {
+        dof_id_type elem_id = elem_map_it->second[i];
+        if(fixed_elems.find(elem_id) == fixed_elems.end())
+        {
+          Elem* el = this->elem(elem_id);
+          fixed_elems.insert(elem_id);
+          for(dof_id_type s(0); s < el->n_neighbors(); ++s)
+          {
+            if(el->neighbor(s) == NULL)
+            {
+              key_type key = el->key(s);
+              std::map<key_type, val_type>::const_iterator key_val_it;
+              key_val_it = side_to_elem_map.find(key);
+              
+              if(key_val_it != side_to_elem_map.end())
+              {
+                Elem* neighbor = key_val_it->second.first;
+                dof_id_type neighbor_side = key_val_it->second.second;
+                el->set_neighbor(s, key_val_it->second.first);
+                neighbor->set_neighbor(neighbor_side, el);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
   // After the stitching, we may want to clear boundary IDs from element
   // faces that are now internal to the mesh

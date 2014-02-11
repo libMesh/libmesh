@@ -154,7 +154,7 @@ class UnstructuredMesh : public MeshBase
    * Deep copy of another unstructured mesh class (used by subclass
    * copy constructors)
    */
-  virtual void copy_nodes_and_elements(const UnstructuredMesh& other_mesh);
+  virtual void copy_nodes_and_elements(const UnstructuredMesh& other_mesh, const bool skip_find_neighbors=false);
 
 
   /**

@@ -504,7 +504,7 @@ public:
    * The argument to skip renumbering is now deprecated - to prevent a
    * mesh from being renumbered, set allow_renumbering(false).
    */
-  void prepare_for_use (const bool skip_renumber_nodes_and_elements=false);
+  void prepare_for_use (const bool skip_renumber_nodes_and_elements=false, const bool skip_find_neighbors=false);
 
   /**
    * Call the default partitioner (currently \p metis_partition()).

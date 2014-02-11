@@ -101,7 +101,7 @@ UnstructuredMesh::UnstructuredMesh (unsigned int d) :
 
 
 void UnstructuredMesh::copy_nodes_and_elements
-  (const UnstructuredMesh& other_mesh)
+  (const UnstructuredMesh& other_mesh, const bool skip_find_neighbors)
 {
   // We're assuming our subclass data needs no copy
   libmesh_assert_equal_to (_n_parts, other_mesh._n_parts);
@@ -138,7 +138,10 @@ void UnstructuredMesh::copy_nodes_and_elements
   {
     //Preallocate Memory if necessary
     this->reserve_elem(other_mesh.n_elem());
-
+    
+    // Declare a map linking old and new elements, needed to copy the neighbor lists
+    std::map<const Elem*, Elem*> old_elems_to_new_elems;
+    
     // Loop over the elements
     MeshBase::const_element_iterator it = other_mesh.elements_begin();
     const MeshBase::const_element_iterator end = other_mesh.elements_end();
@@ -189,7 +192,36 @@ void UnstructuredMesh::copy_nodes_and_elements
       el->set_id(old->id());
 
       //Hold onto it
-      this->add_elem(el);
+      if(!skip_find_neighbors)
+      {
+        this->add_elem(el);
+      }
+      else
+      {
+        Elem* new_el = this->add_elem(el);
+        old_elems_to_new_elems[old] = new_el;
+      }
+      
+      // Add the link between the original element and this copy to the map
+      if(skip_find_neighbors)
+        old_elems_to_new_elems[old] = el;
+    }
+    
+    // Loop (again) over the elements to fill in the neighbors
+    if(skip_find_neighbors)
+    {
+      it = other_mesh.elements_begin();
+      for (; it != end; ++it)
+      {
+        Elem* old_elem = *it;
+        Elem* new_elem = old_elems_to_new_elems[old_elem];
+        for (unsigned int s=0; s != old_elem->n_neighbors(); ++s)
+        {
+          const Elem* old_neighbor = old_elem->neighbor(s);
+          Elem* new_neighbor = old_elems_to_new_elems[old_neighbor];
+          new_elem->set_neighbor(s, new_neighbor);
+        }
+      }
     }
   }
 
@@ -198,7 +230,7 @@ void UnstructuredMesh::copy_nodes_and_elements
   //policies as our source mesh.
   this->allow_renumbering(false);
   this->skip_partitioning(true);
-  this->prepare_for_use();
+  this->prepare_for_use(false, skip_find_neighbors);
   this->allow_renumbering(other_mesh.allow_renumbering());
   this->skip_partitioning(other_mesh.skip_partitioning());
 }
