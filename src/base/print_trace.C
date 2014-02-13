@@ -138,7 +138,7 @@ namespace libMesh
   {
 #ifdef LIBMESH_ENABLE_TRACEFILES
     std::stringstream outname;
-    outname << "traceout_" << static_cast<std::size_t>(libMesh::processor_id()) << '_' << getpid() << ".txt";
+    outname << "traceout_" << static_cast<std::size_t>(libMesh::global_processor_id()) << '_' << getpid() << ".txt";
     std::ofstream traceout(outname.str().c_str(), std::ofstream::app);
     libMesh::print_trace(traceout);
 #endif
