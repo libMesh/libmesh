@@ -29,8 +29,9 @@ int main(int argc, char** argv)
 
   START_LOG("mesh.read()", "main");
   mesh.read(argv[1]);
-  libMesh::out << "Loaded mesh " << argv[1] << std::endl;
   STOP_LOG("mesh.read()", "main");
+  libMesh::out << "Loaded mesh " << argv[1] << std::endl;
+  mesh.print_info();
 
   START_LOG("es.read()", "main");
   std::string solnname = argv[2];
@@ -40,8 +41,9 @@ int main(int argc, char** argv)
           EquationSystems::READ_DATA |
           EquationSystems::READ_ADDITIONAL_DATA |
           EquationSystems::READ_BASIC_ONLY);
-  libMesh::out << "Loaded solution " << argv[2] << std::endl;
   STOP_LOG("es.read()", "main");
+  libMesh::out << "Loaded solution " << argv[2] << std::endl;
+  es.print_info();
 
   START_LOG("write_equation_systems()", "main");
   std::string outputname(argv[3]);
