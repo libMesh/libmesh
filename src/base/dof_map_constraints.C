@@ -2427,6 +2427,8 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
   std::vector<std::set<dof_id_type> > pushed_node_ids(this->n_processors());
 #endif
 
+  const unsigned int sys_num = this->sys_number();
+
   MeshBase::element_iterator
     foreign_elem_it  = mesh.active_not_local_elements_begin(),
     foreign_elem_end = mesh.active_not_local_elements_end();
@@ -2434,14 +2436,49 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
   // Collect the constraints to push to each processor
   for (; foreign_elem_it != foreign_elem_end; ++foreign_elem_it)
     {
-      Elem *elem = *foreign_elem_it;
+      const Elem *elem = *foreign_elem_it;
 
-      std::vector<dof_id_type> my_dof_indices;
-      this->dof_indices (elem, my_dof_indices);
+      // Just checking dof_indices on the foreign element isn't
+      // enough.  Consider a central hanging node between a coarse
+      // Q2/Q1 element and its finer neighbors on a higher-ranked
+      // processor.  The coarse element's processor will own the node,
+      // and will thereby own the pressure dof on that node, despite
+      // the fact that that pressure dof doesn't directly exist on the
+      // coarse element!
+      //
+      // So, we loop through dofs manually.
 
-      for (unsigned int i=0; i != my_dof_indices.size(); ++i)
-        if (this->is_constrained_dof(my_dof_indices[i]))
-          pushed_ids[elem->processor_id()].insert(my_dof_indices[i]);
+      {
+      const unsigned int n_vars = elem->n_vars(sys_num);
+      for (unsigned int v=0; v != n_vars; ++v)
+        {
+          const unsigned int n_comp = elem->n_comp(sys_num,v);
+          for (unsigned int c=0; c != n_comp; ++c)
+            {
+              const unsigned int id =
+                elem->dof_number(sys_num,v,c);
+              if (this->is_constrained_dof(id))
+                pushed_ids[elem->processor_id()].insert(id);
+            }
+        }
+      }
+
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        {
+          const Node *node = elem->get_node(n);
+          const unsigned int n_vars = node->n_vars(sys_num);
+          for (unsigned int v=0; v != n_vars; ++v)
+            {
+              const unsigned int n_comp = node->n_comp(sys_num,v);
+              for (unsigned int c=0; c != n_comp; ++c)
+                {
+                  const unsigned int id =
+                    node->dof_number(sys_num,v,c);
+                  if (this->is_constrained_dof(id))
+                    pushed_ids[elem->processor_id()].insert(id);
+                }
+            }
+        }
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
