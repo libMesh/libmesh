@@ -746,7 +746,7 @@ namespace libMesh
 
 		  DofConstraintRow* constraint_row;
 
-		  // we may be running constraint methods concurretly
+		  // we may be running constraint methods concurrently
                   // on multiple threads, so we need a lock to
                   // ensure that this constraint is "ours"
 		  {

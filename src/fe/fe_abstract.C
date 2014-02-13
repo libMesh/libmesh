@@ -1019,7 +1019,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
 		  // Lagrange case.
                   if (their_mag < 1.e-5)
                     {
-		      // since we may be running this method concurretly
+		      // since we may be running this method concurrently
 		      // on multiple threads we need to acquire a lock
 		      // before modifying the shared constraint_row object.
 		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
@@ -1035,7 +1035,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
 		  // basis functions.
 		  else // (1.e-5 <= their_mag <= .999)
 		    {
-		      // since we may be running this method concurretly
+		      // since we may be running this method concurrently
 		      // on multiple threads we need to acquire a lock
 		      // before modifying the shared constraint_row object.
 		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
@@ -1236,7 +1236,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
 							              their_side_n,
 							              mapped_point);
 
-		          // since we may be running this method concurretly
+		          // since we may be running this method concurrently
 		          // on multiple threads we need to acquire a lock
 		          // before modifying the shared constraint_row object.
 		          {

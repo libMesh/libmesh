@@ -474,7 +474,7 @@ namespace libMesh
 		      if ((std::abs(their_dof_value) > 1.e-5) &&
 			  (std::abs(their_dof_value) < .999))
 			{
-			  // since we may be running this method concurretly
+			  // since we may be running this method concurrently
 			  // on multiple threads we need to acquire a lock
 			  // before modifying the shared constraint_row object.
 			  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);

@@ -3517,7 +3517,7 @@ void DofMap::constrain_p_dofs (unsigned int var,
         const unsigned int high_nc =
 	  FEInterface::n_dofs_at_node (dim, high_p_fe_type, type, n);
 
-	// since we may be running this method concurretly
+	// since we may be running this method concurrently
 	// on multiple threads we need to acquire a lock
 	// before modifying the _dof_constraints object.
 	Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
