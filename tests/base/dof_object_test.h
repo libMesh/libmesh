@@ -62,15 +62,15 @@ public:
   {
     DofObject aobject(*instance);
 
-    aobject.processor_id(libMesh::processor_id());
-    CPPUNIT_ASSERT_EQUAL( (processor_id_type)libMesh::processor_id() , aobject.processor_id() );
+    aobject.processor_id(libMesh::global_processor_id());
+    CPPUNIT_ASSERT_EQUAL( (processor_id_type)libMesh::global_processor_id() , aobject.processor_id() );
   }
 
   void testValidProcId()
   {
     DofObject aobject(*instance);
 
-    aobject.processor_id(libMesh::processor_id());
+    aobject.processor_id(libMesh::global_processor_id());
     CPPUNIT_ASSERT(aobject.valid_processor_id());
 
     aobject.processor_id(DofObject::invalid_processor_id);
@@ -81,7 +81,7 @@ public:
   {
     DofObject aobject(*instance);
 
-    aobject.processor_id(libMesh::processor_id());
+    aobject.processor_id(libMesh::global_processor_id());
     aobject.invalidate_processor_id();
 
     CPPUNIT_ASSERT( !aobject.valid_processor_id() );

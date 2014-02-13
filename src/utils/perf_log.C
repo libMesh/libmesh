@@ -146,10 +146,10 @@ std::string PerfLog::get_info_header() const
       v.push_back(&user_stream);
 
       // Fill string stream objects
-      if (libMesh::n_processors() > 1)
+      if (libMesh::global_n_processors() > 1)
 	{
-	  pid_stream     << "| Processor id:   " << libMesh::processor_id();
-	  nprocs_stream  << "| Num Processors: " << libMesh::n_processors();
+	  pid_stream     << "| Processor id:   " << libMesh::global_processor_id();
+	  nprocs_stream  << "| Num Processors: " << libMesh::global_n_processors();
 	}
 
       time_stream    << "| Time:           " << date                   ;

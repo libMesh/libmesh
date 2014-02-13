@@ -169,9 +169,15 @@ namespace libMesh
 // ------------------------------------------------------------
 // libMeshdata initialization
 #ifdef LIBMESH_HAVE_MPI
-MPI_Comm           COMM_WORLD = MPI_COMM_NULL;
+  #ifndef LIBMESH_DISABLE_COMMWORLD
+    MPI_Comm           COMM_WORLD = MPI_COMM_NULL;
+  #endif
+    MPI_Comm           GLOBAL_COMM_WORLD = MPI_COMM_NULL;
 #else
-int                COMM_WORLD = 0;
+  #ifndef LIBMESH_DISABLE_COMMWORLD
+    int                COMM_WORLD = 0;
+  #endif
+    int                GLOBAL_COMM_WORLD = 0;
 #endif
 
 #ifdef LIBMESH_DISABLE_COMMWORLD
@@ -293,7 +299,7 @@ void libmesh_terminate_handler()
   MPI_Initialized (&mpi_initialized);
 
   if (mpi_initialized)
-    MPI_Abort(libMesh::COMM_WORLD, 1);
+    MPI_Abort(libMesh::GLOBAL_COMM_WORLD, 1);
   else
 #endif
     // The system terminate_handler may do useful things like printing
@@ -372,9 +378,10 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
       // as a default for that API
       this->_comm = COMM_WORLD_IN;
 
-      libMesh::COMM_WORLD = COMM_WORLD_IN;
+      libMesh::GLOBAL_COMM_WORLD = COMM_WORLD_IN;
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
+      libMesh::COMM_WORLD = COMM_WORLD_IN;
       Parallel::Communicator_World = COMM_WORLD_IN;
 #endif
 
@@ -392,11 +399,11 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
         {
 #if MPI_VERSION > 1
 	  MPI_Comm_create_errhandler(libMesh_MPI_Handler, &libmesh_errhandler);
-	  MPI_Comm_set_errhandler(libMesh::COMM_WORLD, libmesh_errhandler);
+	  MPI_Comm_set_errhandler(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler);
 	  MPI_Comm_set_errhandler(MPI_COMM_WORLD, libmesh_errhandler);
 #else
 	  MPI_Errhandler_create(libMesh_MPI_Handler, &libmesh_errhandler);
-	  MPI_Errhandler_set(libMesh::COMM_WORLD, libmesh_errhandler);
+	  MPI_Errhandler_set(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler);
 	  MPI_Errhandler_set(MPI_COMM_WORLD, libmesh_errhandler);
 #endif // #if MPI_VERSION > 1
         }
@@ -428,13 +435,13 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
     {
       int ierr=0;
 
-      PETSC_COMM_WORLD = libMesh::COMM_WORLD;
+      PETSC_COMM_WORLD = libMesh::GLOBAL_COMM_WORLD;
 
       // Check whether the calling program has already initialized
       // PETSc, and avoid duplicate Initialize/Finalize
       PetscBool petsc_already_initialized;
       ierr = PetscInitialized(&petsc_already_initialized);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
       if (petsc_already_initialized != PETSC_TRUE)
         libmesh_initialized_petsc = true;
 # if defined(LIBMESH_HAVE_SLEPC)
@@ -449,14 +456,14 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
 #  endif
         {
           ierr = SlepcInitialize  (&argc, const_cast<char***>(&argv), NULL, NULL);
-	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	         CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
           libmesh_initialized_slepc = true;
         }
 # else
       if (libmesh_initialized_petsc)
         {
           ierr = PetscInitialize (&argc, const_cast<char***>(&argv), NULL, NULL);
-	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	         CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
         }
 # endif
     }
@@ -498,7 +505,7 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
   if (libMesh::on_command_line ("--redirect-stdout"))
     {
       std::ostringstream filename;
-      filename << "stdout.processor." << libMesh::processor_id();
+      filename << "stdout.processor." << libMesh::global_processor_id();
       _ofstream.reset (new std::ofstream (filename.str().c_str()));
       // Redirect, saving the original streambufs!
       out_buf = libMesh::out.rdbuf (_ofstream->rdbuf());
@@ -508,7 +515,7 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
   // redirect libMesh::out to nothing on all
   // other processors unless explicitly told
   // not to via the --keep-cout command-line argument.
-  if (libMesh::processor_id() != 0)
+  if (libMesh::global_processor_id() != 0)
     if (!libMesh::on_command_line ("--keep-cout"))
       libMesh::out.rdbuf (NULL);
 

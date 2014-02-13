@@ -44,7 +44,7 @@ void HeatSystem::init_data ()
     std::ifstream i("heat.in");
     if (!i)
       {
-        std::cerr << '[' << libMesh::processor_id()
+        std::cerr << '[' << this->processor_id()
                   << "] Can't find heat.in; exiting early."
                   << std::endl;
         libmesh_error();

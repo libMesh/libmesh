@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 
   ExodusII_IO(from_mesh).write_equation_systems("from.e", from_es);
 
-  Mesh to_mesh;
+  Mesh to_mesh(init.comm());
   MeshTools::Generation::build_cube(to_mesh, 5, 5, 5, 0, 1, 0, 1, 0, 1, TET4);
   to_mesh.print_info();
   EquationSystems to_es(to_mesh);
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
   unsigned int to_var = to_sys.add_variable("to");
   to_es.init();
 
-  DTKSolutionTransfer dtk_transfer;
+  DTKSolutionTransfer dtk_transfer(init.comm());
 
   dtk_transfer.transfer(from_sys.variable(from_var), to_sys.variable(to_var));
 

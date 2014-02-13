@@ -179,7 +179,7 @@ int main (int argc, char** argv)
     init_timestep = command_line.next(0);
   else
     {
-      if (libMesh::processor_id() == 0)
+      if (init.comm().rank() == 0)
         std::cerr << "ERROR: Initial timestep not specified\n" << std::endl;
 
       // This handy function will print the file name, line number,

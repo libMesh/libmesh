@@ -34,7 +34,7 @@ namespace MacroFunctions
 {
   void here(const char* file, int line, const char* date, const char* time)
   {
-    libMesh::err << "[" << static_cast<std::size_t>(libMesh::processor_id()) << "] "
+    libMesh::err << "[" << static_cast<std::size_t>(libMesh::global_processor_id()) << "] "
                  << file
                  << ", line " << line
                  << ", compiled " << date
@@ -46,7 +46,7 @@ namespace MacroFunctions
 
   void stop(const char* file, int line, const char* date, const char* time)
   {
-    if (libMesh::n_processors() == 1)
+    if (libMesh::global_n_processors() == 1)
       {
         libMesh::MacroFunctions::here(file, line, date, time);
 #ifdef LIBMESH_HAVE_CSIGNAL
@@ -62,7 +62,7 @@ namespace MacroFunctions
 
   void report_error(const char* file, int line, const char* date, const char* time)
   {
-    if (libMesh::n_processors() == 1)
+    if (libMesh::global_n_processors() == 1)
       libMesh::print_trace();
     else
       libMesh::write_traceout();
