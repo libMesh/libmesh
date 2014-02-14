@@ -26168,7 +26168,6 @@ fi
 
 if (test "$enableopenmp" != no) ; then
 
- # for _AC_LANG_PREFIX
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenMP flag of C++ compiler" >&5
 $as_echo_n "checking for OpenMP flag of C++ compiler... " >&6; }
@@ -26190,18 +26189,22 @@ for ax_openmp_flag in $ax_openmp_flags; do
   esac
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
 #ifdef __cplusplus
 extern "C"
 #endif
-char omp_get_num_threads ();
+void omp_set_num_threads(int);
 int
 main ()
 {
-return omp_get_num_threads ();
+const int N = 100000;
+  int i, arr[N];
+
+  omp_set_num_threads(2);
+
+  #pragma omp parallel for
+  for (i = 0; i < N; i++) {
+    arr[i] = i;
+  }
   ;
   return 0;
 }
@@ -26218,7 +26221,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_cxx_openmp" >&5
 $as_echo "$ax_cv_cxx_openmp" >&6; }
 if test "x$ax_cv_cxx_openmp" = "xunknown"; then
-  :
+  enableopenmp=no
 else
   if test "x$ax_cv_cxx_openmp" != "xnone"; then
     OPENMP_CXXFLAGS=$ax_cv_cxx_openmp
