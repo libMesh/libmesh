@@ -171,7 +171,7 @@ AC_ARG_ENABLE(openmp,
              enableopenmp=$enableval,
              enableopenmp=yes)
 if (test "$enableopenmp" != no) ; then
-   AX_OPENMP
+   AX_OPENMP([],[enableopenmp=no])
    #The above call only sets the flag for C++
    if (test "x$OPENMP_CXXFLAGS" != x) ; then
      AC_MSG_RESULT(<<< Configuring library with OpenMP support >>>)
