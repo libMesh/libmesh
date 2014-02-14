@@ -533,6 +533,7 @@ include_HEADERS = \
         base/sparsity_pattern.h \
         base/variable.h \
         base/variant_filter_iterator.h \
+        enums/enum_convergence_flags.h \
         enums/enum_eigen_solver_type.h \
         enums/enum_elem_quality.h \
         enums/enum_elem_type.h \

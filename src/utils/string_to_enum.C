@@ -24,6 +24,7 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/enum_convergence_flags.h"
 #include "libmesh/enum_elem_quality.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_eigen_solver_type.h"
@@ -552,7 +553,35 @@ INSTANTIATE_ENUM_MAPS(XdrMODE, xdr_mode)
   }
 
 
+INSTANTIATE_ENUM_MAPS(LinearConvergenceReason, linear_convergence_reason)
 
+  // Initialize xdr_mode_to_enum on first call
+  void init_linear_convergence_reason_to_enum ()
+  {
+    if (linear_convergence_reason_to_enum.empty())
+      {
+        linear_convergence_reason_to_enum["CONVERGED_RTOL_NORMAL"]     = CONVERGED_RTOL_NORMAL;
+        linear_convergence_reason_to_enum["CONVERGED_ATOL_NORMAL"]     = CONVERGED_ATOL_NORMAL;
+        linear_convergence_reason_to_enum["CONVERGED_RTOL"]            = CONVERGED_RTOL;
+        linear_convergence_reason_to_enum["CONVERGED_ATOL"]            = CONVERGED_ATOL;
+        linear_convergence_reason_to_enum["CONVERGED_ITS"]             = CONVERGED_ITS;
+        linear_convergence_reason_to_enum["CONVERGED_CG_NEG_CURVE"]    = CONVERGED_CG_NEG_CURVE;
+        linear_convergence_reason_to_enum["CONVERGED_CG_CONSTRAINED"]  = CONVERGED_CG_CONSTRAINED;
+        linear_convergence_reason_to_enum["CONVERGED_STEP_LENGTH"]     = CONVERGED_STEP_LENGTH;
+        linear_convergence_reason_to_enum["CONVERGED_HAPPY_BREAKDOWN"] = CONVERGED_HAPPY_BREAKDOWN;
+        linear_convergence_reason_to_enum["DIVERGED_NULL"]             = DIVERGED_NULL;
+        linear_convergence_reason_to_enum["DIVERGED_ITS"]              = DIVERGED_ITS;
+        linear_convergence_reason_to_enum["DIVERGED_DTOL"]             = DIVERGED_DTOL;
+        linear_convergence_reason_to_enum["DIVERGED_BREAKDOWN"]        = DIVERGED_BREAKDOWN;
+        linear_convergence_reason_to_enum["DIVERGED_BREAKDOWN_BICG"]   = DIVERGED_BREAKDOWN_BICG;
+        linear_convergence_reason_to_enum["DIVERGED_NONSYMMETRIC"]     = DIVERGED_NONSYMMETRIC;
+        linear_convergence_reason_to_enum["DIVERGED_INDEFINITE_PC"]    = DIVERGED_INDEFINITE_PC;
+        linear_convergence_reason_to_enum["DIVERGED_NAN"]              = DIVERGED_NAN;
+        linear_convergence_reason_to_enum["DIVERGED_INDEFINITE_MAT"]   = DIVERGED_INDEFINITE_MAT;
+        linear_convergence_reason_to_enum["CONVERGED_ITERATING"]       = CONVERGED_ITERATING;
+        linear_convergence_reason_to_enum["UNKNOWN_FLAG"]              = UNKNOWN_FLAG;
+      }
+  }
 
 
 #undef INSTANTIATE_ENUM_MAPS
@@ -616,6 +645,7 @@ INSTANTIATE_STRING_TO_ENUM(PointLocatorType, point_locator_type)
 INSTANTIATE_STRING_TO_ENUM(SolverPackage,solverpackage_type)
 INSTANTIATE_STRING_TO_ENUM(SubsetSolveMode,subset_solve_mode)
 INSTANTIATE_STRING_TO_ENUM(XdrMODE,xdr_mode)
+INSTANTIATE_STRING_TO_ENUM(LinearConvergenceReason, linear_convergence_reason)
 
 #undef INSTANTIATE_STRING_TO_ENUM
 

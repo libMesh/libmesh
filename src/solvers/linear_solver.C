@@ -29,6 +29,7 @@
 #include "libmesh/trilinos_aztec_linear_solver.h"
 #include "libmesh/preconditioner.h"
 #include "libmesh/sparse_matrix.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -173,6 +174,12 @@ LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int>* const dofs,
 
   }
 
+template <typename T>
+void LinearSolver<T>::print_converged_reason() const
+{
+  LinearConvergenceReason reason = this->get_converged_reason();
+  libMesh::out << "Linear solver convergence/divergence reason: " << Utility::enum_to_string(reason) << std::endl;
+}
 
 //------------------------------------------------------------------
 // Explicit instantiations

@@ -1804,14 +1804,40 @@ void PetscLinearSolver<T>::set_petsc_solver_type()
     }
 }
 
+
+
 template <typename T>
-void PetscLinearSolver<T>::print_converged_reason()
+LinearConvergenceReason PetscLinearSolver<T>::get_converged_reason() const
 {
   KSPConvergedReason reason;
   KSPGetConvergedReason(_ksp, &reason);
-  libMesh::out << "Linear solver convergence/divergence reason: " << KSPConvergedReasons[reason] << std::endl;
-}
 
+  switch(reason)
+  {
+    case KSP_CONVERGED_RTOL_NORMAL     : return CONVERGED_RTOL_NORMAL;
+    case KSP_CONVERGED_ATOL_NORMAL     : return CONVERGED_ATOL_NORMAL;
+    case KSP_CONVERGED_RTOL            : return CONVERGED_RTOL;
+    case KSP_CONVERGED_ATOL            : return CONVERGED_ATOL;
+    case KSP_CONVERGED_ITS             : return CONVERGED_ITS;
+    case KSP_CONVERGED_CG_NEG_CURVE    : return CONVERGED_CG_NEG_CURVE;
+    case KSP_CONVERGED_CG_CONSTRAINED  : return CONVERGED_CG_CONSTRAINED;
+    case KSP_CONVERGED_STEP_LENGTH     : return CONVERGED_STEP_LENGTH;
+    case KSP_CONVERGED_HAPPY_BREAKDOWN : return CONVERGED_HAPPY_BREAKDOWN;
+    case KSP_DIVERGED_NULL             : return DIVERGED_NULL;
+    case KSP_DIVERGED_ITS              : return DIVERGED_ITS;
+    case KSP_DIVERGED_DTOL             : return DIVERGED_DTOL;
+    case KSP_DIVERGED_BREAKDOWN        : return DIVERGED_BREAKDOWN;
+    case KSP_DIVERGED_BREAKDOWN_BICG   : return DIVERGED_BREAKDOWN_BICG;
+    case KSP_DIVERGED_NONSYMMETRIC     : return DIVERGED_NONSYMMETRIC;
+    case KSP_DIVERGED_INDEFINITE_PC    : return DIVERGED_INDEFINITE_PC;
+    case KSP_DIVERGED_NAN              : return DIVERGED_NAN;
+    case KSP_DIVERGED_INDEFINITE_MAT   : return DIVERGED_INDEFINITE_MAT;
+    case KSP_CONVERGED_ITERATING       : return CONVERGED_ITERATING;
+    default :
+      libMesh::err << "Unknown convergence flag!" << std::endl;
+      return UNKNOWN_FLAG;
+  }
+}
 
 
 template <typename T>
