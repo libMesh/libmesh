@@ -19,6 +19,11 @@
   * Assorted bugfixes:
     * for SzaBab and Bernstein h-adaptivity.
     * for p-adaptivity.
+  * global_n_processors()/global_processor_id() functions to access
+    MPI rank information from the original communicator used to
+    initialize the library
+  * Fixed longstanding bug that could arise for mixed finite element
+    types with ParallelMesh on specific partitionings
 
 0.9.1 -> 0.9.2
   * PETSc 3.4 support
