@@ -46,7 +46,7 @@ namespace
 {
   // Define equivalence classes of Cubit/Exodus element types that map to
   // libmesh ElemTypes
-  std::map<std::string, libMeshEnums::ElemType> element_equivalence_map;
+  std::map<std::string, ElemType> element_equivalence_map;
 
   // This function initializes the element_equivalence_map the first time it
   // is called, and returns early all other times.
@@ -1954,7 +1954,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
   // Do only upper-case comparisons
   std::transform(type_str.begin(), type_str.end(), type_str.begin(), ::toupper);
 
-  std::map<std::string, libMeshEnums::ElemType>::iterator it =
+  std::map<std::string, ElemType>::iterator it =
     element_equivalence_map.find(type_str);
 
   if (it != element_equivalence_map.end())

@@ -261,7 +261,7 @@ void TransientRBConstruction::allocate_data_structures()
   for(unsigned int i=0; i<n_time_levels; i++)
   {
     temporal_data[i] = (NumericVector<Number>::build(this->comm()).release());
-    temporal_data[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    temporal_data[i]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
   }
 
   // and the truth output vectors
@@ -293,7 +293,7 @@ void TransientRBConstruction::assemble_affine_expansion()
     initialize_truth();
 
     AutoPtr< NumericVector<Number> > temp1 = NumericVector<Number>::build(this->comm());
-    temp1->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    temp1->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
     // First compute the right-hand side vector for the L2 projection
     L2_matrix->vector_mult(*temp1, *solution);
@@ -398,7 +398,7 @@ void TransientRBConstruction::mass_matrix_scaled_matvec(Number scalar,
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
 
   AutoPtr< NumericVector<Number> > temp_vec = NumericVector<Number>::build(this->comm());
-  temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+  temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   for(unsigned int q=0; q<Q_m; q++)
   {
@@ -438,7 +438,7 @@ void TransientRBConstruction::truth_assembly()
     mass_matrix_scaled_matvec(1./dt, *rhs, *current_local_solution);
 
     AutoPtr< NumericVector<Number> > temp_vec = NumericVector<Number>::build(this->comm());
-    temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
     for(unsigned int q_a=0; q_a<Q_a; q_a++)
     {
@@ -548,7 +548,7 @@ Real TransientRBConstruction::truth_solve(int write_interval)
 
 //   // NumericVector for computing true L2 error
 //   AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build();
-//   temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+//   temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   // Apply initial condition again.
   initialize_truth();
@@ -685,7 +685,7 @@ Number TransientRBConstruction::set_error_temporal_data()
     unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
     AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->comm());
-    temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
     // First compute the right-hand side vector for the projection
     inner_product_matrix->vector_mult(*temp, *solution);
@@ -787,7 +787,7 @@ void TransientRBConstruction::add_IC_to_RB_space()
   // load the new basis function into the basis_functions vector.
   get_rb_evaluation().basis_functions.push_back( NumericVector<Number>::build(this->comm()).release() );
   NumericVector<Number>& current_bf = get_rb_evaluation().get_basis_function(get_rb_evaluation().get_n_basis_functions()-1);
-  current_bf.init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+  current_bf.init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
   current_bf = *solution;
 
   // We can just set the norm to 1.
@@ -911,7 +911,7 @@ void TransientRBConstruction::enrich_RB_space()
       // load the new basis function into the basis_functions vector.
       get_rb_evaluation().basis_functions.push_back( NumericVector<Number>::build(this->comm()).release() );
       NumericVector<Number>& current_bf = get_rb_evaluation().get_basis_function(get_rb_evaluation().get_n_basis_functions()-1);
-      current_bf.init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      current_bf.init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       current_bf.zero();
 
       // Perform the matrix multiplication of temporal data with
@@ -1042,7 +1042,7 @@ void TransientRBConstruction::update_RB_system_matrices()
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
   AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->comm());
-  temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+  temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
   {
@@ -1129,7 +1129,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
       if(!trans_rb_eval.M_q_representor[q_m][i])
       {
         trans_rb_eval.M_q_representor[q_m][i] = (NumericVector<Number>::build(this->comm()).release());
-        trans_rb_eval.M_q_representor[q_m][i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+        trans_rb_eval.M_q_representor[q_m][i]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       }
 
       libmesh_assert(trans_rb_eval.M_q_representor[q_m][i]->size()       == this->n_dofs()       &&
@@ -1273,10 +1273,10 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
   initialize_truth();
 
   AutoPtr< NumericVector<Number> > temp1 = NumericVector<Number>::build(this->comm());
-  temp1->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+  temp1->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   AutoPtr< NumericVector<Number> > temp2 = NumericVector<Number>::build(this->comm());
-  temp2->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+  temp2->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
@@ -1343,7 +1343,7 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 //   // Assemble the right-hand side to find the Reisz representor
 //   // of the residual in the X norm
 //   AutoPtr< NumericVector<Number> > RB_sol = NumericVector<Number>::build();
-//   RB_sol->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+//   RB_sol->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 //   RB_sol->zero();
 //
 //   AutoPtr< NumericVector<Number> > ghosted_temp = NumericVector<Number>::build();
@@ -1352,7 +1352,7 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 //                       GHOSTED);
 //
 //   AutoPtr< NumericVector<Number> > parallel_temp = NumericVector<Number>::build();
-//   parallel_temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+//   parallel_temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 //
 //   // Store current_local_solution, since we don't want to corrupt it
 //   *ghosted_temp = *current_local_solution;
@@ -1519,7 +1519,7 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
 
         trans_rb_eval.M_q_representor[i][j] = NumericVector<Number>::build(this->comm()).release();
         trans_rb_eval.M_q_representor[i][j]->init (n_dofs(), n_local_dofs(),
-                                                   false, libMeshEnums::PARALLEL);
+                                                   false, PARALLEL);
 
         // No need to copy, just swap
         //*M_q_representor[i][j] = *solution;

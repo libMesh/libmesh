@@ -93,7 +93,7 @@ void RBConstructionBase<Base>::init_data ()
   // Initialize the inner product storage vector, which is useful for
   // storing intermediate results when evaluating inner products
   inner_product_storage_vector = NumericVector<Number>::build(this->comm());
-  inner_product_storage_vector->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+  inner_product_storage_vector->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 }
 
 template <class Base>
@@ -298,7 +298,7 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
   for( ; it != it_end; ++it)
   {
     it->second = NumericVector<Number>::build(this->comm()).release();
-    it->second->init(n_global_training_samples, n_local_training_samples, false, libMeshEnums::PARALLEL);
+    it->second->init(n_global_training_samples, n_local_training_samples, false, PARALLEL);
   }
 
   it = training_parameters.begin();
@@ -403,11 +403,11 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
         else
           n_local_training_samples = quotient;
 
-        training_parameters_in[param_name]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
+        training_parameters_in[param_name]->init(n_training_samples_in, n_local_training_samples, false, PARALLEL);
       }
       else
       {
-        training_parameters_in[param_name]->init(n_training_samples_in, false, libMeshEnums::SERIAL);
+        training_parameters_in[param_name]->init(n_training_samples_in, false, SERIAL);
       }
     }
   }
@@ -536,11 +536,11 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
         else
           n_local_training_samples = quotient;
 
-        training_parameters_in[param_name]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
+        training_parameters_in[param_name]->init(n_training_samples_in, n_local_training_samples, false, PARALLEL);
       }
       else
       {
-        training_parameters_in[param_name]->init(n_training_samples_in, false, libMeshEnums::SERIAL);
+        training_parameters_in[param_name]->init(n_training_samples_in, false, SERIAL);
       }
     }
   }
@@ -692,11 +692,11 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
         else
           n_local_training_samples = quotient;
 
-        training_parameters_in[param_name]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
+        training_parameters_in[param_name]->init(n_training_samples_in, n_local_training_samples, false, PARALLEL);
       }
       else
       {
-        training_parameters_in[param_name]->init(n_training_samples_in, false, libMeshEnums::SERIAL);
+        training_parameters_in[param_name]->init(n_training_samples_in, false, SERIAL);
       }
     }
   }

@@ -182,14 +182,14 @@ void write_output(EquationSystems &es,
     {
       mesh.write(numbered_filename(t_step, a_step, solution_type, "mesh", "xda", param));
       es.write(numbered_filename(t_step, a_step, solution_type, "soln", "xda", param),
-               libMeshEnums::WRITE, EquationSystems::WRITE_DATA |
+               WRITE, EquationSystems::WRITE_DATA |
                EquationSystems::WRITE_ADDITIONAL_DATA);
     }
   if (param.output_xdr)
     {
       mesh.write(numbered_filename(t_step, a_step, solution_type, "mesh", "xdr", param));
       es.write(numbered_filename(t_step, a_step, solution_type, "soln", "xdr", param),
-               libMeshEnums::WRITE, EquationSystems::WRITE_DATA |
+               WRITE, EquationSystems::WRITE_DATA |
                EquationSystems::WRITE_ADDITIONAL_DATA);
     }
 }
@@ -377,7 +377,7 @@ void read_output(EquationSystems &es,
   mesh.read(file_name_mesh);
 
   // And the stored solution
-  es.read(file_name_soln, libMeshEnums::READ,
+  es.read(file_name_soln, READ,
           EquationSystems::READ_HEADER |
           EquationSystems::READ_DATA |
           EquationSystems::READ_ADDITIONAL_DATA);
@@ -584,8 +584,8 @@ AutoPtr<ErrorEstimator>
 build_error_estimator_component_wise
   (FEMParameters &param,
    std::vector<std::vector<Real> > &term_weights,
-   std::vector<libMeshEnums::FEMNormType> &primal_error_norm_type,
-   std::vector<libMeshEnums::FEMNormType> &dual_error_norm_type)
+   std::vector<FEMNormType> &primal_error_norm_type,
+   std::vector<FEMNormType> &dual_error_norm_type)
 {
   AutoPtr<ErrorEstimator> error_estimator;
 
@@ -639,8 +639,8 @@ AutoPtr<ErrorEstimator>
 build_weighted_error_estimator_component_wise
   (FEMParameters &param,
    std::vector<std::vector<Real> > &term_weights,
-   std::vector<libMeshEnums::FEMNormType> &primal_error_norm_type,
-   std::vector<libMeshEnums::FEMNormType> &dual_error_norm_type,
+   std::vector<FEMNormType> &primal_error_norm_type,
+   std::vector<FEMNormType> &dual_error_norm_type,
    std::vector<FEMFunctionBase<Number>*> coupled_system_weight_functions)
 {
   AutoPtr<ErrorEstimator> error_estimator;
@@ -867,14 +867,14 @@ int main (int argc, char** argv)
           // First we build the norm_type_vector_non_pressure vectors and
           // weights_matrix_non_pressure matrix for the non-pressure term
           // error contributions
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             primal_norm_type_vector_non_pressure;
           primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
           primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
           primal_norm_type_vector_non_pressure.push_back(L2);
           primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
 
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             dual_norm_type_vector_non_pressure;
           dual_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
           dual_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
@@ -909,14 +909,14 @@ int main (int argc, char** argv)
 	  // Next we build the norm_type_vector_with_pressure vectors and
           // weights_matrix_with_pressure matrix for the pressure term
           // error contributions
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             primal_norm_type_vector_with_pressure;
           primal_norm_type_vector_with_pressure.push_back(H1_X_SEMINORM);
           primal_norm_type_vector_with_pressure.push_back(H1_Y_SEMINORM);
           primal_norm_type_vector_with_pressure.push_back(L2);
           primal_norm_type_vector_with_pressure.push_back(L2);
 
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             dual_norm_type_vector_with_pressure;
           dual_norm_type_vector_with_pressure.push_back(H1_X_SEMINORM);
           dual_norm_type_vector_with_pressure.push_back(H1_Y_SEMINORM);
@@ -953,14 +953,14 @@ int main (int argc, char** argv)
           ErrorVector error_convection_diffusion_x;
 
           // The norm type vectors and weights matrix for the convection_diffusion_x errors
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             primal_norm_type_vector_convection_diffusion_x;
           primal_norm_type_vector_convection_diffusion_x.push_back(L2);
           primal_norm_type_vector_convection_diffusion_x.push_back(L2);
           primal_norm_type_vector_convection_diffusion_x.push_back(L2);
           primal_norm_type_vector_convection_diffusion_x.push_back(H1_X_SEMINORM);
 
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             dual_norm_type_vector_convection_diffusion_x;
           dual_norm_type_vector_convection_diffusion_x.push_back(L2);
           dual_norm_type_vector_convection_diffusion_x.push_back(L2);
@@ -1016,14 +1016,14 @@ int main (int argc, char** argv)
           ErrorVector error_convection_diffusion_y;
 
           // The norm type vectors and weights matrix for the convection_diffusion_x errors
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             primal_norm_type_vector_convection_diffusion_y;
           primal_norm_type_vector_convection_diffusion_y.push_back(L2);
           primal_norm_type_vector_convection_diffusion_y.push_back(L2);
           primal_norm_type_vector_convection_diffusion_y.push_back(L2);
           primal_norm_type_vector_convection_diffusion_y.push_back(H1_Y_SEMINORM);
 
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             dual_norm_type_vector_convection_diffusion_y;
           dual_norm_type_vector_convection_diffusion_y.push_back(L2);
           dual_norm_type_vector_convection_diffusion_y.push_back(L2);

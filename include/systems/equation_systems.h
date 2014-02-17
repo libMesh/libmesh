@@ -325,12 +325,12 @@ public:
    */
     template <typename InValType>
   void read (const std::string& name,
-             const libMeshEnums::XdrMODE,
+             const XdrMODE,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true);
 
   void read (const std::string& name,
-             const libMeshEnums::XdrMODE mode,
+             const XdrMODE mode,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true)
     { read<Number>(name, mode, read_flags, partition_agnostic); }
@@ -368,7 +368,7 @@ public:
    * that have two nodes in exactly the same position!
    */
   void write (const std::string& name,
-              const libMeshEnums::XdrMODE,
+              const XdrMODE,
               const unsigned int write_flags=(WRITE_DATA),
               bool partition_agnostic = true) const;
 
@@ -485,7 +485,7 @@ private:
    */
     template <typename InValType>
   void _read_impl (const std::string& name,
-                   const libMeshEnums::XdrMODE,
+                   const XdrMODE,
                    const unsigned int read_flags,
                    bool partition_agnostic = true);
 

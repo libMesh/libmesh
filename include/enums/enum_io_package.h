@@ -20,14 +20,10 @@
 #ifndef LIBMESH_ENUM_IO_PACKAGE_H
 #define LIBMESH_ENUM_IO_PACKAGE_H
 
-/*
- * The \p libMeshEnums namespace is the namespace all \p enum definitions
- * should be put into.
- */
 
 // ------------------------------------------------------------
 // enum IOPackage definition
-namespace libMeshEnums {
+namespace libMesh {
 
   /**
    * libMesh interfaces with several different software packages
@@ -48,7 +44,5 @@ namespace libMeshEnums {
       INVALID_IO_PACKAGE
     };
 }
-
-using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_IO_PACKAGE_H

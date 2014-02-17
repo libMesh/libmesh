@@ -22,7 +22,7 @@
 
 // ------------------------------------------------------------
 // enum ElemType definition
-namespace libMeshEnums
+namespace libMesh
 {
   /**
    * Defines an \p enum for element quality metrics.
@@ -44,8 +44,5 @@ namespace libMeshEnums
                     SIZE,
                     JACOBIAN};
 }
-
-
-using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_ELEM_QUALITY_H

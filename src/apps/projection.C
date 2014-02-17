@@ -140,7 +140,7 @@ int main(int argc, char** argv)
   EquationSystems old_es(old_mesh);
   EquationSystems new_es(new_mesh);
 
-  libMeshEnums::XdrMODE read_mode;
+  XdrMODE read_mode;
 
   if (solnname.rfind(".xdr") < solnname.size())
     read_mode = DECODE;

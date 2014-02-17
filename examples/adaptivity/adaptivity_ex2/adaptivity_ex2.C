@@ -247,7 +247,7 @@ int main (int argc, char** argv)
       mesh.print_info();
 
       // Read in the solution stored in "saved_solution.xda"
-      equation_systems.read("saved_solution.xda", libMeshEnums::READ);
+      equation_systems.read("saved_solution.xda", READ);
 
       // Get a reference to the system so that we can call update() on it
       TransientLinearImplicitSystem & system =
@@ -445,7 +445,7 @@ int main (int argc, char** argv)
       std::cout << "Final H1 norm = " << H1norm << std::endl << std::endl;
 
       mesh.write("saved_mesh.xda");
-      equation_systems.write("saved_solution.xda", libMeshEnums::WRITE);
+      equation_systems.write("saved_solution.xda", WRITE);
       GMVIO(mesh).write_equation_systems ("saved_solution.gmv",
                                           equation_systems);
     }

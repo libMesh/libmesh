@@ -1066,7 +1066,7 @@ void RBEvaluation::read_in_vectors(System& sys,
           sys.read_serialized_data(vector_data, false);
 
           vectors[i] = NumericVector<Number>::build(sys.comm()).release();
-          vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
+          vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, PARALLEL);
 
           // No need to copy, just swap
           // *vectors[i] = *solution;
@@ -1082,7 +1082,7 @@ void RBEvaluation::read_in_vectors(System& sys,
       for(unsigned int i=0; i<vectors.size(); i++)
         {
           vectors[i] = NumericVector<Number>::build(sys.comm()).release();
-          vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
+          vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, PARALLEL);
         }
 
       file_name.str("");
