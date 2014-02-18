@@ -885,9 +885,13 @@ static PetscErrorCode DMVariableBounds_libMesh(DM dm, Vec xl, Vec xu)
   PetscVector<Number> XL(xl, sys.comm());
   PetscVector<Number> XU(xu, sys.comm());
   PetscFunctionBegin;
-
-  ierr = VecSet(xl, SNES_VI_NINF); CHKERRQ(ierr);
-  ierr = VecSet(xu, SNES_VI_INF);  CHKERRQ(ierr);
+#if PETSC_VERSION_LESS_THAN(3,5,0) && PETSC_VERSION_RELEASE
+  ierr = VecSet(xl, SNES_VI_NINF);CHKERRQ(ierr);
+  ierr = VecSet(xu, SNES_VI_INF);CHKERRQ(ierr);
+#else
+  ierr = VecSet(xl, PETSC_NINFINITY);CHKERRQ(ierr);
+  ierr = VecSet(xu, PETSC_INFINITY);CHKERRQ(ierr);
+#endif
   if (sys.nonlinear_solver->bounds != NULL)
     sys.nonlinear_solver->bounds(XL,XU,sys);
   else if (sys.nonlinear_solver->bounds_object != NULL)
