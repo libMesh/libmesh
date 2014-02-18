@@ -77,12 +77,12 @@ namespace {
 
 // ------------------------------------------------------------
 // Nemesis_IO class members
-Nemesis_IO::Nemesis_IO (MeshBase& mesh) :
+Nemesis_IO::Nemesis_IO (MeshBase& mesh, bool single_precision) :
   MeshInput<MeshBase> (mesh, /*is_parallel_format=*/true),
   MeshOutput<MeshBase> (mesh, /*is_parallel_format=*/true),
   ParallelObject (mesh),
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-  nemhelper(new Nemesis_IO_Helper(*this)),
+  nemhelper(new Nemesis_IO_Helper(*this, false, single_precision)),
 #endif
   _timestep(1),
   _verbose (false),
@@ -1264,45 +1264,52 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
 
   if (!nemhelper->opened_for_writing)
+  {
+    // If we're appending, open() the file with read_only=false,
+    // otherwise create() it and write the contents of the mesh to
+    // it.
+    if (_append)
     {
-      // If we're appending, open() the file with read_only=false,
-      // otherwise create() it and write the contents of the mesh to
-      // it.
-      if (_append)
-        {
-          nemhelper->open(nemesis_filename.c_str(), /*read_only=*/false);
-          // After opening the file, read the header so that certain
-          // fields, such as the number of nodes and the number of
-          // elements, are correctly initialized for the subsequent
-          // call to write the nodal solution.
-          nemhelper->read_header();
-        }
-      else
-        {
-          nemhelper->create(nemesis_filename);
-          nemhelper->initialize(nemesis_filename,mesh);
-          nemhelper->write_nodal_coordinates(mesh);
-          nemhelper->write_elements(mesh);
-          nemhelper->write_nodesets(mesh);
-          nemhelper->write_sidesets(mesh);
-
-          if( (mesh.boundary_info->n_edge_conds() > 0) &&
-               _verbose )
-          {
-            libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
-                         << "are not supported by the ExodusII format."
-                         << std::endl;
-          }
-
-          // If we don't have any nodes written out on this processor,
-          // Exodus seems to like us better if we don't try to write out any
-          // variable names too...
-          nemhelper->initialize_nodal_variables(names);
-        }
+      nemhelper->open(nemesis_filename.c_str(), /*read_only=*/false);
+      // After opening the file, read the header so that certain
+      // fields, such as the number of nodes and the number of
+      // elements, are correctly initialized for the subsequent
+      // call to write the nodal solution.
+      nemhelper->read_header();
     }
+    else
+    {
+      nemhelper->create(nemesis_filename);
+      nemhelper->initialize(nemesis_filename,mesh);
+      nemhelper->write_nodal_coordinates(mesh);
+      nemhelper->write_elements(mesh);
+      nemhelper->write_nodesets(mesh);
+      nemhelper->write_sidesets(mesh);
+
+      if( (mesh.boundary_info->n_edge_conds() > 0) &&
+           _verbose )
+      {
+        libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
+                     << "are not supported by the ExodusII format."
+                     << std::endl;
+      }
+
+      // If we don't have any nodes written out on this processor,
+      // Exodus seems to like us better if we don't try to write out any
+      // variable names too...
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+      
+      std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
+
+      nemhelper->initialize_nodal_variables(complex_names);
+#else
+      nemhelper->initialize_nodal_variables(names);
+#endif
+      }
+  }
 
   nemhelper->write_nodal_solution(soln, names, _timestep);
-
+    
   STOP_LOG("write_nodal_data()", "Nemesis_IO");
 }
 
@@ -1337,10 +1344,50 @@ void Nemesis_IO::write_global_data (const std::vector<Number>& soln,
 		   << std::endl;
       libmesh_error();
     }
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  
+  std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
+  
+  nemhelper->initialize_global_variables(complex_names);
+  
+  unsigned int num_values = soln.size();
+  unsigned int num_vars = names.size();
+  unsigned int num_elems = num_values / num_vars;
+  
+  // This will contain the real and imaginary parts and the magnitude
+  // of the values in soln
+  std::vector<Real> complex_soln(3*num_values);
+     
+  for(unsigned i(0); i < num_vars; ++i)
+  {
+  
+    for(unsigned int j(0); j < num_elems; ++j)
+    {
+      Number value = soln[i*num_vars + j];
+      complex_soln[3*i*num_elems + j] = value.real();   
+    }
+    for(unsigned int j(0); j < num_elems; ++j)
+    {
+      Number value = soln[i*num_vars + j];
+      complex_soln[3*i*num_elems + num_elems +j] = value.imag();
+    }      
+    for(unsigned int j(0); j < num_elems; ++j)
+    {
+      Number value = soln[i*num_vars + j];
+      complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);  
+    }
+  }
+   
+  nemhelper->write_global_values(complex_soln, _timestep);
+  
+#else  
 
   // Call the Exodus writer implementation
   nemhelper->initialize_global_variables( names );
   nemhelper->write_global_values( soln, _timestep);
+  
+#endif
+  
 }
 
 #else
