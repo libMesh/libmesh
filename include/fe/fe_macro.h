@@ -49,7 +49,7 @@
                                template class FE< (_dim), MONOMIAL>;   \
                                template class FE< (_dim), SCALAR>;   \
                                template class FE< (_dim), XYZ>; \
-			       template class FE< (_dim), NEDELEC_ONE>
+                                                        template class FE< (_dim), NEDELEC_ONE>
 
 #define INSTANTIATE_ALL_MAPS(_dim) \
   INSTANTIATE_MAPS(_dim,CLOUGH); \

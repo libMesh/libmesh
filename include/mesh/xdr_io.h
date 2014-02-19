@@ -49,8 +49,8 @@ class Elem;
 // ------------------------------------------------------------
 // XdrIO class definition
 class XdrIO : public MeshInput<MeshBase>,
-	      public MeshOutput<MeshBase>,
-	      public ParallelObject
+  public MeshOutput<MeshBase>,
+  public ParallelObject
 {
  public:
   // The size used for encoding all id types in this file
@@ -240,9 +240,9 @@ class XdrIO : public MeshInput<MeshBase>,
    * Pack an element into a transfer buffer for parallel communication.
    */
   void pack_element (std::vector<xdr_id_type> &conn,
-		     const Elem *elem,
-		     const dof_id_type parent_id  = DofObject::invalid_id,
-		     const dof_id_type parent_pid = DofObject::invalid_id) const;
+                     const Elem *elem,
+                     const dof_id_type parent_id  = DofObject::invalid_id,
+                     const dof_id_type parent_pid = DofObject::invalid_id) const;
 
   bool _binary;
   bool _legacy;

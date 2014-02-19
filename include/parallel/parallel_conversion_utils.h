@@ -49,14 +49,14 @@ namespace Parallel {
       inline
       bool is_sorted (const std::vector<KeyType>& v)
       {
-	if (v.empty())
-	  return true;
+        if (v.empty())
+          return true;
 
-	for (unsigned int i=1; i<v.size(); i++)
-	  if (v[i] < v[i-1])
-	    return false;
+        for (unsigned int i=1; i<v.size(); i++)
+          if (v[i] < v[i-1])
+            return false;
 
-	return true;
+        return true;
       }
 
     /**
@@ -67,7 +67,7 @@ namespace Parallel {
       inline
       double to_double (const KeyType &k)
       {
-	return static_cast<double>(k);
+        return static_cast<double>(k);
       }
 
     /**
@@ -80,7 +80,7 @@ namespace Parallel {
       inline
       KeyType to_key_type (const double f)
       {
-	return static_cast<KeyType>(f);
+        return static_cast<KeyType>(f);
       }
 
 #ifdef LIBMESH_HAVE_LIBHILBERT
@@ -89,7 +89,7 @@ namespace Parallel {
       inline
       double to_double (const Hilbert::HilbertIndices &bvt)
       {
-	return static_cast<double>(bvt.rack2);
+        return static_cast<double>(bvt.rack2);
       }
 
     template <>
@@ -97,13 +97,13 @@ namespace Parallel {
       Hilbert::HilbertIndices
       to_key_type (const double f)
       {
-	Hilbert::HilbertIndices bvt;
+        Hilbert::HilbertIndices bvt;
 
-	bvt.rack0 = 0;
-	bvt.rack1 = 0;
-	bvt.rack2 = static_cast<Hilbert::inttype>(f);
+        bvt.rack0 = 0;
+        bvt.rack1 = 0;
+        bvt.rack2 = static_cast<Hilbert::inttype>(f);
 
-	return bvt;
+        return bvt;
       }
 #endif // LIBMESH_HAVE_LIBHILBERT
   }

@@ -285,10 +285,10 @@ namespace Threads
 #endif
 
        if (libMesh::n_threads() > 1)
-	 tbb::parallel_reduce (range, body, partitioner);
+         tbb::parallel_reduce (range, body, partitioner);
 
        else
-	 body(range);
+         body(range);
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
     if (libMesh::n_threads() > 1 && logging_was_enabled)
@@ -928,8 +928,8 @@ namespace Threads
      * execution.
      */
     BlockedRange (const const_iterator first,
-		  const const_iterator last,
-		  const unsigned int new_grainsize = 1000) :
+                  const const_iterator last,
+                  const unsigned int new_grainsize = 1000) :
       _grainsize(new_grainsize)
     {
       this->reset(first, last);
@@ -965,9 +965,9 @@ namespace Threads
       _grainsize(r._grainsize)
     {
       const_iterator
-	beginning = r._begin,
-	ending    = r._end,
-	middle    = beginning + (ending - beginning)/2u;
+        beginning = r._begin,
+        ending    = r._end,
+        middle    = beginning + (ending - beginning)/2u;
 
       r._end = _begin = middle;
     }
@@ -976,7 +976,7 @@ namespace Threads
      * Resets the \p StoredRange to contain [first,last).
      */
     void reset (const const_iterator first,
-		const const_iterator last)
+                const const_iterator last)
     {
       _begin = first;
       _end   = last;

@@ -55,8 +55,8 @@ public:
    * data structures.
    */
   ImplicitSystem (EquationSystems& es,
-		  const std::string& name,
-		  const unsigned int number);
+                  const std::string& name,
+                  const unsigned int number);
 
   /**
    * Destructor.

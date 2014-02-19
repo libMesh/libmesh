@@ -56,7 +56,7 @@ public:
    * Constructor.  Creates a dense matrix of dimension \p m by \p n.
    */
   DenseMatrix(const unsigned int new_m=0,
-	      const unsigned int new_n=0);
+              const unsigned int new_n=0);
 
   /**
    * Copy-constructor.
@@ -78,25 +78,25 @@ public:
    * @returns the \p (i,j) element of the matrix.
    */
   T operator() (const unsigned int i,
-		const unsigned int j) const;
+                const unsigned int j) const;
 
   /**
    * @returns the \p (i,j) element of the matrix as a writeable reference.
    */
   T & operator() (const unsigned int i,
-		  const unsigned int j);
+                  const unsigned int j);
 
   /**
    * @returns the \p (i,j) element of the matrix as a writeable reference.
    */
   virtual T el(const unsigned int i,
-	       const unsigned int j) const { return (*this)(i,j); }
+               const unsigned int j) const { return (*this)(i,j); }
 
   /**
    * @returns the \p (i,j) element of the matrix as a writeable reference.
    */
   virtual T & el(const unsigned int i,
-		 const unsigned int j)     { return (*this)(i,j); }
+                 const unsigned int j)     { return (*this)(i,j); }
 
   /**
    * Left multipliess by the matrix \p M2.
@@ -163,7 +163,7 @@ public:
    * allocate more.  Sets all elements to 0.
    */
   void resize(const unsigned int new_m,
-	      const unsigned int new_n);
+              const unsigned int new_n);
 
   /**
    * Multiplies every element in the matrix by \p factor.
@@ -263,7 +263,7 @@ public:
    * @returns the \p (i,j) element of the transposed matrix.
    */
   T transpose (const unsigned int i,
-	       const unsigned int j) const;
+               const unsigned int j) const;
 
   /**
    * Put the tranposed matrix into \p dest.
@@ -289,9 +289,9 @@ public:
    * symmetry of the matrix.
    */
   void condense(const unsigned int i,
-		const unsigned int j,
-		const T val,
-		DenseVector<T>& rhs)
+                const unsigned int j,
+                const T val,
+                DenseVector<T>& rhs)
   { DenseMatrixBase<T>::condense (i, j, val, rhs); }
 
   /**
@@ -300,7 +300,7 @@ public:
    * the effects of round-off error.
    */
   void lu_solve (const DenseVector<T>& b,
-		 DenseVector<T>& x);
+                 DenseVector<T>& x);
 
 
 
@@ -315,7 +315,7 @@ public:
    */
   template <typename T2>
   void cholesky_solve(const DenseVector<T2>& b,
-		      DenseVector<T2>& x);
+                      DenseVector<T2>& x);
 
 
   /**
@@ -387,7 +387,7 @@ private:
    * of the lu_solve(...) function.
    */
   void _lu_back_substitute (const DenseVector<T>& b,
-			    DenseVector<T>& x) const;
+                            DenseVector<T>& x) const;
 
   /**
    * Decomposes a symmetric positive definite matrix into a
@@ -405,7 +405,7 @@ private:
    */
   template <typename T2>
   void _cholesky_back_substitute(const DenseVector<T2>& b,
-				 DenseVector<T2>& x) const;
+                                 DenseVector<T2>& x) const;
 
   /**
    * The decomposition schemes above change the entries of the matrix
@@ -441,7 +441,7 @@ private:
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
   void _multiply_blas(const DenseMatrixBase<T>& other,
-		      _BLAS_Multiply_Flag flag);
+                      _BLAS_Multiply_Flag flag);
 
   /**
    * Computes an LU factorization of the matrix using the
@@ -497,7 +497,7 @@ private:
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
   void _lu_back_substitute_lapack (const DenseVector<T>& b,
-				   DenseVector<T>& x);
+                                   DenseVector<T>& x);
 
   /**
    * Uses the BLAS GEMV function (through PETSc) to compute
@@ -512,9 +512,9 @@ private:
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
   void _matvec_blas(T alpha, T beta,
-		    DenseVector<T>& dest,
-		    const DenseVector<T>& arg,
-		    bool trans=false) const;
+                    DenseVector<T>& dest,
+                    const DenseVector<T>& arg,
+                    bool trans=false) const;
 };
 
 
@@ -560,7 +560,7 @@ using namespace DenseMatrices;
 template<typename T>
 inline
 DenseMatrix<T>::DenseMatrix(const unsigned int new_m,
-			    const unsigned int new_n)
+                            const unsigned int new_n)
   : DenseMatrixBase<T>(new_m,new_n),
 #if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_USE_REAL_NUMBERS) && defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
     use_blas_lapack(true),
@@ -622,7 +622,7 @@ DenseMatrix<T>::operator=(const DenseMatrix<T2>& mat)
 template<typename T>
 inline
 void DenseMatrix<T>::resize(const unsigned int new_m,
-			    const unsigned int new_n)
+                            const unsigned int new_n)
 {
   _val.resize(new_m*new_n);
 
@@ -670,7 +670,7 @@ DenseMatrix<T>& DenseMatrix<T>::operator = (const DenseMatrix<T>& other_matrix)
 template<typename T>
 inline
 T DenseMatrix<T>::operator () (const unsigned int i,
-			       const unsigned int j) const
+                               const unsigned int j) const
 {
   libmesh_assert_less (i*j, _val.size());
   libmesh_assert_less (i, this->_m);
@@ -686,7 +686,7 @@ T DenseMatrix<T>::operator () (const unsigned int i,
 template<typename T>
 inline
 T & DenseMatrix<T>::operator () (const unsigned int i,
-				 const unsigned int j)
+                                 const unsigned int j)
 {
   libmesh_assert_less (i*j, _val.size());
   libmesh_assert_less (i, this->_m);
@@ -896,7 +896,7 @@ Real DenseMatrix<T>::linfty_norm () const
 template<typename T>
 inline
 T DenseMatrix<T>::transpose (const unsigned int i,
-			     const unsigned int j) const
+                             const unsigned int j) const
 {
   // Implement in terms of operator()
   return (*this)(j,i);
@@ -909,9 +909,9 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 // template<typename T>
 // inline
 // void DenseMatrix<T>::condense(const unsigned int iv,
-// 			      const unsigned int jv,
-// 			      const T val,
-// 			      DenseVector<T>& rhs)
+//       const unsigned int jv,
+//       const T val,
+//       DenseVector<T>& rhs)
 // {
 //   libmesh_assert_equal_to (this->_m, rhs.size());
 //   libmesh_assert_equal_to (iv, jv);

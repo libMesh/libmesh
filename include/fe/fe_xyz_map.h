@@ -40,7 +40,7 @@ namespace libMesh
      * Special implementation for XYZ finite elements
      */
     virtual void compute_face_map(int dim, const std::vector<Real>& qw,
-				  const Elem* side);
+                                  const Elem* side);
 
   }; // class FEXYZMap
 } // namespace libMesh

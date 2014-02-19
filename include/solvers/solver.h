@@ -61,8 +61,8 @@ protected:
    * object, a name for the system, and the system number.
    */
   Solver (EquationSystems& es,
-	  const std::string& name,
-	  const unsigned int number);
+          const std::string& name,
+          const unsigned int number);
 
 
 public:
@@ -171,7 +171,7 @@ inline
 void Solver::pre_process ()
 {
 //  libMesh::out << "Pre-processing"
-//	         << std::endl;
+//         << std::endl;
 }
 
 
@@ -195,7 +195,7 @@ inline
 void Solver::post_process ()
 {
 //  libMesh::out << "Post-processing"
-//	         << std::endl;
+//         << std::endl;
 }
 
 } // namespace libMesh

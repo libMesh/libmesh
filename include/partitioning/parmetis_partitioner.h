@@ -70,13 +70,13 @@ protected:
    * then been adaptively refined) and repartitions it.
    */
   virtual void _do_repartition (MeshBase& mesh,
-				const unsigned int n);
+                                const unsigned int n);
 
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
   virtual void _do_partition (MeshBase& mesh,
-			      const unsigned int n);
+                              const unsigned int n);
 
 private:
 

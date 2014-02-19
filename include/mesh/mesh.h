@@ -58,7 +58,7 @@ class Mesh : public DefaultMesh
    */
   explicit
   Mesh (const Parallel::Communicator &comm_in,
-	unsigned int dim=1)
+        unsigned int dim=1)
     : DefaultMesh(comm_in,dim) {}
 
 #ifndef LIBMESH_DISABLE_COMMWORLD

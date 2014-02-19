@@ -132,8 +132,8 @@ public:
    * of freedom for variable number \p var
    */
   unsigned int n_dofs (const unsigned int s,
-		       const unsigned int var =
-		       libMesh::invalid_uint) const;
+                       const unsigned int var =
+                       libMesh::invalid_uint) const;
 
   /**
    * \returns the \p id for this \p DofObject
@@ -226,7 +226,7 @@ public:
    * with \p VariableGroup \p vg in system \p s for this \p DofObject
    */
   unsigned int n_vars(const unsigned int s,
-		      const unsigned int vg) const;
+                      const unsigned int vg) const;
 
   /**
    * @returns the number of \p Variable variables associated
@@ -242,7 +242,7 @@ public:
    * to 0 even when called even with (nvg == this->n_var_groups(s)).
    */
   void set_n_vars_per_group(const unsigned int s,
-			    const std::vector<unsigned int> &nvpg);
+                            const std::vector<unsigned int> &nvpg);
 
   /**
    * @returns the number of components for variable \p var
@@ -254,7 +254,7 @@ public:
    * and orders, see \p FE.
    */
   unsigned int n_comp(const unsigned int s,
-		      const unsigned int var) const;
+                      const unsigned int var) const;
 
   /**
    * @returns the number of components for \p VariableGroup \p vg
@@ -266,23 +266,23 @@ public:
    * and orders, see \p FE.
    */
   unsigned int n_comp_group(const unsigned int s,
-			    const unsigned int vg) const;
+                            const unsigned int vg) const;
 
   /**
    * Sets the number of components for \p Variable \p var
    * of system \p s associated with this \p DofObject
    */
   void set_n_comp(const unsigned int s,
-		  const unsigned int var,
-		  const unsigned int ncomp);
+                  const unsigned int var,
+                  const unsigned int ncomp);
 
   /**
    * Sets the number of components for \p VariableGroup \p vg
    * of system \p s associated with this \p DofObject
    */
   void set_n_comp_group(const unsigned int s,
-			const unsigned int vg,
-			const unsigned int ncomp);
+                        const unsigned int vg,
+                        const unsigned int ncomp);
 
   /**
    * @returns the global degree of freedom number for variable \p var,
@@ -294,17 +294,17 @@ public:
    * processor.
    */
   dof_id_type dof_number(const unsigned int s,
-			 const unsigned int var,
-			 const unsigned int comp) const;
+                         const unsigned int var,
+                         const unsigned int comp) const;
 
   /**
    * Sets the global degree of freedom number for variable \p var,
    * component \p comp for system \p s associated with this \p DofObject
    */
   void set_dof_number(const unsigned int s,
-		      const unsigned int var,
-		      const unsigned int comp,
-		      const dof_id_type dn);
+                      const unsigned int var,
+                      const unsigned int comp,
+                      const dof_id_type dn);
 
   /**
    * @returns true if any system has variables which have been assigned,
@@ -318,8 +318,8 @@ public:
    * This method allows for direct access to the base.
    */
   void set_vg_dof_base(const unsigned int s,
-		       const unsigned int vg,
-		       const dof_id_type db);
+                       const unsigned int vg,
+                       const dof_id_type db);
 
   /**
    * \p VariableGroup DoF indices are indexed as
@@ -327,7 +327,7 @@ public:
    * This method allows for direct access to the base.
    */
   dof_id_type vg_dof_base(const unsigned int s,
-			  const unsigned int vg) const;
+                          const unsigned int vg) const;
 
   /**
    * An invaild \p id to distinguish an uninitialized \p DofObject
@@ -384,15 +384,15 @@ private:
    * variable group it lives in.
    */
   unsigned int var_to_vg (const unsigned int s,
-			  const unsigned int var) const;
+                          const unsigned int var) const;
 
   /**
    * Utility function - for variable \p var in system \p s, figure out what
    * variable group it lives in.
    */
   unsigned int system_var_to_vg_var (const unsigned int s,
-				     const unsigned int vg,
-				     const unsigned int var) const;
+                                     const unsigned int vg,
+                                     const unsigned int var) const;
 
   /**
    * The \p id of the \p DofObject
@@ -535,8 +535,8 @@ void DofObject::invalidate_dofs (const unsigned int sys_num)
     {
       for (unsigned int s=0; s<this->n_systems(); s++)
         for (unsigned int vg=0; vg<this->n_var_groups(s); vg++)
-	  if (this->n_comp_group(s,vg))
-	    this->set_vg_dof_base(s,vg,invalid_id);
+          if (this->n_comp_group(s,vg))
+            this->set_vg_dof_base(s,vg,invalid_id);
     }
   // ...otherwise invalidate the dofs for all systems
   else
@@ -587,7 +587,7 @@ void DofObject::clear_dofs ()
 
 inline
 unsigned int DofObject::n_dofs (const unsigned int s,
-				const unsigned int var) const
+                                const unsigned int var) const
 {
   libmesh_assert_less (s, this->n_systems());
 
@@ -722,7 +722,7 @@ unsigned int DofObject::n_var_groups(const unsigned int s) const
 
 inline
 unsigned int DofObject::n_vars(const unsigned int s,
-			       const unsigned int vg) const
+                               const unsigned int vg) const
 {
   libmesh_assert_less (s,  this->n_systems());
   libmesh_assert_less (vg, this->n_var_groups(s));
@@ -732,7 +732,7 @@ unsigned int DofObject::n_vars(const unsigned int s,
   libmesh_assert_less ((start_idx_sys + 2*vg), _idx_buf.size());
 
   return (libmesh_cast_int<unsigned int>
-	  (_idx_buf[start_idx_sys + 2*vg]) / ncv_magic);
+          (_idx_buf[start_idx_sys + 2*vg]) / ncv_magic);
 }
 
 
@@ -757,7 +757,7 @@ unsigned int DofObject::n_vars(const unsigned int s) const
 
 inline
 unsigned int DofObject::n_comp(const unsigned int s,
-			       const unsigned int var) const
+                               const unsigned int var) const
 {
   libmesh_assert_less (s,   this->n_systems());
   libmesh_assert_less (var, this->n_vars(s));
@@ -770,7 +770,7 @@ unsigned int DofObject::n_comp(const unsigned int s,
 
 inline
 unsigned int DofObject::n_comp_group(const unsigned int s,
-				     const unsigned int vg) const
+                                     const unsigned int vg) const
 {
   libmesh_assert_less (s,  this->n_systems());
   libmesh_assert_less (vg, this->n_var_groups(s));
@@ -787,8 +787,8 @@ unsigned int DofObject::n_comp_group(const unsigned int s,
 
 inline
 dof_id_type DofObject::dof_number(const unsigned int s,
-				  const unsigned int var,
-				  const unsigned int comp) const
+                                  const unsigned int var,
+                                  const unsigned int comp) const
 {
   libmesh_assert_less (s,    this->n_systems());
   libmesh_assert_less (var,  this->n_vars(s));
@@ -813,16 +813,16 @@ dof_id_type DofObject::dof_number(const unsigned int s,
   else
     {
       const unsigned int
-	ncg = this->n_comp_group(s,vg),
-	vig = this->system_var_to_vg_var(s,vg,var);
+        ncg = this->n_comp_group(s,vg),
+        vig = this->system_var_to_vg_var(s,vg,var);
 
       // std::cout << "base_idx, var, vg, vig, ncg, comp="
-      // 		<< base_idx << " "
-      // 		<< var << " "
-      // 		<< vg << " "
-      // 		<< vig << " "
-      // 		<< ncg << " "
-      // 		<< comp << '\n';
+      // << base_idx << " "
+      // << var << " "
+      // << vg << " "
+      // << vig << " "
+      // << ncg << " "
+      // << comp << '\n';
 
       return libmesh_cast_int<dof_id_type>(base_idx + vig*ncg + comp);
     }
@@ -836,8 +836,8 @@ bool DofObject::has_dofs (const unsigned int sys) const
   if (sys == libMesh::invalid_uint)
     {
       for (unsigned int s=0; s<this->n_systems(); s++)
-	if (this->n_vars(s))
-	  return true;
+        if (this->n_vars(s))
+          return true;
     }
 
   else
@@ -845,7 +845,7 @@ bool DofObject::has_dofs (const unsigned int sys) const
       libmesh_assert_less (sys, this->n_systems());
 
       if (this->n_vars(sys))
-	return true;
+        return true;
     }
 
   return false;
@@ -872,15 +872,15 @@ unsigned int DofObject::end_idx (const unsigned int s) const
 
   return ((s+1) == this->n_systems()) ?
           libmesh_cast_int<unsigned int>(_idx_buf.size()) :
-	  libmesh_cast_int<unsigned int>(_idx_buf[s+1]);
+    libmesh_cast_int<unsigned int>(_idx_buf[s+1]);
 }
 
 
 
 inline
 void DofObject::set_vg_dof_base(const unsigned int s,
-				const unsigned int vg,
-				const dof_id_type db)
+                                const unsigned int vg,
+                                const dof_id_type db)
 {
   libmesh_assert_less (s,  this->n_systems());
   libmesh_assert_less (vg, this->n_var_groups(s));
@@ -899,7 +899,7 @@ void DofObject::set_vg_dof_base(const unsigned int s,
 
 inline
 dof_id_type DofObject::vg_dof_base(const unsigned int s,
-				   const unsigned int vg) const
+                                   const unsigned int vg) const
 {
   libmesh_assert_less (s,  this->n_systems());
   libmesh_assert_less (vg, this->n_var_groups(s));
@@ -923,7 +923,7 @@ dof_id_type DofObject::vg_dof_base(const unsigned int s,
 
 inline
 unsigned int DofObject::var_to_vg (const unsigned int s,
-				   const unsigned int var) const
+                                   const unsigned int var) const
 {
   const unsigned int
     nvg = this->n_var_groups(s);
@@ -943,8 +943,8 @@ unsigned int DofObject::var_to_vg (const unsigned int s,
 
 inline
 unsigned int DofObject::system_var_to_vg_var (const unsigned int s,
-					      const unsigned int vg,
-					      const unsigned int var) const
+                                              const unsigned int vg,
+                                              const unsigned int var) const
 {
   unsigned int accumulated_sum=0;
 

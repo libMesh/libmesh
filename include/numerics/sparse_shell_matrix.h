@@ -71,13 +71,13 @@ public:
    * dest.
    */
   virtual void vector_mult (NumericVector<T>& dest,
-			    const NumericVector<T>& arg) const;
+                            const NumericVector<T>& arg) const;
 
   /**
    * Multiplies the matrix with \p arg and adds the result to \p dest.
    */
   virtual void vector_mult_add (NumericVector<T>& dest,
-				const NumericVector<T>& arg) const;
+                                const NumericVector<T>& arg) const;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.

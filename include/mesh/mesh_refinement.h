@@ -127,9 +127,9 @@ public:
    * set the corresponding member variables.
    */
   void flag_elements_by_error_fraction (const ErrorVector& error_per_cell,
-					const Real refine_fraction  = 0.3,
-					const Real coarsen_fraction = 0.0,
-					const unsigned int max_level = libMesh::invalid_uint);
+                                        const Real refine_fraction  = 0.3,
+                                        const Real coarsen_fraction = 0.0,
+                                        const unsigned int max_level = libMesh::invalid_uint);
 
   /**
    * Flags elements for coarsening and refinement based on
@@ -176,9 +176,9 @@ public:
    * set the corresponding member variables.
    */
   void flag_elements_by_elem_fraction (const ErrorVector& error_per_cell,
-				       const Real refine_fraction  = 0.3,
-				       const Real coarsen_fraction = 0.0,
-				       const unsigned int max_level = libMesh::invalid_uint);
+                                       const Real refine_fraction  = 0.3,
+                                       const Real coarsen_fraction = 0.0,
+                                       const unsigned int max_level = libMesh::invalid_uint);
 
   /**
    * Flags elements for coarsening and refinement based on
@@ -194,9 +194,9 @@ public:
    * set the corresponding member variables.
    */
   void flag_elements_by_mean_stddev (const ErrorVector& error_per_cell,
-				     const Real refine_fraction  = 1.0,
-				     const Real coarsen_fraction = 0.0,
-				     const unsigned int max_level = libMesh::invalid_uint);
+                                     const Real refine_fraction  = 1.0,
+                                     const Real coarsen_fraction = 0.0,
+                                     const unsigned int max_level = libMesh::invalid_uint);
 
   /**
    * Flag elements based on a function object.  The class \p ElementFlagging
@@ -600,9 +600,9 @@ private:
    * to a coarsenable parent, and stores -1 otherwise.
    */
   void create_parent_error_vector (const ErrorVector& error_per_cell,
-				   ErrorVector& error_per_parent,
-				   Real &parent_error_min,
-				   Real &parent_error_max);
+                                   ErrorVector& error_per_parent,
+                                   Real &parent_error_min,
+                                   Real &parent_error_max);
 
   /**
    * Updates the \p _new_nodes_map
@@ -673,7 +673,7 @@ private:
   Real _absolute_global_tolerance;
 
   unsigned char _face_level_mismatch_limit, _edge_level_mismatch_limit,
-	        _node_level_mismatch_limit;
+    _node_level_mismatch_limit;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   PeriodicBoundaries * _periodic_boundaries;

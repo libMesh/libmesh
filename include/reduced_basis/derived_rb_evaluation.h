@@ -54,7 +54,7 @@ public:
    * Constructor.
    */
   DerivedRBEvaluation (const Parallel::Communicator &comm 
-		       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Clear this object. Overload to also reset residual_type_flag.

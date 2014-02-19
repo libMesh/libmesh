@@ -60,7 +60,7 @@ public:
    *  Constructor. Initializes Solver data structures
    */
   EigenSolver (const Parallel::Communicator &comm
-	       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.
@@ -72,8 +72,8 @@ public:
    * \p solver_package
    */
   static AutoPtr<EigenSolver<T> > build(const Parallel::Communicator &comm
-					LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
-					const SolverPackage solver_package = SLEPC_SOLVERS);
+                                        LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
+                                        const SolverPackage solver_package = SLEPC_SOLVERS);
 
   /**
    * @returns true if the data structures are
@@ -132,10 +132,10 @@ public:
    * eigenpairs and the number of iterations.
    */
   virtual std::pair<unsigned int, unsigned int> solve_standard (SparseMatrix<T> &matrix_A,
-								int nev,
-								int ncv,
-								const double tol,
-								const unsigned int m_its) = 0;
+                                                                int nev,
+                                                                int ncv,
+                                                                const double tol,
+                                                                const unsigned int m_its) = 0;
 
   /**
    * Solves the standard eigen problem when matrix_A is a
@@ -143,10 +143,10 @@ public:
    * eigenpairs and the number of iterations.
    */
   virtual std::pair<unsigned int, unsigned int> solve_standard (ShellMatrix<T> &matrix_A,
-								int nev,
-								int ncv,
-								const double tol,
-								const unsigned int m_its) = 0;
+                                                                int nev,
+                                                                int ncv,
+                                                                const double tol,
+                                                                const unsigned int m_its) = 0;
 
 
   /**
@@ -156,44 +156,44 @@ public:
    * of iterations.
    */
   virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> &matrix_A,
-								   SparseMatrix<T> &matrix_B,
-								   int nev,
-								   int ncv,
-								   const double tol,
-								   const unsigned int m_its) = 0;
+                                                                   SparseMatrix<T> &matrix_B,
+                                                                   int nev,
+                                                                   int ncv,
+                                                                   const double tol,
+                                                                   const unsigned int m_its) = 0;
 
   /**
    * Solves the generalized eigen problem when matrix_A is
    * a ShellMatrix and matrix_B is a SparseMatrix.
    */
    virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> &matrix_A,
- 								   SparseMatrix<T> &matrix_B,
- 								   int nev,
- 								   int ncv,
- 								   const double tol,
- 								   const unsigned int m_its) = 0;
+                                                                    SparseMatrix<T> &matrix_B,
+                                                                    int nev,
+                                                                    int ncv,
+                                                                    const double tol,
+                                                                    const unsigned int m_its) = 0;
 
   /**
    * Solves the generalized eigen problem when matrix_A is
    * a SparseMatrix and matrix_B is a ShellMatrix.
    */
    virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> &matrix_A,
- 								   ShellMatrix<T> &matrix_B,
- 								   int nev,
- 								   int ncv,
- 								   const double tol,
- 								   const unsigned int m_its) = 0;
+                                                                    ShellMatrix<T> &matrix_B,
+                                                                    int nev,
+                                                                    int ncv,
+                                                                    const double tol,
+                                                                    const unsigned int m_its) = 0;
 
   /**
    * Solves the generalized eigen problem when both matrix_A
    * and matrix_B are of type ShellMatrix.
    */
    virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> &matrix_A,
- 								   ShellMatrix<T> &matrix_B,
- 								   int nev,
- 								   int ncv,
- 								   const double tol,
- 								   const unsigned int m_its) = 0;
+                                                                    ShellMatrix<T> &matrix_B,
+                                                                    int nev,
+                                                                    int ncv,
+                                                                    const double tol,
+                                                                    const unsigned int m_its) = 0;
 
 
   /**
@@ -201,7 +201,7 @@ public:
    * and copies the \ ith eigen vector to the solution vector.
    */
   virtual std::pair<Real, Real> get_eigenpair (unsigned int i,
-					       NumericVector<T> &solution) = 0;
+                                               NumericVector<T> &solution) = 0;
 
   /**
    * Returns the \p ith eigenvalue (real and imaginary part).

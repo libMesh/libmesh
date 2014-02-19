@@ -59,7 +59,7 @@ class MeshData;
 // ------------------------------------------------------------
 // VTKIO class definition
 class VTKIO : public MeshInput<MeshBase>,
-	      public MeshOutput<MeshBase>
+  public MeshOutput<MeshBase>
 {
 public:
   /**

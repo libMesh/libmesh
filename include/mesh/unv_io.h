@@ -47,7 +47,7 @@ class MeshData;
 // ------------------------------------------------------------
 // UNVIO class definition
 class UNVIO : public MeshInput<MeshBase>,
-	      public MeshOutput<MeshBase>
+  public MeshOutput<MeshBase>
 {
 
  public:
@@ -150,7 +150,7 @@ class UNVIO : public MeshInput<MeshBase>,
    * dataset \p ds_name.
    */
   bool beginning_of_dataset (std::istream& in_file,
-			     const std::string& ds_name) const;
+                             const std::string& ds_name) const;
 
   /**
    * Method for converting exponential notation
@@ -278,7 +278,7 @@ bool & UNVIO::verbose ()
 
 inline
 bool UNVIO::beginning_of_dataset (std::istream& in_file,
-				  const std::string& ds_name) const
+                                  const std::string& ds_name) const
 {
   libmesh_assert (in_file.good());
   libmesh_assert (!ds_name.empty());
@@ -294,16 +294,16 @@ bool UNVIO::beginning_of_dataset (std::istream& in_file,
        * stop combing at the end of the file
        */
       while( ((olds != "-1") || (news == "-1") ) && !in_file.eof() )
-	{
-	  olds = news;
-	  in_file >> news;
-	}
+        {
+          olds = news;
+          in_file >> news;
+        }
 
       if (in_file.eof())
-	return false;
+        return false;
 
       if (news == ds_name)
-	return true;
+        return true;
     }
 
   // should never end up here

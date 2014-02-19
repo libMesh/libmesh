@@ -59,9 +59,9 @@ class QJacobi : public QBase
    * higher dimensions.
    */
   QJacobi (const unsigned int _dim,
-	   const Order _order=INVALID_ORDER,
-	   const unsigned int _alpha=1,
-	   const unsigned int _beta=0);
+           const Order _order=INVALID_ORDER,
+           const unsigned int _alpha=1,
+           const unsigned int _beta=0);
 
   /**
    * Destructor. Empty.
@@ -80,7 +80,7 @@ class QJacobi : public QBase
   const unsigned int _beta;
 
   void init_1D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
 
 };
 
@@ -91,9 +91,9 @@ class QJacobi : public QBase
 // QJacobi class members
 inline
 QJacobi::QJacobi(const unsigned int d,
-		 const Order o,
-		 const unsigned int a,
-		 const unsigned int b) : QBase(d,o), _alpha(a), _beta(b)
+                 const Order o,
+                 const unsigned int a,
+                 const unsigned int b) : QBase(d,o), _alpha(a), _beta(b)
 {
   // explicitly call the init function in 1D since the
   // other tensor-product rules require this one.

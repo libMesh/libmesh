@@ -75,7 +75,7 @@ class Partitioner
    * material properties, etc.
    */
   void partition (MeshBase& mesh,
-		  const unsigned int n);
+                  const unsigned int n);
 
   /**
    * Partition the \p MeshBase into \p mesh.n_processors() parts.
@@ -92,7 +92,7 @@ class Partitioner
    * The default behavior is to simply call this->partition(mesh,n)
    */
   void repartition (MeshBase& mesh,
-		    const unsigned int n);
+                    const unsigned int n);
 
   /**
    * Repartitions the \p MeshBase into \p mesh.n_processors() parts.  This
@@ -107,7 +107,7 @@ class Partitioner
   static void partition_unpartitioned_elements (MeshBase &mesh);
 
   static void partition_unpartitioned_elements (MeshBase &mesh,
-						const unsigned int n);
+                                                const unsigned int n);
 
   /**
    * This function is called after partitioning to set the processor IDs
@@ -146,7 +146,7 @@ protected:
    * method above by the user.
    */
   virtual void _do_partition(MeshBase& mesh,
-			     const unsigned int n) = 0;
+                             const unsigned int n) = 0;
 
   /**
    * This is the actual re-partitioning method which can be overloaded
@@ -154,7 +154,7 @@ protected:
    * call the partition function.
    */
   virtual void _do_repartition (MeshBase& mesh,
-				const unsigned int n) { this->_do_partition (mesh, n); }
+                                const unsigned int n) { this->_do_partition (mesh, n); }
 
   /**
    * The blocksize to use when doing blocked parallel communication.  This limits the

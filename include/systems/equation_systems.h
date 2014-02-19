@@ -66,7 +66,7 @@ class MeshBase;
 // ------------------------------------------------------------
 // EquationSystems class definition
   class EquationSystems : public ReferenceCountedObject<EquationSystems>,
-			  public ParallelObject
+  public ParallelObject
 
 {
 public:
@@ -192,7 +192,7 @@ public:
    * systems array.
    */
   virtual System & add_system (const std::string& system_type,
-		               const std::string& name);
+                               const std::string& name);
 
   /**
    * Add the system named \p name to the systems array.
@@ -325,12 +325,12 @@ public:
    */
     template <typename InValType>
   void read (const std::string& name,
-	     const libMeshEnums::XdrMODE,
+             const libMeshEnums::XdrMODE,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true);
 
   void read (const std::string& name,
-	     const libMeshEnums::XdrMODE mode,
+             const libMeshEnums::XdrMODE mode,
              const unsigned int read_flags=(READ_HEADER | READ_DATA),
              bool partition_agnostic = true)
     { read<Number>(name, mode, read_flags, partition_agnostic); }
@@ -368,7 +368,7 @@ public:
    * that have two nodes in exactly the same position!
    */
   void write (const std::string& name,
-	      const libMeshEnums::XdrMODE,
+              const libMeshEnums::XdrMODE,
               const unsigned int write_flags=(WRITE_DATA),
               bool partition_agnostic = true) const;
 
@@ -485,8 +485,8 @@ private:
    */
     template <typename InValType>
   void _read_impl (const std::string& name,
-		   const libMeshEnums::XdrMODE,
-		   const unsigned int read_flags,
+                   const libMeshEnums::XdrMODE,
+                   const unsigned int read_flags,
                    bool partition_agnostic = true);
 
   /**
@@ -569,8 +569,8 @@ T_sys & EquationSystems::add_system (const std::string& name)
       // easier to load data from files for user-derived system
       // subclasses
 //      libMesh::err << "ERROR: There was already a system"
-//		<< " named " << name
-//		<< std::endl;
+//<< " named " << name
+//<< std::endl;
 
 //      libmesh_error();
 
@@ -612,7 +612,7 @@ const T_sys & EquationSystems::get_system (const unsigned int num) const
   if (pos == end)
     {
       libMesh::err << "ERROR: no system number " << num << " found!"
-		    << std::endl;
+                   << std::endl;
       libmesh_error();
     }
 
@@ -640,7 +640,7 @@ T_sys & EquationSystems::get_system (const unsigned int num)
   if (pos == end)
     {
       libMesh::err << "ERROR: no system number " << num << " found!"
-		    << std::endl;
+                   << std::endl;
       libmesh_error();
     }
 
@@ -663,7 +663,7 @@ const T_sys & EquationSystems::get_system (const std::string& name) const
   if (pos == _systems.end())
     {
       libMesh::err << "ERROR: no system named \"" << name << "\" found!"
-		    << std::endl;
+                   << std::endl;
       libmesh_error();
     }
 
@@ -686,7 +686,7 @@ T_sys & EquationSystems::get_system (const std::string& name)
   if (pos == _systems.end())
     {
       libMesh::err << "ERROR: no system named " << name << " found!"
-		    << std::endl;
+                   << std::endl;
       libmesh_error();
     }
 

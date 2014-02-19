@@ -54,8 +54,8 @@ public:
    * data structures.
    */
   NonlinearImplicitSystem (EquationSystems& es,
-			   const std::string& name,
-			   const unsigned int number);
+                           const std::string& name,
+                           const unsigned int number);
 
   /**
    * Destructor.
@@ -85,8 +85,8 @@ public:
      * residual and must be implemented by the user in a derived class.
      */
     virtual void residual (const NumericVector<Number>& X,
-			   NumericVector<Number>& R,
-			   sys_type& S) = 0;
+                           NumericVector<Number>& R,
+                           sys_type& S) = 0;
   };
 
 
@@ -104,8 +104,8 @@ public:
      * jacobian and must be implemented by the user in a derived class.
      */
     virtual void jacobian (const NumericVector<Number>& X,
-			   SparseMatrix<Number>& J,
-			   sys_type& S) = 0;
+                           SparseMatrix<Number>& J,
+                           sys_type& S) = 0;
   };
 
 
@@ -123,8 +123,8 @@ public:
      * must be implemented by the user in a derived class.
      */
     virtual void bounds (NumericVector<Number>& XL,
-			 NumericVector<Number>& XU,
-			 sys_type& S) = 0;
+                         NumericVector<Number>& XU,
+                         sys_type& S) = 0;
   };
 
   /**
@@ -165,9 +165,9 @@ public:
      * simultaneously and must be implemented by the user in a derived class.
      */
     virtual void residual_and_jacobian (const NumericVector<Number>& X,
-					NumericVector<Number>* R,
-					SparseMatrix<Number>*  J,
-					sys_type& S) = 0;
+                                        NumericVector<Number>* R,
+                                        SparseMatrix<Number>*  J,
+                                        sys_type& S) = 0;
   };
 
   /**

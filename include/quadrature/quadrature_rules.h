@@ -51,8 +51,8 @@ namespace QuadratureRules
    * over geometric entities.
    */
   const QuadratureType valid_elem_rules[] = {QGAUSS,
-					     QSIMPSON,
-					     QTRAP};
+                                             QSIMPSON,
+                                             QTRAP};
 
   /**
    * The number of valid quadrature rules for

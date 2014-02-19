@@ -77,7 +77,7 @@ namespace libMesh
 
 #undef libmesh_parallel_only_on
 #ifndef NDEBUG
-  #define libmesh_parallel_only_on(comm_obj,comm_arg) do {	\
+#define libmesh_parallel_only_on(comm_obj,comm_arg) do {                \
     libmesh_assert(comm_obj.verify(std::string(__FILE__).size(), comm_arg)); \
     libmesh_assert(comm_obj.verify(std::string(__FILE__), comm_arg)); \
     libmesh_assert(comm_obj.verify(__LINE__), comm_arg); } while (0)
@@ -346,12 +346,12 @@ namespace Parallel
     explicit Status (const status &status);
 
     Status (const status    &status,
-	    const data_type &type);
+            const data_type &type);
 
     Status (const Status &status);
 
     Status (const Status    &status,
-	    const data_type &type);
+            const data_type &type);
 
     status * get() { return &_status; }
 
@@ -470,8 +470,8 @@ namespace Parallel
    */
   template <typename T, typename buffertype, typename Context>
   void pack(const T* object,
-	    typename std::vector<buffertype>& data,
-	    const Context* context);
+            typename std::vector<buffertype>& data,
+            const Context* context);
 
   /**
    * Output the number of integers required to encode a
@@ -497,7 +497,7 @@ namespace Parallel
    */
   template <typename T, typename BufferIter>
   unsigned int packed_size(const T*,
-			   BufferIter);
+                           BufferIter);
 
   /**
    * Decode a potentially-variable-size object from a subsequence of a
@@ -516,8 +516,8 @@ namespace Parallel
    */
   template <typename Context, typename buffertype, typename OutputIter>
   inline void unpack_range (const typename std::vector<buffertype>& buffer,
-		            Context *context,
-		            OutputIter out);
+                            Context *context,
+                            OutputIter out);
 
   /**
    * Encode a range of potentially-variable-size objects to a data
@@ -525,8 +525,8 @@ namespace Parallel
    */
   template <typename Context, typename buffertype, typename Iter>
   inline void pack_range (const Context *context,
-		          Iter range_begin,
-		          const Iter range_end,
+                          Iter range_begin,
+                          const Iter range_end,
                           typename std::vector<buffertype>& buffer);
 
   //-------------------------------------------------------------------
@@ -1079,10 +1079,10 @@ namespace Parallel
      */
     template <typename Context, typename Iter, typename OutputIter>
     inline void gather_packed_range (const unsigned int root_id,
-				     Context *context,
-				     Iter range_begin,
-				     const Iter range_end,
-				     OutputIter out) const;
+                                     Context *context,
+                                     Iter range_begin,
+                                     const Iter range_end,
+                                     OutputIter out) const;
 
     /**
      * Take a range of local variables, combine it with ranges from all

@@ -28,39 +28,39 @@ namespace libMeshEnums {
    * \enum libMeshEnums::FEMNormType defines an \p enum for norms
    * defined on vectors of finite element coefficients
    */
-		    // Hilbert norms and seminorms in FE space
+  // Hilbert norms and seminorms in FE space
   enum FEMNormType {L2              = 0,
-		    H1              = 1,
-		    H2              = 2,
-		    HCURL           = 3,
-		    HDIV            = 4,
+                    H1              = 1,
+                    H2              = 2,
+                    HCURL           = 3,
+                    HDIV            = 4,
 
-		    L1              = 5,
+                    L1              = 5,
                     L_INF           = 6,
 
-		    H1_SEMINORM     = 10,
+                    H1_SEMINORM     = 10,
 
-		    H2_SEMINORM     = 11,
+                    H2_SEMINORM     = 11,
 
-		    HCURL_SEMINORM  = 12,
+                    HCURL_SEMINORM  = 12,
 
-		    HDIV_SEMINORM   = 13,
+                    HDIV_SEMINORM   = 13,
 
                     W1_INF_SEMINORM = 15,
                     W2_INF_SEMINORM = 16,
 
                     // discrete norms on coefficient vectors
                     DISCRETE_L1     = 20,
-		    DISCRETE_L2     = 21,
-		    DISCRETE_L_INF  = 22,
+                    DISCRETE_L2     = 21,
+                    DISCRETE_L_INF  = 22,
 
                     // Seminorms based on only individual gradient
                     // directional components
-		    H1_X_SEMINORM    = 31,
-		    H1_Y_SEMINORM    = 32,
-		    H1_Z_SEMINORM    = 33,
+                    H1_X_SEMINORM    = 31,
+                    H1_Y_SEMINORM    = 32,
+                    H1_Z_SEMINORM    = 33,
 
-		    INVALID_NORM    = 42};
+                    INVALID_NORM    = 42};
 }
 
 using namespace libMeshEnums;

@@ -33,47 +33,47 @@ namespace libMeshEnums {
    * Defines an \p enum for geometric element types.
    */
   enum ElemType {EDGE2=0,    // 0
-		 EDGE3,      // 1
-		 EDGE4,      // 2
+                 EDGE3,      // 1
+                 EDGE4,      // 2
 
-		 TRI3,       // 3
-		 TRI6,       // 4
+                 TRI3,       // 3
+                 TRI6,       // 4
 
-		 QUAD4,      // 5
-		 QUAD8,      // 6
-		 QUAD9,      // 7
+                 QUAD4,      // 5
+                 QUAD8,      // 6
+                 QUAD9,      // 7
 
-		 TET4,       // 8
-		 TET10,      // 9
+                 TET4,       // 8
+                 TET10,      // 9
 
-		 HEX8,       // 10
-		 HEX20,      // 11
-		 HEX27,      // 12
+                 HEX8,       // 10
+                 HEX20,      // 11
+                 HEX27,      // 12
 
-		 PRISM6,     // 13
-		 PRISM15,    // 14
-		 PRISM18,    // 15
+                 PRISM6,     // 13
+                 PRISM15,    // 14
+                 PRISM18,    // 15
 
-		 PYRAMID5,   // 16
+                 PYRAMID5,   // 16
                  PYRAMID14,  // 17
 
-		 INFEDGE2,   // 18
+                 INFEDGE2,   // 18
 
-		 INFQUAD4,   // 19
-		 INFQUAD6,   // 20
+                 INFQUAD4,   // 19
+                 INFQUAD6,   // 20
 
-		 INFHEX8,    // 21
-		 INFHEX16,   // 22
-		 INFHEX18,   // 23
+                 INFHEX8,    // 21
+                 INFHEX16,   // 22
+                 INFHEX18,   // 23
 
-		 INFPRISM6,  // 24
-		 INFPRISM12, // 25
+                 INFPRISM6,  // 24
+                 INFPRISM12, // 25
 
-		 NODEELEM,   // 26
+                 NODEELEM,   // 26
 
-		 REMOTEELEM,   // 27
+                 REMOTEELEM,   // 27
 
-		 INVALID_ELEM};  // 28 - should always be last
+                 INVALID_ELEM};  // 28 - should always be last
 }
 
 using namespace libMeshEnums;

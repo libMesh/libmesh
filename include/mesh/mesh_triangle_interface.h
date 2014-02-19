@@ -69,29 +69,29 @@ namespace libMesh
      */
     enum TriangulationType
       {
-	/**
-	 * Uses the triangle library to first generate a convex hull from the set
-	 * of points passed in, and then triangulate this set of points.  This
-	 * is probably the most common type of usage.
-	 */
-	GENERATE_CONVEX_HULL = 0,
+        /**
+         * Uses the triangle library to first generate a convex hull from the set
+         * of points passed in, and then triangulate this set of points.  This
+         * is probably the most common type of usage.
+         */
+        GENERATE_CONVEX_HULL = 0,
 
-	/**
-	 * Use the triangle library to triangulate a Planar Straight Line
-	 * Graph which is defined implicitly by the order of the "points" vector:
-	 * a straight line is assumed to lie between each successive pair of
-	 * points, with an additional line joining the final and first points.
-	 * In case your triangulation is a little too "structured" looking
-	 * (which can happen when the initial PSLG is really simple) you can try to
-	 * make the resulting triangulation a little more "unstructured" looking
-	 * by setting insert_points to true in the triangulate() function.
-	 */
-	PSLG = 1,
+        /**
+         * Use the triangle library to triangulate a Planar Straight Line
+         * Graph which is defined implicitly by the order of the "points" vector:
+         * a straight line is assumed to lie between each successive pair of
+         * points, with an additional line joining the final and first points.
+         * In case your triangulation is a little too "structured" looking
+         * (which can happen when the initial PSLG is really simple) you can try to
+         * make the resulting triangulation a little more "unstructured" looking
+         * by setting insert_points to true in the triangulate() function.
+         */
+        PSLG = 1,
 
-	/**
-	 * Does nothing, used as a default value.
-	 */
-	INVALID_TRIANGULATION_TYPE
+        /**
+         * Does nothing, used as a default value.
+         */
+        INVALID_TRIANGULATION_TYPE
       };
 
     /**

@@ -63,7 +63,7 @@ public:
    *  Constructor. Initializes Solver data structures
    */
   LinearSolver (const libMesh::Parallel::Communicator &comm_in
-		LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.
@@ -75,8 +75,8 @@ public:
    * \p solver_package
    */
   static AutoPtr<LinearSolver<T> > build(const
-					 libMesh::Parallel::Communicator &comm_in,
-					 const SolverPackage solver_package = libMesh::default_solver_package());
+                                         libMesh::Parallel::Communicator &comm_in,
+                                         const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
    * @returns true if the data structures are
@@ -132,7 +132,7 @@ public:
    * \p NULL pointer.
    */
   virtual void restrict_solve_to (const std::vector<unsigned int>* const dofs,
-				  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
+                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
 
   /**
    * This function calls the solver
@@ -141,10 +141,10 @@ public:
    * will compute the preconditioner from the system matrix.
    */
   virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Matrix
-					       NumericVector<T>&, // Solution vector
-					       NumericVector<T>&, // RHS vector
-					       const double,      // Stopping tolerance
-					       const unsigned int) = 0; // N. Iterations
+                                               NumericVector<T>&, // Solution vector
+                                               NumericVector<T>&, // RHS vector
+                                               const double,      // Stopping tolerance
+                                               const unsigned int) = 0; // N. Iterations
 
     /**
    * Function to solve the adjoint system. Note that this method
@@ -152,10 +152,10 @@ public:
    * function and is defined linear_solver.C
    */
   virtual std::pair<unsigned int, Real> adjoint_solve (SparseMatrix<T>&,  // System Matrix
-  						       NumericVector<T>&, // Solution vector
-  						       NumericVector<T>&, // RHS vector
-  						       const double,      // Stopping tolerance
-  						       const unsigned int); // N. Iterations
+                                                       NumericVector<T>&, // Solution vector
+                                                       NumericVector<T>&, // RHS vector
+                                                       const double,      // Stopping tolerance
+                                                       const unsigned int); // N. Iterations
 
   /**
    * This function calls the solver
@@ -163,11 +163,11 @@ public:
    * "_preconditioner_type" preconditioner.
    */
   virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Matrix
-					       SparseMatrix<T>&,  // Preconditioning Matrix
-					       NumericVector<T>&, // Solution vector
-					       NumericVector<T>&, // RHS vector
-					       const double,      // Stopping tolerance
-					       const unsigned int) = 0; // N. Iterations
+                                               SparseMatrix<T>&,  // Preconditioning Matrix
+                                               NumericVector<T>&, // Solution vector
+                                               NumericVector<T>&, // RHS vector
+                                               const double,      // Stopping tolerance
+                                               const unsigned int) = 0; // N. Iterations
 
   /**
    * This function calls the solver "_solver_type" preconditioned with
@@ -176,11 +176,11 @@ public:
    * \p precond_matrix is null
    */
   std::pair<unsigned int, Real> solve (SparseMatrix<T>& matrix,
-				       SparseMatrix<T>* precond_matrix,
-				       NumericVector<T>&, // Solution vector
-				       NumericVector<T>&, // RHS vector
-				       const double,      // Stopping tolerance
-				       const unsigned int); // N. Iterations
+                                       SparseMatrix<T>* precond_matrix,
+                                       NumericVector<T>&, // Solution vector
+                                       NumericVector<T>&, // RHS vector
+                                       const double,      // Stopping tolerance
+                                       const unsigned int); // N. Iterations
 
 
 
@@ -188,10 +188,10 @@ public:
    * This function solves a system whose matrix is a shell matrix.
    */
   virtual std::pair<unsigned int, Real> solve (const ShellMatrix<T>& shell_matrix,
-					       NumericVector<T>&, // Solution vector
-					       NumericVector<T>&, // RHS vector
-					       const double,      // Stopping tolerance
-					       const unsigned int) = 0; // N. Iterations
+                                               NumericVector<T>&, // Solution vector
+                                               NumericVector<T>&, // RHS vector
+                                               const double,      // Stopping tolerance
+                                               const unsigned int) = 0; // N. Iterations
 
 
 
@@ -201,11 +201,11 @@ public:
    * other preconditioners than JACOBI.
    */
   virtual std::pair<unsigned int, Real> solve (const ShellMatrix<T>& shell_matrix,
-					       const SparseMatrix<T>& precond_matrix,
-					       NumericVector<T>&, // Solution vector
-					       NumericVector<T>&, // RHS vector
-					       const double,      // Stopping tolerance
-					       const unsigned int) = 0; // N. Iterations
+                                               const SparseMatrix<T>& precond_matrix,
+                                               NumericVector<T>&, // Solution vector
+                                               NumericVector<T>&, // RHS vector
+                                               const double,      // Stopping tolerance
+                                               const unsigned int) = 0; // N. Iterations
 
 
   /**
@@ -213,11 +213,11 @@ public:
    * an optional sparse matrix may be used as preconditioning matrix.
    */
   std::pair<unsigned int, Real> solve (const ShellMatrix<T>& matrix,
-				       const SparseMatrix<T>* precond_matrix,
-				       NumericVector<T>&, // Solution vector
-				       NumericVector<T>&, // RHS vector
-				       const double,      // Stopping tolerance
-				       const unsigned int); // N. Iterations
+                                       const SparseMatrix<T>* precond_matrix,
+                                       NumericVector<T>&, // Solution vector
+                                       NumericVector<T>&, // RHS vector
+                                       const double,      // Stopping tolerance
+                                       const unsigned int); // N. Iterations
 
 
   /**
@@ -296,11 +296,11 @@ template <typename T>
 inline
 std::pair<unsigned int, Real>
 LinearSolver<T>::solve (SparseMatrix<T>&   mat,
-		        SparseMatrix<T>*   pc_mat,
-		        NumericVector<T>&  sol,
-		        NumericVector<T>&  rhs,
-		        const double       tol,
-		        const unsigned int n_iter)
+                        SparseMatrix<T>*   pc_mat,
+                        NumericVector<T>&  sol,
+                        NumericVector<T>&  rhs,
+                        const double       tol,
+                        const unsigned int n_iter)
 {
   if (pc_mat)
     return this->solve(mat, *pc_mat, sol, rhs, tol, n_iter);
@@ -313,11 +313,11 @@ template <typename T>
 inline
 std::pair<unsigned int, Real>
 LinearSolver<T>::solve (const ShellMatrix<T>&  mat,
-		        const SparseMatrix<T>* pc_mat,
-		        NumericVector<T>&      sol,
-		        NumericVector<T>&      rhs,
-		        const double           tol,
-		        const unsigned int     n_iter)
+                        const SparseMatrix<T>* pc_mat,
+                        NumericVector<T>&      sol,
+                        NumericVector<T>&      rhs,
+                        const double           tol,
+                        const unsigned int     n_iter)
 {
   if (pc_mat)
     return this->solve(mat, *pc_mat, sol, rhs, tol, n_iter);

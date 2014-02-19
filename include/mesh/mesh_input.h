@@ -97,7 +97,7 @@ class MeshInput
    * that start with the character \p comment_start.
    */
   void skip_comment_lines (std::istream& in,
-			   const char comment_start);
+                           const char comment_start);
 
 
  private:
@@ -142,8 +142,8 @@ MeshInput<MT>::MeshInput (MT& obj, const bool is_parallel_format) :
   if (!_is_parallel_format && !this->mesh().is_serial())
     {
       if (this->mesh().processor_id() == 0)
-	{
-	  libmesh_do_once(libMesh::out <<
+        {
+          libmesh_do_once(libMesh::out <<
             "Warning:  This MeshOutput subclass only supports meshes which have been serialized!"
             << std::endl;);
         }
@@ -172,7 +172,7 @@ MT& MeshInput<MT>::mesh ()
 
 template <class MT>
 void MeshInput<MT>::skip_comment_lines (std::istream &in,
-					const char comment_start)
+                                        const char comment_start)
 {
   char c, line[256];
 

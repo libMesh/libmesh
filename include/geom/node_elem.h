@@ -129,19 +129,19 @@ class NodeElem : public Elem
   virtual bool is_face(const unsigned int) const { return false; }
 
   virtual bool is_child_on_side(const unsigned int,
-			        const unsigned int) const
+                                const unsigned int) const
   { libmesh_error(); return false; }
 
   virtual bool is_node_on_side(const unsigned int,
-			       const unsigned int) const
+                               const unsigned int) const
   { libmesh_error(); return false; }
 
   virtual bool is_node_on_edge(const unsigned int,
-			       const unsigned int) const
+                               const unsigned int) const
   { libmesh_error(); return false; }
 
   virtual bool is_edge_on_side(const unsigned int,
-			       const unsigned int) const
+                               const unsigned int) const
   { libmesh_error(); return false; }
 
   /*
@@ -167,8 +167,8 @@ class NodeElem : public Elem
   Order default_order() const { return FIRST; }
 
   virtual void connectivity(const unsigned int sc,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -200,8 +200,8 @@ protected:
    * Matrix used to create the elements children.
    */
   float embedding_matrix (const unsigned int i,
-			 const unsigned int j,
-			 const unsigned int k) const
+                          const unsigned int j,
+                          const unsigned int k) const
   { return _embedding_matrix[i][j][k]; }
 
   /**
@@ -214,7 +214,7 @@ protected:
    * Matrix that allows children to inherit boundary conditions.
    */
   unsigned int side_children_matrix (const unsigned int,
-				     const unsigned int) const
+                                     const unsigned int) const
   { libmesh_error(); return 0; }
 
 #endif

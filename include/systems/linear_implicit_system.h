@@ -55,8 +55,8 @@ public:
    * data structures.
    */
   LinearImplicitSystem (EquationSystems& es,
-			const std::string& name,
-			const unsigned int number);
+                        const std::string& name,
+                        const unsigned int number);
 
   /**
    * Destructor.
@@ -109,7 +109,7 @@ public:
    * being a \p NULL pointer.
    */
   virtual void restrict_solve_to (const SystemSubset* subset,
-				  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
+                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
 
   /**
    * Assembles & solves the linear system A*x=b.

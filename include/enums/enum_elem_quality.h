@@ -28,21 +28,21 @@ namespace libMeshEnums
    * Defines an \p enum for element quality metrics.
    */
   enum ElemQuality {ASPECT_RATIO=0,
-		    SKEW,
-		    SHEAR,
-		    SHAPE,
-		    MAX_ANGLE,
-		    MIN_ANGLE,
-		    CONDITION,
-		    DISTORTION,
-		    TAPER,
-		    WARP,
-		    STRETCH,
-		    DIAGONAL,
-		    ASPECT_RATIO_BETA,
-		    ASPECT_RATIO_GAMMA,
-		    SIZE,
-		    JACOBIAN};
+                    SKEW,
+                    SHEAR,
+                    SHAPE,
+                    MAX_ANGLE,
+                    MIN_ANGLE,
+                    CONDITION,
+                    DISTORTION,
+                    TAPER,
+                    WARP,
+                    STRETCH,
+                    DIAGONAL,
+                    ASPECT_RATIO_BETA,
+                    ASPECT_RATIO_GAMMA,
+                    SIZE,
+                    JACOBIAN};
 }
 
 

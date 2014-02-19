@@ -126,9 +126,9 @@ public:
    * the solution at any point.
    */
   void attach_exact_deriv (Gradient gptr(const Point& p,
-					 const Parameters& parameters,
-					 const std::string& sys_name,
-					 const std::string& unknown_name));
+                                         const Parameters& parameters,
+                                         const std::string& sys_name,
+                                         const std::string& unknown_name));
 
   /**
    * Clone and attach arbitrary functors which compute the exact
@@ -148,9 +148,9 @@ public:
    * derivatives of the solution at any point.
    */
   void attach_exact_hessian (Tensor hptr(const Point& p,
-					 const Parameters& parameters,
-					 const std::string& sys_name,
-					 const std::string& unknown_name));
+                                         const Parameters& parameters,
+                                         const std::string& sys_name,
+                                         const std::string& unknown_name));
 
   /**
    * Increases or decreases the order of the quadrature rule used for numerical
@@ -167,7 +167,7 @@ public:
    * or h2_error() functions respectively.
    */
   void compute_error(const std::string& sys_name,
-		     const std::string& unknown_name);
+                     const std::string& unknown_name);
 
   /**
    * This function returns the integrated L2 error for the system
@@ -213,7 +213,7 @@ public:
    * for scalar-valued elements.
    */
   Real hcurl_error(const std::string& sys_name,
-		   const std::string& unknown_name);
+                   const std::string& unknown_name);
 
   /**
    * This function computes and returns the HDiv error for the system
@@ -223,7 +223,7 @@ public:
    * for scalar-valued elements.
    */
   Real hdiv_error(const std::string& sys_name,
-		  const std::string& unknown_name);
+                  const std::string& unknown_name);
 
   /**
    * This function computes and returns the H2 error for the system
@@ -241,8 +241,8 @@ public:
    * based on the chosen quadrature rule.
    */
   Real error_norm(const std::string& sys_name,
-	          const std::string& unknown_name,
-	          const FEMNormType& norm);
+                  const std::string& unknown_name,
+                  const FEMNormType& norm);
 private:
 
   /**
@@ -253,8 +253,8 @@ private:
    */
   template<typename OutputShape>
   void _compute_error(const std::string& sys_name,
-		      const std::string& unknown_name,
-		      std::vector<Real>& error_vals);
+                      const std::string& unknown_name,
+                      std::vector<Real>& error_vals);
 
   /**
    * This function is responsible for checking the validity of

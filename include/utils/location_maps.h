@@ -59,7 +59,7 @@ public:
   bool empty() const { return _map.empty(); }
 
   T* find(const Point&,
-	  const Real tol = TOLERANCE);
+          const Real tol = TOLERANCE);
 
   Point point_of(const T&) const;
 

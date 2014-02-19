@@ -56,7 +56,7 @@ namespace MeshTools
      * \p perturb_boundary true.
      */
     void distort (MeshBase& mesh,
-		  const Real factor, const bool perturb_boundary=false);
+                  const Real factor, const bool perturb_boundary=false);
 
     /**
      * Translates the mesh.  The grid points are translated in the
@@ -64,7 +64,7 @@ namespace MeshTools
      * etc...
      */
     void translate (MeshBase& mesh,
-		    const Real xt=0., const Real yt=0., const Real zt=0.);
+                    const Real xt=0., const Real yt=0., const Real zt=0.);
 
 //     /**
 //      * Rotates the mesh in the xy plane. The rotation is
@@ -81,7 +81,7 @@ namespace MeshTools
      * The angles are in degrees (360 make a full circle)
      */
     void rotate (MeshBase& mesh,
-		 const Real phi, const Real theta=0., const Real psi=0.);
+                 const Real phi, const Real theta=0., const Real psi=0.);
 
     /**
      * Scales the mesh.  The grid points are scaled in the
@@ -90,7 +90,7 @@ namespace MeshTools
      * assumed uniform in all directions.
      */
     void scale (MeshBase& mesh,
-		const Real xs, const Real ys=0., const Real zs=0.);
+                const Real xs, const Real ys=0., const Real zs=0.);
 
     /**
      * Converts the 2D quadrilateral elements of a Mesh into
@@ -133,16 +133,16 @@ namespace MeshTools
      * changes them to new_id
      */
     void change_boundary_id (MeshBase &mesh,
-			     const boundary_id_type old_id,
-			     const boundary_id_type new_id);
+                             const boundary_id_type old_id,
+                             const boundary_id_type new_id);
 
     /**
      * Finds any subdomain ids that are currently old_id,
      * changes them to new_id
      */
     void change_subdomain_id (MeshBase &mesh,
-			      const subdomain_id_type old_id,
-			      const subdomain_id_type new_id);
+                              const subdomain_id_type old_id,
+                              const subdomain_id_type new_id);
 
   } // end namespace Meshtools::Modification
 } // end namespace MeshTools

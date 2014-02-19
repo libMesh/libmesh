@@ -136,25 +136,25 @@ protected:
    * the return value is the substep size.
    */
   Real line_search(Real tol, Real last_residual, Real& current_residual,
-		   NumericVector<Number> &newton_iterate,
-		   const NumericVector<Number> &linear_solution);
+                   NumericVector<Number> &newton_iterate,
+                   const NumericVector<Number> &linear_solution);
 
   /**
    * This prints output for the convergence criteria based on
    * by the given residual and step size.
    */
   void print_convergence(unsigned int step_num,
-			 Real current_residual,
-			 Real step_norm,
-			 bool linear_solve_finished);
+                         Real current_residual,
+                         Real step_norm,
+                         bool linear_solve_finished);
 
   /**
    * This returns true if a convergence criterion has been passed
    * by the given residual and step size; false otherwise.
    */
   bool test_convergence(Real current_residual,
-			Real step_norm,
-			bool linear_solve_finished);
+                        Real step_norm,
+                        bool linear_solve_finished);
 };
 
 

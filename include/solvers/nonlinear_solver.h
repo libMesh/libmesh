@@ -53,7 +53,7 @@ template <typename T> class Preconditioner;
 
 template <typename T>
 class NonlinearSolver : public ReferenceCountedObject<NonlinearSolver<T> >,
-			public ParallelObject
+  public ParallelObject
 {
 public:
   /**
@@ -77,7 +77,7 @@ public:
    * \p solver_package
    */
   static AutoPtr<NonlinearSolver<T> > build(sys_type& s,
-					    const SolverPackage solver_package = libMesh::default_solver_package());
+                                            const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
    * @returns true if the data structures are
@@ -99,10 +99,10 @@ public:
    * Solves the nonlinear system.
    */
   virtual std::pair<unsigned int, Real> solve (SparseMatrix<T>&,  // System Jacobian Matrix
-					       NumericVector<T>&, // Solution vector
-					       NumericVector<T>&, // Residual vector
-					       const double,      // Stopping tolerance
-					       const unsigned int) = 0; // N. Iterations
+                                               NumericVector<T>&, // Solution vector
+                                               NumericVector<T>&, // Residual vector
+                                               const double,      // Stopping tolerance
+                                               const unsigned int) = 0; // N. Iterations
 
   /**
    * Prints a useful message about why the latest nonlinear solve
@@ -127,7 +127,7 @@ public:
    * at the input iterate \p X.
    */
   void (* residual) (const NumericVector<Number>& X,
-		     NumericVector<Number>& R,
+                     NumericVector<Number>& R,
                      sys_type& S);
 
   /**
@@ -141,7 +141,7 @@ public:
    * at the input iterate \p X.
    */
   void (* jacobian) (const NumericVector<Number>& X,
-		     SparseMatrix<Number>& J,
+                     SparseMatrix<Number>& J,
                      sys_type& S);
 
   /**
@@ -157,8 +157,8 @@ public:
    * \p XSNULL.
    */
   void (* matvec) (const NumericVector<Number>& X,
-		   NumericVector<Number>* R,
-		   SparseMatrix<Number>*  J,
+                   NumericVector<Number>* R,
+                   SparseMatrix<Number>*  J,
                    sys_type& S);
 
   /**
@@ -173,8 +173,8 @@ public:
    * Function that computes the lower and upper bounds \p XL and \p XU on the solution of the nonlinear system.
    */
   void (* bounds) (NumericVector<Number>& XL,
-		   NumericVector<Number>& XU,
-		   sys_type& S);
+                   NumericVector<Number>& XU,
+                   sys_type& S);
   /**
    * Object that computes the bounds vectors  \f$ XL \f$ and \f$ XU \f$.
    */

@@ -51,7 +51,7 @@ namespace Predicates
     {
       // Clean-up vector
       for (unsigned int i=0; i<_predicates.size(); ++i)
-	delete _predicates[i];
+        delete _predicates[i];
     }
 
     // operator= (perform deep copy of entries in _predicates vector
@@ -59,7 +59,7 @@ namespace Predicates
     {
       // First clear out the predicates vector
       for (unsigned int i=0; i<_predicates.size(); ++i)
-	delete _predicates[i];
+        delete _predicates[i];
 
       // Now copy over the information from the rhs.
       this->deep_copy(rhs);
@@ -71,14 +71,14 @@ namespace Predicates
     virtual bool operator()(const T& it) const
     {
       for (unsigned int i=0; i<_predicates.size(); ++i)
-	{
-	  const predicate<T>* pred = _predicates[i];
+        {
+          const predicate<T>* pred = _predicates[i];
 
-	  libmesh_assert (pred);
+          libmesh_assert (pred);
 
-	  if ( ! (*pred)(it) )
-	    return false;
-	}
+          if ( ! (*pred)(it) )
+            return false;
+        }
 
       return true;
     }
@@ -99,7 +99,7 @@ namespace Predicates
     void deep_copy(const abstract_multi_predicate& rhs)
     {
       for (unsigned int i=0; i<rhs._predicates.size(); ++i)
-	_predicates.push_back(rhs._predicates[i]->clone());
+        _predicates.push_back(rhs._predicates[i]->clone());
     }
 
     // Predicates to be evaluated.
@@ -390,7 +390,7 @@ namespace Predicates
   struct LocalLevel : abstract_multi_predicate<T>
   {
     LocalLevel(const processor_id_type my_pid,
-	       const unsigned int l)
+               const unsigned int l)
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new pid<T>(my_pid));
@@ -406,7 +406,7 @@ namespace Predicates
   struct LocalNotLevel : abstract_multi_predicate<T>
   {
     LocalNotLevel(const processor_id_type my_pid,
-		  const unsigned int l)
+                  const unsigned int l)
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new pid<T>(my_pid));
@@ -447,7 +447,7 @@ namespace Predicates
   struct ActiveLocalSubdomain : abstract_multi_predicate<T>
   {
     ActiveLocalSubdomain(const processor_id_type my_pid,
-			 const subdomain_id_type subdomain_id)
+                         const subdomain_id_type subdomain_id)
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new active<T>);

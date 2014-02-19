@@ -121,7 +121,7 @@ protected:
    * cannot be explicitly instantiated.
    */
   FEGenericBase (const unsigned int dim,
-	         const FEType& fet);
+                 const FEType& fet);
 
 public:
 
@@ -139,7 +139,7 @@ public:
    * compatible with the output required for the requested \p type
    */
   static AutoPtr<FEGenericBase> build (const unsigned int dim,
-				       const FEType& type);
+                                       const FEType& type);
 
   /**
    * Convenient typedefs for gradients of output, hessians of output,
@@ -167,7 +167,7 @@ public:
    * compatible with the output required for the requested \p type
    */
   static AutoPtr<FEGenericBase> build_InfFE (const unsigned int dim,
-				             const FEType& type);
+                                             const FEType& type);
 
 #endif
 
@@ -190,11 +190,11 @@ public:
    */
 
   static void coarsened_dof_values(const NumericVector<Number> &global_vector,
-			           const DofMap &dof_map,
+                                   const DofMap &dof_map,
                                    const Elem *coarse_elem,
-			           DenseVector<Number> &coarse_dofs,
-			           const unsigned int var,
-			           const bool use_old_dof_indices = false);
+                                   DenseVector<Number> &coarse_dofs,
+                                   const unsigned int var,
+                                   const bool use_old_dof_indices = false);
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
@@ -479,7 +479,7 @@ protected:
    * class \p FE<Dim,T>.
    */
   virtual void init_base_shape_functions(const std::vector<Point>& qp,
-					 const Elem* e) = 0;
+                                         const Elem* e) = 0;
 
 #endif
 
@@ -683,7 +683,7 @@ typedef FEGenericBase<RealGradient> FEVectorBase;
 template <typename OutputType>
 inline
 FEGenericBase<OutputType>::FEGenericBase(const unsigned int d,
-	                                 const FEType& fet) :
+                                         const FEType& fet) :
   FEAbstract(d,fet),
   _fe_trans( FETransformationBase<OutputType>::build(fet) ),
   phi(),

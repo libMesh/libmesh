@@ -52,15 +52,15 @@ public:
    * with a vector and will give the expected result.
    */
   SumShellMatrix (const Parallel::Communicator &comm_in
-		  LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                  LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor that passes a vector of shell matrices.
    */
   explicit
   SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat,
-		  const Parallel::Communicator &comm_in
-		  LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                  const Parallel::Communicator &comm_in
+                  LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.
@@ -84,13 +84,13 @@ public:
    * dest.
    */
   virtual void vector_mult (NumericVector<T>& dest,
-			    const NumericVector<T>& arg) const;
+                            const NumericVector<T>& arg) const;
 
   /**
    * Multiplies the matrix with \p arg and adds the result to \p dest.
    */
   virtual void vector_mult_add (NumericVector<T>& dest,
-				const NumericVector<T>& arg) const;
+                                const NumericVector<T>& arg) const;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.
@@ -120,7 +120,7 @@ SumShellMatrix<T>::SumShellMatrix (const Parallel::Communicator &comm_in):
 template <typename T>
 inline
 SumShellMatrix<T>::SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat,
-				   const Parallel::Communicator &comm_in):
+                                   const Parallel::Communicator &comm_in):
   ShellMatrix<T>(comm_in),
   matrices(mat)
 {}

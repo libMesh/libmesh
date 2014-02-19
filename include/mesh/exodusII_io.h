@@ -50,8 +50,8 @@ class System;
 // ------------------------------------------------------------
 // ExodusII_IO class definition
 class ExodusII_IO : public MeshInput<MeshBase>,
-		    public MeshOutput<MeshBase>,
-		    public ParallelObject
+  public MeshOutput<MeshBase>,
+  public ParallelObject
 {
  public:
 
@@ -131,8 +131,8 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * Write out a nodal solution.
    */
   void write_nodal_data (const std::string&,
-			 const std::vector<Number>&,
-			 const std::vector<std::string>&);
+                         const std::vector<Number>&,
+                         const std::vector<std::string>&);
 
   /**
    * Write out a discontinuous nodal solution.
@@ -157,9 +157,9 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * @param timestep The timestep to write out, should be _1_ indexed.
    */
   void write_timestep (const std::string& fname,
-		       const EquationSystems& es,
-		       const int timestep,
-		       const Real time);
+                       const EquationSystems& es,
+                       const int timestep,
+                       const Real time);
 
   /**
    * Sets the list of variable names to be included in the output.

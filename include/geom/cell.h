@@ -47,10 +47,10 @@ public:
    * Constructor.
    */
   Cell (const unsigned int nn,
-	const unsigned int ns,
-	Elem* p,
-	Elem** elemlinkdata,
-	Node** nodelinkdata) :
+        const unsigned int ns,
+        Elem* p,
+        Elem** elemlinkdata,
+        Node** nodelinkdata) :
     Elem (nn, ns, p, elemlinkdata, nodelinkdata)
   {}
 

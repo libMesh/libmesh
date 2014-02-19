@@ -420,7 +420,7 @@ inline Tnew libmesh_cast_ref(Told& oldvar)
                    << std::endl;
       libMesh::err << "The " << typeid(Told).name()
                    << " appears to be a "
-		   << typeid(*(&oldvar)).name() << std::endl;
+                   << typeid(*(&oldvar)).name() << std::endl;
       libmesh_error();
     }
 #else
@@ -442,7 +442,7 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
                    << std::endl;
       libMesh::err << "The " << typeid(Told).name()
                    << " appears to be a "
-		   << typeid(*oldvar).name() << std::endl;
+                   << typeid(*oldvar).name() << std::endl;
       libmesh_error();
     }
   return newvar;

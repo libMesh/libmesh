@@ -50,7 +50,7 @@ template <typename T> class NumericVector;
 // ------------------------------------------------------------
 // RBEvaluation class definition
 class RBEvaluation : public RBParametrized,
-		     public ParallelObject
+  public ParallelObject
 {
 public:
 
@@ -58,7 +58,7 @@ public:
    * Constructor.
    */
   RBEvaluation (const Parallel::Communicator &comm
-		LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.

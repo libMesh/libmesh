@@ -34,9 +34,9 @@ namespace libMeshEnums {
    * types of coordinate mappings available in infinite elements.
    */
   enum InfMapType {CARTESIAN=0,
-		   SPHERICAL,
-		   ELLIPSOIDAL,
-		   INVALID_INF_MAP};
+                   SPHERICAL,
+                   ELLIPSOIDAL,
+                   INVALID_INF_MAP};
 
 }
 

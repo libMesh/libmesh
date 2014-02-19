@@ -136,7 +136,7 @@ public:
    * should be cleared.  By default, both id maps are deleted.
    */
   void slim (const bool node_id_map = true,
-	     const bool elem_id_map = true);
+             const bool elem_id_map = true);
 
   /**
    * Translates the @e nodal data contained in this object
@@ -153,8 +153,8 @@ public:
    * to), or its \p BoundaryMesh, cf. \p Mesh.
    */
   void translate (const MeshBase& out_mesh,
-		  std::vector<Number>& data_values,
-		  std::vector<std::string>& data_names) const;
+                  std::vector<Number>& data_values,
+                  std::vector<std::string>& data_names) const;
 
   /**
    * Read mesh data from file named \p name.
@@ -195,7 +195,7 @@ public:
    * is no such \p node in the map.
    */
   Number operator() (const Node* node,
-		     const unsigned int i=0) const;
+                     const unsigned int i=0) const;
 
   /**
    * @returns \p true when the node \p node has data,
@@ -261,8 +261,8 @@ public:
    * user @e has to add element-associated data, too.
    */
   void insert_node_data (std::map<const Node*,
-			          std::vector<Number> >& nd,
-			 const bool close_elem_data = true);
+                         std::vector<Number> >& nd,
+                         const bool close_elem_data = true);
 
 
   //----------------------------------------------------------
@@ -273,7 +273,7 @@ public:
    * is no data for \p elem in the map.
    */
   Number operator() (const Elem* elem,
-		     const unsigned int i=0) const;
+                     const unsigned int i=0) const;
 
   /**
    * @returns \p true when the element \p elem has data,
@@ -340,8 +340,8 @@ public:
    * user @e has to add nodal data, too.
    */
   void insert_elem_data (std::map<const Elem*,
-			          std::vector<Number> >& ed,
-			 const bool close_node_data = true);
+                         std::vector<Number> >& ed,
+                         const bool close_node_data = true);
 
 
   //----------------------------------------------------------
@@ -430,7 +430,7 @@ public:
    * a map.
    */
   void add_foreign_node_id (const Node* node,
-			    const unsigned int foreign_node_id);
+                            const unsigned int foreign_node_id);
 
   /**
    * In general, \p MeshData gathers element-associated
@@ -440,7 +440,7 @@ public:
    * a map.
    */
   void add_foreign_elem_id (const Elem* elem,
-			    const unsigned int foreign_elem_id);
+                            const unsigned int foreign_elem_id);
 
   /**
    * Signal to this object that the mesh importer finished
@@ -498,7 +498,7 @@ protected:
    * be changed setting \p mode to \p DECODE.
    */
   void read_xdr (const std::string& name,
-		 const XdrMODE mode = READ);
+                 const XdrMODE mode = READ);
 
   /**
    * Write nodal data in format comparable to
@@ -507,7 +507,7 @@ protected:
    * be changed setting \p mode to \p ENCODE.
    */
   void write_xdr (const std::string& name,
-		  const XdrMODE mode = WRITE);
+                  const XdrMODE mode = WRITE);
 
 
   /**
@@ -836,7 +836,7 @@ private:
 // element data inline methods
 inline
 Number MeshData::operator() (const Node* node,
-			     const unsigned int i) const
+                             const unsigned int i) const
 {
   libmesh_assert (_active || _compatibility_mode);
   libmesh_assert (_node_data_closed);
@@ -892,7 +892,7 @@ const std::vector<Number>& MeshData::get_data (const Node* node) const
 
 inline
 void MeshData::set_data (const Node* node,
-			 const std::vector<Number> &val)
+                         const std::vector<Number> &val)
 {
   this->_node_data[node] = val;
 }
@@ -919,7 +919,7 @@ MeshData::const_node_data_iterator MeshData::node_data_end () const
 // element data inline methods
 inline
 Number MeshData::operator() (const Elem* elem,
-			     const unsigned int i) const
+                             const unsigned int i) const
 {
   libmesh_assert (_active || _compatibility_mode);
   libmesh_assert (_elem_data_closed);
@@ -975,7 +975,7 @@ const std::vector<Number>& MeshData::get_data (const Elem* elem) const
 
 inline
 void MeshData::set_data (const Elem* elem,
-			 const std::vector<Number> &val)
+                         const std::vector<Number> &val)
 {
   this->_elem_data[elem] = val;
 }
@@ -1034,7 +1034,7 @@ bool MeshData::node_initialized() const
 
 inline
 void MeshData::add_foreign_node_id (const Node* node,
-				    const unsigned int foreign_node_id)
+                                    const unsigned int foreign_node_id)
 {
   if (_active)
     {
@@ -1060,7 +1060,7 @@ void MeshData::add_foreign_node_id (const Node* node,
 
 inline
 void MeshData::add_foreign_elem_id (const Elem* elem,
-				    const unsigned int foreign_elem_id)
+                                    const unsigned int foreign_elem_id)
 {
   if (_active)
     {

@@ -79,14 +79,14 @@ class Elem;
      */
     virtual void compute_face_map(int dim,
                                   const std::vector<Real>& qw,
-				  const Elem* side);
+                                  const Elem* side);
 
     /**
      * Same as before, but for an edge.  Useful for some projections.
      */
     void compute_edge_map(int dim,
                           const std::vector<Real>& qw,
-			  const Elem* side);
+                          const Elem* side);
 
     /**
      * Initalizes the reference to physical element map for a side.

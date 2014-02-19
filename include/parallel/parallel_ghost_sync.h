@@ -58,7 +58,7 @@ namespace Parallel {
             typename DofObjType,
             typename SyncFunctor>
   void sync_dofobject_data_by_xyz(const Communicator&      communicator,
-				  const Iterator&          range_begin,
+                                  const Iterator&          range_begin,
                                   const Iterator&          range_end,
                                   LocationMap<DofObjType>* location_map,
                                   SyncFunctor&             sync);
@@ -79,7 +79,7 @@ namespace Parallel {
   template <typename Iterator,
             typename SyncFunctor>
   void sync_dofobject_data_by_id(const Communicator& communicator,
-				 const Iterator&     range_begin,
+                                 const Iterator&     range_begin,
                                  const Iterator&     range_end,
                                  SyncFunctor&        sync);
 
@@ -111,7 +111,7 @@ template <typename Iterator,
           typename DofObjType,
           typename SyncFunctor>
 void sync_dofobject_data_by_xyz(const Communicator&      communicator,
-				const Iterator&          range_begin,
+                                const Iterator&          range_begin,
                                 const Iterator&          range_end,
                                 LocationMap<DofObjType>& location_map,
                                 SyncFunctor&             sync)
@@ -179,20 +179,20 @@ void sync_dofobject_data_by_xyz(const Communicator&      communicator,
       // Trade my requests with processor procup and procdown
       const processor_id_type procup =
         libmesh_cast_int<processor_id_type>
-	  ((communicator.rank() + p) % communicator.size());
+        ((communicator.rank() + p) % communicator.size());
       const processor_id_type procdown =
         libmesh_cast_int<processor_id_type>
-	  ((communicator.size() + communicator.rank() - p) %
+        ((communicator.size() + communicator.rank() - p) %
            communicator.size());
       std::vector<Real> request_to_fill_x,
                         request_to_fill_y,
                         request_to_fill_z;
       communicator.send_receive(procup, requested_objs_x[procup],
-				procdown, request_to_fill_x);
+                                procdown, request_to_fill_x);
       communicator.send_receive(procup, requested_objs_y[procup],
-				procdown, request_to_fill_y);
+                                procdown, request_to_fill_y);
       communicator.send_receive(procup, requested_objs_z[procup],
-				procdown, request_to_fill_z);
+                                procdown, request_to_fill_z);
 
       // Find the local id of each requested object
       std::vector<dof_id_type> request_to_fill_id(request_to_fill_x.size());
@@ -220,7 +220,7 @@ void sync_dofobject_data_by_xyz(const Communicator&      communicator,
       // Trade back the results
       std::vector<typename SyncFunctor::datum> received_data;
       communicator.send_receive(procdown, data,
-				procup, received_data);
+                                procup, received_data);
       libmesh_assert_equal_to (requested_objs_x[procup].size(),
                                received_data.size());
 
@@ -234,7 +234,7 @@ void sync_dofobject_data_by_xyz(const Communicator&      communicator,
 template <typename Iterator,
           typename SyncFunctor>
 void sync_dofobject_data_by_id(const Communicator& communicator,
-			       const Iterator& range_begin,
+                               const Iterator& range_begin,
                                const Iterator& range_end,
                                SyncFunctor&    sync)
 {
@@ -282,14 +282,14 @@ void sync_dofobject_data_by_id(const Communicator& communicator,
       // Trade my requests with processor procup and procdown
       const processor_id_type procup =
         libmesh_cast_int<processor_id_type>
-	  (communicator.rank() + p) % communicator.size();
+        (communicator.rank() + p) % communicator.size();
       const processor_id_type procdown =
         libmesh_cast_int<processor_id_type>
-	  ((communicator.size() + communicator.rank() - p) %
+        ((communicator.size() + communicator.rank() - p) %
            communicator.size());
       std::vector<dof_id_type> request_to_fill_id;
       communicator.send_receive(procup, requested_objs_id[procup],
-				procdown, request_to_fill_id);
+                                procdown, request_to_fill_id);
 
       // Gather whatever data the user wants
       std::vector<typename SyncFunctor::datum> data;
@@ -367,8 +367,8 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
       requested_objs_id[obj_procid].push_back(elem->id());
       requested_objs_parent_id[obj_procid].push_back(parent->id());
       requested_objs_child_num[obj_procid].push_back
-	(libmesh_cast_int<unsigned char>
-	  (parent->which_child_am_i(elem)));
+        (libmesh_cast_int<unsigned char>
+         (parent->which_child_am_i(elem)));
     }
 
   // Trade requests with other processors
@@ -377,23 +377,23 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
       // Trade my requests with processor procup and procdown
       const processor_id_type procup =
         libmesh_cast_int<processor_id_type>
-	  (communicator.rank() + p) % communicator.size();
+        (communicator.rank() + p) % communicator.size();
       const processor_id_type procdown =
         libmesh_cast_int<processor_id_type>
-	  ((communicator.size() + communicator.rank() - p) %
+        ((communicator.size() + communicator.rank() - p) %
            communicator.size());
       std::vector<dof_id_type>   request_to_fill_parent_id;
       std::vector<unsigned char> request_to_fill_child_num;
       communicator.send_receive(procup, requested_objs_parent_id[procup],
-				procdown, request_to_fill_parent_id);
+                                procdown, request_to_fill_parent_id);
       communicator.send_receive(procup, requested_objs_child_num[procup],
-				procdown, request_to_fill_child_num);
+                                procdown, request_to_fill_child_num);
 
       // Find the id of each requested element
       std::size_t request_size = request_to_fill_parent_id.size();
       std::vector<dof_id_type> request_to_fill_id(request_size);
       for (std::size_t i=0; i != request_size; ++i)
-	{
+        {
           Elem *parent = mesh.elem(request_to_fill_parent_id[i]);
           libmesh_assert(parent);
           libmesh_assert(parent->has_children());
@@ -401,7 +401,7 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
           libmesh_assert(child);
           libmesh_assert(child->active());
           request_to_fill_id[i] = child->id();
-	}
+        }
 
       // Gather whatever data the user wants
       std::vector<typename SyncFunctor::datum> data;
@@ -410,9 +410,9 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
       // Trade back the results
       std::vector<typename SyncFunctor::datum> received_data;
       communicator.send_receive(procdown, data,
-				procup, received_data);
+                                procup, received_data);
       libmesh_assert_equal_to (requested_objs_id[procup].size(),
-			       received_data.size());
+                               received_data.size());
 
       // Let the user process the results
       sync.act_on_data(requested_objs_id[procup], received_data);

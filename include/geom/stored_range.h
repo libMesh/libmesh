@@ -77,8 +77,8 @@ public:
    * execution.
    */
   StoredRange (const iterator_type &first,
-	       const iterator_type &last,
-	       const unsigned int new_grainsize = 1000) :
+               const iterator_type &last,
+               const unsigned int new_grainsize = 1000) :
     _end(),
     _begin(),
     _last(),
@@ -181,7 +181,7 @@ public:
    */
   StoredRange<iterator_type, object_type> &
   reset (const iterator_type &first,
-	 const iterator_type &last)
+         const iterator_type &last)
   {
     _objs.clear();
 

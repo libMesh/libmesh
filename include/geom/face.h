@@ -49,8 +49,8 @@ public:
    * nodes and neighbors for which storage will be allocated.
    */
   Face (const unsigned int nn,
-	const unsigned int ns,
-	Elem* p,
+        const unsigned int ns,
+        Elem* p,
         Elem** elemlinkdata,
         Node** nodelinkdata) :
     Elem(nn, ns, p, elemlinkdata, nodelinkdata) {}
@@ -76,7 +76,7 @@ public:
    * is_edge_on_side is trivial in 2D
    */
   virtual bool is_edge_on_side(const unsigned int e,
-			       const unsigned int s) const
+                               const unsigned int s) const
     { return (e == s); }
 
 //   /**

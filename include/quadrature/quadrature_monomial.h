@@ -70,7 +70,7 @@ class QMonomial : public QBase
    * Constructor.  Declares the order of the quadrature rule.
    */
   QMonomial (const unsigned int _dim,
-	     const Order _order=INVALID_ORDER);
+             const Order _order=INVALID_ORDER);
 
   /**
    * Destructor.
@@ -86,7 +86,7 @@ class QMonomial : public QBase
  private:
 
   void init_1D (const ElemType,
-		unsigned int =0)
+                unsigned int =0)
   {
     // See about making this non-pure virtual in the base class?
     libmesh_error();
@@ -96,13 +96,13 @@ class QMonomial : public QBase
    * More efficient rules for QUADs
    */
   void init_2D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
 
   /**
    * More efficient rules for HEXes
    */
   void init_3D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
 
 
 
@@ -119,7 +119,7 @@ class QMonomial : public QBase
    * (1986), 676--685.
   */
   void wissmann_rule(const Real rule_data[][3],
-		     const unsigned int n_pts);
+                     const unsigned int n_pts);
 
   /**
    * Stroud's rules for QUADs and HEXes can have one of several
@@ -142,8 +142,8 @@ class QMonomial : public QBase
    * quadrature rules and later authors certainly built upon his work.
    */
   void stroud_rule(const Real rule_data[][3],
-		   const unsigned int* rule_symmetry,
-		   const unsigned int n_pts);
+                   const unsigned int* rule_symmetry,
+                   const unsigned int n_pts);
 
   /**
    * Rules from Kim and Song, Comm. Korean Math. Soc vol. 13, no. 4, 1998, pp. 913-931.
@@ -183,8 +183,8 @@ class QMonomial : public QBase
    * the unique permutations of G^{rot} were computed by me [JWP] using Maple.
    */
   void kim_rule(const Real rule_data[][4],
-		const unsigned int* rule_id,
-		const unsigned int n_pts);
+                const unsigned int* rule_id,
+                const unsigned int n_pts);
 };
 
 

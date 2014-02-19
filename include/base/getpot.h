@@ -668,7 +668,7 @@ GetPot::GetPot() :
 
 inline
 GetPot::GetPot(const int argc_, const char * const * argv_,
-	       const char* FieldSeparator /* =0x0 */) :
+               const char* FieldSeparator /* =0x0 */) :
   // leave 'char**' non-const to honor less capable compilers ...
   prefix(),
   section(),
@@ -729,8 +729,8 @@ GetPot::parse_command_line(const int argc_, const char * const * argv_,
 
 inline
 GetPot::GetPot(const char* FileName,
-	       const char* CommentStart  /* = 0x0 */, const char* CommentEnd /* = 0x0 */,
-	       const char* FieldSeparator/* = 0x0 */) :
+               const char* CommentStart  /* = 0x0 */, const char* CommentEnd /* = 0x0 */,
+               const char* FieldSeparator/* = 0x0 */) :
   prefix(),
   section(),
   section_list(),
@@ -1104,7 +1104,7 @@ GetPot::_read_in_stream(std::istream& istr)
       const std::string Token = _get_next_token(istr);
       // Allow 'keyword =' to parse with an empty string as value.
       // Only break at EOF.
-      // 	if (Token.length() == 0 || Token[0] == EOF) break;
+      // if (Token.length() == 0 || Token[0] == EOF) break;
       if (Token[0] == EOF)
         break;
       brute_tokens.push_back(Token);
@@ -1191,8 +1191,8 @@ GetPot::_skip_whitespace(std::istream& istr)
           }
 
         // RHS: Why is this here?  It breaks on empty comments
-        //	    tmp = istr.get();
-        //	    if (!istr) { istr.unget(); return; }
+        //    tmp = istr.get();
+        //    if (!istr) { istr.unget(); return; }
       }
     // 'tmp' contains last character of _comment_starter
 
@@ -2322,7 +2322,7 @@ GetPot::_record_variable_request(const std::string& Name) const
 //     arguments => append an argument in the argument vector that reflects the addition
 inline void
 GetPot::_set_variable(const std::string& VarName,
-		      const std::string& Value, const bool Requested /* = true */)
+                      const std::string& Value, const bool Requested /* = true */)
 {
   const GetPot::variable* Var = Requested ?
     _request_variable(VarName.c_str()) :
@@ -3177,7 +3177,7 @@ GetPot::_search_string_vector(const STRING_VECTOR& VecStr, const std::string& St
 
 inline STRING_VECTOR
 GetPot::unidentified_arguments(unsigned Number,
-			       const char* KnownArgument1, ...) const
+                               const char* KnownArgument1, ...) const
 {
   std::set<std::string> known_arguments;
 
@@ -3239,7 +3239,7 @@ GetPot::unidentified_arguments(const std::set<std::string>& Knowns) const
 
 inline STRING_VECTOR
 GetPot::unidentified_options(unsigned Number,
-			     const char* KnownOption1, ...) const
+                             const char* KnownOption1, ...) const
 {
   std::set<std::string> known_options;
 
@@ -3379,7 +3379,7 @@ GetPot::unidentified_flags(const char* KnownFlagList, int ArgumentNumber=-1) con
 
 inline STRING_VECTOR
 GetPot::unidentified_variables(unsigned Number,
-			       const char* KnownVariable1, ...) const
+                               const char* KnownVariable1, ...) const
 {
   std::set<std::string> known_variables;
 
@@ -3440,7 +3440,7 @@ GetPot::unidentified_variables() const
 
 inline STRING_VECTOR
 GetPot::unidentified_sections(unsigned Number,
-			      const char* KnownSection1, ...) const
+                              const char* KnownSection1, ...) const
 {
   std::set<std::string> known_sections;
 

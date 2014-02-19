@@ -265,7 +265,7 @@ public:
    */
   template<typename OutputType>
   void interior_values(unsigned int var, const NumericVector<Number> & _system_vector,
-		       std::vector<OutputType>& interior_values_vector) const;
+                       std::vector<OutputType>& interior_values_vector) const;
 
   /**
    * Returns the value of the solution variable \p var at the quadrature
@@ -281,7 +281,7 @@ public:
    */
   template<typename OutputType>
   void side_values(unsigned int var, const NumericVector<Number> & _system_vector,
-		   std::vector<OutputType>& side_values_vector) const;
+                   std::vector<OutputType>& side_values_vector) const;
 
   /**
    * Returns the value of the solution variable \p var at the physical
@@ -297,7 +297,7 @@ public:
    */
   template<typename OutputType>
   void interior_gradient(unsigned int var, unsigned int qp,
-			 OutputType& du) const;
+                         OutputType& du) const;
 
   /**
    * Fills a vector with the gradient of the solution variable \p var at all the quadrature
@@ -305,7 +305,7 @@ public:
    */
   template<typename OutputType>
   void interior_gradients(unsigned int var, const NumericVector<Number> & _system_vector,
-			  std::vector<OutputType>& interior_gradients_vector) const;
+                          std::vector<OutputType>& interior_gradients_vector) const;
 
   /**
    * Returns the gradient of the solution variable \p var at the quadrature
@@ -313,7 +313,7 @@ public:
    */
   template<typename OutputType>
   void side_gradient(unsigned int var, unsigned int qp,
-		     OutputType & du) const;
+                     OutputType & du) const;
 
   /**
    * Fills a vector with the gradient of the solution variable \p var at all the quadrature
@@ -321,7 +321,7 @@ public:
    */
   template<typename OutputType>
   void side_gradients(unsigned int var, const NumericVector<Number> & _system_vector,
-		      std::vector<OutputType>& side_gradients_vector) const;
+                      std::vector<OutputType>& side_gradients_vector) const;
 
    /**
    * Returns the gradient of the solution variable \p var at the physical
@@ -329,7 +329,7 @@ public:
    */
   template<typename OutputType>
   void point_gradient(unsigned int var, const Point &p,
-		      OutputType& grad_u) const;
+                      OutputType& grad_u) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -338,7 +338,7 @@ public:
    */
   template<typename OutputType>
   void interior_hessian(unsigned int var, unsigned int qp,
-			OutputType& d2u) const;
+                        OutputType& d2u) const;
 
   /**
    * Fills a vector of hessians of the _system_vector at the all the
@@ -347,7 +347,7 @@ public:
    */
   template<typename OutputType>
   void interior_hessians(unsigned int var, const NumericVector<Number> & _system_vector,
-		         std::vector<OutputType>& d2u_vals) const;
+                         std::vector<OutputType>& d2u_vals) const;
 
   /**
    * Returns the hessian of the solution variable \p var at the quadrature
@@ -355,7 +355,7 @@ public:
    */
   template<typename OutputType>
   void side_hessian(unsigned int var, unsigned int qp,
-		    OutputType& d2u) const;
+                    OutputType& d2u) const;
 
   /**
    * Fills a vector of hessians of the _system_vector at the all the
@@ -364,7 +364,7 @@ public:
    */
   template<typename OutputType>
   void side_hessians(unsigned int var, const NumericVector<Number> & _system_vector,
-		     std::vector<OutputType>& d2u_vals) const;
+                     std::vector<OutputType>& d2u_vals) const;
 
   /**
    * Returns the hessian of the solution variable \p var at the physical
@@ -372,7 +372,7 @@ public:
    */
   template<typename OutputType>
   void point_hessian(unsigned int var, const Point &p,
-		     OutputType& hess_u) const;
+                     OutputType& hess_u) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -406,7 +406,7 @@ public:
    */
   template<typename OutputType>
   void fixed_interior_gradient(unsigned int var, unsigned int qp,
-			       OutputType& grad_u) const;
+                               OutputType& grad_u) const;
 
   /**
    * Returns the gradient of the fixed_solution variable \p var at the quadrature
@@ -414,7 +414,7 @@ public:
    */
   template<typename OutputType>
   void fixed_side_gradient(unsigned int var, unsigned int qp,
-			   OutputType& grad_u) const;
+                           OutputType& grad_u) const;
 
   /**
    * Returns the gradient of the fixed_solution variable \p var at the physical
@@ -422,7 +422,7 @@ public:
    */
   template<typename OutputType>
   void fixed_point_gradient(unsigned int var, const Point &p,
-			    OutputType& grad_u) const;
+                            OutputType& grad_u) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -431,7 +431,7 @@ public:
    */
   template<typename OutputType>
   void fixed_interior_hessian(unsigned int var, unsigned int qp,
-			      OutputType& hess_u) const;
+                              OutputType& hess_u) const;
 
   /**
    * Returns the hessian of the fixed_solution variable \p var at the quadrature
@@ -439,7 +439,7 @@ public:
    */
   template<typename OutputType>
   void fixed_side_hessian(unsigned int var, unsigned int qp,
-			  OutputType& hess_u) const;
+                          OutputType& hess_u) const;
 
   /**
    * Returns the hessian of the fixed_solution variable \p var at the physical
@@ -447,7 +447,7 @@ public:
    */
   template<typename OutputType>
   void fixed_point_hessian(unsigned int var, const Point &p,
-			   OutputType& hess_u) const;
+                           OutputType& hess_u) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -457,7 +457,7 @@ public:
    */
   template<typename OutputType>
   void interior_curl(unsigned int var, unsigned int qp,
-		     OutputType& curl_u) const;
+                     OutputType& curl_u) const;
 
   /**
    * Returns the curl of the solution variable \p var at the physical
@@ -465,7 +465,7 @@ public:
    */
   template<typename OutputType>
   void point_curl(unsigned int var, const Point &p,
-		  OutputType& curl_u) const;
+                  OutputType& curl_u) const;
 
   /**
    * Returns the divergence of the solution variable \p var at the physical
@@ -473,7 +473,7 @@ public:
    */
   template<typename OutputType>
   void interior_div(unsigned int var, unsigned int qp,
-		    OutputType& div_u) const;
+                    OutputType& div_u) const;
 
   /**
    * Reinitialize all my FEM context data on a given

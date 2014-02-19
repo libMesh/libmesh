@@ -65,14 +65,14 @@ public:
    */
   explicit
   NumericVector (const Parallel::Communicator &comm_in,
-		 const ParallelType ptype = AUTOMATIC);
+                 const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   NumericVector (const Parallel::Communicator &comm_in,
-		 const numeric_index_type n,
+                 const numeric_index_type n,
                  const ParallelType ptype = AUTOMATIC);
 
   /**
@@ -80,8 +80,8 @@ public:
    * to \p n, and initialize all elements with zero.
    */
   NumericVector (const Parallel::Communicator &comm_in,
-		 const numeric_index_type n,
-		 const numeric_index_type n_local,
+                 const numeric_index_type n,
+                 const numeric_index_type n_local,
                  const ParallelType ptype = AUTOMATIC);
 
   /**
@@ -90,9 +90,9 @@ public:
    * indices specified by the \p ghost argument.
    */
   NumericVector (const Parallel::Communicator &comm_in,
-		 const numeric_index_type N,
-		 const numeric_index_type n_local,
-		 const std::vector<numeric_index_type>& ghost,
+                 const numeric_index_type N,
+                 const numeric_index_type n_local,
+                 const std::vector<numeric_index_type>& ghost,
                  const ParallelType ptype = AUTOMATIC);
 
 public:
@@ -110,7 +110,7 @@ public:
    */
   static AutoPtr<NumericVector<T> >
   build(const Parallel::Communicator &comm,
-	const SolverPackage solver_package = libMesh::default_solver_package());
+        const SolverPackage solver_package = libMesh::default_solver_package());
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
@@ -188,15 +188,15 @@ public:
    */
 
   virtual void init (const numeric_index_type,
-		     const numeric_index_type,
-		     const bool = false,
+                     const numeric_index_type,
+                     const bool = false,
                      const ParallelType = AUTOMATIC) = 0;
 
   /**
    * call init with n_local = N,
    */
   virtual void init (const numeric_index_type,
-		     const bool = false,
+                     const bool = false,
                      const ParallelType = AUTOMATIC) = 0;
 
   /**
@@ -204,9 +204,9 @@ public:
    * in the \p ghost argument.
    */
   virtual void init (const numeric_index_type /*N*/,
-		     const numeric_index_type /*n_local*/,
-		     const std::vector<numeric_index_type>& /*ghost*/,
-		     const bool /*fast*/ = false,
+                     const numeric_index_type /*n_local*/,
+                     const std::vector<numeric_index_type>& /*ghost*/,
+                     const bool /*fast*/ = false,
                      const ParallelType = AUTOMATIC) = 0;
 
   /**
@@ -426,7 +426,7 @@ public:
    * want to specify WHERE to add it
    */
   virtual void add_vector (const std::vector<T>& v,
-			   const std::vector<numeric_index_type>& dof_indices) = 0;
+                           const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$U+=V\f$, where U and V are type
@@ -435,21 +435,21 @@ public:
    * the NumericVector<T> V
    */
   virtual void add_vector (const NumericVector<T>& V,
-			   const std::vector<numeric_index_type>& dof_indices) = 0;
+                           const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$U+=A*V\f$, add the product of a \p SparseMatrix \p A
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
   virtual void add_vector (const NumericVector<T>&,
-			   const SparseMatrix<T>&) = 0;
+                           const SparseMatrix<T>&) = 0;
 
   /**
    * \f$U+=A*V\f$, add the product of a \p ShellMatrix \p A
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
   void add_vector (const NumericVector<T>& v,
-		   const ShellMatrix<T>& a);
+                   const ShellMatrix<T>& a);
 
   /**
    * \f$ U+=V \f$ where U and V are type
@@ -458,21 +458,21 @@ public:
    * the DenseVector<T> V
    */
   virtual void add_vector (const DenseVector<T>& V,
-			   const std::vector<numeric_index_type>& dof_indices) = 0;
+                           const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$U+=A^T*V\f$, add the product of the transpose of a \p SparseMatrix \p A_trans
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
   virtual void add_vector_transpose (const NumericVector<T>&,
-			             const SparseMatrix<T>&) = 0;
+                                     const SparseMatrix<T>&) = 0;
 
   /**
    * \f$ U=v \f$ where v is a \p std::vector<T>
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
-		       const std::vector<numeric_index_type>& dof_indices) = 0;
+                       const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$U=V\f$, where U and V are type
@@ -481,7 +481,7 @@ public:
    * the NumericVector<T> V
    */
   virtual void insert (const NumericVector<T>& V,
-		       const std::vector<numeric_index_type>& dof_indices) = 0;
+                       const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$ U=V \f$ where U and V are type
@@ -490,7 +490,7 @@ public:
    * the DenseVector<T> V
    */
   virtual void insert (const DenseVector<T>& V,
-		       const std::vector<numeric_index_type>& dof_indices) = 0;
+                       const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$ U=V \f$ where V is a
@@ -498,7 +498,7 @@ public:
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseSubVector<T>& V,
-		       const std::vector<numeric_index_type>& dof_indices) = 0;
+                       const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * Scale each element of the
@@ -535,15 +535,15 @@ public:
    * defined by the \p send_list.
    */
   virtual void localize (NumericVector<T>& v_local,
-			 const std::vector<numeric_index_type>& send_list) const = 0;
+                         const std::vector<numeric_index_type>& send_list) const = 0;
 
   /**
    * Updates a local vector with selected values from neighboring
    * processors, as defined by \p send_list.
    */
   virtual void localize (const numeric_index_type first_local_idx,
-			 const numeric_index_type last_local_idx,
-			 const std::vector<numeric_index_type>& send_list) = 0;
+                         const numeric_index_type last_local_idx,
+                         const std::vector<numeric_index_type>& send_list) = 0;
 
   /**
    * Creates a local copy of the global vector in
@@ -552,7 +552,7 @@ public:
    * is useful for outputting data from one processor.
    */
   virtual void localize_to_one (std::vector<T>& v_local,
-				const processor_id_type proc_id=0) const = 0;
+                                const processor_id_type proc_id=0) const = 0;
 
   /**
    * @returns \p -1 when \p this is equivalent to \p other_vector,
@@ -563,7 +563,7 @@ public:
    * is used.
    */
   virtual int compare (const NumericVector<T> &other_vector,
-		       const Real threshold = TOLERANCE) const;
+                       const Real threshold = TOLERANCE) const;
 
   /**
    * @returns \p -1 when \p this is equivalent to \p other_vector,
@@ -592,7 +592,7 @@ public:
    * and \p vec2 and stores the result in \p *this.
    */
   virtual void pointwise_mult (const NumericVector<T>& vec1,
-			       const NumericVector<T>& vec2) = 0;
+                               const NumericVector<T>& vec2) = 0;
 
   /**
    * Prints the local contents of the vector, by default to
@@ -635,7 +635,7 @@ public:
    * PetscVectors.
    */
   virtual void create_subvector(NumericVector<T>& ,
-				const std::vector<numeric_index_type>& ) const
+                                const std::vector<numeric_index_type>& ) const
   {
     libMesh::err << "ERROR: Not Implemented in base class yet!" << std::endl;
     libmesh_error();
@@ -676,7 +676,7 @@ protected:
 template <typename T>
 inline
 NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
-				 const ParallelType ptype) :
+                                 const ParallelType ptype) :
   ParallelObject(comm_in),
   _is_closed(false),
   _is_initialized(false),
@@ -689,7 +689,7 @@ NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
 template <typename T>
 inline
 NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
-				 const numeric_index_type /*n*/,
+                                 const numeric_index_type /*n*/,
                                  const ParallelType ptype) :
   ParallelObject(comm_in),
   _is_closed(false),
@@ -705,8 +705,8 @@ NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
 template <typename T>
 inline
 NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
-				 const numeric_index_type /*n*/,
-				 const numeric_index_type /*n_local*/,
+                                 const numeric_index_type /*n*/,
+                                 const numeric_index_type /*n_local*/,
                                  const ParallelType ptype) :
   ParallelObject(comm_in),
   _is_closed(false),
@@ -722,9 +722,9 @@ NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
 template <typename T>
 inline
 NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
-				 const numeric_index_type /*n*/,
-				 const numeric_index_type /*n_local*/,
-				 const std::vector<numeric_index_type>& /*ghost*/,
+                                 const numeric_index_type /*n*/,
+                                 const numeric_index_type /*n_local*/,
+                                 const std::vector<numeric_index_type>& /*ghost*/,
                                  const ParallelType ptype) :
   ParallelObject(comm_in),
   _is_closed(false),

@@ -51,7 +51,7 @@ class Edge : public Elem
    * parent. Derived classes implement 'true' elements.
    */
   Edge (const unsigned int nn,
-	Elem* p,
+        Elem* p,
         Node** nodelinkdata) :
     Elem(nn, Edge::n_sides(), p, _elemlinks_data, nodelinkdata) {}
 
@@ -95,13 +95,13 @@ class Edge : public Elem
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-			        const unsigned int s) const;
+                                const unsigned int s) const;
 
   /*
    * @returns true iff the specified edge is on the specified side
    */
   virtual bool is_edge_on_side(const unsigned int,
-			       const unsigned int) const
+                               const unsigned int) const
     { return false; }
 
   /*
@@ -142,7 +142,7 @@ class Edge : public Elem
    * an auto pointer to a NodeElem for the specified node.
    */
   AutoPtr<Elem> build_side (const unsigned int i,
-			    bool proxy) const;
+                            bool proxy) const;
 
   /**
    * The \p Elem::build_edge() member makes no sense for edges.
@@ -165,7 +165,7 @@ class Edge : public Elem
    * Matrix that allows children to inherit boundary conditions.
    */
   unsigned int side_children_matrix (const unsigned int,
-				     const unsigned int) const
+                                     const unsigned int) const
   { libmesh_error(); return 0; }
 
 #endif

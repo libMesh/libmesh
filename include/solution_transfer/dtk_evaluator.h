@@ -43,7 +43,7 @@ namespace libMesh {
 class DTKEvaluator : public DataTransferKit::FieldEvaluator<int,DataTransferKit::FieldContainer<double> >
 {
 public:
-  typedef DataTransferKit::MeshContainer<int>	      MeshContainerType;
+  typedef DataTransferKit::MeshContainer<int>      MeshContainerType;
   typedef DataTransferKit::FieldContainer<Number>     FieldContainerType;
 
   DTKEvaluator(System & in_sys, std::string var_name);

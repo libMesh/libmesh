@@ -33,7 +33,7 @@ class MeshfreeSolutionTransfer : public SolutionTransfer
 {
 public:
   MeshfreeSolutionTransfer(const libMesh::Parallel::Communicator &comm
-			   LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
+                           LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
     SolutionTransfer(comm)
   {}
 

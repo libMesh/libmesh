@@ -385,9 +385,9 @@ void Parameters::print (std::ostream& os) const
     {
       os << " "   << it->first
 #ifdef LIBMESH_HAVE_RTTI
-	 << "\t " << it->second->type()
+         << "\t " << it->second->type()
 #endif // LIBMESH_HAVE_RTTI
-	 << "\t ";   it->second->print(os);
+         << "\t ";   it->second->print(os);
       os << '\n';
 
       ++it;
@@ -437,9 +437,9 @@ const T& Parameters::get (const std::string& name) const
 #ifdef LIBMESH_HAVE_RTTI
                    << ' ' << demangle(typeid(T).name())
 #endif // LIBMESH_HAVE_RTTI
-		    << " parameter named \""
-		    << name << "\":" << std::endl
-		    << *this;
+                   << " parameter named \""
+                   << name << "\":" << std::endl
+                   << *this;
 
       libmesh_error();
     }

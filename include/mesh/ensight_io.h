@@ -56,19 +56,19 @@ class EnsightIO : public MeshOutput<MeshBase>
    * Note that u and v should be the same variables defined in the system.
    */
   void add_vector (const std::string &system, const std::string &vec_description,
-		   const std::string &u, const std::string &v);
+                   const std::string &u, const std::string &v);
 
   /**
    * add 3D vector: tell the EnsightIO interface that the variables u, v and w are vector components
    */
   void add_vector (const std::string &system, const std::string &vec_description,
-		   const std::string &u, const std::string &v, const std::string &w);
+                   const std::string &u, const std::string &v, const std::string &w);
 
   /**
    * add scalar: tell the EnsightIO interface that the variable s is a scalar
    */
   void add_scalar (const std::string &system, const std::string &scalar_description,
-		   const std::string &s);
+                   const std::string &s);
 
   /**
    * write solution

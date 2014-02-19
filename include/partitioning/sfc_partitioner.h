@@ -73,7 +73,7 @@ protected:
    * Partition the \p MeshBase into \p n subdomains.
    */
   virtual void _do_partition (MeshBase& mesh,
-			      const unsigned int n);
+                              const unsigned int n);
 
 
 private:
@@ -94,7 +94,7 @@ inline
 void SFCPartitioner::set_sfc_type (const std::string& sfc_type)
 {
   libmesh_assert ((sfc_type == "Hilbert") ||
-	  (sfc_type == "Morton"));
+                  (sfc_type == "Morton"));
 
   _sfc_type = sfc_type;
 }

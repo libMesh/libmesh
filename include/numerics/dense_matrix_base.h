@@ -52,7 +52,7 @@ protected:
    * Protected so that there is no way the user can create one.
    */
   DenseMatrixBase(const unsigned int new_m=0,
-		  const unsigned int new_n=0) : _m(new_m), _n(new_n) {}
+                  const unsigned int new_n=0) : _m(new_m), _n(new_n) {}
 
 public:
   /**
@@ -73,7 +73,7 @@ public:
    * must redefine this function.
    */
   virtual T el(const unsigned int i,
-	       const unsigned int j) const = 0;
+               const unsigned int j) const = 0;
 
   /**
    * @returns the \p (i,j) element of the matrix as a writeable reference.
@@ -81,7 +81,7 @@ public:
    * must redefine this function.
    */
   virtual T & el(const unsigned int i,
-		 const unsigned int j) = 0;
+                 const unsigned int j) = 0;
 
   /**
    * Performs the operation: (*this) <- M2 * (*this)
@@ -145,8 +145,8 @@ protected:
    * M3 = (p x n)
    */
   void multiply (DenseMatrixBase<T>& M1,
-		 const DenseMatrixBase<T>& M2,
-		 const DenseMatrixBase<T>& M3);
+                 const DenseMatrixBase<T>& M2,
+                 const DenseMatrixBase<T>& M3);
 
   /**
    * Condense-out the \p (i,j) entry of the matrix, forcing
@@ -155,9 +155,9 @@ protected:
    * symmetry of the matrix.
    */
   void condense(const unsigned int i,
-		const unsigned int j,
-		const T val,
-		DenseVectorBase<T>& rhs);
+                const unsigned int j,
+                const T val,
+                DenseVectorBase<T>& rhs);
 
   /**
    * The row dimension.
@@ -182,7 +182,7 @@ inline
 typename boostcopy::enable_if_c<
   ScalarTraits<T2>::value, void >::type
 DenseMatrixBase<T>::add (const T2 factor,
-			 const DenseMatrixBase<T3>& mat)
+                         const DenseMatrixBase<T3>& mat)
 {
   libmesh_assert_equal_to (this->m(), mat.m());
   libmesh_assert_equal_to (this->n(), mat.n());

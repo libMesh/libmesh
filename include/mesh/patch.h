@@ -111,8 +111,8 @@ public:
    * until the patch has no more local neighbors.
    */
   void build_around_element(const Elem* elem,
-			    const unsigned int target_patch_size = 10,
-			    PMF patchtype = &Patch::add_local_face_neighbors);
+                            const unsigned int target_patch_size = 10,
+                            PMF patchtype = &Patch::add_local_face_neighbors);
 
 protected:
 

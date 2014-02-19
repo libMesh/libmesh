@@ -51,8 +51,8 @@ class Nemesis_IO_Helper;
 // ------------------------------------------------------------
 // Nemesis_IO class definition
   class Nemesis_IO : public MeshInput<MeshBase>,
-		     public MeshOutput<MeshBase>,
-		     public ParallelObject
+  public MeshOutput<MeshBase>,
+  public ParallelObject
 {
 
  public:

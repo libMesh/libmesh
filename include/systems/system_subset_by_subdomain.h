@@ -45,7 +45,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // SystemSubset class definition
 class SystemSubsetBySubdomain : public SystemSubset,
-				public ParallelObject
+    public ParallelObject
 {
 public:
 
@@ -127,8 +127,8 @@ public:
    * subset, no matter what elements they belong to.
    */
   SystemSubsetBySubdomain (const System& system,
-			   const SubdomainSelection& subdomain_selection,
-			   const std::set<unsigned int>* const var_nums = NULL);
+                           const SubdomainSelection& subdomain_selection,
+                           const std::set<unsigned int>* const var_nums = NULL);
 
   /**
    * Constructor.  The subset will consist of those dofs which are
@@ -139,8 +139,8 @@ public:
    * subset, no matter what elements they belong to.
    */
   SystemSubsetBySubdomain (const System& system,
-			   const std::set<subdomain_id_type>& subdomain_ids,
-			   const std::set<unsigned int>* const var_nums = NULL);
+                           const std::set<subdomain_id_type>& subdomain_ids,
+                           const std::set<unsigned int>* const var_nums = NULL);
 
   /**
    * Destructor.

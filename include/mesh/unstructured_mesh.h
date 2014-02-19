@@ -59,7 +59,7 @@ class UnstructuredMesh : public MeshBase
    */
   explicit
   UnstructuredMesh (const Parallel::Communicator &comm,
-		    unsigned int dim=1);
+                    unsigned int dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
@@ -89,8 +89,8 @@ class UnstructuredMesh : public MeshBase
    * to disallow renumbering, set \p MeshBase::allow_renumbering(false)
    */
   void read (const std::string& name,
-	     MeshData* mesh_data=NULL,
-	     bool skip_renumber_nodes_and_elements=false);
+             MeshData* mesh_data=NULL,
+             bool skip_renumber_nodes_and_elements=false);
   /**
    * Write the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
@@ -100,15 +100,15 @@ class UnstructuredMesh : public MeshBase
    * using with this mesh, since these write methods expect it.
    */
   void write (const std::string& name,
-	      MeshData* mesh_data=NULL);
+              MeshData* mesh_data=NULL);
 
   /**
    * Write to the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension. Also writes data.
    */
   void write (const std::string& name,
-	      const std::vector<Number>& values,
-	      const std::vector<std::string>& variable_names);
+              const std::vector<Number>& values,
+              const std::vector<std::string>& variable_names);
 
   /**
    * Converts a mesh with higher-order
@@ -138,7 +138,7 @@ class UnstructuredMesh : public MeshBase
    * to the function.
    */
   void create_pid_mesh (UnstructuredMesh& pid_mesh,
-			const processor_id_type pid) const;
+                        const processor_id_type pid) const;
 
   /**
    * Constructs a mesh called "new_mesh" from the current mesh by
@@ -146,8 +146,8 @@ class UnstructuredMesh : public MeshBase
    * them to the new mesh.
    */
   void create_submesh (UnstructuredMesh& new_mesh,
-		       const_element_iterator& it,
-		       const const_element_iterator& it_end) const;
+                       const_element_iterator& it,
+                       const const_element_iterator& it_end) const;
 
 
   /**
@@ -161,7 +161,7 @@ class UnstructuredMesh : public MeshBase
    * Other functions from MeshBase requiring re-definition.
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
-			       const bool reset_current_list    = true);
+                               const bool reset_current_list    = true);
 
 #ifdef LIBMESH_ENABLE_AMR
   /**

@@ -57,7 +57,7 @@ public:
    * where n is the length of the vector.
    */
   Sort (const Parallel::Communicator &comm,
-	std::vector<KeyType>& d);
+        std::vector<KeyType>& d);
 
 
   /**

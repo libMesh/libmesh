@@ -95,9 +95,9 @@ public:
    * \p error_per_cell
    */
   virtual void estimate_error (const System& system,
-			       ErrorVector& error_per_cell,
-			       const NumericVector<Number>* solution_vector = NULL,
-			       bool estimate_parent_error = false);
+                               ErrorVector& error_per_cell,
+                               const NumericVector<Number>* solution_vector = NULL,
+                               bool estimate_parent_error = false);
 
   /**
    * This is an accessor function to access the computed global
@@ -129,10 +129,10 @@ protected:
   /*  *\/ */
   /* virtual void _estimate_error (const EquationSystems *equation_systems, */
   /*                               const System* system, */
-  /* 				ErrorVector* error_per_cell, */
-  /* 			        std::map<std::pair<const System*, unsigned int>, ErrorVector*>* errors_per_cell, */
-  /* 			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL, */
-  /* 				bool estimate_parent_error = false); */
+  /* ErrorVector* error_per_cell, */
+  /*         std::map<std::pair<const System*, unsigned int>, ErrorVector*>* errors_per_cell, */
+  /*         const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL, */
+  /* bool estimate_parent_error = false); */
 
   /**
    * A QoISet to handle cases with multiple QoIs available

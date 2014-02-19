@@ -65,12 +65,12 @@ public:
    * as needed.
    */
   enum ParallelizationStrategy { SYNC_SOURCES     = 0,
-				 INVALID_STRATEGY};
+                                 INVALID_STRATEGY};
   /**
    * Constructor.
    */
   MeshfreeInterpolation (const libMesh::Parallel::Communicator &comm_in
-			 LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
+                         LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
     ParallelObject(comm_in),
     _parallelization_strategy (SYNC_SOURCES)
   {}
@@ -85,7 +85,7 @@ public:
    * Same as above, but allows you to also use stream syntax.
    */
   friend std::ostream& operator << (std::ostream& os,
-				    const MeshfreeInterpolation& mfi);
+                                    const MeshfreeInterpolation& mfi);
 
   /**
    * Clears all internal data structures and restores to a
@@ -128,8 +128,8 @@ public:
    * Sets source data at specified points.
    */
   virtual void add_field_data (const std::vector<std::string> &field_names,
-			       const std::vector<Point>  &pts,
-			       const std::vector<Number> &vals);
+                               const std::vector<Point>  &pts,
+                               const std::vector<Number> &vals);
 
   /**
    * Prepares data structures for use.
@@ -144,8 +144,8 @@ public:
    * Pure virtual, must be overriden in derived classes.
    */
   virtual void interpolate_field_data (const std::vector<std::string> &field_names,
-				       const std::vector<Point>  &tgt_pts,
-				       std::vector<Number> &tgt_vals) const = 0;
+                                       const std::vector<Point>  &tgt_pts,
+                                       std::vector<Number> &tgt_vals) const = 0;
 
 protected:
 
@@ -215,35 +215,35 @@ protected:
       const Point &p2(_pts[idx_p2]);
 
       switch (size)
-	{
-	case 3:
-	  {
-	    const coord_t d0=p1[0] - p2(0);
-	    const coord_t d1=p1[1] - p2(1);
-	    const coord_t d2=p1[2] - p2(2);
+        {
+        case 3:
+          {
+            const coord_t d0=p1[0] - p2(0);
+            const coord_t d1=p1[1] - p2(1);
+            const coord_t d2=p1[2] - p2(2);
 
-	    return d0*d0 + d1*d1 + d2*d2;
-	  }
+            return d0*d0 + d1*d1 + d2*d2;
+          }
 
-	case 2:
-	  {
-	    const coord_t d0=p1[0] - p2(0);
-	    const coord_t d1=p1[1] - p2(1);
+        case 2:
+          {
+            const coord_t d0=p1[0] - p2(0);
+            const coord_t d1=p1[1] - p2(1);
 
-	    return d0*d0 + d1*d1;
-	  }
+            return d0*d0 + d1*d1;
+          }
 
-	case 1:
-	  {
-	    const coord_t d0=p1[0] - p2(0);
+        case 1:
+          {
+            const coord_t d0=p1[0] - p2(0);
 
-	    return d0*d0;
-	  }
+            return d0*d0;
+          }
 
-	default:
-	  libMesh::err << "ERROR: unknown size " << size << std::endl;
-	  libmesh_error();
-	}
+        default:
+          libMesh::err << "ERROR: unknown size " << size << std::endl;
+          libmesh_error();
+        }
 
       return -1.;
     }
@@ -280,13 +280,13 @@ protected:
 
   // template <int KDDIM>
   // class KDTree : public KDTreeSingleIndexAdaptor<L2_Simple_Adaptor<num_t, PointListAdaptor >,
-  // 						 PointListAdaptor,
-  // 						 KDDIM>
+  //  PointListAdaptor,
+  //  KDDIM>
   // {
   // };
 
   typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<Real, PointListAdaptor<KDDim> >,
-					      PointListAdaptor<KDDim>, KDDim> kd_tree_t;
+    PointListAdaptor<KDDim>, KDDim> kd_tree_t;
 
   mutable AutoPtr<kd_tree_t> _kd_tree;
 
@@ -302,9 +302,9 @@ protected:
    * the specified points.
    */
   virtual void interpolate (const Point               &pt,
-			    const std::vector<size_t> &src_indices,
-			    const std::vector<Real>   &src_dist_sqr,
-			    std::vector<Number>::iterator &out_it) const;
+                            const std::vector<size_t> &src_indices,
+                            const std::vector<Real>   &src_dist_sqr,
+                            std::vector<Number>::iterator &out_it) const;
 
   const Real         _half_power;
   const unsigned int _n_interp_pts;
@@ -321,8 +321,8 @@ public:
    * which defaults to 2.
    */
   InverseDistanceInterpolation (const libMesh::Parallel::Communicator &comm,
-				const unsigned int n_interp_pts = 8,
-				const Real  power               = 2) :
+                                const unsigned int n_interp_pts = 8,
+                                const Real  power               = 2) :
     MeshfreeInterpolation(comm),
 #if LIBMESH_HAVE_NANOFLANN
     _point_list_adaptor(_src_pts),
@@ -342,8 +342,8 @@ public:
    * Pure virtual, must be overriden in derived classes.
    */
   virtual void interpolate_field_data (const std::vector<std::string> &field_names,
-				       const std::vector<Point>  &tgt_pts,
-				       std::vector<Number> &tgt_vals) const;
+                                       const std::vector<Point>  &tgt_pts,
+                                       std::vector<Number> &tgt_vals) const;
 
 };
 

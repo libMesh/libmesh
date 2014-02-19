@@ -60,8 +60,8 @@ public:
    * data structures.
    */
   NewmarkSystem (EquationSystems& es,
-		 const std::string& name,
-		 const unsigned int number);
+                 const std::string& name,
+                 const unsigned int number);
 
   /**
    * Destructor.
@@ -130,8 +130,8 @@ public:
    * time integration.
    */
   void set_newmark_parameters (const Real delta_T = _default_timestep,
-			       const Real alpha   = _default_alpha,
-			       const Real delta   = _default_delta);
+                               const Real alpha   = _default_alpha,
+                               const Real delta   = _default_delta);
 
 protected:
 

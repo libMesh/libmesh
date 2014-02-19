@@ -51,7 +51,7 @@ class MeshBase;
 // ------------------------------------------------------------
 // GMVIO class definition
 class GMVIO : public MeshInput<MeshBase>,
-	      public MeshOutput<MeshBase>
+  public MeshOutput<MeshBase>
 {
  public:
 
@@ -92,15 +92,15 @@ class GMVIO : public MeshInput<MeshBase>,
 //    * into the EquationSystems object.
 //    */
 //   virtual void read_mesh_and_nodal_data (const std::string& ,
-// 					 EquationSystems* es=NULL);
+//  EquationSystems* es=NULL);
 
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
    */
   virtual void write_nodal_data (const std::string&,
-				 const std::vector<Number>&,
-				 const std::vector<std::string>&);
+                                 const std::vector<Number>&,
+                                 const std::vector<std::string>&);
 
   /**
    * Flag indicating whether or not to write a binary file.  While binary
@@ -149,8 +149,8 @@ class GMVIO : public MeshInput<MeshBase>,
    * Writes a GMV file with discontinuous data
    */
   void write_discontinuous_gmv (const std::string& name,
-				const EquationSystems& es,
-				const bool write_partitioning) const;
+                                const EquationSystems& es,
+                                const bool write_partitioning) const;
 
 
   /**
@@ -160,8 +160,8 @@ class GMVIO : public MeshInput<MeshBase>,
    * (without subcells).
    */
   void write_ascii_new_impl (const std::string&,
-			     const std::vector<Number>* = NULL,
-			     const std::vector<std::string>* = NULL);
+                             const std::vector<Number>* = NULL,
+                             const std::vector<std::string>* = NULL);
 
   /**
    * Takes a vector of cell-centered data to be plotted.
@@ -175,7 +175,7 @@ class GMVIO : public MeshInput<MeshBase>,
    *    output alphabetically.
    */
   void add_cell_centered_data (const std::string&       cell_centered_data_name,
-			       const std::vector<Real>* cell_centered_data_vals);
+                               const std::vector<Real>* cell_centered_data_vals);
 
   /**
    * If we read in a nodal solution while reading in a mesh, we can attempt
@@ -192,8 +192,8 @@ private:
    * (using subcells) which was the default in libMesh-0.4.3-rc2.
    */
   void write_ascii_old_impl (const std::string&,
-			     const std::vector<Number>* = NULL,
-			     const std::vector<std::string>* = NULL);
+                             const std::vector<Number>* = NULL,
+                             const std::vector<std::string>* = NULL);
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -201,8 +201,8 @@ private:
    * provided.
    */
   void write_binary (const std::string&,
-		     const std::vector<Number>* = NULL,
-		     const std::vector<std::string>* = NULL);
+                     const std::vector<Number>* = NULL,
+                     const std::vector<std::string>* = NULL);
 
   /**
    * Helper function for writing unsigned ints to an ostream in binary format.
@@ -210,7 +210,7 @@ private:
    */
   template <typename T>
   void to_binary_stream(std::ostream& out,
-			const T i);
+                        const T i);
 
   /**
    * Flag to write binary data.
@@ -345,7 +345,7 @@ bool & GMVIO::p_levels()
 
 template <typename T>
 void GMVIO::to_binary_stream(std::ostream& out_str,
-			     const T i)
+                             const T i)
 {
   static char buf[sizeof(T)];
   memcpy(buf, &i, sizeof(T));

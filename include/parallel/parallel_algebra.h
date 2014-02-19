@@ -107,17 +107,17 @@ namespace Parallel {
           MPI_Aint displs, start;
           MPI_Datatype tmptype, type = T_type;
 
-	  MPI_Get_address (ex,   &start);
-	  MPI_Get_address (&((*ex)(0)), &displs);
+          MPI_Get_address (ex,   &start);
+          MPI_Get_address (&((*ex)(0)), &displs);
 
-	  // subtract off offset to first value from the beginning of the structure
-	  displs -= start;
+          // subtract off offset to first value from the beginning of the structure
+          displs -= start;
 
-	  // create a prototype structure
-	  MPI_Type_create_struct (1, &blocklength, &displs, &type, &tmptype);
+          // create a prototype structure
+          MPI_Type_create_struct (1, &blocklength, &displs, &type, &tmptype);
 
-	  // resize the structure type to account for padding, if any
-	  MPI_Type_create_resized (tmptype, 0, sizeof(TypeVector<T>), &_static_type);
+          // resize the structure type to account for padding, if any
+          MPI_Type_create_resized (tmptype, 0, sizeof(TypeVector<T>), &_static_type);
 #endif
 
           MPI_Type_commit (&_static_type);
@@ -186,17 +186,17 @@ namespace Parallel {
           MPI_Aint displs, start;
           MPI_Datatype tmptype, type = T_type;
 
-	  MPI_Get_address (ex,   &start);
-	  MPI_Get_address (&((*ex)(0)), &displs);
+          MPI_Get_address (ex,   &start);
+          MPI_Get_address (&((*ex)(0)), &displs);
 
-	  // subtract off offset to first value from the beginning of the structure
-	  displs -= start;
+          // subtract off offset to first value from the beginning of the structure
+          displs -= start;
 
-	  // create a prototype structure
-	  MPI_Type_create_struct (1, &blocklength, &displs, &type, &tmptype);
+          // create a prototype structure
+          MPI_Type_create_struct (1, &blocklength, &displs, &type, &tmptype);
 
-	  // resize the structure type to account for padding, if any
-	  MPI_Type_create_resized (tmptype, 0, sizeof(VectorValue<T>), &_static_type);
+          // resize the structure type to account for padding, if any
+          MPI_Type_create_resized (tmptype, 0, sizeof(VectorValue<T>), &_static_type);
 #endif
 
           MPI_Type_commit (&_static_type);
@@ -265,17 +265,17 @@ namespace Parallel {
           MPI_Aint displs, start;
           MPI_Datatype tmptype, type = T_type;
 
-	  MPI_Get_address (ex,   &start);
-	  MPI_Get_address (&((*ex)(0)), &displs);
+          MPI_Get_address (ex,   &start);
+          MPI_Get_address (&((*ex)(0)), &displs);
 
-	  // subtract off offset to first value from the beginning of the structure
-	  displs -= start;
+          // subtract off offset to first value from the beginning of the structure
+          displs -= start;
 
-	  // create a prototype structure
-	  MPI_Type_create_struct (1, &blocklength, &displs, &type, &tmptype);
+          // create a prototype structure
+          MPI_Type_create_struct (1, &blocklength, &displs, &type, &tmptype);
 
-	  // resize the structure type to account for padding, if any
-	  MPI_Type_create_resized (tmptype, 0, sizeof(Point), &_static_type);
+          // resize the structure type to account for padding, if any
+          MPI_Type_create_resized (tmptype, 0, sizeof(Point), &_static_type);
 #endif
 
           MPI_Type_commit (&_static_type);

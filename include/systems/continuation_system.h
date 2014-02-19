@@ -62,8 +62,8 @@ public:
    * data structures.
    */
   ContinuationSystem (EquationSystems& es,
-		      const std::string& name,
-		      const unsigned int number);
+                      const std::string& name,
+                      const unsigned int number);
 
   /**
    * Destructor.
@@ -286,7 +286,7 @@ protected:
    *   }
    */
   enum RHS_Mode {Residual,
-		 G_Lambda};
+                 G_Lambda};
 
   RHS_Mode rhs_mode;
 
