@@ -1021,7 +1021,7 @@ void RBConstruction::assemble_all_output_vectors()
     for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
     {
       libMesh::out << "Assembling output vector, (" << (n+1) << "," << (q_l+1)
-                   << ")  of (" << get_rb_theta_expansion().get_n_outputs()
+                   << ") of (" << get_rb_theta_expansion().get_n_outputs()
                    << "," << get_rb_theta_expansion().get_n_output_terms(n) << ")"
                    << std::endl;
       get_output_vector(n, q_l)->zero();
@@ -1038,7 +1038,7 @@ void RBConstruction::assemble_all_output_vectors()
       for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
       {
       libMesh::out << "Assembling non-Dirichlet output vector, (" << (n+1) << "," << (q_l+1)
-                   << ")  of (" << get_rb_theta_expansion().get_n_outputs()
+                   << ") of (" << get_rb_theta_expansion().get_n_outputs()
                    << "," << get_rb_theta_expansion().get_n_output_terms(n) << ")"
                    << std::endl;
         get_non_dirichlet_output_vector(n, q_l)->zero();
