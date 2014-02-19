@@ -75,10 +75,9 @@ int main (int argc, char** argv)
   // Check for proper calling arguments.
   if (argc < 3)
   {
-    if (libMesh::processor_id() == 0)
-      std::cerr << "Usage:\n"
-                <<"\t " << argv[0] << " -n 15"
-                << std::endl;
+    std::cout << "Usage:\n"
+	      <<"\t " << argv[0] << " -n 15"
+	      << std::endl;
     libmesh_error();
   }
   // Brief message to the user regarding the program name
@@ -132,20 +131,20 @@ int main (int argc, char** argv)
   mesh.stitch_meshes(mesh1, 2, 4, TOLERANCE, true, true, false, false);
   mesh2.stitch_meshes(mesh3, 2, 4, TOLERANCE, true, true, false, false);
   mesh.stitch_meshes(mesh2, 1, 3, TOLERANCE, true, true, false, false);
-  mesh4.stitch_meshes(mesh5, 2, 4, TOLERANCE, true, true, false, false); 
+  mesh4.stitch_meshes(mesh5, 2, 4, TOLERANCE, true, true, false, false);
   mesh6.stitch_meshes(mesh7, 2, 4, TOLERANCE, true, true, false, false);
   mesh4.stitch_meshes(mesh6, 1, 3, TOLERANCE, true, true, false, false);
   mesh.stitch_meshes(mesh4, 0, 5, TOLERANCE, true, true, false, false);
   STOP_LOG("Stitching", "main");
-  
+
   START_LOG("Initialize and solve systems", "main");
-  EquationSystems equation_systems_stitch (mesh);  
+  EquationSystems equation_systems_stitch (mesh);
   assemble_and_solve(mesh, equation_systems_stitch);
 
   EquationSystems equation_systems_nostitch (nostitch_mesh);
   assemble_and_solve(nostitch_mesh, equation_systems_nostitch);
   STOP_LOG("Initialize and solve systems", "main");
-  
+
   START_LOG("Result comparison", "main");
   Real error_tol = 1e-10;
   ExactSolution comparison(equation_systems_stitch);
@@ -155,15 +154,15 @@ int main (int argc, char** argv)
   libmesh_assert(error < error_tol);
   libMesh::out << "L2 error between stitched and non-stitched cases: " << error << std::endl;
   STOP_LOG("Result comparison", "main");
-  
+
   START_LOG("Output", "main");
 #ifdef LIBMESH_HAVE_EXODUS_API
   ExodusII_IO(mesh).write_equation_systems(
     "solution_stitch.exo",
-    equation_systems_stitch); 
+    equation_systems_stitch);
   ExodusII_IO(mesh).write_equation_systems(
     "solution_nostitch.exo",
-    equation_systems_nostitch); 
+    equation_systems_nostitch);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   STOP_LOG("Output", "main");
 
@@ -173,7 +172,7 @@ int main (int argc, char** argv)
 void assemble_and_solve(Mesh& mesh, EquationSystems& equation_systems)
 {
   mesh.print_info();
-  
+
   LinearImplicitSystem& system =
     equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
@@ -203,13 +202,13 @@ void assemble_and_solve(Mesh& mesh, EquationSystems& equation_systems)
 
 #ifdef LIBMESH_ENABLE_AMR
   MeshRefinement mesh_refinement(mesh);
-  
+
   mesh_refinement.refine_fraction()  = 0.7;
   mesh_refinement.coarsen_fraction() = 0.3;
   mesh_refinement.max_h_level()      = 5;
-  
+
   const unsigned int max_r_steps = 2;
-  
+
   for(unsigned int r_step=0; r_step<=max_r_steps; r_step++)
   {
     system.solve();
@@ -232,7 +231,7 @@ void assemble_and_solve(Mesh& mesh, EquationSystems& equation_systems)
   }
 #else
     system.solve();
-#endif  
+#endif
 }
 
 void assemble_poisson(EquationSystems& es,
