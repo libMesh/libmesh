@@ -853,8 +853,9 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
       cur_soln[i] = soln[i*num_vars + c];
 
     exio_helper->write_nodal_values(c+1,cur_soln,_timestep);
-  }
 #endif
+  }
+
   STOP_LOG("write_nodal_data_discontinuous()", "ExodusII_IO");
 }
 
