@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <sstream>
 
 #include "libmesh/boundary_info.h"
 #include "libmesh/enum_elem_type.h"
@@ -970,7 +971,7 @@ void ExodusII_IO_Helper::create(std::string filename)
   if ((this->processor_id() == 0) || (!_run_only_on_proc0))
     {
       int comp_ws(0), io_ws(0);
-      
+
       if(_single_precision)
       {
         comp_ws = sizeof(float);
@@ -1164,7 +1165,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
       node_num_map[i] = node->id() + 1;
     }
   }
-  
+
   if(_single_precision)
   {
     std::vector<float> x_single(num_nodes), y_single(num_nodes), z_single(num_nodes);
@@ -1174,7 +1175,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
         y_single[i] = static_cast<float>(y[i]);
         z_single[i] = static_cast<float>(z[i]);
     }
-    
+
     ex_err = exII::ex_put_coord(ex_id,
 			      x_single.empty() ? NULL : &x_single[0],
 			      y_single.empty() ? NULL : &y_single[0],
@@ -1187,7 +1188,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 			      y.empty() ? NULL : &y[0],
 			      z.empty() ? NULL : &z[0]);
   }
-    
+
 
   EX_CHECK_ERR(ex_err, "Error writing coordinates to Exodus file.");
 
@@ -1237,7 +1238,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates_discontinuous(const MeshBase & 
         y_single[i] = static_cast<float>(y[i]);
         z_single[i] = static_cast<float>(z[i]);
     }
-    
+
     ex_err = exII::ex_put_coord(ex_id,
 			      x_single.empty() ? NULL : &x_single[0],
 			      y_single.empty() ? NULL : &y_single[0],
@@ -1826,7 +1827,7 @@ void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Real> 
     {
       cast_values[i] = static_cast<float>(values[i]);
     }
-    ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &cast_values[0]);      
+    ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &cast_values[0]);
   }
   else
   {
@@ -1883,15 +1884,15 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Real> & values, i
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
-    
+
   if(_single_precision)
   {
     unsigned int num_values = values.size();
     std::vector<float> cast_values(num_values);
-    
+
     for(unsigned int i(0); i < num_values; ++i)
       cast_values[i] = static_cast<float>(values[i]);
-    
+
     ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_global_vars, &cast_values[0]);
   }
   else
@@ -1921,9 +1922,9 @@ std::vector<std::string> ExodusII_IO_Helper::get_complex_names(const std::vector
 {
   std::vector<std::string>::const_iterator names_it = names.begin();
   std::vector<std::string>::const_iterator names_end = names.end();
-  
+
   std::vector<std::string> complex_names;
-  
+
   // This will loop over all names and create new "complex" names
   // (i.e. names that start with r_, i_ or a_
   for(; names_it != names_end; ++names_it)
@@ -1933,13 +1934,13 @@ std::vector<std::string> ExodusII_IO_Helper::get_complex_names(const std::vector
     name_real << "r_" << *names_it;
     name_imag << "i_" << *names_it;
     name_abs << "a_" << *names_it;
-    
+
     complex_names.push_back(name_real.str());
     complex_names.push_back(name_imag.str());
     complex_names.push_back(name_abs.str());
   }
-  
-  return complex_names; 
+
+  return complex_names;
 }
 
 
