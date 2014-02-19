@@ -61,7 +61,7 @@ DiffContext::DiffContext (const System& sys) :
 
       if (sys.use_fixed_solution)
         elem_fixed_subsolutions.push_back
-	  (new DenseSubVector<Number>(elem_fixed_solution));
+          (new DenseSubVector<Number>(elem_fixed_solution));
 
       for (unsigned int j=0; j != nv; ++j)
         {
@@ -101,7 +101,7 @@ DiffContext::~DiffContext ()
 
       // Loop over that vector and delete each entry
       for(std::size_t i=0; i != localized_vector_dsv.size(); ++i)
-	delete localized_vector_dsv[i];
+        delete localized_vector_dsv[i];
     }
 }
 

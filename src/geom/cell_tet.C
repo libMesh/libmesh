@@ -38,27 +38,27 @@ dof_id_type Tet::key (const unsigned int s) const
     {
     case 0:
       return
-	this->compute_key (this->node(0),
-			   this->node(2),
-			   this->node(1));
+        this->compute_key (this->node(0),
+                           this->node(2),
+                           this->node(1));
 
     case 1:
       return
-	this->compute_key (this->node(0),
-			   this->node(1),
-			   this->node(3));
+        this->compute_key (this->node(0),
+                           this->node(1),
+                           this->node(3));
 
     case 2:
       return
-	this->compute_key (this->node(1),
-			   this->node(2),
-			   this->node(3));
+        this->compute_key (this->node(1),
+                           this->node(2),
+                           this->node(3));
 
     case 3:
       return
-	this->compute_key (this->node(2),
-			   this->node(0),
-			   this->node(3));
+        this->compute_key (this->node(2),
+                           this->node(0),
+                           this->node(3));
     }
 
   // We'll never get here.
@@ -80,43 +80,43 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
     {
     case 0:
       {
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(1);
+        face->set_node(0) = this->get_node(0);
+        face->set_node(1) = this->get_node(2);
+        face->set_node(2) = this->get_node(1);
 
         AutoPtr<Elem> ap_face(face);
-	return ap_face;
+        return ap_face;
       }
     case 1:
       {
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(3);
+        face->set_node(0) = this->get_node(0);
+        face->set_node(1) = this->get_node(1);
+        face->set_node(2) = this->get_node(3);
 
         AutoPtr<Elem> ap_face(face);
-	return ap_face;
+        return ap_face;
       }
     case 2:
       {
-	face->set_node(0) = this->get_node(1);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(3);
+        face->set_node(0) = this->get_node(1);
+        face->set_node(1) = this->get_node(2);
+        face->set_node(2) = this->get_node(3);
 
         AutoPtr<Elem> ap_face(face);
-	return ap_face;
+        return ap_face;
       }
     case 3:
       {
-	face->set_node(0) = this->get_node(2);
-	face->set_node(1) = this->get_node(0);
-	face->set_node(2) = this->get_node(3);
+        face->set_node(0) = this->get_node(2);
+        face->set_node(1) = this->get_node(0);
+        face->set_node(2) = this->get_node(3);
 
         AutoPtr<Elem> ap_face(face);
-	return ap_face;
+        return ap_face;
       }
     default:
       {
-	libmesh_error();
+        libmesh_error();
       }
     }
 

@@ -43,7 +43,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // MeshBase class member functions
 MeshBase::MeshBase (const Parallel::Communicator &comm,
-		    unsigned int d) :
+                    unsigned int d) :
   ParallelObject (comm),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
@@ -243,10 +243,10 @@ dof_id_type MeshBase::n_nodes_on_proc (const processor_id_type proc_id) const
   // We're either counting a processor's nodes or unpartitioned
   // nodes
   libmesh_assert (proc_id < this->n_processors() ||
-		  proc_id == DofObject::invalid_processor_id);
+                  proc_id == DofObject::invalid_processor_id);
 
   return static_cast<dof_id_type>(std::distance (this->pid_nodes_begin(proc_id),
-						 this->pid_nodes_end  (proc_id)));
+                                                 this->pid_nodes_end  (proc_id)));
 }
 
 
@@ -256,10 +256,10 @@ dof_id_type MeshBase::n_elem_on_proc (const processor_id_type proc_id) const
   // We're either counting a processor's elements or unpartitioned
   // elements
   libmesh_assert (proc_id < this->n_processors() ||
-		  proc_id == DofObject::invalid_processor_id);
+                  proc_id == DofObject::invalid_processor_id);
 
   return static_cast<dof_id_type>(std::distance (this->pid_elements_begin(proc_id),
-						 this->pid_elements_end  (proc_id)));
+                                                 this->pid_elements_end  (proc_id)));
 }
 
 
@@ -268,7 +268,7 @@ dof_id_type MeshBase::n_active_elem_on_proc (const processor_id_type proc_id) co
 {
   libmesh_assert_less (proc_id, this->n_processors());
   return static_cast<dof_id_type>(std::distance (this->active_pid_elements_begin(proc_id),
-						 this->active_pid_elements_end  (proc_id)));
+                                                 this->active_pid_elements_end  (proc_id)));
 }
 
 

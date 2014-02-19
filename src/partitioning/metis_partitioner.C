@@ -56,7 +56,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // MetisPartitioner implementation
 void MetisPartitioner::_do_partition (MeshBase& mesh,
-				      const unsigned int n_pieces)
+                                      const unsigned int n_pieces)
 {
   libmesh_assert_greater (n_pieces, 0);
   libmesh_assert (mesh.is_serial());
@@ -73,8 +73,8 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 
   libmesh_here();
   libMesh::err << "ERROR: The library has been built without"    << std::endl
-	        << "Metis support.  Using a space-filling curve"  << std::endl
-	        << "partitioner instead!"                         << std::endl;
+               << "Metis support.  Using a space-filling curve"  << std::endl
+               << "partitioner instead!"                         << std::endl;
 
   SFCPartitioner sfcp;
 
@@ -121,16 +121,16 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
     const MeshBase::element_iterator end = mesh.active_elements_end();
 
     MeshCommunication().find_global_indices (mesh.comm(),
-					     MeshTools::bounding_box(mesh),
-					     it, end, global_index);
+                                             MeshTools::bounding_box(mesh),
+                                             it, end, global_index);
 
     libmesh_assert_equal_to (global_index.size(), n_active_elem);
 
     for (std::size_t cnt=0; it != end; ++it)
       {
-	const Elem *elem = *it;
+        const Elem *elem = *it;
 
-	global_index_map.insert (std::make_pair(elem->id(), global_index[cnt++]));
+        global_index_map.insert (std::make_pair(elem->id(), global_index[cnt++]));
       }
     libmesh_assert_equal_to (global_index_map.size(), n_active_elem);
   }
@@ -146,167 +146,167 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 
       // Local scope for these
       {
-	// build the graph in CSR format.  Note that
-	// the edges in the graph will correspond to
-	// face neighbors
-	std::vector<const Elem*> neighbors_offspring;
+        // build the graph in CSR format.  Note that
+        // the edges in the graph will correspond to
+        // face neighbors
+        std::vector<const Elem*> neighbors_offspring;
 
-	MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-	const MeshBase::element_iterator elem_end = mesh.active_elements_end();
+        MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
+        const MeshBase::element_iterator elem_end = mesh.active_elements_end();
 
-	std::size_t graph_size=0;
+        std::size_t graph_size=0;
 
-	// (1) first pass - get the row sizes for each element by counting the number
-	// of face neighbors.  Also populate the vwght array if necessary
-	for (; elem_it != elem_end; ++elem_it)
-	  {
-	    const Elem* elem = *elem_it;
+        // (1) first pass - get the row sizes for each element by counting the number
+        // of face neighbors.  Also populate the vwght array if necessary
+        for (; elem_it != elem_end; ++elem_it)
+          {
+            const Elem* elem = *elem_it;
 
-	    const dof_id_type elem_global_index =
-	      global_index_map[elem->id()];
+            const dof_id_type elem_global_index =
+              global_index_map[elem->id()];
 
-	    libmesh_assert_less (elem_global_index, vwgt.size());
+            libmesh_assert_less (elem_global_index, vwgt.size());
 
-	    // maybe there is a better weight?
-	    // The weight is used to define what a balanced graph is
-	    if(!_weights)
-	      vwgt[elem_global_index] = elem->n_nodes();
-	    else
-	      vwgt[elem_global_index] = static_cast<int>((*_weights)[elem->id()]);
+            // maybe there is a better weight?
+            // The weight is used to define what a balanced graph is
+            if(!_weights)
+              vwgt[elem_global_index] = elem->n_nodes();
+            else
+              vwgt[elem_global_index] = static_cast<int>((*_weights)[elem->id()]);
 
-	    unsigned int num_neighbors = 0;
+            unsigned int num_neighbors = 0;
 
-	    // Loop over the element's neighbors.  An element
-	    // adjacency corresponds to a face neighbor
-	    for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
-	      {
-		const Elem* neighbor = elem->neighbor(ms);
+            // Loop over the element's neighbors.  An element
+            // adjacency corresponds to a face neighbor
+            for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
+              {
+                const Elem* neighbor = elem->neighbor(ms);
 
-		if (neighbor != NULL)
-		  {
-		    // If the neighbor is active treat it
-		    // as a connection
-		    if (neighbor->active())
-		      num_neighbors++;
-
-#ifdef LIBMESH_ENABLE_AMR
-
-		    // Otherwise we need to find all of the
-		    // neighbor's children that are connected to
-		    // us and add them
-		    else
-		      {
-			// The side of the neighbor to which
-			// we are connected
-			const unsigned int ns =
-			  neighbor->which_neighbor_am_i (elem);
-			libmesh_assert_less (ns, neighbor->n_neighbors());
-
-			// Get all the active children (& grandchildren, etc...)
-			// of the neighbor.
-			neighbor->active_family_tree (neighbors_offspring);
-
-			// Get all the neighbor's children that
-			// live on that side and are thus connected
-			// to us
-			for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
-			  {
-			    const Elem* child =
-			      neighbors_offspring[nc];
-
-			    // This does not assume a level-1 mesh.
-			    // Note that since children have sides numbered
-			    // coincident with the parent then this is a sufficient test.
-			    if (child->neighbor(ns) == elem)
-			      {
-				libmesh_assert (child->active());
-				num_neighbors++;
-			      }
-			  }
-		      }
-
-#endif /* ifdef LIBMESH_ENABLE_AMR */
-
-		  }
-	      }
-
-	    csr_graph.prep_n_nonzeros(elem_global_index, num_neighbors);
-	    graph_size += num_neighbors;
-	  }
-
-	csr_graph.prepare_for_use();
-
-	// (2) second pass - fill the compressed adjacency array
-	elem_it  = mesh.active_elements_begin();
-
-	for (; elem_it != elem_end; ++elem_it)
-	  {
-	    const Elem* elem = *elem_it;
-
-	    const dof_id_type elem_global_index =
-	      global_index_map[elem->id()];
-
-	    unsigned int connection=0;
-
-	    // Loop over the element's neighbors.  An element
-	    // adjacency corresponds to a face neighbor
-	    for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
-	      {
-		const Elem* neighbor = elem->neighbor(ms);
-
-		if (neighbor != NULL)
-		  {
-		    // If the neighbor is active treat it
-		    // as a connection
-		    if (neighbor->active())
-		      csr_graph(elem_global_index, connection++) = global_index_map[neighbor->id()];
+                if (neighbor != NULL)
+                  {
+                    // If the neighbor is active treat it
+                    // as a connection
+                    if (neighbor->active())
+                      num_neighbors++;
 
 #ifdef LIBMESH_ENABLE_AMR
 
-		    // Otherwise we need to find all of the
-		    // neighbor's children that are connected to
-		    // us and add them
-		    else
-		      {
-			// The side of the neighbor to which
-			// we are connected
-			const unsigned int ns =
-			  neighbor->which_neighbor_am_i (elem);
-			libmesh_assert_less (ns, neighbor->n_neighbors());
+                    // Otherwise we need to find all of the
+                    // neighbor's children that are connected to
+                    // us and add them
+                    else
+                      {
+                        // The side of the neighbor to which
+                        // we are connected
+                        const unsigned int ns =
+                          neighbor->which_neighbor_am_i (elem);
+                        libmesh_assert_less (ns, neighbor->n_neighbors());
 
-			// Get all the active children (& grandchildren, etc...)
-			// of the neighbor.
-			neighbor->active_family_tree (neighbors_offspring);
+                        // Get all the active children (& grandchildren, etc...)
+                        // of the neighbor.
+                        neighbor->active_family_tree (neighbors_offspring);
 
-			// Get all the neighbor's children that
-			// live on that side and are thus connected
-			// to us
-			for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
-			  {
-			    const Elem* child =
-			      neighbors_offspring[nc];
+                        // Get all the neighbor's children that
+                        // live on that side and are thus connected
+                        // to us
+                        for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
+                          {
+                            const Elem* child =
+                              neighbors_offspring[nc];
 
-			    // This does not assume a level-1 mesh.
-			    // Note that since children have sides numbered
-			    // coincident with the parent then this is a sufficient test.
-			    if (child->neighbor(ns) == elem)
-			      {
-				libmesh_assert (child->active());
-
-				csr_graph(elem_global_index, connection++) = global_index_map[child->id()];
-			      }
-			  }
-		      }
+                            // This does not assume a level-1 mesh.
+                            // Note that since children have sides numbered
+                            // coincident with the parent then this is a sufficient test.
+                            if (child->neighbor(ns) == elem)
+                              {
+                                libmesh_assert (child->active());
+                                num_neighbors++;
+                              }
+                          }
+                      }
 
 #endif /* ifdef LIBMESH_ENABLE_AMR */
 
-		  }
-	      }
-	  }
+                  }
+              }
+
+            csr_graph.prep_n_nonzeros(elem_global_index, num_neighbors);
+            graph_size += num_neighbors;
+          }
+
+        csr_graph.prepare_for_use();
+
+        // (2) second pass - fill the compressed adjacency array
+        elem_it  = mesh.active_elements_begin();
+
+        for (; elem_it != elem_end; ++elem_it)
+          {
+            const Elem* elem = *elem_it;
+
+            const dof_id_type elem_global_index =
+              global_index_map[elem->id()];
+
+            unsigned int connection=0;
+
+            // Loop over the element's neighbors.  An element
+            // adjacency corresponds to a face neighbor
+            for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
+              {
+                const Elem* neighbor = elem->neighbor(ms);
+
+                if (neighbor != NULL)
+                  {
+                    // If the neighbor is active treat it
+                    // as a connection
+                    if (neighbor->active())
+                      csr_graph(elem_global_index, connection++) = global_index_map[neighbor->id()];
+
+#ifdef LIBMESH_ENABLE_AMR
+
+                    // Otherwise we need to find all of the
+                    // neighbor's children that are connected to
+                    // us and add them
+                    else
+                      {
+                        // The side of the neighbor to which
+                        // we are connected
+                        const unsigned int ns =
+                          neighbor->which_neighbor_am_i (elem);
+                        libmesh_assert_less (ns, neighbor->n_neighbors());
+
+                        // Get all the active children (& grandchildren, etc...)
+                        // of the neighbor.
+                        neighbor->active_family_tree (neighbors_offspring);
+
+                        // Get all the neighbor's children that
+                        // live on that side and are thus connected
+                        // to us
+                        for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
+                          {
+                            const Elem* child =
+                              neighbors_offspring[nc];
+
+                            // This does not assume a level-1 mesh.
+                            // Note that since children have sides numbered
+                            // coincident with the parent then this is a sufficient test.
+                            if (child->neighbor(ns) == elem)
+                              {
+                                libmesh_assert (child->active());
+
+                                csr_graph(elem_global_index, connection++) = global_index_map[child->id()];
+                              }
+                          }
+                      }
+
+#endif /* ifdef LIBMESH_ENABLE_AMR */
+
+                  }
+              }
+          }
 
         // We create a non-empty vals for a disconnected graph, to
         // work around a segfault from METIS.
-	libmesh_assert_equal_to (csr_graph.vals.size(),
+        libmesh_assert_equal_to (csr_graph.vals.size(),
                                  std::max(graph_size,std::size_t(1)));
       } // done building the graph
 
@@ -316,15 +316,15 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 
       // Use recursive if the number of partitions is less than or equal to 8
       if (n_pieces <= 8)
-	Metis::METIS_PartGraphRecursive(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], NULL,
-					NULL, &nparts, NULL, NULL, NULL,
-					&edgecut, &part[0]);
+        Metis::METIS_PartGraphRecursive(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], NULL,
+                                        NULL, &nparts, NULL, NULL, NULL,
+                                        &edgecut, &part[0]);
 
       // Otherwise  use kway
       else
-	Metis::METIS_PartGraphKway(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], NULL,
-				   NULL, &nparts, NULL, NULL, NULL,
-				   &edgecut, &part[0]);
+        Metis::METIS_PartGraphKway(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], NULL,
+                                   NULL, &nparts, NULL, NULL, NULL,
+                                   &edgecut, &part[0]);
 
     } // end processor 0 part
 
@@ -340,18 +340,18 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 
     for (; it!=end; ++it)
       {
-	Elem* elem = *it;
+        Elem* elem = *it;
 
-	libmesh_assert (global_index_map.count(elem->id()));
+        libmesh_assert (global_index_map.count(elem->id()));
 
-	const dof_id_type elem_global_index =
-	  global_index_map[elem->id()];
+        const dof_id_type elem_global_index =
+          global_index_map[elem->id()];
 
-	libmesh_assert_less (elem_global_index, part.size());
-	const processor_id_type elem_procid =
-	  static_cast<processor_id_type>(part[elem_global_index]);
+        libmesh_assert_less (elem_global_index, part.size());
+        const processor_id_type elem_procid =
+          static_cast<processor_id_type>(part[elem_global_index]);
 
-	elem->processor_id() = elem_procid;
+        elem->processor_id() = elem_procid;
       }
   }
 

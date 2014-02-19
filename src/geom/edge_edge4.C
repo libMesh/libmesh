@@ -95,8 +95,8 @@ bool Edge4::has_affine_map() const
 
 
 void Edge4::connectivity(const unsigned int sc,
-			 const IOPackage iop,
-			 std::vector<dof_id_type>& conn) const
+                         const IOPackage iop,
+                         std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_less_equal (sc, 2);
   libmesh_assert_less (sc, this->n_sub_elem());

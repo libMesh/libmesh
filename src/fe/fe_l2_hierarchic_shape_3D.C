@@ -31,22 +31,22 @@ namespace
 {
 
   Point get_min_point(const Elem *elem,
-		      unsigned int a,
-		      unsigned int b,
-		      unsigned int c,
-		      unsigned int d)
+                      unsigned int a,
+                      unsigned int b,
+                      unsigned int c,
+                      unsigned int d)
   {
     return std::min(std::min(elem->point(a),elem->point(b)),
-		    std::min(elem->point(c),elem->point(d)));
+                    std::min(elem->point(c),elem->point(d)));
   }
 
   void cube_indices(const Elem *elem,
-		    const unsigned int totalorder,
-		    const unsigned int i,
-		    Real &xi, Real &eta, Real &zeta,
-		    unsigned int &i0,
-		    unsigned int &i1,
-		    unsigned int &i2)
+                    const unsigned int totalorder,
+                    const unsigned int i,
+                    Real &xi, Real &eta, Real &zeta,
+                    unsigned int &i0,
+                    unsigned int &i1,
+                    unsigned int &i2)
   {
     // The only way to make any sense of this
     // is to look at the mgflo/mg2/mgf documentation
@@ -70,570 +70,570 @@ namespace
     // Vertices:
     if (i == 0)
       {
-	i0 = 0;
-	i1 = 0;
-	i2 = 0;
+        i0 = 0;
+        i1 = 0;
+        i2 = 0;
       }
     else if (i == 1)
       {
-	i0 = 1;
-	i1 = 0;
-	i2 = 0;
+        i0 = 1;
+        i1 = 0;
+        i2 = 0;
       }
     else if (i == 2)
       {
-	i0 = 1;
-	i1 = 1;
-	i2 = 0;
+        i0 = 1;
+        i1 = 1;
+        i2 = 0;
       }
     else if (i == 3)
       {
-	i0 = 0;
-	i1 = 1;
-	i2 = 0;
+        i0 = 0;
+        i1 = 1;
+        i2 = 0;
       }
     else if (i == 4)
       {
-	i0 = 0;
-	i1 = 0;
-	i2 = 1;
+        i0 = 0;
+        i1 = 0;
+        i2 = 1;
       }
     else if (i == 5)
       {
-	i0 = 1;
-	i1 = 0;
-	i2 = 1;
+        i0 = 1;
+        i1 = 0;
+        i2 = 1;
       }
     else if (i == 6)
       {
-	i0 = 1;
-	i1 = 1;
-	i2 = 1;
+        i0 = 1;
+        i1 = 1;
+        i2 = 1;
       }
     else if (i == 7)
       {
-	i0 = 0;
-	i1 = 1;
-	i2 = 1;
+        i0 = 0;
+        i1 = 1;
+        i2 = 1;
       }
     // Edge 0
     else if (i < 8 + e)
       {
-	i0 = i - 6;
-	i1 = 0;
-	i2 = 0;
-	if (elem->point(0) > elem->point(1))
-	  xi = -xi_saved;
+        i0 = i - 6;
+        i1 = 0;
+        i2 = 0;
+        if (elem->point(0) > elem->point(1))
+          xi = -xi_saved;
       }
     // Edge 1
     else if (i < 8 + 2*e)
       {
-	i0 = 1;
-	i1 = i - e - 6;
-	i2 = 0;
-	if (elem->point(1) > elem->point(2))
-	  eta = -eta_saved;
+        i0 = 1;
+        i1 = i - e - 6;
+        i2 = 0;
+        if (elem->point(1) > elem->point(2))
+          eta = -eta_saved;
       }
     // Edge 2
     else if (i < 8 + 3*e)
       {
-	i0 = i - 2*e - 6;
-	i1 = 1;
-	i2 = 0;
-	if (elem->point(3) > elem->point(2))
-	  xi = -xi_saved;
+        i0 = i - 2*e - 6;
+        i1 = 1;
+        i2 = 0;
+        if (elem->point(3) > elem->point(2))
+          xi = -xi_saved;
       }
     // Edge 3
     else if (i < 8 + 4*e)
       {
-	i0 = 0;
-	i1 = i - 3*e - 6;
-	i2 = 0;
-	if (elem->point(0) > elem->point(3))
-	  eta = -eta_saved;
+        i0 = 0;
+        i1 = i - 3*e - 6;
+        i2 = 0;
+        if (elem->point(0) > elem->point(3))
+          eta = -eta_saved;
       }
     // Edge 4
     else if (i < 8 + 5*e)
       {
-	i0 = 0;
-	i1 = 0;
-	i2 = i - 4*e - 6;
-	if (elem->point(0) > elem->point(4))
-	  zeta = -zeta_saved;
+        i0 = 0;
+        i1 = 0;
+        i2 = i - 4*e - 6;
+        if (elem->point(0) > elem->point(4))
+          zeta = -zeta_saved;
       }
     // Edge 5
     else if (i < 8 + 6*e)
       {
-	i0 = 1;
-	i1 = 0;
-	i2 = i - 5*e - 6;
-	if (elem->point(1) > elem->point(5))
-	  zeta = -zeta_saved;
+        i0 = 1;
+        i1 = 0;
+        i2 = i - 5*e - 6;
+        if (elem->point(1) > elem->point(5))
+          zeta = -zeta_saved;
       }
     // Edge 6
     else if (i < 8 + 7*e)
       {
-	i0 = 1;
-	i1 = 1;
-	i2 = i - 6*e - 6;
-	if (elem->point(2) > elem->point(6))
-	  zeta = -zeta_saved;
+        i0 = 1;
+        i1 = 1;
+        i2 = i - 6*e - 6;
+        if (elem->point(2) > elem->point(6))
+          zeta = -zeta_saved;
       }
     // Edge 7
     else if (i < 8 + 8*e)
       {
-	i0 = 0;
-	i1 = 1;
-	i2 = i - 7*e - 6;
-	if (elem->point(3) > elem->point(7))
-	  zeta = -zeta_saved;
+        i0 = 0;
+        i1 = 1;
+        i2 = i - 7*e - 6;
+        if (elem->point(3) > elem->point(7))
+          zeta = -zeta_saved;
       }
     // Edge 8
     else if (i < 8 + 9*e)
       {
-	i0 = i - 8*e - 6;
-	i1 = 0;
-	i2 = 1;
-	if (elem->point(4) > elem->point(5))
-	  xi = -xi_saved;
+        i0 = i - 8*e - 6;
+        i1 = 0;
+        i2 = 1;
+        if (elem->point(4) > elem->point(5))
+          xi = -xi_saved;
       }
     // Edge 9
     else if (i < 8 + 10*e)
       {
-	i0 = 1;
-	i1 = i - 9*e - 6;
-	i2 = 1;
-	if (elem->point(5) > elem->point(6))
-	  eta = -eta_saved;
+        i0 = 1;
+        i1 = i - 9*e - 6;
+        i2 = 1;
+        if (elem->point(5) > elem->point(6))
+          eta = -eta_saved;
       }
     // Edge 10
     else if (i < 8 + 11*e)
       {
-	i0 = i - 10*e - 6;
-	i1 = 1;
-	i2 = 1;
-	if (elem->point(7) > elem->point(6))
-	  xi = -xi_saved;
+        i0 = i - 10*e - 6;
+        i1 = 1;
+        i2 = 1;
+        if (elem->point(7) > elem->point(6))
+          xi = -xi_saved;
       }
     // Edge 11
     else if (i < 8 + 12*e)
       {
-	i0 = 0;
-	i1 = i - 11*e - 6;
-	i2 = 1;
-	if (elem->point(4) > elem->point(7))
-	  eta = -eta_saved;
+        i0 = 0;
+        i1 = i - 11*e - 6;
+        i2 = 1;
+        if (elem->point(4) > elem->point(7))
+          eta = -eta_saved;
       }
     // Face 0
     else if (i < 8 + 12*e + e*e)
       {
-	unsigned int basisnum = i - 8 - 12*e;
-	i0 = square_number_row[basisnum] + 2;
-	i1 = square_number_column[basisnum] + 2;
-	i2 = 0;
-	const Point min_point = get_min_point(elem, 1, 2, 0, 3);
+        unsigned int basisnum = i - 8 - 12*e;
+        i0 = square_number_row[basisnum] + 2;
+        i1 = square_number_column[basisnum] + 2;
+        i2 = 0;
+        const Point min_point = get_min_point(elem, 1, 2, 0, 3);
 
-	if (elem->point(0) == min_point)
-	  if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
-	    {
-	      // Case 1
-	      xi  = xi_saved;
-	      eta = eta_saved;
-	    }
-	  else
-	    {
-	      // Case 2
-	      xi  = eta_saved;
-	      eta = xi_saved;
-	    }
+        if (elem->point(0) == min_point)
+          if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
+            {
+              // Case 1
+              xi  = xi_saved;
+              eta = eta_saved;
+            }
+          else
+            {
+              // Case 2
+              xi  = eta_saved;
+              eta = xi_saved;
+            }
 
-	else if (elem->point(3) == min_point)
-	  if (elem->point(0) == std::min(elem->point(0), elem->point(2)))
-	    {
-	      // Case 3
-	      xi  = -eta_saved;
-	      eta = xi_saved;
-	    }
-	  else
-	    {
-	      // Case 4
-	      xi  = xi_saved;
-	      eta = -eta_saved;
-	    }
+        else if (elem->point(3) == min_point)
+          if (elem->point(0) == std::min(elem->point(0), elem->point(2)))
+            {
+              // Case 3
+              xi  = -eta_saved;
+              eta = xi_saved;
+            }
+          else
+            {
+              // Case 4
+              xi  = xi_saved;
+              eta = -eta_saved;
+            }
 
-	else if (elem->point(2) == min_point)
-	  if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
-	    {
-	      // Case 5
-	      xi  = -xi_saved;
-	      eta = -eta_saved;
-	    }
-	  else
-	    {
-	      // Case 6
-	      xi  = -eta_saved;
-	      eta = -xi_saved;
-	    }
+        else if (elem->point(2) == min_point)
+          if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
+            {
+              // Case 5
+              xi  = -xi_saved;
+              eta = -eta_saved;
+            }
+          else
+            {
+              // Case 6
+              xi  = -eta_saved;
+              eta = -xi_saved;
+            }
 
-	else if (elem->point(1) == min_point)
-	  {
-	    if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
-	      {
-		// Case 7
-		xi  = eta_saved;
-		eta = -xi_saved;
-	      }
-	    else
-	      {
-		// Case 8
-		xi  = -xi_saved;
-		eta = eta_saved;
-	      }
-	  }
+        else if (elem->point(1) == min_point)
+          {
+            if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
+              {
+                // Case 7
+                xi  = eta_saved;
+                eta = -xi_saved;
+              }
+            else
+              {
+                // Case 8
+                xi  = -xi_saved;
+                eta = eta_saved;
+              }
+          }
       }
     // Face 1
     else if (i < 8 + 12*e + 2*e*e)
       {
-	unsigned int basisnum = i - 8 - 12*e - e*e;
-	i0 = square_number_row[basisnum] + 2;
-	i1 = 0;
-	i2 = square_number_column[basisnum] + 2;
-	const Point min_point = get_min_point(elem, 0, 1, 5, 4);
+        unsigned int basisnum = i - 8 - 12*e - e*e;
+        i0 = square_number_row[basisnum] + 2;
+        i1 = 0;
+        i2 = square_number_column[basisnum] + 2;
+        const Point min_point = get_min_point(elem, 0, 1, 5, 4);
 
-	if (elem->point(0) == min_point)
-	  if (elem->point(1) == std::min(elem->point(1), elem->point(4)))
-	    {
-	      // Case 1
-	      xi   = xi_saved;
-	      zeta = zeta_saved;
-	    }
-	  else
-	    {
-	      // Case 2
-	      xi   = zeta_saved;
-	      zeta = xi_saved;
-	    }
+        if (elem->point(0) == min_point)
+          if (elem->point(1) == std::min(elem->point(1), elem->point(4)))
+            {
+              // Case 1
+              xi   = xi_saved;
+              zeta = zeta_saved;
+            }
+          else
+            {
+              // Case 2
+              xi   = zeta_saved;
+              zeta = xi_saved;
+            }
 
-	else if (elem->point(1) == min_point)
-	  if (elem->point(5) == std::min(elem->point(5), elem->point(0)))
-	    {
-	      // Case 3
-	      xi   = zeta_saved;
-	      zeta = -xi_saved;
-	    }
-	  else
-	    {
-	      // Case 4
-	      xi   = -xi_saved;
-	      zeta = zeta_saved;
-	    }
+        else if (elem->point(1) == min_point)
+          if (elem->point(5) == std::min(elem->point(5), elem->point(0)))
+            {
+              // Case 3
+              xi   = zeta_saved;
+              zeta = -xi_saved;
+            }
+          else
+            {
+              // Case 4
+              xi   = -xi_saved;
+              zeta = zeta_saved;
+            }
 
-	else if (elem->point(5) == min_point)
-	  if (elem->point(4) == std::min(elem->point(4), elem->point(1)))
-	    {
-	      // Case 5
-	      xi   = -xi_saved;
-	      zeta = -zeta_saved;
-	    }
-	  else
-	    {
-	      // Case 6
-	      xi   = -zeta_saved;
-	      zeta = -xi_saved;
-	    }
+        else if (elem->point(5) == min_point)
+          if (elem->point(4) == std::min(elem->point(4), elem->point(1)))
+            {
+              // Case 5
+              xi   = -xi_saved;
+              zeta = -zeta_saved;
+            }
+          else
+            {
+              // Case 6
+              xi   = -zeta_saved;
+              zeta = -xi_saved;
+            }
 
-	else if (elem->point(4) == min_point)
-	  {
-	    if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
-	      {
-		// Case 7
-		xi   = -xi_saved;
-		zeta = zeta_saved;
-	      }
-	    else
-	      {
-		// Case 8
-		xi   = xi_saved;
-		zeta = -zeta_saved;
-	      }
-	  }
+        else if (elem->point(4) == min_point)
+          {
+            if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
+              {
+                // Case 7
+                xi   = -xi_saved;
+                zeta = zeta_saved;
+              }
+            else
+              {
+                // Case 8
+                xi   = xi_saved;
+                zeta = -zeta_saved;
+              }
+          }
       }
     // Face 2
     else if (i < 8 + 12*e + 3*e*e)
       {
-	unsigned int basisnum = i - 8 - 12*e - 2*e*e;
-	i0 = 1;
-	i1 = square_number_row[basisnum] + 2;
-	i2 = square_number_column[basisnum] + 2;
-	const Point min_point = get_min_point(elem, 1, 2, 6, 5);
+        unsigned int basisnum = i - 8 - 12*e - 2*e*e;
+        i0 = 1;
+        i1 = square_number_row[basisnum] + 2;
+        i2 = square_number_column[basisnum] + 2;
+        const Point min_point = get_min_point(elem, 1, 2, 6, 5);
 
-	if (elem->point(1) == min_point)
-	  if (elem->point(2) == std::min(elem->point(2), elem->point(5)))
-	    {
-	      // Case 1
-	      eta  = eta_saved;
-	      zeta = zeta_saved;
-	    }
-	  else
-	    {
-	      // Case 2
-	      eta  = zeta_saved;
-	      zeta = eta_saved;
-	    }
+        if (elem->point(1) == min_point)
+          if (elem->point(2) == std::min(elem->point(2), elem->point(5)))
+            {
+              // Case 1
+              eta  = eta_saved;
+              zeta = zeta_saved;
+            }
+          else
+            {
+              // Case 2
+              eta  = zeta_saved;
+              zeta = eta_saved;
+            }
 
-	else if (elem->point(2) == min_point)
-	  if (elem->point(6) == std::min(elem->point(6), elem->point(1)))
-	    {
-	      // Case 3
-	      eta  = zeta_saved;
-	      zeta = -eta_saved;
-	    }
-	  else
-	    {
-	      // Case 4
-	      eta  = -eta_saved;
-	      zeta = zeta_saved;
-	    }
+        else if (elem->point(2) == min_point)
+          if (elem->point(6) == std::min(elem->point(6), elem->point(1)))
+            {
+              // Case 3
+              eta  = zeta_saved;
+              zeta = -eta_saved;
+            }
+          else
+            {
+              // Case 4
+              eta  = -eta_saved;
+              zeta = zeta_saved;
+            }
 
-	else if (elem->point(6) == min_point)
-	  if (elem->point(5) == std::min(elem->point(5), elem->point(2)))
-	    {
-	      // Case 5
-	      eta  = -eta_saved;
-	      zeta = -zeta_saved;
-	    }
-	  else
-	    {
-	      // Case 6
-	      eta  = -zeta_saved;
-	      zeta = -eta_saved;
-	    }
+        else if (elem->point(6) == min_point)
+          if (elem->point(5) == std::min(elem->point(5), elem->point(2)))
+            {
+              // Case 5
+              eta  = -eta_saved;
+              zeta = -zeta_saved;
+            }
+          else
+            {
+              // Case 6
+              eta  = -zeta_saved;
+              zeta = -eta_saved;
+            }
 
-	else if (elem->point(5) == min_point)
-	  {
-	    if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
-	      {
-		// Case 7
-		eta  = -zeta_saved;
-		zeta = eta_saved;
-	      }
-	    else
-	      {
-		// Case 8
-		eta   = eta_saved;
-		zeta = -zeta_saved;
-	      }
-	  }
+        else if (elem->point(5) == min_point)
+          {
+            if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
+              {
+                // Case 7
+                eta  = -zeta_saved;
+                zeta = eta_saved;
+              }
+            else
+              {
+                // Case 8
+                eta   = eta_saved;
+                zeta = -zeta_saved;
+              }
+          }
       }
     // Face 3
     else if (i < 8 + 12*e + 4*e*e)
       {
-	unsigned int basisnum = i - 8 - 12*e - 3*e*e;
-	i0 = square_number_row[basisnum] + 2;
-	i1 = 1;
-	i2 = square_number_column[basisnum] + 2;
-	const Point min_point = get_min_point(elem, 2, 3, 7, 6);
+        unsigned int basisnum = i - 8 - 12*e - 3*e*e;
+        i0 = square_number_row[basisnum] + 2;
+        i1 = 1;
+        i2 = square_number_column[basisnum] + 2;
+        const Point min_point = get_min_point(elem, 2, 3, 7, 6);
 
-	if (elem->point(3) == min_point)
-	  if (elem->point(2) == std::min(elem->point(2), elem->point(7)))
-	    {
-	      // Case 1
-	      xi   = xi_saved;
-	      zeta = zeta_saved;
-	    }
-	  else
-	    {
-	      // Case 2
-	      xi   = zeta_saved;
-	      zeta = xi_saved;
-	    }
+        if (elem->point(3) == min_point)
+          if (elem->point(2) == std::min(elem->point(2), elem->point(7)))
+            {
+              // Case 1
+              xi   = xi_saved;
+              zeta = zeta_saved;
+            }
+          else
+            {
+              // Case 2
+              xi   = zeta_saved;
+              zeta = xi_saved;
+            }
 
-	else if (elem->point(7) == min_point)
-	  if (elem->point(3) == std::min(elem->point(3), elem->point(6)))
-	    {
-	      // Case 3
-	      xi   = -zeta_saved;
-	      zeta = xi_saved;
-	    }
-	  else
-	    {
-	      // Case 4
-	      xi   = xi_saved;
-	      zeta = -zeta_saved;
-	    }
+        else if (elem->point(7) == min_point)
+          if (elem->point(3) == std::min(elem->point(3), elem->point(6)))
+            {
+              // Case 3
+              xi   = -zeta_saved;
+              zeta = xi_saved;
+            }
+          else
+            {
+              // Case 4
+              xi   = xi_saved;
+              zeta = -zeta_saved;
+            }
 
-	else if (elem->point(6) == min_point)
-	  if (elem->point(7) == std::min(elem->point(7), elem->point(2)))
-	    {
-	      // Case 5
-	      xi   = -xi_saved;
-	      zeta = -zeta_saved;
-	    }
-	  else
-	    {
-	      // Case 6
-	      xi   = -zeta_saved;
-	      zeta = -xi_saved;
-	    }
+        else if (elem->point(6) == min_point)
+          if (elem->point(7) == std::min(elem->point(7), elem->point(2)))
+            {
+              // Case 5
+              xi   = -xi_saved;
+              zeta = -zeta_saved;
+            }
+          else
+            {
+              // Case 6
+              xi   = -zeta_saved;
+              zeta = -xi_saved;
+            }
 
-	else if (elem->point(2) == min_point)
-	  {
-	    if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
-	      {
-		// Case 7
-		xi   = zeta_saved;
-		zeta = -xi_saved;
-	      }
-	    else
-	      {
-		// Case 8
-		xi   = -xi_saved;
-	      zeta = zeta_saved;
-	      }
-	  }
+        else if (elem->point(2) == min_point)
+          {
+            if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
+              {
+                // Case 7
+                xi   = zeta_saved;
+                zeta = -xi_saved;
+              }
+            else
+              {
+                // Case 8
+                xi   = -xi_saved;
+                zeta = zeta_saved;
+              }
+          }
       }
     // Face 4
     else if (i < 8 + 12*e + 5*e*e)
       {
-	unsigned int basisnum = i - 8 - 12*e - 4*e*e;
-	i0 = 0;
-	i1 = square_number_row[basisnum] + 2;
-	i2 = square_number_column[basisnum] + 2;
-	const Point min_point = get_min_point(elem, 3, 0, 4, 7);
+        unsigned int basisnum = i - 8 - 12*e - 4*e*e;
+        i0 = 0;
+        i1 = square_number_row[basisnum] + 2;
+        i2 = square_number_column[basisnum] + 2;
+        const Point min_point = get_min_point(elem, 3, 0, 4, 7);
 
-	if (elem->point(0) == min_point)
-	  if (elem->point(3) == std::min(elem->point(3), elem->point(4)))
-	    {
-	      // Case 1
-	      eta  = eta_saved;
-	      zeta = zeta_saved;
-	    }
-	  else
-	    {
-	      // Case 2
-	      eta  = zeta_saved;
-	      zeta = eta_saved;
-	    }
+        if (elem->point(0) == min_point)
+          if (elem->point(3) == std::min(elem->point(3), elem->point(4)))
+            {
+              // Case 1
+              eta  = eta_saved;
+              zeta = zeta_saved;
+            }
+          else
+            {
+              // Case 2
+              eta  = zeta_saved;
+              zeta = eta_saved;
+            }
 
-	else if (elem->point(4) == min_point)
-	  if (elem->point(0) == std::min(elem->point(0), elem->point(7)))
-	    {
-	      // Case 3
-	      eta  = -zeta_saved;
-	      zeta = eta_saved;
-	    }
-	  else
-	    {
-	      // Case 4
-	      eta  = eta_saved;
-	      zeta = -zeta_saved;
-	    }
+        else if (elem->point(4) == min_point)
+          if (elem->point(0) == std::min(elem->point(0), elem->point(7)))
+            {
+              // Case 3
+              eta  = -zeta_saved;
+              zeta = eta_saved;
+            }
+          else
+            {
+              // Case 4
+              eta  = eta_saved;
+              zeta = -zeta_saved;
+            }
 
-	else if (elem->point(7) == min_point)
-	  if (elem->point(4) == std::min(elem->point(4), elem->point(3)))
-	    {
-	      // Case 5
-	      eta  = -eta_saved;
-	      zeta = -zeta_saved;
-	    }
-	  else
-	    {
-	      // Case 6
-	      eta  = -zeta_saved;
-	      zeta = -eta_saved;
-	    }
+        else if (elem->point(7) == min_point)
+          if (elem->point(4) == std::min(elem->point(4), elem->point(3)))
+            {
+              // Case 5
+              eta  = -eta_saved;
+              zeta = -zeta_saved;
+            }
+          else
+            {
+              // Case 6
+              eta  = -zeta_saved;
+              zeta = -eta_saved;
+            }
 
-	else if (elem->point(3) == min_point)
-	  {
-	    if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
-	      {
-		// Case 7
-		eta   = zeta_saved;
-		zeta = -eta_saved;
-	      }
-	    else
-	      {
-		// Case 8
-		eta  = -eta_saved;
-		zeta = zeta_saved;
-	      }
-	  }
+        else if (elem->point(3) == min_point)
+          {
+            if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
+              {
+                // Case 7
+                eta   = zeta_saved;
+                zeta = -eta_saved;
+              }
+            else
+              {
+                // Case 8
+                eta  = -eta_saved;
+                zeta = zeta_saved;
+              }
+          }
       }
     // Face 5
     else if (i < 8 + 12*e + 6*e*e)
       {
-	unsigned int basisnum = i - 8 - 12*e - 5*e*e;
-	i0 = square_number_row[basisnum] + 2;
-	i1 = square_number_column[basisnum] + 2;
-	i2 = 1;
-	const Point min_point = get_min_point(elem, 4, 5, 6, 7);
+        unsigned int basisnum = i - 8 - 12*e - 5*e*e;
+        i0 = square_number_row[basisnum] + 2;
+        i1 = square_number_column[basisnum] + 2;
+        i2 = 1;
+        const Point min_point = get_min_point(elem, 4, 5, 6, 7);
 
-	if (elem->point(4) == min_point)
-	  if (elem->point(5) == std::min(elem->point(5), elem->point(7)))
-	    {
-	      // Case 1
-	      xi  = xi_saved;
-	      eta = eta_saved;
-	    }
-	  else
-	    {
-	      // Case 2
-	      xi  = eta_saved;
-	      eta = xi_saved;
-	    }
+        if (elem->point(4) == min_point)
+          if (elem->point(5) == std::min(elem->point(5), elem->point(7)))
+            {
+              // Case 1
+              xi  = xi_saved;
+              eta = eta_saved;
+            }
+          else
+            {
+              // Case 2
+              xi  = eta_saved;
+              eta = xi_saved;
+            }
 
-	else if (elem->point(5) == min_point)
-	  if (elem->point(6) == std::min(elem->point(6), elem->point(4)))
-	    {
-	      // Case 3
-	      xi  = eta_saved;
-	      eta = -xi_saved;
-	    }
-	  else
-	    {
-	      // Case 4
-	      xi  = -xi_saved;
-	      eta = eta_saved;
-	    }
+        else if (elem->point(5) == min_point)
+          if (elem->point(6) == std::min(elem->point(6), elem->point(4)))
+            {
+              // Case 3
+              xi  = eta_saved;
+              eta = -xi_saved;
+            }
+          else
+            {
+              // Case 4
+              xi  = -xi_saved;
+              eta = eta_saved;
+            }
 
-	else if (elem->point(6) == min_point)
-	  if (elem->point(7) == std::min(elem->point(7), elem->point(5)))
-	    {
-	      // Case 5
-	      xi  = -xi_saved;
-	      eta = -eta_saved;
-	    }
-	  else
-	    {
-	      // Case 6
-	      xi  = -eta_saved;
-	      eta = -xi_saved;
-	    }
+        else if (elem->point(6) == min_point)
+          if (elem->point(7) == std::min(elem->point(7), elem->point(5)))
+            {
+              // Case 5
+              xi  = -xi_saved;
+              eta = -eta_saved;
+            }
+          else
+            {
+              // Case 6
+              xi  = -eta_saved;
+              eta = -xi_saved;
+            }
 
-	else if (elem->point(7) == min_point)
-	  {
-	    if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
-	      {
-		// Case 7
-		xi  = -eta_saved;
-		eta = xi_saved;
-	      }
-	    else
-	      {
-		// Case 8
-		xi  = xi_saved;
-		eta = eta_saved;
-	      }
-	  }
+        else if (elem->point(7) == min_point)
+          {
+            if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
+              {
+                // Case 7
+                xi  = -eta_saved;
+                eta = xi_saved;
+              }
+            else
+              {
+                // Case 8
+                xi  = xi_saved;
+                eta = eta_saved;
+              }
+          }
       }
 
     // Internal DoFs
     else
       {
-	unsigned int basisnum = i - 8 - 12*e - 6*e*e;
-	i0 = cube_number_column[basisnum] + 2;
-	i1 = cube_number_row[basisnum] + 2;
-	i2 = cube_number_page[basisnum] + 2;
+        unsigned int basisnum = i - 8 - 12*e - 6*e*e;
+        i0 = cube_number_column[basisnum] + 2;
+        i1 = cube_number_row[basisnum] + 2;
+        i2 = cube_number_page[basisnum] + 2;
       }
   }
 } // end anonymous namespace
@@ -686,7 +686,7 @@ Real FE<3,L2_HIERARCHIC>::shape(const Elem* elem,
 
         unsigned int i0, i1, i2;
 
-	cube_indices(elem, totalorder, i, xi, eta, zeta, i0, i1, i2);
+        cube_indices(elem, totalorder, i, xi, eta, zeta, i0, i1, i2);
 
         return (FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder, i0, xi)*
                 FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder, i1, eta)*

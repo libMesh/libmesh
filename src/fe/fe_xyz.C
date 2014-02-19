@@ -33,10 +33,10 @@ namespace libMesh
   namespace {
 
     void xyz_nodal_soln(const Elem* elem,
-			const Order order,
-			const std::vector<Number>& elem_soln,
-			std::vector<Number>&       nodal_soln,
-			unsigned Dim)
+                        const Order order,
+                        const std::vector<Number>& elem_soln,
+                        std::vector<Number>&       nodal_soln,
+                        unsigned Dim)
     {
       const unsigned int n_nodes = elem->n_nodes();
 
@@ -47,49 +47,49 @@ namespace libMesh
       const Order totalorder = static_cast<Order>(order + elem->p_level());
 
       switch (totalorder)
-	{
-	  // Constant shape functions
-	case CONSTANT:
-	  {
-	    libmesh_assert_equal_to (elem_soln.size(), 1);
+        {
+          // Constant shape functions
+        case CONSTANT:
+          {
+            libmesh_assert_equal_to (elem_soln.size(), 1);
 
-	    const Number val = elem_soln[0];
+            const Number val = elem_soln[0];
 
-	    for (unsigned int n=0; n<n_nodes; n++)
-	      nodal_soln[n] = val;
+            for (unsigned int n=0; n<n_nodes; n++)
+              nodal_soln[n] = val;
 
-	    return;
-	  }
+            return;
+          }
 
 
-	  // For other orders do interpolation at the nodes
-	  // explicitly.
-	default:
-	  {
-	    // FEType object to be passed to various FEInterface functions below.
-	    FEType fe_type(totalorder, XYZ);
+          // For other orders do interpolation at the nodes
+          // explicitly.
+        default:
+          {
+            // FEType object to be passed to various FEInterface functions below.
+            FEType fe_type(totalorder, XYZ);
 
-	    const unsigned int n_sf =
-	      // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
-	      FEInterface::n_shape_functions(Dim, fe_type, elem_type);
+            const unsigned int n_sf =
+              // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
+              FEInterface::n_shape_functions(Dim, fe_type, elem_type);
 
-	    for (unsigned int n=0; n<n_nodes; n++)
-	      {
-		libmesh_assert_equal_to (elem_soln.size(), n_sf);
+            for (unsigned int n=0; n<n_nodes; n++)
+              {
+                libmesh_assert_equal_to (elem_soln.size(), n_sf);
 
-		// Zero before summation
-		nodal_soln[n] = 0;
+                // Zero before summation
+                nodal_soln[n] = 0;
 
-		// u_i = Sum (alpha_i phi_i)
-		for (unsigned int i=0; i<n_sf; i++)
-		  nodal_soln[n] += elem_soln[i] *
-		    // FE<Dim,T>::shape(elem, order, i, elem->point(n));
-		    FEInterface::shape(Dim, fe_type, elem, i, elem->point(n));
-	      }
+                // u_i = Sum (alpha_i phi_i)
+                for (unsigned int i=0; i<n_sf; i++)
+                  nodal_soln[n] += elem_soln[i] *
+                    // FE<Dim,T>::shape(elem, order, i, elem->point(n));
+                    FEInterface::shape(Dim, fe_type, elem, i, elem->point(n));
+              }
 
-	    return;
-	  } // default
-	} // switch
+            return;
+          } // default
+        } // switch
     } // xyz_nodal_soln()
 
 
@@ -99,240 +99,240 @@ namespace libMesh
     unsigned int xyz_n_dofs(const ElemType t, const Order o)
     {
       switch (o)
-	{
+        {
 
-	  // constant shape functions
-	  // no matter what shape there is only one DOF.
-	case CONSTANT:
-	  return 1;
+          // constant shape functions
+          // no matter what shape there is only one DOF.
+        case CONSTANT:
+          return 1;
 
 
-	  // Discontinuous linear shape functions
-	  // expressed in the XYZ monomials.
-	case FIRST:
-	  {
-	    switch (t)
-	      {
-	      case NODEELEM:
-		return 1;
+          // Discontinuous linear shape functions
+          // expressed in the XYZ monomials.
+        case FIRST:
+          {
+            switch (t)
+              {
+              case NODEELEM:
+                return 1;
 
-	      case EDGE2:
-	      case EDGE3:
-	      case EDGE4:
-		return 2;
+              case EDGE2:
+              case EDGE3:
+              case EDGE4:
+                return 2;
 
-	      case TRI3:
-	      case TRI6:
-	      case QUAD4:
-	      case QUAD8:
-	      case QUAD9:
-		return 3;
+              case TRI3:
+              case TRI6:
+              case QUAD4:
+              case QUAD8:
+              case QUAD9:
+                return 3;
 
-	      case TET4:
-	      case TET10:
-	      case HEX8:
-	      case HEX20:
-	      case HEX27:
-	      case PRISM6:
-	      case PRISM15:
-	      case PRISM18:
-	      case PYRAMID5:
-	      case PYRAMID14:
-		return 4;
+              case TET4:
+              case TET10:
+              case HEX8:
+              case HEX20:
+              case HEX27:
+              case PRISM6:
+              case PRISM15:
+              case PRISM18:
+              case PYRAMID5:
+              case PYRAMID14:
+                return 4;
 
-	      default:
-		{
+              default:
+                {
 #ifdef DEBUG
-		  libMesh::err << "ERROR: Bad ElemType = " << t
-			       << " for " << o << "th order approximation!"
-			       << std::endl;
+                  libMesh::err << "ERROR: Bad ElemType = " << t
+                               << " for " << o << "th order approximation!"
+                               << std::endl;
 #endif
-		  libmesh_error();
-		}
-	      }
-	  }
+                  libmesh_error();
+                }
+              }
+          }
 
 
-	  // Discontinuous quadratic shape functions
-	  // expressed in the XYZ monomials.
-	case SECOND:
-	  {
-	    switch (t)
-	      {
-	      case NODEELEM:
-		return 1;
+          // Discontinuous quadratic shape functions
+          // expressed in the XYZ monomials.
+        case SECOND:
+          {
+            switch (t)
+              {
+              case NODEELEM:
+                return 1;
 
-	      case EDGE2:
-	      case EDGE3:
-	      case EDGE4:
-		return 3;
+              case EDGE2:
+              case EDGE3:
+              case EDGE4:
+                return 3;
 
-	      case TRI3:
-	      case TRI6:
-	      case QUAD4:
-	      case QUAD8:
-	      case QUAD9:
-		return 6;
+              case TRI3:
+              case TRI6:
+              case QUAD4:
+              case QUAD8:
+              case QUAD9:
+                return 6;
 
-	      case TET4:
-	      case TET10:
-	      case HEX8:
-	      case HEX20:
-	      case HEX27:
-	      case PRISM6:
-	      case PRISM15:
-	      case PRISM18:
-	      case PYRAMID5:
-	      case PYRAMID14:
-		return 10;
+              case TET4:
+              case TET10:
+              case HEX8:
+              case HEX20:
+              case HEX27:
+              case PRISM6:
+              case PRISM15:
+              case PRISM18:
+              case PYRAMID5:
+              case PYRAMID14:
+                return 10;
 
-	      default:
-		{
+              default:
+                {
 #ifdef DEBUG
-		  libMesh::err << "ERROR: Bad ElemType = " << t
-			       << " for " << o << "th order approximation!"
-			       << std::endl;
+                  libMesh::err << "ERROR: Bad ElemType = " << t
+                               << " for " << o << "th order approximation!"
+                               << std::endl;
 #endif
-		  libmesh_error();
-		}
-	      }
-	  }
+                  libmesh_error();
+                }
+              }
+          }
 
 
-	  // Discontinuous cubic shape functions
-	  // expressed in the XYZ monomials.
-	case THIRD:
-	  {
-	    switch (t)
-	      {
-	      case NODEELEM:
-		return 1;
+          // Discontinuous cubic shape functions
+          // expressed in the XYZ monomials.
+        case THIRD:
+          {
+            switch (t)
+              {
+              case NODEELEM:
+                return 1;
 
-	      case EDGE2:
-	      case EDGE3:
-	      case EDGE4:
-		return 4;
+              case EDGE2:
+              case EDGE3:
+              case EDGE4:
+                return 4;
 
-	      case TRI3:
-	      case TRI6:
-	      case QUAD4:
-	      case QUAD8:
-	      case QUAD9:
-		return 10;
+              case TRI3:
+              case TRI6:
+              case QUAD4:
+              case QUAD8:
+              case QUAD9:
+                return 10;
 
-	      case TET4:
-	      case TET10:
-	      case HEX8:
-	      case HEX20:
-	      case HEX27:
-	      case PRISM6:
-	      case PRISM15:
-	      case PRISM18:
-	      case PYRAMID5:
-	      case PYRAMID14:
-		return 20;
+              case TET4:
+              case TET10:
+              case HEX8:
+              case HEX20:
+              case HEX27:
+              case PRISM6:
+              case PRISM15:
+              case PRISM18:
+              case PYRAMID5:
+              case PYRAMID14:
+                return 20;
 
-	      default:
-		{
+              default:
+                {
 #ifdef DEBUG
-		  libMesh::err << "ERROR: Bad ElemType = " << t
-			       << " for " << o << "th order approximation!"
-			       << std::endl;
+                  libMesh::err << "ERROR: Bad ElemType = " << t
+                               << " for " << o << "th order approximation!"
+                               << std::endl;
 #endif
-		  libmesh_error();
-		}
-	      }
-	  }
+                  libmesh_error();
+                }
+              }
+          }
 
 
-	  // Discontinuous quartic shape functions
-	  // expressed in the XYZ monomials.
-	case FOURTH:
-	  {
-	    switch (t)
-	      {
-	      case NODEELEM:
-		return 1;
+          // Discontinuous quartic shape functions
+          // expressed in the XYZ monomials.
+        case FOURTH:
+          {
+            switch (t)
+              {
+              case NODEELEM:
+                return 1;
 
-	      case EDGE2:
-	      case EDGE3:
-		return 5;
+              case EDGE2:
+              case EDGE3:
+                return 5;
 
-	      case TRI3:
-	      case TRI6:
-	      case QUAD4:
-	      case QUAD8:
-	      case QUAD9:
-		return 15;
+              case TRI3:
+              case TRI6:
+              case QUAD4:
+              case QUAD8:
+              case QUAD9:
+                return 15;
 
-	      case TET4:
-	      case TET10:
-	      case HEX8:
-	      case HEX20:
-	      case HEX27:
-	      case PRISM6:
-	      case PRISM15:
-	      case PRISM18:
-	      case PYRAMID5:
-	      case PYRAMID14:
-		return 35;
+              case TET4:
+              case TET10:
+              case HEX8:
+              case HEX20:
+              case HEX27:
+              case PRISM6:
+              case PRISM15:
+              case PRISM18:
+              case PYRAMID5:
+              case PYRAMID14:
+                return 35;
 
-	      default:
-		{
+              default:
+                {
 #ifdef DEBUG
-		  libMesh::err << "ERROR: Bad ElemType = " << t
-			       << " for " << o << "th order approximation!"
-			       << std::endl;
+                  libMesh::err << "ERROR: Bad ElemType = " << t
+                               << " for " << o << "th order approximation!"
+                               << std::endl;
 #endif
-		  libmesh_error();
-		}
-	      }
-	  }
+                  libmesh_error();
+                }
+              }
+          }
 
 
-	default:
-	  {
-	    const unsigned int order = static_cast<unsigned int>(o);
-	    switch (t)
-	      {
-	      case NODEELEM:
-		return 1;
+        default:
+          {
+            const unsigned int order = static_cast<unsigned int>(o);
+            switch (t)
+              {
+              case NODEELEM:
+                return 1;
 
-	      case EDGE2:
-	      case EDGE3:
-		return (order+1);
+              case EDGE2:
+              case EDGE3:
+                return (order+1);
 
-	      case TRI3:
-	      case TRI6:
-	      case QUAD4:
-	      case QUAD8:
-	      case QUAD9:
-		return (order+1)*(order+2)/2;
+              case TRI3:
+              case TRI6:
+              case QUAD4:
+              case QUAD8:
+              case QUAD9:
+                return (order+1)*(order+2)/2;
 
-	      case TET4:
-	      case TET10:
-	      case HEX8:
-	      case HEX20:
-	      case HEX27:
-	      case PRISM6:
-	      case PRISM15:
-	      case PRISM18:
-	      case PYRAMID5:
-	      case PYRAMID14:
-		return (order+1)*(order+2)*(order+3)/6;
+              case TET4:
+              case TET10:
+              case HEX8:
+              case HEX20:
+              case HEX27:
+              case PRISM6:
+              case PRISM15:
+              case PRISM18:
+              case PYRAMID5:
+              case PYRAMID14:
+                return (order+1)*(order+2)*(order+3)/6;
 
-	      default:
-		{
+              default:
+                {
 #ifdef DEBUG
-		  libMesh::err << "ERROR: Bad ElemType = " << t
-			       << " for " << o << "th order approximation!"
-			       << std::endl;
+                  libMesh::err << "ERROR: Bad ElemType = " << t
+                               << " for " << o << "th order approximation!"
+                               << std::endl;
 #endif
-		  libmesh_error();
-		}
-	      }
-	  }
-	}
+                  libmesh_error();
+                }
+              }
+          }
+        }
 
       libmesh_error();
 
@@ -343,248 +343,248 @@ namespace libMesh
 
 
     unsigned int xyz_n_dofs_per_elem(const ElemType t,
-				     const Order o)
+                                     const Order o)
     {
       switch (o)
-	{
-	  // constant shape functions always have 1 DOF per element
-	case CONSTANT:
-	  return 1;
+        {
+          // constant shape functions always have 1 DOF per element
+        case CONSTANT:
+          return 1;
 
 
-	  // Discontinuous linear shape functions
-	  // expressed in the XYZ monomials.
-	case FIRST:
-	  {
-	    switch (t)
-	      {
-	      case NODEELEM:
-		return 1;
+          // Discontinuous linear shape functions
+          // expressed in the XYZ monomials.
+        case FIRST:
+          {
+            switch (t)
+              {
+              case NODEELEM:
+                return 1;
 
-		// 1D linears have 2 DOFs per element
-	      case EDGE2:
-	      case EDGE3:
-	      case EDGE4:
-		return 2;
+                // 1D linears have 2 DOFs per element
+              case EDGE2:
+              case EDGE3:
+              case EDGE4:
+                return 2;
 
-		// 2D linears have 3 DOFs per element
-	      case TRI3:
-	      case TRI6:
-	      case QUAD4:
-	      case QUAD8:
-	      case QUAD9:
-		return 3;
+                // 2D linears have 3 DOFs per element
+              case TRI3:
+              case TRI6:
+              case QUAD4:
+              case QUAD8:
+              case QUAD9:
+                return 3;
 
-		// 3D linears have 4 DOFs per element
-	      case TET4:
-	      case TET10:
-	      case HEX8:
-	      case HEX20:
-	      case HEX27:
-	      case PRISM6:
-	      case PRISM15:
-	      case PRISM18:
-	      case PYRAMID5:
-	      case PYRAMID14:
-		return 4;
+                // 3D linears have 4 DOFs per element
+              case TET4:
+              case TET10:
+              case HEX8:
+              case HEX20:
+              case HEX27:
+              case PRISM6:
+              case PRISM15:
+              case PRISM18:
+              case PYRAMID5:
+              case PYRAMID14:
+                return 4;
 
-	      default:
-		{
+              default:
+                {
 #ifdef DEBUG
-		  libMesh::err << "ERROR: Bad ElemType = " << t
-			       << " for " << o << "th order approximation!"
-			       << std::endl;
+                  libMesh::err << "ERROR: Bad ElemType = " << t
+                               << " for " << o << "th order approximation!"
+                               << std::endl;
 #endif
-		  libmesh_error();
-		}
-	      }
-	  }
+                  libmesh_error();
+                }
+              }
+          }
 
 
-	  // Discontinuous quadratic shape functions
-	  // expressed in the XYZ monomials.
-	case SECOND:
-	  {
-	    switch (t)
-	      {
-	      case NODEELEM:
-		return 1;
+          // Discontinuous quadratic shape functions
+          // expressed in the XYZ monomials.
+        case SECOND:
+          {
+            switch (t)
+              {
+              case NODEELEM:
+                return 1;
 
-		// 1D quadratics have 3 DOFs per element
-	      case EDGE2:
-	      case EDGE3:
-	      case EDGE4:
-		return 3;
+                // 1D quadratics have 3 DOFs per element
+              case EDGE2:
+              case EDGE3:
+              case EDGE4:
+                return 3;
 
-		// 2D quadratics have 6 DOFs per element
-	      case TRI3:
-	      case TRI6:
-	      case QUAD4:
-	      case QUAD8:
-	      case QUAD9:
-		return 6;
+                // 2D quadratics have 6 DOFs per element
+              case TRI3:
+              case TRI6:
+              case QUAD4:
+              case QUAD8:
+              case QUAD9:
+                return 6;
 
-		// 3D quadratics have 10 DOFs per element
-	      case TET4:
-	      case TET10:
-	      case HEX8:
-	      case HEX20:
-	      case HEX27:
-	      case PRISM6:
-	      case PRISM15:
-	      case PRISM18:
-	      case PYRAMID5:
-	      case PYRAMID14:
-		return 10;
+                // 3D quadratics have 10 DOFs per element
+              case TET4:
+              case TET10:
+              case HEX8:
+              case HEX20:
+              case HEX27:
+              case PRISM6:
+              case PRISM15:
+              case PRISM18:
+              case PYRAMID5:
+              case PYRAMID14:
+                return 10;
 
-	      default:
-		{
+              default:
+                {
 #ifdef DEBUG
-		  libMesh::err << "ERROR: Bad ElemType = " << t
-			       << " for " << o << "th order approximation!"
-			       << std::endl;
+                  libMesh::err << "ERROR: Bad ElemType = " << t
+                               << " for " << o << "th order approximation!"
+                               << std::endl;
 #endif
-		  libmesh_error();
-		}
-	      }
-	  }
+                  libmesh_error();
+                }
+              }
+          }
 
 
-	  // Discontinuous cubic shape functions
-	  // expressed in the XYZ monomials.
-	case THIRD:
-	  {
-	    switch (t)
-	      {
-	      case NODEELEM:
-		return 1;
+          // Discontinuous cubic shape functions
+          // expressed in the XYZ monomials.
+        case THIRD:
+          {
+            switch (t)
+              {
+              case NODEELEM:
+                return 1;
 
-	      case EDGE2:
-	      case EDGE3:
-	      case EDGE4:
-		return 4;
+              case EDGE2:
+              case EDGE3:
+              case EDGE4:
+                return 4;
 
-	      case TRI3:
-	      case TRI6:
-	      case QUAD4:
-	      case QUAD8:
-	      case QUAD9:
-		return 10;
+              case TRI3:
+              case TRI6:
+              case QUAD4:
+              case QUAD8:
+              case QUAD9:
+                return 10;
 
-	      case TET4:
-	      case TET10:
-	      case HEX8:
-	      case HEX20:
-	      case HEX27:
-	      case PRISM6:
-	      case PRISM15:
-	      case PRISM18:
-	      case PYRAMID5:
-	      case PYRAMID14:
-		return 20;
+              case TET4:
+              case TET10:
+              case HEX8:
+              case HEX20:
+              case HEX27:
+              case PRISM6:
+              case PRISM15:
+              case PRISM18:
+              case PYRAMID5:
+              case PYRAMID14:
+                return 20;
 
-	      default:
-		{
+              default:
+                {
 #ifdef DEBUG
-		  libMesh::err << "ERROR: Bad ElemType = " << t
-			       << " for " << o << "th order approximation!"
-			       << std::endl;
+                  libMesh::err << "ERROR: Bad ElemType = " << t
+                               << " for " << o << "th order approximation!"
+                               << std::endl;
 #endif
-		  libmesh_error();
-		}
-	      }
-	  }
+                  libmesh_error();
+                }
+              }
+          }
 
 
-	  // Discontinuous quartic shape functions
-	  // expressed in the XYZ monomials.
-	case FOURTH:
-	  {
-	    switch (t)
-	      {
-	      case NODEELEM:
-		return 1;
+          // Discontinuous quartic shape functions
+          // expressed in the XYZ monomials.
+        case FOURTH:
+          {
+            switch (t)
+              {
+              case NODEELEM:
+                return 1;
 
-	      case EDGE2:
-	      case EDGE3:
-	      case EDGE4:
-		return 5;
+              case EDGE2:
+              case EDGE3:
+              case EDGE4:
+                return 5;
 
-	      case TRI3:
-	      case TRI6:
-	      case QUAD4:
-	      case QUAD8:
-	      case QUAD9:
-		return 15;
+              case TRI3:
+              case TRI6:
+              case QUAD4:
+              case QUAD8:
+              case QUAD9:
+                return 15;
 
-	      case TET4:
-	      case TET10:
-	      case HEX8:
-	      case HEX20:
-	      case HEX27:
-	      case PRISM6:
-	      case PRISM15:
-	      case PRISM18:
-	      case PYRAMID5:
-	      case PYRAMID14:
-		return 35;
+              case TET4:
+              case TET10:
+              case HEX8:
+              case HEX20:
+              case HEX27:
+              case PRISM6:
+              case PRISM15:
+              case PRISM18:
+              case PYRAMID5:
+              case PYRAMID14:
+                return 35;
 
-	      default:
-		{
+              default:
+                {
 #ifdef DEBUG
-		  libMesh::err << "ERROR: Bad ElemType = " << t
-			       << " for " << o << "th order approximation!"
-			       << std::endl;
+                  libMesh::err << "ERROR: Bad ElemType = " << t
+                               << " for " << o << "th order approximation!"
+                               << std::endl;
 #endif
-		  libmesh_error();
-		}
-	      }
-	  }
+                  libmesh_error();
+                }
+              }
+          }
 
-	default:
-	  {
-	    const unsigned int order = static_cast<unsigned int>(o);
-	    switch (t)
-	      {
-	      case NODEELEM:
-		return 1;
+        default:
+          {
+            const unsigned int order = static_cast<unsigned int>(o);
+            switch (t)
+              {
+              case NODEELEM:
+                return 1;
 
-	      case EDGE2:
-	      case EDGE3:
-		return (order+1);
+              case EDGE2:
+              case EDGE3:
+                return (order+1);
 
-	      case TRI3:
-	      case TRI6:
-	      case QUAD4:
-	      case QUAD8:
-	      case QUAD9:
-		return (order+1)*(order+2)/2;
+              case TRI3:
+              case TRI6:
+              case QUAD4:
+              case QUAD8:
+              case QUAD9:
+                return (order+1)*(order+2)/2;
 
-	      case TET4:
-	      case TET10:
-	      case HEX8:
-	      case HEX20:
-	      case HEX27:
-	      case PRISM6:
-	      case PRISM15:
-	      case PRISM18:
-	      case PYRAMID5:
-	      case PYRAMID14:
-		return (order+1)*(order+2)*(order+3)/6;
+              case TET4:
+              case TET10:
+              case HEX8:
+              case HEX20:
+              case HEX27:
+              case PRISM6:
+              case PRISM15:
+              case PRISM18:
+              case PYRAMID5:
+              case PYRAMID14:
+                return (order+1)*(order+2)*(order+3)/6;
 
-	      default:
-		{
+              default:
+                {
 #ifdef DEBUG
-		  libMesh::err << "ERROR: Bad ElemType = " << t
-			       << " for " << o << "th order approximation!"
-			       << std::endl;
+                  libMesh::err << "ERROR: Bad ElemType = " << t
+                               << " for " << o << "th order approximation!"
+                               << std::endl;
 #endif
-		  libmesh_error();
-		}
-	      }
-	  }
-	  return 0;
-	}
+                  libmesh_error();
+                }
+              }
+          }
+          return 0;
+        }
     }
 
 
@@ -598,7 +598,7 @@ namespace libMesh
 
 template <unsigned int Dim>
 void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
-				      const Elem* elem)
+                                      const Elem* elem)
 {
   libmesh_assert(elem);
   this->calculations_started = true;
@@ -624,7 +624,7 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
   // space.
   const unsigned int n_approx_shape_functions =
     this->n_shape_functions(this->get_type(),
-			    this->get_order());
+                            this->get_order());
 
   // resize the vectors to hold current data
   // Phi are the shape functions used for the FE approximation
@@ -657,24 +657,24 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
     for (unsigned int i=0; i<n_approx_shape_functions; i++)
       {
         if (this->calculate_phi)
-	  this->phi[i].resize           (n_qp);
+          this->phi[i].resize           (n_qp);
         if (this->calculate_dphi)
           {
-	    this->dphi[i].resize        (n_qp);
-	    this->dphidx[i].resize      (n_qp);
-	    this->dphidy[i].resize      (n_qp);
-	    this->dphidz[i].resize      (n_qp);
+            this->dphi[i].resize        (n_qp);
+            this->dphidx[i].resize      (n_qp);
+            this->dphidy[i].resize      (n_qp);
+            this->dphidz[i].resize      (n_qp);
           }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         if (this->calculate_d2phi)
           {
-	    this->d2phi[i].resize       (n_qp);
-	    this->d2phidx2[i].resize    (n_qp);
-	    this->d2phidxdy[i].resize   (n_qp);
-	    this->d2phidxdz[i].resize   (n_qp);
+            this->d2phi[i].resize       (n_qp);
+            this->d2phidx2[i].resize    (n_qp);
+            this->d2phidxdy[i].resize   (n_qp);
+            this->d2phidxdz[i].resize   (n_qp);
             this->d2phidy2[i].resize    (n_qp);
-	    this->d2phidydz[i].resize   (n_qp);
-	    this->d2phidz2[i].resize    (n_qp);
+            this->d2phidydz[i].resize   (n_qp);
+            this->d2phidz2[i].resize    (n_qp);
           }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       }
@@ -697,8 +697,8 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
     for (unsigned int p=0; p<n_qp; p++)
       {
         this->weight[p] = 1.;
-	this->dweight[p].zero();
-	this->dphase[p].zero();
+        this->dweight[p].zero();
+        this->dphase[p].zero();
       }
 
  }
@@ -733,140 +733,140 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem, const std::vector<Po
     case 1:
       {
         if (this->calculate_phi)
-	  for (unsigned int i=0; i<this->phi.size(); i++)
-	    for (unsigned int p=0; p<this->phi[i].size(); p++)
-	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
+          for (unsigned int i=0; i<this->phi.size(); i++)
+            for (unsigned int p=0; p<this->phi[i].size(); p++)
+              this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
         if (this->calculate_dphi)
-	  for (unsigned int i=0; i<this->dphi.size(); i++)
-	    for (unsigned int p=0; p<this->dphi[i].size(); p++)
-	      {
-	        this->dphi[i][p](0) =
-		  this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
+          for (unsigned int i=0; i<this->dphi.size(); i++)
+            for (unsigned int p=0; p<this->dphi[i].size(); p++)
+              {
+                this->dphi[i][p](0) =
+                  this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
 
-	        this->dphi[i][p](1) = this->dphidy[i][p] = 0.;
-	        this->dphi[i][p](2) = this->dphidz[i][p] = 0.;
-	      }
+                this->dphi[i][p](1) = this->dphidy[i][p] = 0.;
+                this->dphi[i][p](2) = this->dphidz[i][p] = 0.;
+              }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         if (this->calculate_d2phi)
-	  for (unsigned int i=0; i<this->d2phi.size(); i++)
-	    for (unsigned int p=0; p<this->d2phi[i].size(); p++)
-	      {
-	        this->d2phi[i][p](0,0) =
-		  this->d2phidx2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
+          for (unsigned int i=0; i<this->d2phi.size(); i++)
+            for (unsigned int p=0; p<this->d2phi[i].size(); p++)
+              {
+                this->d2phi[i][p](0,0) =
+                  this->d2phidx2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
 
 #if LIBMESH_DIM>1
-	        this->d2phi[i][p](0,1) = this->d2phidxdy[i][p] =
-	        this->d2phi[i][p](1,0) = 0.;
-	        this->d2phi[i][p](1,1) = this->d2phidy2[i][p] = 0.;
+                this->d2phi[i][p](0,1) = this->d2phidxdy[i][p] =
+                  this->d2phi[i][p](1,0) = 0.;
+                this->d2phi[i][p](1,1) = this->d2phidy2[i][p] = 0.;
 #if LIBMESH_DIM>2
-	        this->d2phi[i][p](0,2) = this->d2phidxdz[i][p] =
-	        this->d2phi[i][p](2,0) = 0.;
-	        this->d2phi[i][p](1,2) = this->d2phidydz[i][p] =
-	        this->d2phi[i][p](2,1) = 0.;
-	        this->d2phi[i][p](2,2) = this->d2phidz2[i][p] = 0.;
+                this->d2phi[i][p](0,2) = this->d2phidxdz[i][p] =
+                  this->d2phi[i][p](2,0) = 0.;
+                this->d2phi[i][p](1,2) = this->d2phidydz[i][p] =
+                  this->d2phi[i][p](2,1) = 0.;
+                this->d2phi[i][p](2,2) = this->d2phidz2[i][p] = 0.;
 #endif
 #endif
-	      }
+              }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-	// All done
-	break;
+        // All done
+        break;
       }
 
     case 2:
       {
         if (this->calculate_phi)
-	  for (unsigned int i=0; i<this->phi.size(); i++)
-	    for (unsigned int p=0; p<this->phi[i].size(); p++)
-	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
+          for (unsigned int i=0; i<this->phi.size(); i++)
+            for (unsigned int p=0; p<this->phi[i].size(); p++)
+              this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
         if (this->calculate_dphi)
-	  for (unsigned int i=0; i<this->dphi.size(); i++)
-	    for (unsigned int p=0; p<this->dphi[i].size(); p++)
-	      {
-	        this->dphi[i][p](0) =
-		  this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
+          for (unsigned int i=0; i<this->dphi.size(); i++)
+            for (unsigned int p=0; p<this->dphi[i].size(); p++)
+              {
+                this->dphi[i][p](0) =
+                  this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
 
-	        this->dphi[i][p](1) =
-		  this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, xyz_qp[p]);
+                this->dphi[i][p](1) =
+                  this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, xyz_qp[p]);
 
 #if LIBMESH_DIM == 3
-	        this->dphi[i][p](2) = // can only assign to the Z component if LIBMESH_DIM==3
+                this->dphi[i][p](2) = // can only assign to the Z component if LIBMESH_DIM==3
 #endif
-		this->dphidz[i][p] = 0.;
-	      }
+                  this->dphidz[i][p] = 0.;
+              }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         if (this->calculate_d2phi)
-	  for (unsigned int i=0; i<this->d2phi.size(); i++)
-	    for (unsigned int p=0; p<this->d2phi[i].size(); p++)
-	      {
-	        this->d2phi[i][p](0,0) =
-		  this->d2phidx2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
+          for (unsigned int i=0; i<this->d2phi.size(); i++)
+            for (unsigned int p=0; p<this->d2phi[i].size(); p++)
+              {
+                this->d2phi[i][p](0,0) =
+                  this->d2phidx2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
 
-	        this->d2phi[i][p](0,1) = this->d2phidxdy[i][p] =
-	        this->d2phi[i][p](1,0) = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 1, xyz_qp[p]);
-	        this->d2phi[i][p](1,1) =
+                this->d2phi[i][p](0,1) = this->d2phidxdy[i][p] =
+                  this->d2phi[i][p](1,0) = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 1, xyz_qp[p]);
+                this->d2phi[i][p](1,1) =
                   this->d2phidy2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 2, xyz_qp[p]);
 #if LIBMESH_DIM>2
-	        this->d2phi[i][p](0,2) = this->d2phidxdz[i][p] =
-	        this->d2phi[i][p](2,0) = 0.;
-	        this->d2phi[i][p](1,2) = this->d2phidydz[i][p] =
-	        this->d2phi[i][p](2,1) = 0.;
-	        this->d2phi[i][p](2,2) = this->d2phidz2[i][p] = 0.;
+                this->d2phi[i][p](0,2) = this->d2phidxdz[i][p] =
+                  this->d2phi[i][p](2,0) = 0.;
+                this->d2phi[i][p](1,2) = this->d2phidydz[i][p] =
+                  this->d2phi[i][p](2,1) = 0.;
+                this->d2phi[i][p](2,2) = this->d2phidz2[i][p] = 0.;
 #endif
-	      }
+              }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-	// All done
-	break;
+        // All done
+        break;
       }
 
     case 3:
       {
         if (this->calculate_phi)
-	  for (unsigned int i=0; i<this->phi.size(); i++)
-	    for (unsigned int p=0; p<this->phi[i].size(); p++)
-	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
+          for (unsigned int i=0; i<this->phi.size(); i++)
+            for (unsigned int p=0; p<this->phi[i].size(); p++)
+              this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
 
         if (this->calculate_dphi)
-	  for (unsigned int i=0; i<this->dphi.size(); i++)
-	    for (unsigned int p=0; p<this->dphi[i].size(); p++)
-	      {
-	        this->dphi[i][p](0) =
-		  this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
+          for (unsigned int i=0; i<this->dphi.size(); i++)
+            for (unsigned int p=0; p<this->dphi[i].size(); p++)
+              {
+                this->dphi[i][p](0) =
+                  this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
 
-	        this->dphi[i][p](1) =
-		  this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, xyz_qp[p]);
+                this->dphi[i][p](1) =
+                  this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, xyz_qp[p]);
 
-	        this->dphi[i][p](2) =
-		  this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 2, xyz_qp[p]);
-	      }
+                this->dphi[i][p](2) =
+                  this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 2, xyz_qp[p]);
+              }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         if (this->calculate_d2phi)
-	  for (unsigned int i=0; i<this->d2phi.size(); i++)
-	    for (unsigned int p=0; p<this->d2phi[i].size(); p++)
-	      {
-	        this->d2phi[i][p](0,0) =
-		  this->d2phidx2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
+          for (unsigned int i=0; i<this->d2phi.size(); i++)
+            for (unsigned int p=0; p<this->d2phi[i].size(); p++)
+              {
+                this->d2phi[i][p](0,0) =
+                  this->d2phidx2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 0, xyz_qp[p]);
 
-	        this->d2phi[i][p](0,1) = this->d2phidxdy[i][p] =
-	        this->d2phi[i][p](1,0) = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 1, xyz_qp[p]);
-	        this->d2phi[i][p](1,1) =
+                this->d2phi[i][p](0,1) = this->d2phidxdy[i][p] =
+                  this->d2phi[i][p](1,0) = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 1, xyz_qp[p]);
+                this->d2phi[i][p](1,1) =
                   this->d2phidy2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 2, xyz_qp[p]);
-	        this->d2phi[i][p](0,2) = this->d2phidxdz[i][p] =
-	        this->d2phi[i][p](2,0) = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 3, xyz_qp[p]);
-	        this->d2phi[i][p](1,2) = this->d2phidydz[i][p] =
-	        this->d2phi[i][p](2,1) = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 4, xyz_qp[p]);
-	        this->d2phi[i][p](2,2) = this->d2phidz2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 5, xyz_qp[p]);
-	      }
+                this->d2phi[i][p](0,2) = this->d2phidxdz[i][p] =
+                  this->d2phi[i][p](2,0) = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 3, xyz_qp[p]);
+                this->d2phi[i][p](1,2) = this->d2phidydz[i][p] =
+                  this->d2phi[i][p](2,1) = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 4, xyz_qp[p]);
+                this->d2phi[i][p](2,2) = this->d2phidz2[i][p] = FE<Dim,XYZ>::shape_second_deriv (elem, this->fe_type.order, i, 5, xyz_qp[p]);
+              }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-	// All done
-	break;
+        // All done
+        break;
       }
 
     default:
       {
-	libmesh_error();
+        libmesh_error();
       }
     }
 
@@ -882,30 +882,30 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem, const std::vector<Po
   // This could be macro-ified so that it fits on one line...
   template <>
   void FE<0,XYZ>::nodal_soln(const Elem* elem,
-			     const Order order,
-			     const std::vector<Number>& elem_soln,
-			     std::vector<Number>& nodal_soln)
+                             const Order order,
+                             const std::vector<Number>& elem_soln,
+                             std::vector<Number>& nodal_soln)
   { xyz_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
 
   template <>
   void FE<1,XYZ>::nodal_soln(const Elem* elem,
-			     const Order order,
-			     const std::vector<Number>& elem_soln,
-			     std::vector<Number>& nodal_soln)
+                             const Order order,
+                             const std::vector<Number>& elem_soln,
+                             std::vector<Number>& nodal_soln)
   { xyz_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
 
   template <>
   void FE<2,XYZ>::nodal_soln(const Elem* elem,
-			     const Order order,
-			     const std::vector<Number>& elem_soln,
-			     std::vector<Number>& nodal_soln)
+                             const Order order,
+                             const std::vector<Number>& elem_soln,
+                             std::vector<Number>& nodal_soln)
   { xyz_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
 
   template <>
   void FE<3,XYZ>::nodal_soln(const Elem* elem,
-			     const Order order,
-			     const std::vector<Number>& elem_soln,
-			     std::vector<Number>& nodal_soln)
+                             const Order order,
+                             const std::vector<Number>& elem_soln,
+                             std::vector<Number>& nodal_soln)
   { xyz_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
 
 

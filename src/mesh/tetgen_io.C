@@ -69,7 +69,7 @@ void TetGenIO::read (const std::string& name)
   else
     {
       libMesh::err << "ERROR: Unrecognized file name: "
-		    << name << std::endl;
+                   << name << std::endl;
       libmesh_error();
     }
 
@@ -82,9 +82,9 @@ void TetGenIO::read (const std::string& name)
   if ( !node_stream.good() || !ele_stream.good() )
     {
       libMesh::err << "ERROR: One or both Input file(s) not good." << std::endl
-		    << "Error checking files "
-		    << name_node << " and "
-		    << name_ele  << std::endl;
+                   << "Error checking files "
+                   << name_node << " and "
+                   << name_ele  << std::endl;
       libmesh_error();
     }
   libMesh::out<< "TetGenIO found the tetgen files to read " <<std::endl;
@@ -101,7 +101,7 @@ void TetGenIO::read (const std::string& name)
 
 
 void TetGenIO::read_nodes_and_elem (std::istream& node_stream,
-				    std::istream& ele_stream)
+                                    std::istream& ele_stream)
 {
   _num_nodes    = 0;
   _num_elements = 0;
@@ -134,9 +134,9 @@ void TetGenIO::node_in (std::istream& node_stream)
   unsigned int dimension=0, nAttributes=0, BoundaryMarkers=0;
 
   node_stream >> _num_nodes       // Read the number of nodes from the stream
-	      >> dimension        // Read the dimension from the stream
-	      >> nAttributes      // Read the number of attributes from stream
-	      >> BoundaryMarkers; // Read if or not boundary markers are included in *.node (0 or 1)
+              >> dimension        // Read the dimension from the stream
+              >> nAttributes      // Read the number of attributes from stream
+              >> BoundaryMarkers; // Read if or not boundary markers are included in *.node (0 or 1)
 
   // Read the nodal coordinates from the node_stream (*.node file).
   unsigned int node_lab=0;
@@ -155,18 +155,18 @@ void TetGenIO::node_in (std::istream& node_stream)
       libmesh_assert (node_stream.good());
 
       node_stream >> node_lab  // node number
-		  >> xyz(0)    // x-coordinate value
-		  >> xyz(1)    // y-coordinate value
-		  >> xyz(2);   // z-coordinate value
+                  >> xyz(0)    // x-coordinate value
+                  >> xyz(1)    // y-coordinate value
+                  >> xyz(2);   // z-coordinate value
 
       // Read and store attributes from the stream.
       for (unsigned int j=0; j<nAttributes; j++)
-	node_stream >> node_attributes[j][i];
+        node_stream >> node_attributes[j][i];
 
       // Read (and discard) boundary marker if BoundaryMarker=1.
       // TODO: should we store this somehow?
       if (BoundaryMarkers == 1)
-	node_stream >> dummy;
+        node_stream >> dummy;
 
       // Store the new position of the node under its label.
       //_assign_nodes.insert (std::make_pair(node_lab,i));
@@ -178,7 +178,7 @@ void TetGenIO::node_in (std::istream& node_stream)
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
       if (this->_mesh_data != NULL)
-	this->_mesh_data->add_foreign_node_id (newnode, node_lab);
+        this->_mesh_data->add_foreign_node_id (newnode, node_lab);
     }
 }
 
@@ -198,8 +198,8 @@ void TetGenIO::element_in (std::istream& ele_stream)
   unsigned int element_lab=0, n_nodes=0, nAttri=0;
 
   ele_stream >> _num_elements // Read the number of tetrahedrons from the stream.
-	     >> n_nodes       // Read the number of nodes per tetrahedron from the stream (defaults to 4).
-	     >> nAttri;       // Read the number of attributes from stream.
+             >> n_nodes       // Read the number of nodes per tetrahedron from the stream (defaults to 4).
+             >> nAttri;       // Read the number of attributes from stream.
 
   // Vector that assigns element nodes to their correct position.
   // TetGen is normaly 0-based
@@ -220,17 +220,17 @@ void TetGenIO::element_in (std::istream& ele_stream)
       Elem* elem;
 
       if (n_nodes==4)
-	elem = new Tet4;
+        elem = new Tet4;
 
       else if (n_nodes==10)
-	elem = new Tet10;
+        elem = new Tet10;
 
       else
-	{
-	  libMesh::err << "Elements with " << n_nodes
-		        << " nodes are not supported in the LibMesh tetgen module\n";
-	  libmesh_error();
-	}
+        {
+          libMesh::err << "Elements with " << n_nodes
+                       << " nodes are not supported in the LibMesh tetgen module\n";
+          libmesh_error();
+        }
       elem->set_id(i);
 
       mesh.add_elem (elem);
@@ -244,22 +244,22 @@ void TetGenIO::element_in (std::istream& ele_stream)
       // Add the element to the mesh &
       // tell the MeshData object the foreign element id
       if (this->_mesh_data != NULL)
-	this->_mesh_data->add_foreign_elem_id (elem, element_lab);
+        this->_mesh_data->add_foreign_elem_id (elem, element_lab);
 
       // Read node labels
       for (dof_id_type j=0; j<n_nodes; j++)
-	{
-	  dof_id_type node_label;
-	  ele_stream >> node_label;
+        {
+          dof_id_type node_label;
+          ele_stream >> node_label;
 
-	  // Assign node to element
-	  elem->set_node(assign_elm_nodes[j]) =
-	    mesh.node_ptr(_assign_nodes[node_label]);
-	}
+          // Assign node to element
+          elem->set_node(assign_elm_nodes[j]) =
+            mesh.node_ptr(_assign_nodes[node_label]);
+        }
 
       // Read and store attributes from the stream.
       for (unsigned int j=0; j<nAttri; j++)
-	ele_stream >> this->element_attributes[j][i];
+        ele_stream >> this->element_attributes[j][i];
     }
 }
 
@@ -294,20 +294,20 @@ void TetGenIO::write (const std::string& fname)
   {
     // header:
     out_stream << "# poly file output generated by libmesh\n"
-	<< mesh.n_nodes() << " 3 0 0\n";
+               << mesh.n_nodes() << " 3 0 0\n";
 
     // write the nodes:
     for (dof_id_type v=0; v<mesh.n_nodes(); v++)
       out_stream << v << " "
-	  << mesh.point(v)(0) << " "
-	  << mesh.point(v)(1) << " "
-	  << mesh.point(v)(2) << "\n";
+                 << mesh.point(v)(0) << " "
+                 << mesh.point(v)(1) << " "
+                 << mesh.point(v)(2) << "\n";
   }
 
   {
     // write the connectivity:
     out_stream << "# Facets:\n"
-	<< mesh.n_elem() << " 0\n";
+               << mesh.n_elem() << " 0\n";
 
 //     const_active_elem_iterator       it (mesh.elements_begin());
 //     const const_active_elem_iterator end(mesh.elements_end());
@@ -317,10 +317,10 @@ void TetGenIO::write (const std::string& fname)
 
     for ( ; it != end; ++it)
       out_stream << "1\n3 " // no. of facet polygons
-        //	  << (*it)->n_nodes() << " "
-	  << (*it)->node(0)   << " "
-	  << (*it)->node(1)   << " "
-	  << (*it)->node(2)   << "\n";
+        //  << (*it)->n_nodes() << " "
+                 << (*it)->node(0)   << " "
+                 << (*it)->node(1)   << " "
+                 << (*it)->node(2)   << "\n";
   }
 
   // end of the file

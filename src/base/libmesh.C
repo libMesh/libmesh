@@ -137,7 +137,7 @@ namespace {
 #ifdef LIBMESH_HAVE_MPI
 void libMesh_MPI_Handler (MPI_Comm *, int *, ...)
 {
-	  libmesh_error();
+  libmesh_error();
 }
 #endif
 
@@ -195,11 +195,11 @@ OStreamProxy err(std::cerr);
 
 PerfLog            perflog ("libMesh",
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
-				     true
+                            true
 #else
-				     false
+                            false
 #endif
-				     );
+                            );
 
 
 // const Real         pi = 3.1415926535897932384626433832795029L;
@@ -315,7 +315,7 @@ void libmesh_terminate_handler()
 LibMeshInit::LibMeshInit (int argc, const char* const* argv)
 #else
 LibMeshInit::LibMeshInit (int argc, const char* const* argv,
-		          MPI_Comm COMM_WORLD_IN)
+                          MPI_Comm COMM_WORLD_IN)
 #endif
 {
   // should _not_ be initialized already.
@@ -368,10 +368,10 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
       MPI_Initialized (&flag);
 
       if (!flag)
-	{
-	  MPI_Init (&argc, const_cast<char***>(&argv));
-	  libmesh_initialized_mpi = true;
-	}
+        {
+          MPI_Init (&argc, const_cast<char***>(&argv));
+          libmesh_initialized_mpi = true;
+        }
 
       // Duplicate the input communicator for internal use
       // And get a Parallel::Communicator copy too, to use
@@ -398,13 +398,13 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
       if (libMesh::on_command_line ("--handle-mpi-errors"))
         {
 #if MPI_VERSION > 1
-	  MPI_Comm_create_errhandler(libMesh_MPI_Handler, &libmesh_errhandler);
-	  MPI_Comm_set_errhandler(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler);
-	  MPI_Comm_set_errhandler(MPI_COMM_WORLD, libmesh_errhandler);
+          MPI_Comm_create_errhandler(libMesh_MPI_Handler, &libmesh_errhandler);
+          MPI_Comm_set_errhandler(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler);
+          MPI_Comm_set_errhandler(MPI_COMM_WORLD, libmesh_errhandler);
 #else
-	  MPI_Errhandler_create(libMesh_MPI_Handler, &libmesh_errhandler);
-	  MPI_Errhandler_set(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler);
-	  MPI_Errhandler_set(MPI_COMM_WORLD, libmesh_errhandler);
+          MPI_Errhandler_create(libMesh_MPI_Handler, &libmesh_errhandler);
+          MPI_Errhandler_set(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler);
+          MPI_Errhandler_set(MPI_COMM_WORLD, libmesh_errhandler);
 #endif // #if MPI_VERSION > 1
         }
     }
@@ -456,14 +456,14 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
 #  endif
         {
           ierr = SlepcInitialize  (&argc, const_cast<char***>(&argv), NULL, NULL);
-	         CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
+          CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
           libmesh_initialized_slepc = true;
         }
 # else
       if (libmesh_initialized_petsc)
         {
           ierr = PetscInitialize (&argc, const_cast<char***>(&argv), NULL, NULL);
-	         CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
+          CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
         }
 # endif
     }
@@ -576,14 +576,14 @@ LibMeshInit::~LibMeshInit()
   if (ReferenceCounter::n_objects() != 0)
     {
       libMesh::err << "Memory leak detected!"
-		    << std::endl;
+                   << std::endl;
 
 #if !defined(LIBMESH_ENABLE_REFERENCE_COUNTING) || defined(NDEBUG)
 
       libMesh::err << "Compile in DEBUG mode with --enable-reference-counting"
-		    << std::endl
-		    << "for more information"
-		    << std::endl;
+                   << std::endl
+                   << "for more information"
+                   << std::endl;
 #endif
 
     }
@@ -783,7 +783,7 @@ void command_line_vector (const std::string &name, std::vector<T>& vec)
       vec.resize(size);
 
       for (unsigned i=0; i<size; ++i)
-	vec[i] = (*command_line)(name.c_str(), vec[i], i);
+        vec[i] = (*command_line)(name.c_str(), vec[i], i);
     }
 }
 
@@ -802,47 +802,47 @@ SolverPackage default_solver_package ()
 
 #ifdef LIBMESH_HAVE_PETSC
       if (libMesh::on_command_line ("--use-petsc"))
-	libMeshPrivateData::_solver_package = PETSC_SOLVERS;
+        libMeshPrivateData::_solver_package = PETSC_SOLVERS;
 #endif
 
 #ifdef LIBMESH_HAVE_TRILINOS
       if (libMesh::on_command_line ("--use-trilinos") ||
-	  libMesh::on_command_line ("--disable-petsc"))
-	libMeshPrivateData::_solver_package = TRILINOS_SOLVERS;
+          libMesh::on_command_line ("--disable-petsc"))
+        libMeshPrivateData::_solver_package = TRILINOS_SOLVERS;
 #endif
 
 #ifdef LIBMESH_HAVE_EIGEN
       if (libMesh::on_command_line ("--use-eigen"  ) ||
 #if defined(LIBMESH_HAVE_MPI)
-	  // If the user bypassed MPI, we disable PETSc and Trilinos
-	  // too
+          // If the user bypassed MPI, we disable PETSc and Trilinos
+          // too
           libMesh::on_command_line ("--disable-mpi") ||
 #endif
-	  libMesh::on_command_line ("--disable-petsc"))
-	libMeshPrivateData::_solver_package = EIGEN_SOLVERS;
+          libMesh::on_command_line ("--disable-petsc"))
+        libMeshPrivateData::_solver_package = EIGEN_SOLVERS;
 #endif
 
 #ifdef LIBMESH_HAVE_LASPACK
       if (libMesh::on_command_line ("--use-laspack"  ) ||
 #if defined(LIBMESH_HAVE_MPI)
-	  // If the user bypassed MPI, we disable PETSc and Trilinos
-	  // too
+          // If the user bypassed MPI, we disable PETSc and Trilinos
+          // too
           libMesh::on_command_line ("--disable-mpi") ||
 #endif
-	  libMesh::on_command_line ("--disable-petsc"))
-	libMeshPrivateData::_solver_package = LASPACK_SOLVERS;
+          libMesh::on_command_line ("--disable-petsc"))
+        libMeshPrivateData::_solver_package = LASPACK_SOLVERS;
 #endif
 
       if (libMesh::on_command_line ("--disable-laspack") &&
-	  libMesh::on_command_line ("--disable-trilinos") &&
-	  libMesh::on_command_line ("--disable-eigen") &&
+          libMesh::on_command_line ("--disable-trilinos") &&
+          libMesh::on_command_line ("--disable-eigen") &&
           (
 #if defined(LIBMESH_HAVE_MPI)
            // If the user bypassed MPI, we disable PETSc too
            libMesh::on_command_line ("--disable-mpi") ||
 #endif
-	   libMesh::on_command_line ("--disable-petsc")))
-	libMeshPrivateData::_solver_package = INVALID_SOLVER_PACKAGE;
+           libMesh::on_command_line ("--disable-petsc")))
+        libMeshPrivateData::_solver_package = INVALID_SOLVER_PACKAGE;
     }
 
 

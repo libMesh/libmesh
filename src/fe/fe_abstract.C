@@ -42,7 +42,7 @@ namespace libMesh
 {
 
 AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
-				       const FEType& fet)
+                                       const FEType& fet)
 {
   // The stupid AutoPtr<FEAbstract> ap(); return ap;
   // construct is required to satisfy IBM's xlC
@@ -52,355 +52,355 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
       // 0D
     case 0:
       {
-	switch (fet.family)
-	  {
-	  case CLOUGH:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<0,CLOUGH>(fet));
-	      return ap;
-	    }
+        switch (fet.family)
+          {
+          case CLOUGH:
+            {
+              AutoPtr<FEAbstract> ap(new FE<0,CLOUGH>(fet));
+              return ap;
+            }
 
-	  case HERMITE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<0,HERMITE>(fet));
-	      return ap;
-	    }
+          case HERMITE:
+            {
+              AutoPtr<FEAbstract> ap(new FE<0,HERMITE>(fet));
+              return ap;
+            }
 
-	  case LAGRANGE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<0,LAGRANGE>(fet));
-	      return ap;
-	    }
+          case LAGRANGE:
+            {
+              AutoPtr<FEAbstract> ap(new FE<0,LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case LAGRANGE_VEC:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<0,LAGRANGE_VEC>(fet));
-	      return ap;
-	    }
+          case LAGRANGE_VEC:
+            {
+              AutoPtr<FEAbstract> ap(new FE<0,LAGRANGE_VEC>(fet));
+              return ap;
+            }
 
-	  case L2_LAGRANGE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<0,L2_LAGRANGE>(fet));
-	      return ap;
-	    }
+          case L2_LAGRANGE:
+            {
+              AutoPtr<FEAbstract> ap(new FE<0,L2_LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case HIERARCHIC:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<0,HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case HIERARCHIC:
+            {
+              AutoPtr<FEAbstract> ap(new FE<0,HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case L2_HIERARCHIC:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<0,L2_HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case L2_HIERARCHIC:
+            {
+              AutoPtr<FEAbstract> ap(new FE<0,L2_HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case MONOMIAL:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<0,MONOMIAL>(fet));
-	      return ap;
-	    }
+          case MONOMIAL:
+            {
+              AutoPtr<FEAbstract> ap(new FE<0,MONOMIAL>(fet));
+              return ap;
+            }
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-	  case SZABAB:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<0,SZABAB>(fet));
-	      return ap;
-	    }
+          case SZABAB:
+            {
+              AutoPtr<FEAbstract> ap(new FE<0,SZABAB>(fet));
+              return ap;
+            }
 
-	  case BERNSTEIN:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<0,BERNSTEIN>(fet));
-	      return ap;
-	    }
+          case BERNSTEIN:
+            {
+              AutoPtr<FEAbstract> ap(new FE<0,BERNSTEIN>(fet));
+              return ap;
+            }
 #endif
 
-	  case XYZ:
-	    {
-	      AutoPtr<FEAbstract> ap(new FEXYZ<0>(fet));
-	      return ap;
-	    }
+          case XYZ:
+            {
+              AutoPtr<FEAbstract> ap(new FEXYZ<0>(fet));
+              return ap;
+            }
 
           case SCALAR:
           {
-	      AutoPtr<FEAbstract> ap(new FEScalar<0>(fet));
-	      return ap;
+            AutoPtr<FEAbstract> ap(new FEScalar<0>(fet));
+            return ap;
           }
 
-	  default:
-	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-	    libmesh_error();
-	  }
+          default:
+            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+            libmesh_error();
+          }
       }
       // 1D
     case 1:
       {
-	switch (fet.family)
-	  {
-	  case CLOUGH:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<1,CLOUGH>(fet));
-	      return ap;
-	    }
+        switch (fet.family)
+          {
+          case CLOUGH:
+            {
+              AutoPtr<FEAbstract> ap(new FE<1,CLOUGH>(fet));
+              return ap;
+            }
 
-	  case HERMITE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<1,HERMITE>(fet));
-	      return ap;
-	    }
+          case HERMITE:
+            {
+              AutoPtr<FEAbstract> ap(new FE<1,HERMITE>(fet));
+              return ap;
+            }
 
-	  case LAGRANGE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<1,LAGRANGE>(fet));
-	      return ap;
-	    }
+          case LAGRANGE:
+            {
+              AutoPtr<FEAbstract> ap(new FE<1,LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case LAGRANGE_VEC:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<1,LAGRANGE_VEC>(fet));
-	      return ap;
-	    }
+          case LAGRANGE_VEC:
+            {
+              AutoPtr<FEAbstract> ap(new FE<1,LAGRANGE_VEC>(fet));
+              return ap;
+            }
 
-	  case L2_LAGRANGE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<1,L2_LAGRANGE>(fet));
-	      return ap;
-	    }
+          case L2_LAGRANGE:
+            {
+              AutoPtr<FEAbstract> ap(new FE<1,L2_LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case HIERARCHIC:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<1,HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case HIERARCHIC:
+            {
+              AutoPtr<FEAbstract> ap(new FE<1,HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case L2_HIERARCHIC:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<1,L2_HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case L2_HIERARCHIC:
+            {
+              AutoPtr<FEAbstract> ap(new FE<1,L2_HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case MONOMIAL:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<1,MONOMIAL>(fet));
-	      return ap;
-	    }
+          case MONOMIAL:
+            {
+              AutoPtr<FEAbstract> ap(new FE<1,MONOMIAL>(fet));
+              return ap;
+            }
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-	  case SZABAB:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<1,SZABAB>(fet));
-	      return ap;
-	    }
+          case SZABAB:
+            {
+              AutoPtr<FEAbstract> ap(new FE<1,SZABAB>(fet));
+              return ap;
+            }
 
-	  case BERNSTEIN:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<1,BERNSTEIN>(fet));
-	      return ap;
-	    }
+          case BERNSTEIN:
+            {
+              AutoPtr<FEAbstract> ap(new FE<1,BERNSTEIN>(fet));
+              return ap;
+            }
 #endif
 
-	  case XYZ:
-	    {
-	      AutoPtr<FEAbstract> ap(new FEXYZ<1>(fet));
-	      return ap;
-	    }
+          case XYZ:
+            {
+              AutoPtr<FEAbstract> ap(new FEXYZ<1>(fet));
+              return ap;
+            }
 
           case SCALAR:
           {
-	      AutoPtr<FEAbstract> ap(new FEScalar<1>(fet));
-	      return ap;
+            AutoPtr<FEAbstract> ap(new FEScalar<1>(fet));
+            return ap;
           }
 
-	  default:
-	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-	    libmesh_error();
-	  }
+          default:
+            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+            libmesh_error();
+          }
       }
 
 
       // 2D
     case 2:
       {
-	switch (fet.family)
-	  {
-	  case CLOUGH:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<2,CLOUGH>(fet));
-	      return ap;
-	    }
+        switch (fet.family)
+          {
+          case CLOUGH:
+            {
+              AutoPtr<FEAbstract> ap(new FE<2,CLOUGH>(fet));
+              return ap;
+            }
 
-	  case HERMITE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<2,HERMITE>(fet));
-	      return ap;
-	    }
+          case HERMITE:
+            {
+              AutoPtr<FEAbstract> ap(new FE<2,HERMITE>(fet));
+              return ap;
+            }
 
-	  case LAGRANGE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<2,LAGRANGE>(fet));
-	      return ap;
-	    }
+          case LAGRANGE:
+            {
+              AutoPtr<FEAbstract> ap(new FE<2,LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case LAGRANGE_VEC:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<2,LAGRANGE_VEC>(fet));
-	      return ap;
-	    }
+          case LAGRANGE_VEC:
+            {
+              AutoPtr<FEAbstract> ap(new FE<2,LAGRANGE_VEC>(fet));
+              return ap;
+            }
 
-	  case L2_LAGRANGE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<2,L2_LAGRANGE>(fet));
-	      return ap;
-	    }
+          case L2_LAGRANGE:
+            {
+              AutoPtr<FEAbstract> ap(new FE<2,L2_LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case HIERARCHIC:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<2,HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case HIERARCHIC:
+            {
+              AutoPtr<FEAbstract> ap(new FE<2,HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case L2_HIERARCHIC:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<2,L2_HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case L2_HIERARCHIC:
+            {
+              AutoPtr<FEAbstract> ap(new FE<2,L2_HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case MONOMIAL:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<2,MONOMIAL>(fet));
-	      return ap;
-	    }
+          case MONOMIAL:
+            {
+              AutoPtr<FEAbstract> ap(new FE<2,MONOMIAL>(fet));
+              return ap;
+            }
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-	  case SZABAB:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<2,SZABAB>(fet));
-	      return ap;
-	    }
+          case SZABAB:
+            {
+              AutoPtr<FEAbstract> ap(new FE<2,SZABAB>(fet));
+              return ap;
+            }
 
-	  case BERNSTEIN:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<2,BERNSTEIN>(fet));
-	      return ap;
-	    }
+          case BERNSTEIN:
+            {
+              AutoPtr<FEAbstract> ap(new FE<2,BERNSTEIN>(fet));
+              return ap;
+            }
 #endif
 
-	  case XYZ:
-	    {
-	      AutoPtr<FEAbstract> ap(new FEXYZ<2>(fet));
-	      return ap;
-	    }
+          case XYZ:
+            {
+              AutoPtr<FEAbstract> ap(new FEXYZ<2>(fet));
+              return ap;
+            }
 
           case SCALAR:
           {
-	      AutoPtr<FEAbstract> ap(new FEScalar<2>(fet));
-	      return ap;
+            AutoPtr<FEAbstract> ap(new FEScalar<2>(fet));
+            return ap;
           }
 
-	  case NEDELEC_ONE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FENedelecOne<2>(fet));
-	      return ap;
-	    }
+          case NEDELEC_ONE:
+            {
+              AutoPtr<FEAbstract> ap(new FENedelecOne<2>(fet));
+              return ap;
+            }
 
-	  default:
-	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-	    libmesh_error();
-	  }
+          default:
+            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+            libmesh_error();
+          }
       }
 
 
       // 3D
     case 3:
       {
-	switch (fet.family)
-	  {
-	  case CLOUGH:
-	    {
-	      libMesh::out << "ERROR: Clough-Tocher elements currently only support 1D and 2D"
+        switch (fet.family)
+          {
+          case CLOUGH:
+            {
+              libMesh::out << "ERROR: Clough-Tocher elements currently only support 1D and 2D"
                             << std::endl;
-	      libmesh_error();
-	    }
+              libmesh_error();
+            }
 
-	  case HERMITE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<3,HERMITE>(fet));
-	      return ap;
-	    }
+          case HERMITE:
+            {
+              AutoPtr<FEAbstract> ap(new FE<3,HERMITE>(fet));
+              return ap;
+            }
 
-	  case LAGRANGE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<3,LAGRANGE>(fet));
-	      return ap;
-	    }
+          case LAGRANGE:
+            {
+              AutoPtr<FEAbstract> ap(new FE<3,LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case LAGRANGE_VEC:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<3,LAGRANGE_VEC>(fet));
-	      return ap;
-	    }
+          case LAGRANGE_VEC:
+            {
+              AutoPtr<FEAbstract> ap(new FE<3,LAGRANGE_VEC>(fet));
+              return ap;
+            }
 
-	  case L2_LAGRANGE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<3,L2_LAGRANGE>(fet));
-	      return ap;
-	    }
+          case L2_LAGRANGE:
+            {
+              AutoPtr<FEAbstract> ap(new FE<3,L2_LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case HIERARCHIC:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<3,HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case HIERARCHIC:
+            {
+              AutoPtr<FEAbstract> ap(new FE<3,HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case L2_HIERARCHIC:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<3,L2_HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case L2_HIERARCHIC:
+            {
+              AutoPtr<FEAbstract> ap(new FE<3,L2_HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case MONOMIAL:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<3,MONOMIAL>(fet));
-	      return ap;
-	    }
+          case MONOMIAL:
+            {
+              AutoPtr<FEAbstract> ap(new FE<3,MONOMIAL>(fet));
+              return ap;
+            }
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-	  case SZABAB:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<3,SZABAB>(fet));
-	      return ap;
-	    }
+          case SZABAB:
+            {
+              AutoPtr<FEAbstract> ap(new FE<3,SZABAB>(fet));
+              return ap;
+            }
 
-	  case BERNSTEIN:
-	    {
-	      AutoPtr<FEAbstract> ap(new FE<3,BERNSTEIN>(fet));
-	      return ap;
-	    }
+          case BERNSTEIN:
+            {
+              AutoPtr<FEAbstract> ap(new FE<3,BERNSTEIN>(fet));
+              return ap;
+            }
 #endif
 
-	  case XYZ:
-	    {
-	      AutoPtr<FEAbstract> ap(new FEXYZ<3>(fet));
-	      return ap;
-	    }
+          case XYZ:
+            {
+              AutoPtr<FEAbstract> ap(new FEXYZ<3>(fet));
+              return ap;
+            }
 
           case SCALAR:
           {
-	      AutoPtr<FEAbstract> ap(new FEScalar<3>(fet));
-	      return ap;
+            AutoPtr<FEAbstract> ap(new FEScalar<3>(fet));
+            return ap;
           }
 
-	  case NEDELEC_ONE:
-	    {
-	      AutoPtr<FEAbstract> ap(new FENedelecOne<3>(fet));
-	      return ap;
-	    }
+          case NEDELEC_ONE:
+            {
+              AutoPtr<FEAbstract> ap(new FENedelecOne<3>(fet));
+              return ap;
+            }
 
-	  default:
-	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-	    libmesh_error();
-	  }
+          default:
+            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+            libmesh_error();
+          }
       }
 
     default:
@@ -709,26 +709,26 @@ bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Re
     case EDGE3:
     case EDGE4:
       {
-	// The reference 1D element is [-1,1].
-	if ((xi >= -1.-eps) &&
-	    (xi <=  1.+eps))
-	  return true;
+        // The reference 1D element is [-1,1].
+        if ((xi >= -1.-eps) &&
+            (xi <=  1.+eps))
+          return true;
 
-	return false;
+        return false;
       }
 
 
     case TRI3:
     case TRI6:
       {
-	// The reference triangle is isocoles
-	// and is bound by xi=0, eta=0, and xi+eta=1.
-	if ((xi  >= 0.-eps) &&
-	    (eta >= 0.-eps) &&
-	    ((xi + eta) <= 1.+eps))
-	  return true;
+        // The reference triangle is isocoles
+        // and is bound by xi=0, eta=0, and xi+eta=1.
+        if ((xi  >= 0.-eps) &&
+            (eta >= 0.-eps) &&
+            ((xi + eta) <= 1.+eps))
+          return true;
 
-	return false;
+        return false;
       }
 
 
@@ -736,30 +736,30 @@ bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Re
     case QUAD8:
     case QUAD9:
       {
-	// The reference quadrilateral element is [-1,1]^2.
-	if ((xi  >= -1.-eps) &&
-	    (xi  <=  1.+eps) &&
-	    (eta >= -1.-eps) &&
-	    (eta <=  1.+eps))
-	  return true;
+        // The reference quadrilateral element is [-1,1]^2.
+        if ((xi  >= -1.-eps) &&
+            (xi  <=  1.+eps) &&
+            (eta >= -1.-eps) &&
+            (eta <=  1.+eps))
+          return true;
 
-	return false;
+        return false;
       }
 
 
     case TET4:
     case TET10:
       {
-	// The reference tetrahedral is isocoles
-	// and is bound by xi=0, eta=0, zeta=0,
-	// and xi+eta+zeta=1.
-	if ((xi   >= 0.-eps) &&
-	    (eta  >= 0.-eps) &&
-	    (zeta >= 0.-eps) &&
-	    ((xi + eta + zeta) <= 1.+eps))
-	  return true;
+        // The reference tetrahedral is isocoles
+        // and is bound by xi=0, eta=0, zeta=0,
+        // and xi+eta+zeta=1.
+        if ((xi   >= 0.-eps) &&
+            (eta  >= 0.-eps) &&
+            (zeta >= 0.-eps) &&
+            ((xi + eta + zeta) <= 1.+eps))
+          return true;
 
-	return false;
+        return false;
       }
 
 
@@ -767,46 +767,46 @@ bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Re
     case HEX20:
     case HEX27:
       {
-	/*
-	  if ((xi   >= -1.) &&
-	  (xi   <=  1.) &&
-	  (eta  >= -1.) &&
-	  (eta  <=  1.) &&
-	  (zeta >= -1.) &&
-	  (zeta <=  1.))
-	  return true;
-	*/
+        /*
+          if ((xi   >= -1.) &&
+          (xi   <=  1.) &&
+          (eta  >= -1.) &&
+          (eta  <=  1.) &&
+          (zeta >= -1.) &&
+          (zeta <=  1.))
+          return true;
+        */
 
-	// The reference hexahedral element is [-1,1]^3.
-	if ((xi   >= -1.-eps) &&
-	    (xi   <=  1.+eps) &&
-	    (eta  >= -1.-eps) &&
-	    (eta  <=  1.+eps) &&
-	    (zeta >= -1.-eps) &&
-	    (zeta <=  1.+eps))
-	  {
-	    //	    libMesh::out << "Strange Point:\n";
-	    //	    p.print();
-	    return true;
-	  }
+        // The reference hexahedral element is [-1,1]^3.
+        if ((xi   >= -1.-eps) &&
+            (xi   <=  1.+eps) &&
+            (eta  >= -1.-eps) &&
+            (eta  <=  1.+eps) &&
+            (zeta >= -1.-eps) &&
+            (zeta <=  1.+eps))
+          {
+            //    libMesh::out << "Strange Point:\n";
+            //    p.print();
+            return true;
+          }
 
-	return false;
+        return false;
       }
 
     case PRISM6:
     case PRISM15:
     case PRISM18:
       {
-	// Figure this one out...
-	// inside the reference triange with zeta in [-1,1]
-	if ((xi   >=  0.-eps) &&
-	    (eta  >=  0.-eps) &&
-	    (zeta >= -1.-eps) &&
-	    (zeta <=  1.+eps) &&
-	    ((xi + eta) <= 1.+eps))
-	  return true;
+        // Figure this one out...
+        // inside the reference triange with zeta in [-1,1]
+        if ((xi   >=  0.-eps) &&
+            (eta  >=  0.-eps) &&
+            (zeta >= -1.-eps) &&
+            (zeta <=  1.+eps) &&
+            ((xi + eta) <= 1.+eps))
+          return true;
 
-	return false;
+        return false;
       }
 
 
@@ -828,38 +828,38 @@ bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Re
             (            zeta >= 0.-eps))
           return true;
 
-	return false;
+        return false;
       }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     case INFHEX8:
       {
-	// The reference infhex8 is a [-1,1]^3.
-	if ((xi   >= -1.-eps) &&
-	    (xi   <=  1.+eps) &&
-	    (eta  >= -1.-eps) &&
-	    (eta  <=  1.+eps) &&
-	    (zeta >= -1.-eps) &&
-	    (zeta <=  1.+eps))
-	  {
-	    return true;
-	  }
-	return false;
+        // The reference infhex8 is a [-1,1]^3.
+        if ((xi   >= -1.-eps) &&
+            (xi   <=  1.+eps) &&
+            (eta  >= -1.-eps) &&
+            (eta  <=  1.+eps) &&
+            (zeta >= -1.-eps) &&
+            (zeta <=  1.+eps))
+          {
+            return true;
+          }
+        return false;
       }
 
     case INFPRISM6:
       {
-	// inside the reference triange with zeta in [-1,1]
-	if ((xi   >=  0.-eps) &&
-	    (eta  >=  0.-eps) &&
-	    (zeta >= -1.-eps) &&
-	    (zeta <=  1.+eps) &&
-	    ((xi + eta) <= 1.+eps))
-	  {
-	    return true;
-	  }
+        // inside the reference triange with zeta in [-1,1]
+        if ((xi   >=  0.-eps) &&
+            (eta  >=  0.-eps) &&
+            (zeta >= -1.-eps) &&
+            (zeta <=  1.+eps) &&
+            ((xi + eta) <= 1.+eps))
+          {
+            return true;
+          }
 
-	return false;
+        return false;
       }
 #endif
 
@@ -918,7 +918,7 @@ std::ostream& operator << (std::ostream& os, const FEAbstract& fe)
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
 void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
-					   const Elem* elem)
+                                           const Elem* elem)
 {
   libmesh_assert(elem);
 
@@ -941,27 +941,27 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
   // build constraints.
   for (unsigned int s=0; s<elem->n_sides(); s++)
     if (elem->neighbor(s) != NULL &&
-	elem->neighbor(s) != remote_elem)
+        elem->neighbor(s) != remote_elem)
       if (elem->neighbor(s)->level() < elem->level()) // constrain dofs shared between
-	{                                                     // this element and ones coarser
-	                                                      // than this element.
-	  // Get pointers to the elements of interest and its parent.
-	  const Elem* parent = elem->parent();
+        {                                                     // this element and ones coarser
+          // than this element.
+          // Get pointers to the elements of interest and its parent.
+          const Elem* parent = elem->parent();
 
-	  // This can't happen...  Only level-0 elements have NULL
-	  // parents, and no level-0 elements can be at a higher
-	  // level than their neighbors!
-	  libmesh_assert(parent);
+          // This can't happen...  Only level-0 elements have NULL
+          // parents, and no level-0 elements can be at a higher
+          // level than their neighbors!
+          libmesh_assert(parent);
 
-	  const AutoPtr<Elem> my_side     (elem->build_side(s));
-	  const AutoPtr<Elem> parent_side (parent->build_side(s));
+          const AutoPtr<Elem> my_side     (elem->build_side(s));
+          const AutoPtr<Elem> parent_side (parent->build_side(s));
 
-	  const unsigned int n_side_nodes = my_side->n_nodes();
+          const unsigned int n_side_nodes = my_side->n_nodes();
 
           my_nodes.clear();
-	  my_nodes.reserve (n_side_nodes);
+          my_nodes.reserve (n_side_nodes);
           parent_nodes.clear();
-	  parent_nodes.reserve (n_side_nodes);
+          parent_nodes.reserve (n_side_nodes);
 
           for (unsigned int n=0; n != n_side_nodes; ++n)
             my_nodes.push_back(my_side->get_node(n));
@@ -969,86 +969,86 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
           for (unsigned int n=0; n != n_side_nodes; ++n)
             parent_nodes.push_back(parent_side->get_node(n));
 
-	  for (unsigned int my_side_n=0;
-	       my_side_n < n_side_nodes;
-	       my_side_n++)
-	    {
-	      libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+          for (unsigned int my_side_n=0;
+               my_side_n < n_side_nodes;
+               my_side_n++)
+            {
+              libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
-	      const Node* my_node = my_nodes[my_side_n];
+              const Node* my_node = my_nodes[my_side_n];
 
-	      // The support point of the DOF
-	      const Point& support_point = *my_node;
+              // The support point of the DOF
+              const Point& support_point = *my_node;
 
-	      // Figure out where my node lies on their reference element.
-	      const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
-								  parent_side.get(),
-								  support_point);
+              // Figure out where my node lies on their reference element.
+              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
+                                                                  parent_side.get(),
+                                                                  support_point);
 
-	      // Compute the parent's side shape function values.
-	      for (unsigned int their_side_n=0;
-		   their_side_n < n_side_nodes;
-		   their_side_n++)
-		{
-	          libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, parent_side->type()));
+              // Compute the parent's side shape function values.
+              for (unsigned int their_side_n=0;
+                   their_side_n < n_side_nodes;
+                   their_side_n++)
+                {
+                  libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, parent_side->type()));
 
-	          const Node* their_node = parent_nodes[their_side_n];
+                  const Node* their_node = parent_nodes[their_side_n];
                   libmesh_assert(their_node);
 
-		  const Real their_value = FEInterface::shape(Dim-1,
-							      fe_type,
-							      parent_side->type(),
-							      their_side_n,
-							      mapped_point);
+                  const Real their_value = FEInterface::shape(Dim-1,
+                                                              fe_type,
+                                                              parent_side->type(),
+                                                              their_side_n,
+                                                              mapped_point);
 
                   const Real their_mag = std::abs(their_value);
 #ifdef DEBUG
-		  // Protect for the case u_i ~= u_j,
-		  // in which case i better equal j.
-		  if (their_mag > 0.999)
+                  // Protect for the case u_i ~= u_j,
+                  // in which case i better equal j.
+                  if (their_mag > 0.999)
                     {
-		      libmesh_assert_equal_to (my_node, their_node);
-		      libmesh_assert_less (std::abs(their_value - 1.), 0.001);
+                      libmesh_assert_equal_to (my_node, their_node);
+                      libmesh_assert_less (std::abs(their_value - 1.), 0.001);
                     }
                   else
 #endif
-		  // To make nodal constraints useful for constructing
-		  // sparsity patterns faster, we need to get EVERY
-		  // POSSIBLE constraint coupling identified, even if
-		  // there is no coupling in the isoparametric
-		  // Lagrange case.
+                    // To make nodal constraints useful for constructing
+                    // sparsity patterns faster, we need to get EVERY
+                    // POSSIBLE constraint coupling identified, even if
+                    // there is no coupling in the isoparametric
+                    // Lagrange case.
                   if (their_mag < 1.e-5)
                     {
-		      // since we may be running this method concurrently
-		      // on multiple threads we need to acquire a lock
-		      // before modifying the shared constraint_row object.
-		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                      // since we may be running this method concurrently
+                      // on multiple threads we need to acquire a lock
+                      // before modifying the shared constraint_row object.
+                      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
-		      // A reference to the constraint row.
-		      NodeConstraintRow& constraint_row = constraints[my_node].first;
+                      // A reference to the constraint row.
+                      NodeConstraintRow& constraint_row = constraints[my_node].first;
 
-		      constraint_row.insert(std::make_pair (their_node,
-							    0.));
+                      constraint_row.insert(std::make_pair (their_node,
+                                                            0.));
                     }
-		  // To get nodal coordinate constraints right, only
-		  // add non-zero and non-identity values for Lagrange
-		  // basis functions.
-		  else // (1.e-5 <= their_mag <= .999)
-		    {
-		      // since we may be running this method concurrently
-		      // on multiple threads we need to acquire a lock
-		      // before modifying the shared constraint_row object.
-		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                  // To get nodal coordinate constraints right, only
+                  // add non-zero and non-identity values for Lagrange
+                  // basis functions.
+                  else // (1.e-5 <= their_mag <= .999)
+                    {
+                      // since we may be running this method concurrently
+                      // on multiple threads we need to acquire a lock
+                      // before modifying the shared constraint_row object.
+                      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
-		      // A reference to the constraint row.
-		      NodeConstraintRow& constraint_row = constraints[my_node].first;
+                      // A reference to the constraint row.
+                      NodeConstraintRow& constraint_row = constraints[my_node].first;
 
-		      constraint_row.insert(std::make_pair (their_node,
-							    their_value));
-		    }
-		}
-	    }
-	}
+                      constraint_row.insert(std::make_pair (their_node,
+                                                            their_value));
+                    }
+                }
+            }
+        }
 }
 
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -1061,10 +1061,10 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
 void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints,
-						    const PeriodicBoundaries &boundaries,
-						    const MeshBase &mesh,
-						    const PointLocatorBase *point_locator,
-						    const Elem* elem)
+                                                    const PeriodicBoundaries &boundaries,
+                                                    const MeshBase &mesh,
+                                                    const PointLocatorBase *point_locator,
+                                                    const Elem* elem)
 {
   // Only bother if we truly have periodic boundaries
   if (boundaries.empty())
@@ -1108,7 +1108,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
               // as or coarser than this element.
               if (neigh->level() <= elem->level())
                 {
-	          unsigned int s_neigh =
+                  unsigned int s_neigh =
                     mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
                   libmesh_assert_not_equal_to (s_neigh, libMesh::invalid_uint);
 
@@ -1116,15 +1116,15 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                   libmesh_assert(neigh->active());
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-	          const AutoPtr<Elem> my_side    (elem->build_side(s));
-	          const AutoPtr<Elem> neigh_side (neigh->build_side(s_neigh));
+                  const AutoPtr<Elem> my_side    (elem->build_side(s));
+                  const AutoPtr<Elem> neigh_side (neigh->build_side(s_neigh));
 
-	          const unsigned int n_side_nodes = my_side->n_nodes();
+                  const unsigned int n_side_nodes = my_side->n_nodes();
 
                   my_nodes.clear();
-	          my_nodes.reserve (n_side_nodes);
+                  my_nodes.reserve (n_side_nodes);
                   neigh_nodes.clear();
-	          neigh_nodes.reserve (n_side_nodes);
+                  neigh_nodes.reserve (n_side_nodes);
 
                   for (unsigned int n=0; n != n_side_nodes; ++n)
                     my_nodes.push_back(my_side->get_node(n));
@@ -1138,26 +1138,26 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                   // nodes that already have AMR constraints
                   std::vector<bool> skip_constraint(n_side_nodes, false);
 
-	          for (unsigned int my_side_n=0;
-	               my_side_n < n_side_nodes;
-	               my_side_n++)
-	            {
-	              libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+                  for (unsigned int my_side_n=0;
+                       my_side_n < n_side_nodes;
+                       my_side_n++)
+                    {
+                      libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
-	              const Node* my_node = my_nodes[my_side_n];
+                      const Node* my_node = my_nodes[my_side_n];
 
-	              // Figure out where my node lies on their reference element.
+                      // Figure out where my node lies on their reference element.
                       const Point neigh_point = periodic->get_corresponding_pos(*my_node);
 
-	              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
-								          neigh_side.get(),
-								          neigh_point);
+                      const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
+                                                                          neigh_side.get(),
+                                                                          neigh_point);
 
                       // If we've already got a constraint on this
                       // node, then the periodic constraint is
                       // redundant
                       {
-			Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                        Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
                         if (constraints.count(my_node))
                           {
@@ -1166,21 +1166,21 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                           }
                       }
 
-	      	      // Compute the neighbors's side shape function values.
-	              for (unsigned int their_side_n=0;
-		           their_side_n < n_side_nodes;
-		           their_side_n++)
-		        {
-	                  libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
+                      // Compute the neighbors's side shape function values.
+                      for (unsigned int their_side_n=0;
+                           their_side_n < n_side_nodes;
+                           their_side_n++)
+                        {
+                          libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
 
-	                  const Node* their_node = neigh_nodes[their_side_n];
+                          const Node* their_node = neigh_nodes[their_side_n];
 
                           // If there's a constraint on an opposing node,
-			  // we need to see if it's constrained by
-			  // *our side* making any periodic constraint
-			  // on us recursive
+                          // we need to see if it's constrained by
+                          // *our side* making any periodic constraint
+                          // on us recursive
                           {
-			    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                            Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
                             if (!constraints.count(their_node))
                               continue;
@@ -1188,69 +1188,69 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                             const NodeConstraintRow& their_constraint_row =
                               constraints[their_node].first;
 
-	                    for (unsigned int orig_side_n=0;
-	                         orig_side_n < n_side_nodes;
-	                         orig_side_n++)
-	                      {
-	                        libmesh_assert_less (orig_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+                            for (unsigned int orig_side_n=0;
+                                 orig_side_n < n_side_nodes;
+                                 orig_side_n++)
+                              {
+                                libmesh_assert_less (orig_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
-	                        const Node* orig_node = my_nodes[orig_side_n];
+                                const Node* orig_node = my_nodes[orig_side_n];
 
                                 if (their_constraint_row.count(orig_node))
                                   skip_constraint[orig_side_n] = true;
-	                      }
+                              }
                           }
                         }
                     }
-	          for (unsigned int my_side_n=0;
-	               my_side_n < n_side_nodes;
-	               my_side_n++)
-	            {
-	              libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+                  for (unsigned int my_side_n=0;
+                       my_side_n < n_side_nodes;
+                       my_side_n++)
+                    {
+                      libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
                       if (skip_constraint[my_side_n])
                         continue;
 
-	              const Node* my_node = my_nodes[my_side_n];
+                      const Node* my_node = my_nodes[my_side_n];
 
-	              // Figure out where my node lies on their reference element.
+                      // Figure out where my node lies on their reference element.
                       const Point neigh_point = periodic->get_corresponding_pos(*my_node);
 
-	              // Figure out where my node lies on their reference element.
-	              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
-								          neigh_side.get(),
-								          neigh_point);
+                      // Figure out where my node lies on their reference element.
+                      const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
+                                                                          neigh_side.get(),
+                                                                          neigh_point);
 
-	              for (unsigned int their_side_n=0;
-		           their_side_n < n_side_nodes;
-		           their_side_n++)
-	                {
-	                  libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
+                      for (unsigned int their_side_n=0;
+                           their_side_n < n_side_nodes;
+                           their_side_n++)
+                        {
+                          libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
 
-	                  const Node* their_node = neigh_nodes[their_side_n];
+                          const Node* their_node = neigh_nodes[their_side_n];
                           libmesh_assert(their_node);
 
-		          const Real their_value = FEInterface::shape(Dim-1,
-							              fe_type,
-							              neigh_side->type(),
-							              their_side_n,
-							              mapped_point);
+                          const Real their_value = FEInterface::shape(Dim-1,
+                                                                      fe_type,
+                                                                      neigh_side->type(),
+                                                                      their_side_n,
+                                                                      mapped_point);
 
-		          // since we may be running this method concurrently
-		          // on multiple threads we need to acquire a lock
-		          // before modifying the shared constraint_row object.
-		          {
-			    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                          // since we may be running this method concurrently
+                          // on multiple threads we need to acquire a lock
+                          // before modifying the shared constraint_row object.
+                          {
+                            Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
-			    NodeConstraintRow& constraint_row =
-			      constraints[my_node].first;
+                            NodeConstraintRow& constraint_row =
+                              constraints[my_node].first;
 
-			    constraint_row.insert(std::make_pair(their_node,
-							         their_value));
-		          }
-		        }
-	            }
-	        }
+                            constraint_row.insert(std::make_pair(their_node,
+                                                                 their_value));
+                          }
+                        }
+                    }
+                }
             }
         }
     }

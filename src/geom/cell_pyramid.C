@@ -40,38 +40,38 @@ dof_id_type Pyramid::key (const unsigned int s) const
     case 0:  // triangular face 1
 
       return
-	this->compute_key (this->node(0),
-			   this->node(1),
-			   this->node(4));
+        this->compute_key (this->node(0),
+                           this->node(1),
+                           this->node(4));
 
     case 1:  // triangular face 2
 
       return
-	this->compute_key (this->node(1),
-			   this->node(2),
-			   this->node(4));
+        this->compute_key (this->node(1),
+                           this->node(2),
+                           this->node(4));
 
     case 2:  // triangular face 3
 
       return
-	this->compute_key (this->node(2),
-			   this->node(3),
-			   this->node(4));
+        this->compute_key (this->node(2),
+                           this->node(3),
+                           this->node(4));
 
     case 3:  // triangular face 4
 
       return
-	this->compute_key (this->node(3),
-			   this->node(0),
-			   this->node(4));
+        this->compute_key (this->node(3),
+                           this->node(0),
+                           this->node(4));
 
     case 4:  // the quad face at z=0
 
       return
-	this->compute_key (this->node(0),
-			   this->node(3),
-			   this->node(2),
-			   this->node(1));
+        this->compute_key (this->node(0),
+                           this->node(3),
+                           this->node(2),
+                           this->node(1));
     }
 
   // We'll never get here.
@@ -93,63 +93,63 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
       {
         Elem* face = new Tri3;
 
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(4);
+        face->set_node(0) = this->get_node(0);
+        face->set_node(1) = this->get_node(1);
+        face->set_node(2) = this->get_node(4);
 
         AutoPtr<Elem> ap_face(face);
-	return ap_face;
+        return ap_face;
       }
     case 1:  // triangular face 2
       {
         Elem* face = new Tri3;
 
-	face->set_node(0) = this->get_node(1);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(4);
+        face->set_node(0) = this->get_node(1);
+        face->set_node(1) = this->get_node(2);
+        face->set_node(2) = this->get_node(4);
 
         AutoPtr<Elem> ap_face(face);
-	return ap_face;
+        return ap_face;
       }
     case 2:  // triangular face 3
       {
         Elem* face = new Tri3;
 
-	face->set_node(0) = this->get_node(2);
-	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(4);
+        face->set_node(0) = this->get_node(2);
+        face->set_node(1) = this->get_node(3);
+        face->set_node(2) = this->get_node(4);
 
         AutoPtr<Elem> ap_face(face);
-	return ap_face;
+        return ap_face;
       }
     case 3:  // triangular face 4
       {
         Elem* face = new Tri3;
 
-	face->set_node(0) = this->get_node(3);
-	face->set_node(1) = this->get_node(0);
-	face->set_node(2) = this->get_node(4);
+        face->set_node(0) = this->get_node(3);
+        face->set_node(1) = this->get_node(0);
+        face->set_node(2) = this->get_node(4);
 
         AutoPtr<Elem> ap_face(face);
-	return ap_face;
+        return ap_face;
       }
     case 4:  // the quad face at z=0
       {
         Elem* face = new Quad4;
 
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(2);
-	face->set_node(3) = this->get_node(1);
+        face->set_node(0) = this->get_node(0);
+        face->set_node(1) = this->get_node(3);
+        face->set_node(2) = this->get_node(2);
+        face->set_node(3) = this->get_node(1);
 
         AutoPtr<Elem> ap_face(face);
-	return ap_face;
+        return ap_face;
       }
     default:
       {
-	libmesh_error();
-	AutoPtr<Elem> ap_face(NULL);
-	return ap_face;
+        libmesh_error();
+        AutoPtr<Elem> ap_face(NULL);
+        return ap_face;
       }
     }
 

@@ -82,55 +82,55 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
     case (XdrMGF::ENCODE):
     case (XdrMGF::DECODE):
       {
-	mp_fp = fopen (fn, (m_type == ENCODE) ? "w" : "r");
+        mp_fp = fopen (fn, (m_type == ENCODE) ? "w" : "r");
 
-	// Make sure the file is ready for use
-	if (!mp_fp)
-	  {
-	    libMesh::err << "XDR Error: Accessing file: "
-		          << fn
-		          << " failed."
-		          << std::endl;
-	    libmesh_error();
-	  }
+        // Make sure the file is ready for use
+        if (!mp_fp)
+          {
+            libMesh::err << "XDR Error: Accessing file: "
+                         << fn
+                         << " failed."
+                         << std::endl;
+            libmesh_error();
+          }
 
-	// Create the XDR handle
-	mp_xdr_handle = new XDR;
-	xdrstdio_create(mp_xdr_handle,
-			mp_fp,
-			((m_type == ENCODE) ? XDR_ENCODE : XDR_DECODE));
+        // Create the XDR handle
+        mp_xdr_handle = new XDR;
+        xdrstdio_create(mp_xdr_handle,
+                        mp_fp,
+                        ((m_type == ENCODE) ? XDR_ENCODE : XDR_DECODE));
 
-	break;
+        break;
       }
 
 #endif
 
     case (XdrMGF::R_ASCII):
       {
-	mp_in.open(fn, std::ios::in);
+        mp_in.open(fn, std::ios::in);
 
         // Make sure it opened correctly
         if (!mp_in.good())
           libmesh_file_error(fn);
 
-	break;
+        break;
       }
 
     case (XdrMGF::W_ASCII):
       {
-	mp_out.open(fn, std::ios::out);
+        mp_out.open(fn, std::ios::out);
 
         // Make sure it opened correctly
         if (!mp_out.good())
           libmesh_file_error(fn);
 
-	break;
+        break;
       }
 
     default:
       {
-	libMesh::out << "Unrecognized file access type!" << std::endl;
-	libmesh_error();
+        libMesh::out << "Unrecognized file access type!" << std::endl;
+        libmesh_error();
       }
     }
 
@@ -149,91 +149,91 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 
     case (XdrMGF::ENCODE):
       {
-	char* p = &buf[0];
-	const LegacyXdrIO::FileFormat orig = this->get_orig_flag();
+        char* p = &buf[0];
+        const LegacyXdrIO::FileFormat orig = this->get_orig_flag();
 
-	std::ostringstream name;
-	if (orig == LegacyXdrIO::DEAL)
-	  name << "DEAL 003:003";
+        std::ostringstream name;
+        if (orig == LegacyXdrIO::DEAL)
+          name << "DEAL 003:003";
 
-	else if (orig == LegacyXdrIO::MGF)
-	  name << "MGF  002:000";
+        else if (orig == LegacyXdrIO::MGF)
+          name << "MGF  002:000";
 
-	else if (orig == LegacyXdrIO::LIBM)
-	  name << "LIBM " << this->get_num_levels();
+        else if (orig == LegacyXdrIO::LIBM)
+          name << "LIBM " << this->get_num_levels();
 
-	else
-	  libmesh_error();
+        else
+          libmesh_error();
 
-	// Fill the buffer
-	std::sprintf(&buf[0], "%s", name.str().c_str());
+        // Fill the buffer
+        std::sprintf(&buf[0], "%s", name.str().c_str());
 
-	xdr_string(mp_xdr_handle, &p, bufLen);  // Writes binary signature
+        xdr_string(mp_xdr_handle, &p, bufLen);  // Writes binary signature
 
-	break;
+        break;
       }
 
     case (XdrMGF::DECODE):
       {
-	char* p = &buf[0];
-	xdr_string(mp_xdr_handle, &p, bufLen); // Reads binary signature
+        char* p = &buf[0];
+        xdr_string(mp_xdr_handle, &p, bufLen); // Reads binary signature
 
-	// Set the number of levels used in the mesh
-	this->tokenize_first_line(p);
+        // Set the number of levels used in the mesh
+        this->tokenize_first_line(p);
 
-	break;
+        break;
       }
 
 #endif
 
     case (XdrMGF::W_ASCII):
       {
-	const LegacyXdrIO::FileFormat orig = this->get_orig_flag();
+        const LegacyXdrIO::FileFormat orig = this->get_orig_flag();
 
-	if (orig == LegacyXdrIO::DEAL)
-	  std::sprintf(&buf[0], "%s %03d:%03d", "DEAL", 3, 3);
+        if (orig == LegacyXdrIO::DEAL)
+          std::sprintf(&buf[0], "%s %03d:%03d", "DEAL", 3, 3);
 
-	else if (orig == LegacyXdrIO::MGF)
-	  std::sprintf(&buf[0], "%s %03d:%03d", "MGF ", 2, 0);
+        else if (orig == LegacyXdrIO::MGF)
+          std::sprintf(&buf[0], "%s %03d:%03d", "MGF ", 2, 0);
 
-	else if (orig == LegacyXdrIO::LIBM)
-	  std::sprintf(&buf[0], "%s %d", "LIBM", this->get_num_levels());
+        else if (orig == LegacyXdrIO::LIBM)
+          std::sprintf(&buf[0], "%s %d", "LIBM", this->get_num_levels());
 
-	mp_out << buf << '\n';
+        mp_out << buf << '\n';
 
-	break;
+        break;
       }
 
     case (XdrMGF::R_ASCII):
       {
 
 #ifdef __HP_aCC
-	// weirdly, _only_ here aCC
-	// is not fond of mp_in.getline()
-	// however, using mp_in.getline()
-	// further below is ok...
-	std::string buf_buf;
-	std::getline (mp_in, buf_buf, '\n');
-	libmesh_assert_less_equal (buf_buf.size(), bufLen);
+        // weirdly, _only_ here aCC
+        // is not fond of mp_in.getline()
+        // however, using mp_in.getline()
+        // further below is ok...
+        std::string buf_buf;
+        std::getline (mp_in, buf_buf, '\n');
+        libmesh_assert_less_equal (buf_buf.size(), bufLen);
 
-	buf_buf.copy (buf, std::string::npos);
+        buf_buf.copy (buf, std::string::npos);
 #else
 
-	// Here we first use getline() to grab the very
-	// first line of the file into a char buffer.  Then
-	// this line is tokenized to look for:
-	// 1.) The name LIBM, which specifies the new Mesh style.
-	// 2.) The number of levels in the Mesh which is being read.
-	// Note that "buf" will be further processed below, here we
-	// are just attempting to get the number of levels.
-	mp_in.getline(buf, bufLen+1);
+        // Here we first use getline() to grab the very
+        // first line of the file into a char buffer.  Then
+        // this line is tokenized to look for:
+        // 1.) The name LIBM, which specifies the new Mesh style.
+        // 2.) The number of levels in the Mesh which is being read.
+        // Note that "buf" will be further processed below, here we
+        // are just attempting to get the number of levels.
+        mp_in.getline(buf, bufLen+1);
 
 #endif
 
-	// Determine the number of levels in this mesh
-	this->tokenize_first_line(buf);
+        // Determine the number of levels in this mesh
+        this->tokenize_first_line(buf);
 
-	break;
+        break;
       }
 
     default:
@@ -250,25 +250,25 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
       name[4] = '\0';
 
       if (std::strcmp (name, "DEAL") == 0)
-	{
-	  this->orig_flag = LegacyXdrIO::DEAL; // 0 is the DEAL identifier by definition
-	}
+        {
+          this->orig_flag = LegacyXdrIO::DEAL; // 0 is the DEAL identifier by definition
+        }
       else if (std::strcmp (name, "MGF ") == 0)
-	{
-	  this->orig_flag = LegacyXdrIO::MGF; // 1 is the MGF identifier by definition
-	}
+        {
+          this->orig_flag = LegacyXdrIO::MGF; // 1 is the MGF identifier by definition
+        }
       else if (std::strcmp (name, "LIBM") == 0)
-	{
-	  this->orig_flag = LegacyXdrIO::LIBM; // the New and Improved XDA
-	}
+        {
+          this->orig_flag = LegacyXdrIO::LIBM; // the New and Improved XDA
+        }
 
       else
-	{
-	  libMesh::err <<
+        {
+          libMesh::err <<
             "No originating software can be determined for header string '" <<
             name << "'. Error." << std::endl;
-	  libmesh_error();
-	}
+          libmesh_error();
+        }
     }
 
 }
@@ -287,45 +287,45 @@ int XdrMGF::dataBlk(int* array, int numvar, int size)
     case (XdrMGF::DECODE):
     case (XdrMGF::ENCODE):
       {
-	xdr_vector(mp_xdr_handle,
-		   (char *) &array[0],
-		   totalSize,
-		   sizeof(int),
-		   (xdrproc_t) xdr_int);
-	break;
+        xdr_vector(mp_xdr_handle,
+                   (char *) &array[0],
+                   totalSize,
+                   sizeof(int),
+                   (xdrproc_t) xdr_int);
+        break;
       }
 
 #endif
 
     case (XdrMGF::W_ASCII):
       {
-	for (int i=0; i<size; i++)
-	  {
-	    for (int j=0; j<numvar; j++)
-	      mp_out << array[i*numvar + j] << " ";
+        for (int i=0; i<size; i++)
+          {
+            for (int j=0; j<numvar; j++)
+              mp_out << array[i*numvar + j] << " ";
 
-	    mp_out << '\n';
-	  }
+            mp_out << '\n';
+          }
 
-	mp_out.flush();
-	break;
+        mp_out.flush();
+        break;
       }
 
     case (XdrMGF::R_ASCII):
       {
-	libmesh_assert (mp_in.good());
+        libmesh_assert (mp_in.good());
 
-	for (int i=0; i<size; i++)
-	  {
-	    for (int j=0; j<numvar; j++)
+        for (int i=0; i<size; i++)
+          {
+            for (int j=0; j<numvar; j++)
               {
-		mp_in >> array[i*numvar + j];
+                mp_in >> array[i*numvar + j];
               }
 
-	    mp_in.ignore(); // Read newline
-	  }
+            mp_in.ignore(); // Read newline
+          }
 
-	break;
+        break;
       }
 
     default:
@@ -356,13 +356,13 @@ int XdrMGF::dataBlk(Real* array, int numvar, int size)
     case (XdrMGF::DECODE):
     case (XdrMGF::ENCODE):
       {
-	// FIXME - this is probably broken for Real == long double
-	// RHS
-	xdr_vector(mp_xdr_handle,
-		   (char *) &array[0],
-		   totalSize,
-		   sizeof(Real),
-		   (xdrproc_t) xdr_REAL);
+        // FIXME - this is probably broken for Real == long double
+        // RHS
+        xdr_vector(mp_xdr_handle,
+                   (char *) &array[0],
+                   totalSize,
+                   sizeof(Real),
+                   (xdrproc_t) xdr_REAL);
       }
 
 #endif
@@ -378,36 +378,36 @@ int XdrMGF::dataBlk(Real* array, int numvar, int size)
         mp_out << std::scientific
                << std::setprecision(16);
 
-	for (int i=0; i<size; i++)
-	  {
-	    for (int j=0; j<numvar; j++)
+        for (int i=0; i<size; i++)
+          {
+            for (int j=0; j<numvar; j++)
               mp_out << array[i*numvar + j] << " \t";
 
-	    mp_out << '\n';
-	  }
+            mp_out << '\n';
+          }
 
         // Restore stream flags
         mp_out.flags(out_flags);
 
-	mp_out.flush();
-	break;
+        mp_out.flush();
+        break;
       }
 
     case (XdrMGF::R_ASCII):
       {
-	libmesh_assert (mp_in.good());
+        libmesh_assert (mp_in.good());
 
-	for (int i=0; i<size; i++)
-	  {
-	    libmesh_assert (mp_in.good());
+        for (int i=0; i<size; i++)
+          {
+            libmesh_assert (mp_in.good());
 
-	    for (int j=0; j<numvar; j++)
-	      mp_in >> array[i*numvar + j];
+            for (int j=0; j<numvar; j++)
+              mp_in >> array[i*numvar + j];
 
-	    mp_in.ignore(); // Read newline
-	  }
+            mp_in.ignore(); // Read newline
+          }
 
-	break;
+        break;
       }
 
     default:

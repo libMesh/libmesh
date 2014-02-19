@@ -56,10 +56,10 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType& fet) :
   // the data structures like \p phi etc are not initialized
   // through the constructor, but throught reinit()
   current_fe_type ( FEType(fet.order,
-			   fet.family,
-			   INVALID_ORDER,
-			   fet.radial_family,
-			   fet.inf_map) )
+                           fet.family,
+                           INVALID_ORDER,
+                           fet.radial_family,
+                           fet.inf_map) )
 
 {
   // Sanity checks
@@ -144,7 +144,7 @@ void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem* inf_elem)
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
-				       const std::vector<Point>* const pts,
+                                       const std::vector<Point>* const pts,
                                        const std::vector<Real>* const weights)
 {
   libmesh_assert(base_fe);
@@ -160,19 +160,19 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
       // -----------------------------------------------------------------
       // init the radial data fields only when the radial order changes
       if (current_fe_type.radial_order != fe_type.radial_order)
-	{
-	  current_fe_type.radial_order = fe_type.radial_order;
+        {
+          current_fe_type.radial_order = fe_type.radial_order;
 
-	  // Watch out: this call to QBase->init() only works for
-	  // current_fe_type = const!   To allow variable Order,
-	  // the init() of QBase has to be modified...
-	  radial_qrule->init(EDGE2);
+          // Watch out: this call to QBase->init() only works for
+          // current_fe_type = const!   To allow variable Order,
+          // the init() of QBase has to be modified...
+          radial_qrule->init(EDGE2);
 
-	  // initialize the radial shape functions
-	  this->init_radial_shape_functions(inf_elem);
+          // initialize the radial shape functions
+          this->init_radial_shape_functions(inf_elem);
 
-	  init_shape_functions_required=true;
-	}
+          init_shape_functions_required=true;
+        }
 
 
       bool update_base_elem_required=true;
@@ -183,38 +183,38 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
       // the case of the hierarchics) the shape functions
       // depend on the particular element and need a reinit
       if (  ( Dim != 1) &&
-	    (  (this->get_type() != inf_elem->type())  ||
-	       (base_fe->shapes_need_reinit())  )  )
-	{
-	  // store the new element type, update base_elem
-	  // here.  Through \p update_base_elem_required,
-	  // remember whether it has to be updated (see below).
-	  elem_type = inf_elem->type();
-	  this->update_base_elem(inf_elem);
-	  update_base_elem_required=false;
+            (  (this->get_type() != inf_elem->type())  ||
+               (base_fe->shapes_need_reinit())  )  )
+        {
+          // store the new element type, update base_elem
+          // here.  Through \p update_base_elem_required,
+          // remember whether it has to be updated (see below).
+          elem_type = inf_elem->type();
+          this->update_base_elem(inf_elem);
+          update_base_elem_required=false;
 
-	  // initialize the base quadrature rule for the new element
-	  base_qrule->init(base_elem->type());
+          // initialize the base quadrature rule for the new element
+          base_qrule->init(base_elem->type());
 
-	  // initialize the shape functions in the base
-	  base_fe->init_base_shape_functions(base_fe->qrule->get_points(),
-					     base_elem);
+          // initialize the shape functions in the base
+          base_fe->init_base_shape_functions(base_fe->qrule->get_points(),
+                                             base_elem);
 
-	  init_shape_functions_required=true;
-	}
+          init_shape_functions_required=true;
+        }
 
 
       // when either the radial or base part change,
       // we have to init the whole fields
       if (init_shape_functions_required)
-	this->init_shape_functions (inf_elem);
+        this->init_shape_functions (inf_elem);
 
       // computing the distance only works when we have the current
       // base_elem stored.  This happens when fe_type is const,
       // the inf_elem->type remains the same.  Then we have to
       // update the base elem _here_.
       if (update_base_elem_required)
-	this->update_base_elem(inf_elem);
+        this->update_base_elem(inf_elem);
 
       // compute dist (depends on geometry, therefore has to be updated for
       // each and every new element), throw radial and base part together
@@ -240,15 +240,15 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
 
       // the finite element on the ifem base
       {
-	AutoPtr<FEBase> ap_fb(FEBase::build(Dim-1, this->fe_type));
-	if (base_fe != NULL)
-	  delete base_fe;
-	base_fe = ap_fb.release();
+        AutoPtr<FEBase> ap_fb(FEBase::build(Dim-1, this->fe_type));
+        if (base_fe != NULL)
+          delete base_fe;
+        base_fe = ap_fb.release();
       }
 
       // inite base shapes
       base_fe->init_base_shape_functions(*pts,
-					 base_elem);
+                                         base_elem);
 
       this->init_shape_functions (inf_elem);
 
@@ -357,8 +357,8 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem* libmesh_
   for (unsigned int i=0; i<n_radial_mapping_shape_functions; i++)
     for (unsigned int p=0; p<n_radial_qp; p++)
       {
-	radial_map[i][p]    = InfFE<Dim,INFINITE_MAP,T_map>::eval       (radial_qp[p](0), radial_mapping_order, i);
-	dradialdv_map[i][p] = InfFE<Dim,INFINITE_MAP,T_map>::eval_deriv (radial_qp[p](0), radial_mapping_order, i);
+        radial_map[i][p]    = InfFE<Dim,INFINITE_MAP,T_map>::eval       (radial_qp[p](0), radial_mapping_order, i);
+        dradialdv_map[i][p] = InfFE<Dim,INFINITE_MAP,T_map>::eval_deriv (radial_qp[p](0), radial_mapping_order, i);
       }
 
   /**
@@ -402,7 +402,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
   // the number of base shape functions used to construct the map
   // (Lagrange shape functions are used for mapping in the base)
   unsigned int n_base_mapping_shape_functions = Base::n_base_mapping_sf(base_mapping_elem_type,
-									base_mapping_order);
+                                                                        base_mapping_order);
 
   const unsigned int n_total_mapping_shape_functions =
     n_radial_mapping_sf * n_base_mapping_shape_functions;
@@ -457,23 +457,23 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     for (unsigned int n=0; n<n_total_mapping_shape_functions; n++)
       {
         compute_node_indices (inf_elem_type,
-			      n,
-			      _base_node_index[n],
-			      _radial_node_index[n]);
-	libmesh_assert_less (_base_node_index[n], n_base_mapping_shape_functions);
-	libmesh_assert_less (_radial_node_index[n], n_radial_mapping_sf);
+                              n,
+                              _base_node_index[n],
+                              _radial_node_index[n]);
+        libmesh_assert_less (_base_node_index[n], n_base_mapping_shape_functions);
+        libmesh_assert_less (_radial_node_index[n], n_radial_mapping_sf);
       }
 
     // fill the shape index map
     for (unsigned int n=0; n<n_total_approx_shape_functions; n++)
       {
-	compute_shape_indices (this->fe_type,
-			       inf_elem_type,
-			       n,
-			       _base_shape_index[n],
-			       _radial_shape_index[n]);
-	libmesh_assert_less (_base_shape_index[n], n_base_approx_shape_functions);
-	libmesh_assert_less (_radial_shape_index[n], n_radial_approx_sf);
+        compute_shape_indices (this->fe_type,
+                               inf_elem_type,
+                               n,
+                               _base_shape_index[n],
+                               _radial_shape_index[n]);
+        libmesh_assert_less (_base_shape_index[n], n_base_approx_shape_functions);
+        libmesh_assert_less (_radial_shape_index[n], n_radial_approx_sf);
       }
   }
 
@@ -524,8 +524,8 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
     dphidxi.resize (n_total_approx_shape_functions);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     libmesh_do_once(libMesh::err << "Second derivatives for Infinite elements"
-		                  << " are not yet implemented!"
-		                  << std::endl);
+                    << " are not yet implemented!"
+                    << std::endl);
 
     d2phi.resize     (n_total_approx_shape_functions);
     d2phidx2.resize  (n_total_approx_shape_functions);
@@ -569,17 +569,17 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
     if (Dim > 1)
       {
-	std::vector<std::vector<Real> >& d2phidxideta_map = this->_fe_map->get_d2phidxideta_map();
-	std::vector<std::vector<Real> >& d2phideta2_map = this->_fe_map->get_d2phideta2_map();
+        std::vector<std::vector<Real> >& d2phidxideta_map = this->_fe_map->get_d2phidxideta_map();
+        std::vector<std::vector<Real> >& d2phideta2_map = this->_fe_map->get_d2phideta2_map();
         d2phidxideta_map.resize   (n_total_mapping_shape_functions);
         d2phideta2_map.resize     (n_total_mapping_shape_functions);
       }
 
     if (Dim == 3)
       {
-	std::vector<std::vector<Real> >& d2phidxidzeta_map = this->_fe_map->get_d2phidxidzeta_map();
-	std::vector<std::vector<Real> >& d2phidetadzeta_map = this->_fe_map->get_d2phidetadzeta_map();
-	std::vector<std::vector<Real> >& d2phidzeta2_map = this->_fe_map->get_d2phidzeta2_map();
+        std::vector<std::vector<Real> >& d2phidxidzeta_map = this->_fe_map->get_d2phidxidzeta_map();
+        std::vector<std::vector<Real> >& d2phidetadzeta_map = this->_fe_map->get_d2phidetadzeta_map();
+        std::vector<std::vector<Real> >& d2phidzeta2_map = this->_fe_map->get_d2phidzeta2_map();
         d2phidxidzeta_map.resize  (n_total_mapping_shape_functions);
         d2phidetadzeta_map.resize (n_total_mapping_shape_functions);
         d2phidzeta2_map.resize    (n_total_mapping_shape_functions);
@@ -588,14 +588,14 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
     if (Dim > 1)
       {
-	std::vector<std::vector<Real> >& dphideta_map = this->_fe_map->get_dphideta_map();
-	dphideta_map.resize  (n_total_mapping_shape_functions);
+        std::vector<std::vector<Real> >& dphideta_map = this->_fe_map->get_dphideta_map();
+        dphideta_map.resize  (n_total_mapping_shape_functions);
       }
 
     if (Dim == 3)
       {
-	std::vector<std::vector<Real> >& dphidzeta_map = this->_fe_map->get_dphidzeta_map();
-	dphidzeta_map.resize (n_total_mapping_shape_functions);
+        std::vector<std::vector<Real> >& dphidzeta_map = this->_fe_map->get_dphidzeta_map();
+        dphidzeta_map.resize (n_total_mapping_shape_functions);
       }
   }
 
@@ -607,82 +607,82 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
   {
     for (unsigned int i=0; i<n_total_approx_shape_functions; i++)
       {
-	phi[i].resize         (n_total_qp);
-	dphi[i].resize        (n_total_qp);
-	dphidx[i].resize      (n_total_qp);
-	dphidy[i].resize      (n_total_qp);
-	dphidz[i].resize      (n_total_qp);
-	dphidxi[i].resize     (n_total_qp);
+        phi[i].resize         (n_total_qp);
+        dphi[i].resize        (n_total_qp);
+        dphidx[i].resize      (n_total_qp);
+        dphidy[i].resize      (n_total_qp);
+        dphidz[i].resize      (n_total_qp);
+        dphidxi[i].resize     (n_total_qp);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	d2phi[i].resize       (n_total_qp);
-	d2phidx2[i].resize    (n_total_qp);
-	d2phidxdy[i].resize   (n_total_qp);
-	d2phidxdz[i].resize   (n_total_qp);
-	d2phidy2[i].resize    (n_total_qp);
-	d2phidydz[i].resize   (n_total_qp);
-	d2phidy2[i].resize    (n_total_qp);
-	d2phidxi2[i].resize   (n_total_qp);
+        d2phi[i].resize       (n_total_qp);
+        d2phidx2[i].resize    (n_total_qp);
+        d2phidxdy[i].resize   (n_total_qp);
+        d2phidxdz[i].resize   (n_total_qp);
+        d2phidy2[i].resize    (n_total_qp);
+        d2phidydz[i].resize   (n_total_qp);
+        d2phidy2[i].resize    (n_total_qp);
+        d2phidxi2[i].resize   (n_total_qp);
 
-	if (Dim > 1)
-	  {
-	    d2phidxideta[i].resize   (n_total_qp);
-	    d2phideta2[i].resize     (n_total_qp);
-	  }
-	if (Dim > 2)
-	  {
-	    d2phidxidzeta[i].resize  (n_total_qp);
-	    d2phidetadzeta[i].resize (n_total_qp);
-	    d2phidzeta2[i].resize    (n_total_qp);
-	  }
+        if (Dim > 1)
+          {
+            d2phidxideta[i].resize   (n_total_qp);
+            d2phideta2[i].resize     (n_total_qp);
+          }
+        if (Dim > 2)
+          {
+            d2phidxidzeta[i].resize  (n_total_qp);
+            d2phidetadzeta[i].resize (n_total_qp);
+            d2phidzeta2[i].resize    (n_total_qp);
+          }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-	if (Dim > 1)
-	  dphideta[i].resize  (n_total_qp);
+        if (Dim > 1)
+          dphideta[i].resize  (n_total_qp);
 
-	if (Dim == 3)
-	  dphidzeta[i].resize (n_total_qp);
+        if (Dim == 3)
+          dphidzeta[i].resize (n_total_qp);
 
       }
 
     for (unsigned int i=0; i<n_total_mapping_shape_functions; i++)
       {
-	std::vector<std::vector<Real> >& phi_map = this->_fe_map->get_phi_map();
-	std::vector<std::vector<Real> >& dphidxi_map = this->_fe_map->get_dphidxi_map();
-	phi_map[i].resize         (n_total_qp);
-	dphidxi_map[i].resize     (n_total_qp);
+        std::vector<std::vector<Real> >& phi_map = this->_fe_map->get_phi_map();
+        std::vector<std::vector<Real> >& dphidxi_map = this->_fe_map->get_dphidxi_map();
+        phi_map[i].resize         (n_total_qp);
+        dphidxi_map[i].resize     (n_total_qp);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	std::vector<std::vector<Real> >& d2phidxi2_map = this->_fe_map->get_d2phidxi2_map();
-	d2phidxi2_map[i].resize   (n_total_qp);
-	if (Dim > 1)
-	  {
-	    std::vector<std::vector<Real> >& d2phidxideta_map = this->_fe_map->get_d2phidxideta_map();
-	std::vector<std::vector<Real> >& d2phideta2_map = this->_fe_map->get_d2phideta2_map();
-	    d2phidxideta_map[i].resize   (n_total_qp);
-	    d2phideta2_map[i].resize     (n_total_qp);
-	  }
+        std::vector<std::vector<Real> >& d2phidxi2_map = this->_fe_map->get_d2phidxi2_map();
+        d2phidxi2_map[i].resize   (n_total_qp);
+        if (Dim > 1)
+          {
+            std::vector<std::vector<Real> >& d2phidxideta_map = this->_fe_map->get_d2phidxideta_map();
+            std::vector<std::vector<Real> >& d2phideta2_map = this->_fe_map->get_d2phideta2_map();
+            d2phidxideta_map[i].resize   (n_total_qp);
+            d2phideta2_map[i].resize     (n_total_qp);
+          }
 
-	if (Dim > 2)
-	  {
-	    std::vector<std::vector<Real> >& d2phidxidzeta_map = this->_fe_map->get_d2phidxidzeta_map();
-	std::vector<std::vector<Real> >& d2phidetadzeta_map = this->_fe_map->get_d2phidetadzeta_map();
-	std::vector<std::vector<Real> >& d2phidzeta2_map = this->_fe_map->get_d2phidzeta2_map();
-	    d2phidxidzeta_map[i].resize  (n_total_qp);
-	    d2phidetadzeta_map[i].resize (n_total_qp);
-	    d2phidzeta2_map[i].resize    (n_total_qp);
-	  }
+        if (Dim > 2)
+          {
+            std::vector<std::vector<Real> >& d2phidxidzeta_map = this->_fe_map->get_d2phidxidzeta_map();
+            std::vector<std::vector<Real> >& d2phidetadzeta_map = this->_fe_map->get_d2phidetadzeta_map();
+            std::vector<std::vector<Real> >& d2phidzeta2_map = this->_fe_map->get_d2phidzeta2_map();
+            d2phidxidzeta_map[i].resize  (n_total_qp);
+            d2phidetadzeta_map[i].resize (n_total_qp);
+            d2phidzeta2_map[i].resize    (n_total_qp);
+          }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-	if (Dim > 1)
-	  {
-	    std::vector<std::vector<Real> >& dphideta_map = this->_fe_map->get_dphideta_map();
-	    dphideta_map[i].resize  (n_total_qp);
-	  }
+        if (Dim > 1)
+          {
+            std::vector<std::vector<Real> >& dphideta_map = this->_fe_map->get_dphideta_map();
+            dphideta_map[i].resize  (n_total_qp);
+          }
 
-	if (Dim == 3)
-	  {
-	    std::vector<std::vector<Real> >& dphidzeta_map = this->_fe_map->get_dphidzeta_map();
-	    dphidzeta_map[i].resize (n_total_qp);
-	  }
+        if (Dim == 3)
+          {
+            std::vector<std::vector<Real> >& dphidzeta_map = this->_fe_map->get_dphidzeta_map();
+            dphidzeta_map[i].resize (n_total_qp);
+          }
       }
   }
 
@@ -706,10 +706,10 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
       for (unsigned int bp=0; bp<n_base_qp; bp++)
         {
           weight   [ bp+rp*n_base_qp ] = Radial::D       (radial_qp[rp](0));
-	  dweightdv[ bp+rp*n_base_qp ] = Radial::D_deriv (radial_qp[rp](0));
+          dweightdv[ bp+rp*n_base_qp ] = Radial::D_deriv (radial_qp[rp](0));
 
-	  _total_qrule_weights[  bp+rp*n_base_qp ] = radial_qw[rp] * base_qw[bp];
-	}
+          _total_qrule_weights[  bp+rp*n_base_qp ] = radial_qw[rp] * base_qw[bp];
+        }
   }
 
 
@@ -761,8 +761,8 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
       // 1D
     case 1:
       {
-	libmesh_not_implemented();
-	break;
+        libmesh_not_implemented();
+        break;
       }
 
 
@@ -771,8 +771,8 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
       // 2D
     case 2:
       {
-	libmesh_not_implemented();
-     	break;
+        libmesh_not_implemented();
+        break;
       }
 
 
@@ -781,93 +781,93 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
       // 3D
     case 3:
       {
-	// fast access to the approximation and mapping shapes of base_fe
-	const std::vector<std::vector<Real> >& S  = base_fe->phi;
-	const std::vector<std::vector<Real> >& Ss = base_fe->dphidxi;
-	const std::vector<std::vector<Real> >& St = base_fe->dphideta;
-	const std::vector<std::vector<Real> >& S_map  = (base_fe->get_fe_map()).get_phi_map();
-	const std::vector<std::vector<Real> >& Ss_map = (base_fe->get_fe_map()).get_dphidxi_map();
-	const std::vector<std::vector<Real> >& St_map = (base_fe->get_fe_map()).get_dphideta_map();
+        // fast access to the approximation and mapping shapes of base_fe
+        const std::vector<std::vector<Real> >& S  = base_fe->phi;
+        const std::vector<std::vector<Real> >& Ss = base_fe->dphidxi;
+        const std::vector<std::vector<Real> >& St = base_fe->dphideta;
+        const std::vector<std::vector<Real> >& S_map  = (base_fe->get_fe_map()).get_phi_map();
+        const std::vector<std::vector<Real> >& Ss_map = (base_fe->get_fe_map()).get_dphidxi_map();
+        const std::vector<std::vector<Real> >& St_map = (base_fe->get_fe_map()).get_dphideta_map();
 
-	const unsigned int n_radial_qp         = radial_qrule->n_points();
-	const unsigned int n_base_qp           = base_qrule->  n_points();
+        const unsigned int n_radial_qp         = radial_qrule->n_points();
+        const unsigned int n_base_qp           = base_qrule->  n_points();
 
-	const unsigned int n_total_mapping_sf  =
-	  libmesh_cast_int<unsigned int>(radial_map.size()) * n_base_mapping_sf;
+        const unsigned int n_total_mapping_sf  =
+          libmesh_cast_int<unsigned int>(radial_map.size()) * n_base_mapping_sf;
 
-	const unsigned int n_total_approx_sf   = Radial::n_dofs(fe_type.radial_order) *  base_fe->n_shape_functions();
-
-
-	// compute the phase term derivatives
-	{
-  	  unsigned int tp=0;
-	  for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-	    for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
-	      {
-	        // sum over all base shapes, to get the average distance
-    	        for (unsigned int i=0; i<n_base_mapping_sf; i++)
-	          {
-	            dphasedxi[tp]   += Ss_map[i][bp] * dist[i] * radial_map   [1][rp];
-		    dphasedeta[tp]  += St_map[i][bp] * dist[i] * radial_map   [1][rp];
-		    dphasedzeta[tp] += S_map [i][bp] * dist[i] * dradialdv_map[1][rp];
-		  }
-
-		tp++;
-
-	      } // loop radial and base qp's
-
-	}
-
-	libmesh_assert_equal_to (phi.size(), n_total_approx_sf);
-	libmesh_assert_equal_to (dphidxi.size(), n_total_approx_sf);
-	libmesh_assert_equal_to (dphideta.size(), n_total_approx_sf);
-	libmesh_assert_equal_to (dphidzeta.size(), n_total_approx_sf);
-
-	// compute the overall approximation shape functions,
-	// pick the appropriate radial and base shapes through using
-	// _base_shape_index and _radial_shape_index
-	for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-	  for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
-	    for (unsigned int ti=0; ti<n_total_approx_sf; ti++)  // over _all_ approx_sf
-	      {
-		// let the index vectors take care of selecting the appropriate base/radial shape
-		const unsigned int bi = _base_shape_index  [ti];
-		const unsigned int ri = _radial_shape_index[ti];
-		phi      [ti][bp+rp*n_base_qp] = S [bi][bp] * mode[ri][rp] * som[rp];
-		dphidxi  [ti][bp+rp*n_base_qp] = Ss[bi][bp] * mode[ri][rp] * som[rp];
-		dphideta [ti][bp+rp*n_base_qp] = St[bi][bp] * mode[ri][rp] * som[rp];
-		dphidzeta[ti][bp+rp*n_base_qp] = S [bi][bp]
-		    * (dmodedv[ri][rp] * som[rp] + mode[ri][rp] * dsomdv[rp]);
-	      }
-
-	std::vector<std::vector<Real> >& phi_map = this->_fe_map->get_phi_map();
-	std::vector<std::vector<Real> >& dphidxi_map = this->_fe_map->get_dphidxi_map();
-	std::vector<std::vector<Real> >& dphideta_map = this->_fe_map->get_dphideta_map();
-	std::vector<std::vector<Real> >& dphidzeta_map = this->_fe_map->get_dphidzeta_map();
-
-	libmesh_assert_equal_to (phi_map.size(), n_total_mapping_sf);
-	libmesh_assert_equal_to (dphidxi_map.size(), n_total_mapping_sf);
-	libmesh_assert_equal_to (dphideta_map.size(), n_total_mapping_sf);
-	libmesh_assert_equal_to (dphidzeta_map.size(), n_total_mapping_sf);
-
-	// compute the overall mapping functions,
-	// pick the appropriate radial and base entries through using
-	// _base_node_index and _radial_node_index
-	for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-	  for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
-	    for (unsigned int ti=0; ti<n_total_mapping_sf; ti++)  // over all mapping shapes
-	      {
-		// let the index vectors take care of selecting the appropriate base/radial mapping shape
-		const unsigned int bi = _base_node_index  [ti];
-		const unsigned int ri = _radial_node_index[ti];
-		phi_map      [ti][bp+rp*n_base_qp] = S_map [bi][bp] * radial_map   [ri][rp];
-		dphidxi_map  [ti][bp+rp*n_base_qp] = Ss_map[bi][bp] * radial_map   [ri][rp];
-		dphideta_map [ti][bp+rp*n_base_qp] = St_map[bi][bp] * radial_map   [ri][rp];
-		dphidzeta_map[ti][bp+rp*n_base_qp] = S_map [bi][bp] * dradialdv_map[ri][rp];
-	      }
+        const unsigned int n_total_approx_sf   = Radial::n_dofs(fe_type.radial_order) *  base_fe->n_shape_functions();
 
 
-	break;
+        // compute the phase term derivatives
+        {
+          unsigned int tp=0;
+          for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
+            for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
+              {
+                // sum over all base shapes, to get the average distance
+                for (unsigned int i=0; i<n_base_mapping_sf; i++)
+                  {
+                    dphasedxi[tp]   += Ss_map[i][bp] * dist[i] * radial_map   [1][rp];
+                    dphasedeta[tp]  += St_map[i][bp] * dist[i] * radial_map   [1][rp];
+                    dphasedzeta[tp] += S_map [i][bp] * dist[i] * dradialdv_map[1][rp];
+                  }
+
+                tp++;
+
+              } // loop radial and base qp's
+
+        }
+
+        libmesh_assert_equal_to (phi.size(), n_total_approx_sf);
+        libmesh_assert_equal_to (dphidxi.size(), n_total_approx_sf);
+        libmesh_assert_equal_to (dphideta.size(), n_total_approx_sf);
+        libmesh_assert_equal_to (dphidzeta.size(), n_total_approx_sf);
+
+        // compute the overall approximation shape functions,
+        // pick the appropriate radial and base shapes through using
+        // _base_shape_index and _radial_shape_index
+        for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
+          for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
+            for (unsigned int ti=0; ti<n_total_approx_sf; ti++)  // over _all_ approx_sf
+              {
+                // let the index vectors take care of selecting the appropriate base/radial shape
+                const unsigned int bi = _base_shape_index  [ti];
+                const unsigned int ri = _radial_shape_index[ti];
+                phi      [ti][bp+rp*n_base_qp] = S [bi][bp] * mode[ri][rp] * som[rp];
+                dphidxi  [ti][bp+rp*n_base_qp] = Ss[bi][bp] * mode[ri][rp] * som[rp];
+                dphideta [ti][bp+rp*n_base_qp] = St[bi][bp] * mode[ri][rp] * som[rp];
+                dphidzeta[ti][bp+rp*n_base_qp] = S [bi][bp]
+                  * (dmodedv[ri][rp] * som[rp] + mode[ri][rp] * dsomdv[rp]);
+              }
+
+        std::vector<std::vector<Real> >& phi_map = this->_fe_map->get_phi_map();
+        std::vector<std::vector<Real> >& dphidxi_map = this->_fe_map->get_dphidxi_map();
+        std::vector<std::vector<Real> >& dphideta_map = this->_fe_map->get_dphideta_map();
+        std::vector<std::vector<Real> >& dphidzeta_map = this->_fe_map->get_dphidzeta_map();
+
+        libmesh_assert_equal_to (phi_map.size(), n_total_mapping_sf);
+        libmesh_assert_equal_to (dphidxi_map.size(), n_total_mapping_sf);
+        libmesh_assert_equal_to (dphideta_map.size(), n_total_mapping_sf);
+        libmesh_assert_equal_to (dphidzeta_map.size(), n_total_mapping_sf);
+
+        // compute the overall mapping functions,
+        // pick the appropriate radial and base entries through using
+        // _base_node_index and _radial_node_index
+        for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
+          for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
+            for (unsigned int ti=0; ti<n_total_mapping_sf; ti++)  // over all mapping shapes
+              {
+                // let the index vectors take care of selecting the appropriate base/radial mapping shape
+                const unsigned int bi = _base_node_index  [ti];
+                const unsigned int ri = _radial_node_index[ti];
+                phi_map      [ti][bp+rp*n_base_qp] = S_map [bi][bp] * radial_map   [ri][rp];
+                dphidxi_map  [ti][bp+rp*n_base_qp] = Ss_map[bi][bp] * radial_map   [ri][rp];
+                dphideta_map [ti][bp+rp*n_base_qp] = St_map[bi][bp] * radial_map   [ri][rp];
+                dphidzeta_map[ti][bp+rp*n_base_qp] = S_map [bi][bp] * dradialdv_map[ri][rp];
+              }
+
+
+        break;
       }
 
 
@@ -913,88 +913,88 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*, const std::
 
     case 1:
       {
-	libmesh_not_implemented();
-	break;
+        libmesh_not_implemented();
+        break;
       }
 
     case 2:
       {
-	libmesh_not_implemented();
-	break;
+        libmesh_not_implemented();
+        break;
       }
 
     case 3:
       {
-	const std::vector<Real>& dxidx_map = this->_fe_map->get_dxidx();
-	const std::vector<Real>& dxidy_map = this->_fe_map->get_dxidy();
-	const std::vector<Real>& dxidz_map = this->_fe_map->get_dxidz();
+        const std::vector<Real>& dxidx_map = this->_fe_map->get_dxidx();
+        const std::vector<Real>& dxidy_map = this->_fe_map->get_dxidy();
+        const std::vector<Real>& dxidz_map = this->_fe_map->get_dxidz();
 
-	const std::vector<Real>& detadx_map = this->_fe_map->get_detadx();
-	const std::vector<Real>& detady_map = this->_fe_map->get_detady();
-	const std::vector<Real>& detadz_map = this->_fe_map->get_detadz();
+        const std::vector<Real>& detadx_map = this->_fe_map->get_detadx();
+        const std::vector<Real>& detady_map = this->_fe_map->get_detady();
+        const std::vector<Real>& detadz_map = this->_fe_map->get_detadz();
 
-	const std::vector<Real>& dzetadx_map = this->_fe_map->get_dzetadx();
-	const std::vector<Real>& dzetady_map = this->_fe_map->get_dzetady();
-	const std::vector<Real>& dzetadz_map = this->_fe_map->get_dzetadz();
+        const std::vector<Real>& dzetadx_map = this->_fe_map->get_dzetadx();
+        const std::vector<Real>& dzetady_map = this->_fe_map->get_dzetady();
+        const std::vector<Real>& dzetadz_map = this->_fe_map->get_dzetadz();
 
-	// These are _all_ shape functions of this infinite element
-	for (unsigned int i=0; i<phi.size(); i++)
-	  for (unsigned int p=0; p<n_total_qp; p++)
-	    {
-	      // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);
-	      dphi[i][p](0) =
-		dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
-				dphideta[i][p]*detadx_map[p] +
-				dphidzeta[i][p]*dzetadx_map[p]);
+        // These are _all_ shape functions of this infinite element
+        for (unsigned int i=0; i<phi.size(); i++)
+          for (unsigned int p=0; p<n_total_qp; p++)
+            {
+              // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);
+              dphi[i][p](0) =
+                dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
+                                dphideta[i][p]*detadx_map[p] +
+                                dphidzeta[i][p]*dzetadx_map[p]);
 
-	      // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy) + (dphi/dzeta)*(dzeta/dy);
-	      dphi[i][p](1) =
-		dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
-				dphideta[i][p]*detady_map[p] +
-				dphidzeta[i][p]*dzetady_map[p]);
+              // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy) + (dphi/dzeta)*(dzeta/dy);
+              dphi[i][p](1) =
+                dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
+                                dphideta[i][p]*detady_map[p] +
+                                dphidzeta[i][p]*dzetady_map[p]);
 
-	      // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz) + (dphi/dzeta)*(dzeta/dz);
-	      dphi[i][p](2) =
-		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
-				dphideta[i][p]*detadz_map[p] +
-				dphidzeta[i][p]*dzetadz_map[p]);
-	    }
+              // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz) + (dphi/dzeta)*(dzeta/dz);
+              dphi[i][p](2) =
+                dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
+                                dphideta[i][p]*detadz_map[p] +
+                                dphidzeta[i][p]*dzetadz_map[p]);
+            }
 
 
-	// This is the derivative of the phase term of this infinite element
-	for (unsigned int p=0; p<n_total_qp; p++)
-	  {
-	    // the derivative of the phase term
-	    dphase[p](0) = (dphasedxi[p]   * dxidx_map[p] +
-			    dphasedeta[p]  * detadx_map[p] +
-			    dphasedzeta[p] * dzetadx_map[p]);
+        // This is the derivative of the phase term of this infinite element
+        for (unsigned int p=0; p<n_total_qp; p++)
+          {
+            // the derivative of the phase term
+            dphase[p](0) = (dphasedxi[p]   * dxidx_map[p] +
+                            dphasedeta[p]  * detadx_map[p] +
+                            dphasedzeta[p] * dzetadx_map[p]);
 
-	    dphase[p](1) = (dphasedxi[p]   * dxidy_map[p] +
-			    dphasedeta[p]  * detady_map[p] +
-			    dphasedzeta[p] * dzetady_map[p]);
+            dphase[p](1) = (dphasedxi[p]   * dxidy_map[p] +
+                            dphasedeta[p]  * detady_map[p] +
+                            dphasedzeta[p] * dzetady_map[p]);
 
-	    dphase[p](2) = (dphasedxi[p]   * dxidz_map[p] +
-			    dphasedeta[p]  * detadz_map[p] +
-			    dphasedzeta[p] * dzetadz_map[p]);
+            dphase[p](2) = (dphasedxi[p]   * dxidz_map[p] +
+                            dphasedeta[p]  * detadz_map[p] +
+                            dphasedzeta[p] * dzetadz_map[p]);
 
-	    // the derivative of the radial weight - varies only in radial direction,
-	    // therefore dweightdxi = dweightdeta = 0.
-	    dweight[p](0) = dweightdv[p] * dzetadx_map[p];
+            // the derivative of the radial weight - varies only in radial direction,
+            // therefore dweightdxi = dweightdeta = 0.
+            dweight[p](0) = dweightdv[p] * dzetadx_map[p];
 
-	    dweight[p](1) = dweightdv[p] * dzetady_map[p];
+            dweight[p](1) = dweightdv[p] * dzetady_map[p];
 
-	    dweight[p](2) = dweightdv[p] * dzetadz_map[p];
+            dweight[p](2) = dweightdv[p] * dzetadz_map[p];
 
-	  }
+          }
 
-	break;
+        break;
       }
 
 
 
     default:
       {
-	libmesh_error();
+        libmesh_error();
       }
     }
 

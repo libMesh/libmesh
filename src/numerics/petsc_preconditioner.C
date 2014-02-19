@@ -138,21 +138,21 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
     {
       // In serial, just set the ILU preconditioner type
       if (communicator.size())
-	{
-	  ierr = PCSetType (pc, (char*) PCILU);
-	  CHKERRABORT(comm,ierr);
-	}
+        {
+          ierr = PCSetType (pc, (char*) PCILU);
+          CHKERRABORT(comm,ierr);
+        }
       else
-	{
-	  // But PETSc has no truly parallel ILU, instead you have to set
-	  // an actual parallel preconditioner (e.g. block Jacobi) and then
-	  // assign ILU sub-preconditioners.
-	  ierr = PCSetType (pc, (char*) PCBJACOBI);
-	  CHKERRABORT(comm,ierr);
+        {
+          // But PETSc has no truly parallel ILU, instead you have to set
+          // an actual parallel preconditioner (e.g. block Jacobi) and then
+          // assign ILU sub-preconditioners.
+          ierr = PCSetType (pc, (char*) PCBJACOBI);
+          CHKERRABORT(comm,ierr);
 
-	  // Set ILU as the sub preconditioner type
-	  set_petsc_subpreconditioner_type(PCILU, pc);
-	}
+          // Set ILU as the sub preconditioner type
+          set_petsc_subpreconditioner_type(PCILU, pc);
+        }
       break;
     }
 
@@ -160,21 +160,21 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
     {
       // In serial, just set the LU preconditioner type
       if (communicator.size())
-	{
-	  ierr = PCSetType (pc, (char*) PCLU);
-	  CHKERRABORT(comm,ierr);
-	}
+        {
+          ierr = PCSetType (pc, (char*) PCLU);
+          CHKERRABORT(comm,ierr);
+        }
       else
-	{
-	  // But PETSc has no truly parallel LU, instead you have to set
-	  // an actual parallel preconditioner (e.g. block Jacobi) and then
-	  // assign LU sub-preconditioners.
-	  ierr = PCSetType (pc, (char*) PCBJACOBI);
-	  CHKERRABORT(comm,ierr);
+        {
+          // But PETSc has no truly parallel LU, instead you have to set
+          // an actual parallel preconditioner (e.g. block Jacobi) and then
+          // assign LU sub-preconditioners.
+          ierr = PCSetType (pc, (char*) PCBJACOBI);
+          CHKERRABORT(comm,ierr);
 
-	  // Set ILU as the sub preconditioner type
-	  set_petsc_subpreconditioner_type(PCLU, pc);
-	}
+          // Set ILU as the sub preconditioner type
+          set_petsc_subpreconditioner_type(PCLU, pc);
+        }
       break;
     }
 

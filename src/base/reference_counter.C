@@ -63,8 +63,8 @@ std::string ReferenceCounter::get_info ()
       const unsigned int destructions = it->second.second;
 
       oss << "| " << name << " reference count information:\n"
-	  << "|  Creations:    " << creations    << '\n'
-	  << "|  Destructions: " << destructions << '\n';
+          << "|  Creations:    " << creations    << '\n'
+          << "|  Destructions: " << destructions << '\n';
     }
 
   oss << " ---------------------------------------------------------------------------- \n";

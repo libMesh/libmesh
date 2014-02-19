@@ -54,7 +54,7 @@ numeric_index_type SumShellMatrix<T>::n () const
 
 template <typename T>
 void SumShellMatrix<T>::vector_mult (NumericVector<T>& dest,
-				     const NumericVector<T>& arg) const
+                                     const NumericVector<T>& arg) const
 {
   dest.zero();
   this->vector_mult_add(dest,arg);
@@ -64,7 +64,7 @@ void SumShellMatrix<T>::vector_mult (NumericVector<T>& dest,
 
 template <typename T>
 void SumShellMatrix<T>::vector_mult_add (NumericVector<T>& dest,
-					 const NumericVector<T>& arg) const
+                                         const NumericVector<T>& arg) const
 {
   for(numeric_index_type i=matrices.size(); i-->0; )
     {

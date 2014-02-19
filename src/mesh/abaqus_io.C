@@ -53,10 +53,10 @@ namespace
    * Helper function to fill up eletypes map
    */
   void add_eletype_entry(ElemType libmesh_elem_type,
-			 const unsigned* node_map,
-			 unsigned node_map_size,
-			 const unsigned* side_map,
-			 unsigned side_map_size)
+                         const unsigned* node_map,
+                         unsigned node_map_size,
+                         const unsigned* side_map,
+                         unsigned side_map_size)
   {
     // If map entry does not exist, this will create it
     ElementDefinition& map_entry = eletypes[libmesh_elem_type];
@@ -66,10 +66,10 @@ namespace
     // an unnamed temporary vector into the map_entry's vector.  Note:
     // the vector(iter, iter) constructor is used.
     std::vector<unsigned>(node_map,
-			  node_map+node_map_size).swap(map_entry.abaqus_zero_based_node_id_to_libmesh_node_id);
+                          node_map+node_map_size).swap(map_entry.abaqus_zero_based_node_id_to_libmesh_node_id);
 
     std::vector<unsigned>(side_map,
-			  side_map+side_map_size).swap(map_entry.abaqus_zero_based_side_id_to_libmesh_side_id);
+                          side_map+side_map_size).swap(map_entry.abaqus_zero_based_side_id_to_libmesh_side_id);
   }
 
 
@@ -84,75 +84,75 @@ namespace
     // eletypes map and will do nothing.
     if (eletypes.empty())
       {
-	{
-	  // TRI3
-	  const unsigned int node_map[] = {0,1,2}; // identity
-	  const unsigned int side_map[] = {0,1,2}; // identity
-	  add_eletype_entry(TRI3, node_map, 3, side_map, 3);
-	}
+        {
+          // TRI3
+          const unsigned int node_map[] = {0,1,2}; // identity
+          const unsigned int side_map[] = {0,1,2}; // identity
+          add_eletype_entry(TRI3, node_map, 3, side_map, 3);
+        }
 
-	{
-	  // QUAD4
-	  const unsigned int node_map[] = {0,1,2,3}; // identity
-	  const unsigned int side_map[] = {0,1,2,3}; // identity
-	  add_eletype_entry(QUAD4, node_map, 4, side_map, 4);
-	}
+        {
+          // QUAD4
+          const unsigned int node_map[] = {0,1,2,3}; // identity
+          const unsigned int side_map[] = {0,1,2,3}; // identity
+          add_eletype_entry(QUAD4, node_map, 4, side_map, 4);
+        }
 
-	{
-	  // TET4
-	  const unsigned int node_map[] = {0,1,2,3}; // identity
-	  const unsigned int side_map[] = {0,1,2,3}; // identity
-	  add_eletype_entry(TET4, node_map, 4, side_map, 4);
-	}
+        {
+          // TET4
+          const unsigned int node_map[] = {0,1,2,3}; // identity
+          const unsigned int side_map[] = {0,1,2,3}; // identity
+          add_eletype_entry(TET4, node_map, 4, side_map, 4);
+        }
 
-	{
-	  // TET10
-	  const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9}; // identity
-	  const unsigned int side_map[] = {0,1,2,3};             // identity
-	  add_eletype_entry(TET10, node_map, 10, side_map, 4);
-	}
+        {
+          // TET10
+          const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9}; // identity
+          const unsigned int side_map[] = {0,1,2,3};             // identity
+          add_eletype_entry(TET10, node_map, 10, side_map, 4);
+        }
 
-	{
-	  // HEX8
-	  const unsigned int node_map[] = {0,1,2,3,4,5,6,7}; // identity
-	  const unsigned int side_map[] = {0,5,1,2,3,4};     // inverse = 0,2,3,4,5,1
-	  add_eletype_entry(HEX8, node_map, 8, side_map, 6);
-	}
+        {
+          // HEX8
+          const unsigned int node_map[] = {0,1,2,3,4,5,6,7}; // identity
+          const unsigned int side_map[] = {0,5,1,2,3,4};     // inverse = 0,2,3,4,5,1
+          add_eletype_entry(HEX8, node_map, 8, side_map, 6);
+        }
 
-	{
-	  // HEX20
-	  const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15}; // map is its own inverse
-	  const unsigned int side_map[] = {0,5,1,2,3,4};                                       // inverse = 0,2,3,4,5,1
-	  add_eletype_entry(HEX20, node_map, 20, side_map, 6);
-	}
+        {
+          // HEX20
+          const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15}; // map is its own inverse
+          const unsigned int side_map[] = {0,5,1,2,3,4};                                       // inverse = 0,2,3,4,5,1
+          add_eletype_entry(HEX20, node_map, 20, side_map, 6);
+        }
 
-	{
-	  // HEX27
-	  const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15,26,20,25,21,22,23,24}; // inverse = ...,21,23,24,25,26,22,20
-	  const unsigned int side_map[] = {0,5,1,2,3,4};                                                            // inverse = 0,2,3,4,5,1
-	  add_eletype_entry(HEX27, node_map, 27, side_map, 6);
-	}
+        {
+          // HEX27
+          const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15,26,20,25,21,22,23,24}; // inverse = ...,21,23,24,25,26,22,20
+          const unsigned int side_map[] = {0,5,1,2,3,4};                                                            // inverse = 0,2,3,4,5,1
+          add_eletype_entry(HEX27, node_map, 27, side_map, 6);
+        }
 
-	{
-	  // PRISM6
-	  const unsigned int node_map[] = {0,1,2,3,4,5}; // identity
-	  const unsigned int side_map[] = {0,4,1,2,3};   // inverse = 0,2,3,4,1
-	  add_eletype_entry(PRISM6, node_map, 6, side_map, 5);
-	}
+        {
+          // PRISM6
+          const unsigned int node_map[] = {0,1,2,3,4,5}; // identity
+          const unsigned int side_map[] = {0,4,1,2,3};   // inverse = 0,2,3,4,1
+          add_eletype_entry(PRISM6, node_map, 6, side_map, 5);
+        }
 
-	{
-	  // PRISM15
-	  const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11}; // map is its own inverse
-	  const unsigned int side_map[] = {0,4,1,2,3};                          // inverse = 0,2,3,4,1
-	  add_eletype_entry(PRISM15, node_map, 15, side_map, 5);
-	}
+        {
+          // PRISM15
+          const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11}; // map is its own inverse
+          const unsigned int side_map[] = {0,4,1,2,3};                          // inverse = 0,2,3,4,1
+          add_eletype_entry(PRISM15, node_map, 15, side_map, 5);
+        }
 
-	{
-	  // PRISM18
-	  const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11,15,16,17}; // map is its own inverse
-	  const unsigned int side_map[] = {0,4,1,2,3};                                   // inverse = 0,2,3,4,1
-	  add_eletype_entry(PRISM18, node_map, 18, side_map, 5);
-	}
+        {
+          // PRISM18
+          const unsigned int node_map[] = {0,1,2,3,4,5,6,7,8,12,13,14,9,10,11,15,16,17}; // map is its own inverse
+          const unsigned int side_map[] = {0,4,1,2,3};                                   // inverse = 0,2,3,4,1
+          add_eletype_entry(PRISM18, node_map, 18, side_map, 5);
+        }
 
 
 
@@ -202,143 +202,143 @@ namespace libMesh
     std::string s;
     while (true)
       {
-	// Try to read something.  This may set EOF!
-	std::getline(_in, s);
+        // Try to read something.  This may set EOF!
+        std::getline(_in, s);
 
-	if (_in)
-	  {
-	    // Process s...
-	    //
-	    // There are many sections in Abaqus files, we read some
-	    // but others are just ignored...  Some sections may occur
-	    // more than once.  For example for a hybrid grid, you
-	    // will have multiple *Element sections...
+        if (_in)
+          {
+            // Process s...
+            //
+            // There are many sections in Abaqus files, we read some
+            // but others are just ignored...  Some sections may occur
+            // more than once.  For example for a hybrid grid, you
+            // will have multiple *Element sections...
 
-	    // Some Abaqus files use all upper-case for section names,
-	    // so we will just convert s to uppercase
-	    std::string upper(s);
-	    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+            // Some Abaqus files use all upper-case for section names,
+            // so we will just convert s to uppercase
+            std::string upper(s);
+            std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
 
-	    // 0.) Look for the "*Part" section
-	    if (upper.find("*PART") == 0)
-	      {
-		// libMesh::out << "Found parts section!" << std::endl;
+            // 0.) Look for the "*Part" section
+            if (upper.find("*PART") == 0)
+              {
+                // libMesh::out << "Found parts section!" << std::endl;
 
-		if (_already_seen_part)
-		  {
-		    libMesh::err << "We currently don't support reading Abaqus files with multiple PART sections" << std::endl;
-		    libmesh_error();
-		  }
+                if (_already_seen_part)
+                  {
+                    libMesh::err << "We currently don't support reading Abaqus files with multiple PART sections" << std::endl;
+                    libmesh_error();
+                  }
 
-		_already_seen_part = true;
-	      }
+                _already_seen_part = true;
+              }
 
-	    // 1.) Look for the "*Nodes" section
-	    if (upper.find("*NODE") == 0)
-	      {
-		// Process any lines of comments that may be present
-		this->process_and_discard_comments();
+            // 1.) Look for the "*Nodes" section
+            if (upper.find("*NODE") == 0)
+              {
+                // Process any lines of comments that may be present
+                this->process_and_discard_comments();
 
-		// Read a block of nodes
-		this->read_nodes();
-	      }
-
-
-
-	    // 2.) Look for the "*Element" section
-	    else if (upper.find("*ELEMENT,") == 0)
-	      {
-		// Process any lines of comments that may be present
-		this->process_and_discard_comments();
-
-		// Read a block of elements
-		this->read_elements(upper);
-	      }
+                // Read a block of nodes
+                this->read_nodes();
+              }
 
 
 
-	    // 3.) Look for a Nodeset section
-	    else if (upper.find("*NSET") == 0)
-	      {
-		std::string nset_name = this->parse_label(s, "nset");
+            // 2.) Look for the "*Element" section
+            else if (upper.find("*ELEMENT,") == 0)
+              {
+                // Process any lines of comments that may be present
+                this->process_and_discard_comments();
 
-		// I haven't seen an unnamed elset yet, but let's detect it
-		// just in case...
-		if (nset_name == "")
-		  {
-		    libMesh::err << "Unnamed nset encountered!" << std::endl;
-		    libmesh_error();
-		  }
-
-		// Process any lines of comments that may be present
-		this->process_and_discard_comments();
-
-		// Read the IDs, storing them in _nodeset_ids
-		this->read_ids(nset_name, _nodeset_ids);
-	      } // *Nodeset
+                // Read a block of elements
+                this->read_elements(upper);
+              }
 
 
 
-	    // 4.) Look for an Elset section
-	    else if (upper.find("*ELSET") == 0)
-	      {
-		std::string elset_name = this->parse_label(s, "elset");
+            // 3.) Look for a Nodeset section
+            else if (upper.find("*NSET") == 0)
+              {
+                std::string nset_name = this->parse_label(s, "nset");
 
-		// I haven't seen an unnamed elset yet, but let's detect it
-		// just in case...
-		if (elset_name == "")
-		  {
-		    libMesh::err << "Unnamed elset encountered!" << std::endl;
-		    libmesh_error();
-		  }
+                // I haven't seen an unnamed elset yet, but let's detect it
+                // just in case...
+                if (nset_name == "")
+                  {
+                    libMesh::err << "Unnamed nset encountered!" << std::endl;
+                    libmesh_error();
+                  }
 
-		// Debugging
-		// libMesh::out << "Processing ELSET: " << elset_name << std::endl;
+                // Process any lines of comments that may be present
+                this->process_and_discard_comments();
 
-		// Process any lines of comments that may be present
-		this->process_and_discard_comments();
-
-		// Read the IDs, storing them in _elemset_ids
-		this->read_ids(elset_name, _elemset_ids);
-	      } // *Elset
+                // Read the IDs, storing them in _nodeset_ids
+                this->read_ids(nset_name, _nodeset_ids);
+              } // *Nodeset
 
 
 
-	    // 5.) Look for a Surface section.  Need to be a little
-	    // careful, since there are also "surface interaction"
-	    // sections we don't want to read here.
-	    else if (upper.find("*SURFACE,") == 0)
-	      {
-		// libMesh::out << "Found SURFACE section: " << s << std::endl;
+            // 4.) Look for an Elset section
+            else if (upper.find("*ELSET") == 0)
+              {
+                std::string elset_name = this->parse_label(s, "elset");
 
-		// Get the name from the Name=Foo label.  This will be the map key.
-		std::string sideset_name = this->parse_label(s, "name");
+                // I haven't seen an unnamed elset yet, but let's detect it
+                // just in case...
+                if (elset_name == "")
+                  {
+                    libMesh::err << "Unnamed elset encountered!" << std::endl;
+                    libmesh_error();
+                  }
 
-		// Print name of section we just found
-		// libMesh::out << "Found surface section named: " << sideset_name << std::endl;
+                // Debugging
+                // libMesh::out << "Processing ELSET: " << elset_name << std::endl;
 
-		// Process any lines of comments that may be present
-		this->process_and_discard_comments();
+                // Process any lines of comments that may be present
+                this->process_and_discard_comments();
 
-		// Read the sideset IDs
-		this->read_sideset(sideset_name, _sideset_ids);
+                // Read the IDs, storing them in _elemset_ids
+                this->read_ids(elset_name, _elemset_ids);
+              } // *Elset
 
-		// Debugging: print status of most recently read sideset
-		// libMesh::out << "Read " << _sideset_ids[sideset_name].size() << " sides in " << sideset_name << std::endl;
-	      }
 
-	    continue;
-	  } // if (_in)
 
-	// If !file, check to see if EOF was set.  If so, break out
-	// of while loop.
-	if (_in.eof())
-	  break;
+            // 5.) Look for a Surface section.  Need to be a little
+            // careful, since there are also "surface interaction"
+            // sections we don't want to read here.
+            else if (upper.find("*SURFACE,") == 0)
+              {
+                // libMesh::out << "Found SURFACE section: " << s << std::endl;
 
-	// If !in and !in.eof(), stream is in a bad state!
-	libMesh::err << "Stream is bad!\n";
-	libMesh::err << "Perhaps the file: " << fname << " does not exist?" << std::endl;
-	libmesh_error();
+                // Get the name from the Name=Foo label.  This will be the map key.
+                std::string sideset_name = this->parse_label(s, "name");
+
+                // Print name of section we just found
+                // libMesh::out << "Found surface section named: " << sideset_name << std::endl;
+
+                // Process any lines of comments that may be present
+                this->process_and_discard_comments();
+
+                // Read the sideset IDs
+                this->read_sideset(sideset_name, _sideset_ids);
+
+                // Debugging: print status of most recently read sideset
+                // libMesh::out << "Read " << _sideset_ids[sideset_name].size() << " sides in " << sideset_name << std::endl;
+              }
+
+            continue;
+          } // if (_in)
+
+        // If !file, check to see if EOF was set.  If so, break out
+        // of while loop.
+        if (_in.eof())
+          break;
+
+        // If !in and !in.eof(), stream is in a bad state!
+        libMesh::err << "Stream is bad!\n";
+        libMesh::err << "Perhaps the file: " << fname << " does not exist?" << std::endl;
+        libmesh_error();
       } // while
 
 
@@ -347,26 +347,26 @@ namespace libMesh
     // do some more processing.
     //
     libMesh::out << "Mesh contains "
-		 << the_mesh.n_elem()
-		 << " elements, and "
-		 << the_mesh.n_nodes()
-		 << " nodes." << std::endl;
+                 << the_mesh.n_elem()
+                 << " elements, and "
+                 << the_mesh.n_nodes()
+                 << " nodes." << std::endl;
 
     // TODO: Remove these or write a function to do it?
 //    {
 //      container_t::iterator it=_nodeset_ids.begin();
 //      for (; it != _nodeset_ids.end(); ++it)
-//	{
-//	  libMesh::out << "Node set '" << (*it).first << "' contains " << (*it).second.size() << " ID(s)." << std::endl;
-//	}
+//{
+//  libMesh::out << "Node set '" << (*it).first << "' contains " << (*it).second.size() << " ID(s)." << std::endl;
+//}
 //    }
 //
 //    {
 //      container_t::iterator it=_elemset_ids.begin();
 //      for (; it != _elemset_ids.end(); ++it)
-//	{
-//	  libMesh::out << "Elem set '" << (*it).first << "' contains " << (*it).second.size() << " ID(s)." << std::endl;
-//	}
+//{
+//  libMesh::out << "Elem set '" << (*it).first << "' contains " << (*it).second.size() << " ID(s)." << std::endl;
+//}
 //    }
 
 
@@ -401,10 +401,10 @@ namespace libMesh
 
     // Debugging: print node count
     // libMesh::out << "Before read_nodes(), mesh contains "
-    // 		 << the_mesh.n_elem()
-    // 		 << " elements, and "
-    // 		 << the_mesh.n_nodes()
-    // 		 << " nodes." << std::endl;
+    //  << the_mesh.n_elem()
+    //  << " elements, and "
+    //  << the_mesh.n_nodes()
+    //  << " nodes." << std::endl;
 
     // In the input file I have, Abaqus neither tells what
     // the mesh dimension is nor how many nodes it has...
@@ -428,38 +428,38 @@ namespace libMesh
     // TODO: Is Abaqus guaranteed to start the line with '*' or can there be leading white space?
     while (_in.peek() != '*' && _in.peek() != EOF)
       {
-	// Re-Initialize variables to be read in from file
-	abaqus_node_id=0;
-	x = y = z = 0.;
+        // Re-Initialize variables to be read in from file
+        abaqus_node_id=0;
+        x = y = z = 0.;
 
-	// Note: we assume *at least* 2D points here, should we worry about
-	// trying to read 1D Abaqus meshes?
-	_in >> abaqus_node_id >> c >> x >> c >> y;
+        // Note: we assume *at least* 2D points here, should we worry about
+        // trying to read 1D Abaqus meshes?
+        _in >> abaqus_node_id >> c >> x >> c >> y;
 
-	// Peek at the next character.  If it is a comma, then there is another
-	// value to read!
-	if (_in.peek() == ',')
-	  _in >> c >> z;
+        // Peek at the next character.  If it is a comma, then there is another
+        // value to read!
+        if (_in.peek() == ',')
+          _in >> c >> z;
 
-	// Debugging: Print what we just read in.
-	// libMesh::out << "node_id=" << node_id
-	// 	     << ", x=" << x
-	// 	     << ", y=" << y
-	// 	     << ", z=" << z
-	// 	     << std::endl;
+        // Debugging: Print what we just read in.
+        // libMesh::out << "node_id=" << node_id
+        //      << ", x=" << x
+        //      << ", y=" << y
+        //      << ", z=" << z
+        //      << std::endl;
 
-	// Read (and discard) the rest of the line, including the newline.
-	// This is required so that our 'peek()' at the beginning of this
-	// loop doesn't read the newline character, for example.
-	std::getline(_in, dummy);
+        // Read (and discard) the rest of the line, including the newline.
+        // This is required so that our 'peek()' at the beginning of this
+        // loop doesn't read the newline character, for example.
+        std::getline(_in, dummy);
 
-	// Set up the abaqus -> libmesh node mapping.  This is usually just the
-	// "off-by-one" map.
-	_abaqus_to_libmesh_node_mapping[abaqus_node_id] = libmesh_node_id;
+        // Set up the abaqus -> libmesh node mapping.  This is usually just the
+        // "off-by-one" map.
+        _abaqus_to_libmesh_node_mapping[abaqus_node_id] = libmesh_node_id;
 
-	// Add the point to the mesh using libmesh's numbering,
-	// and post-increment the libmesh node counter.
-	the_mesh.add_point(Point(x,y,z), libmesh_node_id++);
+        // Add the point to the mesh using libmesh's numbering,
+        // and post-increment the libmesh node counter.
+        the_mesh.add_point(Point(x,y,z), libmesh_node_id++);
       } // while
 
     // Debugging: print node count.  Note: in serial mesh, this count may
@@ -494,58 +494,58 @@ namespace libMesh
 
     // Within s, we should have "type=XXXX"
     if (upper.find("CPE4") != std::string::npos ||
-	upper.find("CPS4") != std::string::npos)
+        upper.find("CPS4") != std::string::npos)
       {
-	elem_type = QUAD4;
-	n_nodes_per_elem = 4;
-	the_mesh.set_mesh_dimension(2);
+        elem_type = QUAD4;
+        n_nodes_per_elem = 4;
+        the_mesh.set_mesh_dimension(2);
       }
     else if (upper.find("CPS3") != std::string::npos)
       {
-	elem_type = TRI3;
-	n_nodes_per_elem = 3;
-	the_mesh.set_mesh_dimension(2);
+        elem_type = TRI3;
+        n_nodes_per_elem = 3;
+        the_mesh.set_mesh_dimension(2);
       }
     else if (upper.find("C3D8") != std::string::npos)
       {
-	elem_type = HEX8;
-	n_nodes_per_elem = 8;
-	the_mesh.set_mesh_dimension(3);
+        elem_type = HEX8;
+        n_nodes_per_elem = 8;
+        the_mesh.set_mesh_dimension(3);
       }
     else if (upper.find("C3D4") != std::string::npos)
       {
-	elem_type = TET4;
-	n_nodes_per_elem = 4;
-	the_mesh.set_mesh_dimension(3);
+        elem_type = TET4;
+        n_nodes_per_elem = 4;
+        the_mesh.set_mesh_dimension(3);
       }
     else if (upper.find("C3D20") != std::string::npos)
       {
-	elem_type = HEX20;
-	n_nodes_per_elem = 20;
-	the_mesh.set_mesh_dimension(3);
+        elem_type = HEX20;
+        n_nodes_per_elem = 20;
+        the_mesh.set_mesh_dimension(3);
       }
     else if (upper.find("C3D6") != std::string::npos)
       {
-	elem_type = PRISM6;
-	n_nodes_per_elem = 6;
-	the_mesh.set_mesh_dimension(3);
+        elem_type = PRISM6;
+        n_nodes_per_elem = 6;
+        the_mesh.set_mesh_dimension(3);
       }
     else if (upper.find("C3D15") != std::string::npos)
       {
-	elem_type = PRISM15;
-	n_nodes_per_elem = 15;
-	the_mesh.set_mesh_dimension(3);
+        elem_type = PRISM15;
+        n_nodes_per_elem = 15;
+        the_mesh.set_mesh_dimension(3);
       }
     else if (upper.find("C3D10") != std::string::npos)
       {
-	elem_type = TET10;
-	n_nodes_per_elem = 10;
-	the_mesh.set_mesh_dimension(3);
+        elem_type = TET10;
+        n_nodes_per_elem = 10;
+        the_mesh.set_mesh_dimension(3);
       }
     else
       {
-	libMesh::err << "Unrecognized element type: " << upper << std::endl;
-	libmesh_error();
+        libMesh::err << "Unrecognized element type: " << upper << std::endl;
+        libmesh_error();
       }
 
     // Insert the elem type we detected into the set of all elem types for this mesh
@@ -561,115 +561,115 @@ namespace libMesh
     // created one with an uninitialized struct.  Check for that here...
     if (eledef.abaqus_zero_based_node_id_to_libmesh_node_id.size() == 0)
       {
-	// libMesh::err << "No Abaqus->LibMesh mapping information for ElemType "
-	// 	     << Utility::enum_to_string(elem_type)
-	// 	     << "!"
-	// 	     << std::endl;
-	libmesh_error();
+        // libMesh::err << "No Abaqus->LibMesh mapping information for ElemType "
+        //      << Utility::enum_to_string(elem_type)
+        //      << "!"
+        //      << std::endl;
+        libmesh_error();
       }
 
     // We will read elements until the next line begins with *, since that will be the
     // next section.
     while (_in.peek() != '*' && _in.peek() != EOF)
       {
-	// Read the element ID, it is the first number on each line.  It is
-	// followed by a comma, so read that also.  We will need this ID later
-	// when we try to assign subdomain IDs
-	dof_id_type abaqus_elem_id = 0;
-	char c;
-	_in >> abaqus_elem_id >> c;
+        // Read the element ID, it is the first number on each line.  It is
+        // followed by a comma, so read that also.  We will need this ID later
+        // when we try to assign subdomain IDs
+        dof_id_type abaqus_elem_id = 0;
+        char c;
+        _in >> abaqus_elem_id >> c;
 
-	// Debugging:
-	// libMesh::out << "Reading data for element " << abaqus_elem_id << std::endl;
+        // Debugging:
+        // libMesh::out << "Reading data for element " << abaqus_elem_id << std::endl;
 
-	// Add an element of the appropriate type to the Mesh.
-	Elem* elem = the_mesh.add_elem(Elem::build(elem_type).release());
+        // Add an element of the appropriate type to the Mesh.
+        Elem* elem = the_mesh.add_elem(Elem::build(elem_type).release());
 
-	// Associate the ID returned from libmesh with the abaqus element ID
-	//_libmesh_to_abaqus_elem_mapping[elem->id()] = abaqus_elem_id;
-	_abaqus_to_libmesh_elem_mapping[abaqus_elem_id] = elem->id();
+        // Associate the ID returned from libmesh with the abaqus element ID
+        //_libmesh_to_abaqus_elem_mapping[elem->id()] = abaqus_elem_id;
+        _abaqus_to_libmesh_elem_mapping[abaqus_elem_id] = elem->id();
 
-	// The count of the total number of IDs read for the current element.
-	unsigned id_count=0;
+        // The count of the total number of IDs read for the current element.
+        unsigned id_count=0;
 
-	// Continue reading line-by-line until we have read enough nodes for this element
-	while (id_count < n_nodes_per_elem)
-	  {
-	    // Read entire line (up to carriage return) of comma-separated values
-	    std::string csv_line;
-	    std::getline(_in, csv_line);
+        // Continue reading line-by-line until we have read enough nodes for this element
+        while (id_count < n_nodes_per_elem)
+          {
+            // Read entire line (up to carriage return) of comma-separated values
+            std::string csv_line;
+            std::getline(_in, csv_line);
 
-	    // Create a stream object out of the current line
-	    std::stringstream line_stream(csv_line);
+            // Create a stream object out of the current line
+            std::stringstream line_stream(csv_line);
 
-	    // Process the comma-separated values
-	    std::string cell;
-	    while (std::getline(line_stream, cell, ','))
-	      {
-		// FIXME: factor out this strtol stuff into a utility function.
-		char* endptr;
-		long abaqus_global_node_id = std::strtol(cell.c_str(), &endptr, /*base=*/10);
+            // Process the comma-separated values
+            std::string cell;
+            while (std::getline(line_stream, cell, ','))
+              {
+                // FIXME: factor out this strtol stuff into a utility function.
+                char* endptr;
+                long abaqus_global_node_id = std::strtol(cell.c_str(), &endptr, /*base=*/10);
 
-		if (abaqus_global_node_id!=0 || cell.c_str() != endptr)
-		  {
-		    // Use the global node number mapping to determine the corresponding libmesh global node id
-		    dof_id_type libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[abaqus_global_node_id];
+                if (abaqus_global_node_id!=0 || cell.c_str() != endptr)
+                  {
+                    // Use the global node number mapping to determine the corresponding libmesh global node id
+                    dof_id_type libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[abaqus_global_node_id];
 
-		    // Grab the node pointer from the mesh for this ID
-		    Node* node = the_mesh.node_ptr(libmesh_global_node_id);
+                    // Grab the node pointer from the mesh for this ID
+                    Node* node = the_mesh.node_ptr(libmesh_global_node_id);
 
-		    // Debugging:
-		    // libMesh::out << "Assigning global node id: " << abaqus_global_node_id
-		    //              << "(Abaqus), " << node->id() << "(LibMesh)" << std::endl;
+                    // Debugging:
+                    // libMesh::out << "Assigning global node id: " << abaqus_global_node_id
+                    //              << "(Abaqus), " << node->id() << "(LibMesh)" << std::endl;
 
-		    // If node_ptr() returns NULL, it may mean we have not yet read the
-		    // *Nodes section, though I assumed that always came before the *Elements section...
-		    if (node == NULL)
-		      {
-			libMesh::err << "Error!  Mesh returned NULL Node pointer.\n";
-			libMesh::err << "Either no node exists with ID " << libmesh_global_node_id
-				     << " or perhaps this input file has *Elements defined before *Nodes?" << std::endl;
-			libmesh_error();
-		      }
+                    // If node_ptr() returns NULL, it may mean we have not yet read the
+                    // *Nodes section, though I assumed that always came before the *Elements section...
+                    if (node == NULL)
+                      {
+                        libMesh::err << "Error!  Mesh returned NULL Node pointer.\n";
+                        libMesh::err << "Either no node exists with ID " << libmesh_global_node_id
+                                     << " or perhaps this input file has *Elements defined before *Nodes?" << std::endl;
+                        libmesh_error();
+                      }
 
-		    // Note: id_count is the zero-based abaqus (elem local) node index.  We therefore map
-		    // it to a libmesh elem local node index using the element definition map
-		    unsigned libmesh_elem_local_node_id =
-		      eledef.abaqus_zero_based_node_id_to_libmesh_node_id[id_count];
+                    // Note: id_count is the zero-based abaqus (elem local) node index.  We therefore map
+                    // it to a libmesh elem local node index using the element definition map
+                    unsigned libmesh_elem_local_node_id =
+                      eledef.abaqus_zero_based_node_id_to_libmesh_node_id[id_count];
 
-		    // Set this node pointer within the element.
-		    elem->set_node(libmesh_elem_local_node_id) = node;
+                    // Set this node pointer within the element.
+                    elem->set_node(libmesh_elem_local_node_id) = node;
 
-		    // Debugging:
-		    // libMesh::out << "Setting elem " << elem->id()
-		    //              << ", local node " << libmesh_elem_local_node_id
-		    //              << " to global node " << node->id() << std::endl;
+                    // Debugging:
+                    // libMesh::out << "Setting elem " << elem->id()
+                    //              << ", local node " << libmesh_elem_local_node_id
+                    //              << " to global node " << node->id() << std::endl;
 
-		    // Increment the count of IDs read for this element
-		    id_count++;
-		  } // end if strtol success
-	      } // end while getline(',')
-	  } // end while (id_count)
+                    // Increment the count of IDs read for this element
+                    id_count++;
+                  } // end if strtol success
+              } // end while getline(',')
+          } // end while (id_count)
 
-	// Ensure that we read *exactly* as many nodes as we were expecting to, no more.
-	if (id_count != n_nodes_per_elem)
-	  {
-	    libMesh::err << "Error: Needed to read "
-			 << n_nodes_per_elem
-			 << " nodes, but read "
-			 << id_count
-			 << " instead!" << std::endl;
-	    libmesh_error();
-	  }
+        // Ensure that we read *exactly* as many nodes as we were expecting to, no more.
+        if (id_count != n_nodes_per_elem)
+          {
+            libMesh::err << "Error: Needed to read "
+                         << n_nodes_per_elem
+                         << " nodes, but read "
+                         << id_count
+                         << " instead!" << std::endl;
+            libmesh_error();
+          }
 
-	// If we are recording Elset IDs, add this element to the correct set for later processing.
-	// Make sure to add it with the Abaqus ID, not the libmesh one!
-	if (elset_name != "")
-	  {
-	    // Debugging:
-	    // libMesh::out << "Adding Elem " << abaqus_elem_id << " to Elmset " << elset_name << std::endl;
-	    _elemset_ids[elset_name].push_back(abaqus_elem_id);
-	  }
+        // If we are recording Elset IDs, add this element to the correct set for later processing.
+        // Make sure to add it with the Abaqus ID, not the libmesh one!
+        if (elset_name != "")
+          {
+            // Debugging:
+            // libMesh::out << "Adding Elem " << abaqus_elem_id << " to Elmset " << elset_name << std::endl;
+            _elemset_ids[elset_name].push_back(abaqus_elem_id);
+          }
       } // end while (peek)
   } // read_elements()
 
@@ -688,16 +688,16 @@ namespace libMesh
 
     if (label_index != std::string::npos)
       {
-	// Location of the first comma following "label="
-	size_t comma_index = upper_line.find(",", label_index);
+        // Location of the first comma following "label="
+        size_t comma_index = upper_line.find(",", label_index);
 
-	// Construct iterators from which to build the sub-string.
-	// Note the +1 is to skip past the "=" which follows the label name
-	std::string::iterator
-	  beg = line.begin() + label_name.size() + 1 + label_index,
-	  end = (comma_index == std::string::npos) ? line.end() : line.begin()+comma_index;
+        // Construct iterators from which to build the sub-string.
+        // Note the +1 is to skip past the "=" which follows the label name
+        std::string::iterator
+          beg = line.begin() + label_name.size() + 1 + label_index,
+          end = (comma_index == std::string::npos) ? line.end() : line.begin()+comma_index;
 
-	return std::string(beg, end);
+        return std::string(beg, end);
       }
 
     // The label index was not found, return the empty string
@@ -718,39 +718,39 @@ namespace libMesh
     // Read until the start of another section is detected, or EOF is encountered
     while (_in.peek() != '*' && _in.peek() != EOF)
       {
-	// Read entire comma-separated line into a string
-	std::string csv_line;
-	std::getline(_in, csv_line);
+        // Read entire comma-separated line into a string
+        std::string csv_line;
+        std::getline(_in, csv_line);
 
-	// On that line, use std::getline again to parse each
-	// comma-separated entry.
-	std::string cell;
-	std::stringstream line_stream(csv_line);
-	while (std::getline(line_stream, cell, ','))
-	  {
-	    // If no conversion can be performed by strtol, 0 is returned.
-	    //
-	    // If endptr is not NULL, strtol() stores the address of the
-	    // first invalid character in *endptr.  If there were no
-	    // digits at all, however, strtol() stores the original
-	    // value of str in *endptr.
-	    char* endptr;
+        // On that line, use std::getline again to parse each
+        // comma-separated entry.
+        std::string cell;
+        std::stringstream line_stream(csv_line);
+        while (std::getline(line_stream, cell, ','))
+          {
+            // If no conversion can be performed by strtol, 0 is returned.
+            //
+            // If endptr is not NULL, strtol() stores the address of the
+            // first invalid character in *endptr.  If there were no
+            // digits at all, however, strtol() stores the original
+            // value of str in *endptr.
+            char* endptr;
 
-	    // FIXME - this needs to be updated for 64-bit inputs
-	    long id = std::strtol(cell.c_str(), &endptr, /*base=*/10);
+            // FIXME - this needs to be updated for 64-bit inputs
+            long id = std::strtol(cell.c_str(), &endptr, /*base=*/10);
 
-	    // Note that lists of comma-separated values in abaqus also
-	    // *end* with a comma, so the last call to getline on a given
-	    // line will get an empty string, which we must detect.
-	    if (id!=0 || cell.c_str() != endptr)
-	      {
-		// Debugging
-		// libMesh::out << "Read id: " << id << std::endl;
+            // Note that lists of comma-separated values in abaqus also
+            // *end* with a comma, so the last call to getline on a given
+            // line will get an empty string, which we must detect.
+            if (id!=0 || cell.c_str() != endptr)
+              {
+                // Debugging
+                // libMesh::out << "Read id: " << id << std::endl;
 
-		// 'cell' is now a string with an integer id in it
-		id_storage.push_back( id );
-	      }
-	  }
+                // 'cell' is now a string with an integer id in it
+                id_storage.push_back( id );
+              }
+          }
       }
 
     // Status message
@@ -774,22 +774,22 @@ namespace libMesh
     // Read until the start of another section is detected, or EOF is encountered
     while (_in.peek() != '*' && _in.peek() != EOF)
       {
-	// The strings are of the form: "391, S2"
+        // The strings are of the form: "391, S2"
 
-	// Read the element ID and the leading comma
-	_in >> elem_id >> c;
+        // Read the element ID and the leading comma
+        _in >> elem_id >> c;
 
-	// Read another character (the 'S') and finally the side ID
-	_in >> c >> side_id;
+        // Read another character (the 'S') and finally the side ID
+        _in >> c >> side_id;
 
-	// Debugging: print status
-	// libMesh::out << "Read elem_id=" << elem_id << ", side_id=" << side_id << std::endl;
+        // Debugging: print status
+        // libMesh::out << "Read elem_id=" << elem_id << ", side_id=" << side_id << std::endl;
 
-	// Store this pair of data in the vector
-	id_storage.push_back( std::make_pair(elem_id, side_id) );
+        // Store this pair of data in the vector
+        id_storage.push_back( std::make_pair(elem_id, side_id) );
 
-	// Extract remaining characters on line including newline
-	std::getline(_in, dummy);
+        // Extract remaining characters on line including newline
+        std::getline(_in, dummy);
       } // while
   }
 
@@ -810,7 +810,7 @@ namespace libMesh
     {
       unsigned ctr=0;
       for (std::set<ElemType>::iterator it=_elem_types.begin(); it!=_elem_types.end(); ++it)
-	elem_types_map[*it] = ctr++;
+        elem_types_map[*it] = ctr++;
     }
 
     // Loop over each Elemset and assign subdomain IDs to Mesh elements
@@ -818,33 +818,33 @@ namespace libMesh
       // The elemset_id counter assigns a logical numbering to the _elemset_ids keys
       container_t::iterator it=_elemset_ids.begin();
       for (unsigned elemset_id=0; it != _elemset_ids.end(); ++it, ++elemset_id)
-	{
-	  // Grab a reference to the vector of IDs
-	  std::vector<dof_id_type>& id_vector = (*it).second;
+        {
+          // Grab a reference to the vector of IDs
+          std::vector<dof_id_type>& id_vector = (*it).second;
 
-	  // Loop over this vector
-	  for (std::size_t i=0; i<id_vector.size(); ++i)
-	    {
-	      // Map the id_vector[i]'th element ID (Abaqus numbering) to LibMesh numbering
-	      dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ id_vector[i] ];
+          // Loop over this vector
+          for (std::size_t i=0; i<id_vector.size(); ++i)
+            {
+              // Map the id_vector[i]'th element ID (Abaqus numbering) to LibMesh numbering
+              dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ id_vector[i] ];
 
-	      // Get pointer to that element
-	      Elem* elem = the_mesh.elem(libmesh_elem_id);
+              // Get pointer to that element
+              Elem* elem = the_mesh.elem(libmesh_elem_id);
 
-	      if (elem == NULL)
-		{
-		  libMesh::err << "Mesh returned NULL pointer for Elem " << libmesh_elem_id << std::endl;
-		  libmesh_error();
-		}
+              if (elem == NULL)
+                {
+                  libMesh::err << "Mesh returned NULL pointer for Elem " << libmesh_elem_id << std::endl;
+                  libmesh_error();
+                }
 
-	      // Compute the proper subdomain ID, based on the formula in the
-	      // documentation for this function.
-	      subdomain_id_type computed_id = elemset_id + (elem_types_map[elem->type()] * n_elemsets);
+              // Compute the proper subdomain ID, based on the formula in the
+              // documentation for this function.
+              subdomain_id_type computed_id = elemset_id + (elem_types_map[elem->type()] * n_elemsets);
 
-	      // Assign this ID to the element in question
-	      elem->subdomain_id() = computed_id;
-	    }
-	}
+              // Assign this ID to the element in question
+              elem->subdomain_id() = computed_id;
+            }
+        }
     }
   } // assign_subdomain_ids()
 
@@ -860,31 +860,31 @@ namespace libMesh
     container_t::iterator it=_nodeset_ids.begin();
     for (unsigned current_id=0; it != _nodeset_ids.end(); ++it, ++current_id)
       {
-	libMesh::out << "Assigning node boundary ID " << current_id << " to nodeset '"
-		     << (*it).first
-		     << "'." << std::endl;
+        libMesh::out << "Assigning node boundary ID " << current_id << " to nodeset '"
+                     << (*it).first
+                     << "'." << std::endl;
 
-	// Get a reference to the current vector of nodeset ID values
-	std::vector<dof_id_type>& nodeset_ids = (*it).second;
+        // Get a reference to the current vector of nodeset ID values
+        std::vector<dof_id_type>& nodeset_ids = (*it).second;
 
-	for (std::size_t i=0; i<nodeset_ids.size(); ++i)
-	  {
-	    // Map the Abaqus global node ID to the libmesh node ID
-	    dof_id_type libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[nodeset_ids[i]];
+        for (std::size_t i=0; i<nodeset_ids.size(); ++i)
+          {
+            // Map the Abaqus global node ID to the libmesh node ID
+            dof_id_type libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[nodeset_ids[i]];
 
-	    // Get node pointer from the mesh
-	    Node* node = the_mesh.node_ptr(libmesh_global_node_id);
+            // Get node pointer from the mesh
+            Node* node = the_mesh.node_ptr(libmesh_global_node_id);
 
-	    if (node == NULL)
-	      {
-		libMesh::err << "Error! Mesh returned NULL node pointer!" << std::endl;
-		libmesh_error();
-	      }
+            if (node == NULL)
+              {
+                libMesh::err << "Error! Mesh returned NULL node pointer!" << std::endl;
+                libmesh_error();
+              }
 
-	    // Add this node with the current_id (which is determined by the
-	    // alphabetical ordering of the map) to the BoundaryInfo object
-	    the_mesh.boundary_info->add_node(node, current_id);
-	  }
+            // Add this node with the current_id (which is determined by the
+            // alphabetical ordering of the map) to the BoundaryInfo object
+            the_mesh.boundary_info->add_node(node, current_id);
+          }
       }
 
   } // assign_boundary_node_ids()
@@ -904,52 +904,52 @@ namespace libMesh
     sideset_container_t::iterator it=_sideset_ids.begin();
     for (unsigned current_id=0; it != _sideset_ids.end(); ++it, ++current_id)
       {
-	libMesh::out << "Assigning sideset ID " << current_id << " to sideset '"
-		     << (*it).first
-		     << "'." << std::endl;
+        libMesh::out << "Assigning sideset ID " << current_id << " to sideset '"
+                     << (*it).first
+                     << "'." << std::endl;
 
-	// Get a reference to the current vector of nodeset ID values
-	std::vector<std::pair<dof_id_type,unsigned> >& sideset_ids = (*it).second;
+        // Get a reference to the current vector of nodeset ID values
+        std::vector<std::pair<dof_id_type,unsigned> >& sideset_ids = (*it).second;
 
-	for (std::size_t i=0; i<sideset_ids.size(); ++i)
-	  {
-	    // sideset_ids is a vector of pairs (elem id, side id).  Pull them out
-	    // now to make the code below more readable.
-	    dof_id_type  abaqus_elem_id = sideset_ids[i].first;
-	    unsigned abaqus_side_number = sideset_ids[i].second;
+        for (std::size_t i=0; i<sideset_ids.size(); ++i)
+          {
+            // sideset_ids is a vector of pairs (elem id, side id).  Pull them out
+            // now to make the code below more readable.
+            dof_id_type  abaqus_elem_id = sideset_ids[i].first;
+            unsigned abaqus_side_number = sideset_ids[i].second;
 
-	    // Map the Abaqus element ID to LibMesh numbering
-	    dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ abaqus_elem_id ];
+            // Map the Abaqus element ID to LibMesh numbering
+            dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ abaqus_elem_id ];
 
-	    // Get pointer to that element
-	    Elem* elem = the_mesh.elem(libmesh_elem_id);
+            // Get pointer to that element
+            Elem* elem = the_mesh.elem(libmesh_elem_id);
 
-	    // Check that the pointer returned from the Mesh is non-NULL
-	    if (elem == NULL)
-	      {
-		libMesh::err << "Mesh returned NULL pointer for Elem " << libmesh_elem_id << std::endl;
-		libmesh_error();
-	      }
+            // Check that the pointer returned from the Mesh is non-NULL
+            if (elem == NULL)
+              {
+                libMesh::err << "Mesh returned NULL pointer for Elem " << libmesh_elem_id << std::endl;
+                libmesh_error();
+              }
 
-	    // Grab a reference to the element definition for this element type
-	    const ElementDefinition& eledef = eletypes[elem->type()];
+            // Grab a reference to the element definition for this element type
+            const ElementDefinition& eledef = eletypes[elem->type()];
 
-	    // If the element definition was not found, the call above would have
-	    // created one with an uninitialized struct.  Check for that here...
-	    if (eledef.abaqus_zero_based_side_id_to_libmesh_side_id.size() == 0)
-	      {
-		libMesh::err << "No Abaqus->LibMesh mapping information for ElemType " << Utility::enum_to_string(elem->type()) << "!" << std::endl;
-		libmesh_error();
-	      }
+            // If the element definition was not found, the call above would have
+            // created one with an uninitialized struct.  Check for that here...
+            if (eledef.abaqus_zero_based_side_id_to_libmesh_side_id.size() == 0)
+              {
+                libMesh::err << "No Abaqus->LibMesh mapping information for ElemType " << Utility::enum_to_string(elem->type()) << "!" << std::endl;
+                libmesh_error();
+              }
 
-	    // Add this node with the current_id (which is determined by the
-	    // alphabetical ordering of the map).  Side numbers in Abaqus are 1-based,
-	    // so we subtract 1 here before passing the abaqus side number to the
-	    // mapping array
-	    the_mesh.boundary_info->add_side(elem,
+            // Add this node with the current_id (which is determined by the
+            // alphabetical ordering of the map).  Side numbers in Abaqus are 1-based,
+            // so we subtract 1 here before passing the abaqus side number to the
+            // mapping array
+            the_mesh.boundary_info->add_side(elem,
                                              eledef.abaqus_zero_based_side_id_to_libmesh_side_id[abaqus_side_number-1],
                                              current_id);
-	  }
+          }
       }
   } // assign_sideset_ids()
 
@@ -960,42 +960,42 @@ namespace libMesh
     std::string dummy;
     while (true)
       {
-	// We assume we are at the beginning of a line that may be
-	// comments or may be data.  We need to only discard the line if
-	// it begins with **, but we must avoid calling std::getline()
-	// since there's no way to put that back.
-	if (_in.peek() == '*')
-	  {
-	    // The first character was a star, so actually read it from the stream.
-	    _in.get();
+        // We assume we are at the beginning of a line that may be
+        // comments or may be data.  We need to only discard the line if
+        // it begins with **, but we must avoid calling std::getline()
+        // since there's no way to put that back.
+        if (_in.peek() == '*')
+          {
+            // The first character was a star, so actually read it from the stream.
+            _in.get();
 
-	    // Peek at the next character...
-	    if (_in.peek() == '*')
-	      {
-		// OK, second character was star also, by definition this
-		// line must be a comment!  Read the rest of the line and discard!
-		std::getline(_in, dummy);
+            // Peek at the next character...
+            if (_in.peek() == '*')
+              {
+                // OK, second character was star also, by definition this
+                // line must be a comment!  Read the rest of the line and discard!
+                std::getline(_in, dummy);
 
-		// Debugging:
-		// libMesh::out << "Read comment line: " << dummy << std::endl;
-	      }
-	    else
-	      {
-		// The second character was _not_ a star, so put back the first star
-		// we pulled out so that the line can be parsed correctly by somebody
-		// else!
-		_in.unget();
+                // Debugging:
+                // libMesh::out << "Read comment line: " << dummy << std::endl;
+              }
+            else
+              {
+                // The second character was _not_ a star, so put back the first star
+                // we pulled out so that the line can be parsed correctly by somebody
+                // else!
+                _in.unget();
 
-		// Finally, break out of the while loop, we are done parsing comments
-		break;
-	      }
-	  }
-	else
-	  {
-	    // First character was not *, so this line must be data! Break out of the
-	    // while loop!
-	    break;
-	  }
+                // Finally, break out of the while loop, we are done parsing comments
+                break;
+              }
+          }
+        else
+          {
+            // First character was not *, so this line must be data! Break out of the
+            // while loop!
+            break;
+          }
       }
 
   } // process_and_discard_comments()

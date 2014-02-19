@@ -36,7 +36,7 @@ using namespace libMesh;
 
 
 void assemble(EquationSystems& es,
-	      const std::string& system_name);
+              const std::string& system_name);
 
 
 
@@ -129,7 +129,7 @@ int main (int, char**)
 
 
 void assemble(EquationSystems& es,
-	      const std::string& libmesh_dbg_var(system_name))
+              const std::string& libmesh_dbg_var(system_name))
 {
   libmesh_assert_equal_to (system_name, "primary");
 
@@ -190,62 +190,62 @@ void assemble(EquationSystems& es,
 
       // zero the element matrix and vector
       Kuu.resize (phi.size(),
-		  phi.size());
+                  phi.size());
 
       Kvv.resize (phi.size(),
-		  phi.size());
+                  phi.size());
 
       Fu.resize (phi.size());
       Fv.resize (phi.size());
 
       // standard stuff...  like in code 1.
       for (unsigned int gp=0; gp<qrule.n_points(); gp++)
-	{
-	  for (unsigned int i=0; i<phi.size(); ++i)
-	    {
-	      // this is tricky.  ig is the _global_ dof index corresponding
-	      // to the _global_ vertex number elem->node(i).  Note that
-	      // in general these numbers will not be the same (except for
-	      // the case of one unknown per node on one subdomain) so
-	      // we need to go through the dof_map
+        {
+          for (unsigned int i=0; i<phi.size(); ++i)
+            {
+              // this is tricky.  ig is the _global_ dof index corresponding
+              // to the _global_ vertex number elem->node(i).  Note that
+              // in general these numbers will not be the same (except for
+              // the case of one unknown per node on one subdomain) so
+              // we need to go through the dof_map
 
-	      const Real f = q_point[gp]*q_point[gp];
-	      //		    const Real f = (q_point[gp](0) +
-	      //				    q_point[gp](1) +
-	      //				    q_point[gp](2));
+              const Real f = q_point[gp]*q_point[gp];
+              //    const Real f = (q_point[gp](0) +
+              //    q_point[gp](1) +
+              //    q_point[gp](2));
 
-	      // add jac*weight*f*phi to the RHS in position ig
+              // add jac*weight*f*phi to the RHS in position ig
 
-	      Fu(i) += JxW[gp]*f*phi[i][gp];
-	      Fv(i) += JxW[gp]*f*phi[i][gp];
+              Fu(i) += JxW[gp]*f*phi[i][gp];
+              Fv(i) += JxW[gp]*f*phi[i][gp];
 
-	      for (unsigned int j=0; j<phi.size(); ++j)
-		{
+              for (unsigned int j=0; j<phi.size(); ++j)
+                {
 
-		  Kuu(i,j) += JxW[gp]*((phi[i][gp])*(phi[j][gp]));
+                  Kuu(i,j) += JxW[gp]*((phi[i][gp])*(phi[j][gp]));
 
-		  Kvv(i,j) += JxW[gp]*((phi[i][gp])*(phi[j][gp]) +
-				       1.*((dphi[i][gp])*(dphi[j][gp])));
-		};
-	    };
-	  vol += JxW[gp];
-	};
+                  Kvv(i,j) += JxW[gp]*((phi[i][gp])*(phi[j][gp]) +
+                                       1.*((dphi[i][gp])*(dphi[j][gp])));
+                };
+            };
+          vol += JxW[gp];
+        };
 
 
       // You can't compute "area" (perimeter) if you are in 2D
       if (dim == 3)
-	{
-	  for (unsigned int side=0; side<elem->n_sides(); side++)
-	    if (elem->neighbor(side) == NULL)
-	      {
-		fe_face->reinit (elem, side);
+        {
+          for (unsigned int side=0; side<elem->n_sides(); side++)
+            if (elem->neighbor(side) == NULL)
+              {
+                fe_face->reinit (elem, side);
 
-		//fe_face->print_info();
+                //fe_face->print_info();
 
-		for (unsigned int gp=0; gp<JxW_face.size(); gp++)
-		  area += JxW_face[gp];
-	      }
-	}
+                for (unsigned int gp=0; gp<JxW_face.size(); gp++)
+                  area += JxW_face[gp];
+              }
+        }
 
       // Constrain the DOF indices.
       dof_map.constrain_element_matrix_and_vector(Kuu, Fu, dof_indices_U);

@@ -67,9 +67,9 @@ namespace libMesh
 // each element
 
 void AdjointRefinementEstimator::estimate_error (const System& _system,
-					         ErrorVector& error_per_cell,
-					         const NumericVector<Number>* solution_vector,
-					         bool /*estimate_parent_error*/)
+                                                 ErrorVector& error_per_cell,
+                                                 const NumericVector<Number>* solution_vector,
+                                                 bool /*estimate_parent_error*/)
 {
   // We have to break the rules here, because we can't refine a const System
   System& system = const_cast<System&>(_system);
@@ -136,7 +136,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
       // heterogeneous Dirichlet boundaries for it
       if (_qoi_set.has_index(j) &&
           system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
-	{
+        {
           std::ostringstream liftfunc_name;
           liftfunc_name << "adjoint_lift_function" << j;
           NumericVector<Number> &liftvec =
@@ -181,7 +181,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   projected_solution = NumericVector<Number>::build(mesh.comm()).release();
   projected_solution->init(system.solution->size(), true, SERIAL);
   system.solution->localize(*projected_solution,
-			    system.get_dof_map().get_send_list());
+                            system.get_dof_map().get_send_list());
 
   // Rebuild the rhs with the projected primal solution
   (dynamic_cast<ImplicitSystem&>(system)).assembly(true, false);
@@ -204,7 +204,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
     {
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(j))
-	{
+        {
           // If the adjoint solution has heterogeneous dirichlet
           // values, then to get a proper error estimate here we need
           // to subtract off a coarse grid lift function.  We won't
@@ -256,77 +256,77 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
       // Loop over the nodes in the element
       for(unsigned int n=0; n != elem->n_nodes(); ++n)
-	{
-	  // Get a pointer to the current node
-	  Node* node = elem->get_node(n);
+        {
+          // Get a pointer to the current node
+          Node* node = elem->get_node(n);
 
-	  // Get the id of this node
-	  dof_id_type node_id = node->id();
+          // Get the id of this node
+          dof_id_type node_id = node->id();
 
-	  // If we havent already processed this node, do so now
-	  if(processed_node_ids.find(node_id) == processed_node_ids.end())
-	    {
-	      // Declare a neighbor_set to be filled by the find_point_neighbors
-	      std::set<const Elem *> fine_grid_neighbor_set;
+          // If we havent already processed this node, do so now
+          if(processed_node_ids.find(node_id) == processed_node_ids.end())
+            {
+              // Declare a neighbor_set to be filled by the find_point_neighbors
+              std::set<const Elem *> fine_grid_neighbor_set;
 
-	      // Call find_point_neighbors to fill the neighbor_set
-	      elem->find_point_neighbors(*node, fine_grid_neighbor_set);
+              // Call find_point_neighbors to fill the neighbor_set
+              elem->find_point_neighbors(*node, fine_grid_neighbor_set);
 
-	      // A vector to hold the coarse grid parents neighbors
-	      std::vector<dof_id_type> coarse_grid_neighbors;
+              // A vector to hold the coarse grid parents neighbors
+              std::vector<dof_id_type> coarse_grid_neighbors;
 
-	      // Iterators over the fine grid neighbors set
-	      std::set<const Elem*>::iterator fine_neighbor_it = fine_grid_neighbor_set.begin();
-	      const std::set<const Elem*>::iterator fine_neighbor_end = fine_grid_neighbor_set.end();
+              // Iterators over the fine grid neighbors set
+              std::set<const Elem*>::iterator fine_neighbor_it = fine_grid_neighbor_set.begin();
+              const std::set<const Elem*>::iterator fine_neighbor_end = fine_grid_neighbor_set.end();
 
-	      // Loop over all the fine neighbors of this node
-	      for(; fine_neighbor_it != fine_neighbor_end ; ++fine_neighbor_it)
-		{
-		  // Pointer to the current fine neighbor element
-		  const Elem* fine_elem = *fine_neighbor_it;
+              // Loop over all the fine neighbors of this node
+              for(; fine_neighbor_it != fine_neighbor_end ; ++fine_neighbor_it)
+                {
+                  // Pointer to the current fine neighbor element
+                  const Elem* fine_elem = *fine_neighbor_it;
 
-		  // Find the element id for the corresponding coarse grid element
-		  const Elem* coarse_elem = fine_elem;
-		  for (unsigned int j = 0; j != number_h_refinements; ++j)
-		    {
-		      libmesh_assert (coarse_elem->parent());
+                  // Find the element id for the corresponding coarse grid element
+                  const Elem* coarse_elem = fine_elem;
+                  for (unsigned int j = 0; j != number_h_refinements; ++j)
+                    {
+                      libmesh_assert (coarse_elem->parent());
 
-		      coarse_elem = coarse_elem->parent();
-		    }
+                      coarse_elem = coarse_elem->parent();
+                    }
 
-		  // Loop over the existing coarse neighbors and check if this one is
-		  // already in there
+                  // Loop over the existing coarse neighbors and check if this one is
+                  // already in there
                   const dof_id_type coarse_id = coarse_elem->id();
-		  std::size_t j = 0;
-		  for (; j != coarse_grid_neighbors.size(); j++)
-		    {
-		      // If the set already contains this element break out of the loop
-		      if(coarse_grid_neighbors[j] == coarse_id)
-			{
-			  break;
-			}
-		    }
+                  std::size_t j = 0;
+                  for (; j != coarse_grid_neighbors.size(); j++)
+                    {
+                      // If the set already contains this element break out of the loop
+                      if(coarse_grid_neighbors[j] == coarse_id)
+                        {
+                          break;
+                        }
+                    }
 
-		  // If we didn't leave the loop even at the last element,
-		  // this is a new neighbour, put in the coarse_grid_neighbor_set
-		  if(j == coarse_grid_neighbors.size())
-		    {
-		      coarse_grid_neighbors.push_back(coarse_id);
-		    }
+                  // If we didn't leave the loop even at the last element,
+                  // this is a new neighbour, put in the coarse_grid_neighbor_set
+                  if(j == coarse_grid_neighbors.size())
+                    {
+                      coarse_grid_neighbors.push_back(coarse_id);
+                    }
 
-		} // End loop over fine neighbors
+                } // End loop over fine neighbors
 
-	      // Set the shared_neighbour index for this node to the
-	      // size of the coarse grid neighbor set
-	      shared_element_count[node_id] =
-	        libmesh_cast_int<unsigned int>(coarse_grid_neighbors.size());
+              // Set the shared_neighbour index for this node to the
+              // size of the coarse grid neighbor set
+              shared_element_count[node_id] =
+                libmesh_cast_int<unsigned int>(coarse_grid_neighbors.size());
 
-	      // Add this node to processed_node_ids vector
-	      processed_node_ids.insert(node_id);
+              // Add this node to processed_node_ids vector
+              processed_node_ids.insert(node_id);
 
-	    } // End if not processed node
+            } // End if not processed node
 
-	} // End loop over nodes
+        } // End loop over nodes
 
     }  // End loop over elems
 
@@ -353,56 +353,56 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
     {
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(i))
-	{
-	  // Get the weight for the current QoI
-	  Real error_weight = _qoi_set.weight(i);
+        {
+          // Get the weight for the current QoI
+          Real error_weight = _qoi_set.weight(i);
 
-	  (system.get_adjoint_solution(i)).localize(*localized_adjoint_solution, system.get_dof_map().get_send_list());
+          (system.get_adjoint_solution(i)).localize(*localized_adjoint_solution, system.get_dof_map().get_send_list());
 
-	  // Loop over elements
+          // Loop over elements
           MeshBase::const_element_iterator elem_it = mesh.active_local_elements_begin();
           const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
-	  for(; elem_it != elem_end; ++elem_it)
-	    {
-	      // Pointer to the element
-	      const Elem* elem = *elem_it;
+          for(; elem_it != elem_end; ++elem_it)
+            {
+              // Pointer to the element
+              const Elem* elem = *elem_it;
 
-	      // Go up number_h_refinements levels up to find the coarse parent
-	      const Elem* coarse = elem;
+              // Go up number_h_refinements levels up to find the coarse parent
+              const Elem* coarse = elem;
 
-	      for (unsigned int j = 0; j != number_h_refinements; ++j)
-	        {
-		  libmesh_assert (coarse->parent());
+              for (unsigned int j = 0; j != number_h_refinements; ++j)
+                {
+                  libmesh_assert (coarse->parent());
 
-		  coarse = coarse->parent();
-		}
+                  coarse = coarse->parent();
+                }
 
               const dof_id_type e_id = coarse->id();
 
-	      // Get the local to global degree of freedom maps for this element
-	      dof_map.dof_indices (elem, dof_indices);
+              // Get the local to global degree of freedom maps for this element
+              dof_map.dof_indices (elem, dof_indices);
 
-	      // We will have to manually do the dot products.
+              // We will have to manually do the dot products.
               Number local_contribution = 0.;
 
-	      for (unsigned int j=0; j != dof_indices.size(); j++)
-		{
-		  // The contribution to the error indicator for this element from the current QoI
-		  local_contribution += (*localized_projected_residual)(dof_indices[j]) * (*localized_adjoint_solution)(dof_indices[j]);
-		}
+              for (unsigned int j=0; j != dof_indices.size(); j++)
+                {
+                  // The contribution to the error indicator for this element from the current QoI
+                  local_contribution += (*localized_projected_residual)(dof_indices[j]) * (*localized_adjoint_solution)(dof_indices[j]);
+                }
 
-	      // Multiply by the error weight for this QoI
+              // Multiply by the error weight for this QoI
               local_contribution *= error_weight;
 
               // FIXME: we're throwing away information in the
               // --enable-complex case
-	      error_per_cell[e_id] += static_cast<ErrorVectorReal>
-	        (libmesh_real(local_contribution));
+              error_per_cell[e_id] += static_cast<ErrorVectorReal>
+                (libmesh_real(local_contribution));
 
-	    } // End loop over elements
+            } // End loop over elements
 
-	} // End if belong to QoI set
+        } // End if belong to QoI set
 
     } // End loop over QoIs
 
@@ -440,7 +440,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   delete projected_solution;
 
   for (System::vectors_iterator vec = system.vectors_begin(); vec !=
-	 system.vectors_end(); ++vec)
+         system.vectors_end(); ++vec)
     {
       // The (string) name of this vector
       const std::string& var_name = vec->first;

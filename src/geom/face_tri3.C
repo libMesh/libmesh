@@ -97,7 +97,7 @@ bool Tri3::is_face(const unsigned int) const
 }
 
 bool Tri3::is_node_on_side(const unsigned int n,
-			   const unsigned int s) const
+                           const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 2; ++i)
@@ -107,7 +107,7 @@ bool Tri3::is_node_on_side(const unsigned int n,
 }
 
 AutoPtr<Elem> Tri3::build_side (const unsigned int i,
-				bool proxy) const
+                                bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -123,33 +123,33 @@ AutoPtr<Elem> Tri3::build_side (const unsigned int i,
       edge->subdomain_id() = this->subdomain_id();
 
       switch (i)
-	{
-	case 0:
-	  {
-	    edge->set_node(0) = this->get_node(0);
-	    edge->set_node(1) = this->get_node(1);
+        {
+        case 0:
+          {
+            edge->set_node(0) = this->get_node(0);
+            edge->set_node(1) = this->get_node(1);
 
             return edge;
-	  }
-	case 1:
-	  {
-	    edge->set_node(0) = this->get_node(1);
-	    edge->set_node(1) = this->get_node(2);
+          }
+        case 1:
+          {
+            edge->set_node(0) = this->get_node(1);
+            edge->set_node(1) = this->get_node(2);
 
             return edge;
-	  }
-	case 2:
-	  {
-	    edge->set_node(0) = this->get_node(2);
-	    edge->set_node(1) = this->get_node(0);
+          }
+        case 2:
+          {
+            edge->set_node(0) = this->get_node(2);
+            edge->set_node(1) = this->get_node(0);
 
             return edge;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+          }
+        default:
+          {
+            libmesh_error();
+          }
+        }
     }
 
   // We will never get here...  Look at the code above.
@@ -159,8 +159,8 @@ AutoPtr<Elem> Tri3::build_side (const unsigned int i,
 
 
 void Tri3::connectivity(const unsigned int libmesh_dbg_var(sf),
-			const IOPackage iop,
-			std::vector<dof_id_type>& conn) const
+                        const IOPackage iop,
+                        std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_less (sf, this->n_sub_elem());
   libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
@@ -169,21 +169,21 @@ void Tri3::connectivity(const unsigned int libmesh_dbg_var(sf),
     {
     case TECPLOT:
       {
-	conn.resize(4);
-	conn[0] = this->node(0)+1;
-	conn[1] = this->node(1)+1;
-	conn[2] = this->node(2)+1;
-	conn[3] = this->node(2)+1;
-	return;
+        conn.resize(4);
+        conn[0] = this->node(0)+1;
+        conn[1] = this->node(1)+1;
+        conn[2] = this->node(2)+1;
+        conn[3] = this->node(2)+1;
+        return;
       }
 
     case VTK:
       {
-	conn.resize(3);
-	conn[0] = this->node(0);
-	conn[1] = this->node(1);
-	conn[2] = this->node(2);
-	return;
+        conn.resize(3);
+        conn[0] = this->node(0);
+        conn[1] = this->node(1);
+        conn[2] = this->node(2);
+        return;
       }
 
     default:
@@ -233,7 +233,7 @@ std::pair<Real, Real> Tri3::min_and_max_angle() const
   libmesh_assert_greater (theta2, 0.);
 
   return std::make_pair(std::min(theta0, std::min(theta1,theta2)),
-			std::max(theta0, std::max(theta1,theta2)));
+                        std::max(theta0, std::max(theta1,theta2)));
 }
 
 } // namespace libMesh

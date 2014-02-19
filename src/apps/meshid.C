@@ -144,63 +144,63 @@ int main(int argc, char** argv)
 
     if ( (flags & mask) != EXODUS_DIM)
       {
-	// Now get the variable values themselves
-	std::vector<long> var_vals(dim_len);
+        // Now get the variable values themselves
+        std::vector<long> var_vals(dim_len);
 
-	status = nc_inq_varid (nc_id, var_name.c_str(), &var_id);
-	if (status != NC_NOERR) handle_error(status, "Error while inquiring about a variable's ID.");
+        status = nc_inq_varid (nc_id, var_name.c_str(), &var_id);
+        if (status != NC_NOERR) handle_error(status, "Error while inquiring about a variable's ID.");
 
-	status = nc_get_var_long (nc_id, var_id, &var_vals[0]);
-	if (status != NC_NOERR) handle_error(status, "Error while retrieving a variable's values.");
+        status = nc_get_var_long (nc_id, var_id, &var_vals[0]);
+        if (status != NC_NOERR) handle_error(status, "Error while retrieving a variable's values.");
 
-	// Update the variable value specified on the command line
-	for (unsigned int i=0; i<dim_len; ++i)
-	  if (var_vals[i] == oldid)
-	    var_vals[i] = newid;
+        // Update the variable value specified on the command line
+        for (unsigned int i=0; i<dim_len; ++i)
+          if (var_vals[i] == oldid)
+            var_vals[i] = newid;
 
-	// Save that value back to the NetCDF database
-	status = nc_put_var_long (nc_id, var_id, &var_vals[0]);
-	if (status != NC_NOERR) handle_error(status, "Error while writing a variable's values.");
+        // Save that value back to the NetCDF database
+        status = nc_put_var_long (nc_id, var_id, &var_vals[0]);
+        if (status != NC_NOERR) handle_error(status, "Error while writing a variable's values.");
       }
 
     // Redefine the dimension
     else
       {
-	// The value stored in dim_len is actually the dimension?
-	if (dim_len == (size_t)oldid)
-	  {
-	    // Trying to change def's always raises
-	    // Error -38: /* Operation not allowed in data mode */
-	    // unless you are in "define" mode.  So let's go there now.
+        // The value stored in dim_len is actually the dimension?
+        if (dim_len == (size_t)oldid)
+          {
+            // Trying to change def's always raises
+            // Error -38: /* Operation not allowed in data mode */
+            // unless you are in "define" mode.  So let's go there now.
 
-	    // Try to put the file into define mode
-	    status = nc_redef(nc_id);
-	    if (status != NC_NOERR) handle_error(status, "Error while putting file into define mode.");
+            // Try to put the file into define mode
+            status = nc_redef(nc_id);
+            if (status != NC_NOERR) handle_error(status, "Error while putting file into define mode.");
 
-	    // Rename the "num_dim" dimension.  Note: this will fail if there is already a dimension
-	    // which has the name you are trying to use.  This can happen, for example if you have already
-	    // changed the dimension of this exodus file once using this very script.  There appears
-	    // to be no way to delete a dimension using basic NetCDF interfaces, so to workaround this
-	    // we just rename it to an arbitrary unique string that Exodus will ignore.
+            // Rename the "num_dim" dimension.  Note: this will fail if there is already a dimension
+            // which has the name you are trying to use.  This can happen, for example if you have already
+            // changed the dimension of this exodus file once using this very script.  There appears
+            // to be no way to delete a dimension using basic NetCDF interfaces, so to workaround this
+            // we just rename it to an arbitrary unique string that Exodus will ignore.
 
-	    // Construct a string with 6 random alpha-numeric characters at the end.
-	    std::string random_dim_name;
-	    gen_random_string(random_dim_name, 6);
-	    random_dim_name = std::string("ignored_num_dim_") + random_dim_name;
+            // Construct a string with 6 random alpha-numeric characters at the end.
+            std::string random_dim_name;
+            gen_random_string(random_dim_name, 6);
+            random_dim_name = std::string("ignored_num_dim_") + random_dim_name;
 
-	    // Rename the old dimension variable to our randomly-chosen name
-	    status = nc_rename_dim(nc_id, dim_id, random_dim_name.c_str());
-	    if (status != NC_NOERR) handle_error(status, "Error while trying to rename num_dim.");
+            // Rename the old dimension variable to our randomly-chosen name
+            status = nc_rename_dim(nc_id, dim_id, random_dim_name.c_str());
+            if (status != NC_NOERR) handle_error(status, "Error while trying to rename num_dim.");
 
-	    // Now define a new "num_dim" value of newid
-	    int dummy=0;
-	    status = nc_def_dim (nc_id, dim_name.c_str(), newid, &dummy);
-	    if (status != NC_NOERR) handle_error(status, "Error while trying to define num_dim.");
+            // Now define a new "num_dim" value of newid
+            int dummy=0;
+            status = nc_def_dim (nc_id, dim_name.c_str(), newid, &dummy);
+            if (status != NC_NOERR) handle_error(status, "Error while trying to define num_dim.");
 
-	    // Leave define mode
-	    status = nc_enddef(nc_id);
-	    if (status != NC_NOERR) handle_error(status, "Error while leaving define mode.");
-	  }
+            // Leave define mode
+            status = nc_enddef(nc_id);
+            if (status != NC_NOERR) handle_error(status, "Error while leaving define mode.");
+          }
       }
   } // end for
 

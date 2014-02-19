@@ -165,11 +165,11 @@ const int ExodusII_IO_Helper::ElementMaps::quad_inverse_edge_map[4] = {1, 2, 3, 
 // 3D node map definitions
 const int ExodusII_IO_Helper::ElementMaps::hex8_node_map[8]   = {0, 1, 2, 3, 4, 5, 6, 7};
 const int ExodusII_IO_Helper::ElementMaps::hex20_node_map[20] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,
-							10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+                                                                  10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
 
 // Perhaps an older Hex27 node numbering?  This no longer works.
 //const int ExodusII_IO_Helper::ElementMaps::hex27_node_map[27] = { 1,  5,  6,  2,  0,  4,  7,  3, 13, 17, 14,  9,  8, 16,
-//							  18, 10, 12, 19, 15, 11, 24, 25, 22, 26, 21, 23, 20};
+//  18, 10, 12, 19, 15, 11, 24, 25, 22, 26, 21, 23, 20};
 
 //DRG: Using the newest exodus documentation available on sourceforge and using Table 2 to see
 // where all of the nodes over 21 are supposed to go... we come up with:
@@ -196,9 +196,9 @@ const int ExodusII_IO_Helper::ElementMaps::tet10_node_map[10] = {0, 1, 2, 3, 4, 
 
 const int ExodusII_IO_Helper::ElementMaps::prism6_node_map[6]   = {0, 1, 2, 3, 4, 5};
 const int ExodusII_IO_Helper::ElementMaps::prism15_node_map[15]   = {0, 1, 2, 3, 4, 5, 6,  7,  8,  9,
-								     10, 11, 12, 13, 14};
+                                                                     10, 11, 12, 13, 14};
 const int ExodusII_IO_Helper::ElementMaps::prism18_node_map[18]   = {0, 1, 2, 3, 4, 5, 6,  7,  8,  9,
-								     10, 11, 12, 13, 14, 15, 16, 17};
+                                                                     10, 11, 12, 13, 14, 15, 16, 17};
 const int ExodusII_IO_Helper::ElementMaps::pyramid5_node_map[5] = {0, 1, 2, 3, 4};
 const int ExodusII_IO_Helper::ElementMaps::pyramid14_node_map[14] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
@@ -302,10 +302,10 @@ void ExodusII_IO_Helper::open(const char* filename, bool read_only)
   int io_ws = 0;
 
   ex_id = exII::ex_open(filename,
-			read_only ? EX_READ : EX_WRITE,
-			&comp_ws,
-			&io_ws,
-			&ex_version);
+                        read_only ? EX_READ : EX_WRITE,
+                        &comp_ws,
+                        &io_ws,
+                        &ex_version);
 
   std::string err_msg = std::string("Error opening ExodusII mesh file: ") + std::string(filename);
   EX_CHECK_ERR(ex_id, err_msg);
@@ -325,12 +325,12 @@ void ExodusII_IO_Helper::read_header()
 {
   ex_err = exII::ex_get_init(ex_id,
                              &title[0],
-			     &num_dim,
-			     &num_nodes,
-			     &num_elem,
-			     &num_elem_blk,
-			     &num_node_sets,
-			     &num_side_sets);
+                             &num_dim,
+                             &num_nodes,
+                             &num_elem,
+                             &num_elem_blk,
+                             &num_node_sets,
+                             &num_side_sets);
 
   EX_CHECK_ERR(ex_err, "Error retrieving header info.");
 
@@ -355,12 +355,12 @@ void ExodusII_IO_Helper::print_header()
 {
   if (verbose)
     libMesh::out << "Title: \t" << &title[0] << std::endl
-	          << "Mesh Dimension: \t"   << num_dim << std::endl
-	          << "Number of Nodes: \t" << num_nodes << std::endl
-	          << "Number of elements: \t" << num_elem << std::endl
-	          << "Number of elt blocks: \t" << num_elem_blk << std::endl
-	          << "Number of node sets: \t" << num_node_sets << std::endl
-	          << "Number of side sets: \t" << num_side_sets << std::endl;
+                 << "Mesh Dimension: \t"   << num_dim << std::endl
+                 << "Number of Nodes: \t" << num_nodes << std::endl
+                 << "Number of elements: \t" << num_elem << std::endl
+                 << "Number of elt blocks: \t" << num_elem_blk << std::endl
+                 << "Number of node sets: \t" << num_node_sets << std::endl
+                 << "Number of side sets: \t" << num_side_sets << std::endl;
 }
 
 
@@ -372,9 +372,9 @@ void ExodusII_IO_Helper::read_nodes()
   z.resize(num_nodes);
 
   ex_err = exII::ex_get_coord(ex_id,
-			      static_cast<void*>(&x[0]),
-			      static_cast<void*>(&y[0]),
-			      static_cast<void*>(&z[0]));
+                              static_cast<void*>(&x[0]),
+                              static_cast<void*>(&y[0]),
+                              static_cast<void*>(&z[0]));
 
   EX_CHECK_ERR(ex_err, "Error retrieving nodal data.");
   message("Nodal data retrieved successfully.");
@@ -387,7 +387,7 @@ void ExodusII_IO_Helper::read_node_num_map ()
   node_num_map.resize(num_nodes);
 
   ex_err = exII::ex_get_node_num_map (ex_id,
-				      node_num_map.empty() ? NULL : &node_num_map[0]);
+                                      node_num_map.empty() ? NULL : &node_num_map[0]);
 
   EX_CHECK_ERR(ex_err, "Error retrieving nodal number map.");
   message("Nodal numbering map retrieved successfully.");
@@ -415,7 +415,7 @@ void ExodusII_IO_Helper::read_block_info()
   block_ids.resize(num_elem_blk);
   // Get all element block IDs.
   ex_err = exII::ex_get_elem_blk_ids(ex_id,
-				     block_ids.empty() ? NULL : &block_ids[0]);
+                                     block_ids.empty() ? NULL : &block_ids[0]);
   // Usually, there is only one
   // block since there is only
   // one type of element.
@@ -497,16 +497,16 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   libmesh_assert_less (static_cast<unsigned int>(block), block_ids.size());
 
   ex_err = exII::ex_get_elem_block(ex_id,
-				   block_ids[block],
-				   &elem_type[0],
-				   &num_elem_this_blk,
-				   &num_nodes_per_elem,
-				   &num_attr);
+                                   block_ids[block],
+                                   &elem_type[0],
+                                   &num_elem_this_blk,
+                                   &num_nodes_per_elem,
+                                   &num_attr);
   if (verbose)
     libMesh::out << "Reading a block of " << num_elem_this_blk
-	      << " " << &elem_type[0] << "(s)"
-	      << " having " << num_nodes_per_elem
-	      << " nodes per element." << std::endl;
+                 << " " << &elem_type[0] << "(s)"
+                 << " having " << num_nodes_per_elem
+                 << " nodes per element." << std::endl;
 
   EX_CHECK_ERR(ex_err, "Error getting block info.");
   message("Info retrieved successfully for block: ", block);
@@ -521,8 +521,8 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   if (!connect.empty())
     {
       ex_err = exII::ex_get_elem_conn(ex_id,
-				      block_ids[block],
-				      &connect[0]);
+                                      block_ids[block],
+                                      &connect[0]);
 
       EX_CHECK_ERR(ex_err, "Error reading block connectivity.");
       message("Connectivity retrieved successfully for block: ", block);
@@ -537,7 +537,7 @@ void ExodusII_IO_Helper::read_elem_num_map ()
   elem_num_map.resize(num_elem);
 
   ex_err = exII::ex_get_elem_num_map (ex_id,
-				      elem_num_map.empty() ? NULL : &elem_num_map[0]);
+                                      elem_num_map.empty() ? NULL : &elem_num_map[0]);
 
   EX_CHECK_ERR(ex_err, "Error retrieving element number map.");
   message("Element numbering map retrieved successfully.");
@@ -560,7 +560,7 @@ void ExodusII_IO_Helper::read_sideset_info()
   if (num_side_sets > 0)
     {
       ex_err = exII::ex_get_side_set_ids(ex_id,
-					 &ss_ids[0]);
+                                         &ss_ids[0]);
       EX_CHECK_ERR(ex_err, "Error retrieving sideset information.");
       message("All sideset information retrieved successfully.");
 
@@ -593,7 +593,7 @@ void ExodusII_IO_Helper::read_nodeset_info()
   if (num_node_sets > 0)
     {
       ex_err = exII::ex_get_node_set_ids(ex_id,
-					 &nodeset_ids[0]);
+                                         &nodeset_ids[0]);
       EX_CHECK_ERR(ex_err, "Error retrieving nodeset information.");
       message("All nodeset information retrieved successfully.");
 
@@ -624,9 +624,9 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
   libmesh_assert_less_equal (static_cast<unsigned int>(offset), side_list.size());
 
   ex_err = exII::ex_get_side_set_param(ex_id,
-				       ss_ids[id],
-				       &num_sides_per_set[id],
-				       &num_df_per_set[id]);
+                                       ss_ids[id],
+                                       &num_sides_per_set[id],
+                                       &num_df_per_set[id]);
   EX_CHECK_ERR(ex_err, "Error retrieving sideset parameters.");
   message("Parameters retrieved successfully for sideset: ", id);
 
@@ -645,14 +645,14 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
   if (num_sides_per_set[id] > 0)
     {
       ex_err = exII::ex_get_side_set(ex_id,
-				     ss_ids[id],
-				     &elem_list[offset],
-				     &side_list[offset]);
+                                     ss_ids[id],
+                                     &elem_list[offset],
+                                     &side_list[offset]);
       EX_CHECK_ERR(ex_err, "Error retrieving sideset data.");
       message("Data retrieved successfully for sideset: ", id);
 
       for (int i=0; i<num_sides_per_set[id]; i++)
-	id_list[i+offset] = ss_ids[id];
+        id_list[i+offset] = ss_ids[id];
     }
 }
 
@@ -665,9 +665,9 @@ void ExodusII_IO_Helper::read_nodeset(int id)
   libmesh_assert_less (static_cast<unsigned int>(id), num_node_df_per_set.size());
 
   ex_err = exII::ex_get_node_set_param(ex_id,
-				       nodeset_ids[id],
-				       &num_nodes_per_set[id],
-				       &num_node_df_per_set[id]);
+                                       nodeset_ids[id],
+                                       &num_nodes_per_set[id],
+                                       &num_node_df_per_set[id]);
   EX_CHECK_ERR(ex_err, "Error retrieving nodeset parameters.");
   message("Parameters retrieved successfully for nodeset: ", id);
 
@@ -678,8 +678,8 @@ void ExodusII_IO_Helper::read_nodeset(int id)
   if (num_nodes_per_set[id] > 0)
     {
       ex_err = exII::ex_get_node_set(ex_id,
-				     nodeset_ids[id],
-				     &node_list[0]);
+                                     nodeset_ids[id],
+                                     &node_list[0]);
 
       EX_CHECK_ERR(ex_err, "Error retrieving nodeset data.");
       message("Data retrieved successfully for nodeset: ", id);
@@ -710,10 +710,10 @@ int ExodusII_IO_Helper::inquire(int req_info_in, std::string error_msg)
   float ret_float = 0.;
 
   ex_err = exII::ex_inquire(ex_id,
-			    req_info_in,
-			    &ret_int,
-			    &ret_float,
-			    &ret_char);
+                            req_info_in,
+                            &ret_int,
+                            &ret_float,
+                            &ret_char);
 
   EX_CHECK_ERR(ex_err, error_msg);
 
@@ -1013,7 +1013,7 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
   MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
   for (; it!=end; ++it)
-	num_nodes += (*it)->n_nodes();
+    num_nodes += (*it)->n_nodes();
 
   num_elem = mesh.n_elem();
 
@@ -1041,20 +1041,20 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
   if (str_title.size() > MAX_LINE_LENGTH)
     {
       libMesh::err << "Warning, Exodus files cannot have titles longer than "
-		   << MAX_LINE_LENGTH
-		   << " characters.  Your title will be truncated."
-		   << std::endl;
+                   << MAX_LINE_LENGTH
+                   << " characters.  Your title will be truncated."
+                   << std::endl;
       str_title.resize(MAX_LINE_LENGTH);
     }
 
   ex_err = exII::ex_put_init(ex_id,
-			     str_title.c_str(),
-			     num_dim,
-			     num_nodes,
-			     num_elem,
-			     num_elem_blk,
-			     num_node_sets,
-			     num_side_sets);
+                             str_title.c_str(),
+                             num_dim,
+                             num_nodes,
+                             num_elem,
+                             num_elem_blk,
+                             num_node_sets,
+                             num_side_sets);
 
   EX_CHECK_ERR(ex_err, "Error initializing new Exodus file.");
 }
@@ -1103,20 +1103,20 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   if (str_title.size() > MAX_LINE_LENGTH)
     {
       libMesh::err << "Warning, Exodus files cannot have titles longer than "
-		   << MAX_LINE_LENGTH
-		   << " characters.  Your title will be truncated."
-		   << std::endl;
+                   << MAX_LINE_LENGTH
+                   << " characters.  Your title will be truncated."
+                   << std::endl;
       str_title.resize(MAX_LINE_LENGTH);
     }
 
   ex_err = exII::ex_put_init(ex_id,
-			     str_title.c_str(),
-			     num_dim,
-			     num_nodes,
-			     n_active_elem,
-			     num_elem_blk,
-			     num_node_sets,
-			     num_side_sets);
+                             str_title.c_str(),
+                             num_dim,
+                             num_nodes,
+                             n_active_elem,
+                             num_elem_blk,
+                             num_node_sets,
+                             num_side_sets);
 
   EX_CHECK_ERR(ex_err, "Error initializing new Exodus file.");
 }
@@ -1177,16 +1177,16 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
     }
 
     ex_err = exII::ex_put_coord(ex_id,
-			      x_single.empty() ? NULL : &x_single[0],
-			      y_single.empty() ? NULL : &y_single[0],
-			      z_single.empty() ? NULL : &z_single[0]);
+                                x_single.empty() ? NULL : &x_single[0],
+                                y_single.empty() ? NULL : &y_single[0],
+                                z_single.empty() ? NULL : &z_single[0]);
   }
   else
   {
     ex_err = exII::ex_put_coord(ex_id,
-			      x.empty() ? NULL : &x[0],
-			      y.empty() ? NULL : &y[0],
-			      z.empty() ? NULL : &z[0]);
+                                x.empty() ? NULL : &x[0],
+                                y.empty() ? NULL : &y[0],
+                                z.empty() ? NULL : &z[0]);
   }
 
 
@@ -1240,16 +1240,16 @@ void ExodusII_IO_Helper::write_nodal_coordinates_discontinuous(const MeshBase & 
     }
 
     ex_err = exII::ex_put_coord(ex_id,
-			      x_single.empty() ? NULL : &x_single[0],
-			      y_single.empty() ? NULL : &y_single[0],
-			      z_single.empty() ? NULL : &z_single[0]);
+                                x_single.empty() ? NULL : &x_single[0],
+                                y_single.empty() ? NULL : &y_single[0],
+                                z_single.empty() ? NULL : &z_single[0]);
   }
   else
   {
     ex_err = exII::ex_put_coord(ex_id,
-			      x.empty() ? NULL : &x[0],
-			      y.empty() ? NULL : &y[0],
-			      z.empty() ? NULL : &z[0]);
+                                x.empty() ? NULL : &x[0],
+                                y.empty() ? NULL : &y[0],
+                                z.empty() ? NULL : &z[0]);
   }
 
   EX_CHECK_ERR(ex_err, "Error writing coordinates to Exodus file.");
@@ -1979,253 +1979,253 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     {
     case EDGE2:
       {
-	const Conversion conv(edge2_node_map,
-			      ARRAY_LENGTH(edge2_node_map),
-			      edge2_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(edge2_node_map),
-			      edge_edge_map,
-			      ARRAY_LENGTH(edge_edge_map),
-			      edge_inverse_edge_map,
-			      ARRAY_LENGTH(edge_inverse_edge_map),
-			      EDGE2, "EDGE2");
-	return conv;
+        const Conversion conv(edge2_node_map,
+                              ARRAY_LENGTH(edge2_node_map),
+                              edge2_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(edge2_node_map),
+                              edge_edge_map,
+                              ARRAY_LENGTH(edge_edge_map),
+                              edge_inverse_edge_map,
+                              ARRAY_LENGTH(edge_inverse_edge_map),
+                              EDGE2, "EDGE2");
+        return conv;
       }
     case EDGE3:
       {
-	const Conversion conv(edge3_node_map,
-			      ARRAY_LENGTH(edge3_node_map),
-			      edge3_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(edge3_node_map),
-			      edge_edge_map,
-			      ARRAY_LENGTH(edge_edge_map),
-			      edge_inverse_edge_map,
-			      ARRAY_LENGTH(edge_inverse_edge_map),
-			      EDGE3, "EDGE3");
-	return conv;
+        const Conversion conv(edge3_node_map,
+                              ARRAY_LENGTH(edge3_node_map),
+                              edge3_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(edge3_node_map),
+                              edge_edge_map,
+                              ARRAY_LENGTH(edge_edge_map),
+                              edge_inverse_edge_map,
+                              ARRAY_LENGTH(edge_inverse_edge_map),
+                              EDGE3, "EDGE3");
+        return conv;
       }
     case QUAD4:
       {
-	const Conversion conv(quad4_node_map,
-			      ARRAY_LENGTH(quad4_node_map),
-			      quad4_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(quad4_node_map),
-			      quad_edge_map,
-			      ARRAY_LENGTH(quad_edge_map),
-			      quad_inverse_edge_map,
-			      ARRAY_LENGTH(quad_inverse_edge_map),
-			      QUAD4,
-			      "QUAD4");
-	return conv;
+        const Conversion conv(quad4_node_map,
+                              ARRAY_LENGTH(quad4_node_map),
+                              quad4_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(quad4_node_map),
+                              quad_edge_map,
+                              ARRAY_LENGTH(quad_edge_map),
+                              quad_inverse_edge_map,
+                              ARRAY_LENGTH(quad_inverse_edge_map),
+                              QUAD4,
+                              "QUAD4");
+        return conv;
       }
 
     case QUAD8:
       {
-	const Conversion conv(quad8_node_map,
-			      ARRAY_LENGTH(quad8_node_map),
-			      quad8_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(quad8_node_map),
-			      quad_edge_map,
-			      ARRAY_LENGTH(quad_edge_map),
-			      quad_inverse_edge_map,
-			      ARRAY_LENGTH(quad_inverse_edge_map),
-			      QUAD8,
-			      "QUAD8");
-	return conv;
+        const Conversion conv(quad8_node_map,
+                              ARRAY_LENGTH(quad8_node_map),
+                              quad8_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(quad8_node_map),
+                              quad_edge_map,
+                              ARRAY_LENGTH(quad_edge_map),
+                              quad_inverse_edge_map,
+                              ARRAY_LENGTH(quad_inverse_edge_map),
+                              QUAD8,
+                              "QUAD8");
+        return conv;
       }
 
     case QUAD9:
       {
-	const Conversion conv(quad9_node_map,
-			      ARRAY_LENGTH(quad9_node_map),
-			      quad9_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(quad9_node_map),
-			      quad_edge_map,
-			      ARRAY_LENGTH(quad_edge_map),
-			      quad_inverse_edge_map,
-			      ARRAY_LENGTH(quad_inverse_edge_map),
-			      QUAD9,
-			      "QUAD9");
-	return conv;
+        const Conversion conv(quad9_node_map,
+                              ARRAY_LENGTH(quad9_node_map),
+                              quad9_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(quad9_node_map),
+                              quad_edge_map,
+                              ARRAY_LENGTH(quad_edge_map),
+                              quad_inverse_edge_map,
+                              ARRAY_LENGTH(quad_inverse_edge_map),
+                              QUAD9,
+                              "QUAD9");
+        return conv;
       }
 
     case TRI3:
       {
-	const Conversion conv(tri3_node_map,
-			      ARRAY_LENGTH(tri3_node_map),
-			      tri3_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(tri3_node_map),
-			      tri_edge_map,
-			      ARRAY_LENGTH(tri_edge_map),
-			      tri_inverse_edge_map,
-			      ARRAY_LENGTH(tri_inverse_edge_map),
-			      TRI3,
-			      "TRI3");
-	return conv;
+        const Conversion conv(tri3_node_map,
+                              ARRAY_LENGTH(tri3_node_map),
+                              tri3_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(tri3_node_map),
+                              tri_edge_map,
+                              ARRAY_LENGTH(tri_edge_map),
+                              tri_inverse_edge_map,
+                              ARRAY_LENGTH(tri_inverse_edge_map),
+                              TRI3,
+                              "TRI3");
+        return conv;
       }
 
     case TRI6:
       {
-	const Conversion conv(tri6_node_map,
-			      ARRAY_LENGTH(tri6_node_map),
-			      tri6_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(tri6_node_map),
-			      tri_edge_map,
-			      ARRAY_LENGTH(tri_edge_map),
-			      tri_inverse_edge_map,
-			      ARRAY_LENGTH(tri_inverse_edge_map),
-			      TRI6,
-			      "TRI6");
-	return conv;
+        const Conversion conv(tri6_node_map,
+                              ARRAY_LENGTH(tri6_node_map),
+                              tri6_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(tri6_node_map),
+                              tri_edge_map,
+                              ARRAY_LENGTH(tri_edge_map),
+                              tri_inverse_edge_map,
+                              ARRAY_LENGTH(tri_inverse_edge_map),
+                              TRI6,
+                              "TRI6");
+        return conv;
       }
 
     case HEX8:
       {
-	const Conversion conv(hex8_node_map,
-			      ARRAY_LENGTH(hex8_node_map),
-			      hex8_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(hex8_node_map),
-			      hex_face_map,
-			      ARRAY_LENGTH(hex_face_map),
-			      hex_inverse_face_map,
-			      ARRAY_LENGTH(hex_inverse_face_map),
-			      HEX8,
-			      "HEX8");
-	return conv;
+        const Conversion conv(hex8_node_map,
+                              ARRAY_LENGTH(hex8_node_map),
+                              hex8_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(hex8_node_map),
+                              hex_face_map,
+                              ARRAY_LENGTH(hex_face_map),
+                              hex_inverse_face_map,
+                              ARRAY_LENGTH(hex_inverse_face_map),
+                              HEX8,
+                              "HEX8");
+        return conv;
       }
 
     case HEX20:
       {
-	const Conversion conv(hex20_node_map,
-			      ARRAY_LENGTH(hex20_node_map),
-			      hex20_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(hex20_node_map),
-			      hex_face_map,
-			      ARRAY_LENGTH(hex_face_map),
-			      hex_inverse_face_map,
-			      ARRAY_LENGTH(hex_inverse_face_map),
-			      HEX20,
-			      "HEX20");
-	return conv;
+        const Conversion conv(hex20_node_map,
+                              ARRAY_LENGTH(hex20_node_map),
+                              hex20_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(hex20_node_map),
+                              hex_face_map,
+                              ARRAY_LENGTH(hex_face_map),
+                              hex_inverse_face_map,
+                              ARRAY_LENGTH(hex_inverse_face_map),
+                              HEX20,
+                              "HEX20");
+        return conv;
       }
 
     case HEX27:
       {
-	const Conversion conv(hex27_node_map,
-			      ARRAY_LENGTH(hex27_node_map),
-			      hex27_inverse_node_map, // different inverse node map for Hex27!
-			      ARRAY_LENGTH(hex27_inverse_node_map),
-			      hex27_face_map,
-			      ARRAY_LENGTH(hex27_face_map),
-			      hex27_inverse_face_map,
-			      ARRAY_LENGTH(hex27_inverse_face_map),
-			      HEX27,
-			      "HEX27");
-	return conv;
+        const Conversion conv(hex27_node_map,
+                              ARRAY_LENGTH(hex27_node_map),
+                              hex27_inverse_node_map, // different inverse node map for Hex27!
+                              ARRAY_LENGTH(hex27_inverse_node_map),
+                              hex27_face_map,
+                              ARRAY_LENGTH(hex27_face_map),
+                              hex27_inverse_face_map,
+                              ARRAY_LENGTH(hex27_inverse_face_map),
+                              HEX27,
+                              "HEX27");
+        return conv;
       }
 
     case TET4:
       {
-	const Conversion conv(tet4_node_map,
-			      ARRAY_LENGTH(tet4_node_map),
-			      tet4_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(tet4_node_map),
-			      tet_face_map,
-			      ARRAY_LENGTH(tet_face_map),
-			      tet_inverse_face_map,
-			      ARRAY_LENGTH(tet_inverse_face_map),
-			      TET4,
-			      "TETRA4");
-	return conv;
+        const Conversion conv(tet4_node_map,
+                              ARRAY_LENGTH(tet4_node_map),
+                              tet4_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(tet4_node_map),
+                              tet_face_map,
+                              ARRAY_LENGTH(tet_face_map),
+                              tet_inverse_face_map,
+                              ARRAY_LENGTH(tet_inverse_face_map),
+                              TET4,
+                              "TETRA4");
+        return conv;
       }
 
     case TET10:
       {
-	const Conversion conv(tet10_node_map,
-			      ARRAY_LENGTH(tet10_node_map),
-			      tet10_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(tet10_node_map),
-			      tet_face_map,
-			      ARRAY_LENGTH(tet_face_map),
-			      tet_inverse_face_map,
-			      ARRAY_LENGTH(tet_inverse_face_map),
-			      TET10,
-			      "TETRA10");
-	return conv;
+        const Conversion conv(tet10_node_map,
+                              ARRAY_LENGTH(tet10_node_map),
+                              tet10_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(tet10_node_map),
+                              tet_face_map,
+                              ARRAY_LENGTH(tet_face_map),
+                              tet_inverse_face_map,
+                              ARRAY_LENGTH(tet_inverse_face_map),
+                              TET10,
+                              "TETRA10");
+        return conv;
       }
 
     case PRISM6:
       {
-	const Conversion conv(prism6_node_map,
-			      ARRAY_LENGTH(prism6_node_map),
-			      prism6_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(prism6_node_map),
-			      prism_face_map,
-			      ARRAY_LENGTH(prism_face_map),
-			      prism_inverse_face_map,
-			      ARRAY_LENGTH(prism_inverse_face_map),
-			      PRISM6,
-			      "WEDGE");
-	return conv;
+        const Conversion conv(prism6_node_map,
+                              ARRAY_LENGTH(prism6_node_map),
+                              prism6_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(prism6_node_map),
+                              prism_face_map,
+                              ARRAY_LENGTH(prism_face_map),
+                              prism_inverse_face_map,
+                              ARRAY_LENGTH(prism_inverse_face_map),
+                              PRISM6,
+                              "WEDGE");
+        return conv;
       }
 
     case PRISM15:
       {
-	const Conversion conv(prism15_node_map,
-			      ARRAY_LENGTH(prism15_node_map),
-			      prism15_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(prism15_node_map),
-			      prism_face_map,
-			      ARRAY_LENGTH(prism_face_map),
-			      prism_inverse_face_map,
-			      ARRAY_LENGTH(prism_inverse_face_map),
-			      PRISM15,
-			      "WEDGE15");
-	return conv;
+        const Conversion conv(prism15_node_map,
+                              ARRAY_LENGTH(prism15_node_map),
+                              prism15_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(prism15_node_map),
+                              prism_face_map,
+                              ARRAY_LENGTH(prism_face_map),
+                              prism_inverse_face_map,
+                              ARRAY_LENGTH(prism_inverse_face_map),
+                              PRISM15,
+                              "WEDGE15");
+        return conv;
       }
 
     case PRISM18:
       {
-	const Conversion conv(prism18_node_map,
-			      ARRAY_LENGTH(prism18_node_map),
-			      prism18_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(prism18_node_map),
-			      prism_face_map,
-			      ARRAY_LENGTH(prism_face_map),
-			      prism_inverse_face_map,
-			      ARRAY_LENGTH(prism_inverse_face_map),
-			      PRISM18,
-			      "WEDGE18");
-	return conv;
+        const Conversion conv(prism18_node_map,
+                              ARRAY_LENGTH(prism18_node_map),
+                              prism18_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(prism18_node_map),
+                              prism_face_map,
+                              ARRAY_LENGTH(prism_face_map),
+                              prism_inverse_face_map,
+                              ARRAY_LENGTH(prism_inverse_face_map),
+                              PRISM18,
+                              "WEDGE18");
+        return conv;
       }
 
     case PYRAMID5:
       {
-	const Conversion conv(pyramid5_node_map,
-			      ARRAY_LENGTH(pyramid5_node_map),
-			      pyramid5_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(pyramid5_node_map),
-			      pyramid_face_map,
-			      ARRAY_LENGTH(pyramid_face_map),
-			      pyramid_inverse_face_map,
-			      ARRAY_LENGTH(pyramid_inverse_face_map),
-			      PYRAMID5,
-			      "PYRAMID5");
-	return conv;
+        const Conversion conv(pyramid5_node_map,
+                              ARRAY_LENGTH(pyramid5_node_map),
+                              pyramid5_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(pyramid5_node_map),
+                              pyramid_face_map,
+                              ARRAY_LENGTH(pyramid_face_map),
+                              pyramid_inverse_face_map,
+                              ARRAY_LENGTH(pyramid_inverse_face_map),
+                              PYRAMID5,
+                              "PYRAMID5");
+        return conv;
       }
 
     case PYRAMID14:
       {
-	const Conversion conv(pyramid14_node_map,
-			      ARRAY_LENGTH(pyramid14_node_map),
-			      pyramid14_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(pyramid14_node_map),
-			      pyramid_face_map,
-			      ARRAY_LENGTH(pyramid_face_map),
-			      pyramid_inverse_face_map,
-			      ARRAY_LENGTH(pyramid_inverse_face_map),
-			      PYRAMID14,
-			      "PYRAMID14");
-	return conv;
+        const Conversion conv(pyramid14_node_map,
+                              ARRAY_LENGTH(pyramid14_node_map),
+                              pyramid14_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(pyramid14_node_map),
+                              pyramid_face_map,
+                              ARRAY_LENGTH(pyramid_face_map),
+                              pyramid_inverse_face_map,
+                              ARRAY_LENGTH(pyramid_inverse_face_map),
+                              PYRAMID14,
+                              "PYRAMID14");
+        return conv;
       }
 
     default:
@@ -2236,15 +2236,15 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
 
   // dummy return value, we will never get here
   const Conversion conv(tri3_node_map,
-			ARRAY_LENGTH(tri3_node_map),
-			tri3_node_map, // inverse node map same as forward node map
-			ARRAY_LENGTH(tri3_node_map),
-			tri_edge_map,
-			ARRAY_LENGTH(tri_edge_map),
-			tri_inverse_edge_map,
-			ARRAY_LENGTH(tri_inverse_edge_map),
-			TRI3,
-			"TRI3");
+                        ARRAY_LENGTH(tri3_node_map),
+                        tri3_node_map, // inverse node map same as forward node map
+                        ARRAY_LENGTH(tri3_node_map),
+                        tri_edge_map,
+                        ARRAY_LENGTH(tri_edge_map),
+                        tri_inverse_edge_map,
+                        ARRAY_LENGTH(tri_inverse_edge_map),
+                        TRI3,
+                        "TRI3");
   return conv;
 }
 

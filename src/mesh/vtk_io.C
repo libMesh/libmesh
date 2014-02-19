@@ -408,8 +408,8 @@ void VTKIO::read (const std::string& name)
 
 #ifndef LIBMESH_HAVE_VTK
   libMesh::err << "Cannot read VTK file: " << name
-	        << "\nYou must have VTK installed and correctly configured to read VTK meshes."
-	        << std::endl;
+               << "\nYou must have VTK installed and correctly configured to read VTK meshes."
+               << std::endl;
   libmesh_error();
 
 #else
@@ -449,7 +449,7 @@ void VTKIO::read (const std::string& name)
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
       if (this->_mesh_data != NULL)
-	this->_mesh_data->add_foreign_node_id (newnode, i);
+        this->_mesh_data->add_foreign_node_id (newnode, i);
     }
 
   // Get the number of cells from the _vtk_grid object
@@ -460,7 +460,7 @@ void VTKIO::read (const std::string& name)
       vtkCell* cell = _vtk_grid->GetCell(i);
       Elem* elem = NULL;
       switch (cell->GetCellType())
-	{
+        {
         case VTK_LINE:
           elem = new Edge2;
           break;
@@ -484,38 +484,38 @@ void VTKIO::read (const std::string& name)
           elem = new Quad9();
           break;
 #endif
-	case VTK_TETRA:
-	  elem = new Tet4();
-	  break;
-        case VTK_QUADRATIC_TETRA:
-	  elem = new Tet10();
-	  break;
-	case VTK_WEDGE:
-	  elem = new Prism6();
-	  break;
-        case VTK_QUADRATIC_WEDGE:
-	  elem = new Prism15();
-	  break;
-        case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
-	  elem = new Prism18();
-	  break;
-	case VTK_HEXAHEDRON:
-	  elem = new Hex8();
-	  break;
-	case VTK_QUADRATIC_HEXAHEDRON:
-  	  elem = new Hex20();
-	  break;
-        case VTK_TRIQUADRATIC_HEXAHEDRON:
-	  elem = new Hex27();
-	  break;
-	case VTK_PYRAMID:
-	  elem = new Pyramid5();
-	  break;
-	default:
-	  libMesh::err << "element type not implemented in vtkinterface " << cell->GetCellType() << std::endl;
-	  libmesh_error();
+        case VTK_TETRA:
+          elem = new Tet4();
           break;
-	}
+        case VTK_QUADRATIC_TETRA:
+          elem = new Tet10();
+          break;
+        case VTK_WEDGE:
+          elem = new Prism6();
+          break;
+        case VTK_QUADRATIC_WEDGE:
+          elem = new Prism15();
+          break;
+        case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
+          elem = new Prism18();
+          break;
+        case VTK_HEXAHEDRON:
+          elem = new Hex8();
+          break;
+        case VTK_QUADRATIC_HEXAHEDRON:
+          elem = new Hex20();
+          break;
+        case VTK_TRIQUADRATIC_HEXAHEDRON:
+          elem = new Hex27();
+          break;
+        case VTK_PYRAMID:
+          elem = new Pyramid5();
+          break;
+        default:
+          libMesh::err << "element type not implemented in vtkinterface " << cell->GetCellType() << std::endl;
+          libmesh_error();
+          break;
+        }
 
       // get the straightforward numbering from the VTK cells
       for (unsigned int j=0; j<elem->n_nodes(); ++j)
@@ -546,8 +546,8 @@ void VTKIO::read (const std::string& name)
   if (mesh.mesh_dimension() > LIBMESH_DIM)
     {
       libMesh::err << "Cannot open dimension " <<
-		      mesh.mesh_dimension() <<
-		      " mesh file when configured without " <<
+        mesh.mesh_dimension() <<
+        " mesh file when configured without " <<
                       mesh.mesh_dimension() << "D support." <<
                       std::endl;
       libmesh_error();
@@ -572,8 +572,8 @@ void VTKIO::write_nodal_data (const std::string& fname,
 #ifndef LIBMESH_HAVE_VTK
 
   libMesh::err << "Cannot write VTK file: " << fname
-	        << "\nYou must have VTK installed and correctly configured to read VTK meshes."
-	        << std::endl;
+               << "\nYou must have VTK installed and correctly configured to read VTK meshes."
+               << std::endl;
   libmesh_error();
 
 #else
@@ -618,10 +618,10 @@ void VTKIO::write_nodal_data (const std::string& fname,
               if (!soln.empty())
                 {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-	          libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
-					        << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
-					        << std::endl);
-	          data->SetValue(_local_node_map[k], soln[k*num_vars + variable].real());
+                  libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
+                                   << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
+                                   << std::endl);
+                  data->SetValue(_local_node_map[k], soln[k*num_vars + variable].real());
 #else
                   data->SetValue(_local_node_map[k], soln[k*num_vars + variable]);
 #endif

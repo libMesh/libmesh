@@ -61,22 +61,22 @@ bool Edge2::is_face(const unsigned int) const
 }
 
 bool Edge2::is_node_on_side(const unsigned int n,
-			    const unsigned int s) const
+                            const unsigned int s) const
 {
   libmesh_assert_less (s, 2);
   return (s == n);
 }
 
 bool Edge2::is_node_on_edge(const unsigned int,
-			    const unsigned int libmesh_dbg_var(e)) const
+                            const unsigned int libmesh_dbg_var(e)) const
 {
   libmesh_assert_equal_to (e, 0);
   return true;
 }
 
 void Edge2::connectivity(const unsigned int libmesh_dbg_var(sc),
-			 const IOPackage iop,
-			 std::vector<dof_id_type>& conn) const
+                         const IOPackage iop,
+                         std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_equal_to (sc, 0);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -89,21 +89,21 @@ void Edge2::connectivity(const unsigned int libmesh_dbg_var(sc),
     {
     case TECPLOT:
       {
-	conn[0] = this->node(0)+1;
-	conn[1] = this->node(1)+1;
-	return;
+        conn[0] = this->node(0)+1;
+        conn[1] = this->node(1)+1;
+        return;
       }
 
     case VTK:
       {
-	conn[0] = this->node(0);
-	conn[1] = this->node(1);
-	return;
+        conn[0] = this->node(0);
+        conn[1] = this->node(1);
+        return;
       }
 
     default:
       {
-	libmesh_error();
+        libmesh_error();
       }
     }
 

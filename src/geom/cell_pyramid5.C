@@ -75,7 +75,7 @@ bool Pyramid5::is_face(const unsigned int) const
 }
 
 bool Pyramid5::is_node_on_side(const unsigned int n,
-			       const unsigned int s) const
+                               const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 4; ++i)
@@ -85,7 +85,7 @@ bool Pyramid5::is_node_on_side(const unsigned int n,
 }
 
 bool Pyramid5::is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const
+                               const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 2; ++i)
@@ -106,34 +106,34 @@ bool Pyramid5::has_affine_map() const
 
 
 AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
-				    bool proxy) const
+                                    bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
       switch (i)
-	{
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-	  {
-	    AutoPtr<Elem> face(new Side<Tri3,Pyramid5>(this,i));
-	    return face;
-	  }
+        {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+          {
+            AutoPtr<Elem> face(new Side<Tri3,Pyramid5>(this,i));
+            return face;
+          }
 
-	case 4:
-	  {
-	    AutoPtr<Elem> face(new Side<Quad4,Pyramid5>(this,i));
-	    return face;
-	  }
+        case 4:
+          {
+            AutoPtr<Elem> face(new Side<Quad4,Pyramid5>(this,i));
+            return face;
+          }
 
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+        default:
+          {
+            libmesh_error();
+          }
+        }
     }
 
   else
@@ -142,63 +142,63 @@ AutoPtr<Elem> Pyramid5::build_side (const unsigned int i,
       AutoPtr<Elem> face(NULL);
 
       switch (i)
-	{
-	case 0:  // triangular face 1
-	  {
+        {
+        case 0:  // triangular face 1
+          {
             face.reset(new Tri3);
 
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(4);
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(4);
 
-	    break;
-	  }
-	case 1:  // triangular face 2
-	  {
+            break;
+          }
+        case 1:  // triangular face 2
+          {
             face.reset(new Tri3);
 
-	    face->set_node(0) = this->get_node(1);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(4);
+            face->set_node(0) = this->get_node(1);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(4);
 
-	    break;
-	  }
-	case 2:  // triangular face 3
-	  {
+            break;
+          }
+        case 2:  // triangular face 3
+          {
             face.reset(new Tri3);
 
-	    face->set_node(0) = this->get_node(2);
-	    face->set_node(1) = this->get_node(3);
-	    face->set_node(2) = this->get_node(4);
+            face->set_node(0) = this->get_node(2);
+            face->set_node(1) = this->get_node(3);
+            face->set_node(2) = this->get_node(4);
 
-	    break;
-	  }
-	case 3:  // triangular face 4
-	  {
+            break;
+          }
+        case 3:  // triangular face 4
+          {
             face.reset(new Tri3);
 
-	    face->set_node(0) = this->get_node(3);
-	    face->set_node(1) = this->get_node(0);
-	    face->set_node(2) = this->get_node(4);
+            face->set_node(0) = this->get_node(3);
+            face->set_node(1) = this->get_node(0);
+            face->set_node(2) = this->get_node(4);
 
-	    break;
-	  }
-	case 4:  // the quad face at z=0
-	  {
+            break;
+          }
+        case 4:  // the quad face at z=0
+          {
             face.reset(new Quad4);
 
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(3);
-	    face->set_node(2) = this->get_node(2);
-	    face->set_node(3) = this->get_node(1);
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(3);
+            face->set_node(2) = this->get_node(2);
+            face->set_node(3) = this->get_node(1);
 
-	    break;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+            break;
+          }
+        default:
+          {
+            libmesh_error();
+          }
+        }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
@@ -222,8 +222,8 @@ AutoPtr<Elem> Pyramid5::build_edge (const unsigned int i) const
 
 
 void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -233,27 +233,27 @@ void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
     {
     case TECPLOT:
       {
-	conn.resize(8);
-	conn[0] = this->node(0)+1;
-	conn[1] = this->node(1)+1;
-	conn[2] = this->node(2)+1;
-	conn[3] = this->node(3)+1;
-	conn[4] = this->node(4)+1;
-	conn[5] = this->node(4)+1;
-	conn[6] = this->node(4)+1;
-	conn[7] = this->node(4)+1;
-	return;
+        conn.resize(8);
+        conn[0] = this->node(0)+1;
+        conn[1] = this->node(1)+1;
+        conn[2] = this->node(2)+1;
+        conn[3] = this->node(3)+1;
+        conn[4] = this->node(4)+1;
+        conn[5] = this->node(4)+1;
+        conn[6] = this->node(4)+1;
+        conn[7] = this->node(4)+1;
+        return;
       }
 
     case VTK:
       {
-	conn.resize(5);
-	conn[0] = this->node(3);
-	conn[1] = this->node(2);
-	conn[2] = this->node(1);
-	conn[3] = this->node(0);
-	conn[4] = this->node(4);
-	return;
+        conn.resize(5);
+        conn[0] = this->node(3);
+        conn[1] = this->node(2);
+        conn[2] = this->node(1);
+        conn[3] = this->node(0);
+        conn[4] = this->node(4);
+        return;
       }
 
     default:

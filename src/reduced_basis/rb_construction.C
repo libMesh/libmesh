@@ -53,8 +53,8 @@ namespace libMesh
 {
 
 RBConstruction::RBConstruction (EquationSystems& es,
-		                const std::string& name_in,
-		                const unsigned int number_in)
+                                const std::string& name_in,
+                                const unsigned int number_in)
   : Parent(es, name_in, number_in),
     inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
     non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build(es.comm())),
@@ -205,7 +205,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   unsigned int training_parameters_random_seed_in =
     static_cast<int>(-1);
   training_parameters_random_seed_in = infile("training_parameters_random_seed",
-					   training_parameters_random_seed_in);
+                                              training_parameters_random_seed_in);
   const bool quiet_mode_in = infile("quiet_mode", quiet_mode);
   const unsigned int Nmax_in = infile("Nmax", Nmax);
   const Real training_tolerance_in = infile("training_tolerance",
@@ -1845,15 +1845,15 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
 
       if (!is_quiet())
         libMesh::out << "Starting solve q_f=" << q_f
-		     << " in RBConstruction::update_residual_terms() at "
- 		     << Utility::get_timestamp() << std::endl;
+                     << " in RBConstruction::update_residual_terms() at "
+                     << Utility::get_timestamp() << std::endl;
 
       solve();
 
       if (!is_quiet())
       {
         libMesh::out << "Finished solve q_f=" << q_f
-		     << " in RBConstruction::update_residual_terms() at "
+                     << " in RBConstruction::update_residual_terms() at "
                      << Utility::get_timestamp() << std::endl;
 
         libMesh::out << this->n_linear_iterations()
@@ -1863,12 +1863,12 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
 
       // Make sure we didn't max out the number of iterations
       if( (this->n_linear_iterations() >=
-	   this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
+           this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
           (this->final_linear_residual() >
            this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
       {
         libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
-		     << this->final_linear_residual() << ", number of iterations = "
+                     << this->final_linear_residual() << ", number of iterations = "
                      << this->n_linear_iterations() << std::endl << std::endl;
 //      libmesh_error();
 
@@ -2148,28 +2148,28 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
       int stat_result = stat(file_name.str().c_str(), &stat_info);
 
       if ( (stat_result != 0) ||     // file definitely doesn't already exist
-	   (stat_info.st_size == 0)) // file exists, but has zero length (can happen if another proc already opened it!)
-	{
-	  // No need to copy!
-	  // *solution = *(Fq_representor[i]);
-	  // std::swap doesn't work on pointers
-	  //std::swap(solution.get(), Fq_representor[i]);
-	  Fq_representor[i]->swap(*solution);
+           (stat_info.st_size == 0)) // file exists, but has zero length (can happen if another proc already opened it!)
+        {
+          // No need to copy!
+          // *solution = *(Fq_representor[i]);
+          // std::swap doesn't work on pointers
+          //std::swap(solution.get(), Fq_representor[i]);
+          Fq_representor[i]->swap(*solution);
 
-	  Xdr fqr_data(file_name.str(),
-		       write_binary_residual_representors ? ENCODE : WRITE);
+          Xdr fqr_data(file_name.str(),
+                       write_binary_residual_representors ? ENCODE : WRITE);
 
-	  write_serialized_data(fqr_data, false);
+          write_serialized_data(fqr_data, false);
 
-	  // Synchronize before moving on
-	  this->comm().barrier();
+          // Synchronize before moving on
+          this->comm().barrier();
 
-	  // Swap back.
-	  Fq_representor[i]->swap(*solution);
+          // Swap back.
+          Fq_representor[i]->swap(*solution);
 
-	  // TODO: bzip the resulting file?  See $LIBMESH_DIR/src/mesh/unstructured_mesh.C
-	  // for the system call, be sure to do it only on one processor, etc.
-	}
+          // TODO: bzip the resulting file?  See $LIBMESH_DIR/src/mesh/unstructured_mesh.C
+          // for the system call, be sure to do it only on one processor, etc.
+        }
       }
   }
 

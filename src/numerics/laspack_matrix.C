@@ -67,16 +67,16 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
 
     for (numeric_index_type row=0; row<n_rows; row++)
       {
-	// insert the row indices
-	for (SparsityPattern::Row::const_iterator col = sparsity_pattern[row].begin();
-	     col != sparsity_pattern[row].end(); ++col)
-	  {
-	    libmesh_assert (position != _csr.end());
-	    *position = *col;
-	    ++position;
-	  }
+        // insert the row indices
+        for (SparsityPattern::Row::const_iterator col = sparsity_pattern[row].begin();
+             col != sparsity_pattern[row].end(); ++col)
+          {
+            libmesh_assert (position != _csr.end());
+            *position = *col;
+            ++position;
+          }
 
-	_row_start.push_back (position);
+        _row_start.push_back (position);
       }
   }
 
@@ -94,27 +94,27 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
   for (numeric_index_type i=0; i<n_rows; i++)
     {
       const std::vector<numeric_index_type>::const_iterator
-	rs = _row_start[i];
+        rs = _row_start[i];
 
       const numeric_index_type length = _row_start[i+1] - rs;
 
       Q_SetLen (&_QMat, i+1, length);
 
       for (numeric_index_type l=0; l<length; l++)
-	{
-	  const numeric_index_type j = *(rs+l);
+        {
+          const numeric_index_type j = *(rs+l);
 
-	  // sanity check
-	  //libMesh::out << "m()=" << m() << std::endl;
-	  //libMesh::out << "(i,j,l) = (" << i
-	  //	          << "," << j
-	  //	          << "," << l
-	  // 	          << ")" << std::endl;
-	  //libMesh::out << "pos(i,j)=" << pos(i,j)
-	  //              << std::endl;
-	  libmesh_assert_equal_to (this->pos(i,j), l);
-	  Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
-	}
+          // sanity check
+          //libMesh::out << "m()=" << m() << std::endl;
+          //libMesh::out << "(i,j,l) = (" << i
+          //          << "," << j
+          //          << "," << l
+          //           << ")" << std::endl;
+          //libMesh::out << "pos(i,j)=" << pos(i,j)
+          //              << std::endl;
+          libmesh_assert_equal_to (this->pos(i,j), l);
+          Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
+        }
     }
 
   // That's it!
@@ -125,12 +125,12 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
 
 template <typename T>
 void LaspackMatrix<T>::init (const numeric_index_type libmesh_dbg_var(m_in),
-			     const numeric_index_type libmesh_dbg_var(n_in),
-			     const numeric_index_type libmesh_dbg_var(m_l),
-			     const numeric_index_type libmesh_dbg_var(n_l),
-			     const numeric_index_type libmesh_dbg_var(nnz),
-			     const numeric_index_type,
-			     const numeric_index_type)
+                             const numeric_index_type libmesh_dbg_var(n_in),
+                             const numeric_index_type libmesh_dbg_var(m_l),
+                             const numeric_index_type libmesh_dbg_var(n_l),
+                             const numeric_index_type libmesh_dbg_var(nnz),
+                             const numeric_index_type,
+                             const numeric_index_type)
 {
   // noz ignored...  only used for multiple processors!
   libmesh_assert_equal_to (m_in, m_l);
@@ -140,7 +140,7 @@ void LaspackMatrix<T>::init (const numeric_index_type libmesh_dbg_var(m_in),
 
 
   libMesh::err << "ERROR: Only the init() member that uses the" << std::endl
-	        << "DofMap is implemented for Laspack matrices!" << std::endl;
+               << "DofMap is implemented for Laspack matrices!" << std::endl;
   libmesh_error();
 
   this->_is_initialized = true;
@@ -201,8 +201,8 @@ void LaspackMatrix<T>::init ()
 
 template <typename T>
 void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-				  const std::vector<numeric_index_type>& rows,
-				  const std::vector<numeric_index_type>& cols)
+                                  const std::vector<numeric_index_type>& rows,
+                                  const std::vector<numeric_index_type>& cols)
 
 {
   libmesh_assert (this->initialized());
@@ -276,7 +276,7 @@ void LaspackMatrix<T>::zero ()
   for (numeric_index_type row=0; row<n_rows; row++)
     {
       const std::vector<numeric_index_type>::const_iterator
-	r_start = _row_start[row];
+        r_start = _row_start[row];
 
       const numeric_index_type len = (_row_start[row+1] - _row_start[row]);
 
@@ -284,14 +284,14 @@ void LaspackMatrix<T>::zero ()
       libmesh_assert_equal_to (len, Q_GetLen(&_QMat, row+1));
 
       for (numeric_index_type l=0; l<len; l++)
-	{
-	  const numeric_index_type j = *(r_start + l);
+        {
+          const numeric_index_type j = *(r_start + l);
 
-	  // Make sure the data structures are working
-	  libmesh_assert_equal_to ((j+1), Q_GetPos (&_QMat, row+1, l));
+          // Make sure the data structures are working
+          libmesh_assert_equal_to ((j+1), Q_GetPos (&_QMat, row+1, l));
 
-	  Q_SetEntry (&_QMat, row+1, l, j+1, 0.);
-	}
+          Q_SetEntry (&_QMat, row+1, l, j+1, 0.);
+        }
     }
 }
 
@@ -335,8 +335,8 @@ numeric_index_type LaspackMatrix<T>::row_stop () const
 
 template <typename T>
 void LaspackMatrix<T>::set (const numeric_index_type i,
-			    const numeric_index_type j,
-			    const T value)
+                            const numeric_index_type j,
+                            const T value)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->m());
@@ -355,8 +355,8 @@ void LaspackMatrix<T>::set (const numeric_index_type i,
 
 template <typename T>
 void LaspackMatrix<T>::add (const numeric_index_type i,
-			    const numeric_index_type j,
-			    const T value)
+                            const numeric_index_type j,
+                            const T value)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->m());
@@ -374,7 +374,7 @@ void LaspackMatrix<T>::add (const numeric_index_type i,
 
 template <typename T>
 void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-				  const std::vector<numeric_index_type>& dof_indices)
+                                  const std::vector<numeric_index_type>& dof_indices)
 {
   this->add_matrix (dm, dof_indices, dof_indices);
 }
@@ -400,7 +400,7 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
   for (numeric_index_type row=0; row<n_rows; row++)
     {
       const std::vector<numeric_index_type>::const_iterator
-	r_start = _row_start[row];
+        r_start = _row_start[row];
 
       const numeric_index_type len = (_row_start[row+1] - _row_start[row]);
 
@@ -411,15 +411,15 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 
 
       for (numeric_index_type l=0; l<len; l++)
-	{
-	  const numeric_index_type j = *(r_start + l);
+        {
+          const numeric_index_type j = *(r_start + l);
 
-	  // Make sure the data structures are working
-	  libmesh_assert_equal_to ((j+1), Q_GetPos (&_QMat, row+1, l));
+          // Make sure the data structures are working
+          libmesh_assert_equal_to ((j+1), Q_GetPos (&_QMat, row+1, l));
 
-	  const _LPNumber value = a * Q_GetEl(const_cast<QMatrix*>(&(X->_QMat)), row+1, j+1);
-	  Q_AddVal   (&_QMat, row+1, l, value);
-	}
+          const _LPNumber value = a * Q_GetEl(const_cast<QMatrix*>(&(X->_QMat)), row+1, j+1);
+          Q_AddVal   (&_QMat, row+1, l, value);
+        }
     }
 }
 
@@ -428,7 +428,7 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 
 template <typename T>
 T LaspackMatrix<T>::operator () (const numeric_index_type i,
-				 const numeric_index_type j) const
+                                 const numeric_index_type j) const
 {
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->m());
@@ -441,7 +441,7 @@ T LaspackMatrix<T>::operator () (const numeric_index_type i,
 
 template <typename T>
 numeric_index_type LaspackMatrix<T>::pos (const numeric_index_type i,
-				          const numeric_index_type j) const
+                                          const numeric_index_type j) const
 {
   libmesh_assert_less (i, this->m());
   libmesh_assert_less (j, this->n());
@@ -450,10 +450,10 @@ numeric_index_type LaspackMatrix<T>::pos (const numeric_index_type i,
 
   // note this requires the _csr to be
   std::pair<std::vector<numeric_index_type>::const_iterator,
-	    std::vector<numeric_index_type>::const_iterator> p =
+    std::vector<numeric_index_type>::const_iterator> p =
     std::equal_range (_row_start[i],
-		      _row_start[i+1],
-		      j);
+                      _row_start[i+1],
+                      j);
 
   // Make sure the row contains the element j
   libmesh_assert (p.first != p.second);

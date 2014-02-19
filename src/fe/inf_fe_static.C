@@ -53,7 +53,7 @@ bool InfFE<Dim,T_radial,T_map>::_warned_for_shape      = false;
 // InfFE static class members
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType& fet,
-						const ElemType inf_elem_type)
+                                                const ElemType inf_elem_type)
 {
   const ElemType base_et (Base::get_elem_type(inf_elem_type));
 
@@ -70,8 +70,8 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType& fet,
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType& fet,
-							const ElemType inf_elem_type,
-							const unsigned int n)
+                                                        const ElemType inf_elem_type,
+                                                        const unsigned int n)
 {
   const ElemType base_et (Base::get_elem_type(inf_elem_type));
 
@@ -79,11 +79,11 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType& fet,
   compute_node_indices(inf_elem_type, n, n_base, n_radial);
 
 //   libMesh::out << "elem_type=" << inf_elem_type
-// 	    << ",  fet.radial_order=" << fet.radial_order
-// 	    << ",  n=" << n
-// 	    << ",  n_radial=" << n_radial
-// 	    << ",  n_base=" << n_base
-// 	    << std::endl;
+//     << ",  fet.radial_order=" << fet.radial_order
+//     << ",  n=" << n
+//     << ",  n_radial=" << n_radial
+//     << ",  n_base=" << n_base
+//     << std::endl;
 
   if (Dim > 1)
     return FEInterface::n_dofs_at_node(Dim-1, fet, base_et, n_base)
@@ -99,7 +99,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType& fet,
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType& fet,
-							 const ElemType inf_elem_type)
+                                                         const ElemType inf_elem_type)
 {
   const ElemType base_et (Base::get_elem_type(inf_elem_type));
 
@@ -117,16 +117,16 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType& fet,
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType& /* fet */,
-					   const Elem* /* elem */,
-					   const std::vector<Number>& /* elem_soln */,
-					   std::vector<Number>&       nodal_soln)
+                                           const Elem* /* elem */,
+                                           const std::vector<Number>& /* elem_soln */,
+                                           std::vector<Number>&       nodal_soln)
 {
 #ifdef DEBUG
   if (!_warned_for_nodal_soln)
     {
       libMesh::err << "WARNING: nodal_soln(...) does _not_ work for infinite elements." << std::endl
-		    << " Will return an empty nodal solution.  Use " << std::endl
-		    << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!" << std::endl;
+                   << " Will return an empty nodal solution.  Use " << std::endl
+                   << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!" << std::endl;
       _warned_for_nodal_soln = true;
     }
 #endif
@@ -152,9 +152,9 @@ void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType& /* fet */,
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
-				      const ElemType inf_elem_type,
-				      const unsigned int i,
-				      const Point& p)
+                                      const ElemType inf_elem_type,
+                                      const unsigned int i,
+                                      const Point& p)
 {
   libmesh_assert_not_equal_to (Dim, 0);
 
@@ -163,9 +163,9 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   if ((T_radial != INFINITE_MAP) && !_warned_for_shape)
     {
       libMesh::err << "WARNING: InfFE<Dim,T_radial,T_map>::shape(...) does _not_" << std::endl
-		    << " return the correct trial function!  Use " << std::endl
-		    << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!"
-		    << std::endl;
+                   << " return the correct trial function!  Use " << std::endl
+                   << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!"
+                   << std::endl;
       _warned_for_shape = true;
     }
 #endif
@@ -194,9 +194,9 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
-				      const Elem* inf_elem,
-				      const unsigned int i,
-				      const Point& p)
+                                      const Elem* inf_elem,
+                                      const unsigned int i,
+                                      const Point& p)
 {
   libmesh_assert(inf_elem);
   libmesh_assert_not_equal_to (Dim, 0);
@@ -206,9 +206,9 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   if ((T_radial != INFINITE_MAP) && !_warned_for_shape)
     {
       libMesh::err << "WARNING: InfFE<Dim,T_radial,T_map>::shape(...) does _not_" << std::endl
-		    << " return the correct trial function!  Use " << std::endl
-		    << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!"
-		    << std::endl;
+                   << " return the correct trial function!  Use " << std::endl
+                   << " InfFE<Dim,T_radial,T_map>::compute_data(..) instead!"
+                   << std::endl;
       _warned_for_shape = true;
     }
 #endif
@@ -237,8 +237,8 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
-					     const Elem* inf_elem,
-					     FEComputeData& data)
+                                             const Elem* inf_elem,
+                                             FEComputeData& data)
 {
   libmesh_assert(inf_elem);
   libmesh_assert_not_equal_to (Dim, 0);
@@ -261,42 +261,42 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
     case 1:
       {
         libmesh_assert_equal_to (inf_elem->type(), INFEDGE2);
-	interpolated_dist =  Point(inf_elem->point(0) - inf_elem->point(1)).size();
-	break;
+        interpolated_dist =  Point(inf_elem->point(0) - inf_elem->point(1)).size();
+        break;
       }
 
     case 2:
       {
-	const unsigned int n_base_nodes = base_el->n_nodes();
+        const unsigned int n_base_nodes = base_el->n_nodes();
 
-	const Point    origin                 = inf_elem->origin();
-	const Order    base_mapping_order     (base_el->default_order());
-	const ElemType base_mapping_elem_type (base_el->type());
+        const Point    origin                 = inf_elem->origin();
+        const Order    base_mapping_order     (base_el->default_order());
+        const ElemType base_mapping_elem_type (base_el->type());
 
-	// interpolate the base nodes' distances
-	for (unsigned int n=0; n<n_base_nodes; n++)
-	    interpolated_dist += Point(base_el->point(n) - origin).size()
-		* FE<1,LAGRANGE>::shape (base_mapping_elem_type, base_mapping_order, n, p);
-	break;
+        // interpolate the base nodes' distances
+        for (unsigned int n=0; n<n_base_nodes; n++)
+          interpolated_dist += Point(base_el->point(n) - origin).size()
+            * FE<1,LAGRANGE>::shape (base_mapping_elem_type, base_mapping_order, n, p);
+        break;
       }
 
     case 3:
       {
-	const unsigned int n_base_nodes = base_el->n_nodes();
+        const unsigned int n_base_nodes = base_el->n_nodes();
 
-	const Point    origin                 = inf_elem->origin();
-	const Order    base_mapping_order     (base_el->default_order());
-	const ElemType base_mapping_elem_type (base_el->type());
+        const Point    origin                 = inf_elem->origin();
+        const Order    base_mapping_order     (base_el->default_order());
+        const ElemType base_mapping_elem_type (base_el->type());
 
-	// interpolate the base nodes' distances
-	for (unsigned int n=0; n<n_base_nodes; n++)
-	    interpolated_dist += Point(base_el->point(n) - origin).size()
-		* FE<2,LAGRANGE>::shape (base_mapping_elem_type, base_mapping_order, n, p);
-	break;
+        // interpolate the base nodes' distances
+        for (unsigned int n=0; n<n_base_nodes; n++)
+          interpolated_dist += Point(base_el->point(n) - origin).size()
+            * FE<2,LAGRANGE>::shape (base_mapping_elem_type, base_mapping_order, n, p);
+        break;
       }
 #ifdef DEBUG
     default:
-	libmesh_error();
+      libmesh_error();
 #endif
     }
 
@@ -328,15 +328,15 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 
       for (unsigned int i=0; i<n_dof; i++)
         {
-	  // compute base and radial shape indices
-	  unsigned int i_base, i_radial;
-	  compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
+          // compute base and radial shape indices
+          unsigned int i_base, i_radial;
+          compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
 
-	  data.shape[i] = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D          */
-			   *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)                 */
-			   * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))    /* L_n(v)                   */
-	      * time_harmonic;                                                          /* e^(sign*i*k*phase(s,t,v) */
-	}
+          data.shape[i] = (InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D          */
+                           *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)                 */
+                           * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial))    /* L_n(v)                   */
+            * time_harmonic;                                                          /* e^(sign*i*k*phase(s,t,v) */
+        }
     }
   else
     {
@@ -365,14 +365,14 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 
       for (unsigned int i=0; i<n_dof; i++)
         {
-	  // compute base and radial shape indices
-	  unsigned int i_base, i_radial;
-	  compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
+          // compute base and radial shape indices
+          unsigned int i_base, i_radial;
+          compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
 
-	  data.shape[i] = InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D */
-	                  *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)        */
-	                  * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial);    /* L_n(v)          */
-	}
+          data.shape[i] = InfFE<Dim,T_radial,T_map>::Radial::decay(v)                  /* (1.-v)/2. in 3D */
+            *  FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)  /* S_n(s,t)        */
+            * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial);    /* L_n(v)          */
+        }
     }
   else
     {
@@ -390,216 +390,216 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_type,
-						      const unsigned int outer_node_index,
-						      unsigned int& base_node,
-						      unsigned int& radial_node)
+                                                      const unsigned int outer_node_index,
+                                                      unsigned int& base_node,
+                                                      unsigned int& radial_node)
 {
   switch (inf_elem_type)
     {
     case INFEDGE2:
       {
-	libmesh_assert_less (outer_node_index, 2);
-	base_node   = 0;
-	radial_node = outer_node_index;
-	return;
+        libmesh_assert_less (outer_node_index, 2);
+        base_node   = 0;
+        radial_node = outer_node_index;
+        return;
       }
 
 
     // linear base approximation, easy to determine
     case INFQUAD4:
       {
-	libmesh_assert_less (outer_node_index, 4);
-	base_node   = outer_node_index % 2;
-	radial_node = outer_node_index / 2;
-	return;
+        libmesh_assert_less (outer_node_index, 4);
+        base_node   = outer_node_index % 2;
+        radial_node = outer_node_index / 2;
+        return;
       }
 
     case INFPRISM6:
       {
-	libmesh_assert_less (outer_node_index, 6);
-	base_node   = outer_node_index % 3;
-	radial_node = outer_node_index / 3;
-	return;
+        libmesh_assert_less (outer_node_index, 6);
+        base_node   = outer_node_index % 3;
+        radial_node = outer_node_index / 3;
+        return;
       }
 
     case INFHEX8:
       {
-	libmesh_assert_less (outer_node_index, 8);
-	base_node   = outer_node_index % 4;
-	radial_node = outer_node_index / 4;
-	return;
+        libmesh_assert_less (outer_node_index, 8);
+        base_node   = outer_node_index % 4;
+        radial_node = outer_node_index / 4;
+        return;
       }
 
 
     // higher order base approximation, more work necessary
     case INFQUAD6:
       {
-	switch (outer_node_index)
-	  {
-	  case 0:
-	  case 1:
-	    {
-	      radial_node = 0;
-	      base_node   = outer_node_index;
-	      return;
-	    }
+        switch (outer_node_index)
+          {
+          case 0:
+          case 1:
+            {
+              radial_node = 0;
+              base_node   = outer_node_index;
+              return;
+            }
 
-	  case 2:
-	  case 3:
-	    {
-	      radial_node = 1;
-	      base_node   = outer_node_index-2;
-	      return;
-	    }
+          case 2:
+          case 3:
+            {
+              radial_node = 1;
+              base_node   = outer_node_index-2;
+              return;
+            }
 
-	  case 4:
-	    {
-	      radial_node = 0;
-	      base_node   = 2;
-	      return;
-	    }
+          case 4:
+            {
+              radial_node = 0;
+              base_node   = 2;
+              return;
+            }
 
-	  case 5:
-	    {
-	      radial_node = 1;
-	      base_node   = 2;
-	      return;
-	    }
+          case 5:
+            {
+              radial_node = 1;
+              base_node   = 2;
+              return;
+            }
 
-	  default:
-	    {
-	      libmesh_error();
-	      return;
-	    }
-	  }
+          default:
+            {
+              libmesh_error();
+              return;
+            }
+          }
       }
 
 
     case INFHEX16:
     case INFHEX18:
       {
-	switch (outer_node_index)
-	  {
-	  case 0:
-	  case 1:
-	  case 2:
-	  case 3:
-	    {
-	      radial_node = 0;
-	      base_node   = outer_node_index;
-	      return;
-	    }
+        switch (outer_node_index)
+          {
+          case 0:
+          case 1:
+          case 2:
+          case 3:
+            {
+              radial_node = 0;
+              base_node   = outer_node_index;
+              return;
+            }
 
-	  case 4:
-	  case 5:
-	  case 6:
-	  case 7:
-	    {
-	      radial_node = 1;
-	      base_node   = outer_node_index-4;
-	      return;
-	    }
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+            {
+              radial_node = 1;
+              base_node   = outer_node_index-4;
+              return;
+            }
 
-	  case 8:
-	  case 9:
-	  case 10:
-	  case 11:
-	    {
-	      radial_node = 0;
-	      base_node   = outer_node_index-4;
-	      return;
-	    }
+          case 8:
+          case 9:
+          case 10:
+          case 11:
+            {
+              radial_node = 0;
+              base_node   = outer_node_index-4;
+              return;
+            }
 
-	  case 12:
-	  case 13:
-	  case 14:
-	  case 15:
-	    {
-	      radial_node = 1;
-	      base_node   = outer_node_index-8;
-	      return;
-	    }
+          case 12:
+          case 13:
+          case 14:
+          case 15:
+            {
+              radial_node = 1;
+              base_node   = outer_node_index-8;
+              return;
+            }
 
-	  case 16:
-	    {
-	      libmesh_assert_equal_to (inf_elem_type, INFHEX18);
-	      radial_node = 0;
-	      base_node   = 8;
-	      return;
-	    }
+          case 16:
+            {
+              libmesh_assert_equal_to (inf_elem_type, INFHEX18);
+              radial_node = 0;
+              base_node   = 8;
+              return;
+            }
 
-	  case 17:
-	    {
-	      libmesh_assert_equal_to (inf_elem_type, INFHEX18);
-	      radial_node = 1;
-	      base_node   = 8;
-	      return;
-	    }
+          case 17:
+            {
+              libmesh_assert_equal_to (inf_elem_type, INFHEX18);
+              radial_node = 1;
+              base_node   = 8;
+              return;
+            }
 
-	  default:
-	    {
-	      libmesh_error();
-	      return;
-	    }
-	  }
+          default:
+            {
+              libmesh_error();
+              return;
+            }
+          }
       }
 
 
     case INFPRISM12:
       {
-	switch (outer_node_index)
-	  {
-	  case 0:
-	  case 1:
-	  case 2:
-	    {
-	      radial_node = 0;
-	      base_node   = outer_node_index;
-	      return;
-	    }
+        switch (outer_node_index)
+          {
+          case 0:
+          case 1:
+          case 2:
+            {
+              radial_node = 0;
+              base_node   = outer_node_index;
+              return;
+            }
 
-	  case 3:
-	  case 4:
-	  case 5:
-	    {
-	      radial_node = 1;
-	      base_node   = outer_node_index-3;
-	      return;
-	    }
+          case 3:
+          case 4:
+          case 5:
+            {
+              radial_node = 1;
+              base_node   = outer_node_index-3;
+              return;
+            }
 
-	  case 6:
-	  case 7:
-	  case 8:
-	    {
-	      radial_node = 0;
-	      base_node   = outer_node_index-3;
-	      return;
-	    }
+          case 6:
+          case 7:
+          case 8:
+            {
+              radial_node = 0;
+              base_node   = outer_node_index-3;
+              return;
+            }
 
-	  case 9:
-	  case 10:
-	  case 11:
-	    {
-	      radial_node = 1;
-	      base_node   = outer_node_index-6;
-	      return;
-	    }
+          case 9:
+          case 10:
+          case 11:
+            {
+              radial_node = 1;
+              base_node   = outer_node_index-6;
+              return;
+            }
 
-	  default:
-	    {
-	      libmesh_error();
-	      return;
-	    }
-	  }
+          default:
+            {
+              libmesh_error();
+              return;
+            }
+          }
       }
 
 
     default:
       {
         libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type
-		      << ", node=" << outer_node_index << std::endl;
-	libmesh_error();
-	return;
+                     << ", node=" << outer_node_index << std::endl;
+        libmesh_error();
+        return;
       }
     }
 }
@@ -611,9 +611,9 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_elem_type,
-							   const unsigned int outer_node_index,
-							   unsigned int& base_node,
-							   unsigned int& radial_node)
+                                                           const unsigned int outer_node_index,
+                                                           unsigned int& base_node,
+                                                           unsigned int& radial_node)
 {
   libmesh_assert_not_equal_to (inf_elem_type, INVALID_ELEM);
 
@@ -653,63 +653,63 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_el
       switch (inf_elem_type)
         {
         case INFEDGE2:
-	  {
-	    n_nodes = 2;
-	    break;
-	  }
-	case INFQUAD4:
-	  {
-	    n_nodes = 4;
-	    break;
-	  }
+          {
+            n_nodes = 2;
+            break;
+          }
+        case INFQUAD4:
+          {
+            n_nodes = 4;
+            break;
+          }
         case INFQUAD6:
-	  {
-	    n_nodes = 6;
-	    break;
-	  }
+          {
+            n_nodes = 6;
+            break;
+          }
         case INFHEX8:
-	  {
-	    n_nodes = 8;
-	    break;
-	  }
+          {
+            n_nodes = 8;
+            break;
+          }
         case INFHEX16:
-	  {
-	    n_nodes = 16;
-	    break;
-	  }
+          {
+            n_nodes = 16;
+            break;
+          }
         case INFHEX18:
-	  {
-	    n_nodes = 18;
-	    break;
-	  }
+          {
+            n_nodes = 18;
+            break;
+          }
         case INFPRISM6:
-	  {
-	    n_nodes = 6;
-	    break;
-	  }
+          {
+            n_nodes = 6;
+            break;
+          }
         case INFPRISM12:
-	  {
-	    n_nodes = 12;
-	    break;
-	  }
-	default:
-	  {
-	    libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type
-		          << ", node=" << outer_node_index << std::endl;
-	    libmesh_error();
-	    break;
-	  }
-	}
+          {
+            n_nodes = 12;
+            break;
+          }
+        default:
+          {
+            libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type
+                         << ", node=" << outer_node_index << std::endl;
+            libmesh_error();
+            break;
+          }
+        }
 
 
       _static_base_node_index.resize  (n_nodes);
       _static_radial_node_index.resize(n_nodes);
 
       for (unsigned int n=0; n<n_nodes; n++)
-	  compute_node_indices (inf_elem_type,
-				n,
-				_static_base_node_index  [outer_node_index],
-				_static_radial_node_index[outer_node_index]);
+        compute_node_indices (inf_elem_type,
+                              n,
+                              _static_base_node_index  [outer_node_index],
+                              _static_radial_node_index[outer_node_index]);
 
       // and return for the specified node
       base_node   = _static_base_node_index  [outer_node_index];
@@ -725,10 +725,10 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_el
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
-						       const ElemType inf_elem_type,
-						       const unsigned int i,
-						       unsigned int& base_shape,
-						       unsigned int& radial_shape)
+                                                       const ElemType inf_elem_type,
+                                                       const unsigned int i,
+                                                       unsigned int& base_shape,
+                                                       unsigned int& radial_shape)
 {
 
   /*
@@ -778,87 +778,87 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
     {
     case INFEDGE2:
       {
-	n_base_vertices   = 1;
-	n_base_side_nodes = 0;
-	n_base_face_nodes = 0;
-	n_base_side_dof   = 0;
-	n_base_face_dof   = 0;
-	break;
+        n_base_vertices   = 1;
+        n_base_side_nodes = 0;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = 0;
+        n_base_face_dof   = 0;
+        break;
       }
 
     case INFQUAD4:
       {
-	n_base_vertices   = 2;
-	n_base_side_nodes = 0;
-	n_base_face_nodes = 0;
-	n_base_side_dof   = 0;
-	n_base_face_dof   = 0;
-	break;
+        n_base_vertices   = 2;
+        n_base_side_nodes = 0;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = 0;
+        n_base_face_dof   = 0;
+        break;
       }
 
     case INFQUAD6:
       {
-	n_base_vertices   = 2;
-	n_base_side_nodes = 1;
-	n_base_face_nodes = 0;
-	n_base_side_dof   = FEInterface::n_dofs_at_node (Dim-1, fet,base_elem_type, n_base_vertices);
-	n_base_face_dof   = 0;
-	break;
+        n_base_vertices   = 2;
+        n_base_side_nodes = 1;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = FEInterface::n_dofs_at_node (Dim-1, fet,base_elem_type, n_base_vertices);
+        n_base_face_dof   = 0;
+        break;
       }
 
     case INFHEX8:
       {
-	n_base_vertices   = 4;
-	n_base_side_nodes = 0;
-	n_base_face_nodes = 0;
-	n_base_side_dof   = 0;
-	n_base_face_dof   = 0;
-	break;
+        n_base_vertices   = 4;
+        n_base_side_nodes = 0;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = 0;
+        n_base_face_dof   = 0;
+        break;
       }
 
     case INFHEX16:
       {
-	n_base_vertices   = 4;
-	n_base_side_nodes = 4;
-	n_base_face_nodes = 0;
-	n_base_side_dof   = FEInterface::n_dofs_at_node (Dim-1, fet,base_elem_type, n_base_vertices);
-	n_base_face_dof   = 0;
-	break;
+        n_base_vertices   = 4;
+        n_base_side_nodes = 4;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = FEInterface::n_dofs_at_node (Dim-1, fet,base_elem_type, n_base_vertices);
+        n_base_face_dof   = 0;
+        break;
       }
 
     case INFHEX18:
       {
-	n_base_vertices   = 4;
-	n_base_side_nodes = 4;
-	n_base_face_nodes = 1;
-	n_base_side_dof   = FEInterface::n_dofs_at_node (Dim-1, fet,base_elem_type, n_base_vertices);
-	n_base_face_dof   = FEInterface::n_dofs_at_node (Dim-1, fet,base_elem_type, 8);
-	break;
+        n_base_vertices   = 4;
+        n_base_side_nodes = 4;
+        n_base_face_nodes = 1;
+        n_base_side_dof   = FEInterface::n_dofs_at_node (Dim-1, fet,base_elem_type, n_base_vertices);
+        n_base_face_dof   = FEInterface::n_dofs_at_node (Dim-1, fet,base_elem_type, 8);
+        break;
       }
 
 
     case INFPRISM6:
       {
-	n_base_vertices   = 3;
-	n_base_side_nodes = 0;
-	n_base_face_nodes = 0;
-	n_base_side_dof   = 0;
-	n_base_face_dof   = 0;
-	break;
+        n_base_vertices   = 3;
+        n_base_side_nodes = 0;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = 0;
+        n_base_face_dof   = 0;
+        break;
       }
 
     case INFPRISM12:
       {
-	n_base_vertices   = 3;
-	n_base_side_nodes = 3;
-	n_base_face_nodes = 0;
-	n_base_side_dof   = FEInterface::n_dofs_at_node (Dim-1, fet,base_elem_type, n_base_vertices);
-	n_base_face_dof   = 0;
-	break;
+        n_base_vertices   = 3;
+        n_base_side_nodes = 3;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = FEInterface::n_dofs_at_node (Dim-1, fet,base_elem_type, n_base_vertices);
+        n_base_face_dof   = 0;
+        break;
       }
 
     default:
-	libmesh_error();
+      libmesh_error();
     }
 
 
@@ -877,78 +877,78 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
     // start locating the shape function
     if (i < n_dof_at_base_vertices)                                              // range of i: 0..7
       {
-	// belongs to vertex in the base
-	radial_shape = 0;
-	base_shape   = i;
+        // belongs to vertex in the base
+        radial_shape = 0;
+        base_shape   = i;
       }
 
     else if (i < n_dof_at_all_vertices)                                          // range of i: 8..39
       {
-	/* belongs to vertex in the outer shell
-	 *
-	 * subtract the number of dof already counted,
-	 * so that i_offset contains only the offset for the base
-	 */
-	const unsigned int i_offset = i - n_dof_at_base_vertices;                // 0..31
+        /* belongs to vertex in the outer shell
+         *
+         * subtract the number of dof already counted,
+         * so that i_offset contains only the offset for the base
+         */
+        const unsigned int i_offset = i - n_dof_at_base_vertices;                // 0..31
 
-	// first the radial dof are counted, then the base dof
-	radial_shape = (i_offset % radial_order) + 1;
-	base_shape   = i_offset / radial_order;
+        // first the radial dof are counted, then the base dof
+        radial_shape = (i_offset % radial_order) + 1;
+        base_shape   = i_offset / radial_order;
       }
 
     else if (i < n_dof_at_all_vertices+n_dof_at_base_sides)                      // range of i: 40..51
       {
-	// belongs to base, is a side node
-	radial_shape = 0;
-	base_shape = i - radial_order * n_dof_at_base_vertices;                  //  8..19
+        // belongs to base, is a side node
+        radial_shape = 0;
+        base_shape = i - radial_order * n_dof_at_base_vertices;                  //  8..19
       }
 
     else if (i < n_dof_at_all_vertices+n_dof_at_all_sides)                       // range of i: 52..99
       {
-	// belongs to side node in the outer shell
-	const unsigned int i_offset = i - (n_dof_at_all_vertices
-					   + n_dof_at_base_sides);               // 0..47
-	radial_shape = (i_offset % radial_order) + 1;
-	base_shape   = (i_offset / radial_order) + n_dof_at_base_vertices;
+        // belongs to side node in the outer shell
+        const unsigned int i_offset = i - (n_dof_at_all_vertices
+                                           + n_dof_at_base_sides);               // 0..47
+        radial_shape = (i_offset % radial_order) + 1;
+        base_shape   = (i_offset / radial_order) + n_dof_at_base_vertices;
       }
 
     else if (i < n_dof_at_all_vertices+n_dof_at_all_sides+n_dof_at_base_face)    // range of i: 100..104
       {
-	// belongs to the node in the base face
-	radial_shape = 0;
-	base_shape = i - radial_order*(n_dof_at_base_vertices
-				       + n_dof_at_base_sides);                   //  20..24
+        // belongs to the node in the base face
+        radial_shape = 0;
+        base_shape = i - radial_order*(n_dof_at_base_vertices
+                                       + n_dof_at_base_sides);                   //  20..24
       }
 
     else if (i < n_dof_at_all_vertices+n_dof_at_all_sides+n_dof_at_all_faces)    // range of i: 105..124
       {
-	// belongs to the node in the outer face
-	const unsigned int i_offset = i - (n_dof_at_all_vertices
-					   + n_dof_at_all_sides
-					   + n_dof_at_base_face);                // 0..19
-	radial_shape = (i_offset % radial_order) + 1;
-	base_shape   = (i_offset / radial_order) + n_dof_at_base_vertices + n_dof_at_base_sides;
+        // belongs to the node in the outer face
+        const unsigned int i_offset = i - (n_dof_at_all_vertices
+                                           + n_dof_at_all_sides
+                                           + n_dof_at_base_face);                // 0..19
+        radial_shape = (i_offset % radial_order) + 1;
+        base_shape   = (i_offset / radial_order) + n_dof_at_base_vertices + n_dof_at_base_sides;
       }
 
     else if (i < n_dof_at_all_vertices+n_dof_at_all_sides+n_dof_at_all_faces+n_base_elem_dof)      // range of i: 125..133
       {
-	// belongs to the base and is an element associated shape
-	radial_shape = 0;
-	base_shape = i - (n_dof_at_all_vertices
-			  + n_dof_at_all_sides
-			  + n_dof_at_all_faces);                                 // 0..8
+        // belongs to the base and is an element associated shape
+        radial_shape = 0;
+        base_shape = i - (n_dof_at_all_vertices
+                          + n_dof_at_all_sides
+                          + n_dof_at_all_faces);                                 // 0..8
       }
 
     else                                                                         // range of i: 134..169
       {
-	libmesh_assert_less (i, n_dofs(fet, inf_elem_type));
-	// belongs to the outer shell and is an element associated shape
-	const unsigned int i_offset = i - (n_dof_at_all_vertices
-					   + n_dof_at_all_sides
-					   + n_dof_at_all_faces
-					   + n_base_elem_dof);                   // 0..19
-	radial_shape = (i_offset % radial_order) + 1;
-	base_shape   = (i_offset / radial_order) + n_dof_at_base_vertices + n_dof_at_base_sides + n_dof_at_base_face;
+        libmesh_assert_less (i, n_dofs(fet, inf_elem_type));
+        // belongs to the outer shell and is an element associated shape
+        const unsigned int i_offset = i - (n_dof_at_all_vertices
+                                           + n_dof_at_all_sides
+                                           + n_dof_at_all_faces
+                                           + n_base_elem_dof);                   // 0..19
+        radial_shape = (i_offset % radial_order) + 1;
+        base_shape   = (i_offset / radial_order) + n_dof_at_base_vertices + n_dof_at_base_sides + n_dof_at_base_face;
       }
   }
 

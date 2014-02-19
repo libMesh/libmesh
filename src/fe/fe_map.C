@@ -44,13 +44,13 @@ AutoPtr<FEMap> FEMap::build( FEType fe_type )
     {
     case XYZ:
       {
-	AutoPtr<FEMap> ap( new FEXYZMap );
-	return ap;
+        AutoPtr<FEMap> ap( new FEXYZMap );
+        return ap;
       }
     default:
       {
-	AutoPtr<FEMap> ap( new FEMap );
-	return ap;
+        AutoPtr<FEMap> ap( new FEMap );
+        return ap;
       }
     }
 
@@ -63,7 +63,7 @@ AutoPtr<FEMap> FEMap::build( FEType fe_type )
 
 template<unsigned int Dim>
 void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
-					    const Elem* elem)
+                                            const Elem* elem)
 {
   // Start logging the reference->physical map initialization
   START_LOG("init_reference_to_physical_map()", "FEMap");
@@ -80,7 +80,7 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
   // (Lagrange shape functions are used for mapping)
   const unsigned int n_mapping_shape_functions =
     FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
-					 mapping_order);
+                                         mapping_order);
 
   this->phi_map.resize         (n_mapping_shape_functions);
   if (Dim > 0)
@@ -116,10 +116,10 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
       this->phi_map[i].resize         (n_qp);
       if (Dim > 0)
         {
-	  this->dphidxi_map[i].resize     (n_qp);
+          this->dphidxi_map[i].resize     (n_qp);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	  this->d2phidxi2_map[i].resize     (n_qp);
-	  if (Dim > 1)
+          this->d2phidxi2_map[i].resize     (n_qp);
+          if (Dim > 1)
             {
               this->d2phidxideta_map[i].resize (n_qp);
               this->d2phideta2_map[i].resize (n_qp);
@@ -132,11 +132,11 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
             }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-	  if (Dim > 1)
-	    this->dphideta_map[i].resize  (n_qp);
+          if (Dim > 1)
+            this->dphideta_map[i].resize  (n_qp);
 
-	  if (Dim > 2)
-	    this->dphidzeta_map[i].resize (n_qp);
+          if (Dim > 2)
+            this->dphidzeta_map[i].resize (n_qp);
         }
     }
 
@@ -150,32 +150,32 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
       // 0D
     case 0:
       {
-	for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-	  for (std::size_t p=0; p<n_qp; p++)
-	    this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
+        for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+          for (std::size_t p=0; p<n_qp; p++)
+            this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
 
-	break;
+        break;
       }
 
       //------------------------------------------------------------
       // 1D
     case 1:
       {
-	// Compute the value of the mapping shape function i at quadrature point p
-	// (Lagrange shape functions are used for mapping)
+        // Compute the value of the mapping shape function i at quadrature point p
+        // (Lagrange shape functions are used for mapping)
         if (is_linear)
           {
-	    for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+            for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
-	        this->phi_map[i][0]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[0]);
-	        this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
+                this->phi_map[i][0]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[0]);
+                this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 this->d2phidxi2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	        for (std::size_t p=1; p<n_qp; p++)
+                for (std::size_t p=1; p<n_qp; p++)
                   {
-	            this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
-	            this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
+                    this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
+                    this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                     this->d2phidxi2_map[i][p] = this->d2phidxi2_map[i][0];
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -183,41 +183,41 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
               }
           }
         else
-	  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-	    for (std::size_t p=0; p<n_qp; p++)
-	      {
-	        this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
-	        this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
+          for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+            for (std::size_t p=0; p<n_qp; p++)
+              {
+                this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
+                this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 this->d2phidxi2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	      }
+              }
 
-	break;
+        break;
       }
       //------------------------------------------------------------
       // 2D
     case 2:
       {
-	// Compute the value of the mapping shape function i at quadrature point p
-	// (Lagrange shape functions are used for mapping)
+        // Compute the value of the mapping shape function i at quadrature point p
+        // (Lagrange shape functions are used for mapping)
         if (is_linear)
           {
-	    for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+            for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
-	        this->phi_map[i][0]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[0]);
-	        this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
-	        this->dphideta_map[i][0] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
+                this->phi_map[i][0]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[0]);
+                this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
+                this->dphideta_map[i][0] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 this->d2phidxi2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
                 this->d2phidxideta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
                 this->d2phideta2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 2, qp[0]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	        for (std::size_t p=1; p<n_qp; p++)
+                for (std::size_t p=1; p<n_qp; p++)
                   {
-	            this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
-	            this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
-	            this->dphideta_map[i][p] = this->dphideta_map[i][0];
+                    this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
+                    this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
+                    this->dphideta_map[i][p] = this->dphideta_map[i][0];
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                     this->d2phidxi2_map[i][p] = this->d2phidxi2_map[i][0];
                     this->d2phidxideta_map[i][p] = this->d2phidxideta_map[i][0];
@@ -227,36 +227,36 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
               }
           }
         else
-	  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-	    for (std::size_t p=0; p<n_qp; p++)
-	      {
-	        this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
-	        this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-	        this->dphideta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
+          for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+            for (std::size_t p=0; p<n_qp; p++)
+              {
+                this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
+                this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
+                this->dphideta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 this->d2phidxi2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
                 this->d2phidxideta_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
                 this->d2phideta2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	      }
+              }
 
-	break;
+        break;
       }
 
       //------------------------------------------------------------
       // 3D
     case 3:
       {
-	// Compute the value of the mapping shape function i at quadrature point p
-	// (Lagrange shape functions are used for mapping)
+        // Compute the value of the mapping shape function i at quadrature point p
+        // (Lagrange shape functions are used for mapping)
         if (is_linear)
           {
-	    for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+            for (unsigned int i=0; i<n_mapping_shape_functions; i++)
               {
-	        this->phi_map[i][0]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[0]);
-	        this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
-	        this->dphideta_map[i][0] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
-	        this->dphidzeta_map[i][0] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 2, qp[0]);
+                this->phi_map[i][0]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[0]);
+                this->dphidxi_map[i][0]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
+                this->dphideta_map[i][0] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
+                this->dphidzeta_map[i][0] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 2, qp[0]);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 this->d2phidxi2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
                 this->d2phidxideta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
@@ -265,12 +265,12 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
                 this->d2phidetadzeta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 4, qp[0]);
                 this->d2phidzeta2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 5, qp[0]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	        for (std::size_t p=1; p<n_qp; p++)
+                for (std::size_t p=1; p<n_qp; p++)
                   {
-	            this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
-	            this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
-	            this->dphideta_map[i][p] = this->dphideta_map[i][0];
-	            this->dphidzeta_map[i][p] = this->dphidzeta_map[i][0];
+                    this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
+                    this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
+                    this->dphideta_map[i][p] = this->dphideta_map[i][0];
+                    this->dphidzeta_map[i][p] = this->dphidzeta_map[i][0];
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                     this->d2phidxi2_map[i][p] = this->d2phidxi2_map[i][0];
                     this->d2phidxideta_map[i][p] = this->d2phidxideta_map[i][0];
@@ -283,13 +283,13 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
               }
           }
         else
-	  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-	    for (std::size_t p=0; p<n_qp; p++)
-	      {
-	        this->phi_map[i][p]       = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
-	        this->dphidxi_map[i][p]   = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
-	        this->dphideta_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
-	        this->dphidzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
+          for (unsigned int i=0; i<n_mapping_shape_functions; i++)
+            for (std::size_t p=0; p<n_qp; p++)
+              {
+                this->phi_map[i][p]       = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
+                this->dphidxi_map[i][p]   = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
+                this->dphideta_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
+                this->dphidzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 2, qp[p]);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 this->d2phidxi2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
                 this->d2phidxideta_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[p]);
@@ -298,9 +298,9 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
                 this->d2phidetadzeta_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 4, qp[p]);
                 this->d2phidzeta2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 5, qp[p]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	      }
+              }
 
-	break;
+        break;
       }
 
     default:
@@ -315,9 +315,9 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
 
 
 void FEMap::compute_single_point_map(const unsigned int dim,
-				     const std::vector<Real>& qw,
-				     const Elem* elem,
-				     unsigned int p)
+                                     const std::vector<Real>& qw,
+                                     const Elem* elem,
+                                     unsigned int p)
 {
   libmesh_assert(elem);
 
@@ -327,9 +327,9 @@ void FEMap::compute_single_point_map(const unsigned int dim,
       // 0D
     case 0:
       {
-	xyz[p] = elem->point(0);
+        xyz[p] = elem->point(0);
         jac[p] = 1.0;
-	JxW[p] = qw[p];
+        JxW[p] = qw[p];
         break;
       }
 
@@ -337,72 +337,72 @@ void FEMap::compute_single_point_map(const unsigned int dim,
       // 1D
     case 1:
       {
-	// Clear the entities that will be summed
-	xyz[p].zero();
-	dxyzdxi_map[p].zero();
+        // Clear the entities that will be summed
+        xyz[p].zero();
+        dxyzdxi_map[p].zero();
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	d2xyzdxi2_map[p].zero();
+        d2xyzdxi2_map[p].zero();
 #endif
 
-	// compute x, dx, d2x at the quadrature point
-	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
-	  {
-	    // Reference to the point, helps eliminate
-	    // exessive temporaries in the inner loop
-	    const Point& elem_point = elem->point(i);
+        // compute x, dx, d2x at the quadrature point
+        for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
+          {
+            // Reference to the point, helps eliminate
+            // exessive temporaries in the inner loop
+            const Point& elem_point = elem->point(i);
 
-	    xyz[p].add_scaled          (elem_point, phi_map[i][p]    );
-	    dxyzdxi_map[p].add_scaled  (elem_point, dphidxi_map[i][p]);
+            xyz[p].add_scaled          (elem_point, phi_map[i][p]    );
+            dxyzdxi_map[p].add_scaled  (elem_point, dphidxi_map[i][p]);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	    d2xyzdxi2_map[p].add_scaled(elem_point, d2phidxi2_map[i][p]);
+            d2xyzdxi2_map[p].add_scaled(elem_point, d2phidxi2_map[i][p]);
 #endif
-	  }
+          }
 
-	// Compute the jacobian
-	//
-	// 1D elements can live in 2D or 3D space.
-	// The transformation matrix from local->global
-	// coordinates is
-	//
-	// T = | dx/dxi |
-	//     | dy/dxi |
-	//     | dz/dxi |
-	//
-	// The generalized determinant of T (from the
-	// so-called "normal" eqns.) is
-	// jac = "det(T)" = sqrt(det(T'T))
-	//
-	// where T'= transpose of T, so
-	//
-	// jac = sqrt( (dx/dxi)^2 + (dy/dxi)^2 + (dz/dxi)^2 )
-	jac[p] = dxyzdxi_map[p].size();
+        // Compute the jacobian
+        //
+        // 1D elements can live in 2D or 3D space.
+        // The transformation matrix from local->global
+        // coordinates is
+        //
+        // T = | dx/dxi |
+        //     | dy/dxi |
+        //     | dz/dxi |
+        //
+        // The generalized determinant of T (from the
+        // so-called "normal" eqns.) is
+        // jac = "det(T)" = sqrt(det(T'T))
+        //
+        // where T'= transpose of T, so
+        //
+        // jac = sqrt( (dx/dxi)^2 + (dy/dxi)^2 + (dz/dxi)^2 )
+        jac[p] = dxyzdxi_map[p].size();
 
-	if (jac[p] <= 0.)
-	  {
-	    libMesh::err << "ERROR: negative Jacobian: "
-		          << jac[p]
+        if (jac[p] <= 0.)
+          {
+            libMesh::err << "ERROR: negative Jacobian: "
+                         << jac[p]
                           << " in element "
                           << elem->id()
-		          << std::endl;
-	    libmesh_error();
-	  }
+                         << std::endl;
+            libmesh_error();
+          }
 
-	// The inverse Jacobian entries also come from the
-	// generalized inverse of T (see also the 2D element
-	// living in 3D code).
-	const Real jacm2 = 1./jac[p]/jac[p];
-	dxidx_map[p] = jacm2*dxdxi_map(p);
+        // The inverse Jacobian entries also come from the
+        // generalized inverse of T (see also the 2D element
+        // living in 3D code).
+        const Real jacm2 = 1./jac[p]/jac[p];
+        dxidx_map[p] = jacm2*dxdxi_map(p);
 #if LIBMESH_DIM > 1
-	dxidy_map[p] = jacm2*dydxi_map(p);
+        dxidy_map[p] = jacm2*dydxi_map(p);
 #endif
 #if LIBMESH_DIM > 2
-	dxidz_map[p] = jacm2*dzdxi_map(p);
+        dxidz_map[p] = jacm2*dzdxi_map(p);
 #endif
 
-	JxW[p] = jac[p]*qw[p];
+        JxW[p] = jac[p]*qw[p];
 
-	// done computing the map
-	break;
+        // done computing the map
+        break;
       }
 
 
@@ -410,152 +410,152 @@ void FEMap::compute_single_point_map(const unsigned int dim,
       // 2D
     case 2:
       {
-	//------------------------------------------------------------------
-	// Compute the (x,y) values at the quadrature points,
-	// the Jacobian at the quadrature points
+        //------------------------------------------------------------------
+        // Compute the (x,y) values at the quadrature points,
+        // the Jacobian at the quadrature points
 
-	xyz[p].zero();
+        xyz[p].zero();
 
-	dxyzdxi_map[p].zero();
-	dxyzdeta_map[p].zero();
+        dxyzdxi_map[p].zero();
+        dxyzdeta_map[p].zero();
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	d2xyzdxi2_map[p].zero();
-	d2xyzdxideta_map[p].zero();
-	d2xyzdeta2_map[p].zero();
+        d2xyzdxi2_map[p].zero();
+        d2xyzdxideta_map[p].zero();
+        d2xyzdeta2_map[p].zero();
 #endif
 
 
-	// compute (x,y) at the quadrature points, derivatives once
-	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
-	  {
-	    // Reference to the point, helps eliminate
-	    // exessive temporaries in the inner loop
-	    const Point& elem_point = elem->point(i);
+        // compute (x,y) at the quadrature points, derivatives once
+        for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
+          {
+            // Reference to the point, helps eliminate
+            // exessive temporaries in the inner loop
+            const Point& elem_point = elem->point(i);
 
-	    xyz[p].add_scaled          (elem_point, phi_map[i][p]     );
+            xyz[p].add_scaled          (elem_point, phi_map[i][p]     );
 
-	    dxyzdxi_map[p].add_scaled      (elem_point, dphidxi_map[i][p] );
-	    dxyzdeta_map[p].add_scaled     (elem_point, dphideta_map[i][p]);
+            dxyzdxi_map[p].add_scaled      (elem_point, dphidxi_map[i][p] );
+            dxyzdeta_map[p].add_scaled     (elem_point, dphideta_map[i][p]);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	    d2xyzdxi2_map[p].add_scaled    (elem_point, d2phidxi2_map[i][p]);
-	    d2xyzdxideta_map[p].add_scaled (elem_point, d2phidxideta_map[i][p]);
-	    d2xyzdeta2_map[p].add_scaled   (elem_point, d2phideta2_map[i][p]);
+            d2xyzdxi2_map[p].add_scaled    (elem_point, d2phidxi2_map[i][p]);
+            d2xyzdxideta_map[p].add_scaled (elem_point, d2phidxideta_map[i][p]);
+            d2xyzdeta2_map[p].add_scaled   (elem_point, d2phideta2_map[i][p]);
 #endif
-	  }
+          }
 
-	// compute the jacobian once
-	const Real dx_dxi = dxdxi_map(p),
+        // compute the jacobian once
+        const Real dx_dxi = dxdxi_map(p),
                    dx_deta = dxdeta_map(p),
-	           dy_dxi = dydxi_map(p),
+          dy_dxi = dydxi_map(p),
                    dy_deta = dydeta_map(p);
 
 #if LIBMESH_DIM == 2
-	// Compute the Jacobian.  This assumes the 2D face
-	// lives in 2D space
-	//
-	// Symbolically, the matrix determinant is
-	//
-	//         | dx/dxi  dx/deta |
-	// jac =   | dy/dxi  dy/deta |
-	//
-	// jac = dx/dxi*dy/deta - dx/deta*dy/dxi
-	jac[p] = (dx_dxi*dy_deta - dx_deta*dy_dxi);
+        // Compute the Jacobian.  This assumes the 2D face
+        // lives in 2D space
+        //
+        // Symbolically, the matrix determinant is
+        //
+        //         | dx/dxi  dx/deta |
+        // jac =   | dy/dxi  dy/deta |
+        //
+        // jac = dx/dxi*dy/deta - dx/deta*dy/dxi
+        jac[p] = (dx_dxi*dy_deta - dx_deta*dy_dxi);
 
-	if (jac[p] <= 0.)
-	  {
-	    libMesh::err << "ERROR: negative Jacobian: "
-		          << jac[p]
+        if (jac[p] <= 0.)
+          {
+            libMesh::err << "ERROR: negative Jacobian: "
+                         << jac[p]
                           << " in element "
                           << elem->id()
-		          << std::endl;
-	    libmesh_error();
-	  }
+                         << std::endl;
+            libmesh_error();
+          }
 
-	JxW[p] = jac[p]*qw[p];
+        JxW[p] = jac[p]*qw[p];
 
-	// Compute the shape function derivatives wrt x,y at the
-	// quadrature points
-	const Real inv_jac = 1./jac[p];
+        // Compute the shape function derivatives wrt x,y at the
+        // quadrature points
+        const Real inv_jac = 1./jac[p];
 
-	dxidx_map[p]  =  dy_deta*inv_jac; //dxi/dx  =  (1/J)*dy/deta
-	dxidy_map[p]  = -dx_deta*inv_jac; //dxi/dy  = -(1/J)*dx/deta
-	detadx_map[p] = -dy_dxi* inv_jac; //deta/dx = -(1/J)*dy/dxi
-	detady_map[p] =  dx_dxi* inv_jac; //deta/dy =  (1/J)*dx/dxi
+        dxidx_map[p]  =  dy_deta*inv_jac; //dxi/dx  =  (1/J)*dy/deta
+        dxidy_map[p]  = -dx_deta*inv_jac; //dxi/dy  = -(1/J)*dx/deta
+        detadx_map[p] = -dy_dxi* inv_jac; //deta/dx = -(1/J)*dy/dxi
+        detady_map[p] =  dx_dxi* inv_jac; //deta/dy =  (1/J)*dx/dxi
 
-	dxidz_map[p] = detadz_map[p] = 0.;
+        dxidz_map[p] = detadz_map[p] = 0.;
 #else
 
-	const Real dz_dxi = dzdxi_map(p),
+        const Real dz_dxi = dzdxi_map(p),
                    dz_deta = dzdeta_map(p);
 
-	// Compute the Jacobian.  This assumes a 2D face in
-	// 3D space.
-	//
-	// The transformation matrix T from local to global
-	// coordinates is
-	//
-	//         | dx/dxi  dx/deta |
-	//     T = | dy/dxi  dy/deta |
-	//         | dz/dxi  dz/deta |
-	// note det(T' T) = det(T')det(T) = det(T)det(T)
-	// so det(T) = std::sqrt(det(T' T))
-	//
-	//----------------------------------------------
-	// Notes:
-	//
-	//       dX = R dXi -> R'dX = R'R dXi
-	// (R^-1)dX =   dXi    [(R'R)^-1 R']dX = dXi
-	//
-	// so R^-1 = (R'R)^-1 R'
-	//
-	// and R^-1 R = (R'R)^-1 R'R = I.
-	//
-	const Real g11 = (dx_dxi*dx_dxi +
-			  dy_dxi*dy_dxi +
-			  dz_dxi*dz_dxi);
+        // Compute the Jacobian.  This assumes a 2D face in
+        // 3D space.
+        //
+        // The transformation matrix T from local to global
+        // coordinates is
+        //
+        //         | dx/dxi  dx/deta |
+        //     T = | dy/dxi  dy/deta |
+        //         | dz/dxi  dz/deta |
+        // note det(T' T) = det(T')det(T) = det(T)det(T)
+        // so det(T) = std::sqrt(det(T' T))
+        //
+        //----------------------------------------------
+        // Notes:
+        //
+        //       dX = R dXi -> R'dX = R'R dXi
+        // (R^-1)dX =   dXi    [(R'R)^-1 R']dX = dXi
+        //
+        // so R^-1 = (R'R)^-1 R'
+        //
+        // and R^-1 R = (R'R)^-1 R'R = I.
+        //
+        const Real g11 = (dx_dxi*dx_dxi +
+                          dy_dxi*dy_dxi +
+                          dz_dxi*dz_dxi);
 
-	const Real g12 = (dx_dxi*dx_deta +
-			  dy_dxi*dy_deta +
-			  dz_dxi*dz_deta);
+        const Real g12 = (dx_dxi*dx_deta +
+                          dy_dxi*dy_deta +
+                          dz_dxi*dz_deta);
 
-	const Real g21 = g12;
+        const Real g21 = g12;
 
-	const Real g22 = (dx_deta*dx_deta +
-			  dy_deta*dy_deta +
-			  dz_deta*dz_deta);
+        const Real g22 = (dx_deta*dx_deta +
+                          dy_deta*dy_deta +
+                          dz_deta*dz_deta);
 
-	const Real det = (g11*g22 - g12*g21);
+        const Real det = (g11*g22 - g12*g21);
 
-	if (det <= 0.)
-	  {
-	    libMesh::err << "ERROR: negative Jacobian! "
+        if (det <= 0.)
+          {
+            libMesh::err << "ERROR: negative Jacobian! "
                           << " in element "
                           << elem->id()
-		          << std::endl;
-	    libmesh_error();
-	  }
+                         << std::endl;
+            libmesh_error();
+          }
 
-	const Real inv_det = 1./det;
-	jac[p] = std::sqrt(det);
+        const Real inv_det = 1./det;
+        jac[p] = std::sqrt(det);
 
-	JxW[p] = jac[p]*qw[p];
+        JxW[p] = jac[p]*qw[p];
 
-	const Real g11inv =  g22*inv_det;
-	const Real g12inv = -g12*inv_det;
-	const Real g21inv = -g21*inv_det;
-	const Real g22inv =  g11*inv_det;
+        const Real g11inv =  g22*inv_det;
+        const Real g12inv = -g12*inv_det;
+        const Real g21inv = -g21*inv_det;
+        const Real g22inv =  g11*inv_det;
 
-	dxidx_map[p]  = g11inv*dx_dxi + g12inv*dx_deta;
-	dxidy_map[p]  = g11inv*dy_dxi + g12inv*dy_deta;
-	dxidz_map[p]  = g11inv*dz_dxi + g12inv*dz_deta;
+        dxidx_map[p]  = g11inv*dx_dxi + g12inv*dx_deta;
+        dxidy_map[p]  = g11inv*dy_dxi + g12inv*dy_deta;
+        dxidz_map[p]  = g11inv*dz_dxi + g12inv*dz_deta;
 
-	detadx_map[p] = g21inv*dx_dxi + g22inv*dx_deta;
-	detady_map[p] = g21inv*dy_dxi + g22inv*dy_deta;
-	detadz_map[p] = g21inv*dz_dxi + g22inv*dz_deta;
+        detadx_map[p] = g21inv*dx_dxi + g22inv*dx_deta;
+        detady_map[p] = g21inv*dy_dxi + g22inv*dy_deta;
+        detadz_map[p] = g21inv*dz_dxi + g22inv*dz_deta;
 
 #endif
-	// done computing the map
-	break;
+        // done computing the map
+        break;
       }
 
 
@@ -564,105 +564,105 @@ void FEMap::compute_single_point_map(const unsigned int dim,
       // 3D
     case 3:
       {
-	//------------------------------------------------------------------
-	// Compute the (x,y,z) values at the quadrature points,
-	// the Jacobian at the quadrature point
+        //------------------------------------------------------------------
+        // Compute the (x,y,z) values at the quadrature points,
+        // the Jacobian at the quadrature point
 
-	// Clear the entities that will be summed
-	xyz[p].zero           ();
-	dxyzdxi_map[p].zero   ();
-	dxyzdeta_map[p].zero  ();
-	dxyzdzeta_map[p].zero ();
+        // Clear the entities that will be summed
+        xyz[p].zero           ();
+        dxyzdxi_map[p].zero   ();
+        dxyzdeta_map[p].zero  ();
+        dxyzdzeta_map[p].zero ();
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	d2xyzdxi2_map[p].zero();
-	d2xyzdxideta_map[p].zero();
-	d2xyzdxidzeta_map[p].zero();
-	d2xyzdeta2_map[p].zero();
-	d2xyzdetadzeta_map[p].zero();
-	d2xyzdzeta2_map[p].zero();
+        d2xyzdxi2_map[p].zero();
+        d2xyzdxideta_map[p].zero();
+        d2xyzdxidzeta_map[p].zero();
+        d2xyzdeta2_map[p].zero();
+        d2xyzdetadzeta_map[p].zero();
+        d2xyzdzeta2_map[p].zero();
 #endif
 
 
-	// compute (x,y,z) at the quadrature points,
+        // compute (x,y,z) at the quadrature points,
         // dxdxi,   dydxi,   dzdxi,
-	// dxdeta,  dydeta,  dzdeta,
-	// dxdzeta, dydzeta, dzdzeta  all once
-	for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
-	  {
-	    // Reference to the point, helps eliminate
-	    // exessive temporaries in the inner loop
-	    const Point& elem_point = elem->point(i);
+        // dxdeta,  dydeta,  dzdeta,
+        // dxdzeta, dydzeta, dzdzeta  all once
+        for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
+          {
+            // Reference to the point, helps eliminate
+            // exessive temporaries in the inner loop
+            const Point& elem_point = elem->point(i);
 
-	    xyz[p].add_scaled           (elem_point, phi_map[i][p]      );
-	    dxyzdxi_map[p].add_scaled   (elem_point, dphidxi_map[i][p]  );
-	    dxyzdeta_map[p].add_scaled  (elem_point, dphideta_map[i][p] );
-	    dxyzdzeta_map[p].add_scaled (elem_point, dphidzeta_map[i][p]);
+            xyz[p].add_scaled           (elem_point, phi_map[i][p]      );
+            dxyzdxi_map[p].add_scaled   (elem_point, dphidxi_map[i][p]  );
+            dxyzdeta_map[p].add_scaled  (elem_point, dphideta_map[i][p] );
+            dxyzdzeta_map[p].add_scaled (elem_point, dphidzeta_map[i][p]);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	    d2xyzdxi2_map[p].add_scaled      (elem_point,
-					       d2phidxi2_map[i][p]);
-	    d2xyzdxideta_map[p].add_scaled   (elem_point,
-					       d2phidxideta_map[i][p]);
-	    d2xyzdxidzeta_map[p].add_scaled  (elem_point,
-					       d2phidxidzeta_map[i][p]);
-	    d2xyzdeta2_map[p].add_scaled     (elem_point,
-					       d2phideta2_map[i][p]);
-	    d2xyzdetadzeta_map[p].add_scaled (elem_point,
-					       d2phidetadzeta_map[i][p]);
-	    d2xyzdzeta2_map[p].add_scaled    (elem_point,
-					       d2phidzeta2_map[i][p]);
+            d2xyzdxi2_map[p].add_scaled      (elem_point,
+                                              d2phidxi2_map[i][p]);
+            d2xyzdxideta_map[p].add_scaled   (elem_point,
+                                              d2phidxideta_map[i][p]);
+            d2xyzdxidzeta_map[p].add_scaled  (elem_point,
+                                              d2phidxidzeta_map[i][p]);
+            d2xyzdeta2_map[p].add_scaled     (elem_point,
+                                              d2phideta2_map[i][p]);
+            d2xyzdetadzeta_map[p].add_scaled (elem_point,
+                                              d2phidetadzeta_map[i][p]);
+            d2xyzdzeta2_map[p].add_scaled    (elem_point,
+                                              d2phidzeta2_map[i][p]);
 #endif
-	  }
+          }
 
-	// compute the jacobian
-	const Real
-	  dx_dxi   = dxdxi_map(p),   dy_dxi   = dydxi_map(p),   dz_dxi   = dzdxi_map(p),
-	  dx_deta  = dxdeta_map(p),  dy_deta  = dydeta_map(p),  dz_deta  = dzdeta_map(p),
-	  dx_dzeta = dxdzeta_map(p), dy_dzeta = dydzeta_map(p), dz_dzeta = dzdzeta_map(p);
+        // compute the jacobian
+        const Real
+          dx_dxi   = dxdxi_map(p),   dy_dxi   = dydxi_map(p),   dz_dxi   = dzdxi_map(p),
+          dx_deta  = dxdeta_map(p),  dy_deta  = dydeta_map(p),  dz_deta  = dzdeta_map(p),
+          dx_dzeta = dxdzeta_map(p), dy_dzeta = dydzeta_map(p), dz_dzeta = dzdzeta_map(p);
 
-	// Symbolically, the matrix determinant is
-	//
-	//         | dx/dxi   dy/dxi   dz/dxi   |
-	// jac =   | dx/deta  dy/deta  dz/deta  |
-	//         | dx/dzeta dy/dzeta dz/dzeta |
-	//
-	// jac = dx/dxi*(dy/deta*dz/dzeta - dz/deta*dy/dzeta) +
-	//       dy/dxi*(dz/deta*dx/dzeta - dx/deta*dz/dzeta) +
-	//       dz/dxi*(dx/deta*dy/dzeta - dy/deta*dx/dzeta)
+        // Symbolically, the matrix determinant is
+        //
+        //         | dx/dxi   dy/dxi   dz/dxi   |
+        // jac =   | dx/deta  dy/deta  dz/deta  |
+        //         | dx/dzeta dy/dzeta dz/dzeta |
+        //
+        // jac = dx/dxi*(dy/deta*dz/dzeta - dz/deta*dy/dzeta) +
+        //       dy/dxi*(dz/deta*dx/dzeta - dx/deta*dz/dzeta) +
+        //       dz/dxi*(dx/deta*dy/dzeta - dy/deta*dx/dzeta)
 
-	jac[p] = (dx_dxi*(dy_deta*dz_dzeta - dz_deta*dy_dzeta)  +
-		  dy_dxi*(dz_deta*dx_dzeta - dx_deta*dz_dzeta)  +
-		  dz_dxi*(dx_deta*dy_dzeta - dy_deta*dx_dzeta));
+        jac[p] = (dx_dxi*(dy_deta*dz_dzeta - dz_deta*dy_dzeta)  +
+                  dy_dxi*(dz_deta*dx_dzeta - dx_deta*dz_dzeta)  +
+                  dz_dxi*(dx_deta*dy_dzeta - dy_deta*dx_dzeta));
 
-	if (jac[p] <= 0.)
-	  {
-	    libMesh::err << "ERROR: negative Jacobian: "
-		          << jac[p]
+        if (jac[p] <= 0.)
+          {
+            libMesh::err << "ERROR: negative Jacobian: "
+                         << jac[p]
                           << " in element "
                           << elem->id()
-		          << std::endl;
-	    libmesh_error();
-	  }
+                         << std::endl;
+            libmesh_error();
+          }
 
-	JxW[p] = jac[p]*qw[p];
+        JxW[p] = jac[p]*qw[p];
 
-	    // Compute the shape function derivatives wrt x,y at the
-	    // quadrature points
-	const Real inv_jac  = 1./jac[p];
+        // Compute the shape function derivatives wrt x,y at the
+        // quadrature points
+        const Real inv_jac  = 1./jac[p];
 
-	dxidx_map[p]   = (dy_deta*dz_dzeta - dz_deta*dy_dzeta)*inv_jac;
-	dxidy_map[p]   = (dz_deta*dx_dzeta - dx_deta*dz_dzeta)*inv_jac;
-	dxidz_map[p]   = (dx_deta*dy_dzeta - dy_deta*dx_dzeta)*inv_jac;
+        dxidx_map[p]   = (dy_deta*dz_dzeta - dz_deta*dy_dzeta)*inv_jac;
+        dxidy_map[p]   = (dz_deta*dx_dzeta - dx_deta*dz_dzeta)*inv_jac;
+        dxidz_map[p]   = (dx_deta*dy_dzeta - dy_deta*dx_dzeta)*inv_jac;
 
-	detadx_map[p]  = (dz_dxi*dy_dzeta  - dy_dxi*dz_dzeta )*inv_jac;
-	detady_map[p]  = (dx_dxi*dz_dzeta  - dz_dxi*dx_dzeta )*inv_jac;
-	detadz_map[p]  = (dy_dxi*dx_dzeta  - dx_dxi*dy_dzeta )*inv_jac;
+        detadx_map[p]  = (dz_dxi*dy_dzeta  - dy_dxi*dz_dzeta )*inv_jac;
+        detady_map[p]  = (dx_dxi*dz_dzeta  - dz_dxi*dx_dzeta )*inv_jac;
+        detadz_map[p]  = (dy_dxi*dx_dzeta  - dx_dxi*dy_dzeta )*inv_jac;
 
-	dzetadx_map[p] = (dy_dxi*dz_deta   - dz_dxi*dy_deta  )*inv_jac;
-	dzetady_map[p] = (dz_dxi*dx_deta   - dx_dxi*dz_deta  )*inv_jac;
-	dzetadz_map[p] = (dx_dxi*dy_deta   - dy_dxi*dx_deta  )*inv_jac;
+        dzetadx_map[p] = (dy_dxi*dz_deta   - dz_dxi*dy_deta  )*inv_jac;
+        dzetady_map[p] = (dz_dxi*dx_deta   - dx_dxi*dz_deta  )*inv_jac;
+        dzetadz_map[p] = (dx_dxi*dy_deta   - dy_dxi*dx_deta  )*inv_jac;
 
-	// done computing the map
-	break;
+        // done computing the map
+        break;
       }
 
     default:
@@ -714,8 +714,8 @@ void FEMap::resize_quadrature_map_vectors(const unsigned int dim, unsigned int n
 
 
 void FEMap::compute_affine_map( const unsigned int dim,
-				const std::vector<Real>& qw,
-				const Elem* elem )
+                                const std::vector<Real>& qw,
+                                const Elem* elem )
 {
    // Start logging the map computation.
   START_LOG("compute_affine_map()", "FEMap");
@@ -782,8 +782,8 @@ void FEMap::compute_affine_map( const unsigned int dim,
 
 
 void FEMap::compute_map(const unsigned int dim,
-			const std::vector<Real>& qw,
-			const Elem* elem)
+                        const std::vector<Real>& qw,
+                        const Elem* elem)
 {
   if (elem->has_affine_map())
     {
@@ -830,9 +830,9 @@ void FEMap::print_xyz(std::ostream& os) const
 // TODO: PB: We should consider moving this to the FEMap class
 template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::inverse_map (const Elem* elem,
-			      const Point& physical_point,
-			      const Real tolerance,
-			      const bool secure)
+                              const Point& physical_point,
+                              const Real tolerance,
+                              const bool secure)
 {
   libmesh_assert(elem);
   libmesh_assert_greater_equal (tolerance, 0.);
@@ -884,202 +884,202 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       //  The form of the map and how we invert it depends
       //  on the dimension that we are in.
       switch (Dim)
-	{
-	  // ------------------------------------------------------------------
-	  //  0D map inversion is trivial
+        {
+          // ------------------------------------------------------------------
+          //  0D map inversion is trivial
         case 0:
           {
             break;
           }
 
-	  // ------------------------------------------------------------------
-	  //  1D map inversion
-	  //
-	  //  Here we find the point on a 1D reference element that maps to
-	  //  the point \p physical_point in the domain.  This is a bit tricky
-	  //  since we do not want to assume that the point \p physical_point
-	  //  is also in a 1D domain.  In particular, this method might get
-	  //  called on the edge of a 3D element, in which case
-	  //  \p physical_point actually lives in 3D.
-	case 1:
-	  {
-	    const Point dxi = FE<Dim,T>::map_xi (elem, p);
+          // ------------------------------------------------------------------
+          //  1D map inversion
+          //
+          //  Here we find the point on a 1D reference element that maps to
+          //  the point \p physical_point in the domain.  This is a bit tricky
+          //  since we do not want to assume that the point \p physical_point
+          //  is also in a 1D domain.  In particular, this method might get
+          //  called on the edge of a 3D element, in which case
+          //  \p physical_point actually lives in 3D.
+        case 1:
+          {
+            const Point dxi = FE<Dim,T>::map_xi (elem, p);
 
-	    //  Newton's method in this case looks like
-	    //
-	    //  {X} - {X_n} = [J]*dp
-	    //
-	    //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x1 matrix
-	    //  d(x,y,z)/dxi, and we seek dp, a scalar.  Since the above
-	    //  system is either overdetermined or rank-deficient, we will
-	    //  solve the normal equations for this system
-	    //
-	    //  [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
-	    //
-	    //  which involves the trivial inversion of the scalar
-	    //  G = [J]^T [J]
-	    const Real G = dxi*dxi;
+            //  Newton's method in this case looks like
+            //
+            //  {X} - {X_n} = [J]*dp
+            //
+            //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x1 matrix
+            //  d(x,y,z)/dxi, and we seek dp, a scalar.  Since the above
+            //  system is either overdetermined or rank-deficient, we will
+            //  solve the normal equations for this system
+            //
+            //  [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
+            //
+            //  which involves the trivial inversion of the scalar
+            //  G = [J]^T [J]
+            const Real G = dxi*dxi;
 
-	    if (secure)
-	      libmesh_assert_greater (G, 0.);
+            if (secure)
+              libmesh_assert_greater (G, 0.);
 
-	    const Real Ginv = 1./G;
+            const Real Ginv = 1./G;
 
-	    const Real  dxidelta = dxi*delta;
+            const Real  dxidelta = dxi*delta;
 
-	    dp(0) = Ginv*dxidelta;
-
-            // No master elements have radius > 4, but sometimes we
-            // can take a step that big while still converging
-	    // if (secure)
-	      // libmesh_assert_less (dp.size(), max_step_length);
-
-	    break;
-	  }
-
-
-
-	  // ------------------------------------------------------------------
-	  //  2D map inversion
-	  //
-	  //  Here we find the point on a 2D reference element that maps to
-	  //  the point \p physical_point in the domain.  This is a bit tricky
-	  //  since we do not want to assume that the point \p physical_point
-	  //  is also in a 2D domain.  In particular, this method might get
-	  //  called on the face of a 3D element, in which case
-	  //  \p physical_point actually lives in 3D.
-	case 2:
-	  {
-	    const Point dxi  = FE<Dim,T>::map_xi  (elem, p);
-	    const Point deta = FE<Dim,T>::map_eta (elem, p);
-
-	    //  Newton's method in this case looks like
-	    //
-	    //  {X} - {X_n} = [J]*{dp}
-	    //
-	    //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x2 matrix
-	    //  d(x,y,z)/d(xi,eta), and we seek {dp}, a 2x1 vector.  Since
-	    //  the above system is either overdermined or rank-deficient,
-	    //  we will solve the normal equations for this system
-	    //
-	    //  [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
-	    //
-	    //  which involves the inversion of the 2x2 matrix
-	    //  [G] = [J]^T [J]
-	    const Real
-	      G11 = dxi*dxi,  G12 = dxi*deta,
-	      G21 = dxi*deta, G22 = deta*deta;
-
-
-	    const Real det = (G11*G22 - G12*G21);
-
-	    if (secure)
-	      libmesh_assert_not_equal_to (det, 0.);
-
-	    const Real inv_det = 1./det;
-
-	    const Real
-	      Ginv11 =  G22*inv_det,
-	      Ginv12 = -G12*inv_det,
-
-	      Ginv21 = -G21*inv_det,
-	      Ginv22 =  G11*inv_det;
-
-
-	    const Real  dxidelta  = dxi*delta;
-	    const Real  detadelta = deta*delta;
-
-	    dp(0) = (Ginv11*dxidelta + Ginv12*detadelta);
-	    dp(1) = (Ginv21*dxidelta + Ginv22*detadelta);
+            dp(0) = Ginv*dxidelta;
 
             // No master elements have radius > 4, but sometimes we
             // can take a step that big while still converging
-	    // if (secure)
-	      // libmesh_assert_less (dp.size(), max_step_length);
+            // if (secure)
+            // libmesh_assert_less (dp.size(), max_step_length);
 
-	    break;
-	  }
+            break;
+          }
 
 
 
-	  // ------------------------------------------------------------------
-	  //  3D map inversion
-	  //
-	  //  Here we find the point in a 3D reference element that maps to
-	  //  the point \p physical_point in a 3D domain. Nothing special
-	  //  has to happen here, since (unless the map is singular because
-	  //  you have a BAD element) the map will be invertable and we can
-	  //  apply Newton's method directly.
-	case 3:
-	  {
-       	    const Point dxi   = FE<Dim,T>::map_xi   (elem, p);
-	    const Point deta  = FE<Dim,T>::map_eta  (elem, p);
-	    const Point dzeta = FE<Dim,T>::map_zeta (elem, p);
+          // ------------------------------------------------------------------
+          //  2D map inversion
+          //
+          //  Here we find the point on a 2D reference element that maps to
+          //  the point \p physical_point in the domain.  This is a bit tricky
+          //  since we do not want to assume that the point \p physical_point
+          //  is also in a 2D domain.  In particular, this method might get
+          //  called on the face of a 3D element, in which case
+          //  \p physical_point actually lives in 3D.
+        case 2:
+          {
+            const Point dxi  = FE<Dim,T>::map_xi  (elem, p);
+            const Point deta = FE<Dim,T>::map_eta (elem, p);
 
-	    //  Newton's method in this case looks like
-	    //
-	    //  {X} = {X_n} + [J]*{dp}
-	    //
-	    //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x3 matrix
-	    //  d(x,y,z)/d(xi,eta,zeta), and we seek {dp}, a 3x1 vector.
-	    //  Since the above system is nonsingular for invertable maps
-	    //  we will solve
-	    //
-	    //  {dp} = [J]^-1 ({X} - {X_n})
-	    //
-	    //  which involves the inversion of the 3x3 matrix [J]
-	    const Real
-	      J11 = dxi(0), J12 = deta(0), J13 = dzeta(0),
-	      J21 = dxi(1), J22 = deta(1), J23 = dzeta(1),
-	      J31 = dxi(2), J32 = deta(2), J33 = dzeta(2);
+            //  Newton's method in this case looks like
+            //
+            //  {X} - {X_n} = [J]*{dp}
+            //
+            //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x2 matrix
+            //  d(x,y,z)/d(xi,eta), and we seek {dp}, a 2x1 vector.  Since
+            //  the above system is either overdermined or rank-deficient,
+            //  we will solve the normal equations for this system
+            //
+            //  [J]^T ({X} - {X_n}) = [J]^T [J] {dp}
+            //
+            //  which involves the inversion of the 2x2 matrix
+            //  [G] = [J]^T [J]
+            const Real
+              G11 = dxi*dxi,  G12 = dxi*deta,
+              G21 = dxi*deta, G22 = deta*deta;
 
-	    const Real det = (J11*(J22*J33 - J23*J32) +
-			      J12*(J23*J31 - J21*J33) +
-			      J13*(J21*J32 - J22*J31));
 
-	    if (secure)
-	      libmesh_assert_not_equal_to (det, 0.);
+            const Real det = (G11*G22 - G12*G21);
 
-	    const Real inv_det = 1./det;
+            if (secure)
+              libmesh_assert_not_equal_to (det, 0.);
 
-	    const Real
-	      Jinv11 =  (J22*J33 - J23*J32)*inv_det,
-	      Jinv12 = -(J12*J33 - J13*J32)*inv_det,
-	      Jinv13 =  (J12*J23 - J13*J22)*inv_det,
+            const Real inv_det = 1./det;
 
-	      Jinv21 = -(J21*J33 - J23*J31)*inv_det,
-	      Jinv22 =  (J11*J33 - J13*J31)*inv_det,
-	      Jinv23 = -(J11*J23 - J13*J21)*inv_det,
+            const Real
+              Ginv11 =  G22*inv_det,
+              Ginv12 = -G12*inv_det,
 
-	      Jinv31 =  (J21*J32 - J22*J31)*inv_det,
-	      Jinv32 = -(J11*J32 - J12*J31)*inv_det,
-	      Jinv33 =  (J11*J22 - J12*J21)*inv_det;
+              Ginv21 = -G21*inv_det,
+              Ginv22 =  G11*inv_det;
 
-	    dp(0) = (Jinv11*delta(0) +
-		     Jinv12*delta(1) +
-		     Jinv13*delta(2));
 
-	    dp(1) = (Jinv21*delta(0) +
-		     Jinv22*delta(1) +
-		     Jinv23*delta(2));
+            const Real  dxidelta  = dxi*delta;
+            const Real  detadelta = deta*delta;
 
-	    dp(2) = (Jinv31*delta(0) +
-		     Jinv32*delta(1) +
-		     Jinv33*delta(2));
+            dp(0) = (Ginv11*dxidelta + Ginv12*detadelta);
+            dp(1) = (Ginv21*dxidelta + Ginv22*detadelta);
 
             // No master elements have radius > 4, but sometimes we
             // can take a step that big while still converging
-	    // if (secure)
-	      // libmesh_assert_less (dp.size(), max_step_length);
+            // if (secure)
+            // libmesh_assert_less (dp.size(), max_step_length);
 
-	    break;
-	  }
+            break;
+          }
 
 
-	  //  Some other dimension?
-	default:
-	  libmesh_error();
-	} // end switch(Dim), dp now computed
+
+          // ------------------------------------------------------------------
+          //  3D map inversion
+          //
+          //  Here we find the point in a 3D reference element that maps to
+          //  the point \p physical_point in a 3D domain. Nothing special
+          //  has to happen here, since (unless the map is singular because
+          //  you have a BAD element) the map will be invertable and we can
+          //  apply Newton's method directly.
+        case 3:
+          {
+            const Point dxi   = FE<Dim,T>::map_xi   (elem, p);
+            const Point deta  = FE<Dim,T>::map_eta  (elem, p);
+            const Point dzeta = FE<Dim,T>::map_zeta (elem, p);
+
+            //  Newton's method in this case looks like
+            //
+            //  {X} = {X_n} + [J]*{dp}
+            //
+            //  Where {X}, {X_n} are 3x1 vectors, [J] is a 3x3 matrix
+            //  d(x,y,z)/d(xi,eta,zeta), and we seek {dp}, a 3x1 vector.
+            //  Since the above system is nonsingular for invertable maps
+            //  we will solve
+            //
+            //  {dp} = [J]^-1 ({X} - {X_n})
+            //
+            //  which involves the inversion of the 3x3 matrix [J]
+            const Real
+              J11 = dxi(0), J12 = deta(0), J13 = dzeta(0),
+              J21 = dxi(1), J22 = deta(1), J23 = dzeta(1),
+              J31 = dxi(2), J32 = deta(2), J33 = dzeta(2);
+
+            const Real det = (J11*(J22*J33 - J23*J32) +
+                              J12*(J23*J31 - J21*J33) +
+                              J13*(J21*J32 - J22*J31));
+
+            if (secure)
+              libmesh_assert_not_equal_to (det, 0.);
+
+            const Real inv_det = 1./det;
+
+            const Real
+              Jinv11 =  (J22*J33 - J23*J32)*inv_det,
+              Jinv12 = -(J12*J33 - J13*J32)*inv_det,
+              Jinv13 =  (J12*J23 - J13*J22)*inv_det,
+
+              Jinv21 = -(J21*J33 - J23*J31)*inv_det,
+              Jinv22 =  (J11*J33 - J13*J31)*inv_det,
+              Jinv23 = -(J11*J23 - J13*J21)*inv_det,
+
+              Jinv31 =  (J21*J32 - J22*J31)*inv_det,
+              Jinv32 = -(J11*J32 - J12*J31)*inv_det,
+              Jinv33 =  (J11*J22 - J12*J21)*inv_det;
+
+            dp(0) = (Jinv11*delta(0) +
+                     Jinv12*delta(1) +
+                     Jinv13*delta(2));
+
+            dp(1) = (Jinv21*delta(0) +
+                     Jinv22*delta(1) +
+                     Jinv23*delta(2));
+
+            dp(2) = (Jinv31*delta(0) +
+                     Jinv32*delta(1) +
+                     Jinv33*delta(2));
+
+            // No master elements have radius > 4, but sometimes we
+            // can take a step that big while still converging
+            // if (secure)
+            // libmesh_assert_less (dp.size(), max_step_length);
+
+            break;
+          }
+
+
+          //  Some other dimension?
+        default:
+          libmesh_error();
+        } // end switch(Dim), dp now computed
 
 
 
@@ -1105,65 +1105,65 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       //      For these cases if we have not converged in 10 iterations forget
       //      about it.
       if (cnt > max_cnt)
-	{
-	  //  Warn about divergence when secure is true - this
-	  //  shouldn't happen
-	  if (secure)
-	    {
-	      // Print every time in devel/dbg modes
+        {
+          //  Warn about divergence when secure is true - this
+          //  shouldn't happen
+          if (secure)
+            {
+              // Print every time in devel/dbg modes
 #ifndef NDEBUG
-	      libmesh_here();
-	      libMesh::err << "WARNING: Newton scheme has not converged in "
-			    << cnt << " iterations:" << std::endl
-			    << "   physical_point="
-			    << physical_point
-			    << "   physical_guess="
-			    << physical_guess
-			    << "   dp="
-			    << dp
-			    << "   p="
-			    << p
-			    << "   error=" << inverse_map_error
+              libmesh_here();
+              libMesh::err << "WARNING: Newton scheme has not converged in "
+                           << cnt << " iterations:" << std::endl
+                           << "   physical_point="
+                           << physical_point
+                           << "   physical_guess="
+                           << physical_guess
+                           << "   dp="
+                           << dp
+                           << "   p="
+                           << p
+                           << "   error=" << inverse_map_error
                             << "   in element " << elem->id()
-			    << std::endl;
+                           << std::endl;
 
               elem->print_info(libMesh::err);
 #else
-	      // In optimized mode, just print once that an inverse_map() call
-	      // had trouble converging its Newton iteration.
-	      libmesh_do_once(libMesh::err << "WARNING: At least one element took more than "
-			      << max_cnt
-			      << " iterations to converge in inverse_map()...\n"
-			      << "Rerun in devel/dbg mode for more details."
-			      << std::endl;);
+              // In optimized mode, just print once that an inverse_map() call
+              // had trouble converging its Newton iteration.
+              libmesh_do_once(libMesh::err << "WARNING: At least one element took more than "
+                              << max_cnt
+                              << " iterations to converge in inverse_map()...\n"
+                              << "Rerun in devel/dbg mode for more details."
+                              << std::endl;);
 
 #endif // NDEBUG
 
-	      if (cnt > 2*max_cnt)
-		{
-		  libMesh::err << "ERROR: Newton scheme FAILED to converge in "
-			        << cnt
-			        << " iterations!"
+              if (cnt > 2*max_cnt)
+                {
+                  libMesh::err << "ERROR: Newton scheme FAILED to converge in "
+                               << cnt
+                               << " iterations!"
                                 << " in element " << elem->id()
-			        << std::endl;
+                               << std::endl;
 
                   elem->print_info(libMesh::err);
 
-		  libmesh_error();
-		}
-	    }
-	  //  Return a far off point when secure is false - this
-	  //  should only happen when we're trying to map a point
-	  //  that's outside the element
-	  else
-	    {
-	      for (unsigned int i=0; i != Dim; ++i)
-		p(i) = 1e6;
+                  libmesh_error();
+                }
+            }
+          //  Return a far off point when secure is false - this
+          //  should only happen when we're trying to map a point
+          //  that's outside the element
+          else
+            {
+              for (unsigned int i=0; i != Dim; ++i)
+                p(i) = 1e6;
 
-	      STOP_LOG("inverse_map()", "FE");
-	      return p;
-	    }
-	}
+              STOP_LOG("inverse_map()", "FE");
+              return p;
+            }
+        }
     }
   while (inverse_map_error > tolerance);
 
@@ -1181,30 +1181,30 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
       const Point diff  = physical_point - check;
 
       if (diff.size() > tolerance)
-	{
-	  libmesh_here();
-	  libMesh::err << "WARNING:  diff is "
-		        << diff.size()
-		        << std::endl
-		        << " point="
-		        << physical_point;
-	  libMesh::err << " local=" << check;
-	  libMesh::err << " lref= " << p;
+        {
+          libmesh_here();
+          libMesh::err << "WARNING:  diff is "
+                       << diff.size()
+                       << std::endl
+                       << " point="
+                       << physical_point;
+          libMesh::err << " local=" << check;
+          libMesh::err << " lref= " << p;
 
           elem->print_info(libMesh::err);
-	}
+        }
 
       // Make sure the point \p p on the reference element actually
       // is
 
       if (!FEAbstract::on_reference_element(p, elem->type(), 2*tolerance))
         {
-	  libmesh_here();
-	  libMesh::err << "WARNING:  inverse_map of physical point "
-		       << physical_point
-		       << "is not on element." << '\n';
+          libmesh_here();
+          libMesh::err << "WARNING:  inverse_map of physical point "
+                       << physical_point
+                       << "is not on element." << '\n';
           elem->print_info(libMesh::err);
-	}
+        }
     }
 
 #endif
@@ -1222,10 +1222,10 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 // TODO: PB: We should consider moving this to the FEMap class
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::inverse_map (const Elem* elem,
-			     const std::vector<Point>& physical_points,
-			     std::vector<Point>&       reference_points,
-			     const Real tolerance,
-			     const bool secure)
+                             const std::vector<Point>& physical_points,
+                             std::vector<Point>&       reference_points,
+                             const Real tolerance,
+                             const bool secure)
 {
   // The number of points to find the
   // inverse map of
@@ -1247,7 +1247,7 @@ void FE<Dim,T>::inverse_map (const Elem* elem,
 // TODO: PB: We should consider moving this to the FEMap class
 template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map (const Elem* elem,
-		      const Point& reference_point)
+                      const Point& reference_point)
 {
   libmesh_assert(elem);
 
@@ -1260,11 +1260,11 @@ Point FE<Dim,T>::map (const Elem* elem,
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
     p.add_scaled (elem->point(i),
-		  FE<Dim,LAGRANGE>::shape(type,
-					  order,
-					  i,
-					  reference_point)
-		  );
+                  FE<Dim,LAGRANGE>::shape(type,
+                                          order,
+                                          i,
+                                          reference_point)
+                  );
 
   return p;
 }
@@ -1274,7 +1274,7 @@ Point FE<Dim,T>::map (const Elem* elem,
 // TODO: PB: We should consider moving this to the FEMap class
 template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map_xi (const Elem* elem,
-			 const Point& reference_point)
+                         const Point& reference_point)
 {
   libmesh_assert(elem);
 
@@ -1287,12 +1287,12 @@ Point FE<Dim,T>::map_xi (const Elem* elem,
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
     p.add_scaled (elem->point(i),
-		  FE<Dim,LAGRANGE>::shape_deriv(type,
-						order,
-						i,
-						0,
-						reference_point)
-		  );
+                  FE<Dim,LAGRANGE>::shape_deriv(type,
+                                                order,
+                                                i,
+                                                0,
+                                                reference_point)
+                  );
 
   return p;
 }
@@ -1302,7 +1302,7 @@ Point FE<Dim,T>::map_xi (const Elem* elem,
 // TODO: PB: We should consider moving this to the FEMap class
 template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map_eta (const Elem* elem,
-			  const Point& reference_point)
+                          const Point& reference_point)
 {
   libmesh_assert(elem);
 
@@ -1315,12 +1315,12 @@ Point FE<Dim,T>::map_eta (const Elem* elem,
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
     p.add_scaled (elem->point(i),
-		  FE<Dim,LAGRANGE>::shape_deriv(type,
-						order,
-						i,
-						1,
-						reference_point)
-		  );
+                  FE<Dim,LAGRANGE>::shape_deriv(type,
+                                                order,
+                                                i,
+                                                1,
+                                                reference_point)
+                  );
 
   return p;
 }
@@ -1330,7 +1330,7 @@ Point FE<Dim,T>::map_eta (const Elem* elem,
 // TODO: PB: We should consider moving this to the FEMap class
 template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map_zeta (const Elem* elem,
-			   const Point& reference_point)
+                           const Point& reference_point)
 {
   libmesh_assert(elem);
 
@@ -1343,12 +1343,12 @@ Point FE<Dim,T>::map_zeta (const Elem* elem,
   // Lagrange basis functions are used for mapping
   for (unsigned int i=0; i<n_sf; i++)
     p.add_scaled (elem->point(i),
-		  FE<Dim,LAGRANGE>::shape_deriv(type,
-						order,
-						i,
-						2,
-						reference_point)
-		  );
+                  FE<Dim,LAGRANGE>::shape_deriv(type,
+                                                order,
+                                                i,
+                                                2,
+                                                reference_point)
+                  );
 
   return p;
 }

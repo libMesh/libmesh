@@ -42,7 +42,7 @@ namespace Parallel {
 // where n is the length of _data.
 template <typename KeyType, typename IdxType>
 Sort<KeyType,IdxType>::Sort(const Parallel::Communicator &comm_in,
-			    std::vector<KeyType>& d) :
+                            std::vector<KeyType>& d) :
   ParallelObject(comm_in),
   _n_procs(comm_in.size()),
   _proc_id(comm_in.rank()),
@@ -74,7 +74,7 @@ void Sort<KeyType,IdxType>::sort()
       _my_bin = _data;
 
       this->comm().allgather (static_cast<IdxType>(_my_bin.size()),
-				      _local_bin_sizes);
+                              _local_bin_sizes);
     }
   else
     {
@@ -157,18 +157,18 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::binsort()
   // Communicate to determine the global
   // min and max for all processors.
   MPI_Allreduce(&local_min,
-		&global_min,
-		1,
-		Parallel::StandardType<Hilbert::HilbertIndices>(),
-		hilbert_min,
-		this->comm().get());
+                &global_min,
+                1,
+                Parallel::StandardType<Hilbert::HilbertIndices>(),
+                hilbert_min,
+                this->comm().get());
 
   MPI_Allreduce(&local_max,
-		&global_max,
-		1,
-		Parallel::StandardType<Hilbert::HilbertIndices>(),
-		hilbert_max,
-		this->comm().get());
+                &global_max,
+                1,
+                Parallel::StandardType<Hilbert::HilbertIndices>(),
+                hilbert_max,
+                this->comm().get());
 
   MPI_Op_free   (&hilbert_max);
   MPI_Op_free   (&hilbert_min);
@@ -222,29 +222,29 @@ void Sort<KeyType,IdxType>::communicate_bins()
       // of the proc_bin_size vector.
       std::vector<IdxType> displacements(_n_procs);
       for (processor_id_type j=1; j<_n_procs; ++j)
-	displacements[j] = proc_bin_size[j-1] + displacements[j-1];
+        displacements[j] = proc_bin_size[j-1] + displacements[j-1];
 
       // Resize the destination buffer
       dest.resize (global_bin_sizes[i]);
 
       MPI_Gatherv((_data.size() > local_offset) ?
-		    &_data[local_offset] :
-		    NULL,                            // Points to the beginning of the bin to be sent
-		  _local_bin_sizes[i],               // How much data is in the bin being sent.
-		  Parallel::StandardType<KeyType>(), // The data type we are sorting
-		  (dest.empty()) ?
-		    NULL :
-		    &dest[0],                        // Enough storage to hold all bin contributions
-		  (int*) &proc_bin_size[0],          // How much is to be received from each processor
-	          (int*) &displacements[0],          // Offsets into the receive buffer
-		  Parallel::StandardType<KeyType>(), // The data type we are sorting
-		  i,                                 // The root process (we do this once for each proc)
-		  this->comm().get());
+                  &_data[local_offset] :
+                  NULL,                            // Points to the beginning of the bin to be sent
+                  _local_bin_sizes[i],               // How much data is in the bin being sent.
+                  Parallel::StandardType<KeyType>(), // The data type we are sorting
+                  (dest.empty()) ?
+                  NULL :
+                  &dest[0],                        // Enough storage to hold all bin contributions
+                  (int*) &proc_bin_size[0],          // How much is to be received from each processor
+                  (int*) &displacements[0],          // Offsets into the receive buffer
+                  Parallel::StandardType<KeyType>(), // The data type we are sorting
+                  i,                                 // The root process (we do this once for each proc)
+                  this->comm().get());
 
       // Copy the destination buffer if it
       // corresponds to the bin for this processor
       if (i == _proc_id)
-	_my_bin = dest;
+        _my_bin = dest;
 
       // Increment the local offset counter
       local_offset += _local_bin_sizes[i];
@@ -272,11 +272,11 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
   // This is stored in global_bin_sizes.  Note, we
   // explicitly know that we are communicating MPI_UNSIGNED's here.
   MPI_Allreduce(&_local_bin_sizes[0],
-		&global_bin_sizes[0],
-		_n_procs,
-		MPI_UNSIGNED,
-		MPI_SUM,
-		this->comm().get());
+                &global_bin_sizes[0],
+                _n_procs,
+                MPI_UNSIGNED,
+                MPI_SUM,
+                this->comm().get());
 
   // Create a vector to temporarily hold the results of MPI_Gatherv
   // calls.  The vector dest  may be saved away to _my_bin depending on which
@@ -298,41 +298,41 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
       // Note: Here again we know that we are communicating
       // MPI_UNSIGNED's so there is no need to check the MPI_traits.
       MPI_Allgather(&_local_bin_sizes[i], // Source: # of entries on this proc in bin i
-		    1,                    // Number of items to gather
-		    MPI_UNSIGNED,
-		    &proc_bin_size[0],    // Destination: Total # of entries in bin i
-		    1,
-		    MPI_UNSIGNED,
-		    this->comm().get());
+                    1,                    // Number of items to gather
+                    MPI_UNSIGNED,
+                    &proc_bin_size[0],    // Destination: Total # of entries in bin i
+                    1,
+                    MPI_UNSIGNED,
+                    this->comm().get());
 
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
       // of the proc_bin_size vector.
       std::vector<unsigned int> displacements(_n_procs);
       for (unsigned int j=1; j<_n_procs; ++j)
-	displacements[j] = proc_bin_size[j-1] + displacements[j-1];
+        displacements[j] = proc_bin_size[j-1] + displacements[j-1];
 
       // Resize the destination buffer
       dest.resize (global_bin_sizes[i]);
 
       MPI_Gatherv((_data.size() > local_offset) ?
-		    &_data[local_offset] :
-		    NULL,                   // Points to the beginning of the bin to be sent
-		  _local_bin_sizes[i],      // How much data is in the bin being sent.
-		  Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
-		  (dest.empty()) ?
-		    NULL :
-		    &dest[0],               // Enough storage to hold all bin contributions
-		  (int*) &proc_bin_size[0], // How much is to be received from each processor
-		  (int*) &displacements[0], // Offsets into the receive buffer
-		  Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
-		  i,                        // The root process (we do this once for each proc)
-		  this->comm().get());
+                  &_data[local_offset] :
+                  NULL,                   // Points to the beginning of the bin to be sent
+                  _local_bin_sizes[i],      // How much data is in the bin being sent.
+                  Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
+                  (dest.empty()) ?
+                  NULL :
+                  &dest[0],               // Enough storage to hold all bin contributions
+                  (int*) &proc_bin_size[0], // How much is to be received from each processor
+                  (int*) &displacements[0], // Offsets into the receive buffer
+                  Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
+                  i,                        // The root process (we do this once for each proc)
+                  this->comm().get());
 
       // Copy the destination buffer if it
       // corresponds to the bin for this processor
       if (i == _proc_id)
-	_my_bin = dest;
+        _my_bin = dest;
 
       // Increment the local offset counter
       local_offset += _local_bin_sizes[i];

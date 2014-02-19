@@ -78,8 +78,8 @@ void OFFIO::read_stream(std::istream& in)
       libmesh_assert (in.good());
 
       in >> x
-	 >> y
-	 >> z;
+         >> y
+         >> z;
 
       the_mesh.add_point ( Point(x,y,z), n );
     }

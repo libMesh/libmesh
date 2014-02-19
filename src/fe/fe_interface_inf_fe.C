@@ -37,8 +37,8 @@ namespace libMesh
 
 
 unsigned int FEInterface::ifem_n_shape_functions(const unsigned int dim,
-						 const FEType& fe_t,
-						 const ElemType t)
+                                                 const FEType& fe_t,
+                                                 const ElemType t)
 {
   switch (dim)
     {
@@ -73,8 +73,8 @@ unsigned int FEInterface::ifem_n_shape_functions(const unsigned int dim,
 
 
 unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
-				      const FEType& fe_t,
-				      const ElemType t)
+                                      const FEType& fe_t,
+                                      const ElemType t)
 {
   switch (dim)
     {
@@ -108,9 +108,9 @@ unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
 
 
 unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
-					      const FEType& fe_t,
-					      const ElemType t,
-					      const unsigned int n)
+                                              const FEType& fe_t,
+                                              const ElemType t,
+                                              const unsigned int n)
 {
   switch (dim)
     {
@@ -145,8 +145,8 @@ unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
 
 
 unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
-					       const FEType& fe_t,
-					       const ElemType t)
+                                               const FEType& fe_t,
+                                               const ElemType t)
 {
   switch (dim)
     {
@@ -180,10 +180,10 @@ unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
 
 
 void FEInterface::ifem_nodal_soln(const unsigned int dim,
-				  const FEType& fe_t,
-				  const Elem* elem,
-				  const std::vector<Number>& elem_soln,
-				  std::vector<Number>& nodal_soln)
+                                  const FEType& fe_t,
+                                  const Elem* elem,
+                                  const std::vector<Number>& elem_soln,
+                                  std::vector<Number>& nodal_soln)
 {
   switch (dim)
     {
@@ -191,88 +191,88 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
       // 1D
     case 1:
       {
-	switch (fe_t.radial_family)
-	  {
-	  case INFINITE_MAP:
-	    {
-	      libMesh::err << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
-	      libmesh_error();
-	      break;
-	    }
+        switch (fe_t.radial_family)
+          {
+          case INFINITE_MAP:
+            {
+              libMesh::err << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
+              libmesh_error();
+              break;
+            }
 
-	  case JACOBI_20_00:
-	    {
-  	      switch (fe_t.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      InfFE<1,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-		      break;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    libmesh_error();
-		}
-	      break;
-	    }
+          case JACOBI_20_00:
+            {
+              switch (fe_t.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    InfFE<1,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+                    break;
+                  }
+                default:
+                  libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+                  libmesh_error();
+                }
+              break;
+            }
 
-	  case JACOBI_30_00:
-	    {
-  	      switch (fe_t.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      InfFE<1,JACOBI_30_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-		      break;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    libmesh_error();
-		}
-	      break;
-	    }
+          case JACOBI_30_00:
+            {
+              switch (fe_t.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    InfFE<1,JACOBI_30_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+                    break;
+                  }
+                default:
+                  libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+                  libmesh_error();
+                }
+              break;
+            }
 
-	  case LEGENDRE:
-	    {
-  	      switch (fe_t.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      InfFE<1,LEGENDRE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-		      break;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    libmesh_error();
-		}
-	      break;
-	    }
+          case LEGENDRE:
+            {
+              switch (fe_t.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    InfFE<1,LEGENDRE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+                    break;
+                  }
+                default:
+                  libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+                  libmesh_error();
+                }
+              break;
+            }
 
-	  case LAGRANGE:
-	    {
-  	      switch (fe_t.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      InfFE<1,LAGRANGE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-		      break;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    libmesh_error();
-		}
-	      break;
-	    }
+          case LAGRANGE:
+            {
+              switch (fe_t.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    InfFE<1,LAGRANGE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+                    break;
+                  }
+                default:
+                  libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+                  libmesh_error();
+                }
+              break;
+            }
 
 
 
-	  default:
-	    libMesh::err << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
-	    libmesh_error();
-	    break;
-	  }
+          default:
+            libMesh::err << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
+            libmesh_error();
+            break;
+          }
 
-	break;
+        break;
       }
 
 
@@ -281,88 +281,88 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
       // 2D
     case 2:
       {
-	switch (fe_t.radial_family)
-	  {
-	  case INFINITE_MAP:
-	    {
-	      libMesh::err << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
-	      libmesh_error();
-	      break;
-	    }
+        switch (fe_t.radial_family)
+          {
+          case INFINITE_MAP:
+            {
+              libMesh::err << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
+              libmesh_error();
+              break;
+            }
 
-	  case JACOBI_20_00:
-	    {
-  	      switch (fe_t.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      InfFE<2,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-		      break;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    libmesh_error();
-		}
-	      break;
-	    }
+          case JACOBI_20_00:
+            {
+              switch (fe_t.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    InfFE<2,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+                    break;
+                  }
+                default:
+                  libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+                  libmesh_error();
+                }
+              break;
+            }
 
-	  case JACOBI_30_00:
-	    {
-  	      switch (fe_t.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      InfFE<2,JACOBI_30_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-		      break;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    libmesh_error();
-		}
-	      break;
-	    }
+          case JACOBI_30_00:
+            {
+              switch (fe_t.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    InfFE<2,JACOBI_30_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+                    break;
+                  }
+                default:
+                  libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+                  libmesh_error();
+                }
+              break;
+            }
 
-	  case LEGENDRE:
-	    {
-  	      switch (fe_t.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      InfFE<2,LEGENDRE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-		      break;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    libmesh_error();
-		}
-	      break;
-	    }
+          case LEGENDRE:
+            {
+              switch (fe_t.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    InfFE<2,LEGENDRE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+                    break;
+                  }
+                default:
+                  libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+                  libmesh_error();
+                }
+              break;
+            }
 
-	  case LAGRANGE:
-	    {
-  	      switch (fe_t.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      InfFE<2,LAGRANGE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-		      break;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    libmesh_error();
-		}
-	      break;
-	    }
+          case LAGRANGE:
+            {
+              switch (fe_t.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    InfFE<2,LAGRANGE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+                    break;
+                  }
+                default:
+                  libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+                  libmesh_error();
+                }
+              break;
+            }
 
 
 
-	  default:
-	    libMesh::err << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
-	    libmesh_error();
-	    break;
-	  }
+          default:
+            libMesh::err << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
+            libmesh_error();
+            break;
+          }
 
-	break;
+        break;
       }
 
 
@@ -371,88 +371,88 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
       // 3D
     case 3:
       {
-	switch (fe_t.radial_family)
-	  {
-	  case INFINITE_MAP:
-	    {
-	      libMesh::err << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
-	      libmesh_error();
-	      break;
-	    }
+        switch (fe_t.radial_family)
+          {
+          case INFINITE_MAP:
+            {
+              libMesh::err << "ERROR: INFINTE_MAP is not a valid shape family for radial approximation." << std::endl;
+              libmesh_error();
+              break;
+            }
 
-	  case JACOBI_20_00:
-	    {
-  	      switch (fe_t.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      InfFE<3,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-		      break;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    libmesh_error();
-		}
-	      break;
-	    }
+          case JACOBI_20_00:
+            {
+              switch (fe_t.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    InfFE<3,JACOBI_20_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+                    break;
+                  }
+                default:
+                  libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+                  libmesh_error();
+                }
+              break;
+            }
 
-	  case JACOBI_30_00:
-	    {
-  	      switch (fe_t.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      InfFE<3,JACOBI_30_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-		      break;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    libmesh_error();
-		}
-	      break;
-	    }
+          case JACOBI_30_00:
+            {
+              switch (fe_t.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    InfFE<3,JACOBI_30_00,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+                    break;
+                  }
+                default:
+                  libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+                  libmesh_error();
+                }
+              break;
+            }
 
-	  case LEGENDRE:
-	    {
-  	      switch (fe_t.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      InfFE<3,LEGENDRE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-		      break;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    libmesh_error();
-		}
-	      break;
-	    }
+          case LEGENDRE:
+            {
+              switch (fe_t.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    InfFE<3,LEGENDRE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+                    break;
+                  }
+                default:
+                  libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+                  libmesh_error();
+                }
+              break;
+            }
 
-	  case LAGRANGE:
-	    {
-  	      switch (fe_t.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      InfFE<3,LAGRANGE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
-		      break;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
-		    libmesh_error();
-		}
-	      break;
-	    }
+          case LAGRANGE:
+            {
+              switch (fe_t.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    InfFE<3,LAGRANGE,CARTESIAN>::nodal_soln(fe_t, elem, elem_soln, nodal_soln);
+                    break;
+                  }
+                default:
+                  libMesh::err << "ERROR: Spherical & Ellipsoidal IFEMs not implemented." << std::endl;
+                  libmesh_error();
+                }
+              break;
+            }
 
 
 
-	  default:
-	    libMesh::err << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
-	    libmesh_error();
-	    break;
-	  }
+          default:
+            libMesh::err << "ERROR: Bad FEType.radial_family= " << fe_t.radial_family << std::endl;
+            libmesh_error();
+            break;
+          }
 
-	break;
+        break;
       }
 
     default:
@@ -468,71 +468,71 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 
 
 Point FEInterface::ifem_inverse_map (const unsigned int dim,
-				     const FEType& fe_t,
-				     const Elem* elem,
-				     const Point& p,
-				     const Real tolerance,
-				     const bool secure)
+                                     const FEType& fe_t,
+                                     const Elem* elem,
+                                     const Point& p,
+                                     const Real tolerance,
+                                     const bool secure)
 {
   switch (dim)
     {
       // 1D
     case 1:
       {
-	switch (fe_t.inf_map)
-	  {
-	  case CARTESIAN:
-	    return InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance, secure);
+        switch (fe_t.inf_map)
+          {
+          case CARTESIAN:
+            return InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance, secure);
 
-	  case SPHERICAL:
-	  case ELLIPSOIDAL:
-	    {
-	      libMesh::err << "ERROR: Spherical and Ellipsoidal IFEMs not (yet) " << std::endl
-			    << "implemented." << std::endl;
-	      libmesh_error();
-	    }
+          case SPHERICAL:
+          case ELLIPSOIDAL:
+            {
+              libMesh::err << "ERROR: Spherical and Ellipsoidal IFEMs not (yet) " << std::endl
+                           << "implemented." << std::endl;
+              libmesh_error();
+            }
 
 /*
-	  case SPHERICAL:
-	    return InfFE<1,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
+  case SPHERICAL:
+  return InfFE<1,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
 
-	  case ELLIPSOIDAL:
-	    return InfFE<1,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
+  case ELLIPSOIDAL:
+  return InfFE<1,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
 */
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
 
       // 2D
     case 2:
       {
-	switch (fe_t.inf_map)
-	  {
-	  case CARTESIAN:
-	    return InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance, secure);
+        switch (fe_t.inf_map)
+          {
+          case CARTESIAN:
+            return InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance, secure);
 
-	  case SPHERICAL:
-	  case ELLIPSOIDAL:
-	    {
-	      libMesh::err << "ERROR: Spherical and Ellipsoidal IFEMs not (yet) " << std::endl
-			    << "implemented." << std::endl;
-	      libmesh_error();
-	    }
+          case SPHERICAL:
+          case ELLIPSOIDAL:
+            {
+              libMesh::err << "ERROR: Spherical and Ellipsoidal IFEMs not (yet) " << std::endl
+                           << "implemented." << std::endl;
+              libmesh_error();
+            }
 
 /*
-	  case SPHERICAL:
-	    return InfFE<2,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
+  case SPHERICAL:
+  return InfFE<2,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
 
-	  case ELLIPSOIDAL:
-	    return InfFE<2,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
+  case ELLIPSOIDAL:
+  return InfFE<2,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
 */
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
       }
 
@@ -540,30 +540,30 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
       // 3D
     case 3:
       {
-	switch (fe_t.inf_map)
-	  {
-	  case CARTESIAN:
-	    return InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance, secure);
+        switch (fe_t.inf_map)
+          {
+          case CARTESIAN:
+            return InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, p, tolerance, secure);
 
-	  case SPHERICAL:
-	  case ELLIPSOIDAL:
-	    {
-	      libMesh::err << "ERROR: Spherical and Ellipsoidal IFEMs not (yet) " << std::endl
-			    << "implemented." << std::endl;
-	      libmesh_error();
-	    }
+          case SPHERICAL:
+          case ELLIPSOIDAL:
+            {
+              libMesh::err << "ERROR: Spherical and Ellipsoidal IFEMs not (yet) " << std::endl
+                           << "implemented." << std::endl;
+              libmesh_error();
+            }
 
 /*
-	  case SPHERICAL:
-	    return InfFE<3,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
+  case SPHERICAL:
+  return InfFE<3,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
 
-	  case ELLIPSOIDAL:
-	    return InfFE<3,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
+  case ELLIPSOIDAL:
+  return InfFE<3,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
 */
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
       }
 
@@ -581,42 +581,42 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
 
 
 void FEInterface::ifem_inverse_map (const unsigned int dim,
-				    const FEType& fe_t,
-				    const Elem* elem,
-				    const std::vector<Point>& physical_points,
-				    std::vector<Point>&       reference_points,
-				    const Real tolerance,
-				    const bool secure)
+                                    const FEType& fe_t,
+                                    const Elem* elem,
+                                    const std::vector<Point>& physical_points,
+                                    std::vector<Point>&       reference_points,
+                                    const Real tolerance,
+                                    const bool secure)
 {
   switch (dim)
     {
       // 1D
     case 1:
       {
-	switch (fe_t.inf_map)
-	  {
-	  case CARTESIAN:
-	    InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
-	    return;
+        switch (fe_t.inf_map)
+          {
+          case CARTESIAN:
+            InfFE<1,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+            return;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
 
       // 2D
     case 2:
       {
-	switch (fe_t.inf_map)
-	  {
-	  case CARTESIAN:
-	   InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
-	   return;
+        switch (fe_t.inf_map)
+          {
+          case CARTESIAN:
+            InfFE<2,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+            return;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
       }
 
@@ -624,15 +624,15 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
       // 3D
     case 3:
       {
-	switch (fe_t.inf_map)
-	  {
-	  case CARTESIAN:
-	   InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
-	   return;
+        switch (fe_t.inf_map)
+          {
+          case CARTESIAN:
+            InfFE<3,JACOBI_20_00,CARTESIAN>::inverse_map(elem, physical_points, reference_points, tolerance, secure);
+            return;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
       }
 
@@ -649,8 +649,8 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
 
 
 bool FEInterface::ifem_on_reference_element(const Point& p,
-					    const ElemType t,
-					    const Real eps)
+                                            const ElemType t,
+                                            const Real eps)
 {
   return FEBase::on_reference_element(p,t,eps);
 }
@@ -659,67 +659,67 @@ bool FEInterface::ifem_on_reference_element(const Point& p,
 
 
 Real FEInterface::ifem_shape(const unsigned int dim,
-			     const FEType& fe_t,
-			     const ElemType t,
-			     const unsigned int i,
-			     const Point& p)
+                             const FEType& fe_t,
+                             const ElemType t,
+                             const unsigned int i,
+                             const Point& p)
 {
   switch (dim)
     {
       // 1D
     case 1:
       {
-	switch (fe_t.radial_family)
-	  {
-	    /*
-	     * For no derivatives (and local coordinates, as
-	     * given in \p p) the infinite element shapes
-	     * are independent of mapping type
-	     */
-	  case INFINITE_MAP:
-	    return InfFE<1,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
+        switch (fe_t.radial_family)
+          {
+            /*
+             * For no derivatives (and local coordinates, as
+             * given in \p p) the infinite element shapes
+             * are independent of mapping type
+             */
+          case INFINITE_MAP:
+            return InfFE<1,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case JACOBI_20_00:
-	    return InfFE<1,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
+          case JACOBI_20_00:
+            return InfFE<1,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case JACOBI_30_00:
-	    return InfFE<1,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
+          case JACOBI_30_00:
+            return InfFE<1,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case LEGENDRE:
-	    return InfFE<1,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
+          case LEGENDRE:
+            return InfFE<1,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case LAGRANGE:
-	    return InfFE<1,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
+          case LAGRANGE:
+            return InfFE<1,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
 
       // 2D
     case 2:
       {
-	switch (fe_t.radial_family)
-	  {
-	  case INFINITE_MAP:
-	    return InfFE<2,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
+        switch (fe_t.radial_family)
+          {
+          case INFINITE_MAP:
+            return InfFE<2,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case JACOBI_20_00:
-	    return InfFE<2,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
+          case JACOBI_20_00:
+            return InfFE<2,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case JACOBI_30_00:
-	    return InfFE<2,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
+          case JACOBI_30_00:
+            return InfFE<2,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case LEGENDRE:
-	    return InfFE<2,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
+          case LEGENDRE:
+            return InfFE<2,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case LAGRANGE:
-	    return InfFE<2,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
+          case LAGRANGE:
+            return InfFE<2,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
       }
 
@@ -727,26 +727,26 @@ Real FEInterface::ifem_shape(const unsigned int dim,
       // 3D
     case 3:
       {
-	switch (fe_t.radial_family)
-	  {
-	  case INFINITE_MAP:
-	    return InfFE<3,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
+        switch (fe_t.radial_family)
+          {
+          case INFINITE_MAP:
+            return InfFE<3,INFINITE_MAP,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case JACOBI_20_00:
-	    return InfFE<3,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
+          case JACOBI_20_00:
+            return InfFE<3,JACOBI_20_00,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case JACOBI_30_00:
-	    return InfFE<3,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
+          case JACOBI_30_00:
+            return InfFE<3,JACOBI_30_00,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case LEGENDRE:
-	    return InfFE<3,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
+          case LEGENDRE:
+            return InfFE<3,LEGENDRE,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  case LAGRANGE:
-	    return InfFE<3,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
+          case LAGRANGE:
+            return InfFE<3,LAGRANGE,CARTESIAN>::shape(fe_t, t, i, p);
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
       }
 
@@ -764,67 +764,67 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
 
 Real FEInterface::ifem_shape(const unsigned int dim,
-			     const FEType& fe_t,
-			     const Elem* elem,
-			     const unsigned int i,
-			     const Point& p)
+                             const FEType& fe_t,
+                             const Elem* elem,
+                             const unsigned int i,
+                             const Point& p)
 {
   switch (dim)
     {
       // 1D
     case 1:
       {
-	switch (fe_t.radial_family)
-	  {
-	    /*
-	     * For no derivatives (and local coordinates, as
-	     * given in \p p) the infinite element shapes
-	     * are independent of mapping type
-	     */
-	  case INFINITE_MAP:
-	    return InfFE<1,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
+        switch (fe_t.radial_family)
+          {
+            /*
+             * For no derivatives (and local coordinates, as
+             * given in \p p) the infinite element shapes
+             * are independent of mapping type
+             */
+          case INFINITE_MAP:
+            return InfFE<1,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case JACOBI_20_00:
-	    return InfFE<1,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
+          case JACOBI_20_00:
+            return InfFE<1,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case JACOBI_30_00:
-	    return InfFE<1,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
+          case JACOBI_30_00:
+            return InfFE<1,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case LEGENDRE:
-	    return InfFE<1,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
+          case LEGENDRE:
+            return InfFE<1,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case LAGRANGE:
-	    return InfFE<1,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
+          case LAGRANGE:
+            return InfFE<1,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
 
       // 2D
     case 2:
       {
-	switch (fe_t.radial_family)
-	  {
-	  case INFINITE_MAP:
-	    return InfFE<2,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
+        switch (fe_t.radial_family)
+          {
+          case INFINITE_MAP:
+            return InfFE<2,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case JACOBI_20_00:
-	    return InfFE<2,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
+          case JACOBI_20_00:
+            return InfFE<2,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case JACOBI_30_00:
-	    return InfFE<2,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
+          case JACOBI_30_00:
+            return InfFE<2,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case LEGENDRE:
-	    return InfFE<2,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
+          case LEGENDRE:
+            return InfFE<2,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case LAGRANGE:
-	    return InfFE<2,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
+          case LAGRANGE:
+            return InfFE<2,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
       }
 
@@ -832,26 +832,26 @@ Real FEInterface::ifem_shape(const unsigned int dim,
       // 3D
     case 3:
       {
-	switch (fe_t.radial_family)
-	  {
-	  case INFINITE_MAP:
-	    return InfFE<3,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
+        switch (fe_t.radial_family)
+          {
+          case INFINITE_MAP:
+            return InfFE<3,INFINITE_MAP,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case JACOBI_20_00:
-	    return InfFE<3,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
+          case JACOBI_20_00:
+            return InfFE<3,JACOBI_20_00,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case JACOBI_30_00:
-	    return InfFE<3,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
+          case JACOBI_30_00:
+            return InfFE<3,JACOBI_30_00,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case LEGENDRE:
-	    return InfFE<3,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
+          case LEGENDRE:
+            return InfFE<3,LEGENDRE,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  case LAGRANGE:
-	    return InfFE<3,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
+          case LAGRANGE:
+            return InfFE<3,LAGRANGE,CARTESIAN>::shape(fe_t, elem, i, p);
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
       }
 
@@ -869,113 +869,113 @@ Real FEInterface::ifem_shape(const unsigned int dim,
 
 
 void FEInterface::ifem_compute_data(const unsigned int dim,
-				    const FEType& fe_t,
-				    const Elem* elem,
-				    FEComputeData& data)
+                                    const FEType& fe_t,
+                                    const Elem* elem,
+                                    FEComputeData& data)
 {
   switch (dim)
     {
       // 1D
     case 1:
       {
-	switch (fe_t.radial_family)
-	  {
-	    /*
-	     * For no derivatives (and local coordinates, as
-	     * given in \p p) the infinite element shapes
-	     * are independent of mapping type
-	     */
-	  case INFINITE_MAP:
-	    InfFE<1,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+        switch (fe_t.radial_family)
+          {
+            /*
+             * For no derivatives (and local coordinates, as
+             * given in \p p) the infinite element shapes
+             * are independent of mapping type
+             */
+          case INFINITE_MAP:
+            InfFE<1,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  case JACOBI_20_00:
-	    InfFE<1,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+          case JACOBI_20_00:
+            InfFE<1,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  case JACOBI_30_00:
-	    InfFE<1,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+          case JACOBI_30_00:
+            InfFE<1,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  case LEGENDRE:
-	    InfFE<1,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+          case LEGENDRE:
+            InfFE<1,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  case LAGRANGE:
-	    InfFE<1,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+          case LAGRANGE:
+            InfFE<1,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
-	break;
+        break;
       }
 
 
       // 2D
     case 2:
       {
-	switch (fe_t.radial_family)
-	  {
-	  case INFINITE_MAP:
-	    InfFE<2,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+        switch (fe_t.radial_family)
+          {
+          case INFINITE_MAP:
+            InfFE<2,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  case JACOBI_20_00:
-	    InfFE<2,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+          case JACOBI_20_00:
+            InfFE<2,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  case JACOBI_30_00:
-	    InfFE<2,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+          case JACOBI_30_00:
+            InfFE<2,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  case LEGENDRE:
-	    InfFE<2,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+          case LEGENDRE:
+            InfFE<2,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  case LAGRANGE:
-	    InfFE<2,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+          case LAGRANGE:
+            InfFE<2,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
-	break;
+        break;
       }
 
 
       // 3D
     case 3:
       {
-	switch (fe_t.radial_family)
-	  {
-	  case INFINITE_MAP:
-	    InfFE<3,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+        switch (fe_t.radial_family)
+          {
+          case INFINITE_MAP:
+            InfFE<3,INFINITE_MAP,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  case JACOBI_20_00:
-	    InfFE<3,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+          case JACOBI_20_00:
+            InfFE<3,JACOBI_20_00,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  case JACOBI_30_00:
-	    InfFE<3,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+          case JACOBI_30_00:
+            InfFE<3,JACOBI_30_00,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  case LEGENDRE:
-	    InfFE<3,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+          case LEGENDRE:
+            InfFE<3,LEGENDRE,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  case LAGRANGE:
-	    InfFE<3,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
-	    break;
+          case LAGRANGE:
+            InfFE<3,LAGRANGE,CARTESIAN>::compute_data(fe_t, elem, data);
+            break;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
-	break;
+        break;
       }
 
 

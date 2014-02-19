@@ -35,23 +35,23 @@ dof_id_type Quad::key (const unsigned int s) const
     {
     case 0:
       return
-	this->compute_key (this->node(0),
-			   this->node(1));
+        this->compute_key (this->node(0),
+                           this->node(1));
 
     case 1:
       return
-	this->compute_key (this->node(1),
-			   this->node(2));
+        this->compute_key (this->node(1),
+                           this->node(2));
 
     case 2:
       return
-	this->compute_key (this->node(2),
-			   this->node(3));
+        this->compute_key (this->node(2),
+                           this->node(3));
 
     case 3:
       return
-	this->compute_key (this->node(3),
-			   this->node(0));
+        this->compute_key (this->node(3),
+                           this->node(0));
     }
 
 
@@ -72,39 +72,39 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
     {
     case 0:
       {
-	edge->set_node(0) = this->get_node(0);
-	edge->set_node(1) = this->get_node(1);
+        edge->set_node(0) = this->get_node(0);
+        edge->set_node(1) = this->get_node(1);
 
         AutoPtr<Elem> ap_edge(edge);
-	return ap_edge;
+        return ap_edge;
       }
     case 1:
       {
-	edge->set_node(0) = this->get_node(1);
-	edge->set_node(1) = this->get_node(2);
+        edge->set_node(0) = this->get_node(1);
+        edge->set_node(1) = this->get_node(2);
 
         AutoPtr<Elem> ap_edge(edge);
-	return ap_edge;
+        return ap_edge;
       }
     case 2:
       {
-	edge->set_node(0) = this->get_node(2);
-	edge->set_node(1) = this->get_node(3);
+        edge->set_node(0) = this->get_node(2);
+        edge->set_node(1) = this->get_node(3);
 
         AutoPtr<Elem> ap_edge(edge);
-	return ap_edge;
+        return ap_edge;
       }
     case 3:
       {
-	edge->set_node(0) = this->get_node(3);
-	edge->set_node(1) = this->get_node(0);
+        edge->set_node(0) = this->get_node(3);
+        edge->set_node(1) = this->get_node(0);
 
         AutoPtr<Elem> ap_edge(edge);
-	return ap_edge;
+        return ap_edge;
       }
     default:
       {
-	libmesh_error();
+        libmesh_error();
       }
     }
 
@@ -185,19 +185,19 @@ Real Quad::quality (const ElemQuality q) const
     case DIAGONAL:
     case STRETCH:
       {
-	// Diagonal between node 0 and node 2
-	const Real d02 = this->length(0,2);
+        // Diagonal between node 0 and node 2
+        const Real d02 = this->length(0,2);
 
-	// Diagonal between node 1 and node 3
-	const Real d13 = this->length(1,3);
+        // Diagonal between node 1 and node 3
+        const Real d13 = this->length(1,3);
 
-	// Find the biggest and smallest diagonals
+        // Find the biggest and smallest diagonals
         if ( (d02 > 0.) && (d13 >0.) )
           if (d02 < d13) return d02 / d13;
           else return d13 / d02;
         else
           return 0.;
-	break;
+        break;
       }
 
     default:

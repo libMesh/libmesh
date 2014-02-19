@@ -81,17 +81,17 @@ namespace libMesh
 
     for (unsigned int i=0; i<num_elements; ++i)
       {
-	Elem* elem = new Tet4;
+        Elem* elem = new Tet4;
 
-	// Get the nodes associated with this element
-	for (unsigned int j=0; j<elem->n_nodes(); ++j)
-	  node_labels[j] = tetgen_wrapper.get_element_node(i,j);
+        // Get the nodes associated with this element
+        for (unsigned int j=0; j<elem->n_nodes(); ++j)
+          node_labels[j] = tetgen_wrapper.get_element_node(i,j);
 
-	// Associate the nodes with this element
-	this->assign_nodes_to_elem(node_labels, elem);
+        // Associate the nodes with this element
+        this->assign_nodes_to_elem(node_labels, elem);
 
-	// Finally, add this element to the mesh.
-	this->_mesh.add_elem(elem);
+        // Finally, add this element to the mesh.
+        this->_mesh.add_elem(elem);
       }
   }
 
@@ -123,7 +123,7 @@ namespace libMesh
       MeshBase::element_iterator       it  = this->_mesh.elements_begin();
       const MeshBase::element_iterator end = this->_mesh.elements_end();
       for ( ; it != end; ++it)
-	this->_mesh.delete_elem (*it);
+        this->_mesh.delete_elem (*it);
     }
 
 
@@ -133,16 +133,16 @@ namespace libMesh
 
     for (unsigned int i=0; i<num_elements; ++i)
       {
-	Elem* elem = new Tri3;
+        Elem* elem = new Tri3;
 
-	// Get node labels associated with this element
-	for (unsigned int j=0; j<elem->n_nodes(); ++j)
-	  node_labels[j] = tetgen_wrapper.get_triface_node(i,j);
+        // Get node labels associated with this element
+        for (unsigned int j=0; j<elem->n_nodes(); ++j)
+          node_labels[j] = tetgen_wrapper.get_triface_node(i,j);
 
-	this->assign_nodes_to_elem(node_labels, elem);
+        this->assign_nodes_to_elem(node_labels, elem);
 
-	// Finally, add this element to the mesh.
-	this->_mesh.add_elem(elem);
+        // Finally, add this element to the mesh.
+        this->_mesh.add_elem(elem);
       }
   }
 
@@ -151,7 +151,7 @@ namespace libMesh
 
 
   void TetGenMeshInterface::triangulate_conformingDelaunayMesh (double quality_constraint,
-								double volume_constraint)
+                                                                double volume_constraint)
   {
     // start triangulation method with empty holes list:
     std::vector<Point> noholes;
@@ -161,8 +161,8 @@ namespace libMesh
 
 
   void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const std::vector<Point>& holes,
-									   double quality_constraint,
-									   double volume_constraint)
+                                                                           double quality_constraint,
+                                                                           double volume_constraint)
   {
     // Before calling this function, the Mesh must contain a convex hull
     // of TRI3 elements which define the boundary.
@@ -191,50 +191,50 @@ namespace libMesh
       MeshBase::element_iterator it        = this->_mesh.elements_begin();
       const MeshBase::element_iterator end = this->_mesh.elements_end();
       for (; it != end ; ++it)
-	{
-	  tetgen_wrapper.allocate_facet_polygonlist(insertnum, 1);
-	  tetgen_wrapper.allocate_polygon_vertexlist(insertnum, 0, 3);
+        {
+          tetgen_wrapper.allocate_facet_polygonlist(insertnum, 1);
+          tetgen_wrapper.allocate_polygon_vertexlist(insertnum, 0, 3);
 
-	  Elem* elem = *it;
+          Elem* elem = *it;
 
-	  for (unsigned int j=0; j<elem->n_nodes(); ++j)
-	    {
-	      // We need to get the sequential index of elem->get_node(j), but
-	      // it should already be stored in _sequential_to_libmesh_node_map...
-	      unsigned libmesh_node_id = elem->node(j);
+          for (unsigned int j=0; j<elem->n_nodes(); ++j)
+            {
+              // We need to get the sequential index of elem->get_node(j), but
+              // it should already be stored in _sequential_to_libmesh_node_map...
+              unsigned libmesh_node_id = elem->node(j);
 
-	      // The libmesh node IDs may not be sequential, but can we assume
-	      // they are at least in order???  We will do so here.
-	      std::vector<unsigned>::iterator node_iter =
-		Utility::binary_find(_sequential_to_libmesh_node_map.begin(),
-				     _sequential_to_libmesh_node_map.end(),
-				     libmesh_node_id);
+              // The libmesh node IDs may not be sequential, but can we assume
+              // they are at least in order???  We will do so here.
+              std::vector<unsigned>::iterator node_iter =
+                Utility::binary_find(_sequential_to_libmesh_node_map.begin(),
+                                     _sequential_to_libmesh_node_map.end(),
+                                     libmesh_node_id);
 
-	      // Check to see if not found: this could also indicate the sequential
-	      // node map is not sorted...
-	      if (node_iter == _sequential_to_libmesh_node_map.end())
-		{
-		  libMesh::err << "Global node " << libmesh_node_id << " not found in sequential node map!"  << std::endl;
-		  libmesh_error();
-		}
+              // Check to see if not found: this could also indicate the sequential
+              // node map is not sorted...
+              if (node_iter == _sequential_to_libmesh_node_map.end())
+                {
+                  libMesh::err << "Global node " << libmesh_node_id << " not found in sequential node map!"  << std::endl;
+                  libmesh_error();
+                }
 
-	      std::vector<unsigned>::difference_type
-		sequential_index = std::distance(_sequential_to_libmesh_node_map.begin(), node_iter);
+              std::vector<unsigned>::difference_type
+                sequential_index = std::distance(_sequential_to_libmesh_node_map.begin(), node_iter);
 
-	      // Debugging:
-	      //	    libMesh::out << "libmesh_node_id=" << libmesh_node_id
-	      //		         << ", sequential_index=" << sequential_index
-	      //		         << std::endl;
+              // Debugging:
+              //    libMesh::out << "libmesh_node_id=" << libmesh_node_id
+              //         << ", sequential_index=" << sequential_index
+              //         << std::endl;
 
-	      tetgen_wrapper.set_vertex(insertnum, // facet number
-					0,         // polygon (always 0)
-					j,         // local vertex index in tetgen input
-					sequential_index);
-	    }
+              tetgen_wrapper.set_vertex(insertnum, // facet number
+                                        0,         // polygon (always 0)
+                                        j,         // local vertex index in tetgen input
+                                        sequential_index);
+            }
 
-	  // Go to next facet in polygonlist
-	  insertnum++;
-	}
+          // Go to next facet in polygonlist
+          insertnum++;
+        }
     }
 
 
@@ -242,10 +242,10 @@ namespace libMesh
     // fill hole list (if there are holes):
     if (holes.size() > 0)
       {
-	std::vector<Point>::const_iterator ihole;
-	unsigned hole_index = 0;
-	for (ihole=holes.begin(); ihole!=holes.end(); ++ihole)
-	  tetgen_wrapper.set_hole(hole_index++, (*ihole)(0), (*ihole)(1), (*ihole)(2));
+        std::vector<Point>::const_iterator ihole;
+        unsigned hole_index = 0;
+        for (ihole=holes.begin(); ihole!=holes.end(); ++ihole)
+          tetgen_wrapper.set_hole(hole_index++, (*ihole)(0), (*ihole)(1), (*ihole)(2));
       }
 
 
@@ -289,21 +289,21 @@ namespace libMesh
     // index [0]."
     for (unsigned int i=old_nodesnum; i<num_nodes; i++)
       {
-	// Fill in x, y, z values
-	tetgen_wrapper.get_output_node(i, x,y,z);
+        // Fill in x, y, z values
+        tetgen_wrapper.get_output_node(i, x,y,z);
 
-	// Catch the node returned by add_point()... this will tell us the ID
-	// assigned by the Mesh.
-	Node* new_node = this->_mesh.add_point ( Point(x,y,z) );
+        // Catch the node returned by add_point()... this will tell us the ID
+        // assigned by the Mesh.
+        Node* new_node = this->_mesh.add_point ( Point(x,y,z) );
 
-	// Store this new ID in our sequential-to-libmesh node mapping array
-	_sequential_to_libmesh_node_map.push_back( new_node->id() );
+        // Store this new ID in our sequential-to-libmesh node mapping array
+        _sequential_to_libmesh_node_map.push_back( new_node->id() );
       }
 
     // Debugging:
     //  std::copy(_sequential_to_libmesh_node_map.begin(),
-    //	    _sequential_to_libmesh_node_map.end(),
-    //	    std::ostream_iterator<unsigned>(std::cout, " "));
+    //    _sequential_to_libmesh_node_map.end(),
+    //    std::ostream_iterator<unsigned>(std::cout, " "));
     //  std::cout << std::endl;
 
 
@@ -315,18 +315,18 @@ namespace libMesh
 
     for (unsigned int i=0; i<num_elements; i++)
       {
-	// TetGen only supports Tet4 elements.
-	Elem* elem = new Tet4;
+        // TetGen only supports Tet4 elements.
+        Elem* elem = new Tet4;
 
-	// Fill up the the node_labels vector
-	for (unsigned int j=0; j<elem->n_nodes(); j++)
-	  node_labels[j] = tetgen_wrapper.get_element_node(i,j);
+        // Fill up the the node_labels vector
+        for (unsigned int j=0; j<elem->n_nodes(); j++)
+          node_labels[j] = tetgen_wrapper.get_element_node(i,j);
 
-	// Associate nodes with this element
-	this->assign_nodes_to_elem(node_labels, elem);
+        // Associate nodes with this element
+        this->assign_nodes_to_elem(node_labels, elem);
 
-	// Finally, add this element to the mesh
-	this->_mesh.add_elem(elem);
+        // Finally, add this element to the mesh
+        this->_mesh.add_elem(elem);
       }
 
     // Delete original convex hull elements.  Is there ever a case where
@@ -354,10 +354,10 @@ namespace libMesh
       MeshBase::node_iterator it  = this->_mesh.nodes_begin();
       const MeshBase::node_iterator end = this->_mesh.nodes_end();
       for ( ; it != end; ++it)
-	{
-	  _sequential_to_libmesh_node_map[index] = (*it)->id();
-	  wrapper.set_node(index++, (**it)(0), (**it)(1), (**it)(2));
-	}
+        {
+          _sequential_to_libmesh_node_map[index] = (*it)->id();
+          wrapper.set_node(index++, (**it)(0), (**it)(1), (**it)(2));
+        }
     }
   }
 
@@ -369,19 +369,19 @@ namespace libMesh
   {
     for (unsigned int j=0; j<elem->n_nodes(); ++j)
       {
-	// Get the mapped node index to ask the Mesh for
-	unsigned mapped_node_id = _sequential_to_libmesh_node_map[ node_labels[j] ];
+        // Get the mapped node index to ask the Mesh for
+        unsigned mapped_node_id = _sequential_to_libmesh_node_map[ node_labels[j] ];
 
-	// Parallel mesh can return NULL pointers, this is bad...
-	Node* current_node = this->_mesh.node_ptr( mapped_node_id );
+        // Parallel mesh can return NULL pointers, this is bad...
+        Node* current_node = this->_mesh.node_ptr( mapped_node_id );
 
-	if (current_node == NULL)
-	  {
-	    libMesh::err << "Error! Mesh returned NULL node pointer!" << std::endl;
-	    libmesh_error();
-	  }
+        if (current_node == NULL)
+          {
+            libMesh::err << "Error! Mesh returned NULL node pointer!" << std::endl;
+            libmesh_error();
+          }
 
-	elem->set_node(j) = current_node;
+        elem->set_node(j) = current_node;
       }
   }
 
@@ -403,25 +403,25 @@ namespace libMesh
 
     for (; it != end ; ++it)
       {
-	Elem* elem = *it;
+        Elem* elem = *it;
 
-	// Check for proper element type
-	if (elem->type() != TRI3)
-	  {
-	    //libMesh::err << "ERROR: Some of the elements in the original mesh were not TRI3!" << std::endl;
-	    //libmesh_error();
-	    return 1;
-	  }
+        // Check for proper element type
+        if (elem->type() != TRI3)
+          {
+            //libMesh::err << "ERROR: Some of the elements in the original mesh were not TRI3!" << std::endl;
+            //libmesh_error();
+            return 1;
+          }
 
-	for (unsigned int i=0; i<elem->n_neighbors(); ++i)
-	  {
-	    if (elem->neighbor(i) == NULL)
-	      {
-		// libMesh::err << "ERROR: Non-convex hull, cannot be tetrahedralized." << std::endl;
-		// libmesh_error();
-		return 2;
-	      }
-	  }
+        for (unsigned int i=0; i<elem->n_neighbors(); ++i)
+          {
+            if (elem->neighbor(i) == NULL)
+              {
+                // libMesh::err << "ERROR: Non-convex hull, cannot be tetrahedralized." << std::endl;
+                // libmesh_error();
+                return 2;
+              }
+          }
       }
 
     // If we made it here, return success!
@@ -436,18 +436,18 @@ namespace libMesh
   {
     if (result != 0)
       {
-	libMesh::err << "Error! Conforming Delaunay mesh tetrahedralization requires a convex hull." << std::endl;
+        libMesh::err << "Error! Conforming Delaunay mesh tetrahedralization requires a convex hull." << std::endl;
 
-	if (result==1)
-	  {
-	    libMesh::err << "Non-TRI3 elements were found in the input Mesh.  ";
-	    libMesh::err << "A constrained Delaunay triangulation requires a convex hull of TRI3 elements." << std::endl;
-	  }
+        if (result==1)
+          {
+            libMesh::err << "Non-TRI3 elements were found in the input Mesh.  ";
+            libMesh::err << "A constrained Delaunay triangulation requires a convex hull of TRI3 elements." << std::endl;
+          }
 
-	libMesh::err << "Consider calling TetGenMeshInterface::pointset_convexhull() followed " << std::endl;
-	libMesh::err << "by Mesh::find_neighbors() first." << std::endl;
+        libMesh::err << "Consider calling TetGenMeshInterface::pointset_convexhull() followed " << std::endl;
+        libMesh::err << "by Mesh::find_neighbors() first." << std::endl;
 
-	libmesh_error();
+        libmesh_error();
       }
   }
 
@@ -461,13 +461,13 @@ namespace libMesh
 
     for (; it != end ; ++it)
       {
-	Elem* elem = *it;
+        Elem* elem = *it;
 
-	// Check for proper element type. Yes, we legally delete elements while
-	// iterating over them because no entries from the underlying container
-	// are actually erased.
-	if (elem->type() == TRI3)
-	  _mesh.delete_elem(elem);
+        // Check for proper element type. Yes, we legally delete elements while
+        // iterating over them because no entries from the underlying container
+        // are actually erased.
+        if (elem->type() == TRI3)
+          _mesh.delete_elem(elem);
       }
   }
 

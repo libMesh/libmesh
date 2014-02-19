@@ -33,7 +33,7 @@ namespace libMesh
 
 // Constructor
 QConical::QConical(const unsigned int d,
-		   const Order o) : QBase(d,o)
+                   const Order o) : QBase(d,o)
 {
 }
 
@@ -62,7 +62,7 @@ void QConical::conical_product_tri(unsigned int p)
   std::pair<Real, Real> old_range(-1.0L, 1.0L);
   std::pair<Real, Real> new_range( 0.0L, 1.0L);
   gauss1D.scale(old_range,
-		new_range);
+                new_range);
 
   // Now construct the points and weights for the conical product rule.
 
@@ -87,10 +87,10 @@ void QConical::conical_product_tri(unsigned int p)
   for (unsigned int i=0; i<np; i++)
     for (unsigned int j=0; j<np; j++)
       {
-	_points[gp](0) = jac1D.qp(j)(0);                          //s[j];
-	_points[gp](1) = gauss1D.qp(i)(0) * (1.-jac1D.qp(j)(0)); //r[i]*(1.-s[j]);
-	_weights[gp]   = gauss1D.w(i) * jac1D.w(j);              //A[i]*B[j];
-	gp++;
+        _points[gp](0) = jac1D.qp(j)(0);                          //s[j];
+        _points[gp](1) = gauss1D.qp(i)(0) * (1.-jac1D.qp(j)(0)); //r[i]*(1.-s[j]);
+        _weights[gp]   = gauss1D.w(i) * jac1D.w(j);              //A[i]*B[j];
+        gp++;
       }
 }
 
@@ -114,7 +114,7 @@ void QConical::conical_product_tet(unsigned int p)
   std::pair<Real, Real> old_range(-1.0L, 1.0L);
   std::pair<Real, Real> new_range( 0.0L, 1.0L);
   gauss1D.scale(old_range,
-		new_range);
+                new_range);
 
   // Now construct the points and weights for the conical product rule.
 
@@ -143,11 +143,11 @@ void QConical::conical_product_tet(unsigned int p)
     for (unsigned int j=0; j<np; j++)
       for (unsigned int k=0; k<np; k++)
       {
-	_points[gp](0) = jacB1D.qp(k)(0);                                                  //t[k];
-	_points[gp](1) = jacA1D.qp(j)(0)  * (1.-jacB1D.qp(k)(0));                         //s[j]*(1.-t[k]);
-	_points[gp](2) = gauss1D.qp(i)(0) * (1.-jacA1D.qp(j)(0)) * (1.-jacB1D.qp(k)(0)); //r[i]*(1.-s[j])*(1.-t[k]);
-	_weights[gp]   = gauss1D.w(i)     * jacA1D.w(j)          * jacB1D.w(k);          //A[i]*B[j]*C[k];
-	gp++;
+        _points[gp](0) = jacB1D.qp(k)(0);                                                  //t[k];
+        _points[gp](1) = jacA1D.qp(j)(0)  * (1.-jacB1D.qp(k)(0));                         //s[j]*(1.-t[k]);
+        _points[gp](2) = gauss1D.qp(i)(0) * (1.-jacA1D.qp(j)(0)) * (1.-jacB1D.qp(k)(0)); //r[i]*(1.-s[j])*(1.-t[k]);
+        _weights[gp]   = gauss1D.w(i)     * jacA1D.w(j)          * jacB1D.w(k);          //A[i]*B[j]*C[k];
+        gp++;
       }
 }
 
@@ -202,14 +202,14 @@ void QConical::conical_product_pyramid(unsigned int p)
     for (unsigned int j=0; j<np; ++j)
       for (unsigned int k=0; k<np; ++k, ++q)
       {
-	const Real xi=gauss1D.qp(i)(0);
-	const Real yj=gauss1D.qp(j)(0);
-	const Real zk=jac1D.qp(k)(0);
+        const Real xi=gauss1D.qp(i)(0);
+        const Real yj=gauss1D.qp(j)(0);
+        const Real zk=jac1D.qp(k)(0);
 
-	_points[q](0) = (1.-zk) * xi;
-	_points[q](1) = (1.-zk) * yj;
-	_points[q](2) = zk;
-	_weights[q]   = gauss1D.w(i) * gauss1D.w(j) * jac1D.w(k);
+        _points[q](0) = (1.-zk) * xi;
+        _points[q](1) = (1.-zk) * yj;
+        _points[q](2) = zk;
+        _weights[q]   = gauss1D.w(i) * gauss1D.w(j) * jac1D.w(k);
       }
 
 

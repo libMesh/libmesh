@@ -69,7 +69,7 @@ bool Tet4::is_face(const unsigned int) const
 }
 
 bool Tet4::is_node_on_edge(const unsigned int n,
-			   const unsigned int e) const
+                           const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 2; ++i)
@@ -117,7 +117,7 @@ bool Tet4::is_child_on_side(const unsigned int /*c*/,
 
 
 bool Tet4::is_node_on_side(const unsigned int n,
-			   const unsigned int s) const
+                           const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 3; ++i)
@@ -127,7 +127,7 @@ bool Tet4::is_node_on_side(const unsigned int n,
 }
 
 AutoPtr<Elem> Tet4::build_side (const unsigned int i,
-				bool proxy) const
+                                bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -143,44 +143,44 @@ AutoPtr<Elem> Tet4::build_side (const unsigned int i,
       face->subdomain_id() = this->subdomain_id();
 
       switch (i)
-	{
-	case 0:
-	  {
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(1);
+        {
+        case 0:
+          {
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(1);
 
-	    return face;
-	  }
-	case 1:
-	  {
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(3);
+            return face;
+          }
+        case 1:
+          {
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(3);
 
-	    return face;
-	  }
-	case 2:
-	  {
-	    face->set_node(0) = this->get_node(1);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(3);
+            return face;
+          }
+        case 2:
+          {
+            face->set_node(0) = this->get_node(1);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(3);
 
-	    return face;
-	  }
-	case 3:
-	  {
-	    face->set_node(0) = this->get_node(2);
-	    face->set_node(1) = this->get_node(0);
-	    face->set_node(2) = this->get_node(3);
+            return face;
+          }
+        case 3:
+          {
+            face->set_node(0) = this->get_node(2);
+            face->set_node(1) = this->get_node(0);
+            face->set_node(2) = this->get_node(3);
 
-	    return face;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+            return face;
+          }
+        default:
+          {
+            libmesh_error();
+          }
+        }
     }
 
   // We'll never get here.
@@ -198,8 +198,8 @@ AutoPtr<Elem> Tet4::build_edge (const unsigned int i) const
 
 
 void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),
-			const IOPackage iop,
-			std::vector<dof_id_type>& conn) const
+                        const IOPackage iop,
+                        std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -210,26 +210,26 @@ void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),
     {
     case TECPLOT:
       {
-	conn.resize(8);
-	conn[0] = this->node(0)+1;
-	conn[1] = this->node(1)+1;
-	conn[2] = this->node(2)+1;
-	conn[3] = this->node(2)+1;
-	conn[4] = this->node(3)+1;
-	conn[5] = this->node(3)+1;
-	conn[6] = this->node(3)+1;
-	conn[7] = this->node(3)+1;
-	return;
+        conn.resize(8);
+        conn[0] = this->node(0)+1;
+        conn[1] = this->node(1)+1;
+        conn[2] = this->node(2)+1;
+        conn[3] = this->node(2)+1;
+        conn[4] = this->node(3)+1;
+        conn[5] = this->node(3)+1;
+        conn[6] = this->node(3)+1;
+        conn[7] = this->node(3)+1;
+        return;
       }
 
     case VTK:
       {
-	conn.resize(4);
-	conn[0] = this->node(0);
-	conn[1] = this->node(1);
-	conn[2] = this->node(2);
-	conn[3] = this->node(3);
-	return;
+        conn.resize(4);
+        conn[0] = this->node(0);
+        conn[1] = this->node(1);
+        conn[2] = this->node(2);
+        conn[3] = this->node(3);
+        return;
       }
 
     default:
@@ -361,7 +361,7 @@ std::pair<Real, Real> Tet4::min_and_max_angle() const
 
   // Return max/min dihedral angles
   return std::make_pair(*std::min_element(dihedral_angles, dihedral_angles+6),
- 			*std::max_element(dihedral_angles, dihedral_angles+6));
+                        *std::max_element(dihedral_angles, dihedral_angles+6));
 
 }
 
@@ -369,8 +369,8 @@ std::pair<Real, Real> Tet4::min_and_max_angle() const
 
 #ifdef LIBMESH_ENABLE_AMR
 float Tet4::embedding_matrix (const unsigned int i,
-			      const unsigned int j,
-			      const unsigned int k) const
+                              const unsigned int j,
+                              const unsigned int k) const
 {
   // Choose an optimal diagonal, if one has not already been selected
   this->choose_diagonal();
@@ -434,54 +434,54 @@ float Tet4::embedding_matrix (const unsigned int i,
 //       _diagonal_selection = diag;
 //
 //       /* The first four children do not have to be changed.  For the
-// 	 others, only the nodes have to be changed.  Note that we have
-// 	 to keep track of the nodes ourselves since there is no \p
-// 	 MeshRefinement object with a valid \p _new_nodes_map
-// 	 available.  */
+//  others, only the nodes have to be changed.  Note that we have
+//  to keep track of the nodes ourselves since there is no \p
+//  MeshRefinement object with a valid \p _new_nodes_map
+//  available.  */
 //       for (unsigned int c=4; c<this->n_children(); c++)
-// 	{
-// 	  Elem *child = this->child(c);
-// 	  for (unsigned int nc=0; nc<child->n_nodes(); nc++)
-// 	    {
-// 	      /* Unassign the current node.  */
-// 	      child->set_node(nc) = NULL;
+// {
+//   Elem *child = this->child(c);
+//   for (unsigned int nc=0; nc<child->n_nodes(); nc++)
+//     {
+//       /* Unassign the current node.  */
+//       child->set_node(nc) = NULL;
 //
-// 	      /* We have to find the correct new node now.  We know
-// 		 that it exists somewhere.  We make use of the fact
-// 		 that the embedding matrix for these children consists
-// 		 of entries 0.0 and 0.5 only.  Also, we make use of
-// 		 the properties of the embedding matrix for the first
-// 		 (unchanged) four children, which allow us to use a
-// 		 simple mechanism to find the required node.  */
+//       /* We have to find the correct new node now.  We know
+//  that it exists somewhere.  We make use of the fact
+//  that the embedding matrix for these children consists
+//  of entries 0.0 and 0.5 only.  Also, we make use of
+//  the properties of the embedding matrix for the first
+//  (unchanged) four children, which allow us to use a
+//  simple mechanism to find the required node.  */
 //
 //
-// 	      unsigned int first_05_in_embedding_matrix = libMesh::invalid_uint;
-// 	      for (unsigned int n=0; n<this->n_nodes(); n++)
-// 		{
-// 		  if (this->embedding_matrix(c,nc,n) != 0.0)
-// 		    {
-// 		      /* It must be 0.5 then.  Check whether it's the
-// 			 first or second time that we get a 0.5
-// 			 value.  */
-// 		      if (first_05_in_embedding_matrix==libMesh::invalid_uint)
-// 			{
-// 			  /* First time, so just remeber this position.  */
-// 			  first_05_in_embedding_matrix = n;
-// 			}
-// 		      else
-// 			{
-// 			  /* Second time, so we know now which node to
-// 			     use.  */
-// 			  child->set_node(nc) = this->child(n)->get_node(first_05_in_embedding_matrix);
-// 			}
+//       unsigned int first_05_in_embedding_matrix = libMesh::invalid_uint;
+//       for (unsigned int n=0; n<this->n_nodes(); n++)
+// {
+//   if (this->embedding_matrix(c,nc,n) != 0.0)
+//     {
+//       /* It must be 0.5 then.  Check whether it's the
+//  first or second time that we get a 0.5
+//  value.  */
+//       if (first_05_in_embedding_matrix==libMesh::invalid_uint)
+// {
+//   /* First time, so just remeber this position.  */
+//   first_05_in_embedding_matrix = n;
+// }
+//       else
+// {
+//   /* Second time, so we know now which node to
+//      use.  */
+//   child->set_node(nc) = this->child(n)->get_node(first_05_in_embedding_matrix);
+// }
 //
-// 		    }
-// 		}
+//     }
+// }
 //
-// 	      /* Make sure that a node has been found.  */
-// 	      libmesh_assert(child->get_node(nc));
-// 	    }
-// 	}
+//       /* Make sure that a node has been found.  */
+//       libmesh_assert(child->get_node(nc));
+//     }
+// }
 //     }
 // }
 
@@ -499,40 +499,40 @@ float Tet4::embedding_matrix (const unsigned int i,
 //     case DIAG_01_23:
 //       use_this = DIAG_02_13;
 //       if (diag_03_12 < diag_02_13)
-// 	{
-// 	  use_this = DIAG_03_12;
-// 	}
+// {
+//   use_this = DIAG_03_12;
+// }
 //       break;
 //
 //     case DIAG_02_13:
 //       use_this = DIAG_03_12;
 //       if (diag_01_23 < diag_03_12)
-// 	{
-// 	  use_this = DIAG_01_23;
-// 	}
+// {
+//   use_this = DIAG_01_23;
+// }
 //       break;
 //
 //     case DIAG_03_12:
 //       use_this = DIAG_02_13;
 //       if (diag_01_23 < diag_02_13)
-// 	{
-// 	  use_this = DIAG_01_23;
-// 	}
+// {
+//   use_this = DIAG_01_23;
+// }
 //       break;
 //
 //     default:
 //       use_this = DIAG_02_13;
 //       if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
-// 	{
-// 	  if (diag_01_23 < diag_03_12)
-// 	    {
-// 	      use_this = DIAG_01_23;
-// 	    }
-// 	  else
-// 	    {
-// 	      use_this = DIAG_03_12;
-// 	    }
-// 	}
+// {
+//   if (diag_01_23 < diag_03_12)
+//     {
+//       use_this = DIAG_01_23;
+//     }
+//   else
+//     {
+//       use_this = DIAG_03_12;
+//     }
+// }
 //       break;
 //     }
 //

@@ -34,7 +34,7 @@ namespace libMesh
 //------------------------------------------------------------------
 // PointLocatorBase methods
 PointLocatorBase::PointLocatorBase (const MeshBase& mesh,
-				    const PointLocatorBase* master) :
+                                    const PointLocatorBase* master) :
   _master                  (master),
   _mesh                    (mesh),
   _initialized             (false)
@@ -54,29 +54,29 @@ PointLocatorBase::~PointLocatorBase ()
 
 
 AutoPtr<PointLocatorBase> PointLocatorBase::build (const PointLocatorType t,
-						   const MeshBase& mesh,
-						   const PointLocatorBase* master)
+                                                   const MeshBase& mesh,
+                                                   const PointLocatorBase* master)
 {
   switch (t)
     {
     case TREE:
       {
-	AutoPtr<PointLocatorBase> ap(new PointLocatorTree(mesh,
-							  master));
-	return ap;
+        AutoPtr<PointLocatorBase> ap(new PointLocatorTree(mesh,
+                                                          master));
+        return ap;
       }
 
     case LIST:
       {
-	AutoPtr<PointLocatorBase> ap(new PointLocatorList(mesh,
-							  master));
-	return ap;
+        AutoPtr<PointLocatorBase> ap(new PointLocatorList(mesh,
+                                                          master));
+        return ap;
       }
 
     default:
       {
-	libMesh::err << "ERROR: Bad PointLocatorType = " << t << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: Bad PointLocatorType = " << t << std::endl;
+        libmesh_error();
       }
     }
 

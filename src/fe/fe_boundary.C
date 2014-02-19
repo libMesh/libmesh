@@ -29,7 +29,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/tensor_value.h"  // May be necessary if destructors
-				   // get instantiated here
+// get instantiated here
 
 namespace libMesh
 {
@@ -39,13 +39,13 @@ namespace libMesh
 #define REINIT_ERROR(_dim, _type, _func)       \
 template <>                                    \
 void FE<_dim,_type>::_func(const Elem*,        \
-			   const unsigned int, \
+                           const unsigned int, \
                            const Real,         \
                            const std::vector<Point>* const,     \
                            const std::vector<Real>* const)      \
 {                                              \
   libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
-	        << std::endl;                      \
+               << std::endl;                                            \
   libmesh_error();                                     \
 }
 
@@ -53,22 +53,22 @@ void FE<_dim,_type>::_func(const Elem*,        \
 template <>                                    \
 void FE<_dim,_type>::_func(const Elem*,        \
                            const Elem*,        \
-			   const unsigned int, \
+                           const unsigned int,            \
                            const std::vector<Point>&,     \
                            std::vector<Point>&)      \
 {                                              \
   libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
-	        << std::endl;                      \
+               << std::endl;                                            \
   libmesh_error();                                     \
 }
 
 #define FACE_EDGE_SHAPE_ERROR(_dim, _func)       \
 template <>                                    \
- void FEMap::_func<_dim>(const std::vector<Point>&,	\
+ void FEMap::_func<_dim>(const std::vector<Point>&,     \
                            const Elem* )        \
 {                                              \
   libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
-	        << std::endl;                      \
+               << std::endl;                                            \
   libmesh_error();                                     \
 }
 
@@ -138,8 +138,8 @@ REINIT_ERROR(1, SZABAB, edge_reinit)
 // Methods for 2D, 3D
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit(const Elem* elem,
-		       const unsigned int s,
-		       const Real /* tolerance */,
+                       const unsigned int s,
+                       const Real /* tolerance */,
                        const std::vector<Point>* const pts,
                        const std::vector<Real>* const weights)
 {
@@ -248,8 +248,8 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::edge_reinit(const Elem* elem,
-		            const unsigned int e,
-			    const Real tolerance,
+                            const unsigned int e,
+                            const Real tolerance,
                             const std::vector<Point>* const pts,
                             const std::vector<Real>* const weights)
 {
@@ -333,10 +333,10 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::side_map (const Elem* elem,
-	                  const Elem* side,
+                          const Elem* side,
                           const unsigned int s,
                           const std::vector<Point>& reference_side_points,
-	                  std::vector<Point>&       reference_points)
+                          std::vector<Point>&       reference_points)
 {
   unsigned int side_p_level = elem->p_level();
   if (elem->neighbor(s) != NULL)
@@ -384,7 +384,7 @@ void FE<Dim,T>::side_map (const Elem* elem,
 
 template<unsigned int Dim>
 void FEMap::init_face_shape_functions(const std::vector<Point>& qp,
-				      const Elem* side)
+                                      const Elem* side)
 {
   libmesh_assert(side);
 
@@ -403,7 +403,7 @@ void FEMap::init_face_shape_functions(const std::vector<Point>& qp,
 
   const unsigned int n_mapping_shape_functions =
     FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
-					 mapping_order);
+                                         mapping_order);
 
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping
@@ -433,35 +433,35 @@ void FEMap::init_face_shape_functions(const std::vector<Point>& qp,
           this->d2psidxi2_map[i].resize  (n_qp);
         }
       if (Dim == 3)
-	{
-	  this->dpsideta_map[i].resize     (n_qp);
-	  this->d2psidxideta_map[i].resize (n_qp);
-	  this->d2psideta2_map[i].resize   (n_qp);
-	}
+        {
+          this->dpsideta_map[i].resize     (n_qp);
+          this->d2psidxideta_map[i].resize (n_qp);
+          this->d2psideta2_map[i].resize   (n_qp);
+        }
 
       // Compute the value of shape function i, and its first and
       // second derivatives at quadrature point p
       // (Lagrange shape functions are used for the mapping)
       for (unsigned int p=0; p<n_qp; p++)
-	{
-	  this->psi_map[i][p]        = FE<Dim-1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
+        {
+          this->psi_map[i][p]        = FE<Dim-1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
           if (Dim > 1)
-	    {
-	      this->dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
-	      this->d2psidxi2_map[i][p]  = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
-	    }
-	  // libMesh::out << "this->d2psidxi2_map["<<i<<"][p]=" << d2psidxi2_map[i][p] << std::endl;
+            {
+              this->dpsidxi_map[i][p]    = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
+              this->d2psidxi2_map[i][p]  = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
+            }
+          // libMesh::out << "this->d2psidxi2_map["<<i<<"][p]=" << d2psidxi2_map[i][p] << std::endl;
 
-	  // If we are in 3D, then our sides are 2D faces.
-	  // For the second derivatives, we must also compute the cross
-	  // derivative d^2() / dxi deta
-	  if (Dim == 3)
-	    {
-	      this->dpsideta_map[i][p]     = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 1, qp[p]);
-	      this->d2psidxideta_map[i][p] = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 1, qp[p]);
-	      this->d2psideta2_map[i][p]   = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 2, qp[p]);
-	    }
-	}
+          // If we are in 3D, then our sides are 2D faces.
+          // For the second derivatives, we must also compute the cross
+          // derivative d^2() / dxi deta
+          if (Dim == 3)
+            {
+              this->dpsideta_map[i][p]     = FE<Dim-1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 1, qp[p]);
+              this->d2psidxideta_map[i][p] = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 1, qp[p]);
+              this->d2psideta2_map[i][p]   = FE<Dim-1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 2, qp[p]);
+            }
+        }
     }
 
 
@@ -473,7 +473,7 @@ void FEMap::init_face_shape_functions(const std::vector<Point>& qp,
 
 template<unsigned int Dim>
 void FEMap::init_edge_shape_functions(const std::vector<Point>& qp,
-				      const Elem* edge)
+                                      const Elem* edge)
 {
   libmesh_assert(edge);
 
@@ -492,7 +492,7 @@ void FEMap::init_edge_shape_functions(const std::vector<Point>& qp,
 
   const unsigned int n_mapping_shape_functions =
     FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
-					 mapping_order);
+                                         mapping_order);
 
   // resize the vectors to hold current data
   // Psi are the shape functions used for the FE mapping
@@ -512,11 +512,11 @@ void FEMap::init_edge_shape_functions(const std::vector<Point>& qp,
       // second derivatives at quadrature point p
       // (Lagrange shape functions are used for the mapping)
       for (unsigned int p=0; p<n_qp; p++)
-	{
-	  this->psi_map[i][p]        = FE<1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
-	  this->dpsidxi_map[i][p]    = FE<1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
-	  this->d2psidxi2_map[i][p]  = FE<1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
-	}
+        {
+          this->psi_map[i][p]        = FE<1,LAGRANGE>::shape             (mapping_elem_type, mapping_order, i,    qp[p]);
+          this->dpsidxi_map[i][p]    = FE<1,LAGRANGE>::shape_deriv       (mapping_elem_type, mapping_order, i, 0, qp[p]);
+          this->d2psidxi2_map[i][p]  = FE<1,LAGRANGE>::shape_second_deriv(mapping_elem_type, mapping_order, i, 0, qp[p]);
+        }
     }
 
   /**
@@ -528,7 +528,7 @@ void FEMap::init_edge_shape_functions(const std::vector<Point>& qp,
 
 
 void FEMap::compute_face_map(int dim, const std::vector<Real>& qw,
-			     const Elem* side)
+                             const Elem* side)
 {
   libmesh_assert(side);
 
@@ -541,16 +541,16 @@ void FEMap::compute_face_map(int dim, const std::vector<Real>& qw,
     {
     case 1:
       {
-	// A 1D finite element, currently assumed to be in 1D space
-	// This means the boundary is a "0D finite element", a
+        // A 1D finite element, currently assumed to be in 1D space
+        // This means the boundary is a "0D finite element", a
         // NODEELEM.
 
-	// Resize the vectors to hold data at the quadrature points
-	{
-	  this->xyz.resize(n_qp);
-	  normals.resize(n_qp);
+        // Resize the vectors to hold data at the quadrature points
+        {
+          this->xyz.resize(n_qp);
+          normals.resize(n_qp);
 
-	  this->JxW.resize(n_qp);
+          this->JxW.resize(n_qp);
         }
 
         // If we have no quadrature points, there's nothing else to do
@@ -570,227 +570,227 @@ void FEMap::compute_face_map(int dim, const std::vector<Real>& qw,
           }
 
         // Calculate x at the point
-	libmesh_assert_equal_to (this->psi_map.size(), 1);
+        libmesh_assert_equal_to (this->psi_map.size(), 1);
         // In the unlikely event we have multiple quadrature
         // points, they'll be in the same place
-	for (unsigned int p=0; p<n_qp; p++)
-	  {
-	    this->xyz[p].zero();
-	    this->xyz[p].add_scaled          (side->point(0), this->psi_map[0][p]);
+        for (unsigned int p=0; p<n_qp; p++)
+          {
+            this->xyz[p].zero();
+            this->xyz[p].add_scaled          (side->point(0), this->psi_map[0][p]);
             normals[p] = normals[0];
-	    this->JxW[p] = 1.0*qw[p];
+            this->JxW[p] = 1.0*qw[p];
           }
 
-	// done computing the map
-	break;
+        // done computing the map
+        break;
       }
 
     case 2:
       {
-	// A 2D finite element living in either 2D or 3D space.
-	// This means the boundary is a 1D finite element, i.e.
-	// and EDGE2 or EDGE3.
-	// Resize the vectors to hold data at the quadrature points
-	{
-	  this->xyz.resize(n_qp);
-	  this->dxyzdxi_map.resize(n_qp);
-	  this->d2xyzdxi2_map.resize(n_qp);
-	  this->tangents.resize(n_qp);
-	  this->normals.resize(n_qp);
-	  this->curvatures.resize(n_qp);
+        // A 2D finite element living in either 2D or 3D space.
+        // This means the boundary is a 1D finite element, i.e.
+        // and EDGE2 or EDGE3.
+        // Resize the vectors to hold data at the quadrature points
+        {
+          this->xyz.resize(n_qp);
+          this->dxyzdxi_map.resize(n_qp);
+          this->d2xyzdxi2_map.resize(n_qp);
+          this->tangents.resize(n_qp);
+          this->normals.resize(n_qp);
+          this->curvatures.resize(n_qp);
 
-	  this->JxW.resize(n_qp);
-	}
+          this->JxW.resize(n_qp);
+        }
 
-	// Clear the entities that will be summed
-	// Compute the tangent & normal at the quadrature point
-	for (unsigned int p=0; p<n_qp; p++)
-	  {
-	    this->tangents[p].resize(LIBMESH_DIM-1); // 1 Tangent in 2D, 2 in 3D
-	    this->xyz[p].zero();
-	    this->dxyzdxi_map[p].zero();
-	    this->d2xyzdxi2_map[p].zero();
-	  }
+        // Clear the entities that will be summed
+        // Compute the tangent & normal at the quadrature point
+        for (unsigned int p=0; p<n_qp; p++)
+          {
+            this->tangents[p].resize(LIBMESH_DIM-1); // 1 Tangent in 2D, 2 in 3D
+            this->xyz[p].zero();
+            this->dxyzdxi_map[p].zero();
+            this->d2xyzdxi2_map[p].zero();
+          }
 
-	// compute x, dxdxi at the quadrature points
-	for (unsigned int i=0; i<this->psi_map.size(); i++) // sum over the nodes
-	  {
-	    const Point& side_point = side->point(i);
+        // compute x, dxdxi at the quadrature points
+        for (unsigned int i=0; i<this->psi_map.size(); i++) // sum over the nodes
+          {
+            const Point& side_point = side->point(i);
 
-	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
-	      {
-		this->xyz[p].add_scaled          (side_point, this->psi_map[i][p]);
-		this->dxyzdxi_map[p].add_scaled  (side_point, this->dpsidxi_map[i][p]);
-		this->d2xyzdxi2_map[p].add_scaled(side_point, this->d2psidxi2_map[i][p]);
-	      }
-	  }
+            for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
+              {
+                this->xyz[p].add_scaled          (side_point, this->psi_map[i][p]);
+                this->dxyzdxi_map[p].add_scaled  (side_point, this->dpsidxi_map[i][p]);
+                this->d2xyzdxi2_map[p].add_scaled(side_point, this->d2psidxi2_map[i][p]);
+              }
+          }
 
-	// Compute the tangent & normal at the quadrature point
-	for (unsigned int p=0; p<n_qp; p++)
-	  {
-	    // The first tangent comes from just the edge's Jacobian
-	    this->tangents[p][0] = this->dxyzdxi_map[p].unit();
+        // Compute the tangent & normal at the quadrature point
+        for (unsigned int p=0; p<n_qp; p++)
+          {
+            // The first tangent comes from just the edge's Jacobian
+            this->tangents[p][0] = this->dxyzdxi_map[p].unit();
 
 #if LIBMESH_DIM == 2
-	    // For a 2D element living in 2D, the normal is given directly
-	    // from the entries in the edge Jacobian.
-	    this->normals[p] = (Point(this->dxyzdxi_map[p](1), -this->dxyzdxi_map[p](0), 0.)).unit();
+            // For a 2D element living in 2D, the normal is given directly
+            // from the entries in the edge Jacobian.
+            this->normals[p] = (Point(this->dxyzdxi_map[p](1), -this->dxyzdxi_map[p](0), 0.)).unit();
 
 #elif LIBMESH_DIM == 3
-	    // For a 2D element living in 3D, there is a second tangent.
-	    // For the second tangent, we need to refer to the full
-	    // element's (not just the edge's) Jacobian.
-	    const Elem *elem = side->parent();
-	    libmesh_assert(elem);
+            // For a 2D element living in 3D, there is a second tangent.
+            // For the second tangent, we need to refer to the full
+            // element's (not just the edge's) Jacobian.
+            const Elem *elem = side->parent();
+            libmesh_assert(elem);
 
-	    // Inverse map xyz[p] to a reference point on the parent...
-	    Point reference_point = FE<2,LAGRANGE>::inverse_map(elem, this->xyz[p]);
+            // Inverse map xyz[p] to a reference point on the parent...
+            Point reference_point = FE<2,LAGRANGE>::inverse_map(elem, this->xyz[p]);
 
-	    // Get dxyz/dxi and dxyz/deta from the parent map.
-	    Point dx_dxi  = FE<2,LAGRANGE>::map_xi (elem, reference_point);
-	    Point dx_deta = FE<2,LAGRANGE>::map_eta(elem, reference_point);
+            // Get dxyz/dxi and dxyz/deta from the parent map.
+            Point dx_dxi  = FE<2,LAGRANGE>::map_xi (elem, reference_point);
+            Point dx_deta = FE<2,LAGRANGE>::map_eta(elem, reference_point);
 
-	    // The second tangent vector is formed by crossing these vectors.
-	    tangents[p][1] = dx_dxi.cross(dx_deta).unit();
+            // The second tangent vector is formed by crossing these vectors.
+            tangents[p][1] = dx_dxi.cross(dx_deta).unit();
 
-	    // Finally, the normal in this case is given by crossing these
-	    // two tangents.
-	    normals[p] = tangents[p][0].cross(tangents[p][1]).unit();
+            // Finally, the normal in this case is given by crossing these
+            // two tangents.
+            normals[p] = tangents[p][0].cross(tangents[p][1]).unit();
 #endif
 
 
-	    // The curvature is computed via the familiar Frenet formula:
-	    // curvature = [d^2(x) / d (xi)^2] dot [normal]
-	    // For a reference, see:
-	    // F.S. Merritt, Mathematics Manual, 1962, McGraw-Hill, p. 310
-	    //
-	    // Note: The sign convention here is different from the
-	    // 3D case.  Concave-upward curves (smiles) have a positive
-	    // curvature.  Concave-downward curves (frowns) have a
-	    // negative curvature.  Be sure to take that into account!
-	    const Real numerator   = this->d2xyzdxi2_map[p] * this->normals[p];
-	    const Real denominator = this->dxyzdxi_map[p].size_sq();
-	    libmesh_assert_not_equal_to (denominator, 0);
-	    curvatures[p] = numerator / denominator;
-	  }
+            // The curvature is computed via the familiar Frenet formula:
+            // curvature = [d^2(x) / d (xi)^2] dot [normal]
+            // For a reference, see:
+            // F.S. Merritt, Mathematics Manual, 1962, McGraw-Hill, p. 310
+            //
+            // Note: The sign convention here is different from the
+            // 3D case.  Concave-upward curves (smiles) have a positive
+            // curvature.  Concave-downward curves (frowns) have a
+            // negative curvature.  Be sure to take that into account!
+            const Real numerator   = this->d2xyzdxi2_map[p] * this->normals[p];
+            const Real denominator = this->dxyzdxi_map[p].size_sq();
+            libmesh_assert_not_equal_to (denominator, 0);
+            curvatures[p] = numerator / denominator;
+          }
 
-	// compute the jacobian at the quadrature points
-	for (unsigned int p=0; p<n_qp; p++)
-	  {
-	    const Real the_jac = this->dxyzdxi_map[p].size();
+        // compute the jacobian at the quadrature points
+        for (unsigned int p=0; p<n_qp; p++)
+          {
+            const Real the_jac = this->dxyzdxi_map[p].size();
 
-	    libmesh_assert_greater (the_jac, 0.);
+            libmesh_assert_greater (the_jac, 0.);
 
-	    this->JxW[p] = the_jac*qw[p];
-	  }
+            this->JxW[p] = the_jac*qw[p];
+          }
 
-	// done computing the map
-	break;
+        // done computing the map
+        break;
       }
 
 
 
     case 3:
       {
-	// A 3D finite element living in 3D space.
-	// Resize the vectors to hold data at the quadrature points
-	{
-	  this->xyz.resize(n_qp);
-	  this->dxyzdxi_map.resize(n_qp);
-	  this->dxyzdeta_map.resize(n_qp);
-	  this->d2xyzdxi2_map.resize(n_qp);
-	  this->d2xyzdxideta_map.resize(n_qp);
-	  this->d2xyzdeta2_map.resize(n_qp);
-	  this->tangents.resize(n_qp);
-	  this->normals.resize(n_qp);
-	  this->curvatures.resize(n_qp);
+        // A 3D finite element living in 3D space.
+        // Resize the vectors to hold data at the quadrature points
+        {
+          this->xyz.resize(n_qp);
+          this->dxyzdxi_map.resize(n_qp);
+          this->dxyzdeta_map.resize(n_qp);
+          this->d2xyzdxi2_map.resize(n_qp);
+          this->d2xyzdxideta_map.resize(n_qp);
+          this->d2xyzdeta2_map.resize(n_qp);
+          this->tangents.resize(n_qp);
+          this->normals.resize(n_qp);
+          this->curvatures.resize(n_qp);
 
-	  this->JxW.resize(n_qp);
-	}
+          this->JxW.resize(n_qp);
+        }
 
-	// Clear the entities that will be summed
-	for (unsigned int p=0; p<n_qp; p++)
-	  {
-	    this->tangents[p].resize(LIBMESH_DIM-1); // 1 Tangent in 2D, 2 in 3D
-	    this->xyz[p].zero();
-	    this->dxyzdxi_map[p].zero();
-	    this->dxyzdeta_map[p].zero();
-	    this->d2xyzdxi2_map[p].zero();
-	    this->d2xyzdxideta_map[p].zero();
-	    this->d2xyzdeta2_map[p].zero();
-	  }
+        // Clear the entities that will be summed
+        for (unsigned int p=0; p<n_qp; p++)
+          {
+            this->tangents[p].resize(LIBMESH_DIM-1); // 1 Tangent in 2D, 2 in 3D
+            this->xyz[p].zero();
+            this->dxyzdxi_map[p].zero();
+            this->dxyzdeta_map[p].zero();
+            this->d2xyzdxi2_map[p].zero();
+            this->d2xyzdxideta_map[p].zero();
+            this->d2xyzdeta2_map[p].zero();
+          }
 
-	// compute x, dxdxi at the quadrature points
-	for (unsigned int i=0; i<this->psi_map.size(); i++) // sum over the nodes
-	  {
-	    const Point& side_point = side->point(i);
+        // compute x, dxdxi at the quadrature points
+        for (unsigned int i=0; i<this->psi_map.size(); i++) // sum over the nodes
+          {
+            const Point& side_point = side->point(i);
 
-	    for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
-	      {
-		this->xyz[p].add_scaled         (side_point, this->psi_map[i][p]);
-		this->dxyzdxi_map[p].add_scaled (side_point, this->dpsidxi_map[i][p]);
-		this->dxyzdeta_map[p].add_scaled(side_point, this->dpsideta_map[i][p]);
-		this->d2xyzdxi2_map[p].add_scaled   (side_point, this->d2psidxi2_map[i][p]);
-		this->d2xyzdxideta_map[p].add_scaled(side_point, this->d2psidxideta_map[i][p]);
-		this->d2xyzdeta2_map[p].add_scaled  (side_point, this->d2psideta2_map[i][p]);
-	      }
-	  }
+            for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
+              {
+                this->xyz[p].add_scaled         (side_point, this->psi_map[i][p]);
+                this->dxyzdxi_map[p].add_scaled (side_point, this->dpsidxi_map[i][p]);
+                this->dxyzdeta_map[p].add_scaled(side_point, this->dpsideta_map[i][p]);
+                this->d2xyzdxi2_map[p].add_scaled   (side_point, this->d2psidxi2_map[i][p]);
+                this->d2xyzdxideta_map[p].add_scaled(side_point, this->d2psidxideta_map[i][p]);
+                this->d2xyzdeta2_map[p].add_scaled  (side_point, this->d2psideta2_map[i][p]);
+              }
+          }
 
-	// Compute the tangents, normal, and curvature at the quadrature point
-	for (unsigned int p=0; p<n_qp; p++)
-	  {
-	    const Point n  = this->dxyzdxi_map[p].cross(this->dxyzdeta_map[p]);
-	    this->normals[p]     = n.unit();
-	    this->tangents[p][0] = this->dxyzdxi_map[p].unit();
-	    this->tangents[p][1] = n.cross(this->dxyzdxi_map[p]).unit();
+        // Compute the tangents, normal, and curvature at the quadrature point
+        for (unsigned int p=0; p<n_qp; p++)
+          {
+            const Point n  = this->dxyzdxi_map[p].cross(this->dxyzdeta_map[p]);
+            this->normals[p]     = n.unit();
+            this->tangents[p][0] = this->dxyzdxi_map[p].unit();
+            this->tangents[p][1] = n.cross(this->dxyzdxi_map[p]).unit();
 
-	    // Compute curvature using the typical nomenclature
-	    // of the first and second fundamental forms.
-	    // For reference, see:
-	    // 1) http://mathworld.wolfram.com/MeanCurvature.html
-	    //    (note -- they are using inward normal)
-	    // 2) F.S. Merritt, Mathematics Manual, 1962, McGraw-Hill
-	    const Real L  = -this->d2xyzdxi2_map[p]    * this->normals[p];
-	    const Real M  = -this->d2xyzdxideta_map[p] * this->normals[p];
-	    const Real N  = -this->d2xyzdeta2_map[p]   * this->normals[p];
-	    const Real E  =  this->dxyzdxi_map[p].size_sq();
-	    const Real F  =  this->dxyzdxi_map[p]      * this->dxyzdeta_map[p];
-	    const Real G  =  this->dxyzdeta_map[p].size_sq();
+            // Compute curvature using the typical nomenclature
+            // of the first and second fundamental forms.
+            // For reference, see:
+            // 1) http://mathworld.wolfram.com/MeanCurvature.html
+            //    (note -- they are using inward normal)
+            // 2) F.S. Merritt, Mathematics Manual, 1962, McGraw-Hill
+            const Real L  = -this->d2xyzdxi2_map[p]    * this->normals[p];
+            const Real M  = -this->d2xyzdxideta_map[p] * this->normals[p];
+            const Real N  = -this->d2xyzdeta2_map[p]   * this->normals[p];
+            const Real E  =  this->dxyzdxi_map[p].size_sq();
+            const Real F  =  this->dxyzdxi_map[p]      * this->dxyzdeta_map[p];
+            const Real G  =  this->dxyzdeta_map[p].size_sq();
 
-	    const Real numerator   = E*N -2.*F*M + G*L;
-	    const Real denominator = E*G - F*F;
-	    libmesh_assert_not_equal_to (denominator, 0.);
-	    curvatures[p] = 0.5*numerator/denominator;
-	  }
+            const Real numerator   = E*N -2.*F*M + G*L;
+            const Real denominator = E*G - F*F;
+            libmesh_assert_not_equal_to (denominator, 0.);
+            curvatures[p] = 0.5*numerator/denominator;
+          }
 
-	// compute the jacobian at the quadrature points, see
-	// http://sp81.msi.umn.edu:999/fluent/fidap/help/theory/thtoc.htm
-	for (unsigned int p=0; p<n_qp; p++)
-	  {
-	    const Real g11 = (dxdxi_map(p)*dxdxi_map(p) +
-			      dydxi_map(p)*dydxi_map(p) +
-			      dzdxi_map(p)*dzdxi_map(p));
+        // compute the jacobian at the quadrature points, see
+        // http://sp81.msi.umn.edu:999/fluent/fidap/help/theory/thtoc.htm
+        for (unsigned int p=0; p<n_qp; p++)
+          {
+            const Real g11 = (dxdxi_map(p)*dxdxi_map(p) +
+                              dydxi_map(p)*dydxi_map(p) +
+                              dzdxi_map(p)*dzdxi_map(p));
 
-	    const Real g12 = (dxdxi_map(p)*dxdeta_map(p) +
-			      dydxi_map(p)*dydeta_map(p) +
-			      dzdxi_map(p)*dzdeta_map(p));
+            const Real g12 = (dxdxi_map(p)*dxdeta_map(p) +
+                              dydxi_map(p)*dydeta_map(p) +
+                              dzdxi_map(p)*dzdeta_map(p));
 
-	    const Real g21 = g12;
+            const Real g21 = g12;
 
-	    const Real g22 = (dxdeta_map(p)*dxdeta_map(p) +
-			      dydeta_map(p)*dydeta_map(p) +
-			      dzdeta_map(p)*dzdeta_map(p));
+            const Real g22 = (dxdeta_map(p)*dxdeta_map(p) +
+                              dydeta_map(p)*dydeta_map(p) +
+                              dzdeta_map(p)*dzdeta_map(p));
 
 
-	    const Real the_jac = std::sqrt(g11*g22 - g12*g21);
+            const Real the_jac = std::sqrt(g11*g22 - g12*g21);
 
-	    libmesh_assert_greater (the_jac, 0.);
+            libmesh_assert_greater (the_jac, 0.);
 
-	    this->JxW[p] = the_jac*qw[p];
-	  }
+            this->JxW[p] = the_jac*qw[p];
+          }
 
-	// done computing the map
-	break;
+        // done computing the map
+        break;
       }
 
 
@@ -805,8 +805,8 @@ void FEMap::compute_face_map(int dim, const std::vector<Real>& qw,
 
 
 void FEMap::compute_edge_map(int dim,
-			     const std::vector<Real>& qw,
-			     const Elem* edge)
+                             const std::vector<Real>& qw,
+                             const Elem* edge)
 {
   libmesh_assert(edge);
 
@@ -858,9 +858,9 @@ void FEMap::compute_edge_map(int dim,
 
       for (unsigned int p=0; p<n_qp; p++) // for each quadrature point...
         {
-	  this->xyz[p].add_scaled             (edge_point, this->psi_map[i][p]);
-	  this->dxyzdxi_map[p].add_scaled     (edge_point, this->dpsidxi_map[i][p]);
-	  this->d2xyzdxi2_map[p].add_scaled   (edge_point, this->d2psidxi2_map[i][p]);
+          this->xyz[p].add_scaled             (edge_point, this->psi_map[i][p]);
+          this->dxyzdxi_map[p].add_scaled     (edge_point, this->dpsidxi_map[i][p]);
+          this->d2xyzdxi2_map[p].add_scaled   (edge_point, this->d2psidxi2_map[i][p]);
         }
     }
 

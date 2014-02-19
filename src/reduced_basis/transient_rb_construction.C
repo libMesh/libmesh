@@ -599,7 +599,7 @@ Real TransientRBConstruction::truth_solve(int write_interval)
 
     if(reuse_preconditioner)
       {
-	linear_solver->reuse_preconditioner(true);
+        linear_solver->reuse_preconditioner(true);
       }
 
     // Now compute the truth outputs
@@ -917,12 +917,12 @@ void TransientRBConstruction::enrich_RB_space()
       // Perform the matrix multiplication of temporal data with
       // the next POD eigenvector
       for(int j=0; j<eigen_size; j++)
-	{
-	  int Z_row = j;
-	  int Z_col = (eigen_size-1-count);
-	  int Z_index = Z_col*eigen_size + Z_row;
-	  current_bf.add(Z[Z_index], *temporal_data[j]);
-	}
+        {
+          int Z_row = j;
+          int Z_col = (eigen_size-1-count);
+          int Z_index = Z_col*eigen_size + Z_row;
+          current_bf.add(Z[Z_index], *temporal_data[j]);
+        }
 
       // We just set the norm to 1.
       inner_product_matrix->vector_mult(*inner_product_storage_vector,current_bf);
@@ -939,32 +939,32 @@ void TransientRBConstruction::enrich_RB_space()
       // basis functions have been added. Else we break the loop after delta_N
       // (or Nmax) new basis functions.
       if (POD_tol > 0.)
-	{
-	  set_delta_N(1);
+        {
+          set_delta_N(1);
 
-	  // We need to define the updated RB system matrices before the RB solve
-	  update_system();
-	  Real error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions());
+          // We need to define the updated RB system matrices before the RB solve
+          update_system();
+          Real error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions());
 
-	  if ( (error_bound <= POD_tol) || (get_rb_evaluation().get_n_basis_functions()==get_Nmax()) )
-	    {
-	      set_delta_N(0);
-	      break;
-	    }
-	}
+          if ( (error_bound <= POD_tol) || (get_rb_evaluation().get_n_basis_functions()==get_Nmax()) )
+            {
+              set_delta_N(0);
+              break;
+            }
+        }
       else
-	{
-	  if (count == get_delta_N())
-	  {
-	    break;
-	  }
-	  else
-	  if (get_rb_evaluation().get_n_basis_functions()==get_Nmax())
-	  {
-	    set_delta_N(count);
-	    break;
-	  }
-	}
+        {
+          if (count == get_delta_N())
+            {
+              break;
+            }
+          else
+            if (get_rb_evaluation().get_n_basis_functions()==get_Nmax())
+              {
+                set_delta_N(count);
+                break;
+              }
+        }
     }
 
   STOP_LOG("enrich_RB_space()", "TransientRBConstruction");
@@ -1189,74 +1189,74 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
   if (compute_inner_products)
     {
       for(unsigned int q_f=0; q_f<Q_f; q_f++)
-	{
-	  inner_product_matrix->vector_mult(*inner_product_storage_vector, *Fq_representor[q_f]);
+        {
+          inner_product_matrix->vector_mult(*inner_product_storage_vector, *Fq_representor[q_f]);
 
-	  for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
-	    {
-	      for(unsigned int q_m=0; q_m<Q_m; q_m++)
-		{
-		  trans_rb_eval.Fq_Mq_representor_innerprods[q_f][q_m][i] =
-		    trans_rb_eval.M_q_representor[q_m][i]->dot(*inner_product_storage_vector);
-		} // end for q_m
-	    } // end for i
-	} // end for q_f
+          for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
+            {
+              for(unsigned int q_m=0; q_m<Q_m; q_m++)
+                {
+                  trans_rb_eval.Fq_Mq_representor_innerprods[q_f][q_m][i] =
+                    trans_rb_eval.M_q_representor[q_m][i]->dot(*inner_product_storage_vector);
+                } // end for q_m
+            } // end for i
+        } // end for q_f
 
       unsigned int q=0;
       for(unsigned int q_m1=0; q_m1<Q_m; q_m1++)
-	{
-	  for(unsigned int q_m2=q_m1; q_m2<Q_m; q_m2++)
-	    {
-	      for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
-		{
-		  for(unsigned int j=0; j<RB_size; j++)
-		    {
-		      inner_product_matrix->vector_mult(*inner_product_storage_vector, *trans_rb_eval.M_q_representor[q_m2][j]);
-		      
-		      trans_rb_eval.Mq_Mq_representor_innerprods[q][i][j] =
-		        trans_rb_eval.M_q_representor[q_m1][i]->dot(*inner_product_storage_vector);
+        {
+          for(unsigned int q_m2=q_m1; q_m2<Q_m; q_m2++)
+            {
+              for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
+                {
+                  for(unsigned int j=0; j<RB_size; j++)
+                    {
+                      inner_product_matrix->vector_mult(*inner_product_storage_vector, *trans_rb_eval.M_q_representor[q_m2][j]);
 
-		      if(i != j)
-			{
-			  inner_product_matrix->vector_mult(*inner_product_storage_vector,
-			                                    *trans_rb_eval.M_q_representor[q_m2][i]);
+                      trans_rb_eval.Mq_Mq_representor_innerprods[q][i][j] =
+                        trans_rb_eval.M_q_representor[q_m1][i]->dot(*inner_product_storage_vector);
+
+                      if(i != j)
+                        {
+                          inner_product_matrix->vector_mult(*inner_product_storage_vector,
+                                                            *trans_rb_eval.M_q_representor[q_m2][i]);
                           
-			  trans_rb_eval.Mq_Mq_representor_innerprods[q][j][i] =
-			    trans_rb_eval.M_q_representor[q_m1][j]->dot(*inner_product_storage_vector);
-			}
-		    } // end for j
-		} // end for i
-	      q++;
-	    } // end for q_m2
-	} // end for q_m1
+                          trans_rb_eval.Mq_Mq_representor_innerprods[q][j][i] =
+                            trans_rb_eval.M_q_representor[q_m1][j]->dot(*inner_product_storage_vector);
+                        }
+                    } // end for j
+                } // end for i
+              q++;
+            } // end for q_m2
+        } // end for q_m1
 
 
       for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
-	{
-	  for(unsigned int j=0; j<RB_size; j++)
-	    {
-	      for(unsigned int q_a=0; q_a<Q_a; q_a++)
-		{
-		  for(unsigned int q_m=0; q_m<Q_m; q_m++)
-		    {
-		      inner_product_matrix->vector_mult(*inner_product_storage_vector,
-			                                *trans_rb_eval.M_q_representor[q_m][j]);
+        {
+          for(unsigned int j=0; j<RB_size; j++)
+            {
+              for(unsigned int q_a=0; q_a<Q_a; q_a++)
+                {
+                  for(unsigned int q_m=0; q_m<Q_m; q_m++)
+                    {
+                      inner_product_matrix->vector_mult(*inner_product_storage_vector,
+                                                        *trans_rb_eval.M_q_representor[q_m][j]);
 
-		      trans_rb_eval.Aq_Mq_representor_innerprods[q_a][q_m][i][j] =
-			trans_rb_eval.Aq_representor[q_a][i]->dot(*inner_product_storage_vector);
+                      trans_rb_eval.Aq_Mq_representor_innerprods[q_a][q_m][i][j] =
+                        trans_rb_eval.Aq_representor[q_a][i]->dot(*inner_product_storage_vector);
 
-		      if(i != j)
-			{
-			  inner_product_matrix->vector_mult(*inner_product_storage_vector,
-			                                    *trans_rb_eval.M_q_representor[q_m][i]);
+                      if(i != j)
+                        {
+                          inner_product_matrix->vector_mult(*inner_product_storage_vector,
+                                                            *trans_rb_eval.M_q_representor[q_m][i]);
 
-			  trans_rb_eval.Aq_Mq_representor_innerprods[q_a][q_m][j][i] =
-			    trans_rb_eval.Aq_representor[q_a][j]->dot(*inner_product_storage_vector);
-			}
-		    } // end for q_m
-		} // end for q_a
-	    } // end for j
-	} // end for i
+                          trans_rb_eval.Aq_Mq_representor_innerprods[q_a][q_m][j][i] =
+                            trans_rb_eval.Aq_representor[q_a][j]->dot(*inner_product_storage_vector);
+                        }
+                    } // end for q_m
+                } // end for q_a
+            } // end for j
+        } // end for i
     } // end if (compute_inner_products)
 
   STOP_LOG("update_residual_terms()", "TransientRBConstruction");
@@ -1441,22 +1441,22 @@ void TransientRBConstruction::write_riesz_representors_to_files(const std::strin
 
       {
         // No need to copy!
-	//*solution = *(M_q_representor[q][i]);
-	trans_rb_eval.M_q_representor[q][i]->swap(*solution);
+        //*solution = *(M_q_representor[q][i]);
+        trans_rb_eval.M_q_representor[q][i]->swap(*solution);
 
-	Xdr mr_data(file_name.str(),
-	            write_binary_residual_representors ? ENCODE : WRITE);
+        Xdr mr_data(file_name.str(),
+                    write_binary_residual_representors ? ENCODE : WRITE);
 
         write_serialized_data(mr_data, false);
 
-	// Synchronize before moving on
-	this->comm().barrier();
+        // Synchronize before moving on
+        this->comm().barrier();
 
-	// Swap back.
-	trans_rb_eval.M_q_representor[q][i]->swap(*solution);
+        // Swap back.
+        trans_rb_eval.M_q_representor[q][i]->swap(*solution);
 
-	// TODO: bzip the resulting file?  See $LIBMESH_DIR/src/mesh/unstructured_mesh.C
-	// for the system call, be sure to do it only on one processor, etc.
+        // TODO: bzip the resulting file?  See $LIBMESH_DIR/src/mesh/unstructured_mesh.C
+        // for the system call, be sure to do it only on one processor, etc.
       }
     }
 
@@ -1487,7 +1487,7 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
       if (trans_rb_eval.M_q_representor[i][j] != NULL)
         {
           libMesh::out << "Error, must delete existing M_q_representor before reading in from file."
-	  	       << std::endl;
+                       << std::endl;
           libmesh_error();
         }
     }
@@ -1498,7 +1498,7 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
       {
         file_name.str(""); // reset filename
         file_name << riesz_representors_dir
-		  << "/M_q_representor" << i << "_" << j << riesz_representor_suffix;
+                  << "/M_q_representor" << i << "_" << j << riesz_representor_suffix;
 
         // On processor zero check to be sure the file exists
         if (this->processor_id() == 0)
@@ -1506,24 +1506,24 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
           int stat_result = stat(file_name.str().c_str(), &stat_info);
 
           if (stat_result != 0)
-	  {
+            {
             libMesh::out << "File does not exist: " << file_name.str() << std::endl;
             libmesh_error();
           }
         }
 
-	Xdr aqr_data(file_name.str(),
-	             read_binary_residual_representors ? DECODE : READ);
+        Xdr aqr_data(file_name.str(),
+                     read_binary_residual_representors ? DECODE : READ);
 
-	read_serialized_data(aqr_data, false);
+        read_serialized_data(aqr_data, false);
 
-	trans_rb_eval.M_q_representor[i][j] = NumericVector<Number>::build(this->comm()).release();
-	trans_rb_eval.M_q_representor[i][j]->init (n_dofs(), n_local_dofs(),
-	                 	     false, libMeshEnums::PARALLEL);
+        trans_rb_eval.M_q_representor[i][j] = NumericVector<Number>::build(this->comm()).release();
+        trans_rb_eval.M_q_representor[i][j]->init (n_dofs(), n_local_dofs(),
+                                                   false, libMeshEnums::PARALLEL);
 
-	// No need to copy, just swap
-	//*M_q_representor[i][j] = *solution;
-	trans_rb_eval.M_q_representor[i][j]->swap(*solution);
+        // No need to copy, just swap
+        //*M_q_representor[i][j] = *solution;
+        trans_rb_eval.M_q_representor[i][j]->swap(*solution);
       }
 
   STOP_LOG("read_riesz_representors_from_files()", "TransientRBConstruction");

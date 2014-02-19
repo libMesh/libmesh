@@ -102,11 +102,11 @@ namespace libMesh {
 
     // Set the tolerances for the non-linear solver.
     ierr = SNESSetTolerances(this->_snes,
-			     this->absolute_residual_tolerance,
-			     this->relative_residual_tolerance,
-			     this->absolute_step_tolerance,
-			     this->max_nonlinear_iterations,
-			     this->max_function_evaluations);
+                             this->absolute_residual_tolerance,
+                             this->relative_residual_tolerance,
+                             this->absolute_step_tolerance,
+                             this->max_nonlinear_iterations,
+                             this->max_function_evaluations);
     LIBMESH_CHKERRABORT(ierr);
 
     //Pull in command-line options
@@ -118,10 +118,10 @@ namespace libMesh {
   template <typename T>
   std::pair<unsigned int, Real>
   PetscDMNonlinearSolver<T>::solve (SparseMatrix<T>& jac_in,  // System Jacobian Matrix
-				    NumericVector<T>& x_in,   // Solution vector
-				    NumericVector<T>& r_in,   // Residual vector
-				    const double,             // Stopping tolerance
-				    const unsigned int)
+                                    NumericVector<T>& x_in,   // Solution vector
+                                    NumericVector<T>& r_in,   // Residual vector
+                                    const double,             // Stopping tolerance
+                                    const unsigned int)
   {
     START_LOG("solve()", "PetscNonlinearSolver");
     this->init ();

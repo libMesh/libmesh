@@ -72,33 +72,33 @@ namespace libMesh
     // May or may not need to insert new points ...
     if ((_triangulation_type==PSLG) && (_insert_extra_points))
       {
-	// Make a copy of the original points from the Mesh
-	std::vector<Point> original_points (_mesh.n_nodes());
+        // Make a copy of the original points from the Mesh
+        std::vector<Point> original_points (_mesh.n_nodes());
 
-	MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-	const MeshBase::node_iterator node_end = _mesh.nodes_end();
+        MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
+        const MeshBase::node_iterator node_end = _mesh.nodes_end();
 
-	for (unsigned int ctr=0; node_it != node_end; ++node_it)
-	  original_points[ctr++] = **node_it;
+        for (unsigned int ctr=0; node_it != node_end; ++node_it)
+          original_points[ctr++] = **node_it;
 
-	// Clear out the mesh
-	_mesh.clear();
+        // Clear out the mesh
+        _mesh.clear();
 
-	// Make sure the new Mesh will be 2D
-	_mesh.set_mesh_dimension(2);
+        // Make sure the new Mesh will be 2D
+        _mesh.set_mesh_dimension(2);
 
-	// Insert a new point on each PSLG at some random location
-	// np=index into new points vector
-	// n =index into original points vector
-	for (unsigned int np=0, n=0; np<2*original_points.size(); ++np)
-	  {
-	    // the even entries are the original points
-	    if (np%2==0)
-	      _mesh.add_point(original_points[n++]);
+        // Insert a new point on each PSLG at some random location
+        // np=index into new points vector
+        // n =index into original points vector
+        for (unsigned int np=0, n=0; np<2*original_points.size(); ++np)
+          {
+            // the even entries are the original points
+            if (np%2==0)
+              _mesh.add_point(original_points[n++]);
 
-	    else // the odd entries are the midpoints of the original PSLG segments
-	      _mesh.add_point ((original_points[n] + original_points[n-1])/2);
-	  }
+            else // the odd entries are the midpoints of the original PSLG segments
+              _mesh.add_point ((original_points[n] + original_points[n-1])/2);
+          }
       }
 
     // Regardless of whether we added additional points, the set of points to
@@ -111,8 +111,8 @@ namespace libMesh
 
     if (have_holes)
       {
-	for (unsigned int i=0; i<_holes->size(); ++i)
-	  n_hole_points += (*_holes)[i]->n_points();
+        for (unsigned int i=0; i<_holes->size(); ++i)
+          n_hole_points += (*_holes)[i]->n_points();
       }
 
     // Triangle data structure for the mesh
@@ -128,13 +128,13 @@ namespace libMesh
 
     if (_triangulation_type==PSLG)
       {
-	// Implicit segment ordering: One segment per point, including hole points
-	if (this->segments.empty())
-	  initial.numberofsegments = initial.numberofpoints;
+        // Implicit segment ordering: One segment per point, including hole points
+        if (this->segments.empty())
+          initial.numberofsegments = initial.numberofpoints;
 
-	// User-defined segment ordering: One segment per entry in the segments vector
-	else
-	  initial.numberofsegments = this->segments.size();
+        // User-defined segment ordering: One segment per entry in the segments vector
+        else
+          initial.numberofsegments = this->segments.size();
       }
 
     else if (_triangulation_type==GENERATE_CONVEX_HULL)
@@ -146,7 +146,7 @@ namespace libMesh
     // Allocate space for the segments (2 int per segment)
     if (initial.numberofsegments > 0)
       {
-	initial.segmentlist = static_cast<int*> (std::malloc(initial.numberofsegments * 2 * sizeof(int)));
+        initial.segmentlist = static_cast<int*> (std::malloc(initial.numberofsegments * 2 * sizeof(int)));
       }
 
 
@@ -158,26 +158,26 @@ namespace libMesh
 
     if (have_holes)
       for (unsigned int i=0; i<_holes->size(); ++i)
-	{
-	  for (unsigned int ctr=0, h=0; h<(*_holes)[i]->n_points(); ctr+=2, ++h)
-	    {
-	      Point p = (*_holes)[i]->point(h);
+        {
+          for (unsigned int ctr=0, h=0; h<(*_holes)[i]->n_points(); ctr+=2, ++h)
+            {
+              Point p = (*_holes)[i]->point(h);
 
-	      const unsigned int index0 = 2*hole_offset+ctr;
-	      const unsigned int index1 = 2*hole_offset+ctr+1;
+              const unsigned int index0 = 2*hole_offset+ctr;
+              const unsigned int index1 = 2*hole_offset+ctr+1;
 
-	      // Save the x,y locations in the triangle struct.
-	      initial.pointlist[index0] = p(0);
-	      initial.pointlist[index1] = p(1);
+              // Save the x,y locations in the triangle struct.
+              initial.pointlist[index0] = p(0);
+              initial.pointlist[index1] = p(1);
 
-	      // Set the points which define the segments
-	      initial.segmentlist[index0] = hole_offset+h;
-	      initial.segmentlist[index1] = (h==(*_holes)[i]->n_points()-1) ? hole_offset : hole_offset+h+1; // wrap around
-	    }
+              // Set the points which define the segments
+              initial.segmentlist[index0] = hole_offset+h;
+              initial.segmentlist[index1] = (h==(*_holes)[i]->n_points()-1) ? hole_offset : hole_offset+h+1; // wrap around
+            }
 
-	  // Update the hole_offset for the next hole
-	  hole_offset += (*_holes)[i]->n_points();
-	}
+          // Update the hole_offset for the next hole
+          hole_offset += (*_holes)[i]->n_points();
+        }
 
 
     // Copy all the non-hole points and segments into the triangle struct.
@@ -186,39 +186,39 @@ namespace libMesh
       const MeshBase::node_iterator end = _mesh.nodes_end();
 
       for (dof_id_type ctr=0; it != end; ctr+=2, ++it)
-	{
-	  dof_id_type index = 2*hole_offset + ctr;
+        {
+          dof_id_type index = 2*hole_offset + ctr;
 
-	  // Get pointer to the current node
-	  Node* node = *it;
+          // Get pointer to the current node
+          Node* node = *it;
 
-	  // Set x,y values in pointlist
-	  initial.pointlist[index] = (*node)(0);
-	  initial.pointlist[index+1] = (*node)(1);
+          // Set x,y values in pointlist
+          initial.pointlist[index] = (*node)(0);
+          initial.pointlist[index+1] = (*node)(1);
 
-	  // If the user requested a PSLG, the non-hole points are also segments
-	  if (_triangulation_type==PSLG)
-	    {
-	      // Use implicit ordering to define segments
-	      if (this->segments.empty())
-		{
-		  dof_id_type n = ctr/2; // ctr is always even
-		  initial.segmentlist[index] = hole_offset+n;
-		  initial.segmentlist[index+1] = (n==_mesh.n_nodes()-1) ? hole_offset : hole_offset+n+1; // wrap around
-		}
-	    }
-	}
+          // If the user requested a PSLG, the non-hole points are also segments
+          if (_triangulation_type==PSLG)
+            {
+              // Use implicit ordering to define segments
+              if (this->segments.empty())
+                {
+                  dof_id_type n = ctr/2; // ctr is always even
+                  initial.segmentlist[index] = hole_offset+n;
+                  initial.segmentlist[index+1] = (n==_mesh.n_nodes()-1) ? hole_offset : hole_offset+n+1; // wrap around
+                }
+            }
+        }
     }
 
 
     // If the user provided it, use his ordering to define the segments
     for (unsigned int ctr=0, s=0; s<this->segments.size(); ctr+=2, ++s)
       {
-	const unsigned int index0 = 2*hole_offset+ctr;
-	const unsigned int index1 = 2*hole_offset+ctr+1;
+        const unsigned int index0 = 2*hole_offset+ctr;
+        const unsigned int index1 = 2*hole_offset+ctr+1;
 
-	initial.segmentlist[index0] = hole_offset + this->segments[s].first;
-	initial.segmentlist[index1] = hole_offset + this->segments[s].second;
+        initial.segmentlist[index0] = hole_offset + this->segments[s].first;
+        initial.segmentlist[index1] = hole_offset + this->segments[s].second;
       }
 
 
@@ -226,14 +226,14 @@ namespace libMesh
     // Tell the input struct about the holes
     if (have_holes)
       {
-	initial.numberofholes = _holes->size();
-	initial.holelist      = static_cast<REAL*>(std::malloc(initial.numberofholes * 2 * sizeof(REAL)));
-	for (unsigned int i=0, ctr=0; i<_holes->size(); ++i, ctr+=2)
-	  {
-	    Point inside_point = (*_holes)[i]->inside();
-	    initial.holelist[ctr]   = inside_point(0);
-	    initial.holelist[ctr+1] = inside_point(1);
-	  }
+        initial.numberofholes = _holes->size();
+        initial.holelist      = static_cast<REAL*>(std::malloc(initial.numberofholes * 2 * sizeof(REAL)));
+        for (unsigned int i=0, ctr=0; i<_holes->size(); ++i, ctr+=2)
+          {
+            Point inside_point = (*_holes)[i]->inside();
+            initial.holelist[ctr]   = inside_point(0);
+            initial.holelist[ctr+1] = inside_point(1);
+          }
       }
 
     // Set the triangulation flags.
@@ -263,27 +263,27 @@ namespace libMesh
     switch (_triangulation_type)
       {
       case GENERATE_CONVEX_HULL:
-	{
-	  flags << "c";
-	  break;
-	}
+        {
+          flags << "c";
+          break;
+        }
 
       case PSLG:
-	{
-	  flags << "p";
-	  break;
-	}
+        {
+          flags << "p";
+          break;
+        }
 
       case INVALID_TRIANGULATION_TYPE:
-	{
-	  libmesh_error();
-	  break;
-	}
+        {
+          libmesh_error();
+          break;
+        }
 
       default:
-	{
-	  libmesh_error();
-	}
+        {
+          libmesh_error();
+        }
       }
 
 
@@ -291,22 +291,22 @@ namespace libMesh
     switch (_elem_type)
       {
       case TRI3:
-	{
-	  // do nothing.
-	  break;
-	}
+        {
+          // do nothing.
+          break;
+        }
 
       case TRI6:
-	{
-	  flags << "o2";
-	  break;
-	}
+        {
+          flags << "o2";
+          break;
+        }
 
       default:
-	{
-	  libMesh::err << "ERROR: Unrecognized triangular element type." << std::endl;
-	  libmesh_error();
-	}
+        {
+          libMesh::err << "ERROR: Unrecognized triangular element type." << std::endl;
+          libmesh_error();
+        }
       }
 
 
@@ -329,15 +329,15 @@ namespace libMesh
 
     // Refine the initial output to conform to the area constraint
     TriangleWrapper::triangulate(const_cast<char*>(flags.str().c_str()),
-				 &initial,
-				 &final,
-				 NULL); // voronoi ouput -- not used
+                                 &initial,
+                                 &final,
+                                 NULL); // voronoi ouput -- not used
 
 
     // Send the information computed by Triangle to the Mesh.
     TriangleWrapper::copy_tri_to_mesh(final,
-				      _mesh,
-				      _elem_type);
+                                      _mesh,
+                                      _elem_type);
 
     // To the naked eye, a few smoothing iterations usually looks better,
     // so we do this by default unless the user says not to.

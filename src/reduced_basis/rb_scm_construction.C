@@ -104,7 +104,7 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
   // value is -1, which means use std::time to seed the RNG.
   unsigned int training_parameters_random_seed_in = static_cast<int>(-1);
   training_parameters_random_seed_in = infile("training_parameters_random_seed",
-					   training_parameters_random_seed_in);
+                                              training_parameters_random_seed_in);
   set_training_random_seed(training_parameters_random_seed_in);
 
   // SCM Greedy termination tolerance

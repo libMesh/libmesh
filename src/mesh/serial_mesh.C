@@ -115,7 +115,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // SerialMesh class member functions
 SerialMesh::SerialMesh (const Parallel::Communicator &comm,
-			unsigned int d) :
+                        unsigned int d) :
   UnstructuredMesh (comm,d)
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -198,8 +198,8 @@ Node& SerialMesh::node (const dof_id_type i)
   if (i >= this->n_nodes())
     {
       libMesh::out << " i=" << i
-		    << ", n_nodes()=" << this->n_nodes()
-		    << std::endl;
+                   << ", n_nodes()=" << this->n_nodes()
+                   << std::endl;
       libmesh_error();
     }
 
@@ -390,8 +390,8 @@ void SerialMesh::delete_elem(Elem* e)
     {
       // This search is O(n_elem)
       pos = std::find (_elements.begin(),
-		       _elements.end(),
-		       e);
+                       _elements.end(),
+                       e);
     }
 
   // Huh? Element not in the vector?
@@ -425,8 +425,8 @@ void SerialMesh::renumber_elem(const dof_id_type old_id,
 
 
 Node* SerialMesh::add_point (const Point& p,
-			     const dof_id_type id,
-			     const processor_id_type proc_id)
+                             const dof_id_type id,
+                             const processor_id_type proc_id)
 {
 //   // We only append points with SerialMesh
 //   libmesh_assert(id == DofObject::invalid_id || id == _nodes.size());
@@ -458,9 +458,9 @@ Node* SerialMesh::add_point (const Point& p,
       n->processor_id() = proc_id;
 
       if (id == DofObject::invalid_id)
-	_nodes.back() = n;
+        _nodes.back() = n;
       else
-	_nodes[id] = n;
+        _nodes[id] = n;
     }
 
   // better not pass back a NULL pointer.
@@ -554,8 +554,8 @@ void SerialMesh::delete_node(Node* n)
   else
     {
       pos = std::find (_nodes.begin(),
-		       _nodes.end(),
-		       n);
+                       _nodes.end(),
+                       n);
     }
 
   // Huh? Node not in the vector?
@@ -648,14 +648,14 @@ void SerialMesh::renumber_nodes_and_elements ()
 
     for (; in != end; ++in)
       if (*in != NULL)
-	{
-	  Elem* el = *in;
+        {
+          Elem* el = *in;
 
-	  *out_iter = *in;
-	  ++out_iter;
+          *out_iter = *in;
+          ++out_iter;
 
-	  // Increment the element counter
-	  el->set_id (next_free_elem++);
+          // Increment the element counter
+          el->set_id (next_free_elem++);
 
           if(_skip_renumber_nodes_and_elements)
           {
@@ -674,26 +674,26 @@ void SerialMesh::renumber_nodes_and_elements ()
                 next_free_node++;                      // [(src == dst) below]
 
               else if (el->node(n) > next_free_node) // need to process
-	      {
-		// The source and destination indices
-		// for this node
-		const dof_id_type src_idx = el->node(n);
-		const dof_id_type dst_idx = next_free_node++;
+                {
+                  // The source and destination indices
+                  // for this node
+                  const dof_id_type src_idx = el->node(n);
+                  const dof_id_type dst_idx = next_free_node++;
 
-		// ensure we want to swap a valid nodes
-		libmesh_assert(_nodes[src_idx]);
+                  // ensure we want to swap a valid nodes
+                  libmesh_assert(_nodes[src_idx]);
 
-		// Swap the source and destination nodes
+                  // Swap the source and destination nodes
                 std::swap(_nodes[src_idx],
                           _nodes[dst_idx] );
 
-		// Set proper indices where that makes sense
-		if (_nodes[src_idx] != NULL)
-		  _nodes[src_idx]->set_id (src_idx);
-		_nodes[dst_idx]->set_id (dst_idx);
-	      }
+                // Set proper indices where that makes sense
+                if (_nodes[src_idx] != NULL)
+                  _nodes[src_idx]->set_id (src_idx);
+                _nodes[dst_idx]->set_id (dst_idx);
+                }
           }
-	}
+        }
 
     // Erase any additional storage. These elements have been
     // copied into NULL voids by the procedure above, and are
@@ -760,16 +760,16 @@ void SerialMesh::renumber_nodes_and_elements ()
       {
         // Mesh modification code might have already deleted some
         // nodes
-	if (*it == NULL)
+        if (*it == NULL)
           continue;
 
-	// remove any boundary information associated with
-	// this node
-	this->boundary_info->remove (*it);
+        // remove any boundary information associated with
+        // this node
+        this->boundary_info->remove (*it);
 
-	// delete the node
-	delete *it;
-	*it = NULL;
+        // delete the node
+        delete *it;
+        *it = NULL;
       }
 
       _nodes.erase (nd, end);
@@ -976,34 +976,34 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
         // FuzzyPointCompare does a fuzzy equality comparison internally to handle
         // slight differences between the list of nodes on each mesh.
         PointVector::iterator other_iter = Utility::binary_find(other_sorted_bndry_nodes.begin(),
-								other_sorted_bndry_nodes.end(),
-								this_point,
-								mein_comp);
+                                                                other_sorted_bndry_nodes.end(),
+                                                                this_point,
+                                                                mein_comp);
 
-	// Not every node on this_sorted_bndry_nodes will necessarily be stitched, so
-	// if its pair is not found on other_mesh, just continue.
+        // Not every node on this_sorted_bndry_nodes will necessarily be stitched, so
+        // if its pair is not found on other_mesh, just continue.
         if (other_iter != other_sorted_bndry_nodes.end())
           {
-	    // Check that the points do indeed match - should not be necessary unless something
-	    // is wrong with binary_find.  To be on the safe side, we'll check.
-	    {
-	      // Grab the other point from the iterator
-	      Point other_point = other_iter->first;
+            // Check that the points do indeed match - should not be necessary unless something
+            // is wrong with binary_find.  To be on the safe side, we'll check.
+            {
+              // Grab the other point from the iterator
+              Point other_point = other_iter->first;
 
-	      if (!this_point.absolute_fuzzy_equals(other_point, tol*h_min))
-		{
-		  libMesh::out << "Error: mismatched points: " << this_point << " and " << other_point << std::endl;
-		  libmesh_error();
-		}
-	    }
+              if (!this_point.absolute_fuzzy_equals(other_point, tol*h_min))
+                {
+                  libMesh::out << "Error: mismatched points: " << this_point << " and " << other_point << std::endl;
+                  libmesh_error();
+                }
+            }
 
 
-	    // Associate these two nodes in both the node_to_node_map and the other_to_this_node_map
-	    dof_id_type
-	      this_node_id = this_sorted_bndry_nodes[i].second,
-	      other_node_id = other_iter->second;
-	    node_to_node_map[this_node_id] = other_node_id;
-	    other_to_this_node_map[other_node_id] = this_node_id;
+            // Associate these two nodes in both the node_to_node_map and the other_to_this_node_map
+            dof_id_type
+              this_node_id = this_sorted_bndry_nodes[i].second,
+              other_node_id = other_iter->second;
+            node_to_node_map[this_node_id] = other_node_id;
+            other_to_this_node_map[other_node_id] = this_node_id;
           }
 
       }
@@ -1332,7 +1332,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
 dof_id_type SerialMesh::n_active_elem () const
 {
   return static_cast<dof_id_type>(std::distance (this->active_elements_begin(),
-						 this->active_elements_end()));
+                                                 this->active_elements_end()));
 }
 
 

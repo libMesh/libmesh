@@ -56,24 +56,24 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 
     for (; elem_it != elem_end; ++elem_it)
       {
-	const Elem* elem = *elem_it;
-	const unsigned char elem_level =
-	  elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
-	const unsigned char elem_p_level =
-	  elem->p_level() + ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0);
+        const Elem* elem = *elem_it;
+        const unsigned char elem_level =
+          elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
+        const unsigned char elem_p_level =
+          elem->p_level() + ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0);
 
-	// Set the max_level at each node
-	for (unsigned int n=0; n<elem->n_nodes(); n++)
-	  {
-	    const dof_id_type node_number = elem->node(n);
+        // Set the max_level at each node
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
+          {
+            const dof_id_type node_number = elem->node(n);
 
-	    libmesh_assert_less (node_number, max_level_at_node.size());
+            libmesh_assert_less (node_number, max_level_at_node.size());
 
-	    max_level_at_node[node_number] =
-	      std::max (max_level_at_node[node_number], elem_level);
-	    max_p_level_at_node[node_number] =
-	      std::max (max_p_level_at_node[node_number], elem_p_level);
-	  }
+            max_level_at_node[node_number] =
+              std::max (max_level_at_node[node_number], elem_level);
+            max_p_level_at_node[node_number] =
+              std::max (max_p_level_at_node[node_number], elem_p_level);
+          }
       }
   }
 
@@ -86,35 +86,35 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 
     for (; elem_it != elem_end; ++elem_it)
       {
-	Elem* elem = *elem_it;
-	const unsigned int elem_level = elem->level();
-	const unsigned int elem_p_level = elem->p_level();
+        Elem* elem = *elem_it;
+        const unsigned int elem_level = elem->level();
+        const unsigned int elem_p_level = elem->p_level();
 
-	// Skip the element if it is already fully flagged
-	if (elem->refinement_flag() == Elem::REFINE &&
+        // Skip the element if it is already fully flagged
+        if (elem->refinement_flag() == Elem::REFINE &&
             elem->p_refinement_flag() == Elem::REFINE)
-	  continue;
+          continue;
 
-	// Loop over the nodes, check for possible mismatch
-	for (unsigned int n=0; n<elem->n_nodes(); n++)
-	  {
-	    const dof_id_type node_number = elem->node(n);
+        // Loop over the nodes, check for possible mismatch
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
+          {
+            const dof_id_type node_number = elem->node(n);
 
-	    // Flag the element for refinement if it violates
-	    // the requested level mismatch
-	    if ( (elem_level + max_mismatch) < max_level_at_node[node_number]
+            // Flag the element for refinement if it violates
+            // the requested level mismatch
+            if ( (elem_level + max_mismatch) < max_level_at_node[node_number]
                  && elem->refinement_flag() != Elem::REFINE)
-	      {
-		elem->set_refinement_flag (Elem::REFINE);
-		flags_changed = true;
-	      }
-	    if ( (elem_p_level + max_mismatch) < max_p_level_at_node[node_number]
+              {
+                elem->set_refinement_flag (Elem::REFINE);
+                flags_changed = true;
+              }
+            if ( (elem_p_level + max_mismatch) < max_p_level_at_node[node_number]
                  && elem->p_refinement_flag() != Elem::REFINE)
-	      {
-		elem->set_p_refinement_flag (Elem::REFINE);
-		flags_changed = true;
-	      }
-	  }
+              {
+                elem->set_p_refinement_flag (Elem::REFINE);
+                flags_changed = true;
+              }
+          }
       }
   }
 
@@ -149,38 +149,38 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 
     for (; elem_it != elem_end; ++elem_it)
       {
-	const Elem* elem = *elem_it;
-	const unsigned char elem_level =
-	  elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
-	const unsigned char elem_p_level =
-	  elem->p_level() + ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0);
+        const Elem* elem = *elem_it;
+        const unsigned char elem_level =
+          elem->level() + ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0);
+        const unsigned char elem_p_level =
+          elem->p_level() + ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0);
 
-	// Set the max_level at each edge
-	for (unsigned int n=0; n<elem->n_edges(); n++)
-	  {
+        // Set the max_level at each edge
+        for (unsigned int n=0; n<elem->n_edges(); n++)
+          {
             AutoPtr<Elem> edge = elem->build_edge(n);
             dof_id_type childnode0 = edge->node(0);
             dof_id_type childnode1 = edge->node(1);
             if (childnode1 < childnode0)
               std::swap(childnode0, childnode1);
 
-	    for (const Elem *p = elem; p != NULL; p = p->parent())
-	      {
+            for (const Elem *p = elem; p != NULL; p = p->parent())
+              {
                 AutoPtr<Elem> pedge = p->build_edge(n);
-		dof_id_type node0 = pedge->node(0);
-		dof_id_type node1 = pedge->node(1);
+                dof_id_type node0 = pedge->node(0);
+                dof_id_type node1 = pedge->node(1);
 
                 if (node1 < node0)
                   std::swap(node0, node1);
 
-		// If elem does not share this edge with its ancestor
-		// p, refinement levels of elements sharing p's edge
-		// are not restricted by refinement levels of elem.
-		// Furthermore, elem will not share this edge with any
-		// of p's ancestors, so we can safely break out of the
-		// for loop early.
-		if (node0 != childnode0 && node1 != childnode1)
-		  break;
+                // If elem does not share this edge with its ancestor
+                // p, refinement levels of elements sharing p's edge
+                // are not restricted by refinement levels of elem.
+                // Furthermore, elem will not share this edge with any
+                // of p's ancestors, so we can safely break out of the
+                // for loop early.
+                if (node0 != childnode0 && node1 != childnode1)
+                  break;
 
                 childnode0 = node0;
                 childnode1 = node1;
@@ -192,17 +192,17 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
                     max_level_at_edge.end())
                   {
                     max_level_at_edge[edge_key] = elem_level;
-	            max_p_level_at_edge[edge_key] = elem_p_level;
+                    max_p_level_at_edge[edge_key] = elem_p_level;
                   }
                 else
                   {
-	            max_level_at_edge[edge_key] =
-	              std::max (max_level_at_edge[edge_key], elem_level);
-	            max_p_level_at_edge[edge_key] =
-	              std::max (max_p_level_at_edge[edge_key], elem_p_level);
+                    max_level_at_edge[edge_key] =
+                      std::max (max_level_at_edge[edge_key], elem_level);
+                    max_p_level_at_edge[edge_key] =
+                      std::max (max_p_level_at_edge[edge_key], elem_p_level);
                   }
               }
-	  }
+          }
       }
   }
 
@@ -215,18 +215,18 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 
     for (; elem_it != elem_end; ++elem_it)
       {
-	Elem* elem = *elem_it;
-	const unsigned int elem_level = elem->level();
-	const unsigned int elem_p_level = elem->p_level();
+        Elem* elem = *elem_it;
+        const unsigned int elem_level = elem->level();
+        const unsigned int elem_p_level = elem->p_level();
 
-	// Skip the element if it is already fully flagged
-	if (elem->refinement_flag() == Elem::REFINE &&
+        // Skip the element if it is already fully flagged
+        if (elem->refinement_flag() == Elem::REFINE &&
             elem->p_refinement_flag() == Elem::REFINE)
-	  continue;
+          continue;
 
-	// Loop over the nodes, check for possible mismatch
-	for (unsigned int n=0; n<elem->n_edges(); n++)
-	  {
+        // Loop over the nodes, check for possible mismatch
+        for (unsigned int n=0; n<elem->n_edges(); n++)
+          {
             AutoPtr<Elem> edge = elem->build_edge(n);
             dof_id_type node0 = edge->node(0);
             dof_id_type node1 = edge->node(1);
@@ -236,21 +236,21 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
             std::pair<dof_id_type, dof_id_type> edge_key =
               std::make_pair(node0, node1);
 
-	    // Flag the element for refinement if it violates
-	    // the requested level mismatch
-	    if ( (elem_level + max_mismatch) < max_level_at_edge[edge_key]
+            // Flag the element for refinement if it violates
+            // the requested level mismatch
+            if ( (elem_level + max_mismatch) < max_level_at_edge[edge_key]
                  && elem->refinement_flag() != Elem::REFINE)
-	      {
-		elem->set_refinement_flag (Elem::REFINE);
-		flags_changed = true;
-	      }
-	    if ( (elem_p_level + max_mismatch) < max_p_level_at_edge[edge_key]
+              {
+                elem->set_refinement_flag (Elem::REFINE);
+                flags_changed = true;
+              }
+            if ( (elem_p_level + max_mismatch) < max_p_level_at_edge[edge_key]
                  && elem->p_refinement_flag() != Elem::REFINE)
-	      {
-		elem->set_p_refinement_flag (Elem::REFINE);
-		flags_changed = true;
-	      }
-	  }
+              {
+                elem->set_p_refinement_flag (Elem::REFINE);
+                flags_changed = true;
+              }
+          }
       }
   }
 
@@ -285,7 +285,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
 
       // Skip the element if it is already fully flagged for refinement
       if (elem->p_refinement_flag() == Elem::REFINE)
-	p_flag_me = false;
+        p_flag_me = false;
       if (elem->refinement_flag() == Elem::REFINE)
         {
           h_flag_me = false;
@@ -296,7 +296,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
       else if (elem->refinement_flag() == Elem::COARSEN)
         {
           libmesh_assert(elem->parent());
-	  elem = elem->parent();
+          elem = elem->parent();
           // FIXME - this doesn't seem right - RHS
           if (elem->refinement_flag() != Elem::COARSEN_INACTIVE)
             continue;
@@ -319,15 +319,15 @@ bool MeshRefinement::eliminate_unrefined_patches ()
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
         {
           const Elem *neighbor = elem->neighbor(n);
-	  // Quit if the element is on a local boundary
-	  if (neighbor == NULL || neighbor == remote_elem)
+          // Quit if the element is on a local boundary
+          if (neighbor == NULL || neighbor == remote_elem)
             {
               h_flag_me = false;
               p_flag_me = false;
               break;
             }
           // if the neighbor will be equally or less refined than
-	  // we are, then we will not become an unrefined island.
+          // we are, then we will not become an unrefined island.
           // So if we are still considering h refinement:
           if (h_flag_me &&
             // If our neighbor is already at a lower level,
@@ -346,17 +346,17 @@ bool MeshRefinement::eliminate_unrefined_patches ()
             {
               // We've proven we won't become an unrefined island,
               // so don't h refine to avoid that.
-	      h_flag_me = false;
+              h_flag_me = false;
 
               // If we've also proven we don't need to p refine,
               // we don't need to check more neighbors
               if (!p_flag_me)
                 break;
             }
-	  if (p_flag_me)
+          if (p_flag_me)
             {
-	      // if active neighbors will have a p level
-	      // equal to or lower than ours, then we do not need to p
+              // if active neighbors will have a p level
+              // equal to or lower than ours, then we do not need to p
               // refine ourselves.
               if (neighbor->active())
                 {
@@ -391,8 +391,8 @@ bool MeshRefinement::eliminate_unrefined_patches ()
         }
 
       if (h_flag_me)
-	{
-	  // Parents that would create islands should no longer
+        {
+          // Parents that would create islands should no longer
           // coarsen
           if (elem->refinement_flag() == Elem::COARSEN_INACTIVE)
             {
@@ -405,17 +405,17 @@ bool MeshRefinement::eliminate_unrefined_patches ()
               elem->set_refinement_flag(Elem::INACTIVE);
             }
           else
-	    elem->set_refinement_flag(Elem::REFINE);
-	  flags_changed = true;
-	}
+            elem->set_refinement_flag(Elem::REFINE);
+          flags_changed = true;
+        }
       if (p_flag_me)
-	{
+        {
           if (elem->p_refinement_flag() == Elem::COARSEN)
-	    elem->set_p_refinement_flag(Elem::DO_NOTHING);
+            elem->set_p_refinement_flag(Elem::DO_NOTHING);
           else
-	    elem->set_p_refinement_flag(Elem::REFINE);
-	  flags_changed = true;
-	}
+            elem->set_p_refinement_flag(Elem::REFINE);
+          flags_changed = true;
+        }
     }
 
   // If flags changed on any processor then they changed globally

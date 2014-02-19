@@ -82,8 +82,8 @@ namespace libMesh
     // Only attempt to free these when t was used as an input struct!
     if (io_type==INPUT)
       {
-	std::free (t.holelist  );
-	std::free (t.regionlist);
+        std::free (t.holelist  );
+        std::free (t.regionlist);
       }
 
     std::free (t.edgelist      );
@@ -100,8 +100,8 @@ namespace libMesh
 
 
   void TriangleWrapper::copy_tri_to_mesh(const triangulateio& triangle_data_input,
-					 UnstructuredMesh& mesh_output,
-					 const ElemType type)
+                                         UnstructuredMesh& mesh_output,
+                                         const ElemType type)
   {
     // Transfer the information into the LibMesh mesh.
     mesh_output.clear();
@@ -112,49 +112,49 @@ namespace libMesh
     // Node information
     for (int i=0, c=0; c<triangle_data_input.numberofpoints; i+=2, ++c)
       {
-	// Specify ID when adding point, otherwise, if this is ParallelMesh,
-	// it might add points with a non-sequential numbering...
-	mesh_output.add_point( Point(triangle_data_input.pointlist[i],
-				     triangle_data_input.pointlist[i+1]),
-			       /*id=*/c);
+        // Specify ID when adding point, otherwise, if this is ParallelMesh,
+        // it might add points with a non-sequential numbering...
+        mesh_output.add_point( Point(triangle_data_input.pointlist[i],
+                                     triangle_data_input.pointlist[i+1]),
+                               /*id=*/c);
       }
 
     // Element information
     for (int i=0; i<triangle_data_input.numberoftriangles; ++i)
       {
-	switch (type)
-	  {
-	  case TRI3:
-	    {
-	      Elem* elem = mesh_output.add_elem (new Tri3);
+        switch (type)
+          {
+          case TRI3:
+            {
+              Elem* elem = mesh_output.add_elem (new Tri3);
 
-	      for (unsigned int n=0; n<3; ++n)
-		elem->set_node(n) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*3 + n]);
+              for (unsigned int n=0; n<3; ++n)
+                elem->set_node(n) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*3 + n]);
 
-	      break;
-	    }
+              break;
+            }
 
-	  case TRI6:
-	    {
-	      Elem* elem = mesh_output.add_elem (new Tri6);
+          case TRI6:
+            {
+              Elem* elem = mesh_output.add_elem (new Tri6);
 
-	      // Triangle number TRI6 nodes in a different way to libMesh
-	      elem->set_node(0) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 0]);
-	      elem->set_node(1) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 1]);
-	      elem->set_node(2) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 2]);
-	      elem->set_node(3) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 5]);
-	      elem->set_node(4) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 3]);
-	      elem->set_node(5) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 4]);
+              // Triangle number TRI6 nodes in a different way to libMesh
+              elem->set_node(0) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 0]);
+              elem->set_node(1) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 1]);
+              elem->set_node(2) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 2]);
+              elem->set_node(3) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 5]);
+              elem->set_node(4) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 3]);
+              elem->set_node(5) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 4]);
 
-	      break;
-	    }
+              break;
+            }
 
-	  default:
-	    {
-	      libMesh::err << "ERROR: Unrecognized triangular element type." << std::endl;
-	      libmesh_error();
-	    }
-	  }
+          default:
+            {
+              libMesh::err << "ERROR: Unrecognized triangular element type." << std::endl;
+              libmesh_error();
+            }
+          }
       }
 
     // Note: If the input mesh was a parallel one, calling

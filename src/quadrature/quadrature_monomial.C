@@ -31,7 +31,7 @@ namespace libMesh
 
 // Constructor
 QMonomial::QMonomial(const unsigned int d,
-		     const Order o) : QBase(d,o)
+                     const Order o) : QBase(d,o)
 {
 }
 
@@ -42,7 +42,7 @@ QMonomial::~QMonomial()
 }
 
 void QMonomial::wissmann_rule(const Real rule_data[][3],
-			      const unsigned int n_pts)
+                              const unsigned int n_pts)
 {
   for (unsigned int i=0, c=0; i<n_pts; ++i)
     {
@@ -52,160 +52,160 @@ void QMonomial::wissmann_rule(const Real rule_data[][3],
       // This may be an (x1,x2) -> (-x1,x2) point, in which case
       // we will also generate the mirror point using the same weight.
       if (rule_data[i][0] != static_cast<Real>(0.0))
-	{
-	  _points[c]  = Point( -rule_data[i][0], rule_data[i][1] );
-	  _weights[c++] = rule_data[i][2];
-	}
+        {
+          _points[c]  = Point( -rule_data[i][0], rule_data[i][1] );
+          _weights[c++] = rule_data[i][2];
+        }
     }
 }
 
 
 
 void QMonomial::stroud_rule(const Real rule_data[][3],
-			    const unsigned int* rule_symmetry,
-			    const unsigned int n_pts)
+                            const unsigned int* rule_symmetry,
+                            const unsigned int n_pts)
 {
   for (unsigned int i=0, c=0; i<n_pts; ++i)
     {
       const Real
-	x=rule_data[i][0],
-	y=rule_data[i][1],
-	wt=rule_data[i][2];
+        x=rule_data[i][0],
+        y=rule_data[i][1],
+        wt=rule_data[i][2];
 
       switch(rule_symmetry[i])
-	{
-	case 0: // Single point (no symmetry)
-	  {
-	    _points[c]  = Point( x, y);
-	    _weights[c++] = wt;
+        {
+        case 0: // Single point (no symmetry)
+          {
+            _points[c]  = Point( x, y);
+            _weights[c++] = wt;
 
-	    break;
-	  }
-	case 1: // Fully-symmetric (x,y)
-	  {
-	    _points[c]    = Point( x, y);
-	    _weights[c++] = wt;
+            break;
+          }
+        case 1: // Fully-symmetric (x,y)
+          {
+            _points[c]    = Point( x, y);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(-x, y);
-	    _weights[c++] = wt;
+            _points[c]    = Point(-x, y);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point( x,-y);
-	    _weights[c++] = wt;
+            _points[c]    = Point( x,-y);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(-x,-y);
-	    _weights[c++] = wt;
+            _points[c]    = Point(-x,-y);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point( y, x);
-	    _weights[c++] = wt;
+            _points[c]    = Point( y, x);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(-y, x);
-	    _weights[c++] = wt;
+            _points[c]    = Point(-y, x);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point( y,-x);
-	    _weights[c++] = wt;
+            _points[c]    = Point( y,-x);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(-y,-x);
-	    _weights[c++] = wt;
+            _points[c]    = Point(-y,-x);
+            _weights[c++] = wt;
 
-	    break;
-	  }
-	case 2: // Fully-symmetric (x,x)
-	  {
-	    _points[c]    = Point( x, x);
-	    _weights[c++] = wt;
+            break;
+          }
+        case 2: // Fully-symmetric (x,x)
+          {
+            _points[c]    = Point( x, x);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(-x, x);
-	    _weights[c++] = wt;
+            _points[c]    = Point(-x, x);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point( x,-x);
-	    _weights[c++] = wt;
+            _points[c]    = Point( x,-x);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(-x,-x);
-	    _weights[c++] = wt;
+            _points[c]    = Point(-x,-x);
+            _weights[c++] = wt;
 
-	    break;
-	  }
-	case 3: // Fully-symmetric (x,0)
-	  {
-	    libmesh_assert_equal_to (y, 0.0);
+            break;
+          }
+        case 3: // Fully-symmetric (x,0)
+          {
+            libmesh_assert_equal_to (y, 0.0);
 
-	    _points[c]    = Point( x,0.);
-	    _weights[c++] = wt;
+            _points[c]    = Point( x,0.);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(-x,0.);
-	    _weights[c++] = wt;
+            _points[c]    = Point(-x,0.);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(0., x);
-	    _weights[c++] = wt;
+            _points[c]    = Point(0., x);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(0.,-x);
-	    _weights[c++] = wt;
+            _points[c]    = Point(0.,-x);
+            _weights[c++] = wt;
 
-	    break;
-	  }
-	case 4: // Rotational invariant
-	  {
-	    _points[c]    = Point( x, y);
-	    _weights[c++] = wt;
+            break;
+          }
+        case 4: // Rotational invariant
+          {
+            _points[c]    = Point( x, y);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(-x,-y);
-	    _weights[c++] = wt;
+            _points[c]    = Point(-x,-y);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(-y, x);
-	    _weights[c++] = wt;
+            _points[c]    = Point(-y, x);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point( y,-x);
-	    _weights[c++] = wt;
+            _points[c]    = Point( y,-x);
+            _weights[c++] = wt;
 
-	    break;
-	  }
-	case 5: // Partial symmetry (Wissman's rules)
-	  {
-	    libmesh_assert_not_equal_to (x, 0.0);
+            break;
+          }
+        case 5: // Partial symmetry (Wissman's rules)
+          {
+            libmesh_assert_not_equal_to (x, 0.0);
 
-	    _points[c]    = Point( x, y);
-	    _weights[c++] = wt;
+            _points[c]    = Point( x, y);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(-x, y);
-	    _weights[c++] = wt;
+            _points[c]    = Point(-x, y);
+            _weights[c++] = wt;
 
-	    break;
-	  }
-	case 6: // Rectangular symmetry
-	  {
-	    _points[c]    = Point( x, y);
-	    _weights[c++] = wt;
+            break;
+          }
+        case 6: // Rectangular symmetry
+          {
+            _points[c]    = Point( x, y);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(-x, y);
-	    _weights[c++] = wt;
+            _points[c]    = Point(-x, y);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(-x,-y);
-	    _weights[c++] = wt;
+            _points[c]    = Point(-x,-y);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point( x,-y);
-	    _weights[c++] = wt;
+            _points[c]    = Point( x,-y);
+            _weights[c++] = wt;
 
-	    break;
-	  }
-	case 7: // Central symmetry
-	  {
-	    libmesh_assert_equal_to (x, 0.0);
-	    libmesh_assert_not_equal_to (y, 0.0);
+            break;
+          }
+        case 7: // Central symmetry
+          {
+            libmesh_assert_equal_to (x, 0.0);
+            libmesh_assert_not_equal_to (y, 0.0);
 
-	    _points[c]    = Point(0., y);
-	    _weights[c++] = wt;
+            _points[c]    = Point(0., y);
+            _weights[c++] = wt;
 
-	    _points[c]    = Point(0.,-y);
-	    _weights[c++] = wt;
+            _points[c]    = Point(0.,-y);
+            _weights[c++] = wt;
 
-	    break;
-	  }
-	default:
-	  {
-	    libMesh::err << "Unknown symmetry!" << std::endl;
-	    libmesh_error();
-	  }
-	} // end switch(rule_symmetry[i])
+            break;
+          }
+        default:
+          {
+            libMesh::err << "Unknown symmetry!" << std::endl;
+            libmesh_error();
+          }
+        } // end switch(rule_symmetry[i])
     }
 }
 
@@ -213,159 +213,159 @@ void QMonomial::stroud_rule(const Real rule_data[][3],
 
 
 void QMonomial::kim_rule(const Real rule_data[][4],
-			 const unsigned int* rule_id,
-			 const unsigned int n_pts)
+                         const unsigned int* rule_id,
+                         const unsigned int n_pts)
 {
   for (unsigned int i=0, c=0; i<n_pts; ++i)
     {
       const Real
-	x=rule_data[i][0],
-	y=rule_data[i][1],
-	z=rule_data[i][2],
-	wt=rule_data[i][3];
+        x=rule_data[i][0],
+        y=rule_data[i][1],
+        z=rule_data[i][2],
+        wt=rule_data[i][3];
 
       switch(rule_id[i])
-	{
-	case 0: // (0,0,0) 1 permutation
-	  {
-	    _points[c]  = Point( x, y, z);	    _weights[c++] = wt;
+        {
+        case 0: // (0,0,0) 1 permutation
+          {
+            _points[c]  = Point( x, y, z);    _weights[c++] = wt;
 
-	    break;
-	  }
-	case 1: //  (x,0,0) 6 permutations
-	  {
-	    _points[c] = Point( x, 0., 0.);	    _weights[c++] = wt;
-	    _points[c] = Point(0., -x, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, 0., 0.);	    _weights[c++] = wt;
-	    _points[c] = Point(0.,  x, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point(0., 0., -x);	    _weights[c++] = wt;
-	    _points[c] = Point(0., 0.,  x);	    _weights[c++] = wt;
+            break;
+          }
+        case 1: //  (x,0,0) 6 permutations
+          {
+            _points[c] = Point( x, 0., 0.);    _weights[c++] = wt;
+            _points[c] = Point(0., -x, 0.);    _weights[c++] = wt;
+            _points[c] = Point(-x, 0., 0.);    _weights[c++] = wt;
+            _points[c] = Point(0.,  x, 0.);    _weights[c++] = wt;
+            _points[c] = Point(0., 0., -x);    _weights[c++] = wt;
+            _points[c] = Point(0., 0.,  x);    _weights[c++] = wt;
 
-	    break;
-	  }
-	case 2: // (x,x,0) 12 permutations
-	  {
-	    _points[c] = Point( x,  x, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point( x, -x, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, -x, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point(-x,  x, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point( x, 0., -x);	    _weights[c++] = wt;
-	    _points[c] = Point( x, 0.,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(0.,  x, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(0.,  x,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(0., -x, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, 0., -x);	    _weights[c++] = wt;
-	    _points[c] = Point(0., -x,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, 0.,  x);	    _weights[c++] = wt;
+            break;
+          }
+        case 2: // (x,x,0) 12 permutations
+          {
+            _points[c] = Point( x,  x, 0.);    _weights[c++] = wt;
+            _points[c] = Point( x, -x, 0.);    _weights[c++] = wt;
+            _points[c] = Point(-x, -x, 0.);    _weights[c++] = wt;
+            _points[c] = Point(-x,  x, 0.);    _weights[c++] = wt;
+            _points[c] = Point( x, 0., -x);    _weights[c++] = wt;
+            _points[c] = Point( x, 0.,  x);    _weights[c++] = wt;
+            _points[c] = Point(0.,  x, -x);    _weights[c++] = wt;
+            _points[c] = Point(0.,  x,  x);    _weights[c++] = wt;
+            _points[c] = Point(0., -x, -x);    _weights[c++] = wt;
+            _points[c] = Point(-x, 0., -x);    _weights[c++] = wt;
+            _points[c] = Point(0., -x,  x);    _weights[c++] = wt;
+            _points[c] = Point(-x, 0.,  x);    _weights[c++] = wt;
 
-	    break;
-	  }
-	case 3: // (x,y,0) 24 permutations
-	  {
-	    _points[c] = Point( x,  y, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point( y, -x, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, -y, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point(-y,  x, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point( x, 0., -y);	    _weights[c++] = wt;
-	    _points[c] = Point( x, -y, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point( x, 0.,  y);	    _weights[c++] = wt;
-	    _points[c] = Point(0.,  y, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x,  y, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point(0.,  y,  x);	    _weights[c++] = wt;
-	    _points[c] = Point( y, 0., -x);	    _weights[c++] = wt;
-	    _points[c] = Point(0., -y, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(-y, 0., -x);	    _weights[c++] = wt;
-	    _points[c] = Point( y,  x, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point(-y, -x, 0.);	    _weights[c++] = wt;
-	    _points[c] = Point( y, 0.,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(0., -y,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(-y, 0.,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, 0.,  y);	    _weights[c++] = wt;
-	    _points[c] = Point(0., -x, -y);	    _weights[c++] = wt;
-	    _points[c] = Point(0., -x,  y);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, 0., -y);	    _weights[c++] = wt;
-	    _points[c] = Point(0.,  x,  y);	    _weights[c++] = wt;
-	    _points[c] = Point(0.,  x, -y);	    _weights[c++] = wt;
+            break;
+          }
+        case 3: // (x,y,0) 24 permutations
+          {
+            _points[c] = Point( x,  y, 0.);    _weights[c++] = wt;
+            _points[c] = Point( y, -x, 0.);    _weights[c++] = wt;
+            _points[c] = Point(-x, -y, 0.);    _weights[c++] = wt;
+            _points[c] = Point(-y,  x, 0.);    _weights[c++] = wt;
+            _points[c] = Point( x, 0., -y);    _weights[c++] = wt;
+            _points[c] = Point( x, -y, 0.);    _weights[c++] = wt;
+            _points[c] = Point( x, 0.,  y);    _weights[c++] = wt;
+            _points[c] = Point(0.,  y, -x);    _weights[c++] = wt;
+            _points[c] = Point(-x,  y, 0.);    _weights[c++] = wt;
+            _points[c] = Point(0.,  y,  x);    _weights[c++] = wt;
+            _points[c] = Point( y, 0., -x);    _weights[c++] = wt;
+            _points[c] = Point(0., -y, -x);    _weights[c++] = wt;
+            _points[c] = Point(-y, 0., -x);    _weights[c++] = wt;
+            _points[c] = Point( y,  x, 0.);    _weights[c++] = wt;
+            _points[c] = Point(-y, -x, 0.);    _weights[c++] = wt;
+            _points[c] = Point( y, 0.,  x);    _weights[c++] = wt;
+            _points[c] = Point(0., -y,  x);    _weights[c++] = wt;
+            _points[c] = Point(-y, 0.,  x);    _weights[c++] = wt;
+            _points[c] = Point(-x, 0.,  y);    _weights[c++] = wt;
+            _points[c] = Point(0., -x, -y);    _weights[c++] = wt;
+            _points[c] = Point(0., -x,  y);    _weights[c++] = wt;
+            _points[c] = Point(-x, 0., -y);    _weights[c++] = wt;
+            _points[c] = Point(0.,  x,  y);    _weights[c++] = wt;
+            _points[c] = Point(0.,  x, -y);    _weights[c++] = wt;
 
-	    break;
-	  }
-	case 4: // (x,x,x) 8 permutations
-	  {
-	    _points[c] = Point( x,  x,  x);	    _weights[c++] = wt;
-	    _points[c] = Point( x, -x,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, -x,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x,  x,  x);	    _weights[c++] = wt;
-	    _points[c] = Point( x,  x, -x);	    _weights[c++] = wt;
-	    _points[c] = Point( x, -x, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x,  x, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, -x, -x);	    _weights[c++] = wt;
+            break;
+          }
+        case 4: // (x,x,x) 8 permutations
+          {
+            _points[c] = Point( x,  x,  x);    _weights[c++] = wt;
+            _points[c] = Point( x, -x,  x);    _weights[c++] = wt;
+            _points[c] = Point(-x, -x,  x);    _weights[c++] = wt;
+            _points[c] = Point(-x,  x,  x);    _weights[c++] = wt;
+            _points[c] = Point( x,  x, -x);    _weights[c++] = wt;
+            _points[c] = Point( x, -x, -x);    _weights[c++] = wt;
+            _points[c] = Point(-x,  x, -x);    _weights[c++] = wt;
+            _points[c] = Point(-x, -x, -x);    _weights[c++] = wt;
 
-	    break;
-	  }
-	case 5: // (x,x,z) 24 permutations
-	  {
-	    _points[c] = Point( x,  x,  z);	    _weights[c++] = wt;
-	    _points[c] = Point( x, -x,  z);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, -x,  z);	    _weights[c++] = wt;
-	    _points[c] = Point(-x,  x,  z);	    _weights[c++] = wt;
-	    _points[c] = Point( x,  z, -x);	    _weights[c++] = wt;
-	    _points[c] = Point( x, -x, -z);	    _weights[c++] = wt;
-	    _points[c] = Point( x, -z,  x);	    _weights[c++] = wt;
-	    _points[c] = Point( z,  x, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x,  x, -z);	    _weights[c++] = wt;
-	    _points[c] = Point(-z,  x,  x);	    _weights[c++] = wt;
-	    _points[c] = Point( x, -z, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(-z, -x, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x,  z, -x);	    _weights[c++] = wt;
-	    _points[c] = Point( x,  x, -z);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, -x, -z);	    _weights[c++] = wt;
-	    _points[c] = Point( x,  z,  x);	    _weights[c++] = wt;
-	    _points[c] = Point( z, -x,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, -z,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x,  z,  x);	    _weights[c++] = wt;
-	    _points[c] = Point( z, -x, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(-z, -x,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, -z, -x);	    _weights[c++] = wt;
-	    _points[c] = Point( z,  x,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(-z,  x, -x);	    _weights[c++] = wt;
+            break;
+          }
+        case 5: // (x,x,z) 24 permutations
+          {
+            _points[c] = Point( x,  x,  z);    _weights[c++] = wt;
+            _points[c] = Point( x, -x,  z);    _weights[c++] = wt;
+            _points[c] = Point(-x, -x,  z);    _weights[c++] = wt;
+            _points[c] = Point(-x,  x,  z);    _weights[c++] = wt;
+            _points[c] = Point( x,  z, -x);    _weights[c++] = wt;
+            _points[c] = Point( x, -x, -z);    _weights[c++] = wt;
+            _points[c] = Point( x, -z,  x);    _weights[c++] = wt;
+            _points[c] = Point( z,  x, -x);    _weights[c++] = wt;
+            _points[c] = Point(-x,  x, -z);    _weights[c++] = wt;
+            _points[c] = Point(-z,  x,  x);    _weights[c++] = wt;
+            _points[c] = Point( x, -z, -x);    _weights[c++] = wt;
+            _points[c] = Point(-z, -x, -x);    _weights[c++] = wt;
+            _points[c] = Point(-x,  z, -x);    _weights[c++] = wt;
+            _points[c] = Point( x,  x, -z);    _weights[c++] = wt;
+            _points[c] = Point(-x, -x, -z);    _weights[c++] = wt;
+            _points[c] = Point( x,  z,  x);    _weights[c++] = wt;
+            _points[c] = Point( z, -x,  x);    _weights[c++] = wt;
+            _points[c] = Point(-x, -z,  x);    _weights[c++] = wt;
+            _points[c] = Point(-x,  z,  x);    _weights[c++] = wt;
+            _points[c] = Point( z, -x, -x);    _weights[c++] = wt;
+            _points[c] = Point(-z, -x,  x);    _weights[c++] = wt;
+            _points[c] = Point(-x, -z, -x);    _weights[c++] = wt;
+            _points[c] = Point( z,  x,  x);    _weights[c++] = wt;
+            _points[c] = Point(-z,  x, -x);    _weights[c++] = wt;
 
-	    break;
-	  }
-	case 6: // (x,y,z) 24 permutations
-	  {
-	    _points[c] = Point( x,  y,  z);	    _weights[c++] = wt;
-	    _points[c] = Point( y, -x,  z);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, -y,  z);	    _weights[c++] = wt;
-	    _points[c] = Point(-y,  x,  z);	    _weights[c++] = wt;
-	    _points[c] = Point( x,  z, -y);	    _weights[c++] = wt;
-	    _points[c] = Point( x, -y, -z);	    _weights[c++] = wt;
-	    _points[c] = Point( x, -z,  y);	    _weights[c++] = wt;
-	    _points[c] = Point( z,  y, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x,  y, -z);	    _weights[c++] = wt;
-	    _points[c] = Point(-z,  y,  x);	    _weights[c++] = wt;
-	    _points[c] = Point( y, -z, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(-z, -y, -x);	    _weights[c++] = wt;
-	    _points[c] = Point(-y,  z, -x);	    _weights[c++] = wt;
-	    _points[c] = Point( y,  x, -z);	    _weights[c++] = wt;
-	    _points[c] = Point(-y, -x, -z);	    _weights[c++] = wt;
-	    _points[c] = Point( y,  z,  x);	    _weights[c++] = wt;
-	    _points[c] = Point( z, -y,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(-y, -z,  x);	    _weights[c++] = wt;
-	    _points[c] = Point(-x,  z,  y);	    _weights[c++] = wt;
-	    _points[c] = Point( z, -x, -y);	    _weights[c++] = wt;
-	    _points[c] = Point(-z, -x,  y);	    _weights[c++] = wt;
-	    _points[c] = Point(-x, -z, -y);	    _weights[c++] = wt;
-	    _points[c] = Point( z,  x,  y);	    _weights[c++] = wt;
-	    _points[c] = Point(-z,  x, -y);	    _weights[c++] = wt;
+            break;
+          }
+        case 6: // (x,y,z) 24 permutations
+          {
+            _points[c] = Point( x,  y,  z);    _weights[c++] = wt;
+            _points[c] = Point( y, -x,  z);    _weights[c++] = wt;
+            _points[c] = Point(-x, -y,  z);    _weights[c++] = wt;
+            _points[c] = Point(-y,  x,  z);    _weights[c++] = wt;
+            _points[c] = Point( x,  z, -y);    _weights[c++] = wt;
+            _points[c] = Point( x, -y, -z);    _weights[c++] = wt;
+            _points[c] = Point( x, -z,  y);    _weights[c++] = wt;
+            _points[c] = Point( z,  y, -x);    _weights[c++] = wt;
+            _points[c] = Point(-x,  y, -z);    _weights[c++] = wt;
+            _points[c] = Point(-z,  y,  x);    _weights[c++] = wt;
+            _points[c] = Point( y, -z, -x);    _weights[c++] = wt;
+            _points[c] = Point(-z, -y, -x);    _weights[c++] = wt;
+            _points[c] = Point(-y,  z, -x);    _weights[c++] = wt;
+            _points[c] = Point( y,  x, -z);    _weights[c++] = wt;
+            _points[c] = Point(-y, -x, -z);    _weights[c++] = wt;
+            _points[c] = Point( y,  z,  x);    _weights[c++] = wt;
+            _points[c] = Point( z, -y,  x);    _weights[c++] = wt;
+            _points[c] = Point(-y, -z,  x);    _weights[c++] = wt;
+            _points[c] = Point(-x,  z,  y);    _weights[c++] = wt;
+            _points[c] = Point( z, -x, -y);    _weights[c++] = wt;
+            _points[c] = Point(-z, -x,  y);    _weights[c++] = wt;
+            _points[c] = Point(-x, -z, -y);    _weights[c++] = wt;
+            _points[c] = Point( z,  x,  y);    _weights[c++] = wt;
+            _points[c] = Point(-z,  x, -y);    _weights[c++] = wt;
 
-	    break;
-	  }
-	default:
-	  {
-	    libMesh::err << "Unknown rule ID: " << rule_id[i] << "!" << std::endl;
-	    libmesh_error();
-	  }
-	} // end switch(rule_id[i])
+            break;
+          }
+        default:
+          {
+            libMesh::err << "Unknown rule ID: " << rule_id[i] << "!" << std::endl;
+            libmesh_error();
+          }
+        } // end switch(rule_id[i])
     }
 }
 

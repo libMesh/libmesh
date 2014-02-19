@@ -683,7 +683,7 @@ int main (int argc, char** argv)
   if (triangulate)
     {
       if (verbose)
-	 libMesh::out << "...Converting to all simplices...\n";
+        libMesh::out << "...Converting to all simplices...\n";
 
       MeshTools::Modification::all_tri(mesh);
     }
@@ -954,7 +954,7 @@ int main (int argc, char** argv)
         if (write_bndry != BM_DISABLED)
           {
             BoundaryMesh boundary_mesh (mesh.comm(),
-					mesh.mesh_dimension()-1);
+                                        mesh.mesh_dimension()-1);
             MeshData boundary_mesh_data (boundary_mesh);
 
             std::string boundary_name = "bndry_";

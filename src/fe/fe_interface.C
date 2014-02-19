@@ -32,7 +32,7 @@ namespace libMesh
 FEInterface::FEInterface()
 {
   libMesh::err << "ERROR: Do not define an object of this type."
-	        << std::endl;
+               << std::endl;
   libmesh_error();
 }
 
@@ -40,68 +40,68 @@ FEInterface::FEInterface()
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 #define fe_family_switch(dim, func_and_args, prefix, suffix) \
       do { \
-	switch (fe_t.family) \
-	  { \
-	  case CLOUGH: \
-	    prefix FE<dim,CLOUGH>::func_and_args suffix \
-	  case HERMITE: \
-	    prefix FE<dim,HERMITE>::func_and_args suffix \
-	  case HIERARCHIC: \
-	    prefix FE<dim,HIERARCHIC>::func_and_args suffix \
-	  case L2_HIERARCHIC: \
-	    prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix \
-	  case LAGRANGE: \
-	    prefix FE<dim,LAGRANGE>::func_and_args suffix \
-	  case L2_LAGRANGE: \
-	    prefix FE<dim,L2_LAGRANGE>::func_and_args suffix \
-	  case MONOMIAL: \
-	    prefix FE<dim,MONOMIAL>::func_and_args suffix \
+        switch (fe_t.family)                    \
+          {                                     \
+          case CLOUGH:                          \
+            prefix FE<dim,CLOUGH>::func_and_args suffix \
+          case HERMITE:                                 \
+            prefix FE<dim,HERMITE>::func_and_args suffix        \
+          case HIERARCHIC:                                      \
+            prefix FE<dim,HIERARCHIC>::func_and_args suffix     \
+          case L2_HIERARCHIC:                                   \
+            prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix  \
+          case LAGRANGE:                                        \
+            prefix FE<dim,LAGRANGE>::func_and_args suffix       \
+          case L2_LAGRANGE:                                     \
+            prefix FE<dim,L2_LAGRANGE>::func_and_args suffix    \
+          case MONOMIAL:                                        \
+            prefix FE<dim,MONOMIAL>::func_and_args suffix       \
           case SCALAR: \
             prefix FE<dim,SCALAR>::func_and_args suffix \
-	  case BERNSTEIN: \
-	    prefix FE<dim,BERNSTEIN>::func_and_args suffix \
-	  case SZABAB: \
-	    prefix FE<dim,SZABAB>::func_and_args suffix \
-	  case XYZ: \
-	    prefix FEXYZ<dim>::func_and_args suffix \
-	  default: \
-	    libmesh_error(); \
-	  } \
+          case BERNSTEIN:                               \
+            prefix FE<dim,BERNSTEIN>::func_and_args suffix      \
+          case SZABAB:                                          \
+            prefix FE<dim,SZABAB>::func_and_args suffix         \
+          case XYZ:                                             \
+            prefix FEXYZ<dim>::func_and_args suffix             \
+          default:                                              \
+            libmesh_error();                                    \
+          }                                                     \
       } while (0)
 
 #define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix) \
       do { \
-	switch (fe_t.family) \
-	  { \
-	  case CLOUGH: \
-	    prefix FE<dim,CLOUGH>::func_and_args suffix \
-	  case HERMITE: \
-	    prefix FE<dim,HERMITE>::func_and_args suffix \
-	  case HIERARCHIC: \
-	    prefix FE<dim,HIERARCHIC>::func_and_args suffix \
-	  case L2_HIERARCHIC: \
-	    prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix \
-	  case LAGRANGE: \
-	    prefix FE<dim,LAGRANGE>::func_and_args suffix \
-	  case LAGRANGE_VEC: \
-	    prefix FELagrangeVec<dim>::func_and_args suffix \
-	  case L2_LAGRANGE: \
-	    prefix FE<dim,L2_LAGRANGE>::func_and_args suffix \
-	  case MONOMIAL: \
-	    prefix FE<dim,MONOMIAL>::func_and_args suffix \
+        switch (fe_t.family)                    \
+          {                                     \
+          case CLOUGH:                          \
+            prefix FE<dim,CLOUGH>::func_and_args suffix \
+          case HERMITE:                                 \
+            prefix FE<dim,HERMITE>::func_and_args suffix        \
+          case HIERARCHIC:                                      \
+            prefix FE<dim,HIERARCHIC>::func_and_args suffix     \
+          case L2_HIERARCHIC:                                   \
+            prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix  \
+          case LAGRANGE:                                        \
+            prefix FE<dim,LAGRANGE>::func_and_args suffix       \
+          case LAGRANGE_VEC:                                    \
+            prefix FELagrangeVec<dim>::func_and_args suffix     \
+          case L2_LAGRANGE:                                     \
+            prefix FE<dim,L2_LAGRANGE>::func_and_args suffix    \
+          case MONOMIAL:                                        \
+            prefix FE<dim,MONOMIAL>::func_and_args suffix       \
           case SCALAR: \
             prefix FE<dim,SCALAR>::func_and_args suffix \
-	  case BERNSTEIN: \
-	    prefix FE<dim,BERNSTEIN>::func_and_args suffix \
-	  case SZABAB: \
-	    prefix FE<dim,SZABAB>::func_and_args suffix \
-	  case XYZ: \
-	    prefix FEXYZ<dim>::func_and_args suffix \
-	  case NEDELEC_ONE: \
+          case BERNSTEIN:                               \
+            prefix FE<dim,BERNSTEIN>::func_and_args suffix      \
+          case SZABAB:                                          \
+            prefix FE<dim,SZABAB>::func_and_args suffix         \
+          case XYZ:                                             \
+            prefix FEXYZ<dim>::func_and_args suffix             \
+          case NEDELEC_ONE:                                     \
             prefix FENedelecOne<dim>::func_and_args suffix \
-	  default: \
-	    libmesh_error(); \
-	  } \
+          default:                                         \
+            libmesh_error();                               \
+          }                                                \
       } while (0)
 
 #define fe_scalar_vec_error_switch(dim, func_and_args, prefix, suffix) \
@@ -133,7 +133,7 @@ FEInterface::FEInterface()
     case LAGRANGE_VEC: \
     case NEDELEC_ONE: \
       libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args"\
-		   << std::endl;\
+                   << std::endl;                                        \
       libmesh_error();\
     default: \
       libmesh_error(); \
@@ -142,12 +142,12 @@ FEInterface::FEInterface()
 
 
 #define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
-	do { \
-	switch (fe_t.family) \
+  do {                                                                  \
+    switch (fe_t.family)                                                \
     { \
     case LAGRANGE_VEC: \
       prefix FELagrangeVec<dim>::func_and_args suffix \
-    case NEDELEC_ONE:					    \
+    case NEDELEC_ONE:                                 \
       prefix FENedelecOne<dim>::func_and_args suffix  \
     case HERMITE: \
     case HIERARCHIC: \
@@ -160,7 +160,7 @@ FEInterface::FEInterface()
     case SZABAB: \
     case XYZ: \
       libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::shape" \
-		   << std::endl; \
+                   << std::endl;                                        \
       libmesh_error();\
     default: \
       libmesh_error(); \
@@ -170,60 +170,60 @@ FEInterface::FEInterface()
 #else
 #define fe_family_switch(dim, func_and_args, prefix, suffix) \
       do { \
-	switch (fe_t.family) \
-	  { \
-	  case CLOUGH: \
-	    prefix FE<dim,CLOUGH>::func_and_args suffix \
-	  case HERMITE: \
-	    prefix FE<dim,HERMITE>::func_and_args suffix \
-	  case HIERARCHIC: \
-	    prefix FE<dim,HIERARCHIC>::func_and_args suffix \
-	  case L2_HIERARCHIC: \
-	    prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix \
-	  case LAGRANGE: \
-	    prefix FE<dim,LAGRANGE>::func_and_args suffix \
-	  case L2_LAGRANGE: \
-	    prefix FE<dim,L2_LAGRANGE>::func_and_args suffix \
-	  case MONOMIAL: \
-	    prefix FE<dim,MONOMIAL>::func_and_args suffix \
+        switch (fe_t.family)                    \
+          {                                     \
+          case CLOUGH:                          \
+            prefix FE<dim,CLOUGH>::func_and_args suffix \
+          case HERMITE:                                 \
+            prefix FE<dim,HERMITE>::func_and_args suffix        \
+          case HIERARCHIC:                                      \
+            prefix FE<dim,HIERARCHIC>::func_and_args suffix     \
+          case L2_HIERARCHIC:                                   \
+            prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix  \
+          case LAGRANGE:                                        \
+            prefix FE<dim,LAGRANGE>::func_and_args suffix       \
+          case L2_LAGRANGE:                                     \
+            prefix FE<dim,L2_LAGRANGE>::func_and_args suffix    \
+          case MONOMIAL:                                        \
+            prefix FE<dim,MONOMIAL>::func_and_args suffix       \
           case SCALAR: \
             prefix FE<dim,SCALAR>::func_and_args suffix \
-	  case XYZ: \
-	    prefix FEXYZ<dim>::func_and_args suffix \
-	  default: \
-	    libmesh_error(); \
-	  } \
+          case XYZ:                                     \
+            prefix FEXYZ<dim>::func_and_args suffix     \
+          default:                                      \
+            libmesh_error();                            \
+          }                                             \
       } while (0)
 
 #define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix) \
       do { \
-	switch (fe_t.family) \
-	  { \
-	  case CLOUGH: \
-	    prefix FE<dim,CLOUGH>::func_and_args suffix \
-	  case HERMITE: \
-	    prefix FE<dim,HERMITE>::func_and_args suffix \
-	  case HIERARCHIC: \
-	    prefix FE<dim,HIERARCHIC>::func_and_args suffix \
-	  case L2_HIERARCHIC: \
-	    prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix \
-	  case LAGRANGE: \
-	    prefix FE<dim,LAGRANGE>::func_and_args suffix \
-	  case LAGRANGE_VEC: \
-	    prefix FELagrangeVec<dim>::func_and_args suffix \
-	  case L2_LAGRANGE: \
-	    prefix FE<dim,L2_LAGRANGE>::func_and_args suffix \
-	  case MONOMIAL: \
-	    prefix FE<dim,MONOMIAL>::func_and_args suffix \
+        switch (fe_t.family)                    \
+          {                                     \
+          case CLOUGH:                          \
+            prefix FE<dim,CLOUGH>::func_and_args suffix \
+          case HERMITE:                                 \
+            prefix FE<dim,HERMITE>::func_and_args suffix        \
+          case HIERARCHIC:                                      \
+            prefix FE<dim,HIERARCHIC>::func_and_args suffix     \
+          case L2_HIERARCHIC:                                   \
+            prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix  \
+          case LAGRANGE:                                        \
+            prefix FE<dim,LAGRANGE>::func_and_args suffix       \
+          case LAGRANGE_VEC:                                    \
+            prefix FELagrangeVec<dim>::func_and_args suffix     \
+          case L2_LAGRANGE:                                     \
+            prefix FE<dim,L2_LAGRANGE>::func_and_args suffix    \
+          case MONOMIAL:                                        \
+            prefix FE<dim,MONOMIAL>::func_and_args suffix       \
           case SCALAR: \
             prefix FE<dim,SCALAR>::func_and_args suffix \
-	  case XYZ: \
-	    prefix FEXYZ<dim>::func_and_args suffix \
-	  case NEDELEC_ONE: \
+          case XYZ:                                     \
+            prefix FEXYZ<dim>::func_and_args suffix     \
+          case NEDELEC_ONE:                                \
             prefix FENedelecOne<dim>::func_and_args suffix \
-	  default: \
-	    libmesh_error(); \
-	  } \
+          default:                                         \
+            libmesh_error();                               \
+          }                                                \
       } while (0)
 
 #define fe_scalar_vec_error_switch(dim, func_and_args, prefix, suffix) \
@@ -251,7 +251,7 @@ FEInterface::FEInterface()
     case LAGRANGE_VEC: \
     case NEDELEC_ONE: \
       libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args"\
-		   << std::endl;\
+                   << std::endl;                                        \
       libmesh_error();\
     default: \
       libmesh_error(); \
@@ -260,12 +260,12 @@ FEInterface::FEInterface()
 
 
 #define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
-	do { \
-	switch (fe_t.family) \
+  do {                                                                  \
+    switch (fe_t.family)                                                \
     { \
     case LAGRANGE_VEC: \
       prefix FELagrangeVec<dim>::func_and_args suffix \
-    case NEDELEC_ONE:				      \
+    case NEDELEC_ONE:                                 \
       prefix FENedelecOne<dim>::func_and_args suffix \
     case HERMITE: \
     case HIERARCHIC: \
@@ -276,7 +276,7 @@ FEInterface::FEInterface()
     case SCALAR: \
     case XYZ: \
       libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::func_and_args" \
-		   << std::endl; \
+                   << std::endl;                                        \
       libmesh_error();\
     default: \
       libmesh_error(); \
@@ -373,8 +373,8 @@ FEInterface::FEInterface()
 
 
 unsigned int FEInterface::n_shape_functions(const unsigned int dim,
-					    const FEType& fe_t,
-					    const ElemType t)
+                                            const FEType& fe_t,
+                                            const ElemType t)
 {
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -402,8 +402,8 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
 
 unsigned int FEInterface::n_dofs(const unsigned int dim,
-				 const FEType& fe_t,
-				 const ElemType t)
+                                 const FEType& fe_t,
+                                 const ElemType t)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -424,9 +424,9 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
 
 unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
-					 const FEType& fe_t,
-					 const ElemType t,
-					 const unsigned int n)
+                                         const FEType& fe_t,
+                                         const ElemType t,
+                                         const unsigned int n)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -448,8 +448,8 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 
 
 unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
-					  const FEType& fe_t,
-					  const ElemType t)
+                                          const FEType& fe_t,
+                                          const ElemType t)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -470,10 +470,10 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
 
 void FEInterface::dofs_on_side(const Elem* const elem,
-			       const unsigned int dim,
-			       const FEType& fe_t,
-			       unsigned int s,
-			       std::vector<unsigned int>& di)
+                               const unsigned int dim,
+                               const FEType& fe_t,
+                               unsigned int s,
+                               std::vector<unsigned int>& di)
 {
   const Order o = fe_t.order;
 
@@ -485,10 +485,10 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 
 
 void FEInterface::dofs_on_edge(const Elem* const elem,
-			       const unsigned int dim,
-			       const FEType& fe_t,
-			       unsigned int e,
-			       std::vector<unsigned int>& di)
+                               const unsigned int dim,
+                               const FEType& fe_t,
+                               unsigned int e,
+                               std::vector<unsigned int>& di)
 {
   const Order o = fe_t.order;
 
@@ -501,10 +501,10 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 
 
 void FEInterface::nodal_soln(const unsigned int dim,
-			     const FEType& fe_t,
-			     const Elem* elem,
-			     const std::vector<Number>& elem_soln,
-			     std::vector<Number>&       nodal_soln)
+                             const FEType& fe_t,
+                             const Elem* elem,
+                             const std::vector<Number>& elem_soln,
+                             std::vector<Number>&       nodal_soln)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -540,11 +540,11 @@ Point FEInterface::map(unsigned int dim,
 
 
 Point FEInterface::inverse_map (const unsigned int dim,
-				const FEType& fe_t,
-				const Elem* elem,
-				const Point& p,
-				const Real tolerance,
-				const bool secure)
+                                const FEType& fe_t,
+                                const Elem* elem,
+                                const Point& p,
+                                const Real tolerance,
+                                const bool secure)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -563,12 +563,12 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
 
 void FEInterface::inverse_map (const unsigned int dim,
-			       const FEType& fe_t,
-			       const Elem* elem,
-			       const std::vector<Point>& physical_points,
-			       std::vector<Point>&       reference_points,
-			       const Real tolerance,
-			       const bool secure)
+                               const FEType& fe_t,
+                               const Elem* elem,
+                               const std::vector<Point>& physical_points,
+                               std::vector<Point>&       reference_points,
+                               const Real tolerance,
+                               const bool secure)
 {
   const std::size_t n_pts = physical_points.size();
 
@@ -578,7 +578,7 @@ void FEInterface::inverse_map (const unsigned int dim,
   if (n_pts == 0)
     {
       libMesh::err << "WARNING: empty vector physical_points!"
-		    << std::endl;
+                   << std::endl;
       libmesh_here();
       return;
     }
@@ -591,7 +591,7 @@ void FEInterface::inverse_map (const unsigned int dim,
       return;
 
 //       libMesh::err << "ERROR: Not implemented!"
-// 		<< std::endl;
+// << std::endl;
 //       libmesh_error();
     }
 
@@ -606,8 +606,8 @@ void FEInterface::inverse_map (const unsigned int dim,
 
 
 bool FEInterface::on_reference_element(const Point& p,
-				       const ElemType t,
-				       const Real eps)
+                                       const ElemType t,
+                                       const Real eps)
 {
   return FEBase::on_reference_element(p,t,eps);
 }
@@ -616,10 +616,10 @@ bool FEInterface::on_reference_element(const Point& p,
 
 
 Real FEInterface::shape(const unsigned int dim,
-			const FEType& fe_t,
-			const ElemType t,
-			const unsigned int i,
-			const Point& p)
+                        const FEType& fe_t,
+                        const ElemType t,
+                        const unsigned int i,
+                        const Point& p)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -637,10 +637,10 @@ Real FEInterface::shape(const unsigned int dim,
 }
 
 Real FEInterface::shape(const unsigned int dim,
-			const FEType& fe_t,
-			const Elem* elem,
-			const unsigned int i,
-			const Point& p)
+                        const FEType& fe_t,
+                        const Elem* elem,
+                        const unsigned int i,
+                        const Point& p)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -659,11 +659,11 @@ Real FEInterface::shape(const unsigned int dim,
 
 template<>
 void FEInterface::shape<Real>(const unsigned int dim,
-			      const FEType& fe_t,
-			      const ElemType t,
-			      const unsigned int i,
-			      const Point& p,
-			      Real& phi)
+                              const FEType& fe_t,
+                              const ElemType t,
+                              const unsigned int i,
+                              const Point& p,
+                              Real& phi)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -695,11 +695,11 @@ void FEInterface::shape<Real>(const unsigned int dim,
 
 template<>
 void FEInterface::shape<Real>(const unsigned int dim,
-			      const FEType& fe_t,
-			      const Elem* elem,
-			      const unsigned int i,
-			      const Point& p,
-			      Real& phi)
+                              const FEType& fe_t,
+                              const Elem* elem,
+                              const unsigned int i,
+                              const Point& p,
+                              Real& phi)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -731,11 +731,11 @@ void FEInterface::shape<Real>(const unsigned int dim,
 
 template<>
 void FEInterface::shape<RealGradient>(const unsigned int dim,
-				      const FEType& fe_t,
-				      const ElemType t,
-				      const unsigned int i,
-				      const Point& p,
-				      RealGradient& phi)
+                                      const FEType& fe_t,
+                                      const ElemType t,
+                                      const unsigned int i,
+                                      const Point& p,
+                                      RealGradient& phi)
 {
   const Order o = fe_t.order;
 
@@ -760,11 +760,11 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
 
 template<>
 void FEInterface::shape<RealGradient>(const unsigned int dim,
-				      const FEType& fe_t,
-				      const Elem* elem,
-				      const unsigned int i,
-				      const Point& p,
-				      RealGradient& phi)
+                                      const FEType& fe_t,
+                                      const Elem* elem,
+                                      const unsigned int i,
+                                      const Point& p,
+                                      RealGradient& phi)
 {
   const Order o = fe_t.order;
 
@@ -788,9 +788,9 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
 }
 
 void FEInterface::compute_data(const unsigned int dim,
-			       const FEType& fe_t,
-			       const Elem* elem,
-			       FEComputeData& data)
+                               const FEType& fe_t,
+                               const Elem* elem,
+                               FEComputeData& data)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -824,9 +824,9 @@ void FEInterface::compute_data(const unsigned int dim,
 #ifdef LIBMESH_ENABLE_AMR
 
 void FEInterface::compute_constraints (DofConstraints &constraints,
-				       DofMap &dof_map,
-				       const unsigned int variable_number,
-				       const Elem* elem)
+                                       DofMap &dof_map,
+                                       const unsigned int variable_number,
+                                       const Elem* elem)
 {
   libmesh_assert(elem);
 
@@ -837,122 +837,122 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
     case 0:
     case 1:
       {
-	// No constraints in 0D/1D.
-	return;
+        // No constraints in 0D/1D.
+        return;
       }
 
 
     case 2:
       {
-	switch (fe_t.family)
-	  {
-	  case CLOUGH:
-	    FE<2,CLOUGH>::compute_constraints (constraints,
-					       dof_map,
-					       variable_number,
-					       elem); return;
+        switch (fe_t.family)
+          {
+          case CLOUGH:
+            FE<2,CLOUGH>::compute_constraints (constraints,
+                                               dof_map,
+                                               variable_number,
+                                               elem); return;
 
-	  case HERMITE:
-	    FE<2,HERMITE>::compute_constraints (constraints,
-					        dof_map,
-					        variable_number,
-					        elem); return;
+          case HERMITE:
+            FE<2,HERMITE>::compute_constraints (constraints,
+                                                dof_map,
+                                                variable_number,
+                                                elem); return;
 
-	  case LAGRANGE:
-	    FE<2,LAGRANGE>::compute_constraints (constraints,
-						 dof_map,
-						 variable_number,
-						 elem); return;
+          case LAGRANGE:
+            FE<2,LAGRANGE>::compute_constraints (constraints,
+                                                 dof_map,
+                                                 variable_number,
+                                                 elem); return;
 
-	  case HIERARCHIC:
-	    FE<2,HIERARCHIC>::compute_constraints (constraints,
-						   dof_map,
-						   variable_number,
-						   elem); return;
+          case HIERARCHIC:
+            FE<2,HIERARCHIC>::compute_constraints (constraints,
+                                                   dof_map,
+                                                   variable_number,
+                                                   elem); return;
 
-	  case L2_HIERARCHIC:
-	    FE<2,L2_HIERARCHIC>::compute_constraints (constraints,
-						      dof_map,
-						      variable_number,
-						      elem); return;
+          case L2_HIERARCHIC:
+            FE<2,L2_HIERARCHIC>::compute_constraints (constraints,
+                                                      dof_map,
+                                                      variable_number,
+                                                      elem); return;
 
-	  case LAGRANGE_VEC:
-	    FE<2,LAGRANGE_VEC>::compute_constraints (constraints,
-						     dof_map,
-						     variable_number,
-						     elem); return;
+          case LAGRANGE_VEC:
+            FE<2,LAGRANGE_VEC>::compute_constraints (constraints,
+                                                     dof_map,
+                                                     variable_number,
+                                                     elem); return;
 
         
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-	  case SZABAB:
-	    FE<2,SZABAB>::compute_constraints (constraints,
-					       dof_map,
-					       variable_number,
-					       elem); return;
+          case SZABAB:
+            FE<2,SZABAB>::compute_constraints (constraints,
+                                               dof_map,
+                                               variable_number,
+                                               elem); return;
 
-	  case BERNSTEIN:
-	    FE<2,BERNSTEIN>::compute_constraints (constraints,
-						  dof_map,
-						  variable_number,
-						  elem); return;
+          case BERNSTEIN:
+            FE<2,BERNSTEIN>::compute_constraints (constraints,
+                                                  dof_map,
+                                                  variable_number,
+                                                  elem); return;
 
 #endif
-	  default:
-	    return;
-	  }
+          default:
+            return;
+          }
       }
 
 
     case 3:
       {
-	switch (fe_t.family)
-	  {
-	  case HERMITE:
-	    FE<3,HERMITE>::compute_constraints (constraints,
-					        dof_map,
-					        variable_number,
-					        elem); return;
+        switch (fe_t.family)
+          {
+          case HERMITE:
+            FE<3,HERMITE>::compute_constraints (constraints,
+                                                dof_map,
+                                                variable_number,
+                                                elem); return;
 
-	  case LAGRANGE:
-	    FE<3,LAGRANGE>::compute_constraints (constraints,
-					         dof_map,
-						 variable_number,
-						 elem); return;
+          case LAGRANGE:
+            FE<3,LAGRANGE>::compute_constraints (constraints,
+                                                 dof_map,
+                                                 variable_number,
+                                                 elem); return;
 
-	  case HIERARCHIC:
-	    FE<3,HIERARCHIC>::compute_constraints (constraints,
-						   dof_map,
-						   variable_number,
-						   elem); return;
+          case HIERARCHIC:
+            FE<3,HIERARCHIC>::compute_constraints (constraints,
+                                                   dof_map,
+                                                   variable_number,
+                                                   elem); return;
 
-	  case L2_HIERARCHIC:
-	    FE<3,L2_HIERARCHIC>::compute_constraints (constraints,
-						      dof_map,
-						      variable_number,
-						      elem); return;
+          case L2_HIERARCHIC:
+            FE<3,L2_HIERARCHIC>::compute_constraints (constraints,
+                                                      dof_map,
+                                                      variable_number,
+                                                      elem); return;
 
-	  case LAGRANGE_VEC:
-	    FE<3,LAGRANGE_VEC>::compute_constraints (constraints,
-						     dof_map,
-						     variable_number,
-						     elem); return;
+          case LAGRANGE_VEC:
+            FE<3,LAGRANGE_VEC>::compute_constraints (constraints,
+                                                     dof_map,
+                                                     variable_number,
+                                                     elem); return;
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-	  case SZABAB:
-	    FE<3,SZABAB>::compute_constraints (constraints,
-					       dof_map,
-					       variable_number,
-					       elem); return;
+          case SZABAB:
+            FE<3,SZABAB>::compute_constraints (constraints,
+                                               dof_map,
+                                               variable_number,
+                                               elem); return;
 
-	  case BERNSTEIN:
-	    FE<3,BERNSTEIN>::compute_constraints (constraints,
-						  dof_map,
-						  variable_number,
-						  elem); return;
+          case BERNSTEIN:
+            FE<3,BERNSTEIN>::compute_constraints (constraints,
+                                                  dof_map,
+                                                  variable_number,
+                                                  elem); return;
 
 #endif
-	  default:
-	    return;
-	  }
+          default:
+            return;
+          }
       }
 
 
@@ -968,12 +968,12 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 #ifdef LIBMESH_ENABLE_PERIODIC
 
 void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
-				                DofMap &dof_map,
+                                                DofMap &dof_map,
                                                 const PeriodicBoundaries &boundaries,
-						const MeshBase &mesh,
+                                                const MeshBase &mesh,
                                                 const PointLocatorBase* point_locator,
-				                const unsigned int variable_number,
-				                const Elem* elem)
+                                                const unsigned int variable_number,
+                                                const Elem* elem)
 {
   // No element-specific optimizations currently exist
   FEBase::compute_periodic_constraints (constraints,
@@ -981,8 +981,8 @@ void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
                                         boundaries,
                                         mesh,
                                         point_locator,
-				        variable_number,
-				        elem);
+                                        variable_number,
+                                        elem);
 }
 
 #endif // #ifdef LIBMESH_ENABLE_PERIODIC
@@ -990,7 +990,7 @@ void FEInterface::compute_periodic_constraints (DofConstraints &constraints,
 
 
 unsigned int FEInterface::max_order(const FEType& fe_t,
-			            const ElemType& el_t)
+                                    const ElemType& el_t)
 {
   // Yeah, I know, infinity is much larger than 11, but our
   // solvers don't seem to like high degree polynomials, and our
@@ -1007,310 +1007,310 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
       case LAGRANGE:
       case L2_LAGRANGE: // TODO: L2_LAGRANGE can have higher "max_order" than LAGRANGE
       case LAGRANGE_VEC:
-	switch (el_t)
-	  {
-	    case EDGE2:
-	    case EDGE3:
-	    case EDGE4:
-	      return 3;
-	    case TRI3:
-	      return 1;
-	    case TRI6:
-	      return 2;
-	    case QUAD4:
-	      return 1;
-	    case QUAD8:
-	    case QUAD9:
-	      return 2;
-	    case TET4:
-	      return 1;
-	    case TET10:
-	      return 2;
-	    case HEX8:
-	      return 1;
-	    case HEX20:
-	    case HEX27:
-	      return 2;
-	    case PRISM6:
-	      return 1;
-	    case PRISM15:
-	    case PRISM18:
-	      return 2;
-	    case PYRAMID5:
-	      return 1;
+        switch (el_t)
+          {
+          case EDGE2:
+          case EDGE3:
+          case EDGE4:
+            return 3;
+          case TRI3:
+            return 1;
+          case TRI6:
+            return 2;
+          case QUAD4:
+            return 1;
+          case QUAD8:
+          case QUAD9:
+            return 2;
+          case TET4:
+            return 1;
+          case TET10:
+            return 2;
+          case HEX8:
+            return 1;
+          case HEX20:
+          case HEX27:
+            return 2;
+          case PRISM6:
+            return 1;
+          case PRISM15:
+          case PRISM18:
+            return 2;
+          case PYRAMID5:
+            return 1;
             case PYRAMID14:
               return 2;
-	    default:
-	      return unknown;
-	  }
-	break;
+          default:
+            return unknown;
+          }
+        break;
       case MONOMIAL:
-	switch (el_t)
-	  {
-	    case EDGE2:
-	    case EDGE3:
-	    case EDGE4:
-	    case TRI3:
-	    case TRI6:
-	    case QUAD4:
-	    case QUAD8:
-	    case QUAD9:
-	    case TET4:
-	    case TET10:
-	    case HEX8:
-	    case HEX20:
-	    case HEX27:
-	    case PRISM6:
-	    case PRISM15:
-	    case PRISM18:
-	    case PYRAMID5:
+        switch (el_t)
+          {
+          case EDGE2:
+          case EDGE3:
+          case EDGE4:
+          case TRI3:
+          case TRI6:
+          case QUAD4:
+          case QUAD8:
+          case QUAD9:
+          case TET4:
+          case TET10:
+          case HEX8:
+          case HEX20:
+          case HEX27:
+          case PRISM6:
+          case PRISM15:
+          case PRISM18:
+          case PYRAMID5:
             case PYRAMID14:
-	      return unlimited;
-	    default:
-	      return unknown;
-	  }
-	break;
+              return unlimited;
+          default:
+            return unknown;
+          }
+        break;
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
       case BERNSTEIN:
-	switch (el_t)
-	  {
-	    case EDGE2:
-	    case EDGE3:
-	    case EDGE4:
-	      return unlimited;
-	    case TRI3:
-	      return 0;
-	    case TRI6:
-	      return 6;
-	    case QUAD4:
-	      return 0;
-	    case QUAD8:
-	    case QUAD9:
-	      return unlimited;
-	    case TET4:
-	      return 1;
-	    case TET10:
-	      return 2;
-	    case HEX8:
-	      return 0;
-	    case HEX20:
-	      return 2;
-	    case HEX27:
-	      return 4;
-	    case PRISM6:
-	    case PRISM15:
-	    case PRISM18:
-	    case PYRAMID5:
+        switch (el_t)
+          {
+          case EDGE2:
+          case EDGE3:
+          case EDGE4:
+            return unlimited;
+          case TRI3:
+            return 0;
+          case TRI6:
+            return 6;
+          case QUAD4:
+            return 0;
+          case QUAD8:
+          case QUAD9:
+            return unlimited;
+          case TET4:
+            return 1;
+          case TET10:
+            return 2;
+          case HEX8:
+            return 0;
+          case HEX20:
+            return 2;
+          case HEX27:
+            return 4;
+          case PRISM6:
+          case PRISM15:
+          case PRISM18:
+          case PYRAMID5:
             case PYRAMID14:
-	      return 0;
-	    default:
-	      return unknown;
-	  }
-	break;
+              return 0;
+          default:
+            return unknown;
+          }
+        break;
       case SZABAB:
-	switch (el_t)
-	  {
-	    case EDGE2:
-	    case EDGE3:
-	    case EDGE4:
-	      return 7;
-	    case TRI3:
-	      return 0;
-	    case TRI6:
-	      return 7;
-	    case QUAD4:
-	      return 0;
-	    case QUAD8:
-	    case QUAD9:
-	      return 7;
-	    case TET4:
-	    case TET10:
-	    case HEX8:
-	    case HEX20:
-	    case HEX27:
-	    case PRISM6:
-	    case PRISM15:
-	    case PRISM18:
-	    case PYRAMID5:
+        switch (el_t)
+          {
+          case EDGE2:
+          case EDGE3:
+          case EDGE4:
+            return 7;
+          case TRI3:
+            return 0;
+          case TRI6:
+            return 7;
+          case QUAD4:
+            return 0;
+          case QUAD8:
+          case QUAD9:
+            return 7;
+          case TET4:
+          case TET10:
+          case HEX8:
+          case HEX20:
+          case HEX27:
+          case PRISM6:
+          case PRISM15:
+          case PRISM18:
+          case PYRAMID5:
             case PYRAMID14:
-	      return 0;
-	    default:
-	      return unknown;
-	  }
-	break;
+              return 0;
+          default:
+            return unknown;
+          }
+        break;
 #endif
       case XYZ:
-	switch (el_t)
-	  {
-	    case EDGE2:
-	    case EDGE3:
-	    case EDGE4:
-	    case TRI3:
-	    case TRI6:
-	    case QUAD4:
-	    case QUAD8:
-	    case QUAD9:
-	    case TET4:
-	    case TET10:
-	    case HEX8:
-	    case HEX20:
-	    case HEX27:
-	    case PRISM6:
-	    case PRISM15:
-	    case PRISM18:
-	    case PYRAMID5:
+        switch (el_t)
+          {
+          case EDGE2:
+          case EDGE3:
+          case EDGE4:
+          case TRI3:
+          case TRI6:
+          case QUAD4:
+          case QUAD8:
+          case QUAD9:
+          case TET4:
+          case TET10:
+          case HEX8:
+          case HEX20:
+          case HEX27:
+          case PRISM6:
+          case PRISM15:
+          case PRISM18:
+          case PYRAMID5:
             case PYRAMID14:
-	      return unlimited;
-	    default:
-	      return unknown;
-	  }
-	break;
+              return unlimited;
+          default:
+            return unknown;
+          }
+        break;
       case CLOUGH:
-	switch (el_t)
-	  {
-	    case EDGE2:
-	    case EDGE3:
-	      return 3;
-	    case EDGE4:
-	    case TRI3:
-	      return 0;
-	    case TRI6:
-	      return 3;
-	    case QUAD4:
-	    case QUAD8:
-	    case QUAD9:
-	    case TET4:
-	    case TET10:
-	    case HEX8:
-	    case HEX20:
-	    case HEX27:
-	    case PRISM6:
-	    case PRISM15:
-	    case PRISM18:
-	    case PYRAMID5:
+        switch (el_t)
+          {
+          case EDGE2:
+          case EDGE3:
+            return 3;
+          case EDGE4:
+          case TRI3:
+            return 0;
+          case TRI6:
+            return 3;
+          case QUAD4:
+          case QUAD8:
+          case QUAD9:
+          case TET4:
+          case TET10:
+          case HEX8:
+          case HEX20:
+          case HEX27:
+          case PRISM6:
+          case PRISM15:
+          case PRISM18:
+          case PYRAMID5:
             case PYRAMID14:
-	      return 0;
-	    default:
-	      return unknown;
-	  }
-	break;
+              return 0;
+          default:
+            return unknown;
+          }
+        break;
       case HERMITE:
-	switch (el_t)
-	  {
-	    case EDGE2:
-	    case EDGE3:
-	      return unlimited;
-	    case EDGE4:
-	    case TRI3:
-	    case TRI6:
-	      return 0;
-	    case QUAD4:
-	      return 3;
-	    case QUAD8:
-	    case QUAD9:
-	      return unlimited;
-	    case TET4:
-	    case TET10:
-	      return 0;
-	    case HEX8:
-	      return 3;
-	    case HEX20:
-	    case HEX27:
-	      return unlimited;
-	    case PRISM6:
-	    case PRISM15:
-	    case PRISM18:
-	    case PYRAMID5:
+        switch (el_t)
+          {
+          case EDGE2:
+          case EDGE3:
+            return unlimited;
+          case EDGE4:
+          case TRI3:
+          case TRI6:
+            return 0;
+          case QUAD4:
+            return 3;
+          case QUAD8:
+          case QUAD9:
+            return unlimited;
+          case TET4:
+          case TET10:
+            return 0;
+          case HEX8:
+            return 3;
+          case HEX20:
+          case HEX27:
+            return unlimited;
+          case PRISM6:
+          case PRISM15:
+          case PRISM18:
+          case PYRAMID5:
             case PYRAMID14:
-	      return 0;
-	    default:
-	      return unknown;
-	  }
-	break;
+              return 0;
+          default:
+            return unknown;
+          }
+        break;
       case HIERARCHIC:
-	switch (el_t)
-	  {
-	    case EDGE2:
-	    case EDGE3:
-	    case EDGE4:
-	      return unlimited;
-	    case TRI3:
-	      return 1;
-	    case TRI6:
-	      return unlimited;
-	    case QUAD4:
-	      return 1;
-	    case QUAD8:
-	    case QUAD9:
-	      return unlimited;
-	    case TET4:
-	    case TET10:
-	      return 0;
-	    case HEX8:
-	    case HEX20:
-	      return 1;
-	    case HEX27:
-	      return unlimited;
-	    case PRISM6:
-	    case PRISM15:
-	    case PRISM18:
-	    case PYRAMID5:
-	    case PYRAMID14:
-	      return 0;
-	    default:
-	      return unknown;
-	  }
-	break;
+        switch (el_t)
+          {
+          case EDGE2:
+          case EDGE3:
+          case EDGE4:
+            return unlimited;
+          case TRI3:
+            return 1;
+          case TRI6:
+            return unlimited;
+          case QUAD4:
+            return 1;
+          case QUAD8:
+          case QUAD9:
+            return unlimited;
+          case TET4:
+          case TET10:
+            return 0;
+          case HEX8:
+          case HEX20:
+            return 1;
+          case HEX27:
+            return unlimited;
+          case PRISM6:
+          case PRISM15:
+          case PRISM18:
+          case PYRAMID5:
+          case PYRAMID14:
+            return 0;
+          default:
+            return unknown;
+          }
+        break;
       case L2_HIERARCHIC:
-	switch (el_t)
-	  {
-	    case EDGE2:
-	    case EDGE3:
-	    case EDGE4:
-	      return unlimited;
-	    case TRI3:
-	      return 1;
-	    case TRI6:
-	      return unlimited;
-	    case QUAD4:
-	      return 1;
-	    case QUAD8:
-	    case QUAD9:
-	      return unlimited;
-	    case TET4:
-	    case TET10:
-	      return 0;
-	    case HEX8:
-	    case HEX20:
-	      return 1;
-	    case HEX27:
-	      return unlimited;
-	    case PRISM6:
-	    case PRISM15:
-	    case PRISM18:
-	    case PYRAMID5:
-	    case PYRAMID14:
-	      return 0;
-	    default:
-	      return unknown;
-	  }
-	break;
+        switch (el_t)
+          {
+          case EDGE2:
+          case EDGE3:
+          case EDGE4:
+            return unlimited;
+          case TRI3:
+            return 1;
+          case TRI6:
+            return unlimited;
+          case QUAD4:
+            return 1;
+          case QUAD8:
+          case QUAD9:
+            return unlimited;
+          case TET4:
+          case TET10:
+            return 0;
+          case HEX8:
+          case HEX20:
+            return 1;
+          case HEX27:
+            return unlimited;
+          case PRISM6:
+          case PRISM15:
+          case PRISM18:
+          case PYRAMID5:
+          case PYRAMID14:
+            return 0;
+          default:
+            return unknown;
+          }
+        break;
     case NEDELEC_ONE:
       switch (el_t)
-	{
-	case TRI6:
-	case QUAD8:
-	case QUAD9:
+        {
+        case TRI6:
+        case QUAD8:
+        case QUAD9:
         case HEX20:
         case HEX27:
-	  return 1;
-	default:
-	  return 0;
-	}
+          return 1;
+        default:
+          return 0;
+        }
       break;
       default:
-	return 0;
-	break;
+        return 0;
+        break;
     }
 }
 

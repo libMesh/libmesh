@@ -88,7 +88,7 @@ bool Hex27::is_face(const unsigned int i) const
 }
 
 bool Hex27::is_node_on_side(const unsigned int n,
-			    const unsigned int s) const
+                            const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 9; ++i)
@@ -98,7 +98,7 @@ bool Hex27::is_node_on_side(const unsigned int n,
 }
 
 bool Hex27::is_node_on_edge(const unsigned int n,
-			    const unsigned int e) const
+                            const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 3; ++i)
@@ -165,32 +165,32 @@ dof_id_type Hex27::key (const unsigned int s) const
     case 0:  // the face at z=0
 
       return
-	this->compute_key (this->node(20));
+        this->compute_key (this->node(20));
 
     case 1:  // the face at y = 0
 
       return
-	this->compute_key (this->node(21));
+        this->compute_key (this->node(21));
 
     case 2:  // the face at x=1
 
       return
-	this->compute_key (this->node(22));
+        this->compute_key (this->node(22));
 
     case 3: // the face at y=1
 
       return
-	this->compute_key (this->node(23));
+        this->compute_key (this->node(23));
 
     case 4: // the face at x=0
 
       return
-	this->compute_key (this->node(24));
+        this->compute_key (this->node(24));
 
     case 5: // the face at z=1
 
       return
-	this->compute_key (this->node(25));
+        this->compute_key (this->node(25));
     }
 
   // We'll never get here.
@@ -201,7 +201,7 @@ dof_id_type Hex27::key (const unsigned int s) const
 
 
 AutoPtr<Elem> Hex27::build_side (const unsigned int i,
-				 bool proxy) const
+                                 bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -218,97 +218,97 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i,
 
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
       switch (i)
-	{
-	case 0:  // the face at z=0
-	  {
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(3);
-	    face->set_node(2) = this->get_node(2);
-	    face->set_node(3) = this->get_node(1);
-	    face->set_node(4) = this->get_node(11);
-	    face->set_node(5) = this->get_node(10);
-	    face->set_node(6) = this->get_node(9);
-	    face->set_node(7) = this->get_node(8);
-	    face->set_node(8) = this->get_node(20);
+        {
+        case 0:  // the face at z=0
+          {
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(3);
+            face->set_node(2) = this->get_node(2);
+            face->set_node(3) = this->get_node(1);
+            face->set_node(4) = this->get_node(11);
+            face->set_node(5) = this->get_node(10);
+            face->set_node(6) = this->get_node(9);
+            face->set_node(7) = this->get_node(8);
+            face->set_node(8) = this->get_node(20);
 
-	    return face;
-	  }
-	case 1:  // the face at y = 0
-	  {
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(5);
-	    face->set_node(3) = this->get_node(4);
-	    face->set_node(4) = this->get_node(8);
-	    face->set_node(5) = this->get_node(13);
-	    face->set_node(6) = this->get_node(16);
-	    face->set_node(7) = this->get_node(12);
-	    face->set_node(8) = this->get_node(21);
+            return face;
+          }
+        case 1:  // the face at y = 0
+          {
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(5);
+            face->set_node(3) = this->get_node(4);
+            face->set_node(4) = this->get_node(8);
+            face->set_node(5) = this->get_node(13);
+            face->set_node(6) = this->get_node(16);
+            face->set_node(7) = this->get_node(12);
+            face->set_node(8) = this->get_node(21);
 
-	    return face;
-	  }
-	case 2:  // the face at x=1
-	  {
-	    face->set_node(0) = this->get_node(1);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(6);
-	    face->set_node(3) = this->get_node(5);
-	    face->set_node(4) = this->get_node(9);
-	    face->set_node(5) = this->get_node(14);
-	    face->set_node(6) = this->get_node(17);
-	    face->set_node(7) = this->get_node(13);
-	    face->set_node(8) = this->get_node(22);
+            return face;
+          }
+        case 2:  // the face at x=1
+          {
+            face->set_node(0) = this->get_node(1);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(6);
+            face->set_node(3) = this->get_node(5);
+            face->set_node(4) = this->get_node(9);
+            face->set_node(5) = this->get_node(14);
+            face->set_node(6) = this->get_node(17);
+            face->set_node(7) = this->get_node(13);
+            face->set_node(8) = this->get_node(22);
 
-	    return face;
-	  }
-	case 3: // the face at y=1
-	  {
-	    face->set_node(0) = this->get_node(2);
-	    face->set_node(1) = this->get_node(3);
-	    face->set_node(2) = this->get_node(7);
-	    face->set_node(3) = this->get_node(6);
-	    face->set_node(4) = this->get_node(10);
-	    face->set_node(5) = this->get_node(15);
-	    face->set_node(6) = this->get_node(18);
-	    face->set_node(7) = this->get_node(14);
-	    face->set_node(8) = this->get_node(23);
+            return face;
+          }
+        case 3: // the face at y=1
+          {
+            face->set_node(0) = this->get_node(2);
+            face->set_node(1) = this->get_node(3);
+            face->set_node(2) = this->get_node(7);
+            face->set_node(3) = this->get_node(6);
+            face->set_node(4) = this->get_node(10);
+            face->set_node(5) = this->get_node(15);
+            face->set_node(6) = this->get_node(18);
+            face->set_node(7) = this->get_node(14);
+            face->set_node(8) = this->get_node(23);
 
-	    return face;
-	  }
-	case 4: // the face at x=0
-	  {
-	    face->set_node(0) = this->get_node(3);
-	    face->set_node(1) = this->get_node(0);
-	    face->set_node(2) = this->get_node(4);
-	    face->set_node(3) = this->get_node(7);
-	    face->set_node(4) = this->get_node(11);
-	    face->set_node(5) = this->get_node(12);
-	    face->set_node(6) = this->get_node(19);
-	    face->set_node(7) = this->get_node(15);
-	    face->set_node(8) = this->get_node(24);
+            return face;
+          }
+        case 4: // the face at x=0
+          {
+            face->set_node(0) = this->get_node(3);
+            face->set_node(1) = this->get_node(0);
+            face->set_node(2) = this->get_node(4);
+            face->set_node(3) = this->get_node(7);
+            face->set_node(4) = this->get_node(11);
+            face->set_node(5) = this->get_node(12);
+            face->set_node(6) = this->get_node(19);
+            face->set_node(7) = this->get_node(15);
+            face->set_node(8) = this->get_node(24);
 
-	    return face;
-	  }
-	case 5: // the face at z=1
-	  {
-	    face->set_node(0) = this->get_node(4);
-	    face->set_node(1) = this->get_node(5);
-	    face->set_node(2) = this->get_node(6);
-	    face->set_node(3) = this->get_node(7);
-	    face->set_node(4) = this->get_node(16);
-	    face->set_node(5) = this->get_node(17);
-	    face->set_node(6) = this->get_node(18);
-	    face->set_node(7) = this->get_node(19);
-	    face->set_node(8) = this->get_node(25);
+            return face;
+          }
+        case 5: // the face at z=1
+          {
+            face->set_node(0) = this->get_node(4);
+            face->set_node(1) = this->get_node(5);
+            face->set_node(2) = this->get_node(6);
+            face->set_node(3) = this->get_node(7);
+            face->set_node(4) = this->get_node(16);
+            face->set_node(5) = this->get_node(17);
+            face->set_node(6) = this->get_node(18);
+            face->set_node(7) = this->get_node(19);
+            face->set_node(8) = this->get_node(25);
 
-	    return face;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	    return face;
-	  }
-	}
+            return face;
+          }
+        default:
+          {
+            libmesh_error();
+            return face;
+          }
+        }
     }
 
   // We'll never get here.
@@ -328,8 +328,8 @@ AutoPtr<Elem> Hex27::build_edge (const unsigned int i) const
 
 
 void Hex27::connectivity(const unsigned int sc,
-			 const IOPackage iop,
-			 std::vector<dof_id_type>& conn) const
+                         const IOPackage iop,
+                         std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -341,263 +341,263 @@ void Hex27::connectivity(const unsigned int sc,
     {
     case TECPLOT:
       {
-	switch (sc)
-	  {
-	  case 0:
+        switch (sc)
+          {
+          case 0:
 
-	    conn[0] = this->node(0)+1;
-	    conn[1] = this->node(8)+1;
-	    conn[2] = this->node(20)+1;
-	    conn[3] = this->node(11)+1;
-	    conn[4] = this->node(12)+1;
-	    conn[5] = this->node(21)+1;
-	    conn[6] = this->node(26)+1;
-	    conn[7] = this->node(24)+1;
+            conn[0] = this->node(0)+1;
+            conn[1] = this->node(8)+1;
+            conn[2] = this->node(20)+1;
+            conn[3] = this->node(11)+1;
+            conn[4] = this->node(12)+1;
+            conn[5] = this->node(21)+1;
+            conn[6] = this->node(26)+1;
+            conn[7] = this->node(24)+1;
 
-	    return;
+            return;
 
-	  case 1:
+          case 1:
 
-	    conn[0] = this->node(8)+1;
-	    conn[1] = this->node(1)+1;
-	    conn[2] = this->node(9)+1;
-	    conn[3] = this->node(20)+1;
-	    conn[4] = this->node(21)+1;
-	    conn[5] = this->node(13)+1;
-	    conn[6] = this->node(22)+1;
-	    conn[7] = this->node(26)+1;
+            conn[0] = this->node(8)+1;
+            conn[1] = this->node(1)+1;
+            conn[2] = this->node(9)+1;
+            conn[3] = this->node(20)+1;
+            conn[4] = this->node(21)+1;
+            conn[5] = this->node(13)+1;
+            conn[6] = this->node(22)+1;
+            conn[7] = this->node(26)+1;
 
-	    return;
+            return;
 
-	  case 2:
+          case 2:
 
-	    conn[0] = this->node(11)+1;
-	    conn[1] = this->node(20)+1;
-	    conn[2] = this->node(10)+1;
-	    conn[3] = this->node(3)+1;
-	    conn[4] = this->node(24)+1;
-	    conn[5] = this->node(26)+1;
-	    conn[6] = this->node(23)+1;
-	    conn[7] = this->node(15)+1;
+            conn[0] = this->node(11)+1;
+            conn[1] = this->node(20)+1;
+            conn[2] = this->node(10)+1;
+            conn[3] = this->node(3)+1;
+            conn[4] = this->node(24)+1;
+            conn[5] = this->node(26)+1;
+            conn[6] = this->node(23)+1;
+            conn[7] = this->node(15)+1;
 
-	    return;
+            return;
 
-	  case 3:
+          case 3:
 
-	    conn[0] = this->node(20)+1;
-	    conn[1] = this->node(9)+1;
-	    conn[2] = this->node(2)+1;
-	    conn[3] = this->node(10)+1;
-	    conn[4] = this->node(26)+1;
-	    conn[5] = this->node(22)+1;
-	    conn[6] = this->node(14)+1;
-	    conn[7] = this->node(23)+1;
+            conn[0] = this->node(20)+1;
+            conn[1] = this->node(9)+1;
+            conn[2] = this->node(2)+1;
+            conn[3] = this->node(10)+1;
+            conn[4] = this->node(26)+1;
+            conn[5] = this->node(22)+1;
+            conn[6] = this->node(14)+1;
+            conn[7] = this->node(23)+1;
 
-	    return;
+            return;
 
-	  case 4:
+          case 4:
 
-	    conn[0] = this->node(12)+1;
-	    conn[1] = this->node(21)+1;
-	    conn[2] = this->node(26)+1;
-	    conn[3] = this->node(24)+1;
-	    conn[4] = this->node(4)+1;
-	    conn[5] = this->node(16)+1;
-	    conn[6] = this->node(25)+1;
-	    conn[7] = this->node(19)+1;
+            conn[0] = this->node(12)+1;
+            conn[1] = this->node(21)+1;
+            conn[2] = this->node(26)+1;
+            conn[3] = this->node(24)+1;
+            conn[4] = this->node(4)+1;
+            conn[5] = this->node(16)+1;
+            conn[6] = this->node(25)+1;
+            conn[7] = this->node(19)+1;
 
-	    return;
+            return;
 
-	  case 5:
+          case 5:
 
-	    conn[0] = this->node(21)+1;
-	    conn[1] = this->node(13)+1;
-	    conn[2] = this->node(22)+1;
-	    conn[3] = this->node(26)+1;
-	    conn[4] = this->node(16)+1;
-	    conn[5] = this->node(5)+1;
-	    conn[6] = this->node(17)+1;
-	    conn[7] = this->node(25)+1;
+            conn[0] = this->node(21)+1;
+            conn[1] = this->node(13)+1;
+            conn[2] = this->node(22)+1;
+            conn[3] = this->node(26)+1;
+            conn[4] = this->node(16)+1;
+            conn[5] = this->node(5)+1;
+            conn[6] = this->node(17)+1;
+            conn[7] = this->node(25)+1;
 
-	    return;
+            return;
 
-	  case 6:
+          case 6:
 
-	    conn[0] = this->node(24)+1;
-	    conn[1] = this->node(26)+1;
-	    conn[2] = this->node(23)+1;
-	    conn[3] = this->node(15)+1;
-	    conn[4] = this->node(19)+1;
-	    conn[5] = this->node(25)+1;
-	    conn[6] = this->node(18)+1;
-	    conn[7] = this->node(7)+1;
+            conn[0] = this->node(24)+1;
+            conn[1] = this->node(26)+1;
+            conn[2] = this->node(23)+1;
+            conn[3] = this->node(15)+1;
+            conn[4] = this->node(19)+1;
+            conn[5] = this->node(25)+1;
+            conn[6] = this->node(18)+1;
+            conn[7] = this->node(7)+1;
 
-	    return;
+            return;
 
-	  case 7:
+          case 7:
 
-	    conn[0] = this->node(26)+1;
-	    conn[1] = this->node(22)+1;
-	    conn[2] = this->node(14)+1;
-	    conn[3] = this->node(23)+1;
-	    conn[4] = this->node(25)+1;
-	    conn[5] = this->node(17)+1;
-	    conn[6] = this->node(6)+1;
-	    conn[7] = this->node(18)+1;
+            conn[0] = this->node(26)+1;
+            conn[1] = this->node(22)+1;
+            conn[2] = this->node(14)+1;
+            conn[3] = this->node(23)+1;
+            conn[4] = this->node(25)+1;
+            conn[5] = this->node(17)+1;
+            conn[6] = this->node(6)+1;
+            conn[7] = this->node(18)+1;
 
-	    return;
+            return;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
     case VTK:
       {
-	// VTK now supports VTK_TRIQUADRATIC_HEXAHEDRON directly
-	conn.resize(27);
+        // VTK now supports VTK_TRIQUADRATIC_HEXAHEDRON directly
+        conn.resize(27);
 
-	conn[0] = this->node(0);
-	conn[1] = this->node(1);
-	conn[2] = this->node(2);
-	conn[3] = this->node(3);
-	conn[4] = this->node(4);
-	conn[5] = this->node(5);
-	conn[6] = this->node(6);
-	conn[7] = this->node(7);
-	conn[8] = this->node(8);
-	conn[9] = this->node(9);
-	conn[10] = this->node(10);
-	conn[11] = this->node(11); //
-	conn[12] = this->node(16);
-	conn[13] = this->node(17);
-	conn[14] = this->node(18);
-	conn[15] = this->node(19);
-	conn[16] = this->node(12);
-	conn[17] = this->node(13); //
-	conn[18] = this->node(14);
-	conn[19] = this->node(15);
-	conn[20] = this->node(24);
-	conn[21] = this->node(22);
-	conn[22] = this->node(21);
-	conn[23] = this->node(23);
-	conn[24] = this->node(20);
-	conn[25] = this->node(25);
-	conn[26] = this->node(26);
+        conn[0] = this->node(0);
+        conn[1] = this->node(1);
+        conn[2] = this->node(2);
+        conn[3] = this->node(3);
+        conn[4] = this->node(4);
+        conn[5] = this->node(5);
+        conn[6] = this->node(6);
+        conn[7] = this->node(7);
+        conn[8] = this->node(8);
+        conn[9] = this->node(9);
+        conn[10] = this->node(10);
+        conn[11] = this->node(11); //
+        conn[12] = this->node(16);
+        conn[13] = this->node(17);
+        conn[14] = this->node(18);
+        conn[15] = this->node(19);
+        conn[16] = this->node(12);
+        conn[17] = this->node(13); //
+        conn[18] = this->node(14);
+        conn[19] = this->node(15);
+        conn[20] = this->node(24);
+        conn[21] = this->node(22);
+        conn[22] = this->node(21);
+        conn[23] = this->node(23);
+        conn[24] = this->node(20);
+        conn[25] = this->node(25);
+        conn[26] = this->node(26);
 
-	return;
+        return;
 
-	/*
-	switch (sc)
-	  {
-	  case 0:
+        /*
+          switch (sc)
+          {
+          case 0:
 
-	    conn[0] = this->node(0);
-	    conn[1] = this->node(8);
-	    conn[2] = this->node(20);
-	    conn[3] = this->node(11);
-	    conn[4] = this->node(12);
-	    conn[5] = this->node(21);
-	    conn[6] = this->node(26);
-	    conn[7] = this->node(24);
+          conn[0] = this->node(0);
+          conn[1] = this->node(8);
+          conn[2] = this->node(20);
+          conn[3] = this->node(11);
+          conn[4] = this->node(12);
+          conn[5] = this->node(21);
+          conn[6] = this->node(26);
+          conn[7] = this->node(24);
 
-	    return;
+          return;
 
-	  case 1:
+          case 1:
 
-	    conn[0] = this->node(8);
-	    conn[1] = this->node(1);
-	    conn[2] = this->node(9);
-	    conn[3] = this->node(20);
-	    conn[4] = this->node(21);
-	    conn[5] = this->node(13);
-	    conn[6] = this->node(22);
-	    conn[7] = this->node(26);
+          conn[0] = this->node(8);
+          conn[1] = this->node(1);
+          conn[2] = this->node(9);
+          conn[3] = this->node(20);
+          conn[4] = this->node(21);
+          conn[5] = this->node(13);
+          conn[6] = this->node(22);
+          conn[7] = this->node(26);
 
-	    return;
+          return;
 
-	  case 2:
+          case 2:
 
-	    conn[0] = this->node(11);
-	    conn[1] = this->node(20);
-	    conn[2] = this->node(10);
-	    conn[3] = this->node(3);
-	    conn[4] = this->node(24);
-	    conn[5] = this->node(26);
-	    conn[6] = this->node(23);
-	    conn[7] = this->node(15);
+          conn[0] = this->node(11);
+          conn[1] = this->node(20);
+          conn[2] = this->node(10);
+          conn[3] = this->node(3);
+          conn[4] = this->node(24);
+          conn[5] = this->node(26);
+          conn[6] = this->node(23);
+          conn[7] = this->node(15);
 
-	    return;
+          return;
 
-	  case 3:
+          case 3:
 
-	    conn[0] = this->node(20);
-	    conn[1] = this->node(9);
-	    conn[2] = this->node(2);
-	    conn[3] = this->node(10);
-	    conn[4] = this->node(26);
-	    conn[5] = this->node(22);
-	    conn[6] = this->node(14);
-	    conn[7] = this->node(23);
+          conn[0] = this->node(20);
+          conn[1] = this->node(9);
+          conn[2] = this->node(2);
+          conn[3] = this->node(10);
+          conn[4] = this->node(26);
+          conn[5] = this->node(22);
+          conn[6] = this->node(14);
+          conn[7] = this->node(23);
 
-	    return;
+          return;
 
-	  case 4:
+          case 4:
 
-	    conn[0] = this->node(12);
-	    conn[1] = this->node(21);
-	    conn[2] = this->node(26);
-	    conn[3] = this->node(24);
-	    conn[4] = this->node(4);
-	    conn[5] = this->node(16);
-	    conn[6] = this->node(25);
-	    conn[7] = this->node(19);
+          conn[0] = this->node(12);
+          conn[1] = this->node(21);
+          conn[2] = this->node(26);
+          conn[3] = this->node(24);
+          conn[4] = this->node(4);
+          conn[5] = this->node(16);
+          conn[6] = this->node(25);
+          conn[7] = this->node(19);
 
-	    return;
+          return;
 
-	  case 5:
+          case 5:
 
-	    conn[0] = this->node(21);
-	    conn[1] = this->node(13);
-	    conn[2] = this->node(22);
-	    conn[3] = this->node(26);
-	    conn[4] = this->node(16);
-	    conn[5] = this->node(5);
-	    conn[6] = this->node(17);
-	    conn[7] = this->node(25);
+          conn[0] = this->node(21);
+          conn[1] = this->node(13);
+          conn[2] = this->node(22);
+          conn[3] = this->node(26);
+          conn[4] = this->node(16);
+          conn[5] = this->node(5);
+          conn[6] = this->node(17);
+          conn[7] = this->node(25);
 
-	    return;
+          return;
 
-	  case 6:
+          case 6:
 
-	    conn[0] = this->node(24);
-	    conn[1] = this->node(26);
-	    conn[2] = this->node(23);
-	    conn[3] = this->node(15);
-	    conn[4] = this->node(19);
-	    conn[5] = this->node(25);
-	    conn[6] = this->node(18);
-	    conn[7] = this->node(7);
+          conn[0] = this->node(24);
+          conn[1] = this->node(26);
+          conn[2] = this->node(23);
+          conn[3] = this->node(15);
+          conn[4] = this->node(19);
+          conn[5] = this->node(25);
+          conn[6] = this->node(18);
+          conn[7] = this->node(7);
 
-	    return;
+          return;
 
-	  case 7:
+          case 7:
 
-	    conn[0] = this->node(26);
-	    conn[1] = this->node(22);
-	    conn[2] = this->node(14);
-	    conn[3] = this->node(23);
-	    conn[4] = this->node(25);
-	    conn[5] = this->node(17);
-	    conn[6] = this->node(6);
-	    conn[7] = this->node(18);
+          conn[0] = this->node(26);
+          conn[1] = this->node(22);
+          conn[2] = this->node(14);
+          conn[3] = this->node(23);
+          conn[4] = this->node(25);
+          conn[5] = this->node(17);
+          conn[6] = this->node(6);
+          conn[7] = this->node(18);
 
-	    return;
+          return;
 
-	  default:
-	    libmesh_error();
-	  }
-	*/
+          default:
+          libmesh_error();
+          }
+        */
       }
 
     default:
@@ -627,7 +627,7 @@ unsigned int Hex27::n_second_order_adjacent_vertices (const unsigned int n) cons
       case 17:
       case 18:
       case 19:
-	return 2;
+        return 2;
 
       case 20:
       case 21:
@@ -635,13 +635,13 @@ unsigned int Hex27::n_second_order_adjacent_vertices (const unsigned int n) cons
       case 23:
       case 24:
       case 25:
-	return 4;
+        return 4;
 
       case 26:
-	return 8;
+        return 8;
 
       default:
-	libmesh_error();
+        libmesh_error();
     }
 
   libmesh_error();
@@ -651,7 +651,7 @@ unsigned int Hex27::n_second_order_adjacent_vertices (const unsigned int n) cons
 
 
 unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
-							const unsigned int v) const
+                                                        const unsigned int v) const
 {
   libmesh_assert_greater_equal (n, this->n_vertices());
   libmesh_assert_less (n, this->n_nodes());
@@ -669,7 +669,7 @@ unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
       case 24:
       case 25:
       {
-	libmesh_assert_less (v, 4);
+        libmesh_assert_less (v, 4);
         return _remaining_second_order_adjacent_vertices[n-20][v];
       }
 
@@ -682,8 +682,8 @@ unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
        */
       case 26:
       {
-	libmesh_assert_less (v, 8);
-	return static_cast<unsigned short int>(v);
+        libmesh_assert_less (v, 8);
+        return static_cast<unsigned short int>(v);
       }
 
       /*
@@ -694,7 +694,7 @@ unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
        */
       default:
       {
-	libmesh_assert_less (v, 2);
+        libmesh_assert_less (v, 2);
         return _second_order_adjacent_vertices[n-this->n_vertices()][v];
       }
     }

@@ -60,12 +60,12 @@ namespace {
 
     for (; it != end; ++it)
       {
-	// If the forward map is not invertible, we might already have
-	// found a preimage of it->second.  Choose the "largest"
-	// preimage according to operator<; for std::string this will
-	// give us the longest, hopefully most specific name
-	// corresponding to an enum.
-	typename MapType::iterator preimage = reverse.find(it->second);
+        // If the forward map is not invertible, we might already have
+        // found a preimage of it->second.  Choose the "largest"
+        // preimage according to operator<; for std::string this will
+        // give us the longest, hopefully most specific name
+        // corresponding to an enum.
+        typename MapType::iterator preimage = reverse.find(it->second);
         if (preimage == reverse.end())
           reverse.insert (std::make_pair(it->second, it->first));
         else if (preimage->second < it->first)
@@ -86,12 +86,12 @@ namespace {
     /* Build reverse map */ \
     if (enum_to_##VAR_NAME .empty()) \
       { \
-	/* Initialize elem_type_to_enum on first call */ \
-	init_##VAR_NAME##_to_enum(); \
+        /* Initialize elem_type_to_enum on first call */        \
+        init_##VAR_NAME##_to_enum();                            \
  \
-	build_reverse_map (VAR_NAME##_to_enum.begin(), \
-			   VAR_NAME##_to_enum.end(), \
-			   enum_to_##VAR_NAME); \
+        build_reverse_map (VAR_NAME##_to_enum.begin(),  \
+                           VAR_NAME##_to_enum.end(),    \
+                           enum_to_##VAR_NAME);         \
       } \
   }
 
@@ -104,56 +104,56 @@ INSTANTIATE_ENUM_MAPS(ElemType, elem_type)
   {
     if (elem_type_to_enum.empty())
       {
-	elem_type_to_enum["EDGE"      ]=EDGE2;
-	elem_type_to_enum["EDGE2"     ]=EDGE2;
-	elem_type_to_enum["EDGE3"     ]=EDGE3;
-	elem_type_to_enum["EDGE4"     ]=EDGE4;
+        elem_type_to_enum["EDGE"      ]=EDGE2;
+        elem_type_to_enum["EDGE2"     ]=EDGE2;
+        elem_type_to_enum["EDGE3"     ]=EDGE3;
+        elem_type_to_enum["EDGE4"     ]=EDGE4;
 
-	elem_type_to_enum["TRI"       ]=TRI3;
-	elem_type_to_enum["TRI3"      ]=TRI3;
-	elem_type_to_enum["TRI6"      ]=TRI6;
+        elem_type_to_enum["TRI"       ]=TRI3;
+        elem_type_to_enum["TRI3"      ]=TRI3;
+        elem_type_to_enum["TRI6"      ]=TRI6;
 
-	elem_type_to_enum["QUAD"      ]=QUAD4;
-	elem_type_to_enum["QUAD4"     ]=QUAD4;
-	elem_type_to_enum["QUAD8"     ]=QUAD8;
-	elem_type_to_enum["QUAD9"     ]=QUAD9;
+        elem_type_to_enum["QUAD"      ]=QUAD4;
+        elem_type_to_enum["QUAD4"     ]=QUAD4;
+        elem_type_to_enum["QUAD8"     ]=QUAD8;
+        elem_type_to_enum["QUAD9"     ]=QUAD9;
 
-	elem_type_to_enum["TET"       ]=TET4;
-	elem_type_to_enum["TET4"      ]=TET4;
-	elem_type_to_enum["TET10"     ]=TET10;
+        elem_type_to_enum["TET"       ]=TET4;
+        elem_type_to_enum["TET4"      ]=TET4;
+        elem_type_to_enum["TET10"     ]=TET10;
 
-	elem_type_to_enum["HEX"       ]=HEX8;
-	elem_type_to_enum["HEX8"      ]=HEX8;
-	elem_type_to_enum["HEX20"     ]=HEX20;
-	elem_type_to_enum["HEX27"     ]=HEX27;
+        elem_type_to_enum["HEX"       ]=HEX8;
+        elem_type_to_enum["HEX8"      ]=HEX8;
+        elem_type_to_enum["HEX20"     ]=HEX20;
+        elem_type_to_enum["HEX27"     ]=HEX27;
 
-	elem_type_to_enum["PRISM"     ]=PRISM6;
-	elem_type_to_enum["PRISM6"    ]=PRISM6;
-	elem_type_to_enum["PRISM15"   ]=PRISM15;
-	elem_type_to_enum["PRISM18"   ]=PRISM18;
+        elem_type_to_enum["PRISM"     ]=PRISM6;
+        elem_type_to_enum["PRISM6"    ]=PRISM6;
+        elem_type_to_enum["PRISM15"   ]=PRISM15;
+        elem_type_to_enum["PRISM18"   ]=PRISM18;
 
-	elem_type_to_enum["PYRAMID"   ]=PYRAMID5;
-	elem_type_to_enum["PYRAMID5"  ]=PYRAMID5;
-	elem_type_to_enum["PYRAMID14" ]=PYRAMID14;
+        elem_type_to_enum["PYRAMID"   ]=PYRAMID5;
+        elem_type_to_enum["PYRAMID5"  ]=PYRAMID5;
+        elem_type_to_enum["PYRAMID14" ]=PYRAMID14;
 
-	elem_type_to_enum["INFEDGE"   ]=INFEDGE2;
-	elem_type_to_enum["INFEDGE2"  ]=INFEDGE2;
+        elem_type_to_enum["INFEDGE"   ]=INFEDGE2;
+        elem_type_to_enum["INFEDGE2"  ]=INFEDGE2;
 
-	elem_type_to_enum["INFQUAD"   ]=INFQUAD4;
-	elem_type_to_enum["INFQUAD4"  ]=INFQUAD4;
-	elem_type_to_enum["INFQUAD6"  ]=INFQUAD6;
+        elem_type_to_enum["INFQUAD"   ]=INFQUAD4;
+        elem_type_to_enum["INFQUAD4"  ]=INFQUAD4;
+        elem_type_to_enum["INFQUAD6"  ]=INFQUAD6;
 
-	elem_type_to_enum["INFHEX"    ]=INFHEX8;
-	elem_type_to_enum["INFHEX8"   ]=INFHEX8;
-	elem_type_to_enum["INFHEX16"  ]=INFHEX16;
-	elem_type_to_enum["INFHEX18"  ]=INFHEX18;
+        elem_type_to_enum["INFHEX"    ]=INFHEX8;
+        elem_type_to_enum["INFHEX8"   ]=INFHEX8;
+        elem_type_to_enum["INFHEX16"  ]=INFHEX16;
+        elem_type_to_enum["INFHEX18"  ]=INFHEX18;
 
-	elem_type_to_enum["INFPRISM"  ]=INFPRISM6;
-	elem_type_to_enum["INFPRISM6" ]=INFPRISM6;
-	elem_type_to_enum["INFPRISM12"]=INFPRISM12;
+        elem_type_to_enum["INFPRISM"  ]=INFPRISM6;
+        elem_type_to_enum["INFPRISM6" ]=INFPRISM6;
+        elem_type_to_enum["INFPRISM12"]=INFPRISM12;
 
-	elem_type_to_enum["NODE"      ]=NODEELEM;
-	elem_type_to_enum["NODEELEM"  ]=NODEELEM;
+        elem_type_to_enum["NODE"      ]=NODEELEM;
+        elem_type_to_enum["NODEELEM"  ]=NODEELEM;
       }
   }
 
@@ -165,54 +165,54 @@ INSTANTIATE_ENUM_MAPS(Order, order)
   {
     if (order_to_enum.empty())
       {
-	order_to_enum["CONSTANT"     ]=CONSTANT;
-	order_to_enum["FIRST"        ]=FIRST;
-	order_to_enum["SECOND"       ]=SECOND;
-	order_to_enum["THIRD"        ]=THIRD;
-	order_to_enum["FOURTH"       ]=FOURTH;
-	order_to_enum["FIFTH"        ]=FIFTH;
-	order_to_enum["SIXTH"        ]=SIXTH;
-	order_to_enum["SEVENTH"      ]=SEVENTH;
-	order_to_enum["EIGHTH"       ]=EIGHTH;
-	order_to_enum["NINTH"        ]=NINTH;
-	order_to_enum["TENTH"        ]=TENTH;
+        order_to_enum["CONSTANT"     ]=CONSTANT;
+        order_to_enum["FIRST"        ]=FIRST;
+        order_to_enum["SECOND"       ]=SECOND;
+        order_to_enum["THIRD"        ]=THIRD;
+        order_to_enum["FOURTH"       ]=FOURTH;
+        order_to_enum["FIFTH"        ]=FIFTH;
+        order_to_enum["SIXTH"        ]=SIXTH;
+        order_to_enum["SEVENTH"      ]=SEVENTH;
+        order_to_enum["EIGHTH"       ]=EIGHTH;
+        order_to_enum["NINTH"        ]=NINTH;
+        order_to_enum["TENTH"        ]=TENTH;
 
-	order_to_enum["ELEVENTH"     ]=ELEVENTH;
-	order_to_enum["TWELFTH"      ]=TWELFTH;
-	order_to_enum["THIRTEENTH"   ]=THIRTEENTH;
-	order_to_enum["FOURTEENTH"   ]=FOURTEENTH;
-	order_to_enum["FIFTEENTH"    ]=FIFTEENTH;
-	order_to_enum["SIXTEENTH"    ]=SIXTEENTH;
-	order_to_enum["SEVENTEENTH"  ]=SEVENTEENTH;
-	order_to_enum["EIGHTTEENTH"  ]=EIGHTTEENTH;
-	order_to_enum["NINTEENTH"    ]=NINTEENTH;
-	order_to_enum["TWENTIETH"    ]=TWENTIETH;
+        order_to_enum["ELEVENTH"     ]=ELEVENTH;
+        order_to_enum["TWELFTH"      ]=TWELFTH;
+        order_to_enum["THIRTEENTH"   ]=THIRTEENTH;
+        order_to_enum["FOURTEENTH"   ]=FOURTEENTH;
+        order_to_enum["FIFTEENTH"    ]=FIFTEENTH;
+        order_to_enum["SIXTEENTH"    ]=SIXTEENTH;
+        order_to_enum["SEVENTEENTH"  ]=SEVENTEENTH;
+        order_to_enum["EIGHTTEENTH"  ]=EIGHTTEENTH;
+        order_to_enum["NINTEENTH"    ]=NINTEENTH;
+        order_to_enum["TWENTIETH"    ]=TWENTIETH;
 
-	order_to_enum["TWENTYFIRST"  ]=TWENTYFIRST;
-	order_to_enum["TWENTYSECOND" ]=TWENTYSECOND;
-	order_to_enum["TWENTYTHIRD"  ]=TWENTYTHIRD;
-	order_to_enum["TWENTYFOURTH" ]=TWENTYFOURTH;
-	order_to_enum["TWENTYFIFTH"  ]=TWENTYFIFTH;
-	order_to_enum["TWENTYSIXTH"  ]=TWENTYSIXTH;
-	order_to_enum["TWENTYSEVENTH"]=TWENTYSEVENTH;
-	order_to_enum["TWENTYEIGHTH" ]=TWENTYEIGHTH;
-	order_to_enum["TWENTYNINTH"  ]=TWENTYNINTH;
-	order_to_enum["THIRTIETH"    ]=THIRTIETH;
+        order_to_enum["TWENTYFIRST"  ]=TWENTYFIRST;
+        order_to_enum["TWENTYSECOND" ]=TWENTYSECOND;
+        order_to_enum["TWENTYTHIRD"  ]=TWENTYTHIRD;
+        order_to_enum["TWENTYFOURTH" ]=TWENTYFOURTH;
+        order_to_enum["TWENTYFIFTH"  ]=TWENTYFIFTH;
+        order_to_enum["TWENTYSIXTH"  ]=TWENTYSIXTH;
+        order_to_enum["TWENTYSEVENTH"]=TWENTYSEVENTH;
+        order_to_enum["TWENTYEIGHTH" ]=TWENTYEIGHTH;
+        order_to_enum["TWENTYNINTH"  ]=TWENTYNINTH;
+        order_to_enum["THIRTIETH"    ]=THIRTIETH;
 
-	order_to_enum["THIRTYFIRST"  ]=THIRTYFIRST;
-	order_to_enum["THIRTYSECOND" ]=THIRTYSECOND;
-	order_to_enum["THIRTYTHIRD"  ]=THIRTYTHIRD;
-	order_to_enum["THIRTYFOURTH" ]=THIRTYFOURTH;
-	order_to_enum["THIRTYFIFTH"  ]=THIRTYFIFTH;
-	order_to_enum["THIRTYSIXTH"  ]=THIRTYSIXTH;
-	order_to_enum["THIRTYSEVENTH"]=THIRTYSEVENTH;
-	order_to_enum["THIRTYEIGHTH" ]=THIRTYEIGHTH;
-	order_to_enum["THIRTYNINTH"  ]=THIRTYNINTH;
-	order_to_enum["FORTIETH"    ]=FORTIETH;
+        order_to_enum["THIRTYFIRST"  ]=THIRTYFIRST;
+        order_to_enum["THIRTYSECOND" ]=THIRTYSECOND;
+        order_to_enum["THIRTYTHIRD"  ]=THIRTYTHIRD;
+        order_to_enum["THIRTYFOURTH" ]=THIRTYFOURTH;
+        order_to_enum["THIRTYFIFTH"  ]=THIRTYFIFTH;
+        order_to_enum["THIRTYSIXTH"  ]=THIRTYSIXTH;
+        order_to_enum["THIRTYSEVENTH"]=THIRTYSEVENTH;
+        order_to_enum["THIRTYEIGHTH" ]=THIRTYEIGHTH;
+        order_to_enum["THIRTYNINTH"  ]=THIRTYNINTH;
+        order_to_enum["FORTIETH"    ]=FORTIETH;
 
-	order_to_enum["FORTYFIRST"  ]=FORTYFIRST;
-	order_to_enum["FORTYSECOND" ]=FORTYSECOND;
-	order_to_enum["FORTYTHIRD"  ]=FORTYTHIRD;
+        order_to_enum["FORTYFIRST"  ]=FORTYFIRST;
+        order_to_enum["FORTYSECOND" ]=FORTYSECOND;
+        order_to_enum["FORTYTHIRD"  ]=FORTYTHIRD;
       }
   }
 
@@ -225,23 +225,23 @@ INSTANTIATE_ENUM_MAPS(FEFamily, fefamily)
   {
     if (fefamily_to_enum.empty())
       {
-	fefamily_to_enum["LAGRANGE"     ]=LAGRANGE;
-	fefamily_to_enum["LAGRANGE_VEC" ]=LAGRANGE_VEC;
-	fefamily_to_enum["L2_LAGRANGE"  ]=L2_LAGRANGE;
-	fefamily_to_enum["HIERARCHIC"   ]=HIERARCHIC;
-	fefamily_to_enum["L2_HIERARCHIC"]=L2_HIERARCHIC;
-	fefamily_to_enum["MONOMIAL"     ]=MONOMIAL;
-	fefamily_to_enum["SCALAR"       ]=SCALAR;
-	fefamily_to_enum["XYZ"          ]=XYZ;
-	fefamily_to_enum["BERNSTEIN"    ]=BERNSTEIN;
-	fefamily_to_enum["SZABAB"       ]=SZABAB;
-	fefamily_to_enum["INFINITE_MAP" ]=INFINITE_MAP;
-	fefamily_to_enum["JACOBI_20_00" ]=JACOBI_20_00;
-	fefamily_to_enum["JACOBI_30_00" ]=JACOBI_30_00;
-	fefamily_to_enum["LEGENDRE"     ]=LEGENDRE;
-	fefamily_to_enum["CLOUGH"       ]=CLOUGH;
-	fefamily_to_enum["HERMITE"      ]=HERMITE;
-	fefamily_to_enum["NEDELEC_ONE"  ]=NEDELEC_ONE;
+        fefamily_to_enum["LAGRANGE"     ]=LAGRANGE;
+        fefamily_to_enum["LAGRANGE_VEC" ]=LAGRANGE_VEC;
+        fefamily_to_enum["L2_LAGRANGE"  ]=L2_LAGRANGE;
+        fefamily_to_enum["HIERARCHIC"   ]=HIERARCHIC;
+        fefamily_to_enum["L2_HIERARCHIC"]=L2_HIERARCHIC;
+        fefamily_to_enum["MONOMIAL"     ]=MONOMIAL;
+        fefamily_to_enum["SCALAR"       ]=SCALAR;
+        fefamily_to_enum["XYZ"          ]=XYZ;
+        fefamily_to_enum["BERNSTEIN"    ]=BERNSTEIN;
+        fefamily_to_enum["SZABAB"       ]=SZABAB;
+        fefamily_to_enum["INFINITE_MAP" ]=INFINITE_MAP;
+        fefamily_to_enum["JACOBI_20_00" ]=JACOBI_20_00;
+        fefamily_to_enum["JACOBI_30_00" ]=JACOBI_30_00;
+        fefamily_to_enum["LEGENDRE"     ]=LEGENDRE;
+        fefamily_to_enum["CLOUGH"       ]=CLOUGH;
+        fefamily_to_enum["HERMITE"      ]=HERMITE;
+        fefamily_to_enum["NEDELEC_ONE"  ]=NEDELEC_ONE;
       }
 
   }
@@ -255,9 +255,9 @@ INSTANTIATE_ENUM_MAPS(InfMapType, inf_map_type)
   {
     if (inf_map_type_to_enum.empty())
       {
-	inf_map_type_to_enum["CARTESIAN"  ]=CARTESIAN;
-	inf_map_type_to_enum["SPHERICAL"  ]=SPHERICAL;
-	inf_map_type_to_enum["ELLIPSOIDAL"]=ELLIPSOIDAL;
+        inf_map_type_to_enum["CARTESIAN"  ]=CARTESIAN;
+        inf_map_type_to_enum["SPHERICAL"  ]=SPHERICAL;
+        inf_map_type_to_enum["ELLIPSOIDAL"]=ELLIPSOIDAL;
       }
   }
 
@@ -269,13 +269,13 @@ INSTANTIATE_ENUM_MAPS(QuadratureType, quadrature_type)
   {
     if (quadrature_type_to_enum.empty())
       {
-	quadrature_type_to_enum["QGAUSS"     ]=QGAUSS;
-	quadrature_type_to_enum["QJACOBI_1_0"]=QJACOBI_1_0;
-	quadrature_type_to_enum["QJACOBI_2_0"]=QJACOBI_2_0;
-	quadrature_type_to_enum["QSIMPSON"   ]=QSIMPSON;
-	quadrature_type_to_enum["QTRAP"      ]=QTRAP;
-	quadrature_type_to_enum["QGRID"      ]=QGRID;
-	quadrature_type_to_enum["QCLOUGH"    ]=QCLOUGH;
+        quadrature_type_to_enum["QGAUSS"     ]=QGAUSS;
+        quadrature_type_to_enum["QJACOBI_1_0"]=QJACOBI_1_0;
+        quadrature_type_to_enum["QJACOBI_2_0"]=QJACOBI_2_0;
+        quadrature_type_to_enum["QSIMPSON"   ]=QSIMPSON;
+        quadrature_type_to_enum["QTRAP"      ]=QTRAP;
+        quadrature_type_to_enum["QGRID"      ]=QGRID;
+        quadrature_type_to_enum["QCLOUGH"    ]=QCLOUGH;
       }
   }
 
@@ -287,38 +287,38 @@ INSTANTIATE_ENUM_MAPS(PreconditionerType, preconditioner_type)
   {
     if (preconditioner_type_to_enum.empty())
       {
-	preconditioner_type_to_enum["IDENTITY_PRECOND"      ]=IDENTITY_PRECOND;
-	preconditioner_type_to_enum["JACOBI_PRECOND"	    ]=JACOBI_PRECOND;
-	preconditioner_type_to_enum["BLOCK_JACOBI_PRECOND"  ]=BLOCK_JACOBI_PRECOND;
-	preconditioner_type_to_enum["SOR_PRECOND"           ]=SOR_PRECOND;
-	preconditioner_type_to_enum["SSOR_PRECOND"          ]=SSOR_PRECOND;
-	preconditioner_type_to_enum["EISENSTAT_PRECOND"	    ]=EISENSTAT_PRECOND;
-	preconditioner_type_to_enum["ASM_PRECOND"	    ]=ASM_PRECOND;
-	preconditioner_type_to_enum["CHOLESKY_PRECOND"	    ]=CHOLESKY_PRECOND;
-	preconditioner_type_to_enum["ICC_PRECOND"	    ]=ICC_PRECOND;
-	preconditioner_type_to_enum["ILU_PRECOND"           ]=ILU_PRECOND;
-	preconditioner_type_to_enum["LU_PRECOND"            ]=LU_PRECOND;
-	preconditioner_type_to_enum["USER_PRECOND"          ]=USER_PRECOND;
-	preconditioner_type_to_enum["SHELL_PRECOND"         ]=SHELL_PRECOND;
-	preconditioner_type_to_enum["AMG_PRECOND"           ]=AMG_PRECOND;
-	preconditioner_type_to_enum["INVALID_PRECONDITIONER"]=INVALID_PRECONDITIONER;
+        preconditioner_type_to_enum["IDENTITY_PRECOND"      ]=IDENTITY_PRECOND;
+        preconditioner_type_to_enum["JACOBI_PRECOND"    ]=JACOBI_PRECOND;
+        preconditioner_type_to_enum["BLOCK_JACOBI_PRECOND"  ]=BLOCK_JACOBI_PRECOND;
+        preconditioner_type_to_enum["SOR_PRECOND"           ]=SOR_PRECOND;
+        preconditioner_type_to_enum["SSOR_PRECOND"          ]=SSOR_PRECOND;
+        preconditioner_type_to_enum["EISENSTAT_PRECOND"    ]=EISENSTAT_PRECOND;
+        preconditioner_type_to_enum["ASM_PRECOND"    ]=ASM_PRECOND;
+        preconditioner_type_to_enum["CHOLESKY_PRECOND"    ]=CHOLESKY_PRECOND;
+        preconditioner_type_to_enum["ICC_PRECOND"    ]=ICC_PRECOND;
+        preconditioner_type_to_enum["ILU_PRECOND"           ]=ILU_PRECOND;
+        preconditioner_type_to_enum["LU_PRECOND"            ]=LU_PRECOND;
+        preconditioner_type_to_enum["USER_PRECOND"          ]=USER_PRECOND;
+        preconditioner_type_to_enum["SHELL_PRECOND"         ]=SHELL_PRECOND;
+        preconditioner_type_to_enum["AMG_PRECOND"           ]=AMG_PRECOND;
+        preconditioner_type_to_enum["INVALID_PRECONDITIONER"]=INVALID_PRECONDITIONER;
 
         //shorter
-      	preconditioner_type_to_enum["IDENTITY"    ]=IDENTITY_PRECOND;
-	preconditioner_type_to_enum["JACOBI"	  ]=JACOBI_PRECOND;
-	preconditioner_type_to_enum["BLOCK_JACOBI"]=BLOCK_JACOBI_PRECOND;
-	preconditioner_type_to_enum["SOR"         ]=SOR_PRECOND;
-	preconditioner_type_to_enum["SSOR"        ]=SSOR_PRECOND;
-	preconditioner_type_to_enum["EISENSTAT"	  ]=EISENSTAT_PRECOND;
-	preconditioner_type_to_enum["ASM"	  ]=ASM_PRECOND;
-	preconditioner_type_to_enum["CHOLESKY"	  ]=CHOLESKY_PRECOND;
-	preconditioner_type_to_enum["ICC"	  ]=ICC_PRECOND;
-	preconditioner_type_to_enum["ILU"         ]=ILU_PRECOND;
-	preconditioner_type_to_enum["LU"          ]=LU_PRECOND;
-	preconditioner_type_to_enum["USER"        ]=USER_PRECOND;
-	preconditioner_type_to_enum["SHELL"       ]=SHELL_PRECOND;
-	preconditioner_type_to_enum["AMG"         ]=AMG_PRECOND;
-	preconditioner_type_to_enum["INVALID"     ]=INVALID_PRECONDITIONER;
+        preconditioner_type_to_enum["IDENTITY"    ]=IDENTITY_PRECOND;
+        preconditioner_type_to_enum["JACOBI"  ]=JACOBI_PRECOND;
+        preconditioner_type_to_enum["BLOCK_JACOBI"]=BLOCK_JACOBI_PRECOND;
+        preconditioner_type_to_enum["SOR"         ]=SOR_PRECOND;
+        preconditioner_type_to_enum["SSOR"        ]=SSOR_PRECOND;
+        preconditioner_type_to_enum["EISENSTAT"  ]=EISENSTAT_PRECOND;
+        preconditioner_type_to_enum["ASM"  ]=ASM_PRECOND;
+        preconditioner_type_to_enum["CHOLESKY"  ]=CHOLESKY_PRECOND;
+        preconditioner_type_to_enum["ICC"  ]=ICC_PRECOND;
+        preconditioner_type_to_enum["ILU"         ]=ILU_PRECOND;
+        preconditioner_type_to_enum["LU"          ]=LU_PRECOND;
+        preconditioner_type_to_enum["USER"        ]=USER_PRECOND;
+        preconditioner_type_to_enum["SHELL"       ]=SHELL_PRECOND;
+        preconditioner_type_to_enum["AMG"         ]=AMG_PRECOND;
+        preconditioner_type_to_enum["INVALID"     ]=INVALID_PRECONDITIONER;
       }
   }
 
@@ -332,14 +332,14 @@ INSTANTIATE_ENUM_MAPS(Elem::RefinementState, refinementstate_type)
   {
     if (refinementstate_type_to_enum.empty())
       {
-	refinementstate_type_to_enum["COARSEN"                ]=Elem::COARSEN;
-	refinementstate_type_to_enum["DO_NOTHING"             ]=Elem::DO_NOTHING;
-	refinementstate_type_to_enum["REFINE"                 ]=Elem::REFINE;
-	refinementstate_type_to_enum["JUST_REFINED"           ]=Elem::JUST_REFINED;
-	refinementstate_type_to_enum["JUST_COARSENED"         ]=Elem::JUST_COARSENED;
-	refinementstate_type_to_enum["INACTIVE"               ]=Elem::INACTIVE;
-	refinementstate_type_to_enum["COARSEN_INACTIVE"       ]=Elem::COARSEN_INACTIVE;
-	refinementstate_type_to_enum["INVALID_REFINEMENTSTATE"]=Elem::INVALID_REFINEMENTSTATE;
+        refinementstate_type_to_enum["COARSEN"                ]=Elem::COARSEN;
+        refinementstate_type_to_enum["DO_NOTHING"             ]=Elem::DO_NOTHING;
+        refinementstate_type_to_enum["REFINE"                 ]=Elem::REFINE;
+        refinementstate_type_to_enum["JUST_REFINED"           ]=Elem::JUST_REFINED;
+        refinementstate_type_to_enum["JUST_COARSENED"         ]=Elem::JUST_COARSENED;
+        refinementstate_type_to_enum["INACTIVE"               ]=Elem::INACTIVE;
+        refinementstate_type_to_enum["COARSEN_INACTIVE"       ]=Elem::COARSEN_INACTIVE;
+        refinementstate_type_to_enum["INVALID_REFINEMENTSTATE"]=Elem::INVALID_REFINEMENTSTATE;
       }
   }
 #endif // LIBMESH_ENABLE_AMR
@@ -352,13 +352,13 @@ INSTANTIATE_ENUM_MAPS(EigenSolverType, eigensolvertype)
   {
     if (eigensolvertype_to_enum.empty())
       {
-	eigensolvertype_to_enum["POWER"              ]=POWER;
-	eigensolvertype_to_enum["LAPACK"             ]=LAPACK;
-	eigensolvertype_to_enum["SUBSPACE"           ]=SUBSPACE;
-	eigensolvertype_to_enum["ARNOLDI"            ]=ARNOLDI;
-	eigensolvertype_to_enum["LANCZOS"            ]=LANCZOS;
-	eigensolvertype_to_enum["KRYLOVSCHUR"        ]=KRYLOVSCHUR;
-	eigensolvertype_to_enum["INVALID_EIGENSOLVER"]=INVALID_EIGENSOLVER;
+        eigensolvertype_to_enum["POWER"              ]=POWER;
+        eigensolvertype_to_enum["LAPACK"             ]=LAPACK;
+        eigensolvertype_to_enum["SUBSPACE"           ]=SUBSPACE;
+        eigensolvertype_to_enum["ARNOLDI"            ]=ARNOLDI;
+        eigensolvertype_to_enum["LANCZOS"            ]=LANCZOS;
+        eigensolvertype_to_enum["KRYLOVSCHUR"        ]=KRYLOVSCHUR;
+        eigensolvertype_to_enum["INVALID_EIGENSOLVER"]=INVALID_EIGENSOLVER;
       }
   }
 
@@ -370,24 +370,24 @@ INSTANTIATE_ENUM_MAPS(SolverType, solvertype)
   {
     if (solvertype_to_enum.empty())
       {
-	solvertype_to_enum["CG"            ]=CG;
-	solvertype_to_enum["CGN"           ]=CGN;
-	solvertype_to_enum["CGS"           ]=CGS;
-	solvertype_to_enum["CR"            ]=CR;
-	solvertype_to_enum["QMR"           ]=QMR;
-	solvertype_to_enum["TCQMR"         ]=TCQMR;
-	solvertype_to_enum["TFQMR"         ]=TFQMR;
-	solvertype_to_enum["BICG"          ]=BICG;
-	solvertype_to_enum["MINRES"        ]=MINRES;
-	solvertype_to_enum["GMRES"         ]=GMRES;
-	solvertype_to_enum["LSQR"          ]=LSQR;
-	solvertype_to_enum["JACOBI"        ]=JACOBI;
-	solvertype_to_enum["SOR_FORWARD"   ]=SOR_FORWARD;
-	solvertype_to_enum["SOR_BACKWARD"  ]=SOR_BACKWARD;
-	solvertype_to_enum["SSOR"          ]=SSOR;
-	solvertype_to_enum["RICHARDSON"    ]=RICHARDSON;
-	solvertype_to_enum["CHEBYSHEV"     ]=CHEBYSHEV;
-	solvertype_to_enum["INVALID_SOLVER"]=INVALID_SOLVER;
+        solvertype_to_enum["CG"            ]=CG;
+        solvertype_to_enum["CGN"           ]=CGN;
+        solvertype_to_enum["CGS"           ]=CGS;
+        solvertype_to_enum["CR"            ]=CR;
+        solvertype_to_enum["QMR"           ]=QMR;
+        solvertype_to_enum["TCQMR"         ]=TCQMR;
+        solvertype_to_enum["TFQMR"         ]=TFQMR;
+        solvertype_to_enum["BICG"          ]=BICG;
+        solvertype_to_enum["MINRES"        ]=MINRES;
+        solvertype_to_enum["GMRES"         ]=GMRES;
+        solvertype_to_enum["LSQR"          ]=LSQR;
+        solvertype_to_enum["JACOBI"        ]=JACOBI;
+        solvertype_to_enum["SOR_FORWARD"   ]=SOR_FORWARD;
+        solvertype_to_enum["SOR_BACKWARD"  ]=SOR_BACKWARD;
+        solvertype_to_enum["SSOR"          ]=SSOR;
+        solvertype_to_enum["RICHARDSON"    ]=RICHARDSON;
+        solvertype_to_enum["CHEBYSHEV"     ]=CHEBYSHEV;
+        solvertype_to_enum["INVALID_SOLVER"]=INVALID_SOLVER;
       }
   }
 
@@ -399,22 +399,22 @@ INSTANTIATE_ENUM_MAPS(ElemQuality, elemquality)
   {
     if (elemquality_to_enum.empty())
       {
-	    elemquality_to_enum["ASPECT_RATIO"       ]=ASPECT_RATIO;
-	    elemquality_to_enum["SKEW"               ]=SKEW;
-	    elemquality_to_enum["SHEAR"              ]=SHEAR;
-	    elemquality_to_enum["SHAPE"              ]=SHAPE;
-	    elemquality_to_enum["MAX_ANGLE"          ]=MAX_ANGLE;
-	    elemquality_to_enum["MIN_ANGLE"          ]=MIN_ANGLE;
-	    elemquality_to_enum["CONDITION"          ]=CONDITION;
-	    elemquality_to_enum["DISTORTION"         ]=DISTORTION;
-	    elemquality_to_enum["TAPER"              ]=TAPER;
-	    elemquality_to_enum["WARP"               ]=WARP;
-	    elemquality_to_enum["STRETCH"            ]=STRETCH;
-	    elemquality_to_enum["DIAGONAL"           ]=DIAGONAL;
-	    elemquality_to_enum["ASPECT_RATIO_BETA"  ]=ASPECT_RATIO_BETA;
-	    elemquality_to_enum["ASPECT_RATIO_GAMMA" ]=ASPECT_RATIO_GAMMA;
-	    elemquality_to_enum["SIZE"               ]=SIZE;
-	    elemquality_to_enum["JACOBIAN"           ]=JACOBIAN;
+        elemquality_to_enum["ASPECT_RATIO"       ]=ASPECT_RATIO;
+        elemquality_to_enum["SKEW"               ]=SKEW;
+        elemquality_to_enum["SHEAR"              ]=SHEAR;
+        elemquality_to_enum["SHAPE"              ]=SHAPE;
+        elemquality_to_enum["MAX_ANGLE"          ]=MAX_ANGLE;
+        elemquality_to_enum["MIN_ANGLE"          ]=MIN_ANGLE;
+        elemquality_to_enum["CONDITION"          ]=CONDITION;
+        elemquality_to_enum["DISTORTION"         ]=DISTORTION;
+        elemquality_to_enum["TAPER"              ]=TAPER;
+        elemquality_to_enum["WARP"               ]=WARP;
+        elemquality_to_enum["STRETCH"            ]=STRETCH;
+        elemquality_to_enum["DIAGONAL"           ]=DIAGONAL;
+        elemquality_to_enum["ASPECT_RATIO_BETA"  ]=ASPECT_RATIO_BETA;
+        elemquality_to_enum["ASPECT_RATIO_GAMMA" ]=ASPECT_RATIO_GAMMA;
+        elemquality_to_enum["SIZE"               ]=SIZE;
+        elemquality_to_enum["JACOBIAN"           ]=JACOBIAN;
       }
   }
 
@@ -426,14 +426,14 @@ INSTANTIATE_ENUM_MAPS(IOPackage, iopackage)
   {
     if (iopackage_to_enum.empty())
       {
-	    iopackage_to_enum["TECPLOT" ]=TECPLOT;
-	    iopackage_to_enum["GMV"     ]=GMV;
-	    iopackage_to_enum["GMSH"    ]=GMSH;
-	    iopackage_to_enum["VTK"     ]=VTK;
-	    iopackage_to_enum["DIVA"    ]=DIVA;
-	    iopackage_to_enum["TETGEN"  ]=TETGEN;
-	    iopackage_to_enum["UCD"     ]=UCD;
-	    iopackage_to_enum["LIBMESH" ]=LIBMESH;
+        iopackage_to_enum["TECPLOT" ]=TECPLOT;
+        iopackage_to_enum["GMV"     ]=GMV;
+        iopackage_to_enum["GMSH"    ]=GMSH;
+        iopackage_to_enum["VTK"     ]=VTK;
+        iopackage_to_enum["DIVA"    ]=DIVA;
+        iopackage_to_enum["TETGEN"  ]=TETGEN;
+        iopackage_to_enum["UCD"     ]=UCD;
+        iopackage_to_enum["LIBMESH" ]=LIBMESH;
       }
   }
 
@@ -445,32 +445,32 @@ INSTANTIATE_ENUM_MAPS(FEMNormType, norm_type)
   {
     if (norm_type_to_enum.empty())
       {
-	    norm_type_to_enum["L2" ]=L2;
-	    norm_type_to_enum["H1" ]=H1;
-	    norm_type_to_enum["H2" ]=H2;
-	    norm_type_to_enum["HCURL" ]=HCURL;
-	    norm_type_to_enum["HDIV" ]=HDIV;
+        norm_type_to_enum["L2" ]=L2;
+        norm_type_to_enum["H1" ]=H1;
+        norm_type_to_enum["H2" ]=H2;
+        norm_type_to_enum["HCURL" ]=HCURL;
+        norm_type_to_enum["HDIV" ]=HDIV;
 
-	    norm_type_to_enum["L1" ]=L1;
-	    norm_type_to_enum["L_INF" ]=L_INF;
+        norm_type_to_enum["L1" ]=L1;
+        norm_type_to_enum["L_INF" ]=L_INF;
 
-	    norm_type_to_enum["H1_SEMINORM" ]=H1_SEMINORM;
-	    norm_type_to_enum["H2_SEMINORM" ]=H2_SEMINORM;
-	    norm_type_to_enum["HCURL_SEMINORM" ]=HCURL_SEMINORM;
-	    norm_type_to_enum["HDIV_SEMINORM" ]=HDIV_SEMINORM;
+        norm_type_to_enum["H1_SEMINORM" ]=H1_SEMINORM;
+        norm_type_to_enum["H2_SEMINORM" ]=H2_SEMINORM;
+        norm_type_to_enum["HCURL_SEMINORM" ]=HCURL_SEMINORM;
+        norm_type_to_enum["HDIV_SEMINORM" ]=HDIV_SEMINORM;
 
-	    norm_type_to_enum["W1_INF_SEMINORM" ]=W1_INF_SEMINORM;
-	    norm_type_to_enum["W2_INF_SEMINORM" ]=W2_INF_SEMINORM;
+        norm_type_to_enum["W1_INF_SEMINORM" ]=W1_INF_SEMINORM;
+        norm_type_to_enum["W2_INF_SEMINORM" ]=W2_INF_SEMINORM;
 
-	    norm_type_to_enum["DISCRETE_L1" ]=DISCRETE_L1;
-	    norm_type_to_enum["DISCRETE_L2" ]=DISCRETE_L2;
-	    norm_type_to_enum["DISCRETE_L_INF" ]=DISCRETE_L_INF;
+        norm_type_to_enum["DISCRETE_L1" ]=DISCRETE_L1;
+        norm_type_to_enum["DISCRETE_L2" ]=DISCRETE_L2;
+        norm_type_to_enum["DISCRETE_L_INF" ]=DISCRETE_L_INF;
 
-	    norm_type_to_enum["H1_X_SEMINORM" ]=H1_X_SEMINORM;
-	    norm_type_to_enum["H1_Y_SEMINORM" ]=H1_Y_SEMINORM;
-	    norm_type_to_enum["H1_Z_SEMINORM" ]=H1_Z_SEMINORM;
+        norm_type_to_enum["H1_X_SEMINORM" ]=H1_X_SEMINORM;
+        norm_type_to_enum["H1_Y_SEMINORM" ]=H1_Y_SEMINORM;
+        norm_type_to_enum["H1_Z_SEMINORM" ]=H1_Z_SEMINORM;
 
-	    norm_type_to_enum["INVALID_NORM" ]=INVALID_NORM;
+        norm_type_to_enum["INVALID_NORM" ]=INVALID_NORM;
       }
   }
 
@@ -482,11 +482,11 @@ INSTANTIATE_ENUM_MAPS(ParallelType, parallel_type)
   {
     if (parallel_type_to_enum.empty())
       {
-	parallel_type_to_enum["AUTOMATIC" ]=AUTOMATIC;
-	parallel_type_to_enum["SERIAL"    ]=SERIAL;
-	parallel_type_to_enum["PARALLEL"  ]=PARALLEL;
-	parallel_type_to_enum["GHOSTED"   ]=GHOSTED;
-	parallel_type_to_enum["INVALID_PARALLELIZATION" ]=INVALID_PARALLELIZATION;
+        parallel_type_to_enum["AUTOMATIC" ]=AUTOMATIC;
+        parallel_type_to_enum["SERIAL"    ]=SERIAL;
+        parallel_type_to_enum["PARALLEL"  ]=PARALLEL;
+        parallel_type_to_enum["GHOSTED"   ]=GHOSTED;
+        parallel_type_to_enum["INVALID_PARALLELIZATION" ]=INVALID_PARALLELIZATION;
       }
   }
 
@@ -498,9 +498,9 @@ INSTANTIATE_ENUM_MAPS(PointLocatorType, point_locator_type)
   {
     if (point_locator_type_to_enum.empty())
       {
-	point_locator_type_to_enum["TREE" ]=TREE;
-	point_locator_type_to_enum["LIST" ]=LIST;
-	point_locator_type_to_enum["INVALID_LOCATOR" ]=INVALID_LOCATOR;
+        point_locator_type_to_enum["TREE" ]=TREE;
+        point_locator_type_to_enum["LIST" ]=LIST;
+        point_locator_type_to_enum["INVALID_LOCATOR" ]=INVALID_LOCATOR;
       }
   }
 
@@ -512,12 +512,12 @@ INSTANTIATE_ENUM_MAPS(SolverPackage, solverpackage_type)
   {
     if (solverpackage_type_to_enum.empty())
       {
-	solverpackage_type_to_enum["PETSC_SOLVERS"    ]=PETSC_SOLVERS;
-	solverpackage_type_to_enum["TRILINOS_SOLVERS" ]=TRILINOS_SOLVERS;
-	solverpackage_type_to_enum["LASPACK_SOLVERS"  ]=LASPACK_SOLVERS;
-	solverpackage_type_to_enum["SLEPC_SOLVERS"    ]=SLEPC_SOLVERS;
-	solverpackage_type_to_enum["EIGEN_SOLVERS"    ]=EIGEN_SOLVERS;
-	solverpackage_type_to_enum["INVALID_SOLVER_PACKAGE" ]=INVALID_SOLVER_PACKAGE;
+        solverpackage_type_to_enum["PETSC_SOLVERS"    ]=PETSC_SOLVERS;
+        solverpackage_type_to_enum["TRILINOS_SOLVERS" ]=TRILINOS_SOLVERS;
+        solverpackage_type_to_enum["LASPACK_SOLVERS"  ]=LASPACK_SOLVERS;
+        solverpackage_type_to_enum["SLEPC_SOLVERS"    ]=SLEPC_SOLVERS;
+        solverpackage_type_to_enum["EIGEN_SOLVERS"    ]=EIGEN_SOLVERS;
+        solverpackage_type_to_enum["INVALID_SOLVER_PACKAGE" ]=INVALID_SOLVER_PACKAGE;
       }
   }
 
@@ -529,9 +529,9 @@ INSTANTIATE_ENUM_MAPS(SubsetSolveMode, subset_solve_mode)
   {
     if (subset_solve_mode_to_enum.empty())
       {
-	subset_solve_mode_to_enum["SUBSET_ZERO" ]=SUBSET_ZERO;
-	subset_solve_mode_to_enum["SUBSET_COPY_RHS" ]=SUBSET_COPY_RHS;
-	subset_solve_mode_to_enum["SUBSET_DONT_TOUCH" ]=SUBSET_DONT_TOUCH;
+        subset_solve_mode_to_enum["SUBSET_ZERO" ]=SUBSET_ZERO;
+        subset_solve_mode_to_enum["SUBSET_COPY_RHS" ]=SUBSET_COPY_RHS;
+        subset_solve_mode_to_enum["SUBSET_DONT_TOUCH" ]=SUBSET_DONT_TOUCH;
       }
   }
 
@@ -543,11 +543,11 @@ INSTANTIATE_ENUM_MAPS(XdrMODE, xdr_mode)
   {
     if (xdr_mode_to_enum.empty())
       {
-	xdr_mode_to_enum["UNKNOWN" ]=UNKNOWN;
-	xdr_mode_to_enum["ENCODE"  ]=ENCODE;
-	xdr_mode_to_enum["DECODE"  ]=DECODE;
-	xdr_mode_to_enum["WRITE"   ]=WRITE;
-	xdr_mode_to_enum["READ"    ]=READ;
+        xdr_mode_to_enum["UNKNOWN" ]=UNKNOWN;
+        xdr_mode_to_enum["ENCODE"  ]=ENCODE;
+        xdr_mode_to_enum["DECODE"  ]=DECODE;
+        xdr_mode_to_enum["WRITE"   ]=WRITE;
+        xdr_mode_to_enum["READ"    ]=READ;
       }
   }
 

@@ -43,7 +43,7 @@ bool PerfLog::called = false;
 
 
 PerfLog::PerfLog(const std::string& ln,
-		 const bool le) :
+                 const bool le) :
   label_name(ln),
   log_events(le),
   total_time(0.)
@@ -70,17 +70,17 @@ void PerfLog::clear()
     {
       //  check that all events are closed
       for (std::map<std::pair<std::string,std::string>, PerfData>::iterator
-	     pos = log.begin(); pos != log.end(); ++pos)
-	if (pos->second.open)
-	  {
-	    libMesh::out
-	      << "ERROR clearning performance log for class "
-	      << label_name << std::endl
-	      << "event " << pos->first.second << " is still being monitored!"
-	      << std::endl;
+             pos = log.begin(); pos != log.end(); ++pos)
+        if (pos->second.open)
+          {
+            libMesh::out
+              << "ERROR clearning performance log for class "
+              << label_name << std::endl
+              << "event " << pos->first.second << " is still being monitored!"
+              << std::endl;
 
-	    libmesh_error();
-	  }
+            libmesh_error();
+          }
 
 
       gettimeofday (&tstart, NULL);
@@ -88,7 +88,7 @@ void PerfLog::clear()
       log.clear();
 
       while (!log_stack.empty())
-	log_stack.pop();
+        log_stack.pop();
     }
 }
 
@@ -147,10 +147,10 @@ std::string PerfLog::get_info_header() const
 
       // Fill string stream objects
       if (libMesh::global_n_processors() > 1)
-	{
-	  pid_stream     << "| Processor id:   " << libMesh::global_processor_id();
-	  nprocs_stream  << "| Num Processors: " << libMesh::global_n_processors();
-	}
+        {
+          pid_stream     << "| Processor id:   " << libMesh::global_processor_id();
+          nprocs_stream  << "| Num Processors: " << libMesh::global_n_processors();
+        }
 
       time_stream    << "| Time:           " << date                   ;
       os_stream      << "| OS:             " << sysInfo.sysname        ;
@@ -180,15 +180,15 @@ std::string PerfLog::get_info_header() const
       // Find the longest string in all the streams
       unsigned int max_length = 0;
       for (unsigned int i=0; i<v.size(); ++i)
-	if (v[i]->str().size() > max_length)
-	  max_length = libmesh_cast_int<unsigned int>
-	    (v[i]->str().size());
+        if (v[i]->str().size() > max_length)
+          max_length = libmesh_cast_int<unsigned int>
+            (v[i]->str().size());
 
       // Find the longest string in the parsed_libmesh_configure_info
       for (unsigned i=0; i<parsed_libmesh_configure_info.size(); ++i)
         if (parsed_libmesh_configure_info[i].size() > max_length)
           max_length = libmesh_cast_int<unsigned int>
-	    (parsed_libmesh_configure_info[i].size());
+            (parsed_libmesh_configure_info[i].size());
 
       // Print dashed line for the header
       oss << ' '
@@ -197,13 +197,13 @@ std::string PerfLog::get_info_header() const
 
       // Loop over all the strings and add end formatting
       for (unsigned int i=0; i<v.size(); ++i)
-	{
-	  if (v[i]->str().size())
+        {
+          if (v[i]->str().size())
             oss << v[i]->str()
                 << std::setw(max_length + 4 - v[i]->str().size())
                 << std::right
                 << "|\n";
-	}
+        }
 
       // Print out configuration header plus first parsed string.  The
       // magic number 18 below accounts for the length of the word
@@ -250,7 +250,7 @@ std::string PerfLog::get_perf_info() const
       gettimeofday (&tstop, NULL);
 
       const double elapsed_time = (static_cast<double>(tstop.tv_sec  - tstart.tv_sec) +
-				   static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);
+                                   static_cast<double>(tstop.tv_usec - tstart.tv_usec)*1.e-6);
 
       // Figure out the formatting required based on the event names
       // Unsigned ints for each of the column widths
@@ -269,20 +269,20 @@ std::string PerfLog::get_perf_info() const
       // Reset the event column width based on the longest event name plus
       // a possible 2-character indentation, plus a space.
       for (pos = log.begin(); pos != log.end(); ++pos)
-	if (pos->first.second.size()+3 > event_col_width)
-	  event_col_width = libmesh_cast_int<unsigned int>
-	    (pos->first.second.size()+3);
+        if (pos->first.second.size()+3 > event_col_width)
+          event_col_width = libmesh_cast_int<unsigned int>
+            (pos->first.second.size()+3);
 
       // Set the total width of the column
       const unsigned int total_col_width =
-	event_col_width     +
-	ncalls_col_width    +
-	tot_time_col_width  +
-	avg_time_col_width  +
-	tot_time_incl_sub_col_width  +
-	avg_time_incl_sub_col_width  +
-	pct_active_col_width+
-	pct_active_incl_sub_col_width+1;
+        event_col_width     +
+        ncalls_col_width    +
+        tot_time_col_width  +
+        avg_time_col_width  +
+        tot_time_incl_sub_col_width  +
+        avg_time_incl_sub_col_width  +
+        pct_active_col_width+
+        pct_active_incl_sub_col_width+1;
 
       // Print dashed line
       oss << ' '
@@ -290,28 +290,28 @@ std::string PerfLog::get_perf_info() const
           << '\n';
 
       {
-	// Construct temporary message string
+        // Construct temporary message string
         std::ostringstream temp;
-	temp << "| " << label_name << " Performance: Alive time=" << elapsed_time
-	     << ", Active time=" << total_time;
+        temp << "| " << label_name << " Performance: Alive time=" << elapsed_time
+             << ", Active time=" << total_time;
 
-	// Get the size of the temporary string
-	const unsigned int temp_size = libmesh_cast_int<unsigned int>
-	  (temp.str().size());
+        // Get the size of the temporary string
+        const unsigned int temp_size = libmesh_cast_int<unsigned int>
+          (temp.str().size());
 
-	// Send the temporary message to the output
-	oss << temp.str();
+        // Send the temporary message to the output
+        oss << temp.str();
 
-	// If this string is longer than the previously computed total
-	// column width, skip the additional formatting... this shouldn't
-	// happen often, hopefully.  Add two additional characters for a
-	// space and a "|" character at the end.
-	if (temp_size < total_col_width+2)
+        // If this string is longer than the previously computed total
+        // column width, skip the additional formatting... this shouldn't
+        // happen often, hopefully.  Add two additional characters for a
+        // space and a "|" character at the end.
+        if (temp_size < total_col_width+2)
           oss << std::setw(total_col_width - temp_size + 2)
               << std::right
               << "|";
 
-	oss << '\n';
+        oss << '\n';
       }
 
       // Print dashed line
@@ -382,64 +382,64 @@ std::string PerfLog::get_perf_info() const
       std::string last_header("");
 
       for (pos = log.begin(); pos != log.end(); ++pos)
-	{
-	  const PerfData& perf_data = pos->second;
+        {
+          const PerfData& perf_data = pos->second;
 
-	  // Only print the event if the count is non-zero.
-	  if (perf_data.count != 0)
-	    {
-	      const unsigned int perf_count    = perf_data.count;
-	      const double       perf_time     = perf_data.tot_time;
-	      const double       perf_avg_time = perf_time / static_cast<double>(perf_count);
-	      const double       perf_time_incl_sub     = perf_data.tot_time_incl_sub;
-	      const double       perf_avg_time_incl_sub = perf_time_incl_sub / static_cast<double>(perf_count);
-	      const double       perf_percent  = (total_time != 0.) ? perf_time / total_time * 100. : 0.;
-	      const double       perf_percent_incl_sub  = (total_time != 0.) ? perf_time_incl_sub / total_time * 100. : 0.;
+          // Only print the event if the count is non-zero.
+          if (perf_data.count != 0)
+            {
+              const unsigned int perf_count    = perf_data.count;
+              const double       perf_time     = perf_data.tot_time;
+              const double       perf_avg_time = perf_time / static_cast<double>(perf_count);
+              const double       perf_time_incl_sub     = perf_data.tot_time_incl_sub;
+              const double       perf_avg_time_incl_sub = perf_time_incl_sub / static_cast<double>(perf_count);
+              const double       perf_percent  = (total_time != 0.) ? perf_time / total_time * 100. : 0.;
+              const double       perf_percent_incl_sub  = (total_time != 0.) ? perf_time_incl_sub / total_time * 100. : 0.;
 
-	      summed_function_calls += perf_count;
-	      summed_total_time     += perf_time;
-	      summed_percentage     += perf_percent;
+              summed_function_calls += perf_count;
+              summed_total_time     += perf_time;
+              summed_percentage     += perf_percent;
 
-	      // Print the event name
-	      if (pos->first.first == "")
+              // Print the event name
+              if (pos->first.first == "")
                 oss << "| "
                     << std::setw(event_col_width)
                     << std::left
                     << pos->first.second;
 
-	      else
-		{
-		  if (last_header != pos->first.first)
-		    {
-		      last_header = pos->first.first;
+              else
+                {
+                  if (last_header != pos->first.first)
+                    {
+                      last_header = pos->first.first;
 
-		      // print blank line followed by header name
-		      // (account for additional space before the
-		      // header)
-		      oss << "|"
+                      // print blank line followed by header name
+                      // (account for additional space before the
+                      // header)
+                      oss << "|"
                           << std::string(total_col_width, ' ')
                           << "|\n| "
                           << std::setw(total_col_width-1)
                           << std::left
                           << pos->first.first
                           << "|\n";
-		    }
+                    }
 
-		  oss << "|   "
+                  oss << "|   "
                       << std::setw(event_col_width-2)
                       << std::left
                       << pos->first.second;
-		}
+                }
 
 
-	      // Print the number of calls to the event.
+              // Print the number of calls to the event.
               oss << std::setw(ncalls_col_width)
                   << perf_count;
 
               // Save the original stream flags
               std::ios_base::fmtflags out_flags = oss.flags();
 
-	      // Print the total time spent in the event
+              // Print the total time spent in the event
               oss << std::fixed
                   << std::setprecision(4)
                   << std::setw(tot_time_col_width)
@@ -447,35 +447,35 @@ std::string PerfLog::get_perf_info() const
                   << perf_time;
 
 
-	      // Print the average time per function call
+              // Print the average time per function call
               oss << std::fixed
                   << std::setprecision(6)
                   << std::setw(avg_time_col_width)
                   << std::left
                   << perf_avg_time;
 
-	      // Print the total time spent in the event incl. sub-events
+              // Print the total time spent in the event incl. sub-events
               oss << std::fixed
                   << std::setprecision(4)
                   << std::setw(tot_time_incl_sub_col_width)
                   << std::left
                   << perf_time_incl_sub;
 
-	      // Print the average time per function call incl. sub-events
+              // Print the average time per function call incl. sub-events
               oss << std::fixed
                   << std::setprecision(6)
                   << std::setw(avg_time_incl_sub_col_width)
                   << std::left
                   << perf_avg_time_incl_sub;
 
-	      // Print the percentage of the time spent in the event
+              // Print the percentage of the time spent in the event
               oss << std::fixed
                   << std::setprecision(2)
                   << std::setw(pct_active_col_width)
                   << std::left
                   << perf_percent;
 
-	      // Print the percentage of the time spent in the event incl. sub-events
+              // Print the percentage of the time spent in the event incl. sub-events
               oss << std::fixed
                   << std::setprecision(2)
                   << std::setw(pct_active_incl_sub_col_width)
@@ -485,9 +485,9 @@ std::string PerfLog::get_perf_info() const
               // Reset the stream flags
               oss.flags(out_flags);
 
-	      oss << "|\n";
-	    }
-	}
+              oss << "|\n";
+            }
+        }
 
       oss << ' '
           << std::string(total_col_width, '-')
@@ -504,7 +504,7 @@ std::string PerfLog::get_perf_info() const
             << summed_function_calls;
 
       else
-	{
+        {
           // Save the original stream flags
           std::ios_base::fmtflags out_flags = oss.flags();
 
@@ -515,8 +515,8 @@ std::string PerfLog::get_perf_info() const
               << static_cast<Real>(summed_function_calls);
 
           // Reset the stream flags
-	  oss.flags(out_flags);
-	}
+          oss.flags(out_flags);
+        }
 
       // Print the total time spent in logged function calls.  Don't bother saving/restoring
       // the flags here since we are almost done with this stream anyway...
@@ -562,16 +562,16 @@ std::string PerfLog::get_log() const
       // Only print the log
       // if it isn't empty
       if (!log.empty())
-	{
-	  // Possibly print machine info,
-	  // but only do this once
-	  if (!called)
-	    {
-	      called = true;
-	      oss << get_info_header();
-	    }
-	  oss << get_perf_info();
-	}
+        {
+          // Possibly print machine info,
+          // but only do this once
+          if (!called)
+            {
+              called = true;
+              oss << get_info_header();
+            }
+          oss << get_perf_info();
+        }
     }
 
   return oss.str();
@@ -587,7 +587,7 @@ void PerfLog::print_log() const
       // avoid printing an unnecessary newline.
       std::string log_string = this->get_log();
       if (log_string.size() > 0)
-	libMesh::out << log_string << std::endl;
+        libMesh::out << log_string << std::endl;
     }
 }
 
@@ -597,7 +597,7 @@ PerfData PerfLog::get_perf_data(const std::string &label, const std::string &hea
 }
 
 void PerfLog::start_event(const std::string &label,
-			  const std::string &header)
+                          const std::string &header)
 {
   this->push(label,header);
 }
@@ -605,7 +605,7 @@ void PerfLog::start_event(const std::string &label,
 
 
 void PerfLog::stop_event(const std::string &label,
-			 const std::string &header)
+                         const std::string &header)
 {
   this->pop(label,header);
 }
@@ -613,7 +613,7 @@ void PerfLog::stop_event(const std::string &label,
 
 
 void PerfLog::pause_event(const std::string &,
-			  const std::string &)
+                          const std::string &)
 {
   // nothing to do.  pushing the next object on the stack will handle it
 }
@@ -621,7 +621,7 @@ void PerfLog::pause_event(const std::string &,
 
 
 void PerfLog::restart_event(const std::string &,
-			    const std::string &)
+                            const std::string &)
 {
   // nothing to do.  popping the top off the stack will handle it.
 }

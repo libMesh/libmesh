@@ -44,12 +44,12 @@ void QGrid::init_2D(const ElemType type_in,
     case QUAD8:
     case QUAD9:
       {
-	// We compute the 2D quadrature rule as a tensor
-	// product of the 1D quadrature rule.
-	QGrid q1D(1,_order);
-	q1D.init(EDGE2);
-	tensor_product_quad( q1D );
-	return;
+        // We compute the 2D quadrature rule as a tensor
+        // product of the 1D quadrature rule.
+        QGrid q1D(1,_order);
+        q1D.init(EDGE2);
+        tensor_product_quad( q1D );
+        return;
       }
 
 
@@ -73,15 +73,15 @@ void QGrid::init_2D(const ElemType type_in,
                 pt++;
               }
           }
-	return;
+        return;
       }
 
       //---------------------------------------------
       // Unsupported type
     default:
       {
-	libMesh::err << "Element type not supported!:" << type_in << std::endl;
-	libmesh_error();
+        libMesh::err << "Element type not supported!:" << type_in << std::endl;
+        libmesh_error();
       }
     }
 

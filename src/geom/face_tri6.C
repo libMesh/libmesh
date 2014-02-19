@@ -114,7 +114,7 @@ bool Tri6::is_face(const unsigned int) const
 }
 
 bool Tri6::is_node_on_side(const unsigned int n,
-			   const unsigned int s) const
+                           const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 3; ++i)
@@ -152,17 +152,17 @@ dof_id_type Tri6::key (const unsigned int s) const
     case 0:
 
       return
-	this->compute_key (this->node(3));
+        this->compute_key (this->node(3));
 
     case 1:
 
       return
-	this->compute_key (this->node(4));
+        this->compute_key (this->node(4));
 
     case 2:
 
       return
-	this->compute_key (this->node(5));
+        this->compute_key (this->node(5));
     }
 
 
@@ -174,7 +174,7 @@ dof_id_type Tri6::key (const unsigned int s) const
 
 
 AutoPtr<Elem> Tri6::build_side (const unsigned int i,
-				bool proxy) const
+                                bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -190,36 +190,36 @@ AutoPtr<Elem> Tri6::build_side (const unsigned int i,
       edge->subdomain_id() = this->subdomain_id();
 
       switch (i)
-	{
-	case 0:
-	  {
-	    edge->set_node(0) = this->get_node(0);
-	    edge->set_node(1) = this->get_node(1);
-	    edge->set_node(2) = this->get_node(3);
+        {
+        case 0:
+          {
+            edge->set_node(0) = this->get_node(0);
+            edge->set_node(1) = this->get_node(1);
+            edge->set_node(2) = this->get_node(3);
 
             return edge;
-	  }
-	case 1:
-	  {
-	    edge->set_node(0) = this->get_node(1);
-	    edge->set_node(1) = this->get_node(2);
-	    edge->set_node(2) = this->get_node(4);
+          }
+        case 1:
+          {
+            edge->set_node(0) = this->get_node(1);
+            edge->set_node(1) = this->get_node(2);
+            edge->set_node(2) = this->get_node(4);
 
             return edge;
-	  }
-	case 2:
-	  {
-	    edge->set_node(0) = this->get_node(2);
-	    edge->set_node(1) = this->get_node(0);
-	    edge->set_node(2) = this->get_node(5);
+          }
+        case 2:
+          {
+            edge->set_node(0) = this->get_node(2);
+            edge->set_node(1) = this->get_node(0);
+            edge->set_node(2) = this->get_node(5);
 
             return edge;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+          }
+        default:
+          {
+            libmesh_error();
+          }
+        }
     }
 
   // We will never get here...  Look at the code above.
@@ -228,8 +228,8 @@ AutoPtr<Elem> Tri6::build_side (const unsigned int i,
 
 
 void Tri6::connectivity(const unsigned int sf,
-			const IOPackage iop,
-			std::vector<dof_id_type>& conn) const
+                        const IOPackage iop,
+                        std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_less (sf, this->n_sub_elem());
   libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
@@ -238,53 +238,53 @@ void Tri6::connectivity(const unsigned int sf,
     {
     case TECPLOT:
       {
-	conn.resize(4);
-	switch(sf)
-	  {
-	  case 0:
-	    // linear sub-triangle 0
-	    conn[0] = this->node(0)+1;
-	    conn[1] = this->node(3)+1;
-	    conn[2] = this->node(5)+1;
-	    conn[3] = this->node(5)+1;
+        conn.resize(4);
+        switch(sf)
+          {
+          case 0:
+            // linear sub-triangle 0
+            conn[0] = this->node(0)+1;
+            conn[1] = this->node(3)+1;
+            conn[2] = this->node(5)+1;
+            conn[3] = this->node(5)+1;
 
-	    return;
+            return;
 
-	  case 1:
-	    // linear sub-triangle 1
-	    conn[0] = this->node(3)+1;
-	    conn[1] = this->node(1)+1;
-	    conn[2] = this->node(4)+1;
-	    conn[3] = this->node(4)+1;
+          case 1:
+            // linear sub-triangle 1
+            conn[0] = this->node(3)+1;
+            conn[1] = this->node(1)+1;
+            conn[2] = this->node(4)+1;
+            conn[3] = this->node(4)+1;
 
-	    return;
+            return;
 
-	  case 2:
-	    // linear sub-triangle 2
-	    conn[0] = this->node(5)+1;
-	    conn[1] = this->node(4)+1;
-	    conn[2] = this->node(2)+1;
-	    conn[3] = this->node(2)+1;
+          case 2:
+            // linear sub-triangle 2
+            conn[0] = this->node(5)+1;
+            conn[1] = this->node(4)+1;
+            conn[2] = this->node(2)+1;
+            conn[3] = this->node(2)+1;
 
-	    return;
+            return;
 
-	  case 3:
-	    // linear sub-triangle 3
-	    conn[0] = this->node(3)+1;
-	    conn[1] = this->node(4)+1;
-	    conn[2] = this->node(5)+1;
-	    conn[3] = this->node(5)+1;
+          case 3:
+            // linear sub-triangle 3
+            conn[0] = this->node(3)+1;
+            conn[1] = this->node(4)+1;
+            conn[2] = this->node(5)+1;
+            conn[3] = this->node(5)+1;
 
-	    return;
+            return;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
     case VTK:
       {
-	// VTK_QUADRATIC_TRIANGLE has same numbering as libmesh TRI6
+        // VTK_QUADRATIC_TRIANGLE has same numbering as libmesh TRI6
         conn.resize(6);
         conn[0] = this->node(0);
         conn[1] = this->node(1);
@@ -292,49 +292,49 @@ void Tri6::connectivity(const unsigned int sf,
         conn[3] = this->node(3);
         conn[4] = this->node(4);
         conn[5] = this->node(5);
-	return;
+        return;
 
-	// Used to write out linear sub-triangles for VTK...
-	/*
-	conn.resize(3);
-	switch(sf)
-	  {
-	  case 0:
-	    // linear sub-triangle 0
-	    conn[0] = this->node(0);
-	    conn[1] = this->node(3);
-	    conn[2] = this->node(5);
+        // Used to write out linear sub-triangles for VTK...
+        /*
+          conn.resize(3);
+          switch(sf)
+          {
+          case 0:
+          // linear sub-triangle 0
+          conn[0] = this->node(0);
+          conn[1] = this->node(3);
+          conn[2] = this->node(5);
 
-	    return;
+          return;
 
-	  case 1:
-	    // linear sub-triangle 1
-	    conn[0] = this->node(3);
-	    conn[1] = this->node(1);
-	    conn[2] = this->node(4);
+          case 1:
+          // linear sub-triangle 1
+          conn[0] = this->node(3);
+          conn[1] = this->node(1);
+          conn[2] = this->node(4);
 
-	    return;
+          return;
 
-	  case 2:
-	    // linear sub-triangle 2
-	    conn[0] = this->node(5);
-	    conn[1] = this->node(4);
-	    conn[2] = this->node(2);
+          case 2:
+          // linear sub-triangle 2
+          conn[0] = this->node(5);
+          conn[1] = this->node(4);
+          conn[2] = this->node(2);
 
-	    return;
+          return;
 
-	  case 3:
-	    // linear sub-triangle 3
-	    conn[0] = this->node(3);
-	    conn[1] = this->node(4);
-	    conn[2] = this->node(5);
+          case 3:
+          // linear sub-triangle 3
+          conn[0] = this->node(3);
+          conn[1] = this->node(4);
+          conn[2] = this->node(5);
 
-	    return;
+          return;
 
-	  default:
-	    libmesh_error();
-	  }
-	*/
+          default:
+          libmesh_error();
+          }
+        */
       }
 
     default:
@@ -349,7 +349,7 @@ void Tri6::connectivity(const unsigned int sf,
 
 
 unsigned short int Tri6::second_order_adjacent_vertex (const unsigned int n,
-						       const unsigned int v) const
+                                                       const unsigned int v) const
 {
   libmesh_assert_greater_equal (n, this->n_vertices());
   libmesh_assert_less (n, this->n_nodes());

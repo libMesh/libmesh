@@ -50,34 +50,34 @@
 //       index[j]  = index[j] << 01;
 
 //       if (( cnt % (sizeof(unsigned int)*8) == 0) && (cnt !=0 ) )
-// 	{
-// 	  cnt = 0;
-// 	  j--;
-// 	}
+// {
+//   cnt = 0;
+//   j--;
+// }
 //       else
-// 	cnt++;
+// cnt++;
 
 //       index[j] += (tempy >> i) & 01;
 //       index[j]  = index[j] << 01;
 
 //       if (( cnt % (sizeof(unsigned int)*8) == 0) && (cnt !=0 ) )
-// 	{
-// 	  cnt = 0;
-// 	  j--;
-// 	}
+// {
+//   cnt = 0;
+//   j--;
+// }
 //       else
-// 	cnt++;
+// cnt++;
 
 //       index[j] += (tempz >> i) & 01;
 //       index[j]  = index[j] << 01;
 
 //       if (( cnt % (sizeof(unsigned int)*8) == 0) && (cnt !=0 ) )
-// 	{
-// 	  cnt = 0;
-// 	  j--;
-// 	}
+// {
+//   cnt = 0;
+//   j--;
+// }
 //       else
-// 	cnt++;
+// cnt++;
 //     }
 
 //   return index[2];

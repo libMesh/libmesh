@@ -67,7 +67,7 @@ bool InfQuad6::is_face(const unsigned int) const
 }
 
 bool InfQuad6::is_node_on_side(const unsigned int n,
-			       const unsigned int s) const
+                               const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 3; ++i)
@@ -109,28 +109,28 @@ const float InfQuad6::_embedding_matrix[2][6][6] =
 
 
 AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
-				    bool proxy) const
+                                    bool proxy) const
 {
   // libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
       switch (i)
-	{
-	case 0:
-	  {
-	    AutoPtr<Elem> ap(new Side<Edge3,InfQuad6>(this,i));
-	    return ap;
-	  }
-	case 1:
-	case 2:
-	  {
-	    AutoPtr<Elem> ap(new Side<InfEdge2,InfQuad6>(this,i));
-	    return ap;
-	  }
-	default:
-	  libmesh_error();
-	}
+        {
+        case 0:
+          {
+            AutoPtr<Elem> ap(new Side<Edge3,InfQuad6>(this,i));
+            return ap;
+          }
+        case 1:
+        case 2:
+          {
+            AutoPtr<Elem> ap(new Side<InfEdge2,InfQuad6>(this,i));
+            return ap;
+          }
+        default:
+          libmesh_error();
+        }
     }
 
   else
@@ -139,44 +139,44 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
       AutoPtr<Elem> edge(NULL);
 
       switch (i)
-	{
-	case 0:
-	  {
+        {
+        case 0:
+          {
             edge.reset(new Edge3);
 
-	    edge->set_node(0) = this->get_node(0);
-	    edge->set_node(1) = this->get_node(1);
-	    edge->set_node(2) = this->get_node(4);
+            edge->set_node(0) = this->get_node(0);
+            edge->set_node(1) = this->get_node(1);
+            edge->set_node(2) = this->get_node(4);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 1:
-	  {
-	    // adjacent to another infinite element
+        case 1:
+          {
+            // adjacent to another infinite element
             edge.reset(new InfEdge2);
 
-	    edge->set_node(0) = this->get_node(1);
-	    edge->set_node(1) = this->get_node(3);
+            edge->set_node(0) = this->get_node(1);
+            edge->set_node(1) = this->get_node(3);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 2:
-	  {
-	    // adjacent to another infinite element
+        case 2:
+          {
+            // adjacent to another infinite element
             edge.reset(new InfEdge2);
 
-	    edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
-	    edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
+            edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
+            edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
 
-	    break;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+            break;
+          }
+        default:
+          {
+            libmesh_error();
+          }
+        }
 
       edge->subdomain_id() = this->subdomain_id();
       return edge;
@@ -191,8 +191,8 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
 
 
 void InfQuad6::connectivity(const unsigned int sf,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_less (sf, this->n_sub_elem());
   libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
@@ -203,29 +203,29 @@ void InfQuad6::connectivity(const unsigned int sf,
     {
     case TECPLOT:
       {
-	switch(sf)
-	  {
-	  case 0:
-	    // linear sub-quad 0
-	    conn[0] = this->node(0)+1;
-	    conn[1] = this->node(4)+1;
-	    conn[2] = this->node(5)+1;
-	    conn[3] = this->node(2)+1;
+        switch(sf)
+          {
+          case 0:
+            // linear sub-quad 0
+            conn[0] = this->node(0)+1;
+            conn[1] = this->node(4)+1;
+            conn[2] = this->node(5)+1;
+            conn[3] = this->node(2)+1;
 
-	    return;
+            return;
 
-	  case 1:
-	    // linear sub-quad 1
-	    conn[0] = this->node(4)+1;
-	    conn[1] = this->node(1)+1;
-	    conn[2] = this->node(3)+1;
-	    conn[3] = this->node(5)+1;
+          case 1:
+            // linear sub-quad 1
+            conn[0] = this->node(4)+1;
+            conn[1] = this->node(1)+1;
+            conn[2] = this->node(3)+1;
+            conn[3] = this->node(5)+1;
 
-	    return;
+            return;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
     default:
@@ -239,7 +239,7 @@ void InfQuad6::connectivity(const unsigned int sf,
 
 
 unsigned short int InfQuad6::second_order_adjacent_vertex (const unsigned int n,
-							   const unsigned int v) const
+                                                           const unsigned int v) const
 {
   libmesh_assert_greater_equal (n, this->n_vertices());
   libmesh_assert_less (n, this->n_nodes());

@@ -38,7 +38,7 @@ namespace libMesh
 template <typename T>
 AutoPtr<LinearSolver<T> >
 LinearSolver<T>::build(const libMesh::Parallel::Communicator &comm,
-		       const SolverPackage solver_package)
+                       const SolverPackage solver_package)
 {
   // Build the appropriate solver
   switch (solver_package)
@@ -48,8 +48,8 @@ LinearSolver<T>::build(const libMesh::Parallel::Communicator &comm,
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<LinearSolver<T> > ap(new LaspackLinearSolver<T>(comm));
-	return ap;
+        AutoPtr<LinearSolver<T> > ap(new LaspackLinearSolver<T>(comm));
+        return ap;
       }
 #endif
 
@@ -57,8 +57,8 @@ LinearSolver<T>::build(const libMesh::Parallel::Communicator &comm,
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<LinearSolver<T> > ap(new PetscLinearSolver<T>(comm));
-	return ap;
+        AutoPtr<LinearSolver<T> > ap(new PetscLinearSolver<T>(comm));
+        return ap;
       }
 #endif
 
@@ -66,8 +66,8 @@ LinearSolver<T>::build(const libMesh::Parallel::Communicator &comm,
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
       {
-	AutoPtr<LinearSolver<T> > ap(new AztecLinearSolver<T>(comm));
-	return ap;
+        AutoPtr<LinearSolver<T> > ap(new AztecLinearSolver<T>(comm));
+        return ap;
       }
 #endif
 
@@ -75,15 +75,15 @@ LinearSolver<T>::build(const libMesh::Parallel::Communicator &comm,
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
       {
-	AutoPtr<LinearSolver<T> > ap(new EigenSparseLinearSolver<T>(comm));
-	return ap;
+        AutoPtr<LinearSolver<T> > ap(new EigenSparseLinearSolver<T>(comm));
+        return ap;
       }
 #endif
 
     default:
       libMesh::err << "ERROR:  Unrecognized solver package: "
-		    << solver_package
-		    << std::endl;
+                   << solver_package
+                   << std::endl;
       libmesh_error();
     }
 
@@ -135,7 +135,7 @@ void
 template <typename T>
 void
 LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int>* const dofs,
-				   const SubsetSolveMode /*subset_solve_mode*/)
+                                   const SubsetSolveMode /*subset_solve_mode*/)
 {
   if(dofs!=NULL)
     {
@@ -146,10 +146,10 @@ LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int>* const dofs,
 
   template <typename T>
   std::pair<unsigned int, Real> LinearSolver<T>::adjoint_solve (SparseMatrix<T> & mat,
-					       NumericVector<T>& sol,
-					       NumericVector<T>& rhs,
-					       const double tol,
-					       const unsigned int n_iter)
+                                                                NumericVector<T>& sol,
+                                                                NumericVector<T>& rhs,
+                                                                const double tol,
+                                                                const unsigned int n_iter)
   {
     // Log how long the linear solve takes.
     START_LOG("adjoint_solve()", "LinearSolver");

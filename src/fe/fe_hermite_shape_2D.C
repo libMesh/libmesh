@@ -38,7 +38,7 @@ void hermite_compute_coefs(const Elem* elem,  std::vector<std::vector<Real> > & 
   const ElemType mapping_elem_type (elem->type());
   const int n_mapping_shape_functions =
     FE<2,LAGRANGE>::n_shape_functions(mapping_elem_type,
-				      mapping_order);
+                                      mapping_order);
 
   std::vector<Point> dofpt;
   dofpt.push_back(Point(-1,-1));
@@ -186,13 +186,13 @@ namespace libMesh
 
 template <>
 Real FE<2,HERMITE>::shape(const ElemType,
-			  const Order,
-			  const unsigned int,
-			  const Point&)
+                          const Order,
+                          const unsigned int,
+                          const Point&)
 {
   libMesh::err << "Hermite elements require the real element\n"
-	        << "to construct gradient-based degrees of freedom."
-	        << std::endl;
+               << "to construct gradient-based degrees of freedom."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -202,9 +202,9 @@ Real FE<2,HERMITE>::shape(const ElemType,
 
 template <>
 Real FE<2,HERMITE>::shape(const Elem* elem,
-			  const Order order,
-			  const unsigned int i,
-			  const Point& p)
+                          const Order order,
+                          const unsigned int i,
+                          const Point& p)
 {
   libmesh_assert(elem);
 
@@ -253,14 +253,14 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 
 template <>
 Real FE<2,HERMITE>::shape_deriv(const ElemType,
-				const Order,
-				const unsigned int,
-				const unsigned int,
-				const Point&)
+                                const Order,
+                                const unsigned int,
+                                const unsigned int,
+                                const Point&)
 {
   libMesh::err << "Hermite elements require the real element\n"
-	        << "to construct gradient-based degrees of freedom."
-	        << std::endl;
+               << "to construct gradient-based degrees of freedom."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -270,10 +270,10 @@ Real FE<2,HERMITE>::shape_deriv(const ElemType,
 
 template <>
 Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
-				const Order order,
-				const unsigned int i,
-				const unsigned int j,
-				const Point& p)
+                                const Order order,
+                                const unsigned int i,
+                                const unsigned int j,
+                                const Point& p)
 {
   libmesh_assert(elem);
   libmesh_assert (j == 0 || j == 1);

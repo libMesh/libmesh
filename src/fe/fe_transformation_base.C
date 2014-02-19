@@ -27,7 +27,7 @@ namespace libMesh
   {
     switch( fe_type.family )
       {
-	/* H1 Conforming Elements */
+        /* H1 Conforming Elements */
       case LAGRANGE:
       case HIERARCHIC:
       case BERNSTEIN:
@@ -41,30 +41,30 @@ namespace libMesh
       case L2_LAGRANGE: /* PB: Shouldn't this be L2 conforming? */
       case JACOBI_20_00: /* PB: For infinite elements... */
       case JACOBI_30_00: /* PB: For infinite elements... */
-	{
-	  AutoPtr<FETransformationBase<OutputShape> > ap( new H1FETransformation<OutputShape> );
-	  return ap;
-	}
-	/* HCurl Conforming Elements */
+        {
+          AutoPtr<FETransformationBase<OutputShape> > ap( new H1FETransformation<OutputShape> );
+          return ap;
+        }
+        /* HCurl Conforming Elements */
       case NEDELEC_ONE:
-	{
-	  AutoPtr<FETransformationBase<OutputShape> > ap( new HCurlFETransformation<OutputShape> );
-	  return ap;
-	}
+        {
+          AutoPtr<FETransformationBase<OutputShape> > ap( new HCurlFETransformation<OutputShape> );
+          return ap;
+        }
 
-	/* HDiv Conforming Elements */
-	/* L2 Conforming Elements */
+        /* HDiv Conforming Elements */
+        /* L2 Conforming Elements */
 
-	/* Other... */
+        /* Other... */
       case SCALAR:
-	{
-	  // Should never need this for SCALARs
-	  AutoPtr<FETransformationBase<OutputShape> > ap( new H1FETransformation<OutputShape> );
-	  return ap;
-	}
+        {
+          // Should never need this for SCALARs
+          AutoPtr<FETransformationBase<OutputShape> > ap( new H1FETransformation<OutputShape> );
+          return ap;
+        }
 
       default:
-	libmesh_error();
+        libmesh_error();
       }
 
     // Should never get here...

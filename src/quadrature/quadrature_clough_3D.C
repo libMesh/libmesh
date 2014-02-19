@@ -36,8 +36,8 @@ void QClough::init_3D(const ElemType type_in,
       // Unsupported type
     default:
       {
-	libMesh::err << "ERROR: Unsupported type: " << type_in << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: Unsupported type: " << type_in << std::endl;
+        libmesh_error();
       }
     }
 

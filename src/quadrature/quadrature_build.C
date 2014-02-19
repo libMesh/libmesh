@@ -35,19 +35,19 @@ namespace libMesh
 
 //---------------------------------------------------------------
 AutoPtr<QBase> QBase::build (const std::string &type,
-			     const unsigned int _dim,
-			     const Order _order)
+                             const unsigned int _dim,
+                             const Order _order)
 {
   return QBase::build (Utility::string_to_enum<QuadratureType> (type),
-		       _dim,
-		       _order);
+                       _dim,
+                       _order);
 }
 
 
 
 AutoPtr<QBase> QBase::build(const QuadratureType _qt,
-			    const unsigned int _dim,
-			    const Order _order)
+                            const unsigned int _dim,
+                            const Order _order)
 {
   switch (_qt)
     {
@@ -55,109 +55,109 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
     case QCLOUGH:
       {
 #ifdef DEBUG
-	if (_order > TWENTYTHIRD)
-	  {
-	    libMesh::out << "WARNING: Clough quadrature implemented" << std::endl
-		          << " up to TWENTYTHIRD order." << std::endl;
-	  }
+        if (_order > TWENTYTHIRD)
+          {
+            libMesh::out << "WARNING: Clough quadrature implemented" << std::endl
+                         << " up to TWENTYTHIRD order." << std::endl;
+          }
 #endif
 
-	AutoPtr<QBase> ap(new QClough(_dim, _order));
-	return ap;
+        AutoPtr<QBase> ap(new QClough(_dim, _order));
+        return ap;
       }
 
     case QGAUSS:
       {
 
 #ifdef DEBUG
-	if (_order > FORTYTHIRD)
-	  {
-	    libMesh::out << "WARNING: Gauss quadrature implemented" << std::endl
-		          << " up to FORTYTHIRD order." << std::endl;
-	  }
+        if (_order > FORTYTHIRD)
+          {
+            libMesh::out << "WARNING: Gauss quadrature implemented" << std::endl
+                         << " up to FORTYTHIRD order." << std::endl;
+          }
 #endif
 
-	AutoPtr<QBase> ap(new QGauss(_dim, _order));
-	return ap;
+        AutoPtr<QBase> ap(new QGauss(_dim, _order));
+        return ap;
       }
 
     case QJACOBI_1_0:
       {
 
 #ifdef DEBUG
-	if (_order > TWENTYTHIRD)
-	  {
-	    libMesh::out << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
-		          << " up to TWENTYTHIRD order." << std::endl;
-	  }
+        if (_order > TWENTYTHIRD)
+          {
+            libMesh::out << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
+                         << " up to TWENTYTHIRD order." << std::endl;
+          }
 
-	if (_dim > 1)
-	  {
-	    libMesh::out << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
-		          << " in 1D only." << std::endl;
-	  }
+        if (_dim > 1)
+          {
+            libMesh::out << "WARNING: Jacobi(1,0) quadrature implemented" << std::endl
+                         << " in 1D only." << std::endl;
+          }
 #endif
 
-	AutoPtr<QBase> ap(new QJacobi(_dim, _order, 1, 0));
-	return ap;
+        AutoPtr<QBase> ap(new QJacobi(_dim, _order, 1, 0));
+        return ap;
       }
 
     case QJACOBI_2_0:
       {
 
 #ifdef DEBUG
-	if (_order > TWENTYTHIRD)
-	  {
-	    libMesh::out << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
-		          << " up to TWENTYTHIRD order." << std::endl;
-	  }
+        if (_order > TWENTYTHIRD)
+          {
+            libMesh::out << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
+                         << " up to TWENTYTHIRD order." << std::endl;
+          }
 
-	if (_dim > 1)
-	  {
-	    libMesh::out << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
-		          << " in 1D only." << std::endl;
-	  }
+        if (_dim > 1)
+          {
+            libMesh::out << "WARNING: Jacobi(2,0) quadrature implemented" << std::endl
+                         << " in 1D only." << std::endl;
+          }
 #endif
 
-	AutoPtr<QBase> ap(new QJacobi(_dim, _order, 2, 0));
-	return ap;
+        AutoPtr<QBase> ap(new QJacobi(_dim, _order, 2, 0));
+        return ap;
       }
 
     case QSIMPSON:
       {
 
 #ifdef DEBUG
-	if (_order > THIRD)
-	  {
-	    libMesh::out << "WARNING: Simpson rule provides only" << std::endl
-		          << " THIRD order!" << std::endl;
-	  }
+        if (_order > THIRD)
+          {
+            libMesh::out << "WARNING: Simpson rule provides only" << std::endl
+                         << " THIRD order!" << std::endl;
+          }
 #endif
 
-	AutoPtr<QBase> ap(new QSimpson(_dim));
-	return ap;
+        AutoPtr<QBase> ap(new QSimpson(_dim));
+        return ap;
       }
 
     case QTRAP:
       {
 
 #ifdef DEBUG
-	if (_order > FIRST)
-	  {
-	    libMesh::out << "WARNING: Trapezoidal rule provides only" << std::endl
-		          << " FIRST order!" << std::endl;
-	  }
+        if (_order > FIRST)
+          {
+            libMesh::out << "WARNING: Trapezoidal rule provides only" << std::endl
+                         << " FIRST order!" << std::endl;
+          }
 #endif
 
-	AutoPtr<QBase> ap(new QTrap(_dim));
-	return ap;
+        AutoPtr<QBase> ap(new QTrap(_dim));
+        return ap;
       }
 
 
     default:
       {
-	libMesh::err << "ERROR: Bad qt=" << _qt << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: Bad qt=" << _qt << std::endl;
+        libmesh_error();
       }
     }
 

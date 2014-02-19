@@ -44,9 +44,9 @@ namespace libMesh
 
 template <>
 Real FE<2,XYZ>::shape(const ElemType,
-		      const Order,
-		      const unsigned int,
-		      const Point&)
+                      const Order,
+                      const unsigned int,
+                      const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
                 << "because the centroid is needed."
@@ -60,9 +60,9 @@ Real FE<2,XYZ>::shape(const ElemType,
 
 template <>
 Real FE<2,XYZ>::shape(const Elem* elem,
-		      const Order libmesh_dbg_var(order),
-		      const unsigned int i,
-		      const Point& point_in)
+                      const Order libmesh_dbg_var(order),
+                      const unsigned int i,
+                      const Point& point_in)
 {
 #if LIBMESH_DIM > 1
 
@@ -181,10 +181,10 @@ Real FE<2,XYZ>::shape(const Elem* elem,
 
 template <>
 Real FE<2,XYZ>::shape_deriv(const ElemType,
-			    const Order,
-			    const unsigned int,
-			    const unsigned int,
-			    const Point&)
+                            const Order,
+                            const unsigned int,
+                            const unsigned int,
+                            const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
                 << "because the centroid is needed."
@@ -198,10 +198,10 @@ Real FE<2,XYZ>::shape_deriv(const ElemType,
 
 template <>
 Real FE<2,XYZ>::shape_deriv(const Elem* elem,
-			    const Order libmesh_dbg_var(order),
-			    const unsigned int i,
-			    const unsigned int j,
-			    const Point& point_in)
+                            const Order libmesh_dbg_var(order),
+                            const unsigned int i,
+                            const unsigned int j,
+                            const Point& point_in)
 {
 #if LIBMESH_DIM > 1
 
@@ -254,56 +254,56 @@ switch (j)
   case 0:
     {
       switch (i)
-	{
-	  // constants
-	case 0:
-	  return 0.;
+        {
+          // constants
+        case 0:
+          return 0.;
 
-	  // linears
-	case 1:
-	  return 1./distx;
+          // linears
+        case 1:
+          return 1./distx;
 
-	case 2:
-	  return 0.;
+        case 2:
+          return 0.;
 
-	  // quadratics
-	case 3:
-	  return 2.*dx/distx;
+          // quadratics
+        case 3:
+          return 2.*dx/distx;
 
-	case 4:
-	  return dy/distx;
+        case 4:
+          return dy/distx;
 
-	case 5:
-	  return 0.;
+        case 5:
+          return 0.;
 
-	  // cubics
-	case 6:
-	  return 3.*dx*dx/distx;
+          // cubics
+        case 6:
+          return 3.*dx*dx/distx;
 
-	case 7:
-	  return 2.*dx*dy/distx;
+        case 7:
+          return 2.*dx*dy/distx;
 
-	case 8:
-	  return dy*dy/distx;
+        case 8:
+          return dy*dy/distx;
 
-	case 9:
-	  return 0.;
+        case 9:
+          return 0.;
 
-	  // quartics
-	case 10:
-	  return 4.*dx*dx*dx/distx;
+          // quartics
+        case 10:
+          return 4.*dx*dx*dx/distx;
 
-	case 11:
-	  return 3.*dx*dx*dy/distx;
+        case 11:
+          return 3.*dx*dx*dy/distx;
 
-	case 12:
-	  return 2.*dx*dy*dy/distx;
+        case 12:
+          return 2.*dx*dy*dy/distx;
 
-	case 13:
-	  return dy*dy*dy/distx;
+        case 13:
+          return dy*dy*dy/distx;
 
-	case 14:
-	  return 0.;
+        case 14:
+          return 0.;
 
         default:
           unsigned int o = 0;
@@ -315,7 +315,7 @@ switch (j)
           for (unsigned int index=0; index != i2; index++)
             val *= dy;
           return val/distx;
-	}
+        }
     }
 
 
@@ -323,56 +323,56 @@ switch (j)
   case 1:
     {
       switch (i)
-	{
-	  // constants
-	case 0:
-	  return 0.;
+        {
+          // constants
+        case 0:
+          return 0.;
 
-	  // linears
-	case 1:
-	  return 0.;
+          // linears
+        case 1:
+          return 0.;
 
-	case 2:
-	  return 1./disty;
+        case 2:
+          return 1./disty;
 
-	  // quadratics
-	case 3:
-	  return 0.;
+          // quadratics
+        case 3:
+          return 0.;
 
-	case 4:
-	  return dx/disty;
+        case 4:
+          return dx/disty;
 
-	case 5:
-	  return 2.*dy/disty;
+        case 5:
+          return 2.*dy/disty;
 
-	  // cubics
-	case 6:
-	  return 0.;
+          // cubics
+        case 6:
+          return 0.;
 
-	case 7:
-	  return dx*dx/disty;
+        case 7:
+          return dx*dx/disty;
 
-	case 8:
-	  return 2.*dx*dy/disty;
+        case 8:
+          return 2.*dx*dy/disty;
 
-	case 9:
-	  return 3.*dy*dy/disty;
+        case 9:
+          return 3.*dy*dy/disty;
 
-	  // quartics
-	case 10:
-	  return 0.;
+          // quartics
+        case 10:
+          return 0.;
 
-	case 11:
-	  return dx*dx*dx/disty;
+        case 11:
+          return dx*dx*dx/disty;
 
-	case 12:
-	  return 2.*dx*dx*dy/disty;
+        case 12:
+          return 2.*dx*dx*dy/disty;
 
-	case 13:
-	  return 3.*dx*dy*dy/disty;
+        case 13:
+          return 3.*dx*dy*dy/disty;
 
-	case 14:
-	  return 4.*dy*dy*dy/disty;
+        case 14:
+          return 4.*dy*dy*dy/disty;
 
         default:
           unsigned int o = 0;
@@ -384,7 +384,7 @@ switch (j)
           for (unsigned int index=1; index <= i2; index++)
             val *= dy;
           return val/disty;
-	}
+        }
     }
 
 
@@ -402,10 +402,10 @@ switch (j)
 
 template <>
 Real FE<2,XYZ>::shape_second_deriv(const ElemType,
-			           const Order,
-			           const unsigned int,
-			           const unsigned int,
-			           const Point&)
+                                   const Order,
+                                   const unsigned int,
+                                   const unsigned int,
+                                   const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
                 << "because the centroid is needed."
@@ -419,10 +419,10 @@ Real FE<2,XYZ>::shape_second_deriv(const ElemType,
 
 template <>
 Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
-			           const Order libmesh_dbg_var(order),
-			           const unsigned int i,
-			           const unsigned int j,
-			           const Point& point_in)
+                                   const Order libmesh_dbg_var(order),
+                                   const unsigned int i,
+                                   const unsigned int j,
+                                   const Point& point_in)
 {
 #if LIBMESH_DIM > 1
 
@@ -477,46 +477,46 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
     case 0:
       {
         switch (i)
-	  {
-	    // constants
-	  case 0:
-	    // linears
-	  case 1:
-	  case 2:
-	    return 0.;
+          {
+            // constants
+          case 0:
+            // linears
+          case 1:
+          case 2:
+            return 0.;
 
-	    // quadratics
-	  case 3:
-	    return 2./dist2x;
+            // quadratics
+          case 3:
+            return 2./dist2x;
 
-	  case 4:
-	  case 5:
-	    return 0.;
+          case 4:
+          case 5:
+            return 0.;
 
-	    // cubics
-	  case 6:
-	    return 6.*dx/dist2x;
+            // cubics
+          case 6:
+            return 6.*dx/dist2x;
 
-	  case 7:
-	    return 2.*dy/dist2x;
+          case 7:
+            return 2.*dy/dist2x;
 
-	  case 8:
-	  case 9:
-	    return 0.;
+          case 8:
+          case 9:
+            return 0.;
 
-	    // quartics
-	  case 10:
-	    return 12.*dx*dx/dist2x;
+            // quartics
+          case 10:
+            return 12.*dx*dx/dist2x;
 
-	  case 11:
-	    return 6.*dx*dy/dist2x;
+          case 11:
+            return 6.*dx*dy/dist2x;
 
-	  case 12:
-	    return 2.*dy*dy/dist2x;
+          case 12:
+            return 2.*dy*dy/dist2x;
 
-	  case 13:
-	  case 14:
-	    return 0.;
+          case 13:
+          case 14:
+            return 0.;
 
           default:
             unsigned int o = 0;
@@ -528,59 +528,59 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
             for (unsigned int index=0; index != i2; index++)
               val *= dy;
             return val/dist2x;
-	  }
+          }
       }
 
       // d^2()/dxdy
     case 1:
       {
         switch (i)
-	  {
-	    // constants
-	  case 0:
+          {
+            // constants
+          case 0:
 
-	    // linears
-	  case 1:
-	  case 2:
-	    return 0.;
+            // linears
+          case 1:
+          case 2:
+            return 0.;
 
-	    // quadratics
-	  case 3:
-	    return 0.;
+            // quadratics
+          case 3:
+            return 0.;
 
-	  case 4:
-	    return 1./distxy;
+          case 4:
+            return 1./distxy;
 
-	  case 5:
-	    return 0.;
+          case 5:
+            return 0.;
 
-	    // cubics
-	  case 6:
-	    return 0.;
-	  case 7:
-	    return 2.*dx/distxy;
+            // cubics
+          case 6:
+            return 0.;
+          case 7:
+            return 2.*dx/distxy;
 
-	  case 8:
-	    return 2.*dy/distxy;
+          case 8:
+            return 2.*dy/distxy;
 
-	  case 9:
-	    return 0.;
+          case 9:
+            return 0.;
 
-	    // quartics
-	  case 10:
-	    return 0.;
+            // quartics
+          case 10:
+            return 0.;
 
-	  case 11:
-	    return 3.*dx*dx/distxy;
+          case 11:
+            return 3.*dx*dx/distxy;
 
-	  case 12:
-	    return 4.*dx*dy/distxy;
+          case 12:
+            return 4.*dx*dy/distxy;
 
-	  case 13:
-	    return 3.*dy*dy/distxy;
+          case 13:
+            return 3.*dy*dy/distxy;
 
-	  case 14:
-	    return 0.;
+          case 14:
+            return 0.;
 
           default:
             unsigned int o = 0;
@@ -592,56 +592,56 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
             for (unsigned int index=1; index < i2; index++)
               val *= dy;
             return val/distxy;
-	  }
+          }
       }
 
       // d^2()/dy^2
     case 2:
       {
         switch (i)
-	  {
-	    // constants
-	  case 0:
+          {
+            // constants
+          case 0:
 
-	    // linears
-	  case 1:
-	  case 2:
-	    return 0.;
+            // linears
+          case 1:
+          case 2:
+            return 0.;
 
-	    // quadratics
-	  case 3:
-	  case 4:
-	    return 0.;
+            // quadratics
+          case 3:
+          case 4:
+            return 0.;
 
-	  case 5:
-	    return 2./dist2y;
+          case 5:
+            return 2./dist2y;
 
-	    // cubics
-	  case 6:
-	    return 0.;
+            // cubics
+          case 6:
+            return 0.;
 
-	  case 7:
-	    return 0.;
+          case 7:
+            return 0.;
 
-	  case 8:
-	    return 2.*dx/dist2y;
+          case 8:
+            return 2.*dx/dist2y;
 
-	  case 9:
-	    return 6.*dy/dist2y;
+          case 9:
+            return 6.*dy/dist2y;
 
-	    // quartics
-	  case 10:
-	  case 11:
-	    return 0.;
+            // quartics
+          case 10:
+          case 11:
+            return 0.;
 
-	  case 12:
-	    return 2.*dx*dx/dist2y;
+          case 12:
+            return 2.*dx*dx/dist2y;
 
-	  case 13:
-	    return 6.*dx*dy/dist2y;
+          case 13:
+            return 6.*dx*dy/dist2y;
 
-	  case 14:
-	    return 12.*dy*dy/dist2y;
+          case 14:
+            return 12.*dy*dy/dist2y;
 
           default:
             unsigned int o = 0;
@@ -653,7 +653,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
             for (unsigned int index=2; index < i2; index++)
               val *= dy;
             return val/dist2y;
-	  }
+          }
       }
     }
 

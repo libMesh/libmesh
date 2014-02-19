@@ -63,15 +63,15 @@ DofObject::DofObject (const DofObject& dof_obj) :
       libmesh_assert_equal_to (this->n_var_groups(s), dof_obj.n_var_groups(s));
 
       for (unsigned int vg=0; vg<this->n_var_groups(s); vg++)
-	libmesh_assert_equal_to (this->n_vars(s,vg), dof_obj.n_vars(s,vg));
+        libmesh_assert_equal_to (this->n_vars(s,vg), dof_obj.n_vars(s,vg));
 
       for (unsigned int v=0; v<this->n_vars(s); v++)
-	{
-	  libmesh_assert_equal_to (this->n_comp(s,v), dof_obj.n_comp(s,v));
+        {
+          libmesh_assert_equal_to (this->n_comp(s,v), dof_obj.n_comp(s,v));
 
-	  for (unsigned int c=0; c<this->n_comp(s,v); c++)
-	    libmesh_assert_equal_to (this->dof_number(s,v,c), dof_obj.dof_number(s,v,c));
-	}
+          for (unsigned int c=0; c<this->n_comp(s,v); c++)
+            libmesh_assert_equal_to (this->dof_number(s,v,c), dof_obj.dof_number(s,v,c));
+        }
     }
 
 #endif
@@ -106,15 +106,15 @@ DofObject& DofObject::operator= (const DofObject& dof_obj)
       libmesh_assert_equal_to (this->n_var_groups(s), dof_obj.n_var_groups(s));
 
       for (unsigned int vg=0; vg<this->n_var_groups(s); vg++)
-	libmesh_assert_equal_to (this->n_vars(s,vg), dof_obj.n_vars(s,vg));
+        libmesh_assert_equal_to (this->n_vars(s,vg), dof_obj.n_vars(s,vg));
 
       for (unsigned int v=0; v<this->n_vars(s); v++)
-	{
-	  libmesh_assert_equal_to (this->n_comp(s,v), dof_obj.n_comp(s,v));
+        {
+          libmesh_assert_equal_to (this->n_comp(s,v), dof_obj.n_comp(s,v));
 
-	  for (unsigned int c=0; c<this->n_comp(s,v); c++)
-	    libmesh_assert_equal_to (this->dof_number(s,v,c), dof_obj.dof_number(s,v,c));
-	}
+          for (unsigned int c=0; c<this->n_comp(s,v); c++)
+            libmesh_assert_equal_to (this->dof_number(s,v,c), dof_obj.dof_number(s,v,c));
+        }
     }
 
 #endif
@@ -219,7 +219,7 @@ void DofObject::add_system()
 
 
 void DofObject::set_n_vars_per_group(const unsigned int s,
-				     const std::vector<unsigned int> &nvpg)
+                                     const std::vector<unsigned int> &nvpg)
 {
 
   libmesh_assert_less (s, this->n_systems());
@@ -238,10 +238,10 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
   if (nvg == this->n_var_groups(s))
     {
       for (unsigned int vg=0; vg<nvg; vg++)
-	{
-	  this->set_n_comp_group(s,vg,0);
-	  libmesh_assert_equal_to (this->n_vars(s,vg), nvpg[vg]);
-	}
+        {
+          this->set_n_comp_group(s,vg,0);
+          libmesh_assert_equal_to (this->n_vars(s,vg), nvpg[vg]);
+        }
       return;
     }
 
@@ -261,15 +261,15 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
       const unsigned int old_nvg_s = this->n_var_groups(s);
 
       DofObject::index_buffer_t::iterator
-	it  = _idx_buf.begin(),
-	end = _idx_buf.begin();
+        it  = _idx_buf.begin(),
+        end = _idx_buf.begin();
 
       std::advance(it,  this->start_idx(s));
       std::advance(end, this->end_idx(s));
       _idx_buf.erase(it,end);
 
       for (unsigned int ctr=(s+1); ctr<this->n_systems(); ctr++)
-	_idx_buf[ctr] -= 2*old_nvg_s;
+        _idx_buf[ctr] -= 2*old_nvg_s;
     }
 
   // better not have any now!
@@ -291,8 +291,8 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
     DofObject::index_buffer_t var_idxs(2*nvg);
     for (unsigned int vg=0; vg<nvg; vg++)
       {
-	var_idxs[2*vg    ] = ncv_magic*nvpg[vg] + 0;
-	var_idxs[2*vg + 1] = invalid_id - 1;
+        var_idxs[2*vg    ] = ncv_magic*nvpg[vg] + 0;
+        var_idxs[2*vg + 1] = invalid_id - 1;
       }
 
     DofObject::index_buffer_t::iterator it = _idx_buf.begin();
@@ -338,8 +338,8 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
 
 
 void DofObject::set_n_comp(const unsigned int s,
-			   const unsigned int var,
-			   const unsigned int ncomp)
+                           const unsigned int var,
+                           const unsigned int ncomp)
 {
   libmesh_assert_less (s,   this->n_systems());
   libmesh_assert_less (var, this->n_vars(s));
@@ -350,8 +350,8 @@ void DofObject::set_n_comp(const unsigned int s,
 
 
 void DofObject::set_n_comp_group(const unsigned int s,
-				 const unsigned int vg,
-				 const unsigned int ncomp)
+                                 const unsigned int vg,
+                                 const unsigned int ncomp)
 {
   libmesh_assert_less (s,  this->n_systems());
   libmesh_assert_less (vg, this->n_var_groups(s));
@@ -364,8 +364,8 @@ void DofObject::set_n_comp_group(const unsigned int s,
     {
       const index_t ncvm = ncv_magic;
       libMesh::err << "ERROR: ncomp must be less than DofObject::ncv_magic!\n"
-		   << "ncomp = " << ncomp << ", ncv_magic = " << ncvm
-		   << "\nrecompile and try again!\n";
+                   << "ncomp = " << ncomp << ", ncv_magic = " << ncvm
+                   << "\nrecompile and try again!\n";
       libmesh_error();
     }
 #endif
@@ -379,9 +379,9 @@ void DofObject::set_n_comp_group(const unsigned int s,
 
   // if (ncomp)
   //   libMesh::out << "s,vg,ncomp="
-  // 	      << s  << ","
-  // 	      << vg << ","
-  // 	      << ncomp << '\n';
+  //       << s  << ","
+  //       << vg << ","
+  //       << ncomp << '\n';
 
   // set the number of components, maintaining the number
   // of variables in the group
@@ -393,11 +393,11 @@ void DofObject::set_n_comp_group(const unsigned int s,
 
   // this->debug_buffer();
   // libMesh::out << "s,vg = " << s << "," << vg << '\n'
-  // 	    << "base_offset=" << base_offset << '\n'
-  // 	    << "this->n_comp(s,vg)=" << this->n_comp(s,vg) << '\n'
-  // 	    << "this->n_comp_group(s,vg)=" << this->n_comp_group(s,vg) << '\n'
-  // 	    << "this->n_vars(s,vg)=" << this->n_vars(s,vg) << '\n'
-  // 	    << "this->n_var_groups(s)=" << this->n_var_groups(s) << '\n';
+  //     << "base_offset=" << base_offset << '\n'
+  //     << "this->n_comp(s,vg)=" << this->n_comp(s,vg) << '\n'
+  //     << "this->n_comp_group(s,vg)=" << this->n_comp_group(s,vg) << '\n'
+  //     << "this->n_vars(s,vg)=" << this->n_vars(s,vg) << '\n'
+  //     << "this->n_var_groups(s)=" << this->n_var_groups(s) << '\n';
 
   libmesh_assert_equal_to (ncomp, this->n_comp_group(s,vg));
 }
@@ -405,9 +405,9 @@ void DofObject::set_n_comp_group(const unsigned int s,
 
 
 void DofObject::set_dof_number(const unsigned int s,
-			       const unsigned int var,
-			       const unsigned int comp,
-			       const dof_id_type dn)
+                               const unsigned int var,
+                               const unsigned int comp,
+                               const dof_id_type dn)
 {
   libmesh_assert_less (s,    this->n_systems());
   libmesh_assert_less (var,  this->n_vars(s));
@@ -426,7 +426,7 @@ void DofObject::set_dof_number(const unsigned int s,
   // We intend to change all dof numbers together or not at all
   if (comp || vig)
     libmesh_assert ((dn == invalid_id && base_idx == invalid_id) ||
-		    (dn == base_idx + vig*ncg + comp));
+                    (dn == base_idx + vig*ncg + comp));
 
   // only explicitly store the base index for vig==0, comp==0
   else
@@ -490,7 +490,7 @@ void DofObject::unpack_indexing(std::vector<largest_id_type>::const_iterator beg
   this->clear_old_dof_object();
   const int has_old_dof_object = *begin++;
   libmesh_assert(has_old_dof_object == 1 ||
-		 has_old_dof_object == 0);
+                 has_old_dof_object == 0);
 #endif
 
   const int size = *begin++;

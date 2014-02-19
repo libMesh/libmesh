@@ -15,18 +15,18 @@ namespace libMesh
 
     for(; stored_sols_it != stored_sols_end; ++stored_sols_it)
       {
-	// The saved vectors at this timestep
-	std::map<std::string, NumericVector<Number> *> saved_vectors = stored_sols_it->second;
+        // The saved vectors at this timestep
+        std::map<std::string, NumericVector<Number> *> saved_vectors = stored_sols_it->second;
 
-	std::map<std::string, NumericVector<Number> *>::iterator vec = saved_vectors.begin();
-	std::map<std::string, NumericVector<Number> *>::iterator vec_end = saved_vectors.end();
+        std::map<std::string, NumericVector<Number> *>::iterator vec = saved_vectors.begin();
+        std::map<std::string, NumericVector<Number> *>::iterator vec_end = saved_vectors.end();
 
-	// Loop over all the saved vectors
-	for (; vec != vec_end; ++vec)
-	  {
-	    // Delete this saved vector
-	    delete vec->second;
-	  }
+        // Loop over all the saved vectors
+        for (; vec != vec_end; ++vec)
+          {
+            // Delete this saved vector
+            delete vec->second;
+          }
       }
   }
 
@@ -113,19 +113,19 @@ namespace libMesh
     // Loop over all the system vectors
     for (System::vectors_iterator vec = _system.vectors_begin(); vec != _system.vectors_end(); ++vec)
       {
-	// The name of this vector
-	const std::string& vec_name = vec->first;
+        // The name of this vector
+        const std::string& vec_name = vec->first;
 
-	// If we haven't seen this vector before or if we have and
-	// want to overwrite it
-	if ((overwrite_previously_stored ||
-	     !saved_vectors.count(vec_name)) &&
+        // If we haven't seen this vector before or if we have and
+        // want to overwrite it
+        if ((overwrite_previously_stored ||
+             !saved_vectors.count(vec_name)) &&
           // and if we think it's worth preserving
              _system.vector_preservation(vec_name))
-	  {
-	    // Then we save it.
-	    saved_vectors[vec_name] = vec->second->clone().release();
-	  }
+          {
+            // Then we save it.
+            saved_vectors[vec_name] = vec->second->clone().release();
+          }
       }
 
     // Of course, we will usually save the actual solution
@@ -153,7 +153,7 @@ namespace libMesh
     if(stored_sols == stored_solutions.end() ||
        std::abs(recovery_time - _system.time) > TOLERANCE)
       {
-//	libMesh::out << "No more solutions to recover ! We are at time t = " <<
+        //libMesh::out << "No more solutions to recover ! We are at time t = " <<
 //                     _system.time << std::endl;
         return;
       }
@@ -167,8 +167,8 @@ namespace libMesh
     // Loop over all the saved vectors
     for (; vec != vec_end; ++vec)
       {
-  	// The name of this vector
-  	const std::string& vec_name = vec->first;
+        // The name of this vector
+        const std::string& vec_name = vec->first;
 
         // Get the vec_name entry in the saved vectors map and set the
         // current system vec[vec_name] entry to it

@@ -83,7 +83,7 @@ bool Hex20::is_face(const unsigned int) const
 }
 
 bool Hex20::is_node_on_side(const unsigned int n,
-			    const unsigned int s) const
+                            const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 8; ++i)
@@ -93,7 +93,7 @@ bool Hex20::is_node_on_side(const unsigned int n,
 }
 
 bool Hex20::is_node_on_edge(const unsigned int n,
-			    const unsigned int e) const
+                            const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 3; ++i)
@@ -143,7 +143,7 @@ bool Hex20::has_affine_map() const
 
 
 AutoPtr<Elem> Hex20::build_side (const unsigned int i,
-				 bool proxy ) const
+                                 bool proxy ) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -160,91 +160,91 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i,
 
       // Think of a unit cube: (-1,1) x (-1,1)x (1,1)
       switch (i)
-	{
-	case 0:  // the face at z=0
-	  {
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(3);
-	    face->set_node(2) = this->get_node(2);
-	    face->set_node(3) = this->get_node(1);
-	    face->set_node(4) = this->get_node(11);
-	    face->set_node(5) = this->get_node(10);
-	    face->set_node(6) = this->get_node(9);
-	    face->set_node(7) = this->get_node(8);
+        {
+        case 0:  // the face at z=0
+          {
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(3);
+            face->set_node(2) = this->get_node(2);
+            face->set_node(3) = this->get_node(1);
+            face->set_node(4) = this->get_node(11);
+            face->set_node(5) = this->get_node(10);
+            face->set_node(6) = this->get_node(9);
+            face->set_node(7) = this->get_node(8);
 
-	    return face;
-	  }
-	case 1:  // the face at y = 0
-	  {
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(5);
-	    face->set_node(3) = this->get_node(4);
-	    face->set_node(4) = this->get_node(8);
-	    face->set_node(5) = this->get_node(13);
-	    face->set_node(6) = this->get_node(16);
-	    face->set_node(7) = this->get_node(12);
+            return face;
+          }
+        case 1:  // the face at y = 0
+          {
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(5);
+            face->set_node(3) = this->get_node(4);
+            face->set_node(4) = this->get_node(8);
+            face->set_node(5) = this->get_node(13);
+            face->set_node(6) = this->get_node(16);
+            face->set_node(7) = this->get_node(12);
 
-	    return face;
-	  }
-	case 2:  // the face at x=1
-	  {
-	    face->set_node(0) = this->get_node(1);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(6);
-	    face->set_node(3) = this->get_node(5);
-	    face->set_node(4) = this->get_node(9);
-	    face->set_node(5) = this->get_node(14);
-	    face->set_node(6) = this->get_node(17);
-	    face->set_node(7) = this->get_node(13);
+            return face;
+          }
+        case 2:  // the face at x=1
+          {
+            face->set_node(0) = this->get_node(1);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(6);
+            face->set_node(3) = this->get_node(5);
+            face->set_node(4) = this->get_node(9);
+            face->set_node(5) = this->get_node(14);
+            face->set_node(6) = this->get_node(17);
+            face->set_node(7) = this->get_node(13);
 
-	    return face;
-	  }
-	case 3: // the face at y=1
-	  {
-	    face->set_node(0) = this->get_node(2);
-	    face->set_node(1) = this->get_node(3);
-	    face->set_node(2) = this->get_node(7);
-	    face->set_node(3) = this->get_node(6);
-	    face->set_node(4) = this->get_node(10);
-	    face->set_node(5) = this->get_node(15);
-	    face->set_node(6) = this->get_node(18);
-	    face->set_node(7) = this->get_node(14);
+            return face;
+          }
+        case 3: // the face at y=1
+          {
+            face->set_node(0) = this->get_node(2);
+            face->set_node(1) = this->get_node(3);
+            face->set_node(2) = this->get_node(7);
+            face->set_node(3) = this->get_node(6);
+            face->set_node(4) = this->get_node(10);
+            face->set_node(5) = this->get_node(15);
+            face->set_node(6) = this->get_node(18);
+            face->set_node(7) = this->get_node(14);
 
-	    return face;
-	  }
-	case 4: // the face at x=0
-	  {
-	    face->set_node(0) = this->get_node(3);
-	    face->set_node(1) = this->get_node(0);
-	    face->set_node(2) = this->get_node(4);
-	    face->set_node(3) = this->get_node(7);
-	    face->set_node(4) = this->get_node(11);
-	    face->set_node(5) = this->get_node(12);
-	    face->set_node(6) = this->get_node(19);
-	    face->set_node(7) = this->get_node(15);
+            return face;
+          }
+        case 4: // the face at x=0
+          {
+            face->set_node(0) = this->get_node(3);
+            face->set_node(1) = this->get_node(0);
+            face->set_node(2) = this->get_node(4);
+            face->set_node(3) = this->get_node(7);
+            face->set_node(4) = this->get_node(11);
+            face->set_node(5) = this->get_node(12);
+            face->set_node(6) = this->get_node(19);
+            face->set_node(7) = this->get_node(15);
 
-	    return face;
-	  }
-	case 5: // the face at z=1
-	  {
-	    face->set_node(0) = this->get_node(4);
-	    face->set_node(1) = this->get_node(5);
-	    face->set_node(2) = this->get_node(6);
-	    face->set_node(3) = this->get_node(7);
-	    face->set_node(4) = this->get_node(16);
-	    face->set_node(5) = this->get_node(17);
-	    face->set_node(6) = this->get_node(18);
-	    face->set_node(7) = this->get_node(19);
+            return face;
+          }
+        case 5: // the face at z=1
+          {
+            face->set_node(0) = this->get_node(4);
+            face->set_node(1) = this->get_node(5);
+            face->set_node(2) = this->get_node(6);
+            face->set_node(3) = this->get_node(7);
+            face->set_node(4) = this->get_node(16);
+            face->set_node(5) = this->get_node(17);
+            face->set_node(6) = this->get_node(18);
+            face->set_node(7) = this->get_node(19);
 
-	    return face;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	    return face;
-	  }
-	}
+            return face;
+          }
+        default:
+          {
+            libmesh_error();
+            return face;
+          }
+        }
     }
 
   // We'll never get here.
@@ -265,8 +265,8 @@ AutoPtr<Elem> Hex20::build_edge (const unsigned int i) const
 
 
 void Hex20::connectivity(const unsigned int sc,
-			 const IOPackage iop,
-			 std::vector<dof_id_type>& conn) const
+                         const IOPackage iop,
+                         std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -277,57 +277,57 @@ void Hex20::connectivity(const unsigned int sc,
     {
     case TECPLOT:
       {
-	switch (sc)
-	  {
-	  case 0:
-	    conn.resize(8);
-	    conn[0] = this->node(0)+1;
-	    conn[1] = this->node(1)+1;
-	    conn[2] = this->node(2)+1;
-	    conn[3] = this->node(3)+1;
-	    conn[4] = this->node(4)+1;
-	    conn[5] = this->node(5)+1;
-	    conn[6] = this->node(6)+1;
-	    conn[7] = this->node(7)+1;
+        switch (sc)
+          {
+          case 0:
+            conn.resize(8);
+            conn[0] = this->node(0)+1;
+            conn[1] = this->node(1)+1;
+            conn[2] = this->node(2)+1;
+            conn[3] = this->node(3)+1;
+            conn[4] = this->node(4)+1;
+            conn[5] = this->node(5)+1;
+            conn[6] = this->node(6)+1;
+            conn[7] = this->node(7)+1;
 
-	    return;
+            return;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
     case VTK:
       {
-	switch (sc)
-	  {
-	  case 0:
-	    conn.resize(20);
-	    conn[0] = this->node(0);
-	    conn[1] = this->node(1);
-	    conn[2] = this->node(2);
-	    conn[3] = this->node(3);
-	    conn[4] = this->node(4);
-	    conn[5] = this->node(5);
-	    conn[6] = this->node(6);
-	    conn[7] = this->node(7);
-	    conn[8] = this->node(8);
-	    conn[9] = this->node(9);
-	    conn[10] = this->node(10);
-	    conn[11] = this->node(11);
-	    conn[12] = this->node(16);
-	    conn[13] = this->node(17);
-	    conn[14] = this->node(18);
-	    conn[15] = this->node(19);
-	    conn[16] = this->node(12);
-	    conn[17] = this->node(13);
-	    conn[18] = this->node(14);
-	    conn[19] = this->node(15);
-	    return;
+        switch (sc)
+          {
+          case 0:
+            conn.resize(20);
+            conn[0] = this->node(0);
+            conn[1] = this->node(1);
+            conn[2] = this->node(2);
+            conn[3] = this->node(3);
+            conn[4] = this->node(4);
+            conn[5] = this->node(5);
+            conn[6] = this->node(6);
+            conn[7] = this->node(7);
+            conn[8] = this->node(8);
+            conn[9] = this->node(9);
+            conn[10] = this->node(10);
+            conn[11] = this->node(11);
+            conn[12] = this->node(16);
+            conn[13] = this->node(17);
+            conn[14] = this->node(18);
+            conn[15] = this->node(19);
+            conn[16] = this->node(12);
+            conn[17] = this->node(13);
+            conn[18] = this->node(14);
+            conn[19] = this->node(15);
+            return;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
     default:
@@ -341,7 +341,7 @@ void Hex20::connectivity(const unsigned int sc,
 
 
 unsigned short int Hex20::second_order_adjacent_vertex (const unsigned int n,
-							const unsigned int v) const
+                                                        const unsigned int v) const
 {
   libmesh_assert_greater_equal (n, this->n_vertices());
   libmesh_assert_less (n, this->n_nodes());

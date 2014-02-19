@@ -36,8 +36,8 @@ namespace libMesh
 // TransientSystem implementation
 template <class Base>
 TransientSystem<Base>::TransientSystem (EquationSystems& es,
-					const std::string& name_in,
-					const unsigned int number_in) :
+                                        const std::string& name_in,
+                                        const unsigned int number_in) :
 
   Base                 (es, name_in, number_in)
 {
@@ -162,12 +162,12 @@ void TransientSystem<Base>::re_update ()
   // Update the old & older solutions with the send_list,
   // which may have changed since their last update.
   older_local_solution->localize (first_local_dof,
-				  end_local_dof-1,
-				  send_list);
+                                  end_local_dof-1,
+                                  send_list);
 
   old_local_solution->localize (first_local_dof,
-				end_local_dof-1,
-				send_list);
+                                end_local_dof-1,
+                                send_list);
 }
 
 

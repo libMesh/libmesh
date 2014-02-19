@@ -36,9 +36,9 @@ namespace libMesh
 
 template <>
 Real FE<1,BERNSTEIN>::shape(const ElemType,
-			    const Order order,
-			    const unsigned int i,
-			    const Point& p)
+                            const Order order,
+                            const unsigned int i,
+                            const Point& p)
 {
   const Real xi = p(0);
   using Utility::pow;
@@ -48,146 +48,146 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
     case FIRST:
 
       switch(i)
-	{
-	case 0:
-	  return (1.-xi)/2.;
-	case 1:
-	  return (1.+xi)/2.;
-	default:
-	  libMesh::err << "Invalid shape function index!" << std::endl;
-	  libmesh_error();
-	}
+        {
+        case 0:
+          return (1.-xi)/2.;
+        case 1:
+          return (1.+xi)/2.;
+        default:
+          libMesh::err << "Invalid shape function index!" << std::endl;
+          libmesh_error();
+        }
 
     case SECOND:
 
       switch(i)
-	{
-	case 0:
-	  return (1./4.)*pow<2>(1.-xi);
-	case 1:
-	  return (1./4.)*pow<2>(1.+xi);
-	case 2:
-	  return (1./2.)*(1.-xi)*(1.+xi);
-	default:
-	  libMesh::err << "Invalid shape function index!" << std::endl;
-	  libmesh_error();
-	}
+        {
+        case 0:
+          return (1./4.)*pow<2>(1.-xi);
+        case 1:
+          return (1./4.)*pow<2>(1.+xi);
+        case 2:
+          return (1./2.)*(1.-xi)*(1.+xi);
+        default:
+          libMesh::err << "Invalid shape function index!" << std::endl;
+          libmesh_error();
+        }
 
     case THIRD:
 
       switch(i)
-	{
-	case 0:
-	  return (1./8.)*pow<3>(1.-xi);
-	case 1:
-	  return (1./8.)*pow<3>(1.+xi);
-	case 2:
-	  return (3./8.)*(1.+xi)*pow<2>(1.-xi);
-	case 3:
-	  return (3./8.)*pow<2>(1.+xi)*(1.-xi);
-	default:
-	  libMesh::err << "Invalid shape function index!" << std::endl;
-	  libmesh_error();
-	}
+        {
+        case 0:
+          return (1./8.)*pow<3>(1.-xi);
+        case 1:
+          return (1./8.)*pow<3>(1.+xi);
+        case 2:
+          return (3./8.)*(1.+xi)*pow<2>(1.-xi);
+        case 3:
+          return (3./8.)*pow<2>(1.+xi)*(1.-xi);
+        default:
+          libMesh::err << "Invalid shape function index!" << std::endl;
+          libmesh_error();
+        }
 
     case FOURTH:
 
       switch(i)
-	{
-	case 0:
-	  return (1./16.)*pow<4>(1.-xi);
-	case 1:
-	  return (1./16.)*pow<4>(1.+xi);
-	case 2:
-	  return (1./ 4.)*(1.+xi)*pow<3>(1.-xi);
-	case 3:
-	  return (3./ 8.)*pow<2>(1.+xi)*pow<2>(1.-xi);
-	case 4:
-	  return (1./ 4.)*pow<3>(1.+xi)*(1.-xi);
-	default:
-	  libMesh::err << "Invalid shape function index!" << std::endl;
-	  libmesh_error();
-	}
+        {
+        case 0:
+          return (1./16.)*pow<4>(1.-xi);
+        case 1:
+          return (1./16.)*pow<4>(1.+xi);
+        case 2:
+          return (1./ 4.)*(1.+xi)*pow<3>(1.-xi);
+        case 3:
+          return (3./ 8.)*pow<2>(1.+xi)*pow<2>(1.-xi);
+        case 4:
+          return (1./ 4.)*pow<3>(1.+xi)*(1.-xi);
+        default:
+          libMesh::err << "Invalid shape function index!" << std::endl;
+          libmesh_error();
+        }
 
 
     case FIFTH:
 
       switch(i)
-	{
-	case 0:
-	  return (1./32.)*pow<5>(1.-xi);
-	case 1:
-	  return (1./32.)*pow<5>(1.+xi);
-	case 2:
-	  return (5./32.)*(1.+xi)*pow<4>(1.-xi);
-	case 3:
-	  return (5./16.)*pow<2>(1.+xi)*pow<3>(1.-xi);
-	case 4:
-	  return (5./16.)*pow<3>(1.+xi)*pow<2>(1.-xi);
-	case 5:
-	  return (5./32.)*pow<4>(1.+xi)*(1.-xi);
-	default:
-	  libMesh::err << "Invalid shape function index!" << std::endl;
-	  libmesh_error();
-	}
+        {
+        case 0:
+          return (1./32.)*pow<5>(1.-xi);
+        case 1:
+          return (1./32.)*pow<5>(1.+xi);
+        case 2:
+          return (5./32.)*(1.+xi)*pow<4>(1.-xi);
+        case 3:
+          return (5./16.)*pow<2>(1.+xi)*pow<3>(1.-xi);
+        case 4:
+          return (5./16.)*pow<3>(1.+xi)*pow<2>(1.-xi);
+        case 5:
+          return (5./32.)*pow<4>(1.+xi)*(1.-xi);
+        default:
+          libMesh::err << "Invalid shape function index!" << std::endl;
+          libmesh_error();
+        }
 
 
     case SIXTH:
 
       switch (i)
-	{
-	case 0:
-	  return ( 1./64.)*pow<6>(1.-xi);
-	case 1:
-	  return ( 1./64.)*pow<6>(1.+xi);
-	case 2:
-	  return ( 3./32.)*(1.+xi)*pow<5>(1.-xi);
-	case 3:
-	  return (15./64.)*pow<2>(1.+xi)*pow<4>(1.-xi);
-	case 4:
-	  return ( 5./16.)*pow<3>(1.+xi)*pow<3>(1.-xi);
-	case 5:
-	  return (15./64.)*pow<4>(1.+xi)*pow<2>(1.-xi);
-	case 6:
-	  return ( 3./32.)*pow<5>(1.+xi)*(1.-xi);
-	default:
-	  libMesh::err << "Invalid shape function index!" << std::endl;
-	  libmesh_error();
-	}
+        {
+        case 0:
+          return ( 1./64.)*pow<6>(1.-xi);
+        case 1:
+          return ( 1./64.)*pow<6>(1.+xi);
+        case 2:
+          return ( 3./32.)*(1.+xi)*pow<5>(1.-xi);
+        case 3:
+          return (15./64.)*pow<2>(1.+xi)*pow<4>(1.-xi);
+        case 4:
+          return ( 5./16.)*pow<3>(1.+xi)*pow<3>(1.-xi);
+        case 5:
+          return (15./64.)*pow<4>(1.+xi)*pow<2>(1.-xi);
+        case 6:
+          return ( 3./32.)*pow<5>(1.+xi)*(1.-xi);
+        default:
+          libMesh::err << "Invalid shape function index!" << std::endl;
+          libmesh_error();
+        }
 
     default:
       {
-	libmesh_assert (order>6);
+        libmesh_assert (order>6);
 
-	// Use this for arbitrary orders.
-	// Note that this implementation is less efficient.
-	const int p_order = static_cast<unsigned int>(order);
-	const int m       = p_order-i+1;
-	const int n       = (i-1);
+        // Use this for arbitrary orders.
+        // Note that this implementation is less efficient.
+        const int p_order = static_cast<unsigned int>(order);
+        const int m       = p_order-i+1;
+        const int n       = (i-1);
 
-	unsigned int binomial_p_i = 1;
+        unsigned int binomial_p_i = 1;
 
-	// the binomial coefficient (p choose n)
-	if (i>1)
-	  binomial_p_i = Utility::factorial(p_order)
-	    / (Utility::factorial(n)*Utility::factorial(p_order-n));
+        // the binomial coefficient (p choose n)
+        if (i>1)
+          binomial_p_i = Utility::factorial(p_order)
+            / (Utility::factorial(n)*Utility::factorial(p_order-n));
 
 
-	switch(i)
-	  {
-	  case 0:
-	    return binomial_p_i * std::pow((1-xi)/2,static_cast<int>(p_order));
-	  case 1:
-	    return binomial_p_i * std::pow((1+xi)/2,static_cast<int>(p_order));
-	  default:
-	    {
-	      return binomial_p_i * std::pow((1+xi)/2,n)
-		                  * std::pow((1-xi)/2,m);
-	    }
-	  }
+        switch(i)
+          {
+          case 0:
+            return binomial_p_i * std::pow((1-xi)/2,static_cast<int>(p_order));
+          case 1:
+            return binomial_p_i * std::pow((1+xi)/2,static_cast<int>(p_order));
+          default:
+            {
+              return binomial_p_i * std::pow((1+xi)/2,n)
+                * std::pow((1-xi)/2,m);
+            }
+          }
 
-	// we should never get here
-	libmesh_error();
+        // we should never get here
+        libmesh_error();
       }
     }
 
@@ -199,9 +199,9 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
 
 template <>
 Real FE<1,BERNSTEIN>::shape(const Elem* elem,
-			    const Order order,
-			    const unsigned int i,
-			    const Point& p)
+                            const Order order,
+                            const unsigned int i,
+                            const Point& p)
 {
   libmesh_assert(elem);
 
@@ -212,10 +212,10 @@ Real FE<1,BERNSTEIN>::shape(const Elem* elem,
 
 template <>
 Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
-				  const Order order,
-				  const unsigned int i,
-				  const unsigned int libmesh_dbg_var(j),
-				  const Point& p)
+                                  const Order order,
+                                  const unsigned int i,
+                                  const unsigned int libmesh_dbg_var(j),
+                                  const Point& p)
 {
   // only d()/dxi in 1D!
 
@@ -230,146 +230,146 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
     case FIRST:
 
       switch(i)
-	{
-	case 0:
-	  return -.5;
-	case 1:
-	  return .5;
-	default:
-	  libMesh::err << "Invalid shape function index " << i << std::endl;
-	  libmesh_error();
-	}
+        {
+        case 0:
+          return -.5;
+        case 1:
+          return .5;
+        default:
+          libMesh::err << "Invalid shape function index " << i << std::endl;
+          libmesh_error();
+        }
 
     case SECOND:
 
       switch(i)
-	{
-	case 0:
-	  return (xi-1.)*.5;
-	case 1:
-	  return (xi+1.)*.5;
-	case 2:
-	  return -xi;
-	default:
-	  libMesh::err << "Invalid shape function index!" << std::endl;
-	  libmesh_error();
-	}
+        {
+        case 0:
+          return (xi-1.)*.5;
+        case 1:
+          return (xi+1.)*.5;
+        case 2:
+          return -xi;
+        default:
+          libMesh::err << "Invalid shape function index!" << std::endl;
+          libmesh_error();
+        }
 
     case THIRD:
 
       switch(i)
-	{
-	case 0:
-	  return -0.375*pow<2>(1.-xi);
-	case 1:
-	  return  0.375*pow<2>(1.+xi);
-	case 2:
-	  return -0.375 -.75*xi +1.125*pow<2>(xi);
-	case 3:
-	  return  0.375 -.75*xi -1.125*pow<2>(xi);
-	default:
-	  libMesh::err << "Invalid shape function index!" << std::endl;
-	  libmesh_error();
-	}
+        {
+        case 0:
+          return -0.375*pow<2>(1.-xi);
+        case 1:
+          return  0.375*pow<2>(1.+xi);
+        case 2:
+          return -0.375 -.75*xi +1.125*pow<2>(xi);
+        case 3:
+          return  0.375 -.75*xi -1.125*pow<2>(xi);
+        default:
+          libMesh::err << "Invalid shape function index!" << std::endl;
+          libmesh_error();
+        }
 
     case FOURTH:
 
       switch(i)
-	{
-	case 0:
-	  return -0.25*pow<3>(1.-xi);
-	case 1:
-	  return  0.25*pow<3>(1.+xi);
-	case 2:
-	  return -0.5 +1.5*pow<2>(xi)-pow<3>(xi);
-	case 3:
-	  return  1.5*(pow<3>(xi)-xi);
-	case 4:
-	  return  0.5 -1.5*pow<2>(xi)-pow<3>(xi);
-	default:
-	  libMesh::err << "Invalid shape function index!" << std::endl;
-	  libmesh_error();
-	}
+        {
+        case 0:
+          return -0.25*pow<3>(1.-xi);
+        case 1:
+          return  0.25*pow<3>(1.+xi);
+        case 2:
+          return -0.5 +1.5*pow<2>(xi)-pow<3>(xi);
+        case 3:
+          return  1.5*(pow<3>(xi)-xi);
+        case 4:
+          return  0.5 -1.5*pow<2>(xi)-pow<3>(xi);
+        default:
+          libMesh::err << "Invalid shape function index!" << std::endl;
+          libmesh_error();
+        }
 
     case FIFTH:
 
       switch(i)
-	{
-	case 0:
-	  return -(5./32.)*pow<4>(xi-1.);
-	case 1:
-	  return  (5./32.)*pow<4>(xi+1.);
-	case 2:
-	  return  (5./32.)*pow<4>(1.-xi)         -(5./8.)*(1.+xi)*pow<3>(1.-xi);
-	case 3:
-	  return  (5./ 8.)*(1.+xi)*pow<3>(1.-xi) -(15./16.)*pow<2>(1.+xi)*pow<2>(1.-xi);
-	case 4:
-	  return -(5./ 8.)*pow<3>(1.+xi)*(1.-xi) +(15./16.)*pow<2>(1.+xi)*pow<2>(1.-xi);
-	case 5:
-	  return  (5./ 8.)*pow<3>(1.+xi)*(1.-xi) -(5./32.)*pow<4>(1.+xi);
-	default:
-	  libMesh::err << "Invalid shape function index!" << std::endl;
-	  libmesh_error();
-	}
+        {
+        case 0:
+          return -(5./32.)*pow<4>(xi-1.);
+        case 1:
+          return  (5./32.)*pow<4>(xi+1.);
+        case 2:
+          return  (5./32.)*pow<4>(1.-xi)         -(5./8.)*(1.+xi)*pow<3>(1.-xi);
+        case 3:
+          return  (5./ 8.)*(1.+xi)*pow<3>(1.-xi) -(15./16.)*pow<2>(1.+xi)*pow<2>(1.-xi);
+        case 4:
+          return -(5./ 8.)*pow<3>(1.+xi)*(1.-xi) +(15./16.)*pow<2>(1.+xi)*pow<2>(1.-xi);
+        case 5:
+          return  (5./ 8.)*pow<3>(1.+xi)*(1.-xi) -(5./32.)*pow<4>(1.+xi);
+        default:
+          libMesh::err << "Invalid shape function index!" << std::endl;
+          libmesh_error();
+        }
 
     case SIXTH:
 
       switch(i)
-	{
-	case 0:
-	  return -( 3./32.)*pow<5>(1.-xi);
-	case 1:
-	  return  ( 3./32.)*pow<5>(1.+xi);
-	case 2:
-	  return  ( 3./32.)*pow<5>(1.-xi)-(15./32.)*(1.+xi)*pow<4>(1.-xi);
-	case 3:
-	  return  (15./32.)*(1.+xi)*pow<4>(1.-xi)-(15./16.)*pow<2>(1.+xi)*pow<3>(1.-xi);
-	case 4:
-	  return -(15./ 8.)*xi +(15./4.)*pow<3>(xi)-(15./8.)*pow<5>(xi);
-	case 5:
-	  return -(15./32.)*(1.-xi)*pow<4>(1.+xi)+(15./16.)*pow<2>(1.-xi)*pow<3>(1.+xi);
-	case 6:
-	  return  (15./32.)*pow<4>(1.+xi)*(1.-xi)-(3./32.)*pow<5>(1.+xi);
-	default:
-	  libMesh::err << "Invalid shape function index!" << std::endl;
-	  libmesh_error();
-	}
+        {
+        case 0:
+          return -( 3./32.)*pow<5>(1.-xi);
+        case 1:
+          return  ( 3./32.)*pow<5>(1.+xi);
+        case 2:
+          return  ( 3./32.)*pow<5>(1.-xi)-(15./32.)*(1.+xi)*pow<4>(1.-xi);
+        case 3:
+          return  (15./32.)*(1.+xi)*pow<4>(1.-xi)-(15./16.)*pow<2>(1.+xi)*pow<3>(1.-xi);
+        case 4:
+          return -(15./ 8.)*xi +(15./4.)*pow<3>(xi)-(15./8.)*pow<5>(xi);
+        case 5:
+          return -(15./32.)*(1.-xi)*pow<4>(1.+xi)+(15./16.)*pow<2>(1.-xi)*pow<3>(1.+xi);
+        case 6:
+          return  (15./32.)*pow<4>(1.+xi)*(1.-xi)-(3./32.)*pow<5>(1.+xi);
+        default:
+          libMesh::err << "Invalid shape function index!" << std::endl;
+          libmesh_error();
+        }
 
 
     default:
       {
-	libmesh_assert (order>6);
+        libmesh_assert (order>6);
 
-	// Use this for arbitrary orders
-	const int p_order = static_cast<unsigned int>(order);
-	const int m       = p_order-(i-1);
-	const int n       = (i-1);
+        // Use this for arbitrary orders
+        const int p_order = static_cast<unsigned int>(order);
+        const int m       = p_order-(i-1);
+        const int n       = (i-1);
 
-	unsigned int binomial_p_i = 1;
+        unsigned int binomial_p_i = 1;
 
-	// the binomial coefficient (p choose n)
-	if (i>1)
-	  binomial_p_i = Utility::factorial(p_order)
-	    / (Utility::factorial(n)*Utility::factorial(p_order-n));
+        // the binomial coefficient (p choose n)
+        if (i>1)
+          binomial_p_i = Utility::factorial(p_order)
+            / (Utility::factorial(n)*Utility::factorial(p_order-n));
 
 
 
-	switch(i)
-	  {
-	  case 0:
-	    return binomial_p_i * (-1./2.) * p_order * std::pow((1-xi)/2,static_cast<int>(p_order-1));
-	  case 1:
-	    return binomial_p_i * ( 1./2.) * p_order * std::pow((1+xi)/2,static_cast<int>(p_order-1));
+        switch(i)
+          {
+          case 0:
+            return binomial_p_i * (-1./2.) * p_order * std::pow((1-xi)/2,static_cast<int>(p_order-1));
+          case 1:
+            return binomial_p_i * ( 1./2.) * p_order * std::pow((1+xi)/2,static_cast<int>(p_order-1));
 
-	  default:
-	    {
-	      return binomial_p_i * (1./2. * n * std::pow((1+xi)/2,n-1) * std::pow((1-xi)/2,m)
-				   - 1./2. * m * std::pow((1+xi)/2,n)   * std::pow((1-xi)/2,m-1));
-	    }
-	  }
+          default:
+            {
+              return binomial_p_i * (1./2. * n * std::pow((1+xi)/2,n-1) * std::pow((1-xi)/2,m)
+                                     - 1./2. * m * std::pow((1+xi)/2,n)   * std::pow((1-xi)/2,m-1));
+            }
+          }
 
-	// we should never get here
-	libmesh_error();
+        // we should never get here
+        libmesh_error();
       }
 
     }
@@ -382,25 +382,25 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
 
 template <>
 Real FE<1,BERNSTEIN>::shape_deriv(const Elem* elem,
-				  const Order order,
-				  const unsigned int i,
-				  const unsigned int j,
-				  const Point& p)
+                                  const Order order,
+                                  const unsigned int i,
+                                  const unsigned int j,
+                                  const Point& p)
 {
   libmesh_assert(elem);
 
   return FE<1,BERNSTEIN>::shape_deriv(elem->type(),
-				      static_cast<Order>(order + elem->p_level()), i, j, p);
+                                      static_cast<Order>(order + elem->p_level()), i, j, p);
 }
 
 
 
 template <>
 Real FE<1,BERNSTEIN>::shape_second_deriv(const ElemType,
-					 const Order,
-					 const unsigned int,
-					 const unsigned int,
-					 const Point&)
+                                         const Order,
+                                         const unsigned int,
+                                         const unsigned int,
+                                         const Point&)
 {
   static bool warning_given = false;
 
@@ -418,10 +418,10 @@ Real FE<1,BERNSTEIN>::shape_second_deriv(const ElemType,
 
 template <>
 Real FE<1,BERNSTEIN>::shape_second_deriv(const Elem*,
-					 const Order,
-					 const unsigned int,
-					 const unsigned int,
-					 const Point&)
+                                         const Order,
+                                         const unsigned int,
+                                         const unsigned int,
+                                         const Point&)
 {
   static bool warning_given = false;
 

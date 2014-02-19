@@ -35,7 +35,7 @@ namespace libMesh
 template <typename T>
 AutoPtr<EigenSolver<T> >
 EigenSolver<T>::build(const Parallel::Communicator &comm,
-		      const SolverPackage solver_package)
+                      const SolverPackage solver_package)
 {
   // Build the appropriate solver
   switch (solver_package)
@@ -44,18 +44,18 @@ EigenSolver<T>::build(const Parallel::Communicator &comm,
 
 
 #ifdef LIBMESH_HAVE_SLEPC
-	case SLEPC_SOLVERS:
+    case SLEPC_SOLVERS:
       {
-	AutoPtr<EigenSolver<T> > ap(new SlepcEigenSolver<T>(comm));
-	return ap;
+        AutoPtr<EigenSolver<T> > ap(new SlepcEigenSolver<T>(comm));
+        return ap;
       }
 #endif
 
 
     default:
       libMesh::err << "ERROR:  Unrecognized eigen solver package: "
-		    << solver_package
-		    << std::endl;
+                   << solver_package
+                   << std::endl;
       libmesh_error();
     }
 

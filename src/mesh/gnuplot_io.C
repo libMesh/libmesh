@@ -30,7 +30,7 @@ namespace libMesh
 {
 
 GnuPlotIO::GnuPlotIO(const MeshBase& mesh_in,
-		     const std::string& title,
+                     const std::string& title,
                      int mesh_properties)
   :
   MeshOutput<MeshBase> (mesh_in),
@@ -46,8 +46,8 @@ void GnuPlotIO::write(const std::string& fname)
 }
 
 void GnuPlotIO::write_nodal_data (const std::string& fname,
-				  const std::vector<Number>& soln,
-				  const std::vector<std::string>& names)
+                                  const std::vector<Number>& soln,
+                                  const std::vector<std::string>& names)
 {
   START_LOG("write_nodal_data()", "GnuPlotIO");
 
@@ -60,8 +60,8 @@ void GnuPlotIO::write_nodal_data (const std::string& fname,
 
 
 void GnuPlotIO::write_solution(const std::string& fname,
-   			       const std::vector<Number>* soln,
-			       const std::vector<std::string>* names)
+                               const std::vector<Number>* soln,
+                               const std::vector<std::string>* names)
 {
   // Even when writing on a serialized ParallelMesh, we expect
   // non-proc-0 help with calls like n_active_elem

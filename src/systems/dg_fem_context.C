@@ -170,7 +170,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
         for (unsigned int j=0; j != i; ++j)
           {
             const unsigned int n_dofs_var_j =
-	      libmesh_cast_int<unsigned int>
+              libmesh_cast_int<unsigned int>
                 (dof_indices_var[j].size());
 
             _elem_elem_subjacobians[i][j]->reposition

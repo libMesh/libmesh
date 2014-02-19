@@ -44,7 +44,7 @@
 #include "NOX_Epetra_Interface_Preconditioner.H" // base class
 #include "NOX_Epetra_MatrixFree.H"
 #include "NOX_Epetra_LinearSystem_AztecOO.H"
-#include "NOX_Epetra_Group.H"	// class definition
+#include "NOX_Epetra_Group.H"// class definition
 #include "NOX_Epetra_Vector.H"
 
 namespace libMesh

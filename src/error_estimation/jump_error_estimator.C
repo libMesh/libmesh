@@ -44,17 +44,17 @@ namespace libMesh
 //-----------------------------------------------------------------
 // JumpErrorEstimator implementations
 void JumpErrorEstimator::initialize (const System&,
-				     ErrorVector&,
-				     bool)
+                                     ErrorVector&,
+                                     bool)
 {
 }
 
 
 
 void JumpErrorEstimator::estimate_error (const System& system,
-					 ErrorVector& error_per_cell,
-					 const NumericVector<Number>* solution_vector,
-					 bool estimate_parent_error)
+                                         ErrorVector& error_per_cell,
+                                         const NumericVector<Number>* solution_vector,
+                                         bool estimate_parent_error)
 {
   START_LOG("estimate_error()", "JumpErrorEstimator");
   /*
@@ -65,32 +65,32 @@ void JumpErrorEstimator::estimate_error (const System& system,
 
   Case (1.) Elements are at the same level, e<f
             Compute the flux jump on the face and
-	    add it as a contribution to error_per_cell[e]
-	    and error_per_cell[f]
+            add it as a contribution to error_per_cell[e]
+            and error_per_cell[f]
 
                    ----------------------
-		  |           |          |
-		  |           |    f     |
-		  |           |          |
-		  |    e      |---> n    |
-		  |           |          |
-		  |           |          |
+                   |           |          |
+                   |           |    f     |
+                   |           |          |
+                   |    e      |---> n    |
+                   |           |          |
+                   |           |          |
                    ----------------------
 
 
    Case (2.) The neighbor is at a higher level.
              Compute the flux jump on e's face and
-	     add it as a contribution to error_per_cell[e]
-	     and error_per_cell[f]
+             add it as a contribution to error_per_cell[e]
+             and error_per_cell[f]
 
                    ----------------------
-		  |     |     |          |
-		  |     |  e  |---> n    |
-		  |     |     |          |
-		  |-----------|    f     |
-		  |     |     |          |
-		  |     |     |          |
-		  |     |     |          |
+                   |     |     |          |
+                   |     |  e  |---> n    |
+                   |     |     |          |
+                   |-----------|    f     |
+                   |     |     |          |
+                   |     |     |          |
+                   |     |     |          |
                    ----------------------
   */
 
@@ -178,10 +178,10 @@ void JumpErrorEstimator::estimate_error (const System& system,
       const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
       for (; elem_it != elem_end; ++elem_it)
-	{
-	  // e is necessarily an active element on the local processor
-	  const Elem* e = *elem_it;
-	  const dof_id_type e_id = e->id();
+        {
+          // e is necessarily an active element on the local processor
+          const Elem* e = *elem_it;
+          const dof_id_type e_id = e->id();
 
 #ifdef LIBMESH_ENABLE_AMR
           // See if the parent of element e has been examined yet;
@@ -200,22 +200,22 @@ void JumpErrorEstimator::estimate_error (const System& system,
 
           if (compute_on_parent &&
               !error_per_cell[parent->id()])
-	    {
+            {
               // Compute a projection onto the parent
               DenseVector<Number> Uparent;
               FEBase::coarsened_dof_values(*(system.solution),
                                            dof_map, parent, Uparent,
                                            var, false);
 
-	      // Loop over the neighbors of the parent
-	      for (unsigned int n_p=0; n_p<parent->n_neighbors(); n_p++)
+              // Loop over the neighbors of the parent
+              for (unsigned int n_p=0; n_p<parent->n_neighbors(); n_p++)
                 {
-	          if (parent->neighbor(n_p) != NULL) // parent has a neighbor here
-		    {
+                  if (parent->neighbor(n_p) != NULL) // parent has a neighbor here
+                    {
                       // Find the active neighbors in this direction
                       std::vector<const Elem*> active_neighbors;
                       parent->neighbor(n_p)->
-		        active_family_tree_by_neighbor(active_neighbors,
+                        active_family_tree_by_neighbor(active_neighbors,
                                                        parent);
                       // Compute the flux to each active neighbor
                       for (unsigned int a=0;
@@ -230,20 +230,20 @@ void JumpErrorEstimator::estimate_error (const System& system,
                               coarse_elem = parent;
                               Ucoarse = Uparent;
 
-		              dof_map.dof_indices (fine_elem, dof_indices_fine, var);
-		              const unsigned int n_dofs_fine =
-				libmesh_cast_int<unsigned int>(dof_indices_fine.size());
+                              dof_map.dof_indices (fine_elem, dof_indices_fine, var);
+                              const unsigned int n_dofs_fine =
+                                libmesh_cast_int<unsigned int>(dof_indices_fine.size());
                               Ufine.resize(n_dofs_fine);
 
-			      for (unsigned int i=0; i<n_dofs_fine; i++)
-			        Ufine(i) = system.current_solution(dof_indices_fine[i]);
+                              for (unsigned int i=0; i<n_dofs_fine; i++)
+                                Ufine(i) = system.current_solution(dof_indices_fine[i]);
                               this->reinit_sides();
                               this->internal_side_integration();
 
                               error_per_cell[fine_elem->id()] +=
-				static_cast<ErrorVectorReal>(fine_error);
+                                static_cast<ErrorVectorReal>(fine_error);
                               error_per_cell[coarse_elem->id()] +=
-				static_cast<ErrorVectorReal>(coarse_error);
+                                static_cast<ErrorVectorReal>(coarse_error);
 
                               // Keep track of the number of internal flux
                               // sides found on each element
@@ -251,9 +251,9 @@ void JumpErrorEstimator::estimate_error (const System& system,
                               n_flux_faces[coarse_elem->id()] += this->coarse_n_flux_faces_increment();
                             }
                         }
-		    }
-		  else if (integrate_boundary_sides)
-		    {
+                    }
+                  else if (integrate_boundary_sides)
+                    {
                       fine_elem = parent;
                       Ufine = Uparent;
 
@@ -263,88 +263,88 @@ void JumpErrorEstimator::estimate_error (const System& system,
                       if (this->boundary_side_integration())
                         {
                           error_per_cell[fine_elem->id()] +=
-			    static_cast<ErrorVectorReal>(fine_error);
+                            static_cast<ErrorVectorReal>(fine_error);
                           n_flux_faces[fine_elem->id()]++;
                         }
                     }
-		}
-	    }
+                }
+            }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
           // If we do any more flux integration, e will be the fine element
           fine_elem = e;
 
-	  // Loop over the neighbors of element e
-	  for (unsigned int n_e=0; n_e<e->n_neighbors(); n_e++)
-	    {
+          // Loop over the neighbors of element e
+          for (unsigned int n_e=0; n_e<e->n_neighbors(); n_e++)
+            {
               fine_side = n_e;
 
-	      if (e->neighbor(n_e) != NULL) // e is not on the boundary
-		{
-		  const Elem* f           = e->neighbor(n_e);
-		  const dof_id_type f_id = f->id();
+              if (e->neighbor(n_e) != NULL) // e is not on the boundary
+                {
+                  const Elem* f           = e->neighbor(n_e);
+                  const dof_id_type f_id = f->id();
 
-		  // Compute flux jumps if we are in case 1 or case 2.
-		  if ((f->active() && (f->level() == e->level()) && (e_id < f_id))
-		      || (f->level() < e->level()))
-		    {
+                  // Compute flux jumps if we are in case 1 or case 2.
+                  if ((f->active() && (f->level() == e->level()) && (e_id < f_id))
+                      || (f->level() < e->level()))
+                    {
                       // f is now the coarse element
                       coarse_elem = f;
 
-		      // Get the DOF indices for the two elements
-		      dof_map.dof_indices (fine_elem, dof_indices_fine, var);
-		      dof_map.dof_indices (coarse_elem, dof_indices_coarse, var);
+                      // Get the DOF indices for the two elements
+                      dof_map.dof_indices (fine_elem, dof_indices_fine, var);
+                      dof_map.dof_indices (coarse_elem, dof_indices_coarse, var);
 
-		      // The number of DOFS on each element
-		      const unsigned int n_dofs_fine =
-			libmesh_cast_int<unsigned int>(dof_indices_fine.size());
-		      const unsigned int n_dofs_coarse =
-			libmesh_cast_int<unsigned int>(dof_indices_coarse.size());
+                      // The number of DOFS on each element
+                      const unsigned int n_dofs_fine =
+                        libmesh_cast_int<unsigned int>(dof_indices_fine.size());
+                      const unsigned int n_dofs_coarse =
+                        libmesh_cast_int<unsigned int>(dof_indices_coarse.size());
                       Ufine.resize(n_dofs_fine);
                       Ucoarse.resize(n_dofs_coarse);
 
-		      // The local solutions on each element
-		      for (unsigned int i=0; i<n_dofs_fine; i++)
-			Ufine(i) = system.current_solution(dof_indices_fine[i]);
-		      for (unsigned int i=0; i<n_dofs_coarse; i++)
-			Ucoarse(i) = system.current_solution(dof_indices_coarse[i]);
+                      // The local solutions on each element
+                      for (unsigned int i=0; i<n_dofs_fine; i++)
+                        Ufine(i) = system.current_solution(dof_indices_fine[i]);
+                      for (unsigned int i=0; i<n_dofs_coarse; i++)
+                        Ucoarse(i) = system.current_solution(dof_indices_coarse[i]);
 
                       this->reinit_sides();
                       this->internal_side_integration();
 
                       error_per_cell[fine_elem->id()] +=
-			static_cast<ErrorVectorReal>(fine_error);
+                        static_cast<ErrorVectorReal>(fine_error);
                       error_per_cell[coarse_elem->id()] +=
-			static_cast<ErrorVectorReal>(coarse_error);
+                        static_cast<ErrorVectorReal>(coarse_error);
 
                       // Keep track of the number of internal flux
                       // sides found on each element
                       n_flux_faces[fine_elem->id()]++;
                       n_flux_faces[coarse_elem->id()] += this->coarse_n_flux_faces_increment();
-		    } // end if (case1 || case2)
-		} // if (e->neigbor(n_e) != NULL)
+                    } // end if (case1 || case2)
+                } // if (e->neigbor(n_e) != NULL)
 
-	      // Otherwise, e is on the boundary.  If it happens to
-	      // be on a Dirichlet boundary, we need not do anything.
-	      // On the other hand, if e is on a Neumann (flux) boundary
-	      // with grad(u).n = g, we need to compute the additional residual
-	      // (h * \int |g - grad(u_h).n|^2 dS)^(1/2).
-	      // We can only do this with some knowledge of the boundary
-	      // conditions, i.e. the user must have attached an appropriate
-	      // BC function.
-	      else
-		{
-		  if (integrate_boundary_sides)
-		    {
+              // Otherwise, e is on the boundary.  If it happens to
+              // be on a Dirichlet boundary, we need not do anything.
+              // On the other hand, if e is on a Neumann (flux) boundary
+              // with grad(u).n = g, we need to compute the additional residual
+              // (h * \int |g - grad(u_h).n|^2 dS)^(1/2).
+              // We can only do this with some knowledge of the boundary
+              // conditions, i.e. the user must have attached an appropriate
+              // BC function.
+              else
+                {
+                  if (integrate_boundary_sides)
+                    {
                       // Reinitialize shape functions on the fine element side
                       fe_fine->reinit (fine_elem, fine_side);
 
-		      // Get the DOF indices
-		      dof_map.dof_indices (fine_elem, dof_indices_fine, var);
+                      // Get the DOF indices
+                      dof_map.dof_indices (fine_elem, dof_indices_fine, var);
 
-		      // The number of DOFS on each element
-		      const unsigned int n_dofs_fine =
-			libmesh_cast_int<unsigned int>(dof_indices_fine.size());
+                      // The number of DOFS on each element
+                      const unsigned int n_dofs_fine =
+                        libmesh_cast_int<unsigned int>(dof_indices_fine.size());
                       Ufine.resize(n_dofs_fine);
 
                       for (unsigned int i=0; i<n_dofs_fine; i++)
@@ -353,13 +353,13 @@ void JumpErrorEstimator::estimate_error (const System& system,
                       if (this->boundary_side_integration())
                         {
                           error_per_cell[fine_elem->id()] +=
-			    static_cast<ErrorVectorReal>(fine_error);
+                            static_cast<ErrorVectorReal>(fine_error);
                           n_flux_faces[fine_elem->id()]++;
                         }
                     } // end if _bc_function != NULL
-		} // end if (e->neighbor(n_e) == NULL)
-	    } // end loop over neighbors
-	} // End loop over active local elements
+                } // end if (e->neighbor(n_e) == NULL)
+            } // end loop over neighbors
+        } // End loop over active local elements
     } // End loop over variables
 
 
@@ -390,18 +390,18 @@ void JumpErrorEstimator::estimate_error (const System& system,
       // always an integer value
 #ifdef DEBUG
       for (unsigned int i=0; i<n_flux_faces.size(); ++i)
-	libmesh_assert_equal_to (n_flux_faces[i], static_cast<float>(static_cast<unsigned int>(n_flux_faces[i])) );
+        libmesh_assert_equal_to (n_flux_faces[i], static_cast<float>(static_cast<unsigned int>(n_flux_faces[i])) );
 #endif
 
       // Scale the error by the number of flux faces for each element
       for (unsigned int i=0; i<n_flux_faces.size(); ++i)
-	{
-	  if (n_flux_faces[i] == 0.0) // inactive or non-local element
-	    continue;
+        {
+          if (n_flux_faces[i] == 0.0) // inactive or non-local element
+            continue;
 
-	  //libMesh::out << "Element " << i << " has " << n_flux_faces[i] << " flux faces." << std::endl;
-	  error_per_cell[i] /= static_cast<ErrorVectorReal>(n_flux_faces[i]);
-	}
+          //libMesh::out << "Element " << i << " has " << n_flux_faces[i] << " flux faces." << std::endl;
+          error_per_cell[i] /= static_cast<ErrorVectorReal>(n_flux_faces[i]);
+        }
     }
 
   // If we used a non-standard solution before, now is the time to fix

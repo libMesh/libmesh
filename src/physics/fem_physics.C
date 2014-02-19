@@ -104,7 +104,7 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
       if (this->time_solver->is_steady())
         return request_jacobian;
       else
-	unsteady = libmesh_cast_ptr<UnsteadySolver*>(this->time_solver.get());
+        unsteady = libmesh_cast_ptr<UnsteadySolver*>(this->time_solver.get());
 
       const std::vector<Real> &JxW =
         context.element_fe_var[var]->get_JxW();
@@ -158,11 +158,11 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
           RealGradient convection(0.);
 
           for (unsigned int i = 0; i != n_x_dofs; ++i)
-	    convection(0) += delta_x[i] * psi[i][qp];
+            convection(0) += delta_x[i] * psi[i][qp];
           for (unsigned int i = 0; i != n_y_dofs; ++i)
-	    convection(1) += delta_y[i] * psi[i][qp];
+            convection(1) += delta_y[i] * psi[i][qp];
           for (unsigned int i = 0; i != n_z_dofs; ++i)
-	    convection(2) += delta_z[i] * psi[i][qp];
+            convection(2) += delta_z[i] * psi[i][qp];
 
           for (unsigned int i = 0; i != n_u_dofs; ++i)
             {
@@ -218,7 +218,7 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
       const std::vector<std::vector<Real> > &phi = elem_fe->get_phi();
 
       const unsigned int n_dofs = libmesh_cast_int<unsigned int>
-	(context.get_dof_indices(var).size());
+        (context.get_dof_indices(var).size());
 
       DenseSubVector<Number> &Fu = context.get_elem_residual(var);
       DenseSubMatrix<Number> &Kuu = context.get_elem_jacobian( var, var );

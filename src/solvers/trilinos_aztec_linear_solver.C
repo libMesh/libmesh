@@ -101,11 +101,11 @@ void AztecLinearSolver<T>::init ()
 template <typename T>
 std::pair<unsigned int, Real>
 AztecLinearSolver<T>::solve (SparseMatrix<T>& matrix_in,
-			     SparseMatrix<T>& precond_in,
-			     NumericVector<T>& solution_in,
-			     NumericVector<T>& rhs_in,
-			     const double tol,
-			     const unsigned int m_its)
+                             SparseMatrix<T>& precond_in,
+                             NumericVector<T>& solution_in,
+                             NumericVector<T>& rhs_in,
+                             const double tol,
+                             const unsigned int m_its)
 {
   START_LOG("solve()", "AztecLinearSolver");
 
@@ -143,15 +143,15 @@ AztecLinearSolver<T>::solve (SparseMatrix<T>& matrix_in,
 template <typename T>
 std::pair<unsigned int, Real>
 AztecLinearSolver<T>::solve (const ShellMatrix<T>&,
-			     NumericVector<T>&,
-			     NumericVector<T>&,
-			     const double,
-			     const unsigned int)
+                             NumericVector<T>&,
+                             NumericVector<T>&,
+                             const double,
+                             const unsigned int)
 //AztecLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
-//			     NumericVector<T>& solution_in,
-//			     NumericVector<T>& rhs_in,
-//			     const double tol,
-//			     const unsigned int m_its)
+//     NumericVector<T>& solution_in,
+//     NumericVector<T>& rhs_in,
+//     const double tol,
+//     const unsigned int m_its)
 {
   libmesh_not_implemented();
 }
@@ -161,17 +161,17 @@ AztecLinearSolver<T>::solve (const ShellMatrix<T>&,
 template <typename T>
 std::pair<unsigned int, Real>
 AztecLinearSolver<T>::solve (const ShellMatrix<T>&,
-			     const SparseMatrix<T>&,
-			     NumericVector<T> &,
-			     NumericVector<T> &,
-			     const double,
-			     const unsigned int)
+                             const SparseMatrix<T>&,
+                             NumericVector<T> &,
+                             NumericVector<T> &,
+                             const double,
+                             const unsigned int)
 //AztecLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
-//			     const SparseMatrix<T>& precond_matrix,
-//			     NumericVector<T> &solution_in,
-//			     NumericVector<T> &rhs_in,
-//			     const double tol,
-//			     const unsigned int m_its)
+//     const SparseMatrix<T>& precond_matrix,
+//     NumericVector<T> &solution_in,
+//     NumericVector<T> &rhs_in,
+//     const double tol,
+//     const unsigned int m_its)
 {
   libmesh_not_implemented();
 }

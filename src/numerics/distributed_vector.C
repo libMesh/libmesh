@@ -118,8 +118,8 @@ Real DistributedVector<T>::linfty_norm () const
 
   for (numeric_index_type i=0; i<local_size(); i++)
     local_linfty  = std::max(local_linfty,
-			     static_cast<Real>(std::abs(_values[i]))
-			     ); // Note we static_cast so that both
+                             static_cast<Real>(std::abs(_values[i]))
+                             ); // Note we static_cast so that both
                                 // types are the same, as required
                                 // by std::max
 
@@ -180,7 +180,7 @@ NumericVector<T> & DistributedVector<T>::operator /= (NumericVector<T> & v)
 
 template <typename T>
 void DistributedVector<T>::add_vector (const std::vector<T>& v,
-				       const std::vector<numeric_index_type>& dof_indices)
+                                       const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert (!v.empty());
   libmesh_assert_equal_to (v.size(), dof_indices.size());
@@ -196,7 +196,7 @@ void DistributedVector<T>::add_vector (const std::vector<T>& v,
 
 template <typename T>
 void DistributedVector<T>::add_vector (const NumericVector<T>& V,
-				       const std::vector<numeric_index_type>& dof_indices)
+                                       const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
   libmesh_assert (this->initialized());
@@ -211,7 +211,7 @@ void DistributedVector<T>::add_vector (const NumericVector<T>& V,
 
 template <typename T>
 void DistributedVector<T>::add_vector (const DenseVector<T>& V,
-				       const std::vector<numeric_index_type>& dof_indices)
+                                       const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
   libmesh_assert (this->initialized());
@@ -293,7 +293,7 @@ void DistributedVector<T>::add (const T a, const NumericVector<T>& v)
 
 template <typename T>
 void DistributedVector<T>::insert (const std::vector<T>& v,
-				   const std::vector<numeric_index_type>& dof_indices)
+                                   const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert (!v.empty());
   libmesh_assert_equal_to (v.size(), dof_indices.size());
@@ -309,7 +309,7 @@ void DistributedVector<T>::insert (const std::vector<T>& v,
 
 template <typename T>
 void DistributedVector<T>::insert (const NumericVector<T>& V,
-				   const std::vector<numeric_index_type>& dof_indices)
+                                   const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
   libmesh_assert (this->initialized());
@@ -324,7 +324,7 @@ void DistributedVector<T>::insert (const NumericVector<T>& V,
 
 template <typename T>
 void DistributedVector<T>::insert (const DenseVector<T>& V,
-				   const std::vector<numeric_index_type>& dof_indices)
+                                   const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
   libmesh_assert (this->initialized());
@@ -339,7 +339,7 @@ void DistributedVector<T>::insert (const DenseVector<T>& V,
 
 template <typename T>
 void DistributedVector<T>::insert (const DenseSubVector<T>& V,
-				   const std::vector<numeric_index_type>& dof_indices)
+                                   const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
   libmesh_assert (this->initialized());
@@ -520,7 +520,7 @@ void DistributedVector<T>::localize (NumericVector<T>& v_local_in) const
 
 template <typename T>
 void DistributedVector<T>::localize (NumericVector<T>& v_local_in,
-				     const std::vector<numeric_index_type>&) const
+                                     const std::vector<numeric_index_type>&) const
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -534,8 +534,8 @@ void DistributedVector<T>::localize (NumericVector<T>& v_local_in,
 
 template <typename T>
 void DistributedVector<T>::localize (const numeric_index_type first_local_idx,
-				     const numeric_index_type last_local_idx,
-				     const std::vector<numeric_index_type>& send_list)
+                                     const numeric_index_type last_local_idx,
+                                     const std::vector<numeric_index_type>& send_list)
 {
   // Only good for serial vectors
   libmesh_assert_equal_to (this->size(), this->local_size());
@@ -591,7 +591,7 @@ void DistributedVector<T>::localize (std::vector<T>& v_local) const
 
 template <typename T>
 void DistributedVector<T>::localize_to_one (std::vector<T>& v_local,
-					    const processor_id_type pid) const
+                                            const processor_id_type pid) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -613,9 +613,9 @@ void DistributedVector<T>::localize_to_one (std::vector<T>& v_local,
 
 template <typename T>
 void DistributedVector<T>::pointwise_mult (const NumericVector<T>&,
-					   const NumericVector<T>&)
+                                           const NumericVector<T>&)
 //void DistributedVector<T>::pointwise_mult (const NumericVector<T>& vec1,
-//					   const NumericVector<T>& vec2)
+//   const NumericVector<T>& vec2)
 {
   libmesh_not_implemented();
 }

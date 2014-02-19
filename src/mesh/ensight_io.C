@@ -59,7 +59,7 @@ EnsightIO::~EnsightIO ()
 
 
 void EnsightIO::add_vector (const std::string &system_name, const std::string &vec_description,
-			    const std::string &u, const std::string &v)
+                            const std::string &u, const std::string &v)
 {
   libmesh_assert (_equation_systems.has_system(system_name));
   libmesh_assert (_equation_systems.get_system(system_name).has_variable(u));
@@ -76,7 +76,7 @@ void EnsightIO::add_vector (const std::string &system_name, const std::string &v
 
 
 void EnsightIO::add_vector (const std::string &system_name, const std::string &vec_name,
-			    const std::string &u, const std::string &v, const std::string &w)
+                            const std::string &u, const std::string &v, const std::string &w)
 {
   libmesh_assert(_equation_systems.has_system(system_name));
   libmesh_assert(_equation_systems.get_system(system_name).has_variable(u));
@@ -94,7 +94,7 @@ void EnsightIO::add_vector (const std::string &system_name, const std::string &v
 
 
 void EnsightIO::add_scalar(const std::string &system_name, const std::string &scl_description,
-			   const std::string &s)
+                           const std::string &s)
 {
   libmesh_assert(_equation_systems.has_system(system_name));
   libmesh_assert(_equation_systems.get_system(system_name).has_variable(s));
@@ -188,7 +188,7 @@ void EnsightIO::write_geometry_ascii()
       ensight_parts_map[elem->type()].push_back(elem);
 
       for (unsigned int i = 0; i < elem->n_nodes(); i++)
-	mesh_nodes_map[elem->node(i)] = elem->point(i);
+        mesh_nodes_map[elem->node(i)] = elem->point(i);
     }
 
   // Write number of local points
@@ -240,24 +240,24 @@ void EnsightIO::write_geometry_ascii()
 
       // Write element id
       for (unsigned int i = 0; i < elem_ref.size(); i++)
-	fprintf(fout,"%10lu\n",static_cast<unsigned long>(elem_ref[i]->id()));
+        fprintf(fout,"%10lu\n",static_cast<unsigned long>(elem_ref[i]->id()));
 
       // Write connectivity
       for (unsigned int i = 0; i < elem_ref.size(); i++)
-	{
-	  for (unsigned int j = 0; j < elem_ref[i]->n_nodes(); j++) {
-	    // tests!
-	    if(kvp.first == QUAD9 && i==4)
-	      continue;
-	    // tests!
-	    if(kvp.first == HEX27 && (i==4    || i ==10 || i == 12 ||
-				      i == 13 || i ==14 || i == 16 || i == 22))
-	      continue;
+        {
+          for (unsigned int j = 0; j < elem_ref[i]->n_nodes(); j++) {
+            // tests!
+            if(kvp.first == QUAD9 && i==4)
+              continue;
+            // tests!
+            if(kvp.first == HEX27 && (i==4    || i ==10 || i == 12 ||
+                                      i == 13 || i ==14 || i == 16 || i == 22))
+              continue;
 
-	    fprintf(fout,"%10d",ensight_node_index[elem_ref[i]->node(j)]);
-	  }
-	  fprintf(fout,"\n");
-	}
+            fprintf(fout,"%10d",ensight_node_index[elem_ref[i]->node(j)]);
+          }
+          fprintf(fout,"\n");
+        }
     }
   fclose(fout);
 }
@@ -293,37 +293,37 @@ void EnsightIO::write_case()
       SystemsVarsValue value = *sys;
 
       for (unsigned int i=0; i < value.second.EnsightScalars.size(); i++)
-	{
-	  std::stringstream scl_file;
-	  Scalars scalar = value.second.EnsightScalars[i];
-	  scl_file << _ensight_file_name
-		   << "_" << scalar.scalar_name
-		   << ".scl";
+        {
+          std::stringstream scl_file;
+          Scalars scalar = value.second.EnsightScalars[i];
+          scl_file << _ensight_file_name
+                   << "_" << scalar.scalar_name
+                   << ".scl";
 
-	  fprintf(fout,"scalar per node:   1  %s %s***\n",scalar.description.c_str(), scl_file.str().c_str());
-	}
+          fprintf(fout,"scalar per node:   1  %s %s***\n",scalar.description.c_str(), scl_file.str().c_str());
+        }
 
       for (unsigned int i=0; i < value.second.EnsightVectors.size(); i++)
-	{
-	  std::stringstream vec_file;
-	  Vectors vec = value.second.EnsightVectors[i];
-	  vec_file<<_ensight_file_name<<"_"<<vec.description<<".vec";
+        {
+          std::stringstream vec_file;
+          Vectors vec = value.second.EnsightVectors[i];
+          vec_file<<_ensight_file_name<<"_"<<vec.description<<".vec";
 
-	  fprintf(fout,"vector per node:      1    %s %s***\n",vec.description.c_str(), vec_file.str().c_str());
-	}
+          fprintf(fout,"vector per node:      1    %s %s***\n",vec.description.c_str(), vec_file.str().c_str());
+        }
 
       // Write time step section
       if( _time_steps.size() != 0)
-	{
-	  fprintf(fout,"\n\nTIME\n");
-	  fprintf(fout,"time set:             1\n");
-	  fprintf(fout,"number of steps:   %10d\n", static_cast<int>(_time_steps.size()));
-	  fprintf(fout,"filename start number:   %10d\n", 0);
-	  fprintf(fout,"filename increment:  %10d\n", 1);
-	  fprintf(fout,"time values:\n");
-	  for (unsigned int i = 0; i < _time_steps.size(); i++)
-	    fprintf(fout,"%12.5e\n", _time_steps[i]);
-	}
+        {
+          fprintf(fout,"\n\nTIME\n");
+          fprintf(fout,"time set:             1\n");
+          fprintf(fout,"number of steps:   %10d\n", static_cast<int>(_time_steps.size()));
+          fprintf(fout,"filename start number:   %10d\n", 0);
+          fprintf(fout,"filename increment:  %10d\n", 1);
+          fprintf(fout,"time values:\n");
+          for (unsigned int i = 0; i < _time_steps.size(); i++)
+            fprintf(fout,"%12.5e\n", _time_steps[i]);
+        }
     }
   fclose(fout);
 }
@@ -341,13 +341,13 @@ void EnsightIO::write_solution_ascii()
       SystemsVarsValue value = *sys;
 
       for (unsigned int i = 0; i < value.second.EnsightScalars.size(); i++)
-	this->write_scalar_ascii(value.first,
-				 value.second.EnsightScalars[i].scalar_name);
+        this->write_scalar_ascii(value.first,
+                                 value.second.EnsightScalars[i].scalar_name);
 
       for (unsigned int i = 0; i < value.second.EnsightVectors.size(); i++)
-	this->write_vector_ascii(value.first,
-				 value.second.EnsightVectors[i].components,
-				 value.second.EnsightVectors[i].description);
+        this->write_vector_ascii(value.first,
+                                 value.second.EnsightVectors[i].components,
+                                 value.second.EnsightVectors[i].description);
     }
 }
 
@@ -507,9 +507,9 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
 
     for (unsigned int i = 0; i < dof_indices_u.size(); i++)
       {
-	elem_soln_u[i] = system.current_solution(dof_indices_u[i]);
-	elem_soln_v[i] = system.current_solution(dof_indices_v[i]);
-	if(dim==3) elem_soln_w[i] = system.current_solution(dof_indices_w[i]);
+        elem_soln_u[i] = system.current_solution(dof_indices_u[i]);
+        elem_soln_v[i] = system.current_solution(dof_indices_v[i]);
+        if(dim==3) elem_soln_w[i] = system.current_solution(dof_indices_w[i]);
       }
 
     FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_u,nodal_soln_u);
@@ -527,12 +527,12 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
 
     for (unsigned int n=0; n<elem->n_nodes(); n++)
       {
-	std::vector<Real> node_vec(3);
-	node_vec[0]= libmesh_real(nodal_soln_u[n]);
-	node_vec[1]= libmesh_real(nodal_soln_v[n]);
-	node_vec[2]=0.0;
-	if(dim==3) node_vec[2]= libmesh_real(nodal_soln_w[n]);
-	local_soln[elem->node(n)] = node_vec;
+        std::vector<Real> node_vec(3);
+        node_vec[0]= libmesh_real(nodal_soln_u[n]);
+        node_vec[1]= libmesh_real(nodal_soln_v[n]);
+        node_vec[2]=0.0;
+        if(dim==3) node_vec[2]= libmesh_real(nodal_soln_w[n]);
+        local_soln[elem->node(n)] = node_vec;
       }
 
   }

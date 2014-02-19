@@ -38,7 +38,7 @@ namespace Parallel {
 
 template <typename KeyType, typename IdxType>
 BinSorter<KeyType,IdxType>::BinSorter (const Parallel::Communicator &comm_in,
-				       const std::vector<KeyType>& d) :
+                                       const std::vector<KeyType>& d) :
   ParallelObject(comm_in),
   data(d)
 {
@@ -55,8 +55,8 @@ BinSorter<KeyType,IdxType>::BinSorter (const Parallel::Communicator &comm_in,
 
 template <typename KeyType, typename IdxType>
 void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
-				          KeyType max,
-				          KeyType min)
+                                          KeyType max,
+                                          KeyType min)
 {
   libmesh_assert_less (min, max);
 
@@ -106,29 +106,29 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
 
       // Set the internal bin boundary iterators
       for (IdxType b=0; b<nbins; ++b)
-	{
-	  // The size of bin b.  We want this to
-	  // be ~= target_bin_size[b]
-	  int current_bin_size = 0;
+        {
+          // The size of bin b.  We want this to
+          // be ~= target_bin_size[b]
+          int current_bin_size = 0;
 
-	  // Step through the histogram until we have the
-	  // desired bin size
-	  while ((current_bin_size + histogram[current_histogram_bin] + delta) <= target_bin_size[b])
-	    {
-	      // Don't index out of the histogram!
-	      if ((current_histogram_bin+1) == phist.n_bins())
-		break;
+          // Step through the histogram until we have the
+          // desired bin size
+          while ((current_bin_size + histogram[current_histogram_bin] + delta) <= target_bin_size[b])
+            {
+              // Don't index out of the histogram!
+              if ((current_histogram_bin+1) == phist.n_bins())
+                break;
 
-	      current_bin_size += histogram[current_histogram_bin++];
-	    }
+              current_bin_size += histogram[current_histogram_bin++];
+            }
 
-	  delta += current_bin_size - target_bin_size[b];
+          delta += current_bin_size - target_bin_size[b];
 
-	  // Set the upper bound of the bin
-	  bin_bounds[b+1] = phist.upper_bound (current_histogram_bin);
-	  bin_iters[b+1]  = std::lower_bound(bin_iters[b], data.end(),
-					     Parallel::Utils::to_key_type<KeyType>(bin_bounds[b+1]));
-	}
+          // Set the upper bound of the bin
+          bin_bounds[b+1] = phist.upper_bound (current_histogram_bin);
+          bin_iters[b+1]  = std::lower_bound(bin_iters[b], data.end(),
+                                             Parallel::Utils::to_key_type<KeyType>(bin_bounds[b+1]));
+        }
 
       // Just be sure the last boundaries point to the right place
       bin_iters[nbins]  = data.end();

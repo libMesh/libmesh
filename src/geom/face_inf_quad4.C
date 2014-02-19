@@ -95,7 +95,7 @@ bool InfQuad4::is_face(const unsigned int) const
 }
 
 bool InfQuad4::is_node_on_side(const unsigned int n,
-			       const unsigned int s) const
+                               const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 2; ++i)
@@ -123,7 +123,7 @@ bool InfQuad4::contains_point (const Point& p, Real tol) const
    * use size_sq() instead of size(), it is slightly faster
    */
   const Real min_distance_sq = std::min((Point(this->point(0)-origin)).size_sq(),
-					(Point(this->point(1)-origin)).size_sq());
+                                        (Point(this->point(1)-origin)).size_sq());
 
   /*
    * work with 1% allowable deviation.  Can still fall
@@ -150,11 +150,11 @@ bool InfQuad4::contains_point (const Point& p, Real tol) const
       FEType fe_type(default_order());
 
       const Point mapped_point = FEInterface::inverse_map(dim(),
-							  fe_type,
-							  this,
-							  p,
-							  tol,
-							  false);
+                                                          fe_type,
+                                                          this,
+                                                          p,
+                                                          tol,
+                                                          false);
 
       return FEInterface::on_reference_element(mapped_point, this->type(), tol);
     }
@@ -164,31 +164,31 @@ bool InfQuad4::contains_point (const Point& p, Real tol) const
 
 
 AutoPtr<Elem> InfQuad4::build_side (const unsigned int i,
-				    bool proxy) const
+                                    bool proxy) const
 {
   // libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
       switch (i)
-	{
-	  // base
-	case 0:
-	  {
-	    AutoPtr<Elem> ap(new Side<Edge2,InfQuad4>(this,i));
-	    return ap;
-	  }
-	  // ifem edges
-	case 1:
-	case 2:
-	  {
-	    AutoPtr<Elem> ap(new Side<InfEdge2,InfQuad4>(this,i));
-	    return ap;
-	  }
+        {
+          // base
+        case 0:
+          {
+            AutoPtr<Elem> ap(new Side<Edge2,InfQuad4>(this,i));
+            return ap;
+          }
+          // ifem edges
+        case 1:
+        case 2:
+          {
+            AutoPtr<Elem> ap(new Side<InfEdge2,InfQuad4>(this,i));
+            return ap;
+          }
 
-	default:
-	  libmesh_error();
-	}
+        default:
+          libmesh_error();
+        }
     }
 
   else
@@ -197,43 +197,43 @@ AutoPtr<Elem> InfQuad4::build_side (const unsigned int i,
       AutoPtr<Elem> edge(NULL);
 
       switch (i)
-	{
-	case 0:
-	  {
+        {
+        case 0:
+          {
             edge.reset(new Edge2);
 
-	    edge->set_node(0) = this->get_node(0);
-	    edge->set_node(1) = this->get_node(1);
+            edge->set_node(0) = this->get_node(0);
+            edge->set_node(1) = this->get_node(1);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 1:
-	  {
-	    // adjacent to another infinite element
+        case 1:
+          {
+            // adjacent to another infinite element
             edge.reset(new InfEdge2);
 
-	    edge->set_node(0) = this->get_node(1);
-	    edge->set_node(1) = this->get_node(3);
+            edge->set_node(0) = this->get_node(1);
+            edge->set_node(1) = this->get_node(3);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 2:
-	  {
-	    // adjacent to another infinite element
+        case 2:
+          {
+            // adjacent to another infinite element
             edge.reset(new InfEdge2);
 
-	    edge->set_node(0) = this->get_node(0);
-	    edge->set_node(1) = this->get_node(2);
+            edge->set_node(0) = this->get_node(0);
+            edge->set_node(1) = this->get_node(2);
 
-	    break;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+            break;
+          }
+        default:
+          {
+            libmesh_error();
+          }
+        }
 
       edge->subdomain_id() = this->subdomain_id();
       return edge;
@@ -246,8 +246,8 @@ AutoPtr<Elem> InfQuad4::build_side (const unsigned int i,
 
 
 void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_less (sf, this->n_sub_elem());
   libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
@@ -258,18 +258,18 @@ void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
     {
     case TECPLOT:
       {
-	conn[0] = this->node(0)+1;
-	conn[1] = this->node(1)+1;
-	conn[2] = this->node(3)+1;
-	conn[3] = this->node(2)+1;
-	return;
+        conn[0] = this->node(0)+1;
+        conn[1] = this->node(1)+1;
+        conn[2] = this->node(3)+1;
+        conn[3] = this->node(2)+1;
+        return;
       }
     case VTK:
       {
-	conn[0] = this->node(0);
-	conn[1] = this->node(1);
-	conn[2] = this->node(3);
-	conn[3] = this->node(2);
+        conn[0] = this->node(0);
+        conn[1] = this->node(1);
+        conn[2] = this->node(3);
+        conn[3] = this->node(2);
       }
     default:
       libmesh_error();

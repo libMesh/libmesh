@@ -199,14 +199,14 @@ void ExactErrorEstimator::attach_reference_solution (EquationSystems* es_fine)
 
 #ifdef LIBMESH_ENABLE_AMR
 void ExactErrorEstimator::estimate_error (const System& system,
-					  ErrorVector& error_per_cell,
-					  const NumericVector<Number>* solution_vector,
-					  bool estimate_parent_error)
+                                          ErrorVector& error_per_cell,
+                                          const NumericVector<Number>* solution_vector,
+                                          bool estimate_parent_error)
 #else
 void ExactErrorEstimator::estimate_error (const System& system,
-					  ErrorVector& error_per_cell,
-					  const NumericVector<Number>* solution_vector,
-					  bool /* estimate_parent_error */ )
+                                          ErrorVector& error_per_cell,
+                                          const NumericVector<Number>* solution_vector,
+                                          bool /* estimate_parent_error */ )
 #endif
 {
   // The current mesh
@@ -263,22 +263,22 @@ void ExactErrorEstimator::estimate_error (const System& system,
       AutoPtr<NumericVector<Number> > fine_soln = NumericVector<Number>::build(system.comm());
       if (_equation_systems_fine)
       {
-	const System& fine_system = _equation_systems_fine->get_system(system.name());
+        const System& fine_system = _equation_systems_fine->get_system(system.name());
 
-	std::vector<Number> global_soln;
-	// FIXME - we're assuming that the fine system solution gets
-	// used even when a different vector is used for the coarse
-	// system
-	fine_system.update_global_solution(global_soln);
-	fine_soln->init (global_soln.size(), true, SERIAL);
-	(*fine_soln) = global_soln;
+        std::vector<Number> global_soln;
+        // FIXME - we're assuming that the fine system solution gets
+        // used even when a different vector is used for the coarse
+        // system
+        fine_system.update_global_solution(global_soln);
+        fine_soln->init (global_soln.size(), true, SERIAL);
+        (*fine_soln) = global_soln;
 
-	fine_values = AutoPtr<MeshFunction>
-	  (new MeshFunction(*_equation_systems_fine,
-			    *fine_soln,
-			    fine_system.get_dof_map(),
-			    fine_system.variable_number(var_name)));
-	fine_values->init();
+        fine_values = AutoPtr<MeshFunction>
+          (new MeshFunction(*_equation_systems_fine,
+                            *fine_soln,
+                            fine_system.get_dof_map(),
+                            fine_system.variable_number(var_name)));
+        fine_values->init();
       } else {
         // Initialize functors if we're using them
         for (unsigned int i=0; i != _exact_values.size(); ++i)
@@ -309,7 +309,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 
 #ifdef LIBMESH_ENABLE_AMR
       if (estimate_parent_error)
-	computed_var_on_parent.resize(error_per_cell.size(), false);
+        computed_var_on_parent.resize(error_per_cell.size(), false);
 #endif
 
       // TODO: this ought to be threaded (and using subordinate
@@ -324,10 +324,10 @@ void ExactErrorEstimator::estimate_error (const System& system,
         elem_end = mesh.active_local_elements_end();
 
       for (;elem_it != elem_end; ++elem_it)
-	{
-	  // e is necessarily an active element on the local processor
-	  const Elem* elem = *elem_it;
-	  const dof_id_type e_id = elem->id();
+        {
+          // e is necessarily an active element on the local processor
+          const Elem* elem = *elem_it;
+          const dof_id_type e_id = elem->id();
 
 #ifdef LIBMESH_ENABLE_AMR
           // See if the parent of element e has been examined yet;
@@ -356,30 +356,30 @@ void ExactErrorEstimator::estimate_error (const System& system,
                                            var, false);
 
               error_per_cell[parent->id()] +=
-		static_cast<ErrorVectorReal>
-		  (find_squared_element_error(system, var_name,
-					      parent, Uparent,
-					      fe.get(),
-					      fine_values.get()));
+                static_cast<ErrorVectorReal>
+                (find_squared_element_error(system, var_name,
+                                            parent, Uparent,
+                                            fe.get(),
+                                            fine_values.get()));
             }
 #endif
 
           // Get the local to global degree of freedom maps
           std::vector<dof_id_type> dof_indices;
           dof_map.dof_indices (elem, dof_indices, var);
-	  const unsigned int n_dofs =
-	    libmesh_cast_int<unsigned int>(dof_indices.size());
+          const unsigned int n_dofs =
+            libmesh_cast_int<unsigned int>(dof_indices.size());
           DenseVector<Number> Uelem(n_dofs);
           for (unsigned int i=0; i != n_dofs; ++i)
             Uelem(i) = system.current_solution(dof_indices[i]);
 
           error_per_cell[e_id] +=
-	    static_cast<ErrorVectorReal>
-	      (find_squared_element_error(system, var_name, elem,
-					  Uelem, fe.get(),
-					  fine_values.get()));
+            static_cast<ErrorVectorReal>
+            (find_squared_element_error(system, var_name, elem,
+                                        Uelem, fe.get(),
+                                        fine_values.get()));
 
-	} // End loop over active local elements
+        } // End loop over active local elements
     } // End loop over variables
 
 
@@ -401,10 +401,10 @@ void ExactErrorEstimator::estimate_error (const System& system,
     {
 
       if (error_per_cell[i] != 0.)
-	{
-	  libmesh_assert_greater (error_per_cell[i], 0.);
-	  error_per_cell[i] = std::sqrt(error_per_cell[i]);
-	}
+        {
+          libmesh_assert_greater (error_per_cell[i], 0.);
+          error_per_cell[i] = std::sqrt(error_per_cell[i]);
+        }
 
 
     }
@@ -499,12 +499,12 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
         {
           Number val_error = u_h;
           if (_exact_value)
-	    val_error -= _exact_value(q_point[qp],parameters,sys_name,var_name);
+            val_error -= _exact_value(q_point[qp],parameters,sys_name,var_name);
           else if (_exact_values.size() > sys_num && _exact_values[sys_num])
-	    val_error -= _exact_values[sys_num]->
+            val_error -= _exact_values[sys_num]->
               component(var_component, q_point[qp], system.time);
           else if (_equation_systems_fine)
-	    val_error -= (*fine_values)(q_point[qp]);
+            val_error -= (*fine_values)(q_point[qp]);
 
           // Add the squares of the error to each contribution
           error_val += JxW[qp]*TensorTools::norm_sq(val_error);
@@ -517,13 +517,13 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
           error_norm.type(var) == H2)
         {
           Gradient grad_error = grad_u_h;
-	  if(_exact_deriv)
-	    grad_error -= _exact_deriv(q_point[qp],parameters,sys_name,var_name);
+          if(_exact_deriv)
+            grad_error -= _exact_deriv(q_point[qp],parameters,sys_name,var_name);
           else if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
-	    grad_error -= _exact_derivs[sys_num]->
+            grad_error -= _exact_derivs[sys_num]->
               component(var_component, q_point[qp], system.time);
-	  else if(_equation_systems_fine)
-	    grad_error -= fine_values->gradient(q_point[qp]);
+          else if(_equation_systems_fine)
+            grad_error -= fine_values->gradient(q_point[qp]);
 
           error_val += JxW[qp]*grad_error.size_sq();
         }
@@ -535,14 +535,14 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
       if ((error_norm.type(var) == H2_SEMINORM ||
            error_norm.type(var) == H2))
         {
-	  Tensor grad2_error = grad2_u_h;
-	  if(_exact_hessian)
-	    grad2_error -= _exact_hessian(q_point[qp],parameters,sys_name,var_name);
+          Tensor grad2_error = grad2_u_h;
+          if(_exact_hessian)
+            grad2_error -= _exact_hessian(q_point[qp],parameters,sys_name,var_name);
           else if (_exact_hessians.size() > sys_num && _exact_hessians[sys_num])
-	    grad2_error -= _exact_hessians[sys_num]->
+            grad2_error -= _exact_hessians[sys_num]->
               component(var_component, q_point[qp], system.time);
-	  else if (_equation_systems_fine)
-	    grad2_error -= fine_values->hessian(q_point[qp]);
+          else if (_equation_systems_fine)
+            grad2_error -= fine_values->hessian(q_point[qp]);
 
           error_val += JxW[qp]*grad2_error.size_sq();
         }

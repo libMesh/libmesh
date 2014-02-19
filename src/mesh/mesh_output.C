@@ -29,9 +29,9 @@ namespace libMesh
 template <class MT>
 void MeshOutput<MT>::
 _build_variable_names_and_solution_vector (const EquationSystems& es,
-					   std::vector<Number>& soln,
-					   std::vector<std::string>& names,
-					   const std::set<std::string>* system_names)
+                                           std::vector<Number>& soln,
+                                           std::vector<std::string>& names,
+                                           const std::set<std::string>* system_names)
 {
   if(!_is_parallel_format)
   {

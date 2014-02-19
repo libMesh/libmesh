@@ -69,56 +69,56 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
     {
       //Check to see if we are doing (A^T)*A
       if (this == &A)
-	{
-	  //libmesh_here();
-	  DenseMatrix<T> B(*this);
+        {
+          //libmesh_here();
+          DenseMatrix<T> B(*this);
 
-	  // Simple but inefficient way
-	  // return this->left_multiply_transpose(B);
+          // Simple but inefficient way
+          // return this->left_multiply_transpose(B);
 
-	  // More efficient, but more code way
-	  // If A is mxn, the result will be a square matrix of Size n x n.
-	  const unsigned int n_rows = A.m();
-	  const unsigned int n_cols = A.n();
+          // More efficient, but more code way
+          // If A is mxn, the result will be a square matrix of Size n x n.
+          const unsigned int n_rows = A.m();
+          const unsigned int n_cols = A.n();
 
-	  // resize() *this and also zero out all entries.
-	  this->resize(n_cols,n_cols);
+          // resize() *this and also zero out all entries.
+          this->resize(n_cols,n_cols);
 
-	  // Compute the lower-triangular part
-	  for (unsigned int i=0; i<n_cols; ++i)
-	    for (unsigned int j=0; j<=i; ++j)
-	      for (unsigned int k=0; k<n_rows; ++k) // inner products are over n_rows
-		(*this)(i,j) += B(k,i)*B(k,j);
+          // Compute the lower-triangular part
+          for (unsigned int i=0; i<n_cols; ++i)
+            for (unsigned int j=0; j<=i; ++j)
+              for (unsigned int k=0; k<n_rows; ++k) // inner products are over n_rows
+                (*this)(i,j) += B(k,i)*B(k,j);
 
-	  // Copy lower-triangular part into upper-triangular part
-	  for (unsigned int i=0; i<n_cols; ++i)
-	    for (unsigned int j=i+1; j<n_cols; ++j)
-	      (*this)(i,j) = (*this)(j,i);
-	}
+          // Copy lower-triangular part into upper-triangular part
+          for (unsigned int i=0; i<n_cols; ++i)
+            for (unsigned int j=i+1; j<n_cols; ++j)
+              (*this)(i,j) = (*this)(j,i);
+        }
 
       else
-	{
-	  DenseMatrix<T> B(*this);
+        {
+          DenseMatrix<T> B(*this);
 
-	  this->resize (A.n(), B.n());
+          this->resize (A.n(), B.n());
 
-	  libmesh_assert_equal_to (A.m(), B.m());
-	  libmesh_assert_equal_to (this->m(), A.n());
-	  libmesh_assert_equal_to (this->n(), B.n());
+          libmesh_assert_equal_to (A.m(), B.m());
+          libmesh_assert_equal_to (this->m(), A.n());
+          libmesh_assert_equal_to (this->n(), B.n());
 
-	  const unsigned int m_s = A.n();
-	  const unsigned int p_s = A.m();
-	  const unsigned int n_s = this->n();
+          const unsigned int m_s = A.n();
+          const unsigned int p_s = A.m();
+          const unsigned int n_s = this->n();
 
-	  // Do it this way because there is a
-	  // decent chance (at least for constraint matrices)
-	  // that A.transpose(i,k) = 0.
-	  for (unsigned int i=0; i<m_s; i++)
-	    for (unsigned int k=0; k<p_s; k++)
-	      if (A.transpose(i,k) != 0.)
-		for (unsigned int j=0; j<n_s; j++)
-		  (*this)(i,j) += A.transpose(i,k)*B(k,j);
-	}
+          // Do it this way because there is a
+          // decent chance (at least for constraint matrices)
+          // that A.transpose(i,k) = 0.
+          for (unsigned int i=0; i<m_s; i++)
+            for (unsigned int k=0; k<p_s; k++)
+              if (A.transpose(i,k) != 0.)
+                for (unsigned int j=0; j<n_s; j++)
+                  (*this)(i,j) += A.transpose(i,k)*B(k,j);
+        }
     }
 
 }
@@ -163,56 +163,56 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
     {
       //Check to see if we are doing B*(B^T)
       if (this == &B)
-	{
-	  //libmesh_here();
-	  DenseMatrix<T> A(*this);
+        {
+          //libmesh_here();
+          DenseMatrix<T> A(*this);
 
-	  // Simple but inefficient way
-	  // return this->right_multiply_transpose(A);
+          // Simple but inefficient way
+          // return this->right_multiply_transpose(A);
 
-	  // More efficient, more code
-	  // If B is mxn, the result will be a square matrix of Size m x m.
-	  const unsigned int n_rows = B.m();
-	  const unsigned int n_cols = B.n();
+          // More efficient, more code
+          // If B is mxn, the result will be a square matrix of Size m x m.
+          const unsigned int n_rows = B.m();
+          const unsigned int n_cols = B.n();
 
-	  // resize() *this and also zero out all entries.
-	  this->resize(n_rows,n_rows);
+          // resize() *this and also zero out all entries.
+          this->resize(n_rows,n_rows);
 
-	  // Compute the lower-triangular part
-	  for (unsigned int i=0; i<n_rows; ++i)
-	    for (unsigned int j=0; j<=i; ++j)
-	      for (unsigned int k=0; k<n_cols; ++k) // inner products are over n_cols
-		(*this)(i,j) += A(i,k)*A(j,k);
+          // Compute the lower-triangular part
+          for (unsigned int i=0; i<n_rows; ++i)
+            for (unsigned int j=0; j<=i; ++j)
+              for (unsigned int k=0; k<n_cols; ++k) // inner products are over n_cols
+                (*this)(i,j) += A(i,k)*A(j,k);
 
-	  // Copy lower-triangular part into upper-triangular part
-	  for (unsigned int i=0; i<n_rows; ++i)
-	    for (unsigned int j=i+1; j<n_rows; ++j)
-	      (*this)(i,j) = (*this)(j,i);
-	}
+          // Copy lower-triangular part into upper-triangular part
+          for (unsigned int i=0; i<n_rows; ++i)
+            for (unsigned int j=i+1; j<n_rows; ++j)
+              (*this)(i,j) = (*this)(j,i);
+        }
 
       else
-	{
-	  DenseMatrix<T> A(*this);
+        {
+          DenseMatrix<T> A(*this);
 
-	  this->resize (A.m(), B.m());
+          this->resize (A.m(), B.m());
 
-	  libmesh_assert_equal_to (A.n(), B.n());
-	  libmesh_assert_equal_to (this->m(), A.m());
-	  libmesh_assert_equal_to (this->n(), B.m());
+          libmesh_assert_equal_to (A.n(), B.n());
+          libmesh_assert_equal_to (this->m(), A.m());
+          libmesh_assert_equal_to (this->n(), B.m());
 
-	  const unsigned int m_s = A.m();
-	  const unsigned int p_s = A.n();
-	  const unsigned int n_s = this->n();
+          const unsigned int m_s = A.m();
+          const unsigned int p_s = A.n();
+          const unsigned int n_s = this->n();
 
-	  // Do it this way because there is a
-	  // decent chance (at least for constraint matrices)
-	  // that B.transpose(k,j) = 0.
-	  for (unsigned int j=0; j<n_s; j++)
-	    for (unsigned int k=0; k<p_s; k++)
-	      if (B.transpose(k,j) != 0.)
-		for (unsigned int i=0; i<m_s; i++)
-		  (*this)(i,j) += A(i,k)*B.transpose(k,j);
-	}
+          // Do it this way because there is a
+          // decent chance (at least for constraint matrices)
+          // that B.transpose(k,j) = 0.
+          for (unsigned int j=0; j<n_s; j++)
+            for (unsigned int k=0; k<p_s; k++)
+              if (B.transpose(k,j) != 0.)
+                for (unsigned int i=0; i<m_s; i++)
+                  (*this)(i,j) += A(i,k)*B.transpose(k,j);
+        }
     }
 }
 
@@ -241,8 +241,8 @@ void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
       const unsigned int n_cols = this->n();
 
       for(unsigned int i=0; i<n_rows; i++)
-	for(unsigned int j=0; j<n_cols; j++)
-	  dest(i) += (*this)(i,j)*arg(j);
+        for(unsigned int j=0; j<n_cols; j++)
+          dest(i) += (*this)(i,j)*arg(j);
     }
 }
 
@@ -280,8 +280,8 @@ void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest,
 
       // ALSO WORKS, (i,j) just swapped
       for(unsigned int i=0; i<n_cols; i++)
-	for(unsigned int j=0; j<n_rows; j++)
-	  dest(i) += (*this)(j,i)*arg(j);
+        for(unsigned int j=0; j<n_rows; j++)
+          dest(i) += (*this)(j,i)*arg(j);
     }
 }
 
@@ -349,7 +349,7 @@ void DenseMatrix<T>::get_transpose (DenseMatrix<T>& dest) const
 
 template<typename T>
 void DenseMatrix<T>::lu_solve (const DenseVector<T>& b,
-			       DenseVector<T>& x)
+                               DenseVector<T>& x)
 {
   // Check to be sure that the matrix is square before attempting
   // an LU-solve.  In general, one can compute the LU factorization of
@@ -368,33 +368,33 @@ void DenseMatrix<T>::lu_solve (const DenseVector<T>& b,
     {
     case NONE:
       {
-	if (this->use_blas_lapack)
-	  this->_lu_decompose_lapack();
-	else
-	  this->_lu_decompose ();
-	break;
+        if (this->use_blas_lapack)
+          this->_lu_decompose_lapack();
+        else
+          this->_lu_decompose ();
+        break;
       }
 
     case LU_BLAS_LAPACK:
       {
-	// Already factored, just need to call back_substitute.
-	if (this->use_blas_lapack)
-	  break;
+        // Already factored, just need to call back_substitute.
+        if (this->use_blas_lapack)
+          break;
       }
 
     case LU:
       {
-	// Already factored, just need to call back_substitute.
-	if ( !(this->use_blas_lapack) )
-	  break;
+        // Already factored, just need to call back_substitute.
+        if ( !(this->use_blas_lapack) )
+          break;
       }
 
     default:
       {
-	libMesh::err << "Error! This matrix already has a "
-		      << "different decomposition..."
-		      << std::endl;
-	libmesh_error();
+        libMesh::err << "Error! This matrix already has a "
+                     << "different decomposition..."
+                     << std::endl;
+        libmesh_error();
       }
     }
 
@@ -411,7 +411,7 @@ void DenseMatrix<T>::lu_solve (const DenseVector<T>& b,
 
 template<typename T>
 void DenseMatrix<T>::_lu_back_substitute (const DenseVector<T>& b,
-					  DenseVector<T>& x ) const
+                                          DenseVector<T>& x ) const
 {
   const unsigned int
     n_cols = this->n();
@@ -433,12 +433,12 @@ void DenseMatrix<T>::_lu_back_substitute (const DenseVector<T>& b,
     {
       // Swap
       if (_pivots[i] != static_cast<int>(i))
-	std::swap( z(i), z(_pivots[i]) );
+        std::swap( z(i), z(_pivots[i]) );
 
       x(i) = z(i);
 
       for (unsigned int j=0; j<i; ++j)
-	x(i) -= A(i,j)*x(j);
+        x(i) -= A(i,j)*x(j);
 
       x(i) /= A(i,i);
     }
@@ -449,7 +449,7 @@ void DenseMatrix<T>::_lu_back_substitute (const DenseVector<T>& b,
   for (int i=last_row; i>=0; --i)
     {
       for (int j=i+1; j<static_cast<int>(n_cols); ++j)
-	x(i) -= A(i,j)*x(j);
+        x(i) -= A(i,j)*x(j);
     }
 }
 
@@ -484,14 +484,14 @@ void DenseMatrix<T>::_lu_decompose ()
       // std::abs(complex) must return a Real!
       Real the_max = std::abs( A(i,i) );
       for (unsigned int j=i+1; j<n_rows; ++j)
-	{
-	  Real candidate_max = std::abs( A(j,i) );
-	  if (the_max < candidate_max)
-	    {
-	      the_max = candidate_max;
-	      _pivots[i] = j;
-	    }
-	}
+        {
+          Real candidate_max = std::abs( A(j,i) );
+          if (the_max < candidate_max)
+            {
+              the_max = candidate_max;
+              _pivots[i] = j;
+            }
+        }
 
       // libMesh::out << "the_max=" << the_max << " found at row " << _pivots[i] << std::endl;
 
@@ -499,24 +499,24 @@ void DenseMatrix<T>::_lu_decompose ()
       // Here we interchange the *entire* row, in Gaussian elimination
       // you would only interchange the subrows A(i,j) and A(p(i),j), for j>i
       if (_pivots[i] != static_cast<int>(i))
-	{
-	  for (unsigned int j=0; j<n_rows; ++j)
-	    std::swap( A(i,j), A(_pivots[i], j) );
-	}
+        {
+          for (unsigned int j=0; j<n_rows; ++j)
+            std::swap( A(i,j), A(_pivots[i], j) );
+        }
 
 
       // If the max abs entry found is zero, the matrix is singular
       if (A(i,i) == libMesh::zero)
-	{
-	  libMesh::out << "Matrix A is singular!" << std::endl;
-	  libmesh_error();
-	}
+        {
+          libMesh::out << "Matrix A is singular!" << std::endl;
+          libmesh_error();
+        }
 
       // Scale upper triangle entries of row i by the diagonal entry
       // Note: don't scale the diagonal entry itself!
       const T diag_inv = 1. / A(i,i);
       for (unsigned int j=i+1; j<n_rows; ++j)
-	A(i,j) *= diag_inv;
+        A(i,j) *= diag_inv;
 
       // Update the remaining sub-matrix A[i+1:m][i+1:m]
       // by subtracting off (the diagonal-scaled)
@@ -530,8 +530,8 @@ void DenseMatrix<T>::_lu_decompose ()
       // in Gaussian elimination, this would 'zero' the
       // entry in the i'th column.
       for (unsigned int row=i+1; row<n_rows; ++row)
-	for (unsigned int col=i+1; col<n_rows; ++col)
-	  A(row,col) -= A(row,i) * A(i,col);
+        for (unsigned int col=i+1; col<n_rows; ++col)
+          A(row,col) -= A(row,i) * A(i,col);
 
     } // end i loop
 
@@ -565,25 +565,25 @@ T DenseMatrix<T>::det ()
     {
     case NONE:
       {
-	// First LU decompose the matrix.
-	// Note that the lu_decompose routine will check to see if the
-	// matrix is square so we don't worry about it.
-	if (this->use_blas_lapack)
-	  this->_lu_decompose_lapack();
-	else
-	  this->_lu_decompose ();
+        // First LU decompose the matrix.
+        // Note that the lu_decompose routine will check to see if the
+        // matrix is square so we don't worry about it.
+        if (this->use_blas_lapack)
+          this->_lu_decompose_lapack();
+        else
+          this->_lu_decompose ();
       }
     case LU:
     case LU_BLAS_LAPACK:
       {
-	// Already decomposed, don't do anything
-	break;
+        // Already decomposed, don't do anything
+        break;
       }
     default:
       {
       libMesh::err << "Error! Can't compute the determinant under "
-		    << "the current decomposition."
-		    << std::endl;
+                   << "the current decomposition."
+                   << std::endl;
       libmesh_error();
       }
     }
@@ -600,13 +600,13 @@ T DenseMatrix<T>::det ()
   for (unsigned int i=0; i<this->m(); i++)
     {
       if (this->_decomposition_type==LU)
-	if (_pivots[i] != static_cast<int>(i))
-	  n_interchanges++;
+        if (_pivots[i] != static_cast<int>(i))
+          n_interchanges++;
 
       // Lapack pivots are 1-based!
       if (this->_decomposition_type==LU_BLAS_LAPACK)
-	if (_pivots[i] != static_cast<int>(i+1))
-	  n_interchanges++;
+        if (_pivots[i] != static_cast<int>(i+1))
+          n_interchanges++;
 
       determinant *= (*this)(i,i);
     }
@@ -626,29 +626,29 @@ T DenseMatrix<T>::det ()
 template <typename T>
 template <typename T2>
 void DenseMatrix<T>::cholesky_solve (const DenseVector<T2>& b,
-				     DenseVector<T2>& x)
+                                     DenseVector<T2>& x)
 {
   // Check for a previous decomposition
   switch(this->_decomposition_type)
     {
     case NONE:
       {
-	this->_cholesky_decompose ();
-	break;
+        this->_cholesky_decompose ();
+        break;
       }
 
     case CHOLESKY:
       {
-	// Already factored, just need to call back_substitute.
-	break;
+        // Already factored, just need to call back_substitute.
+        break;
       }
 
     default:
       {
-	libMesh::err << "Error! This matrix already has a "
-		      << "different decomposition..."
-		      << std::endl;
-	libmesh_error();
+        libMesh::err << "Error! This matrix already has a "
+                     << "different decomposition..."
+                     << std::endl;
+        libmesh_error();
       }
     }
 
@@ -682,27 +682,27 @@ void DenseMatrix<T>::_cholesky_decompose ()
   for (unsigned int i=0; i<n_rows; ++i)
     {
       for (unsigned int j=i; j<n_cols; ++j)
-	{
-	  for (unsigned int k=0; k<i; ++k)
-	    A(i,j) -= A(i,k) * A(j,k);
+        {
+          for (unsigned int k=0; k<i; ++k)
+            A(i,j) -= A(i,k) * A(j,k);
 
-	  if (i == j)
-	    {
+          if (i == j)
+            {
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
-	      if (A(i,j) <= 0.0)
-		{
-		  libMesh::err << "Error! Can only use Cholesky decomposition "
-			        << "with symmetric positive definite matrices."
-			        << std::endl;
-		  libmesh_error();
-		}
+              if (A(i,j) <= 0.0)
+                {
+                  libMesh::err << "Error! Can only use Cholesky decomposition "
+                               << "with symmetric positive definite matrices."
+                               << std::endl;
+                  libmesh_error();
+                }
 #endif
 
-	      A(i,i) = std::sqrt(A(i,j));
-	    }
-	  else
-	    A(j,i) = A(i,j) / A(i,i);
-	}
+              A(i,i) = std::sqrt(A(i,j));
+            }
+          else
+            A(j,i) = A(i,j) / A(i,i);
+        }
     }
 
   // Set the flag for CHOLESKY decomposition
@@ -714,7 +714,7 @@ void DenseMatrix<T>::_cholesky_decompose ()
 template <typename T>
 template <typename T2>
 void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
-						DenseVector<T2>& x) const
+                                                DenseVector<T2>& x) const
 {
   // Shorthand notation for number of rows and columns.
   const unsigned int
@@ -736,7 +736,7 @@ void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
       T2 temp = b(i);
 
       for (unsigned int k=0; k<i; ++k)
-	temp -= A(i,k)*x(k);
+        temp -= A(i,k)*x(k);
 
       x(i) = temp / A(i,i);
     }
@@ -747,7 +747,7 @@ void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
       const unsigned int ib = (n_cols-1)-i;
 
       for (unsigned int k=(ib+1); k<n_cols; ++k)
-	x(ib) -= A(k,ib) * x(k);
+        x(ib) -= A(k,ib) * x(k);
 
       x(ib) /= A(ib,ib);
     }
@@ -796,7 +796,7 @@ void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
 //       e(j) = 1.;
 //       this->_lu_back_substitute(e, x, false);
 //       for (unsigned int i=0; i<this->n(); ++i)
-// 	inv(i,j) = x(i);
+// inv(i,j) = x(i);
 //     }
 
 //   // Now overwrite all the entries

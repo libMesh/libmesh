@@ -53,8 +53,8 @@ namespace libMesh
 // ------------------------------------------------------------
 // System implementation
 System::System (EquationSystems& es,
-		const std::string& name_in,
-		const unsigned int number_in) :
+                const std::string& name_in,
+                const unsigned int number_in) :
 
   ParallelObject                    (es),
   assemble_before_solve             (true),
@@ -208,9 +208,9 @@ void System::clear ()
   {
     for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
       {
-	pos->second->clear ();
-	delete pos->second;
-	pos->second = NULL;
+        pos->second->clear ();
+        delete pos->second;
+        pos->second = NULL;
       }
 
     _vectors.clear();
@@ -325,7 +325,7 @@ void System::restrict_vectors ()
       NumericVector<Number>* v = pos->second;
 
       if (_vector_projections[pos->first])
-	this->project_vector (*v);
+        this->project_vector (*v);
       else
       {
         ParallelType type = _vector_types[pos->first];
@@ -354,7 +354,7 @@ void System::restrict_vectors ()
 
 #ifdef LIBMESH_ENABLE_GHOSTED
   current_local_solution->init(this->n_dofs(),
-			       this->n_local_dofs(), send_list,
+                               this->n_local_dofs(), send_list,
                                false, GHOSTED);
 #else
   current_local_solution->init(this->n_dofs());
@@ -401,7 +401,7 @@ void System::reinit ()
 
   for (dof_id_type i=0; i<local_size; i++)
     solution->set(i+first_local_dof,
-		  (*current_local_solution)(i+first_local_dof));
+                  (*current_local_solution)(i+first_local_dof));
 
   solution->close();
 }
@@ -454,7 +454,7 @@ void System::re_update ()
 
 
 void System::restrict_solve_to (const SystemSubset* subset,
-				const SubsetSolveMode /*subset_solve_mode*/)
+                                const SubsetSolveMode /*subset_solve_mode*/)
 {
   if(subset!=NULL)
     {
@@ -524,8 +524,8 @@ void System::qoi_parameter_sensitivity
 
 
 bool System::compare (const System& other_system,
-		      const Real threshold,
-		      const bool verbose) const
+                      const Real threshold,
+                      const bool verbose) const
 {
   // we do not care for matrices, but for vectors
   libmesh_assert (!_can_add_vectors);
@@ -543,24 +543,24 @@ bool System::compare (const System& other_system,
   if (verbose)
     {
       if (name_result == 0)
-	libMesh::out << " identical." << std::endl;
+        libMesh::out << " identical." << std::endl;
       else
-	libMesh::out << "  names not identical." << std::endl;
+        libMesh::out << "  names not identical." << std::endl;
       libMesh::out << "   comparing solution vector...";
     }
 
 
   // compare the solution: -1 means identical
   const int solu_result = solution->compare (*other_system.solution.get(),
-					     threshold);
+                                             threshold);
 
   if (verbose)
     {
       if (solu_result == -1)
-	libMesh::out << " identical up to threshold." << std::endl;
+        libMesh::out << " identical up to threshold." << std::endl;
       else
-	libMesh::out << "  first difference occured at index = "
-		  << solu_result << "." << std::endl;
+        libMesh::out << "  first difference occured at index = "
+                     << solu_result << "." << std::endl;
     }
 
 
@@ -572,13 +572,13 @@ bool System::compare (const System& other_system,
     {
       if (verbose)
         {
-	  libMesh::out << "   Fatal difference. This system handles "
-		    << this->n_vectors() << " add'l vectors," << std::endl
-		    << "   while the other system handles "
-		    << other_system.n_vectors()
-		    << " add'l vectors." << std::endl
-		    << "   Aborting comparison." << std::endl;
-	}
+          libMesh::out << "   Fatal difference. This system handles "
+                       << this->n_vectors() << " add'l vectors," << std::endl
+                       << "   while the other system handles "
+                       << other_system.n_vectors()
+                       << " add'l vectors." << std::endl
+                       << "   Aborting comparison." << std::endl;
+        }
       return false;
     }
   else if (this->n_vectors() == 0)
@@ -590,29 +590,29 @@ bool System::compare (const System& other_system,
     {
       // compare other vectors
       for (const_vectors_iterator pos = _vectors.begin();
-	   pos != _vectors.end(); ++pos)
+           pos != _vectors.end(); ++pos)
         {
-	  if (verbose)
-	      libMesh::out << "   comparing vector \""
-			<< pos->first << "\" ...";
+          if (verbose)
+            libMesh::out << "   comparing vector \""
+                         << pos->first << "\" ...";
 
-	  // assume they have the same name
-	  const NumericVector<Number>& other_system_vector =
-	      other_system.get_vector(pos->first);
+          // assume they have the same name
+          const NumericVector<Number>& other_system_vector =
+            other_system.get_vector(pos->first);
 
-	  ov_result.push_back(pos->second->compare (other_system_vector,
-						    threshold));
+          ov_result.push_back(pos->second->compare (other_system_vector,
+                                                    threshold));
 
-	  if (verbose)
-	    {
-	      if (ov_result[ov_result.size()-1] == -1)
-		libMesh::out << " identical up to threshold." << std::endl;
-	      else
-		libMesh::out << " first difference occured at" << std::endl
-			  << "   index = " << ov_result[ov_result.size()-1] << "." << std::endl;
-	    }
+          if (verbose)
+            {
+              if (ov_result[ov_result.size()-1] == -1)
+                libMesh::out << " identical up to threshold." << std::endl;
+              else
+                libMesh::out << " first difference occured at" << std::endl
+                             << "   index = " << ov_result[ov_result.size()-1] << "." << std::endl;
+            }
 
-	}
+        }
 
     } // finished comparing additional vectors
 
@@ -623,19 +623,19 @@ bool System::compare (const System& other_system,
   if ((name_result==0) && (solu_result==-1))
     {
       if (ov_result.size()==0)
-	overall_result = true;
+        overall_result = true;
       else
         {
-	  bool ov_identical;
-	  unsigned int n    = 0;
-	  do
-	    {
-	      ov_identical = (ov_result[n]==-1);
-	      n++;
-	    }
-	  while (ov_identical && n<ov_result.size());
-	  overall_result = ov_identical;
-	}
+          bool ov_identical;
+          unsigned int n    = 0;
+          do
+            {
+              ov_identical = (ov_result[n]==-1);
+              n++;
+            }
+          while (ov_identical && n<ov_result.size());
+          overall_result = ov_identical;
+        }
     }
   else
     overall_result = false;
@@ -644,9 +644,9 @@ bool System::compare (const System& other_system,
     {
       libMesh::out << "   finished comparisons, ";
       if (overall_result)
-	libMesh::out << "found no differences." << std::endl << std::endl;
+        libMesh::out << "found no differences." << std::endl << std::endl;
       else
-	libMesh::out << "found differences." << std::endl << std::endl;
+        libMesh::out << "found differences." << std::endl << std::endl;
     }
 
   return overall_result;
@@ -664,7 +664,7 @@ void System::update_global_solution (std::vector<Number>& global_soln) const
 
 
 void System::update_global_solution (std::vector<Number>& global_soln,
-				     const unsigned int   dest_proc) const
+                                     const unsigned int   dest_proc) const
 {
   global_soln.resize        (solution->size());
 
@@ -790,9 +790,9 @@ const NumericVector<Number> & System::get_vector (const std::string& vec_name) c
   if (pos == _vectors.end())
     {
       libMesh::err << "ERROR: vector "
-		    << vec_name
-		    << " does not exist in this system!"
-		    << std::endl;
+                   << vec_name
+                   << " does not exist in this system!"
+                   << std::endl;
       libmesh_error();
     }
 
@@ -809,9 +809,9 @@ NumericVector<Number> & System::get_vector (const std::string& vec_name)
   if (pos == _vectors.end())
     {
       libMesh::err << "ERROR: vector "
-		    << vec_name
-		    << " does not exist in this system!"
-		    << std::endl;
+                   << vec_name
+                   << " does not exist in this system!"
+                   << std::endl;
       libmesh_error();
     }
 
@@ -875,7 +875,7 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
     {
       // Check if the current vector is the one whose name we want
       if(&vec_reference == v->second)
-	break; // exit loop if it is
+        break; // exit loop if it is
     }
 
   // Before returning, make sure we didnt loop till the end and not find any match
@@ -1075,22 +1075,22 @@ const NumericVector<Number> & System::get_sensitivity_rhs (unsigned int i) const
 
 
 unsigned int System::add_variable (const std::string& var,
-			           const FEType& type,
-				   const std::set<subdomain_id_type> * const active_subdomains)
+                                   const FEType& type,
+                                   const std::set<subdomain_id_type> * const active_subdomains)
 {
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   for (unsigned int v=0; v<this->n_vars(); v++)
     if (this->variable_name(v) == var)
       {
-	if (this->variable_type(v) == type)
-	  return _variables[v].number();
+        if (this->variable_type(v) == type)
+          return _variables[v].number();
 
-	libMesh::err << "ERROR: incompatible variable "
-		     << var
-		     << " has already been added for this system!"
-		     << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: incompatible variable "
+                     << var
+                     << " has already been added for this system!"
+                     << std::endl;
+        libmesh_error();
       }
 
   // Optimize for VariableGroups here - if the user is adding multiple
@@ -1111,79 +1111,79 @@ unsigned int System::add_variable (const std::string& var,
 
       // get a pointer to their subdomain restriction, if any.
       const std::set<subdomain_id_type> * const
-	their_active_subdomains (vg.implicitly_active() ?
-				 NULL : &vg.active_subdomains());
+        their_active_subdomains (vg.implicitly_active() ?
+                                 NULL : &vg.active_subdomains());
 
       // Different types?
       if (vg.type() != type)
-	should_be_in_vg = false;
+        should_be_in_vg = false;
 
       // they are restricted, we aren't?
       if (their_active_subdomains && !active_subdomains)
-	should_be_in_vg = false;
+        should_be_in_vg = false;
 
       // they aren't restriced, we are?
       if (!their_active_subdomains && active_subdomains)
-	should_be_in_vg = false;
+        should_be_in_vg = false;
 
       if (their_active_subdomains && active_subdomains)
-	// restricted to different sets?
-	if (*their_active_subdomains != *active_subdomains)
-	  should_be_in_vg = false;
+        // restricted to different sets?
+        if (*their_active_subdomains != *active_subdomains)
+          should_be_in_vg = false;
 
       // OK, after all that, append the variable to the vg if none of the conditions
       // were violated
       if (should_be_in_vg)
-	{
-	  const unsigned int curr_n_vars = this->n_vars();
+        {
+          const unsigned int curr_n_vars = this->n_vars();
 
-	  vg.append (var);
+          vg.append (var);
 
-	  _variables.push_back(vg(vg.n_variables()-1));
-	  _variable_numbers[var] = curr_n_vars;
-	  return curr_n_vars;
-	}
+          _variables.push_back(vg(vg.n_variables()-1));
+          _variable_numbers[var] = curr_n_vars;
+          return curr_n_vars;
+        }
     }
 
   // otherwise, fall back to adding a single variable group
   return this->add_variables (std::vector<std::string>(1, var),
-			      type,
-			      active_subdomains);
+                              type,
+                              active_subdomains);
 }
 
 
 
 unsigned int System::add_variable (const std::string& var,
-			           const Order order,
-			           const FEFamily family,
-				   const std::set<subdomain_id_type> * const active_subdomains)
+                                   const Order order,
+                                   const FEFamily family,
+                                   const std::set<subdomain_id_type> * const active_subdomains)
 {
   return this->add_variable(var,
-			    FEType(order, family),
-			    active_subdomains);
+                            FEType(order, family),
+                            active_subdomains);
 }
 
 
 
 unsigned int System::add_variables (const std::vector<std::string> &vars,
-				    const FEType& type,
-				    const std::set<subdomain_id_type> * const active_subdomains)
+                                    const FEType& type,
+                                    const std::set<subdomain_id_type> * const active_subdomains)
 {
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   for (unsigned int ov=0; ov<vars.size(); ov++)
     for (unsigned int v=0; v<this->n_vars(); v++)
       if (this->variable_name(v) == vars[ov])
-	{
-	  if (this->variable_type(v) == type)
-	    return _variables[v].number();
+        {
+          if (this->variable_type(v) == type)
+            return _variables[v].number();
 
-	  libMesh::err << "ERROR: incompatible variable "
-		       << vars[ov]
-		       << " has already been added for this system!"
-		       << std::endl;
-	  libmesh_error();
-	}
+          libMesh::err << "ERROR: incompatible variable "
+                       << vars[ov]
+                       << " has already been added for this system!"
+                       << std::endl;
+          libmesh_error();
+        }
 
   const unsigned int curr_n_vars = this->n_vars();
 
@@ -1191,10 +1191,10 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
 
   // Add the variable group to the list
   _variable_groups.push_back((active_subdomains == NULL) ?
-			     VariableGroup(this, vars, curr_n_vars,
-					   next_first_component, type) :
-			     VariableGroup(this, vars, curr_n_vars,
-					   next_first_component, type, *active_subdomains));
+                             VariableGroup(this, vars, curr_n_vars,
+                                           next_first_component, type) :
+                             VariableGroup(this, vars, curr_n_vars,
+                                           next_first_component, type, *active_subdomains));
 
   const VariableGroup &vg (_variable_groups.back());
 
@@ -1219,13 +1219,13 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
 
 
 unsigned int System::add_variables (const std::vector<std::string> &vars,
-				    const Order order,
-				    const FEFamily family,
-				    const std::set<subdomain_id_type> * const active_subdomains)
+                                    const Order order,
+                                    const FEFamily family,
+                                    const std::set<subdomain_id_type> * const active_subdomains)
 {
   return this->add_variables(vars,
-			     FEType(order, family),
-			     active_subdomains);
+                             FEType(order, family),
+                             active_subdomains);
 }
 
 
@@ -1246,9 +1246,9 @@ unsigned short int System::variable_number (const std::string& var) const
   if (pos == _variable_numbers.end())
     {
       libMesh::err << "ERROR: variable "
-		    << var
-		    << " does not exist in this system!"
-		    << std::endl;
+                   << var
+                   << " does not exist in this system!"
+                   << std::endl;
       libmesh_error();
     }
   libmesh_assert_equal_to (_variables[pos->second].name(), var);
@@ -1277,7 +1277,7 @@ void System::get_all_variable_numbers(std::vector<unsigned int>& all_variable_nu
 
 
 void System::local_dof_indices(const unsigned int var,
-			       std::set<dof_id_type> & var_indices) const
+                               std::set<dof_id_type> & var_indices) const
 {
   // Make sure the set is clear
   var_indices.clear();
@@ -1329,13 +1329,13 @@ void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) cons
     const MeshBase::const_node_iterator end_it = mesh.local_nodes_end();
     for ( ; it != end_it; ++it)
       {
-	const Node* node = *it;
-	unsigned int n_comp = node->n_comp(sys_num,var_num);
-	for(unsigned int i=0; i<n_comp; i++)
-	  {
-	    const dof_id_type index = node->dof_number(sys_num,var_num,i);
-	    v.set(index,0.0);
-	  }
+        const Node* node = *it;
+        unsigned int n_comp = node->n_comp(sys_num,var_num);
+        for(unsigned int i=0; i<n_comp; i++)
+          {
+            const dof_id_type index = node->dof_number(sys_num,var_num,i);
+            v.set(index,0.0);
+          }
       }
   }
 
@@ -1345,13 +1345,13 @@ void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) cons
     const MeshBase::const_element_iterator end_it = mesh.active_local_elements_end();
     for ( ; it != end_it; ++it)
       {
-	const Elem* elem = *it;
-	unsigned int n_comp = elem->n_comp(sys_num,var_num);
-	for(unsigned int i=0; i<n_comp; i++)
-	  {
-	    const dof_id_type index = elem->dof_number(sys_num,var_num,i);
-	    v.set(index,0.0);
-	  }
+        const Elem* elem = *it;
+        unsigned int n_comp = elem->n_comp(sys_num,var_num);
+        for(unsigned int i=0; i<n_comp; i++)
+          {
+            const dof_id_type index = elem->dof_number(sys_num,var_num,i);
+            v.set(index,0.0);
+          }
       }
   }
 }
@@ -1470,26 +1470,26 @@ Real System::calculate_norm(const NumericVector<Number>& v,
       // Check for unimplemented norms (rather than just returning 0).
       FEMNormType norm_type = norm.type(var);
       if((norm_type==H1) ||
-	 (norm_type==H2) ||
-	 (norm_type==L2) ||
-	 (norm_type==H1_SEMINORM) ||
-	 (norm_type==H2_SEMINORM))
+         (norm_type==H2) ||
+         (norm_type==L2) ||
+         (norm_type==H1_SEMINORM) ||
+         (norm_type==H2_SEMINORM))
         {
           if (!using_hilbert_norm)
             libmesh_not_implemented();
           using_nonhilbert_norm = false;
         }
       else if ((norm_type==L1) ||
-	       (norm_type==L_INF) ||
-	       (norm_type==W1_INF_SEMINORM) ||
-	       (norm_type==W2_INF_SEMINORM))
+               (norm_type==L_INF) ||
+               (norm_type==W1_INF_SEMINORM) ||
+               (norm_type==W2_INF_SEMINORM))
         {
           if (!using_nonhilbert_norm)
             libmesh_not_implemented();
           using_hilbert_norm = false;
         }
       else
-	libmesh_not_implemented();
+        libmesh_not_implemented();
 
       const FEType& fe_type = this->get_dof_map().variable_type(var);
       AutoPtr<QBase> qrule =
@@ -1540,7 +1540,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
           const unsigned int n_qp = qrule->n_points();
 
           const unsigned int n_sf = libmesh_cast_int<unsigned int>
-	    (dof_indices.size());
+            (dof_indices.size());
 
           // Begin the loop over the Quadrature points.
           for (unsigned int qp=0; qp<n_qp; qp++)
@@ -1550,7 +1550,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                   Number u_h = 0.;
                   for (unsigned int i=0; i != n_sf; ++i)
                     u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
-	          v_norm += norm_weight *
+                  v_norm += norm_weight *
                             JxW[qp] * std::abs(u_h);
                 }
 
@@ -1559,7 +1559,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                   Number u_h = 0.;
                   for (unsigned int i=0; i != n_sf; ++i)
                     u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
-	          v_norm = std::max(v_norm, norm_weight * std::abs(u_h));
+                  v_norm = std::max(v_norm, norm_weight * std::abs(u_h));
                 }
 
               if (norm_type == H1 ||
@@ -1569,7 +1569,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                   Number u_h = 0.;
                   for (unsigned int i=0; i != n_sf; ++i)
                     u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
-	          v_norm += norm_weight_sq *
+                  v_norm += norm_weight_sq *
                             JxW[qp] * TensorTools::norm_sq(u_h);
                 }
 
@@ -1589,7 +1589,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                   Gradient grad_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
-	          v_norm = std::max(v_norm, norm_weight * grad_u_h.size());
+                  v_norm = std::max(v_norm, norm_weight * grad_u_h.size());
                 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -1608,7 +1608,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                   Tensor hess_u_h;
                   for (unsigned int i=0; i != n_sf; ++i)
                     hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
-	          v_norm = std::max(v_norm, norm_weight * hess_u_h.size());
+                  v_norm = std::max(v_norm, norm_weight * hess_u_h.size());
                 }
 #endif
             }
@@ -1649,7 +1649,7 @@ std::string System::get_info() const
 
       if (vg_description.n_variables() > 1) oss << "{ ";
       for (unsigned int vn=0; vn<vg_description.n_variables(); vn++)
-	oss << "\"" << vg_description.name(vn) << "\" ";
+        oss << "\"" << vg_description.name(vn) << "\" ";
       if (vg_description.n_variables() > 1) oss << "} ";
     }
 
@@ -1659,23 +1659,23 @@ std::string System::get_info() const
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
   for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
     oss << "\""
-	<< Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().family)
-	<< "\" ";
+        << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().family)
+        << "\" ";
 #else
   for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
     {
       oss << "\""
-	  << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().family)
-	  << "\", \""
-	  << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().radial_family)
-	  << "\" ";
+          << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().family)
+          << "\", \""
+          << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().radial_family)
+          << "\" ";
     }
 
   oss << '\n' << "    Infinite Element Mapping=";
   for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
     oss << "\""
-	<< Utility::enum_to_string<InfMapType>(this->get_dof_map().variable_group(vg).type().inf_map)
-	<< "\" ";
+        << Utility::enum_to_string<InfMapType>(this->get_dof_map().variable_group(vg).type().inf_map)
+        << "\" ";
 #endif
 
   oss << '\n';
@@ -1685,14 +1685,14 @@ std::string System::get_info() const
     {
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
       oss << "\""
-	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().order)
-	  << "\" ";
+          << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().order)
+          << "\" ";
 #else
       oss << "\""
-	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().order)
-	  << "\", \""
-	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().radial_order)
-	  << "\" ";
+          << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().order)
+          << "\", \""
+          << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().radial_order)
+          << "\" ";
 #endif
     }
 
@@ -1717,7 +1717,7 @@ std::string System::get_info() const
 
 
 void System::attach_init_function (void fptr(EquationSystems& es,
-					     const std::string& name))
+                                             const std::string& name))
 {
   libmesh_assert(fptr);
 
@@ -1725,7 +1725,7 @@ void System::attach_init_function (void fptr(EquationSystems& es,
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both initialization function and object!"
-		   << std::endl;
+                   << std::endl;
 
       _init_system_object = NULL;
     }
@@ -1741,7 +1741,7 @@ void System::attach_init_object (System::Initialization& init_in)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both initialization object and function!"
-		   << std::endl;
+                   << std::endl;
 
       _init_system_function = NULL;
     }
@@ -1752,7 +1752,7 @@ void System::attach_init_object (System::Initialization& init_in)
 
 
 void System::attach_assemble_function (void fptr(EquationSystems& es,
-						 const std::string& name))
+                                                 const std::string& name))
 {
   libmesh_assert(fptr);
 
@@ -1760,7 +1760,7 @@ void System::attach_assemble_function (void fptr(EquationSystems& es,
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both assembly function and object!"
-		   << std::endl;
+                   << std::endl;
 
       _assemble_system_object = NULL;
     }
@@ -1776,7 +1776,7 @@ void System::attach_assemble_object (System::Assembly& assemble_in)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both assembly object and function!"
-		   << std::endl;
+                   << std::endl;
 
       _assemble_system_function = NULL;
     }
@@ -1787,7 +1787,7 @@ void System::attach_assemble_object (System::Assembly& assemble_in)
 
 
 void System::attach_constraint_function(void fptr(EquationSystems& es,
-						  const std::string& name))
+                                                  const std::string& name))
 {
   libmesh_assert(fptr);
 
@@ -1795,7 +1795,7 @@ void System::attach_constraint_function(void fptr(EquationSystems& es,
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both constraint function and object!"
-		   << std::endl;
+                   << std::endl;
 
       _constrain_system_object = NULL;
     }
@@ -1811,7 +1811,7 @@ void System::attach_constraint_object (System::Constraint& constrain)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both constraint object and function!"
-		   << std::endl;
+                   << std::endl;
 
       _constrain_system_function = NULL;
     }
@@ -1822,7 +1822,7 @@ void System::attach_constraint_object (System::Constraint& constrain)
 
 
 void System::attach_QOI_function(void fptr(EquationSystems&,
-					   const std::string&,
+                                           const std::string&,
                                            const QoISet&))
 {
   libmesh_assert(fptr);
@@ -1831,7 +1831,7 @@ void System::attach_QOI_function(void fptr(EquationSystems&,
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both QOI function and object!"
-		   << std::endl;
+                   << std::endl;
 
       _qoi_evaluate_object = NULL;
     }
@@ -1847,7 +1847,7 @@ void System::attach_QOI_object (QOI& qoi_in)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both QOI object and function!"
-		   << std::endl;
+                   << std::endl;
 
       _qoi_evaluate_function = NULL;
     }
@@ -1858,7 +1858,7 @@ void System::attach_QOI_object (QOI& qoi_in)
 
 
 void System::attach_QOI_derivative(void fptr(EquationSystems&,
-					     const std::string&,
+                                             const std::string&,
                                              const QoISet&))
 {
   libmesh_assert(fptr);
@@ -1867,7 +1867,7 @@ void System::attach_QOI_derivative(void fptr(EquationSystems&,
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both QOI derivative function and object!"
-		   << std::endl;
+                   << std::endl;
 
       _qoi_evaluate_derivative_object = NULL;
     }
@@ -1883,7 +1883,7 @@ void System::attach_QOI_derivative_object (QOIDerivative& qoi_derivative)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both QOI derivative object and function!"
-		   << std::endl;
+                   << std::endl;
 
       _qoi_evaluate_derivative_function = NULL;
     }

@@ -48,7 +48,7 @@ void ErrorEstimator::reduce_error (std::vector<ErrorVectorReal>& error_per_cell,
 void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
                                      ErrorVector& error_per_cell,
                                      const std::map<const System*, SystemNorm>& error_norms,
-				     const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
+                                     const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
                                      bool estimate_parent_error)
 {
   SystemNorm old_error_norm = this->error_norm;
@@ -65,11 +65,11 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
 
       const NumericVector<Number>* solution_vector = NULL;
       if (solution_vectors &&
-	  solution_vectors->find(&sys) != solution_vectors->end())
-	solution_vector = solution_vectors->find(&sys)->second;
+          solution_vectors->find(&sys) != solution_vectors->end())
+        solution_vector = solution_vectors->find(&sys)->second;
 
       this->estimate_error(sys, system_error_per_cell,
-			   solution_vector, estimate_parent_error);
+                           solution_vector, estimate_parent_error);
 
       if (s)
         {
@@ -93,7 +93,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
  */
 void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
                                      ErrorMap& errors_per_cell,
-				     const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
+                                     const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
                                      bool estimate_parent_error)
 {
   SystemNorm old_error_norm = this->error_norm;
@@ -115,14 +115,14 @@ void ErrorEstimator::estimate_errors(const EquationSystems& equation_systems,
           // Calculate error in only one variable
           std::vector<Real> weights(n_vars, 0.0);
           weights[v] = 1.0;
-	  this->error_norm =
+          this->error_norm =
             SystemNorm(std::vector<FEMNormType>(n_vars, old_error_norm.type(v)),
                        weights);
 
           const NumericVector<Number>* solution_vector = NULL;
           if (solution_vectors &&
-	      solution_vectors->find(&sys) != solution_vectors->end())
-	    solution_vector = solution_vectors->find(&sys)->second;
+              solution_vectors->find(&sys) != solution_vectors->end())
+            solution_vector = solution_vectors->find(&sys)->second;
 
           this->estimate_error
             (sys, *errors_per_cell[std::make_pair(&sys, v)],

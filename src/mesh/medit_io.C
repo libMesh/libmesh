@@ -44,8 +44,8 @@ void MEDITIO::write (const std::string& fname)
 
 
 void MEDITIO::write_nodal_data (const std::string& fname,
-			      const std::vector<Number>& soln,
-			      const std::vector<std::string>& names)
+                                const std::vector<Number>& soln,
+                                const std::vector<std::string>& names)
 {
   START_LOG("write_nodal_data()", "MEDITIO");
 
@@ -59,8 +59,8 @@ void MEDITIO::write_nodal_data (const std::string& fname,
 
 
 void MEDITIO::write_ascii (const std::string& fname,
-			   const std::vector<Number>* vec,
-			   const std::vector<std::string>* solution_names)
+                           const std::vector<Number>* vec,
+                           const std::vector<std::string>* solution_names)
 {
   // Current lacks in implementation:
   //  (i)   only 3D meshes.
@@ -111,12 +111,12 @@ void MEDITIO::write_ascii (const std::string& fname,
       const MeshBase::const_element_iterator end = the_mesh.active_elements_end();
 
       for ( ; it != end; ++it)
-	{
-	  if ((*it)->type() == TRI3)  n_tri3++;
-	  if ((*it)->type() == QUAD4) n_quad4++;
-	  if ((*it)->type() == QUAD9) n_quad4+=4; // (QUAD9 is written as 4 QUAD4.)
-	  if ((*it)->type() == TET4)  n_tet4++;
-	} // for
+        {
+          if ((*it)->type() == TRI3)  n_tri3++;
+          if ((*it)->type() == QUAD4) n_quad4++;
+          if ((*it)->type() == QUAD9) n_quad4+=4; // (QUAD9 is written as 4 QUAD4.)
+          if ((*it)->type() == TET4)  n_tet4++;
+        } // for
     }
 
     // First: write out TRI3 elements:
@@ -128,8 +128,8 @@ void MEDITIO::write_ascii (const std::string& fname,
       const MeshBase::const_element_iterator end = the_mesh.active_elements_end();
 
       for ( ; it != end; ++it)
-	if ((*it)->type() == TRI3)
-	  out_stream << (*it)->node(0)+1  << " " << (*it)->node(1)+1  << " " << (*it)->node(2)+1  << " 0\n";
+        if ((*it)->type() == TRI3)
+          out_stream << (*it)->node(0)+1  << " " << (*it)->node(1)+1  << " " << (*it)->node(2)+1  << " 0\n";
     }
 
     // Second: write out QUAD4 elements:
@@ -141,32 +141,32 @@ void MEDITIO::write_ascii (const std::string& fname,
       const MeshBase::const_element_iterator end = the_mesh.active_elements_end();
 
       for ( ; it != end; ++it)
-	if ((*it)->type() == QUAD4)
-	  {
-	    out_stream << (*it)->node(0)+1  << " "
-		<< (*it)->node(1)+1  << " "
-		<< (*it)->node(2)+1  << " "
-		<< (*it)->node(3)+1  <<" 0\n";
-	  } // if
-	else if ((*it)->type() == QUAD9)
-	  {
-	    out_stream << (*it)->node(0)+1  << " "
-		<< (*it)->node(4)+1  << " "
-		<< (*it)->node(8)+1  << " "
-		<< (*it)->node(7)+1  <<" 0\n";
-	    out_stream << (*it)->node(7)+1  << " "
-		<< (*it)->node(8)+1  << " "
-		<< (*it)->node(6)+1  << " "
-		<< (*it)->node(3)+1  <<" 0\n";
-	    out_stream << (*it)->node(4)+1  << " "
-		<< (*it)->node(1)+1  << " "
-		<< (*it)->node(5)+1  << " "
-		<< (*it)->node(8)+1  <<" 0\n";
-	    out_stream << (*it)->node(8)+1  << " "
-		<< (*it)->node(5)+1  << " "
-		<< (*it)->node(2)+1  << " "
-		<< (*it)->node(6)+1  <<" 0\n";
-	  } // if
+        if ((*it)->type() == QUAD4)
+          {
+            out_stream << (*it)->node(0)+1  << " "
+                       << (*it)->node(1)+1  << " "
+                       << (*it)->node(2)+1  << " "
+                       << (*it)->node(3)+1  <<" 0\n";
+          } // if
+        else if ((*it)->type() == QUAD9)
+          {
+            out_stream << (*it)->node(0)+1  << " "
+                       << (*it)->node(4)+1  << " "
+                       << (*it)->node(8)+1  << " "
+                       << (*it)->node(7)+1  <<" 0\n";
+            out_stream << (*it)->node(7)+1  << " "
+                       << (*it)->node(8)+1  << " "
+                       << (*it)->node(6)+1  << " "
+                       << (*it)->node(3)+1  <<" 0\n";
+            out_stream << (*it)->node(4)+1  << " "
+                       << (*it)->node(1)+1  << " "
+                       << (*it)->node(5)+1  << " "
+                       << (*it)->node(8)+1  <<" 0\n";
+            out_stream << (*it)->node(8)+1  << " "
+                       << (*it)->node(5)+1  << " "
+                       << (*it)->node(2)+1  << " "
+                       << (*it)->node(6)+1  <<" 0\n";
+          } // if
     }
 
 
@@ -179,13 +179,13 @@ void MEDITIO::write_ascii (const std::string& fname,
       const MeshBase::const_element_iterator end = the_mesh.active_elements_end();
 
       for ( ; it != end; ++it)
-	if ((*it)->type() == TET4)
-	  {
-	    out_stream << (*it)->node(0)+1  << " "
-		<< (*it)->node(1)+1  << " "
-		<< (*it)->node(2)+1  << " "
-		<< (*it)->node(3)+1  <<" 0\n";
-	  } // if
+        if ((*it)->type() == TET4)
+          {
+            out_stream << (*it)->node(0)+1  << " "
+                       << (*it)->node(1)+1  << " "
+                       << (*it)->node(2)+1  << " "
+                       << (*it)->node(3)+1  <<" 0\n";
+          } // if
     }
 
   }
@@ -210,7 +210,7 @@ void MEDITIO::write_ascii (const std::string& fname,
       const std::size_t n_vars = solution_names->size();
       bbout << "3 1 " << the_mesh.n_nodes() << " 2\n";
       for (dof_id_type n=0; n<the_mesh.n_nodes(); n++)
-	bbout << std::setprecision(10) << (*vec)[n*n_vars + scalar_idx] << " ";
+        bbout << std::setprecision(10) << (*vec)[n*n_vars + scalar_idx] << " ";
       bbout << "\n";
     } // endif
 }

@@ -51,19 +51,19 @@ namespace Utility
     // See below for documentation on the use of the
     // std::time_put::put() function
     tp.put(date_stream,        /*s*/
-	   date_stream,        /*str*/
-	   date_stream.fill(), /*fill*/
-	   tm_struct,          /*tm*/
-	   'c');               /*format*/
+           date_stream,        /*str*/
+           date_stream.fill(), /*fill*/
+           tm_struct,          /*tm*/
+           'c');               /*format*/
 
     // Another way to use it is to totally customize the format...
     //    char pattern[]="%d %B %Y %I:%M:%S %p";
     //    tp.put(date_stream,                /*s*/
-    //	   date_stream,                /*str*/
-    //	   date_stream.fill(),         /*fill*/
-    //	   tm_struct,                  /*tm*/
-    //	   pattern,                    /*format begin*/
-    //	   pattern+sizeof(pattern)-1); /*format end  */
+    //   date_stream,                /*str*/
+    //   date_stream.fill(),         /*fill*/
+    //   tm_struct,                  /*tm*/
+    //   pattern,                    /*format begin*/
+    //   pattern+sizeof(pattern)-1); /*format end  */
 
     return date_stream.str();
 #else
@@ -114,10 +114,10 @@ namespace Utility
   // Example: 'c' is national representation of time and date
   // 'c' = Thu Feb  4 12:24:11 2010
   //  tp.put(date_stream /*s*/,
-  //	 date_stream /*str*/,
-  //	 date_stream.fill() /*fill*/,
-  //	 tm_struct, /*tm*/
-  //	 'c'/*format*/);
+  // date_stream /*str*/,
+  // date_stream.fill() /*fill*/,
+  // tm_struct, /*tm*/
+  // 'c'/*format*/);
 
   // We can also pass to char* to the beginning and end of the desired format:
   // const charT* pattern, const charT* pat_end.  This allows us to have the full
