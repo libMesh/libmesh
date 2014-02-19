@@ -527,10 +527,12 @@ void TransientRBConstruction::assemble_all_affine_operators()
 
 void TransientRBConstruction::assemble_misc_matrices()
 {
+  libMesh::out << "Assembling L2 matrix" << std::endl;
   assemble_L2_matrix(L2_matrix.get());
 
   if(store_non_dirichlet_operators)
   {
+    libMesh::out << "Assembling non-Dirichlet L2 matrix" << std::endl;
     assemble_L2_matrix(non_dirichlet_L2_matrix.get(), /* apply_dirichlet_bc = */ false);
   }
 

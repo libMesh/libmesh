@@ -937,15 +937,18 @@ void RBConstruction::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix
 
 void RBConstruction::assemble_misc_matrices()
 {
+  libMesh::out << "Assembling inner product matrix" << std::endl;
   assemble_inner_product_matrix(inner_product_matrix.get());
 
   if(store_non_dirichlet_operators)
   {
+    libMesh::out << "Assembling non-Dirichlet inner product matrix" << std::endl;
     assemble_inner_product_matrix(non_dirichlet_inner_product_matrix.get(), /* apply_dof_constraints = */ false);
   }
 
   if( constrained_problem )
   {
+    libMesh::out << "Assembling constraint matrix" << std::endl;
     assemble_constraint_matrix(constraint_matrix.get());
   }
 }
@@ -953,24 +956,40 @@ void RBConstruction::assemble_misc_matrices()
 void RBConstruction::assemble_all_affine_operators()
 {
   for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
+  {
+    libMesh::out << "Assembling affine operator " << (q_a+1) << " of "
+                 << get_rb_theta_expansion().get_n_A_terms() << std::endl;
     assemble_Aq_matrix(q_a, get_Aq(q_a));
+  }
 
   if(store_non_dirichlet_operators)
   {
     for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
+    {
+      libMesh::out << "Assembling non-Dirichlet affine operator " << (q_a+1) << " of "
+                   << get_rb_theta_expansion().get_n_A_terms() << std::endl;
       assemble_Aq_matrix(q_a, get_non_dirichlet_Aq(q_a), false);
+    }
   }
 }
 
 void RBConstruction::assemble_all_affine_vectors()
 {
   for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
+  {
+    libMesh::out << "Assembling affine vector " << (q_f+1) << " of "
+                 << get_rb_theta_expansion().get_n_F_terms() << std::endl;
     assemble_Fq_vector(q_f, get_Fq(q_f));
+  }
 
   if(store_non_dirichlet_operators)
   {
     for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
+    {
+      libMesh::out << "Assembling non-Dirichlet affine vector " << (q_f+1) << " of "
+                   << get_rb_theta_expansion().get_n_F_terms() << std::endl;
       assemble_Fq_vector(q_f, get_non_dirichlet_Fq(q_f), false);
+    }
   }
 
 }
@@ -1001,6 +1020,10 @@ void RBConstruction::assemble_all_output_vectors()
   for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
     for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
     {
+      libMesh::out << "Assembling output vector, (" << (n+1) << "," << (q_l+1)
+                   << ")  of (" << get_rb_theta_expansion().get_n_outputs()
+                   << "," << get_rb_theta_expansion().get_n_output_terms(n) << ")"
+                   << std::endl;
       get_output_vector(n, q_l)->zero();
       add_scaled_matrix_and_vector(1., &rb_assembly_expansion->get_output_assembly(n,q_l),
                                        NULL,
@@ -1014,6 +1037,10 @@ void RBConstruction::assemble_all_output_vectors()
     for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
       for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
       {
+      libMesh::out << "Assembling non-Dirichlet output vector, (" << (n+1) << "," << (q_l+1)
+                   << ")  of (" << get_rb_theta_expansion().get_n_outputs()
+                   << "," << get_rb_theta_expansion().get_n_output_terms(n) << ")"
+                   << std::endl;
         get_non_dirichlet_output_vector(n, q_l)->zero();
         add_scaled_matrix_and_vector(1., &rb_assembly_expansion->get_output_assembly(n,q_l),
                                          NULL,
