@@ -87,7 +87,7 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 MeshFunction::~MeshFunction ()
 {
   // only delete the point locator when we are the master
-  if ((this->_point_locator != NULL) && (this->_master == NULL))
+  if (this->_master == NULL)
     delete this->_point_locator;
 }
 

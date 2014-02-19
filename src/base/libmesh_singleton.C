@@ -102,7 +102,6 @@ namespace libMesh
     for (SingletonList::reverse_iterator it = singleton_cache.rbegin();
 	 it!=singleton_cache.rend(); ++it)
       {
-	libmesh_assert (*it != NULL);
 	delete *it;
 	*it = NULL;
       }
