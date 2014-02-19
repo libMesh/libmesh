@@ -190,9 +190,12 @@ class SerialMesh : public UnstructuredMesh
    * If \p use_binary_search is true, we use an optimized "sort then binary search" algorithm
    * for finding matching nodes. Otherwise we use a N^2 algorithm (which can be more reliable
    * at dealing with slightly misaligned meshes).
-   * If enforce_all_nodes_match_on_boundaries is true, we throw an error if the number of
+   * If \p enforce_all_nodes_match_on_boundaries is true, we throw an error if the number of
    * nodes on the specified boundaries don't match the number of nodes that were merged.
    * This is a helpful error check in some cases.
+   * If \p skip_find_neighbors is true, a faster stitching method is used, where the lists of
+   * neighbors for each elements are copied as well and patched, without calling the time-consuming
+   * find_neighbors() function.
    */
   void stitch_meshes (SerialMesh& other_mesh,
                       boundary_id_type this_mesh_boundary,
@@ -421,7 +424,8 @@ private:
                          bool clear_stitched_boundary_ids,
                          bool verbose,
                          bool use_binary_search,
-                         bool enforce_all_nodes_match_on_boundaries);
+                         bool enforce_all_nodes_match_on_boundaries,
+                         bool skip_find_neighbors);
 
   /**
    * Typedefs for the container implementation.  In this case,
