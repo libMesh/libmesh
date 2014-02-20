@@ -179,7 +179,7 @@ struct F0 : ElemAssembly
   virtual void interior_assembly(FEMContext &c)
   {
     const unsigned int u_var = 0;
-    
+
     FEBase* elem_fe = NULL;
     c.get_element_fe( u_var, elem_fe );
 
@@ -216,7 +216,7 @@ struct OutputAssembly : ElemAssembly
   virtual void interior_assembly(FEMContext &c)
   {
     const unsigned int u_var = 0;
-    
+
     FEBase* elem_fe = NULL;
     c.get_element_fe( u_var, elem_fe );
 

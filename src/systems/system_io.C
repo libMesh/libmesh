@@ -811,7 +811,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
     num_vecs   = libmesh_cast_int<unsigned int>(vecs.size()),
     num_vars   = _written_var_indices.size(); // must be <= current number of variables!
   const std::size_t
-    io_blksize = std::min(max_io_blksize, 
+    io_blksize = std::min(max_io_blksize,
                           static_cast<std::size_t>(n_objs)),
     num_blks   = std::ceil(static_cast<double>(n_objs)/static_cast<double>(io_blksize));
 

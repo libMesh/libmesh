@@ -355,7 +355,7 @@ public:
    * Print out info that describes the current setup of this RBConstruction.
    */
   virtual void print_info();
-  
+
   /**
    * Print out a matrix that shows the orthogonality of the RB basis functions.
    * This is a helpful debugging tool, e.g. orthogonality can be degraded

@@ -22,7 +22,7 @@ private:
    * our mesh.
    */
   ElementIdMap _lower_to_upper;
-  
+
   /**
    * Boundary IDs for the lower and upper faces of the "crack" in the mesh.
    */
@@ -41,7 +41,7 @@ public:
    * @return a const reference to the lower-to-upper element ID map.
    */
   const ElementIdMap& get_lower_to_upper() const;
-  
+
   /**
    * User-defined function to augment the sparsity pattern.
    */

@@ -7,8 +7,8 @@
 
 using namespace libMesh;
 
-class DistributedVectorTest : public NumericVectorTest<DistributedVector<Number> > { 
-public: 
+class DistributedVectorTest : public NumericVectorTest<DistributedVector<Number> > {
+public:
   CPPUNIT_TEST_SUITE( DistributedVectorTest );
 
   NUMERICVECTORTEST

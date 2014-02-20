@@ -1298,7 +1298,7 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
       // Exodus seems to like us better if we don't try to write out any
       // variable names too...
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-      
+
       std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
 
       nemhelper->initialize_nodal_variables(complex_names);
@@ -1309,7 +1309,7 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
   }
 
   nemhelper->write_nodal_solution(soln, names, _timestep);
-    
+
   STOP_LOG("write_nodal_data()", "Nemesis_IO");
 }
 
@@ -1345,49 +1345,49 @@ void Nemesis_IO::write_global_data (const std::vector<Number>& soln,
       libmesh_error();
     }
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  
+
   std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
-  
+
   nemhelper->initialize_global_variables(complex_names);
-  
+
   unsigned int num_values = soln.size();
   unsigned int num_vars = names.size();
   unsigned int num_elems = num_values / num_vars;
-  
+
   // This will contain the real and imaginary parts and the magnitude
   // of the values in soln
   std::vector<Real> complex_soln(3*num_values);
-     
+
   for(unsigned i(0); i < num_vars; ++i)
   {
-  
+
     for(unsigned int j(0); j < num_elems; ++j)
     {
       Number value = soln[i*num_vars + j];
-      complex_soln[3*i*num_elems + j] = value.real();   
+      complex_soln[3*i*num_elems + j] = value.real();
     }
     for(unsigned int j(0); j < num_elems; ++j)
     {
       Number value = soln[i*num_vars + j];
       complex_soln[3*i*num_elems + num_elems +j] = value.imag();
-    }      
+    }
     for(unsigned int j(0); j < num_elems; ++j)
     {
       Number value = soln[i*num_vars + j];
-      complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);  
+      complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
     }
   }
-   
+
   nemhelper->write_global_values(complex_soln, _timestep);
-  
-#else  
+
+#else
 
   // Call the Exodus writer implementation
   nemhelper->initialize_global_variables( names );
   nemhelper->write_global_values( soln, _timestep);
-  
+
 #endif
-  
+
 }
 
 #else

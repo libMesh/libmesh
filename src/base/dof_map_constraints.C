@@ -380,7 +380,7 @@ using namespace libMesh;
           {
             const std::vector<boundary_id_type>& bc_ids =
               boundary_info.boundary_ids (elem->get_node(n));
-            
+
             for (std::size_t i=0; i != bc_ids.size(); ++i)
               if (b.count(bc_ids[i]))
                 is_boundary_node[n] = true;
@@ -392,7 +392,7 @@ using namespace libMesh;
           {
             const std::vector<boundary_id_type>& bc_ids =
               boundary_info.edge_boundary_ids (elem, e);
-            
+
             for (std::size_t i=0; i != bc_ids.size(); ++i)
               if (b.count(bc_ids[i]))
                 is_boundary_edge[e] = true;
@@ -2014,7 +2014,7 @@ void DofMap::enforce_adjoint_constraints_exactly
       const DofConstraintRow constraint_row = c_it->second;
 
       Number exact_value = 0;
-      if (constraint_map) 
+      if (constraint_map)
         {
           const DofConstraintValueMap::const_iterator
             adjoint_constraint_it =
@@ -2520,7 +2520,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 
           DofConstraintValueMap::const_iterator rhsit =
             _primal_constraint_values.find(pushed_id);
-          pushed_rhss[i] = 
+          pushed_rhss[i] =
             (rhsit == _primal_constraint_values.end()) ?
              0 : rhsit->second;
         }
@@ -3039,14 +3039,14 @@ void DofMap::process_constraints (MeshBase& mesh)
               _primal_constraint_values[*i] = constraint_rhs;
             else
               _primal_constraint_values.erase(*i);
-          } 
+          }
         else
           {
             if (constraint_rhs != Number(0))
               rhsit->second = constraint_rhs;
             else
               _primal_constraint_values.erase(rhsit);
-          } 
+          }
 
         if (constraints_to_expand.empty())
           unexpanded_set.erase(i++);
@@ -3595,7 +3595,7 @@ void DofMap::add_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary
 }
 
 
-void DofMap::add_adjoint_dirichlet_boundary 
+void DofMap::add_adjoint_dirichlet_boundary
   (const DirichletBoundary& dirichlet_boundary,
    unsigned int qoi_index)
 {
@@ -3616,7 +3616,7 @@ bool DofMap::has_adjoint_dirichlet_boundaries(unsigned int q) const
   }
 
 
-const DirichletBoundaries * 
+const DirichletBoundaries *
 DofMap::get_adjoint_dirichlet_boundaries(unsigned int q) const
   {
     libmesh_assert_greater(_adjoint_dirichlet_boundaries.size(),q);

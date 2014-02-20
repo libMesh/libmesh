@@ -9,15 +9,15 @@
 
 using namespace libMesh;
 
-class LaspackVectorTest : public NumericVectorTest<LaspackVector<Real> > { 
-public: 
+class LaspackVectorTest : public NumericVectorTest<LaspackVector<Real> > {
+public:
   CPPUNIT_TEST_SUITE( LaspackVectorTest );
 
   if (libMesh::n_processors() == 1)
   {
     NUMERICVECTORTEST
   }
-  
+
   CPPUNIT_TEST_SUITE_END();
 };
 

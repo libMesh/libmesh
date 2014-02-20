@@ -97,7 +97,7 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
        (element_qrule.get_dim()   == _fe_qrule[var]->get_dim()) &&
        (element_qrule.get_order() == _fe_qrule[var]->get_order()) );
   }
-  
+
   // If the qrule is not repeated, then we need to make a new copy of element_qrule.
   if(!repeated_qrule)
   {

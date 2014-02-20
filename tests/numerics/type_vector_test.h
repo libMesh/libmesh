@@ -54,7 +54,7 @@
 using namespace libMesh;
 
 template <class DerivedClass>
-class TypeVectorTestBase : public CppUnit::TestCase { 
+class TypeVectorTestBase : public CppUnit::TestCase {
 
 private:
   DerivedClass *m_1_1_1, *m_n1_1_n1;
@@ -70,7 +70,7 @@ public:
     basem_n1_1_n1 = m_n1_1_n1;
   }
 
-  virtual void tearDown() 
+  virtual void tearDown()
   {
     delete m_1_1_1;
     delete m_n1_1_n1;
@@ -91,12 +91,12 @@ public:
   {
     DerivedClass avector(1,1,1);
     avector.zero();
-    
+
     CPPUNIT_ASSERT_EQUAL( Real(0), avector(0));
     CPPUNIT_ASSERT_EQUAL( Real(0), avector(1));
     CPPUNIT_ASSERT_EQUAL( Real(0), avector(2));
   }
-  
+
   void testSize()
   {
     CPPUNIT_ASSERT_DOUBLES_EQUAL( std::sqrt(3.0) , m_1_1_1->size() , TOLERANCE*TOLERANCE );
@@ -109,20 +109,20 @@ public:
 
   void testEquality()
   {
-    CPPUNIT_ASSERT( (*m_1_1_1) == (*m_1_1_1) );    
-    CPPUNIT_ASSERT( !((*m_1_1_1) == (*m_n1_1_n1)) );    
+    CPPUNIT_ASSERT( (*m_1_1_1) == (*m_1_1_1) );
+    CPPUNIT_ASSERT( !((*m_1_1_1) == (*m_n1_1_n1)) );
   }
 
   void testInEquality()
   {
-    CPPUNIT_ASSERT( !((*m_1_1_1) != (*m_1_1_1)) );    
-    CPPUNIT_ASSERT( (*m_1_1_1) != (*m_n1_1_n1) );    
+    CPPUNIT_ASSERT( !((*m_1_1_1) != (*m_1_1_1)) );
+    CPPUNIT_ASSERT( (*m_1_1_1) != (*m_n1_1_n1) );
   }
 
   void testAssignment()
   {
     DerivedClass avector = (*m_1_1_1);
-    
+
     CPPUNIT_ASSERT_EQUAL( Real(1), (avector)(0) );
     CPPUNIT_ASSERT_EQUAL( Real(1), (avector)(1) );
     CPPUNIT_ASSERT_EQUAL( Real(1), (avector)(2) );
@@ -146,7 +146,7 @@ public:
   {
     DerivedClass avector(1,1,1);
     avector*=5.0;
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , avector(0) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , avector(1) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , avector(2) , TOLERANCE*TOLERANCE );
@@ -156,7 +156,7 @@ public:
   {
     DerivedClass avector(1.0,1.0,1.0);
     avector/=5.0;
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , avector(0) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , avector(1) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , avector(2) , TOLERANCE*TOLERANCE );
@@ -173,7 +173,7 @@ public:
   {
     DerivedClass avector(1,1,1);
     avector.add_scaled((*m_1_1_1),0.5);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , avector(0) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , avector(1) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , avector(2) , TOLERANCE*TOLERANCE );
@@ -195,7 +195,7 @@ public:
   {
     DerivedClass avector(1,1,1);
     avector+=(*m_1_1_1);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , avector(0) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , avector(1) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , avector(2) , TOLERANCE*TOLERANCE );
@@ -205,7 +205,7 @@ public:
   {
     DerivedClass avector(1,1,1);
     avector-=(*m_n1_1_n1);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , avector(0) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , avector(1) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , avector(2) , TOLERANCE*TOLERANCE );
@@ -226,12 +226,12 @@ public:
   {
     TypeVector<Real> avector((*basem_1_1_1));
     avector.zero();
-    
+
     CPPUNIT_ASSERT_EQUAL( Real(0), avector(0));
     CPPUNIT_ASSERT_EQUAL( Real(0), avector(1));
     CPPUNIT_ASSERT_EQUAL( Real(0), avector(2));
   }
-  
+
   void testSizeBase()
   {
     CPPUNIT_ASSERT_DOUBLES_EQUAL( std::sqrt(3.0) , basem_1_1_1->size() , TOLERANCE*TOLERANCE );
@@ -244,20 +244,20 @@ public:
 
   void testEqualityBase()
   {
-    CPPUNIT_ASSERT( (*basem_1_1_1) == (*basem_1_1_1) );    
-    CPPUNIT_ASSERT( !((*basem_1_1_1) == (*basem_n1_1_n1)) );    
+    CPPUNIT_ASSERT( (*basem_1_1_1) == (*basem_1_1_1) );
+    CPPUNIT_ASSERT( !((*basem_1_1_1) == (*basem_n1_1_n1)) );
   }
 
   void testInEqualityBase()
   {
-    CPPUNIT_ASSERT( !((*basem_1_1_1) != (*basem_1_1_1)) );    
-    CPPUNIT_ASSERT( (*basem_1_1_1) != (*basem_n1_1_n1) );    
+    CPPUNIT_ASSERT( !((*basem_1_1_1) != (*basem_1_1_1)) );
+    CPPUNIT_ASSERT( (*basem_1_1_1) != (*basem_n1_1_n1) );
   }
 
   void testAssignmentBase()
   {
     TypeVector<Real> avector = (*m_1_1_1);
-    
+
     CPPUNIT_ASSERT_EQUAL( Real(1), (avector)(0) );
     CPPUNIT_ASSERT_EQUAL( Real(1), (avector)(1) );
     CPPUNIT_ASSERT_EQUAL( Real(1), (avector)(2) );
@@ -281,7 +281,7 @@ public:
   {
     TypeVector<Real> avector(*m_1_1_1);
     avector*=5.0;
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , avector(0) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , avector(1) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 5.0 , avector(2) , TOLERANCE*TOLERANCE );
@@ -291,7 +291,7 @@ public:
   {
     TypeVector<Real> avector(*m_1_1_1);
     avector/=5.0;
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , avector(0) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , avector(1) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0/5.0 , avector(2) , TOLERANCE*TOLERANCE );
@@ -308,7 +308,7 @@ public:
   {
     TypeVector<Real> avector(*m_1_1_1);
     avector.add_scaled((*basem_1_1_1),0.5);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , avector(0) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , avector(1) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5 , avector(2) , TOLERANCE*TOLERANCE );
@@ -330,7 +330,7 @@ public:
   {
     TypeVector<Real> avector(*m_1_1_1);
     avector+=(*basem_1_1_1);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , avector(0) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , avector(1) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , avector(2) , TOLERANCE*TOLERANCE );
@@ -340,7 +340,7 @@ public:
   {
     TypeVector<Real> avector(*m_1_1_1);
     avector-=(*basem_n1_1_n1);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , avector(0) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0 , avector(1) , TOLERANCE*TOLERANCE );
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , avector(2) , TOLERANCE*TOLERANCE );

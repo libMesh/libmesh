@@ -154,7 +154,7 @@ int main (int argc, char** argv)
       // Write out the basis functions
       rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
     }
-    
+
     // Basis functions should be orthonormal, so
     // print out the inner products to check this
     rb_con.print_basis_function_orthogonality();

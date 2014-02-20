@@ -317,7 +317,7 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
 
     FEBase* fe = NULL;
     c.get_side_fe( 0, fe );
-  
+
     const std::vector<std::vector<Real> > & phi = fe->get_phi();
     const std::vector<Real>& JxW = fe->get_JxW();
     const std::vector<Point>& coords = fe->get_xyz();

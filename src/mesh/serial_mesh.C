@@ -857,7 +857,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
   typedef std::pair<key_type, val_type>   key_val_pair;
   // Mapping between all side keys in this mesh and elements+side numbers relevant to the boundary in this mesh as well.
   std::map<key_type, val_type>            side_to_elem_map;
-  
+
   // If there is only one mesh (i.e. other_mesh==NULL), then loop over this mesh twice
   if(!other_mesh)
   {
@@ -902,7 +902,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                           set_array[i]->insert( side->node(node_id) );
 
                         h_min = std::min(h_min, side->hmin());
-                        
+
                         // This side is on the boundary, add its information to side_to_elem
                         if(skip_find_neighbors)
                         {
@@ -1285,7 +1285,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
               key_type key = el->key(s);
               std::map<key_type, val_type>::const_iterator key_val_it;
               key_val_it = side_to_elem_map.find(key);
-              
+
               if(key_val_it != side_to_elem_map.end())
               {
                 Elem* neighbor = key_val_it->second.first;

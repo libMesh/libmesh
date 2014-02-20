@@ -493,7 +493,7 @@ namespace {
                 {
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
                   bool has_heterogenous_constraint = false;
-                  for (unsigned int d=0; 
+                  for (unsigned int d=0;
                        d != _femcontext.get_dof_indices().size(); ++d)
                     if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
                         (i, _femcontext.get_dof_indices()[d]))

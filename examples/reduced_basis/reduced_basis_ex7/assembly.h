@@ -83,7 +83,7 @@ struct A0 : ElemAssembly
   virtual void interior_assembly(FEMContext &c)
   {
     const unsigned int p_var = 0;
-    
+
     FEBase* elem_fe = NULL;
     c.get_element_fe( p_var, elem_fe );
 
@@ -114,7 +114,7 @@ struct A1 : ElemAssembly
   virtual void interior_assembly(FEMContext &c)
   {
     const unsigned int p_var = 0;
-    
+
     FEBase* elem_fe = NULL;
     c.get_element_fe( p_var, elem_fe );
 
@@ -144,7 +144,7 @@ struct A2 : ElemAssembly
     if( c.has_side_boundary_id(1) ) // Forcing on the horn "inlet"
     {
       const unsigned int p_var = 0;
-      
+
       FEBase* side_fe = NULL;
       c.get_side_fe( p_var, side_fe );
 
@@ -175,7 +175,7 @@ struct A3 : ElemAssembly
     if( c.has_side_boundary_id(2) ) // Radiation condition on the "bubble"
     {
       const unsigned int p_var = 0;
-      
+
       FEBase* side_fe = NULL;
       c.get_side_fe( p_var, side_fe );
 
@@ -206,7 +206,7 @@ struct F0 : ElemAssembly
     if( c.has_side_boundary_id(1) ) // Output is calculated on the horn "inlet"
     {
       const unsigned int p_var = 0;
-      
+
       FEBase* side_fe = NULL;
       c.get_side_fe( p_var, side_fe );
 
@@ -236,7 +236,7 @@ struct Output0 : ElemAssembly
     if( c.has_side_boundary_id(1) ) // Forcing on the horn "inlet"
     {
       const unsigned int p_var = 0;
-      
+
       FEBase* side_fe = NULL;
       c.get_side_fe( p_var, side_fe );
 

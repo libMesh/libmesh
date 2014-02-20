@@ -1220,7 +1220,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
                         {
                           inner_product_matrix->vector_mult(*inner_product_storage_vector,
                                                             *trans_rb_eval.M_q_representor[q_m2][i]);
-                          
+
                           trans_rb_eval.Mq_Mq_representor_innerprods[q][j][i] =
                             trans_rb_eval.M_q_representor[q_m1][j]->dot(*inner_product_storage_vector);
                         }

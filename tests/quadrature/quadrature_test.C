@@ -5,12 +5,12 @@
 
 using namespace libMesh;
 
-class QuadratureTest : public CppUnit::TestCase { 
-public: 
+class QuadratureTest : public CppUnit::TestCase {
+public:
   CPPUNIT_TEST_SUITE( QuadratureTest );
-  
+
   CPPUNIT_TEST( testBuild );
-  
+
   CPPUNIT_TEST( test1DWeights<FIRST> );
   CPPUNIT_TEST( test1DWeights<SECOND> );
   CPPUNIT_TEST( test1DWeights<THIRD> );
@@ -69,15 +69,15 @@ public:
   {
     AutoPtr<QBase> qrule = QBase::build(QGAUSS, 1, order);
     qrule->init (EDGE3);
-    
+
     Real sum = 0;
-    
+
     for (unsigned int qp=0; qp<qrule->n_points(); qp++)
       sum += qrule->w(qp);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 2.0 , sum , TOLERANCE*TOLERANCE );
   }
-    
+
 
 
   //-------------------------------------------------------
@@ -87,26 +87,26 @@ public:
   {
     AutoPtr<QBase> qrule = QBase::build(QGAUSS, 2, order);
     qrule->init (QUAD8);
-    
+
     Real sum = 0;
-    
+
     for (unsigned int qp=0; qp<qrule->n_points(); qp++)
       sum += qrule->w(qp);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 4.0 , sum , TOLERANCE*TOLERANCE );
-    
+
     qrule->init (TRI6);
-    
+
     sum = 0;
-    
+
     for (unsigned int qp=0; qp<qrule->n_points(); qp++)
       sum += qrule->w(qp);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.5 , sum , TOLERANCE*TOLERANCE );
   }
 
 
-  
+
   //-------------------------------------------------------
   // 3D Gauss Rule Test
   template <Order order>
@@ -114,27 +114,27 @@ public:
   {
     AutoPtr<QBase> qrule = QBase::build(QGAUSS, 3, order);
     qrule->init (HEX20);
-      
+
     Real sum = 0;
-    
+
     for (unsigned int qp=0; qp<qrule->n_points(); qp++)
       sum += qrule->w(qp);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 8.0 , sum , TOLERANCE*TOLERANCE );
-        
+
     qrule->init (TET10);
-      
+
     sum = 0;
-    
+
     for (unsigned int qp=0; qp<qrule->n_points(); qp++)
       sum += qrule->w(qp);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL( 1./6., sum , TOLERANCE*TOLERANCE );
-    
+
     qrule->init (PRISM15);
-      
+
     sum = 0;
-    
+
     for (unsigned int qp=0; qp<qrule->n_points(); qp++)
       sum += qrule->w(qp);
 

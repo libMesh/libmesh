@@ -882,7 +882,7 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
                                                      variable_number,
                                                      elem); return;
 
-        
+
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
           case SZABAB:
             FE<2,SZABAB>::compute_constraints (constraints,

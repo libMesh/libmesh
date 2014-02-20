@@ -50,11 +50,11 @@ class Elem;
 class CheckpointIO : public MeshInput<MeshBase>,
                      public MeshOutput<MeshBase>,
                      public ParallelObject
-{ 
+{
  public:
   // The size used for encoding all id types in this file
   typedef largest_id_type xdr_id_type;
-  
+
   // The size type used to read header sizes (meta data information)
   typedef uint32_t header_id_type;
 
@@ -179,7 +179,7 @@ class CheckpointIO : public MeshInput<MeshBase>,
    * the maximum level.
    */
   unsigned int n_active_levels_on_processor(const MeshBase &mesh) const;
-  
+
   bool _binary;
   std::string _version;
 };

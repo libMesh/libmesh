@@ -244,7 +244,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * By default, calling set_output_variables() sets this flag to true, but it provides an override.
    */
   bool _allow_empty_variables;
-  
+
 };
 
 

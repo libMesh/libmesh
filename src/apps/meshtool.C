@@ -353,7 +353,7 @@ void process_cmd_line(int argc, char **argv,
             quality_type = Utility::string_to_enum<ElemQuality>(optarg);
             break;
           }
- 
+
           /**
            * Be verbose
            */

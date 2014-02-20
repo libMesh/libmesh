@@ -187,7 +187,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
 {
   // First read in data from input_filename
   GetPot infile(parameters_filename);
-  
+
   const unsigned int n_training_samples = infile("n_training_samples",0);
   const bool deterministic_training = infile("deterministic_training",false);
   std::string deterministic_training_parameter_name_in =
@@ -240,7 +240,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
       }
     }
   }
-  
+
   std::map<std::string,bool> log_scaling_in;
   RBParameters::const_iterator it     = mu_min_in.begin();
   RBParameters::const_iterator it_end = mu_min_in.end();
@@ -397,7 +397,7 @@ void RBConstruction::print_basis_function_orthogonality()
     {
       inner_product_matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
       Number value = temp->dot( get_rb_evaluation().get_basis_function(i) );
-      
+
       libMesh::out << value << " ";
     }
     libMesh::out << std::endl;
@@ -490,7 +490,7 @@ void RBConstruction::assemble_affine_expansion()
   // Assemble and store all of the matrices
   this->assemble_misc_matrices();
   this->assemble_all_affine_operators();
-  
+
   // Assemble and store all of the vectors
   this->assemble_all_affine_vectors();
   this->assemble_all_output_vectors();
@@ -661,7 +661,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
       // Impose boundary (e.g. Neumann) term
       context.side_fe_reinit();
       elem_assembly->boundary_assembly(context);
-      
+
       if(context.dg_terms_are_active())
       {
         input_matrix->add_matrix (context.get_elem_elem_jacobian(),
@@ -766,7 +766,7 @@ void RBConstruction::assemble_scaled_matvec(Number scalar,
                                             NumericVector<Number>& arg)
 {
   START_LOG("assemble_scaled_matvec()", "RBConstruction");
-  
+
   // This function isn't well tested lately, let's mark it as deprecated
   // In particular, it probably wouldn't work properly with DG terms
   libmesh_deprecated();

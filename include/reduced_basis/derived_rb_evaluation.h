@@ -53,7 +53,7 @@ public:
   /**
    * Constructor.
    */
-  DerivedRBEvaluation (const Parallel::Communicator &comm 
+  DerivedRBEvaluation (const Parallel::Communicator &comm
                        LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**

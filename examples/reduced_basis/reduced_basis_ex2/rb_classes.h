@@ -148,7 +148,7 @@ public:
     // linear system before doing an element loop.
     FEBase* elem_fe = NULL;
     c.get_element_fe( u_var, elem_fe );
-    
+
     elem_fe->get_JxW();
     elem_fe->get_phi();
     elem_fe->get_dphi();

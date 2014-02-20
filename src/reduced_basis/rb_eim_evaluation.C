@@ -373,7 +373,7 @@ void RBEIMEvaluation::write_out_interpolation_points_elem(const std::string dire
     {
       old_elem = extra_interpolation_point_elem;
     }
-    
+
     for(unsigned int n=0; n<old_elem->n_nodes(); n++)
     {
       Node* node_ptr = old_elem->get_node(n);
@@ -385,9 +385,9 @@ void RBEIMEvaluation::write_out_interpolation_points_elem(const std::string dire
       {
         node_ids.insert(old_node_id);
         _interpolation_points_mesh.add_point(*node_ptr, new_node_id, /* proc_id */ 0);
-        
+
         node_id_map[old_node_id] = new_node_id;
-        
+
         new_node_id++;
       }
     }
@@ -409,16 +409,16 @@ void RBEIMEvaluation::write_out_interpolation_points_elem(const std::string dire
     {
       old_elem = extra_interpolation_point_elem;
     }
-    
+
     dof_id_type old_elem_id = old_elem->id();
-    
+
     // Only insert the element into the mesh if it hasn't already been inserted
     std::map<dof_id_type,dof_id_type>::iterator id_it = elem_id_map.find(old_elem_id);
     if(id_it == elem_id_map.end())
     {
       Elem* new_elem = Elem::build(old_elem->type(), /*parent*/ NULL).release();
       new_elem->subdomain_id() = old_elem->subdomain_id();
-    
+
       // Assign all the nodes
       for(unsigned int n=0; n<new_elem->n_nodes(); n++)
       {
@@ -436,7 +436,7 @@ void RBEIMEvaluation::write_out_interpolation_points_elem(const std::string dire
       new_elem->set_id(new_elem_id);
       interpolation_elem_ids[i] = new_elem->id();
       elem_id_map[old_elem_id] = new_elem->id();
-      
+
       new_elem_id++;
     }
     else

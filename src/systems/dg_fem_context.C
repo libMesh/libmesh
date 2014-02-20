@@ -124,7 +124,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
       FEType neighbor_side_fe_type = i->first;
       FEAbstract* side_fe = _side_fe[neighbor_side_fe_type];
       qface_side_points = side_fe->get_xyz();
-      
+
       FEInterface::inverse_map (dim,
                                 neighbor_side_fe_type,
                                 &get_neighbor(),
@@ -133,7 +133,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
 
       i->second->reinit(&get_neighbor(), &qface_neighbor_points);
     }
-  
+
   // Set boolean flag to indicate that the DG terms are active on this element
   _dg_terms_active = true;
 
@@ -142,7 +142,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
 
   // Initialize the per-element data for elem.
   get_system().get_dof_map().dof_indices (&get_neighbor(), _neighbor_dof_indices);
-  
+
   const unsigned int n_dofs = dof_indices.size();
   const unsigned int n_neighbor_dofs = libmesh_cast_int<unsigned int>
     (_neighbor_dof_indices.size());
@@ -153,7 +153,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
   _elem_neighbor_jacobian.resize(n_dofs, n_neighbor_dofs);
   _neighbor_elem_jacobian.resize(n_neighbor_dofs, n_dofs);
   _neighbor_neighbor_jacobian.resize(n_neighbor_dofs, n_neighbor_dofs);
-  
+
   // Initialize the per-variable data for elem.
   {
     unsigned int sub_dofs = 0;

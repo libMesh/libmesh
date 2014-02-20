@@ -892,7 +892,7 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
         }
       }
     }
-  
+
 #ifdef LIBMESH_ENABLE_AMR
     if(!found_boundary_edge)
     {
@@ -938,7 +938,7 @@ unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem* const elem,
                                                 const unsigned short int edge) const
 {
   libmesh_assert(elem);
-  
+
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
   const Elem* searched_elem = elem;
@@ -960,7 +960,7 @@ unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem* const elem,
         }
       }
     }
-  
+
 #ifdef LIBMESH_ENABLE_AMR
     if(!found_boundary_edge)
     {

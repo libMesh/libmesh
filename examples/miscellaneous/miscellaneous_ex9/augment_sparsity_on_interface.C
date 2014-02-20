@@ -27,11 +27,11 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
 
   // Loop over all elements (not just local elements) to make sure we find
   // "neighbor" elements on opposite sides of the crack.
-  
+
   // TODO: This won't work with ParallelMesh.
   MeshBase::const_element_iterator       el     = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_elements_end();
-  
+
   // Map from (elem,side) to centroid
   std::map< std::pair<dof_id_type,unsigned char>, Point> lower_centroids;
   std::map< std::pair<dof_id_type,unsigned char>, Point> upper_centroids;
@@ -39,7 +39,7 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
   for ( ; el != end_el; ++el)
   {
     const Elem* elem = *el;
-    
+
     {
       for (unsigned char side=0; side<elem->n_sides(); side++)
       if (elem->neighbor(side) == NULL)
@@ -47,12 +47,12 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
         if( mesh.boundary_info->has_boundary_id (elem,side, _crack_boundary_lower) )
         {
           AutoPtr<Elem> side_elem = elem->build_side(side);
-          
+
           lower_centroids[std::make_pair(elem->id(), side)] = side_elem->centroid();
         }
       }
     }
-    
+
     {
       for (unsigned char side=0; side<elem->n_sides(); side++)
       if (elem->neighbor(side) == NULL)
@@ -60,7 +60,7 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
         if( mesh.boundary_info->has_boundary_id (elem,side, _crack_boundary_upper) )
         {
           AutoPtr<Elem> side_elem = elem->build_side(side);
-          
+
           upper_centroids[std::make_pair(elem->id(), side)] = side_elem->centroid();
         }
       }
@@ -69,13 +69,13 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
   std::size_t n_lower_centroids = lower_centroids.size();
   std::size_t n_upper_centroids = upper_centroids.size();
   libmesh_assert(n_lower_centroids == n_upper_centroids);
-  
+
   // Clear _lower_to_upper. This map will be used for matrix assembly later on.
   _lower_to_upper.clear();
-  
+
   // Initialize the two-way element ID map
   std::map<dof_id_type, dof_id_type> two_way_element_ID_map;
-  
+
   // We do an N^2 search to find elements with matching centroids. This could be optimized,
   // e.g. by first sorting the centroids based on their (x,y,z) location.
   {
@@ -84,16 +84,16 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
     for( ; it != it_end; ++it)
     {
       Point lower_centroid = it->second;
-    
+
       // find centroid in upper_centroids
       std::map< std::pair<dof_id_type,unsigned char>, Point>::iterator inner_it     = upper_centroids.begin();
       std::map< std::pair<dof_id_type,unsigned char>, Point>::iterator inner_it_end = upper_centroids.end();
-    
+
       Real min_distance = std::numeric_limits<Real>::max();
       for( ; inner_it != inner_it_end; ++inner_it)
       {
         Point upper_centroid = inner_it->second;
-      
+
         Real distance = (upper_centroid - lower_centroid).size();
         if( distance < min_distance )
         {
@@ -101,10 +101,10 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
           _lower_to_upper[it->first] = inner_it->first.first;
         }
       }
-    
+
       // We should've found matching elements on either side of the crack by now
       libmesh_assert_less(min_distance, TOLERANCE);
-      
+
       // fill up a "two way element ID map" which we iterate over below
       dof_id_type this_id     = it->first.first;
       dof_id_type neighbor_id = _lower_to_upper[it->first];
@@ -187,5 +187,5 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
       } // end loop over nodes on target element
     }
   }
-	      
+
 }

@@ -793,7 +793,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
           {
-            
+
             if (this->get_dof_map().has_adjoint_dirichlet_boundaries(i))
               {
                 AutoPtr<NumericVector<Number> > lift_func =

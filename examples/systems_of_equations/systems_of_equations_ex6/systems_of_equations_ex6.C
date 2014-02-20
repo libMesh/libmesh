@@ -123,7 +123,7 @@ int main (int argc, char** argv)
   for ( ; el != end_el; ++el)
   {
     const Elem* elem = *el;
-    
+
     unsigned int side_max_x = 0, side_min_y = 0,
                  side_max_y = 0, side_max_z = 0;
     bool found_side_max_x = false, found_side_max_y = false,
@@ -147,14 +147,14 @@ int main (int argc, char** argv)
         side_max_y = side;
         found_side_max_y = true;
       }
-      
+
       if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
       {
         side_max_z = side;
         found_side_max_z = true;
       }
     }
-    
+
     // If elem has sides on boundaries
     // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
     // then let's set a node boundary condition
@@ -170,8 +170,8 @@ int main (int argc, char** argv)
         }
       }
     }
-    
-    
+
+
     // If elem has sides on boundaries
     // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Y
     // then let's set an edge boundary condition
@@ -467,7 +467,7 @@ void assemble_elasticity(EquationSystems& es,
                   Kww(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
                 }
             }
-            
+
           // Volumetric load
           for (unsigned int i=0; i<n_w_dofs; i++)
           {

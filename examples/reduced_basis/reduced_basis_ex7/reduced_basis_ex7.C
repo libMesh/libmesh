@@ -169,7 +169,7 @@ int main (int argc, char** argv)
 
       // Plot the solution
       rb_con.load_rb_solution();
-      
+
       //Output the variable in ExodusII format (single precision)
       ExodusII_IO(mesh, /*single_precision=*/true).write_equation_systems ("RB_sol_float.exo", equation_systems);
     }

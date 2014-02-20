@@ -56,7 +56,7 @@ public:
   /**
    * Constructor.
    */
-  RBEIMEvaluation (const libMesh::Parallel::Communicator &comm 
+  RBEIMEvaluation (const libMesh::Parallel::Communicator &comm
                    LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -173,7 +173,7 @@ public:
    * the interpolation points were identified.
    */
   std::vector<unsigned int> interpolation_points_var;
-  
+
   /**
    * The corresponding list of elements at which
    * the interpolation points were identified.

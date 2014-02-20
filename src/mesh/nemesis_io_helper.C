@@ -711,7 +711,7 @@ void Nemesis_IO_Helper::create(std::string filename)
   // Fall back on double precision when necessary since ExodusII
   // doesn't seem to support long double
   int comp_ws(0), io_ws(0);
-  
+
   if(_single_precision)
   {
     comp_ws = sizeof(float);
@@ -2324,7 +2324,7 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
         y_single[i] = static_cast<float>(y[i]);
         z_single[i] = static_cast<float>(z[i]);
       }
-      
+
       ex_err = exII::ex_put_coord(ex_id, &x_single[0], &y_single[0], &z_single[0]);
     }
     else
@@ -2448,7 +2448,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values,
       cur_soln[i] = values[this->exodus_node_num_to_libmesh[i]*num_vars + c];
 
     write_nodal_values(c+1,cur_soln,timestep);
-#endif    
+#endif
   }
 }
 

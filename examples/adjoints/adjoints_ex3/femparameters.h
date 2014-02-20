@@ -41,7 +41,7 @@ public:
       require_residual_reduction(true),
       min_step_length(1e-5),
       max_linear_iterations(200000), max_nonlinear_iterations(20),
-      relative_step_tolerance(1.e-7), 
+      relative_step_tolerance(1.e-7),
       absolute_residual_tolerance(1.e-10),
       relative_residual_tolerance(1.e-10),
       initial_linear_tolerance(1.e-3), minimum_linear_tolerance(TOLERANCE*TOLERANCE),
@@ -93,7 +93,7 @@ public:
     bool time_solver_quiet, solver_quiet, reuse_preconditioner, require_residual_reduction;
     Real min_step_length;
     unsigned int max_linear_iterations, max_nonlinear_iterations;
-    Real relative_step_tolerance, 
+    Real relative_step_tolerance,
          absolute_residual_tolerance, relative_residual_tolerance,
 	 initial_linear_tolerance, minimum_linear_tolerance,
 	 linear_tolerance_multiplier;
