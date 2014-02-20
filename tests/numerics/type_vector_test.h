@@ -6,48 +6,48 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
-#define TYPEVECTORTEST \
-  CPPUNIT_TEST( testSize ); \
-  CPPUNIT_TEST( testSizeSq ); \
-  \
-  CPPUNIT_TEST( testValue ); \
-  CPPUNIT_TEST( testZero ); \
-  \
-  CPPUNIT_TEST( testEquality ); \
-  CPPUNIT_TEST( testInEquality ); \
-  CPPUNIT_TEST( testAssignment ); \
-  \
-  CPPUNIT_TEST( testScalarMult ); \
-  CPPUNIT_TEST( testScalarDiv ); \
-  CPPUNIT_TEST( testScalarMultAssign ); \
-  CPPUNIT_TEST( testScalarDivAssign ); \
-  \
-  CPPUNIT_TEST( testVectorAdd ); \
-  CPPUNIT_TEST( testVectorAddScaled ); \
-  CPPUNIT_TEST( testVectorSub ); \
-  CPPUNIT_TEST( testVectorMult ); \
-  CPPUNIT_TEST( testVectorAddAssign ); \
-  CPPUNIT_TEST( testVectorSubAssign ); \
-  \
-  CPPUNIT_TEST( testSizeBase ); \
-  CPPUNIT_TEST( testSizeSqBase ); \
-  CPPUNIT_TEST( testValueBase );  \
-  CPPUNIT_TEST( testZeroBase ); \
-  \
-  CPPUNIT_TEST( testEqualityBase ); \
-  CPPUNIT_TEST( testInEqualityBase ); \
-  CPPUNIT_TEST( testAssignmentBase ); \
-  \
-  CPPUNIT_TEST( testScalarMultBase ); \
-  CPPUNIT_TEST( testScalarDivBase ); \
-  CPPUNIT_TEST( testScalarMultAssignBase ); \
-  CPPUNIT_TEST( testScalarDivAssignBase ); \
-  \
-  CPPUNIT_TEST( testVectorAddBase ); \
-  CPPUNIT_TEST( testVectorAddScaledBase ); \
-  CPPUNIT_TEST( testVectorSubBase ); \
-  CPPUNIT_TEST( testVectorMultBase ); \
-  CPPUNIT_TEST( testVectorAddAssignBase ); \
+#define TYPEVECTORTEST                          \
+  CPPUNIT_TEST( testSize );                     \
+  CPPUNIT_TEST( testSizeSq );                   \
+                                                \
+  CPPUNIT_TEST( testValue );                    \
+  CPPUNIT_TEST( testZero );                     \
+                                                \
+  CPPUNIT_TEST( testEquality );                 \
+  CPPUNIT_TEST( testInEquality );               \
+  CPPUNIT_TEST( testAssignment );               \
+                                                \
+  CPPUNIT_TEST( testScalarMult );               \
+  CPPUNIT_TEST( testScalarDiv );                \
+  CPPUNIT_TEST( testScalarMultAssign );         \
+  CPPUNIT_TEST( testScalarDivAssign );          \
+                                                \
+  CPPUNIT_TEST( testVectorAdd );                \
+  CPPUNIT_TEST( testVectorAddScaled );          \
+  CPPUNIT_TEST( testVectorSub );                \
+  CPPUNIT_TEST( testVectorMult );               \
+  CPPUNIT_TEST( testVectorAddAssign );          \
+  CPPUNIT_TEST( testVectorSubAssign );          \
+                                                \
+  CPPUNIT_TEST( testSizeBase );                 \
+  CPPUNIT_TEST( testSizeSqBase );               \
+  CPPUNIT_TEST( testValueBase );                \
+  CPPUNIT_TEST( testZeroBase );                 \
+                                                \
+  CPPUNIT_TEST( testEqualityBase );             \
+  CPPUNIT_TEST( testInEqualityBase );           \
+  CPPUNIT_TEST( testAssignmentBase );           \
+                                                \
+  CPPUNIT_TEST( testScalarMultBase );           \
+  CPPUNIT_TEST( testScalarDivBase );            \
+  CPPUNIT_TEST( testScalarMultAssignBase );     \
+  CPPUNIT_TEST( testScalarDivAssignBase );      \
+                                                \
+  CPPUNIT_TEST( testVectorAddBase );            \
+  CPPUNIT_TEST( testVectorAddScaledBase );      \
+  CPPUNIT_TEST( testVectorSubBase );            \
+  CPPUNIT_TEST( testVectorMultBase );           \
+  CPPUNIT_TEST( testVectorAddAssignBase );      \
   CPPUNIT_TEST( testVectorSubAssignBase );
 
 
