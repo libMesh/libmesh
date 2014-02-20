@@ -988,6 +988,90 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 }
 
 
+void DofMap::local_variable_indices(std::vector<dof_id_type>& idx,
+                                    const MeshBase& mesh,
+                                    unsigned int var_num) const
+{
+  const unsigned int sys_num       = this->sys_number();
+  const unsigned int n_var_groups  = this->n_variable_groups();
+
+  // If this isn't a SCALAR variable, we need to find all its field
+  // dofs on the mesh
+  if (this->variable_type(var_num).family != SCALAR)
+    {
+      MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
+      const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
+
+      for ( ; elem_it != elem_end; ++elem_it)
+        {
+          // Only count dofs connected to active
+          // elements on this processor.
+          Elem* elem                 = *elem_it;
+          const unsigned int n_nodes = elem->n_nodes();
+
+          // First get any new nodal DOFS
+          for (unsigned int n=0; n<n_nodes; n++)
+            {
+              Node* node = elem->get_node(n);
+
+              const unsigned int n_comp = node->n_comp(sys_num, var_num);
+              for(unsigned int i=0; i<n_comp; i++)
+                {
+                  const dof_id_type index = node->dof_number(sys_num,var_num,i);
+                  if (idx.empty() || index > idx.back())
+                    idx.push_back(index);
+                }
+            }
+
+          // Next get any new element DOFS
+          const unsigned int n_comp = elem->n_comp(sys_num, var_num);
+          for(unsigned int i=0; i<n_comp; i++)
+            {
+              const dof_id_type index = elem->dof_number(sys_num,var_num,i);
+              if (idx.empty() || index > idx.back())
+                    idx.push_back(index);
+            }
+        } // done looping over elements
+
+
+      // we may have missed assigning DOFs to nodes that we own
+      // but to which we have no connected elements matching our
+      // variable restriction criterion.  this will happen, for example,
+      // if variable V is restricted to subdomain S.  We may not own
+      // any elements which live in S, but we may own nodes which are
+      // *connected* to elements which do.  in this scenario these nodes
+      // will presently have unnumbered DOFs. we need to take care of
+      // them here since we own them and no other processor will touch them.
+      {
+        MeshBase::const_node_iterator       node_it  = mesh.local_nodes_begin();
+        const MeshBase::const_node_iterator node_end = mesh.local_nodes_end();
+
+        for (; node_it != node_end; ++node_it)
+          {
+            Node *node = *node_it;
+            libmesh_assert(node);
+
+            const unsigned int n_comp = node->n_comp(sys_num, var_num);
+            for(unsigned int i=0; i<n_comp; i++)
+              {
+                const dof_id_type index = node->dof_number(sys_num,var_num,i);
+                if (idx.empty() || index > idx.back())
+                  idx.push_back(index);
+              }
+          }
+      }
+    }
+  // Otherwise, count up the SCALAR dofs, if we're on the processor
+  // that holds this SCALAR variable
+  else if ( this->processor_id() == (this->n_processors()-1) )
+    {
+      std::vector<dof_id_type> di_scalar;
+      this->SCALAR_dof_indices(di_scalar,var_num);
+      idx.insert( idx.end(), di_scalar.begin(), di_scalar.end());
+    }
+}
+
+
 void DofMap::distribute_local_dofs_node_major(dof_id_type &next_free_dof,
                                               MeshBase& mesh)
 {
