@@ -37,30 +37,30 @@ namespace libMesh
  */
 namespace Quality
 {
-  /**
-   * The number of element quality types we have
-   * defined.  This needs to be updated if you
-   * add one.
-   */
-  const unsigned int num_quals = 16;
+/**
+ * The number of element quality types we have
+ * defined.  This needs to be updated if you
+ * add one.
+ */
+const unsigned int num_quals = 16;
 
-  /**
-   * @returns a descriptive name for a \p ElemQuality
-   * \p enum
-   */
-  std::string              name     (const ElemQuality q);
+/**
+ * @returns a descriptive name for a \p ElemQuality
+ * \p enum
+ */
+std::string              name     (const ElemQuality q);
 
-  /**
-   * @returns a description for a \p ElemQuality
-   * \p enum
-   */
-  std::string              describe (const ElemQuality q);
+/**
+ * @returns a description for a \p ElemQuality
+ * \p enum
+ */
+std::string              describe (const ElemQuality q);
 
-  /**
-   * @returns the valid \p ElemQuality metrics for a given
-   * \p ElemType element type.
-   */
-  std::vector<ElemQuality> valid    (const ElemType    t);
+/**
+ * @returns the valid \p ElemQuality metrics for a given
+ * \p ElemType element type.
+ */
+std::vector<ElemQuality> valid    (const ElemType    t);
 }
 
 

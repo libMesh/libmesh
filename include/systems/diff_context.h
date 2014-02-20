@@ -361,7 +361,7 @@ public:
    */
   const DenseSubVector<Number> & get_localized_subvector (const NumericVector<Number> & _localized_vector, unsigned int _var) const;
 
- protected:
+protected:
 
   /**
    * Contains pointers to vectors the user has asked to be localized, keyed with

@@ -51,12 +51,12 @@ public:
     variables(variables_in),
     f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
     g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >(NULL))
-    {
-      libmesh_assert(f.get());
-      f->init();
-      if (g.get())
-        g->init();
-    }
+  {
+    libmesh_assert(f.get());
+    f->init();
+    if (g.get())
+      g->init();
+  }
 
   DirichletBoundary(const std::set<boundary_id_type> &b_in,
                     const std::vector<unsigned int>& variables_in,
@@ -65,9 +65,9 @@ public:
     variables(variables_in),
     f(f_in.clone()),
     g(AutoPtr<FunctionBase<Gradient> >(NULL))
-    {
-      f->init();
-    }
+  {
+    f->init();
+  }
 
 
   DirichletBoundary(const std::set<boundary_id_type> &b_in,
@@ -78,10 +78,10 @@ public:
     variables(variables_in),
     f(f_in.clone()),
     g(g_in.clone())
-    {
-      f->init();
-      g->init();
-    }
+  {
+    f->init();
+    g->init();
+  }
 
 
   DirichletBoundary (const DirichletBoundary &dirichlet_in) :
@@ -89,12 +89,12 @@ public:
     variables(dirichlet_in.variables),
     f(dirichlet_in.f.get() ? dirichlet_in.f->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
     g(dirichlet_in.g.get() ? dirichlet_in.g->clone() : AutoPtr<FunctionBase<Gradient> >(NULL))
-    {
-      libmesh_assert(f.get());
-      f->init();
-      if (g.get())
-        g->init();
-    }
+  {
+    libmesh_assert(f.get());
+    f->init();
+    if (g.get())
+      g->init();
+  }
 
   std::set<boundary_id_type> b;
   std::vector<unsigned int> variables;

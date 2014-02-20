@@ -39,12 +39,12 @@ class MeshBase;
 class Node;
 
 
-  /**
-   * Data structures that enable location-based lookups
-   * The key is a hash of the Point location.
-   * For efficiency we will use a hashed multimap if it is
-   * available, otherwise a regular multimap.
-   */
+/**
+ * Data structures that enable location-based lookups
+ * The key is a hash of the Point location.
+ * For efficiency we will use a hashed multimap if it is
+ * available, otherwise a regular multimap.
+ */
 template <typename T>
 class LocationMap
 {

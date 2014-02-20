@@ -51,7 +51,7 @@ namespace libMesh
  */
 class QJacobi : public QBase
 {
- public:
+public:
 
   /**
    * Constructor.  Currently, only one-dimensional rules provided.
@@ -75,7 +75,7 @@ class QJacobi : public QBase
   QuadratureType type() const;
 
 
- private:
+private:
   const unsigned int _alpha;
   const unsigned int _beta;
 

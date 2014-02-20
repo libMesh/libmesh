@@ -41,7 +41,7 @@ namespace libMesh
 // BoundaryMesh class definition
 class BoundaryMesh : public Mesh
 {
- public:
+public:
 
   /**
    * Constructor. Initializes dimenstion and processor id.
@@ -66,7 +66,7 @@ class BoundaryMesh : public Mesh
    */
   ~BoundaryMesh();
 
- private:
+private:
 };
 
 

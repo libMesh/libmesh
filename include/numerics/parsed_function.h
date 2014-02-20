@@ -50,22 +50,22 @@ public:
       // Size the spacetime vector to account for space, time, and any additional
       // variables passed
       //_spacetime(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0)),
-    {
-      std::string variables = "x";
+  {
+    std::string variables = "x";
 #if LIBMESH_DIM > 1
-      variables += ",y";
+    variables += ",y";
 #endif
 #if LIBMESH_DIM > 2
-      variables += ",z";
+    variables += ",z";
 #endif
-      variables += ",t";
+    variables += ",t";
 
-      _spacetime.resize(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0));
+    _spacetime.resize(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0));
 
-      // If additional vars were passed, append them to the string
-      // that we send to the function parser. Also add them to the
-      // end of our spacetime vector
-      if (additional_vars)
+    // If additional vars were passed, append them to the string
+    // that we send to the function parser. Also add them to the
+    // end of our spacetime vector
+    if (additional_vars)
       {
         if (initial_vals)
           std::copy(initial_vals->begin(), initial_vals->end(), std::back_inserter(_initial_vals));
@@ -73,17 +73,17 @@ public:
         std::copy(additional_vars->begin(), additional_vars->end(), std::back_inserter(_additional_vars));
 
         for (unsigned int i=0; i < additional_vars->size(); ++i)
-        {
-          variables += "," + (*additional_vars)[i];
-          // Initialize extra variables to the vector passed in or zero
-          // Note: The initial_vals vector can be shorter than the additional_vars vector
-          _spacetime[LIBMESH_DIM+1 + i] = (initial_vals && i < initial_vals->size()) ? (*initial_vals)[i] : 0;
-        }
+          {
+            variables += "," + (*additional_vars)[i];
+            // Initialize extra variables to the vector passed in or zero
+            // Note: The initial_vals vector can be shorter than the additional_vars vector
+            _spacetime[LIBMESH_DIM+1 + i] = (initial_vals && i < initial_vals->size()) ? (*initial_vals)[i] : 0;
+          }
       }
 
-      size_t nextstart = 0, end = 0;
+    size_t nextstart = 0, end = 0;
 
-      while (end != std::string::npos)
+    while (end != std::string::npos)
       {
         // If we're past the end of the string, we can't make any more
         // subparsers
@@ -105,7 +105,7 @@ public:
         // a substring in the middle.
         std::string subexpression =
           expression.substr(nextstart, (end == std::string::npos) ?
-                                        std::string::npos : end - nextstart);
+                            std::string::npos : end - nextstart);
 
         // fparser can crash on empty expressions
         libmesh_assert(!subexpression.empty());
@@ -122,51 +122,51 @@ public:
         // If at end, use nextstart=maxSize.  Else start at next
         // character.
         nextstart = (end == std::string::npos) ?
-                    std::string::npos : end + 1;
+          std::string::npos : end + 1;
       }
 
-      this->_initialized = true;
-    }
+    this->_initialized = true;
+  }
 
   virtual Output operator() (const Point& p,
                              const Real time = 0)
-    {
-      _spacetime[0] = p(0);
+  {
+    _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
-      _spacetime[1] = p(1);
+    _spacetime[1] = p(1);
 #endif
 #if LIBMESH_DIM > 2
-      _spacetime[2] = p(2);
+    _spacetime[2] = p(2);
 #endif
-      _spacetime[LIBMESH_DIM] = time;
+    _spacetime[LIBMESH_DIM] = time;
 
-      // The remaining locations in _spacetime are currently fixed at construction
-      // but could potentially be made dynamic
-      return parsers[0].Eval(&_spacetime[0]);
-    }
+    // The remaining locations in _spacetime are currently fixed at construction
+    // but could potentially be made dynamic
+    return parsers[0].Eval(&_spacetime[0]);
+  }
 
   virtual void operator() (const Point& p,
                            const Real time,
                            DenseVector<Output>& output)
-    {
-      _spacetime[0] = p(0);
+  {
+    _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
-      _spacetime[1] = p(1);
+    _spacetime[1] = p(1);
 #endif
 #if LIBMESH_DIM > 2
-      _spacetime[2] = p(2);
+    _spacetime[2] = p(2);
 #endif
-      _spacetime[LIBMESH_DIM] = time;
+    _spacetime[LIBMESH_DIM] = time;
 
-      unsigned int size = output.size();
+    unsigned int size = output.size();
 
-      libmesh_assert_equal_to (size, parsers.size());
+    libmesh_assert_equal_to (size, parsers.size());
 
-      // The remaining locations in _spacetime are currently fixed at construction
-      // but could potentially be made dynamic
-      for (unsigned int i=0; i != size; ++i)
-        output(i) = parsers[i].Eval(&_spacetime[0]);
-    }
+    // The remaining locations in _spacetime are currently fixed at construction
+    // but could potentially be made dynamic
+    for (unsigned int i=0; i != size; ++i)
+      output(i) = parsers[i].Eval(&_spacetime[0]);
+  }
 
   /**
    * @returns the vector component \p i at coordinate
@@ -175,40 +175,40 @@ public:
   virtual Output component (unsigned int i,
                             const Point& p,
                             Real time)
-    {
-      _spacetime[0] = p(0);
+  {
+    _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
-      _spacetime[1] = p(1);
+    _spacetime[1] = p(1);
 #endif
 #if LIBMESH_DIM > 2
-      _spacetime[2] = p(2);
+    _spacetime[2] = p(2);
 #endif
-      _spacetime[LIBMESH_DIM] = time;
+    _spacetime[LIBMESH_DIM] = time;
 
-      libmesh_assert_less (i, parsers.size());
+    libmesh_assert_less (i, parsers.size());
 
-      // The remaining locations in _spacetime are currently fixed at construction
-      // but could potentially be made dynamic
-      return parsers[i].Eval(&_spacetime[0]);
-    }
+    // The remaining locations in _spacetime are currently fixed at construction
+    // but could potentially be made dynamic
+    return parsers[i].Eval(&_spacetime[0]);
+  }
 
   /**
    * @returns the address of a parsed variable so you can supply a parameterized value
    */
   virtual Output & getVarAddress(const std::string & variable_name)
-    {
-      const std::vector<std::string>::iterator it =
-          std::find(_additional_vars.begin(), _additional_vars.end(), variable_name);
+  {
+    const std::vector<std::string>::iterator it =
+      std::find(_additional_vars.begin(), _additional_vars.end(), variable_name);
 
-      if (it == _additional_vars.end())
+    if (it == _additional_vars.end())
       {
         libMesh::err << "ERROR: Requested variable not found in parsed function\n" << std::endl;
         libmesh_error();
       }
 
-      // Iterator Arithmetic (How far from the end of the array is our target address?)
-      return _spacetime[_spacetime.size() - (_additional_vars.end() - it)];
-    }
+    // Iterator Arithmetic (How far from the end of the array is our target address?)
+    return _spacetime[_spacetime.size() - (_additional_vars.end() - it)];
+  }
 
 
   virtual AutoPtr<FunctionBase<Output> > clone() const {
@@ -241,13 +241,13 @@ class ParsedFunction : public FunctionBase<Output>
 {
 public:
   ParsedFunction (std::string /* expression */) : _dummy(0)
-    {
-      libmesh_not_implemented();
-    }
+  {
+    libmesh_not_implemented();
+  }
 
   virtual Output operator() (const Point&,
                              const Real /* time */ = 0)
-    { return 0.; }
+  { return 0.; }
 
   virtual void operator() (const Point&,
                            const Real /* time */,

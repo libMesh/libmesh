@@ -54,7 +54,7 @@ class EquationSystems;
 template <class MT>
 class MeshOutput
 {
- protected:
+protected:
 
   /**
    * Default constructor. Will set the _obj to NULL, effectively
@@ -71,7 +71,7 @@ class MeshOutput
   MeshOutput (const MT&, const bool is_parallel_format = false);
 
 
- public:
+public:
 
   /**
    * Destructor.
@@ -109,7 +109,7 @@ class MeshOutput
    */
   unsigned int & ascii_precision ();
 
- protected:
+protected:
 
 
   /**
@@ -126,7 +126,7 @@ class MeshOutput
   const bool _is_parallel_format;
 
 
- private:
+private:
 
 
   /**
@@ -181,10 +181,10 @@ MeshOutput<MT>::MeshOutput (const MT& obj, const bool is_parallel_format) :
       if (this->mesh().processor_id() == 0)
         {
           libmesh_do_once(libMesh::out <<
-            "Warning:  This MeshOutput subclass only supports meshes which have been serialized!"
-            << std::endl;);
+                          "Warning:  This MeshOutput subclass only supports meshes which have been serialized!"
+                          << std::endl;);
         }
-//      libmesh_error();
+      //      libmesh_error();
     }
 }
 
@@ -220,8 +220,8 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
       libmesh_assert(!my_mesh.allow_renumbering());
 
       libmesh_do_once(libMesh::out <<
-        "Warning:  This MeshOutput subclass only supports meshes which are contiguously renumbered!"
-        << std::endl;);
+                      "Warning:  This MeshOutput subclass only supports meshes which are contiguously renumbered!"
+                      << std::endl;);
 
       my_mesh.allow_renumbering(true);
 

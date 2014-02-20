@@ -35,39 +35,39 @@ namespace libMesh
 /**
  * The \p Prism15 is an element in 3D composed of 15 nodes.
  * It is numbered like this:
-   \verbatim
-   PRISM15:
-            5
-            o
-           /:\
-          / : \
-         /  :  \
-        /   :   \
-    14 o    :    o 13
-      /     :     \
-     /      :      \
-    /       o 11    \
+ \verbatim
+ PRISM15:
+ 5
+ o
+ /:\
+ / : \
+ /  :  \
+ /   :   \
+ 14 o    :    o 13
+ /     :     \
+ /      :      \
+ /       o 11    \
  3 /        :        \4
-  o---------o---------o
-  |         :12       |
-  |         :         |
-  |         :         |
-  |         o         |
-  |        .2.        |
-  |       .   .       |
-9 o      .     .      o 10
-  |     .       .     |
-  |  8 o         o 7  |
-  |   .           .   |
-  |  .             .  |
-  | .               . |
-  |.                 .|
-  o---------o---------o
-  0         6         1
+ o---------o---------o
+ |         :12       |
+ |         :         |
+ |         :         |
+ |         o         |
+ |        .2.        |
+ |       .   .       |
+ 9 o      .     .      o 10
+ |     .       .     |
+ |  8 o         o 7  |
+ |   .           .   |
+ |  .             .  |
+ | .               . |
+ |.                 .|
+ o---------o---------o
+ 0         6         1
 
 
-   \endverbatim
- */
+ \endverbatim
+*/
 
 // ------------------------------------------------------------
 // Prism class definition
@@ -156,7 +156,7 @@ public:
    * @returns 2 for all \p n
    */
   unsigned int n_second_order_adjacent_vertices (const unsigned int) const
-      { return 2; }
+  { return 2; }
 
   /**
    * @returns the element-local number of the  \f$ v^{th} \f$ vertex
@@ -176,7 +176,7 @@ public:
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
-    second_order_child_vertex (const unsigned int n) const;
+  second_order_child_vertex (const unsigned int n) const;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to

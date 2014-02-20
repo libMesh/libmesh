@@ -39,18 +39,18 @@ namespace libMesh
 /**
  * The \p INFQUAD6 is an infinite element in 2D composed of 6 nodes.
  * It is numbered like this:
-   \verbatim
-             2     5     3
-   INFQUAD6: o     o     o   closer to infinity
-             |           |
-             |           |
-             |           |
-             |           |
-             |           |
-             o-----o-----o   base side
-             0     4     1
-   \endverbatim
- */
+ \verbatim
+ 2     5     3
+ INFQUAD6: o     o     o   closer to infinity
+ |           |
+ |           |
+ |           |
+ |           |
+ |           |
+ o-----o-----o   base side
+ 0     4     1
+ \endverbatim
+*/
 
 // ------------------------------------------------------------
 // InfQuad6 class definition
@@ -131,7 +131,7 @@ public:
    * @returns 2 for all \p n
    */
   unsigned int n_second_order_adjacent_vertices (const unsigned int) const
-      { return 2; }
+  { return 2; }
 
   /**
    * @returns the element-local number of the  \f$ v^{th} \f$ vertex
@@ -151,7 +151,7 @@ public:
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
-    second_order_child_vertex (const unsigned int n) const;
+  second_order_child_vertex (const unsigned int n) const;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to

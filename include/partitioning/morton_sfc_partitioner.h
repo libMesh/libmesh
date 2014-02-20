@@ -39,7 +39,7 @@ namespace libMesh
 // MortonSFCLinearPartitioner class definition
 class MortonSFCPartitioner : public SFCPartitioner
 {
- public:
+public:
 
   /**
    * Constructor.

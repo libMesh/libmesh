@@ -55,10 +55,10 @@ public:
    */
   InfHex(const unsigned int nn, Elem* p, Node** nodelinkdata);
 
-//   /**
-//    * @returns 4 for the base \p s=0 and 2 for side faces.
-//    */
-//   unsigned int n_children_per_side(const unsigned int s) const;
+  //   /**
+  //    * @returns 4 for the base \p s=0 and 2 for side faces.
+  //    */
+  //   unsigned int n_children_per_side(const unsigned int s) const;
 
   /**
    * @returns 5.  Infinite elements have one side less

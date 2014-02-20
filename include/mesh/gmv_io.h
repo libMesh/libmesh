@@ -51,9 +51,9 @@ class MeshBase;
 // ------------------------------------------------------------
 // GMVIO class definition
 class GMVIO : public MeshInput<MeshBase>,
-  public MeshOutput<MeshBase>
+              public MeshOutput<MeshBase>
 {
- public:
+public:
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
@@ -74,25 +74,25 @@ class GMVIO : public MeshInput<MeshBase>,
    */
   virtual void write (const std::string& );
 
-   /**
-    * This method implements reading a mesh from a specified file.
-    */
+  /**
+   * This method implements reading a mesh from a specified file.
+   */
   virtual void read (const std::string& mesh_file);
 
-//   /**
-//    * This method implements reading a mesh from a specified file.
-//    */
-//   virtual void read (const std::string& mesh_file)
-//   { this->read_mesh_and_nodal_data(mesh_file, NULL); }
+  //   /**
+  //    * This method implements reading a mesh from a specified file.
+  //    */
+  //   virtual void read (const std::string& mesh_file)
+  //   { this->read_mesh_and_nodal_data(mesh_file, NULL); }
 
-//   /**
-//    * Extension of the MeshInput::read() routine which
-//    * also takes an optional EquationSystems pointer and
-//    * tries to read field variables from the GMV file
-//    * into the EquationSystems object.
-//    */
-//   virtual void read_mesh_and_nodal_data (const std::string& ,
-//  EquationSystems* es=NULL);
+  //   /**
+  //    * Extension of the MeshInput::read() routine which
+  //    * also takes an optional EquationSystems pointer and
+  //    * tries to read field variables from the GMV file
+  //    * into the EquationSystems object.
+  //    */
+  //   virtual void read_mesh_and_nodal_data (const std::string& ,
+  //  EquationSystems* es=NULL);
 
   /**
    * This method implements writing a mesh with nodal data to a

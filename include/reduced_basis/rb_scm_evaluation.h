@@ -47,7 +47,7 @@ namespace libMesh
 // RBSCMEvaluation class definition
 
 class RBSCMEvaluation : public RBParametrized,
-    public ParallelObject
+                        public ParallelObject
 {
 public:
 
@@ -134,7 +134,7 @@ public:
   Real get_B_min(unsigned int i) const;
   Real get_B_max(unsigned int i) const;
 
-   /**
+  /**
    * Set B_min and B_max.
    */
   void set_B_min(unsigned int i, Real B_min_val);
@@ -207,7 +207,7 @@ private:
    */
   RBParameters saved_parameters;
 
-   /**
+  /**
    * A pointer to to the object that stores the theta expansion.
    * This is not an AutoPtr since we may want to share it.
    * (Note: a shared_ptr would be a good option here.)

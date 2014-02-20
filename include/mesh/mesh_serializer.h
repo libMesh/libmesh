@@ -26,26 +26,26 @@
 
 namespace libMesh
 {
-  // Forward declarations
-  class MeshBase;
+// Forward declarations
+class MeshBase;
 
-  /**
-   * Temporarily serialize a ParallelMesh for output; a distributed
-   * mesh is allgathered by the MeshSerializer constructor if
-   * need_serial is true, then remote elements are deleted again by the
-   * destructor.
-   */
-  class MeshSerializer
-  {
-  public:
-    MeshSerializer(MeshBase& mesh, bool need_serial = true);
+/**
+ * Temporarily serialize a ParallelMesh for output; a distributed
+ * mesh is allgathered by the MeshSerializer constructor if
+ * need_serial is true, then remote elements are deleted again by the
+ * destructor.
+ */
+class MeshSerializer
+{
+public:
+  MeshSerializer(MeshBase& mesh, bool need_serial = true);
 
-    ~MeshSerializer();
+  ~MeshSerializer();
 
-  private:
-    MeshBase& _mesh;
-    bool reparallelize;
-  };
+private:
+  MeshBase& _mesh;
+  bool reparallelize;
+};
 
 } // namespace libMesh
 

@@ -58,8 +58,8 @@ template <typename T> class ShellMatrix;
 
 template <typename T>
 class TrilinosPreconditioner :
-  public Preconditioner<T>,
-  public Epetra_Operator
+    public Preconditioner<T>,
+    public Epetra_Operator
 {
 public:
 

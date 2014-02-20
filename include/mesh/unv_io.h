@@ -47,10 +47,10 @@ class MeshData;
 // ------------------------------------------------------------
 // UNVIO class definition
 class UNVIO : public MeshInput<MeshBase>,
-  public MeshOutput<MeshBase>
+              public MeshOutput<MeshBase>
 {
 
- public:
+public:
 
   /**
    * Constructor.  Takes a writeable reference to a mesh object.
@@ -85,7 +85,7 @@ class UNVIO : public MeshInput<MeshBase>,
   bool & verbose ();
 
 
- private:
+private:
 
 
   /**

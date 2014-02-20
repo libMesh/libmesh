@@ -44,7 +44,7 @@ namespace libMesh
 
 class QSimpson : public QBase
 {
- public:
+public:
 
   /**
    * Constructor.  Declares the order of the quadrature rule.
@@ -63,7 +63,7 @@ class QSimpson : public QBase
   QuadratureType type() const { return QSIMPSON; }
 
 
- private:
+private:
 
   void init_1D (const ElemType _type=INVALID_ELEM,
                 unsigned int p_level=0);

@@ -40,13 +40,13 @@ namespace libMesh
  * and currently represents the default Mesh implementation.
  * Most methods for this class are found in MeshBase, and most
  * implementation details are found in UnstructuredMesh.
-*/
+ */
 
 // ------------------------------------------------------------
 // Mesh class definition
 class SerialMesh : public UnstructuredMesh
 {
- public:
+public:
 
   /**
    * Constructor.  Takes \p dim, the dimension of the mesh.
@@ -84,7 +84,7 @@ class SerialMesh : public UnstructuredMesh
    * Virtual copy-constructor, creates a copy of this mesh
    */
   virtual AutoPtr<MeshBase> clone () const
-    { return AutoPtr<MeshBase>(new SerialMesh(*this)); }
+  { return AutoPtr<MeshBase>(new SerialMesh(*this)); }
 
   /**
    * Destructor.
@@ -171,12 +171,12 @@ class SerialMesh : public UnstructuredMesh
   virtual void delete_elem (Elem* e) ;
   virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id);
 
-    /**
-     * There is no reason for a user to ever call this function.
-     *
-     * This function restores a previously broken element/node numbering such that
-     * \p mesh.node(n)->id() == n.
-     */
+  /**
+   * There is no reason for a user to ever call this function.
+   *
+   * This function restores a previously broken element/node numbering such that
+   * \p mesh.node(n)->id() == n.
+   */
   virtual void fix_broken_node_and_element_numbering ();
 
   /**

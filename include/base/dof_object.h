@@ -356,7 +356,7 @@ public:
    * much of that buffer applies to this dof object?
    */
   static unsigned int unpackable_indexing_size
-    (std::vector<largest_id_type>::const_iterator begin);
+  (std::vector<largest_id_type>::const_iterator begin);
 
   /**
    * A method for creating our index buffer from packed data -
@@ -428,14 +428,14 @@ private:
    *
    * Specifically, consider the case of 4 systems, with 3, 0, 1, 2 variable groups, respectively.  The _idx_buf then looks like:
    \verbatim
-    [4 10 10 12 () (ncv_0 idx_0 ncv_1 idx_1 ncv_2 idx_2) () (ncv_0 idx_0) (ncv_0 idx_0 ncv_1 idx_1)]
-    [0  1  2  3         4     5     6     7     8     9         10    11      12    13    14    15]
+   [4 10 10 12 () (ncv_0 idx_0 ncv_1 idx_1 ncv_2 idx_2) () (ncv_0 idx_0) (ncv_0 idx_0 ncv_1 idx_1)]
+   [0  1  2  3         4     5     6     7     8     9         10    11      12    13    14    15]
 
    \endverbatim
    * The ending index is then given by
    \verbatim
-    end_s = _idx_buf.size(), s == (ns-1),
-          = _idx_buf[s+1]    otherwise.
+   end_s = _idx_buf.size(), s == (ns-1),
+   = _idx_buf[s+1]    otherwise.
    \endverbatim
    * The starting indices are not specifically stored, but rather inferred as follows:
    *
@@ -871,7 +871,7 @@ unsigned int DofObject::end_idx (const unsigned int s) const
   libmesh_assert_less (s, _idx_buf.size());
 
   return ((s+1) == this->n_systems()) ?
-          libmesh_cast_int<unsigned int>(_idx_buf.size()) :
+    libmesh_cast_int<unsigned int>(_idx_buf.size()) :
     libmesh_cast_int<unsigned int>(_idx_buf[s+1]);
 }
 
@@ -909,12 +909,12 @@ dof_id_type DofObject::vg_dof_base(const unsigned int s,
 
   libmesh_assert_less ((start_idx_sys + 2*vg + 1), _idx_buf.size());
 
-// #ifdef DEBUG
-//   std::cout << " [ ";
-//   for (unsigned int i=0; i<_idx_buf.size(); i++)
-//     std::cout << _idx_buf[i] << " ";
-//   std::cout << "]\n";
-// #endif
+  // #ifdef DEBUG
+  //   std::cout << " [ ";
+  //   for (unsigned int i=0; i<_idx_buf.size(); i++)
+  //     std::cout << _idx_buf[i] << " ";
+  //   std::cout << "]\n";
+  // #endif
 
   return _idx_buf[start_idx_sys + 2*vg + 1];
 }

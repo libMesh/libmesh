@@ -45,7 +45,7 @@ class MeshBase;
 // FroIO class definition
 class FroIO : public MeshOutput<MeshBase>
 {
- public:
+public:
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
@@ -60,7 +60,7 @@ class FroIO : public MeshOutput<MeshBase>
   virtual void write (const std::string& );
 
 
- private:
+private:
 
 };
 

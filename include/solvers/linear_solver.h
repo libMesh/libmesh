@@ -146,7 +146,7 @@ public:
                                                const double,      // Stopping tolerance
                                                const unsigned int) = 0; // N. Iterations
 
-    /**
+  /**
    * Function to solve the adjoint system. Note that this method
    * will compute the preconditioner from the system matrix. This is not a pure virtual
    * function and is defined linear_solver.C

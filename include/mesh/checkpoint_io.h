@@ -51,7 +51,7 @@ class CheckpointIO : public MeshInput<MeshBase>,
                      public MeshOutput<MeshBase>,
                      public ParallelObject
 {
- public:
+public:
   // The size used for encoding all id types in this file
   typedef largest_id_type xdr_id_type;
 
@@ -106,7 +106,7 @@ class CheckpointIO : public MeshInput<MeshBase>,
   const std::string & version () const { return _version; }
   std::string &       version ()       { return _version; }
 
- private:
+private:
   //---------------------------------------------------------------------------
   // Write Implementation
   /**

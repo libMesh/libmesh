@@ -70,19 +70,19 @@ public:
    * build_side and build_edge are identical for faces
    */
   AutoPtr<Elem> build_edge (const unsigned int i) const
-    { return build_side(i); }
+  { return build_side(i); }
 
   /*
    * is_edge_on_side is trivial in 2D
    */
   virtual bool is_edge_on_side(const unsigned int e,
                                const unsigned int s) const
-    { return (e == s); }
+  { return (e == s); }
 
-//   /**
-//    * @returns 2
-//    */
-//   unsigned int n_children_per_side(const unsigned int) const { return 2; }
+  //   /**
+  //    * @returns 2
+  //    */
+  //   unsigned int n_children_per_side(const unsigned int) const { return 2; }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

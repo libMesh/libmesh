@@ -46,7 +46,7 @@ class MeshBase;
 // TecplotIO class definition
 class TecplotIO : public MeshOutput<MeshBase>
 {
- public:
+public:
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
@@ -97,7 +97,7 @@ class TecplotIO : public MeshOutput<MeshBase>
    */
   std::string & zone_title ();
 
- private:
+private:
 
   /**
    * This method implements writing a mesh with nodal data to a

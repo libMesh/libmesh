@@ -64,7 +64,7 @@ namespace libMesh
 
 class QMonomial : public QBase
 {
- public:
+public:
 
   /**
    * Constructor.  Declares the order of the quadrature rule.
@@ -83,7 +83,7 @@ class QMonomial : public QBase
   QuadratureType type() const { return QMONOMIAL; }
 
 
- private:
+private:
 
   void init_1D (const ElemType,
                 unsigned int =0)
@@ -117,7 +117,7 @@ class QMonomial : public QBase
    * J. W. Wissman and T. Becker, Partially symmetric cubature
    * formulas for even degrees of exactness, SIAM J. Numer. Anal.  23
    * (1986), 676--685.
-  */
+   */
   void wissmann_rule(const Real rule_data[][3],
                      const unsigned int n_pts);
 

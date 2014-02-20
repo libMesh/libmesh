@@ -146,7 +146,7 @@ Solver::Solver (EquationSystems& es) :
   _system (es),
   _mesh   (es.get_mesh())
 {
-libmesh_deprecated();
+  libmesh_deprecated();
 }
 
 
@@ -170,8 +170,8 @@ void Solver::init ()
 inline
 void Solver::pre_process ()
 {
-//  libMesh::out << "Pre-processing"
-//         << std::endl;
+  //  libMesh::out << "Pre-processing"
+  //         << std::endl;
 }
 
 
@@ -194,8 +194,8 @@ void Solver::solve ()
 inline
 void Solver::post_process ()
 {
-//  libMesh::out << "Post-processing"
-//         << std::endl;
+  //  libMesh::out << "Post-processing"
+  //         << std::endl;
 }
 
 } // namespace libMesh

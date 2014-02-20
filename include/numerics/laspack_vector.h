@@ -56,7 +56,7 @@ template <typename T> class SparseMatrix;
 template <typename T>
 class LaspackVector : public NumericVector<T>
 {
- public:
+public:
 
   /**
    *  Dummy-Constructor. Dimension=0
@@ -458,7 +458,7 @@ class LaspackVector : public NumericVector<T>
    */
   virtual void swap (NumericVector<T> &v);
 
- private:
+private:
 
   /**
    * Actual Laspack vector datatype

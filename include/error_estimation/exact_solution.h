@@ -157,7 +157,7 @@ public:
    * integration.
    */
   void extra_quadrature_order (const int extraorder)
-    { _extra_order = extraorder; }
+  { _extra_order = extraorder; }
 
   /**
    * Computes and stores the error in the solution value e = u-u_h,

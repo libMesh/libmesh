@@ -171,10 +171,10 @@ public:
   void scale (const T factor);
 
 
-    /**
-     * Multiplies every element in the column \p col matrix by \p factor.
-     */
-    void scale_column (const unsigned int col, const T factor);
+  /**
+   * Multiplies every element in the column \p col matrix by \p factor.
+   */
+  void scale_column (const unsigned int col, const T factor);
 
   /**
    * Multiplies every element in the matrix by \p factor.
@@ -184,8 +184,8 @@ public:
   /**
    * Adds \p factor times \p mat to this matrix.
    */
-    template<typename T2, typename T3>
-    typename boostcopy::enable_if_c<
+  template<typename T2, typename T3>
+  typename boostcopy::enable_if_c<
     ScalarTraits<T2>::value, void >::type add (const T2 factor,
                                                const DenseMatrix<T3>& mat);
 
@@ -528,22 +528,22 @@ private:
 namespace DenseMatrices
 {
 
-  /**
-   * Convenient definition of a real-only
-   * dense matrix.
-   */
-  typedef DenseMatrix<Real> RealDenseMatrix;
+/**
+ * Convenient definition of a real-only
+ * dense matrix.
+ */
+typedef DenseMatrix<Real> RealDenseMatrix;
 
-  /**
-   * Note that this typedef may be either
-   * a real-only matrix, or a truly complex
-   * matrix, depending on how \p Number
-   * was defined in \p libmesh_common.h.
-   * Be also aware of the fact that \p DenseMatrix<T>
-   * is likely to be more efficient for
-   * real than for complex data.
-   */
-  typedef DenseMatrix<Complex> ComplexDenseMatrix;
+/**
+ * Note that this typedef may be either
+ * a real-only matrix, or a truly complex
+ * matrix, depending on how \p Number
+ * was defined in \p libmesh_common.h.
+ * Be also aware of the fact that \p DenseMatrix<T>
+ * is likely to be more efficient for
+ * real than for complex data.
+ */
+typedef DenseMatrix<Complex> ComplexDenseMatrix;
 
 }
 
@@ -713,8 +713,8 @@ template<typename T>
 inline
 void DenseMatrix<T>::scale_column (const unsigned int col, const T factor)
 {
-    for (unsigned int i=0; i<this->m(); i++)
-        (*this)(i, col) *= factor;
+  for (unsigned int i=0; i<this->m(); i++)
+    (*this)(i, col) *= factor;
 }
 
 
@@ -733,16 +733,16 @@ template<typename T>
 template<typename T2, typename T3>
 inline
 typename boostcopy::enable_if_c<
-ScalarTraits<T2>::value, void >::type
+  ScalarTraits<T2>::value, void >::type
 DenseMatrix<T>::add (const T2 factor,
                      const DenseMatrix<T3>& mat)
 {
-    libmesh_assert_equal_to (this->m(), mat.m());
-    libmesh_assert_equal_to (this->n(), mat.n());
+  libmesh_assert_equal_to (this->m(), mat.m());
+  libmesh_assert_equal_to (this->n(), mat.n());
 
-    for (unsigned int i=0; i<this->m(); i++)
-        for (unsigned int j=0; j<this->n(); j++)
-            (*this)(i,j) += factor * mat(i,j);
+  for (unsigned int i=0; i<this->m(); i++)
+    for (unsigned int j=0; j<this->n(); j++)
+      (*this)(i,j) += factor * mat(i,j);
 }
 
 

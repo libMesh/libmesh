@@ -48,8 +48,8 @@ class FEComputeData
 public:
 
 
-//------------------------------------------------------
-// Conventional FEComputeData
+  //------------------------------------------------------
+  // Conventional FEComputeData
   /**
    * Constructor.  Takes the required input data and clears
    * the output data using \p clear().

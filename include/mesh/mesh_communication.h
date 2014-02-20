@@ -69,15 +69,15 @@ public:
    */
   void clear ();
 
-//   /**
-//    * Finds all the processors that may contain
-//    * elements that neighbor my elements.  This list
-//    * is guaranteed to include all processors that border
-//    * any of my elements, but may include additional ones as
-//    * well.  This method computes bounding boxes for the
-//    * elements on each processor and checks for overlaps.
-//    */
-//   void find_neighboring_processors(const MeshBase &);
+  //   /**
+  //    * Finds all the processors that may contain
+  //    * elements that neighbor my elements.  This list
+  //    * is guaranteed to include all processors that border
+  //    * any of my elements, but may include additional ones as
+  //    * well.  This method computes bounding boxes for the
+  //    * elements on each processor and checks for overlaps.
+  //    */
+  //   void find_neighboring_processors(const MeshBase &);
 
   /**
    * This method takes a mesh (which is assumed to reside on

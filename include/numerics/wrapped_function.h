@@ -131,7 +131,7 @@ WrappedFunction<Output>::clone () const
 {
   return AutoPtr<FunctionBase<Output> >
     (new WrappedFunction<Output>
-      (_sys, _fptr, _parameters, _varnum));
+     (_sys, _fptr, _parameters, _varnum));
 }
 
 
@@ -176,7 +176,7 @@ void WrappedFunction<Output>::operator() (const Point& p,
           for (unsigned int j=0; j != n_components; ++j)
             output(_sys.variable_scalar_number(v,j)) =
               _fptr(Point(j,0,0), *_parameters,
-                     _sys.name(), _sys.variable_name(v));
+                    _sys.name(), _sys.variable_name(v));
         }
     }
 }

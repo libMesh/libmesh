@@ -38,16 +38,16 @@ public:
 
   virtual Output operator() (const Point&,
                              const Real = 0)
-    { return _c; }
+  { return _c; }
 
   virtual void operator() (const Point&,
                            const Real,
                            DenseVector<Output>& output)
-    {
-      unsigned int size = output.size();
-      for (unsigned int i=0; i != size; ++i)
-        output(i) = _c;
-    }
+  {
+    unsigned int size = output.size();
+    for (unsigned int i=0; i != size; ++i)
+      output(i) = _c;
+  }
 
   virtual AutoPtr<FunctionBase<Output> > clone() const {
     return AutoPtr<FunctionBase<Output> >

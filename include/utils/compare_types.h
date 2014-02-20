@@ -28,13 +28,13 @@ namespace libMesh
 // Copy of boost's enable_if_c
 
 namespace boostcopy {
-  template <bool B, class T = void>
-    struct enable_if_c {
-      typedef T type;
-    };
+template <bool B, class T = void>
+struct enable_if_c {
+  typedef T type;
+};
 
-  template <class T>
-    struct enable_if_c<false, T> {};
+template <class T>
+struct enable_if_c<false, T> {};
 }
 
 
@@ -42,12 +42,12 @@ namespace boostcopy {
 // Complete list of scalar classes, needed for disambiguation
 template <typename T>
 struct ScalarTraits {
-      static const bool value = false;
+  static const bool value = false;
 };
 
-#define ScalarTraits_true(type) \
-template<> \
-struct ScalarTraits<type> { static const bool value = true; }
+#define ScalarTraits_true(type)                                 \
+  template<>                                                    \
+  struct ScalarTraits<type> { static const bool value = true; }
 
 ScalarTraits_true(char);
 ScalarTraits_true(short);
@@ -97,21 +97,21 @@ struct CompareTypes<std::complex<T>, T> {
 // thing on the net requires a bunch of Alexandrescu's code and doesn't work
 // with older compilers
 
-#define CompareTypes_super(a,b,super) \
-  template<>                          \
-    struct CompareTypes<a, b> {       \
-    typedef super supertype;          \
+#define CompareTypes_super(a,b,super)           \
+  template<>                                    \
+  struct CompareTypes<a, b> {                   \
+    typedef super supertype;                    \
   }
 
-#define SUPERTYPE(mysub,mysuper) \
-        CompareTypes_super(mysub, mysuper, mysuper); \
-        CompareTypes_super(mysuper, mysub, mysuper); \
-        CompareTypes_super(std::complex<mysub>, mysuper, std::complex<mysuper>); \
-        CompareTypes_super(mysuper, std::complex<mysub>, std::complex<mysuper>); \
-        CompareTypes_super(mysub, std::complex<mysuper>, std::complex<mysuper>); \
-        CompareTypes_super(std::complex<mysuper>, mysub, std::complex<mysuper>); \
-        CompareTypes_super(std::complex<mysub>, std::complex<mysuper>, std::complex<mysuper>); \
-        CompareTypes_super(std::complex<mysuper>, std::complex<mysub>, std::complex<mysuper>)
+#define SUPERTYPE(mysub,mysuper)                                        \
+  CompareTypes_super(mysub, mysuper, mysuper);                          \
+  CompareTypes_super(mysuper, mysub, mysuper);                          \
+  CompareTypes_super(std::complex<mysub>, mysuper, std::complex<mysuper>); \
+  CompareTypes_super(mysuper, std::complex<mysub>, std::complex<mysuper>); \
+  CompareTypes_super(mysub, std::complex<mysuper>, std::complex<mysuper>); \
+  CompareTypes_super(std::complex<mysuper>, mysub, std::complex<mysuper>); \
+  CompareTypes_super(std::complex<mysub>, std::complex<mysuper>, std::complex<mysuper>); \
+  CompareTypes_super(std::complex<mysuper>, std::complex<mysub>, std::complex<mysuper>)
 
 SUPERTYPE(unsigned char, short);
 SUPERTYPE(unsigned char, int);
@@ -146,20 +146,20 @@ SUPERTYPE(double, long double);
 
 // gcc can't tell which of the following is the most specialized?  Weak.
 /*
-template<typename S, typename T>
-struct CompareTypes<std::complex<S>, std::complex<T> > {
+  template<typename S, typename T>
+  struct CompareTypes<std::complex<S>, std::complex<T> > {
   typedef std::complex<typename CompareTypes<S, T>::supertype> supertype;
-};
+  };
 
-template<typename S, typename T>
-struct CompareTypes<std::complex<S>, T> {
+  template<typename S, typename T>
+  struct CompareTypes<std::complex<S>, T> {
   typedef std::complex<typename CompareTypes<S, T>::supertype> supertype;
-};
+  };
 
-template<typename S, typename T>
-struct CompareTypes<S, std::complex<T> > {
+  template<typename S, typename T>
+  struct CompareTypes<S, std::complex<T> > {
   typedef std::complex<typename CompareTypes<S, T>::supertype> supertype;
-};
+  };
 */
 
 } // namespace libMesh

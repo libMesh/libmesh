@@ -106,25 +106,25 @@ public:
    * Returns the position of the spectrum to compute.
    */
   PositionOfSpectrum position_of_spectrum () const
-    { return _position_of_spectrum;}
+  { return _position_of_spectrum;}
 
   /**
    * Sets the type of eigensolver to use.
    */
   void set_eigensolver_type (const EigenSolverType est)
-    { _eigen_solver_type = est; }
+  { _eigen_solver_type = est; }
 
   /**
    * Sets the type of the eigenproblem.
    */
   void set_eigenproblem_type ( EigenProblemType ept)
-    {_eigen_problem_type = ept;}
+  {_eigen_problem_type = ept;}
 
   /**
    * Sets the position of the spectrum.
    */
   void set_position_of_spectrum (PositionOfSpectrum pos)
-    {_position_of_spectrum= pos;}
+  {_position_of_spectrum= pos;}
 
   /**
    * Solves the standard eigen problem when matrix_A is a
@@ -166,34 +166,34 @@ public:
    * Solves the generalized eigen problem when matrix_A is
    * a ShellMatrix and matrix_B is a SparseMatrix.
    */
-   virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> &matrix_A,
-                                                                    SparseMatrix<T> &matrix_B,
-                                                                    int nev,
-                                                                    int ncv,
-                                                                    const double tol,
-                                                                    const unsigned int m_its) = 0;
+  virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> &matrix_A,
+                                                                   SparseMatrix<T> &matrix_B,
+                                                                   int nev,
+                                                                   int ncv,
+                                                                   const double tol,
+                                                                   const unsigned int m_its) = 0;
 
   /**
    * Solves the generalized eigen problem when matrix_A is
    * a SparseMatrix and matrix_B is a ShellMatrix.
    */
-   virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> &matrix_A,
-                                                                    ShellMatrix<T> &matrix_B,
-                                                                    int nev,
-                                                                    int ncv,
-                                                                    const double tol,
-                                                                    const unsigned int m_its) = 0;
+  virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> &matrix_A,
+                                                                   ShellMatrix<T> &matrix_B,
+                                                                   int nev,
+                                                                   int ncv,
+                                                                   const double tol,
+                                                                   const unsigned int m_its) = 0;
 
   /**
    * Solves the generalized eigen problem when both matrix_A
    * and matrix_B are of type ShellMatrix.
    */
-   virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> &matrix_A,
-                                                                    ShellMatrix<T> &matrix_B,
-                                                                    int nev,
-                                                                    int ncv,
-                                                                    const double tol,
-                                                                    const unsigned int m_its) = 0;
+  virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> &matrix_A,
+                                                                   ShellMatrix<T> &matrix_B,
+                                                                   int nev,
+                                                                   int ncv,
+                                                                   const double tol,
+                                                                   const unsigned int m_its) = 0;
 
 
   /**

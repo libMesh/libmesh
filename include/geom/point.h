@@ -41,7 +41,7 @@ namespace libMesh
 
 class Point : public TypeVector<Real>
 {
- public:
+public:
 
   /**
    * Constructor.  By default sets all entries to 0.  Gives the point 0 in
@@ -66,13 +66,13 @@ class Point : public TypeVector<Real>
    */
   ~Point() {}
 
-//   /**
-//    * @returns a key associated with this point.  Useful for sorting.
-//    */
-//   dof_id_type key() const;
+  //   /**
+  //    * @returns a key associated with this point.  Useful for sorting.
+  //    */
+  //   dof_id_type key() const;
 
 
- protected:
+protected:
 
 
   /**

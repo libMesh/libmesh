@@ -139,18 +139,18 @@ public:
   {}
 
   enum metric_type
-  {
-    uniform=1,
-    volumetric=2,
-    directional=3
-  };
+    {
+      uniform=1,
+      volumetric=2,
+      directional=3
+    };
 
   enum adapt_type
-  {
-    cell=-1,
-    none=0,
-    node=1
-  };
+    {
+      cell=-1,
+      none=0,
+      node=1
+    };
 
   /**
    * Destructor.
@@ -272,8 +272,8 @@ private:
               int adp, LPDOUBLE afun, FILE *sout);
 
   double minJ_BC(int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-                double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int msglev,
-                double *Vmin, double *emax, double *qmin, int adp, LPDOUBLE afun, int NCN, FILE *sout);
+                 double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int msglev,
+                 double *Vmin, double *emax, double *qmin, int adp, LPDOUBLE afun, int NCN, FILE *sout);
 
   double localP(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLPDOUBLE R, LPINT cell, LPINT mask, double epsilon,
                 double w, int nvert, LPLPDOUBLE H, int me, double vol, int f, double *Vmin,
@@ -299,13 +299,13 @@ private:
   void gener(char grid[], int n, FILE *sout);
 
   void local_sweep(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-                  int nedges, LPINT edges, LPINT hnodes, double w, LPINT iter, int me,
-                      LPLPLPDOUBLE H, int adp, int OPT, FILE *sout);
+                   int nedges, LPINT edges, LPINT hnodes, double w, LPINT iter, int me,
+                   LPLPLPDOUBLE H, int adp, int OPT, FILE *sout);
 
   double minJ_l(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-              double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int nedges,
-              LPINT edges, LPINT hnodes, int msglev, double *Vmin, double *emax, double *qmin,
-              int adp, LPDOUBLE afun, FILE *sout);
+                double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int nedges,
+                LPINT edges, LPINT hnodes, int msglev, double *Vmin, double *emax, double *qmin,
+                int adp, LPDOUBLE afun, FILE *sout);
 };
 
 } // namespace libMesh

@@ -42,7 +42,7 @@ namespace libMesh
 
 class QGauss : public QBase
 {
- public:
+public:
 
   /**
    * Constructor.  Declares the order of the quadrature rule.
@@ -61,7 +61,7 @@ class QGauss : public QBase
   QuadratureType type() const { return QGAUSS; }
 
 
- private:
+private:
 
   void init_1D (const ElemType _type=INVALID_ELEM,
                 unsigned int p_level=0);

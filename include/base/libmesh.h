@@ -79,90 +79,90 @@ private:
   Parallel::Communicator _comm;
 };
 
-  /**
-   * Checks that library initialization has been done.  If it
-   * hasn't an error message is printed and the code aborts.
-   * It is useful to \p libmesh_assert(libMesh::initialized()) in library
-   * object constructors.
-   */
-  bool initialized ();
+/**
+ * Checks that library initialization has been done.  If it
+ * hasn't an error message is printed and the code aborts.
+ * It is useful to \p libmesh_assert(libMesh::initialized()) in library
+ * object constructors.
+ */
+bool initialized ();
 
-  /**
-   * Checks that the library has been closed.  This should
-   * always return false when called from a library object.
-   * It is useful to \p libmesh_assert(!libMesh::closed()) in library
-   * object destructors.
-   */
-  bool closed ();
+/**
+ * Checks that the library has been closed.  This should
+ * always return false when called from a library object.
+ * It is useful to \p libmesh_assert(!libMesh::closed()) in library
+ * object destructors.
+ */
+bool closed ();
 
-  /**
-   * Toggle hardware trap floating point exceptions
-   */
-  void enableFPE(bool on);
+/**
+ * Toggle hardware trap floating point exceptions
+ */
+void enableFPE(bool on);
 
-  /**
-   * @returns true if the argument \p arg was specified on the command line,
-   * \p false otherwise.
-   */
-  bool on_command_line (const std::string& arg);
+/**
+ * @returns true if the argument \p arg was specified on the command line,
+ * \p false otherwise.
+ */
+bool on_command_line (const std::string& arg);
 
-  /**
-   * \returns the value associated with name on the command line if it is specified,
-   * otherwise return the default, provided value.  A second template function is provided
-   * to support recognizing multiple variations of a given option
-   */
-  template <typename T>
-  T command_line_value (const std::string &, T);
-  template <typename T>
-  T command_line_value (const std::vector<std::string> &, T);
+/**
+ * \returns the value associated with name on the command line if it is specified,
+ * otherwise return the default, provided value.  A second template function is provided
+ * to support recognizing multiple variations of a given option
+ */
+template <typename T>
+T command_line_value (const std::string &, T);
+template <typename T>
+T command_line_value (const std::vector<std::string> &, T);
 
-  /**
-   * Use GetPot's search()/next() functions to get following arguments
-   * from the command line.
-   */
-  template <typename T>
-  T command_line_next (const std::string &, T);
+/**
+ * Use GetPot's search()/next() functions to get following arguments
+ * from the command line.
+ */
+template <typename T>
+T command_line_next (const std::string &, T);
 
-  /**
-   * \returns the array of values associated with name on the command line if it is specified,
-   * otherwise return the default, provided array.
-   */
-  template <typename T>
-  void command_line_vector (const std::string &, std::vector<T>&);
+/**
+ * \returns the array of values associated with name on the command line if it is specified,
+ * otherwise return the default, provided array.
+ */
+template <typename T>
+void command_line_vector (const std::string &, std::vector<T>&);
 
- /**
-   * The imaginary unit, \f$ \sqrt{-1} \f$.
-   */
+/**
+ * The imaginary unit, \f$ \sqrt{-1} \f$.
+ */
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  extern const Number imaginary;
+extern const Number imaginary;
 #endif
 
-  /**
-   * @returns the default solver interface to use.  The value depends on
-   * which solver packages  were available when the library was configured.
-   * The command-line is also checked, allowing the user to override the
-   * compiled default.  For example, \p --use-petsc will force the use of
-   * PETSc solvers, and \p --use-laspack will force the use of LASPACK
-   * solvers.
-   */
-  SolverPackage default_solver_package ();
+/**
+ * @returns the default solver interface to use.  The value depends on
+ * which solver packages  were available when the library was configured.
+ * The command-line is also checked, allowing the user to override the
+ * compiled default.  For example, \p --use-petsc will force the use of
+ * PETSc solvers, and \p --use-laspack will force the use of LASPACK
+ * solvers.
+ */
+SolverPackage default_solver_package ();
 
-  /**
-   * \f$ \pi=3.14159... \f$.
-   */
-  const Real pi =
-    static_cast<Real>(3.1415926535897932384626433832795029L);
+/**
+ * \f$ \pi=3.14159... \f$.
+ */
+const Real pi =
+  static_cast<Real>(3.1415926535897932384626433832795029L);
 
-  /**
-   * \f$ zero=0. \f$.
-   */
-  const Number zero = 0.;
+/**
+ * \f$ zero=0. \f$.
+ */
+const Number zero = 0.;
 
-  /**
-   * A number which is used quite often to represent
-   * an invalid or uninitialized value.
-   */
-  const unsigned int invalid_uint = static_cast<unsigned int>(-1);
+/**
+ * A number which is used quite often to represent
+ * an invalid or uninitialized value.
+ */
+const unsigned int invalid_uint = static_cast<unsigned int>(-1);
 
 } // namespace libMesh
 

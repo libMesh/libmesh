@@ -37,7 +37,7 @@ namespace libMesh
 // MetisPartitioner class definition
 class MetisPartitioner : public Partitioner
 {
- public:
+public:
 
   /**
    * Constructor.

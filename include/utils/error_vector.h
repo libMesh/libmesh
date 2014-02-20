@@ -73,7 +73,7 @@ public:
    * elements and all non-zero error values correspond to active elements.
    */
   ErrorVector(dof_id_type i, ErrorVectorReal val) :
-      StatisticsVector<ErrorVectorReal> (i,val) {}
+    StatisticsVector<ErrorVectorReal> (i,val) {}
 
   /**
    * Returns the minimum nonzero value in the data set.

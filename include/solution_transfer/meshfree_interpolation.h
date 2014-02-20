@@ -286,7 +286,7 @@ protected:
   // };
 
   typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<Real, PointListAdaptor<KDDim> >,
-    PointListAdaptor<KDDim>, KDDim> kd_tree_t;
+                                              PointListAdaptor<KDDim>, KDDim> kd_tree_t;
 
   mutable AutoPtr<kd_tree_t> _kd_tree;
 

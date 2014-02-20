@@ -37,32 +37,32 @@ namespace libMesh
 // in elem_quality.h
 namespace ElementTypes
 {
-  /**
-   * The number of element types that are
-   * defined (INVALD_ELEM excluded).
-   * You might have to update this
-   * if you add a new one!
-   */
+/**
+ * The number of element types that are
+ * defined (INVALD_ELEM excluded).
+ * You might have to update this
+ * if you add a new one!
+ */
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  const unsigned int num_types = 24;
+const unsigned int num_types = 24;
 #else
-  const unsigned int num_types = 16;
+const unsigned int num_types = 16;
 #endif
 
-  /**
-   * Returns a standard string representation
-   * of the basic name for element type t.
-   * For example, a HEX27 has the basic name
-   * of "Hexahedron".
-   */
-  std::string basic_name (const ElemType t);
+/**
+ * Returns a standard string representation
+ * of the basic name for element type t.
+ * For example, a HEX27 has the basic name
+ * of "Hexahedron".
+ */
+std::string basic_name (const ElemType t);
 
-  /**
-   * Returns a standard string representation
-   * for the specific name of element type t.
-   * For example, HEX27 returns "Hex 27".
-   */
-  std::string name (const ElemType t);
+/**
+ * Returns a standard string representation
+ * for the specific name of element type t.
+ * For example, HEX27 returns "Hex 27".
+ */
+std::string name (const ElemType t);
 }
 
 } // namespace libMesh

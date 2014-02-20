@@ -183,14 +183,14 @@ protected:
    * subclasses of EigenSystem.
    */
   void set_n_converged (unsigned int nconv)
-    { _n_converged_eigenpairs = nconv; }
+  { _n_converged_eigenpairs = nconv; }
 
   /**
    * Set the _n_iterations member, useful for subclasses of
    * EigenSystem.
    */
   void set_n_iterations (unsigned int its)
-    { _n_iterations = its;}
+  { _n_iterations = its;}
 
 
 private:

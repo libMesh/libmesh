@@ -35,21 +35,21 @@ namespace libMesh
 /**
  * The \p Tet4 is an element in 3D composed of 4 nodes.
  * It is numbered like this:
-   \verbatim
-  TET4:
-        3
-        o
-       /|\
-      / | \
-     /  |  \
-  0 o...|...o 2
-     \  |  /
-      \ | /
-       \|/
-        o
-        1
-  \endverbatim
- */
+ \verbatim
+ TET4:
+ 3
+ o
+ /|\
+ / | \
+ /  |  \
+ 0 o...|...o 2
+ \  |  /
+ \ | /
+ \|/
+ o
+ 1
+ \endverbatim
+*/
 
 // ------------------------------------------------------------
 // Tet4 class definition
@@ -174,7 +174,7 @@ public:
    * bad for interplation, but they can effect the stiffness matrix
    * condition number.
    */
-   std::pair<Real, Real> min_and_max_angle() const;
+  std::pair<Real, Real> min_and_max_angle() const;
 
 protected:
 
@@ -200,26 +200,26 @@ protected:
    */
   static const float _embedding_matrix[8][4][4];
 
-// public:
-//
-//  /**
-//   * Allows the user to reselect the diagonal after refinement.  This
-//   * function may only be called directly after the element is refined
-//   * for the first time (and before the \p EquationSystems::reinit()
-//   * is called).  It will destroy and re-create the children if
-//   * necessary.
-//   */
-//  void reselect_diagonal (const Diagonal diag);
-//
-//  /**
-//   * Reselects the diagonal after refinement to be the optimal one.
-//   * This makes sense if the user has moved some grid points, so that
-//   * the former optimal choice is no longer optimal.  Also, the user
-//   * may exclude one diagonal from this selection by giving it as
-//   * argument.  In this case, the more optimal one of the remaining
-//   * two diagonals is chosen.
-//   */
-//  void reselect_optimal_diagonal (const Diagonal exclude_this=INVALID_DIAG);
+  // public:
+  //
+  //  /**
+  //   * Allows the user to reselect the diagonal after refinement.  This
+  //   * function may only be called directly after the element is refined
+  //   * for the first time (and before the \p EquationSystems::reinit()
+  //   * is called).  It will destroy and re-create the children if
+  //   * necessary.
+  //   */
+  //  void reselect_diagonal (const Diagonal diag);
+  //
+  //  /**
+  //   * Reselects the diagonal after refinement to be the optimal one.
+  //   * This makes sense if the user has moved some grid points, so that
+  //   * the former optimal choice is no longer optimal.  Also, the user
+  //   * may exclude one diagonal from this selection by giving it as
+  //   * argument.  In this case, the more optimal one of the remaining
+  //   * two diagonals is chosen.
+  //   */
+  //  void reselect_optimal_diagonal (const Diagonal exclude_this=INVALID_DIAG);
 
 #endif
 

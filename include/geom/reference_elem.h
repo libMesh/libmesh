@@ -29,24 +29,24 @@
 namespace libMesh
 {
 
-  // forward declarations
-  class Elem;
+// forward declarations
+class Elem;
 
-  /**
-   * This namespace implements singleton reference elements for each
-   * fundamental element type supported by \p libMesh.
-   *
-   * \author Benjamin S. Kirk, 2013.
-   */
-  namespace ReferenceElem
-  {
-    /**
-     * @returns a constant reference to the reference element of
-     * the user-requested type.
-     */
-    const Elem & get (const ElemType Type);
+/**
+ * This namespace implements singleton reference elements for each
+ * fundamental element type supported by \p libMesh.
+ *
+ * \author Benjamin S. Kirk, 2013.
+ */
+namespace ReferenceElem
+{
+/**
+ * @returns a constant reference to the reference element of
+ * the user-requested type.
+ */
+const Elem & get (const ElemType Type);
 
-  } // namespace ReferenceElem
+} // namespace ReferenceElem
 
 
 } // namespace libMesh

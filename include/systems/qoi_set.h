@@ -33,11 +33,11 @@ namespace libMesh
 // Forward Declarations -----------------------------
 class System;
 
-  /**
-   * Data structure for specifying which Quantities of Interest
-   * should be calculated in an adjoint or a parameter sensitivity
-   * calculation.
-   */
+/**
+ * Data structure for specifying which Quantities of Interest
+ * should be calculated in an adjoint or a parameter sensitivity
+ * calculation.
+ */
 class QoISet
 {
 public:
@@ -45,20 +45,20 @@ public:
   {
   public:
     iterator(unsigned int i, const std::vector<bool>& v) : _i(i), _vecbool(v)
-      {
-        while (_i < _vecbool.size() && !_vecbool[_i])
-          _i++;
-      }
+    {
+      while (_i < _vecbool.size() && !_vecbool[_i])
+        _i++;
+    }
 
     unsigned int operator*() const { return _i; }
 
     iterator& operator++()
-      {
-        do {
-          _i++;
-        } while (_i < _vecbool.size() && !_vecbool[_i]);
-        return *this;
-      }
+    {
+      do {
+        _i++;
+      } while (_i < _vecbool.size() && !_vecbool[_i]);
+      return *this;
+    }
 
     iterator operator++(int) {
       iterator it = *this;

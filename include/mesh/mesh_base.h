@@ -476,12 +476,12 @@ public:
    */
   virtual void renumber_nodes_and_elements () = 0;
 
-    /**
-     * There is no reason for a user to ever call this function.
-     *
-     * This function restores a previously broken element/node numbering such that
-     * \p mesh.node(n)->id() == n.
-     */
+  /**
+   * There is no reason for a user to ever call this function.
+   *
+   * This function restores a previously broken element/node numbering such that
+   * \p mesh.node(n)->id() == n.
+   */
   virtual void fix_broken_node_and_element_numbering () = 0;
 
 
@@ -961,7 +961,7 @@ private:
 struct
 MeshBase::element_iterator :
 variant_filter_iterator<MeshBase::Predicate,
-  Elem*>
+                        Elem*>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
@@ -969,7 +969,7 @@ variant_filter_iterator<MeshBase::Predicate,
                     const IterType& e,
                     const PredType& p ) :
     variant_filter_iterator<MeshBase::Predicate,
-      Elem*>(d,e,p) {}
+    Elem*>(d,e,p) {}
 };
 
 
@@ -982,9 +982,9 @@ variant_filter_iterator<MeshBase::Predicate,
 struct
 MeshBase::const_element_iterator :
 variant_filter_iterator<MeshBase::Predicate,
-  Elem* const,
-  Elem* const&,
-  Elem* const*>
+                        Elem* const,
+                        Elem* const&,
+                        Elem* const*>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
@@ -992,18 +992,18 @@ variant_filter_iterator<MeshBase::Predicate,
                           const IterType& e,
                           const PredType& p ) :
     variant_filter_iterator<MeshBase::Predicate,
-      Elem* const,
-      Elem* const&,
-      Elem* const*>(d,e,p)  {}
+    Elem* const,
+    Elem* const&,
+    Elem* const*>(d,e,p)  {}
 
 
   // The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
   // variant_filter_iterator copy constructor.  Note that this one is *not* templated!
   const_element_iterator (const MeshBase::element_iterator& rhs) :
     variant_filter_iterator<Predicate,
-      Elem* const,
-      Elem* const&,
-      Elem* const*>(rhs)
+    Elem* const,
+    Elem* const&,
+    Elem* const*>(rhs)
   {
     // libMesh::out << "Called element_iterator conversion-to-const ctor." << std::endl;
   }
@@ -1021,7 +1021,7 @@ variant_filter_iterator<MeshBase::Predicate,
 struct
 MeshBase::node_iterator :
 variant_filter_iterator<MeshBase::Predicate,
-  Node*>
+                        Node*>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
@@ -1029,7 +1029,7 @@ variant_filter_iterator<MeshBase::Predicate,
                  const IterType& e,
                  const PredType& p ) :
     variant_filter_iterator<MeshBase::Predicate,
-      Node*>(d,e,p) {}
+    Node*>(d,e,p) {}
 };
 
 
@@ -1042,9 +1042,9 @@ variant_filter_iterator<MeshBase::Predicate,
 struct
 MeshBase::const_node_iterator :
 variant_filter_iterator<MeshBase::Predicate,
-  Node* const,
-  Node* const &,
-  Node* const *>
+                        Node* const,
+                        Node* const &,
+                        Node* const *>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
@@ -1052,18 +1052,18 @@ variant_filter_iterator<MeshBase::Predicate,
                        const IterType& e,
                        const PredType& p ) :
     variant_filter_iterator<MeshBase::Predicate,
-      Node* const,
-      Node* const &,
-      Node* const *>(d,e,p)  {}
+    Node* const,
+    Node* const &,
+    Node* const *>(d,e,p)  {}
 
 
   // The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
   // variant_filter_iterator copy constructor.  Note that this one is *not* templated!
   const_node_iterator (const MeshBase::node_iterator& rhs) :
     variant_filter_iterator<Predicate,
-      Node* const,
-      Node* const &,
-      Node* const *>(rhs)
+    Node* const,
+    Node* const &,
+    Node* const *>(rhs)
   {
     // libMesh::out << "Called node_iterator conversion-to-const ctor." << std::endl;
   }

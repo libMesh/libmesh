@@ -74,7 +74,7 @@ inline
 Linear<T>::Linear(EquationSystems& es) :
   T (es)
 {
-libmesh_deprecated();
+  libmesh_deprecated();
 }
 
 
@@ -86,7 +86,7 @@ Linear<T>::Linear (EquationSystems& es,
                    const unsigned int number) :
   T (es, name, number)
 {
-libmesh_deprecated();
+  libmesh_deprecated();
 }
 
 

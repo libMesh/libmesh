@@ -99,8 +99,8 @@ public:
   FE(const FEType& fet);
 
   typedef typename
-    FEGenericBase<typename FEOutputType<T>::type>::OutputShape
-    OutputShape;
+  FEGenericBase<typename FEOutputType<T>::type>::OutputShape
+  OutputShape;
 
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
@@ -792,105 +792,105 @@ public:
  */
 namespace FiniteElements
 {
-  /**
-   * Convenient definition for a 2D
-   * Clough-Tocher finite element.
-   */
-  typedef FEClough<2> FEClough2D;
+/**
+ * Convenient definition for a 2D
+ * Clough-Tocher finite element.
+ */
+typedef FEClough<2> FEClough2D;
 
-  /**
-   * Convenient definition for a 1D
-   * Hierarchic finite element.
-   */
-  typedef FE<1,HIERARCHIC> FEHierarchic1D;
+/**
+ * Convenient definition for a 1D
+ * Hierarchic finite element.
+ */
+typedef FE<1,HIERARCHIC> FEHierarchic1D;
 
-  /**
-   * Convenient definition for a 2D
-   * Hierarchic finite element.
-   */
-  typedef FE<2,HIERARCHIC> FEHierarchic2D;
+/**
+ * Convenient definition for a 2D
+ * Hierarchic finite element.
+ */
+typedef FE<2,HIERARCHIC> FEHierarchic2D;
 
-  /**
-   * Convenient definition for a 3D
-   * Hierarchic finite element.
-   */
-  typedef FE<3,HIERARCHIC> FEHierarchic3D;
-
-
-  /**
-   * Convenient definition for a 1D
-   * Discontinuous Hierarchic finite element.
-   */
-  typedef FE<1,L2_HIERARCHIC> FEL2Hierarchic1D;
-
-  /**
-   * Convenient definition for a 2D
-   * Discontinuous Hierarchic finite element.
-   */
-  typedef FE<2,L2_HIERARCHIC> FEL2Hierarchic2D;
-
-  /**
-   * Convenient definition for a 3D
-   * Discontinuous Hierarchic finite element.
-   */
-  typedef FE<3,L2_HIERARCHIC> FEL2Hierarchic3D;
+/**
+ * Convenient definition for a 3D
+ * Hierarchic finite element.
+ */
+typedef FE<3,HIERARCHIC> FEHierarchic3D;
 
 
-  /**
-   * Convenient definition for a 1D
-   * Lagrange finite element.
-   */
-  typedef FE<1,LAGRANGE> FELagrange1D;
+/**
+ * Convenient definition for a 1D
+ * Discontinuous Hierarchic finite element.
+ */
+typedef FE<1,L2_HIERARCHIC> FEL2Hierarchic1D;
 
-  /**
-   * Convenient definition for a 2D
-   * Lagrange finite element.
-   */
-  typedef FE<2,LAGRANGE> FELagrange2D;
+/**
+ * Convenient definition for a 2D
+ * Discontinuous Hierarchic finite element.
+ */
+typedef FE<2,L2_HIERARCHIC> FEL2Hierarchic2D;
 
-  /**
-   * Convenient definition for a 3D
-   * Lagrange finite element.
-   */
-  typedef FE<3,LAGRANGE> FELagrange3D;
-
-
-  /**
-   * Convenient definition for a 1D
-   * Discontinuous Lagrange finite element.
-   */
-  typedef FE<1,L2_LAGRANGE> FEL2Lagrange1D;
-
-  /**
-   * Convenient definition for a 2D
-   * Discontinuous Lagrange finite element.
-   */
-  typedef FE<2,L2_LAGRANGE> FEL2Lagrange2D;
-
-  /**
-   * Convenient definition for a 3D
-   * Discontinuous Lagrange finite element.
-   */
-  typedef FE<3,L2_LAGRANGE> FEL2Lagrange3D;
+/**
+ * Convenient definition for a 3D
+ * Discontinuous Hierarchic finite element.
+ */
+typedef FE<3,L2_HIERARCHIC> FEL2Hierarchic3D;
 
 
-  /**
-   * Convenient definition for a 1D
-   * Monomial finite element.
-   */
-  typedef FE<1,MONOMIAL> FEMonomial1D;
+/**
+ * Convenient definition for a 1D
+ * Lagrange finite element.
+ */
+typedef FE<1,LAGRANGE> FELagrange1D;
 
-  /**
-   * Convenient definition for a 2D
-   * Monomial finite element.
-   */
-  typedef FE<2,MONOMIAL> FEMonomial2D;
+/**
+ * Convenient definition for a 2D
+ * Lagrange finite element.
+ */
+typedef FE<2,LAGRANGE> FELagrange2D;
 
-  /**
-   * Convenient definition for a 3D
-   * Monomial finite element.
-   */
-  typedef FE<3,MONOMIAL> FEMonomial3D;
+/**
+ * Convenient definition for a 3D
+ * Lagrange finite element.
+ */
+typedef FE<3,LAGRANGE> FELagrange3D;
+
+
+/**
+ * Convenient definition for a 1D
+ * Discontinuous Lagrange finite element.
+ */
+typedef FE<1,L2_LAGRANGE> FEL2Lagrange1D;
+
+/**
+ * Convenient definition for a 2D
+ * Discontinuous Lagrange finite element.
+ */
+typedef FE<2,L2_LAGRANGE> FEL2Lagrange2D;
+
+/**
+ * Convenient definition for a 3D
+ * Discontinuous Lagrange finite element.
+ */
+typedef FE<3,L2_LAGRANGE> FEL2Lagrange3D;
+
+
+/**
+ * Convenient definition for a 1D
+ * Monomial finite element.
+ */
+typedef FE<1,MONOMIAL> FEMonomial1D;
+
+/**
+ * Convenient definition for a 2D
+ * Monomial finite element.
+ */
+typedef FE<2,MONOMIAL> FEMonomial2D;
+
+/**
+ * Convenient definition for a 3D
+ * Monomial finite element.
+ */
+typedef FE<3,MONOMIAL> FEMonomial3D;
 
 }
 

@@ -77,9 +77,9 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 class InfFE : public FEBase
 {
 
-/*
- * Protect the nested class
- */
+  /*
+   * Protect the nested class
+   */
 protected:
 
   /**
@@ -128,7 +128,7 @@ protected:
      */
     static Real D_deriv (const Real v) { return (v-1.)/2.; }
 
-   /**
+    /**
      * @returns the Order of the mapping functions
      * in radial direction. Currently, this is @e always \p FIRST.
      */
@@ -309,7 +309,7 @@ public:
    */
   static unsigned int n_shape_functions (const FEType& fet,
                                          const ElemType t)
-    { return n_dofs(fet, t); }
+  { return n_dofs(fet, t); }
 
   /**
    * @returns the number of shape functions associated with this
@@ -338,14 +338,14 @@ public:
    * @returns the continuity of the element.
    */
   virtual FEContinuity get_continuity() const
-    { return C_ZERO; }  // FIXME - is this true??
+  { return C_ZERO; }  // FIXME - is this true??
 
   /**
    * @returns true if the element's higher order shape functions are
    * hierarchic
    */
   virtual bool is_hierarchic() const
-    { return false; }  // FIXME - Inf FEs don't handle p elevation yet
+  { return false; }  // FIXME - Inf FEs don't handle p elevation yet
 
   /**
    * Usually, this method would build the nodal soln from the
@@ -846,8 +846,8 @@ inline
 Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
 {
   switch (Dim)
-  //TODO:[DD] What decay do i have in 2D and 1D?
-  {
+    //TODO:[DD] What decay do i have in 2D and 1D?
+    {
     case 3:
       return (1.-v)/2.;
 
@@ -860,7 +860,7 @@ Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
     default:
       libmesh_error();
       return 0.;
-  }
+    }
 }
 
 

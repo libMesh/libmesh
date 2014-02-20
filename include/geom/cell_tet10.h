@@ -35,28 +35,28 @@ namespace libMesh
 /**
  * The \p Tet10 is an element in 3D composed of 10 nodes.
  * It is numbered like this:
-  \verbatim
-              3
-  TET10:      o
-             /|\
-            / | \
-        7  /  |  \9
-          o   |   o
-         /    |8   \
-        /     o     \
-       /    6 |      \
-    0 o.....o.|.......o 2
-       \      |      /
-        \     |     /
-         \    |    /
-        4 o   |   o 5
-           \  |  /
-            \ | /
-             \|/
-              o
-              1
-   \endverbatim
- */
+ \verbatim
+ 3
+ TET10:      o
+ /|\
+ / | \
+ 7  /  |  \9
+ o   |   o
+ /    |8   \
+ /     o     \
+ /    6 |      \
+ 0 o.....o.|.......o 2
+ \      |      /
+ \     |     /
+ \    |    /
+ 4 o   |   o 5
+ \  |  /
+ \ | /
+ \|/
+ o
+ 1
+ \endverbatim
+*/
 
 // ------------------------------------------------------------
 // Tet10 class definition
@@ -153,7 +153,7 @@ public:
    * @returns 2 for all \p n
    */
   unsigned int n_second_order_adjacent_vertices (const unsigned int) const
-      { return 2; }
+  { return 2; }
 
   /**
    * @returns the element-local number of the  \f$ v^{th} \f$ vertex
@@ -173,7 +173,7 @@ public:
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
-    second_order_child_vertex (const unsigned int n) const;
+  second_order_child_vertex (const unsigned int n) const;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to

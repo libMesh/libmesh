@@ -36,14 +36,14 @@
 
 namespace libMesh
 {
-  // Register the DM_libMesh constructor with PETSc so that we can do DMSetType(dm, DMLIBMESH);
-  void PetscDMRegister();
+// Register the DM_libMesh constructor with PETSc so that we can do DMSetType(dm, DMLIBMESH);
+void PetscDMRegister();
 
-  // Set a libMesh NonlinearImplicitSystem on a DM_libMesh
-  void PetscDMSetSystem(DM, NonlinearImplicitSystem&);
+// Set a libMesh NonlinearImplicitSystem on a DM_libMesh
+void PetscDMSetSystem(DM, NonlinearImplicitSystem&);
 
-  // Get a libMesh NonlinearImplicitSystem from a DM_libMesh, or throw error if none has been set
-  void PetscDMGetSystem(DM, NonlinearImplicitSystem*&);
+// Get a libMesh NonlinearImplicitSystem from a DM_libMesh, or throw error if none has been set
+void PetscDMGetSystem(DM, NonlinearImplicitSystem*&);
 
 
 

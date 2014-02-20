@@ -44,7 +44,7 @@ class Mesh;
 // Edge class definition
 class Edge : public Elem
 {
- public:
+public:
 
   /**
    * Default line element, takes number of nodes and
@@ -102,7 +102,7 @@ class Edge : public Elem
    */
   virtual bool is_edge_on_side(const unsigned int,
                                const unsigned int) const
-    { return false; }
+  { return false; }
 
   /*
    * @returns the side number opposite to \p s (for a tensor product
@@ -118,10 +118,10 @@ class Edge : public Elem
   virtual unsigned int opposite_node(const unsigned int n,
                                      const unsigned int s) const;
 
-//   /**
-//    * @returns 1
-//    */
-//   unsigned int n_children_per_side(const unsigned int) const { return 1; }
+  //   /**
+  //    * @returns 1
+  //    */
+  //   unsigned int n_children_per_side(const unsigned int) const { return 1; }
 
   /**
    * @returns an id associated with the \p s side of this element.
@@ -152,7 +152,7 @@ class Edge : public Elem
   { libmesh_error(); AutoPtr<Elem> ap(NULL); return ap; }
 
 
- protected:
+protected:
 
   /**
    * Data for links to parent/neighbor/interior_parent elements.

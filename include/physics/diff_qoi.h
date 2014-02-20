@@ -107,7 +107,7 @@ public:
    */
   virtual void element_qoi (DiffContext&,
                             const QoISet&)
-    {}
+  {}
 
   /**
    * Does any work that needs to be done on \p elem in a quantity of
@@ -119,7 +119,7 @@ public:
    */
   virtual void element_qoi_derivative (DiffContext&,
                                        const QoISet&)
-    {}
+  {}
 
   /**
    * Does any work that needs to be done on \p side of \p elem in a
@@ -130,7 +130,7 @@ public:
    */
   virtual void side_qoi (DiffContext&,
                          const QoISet&)
-    {}
+  {}
 
   /**
    * Does any work that needs to be done on \p side of \p elem in a
@@ -142,7 +142,7 @@ public:
    */
   virtual void side_qoi_derivative (DiffContext&,
                                     const QoISet&)
-    {}
+  {}
 
   /**
    * Prepares the result of a build_context() call for use.

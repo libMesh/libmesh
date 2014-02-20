@@ -55,7 +55,7 @@ template <typename T> class SparseMatrix;
 template <typename T>
 class EigenSparseVector : public NumericVector<T>
 {
- public:
+public:
 
   /**
    *  Dummy-Constructor. Dimension=0
@@ -469,7 +469,7 @@ class EigenSparseVector : public NumericVector<T>
   DataType &       vec ()        { return _vec; }
   const DataType & vec () const  { return _vec; }
 
- private:
+private:
 
   /**
    * Actual Eigen::SparseVector<> we are wrapping.
@@ -607,7 +607,7 @@ void EigenSparseVector<T>::init (const numeric_index_type n,
    vectors are not yet implemented.  */
 template <class T>
 void EigenSparseVector<T>::init (const NumericVector<T>& other,
-                             const bool fast)
+                                 const bool fast)
 {
   this->init(other.size(),other.local_size(),fast,other.type());
 }

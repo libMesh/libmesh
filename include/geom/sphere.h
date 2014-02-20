@@ -47,24 +47,24 @@ namespace libMesh
  * starting with 0. from the positive x axis,
  * \f$ \theta \f$ is measured against the positive
  * z axis.
-   \verbatim
+ \verbatim
 
-          \      | Z
-           \theta|
-            \    |    .
-             \   |   .
-              \  |  .
-               \ | .
-                \|.
-  ---------------+---------.---------
-                /|\       .          Y
-               /phi\     .
-              /  |  \   .
-             /   |   \ .
-            /.........\
-           /     |
-        X /
-   \endverbatim
+ \      | Z
+ \theta|
+ \    |    .
+ \   |   .
+ \  |  .
+ \ | .
+ \|.
+ ---------------+---------.---------
+ /|\       .          Y
+ /phi\     .
+ /  |  \   .
+ /   |   \ .
+ /.........\
+ /     |
+ X /
+ \endverbatim
  *
  * \author Benjamin S. Kirk, Daniel Dreyer
  * \date 2002-2007

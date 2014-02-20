@@ -24,21 +24,21 @@
 // enum SolverType definition
 namespace libMesh {
 
-  /**
-   * Defines an \p enum for various linear solver packages.
-   * This allows for run-time switching between solver packages
-   *
-   */
-  enum SolverPackage
-    {
-      PETSC_SOLVERS=0,
-      TRILINOS_SOLVERS,
-      LASPACK_SOLVERS,
-      SLEPC_SOLVERS,
-      EIGEN_SOLVERS,
+/**
+ * Defines an \p enum for various linear solver packages.
+ * This allows for run-time switching between solver packages
+ *
+ */
+enum SolverPackage
+  {
+    PETSC_SOLVERS=0,
+    TRILINOS_SOLVERS,
+    LASPACK_SOLVERS,
+    SLEPC_SOLVERS,
+    EIGEN_SOLVERS,
 
-      INVALID_SOLVER_PACKAGE
-    };
+    INVALID_SOLVER_PACKAGE
+  };
 }
 
 #endif // LIBMESH_ENUM_SOLVER_PACKAGE_H

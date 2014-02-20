@@ -39,7 +39,7 @@ namespace libMesh
 // HilbertSFCLinearPartitioner class definition
 class HilbertSFCPartitioner : public SFCPartitioner
 {
- public:
+public:
 
   /**
    * Constructor.

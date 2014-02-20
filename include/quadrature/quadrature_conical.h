@@ -42,7 +42,7 @@ namespace libMesh
  */
 class QConical : public QBase
 {
- public:
+public:
 
   /**
    * Constructor.  Declares the order of the quadrature rule.
@@ -60,7 +60,7 @@ class QConical : public QBase
    */
   QuadratureType type() const { return QCONICAL; }
 
- private:
+private:
 
   void init_1D (const ElemType,
                 unsigned int =0)

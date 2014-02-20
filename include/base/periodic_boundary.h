@@ -30,58 +30,58 @@
 
 namespace libMesh {
 
-  // Forward Declarations
-  class Elem;
-  class MeshBase;
+// Forward Declarations
+class Elem;
+class MeshBase;
+
+/**
+ * The definition of a periodic boundary.
+ */
+class PeriodicBoundary : public PeriodicBoundaryBase
+{
+public:
+  /**
+   * Constructor
+   */
+  PeriodicBoundary();
 
   /**
-   * The definition of a periodic boundary.
+   * Destructor
    */
-  class PeriodicBoundary : public PeriodicBoundaryBase
-  {
-  public:
-    /**
-     * Constructor
-     */
-    PeriodicBoundary();
+  virtual ~PeriodicBoundary() {}
 
-    /**
-     * Destructor
-     */
-    virtual ~PeriodicBoundary() {}
+  /**
+   * Copy constructor, with option for the copy to represent an inverse transformation.
+   */
+  PeriodicBoundary(const PeriodicBoundary& o, TransformationType t = FORWARD);
 
-    /**
-     * Copy constructor, with option for the copy to represent an inverse transformation.
-     */
-    PeriodicBoundary(const PeriodicBoundary& o, TransformationType t = FORWARD);
+  /**
+   * Constructor taking a reference to the translation vector.
+   */
+  PeriodicBoundary(const RealVectorValue& vector);
 
-    /**
-     * Constructor taking a reference to the translation vector.
-     */
-    PeriodicBoundary(const RealVectorValue& vector);
+  /**
+   * This function should be overloaded by derived classes to
+   * define how one finds corresponding nodes on the periodic
+   * boundary pair.
+   */
+  virtual Point get_corresponding_pos(const Point& pt) const;
 
-    /**
-     * This function should be overloaded by derived classes to
-     * define how one finds corresponding nodes on the periodic
-     * boundary pair.
-     */
-    virtual Point get_corresponding_pos(const Point& pt) const;
+  /**
+   * If we want the DofMap to be able to make copies of references and
+   * store them in the underlying map, this class must be clone'able,
+   * i.e. have a kind of virtual construction mechanism.
+   */
+  virtual AutoPtr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const;
 
-    /**
-     * If we want the DofMap to be able to make copies of references and
-     * store them in the underlying map, this class must be clone'able,
-     * i.e. have a kind of virtual construction mechanism.
-     */
-    virtual AutoPtr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const;
+protected:
+  // One of these days we'll support rotated boundaries
+  // RealTensor rotation_matrix;
 
-  protected:
-    // One of these days we'll support rotated boundaries
-    // RealTensor rotation_matrix;
-
-    // The vector which is added to points in myboundary
-    // to produce corresponding points in pairedboundary
-    RealVectorValue translation_vector;
-  };
+  // The vector which is added to points in myboundary
+  // to produce corresponding points in pairedboundary
+  RealVectorValue translation_vector;
+};
 
 } // namespace libmesh
 

@@ -66,10 +66,10 @@ extern "C" {
 // users aren't doing any threaded GetPot usage when TBB threads are
 // disabled.
 #if !defined(GETPOT_DISABLE_MUTEX)
-  #include "libmesh/threads.h"
-  #define SCOPED_MUTEX  libMesh::Threads::spin_mutex::scoped_lock lock(_getpot_mtx)
+#include "libmesh/threads.h"
+#define SCOPED_MUTEX  libMesh::Threads::spin_mutex::scoped_lock lock(_getpot_mtx)
 #else
-  #define SCOPED_MUTEX
+#define SCOPED_MUTEX
 #endif
 
 #define getpot_cerr libMesh::err
@@ -93,8 +93,8 @@ extern "C" {
 
 typedef  std::vector<std::string>  STRING_VECTOR;
 
-#define victorate(TYPE, VARIABLE, ITERATOR)                        \
-  std::vector<TYPE>::const_iterator ITERATOR = (VARIABLE).begin(); \
+#define victorate(TYPE, VARIABLE, ITERATOR)                             \
+  std::vector<TYPE>::const_iterator ITERATOR = (VARIABLE).begin();      \
   for (; (ITERATOR) != (VARIABLE).end(); (ITERATOR)++)
 
 // We allow GETPOT_NAMESPACE to be defined before this file is
@@ -105,12 +105,12 @@ typedef  std::vector<std::string>  STRING_VECTOR;
 namespace GETPOT_NAMESPACE {
 #endif
 
-  /**
-   * GetPot - A class for parsing comand line arguments and
-   * configuration files.
-   *
-   * @author (C) 2001-2002 Frank R. Schaefer
-   */
+/**
+ * GetPot - A class for parsing comand line arguments and
+ * configuration files.
+ *
+ * @author (C) 2001-2002 Frank R. Schaefer
+ */
 class GetPot
 {
   inline void _basic_initialization();
@@ -574,7 +574,7 @@ private:
   inline STRING_VECTOR _read_in_stream(std::istream& istr);
   inline STRING_VECTOR _read_in_file(const std::string& FileName);
   inline std::string _process_section_label(const std::string& Section,
-                                                   STRING_VECTOR& section_stack);
+                                            STRING_VECTOR& section_stack);
 
   /**
    * dollar bracket expressions
@@ -1462,7 +1462,7 @@ GetPot::_convert_to_type(const std::string& String, const char*) const
 
 
 
-  // be more liberal than std C++ in what we interpret as a boolean
+// be more liberal than std C++ in what we interpret as a boolean
 template<>
 inline bool
 GetPot::_convert_to_type<bool>(const std::string& String, const bool& Default) const
@@ -1493,7 +1493,7 @@ GetPot::_convert_to_type<bool>(const std::string& String, const bool& Default) c
 
 
 
-  // Use C++ istream/ostream to handle most type conversions.
+// Use C++ istream/ostream to handle most type conversions.
 template <typename T>
 inline T
 GetPot::_convert_to_type_no_default(const char* VarName, const std::string& String, const T&) const

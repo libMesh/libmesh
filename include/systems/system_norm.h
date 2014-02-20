@@ -113,7 +113,7 @@ public:
    */
   Real calculate_norm(const std::vector<Real>& v1, const std::vector<Real>& v2);
 
-   /**
+  /**
    * Returns true if no weight matrix W is specified or an identiy matrix is specified, otherwise returns false
    */
   bool is_identity();
@@ -171,21 +171,21 @@ private:
 
 inline
 SystemNorm::SystemNorm() :
-    _norms(1, DISCRETE_L2), _weights(1, 1.0), _weights_sq(1, 1.0)
+  _norms(1, DISCRETE_L2), _weights(1, 1.0), _weights_sq(1, 1.0)
 {
 }
 
 
 inline
 SystemNorm::SystemNorm(const FEMNormType &t) :
-    _norms(1, t), _weights(1, 1.0), _weights_sq(1, 1.0)
+  _norms(1, t), _weights(1, 1.0), _weights_sq(1, 1.0)
 {
 }
 
 
 inline
 SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms) :
-    _norms(norms), _weights(1, 1.0), _weights_sq(1, 1.0)
+  _norms(norms), _weights(1, 1.0), _weights_sq(1, 1.0)
 {
   if (_norms.empty())
     _norms.push_back(DISCRETE_L2);
@@ -195,7 +195,7 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms) :
 inline
 SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
                        std::vector<Real> &weights) :
-    _norms(norms), _weights(weights), _weights_sq(_weights.size(), 0.0)
+  _norms(norms), _weights(weights), _weights_sq(_weights.size(), 0.0)
 {
   if (_norms.empty())
     _norms.push_back(DISCRETE_L2);
@@ -211,8 +211,8 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
 }
 
 inline
-  SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
-                         std::vector<std::vector<Real> > &weights):
+SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
+                       std::vector<std::vector<Real> > &weights):
   _norms(norms), _weights(weights.size()), _off_diagonal_weights(weights)
 {
   if(_norms.empty())
@@ -244,7 +244,7 @@ inline
 
 inline
 SystemNorm::SystemNorm(const SystemNorm &s) :
-    _norms(s._norms), _weights(s._weights), _weights_sq(s._weights_sq)
+  _norms(s._norms), _weights(s._weights), _weights_sq(s._weights_sq)
 {
 }
 
@@ -312,7 +312,7 @@ void SystemNorm::set_weight(unsigned int var, Real w)
 }
 
 inline
-  void SystemNorm::set_off_diagonal_weight(unsigned int i, unsigned int j, Real w)
+void SystemNorm::set_off_diagonal_weight(unsigned int i, unsigned int j, Real w)
 {
   libmesh_assert (!_weights.empty());
 
@@ -384,8 +384,8 @@ Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<R
         }
     }
 
-    return(val);
-  }
+  return(val);
+}
 
 inline
 Real SystemNorm::calculate_norm(const std::vector<Real>& v1)

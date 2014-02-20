@@ -40,7 +40,7 @@ namespace libMesh
  */
 class QTrap : public QBase
 {
- public:
+public:
 
   /**
    * Constructor.  Declares the dimension of the quadrature rule.
@@ -58,7 +58,7 @@ class QTrap : public QBase
    */
   QuadratureType type() const { return QTRAP; }
 
- private:
+private:
 
   void init_1D (const ElemType _type=INVALID_ELEM,
                 unsigned int p_level=0);

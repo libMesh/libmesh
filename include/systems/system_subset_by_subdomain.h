@@ -45,7 +45,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // SystemSubset class definition
 class SystemSubsetBySubdomain : public SystemSubset,
-    public ParallelObject
+                                public ParallelObject
 {
 public:
 

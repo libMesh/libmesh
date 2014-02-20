@@ -67,7 +67,7 @@ public:
     _mesh_x_var            (libMesh::invalid_uint),
     _mesh_y_var            (libMesh::invalid_uint),
     _mesh_z_var            (libMesh::invalid_uint)
-    {}
+  {}
 
   /**
    * Destructor.
@@ -370,8 +370,8 @@ inline
 void DifferentiablePhysics::set_mesh_system(System* sys)
 {
   // For now we assume that we're doing fully coupled mesh motion
-//  if (sys && sys != this)
-//    libmesh_not_implemented();
+  //  if (sys && sys != this)
+  //    libmesh_not_implemented();
 
   // For the foreseeable future we'll assume that we keep these
   // Systems in the same EquationSystems

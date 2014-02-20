@@ -67,19 +67,19 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 class InfFE;
 #endif
 
-  // TypesEqual takes two types as parameters.
-  // If they are the exact same type, then TypesEqual::value is the boolean true,
-  // otherwise TypesEqual::value is the boolean false.
-  // FIXME: Need to put this in a common place
-  template <typename T1, typename T2>
-  struct TypesEqual {
-    static const bool value = false;
-  };
+// TypesEqual takes two types as parameters.
+// If they are the exact same type, then TypesEqual::value is the boolean true,
+// otherwise TypesEqual::value is the boolean false.
+// FIXME: Need to put this in a common place
+template <typename T1, typename T2>
+struct TypesEqual {
+  static const bool value = false;
+};
 
-  template <typename T>
-  struct TypesEqual<T,T> {
-    static const bool value = true;
-  };
+template <typename T>
+struct TypesEqual<T,T> {
+  static const bool value = true;
+};
 
 /**
  * This class forms the foundation from which generic finite
@@ -416,7 +416,7 @@ public:
    * matrices for a mesh using both finite and infinite elements.
    */
   const std::vector<OutputGradient>& get_dphase() const
-      { return dphase; }
+  { return dphase; }
 
 
   /**
@@ -432,7 +432,7 @@ public:
    * matrices for a mesh using both finite and infinite elements.
    */
   const std::vector<Real>& get_Sobolev_weight() const
-      { return weight; }
+  { return weight; }
 
   /**
    * @returns the first global derivative of the multiplicative
@@ -440,7 +440,7 @@ public:
    * for details.  In case of \p FE initialized to all zero.
    */
   const std::vector<RealGradient>& get_Sobolev_dweight() const
-      { return dweight; }
+  { return dweight; }
 
 #endif
 

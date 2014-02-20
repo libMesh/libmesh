@@ -104,7 +104,7 @@ public:
   AutoPtr<Elem> side (const unsigned int i) const;
 
 
- protected:
+protected:
 
   /**
    * Data for links to parent/neighbor/interior_parent elements.

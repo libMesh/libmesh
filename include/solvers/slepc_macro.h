@@ -35,7 +35,7 @@
 // A convenient macro for comparing SLEPc versions.
 // Returns 1 if the current SLEPc version is < major.minor.subminor
 // and zero otherwise.
-#define SLEPC_VERSION_LESS_THAN(major,minor,subminor)   \
+#define SLEPC_VERSION_LESS_THAN(major,minor,subminor)                   \
   ((SLEPC_VERSION_MAJOR < (major) ||                                    \
     (SLEPC_VERSION_MAJOR == (major) && (SLEPC_VERSION_MINOR < (minor) || \
                                         (SLEPC_VERSION_MINOR == (minor) && \

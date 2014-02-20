@@ -28,17 +28,17 @@
 
 namespace libMesh {
 namespace Parallel {
-  // BufferType<> specialization to return a buffer datatype
-  // to handle communication of Nodes
-  template <>
-  struct BufferType<const Node*> {
-    typedef largest_id_type type;
-  };
+// BufferType<> specialization to return a buffer datatype
+// to handle communication of Nodes
+template <>
+struct BufferType<const Node*> {
+  typedef largest_id_type type;
+};
 
-  template <>
-  struct BufferType<Node> {
-    typedef largest_id_type type;
-  };
+template <>
+struct BufferType<Node> {
+  typedef largest_id_type type;
+};
 
 } // namespace Parallel
 } // namespace libMesh

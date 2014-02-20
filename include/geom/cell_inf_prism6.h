@@ -39,23 +39,23 @@ namespace libMesh
 /**
  * The \p InfPrism6 is an infinite element in 3D composed of 6 nodes.
  * It is numbered like this:
-   \verbatim
-   INFPRISM6:
-           5
-           o
-           :
-           :         closer to infinity
-           :
-     3 o   :   o 4
-       |   :   |
-       | 2 o   |
-       |  . .  |
-       | .   . |
-       |.     .|
-       o-------o     base face
-       0       1
-   \endverbatim
- */
+ \verbatim
+ INFPRISM6:
+ 5
+ o
+ :
+ :         closer to infinity
+ :
+ 3 o   :   o 4
+ |   :   |
+ | 2 o   |
+ |  . .  |
+ | .   . |
+ |.     .|
+ o-------o     base face
+ 0       1
+ \endverbatim
+*/
 
 // ------------------------------------------------------------
 // InfPrism6 class definition
@@ -137,15 +137,15 @@ public:
                             const IOPackage iop,
                             std::vector<dof_id_type>& conn) const;
 
-//   void tecplot_connectivity(const unsigned int sc,
-//     std::vector<unsigned int>& conn) const;
+  //   void tecplot_connectivity(const unsigned int sc,
+  //     std::vector<unsigned int>& conn) const;
 
-//   void vtk_connectivity(const unsigned int,
-// std::vector<unsigned int>*) const
-//   { libmesh_error(); }
+  //   void vtk_connectivity(const unsigned int,
+  // std::vector<unsigned int>*) const
+  //   { libmesh_error(); }
 
-//   unsigned int vtk_element_type (const unsigned int) const
-//   { return 13; }
+  //   unsigned int vtk_element_type (const unsigned int) const
+  //   { return 13; }
 
   /**
    * @returns \p true when this element contains the point

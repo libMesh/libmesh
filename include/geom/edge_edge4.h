@@ -44,7 +44,7 @@ namespace libMesh
 // Edge4 class definition
 class Edge4 : public Edge
 {
-  public:
+public:
 
   /**
    * Constructor. By default this element has no parent.
@@ -115,13 +115,13 @@ class Edge4 : public Edge
   /**
    */
   unsigned int n_second_order_adjacent_vertices (const unsigned int) const
-      { libmesh_error(); return 0;  }
+  { libmesh_error(); return 0;  }
 
   /**
    */
   unsigned short int second_order_adjacent_vertex (const unsigned int,
                                                    const unsigned int) const
-      { libmesh_error(); return 0; }
+  { libmesh_error(); return 0; }
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

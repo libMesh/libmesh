@@ -47,7 +47,7 @@ namespace libMesh
 // Edge3 class definition
 class Edge3 : public Edge
 {
- public:
+public:
 
   /**
    * Constructor.  By default this element has no parent.
@@ -119,7 +119,7 @@ class Edge3 : public Edge
    * @returns 2 for all \p n
    */
   unsigned int n_second_order_adjacent_vertices (const unsigned int) const
-      { return 2; }
+  { return 2; }
 
   /**
    * @returns the element-local number of the  \f$ v^{th} \f$ vertex
@@ -127,7 +127,7 @@ class Edge3 : public Edge
    */
   unsigned short int second_order_adjacent_vertex (const unsigned int,
                                                    const unsigned int v) const
-      { return static_cast<unsigned short int>(v); }
+  { return static_cast<unsigned short int>(v); }
 
   /**
    * @returns the child number \p c and element-local index \p v of the
@@ -139,7 +139,7 @@ class Edge3 : public Edge
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
-    second_order_child_vertex (const unsigned int n) const;
+  second_order_child_vertex (const unsigned int n) const;
 
   /**
    * An optimized method for computing the length of a 3-node edge.

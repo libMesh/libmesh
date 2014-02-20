@@ -40,7 +40,7 @@ namespace libMesh
 // SFCPartitioner class definition
 class SFCPartitioner : public Partitioner
 {
- public:
+public:
 
   /**
    * Constructor.  Sets the default space filling

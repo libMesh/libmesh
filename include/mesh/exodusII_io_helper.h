@@ -34,11 +34,11 @@
 #include <map>
 
 // Macro to simplify checking Exodus error codes
-#define EX_CHECK_ERR(code, msg) \
-  do { \
-    if ((code) < 0) { \
-      libMesh::err << (msg) << std::endl; \
-      libmesh_error(); \
+#define EX_CHECK_ERR(code, msg)                 \
+  do {                                          \
+    if ((code) < 0) {                           \
+      libMesh::err << (msg) << std::endl;       \
+      libmesh_error();                          \
     } } while(0)
 
 
@@ -47,9 +47,9 @@ namespace libMesh
 
 
 namespace exII {
-  extern "C" {
+extern "C" {
 #include "exodusII.h" // defines MAX_LINE_LENGTH, MAX_STR_LENGTH used later
-  }
+}
 }
 
 /**

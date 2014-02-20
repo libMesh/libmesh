@@ -156,7 +156,7 @@ public:
    * use the complex conjugate of vec.
    */
   template <typename T2>
-    typename CompareTypes<T, T2>::supertype indefinite_dot (const DenseVector<T2> &vec) const;
+  typename CompareTypes<T, T2>::supertype indefinite_dot (const DenseVector<T2> &vec) const;
 
   /**
    * Tests if \p vec is exactly equal to this vector.
@@ -397,7 +397,7 @@ DenseVector<T>::add (const T2 factor,
 template<typename T>
 template<typename T2>
 inline
-  typename CompareTypes<T, T2>::supertype DenseVector<T>::dot (const DenseVector<T2>& vec) const
+typename CompareTypes<T, T2>::supertype DenseVector<T>::dot (const DenseVector<T2>& vec) const
 {
   libmesh_assert_equal_to (this->size(), vec.size());
 
@@ -412,7 +412,7 @@ inline
 template<typename T>
 template<typename T2>
 inline
-  typename CompareTypes<T, T2>::supertype DenseVector<T>::indefinite_dot (const DenseVector<T2>& vec) const
+typename CompareTypes<T, T2>::supertype DenseVector<T>::indefinite_dot (const DenseVector<T2>& vec) const
 {
   libmesh_assert_equal_to (this->size(), vec.size());
 

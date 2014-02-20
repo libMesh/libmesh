@@ -93,7 +93,7 @@ public:
 
   void set_patch_reuse (bool );
 
- protected:
+protected:
 
   /**
    * Returns the spectral polynomial basis function values at a point x,y,z
@@ -106,7 +106,7 @@ public:
 
   bool patch_reuse ;
 
- private:
+private:
 
   /**
    * Class to compute the error contribution for a range

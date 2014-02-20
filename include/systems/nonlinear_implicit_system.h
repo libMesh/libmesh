@@ -198,7 +198,7 @@ public:
    * be used in linear adjoint and/or sensitivity solves
    */
   virtual std::pair<unsigned int, Real>
-    get_linear_solve_parameters() const;
+  get_linear_solve_parameters() const;
 
   /**
    * Assembles a residual in \p rhs and/or a jacobian in \p matrix,

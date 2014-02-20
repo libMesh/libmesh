@@ -37,14 +37,14 @@
 namespace libMesh
 {
 
-  // Forward Declarations
-  class BoundaryInfo;
-  class Elem;
-  template <typename T> class FEGenericBase;
-  typedef FEGenericBase<Real> FEBase;
-  class QBase;
-  class Point;
-  template <typename T> class NumericVector;
+// Forward Declarations
+class BoundaryInfo;
+class Elem;
+template <typename T> class FEGenericBase;
+typedef FEGenericBase<Real> FEBase;
+class QBase;
+class Point;
+template <typename T> class NumericVector;
 
 /**
  * This class provides all data required for a physics package
@@ -323,7 +323,7 @@ public:
   void side_gradients(unsigned int var, const NumericVector<Number> & _system_vector,
                       std::vector<OutputType>& side_gradients_vector) const;
 
-   /**
+  /**
    * Returns the gradient of the solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
    */
@@ -479,9 +479,9 @@ public:
    * Reinitialize all my FEM context data on a given
    * element for the given system
    */
-//  virtual void reinit(const FEMSystem&, Elem*);
+  //  virtual void reinit(const FEMSystem&, Elem*);
 
-// should be protected:
+  // should be protected:
   /**
    * Reinitialize Elem and FE objects if necessary for integration at a new
    * point in time: specifically, handle moving elements in moving mesh

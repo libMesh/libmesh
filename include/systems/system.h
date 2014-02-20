@@ -77,7 +77,7 @@ class SystemSubset;
 // ------------------------------------------------------------
 // System class definition
 class System : public ReferenceCountedObject<System>,
-  public ParallelObject
+               public ParallelObject
 {
 public:
 
@@ -263,14 +263,14 @@ public:
    * @e Can be overloaded in derived classes.
    */
   virtual void assemble_qoi
-    (const QoISet &qoi_indices = QoISet());
+  (const QoISet &qoi_indices = QoISet());
 
   /**
    * Calls user qoi derivative function.
    * @e Can be overloaded in derived classes.
    */
   virtual void assemble_qoi_derivative
-    (const QoISet &qoi_indices = QoISet());
+  (const QoISet &qoi_indices = QoISet());
 
   /**
    * Calls residual parameter derivative function.
@@ -308,7 +308,7 @@ public:
    * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
-    sensitivity_solve (const ParameterVector& parameters);
+  sensitivity_solve (const ParameterVector& parameters);
 
   /**
    * Assembles & solves the linear system(s) (dR/du)*u_w = sum(w_p*-dR/dp), for
@@ -321,8 +321,8 @@ public:
    * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
-    weighted_sensitivity_solve (const ParameterVector& parameters,
-                                const ParameterVector& weights);
+  weighted_sensitivity_solve (const ParameterVector& parameters,
+                              const ParameterVector& weights);
 
   /**
    * Solves the adjoint system, for the specified qoi indices, or for
@@ -335,7 +335,7 @@ public:
    * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
-    adjoint_solve (const QoISet& qoi_indices = QoISet());
+  adjoint_solve (const QoISet& qoi_indices = QoISet());
 
   /**
    * Assembles & solves the linear system(s)
@@ -352,9 +352,9 @@ public:
    * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
-    weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
-                                        const ParameterVector& weights,
-                                        const QoISet& qoi_indices = QoISet());
+  weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
+                                      const ParameterVector& weights,
+                                      const QoISet& qoi_indices = QoISet());
   /**
    * Accessor for the adjoint_already_solved boolean
    */
@@ -761,7 +761,7 @@ public:
    * unless project_solution_on_reinit() = false is called.
    */
   bool& project_solution_on_reinit (void)
-    { return _solution_projection; }
+  { return _solution_projection; }
 
   /**
    * @returns \p true if this \p System has a vector associated with the
@@ -1183,7 +1183,7 @@ public:
    * Reads additional data, namely vectors, for this System.
    * This method may safely be called on a distributed-memory mesh.
    */
-    template <typename ValType>
+  template <typename ValType>
   void read_serialized_data (Xdr& io,
                              const bool read_additional_data=true);
   /**
@@ -1194,7 +1194,7 @@ public:
    */
   void read_serialized_data (Xdr& io,
                              const bool read_additional_data=true)
-    { read_serialized_data<Number>(io, read_additional_data); }
+  { read_serialized_data<Number>(io, read_additional_data); }
 
   /**
    * Read a number of identically distributed vectors.  This method
@@ -1214,7 +1214,7 @@ public:
    */
   std::size_t read_serialized_vectors (Xdr &io,
                                        const std::vector<NumericVector<Number>*> &vectors) const
-    { return read_serialized_vectors<Number>(io, vectors); }
+  { return read_serialized_vectors<Number>(io, vectors); }
 
   /**
    * Reads additional data, namely vectors, for this System.
@@ -1222,7 +1222,7 @@ public:
    * This method will read an individual file for each processor in the simulation
    * where the local solution components for that processor are stored.
    */
-    template <typename InValType>
+  template <typename InValType>
   void read_parallel_data (Xdr &io,
                            const bool read_additional_data);
 
@@ -1236,7 +1236,7 @@ public:
    */
   void read_parallel_data (Xdr &io,
                            const bool read_additional_data)
-    { read_parallel_data<Number>(io, read_additional_data); }
+  { read_parallel_data<Number>(io, read_additional_data); }
 
   /**
    * Writes the basic data header for this System.
@@ -1617,7 +1617,7 @@ private:
   std::size_t read_serialized_blocked_dof_objects (const dof_id_type n_objects,
                                                    const iterator_type begin,
                                                    const iterator_type end,
-                           const InValType dummy,
+                                                   const InValType dummy,
                                                    Xdr &io,
                                                    const std::vector<NumericVector<Number>*> &vecs,
                                                    const unsigned int var_to_read=libMesh::invalid_uint) const;
@@ -1638,7 +1638,7 @@ private:
    *
    * Returns the length of the vector read.
    */
-    template <typename InValType>
+  template <typename InValType>
   numeric_index_type read_serialized_vector (Xdr& io,
                                              NumericVector<Number> &vec);
 
@@ -1652,7 +1652,7 @@ private:
    */
   numeric_index_type read_serialized_vector (Xdr& io,
                                              NumericVector<Number> &vec)
-    { return read_serialized_vector<Number>(io, vec); }
+  { return read_serialized_vector<Number>(io, vec); }
 
   /**
    * Writes an output vector to the stream \p io for a set of \p DofObjects.

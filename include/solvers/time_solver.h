@@ -259,7 +259,7 @@ protected:
    */
   AutoPtr<SolutionHistory> solution_history;
 
- private:
+private:
 
   /**
    * This boolean tells the TimeSolver whether we are solving a primal or

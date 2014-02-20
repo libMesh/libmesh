@@ -50,12 +50,12 @@ class Nemesis_IO_Helper;
 
 // ------------------------------------------------------------
 // Nemesis_IO class definition
-  class Nemesis_IO : public MeshInput<MeshBase>,
-  public MeshOutput<MeshBase>,
-  public ParallelObject
+class Nemesis_IO : public MeshInput<MeshBase>,
+                   public MeshOutput<MeshBase>,
+                   public ParallelObject
 {
 
- public:
+public:
 
   /**
    * Constructor.  Takes a writeable reference to a mesh object.

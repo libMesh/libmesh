@@ -37,76 +37,76 @@ namespace libMesh
 
 //--------------------------------------------------------------------------
 namespace Parallel {
-  namespace Utils {
+namespace Utils {
 
-    /**
-     * Utility function that returns true if the vector v
-     * is sorted, false otherwise.  O(N), the length of the
-     * vector.  This is implemented solely because the std::is_sorted
-     * appears to be an STL extension.
-     */
-    template <typename KeyType>
-      inline
-      bool is_sorted (const std::vector<KeyType>& v)
-      {
-        if (v.empty())
-          return true;
+/**
+ * Utility function that returns true if the vector v
+ * is sorted, false otherwise.  O(N), the length of the
+ * vector.  This is implemented solely because the std::is_sorted
+ * appears to be an STL extension.
+ */
+template <typename KeyType>
+inline
+bool is_sorted (const std::vector<KeyType>& v)
+{
+  if (v.empty())
+    return true;
 
-        for (unsigned int i=1; i<v.size(); i++)
-          if (v[i] < v[i-1])
-            return false;
+  for (unsigned int i=1; i<v.size(); i++)
+    if (v[i] < v[i-1])
+      return false;
 
-        return true;
-      }
+  return true;
+}
 
-    /**
-     * A utility function which converts whatever \p KeyType is to
-     * a \p double for the histogram bounds
-     */
-    template <typename KeyType>
-      inline
-      double to_double (const KeyType &k)
-      {
-        return static_cast<double>(k);
-      }
+/**
+ * A utility function which converts whatever \p KeyType is to
+ * a \p double for the histogram bounds
+ */
+template <typename KeyType>
+inline
+double to_double (const KeyType &k)
+{
+  return static_cast<double>(k);
+}
 
-    /**
-     * A utility to convert a \p double to some
-     * sort of \p KeyType, for interpreting how
-     * histogram bounds relate to \p KeyType
-     * positions.
-     */
-    template <typename KeyType>
-      inline
-      KeyType to_key_type (const double f)
-      {
-        return static_cast<KeyType>(f);
-      }
+/**
+ * A utility to convert a \p double to some
+ * sort of \p KeyType, for interpreting how
+ * histogram bounds relate to \p KeyType
+ * positions.
+ */
+template <typename KeyType>
+inline
+KeyType to_key_type (const double f)
+{
+  return static_cast<KeyType>(f);
+}
 
 #ifdef LIBMESH_HAVE_LIBHILBERT
 
-    template <>
-      inline
-      double to_double (const Hilbert::HilbertIndices &bvt)
-      {
-        return static_cast<double>(bvt.rack2);
-      }
+template <>
+inline
+double to_double (const Hilbert::HilbertIndices &bvt)
+{
+  return static_cast<double>(bvt.rack2);
+}
 
-    template <>
-      inline
-      Hilbert::HilbertIndices
-      to_key_type (const double f)
-      {
-        Hilbert::HilbertIndices bvt;
+template <>
+inline
+Hilbert::HilbertIndices
+to_key_type (const double f)
+{
+  Hilbert::HilbertIndices bvt;
 
-        bvt.rack0 = 0;
-        bvt.rack1 = 0;
-        bvt.rack2 = static_cast<Hilbert::inttype>(f);
+  bvt.rack0 = 0;
+  bvt.rack1 = 0;
+  bvt.rack2 = static_cast<Hilbert::inttype>(f);
 
-        return bvt;
-      }
+  return bvt;
+}
 #endif // LIBMESH_HAVE_LIBHILBERT
-  }
+}
 }
 
 } // namespace libMesh

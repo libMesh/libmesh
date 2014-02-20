@@ -48,7 +48,7 @@ namespace libMesh
 template <typename T>
 class EigenSparseLinearSolver : public LinearSolver<T>
 {
- public:
+public:
   /**
    *  Constructor. Initializes Eigen data structures
    */
@@ -74,42 +74,42 @@ class EigenSparseLinearSolver : public LinearSolver<T>
    * Call the Eigen solver
    */
   std::pair<unsigned int, Real>
-    solve (SparseMatrix<T>  &matrix,
-           NumericVector<T> &solution,
-           NumericVector<T> &rhs,
-           const double tol,
-           const unsigned int m_its);
+  solve (SparseMatrix<T>  &matrix,
+         NumericVector<T> &solution,
+         NumericVector<T> &rhs,
+         const double tol,
+         const unsigned int m_its);
 
   /**
    * Call the Eigen solver to solve A^T x = b
    */
   std::pair<unsigned int, Real>
-    adjoint_solve (SparseMatrix<T>  &matrix,
-                   NumericVector<T> &solution,
-                   NumericVector<T> &rhs,
-                   const double tol,
-                   const unsigned int m_its);
+  adjoint_solve (SparseMatrix<T>  &matrix,
+                 NumericVector<T> &solution,
+                 NumericVector<T> &rhs,
+                 const double tol,
+                 const unsigned int m_its);
 
   /**
    * Call the Eigen solver
    */
   std::pair<unsigned int, Real>
-    solve (SparseMatrix<T>  &matrix,
-           SparseMatrix<T>  &pc,
-           NumericVector<T> &solution,
-           NumericVector<T> &rhs,
-           const double tol,
-           const unsigned int m_its);
+  solve (SparseMatrix<T>  &matrix,
+         SparseMatrix<T>  &pc,
+         NumericVector<T> &solution,
+         NumericVector<T> &rhs,
+         const double tol,
+         const unsigned int m_its);
 
   /**
    * This function solves a system whose matrix is a shell matrix.
    */
   std::pair<unsigned int, Real>
-    solve (const ShellMatrix<T>& shell_matrix,
-           NumericVector<T>& solution_in,
-           NumericVector<T>& rhs_in,
-           const double tol,
-           const unsigned int m_its);
+  solve (const ShellMatrix<T>& shell_matrix,
+         NumericVector<T>& solution_in,
+         NumericVector<T>& rhs_in,
+         const double tol,
+         const unsigned int m_its);
 
   /**
    * This function solves a system whose matrix is a shell matrix, but
@@ -117,12 +117,12 @@ class EigenSparseLinearSolver : public LinearSolver<T>
    * other preconditioners than JACOBI.
    */
   virtual std::pair<unsigned int, Real>
-    solve (const ShellMatrix<T>& shell_matrix,
-           const SparseMatrix<T>& precond_matrix,
-           NumericVector<T>& solution_in,
-           NumericVector<T>& rhs_in,
-           const double tol,
-           const unsigned int m_its);
+  solve (const ShellMatrix<T>& shell_matrix,
+         const SparseMatrix<T>& precond_matrix,
+         NumericVector<T>& solution_in,
+         NumericVector<T>& rhs_in,
+         const double tol,
+         const unsigned int m_its);
 
   /**
    * Prints a useful message about why the latest linear solve
@@ -130,7 +130,7 @@ class EigenSparseLinearSolver : public LinearSolver<T>
    */
   virtual void print_converged_reason();
 
- private:
+private:
 
   /**
    * Tells Eigen to use the user-specified preconditioner stored in

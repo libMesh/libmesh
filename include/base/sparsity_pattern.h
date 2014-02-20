@@ -30,10 +30,10 @@
 namespace libMesh
 {
 
-  // Forward declaractions
-  class MeshBase;
-  class DofMap;
-  class CouplingMatrix;
+// Forward declaractions
+class MeshBase;
+class DofMap;
+class CouplingMatrix;
 
 // ------------------------------------------------------------
 // Sparsity Pattern
@@ -46,75 +46,75 @@ namespace libMesh
  */
 namespace SparsityPattern // use a namespace so member classes can be forward-declared.
 {
-  typedef std::vector<dof_id_type, Threads::scalable_allocator<dof_id_type> > Row;
-  class Graph : public std::vector<Row> {};
+typedef std::vector<dof_id_type, Threads::scalable_allocator<dof_id_type> > Row;
+class Graph : public std::vector<Row> {};
 
-  class NonlocalGraph : public std::map<dof_id_type, Row> {};
+class NonlocalGraph : public std::map<dof_id_type, Row> {};
 
-  /**
-   * Splices the two sorted ranges [begin,middle) and [middle,end)
-   * into one sorted range [begin,end).  This method is much like
-   * std::inplace_merge except it assumes the intersection
-   * of the two sorted ranges is empty and that any element in
-   * each range occurs only once in that range.  Additionally,
-   * this sort occurs in-place, while std::inplace_merge may
-   * use a temporary buffer.
-   */
-  template<typename BidirectionalIterator>
-  static void sort_row (const BidirectionalIterator begin,
-                        BidirectionalIterator       middle,
-                        const BidirectionalIterator end);
+/**
+ * Splices the two sorted ranges [begin,middle) and [middle,end)
+ * into one sorted range [begin,end).  This method is much like
+ * std::inplace_merge except it assumes the intersection
+ * of the two sorted ranges is empty and that any element in
+ * each range occurs only once in that range.  Additionally,
+ * this sort occurs in-place, while std::inplace_merge may
+ * use a temporary buffer.
+ */
+template<typename BidirectionalIterator>
+static void sort_row (const BidirectionalIterator begin,
+                      BidirectionalIterator       middle,
+                      const BidirectionalIterator end);
 
-  /**
-   * This helper class can be called on multiple threads to compute
-   * the sparsity pattern (or graph) of the sparse matrix resulting
-   * from the discretization.  This pattern may be used directly by
-   * a particular sparse matrix format (e.g. \p LaspackMatrix)
-   * or indirectly (e.g. \p PetscMatrix).  In the latter case the
-   * number of nonzeros per row of the matrix is needed for efficient
-   * preallocation.  In this case it suffices to provide estimate
-   * (but bounding) values, and in this case the threaded method can
-   * take some short-cuts for efficiency.
-   */
-  class Build : public ParallelObject
-  {
-  private:
-    const MeshBase &mesh;
-    const DofMap &dof_map;
-    const CouplingMatrix *dof_coupling;
-    const bool implicit_neighbor_dofs;
-    const bool need_full_sparsity_pattern;
+/**
+ * This helper class can be called on multiple threads to compute
+ * the sparsity pattern (or graph) of the sparse matrix resulting
+ * from the discretization.  This pattern may be used directly by
+ * a particular sparse matrix format (e.g. \p LaspackMatrix)
+ * or indirectly (e.g. \p PetscMatrix).  In the latter case the
+ * number of nonzeros per row of the matrix is needed for efficient
+ * preallocation.  In this case it suffices to provide estimate
+ * (but bounding) values, and in this case the threaded method can
+ * take some short-cuts for efficiency.
+ */
+class Build : public ParallelObject
+{
+private:
+  const MeshBase &mesh;
+  const DofMap &dof_map;
+  const CouplingMatrix *dof_coupling;
+  const bool implicit_neighbor_dofs;
+  const bool need_full_sparsity_pattern;
 
-  public:
+public:
 
-    SparsityPattern::Graph sparsity_pattern;
-    SparsityPattern::NonlocalGraph nonlocal_pattern;
+  SparsityPattern::Graph sparsity_pattern;
+  SparsityPattern::NonlocalGraph nonlocal_pattern;
 
-    std::vector<dof_id_type> n_nz;
-    std::vector<dof_id_type> n_oz;
+  std::vector<dof_id_type> n_nz;
+  std::vector<dof_id_type> n_oz;
 
-    Build (const MeshBase &mesh_in,
-           const DofMap &dof_map_in,
-           const CouplingMatrix *dof_coupling_in,
-           const bool implicit_neighbor_dofs_in,
-           const bool need_full_sparsity_pattern_in);
+  Build (const MeshBase &mesh_in,
+         const DofMap &dof_map_in,
+         const CouplingMatrix *dof_coupling_in,
+         const bool implicit_neighbor_dofs_in,
+         const bool need_full_sparsity_pattern_in);
 
-    Build (Build &other, Threads::split);
+  Build (Build &other, Threads::split);
 
-    void operator()(const ConstElemRange &range);
+  void operator()(const ConstElemRange &range);
 
-    void join (const Build &other);
+  void join (const Build &other);
 
-    void parallel_sync ();
-  };
+  void parallel_sync ();
+};
 
 #if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
-  /**
-   * Dummy function that does nothing but can be used to prohibit
-   * compiler optimization in some situations where some compilers
-   * have optimization bugs.
-   */
-  void _dummy_function(void);
+/**
+ * Dummy function that does nothing but can be used to prohibit
+ * compiler optimization in some situations where some compilers
+ * have optimization bugs.
+ */
+void _dummy_function(void);
 #endif
 
 }

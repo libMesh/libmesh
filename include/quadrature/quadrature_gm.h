@@ -57,19 +57,19 @@ namespace libMesh
  * where V is the volume of the reference element, does grow quickly.
  * (A rule with all positive has has an amplification factor of 1.0 by
  * definition.)
-\verbatim
-  s  | d     | N. CP        | N. GM   | % neg wts | amp. factor
------------------------------------------------------------------
-  0  | 1     |              | 1       |           |
-  1  | 2-3   |              | 5       |           |
-  2  | 4-5   |              | 15      |           |
-  3  | 6-7   |              | 35      | 31.43     |   11.94
-  4  | 8-9   |  5^3=125     | 70      | 34.29     |   25.35
-  5  | 10-11 |  6^3=216     | 126     | 36.51     |   54.14
-  6  | 12-13 |  7^3=343     | 210     | 38.10     |  116.30
-  7  | 14-15 |  8^3=512     | 330     | 39.39     |  251.10
-  8  | 16-17 |  9^3=729     | 495     | 40.40     |  544.68
-  9  | 18-19 | 10^3=1,000   | 715     | 41.26     | 1186.16
+ \verbatim
+ s  | d     | N. CP        | N. GM   | % neg wts | amp. factor
+ -----------------------------------------------------------------
+ 0  | 1     |              | 1       |           |
+ 1  | 2-3   |              | 5       |           |
+ 2  | 4-5   |              | 15      |           |
+ 3  | 6-7   |              | 35      | 31.43     |   11.94
+ 4  | 8-9   |  5^3=125     | 70      | 34.29     |   25.35
+ 5  | 10-11 |  6^3=216     | 126     | 36.51     |   54.14
+ 6  | 12-13 |  7^3=343     | 210     | 38.10     |  116.30
+ 7  | 14-15 |  8^3=512     | 330     | 39.39     |  251.10
+ 8  | 16-17 |  9^3=729     | 495     | 40.40     |  544.68
+ 9  | 18-19 | 10^3=1,000   | 715     | 41.26     | 1186.16
  10  | 20-21 | 11^3=1,331   | 1,001   | 41.96     | 2591.97
  11  | 22-23 | 12^3=1,728   | 1,365   | 42.56     | 5680.75
  ...
@@ -78,7 +78,7 @@ namespace libMesh
  18  | 36-37 | 19^3=6,859   | 7,315   |
  ...
  21  | 42-43 | 22^3=10,648  | 12,650  |
-\endverbatim
+ \endverbatim
  *
  *
  * Reference:
@@ -99,7 +99,7 @@ namespace libMesh
 
 class QGrundmann_Moller : public QBase
 {
- public:
+public:
 
   /**
    * Constructor.  Declares the order of the quadrature rule.
@@ -118,7 +118,7 @@ class QGrundmann_Moller : public QBase
   QuadratureType type() const { return QGRUNDMANN_MOLLER; }
 
 
- private:
+private:
 
   void init_1D (const ElemType,
                 unsigned int =0)

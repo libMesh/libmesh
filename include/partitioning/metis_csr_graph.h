@@ -32,60 +32,60 @@
 namespace libMesh
 {
 
-  /**
-   * This utility class provides a convenient implementation for
-   * building the compressed-row-storage graph required for the METIS/ParMETIS
-   * graph partitioning schemes.
-   */
-  class METIS_CSR_Graph
+/**
+ * This utility class provides a convenient implementation for
+ * building the compressed-row-storage graph required for the METIS/ParMETIS
+ * graph partitioning schemes.
+ */
+class METIS_CSR_Graph
+{
+public:
+  std::vector<int> offsets, vals;
+
+  void prep_n_nonzeros(const libMesh::dof_id_type row, const libMesh::dof_id_type n_nonzeros)
   {
-  public:
-    std::vector<int> offsets, vals;
-
-    void prep_n_nonzeros(const libMesh::dof_id_type row, const libMesh::dof_id_type n_nonzeros)
-    {
-      libmesh_assert_less (row+1, offsets.size());
-      offsets[row+1] = n_nonzeros;
-    }
+    libmesh_assert_less (row+1, offsets.size());
+    offsets[row+1] = n_nonzeros;
+  }
 
 
 
-    libMesh::dof_id_type n_nonzeros (const libMesh::dof_id_type row) const
-    {
-      libmesh_assert_less (row+1, offsets.size());
-      return (offsets[row+1] - offsets[row]);
-    }
+  libMesh::dof_id_type n_nonzeros (const libMesh::dof_id_type row) const
+  {
+    libmesh_assert_less (row+1, offsets.size());
+    return (offsets[row+1] - offsets[row]);
+  }
 
 
-    void prepare_for_use()
-    {
-      std::partial_sum (offsets.begin(), offsets.end(), offsets.begin());
-      libmesh_assert (!offsets.empty());
-      vals.resize(offsets.back());
+  void prepare_for_use()
+  {
+    std::partial_sum (offsets.begin(), offsets.end(), offsets.begin());
+    libmesh_assert (!offsets.empty());
+    vals.resize(offsets.back());
 
-      if (vals.empty())
-        vals.push_back(0);
-    }
-
-
-
-    int& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero)
-    {
-      libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
-
-      return vals[offsets[row]+nonzero];
-    }
+    if (vals.empty())
+      vals.push_back(0);
+  }
 
 
 
-    const int& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero) const
-    {
-      libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
+  int& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero)
+  {
+    libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
 
-      return vals[offsets[row]+nonzero];
-    }
+    return vals[offsets[row]+nonzero];
+  }
 
-  };
+
+
+  const int& operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero) const
+  {
+    libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
+
+    return vals[offsets[row]+nonzero];
+  }
+
+};
 
 } // namespace libMesh
 

@@ -494,10 +494,10 @@ inline
 DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm,
                                          const ParallelType ptype)
   : NumericVector<T>(comm, ptype),
-  _global_size      (0),
-  _local_size       (0),
-  _first_local_index(0),
-  _last_local_index (0)
+    _global_size      (0),
+    _local_size       (0),
+    _first_local_index(0),
+    _last_local_index (0)
 {
   this->_type = ptype;
 }

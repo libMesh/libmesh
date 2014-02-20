@@ -47,7 +47,7 @@ public:
   Val operator[] (const index_t &k) const
   {
     typename maptype::const_iterator it = this->find(k);
-      return it == this->end().it? Val() : it->second;
+    return it == this->end().it? Val() : it->second;
   }
 
   class veclike_iterator
@@ -114,11 +114,11 @@ public:
   };
 
   void erase(index_t i) {
-      maptype::erase(i);
+    maptype::erase(i);
   }
 
   void erase(const veclike_iterator &pos) {
-      maptype::erase(pos.it);
+    maptype::erase(pos.it);
   }
 
   veclike_iterator begin() {

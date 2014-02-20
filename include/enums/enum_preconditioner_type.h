@@ -24,25 +24,25 @@
 // enum PreconditionerType definition
 namespace libMesh {
 
-  /**
-   * Defines an \p enum for preconditioner types
-   */
-  enum PreconditionerType {IDENTITY_PRECOND =0,
-                           JACOBI_PRECOND,
-                           BLOCK_JACOBI_PRECOND,
-                           SOR_PRECOND,
-                           SSOR_PRECOND,
-                           EISENSTAT_PRECOND,
-                           ASM_PRECOND,
-                           CHOLESKY_PRECOND,
-                           ICC_PRECOND,
-                           ILU_PRECOND,
-                           LU_PRECOND,
-                           USER_PRECOND,
-                           SHELL_PRECOND,
-                           AMG_PRECOND,
+/**
+ * Defines an \p enum for preconditioner types
+ */
+enum PreconditionerType {IDENTITY_PRECOND =0,
+                         JACOBI_PRECOND,
+                         BLOCK_JACOBI_PRECOND,
+                         SOR_PRECOND,
+                         SSOR_PRECOND,
+                         EISENSTAT_PRECOND,
+                         ASM_PRECOND,
+                         CHOLESKY_PRECOND,
+                         ICC_PRECOND,
+                         ILU_PRECOND,
+                         LU_PRECOND,
+                         USER_PRECOND,
+                         SHELL_PRECOND,
+                         AMG_PRECOND,
 
-                           INVALID_PRECONDITIONER};
+                         INVALID_PRECONDITIONER};
 }
 
 #endif // LIBMESH_ENUM_PRECONDITIONER_TYPE_H

@@ -29,15 +29,15 @@ namespace libMesh
 
 namespace Utility
 {
-  // Two helpful utility programs for getting and printing a timestamp in
-  // the format:
-  // 04 February 2010 01:56:43 PM
-  std::string get_timestamp();
+// Two helpful utility programs for getting and printing a timestamp in
+// the format:
+// 04 February 2010 01:56:43 PM
+std::string get_timestamp();
 
-  inline void print_timestamp (std::ostream& target = std::cout)
-  {
-    target << get_timestamp() << std::endl;
-  }
+inline void print_timestamp (std::ostream& target = std::cout)
+{
+  target << get_timestamp() << std::endl;
+}
 
 }
 

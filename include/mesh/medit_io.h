@@ -50,7 +50,7 @@ class MeshBase;
 // medit_io class definition
 class MEDITIO : public MeshOutput<MeshBase>
 {
- public:
+public:
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
