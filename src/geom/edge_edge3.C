@@ -26,23 +26,23 @@ namespace libMesh
 #ifdef LIBMESH_ENABLE_AMR
 
 const float Edge3::_embedding_matrix[2][3][3] =
-{
-  // embedding matrix for child 0
   {
-    // 0    1    2
-    {1.0, 0.0, 0.0}, // left
-    {0.0, 0.0, 1.0}, // right
-    {0.375,-0.125,0.75} // middle
-  },
+    // embedding matrix for child 0
+    {
+      // 0    1    2
+      {1.0, 0.0, 0.0}, // left
+      {0.0, 0.0, 1.0}, // right
+      {0.375,-0.125,0.75} // middle
+    },
 
-  // embedding matrix for child 1
-  {
-    // 0    1    2
-    {0.0, 0.0, 1.0}, // left
-    {0.0, 1.0, 0.0},  // right
-    {-0.125,0.375,0.75} // middle
-  }
-};
+    // embedding matrix for child 1
+    {
+      // 0    1    2
+      {0.0, 0.0, 1.0}, // left
+      {0.0, 1.0, 0.0},  // right
+      {-0.125,0.375,0.75} // middle
+    }
+  };
 
 #endif
 
@@ -56,7 +56,7 @@ bool Edge3::is_vertex(const unsigned int i) const
 bool Edge3::is_edge(const unsigned int i) const
 {
   if (i < 2)
-   return false;
+    return false;
   return true;
 }
 

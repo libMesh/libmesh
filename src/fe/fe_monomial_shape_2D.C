@@ -37,7 +37,7 @@ Real FE<2,MONOMIAL>::shape(const ElemType,
 #if LIBMESH_DIM > 1
 
   libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
-               (static_cast<unsigned int>(order)+2)/2);
+                       (static_cast<unsigned int>(order)+2)/2);
 
   const Real xi  = p(0);
   const Real eta = p(1);
@@ -142,7 +142,7 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
   libmesh_assert_less (j, 2);
 
   libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
-               (static_cast<unsigned int>(order)+2)/2);
+                       (static_cast<unsigned int>(order)+2)/2);
 
   const Real xi  = p(0);
   const Real eta = p(1);
@@ -327,7 +327,7 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
   libmesh_assert_less_equal (j, 2);
 
   libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
-               (static_cast<unsigned int>(order)+2)/2);
+                       (static_cast<unsigned int>(order)+2)/2);
 
   const Real xi  = p(0);
   const Real eta = p(1);

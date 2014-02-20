@@ -36,7 +36,7 @@ template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_shape_functions () const
 {
   return FE<Dim,T>::n_dofs (this->elem_type,
-           static_cast<Order>(this->fe_type.order + this->_p_level));
+                            static_cast<Order>(this->fe_type.order + this->_p_level));
 }
 
 
@@ -184,7 +184,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
             for (unsigned int n = 1; n < elem->n_nodes(); ++n)
               {
                 if (!(elem->point(n) - elem->point(0)).relative_fuzzy_equals(
-                      (cached_nodes[n] - cached_nodes[0]), 1e-13))
+                                                                             (cached_nodes[n] - cached_nodes[0]), 1e-13))
                   {
                     cached_nodes_still_fit = false;
                     break;
@@ -407,7 +407,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   // variational formulation of an InfFE, correct element matrices are
   // returned
 
- {
+  {
     this->weight.resize  (n_qp);
     this->dweight.resize (n_qp);
     this->dphase.resize  (n_qp);
@@ -419,7 +419,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
         this->dphase[p].zero();
       }
 
- }
+  }
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   switch (Dim)

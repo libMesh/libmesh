@@ -204,31 +204,31 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
              Elem*) might be slightly inaccurate.  */
           if(!_out_of_mesh_mode)
             {
-                START_LOG("linear search", "PointLocatorTree");
-                MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
-                const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
+              START_LOG("linear search", "PointLocatorTree");
+              MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
+              const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
 
-                for ( ; pos != end_pos; ++pos)
-                  if ((*pos)->contains_point(p))
-                    {
-                      STOP_LOG("linear search", "PointLocatorTree");
-                      STOP_LOG("operator()", "PointLocatorTree");
-                      return this->_element = (*pos);
-                    }
+              for ( ; pos != end_pos; ++pos)
+                if ((*pos)->contains_point(p))
+                  {
+                    STOP_LOG("linear search", "PointLocatorTree");
+                    STOP_LOG("operator()", "PointLocatorTree");
+                    return this->_element = (*pos);
+                  }
 
-/*
-  if (this->_element == NULL)
-  {
-  libMesh::err << std::endl
-  << " ******** Serious Problem.  Could not find an Element "
-  << "in the Mesh"
-  << std:: endl
-  << " ******** that contains the Point "
-  << p;
-  libmesh_error();
-  }
-*/
-                STOP_LOG("linear search", "PointLocatorTree");
+              /*
+                if (this->_element == NULL)
+                {
+                libMesh::err << std::endl
+                << " ******** Serious Problem.  Could not find an Element "
+                << "in the Mesh"
+                << std:: endl
+                << " ******** that contains the Point "
+                << p;
+                libmesh_error();
+                }
+              */
+              STOP_LOG("linear search", "PointLocatorTree");
             }
         }
     }

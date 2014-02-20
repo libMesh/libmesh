@@ -53,14 +53,14 @@ void CondensedEigenSystem::initialize_condensed_dofs(std::set<unsigned int>& glo
   std::set<unsigned int>::iterator iter_end = global_dirichlet_dofs_set.end();
 
   for ( ; iter != iter_end ; iter++)
-  {
-    unsigned int condensed_dof_index = *iter;
-    if ( (this->get_dof_map().first_dof() <= condensed_dof_index) &&
-         (condensed_dof_index < this->get_dof_map().end_dof()) )
     {
-      local_non_condensed_dofs_set.erase(condensed_dof_index);
+      unsigned int condensed_dof_index = *iter;
+      if ( (this->get_dof_map().first_dof() <= condensed_dof_index) &&
+           (condensed_dof_index < this->get_dof_map().end_dof()) )
+        {
+          local_non_condensed_dofs_set.erase(condensed_dof_index);
+        }
     }
-  }
 
   // Finally, move local_non_condensed_dofs_set over to a vector for convenience in solve()
   iter     = local_non_condensed_dofs_set.begin();
@@ -81,16 +81,16 @@ void CondensedEigenSystem::initialize_condensed_dofs(std::set<unsigned int>& glo
 unsigned int CondensedEigenSystem::n_global_non_condensed_dofs() const
 {
   if(!condensed_dofs_initialized)
-  {
-    return this->n_dofs();
-  }
+    {
+      return this->n_dofs();
+    }
   else
-  {
-    unsigned int n_global_non_condensed_dofs = local_non_condensed_dofs_vector.size();
-    this->comm().sum(n_global_non_condensed_dofs);
+    {
+      unsigned int n_global_non_condensed_dofs = local_non_condensed_dofs_vector.size();
+      this->comm().sum(n_global_non_condensed_dofs);
 
-    return n_global_non_condensed_dofs;
-  }
+      return n_global_non_condensed_dofs;
+    }
 }
 
 
@@ -101,11 +101,11 @@ void CondensedEigenSystem::solve()
   // If we haven't initialized any condensed dofs,
   // just use the default eigen_system
   if(!condensed_dofs_initialized)
-  {
-    STOP_LOG("solve()", "CondensedEigenSystem");
-    Parent::solve();
-    return;
-  }
+    {
+      STOP_LOG("solve()", "CondensedEigenSystem");
+      Parent::solve();
+      return;
+    }
 
   // A reference to the EquationSystems
   EquationSystems& es = this->get_equation_systems();
@@ -127,11 +127,11 @@ void CondensedEigenSystem::solve()
                              local_non_condensed_dofs_vector);
 
   if(generalized())
-  {
-    matrix_B->create_submatrix(*condensed_matrix_B,
-                               local_non_condensed_dofs_vector,
-                               local_non_condensed_dofs_vector);
-  }
+    {
+      matrix_B->create_submatrix(*condensed_matrix_B,
+                                 local_non_condensed_dofs_vector,
+                                 local_non_condensed_dofs_vector);
+    }
 
 
   // Get the tolerance for the solver and the maximum
@@ -182,10 +182,10 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
   // If we haven't initialized any condensed dofs,
   // just use the default eigen_system
   if(!condensed_dofs_initialized)
-  {
-    STOP_LOG("get_eigenpair()", "CondensedEigenSystem");
-    return Parent::get_eigenpair(i);
-  }
+    {
+      STOP_LOG("get_eigenpair()", "CondensedEigenSystem");
+      return Parent::get_eigenpair(i);
+    }
 
   // If we reach here, then there should be some non-condensed dofs
   libmesh_assert(!local_non_condensed_dofs_vector.empty());
@@ -204,10 +204,10 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
   // Now map temp to solution. Loop over local entries of local_non_condensed_dofs_vector
   this->solution->zero();
   for (unsigned int j=0; j<local_non_condensed_dofs_vector.size(); j++)
-  {
-    unsigned int index = local_non_condensed_dofs_vector[j];
-    solution->set(index,(*temp)(temp->first_local_index()+j));
-  }
+    {
+      unsigned int index = local_non_condensed_dofs_vector[j];
+      solution->set(index,(*temp)(temp->first_local_index()+j));
+    }
 
   solution->close();
   this->update();

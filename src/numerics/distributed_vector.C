@@ -546,7 +546,7 @@ void DistributedVector<T>::localize (const numeric_index_type first_local_idx,
   const numeric_index_type my_size       = this->size();
   const numeric_index_type my_local_size = (last_local_idx - first_local_idx + 1);
 
-    // Don't bother for serial cases
+  // Don't bother for serial cases
   if ((first_local_idx == 0) &&
       (my_local_size == my_size))
     return;

@@ -112,7 +112,7 @@ void ExactSolution::attach_exact_value (Number fptr(const Point& p,
       const System& system = _equation_systems.get_system(sys);
       _exact_values.push_back
         (new WrappedFunction<Number>
-          (system, fptr, &_equation_systems.parameters));
+         (system, fptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -143,7 +143,7 @@ void ExactSolution::attach_exact_value (unsigned int sys_num,
                                         FunctionBase<Number> * f)
 {
   if (_exact_values.size() <= sys_num)
-  _exact_values.resize(sys_num+1, NULL);
+    _exact_values.resize(sys_num+1, NULL);
 
   if (f)
     _exact_values[sys_num] = f->clone().release();
@@ -166,7 +166,7 @@ void ExactSolution::attach_exact_deriv (Gradient gptr(const Point& p,
       const System& system = _equation_systems.get_system(sys);
       _exact_derivs.push_back
         (new WrappedFunction<Gradient>
-          (system, gptr, &_equation_systems.parameters));
+         (system, gptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -197,7 +197,7 @@ void ExactSolution::attach_exact_deriv (unsigned int sys_num,
                                         FunctionBase<Gradient>* g)
 {
   if (_exact_derivs.size() <= sys_num)
-  _exact_derivs.resize(sys_num+1, NULL);
+    _exact_derivs.resize(sys_num+1, NULL);
 
   if (g)
     _exact_derivs[sys_num] = g->clone().release();
@@ -220,7 +220,7 @@ void ExactSolution::attach_exact_hessian (Tensor hptr(const Point& p,
       const System& system = _equation_systems.get_system(sys);
       _exact_hessians.push_back
         (new WrappedFunction<Tensor>
-          (system, hptr, &_equation_systems.parameters));
+         (system, hptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -251,7 +251,7 @@ void ExactSolution::attach_exact_hessian (unsigned int sys_num,
                                           FunctionBase<Tensor>* h)
 {
   if (_exact_hessians.size() <= sys_num)
-  _exact_hessians.resize(sys_num+1, NULL);
+    _exact_hessians.resize(sys_num+1, NULL);
 
   if (h)
     _exact_hessians[sys_num] = h->clone().release();
@@ -272,7 +272,7 @@ std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
   if (sys_iter == _errors.end())
     {
       libMesh::err << "Sorry, couldn't find the requested system '"
-                    << sys_name << "'."
+                   << sys_name << "'."
                    << std::endl;
       libmesh_error();
     }
@@ -283,7 +283,7 @@ std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
   if (var_iter == (*sys_iter).second.end())
     {
       libMesh::err << "Sorry, couldn't find the requested variable '"
-                    << unknown_name << "'."
+                   << unknown_name << "'."
                    << std::endl;
       libmesh_error();
     }
@@ -403,7 +403,7 @@ Real ExactSolution::error_norm(const std::string& sys_name,
     case L_INF:
       return error_vals[4];
 
-    // Currently only Sobolev norms/seminorms are supported
+      // Currently only Sobolev norms/seminorms are supported
     default:
       libmesh_error();
     }
@@ -867,8 +867,8 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   error_vals[4] = l_infty_norm;
 }
 
-  // Explicit instantiations of templated member functions
-  template void ExactSolution::_compute_error<Real>(const std::string&, const std::string&, std::vector<Real>&);
-  template void ExactSolution::_compute_error<RealGradient>(const std::string&, const std::string&, std::vector<Real>&);
+// Explicit instantiations of templated member functions
+template void ExactSolution::_compute_error<Real>(const std::string&, const std::string&, std::vector<Real>&);
+template void ExactSolution::_compute_error<RealGradient>(const std::string&, const std::string&, std::vector<Real>&);
 
 } // namespace libMesh

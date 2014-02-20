@@ -76,7 +76,7 @@ void usage(char *progName)
     "    -i <string>                   Input file name\n"
     "    -o <string>                   Output file name\n"
     "    -s <string>                   Solution file name\n"
-  "\n    -b                            Write the boundary conditions\n"
+    "\n    -b                            Write the boundary conditions\n"
     "    -B                            Like -b, but with activated MeshData\n"
     "    -D <factor>                   Randomly move interior nodes by D*hmin\n"
     "    -h                            Print help menu\n"
@@ -95,7 +95,7 @@ void usage(char *progName)
     "    -3                            Same, but to the highest possible:\n"
     "                                  Quad4 -> Quad9, Hex8 -> Hex27 etc\n"
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  "\n    -a                            Add infinite elements\n"
+    "\n    -a                            Add infinite elements\n"
     "    -x <coord>                    Specify infinite element origin\n"
     "    -y <coord>                    coordinates. If none given, origin\n"
     "    -z <coord>                    is determined automatically.\n"
@@ -104,8 +104,8 @@ void usage(char *progName)
     "    -Z                            When -X is given, -x <coord> also\n"
     "                                  has to be given.  Similar for y,z.\n"
 #endif
-/*  "\n    -l                            Build the L connectivity matrix \n"         */
-/*    "    -L                            Build the script L connectivity matrix \n"  */
+    /*  "\n    -l                            Build the L connectivity matrix \n"         */
+    /*    "    -L                            Build the script L connectivity matrix \n"  */
     "\n"
     "\n"
     " This program is used to convert and partions from/to a variety of\n"
@@ -463,12 +463,12 @@ void process_cmd_line(int argc, char **argv,
             x_sym = true;
             break;
           }
-          case 'Y':
+        case 'Y':
           {
             y_sym = true;
             break;
           }
-          case 'Z':
+        case 'Z':
           {
             z_sym = true;
             break;
@@ -679,7 +679,7 @@ int main (int argc, char** argv)
   /**
    * Maybe Triangulate
    */
-//  if (dim == 2 && triangulate)
+  //  if (dim == 2 && triangulate)
   if (triangulate)
     {
       if (verbose)
@@ -705,7 +705,7 @@ int main (int argc, char** argv)
                    << std::endl;
 
       MeshBase::const_element_iterator it  = mesh.active_elements_begin(),
-                                       end = mesh.active_elements_end();
+        end = mesh.active_elements_end();
       for (; it != end; ++it)
         {
           Elem *e = *it;
@@ -723,9 +723,9 @@ int main (int argc, char** argv)
                    << " elements below the cutoff." << std::endl;
 
       /*
-      for (unsigned int i=0; i<bad_elts.size(); i++)
+        for (unsigned int i=0; i<bad_elts.size(); i++)
         libMesh::out << bad_elts[i] << " ";
-      libMesh::out << std::endl;
+        libMesh::out << std::endl;
       */
 
       // Compute the histogram for this distribution
@@ -733,7 +733,7 @@ int main (int argc, char** argv)
       sv.histogram(histogram, n_bins);
 
       /*
-      for (unsigned int i=0; i<n_bins; i++)
+        for (unsigned int i=0; i<n_bins; i++)
         histogram[i] = histogram[i] / mesh.n_elem();
       */
 
@@ -796,7 +796,7 @@ int main (int argc, char** argv)
         }
 
       else
-          libmesh_error();
+        libmesh_error();
 
       if (verbose)
         libMesh::out << message << std::endl;
@@ -848,49 +848,49 @@ int main (int argc, char** argv)
 
 
   /*
-  char filechar[81];
-  sprintf(filechar,"%s-%04d.plt", "out", 0);
-  std::string oname(filechar);
+    char filechar[81];
+    sprintf(filechar,"%s-%04d.plt", "out", 0);
+    std::string oname(filechar);
 
-  mesh.write(oname);
+    mesh.write(oname);
 
-  for (unsigned int step=0; step<100; step++)
+    for (unsigned int step=0; step<100; step++)
     {
-//        const Real x = .5 + .25*cos((((Real) step)/100.)*3.1415927);
-//        const Real y = .5 + .25*sin((((Real) step)/100.)*3.1415927);
-      const Real x = 2.5*cos((((Real) step)/100.)*3.1415927);
-      const Real y = 2.5*sin((((Real) step)/100.)*3.1415927);
+    //        const Real x = .5 + .25*cos((((Real) step)/100.)*3.1415927);
+    //        const Real y = .5 + .25*sin((((Real) step)/100.)*3.1415927);
+    const Real x = 2.5*cos((((Real) step)/100.)*3.1415927);
+    const Real y = 2.5*sin((((Real) step)/100.)*3.1415927);
 
-      const Point p(x,y);
+    const Point p(x,y);
 
-      for (unsigned int e=0; e<mesh.n_elem(); e++)
-        if (mesh.elem(e)->active())
-          mesh.elem(e)->set_refinement_flag() = -1;
-
-
-
-      for (unsigned int e=0; e<mesh.n_elem(); e++)
-        if (mesh.elem(e)->active())
-          {
-            const Point diff = mesh.elem(e)->centroid(mesh) - p;
-
-            if (diff.size() < .5)
-              {
-                if (mesh.elem(e)->level() < 4)
-                  mesh.elem(e)->set_refinement_flag() = 1;
-                else if (mesh.elem(e)->level() == 4)
-                  mesh.elem(e)->set_refinement_flag() = 0;
-              }
-          }
+    for (unsigned int e=0; e<mesh.n_elem(); e++)
+    if (mesh.elem(e)->active())
+    mesh.elem(e)->set_refinement_flag() = -1;
 
 
-      mesh.mesh_refinement.refine_and_coarsen_elements();
 
-      char filechar[81];
-      sprintf(filechar,"%s-%04d.plt", "out", step+1);
-      std::string oname(filechar);
+    for (unsigned int e=0; e<mesh.n_elem(); e++)
+    if (mesh.elem(e)->active())
+    {
+    const Point diff = mesh.elem(e)->centroid(mesh) - p;
 
-      mesh.write(oname);
+    if (diff.size() < .5)
+    {
+    if (mesh.elem(e)->level() < 4)
+    mesh.elem(e)->set_refinement_flag() = 1;
+    else if (mesh.elem(e)->level() == 4)
+    mesh.elem(e)->set_refinement_flag() = 0;
+    }
+    }
+
+
+    mesh.mesh_refinement.refine_and_coarsen_elements();
+
+    char filechar[81];
+    sprintf(filechar,"%s-%04d.plt", "out", step+1);
+    std::string oname(filechar);
+
+    mesh.write(oname);
     }
   */
 
@@ -898,9 +898,9 @@ int main (int argc, char** argv)
 
 
 
-//     /**
-//      * Possibly partition the mesh
-//      */
+  //     /**
+  //      * Possibly partition the mesh
+  //      */
   if (n_subdomains > 1)
     mesh.partition(n_subdomains);
 
@@ -922,7 +922,7 @@ int main (int argc, char** argv)
         if (n_rsteps > 0)
           {
             if (verbose)
-                libMesh::out << " Mesh got refined, will write only _active_ elements." << std::endl;
+              libMesh::out << " Mesh got refined, will write only _active_ elements." << std::endl;
 
             Mesh new_mesh (init.comm(), mesh.mesh_dimension());
 
@@ -930,20 +930,20 @@ int main (int argc, char** argv)
 
             // now write the new_mesh
             if (names.size() == 2)
-                new_mesh.write(names[1]);
+              new_mesh.write(names[1]);
             else if (names.size() == 3)
-                new_mesh.write(names[1], soln, var_names);
+              new_mesh.write(names[1], soln, var_names);
             else
-                libmesh_error();
+              libmesh_error();
           }
         else
           {
             if (names.size() == 2)
-                mesh.write(names[1]);
+              mesh.write(names[1]);
             else if (names.size() == 3)
-                mesh.write(names[1], soln, var_names);
+              mesh.write(names[1], soln, var_names);
             else
-                libmesh_error();
+              libmesh_error();
           }
 
 
@@ -978,8 +978,8 @@ int main (int argc, char** argv)
   };
 
   /*
-  libMesh::out << "Infinite loop, look at memory footprint" << std::endl;
-  for (;;)
+    libMesh::out << "Infinite loop, look at memory footprint" << std::endl;
+    for (;;)
     ;
   */
 

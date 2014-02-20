@@ -137,145 +137,145 @@ void ContinuationSystem::initialize_tangent()
 
   // 1.) Compute delta_s_zero as ||u|| - ||u_old|| + ...
   // Compute norms of the current and previous solutions
-//   Real norm_u          = solution->l2_norm();
-//   Real norm_previous_u = previous_u->l2_norm();
+  //   Real norm_u          = solution->l2_norm();
+  //   Real norm_previous_u = previous_u->l2_norm();
 
-//   if (!quiet)
-//     {
-//       libMesh::out << "norm_u=" << norm_u << std::endl;
-//       libMesh::out << "norm_previous_u=" << norm_previous_u << std::endl;
-//     }
+  //   if (!quiet)
+  //     {
+  //       libMesh::out << "norm_u=" << norm_u << std::endl;
+  //       libMesh::out << "norm_previous_u=" << norm_previous_u << std::endl;
+  //     }
 
-//   if (norm_u == norm_previous_u)
-//     {
-//       libMesh::err << "Warning, it appears u and previous_u are the "
-//   << "same, are you sure this is correct?"
-//   << "It's possible you forgot to set one or the other..."
-//   << std::endl;
-//     }
+  //   if (norm_u == norm_previous_u)
+  //     {
+  //       libMesh::err << "Warning, it appears u and previous_u are the "
+  //   << "same, are you sure this is correct?"
+  //   << "It's possible you forgot to set one or the other..."
+  //   << std::endl;
+  //     }
 
-//   Real delta_s_zero = std::sqrt(
-//   (norm_u - norm_previous_u)*(norm_u - norm_previous_u) +
-//   (*continuation_parameter-old_continuation_parameter)*
-//   (*continuation_parameter-old_continuation_parameter)
-//   );
+  //   Real delta_s_zero = std::sqrt(
+  //   (norm_u - norm_previous_u)*(norm_u - norm_previous_u) +
+  //   (*continuation_parameter-old_continuation_parameter)*
+  //   (*continuation_parameter-old_continuation_parameter)
+  //   );
 
-//   // 2.) Compute delta_s_zero as ||u -u_old|| + ...
-//   *delta_u = *solution;
-//   delta_u->add(-1., *previous_u);
-//   delta_u->close();
-//   Real norm_delta_u = delta_u->l2_norm();
-//   Real norm_u          = solution->l2_norm();
-//   Real norm_previous_u = previous_u->l2_norm();
+  //   // 2.) Compute delta_s_zero as ||u -u_old|| + ...
+  //   *delta_u = *solution;
+  //   delta_u->add(-1., *previous_u);
+  //   delta_u->close();
+  //   Real norm_delta_u = delta_u->l2_norm();
+  //   Real norm_u          = solution->l2_norm();
+  //   Real norm_previous_u = previous_u->l2_norm();
 
-//   // Scale norm_delta_u by the bigger of either norm_u or norm_previous_u
-//   norm_delta_u /= std::max(norm_u, norm_previous_u);
+  //   // Scale norm_delta_u by the bigger of either norm_u or norm_previous_u
+  //   norm_delta_u /= std::max(norm_u, norm_previous_u);
 
-//   if (!quiet)
-//     {
-//       libMesh::out << "norm_u=" << norm_u << std::endl;
-//       libMesh::out << "norm_previous_u=" << norm_previous_u << std::endl;
-//       //libMesh::out << "norm_delta_u=" << norm_delta_u << std::endl;
-//       libMesh::out << "norm_delta_u/max(|u|,|u_old|)=" << norm_delta_u << std::endl;
-//       libMesh::out << "|norm_u-norm_previous_u|=" << std::abs(norm_u - norm_previous_u) << std::endl;
-//     }
+  //   if (!quiet)
+  //     {
+  //       libMesh::out << "norm_u=" << norm_u << std::endl;
+  //       libMesh::out << "norm_previous_u=" << norm_previous_u << std::endl;
+  //       //libMesh::out << "norm_delta_u=" << norm_delta_u << std::endl;
+  //       libMesh::out << "norm_delta_u/max(|u|,|u_old|)=" << norm_delta_u << std::endl;
+  //       libMesh::out << "|norm_u-norm_previous_u|=" << std::abs(norm_u - norm_previous_u) << std::endl;
+  //     }
 
-//   const Real dlambda = *continuation_parameter-old_continuation_parameter;
+  //   const Real dlambda = *continuation_parameter-old_continuation_parameter;
 
-//   if (!quiet)
-//     libMesh::out << "dlambda=" << dlambda << std::endl;
+  //   if (!quiet)
+  //     libMesh::out << "dlambda=" << dlambda << std::endl;
 
-//   Real delta_s_zero = std::sqrt(
-//   (norm_delta_u*norm_delta_u) +
-//   (dlambda*dlambda)
-//   );
+  //   Real delta_s_zero = std::sqrt(
+  //   (norm_delta_u*norm_delta_u) +
+  //   (dlambda*dlambda)
+  //   );
 
-//   if (!quiet)
-//     libMesh::out << "delta_s_zero=" << delta_s_zero << std::endl;
+  //   if (!quiet)
+  //     libMesh::out << "delta_s_zero=" << delta_s_zero << std::endl;
 
   // 1.) + 2.)
-//   // Now approximate the initial tangent d(lambda)/ds
-//   this->dlambda_ds = (*continuation_parameter-old_continuation_parameter) / delta_s_zero;
+  //   // Now approximate the initial tangent d(lambda)/ds
+  //   this->dlambda_ds = (*continuation_parameter-old_continuation_parameter) / delta_s_zero;
 
 
-//   // We can also approximate the deriv. wrt s by finite differences:
-//   // du/ds = (u1 - u0) / delta_s_zero.
-//   // FIXME: Use delta_u from above if we decide to keep that method.
-//   *du_ds = *solution;
-//   du_ds->add(-1., *previous_u);
-//   du_ds->scale(1./delta_s_zero);
-//   du_ds->close();
+  //   // We can also approximate the deriv. wrt s by finite differences:
+  //   // du/ds = (u1 - u0) / delta_s_zero.
+  //   // FIXME: Use delta_u from above if we decide to keep that method.
+  //   *du_ds = *solution;
+  //   du_ds->add(-1., *previous_u);
+  //   du_ds->scale(1./delta_s_zero);
+  //   du_ds->close();
 
 
   // 3.) Treating (u-previous_u)/(lambda - lambda_old) as an approximation to du/d(lambda),
   // we follow the same technique as Carnes and Shadid.
-//   const Real dlambda = *continuation_parameter-old_continuation_parameter;
-//   libmesh_assert_greater (dlambda, 0.);
+  //   const Real dlambda = *continuation_parameter-old_continuation_parameter;
+  //   libmesh_assert_greater (dlambda, 0.);
 
-//   // Use delta_u for temporary calculation of du/d(lambda)
-//   *delta_u = *solution;
-//   delta_u->add(-1., *previous_u);
-//   delta_u->scale(1. / dlambda);
-//   delta_u->close();
+  //   // Use delta_u for temporary calculation of du/d(lambda)
+  //   *delta_u = *solution;
+  //   delta_u->add(-1., *previous_u);
+  //   delta_u->scale(1. / dlambda);
+  //   delta_u->close();
 
-//   // Determine initial normalization parameter
-//   const Real solution_size = std::max(solution->l2_norm(), previous_u->l2_norm());
-//   if (solution_size > 1.)
-//     {
-//       Theta = 1./solution_size;
+  //   // Determine initial normalization parameter
+  //   const Real solution_size = std::max(solution->l2_norm(), previous_u->l2_norm());
+  //   if (solution_size > 1.)
+  //     {
+  //       Theta = 1./solution_size;
 
-//       if (!quiet)
-// libMesh::out << "Setting Normalization Parameter Theta=" << Theta << std::endl;
-//     }
+  //       if (!quiet)
+  // libMesh::out << "Setting Normalization Parameter Theta=" << Theta << std::endl;
+  //     }
 
-//   // Compute d(lambda)/ds
-//   // The correct sign of d(lambda)/ds should be positive, since we assume that (lambda > lambda_old)
-//   // but we could always double-check that as well.
-//   Real norm_delta_u = delta_u->l2_norm();
-//   this->dlambda_ds = 1. / std::sqrt(1. + Theta*Theta*norm_delta_u*norm_delta_u);
+  //   // Compute d(lambda)/ds
+  //   // The correct sign of d(lambda)/ds should be positive, since we assume that (lambda > lambda_old)
+  //   // but we could always double-check that as well.
+  //   Real norm_delta_u = delta_u->l2_norm();
+  //   this->dlambda_ds = 1. / std::sqrt(1. + Theta*Theta*norm_delta_u*norm_delta_u);
 
-//   // Finally, compute du/ds = d(lambda)/ds * du/d(lambda)
-//   *du_ds = *delta_u;
-//   du_ds->scale(dlambda_ds);
-//   du_ds->close();
+  //   // Finally, compute du/ds = d(lambda)/ds * du/d(lambda)
+  //   *du_ds = *delta_u;
+  //   du_ds->scale(dlambda_ds);
+  //   du_ds->close();
 
 
   // 4.) Use normalized arclength formula to estimate delta_s_zero
-//   // Determine initial normalization parameter
-//   set_Theta();
+  //   // Determine initial normalization parameter
+  //   set_Theta();
 
-//   // Compute (normalized) delta_s_zero
-//   *delta_u = *solution;
-//   delta_u->add(-1., *previous_u);
-//   delta_u->close();
-//   Real norm_delta_u = delta_u->l2_norm();
+  //   // Compute (normalized) delta_s_zero
+  //   *delta_u = *solution;
+  //   delta_u->add(-1., *previous_u);
+  //   delta_u->close();
+  //   Real norm_delta_u = delta_u->l2_norm();
 
-//   const Real dlambda = *continuation_parameter-old_continuation_parameter;
+  //   const Real dlambda = *continuation_parameter-old_continuation_parameter;
 
-//   if (!quiet)
-//     libMesh::out << "dlambda=" << dlambda << std::endl;
+  //   if (!quiet)
+  //     libMesh::out << "dlambda=" << dlambda << std::endl;
 
-//   Real delta_s_zero = std::sqrt(
-//   (Theta_LOCA*Theta_LOCA*Theta*norm_delta_u*norm_delta_u) +
-//   (dlambda*dlambda)
-//   );
-//   *du_ds = *delta_u;
-//   du_ds->scale(1./delta_s_zero);
-//   dlambda_ds = dlambda / delta_s_zero;
+  //   Real delta_s_zero = std::sqrt(
+  //   (Theta_LOCA*Theta_LOCA*Theta*norm_delta_u*norm_delta_u) +
+  //   (dlambda*dlambda)
+  //   );
+  //   *du_ds = *delta_u;
+  //   du_ds->scale(1./delta_s_zero);
+  //   dlambda_ds = dlambda / delta_s_zero;
 
-//   if (!quiet)
-//     {
-//       libMesh::out << "delta_s_zero=" << delta_s_zero << std::endl;
-//       libMesh::out << "initial d(lambda)/ds|_0 = " << dlambda_ds << std::endl;
-//       libMesh::out << "initial ||du_ds||_0 = " << du_ds->l2_norm() << std::endl;
-//     }
+  //   if (!quiet)
+  //     {
+  //       libMesh::out << "delta_s_zero=" << delta_s_zero << std::endl;
+  //       libMesh::out << "initial d(lambda)/ds|_0 = " << dlambda_ds << std::endl;
+  //       libMesh::out << "initial ||du_ds||_0 = " << du_ds->l2_norm() << std::endl;
+  //     }
 
-//   // FIXME: Also store the initial finite-differenced approximation to -du/dlambda as y.
-//   // We stick to the convention of storing negative y, since that is what we typically
-//   // solve for anyway.
-//   *y = *delta_u;
-//   y->scale(-1./dlambda);
-//   y->close();
+  //   // FIXME: Also store the initial finite-differenced approximation to -du/dlambda as y.
+  //   // We stick to the convention of storing negative y, since that is what we typically
+  //   // solve for anyway.
+  //   *y = *delta_u;
+  //   y->scale(-1./dlambda);
+  //   y->close();
 
 
 
@@ -687,7 +687,7 @@ void ContinuationSystem::continuation_solve()
 
           // Now, we are ready to compute the step delta_lambda
           const Number delta_lambda_comp = delta_lambda_numerator /
-                                           delta_lambda_denominator;
+            delta_lambda_denominator;
           // Lambda is real-valued
           const Real delta_lambda = libmesh_real(delta_lambda_comp);
 
@@ -1010,24 +1010,24 @@ void ContinuationSystem::solve_tangent()
 
 
   // 1.) Previous, probably wrong, technique!
-//   // Solve for the updated d(lambda)/ds
-//   // denom = N_{lambda}   - (du_ds)^t y
-//   //       = d(lambda)/ds - (du_ds)^t y
-//   Real denom = dlambda_ds - du_ds->dot(*y);
+  //   // Solve for the updated d(lambda)/ds
+  //   // denom = N_{lambda}   - (du_ds)^t y
+  //   //       = d(lambda)/ds - (du_ds)^t y
+  //   Real denom = dlambda_ds - du_ds->dot(*y);
 
-//   //libMesh::out << "denom=" << denom << std::endl;
-//   libmesh_assert_not_equal_to (denom, 0.0);
+  //   //libMesh::out << "denom=" << denom << std::endl;
+  //   libmesh_assert_not_equal_to (denom, 0.0);
 
-//   dlambda_ds = 1.0 / denom;
+  //   dlambda_ds = 1.0 / denom;
 
 
-//   if (!quiet)
-//     libMesh::out << "dlambda_ds=" << dlambda_ds << std::endl;
+  //   if (!quiet)
+  //     libMesh::out << "dlambda_ds=" << dlambda_ds << std::endl;
 
-//   // Compute the updated value of du/ds = -_dlambda_ds * y
-//   du_ds->zero();
-//   du_ds->add(-dlambda_ds, *y);
-//   du_ds->close();
+  //   // Compute the updated value of du/ds = -_dlambda_ds * y
+  //   du_ds->zero();
+  //   du_ds->add(-dlambda_ds, *y);
+  //   du_ds->close();
 
 
   // 2.) From Brian Carnes' paper...
@@ -1045,7 +1045,7 @@ void ContinuationSystem::solve_tangent()
 
   const Real sgn_dlambda_ds =
     libmesh_real(Theta_LOCA*Theta_LOCA*Theta*y->dot(*delta_u) +
-    (*continuation_parameter-old_continuation_parameter));
+                 (*continuation_parameter-old_continuation_parameter));
 
   if (sgn_dlambda_ds < 0.)
     {
@@ -1081,64 +1081,64 @@ void ContinuationSystem::set_Theta()
   //Theta = 1./normu/normu;
 
   // // 1.) Use the norm of du, squared
-//   *delta_u = *solution;
-//   delta_u->add(-1, *previous_u);
-//   delta_u->close();
-//   const Real normdu = delta_u->l2_norm();
+  //   *delta_u = *solution;
+  //   delta_u->add(-1, *previous_u);
+  //   delta_u->close();
+  //   const Real normdu = delta_u->l2_norm();
 
-//   if (normdu < 1.) // don't divide by zero or make a huge scaling parameter.
-//     Theta = 1.;
-//   else
-//     Theta = 1./normdu/normdu;
+  //   if (normdu < 1.) // don't divide by zero or make a huge scaling parameter.
+  //     Theta = 1.;
+  //   else
+  //     Theta = 1./normdu/normdu;
 
   // 2.) Use 1.0, i.e. don't scale
   Theta=1.;
 
   // 3.) Use a formula which attempts to make the "solution triangle" isosceles.
-//   libmesh_assert_less (std::abs(dlambda_ds), 1.);
+  //   libmesh_assert_less (std::abs(dlambda_ds), 1.);
 
-//   *delta_u = *solution;
-//   delta_u->add(-1, *previous_u);
-//   delta_u->close();
-//   const Real normdu = delta_u->l2_norm();
+  //   *delta_u = *solution;
+  //   delta_u->add(-1, *previous_u);
+  //   delta_u->close();
+  //   const Real normdu = delta_u->l2_norm();
 
-//   Theta = std::sqrt(1. - dlambda_ds*dlambda_ds) / normdu * tau * ds;
+  //   Theta = std::sqrt(1. - dlambda_ds*dlambda_ds) / normdu * tau * ds;
 
 
-//   // 4.) Use the norm of du and the norm of du/ds
-//   *delta_u = *solution;
-//   delta_u->add(-1, *previous_u);
-//   delta_u->close();
-//   const Real normdu   = delta_u->l2_norm();
-//   du_ds->close();
-//   const Real normduds = du_ds->l2_norm();
+  //   // 4.) Use the norm of du and the norm of du/ds
+  //   *delta_u = *solution;
+  //   delta_u->add(-1, *previous_u);
+  //   delta_u->close();
+  //   const Real normdu   = delta_u->l2_norm();
+  //   du_ds->close();
+  //   const Real normduds = du_ds->l2_norm();
 
-//   if (normduds < 1.e-12)
-//     {
-//       libMesh::out << "Setting initial Theta= 1./normdu/normdu" << std::endl;
-//       libMesh::out << "normdu=" << normdu << std::endl;
+  //   if (normduds < 1.e-12)
+  //     {
+  //       libMesh::out << "Setting initial Theta= 1./normdu/normdu" << std::endl;
+  //       libMesh::out << "normdu=" << normdu << std::endl;
 
-//       // Don't use this scaling if the solution delta is already O(1)
-//       if (normdu > 1.)
-// Theta = 1./normdu/normdu;
-//       else
-// Theta = 1.;
-//     }
-//   else
-//     {
-//       libMesh::out << "Setting Theta= 1./normdu/normduds" << std::endl;
-//       libMesh::out << "normdu=" << normdu << std::endl;
-//       libMesh::out << "normduds=" << normduds << std::endl;
+  //       // Don't use this scaling if the solution delta is already O(1)
+  //       if (normdu > 1.)
+  // Theta = 1./normdu/normdu;
+  //       else
+  // Theta = 1.;
+  //     }
+  //   else
+  //     {
+  //       libMesh::out << "Setting Theta= 1./normdu/normduds" << std::endl;
+  //       libMesh::out << "normdu=" << normdu << std::endl;
+  //       libMesh::out << "normduds=" << normduds << std::endl;
 
-//       // Don't use this scaling if the solution delta is already O(1)
-//       if ((normdu>1.) || (normduds>1.))
-// Theta = 1./normdu/normduds;
-//       else
-// Theta = 1.;
-//     }
+  //       // Don't use this scaling if the solution delta is already O(1)
+  //       if ((normdu>1.) || (normduds>1.))
+  // Theta = 1./normdu/normduds;
+  //       else
+  // Theta = 1.;
+  //     }
 
- if (!quiet)
-   libMesh::out << "Setting Normalization Parameter Theta=" << Theta << std::endl;
+  if (!quiet)
+    libMesh::out << "Setting Normalization Parameter Theta=" << Theta << std::endl;
 }
 
 
@@ -1154,27 +1154,27 @@ void ContinuationSystem::set_Theta_LOCA()
   libmesh_assert_less (std::abs(dlambda_ds), 1.);
 
   // 1.) Attempt to implement the method in LOCA paper
-//   const Real g = 1./std::sqrt(2.); // "desired" dlambda_ds
+  //   const Real g = 1./std::sqrt(2.); // "desired" dlambda_ds
 
-//   // According to the LOCA people, we only renormalize for
-//   // when |dlambda_ds| exceeds some pre-selected maximum (which they take to be zero, btw).
-//   if (std::abs(dlambda_ds) > .9)
-//     {
-//       // Note the *= ... This is updating the previous value of Theta_LOCA
-//       // Note: The LOCA people actually use Theta_LOCA^2 to normalize their arclength constraint.
-//       Theta_LOCA *= std::abs( (dlambda_ds/g)*std::sqrt( (1.-g*g) / (1.-dlambda_ds*dlambda_ds) ) );
+  //   // According to the LOCA people, we only renormalize for
+  //   // when |dlambda_ds| exceeds some pre-selected maximum (which they take to be zero, btw).
+  //   if (std::abs(dlambda_ds) > .9)
+  //     {
+  //       // Note the *= ... This is updating the previous value of Theta_LOCA
+  //       // Note: The LOCA people actually use Theta_LOCA^2 to normalize their arclength constraint.
+  //       Theta_LOCA *= std::abs( (dlambda_ds/g)*std::sqrt( (1.-g*g) / (1.-dlambda_ds*dlambda_ds) ) );
 
-//       // Suggested max-allowable value for Theta_LOCA
-//       if (Theta_LOCA > 1.e8)
-// {
-//   Theta_LOCA = 1.e8;
+  //       // Suggested max-allowable value for Theta_LOCA
+  //       if (Theta_LOCA > 1.e8)
+  // {
+  //   Theta_LOCA = 1.e8;
 
-//   if (!quiet)
-//     libMesh::out << "max Theta_LOCA=" << Theta_LOCA << " has been selected." << std::endl;
-// }
-//     }
-//   else
-//     Theta_LOCA=1.0;
+  //   if (!quiet)
+  //     libMesh::out << "max Theta_LOCA=" << Theta_LOCA << " has been selected." << std::endl;
+  // }
+  //     }
+  //   else
+  //     Theta_LOCA=1.0;
 
   // 2.) FIXME: Should we do *= or just =?  This function is of dlambda_ds is
   //  < 1,  |dlambda_ds| < 1/sqrt(2) ~~ .7071
@@ -1259,10 +1259,10 @@ void ContinuationSystem::update_solution()
       // 2.) Technique 1 tends to shrink the step fairly well (and even if it doesn't
       // get very small, we still have step reduction) but it seems to grow the step
       // very slowly.  Another possible technique is step-doubling:
-//       if (yold_over_y > 1.)
-//       ds_current *= 2.;
-//       else
-// ds_current *= yold_over_y;
+      //       if (yold_over_y > 1.)
+      //       ds_current *= 2.;
+      //       else
+      // ds_current *= yold_over_y;
 
       // 3.) Technique 2 may over-zealous when we are also using the Newton stepgrowth
       // factor.  For technique 3 we multiply by yold_over_y unless yold_over_y > 2

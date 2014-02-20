@@ -89,7 +89,7 @@ std::string ElementTypes::basic_name (const ElemType t)
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-    // infinite elements
+      // infinite elements
     case INFEDGE2:
       {
         its_name = "Infinite Edge";

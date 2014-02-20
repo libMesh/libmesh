@@ -114,16 +114,16 @@ bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
   // will be used, so catch that as an error
 
   if (_solver->residual && _solver->residual_object)
-  {
-    libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Residual!" << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Residual!" << std::endl;
+      libmesh_error();
+    }
 
   if (_solver->matvec && _solver->residual_and_jacobian_object)
-  {
-    libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
+      libmesh_error();
+    }
   //-----------------------------------------------------------------------------
 
   if      (_solver->residual != NULL)                     _solver->residual                                            (*sys.current_local_solution.get(), R, sys);
@@ -166,16 +166,16 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
   if (_solver->jacobian && _solver->jacobian_object)
-  {
-    libMesh::err << "ERROR: cannot specify both a function and object to compute the Jacobian!" << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "ERROR: cannot specify both a function and object to compute the Jacobian!" << std::endl;
+      libmesh_error();
+    }
 
   if (_solver->matvec && _solver->residual_and_jacobian_object)
-  {
-    libMesh::err << "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!" << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!" << std::endl;
+      libmesh_error();
+    }
   //-----------------------------------------------------------------------------
 
   if      (_solver->jacobian != NULL)                     _solver->jacobian                                            (*sys.current_local_solution.get(), Jac, sys);
@@ -194,8 +194,8 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
 
 bool Problem_Interface::computePrecMatrix(const Epetra_Vector & /*x*/, Epetra_RowMatrix & /*M*/)
 {
-//   libMesh::out << "ERROR: Problem_Interface::preconditionVector() - Use Explicit Jacobian only for this test problem!" << endl;
-   throw 1;
+  //   libMesh::out << "ERROR: Problem_Interface::preconditionVector() - Use Explicit Jacobian only for this test problem!" << endl;
+  throw 1;
 }
 
 bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
@@ -226,16 +226,16 @@ bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
   if (_solver->jacobian && _solver->jacobian_object)
-  {
-    libMesh::err << "ERROR: cannot specify both a function and object to compute the Jacobian!" << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "ERROR: cannot specify both a function and object to compute the Jacobian!" << std::endl;
+      libmesh_error();
+    }
 
   if (_solver->matvec && _solver->residual_and_jacobian_object)
-  {
-    libMesh::err << "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!" << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!" << std::endl;
+      libmesh_error();
+    }
   //-----------------------------------------------------------------------------
 
   if      (_solver->jacobian != NULL)                     _solver->jacobian                                            (*sys.current_local_solution.get(), Jac, sys);
@@ -322,41 +322,41 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T>&  /* jac_in */,  // System Jacobia
   Teuchos::RCP<Epetra_Operator> pc;
 
   if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
-  {
-    if(this->_preconditioner)
     {
-      // PJNFK
-      lsParams.set("Preconditioner", "User Defined");
+      if(this->_preconditioner)
+        {
+          // PJNFK
+          lsParams.set("Preconditioner", "User Defined");
 
-      TrilinosPreconditioner<Number> * trilinos_pc = libmesh_cast_ptr<TrilinosPreconditioner<Number> *>(this->_preconditioner);
-      pc = Teuchos::rcp(trilinos_pc);
+          TrilinosPreconditioner<Number> * trilinos_pc = libmesh_cast_ptr<TrilinosPreconditioner<Number> *>(this->_preconditioner);
+          pc = Teuchos::rcp(trilinos_pc);
 
-      Teuchos::RCP<NOX::Epetra::Interface::Preconditioner> iPrec(_interface);
-      linSys = Teuchos::rcp(new NOX::Epetra::LinearSystemAztecOO(printParams, lsParams, iReq, iPrec, pc, x));
+          Teuchos::RCP<NOX::Epetra::Interface::Preconditioner> iPrec(_interface);
+          linSys = Teuchos::rcp(new NOX::Epetra::LinearSystemAztecOO(printParams, lsParams, iReq, iPrec, pc, x));
+        }
+      else
+        {
+          lsParams.set("Preconditioner", "None");
+          //      lsParams.set("Preconditioner", "Ifpack");
+          //      lsParams.set("Preconditioner", "AztecOO");
+
+          // full jacobian
+          NonlinearImplicitSystem & sys = _interface->_solver->system();
+          EpetraMatrix<Number> & jacSys = *libmesh_cast_ptr<EpetraMatrix<Number>*>(sys.matrix);
+          Teuchos::RCP<Epetra_RowMatrix> jacMat = Teuchos::rcp(jacSys.mat());
+
+          Teuchos::RCP<NOX::Epetra::Interface::Jacobian> iJac(_interface);
+          linSys = Teuchos::rcp(new NOX::Epetra::LinearSystemAztecOO(printParams, lsParams, iReq, iJac, jacMat, x));
+        }
     }
-    else
-    {
-      lsParams.set("Preconditioner", "None");
-//      lsParams.set("Preconditioner", "Ifpack");
-//      lsParams.set("Preconditioner", "AztecOO");
-
-      // full jacobian
-      NonlinearImplicitSystem & sys = _interface->_solver->system();
-      EpetraMatrix<Number> & jacSys = *libmesh_cast_ptr<EpetraMatrix<Number>*>(sys.matrix);
-      Teuchos::RCP<Epetra_RowMatrix> jacMat = Teuchos::rcp(jacSys.mat());
-
-      Teuchos::RCP<NOX::Epetra::Interface::Jacobian> iJac(_interface);
-      linSys = Teuchos::rcp(new NOX::Epetra::LinearSystemAztecOO(printParams, lsParams, iReq, iJac, jacMat, x));
-    }
-  }
   else
-  {
-    // matrix free
-    Teuchos::RCP<NOX::Epetra::MatrixFree> MF = Teuchos::rcp(new NOX::Epetra::MatrixFree(printParams, iReq, x));
+    {
+      // matrix free
+      Teuchos::RCP<NOX::Epetra::MatrixFree> MF = Teuchos::rcp(new NOX::Epetra::MatrixFree(printParams, iReq, x));
 
-    Teuchos::RCP<NOX::Epetra::Interface::Jacobian> iJac(MF);
-    linSys = Teuchos::rcp(new NOX::Epetra::LinearSystemAztecOO(printParams, lsParams, iReq, iJac, MF, x));
-  }
+      Teuchos::RCP<NOX::Epetra::Interface::Jacobian> iJac(MF);
+      linSys = Teuchos::rcp(new NOX::Epetra::LinearSystemAztecOO(printParams, lsParams, iReq, iJac, MF, x));
+    }
 
   //create group
   Teuchos::RCP<NOX::Epetra::Group> grpPtr = Teuchos::rcp(new NOX::Epetra::Group(printParams, iReq, x, linSys));

@@ -172,7 +172,7 @@ KellyErrorEstimator::attach_flux_bc_function (std::pair<bool,Real> fptr(const Sy
 {
   _bc_function = fptr;
 
-// We may be turning boundary side integration on or off
+  // We may be turning boundary side integration on or off
   if (fptr)
     integrate_boundary_sides = true;
   else

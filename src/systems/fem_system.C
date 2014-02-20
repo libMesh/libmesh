@@ -36,31 +36,125 @@
 #include "libmesh/fe_interface.h"
 
 namespace {
-  using namespace libMesh;
+using namespace libMesh;
 
-  // give this guy some scope since there
-  // is underlying vector allocation upon
-  // creation/deletion
-  ConstElemRange elem_range;
+// give this guy some scope since there
+// is underlying vector allocation upon
+// creation/deletion
+ConstElemRange elem_range;
 
-  typedef Threads::spin_mutex femsystem_mutex;
-  femsystem_mutex assembly_mutex;
+typedef Threads::spin_mutex femsystem_mutex;
+femsystem_mutex assembly_mutex;
 
-  void assemble_unconstrained_element_system
-    (const FEMSystem& _sys,
-     const bool _get_jacobian,
-     FEMContext &_femcontext)
+void assemble_unconstrained_element_system
+(const FEMSystem& _sys,
+ const bool _get_jacobian,
+ FEMContext &_femcontext)
+{
+  bool jacobian_computed =
+    _sys.time_solver->element_residual(_get_jacobian, _femcontext);
+
+  // Compute a numeric jacobian if we have to
+  if (_get_jacobian && !jacobian_computed)
     {
-      bool jacobian_computed =
-        _sys.time_solver->element_residual(_get_jacobian, _femcontext);
+      // Make sure we didn't compute a jacobian and lie about it
+      libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
+      // Logging of numerical jacobians is done separately
+      _sys.numerical_elem_jacobian(_femcontext);
+    }
+
+  // Compute a numeric jacobian if we're asked to verify the
+  // analytic jacobian we got
+  if (_get_jacobian && jacobian_computed &&
+      _sys.verify_analytic_jacobians != 0.0)
+    {
+      DenseMatrix<Number> analytic_jacobian(_femcontext.get_elem_jacobian());
+
+      _femcontext.get_elem_jacobian().zero();
+      // Logging of numerical jacobians is done separately
+      _sys.numerical_elem_jacobian(_femcontext);
+
+      Real analytic_norm = analytic_jacobian.l1_norm();
+      Real numerical_norm = _femcontext.get_elem_jacobian().l1_norm();
+
+      // If we can continue, we'll probably prefer the analytic jacobian
+      analytic_jacobian.swap(_femcontext.get_elem_jacobian());
+
+      // The matrix "analytic_jacobian" will now hold the error matrix
+      analytic_jacobian.add(-1.0, _femcontext.get_elem_jacobian());
+      Real error_norm = analytic_jacobian.l1_norm();
+
+      Real relative_error = error_norm /
+        std::max(analytic_norm, numerical_norm);
+
+      if (relative_error > _sys.verify_analytic_jacobians)
+        {
+          libMesh::err << "Relative error " << relative_error
+                       << " detected in analytic jacobian on element "
+                       << _femcontext.get_elem().id() << '!' << std::endl;
+
+          std::streamsize old_precision = libMesh::out.precision();
+          libMesh::out.precision(16);
+          libMesh::out << "J_analytic " << _femcontext.get_elem().id() << " = "
+                       << _femcontext.get_elem_jacobian() << std::endl;
+          analytic_jacobian.add(1.0, _femcontext.get_elem_jacobian());
+          libMesh::out << "J_numeric " << _femcontext.get_elem().id() << " = "
+                       << analytic_jacobian << std::endl;
+
+          libMesh::out.precision(old_precision);
+
+          libmesh_error();
+        }
+    }
+
+  for (_femcontext.side = 0;
+       _femcontext.side != _femcontext.get_elem().n_sides();
+       ++_femcontext.side)
+    {
+      // Don't compute on non-boundary sides unless requested
+      if (!_sys.get_physics()->compute_internal_sides &&
+          _femcontext.get_elem().neighbor(_femcontext.side) != NULL)
+        continue;
+
+      // Any mesh movement has already been done (and restored,
+      // if the TimeSolver isn't broken), but
+      // reinitializing the side FE objects is still necessary
+      _femcontext.side_fe_reinit();
+
+      DenseMatrix<Number> old_jacobian;
+      // If we're in DEBUG mode, we should always verify that the
+      // user's side_residual function doesn't alter our existing
+      // jacobian and then lie about it
+#ifndef DEBUG
+      // Even if we're not in DEBUG mode, when we're verifying
+      // analytic jacobians we'll want to verify each side's
+      // jacobian contribution separately.
+      /* PB: We also need to account for the case when the user wants to
+         use numerical Jacobians and not analytic Jacobians */
+      if ( (_sys.verify_analytic_jacobians != 0.0 && _get_jacobian) ||
+           (!jacobian_computed && _get_jacobian) )
+#endif // ifndef DEBUG
+        {
+          old_jacobian = _femcontext.get_elem_jacobian();
+          _femcontext.get_elem_jacobian().zero();
+        }
+      jacobian_computed =
+        _sys.time_solver->side_residual(_get_jacobian, _femcontext);
 
       // Compute a numeric jacobian if we have to
       if (_get_jacobian && !jacobian_computed)
         {
-          // Make sure we didn't compute a jacobian and lie about it
+          // In DEBUG mode, we've already set elem_jacobian == 0,
+          // so we can make sure side_residual didn't compute a
+          // jacobian and lie about it
+#ifdef DEBUG
           libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
+#endif
           // Logging of numerical jacobians is done separately
-          _sys.numerical_elem_jacobian(_femcontext);
+          _sys.numerical_side_jacobian(_femcontext);
+
+          // Add back in element interior numerical Jacobian
+          _femcontext.get_elem_jacobian() += old_jacobian;
         }
 
       // Compute a numeric jacobian if we're asked to verify the
@@ -72,7 +166,7 @@ namespace {
 
           _femcontext.get_elem_jacobian().zero();
           // Logging of numerical jacobians is done separately
-          _sys.numerical_elem_jacobian(_femcontext);
+          _sys.numerical_side_jacobian(_femcontext);
 
           Real analytic_norm = analytic_jacobian.l1_norm();
           Real numerical_norm = _femcontext.get_elem_jacobian().l1_norm();
@@ -85,13 +179,15 @@ namespace {
           Real error_norm = analytic_jacobian.l1_norm();
 
           Real relative_error = error_norm /
-                                std::max(analytic_norm, numerical_norm);
+            std::max(analytic_norm, numerical_norm);
 
           if (relative_error > _sys.verify_analytic_jacobians)
             {
               libMesh::err << "Relative error " << relative_error
                            << " detected in analytic jacobian on element "
-                           << _femcontext.get_elem().id() << '!' << std::endl;
+                           << _femcontext.get_elem().id()
+                           << ", side "
+                           << static_cast<unsigned int>(_femcontext.side) << '!' << std::endl;
 
               std::streamsize old_precision = libMesh::out.precision();
               libMesh::out.precision(16);
@@ -100,444 +196,348 @@ namespace {
               analytic_jacobian.add(1.0, _femcontext.get_elem_jacobian());
               libMesh::out << "J_numeric " << _femcontext.get_elem().id() << " = "
                            << analytic_jacobian << std::endl;
-
               libMesh::out.precision(old_precision);
 
               libmesh_error();
             }
+          // Once we've verified a side, we'll want to add back the
+          // rest of the accumulated jacobian
+          _femcontext.get_elem_jacobian() += old_jacobian;
         }
-
-      for (_femcontext.side = 0;
-           _femcontext.side != _femcontext.get_elem().n_sides();
-           ++_femcontext.side)
+      // In DEBUG mode, we've set elem_jacobian == 0, and we
+      // may still need to add the old jacobian back
+#ifdef DEBUG
+      if (_get_jacobian && jacobian_computed &&
+          _sys.verify_analytic_jacobians == 0.0)
         {
-          // Don't compute on non-boundary sides unless requested
-          if (!_sys.get_physics()->compute_internal_sides &&
-              _femcontext.get_elem().neighbor(_femcontext.side) != NULL)
-            continue;
-
-          // Any mesh movement has already been done (and restored,
-          // if the TimeSolver isn't broken), but
-          // reinitializing the side FE objects is still necessary
-          _femcontext.side_fe_reinit();
-
-          DenseMatrix<Number> old_jacobian;
-          // If we're in DEBUG mode, we should always verify that the
-          // user's side_residual function doesn't alter our existing
-          // jacobian and then lie about it
-#ifndef DEBUG
-          // Even if we're not in DEBUG mode, when we're verifying
-          // analytic jacobians we'll want to verify each side's
-          // jacobian contribution separately.
-          /* PB: We also need to account for the case when the user wants to
-             use numerical Jacobians and not analytic Jacobians */
-          if ( (_sys.verify_analytic_jacobians != 0.0 && _get_jacobian) ||
-               (!jacobian_computed && _get_jacobian) )
-#endif // ifndef DEBUG
-            {
-              old_jacobian = _femcontext.get_elem_jacobian();
-              _femcontext.get_elem_jacobian().zero();
-            }
-          jacobian_computed =
-            _sys.time_solver->side_residual(_get_jacobian, _femcontext);
-
-          // Compute a numeric jacobian if we have to
-          if (_get_jacobian && !jacobian_computed)
-            {
-              // In DEBUG mode, we've already set elem_jacobian == 0,
-              // so we can make sure side_residual didn't compute a
-              // jacobian and lie about it
-#ifdef DEBUG
-              libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
-#endif
-              // Logging of numerical jacobians is done separately
-              _sys.numerical_side_jacobian(_femcontext);
-
-              // Add back in element interior numerical Jacobian
-              _femcontext.get_elem_jacobian() += old_jacobian;
-            }
-
-          // Compute a numeric jacobian if we're asked to verify the
-          // analytic jacobian we got
-          if (_get_jacobian && jacobian_computed &&
-              _sys.verify_analytic_jacobians != 0.0)
-            {
-              DenseMatrix<Number> analytic_jacobian(_femcontext.get_elem_jacobian());
-
-              _femcontext.get_elem_jacobian().zero();
-              // Logging of numerical jacobians is done separately
-              _sys.numerical_side_jacobian(_femcontext);
-
-              Real analytic_norm = analytic_jacobian.l1_norm();
-              Real numerical_norm = _femcontext.get_elem_jacobian().l1_norm();
-
-              // If we can continue, we'll probably prefer the analytic jacobian
-              analytic_jacobian.swap(_femcontext.get_elem_jacobian());
-
-              // The matrix "analytic_jacobian" will now hold the error matrix
-              analytic_jacobian.add(-1.0, _femcontext.get_elem_jacobian());
-              Real error_norm = analytic_jacobian.l1_norm();
-
-              Real relative_error = error_norm /
-                                    std::max(analytic_norm, numerical_norm);
-
-              if (relative_error > _sys.verify_analytic_jacobians)
-                {
-                  libMesh::err << "Relative error " << relative_error
-                               << " detected in analytic jacobian on element "
-                               << _femcontext.get_elem().id()
-                               << ", side "
-                               << static_cast<unsigned int>(_femcontext.side) << '!' << std::endl;
-
-                  std::streamsize old_precision = libMesh::out.precision();
-                  libMesh::out.precision(16);
-                  libMesh::out << "J_analytic " << _femcontext.get_elem().id() << " = "
-                               << _femcontext.get_elem_jacobian() << std::endl;
-                  analytic_jacobian.add(1.0, _femcontext.get_elem_jacobian());
-                  libMesh::out << "J_numeric " << _femcontext.get_elem().id() << " = "
-                               << analytic_jacobian << std::endl;
-                  libMesh::out.precision(old_precision);
-
-                  libmesh_error();
-                }
-              // Once we've verified a side, we'll want to add back the
-              // rest of the accumulated jacobian
-              _femcontext.get_elem_jacobian() += old_jacobian;
-            }
-          // In DEBUG mode, we've set elem_jacobian == 0, and we
-          // may still need to add the old jacobian back
-#ifdef DEBUG
-          if (_get_jacobian && jacobian_computed &&
-              _sys.verify_analytic_jacobians == 0.0)
-            {
-              _femcontext.get_elem_jacobian() += old_jacobian;
-            }
+          _femcontext.get_elem_jacobian() += old_jacobian;
+        }
 #endif // ifdef DEBUG
-        }
     }
+}
 
-  class AssemblyContributions
+class AssemblyContributions
+{
+public:
+  /**
+   * constructor to set context
+   */
+  AssemblyContributions(FEMSystem &sys,
+                        bool get_residual,
+                        bool get_jacobian) :
+    _sys(sys),
+    _get_residual(get_residual),
+    _get_jacobian(get_jacobian) {}
+
+  /**
+   * operator() for use with Threads::parallel_for().
+   */
+  void operator()(const ConstElemRange &range) const
   {
-  public:
-    /**
-     * constructor to set context
-     */
-    AssemblyContributions(FEMSystem &sys,
-                          bool get_residual,
-                          bool get_jacobian) :
-      _sys(sys),
-      _get_residual(get_residual),
-      _get_jacobian(get_jacobian) {}
+    AutoPtr<DiffContext> con = _sys.build_context();
+    FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+    _sys.init_context(_femcontext);
 
-    /**
-     * operator() for use with Threads::parallel_for().
-     */
-    void operator()(const ConstElemRange &range) const
-    {
-      AutoPtr<DiffContext> con = _sys.build_context();
-      FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
-      _sys.init_context(_femcontext);
+    for (ConstElemRange::const_iterator elem_it = range.begin();
+         elem_it != range.end(); ++elem_it)
+      {
+        Elem *el = const_cast<Elem *>(*elem_it);
 
-      for (ConstElemRange::const_iterator elem_it = range.begin();
-           elem_it != range.end(); ++elem_it)
-        {
-          Elem *el = const_cast<Elem *>(*elem_it);
+        _femcontext.pre_fe_reinit(_sys, el);
+        _femcontext.elem_fe_reinit();
 
-          _femcontext.pre_fe_reinit(_sys, el);
-          _femcontext.elem_fe_reinit();
-
-          assemble_unconstrained_element_system
-            (_sys, _get_jacobian, _femcontext);
+        assemble_unconstrained_element_system
+          (_sys, _get_jacobian, _femcontext);
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-          // We turn off the asymmetric constraint application;
-          // enforce_constraints_exactly() should be called in the solver
-          if (_get_residual && _get_jacobian)
-            _sys.get_dof_map().constrain_element_matrix_and_vector
-              (_femcontext.get_elem_jacobian(), _femcontext.get_elem_residual(),
-               _femcontext.get_dof_indices(), false);
-          else if (_get_residual)
-            _sys.get_dof_map().constrain_element_vector
-              (_femcontext.get_elem_residual(), _femcontext.get_dof_indices(), false);
-          else if (_get_jacobian)
-            _sys.get_dof_map().constrain_element_matrix
-              (_femcontext.get_elem_jacobian(), _femcontext.get_dof_indices(), false);
+        // We turn off the asymmetric constraint application;
+        // enforce_constraints_exactly() should be called in the solver
+        if (_get_residual && _get_jacobian)
+          _sys.get_dof_map().constrain_element_matrix_and_vector
+            (_femcontext.get_elem_jacobian(), _femcontext.get_elem_residual(),
+             _femcontext.get_dof_indices(), false);
+        else if (_get_residual)
+          _sys.get_dof_map().constrain_element_vector
+            (_femcontext.get_elem_residual(), _femcontext.get_dof_indices(), false);
+        else if (_get_jacobian)
+          _sys.get_dof_map().constrain_element_matrix
+            (_femcontext.get_elem_jacobian(), _femcontext.get_dof_indices(), false);
 #endif // #ifdef LIBMESH_ENABLE_CONSTRAINTS
 
-          if (_get_jacobian && _sys.print_element_jacobians)
-            {
-              std::streamsize old_precision = libMesh::out.precision();
-              libMesh::out.precision(16);
-              libMesh::out << "J_elem " << _femcontext.get_elem().id() << " = "
-                        << _femcontext.get_elem_jacobian() << std::endl;
-              libMesh::out.precision(old_precision);
-            }
+        if (_get_jacobian && _sys.print_element_jacobians)
+          {
+            std::streamsize old_precision = libMesh::out.precision();
+            libMesh::out.precision(16);
+            libMesh::out << "J_elem " << _femcontext.get_elem().id() << " = "
+                         << _femcontext.get_elem_jacobian() << std::endl;
+            libMesh::out.precision(old_precision);
+          }
 
-          { // A lock is necessary around access to the global system
-            femsystem_mutex::scoped_lock lock(assembly_mutex);
+        { // A lock is necessary around access to the global system
+          femsystem_mutex::scoped_lock lock(assembly_mutex);
 
-            if (_get_jacobian)
-              _sys.matrix->add_matrix (_femcontext.get_elem_jacobian(),
-                                       _femcontext.get_dof_indices());
-            if (_get_residual)
-              _sys.rhs->add_vector (_femcontext.get_elem_residual(),
-                                    _femcontext.get_dof_indices());
-          } // Scope for assembly mutex
+          if (_get_jacobian)
+            _sys.matrix->add_matrix (_femcontext.get_elem_jacobian(),
+                                     _femcontext.get_dof_indices());
+          if (_get_residual)
+            _sys.rhs->add_vector (_femcontext.get_elem_residual(),
+                                  _femcontext.get_dof_indices());
+        } // Scope for assembly mutex
 
-        }
-    }
+      }
+  }
 
-  private:
+private:
 
-    FEMSystem& _sys;
+  FEMSystem& _sys;
 
-    const bool _get_residual, _get_jacobian;
-  };
+  const bool _get_residual, _get_jacobian;
+};
 
-  class PostprocessContributions
+class PostprocessContributions
+{
+public:
+  /**
+   * constructor to set context
+   */
+  explicit
+  PostprocessContributions(FEMSystem &sys) : _sys(sys) {}
+
+  /**
+   * operator() for use with Threads::parallel_for().
+   */
+  void operator()(const ConstElemRange &range) const
   {
-  public:
-    /**
-     * constructor to set context
-     */
-    explicit
-    PostprocessContributions(FEMSystem &sys) : _sys(sys) {}
+    AutoPtr<DiffContext> con = _sys.build_context();
+    FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+    _sys.init_context(_femcontext);
 
-    /**
-     * operator() for use with Threads::parallel_for().
-     */
-    void operator()(const ConstElemRange &range) const
-    {
-      AutoPtr<DiffContext> con = _sys.build_context();
-      FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
-      _sys.init_context(_femcontext);
+    for (ConstElemRange::const_iterator elem_it = range.begin();
+         elem_it != range.end(); ++elem_it)
+      {
+        Elem *el = const_cast<Elem *>(*elem_it);
+        _femcontext.pre_fe_reinit(_sys, el);
 
-      for (ConstElemRange::const_iterator elem_it = range.begin();
-           elem_it != range.end(); ++elem_it)
-        {
-          Elem *el = const_cast<Elem *>(*elem_it);
-          _femcontext.pre_fe_reinit(_sys, el);
+        // Optionally initialize all the interior FE objects on elem.
+        if (_sys.fe_reinit_during_postprocess)
+          _femcontext.elem_fe_reinit();
 
-          // Optionally initialize all the interior FE objects on elem.
-          if (_sys.fe_reinit_during_postprocess)
+        _sys.element_postprocess(_femcontext);
+
+        for (_femcontext.side = 0;
+             _femcontext.side != _femcontext.get_elem().n_sides();
+             ++_femcontext.side)
+          {
+            // Don't compute on non-boundary sides unless requested
+            if (!_sys.postprocess_sides ||
+                (!_sys.get_physics()->compute_internal_sides &&
+                 _femcontext.get_elem().neighbor(_femcontext.side) != NULL))
+              continue;
+
+            // Optionally initialize all the FE objects on this side.
+            if (_sys.fe_reinit_during_postprocess)
+              _femcontext.side_fe_reinit();
+
+            _sys.side_postprocess(_femcontext);
+          }
+      }
+  }
+
+private:
+
+  FEMSystem& _sys;
+};
+
+class QoIContributions
+{
+public:
+  /**
+   * constructor to set context
+   */
+  explicit
+  QoIContributions(FEMSystem &sys, DifferentiableQoI &diff_qoi,
+                   const QoISet &qoi_indices) :
+    qoi(sys.qoi.size(), 0.), _sys(sys), _diff_qoi(diff_qoi),_qoi_indices(qoi_indices) {}
+
+  /**
+   * splitting constructor
+   */
+  QoIContributions(const QoIContributions &other,
+                   Threads::split) :
+    qoi(other._sys.qoi.size(), 0.), _sys(other._sys), _diff_qoi(other._diff_qoi) {}
+
+  /**
+   * operator() for use with Threads::parallel_reduce().
+   */
+  void operator()(const ConstElemRange &range)
+  {
+    AutoPtr<DiffContext> con = _sys.build_context();
+    FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+    _diff_qoi.init_context(_femcontext);
+
+    for (ConstElemRange::const_iterator elem_it = range.begin();
+         elem_it != range.end(); ++elem_it)
+      {
+        Elem *el = const_cast<Elem *>(*elem_it);
+
+        _femcontext.pre_fe_reinit(_sys, el);
+
+        if (_diff_qoi.assemble_qoi_elements)
+          {
             _femcontext.elem_fe_reinit();
 
-          _sys.element_postprocess(_femcontext);
-
-          for (_femcontext.side = 0;
-               _femcontext.side != _femcontext.get_elem().n_sides();
-               ++_femcontext.side)
-            {
-              // Don't compute on non-boundary sides unless requested
-              if (!_sys.postprocess_sides ||
-                  (!_sys.get_physics()->compute_internal_sides &&
-                   _femcontext.get_elem().neighbor(_femcontext.side) != NULL))
-                continue;
-
-              // Optionally initialize all the FE objects on this side.
-              if (_sys.fe_reinit_during_postprocess)
-                _femcontext.side_fe_reinit();
-
-              _sys.side_postprocess(_femcontext);
-            }
-        }
-    }
-
-  private:
-
-    FEMSystem& _sys;
-  };
-
-  class QoIContributions
-  {
-  public:
-    /**
-     * constructor to set context
-     */
-    explicit
-    QoIContributions(FEMSystem &sys, DifferentiableQoI &diff_qoi,
-                     const QoISet &qoi_indices) :
-      qoi(sys.qoi.size(), 0.), _sys(sys), _diff_qoi(diff_qoi),_qoi_indices(qoi_indices) {}
-
-    /**
-     * splitting constructor
-     */
-    QoIContributions(const QoIContributions &other,
-                     Threads::split) :
-      qoi(other._sys.qoi.size(), 0.), _sys(other._sys), _diff_qoi(other._diff_qoi) {}
-
-    /**
-     * operator() for use with Threads::parallel_reduce().
-     */
-    void operator()(const ConstElemRange &range)
-    {
-      AutoPtr<DiffContext> con = _sys.build_context();
-      FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
-      _diff_qoi.init_context(_femcontext);
-
-      for (ConstElemRange::const_iterator elem_it = range.begin();
-           elem_it != range.end(); ++elem_it)
-        {
-          Elem *el = const_cast<Elem *>(*elem_it);
-
-          _femcontext.pre_fe_reinit(_sys, el);
-
-          if (_diff_qoi.assemble_qoi_elements)
-            {
-              _femcontext.elem_fe_reinit();
-
-              _diff_qoi.element_qoi(_femcontext, _qoi_indices);
-            }
-
-          for (_femcontext.side = 0;
-               _femcontext.side != _femcontext.get_elem().n_sides();
-               ++_femcontext.side)
-            {
-              // Don't compute on non-boundary sides unless requested
-              if (!_diff_qoi.assemble_qoi_sides ||
-                  (!_diff_qoi.assemble_qoi_internal_sides &&
-                   _femcontext.get_elem().neighbor(_femcontext.side) != NULL))
-                continue;
-
-              _femcontext.side_fe_reinit();
-
-              _diff_qoi.side_qoi(_femcontext, _qoi_indices);
-            }
-        }
-
-      this->_diff_qoi.thread_join( this->qoi, _femcontext.get_qois(), _qoi_indices );
-    }
-
-    void join (const QoIContributions& other)
-    {
-      libmesh_assert_equal_to (this->qoi.size(), other.qoi.size());
-      this->_diff_qoi.thread_join( this->qoi, other.qoi, _qoi_indices );
-    }
-
-    std::vector<Number> qoi;
-
-  private:
-
-    FEMSystem& _sys;
-    DifferentiableQoI& _diff_qoi;
-
-    const QoISet _qoi_indices;
-  };
-
-  class QoIDerivativeContributions
-  {
-  public:
-    /**
-     * constructor to set context
-     */
-    QoIDerivativeContributions(FEMSystem &sys, const QoISet& qoi_indices,
-                               DifferentiableQoI &qoi ) :
-      _sys(sys), _qoi_indices(qoi_indices), _qoi(qoi) {}
-
-    /**
-     * operator() for use with Threads::parallel_for().
-     */
-    void operator()(const ConstElemRange &range) const
-    {
-      AutoPtr<DiffContext> con = _sys.build_context();
-      FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
-      _qoi.init_context(_femcontext);
-
-      for (ConstElemRange::const_iterator elem_it = range.begin();
-           elem_it != range.end(); ++elem_it)
-        {
-          Elem *el = const_cast<Elem *>(*elem_it);
-
-          _femcontext.pre_fe_reinit(_sys, el);
-
-          if (_qoi.assemble_qoi_elements)
-            {
-              _femcontext.elem_fe_reinit();
-
-              _qoi.element_qoi_derivative(_femcontext, _qoi_indices);
-            }
-
-          for (_femcontext.side = 0;
-               _femcontext.side != _femcontext.get_elem().n_sides();
-               ++_femcontext.side)
-            {
-              // Don't compute on non-boundary sides unless requested
-              if (!_qoi.assemble_qoi_sides ||
-                  (!_qoi.assemble_qoi_internal_sides &&
-                   _femcontext.get_elem().neighbor(_femcontext.side) != NULL))
-                continue;
-
-              _femcontext.side_fe_reinit();
-
-              _qoi.side_qoi_derivative(_femcontext, _qoi_indices);
-            }
-
-          // We need some unmodified indices to use for constraining
-          // multiple vector
-          // FIXME - there should be a DofMap::constrain_element_vectors
-          // to do this more efficiently
-          std::vector<dof_id_type> original_dofs = _femcontext.get_dof_indices();
-
-          { // A lock is necessary around access to the global system
-            femsystem_mutex::scoped_lock lock(assembly_mutex);
-
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-            // We'll need to see if any heterogenous constraints apply
-            // to the QoI dofs on this element *or* to any of the dofs
-            // they depend on, so let's get those dependencies
-            _sys.get_dof_map().constrain_nothing(_femcontext.get_dof_indices());
-#endif
-
-            for (unsigned int i=0; i != _sys.qoi.size(); ++i)
-              if (_qoi_indices.has_index(i))
-                {
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-                  bool has_heterogenous_constraint = false;
-                  for (unsigned int d=0;
-                       d != _femcontext.get_dof_indices().size(); ++d)
-                    if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
-                        (i, _femcontext.get_dof_indices()[d]))
-                      {
-                        has_heterogenous_constraint = true;
-                        break;
-                      }
-
-                  _femcontext.get_dof_indices() = original_dofs;
-
-                  // If we're going to need K to impose a heterogenous
-                  // constraint then we either already have it or we
-                  // need to compute it
-                  if (has_heterogenous_constraint)
-                    {
-                      assemble_unconstrained_element_system
-                        (_sys, true, _femcontext);
-
-                      _sys.get_dof_map().heterogenously_constrain_element_vector
-                        (_femcontext.get_elem_jacobian(),
-                         _femcontext.get_qoi_derivatives()[i],
-                         _femcontext.get_dof_indices(), false, i);
-                    }
-                  else
-                    {
-                      _sys.get_dof_map().constrain_element_vector
-                        (_femcontext.get_qoi_derivatives()[i],
-                         _femcontext.get_dof_indices(), false);
-                    }
-#endif
-
-                  _sys.get_adjoint_rhs(i).add_vector
-                    (_femcontext.get_qoi_derivatives()[i], _femcontext.get_dof_indices());
-                }
+            _diff_qoi.element_qoi(_femcontext, _qoi_indices);
           }
+
+        for (_femcontext.side = 0;
+             _femcontext.side != _femcontext.get_elem().n_sides();
+             ++_femcontext.side)
+          {
+            // Don't compute on non-boundary sides unless requested
+            if (!_diff_qoi.assemble_qoi_sides ||
+                (!_diff_qoi.assemble_qoi_internal_sides &&
+                 _femcontext.get_elem().neighbor(_femcontext.side) != NULL))
+              continue;
+
+            _femcontext.side_fe_reinit();
+
+            _diff_qoi.side_qoi(_femcontext, _qoi_indices);
+          }
+      }
+
+    this->_diff_qoi.thread_join( this->qoi, _femcontext.get_qois(), _qoi_indices );
+  }
+
+  void join (const QoIContributions& other)
+  {
+    libmesh_assert_equal_to (this->qoi.size(), other.qoi.size());
+    this->_diff_qoi.thread_join( this->qoi, other.qoi, _qoi_indices );
+  }
+
+  std::vector<Number> qoi;
+
+private:
+
+  FEMSystem& _sys;
+  DifferentiableQoI& _diff_qoi;
+
+  const QoISet _qoi_indices;
+};
+
+class QoIDerivativeContributions
+{
+public:
+  /**
+   * constructor to set context
+   */
+  QoIDerivativeContributions(FEMSystem &sys, const QoISet& qoi_indices,
+                             DifferentiableQoI &qoi ) :
+    _sys(sys), _qoi_indices(qoi_indices), _qoi(qoi) {}
+
+  /**
+   * operator() for use with Threads::parallel_for().
+   */
+  void operator()(const ConstElemRange &range) const
+  {
+    AutoPtr<DiffContext> con = _sys.build_context();
+    FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
+    _qoi.init_context(_femcontext);
+
+    for (ConstElemRange::const_iterator elem_it = range.begin();
+         elem_it != range.end(); ++elem_it)
+      {
+        Elem *el = const_cast<Elem *>(*elem_it);
+
+        _femcontext.pre_fe_reinit(_sys, el);
+
+        if (_qoi.assemble_qoi_elements)
+          {
+            _femcontext.elem_fe_reinit();
+
+            _qoi.element_qoi_derivative(_femcontext, _qoi_indices);
+          }
+
+        for (_femcontext.side = 0;
+             _femcontext.side != _femcontext.get_elem().n_sides();
+             ++_femcontext.side)
+          {
+            // Don't compute on non-boundary sides unless requested
+            if (!_qoi.assemble_qoi_sides ||
+                (!_qoi.assemble_qoi_internal_sides &&
+                 _femcontext.get_elem().neighbor(_femcontext.side) != NULL))
+              continue;
+
+            _femcontext.side_fe_reinit();
+
+            _qoi.side_qoi_derivative(_femcontext, _qoi_indices);
+          }
+
+        // We need some unmodified indices to use for constraining
+        // multiple vector
+        // FIXME - there should be a DofMap::constrain_element_vectors
+        // to do this more efficiently
+        std::vector<dof_id_type> original_dofs = _femcontext.get_dof_indices();
+
+        { // A lock is necessary around access to the global system
+          femsystem_mutex::scoped_lock lock(assembly_mutex);
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+          // We'll need to see if any heterogenous constraints apply
+          // to the QoI dofs on this element *or* to any of the dofs
+          // they depend on, so let's get those dependencies
+          _sys.get_dof_map().constrain_nothing(_femcontext.get_dof_indices());
+#endif
+
+          for (unsigned int i=0; i != _sys.qoi.size(); ++i)
+            if (_qoi_indices.has_index(i))
+              {
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+                bool has_heterogenous_constraint = false;
+                for (unsigned int d=0;
+                     d != _femcontext.get_dof_indices().size(); ++d)
+                  if (_sys.get_dof_map().has_heterogenous_adjoint_constraint
+                      (i, _femcontext.get_dof_indices()[d]))
+                    {
+                      has_heterogenous_constraint = true;
+                      break;
+                    }
+
+                _femcontext.get_dof_indices() = original_dofs;
+
+                // If we're going to need K to impose a heterogenous
+                // constraint then we either already have it or we
+                // need to compute it
+                if (has_heterogenous_constraint)
+                  {
+                    assemble_unconstrained_element_system
+                      (_sys, true, _femcontext);
+
+                    _sys.get_dof_map().heterogenously_constrain_element_vector
+                      (_femcontext.get_elem_jacobian(),
+                       _femcontext.get_qoi_derivatives()[i],
+                       _femcontext.get_dof_indices(), false, i);
+                  }
+                else
+                  {
+                    _sys.get_dof_map().constrain_element_vector
+                      (_femcontext.get_qoi_derivatives()[i],
+                       _femcontext.get_dof_indices(), false);
+                  }
+#endif
+
+                _sys.get_adjoint_rhs(i).add_vector
+                  (_femcontext.get_qoi_derivatives()[i], _femcontext.get_dof_indices());
+              }
         }
-    }
+      }
+  }
 
-  private:
+private:
 
-    FEMSystem& _sys;
-    const QoISet& _qoi_indices;
-    DifferentiableQoI& _qoi;
-  };
+  FEMSystem& _sys;
+  const QoISet& _qoi_indices;
+  DifferentiableQoI& _qoi;
+};
 
 
 }
@@ -597,31 +597,31 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
   const MeshBase& mesh = this->get_mesh();
 
-//  this->get_vector("_nonlinear_solution").localize
-//    (*current_local_nonlinear_solution,
-//     dof_map.get_send_list());
+  //  this->get_vector("_nonlinear_solution").localize
+  //    (*current_local_nonlinear_solution,
+  //     dof_map.get_send_list());
   this->update();
 
   if (print_solution_norms)
     {
-//      this->get_vector("_nonlinear_solution").close();
+      //      this->get_vector("_nonlinear_solution").close();
       this->solution->close();
 
       std::streamsize old_precision = libMesh::out.precision();
       libMesh::out.precision(16);
       libMesh::out << "|U| = "
-//                    << this->get_vector("_nonlinear_solution").l1_norm()
-                    << this->solution->l1_norm()
-                    << std::endl;
+        //                    << this->get_vector("_nonlinear_solution").l1_norm()
+                   << this->solution->l1_norm()
+                   << std::endl;
       libMesh::out.precision(old_precision);
     }
   if (print_solutions)
     {
       std::streamsize old_precision = libMesh::out.precision();
       libMesh::out.precision(16);
-//      libMesh::out << "U = [" << this->get_vector("_nonlinear_solution")
+      //      libMesh::out << "U = [" << this->get_vector("_nonlinear_solution")
       libMesh::out << "U = [" << *(this->solution)
-                    << "];" << std::endl;
+                   << "];" << std::endl;
       libMesh::out.precision(old_precision);
     }
 
@@ -636,8 +636,8 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
   if (verify_analytic_jacobians > 0.5)
     {
       libMesh::err << "WARNING!  verify_analytic_jacobians was set "
-                    << "to absurdly large value of "
-                    << verify_analytic_jacobians << std::endl;
+                   << "to absurdly large value of "
+                   << verify_analytic_jacobians << std::endl;
       libMesh::err << "Resetting to 1e-6!" << std::endl;
       verify_analytic_jacobians = 1e-6;
     }
@@ -1004,7 +1004,7 @@ void FEMSystem::init_context(DiffContext &c)
               elem_fe->get_JxW();
               elem_fe->get_phi();
             }
-          break;
+            break;
           case( TYPE_VECTOR ):
             {
               FEGenericBase<RealGradient>* elem_fe = NULL;
@@ -1012,7 +1012,7 @@ void FEMSystem::init_context(DiffContext &c)
               elem_fe->get_JxW();
               elem_fe->get_phi();
             }
-          break;
+            break;
           default:
             {
               libmesh_error();

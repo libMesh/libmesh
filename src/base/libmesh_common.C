@@ -32,42 +32,42 @@ namespace libMesh
 
 namespace MacroFunctions
 {
-  void here(const char* file, int line, const char* date, const char* time)
-  {
-    libMesh::err << "[" << static_cast<std::size_t>(libMesh::global_processor_id()) << "] "
-                 << file
-                 << ", line " << line
-                 << ", compiled " << date
-                 << " at " << time
-                 << std::endl;
-  }
+void here(const char* file, int line, const char* date, const char* time)
+{
+  libMesh::err << "[" << static_cast<std::size_t>(libMesh::global_processor_id()) << "] "
+               << file
+               << ", line " << line
+               << ", compiled " << date
+               << " at " << time
+               << std::endl;
+}
 
 
 
-  void stop(const char* file, int line, const char* date, const char* time)
-  {
-    if (libMesh::global_n_processors() == 1)
-      {
-        libMesh::MacroFunctions::here(file, line, date, time);
+void stop(const char* file, int line, const char* date, const char* time)
+{
+  if (libMesh::global_n_processors() == 1)
+    {
+      libMesh::MacroFunctions::here(file, line, date, time);
 #ifdef LIBMESH_HAVE_CSIGNAL
-        libMesh::out << "Stopping process " << getpid() << "..." << std::endl;
-        std::raise(SIGSTOP);
-        libMesh::out << "Continuing process " << getpid() << "..." << std::endl;
+      libMesh::out << "Stopping process " << getpid() << "..." << std::endl;
+      std::raise(SIGSTOP);
+      libMesh::out << "Continuing process " << getpid() << "..." << std::endl;
 #else
-        libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl;
+      libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl;
 #endif
-      }
-  }
+    }
+}
 
 
-  void report_error(const char* file, int line, const char* date, const char* time)
-  {
-    if (libMesh::global_n_processors() == 1)
-      libMesh::print_trace();
-    else
-      libMesh::write_traceout();
-    libMesh::MacroFunctions::here(file, line, date, time);
-  }
+void report_error(const char* file, int line, const char* date, const char* time)
+{
+  if (libMesh::global_n_processors() == 1)
+    libMesh::print_trace();
+  else
+    libMesh::write_traceout();
+  libMesh::MacroFunctions::here(file, line, date, time);
+}
 
 } // namespace MacroFunctions
 } // namespace libMesh

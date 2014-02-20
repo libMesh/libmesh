@@ -159,39 +159,39 @@ void Elem::coarsen()
 
   // re-compute hanging node nodal locations
   for (unsigned int c=0; c<this->n_children(); c++)
-  {
-    Elem *mychild = this->child(c);
-    if (mychild == remote_elem)
-      continue;
-    for (unsigned int nc=0; nc<mychild->n_nodes(); nc++)
     {
-      Point new_pos;
-      bool calculated_new_pos = false;
-
-      for (unsigned int n=0; n<this->n_nodes(); n++)
-      {
-        // The value from the embedding matrix
-        const float em_val = this->embedding_matrix(c,nc,n);
-
-        // The node location is somewhere between existing vertices
-        if ((em_val != 0.) && (em_val != 1.))
+      Elem *mychild = this->child(c);
+      if (mychild == remote_elem)
+        continue;
+      for (unsigned int nc=0; nc<mychild->n_nodes(); nc++)
         {
-          new_pos.add_scaled (this->point(n), em_val);
-          calculated_new_pos = true;
-        }
-      }
+          Point new_pos;
+          bool calculated_new_pos = false;
 
-      if(calculated_new_pos)
-      {
-        //Move the existing node back into it's original location
-        for(unsigned int i=0; i<LIBMESH_DIM; i++)
-          {
-            Point & child_node = *(mychild->get_node(nc));
-            child_node(i)=new_pos(i);
-          }
-      }
+          for (unsigned int n=0; n<this->n_nodes(); n++)
+            {
+              // The value from the embedding matrix
+              const float em_val = this->embedding_matrix(c,nc,n);
+
+              // The node location is somewhere between existing vertices
+              if ((em_val != 0.) && (em_val != 1.))
+                {
+                  new_pos.add_scaled (this->point(n), em_val);
+                  calculated_new_pos = true;
+                }
+            }
+
+          if(calculated_new_pos)
+            {
+              //Move the existing node back into it's original location
+              for(unsigned int i=0; i<LIBMESH_DIM; i++)
+                {
+                  Point & child_node = *(mychild->get_node(nc));
+                  child_node(i)=new_pos(i);
+                }
+            }
+        }
     }
-  }
 
   for (unsigned int c=0; c<this->n_children(); c++)
     {

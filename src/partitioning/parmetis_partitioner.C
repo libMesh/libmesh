@@ -35,11 +35,11 @@
 
 // Include the ParMETIS header files
 namespace Parmetis {
-  extern "C" {
+extern "C" {
 #     include "libmesh/ignore_warnings.h"
 #     include "parmetis.h"
 #     include "libmesh/restore_warnings.h"
-  }
+}
 }
 
 #endif // #ifdef LIBMESH_HAVE_PARMETIS ... else ...
@@ -77,7 +77,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
-// What to do if the Parmetis library IS NOT present
+  // What to do if the Parmetis library IS NOT present
 #ifndef LIBMESH_HAVE_PARMETIS
 
   libmesh_here();
@@ -89,7 +89,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
 
   mp.partition (mesh, n_sbdmns);
 
-// What to do if the Parmetis library IS present
+  // What to do if the Parmetis library IS present
 #else
 
   // Revert to METIS on one processor.
@@ -299,7 +299,7 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
 
           global_index_map.insert(std::make_pair(elem->id(), global_index[cnt++]));
         }
-      }
+    }
     // really, shouldn't be close!
     libmesh_assert_less_equal (global_index_map.size(), n_active_elem);
     libmesh_assert_less_equal (_global_index_by_pid_map.size(), n_active_elem);
@@ -582,28 +582,28 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
                                 procup,   requested_ids[procup]);
     }
 
-   // and finally assign the partitioning.
-   // note we are iterating in exactly the same order
-   // used to build up the request, so we can expect the
-   // required entries to be in the proper sequence.
-   elem_it  = mesh.active_elements_begin();
-   elem_end = mesh.active_elements_end();
+  // and finally assign the partitioning.
+  // note we are iterating in exactly the same order
+  // used to build up the request, so we can expect the
+  // required entries to be in the proper sequence.
+  elem_it  = mesh.active_elements_begin();
+  elem_end = mesh.active_elements_end();
 
-   for (std::vector<unsigned int> counters(mesh.n_processors(), 0);
-        elem_it != elem_end; ++elem_it)
-     {
-       Elem *elem = *elem_it;
+  for (std::vector<unsigned int> counters(mesh.n_processors(), 0);
+       elem_it != elem_end; ++elem_it)
+    {
+      Elem *elem = *elem_it;
 
-       const processor_id_type current_pid = elem->processor_id();
+      const processor_id_type current_pid = elem->processor_id();
 
-       libmesh_assert_less (counters[current_pid], requested_ids[current_pid].size());
+      libmesh_assert_less (counters[current_pid], requested_ids[current_pid].size());
 
-       const processor_id_type elem_procid =
-         requested_ids[current_pid][counters[current_pid]++];
+      const processor_id_type elem_procid =
+        requested_ids[current_pid][counters[current_pid]++];
 
-       libmesh_assert_less (elem_procid, static_cast<unsigned int>(_nparts));
-       elem->processor_id() = elem_procid;
-     }
+      libmesh_assert_less (elem_procid, static_cast<unsigned int>(_nparts));
+      elem->processor_id() = elem_procid;
+    }
 }
 
 #endif // #ifdef LIBMESH_HAVE_PARMETIS

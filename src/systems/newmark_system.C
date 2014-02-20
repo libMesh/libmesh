@@ -268,7 +268,7 @@ void NewmarkSystem::set_newmark_parameters (const Real delta_T,
 {
   libmesh_assert_not_equal_to (delta_T, 0.);
 
-    // Get a reference to the EquationSystems
+  // Get a reference to the EquationSystems
   EquationSystems& es =
     this->get_equation_systems();
 

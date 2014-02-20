@@ -24,69 +24,69 @@
 namespace libMesh
 {
 
-  // Anonymous namespace for local helper functions
-  namespace {
+// Anonymous namespace for local helper functions
+namespace {
 
-    Real infinite_map_eval(Real v, unsigned i)
+Real infinite_map_eval(Real v, unsigned i)
+{
+  libmesh_assert (-1.-1.e-5 <= v && v < 1.);
+
+  switch (i)
     {
-      libmesh_assert (-1.-1.e-5 <= v && v < 1.);
+    case 0:
+      return -2.*v/(1.-v);
+    case 1:
+      return (1.+v)/(1.-v);
 
-      switch (i)
-        {
-        case 0:
-          return -2.*v/(1.-v);
-        case 1:
-          return (1.+v)/(1.-v);
-
-        default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
-
-        }
-
-      // we never end up here.
+    default:
+      libMesh::err << "bad index i = " << i << std::endl;
       libmesh_error();
-      return 0.;
+
     }
 
+  // we never end up here.
+  libmesh_error();
+  return 0.;
+}
 
 
-    Real infinite_map_eval_deriv(Real v, unsigned i)
+
+Real infinite_map_eval_deriv(Real v, unsigned i)
+{
+  libmesh_assert (-1.-1.e-5 <= v && v < 1.);
+
+  switch (i)
     {
-      libmesh_assert (-1.-1.e-5 <= v && v < 1.);
+    case 0:
+      return -2./((1.-v)*(1.-v));
+    case 1:
+      return 2./((1.-v)*(1.-v));
 
-      switch (i)
-        {
-        case 0:
-          return -2./((1.-v)*(1.-v));
-        case 1:
-          return 2./((1.-v)*(1.-v));
-
-        default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
-
-        }
-
-      // we never end up here.
+    default:
+      libMesh::err << "bad index i = " << i << std::endl;
       libmesh_error();
-      return 0.;
+
     }
 
-  } // anonymous namespace
+  // we never end up here.
+  libmesh_error();
+  return 0.;
+}
+
+} // anonymous namespace
 
 
   // Specialize the eval() function for 1, 2, and 3 dimensions and the CARTESIAN mapping type
   // to call the local helper function from the anonymous namespace.
-  template <> Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval(Real v, Order, unsigned i) { return infinite_map_eval(v, i); }
-  template <> Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval(Real v, Order, unsigned i) { return infinite_map_eval(v, i); }
-  template <> Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval(Real v, Order, unsigned i) { return infinite_map_eval(v, i); }
+template <> Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval(Real v, Order, unsigned i) { return infinite_map_eval(v, i); }
+template <> Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval(Real v, Order, unsigned i) { return infinite_map_eval(v, i); }
+template <> Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval(Real v, Order, unsigned i) { return infinite_map_eval(v, i); }
 
-  // Specialize the eval_deriv() function for 1, 2, and 3 dimensions and the CARTESIAN mapping type
-  // to call the local helper function from the anonymous namespace.
-  template <> Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval_deriv(Real v, Order, unsigned i) { return infinite_map_eval_deriv(v, i); }
-  template <> Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval_deriv(Real v, Order, unsigned i) { return infinite_map_eval_deriv(v, i); }
-  template <> Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval_deriv(Real v, Order, unsigned i) { return infinite_map_eval_deriv(v, i); }
+// Specialize the eval_deriv() function for 1, 2, and 3 dimensions and the CARTESIAN mapping type
+// to call the local helper function from the anonymous namespace.
+template <> Real InfFE<1,INFINITE_MAP,CARTESIAN>::eval_deriv(Real v, Order, unsigned i) { return infinite_map_eval_deriv(v, i); }
+template <> Real InfFE<2,INFINITE_MAP,CARTESIAN>::eval_deriv(Real v, Order, unsigned i) { return infinite_map_eval_deriv(v, i); }
+template <> Real InfFE<3,INFINITE_MAP,CARTESIAN>::eval_deriv(Real v, Order, unsigned i) { return infinite_map_eval_deriv(v, i); }
 
 } // namespace libMesh
 

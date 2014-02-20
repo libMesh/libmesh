@@ -25,13 +25,13 @@ namespace libMesh
 
 
 AdaptiveTimeSolver::AdaptiveTimeSolver (sys_type& s)
- : UnsteadySolver(s),
-   core_time_solver(NULL),
-   target_tolerance(1.e-3), upper_tolerance(0.0),
-   max_deltat(0.),
-   min_deltat(0.),
-   max_growth(0.),
-   global_tolerance(true)
+  : UnsteadySolver(s),
+    core_time_solver(NULL),
+    target_tolerance(1.e-3), upper_tolerance(0.0),
+    max_deltat(0.),
+    min_deltat(0.),
+    max_growth(0.),
+    global_tolerance(true)
 {
   // the child class must populate core_time_solver
   // with whatever actual time solver is to be used
@@ -86,10 +86,10 @@ void AdaptiveTimeSolver::reinit()
 void AdaptiveTimeSolver::advance_timestep ()
 {
   NumericVector<Number> &old_nonlinear_soln =
-  _system.get_vector("_old_nonlinear_solution");
+    _system.get_vector("_old_nonlinear_solution");
   NumericVector<Number> &nonlinear_solution =
     *(_system.solution);
-//    _system.get_vector("_nonlinear_solution");
+  //    _system.get_vector("_nonlinear_solution");
 
   old_nonlinear_soln = nonlinear_solution;
 

@@ -44,178 +44,178 @@ namespace libMesh
 // ------------------------------------------------------------
 // Helper class definitions
 
-  /**
-   * This class implements projecting a vector from
-   * an old mesh to the newly refined mesh.  This
-   * may be executed in parallel on multiple threads.
-   */
-  class ProjectVector
-  {
-  private:
-    const System                &system;
-    const NumericVector<Number> &old_vector;
-    NumericVector<Number>       &new_vector;
+/**
+ * This class implements projecting a vector from
+ * an old mesh to the newly refined mesh.  This
+ * may be executed in parallel on multiple threads.
+ */
+class ProjectVector
+{
+private:
+  const System                &system;
+  const NumericVector<Number> &old_vector;
+  NumericVector<Number>       &new_vector;
 
-  public:
-    ProjectVector (const System &system_in,
-                   const NumericVector<Number> &old_v_in,
-                   NumericVector<Number> &new_v_in) :
+public:
+  ProjectVector (const System &system_in,
+                 const NumericVector<Number> &old_v_in,
+                 NumericVector<Number> &new_v_in) :
     system(system_in),
     old_vector(old_v_in),
     new_vector(new_v_in)
-    {}
+  {}
 
-    void operator()(const ConstElemRange &range) const;
-  };
-
-
-  /**
-   * This class builds the send_list of old dof indices
-   * whose coefficients are needed to perform a projection.
-   * This may be executed in parallel on multiple threads.
-   * The end result is a \p send_list vector which is
-   * unsorted and may contain duplicate elements.
-   * The \p unique() method can be used to sort and
-   * create a unique list.
-   */
-  class BuildProjectionList
-  {
-  private:
-    const System              &system;
-
-  public:
-    BuildProjectionList (const System &system_in) :
-      system(system_in),
-      send_list()
-    {}
-
-    BuildProjectionList (BuildProjectionList &other, Threads::split) :
-      system(other.system),
-      send_list()
-    {}
-
-    void unique();
-    void operator()(const ConstElemRange &range);
-    void join (const BuildProjectionList &other);
-    std::vector<dof_id_type> send_list;
-  };
+  void operator()(const ConstElemRange &range) const;
+};
 
 
+/**
+ * This class builds the send_list of old dof indices
+ * whose coefficients are needed to perform a projection.
+ * This may be executed in parallel on multiple threads.
+ * The end result is a \p send_list vector which is
+ * unsorted and may contain duplicate elements.
+ * The \p unique() method can be used to sort and
+ * create a unique list.
+ */
+class BuildProjectionList
+{
+private:
+  const System              &system;
 
-  /**
-   * This class implements projecting an arbitrary
-   * function to the current mesh.  This
-   * may be exectued in parallel on multiple threads.
-   */
-  class ProjectSolution
-  {
-  private:
-    const System                &system;
+public:
+  BuildProjectionList (const System &system_in) :
+    system(system_in),
+    send_list()
+  {}
 
-    AutoPtr<FunctionBase<Number> > f;
-    AutoPtr<FunctionBase<Gradient> > g;
-    const Parameters &parameters;
-    NumericVector<Number>       &new_vector;
+  BuildProjectionList (BuildProjectionList &other, Threads::split) :
+    system(other.system),
+    send_list()
+  {}
 
-  public:
-    ProjectSolution (const System &system_in,
-                     FunctionBase<Number>* f_in,
-                     FunctionBase<Gradient>* g_in,
-                     const Parameters &parameters_in,
-                     NumericVector<Number> &new_v_in) :
+  void unique();
+  void operator()(const ConstElemRange &range);
+  void join (const BuildProjectionList &other);
+  std::vector<dof_id_type> send_list;
+};
+
+
+
+/**
+ * This class implements projecting an arbitrary
+ * function to the current mesh.  This
+ * may be exectued in parallel on multiple threads.
+ */
+class ProjectSolution
+{
+private:
+  const System                &system;
+
+  AutoPtr<FunctionBase<Number> > f;
+  AutoPtr<FunctionBase<Gradient> > g;
+  const Parameters &parameters;
+  NumericVector<Number>       &new_vector;
+
+public:
+  ProjectSolution (const System &system_in,
+                   FunctionBase<Number>* f_in,
+                   FunctionBase<Gradient>* g_in,
+                   const Parameters &parameters_in,
+                   NumericVector<Number> &new_v_in) :
     system(system_in),
     f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
     g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
     parameters(parameters_in),
     new_vector(new_v_in)
-    {
-      libmesh_assert(f.get());
-      f->init();
-      if (g.get())
-        g->init();
-    }
+  {
+    libmesh_assert(f.get());
+    f->init();
+    if (g.get())
+      g->init();
+  }
 
-    ProjectSolution (const ProjectSolution &in) :
+  ProjectSolution (const ProjectSolution &in) :
     system(in.system),
     f(in.f.get() ? in.f->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
     g(in.g.get() ? in.g->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
     parameters(in.parameters),
     new_vector(in.new_vector)
-    {
-      libmesh_assert(f.get());
-      f->init();
-      if (g.get())
-        g->init();
-    }
-
-    void operator()(const ConstElemRange &range) const;
-  };
-
-
-  /**
-   * This class implements projecting an arbitrary
-   * function to the current mesh.  This
-   * may be exectued in parallel on multiple threads.
-   */
-  class ProjectFEMSolution
   {
-  private:
-    const System                &system;
+    libmesh_assert(f.get());
+    f->init();
+    if (g.get())
+      g->init();
+  }
 
-    AutoPtr<FEMFunctionBase<Number> > f;
-    AutoPtr<FEMFunctionBase<Gradient> > g;
-    NumericVector<Number>       &new_vector;
+  void operator()(const ConstElemRange &range) const;
+};
 
-  public:
-    ProjectFEMSolution (const System &system_in,
-                        FEMFunctionBase<Number>* f_in,
-                        FEMFunctionBase<Gradient>* g_in,
-                        NumericVector<Number> &new_v_in) :
+
+/**
+ * This class implements projecting an arbitrary
+ * function to the current mesh.  This
+ * may be exectued in parallel on multiple threads.
+ */
+class ProjectFEMSolution
+{
+private:
+  const System                &system;
+
+  AutoPtr<FEMFunctionBase<Number> > f;
+  AutoPtr<FEMFunctionBase<Gradient> > g;
+  NumericVector<Number>       &new_vector;
+
+public:
+  ProjectFEMSolution (const System &system_in,
+                      FEMFunctionBase<Number>* f_in,
+                      FEMFunctionBase<Gradient>* g_in,
+                      NumericVector<Number> &new_v_in) :
     system(system_in),
     f(f_in ? f_in->clone() : AutoPtr<FEMFunctionBase<Number> >(NULL)),
     g(g_in ? g_in->clone() : AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
     new_vector(new_v_in)
-    {
-      libmesh_assert(f.get());
-    }
+  {
+    libmesh_assert(f.get());
+  }
 
-    ProjectFEMSolution (const ProjectFEMSolution &in) :
+  ProjectFEMSolution (const ProjectFEMSolution &in) :
     system(in.system),
     f(in.f.get() ? in.f->clone() : AutoPtr<FEMFunctionBase<Number> >(NULL)),
     g(in.g.get() ? in.g->clone() : AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
     new_vector(in.new_vector)
-    {
-      libmesh_assert(f.get());
-    }
-
-    void operator()(const ConstElemRange &range) const;
-  };
-
-
-  /**
-   * This class implements projecting an arbitrary
-   * boundary function to the current mesh.  This
-   * may be exectued in parallel on multiple threads.
-   */
-  class BoundaryProjectSolution
   {
-  private:
-    const std::set<boundary_id_type> &b;
-    const std::vector<unsigned int>  &variables;
-    const System                     &system;
-    AutoPtr<FunctionBase<Number> >    f;
-    AutoPtr<FunctionBase<Gradient> >  g;
-    const Parameters                 &parameters;
-    NumericVector<Number>            &new_vector;
+    libmesh_assert(f.get());
+  }
 
-  public:
-    BoundaryProjectSolution (const std::set<boundary_id_type> &b_in,
-                             const std::vector<unsigned int> &variables_in,
-                             const System &system_in,
-                             FunctionBase<Number>* f_in,
-                             FunctionBase<Gradient>* g_in,
-                             const Parameters &parameters_in,
-                             NumericVector<Number> &new_v_in) :
+  void operator()(const ConstElemRange &range) const;
+};
+
+
+/**
+ * This class implements projecting an arbitrary
+ * boundary function to the current mesh.  This
+ * may be exectued in parallel on multiple threads.
+ */
+class BoundaryProjectSolution
+{
+private:
+  const std::set<boundary_id_type> &b;
+  const std::vector<unsigned int>  &variables;
+  const System                     &system;
+  AutoPtr<FunctionBase<Number> >    f;
+  AutoPtr<FunctionBase<Gradient> >  g;
+  const Parameters                 &parameters;
+  NumericVector<Number>            &new_vector;
+
+public:
+  BoundaryProjectSolution (const std::set<boundary_id_type> &b_in,
+                           const std::vector<unsigned int> &variables_in,
+                           const System &system_in,
+                           FunctionBase<Number>* f_in,
+                           FunctionBase<Gradient>* g_in,
+                           const Parameters &parameters_in,
+                           NumericVector<Number> &new_v_in) :
     b(b_in),
     variables(variables_in),
     system(system_in),
@@ -223,14 +223,14 @@ namespace libMesh
     g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
     parameters(parameters_in),
     new_vector(new_v_in)
-    {
-      libmesh_assert(f.get());
-      f->init();
-      if (g.get())
-        g->init();
-    }
+  {
+    libmesh_assert(f.get());
+    f->init();
+    if (g.get())
+      g->init();
+  }
 
-    BoundaryProjectSolution (const BoundaryProjectSolution &in) :
+  BoundaryProjectSolution (const BoundaryProjectSolution &in) :
     b(in.b),
     variables(in.variables),
     system(in.system),
@@ -238,15 +238,15 @@ namespace libMesh
     g(in.g.get() ? in.g->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
     parameters(in.parameters),
     new_vector(in.new_vector)
-    {
-      libmesh_assert(f.get());
-      f->init();
-      if (g.get())
-        g->init();
-    }
+  {
+    libmesh_assert(f.get());
+    f->init();
+    if (g.get())
+      g->init();
+  }
 
-    void operator()(const ConstElemRange &range) const;
-  };
+  void operator()(const ConstElemRange &range) const;
+};
 
 
 
@@ -375,24 +375,24 @@ void System::project_vector (const NumericVector<Number>& old_v,
   // Note: We assume that all SCALAR dofs are on the
   // processor with highest ID
   if(this->processor_id() == (this->n_processors()-1))
-  {
-    const DofMap& dof_map = this->get_dof_map();
-    for (unsigned int var=0; var<this->n_vars(); var++)
-      if(this->variable(var).type().family == SCALAR)
-        {
-          // We can just map SCALAR dofs directly across
-          std::vector<dof_id_type> new_SCALAR_indices, old_SCALAR_indices;
-          dof_map.SCALAR_dof_indices (new_SCALAR_indices, var, false);
-          dof_map.SCALAR_dof_indices (old_SCALAR_indices, var, true);
-          const unsigned int new_n_dofs =
-            libmesh_cast_int<unsigned int>(new_SCALAR_indices.size());
-
-          for (unsigned int i=0; i<new_n_dofs; i++)
+    {
+      const DofMap& dof_map = this->get_dof_map();
+      for (unsigned int var=0; var<this->n_vars(); var++)
+        if(this->variable(var).type().family == SCALAR)
           {
-            new_vector.set( new_SCALAR_indices[i], old_vector(old_SCALAR_indices[i]) );
+            // We can just map SCALAR dofs directly across
+            std::vector<dof_id_type> new_SCALAR_indices, old_SCALAR_indices;
+            dof_map.SCALAR_dof_indices (new_SCALAR_indices, var, false);
+            dof_map.SCALAR_dof_indices (old_SCALAR_indices, var, true);
+            const unsigned int new_n_dofs =
+              libmesh_cast_int<unsigned int>(new_SCALAR_indices.size());
+
+            for (unsigned int i=0; i<new_n_dofs; i++)
+              {
+                new_vector.set( new_SCALAR_indices[i], old_vector(old_SCALAR_indices[i]) );
+              }
           }
-        }
-  }
+    }
 
   new_vector.close();
 
@@ -525,42 +525,42 @@ void System::project_vector (NumericVector<Number>& new_vector,
      ProjectSolution(*this, f, g,
                      this->get_equation_systems().parameters,
                      new_vector)
-    );
+     );
 
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
   // processor with highest ID
   if(this->processor_id() == (this->n_processors()-1))
-  {
-    // We get different scalars as different
-    // components from a new-style f functor.
-    DenseVector<Number> fout(this->n_components());
-    bool filled_fout = false;
+    {
+      // We get different scalars as different
+      // components from a new-style f functor.
+      DenseVector<Number> fout(this->n_components());
+      bool filled_fout = false;
 
-    const DofMap& dof_map = this->get_dof_map();
-    for (unsigned int var=0; var<this->n_vars(); var++)
-      if(this->variable(var).type().family == SCALAR)
-        {
-          if (!filled_fout)
-            {
-              (*f) (Point(), this->time, fout);
-              filled_fout = true;
-            }
-
-          std::vector<dof_id_type> SCALAR_indices;
-          dof_map.SCALAR_dof_indices (SCALAR_indices, var);
-          const unsigned int n_SCALAR_dofs =
-            libmesh_cast_int<unsigned int>(SCALAR_indices.size());
-
-          for (unsigned int i=0; i<n_SCALAR_dofs; i++)
+      const DofMap& dof_map = this->get_dof_map();
+      for (unsigned int var=0; var<this->n_vars(); var++)
+        if(this->variable(var).type().family == SCALAR)
           {
-            const dof_id_type global_index = SCALAR_indices[i];
-            const unsigned int component_index =
-              this->variable_scalar_number(var,i);
-            new_vector.set(global_index, fout(component_index));
+            if (!filled_fout)
+              {
+                (*f) (Point(), this->time, fout);
+                filled_fout = true;
+              }
+
+            std::vector<dof_id_type> SCALAR_indices;
+            dof_map.SCALAR_dof_indices (SCALAR_indices, var);
+            const unsigned int n_SCALAR_dofs =
+              libmesh_cast_int<unsigned int>(SCALAR_indices.size());
+
+            for (unsigned int i=0; i<n_SCALAR_dofs; i++)
+              {
+                const dof_id_type global_index = SCALAR_indices[i];
+                const unsigned int component_index =
+                  this->variable_scalar_number(var,i);
+                new_vector.set(global_index, fout(component_index));
+              }
           }
-        }
-  }
+    }
 
   new_vector.close();
 
@@ -586,41 +586,41 @@ void System::project_vector (NumericVector<Number>& new_vector,
     (ConstElemRange (this->get_mesh().active_local_elements_begin(),
                      this->get_mesh().active_local_elements_end() ),
      ProjectFEMSolution(*this, f, g, new_vector)
-    );
+     );
 
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
   // processor with highest ID
   if(this->processor_id() == (this->n_processors()-1))
-  {
-    // FIXME: Do we want to first check for SCALAR vars before building this? [PB]
-    FEMContext context( *this );
+    {
+      // FIXME: Do we want to first check for SCALAR vars before building this? [PB]
+      FEMContext context( *this );
 
-    const DofMap& dof_map = this->get_dof_map();
-    for (unsigned int var=0; var<this->n_vars(); var++)
-      if(this->variable(var).type().family == SCALAR)
-        {
-          // FIXME: We reinit with an arbitrary element in case the user
-          //        doesn't override FEMFunctionBase::component. Is there
-          //        any use case we're missing? [PB]
-          Elem *el = const_cast<Elem *>(*(this->get_mesh().active_local_elements_begin()));
-          context.pre_fe_reinit( *this, el );
-
-          std::vector<dof_id_type> SCALAR_indices;
-          dof_map.SCALAR_dof_indices (SCALAR_indices, var);
-          const unsigned int n_SCALAR_dofs =
-            libmesh_cast_int<unsigned int>(SCALAR_indices.size());
-
-          for (unsigned int i=0; i<n_SCALAR_dofs; i++)
+      const DofMap& dof_map = this->get_dof_map();
+      for (unsigned int var=0; var<this->n_vars(); var++)
+        if(this->variable(var).type().family == SCALAR)
           {
-            const dof_id_type global_index = SCALAR_indices[i];
-            const unsigned int component_index =
-              this->variable_scalar_number(var,i);
+            // FIXME: We reinit with an arbitrary element in case the user
+            //        doesn't override FEMFunctionBase::component. Is there
+            //        any use case we're missing? [PB]
+            Elem *el = const_cast<Elem *>(*(this->get_mesh().active_local_elements_begin()));
+            context.pre_fe_reinit( *this, el );
 
-            new_vector.set(global_index, f->component(context, component_index, Point(), this->time));
+            std::vector<dof_id_type> SCALAR_indices;
+            dof_map.SCALAR_dof_indices (SCALAR_indices, var);
+            const unsigned int n_SCALAR_dofs =
+              libmesh_cast_int<unsigned int>(SCALAR_indices.size());
+
+            for (unsigned int i=0; i<n_SCALAR_dofs; i++)
+              {
+                const dof_id_type global_index = SCALAR_indices[i];
+                const unsigned int component_index =
+                  this->variable_scalar_number(var,i);
+
+                new_vector.set(global_index, f->component(context, component_index, Point(), this->time));
+              }
           }
-        }
-  }
+    }
 
   new_vector.close();
 
@@ -638,17 +638,17 @@ void System::project_vector (NumericVector<Number>& new_vector,
  * each element.
  */
 void System::boundary_project_solution
-  (const std::set<boundary_id_type> &b,
-   const std::vector<unsigned int> &variables,
-   Number fptr(const Point& p,
+(const std::set<boundary_id_type> &b,
+ const std::vector<unsigned int> &variables,
+ Number fptr(const Point& p,
+             const Parameters& parameters,
+             const std::string& sys_name,
+             const std::string& unknown_name),
+ Gradient gptr(const Point& p,
                const Parameters& parameters,
                const std::string& sys_name,
                const std::string& unknown_name),
-   Gradient gptr(const Point& p,
-                 const Parameters& parameters,
-                 const std::string& sys_name,
-                 const std::string& unknown_name),
-   const Parameters& parameters)
+ const Parameters& parameters)
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
   WrappedFunction<Gradient> g(*this, gptr, &parameters);
@@ -662,10 +662,10 @@ void System::boundary_project_solution
  * element.
  */
 void System::boundary_project_solution
-  (const std::set<boundary_id_type> &b,
-   const std::vector<unsigned int> &variables,
-   FunctionBase<Number> *f,
-   FunctionBase<Gradient> *g)
+(const std::set<boundary_id_type> &b,
+ const std::vector<unsigned int> &variables,
+ FunctionBase<Number> *f,
+ FunctionBase<Gradient> *g)
 {
   this->boundary_project_vector(b, variables, *solution, f, g);
 
@@ -681,18 +681,18 @@ void System::boundary_project_solution
  * projections and nodal interpolations on each element.
  */
 void System::boundary_project_vector
-  (const std::set<boundary_id_type> &b,
-   const std::vector<unsigned int> &variables,
-   Number fptr(const Point& p,
+(const std::set<boundary_id_type> &b,
+ const std::vector<unsigned int> &variables,
+ Number fptr(const Point& p,
+             const Parameters& parameters,
+             const std::string& sys_name,
+             const std::string& unknown_name),
+ Gradient gptr(const Point& p,
                const Parameters& parameters,
                const std::string& sys_name,
                const std::string& unknown_name),
-   Gradient gptr(const Point& p,
-                 const Parameters& parameters,
-                 const std::string& sys_name,
-                 const std::string& unknown_name),
-   const Parameters& parameters,
-   NumericVector<Number>& new_vector) const
+ const Parameters& parameters,
+ NumericVector<Number>& new_vector) const
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
   WrappedFunction<Gradient> g(*this, gptr, &parameters);
@@ -704,11 +704,11 @@ void System::boundary_project_vector
  * nodal interpolations on each element.
  */
 void System::boundary_project_vector
-  (const std::set<boundary_id_type> &b,
-   const std::vector<unsigned int> &variables,
-   NumericVector<Number>& new_vector,
-   FunctionBase<Number> *f,
-   FunctionBase<Gradient> *g) const
+(const std::set<boundary_id_type> &b,
+ const std::vector<unsigned int> &variables,
+ NumericVector<Number>& new_vector,
+ FunctionBase<Number> *f,
+ FunctionBase<Gradient> *g) const
 {
   START_LOG ("boundary_project_vector()", "System");
 
@@ -718,7 +718,7 @@ void System::boundary_project_vector
      BoundaryProjectSolution(b, variables, *this, f, g,
                              this->get_equation_systems().parameters,
                              new_vector)
-    );
+     );
 
   // We don't do SCALAR dofs when just projecting the boundary, so
   // we're done here.
@@ -1420,7 +1420,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                     {
                       // We'll finite difference mixed derivatives
                       Point nxminus = elem->point(n),
-                            nxplus = elem->point(n);
+                        nxplus = elem->point(n);
                       nxminus(0) -= TOLERANCE;
                       nxplus(0) += TOLERANCE;
                       Gradient gxminus = g->component(var_component,
@@ -1435,7 +1435,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                       current_dof++;
                       // xy derivative
                       Ue(current_dof) = (gxplus(1) - gxminus(1))
-                                        / 2. / TOLERANCE;
+                        / 2. / TOLERANCE;
                       dof_is_fixed[current_dof] = true;
                       current_dof++;
 
@@ -1447,12 +1447,12 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                           current_dof++;
                           // xz derivative
                           Ue(current_dof) = (gxplus(2) - gxminus(2))
-                                            / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                           // We need new points for yz
                           Point nyminus = elem->point(n),
-                                nyplus = elem->point(n);
+                            nyplus = elem->point(n);
                           nyminus(1) -= TOLERANCE;
                           nyplus(1) += TOLERANCE;
                           Gradient gyminus = g->component(var_component,
@@ -1463,14 +1463,14 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                                                          system.time);
                           // xz derivative
                           Ue(current_dof) = (gyplus(2) - gyminus(2))
-                                            / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                           // Getting a 2nd order xyz is more tedious
                           Point nxmym = elem->point(n),
-                                nxmyp = elem->point(n),
-                                nxpym = elem->point(n),
-                                nxpyp = elem->point(n);
+                            nxmyp = elem->point(n),
+                            nxpym = elem->point(n),
+                            nxpyp = elem->point(n);
                           nxmym(0) -= TOLERANCE;
                           nxmym(1) -= TOLERANCE;
                           nxmyp(0) -= TOLERANCE;
@@ -1492,12 +1492,12 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                                                         nxpyp,
                                                         system.time);
                           Number gxzplus = (gxpyp(2) - gxmyp(2))
-                                         / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           Number gxzminus = (gxpym(2) - gxmym(2))
-                                          / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           // xyz derivative
                           Ue(current_dof) = (gxzplus - gxzminus)
-                                            / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                         }
@@ -1584,7 +1584,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                             unsigned int j = side_dofs[sidej];
                             if (dof_is_fixed[j])
                               Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                                           JxW[qp] * Ue(j);
+                                JxW[qp] * Ue(j);
                             else
                               Ke(freei,freej) += phi[i][qp] *
                                 phi[j][qp] * JxW[qp];
@@ -1593,11 +1593,11 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                                 if (dof_is_fixed[j])
                                   Fe(freei) -= ((*dphi)[i][qp] *
                                                 (*dphi)[j][qp]) *
-                                                JxW[qp] * Ue(j);
+                                    JxW[qp] * Ue(j);
                                 else
                                   Ke(freei,freej) += ((*dphi)[i][qp] *
                                                       (*dphi)[j][qp])
-                                                      * JxW[qp];
+                                    * JxW[qp];
                               }
                             if (!dof_is_fixed[j])
                               freej++;
@@ -1605,7 +1605,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                         Fe(freei) += phi[i][qp] * fineval * JxW[qp];
                         if (cont == C_ONE)
                           Fe(freei) += (finegrad * (*dphi)[i][qp]) *
-                                       JxW[qp];
+                            JxW[qp];
                         freei++;
                       }
                   }
@@ -1617,7 +1617,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                   {
                     Number &ui = Ue(side_dofs[free_dof[i]]);
                     libmesh_assert(std::abs(ui) < TOLERANCE ||
-                           std::abs(ui - Uedge(i)) < TOLERANCE);
+                                   std::abs(ui - Uedge(i)) < TOLERANCE);
                     ui = Uedge(i);
                     dof_is_fixed[side_dofs[free_dof[i]]] = true;
                   }
@@ -1679,7 +1679,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                             unsigned int j = side_dofs[sidej];
                             if (dof_is_fixed[j])
                               Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                                           JxW[qp] * Ue(j);
+                                JxW[qp] * Ue(j);
                             else
                               Ke(freei,freej) += phi[i][qp] *
                                 phi[j][qp] * JxW[qp];
@@ -1688,11 +1688,11 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                                 if (dof_is_fixed[j])
                                   Fe(freei) -= ((*dphi)[i][qp] *
                                                 (*dphi)[j][qp]) *
-                                               JxW[qp] * Ue(j);
+                                    JxW[qp] * Ue(j);
                                 else
                                   Ke(freei,freej) += ((*dphi)[i][qp] *
                                                       (*dphi)[j][qp])
-                                                     * JxW[qp];
+                                    * JxW[qp];
                               }
                             if (!dof_is_fixed[j])
                               freej++;
@@ -1700,7 +1700,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                         Fe(freei) += (fineval * phi[i][qp]) * JxW[qp];
                         if (cont == C_ONE)
                           Fe(freei) += (finegrad * (*dphi)[i][qp]) *
-                                       JxW[qp];
+                            JxW[qp];
                         freei++;
                       }
                   }
@@ -1712,7 +1712,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                   {
                     Number &ui = Ue(side_dofs[free_dof[i]]);
                     libmesh_assert(std::abs(ui) < TOLERANCE ||
-                           std::abs(ui - Uside(i)) < TOLERANCE);
+                                   std::abs(ui - Uside(i)) < TOLERANCE);
                     ui = Uside(i);
                     dof_is_fixed[side_dofs[free_dof[i]]] = true;
                   }
@@ -1733,73 +1733,73 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
 
               Ke.resize (free_dofs, free_dofs); Ke.zero();
               Fe.resize (free_dofs); Fe.zero();
-          // The new interior coefficients
-          DenseVector<Number> Uint(free_dofs);
+              // The new interior coefficients
+              DenseVector<Number> Uint(free_dofs);
 
-          // Initialize FE data
-          fe->attach_quadrature_rule (qrule.get());
-          fe->reinit (elem);
-          const unsigned int n_qp = qrule->n_points();
+              // Initialize FE data
+              fe->attach_quadrature_rule (qrule.get());
+              fe->reinit (elem);
+              const unsigned int n_qp = qrule->n_points();
 
-          // Loop over the quadrature points
-          for (unsigned int qp=0; qp<n_qp; qp++)
-            {
-              // solution at the quadrature point
-              Number fineval = f->component(var_component,
+              // Loop over the quadrature points
+              for (unsigned int qp=0; qp<n_qp; qp++)
+                {
+                  // solution at the quadrature point
+                  Number fineval = f->component(var_component,
+                                                xyz_values[qp],
+                                                system.time);
+                  // solution grad at the quadrature point
+                  Gradient finegrad;
+                  if (cont == C_ONE)
+                    finegrad = g->component(var_component,
                                             xyz_values[qp],
                                             system.time);
-              // solution grad at the quadrature point
-              Gradient finegrad;
-              if (cont == C_ONE)
-                finegrad = g->component(var_component,
-                                        xyz_values[qp],
-                                        system.time);
 
-              // Form interior projection matrix
-              for (unsigned int i=0, freei=0; i != n_dofs; ++i)
-                {
-                  // fixed DoFs aren't test functions
-                  if (dof_is_fixed[i])
-                    continue;
-                  for (unsigned int j=0, freej=0; j != n_dofs; ++j)
+                  // Form interior projection matrix
+                  for (unsigned int i=0, freei=0; i != n_dofs; ++i)
                     {
-                      if (dof_is_fixed[j])
-                        Fe(freei) -= phi[i][qp] * phi[j][qp] * JxW[qp]
-                                     * Ue(j);
-                      else
-                        Ke(freei,freej) += phi[i][qp] * phi[j][qp] *
-                                           JxW[qp];
-                      if (cont == C_ONE)
+                      // fixed DoFs aren't test functions
+                      if (dof_is_fixed[i])
+                        continue;
+                      for (unsigned int j=0, freej=0; j != n_dofs; ++j)
                         {
                           if (dof_is_fixed[j])
-                            Fe(freei) -= ((*dphi)[i][qp] *
-                                          (*dphi)[j][qp]) * JxW[qp] *
-                                         Ue(j);
+                            Fe(freei) -= phi[i][qp] * phi[j][qp] * JxW[qp]
+                              * Ue(j);
                           else
-                            Ke(freei,freej) += ((*dphi)[i][qp] *
-                                                (*dphi)[j][qp]) *
-                                               JxW[qp];
+                            Ke(freei,freej) += phi[i][qp] * phi[j][qp] *
+                              JxW[qp];
+                          if (cont == C_ONE)
+                            {
+                              if (dof_is_fixed[j])
+                                Fe(freei) -= ((*dphi)[i][qp] *
+                                              (*dphi)[j][qp]) * JxW[qp] *
+                                  Ue(j);
+                              else
+                                Ke(freei,freej) += ((*dphi)[i][qp] *
+                                                    (*dphi)[j][qp]) *
+                                  JxW[qp];
+                            }
+                          if (!dof_is_fixed[j])
+                            freej++;
                         }
-                      if (!dof_is_fixed[j])
-                        freej++;
+                      Fe(freei) += phi[i][qp] * fineval * JxW[qp];
+                      if (cont == C_ONE)
+                        Fe(freei) += (finegrad * (*dphi)[i][qp]) * JxW[qp];
+                      freei++;
                     }
-                  Fe(freei) += phi[i][qp] * fineval * JxW[qp];
-                  if (cont == C_ONE)
-                    Fe(freei) += (finegrad * (*dphi)[i][qp]) * JxW[qp];
-                  freei++;
                 }
-            }
-          Ke.cholesky_solve(Fe, Uint);
+              Ke.cholesky_solve(Fe, Uint);
 
-          // Transfer new interior solutions to element
-          for (unsigned int i=0; i != free_dofs; ++i)
-            {
-              Number &ui = Ue(free_dof[i]);
-              libmesh_assert(std::abs(ui) < TOLERANCE ||
-                     std::abs(ui - Uint(i)) < TOLERANCE);
-              ui = Uint(i);
-              dof_is_fixed[free_dof[i]] = true;
-            }
+              // Transfer new interior solutions to element
+              for (unsigned int i=0; i != free_dofs; ++i)
+                {
+                  Number &ui = Ue(free_dof[i]);
+                  libmesh_assert(std::abs(ui) < TOLERANCE ||
+                                 std::abs(ui - Uint(i)) < TOLERANCE);
+                  ui = Uint(i);
+                  dof_is_fixed[free_dof[i]] = true;
+                }
 
             } // if there are free interior dofs
 
@@ -2009,7 +2009,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
                     {
                       // We'll finite difference mixed derivatives
                       Point nxminus = elem->point(n),
-                            nxplus = elem->point(n);
+                        nxplus = elem->point(n);
                       nxminus(0) -= TOLERANCE;
                       nxplus(0) += TOLERANCE;
                       Gradient gxminus = g->component(context,
@@ -2026,7 +2026,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
                       current_dof++;
                       // xy derivative
                       Ue(current_dof) = (gxplus(1) - gxminus(1))
-                                        / 2. / TOLERANCE;
+                        / 2. / TOLERANCE;
                       dof_is_fixed[current_dof] = true;
                       current_dof++;
 
@@ -2038,12 +2038,12 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
                           current_dof++;
                           // xz derivative
                           Ue(current_dof) = (gxplus(2) - gxminus(2))
-                                            / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                           // We need new points for yz
                           Point nyminus = elem->point(n),
-                                nyplus = elem->point(n);
+                            nyplus = elem->point(n);
                           nyminus(1) -= TOLERANCE;
                           nyplus(1) += TOLERANCE;
                           Gradient gyminus = g->component(context,
@@ -2056,14 +2056,14 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
                                                          system.time);
                           // xz derivative
                           Ue(current_dof) = (gyplus(2) - gyminus(2))
-                                            / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                           // Getting a 2nd order xyz is more tedious
                           Point nxmym = elem->point(n),
-                                nxmyp = elem->point(n),
-                                nxpym = elem->point(n),
-                                nxpyp = elem->point(n);
+                            nxmyp = elem->point(n),
+                            nxpym = elem->point(n),
+                            nxpyp = elem->point(n);
                           nxmym(0) -= TOLERANCE;
                           nxmym(1) -= TOLERANCE;
                           nxmyp(0) -= TOLERANCE;
@@ -2089,12 +2089,12 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
                                                         nxpyp,
                                                         system.time);
                           Number gxzplus = (gxpyp(2) - gxmyp(2))
-                                         / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           Number gxzminus = (gxpym(2) - gxmym(2))
-                                          / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           // xyz derivative
                           Ue(current_dof) = (gxzplus - gxzminus)
-                                            / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                         }
@@ -2563,8 +2563,8 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
           // Find out which nodes, edges and sides are on a requested
           // boundary:
           std::vector<bool> is_boundary_node(elem->n_nodes(), false),
-                            is_boundary_edge(elem->n_edges(), false),
-                            is_boundary_side(elem->n_sides(), false);
+            is_boundary_edge(elem->n_edges(), false),
+            is_boundary_side(elem->n_sides(), false);
           for (unsigned char s=0; s != elem->n_sides(); ++s)
             {
               // First see if this side has been requested
@@ -2666,7 +2666,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                     {
                       // We'll finite difference mixed derivatives
                       Point nxminus = elem->point(n),
-                            nxplus = elem->point(n);
+                        nxplus = elem->point(n);
                       nxminus(0) -= TOLERANCE;
                       nxplus(0) += TOLERANCE;
                       Gradient gxminus = g->component(var_component,
@@ -2681,7 +2681,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                       current_dof++;
                       // xy derivative
                       Ue(current_dof) = (gxplus(1) - gxminus(1))
-                                        / 2. / TOLERANCE;
+                        / 2. / TOLERANCE;
                       dof_is_fixed[current_dof] = true;
                       current_dof++;
 
@@ -2693,12 +2693,12 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                           current_dof++;
                           // xz derivative
                           Ue(current_dof) = (gxplus(2) - gxminus(2))
-                                            / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                           // We need new points for yz
                           Point nyminus = elem->point(n),
-                                nyplus = elem->point(n);
+                            nyplus = elem->point(n);
                           nyminus(1) -= TOLERANCE;
                           nyplus(1) += TOLERANCE;
                           Gradient gyminus = g->component(var_component,
@@ -2709,14 +2709,14 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                                                          system.time);
                           // xz derivative
                           Ue(current_dof) = (gyplus(2) - gyminus(2))
-                                            / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                           // Getting a 2nd order xyz is more tedious
                           Point nxmym = elem->point(n),
-                                nxmyp = elem->point(n),
-                                nxpym = elem->point(n),
-                                nxpyp = elem->point(n);
+                            nxmyp = elem->point(n),
+                            nxpym = elem->point(n),
+                            nxpyp = elem->point(n);
                           nxmym(0) -= TOLERANCE;
                           nxmym(1) -= TOLERANCE;
                           nxmyp(0) -= TOLERANCE;
@@ -2738,12 +2738,12 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                                                         nxpyp,
                                                         system.time);
                           Number gxzplus = (gxpyp(2) - gxmyp(2))
-                                         / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           Number gxzminus = (gxpym(2) - gxmym(2))
-                                          / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           // xyz derivative
                           Ue(current_dof) = (gxzplus - gxzminus)
-                                            / 2. / TOLERANCE;
+                            / 2. / TOLERANCE;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                         }
@@ -2833,7 +2833,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                             unsigned int j = side_dofs[sidej];
                             if (dof_is_fixed[j])
                               Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                                           JxW[qp] * Ue(j);
+                                JxW[qp] * Ue(j);
                             else
                               Ke(freei,freej) += phi[i][qp] *
                                 phi[j][qp] * JxW[qp];
@@ -2842,11 +2842,11 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                                 if (dof_is_fixed[j])
                                   Fe(freei) -= ((*dphi)[i][qp] *
                                                 (*dphi)[j][qp]) *
-                                                JxW[qp] * Ue(j);
+                                    JxW[qp] * Ue(j);
                                 else
                                   Ke(freei,freej) += ((*dphi)[i][qp] *
                                                       (*dphi)[j][qp])
-                                                      * JxW[qp];
+                                    * JxW[qp];
                               }
                             if (!dof_is_fixed[j])
                               freej++;
@@ -2854,7 +2854,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                         Fe(freei) += phi[i][qp] * fineval * JxW[qp];
                         if (cont == C_ONE)
                           Fe(freei) += (finegrad * (*dphi)[i][qp]) *
-                                       JxW[qp];
+                            JxW[qp];
                         freei++;
                       }
                   }
@@ -2866,7 +2866,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                   {
                     Number &ui = Ue(side_dofs[free_dof[i]]);
                     libmesh_assert(std::abs(ui) < TOLERANCE ||
-                           std::abs(ui - Uedge(i)) < TOLERANCE);
+                                   std::abs(ui - Uedge(i)) < TOLERANCE);
                     ui = Uedge(i);
                     dof_is_fixed[side_dofs[free_dof[i]]] = true;
                   }
@@ -2931,7 +2931,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                             unsigned int j = side_dofs[sidej];
                             if (dof_is_fixed[j])
                               Fe(freei) -= phi[i][qp] * phi[j][qp] *
-                                           JxW[qp] * Ue(j);
+                                JxW[qp] * Ue(j);
                             else
                               Ke(freei,freej) += phi[i][qp] *
                                 phi[j][qp] * JxW[qp];
@@ -2940,11 +2940,11 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                                 if (dof_is_fixed[j])
                                   Fe(freei) -= ((*dphi)[i][qp] *
                                                 (*dphi)[j][qp]) *
-                                               JxW[qp] * Ue(j);
+                                    JxW[qp] * Ue(j);
                                 else
                                   Ke(freei,freej) += ((*dphi)[i][qp] *
                                                       (*dphi)[j][qp])
-                                                     * JxW[qp];
+                                    * JxW[qp];
                               }
                             if (!dof_is_fixed[j])
                               freej++;
@@ -2952,7 +2952,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                         Fe(freei) += (fineval * phi[i][qp]) * JxW[qp];
                         if (cont == C_ONE)
                           Fe(freei) += (finegrad * (*dphi)[i][qp]) *
-                                       JxW[qp];
+                            JxW[qp];
                         freei++;
                       }
                   }
@@ -2964,7 +2964,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                   {
                     Number &ui = Ue(side_dofs[free_dof[i]]);
                     libmesh_assert(std::abs(ui) < TOLERANCE ||
-                           std::abs(ui - Uside(i)) < TOLERANCE);
+                                   std::abs(ui - Uside(i)) < TOLERANCE);
                     ui = Uside(i);
                     dof_is_fixed[side_dofs[free_dof[i]]] = true;
                   }

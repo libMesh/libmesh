@@ -72,37 +72,37 @@ namespace libMesh
 
 template<>
 Real FEHermite<1>::hermite_raw_shape_second_deriv
- (const unsigned int i, const Real xi)
+(const unsigned int i, const Real xi)
 {
   using Utility::pow;
 
   switch (i)
     {
-      case 0:
-        return 1.5 * xi;
-      case 1:
-        return -1.5 * xi;
-      case 2:
-        return 0.5 * (-1. + 3.*xi);
-      case 3:
-        return 0.5 * (1. + 3.*xi);
-      case 4:
-        return (8.*xi*xi + 4.*(xi*xi-1.))/24.;
-      case 5:
-        return (8.*xi*xi*xi + 12.*xi*(xi*xi-1.))/120.;
-//      case 6:
-//        return (8.*pow<4>(xi) + 20.*xi*xi*(xi*xi-1.) +
-//          2.*(xi*xi-1)*(xi*xi-1))/720.;
-      default:
-        Real denominator = 720., xipower = 1.;
-        for (unsigned n=6; n != i; ++n)
-          {
-            xipower *= xi;
-            denominator *= (n+1);
-          }
-        return (8.*pow<4>(xi)*xipower +
-                (8.*(i-4)+4.)*xi*xi*xipower*(xi*xi-1.) +
-                (i-4)*(i-5)*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
+    case 0:
+      return 1.5 * xi;
+    case 1:
+      return -1.5 * xi;
+    case 2:
+      return 0.5 * (-1. + 3.*xi);
+    case 3:
+      return 0.5 * (1. + 3.*xi);
+    case 4:
+      return (8.*xi*xi + 4.*(xi*xi-1.))/24.;
+    case 5:
+      return (8.*xi*xi*xi + 12.*xi*(xi*xi-1.))/120.;
+      //      case 6:
+      //        return (8.*pow<4>(xi) + 20.*xi*xi*(xi*xi-1.) +
+      //          2.*(xi*xi-1)*(xi*xi-1))/720.;
+    default:
+      Real denominator = 720., xipower = 1.;
+      for (unsigned n=6; n != i; ++n)
+        {
+          xipower *= xi;
+          denominator *= (n+1);
+        }
+      return (8.*pow<4>(xi)*xipower +
+              (8.*(i-4)+4.)*xi*xi*xipower*(xi*xi-1.) +
+              (i-4)*(i-5)*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
     }
 
   libmesh_error();
@@ -113,33 +113,33 @@ Real FEHermite<1>::hermite_raw_shape_second_deriv
 
 template<>
 Real FEHermite<1>::hermite_raw_shape_deriv
- (const unsigned int i, const Real xi)
+(const unsigned int i, const Real xi)
 {
   switch (i)
     {
-      case 0:
-        return 0.75 * (-1. + xi*xi);
-      case 1:
-        return 0.75 * (1. - xi*xi);
-      case 2:
-        return 0.25 * (-1. - 2.*xi + 3.*xi*xi);
-      case 3:
-        return 0.25 * (-1. + 2.*xi + 3.*xi*xi);
-      case 4:
-        return 4.*xi * (xi*xi-1.)/24.;
-      case 5:
-        return (4*xi*xi*(xi*xi-1.) + (xi*xi-1.)*(xi*xi-1.))/120.;
-//      case 6:
-//        return (4*xi*xi*xi*(xi*xi-1.) + 2*xi*(xi*xi-1.)*(xi*xi-1.))/720.;
-      default:
-        Real denominator = 720., xipower = 1.;
-        for (unsigned n=6; n != i; ++n)
-          {
-            xipower *= xi;
-            denominator *= (n+1);
-          }
-        return (4*xi*xi*xi*xipower*(xi*xi-1.) +
-                (i-4)*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
+    case 0:
+      return 0.75 * (-1. + xi*xi);
+    case 1:
+      return 0.75 * (1. - xi*xi);
+    case 2:
+      return 0.25 * (-1. - 2.*xi + 3.*xi*xi);
+    case 3:
+      return 0.25 * (-1. + 2.*xi + 3.*xi*xi);
+    case 4:
+      return 4.*xi * (xi*xi-1.)/24.;
+    case 5:
+      return (4*xi*xi*(xi*xi-1.) + (xi*xi-1.)*(xi*xi-1.))/120.;
+      //      case 6:
+      //        return (4*xi*xi*xi*(xi*xi-1.) + 2*xi*(xi*xi-1.)*(xi*xi-1.))/720.;
+    default:
+      Real denominator = 720., xipower = 1.;
+      for (unsigned n=6; n != i; ++n)
+        {
+          xipower *= xi;
+          denominator *= (n+1);
+        }
+      return (4*xi*xi*xi*xipower*(xi*xi-1.) +
+              (i-4)*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
     }
 
   libmesh_error();
@@ -148,33 +148,33 @@ Real FEHermite<1>::hermite_raw_shape_deriv
 
 template<>
 Real FEHermite<1>::hermite_raw_shape
- (const unsigned int i, const Real xi)
+(const unsigned int i, const Real xi)
 {
   switch (i)
     {
-      case 0:
-        return 0.25 * (2. - 3.*xi + xi*xi*xi);
-      case 1:
-        return 0.25 * (2. + 3.*xi - xi*xi*xi);
-      case 2:
-        return 0.25 * (1. - xi - xi*xi + xi*xi*xi);
-      case 3:
-        return 0.25 * (-1. - xi + xi*xi + xi*xi*xi);
+    case 0:
+      return 0.25 * (2. - 3.*xi + xi*xi*xi);
+    case 1:
+      return 0.25 * (2. + 3.*xi - xi*xi*xi);
+    case 2:
+      return 0.25 * (1. - xi - xi*xi + xi*xi*xi);
+    case 3:
+      return 0.25 * (-1. - xi + xi*xi + xi*xi*xi);
       // All high order terms have the form x^(p-4)(x^2-1)^2/p!
-      case 4:
-        return (xi*xi-1.) * (xi*xi-1.)/24.;
-      case 5:
-        return xi * (xi*xi-1.) * (xi*xi-1.)/120.;
-//      case 6:
-//        return xi*xi * (xi*xi-1.) * (xi*xi-1.)/720.;
-      default:
-        Real denominator = 720., xipower = 1.;
-        for (unsigned n=6; n != i; ++n)
-          {
-            xipower *= xi;
-            denominator *= (n+1);
-          }
-        return (xi*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
+    case 4:
+      return (xi*xi-1.) * (xi*xi-1.)/24.;
+    case 5:
+      return xi * (xi*xi-1.) * (xi*xi-1.)/120.;
+      //      case 6:
+      //        return xi*xi * (xi*xi-1.) * (xi*xi-1.)/720.;
+    default:
+      Real denominator = 720., xipower = 1.;
+      for (unsigned n=6; n != i; ++n)
+        {
+          xipower *= xi;
+          denominator *= (n+1);
+        }
+      return (xi*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
 
     }
 

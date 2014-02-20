@@ -54,27 +54,27 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
   unsigned int n_qpoints = (context.get_element_qrule())->n_points();
 
   const unsigned int n_x_dofs = (_mesh_x_var == libMesh::invalid_uint) ?
-                                0 : context.dof_indices_var[_mesh_x_var].size();
+    0 : context.dof_indices_var[_mesh_x_var].size();
   const unsigned int n_y_dofs = (_mesh_y_var == libMesh::invalid_uint) ?
-                                0 : context.dof_indices_var[_mesh_y_var].size();
+    0 : context.dof_indices_var[_mesh_y_var].size();
   const unsigned int n_z_dofs = (_mesh_z_var == libMesh::invalid_uint) ?
-                                0 : context.dof_indices_var[_mesh_z_var].size();
+    0 : context.dof_indices_var[_mesh_z_var].size();
 
   const unsigned int mesh_xyz_var = n_x_dofs ? _mesh_x_var :
-                                   (n_y_dofs ? _mesh_y_var :
-                                   (n_z_dofs ? _mesh_z_var :
-                                    libMesh::invalid_uint));
+    (n_y_dofs ? _mesh_y_var :
+     (n_z_dofs ? _mesh_z_var :
+      libMesh::invalid_uint));
 
   // If we're our own _mesh_sys, we'd better be in charge of
   // at least one coordinate, and we'd better have the same
   // FE type for all coordinates we are in charge of
   libmesh_assert_not_equal_to (mesh_xyz_var, libMesh::invalid_uint);
   libmesh_assert(!n_x_dofs || context.element_fe_var[_mesh_x_var] ==
-                              context.element_fe_var[mesh_xyz_var]);
+                 context.element_fe_var[mesh_xyz_var]);
   libmesh_assert(!n_y_dofs || context.element_fe_var[_mesh_y_var] ==
-                              context.element_fe_var[mesh_xyz_var]);
+                 context.element_fe_var[mesh_xyz_var]);
   libmesh_assert(!n_z_dofs || context.element_fe_var[_mesh_z_var] ==
-                              context.element_fe_var[mesh_xyz_var]);
+                 context.element_fe_var[mesh_xyz_var]);
 
   const std::vector<std::vector<Real> >     &psi =
     context.element_fe_var[mesh_xyz_var]->get_phi();
@@ -135,21 +135,21 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
         {
           unsigned int j = context.dof_indices_var[_mesh_x_var][i];
           delta_x[i] = libmesh_real(this->current_solution(j)) -
-                       libmesh_real(unsteady->old_nonlinear_solution(j));
+            libmesh_real(unsteady->old_nonlinear_solution(j));
         }
 
       for (unsigned int i = 0; i != n_y_dofs; ++i)
         {
           unsigned int j = context.dof_indices_var[_mesh_y_var][i];
           delta_y[i] = libmesh_real(this->current_solution(j)) -
-                       libmesh_real(unsteady->old_nonlinear_solution(j));
+            libmesh_real(unsteady->old_nonlinear_solution(j));
         }
 
       for (unsigned int i = 0; i != n_z_dofs; ++i)
         {
           unsigned int j = context.dof_indices_var[_mesh_z_var][i];
           delta_z[i] = libmesh_real(this->current_solution(j)) -
-                       libmesh_real(unsteady->old_nonlinear_solution(j));
+            libmesh_real(unsteady->old_nonlinear_solution(j));
         }
 
       for (unsigned int qp = 0; qp != n_qpoints; ++qp)

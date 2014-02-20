@@ -48,27 +48,27 @@ namespace libMesh
 
 namespace
 {
-  class TecplotMacros
-  {
-  public:
-    TecplotMacros(const unsigned int n_nodes,
-                  const unsigned int n_vars,
-                  const unsigned int n_cells,
-                  const unsigned int n_vert);
-    float & nd(const unsigned int i, const unsigned int j);
-    int   & cd(const unsigned int i, const unsigned int j);
-    std::vector<float> nodalData;
-    std::vector<int>   connData;
-    //float* nodalData;
-    //int*   connData;
+class TecplotMacros
+{
+public:
+  TecplotMacros(const unsigned int n_nodes,
+                const unsigned int n_vars,
+                const unsigned int n_cells,
+                const unsigned int n_vert);
+  float & nd(const unsigned int i, const unsigned int j);
+  int   & cd(const unsigned int i, const unsigned int j);
+  std::vector<float> nodalData;
+  std::vector<int>   connData;
+  //float* nodalData;
+  //int*   connData;
 
-    void set_n_cells (const unsigned int nc);
+  void set_n_cells (const unsigned int nc);
 
-    const unsigned int n_nodes;
-    const unsigned int n_vars;
-    unsigned int n_cells;
-    const unsigned int n_vert;
-  };
+  const unsigned int n_nodes;
+  const unsigned int n_vars;
+  unsigned int n_cells;
+  const unsigned int n_vert;
+};
 }
 
 
@@ -709,7 +709,7 @@ void TecplotIO::write_binary (const std::string& fname,
 #ifdef LIBMESH_USE_REAL_NUMBERS
       ((3 + ((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
 #else
-      ((3 + 3*((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
+    ((3 + 3*((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
 #endif
 
 

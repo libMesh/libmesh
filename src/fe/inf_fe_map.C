@@ -222,7 +222,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
       }
     }
 
-   /**
+  /**
    * The number of iterations in the map inversion process.
    */
   unsigned int cnt = 0;

@@ -54,7 +54,7 @@ std::string Utility::system_info()
 
   // Get user information
 #ifdef LIBMESH_HAVE_GETPWUID
-      struct passwd* p = getpwuid(getuid());
+  struct passwd* p = getpwuid(getuid());
 #endif
 
 

@@ -281,7 +281,7 @@ bool do_compare (EquationSystems& les,
       libMesh::out << "*********   RIGHT SYSTEM   *********" << std::endl;
       res.print_info ();
       libMesh::out << "********* COMPARISON PHASE *********" << std::endl
-                << std::endl;
+                   << std::endl;
     }
 
   /**
@@ -334,8 +334,8 @@ int main (int argc, char** argv)
   if (dim == static_cast<unsigned int>(-1))
     {
       libMesh::out << "ERROR:  you must specify the dimension on "
-                << "the command line!\n\n"
-                << argv[0] << " -d 3 ... for example\n\n";
+                   << "the command line!\n\n"
+                   << argv[0] << " -d 3 ... for example\n\n";
       libmesh_error();
     }
 
@@ -344,14 +344,14 @@ int main (int argc, char** argv)
 
   if (verbose)
     {
-        libMesh::out << "Settings:" << std::endl
-                     << " dimensionality = " << dim << std::endl
-                     << " mesh           = " << names[0] << std::endl
-                     << " left system    = " << names[1] << std::endl
-                     << " right system   = " << names[2] << std::endl
-                     << " threshold      = " << threshold << std::endl
-                     << " read format    = " << format << std::endl
-                     << std::endl;
+      libMesh::out << "Settings:" << std::endl
+                   << " dimensionality = " << dim << std::endl
+                   << " mesh           = " << names[0] << std::endl
+                   << " left system    = " << names[1] << std::endl
+                   << " right system   = " << names[2] << std::endl
+                   << " threshold      = " << threshold << std::endl
+                   << " read format    = " << format << std::endl
+                   << std::endl;
     }
 
 
@@ -405,24 +405,24 @@ int main (int argc, char** argv)
   if (are_equal)
     {
       if (!quiet)
-          libMesh::out << std::endl
-                       << " Congrat's, up to the defined threshold, the two"
-                       << std::endl
-                       << " are identical."
-                       << std::endl;
+        libMesh::out << std::endl
+                     << " Congrat's, up to the defined threshold, the two"
+                     << std::endl
+                     << " are identical."
+                     << std::endl;
       our_result=0;
     }
   else
     {
       if (!quiet)
-          libMesh::out << std::endl
-                       << " Oops, differences occured!"
-                       << std::endl
-                       << " Use -v to obtain more information where differences occured."
-                       << std::endl;
+        libMesh::out << std::endl
+                     << " Oops, differences occured!"
+                     << std::endl
+                     << " Use -v to obtain more information where differences occured."
+                     << std::endl;
       our_result=1;
     }
 
-//  return libMesh::close();
+  //  return libMesh::close();
   return our_result;
 }

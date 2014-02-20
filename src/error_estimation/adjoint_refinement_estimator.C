@@ -88,7 +88,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // We'll want to back up all coarse grid vectors
   std::map<std::string, NumericVector<Number> *> coarse_vectors;
   for (System::vectors_iterator vec = system.vectors_begin(); vec !=
-       system.vectors_end(); ++vec)
+         system.vectors_end(); ++vec)
     {
       // The (string) name of this vector
       const std::string& var_name = vec->first;

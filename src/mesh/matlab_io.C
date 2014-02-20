@@ -56,7 +56,7 @@ void MatlabIO::read_stream(std::istream& in)
 
 #if LIBMESH_DIM < 2
   libMesh::err << "Cannot open dimension 2 mesh file when configured without 2D support." <<
-                  std::endl;
+    std::endl;
   libmesh_error();
 #endif
 

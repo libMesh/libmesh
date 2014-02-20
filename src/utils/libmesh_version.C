@@ -53,23 +53,23 @@ int libMesh::get_libmesh_version()
      v   0.23.1 -> 002301 = 2301
      v. 10.23.2 -> 102302         */
 
-    int major_version = 0;
-    int minor_version = 0;
-    int micro_version = 0;
+  int major_version = 0;
+  int minor_version = 0;
+  int micro_version = 0;
 
 #ifdef LIBMESH_MAJOR_VERSION
-    major_version = LIBMESH_MAJOR_VERSION;
+  major_version = LIBMESH_MAJOR_VERSION;
 #endif
 
 #ifdef LIBMESH_MINOR_VERSION
-    minor_version = LIBMESH_MINOR_VERSION;
+  minor_version = LIBMESH_MINOR_VERSION;
 #endif
 
 #ifdef LIBMESH_MICRO_VERSION
-    micro_version = LIBMESH_MICRO_VERSION;
+  micro_version = LIBMESH_MICRO_VERSION;
 #endif
 
-    return major_version*10000 + minor_version*100 + micro_version;
+  return major_version*10000 + minor_version*100 + micro_version;
 }
 
 

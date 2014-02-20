@@ -140,42 +140,42 @@ void Tet::select_diagonal (const Diagonal diag) const
 #ifdef LIBMESH_ENABLE_AMR
 
 
-  bool Tet::is_child_on_side_helper(const unsigned int c,
-                                    const unsigned int s,
-                                    const unsigned int checked_nodes[][3]) const
-  {
-    libmesh_assert_less (c, this->n_children());
-    libmesh_assert_less (s, this->n_sides());
+bool Tet::is_child_on_side_helper(const unsigned int c,
+                                  const unsigned int s,
+                                  const unsigned int checked_nodes[][3]) const
+{
+  libmesh_assert_less (c, this->n_children());
+  libmesh_assert_less (s, this->n_sides());
 
-    // For the 4 vertices, child c touches vertex c, so we can return
-    // true if that vertex is on side s
-    for (unsigned int i = 0; i != 3; ++i)
-      if (Tet4::side_nodes_map[s][i] == c)
-        return true;
+  // For the 4 vertices, child c touches vertex c, so we can return
+  // true if that vertex is on side s
+  for (unsigned int i = 0; i != 3; ++i)
+    if (Tet4::side_nodes_map[s][i] == c)
+      return true;
 
-    // If we are a "vertex child" and we didn't already return true,
-    // we must not be on the side in question
-    if (c < 4)
-      return false;
+  // If we are a "vertex child" and we didn't already return true,
+  // we must not be on the side in question
+  if (c < 4)
+    return false;
 
-    // For the 4 non-vertex children, the child ordering depends on the
-    // diagonal selection.  We'll let the embedding matrix figure that
-    // out: if this child has three nodes that don't depend on the
-    // position of the node_facing_side[s], then we're on side s.  Which
-    // three nodes those are depends on the subclass, so their responsibility
-    // is to call this function with the proper check_nodes array
-    const unsigned int node_facing_side[4] = {3, 2, 0, 1};
-    const unsigned int n = node_facing_side[s];
+  // For the 4 non-vertex children, the child ordering depends on the
+  // diagonal selection.  We'll let the embedding matrix figure that
+  // out: if this child has three nodes that don't depend on the
+  // position of the node_facing_side[s], then we're on side s.  Which
+  // three nodes those are depends on the subclass, so their responsibility
+  // is to call this function with the proper check_nodes array
+  const unsigned int node_facing_side[4] = {3, 2, 0, 1};
+  const unsigned int n = node_facing_side[s];
 
-    // Add up the absolute values of the entries of the embedding matrix for the
-    // nodes opposite node n.  If it is equal to zero, then the child in question is
-    // on side s, so return true.
-    Real embedding_sum = 0.;
-    for (unsigned i=0; i<3; ++i)
-      embedding_sum += std::abs(this->embedding_matrix(c, checked_nodes[n][i], n));
+  // Add up the absolute values of the entries of the embedding matrix for the
+  // nodes opposite node n.  If it is equal to zero, then the child in question is
+  // on side s, so return true.
+  Real embedding_sum = 0.;
+  for (unsigned i=0; i<3; ++i)
+    embedding_sum += std::abs(this->embedding_matrix(c, checked_nodes[n][i], n));
 
-    return ( std::abs(embedding_sum) < 1.e-3 );
-  }
+  return ( std::abs(embedding_sum) < 1.e-3 );
+}
 
 #else
 

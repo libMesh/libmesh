@@ -27,10 +27,10 @@ namespace libMesh
 {
 
 RBTemporalDiscretization::RBTemporalDiscretization()
-: _delta_t(0.),
-  _euler_theta(0.),
-  _current_time_step(0),
-  _n_time_steps(0)
+  : _delta_t(0.),
+    _euler_theta(0.),
+    _current_time_step(0),
+    _n_time_steps(0)
 {}
 
 Real RBTemporalDiscretization::get_delta_t() const

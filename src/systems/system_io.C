@@ -39,69 +39,69 @@
 // Anonymous namespace for implementation details.
 namespace {
 
-  using libMesh::DofObject;
-  using libMesh::Number;
+using libMesh::DofObject;
+using libMesh::Number;
 
-  // Comments:
-  // ---------
-  // - The max_io_blksize governs how many nodes or elements will be
-  // treated as a single block when performing parallel IO on large
-  // systems.
-  // - This parameter only loosely affects the size of the actual IO
-  // buffer as this depends on the number of components a given
-  // variable has for the nodes/elements in the block.
-  // - When reading/writing each processor uses an ID map which is
-  // 3*io_blksize*sizeof(dof_id_type) bytes long, so with unsigned int
-  // and // io_blksize=256000 we would expect that buffer alone to be
-  // ~3Mb.
-  // - In general, an increase in max_io_blksize should increase the
-  // efficiency of large parallel read/writes by reducing the number
-  // of MPI messages at the expense of memory.
-  // - If the library exhausts memory during IO you might reduce this
-  // parameter.
+// Comments:
+// ---------
+// - The max_io_blksize governs how many nodes or elements will be
+// treated as a single block when performing parallel IO on large
+// systems.
+// - This parameter only loosely affects the size of the actual IO
+// buffer as this depends on the number of components a given
+// variable has for the nodes/elements in the block.
+// - When reading/writing each processor uses an ID map which is
+// 3*io_blksize*sizeof(dof_id_type) bytes long, so with unsigned int
+// and // io_blksize=256000 we would expect that buffer alone to be
+// ~3Mb.
+// - In general, an increase in max_io_blksize should increase the
+// efficiency of large parallel read/writes by reducing the number
+// of MPI messages at the expense of memory.
+// - If the library exhausts memory during IO you might reduce this
+// parameter.
 
-  const std::size_t max_io_blksize = 256000;
+const std::size_t max_io_blksize = 256000;
 
 
-  /**
-   * Comparison object to use with DofObject pointers.  This sorts by id(),
-   * so when we iterate over a set of DofObjects we visit the objects in
-   * order of increasing ID.
-   */
-  struct CompareDofObjectsByID
+/**
+ * Comparison object to use with DofObject pointers.  This sorts by id(),
+ * so when we iterate over a set of DofObjects we visit the objects in
+ * order of increasing ID.
+ */
+struct CompareDofObjectsByID
+{
+  bool operator()(const DofObject *a,
+                  const DofObject *b) const
   {
-    bool operator()(const DofObject *a,
-                    const DofObject *b) const
-    {
-      libmesh_assert (a);
-      libmesh_assert (b);
+    libmesh_assert (a);
+    libmesh_assert (b);
 
-      return a->id() < b->id();
-    }
-  };
+    return a->id() < b->id();
+  }
+};
 
-  /**
-   *
-   */
-    template <typename InValType>
-  class ThreadedIO
+/**
+ *
+ */
+template <typename InValType>
+class ThreadedIO
+{
+private:
+  libMesh::Xdr &_io;
+  std::vector<InValType> &_data;
+
+public:
+  ThreadedIO (libMesh::Xdr &io, std::vector<InValType> &data) :
+    _io(io),
+    _data(data)
+  {}
+
+  void operator()()
   {
-  private:
-    libMesh::Xdr &_io;
-    std::vector<InValType> &_data;
-
-  public:
-    ThreadedIO (libMesh::Xdr &io, std::vector<InValType> &data) :
-      _io(io),
-      _data(data)
-    {}
-
-    void operator()()
-    {
-      if (_data.empty()) return;
-      _io.data_stream (&_data[0], _data.size());
-    }
-  };
+    if (_data.empty()) return;
+    _io.data_stream (&_data[0], _data.size());
+  }
+};
 }
 
 
@@ -187,7 +187,7 @@ void System::read_header (Xdr& io,
           {
             std::vector<subdomain_id_type> domain_array;
             if (this->processor_id() == 0)
-            io.data (domain_array);
+              io.data (domain_array);
             for (std::vector<subdomain_id_type>::iterator it = domain_array.begin(); it != domain_array.end(); ++it)
               domains.insert(*it);
           }
@@ -266,8 +266,8 @@ void System::read_header (Xdr& io,
             else
               _written_var_indices[var] = this->add_variable (var_name, type, &domains);
           }
-    else
-      _written_var_indices[var] = this->variable_number(var_name);
+        else
+          _written_var_indices[var] = this->variable_number(var_name);
       }
   }
 
@@ -536,22 +536,22 @@ void System::read_parallel_data (Xdr &io,
       ordered_nodes_set (this->get_mesh().local_nodes_begin(),
                          this->get_mesh().local_nodes_end());
 
-      ordered_nodes.insert(ordered_nodes.end(),
-                           ordered_nodes_set.begin(),
-                           ordered_nodes_set.end());
+    ordered_nodes.insert(ordered_nodes.end(),
+                         ordered_nodes_set.begin(),
+                         ordered_nodes_set.end());
   }
   {
     std::set<const DofObject*, CompareDofObjectsByID>
       ordered_elements_set (this->get_mesh().local_elements_begin(),
                             this->get_mesh().local_elements_end());
 
-      ordered_elements.insert(ordered_elements.end(),
-                              ordered_elements_set.begin(),
-                              ordered_elements_set.end());
+    ordered_elements.insert(ordered_elements.end(),
+                            ordered_elements_set.begin(),
+                            ordered_elements_set.end());
   }
 
-//  std::vector<Number> io_buffer;
-    std::vector<InValType> io_buffer;
+  //  std::vector<Number> io_buffer;
+  std::vector<InValType> io_buffer;
 
   // 9.)
   //
@@ -706,7 +706,7 @@ void System::read_parallel_data (Xdr &io,
 }
 
 
-  template <typename InValType>
+template <typename InValType>
 void System::read_serialized_data (Xdr& io,
                                    const bool read_additional_data)
 {
@@ -775,7 +775,7 @@ template <typename iterator_type, typename InValType>
 std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_objs,
                                                          const iterator_type begin,
                                                          const iterator_type end,
-                             const InValType ,
+                                                         const InValType ,
                                                          Xdr &io,
                                                          const std::vector<NumericVector<Number>*> &vecs,
                                                          const unsigned int var_to_read) const
@@ -1000,46 +1000,46 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
           // Wait for read completion
           async_io.join();
-      // now copy the values back to the main vector for transfer
-      for (unsigned int i_val=0; i_val<input_vals.size(); i_val++)
-          input_vals[i_val] = input_vals_tmp[i_val];
+          // now copy the values back to the main vector for transfer
+          for (unsigned int i_val=0; i_val<input_vals.size(); i_val++)
+            input_vals[i_val] = input_vals_tmp[i_val];
 
-      n_read_values += input_vals.size();
+          n_read_values += input_vals.size();
 
-      // pack data replies for each processor
-      for (processor_id_type proc=0; proc<this->n_processors(); proc++)
-        {
-          const std::vector<dof_id_type> &ids (recv_ids[proc]);
-          std::vector<Number> &vals (send_vals[proc]);
-          const std::size_t &n_vals_proc (recv_vals_size[proc]);
-
-          vals.clear(); /**/ vals.reserve(n_vals_proc);
-
-          for (std::size_t idx=0; idx<ids.size(); idx+=2)
+          // pack data replies for each processor
+          for (processor_id_type proc=0; proc<this->n_processors(); proc++)
             {
-              const dof_id_type
-                local_idx          = ids[idx+0]-first_object,
-                n_vals_tot_allvecs = ids[idx+1];
+              const std::vector<dof_id_type> &ids (recv_ids[proc]);
+              std::vector<Number> &vals (send_vals[proc]);
+              const std::size_t &n_vals_proc (recv_vals_size[proc]);
 
-              std::vector<Number>::const_iterator in_vals(input_vals.begin());
-              if (local_idx != 0)
-                std::advance (in_vals, obj_val_offsets[local_idx-1]);
+              vals.clear(); /**/ vals.reserve(n_vals_proc);
 
-              for (unsigned int val=0; val<n_vals_tot_allvecs; val++, ++in_vals)
+              for (std::size_t idx=0; idx<ids.size(); idx+=2)
                 {
-                  libmesh_assert (in_vals != input_vals.end());
-                  //libMesh::out << "*in_vals=" << *in_vals << '\n';
-                  vals.push_back(*in_vals);
+                  const dof_id_type
+                    local_idx          = ids[idx+0]-first_object,
+                    n_vals_tot_allvecs = ids[idx+1];
+
+                  std::vector<Number>::const_iterator in_vals(input_vals.begin());
+                  if (local_idx != 0)
+                    std::advance (in_vals, obj_val_offsets[local_idx-1]);
+
+                  for (unsigned int val=0; val<n_vals_tot_allvecs; val++, ++in_vals)
+                    {
+                      libmesh_assert (in_vals != input_vals.end());
+                      //libMesh::out << "*in_vals=" << *in_vals << '\n';
+                      vals.push_back(*in_vals);
+                    }
                 }
-            }
 
 #ifdef LIBMESH_HAVE_MPI
-          // send the relevant values to this processor
-          this->comm().send (proc, vals, reply_requests[proc], val_tag);
+              // send the relevant values to this processor
+              this->comm().send (proc, vals, reply_requests[proc], val_tag);
 #else
-          recv_vals[blk] = vals;
+              recv_vals[blk] = vals;
 #endif
-        }
+            }
         } // end processor 0 read/reply
 
       // all processors complete the (already posted) read for this block
@@ -1176,7 +1176,7 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
         this->read_serialized_blocked_dof_objects (n_nodes,
                                                    this->get_mesh().local_nodes_begin(),
                                                    this->get_mesh().local_nodes_end(),
-                           InValType(),
+                                                   InValType(),
                                                    io,
                                                    std::vector<NumericVector<Number>*> (1,&vec));
 
@@ -1187,7 +1187,7 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
         this->read_serialized_blocked_dof_objects (n_elem,
                                                    this->get_mesh().local_elements_begin(),
                                                    this->get_mesh().local_elements_end(),
-                           InValType(),
+                                                   InValType(),
                                                    io,
                                                    std::vector<NumericVector<Number>*> (1,&vec));
     }
@@ -1207,7 +1207,7 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
                 this->read_serialized_blocked_dof_objects (n_nodes,
                                                            this->get_mesh().local_nodes_begin(),
                                                            this->get_mesh().local_nodes_end(),
-                               InValType(),
+                                                           InValType(),
                                                            io,
                                                            std::vector<NumericVector<Number>*> (1,&vec),
                                                            var);
@@ -1219,7 +1219,7 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
                 this->read_serialized_blocked_dof_objects (n_elem,
                                                            this->get_mesh().local_elements_begin(),
                                                            this->get_mesh().local_elements_end(),
-                               InValType(),
+                                                           InValType(),
                                                            io,
                                                            std::vector<NumericVector<Number>*> (1,&vec),
                                                            var);
@@ -1505,18 +1505,18 @@ void System::write_parallel_data (Xdr &io,
       ordered_nodes_set (this->get_mesh().local_nodes_begin(),
                          this->get_mesh().local_nodes_end());
 
-      ordered_nodes.insert(ordered_nodes.end(),
-                           ordered_nodes_set.begin(),
-                           ordered_nodes_set.end());
+    ordered_nodes.insert(ordered_nodes.end(),
+                         ordered_nodes_set.begin(),
+                         ordered_nodes_set.end());
   }
   {
     std::set<const DofObject*, CompareDofObjectsByID>
       ordered_elements_set (this->get_mesh().local_elements_begin(),
                             this->get_mesh().local_elements_end());
 
-      ordered_elements.insert(ordered_elements.end(),
-                              ordered_elements_set.begin(),
-                              ordered_elements_set.end());
+    ordered_elements.insert(ordered_elements.end(),
+                            ordered_elements_set.begin(),
+                            ordered_elements_set.end());
   }
 
   const unsigned int sys_num = this->number();
@@ -1525,30 +1525,30 @@ void System::write_parallel_data (Xdr &io,
   // Loop over each non-SCALAR variable and each node, and write out the value.
   for (unsigned int var=0; var<nv; var++)
     if (this->variable(var).type().family != SCALAR)
-    {
-      // First write the node DOF values
-      for (std::vector<const DofObject*>::const_iterator
-             it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
-        for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-          {
-            //libMesh::out << "(*it)->id()=" << (*it)->id() << std::endl;
-            libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
-                                         DofObject::invalid_id);
+      {
+        // First write the node DOF values
+        for (std::vector<const DofObject*>::const_iterator
+               it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
+          for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+            {
+              //libMesh::out << "(*it)->id()=" << (*it)->id() << std::endl;
+              libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
+                                           DofObject::invalid_id);
 
-            io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));
-          }
+              io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));
+            }
 
-      // Then write the element DOF values
-      for (std::vector<const DofObject*>::const_iterator
-             it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
-        for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-          {
-            libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
-                                         DofObject::invalid_id);
+        // Then write the element DOF values
+        for (std::vector<const DofObject*>::const_iterator
+               it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
+          for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+            {
+              libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
+                                           DofObject::invalid_id);
 
-            io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));
-          }
-    }
+              io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));
+            }
+      }
 
   // Finally, write the SCALAR data on the last processor
   for (unsigned int var=0; var<this->n_vars(); var++)
@@ -1620,40 +1620,40 @@ void System::write_parallel_data (Xdr &io,
                     }
               }
 
-            // Finally, write the SCALAR data on the last processor
-            for (unsigned int var=0; var<this->n_vars(); var++)
-              if(this->variable(var).type().family == SCALAR)
-                {
-                  if (this->processor_id() == (this->n_processors()-1))
-                    {
-                      const DofMap& dof_map = this->get_dof_map();
-                      std::vector<dof_id_type> SCALAR_dofs;
-                      dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
+          // Finally, write the SCALAR data on the last processor
+          for (unsigned int var=0; var<this->n_vars(); var++)
+            if(this->variable(var).type().family == SCALAR)
+              {
+                if (this->processor_id() == (this->n_processors()-1))
+                  {
+                    const DofMap& dof_map = this->get_dof_map();
+                    std::vector<dof_id_type> SCALAR_dofs;
+                    dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
 
-                      for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
-                        {
-                          io_buffer.push_back( (*pos->second)(SCALAR_dofs[i]) );
-                        }
-                    }
-                }
+                    for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+                      {
+                        io_buffer.push_back( (*pos->second)(SCALAR_dofs[i]) );
+                      }
+                  }
+              }
 
-            // 10.)
-            //
-            // Actually write the reordered additional vector
-            // for this system to disk
+          // 10.)
+          //
+          // Actually write the reordered additional vector
+          // for this system to disk
 
-            // set up the comment
-            {
-              comment = "# System \"";
-              comment += this->name();
-              comment += "\" Additional Vector \"";
-              comment += pos->first;
-              comment += "\"";
-            }
+          // set up the comment
+          {
+            comment = "# System \"";
+            comment += this->name();
+            comment += "\" Additional Vector \"";
+            comment += pos->first;
+            comment += "\"";
+          }
 
-            io.data (io_buffer, comment.c_str());
+          io.data (io_buffer, comment.c_str());
 
-            total_written_size += io_buffer.size();
+          total_written_size += io_buffer.size();
         }
     }
 
@@ -2182,15 +2182,15 @@ std::size_t System::read_serialized_vectors (Xdr &io,
   parallel_object_only();
 
   // Error checking
-// #ifndef NDEBUG
-//   // In parallel we better be reading a parallel vector -- if not
-//   // we will not set all of its components below!!
-//   if (this->n_processors() > 1)
-//     {
-//       libmesh_assert (vec.type() == PARALLEL ||
-//       vec.type() == GHOSTED);
-//     }
-// #endif
+  // #ifndef NDEBUG
+  //   // In parallel we better be reading a parallel vector -- if not
+  //   // we will not set all of its components below!!
+  //   if (this->n_processors() > 1)
+  //     {
+  //       libmesh_assert (vec.type() == PARALLEL ||
+  //       vec.type() == GHOSTED);
+  //     }
+  // #endif
 
   libmesh_assert (io.reading());
 
@@ -2231,7 +2231,7 @@ std::size_t System::read_serialized_vectors (Xdr &io,
     this->read_serialized_blocked_dof_objects (n_nodes,
                                                this->get_mesh().local_nodes_begin(),
                                                this->get_mesh().local_nodes_end(),
-                           InValType(),
+                                               InValType(),
                                                io,
                                                vectors);
 
@@ -2241,7 +2241,7 @@ std::size_t System::read_serialized_vectors (Xdr &io,
     this->read_serialized_blocked_dof_objects (n_elem,
                                                this->get_mesh().local_elements_begin(),
                                                this->get_mesh().local_elements_end(),
-                           InValType(),
+                                               InValType(),
                                                io,
                                                vectors);
 

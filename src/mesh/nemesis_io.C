@@ -39,38 +39,38 @@ namespace libMesh
 //-----------------------------------------------
 // anonymous namespace for implementation details
 namespace {
-  struct CompareGlobalIdxMappings
-  {
-    // strict weak ordering for a.first -> a.second mapping.  since we can only map to one
-    // value only order the first entry
-    bool operator()(const std::pair<unsigned int, unsigned int> &a,
-                    const std::pair<unsigned int, unsigned int> &b) const
-    { return a.first < b.first; }
+struct CompareGlobalIdxMappings
+{
+  // strict weak ordering for a.first -> a.second mapping.  since we can only map to one
+  // value only order the first entry
+  bool operator()(const std::pair<unsigned int, unsigned int> &a,
+                  const std::pair<unsigned int, unsigned int> &b) const
+  { return a.first < b.first; }
 
-    // strict weak ordering for a.first -> a.second mapping.  lookups will
-    // be in terms of a single integer, which is why we need this method.
-    bool operator()(const std::pair<unsigned int, unsigned int> &a,
-                    const unsigned int b) const
-    { return a.first < b; }
-  };
+  // strict weak ordering for a.first -> a.second mapping.  lookups will
+  // be in terms of a single integer, which is why we need this method.
+  bool operator()(const std::pair<unsigned int, unsigned int> &a,
+                  const unsigned int b) const
+  { return a.first < b; }
+};
 
-  // Nemesis & ExodusII use int for all integer values, even the ones which
-  // should never be negative.  we like to use unsigned as a force of habit,
-  // this trivial little method saves some typing & also makes sure something
-  // is not horribly wrong.
-  template <typename T>
-  inline unsigned int to_uint ( const T &t )
-  {
-    libmesh_assert_equal_to (t, static_cast<T>(static_cast<unsigned int>(t)));
+// Nemesis & ExodusII use int for all integer values, even the ones which
+// should never be negative.  we like to use unsigned as a force of habit,
+// this trivial little method saves some typing & also makes sure something
+// is not horribly wrong.
+template <typename T>
+inline unsigned int to_uint ( const T &t )
+{
+  libmesh_assert_equal_to (t, static_cast<T>(static_cast<unsigned int>(t)));
 
-    return static_cast<unsigned int>(t);
-  }
+  return static_cast<unsigned int>(t);
+}
 
-  // test equality for a.first -> a.second mapping.  since we can only map to one
-  // value only test the first entry
-  inline bool global_idx_mapping_equality (const std::pair<unsigned int, unsigned int> &a,
-                                           const std::pair<unsigned int, unsigned int> &b)
-  { return a.first == b.first; }
+// test equality for a.first -> a.second mapping.  since we can only map to one
+// value only test the first entry
+inline bool global_idx_mapping_equality (const std::pair<unsigned int, unsigned int> &a,
+                                         const std::pair<unsigned int, unsigned int> &b)
+{ return a.first == b.first; }
 }
 
 
@@ -755,14 +755,14 @@ void Nemesis_IO::read (const std::string& base_filename)
   // global_elem_blk_cnts[] arrays.
   nemhelper->get_eb_info_global();
 
-//   // Fills in the vectors
-//   // elem_mapi[num_internal_elems]
-//   // elem_mapb[num_border_elems  ]
-//   // These tell which of the (locally-numbered) elements are internal and which are border elements.
-//   // In our test example these arrays are sorted (but non-contiguous), which makes it possible to
-//   // binary search for each element ID... however I don't think we need to distinguish between the
-//   // two types, since either can have nodes the boundary!
-//   nemhelper->get_elem_map();
+  //   // Fills in the vectors
+  //   // elem_mapi[num_internal_elems]
+  //   // elem_mapb[num_border_elems  ]
+  //   // These tell which of the (locally-numbered) elements are internal and which are border elements.
+  //   // In our test example these arrays are sorted (but non-contiguous), which makes it possible to
+  //   // binary search for each element ID... however I don't think we need to distinguish between the
+  //   // two types, since either can have nodes the boundary!
+  //   nemhelper->get_elem_map();
 
   // Fills in the vectors of vectors:
   // elem_cmap_elem_ids[][]
@@ -902,8 +902,8 @@ void Nemesis_IO::read (const std::string& base_filename)
       libMesh::err << "Cannot open dimension " <<
         mesh.mesh_dimension() <<
         " mesh file when configured without " <<
-                      mesh.mesh_dimension() << "D support." <<
-                      std::endl;
+        mesh.mesh_dimension() << "D support." <<
+        std::endl;
       libmesh_error();
     }
 #endif
@@ -1068,13 +1068,13 @@ void Nemesis_IO::read (const std::string& base_filename)
       libMesh::out << "nemhelper->num_node_sets=" << nemhelper->num_node_sets << std::endl;
     }
 
-//  // Debugging, what is currently in nemhelper->node_num_map anyway?
-//  libMesh::out << "[" << this->processor_id() << "] "
-//       << "nemhelper->node_num_map = ";
-//
-//  for (unsigned int i=0; i<nemhelper->node_num_map.size(); ++i)
-//    libMesh::out << nemhelper->node_num_map[i] << ", ";
-//  libMesh::out << std::endl;
+  //  // Debugging, what is currently in nemhelper->node_num_map anyway?
+  //  libMesh::out << "[" << this->processor_id() << "] "
+  //       << "nemhelper->node_num_map = ";
+  //
+  //  for (unsigned int i=0; i<nemhelper->node_num_map.size(); ++i)
+  //    libMesh::out << nemhelper->node_num_map[i] << ", ";
+  //  libMesh::out << std::endl;
 
   // For each nodeset,
   for (int nodeset=0; nodeset<nemhelper->num_node_sets; nodeset++)
@@ -1206,12 +1206,12 @@ void Nemesis_IO::write (const std::string& base_filename)
   nemhelper->ex_err = exII::ex_update(nemhelper->ex_id);
 
   if( (mesh.boundary_info->n_edge_conds() > 0) &&
-       _verbose )
-  {
-    libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
-                 << "are not supported by the Nemesis format."
-                 << std::endl;
-  }
+      _verbose )
+    {
+      libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
+                   << "are not supported by the Nemesis format."
+                   << std::endl;
+    }
 }
 
 #else
@@ -1264,49 +1264,49 @@ void Nemesis_IO::write_nodal_data (const std::string& base_filename,
   std::string nemesis_filename = nemhelper->construct_nemesis_filename(base_filename);
 
   if (!nemhelper->opened_for_writing)
-  {
-    // If we're appending, open() the file with read_only=false,
-    // otherwise create() it and write the contents of the mesh to
-    // it.
-    if (_append)
     {
-      nemhelper->open(nemesis_filename.c_str(), /*read_only=*/false);
-      // After opening the file, read the header so that certain
-      // fields, such as the number of nodes and the number of
-      // elements, are correctly initialized for the subsequent
-      // call to write the nodal solution.
-      nemhelper->read_header();
-    }
-    else
-    {
-      nemhelper->create(nemesis_filename);
-      nemhelper->initialize(nemesis_filename,mesh);
-      nemhelper->write_nodal_coordinates(mesh);
-      nemhelper->write_elements(mesh);
-      nemhelper->write_nodesets(mesh);
-      nemhelper->write_sidesets(mesh);
+      // If we're appending, open() the file with read_only=false,
+      // otherwise create() it and write the contents of the mesh to
+      // it.
+      if (_append)
+        {
+          nemhelper->open(nemesis_filename.c_str(), /*read_only=*/false);
+          // After opening the file, read the header so that certain
+          // fields, such as the number of nodes and the number of
+          // elements, are correctly initialized for the subsequent
+          // call to write the nodal solution.
+          nemhelper->read_header();
+        }
+      else
+        {
+          nemhelper->create(nemesis_filename);
+          nemhelper->initialize(nemesis_filename,mesh);
+          nemhelper->write_nodal_coordinates(mesh);
+          nemhelper->write_elements(mesh);
+          nemhelper->write_nodesets(mesh);
+          nemhelper->write_sidesets(mesh);
 
-      if( (mesh.boundary_info->n_edge_conds() > 0) &&
-           _verbose )
-      {
-        libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
-                     << "are not supported by the ExodusII format."
-                     << std::endl;
-      }
+          if( (mesh.boundary_info->n_edge_conds() > 0) &&
+              _verbose )
+            {
+              libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
+                           << "are not supported by the ExodusII format."
+                           << std::endl;
+            }
 
-      // If we don't have any nodes written out on this processor,
-      // Exodus seems to like us better if we don't try to write out any
-      // variable names too...
+          // If we don't have any nodes written out on this processor,
+          // Exodus seems to like us better if we don't try to write out any
+          // variable names too...
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
-      std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
+          std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
 
-      nemhelper->initialize_nodal_variables(complex_names);
+          nemhelper->initialize_nodal_variables(complex_names);
 #else
-      nemhelper->initialize_nodal_variables(names);
+          nemhelper->initialize_nodal_variables(names);
 #endif
-      }
-  }
+        }
+    }
 
   nemhelper->write_nodal_solution(soln, names, _timestep);
 
@@ -1359,24 +1359,24 @@ void Nemesis_IO::write_global_data (const std::vector<Number>& soln,
   std::vector<Real> complex_soln(3*num_values);
 
   for(unsigned i(0); i < num_vars; ++i)
-  {
+    {
 
-    for(unsigned int j(0); j < num_elems; ++j)
-    {
-      Number value = soln[i*num_vars + j];
-      complex_soln[3*i*num_elems + j] = value.real();
+      for(unsigned int j(0); j < num_elems; ++j)
+        {
+          Number value = soln[i*num_vars + j];
+          complex_soln[3*i*num_elems + j] = value.real();
+        }
+      for(unsigned int j(0); j < num_elems; ++j)
+        {
+          Number value = soln[i*num_vars + j];
+          complex_soln[3*i*num_elems + num_elems +j] = value.imag();
+        }
+      for(unsigned int j(0); j < num_elems; ++j)
+        {
+          Number value = soln[i*num_vars + j];
+          complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
+        }
     }
-    for(unsigned int j(0); j < num_elems; ++j)
-    {
-      Number value = soln[i*num_vars + j];
-      complex_soln[3*i*num_elems + num_elems +j] = value.imag();
-    }
-    for(unsigned int j(0); j < num_elems; ++j)
-    {
-      Number value = soln[i*num_vars + j];
-      complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
-    }
-  }
 
   nemhelper->write_global_values(complex_soln, _timestep);
 

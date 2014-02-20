@@ -356,8 +356,8 @@ void FrequencySystem::solve (const unsigned int n_start,
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
 
-//   // return values
-//   std::vector< std::pair<unsigned int, Real> > vec_rval;
+  //   // return values
+  //   std::vector< std::pair<unsigned int, Real> > vec_rval;
 
   // start solver loop
   for (unsigned int n=n_start; n<= n_stop; n++)
@@ -380,7 +380,7 @@ void FrequencySystem::solve (const unsigned int n_start,
       _n_linear_iterations   = rval.first;
       _final_linear_residual = rval.second;
 
-       vec_rval.push_back(rval);
+      vec_rval.push_back(rval);
 
       /**
        * store the current solution in the additional vector

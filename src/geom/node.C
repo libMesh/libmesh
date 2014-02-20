@@ -62,7 +62,7 @@ std::string Node::get_info () const
     oss << "invalid";
 
   oss << ", processor_id()=" << this->processor_id() <<
-         ", Point=" << *static_cast<const Point*>(this) << '\n';
+    ", Point=" << *static_cast<const Point*>(this) << '\n';
 
   oss << "    DoFs=";
   for (unsigned int s=0; s != this->n_systems(); ++s)

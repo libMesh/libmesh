@@ -26,26 +26,26 @@ namespace libMesh
 #ifdef LIBMESH_ENABLE_AMR
 
 const float Edge4::_embedding_matrix[2][4][4] =
-{
-  // embedding matrix for child 0
-
   {
-    // 0       1       2        3        // Shape function index
-    {1.0,      0.0,    0.0,     0.0},    // left,  xi = -1
-    {-0.0625, -0.0625, 0.5625,  0.5625}, // right, xi = 0
-    {0.3125,   0.0625, 0.9375, -0.3125}, // middle left,  xi = -2/3
-    {0.0,      0.0,    1.0,     0.0}     // middle right, xi = -1/3
-  },
+    // embedding matrix for child 0
 
-  // embedding matrix for child 1
-  {
-    // 0       1        2        3        // Shape function index
-    {-0.0625, -0.0625,  0.5625,  0.5625}, // left,  xi = 0
-    {0.0,      1.0,     0.0,     0.0},    // right, xi = 1
-    {0.0,      0.0,     0.0,     1.0},    // middle left,  xi = 1/3
-    {0.0625,   0.3125, -0.3125,  0.9375}  // middle right, xi = 2/3
-  }
-};
+    {
+      // 0       1       2        3        // Shape function index
+      {1.0,      0.0,    0.0,     0.0},    // left,  xi = -1
+      {-0.0625, -0.0625, 0.5625,  0.5625}, // right, xi = 0
+      {0.3125,   0.0625, 0.9375, -0.3125}, // middle left,  xi = -2/3
+      {0.0,      0.0,    1.0,     0.0}     // middle right, xi = -1/3
+    },
+
+    // embedding matrix for child 1
+    {
+      // 0       1        2        3        // Shape function index
+      {-0.0625, -0.0625,  0.5625,  0.5625}, // left,  xi = 0
+      {0.0,      1.0,     0.0,     0.0},    // right, xi = 1
+      {0.0,      0.0,     0.0,     1.0},    // middle left,  xi = 1/3
+      {0.0625,   0.3125, -0.3125,  0.9375}  // middle right, xi = 2/3
+    }
+  };
 
 #endif
 
@@ -106,61 +106,61 @@ void Edge4::connectivity(const unsigned int sc,
   conn.resize(2);
 
   switch(iop)
-  {
-    case TECPLOT:
     {
-      switch (sc)
+    case TECPLOT:
       {
-        case 0:
-          conn[0] = this->node(0)+1;
-          conn[1] = this->node(2)+1;
-          return;
+        switch (sc)
+          {
+          case 0:
+            conn[0] = this->node(0)+1;
+            conn[1] = this->node(2)+1;
+            return;
 
-        case 1:
-          conn[0] = this->node(2)+1;
-          conn[1] = this->node(3)+1;
-          return;
+          case 1:
+            conn[0] = this->node(2)+1;
+            conn[1] = this->node(3)+1;
+            return;
 
-        case 2:
-          conn[0] = this->node(3)+1;
-          conn[1] = this->node(1)+1;
-          return;
+          case 2:
+            conn[0] = this->node(3)+1;
+            conn[1] = this->node(1)+1;
+            return;
 
-        default:
-          libmesh_error();
+          default:
+            libmesh_error();
+          }
+
       }
 
-  }
-
-  case VTK:
-  {
-
-      switch (sc)
+    case VTK:
       {
-        case 0:
-          conn[0] = this->node(0);
-          conn[1] = this->node(2);
-          return;
 
-        case 1:
-          conn[0] = this->node(2);
-          conn[1] = this->node(3);
-          return;
+        switch (sc)
+          {
+          case 0:
+            conn[0] = this->node(0);
+            conn[1] = this->node(2);
+            return;
 
-        case 2:
-          conn[0] = this->node(3);
-          conn[1] = this->node(1);
-          return;
+          case 1:
+            conn[0] = this->node(2);
+            conn[1] = this->node(3);
+            return;
 
-        default:
-          libmesh_error();
+          case 2:
+            conn[0] = this->node(3);
+            conn[1] = this->node(1);
+            return;
+
+          default:
+            libmesh_error();
+          }
       }
-   }
 
-  default:
-    libmesh_error();
+    default:
+      libmesh_error();
 
-  }
+    }
 
 }
 

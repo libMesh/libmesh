@@ -34,11 +34,11 @@ Number TransientRBThetaExpansion::eval_M_theta(unsigned int q,
                                                const RBParameters& mu)
 {
   if(q >= get_n_M_terms())
-  {
-    libMesh::err << "Error: We must have q < get_n_M_terms in eval_M_theta."
-                 << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "Error: We must have q < get_n_M_terms in eval_M_theta."
+                   << std::endl;
+      libmesh_error();
+    }
 
   libmesh_assert(_M_theta_vector[q]);
 

@@ -32,30 +32,30 @@ namespace libMesh
 // ------------------------------------------------------------
 // Hex27 class static member initializations
 const unsigned int Hex27::side_nodes_map[6][9] =
-{
-  {0, 3, 2, 1, 11, 10,  9,  8, 20}, // Side 0
-  {0, 1, 5, 4,  8, 13, 16, 12, 21}, // Side 1
-  {1, 2, 6, 5,  9, 14, 17, 13, 22}, // Side 2
-  {2, 3, 7, 6, 10, 15, 18, 14, 23}, // Side 3
-  {3, 0, 4, 7, 11, 12, 19, 15, 24}, // Side 4
-  {4, 5, 6, 7, 16, 17, 18, 19, 25}  // Side 5
-};
+  {
+    {0, 3, 2, 1, 11, 10,  9,  8, 20}, // Side 0
+    {0, 1, 5, 4,  8, 13, 16, 12, 21}, // Side 1
+    {1, 2, 6, 5,  9, 14, 17, 13, 22}, // Side 2
+    {2, 3, 7, 6, 10, 15, 18, 14, 23}, // Side 3
+    {3, 0, 4, 7, 11, 12, 19, 15, 24}, // Side 4
+    {4, 5, 6, 7, 16, 17, 18, 19, 25}  // Side 5
+  };
 
 const unsigned int Hex27::edge_nodes_map[12][3] =
-{
-  {0, 1, 8},  // Side 0
-  {1, 2, 9},  // Side 1
-  {2, 3, 10}, // Side 2
-  {0, 3, 11}, // Side 3
-  {0, 4, 12}, // Side 4
-  {1, 5, 13}, // Side 5
-  {2, 6, 14}, // Side 6
-  {3, 7, 15}, // Side 7
-  {4, 5, 16}, // Side 8
-  {5, 6, 17}, // Side 9
-  {6, 7, 18}, // Side 10
-  {4, 7, 19}  // Side 11
-};
+  {
+    {0, 1, 8},  // Side 0
+    {1, 2, 9},  // Side 1
+    {2, 3, 10}, // Side 2
+    {0, 3, 11}, // Side 3
+    {0, 4, 12}, // Side 4
+    {1, 5, 13}, // Side 5
+    {2, 6, 14}, // Side 6
+    {3, 7, 15}, // Side 7
+    {4, 5, 16}, // Side 8
+    {5, 6, 17}, // Side 9
+    {6, 7, 18}, // Side 10
+    {4, 7, 19}  // Side 11
+  };
 
 
 
@@ -157,7 +157,7 @@ bool Hex27::has_affine_map() const
 
 dof_id_type Hex27::key (const unsigned int s) const
 {
- libmesh_assert_less (s, this->n_sides());
+  libmesh_assert_less (s, this->n_sides());
 
   // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
   switch (s)
@@ -615,33 +615,33 @@ unsigned int Hex27::n_second_order_adjacent_vertices (const unsigned int n) cons
 {
   switch (n)
     {
-      case 8:
-      case 9:
-      case 10:
-      case 11:
-      case 12:
-      case 13:
-      case 14:
-      case 15:
-      case 16:
-      case 17:
-      case 18:
-      case 19:
-        return 2;
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+    case 18:
+    case 19:
+      return 2;
 
-      case 20:
-      case 21:
-      case 22:
-      case 23:
-      case 24:
-      case 25:
-        return 4;
+    case 20:
+    case 21:
+    case 22:
+    case 23:
+    case 24:
+    case 25:
+      return 4;
 
-      case 26:
-        return 8;
+    case 26:
+      return 8;
 
-      default:
-        libmesh_error();
+    default:
+      libmesh_error();
     }
 
   libmesh_error();
@@ -662,12 +662,12 @@ unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
        * these are all nodes that are unique to Hex27,
        * use our _remaining.... matrix
        */
-      case 20:
-      case 21:
-      case 22:
-      case 23:
-      case 24:
-      case 25:
+    case 20:
+    case 21:
+    case 22:
+    case 23:
+    case 24:
+    case 25:
       {
         libmesh_assert_less (v, 4);
         return _remaining_second_order_adjacent_vertices[n-20][v];
@@ -680,7 +680,7 @@ unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
        * are 8 adjacent vertices, and these happen to be
        * 0..7
        */
-      case 26:
+    case 26:
       {
         libmesh_assert_less (v, 8);
         return static_cast<unsigned short int>(v);
@@ -692,7 +692,7 @@ unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
        * Hex20 and Hex27.  Therefore use the
        * matrix stored in cell_hex.C
        */
-      default:
+    default:
       {
         libmesh_assert_less (v, 2);
         return _second_order_adjacent_vertices[n-this->n_vertices()][v];
@@ -703,14 +703,14 @@ unsigned short int Hex27::second_order_adjacent_vertex (const unsigned int n,
 
 
 const unsigned short int Hex27::_remaining_second_order_adjacent_vertices[6][4] =
-{
-  { 0,  1,  2,  3}, // vertices adjacent to node 20   face nodes
-  { 0,  1,  4,  5}, // vertices adjacent to node 21
-  { 1,  2,  5,  6}, // vertices adjacent to node 22
-  { 2,  3,  6,  7}, // vertices adjacent to node 23
-  { 0,  3,  4,  7}, // vertices adjacent to node 24
-  { 4,  5,  6,  7}, // vertices adjacent to node 25
-};
+  {
+    { 0,  1,  2,  3}, // vertices adjacent to node 20   face nodes
+    { 0,  1,  4,  5}, // vertices adjacent to node 21
+    { 1,  2,  5,  6}, // vertices adjacent to node 22
+    { 2,  3,  6,  7}, // vertices adjacent to node 23
+    { 0,  3,  4,  7}, // vertices adjacent to node 24
+    { 4,  5,  6,  7}, // vertices adjacent to node 25
+  };
 
 
 
@@ -995,7 +995,7 @@ const float Hex27::_embedding_matrix[8][27][27] =
       {    0.00000,    0.00000,    0.00000,    0.00000,  0.0156250, -0.0468750,   0.140625, -0.0468750,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000, -0.0937500,   0.281250,   0.281250, -0.0937500,    0.00000,    0.00000,    0.00000,    0.00000,    0.00000,   0.562500,    0.00000 }, // 25
       { -0.001953125, 0.005859375, -0.017578125, 0.005859375, 0.005859375, -0.017578125, 0.052734375, -0.017578125, 0.01171875, -0.03515625, -0.03515625, 0.01171875, 0.01171875, -0.03515625, 0.10546875, -0.03515625, -0.03515625, 0.10546875, 0.10546875, -0.03515625, -0.0703125, -0.0703125, 0.2109375, 0.2109375, -0.0703125, 0.2109375, 0.421875 } // 26
     }
-};
+  };
 
 #endif
 

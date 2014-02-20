@@ -37,11 +37,11 @@ namespace libMesh
 // ------------------------------------------------------------
 // InfQuad6 class static member initializations
 const unsigned int InfQuad6::side_nodes_map[3][3] =
-{
-  {0, 1, 4}, // Side 0
-  {1, 3},    // Side 1
-  {0, 2}     // Side 2
-};
+  {
+    {0, 1, 4}, // Side 0
+    {1, 3},    // Side 1
+    {0, 2}     // Side 2
+  };
 
 
 // ------------------------------------------------------------
@@ -79,29 +79,29 @@ bool InfQuad6::is_node_on_side(const unsigned int n,
 #ifdef LIBMESH_ENABLE_AMR
 
 const float InfQuad6::_embedding_matrix[2][6][6] =
-{
-  // embedding matrix for child 0
   {
-    //     0       1       2       3       4       5th parent node
-    {    1.0,    0.0,    0.0,    0.0,    0.0,    0.0 }, // 0th child node
-    {    0.0,    0.0,    0.0,    0.0,    1.0,    0.0 }, // 1
-    {    0.0,    0.0,    1.0,    0.0,    0.0,    0.0 }, // 2
-    {    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 3
-    {  0.375, -0.125,    0.0,    0.0,   0.75,    0.0 }, // 4
-    {    0.0,    0.0,  0.375, -0.125,    0.0,   0.75 }  // 5
-  },
+    // embedding matrix for child 0
+    {
+      //     0       1       2       3       4       5th parent node
+      {    1.0,    0.0,    0.0,    0.0,    0.0,    0.0 }, // 0th child node
+      {    0.0,    0.0,    0.0,    0.0,    1.0,    0.0 }, // 1
+      {    0.0,    0.0,    1.0,    0.0,    0.0,    0.0 }, // 2
+      {    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 3
+      {  0.375, -0.125,    0.0,    0.0,   0.75,    0.0 }, // 4
+      {    0.0,    0.0,  0.375, -0.125,    0.0,   0.75 }  // 5
+    },
 
-  // embedding matrix for child 1
-  {
-    //     0       1       2       3       4       5th parent node
-    {    0.0,    0.0,    0.0,    0.0,    1.0,    0.0 }, // 0th child node
-    {    0.0,    1.0,    0.0,    0.0,    0.0,    0.0 }, // 1
-    {    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 2
-    {    0.0,    0.0,    0.0,    1.0,    0.0,    0.0 }, // 3
-    { -0.125,  0.375,    0.0,    0.0,   0.75,    0.0 }, // 4
-    {    0.0,    0.0, -0.125,  0.375,    0.0,   0.75 }  // 5
-  }
-};
+    // embedding matrix for child 1
+    {
+      //     0       1       2       3       4       5th parent node
+      {    0.0,    0.0,    0.0,    0.0,    1.0,    0.0 }, // 0th child node
+      {    0.0,    1.0,    0.0,    0.0,    0.0,    0.0 }, // 1
+      {    0.0,    0.0,    0.0,    0.0,    0.0,    1.0 }, // 2
+      {    0.0,    0.0,    0.0,    1.0,    0.0,    0.0 }, // 3
+      { -0.125,  0.375,    0.0,    0.0,   0.75,    0.0 }, // 4
+      {    0.0,    0.0, -0.125,  0.375,    0.0,   0.75 }  // 5
+    }
+  };
 
 #endif
 
@@ -250,10 +250,10 @@ unsigned short int InfQuad6::second_order_adjacent_vertex (const unsigned int n,
 
 
 const unsigned short int InfQuad6::_second_order_adjacent_vertices[2][2] =
-{
-  {0, 1}, // vertices adjacent to node 4
-  {2, 3}  // vertices adjacent to node 5
-};
+  {
+    {0, 1}, // vertices adjacent to node 4
+    {2, 3}  // vertices adjacent to node 5
+  };
 
 
 

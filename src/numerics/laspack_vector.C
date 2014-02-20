@@ -113,7 +113,7 @@ NumericVector<T> & LaspackVector<T>::operator /= (NumericVector<T> & v)
   const numeric_index_type n = this->size();
 
   for (numeric_index_type i=0; i<n; i++)
-      this->set(i, (*this)(i) / v(i));
+    this->set(i, (*this)(i) / v(i));
 
   return *this;
 }
@@ -256,7 +256,7 @@ void LaspackVector<T>::insert (const NumericVector<T>& V,
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   for (numeric_index_type i=0; i<V.size(); i++)
-   this->set (dof_indices[i], V(i));
+    this->set (dof_indices[i], V(i));
 }
 
 

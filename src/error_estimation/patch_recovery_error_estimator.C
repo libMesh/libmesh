@@ -43,11 +43,11 @@
 
 namespace libMesh
 {
-  // Setter function for the patch_reuse flag
-  void PatchRecoveryErrorEstimator::set_patch_reuse(bool patch_reuse_flag)
-  {
-    patch_reuse = patch_reuse_flag;
-  }
+// Setter function for the patch_reuse flag
+void PatchRecoveryErrorEstimator::set_patch_reuse(bool patch_reuse_flag)
+{
+  patch_reuse = patch_reuse_flag;
+}
 
 //-----------------------------------------------------------------
 // PatchRecoveryErrorEstimator implementations
@@ -238,7 +238,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
       for (unsigned int var=0; var<n_vars; var++)
         {
 #ifndef DEBUG
-  #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           libmesh_assert (error_estimator.error_norm.type(var) == L2 ||
                           error_estimator.error_norm.type(var) == H1_SEMINORM ||
                           error_estimator.error_norm.type(var) == H2_SEMINORM ||
@@ -248,7 +248,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
                           error_estimator.error_norm.type(var) == L_INF ||
                           error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
                           error_estimator.error_norm.type(var) == W2_INF_SEMINORM);
-  #else
+#else
           libmesh_assert (error_estimator.error_norm.type(var) == L2 ||
                           error_estimator.error_norm.type(var) == L_INF ||
                           error_estimator.error_norm.type(var) == H1_SEMINORM ||
@@ -256,7 +256,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
                           error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
                           error_estimator.error_norm.type(var) == H1_Z_SEMINORM ||
                           error_estimator.error_norm.type(var) == W1_INF_SEMINORM);
-  #endif
+#endif
           if (var > 0)
             // We can't mix L_inf and L_2 norms
             libmesh_assert (((error_estimator.error_norm.type(var) == L2 ||
@@ -356,9 +356,9 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
               F.resize(matsize); Pu_h.resize(matsize);
             }
           else if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
-              error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
-              error_estimator.error_norm.type(var) == H2_SEMINORM ||
-              error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
+                   error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
+                   error_estimator.error_norm.type(var) == H2_SEMINORM ||
+                   error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
             {
               Fx.resize(matsize); Pu_x_h.resize(matsize); // stores xx in W2 cases
 #if LIBMESH_DIM > 1
@@ -446,7 +446,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 
                     }
                   else if (error_estimator.error_norm.type(var) == H1_SEMINORM ||
-                      error_estimator.error_norm.type(var) == W1_INF_SEMINORM)
+                           error_estimator.error_norm.type(var) == W1_INF_SEMINORM)
                     {
                       // Compute the gradient on the current patch element
                       // at the quadrature point

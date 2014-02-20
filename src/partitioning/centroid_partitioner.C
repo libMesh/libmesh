@@ -79,7 +79,7 @@ void CentroidPartitioner::_do_partition (MeshBase& mesh,
       }
 
 
-     case RADIAL:
+    case RADIAL:
       {
         std::sort(_elem_centroids.begin(),
                   _elem_centroids.end(),
@@ -127,8 +127,8 @@ void CentroidPartitioner::compute_centroids (MeshBase& mesh)
   _elem_centroids.clear();
   _elem_centroids.reserve(mesh.n_elem());
 
-//   elem_iterator it(mesh.elements_begin());
-//   const elem_iterator it_end(mesh.elements_end());
+  //   elem_iterator it(mesh.elements_begin());
+  //   const elem_iterator it_end(mesh.elements_end());
 
   MeshBase::element_iterator       it     = mesh.elements_begin();
   const MeshBase::element_iterator it_end = mesh.elements_end();

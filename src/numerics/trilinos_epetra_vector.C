@@ -447,27 +447,27 @@ EpetraVector<T>::operator = (const std::vector<T>& v)
    * The global vector.  Only add the local components.
    */
   if(this->size() == v.size())
-  {
-    const unsigned int nl=this->local_size();
-    const unsigned int fli=this->first_local_index();
+    {
+      const unsigned int nl=this->local_size();
+      const unsigned int fli=this->first_local_index();
 
-    for(unsigned int i=0;i<nl;i++)
-      values[i]=v[fli+i];
-  }
+      for(unsigned int i=0;i<nl;i++)
+        values[i]=v[fli+i];
+    }
 
   /**
    * Case 2: The vector is the same size as our local
    * piece.  Insert directly to the local piece.
    */
   else
-  {
-    libmesh_assert_equal_to (v.size(), this->local_size());
+    {
+      libmesh_assert_equal_to (v.size(), this->local_size());
 
-    const unsigned int nl=this->local_size();
+      const unsigned int nl=this->local_size();
 
-    for(unsigned int i=0;i<nl;i++)
-      values[i]=v[i];
-  }
+      for(unsigned int i=0;i<nl;i++)
+        values[i]=v[i];
+    }
 
   return *this;
 }
@@ -495,17 +495,17 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
   // TODO: optimize to sync only the send list values
   this->localize(v_local_in);
 
-//   EpetraVector<T>* v_local =
-//   libmesh_cast_ptr<EpetraVector<T>*>(&v_local_in);
+  //   EpetraVector<T>* v_local =
+  //   libmesh_cast_ptr<EpetraVector<T>*>(&v_local_in);
 
-//   libmesh_assert(this->_map.get());
-//   libmesh_assert(v_local->_map.get());
-//   libmesh_assert_equal_to (v_local->local_size(), this->size());
-//   libmesh_assert_less_equal (send_list.size(), v_local->size());
+  //   libmesh_assert(this->_map.get());
+  //   libmesh_assert(v_local->_map.get());
+  //   libmesh_assert_equal_to (v_local->local_size(), this->size());
+  //   libmesh_assert_less_equal (send_list.size(), v_local->size());
 
-//   Epetra_Import importer (*v_local->_map, *this->_map);
+  //   Epetra_Import importer (*v_local->_map, *this->_map);
 
-//   v_local->_vec->Import (*this->_vec, importer, Insert);
+  //   v_local->_vec->Import (*this->_vec, importer, Insert);
 }
 
 
@@ -693,8 +693,8 @@ int EpetraVector<T>::inputValues(int numIDs,
     last_edit = 1;
   }
 
- //Important note!! This method assumes that there is only 1 point
- //associated with each element.
+  //Important note!! This method assumes that there is only 1 point
+  //associated with each element.
 
   for(int i=0; i<numIDs; ++i) {
     if (_vec->Map().MyGID(GIDs[i])) {

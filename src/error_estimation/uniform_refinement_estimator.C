@@ -61,7 +61,7 @@ void UniformRefinementEstimator::estimate_error (const System& _system,
 
 void UniformRefinementEstimator::estimate_errors (const EquationSystems& _es,
                                                   ErrorVector& error_per_cell,
-                                                 const std::map<const System*, SystemNorm>& error_norms,
+                                                  const std::map<const System*, SystemNorm>& error_norms,
                                                   const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
                                                   bool estimate_parent_error)
 {
@@ -84,10 +84,10 @@ void UniformRefinementEstimator::estimate_errors (const EquationSystems& _es,
 }
 
 void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
-                                                 const System* _system,
+                                                  const System* _system,
                                                   ErrorVector* error_per_cell,
-                                                 ErrorMap* errors_per_cell,
-                                                 const std::map<const System*, SystemNorm > *_error_norms,
+                                                  ErrorMap* errors_per_cell,
+                                                  const std::map<const System*, SystemNorm > *_error_norms,
                                                   const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
                                                   bool)
 {
@@ -107,7 +107,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
       libmesh_assert(_es->n_systems());
       for (unsigned int i=0; i != _es->n_systems(); ++i)
-      // We have to break the rules here, because we can't refine a const System
+        // We have to break the rules here, because we can't refine a const System
         system_list.push_back(const_cast<System *>(&(_es->get_system(i))));
 
       // If we're computing one vector, we need to know how to scale
@@ -117,8 +117,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
           libmesh_assert(!errors_per_cell);
         }
       else
-      // If we're computing many vectors, we just need to know which
-      // variables to skip
+        // If we're computing many vectors, we just need to know which
+        // variables to skip
         {
           libmesh_assert (errors_per_cell);
 
@@ -218,7 +218,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
       // Back up all other coarse grid vectors
       for (System::vectors_iterator vec = system.vectors_begin(); vec !=
-           system.vectors_end(); ++vec)
+             system.vectors_end(); ++vec)
         {
           // The (string) name of this vector
           const std::string& var_name = vec->first;
@@ -279,7 +279,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
       // Copy the projected coarse grid solutions, which will be
       // overwritten by solve()
-//      projected_solutions[i] = system.solution->clone().release();
+      //      projected_solutions[i] = system.solution->clone().release();
       projected_solutions[i] = NumericVector<Number>::build(system.comm()).release();
       projected_solutions[i]->init(system.solution->size(), true, SERIAL);
       system.solution->localize(*projected_solutions[i],
@@ -572,7 +572,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                       system_i_norm.type(var) == H2)
                     {
                       L2normsq += JxW[qp] * system_i_norm.weight_sq(var) *
-                                  TensorTools::norm_sq(val_error);
+                        TensorTools::norm_sq(val_error);
                       libmesh_assert_greater_equal (L2normsq, 0.);
                     }
 
@@ -701,7 +701,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       delete projected_solutions[i];
 
       for (System::vectors_iterator vec = system.vectors_begin(); vec !=
-           system.vectors_end(); ++vec)
+             system.vectors_end(); ++vec)
         {
           // The (string) name of this vector
           const std::string& var_name = vec->first;

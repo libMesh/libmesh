@@ -111,12 +111,12 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
         break;
       }
 
-    //   // Generalized Minimum Residual
-    // case GMRES:
-    //   {
-    // libmesh_not_implemented();
-    // break;
-    //   }
+      //   // Generalized Minimum Residual
+      // case GMRES:
+      //   {
+      // libmesh_not_implemented();
+      // break;
+      //   }
 
       // Unknown solver, use BICGSTAB
     default:

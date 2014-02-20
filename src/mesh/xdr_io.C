@@ -44,64 +44,64 @@ namespace libMesh
 //-----------------------------------------------
 // anonymous namespace for implementation details
 namespace {
-  struct DofBCData
-  {
-    unsigned int       dof_id;
-    unsigned short int side;
-    boundary_id_type   bc_id;
+struct DofBCData
+{
+  unsigned int       dof_id;
+  unsigned short int side;
+  boundary_id_type   bc_id;
 
-    // Default constructor
-    DofBCData (unsigned int       dof_id_in=0,
-               unsigned short int side_in=0,
-               boundary_id_type   bc_id_in=0) :
-      dof_id(dof_id_in),
-      side(side_in),
-      bc_id(bc_id_in)
-    {}
-
-    // comparison operator
-    bool operator < (const DofBCData &other) const
-    {
-      if (this->dof_id == other.dof_id)
-        return (this->side < other.side);
-
-      return this->dof_id < other.dof_id;
-    }
-  };
+  // Default constructor
+  DofBCData (unsigned int       dof_id_in=0,
+             unsigned short int side_in=0,
+             boundary_id_type   bc_id_in=0) :
+    dof_id(dof_id_in),
+    side(side_in),
+    bc_id(bc_id_in)
+  {}
 
   // comparison operator
-  bool operator < (const unsigned int &other_dof_id,
-                   const DofBCData &dof_bc)
+  bool operator < (const DofBCData &other) const
+  {
+    if (this->dof_id == other.dof_id)
+      return (this->side < other.side);
+
+    return this->dof_id < other.dof_id;
+  }
+};
+
+// comparison operator
+bool operator < (const unsigned int &other_dof_id,
+                 const DofBCData &dof_bc)
+{
+  return other_dof_id < dof_bc.dof_id;
+}
+
+bool operator < (const DofBCData &dof_bc,
+                 const unsigned int &other_dof_id)
+
+{
+  return dof_bc.dof_id < other_dof_id;
+}
+
+
+// For some reason SunStudio does not seem to accept the above
+// comparison functions for use in
+// std::equal_range (ElemBCData::iterator, ElemBCData::iterator, unsigned int);
+#if defined(__SUNPRO_CC) || defined(__PGI)
+struct CompareIntDofBCData
+{
+  bool operator()(const unsigned int &other_dof_id,
+                  const DofBCData &dof_bc)
   {
     return other_dof_id < dof_bc.dof_id;
   }
 
-  bool operator < (const DofBCData &dof_bc,
-                   const unsigned int &other_dof_id)
-
+  bool operator()(const DofBCData &dof_bc,
+                  const unsigned int &other_dof_id)
   {
     return dof_bc.dof_id < other_dof_id;
   }
-
-
-  // For some reason SunStudio does not seem to accept the above
-  // comparison functions for use in
-  // std::equal_range (ElemBCData::iterator, ElemBCData::iterator, unsigned int);
-#if defined(__SUNPRO_CC) || defined(__PGI)
-  struct CompareIntDofBCData
-  {
-    bool operator()(const unsigned int &other_dof_id,
-                    const DofBCData &dof_bc)
-    {
-      return other_dof_id < dof_bc.dof_id;
-    }
-
-    bool operator()(const DofBCData &dof_bc,
-                    const unsigned int &other_dof_id)
-    {
-      return dof_bc.dof_id < other_dof_id;
-    }
-  };
+};
 #endif
 }
 
@@ -289,11 +289,11 @@ void XdrIO::write (const std::string& name)
     }
 
   if(mesh.boundary_info->n_edge_conds() > 0)
-  {
-    libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
-                 << "are not supported by the XDR format."
-                 << std::endl;
-  }
+    {
+      libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
+                   << "are not supported by the XDR format."
+                   << std::endl;
+    }
 
   STOP_LOG("write()","XdrIO");
 
@@ -310,37 +310,37 @@ void XdrIO::write (const std::string& name)
 void XdrIO::write_serialized_subdomain_names(Xdr &io) const
 {
   if (this->processor_id() == 0)
-  {
-    const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
-
-    const std::map<subdomain_id_type, std::string> & subdomain_map = mesh.get_subdomain_name_map();
-
-    std::vector<header_id_type> subdomain_ids;   subdomain_ids.reserve(subdomain_map.size());
-    std::vector<std::string>  subdomain_names; subdomain_names.reserve(subdomain_map.size());
-
-    // We need to loop over the map and make sure that there aren't any invalid entries.  Since we
-    // return writable references in mesh_base, it's possible for the user to leave some entity names
-    // blank.  We can't write those to the XDA file.
-    header_id_type n_subdomain_names = 0;
-    std::map<subdomain_id_type, std::string>::const_iterator it_end = subdomain_map.end();
-    for (std::map<subdomain_id_type, std::string>::const_iterator it = subdomain_map.begin(); it != it_end; ++it)
     {
-      if (!it->second.empty())
-      {
-        n_subdomain_names++;
-        subdomain_ids.push_back(it->first);
-        subdomain_names.push_back(it->second);
-      }
-    }
+      const MeshBase &mesh = MeshOutput<MeshBase>::mesh();
 
-    io.data(n_subdomain_names, "# subdomain id to name map");
-    // Write out the ids and names in two vectors
-    if (n_subdomain_names)
-    {
-      io.data(subdomain_ids);
-      io.data(subdomain_names);
+      const std::map<subdomain_id_type, std::string> & subdomain_map = mesh.get_subdomain_name_map();
+
+      std::vector<header_id_type> subdomain_ids;   subdomain_ids.reserve(subdomain_map.size());
+      std::vector<std::string>  subdomain_names; subdomain_names.reserve(subdomain_map.size());
+
+      // We need to loop over the map and make sure that there aren't any invalid entries.  Since we
+      // return writable references in mesh_base, it's possible for the user to leave some entity names
+      // blank.  We can't write those to the XDA file.
+      header_id_type n_subdomain_names = 0;
+      std::map<subdomain_id_type, std::string>::const_iterator it_end = subdomain_map.end();
+      for (std::map<subdomain_id_type, std::string>::const_iterator it = subdomain_map.begin(); it != it_end; ++it)
+        {
+          if (!it->second.empty())
+            {
+              n_subdomain_names++;
+              subdomain_ids.push_back(it->first);
+              subdomain_names.push_back(it->second);
+            }
+        }
+
+      io.data(n_subdomain_names, "# subdomain id to name map");
+      // Write out the ids and names in two vectors
+      if (n_subdomain_names)
+        {
+          io.data(subdomain_ids);
+          io.data(subdomain_names);
+        }
     }
-  }
 }
 
 
@@ -459,23 +459,23 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
                 const xdr_id_type n_nodes = *recv_conn_iter; ++recv_conn_iter;
                 output_buffer.push_back(*recv_conn_iter);     /* type       */ ++recv_conn_iter;
 
-              if (_write_unique_id)
-                output_buffer.push_back(*recv_conn_iter);   /* unique_id  */ ++recv_conn_iter;
+                if (_write_unique_id)
+                  output_buffer.push_back(*recv_conn_iter);   /* unique_id  */ ++recv_conn_iter;
 
-              if (write_partitioning)
-                output_buffer.push_back(*recv_conn_iter); /* processor id */ ++recv_conn_iter;
+                if (write_partitioning)
+                  output_buffer.push_back(*recv_conn_iter); /* processor id */ ++recv_conn_iter;
 
-              if (write_subdomain_id)
-                output_buffer.push_back(*recv_conn_iter); /* subdomain id */ ++recv_conn_iter;
+                if (write_subdomain_id)
+                  output_buffer.push_back(*recv_conn_iter); /* subdomain id */ ++recv_conn_iter;
 
 #ifdef LIBMESH_ENABLE_AMR
-              if (write_p_level)
-                output_buffer.push_back(*recv_conn_iter); /* p level      */ ++recv_conn_iter;
+                if (write_p_level)
+                  output_buffer.push_back(*recv_conn_iter); /* p level      */ ++recv_conn_iter;
 #endif
-              for (dof_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
-                output_buffer.push_back(*recv_conn_iter);
+                for (dof_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
+                  output_buffer.push_back(*recv_conn_iter);
 
-              io.data_stream (&output_buffer[0], output_buffer.size(), output_buffer.size());
+                io.data_stream (&output_buffer[0], output_buffer.size(), output_buffer.size());
               }
           }
         }
@@ -566,27 +566,27 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
                     output_buffer.clear();
                     const xdr_id_type n_nodes = *recv_conn_iter; ++recv_conn_iter;
                     output_buffer.push_back(*recv_conn_iter);                   /* type          */ ++recv_conn_iter;
-                  if (_write_unique_id)
-                    output_buffer.push_back(*recv_conn_iter);                 /* unique_id     */ ++recv_conn_iter;
+                    if (_write_unique_id)
+                      output_buffer.push_back(*recv_conn_iter);                 /* unique_id     */ ++recv_conn_iter;
 
-                  const xdr_id_type parent_local_id = *recv_conn_iter; ++recv_conn_iter;
-                  const xdr_id_type parent_pid      = *recv_conn_iter; ++recv_conn_iter;
+                    const xdr_id_type parent_local_id = *recv_conn_iter; ++recv_conn_iter;
+                    const xdr_id_type parent_pid      = *recv_conn_iter; ++recv_conn_iter;
 
-                  output_buffer.push_back (parent_local_id+processor_offsets[parent_pid]);
+                    output_buffer.push_back (parent_local_id+processor_offsets[parent_pid]);
 
-                  if (write_partitioning)
-                    output_buffer.push_back(*recv_conn_iter); /* processor id */ ++recv_conn_iter;
+                    if (write_partitioning)
+                      output_buffer.push_back(*recv_conn_iter); /* processor id */ ++recv_conn_iter;
 
-                  if (write_subdomain_id)
-                    output_buffer.push_back(*recv_conn_iter); /* subdomain id */ ++recv_conn_iter;
+                    if (write_subdomain_id)
+                      output_buffer.push_back(*recv_conn_iter); /* subdomain id */ ++recv_conn_iter;
 
-                  if (write_p_level)
-                    output_buffer.push_back(*recv_conn_iter); /* p level       */ ++recv_conn_iter;
+                    if (write_p_level)
+                      output_buffer.push_back(*recv_conn_iter); /* p level       */ ++recv_conn_iter;
 
-                  for (xdr_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
-                    output_buffer.push_back(*recv_conn_iter);
+                    for (xdr_id_type node=0; node<n_nodes; node++, ++recv_conn_iter)
+                      output_buffer.push_back(*recv_conn_iter);
 
-                  io.data_stream (&output_buffer[0], output_buffer.size(), output_buffer.size());
+                    io.data_stream (&output_buffer[0], output_buffer.size(), output_buffer.size());
                   }
               }
             }
@@ -622,7 +622,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
           {
             // Trade my requests with processor procup and procdown
             unsigned int procup = (this->processor_id() + p) %
-                                   this->n_processors();
+              this->n_processors();
             unsigned int procdown = (this->n_processors() +
                                      this->processor_id() - p) %
               this->n_processors();
@@ -851,8 +851,8 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
       const Elem *elem = *it;
 
       for (unsigned int s=0; s<elem->n_sides(); s++)
-// We're supporting boundary ids on internal sides now
-//if (elem->neighbor(s) == NULL)
+        // We're supporting boundary ids on internal sides now
+        //if (elem->neighbor(s) == NULL)
         {
           const std::vector<boundary_id_type>& bc_ids =
             boundary_info.boundary_ids (elem, s);
@@ -984,39 +984,39 @@ void XdrIO::write_serialized_nodesets (Xdr &io, const std::size_t n_nodesets) co
 void XdrIO::write_serialized_bc_names (Xdr &io, const BoundaryInfo & info, bool is_sideset) const
 {
   if (this->processor_id() == 0)
-  {
-    const std::map<boundary_id_type, std::string> & boundary_map = is_sideset ?
-      info.get_sideset_name_map() : info.get_nodeset_name_map();
-
-    std::vector<header_id_type> boundary_ids;   boundary_ids.reserve(boundary_map.size());
-    std::vector<std::string>  boundary_names; boundary_names.reserve(boundary_map.size());
-
-    // We need to loop over the map and make sure that there aren't any invalid entries.  Since we
-    // return writable references in boundary_info, it's possible for the user to leave some entity names
-    // blank.  We can't write those to the XDA file.
-    header_id_type n_boundary_names = 0;
-    std::map<boundary_id_type, std::string>::const_iterator it_end = boundary_map.end();
-    for (std::map<boundary_id_type, std::string>::const_iterator it = boundary_map.begin(); it != it_end; ++it)
     {
-      if (!it->second.empty())
-      {
-        n_boundary_names++;
-        boundary_ids.push_back(it->first);
-        boundary_names.push_back(it->second);
-      }
-    }
+      const std::map<boundary_id_type, std::string> & boundary_map = is_sideset ?
+        info.get_sideset_name_map() : info.get_nodeset_name_map();
 
-    if (is_sideset)
-      io.data(n_boundary_names, "# sideset id to name map");
-    else
-      io.data(n_boundary_names, "# nodeset id to name map");
-    // Write out the ids and names in two vectors
-    if (n_boundary_names)
-    {
-      io.data(boundary_ids);
-      io.data(boundary_names);
+      std::vector<header_id_type> boundary_ids;   boundary_ids.reserve(boundary_map.size());
+      std::vector<std::string>  boundary_names; boundary_names.reserve(boundary_map.size());
+
+      // We need to loop over the map and make sure that there aren't any invalid entries.  Since we
+      // return writable references in boundary_info, it's possible for the user to leave some entity names
+      // blank.  We can't write those to the XDA file.
+      header_id_type n_boundary_names = 0;
+      std::map<boundary_id_type, std::string>::const_iterator it_end = boundary_map.end();
+      for (std::map<boundary_id_type, std::string>::const_iterator it = boundary_map.begin(); it != it_end; ++it)
+        {
+          if (!it->second.empty())
+            {
+              n_boundary_names++;
+              boundary_ids.push_back(it->first);
+              boundary_names.push_back(it->second);
+            }
+        }
+
+      if (is_sideset)
+        io.data(n_boundary_names, "# sideset id to name map");
+      else
+        io.data(n_boundary_names, "# nodeset id to name map");
+      // Write out the ids and names in two vectors
+      if (n_boundary_names)
+        {
+          io.data(boundary_ids);
+          io.data(boundary_names);
+        }
     }
-  }
 }
 
 
@@ -1066,17 +1066,17 @@ void XdrIO::read (const std::string& name)
       io.data (this->polynomial_level_file_name());   // libMesh::out << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
 
       if (is_version_0_9_2)
-      {
-        io.data (meta_data[pos++], "# type size");
-        io.data (meta_data[pos++], "# uid size");
-        io.data (meta_data[pos++], "# pid size");
-        io.data (meta_data[pos++], "# sid size");
-        io.data (meta_data[pos++], "# p-level size");
-        // Boundary Condition sizes
-        io.data (meta_data[pos++], "# eid size");   // elem id
-        io.data (meta_data[pos++], "# side size "); // side number
-        io.data (meta_data[pos++], "# bid size");   // boundary id
-      }
+        {
+          io.data (meta_data[pos++], "# type size");
+          io.data (meta_data[pos++], "# uid size");
+          io.data (meta_data[pos++], "# pid size");
+          io.data (meta_data[pos++], "# sid size");
+          io.data (meta_data[pos++], "# p-level size");
+          // Boundary Condition sizes
+          io.data (meta_data[pos++], "# eid size");   // elem id
+          io.data (meta_data[pos++], "# side size "); // side number
+          io.data (meta_data[pos++], "# bid size");   // boundary id
+        }
     }
 
   // broadcast the n_elems, n_nodes, and size information
@@ -1157,44 +1157,44 @@ void XdrIO::read_serialized_subdomain_names(Xdr &io)
 {
   const bool read_entity_info = this->version().find("0.9.2") != std::string::npos ? true : false;
   if (read_entity_info)
-  {
-    MeshBase &mesh = MeshInput<MeshBase>::mesh();
-
-    unsigned int n_subdomain_names = 0;
-    std::vector<header_id_type> subdomain_ids;
-    std::vector<std::string>  subdomain_names;
-
-    // Read the sideset names
-    if (this->processor_id() == 0)
     {
-      io.data(n_subdomain_names);
+      MeshBase &mesh = MeshInput<MeshBase>::mesh();
+
+      unsigned int n_subdomain_names = 0;
+      std::vector<header_id_type> subdomain_ids;
+      std::vector<std::string>  subdomain_names;
+
+      // Read the sideset names
+      if (this->processor_id() == 0)
+        {
+          io.data(n_subdomain_names);
+
+          subdomain_ids.resize(n_subdomain_names);
+          subdomain_names.resize(n_subdomain_names);
+
+          if (n_subdomain_names)
+            {
+              io.data(subdomain_ids);
+              io.data(subdomain_names);
+            }
+        }
+
+      // Broadcast the subdomain names to all processors
+      this->comm().broadcast(n_subdomain_names);
+      if (n_subdomain_names == 0)
+        return;
 
       subdomain_ids.resize(n_subdomain_names);
       subdomain_names.resize(n_subdomain_names);
+      this->comm().broadcast(subdomain_ids);
+      this->comm().broadcast(subdomain_names);
 
-      if (n_subdomain_names)
-      {
-        io.data(subdomain_ids);
-        io.data(subdomain_names);
-      }
+      // Reassemble the named subdomain information
+      std::map<subdomain_id_type, std::string> & subdomain_map = mesh.set_subdomain_name_map();
+
+      for (unsigned int i=0; i<n_subdomain_names; ++i)
+        subdomain_map.insert(std::make_pair(subdomain_ids[i], subdomain_names[i]));
     }
-
-    // Broadcast the subdomain names to all processors
-    this->comm().broadcast(n_subdomain_names);
-    if (n_subdomain_names == 0)
-      return;
-
-    subdomain_ids.resize(n_subdomain_names);
-    subdomain_names.resize(n_subdomain_names);
-    this->comm().broadcast(subdomain_ids);
-    this->comm().broadcast(subdomain_names);
-
-    // Reassemble the named subdomain information
-    std::map<subdomain_id_type, std::string> & subdomain_map = mesh.set_subdomain_name_map();
-
-    for (unsigned int i=0; i<n_subdomain_names; ++i)
-      subdomain_map.insert(std::make_pair(subdomain_ids[i], subdomain_names[i]));
-  }
 }
 
 
@@ -1302,16 +1302,16 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
           unique_id_type unique_id = 0;
 #endif
           if (read_unique_id)
-          {
+            {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-            unique_id  = libmesh_cast_int<unique_id_type>(*it);
+              unique_id  = libmesh_cast_int<unique_id_type>(*it);
 #endif
-            ++it;
-          }
+              ++it;
+            }
           const dof_id_type parent_id =
             (*it == static_cast<T>(-1)) ?
-              DofObject::invalid_id :
-              libmesh_cast_int<dof_id_type>(*it);
+            DofObject::invalid_id :
+            libmesh_cast_int<dof_id_type>(*it);
           ++it;
           const processor_id_type processor_id =
             libmesh_cast_int<processor_id_type>(*it);
@@ -1371,8 +1371,8 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
       libMesh::err << "Cannot open dimension " <<
         mesh.mesh_dimension() <<
         " mesh file when configured without " <<
-                      mesh.mesh_dimension() << "D support." <<
-                      std::endl;
+        mesh.mesh_dimension() << "D support." <<
+        std::endl;
       libmesh_error();
     }
 #endif
@@ -1414,7 +1414,7 @@ void XdrIO::read_serialized_nodes (Xdr &io, const dof_id_type n_nodes)
   // Get the nodes in blocks.
   std::vector<Real> coords;
   std::pair<std::vector<dof_id_type>::iterator,
-            std::vector<dof_id_type>::iterator> pos;
+    std::vector<dof_id_type>::iterator> pos;
   pos.first = needed_nodes.begin();
 
   for (std::size_t blk=0, first_node=0, last_node=0; last_node<n_nodes; blk++)
@@ -1494,8 +1494,8 @@ void XdrIO::read_serialized_bcs (Xdr &io, T)
       // convert the input_buffer to DofBCData to facilitate searching
       for (std::size_t idx=0; idx<input_buffer.size(); idx+=3)
         dof_bc_data.push_back (DofBCData(input_buffer[idx+0],
-                                          input_buffer[idx+1],
-                                          input_buffer[idx+2]));
+                                         input_buffer[idx+1],
+                                         input_buffer[idx+2]));
       input_buffer.clear();
       // note that while the files *we* write should already be sorted by
       // element id this is not necessarily guaranteed.
@@ -1595,7 +1595,7 @@ void XdrIO::read_serialized_nodesets (Xdr &io, T)
                pos.first != pos.second; ++pos.first)
 #endif
             {
-            // Note: dof_id from ElmeBCData is being used to hold node_id here
+              // Note: dof_id from ElmeBCData is being used to hold node_id here
               libmesh_assert_equal_to (pos.first->dof_id, (*it)->id());
 
               boundary_info.add_node (*it, pos.first->bc_id);
@@ -1609,43 +1609,43 @@ void XdrIO::read_serialized_bc_names(Xdr &io, BoundaryInfo & info, bool is_sides
 {
   const bool read_entity_info = this->version().find("0.9.2") != std::string::npos ? true : false;
   if (read_entity_info)
-  {
-    header_id_type n_boundary_names = 0;
-    std::vector<header_id_type> boundary_ids;
-    std::vector<std::string>  boundary_names;
-
-    // Read the sideset names
-    if (this->processor_id() == 0)
     {
-      io.data(n_boundary_names);
+      header_id_type n_boundary_names = 0;
+      std::vector<header_id_type> boundary_ids;
+      std::vector<std::string>  boundary_names;
+
+      // Read the sideset names
+      if (this->processor_id() == 0)
+        {
+          io.data(n_boundary_names);
+
+          boundary_ids.resize(n_boundary_names);
+          boundary_names.resize(n_boundary_names);
+
+          if (n_boundary_names)
+            {
+              io.data(boundary_ids);
+              io.data(boundary_names);
+            }
+        }
+
+      // Broadcast the boundary names to all processors
+      this->comm().broadcast(n_boundary_names);
+      if (n_boundary_names == 0)
+        return;
 
       boundary_ids.resize(n_boundary_names);
       boundary_names.resize(n_boundary_names);
+      this->comm().broadcast(boundary_ids);
+      this->comm().broadcast(boundary_names);
 
-      if (n_boundary_names)
-      {
-        io.data(boundary_ids);
-        io.data(boundary_names);
-      }
+      // Reassemble the named boundary information
+      std::map<boundary_id_type, std::string> & boundary_map = is_sideset ?
+        info.set_sideset_name_map() : info.set_nodeset_name_map();
+
+      for (unsigned int i=0; i<n_boundary_names; ++i)
+        boundary_map.insert(std::make_pair(boundary_ids[i], boundary_names[i]));
     }
-
-    // Broadcast the boundary names to all processors
-    this->comm().broadcast(n_boundary_names);
-    if (n_boundary_names == 0)
-      return;
-
-    boundary_ids.resize(n_boundary_names);
-    boundary_names.resize(n_boundary_names);
-    this->comm().broadcast(boundary_ids);
-    this->comm().broadcast(boundary_names);
-
-    // Reassemble the named boundary information
-    std::map<boundary_id_type, std::string> & boundary_map = is_sideset ?
-      info.set_sideset_name_map() : info.set_nodeset_name_map();
-
-    for (unsigned int i=0; i<n_boundary_names; ++i)
-      boundary_map.insert(std::make_pair(boundary_ids[i], boundary_names[i]));
-  }
 }
 
 

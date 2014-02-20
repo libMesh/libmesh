@@ -52,18 +52,18 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
   // The function arguments are currently just there for
   // backwards_compatibility
   if (!_use_member_parameters)
-  {
-    // If the user used non-default parameters, lets warn
-    // that they're deprecated
-    if (refine_frac != 0.3 ||
-        coarsen_frac != 0.0 ||
-        max_l != libMesh::invalid_uint)
-      libmesh_deprecated();
+    {
+      // If the user used non-default parameters, lets warn
+      // that they're deprecated
+      if (refine_frac != 0.3 ||
+          coarsen_frac != 0.0 ||
+          max_l != libMesh::invalid_uint)
+        libmesh_deprecated();
 
-    _refine_fraction = refine_frac;
-    _coarsen_fraction = coarsen_frac;
-    _max_h_level = max_l;
-  }
+      _refine_fraction = refine_frac;
+      _coarsen_fraction = coarsen_frac;
+      _max_h_level = max_l;
+    }
 
   // Check for valid fractions..
   // The fraction values must be in [0,1]
@@ -88,12 +88,12 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
   // Prepare another error vector if we need to sum parent errors
   ErrorVector error_per_parent;
   if (_coarsen_by_parents)
-  {
-    create_parent_error_vector(error_per_cell,
-                               error_per_parent,
-                               parent_error_min,
-                               parent_error_max);
-  }
+    {
+      create_parent_error_vector(error_per_cell,
+                                 error_per_parent,
+                                 parent_error_min,
+                                 parent_error_max);
+    }
 
   // We need to loop over all active elements to find the minimum
   MeshBase::element_iterator       el_it  =
@@ -102,13 +102,13 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
     _mesh.active_local_elements_end();
 
   for (; el_it != el_end; ++el_it)
-  {
-    const dof_id_type id  = (*el_it)->id();
-    libmesh_assert_less (id, error_per_cell.size());
+    {
+      const dof_id_type id  = (*el_it)->id();
+      libmesh_assert_less (id, error_per_cell.size());
 
-    error_max = std::max (error_max, error_per_cell[id]);
-    error_min = std::min (error_min, error_per_cell[id]);
-  }
+      error_max = std::max (error_max, error_per_cell[id]);
+      error_min = std::min (error_min, error_per_cell[id]);
+    }
   this->comm().max(error_max);
   this->comm().min(error_min);
 
@@ -120,14 +120,14 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
   const Real coarsen_cutoff = _coarsen_fraction*error_delta + error_min;
   const Real parent_cutoff = _coarsen_fraction*parent_error_delta + error_min;
 
-//   // Print information about the error
-//   libMesh::out << " Error Information:"                     << std::endl
-//     << " ------------------"                     << std::endl
-//     << "   min:              " << error_min      << std::endl
-//     << "   max:              " << error_max      << std::endl
-//     << "   delta:            " << error_delta    << std::endl
-//     << "     refine_cutoff:  " << refine_cutoff  << std::endl
-//     << "     coarsen_cutoff: " << coarsen_cutoff << std::endl;
+  //   // Print information about the error
+  //   libMesh::out << " Error Information:"                     << std::endl
+  //     << " ------------------"                     << std::endl
+  //     << "   min:              " << error_min      << std::endl
+  //     << "   max:              " << error_max      << std::endl
+  //     << "   delta:            " << error_delta    << std::endl
+  //     << "     refine_cutoff:  " << refine_cutoff  << std::endl
+  //     << "     coarsen_cutoff: " << coarsen_cutoff << std::endl;
 
 
 
@@ -139,38 +139,38 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
   const MeshBase::element_iterator e_end =
     _mesh.active_elements_end();
   for (; e_it != e_end; ++e_it)
-  {
-    Elem* elem           = *e_it;
-    const dof_id_type id = elem->id();
-
-    libmesh_assert_less (id, error_per_cell.size());
-
-    const ErrorVectorReal elem_error = error_per_cell[id];
-
-    if (_coarsen_by_parents)
     {
-      Elem* parent           = elem->parent();
-      if (parent)
-      {
-        const dof_id_type parentid  = parent->id();
-        if (error_per_parent[parentid] >= 0. &&
-            error_per_parent[parentid] <= parent_cutoff)
+      Elem* elem           = *e_it;
+      const dof_id_type id = elem->id();
+
+      libmesh_assert_less (id, error_per_cell.size());
+
+      const ErrorVectorReal elem_error = error_per_cell[id];
+
+      if (_coarsen_by_parents)
+        {
+          Elem* parent           = elem->parent();
+          if (parent)
+            {
+              const dof_id_type parentid  = parent->id();
+              if (error_per_parent[parentid] >= 0. &&
+                  error_per_parent[parentid] <= parent_cutoff)
+                elem->set_refinement_flag(Elem::COARSEN);
+            }
+        }
+      // Flag the element for coarsening if its error
+      // is <= coarsen_fraction*delta + error_min
+      else if (elem_error <= coarsen_cutoff)
+        {
           elem->set_refinement_flag(Elem::COARSEN);
-      }
-    }
-    // Flag the element for coarsening if its error
-    // is <= coarsen_fraction*delta + error_min
-    else if (elem_error <= coarsen_cutoff)
-    {
-      elem->set_refinement_flag(Elem::COARSEN);
-    }
+        }
 
-    // Flag the element for refinement if its error
-    // is >= refinement_cutoff.
-    if (elem_error >= refine_cutoff)
-      if (elem->level() < _max_h_level)
-        elem->set_refinement_flag(Elem::REFINE);
-  }
+      // Flag the element for refinement if its error
+      // is >= refinement_cutoff.
+      if (elem_error >= refine_cutoff)
+        if (elem->level() < _max_h_level)
+          elem->set_refinement_flag(Elem::REFINE);
+    }
 }
 
 
@@ -197,47 +197,47 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
   // Prepare another error vector if we need to sum parent errors
   ErrorVector error_per_parent;
   if (_coarsen_by_parents)
-  {
-    Real parent_error_min, parent_error_max;
+    {
+      Real parent_error_min, parent_error_max;
 
-    create_parent_error_vector(error_per_cell_in,
-                               error_per_parent,
-                               parent_error_min,
-                               parent_error_max);
-  }
+      create_parent_error_vector(error_per_cell_in,
+                                 error_per_parent,
+                                 parent_error_min,
+                                 parent_error_max);
+    }
 
   MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
 
   for (; elem_it != elem_end; ++elem_it)
-  {
-    Elem* elem = *elem_it;
-    Elem* parent = elem->parent();
-    const dof_id_type elem_number    = elem->id();
-    const ErrorVectorReal elem_error = error_per_cell_in[elem_number];
-
-    if (elem_error > local_refinement_tolerance &&
-        elem->level() < _max_h_level)
-      elem->set_refinement_flag(Elem::REFINE);
-
-    if (!_coarsen_by_parents && elem_error <
-        local_coarsening_tolerance)
-      elem->set_refinement_flag(Elem::COARSEN);
-
-    if (_coarsen_by_parents && parent)
     {
-      ErrorVectorReal parent_error = error_per_parent[parent->id()];
-      if (parent_error >= 0.)
-      {
-        const Real parent_coarsening_tolerance =
-          std::sqrt(parent->n_children() *
-                    local_coarsening_tolerance *
-                    local_coarsening_tolerance);
-        if (parent_error < parent_coarsening_tolerance)
-          elem->set_refinement_flag(Elem::COARSEN);
-      }
+      Elem* elem = *elem_it;
+      Elem* parent = elem->parent();
+      const dof_id_type elem_number    = elem->id();
+      const ErrorVectorReal elem_error = error_per_cell_in[elem_number];
+
+      if (elem_error > local_refinement_tolerance &&
+          elem->level() < _max_h_level)
+        elem->set_refinement_flag(Elem::REFINE);
+
+      if (!_coarsen_by_parents && elem_error <
+          local_coarsening_tolerance)
+        elem->set_refinement_flag(Elem::COARSEN);
+
+      if (_coarsen_by_parents && parent)
+        {
+          ErrorVectorReal parent_error = error_per_parent[parent->id()];
+          if (parent_error >= 0.)
+            {
+              const Real parent_coarsening_tolerance =
+                std::sqrt(parent->n_children() *
+                          local_coarsening_tolerance *
+                          local_coarsening_tolerance);
+              if (parent_error < parent_coarsening_tolerance)
+                elem->set_refinement_flag(Elem::COARSEN);
+            }
+        }
     }
-  }
 }
 
 
@@ -339,21 +339,21 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   // First, let's try to get our element count to target_nelem
   if (n_elem_new >= 0)
-  {
-    // Every element refinement creates at least
-    // 2^dim-1 new elements
-    refine_count =
-      std::min(libmesh_cast_int<dof_id_type>(n_elem_new / (twotodim-1)),
-               max_elem_refine);
-  }
+    {
+      // Every element refinement creates at least
+      // 2^dim-1 new elements
+      refine_count =
+        std::min(libmesh_cast_int<dof_id_type>(n_elem_new / (twotodim-1)),
+                 max_elem_refine);
+    }
   else
-  {
-    // Every successful element coarsening is likely to destroy
-    // 2^dim-1 net elements.
-    coarsen_count =
-      std::min(libmesh_cast_int<dof_id_type>(-n_elem_new / (twotodim-1)),
-               max_elem_coarsen);
-  }
+    {
+      // Every successful element coarsening is likely to destroy
+      // 2^dim-1 net elements.
+      coarsen_count =
+        std::min(libmesh_cast_int<dof_id_type>(-n_elem_new / (twotodim-1)),
+                 max_elem_coarsen);
+    }
 
   // Next, let's see if we can trade any refinement for coarsening
   while (coarsen_count < max_elem_coarsen &&
@@ -362,10 +362,10 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
          refine_count < sorted_error.size() &&
          sorted_error[refine_count].first >
          sorted_parent_error[coarsen_count].first * _coarsen_threshold)
-  {
-    coarsen_count++;
-    refine_count++;
-  }
+    {
+      coarsen_count++;
+      refine_count++;
+    }
 
   // On a ParallelMesh, we need to communicate to know which remote ids
   // correspond to refinable elements
@@ -459,18 +459,18 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
   // The function arguments are currently just there for
   // backwards_compatibility
   if (!_use_member_parameters)
-  {
-    // If the user used non-default parameters, lets warn
-    // that they're deprecated
-    if (refine_frac != 0.3 ||
-        coarsen_frac != 0.0 ||
-        max_l != libMesh::invalid_uint)
-      libmesh_deprecated();
+    {
+      // If the user used non-default parameters, lets warn
+      // that they're deprecated
+      if (refine_frac != 0.3 ||
+          coarsen_frac != 0.0 ||
+          max_l != libMesh::invalid_uint)
+        libmesh_deprecated();
 
-    _refine_fraction = refine_frac;
-    _coarsen_fraction = coarsen_frac;
-    _max_h_level = max_l;
-  }
+      _refine_fraction = refine_frac;
+      _coarsen_fraction = coarsen_frac;
+      _max_h_level = max_l;
+    }
 
   // Check for valid fractions..
   // The fraction values must be in [0,1]
@@ -522,22 +522,22 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
   // only, sorted by lowest errors first
   ErrorVector error_per_parent, sorted_parent_error;
   if (_coarsen_by_parents)
-  {
-    Real parent_error_min, parent_error_max;
+    {
+      Real parent_error_min, parent_error_max;
 
-    create_parent_error_vector(error_per_cell,
-                               error_per_parent,
-                               parent_error_min,
-                               parent_error_max);
+      create_parent_error_vector(error_per_cell,
+                                 error_per_parent,
+                                 parent_error_min,
+                                 parent_error_max);
 
-    sorted_parent_error = error_per_parent;
-    std::sort (sorted_parent_error.begin(), sorted_parent_error.end());
+      sorted_parent_error = error_per_parent;
+      std::sort (sorted_parent_error.begin(), sorted_parent_error.end());
 
-    // All the other error values will be 0., so get rid of them.
-    sorted_parent_error.erase (std::remove(sorted_parent_error.begin(),
-                                           sorted_parent_error.end(), 0.),
-                               sorted_parent_error.end());
-  }
+      // All the other error values will be 0., so get rid of them.
+      sorted_parent_error.erase (std::remove(sorted_parent_error.begin(),
+                                             sorted_parent_error.end(), 0.),
+                                 sorted_parent_error.end());
+    }
 
 
   ErrorVectorReal top_error= 0., bottom_error = 0.;
@@ -696,8 +696,8 @@ void MeshRefinement::clean_refinement_flags ()
 {
   // Possibly clean up the refinement flags from
   // a previous step
-//   elem_iterator       elem_it (_mesh.elements_begin());
-//   const elem_iterator elem_end(_mesh.elements_end());
+  //   elem_iterator       elem_it (_mesh.elements_begin());
+  //   const elem_iterator elem_end(_mesh.elements_end());
 
   MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.elements_end();

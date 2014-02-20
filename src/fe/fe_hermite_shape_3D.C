@@ -34,7 +34,7 @@ void hermite_compute_coefs(const Elem* elem, std::vector<std::vector<Real> > & d
                            , std::vector<Real> & dydxi, std::vector<Real> & dzdeta, std::vector<Real> & dxdzeta,
                            std::vector<Real> & dzdxi, std::vector<Real> & dxdeta, std::vector<Real> & dydzeta
 #endif
-                          )
+                           )
 {
 
   const Order mapping_order        (elem->default_order());
@@ -102,10 +102,10 @@ void hermite_compute_coefs(const Elem* elem, std::vector<std::vector<Real> > & d
 
 
 Real hermite_bases_3D
- (std::vector<unsigned int> &bases1D,
-  const std::vector<std::vector<Real> > &dxdxi,
-  const Order &o,
-  unsigned int i)
+(std::vector<unsigned int> &bases1D,
+ const std::vector<std::vector<Real> > &dxdxi,
+ const Order &o,
+ unsigned int i)
 {
   bases1D.clear();
   bases1D.resize(3,0);
@@ -424,9 +424,9 @@ Real FE<3,HERMITE>::shape(const Elem* elem,
               Real coef = hermite_bases_3D(bases1D, dxdxi, totalorder, i);
 
               return coef *
-                     FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
-                     FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
-                     FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
+                FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
+                FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
+                FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
             }
           default:
             libMesh::err << "ERROR: Unsupported element type!" << std::endl;
@@ -548,10 +548,10 @@ Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
 
 template <>
 Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
-                                      const Order order,
-                                      const unsigned int i,
-                                      const unsigned int j,
-                                      const Point& p)
+                                       const Order order,
+                                       const unsigned int i,
+                                       const unsigned int j,
+                                       const Point& p)
 {
   libmesh_assert(elem);
 

@@ -240,20 +240,20 @@ unsigned int Hex::opposite_node(const unsigned int node_in,
     {1, 0, 3, 2, 5, 4, 7, 6, 255, 11, 255, 9, 13, 12, 15, 14, 255, 19, 255, 17, 255, 255, 24, 255, 22, 255};
 
   switch (side_in)
-  {
-  case 0:
-  case 5:
-    return side05_nodes_map[node_in];
-    break;
-  case 1:
-  case 3:
-    return side13_nodes_map[node_in];
-    break;
-  case 2:
-  case 4:
-    return side24_nodes_map[node_in];
-    break;
-  }
+    {
+    case 0:
+    case 5:
+      return side05_nodes_map[node_in];
+      break;
+    case 1:
+    case 3:
+      return side13_nodes_map[node_in];
+      break;
+    case 2:
+    case 4:
+      return side24_nodes_map[node_in];
+      break;
+    }
 
   libmesh_error();
   return 255;
@@ -402,9 +402,9 @@ Real Hex::quality (const ElemQuality q) const
     }
 
 
-    // Will never get here...
-    libmesh_error();
-    return 0.;
+  // Will never get here...
+  libmesh_error();
+  return 0.;
 }
 
 
@@ -479,40 +479,40 @@ std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
 
 
 const unsigned short int Hex::_second_order_vertex_child_number[27] =
-{
-  99,99,99,99,99,99,99,99, // Vertices
-  0,1,2,0,0,1,2,3,4,5,6,5, // Edges
-  0,0,1,2,0,4,             // Faces
-  0                        // Interior
-};
+  {
+    99,99,99,99,99,99,99,99, // Vertices
+    0,1,2,0,0,1,2,3,4,5,6,5, // Edges
+    0,0,1,2,0,4,             // Faces
+    0                        // Interior
+  };
 
 
 
 const unsigned short int Hex::_second_order_vertex_child_index[27] =
-{
-  99,99,99,99,99,99,99,99, // Vertices
-  1,2,3,3,4,5,6,7,5,6,7,7, // Edges
-  2,5,6,7,7,6,             // Faces
-  6                        // Interior
-};
+  {
+    99,99,99,99,99,99,99,99, // Vertices
+    1,2,3,3,4,5,6,7,5,6,7,7, // Edges
+    2,5,6,7,7,6,             // Faces
+    6                        // Interior
+  };
 
 
 const unsigned short int Hex::_second_order_adjacent_vertices[12][2] =
-{
-  { 0,  1}, // vertices adjacent to node 8
-  { 1,  2}, // vertices adjacent to node 9
-  { 2,  3}, // vertices adjacent to node 10
-  { 0,  3}, // vertices adjacent to node 11
+  {
+    { 0,  1}, // vertices adjacent to node 8
+    { 1,  2}, // vertices adjacent to node 9
+    { 2,  3}, // vertices adjacent to node 10
+    { 0,  3}, // vertices adjacent to node 11
 
-  { 0,  4}, // vertices adjacent to node 12
-  { 1,  5}, // vertices adjacent to node 13
-  { 2,  6}, // vertices adjacent to node 14
-  { 3,  7}, // vertices adjacent to node 15
+    { 0,  4}, // vertices adjacent to node 12
+    { 1,  5}, // vertices adjacent to node 13
+    { 2,  6}, // vertices adjacent to node 14
+    { 3,  7}, // vertices adjacent to node 15
 
-  { 4,  5}, // vertices adjacent to node 16
-  { 5,  6}, // vertices adjacent to node 17
-  { 6,  7}, // vertices adjacent to node 18
-  { 4,  7}  // vertices adjacent to node 19
-};
+    { 4,  5}, // vertices adjacent to node 16
+    { 5,  6}, // vertices adjacent to node 17
+    { 6,  7}, // vertices adjacent to node 18
+    { 4,  7}  // vertices adjacent to node 19
+  };
 
 } // namespace libMesh

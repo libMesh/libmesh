@@ -32,12 +32,12 @@
 
 namespace libMesh
 {
-  // LaplaceMeshSmoother member functions
-  LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh& mesh)
-    : MeshSmoother(mesh),
-      _initialized(false)
-  {
-  }
+// LaplaceMeshSmoother member functions
+LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh& mesh)
+  : MeshSmoother(mesh),
+    _initialized(false)
+{
+}
 
 
 
@@ -311,89 +311,89 @@ void LaplaceMeshSmoother::print_graph(std::ostream& out_stream) const
 
 
 
-  void LaplaceMeshSmoother::allgather_graph()
-  {
-    // The graph data structure is not well-suited for parallel communication,
-    // so copy the graph into a single vector defined by:
-    // NA A_0 A_1 ... A_{NA} | NB B_0 B_1 ... B_{NB} | NC C_0 C_1 ... C_{NC}
-    // where:
-    // * NA is the number of graph connections for node A
-    // * A_0, A_1, etc. are the IDs connected to node A
-    std::vector<std::size_t> flat_graph;
+void LaplaceMeshSmoother::allgather_graph()
+{
+  // The graph data structure is not well-suited for parallel communication,
+  // so copy the graph into a single vector defined by:
+  // NA A_0 A_1 ... A_{NA} | NB B_0 B_1 ... B_{NB} | NC C_0 C_1 ... C_{NC}
+  // where:
+  // * NA is the number of graph connections for node A
+  // * A_0, A_1, etc. are the IDs connected to node A
+  std::vector<std::size_t> flat_graph;
 
-    // Reserve at least enough space for each node to have zero entries
-    flat_graph.reserve(_graph.size());
+  // Reserve at least enough space for each node to have zero entries
+  flat_graph.reserve(_graph.size());
 
-    for (std::size_t i=0; i<_graph.size(); ++i)
+  for (std::size_t i=0; i<_graph.size(); ++i)
+    {
+      // First push back the number of entries for this node
+      flat_graph.push_back (_graph[i].size());
+
+      // Then push back all the IDs
+      for (std::size_t j=0; j<_graph[i].size(); ++j)
+        flat_graph.push_back(_graph[i][j]);
+    }
+
+  // // A copy of the flat graph (for printing only, delete me later)
+  // std::vector<unsigned> copy_of_flat_graph(flat_graph);
+
+  // Use the allgather routine to combine all the flat graphs on all processors
+  _mesh.comm().allgather(flat_graph);
+
+  // Now reconstruct _graph from the allgathered flat_graph.
+
+  // // (Delete me later, the copy is just for printing purposes.)
+  // std::vector<std::vector<unsigned > > copy_of_graph(_graph);
+
+  // Make sure the old graph is cleared out
+  _graph.clear();
+  _graph.resize(_mesh.n_nodes());
+
+  // Our current position in the allgather'd flat_graph
+  std::size_t cursor=0;
+
+  // There are n_nodes * n_processors vectors to read in total
+  for (processor_id_type p=0; p<_mesh.n_processors(); ++p)
+    for (dof_id_type node_ctr=0; node_ctr<_mesh.n_nodes(); ++node_ctr)
       {
-        // First push back the number of entries for this node
-        flat_graph.push_back (_graph[i].size());
+        // Read the number of entries for this node, move cursor
+        std::size_t n_entries = flat_graph[cursor++];
 
-        // Then push back all the IDs
-        for (std::size_t j=0; j<_graph[i].size(); ++j)
-          flat_graph.push_back(_graph[i][j]);
+        // Reserve space for that many more entries, then push back
+        _graph[node_ctr].reserve(_graph[node_ctr].size() + n_entries);
+
+        // Read all graph connections for this node, move the cursor each time
+        // Note: there might be zero entries but that's fine
+        for (std::size_t i=0; i<n_entries; ++i)
+          _graph[node_ctr].push_back(flat_graph[cursor++]);
       }
 
-    // // A copy of the flat graph (for printing only, delete me later)
-    // std::vector<unsigned> copy_of_flat_graph(flat_graph);
 
-    // Use the allgather routine to combine all the flat graphs on all processors
-    _mesh.comm().allgather(flat_graph);
-
-    // Now reconstruct _graph from the allgathered flat_graph.
-
-    // // (Delete me later, the copy is just for printing purposes.)
-    // std::vector<std::vector<unsigned > > copy_of_graph(_graph);
-
-    // Make sure the old graph is cleared out
-    _graph.clear();
-    _graph.resize(_mesh.n_nodes());
-
-    // Our current position in the allgather'd flat_graph
-    std::size_t cursor=0;
-
-    // There are n_nodes * n_processors vectors to read in total
-    for (processor_id_type p=0; p<_mesh.n_processors(); ++p)
-      for (dof_id_type node_ctr=0; node_ctr<_mesh.n_nodes(); ++node_ctr)
-        {
-          // Read the number of entries for this node, move cursor
-          std::size_t n_entries = flat_graph[cursor++];
-
-          // Reserve space for that many more entries, then push back
-          _graph[node_ctr].reserve(_graph[node_ctr].size() + n_entries);
-
-          // Read all graph connections for this node, move the cursor each time
-          // Note: there might be zero entries but that's fine
-          for (std::size_t i=0; i<n_entries; ++i)
-            _graph[node_ctr].push_back(flat_graph[cursor++]);
-        }
-
-
-//    // Print local graph to uniquely named file (debugging)
-//    {
-//      // Generate unique filename for this processor
-//      std::ostringstream oss;
-//      oss << "graph_filename_" << _mesh.processor_id() << ".txt";
-//      std::ofstream graph_stream(oss.str().c_str());
-//
-//      // Print the local non-flat graph
-//      std::swap(_graph, copy_of_graph);
-//      print_graph(graph_stream);
-//
-//      // Print the (local) flat graph for verification
-//      for (std::size_t i=0; i<copy_of_flat_graph.size(); ++i)
-//graph_stream << copy_of_flat_graph[i] << " ";
-//      graph_stream << "\n";
-//
-//      // Print the allgather'd grap for verification
-//      for (std::size_t i=0; i<flat_graph.size(); ++i)
-//graph_stream << flat_graph[i] << " ";
-//      graph_stream << "\n";
-//
-//      // Print the global non-flat graph
-//      std::swap(_graph, copy_of_graph);
-//      print_graph(graph_stream);
-//    }
-  } // allgather_graph()
+  //    // Print local graph to uniquely named file (debugging)
+  //    {
+  //      // Generate unique filename for this processor
+  //      std::ostringstream oss;
+  //      oss << "graph_filename_" << _mesh.processor_id() << ".txt";
+  //      std::ofstream graph_stream(oss.str().c_str());
+  //
+  //      // Print the local non-flat graph
+  //      std::swap(_graph, copy_of_graph);
+  //      print_graph(graph_stream);
+  //
+  //      // Print the (local) flat graph for verification
+  //      for (std::size_t i=0; i<copy_of_flat_graph.size(); ++i)
+  //graph_stream << copy_of_flat_graph[i] << " ";
+  //      graph_stream << "\n";
+  //
+  //      // Print the allgather'd grap for verification
+  //      for (std::size_t i=0; i<flat_graph.size(); ++i)
+  //graph_stream << flat_graph[i] << " ";
+  //      graph_stream << "\n";
+  //
+  //      // Print the global non-flat graph
+  //      std::swap(_graph, copy_of_graph);
+  //      print_graph(graph_stream);
+  //    }
+} // allgather_graph()
 
 } // namespace libMesh

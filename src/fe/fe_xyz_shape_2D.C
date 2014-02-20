@@ -30,11 +30,11 @@
 // to be recalculated.
 namespace
 {
-  using namespace libMesh;
+using namespace libMesh;
 
-  static dof_id_type old_elem_id = DofObject::invalid_id;
-  static Point centroid;
-  static Point max_distance;
+static dof_id_type old_elem_id = DofObject::invalid_id;
+static Point centroid;
+static Point max_distance;
 }
 
 
@@ -49,8 +49,8 @@ Real FE<2,XYZ>::shape(const ElemType,
                       const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
-                << "because the centroid is needed."
-                << std::endl;
+               << "because the centroid is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -79,10 +79,10 @@ Real FE<2,XYZ>::shape(const Elem* elem,
       max_distance = Point(0.,0.,0.);
       for (unsigned int p = 0; p < elem->n_nodes(); p++)
         for (unsigned int d = 0; d < 2; d++)
-        {
-           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
-           max_distance(d) = std::max(distance, max_distance(d));
-        }
+          {
+            const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+            max_distance(d) = std::max(distance, max_distance(d));
+          }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -187,8 +187,8 @@ Real FE<2,XYZ>::shape_deriv(const ElemType,
                             const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
-                << "because the centroid is needed."
-                << std::endl;
+               << "because the centroid is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -220,10 +220,10 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
       max_distance = Point(0.,0.,0.);
       for (unsigned int p = 0; p < elem->n_nodes(); p++)
         for (unsigned int d = 0; d < 2; d++)
-        {
-           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
-           max_distance(d) = std::max(distance, max_distance(d));
-        }
+          {
+            const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+            max_distance(d) = std::max(distance, max_distance(d));
+          }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -248,149 +248,149 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
 
   // monomials. since they are hierarchic we only need one case block.
 
-switch (j)
-  {
-    // d()/dx
-  case 0:
+  switch (j)
     {
-      switch (i)
-        {
-          // constants
-        case 0:
-          return 0.;
+      // d()/dx
+    case 0:
+      {
+        switch (i)
+          {
+            // constants
+          case 0:
+            return 0.;
 
-          // linears
-        case 1:
-          return 1./distx;
+            // linears
+          case 1:
+            return 1./distx;
 
-        case 2:
-          return 0.;
+          case 2:
+            return 0.;
 
-          // quadratics
-        case 3:
-          return 2.*dx/distx;
+            // quadratics
+          case 3:
+            return 2.*dx/distx;
 
-        case 4:
-          return dy/distx;
+          case 4:
+            return dy/distx;
 
-        case 5:
-          return 0.;
+          case 5:
+            return 0.;
 
-          // cubics
-        case 6:
-          return 3.*dx*dx/distx;
+            // cubics
+          case 6:
+            return 3.*dx*dx/distx;
 
-        case 7:
-          return 2.*dx*dy/distx;
+          case 7:
+            return 2.*dx*dy/distx;
 
-        case 8:
-          return dy*dy/distx;
+          case 8:
+            return dy*dy/distx;
 
-        case 9:
-          return 0.;
+          case 9:
+            return 0.;
 
-          // quartics
-        case 10:
-          return 4.*dx*dx*dx/distx;
+            // quartics
+          case 10:
+            return 4.*dx*dx*dx/distx;
 
-        case 11:
-          return 3.*dx*dx*dy/distx;
+          case 11:
+            return 3.*dx*dx*dy/distx;
 
-        case 12:
-          return 2.*dx*dy*dy/distx;
+          case 12:
+            return 2.*dx*dy*dy/distx;
 
-        case 13:
-          return dy*dy*dy/distx;
+          case 13:
+            return dy*dy*dy/distx;
 
-        case 14:
-          return 0.;
+          case 14:
+            return 0.;
 
-        default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)/2; o++) { }
-          unsigned int i2 = i - (o*(o+1)/2);
-          Real val = o - i2;
-          for (unsigned int index=i2+1; index < o; index++)
-            val *= dx;
-          for (unsigned int index=0; index != i2; index++)
-            val *= dy;
-          return val/distx;
-        }
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)/2; o++) { }
+            unsigned int i2 = i - (o*(o+1)/2);
+            Real val = o - i2;
+            for (unsigned int index=i2+1; index < o; index++)
+              val *= dx;
+            for (unsigned int index=0; index != i2; index++)
+              val *= dy;
+            return val/distx;
+          }
+      }
+
+
+      // d()/dy
+    case 1:
+      {
+        switch (i)
+          {
+            // constants
+          case 0:
+            return 0.;
+
+            // linears
+          case 1:
+            return 0.;
+
+          case 2:
+            return 1./disty;
+
+            // quadratics
+          case 3:
+            return 0.;
+
+          case 4:
+            return dx/disty;
+
+          case 5:
+            return 2.*dy/disty;
+
+            // cubics
+          case 6:
+            return 0.;
+
+          case 7:
+            return dx*dx/disty;
+
+          case 8:
+            return 2.*dx*dy/disty;
+
+          case 9:
+            return 3.*dy*dy/disty;
+
+            // quartics
+          case 10:
+            return 0.;
+
+          case 11:
+            return dx*dx*dx/disty;
+
+          case 12:
+            return 2.*dx*dx*dy/disty;
+
+          case 13:
+            return 3.*dx*dy*dy/disty;
+
+          case 14:
+            return 4.*dy*dy*dy/disty;
+
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)/2; o++) { }
+            unsigned int i2 = i - (o*(o+1)/2);
+            Real val = i2;
+            for (unsigned int index=i2; index != o; index++)
+              val *= dx;
+            for (unsigned int index=1; index <= i2; index++)
+              val *= dy;
+            return val/disty;
+          }
+      }
+
+
+    default:
+      libmesh_error();
     }
-
-
-    // d()/dy
-  case 1:
-    {
-      switch (i)
-        {
-          // constants
-        case 0:
-          return 0.;
-
-          // linears
-        case 1:
-          return 0.;
-
-        case 2:
-          return 1./disty;
-
-          // quadratics
-        case 3:
-          return 0.;
-
-        case 4:
-          return dx/disty;
-
-        case 5:
-          return 2.*dy/disty;
-
-          // cubics
-        case 6:
-          return 0.;
-
-        case 7:
-          return dx*dx/disty;
-
-        case 8:
-          return 2.*dx*dy/disty;
-
-        case 9:
-          return 3.*dy*dy/disty;
-
-          // quartics
-        case 10:
-          return 0.;
-
-        case 11:
-          return dx*dx*dx/disty;
-
-        case 12:
-          return 2.*dx*dx*dy/disty;
-
-        case 13:
-          return 3.*dx*dy*dy/disty;
-
-        case 14:
-          return 4.*dy*dy*dy/disty;
-
-        default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)/2; o++) { }
-          unsigned int i2 = i - (o*(o+1)/2);
-          Real val = i2;
-          for (unsigned int index=i2; index != o; index++)
-            val *= dx;
-          for (unsigned int index=1; index <= i2; index++)
-            val *= dy;
-          return val/disty;
-        }
-    }
-
-
-  default:
-    libmesh_error();
-  }
 
   libmesh_error();
   return 0.;
@@ -408,8 +408,8 @@ Real FE<2,XYZ>::shape_second_deriv(const ElemType,
                                    const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
-                << "because the centroid is needed."
-                << std::endl;
+               << "because the centroid is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -440,10 +440,10 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
       max_distance = Point(0.,0.,0.);
       for (unsigned int p = 0; p < elem->n_nodes(); p++)
         for (unsigned int d = 0; d < 2; d++)
-        {
-           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
-           max_distance(d) = std::max(distance, max_distance(d));
-        }
+          {
+            const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+            max_distance(d) = std::max(distance, max_distance(d));
+          }
     }
 
   // Using static globals for old_elem_id, etc. will fail

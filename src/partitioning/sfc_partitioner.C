@@ -27,11 +27,11 @@
 #include "libmesh/elem.h"
 
 #ifdef LIBMESH_HAVE_SFCURVES
-  namespace Sfc {
-    extern "C" {
+namespace Sfc {
+extern "C" {
 #     include "sfcurves.h"
-    }
-  }
+}
+}
 #else
 #  include "libmesh/linear_partitioner.h"
 #endif
@@ -55,7 +55,7 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
       return;
     }
 
-// What to do if the sfcurves library IS NOT present
+  // What to do if the sfcurves library IS NOT present
 #ifndef LIBMESH_HAVE_SFCURVES
 
   libmesh_here();
@@ -67,7 +67,7 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 
   lp.partition (mesh, n);
 
-// What to do if the sfcurves library IS present
+  // What to do if the sfcurves library IS present
 #else
 
   START_LOG("sfc_partition()", "SFCPartitioner");
@@ -94,8 +94,8 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
   // We need to map the active element ids into a
   // contiguous range.
   {
-//     active_elem_iterator       elem_it (mesh.elements_begin());
-//     const active_elem_iterator elem_end(mesh.elements_end());
+    //     active_elem_iterator       elem_it (mesh.elements_begin());
+    //     const active_elem_iterator elem_end(mesh.elements_end());
 
     MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = mesh.active_elements_end();
@@ -117,8 +117,8 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 
   // Get the centroid for each active element
   {
-//     const_active_elem_iterator       elem_it (mesh.const_elements_begin());
-//     const const_active_elem_iterator elem_end(mesh.const_elements_end());
+    //     const_active_elem_iterator       elem_it (mesh.const_elements_begin());
+    //     const const_active_elem_iterator elem_end(mesh.const_elements_end());
 
     MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = mesh.active_elements_end();
@@ -160,16 +160,16 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 
   // Assign the partitioning to the active elements
   {
-//      {
-//        std::ofstream out ("sfc.dat");
-//        out << "variables=x,y,z" << std::endl;
-//        out << "zone f=point" << std::endl;
+    //      {
+    //        std::ofstream out ("sfc.dat");
+    //        out << "variables=x,y,z" << std::endl;
+    //        out << "zone f=point" << std::endl;
 
-//        for (unsigned int i=0; i<n_active_elem; i++)
-//  out << x[i] << " "
-//      << y[i] << " "
-//      << z[i] << std::endl;
-//      }
+    //        for (unsigned int i=0; i<n_active_elem; i++)
+    //  out << x[i] << " "
+    //      << y[i] << " "
+    //      << z[i] << std::endl;
+    //      }
 
     const dof_id_type blksize = (n_active_elem+n-1)/n;
 

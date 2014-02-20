@@ -59,39 +59,39 @@ void JumpErrorEstimator::estimate_error (const System& system,
   START_LOG("estimate_error()", "JumpErrorEstimator");
   /*
 
-  Conventions for assigning the direction of the normal:
+    Conventions for assigning the direction of the normal:
 
-  - e & f are global element ids
+    - e & f are global element ids
 
-  Case (1.) Elements are at the same level, e<f
-            Compute the flux jump on the face and
-            add it as a contribution to error_per_cell[e]
-            and error_per_cell[f]
+    Case (1.) Elements are at the same level, e<f
+    Compute the flux jump on the face and
+    add it as a contribution to error_per_cell[e]
+    and error_per_cell[f]
 
-                   ----------------------
-                   |           |          |
-                   |           |    f     |
-                   |           |          |
-                   |    e      |---> n    |
-                   |           |          |
-                   |           |          |
-                   ----------------------
+    ----------------------
+    |           |          |
+    |           |    f     |
+    |           |          |
+    |    e      |---> n    |
+    |           |          |
+    |           |          |
+    ----------------------
 
 
-   Case (2.) The neighbor is at a higher level.
-             Compute the flux jump on e's face and
-             add it as a contribution to error_per_cell[e]
-             and error_per_cell[f]
+    Case (2.) The neighbor is at a higher level.
+    Compute the flux jump on e's face and
+    add it as a contribution to error_per_cell[e]
+    and error_per_cell[f]
 
-                   ----------------------
-                   |     |     |          |
-                   |     |  e  |---> n    |
-                   |     |     |          |
-                   |-----------|    f     |
-                   |     |     |          |
-                   |     |     |          |
-                   |     |     |          |
-                   ----------------------
+    ----------------------
+    |     |     |          |
+    |     |  e  |---> n    |
+    |     |     |          |
+    |-----------|    f     |
+    |     |     |          |
+    |     |     |          |
+    |     |     |          |
+    ----------------------
   */
 
   // The current mesh
@@ -222,8 +222,8 @@ void JumpErrorEstimator::estimate_error (const System& system,
                            a != active_neighbors.size(); ++a)
                         {
                           const Elem *f = active_neighbors[a];
-                      // FIXME - what about when f->level <
-                      // parent->level()??
+                          // FIXME - what about when f->level <
+                          // parent->level()??
                           if (f->level() >= parent->level())
                             {
                               fine_elem = f;

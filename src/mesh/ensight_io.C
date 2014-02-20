@@ -525,15 +525,15 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
     libmesh_not_implemented()
 #endif
 
-    for (unsigned int n=0; n<elem->n_nodes(); n++)
-      {
-        std::vector<Real> node_vec(3);
-        node_vec[0]= libmesh_real(nodal_soln_u[n]);
-        node_vec[1]= libmesh_real(nodal_soln_v[n]);
-        node_vec[2]=0.0;
-        if(dim==3) node_vec[2]= libmesh_real(nodal_soln_w[n]);
-        local_soln[elem->node(n)] = node_vec;
-      }
+      for (unsigned int n=0; n<elem->n_nodes(); n++)
+        {
+          std::vector<Real> node_vec(3);
+          node_vec[0]= libmesh_real(nodal_soln_u[n]);
+          node_vec[1]= libmesh_real(nodal_soln_v[n]);
+          node_vec[2]=0.0;
+          if(dim==3) node_vec[2]= libmesh_real(nodal_soln_w[n]);
+          local_soln[elem->node(n)] = node_vec;
+        }
 
   }
 

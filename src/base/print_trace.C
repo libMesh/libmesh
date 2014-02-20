@@ -60,10 +60,10 @@ std::string process_trace(const char *name)
 #ifdef __APPLE__
   namestart = fullname.find("0x");
   if (namestart != std::string::npos)
-  {
-    namestart = fullname.find(' ', namestart) + 1;
-    saved_begin = fullname.substr(0, namestart);
-  }
+    {
+      namestart = fullname.find(' ', namestart) + 1;
+      saved_begin = fullname.substr(0, namestart);
+    }
   else
     namestart = 0;
   nameend = fullname.find('+');
@@ -71,10 +71,10 @@ std::string process_trace(const char *name)
       nameend <= namestart)
     nameend = fullname.size();
   else
-  {
-    nameend -= 1;
-    saved_end = fullname.substr(nameend, fullname.length());
-  }
+    {
+      nameend -= 1;
+      saved_end = fullname.substr(nameend, fullname.length());
+    }
 #else
   namestart = fullname.find('(');
   if (namestart == std::string::npos)
@@ -96,13 +96,13 @@ std::string process_trace(const char *name)
 
 std::string demangle(const char *name)
 {
-    int status = 0;
-    char *d = 0;
-    std::string ret = name;
-    try { if ( (d = abi::__cxa_demangle(name, 0, 0, &status)) ) ret = d; }
-    catch(...) {  }
-    std::free(d);
-    return ret;
+  int status = 0;
+  char *d = 0;
+  std::string ret = name;
+  try { if ( (d = abi::__cxa_demangle(name, 0, 0, &status)) ) ret = d; }
+  catch(...) {  }
+  std::free(d);
+  return ret;
 }
 
 void print_trace(std::ostream &out)
@@ -134,13 +134,13 @@ std::string demangle(const char *name) { return std::string(name); }
 
 namespace libMesh
 {
-  void write_traceout()
-  {
+void write_traceout()
+{
 #ifdef LIBMESH_ENABLE_TRACEFILES
-    std::stringstream outname;
-    outname << "traceout_" << static_cast<std::size_t>(libMesh::global_processor_id()) << '_' << getpid() << ".txt";
-    std::ofstream traceout(outname.str().c_str(), std::ofstream::app);
-    libMesh::print_trace(traceout);
+  std::stringstream outname;
+  outname << "traceout_" << static_cast<std::size_t>(libMesh::global_processor_id()) << '_' << getpid() << ".txt";
+  std::ofstream traceout(outname.str().c_str(), std::ofstream::app);
+  libMesh::print_trace(traceout);
 #endif
-  }
+}
 }

@@ -39,136 +39,136 @@
 #ifdef LIBMESH_HAVE_LIBHILBERT
 namespace { // anonymous namespace for helper functions
 
-  using namespace libMesh;
+using namespace libMesh;
 
-  // Utility function to map (x,y,z) in [bbox.min, bbox.max]^3 into
-  // [0,max_inttype]^3 for computing Hilbert keys
-  void get_hilbert_coords (const Point &p,
-                           const MeshTools::BoundingBox &bbox,
-                           CFixBitVec icoords[3])
-  {
-    static const Hilbert::inttype max_inttype = static_cast<Hilbert::inttype>(-1);
+// Utility function to map (x,y,z) in [bbox.min, bbox.max]^3 into
+// [0,max_inttype]^3 for computing Hilbert keys
+void get_hilbert_coords (const Point &p,
+                         const MeshTools::BoundingBox &bbox,
+                         CFixBitVec icoords[3])
+{
+  static const Hilbert::inttype max_inttype = static_cast<Hilbert::inttype>(-1);
 
-    const long double // put (x,y,z) in [0,1]^3 (don't divide by 0)
-      x = ((bbox.first(0) == bbox.second(0)) ? 0. :
-           (p(0)-bbox.first(0))/(bbox.second(0)-bbox.first(0))),
+  const long double // put (x,y,z) in [0,1]^3 (don't divide by 0)
+    x = ((bbox.first(0) == bbox.second(0)) ? 0. :
+         (p(0)-bbox.first(0))/(bbox.second(0)-bbox.first(0))),
 
 #if LIBMESH_DIM > 1
-      y = ((bbox.first(1) == bbox.second(1)) ? 0. :
-           (p(1)-bbox.first(1))/(bbox.second(1)-bbox.first(1))),
+    y = ((bbox.first(1) == bbox.second(1)) ? 0. :
+         (p(1)-bbox.first(1))/(bbox.second(1)-bbox.first(1))),
 #else
-      y = 0.,
+    y = 0.,
 #endif
 
 #if LIBMESH_DIM > 2
-      z = ((bbox.first(2) == bbox.second(2)) ? 0. :
-           (p(2)-bbox.first(2))/(bbox.second(2)-bbox.first(2)));
+    z = ((bbox.first(2) == bbox.second(2)) ? 0. :
+         (p(2)-bbox.first(2))/(bbox.second(2)-bbox.first(2)));
 #else
-      z = 0.;
+  z = 0.;
 #endif
 
-    // (icoords) in [0,max_inttype]^3
-    icoords[0] = static_cast<Hilbert::inttype>(x*max_inttype);
-    icoords[1] = static_cast<Hilbert::inttype>(y*max_inttype);
-    icoords[2] = static_cast<Hilbert::inttype>(z*max_inttype);
+  // (icoords) in [0,max_inttype]^3
+  icoords[0] = static_cast<Hilbert::inttype>(x*max_inttype);
+  icoords[1] = static_cast<Hilbert::inttype>(y*max_inttype);
+  icoords[2] = static_cast<Hilbert::inttype>(z*max_inttype);
+}
+
+
+
+// Compute the hilbert index
+template <typename T>
+Hilbert::HilbertIndices
+get_hilbert_index (const T *p,
+                   const MeshTools::BoundingBox &bbox)
+{
+  static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
+
+  Hilbert::HilbertIndices index;
+  CFixBitVec icoords[3];
+  Hilbert::BitVecType bv;
+  get_hilbert_coords (*p, bbox, icoords);
+  Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, bv);
+  index = bv;
+
+  return index;
+}
+
+template <>
+Hilbert::HilbertIndices
+get_hilbert_index (const Elem *e,
+                   const MeshTools::BoundingBox &bbox)
+{
+  static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
+
+  Hilbert::HilbertIndices index;
+  CFixBitVec icoords[3];
+  Hilbert::BitVecType bv;
+  get_hilbert_coords (e->centroid(), bbox, icoords);
+  Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, bv);
+  index = bv;
+
+  return index;
+}
+
+
+
+// Compute the hilbert index
+Hilbert::HilbertIndices
+get_hilbert_index (const Point &p,
+                   const MeshTools::BoundingBox &bbox)
+{
+  static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
+
+  Hilbert::HilbertIndices index;
+  CFixBitVec icoords[3];
+  Hilbert::BitVecType bv;
+  get_hilbert_coords (p, bbox, icoords);
+  Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, bv);
+  index = bv;
+
+  return index;
+}
+
+// Helper class for threaded Hilbert key computation
+class ComputeHilbertKeys
+{
+public:
+  ComputeHilbertKeys (const MeshTools::BoundingBox &bbox,
+                      std::vector<Hilbert::HilbertIndices> &keys) :
+    _bbox(bbox),
+    _keys(keys)
+  {}
+
+  // computes the hilbert index for a node
+  void operator() (const ConstNodeRange &range) const
+  {
+    dof_id_type pos = range.first_idx();
+    for (ConstNodeRange::const_iterator it = range.begin(); it!=range.end(); ++it)
+      {
+        const Node* node = (*it);
+        libmesh_assert(node);
+        libmesh_assert_less (pos, _keys.size());
+        _keys[pos++] = get_hilbert_index (*node, _bbox);
+      }
   }
 
-
-
-  // Compute the hilbert index
-  template <typename T>
-  Hilbert::HilbertIndices
-  get_hilbert_index (const T *p,
-                     const MeshTools::BoundingBox &bbox)
+  // computes the hilbert index for an element
+  void operator() (const ConstElemRange &range) const
   {
-    static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
-
-    Hilbert::HilbertIndices index;
-    CFixBitVec icoords[3];
-    Hilbert::BitVecType bv;
-    get_hilbert_coords (*p, bbox, icoords);
-    Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, bv);
-    index = bv;
-
-    return index;
+    dof_id_type pos = range.first_idx();
+    for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
+      {
+        const Elem* elem = (*it);
+        libmesh_assert(elem);
+        libmesh_assert_less (pos, _keys.size());
+        _keys[pos++] = get_hilbert_index (elem->centroid(), _bbox);
+      }
   }
 
-  template <>
-  Hilbert::HilbertIndices
-  get_hilbert_index (const Elem *e,
-                     const MeshTools::BoundingBox &bbox)
-  {
-    static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
-
-    Hilbert::HilbertIndices index;
-    CFixBitVec icoords[3];
-    Hilbert::BitVecType bv;
-    get_hilbert_coords (e->centroid(), bbox, icoords);
-    Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, bv);
-    index = bv;
-
-    return index;
-  }
-
-
-
-  // Compute the hilbert index
-  Hilbert::HilbertIndices
-  get_hilbert_index (const Point &p,
-                     const MeshTools::BoundingBox &bbox)
-  {
-    static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
-
-    Hilbert::HilbertIndices index;
-    CFixBitVec icoords[3];
-    Hilbert::BitVecType bv;
-    get_hilbert_coords (p, bbox, icoords);
-    Hilbert::coordsToIndex (icoords, 8*sizeof_inttype, 3, bv);
-    index = bv;
-
-    return index;
-  }
-
-  // Helper class for threaded Hilbert key computation
-  class ComputeHilbertKeys
-  {
-  public:
-    ComputeHilbertKeys (const MeshTools::BoundingBox &bbox,
-                        std::vector<Hilbert::HilbertIndices> &keys) :
-      _bbox(bbox),
-      _keys(keys)
-    {}
-
-    // computes the hilbert index for a node
-    void operator() (const ConstNodeRange &range) const
-    {
-      dof_id_type pos = range.first_idx();
-      for (ConstNodeRange::const_iterator it = range.begin(); it!=range.end(); ++it)
-        {
-          const Node* node = (*it);
-          libmesh_assert(node);
-          libmesh_assert_less (pos, _keys.size());
-          _keys[pos++] = get_hilbert_index (*node, _bbox);
-        }
-    }
-
-    // computes the hilbert index for an element
-    void operator() (const ConstElemRange &range) const
-    {
-      dof_id_type pos = range.first_idx();
-      for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
-        {
-          const Elem* elem = (*it);
-          libmesh_assert(elem);
-          libmesh_assert_less (pos, _keys.size());
-          _keys[pos++] = get_hilbert_index (elem->centroid(), _bbox);
-        }
-    }
-
-  private:
-    const MeshTools::BoundingBox &_bbox;
-    std::vector<Hilbert::HilbertIndices> &_keys;
-  };
+private:
+  const MeshTools::BoundingBox &_bbox;
+  std::vector<Hilbert::HilbertIndices> &_keys;
+};
 }
 #endif
 
@@ -214,8 +214,8 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
       Threads::parallel_for (nr, ComputeHilbertKeys (bbox, node_keys));
 
 #if 0
-    // It's O(N^2) to check that these keys don't duplicate before the
-    // sort...
+      // It's O(N^2) to check that these keys don't duplicate before the
+      // sort...
       MeshBase::const_node_iterator nodei = mesh.local_nodes_begin();
       for (std::size_t i = 0; i != node_keys.size(); ++i, ++nodei)
         {
@@ -252,9 +252,9 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
       Threads::parallel_for (er, ComputeHilbertKeys (bbox, elem_keys));
 
 #if 0
-    // For elements, the keys can be (and in the case of TRI, are
-    // expected to be) duplicates, but only if the elements are at
-    // different levels
+      // For elements, the keys can be (and in the case of TRI, are
+      // expected to be) duplicates, but only if the elements are at
+      // different levels
       MeshBase::const_element_iterator elemi = mesh.local_elements_begin();
       for (std::size_t i = 0; i != elem_keys.size(); ++i, ++elemi)
         {
@@ -364,27 +364,27 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
         filled_request (communicator.size());
 
       {
-      MeshBase::const_node_iterator       it  = mesh.nodes_begin();
-      const MeshBase::const_node_iterator end = mesh.nodes_end();
+        MeshBase::const_node_iterator       it  = mesh.nodes_begin();
+        const MeshBase::const_node_iterator end = mesh.nodes_end();
 
-      // build up list of requests
-      for (; it != end; ++it)
-        {
-          const Node* node = (*it);
-          libmesh_assert(node);
-          const Hilbert::HilbertIndices hi =
-            get_hilbert_index (*node, bbox);
-          const processor_id_type pid =
-            libmesh_cast_int<processor_id_type>
-            (std::distance (node_upper_bounds.begin(),
-                            std::lower_bound(node_upper_bounds.begin(),
-                                             node_upper_bounds.end(),
-                                             hi)));
+        // build up list of requests
+        for (; it != end; ++it)
+          {
+            const Node* node = (*it);
+            libmesh_assert(node);
+            const Hilbert::HilbertIndices hi =
+              get_hilbert_index (*node, bbox);
+            const processor_id_type pid =
+              libmesh_cast_int<processor_id_type>
+              (std::distance (node_upper_bounds.begin(),
+                              std::lower_bound(node_upper_bounds.begin(),
+                                               node_upper_bounds.end(),
+                                               hi)));
 
-          libmesh_assert_less (pid, communicator.size());
+            libmesh_assert_less (pid, communicator.size());
 
-          requested_ids[pid].push_back(hi);
-        }
+            requested_ids[pid].push_back(hi);
+          }
       }
 
       // The number of objects in my_node_bin on each processor
@@ -401,10 +401,10 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
         {
           // Trade my requests with processor procup and procdown
           const processor_id_type procup = (communicator.rank() + pid) %
-                                            communicator.size();
+            communicator.size();
           const processor_id_type procdown = (communicator.size() +
                                               communicator.rank() - pid) %
-                                              communicator.size();
+            communicator.size();
 
           std::vector<Hilbert::HilbertIndices> request_to_fill;
           communicator.send_receive(procup, requested_ids[procup],
@@ -482,26 +482,26 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
         filled_request (communicator.size());
 
       {
-      MeshBase::const_element_iterator       it  = mesh.elements_begin();
-      const MeshBase::const_element_iterator end = mesh.elements_end();
+        MeshBase::const_element_iterator       it  = mesh.elements_begin();
+        const MeshBase::const_element_iterator end = mesh.elements_end();
 
-      for (; it != end; ++it)
-        {
-          const Elem* elem = (*it);
-          libmesh_assert(elem);
-          const Hilbert::HilbertIndices hi =
-            get_hilbert_index (elem->centroid(), bbox);
-          const processor_id_type pid =
-            libmesh_cast_int<processor_id_type>
-            (std::distance (elem_upper_bounds.begin(),
-                            std::lower_bound(elem_upper_bounds.begin(),
-                                             elem_upper_bounds.end(),
-                                             hi)));
+        for (; it != end; ++it)
+          {
+            const Elem* elem = (*it);
+            libmesh_assert(elem);
+            const Hilbert::HilbertIndices hi =
+              get_hilbert_index (elem->centroid(), bbox);
+            const processor_id_type pid =
+              libmesh_cast_int<processor_id_type>
+              (std::distance (elem_upper_bounds.begin(),
+                              std::lower_bound(elem_upper_bounds.begin(),
+                                               elem_upper_bounds.end(),
+                                               hi)));
 
-          libmesh_assert_less (pid, communicator.size());
+            libmesh_assert_less (pid, communicator.size());
 
-          requested_ids[pid].push_back(hi);
-        }
+            requested_ids[pid].push_back(hi);
+          }
       }
 
       // The number of objects in my_elem_bin on each processor
@@ -518,10 +518,10 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
         {
           // Trade my requests with processor procup and procdown
           const processor_id_type procup = (communicator.rank() + pid) %
-                                            communicator.size();
+            communicator.size();
           const processor_id_type procdown = (communicator.size() +
                                               communicator.rank() - pid) %
-                                              communicator.size();
+            communicator.size();
 
           std::vector<Hilbert::HilbertIndices> request_to_fill;
           communicator.send_receive(procup, requested_ids[procup],
@@ -729,10 +729,10 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
       {
         // Trade my requests with processor procup and procdown
         const unsigned int procup = (communicator.rank() + pid) %
-                                     communicator.size();
+          communicator.size();
         const unsigned int procdown = (communicator.size() +
                                        communicator.rank() - pid) %
-                                       communicator.size();
+          communicator.size();
 
         communicator.send_receive(procup, requested_ids[procup],
                                   procdown, request_to_fill);

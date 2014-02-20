@@ -29,28 +29,28 @@
 // Local anonymous namespace to hold miscelaneous bits
 namespace
 {
-  using namespace libMesh;
+using namespace libMesh;
 
-  // Mutex object for required locking
-  typedef Threads::spin_mutex SingletonMutex;
-  SingletonMutex singleton_mtx, setup_mtx;
+// Mutex object for required locking
+typedef Threads::spin_mutex SingletonMutex;
+SingletonMutex singleton_mtx, setup_mtx;
 
-  // global list of runtime Singleton objects - created dynamically,
-  // cleaned up in reverse order.
-  typedef std::vector<Singleton*> SingletonList;
+// global list of runtime Singleton objects - created dynamically,
+// cleaned up in reverse order.
+typedef std::vector<Singleton*> SingletonList;
 
-  SingletonList& get_singleton_cache()
-  {
-    static SingletonList singleton_cache;
-    return singleton_cache;
-  }
+SingletonList& get_singleton_cache()
+{
+  static SingletonList singleton_cache;
+  return singleton_cache;
+}
 
-  typedef std::vector<Singleton::Setup*> SetupList;
-  SetupList& get_setup_cache()
-  {
-    static SetupList setup_cache;
-    return setup_cache;
-  }
+typedef std::vector<Singleton::Setup*> SetupList;
+SetupList& get_setup_cache()
+{
+  static SetupList setup_cache;
+  return setup_cache;
+}
 
 } // end anonymous namespace
 
@@ -61,54 +61,54 @@ namespace
 namespace libMesh
 {
 
-  Singleton::Singleton ()
-  {
-    SingletonMutex::scoped_lock lock(singleton_mtx);
+Singleton::Singleton ()
+{
+  SingletonMutex::scoped_lock lock(singleton_mtx);
 
-    get_singleton_cache().push_back (this);
-  }
-
-
-
-  Singleton::Setup::Setup ()
-  {
-    get_setup_cache().push_back (this);
-  }
+  get_singleton_cache().push_back (this);
+}
 
 
 
-  void Singleton::setup ()
-  {
-    SingletonMutex::scoped_lock lock(setup_mtx);
-
-    SetupList& setup_cache = get_setup_cache();
-
-    for (SetupList::iterator it = setup_cache.begin();
-         it!=setup_cache.end(); ++it)
-      {
-        libmesh_assert (*it != NULL);
-        (*it)->setup();
-      }
-  }
+Singleton::Setup::Setup ()
+{
+  get_setup_cache().push_back (this);
+}
 
 
 
-  void Singleton::cleanup ()
-  {
-    SingletonMutex::scoped_lock lock(singleton_mtx);
+void Singleton::setup ()
+{
+  SingletonMutex::scoped_lock lock(setup_mtx);
 
-    SingletonList& singleton_cache = get_singleton_cache();
+  SetupList& setup_cache = get_setup_cache();
 
-    for (SingletonList::reverse_iterator it = singleton_cache.rbegin();
-         it!=singleton_cache.rend(); ++it)
-      {
-        libmesh_assert (*it != NULL);
-        delete *it;
-        *it = NULL;
-      }
+  for (SetupList::iterator it = setup_cache.begin();
+       it!=setup_cache.end(); ++it)
+    {
+      libmesh_assert (*it != NULL);
+      (*it)->setup();
+    }
+}
 
-    singleton_cache.clear();
-  }
+
+
+void Singleton::cleanup ()
+{
+  SingletonMutex::scoped_lock lock(singleton_mtx);
+
+  SingletonList& singleton_cache = get_singleton_cache();
+
+  for (SingletonList::reverse_iterator it = singleton_cache.rbegin();
+       it!=singleton_cache.rend(); ++it)
+    {
+      libmesh_assert (*it != NULL);
+      delete *it;
+      *it = NULL;
+    }
+
+  singleton_cache.clear();
+}
 
 
 

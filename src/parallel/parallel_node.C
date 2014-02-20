@@ -30,19 +30,19 @@
 
 namespace
 {
-  using namespace libMesh;
+using namespace libMesh;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  static const unsigned int header_size = 3;
+static const unsigned int header_size = 3;
 #else
-  static const unsigned int header_size = 2;
+static const unsigned int header_size = 2;
 #endif
 
-  // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int idtypes_per_Real =
-    (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
+// use "(a+b-1)/b" trick to get a/b to round up
+static const unsigned int idtypes_per_Real =
+  (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
 
-  static const largest_id_type node_magic_header = 1234567890;
+static const largest_id_type node_magic_header = 1234567890;
 }
 
 
@@ -59,11 +59,11 @@ unsigned int packable_size (const Node* node, const MeshBase* mesh)
 {
   return
 #ifndef NDEBUG
-         1 + // add an int for the magic header when testing
+    1 + // add an int for the magic header when testing
 #endif
     header_size + LIBMESH_DIM*idtypes_per_Real +
-         node->packed_indexing_size() +
-         1 + mesh->boundary_info->n_boundary_ids(node);
+    node->packed_indexing_size() +
+    1 + mesh->boundary_info->n_boundary_ids(node);
 }
 
 
@@ -279,7 +279,7 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
 #ifndef NDEBUG
   libmesh_assert (in - original_in ==
                   static_cast<int>
-                    (Parallel::packed_size(node, original_in)));
+                  (Parallel::packed_size(node, original_in)));
 #endif
 }
 

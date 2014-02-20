@@ -32,9 +32,9 @@ namespace libMesh
 
 RBEIMAssembly::RBEIMAssembly(RBEIMConstruction& rb_eim_con_in,
                              unsigned int basis_function_index_in)
-: _rb_eim_con(rb_eim_con_in),
-  _basis_function_index(basis_function_index_in),
-  _ghosted_basis_function(NumericVector<Number>::build(rb_eim_con_in.system().comm()))
+  : _rb_eim_con(rb_eim_con_in),
+    _basis_function_index(basis_function_index_in),
+    _ghosted_basis_function(NumericVector<Number>::build(rb_eim_con_in.system().comm()))
 {
   // localize the vector that stores the basis function for this assembly object,
   // i.e. the vector that is used in evaluate_basis_function_at_quad_pts
@@ -42,11 +42,11 @@ RBEIMAssembly::RBEIMAssembly(RBEIMConstruction& rb_eim_con_in,
   _ghosted_basis_function->init (_rb_eim_con.n_dofs(), _rb_eim_con.n_local_dofs(),
                                  _rb_eim_con.get_dof_map().get_send_list(), false, GHOSTED);
   _rb_eim_con.get_rb_evaluation().get_basis_function(_basis_function_index).
-      localize(*_ghosted_basis_function, _rb_eim_con.get_dof_map().get_send_list());
+    localize(*_ghosted_basis_function, _rb_eim_con.get_dof_map().get_send_list());
 #else
   _ghosted_basis_function->init (_rb_eim_con.n_dofs(), false, SERIAL);
   _rb_eim_con.get_rb_evaluation().get_basis_function(_basis_function_index).
-      localize(*_ghosted_basis_function);
+    localize(*_ghosted_basis_function);
 #endif
 
   initialize_fe_objects();
@@ -54,31 +54,31 @@ RBEIMAssembly::RBEIMAssembly(RBEIMConstruction& rb_eim_con_in,
   // Also, declare fe_qrule. Just set entries to NULL for now.
   _fe_qrule.resize(_fe_var.size());
   for(unsigned int var=0; var<_fe_qrule.size(); var++)
-  {
-    _fe_qrule[var] = NULL;
-  }
+    {
+      _fe_qrule[var] = NULL;
+    }
 }
 
 RBEIMAssembly::~RBEIMAssembly()
 {
   for(unsigned int var=0; var<_fe_var.size(); var++)
-  {
-    if(_fe_var[var])
     {
-      delete _fe_var[var];
-      _fe_var[var] = NULL;
+      if(_fe_var[var])
+        {
+          delete _fe_var[var];
+          _fe_var[var] = NULL;
+        }
     }
-  }
   _fe_var.clear();
 
   for(unsigned int var=0; var<_fe_qrule.size(); var++)
-  {
-    if(_fe_qrule[var])
     {
-      delete _fe_qrule[var];
-      _fe_qrule[var] = NULL;
+      if(_fe_qrule[var])
+        {
+          delete _fe_qrule[var];
+          _fe_qrule[var] = NULL;
+        }
     }
-  }
   _fe_qrule.clear();
 }
 
@@ -91,29 +91,29 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
 
   bool repeated_qrule = false;
   if(_fe_qrule[var] != NULL)
-  {
-    repeated_qrule =
-     ( (element_qrule.type()      == _fe_qrule[var]->type()) &&
-       (element_qrule.get_dim()   == _fe_qrule[var]->get_dim()) &&
-       (element_qrule.get_order() == _fe_qrule[var]->get_order()) );
-  }
+    {
+      repeated_qrule =
+        ( (element_qrule.type()      == _fe_qrule[var]->type()) &&
+          (element_qrule.get_dim()   == _fe_qrule[var]->get_dim()) &&
+          (element_qrule.get_order() == _fe_qrule[var]->get_order()) );
+    }
 
   // If the qrule is not repeated, then we need to make a new copy of element_qrule.
   if(!repeated_qrule)
-  {
-    // First, possibly delete the old qrule
-    if(_fe_qrule[var] != NULL)
     {
-      delete _fe_qrule[var];
+      // First, possibly delete the old qrule
+      if(_fe_qrule[var] != NULL)
+        {
+          delete _fe_qrule[var];
+        }
+
+      _fe_qrule[var] =
+        QBase::build(element_qrule.type(),
+                     element_qrule.get_dim(),
+                     element_qrule.get_order()).release();
+
+      get_fe(var).attach_quadrature_rule (_fe_qrule[var]);
     }
-
-    _fe_qrule[var] =
-      QBase::build(element_qrule.type(),
-                   element_qrule.get_dim(),
-                   element_qrule.get_order()).release();
-
-    get_fe(var).attach_quadrature_rule (_fe_qrule[var]);
-  }
 
   const std::vector<std::vector<Real> >& phi = get_fe(var).get_phi();
 
@@ -132,11 +132,11 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
   values.resize(n_qpoints);
 
   for(unsigned int qp=0; qp<n_qpoints; qp++)
-  {
-    values[qp] = 0.;
-    for (unsigned int i=0; i<dof_indices_var.size(); i++)
-      values[qp] += (*_ghosted_basis_function)(dof_indices_var[i]) * phi[i][qp];
-  }
+    {
+      values[qp] = 0.;
+      for (unsigned int i=0; i<dof_indices_var.size(); i++)
+        values[qp] += (*_ghosted_basis_function)(dof_indices_var[i]) * phi[i][qp];
+    }
 
   STOP_LOG("evaluate_basis_function", "RBEIMAssembly");
 }
@@ -169,15 +169,15 @@ void RBEIMAssembly::initialize_fe_objects()
 
   _fe_var.resize(get_rb_eim_construction().n_vars());
   for(unsigned int var=0; var<get_rb_eim_construction().n_vars(); var++)
-  {
-    FEType fe_type = dof_map.variable_type(var);
-    FEBase* fe = (FEBase::build(dim, fe_type)).release();
+    {
+      FEType fe_type = dof_map.variable_type(var);
+      FEBase* fe = (FEBase::build(dim, fe_type)).release();
 
-    _fe_var[var] = fe;
+      _fe_var[var] = fe;
 
-    // Pre-request the shape function for efficieny's sake
-    fe->get_phi();
-  }
+      // Pre-request the shape function for efficieny's sake
+      fe->get_phi();
+    }
 }
 
 }

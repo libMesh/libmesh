@@ -372,9 +372,9 @@ void MeshData::write_xdr (const std::string& name,
 #elif LIBMESH_USE_REAL_NUMBERS
     std::string desc = "REAL";
 #else
-better_you_choke_this...
+    better_you_choke_this...
 #endif
-    io.data (desc, "# type of values");
+      io.data (desc, "# type of values");
   }
 
 
@@ -404,7 +404,7 @@ better_you_choke_this...
 
 
   std::map<const Node*,
-           std::vector<Number> >::const_iterator nit = _node_data.begin ();
+    std::vector<Number> >::const_iterator nit = _node_data.begin ();
 
   for (; nit != _node_data.end(); ++nit)
     {
@@ -452,7 +452,7 @@ better_you_choke_this...
 
 
   std::map<const Elem*,
-           std::vector<Number> >::const_iterator eit = _elem_data.begin ();
+    std::vector<Number> >::const_iterator eit = _elem_data.begin ();
 
   for (; eit != _elem_data.end(); ++eit)
     {

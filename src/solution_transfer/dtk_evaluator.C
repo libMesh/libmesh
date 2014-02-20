@@ -14,14 +14,14 @@
 namespace libMesh {
 
 DTKEvaluator::DTKEvaluator(System & in_sys, std::string var_name):
-    sys(in_sys),
-    current_local_solution(*sys.current_local_solution),
-    es(in_sys.get_equation_systems()),
-    mesh(sys.get_mesh()),
-    dim(mesh.mesh_dimension()),
-    dof_map(sys.get_dof_map()),
-    var_num(sys.variable_number(var_name)),
-    fe_type(dof_map.variable_type(var_num))
+  sys(in_sys),
+  current_local_solution(*sys.current_local_solution),
+  es(in_sys.get_equation_systems()),
+  mesh(sys.get_mesh()),
+  dim(mesh.mesh_dimension()),
+  dof_map(sys.get_dof_map()),
+  var_num(sys.variable_number(var_name)),
+  fe_type(dof_map.variable_type(var_num))
 {}
 
 DTKEvaluator::FieldContainerType
@@ -33,29 +33,29 @@ DTKEvaluator::evaluate(const Teuchos::ArrayRCP<int>& elements, const Teuchos::Ar
   DataTransferKit::FieldContainer<Number> evaluations(values, 1);
 
   for(unsigned int i=0; i<num_values; i++)
-  {
-    Elem * elem = mesh.elem(elements[i]);
+    {
+      Elem * elem = mesh.elem(elements[i]);
 
-    Point p;
+      Point p;
 
-    for(unsigned int j=0; j<dim; j++)
-      p(j) = coords[(j*num_values)+i];
+      for(unsigned int j=0; j<dim; j++)
+        p(j) = coords[(j*num_values)+i];
 
-    const Point mapped_point(FEInterface::inverse_map(dim, dof_map.variable_type(0), elem, p));
+      const Point mapped_point(FEInterface::inverse_map(dim, dof_map.variable_type(0), elem, p));
 
-    FEComputeData data (es, mapped_point);
-    FEInterface::compute_data (dim, fe_type, elem, data);
+      FEComputeData data (es, mapped_point);
+      FEInterface::compute_data (dim, fe_type, elem, data);
 
-    std::vector<dof_id_type> dof_indices;
-    dof_map.dof_indices(elem, dof_indices, var_num);
+      std::vector<dof_id_type> dof_indices;
+      dof_map.dof_indices(elem, dof_indices, var_num);
 
-    Number value = 0;
+      Number value = 0;
 
-    for (unsigned int j=0; j<dof_indices.size(); j++)
-      value += current_local_solution(dof_indices[j]) * data.shape[j];
+      for (unsigned int j=0; j<dof_indices.size(); j++)
+        value += current_local_solution(dof_indices[j]) * data.shape[j];
 
-    values[i] = value;
-  }
+      values[i] = value;
+    }
 
   return evaluations;
 }

@@ -330,7 +330,7 @@ AutoPtr<Elem> Elem::build(const ElemType type,
       }
 
 
-    // 3D infinite elements
+      // 3D infinite elements
     case INFHEX8:
       {
         elem = new InfHex8(p);
@@ -440,45 +440,45 @@ Real Elem::length(const unsigned int n1,
 bool Elem::operator == (const Elem& rhs) const
 {
 
-    // Cast rhs to an Elem*
-//    const Elem* rhs_elem = dynamic_cast<const Elem*>(&rhs);
-    const Elem* rhs_elem = &rhs;
+  // Cast rhs to an Elem*
+  //    const Elem* rhs_elem = dynamic_cast<const Elem*>(&rhs);
+  const Elem* rhs_elem = &rhs;
 
-    // If we cannot cast to an Elem*, rhs must be a Node
-//    if(rhs_elem == static_cast<const Elem*>(NULL))
-//        return false;
+  // If we cannot cast to an Elem*, rhs must be a Node
+  //    if(rhs_elem == static_cast<const Elem*>(NULL))
+  //        return false;
 
-//   libmesh_assert (n_nodes());
-//   libmesh_assert (rhs.n_nodes());
+  //   libmesh_assert (n_nodes());
+  //   libmesh_assert (rhs.n_nodes());
 
-//   // Elements can only be equal if they
-//   // contain the same number of nodes.
-//   if (this->n_nodes() == rhs.n_nodes())
-//     {
-//       // Create a set that contains our global
-//       // node numbers and those of our neighbor.
-//       // If the set is the same size as the number
-//       // of nodes in both elements then they must
-//       // be connected to the same nodes.
-//       std::set<unsigned int> nodes_set;
+  //   // Elements can only be equal if they
+  //   // contain the same number of nodes.
+  //   if (this->n_nodes() == rhs.n_nodes())
+  //     {
+  //       // Create a set that contains our global
+  //       // node numbers and those of our neighbor.
+  //       // If the set is the same size as the number
+  //       // of nodes in both elements then they must
+  //       // be connected to the same nodes.
+  //       std::set<unsigned int> nodes_set;
 
-//       for (unsigned int n=0; n<this->n_nodes(); n++)
-//         {
-//           nodes_set.insert(this->node(n));
-//           nodes_set.insert(rhs.node(n));
-//         }
+  //       for (unsigned int n=0; n<this->n_nodes(); n++)
+  //         {
+  //           nodes_set.insert(this->node(n));
+  //           nodes_set.insert(rhs.node(n));
+  //         }
 
-//       // If this passes the elements are connected
-//       // to the same global nodes
-//       if (nodes_set.size() == this->n_nodes())
-//         return true;
-//     }
+  //       // If this passes the elements are connected
+  //       // to the same global nodes
+  //       if (nodes_set.size() == this->n_nodes())
+  //         return true;
+  //     }
 
-//   // If we get here it is because the elements either
-//   // do not have the same number of nodes or they are
-//   // connected to different nodes.  Either way they
-//   // are not the same element
-//   return false;
+  //   // If we get here it is because the elements either
+  //   // do not have the same number of nodes or they are
+  //   // connected to different nodes.  Either way they
+  //   // are not the same element
+  //   return false;
 
   // Useful typedefs
   typedef std::vector<dof_id_type>::iterator iterator;
@@ -857,26 +857,26 @@ Elem* Elem::topological_neighbor (const unsigned int i,
     return neighbor_i;
 
   if (pb)
-  {
-    // Since the neighbor is NULL it must be on a boundary. We need
-    // see if this is a periodic boundary in which case it will have a
-    // topological neighbor
+    {
+      // Since the neighbor is NULL it must be on a boundary. We need
+      // see if this is a periodic boundary in which case it will have a
+      // topological neighbor
 
-    std::vector<boundary_id_type> boundary_ids = mesh.boundary_info->boundary_ids(this, i);
-    for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
-      if (pb->boundary(*j))
-      {
-        // Since the point locator inside of periodic boundaries
-        // returns a const pointer we will retrieve the proper
-        // pointer directly from the mesh object.  Also since coarse
-        // elements do not have more refined neighbors we need to make
-        // sure that we don't return one of these types of neighbors.
-        neighbor_i = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
-        if (level() < neighbor_i->level())
-          neighbor_i = neighbor_i->parent();
-        return neighbor_i;
-      }
-  }
+      std::vector<boundary_id_type> boundary_ids = mesh.boundary_info->boundary_ids(this, i);
+      for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
+        if (pb->boundary(*j))
+          {
+            // Since the point locator inside of periodic boundaries
+            // returns a const pointer we will retrieve the proper
+            // pointer directly from the mesh object.  Also since coarse
+            // elements do not have more refined neighbors we need to make
+            // sure that we don't return one of these types of neighbors.
+            neighbor_i = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
+            if (level() < neighbor_i->level())
+              neighbor_i = neighbor_i->parent();
+            return neighbor_i;
+          }
+    }
 
   return NULL;
 }
@@ -895,26 +895,26 @@ const Elem* Elem::topological_neighbor (const unsigned int i,
     return neighbor_i;
 
   if (pb)
-  {
-    // Since the neighbor is NULL it must be on a boundary. We need
-    // see if this is a periodic boundary in which case it will have a
-    // topological neighbor
+    {
+      // Since the neighbor is NULL it must be on a boundary. We need
+      // see if this is a periodic boundary in which case it will have a
+      // topological neighbor
 
-    std::vector<boundary_id_type> boundary_ids = mesh.boundary_info->boundary_ids(this, i);
-    for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
-      if (pb->boundary(*j))
-      {
-        // Since the point locator inside of periodic boundaries
-        // returns a const pointer we will retrieve the proper
-        // pointer directly from the mesh object.  Also since coarse
-        // elements do not have more refined neighbors we need to make
-        // sure that we don't return one of these types of neighbors.
-        neighbor_i = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
-        if (level() < neighbor_i->level())
-          neighbor_i = neighbor_i->parent();
-        return neighbor_i;
-      }
-  }
+      std::vector<boundary_id_type> boundary_ids = mesh.boundary_info->boundary_ids(this, i);
+      for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
+        if (pb->boundary(*j))
+          {
+            // Since the point locator inside of periodic boundaries
+            // returns a const pointer we will retrieve the proper
+            // pointer directly from the mesh object.  Also since coarse
+            // elements do not have more refined neighbors we need to make
+            // sure that we don't return one of these types of neighbors.
+            neighbor_i = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
+            if (level() < neighbor_i->level())
+              neighbor_i = neighbor_i->parent();
+            return neighbor_i;
+          }
+    }
 
   return NULL;
 }
@@ -1011,10 +1011,10 @@ void Elem::libmesh_assert_valid_neighbors() const
         {
           const Elem *my_parent = this->parent();
           if (my_parent &&
-          // A parent with a different dimension isn't really one of
-          // our ancestors, it means we're on a boundary mesh and this
-          // is an interior mesh element for which we're on a side.
-          // Nothing to test for in that case.
+              // A parent with a different dimension isn't really one of
+              // our ancestors, it means we're on a boundary mesh and this
+              // is an interior mesh element for which we're on a side.
+              // Nothing to test for in that case.
               (my_parent->dim() == this->dim()))
             libmesh_assert (!my_parent->neighbor(s));
         }
@@ -1097,8 +1097,8 @@ void Elem::make_links_to_me_local(unsigned int n)
       libmesh_assert((neigh_family_member->neighbor(nn) == this) ||
                      (neigh_family_member->neighbor(nn) == remote_elem)
                      || ((this->refinement_flag() == JUST_REFINED) &&
-                      (this->parent() != NULL) &&
-                      (neigh_family_member->neighbor(nn) == this->parent())));
+                         (this->parent() != NULL) &&
+                         (neigh_family_member->neighbor(nn) == this->parent())));
 #else
       libmesh_assert((neigh_family_member->neighbor(nn) == this) ||
                      (neigh_family_member->neighbor(nn) == remote_elem));
@@ -1318,7 +1318,7 @@ Real Elem::quality (const ElemQuality q) const
       {
         libmesh_do_once( libmesh_here();
 
-         libMesh::err << "ERROR:  unknown quality metric: "
+                         libMesh::err << "ERROR:  unknown quality metric: "
                          << Utility::enum_to_string(q)
                          << std::endl
                          << "Cowardly returning 1."
@@ -1329,9 +1329,9 @@ Real Elem::quality (const ElemQuality q) const
     }
 
 
-    // Will never get here...
-    libmesh_error();
-    return 0.;
+  // Will never get here...
+  libmesh_error();
+  return 0.;
 }
 
 
@@ -1343,7 +1343,7 @@ bool Elem::ancestor() const
   if (this->active())
     return false;
 
-if (!this->has_children())
+  if (!this->has_children())
     return false;
   if (this->child(0)->active())
     return true;
@@ -1379,7 +1379,7 @@ void Elem::add_child (Elem* elem)
     }
 
   libMesh::err << "Error: Tried to add a child to an element with full children array"
-                << std::endl;
+               << std::endl;
   libmesh_error();
 }
 
@@ -1426,7 +1426,7 @@ bool Elem::is_child_on_edge(const unsigned int libmesh_dbg_var(c),
   // We're assuming that an overlapping child edge has the same
   // number and orientation as its parent
   return (child_edge->node(0) == my_edge->node(0) ||
-      child_edge->node(1) == my_edge->node(1));
+          child_edge->node(1) == my_edge->node(1));
 }
 
 
@@ -1785,15 +1785,15 @@ bool Elem::point_test(const Point& p, Real box_tol, Real map_tol) const
       // can avoid an expensive inverse_map call if it doesn't.
       bool
 #if LIBMESH_DIM > 2
-           point_above_min_z = false,
-           point_below_max_z = false,
+        point_above_min_z = false,
+        point_below_max_z = false,
 #endif
 #if LIBMESH_DIM > 1
-           point_above_min_y = false,
-           point_below_max_y = false,
+        point_above_min_y = false,
+        point_below_max_y = false,
 #endif
-           point_above_min_x = false,
-           point_below_max_x = false;
+        point_above_min_x = false,
+        point_below_max_x = false;
 
       // For relative bounding box checks in physical space
       const Real my_hmax = this->hmax();
@@ -1935,8 +1935,8 @@ std::string Elem::get_info () const
 #endif
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       << "   infinite()=" << this->infinite()    << '\n';
-      if (this->infinite())
-        oss << "   origin()=" << this->origin()    << '\n'
+  if (this->infinite())
+    oss << "   origin()=" << this->origin()    << '\n'
 #endif
       ;
 
@@ -2124,7 +2124,7 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-    // infinite elements
+      // infinite elements
     case INFEDGE2:
       {
         // libmesh_error();
@@ -2199,7 +2199,7 @@ Real Elem::volume () const
   AutoPtr<FEBase> fe (FEBase::build(this->dim(),
                                     fe_type));
 
-   const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<Real>& JxW = fe->get_JxW();
 
   // The default quadrature rule should integrate the mass matrix,
   // thus it should be plenty to compute the area
@@ -2385,7 +2385,7 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
       if (!neigh->subactive())
         neigh->family_tree_by_side(neigh_family, nn);
 #else
-        neigh_family.push_back(neigh);
+      neigh_family.push_back(neigh);
 #endif
 
       // And point them to elem

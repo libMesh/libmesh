@@ -215,24 +215,24 @@ template <>
 int NumericVector<float>::compare (const NumericVector<float> &other_vector,
 const Real threshold) const
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+libmesh_assert (this->initialized());
+libmesh_assert (other_vector.initialized());
+libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
-  int rvalue     = -1;
-  numeric_index_type i = first_local_index();
+int rvalue     = -1;
+numeric_index_type i = first_local_index();
 
-  do
-    {
-      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
-      rvalue = i;
-      else
-      i++;
-    }
-  while (rvalue==-1 && i<last_local_index());
+do
+{
+if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
+rvalue = i;
+else
+i++;
+}
+while (rvalue==-1 && i<last_local_index());
 
-  return rvalue;
+return rvalue;
 }
 
 // Full specialization for double datatypes
@@ -240,24 +240,24 @@ template <>
 int NumericVector<double>::compare (const NumericVector<double> &other_vector,
 const Real threshold) const
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+libmesh_assert (this->initialized());
+libmesh_assert (other_vector.initialized());
+libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
-  int rvalue     = -1;
-  numeric_index_type i = first_local_index();
+int rvalue     = -1;
+numeric_index_type i = first_local_index();
 
-  do
-    {
-      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
-      rvalue = i;
-      else
-      i++;
-    }
-  while (rvalue==-1 && i<last_local_index());
+do
+{
+if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
+rvalue = i;
+else
+i++;
+}
+while (rvalue==-1 && i<last_local_index());
 
-  return rvalue;
+return rvalue;
 }
 
 #ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
@@ -266,24 +266,24 @@ template <>
 int NumericVector<long double>::compare (const NumericVector<long double> &other_vector,
 const Real threshold) const
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+libmesh_assert (this->initialized());
+libmesh_assert (other_vector.initialized());
+libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
-  int rvalue     = -1;
-  numeric_index_type i = first_local_index();
+int rvalue     = -1;
+numeric_index_type i = first_local_index();
 
-  do
-    {
-      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
-      rvalue = i;
-      else
-      i++;
-    }
-  while (rvalue==-1 && i<last_local_index());
+do
+{
+if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
+rvalue = i;
+else
+i++;
+}
+while (rvalue==-1 && i<last_local_index());
 
-  return rvalue;
+return rvalue;
 }
 #endif
 
@@ -293,25 +293,25 @@ template <>
 int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
 const Real threshold) const
 {
-  libmesh_assert (this->initialized());
-  libmesh_assert (other_vector.initialized());
-  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
-  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
+libmesh_assert (this->initialized());
+libmesh_assert (other_vector.initialized());
+libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
-  int rvalue     = -1;
-  numeric_index_type i = first_local_index();
+int rvalue     = -1;
+numeric_index_type i = first_local_index();
 
-  do
-    {
-      if (( std::abs( (*this)(i).real() - other_vector(i).real() ) > threshold ) ||
-      ( std::abs( (*this)(i).imag() - other_vector(i).imag() ) > threshold ))
-      rvalue = i;
-      else
-      i++;
-    }
-  while (rvalue==-1 && i<this->last_local_index());
+do
+{
+if (( std::abs( (*this)(i).real() - other_vector(i).real() ) > threshold ) ||
+( std::abs( (*this)(i).imag() - other_vector(i).imag() ) > threshold ))
+rvalue = i;
+else
+i++;
+}
+while (rvalue==-1 && i<this->last_local_index());
 
-  return rvalue;
+return rvalue;
 }
 */
 

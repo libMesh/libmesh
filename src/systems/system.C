@@ -288,30 +288,30 @@ void System::init_data ()
 
   // initialize & zero other vectors, if necessary
   for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
-  {
-    ParallelType type = _vector_types[pos->first];
+    {
+      ParallelType type = _vector_types[pos->first];
 
-    if (type == GHOSTED)
-      {
+      if (type == GHOSTED)
+        {
 #ifdef LIBMESH_ENABLE_GHOSTED
-        pos->second->init (this->n_dofs(), this->n_local_dofs(),
-                           _dof_map->get_send_list(), false,
-                           GHOSTED);
+          pos->second->init (this->n_dofs(), this->n_local_dofs(),
+                             _dof_map->get_send_list(), false,
+                             GHOSTED);
 #else
-        libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
-        libmesh_error();
+          libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
+          libmesh_error();
 #endif
-      }
-    else if (type == SERIAL)
-      {
-        pos->second->init (this->n_dofs(), false, type);
-      }
-    else
-      {
-        libmesh_assert_equal_to(type, PARALLEL);
-        pos->second->init (this->n_dofs(), this->n_local_dofs(), false, type);
-      }
-  }
+        }
+      else if (type == SERIAL)
+        {
+          pos->second->init (this->n_dofs(), false, type);
+        }
+      else
+        {
+          libmesh_assert_equal_to(type, PARALLEL);
+          pos->second->init (this->n_dofs(), this->n_local_dofs(), false, type);
+        }
+    }
 }
 
 
@@ -327,23 +327,23 @@ void System::restrict_vectors ()
       if (_vector_projections[pos->first])
         this->project_vector (*v);
       else
-      {
-        ParallelType type = _vector_types[pos->first];
-
-        if(type == GHOSTED)
         {
+          ParallelType type = _vector_types[pos->first];
+
+          if(type == GHOSTED)
+            {
 #ifdef LIBMESH_ENABLE_GHOSTED
-          pos->second->init (this->n_dofs(), this->n_local_dofs(),
-                         _dof_map->get_send_list(), false,
-                         GHOSTED);
+              pos->second->init (this->n_dofs(), this->n_local_dofs(),
+                                 _dof_map->get_send_list(), false,
+                                 GHOSTED);
 #else
-          libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
-          libmesh_error();
+              libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
+              libmesh_error();
 #endif
+            }
+          else
+            pos->second->init (this->n_dofs(), this->n_local_dofs(), false, type);
         }
-        else
-          pos->second->init (this->n_dofs(), this->n_local_dofs(), false, type);
-      }
     }
 
   const std::vector<dof_id_type>& send_list = _dof_map->get_send_list ();
@@ -386,7 +386,7 @@ void System::reinit ()
     return;
 
   // Constraints get handled in EquationSystems::reinit now
-//  _dof_map->create_dof_constraints(this->get_mesh());
+  //  _dof_map->create_dof_constraints(this->get_mesh());
 
   // Update the solution based on the projected
   // current_local_solution.
@@ -416,8 +416,8 @@ void System::update ()
 
   // Check sizes
   libmesh_assert_equal_to (current_local_solution->size(), solution->size());
-// More processors than elements => empty send_list
-//  libmesh_assert (!send_list.empty());
+  // More processors than elements => empty send_list
+  //  libmesh_assert (!send_list.empty());
   libmesh_assert_less_equal (send_list.size(), solution->size());
 
   // Create current_local_solution from solution.  This will
@@ -507,9 +507,9 @@ void System::assemble_qoi_derivative (const QoISet& qoi_indices)
 
 
 void System::qoi_parameter_sensitivity
-  (const QoISet& qoi_indices,
-   const ParameterVector& parameters,
-   SensitivityData& sensitivities)
+(const QoISet& qoi_indices,
+ const ParameterVector& parameters,
+ SensitivityData& sensitivities)
 {
   // Forward sensitivities are more efficient for Nq > Np
   if (qoi_indices.size(*this) > parameters.size())
@@ -690,21 +690,21 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
 
   // Initialize it if necessary
   if (!_can_add_vectors)
-  {
-    if(type == GHOSTED)
     {
+      if(type == GHOSTED)
+        {
 #ifdef LIBMESH_ENABLE_GHOSTED
-      buf->init (this->n_dofs(), this->n_local_dofs(),
-                 _dof_map->get_send_list(), false,
-                 GHOSTED);
+          buf->init (this->n_dofs(), this->n_local_dofs(),
+                     _dof_map->get_send_list(), false,
+                     GHOSTED);
 #else
-      libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
-      libmesh_error();
+          libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
+          libmesh_error();
 #endif
+        }
+      else
+        buf->init (this->n_dofs(), this->n_local_dofs(), false, type);
     }
-    else
-      buf->init (this->n_dofs(), this->n_local_dofs(), false, type);
-  }
 
   return *buf;
 }
@@ -1269,10 +1269,10 @@ void System::get_all_variable_numbers(std::vector<unsigned int>& all_variable_nu
 
   unsigned int count = 0;
   for( ; it != it_end; ++it)
-  {
-    all_variable_numbers[count] = it->second;
-    count++;
-  }
+    {
+      all_variable_numbers[count] = it->second;
+      count++;
+    }
 }
 
 
@@ -1456,7 +1456,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
   // like L_inf (for which we'll just want to take an absolute value
   // and then sum).
   bool using_hilbert_norm = true,
-       using_nonhilbert_norm = true;
+    using_nonhilbert_norm = true;
 
   // Loop over all variables
   for (unsigned int var=0; var != this->n_vars(); ++var)
@@ -1551,7 +1551,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                   for (unsigned int i=0; i != n_sf; ++i)
                     u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
                   v_norm += norm_weight *
-                            JxW[qp] * std::abs(u_h);
+                    JxW[qp] * std::abs(u_h);
                 }
 
               if (norm_type == L_INF)
@@ -1570,7 +1570,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                   for (unsigned int i=0; i != n_sf; ++i)
                     u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
                   v_norm += norm_weight_sq *
-                            JxW[qp] * TensorTools::norm_sq(u_h);
+                    JxW[qp] * TensorTools::norm_sq(u_h);
                 }
 
               if (norm_type == H1 ||
@@ -1581,7 +1581,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                   for (unsigned int i=0; i != n_sf; ++i)
                     grad_u_h.add_scaled((*dphi)[i][qp], (*local_v)(dof_indices[i]));
                   v_norm += norm_weight_sq *
-                            JxW[qp] * grad_u_h.size_sq();
+                    JxW[qp] * grad_u_h.size_sq();
                 }
 
               if (norm_type == W1_INF_SEMINORM)
@@ -1600,7 +1600,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                   for (unsigned int i=0; i != n_sf; ++i)
                     hess_u_h.add_scaled((*d2phi)[i][qp], (*local_v)(dof_indices[i]));
                   v_norm += norm_weight_sq *
-                            JxW[qp] * hess_u_h.size_sq();
+                    JxW[qp] * hess_u_h.size_sq();
                 }
 
               if (norm_type == W2_INF_SEMINORM)
@@ -1707,7 +1707,7 @@ std::string System::get_info() const
 
   oss << "    " << "n_vectors()="  << this->n_vectors()  << '\n';
   oss << "    " << "n_matrices()="  << this->n_matrices()  << '\n';
-//   oss << "    " << "n_additional_matrices()=" << this->n_additional_matrices() << '\n';
+  //   oss << "    " << "n_additional_matrices()=" << this->n_additional_matrices() << '\n';
 
   oss << this->get_dof_map().get_info();
 

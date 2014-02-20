@@ -24,23 +24,23 @@
 namespace libMesh
 {
 
-  MeshSerializer::MeshSerializer(MeshBase& mesh, bool need_serial) :
-    _mesh(mesh),
-    reparallelize(false)
-  {
-    libmesh_parallel_only(mesh.comm());
-    if (need_serial && !_mesh.is_serial()) {
-      reparallelize = true;
-      _mesh.allgather();
-    }
+MeshSerializer::MeshSerializer(MeshBase& mesh, bool need_serial) :
+  _mesh(mesh),
+  reparallelize(false)
+{
+  libmesh_parallel_only(mesh.comm());
+  if (need_serial && !_mesh.is_serial()) {
+    reparallelize = true;
+    _mesh.allgather();
   }
+}
 
 
 
-  MeshSerializer::~MeshSerializer()
-  {
-    if (reparallelize)
-      _mesh.delete_remote_elements();
-  }
+MeshSerializer::~MeshSerializer()
+{
+  if (reparallelize)
+    _mesh.delete_remote_elements();
+}
 
 } // namespace libMesh

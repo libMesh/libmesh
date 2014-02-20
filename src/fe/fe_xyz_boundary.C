@@ -111,13 +111,13 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
       // initialize quadrature rule
       this->qrule->init(side->type(), elem->p_level());
 
-        {
-          // Set the element type
-          this->elem_type = elem->type();
+      {
+        // Set the element type
+        this->elem_type = elem->type();
 
-          // Initialize the face shape functions
-          this->_fe_map->template init_face_shape_functions<Dim>(this->qrule->get_points(),  side.get());
-        }
+        // Initialize the face shape functions
+        this->_fe_map->template init_face_shape_functions<Dim>(this->qrule->get_points(),  side.get());
+      }
       // We can't get away without recomputing shape functions next
       // time
       this->shapes_on_quadrature = false;

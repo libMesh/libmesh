@@ -96,34 +96,34 @@ void OFFIO::read_stream(std::istream& in)
 
       libmesh_assert(nv == 2 || nv == 3);
       if (e == 0)
-      {
-        the_mesh.set_mesh_dimension(nv-1);
-        if (nv == 3)
         {
+          the_mesh.set_mesh_dimension(nv-1);
+          if (nv == 3)
+            {
 #if LIBMESH_DIM < 2
-          libMesh::err << "Cannot open dimension 2 mesh file when configured without 2D support." <<
-                          std::endl;
-          libmesh_error();
+              libMesh::err << "Cannot open dimension 2 mesh file when configured without 2D support." <<
+                std::endl;
+              libmesh_error();
 #endif
+            }
         }
-      }
 
       Elem* elem;
       switch (nv)
-      {
+        {
         case 2: elem = new Edge2; break;
         case 3: elem = new Tri3 ; break;
         default: libmesh_error();
-      }
+        }
 
       elem->set_id(e);
       the_mesh.add_elem (elem);
 
       for (unsigned int i=0; i<nv; i++)
-      {
-        in >> nid;
-        elem->set_node(i) = the_mesh.node_ptr(nid);
-      }
+        {
+          in >> nid;
+          elem->set_node(i) = the_mesh.node_ptr(nid);
+        }
     }
 }
 

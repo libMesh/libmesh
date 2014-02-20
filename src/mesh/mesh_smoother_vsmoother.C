@@ -47,7 +47,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
   int n, me, gr, adp, miniter, miniterBC, maxiter, N, ncells, nedges, s, vms_err=0;
   double theta;
   char grid[40], metr[40], grid_old[40], adap[40];
-//  FILE *stream;
+  //  FILE *stream;
   LPLPLPDOUBLE H;
   LPLPDOUBLE R;
   LPLPINT cells;
@@ -68,10 +68,10 @@ double VariationalMeshSmoother::smooth(unsigned int)
   miniterBC=_miniterBC;
 
   if((gr==0)&&(me>1))
-  {
-    for(i=0;i<40;i++) grid_old[i]=grid[i];
+    {
+      for(i=0;i<40;i++) grid_old[i]=grid[i];
       metr_data_gen(grid, metr, n, me, sout); //generate metric from initial mesh (me=2,3)
-  }
+    }
 
   s=_dim;
   N=_mesh.n_nodes();
@@ -98,11 +98,11 @@ double VariationalMeshSmoother::smooth(unsigned int)
   R=alloc_d_n1_n2(N,n);
   cells=alloc_i_n1_n2(ncells,3*n+n%2);
   for(i=0;i<ncells;i++){
-     cells[i]=alloc_i_n1(3*n+n%2);
-     if(me>1){
-       H[i]=alloc_d_n1_n2(n,n);
-       for(j=0;j<n;j++) H[i][j]=alloc_d_n1(n);
-     }
+    cells[i]=alloc_i_n1(3*n+n%2);
+    if(me>1){
+      H[i]=alloc_d_n1_n2(n,n);
+      for(j=0;j<n;j++) H[i][j]=alloc_d_n1(n);
+    }
   }
   for(i=0;i<N;i++) R[i]=alloc_d_n1(n);
 
@@ -143,7 +143,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
       for(j=0;j<n;j++) free(H[i][j]);
       free(H[i]);
     }
-     free(cells[i]);
+    free(cells[i]);
   }
 
   free(cells);
@@ -179,35 +179,35 @@ int VariationalMeshSmoother::writegr(int, int, LPLPDOUBLE R, LPINT, int, LPLPINT
     _dist_norm=0;
     i=0;
     for (; it != end; ++it)
-    {
-      double total_dist=0.0;
-
-      //For each node set its X Y [Z] coordinates
-      for(unsigned int j=0;j<_dim;j++)
       {
-        double distance = R[i][j]-(*(*it))(j);
+        double total_dist=0.0;
 
-        //Save the squares of the distance
-        total_dist+=Utility::pow<2>(distance);
+        //For each node set its X Y [Z] coordinates
+        for(unsigned int j=0;j<_dim;j++)
+          {
+            double distance = R[i][j]-(*(*it))(j);
 
-        (*(*it))(j)=(*(*it))(j)+(distance*_percent_to_move);
+            //Save the squares of the distance
+            total_dist+=Utility::pow<2>(distance);
+
+            (*(*it))(j)=(*(*it))(j)+(distance*_percent_to_move);
+          }
+
+        libmesh_assert_greater_equal (total_dist, 0.0);
+
+        //Add the distance this node moved to the global distance
+        _dist_norm+=total_dist;
+
+        i++;
       }
-
-      libmesh_assert_greater_equal (total_dist, 0.0);
-
-      //Add the distance this node moved to the global distance
-      _dist_norm+=total_dist;
-
-      i++;
-    }
 
     //Relative "error"
     _dist_norm=sqrt(_dist_norm/_mesh.n_nodes());
   }
   /*
-int scanned;
-if(me>=3){
-fprintf(stream,"%d \n%d \n%d \n%d \n",n,N,ncells,nedges);
+    int scanned;
+    if(me>=3){
+    fprintf(stream,"%d \n%d \n%d \n%d \n",n,N,ncells,nedges);
 
     for(i=0;i<N;i++){//node coordinates
     for(unsigned int j=0;j<n;j++) fprintf(stream,"%e ",R[i][j]);
@@ -224,22 +224,22 @@ fprintf(stream,"%d \n%d \n%d \n%d \n",n,N,ncells,nedges);
     }
     //hanging nodes on edges
     for(i=0;i<nedges;i++) fprintf(stream,"%d %d %d \n",edges[2*i],edges[2*i+1],hnodes[i]);
-} else {//restoring original grid connectivity when me>1
-int lo, Ncells;
-double d1;
-stream1=fopen(grid_old,"r");
-scanned = fscanf(stream1,"%d \n%d \n%d \n%d \n",&lo,&i,&Ncells,&nedges);
-libmesh_assert_not_equal_to (scanned, EOF);
-fprintf(stream,"%d \n%d \n%d \n%d \n",n,N,Ncells,nedges);
+    } else {//restoring original grid connectivity when me>1
+    int lo, Ncells;
+    double d1;
+    stream1=fopen(grid_old,"r");
+    scanned = fscanf(stream1,"%d \n%d \n%d \n%d \n",&lo,&i,&Ncells,&nedges);
+    libmesh_assert_not_equal_to (scanned, EOF);
+    fprintf(stream,"%d \n%d \n%d \n%d \n",n,N,Ncells,nedges);
 
-for(i=0;i<N;i++){//node coordinates
-for(unsigned int j=0;j<n;j++) {fprintf(stream,"%e ",R[i][j]);
-scanned = fscanf(stream1,"%le ",&d1);
-libmesh_assert_not_equal_to (scanned, EOF);
-}
-fprintf(stream,"%d \n",mask[i]);
-scanned = fscanf(stream1,"%d \n",&lo);
-libmesh_assert_not_equal_to (scanned, EOF);
+    for(i=0;i<N;i++){//node coordinates
+    for(unsigned int j=0;j<n;j++) {fprintf(stream,"%e ",R[i][j]);
+    scanned = fscanf(stream1,"%le ",&d1);
+    libmesh_assert_not_equal_to (scanned, EOF);
+    }
+    fprintf(stream,"%d \n",mask[i]);
+    scanned = fscanf(stream1,"%d \n",&lo);
+    libmesh_assert_not_equal_to (scanned, EOF);
     }
     for(i=0;i<Ncells;i++){
     for(unsigned int j=0;j<=3*n+n%2;j++){
@@ -262,10 +262,10 @@ libmesh_assert_not_equal_to (scanned, EOF);
     fprintf(stream,"\n");
     }
     fclose(stream1);
-}
+    }
 
-fclose(stream);
-*/
+    fclose(stream);
+  */
   libMesh::out<<"Finished writegr"<<std::endl;
   return 0;
 }
@@ -281,7 +281,7 @@ int VariationalMeshSmoother::readgr(int n, int, LPLPDOUBLE R, LPINT mask, int, L
 {
   libMesh::out<<"Sarting readgr"<<std::endl;
   int i;
- //add error messages where format can be inconsistent
+  //add error messages where format can be inconsistent
 
   //Find the boundary nodes
   std::vector<bool> on_boundary;
@@ -298,84 +298,84 @@ int VariationalMeshSmoother::readgr(int n, int, LPLPDOUBLE R, LPINT mask, int, L
 
     i=0;
     for (; it != end; ++it)
-    {
-      //For each node grab its X Y [Z] coordinates
-      for(unsigned int j=0;j<_dim;j++)
-        R[i][j]=(*(*it))(j);
-
-      //Set the Proper Mask
-      //Internal nodes are 0
-      //Immovable boundary nodes are 1
-      //Movable boundary nodes are 2
-      if(on_boundary[i])
       {
-        //Only look for sliding edge nodes in 2D
-        if(_dim == 2)
+        //For each node grab its X Y [Z] coordinates
+        for(unsigned int j=0;j<_dim;j++)
+          R[i][j]=(*(*it))(j);
+
+        //Set the Proper Mask
+        //Internal nodes are 0
+        //Immovable boundary nodes are 1
+        //Movable boundary nodes are 2
+        if(on_boundary[i])
           {
-            //Find all the nodal neighbors... that is the nodes directly connected
-            //to this node through one edge
-            std::vector<const Node*> neighbors;
-            MeshTools::find_nodal_neighbors(_mesh, *(*it), nodes_to_elem_map, neighbors);
-
-            std::vector<const Node*>::const_iterator ne = neighbors.begin();
-            std::vector<const Node*>::const_iterator ne_end = neighbors.end();
-
-            //Grab the x,y coordinates
-            Real x = (*(*it))(0);
-            Real y = (*(*it))(1);
-
-            //Theta will represent the atan2 angle (meaning with the proper quadrant in mind)
-            //of the neighbor node in a system where the current node is at the origin
-            Real theta = 0;
-            std::vector<Real> thetas;
-
-            //Calculate the thetas
-            for(; ne != ne_end; ne++)
+            //Only look for sliding edge nodes in 2D
+            if(_dim == 2)
               {
-                //Note that the x and y values of this node are subtracted off
-                //this centers the system around this node
-                theta = atan2((*(*ne))(1)-y,(*(*ne))(0)-x);
+                //Find all the nodal neighbors... that is the nodes directly connected
+                //to this node through one edge
+                std::vector<const Node*> neighbors;
+                MeshTools::find_nodal_neighbors(_mesh, *(*it), nodes_to_elem_map, neighbors);
 
-                //Save it for later
-                thetas.push_back(theta);
-              }
+                std::vector<const Node*>::const_iterator ne = neighbors.begin();
+                std::vector<const Node*>::const_iterator ne_end = neighbors.end();
 
-            //Assume the node is immovable... then prove otherwise
-            mask[i]=1;
+                //Grab the x,y coordinates
+                Real x = (*(*it))(0);
+                Real y = (*(*it))(1);
 
-            //Search through neighbor nodes looking for two that form a straight line with this node
-            for(unsigned int a=0;a<thetas.size()-1;a++)
-              {
-                //Only try each pairing once
-                for(unsigned int b=a+1;b<thetas.size();b++)
+                //Theta will represent the atan2 angle (meaning with the proper quadrant in mind)
+                //of the neighbor node in a system where the current node is at the origin
+                Real theta = 0;
+                std::vector<Real> thetas;
+
+                //Calculate the thetas
+                for(; ne != ne_end; ne++)
                   {
-                    //Find if the two neighbor nodes angles are 180 degrees (pi) off of eachother (withing a tolerance)
-                    //In order to make this a true movable boundary node... the two that forma  straight line with
-                    //it must also be on the boundary
-                    if(on_boundary[neighbors[a]->id()] &&
-                       on_boundary[neighbors[b]->id()] &&
-                       (
-                        (fabs(thetas[a]-(thetas[b] + (libMesh::pi))) < .001) ||
-                        (fabs(thetas[a]-(thetas[b] - (libMesh::pi))) < .001)
-                        )
-                       )
-                      {
-                        //if((*(*it))(1) > 0.25 || (*(*it))(0) > .7 || (*(*it))(0) < .01)
-                        mask[i]=2;
-                      }
+                    //Note that the x and y values of this node are subtracted off
+                    //this centers the system around this node
+                    theta = atan2((*(*ne))(1)-y,(*(*ne))(0)-x);
 
+                    //Save it for later
+                    thetas.push_back(theta);
+                  }
+
+                //Assume the node is immovable... then prove otherwise
+                mask[i]=1;
+
+                //Search through neighbor nodes looking for two that form a straight line with this node
+                for(unsigned int a=0;a<thetas.size()-1;a++)
+                  {
+                    //Only try each pairing once
+                    for(unsigned int b=a+1;b<thetas.size();b++)
+                      {
+                        //Find if the two neighbor nodes angles are 180 degrees (pi) off of eachother (withing a tolerance)
+                        //In order to make this a true movable boundary node... the two that forma  straight line with
+                        //it must also be on the boundary
+                        if(on_boundary[neighbors[a]->id()] &&
+                           on_boundary[neighbors[b]->id()] &&
+                           (
+                            (fabs(thetas[a]-(thetas[b] + (libMesh::pi))) < .001) ||
+                            (fabs(thetas[a]-(thetas[b] - (libMesh::pi))) < .001)
+                            )
+                           )
+                          {
+                            //if((*(*it))(1) > 0.25 || (*(*it))(0) > .7 || (*(*it))(0) < .01)
+                            mask[i]=2;
+                          }
+
+                      }
                   }
               }
+            else //In 3D set all boundary nodes to be fixed
+              mask[i]=1;
           }
-        else //In 3D set all boundary nodes to be fixed
-          mask[i]=1;
-      }
-      else
-        mask[i]=0;  //Internal Node
+        else
+          mask[i]=0;  //Internal Node
 
-      //libMesh::out<<"Node: "<<i<<"  Mask: "<<mask[i]<<std::endl;
-      i++;
-    }
+        //libMesh::out<<"Node: "<<i<<"  Mask: "<<mask[i]<<std::endl;
+        i++;
+      }
   }
 
   // Grab the connectivity
@@ -386,79 +386,79 @@ int VariationalMeshSmoother::readgr(int n, int, LPLPDOUBLE R, LPINT mask, int, L
 
     i=0;
     for (; it != end; ++it)
-    {
-      //Keep track of the number of nodes
-      //there must be 6 for 2D
-      //10 for 3D
-      //If there are actually less than that -1 must be used
-      //to fill out the rest
-      int num=0;
-/*
-      int num_necessary = 0;
-
-      if (_dim == 2)
-      num_necessary = 6;
-      else
-      num_necessary = 10;
-*/
-
-      if(_dim == 2)
       {
-        switch((*it)->n_vertices())
+        //Keep track of the number of nodes
+        //there must be 6 for 2D
+        //10 for 3D
+        //If there are actually less than that -1 must be used
+        //to fill out the rest
+        int num=0;
+        /*
+          int num_necessary = 0;
+
+          if (_dim == 2)
+          num_necessary = 6;
+          else
+          num_necessary = 10;
+        */
+
+        if(_dim == 2)
+          {
+            switch((*it)->n_vertices())
+              {
+                //Grab nodes that do exist
+              case 3:  //Tri
+                for(unsigned int k=0;k<(*it)->n_vertices();k++)
+                  cells[i][k]=(*it)->node(k);
+                num=(*it)->n_vertices();
+                break;
+              case 4:  //Quad 4
+                cells[i][0]=(*it)->node(0);
+                cells[i][1]=(*it)->node(1);
+                cells[i][2]=(*it)->node(3); //Note that 2 and 3 are switched!
+                cells[i][3]=(*it)->node(2);
+                num=4;
+                break;
+              default:
+                libmesh_assert(false);
+              }
+          }
+        else
           {
             //Grab nodes that do exist
-          case 3:  //Tri
-            for(unsigned int k=0;k<(*it)->n_vertices();k++)
-              cells[i][k]=(*it)->node(k);
-            num=(*it)->n_vertices();
-            break;
-          case 4:  //Quad 4
-            cells[i][0]=(*it)->node(0);
-            cells[i][1]=(*it)->node(1);
-            cells[i][2]=(*it)->node(3); //Note that 2 and 3 are switched!
-            cells[i][3]=(*it)->node(2);
-            num=4;
-            break;
-          default:
-            libmesh_assert(false);
+            switch((*it)->n_vertices())
+              {
+              case 4:  //Tet 4
+                for(unsigned int k=0;k<(*it)->n_vertices();k++)
+                  cells[i][k]=(*it)->node(k);
+                num=(*it)->n_vertices();
+                break;
+              case 8:  //Hex 8f
+                cells[i][0]=(*it)->node(0);
+                cells[i][1]=(*it)->node(1);
+                cells[i][2]=(*it)->node(3); //Note that 2 and 3 are switched!
+                cells[i][3]=(*it)->node(2);
+
+                cells[i][4]=(*it)->node(4);
+                cells[i][5]=(*it)->node(5);
+                cells[i][6]=(*it)->node(7); //Note that 6 and 7 are switched!
+                cells[i][7]=(*it)->node(6);
+                num=8;
+              default:
+                libmesh_assert(false);
+              }
           }
+
+        //Fill in the rest with -1
+        for(int j=num;j<3*n+n%2;j++)
+          cells[i][j]=-1;
+
+        //Mask it with 0 to state that this is an active element
+        //FIXME: Could be something other than zero
+        mcells[i]=0;
+
+        i++;
       }
-      else
-      {
-        //Grab nodes that do exist
-        switch((*it)->n_vertices())
-          {
-          case 4:  //Tet 4
-            for(unsigned int k=0;k<(*it)->n_vertices();k++)
-              cells[i][k]=(*it)->node(k);
-            num=(*it)->n_vertices();
-            break;
-          case 8:  //Hex 8f
-            cells[i][0]=(*it)->node(0);
-            cells[i][1]=(*it)->node(1);
-            cells[i][2]=(*it)->node(3); //Note that 2 and 3 are switched!
-            cells[i][3]=(*it)->node(2);
-
-            cells[i][4]=(*it)->node(4);
-            cells[i][5]=(*it)->node(5);
-            cells[i][6]=(*it)->node(7); //Note that 6 and 7 are switched!
-            cells[i][7]=(*it)->node(6);
-            num=8;
-          default:
-            libmesh_assert(false);
-          }
-      }
-
-      //Fill in the rest with -1
-      for(int j=num;j<3*n+n%2;j++)
-        cells[i][j]=-1;
-
-      //Mask it with 0 to state that this is an active element
-      //FIXME: Could be something other than zero
-      mcells[i]=0;
-
-      i++;
-    }
   }
 
   //Grab hanging node connectivity
@@ -467,28 +467,28 @@ int VariationalMeshSmoother::readgr(int n, int, LPLPDOUBLE R, LPINT mask, int, L
     std::map<dof_id_type, std::vector<dof_id_type> >::iterator end = _hanging_nodes.end();
 
     for(i=0;it!=end;it++)
-    {
+      {
 
-      libMesh::out<<"Parent 1: "<<(it->second)[0]<<std::endl;
-      libMesh::out<<"Parent 2: "<<(it->second)[1]<<std::endl;
-      libMesh::out<<"Hanging Node: "<<it->first<<std::endl<<std::endl;
+        libMesh::out<<"Parent 1: "<<(it->second)[0]<<std::endl;
+        libMesh::out<<"Parent 2: "<<(it->second)[1]<<std::endl;
+        libMesh::out<<"Hanging Node: "<<it->first<<std::endl<<std::endl;
 
 
-      //First Parent
-      edges[2*i]=(it->second)[1];
+        //First Parent
+        edges[2*i]=(it->second)[1];
 
-      //Second Parent
-      edges[2*i+1]=(it->second)[0];
+        //Second Parent
+        edges[2*i+1]=(it->second)[0];
 
-      //Hanging Node
-      hnodes[i]=it->first;
+        //Hanging Node
+        hnodes[i]=it->first;
 
-      i++;
-    }
+        i++;
+      }
   }
   libMesh::out<<"Finished readgr"<<std::endl;
 
-return 0;
+  return 0;
 }
 
 /**
@@ -497,23 +497,23 @@ return 0;
 //int VariationalMeshSmoother::readmetr(char *name, LPLPLPDOUBLE H, int ncells, int n, FILE *sout)
 int VariationalMeshSmoother::readmetr(char *name, LPLPLPDOUBLE H, int ncells, int n, FILE *)
 {
-int i, j, k, scanned;
-double d;
-FILE *stream;
+  int i, j, k, scanned;
+  double d;
+  FILE *stream;
 
-   stream=fopen(name,"r");
-   for(i=0;i<ncells;i++)
-     for(j=0;j<n;j++){
-       for(k=0;k<n;k++){scanned = fscanf(stream,"%le ",&d);
-            libmesh_assert_not_equal_to (scanned, EOF);
-            H[i][j][k]=d;}
-       scanned = fscanf(stream,"\n");
-       libmesh_assert_not_equal_to (scanned, EOF);
-     }
+  stream=fopen(name,"r");
+  for(i=0;i<ncells;i++)
+    for(j=0;j<n;j++){
+      for(k=0;k<n;k++){scanned = fscanf(stream,"%le ",&d);
+        libmesh_assert_not_equal_to (scanned, EOF);
+        H[i][j][k]=d;}
+      scanned = fscanf(stream,"\n");
+      libmesh_assert_not_equal_to (scanned, EOF);
+    }
 
-   fclose(stream);
+  fclose(stream);
 
-return 0;
+  return 0;
 }
 
 // Stolen from ErrorVector!
@@ -525,11 +525,11 @@ float VariationalMeshSmoother::adapt_minimum() const
   float min = 1.e30;
 
   for (unsigned int i=0; i<n; i++)
-  {
+    {
       // Only positive (or zero) values in the error vector
-    libmesh_assert_greater_equal (adapt_data[i], 0.);
-    min = std::min (min, adapt_data[i]);
-  }
+      libmesh_assert_greater_equal (adapt_data[i], 0.);
+      min = std::min (min, adapt_data[i]);
+    }
 
   // ErrorVectors are for positive values
   libmesh_assert_greater_equal (min, 0.);
@@ -555,27 +555,27 @@ void VariationalMeshSmoother::adjust_adapt_data()
   int i=0;
 
   for(; el != end_el; el++)
-  {
-    //Only do this for active elements
-    if(adapt_data[i])
     {
-      Point centroid=(*el)->centroid();
-      bool in_aoe=false;
+      //Only do this for active elements
+      if(adapt_data[i])
+        {
+          Point centroid=(*el)->centroid();
+          bool in_aoe=false;
 
-      //See if the elements centroid lies in the aoe mesh
-      //for(aoe_el=aoe_mesh.elements_begin(); aoe_el != aoe_end_el; ++aoe_el)
-      //{
-      if((*aoe_el)->contains_point(centroid))
-        in_aoe=true;
-      //}
+          //See if the elements centroid lies in the aoe mesh
+          //for(aoe_el=aoe_mesh.elements_begin(); aoe_el != aoe_end_el; ++aoe_el)
+          //{
+          if((*aoe_el)->contains_point(centroid))
+            in_aoe=true;
+          //}
 
-      //If the element is not in the area of interest... then set
-      //it's adaptivity value to the minimum.
-      if(!in_aoe)
-        adapt_data[i]=min;
+          //If the element is not in the area of interest... then set
+          //it's adaptivity value to the minimum.
+          if(!in_aoe)
+            adapt_data[i]=min;
+        }
+      i++;
     }
-    i++;
-  }
 }
 
 /**
@@ -595,13 +595,13 @@ int VariationalMeshSmoother::read_adp(LPDOUBLE afun, char [], FILE *)
 
   j=0;
   for(i=0;i<m;i++)
-  {
-    if(adapt_data[i]!=0)
     {
-      afun[j]=adapt_data[i];
-      j++;
+      if(adapt_data[i]!=0)
+        {
+          afun[j]=adapt_data[i];
+          j++;
+        }
     }
-  }
 
   return 0;
 }
@@ -622,12 +622,12 @@ double VariationalMeshSmoother::jac2(double x1,double y1,double x2,double y2)
  */
 int VariationalMeshSmoother::basisA(int n, LPLPDOUBLE Q, int nvert, LPDOUBLE K, LPLPDOUBLE H, int me)
 {
- LPLPDOUBLE U;
- int i,j,k;
- U=alloc_d_n1_n2(n,nvert);
- for(i=0;i<n;i++) U[i]=alloc_d_n1(nvert);
+  LPLPDOUBLE U;
+  int i,j,k;
+  U=alloc_d_n1_n2(n,nvert);
+  for(i=0;i<n;i++) U[i]=alloc_d_n1(nvert);
 
- if(n==2){
+  if(n==2){
     if(nvert==4){//quad
       U[0][0]=(-(1-K[1]));
       U[0][1]=( (1-K[1]));
@@ -662,96 +662,96 @@ int VariationalMeshSmoother::basisA(int n, LPLPDOUBLE Q, int nvert, LPDOUBLE K, 
       U[1][4]=(1-K[2]-K[3]*0.5)*(4.0)+K[3]*(-2.0);
       U[1][5]=(1-K[2]-K[3]*0.5)*(-2.0)+(K[2]-0.5*K[3])*(-2.0);
     }
- }
- if(n==3){
-     if(nvert==8){//hex
-       U[0][0]=(-(1-K[0])*(1-K[1]));
-       U[0][1]=( (1-K[0])*(1-K[1]));
-       U[0][2]=(-    K[0]*(1-K[1]));
-       U[0][3]=(     K[0]*(1-K[1]));
-       U[0][4]=(-(1-K[0])*    K[1]);
-       U[0][5]=( (1-K[0])*    K[1]);
-       U[0][6]=(-    K[0]*    K[1]);
-       U[0][7]=(     K[0]*    K[1]);
-       U[1][0]=(-(1-K[2])*(1-K[3]));
-       U[1][1]=(-    K[2]*(1-K[3]));
-       U[1][2]=( (1-K[2])*(1-K[3]));
-       U[1][3]=(     K[2]*(1-K[3]));
-       U[1][4]=(-(1-K[2])*    K[3]);
-       U[1][5]=(-    K[2]*    K[3]);
-       U[1][6]=( (1-K[2])*    K[3]);
-       U[1][7]=(     K[2]*    K[3]);
-       U[2][0]=(-(1-K[4])*(1-K[5]));
-       U[2][1]=(-    K[4]*(1-K[5]));
-       U[2][2]=(-(1-K[4])*    K[5]);
-       U[2][3]=(-    K[4]*    K[5]);
-       U[2][4]=( (1-K[4])*(1-K[5]));
-       U[2][5]=(     K[4]*(1-K[5]));
-       U[2][6]=( (1-K[4])*    K[5]);
-       U[2][7]=(     K[4]*    K[5]);
-     }
-     if(nvert==4){//linear tetr
+  }
+  if(n==3){
+    if(nvert==8){//hex
+      U[0][0]=(-(1-K[0])*(1-K[1]));
+      U[0][1]=( (1-K[0])*(1-K[1]));
+      U[0][2]=(-    K[0]*(1-K[1]));
+      U[0][3]=(     K[0]*(1-K[1]));
+      U[0][4]=(-(1-K[0])*    K[1]);
+      U[0][5]=( (1-K[0])*    K[1]);
+      U[0][6]=(-    K[0]*    K[1]);
+      U[0][7]=(     K[0]*    K[1]);
+      U[1][0]=(-(1-K[2])*(1-K[3]));
+      U[1][1]=(-    K[2]*(1-K[3]));
+      U[1][2]=( (1-K[2])*(1-K[3]));
+      U[1][3]=(     K[2]*(1-K[3]));
+      U[1][4]=(-(1-K[2])*    K[3]);
+      U[1][5]=(-    K[2]*    K[3]);
+      U[1][6]=( (1-K[2])*    K[3]);
+      U[1][7]=(     K[2]*    K[3]);
+      U[2][0]=(-(1-K[4])*(1-K[5]));
+      U[2][1]=(-    K[4]*(1-K[5]));
+      U[2][2]=(-(1-K[4])*    K[5]);
+      U[2][3]=(-    K[4]*    K[5]);
+      U[2][4]=( (1-K[4])*(1-K[5]));
+      U[2][5]=(     K[4]*(1-K[5]));
+      U[2][6]=( (1-K[4])*    K[5]);
+      U[2][7]=(     K[4]*    K[5]);
+    }
+    if(nvert==4){//linear tetr
       /*---for regular reference tetrahedron--------*/
       U[0][0]=-1; U[1][0]=-1.0/sqrt(3.0); U[2][0]=-1.0/sqrt(6.0);
       U[0][1]=1;  U[1][1]=-1.0/sqrt(3.0); U[2][1]=-1.0/sqrt(6.0);
       U[0][2]=0;  U[1][2]=2.0/sqrt(3.0);  U[2][2]=-1.0/sqrt(6.0);
       U[0][3]=0;  U[1][3]=0;            U[2][3]=3.0/sqrt(6.0);
       /*---for right corner reference tetrahedron----
-      U[0][0]=-1; U[1][0]=-1; U[2][0]=-1;
-      U[0][1]=1;  U[1][1]=0;  U[2][1]=0;
-      U[0][2]=0;  U[1][2]=1;  U[2][2]=0;
-      U[0][3]=0;  U[1][3]=0;  U[2][3]=1;*/
-     }
-     if(nvert==6){//prism
-       /* for regular triangle in the prism base */
-       U[0][0]=-1+K[0]; U[1][0]=(-1+K[1])/2.0; U[2][0]=-1+K[2]+K[3]/2.0;
-       U[0][1]=1-K[0]; U[1][1]=(-1+K[1])/2.0; U[2][1]=-K[2]+K[3]/2.0;
-       U[0][2]=0; U[1][2]=(1-K[1]); U[2][2]=-K[3];
-       U[0][3]=-K[0]; U[1][3]=(-K[1])/2.0; U[2][3]=1-K[2]-K[3]/2.0;
-       U[0][4]=K[0]; U[1][4]=(-K[1])/2.0; U[2][4]=K[2]-K[3]/2.0;
-       U[0][5]=0; U[1][5]=K[1]; U[2][5]=K[3];
-     }
-     if(nvert==10){//quad tetr
-       U[0][0]=(1-K[0]-K[1]/2-K[2]/3)*(-3)+(K[0]-K[1]/2-K[2]/3)+(K[1]-K[2]/3)+K[2];
-       U[0][1]=(1-K[0]-K[1]/2-K[2]/3)*(-1)+(K[0]-K[1]/2-K[2]/3)*3-(K[1]-K[2]/3)-K[2];
-       U[0][2]=0; U[0][3]=0;
-       U[0][4]=4*(K[1]-K[2]/3); U[0][5]=-4*(K[1]-K[2]/3);
-       U[0][6]=4*(1-K[0]-K[1]/2-K[2]/3)-4*(K[0]-K[1]/2-K[2]/3);
-       U[0][7]=4*K[2]; U[0][8]=0; U[0][9]=-4*K[2];
-       U[1][0]=(1-K[3]-K[4]/2-K[5]/3)*(-3/2)+(K[3]-K[4]/2-K[5]/3)/2+(K[4]-K[5]/3)/2+K[5]/2;
-       U[1][1]=(1-K[3]-K[4]/2-K[5]/3)/2+(K[3]-K[4]/2-K[5]/3)*(-3/2)+(K[4]-K[5]/3)/2+K[5]/2;
-       U[1][2]=-(1-K[3]-K[4]/2-K[5]/3)-(K[3]-K[4]/2-K[5]/3)+3*(K[4]-K[5]/3)-K[5];
-       U[1][3]=0; U[1][4]=4*(K[3]-K[4]/2-K[5]/3)-2*(K[4]-K[5]/3);
-       U[1][5]=4*(1-K[3]-K[4]/2-K[5]/3)-2*(K[4]-K[5]/3);
-       U[1][6]=-2*(1-K[3]-K[4]/2-K[5]/3)-2*(K[3]-K[4]/2-K[5]/3);
-       U[1][7]=-2*K[5]; U[1][8]=4*K[5]; U[1][9]=-2*K[5];
-       U[2][0]=-(1-K[6]-K[7]/2-K[8]/3)+(K[6]-K[7]/2-K[8]/3)/3+(K[7]-K[8]/3)/3+K[8]/3;
-       U[2][1]=(1-K[6]-K[7]/2-K[8]/3)/3-(K[6]-K[7]/2-K[8]/3)+(K[7]-K[8]/3)/3+K[8]/3;
-       U[2][2]=(1-K[6]-K[7]/2-K[8]/3)/3+(K[6]-K[7]/2-K[8]/3)/3-(K[7]-K[8]/3)+K[8]/3;
-       U[2][3]=-(1-K[6]-K[7]/2-K[8]/3)-(K[6]-K[7]/2-K[8]/3)-(K[7]-K[8]/3)+3*K[8];
-       U[2][4]=-4*(K[6]-K[7]/2-K[8]/3)/3-4*(K[7]-K[8]/3)/3;
-       U[2][5]=-4*(1-K[6]-K[7]/2-K[8]/3)/3-4*(K[7]-K[8]/3)/3;
-       U[2][6]=-4*(1-K[6]-K[7]/2-K[8]/3)/3-4*(K[6]-K[7]/2-K[8]/3)/3;
-       U[2][7]=4*(K[6]-K[7]/2-K[8]/3)-4*K[8]/3;
-       U[2][8]=4*(K[7]-K[8]/3)-4*K[8]/3; U[2][9]=4*(1-K[6]-K[7]/2-K[8]/3)-4*K[8]/3;
-     }
- }
+        U[0][0]=-1; U[1][0]=-1; U[2][0]=-1;
+        U[0][1]=1;  U[1][1]=0;  U[2][1]=0;
+        U[0][2]=0;  U[1][2]=1;  U[2][2]=0;
+        U[0][3]=0;  U[1][3]=0;  U[2][3]=1;*/
+    }
+    if(nvert==6){//prism
+      /* for regular triangle in the prism base */
+      U[0][0]=-1+K[0]; U[1][0]=(-1+K[1])/2.0; U[2][0]=-1+K[2]+K[3]/2.0;
+      U[0][1]=1-K[0]; U[1][1]=(-1+K[1])/2.0; U[2][1]=-K[2]+K[3]/2.0;
+      U[0][2]=0; U[1][2]=(1-K[1]); U[2][2]=-K[3];
+      U[0][3]=-K[0]; U[1][3]=(-K[1])/2.0; U[2][3]=1-K[2]-K[3]/2.0;
+      U[0][4]=K[0]; U[1][4]=(-K[1])/2.0; U[2][4]=K[2]-K[3]/2.0;
+      U[0][5]=0; U[1][5]=K[1]; U[2][5]=K[3];
+    }
+    if(nvert==10){//quad tetr
+      U[0][0]=(1-K[0]-K[1]/2-K[2]/3)*(-3)+(K[0]-K[1]/2-K[2]/3)+(K[1]-K[2]/3)+K[2];
+      U[0][1]=(1-K[0]-K[1]/2-K[2]/3)*(-1)+(K[0]-K[1]/2-K[2]/3)*3-(K[1]-K[2]/3)-K[2];
+      U[0][2]=0; U[0][3]=0;
+      U[0][4]=4*(K[1]-K[2]/3); U[0][5]=-4*(K[1]-K[2]/3);
+      U[0][6]=4*(1-K[0]-K[1]/2-K[2]/3)-4*(K[0]-K[1]/2-K[2]/3);
+      U[0][7]=4*K[2]; U[0][8]=0; U[0][9]=-4*K[2];
+      U[1][0]=(1-K[3]-K[4]/2-K[5]/3)*(-3/2)+(K[3]-K[4]/2-K[5]/3)/2+(K[4]-K[5]/3)/2+K[5]/2;
+      U[1][1]=(1-K[3]-K[4]/2-K[5]/3)/2+(K[3]-K[4]/2-K[5]/3)*(-3/2)+(K[4]-K[5]/3)/2+K[5]/2;
+      U[1][2]=-(1-K[3]-K[4]/2-K[5]/3)-(K[3]-K[4]/2-K[5]/3)+3*(K[4]-K[5]/3)-K[5];
+      U[1][3]=0; U[1][4]=4*(K[3]-K[4]/2-K[5]/3)-2*(K[4]-K[5]/3);
+      U[1][5]=4*(1-K[3]-K[4]/2-K[5]/3)-2*(K[4]-K[5]/3);
+      U[1][6]=-2*(1-K[3]-K[4]/2-K[5]/3)-2*(K[3]-K[4]/2-K[5]/3);
+      U[1][7]=-2*K[5]; U[1][8]=4*K[5]; U[1][9]=-2*K[5];
+      U[2][0]=-(1-K[6]-K[7]/2-K[8]/3)+(K[6]-K[7]/2-K[8]/3)/3+(K[7]-K[8]/3)/3+K[8]/3;
+      U[2][1]=(1-K[6]-K[7]/2-K[8]/3)/3-(K[6]-K[7]/2-K[8]/3)+(K[7]-K[8]/3)/3+K[8]/3;
+      U[2][2]=(1-K[6]-K[7]/2-K[8]/3)/3+(K[6]-K[7]/2-K[8]/3)/3-(K[7]-K[8]/3)+K[8]/3;
+      U[2][3]=-(1-K[6]-K[7]/2-K[8]/3)-(K[6]-K[7]/2-K[8]/3)-(K[7]-K[8]/3)+3*K[8];
+      U[2][4]=-4*(K[6]-K[7]/2-K[8]/3)/3-4*(K[7]-K[8]/3)/3;
+      U[2][5]=-4*(1-K[6]-K[7]/2-K[8]/3)/3-4*(K[7]-K[8]/3)/3;
+      U[2][6]=-4*(1-K[6]-K[7]/2-K[8]/3)/3-4*(K[6]-K[7]/2-K[8]/3)/3;
+      U[2][7]=4*(K[6]-K[7]/2-K[8]/3)-4*K[8]/3;
+      U[2][8]=4*(K[7]-K[8]/3)-4*K[8]/3; U[2][9]=4*(1-K[6]-K[7]/2-K[8]/3)-4*K[8]/3;
+    }
+  }
 
- if(me==1){
+  if(me==1){
     for(i=0;i<n;i++)
       for(j=0;j<nvert;j++) Q[i][j]=U[i][j];
 
- } else {
+  } else {
     for(i=0;i<n;i++){
-       for(j=0;j<nvert;j++){ Q[i][j]=0;
-         for(k=0;k<n;k++) Q[i][j]+=H[k][i]*U[k][j];
-       }
+      for(j=0;j<nvert;j++){ Q[i][j]=0;
+        for(k=0;k<n;k++) Q[i][j]+=H[k][i]*U[k][j];
+      }
     }
- }
+  }
 
- for(i=0;i<n;i++) free(U[i]);
- free(U);
-return 0;
+  for(i=0;i<n;i++) free(U[i]);
+  free(U);
+  return 0;
 }
 
 /**
@@ -766,28 +766,28 @@ void VariationalMeshSmoother::adp_renew(int n, int N, LPLPDOUBLE R, int ncells, 
   //evaluates given adaptive function on the provided mesh
   if(adp<0){
     for(i=0;i<ncells;i++)
-    {
-      x=y=z=0;
-      nvert=0;
-      while(cells[i][nvert]>=0)
       {
-        x+=R[cells[i][nvert]][0];
-        y+=R[cells[i][nvert]][1];
-        if(n==3)
-          z+=R[cells[i][nvert]][2];
-        nvert++;
+        x=y=z=0;
+        nvert=0;
+        while(cells[i][nvert]>=0)
+          {
+            x+=R[cells[i][nvert]][0];
+            y+=R[cells[i][nvert]][1];
+            if(n==3)
+              z+=R[cells[i][nvert]][2];
+            nvert++;
+          }
+        afun[i]=5*(x+y+z); //adaptive function, cell based
       }
-      afun[i]=5*(x+y+z); //adaptive function, cell based
-    }
   }
   if(adp>0)
-  {
-    for(i=0;i<N;i++)
     {
-      z=0; for(j=0;j<n;j++) z+=R[i][j];
-      afun[i]=5*sin(R[i][0]); //adaptive function, node based
+      for(i=0;i<N;i++)
+        {
+          z=0; for(j=0;j<n;j++) z+=R[i][j];
+          afun[i]=5*sin(R[i][0]); //adaptive function, node based
+        }
     }
-  }
 
   return;
 }
@@ -826,23 +826,23 @@ void VariationalMeshSmoother::full_smooth(int n, int N, LPLPDOUBLE R, LPINT mask
       NBN++;
 
   if(NBN>0)
-  {
-    if(msglev>=1) fprintf(sout,"# of Boundary Nodes=%d  \n",NBN);
+    {
+      if(msglev>=1) fprintf(sout,"# of Boundary Nodes=%d  \n",NBN);
 
-    NBN=0;
-    for(i=0;i<N;i++)
-      if(mask[i]==2)
-        NBN++;
-    if(msglev>=1) fprintf(sout,"# of moving Boundary Nodes=%d  \n",NBN);
-  }
+      NBN=0;
+      for(i=0;i<N;i++)
+        if(mask[i]==2)
+          NBN++;
+      if(msglev>=1) fprintf(sout,"# of moving Boundary Nodes=%d  \n",NBN);
+    }
 
   for(i=0;i<N;i++)
-  {
-    if((mask[i]==1)||(mask[i]==2))
-      maskf[i]=1;
-    else
-      maskf[i]=0;
-  }
+    {
+      if((mask[i]==1)||(mask[i]==2))
+        maskf[i]=1;
+      else
+        maskf[i]=0;
+    }
 
   /*-------determination of min jacobian-------*/
   qmin=minq(n, N, R, ncells, cells, mcells, me, H, &vol, &Vmin, sout);
@@ -865,82 +865,82 @@ void VariationalMeshSmoother::full_smooth(int n, int N, LPLPDOUBLE R, LPINT mask
   if(adp*gr!=0) read_adp(afun, adap, sout);
 
   while(((qmin<=0)||(counter<iter[0])||(fabs(emax-Enm1)>1e-3))&&(ii<iter[1])&&(counter<iter[1]))
-  {
-    libmesh_assert_less (counter, iter[1]);
-
-    Enm1=emax;
-
-    if((ii>=0)&&(ii%2==0))
     {
-      if(qmin<0)
-        eps=sqrt(epsilon*epsilon+0.004*qmin*qmin*vol*vol);
+      libmesh_assert_less (counter, iter[1]);
+
+      Enm1=emax;
+
+      if((ii>=0)&&(ii%2==0))
+        {
+          if(qmin<0)
+            eps=sqrt(epsilon*epsilon+0.004*qmin*qmin*vol*vol);
+          else
+            eps=epsilon;
+        }
+
+      if((qmin<=0)||(counter<ii)) ladp=0; else ladp=adp;
+
+      //update adaptation function before each iteration
+      if((ladp!=0)&&(gr==0))
+        adp_renew(n, N, R, ncells, cells, afun, adp, sout);
+
+      Jk=minJ(n, N, R, maskf, ncells, cells, mcells, eps, w, me, H, vol, nedges, edges, hnodes,
+              msglev, &Vmin, &emax, &qmin, ladp, afun, sout);
+
+      if(qmin>0)
+        counter++;
       else
-        eps=epsilon;
+        ii++;
+
+      if(msglev>=1)
+        {
+          fprintf(sout, "niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e  Jk=%e \n",counter,qmin,Vmin,emax, Jk);
+          fprintf(sout," emax=%e, Enm1=%e \n",emax,Enm1);
+        }
+
     }
-
-    if((qmin<=0)||(counter<ii)) ladp=0; else ladp=adp;
-
-    //update adaptation function before each iteration
-    if((ladp!=0)&&(gr==0))
-      adp_renew(n, N, R, ncells, cells, afun, adp, sout);
-
-    Jk=minJ(n, N, R, maskf, ncells, cells, mcells, eps, w, me, H, vol, nedges, edges, hnodes,
-            msglev, &Vmin, &emax, &qmin, ladp, afun, sout);
-
-    if(qmin>0)
-      counter++;
-    else
-      ii++;
-
-    if(msglev>=1)
-    {
-      fprintf(sout, "niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e  Jk=%e \n",counter,qmin,Vmin,emax, Jk);
-      fprintf(sout," emax=%e, Enm1=%e \n",emax,Enm1);
-    }
-
-  }
 
   free(Gamma);
 
   /*-----BN correction - 2D only!---*/
   epsilon=0.000000001;
   if(NBN>0) for(counter=0;counter<iter[2];counter++)
-  {
-    //update adaptation function before each iteration
-    if((adp!=0)&&(gr==0))
-      adp_renew(n, N, R, ncells, cells, afun, adp, sout);
-    Jk=minJ_BC(N, R, mask, ncells, cells, mcells, eps, w, me, H, vol, msglev, &Vmin, &emax, &qmin, adp, afun, NBN, sout);
-    if(msglev>=1)
-      fprintf(sout, "NBC niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e  \n",counter,qmin,Vmin,emax);
+              {
+                //update adaptation function before each iteration
+                if((adp!=0)&&(gr==0))
+                  adp_renew(n, N, R, ncells, cells, afun, adp, sout);
+                Jk=minJ_BC(N, R, mask, ncells, cells, mcells, eps, w, me, H, vol, msglev, &Vmin, &emax, &qmin, adp, afun, NBN, sout);
+                if(msglev>=1)
+                  fprintf(sout, "NBC niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e  \n",counter,qmin,Vmin,emax);
 
-    //Outrageous Enm1 to make sure we hit this atleast once
-    Enm1=99999;
+                //Outrageous Enm1 to make sure we hit this atleast once
+                Enm1=99999;
 
-    //Now that we've moved the boundary nodes (or not) we need to resmoooth
-    for(j=0;(j<iter[1]);j++)
-    {
-      if(fabs(emax-Enm1)<1e-2)
-        break;
+                //Now that we've moved the boundary nodes (or not) we need to resmoooth
+                for(j=0;(j<iter[1]);j++)
+                  {
+                    if(fabs(emax-Enm1)<1e-2)
+                      break;
 
-      //Save off the error from the previous smoothing step
-      Enm1=emax;
+                    //Save off the error from the previous smoothing step
+                    Enm1=emax;
 
-      //update adaptation function before each iteration
-      if((adp!=0)&&(gr==0))
-        adp_renew(n, N, R, ncells, cells, afun, adp, sout);
+                    //update adaptation function before each iteration
+                    if((adp!=0)&&(gr==0))
+                      adp_renew(n, N, R, ncells, cells, afun, adp, sout);
 
-      Jk=minJ(n, N, R, maskf, ncells, cells, mcells, eps, w, me, H, vol, nedges, edges, hnodes,msglev, &Vmin, &emax, &qmin, adp, afun, sout);
+                    Jk=minJ(n, N, R, maskf, ncells, cells, mcells, eps, w, me, H, vol, nedges, edges, hnodes,msglev, &Vmin, &emax, &qmin, adp, afun, sout);
 
-      if(msglev>=1)
-      {
-        fprintf(sout, "  Re-smooth: niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e  Jk=%e \n",j,qmin,Vmin,emax, Jk);
-        //fprintf(sout,"    emax-Enm1=%e \n",emax-Enm1);
-      }
-    }
+                    if(msglev>=1)
+                      {
+                        fprintf(sout, "  Re-smooth: niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e  Jk=%e \n",j,qmin,Vmin,emax, Jk);
+                        //fprintf(sout,"    emax-Enm1=%e \n",emax-Enm1);
+                      }
+                  }
 
-    if(msglev>=1)
-      fprintf(sout, "NBC smoothed niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e  \n",counter,qmin,Vmin,emax);
-  }
+                if(msglev>=1)
+                  fprintf(sout, "NBC smoothed niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e  \n",counter,qmin,Vmin,emax);
+              }
 
   /*----------free memory-----------------*/
   //free(maskf);
@@ -970,185 +970,185 @@ double VariationalMeshSmoother::maxE(int n, int, LPLPDOUBLE R, int ncells, LPLPI
 
   gemax=-1e32; vmin=1e32;
 
-for(ii=0; ii<ncells; ii++) if(mcells[ii]>=0){
-    if(n==2){
-      if(cells[ii][3]==-1){//tri
-        basisA(2,Q,3,K,H[ii],me);
-        for(k=0;k<2;k++){a1[k]=0; a2[k]=0;
-          for(l=0;l<3;l++){
-            a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-            a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
-          }
-        }
-        det=jac2(a1[0],a1[1],a2[0],a2[1]);
-        tr=0.5*(a1[0]*a1[0]+a2[0]*a2[0]+a1[1]*a1[1]+a2[1]*a2[1]);
-        chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-        E=(1-w)*tr/chi+0.5*w*(v+det*det/v)/chi;
-        if(E>gemax) gemax=E;
-        if(vmin>det) vmin=det;
-      } else if(cells[ii][4]==-1){ E=0; //quad
-        for(i=0; i<2; i++){ K[0]=i;
-          for(j=0; j<2; j++){ K[1]=j;
-            basisA(2,Q,4,K,H[ii],me);
-            for(k=0;k<2;k++){a1[k]=0; a2[k]=0;
-              for(l=0;l<4;l++){
-                a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-                a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
-              }
+  for(ii=0; ii<ncells; ii++) if(mcells[ii]>=0){
+      if(n==2){
+        if(cells[ii][3]==-1){//tri
+          basisA(2,Q,3,K,H[ii],me);
+          for(k=0;k<2;k++){a1[k]=0; a2[k]=0;
+            for(l=0;l<3;l++){
+              a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
+              a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
             }
-            det=jac2(a1[0],a1[1],a2[0],a2[1]);
-            tr=0.5*(a1[0]*a1[0]+a2[0]*a2[0]+a1[1]*a1[1]+a2[1]*a2[1]);
-            chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-            E+=0.25*((1-w)*tr/chi+0.5*w*(v+det*det/v)/chi);
-            if(vmin>det) vmin=det;
           }
-        }
-        if(E>gemax) gemax=E;
-      } else { E=0; //quad tri
-        for(i=0; i<3; i++){ K[0]=i*0.5; k=i/2; K[1]=(double)k;
-          for(j=0; j<3; j++){  K[2]=j*0.5; k=j/2; K[3]=(double)k;
-            basisA(2,Q,6,K,H[ii],me);
-            for(k=0;k<2;k++){a1[k]=0; a2[k]=0;
-              for(l=0;l<6;l++){
-                a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-                a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
+          det=jac2(a1[0],a1[1],a2[0],a2[1]);
+          tr=0.5*(a1[0]*a1[0]+a2[0]*a2[0]+a1[1]*a1[1]+a2[1]*a2[1]);
+          chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
+          E=(1-w)*tr/chi+0.5*w*(v+det*det/v)/chi;
+          if(E>gemax) gemax=E;
+          if(vmin>det) vmin=det;
+        } else if(cells[ii][4]==-1){ E=0; //quad
+          for(i=0; i<2; i++){ K[0]=i;
+            for(j=0; j<2; j++){ K[1]=j;
+              basisA(2,Q,4,K,H[ii],me);
+              for(k=0;k<2;k++){a1[k]=0; a2[k]=0;
+                for(l=0;l<4;l++){
+                  a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
+                  a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
+                }
               }
+              det=jac2(a1[0],a1[1],a2[0],a2[1]);
+              tr=0.5*(a1[0]*a1[0]+a2[0]*a2[0]+a1[1]*a1[1]+a2[1]*a2[1]);
+              chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
+              E+=0.25*((1-w)*tr/chi+0.5*w*(v+det*det/v)/chi);
+              if(vmin>det) vmin=det;
             }
-            det=jac2(a1[0],a1[1],a2[0],a2[1]);
-            if(i==j) sigma=1.0/12; else sigma=1.0/24;
-            tr=0.5*(a1[0]*a1[0]+a2[0]*a2[0]+a1[1]*a1[1]+a2[1]*a2[1]);
-            chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-            E+=sigma*((1-w)*tr/chi+0.5*w*(v+det*det/v)/chi);
-            if(vmin>det) vmin=det;
           }
+          if(E>gemax) gemax=E;
+        } else { E=0; //quad tri
+          for(i=0; i<3; i++){ K[0]=i*0.5; k=i/2; K[1]=(double)k;
+            for(j=0; j<3; j++){  K[2]=j*0.5; k=j/2; K[3]=(double)k;
+              basisA(2,Q,6,K,H[ii],me);
+              for(k=0;k<2;k++){a1[k]=0; a2[k]=0;
+                for(l=0;l<6;l++){
+                  a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
+                  a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
+                }
+              }
+              det=jac2(a1[0],a1[1],a2[0],a2[1]);
+              if(i==j) sigma=1.0/12; else sigma=1.0/24;
+              tr=0.5*(a1[0]*a1[0]+a2[0]*a2[0]+a1[1]*a1[1]+a2[1]*a2[1]);
+              chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
+              E+=sigma*((1-w)*tr/chi+0.5*w*(v+det*det/v)/chi);
+              if(vmin>det) vmin=det;
+            }
+          }
+          if(E>gemax) gemax=E;
         }
-        if(E>gemax) gemax=E;
       }
+      if(n==3){
+        if(cells[ii][4]==-1){//tetr
+          basisA(3,Q,4,K,H[ii],me);
+          for(k=0;k<3;k++){a1[k]=0; a2[k]=0; a3[k]=0;
+            for(l=0;l<4;l++){
+              a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
+              a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
+              a3[k]=a3[k]+Q[k][l]*R[cells[ii][l]][2];
+            }
+          }
+          det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+          tr=0; for(k=0;k<3;k++) tr+=(a1[k]*a1[k]+a2[k]*a2[k]+a3[k]*a3[k])/3.0;
+          chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
+          E=(1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi;
+          if(E>gemax) gemax=E;
+          if(vmin>det) vmin=det;
+        } else if(cells[ii][6]==-1){//prism
+          E=0;
+          for(i=0;i<2;i++){ K[0]=i;
+            for(j=0;j<2;j++){ K[1]=j;
+              for(k=0;k<3;k++) {K[2]=(double)k/2.0; K[3]=(double)(k%2);
+                basisA(3,Q,6,K,H[ii],me);
+                for(kk=0;kk<3;kk++){a1[kk]=0; a2[kk]=0; a3[kk]=0;
+                  for(ll=0;ll<6;ll++){
+                    a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
+                    a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
+                    a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
+                  }
+                }
+                det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                tr=0; for(kk=0;kk<3;kk++) tr+=(a1[kk]*a1[kk]+a2[kk]*a2[kk]+a3[kk]*a3[kk])/3.0;
+                chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
+                E+=((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)/12.0;
+                if(vmin>det) vmin=det;
+              }
+            }
+          }
+          if(E>gemax) gemax=E;
+        } else if(cells[ii][8]==-1){ E=0; //hex
+          for(i=0; i<2; i++){ K[0]=i;
+            for(j=0; j<2; j++){ K[1]=j;
+              for(k=0; k<2; k++){ K[2]=k;
+                for(l=0; l<2; l++){ K[3]=l;
+                  for(m=0; m<2; m++){ K[4]=m;
+                    for(nn=0; nn<2; nn++){ K[5]=nn;
+                      basisA(3,Q,8,K,H[ii],me);
+                      for(kk=0;kk<3;kk++){a1[kk]=0; a2[kk]=0; a3[kk]=0;
+                        for(ll=0;ll<8;ll++){
+                          a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
+                          a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
+                          a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
+                        }
+                      }
+                      det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                      if((i==nn)&&(j==l)&&(k==m)) sigma=(double)1/27;
+                      if(((i==nn)&&(j==l)&&(k!=m))||((i==nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k==m))) sigma=(double)1/(27*2);
+                      if(((i==nn)&&(j!=l)&&(k!=m))||((i!=nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k!=m))) sigma=(double)1/(27*4);
+                      if((i!=nn)&&(j!=l)&&(k!=m)) sigma=(double)1/(27*8);
+                      tr=0; for(kk=0;kk<3;kk++) tr+=(a1[kk]*a1[kk]+a2[kk]*a2[kk]+a3[kk]*a3[kk])/3.0;
+                      chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
+                      E+=((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)*sigma;
+                      if(vmin>det) vmin=det;
+                    }
+                  }
+                }
+              }
+            }
+          }
+          if(E>gemax) gemax=E;
+        } else {//quad tetr
+          E=0;
+          for(i=0;i<4;i++){
+            for(j=0;j<4;j++){
+              for(k=0;k<4;k++){
+                switch (i)
+                  { case 0 : K[0]=0; K[1]=0; K[2]=0; break;
+                  case 1 : K[0]=1; K[1]=0; K[2]=0; break;
+                  case 2 : K[0]=1.0/2; K[1]=1; K[2]=0; break;
+                  case 3 : K[0]=1.0/2; K[1]=1.0/3; K[2]=1; break; }
+                switch (j)
+                  { case 0 : K[3]=0; K[4]=0; K[5]=0; break;
+                  case 1 : K[3]=1; K[4]=0; K[5]=0; break;
+                  case 2 : K[3]=1.0/2; K[4]=1; K[5]=0; break;
+                  case 3 : K[3]=1.0/2; K[4]=1.0/3; K[5]=1; break; }
+                switch (k)
+                  { case 0 : K[6]=0; K[7]=0; K[8]=0; break;
+                  case 1 : K[6]=1; K[7]=0; K[8]=0; break;
+                  case 2 : K[6]=1.0/2; K[7]=1; K[8]=0; break;
+                  case 3 : K[6]=1.0/2; K[7]=1.0/3; K[8]=1; break; }
+                basisA(3,Q,10,K,H[ii],me);
+                for(kk=0;kk<3;kk++){a1[kk]=0; a2[kk]=0; a3[kk]=0;
+                  for(ll=0;ll<10;ll++){
+                    a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
+                    a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
+                    a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
+                  }
+                }
+                det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                if((i==j)&&(j==k)) sigma=1.0/120; else
+                  if((i==j)||(j==k)||(i==k)) sigma=1.0/360; else sigma=1.0/720;
+                tr=0; for(kk=0;kk<3;kk++) tr+=(a1[kk]*a1[kk]+a2[kk]*a2[kk]+a3[kk]*a3[kk])/3.0;
+                chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
+                E+=((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)*sigma;
+                if(vmin>det) vmin=det;
+              }
+            }
+          }
+          if(E>gemax) gemax=E;
+        }
+      }
+      Gamma[ii]=E;
     }
-    if(n==3){
-       if(cells[ii][4]==-1){//tetr
-         basisA(3,Q,4,K,H[ii],me);
-         for(k=0;k<3;k++){a1[k]=0; a2[k]=0; a3[k]=0;
-           for(l=0;l<4;l++){
-             a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-             a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
-             a3[k]=a3[k]+Q[k][l]*R[cells[ii][l]][2];
-           }
-         }
-         det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-         tr=0; for(k=0;k<3;k++) tr+=(a1[k]*a1[k]+a2[k]*a2[k]+a3[k]*a3[k])/3.0;
-         chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-         E=(1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi;
-         if(E>gemax) gemax=E;
-         if(vmin>det) vmin=det;
-       } else if(cells[ii][6]==-1){//prism
-         E=0;
-         for(i=0;i<2;i++){ K[0]=i;
-           for(j=0;j<2;j++){ K[1]=j;
-             for(k=0;k<3;k++) {K[2]=(double)k/2.0; K[3]=(double)(k%2);
-               basisA(3,Q,6,K,H[ii],me);
-               for(kk=0;kk<3;kk++){a1[kk]=0; a2[kk]=0; a3[kk]=0;
-                 for(ll=0;ll<6;ll++){
-                   a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
-                   a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
-                   a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
-                 }
-               }
-               det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-               tr=0; for(kk=0;kk<3;kk++) tr+=(a1[kk]*a1[kk]+a2[kk]*a2[kk]+a3[kk]*a3[kk])/3.0;
-               chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-               E+=((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)/12.0;
-               if(vmin>det) vmin=det;
-             }
-           }
-         }
-         if(E>gemax) gemax=E;
-       } else if(cells[ii][8]==-1){ E=0; //hex
-         for(i=0; i<2; i++){ K[0]=i;
-           for(j=0; j<2; j++){ K[1]=j;
-             for(k=0; k<2; k++){ K[2]=k;
-               for(l=0; l<2; l++){ K[3]=l;
-                 for(m=0; m<2; m++){ K[4]=m;
-                   for(nn=0; nn<2; nn++){ K[5]=nn;
-                     basisA(3,Q,8,K,H[ii],me);
-                     for(kk=0;kk<3;kk++){a1[kk]=0; a2[kk]=0; a3[kk]=0;
-                       for(ll=0;ll<8;ll++){
-                         a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
-                         a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
-                         a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
-                       }
-                     }
-                     det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-                     if((i==nn)&&(j==l)&&(k==m)) sigma=(double)1/27;
-                     if(((i==nn)&&(j==l)&&(k!=m))||((i==nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k==m))) sigma=(double)1/(27*2);
-                     if(((i==nn)&&(j!=l)&&(k!=m))||((i!=nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k!=m))) sigma=(double)1/(27*4);
-                     if((i!=nn)&&(j!=l)&&(k!=m)) sigma=(double)1/(27*8);
-                     tr=0; for(kk=0;kk<3;kk++) tr+=(a1[kk]*a1[kk]+a2[kk]*a2[kk]+a3[kk]*a3[kk])/3.0;
-                     chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-                     E+=((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)*sigma;
-                     if(vmin>det) vmin=det;
-                   }
-                 }
-               }
-             }
-           }
-         }
-         if(E>gemax) gemax=E;
-       } else {//quad tetr
-         E=0;
-         for(i=0;i<4;i++){
-           for(j=0;j<4;j++){
-             for(k=0;k<4;k++){
-               switch (i)
-                 { case 0 : K[0]=0; K[1]=0; K[2]=0; break;
-                 case 1 : K[0]=1; K[1]=0; K[2]=0; break;
-                 case 2 : K[0]=1.0/2; K[1]=1; K[2]=0; break;
-                 case 3 : K[0]=1.0/2; K[1]=1.0/3; K[2]=1; break; }
-               switch (j)
-                 { case 0 : K[3]=0; K[4]=0; K[5]=0; break;
-                 case 1 : K[3]=1; K[4]=0; K[5]=0; break;
-                 case 2 : K[3]=1.0/2; K[4]=1; K[5]=0; break;
-                 case 3 : K[3]=1.0/2; K[4]=1.0/3; K[5]=1; break; }
-               switch (k)
-                 { case 0 : K[6]=0; K[7]=0; K[8]=0; break;
-                 case 1 : K[6]=1; K[7]=0; K[8]=0; break;
-                 case 2 : K[6]=1.0/2; K[7]=1; K[8]=0; break;
-                 case 3 : K[6]=1.0/2; K[7]=1.0/3; K[8]=1; break; }
-               basisA(3,Q,10,K,H[ii],me);
-               for(kk=0;kk<3;kk++){a1[kk]=0; a2[kk]=0; a3[kk]=0;
-                 for(ll=0;ll<10;ll++){
-                   a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
-                   a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
-                   a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
-                 }
-               }
-               det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-               if((i==j)&&(j==k)) sigma=1.0/120; else
-                 if((i==j)||(j==k)||(i==k)) sigma=1.0/360; else sigma=1.0/720;
-               tr=0; for(kk=0;kk<3;kk++) tr+=(a1[kk]*a1[kk]+a2[kk]*a2[kk]+a3[kk]*a3[kk])/3.0;
-               chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-               E+=((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)*sigma;
-               if(vmin>det) vmin=det;
-             }
-           }
-         }
-         if(E>gemax) gemax=E;
-       }
-    }
-    Gamma[ii]=E;
-}
 
-(*qmin)=vmin;
+  (*qmin)=vmin;
 
-for(i=0;i<n;i++) free(Q[i]);
-free(Q);
+  for(i=0;i<n;i++) free(Q[i]);
+  free(Q);
 
-return gemax;
+  return gemax;
 }
 
 /**
-  * Compute min Jacobian determinant (minq), min cell volume (Vmin), and average cell volume (vol).
-  */
+ * Compute min Jacobian determinant (minq), min cell volume (Vmin), and average cell volume (vol).
+ */
 // double VariationalMeshSmoother::minq(int n, int N, LPLPDOUBLE R, int ncells, LPLPINT cells, LPINT mcells,
 //                                      int me, LPLPLPDOUBLE H, double *vol, double *Vmin, FILE *sout)
 double VariationalMeshSmoother::minq(int n, int, LPLPDOUBLE R, int ncells, LPLPINT cells, LPINT mcells,
@@ -1164,170 +1164,170 @@ double VariationalMeshSmoother::minq(int n, int, LPLPDOUBLE R, int ncells, LPLPI
 
   v=0; vmin=1e32; gqmin=1e32;
 
-for(ii=0; ii<ncells; ii++) if(mcells[ii]>=0){
-    if(n==2){//2D
-      if(cells[ii][3]==-1){//tri
-        basisA(2,Q,3,K,H[ii],me);
-        for(k=0;k<2;k++){a1[k]=0; a2[k]=0;
-          for(l=0;l<3;l++){
-            a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-            a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
+  for(ii=0; ii<ncells; ii++) if(mcells[ii]>=0){
+      if(n==2){//2D
+        if(cells[ii][3]==-1){//tri
+          basisA(2,Q,3,K,H[ii],me);
+          for(k=0;k<2;k++){a1[k]=0; a2[k]=0;
+            for(l=0;l<3;l++){
+              a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
+              a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
+            }
           }
+          det=jac2(a1[0],a1[1],a2[0],a2[1]);
+          if(gqmin>det) gqmin=det;
+          if(vmin>det) vmin=det;
+          v+=det;
+        } else if(cells[ii][4]==-1){ vcell=0; //quad
+          for(i=0; i<2; i++){ K[0]=i;
+            for(j=0; j<2; j++){ K[1]=j;
+              basisA(2,Q,4,K,H[ii],me);
+              for(k=0;k<2;k++){a1[k]=0; a2[k]=0;
+                for(l=0;l<4;l++){
+                  a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
+                  a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
+                }
+              }
+              det=jac2(a1[0],a1[1],a2[0],a2[1]);
+              if(gqmin>det) gqmin=det;
+              v+=0.25*det;
+              vcell+=0.25*det;
+            }
+          }
+          if(vmin>vcell) vmin=vcell;
+        } else { vcell=0; //quad tri
+          for(i=0; i<3; i++){ K[0]=i*0.5; k=i/2; K[1]=(double)k;
+            for(j=0; j<3; j++){  K[2]=j*0.5; k=j/2; K[3]=(double)k;
+              basisA(2,Q,6,K,H[ii],me);
+              for(k=0;k<2;k++){a1[k]=0; a2[k]=0;
+                for(l=0;l<6;l++){
+                  a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
+                  a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
+                }
+              }
+              det=jac2(a1[0],a1[1],a2[0],a2[1]);
+              if(gqmin>det) gqmin=det;
+              if(i==j) sigma=1.0/12; else sigma=1.0/24;
+              v+=sigma*det;
+              vcell+=sigma*det;
+            }
+          }
+          if(vmin>vcell) vmin=vcell;
         }
-        det=jac2(a1[0],a1[1],a2[0],a2[1]);
-        if(gqmin>det) gqmin=det;
-        if(vmin>det) vmin=det;
-        v+=det;
-      } else if(cells[ii][4]==-1){ vcell=0; //quad
-        for(i=0; i<2; i++){ K[0]=i;
-          for(j=0; j<2; j++){ K[1]=j;
-            basisA(2,Q,4,K,H[ii],me);
-            for(k=0;k<2;k++){a1[k]=0; a2[k]=0;
-              for(l=0;l<4;l++){
-                a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-                a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
+      }
+      if(n==3){//3D
+        if(cells[ii][4]==-1){//tetr
+          basisA(3,Q,4,K,H[ii],me);
+          for(k=0;k<3;k++){a1[k]=0; a2[k]=0; a3[k]=0;
+            for(l=0;l<4;l++){
+              a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
+              a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
+              a3[k]=a3[k]+Q[k][l]*R[cells[ii][l]][2];
+            }
+          }
+          det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+          if(gqmin>det) gqmin=det;
+          if(vmin>det) vmin=det;
+          v+=det;
+        } else if(cells[ii][6]==-1){//prism
+          vcell=0;
+          for(i=0;i<2;i++){ K[0]=i;
+            for(j=0;j<2;j++){ K[1]=j;
+              for(k=0;k<3;k++) {K[2]=(double)k/2.0; K[3]=(double)(k%2);
+                basisA(3,Q,6,K,H[ii],me);
+                for(kk=0;kk<3;kk++){a1[kk]=0; a2[kk]=0; a3[kk]=0;
+                  for(ll=0;ll<6;ll++){
+                    a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
+                    a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
+                    a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
+                  }
+                }
+                det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                if(gqmin>det) gqmin=det; sigma=1.0/12.0;
+                v+=sigma*det; vcell+=sigma*det;
               }
             }
-            det=jac2(a1[0],a1[1],a2[0],a2[1]);
-            if(gqmin>det) gqmin=det;
-            v+=0.25*det;
-            vcell+=0.25*det;
           }
-        }
-        if(vmin>vcell) vmin=vcell;
-      } else { vcell=0; //quad tri
-        for(i=0; i<3; i++){ K[0]=i*0.5; k=i/2; K[1]=(double)k;
-          for(j=0; j<3; j++){  K[2]=j*0.5; k=j/2; K[3]=(double)k;
-            basisA(2,Q,6,K,H[ii],me);
-            for(k=0;k<2;k++){a1[k]=0; a2[k]=0;
-              for(l=0;l<6;l++){
-                a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-                a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
+          if(vmin>vcell) vmin=vcell;
+        } else if(cells[ii][8]==-1){ vcell=0; //hex
+          for(i=0; i<2; i++){ K[0]=i;
+            for(j=0; j<2; j++){ K[1]=j;
+              for(k=0; k<2; k++){ K[2]=k;
+                for(l=0; l<2; l++){ K[3]=l;
+                  for(m=0; m<2; m++){ K[4]=m;
+                    for(nn=0; nn<2; nn++){ K[5]=nn;
+                      basisA(3,Q,8,K,H[ii],me);
+                      for(kk=0;kk<3;kk++){a1[kk]=0; a2[kk]=0; a3[kk]=0;
+                        for(ll=0;ll<8;ll++){
+                          a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
+                          a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
+                          a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
+                        }
+                      }
+                      det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                      if(gqmin>det) gqmin=det;
+                      if((i==nn)&&(j==l)&&(k==m)) sigma=(double)1/27;
+                      if(((i==nn)&&(j==l)&&(k!=m))||((i==nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k==m))) sigma=(double)1/(27*2);
+                      if(((i==nn)&&(j!=l)&&(k!=m))||((i!=nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k!=m))) sigma=(double)1/(27*4);
+                      if((i!=nn)&&(j!=l)&&(k!=m)) sigma=(double)1/(27*8);
+                      v+=sigma*det;
+                      vcell+=sigma*det;
+                    }
+                  }
+                }
               }
             }
-            det=jac2(a1[0],a1[1],a2[0],a2[1]);
-            if(gqmin>det) gqmin=det;
-            if(i==j) sigma=1.0/12; else sigma=1.0/24;
-            v+=sigma*det;
-            vcell+=sigma*det;
           }
+          if(vmin>vcell) vmin=vcell;
+        } else {//quad tetr
+          vcell=0;
+          for(i=0;i<4;i++){
+            for(j=0;j<4;j++){
+              for(k=0;k<4;k++){
+                switch (i)
+                  { case 0 : K[0]=0; K[1]=0; K[2]=0; break;
+                  case 1 : K[0]=1; K[1]=0; K[2]=0; break;
+                  case 2 : K[0]=1.0/2; K[1]=1; K[2]=0; break;
+                  case 3 : K[0]=1.0/2; K[1]=1.0/3; K[2]=1; break; }
+                switch (j)
+                  { case 0 : K[3]=0; K[4]=0; K[5]=0; break;
+                  case 1 : K[3]=1; K[4]=0; K[5]=0; break;
+                  case 2 : K[3]=1.0/2; K[4]=1; K[5]=0; break;
+                  case 3 : K[3]=1.0/2; K[4]=1.0/3; K[5]=1; break; }
+                switch (k)
+                  { case 0 : K[6]=0; K[7]=0; K[8]=0; break;
+                  case 1 : K[6]=1; K[7]=0; K[8]=0; break;
+                  case 2 : K[6]=1.0/2; K[7]=1; K[8]=0; break;
+                  case 3 : K[6]=1.0/2; K[7]=1.0/3; K[8]=1; break; }
+                basisA(3,Q,10,K,H[ii],me);
+                for(kk=0;kk<3;kk++){a1[kk]=0; a2[kk]=0; a3[kk]=0;
+                  for(ll=0;ll<10;ll++){
+                    a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
+                    a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
+                    a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
+                  }
+                }
+                det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                if(gqmin>det) gqmin=det;
+                if((i==j)&&(j==k)) sigma=1.0/120; else
+                  if((i==j)||(j==k)||(i==k)) sigma=1.0/360; else sigma=1.0/720;
+                v+=sigma*det;   vcell+=sigma*det;
+              }
+            }
+          }
+          if(vmin>vcell) vmin=vcell;
         }
-        if(vmin>vcell) vmin=vcell;
       }
     }
-    if(n==3){//3D
-       if(cells[ii][4]==-1){//tetr
-         basisA(3,Q,4,K,H[ii],me);
-         for(k=0;k<3;k++){a1[k]=0; a2[k]=0; a3[k]=0;
-           for(l=0;l<4;l++){
-             a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-             a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
-             a3[k]=a3[k]+Q[k][l]*R[cells[ii][l]][2];
-           }
-         }
-         det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-         if(gqmin>det) gqmin=det;
-         if(vmin>det) vmin=det;
-         v+=det;
-       } else if(cells[ii][6]==-1){//prism
-         vcell=0;
-         for(i=0;i<2;i++){ K[0]=i;
-           for(j=0;j<2;j++){ K[1]=j;
-             for(k=0;k<3;k++) {K[2]=(double)k/2.0; K[3]=(double)(k%2);
-               basisA(3,Q,6,K,H[ii],me);
-               for(kk=0;kk<3;kk++){a1[kk]=0; a2[kk]=0; a3[kk]=0;
-                 for(ll=0;ll<6;ll++){
-                   a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
-                   a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
-                   a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
-                 }
-               }
-               det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-               if(gqmin>det) gqmin=det; sigma=1.0/12.0;
-               v+=sigma*det; vcell+=sigma*det;
-             }
-           }
-         }
-         if(vmin>vcell) vmin=vcell;
-       } else if(cells[ii][8]==-1){ vcell=0; //hex
-         for(i=0; i<2; i++){ K[0]=i;
-           for(j=0; j<2; j++){ K[1]=j;
-             for(k=0; k<2; k++){ K[2]=k;
-               for(l=0; l<2; l++){ K[3]=l;
-                 for(m=0; m<2; m++){ K[4]=m;
-                   for(nn=0; nn<2; nn++){ K[5]=nn;
-                     basisA(3,Q,8,K,H[ii],me);
-                     for(kk=0;kk<3;kk++){a1[kk]=0; a2[kk]=0; a3[kk]=0;
-                       for(ll=0;ll<8;ll++){
-                         a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
-                         a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
-                         a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
-                       }
-                     }
-                     det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-                     if(gqmin>det) gqmin=det;
-                     if((i==nn)&&(j==l)&&(k==m)) sigma=(double)1/27;
-                     if(((i==nn)&&(j==l)&&(k!=m))||((i==nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k==m))) sigma=(double)1/(27*2);
-                     if(((i==nn)&&(j!=l)&&(k!=m))||((i!=nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k!=m))) sigma=(double)1/(27*4);
-                     if((i!=nn)&&(j!=l)&&(k!=m)) sigma=(double)1/(27*8);
-                     v+=sigma*det;
-                     vcell+=sigma*det;
-                   }
-                 }
-               }
-             }
-           }
-         }
-         if(vmin>vcell) vmin=vcell;
-       } else {//quad tetr
-         vcell=0;
-         for(i=0;i<4;i++){
-           for(j=0;j<4;j++){
-             for(k=0;k<4;k++){
-               switch (i)
-                 { case 0 : K[0]=0; K[1]=0; K[2]=0; break;
-                 case 1 : K[0]=1; K[1]=0; K[2]=0; break;
-                 case 2 : K[0]=1.0/2; K[1]=1; K[2]=0; break;
-                 case 3 : K[0]=1.0/2; K[1]=1.0/3; K[2]=1; break; }
-               switch (j)
-                 { case 0 : K[3]=0; K[4]=0; K[5]=0; break;
-                 case 1 : K[3]=1; K[4]=0; K[5]=0; break;
-                 case 2 : K[3]=1.0/2; K[4]=1; K[5]=0; break;
-                 case 3 : K[3]=1.0/2; K[4]=1.0/3; K[5]=1; break; }
-               switch (k)
-                 { case 0 : K[6]=0; K[7]=0; K[8]=0; break;
-                 case 1 : K[6]=1; K[7]=0; K[8]=0; break;
-                 case 2 : K[6]=1.0/2; K[7]=1; K[8]=0; break;
-                 case 3 : K[6]=1.0/2; K[7]=1.0/3; K[8]=1; break; }
-               basisA(3,Q,10,K,H[ii],me);
-               for(kk=0;kk<3;kk++){a1[kk]=0; a2[kk]=0; a3[kk]=0;
-                 for(ll=0;ll<10;ll++){
-                   a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
-                   a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
-                   a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
-                 }
-               }
-               det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-               if(gqmin>det) gqmin=det;
-               if((i==j)&&(j==k)) sigma=1.0/120; else
-                 if((i==j)||(j==k)||(i==k)) sigma=1.0/360; else sigma=1.0/720;
-               v+=sigma*det;   vcell+=sigma*det;
-             }
-           }
-         }
-         if(vmin>vcell) vmin=vcell;
-       }
-    }
-}
 
 
-(*vol)=v/(double)ncells;
-(*Vmin)=vmin;
+  (*vol)=v/(double)ncells;
+  (*Vmin)=vmin;
 
   for(i=0;i<n;i++) free(Q[i]);
   free(Q);
 
-return gqmin;
+  return gqmin;
 }
 
 /**
@@ -1341,176 +1341,176 @@ double VariationalMeshSmoother::minJ(int n, int N, LPLPDOUBLE R, LPINT mask, int
                                      int adp, LPDOUBLE afun, FILE *sout)
 {
 
-LPLPLPDOUBLE W; //local Hessian matrix;
-LPLPDOUBLE  F, A, G; //F - local gradient; G - adaptation metric;
-LPDOUBLE b, u, a; // matrix & rhs for solver, u - solution vector;
-LPINT ia, ja; // matrix connectivity for solver;
-LPLPINT JA; //A, JA - internal form of global matrix;
-LPLPDOUBLE Rpr, P; //P - minimization direction;
-double  tau=0.0, J, T, Jpr, lVmin, lemax, lqmin, gVmin=0.0, gemax=0.0,
-gqmin=0.0, gtmin0=0.0, gtmax0=0.0, gqmin0=0.0;
-double eps, nonzero, Tau_hn, g_i;
-int index, i, ii, j, jj, k, l, m, nz;
-int sch, ind, columns, nvert, ind_i, ind_j, ind_k;
-/* Jpr - value of functional;
-   nonzero - norm of gradient;
-   columns - max number of nonzero entries in every row of global matrix;
-*/
+  LPLPLPDOUBLE W; //local Hessian matrix;
+  LPLPDOUBLE  F, A, G; //F - local gradient; G - adaptation metric;
+  LPDOUBLE b, u, a; // matrix & rhs for solver, u - solution vector;
+  LPINT ia, ja; // matrix connectivity for solver;
+  LPLPINT JA; //A, JA - internal form of global matrix;
+  LPLPDOUBLE Rpr, P; //P - minimization direction;
+  double  tau=0.0, J, T, Jpr, lVmin, lemax, lqmin, gVmin=0.0, gemax=0.0,
+    gqmin=0.0, gtmin0=0.0, gtmax0=0.0, gqmin0=0.0;
+  double eps, nonzero, Tau_hn, g_i;
+  int index, i, ii, j, jj, k, l, m, nz;
+  int sch, ind, columns, nvert, ind_i, ind_j, ind_k;
+  /* Jpr - value of functional;
+     nonzero - norm of gradient;
+     columns - max number of nonzero entries in every row of global matrix;
+  */
 
-columns=n*n*10;
-W=alloc_d_n1_n2_n3(n,3*n+n%2,3*n+n%2);
-F = alloc_d_n1_n2(n,3*n+n%2);
-for(i=0;i<n;i++){
-   F[i]=alloc_d_n1(3*n+n%2);
-   W[i]=alloc_d_n1_n2(3*n+n%2,3*n+n%2);
-   for(j=0;j<3*n+n%2;j++) W[i][j]=alloc_d_n1(3*n+n%2);}
-Rpr=alloc_d_n1_n2(N,n);
-P=alloc_d_n1_n2(N,n);
-for(i=0;i<N;i++) {Rpr[i]=alloc_d_n1(n);
- P[i]=alloc_d_n1(n);}
-A = alloc_d_n1_n2(n*N, columns);
-b = alloc_d_n1(n*N);
-u = alloc_d_n1(n*N);
-a = alloc_d_n1(n*N*columns);
-ia = alloc_i_n1(n*N+1);
-ja = alloc_i_n1(n*N*columns);
-JA = alloc_i_n1_n2(n*N, columns);
-for(i=0;i<n*N;i++) {
-   A[i] = alloc_d_n1(columns);
-   JA[i] = alloc_i_n1(columns);}
-G=alloc_d_n1_n2(ncells,n);
-for(i=0;i<ncells;i++) G[i]=alloc_d_n1(n);
+  columns=n*n*10;
+  W=alloc_d_n1_n2_n3(n,3*n+n%2,3*n+n%2);
+  F = alloc_d_n1_n2(n,3*n+n%2);
+  for(i=0;i<n;i++){
+    F[i]=alloc_d_n1(3*n+n%2);
+    W[i]=alloc_d_n1_n2(3*n+n%2,3*n+n%2);
+    for(j=0;j<3*n+n%2;j++) W[i][j]=alloc_d_n1(3*n+n%2);}
+  Rpr=alloc_d_n1_n2(N,n);
+  P=alloc_d_n1_n2(N,n);
+  for(i=0;i<N;i++) {Rpr[i]=alloc_d_n1(n);
+    P[i]=alloc_d_n1(n);}
+  A = alloc_d_n1_n2(n*N, columns);
+  b = alloc_d_n1(n*N);
+  u = alloc_d_n1(n*N);
+  a = alloc_d_n1(n*N*columns);
+  ia = alloc_i_n1(n*N+1);
+  ja = alloc_i_n1(n*N*columns);
+  JA = alloc_i_n1_n2(n*N, columns);
+  for(i=0;i<n*N;i++) {
+    A[i] = alloc_d_n1(columns);
+    JA[i] = alloc_i_n1(columns);}
+  G=alloc_d_n1_n2(ncells,n);
+  for(i=0;i<ncells;i++) G[i]=alloc_d_n1(n);
 
-//---------find minimization direction P-----------------
-nonzero=0; Jpr=0;
-for(i=0; i<n*N; i++){//initialise matrix and rhs
+  //---------find minimization direction P-----------------
+  nonzero=0; Jpr=0;
+  for(i=0; i<n*N; i++){//initialise matrix and rhs
     for(j=0; j<columns; j++){ A[i][j] = 0; JA[i][j] =0;}
     b[i] = 0;
-    }
-for(i=0; i<ncells; i++)
-{
-  nvert=0;
-  while(cells[i][nvert]>=0)
-    nvert++;
-  //---determination of local matrices on each cell----
-
-  for(j=0;j<n;j++)
-  {
-    G[i][j]=0; //adaptation metric G is held constant throughout minJ run
-    if(adp<0)
+  }
+  for(i=0; i<ncells; i++)
     {
-      for(k=0;k<abs(adp);k++)
-        G[i][j]=G[i][j]+afun[i*(-adp)+k]; //cell-based adaptivity is computed here
+      nvert=0;
+      while(cells[i][nvert]>=0)
+        nvert++;
+      //---determination of local matrices on each cell----
+
+      for(j=0;j<n;j++)
+        {
+          G[i][j]=0; //adaptation metric G is held constant throughout minJ run
+          if(adp<0)
+            {
+              for(k=0;k<abs(adp);k++)
+                G[i][j]=G[i][j]+afun[i*(-adp)+k]; //cell-based adaptivity is computed here
+            }
+        }
+      for(index=0;index<n;index++){//initialise local matrices
+        for(k=0;k<3*n+n%2;k++){ F[index][k]=0;
+          for(j=0;j<3*n+n%2;j++) W[index][k][j]=0;
+        }
+      }
+      if(mcells[i]>=0){//if cell is not excluded
+        Jpr+=localP(n, W, F, R, cells[i], mask, epsilon, w, nvert, H[i],
+                    me, vol, 0, &lVmin, &lqmin, adp, afun, G[i], sout);
+      } else {
+        for(index=0;index<n;index++) for(j=0;j<nvert;j++) W[index][j][j]=1;
+      }
+      //----assembly of an upper triangular part of a global matrix A------
+      for(index=0;index<n;index++)
+        {
+          for(l=0; l<nvert; l++)
+            {
+              for(m=0; m<nvert; m++){
+                if((W[index][l][m]!=0)&&(cells[i][m]>=cells[i][l]))
+                  {
+                    sch=0; ind=1;
+                    while (ind!=0)
+                      {
+                        if(A[cells[i][l]+index*N][sch]!=0)
+                          {
+                            if(JA[cells[i][l]+index*N][sch]==(cells[i][m]+index*N))
+                              {
+                                A[cells[i][l]+index*N][sch] = A[cells[i][l]+index*N][sch] + W[index][l][m];
+                                ind=0;
+                              }
+                            else
+                              sch++;
+                          }
+                        else
+                          {
+                            A[cells[i][l]+index*N][sch] = W[index][l][m];
+                            JA[cells[i][l]+index*N][sch]=cells[i][m]+index*N;
+                            ind = 0;
+                          }
+                        if(sch>columns-1) fprintf(sout,"error: # of nonzero entries in the %d row of Hessian =%d >= columns=%d \n",cells[i][l],sch,columns);
+                      }
+                  }
+              }
+              b[cells[i][l]+index*N]=b[cells[i][l]+index*N]-F[index][l];
+            }
+        }
+      //------end of matrix A---------
+    }
+  //-------HN correction--------
+  Tau_hn=pow(vol,1.0/(double)n)*1e-10; //tolerance for HN being the mid-edge node for its parents
+  for(i=0;i<nedges;i++){
+    ind_i=hnodes[i]; ind_j=edges[2*i]; ind_k=edges[2*i+1];
+    for(j=0;j<n;j++){
+      g_i=R[ind_i][j]-0.5*(R[ind_j][j]+R[ind_k][j]);
+      Jpr+=g_i*g_i/(2*Tau_hn);
+      b[ind_i+j*N]-=g_i/Tau_hn;
+      b[ind_j+j*N]+=0.5*g_i/Tau_hn;
+      b[ind_k+j*N]+=0.5*g_i/Tau_hn;
+    }
+    for(ind=0;ind<columns;ind++){
+      if(JA[ind_i][ind]==ind_i) A[ind_i][ind]+=1.0/Tau_hn;
+      if(JA[ind_i+N][ind]==ind_i+N) A[ind_i+N][ind]+=1.0/Tau_hn;
+      if(n==3) if(JA[ind_i+2*N][ind]==ind_i+2*N) A[ind_i+2*N][ind]+=1.0/Tau_hn;
+      if((JA[ind_i][ind]==ind_j)||(JA[ind_i][ind]==ind_k)) A[ind_i][ind]-=0.5/Tau_hn;
+      if((JA[ind_i+N][ind]==ind_j+N)||(JA[ind_i+N][ind]==ind_k+N)) A[ind_i+N][ind]-=0.5/Tau_hn;
+      if(n==3) if((JA[ind_i+2*N][ind]==ind_j+2*N)||(JA[ind_i+2*N][ind]==ind_k+2*N)) A[ind_i+2*N][ind]-=0.5/Tau_hn;
+      if(JA[ind_j][ind]==ind_i) A[ind_j][ind]-=0.5/Tau_hn;
+      if(JA[ind_k][ind]==ind_i) A[ind_k][ind]-=0.5/Tau_hn;
+      if(JA[ind_j+N][ind]==ind_i+N) A[ind_j+N][ind]-=0.5/Tau_hn;
+      if(JA[ind_k+N][ind]==ind_i+N) A[ind_k+N][ind]-=0.5/Tau_hn;
+      if(n==3) if(JA[ind_j+2*N][ind]==ind_i+2*N) A[ind_j+2*N][ind]-=0.5/Tau_hn;
+      if(n==3) if(JA[ind_k+2*N][ind]==ind_i+2*N) A[ind_k+2*N][ind]-=0.5/Tau_hn;
+      if((JA[ind_j][ind]==ind_j)||(JA[ind_j][ind]==ind_k)) A[ind_j][ind]+=0.25/Tau_hn;
+      if((JA[ind_k][ind]==ind_j)||(JA[ind_k][ind]==ind_k)) A[ind_k][ind]+=0.25/Tau_hn;
+      if((JA[ind_j+N][ind]==ind_j+N)||(JA[ind_j+N][ind]==ind_k+N)) A[ind_j+N][ind]+=0.25/Tau_hn;
+      if((JA[ind_k+N][ind]==ind_j+N)||(JA[ind_k+N][ind]==ind_k+N)) A[ind_k+N][ind]+=0.25/Tau_hn;
+      if(n==3) if((JA[ind_j+2*N][ind]==ind_j+2*N)||(JA[ind_j+2*N][ind]==ind_k+2*N)) A[ind_j+2*N][ind]+=0.25/Tau_hn;
+      if(n==3) if((JA[ind_k+2*N][ind]==ind_j+2*N)||(JA[ind_k+2*N][ind]==ind_k+2*N)) A[ind_k+2*N][ind]+=0.25/Tau_hn;
     }
   }
-     for(index=0;index<n;index++){//initialise local matrices
-       for(k=0;k<3*n+n%2;k++){ F[index][k]=0;
-         for(j=0;j<3*n+n%2;j++) W[index][k][j]=0;
-       }
-     }
-     if(mcells[i]>=0){//if cell is not excluded
-       Jpr+=localP(n, W, F, R, cells[i], mask, epsilon, w, nvert, H[i],
-                   me, vol, 0, &lVmin, &lqmin, adp, afun, G[i], sout);
-     } else {
-       for(index=0;index<n;index++) for(j=0;j<nvert;j++) W[index][j][j]=1;
-     }
-    //----assembly of an upper triangular part of a global matrix A------
-    for(index=0;index<n;index++)
+  //------||\grad J||_2------
+  for(i=0;i<n*N;i++){ nonzero=nonzero+b[i]*b[i];}
+
+  //-----sort matrix A-----
+  for(i=0;i<n*N;i++)
     {
-      for(l=0; l<nvert; l++)
-      {
-        for(m=0; m<nvert; m++){
-          if((W[index][l][m]!=0)&&(cells[i][m]>=cells[i][l]))
+      for(j=columns-1;j>1;j--)
+        {
+          for(k=0;k<j;k++)
             {
-              sch=0; ind=1;
-              while (ind!=0)
+              if(JA[i][k]>JA[i][k+1])
                 {
-                  if(A[cells[i][l]+index*N][sch]!=0)
-                    {
-                      if(JA[cells[i][l]+index*N][sch]==(cells[i][m]+index*N))
-                        {
-                          A[cells[i][l]+index*N][sch] = A[cells[i][l]+index*N][sch] + W[index][l][m];
-                          ind=0;
-                        }
-                      else
-                        sch++;
-                    }
-                  else
-                    {
-                      A[cells[i][l]+index*N][sch] = W[index][l][m];
-                      JA[cells[i][l]+index*N][sch]=cells[i][m]+index*N;
-                      ind = 0;
-                    }
-                  if(sch>columns-1) fprintf(sout,"error: # of nonzero entries in the %d row of Hessian =%d >= columns=%d \n",cells[i][l],sch,columns);
+                  sch=JA[i][k];
+                  JA[i][k]=JA[i][k+1];
+                  JA[i][k+1]=sch;
+                  tau=A[i][k];
+                  A[i][k]=A[i][k+1];
+                  A[i][k+1]=tau;
                 }
             }
         }
-        b[cells[i][l]+index*N]=b[cells[i][l]+index*N]-F[index][l];
-      }
     }
-//------end of matrix A---------
-  }
- //-------HN correction--------
- Tau_hn=pow(vol,1.0/(double)n)*1e-10; //tolerance for HN being the mid-edge node for its parents
- for(i=0;i<nedges;i++){
-     ind_i=hnodes[i]; ind_j=edges[2*i]; ind_k=edges[2*i+1];
-     for(j=0;j<n;j++){
-       g_i=R[ind_i][j]-0.5*(R[ind_j][j]+R[ind_k][j]);
-       Jpr+=g_i*g_i/(2*Tau_hn);
-       b[ind_i+j*N]-=g_i/Tau_hn;
-       b[ind_j+j*N]+=0.5*g_i/Tau_hn;
-       b[ind_k+j*N]+=0.5*g_i/Tau_hn;
-     }
-     for(ind=0;ind<columns;ind++){
-       if(JA[ind_i][ind]==ind_i) A[ind_i][ind]+=1.0/Tau_hn;
-       if(JA[ind_i+N][ind]==ind_i+N) A[ind_i+N][ind]+=1.0/Tau_hn;
-       if(n==3) if(JA[ind_i+2*N][ind]==ind_i+2*N) A[ind_i+2*N][ind]+=1.0/Tau_hn;
-       if((JA[ind_i][ind]==ind_j)||(JA[ind_i][ind]==ind_k)) A[ind_i][ind]-=0.5/Tau_hn;
-       if((JA[ind_i+N][ind]==ind_j+N)||(JA[ind_i+N][ind]==ind_k+N)) A[ind_i+N][ind]-=0.5/Tau_hn;
-       if(n==3) if((JA[ind_i+2*N][ind]==ind_j+2*N)||(JA[ind_i+2*N][ind]==ind_k+2*N)) A[ind_i+2*N][ind]-=0.5/Tau_hn;
-       if(JA[ind_j][ind]==ind_i) A[ind_j][ind]-=0.5/Tau_hn;
-       if(JA[ind_k][ind]==ind_i) A[ind_k][ind]-=0.5/Tau_hn;
-       if(JA[ind_j+N][ind]==ind_i+N) A[ind_j+N][ind]-=0.5/Tau_hn;
-       if(JA[ind_k+N][ind]==ind_i+N) A[ind_k+N][ind]-=0.5/Tau_hn;
-       if(n==3) if(JA[ind_j+2*N][ind]==ind_i+2*N) A[ind_j+2*N][ind]-=0.5/Tau_hn;
-       if(n==3) if(JA[ind_k+2*N][ind]==ind_i+2*N) A[ind_k+2*N][ind]-=0.5/Tau_hn;
-       if((JA[ind_j][ind]==ind_j)||(JA[ind_j][ind]==ind_k)) A[ind_j][ind]+=0.25/Tau_hn;
-       if((JA[ind_k][ind]==ind_j)||(JA[ind_k][ind]==ind_k)) A[ind_k][ind]+=0.25/Tau_hn;
-       if((JA[ind_j+N][ind]==ind_j+N)||(JA[ind_j+N][ind]==ind_k+N)) A[ind_j+N][ind]+=0.25/Tau_hn;
-       if((JA[ind_k+N][ind]==ind_j+N)||(JA[ind_k+N][ind]==ind_k+N)) A[ind_k+N][ind]+=0.25/Tau_hn;
-       if(n==3) if((JA[ind_j+2*N][ind]==ind_j+2*N)||(JA[ind_j+2*N][ind]==ind_k+2*N)) A[ind_j+2*N][ind]+=0.25/Tau_hn;
-       if(n==3) if((JA[ind_k+2*N][ind]==ind_j+2*N)||(JA[ind_k+2*N][ind]==ind_k+2*N)) A[ind_k+2*N][ind]+=0.25/Tau_hn;
-     }
- }
-//------||\grad J||_2------
-for(i=0;i<n*N;i++){ nonzero=nonzero+b[i]*b[i];}
 
-//-----sort matrix A-----
-  for(i=0;i<n*N;i++)
-  {
-      for(j=columns-1;j>1;j--)
-      {
-        for(k=0;k<j;k++)
-          {
-            if(JA[i][k]>JA[i][k+1])
-              {
-                sch=JA[i][k];
-                JA[i][k]=JA[i][k+1];
-                JA[i][k+1]=sch;
-                tau=A[i][k];
-                A[i][k]=A[i][k+1];
-                A[i][k+1]=tau;
-              }
-          }
-      }
-  }
+  eps=sqrt(vol)*1e-9;
 
-eps=sqrt(vol)*1e-9;
-
-//-------solver for P (unconstrained)-------
+  //-------solver for P (unconstrained)-------
   ia[0]=0; j=0;
   for(i=0;i<n*N;i++)
-  {
+    {
       u[i]=0;
       nz=0;
       for(k=0;k<columns;k++){
@@ -1523,152 +1523,152 @@ eps=sqrt(vol)*1e-9;
           }
       }
       ia[i+1]=ia[i]+nz;
-  }
+    }
   nz=ia[n*N];
   m=n*N;
   if(msglev>=3) sch=1; else sch=0;
 
 
   nz=solver(m,ia,ja,a,u,b,eps,100,sch, sout);
-//    sol_pcg_pj(m,ia,ja,a,u,b,eps,100,sch);
+  //    sol_pcg_pj(m,ia,ja,a,u,b,eps,100,sch);
 
   for(i=0;i<N;i++){ //ensure fixed nodes are not moved
-      for(index=0;index<n;index++)
-        if(mask[i]==1) P[i][index]=0; else P[i][index]=u[i+index*N];
+    for(index=0;index<n;index++)
+      if(mask[i]==1) P[i][index]=0; else P[i][index]=u[i+index*N];
   }
- //----P is determined--------
- if(msglev>=4){
- for(i=0;i<N;i++){
-    for(j=0;j<n;j++)  if(P[i][j]!=0) fprintf(sout, "P[%d][%d]=%f  ",i,j,P[i][j]);
+  //----P is determined--------
+  if(msglev>=4){
+    for(i=0;i<N;i++){
+      for(j=0;j<n;j++)  if(P[i][j]!=0) fprintf(sout, "P[%d][%d]=%f  ",i,j,P[i][j]);
     }
- }
-//-------local minimization problem, determination of tau----------
-if(msglev>=3) fprintf(sout, "dJ=%e J0=%e \n",sqrt(nonzero),Jpr);
-J=1e32; j=1;
-while((Jpr<=J)&&(j>-30)){
-   j=j-1;
-   tau=pow(2.0,j); //search through finite # of values for tau
-   for(i=0;i<N;i++)
-   {
-       for(k=0;k<n;k++)
-         Rpr[i][k]=R[i][k]+tau*P[i][k];
-   }
-   J=0;
-   gVmin=1e32; gemax=-1e32; gqmin=1e32;
-   for(i=0; i<ncells; i++)
-   {
-     if(mcells[i]>=0)
-     {
-       nvert=0;
-       while(cells[i][nvert]>=0)
-         nvert++;
-       lemax=localP(n, W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, &lVmin, &lqmin, adp, afun, G[i], sout);
-       J+=lemax;
-       if(gVmin>lVmin)
-         gVmin=lVmin;
-       if(gemax<lemax)
-         gemax=lemax;
-       if(gqmin>lqmin)
-         gqmin=lqmin;
-
-       //------HN correction--------
-       for(ii=0;ii<nedges;ii++)
-         {
-           ind_i=hnodes[ii];
-           ind_j=edges[2*ii];
-           ind_k=edges[2*ii+1];
-           for(jj=0;jj<n;jj++)
-             {
-               g_i=Rpr[ind_i][jj]-0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
-               J+=g_i*g_i/(2*Tau_hn);
-             }
-         }
+  }
+  //-------local minimization problem, determination of tau----------
+  if(msglev>=3) fprintf(sout, "dJ=%e J0=%e \n",sqrt(nonzero),Jpr);
+  J=1e32; j=1;
+  while((Jpr<=J)&&(j>-30)){
+    j=j-1;
+    tau=pow(2.0,j); //search through finite # of values for tau
+    for(i=0;i<N;i++)
+      {
+        for(k=0;k<n;k++)
+          Rpr[i][k]=R[i][k]+tau*P[i][k];
       }
-   }
-   if(msglev>=3)
-     fprintf(sout, "tau=%f J=%f \n",tau,J);
-}
+    J=0;
+    gVmin=1e32; gemax=-1e32; gqmin=1e32;
+    for(i=0; i<ncells; i++)
+      {
+        if(mcells[i]>=0)
+          {
+            nvert=0;
+            while(cells[i][nvert]>=0)
+              nvert++;
+            lemax=localP(n, W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, &lVmin, &lqmin, adp, afun, G[i], sout);
+            J+=lemax;
+            if(gVmin>lVmin)
+              gVmin=lVmin;
+            if(gemax<lemax)
+              gemax=lemax;
+            if(gqmin>lqmin)
+              gqmin=lqmin;
 
-if(j==-30)
-  T=0;
-else
-{
-  Jpr=J;
-  for(i=0;i<N;i++)
-  {
-    for(k=0;k<n;k++)
-      Rpr[i][k]=R[i][k]+tau*0.5*P[i][k];
+            //------HN correction--------
+            for(ii=0;ii<nedges;ii++)
+              {
+                ind_i=hnodes[ii];
+                ind_j=edges[2*ii];
+                ind_k=edges[2*ii+1];
+                for(jj=0;jj<n;jj++)
+                  {
+                    g_i=Rpr[ind_i][jj]-0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
+                    J+=g_i*g_i/(2*Tau_hn);
+                  }
+              }
+          }
+      }
+    if(msglev>=3)
+      fprintf(sout, "tau=%f J=%f \n",tau,J);
   }
-  J=0; gtmin0=1e32; gtmax0=-1e32; gqmin0=1e32;
-  for(i=0; i<ncells; i++)
-  {
-    if(mcells[i]>=0)
+
+  if(j==-30)
+    T=0;
+  else
     {
-      nvert=0; while(cells[i][nvert]>=0) nvert++;
-      lemax=localP(n, W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, &lVmin, &lqmin, adp, afun, G[i], sout);
-      J+=lemax;
-      if(gtmin0>lVmin)
-        gtmin0=lVmin;
-      if(gtmax0<lemax)
-        gtmax0=lemax;
-      if(gqmin0>lqmin)
-        gqmin0=lqmin;
-      //-------HN correction--------
-       for(ii=0;ii<nedges;ii++){
-         ind_i=hnodes[ii]; ind_j=edges[2*ii]; ind_k=edges[2*ii+1];
-         for(jj=0;jj<n;jj++){
-           g_i=Rpr[ind_i][jj]-0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
-           J+=g_i*g_i/(2*Tau_hn);
-         }
-       }//HN
-   }
-  }
-}
- if(Jpr>J) {
+      Jpr=J;
+      for(i=0;i<N;i++)
+        {
+          for(k=0;k<n;k++)
+            Rpr[i][k]=R[i][k]+tau*0.5*P[i][k];
+        }
+      J=0; gtmin0=1e32; gtmax0=-1e32; gqmin0=1e32;
+      for(i=0; i<ncells; i++)
+        {
+          if(mcells[i]>=0)
+            {
+              nvert=0; while(cells[i][nvert]>=0) nvert++;
+              lemax=localP(n, W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, &lVmin, &lqmin, adp, afun, G[i], sout);
+              J+=lemax;
+              if(gtmin0>lVmin)
+                gtmin0=lVmin;
+              if(gtmax0<lemax)
+                gtmax0=lemax;
+              if(gqmin0>lqmin)
+                gqmin0=lqmin;
+              //-------HN correction--------
+              for(ii=0;ii<nedges;ii++){
+                ind_i=hnodes[ii]; ind_j=edges[2*ii]; ind_k=edges[2*ii+1];
+                for(jj=0;jj<n;jj++){
+                  g_i=Rpr[ind_i][jj]-0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
+                  J+=g_i*g_i/(2*Tau_hn);
+                }
+              }//HN
+            }
+        }
+    }
+  if(Jpr>J) {
     T=0.5*tau;
     (*Vmin)=gtmin0;
     (*emax)=gtmax0;
     (*qmin)=gqmin0;
- } else {
+  } else {
     T=tau; J=Jpr;
     (*Vmin)=gVmin;
     (*emax)=gemax;
     (*qmin)=gqmin;
- }
+  }
 
- nonzero=0;
-for(j=0;j<N;j++) for(k=0;k<n;k++){
-     R[j][k]=R[j][k]+T*P[j][k];
-     nonzero+=T*P[j][k]*T*P[j][k];
-}
+  nonzero=0;
+  for(j=0;j<N;j++) for(k=0;k<n;k++){
+      R[j][k]=R[j][k]+T*P[j][k];
+      nonzero+=T*P[j][k]*T*P[j][k];
+    }
 
-if(msglev>=2)
-  fprintf(sout, "tau=%e, J=%e  \n",T,J);
+  if(msglev>=2)
+    fprintf(sout, "tau=%e, J=%e  \n",T,J);
 
-free(b);
-free(u);
-free(ia);
-free(ja);
-free(a);
-for(i=0;i<n;i++){
-   for(j=0;j<3*n+n%2;j++) free(W[i][j]);
-   free(W[i]);
-   free(F[i]);}
-free(W);
-free(F);
-for(i=0;i<N;i++) {free(Rpr[i]);
+  free(b);
+  free(u);
+  free(ia);
+  free(ja);
+  free(a);
+  for(i=0;i<n;i++){
+    for(j=0;j<3*n+n%2;j++) free(W[i][j]);
+    free(W[i]);
+    free(F[i]);}
+  free(W);
+  free(F);
+  for(i=0;i<N;i++) {free(Rpr[i]);
     free(P[i]);}
-free(Rpr);
-free(P);
-for(i=0;i<n*N;i++) {
+  free(Rpr);
+  free(P);
+  for(i=0;i<n*N;i++) {
     free(A[i]);
     free(JA[i]);}
-free(A);
-free(JA);
-for(i=0;i<ncells;i++) free(G[i]);
-free(G);
+  free(A);
+  free(JA);
+  for(i=0;i<ncells;i++) free(G[i]);
+  free(G);
 
-return (sqrt(nonzero));
+  return (sqrt(nonzero));
 
 }
 
@@ -1681,180 +1681,180 @@ double VariationalMeshSmoother::minJ_BC(int N, LPLPDOUBLE R, LPINT mask, int nce
                                         double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int msglev,
                                         double *Vmin, double *emax, double *qmin, int adp, LPDOUBLE afun, int NCN, FILE *sout)
 {
-/*---new form of matrices, 5 iterations for minL---*/
-LPLPLPDOUBLE W;
-LPLPDOUBLE  F, G;
-LPDOUBLE b, hm, Plam, constr, lam;
-LPINT Bind;
-LPLPDOUBLE Rpr, P;
-double  tau=0.0, J=0.0, T, Jpr, L, lVmin, lqmin, gVmin=0.0, gqmin=0.0, gVmin0=0.0,
-gqmin0=0.0, lemax, gemax=0.0, gemax0=0.0;
-double a, g, qq=0.0, eps, nonzero, x0, y0, del1, del2, Bx, By;
-int index, i, j, k=0, l, nz, I;
-int ind, nvert;
+  /*---new form of matrices, 5 iterations for minL---*/
+  LPLPLPDOUBLE W;
+  LPLPDOUBLE  F, G;
+  LPDOUBLE b, hm, Plam, constr, lam;
+  LPINT Bind;
+  LPLPDOUBLE Rpr, P;
+  double  tau=0.0, J=0.0, T, Jpr, L, lVmin, lqmin, gVmin=0.0, gqmin=0.0, gVmin0=0.0,
+    gqmin0=0.0, lemax, gemax=0.0, gemax0=0.0;
+  double a, g, qq=0.0, eps, nonzero, x0, y0, del1, del2, Bx, By;
+  int index, i, j, k=0, l, nz, I;
+  int ind, nvert;
 
-//----memory------
-Bind=alloc_i_n1(NCN); //array of sliding BN
-lam=alloc_d_n1(NCN);
-hm=alloc_d_n1(2*N);
-Plam=alloc_d_n1(NCN);
-constr=alloc_d_n1(4*NCN); //holds constraints = local approximation to the boundary
-F = alloc_d_n1_n2(2, 6);
-W=alloc_d_n1_n2_n3(2, 6, 6);
-for(i=0;i<2;i++){
-   F[i]=alloc_d_n1(6);
-   W[i]=alloc_d_n1_n2(6,6);
-   for(j=0;j<6;j++) W[i][j]=alloc_d_n1(6);}
-Rpr=alloc_d_n1_n2(N,2);
-P=alloc_d_n1_n2(N,2);
-for(i=0;i<N;i++) {Rpr[i]=alloc_d_n1(2);
- P[i]=alloc_d_n1(2);}
-b = alloc_d_n1(2*N);
-G=alloc_d_n1_n2(ncells,6);
-for(i=0;i<ncells;i++) G[i]=alloc_d_n1(6);
+  //----memory------
+  Bind=alloc_i_n1(NCN); //array of sliding BN
+  lam=alloc_d_n1(NCN);
+  hm=alloc_d_n1(2*N);
+  Plam=alloc_d_n1(NCN);
+  constr=alloc_d_n1(4*NCN); //holds constraints = local approximation to the boundary
+  F = alloc_d_n1_n2(2, 6);
+  W=alloc_d_n1_n2_n3(2, 6, 6);
+  for(i=0;i<2;i++){
+    F[i]=alloc_d_n1(6);
+    W[i]=alloc_d_n1_n2(6,6);
+    for(j=0;j<6;j++) W[i][j]=alloc_d_n1(6);}
+  Rpr=alloc_d_n1_n2(N,2);
+  P=alloc_d_n1_n2(N,2);
+  for(i=0;i<N;i++) {Rpr[i]=alloc_d_n1(2);
+    P[i]=alloc_d_n1(2);}
+  b = alloc_d_n1(2*N);
+  G=alloc_d_n1_n2(ncells,6);
+  for(i=0;i<ncells;i++) G[i]=alloc_d_n1(6);
 
-//-----assembler of constraints-----
+  //-----assembler of constraints-----
   eps=sqrt(vol)*1e-9;
   for(i=0;i<4*NCN;i++) constr[i]=1.0/eps;
   I=0; for(i=0;i<N;i++) if(mask[i]==2) {Bind[I]=i; I++;}
   for(I=0;I<NCN;I++){ i=Bind[I];
-      ind=0;
-      //---boundary connectivity----
-      for(l=0;l<ncells;l++){
-        nvert=0; while(cells[l][nvert]>=0) nvert++;
-        switch(nvert)
-          {case 3: //tri
-              if(i==cells[l][0]){
-                if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][1]; ind++;} else {k=cells[l][1]; ind++;}}
-                if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][2]; ind++;} else {k=cells[l][2]; ind++;}}
-              }
-              if(i==cells[l][1]){
-                if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][0]; ind++;} else {k=cells[l][0]; ind++;}}
-                if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][2]; ind++;} else {k=cells[l][2]; ind++;}}
-              }
-              if(i==cells[l][2]){
-                if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][1]; ind++;} else {k=cells[l][1]; ind++;}}
-                if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][0]; ind++;} else {k=cells[l][0]; ind++;}}
-              }
-              break;
-          case 4: //quad
-            if((i==cells[l][0])||(i==cells[l][3])){
+    ind=0;
+    //---boundary connectivity----
+    for(l=0;l<ncells;l++){
+      nvert=0; while(cells[l][nvert]>=0) nvert++;
+      switch(nvert)
+        {case 3: //tri
+            if(i==cells[l][0]){
               if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][1]; ind++;} else {k=cells[l][1]; ind++;}}
               if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][2]; ind++;} else {k=cells[l][2]; ind++;}}
             }
-            if((i==cells[l][1])||(i==cells[l][2])){
-              if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][0]; ind++;} else {k=cells[l][0]; ind++;}}
-              if(mask[cells[l][3]]>0) {if(ind==0) {j=cells[l][3]; ind++;} else {k=cells[l][3]; ind++;}}
-            }
-            break;
-          case 6: //quad tri
-            if(i==cells[l][0]){
-              if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][5]; ind++;} else {k=cells[l][5]; ind++;}}
-              if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][4]; ind++;} else {k=cells[l][4]; ind++;}}
-            }
             if(i==cells[l][1]){
-              if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][5]; ind++;} else {k=cells[l][5]; ind++;}}
-              if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][3]; ind++;} else {k=cells[l][3]; ind++;}}
+              if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][0]; ind++;} else {k=cells[l][0]; ind++;}}
+              if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][2]; ind++;} else {k=cells[l][2]; ind++;}}
             }
             if(i==cells[l][2]){
-              if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][3]; ind++;} else {k=cells[l][3]; ind++;}}
-              if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][4]; ind++;} else {k=cells[l][4]; ind++;}}
+              if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][1]; ind++;} else {k=cells[l][1]; ind++;}}
+              if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][0]; ind++;} else {k=cells[l][0]; ind++;}}
             }
-            if(i==cells[l][3]){j=cells[l][1]; k=cells[l][2];}
-            if(i==cells[l][4]){j=cells[l][2]; k=cells[l][0];}
-            if(i==cells[l][5]){j=cells[l][0]; k=cells[l][1];}
-            break;}
-      }//end boundary connectivity
-      //lines
-      del1=R[j][0]-R[i][0]; del2=R[i][0]-R[k][0];
-      if((fabs(del1)<eps)&&(fabs(del2)<eps)) {constr[I*4]=1; constr[I*4+1]=0;
-        constr[I*4+2]=R[i][0]; constr[I*4+3]=R[i][1];} else {
-        del1=R[j][1]-R[i][1]; del2=R[i][1]-R[k][1];
-        if((fabs(del1)<eps)&&(fabs(del2)<eps)) {constr[I*4]=0; constr[I*4+1]=1;
-          constr[I*4+2]=R[i][0]; constr[I*4+3]=R[i][1];
-        } else {
-          J=(R[i][0]-R[j][0])*(R[k][1]-R[j][1])-(R[k][0]-R[j][0])*(R[i][1]-R[j][1]);
-          if(fabs(J)<eps) {
-            constr[I*4]=1.0/(R[k][0]-R[j][0]); constr[I*4+1]=-1.0/(R[k][1]-R[j][1]);
-            constr[I*4+2]=R[i][0]; constr[I*4+3]=R[i][1];
-                  } else { //circle
-            x0=((R[k][1]-R[j][1])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1])+
-                (R[j][1]-R[i][1])*(R[k][0]*R[k][0]-R[j][0]*R[j][0]+R[k][1]*R[k][1]-R[j][1]*R[j][1]))/(2*J);
-            y0=((R[j][0]-R[k][0])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1])+
-                (R[i][0]-R[j][0])*(R[k][0]*R[k][0]-R[j][0]*R[j][0]+R[k][1]*R[k][1]-R[j][1]*R[j][1]))/(2*J);
-            constr[I*4]=x0; constr[I*4+1]=y0;
-            constr[I*4+2]=(R[i][0]-x0)*(R[i][0]-x0)+(R[i][1]-y0)*(R[i][1]-y0);
+            break;
+        case 4: //quad
+          if((i==cells[l][0])||(i==cells[l][3])){
+            if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][1]; ind++;} else {k=cells[l][1]; ind++;}}
+            if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][2]; ind++;} else {k=cells[l][2]; ind++;}}
           }
+          if((i==cells[l][1])||(i==cells[l][2])){
+            if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][0]; ind++;} else {k=cells[l][0]; ind++;}}
+            if(mask[cells[l][3]]>0) {if(ind==0) {j=cells[l][3]; ind++;} else {k=cells[l][3]; ind++;}}
+          }
+          break;
+        case 6: //quad tri
+          if(i==cells[l][0]){
+            if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][5]; ind++;} else {k=cells[l][5]; ind++;}}
+            if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][4]; ind++;} else {k=cells[l][4]; ind++;}}
+          }
+          if(i==cells[l][1]){
+            if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][5]; ind++;} else {k=cells[l][5]; ind++;}}
+            if(mask[cells[l][2]]>0) {if(ind==0) {j=cells[l][3]; ind++;} else {k=cells[l][3]; ind++;}}
+          }
+          if(i==cells[l][2]){
+            if(mask[cells[l][1]]>0) {if(ind==0) {j=cells[l][3]; ind++;} else {k=cells[l][3]; ind++;}}
+            if(mask[cells[l][0]]>0) {if(ind==0) {j=cells[l][4]; ind++;} else {k=cells[l][4]; ind++;}}
+          }
+          if(i==cells[l][3]){j=cells[l][1]; k=cells[l][2];}
+          if(i==cells[l][4]){j=cells[l][2]; k=cells[l][0];}
+          if(i==cells[l][5]){j=cells[l][0]; k=cells[l][1];}
+          break;}
+    }//end boundary connectivity
+    //lines
+    del1=R[j][0]-R[i][0]; del2=R[i][0]-R[k][0];
+    if((fabs(del1)<eps)&&(fabs(del2)<eps)) {constr[I*4]=1; constr[I*4+1]=0;
+      constr[I*4+2]=R[i][0]; constr[I*4+3]=R[i][1];} else {
+      del1=R[j][1]-R[i][1]; del2=R[i][1]-R[k][1];
+      if((fabs(del1)<eps)&&(fabs(del2)<eps)) {constr[I*4]=0; constr[I*4+1]=1;
+        constr[I*4+2]=R[i][0]; constr[I*4+3]=R[i][1];
+      } else {
+        J=(R[i][0]-R[j][0])*(R[k][1]-R[j][1])-(R[k][0]-R[j][0])*(R[i][1]-R[j][1]);
+        if(fabs(J)<eps) {
+          constr[I*4]=1.0/(R[k][0]-R[j][0]); constr[I*4+1]=-1.0/(R[k][1]-R[j][1]);
+          constr[I*4+2]=R[i][0]; constr[I*4+3]=R[i][1];
+        } else { //circle
+          x0=((R[k][1]-R[j][1])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1])+
+              (R[j][1]-R[i][1])*(R[k][0]*R[k][0]-R[j][0]*R[j][0]+R[k][1]*R[k][1]-R[j][1]*R[j][1]))/(2*J);
+          y0=((R[j][0]-R[k][0])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1])+
+              (R[i][0]-R[j][0])*(R[k][0]*R[k][0]-R[j][0]*R[j][0]+R[k][1]*R[k][1]-R[j][1]*R[j][1]))/(2*J);
+          constr[I*4]=x0; constr[I*4+1]=y0;
+          constr[I*4+2]=(R[i][0]-x0)*(R[i][0]-x0)+(R[i][1]-y0)*(R[i][1]-y0);
         }
       }
+    }
   }
-/*for(i=0;i<NCN;i++){
+  /*for(i=0;i<NCN;i++){
     for(j=0;j<4;j++) fprintf(stdout," %e ",constr[4*i+j]);
     fprintf(stdout, "constr %d node %d \n",i,Bind[i]);
-}*/
+    }*/
 
 
 
-//----initial values----
-for(i=0;i<NCN;i++) lam[i]=0;
-for(nz=0;nz<5;nz++){
-  //---------find H and -grad J-----------------
-   nonzero=0; Jpr=0;
-   for(i=0; i<2*N; i++){ b[i] = 0; hm[i]=0; }
-   for(i=0; i<ncells; i++){
-     nvert=0; while(cells[i][nvert]>=0) nvert++;
-     for(j=0;j<nvert;j++){ G[i][j]=0;
-       if(adp<0) for(k=0;k<abs(adp);k++) G[i][j]=G[i][j]+afun[i*(-adp)+k]; }
-     for(index=0;index<2;index++){
-       for(k=0;k<nvert;k++){ F[index][k]=0;
-         for(j=0;j<nvert;j++) W[index][k][j]=0;
-       }
-     }
-     if(mcells[i]>=0){
-       Jpr+=localP(2, W, F, R, cells[i], mask, epsilon, w, nvert, H[i],
-                   me, vol, 0, &lVmin, &lqmin, adp, afun, G[i], sout);
-     } else {
-       for(index=0;index<2;index++) for(j=0;j<nvert;j++) W[index][j][j]=1;
-     }
-     for(index=0;index<2;index++){
-       for(l=0; l<nvert; l++){//-diagonal Hessian-
-         hm[cells[i][l]+index*N]=hm[cells[i][l]+index*N]+W[index][l][l];
-         b[cells[i][l]+index*N]=b[cells[i][l]+index*N]-F[index][l];
-       }
-     }
+  //----initial values----
+  for(i=0;i<NCN;i++) lam[i]=0;
+  for(nz=0;nz<5;nz++){
+    //---------find H and -grad J-----------------
+    nonzero=0; Jpr=0;
+    for(i=0; i<2*N; i++){ b[i] = 0; hm[i]=0; }
+    for(i=0; i<ncells; i++){
+      nvert=0; while(cells[i][nvert]>=0) nvert++;
+      for(j=0;j<nvert;j++){ G[i][j]=0;
+        if(adp<0) for(k=0;k<abs(adp);k++) G[i][j]=G[i][j]+afun[i*(-adp)+k]; }
+      for(index=0;index<2;index++){
+        for(k=0;k<nvert;k++){ F[index][k]=0;
+          for(j=0;j<nvert;j++) W[index][k][j]=0;
+        }
+      }
+      if(mcells[i]>=0){
+        Jpr+=localP(2, W, F, R, cells[i], mask, epsilon, w, nvert, H[i],
+                    me, vol, 0, &lVmin, &lqmin, adp, afun, G[i], sout);
+      } else {
+        for(index=0;index<2;index++) for(j=0;j<nvert;j++) W[index][j][j]=1;
+      }
+      for(index=0;index<2;index++){
+        for(l=0; l<nvert; l++){//-diagonal Hessian-
+          hm[cells[i][l]+index*N]=hm[cells[i][l]+index*N]+W[index][l][l];
+          b[cells[i][l]+index*N]=b[cells[i][l]+index*N]-F[index][l];
+        }
+      }
     }
     //------||grad J||_2------
     for(i=0;i<2*N;i++){ nonzero=nonzero+b[i]*b[i];}
     //-----solve for Plam--------
     for(I=0;I<NCN;I++){i=Bind[I];
-       if(constr[4*I+3]<0.5/eps) {Bx=constr[4*I]; By=constr[4*I+1];
-         g=(R[i][0]-constr[4*I+2])*constr[4*I]+(R[i][1]-constr[4*I+3])*constr[4*I+1];
-       } else {
-         Bx=2*(R[i][0]-constr[4*I]); By=2*(R[i][1]-constr[4*I+1]);
-         hm[i]+=2*lam[I]; hm[i+N]+=2*lam[I];
-         g=(R[i][0]-constr[4*I])*(R[i][0]-constr[4*I])+(R[i][1]-constr[4*I+1])*(R[i][1]-constr[4*I+1])-constr[4*I+2];
-       }
-       Jpr+=lam[I]*g;
-       qq=Bx*b[i]/hm[i]+By*b[i+N]/hm[i+N]-g;
-       a=Bx*Bx/hm[i]+By*By/hm[i+N];
-       if(a!=0) Plam[I]=qq/a; else fprintf(sout,"error: B^TH-1B is degenerate \n");
-       b[i]-=Plam[I]*Bx; b[i+N]-=Plam[I]*By;
-       Plam[I]-=lam[I];
-   }
-   //-----------solve for P------------
-   for(i=0;i<N;i++) {P[i][0]=b[i]/hm[i]; P[i][1]=b[i+N]/hm[i+N];}
-   //-----correct solution-----
-   for(i=0;i<N;i++) for(j=0;j<2;j++) if((fabs(P[i][j])<eps)||(mask[i]==1)) P[i][j]=0;
-   //----P is determined--------
-   if(msglev>=3){
-       for(i=0;i<N;i++){
-         for(j=0;j<2;j++)  if(P[i][j]!=0) fprintf(sout, "P[%d][%d]=%f  ",i,j,P[i][j]);
-       }
-   }
-   //-------local minimization problem, determination of tau----------
-   if(msglev>=3) fprintf(sout, "dJ=%e L0=%e \n",sqrt(nonzero), Jpr);
-   L=1e32; j=1;
-   while((Jpr<=L)&&(j>-30)){
+      if(constr[4*I+3]<0.5/eps) {Bx=constr[4*I]; By=constr[4*I+1];
+        g=(R[i][0]-constr[4*I+2])*constr[4*I]+(R[i][1]-constr[4*I+3])*constr[4*I+1];
+      } else {
+        Bx=2*(R[i][0]-constr[4*I]); By=2*(R[i][1]-constr[4*I+1]);
+        hm[i]+=2*lam[I]; hm[i+N]+=2*lam[I];
+        g=(R[i][0]-constr[4*I])*(R[i][0]-constr[4*I])+(R[i][1]-constr[4*I+1])*(R[i][1]-constr[4*I+1])-constr[4*I+2];
+      }
+      Jpr+=lam[I]*g;
+      qq=Bx*b[i]/hm[i]+By*b[i+N]/hm[i+N]-g;
+      a=Bx*Bx/hm[i]+By*By/hm[i+N];
+      if(a!=0) Plam[I]=qq/a; else fprintf(sout,"error: B^TH-1B is degenerate \n");
+      b[i]-=Plam[I]*Bx; b[i+N]-=Plam[I]*By;
+      Plam[I]-=lam[I];
+    }
+    //-----------solve for P------------
+    for(i=0;i<N;i++) {P[i][0]=b[i]/hm[i]; P[i][1]=b[i+N]/hm[i+N];}
+    //-----correct solution-----
+    for(i=0;i<N;i++) for(j=0;j<2;j++) if((fabs(P[i][j])<eps)||(mask[i]==1)) P[i][j]=0;
+    //----P is determined--------
+    if(msglev>=3){
+      for(i=0;i<N;i++){
+        for(j=0;j<2;j++)  if(P[i][j]!=0) fprintf(sout, "P[%d][%d]=%f  ",i,j,P[i][j]);
+      }
+    }
+    //-------local minimization problem, determination of tau----------
+    if(msglev>=3) fprintf(sout, "dJ=%e L0=%e \n",sqrt(nonzero), Jpr);
+    L=1e32; j=1;
+    while((Jpr<=L)&&(j>-30)){
       j=j-1;
       tau=pow(2.0,j);
       for(i=0;i<N;i++){
@@ -1879,8 +1879,8 @@ for(nz=0;nz<5;nz++){
       }
       //----end of constraints----
       if(msglev>=3) fprintf(sout," tau=%f J=%f \n",tau,J);
-   }
-   if(j==-30) { T=0; } else {
+    }
+    if(j==-30) { T=0; } else {
       Jpr=L; qq=J;
       for(i=0;i<N;i++){
         for(k=0;k<2;k++) Rpr[i][k]=R[i][k]+tau*0.5*P[i][k];}
@@ -1903,46 +1903,46 @@ for(nz=0;nz<5;nz++){
         L+=(lam[I]+tau*0.5*Plam[I])*g;
       }
       //----end of constraints----
-   }
-   if(Jpr>L) {
+    }
+    if(Jpr>L) {
       T=0.5*tau;
       (*Vmin)=gVmin0;
       (*emax)=gemax0;
       (*qmin)=gqmin0;
-   } else {
+    } else {
       T=tau; L=Jpr; J=qq;
       (*Vmin)=gVmin;
       (*emax)=gemax;
       (*qmin)=gqmin;
-   }
+    }
 
-   for(j=0;j<N;j++) for(k=0;k<2;k++) R[j][k]+=T*P[j][k];
-   for(i=0;i<NCN;i++) lam[i]+=T*Plam[i];
+    for(j=0;j<N;j++) for(k=0;k<2;k++) R[j][k]+=T*P[j][k];
+    for(i=0;i<NCN;i++) lam[i]+=T*Plam[i];
 
-}//end Lagrangian iter
+  }//end Lagrangian iter
 
- if(msglev>=2) fprintf(sout, "tau=%e, J=%e, L=%e  \n",T,J,L);
+  if(msglev>=2) fprintf(sout, "tau=%e, J=%e, L=%e  \n",T,J,L);
 
-free(lam);
-free(b);
-for(i=0;i<2;i++){
-   for(j=0;j<6;j++) free(W[i][j]);
-   free(W[i]);
-   free(F[i]);}
-free(W);
-free(F);
-for(i=0;i<N;i++) {free(Rpr[i]);
+  free(lam);
+  free(b);
+  for(i=0;i<2;i++){
+    for(j=0;j<6;j++) free(W[i][j]);
+    free(W[i]);
+    free(F[i]);}
+  free(W);
+  free(F);
+  for(i=0;i<N;i++) {free(Rpr[i]);
     free(P[i]);}
-free(Rpr);
-free(P);
-for(i=0;i<ncells;i++) free(G[i]);
-free(G);
-free(Bind);
-free(constr);
-free(hm);
-free(Plam);
+  free(Rpr);
+  free(P);
+  for(i=0;i<ncells;i++) free(G[i]);
+  free(G);
+  free(Bind);
+  free(constr);
+  free(hm);
+  free(Plam);
 
-return (sqrt(nonzero));
+  return (sqrt(nonzero));
 
 }
 
@@ -1964,26 +1964,26 @@ double VariationalMeshSmoother::localP(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLP
 
   /*-------adaptivity, determined on the first step for adp>0 (nodal based)------*/
   if(f==0)
-  {
-    if(adp>0)
-      avertex(n, afun, Gloc, R, cell_in, nvert, adp, sout);
-    if(adp==0)
     {
-      for(i=0;i<n;i++)
-        Gloc[i]=1.0;
+      if(adp>0)
+        avertex(n, afun, Gloc, R, cell_in, nvert, adp, sout);
+      if(adp==0)
+        {
+          for(i=0;i<n;i++)
+            Gloc[i]=1.0;
+        }
     }
-  }
 
-fun=0; gqmin=1e32; g=0;//Vmin
+  fun=0; gqmin=1e32; g=0;//Vmin
 
-//cell integration depending on cell type
-if(n==2){//2D
-  if(nvert==3){//tri
-    sigma=1.0;
-    fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me, vol, f, &lqmin, adp, Gloc, sigma, sout);
-    g+=sigma*lqmin;
-    if(gqmin>lqmin) gqmin=lqmin;
-  }
+  //cell integration depending on cell type
+  if(n==2){//2D
+    if(nvert==3){//tri
+      sigma=1.0;
+      fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me, vol, f, &lqmin, adp, Gloc, sigma, sout);
+      g+=sigma*lqmin;
+      if(gqmin>lqmin) gqmin=lqmin;
+    }
     if(nvert==4){//quad
       for(i=0; i<2; i++){ K[0]=i;
         for(j=0; j<2; j++){ K[1]=j;
@@ -2005,104 +2005,104 @@ if(n==2){//2D
         }
       }
     }
-}
-if(n==3){//3D
-       if(nvert==4){//tetr
-         sigma=1.0;
-         fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
-                     vol, f, &lqmin, adp, Gloc, sigma, sout);
-         g+=sigma*lqmin;
-         if(gqmin>lqmin) gqmin=lqmin;
-       }
-       if(nvert==6){//prism
-         for(i=0;i<2;i++){ K[0]=i;
-           for(j=0;j<2;j++){ K[1]=j;
-             for(k=0;k<3;k++) {K[2]=(double)k/2.0; K[3]=(double)(k%2);
-               sigma=1.0/12.0;
-               fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
-                           vol, f, &lqmin, adp, Gloc, sigma, sout);
-               g+=sigma*lqmin;
-               if(gqmin>lqmin) gqmin=lqmin;
-             }
-           }
-         }
-       }
-       if(nvert==8){//hex
-         for(i=0; i<2; i++){ K[0]=i;
-           for(j=0; j<2; j++){ K[1]=j;
-             for(k=0; k<2; k++){ K[2]=k;
-               for(l=0; l<2; l++){ K[3]=l;
-                 for(m=0; m<2; m++){ K[4]=m;
-                   for(nn=0; nn<2; nn++){ K[5]=nn;
-                     if((i==nn)&&(j==l)&&(k==m)) sigma=(double)1/27;
-                     if(((i==nn)&&(j==l)&&(k!=m))||((i==nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k==m))) sigma=(double)1/(27*2);
-                     if(((i==nn)&&(j!=l)&&(k!=m))||((i!=nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k!=m))) sigma=(double)1/(27*4);
-                     if((i!=nn)&&(j!=l)&&(k!=m)) sigma=(double)1/(27*8);
-                     fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
-                                 vol, f, &lqmin, adp, Gloc, sigma, sout);
-                     g+=sigma*lqmin;
-                     if(gqmin>lqmin) gqmin=lqmin;
-                   }
-                 }
-               }
-             }
-           }
-         }
-       } else {//quad tetr
-         for(i=0;i<4;i++){
-           for(j=0;j<4;j++){
-             for(k=0;k<4;k++){
-               switch (i)
-                 { case 0 : K[0]=0; K[1]=0; K[2]=0; break;
-                 case 1 : K[0]=1; K[1]=0; K[2]=0; break;
-                 case 2 : K[0]=1.0/2; K[1]=1; K[2]=0; break;
-                 case 3 : K[0]=1.0/2; K[1]=1.0/3; K[2]=1; break; }
-               switch (j)
-                 { case 0 : K[3]=0; K[4]=0; K[5]=0; break;
-                 case 1 : K[3]=1; K[4]=0; K[5]=0; break;
-                 case 2 : K[3]=1.0/2; K[4]=1; K[5]=0; break;
-                 case 3 : K[3]=1.0/2; K[4]=1.0/3; K[5]=1; break; }
-               switch (k)
-                 { case 0 : K[6]=0; K[7]=0; K[8]=0; break;
-                 case 1 : K[6]=1; K[7]=0; K[8]=0; break;
-                 case 2 : K[6]=1.0/2; K[7]=1; K[8]=0; break;
-                 case 3 : K[6]=1.0/2; K[7]=1.0/3; K[8]=1; break; }
-               if((i==j)&&(j==k)) sigma=1.0/120; else
-                 if((i==j)||(j==k)||(i==k)) sigma=1.0/360; else sigma=1.0/720;
-               fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
-                           vol, f, &lqmin, adp, Gloc, sigma, sout);
-               g+=sigma*lqmin;
-               if(gqmin>lqmin) gqmin=lqmin;
-             }
-           }
-         }
-       }
-}
-
-/*---fixed nodes correction---*/
-for(ii=0;ii<nvert;ii++)
-{
-    if(mask[cell_in[ii]]==1)
-    {
-      for(kk=0;kk<n;kk++)
-      {
-        for(jj=0;jj<nvert;jj++)
-          {
-            W[kk][ii][jj]=0;
-            W[kk][jj][ii]=0;
+  }
+  if(n==3){//3D
+    if(nvert==4){//tetr
+      sigma=1.0;
+      fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
+                  vol, f, &lqmin, adp, Gloc, sigma, sout);
+      g+=sigma*lqmin;
+      if(gqmin>lqmin) gqmin=lqmin;
+    }
+    if(nvert==6){//prism
+      for(i=0;i<2;i++){ K[0]=i;
+        for(j=0;j<2;j++){ K[1]=j;
+          for(k=0;k<3;k++) {K[2]=(double)k/2.0; K[3]=(double)(k%2);
+            sigma=1.0/12.0;
+            fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
+                        vol, f, &lqmin, adp, Gloc, sigma, sout);
+            g+=sigma*lqmin;
+            if(gqmin>lqmin) gqmin=lqmin;
           }
-
-        W[kk][ii][ii]=1;
-        F[kk][ii]=0;
+        }
       }
     }
-}
-/*---end of fixed nodes correction---*/
+    if(nvert==8){//hex
+      for(i=0; i<2; i++){ K[0]=i;
+        for(j=0; j<2; j++){ K[1]=j;
+          for(k=0; k<2; k++){ K[2]=k;
+            for(l=0; l<2; l++){ K[3]=l;
+              for(m=0; m<2; m++){ K[4]=m;
+                for(nn=0; nn<2; nn++){ K[5]=nn;
+                  if((i==nn)&&(j==l)&&(k==m)) sigma=(double)1/27;
+                  if(((i==nn)&&(j==l)&&(k!=m))||((i==nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k==m))) sigma=(double)1/(27*2);
+                  if(((i==nn)&&(j!=l)&&(k!=m))||((i!=nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k!=m))) sigma=(double)1/(27*4);
+                  if((i!=nn)&&(j!=l)&&(k!=m)) sigma=(double)1/(27*8);
+                  fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
+                              vol, f, &lqmin, adp, Gloc, sigma, sout);
+                  g+=sigma*lqmin;
+                  if(gqmin>lqmin) gqmin=lqmin;
+                }
+              }
+            }
+          }
+        }
+      }
+    } else {//quad tetr
+      for(i=0;i<4;i++){
+        for(j=0;j<4;j++){
+          for(k=0;k<4;k++){
+            switch (i)
+              { case 0 : K[0]=0; K[1]=0; K[2]=0; break;
+              case 1 : K[0]=1; K[1]=0; K[2]=0; break;
+              case 2 : K[0]=1.0/2; K[1]=1; K[2]=0; break;
+              case 3 : K[0]=1.0/2; K[1]=1.0/3; K[2]=1; break; }
+            switch (j)
+              { case 0 : K[3]=0; K[4]=0; K[5]=0; break;
+              case 1 : K[3]=1; K[4]=0; K[5]=0; break;
+              case 2 : K[3]=1.0/2; K[4]=1; K[5]=0; break;
+              case 3 : K[3]=1.0/2; K[4]=1.0/3; K[5]=1; break; }
+            switch (k)
+              { case 0 : K[6]=0; K[7]=0; K[8]=0; break;
+              case 1 : K[6]=1; K[7]=0; K[8]=0; break;
+              case 2 : K[6]=1.0/2; K[7]=1; K[8]=0; break;
+              case 3 : K[6]=1.0/2; K[7]=1.0/3; K[8]=1; break; }
+            if((i==j)&&(j==k)) sigma=1.0/120; else
+              if((i==j)||(j==k)||(i==k)) sigma=1.0/360; else sigma=1.0/720;
+            fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
+                        vol, f, &lqmin, adp, Gloc, sigma, sout);
+            g+=sigma*lqmin;
+            if(gqmin>lqmin) gqmin=lqmin;
+          }
+        }
+      }
+    }
+  }
 
-(*Vmin)=g;
-(*qmin)=gqmin/vol;
+  /*---fixed nodes correction---*/
+  for(ii=0;ii<nvert;ii++)
+    {
+      if(mask[cell_in[ii]]==1)
+        {
+          for(kk=0;kk<n;kk++)
+            {
+              for(jj=0;jj<nvert;jj++)
+                {
+                  W[kk][ii][jj]=0;
+                  W[kk][jj][ii]=0;
+                }
 
-return fun;
+              W[kk][ii][ii]=1;
+              F[kk][ii]=0;
+            }
+        }
+    }
+  /*---end of fixed nodes correction---*/
+
+  (*Vmin)=g;
+  (*qmin)=gqmin/vol;
+
+  return fun;
 }
 
 /**
@@ -2124,12 +2124,12 @@ double VariationalMeshSmoother::avertex(int n, LPDOUBLE afun, LPDOUBLE G, LPLPDO
 
   basisA(n,Q,nvert,K,Q,1);
   for(i=0;i<n;i++){a1[i]=0; a2[i]=0; a3[i]=0; qu[i]=0;
-     for(j=0;j<nvert;j++){
-       a1[i]+=Q[i][j]*R[cell_in[j]][0];
-       a2[i]+=Q[i][j]*R[cell_in[j]][1];
-       if(n==3) a3[i]+=Q[i][j]*R[cell_in[j]][2];
-       qu[i]+=Q[i][j]*afun[cell_in[j]];
-     }
+    for(j=0;j<nvert;j++){
+      a1[i]+=Q[i][j]*R[cell_in[j]][0];
+      a2[i]+=Q[i][j]*R[cell_in[j]][1];
+      if(n==3) a3[i]+=Q[i][j]*R[cell_in[j]][2];
+      qu[i]+=Q[i][j]*afun[cell_in[j]];
+    }
   }
   if(n==2) det=jac2(a1[0],a1[1],a2[0],a2[1]); else det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
   if(det!=0){
@@ -2156,10 +2156,10 @@ double VariationalMeshSmoother::avertex(int n, LPDOUBLE afun, LPDOUBLE G, LPLPDO
   } else {g=1.0; for(i=0;i<n;i++) G[i]=g;}
 
 
- for(i=0;i<n;i++) free(Q[i]);
- free(Q);
+  for(i=0;i<n;i++) free(Q[i]);
+  free(Q);
 
- return(g);
+  return(g);
 
 }
 
@@ -2179,64 +2179,64 @@ double VariationalMeshSmoother::vertex(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLP
   double tr=0.0, det=0.0, dchi, chi, fet, phit=0.0, G, con=100.0;
   Q = alloc_d_n1_n2(3, nvert);
   for(i=0;i<n;i++) Q[i]=alloc_d_n1(nvert);
-if(f==0){
-  gpr = alloc_d_n1_n2(3, nvert);
-  dphi=alloc_d_n1_n2(3,3);
-  dfe=alloc_d_n1_n2(3,3);
-  for(i=0;i<n;i++){ gpr[i]=alloc_d_n1(nvert);
+  if(f==0){
+    gpr = alloc_d_n1_n2(3, nvert);
+    dphi=alloc_d_n1_n2(3,3);
+    dfe=alloc_d_n1_n2(3,3);
+    for(i=0;i<n;i++){ gpr[i]=alloc_d_n1(nvert);
       dphi[i]=alloc_d_n1(3);
       dfe[i]=alloc_d_n1(3);}
-  P = alloc_d_n1_n2_n3(3,3,3);
-  d2phi = alloc_d_n1_n2_n3(3,3,3);
-  for(i=0;i<n;i++){ P[i]=alloc_d_n1_n2(3,3);
-     d2phi[i]=alloc_d_n1_n2(3,3);
-     for(j=0;j<n;j++){ P[i][j]=alloc_d_n1(3);
-       d2phi[i][j]=alloc_d_n1(3);}
+    P = alloc_d_n1_n2_n3(3,3,3);
+    d2phi = alloc_d_n1_n2_n3(3,3,3);
+    for(i=0;i<n;i++){ P[i]=alloc_d_n1_n2(3,3);
+      d2phi[i]=alloc_d_n1_n2(3,3);
+      for(j=0;j<n;j++){ P[i][j]=alloc_d_n1(3);
+        d2phi[i][j]=alloc_d_n1(3);}
+    }
   }
-}
 
   /*--------hessian, function, gradient-----------------------*/
   basisA(n,Q,nvert,K,H,me);
   for(i=0;i<n;i++)
-  {
-    a1[i]=0;
-    a2[i]=0;
-    a3[i]=0;
-    for(j=0;j<nvert;j++)
     {
-      a1[i]+=Q[i][j]*R[cell_in[j]][0];
-      a2[i]+=Q[i][j]*R[cell_in[j]][1];
-      if(n==3)
-        a3[i]+=Q[i][j]*R[cell_in[j]][2];
+      a1[i]=0;
+      a2[i]=0;
+      a3[i]=0;
+      for(j=0;j<nvert;j++)
+        {
+          a1[i]+=Q[i][j]*R[cell_in[j]][0];
+          a2[i]+=Q[i][j]*R[cell_in[j]][1];
+          if(n==3)
+            a3[i]+=Q[i][j]*R[cell_in[j]][2];
+        }
     }
-  }
   //account for adaptation
   if(adp<2)
     G=g[0];
   else
-  {
-    G=1.0;
-    for(i=0;i<n;i++)
     {
-      a1[i]*=sqrt(g[0]);
-      a2[i]*=sqrt(g[1]);
-      if(n==3)
-        a3[i]*=sqrt(g[2]);
+      G=1.0;
+      for(i=0;i<n;i++)
+        {
+          a1[i]*=sqrt(g[0]);
+          a2[i]*=sqrt(g[1]);
+          if(n==3)
+            a3[i]*=sqrt(g[2]);
+        }
     }
-  }
 
   if(n==2)
-  {
-    av1[0]= a2[1];  av1[1]=-a2[0];
-    av2[0]=-a1[1];  av2[1]= a1[0];
-    det=jac2(a1[0],a1[1],a2[0],a2[1]);
-    tr=0;
-    for(i=0;i<2;i++) tr=tr+a1[i]*a1[i]/2+a2[i]*a2[i]/2;
+    {
+      av1[0]= a2[1];  av1[1]=-a2[0];
+      av2[0]=-a1[1];  av2[1]= a1[0];
+      det=jac2(a1[0],a1[1],a2[0],a2[1]);
+      tr=0;
+      for(i=0;i<2;i++) tr=tr+a1[i]*a1[i]/2+a2[i]*a2[i]/2;
       phit=(1-w)*tr+w*(vol/G+det*det*G/vol)/(double)2;
-  }
+    }
 
   if(n==3)
-  {
+    {
       av1[0]= a2[1]*a3[2]-a2[2]*a3[1];  av1[1]=a2[2]*a3[0]-a2[0]*a3[2]; av1[2]=a2[0]*a3[1]-a2[1]*a3[0];
       av2[0]= a3[1]*a1[2]-a3[2]*a1[1];  av2[1]=a3[2]*a1[0]-a3[0]*a1[2]; av2[2]=a3[0]*a1[1]-a3[1]*a1[0];
       av3[0]= a1[1]*a2[2]-a1[2]*a2[1];  av3[1]=a1[2]*a2[0]-a1[0]*a2[2]; av3[2]=a1[0]*a2[1]-a1[1]*a2[0];
@@ -2244,7 +2244,7 @@ if(f==0){
       tr=0;
       for(i=0;i<3;i++) tr=tr+a1[i]*a1[i]/3+a2[i]*a2[i]/3+a3[i]*a3[i]/3;
       phit=(1-w)*pow(tr,1.5)+w*(vol/G+det*det*G/vol)/(double)2;
-  }
+    }
 
   dchi=0.5+det*0.5/sqrt(epsilon*epsilon+det*det);
   chi=0.5*(det+sqrt(epsilon*epsilon+det*det));
@@ -2253,159 +2253,159 @@ if(f==0){
 
   //gradient and Hessian
   if(f==0)
-  {
-    if(n==2)
     {
-      for(i=0;i<2;i++)
-      {
-        dphi[0][i]=(1-w)*a1[i]+w*G*det*av1[i]/vol;
-        dphi[1][i]=(1-w)*a2[i]+w*G*det*av2[i]/vol;
-      }
+      if(n==2)
+        {
+          for(i=0;i<2;i++)
+            {
+              dphi[0][i]=(1-w)*a1[i]+w*G*det*av1[i]/vol;
+              dphi[1][i]=(1-w)*a2[i]+w*G*det*av2[i]/vol;
+            }
 
-      for(i=0;i<2;i++)
-      {
-        for(j=0;j<2;j++)
-          {
-            d2phi[0][i][j]=w*G*av1[i]*av1[j]/vol;
-            d2phi[1][i][j]=w*G*av2[i]*av2[j]/vol;
+          for(i=0;i<2;i++)
+            {
+              for(j=0;j<2;j++)
+                {
+                  d2phi[0][i][j]=w*G*av1[i]*av1[j]/vol;
+                  d2phi[1][i][j]=w*G*av2[i]*av2[j]/vol;
 
-            if(i==j) for(k=0;k<2;k++)
-                       {
-                         d2phi[k][i][j]+=(1-w);
-                       }
-          }
-      }
+                  if(i==j) for(k=0;k<2;k++)
+                             {
+                               d2phi[k][i][j]+=(1-w);
+                             }
+                }
+            }
 
-      for(i=0;i<2;i++)
-      {
-        dfe[0][i]=(dphi[0][i]-fet*dchi*av1[i])/chi;
-        dfe[1][i]=(dphi[1][i]-fet*dchi*av2[i])/chi;
-      }
+          for(i=0;i<2;i++)
+            {
+              dfe[0][i]=(dphi[0][i]-fet*dchi*av1[i])/chi;
+              dfe[1][i]=(dphi[1][i]-fet*dchi*av2[i])/chi;
+            }
 
-      for(i=0;i<2;i++)
-      {
-        for(j=0;j<2;j++)
-          {
-            P[0][i][j]=(d2phi[0][i][j]-dchi*(av1[i]*dfe[0][j]+dfe[0][i]*av1[j]))/chi;
-            P[1][i][j]=(d2phi[1][i][j]-dchi*(av2[i]*dfe[1][j]+dfe[1][i]*av2[j]))/chi;
-          }
-      }
+          for(i=0;i<2;i++)
+            {
+              for(j=0;j<2;j++)
+                {
+                  P[0][i][j]=(d2phi[0][i][j]-dchi*(av1[i]*dfe[0][j]+dfe[0][i]*av1[j]))/chi;
+                  P[1][i][j]=(d2phi[1][i][j]-dchi*(av2[i]*dfe[1][j]+dfe[1][i]*av2[j]))/chi;
+                }
+            }
+        }
+
+      if(n==3)
+        {
+          for(i=0;i<3;i++)
+            {
+              dphi[0][i]=(1-w)*sqrt(tr)*a1[i]+w*G*det*av1[i]/vol;
+              dphi[1][i]=(1-w)*sqrt(tr)*a2[i]+w*G*det*av2[i]/vol;
+              dphi[2][i]=(1-w)*sqrt(tr)*a3[i]+w*G*det*av3[i]/vol;
+            }
+
+          for(i=0;i<3;i++)
+            {
+              if(tr!=0)
+                {
+                  d2phi[0][i][i]=(1-w)/((double)3*sqrt(tr))*a1[i]*a1[i]+w*G*av1[i]*av1[i]/vol;
+                  d2phi[1][i][i]=(1-w)/((double)3*sqrt(tr))*a2[i]*a2[i]+w*G*av2[i]*av2[i]/vol;
+                  d2phi[2][i][i]=(1-w)/((double)3*sqrt(tr))*a3[i]*a3[i]+w*G*av3[i]*av3[i]/vol;
+                }
+              else
+                {
+                  for(k=0;k<3;k++)
+                    d2phi[k][i][i]=0;
+                }
+
+              for(k=0;k<3;k++)
+                d2phi[k][i][i]+=(1-w)*sqrt(tr);
+            }
+
+          for(i=0;i<3;i++)
+            {
+              dfe[0][i]=(dphi[0][i]-fet*dchi*av1[i]+con*epsilon*a1[i])/chi;
+              dfe[1][i]=(dphi[1][i]-fet*dchi*av2[i]+con*epsilon*a2[i])/chi;
+              dfe[2][i]=(dphi[2][i]-fet*dchi*av3[i]+con*epsilon*a3[i])/chi;
+            }
+
+          for(i=0;i<3;i++)
+            {
+              P[0][i][i]=(d2phi[0][i][i]-dchi*(av1[i]*dfe[0][i]+dfe[0][i]*av1[i])+con*epsilon)/chi;
+              P[1][i][i]=(d2phi[1][i][i]-dchi*(av2[i]*dfe[1][i]+dfe[1][i]*av2[i])+con*epsilon)/chi;
+              P[2][i][i]=(d2phi[2][i][i]-dchi*(av3[i]*dfe[2][i]+dfe[2][i]*av3[i])+con*epsilon)/chi;
+            }
+
+          for(k=0;k<3;k++)
+            {
+              for(i=0;i<3;i++)
+                {
+                  for(j=0;j<3;j++)
+                    {
+                      if(i!=j)
+                        P[k][i][j]=0;
+                    }
+                }
+            }
+        }
+
+      /*--------matrix W, right side F---------------------*/
+      for(i1=0;i1<n;i1++)
+        {
+          for(i=0;i<n;i++)
+            {
+              for(j=0;j<nvert;j++)
+                {
+                  gpr[i][j]=0;
+                  for(k=0;k<n;k++) gpr[i][j]=gpr[i][j]+P[i1][i][k]*Q[k][j];
+                }
+            }
+
+          for(i=0;i<nvert;i++)
+            {
+              for(j=0;j<nvert;j++)
+                {
+                  for(k=0;k<n;k++)
+                    {
+                      W[i1][i][j]=W[i1][i][j]+Q[k][i]*gpr[k][j]*sigma;
+                    }
+                }
+            }
+
+          for(i=0;i<nvert;i++)
+            {
+              for(k=0;k<2;k++)
+                F[i1][i]=F[i1][i]+Q[k][i]*dfe[i1][k]*sigma;
+            }
+        }
     }
-
-    if(n==3)
-    {
-      for(i=0;i<3;i++)
-      {
-        dphi[0][i]=(1-w)*sqrt(tr)*a1[i]+w*G*det*av1[i]/vol;
-        dphi[1][i]=(1-w)*sqrt(tr)*a2[i]+w*G*det*av2[i]/vol;
-        dphi[2][i]=(1-w)*sqrt(tr)*a3[i]+w*G*det*av3[i]/vol;
-      }
-
-      for(i=0;i<3;i++)
-      {
-        if(tr!=0)
-          {
-            d2phi[0][i][i]=(1-w)/((double)3*sqrt(tr))*a1[i]*a1[i]+w*G*av1[i]*av1[i]/vol;
-            d2phi[1][i][i]=(1-w)/((double)3*sqrt(tr))*a2[i]*a2[i]+w*G*av2[i]*av2[i]/vol;
-            d2phi[2][i][i]=(1-w)/((double)3*sqrt(tr))*a3[i]*a3[i]+w*G*av3[i]*av3[i]/vol;
-          }
-        else
-          {
-            for(k=0;k<3;k++)
-              d2phi[k][i][i]=0;
-          }
-
-        for(k=0;k<3;k++)
-          d2phi[k][i][i]+=(1-w)*sqrt(tr);
-      }
-
-      for(i=0;i<3;i++)
-      {
-        dfe[0][i]=(dphi[0][i]-fet*dchi*av1[i]+con*epsilon*a1[i])/chi;
-        dfe[1][i]=(dphi[1][i]-fet*dchi*av2[i]+con*epsilon*a2[i])/chi;
-        dfe[2][i]=(dphi[2][i]-fet*dchi*av3[i]+con*epsilon*a3[i])/chi;
-      }
-
-      for(i=0;i<3;i++)
-      {
-        P[0][i][i]=(d2phi[0][i][i]-dchi*(av1[i]*dfe[0][i]+dfe[0][i]*av1[i])+con*epsilon)/chi;
-        P[1][i][i]=(d2phi[1][i][i]-dchi*(av2[i]*dfe[1][i]+dfe[1][i]*av2[i])+con*epsilon)/chi;
-        P[2][i][i]=(d2phi[2][i][i]-dchi*(av3[i]*dfe[2][i]+dfe[2][i]*av3[i])+con*epsilon)/chi;
-      }
-
-      for(k=0;k<3;k++)
-      {
-        for(i=0;i<3;i++)
-          {
-            for(j=0;j<3;j++)
-              {
-                if(i!=j)
-                  P[k][i][j]=0;
-              }
-          }
-      }
-    }
-
-    /*--------matrix W, right side F---------------------*/
-    for(i1=0;i1<n;i1++)
-    {
-      for(i=0;i<n;i++)
-      {
-        for(j=0;j<nvert;j++)
-          {
-            gpr[i][j]=0;
-            for(k=0;k<n;k++) gpr[i][j]=gpr[i][j]+P[i1][i][k]*Q[k][j];
-          }
-      }
-
-      for(i=0;i<nvert;i++)
-      {
-        for(j=0;j<nvert;j++)
-          {
-            for(k=0;k<n;k++)
-              {
-                W[i1][i][j]=W[i1][i][j]+Q[k][i]*gpr[k][j]*sigma;
-              }
-          }
-      }
-
-      for(i=0;i<nvert;i++)
-      {
-        for(k=0;k<2;k++)
-          F[i1][i]=F[i1][i]+Q[k][i]*dfe[i1][k]*sigma;
-      }
-    }
-  }
 
   /*----------------------------------------*/
   for(i=0;i<n;i++)
     free(Q[i]);
   free(Q);
   if(f==0)
-  {
-    for(i=0;i<n;i++)
     {
-      free(gpr[i]);
-      free(dphi[i]);
-      free(dfe[i]);
-    }
-    free(gpr);
-    free(dphi);
-    free(dfe);
+      for(i=0;i<n;i++)
+        {
+          free(gpr[i]);
+          free(dphi[i]);
+          free(dfe[i]);
+        }
+      free(gpr);
+      free(dphi);
+      free(dfe);
 
-    for(i=0;i<n;i++)
-    {
-      for(j=0;j<n;j++)
-      {
-        free(P[i][j]);
-        free(d2phi[i][j]);
-      }
-      free(P[i]);
-      free(d2phi[i]);
+      for(i=0;i<n;i++)
+        {
+          for(j=0;j<n;j++)
+            {
+              free(P[i][j]);
+              free(d2phi[i][j]);
+            }
+          free(P[i]);
+          free(d2phi[i]);
+        }
+      free(P);
+      free(d2phi);
     }
-    free(P);
-    free(d2phi);
-  }
 
   return (fet*sigma);
 }
@@ -2417,43 +2417,43 @@ if(f==0){
  */
 int VariationalMeshSmoother::solver(int n, LPINT ia, LPINT ja, LPDOUBLE a, LPDOUBLE x, LPDOUBLE b, double eps, int maxite, int msglev, FILE *sout)
 {
-    int info, i;
-    LPDOUBLE u, r, p, z;
+  int info, i;
+  LPDOUBLE u, r, p, z;
 
-    info = 0;
+  info = 0;
 
-    fprintf(sout, "Beginning Solve %d\n", n);
+  fprintf(sout, "Beginning Solve %d\n", n);
 
 
-    // Check parameters
-    info=pcg_par_check(n, ia, ja, a, eps, maxite, msglev, sout);
-    if (info != 0)
-      return info;
-
-    // Allocate working arrays
-    u=alloc_d_n1(n);
-    r=alloc_d_n1(n);
-    p=alloc_d_n1(n);
-    z=alloc_d_n1(n);
-
-    // PJ preconditioner construction
-    for (i=0;i<n;i++) u[i]=1.0/a[ia[i]];
-
-    // PCG iterations
-    info=pcg_ic0(n, ia, ja, a, u, x, b, r, p, z, eps, maxite, msglev, sout);
-
-    // Free working arrays
-    free(u);
-    free(r);
-    free(p);
-    free(z);
-
-    //Mat sparse_global;
-    //MatCreateSeqAIJWithArrays(PETSC_COMM_SELF,n,n,ia,ja,a,&sparse_global);
-
-    fprintf(sout, "Finished Solve %d\n",n);
-
+  // Check parameters
+  info=pcg_par_check(n, ia, ja, a, eps, maxite, msglev, sout);
+  if (info != 0)
     return info;
+
+  // Allocate working arrays
+  u=alloc_d_n1(n);
+  r=alloc_d_n1(n);
+  p=alloc_d_n1(n);
+  z=alloc_d_n1(n);
+
+  // PJ preconditioner construction
+  for (i=0;i<n;i++) u[i]=1.0/a[ia[i]];
+
+  // PCG iterations
+  info=pcg_ic0(n, ia, ja, a, u, x, b, r, p, z, eps, maxite, msglev, sout);
+
+  // Free working arrays
+  free(u);
+  free(r);
+  free(p);
+  free(z);
+
+  //Mat sparse_global;
+  //MatCreateSeqAIJWithArrays(PETSC_COMM_SELF,n,n,ia,ja,a,&sparse_global);
+
+  fprintf(sout, "Finished Solve %d\n",n);
+
+  return info;
 }
 
 /**
@@ -2461,63 +2461,63 @@ int VariationalMeshSmoother::solver(int n, LPINT ia, LPINT ja, LPDOUBLE a, LPDOU
  */
 int VariationalMeshSmoother::pcg_par_check(int n, LPINT ia, LPINT ja, LPDOUBLE a, double eps, int maxite, int msglev, FILE *sout)
 {
-    int i, j, jj, k;
+  int i, j, jj, k;
 
-    if (n<=0){
-      if (msglev>0) fprintf(sout, "sol_pcg: incorrect input parameter: n =%d \n",n);
-      return -1;
-    }
-    if (ia[0]!=0) {
-      if (msglev > 0) fprintf(sout, "sol_pcg: incorrect input parameter: ia(1) =%d \n", ia[0]);
+  if (n<=0){
+    if (msglev>0) fprintf(sout, "sol_pcg: incorrect input parameter: n =%d \n",n);
+    return -1;
+  }
+  if (ia[0]!=0) {
+    if (msglev > 0) fprintf(sout, "sol_pcg: incorrect input parameter: ia(1) =%d \n", ia[0]);
+    return -2;
+  }
+  for (i=0;i<n;i++) {
+    if (ia[i+1]<ia[i]) {
+      if (msglev>=1)fprintf(sout, "sol_pcg: incorrect input parameter: i =%d ; ia(i) =%d  must be <= a(i+1) =%d \n",
+                            (i+1), ia[i], ia[i+1]);
       return -2;
     }
-    for (i=0;i<n;i++) {
-      if (ia[i+1]<ia[i]) {
-        if (msglev>=1)fprintf(sout, "sol_pcg: incorrect input parameter: i =%d ; ia(i) =%d  must be <= a(i+1) =%d \n",
-                              (i+1), ia[i], ia[i+1]);
-        return -2;
-      }
+  }
+  for (i=0;i<n;i++) {
+    if (ja[ia[i]]!=(i+1)) {
+      if (msglev>=1) fprintf(sout, "sol_pcg: incorrect input parameter: i =%d ; ia(i) =%d ; absence of diagonal entry; k =%d ; the value ja(k) =%d  must be equal to i\n",
+                             (i+1), ia[i], ia[i]+1, ja[ia[i]]);
+      return -3;
     }
-    for (i=0;i<n;i++) {
-      if (ja[ia[i]]!=(i+1)) {
-        if (msglev>=1) fprintf(sout, "sol_pcg: incorrect input parameter: i =%d ; ia(i) =%d ; absence of diagonal entry; k =%d ; the value ja(k) =%d  must be equal to i\n",
-                               (i+1), ia[i], ia[i]+1, ja[ia[i]]);
+    jj = 0;
+    for (k=ia[i];k<ia[i+1];k++) {
+      j=ja[k];
+      if ((j<(i+1))||(j>n)) {
+        if (msglev>=1) fprintf(sout, "sol_pcg: incorrect input parameter: i =%d ; ia(i) =%d ; a(i+1) =%d ; k =%d ; the value ja(k) =%d  is out of range\n",
+                               (i+1), ia[i], ia[i+1], (k+1), ja[k]);
         return -3;
       }
-      jj = 0;
-      for (k=ia[i];k<ia[i+1];k++) {
-        j=ja[k];
-        if ((j<(i+1))||(j>n)) {
-          if (msglev>=1) fprintf(sout, "sol_pcg: incorrect input parameter: i =%d ; ia(i) =%d ; a(i+1) =%d ; k =%d ; the value ja(k) =%d  is out of range\n",
-                                 (i+1), ia[i], ia[i+1], (k+1), ja[k]);
-          return -3;
-        }
-        if (j<=jj) {
-          if (msglev >= 1) fprintf(sout, "sol_pcg: incorrect input parameter: i =%d ; ia(i) =%d ; a(i+1) =%d ; k =%d ; the value ja(k) =%d  must be less than ja(k+1) =%d \n",
-                                   (i+1), ia[i], ia[i+1], (k+1), ja[k], ja[k+1]);
-          return -3;
-        }
-        jj=j;
+      if (j<=jj) {
+        if (msglev >= 1) fprintf(sout, "sol_pcg: incorrect input parameter: i =%d ; ia(i) =%d ; a(i+1) =%d ; k =%d ; the value ja(k) =%d  must be less than ja(k+1) =%d \n",
+                                 (i+1), ia[i], ia[i+1], (k+1), ja[k], ja[k+1]);
+        return -3;
       }
+      jj=j;
     }
+  }
 
-    for (i=0;i<n;i++) {
-      if (a[ia[i]]<=0.0e0) {
-        if (msglev>=1) fprintf(sout, "sol_pcg: incorrect input parameter: i =%d ; ia(i) =%d ; the diagonal entry a(ia(i)) =%g  must be > 0\n",
-                               (i+1), ia[i], a[ia[i]]);
-        return -4;
-      }
+  for (i=0;i<n;i++) {
+    if (a[ia[i]]<=0.0e0) {
+      if (msglev>=1) fprintf(sout, "sol_pcg: incorrect input parameter: i =%d ; ia(i) =%d ; the diagonal entry a(ia(i)) =%g  must be > 0\n",
+                             (i+1), ia[i], a[ia[i]]);
+      return -4;
     }
+  }
 
-    if (eps<0.0e0) {
-      if (msglev>0) fprintf(sout, "sol_pcg: incorrect input parameter: eps =%g \n",eps);
-      return -7;
-    }
-    if (maxite<1) {
-      if (msglev>0) fprintf(sout, "sol_pcg: incorrect input parameter: maxite =%d \n", maxite);
-      return -8;
-    }
-    return 0;
+  if (eps<0.0e0) {
+    if (msglev>0) fprintf(sout, "sol_pcg: incorrect input parameter: eps =%g \n",eps);
+    return -7;
+  }
+  if (maxite<1) {
+    if (msglev>0) fprintf(sout, "sol_pcg: incorrect input parameter: maxite =%d \n", maxite);
+    return -8;
+  }
+  return 0;
 }
 
 /**
@@ -2526,57 +2526,57 @@ int VariationalMeshSmoother::pcg_par_check(int n, LPINT ia, LPINT ja, LPDOUBLE a
 int VariationalMeshSmoother::pcg_ic0(int n, LPINT ia, LPINT ja, LPDOUBLE a, LPDOUBLE u, LPDOUBLE x, LPDOUBLE b, LPDOUBLE r,
                                      LPDOUBLE p, LPDOUBLE z, double eps, int maxite, int msglev, FILE *sout)
 {
-    int i, ii, j, k;
-    double beta, pap, rhr = 0.0, rhr0 = 0.0, rhrold = 0.0, alpha, rr0 = 0.0, rr;
+  int i, ii, j, k;
+  double beta, pap, rhr = 0.0, rhr0 = 0.0, rhrold = 0.0, alpha, rr0 = 0.0, rr;
 
-    for(i=0;i<=maxite;i++){
-      if(i==0) for(k=0;k<n;k++) p[k]=x[k];
-      //z=Ap
-      for(ii=0;ii<n;ii++) z[ii]=0.0;
-       for(ii=0;ii<n;ii++){
-         z[ii]+=a[ia[ii]]*p[ii];
-         for(j=ia[ii]+1;j<ia[ii+1];j++){
-           z[ii]+=a[j]*p[ja[j]-1];
-           z[ja[j]-1]+=a[j]*p[ii];
-         }
-       }
-       if(i==0) for(k=0;k<n;k++) r[k]=b[k]-z[k]; //r(0) = b - Ax(0)
-       if(i>0){
-         pap=0.0;
-         for(k=0;k<n;k++) pap+=p[k]*z[k];
-         alpha=rhr/pap;
-         for(k=0;k<n;k++){
-           x[k]+=p[k]*alpha;
-           r[k]-=z[k]*alpha;
-         }
-         rhrold = rhr;
-       }
-       // z = H * r
-       for(ii=0;ii<n;ii++) z[ii]=r[ii]*u[ii];
-       if(i==0) for(k=0;k<n;k++) p[k]=z[k];// p(0) = Hr(0)
-       rhr=0.0;
-       rr=0.0;
-       for(k=0;k<n;k++){
-         rhr+=r[k]*z[k];
-         rr+=r[k]*r[k];
-       }
-       if(i==0){
-         rhr0 = rhr;
-         rr0 = rr;
-       }
-       if(msglev>0) fprintf(sout, "%d )  rHr =%g  rr =%g \n", i, sqrt(rhr/rhr0), sqrt(rr/rr0));
-
-       if(rr<=eps*eps*rr0) return i;
-
-       if(i>=maxite) return i;
-
-       if(i>0){
-         beta=rhr/rhrold;
-         for(k=0;k<n;k++) p[k]=z[k]+p[k]*beta;
-       }
+  for(i=0;i<=maxite;i++){
+    if(i==0) for(k=0;k<n;k++) p[k]=x[k];
+    //z=Ap
+    for(ii=0;ii<n;ii++) z[ii]=0.0;
+    for(ii=0;ii<n;ii++){
+      z[ii]+=a[ia[ii]]*p[ii];
+      for(j=ia[ii]+1;j<ia[ii+1];j++){
+        z[ii]+=a[j]*p[ja[j]-1];
+        z[ja[j]-1]+=a[j]*p[ii];
+      }
     }
+    if(i==0) for(k=0;k<n;k++) r[k]=b[k]-z[k]; //r(0) = b - Ax(0)
+    if(i>0){
+      pap=0.0;
+      for(k=0;k<n;k++) pap+=p[k]*z[k];
+      alpha=rhr/pap;
+      for(k=0;k<n;k++){
+        x[k]+=p[k]*alpha;
+        r[k]-=z[k]*alpha;
+      }
+      rhrold = rhr;
+    }
+    // z = H * r
+    for(ii=0;ii<n;ii++) z[ii]=r[ii]*u[ii];
+    if(i==0) for(k=0;k<n;k++) p[k]=z[k];// p(0) = Hr(0)
+    rhr=0.0;
+    rr=0.0;
+    for(k=0;k<n;k++){
+      rhr+=r[k]*z[k];
+      rr+=r[k]*r[k];
+    }
+    if(i==0){
+      rhr0 = rhr;
+      rr0 = rr;
+    }
+    if(msglev>0) fprintf(sout, "%d )  rHr =%g  rr =%g \n", i, sqrt(rhr/rhr0), sqrt(rr/rr0));
 
-    return i;
+    if(rr<=eps*eps*rr0) return i;
+
+    if(i>=maxite) return i;
+
+    if(i>0){
+      beta=rhr/rhrold;
+      for(k=0;k<n;k++) p[k]=z[k]+p[k]*beta;
+    }
+  }
+
+  return i;
 }
 
 /**
@@ -2589,35 +2589,35 @@ void VariationalMeshSmoother::gener(char grid[], int n, FILE *)
   int i, j, k, n1=3, N, ncells, mask, ii, jj, kk, nc;
   double x;
 
-    N=1; ncells=1;
-    for(i=0;i<n;i++){N*=n1; ncells*=(n1-1);}
-    x=1.0/(double)(n1-1);
+  N=1; ncells=1;
+  for(i=0;i<n;i++){N*=n1; ncells*=(n1-1);}
+  x=1.0/(double)(n1-1);
 
-    stream=fopen(grid,"w+");
+  stream=fopen(grid,"w+");
 
-    fprintf(stream,"%d \n%d \n%d \n0 \n",n,N,ncells);
+  fprintf(stream,"%d \n%d \n%d \n0 \n",n,N,ncells);
 
-    for(i=0;i<N;i++){//node coordinates
-      k=i; mask=0;
-      for(j=0;j<n;j++){
-        ii=k%n1;
-        if((ii==0)||(ii==n1-1)) mask=1;
-        //if((i==N/2)&&(j==1)) fprintf(stream,"%e ",(double)ii*x+x/2.0); else
-        fprintf(stream,"%e ",(double)ii*x);
-        k/=n1;
-      }
-      fprintf(stream,"%d \n",mask);
+  for(i=0;i<N;i++){//node coordinates
+    k=i; mask=0;
+    for(j=0;j<n;j++){
+      ii=k%n1;
+      if((ii==0)||(ii==n1-1)) mask=1;
+      //if((i==N/2)&&(j==1)) fprintf(stream,"%e ",(double)ii*x+x/2.0); else
+      fprintf(stream,"%e ",(double)ii*x);
+      k/=n1;
     }
-    for(i=0;i<ncells;i++){//cell connectivity
-      nc=i; ii=nc%(n1-1); nc/=(n1-1); jj=nc%(n1-1); kk=nc/(n1-1);
-      if(n==2) fprintf(stream,"%d %d %d %d ",ii+n1*jj,ii+1+jj*n1,ii+(jj+1)*n1,ii+1+(jj+1)*n1);
-      if(n==3) fprintf(stream,"%d %d %d %d %d %d %d %d ",ii+n1*jj+n1*n1*kk,ii+1+jj*n1+n1*n1*kk,ii+(jj+1)*n1+n1*n1*kk,ii+1+(jj+1)*n1+n1*n1*kk,
-                       ii+n1*jj+n1*n1*(kk+1),ii+1+jj*n1+n1*n1*(kk+1),ii+(jj+1)*n1+n1*n1*(kk+1),ii+1+(jj+1)*n1+n1*n1*(kk+1));
-      fprintf(stream,"-1 -1 0 \n");
-    }
-    fclose(stream);
+    fprintf(stream,"%d \n",mask);
+  }
+  for(i=0;i<ncells;i++){//cell connectivity
+    nc=i; ii=nc%(n1-1); nc/=(n1-1); jj=nc%(n1-1); kk=nc/(n1-1);
+    if(n==2) fprintf(stream,"%d %d %d %d ",ii+n1*jj,ii+1+jj*n1,ii+(jj+1)*n1,ii+1+(jj+1)*n1);
+    if(n==3) fprintf(stream,"%d %d %d %d %d %d %d %d ",ii+n1*jj+n1*n1*kk,ii+1+jj*n1+n1*n1*kk,ii+(jj+1)*n1+n1*n1*kk,ii+1+(jj+1)*n1+n1*n1*kk,
+                     ii+n1*jj+n1*n1*(kk+1),ii+1+jj*n1+n1*n1*(kk+1),ii+(jj+1)*n1+n1*n1*(kk+1),ii+1+(jj+1)*n1+n1*n1*(kk+1));
+    fprintf(stream,"-1 -1 0 \n");
+  }
+  fclose(stream);
 
-    return;
+  return;
 }
 
 /**
@@ -2961,7 +2961,7 @@ void VariationalMeshSmoother::metr_data_gen(char grid[], char metr[], int n, int
           Ncells++;
         }
       }
-  }
+    }
   fclose(stream);
 
   for(i=0;i<n;i++) free(Q[i]);
@@ -3004,16 +3004,16 @@ void VariationalMeshSmoother::metr_data_gen(char grid[], char metr[], int n, int
         fprintf(stream,"%d %d %d %d -1 -1 -1 -1 -1 -1 0\n",cells[i][7],cells[i][5],cells[i][6],cells[i][3]);
         fprintf(stream,"%d %d %d %d -1 -1 -1 -1 -1 -1 0\n",cells[i][6],cells[i][7],cells[i][4],cells[i][2]);
       }
-  }
+    }
 
 
- fclose(stream);
+  fclose(stream);
 
- for(i=0;i<ncells;i++) free(cells[i]);
- free(cells);
- free(mcells);
+  for(i=0;i<ncells;i++) free(cells[i]);
+  free(cells);
+  free(mcells);
 
-return;
+  return;
 }
 
 } // namespace libMesh

@@ -40,17 +40,17 @@ template <typename T>
 void AztecLinearSolver<T>::clear ()
 {
   if (this->initialized())
-  {
-    this->_is_initialized = false;
+    {
+      this->_is_initialized = false;
 
-    // Mimic PETSc default solver and preconditioner
-    this->_solver_type           = GMRES;
+      // Mimic PETSc default solver and preconditioner
+      this->_solver_type           = GMRES;
 
-    if (this->n_processors() == 1)
-      this->_preconditioner_type = ILU_PRECOND;
-    else
-      this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
-  }
+      if (this->n_processors() == 1)
+        this->_preconditioner_type = ILU_PRECOND;
+      else
+        this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
+    }
 }
 
 
@@ -60,39 +60,39 @@ void AztecLinearSolver<T>::init ()
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())
-  {
-    this->_is_initialized = true;
-
-    _linear_solver = new AztecOO();
-
-    set_solver_type();
-
-    switch(this->_preconditioner_type)
     {
-    case ILU_PRECOND:
-      _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
-      _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_ilu);
-      break;
+      this->_is_initialized = true;
 
-    case BLOCK_JACOBI_PRECOND:
-      _linear_solver->SetAztecOption(AZ_precond,AZ_Jacobi);
-      break;
+      _linear_solver = new AztecOO();
 
-    case ICC_PRECOND:
-      _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
-      _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_icc);
-      break;
+      set_solver_type();
 
-    case LU_PRECOND:
-      _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
-      _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_lu);
-      break;
+      switch(this->_preconditioner_type)
+        {
+        case ILU_PRECOND:
+          _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+          _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_ilu);
+          break;
 
-    default:
-      _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
-      _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_ilu);
+        case BLOCK_JACOBI_PRECOND:
+          _linear_solver->SetAztecOption(AZ_precond,AZ_Jacobi);
+          break;
+
+        case ICC_PRECOND:
+          _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+          _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_icc);
+          break;
+
+        case LU_PRECOND:
+          _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+          _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_lu);
+          break;
+
+        default:
+          _linear_solver->SetAztecOption(AZ_precond,AZ_dom_decomp);
+          _linear_solver->SetAztecOption(AZ_subdomain_solve,AZ_ilu);
+        }
     }
-  }
 }
 
 
@@ -205,7 +205,7 @@ template <typename T>
 void AztecLinearSolver<T>::set_solver_type()
 {
   switch (this->_solver_type)
-  {
+    {
     case CG:
       _linear_solver->SetAztecOption(AZ_solver, AZ_cg); return;
 
@@ -223,9 +223,9 @@ void AztecLinearSolver<T>::set_solver_type()
 
     default:
       libMesh::err << "ERROR:  Unsupported AztecOO Solver: "
-                    << Utility::enum_to_string(this->_solver_type) << std::endl
-                    << "Continuing with AztecOO defaults" << std::endl;
-  }
+                   << Utility::enum_to_string(this->_solver_type) << std::endl
+                   << "Continuing with AztecOO defaults" << std::endl;
+    }
 }
 
 //------------------------------------------------------------------

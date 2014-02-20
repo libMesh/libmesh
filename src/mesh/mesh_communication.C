@@ -45,29 +45,29 @@
 // anonymous namespace for implementation details
 namespace {
 
-  using libMesh::Elem;
+using libMesh::Elem;
 
-  /**
-   * Specific weak ordering for Elem*'s to be used in a set.
-   * We use the id, but first sort by level.  This guarantees
-   * when traversing the set from beginning to end the lower
-   * level (parent) elements are encountered first.
-   */
-  struct CompareElemIdsByLevel
+/**
+ * Specific weak ordering for Elem*'s to be used in a set.
+ * We use the id, but first sort by level.  This guarantees
+ * when traversing the set from beginning to end the lower
+ * level (parent) elements are encountered first.
+ */
+struct CompareElemIdsByLevel
+{
+  bool operator()(const Elem *a,
+                  const Elem *b) const
   {
-    bool operator()(const Elem *a,
-                    const Elem *b) const
-    {
-      libmesh_assert (a);
-      libmesh_assert (b);
-      const unsigned int
-        al = a->level(), bl = b->level();
-      const dof_id_type
-        aid = a->id(),   bid = b->id();
+    libmesh_assert (a);
+    libmesh_assert (b);
+    const unsigned int
+      al = a->level(), bl = b->level();
+    const dof_id_type
+      aid = a->id(),   bid = b->id();
 
-      return (al == bl) ? aid < bid : al < bl;
-    }
-  };
+    return (al == bl) ? aid < bid : al < bl;
+  }
+};
 }
 
 
@@ -349,8 +349,8 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   // Let's begin with finding consistent neighbor data information
   // for all the elements we currently have.  We'll use a clean
   // slate here - clear any existing information, including RemoteElem's.
-//  mesh.find_neighbors (/* reset_remote_elements = */ true,
-//       /* reset_current_list    = */ true);
+  //  mesh.find_neighbors (/* reset_remote_elements = */ true,
+  //       /* reset_current_list    = */ true);
 
   // Get a unique message tag to use in communications; we'll default
   // to some numbers around pi*10000
@@ -498,7 +498,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
                                     common_interface_node_list.begin(),
                                     common_interface_node_list.end(),
                                     common_interface_node_list.begin()),
-                                    common_interface_node_list.end());
+             common_interface_node_list.end());
 
           if (false)
             libMesh::out << "[" << mesh.processor_id() << "] "
@@ -729,7 +729,7 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
 
 #ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
 // ------------------------------------------------------------
-  void MeshCommunication::gather (const processor_id_type, ParallelMesh&) const
+void MeshCommunication::gather (const processor_id_type, ParallelMesh&) const
 {
   // no MPI == one processor, no need for this method...
   return;
@@ -812,32 +812,32 @@ namespace {
 
 struct SyncIds
 {
-typedef dof_id_type datum;
-typedef void (MeshBase::*renumber_obj)(dof_id_type, dof_id_type);
+  typedef dof_id_type datum;
+  typedef void (MeshBase::*renumber_obj)(dof_id_type, dof_id_type);
 
-SyncIds(MeshBase &_mesh, renumber_obj _renumberer) :
-  mesh(_mesh),
-  renumber(_renumberer) {}
+  SyncIds(MeshBase &_mesh, renumber_obj _renumberer) :
+    mesh(_mesh),
+    renumber(_renumberer) {}
 
-MeshBase &mesh;
-renumber_obj renumber;
-// renumber_obj &renumber;
+  MeshBase &mesh;
+  renumber_obj renumber;
+  // renumber_obj &renumber;
 
-// Find the id of each requested DofObject -
-// sync_dofobject_data_by_xyz already did the work for us
-void gather_data (const std::vector<dof_id_type>& ids,
-                  std::vector<datum>& ids_out)
-{
-  ids_out = ids;
-}
+  // Find the id of each requested DofObject -
+  // sync_dofobject_data_by_xyz already did the work for us
+  void gather_data (const std::vector<dof_id_type>& ids,
+                    std::vector<datum>& ids_out)
+  {
+    ids_out = ids;
+  }
 
-void act_on_data (const std::vector<dof_id_type>& old_ids,
-                  std::vector<datum>& new_ids)
-{
-  for (unsigned int i=0; i != old_ids.size(); ++i)
-    if (old_ids[i] != new_ids[i])
-      (mesh.*renumber)(old_ids[i], new_ids[i]);
-}
+  void act_on_data (const std::vector<dof_id_type>& old_ids,
+                    std::vector<datum>& new_ids)
+  {
+    for (unsigned int i=0; i != old_ids.size(); ++i)
+      if (old_ids[i] != new_ids[i])
+        (mesh.*renumber)(old_ids[i], new_ids[i]);
+  }
 };
 }
 
@@ -845,8 +845,8 @@ void act_on_data (const std::vector<dof_id_type>& old_ids,
 
 // ------------------------------------------------------------
 void MeshCommunication::make_node_ids_parallel_consistent
-  (MeshBase &mesh,
-   LocationMap<Node> &loc_map)
+(MeshBase &mesh,
+ LocationMap<Node> &loc_map)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -887,41 +887,41 @@ namespace {
 
 struct SyncProcIds
 {
-typedef processor_id_type datum;
+  typedef processor_id_type datum;
 
-SyncProcIds(MeshBase &_mesh) : mesh(_mesh) {}
+  SyncProcIds(MeshBase &_mesh) : mesh(_mesh) {}
 
-MeshBase &mesh;
+  MeshBase &mesh;
 
-// ------------------------------------------------------------
-void gather_data (const std::vector<dof_id_type>& ids,
-                  std::vector<datum>& data)
-{
-  // Find the processor id of each requested node
-  data.resize(ids.size());
+  // ------------------------------------------------------------
+  void gather_data (const std::vector<dof_id_type>& ids,
+                    std::vector<datum>& data)
+  {
+    // Find the processor id of each requested node
+    data.resize(ids.size());
 
-  for (std::size_t i=0; i != ids.size(); ++i)
-    {
-      // Look for this point in the mesh
-      // We'd better find every node we're asked for
-      Node *node = mesh.node_ptr(ids[i]);
+    for (std::size_t i=0; i != ids.size(); ++i)
+      {
+        // Look for this point in the mesh
+        // We'd better find every node we're asked for
+        Node *node = mesh.node_ptr(ids[i]);
 
-      // Return the node's correct processor id,
-      data[i] = node->processor_id();
-    }
-}
+        // Return the node's correct processor id,
+        data[i] = node->processor_id();
+      }
+  }
 
-// ------------------------------------------------------------
-void act_on_data (const std::vector<dof_id_type>& ids,
-                  std::vector<datum> proc_ids)
-{
-  // Set the ghost node processor ids we've now been informed of
-  for (std::size_t i=0; i != ids.size(); ++i)
-    {
-      Node *node = mesh.node_ptr(ids[i]);
-      node->processor_id() = proc_ids[i];
-    }
-}
+  // ------------------------------------------------------------
+  void act_on_data (const std::vector<dof_id_type>& ids,
+                    std::vector<datum> proc_ids)
+  {
+    // Set the ghost node processor ids we've now been informed of
+    for (std::size_t i=0; i != ids.size(); ++i)
+      {
+        Node *node = mesh.node_ptr(ids[i]);
+        node->processor_id() = proc_ids[i];
+      }
+  }
 };
 }
 
@@ -929,8 +929,8 @@ void act_on_data (const std::vector<dof_id_type>& ids,
 
 // ------------------------------------------------------------
 void MeshCommunication::make_node_proc_ids_parallel_consistent
-  (MeshBase& mesh,
-   LocationMap<Node>& loc_map)
+(MeshBase& mesh,
+ LocationMap<Node>& loc_map)
 {
   START_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
 
@@ -962,8 +962,8 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent
 
 // ------------------------------------------------------------
 void MeshCommunication::make_nodes_parallel_consistent
-  (MeshBase &mesh,
-   LocationMap<Node> &loc_map)
+(MeshBase &mesh,
+ LocationMap<Node> &loc_map)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -1035,7 +1035,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
   // We don't want to delete any element that shares a node
   // with or is an ancestor of a local element.
   MeshBase::const_element_iterator l_elem_it = mesh.local_elements_begin(),
-                                   l_end     = mesh.local_elements_end();
+    l_end     = mesh.local_elements_end();
   for (; l_elem_it != l_end; ++l_elem_it)
     {
       const Elem *elem = *l_elem_it;
@@ -1093,7 +1093,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
   // Flag all the elements that share nodes with
   // local and unpartitioned elements, along with their ancestors
   MeshBase::element_iterator nl_elem_it = mesh.not_local_elements_begin(),
-                             nl_end     = mesh.not_local_elements_end();
+    nl_end     = mesh.not_local_elements_end();
   for (; nl_elem_it != nl_end; ++nl_elem_it)
     {
       const Elem *elem = *nl_elem_it;
@@ -1137,7 +1137,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
   for (int l = n_levels - 1; l >= 0; --l)
     {
       MeshBase::element_iterator lev_elem_it = mesh.level_elements_begin(l),
-                                 lev_end     = mesh.level_elements_end(l);
+        lev_end     = mesh.level_elements_end(l);
       for (; lev_elem_it != lev_end; ++lev_elem_it)
         {
           Elem *elem = *lev_elem_it;
@@ -1160,7 +1160,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
 
   // Delete all the nodes we have no reason to save
   MeshBase::node_iterator node_it  = mesh.nodes_begin(),
-                          node_end = mesh.nodes_end();
+    node_end = mesh.nodes_end();
   for (node_it = mesh.nodes_begin(); node_it != node_end; ++node_it)
     {
       Node *node = *node_it;

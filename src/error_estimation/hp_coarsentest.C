@@ -44,8 +44,8 @@ namespace libMesh
 // HPCoarsenTest implementations
 
 void HPCoarsenTest::add_projection(const System &system,
-                                const Elem *elem,
-                                unsigned int var)
+                                   const Elem *elem,
+                                   unsigned int var)
 {
   // If we have children, we need to add their projections instead
   if (!elem->active())
@@ -72,7 +72,7 @@ void HPCoarsenTest::add_projection(const System &system,
     libmesh_cast_int<unsigned int>(dof_indices.size());
 
   FEInterface::inverse_map (system.get_mesh().mesh_dimension(),
-    fe_type, coarse, *xyz_values, coarse_qpoints);
+                            fe_type, coarse, *xyz_values, coarse_qpoints);
 
   fe_coarse->reinit(coarse, &coarse_qpoints);
 
@@ -105,12 +105,12 @@ void HPCoarsenTest::add_projection(const System &system,
             system.current_solution(dof_num);
           if (cont == C_ZERO || cont == C_ONE)
             grad.add_scaled((*dphi)[i][qp],system.current_solution(dof_num));
-           // grad += (*dphi)[i][qp] *
-            //  system.current_solution(dof_num);
+          // grad += (*dphi)[i][qp] *
+          //  system.current_solution(dof_num);
           if (cont == C_ONE)
             hess.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
           // hess += (*d2phi)[i][qp] *
-            //  system.current_solution(dof_num);
+          //  system.current_solution(dof_num);
         }
 
       // The projection matrix and vector
@@ -125,7 +125,7 @@ void HPCoarsenTest::add_projection(const System &system,
             Fe(i) += (*JxW)[qp] *
               hess.contract((*d2phi_coarse)[i][qp]);
           // Fe(i) += (*JxW)[qp] *
-            //  (*d2phi_coarse)[i][qp].contract(hess);
+          //  (*d2phi_coarse)[i][qp].contract(hess);
 
           for (unsigned int j=0; j != Fe.size(); ++j)
             {
@@ -351,11 +351,11 @@ void HPCoarsenTest::select_refinement (System &system)
                       if (cont == C_ZERO || cont == C_ONE)
                         grad.add_scaled((*dphi)[i][qp], system.current_solution(dof_num));
                       // grad += (*dphi)[i][qp] *
-                        //  system.current_solution(dof_num);
+                      //  system.current_solution(dof_num);
                       if (cont == C_ONE)
                         hess.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
                       // hess += (*d2phi)[i][qp] *
-                        //  system.current_solution(dof_num);
+                      //  system.current_solution(dof_num);
                     }
 
                   // The projection matrix and vector
@@ -402,7 +402,7 @@ void HPCoarsenTest::select_refinement (System &system)
                   if (cont == C_ZERO || cont == C_ONE)
                     grad_error.add_scaled((*dphi)[i][qp], system.current_solution(dof_num));
                   // grad_error += (*dphi)[i][qp] *
-                    //  system.current_solution(dof_num);
+                  //  system.current_solution(dof_num);
                   if (cont == C_ONE)
                     hessian_error.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
                   // hessian_error += (*d2phi)[i][qp] *
@@ -419,10 +419,10 @@ void HPCoarsenTest::select_refinement (System &system)
                       value_error -= (*phi_coarse)[i][qp] * Up(i);
                       if (cont == C_ZERO || cont == C_ONE)
                         grad_error.subtract_scaled((*dphi_coarse)[i][qp], Up(i));
-                        // grad_error -= (*dphi_coarse)[i][qp] * Up(i);
+                      // grad_error -= (*dphi_coarse)[i][qp] * Up(i);
                       if (cont == C_ONE)
                         hessian_error.subtract_scaled((*d2phi_coarse)[i][qp], Up(i));
-                        // hessian_error -= (*d2phi_coarse)[i][qp] * Up(i);
+                      // hessian_error -= (*d2phi_coarse)[i][qp] * Up(i);
                     }
                 }
 
@@ -451,7 +451,7 @@ void HPCoarsenTest::select_refinement (System &system)
           else
             {
               FEInterface::inverse_map (dim, fe_type, coarse,
-                *xyz_values, coarse_qpoints);
+                                        *xyz_values, coarse_qpoints);
 
               unsigned int old_parent_level = coarse->p_level();
               (const_cast<Elem *>(coarse))->hack_p_level(elem->p_level());
@@ -479,12 +479,12 @@ void HPCoarsenTest::select_refinement (System &system)
                         system.current_solution(dof_num);
                       if (cont == C_ZERO || cont == C_ONE)
                         grad_error.add_scaled((*dphi)[i][qp], system.current_solution(dof_num));
-                        // grad_error += (*dphi)[i][qp] *
-                        //  system.current_solution(dof_num);
+                      // grad_error += (*dphi)[i][qp] *
+                      //  system.current_solution(dof_num);
                       if (cont == C_ONE)
                         hessian_error.add_scaled((*d2phi)[i][qp], system.current_solution(dof_num));
                       // hessian_error += (*d2phi)[i][qp] *
-                        //  system.current_solution(dof_num);
+                      //  system.current_solution(dof_num);
                     }
 
                   for (unsigned int i=0; i != n_coarse_dofs; ++i)
@@ -565,14 +565,14 @@ void HPCoarsenTest::select_refinement (System &system)
       const unsigned int new_p_dofs = dofs_per_p_elem -
         dofs_per_elem;
 
-/*
-libMesh::err << "Cell " << e_id << ": h = " << elem->hmax()
-              << ", p = " << elem->p_level() + 1 << "," << std::endl
-              << "     h_error = " << h_error_per_cell[e_id]
-              << ", p_error = " << p_error_per_cell[e_id] << std::endl
-              << "     new_h_dofs = " << new_h_dofs
-              << ", new_p_dofs = " << new_p_dofs << std::endl;
-*/
+      /*
+        libMesh::err << "Cell " << e_id << ": h = " << elem->hmax()
+        << ", p = " << elem->p_level() + 1 << "," << std::endl
+        << "     h_error = " << h_error_per_cell[e_id]
+        << ", p_error = " << p_error_per_cell[e_id] << std::endl
+        << "     new_h_dofs = " << new_h_dofs
+        << ", new_p_dofs = " << new_p_dofs << std::endl;
+      */
       const Real p_value =
         std::sqrt(p_error_per_cell[e_id]) * p_weight / new_p_dofs;
       const Real h_value =

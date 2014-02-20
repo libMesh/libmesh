@@ -296,29 +296,29 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const ElemType,
       } // end case SECOND
 
     case THIRD:
-     {
-      switch (i)
-        {
-        case 0:
+      {
+        switch (i)
+          {
+          case 0:
             return -9./16.*(6.*xi-2);
 
-        case 1:
+          case 1:
             return -9./16.*(-6*xi-2.);
 
-        case 2:
+          case 2:
             return 27./16.*(6*xi-2./3.);
 
-        case 3:
+          case 3:
             return 27./16.*(-6*xi-2./3.);
 
-        default:
-          {
-            libMesh::err << "Invalid shape function index requested!"
-                          << std::endl;
-            libmesh_error();
+          default:
+            {
+              libMesh::err << "Invalid shape function index requested!"
+                           << std::endl;
+              libmesh_error();
+            }
           }
-        }
-     } // end case THIRD
+      } // end case THIRD
 
 
     default:
