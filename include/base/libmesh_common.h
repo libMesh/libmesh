@@ -20,9 +20,23 @@
 #ifndef LIBMESH_LIBMESH_COMMON_H
 #define LIBMESH_LIBMESH_COMMON_H
 
-
 // The library configuration options
 #include "libmesh/libmesh_config.h"
+
+// C/C++ includes everyone should know about
+#include <cstdlib>
+#ifdef __PGI
+   // BSK, Thu Feb 20 08:32:06 CST 2014 - For some reason, unless PGI gets
+   // <cmath> early this nonsense shows up:
+   // "/software/x86_64/pgi/12.9/linux86-64/12.9/include/CC/cmath", line 57: error:
+   //           the global scope has no "abs"
+   //   using _STLP_VENDOR_CSTD::abs;
+   // So include <cmath> as early as possible under the PGI compilers.
+#  include <cmath>
+#endif
+#include <complex>
+#include <typeinfo> // std::bad_cast
+
 
 // Include the MPI definition
 #ifdef LIBMESH_HAVE_MPI
@@ -30,13 +44,6 @@
 # include <mpi.h>
 # include "libmesh/restore_warnings.h"
 #endif
-
-// C/C++ includes everyone should know about
-#include <complex>
-#ifdef LIBMESH_HAVE_STDLIB_H
-# include <cstdlib>
-#endif
-#include <typeinfo> // std::bad_cast
 
 // _basic_ library functionality
 #include "libmesh/libmesh_base.h"
