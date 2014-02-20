@@ -3,12 +3,9 @@
 Nmax = 20
 training_tolerance = 0.001
 
-n_parameters = 1
 parameter_names = 'curvature'
 
-curvature = '0.1 1.0472 0.5'
-
-log_scaling = '0'
+curvature = '0.1 1.0472'
 
 deterministic_training = true # Are the training points generated randomly or deterministically
 

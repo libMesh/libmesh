@@ -3,14 +3,10 @@
 Nmax = 20
 training_tolerance = 0.001
 
-n_parameters = 2
 parameter_names = 'center_x center_y'
 
-center_x = '-1 1 1'
-center_y = '-1 1 1'
-
-log_scaling = '0 0'
-
+center_x = '-1 1'
+center_y = '-1 1'
 deterministic_training = true # Are the training points generated randomly or deterministically
 
 n_training_samples = 25       # The number of parameters in training set (must be square for the 2-parameter deterministic case)

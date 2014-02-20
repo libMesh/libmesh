@@ -3,14 +3,11 @@
 Nmax = 15
 training_tolerance = 0.001
 
-n_parameters = 3
 parameter_names = 'curvature Bi kappa'
 
-curvature = '0.1 1.0472 0.5'
-Bi = '0.001 0.01 0.005'
-kappa = '0.5 2. 1.'
-
-log_scaling = '0 1 1'
+curvature = '0.1 1.0472'
+Bi = '0.001 0.01'
+kappa = '0.5 2.'
 
 deterministic_training = false
 use_relative_bound_in_greedy = true

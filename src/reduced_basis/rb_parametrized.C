@@ -25,6 +25,7 @@
 
 // C++ includes
 #include <sstream>
+#include <fstream>
 
 namespace libMesh
 {
@@ -59,43 +60,74 @@ void RBParametrized::clear()
 
 void RBParametrized::initialize_parameters(const RBParameters& mu_min_in,
                                            const RBParameters& mu_max_in,
-                                           const RBParameters& mu_in)
+                                           const std::map< std::string, std::vector<Real> >& discrete_parameter_values)
 {
   // Check that the min/max vectors are valid
   {
     const std::string err_string = "Error: Invalid mu_min/mu_max in RBParameters constructor.";
     bool valid_min_max = (mu_min_in.n_parameters() == mu_max_in.n_parameters());
     if(!valid_min_max)
-      {
-        libMesh::err << err_string << std::endl;
-      }
+    {
+      libMesh::err << err_string << std::endl;
+      libmesh_error();
+    }
     else
+    {
+      RBParameters::const_iterator it     = mu_min_in.begin();
+      RBParameters::const_iterator it_end = mu_min_in.end();
+      for( ; it != it_end; ++it)
       {
-        RBParameters::const_iterator it     = mu_min_in.begin();
-        RBParameters::const_iterator it_end = mu_min_in.end();
-        for( ; it != it_end; ++it)
-          {
-            std::string param_name = it->first;
-            if(mu_min_in.get_value(param_name) > mu_max_in.get_value(param_name))
-              {
-                libMesh::err << err_string << std::endl;
-              }
-          }
+        std::string param_name = it->first;
+        if(mu_min_in.get_value(param_name) > mu_max_in.get_value(param_name))
+        {
+          libMesh::err << err_string << std::endl;
+          libmesh_error();
+        }
       }
+    }
   }
 
   parameters_min = mu_min_in;
   parameters_max = mu_max_in;
+  
+  // Add in min/max values due to the discrete parameters
+  {
+    std::map< std::string, std::vector<Real> >::const_iterator it =
+      discrete_parameter_values.begin();
+    const std::map< std::string, std::vector<Real> >::const_iterator it_end =
+      discrete_parameter_values.end();
+    for( ; it != it_end; ++it)
+    {
+      if(it->second.empty())
+      {
+        libMesh::err << "Error: List of discrete parameters for " << it->first << " is empty."
+                     << std::endl;
+        libmesh_error();
+      }
+    
+      Real min_val = *std::min_element(it->second.begin(), it->second.end());
+      Real max_val = *std::max_element(it->second.begin(), it->second.end());
+
+      libmesh_assert(min_val > max_val);
+
+      parameters_min.set_value(it->first, min_val);
+      parameters_max.set_value(it->first, max_val);
+    }
+
+    _discrete_parameter_values = discrete_parameter_values;
+  }
 
   parameters_initialized = true;
-  set_parameters(mu_in);
+
+  // Initialize the current parameters to parameters_min
+  set_parameters(parameters_min);
 }
 
 void RBParametrized::initialize_parameters(const RBParametrized& rb_parametrized)
 {
   initialize_parameters(rb_parametrized.get_parameters_min(),
                         rb_parametrized.get_parameters_max(),
-                        rb_parametrized.get_parameters());
+                        rb_parametrized.get_discrete_parameter_values());
 }
 
 unsigned int RBParametrized::get_n_params() const
@@ -109,6 +141,44 @@ unsigned int RBParametrized::get_n_params() const
   libmesh_assert_equal_to ( parameters_min.n_parameters(), parameters_max.n_parameters() );
 
   return parameters_min.n_parameters();
+}
+
+unsigned int RBParametrized::get_n_continuous_params() const
+{
+  if(!parameters_initialized)
+  {
+    libMesh::err << "Error: parameters not initialized in RBParametrized::get_n_continuous_params" << std::endl;
+    libmesh_error();
+  }
+
+  libmesh_assert(get_n_params() >= get_n_discrete_params());
+
+  return static_cast<unsigned int>(get_n_params() - get_n_discrete_params());
+}
+
+unsigned int RBParametrized::get_n_discrete_params() const
+{
+  if(!parameters_initialized)
+  {
+    libMesh::err << "Error: parameters not initialized in RBParametrized::get_n_discrete_params" << std::endl;
+    libmesh_error();
+  }
+
+  return get_discrete_parameter_values().size();
+}
+
+std::set<std::string> RBParametrized::get_parameter_names() const
+{
+  if(!parameters_initialized)
+  {
+    libMesh::err << "Error: parameters not initialized in RBParametrized::get_parameter_names" << std::endl;
+    libmesh_error();
+  }
+
+  std::set<std::string> parameter_names;
+  parameters_min.get_parameter_names(parameter_names);
+
+  return parameter_names;
 }
 
 void RBParametrized::set_parameters(const RBParameters& params)
@@ -191,6 +261,14 @@ void RBParametrized::print_parameters() const
   get_parameters().print();
 }
 
+void RBParametrized::write_parameter_data_to_files(const std::string& continuous_param_file_name,
+                                                   const std::string& discrete_param_file_name,
+                                                   const bool write_binary_data)
+{
+  write_parameter_ranges_to_file(continuous_param_file_name, write_binary_data);
+  write_discrete_parameter_values_to_file(discrete_param_file_name, write_binary_data);
+}
+
 void RBParametrized::write_parameter_ranges_to_file(const std::string& file_name,
                                                     const bool write_binary_data)
 {
@@ -199,96 +277,283 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string& file_name
 
   // Write out the parameter ranges
   Xdr parameter_ranges_out(file_name, mode);
-  unsigned int n_params = get_n_params();
-  parameter_ranges_out << n_params;
+  unsigned int n_continuous_params = get_n_continuous_params();
+  parameter_ranges_out << n_continuous_params;
 
   RBParameters::const_iterator it;
   RBParameters::const_iterator it_end;
   it = get_parameters_min().begin();
   it_end = get_parameters_min().end();
   for( ; it != it_end; ++it)
+  {
+    std::string param_name = it->first;
+    if(!is_discrete_parameter(param_name))
     {
-      std::string param_name = it->first;
       Real param_value = it->second;
-
       parameter_ranges_out << param_name << param_value;
     }
+  }
   it     = get_parameters_max().begin();
   it_end = get_parameters_max().end();
   for( ; it != it_end; ++it)
+  {
+    std::string param_name = it->first;
+    if(!is_discrete_parameter(param_name))
     {
-      std::string param_name = it->first;
       Real param_value = it->second;
-
       parameter_ranges_out << param_name << param_value;
     }
+  }
   parameter_ranges_out.close();
 }
 
+void RBParametrized::write_discrete_parameter_values_to_file(const std::string& file_name,
+                                                             const bool write_binary_data)
+{
+  // write out the discrete parameters, if we have any
+  if(get_n_discrete_params() > 0)
+  {
+    // The writing mode: ENCODE for binary, WRITE for ASCII
+    XdrMODE mode = write_binary_data ? ENCODE : WRITE;
+
+    Xdr discrete_parameters_out(file_name, mode);
+    unsigned int n_discrete_params = get_n_discrete_params();
+    discrete_parameters_out << n_discrete_params;
+
+    std::map< std::string, std::vector<Real> >::const_iterator discrete_it =
+      get_discrete_parameter_values().begin();
+    const std::map< std::string, std::vector<Real> >::const_iterator discrete_it_end =
+      get_discrete_parameter_values().end();
+    for( ; discrete_it != discrete_it_end; ++discrete_it)
+    {
+      std::string param_name = discrete_it->first;
+      unsigned int n_discrete_values = discrete_it->second.size();
+      discrete_parameters_out << param_name << n_discrete_values;
+    
+      for(unsigned int i=0; i<n_discrete_values; i++)
+      {
+        Real discrete_value = discrete_it->second[i];
+        discrete_parameters_out << discrete_value;
+      }
+    }
+  }
+}
+
+void RBParametrized::read_parameter_data_from_files(const std::string& continuous_param_file_name,
+                                                    const std::string& discrete_param_file_name,
+                                                    const bool read_binary_data)
+{
+  RBParameters param_min;
+  RBParameters param_max;
+  read_parameter_ranges_from_file(continuous_param_file_name,
+                                  read_binary_data,
+                                  param_min,
+                                  param_max);
+  
+  std::map< std::string, std::vector<Real> > discrete_parameter_values_in;
+  read_discrete_parameter_values_from_file(discrete_param_file_name,
+                                           read_binary_data,
+                                           discrete_parameter_values_in);
+
+  initialize_parameters(param_min, param_max, discrete_parameter_values_in);
+}
+
 void RBParametrized::read_parameter_ranges_from_file(const std::string& file_name,
-                                                     const bool read_binary_data)
+                                                     const bool read_binary_data,
+                                                     RBParameters& param_min,
+                                                     RBParameters& param_max)
 {
   // The reading mode: DECODE for binary, READ for ASCII
   XdrMODE mode = read_binary_data ? DECODE : READ;
 
   // Read in the parameter ranges
   Xdr parameter_ranges_in(file_name, mode);
-  unsigned int n_params;
-  parameter_ranges_in >> n_params;
-  RBParameters param_min;
-  for(unsigned int i=0; i<n_params; i++)
-    {
-      std::string param_name;
-      Real param_value;
+  unsigned int n_continuous_params;
+  parameter_ranges_in >> n_continuous_params;
+  
+  for(unsigned int i=0; i<n_continuous_params; i++)
+  {
+    std::string param_name;
+    Real param_value;
 
-      parameter_ranges_in >> param_name;
-      parameter_ranges_in >> param_value;
+    parameter_ranges_in >> param_name;
+    parameter_ranges_in >> param_value;
 
-      param_min.set_value(param_name, param_value);
-    }
-  RBParameters param_max;
-  for(unsigned int i=0; i<n_params; i++)
-    {
-      std::string param_name;
-      Real param_value;
+    param_min.set_value(param_name, param_value);
+  }
+  for(unsigned int i=0; i<n_continuous_params; i++)
+  {
+    std::string param_name;
+    Real param_value;
 
-      parameter_ranges_in >> param_name;
-      parameter_ranges_in >> param_value;
+    parameter_ranges_in >> param_name;
+    parameter_ranges_in >> param_value;
 
-      param_max.set_value(param_name, param_value);
-    }
+    param_max.set_value(param_name, param_value);
+  }
+
   parameter_ranges_in.close();
+}
 
-  initialize_parameters(param_min, param_max, param_min);
+void RBParametrized::read_discrete_parameter_values_from_file(const std::string& file_name,
+                                                              const bool read_binary_data,
+                                                              std::map< std::string, std::vector<Real> >& discrete_parameter_values)
+{
+  // read in the discrete parameters, if we have any
+  std::ifstream check_if_file_exists(file_name.c_str());
+  if(check_if_file_exists.good())
+  {
+    // The reading mode: DECODE for binary, READ for ASCII
+    XdrMODE mode = read_binary_data ? DECODE : READ;
+
+    // Read in the parameter ranges
+    Xdr discrete_parameter_values_in(file_name, mode);
+    unsigned int n_discrete_params;
+    discrete_parameter_values_in >> n_discrete_params;
+
+    for(unsigned int i=0; i<n_discrete_params; i++)
+    {
+      std::string param_name;
+      discrete_parameter_values_in >> param_name;
+      
+      unsigned int n_discrete_values;
+      discrete_parameter_values_in >> n_discrete_values;
+      
+      std::vector<Real> discrete_values(n_discrete_values);
+      for(unsigned int j=0; j<discrete_values.size(); j++)
+      {
+        Real param_value;
+        discrete_parameter_values_in >> param_value;
+
+        discrete_values[j] = param_value;
+      }
+      
+      discrete_parameter_values[param_name] = discrete_values;
+    }
+  }
+}
+
+bool RBParametrized::is_discrete_parameter(std::string& mu_name) const
+{
+  if(!parameters_initialized)
+  {
+    libMesh::err << "Error: parameters not initialized in RBParametrized::is_discrete_parameter" << std::endl;
+    libmesh_error();
+  }
+
+  return (_discrete_parameter_values.find(mu_name) != _discrete_parameter_values.end());
+}
+
+const std::map< std::string, std::vector<Real> >& RBParametrized::get_discrete_parameter_values() const
+{
+  if(!parameters_initialized)
+  {
+    libMesh::err << "Error: parameters not initialized in RBParametrized::get_discrete_parameter_values" << std::endl;
+    libmesh_error();
+  }
+
+  return _discrete_parameter_values;
+}
+
+void RBParametrized::print_discrete_parameter_values() const
+{
+  std::map< std::string, std::vector<Real> >::const_iterator it =
+    get_discrete_parameter_values().begin();
+  const std::map< std::string, std::vector<Real> >::const_iterator it_end =
+    get_discrete_parameter_values().end();
+
+  for( ; it != it_end; ++it)
+  {
+    libMesh::out << "Discrete parameter " << it->first << ", values: ";
+
+    std::vector<Real> values = it->second;
+    for(unsigned int i=0; i<values.size(); i++)
+    {
+      libMesh::out << values[i] << " ";
+    }
+    libMesh::out << std::endl;
+  }
 }
 
 bool RBParametrized::valid_params(const RBParameters& params)
 {
   if(params.n_parameters() != get_n_params())
-    {
-      libMesh::out << "Error: Number of parameters don't match" << std::endl;
-      libmesh_error();
-      return false;
-    }
+  {
+    libMesh::out << "Error: Number of parameters don't match" << std::endl;
+    libmesh_error();
+    return false;
+  }
   else
+  {
+    bool valid = true;
+    RBParameters::const_iterator it     = params.begin();
+    RBParameters::const_iterator it_end = params.end();
+    for( ; it != it_end; ++it)
     {
-      bool valid = true;
-      RBParameters::const_iterator it     = params.begin();
-      RBParameters::const_iterator it_end = params.end();
-      for( ; it != it_end; ++it)
-        {
-          std::string param_name = it->first;
-          valid = valid && ( (get_parameter_min(param_name) <= params.get_value(param_name)) &&
-                             (params.get_value(param_name) <= get_parameter_max(param_name)) );
-        }
+      std::string param_name = it->first;
+      valid = valid && ( (get_parameter_min(param_name) <= params.get_value(param_name)) &&
+                         (params.get_value(param_name) <= get_parameter_max(param_name)) );
 
-      if(!valid && verbose_mode)
-        {
-          libMesh::out << "Warning: parameter is outside parameter range" << std::endl;
-        }
-
-      return valid;
+      if(is_discrete_parameter(param_name))
+      {
+        // make sure params.get_value(param_name) is sufficiently close
+        // to one of the discrete parameter values
+        valid = valid && is_value_in_list(params.get_value(param_name),
+                                          get_discrete_parameter_values().find(param_name)->second,
+                                          TOLERANCE);
+      }
     }
+
+    if(!valid && verbose_mode)
+    {
+      libMesh::out << "Warning: parameter is outside parameter range" << std::endl;
+    }
+
+    return valid;
+  }
+}
+
+Real RBParametrized::get_closest_value(Real value, const std::vector<Real>& list_of_values)
+{
+  if(list_of_values.empty())
+  {
+    libMesh::err << "Error: list_of_values is empty." << std::endl;
+    libmesh_error();
+  }
+
+  std::vector<Real>::const_iterator it = list_of_values.begin();
+  std::vector<Real>::const_iterator it_end = list_of_values.end();
+  
+  Real min_distance = std::numeric_limits<Real>::max();
+  Real closest_val = 0.;
+  for( ; it != it_end; ++it)
+  {
+    Real distance = std::abs(value - *it);
+    if( distance < min_distance )
+    {
+      min_distance = distance;
+      closest_val = *it;
+    }
+  }
+  
+  return closest_val;
+}
+
+bool RBParametrized::is_value_in_list(Real value, const std::vector<Real>& list_of_values, Real tol)
+{
+  Real closest_value = get_closest_value(value, list_of_values);
+  
+  // Check if relative tolerance is satisfied
+  Real rel_error = std::abs(value - closest_value) / std::abs(value);
+  if( rel_error <= tol )
+  {
+    return true;
+  }
+  
+  // If relative tolerance isn't satisfied, we should still check an absolute
+  // error, since relative tolerance can be misleading if value is close to zero
+  Real abs_error = std::abs(value - closest_value);
+  return (abs_error <= tol);
 }
 
 } // namespace libMesh

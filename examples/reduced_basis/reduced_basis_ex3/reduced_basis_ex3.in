@@ -13,12 +13,10 @@ online_y_vel = 1.
 
 Nmax = 20        # The maximum number of basis functions we can generate in the Offline stage
 
-n_parameters = 2                # The number of parameters in the problem
 parameter_names = 'x_vel y_vel' # The names of the parameters
 
-x_vel = '-2 2 1'               # the min, max and initial value of x_vel
-y_vel = '-2 2 1'               # the min, max and initial value of y_vel
-log_scaling = '0 0'            # Generate a training set with uniform (0) or logarithmic (1) scaling in each parameter
+x_vel = '-2 2'               # the min and max of x_vel
+y_vel = '-2 2'               # the min and max of y_vel
 
 deterministic_training = true        # Are the training points generated randomly or deterministically
 use_relative_bound_in_greedy = true  # Do we use a relative or absolute error bound when training the RB space?

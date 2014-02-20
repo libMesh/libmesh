@@ -396,7 +396,16 @@ void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_n
       // Write out the parameter ranges
       file_name.str("");
       file_name << directory_name << "/parameter_ranges" << suffix;
-      write_parameter_ranges_to_file(file_name.str(), write_binary_data);
+      std::string continuous_param_file_name = file_name.str();
+
+      // Write out the discrete parameter values
+      file_name.str("");
+      file_name << directory_name << "/discrete_parameter_values" << suffix;
+      std::string discrete_param_file_name = file_name.str();
+    
+      write_parameter_data_to_files(continuous_param_file_name,
+                                    discrete_param_file_name,
+                                    write_binary_data);
 
       // Write out the bounding box min values
       file_name.str("");
@@ -500,7 +509,15 @@ void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_
   // Read in the parameter ranges
   file_name.str("");
   file_name << directory_name << "/parameter_ranges" << suffix;
-  read_parameter_ranges_from_file(file_name.str(), read_binary_data);
+  std::string continuous_param_file_name = file_name.str();
+
+  // Read in the discrete parameter values
+  file_name.str("");
+  file_name << directory_name << "/discrete_parameter_values" << suffix;
+  std::string discrete_param_file_name = file_name.str();
+  read_parameter_data_from_files(continuous_param_file_name,
+                                 discrete_param_file_name,
+                                 read_binary_data);
 
   // Read in the bounding box min values
   // Note that there are Q_a values

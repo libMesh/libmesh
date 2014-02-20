@@ -67,7 +67,7 @@ public:
    */
   void initialize_parameters(const RBParameters& mu_min_in,
                              const RBParameters& mu_max_in,
-                             const RBParameters& mu_in);
+                             const std::map< std::string, std::vector<Real> >& discrete_parameter_values);
 
   /**
    * Initialize the parameter ranges and set current_parameters.
@@ -78,6 +78,21 @@ public:
    * Get the number of parameters.
    */
   unsigned int get_n_params() const;
+
+  /**
+   * Get the number of continuous parameters.
+   */
+  unsigned int get_n_continuous_params() const;
+
+  /**
+   * Get the number of discrete parameters.
+   */
+  unsigned int get_n_discrete_params() const;
+  
+  /**
+   * Get a set that stores the parameter names.
+   */
+  std::set<std::string> get_parameter_names() const;
 
   /**
    * Get the current parameters.
@@ -117,17 +132,39 @@ public:
   void print_parameters() const;
 
   /**
-   * Write out the parameter ranges to file.
+   * Write out the parameter ranges to files.
    */
-  void write_parameter_ranges_to_file(const std::string& file_name,
-                                      const bool write_binary);
+  void write_parameter_data_to_files(const std::string& continuous_param_file_name,
+                                     const std::string& discrete_param_file_name,
+                                     const bool write_binary_data);
 
   /**
-   * Read in the parameter ranges from file. Initialize parameters
-   * to the "minimum" parameter values.
+   * Read in the parameter ranges from files.
    */
-  void read_parameter_ranges_from_file(const std::string& file_name,
-                                       const bool read_binary);
+  void read_parameter_data_from_files(const std::string& continuous_param_file_name,
+                                      const std::string& discrete_param_file_name,
+                                      const bool read_binary_data);
+
+  /**
+   * Is parameter \p mu_name discrete?
+   */
+  bool is_discrete_parameter(std::string& mu_name) const;
+
+  /**
+   * Get a const reference to the discrete parameter values.
+   */
+  const std::map< std::string, std::vector<Real> >& get_discrete_parameter_values() const;
+
+  /**
+   * Print out all the discrete parameter values.
+   */
+  void print_discrete_parameter_values() const;
+
+  /**
+   * Helper function that returns the closest entry to \p value from
+   * \p list_of_values.
+   */
+  static Real get_closest_value(Real value, const std::vector<Real>& list_of_values);
 
   /**
    * Public boolean to toggle verbose mode.
@@ -137,9 +174,44 @@ public:
 private:
 
   /**
+   * Write out the parameter ranges to file.
+   */
+  void write_parameter_ranges_to_file(const std::string& file_name,
+                                      const bool write_binary);
+
+  /**
+   * Write out the discrete parameter values to file.
+   */
+  void write_discrete_parameter_values_to_file(const std::string& file_name,
+                                               const bool write_binary_data);
+
+  /**
+   * Read in the parameter ranges from file. Initialize parameters
+   * to the "minimum" parameter values.
+   */
+  void read_parameter_ranges_from_file(const std::string& file_name,
+                                       const bool read_binary,
+                                       RBParameters& param_min,
+                                       RBParameters& param_max);
+
+  /**
+   * Read in the discrete parameter values from file, if we have any.
+   */
+  void read_discrete_parameter_values_from_file(const std::string& file_name,
+                                                const bool read_binary_data,
+                                                std::map< std::string, std::vector<Real> >& discrete_parameter_values_in);
+
+  /**
    * Helper function to check that \p params is valid.
    */
   bool valid_params(const RBParameters& params);
+
+  /**
+   * Helper function to check if the specified value
+   * is in the list of values (within a tolerance given
+   * by \p tol).
+   */
+  static bool is_value_in_list(Real value, const std::vector<Real>& list_of_values, Real tol);
 
   //--------------- PRIVATE DATA MEMBERS ---------------//
 
@@ -158,6 +230,11 @@ private:
    */
   RBParameters parameters_min;
   RBParameters parameters_max;
+
+  /**
+   * Map that defines the allowable values of any discrete parameters.
+   */
+  std::map< std::string, std::vector<Real> > _discrete_parameter_values;
 
 };
 

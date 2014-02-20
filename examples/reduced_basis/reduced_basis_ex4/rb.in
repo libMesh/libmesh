@@ -9,8 +9,6 @@ parameter_names = 'center_x center_y'
 center_x = '-1 1 1'
 center_y = '-1 1 1'
 
-log_scaling = '0 0'
-
 deterministic_training = true   # Are the training points generated randomly or deterministically
 
 n_training_samples = 100        # The number of parameters in training set (must be square for the 2-parameter deterministic case)
