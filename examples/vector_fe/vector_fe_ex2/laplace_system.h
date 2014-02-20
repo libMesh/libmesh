@@ -53,8 +53,8 @@ public:
 
   // Constraint part
   /*
-  virtual bool side_constraint (bool request_jacobian,
-				DiffContext& context);
+    virtual bool side_constraint (bool request_jacobian,
+    DiffContext& context);
   */
 
 protected:

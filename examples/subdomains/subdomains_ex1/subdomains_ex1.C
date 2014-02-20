@@ -17,10 +17,10 @@
 
 
 
- // <h1>Subdomains Example 1 - Solving on a Subdomain</h1>
- //
- // This example builds on the example 4 by showing what to do in
- // order to solve an equation only on a subdomain.
+// <h1>Subdomains Example 1 - Solving on a Subdomain</h1>
+//
+// This example builds on the example 4 by showing what to do in
+// order to solve an equation only on a subdomain.
 
 
 // C++ include files that we need
@@ -329,19 +329,19 @@ int main (int argc, char** argv)
   // After solving the system write the solution
   // to a GMV-formatted plot file.
   if(dim == 1)
-  {
-    GnuPlotIO plot(mesh,"Subdomains Example 1, 1D",GnuPlotIO::GRID_ON);
-    plot.write_equation_systems("gnuplot_script",equation_systems);
-  }
+    {
+      GnuPlotIO plot(mesh,"Subdomains Example 1, 1D",GnuPlotIO::GRID_ON);
+      plot.write_equation_systems("gnuplot_script",equation_systems);
+    }
   else
-  {
-    GMVIO (mesh).write_equation_systems ((dim == 3) ?
-      "out_3.gmv" : "out_2.gmv",equation_systems);
+    {
+      GMVIO (mesh).write_equation_systems ((dim == 3) ?
+                                           "out_3.gmv" : "out_2.gmv",equation_systems);
 #ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO (mesh).write_equation_systems ((dim == 3) ?
-      "out_3.e" : "out_2.e",equation_systems);
+      ExodusII_IO (mesh).write_equation_systems ((dim == 3) ?
+                                                 "out_3.e" : "out_2.e",equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
-  }
+    }
 
 #endif // #ifndef LIBMESH_ENABLE_AMR
 
@@ -374,7 +374,7 @@ void assemble_poisson(EquationSystems& es,
   // application.
   PerfLog perf_log ("Matrix Assembly");
 
-    // Get a constant reference to the mesh object.
+  // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
 
   // The dimension that we are running

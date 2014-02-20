@@ -43,24 +43,24 @@ public:
                unsigned int w_var,
                Real Reynolds)
     : _u_var(u_var), _v_var(v_var), _w_var(w_var), _Re(Reynolds)
-    { this->_initialized = true; }
+  { this->_initialized = true; }
 
   virtual Number operator() (const Point&, const Real = 0)
-    { libmesh_not_implemented(); }
+  { libmesh_not_implemented(); }
 
   virtual void operator() (const Point& p,
                            const Real,
                            DenseVector<Number>& output)
-    {
-      output.zero();
-      const Real x=p(0), y=p(1), z=p(2);
-      output(_u_var) = (_Re+1)*(y*y + z*z);
-      output(_v_var) = (_Re+1)*(x*x + z*z);
-      output(_w_var) = (_Re+1)*(x*x + y*y);
-    }
+  {
+    output.zero();
+    const Real x=p(0), y=p(1), z=p(2);
+    output(_u_var) = (_Re+1)*(y*y + z*z);
+    output(_v_var) = (_Re+1)*(x*x + z*z);
+    output(_w_var) = (_Re+1)*(x*x + y*y);
+  }
 
   virtual AutoPtr<FunctionBase<Number> > clone() const
-    { return AutoPtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _w_var, _Re)); }
+  { return AutoPtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _w_var, _Re)); }
 
 private:
   const unsigned int _u_var, _v_var, _w_var;
@@ -268,12 +268,12 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
     {
       // Compute the solution & its gradient at the old Newton iterate
       Number p = c.interior_value(p_var, qp),
-             u = c.interior_value(u_var, qp),
-             v = c.interior_value(v_var, qp),
-             w = c.interior_value(w_var, qp);
+        u = c.interior_value(u_var, qp),
+        v = c.interior_value(v_var, qp),
+        w = c.interior_value(w_var, qp);
       Gradient grad_u = c.interior_gradient(u_var, qp),
-               grad_v = c.interior_gradient(v_var, qp),
-               grad_w = c.interior_gradient(w_var, qp);
+        grad_v = c.interior_gradient(v_var, qp),
+        grad_w = c.interior_gradient(w_var, qp);
 
       // Definitions for convenience.  It is sometimes simpler to do a
       // dot product if you have the full vector at your disposal.
@@ -299,28 +299,28 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
       for (unsigned int i=0; i != n_u_dofs; i++)
         {
           Fu(i) += JxW[qp] *
-                   (-Reynolds*(U*grad_u)*phi[i][qp] + // convection term
-                    p*dphi[i][qp](0) -                // pressure term
-		    (grad_u*dphi[i][qp]) +            // diffusion term
-		    f(0)*phi[i][qp]                   // forcing function
-		    );
+            (-Reynolds*(U*grad_u)*phi[i][qp] + // convection term
+             p*dphi[i][qp](0) -                // pressure term
+             (grad_u*dphi[i][qp]) +            // diffusion term
+             f(0)*phi[i][qp]                   // forcing function
+             );
 
 
           Fv(i) += JxW[qp] *
-                   (-Reynolds*(U*grad_v)*phi[i][qp] + // convection term
-                    p*dphi[i][qp](1) -                // pressure term
-		    (grad_v*dphi[i][qp]) +            // diffusion term
-		    f(1)*phi[i][qp]                   // forcing function
-		    );
+            (-Reynolds*(U*grad_v)*phi[i][qp] + // convection term
+             p*dphi[i][qp](1) -                // pressure term
+             (grad_v*dphi[i][qp]) +            // diffusion term
+             f(1)*phi[i][qp]                   // forcing function
+             );
 
 
           if (dim == 3)
-          Fw(i) += JxW[qp] *
-                   (-Reynolds*(U*grad_w)*phi[i][qp] + // convection term
-                    p*dphi[i][qp](2) -                // pressure term
-		    (grad_w*dphi[i][qp]) +            // diffusion term
-		    f(2)*phi[i][qp]                   // forcing function
-		    );
+            Fw(i) += JxW[qp] *
+              (-Reynolds*(U*grad_w)*phi[i][qp] + // convection term
+               p*dphi[i][qp](2) -                // pressure term
+               (grad_w*dphi[i][qp]) +            // diffusion term
+               f(2)*phi[i][qp]                   // forcing function
+               );
 
 
           // Note that the Fp block is identically zero unless we are using
@@ -334,34 +334,34 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
               for (unsigned int j=0; j != n_u_dofs; j++)
                 {
                   Kuu(i,j) += JxW[qp] *
-   /* convection term */      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
-   /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
-   /* Newton term     */       Reynolds*u_x*phi[i][qp]*phi[j][qp]);
+                    /* convection term */      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
+                                                /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
+                                                /* Newton term     */       Reynolds*u_x*phi[i][qp]*phi[j][qp]);
 
                   Kuv(i,j) += JxW[qp] *
-   /* Newton term     */      -Reynolds*u_y*phi[i][qp]*phi[j][qp];
+                    /* Newton term     */      -Reynolds*u_y*phi[i][qp]*phi[j][qp];
 
                   Kvv(i,j) += JxW[qp] *
-   /* convection term */      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
-   /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
-   /* Newton term     */       Reynolds*v_y*phi[i][qp]*phi[j][qp]);
+                    /* convection term */      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
+                                                /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
+                                                /* Newton term     */       Reynolds*v_y*phi[i][qp]*phi[j][qp]);
 
                   Kvu(i,j) += JxW[qp] *
-   /* Newton term     */      -Reynolds*v_x*phi[i][qp]*phi[j][qp];
+                    /* Newton term     */      -Reynolds*v_x*phi[i][qp]*phi[j][qp];
                   if (dim == 3)
                     {
                       Kww(i,j) += JxW[qp] *
-   /* convection term */          (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
-   /* diffusion term  */           (dphi[i][qp]*dphi[j][qp]) -
-   /* Newton term     */           Reynolds*w_z*phi[i][qp]*phi[j][qp]);
+                        /* convection term */          (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
+                                                        /* diffusion term  */           (dphi[i][qp]*dphi[j][qp]) -
+                                                        /* Newton term     */           Reynolds*w_z*phi[i][qp]*phi[j][qp]);
                       Kuw(i,j) += JxW[qp] *
-   /* Newton term     */      -Reynolds*u_z*phi[i][qp]*phi[j][qp];
+                        /* Newton term     */      -Reynolds*u_z*phi[i][qp]*phi[j][qp];
                       Kvw(i,j) += JxW[qp] *
-   /* Newton term     */      -Reynolds*v_z*phi[i][qp]*phi[j][qp];
+                        /* Newton term     */      -Reynolds*v_z*phi[i][qp]*phi[j][qp];
                       Kwu(i,j) += JxW[qp] *
-   /* Newton term     */      -Reynolds*w_x*phi[i][qp]*phi[j][qp];
+                        /* Newton term     */      -Reynolds*w_x*phi[i][qp]*phi[j][qp];
                       Kwv(i,j) += JxW[qp] *
-   /* Newton term     */      -Reynolds*w_y*phi[i][qp]*phi[j][qp];
+                        /* Newton term     */      -Reynolds*w_y*phi[i][qp]*phi[j][qp];
                     }
                 }
 
@@ -425,18 +425,18 @@ bool NavierSystem::element_constraint (bool request_jacobian,
     {
       // Compute the velocity gradient at the old Newton iterate
       Gradient grad_u = c.interior_gradient(u_var, qp),
-               grad_v = c.interior_gradient(v_var, qp),
-               grad_w = c.interior_gradient(w_var, qp);
+        grad_v = c.interior_gradient(v_var, qp),
+        grad_w = c.interior_gradient(w_var, qp);
 
       // Now a loop over the pressure degrees of freedom.  This
       // computes the contributions of the continuity equation.
       for (unsigned int i=0; i != n_p_dofs; i++)
         {
           Fp(i) += JxW[qp] * psi[i][qp] *
-                   (grad_u(0) + grad_v(1));
+            (grad_u(0) + grad_v(1));
           if (dim == 3)
             Fp(i) += JxW[qp] * psi[i][qp] *
-                     (grad_w(2));
+              (grad_w(2));
 
           if (request_jacobian && c.get_elem_solution_derivative())
             {
@@ -550,8 +550,8 @@ bool NavierSystem::mass_residual (bool request_jacobian,
   for (unsigned int qp = 0; qp != n_qpoints; ++qp)
     {
       Number u = c.interior_value(u_var, qp),
-             v = c.interior_value(v_var, qp),
-             w = c.interior_value(w_var, qp);
+        v = c.interior_value(v_var, qp),
+        w = c.interior_value(w_var, qp);
 
       // We pull as many calculations as possible outside of loops
       Number JxWxRe   = JxW[qp] * Reynolds;
@@ -608,8 +608,8 @@ void NavierSystem::postprocess()
 
   Point p(1./3., 1./3.);
   Number u = point_value(u_var, p),
-         v = point_value(v_var, p),
-         w = (dim == 3) ? point_value(w_var, p) : 0;
+    v = point_value(v_var, p),
+    w = (dim == 3) ? point_value(w_var, p) : 0;
 
   std::cout << "u(1/3,1/3) = ("
             << u << ", "

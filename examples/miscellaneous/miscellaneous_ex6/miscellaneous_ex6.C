@@ -17,11 +17,11 @@
 
 
 
- // <h1>Miscellaneous Example 6 - Meshing with LibMesh's TetGen and Triangle Interfaces</h1>
- //
- // LibMesh provides interfaces to both Triangle and TetGen for generating
- // Delaunay triangulations and tetrahedralizations in two and three dimensions
- // (respectively).
+// <h1>Miscellaneous Example 6 - Meshing with LibMesh's TetGen and Triangle Interfaces</h1>
+//
+// LibMesh provides interfaces to both Triangle and TetGen for generating
+// Delaunay triangulations and tetrahedralizations in two and three dimensions
+// (respectively).
 
 // Local header files
 #include "libmesh/elem.h"

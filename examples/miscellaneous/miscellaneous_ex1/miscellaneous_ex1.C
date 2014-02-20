@@ -18,19 +18,19 @@
 
 
 
- // <h1>Miscellaneous Example 1 - Infinite Elements for the Wave Equation</h1>
- //
- // This is the sixth example program.  It builds on
- // the previous examples, and introduces the Infinite
- // Element class.  Note that the library must be compiled
- // with Infinite Elements enabled.  Otherwise, this
- // example will abort.
- // This example intends to demonstrate the similarities
- // between the \p FE and the \p InfFE classes in libMesh.
- // The matrices are assembled according to the wave equation.
- // However, for practical applications a time integration
- // scheme (as introduced in subsequent examples) should be
- // used.
+// <h1>Miscellaneous Example 1 - Infinite Elements for the Wave Equation</h1>
+//
+// This is the sixth example program.  It builds on
+// the previous examples, and introduces the Infinite
+// Element class.  Note that the library must be compiled
+// with Infinite Elements enabled.  Otherwise, this
+// example will abort.
+// This example intends to demonstrate the similarities
+// between the \p FE and the \p InfFE classes in libMesh.
+// The matrices are assembled according to the wave equation.
+// However, for practical applications a time integration
+// scheme (as introduced in subsequent examples) should be
+// used.
 
 // C++ include files that we need
 #include <iostream>
@@ -330,7 +330,7 @@ void assemble_wave(EquationSystems& es,
       else
         {
           // This is a conventional finite element.  Let \p fe handle it.
-            cfe = fe.get();
+          cfe = fe.get();
 
           // Boundary conditions.
           // Here we just zero the rhs-vector. For natural boundary
@@ -425,8 +425,8 @@ void assemble_wave(EquationSystems& es,
                     dweight[qp] * phi[i][qp]   //        Point * Real  = Point
                     +                          //        +
                     dphi[i][qp] * weight[qp]   //        Point * Real  = Point
-                    ) * dphi[j][qp]            //      )       * Point = Real
-                   ) * JxW[qp];                //    )         * Real  = Real
+                                               ) * dphi[j][qp]            //      )       * Point = Real
+                                               ) * JxW[qp];                //    )         * Real  = Real
 
                 // (d*Ht*nmut*nH - ndt*nmu*Ht*H - d*nHt*nmu*H)
                 Ce(i,j) +=
@@ -439,14 +439,14 @@ void assemble_wave(EquationSystems& es,
                    -                               //      -
                    (dphi[i][qp] * dphase[qp])      //      (Point * Point) = Real
                    * weight[qp] * phi[j][qp]       //      * Real * Real   = Real
-                   ) * JxW[qp];                    //    )         * Real  = Real
+                                                   ) * JxW[qp];                    //    )         * Real  = Real
 
                 // (d*Ht*H * (1 - nmut*nmu))
                 Me(i,j) +=
                   (                                       //    (
                    (1. - (dphase[qp] * dphase[qp]))       //      (Real  - (Point * Point)) = Real
                    * phi[i][qp] * phi[j][qp] * weight[qp] //      * Real *  Real  * Real    = Real
-                   ) * JxW[qp];                           //    ) * Real                    = Real
+                                                          ) * JxW[qp];                           //    ) * Real                    = Real
 
               } // end of the matrix summation loop
         } // end of quadrature point loop

@@ -17,19 +17,19 @@
 
 
 
- // <h1> Systems Example 5 - Linear Elastic Cantilever with Constraint </h1>
- //      By David Knezevic
- //
- // In this example we extend systems_of_equations_ex4 to enforce a constraint.
- // We apply a uniform load on the top surface of the cantilever, and we
- // determine the traction on the right boundary in order to obtain zero
- // average vertical displacement on the right boundary of the domain.
- //
- // This constraint is enforced via a Lagrange multiplier (SCALAR variable).
- // The system we solve, therefore, is of the form:
- //   a(u,v) + \lambda g(v) = f(v)
- //                    g(u) = 0
- // Here \lambda tells us the traction required to satisfy the constraint.
+// <h1> Systems Example 5 - Linear Elastic Cantilever with Constraint </h1>
+//      By David Knezevic
+//
+// In this example we extend systems_of_equations_ex4 to enforce a constraint.
+// We apply a uniform load on the top surface of the cantilever, and we
+// determine the traction on the right boundary in order to obtain zero
+// average vertical displacement on the right boundary of the domain.
+//
+// This constraint is enforced via a Lagrange multiplier (SCALAR variable).
+// The system we solve, therefore, is of the form:
+//   a(u,v) + \lambda g(v) = f(v)
+//                    g(u) = 0
+// Here \lambda tells us the traction required to satisfy the constraint.
 
 // C++ include files that we need
 #include <iostream>
@@ -239,91 +239,91 @@ void assemble_elasticity(EquationSystems& es,
       Fv.reposition (v_var*n_u_dofs, n_v_dofs);
 
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-      {
+        {
           for (unsigned int i=0; i<n_u_dofs; i++)
             for (unsigned int j=0; j<n_u_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=0, C_k=0;
+              {
+                // Tensor indices
+                unsigned int C_i, C_j, C_k, C_l;
+                C_i=0, C_k=0;
 
 
-              C_j=0, C_l=0;
-              Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                C_j=0, C_l=0;
+                Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
-              C_j=1, C_l=0;
-              Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                C_j=1, C_l=0;
+                Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
-              C_j=0, C_l=1;
-              Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                C_j=0, C_l=1;
+                Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
-              C_j=1, C_l=1;
-              Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
+                C_j=1, C_l=1;
+                Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+              }
 
           for (unsigned int i=0; i<n_u_dofs; i++)
             for (unsigned int j=0; j<n_v_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=0, C_k=1;
+              {
+                // Tensor indices
+                unsigned int C_i, C_j, C_k, C_l;
+                C_i=0, C_k=1;
 
 
-              C_j=0, C_l=0;
-              Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                C_j=0, C_l=0;
+                Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
-              C_j=1, C_l=0;
-              Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                C_j=1, C_l=0;
+                Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
-              C_j=0, C_l=1;
-              Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                C_j=0, C_l=1;
+                Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
-              C_j=1, C_l=1;
-              Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
+                C_j=1, C_l=1;
+                Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+              }
 
           for (unsigned int i=0; i<n_v_dofs; i++)
             for (unsigned int j=0; j<n_u_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=1, C_k=0;
+              {
+                // Tensor indices
+                unsigned int C_i, C_j, C_k, C_l;
+                C_i=1, C_k=0;
 
 
-              C_j=0, C_l=0;
-              Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                C_j=0, C_l=0;
+                Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
-              C_j=1, C_l=0;
-              Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                C_j=1, C_l=0;
+                Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
-              C_j=0, C_l=1;
-              Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                C_j=0, C_l=1;
+                Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
-              C_j=1, C_l=1;
-              Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
+                C_j=1, C_l=1;
+                Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+              }
 
           for (unsigned int i=0; i<n_v_dofs; i++)
             for (unsigned int j=0; j<n_v_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=1, C_k=1;
+              {
+                // Tensor indices
+                unsigned int C_i, C_j, C_k, C_l;
+                C_i=1, C_k=1;
 
 
-              C_j=0, C_l=0;
-              Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                C_j=0, C_l=0;
+                Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
-              C_j=1, C_l=0;
-              Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                C_j=1, C_l=0;
+                Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
-              C_j=0, C_l=1;
-              Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                C_j=0, C_l=1;
+                Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
-              C_j=1, C_l=1;
-              Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-      }
+                C_j=1, C_l=1;
+                Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+              }
+        }
 
       {
         for (unsigned int side=0; side<elem->n_sides(); side++)
@@ -338,7 +338,7 @@ void assemble_elasticity(EquationSystems& es,
               fe_face->reinit(elem, side);
 
               for (std::vector<boundary_id_type>::const_iterator b =
-                   bc_ids.begin(); b != bc_ids.end(); ++b)
+                     bc_ids.begin(); b != bc_ids.end(); ++b)
                 {
                   const boundary_id_type bc_id = *b;
                   for (unsigned int qp=0; qp<qface.n_points(); qp++)
@@ -357,9 +357,9 @@ void assemble_elasticity(EquationSystems& es,
                         {
                           for (unsigned int i=0; i<n_v_dofs; i++)
                             for (unsigned int j=0; j<n_lambda_dofs; j++)
-                            {
-                              Kv_lambda(i,j) += JxW_face[qp]* (-1.) * phi_face[i][qp];
-                            }
+                              {
+                                Kv_lambda(i,j) += JxW_face[qp]* (-1.) * phi_face[i][qp];
+                              }
 
                           for (unsigned int i=0; i<n_lambda_dofs; i++)
                             for (unsigned int j=0; j<n_v_dofs; j++)

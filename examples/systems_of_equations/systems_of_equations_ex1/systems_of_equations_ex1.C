@@ -15,11 +15,11 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Systems Example 1 - Stokes Equations</h1>
- //
- // This example shows how a simple, linear system of equations
- // can be solved in parallel.  The system of equations are the familiar
- // Stokes equations for low-speed incompressible fluid flow.
+// <h1>Systems Example 1 - Stokes Equations</h1>
+//
+// This example shows how a simple, linear system of equations
+// can be solved in parallel.  The system of equations are the familiar
+// Stokes equations for low-speed incompressible fluid flow.
 
 // C++ include files that we need
 #include <iostream>
@@ -123,7 +123,7 @@ int main (int argc, char** argv)
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   ExodusII_IO(mesh).write_equation_systems ("out.e",
-                                      equation_systems);
+                                            equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // All done.

@@ -15,10 +15,10 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Vector Finite Elements Example 3 - Nedelec Elements</h1>
- //
- // This example shows an example of using the Nedelec elements of the
- // first type to solve a model problem in H(curl).
+// <h1>Vector Finite Elements Example 3 - Nedelec Elements</h1>
+//
+// This example shows an example of using the Nedelec elements of the
+// first type to solve a model problem in H(curl).
 
 // Basic include files
 #include "libmesh/equation_systems.h"

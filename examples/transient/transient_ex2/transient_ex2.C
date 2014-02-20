@@ -19,17 +19,17 @@
 
 
 
- // <h1>Transient Example 2 - The Newmark System and the Wave Equation</h1>
- //
- // This is the eighth example program. It builds on
- // the previous example programs.  It introduces the
- // NewmarkSystem class.  In this example the wave equation
- // is solved using the time integration scheme provided
- // by the NewmarkSystem class.
- //
- // This example comes with a cylindrical mesh given in the
- // universal file pipe-mesh.unv.
- // The mesh contains HEX8 and PRISM6 elements.
+// <h1>Transient Example 2 - The Newmark System and the Wave Equation</h1>
+//
+// This is the eighth example program. It builds on
+// the previous example programs.  It introduces the
+// NewmarkSystem class.  In this example the wave equation
+// is solved using the time integration scheme provided
+// by the NewmarkSystem class.
+//
+// This example comes with a cylindrical mesh given in the
+// universal file pipe-mesh.unv.
+// The mesh contains HEX8 and PRISM6 elements.
 
 // C++ include files that we need
 #include <iostream>
@@ -487,7 +487,7 @@ void assemble_wave(EquationSystems& es,
               {
                 Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
                 Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
-                           *1./(speed*speed);
+                  *1./(speed*speed);
               } // end of the matrix summation loop
         } // end of quadrature point loop
 

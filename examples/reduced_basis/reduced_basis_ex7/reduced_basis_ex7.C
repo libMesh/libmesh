@@ -116,82 +116,82 @@ int main (int argc, char** argv)
   rb_con.set_rb_evaluation(rb_eval);
 
   if(!online_mode) // Perform the Offline stage of the RB method
-  {
-    // Read in the data that defines this problem from the specified text file
-    rb_con.process_parameters_file(parameters_filename);
-
-    // Print out info that describes the current setup of rb_con
-    rb_con.print_info();
-
-    // Prepare rb_con for the Construction stage of the RB method.
-    // This sets up the necessary data structures and performs
-    // initial assembly of the "truth" affine expansion of the PDE.
-    rb_con.initialize_rb_construction();
-
-    // Compute the reduced basis space by computing "snapshots", i.e.
-    // "truth" solves, at well-chosen parameter values and employing
-    // these snapshots as basis functions.
-    rb_con.train_reduced_basis();
-
-    // Write out the data that will subsequently be required for the Evaluation stage
-    rb_con.get_rb_evaluation().write_offline_data_to_files();
-
-    // If requested, write out the RB basis functions for visualization purposes
-    if(store_basis_functions)
     {
-      // Write out the basis functions
-      rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
-    }
+      // Read in the data that defines this problem from the specified text file
+      rb_con.process_parameters_file(parameters_filename);
 
-    // Basis functions should be orthonormal, so
-    // print out the inner products to check this
-    rb_con.print_basis_function_orthogonality();
-  }
+      // Print out info that describes the current setup of rb_con
+      rb_con.print_info();
+
+      // Prepare rb_con for the Construction stage of the RB method.
+      // This sets up the necessary data structures and performs
+      // initial assembly of the "truth" affine expansion of the PDE.
+      rb_con.initialize_rb_construction();
+
+      // Compute the reduced basis space by computing "snapshots", i.e.
+      // "truth" solves, at well-chosen parameter values and employing
+      // these snapshots as basis functions.
+      rb_con.train_reduced_basis();
+
+      // Write out the data that will subsequently be required for the Evaluation stage
+      rb_con.get_rb_evaluation().write_offline_data_to_files();
+
+      // If requested, write out the RB basis functions for visualization purposes
+      if(store_basis_functions)
+        {
+          // Write out the basis functions
+          rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
+        }
+
+      // Basis functions should be orthonormal, so
+      // print out the inner products to check this
+      rb_con.print_basis_function_orthogonality();
+    }
   else // Perform the Online stage of the RB method
-  {
-    // Read in the reduced basis data
-    rb_eval.read_offline_data_from_files();
-
-    // Read in online_N and initialize online parameters
-    Real online_frequency = infile("online_frequency", 0.);
-    RBParameters online_mu;
-    online_mu.set_value("frequency", online_frequency);
-    rb_eval.set_parameters(online_mu);
-    rb_eval.print_parameters();
-
-    // Now do the Online solve using the precomputed reduced basis
-    rb_eval.rb_solve(rb_eval.get_n_basis_functions());
-
-    if(store_basis_functions)
     {
-      // Read in the basis functions
-      rb_eval.read_in_basis_functions(rb_con);
+      // Read in the reduced basis data
+      rb_eval.read_offline_data_from_files();
 
-      // Plot the solution
-      rb_con.load_rb_solution();
-
-      //Output the variable in ExodusII format (single precision)
-      ExodusII_IO(mesh, /*single_precision=*/true).write_equation_systems ("RB_sol_float.exo", equation_systems);
-    }
-
-    // Now do a sweep over frequencies and write out the reflection coefficient for each frequency
-    std::ofstream reflection_coeffs_out("reflection_coefficients.dat");
-
-    Real n_frequencies = infile("n_frequencies", 0.);
-    Real delta_f = (rb_eval.get_parameter_max("frequency") - rb_eval.get_parameter_min("frequency")) / (n_frequencies-1);
-    for(unsigned int freq_i=0; freq_i<n_frequencies; freq_i++)
-    {
-      Real frequency = rb_eval.get_parameter_min("frequency") + freq_i * delta_f;
-      online_mu.set_value("frequency", frequency);
+      // Read in online_N and initialize online parameters
+      Real online_frequency = infile("online_frequency", 0.);
+      RBParameters online_mu;
+      online_mu.set_value("frequency", online_frequency);
       rb_eval.set_parameters(online_mu);
+      rb_eval.print_parameters();
+
+      // Now do the Online solve using the precomputed reduced basis
       rb_eval.rb_solve(rb_eval.get_n_basis_functions());
 
-      Number complex_one(1., 0.);
-      reflection_coeffs_out << frequency << " " << std::abs(rb_eval.RB_outputs[0] - complex_one) << std::endl;
-    }
-    reflection_coeffs_out.close();
+      if(store_basis_functions)
+        {
+          // Read in the basis functions
+          rb_eval.read_in_basis_functions(rb_con);
 
-  }
+          // Plot the solution
+          rb_con.load_rb_solution();
+
+          //Output the variable in ExodusII format (single precision)
+          ExodusII_IO(mesh, /*single_precision=*/true).write_equation_systems ("RB_sol_float.exo", equation_systems);
+        }
+
+      // Now do a sweep over frequencies and write out the reflection coefficient for each frequency
+      std::ofstream reflection_coeffs_out("reflection_coefficients.dat");
+
+      Real n_frequencies = infile("n_frequencies", 0.);
+      Real delta_f = (rb_eval.get_parameter_max("frequency") - rb_eval.get_parameter_min("frequency")) / (n_frequencies-1);
+      for(unsigned int freq_i=0; freq_i<n_frequencies; freq_i++)
+        {
+          Real frequency = rb_eval.get_parameter_min("frequency") + freq_i * delta_f;
+          online_mu.set_value("frequency", frequency);
+          rb_eval.set_parameters(online_mu);
+          rb_eval.rb_solve(rb_eval.get_n_basis_functions());
+
+          Number complex_one(1., 0.);
+          reflection_coeffs_out << frequency << " " << std::abs(rb_eval.RB_outputs[0] - complex_one) << std::endl;
+        }
+      reflection_coeffs_out.close();
+
+    }
 
 #endif
 

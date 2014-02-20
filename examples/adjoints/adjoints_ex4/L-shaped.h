@@ -13,11 +13,11 @@ class LaplaceSystem : public FEMSystem
 public:
   // Constructor
   LaplaceSystem(EquationSystems& es,
-               const std::string& name_in,
-               const unsigned int number_in)
-  : FEMSystem(es, name_in, number_in),
-    _fe_family("LAGRANGE"), _fe_order(1),
-    _analytic_jacobians(true) { qoi.resize(2); }
+                const std::string& name_in,
+                const unsigned int number_in)
+    : FEMSystem(es, name_in, number_in),
+      _fe_family("LAGRANGE"), _fe_order(1),
+      _analytic_jacobians(true) { qoi.resize(2); }
 
   std::string & fe_family() { return _fe_family;  }
   unsigned int & fe_order() { return _fe_order;  }
@@ -28,18 +28,18 @@ public:
   virtual void postprocess(void);
 
   Number &get_QoI_value(std::string type, unsigned int QoI_index)
-    {
-      if(type == "exact")
-	{
-	  return exact_QoI[QoI_index];
-	}
-      else
-	{
-	  return computed_QoI[QoI_index];
-	}
-    }
+  {
+    if(type == "exact")
+      {
+        return exact_QoI[QoI_index];
+      }
+    else
+      {
+        return computed_QoI[QoI_index];
+      }
+  }
 
-  protected:
+protected:
   // System initialization
   virtual void init_data ();
 
@@ -64,14 +64,14 @@ public:
   // Overloading the qoi function on elements
 
   virtual void element_qoi_derivative
-    (DiffContext &context,
-     const QoISet & qois);
+  (DiffContext &context,
+   const QoISet & qois);
 
   // Overloading the qoi function on sides
 
   virtual void side_qoi_derivative
-    (DiffContext &context,
-     const QoISet & qois);
+  (DiffContext &context,
+   const QoISet & qois);
 
   Number exact_solution (const Point&);
 

@@ -162,81 +162,81 @@ int main (int argc, char** argv)
   rb_construction.set_rb_evaluation(rb_eval);
 
   if(!online_mode) // Perform the Offline stage of the RB method
-  {
-    // Read data from input file and print state
-    eim_construction.process_parameters_file(eim_parameters);
-    eim_construction.print_info();
-
-    // Perform the EIM Greedy and write out the data
-    eim_construction.initialize_rb_construction();
-
-    eim_construction.train_reduced_basis();
-    eim_construction.get_rb_evaluation().write_offline_data_to_files("eim_data");
-
-    // Read data from input file and print state
-    rb_construction.process_parameters_file(rb_parameters);
-
-    // attach the EIM theta objects to the RBEvaluation
-    eim_rb_eval.initialize_eim_theta_objects();
-    rb_eval.get_rb_theta_expansion().attach_multiple_A_theta(eim_rb_eval.get_eim_theta_objects());
-
-    // attach the EIM assembly objects to the RBConstruction
-    eim_construction.initialize_eim_assembly_objects();
-    rb_construction.get_rb_assembly_expansion().attach_multiple_A_assembly(eim_construction.get_eim_assembly_objects());
-
-    // Print out the state of rb_construction now that the EIM objects have been attached
-    rb_construction.print_info();
-
-    // Need to initialize _after_ EIM greedy so that
-    // the system knows how many affine terms there are
-    rb_construction.initialize_rb_construction();
-    rb_construction.train_reduced_basis();
-    rb_construction.get_rb_evaluation().write_offline_data_to_files("rb_data");
-
-    // Write out the basis functions, if requested
-    if(store_basis_functions)
     {
-      // Write out the basis functions
-      eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction,"eim_data");
-      rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,"rb_data");
+      // Read data from input file and print state
+      eim_construction.process_parameters_file(eim_parameters);
+      eim_construction.print_info();
+
+      // Perform the EIM Greedy and write out the data
+      eim_construction.initialize_rb_construction();
+
+      eim_construction.train_reduced_basis();
+      eim_construction.get_rb_evaluation().write_offline_data_to_files("eim_data");
+
+      // Read data from input file and print state
+      rb_construction.process_parameters_file(rb_parameters);
+
+      // attach the EIM theta objects to the RBEvaluation
+      eim_rb_eval.initialize_eim_theta_objects();
+      rb_eval.get_rb_theta_expansion().attach_multiple_A_theta(eim_rb_eval.get_eim_theta_objects());
+
+      // attach the EIM assembly objects to the RBConstruction
+      eim_construction.initialize_eim_assembly_objects();
+      rb_construction.get_rb_assembly_expansion().attach_multiple_A_assembly(eim_construction.get_eim_assembly_objects());
+
+      // Print out the state of rb_construction now that the EIM objects have been attached
+      rb_construction.print_info();
+
+      // Need to initialize _after_ EIM greedy so that
+      // the system knows how many affine terms there are
+      rb_construction.initialize_rb_construction();
+      rb_construction.train_reduced_basis();
+      rb_construction.get_rb_evaluation().write_offline_data_to_files("rb_data");
+
+      // Write out the basis functions, if requested
+      if(store_basis_functions)
+        {
+          // Write out the basis functions
+          eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction,"eim_data");
+          rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,"rb_data");
+        }
     }
-  }
   else // Perform the Online stage of the RB method
-  {
-    eim_rb_eval.read_offline_data_from_files("eim_data");
-
-    // attach the EIM theta objects to rb_eval objects
-    eim_rb_eval.initialize_eim_theta_objects();
-    rb_eval.get_rb_theta_expansion().attach_multiple_A_theta(eim_rb_eval.get_eim_theta_objects());
-
-    // Read in the offline data for rb_eval
-    rb_eval.read_offline_data_from_files("rb_data");
-
-    // Get the parameters at which we will do a reduced basis solve
-    Real online_curvature = infile("online_curvature", 0.);
-    Real online_Bi        = infile("online_Bi", 0.);
-    Real online_kappa     = infile("online_kappa", 0.);
-    RBParameters online_mu;
-    online_mu.set_value("curvature", online_curvature);
-    online_mu.set_value("Bi", online_Bi);
-    online_mu.set_value("kappa", online_kappa);
-    rb_eval.set_parameters(online_mu);
-    rb_eval.print_parameters();
-    rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
-
-    // plot the solution, if requested
-    if(store_basis_functions)
     {
-      // read in the data from files
-      eim_rb_eval.read_in_basis_functions(eim_construction,"eim_data");
-      rb_eval.read_in_basis_functions(rb_construction,"rb_data");
+      eim_rb_eval.read_offline_data_from_files("eim_data");
 
-      eim_construction.load_rb_solution();
-      rb_construction.load_rb_solution();
+      // attach the EIM theta objects to rb_eval objects
+      eim_rb_eval.initialize_eim_theta_objects();
+      rb_eval.get_rb_theta_expansion().attach_multiple_A_theta(eim_rb_eval.get_eim_theta_objects());
 
-      transform_mesh_and_plot(equation_systems,online_curvature,"RB_sol.e");
+      // Read in the offline data for rb_eval
+      rb_eval.read_offline_data_from_files("rb_data");
+
+      // Get the parameters at which we will do a reduced basis solve
+      Real online_curvature = infile("online_curvature", 0.);
+      Real online_Bi        = infile("online_Bi", 0.);
+      Real online_kappa     = infile("online_kappa", 0.);
+      RBParameters online_mu;
+      online_mu.set_value("curvature", online_curvature);
+      online_mu.set_value("Bi", online_Bi);
+      online_mu.set_value("kappa", online_kappa);
+      rb_eval.set_parameters(online_mu);
+      rb_eval.print_parameters();
+      rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
+
+      // plot the solution, if requested
+      if(store_basis_functions)
+        {
+          // read in the data from files
+          eim_rb_eval.read_in_basis_functions(eim_construction,"eim_data");
+          rb_eval.read_in_basis_functions(rb_construction,"rb_data");
+
+          eim_construction.load_rb_solution();
+          rb_construction.load_rb_solution();
+
+          transform_mesh_and_plot(equation_systems,online_curvature,"RB_sol.e");
+        }
     }
-  }
 
   return 0;
 }
@@ -250,15 +250,15 @@ void transform_mesh_and_plot(EquationSystems& es, Real curvature, const std::str
   const MeshBase::node_iterator node_end = mesh.nodes_end();
 
   for( ; node_it != node_end; node_it++)
-  {
-    Node* node = *node_it;
+    {
+      Node* node = *node_it;
 
-    Real x = (*node)(0);
-    Real z = (*node)(2);
+      Real x = (*node)(0);
+      Real z = (*node)(2);
 
-    (*node)(0) = -1./curvature + (1./curvature + x)*cos(curvature*z);
-    (*node)(2) = (1./curvature + x)*sin(curvature*z);
-  }
+      (*node)(0) = -1./curvature + (1./curvature + x)*cos(curvature*z);
+      (*node)(2) = (1./curvature + x)*sin(curvature*z);
+    }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   ExodusII_IO(mesh).write_equation_systems(filename, es);

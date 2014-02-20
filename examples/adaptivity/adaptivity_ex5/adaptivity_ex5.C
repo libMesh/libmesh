@@ -15,14 +15,14 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-  // <h1>Adaptivity Example 5 - Periodic Boundary Conditions with Adaptive Mesh Refinement</h1>
-  //
-  // This example uses the same simple, linear transient
-  // system as in example 10; however in this case periodic boundary
-  // conditions are applied at the sides of the domain.
-  //
-  // This code also contains an example use of ParsedFunction, to
-  // allow users to specify an exact solution on the command line.
+// <h1>Adaptivity Example 5 - Periodic Boundary Conditions with Adaptive Mesh Refinement</h1>
+//
+// This example uses the same simple, linear transient
+// system as in example 10; however in this case periodic boundary
+// conditions are applied at the sides of the domain.
+//
+// This code also contains an example use of ParsedFunction, to
+// allow users to specify an exact solution on the command line.
 
 // C++ include files that we need
 #include <iostream>
@@ -142,10 +142,10 @@ int main (int argc, char** argv)
   // Use commandline parameter to specify if we are to
   // read in an initial solution or generate it ourself
   std::cout << "Usage:\n"
-    <<"\t " << argv[0] << " -init_timestep 0\n"
-    << "OR\n"
-    <<"\t " << argv[0] << " -read_solution -init_timestep 26\n"
-    << std::endl;
+            <<"\t " << argv[0] << " -init_timestep 0\n"
+            << "OR\n"
+            <<"\t " << argv[0] << " -read_solution -init_timestep 26\n"
+            << std::endl;
 
   std::cout << "Running: " << argv[0];
 
@@ -323,29 +323,29 @@ int main (int argc, char** argv)
     ("linear solver tolerance") = TOLERANCE;
 
   if(!read_solution)
-  {
-    // Write out the initial condition
+    {
+      // Write out the initial condition
 #ifdef LIBMESH_HAVE_GMV
-    GMVIO(mesh).write_equation_systems ("out.gmv.000",
-                                        equation_systems);
+      GMVIO(mesh).write_equation_systems ("out.gmv.000",
+                                          equation_systems);
 #endif
 #ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO(mesh).write_equation_systems (exodus_filename(0),
-                                              equation_systems);
+      ExodusII_IO(mesh).write_equation_systems (exodus_filename(0),
+                                                equation_systems);
 #endif
-  }
+    }
   else
-  {
-    // Write out the solution that was read in
+    {
+      // Write out the solution that was read in
 #ifdef LIBMESH_HAVE_GMV
-    GMVIO(mesh).write_equation_systems ("solution_read_in.gmv",
-                                        equation_systems);
+      GMVIO(mesh).write_equation_systems ("solution_read_in.gmv",
+                                          equation_systems);
 #endif
 #ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO(mesh).write_equation_systems ("solution_read_in.e",
-                                        equation_systems);
+      ExodusII_IO(mesh).write_equation_systems ("solution_read_in.e",
+                                                equation_systems);
 #endif
-  }
+    }
 
 
   // The Convection-Diffusion system requires that we specify
@@ -376,8 +376,8 @@ int main (int argc, char** argv)
   // We do 25 timesteps both before and after writing out the
   // intermediate solution
   for(unsigned int t_step=init_timestep;
-                   t_step<(init_timestep+n_timesteps);
-                   t_step++)
+      t_step<(init_timestep+n_timesteps);
+      t_step++)
     {
       // Increment the time counter, set the time and the
       // time step size as parameters in the EquationSystem.
@@ -491,11 +491,11 @@ int main (int argc, char** argv)
           // OStringStream file_name;
 
 #ifdef LIBMESH_HAVE_GMV
-//          file_name << "out.gmv.";
-//          OSSRealzeroright(file_name,3,0,t_step+1);
-//
-//          GMVIO(mesh).write_equation_systems (file_name.str(),
-//                                              equation_systems);
+          //          file_name << "out.gmv.";
+          //          OSSRealzeroright(file_name,3,0,t_step+1);
+          //
+          //          GMVIO(mesh).write_equation_systems (file_name.str(),
+          //                                              equation_systems);
 #endif
 #ifdef LIBMESH_HAVE_EXODUS_API
           // So... if paraview is told to open a file called out.e.{N}, it automatically tries to
@@ -523,7 +523,7 @@ int main (int argc, char** argv)
 #endif
 #ifdef LIBMESH_HAVE_EXODUS_API
       ExodusII_IO(mesh).write_equation_systems ("saved_solution.e",
-                                          equation_systems);
+                                                equation_systems);
 #endif
     }
 #endif // #ifndef LIBMESH_ENABLE_AMR

@@ -15,12 +15,12 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Systems Example 3 - Navier-Stokes with SCALAR Lagrange Multiplier</h1>
- //
- // This example shows how the transient Navier-Stokes problem from
- // example 13 can be solved using a scalar Lagrange multiplier formulation to
- // constrain the integral of the pressure variable, rather than pinning the
- // pressure at a single point.
+// <h1>Systems Example 3 - Navier-Stokes with SCALAR Lagrange Multiplier</h1>
+//
+// This example shows how the transient Navier-Stokes problem from
+// example 13 can be solved using a scalar Lagrange multiplier formulation to
+// constrain the integral of the pressure variable, rather than pinning the
+// pressure at a single point.
 
 // C++ include files that we need
 #include <iostream>
@@ -138,7 +138,7 @@ int main (int argc, char** argv)
 
   // Get a reference to the Stokes system to use later.
   TransientLinearImplicitSystem&  navier_stokes_system =
-        equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
+    equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
 
   // Now we begin the timestep loop to compute the time-accurate
   // solution of the equations.
@@ -174,8 +174,8 @@ int main (int argc, char** argv)
 
       // A pretty update message
       std::cout << "\n\n*** Solving time step " << t_step <<
-                   ", time = " << navier_stokes_system.time <<
-                   " ***" << std::endl;
+        ", time = " << navier_stokes_system.time <<
+        " ***" << std::endl;
 
       // Now we need to update the solution vector from the
       // previous time step.  This is done directly through
@@ -264,7 +264,7 @@ int main (int argc, char** argv)
                     << ".e";
 
           ExodusII_IO(mesh).write_equation_systems (file_name.str(),
-                                              equation_systems);
+                                                    equation_systems);
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     } // end timestep loop.

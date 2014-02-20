@@ -28,11 +28,11 @@ class SolutionFunction : public FunctionBase<Number>
 public:
 
   SolutionFunction( const unsigned int u_var )
-  : _u_var(u_var) {}
+    : _u_var(u_var) {}
   ~SolutionFunction( ){}
 
   virtual Number operator() (const Point&, const Real = 0)
-    { libmesh_not_implemented(); }
+  { libmesh_not_implemented(); }
 
   virtual void operator() (const Point& p,
                            const Real,
@@ -67,11 +67,11 @@ class SolutionGradient : public FunctionBase<Gradient>
 public:
 
   SolutionGradient( const unsigned int u_var )
-  : _u_var(u_var) {}
+    : _u_var(u_var) {}
   ~SolutionGradient( ){}
 
   virtual Gradient operator() (const Point&, const Real = 0)
-    { libmesh_not_implemented(); }
+  { libmesh_not_implemented(); }
 
   virtual void operator() (const Point& p,
                            const Real,DenseVector<Gradient>& output)
@@ -83,7 +83,7 @@ public:
   }
 
   virtual Gradient component( unsigned int component_in, const Point& p,
-			    const Real )
+                              const Real )
   {
     const Real x=p(0), y=p(1);
     return soln.grad( x, y ).row(component_in);

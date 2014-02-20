@@ -16,11 +16,11 @@
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 
- // <h1>Vector Finite Element Example 1 - Solving an uncoupled Poisson Problem</h1>
- //
- // This is the first vector FE example program.  It builds on
- // the introduction_ex3 example program by showing how to solve a simple
- // uncoupled Poisson system using vector Lagrange elements.
+// <h1>Vector Finite Element Example 1 - Solving an uncoupled Poisson Problem</h1>
+//
+// This is the first vector FE example program.  It builds on
+// the introduction_ex3 example program by showing how to solve a simple
+// uncoupled Poisson system using vector Lagrange elements.
 
 // C++ include files that we need
 #include <iostream>

@@ -76,8 +76,8 @@ public:
   SimpleRBConstruction (EquationSystems& es,
                         const std::string& name_in,
                         const unsigned int number_in)
-  : Parent(es, name_in, number_in),
-    dirichlet_bc(AutoPtr<DirichletBoundary>(NULL))
+    : Parent(es, name_in, number_in),
+      dirichlet_bc(AutoPtr<DirichletBoundary>(NULL))
   {}
 
   /**

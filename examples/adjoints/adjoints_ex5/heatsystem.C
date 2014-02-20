@@ -37,7 +37,7 @@
 void HeatSystem::init_data ()
 {
   T_var = this->add_variable ("T", static_cast<Order>(_fe_order),
-                      Utility::string_to_enum<FEFamily>(_fe_family));
+                              Utility::string_to_enum<FEFamily>(_fe_family));
 
   // Make sure the input file heat.in exists, and parse it.
   {
@@ -69,7 +69,7 @@ void HeatSystem::init_data ()
   ZeroFunction<Number> zero;
 
   this->get_dof_map().add_dirichlet_boundary
-        (DirichletBoundary (all_bdys, T_only, &zero));
+    (DirichletBoundary (all_bdys, T_only, &zero));
 
   FEMSystem::init_data();
 }
@@ -118,7 +118,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
-FEBase* elem_fe = NULL;
+  FEBase* elem_fe = NULL;
   c.get_element_fe( 0, elem_fe );
 
   // Element Jacobian * quadrature weights for interior integration

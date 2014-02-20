@@ -53,7 +53,7 @@ void LaplaceSystem::init_context(DiffContext &context)
 
 // Assemble the element contributions to the stiffness matrix
 bool LaplaceSystem::element_time_derivative (bool request_jacobian,
-					  DiffContext &context)
+                                             DiffContext &context)
 {
   // Are the jacobians specified analytically ?
   bool compute_jacobian = request_jacobian && _analytic_jacobians;
@@ -106,7 +106,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
 
 // Set Dirichlet bcs, side contributions to global stiffness matrix
 bool LaplaceSystem::side_constraint (bool request_jacobian,
-				  DiffContext &context)
+                                     DiffContext &context)
 {
   // Are the jacobians specified analytically ?
   bool compute_jacobian = request_jacobian && _analytic_jacobians;

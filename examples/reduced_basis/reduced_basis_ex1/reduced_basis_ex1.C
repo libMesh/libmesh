@@ -128,88 +128,88 @@ int main (int argc, char** argv)
   rb_con.set_rb_evaluation(rb_eval);
 
   if(!online_mode) // Perform the Offline stage of the RB method
-  {
-    // Read in the data that defines this problem from the specified text file
-    rb_con.process_parameters_file(parameters_filename);
-
-    // Print out info that describes the current setup of rb_con
-    rb_con.print_info();
-
-    // Prepare rb_con for the Construction stage of the RB method.
-    // This sets up the necessary data structures and performs
-    // initial assembly of the "truth" affine expansion of the PDE.
-    rb_con.initialize_rb_construction();
-
-    // Compute the reduced basis space by computing "snapshots", i.e.
-    // "truth" solves, at well-chosen parameter values and employing
-    // these snapshots as basis functions.
-    rb_con.train_reduced_basis();
-
-    // Write out the data that will subsequently be required for the Evaluation stage
-    rb_con.get_rb_evaluation().write_offline_data_to_files();
-
-    // If requested, write out the RB basis functions for visualization purposes
-    if(store_basis_functions)
     {
-      // Write out the basis functions
-      rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
-    }
+      // Read in the data that defines this problem from the specified text file
+      rb_con.process_parameters_file(parameters_filename);
 
-    // Basis functions should be orthonormal, so
-    // print out the inner products to check this
-    rb_con.print_basis_function_orthogonality();
-  }
+      // Print out info that describes the current setup of rb_con
+      rb_con.print_info();
+
+      // Prepare rb_con for the Construction stage of the RB method.
+      // This sets up the necessary data structures and performs
+      // initial assembly of the "truth" affine expansion of the PDE.
+      rb_con.initialize_rb_construction();
+
+      // Compute the reduced basis space by computing "snapshots", i.e.
+      // "truth" solves, at well-chosen parameter values and employing
+      // these snapshots as basis functions.
+      rb_con.train_reduced_basis();
+
+      // Write out the data that will subsequently be required for the Evaluation stage
+      rb_con.get_rb_evaluation().write_offline_data_to_files();
+
+      // If requested, write out the RB basis functions for visualization purposes
+      if(store_basis_functions)
+        {
+          // Write out the basis functions
+          rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
+        }
+
+      // Basis functions should be orthonormal, so
+      // print out the inner products to check this
+      rb_con.print_basis_function_orthogonality();
+    }
   else // Perform the Online stage of the RB method
-  {
-    // Read in the reduced basis data
-    rb_eval.read_offline_data_from_files();
-
-    // Read in online_N and initialize online parameters
-    unsigned int online_N = infile("online_N",1);
-    Real online_x_vel = infile("online_x_vel", 0.);
-    Real online_y_vel = infile("online_y_vel", 0.);
-    RBParameters online_mu;
-    online_mu.set_value("x_vel", online_x_vel);
-    online_mu.set_value("y_vel", online_y_vel);
-    rb_eval.set_parameters(online_mu);
-    rb_eval.print_parameters();
-
-    // Now do the Online solve using the precomputed reduced basis
-    rb_eval.rb_solve(online_N);
-
-    // Print out outputs as well as the corresponding output error bounds.
-    std::cout << "output 1, value = " << rb_eval.RB_outputs[0]
-              << ", bound = " << rb_eval.RB_output_error_bounds[0]
-              << std::endl;
-    std::cout << "output 2, value = " << rb_eval.RB_outputs[1]
-              << ", bound = " << rb_eval.RB_output_error_bounds[1]
-              << std::endl;
-    std::cout << "output 3, value = " << rb_eval.RB_outputs[2]
-              << ", bound = " << rb_eval.RB_output_error_bounds[2]
-              << std::endl;
-    std::cout << "output 4, value = " << rb_eval.RB_outputs[3]
-              << ", bound = " << rb_eval.RB_output_error_bounds[3]
-              << std::endl << std::endl;
-
-    if(store_basis_functions)
     {
-      // Read in the basis functions
-      rb_eval.read_in_basis_functions(rb_con);
+      // Read in the reduced basis data
+      rb_eval.read_offline_data_from_files();
 
-      // Plot the solution
-      rb_con.load_rb_solution();
+      // Read in online_N and initialize online parameters
+      unsigned int online_N = infile("online_N",1);
+      Real online_x_vel = infile("online_x_vel", 0.);
+      Real online_y_vel = infile("online_y_vel", 0.);
+      RBParameters online_mu;
+      online_mu.set_value("x_vel", online_x_vel);
+      online_mu.set_value("y_vel", online_y_vel);
+      rb_eval.set_parameters(online_mu);
+      rb_eval.print_parameters();
+
+      // Now do the Online solve using the precomputed reduced basis
+      rb_eval.rb_solve(online_N);
+
+      // Print out outputs as well as the corresponding output error bounds.
+      std::cout << "output 1, value = " << rb_eval.RB_outputs[0]
+                << ", bound = " << rb_eval.RB_output_error_bounds[0]
+                << std::endl;
+      std::cout << "output 2, value = " << rb_eval.RB_outputs[1]
+                << ", bound = " << rb_eval.RB_output_error_bounds[1]
+                << std::endl;
+      std::cout << "output 3, value = " << rb_eval.RB_outputs[2]
+                << ", bound = " << rb_eval.RB_output_error_bounds[2]
+                << std::endl;
+      std::cout << "output 4, value = " << rb_eval.RB_outputs[3]
+                << ", bound = " << rb_eval.RB_output_error_bounds[3]
+                << std::endl << std::endl;
+
+      if(store_basis_functions)
+        {
+          // Read in the basis functions
+          rb_eval.read_in_basis_functions(rb_con);
+
+          // Plot the solution
+          rb_con.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
-      ExodusII_IO(mesh).write_equation_systems ("RB_sol.e",equation_systems);
+          ExodusII_IO(mesh).write_equation_systems ("RB_sol.e",equation_systems);
 #endif
 
-      // Plot the first basis function that was generated from the train_reduced_basis
-      // call in the Offline stage
-      rb_con.load_basis_function(0);
+          // Plot the first basis function that was generated from the train_reduced_basis
+          // call in the Offline stage
+          rb_con.load_basis_function(0);
 #ifdef LIBMESH_HAVE_EXODUS_API
-      ExodusII_IO(mesh).write_equation_systems ("bf0.e",equation_systems);
+          ExodusII_IO(mesh).write_equation_systems ("bf0.e",equation_systems);
 #endif
+        }
     }
-  }
 
   return 0;
 }

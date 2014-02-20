@@ -69,122 +69,122 @@ int main (int argc, char** argv)
 #else
 
 #ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
-  // SLEPc currently gives us a nasty crash with Real==float
-  libmesh_example_assert(false, "--disable-singleprecision");
+// SLEPc currently gives us a nasty crash with Real==float
+libmesh_example_assert(false, "--disable-singleprecision");
 #endif
 
-  // Check for proper usage.
-  if (argc < 3)
-    {
-      if (init.comm().rank() == 0)
-        std::cerr << "\nUsage: " << argv[0]
-                  << " -n <number of eigen values>"
-                  << std::endl;
-      libmesh_error();
-    }
+// Check for proper usage.
+if (argc < 3)
+  {
+    if (init.comm().rank() == 0)
+      std::cerr << "\nUsage: " << argv[0]
+                << " -n <number of eigen values>"
+                << std::endl;
+    libmesh_error();
+  }
 
-  // Tell the user what we are doing.
-  else
-    {
-      std::cout << "Running " << argv[0];
+// Tell the user what we are doing.
+ else
+   {
+     std::cout << "Running " << argv[0];
 
-      for (int i=1; i<argc; i++)
-        std::cout << " " << argv[i];
+     for (int i=1; i<argc; i++)
+       std::cout << " " << argv[i];
 
-      std::cout << std::endl << std::endl;
-    }
+     std::cout << std::endl << std::endl;
+   }
 
-  // Get the number of eigen values to be computed from argv[2]
-  const unsigned int nev = std::atoi(argv[2]);
+// Get the number of eigen values to be computed from argv[2]
+const unsigned int nev = std::atoi(argv[2]);
 
-  // Skip this 2D example if libMesh was compiled as 1D-only.
-  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+// Skip this 2D example if libMesh was compiled as 1D-only.
+libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
 
-  // Create a mesh, with dimension to be overridden later, on the
-  // default MPI communicator.
-  Mesh mesh(init.comm());
+// Create a mesh, with dimension to be overridden later, on the
+// default MPI communicator.
+Mesh mesh(init.comm());
 
-  // Use the internal mesh generator to create a uniform
-  // 2D grid on a square.
-  MeshTools::Generation::build_square (mesh,
-                                       20, 20,
-                                       -1., 1.,
-                                       -1., 1.,
-                                       QUAD4);
+// Use the internal mesh generator to create a uniform
+// 2D grid on a square.
+MeshTools::Generation::build_square (mesh,
+                                     20, 20,
+                                     -1., 1.,
+                                     -1., 1.,
+                                     QUAD4);
 
-  // Print information about the mesh to the screen.
-  mesh.print_info();
+// Print information about the mesh to the screen.
+mesh.print_info();
 
-  // Create an equation systems object.
-  EquationSystems equation_systems (mesh);
+// Create an equation systems object.
+EquationSystems equation_systems (mesh);
 
-  // Create a EigenSystem named "Eigensystem" and (for convenience)
-  // use a reference to the system we create.
-  EigenSystem & eigen_system =
-    equation_systems.add_system<EigenSystem> ("Eigensystem");
+// Create a EigenSystem named "Eigensystem" and (for convenience)
+// use a reference to the system we create.
+EigenSystem & eigen_system =
+  equation_systems.add_system<EigenSystem> ("Eigensystem");
 
-  // Declare the system variables.
-  // Adds the variable "p" to "Eigensystem".   "p"
-  // will be approximated using second-order approximation.
-  eigen_system.add_variable("p", FIRST);
+// Declare the system variables.
+// Adds the variable "p" to "Eigensystem".   "p"
+// will be approximated using second-order approximation.
+eigen_system.add_variable("p", FIRST);
 
-  // Give the system a pointer to the matrix assembly
-  // function defined below.
-  eigen_system.attach_assemble_function (assemble_mass);
+// Give the system a pointer to the matrix assembly
+// function defined below.
+eigen_system.attach_assemble_function (assemble_mass);
 
-  // Set necessary parametrs used in EigenSystem::solve(),
-  // i.e. the number of requested eigenpairs \p nev and the number
-  // of basis vectors \p ncv used in the solution algorithm. Note that
-  // ncv >= nev must hold and ncv >= 2*nev is recommended.
-  equation_systems.parameters.set<unsigned int>("eigenpairs")    = nev;
-  equation_systems.parameters.set<unsigned int>("basis vectors") = nev*3;
+// Set necessary parametrs used in EigenSystem::solve(),
+// i.e. the number of requested eigenpairs \p nev and the number
+// of basis vectors \p ncv used in the solution algorithm. Note that
+// ncv >= nev must hold and ncv >= 2*nev is recommended.
+equation_systems.parameters.set<unsigned int>("eigenpairs")    = nev;
+equation_systems.parameters.set<unsigned int>("basis vectors") = nev*3;
 
-  // You may optionally change the default eigensolver used by SLEPc.
-  // The Krylov-Schur method is mathematically equivalent to implicitly
-  // restarted Arnoldi, the method of Arpack, so there is currently no
-  // point in using SLEPc with Arpack.
-  // ARNOLDI     = default in SLEPc 2.3.1 and earlier
-  // KRYLOVSCHUR default in SLEPc 2.3.2 and later
-  // eigen_system.eigen_solver->set_eigensolver_type(KRYLOVSCHUR);
+// You may optionally change the default eigensolver used by SLEPc.
+// The Krylov-Schur method is mathematically equivalent to implicitly
+// restarted Arnoldi, the method of Arpack, so there is currently no
+// point in using SLEPc with Arpack.
+// ARNOLDI     = default in SLEPc 2.3.1 and earlier
+// KRYLOVSCHUR default in SLEPc 2.3.2 and later
+// eigen_system.eigen_solver->set_eigensolver_type(KRYLOVSCHUR);
 
-  // Set the solver tolerance and the maximum number of iterations.
-  equation_systems.parameters.set<Real>
-    ("linear solver tolerance") = pow(TOLERANCE, 5./3.);
-  equation_systems.parameters.set<unsigned int>
-    ("linear solver maximum iterations") = 1000;
+// Set the solver tolerance and the maximum number of iterations.
+equation_systems.parameters.set<Real>
+("linear solver tolerance") = pow(TOLERANCE, 5./3.);
+equation_systems.parameters.set<unsigned int>
+("linear solver maximum iterations") = 1000;
 
-  // Initialize the data structures for the equation system.
-  equation_systems.init();
+// Initialize the data structures for the equation system.
+equation_systems.init();
 
-  // Prints information about the system to the screen.
-  equation_systems.print_info();
+// Prints information about the system to the screen.
+equation_systems.print_info();
 
-  // Solve the system "Eigensystem".
-  eigen_system.solve();
+// Solve the system "Eigensystem".
+eigen_system.solve();
 
-  // Get the number of converged eigen pairs.
-  unsigned int nconv = eigen_system.get_n_converged();
+// Get the number of converged eigen pairs.
+unsigned int nconv = eigen_system.get_n_converged();
 
-  std::cout << "Number of converged eigenpairs: " << nconv
-            << "\n" << std::endl;
+std::cout << "Number of converged eigenpairs: " << nconv
+<< "\n" << std::endl;
 
-  // Get the last converged eigenpair
-  if (nconv != 0)
-    {
-      eigen_system.get_eigenpair(nconv-1);
+// Get the last converged eigenpair
+if (nconv != 0)
+  {
+    eigen_system.get_eigenpair(nconv-1);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-      // Write the eigen vector to file.
-      ExodusII_IO (mesh).write_equation_systems ("out.e", equation_systems);
+    // Write the eigen vector to file.
+    ExodusII_IO (mesh).write_equation_systems ("out.e", equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
-    }
-  else
-    {
-      std::cout << "WARNING: Solver did not converge!\n" << nconv << std::endl;
-    }
+  }
+ else
+   {
+     std::cout << "WARNING: Solver did not converge!\n" << nconv << std::endl;
+   }
 
-  // All done.
-  return 0;
+// All done.
+return 0;
 }
 
 #endif // LIBMESH_HAVE_SLEPC
@@ -299,7 +299,7 @@ void assemble_mass(EquationSystems& es,
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         for (unsigned int i=0; i<phi.size(); i++)
           for (unsigned int j=0; j<phi.size(); j++)
-              Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
+            Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
 
       // On an unrefined mesh, constrain_element_matrix does
       // nothing.  If this assembly function is ever repurposed to

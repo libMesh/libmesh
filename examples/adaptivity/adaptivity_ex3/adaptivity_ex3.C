@@ -15,31 +15,31 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Adaptivity Example 3 - Laplace Equation in the L-Shaped Domain</h1>
- //
- // This example solves the Laplace equation on the classic "L-shaped"
- // domain with adaptive mesh refinement.  In this case, the exact
- // solution is u(r,\theta) = r^{2/3} * \sin ( (2/3) * \theta), but
- // the standard Kelly error indicator is used to estimate the error.
- // The initial mesh contains three QUAD9 elements which represent the
- // standard quadrants I, II, and III of the domain [-1,1]x[-1,1],
- // i.e.
- // Element 0: [-1,0]x[ 0,1]
- // Element 1: [ 0,1]x[ 0,1]
- // Element 2: [-1,0]x[-1,0]
- // The mesh is provided in the standard libMesh ASCII format file
- // named "lshaped.xda".  In addition, an input file named "adaptivity_ex3.in"
- // is provided which allows the user to set several parameters for
- // the solution so that the problem can be re-run without a
- // re-compile.  The solution technique employed is to have a
- // refinement loop with a linear solve inside followed by a
- // refinement of the grid and projection of the solution to the new grid
- // In the final loop iteration, there is no additional
- // refinement after the solve.  In the input file "adaptivity_ex3.in",
- // the variable "max_r_steps" controls the number of refinement steps,
- // "max_r_level" controls the maximum element refinement level, and
- // "refine_percentage" / "coarsen_percentage" determine the number of
- // elements which will be refined / coarsened at each step.
+// <h1>Adaptivity Example 3 - Laplace Equation in the L-Shaped Domain</h1>
+//
+// This example solves the Laplace equation on the classic "L-shaped"
+// domain with adaptive mesh refinement.  In this case, the exact
+// solution is u(r,\theta) = r^{2/3} * \sin ( (2/3) * \theta), but
+// the standard Kelly error indicator is used to estimate the error.
+// The initial mesh contains three QUAD9 elements which represent the
+// standard quadrants I, II, and III of the domain [-1,1]x[-1,1],
+// i.e.
+// Element 0: [-1,0]x[ 0,1]
+// Element 1: [ 0,1]x[ 0,1]
+// Element 2: [-1,0]x[-1,0]
+// The mesh is provided in the standard libMesh ASCII format file
+// named "lshaped.xda".  In addition, an input file named "adaptivity_ex3.in"
+// is provided which allows the user to set several parameters for
+// the solution so that the problem can be re-run without a
+// re-compile.  The solution technique employed is to have a
+// refinement loop with a linear solve inside followed by a
+// refinement of the grid and projection of the solution to the new grid
+// In the final loop iteration, there is no additional
+// refinement after the solve.  In the input file "adaptivity_ex3.in",
+// the variable "max_r_steps" controls the number of refinement steps,
+// "max_r_level" controls the maximum element refinement level, and
+// "refine_percentage" / "coarsen_percentage" determine the number of
+// elements which will be refined / coarsened at each step.
 
 // LibMesh include files.
 #include "libmesh/mesh.h"
@@ -260,7 +260,7 @@ int main(int argc, char** argv)
           std::ostringstream outfile;
           outfile << "lshaped_" << r_step << ".e";
           ExodusII_IO (mesh).write_equation_systems (outfile.str(),
-                                               equation_systems);
+                                                     equation_systems);
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
@@ -425,7 +425,7 @@ int main(int argc, char** argv)
   // After solving the system write the solution
   // to a ExodusII-formatted plot file.
   ExodusII_IO (mesh).write_equation_systems ("lshaped.e",
-                                       equation_systems);
+                                             equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // Close up the output file.
@@ -575,7 +575,7 @@ void assemble_laplace(EquationSystems& es,
   // application.
   PerfLog perf_log ("Matrix Assembly",false);
 
-    // Get a constant reference to the mesh object.
+  // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
 
   // The dimension that we are running
@@ -715,7 +715,7 @@ void assemble_laplace(EquationSystems& es,
           {
             Real x = q_point[qp](0);
             Real f = singularity ? sqrt(3.)/9.*pow(-x, -4./3.) :
-                                   cos(x);
+              cos(x);
             for (unsigned int i=0; i<dphi.size(); ++i)
               Fe(i) += JxW[qp]*phi[i][qp]*f;
           }

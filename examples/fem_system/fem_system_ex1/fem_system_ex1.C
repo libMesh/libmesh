@@ -15,12 +15,12 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>FEMSystem Example 1 - Unsteady Navier-Stokes Equations with
- // FEMSystem</h1>
- //
- // This example shows how the transient nonlinear problem from
- // example 13 can be solved using the
- // DifferentiableSystem class framework
+// <h1>FEMSystem Example 1 - Unsteady Navier-Stokes Equations with
+// FEMSystem</h1>
+//
+// This example shows how the transient nonlinear problem from
+// example 13 can be solved using the
+// DifferentiableSystem class framework
 
 // C++ includes
 #include <iomanip>

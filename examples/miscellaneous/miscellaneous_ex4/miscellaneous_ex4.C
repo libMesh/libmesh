@@ -15,23 +15,23 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-  // <h1>Miscellaneous Example 4 - Using a shell matrix</h1>
-  //
-  // This example solves the equation
-  //
-  // \f$-\Delta u+\int u = 1\f$
-  //
-  // with homogeneous Dirichlet boundary conditions.  This system has
-  // a full system matrix which can be written as the sum of of sparse
-  // matrix and a rank 1 matrix.  The shell matrix concept is used to
-  // solve this problem.
-  //
-  // The problem is solved in parallel on a non-uniform grid in order
-  // to demonstrate all the techniques that are required for this.
-  // The grid is fixed, however, i.e. no adaptive mesh refinement is
-  // used, so that the example remains simple.
-  //
-  // The example is 2d; extension to 3d is straight forward.
+// <h1>Miscellaneous Example 4 - Using a shell matrix</h1>
+//
+// This example solves the equation
+//
+// \f$-\Delta u+\int u = 1\f$
+//
+// with homogeneous Dirichlet boundary conditions.  This system has
+// a full system matrix which can be written as the sum of of sparse
+// matrix and a rank 1 matrix.  The shell matrix concept is used to
+// solve this problem.
+//
+// The problem is solved in parallel on a non-uniform grid in order
+// to demonstrate all the techniques that are required for this.
+// The grid is fixed, however, i.e. no adaptive mesh refinement is
+// used, so that the example remains simple.
+//
+// The example is 2d; extension to 3d is straight forward.
 
 // C++ include files that we need
 #include <iostream>

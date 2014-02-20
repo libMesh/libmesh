@@ -56,8 +56,8 @@ public:
    */
   MeshlessInterpolationFunction (const MeshfreeInterpolation &mfi,
 				 Threads::spin_mutex &mutex) :
-  _mfi (mfi),
-  _mutex(mutex)
+    _mfi (mfi),
+    _mutex(mutex)
   {}
 
 

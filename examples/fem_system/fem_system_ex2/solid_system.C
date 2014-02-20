@@ -37,15 +37,15 @@
 
 // Solaris Studio has no NAN
 #ifdef __SUNPRO_CC
-  #define NAN (1.0/0.0)
+#define NAN (1.0/0.0)
 #endif
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
 SolidSystem::SolidSystem(EquationSystems& es, const std::string& name_in,
-    const unsigned int number_in) :
-    FEMSystem(es, name_in, number_in) {
+                         const unsigned int number_in) :
+  FEMSystem(es, name_in, number_in) {
 
   // Add a time solver. We are just looking at a steady state problem here.
   this->time_solver = AutoPtr<TimeSolver>(new SteadySolver(*this));
@@ -59,14 +59,14 @@ void SolidSystem::save_initial_mesh() {
   // Loop over all nodes and copy the location from the current system to
   // the auxiliary system.
   const MeshBase::const_node_iterator nd_end =
-      this->get_mesh().local_nodes_end();
+    this->get_mesh().local_nodes_end();
   for (MeshBase::const_node_iterator nd = this->get_mesh().local_nodes_begin();
-      nd != nd_end; ++nd) {
+       nd != nd_end; ++nd) {
     const Node *node = *nd;
     for (unsigned int d = 0; d < dim; ++d) {
       unsigned int source_dof = node->dof_number(this->number(), var[d], 0);
       unsigned int dest_dof = node->dof_number(aux_sys.number(), undefo_var[d],
-          0);
+                                               0);
       Number value = this->current_local_solution->el(source_dof);
       aux_sys.current_local_solution->set(dest_dof, value);
     }
@@ -100,12 +100,12 @@ void SolidSystem::init_data() {
   // Do the parent's initialization after variables are defined
   FEMSystem::init_data();
 
-//	// Tell the system to march velocity forward in time, but
-//	// leave p as a constraint only
-//	this->time_evolving(var[0]);
-//	this->time_evolving(var[1]);
-//	if (dim == 3)
-//		this->time_evolving(var[2]);
+  //	// Tell the system to march velocity forward in time, but
+  //	// leave p as a constraint only
+  //	this->time_evolving(var[0]);
+  //	this->time_evolving(var[1]);
+  //	if (dim == 3)
+  //		this->time_evolving(var[2]);
 
   // Tell the system which variables are containing the node positions
   set_mesh_system(this);
@@ -124,17 +124,17 @@ void SolidSystem::init_data() {
   DiffSolver &solver = *(this->time_solver->diff_solver().get());
   solver.quiet = args("solver/quiet", false);
   solver.max_nonlinear_iterations = args(
-      "solver/nonlinear/max_nonlinear_iterations", 100);
+                                         "solver/nonlinear/max_nonlinear_iterations", 100);
   solver.relative_step_tolerance = args(
-      "solver/nonlinear/relative_step_tolerance", 1.e-3);
+                                        "solver/nonlinear/relative_step_tolerance", 1.e-3);
   solver.relative_residual_tolerance = args(
-      "solver/nonlinear/relative_residual_tolerance", 1.e-8);
+                                            "solver/nonlinear/relative_residual_tolerance", 1.e-8);
   solver.absolute_residual_tolerance = args(
-      "solver/nonlinear/absolute_residual_tolerance", 1.e-8);
+                                            "solver/nonlinear/absolute_residual_tolerance", 1.e-8);
   solver.verbose = !args("solver/quiet", false);
 
   ((NewtonSolver&) solver).require_residual_reduction = args(
-      "solver/nonlinear/require_reduction", false);
+                                                             "solver/nonlinear/require_reduction", false);
 
   // And the linear solver options
   solver.max_linear_iterations = args("max_linear_iterations", 50000);
@@ -171,12 +171,12 @@ void SolidSystem::init_context(DiffContext &context) {
  * linearized internal forces (stiffness matrix) in elem_jacobian.
  */
 bool SolidSystem::element_time_derivative(bool request_jacobian,
-    DiffContext &context) {
+                                          DiffContext &context) {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
-FEBase* elem_fe = NULL;
+  FEBase* elem_fe = NULL;
   c.get_element_fe( 0, elem_fe );
 
   // Element Jacobian * quadrature weights for interior integration
@@ -211,7 +211,7 @@ FEBase* elem_fe = NULL;
 
   // Get a reference to the auxiliary system
   TransientExplicitSystem& aux_system = this->get_equation_systems().get_system<
-      TransientExplicitSystem>("auxiliary");
+    TransientExplicitSystem>("auxiliary");
   std::vector<dof_id_type> undefo_index;
 
   // Assume symmetry of local stiffness matrices
@@ -271,14 +271,14 @@ FEBase* elem_fe = NULL;
 }
 
 bool SolidSystem::side_time_derivative(bool request_jacobian,
-    DiffContext &context) {
+                                       DiffContext &context) {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
   // Apply displacement boundary conditions with penalty method
 
   // Get the current load step
   Real ratio = this->get_equation_systems().parameters.get<Real>("progress")
-      + 0.001;
+    + 0.001;
 
   // The BC are stored in the simulation parameters as array containing sequences of
   // four numbers: Id of the side for the displacements and three values describing the
@@ -289,8 +289,8 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
   unsigned int num_bc = args.vector_variable_size("bc/displacement");
   if (num_bc % 4 != 0) {
     libMesh::err
-        << "ERROR, Odd number of values in displacement boundary condition.\n"
-        << std::endl;
+      << "ERROR, Odd number of values in displacement boundary condition.\n"
+      << std::endl;
     libmesh_error();
   }
   num_bc /= 4;
@@ -326,7 +326,7 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
 
     // get mappings for dofs for auxiliary system for original mesh positions
     const System & auxsys = this->get_equation_systems().get_system(
-        "auxiliary");
+                                                                    "auxiliary");
     const DofMap & auxmap = auxsys.get_dof_map();
     std::vector<dof_id_type> undefo_dofs[3];
     for (unsigned int d = 0; d < c.get_dim(); ++d) {

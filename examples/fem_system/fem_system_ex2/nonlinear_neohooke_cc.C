@@ -47,80 +47,80 @@ template <typename T> TypeTensor<T> inv(const TypeTensor<T> &A ) {
 }
 
 void NonlinearNeoHookeCurrentConfig::init_for_qp(VectorValue<Gradient> & grad_u, unsigned int qp) {
-	this->current_qp = qp;
-	F.zero();
-	S.zero();
+  this->current_qp = qp;
+  F.zero();
+  S.zero();
 
-	{
-	  RealTensor invF;
-	  invF.zero();
-	  for (unsigned int i = 0; i < 3; ++i)
-	    for (unsigned int j = 0; j < 3; ++j) {
-	      invF(i, j) += libmesh_real(grad_u(i)(j));
-	    }
-	  F.add(inv(invF));
+  {
+    RealTensor invF;
+    invF.zero();
+    for (unsigned int i = 0; i < 3; ++i)
+      for (unsigned int j = 0; j < 3; ++j) {
+        invF(i, j) += libmesh_real(grad_u(i)(j));
+      }
+    F.add(inv(invF));
 
-	  libmesh_assert_greater (F.det(), -TOLERANCE);
-	}
+    libmesh_assert_greater (F.det(), -TOLERANCE);
+  }
 
-	if (this->calculate_linearized_stiffness) {
-		this->calculate_tangent();
-	}
+  if (this->calculate_linearized_stiffness) {
+    this->calculate_tangent();
+  }
 
-	this->calculate_stress();
+  this->calculate_stress();
 }
 
 
 
 void NonlinearNeoHookeCurrentConfig::calculate_tangent() {
-	Real mu = E / (2 * (1 + nu));
-	Real lambda = E * nu / ((1 + nu) * (1 - 2 * nu));
+  Real mu = E / (2 * (1 + nu));
+  Real lambda = E * nu / ((1 + nu) * (1 - 2 * nu));
 
-	Real detF = F.det();
+  Real detF = F.det();
 
-	C_mat.resize(6, 6);
-	for (unsigned int i = 0; i < 3; ++i) {
-		for (unsigned int j = 0; j < 3; ++j) {
-			if (i == j) {
-				C_mat(i, j) = 2 * mu + lambda;
-				C_mat(i + 3, j + 3) = mu - 0.5 * lambda * (detF * detF - 1);
-			} else {
-				C_mat(i, j) = lambda * detF * detF;
-			}
-		}
-	}
+  C_mat.resize(6, 6);
+  for (unsigned int i = 0; i < 3; ++i) {
+    for (unsigned int j = 0; j < 3; ++j) {
+      if (i == j) {
+        C_mat(i, j) = 2 * mu + lambda;
+        C_mat(i + 3, j + 3) = mu - 0.5 * lambda * (detF * detF - 1);
+      } else {
+        C_mat(i, j) = lambda * detF * detF;
+      }
+    }
+  }
 }
 
 
 void NonlinearNeoHookeCurrentConfig::calculate_stress() {
 
   double mu = E / (2.0 * (1.0 + nu));
-	double lambda = E * nu / ((1 + nu) * (1 - 2 * nu));
+  double lambda = E * nu / ((1 + nu) * (1 - 2 * nu));
 
-	Real detF = F.det();
-	RealTensor Ft = F.transpose();
+  Real detF = F.det();
+  RealTensor Ft = F.transpose();
 
-	RealTensor C = Ft * F;
-	RealTensor b = F * Ft;
-	RealTensor identity;
-	identity(0, 0) = 1.0; identity(1, 1) = 1.0; identity(2, 2) = 1.0;
-	RealTensor invC = inv(C);
+  RealTensor C = Ft * F;
+  RealTensor b = F * Ft;
+  RealTensor identity;
+  identity(0, 0) = 1.0; identity(1, 1) = 1.0; identity(2, 2) = 1.0;
+  RealTensor invC = inv(C);
 
-	S = 0.5 * lambda * (detF * detF - 1) * invC + mu * (identity - invC);
+  S = 0.5 * lambda * (detF * detF - 1) * invC + mu * (identity - invC);
 
-	tau = (F * S) * Ft;
-	sigma = 1/detF * tau;
+  tau = (F * S) * Ft;
+  sigma = 1/detF * tau;
 }
 
 void NonlinearNeoHookeCurrentConfig::get_residual(DenseVector<Real> & residuum, unsigned int & i) {
-	B_L.resize(3, 6);
-	DenseVector<Real> sigma_voigt(6);
+  B_L.resize(3, 6);
+  DenseVector<Real> sigma_voigt(6);
 
-	this->build_b_0_mat(i, B_L);
+  this->build_b_0_mat(i, B_L);
 
-	tensor_to_voigt(sigma, sigma_voigt);
+  tensor_to_voigt(sigma, sigma_voigt);
 
-	B_L.vector_mult(residuum, sigma_voigt);
+  B_L.vector_mult(residuum, sigma_voigt);
 }
 
 void NonlinearNeoHookeCurrentConfig::tensor_to_voigt(const RealTensor &tensor, DenseVector<Real> &vec) {
@@ -134,33 +134,33 @@ void NonlinearNeoHookeCurrentConfig::tensor_to_voigt(const RealTensor &tensor, D
 }
 
 void NonlinearNeoHookeCurrentConfig::get_linearized_stiffness(DenseMatrix<Real> & stiffness, unsigned int & i, unsigned int & j) {
-	stiffness.resize(3, 3);
+  stiffness.resize(3, 3);
 
-	double G_IK = (sigma * dphi[i][current_qp]) * dphi[j][current_qp];
-	stiffness(0, 0) += G_IK;
-	stiffness(1, 1) += G_IK;
-	stiffness(2, 2) += G_IK;
+  double G_IK = (sigma * dphi[i][current_qp]) * dphi[j][current_qp];
+  stiffness(0, 0) += G_IK;
+  stiffness(1, 1) += G_IK;
+  stiffness(2, 2) += G_IK;
 
-	B_L.resize(3, 6);
-	this->build_b_0_mat(i, B_L);
-	B_K.resize(3, 6);
-	this->build_b_0_mat(j, B_K);
+  B_L.resize(3, 6);
+  this->build_b_0_mat(i, B_L);
+  B_K.resize(3, 6);
+  this->build_b_0_mat(j, B_K);
 
-	B_L.right_multiply(C_mat);
-	B_L.right_multiply_transpose(B_K);
-	B_L *= 1/F.det();
+  B_L.right_multiply(C_mat);
+  B_L.right_multiply_transpose(B_K);
+  B_L *= 1/F.det();
 
-	stiffness += B_L;
+  stiffness += B_L;
 }
 
 void NonlinearNeoHookeCurrentConfig::build_b_0_mat(int i, DenseMatrix<Real>& b_0_mat) {
-	for (unsigned int ii = 0; ii < 3; ++ii) {
-		b_0_mat(ii, ii) = dphi[i][current_qp](ii);
-	}
-	b_0_mat(0, 3) = dphi[i][current_qp](1);
-	b_0_mat(1, 3) = dphi[i][current_qp](0);
-	b_0_mat(1, 4) = dphi[i][current_qp](2);
-	b_0_mat(2, 4) = dphi[i][current_qp](1);
-	b_0_mat(0, 5) = dphi[i][current_qp](2);
-	b_0_mat(2, 5) = dphi[i][current_qp](0);
+  for (unsigned int ii = 0; ii < 3; ++ii) {
+    b_0_mat(ii, ii) = dphi[i][current_qp](ii);
+  }
+  b_0_mat(0, 3) = dphi[i][current_qp](1);
+  b_0_mat(1, 3) = dphi[i][current_qp](0);
+  b_0_mat(1, 4) = dphi[i][current_qp](2);
+  b_0_mat(2, 4) = dphi[i][current_qp](1);
+  b_0_mat(0, 5) = dphi[i][current_qp](2);
+  b_0_mat(2, 5) = dphi[i][current_qp](0);
 }

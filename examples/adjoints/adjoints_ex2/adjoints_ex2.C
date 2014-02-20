@@ -17,41 +17,41 @@
 
 // <h1>Adjoints Example 2 - Laplace Equation in the L-Shaped Domain with
 // Adjoint based sensitivity</h1>
- //
- // This example solves the Laplace equation on the classic "L-shaped"
- // domain with adaptive mesh refinement. The exact solution is
- // u(r,\theta) = r^{2/3} * \sin ( (2/3) * \theta). We scale this
- // exact solution by a combination of parameters, (\alpha_{1} + 2
- // *\alpha_{2}) to get u = (\alpha_{1} + 2 *\alpha_{2}) * r^{2/3} *
- // \sin ( (2/3) * \theta), which again satisfies the Laplace
- // Equation. We define the Quantity of Interest in element_qoi.C, and
- // compute the sensitivity of the QoI to \alpha_{1} and \alpha_{2}
- // using the adjoint sensitivity method. Since we use the adjoint
- // capabilities of libMesh in this example, we use the DiffSystem
- // framework. This file (main.C) contains the declaration of mesh and
- // equation system objects, L-shaped.C contains the assembly of the
- // system, element_qoi_derivative.C contains
- // the RHS for the adjoint system. Postprocessing to compute the the
- // QoIs is done in element_qoi.C
+//
+// This example solves the Laplace equation on the classic "L-shaped"
+// domain with adaptive mesh refinement. The exact solution is
+// u(r,\theta) = r^{2/3} * \sin ( (2/3) * \theta). We scale this
+// exact solution by a combination of parameters, (\alpha_{1} + 2
+// *\alpha_{2}) to get u = (\alpha_{1} + 2 *\alpha_{2}) * r^{2/3} *
+// \sin ( (2/3) * \theta), which again satisfies the Laplace
+// Equation. We define the Quantity of Interest in element_qoi.C, and
+// compute the sensitivity of the QoI to \alpha_{1} and \alpha_{2}
+// using the adjoint sensitivity method. Since we use the adjoint
+// capabilities of libMesh in this example, we use the DiffSystem
+// framework. This file (main.C) contains the declaration of mesh and
+// equation system objects, L-shaped.C contains the assembly of the
+// system, element_qoi_derivative.C contains
+// the RHS for the adjoint system. Postprocessing to compute the the
+// QoIs is done in element_qoi.C
 
- // The initial mesh contains three QUAD9 elements which represent the
- // standard quadrants I, II, and III of the domain [-1,1]x[-1,1],
- // i.e.
- // Element 0: [-1,0]x[ 0,1]
- // Element 1: [ 0,1]x[ 0,1]
- // Element 2: [-1,0]x[-1,0]
- // The mesh is provided in the standard libMesh ASCII format file
- // named "lshaped.xda".  In addition, an input file named "general.in"
- // is provided which allows the user to set several parameters for
- // the solution so that the problem can be re-run without a
- // re-compile.  The solution technique employed is to have a
- // refinement loop with a linear (forward and adjoint) solve inside followed by a
- // refinement of the grid and projection of the solution to the new grid
- // In the final loop iteration, there is no additional
- // refinement after the solve.  In the input file "general.in", the variable
- // "max_adaptivesteps" controls the number of refinement steps, and
- // "refine_fraction" / "coarsen_fraction" determine the number of
- // elements which will be refined / coarsened at each step.
+// The initial mesh contains three QUAD9 elements which represent the
+// standard quadrants I, II, and III of the domain [-1,1]x[-1,1],
+// i.e.
+// Element 0: [-1,0]x[ 0,1]
+// Element 1: [ 0,1]x[ 0,1]
+// Element 2: [-1,0]x[-1,0]
+// The mesh is provided in the standard libMesh ASCII format file
+// named "lshaped.xda".  In addition, an input file named "general.in"
+// is provided which allows the user to set several parameters for
+// the solution so that the problem can be re-run without a
+// re-compile.  The solution technique employed is to have a
+// refinement loop with a linear (forward and adjoint) solve inside followed by a
+// refinement of the grid and projection of the solution to the new grid
+// In the final loop iteration, there is no additional
+// refinement after the solve.  In the input file "general.in", the variable
+// "max_adaptivesteps" controls the number of refinement steps, and
+// "refine_fraction" / "coarsen_fraction" determine the number of
+// elements which will be refined / coarsened at each step.
 
 // C++ includes
 #include <iostream>
@@ -144,7 +144,7 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 
   // No transient time solver
   system.time_solver =
-      AutoPtr<TimeSolver>(new SteadySolver(system));
+    AutoPtr<TimeSolver>(new SteadySolver(system));
 
   // Nonlinear solver options
   {
@@ -284,7 +284,7 @@ int main (int argc, char** argv)
 
   std::cout << "Reading in and building the mesh" << std::endl;
 
-   // Read in the mesh
+  // Read in the mesh
   mesh.read(param.domainfile.c_str());
   // Make all the elements of the mesh second order so we can compute
   // with a higher order basis
@@ -336,8 +336,8 @@ int main (int argc, char** argv)
 	  libmesh_assert_equal_to (param.nelem_target, 0);
 	// If we aren't adapting to a tolerance we need a
 	// target mesh size
-            else
-              libmesh_assert_greater (param.nelem_target, 0);
+        else
+          libmesh_assert_greater (param.nelem_target, 0);
 
 	// Solve the forward problem
 	system.solve();
@@ -372,8 +372,8 @@ int main (int argc, char** argv)
 	Number sensitivity_QoI_0_1_exact = infile_l_shaped("sensitivity_0_1", 0.0);
 
 	std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
-                      << " active elements and "
-                      << equation_systems.n_active_dofs()
+                  << " active elements and "
+                  << equation_systems.n_active_dofs()
 		  << " active dofs." << std::endl ;
 
 	std::cout<<"Sensitivity of QoI one to Parameter one is "<<sensitivity_QoI_0_0_computed<<std::endl;
@@ -382,11 +382,11 @@ int main (int argc, char** argv)
 	std::cout<< "The relative error in sensitivity QoI_0_0 is "
 		 << std::setprecision(17)
                  << std::abs(sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact) /
-                    std::abs(sensitivity_QoI_0_0_exact) << std::endl;
+          std::abs(sensitivity_QoI_0_0_exact) << std::endl;
 	std::cout<< "The relative error in sensitivity QoI_0_1 is "
                  << std::setprecision(17)
                  << std::abs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact) /
-                    std::abs(sensitivity_QoI_0_1_exact) << std::endl << std::endl;
+          std::abs(sensitivity_QoI_0_1_exact) << std::endl << std::endl;
 
 	// Get a pointer to the solution vector of the adjoint problem for QoI 0
 	NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
