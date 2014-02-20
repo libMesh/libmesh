@@ -332,8 +332,8 @@ inline
 void DenseVector<T>::zero()
 {
   std::fill (_val.begin(),
-	     _val.end(),
-	     T(0.));
+             _val.end(),
+             T(0.));
 }
 
 
@@ -386,7 +386,7 @@ inline
 typename boostcopy::enable_if_c<
   ScalarTraits<T2>::value, void >::type
 DenseVector<T>::add (const T2 factor,
-		     const DenseVector<T3>& vec)
+                     const DenseVector<T3>& vec)
 {
   libmesh_assert_equal_to (this->size(), vec.size());
 

@@ -52,8 +52,8 @@ public:
    * entries to 0.
    */
   VectorValue (const T x,
-	       const T y=0,
-	       const T z=0);
+               const T y=0,
+               const T z=0);
 
   /**
    * Constructor-from-scalars.  By default sets higher dimensional
@@ -61,7 +61,7 @@ public:
    */
   template <typename Scalar>
   VectorValue (const Scalar x,
-	       const Scalar y=0,
+               const Scalar y=0,
                typename
                  boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
                                         const Scalar>::type z=0);
@@ -85,7 +85,7 @@ public:
    * arguments.
    */
   VectorValue (const TypeVector<Real>& p_re,
-	       const TypeVector<Real>& p_im);
+               const TypeVector<Real>& p_im);
 #endif
 
   /**
@@ -131,8 +131,8 @@ VectorValue<T>::VectorValue () :
 template <typename T>
 inline
 VectorValue<T>::VectorValue (const T x,
-	                     const T y,
-	                     const T z) :
+                             const T y,
+                             const T z) :
   TypeVector<T> (x,y,z)
 {
 }
@@ -143,7 +143,7 @@ template <typename T>
 template <typename Scalar>
 inline
 VectorValue<T>::VectorValue (const Scalar x,
-	                     const Scalar y,
+                             const Scalar y,
                              typename
                               boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
                                                      const Scalar>::type z) :
@@ -175,10 +175,10 @@ VectorValue<T>::VectorValue (const TypeVector<T2>& p) :
 template <typename T>
 inline
 VectorValue<T>::VectorValue (const TypeVector<Real>& p_re,
-			     const TypeVector<Real>& p_im) :
+                             const TypeVector<Real>& p_im) :
   TypeVector<T> (Complex (p_re(0), p_im(0)),
-		 Complex (p_re(1), p_im(1)),
-		 Complex (p_re(2), p_im(2)))
+                 Complex (p_re(1), p_im(1)),
+                 Complex (p_re(2), p_im(2)))
 {
 }
 #endif

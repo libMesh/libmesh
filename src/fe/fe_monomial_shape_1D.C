@@ -30,9 +30,9 @@ namespace libMesh
 
 template <>
 Real FE<1,MONOMIAL>::shape(const ElemType,
-			   const Order libmesh_dbg_var(order),
-			   const unsigned int i,
-			   const Point& p)
+                           const Order libmesh_dbg_var(order),
+                           const unsigned int i,
+                           const Point& p)
 {
   const Real xi = p(0);
 
@@ -71,9 +71,9 @@ Real FE<1,MONOMIAL>::shape(const ElemType,
 
 template <>
 Real FE<1,MONOMIAL>::shape(const Elem* elem,
-			   const Order order,
-			   const unsigned int i,
-			   const Point& p)
+                           const Order order,
+                           const unsigned int i,
+                           const Point& p)
 {
   libmesh_assert(elem);
 
@@ -84,10 +84,10 @@ Real FE<1,MONOMIAL>::shape(const Elem* elem,
 
 template <>
 Real FE<1,MONOMIAL>::shape_deriv(const ElemType,
-				 const Order libmesh_dbg_var(order),
-				 const unsigned int i,
-				 const unsigned int libmesh_dbg_var(j),
-				 const Point& p)
+                                 const Order libmesh_dbg_var(order),
+                                 const unsigned int i,
+                                 const unsigned int libmesh_dbg_var(j),
+                                 const Point& p)
 {
   // only d()/dxi in 1D!
 
@@ -130,25 +130,25 @@ Real FE<1,MONOMIAL>::shape_deriv(const ElemType,
 
 template <>
 Real FE<1,MONOMIAL>::shape_deriv(const Elem* elem,
-				 const Order order,
-				 const unsigned int i,
-				 const unsigned int j,
-				 const Point& p)
+                                 const Order order,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point& p)
 {
   libmesh_assert(elem);
 
   return FE<1,MONOMIAL>::shape_deriv(elem->type(),
-				     static_cast<Order>(order + elem->p_level()), i, j, p);
+                                     static_cast<Order>(order + elem->p_level()), i, j, p);
 }
 
 
 
 template <>
 Real FE<1,MONOMIAL>::shape_second_deriv(const ElemType,
-				        const Order libmesh_dbg_var(order),
-				        const unsigned int i,
-				        const unsigned int libmesh_dbg_var(j),
-				        const Point& p)
+                                        const Order libmesh_dbg_var(order),
+                                        const unsigned int i,
+                                        const unsigned int libmesh_dbg_var(j),
+                                        const Point& p)
 {
   // only d()/dxi in 1D!
 
@@ -188,15 +188,15 @@ Real FE<1,MONOMIAL>::shape_second_deriv(const ElemType,
 
 template <>
 Real FE<1,MONOMIAL>::shape_second_deriv(const Elem* elem,
-				        const Order order,
-				        const unsigned int i,
-				        const unsigned int j,
-				        const Point& p)
+                                        const Order order,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point& p)
 {
   libmesh_assert(elem);
 
   return FE<1,MONOMIAL>::shape_second_deriv(elem->type(),
-				            static_cast<Order>(order + elem->p_level()), i, j, p);
+                                            static_cast<Order>(order + elem->p_level()), i, j, p);
 }
 
 } // namespace libMesh

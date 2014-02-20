@@ -38,9 +38,9 @@ namespace libMesh
 // #endif
 
 //   void print_iter_accuracy(int Iter,
-// 			   _LPReal rNorm,
-// 			   _LPReal bNorm,
-// 			   IterIdType IterId)
+//    _LPReal rNorm,
+//    _LPReal bNorm,
+//    IterIdType IterId)
 //     /* put out accuracy reached after each solver iteration */
 //   {
 
@@ -49,23 +49,23 @@ namespace libMesh
 
 //     if (!icall)
 //       {
-// 	printf("Iter   ||r||/||f||\n");
-// 	printf("------------------\n");
-// 	icall=1;
+// printf("Iter   ||r||/||f||\n");
+// printf("------------------\n");
+// icall=1;
 //       }
 
 //     if ( Iter%1==0 && (IterId == CGIterId ||
-// 		       IterId == CGNIterId ||
-// 		       IterId == GMRESIterId ||
-// 		       IterId == BiCGIterId ||
-// 		       IterId == QMRIterId ||
-// 		       IterId == CGSIterId ||
-// 		       IterId == BiCGSTABIterId)  )
+//        IterId == CGNIterId ||
+//        IterId == GMRESIterId ||
+//        IterId == BiCGIterId ||
+//        IterId == QMRIterId ||
+//        IterId == CGSIterId ||
+//        IterId == BiCGSTABIterId)  )
 //       {
-// 	if (!_LPIsZeroReal(bNorm))
-// 	  printf("%d    \t %g\n", Iter, rNorm/bNorm);
-// 	else
-// 	  printf("%d     (fnorm == 0)\n", Iter);
+// if (!_LPIsZeroReal(bNorm))
+//   printf("%d    \t %g\n", Iter, rNorm/bNorm);
+// else
+//   printf("%d     (fnorm == 0)\n", Iter);
 //       }
 
 //     //fclose(out);
@@ -107,10 +107,10 @@ void LaspackLinearSolver<T>::init ()
 template <typename T>
 std::pair<unsigned int, Real>
 LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
-			       NumericVector<T> &solution_in,
-			       NumericVector<T> &rhs_in,
-			       const double tol,
-			       const unsigned int m_its)
+                               NumericVector<T> &solution_in,
+                               NumericVector<T> &rhs_in,
+                               const double tol,
+                               const unsigned int m_its)
 {
   START_LOG("solve()", "LaspackLinearSolver");
   this->init ();
@@ -142,126 +142,126 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
       // Conjugate-Gradient
     case CG:
       {
-	CGIter (&matrix->_QMat,
-		&solution->_vec,
-		&rhs->_vec,
-		m_its,
-		_precond_type,
-		1.);
-	break;
+        CGIter (&matrix->_QMat,
+                &solution->_vec,
+                &rhs->_vec,
+                m_its,
+                _precond_type,
+                1.);
+        break;
       }
 
       // Conjugate-Gradient Normalized
     case CGN:
       {
-	CGNIter (&matrix->_QMat,
-		 &solution->_vec,
-		 &rhs->_vec,
-		 m_its,
-		 _precond_type,
-		 1.);
-	break;
+        CGNIter (&matrix->_QMat,
+                 &solution->_vec,
+                 &rhs->_vec,
+                 m_its,
+                 _precond_type,
+                 1.);
+        break;
       }
 
       // Conjugate-Gradient Squared
     case CGS:
       {
-	CGSIter (&matrix->_QMat,
-		 &solution->_vec,
-		 &rhs->_vec,
-		 m_its,
-		 _precond_type,
-		 1.);
-	break;
+        CGSIter (&matrix->_QMat,
+                 &solution->_vec,
+                 &rhs->_vec,
+                 m_its,
+                 _precond_type,
+                 1.);
+        break;
       }
 
       // Bi-Conjugate Gradient
     case BICG:
       {
-	BiCGIter (&matrix->_QMat,
-		  &solution->_vec,
-		  &rhs->_vec,
-		  m_its,
-		  _precond_type,
-		  1.);
-	break;
+        BiCGIter (&matrix->_QMat,
+                  &solution->_vec,
+                  &rhs->_vec,
+                  m_its,
+                  _precond_type,
+                  1.);
+        break;
       }
 
       // Bi-Conjugate Gradient Stabilized
     case BICGSTAB:
       {
-	BiCGSTABIter (&matrix->_QMat,
-		      &solution->_vec,
-		      &rhs->_vec,
-		      m_its,
-		      _precond_type,
-		      1.);
-	break;
+        BiCGSTABIter (&matrix->_QMat,
+                      &solution->_vec,
+                      &rhs->_vec,
+                      m_its,
+                      _precond_type,
+                      1.);
+        break;
       }
 
       // Quasi-Minimum Residual
     case QMR:
       {
-	QMRIter (&matrix->_QMat,
-		 &solution->_vec,
-		 &rhs->_vec,
-		 m_its,
-		 _precond_type,
-		 1.);
-	break;
+        QMRIter (&matrix->_QMat,
+                 &solution->_vec,
+                 &rhs->_vec,
+                 m_its,
+                 _precond_type,
+                 1.);
+        break;
       }
 
       // Symmetric over-relaxation
     case SSOR:
       {
-	SSORIter (&matrix->_QMat,
-		  &solution->_vec,
-		  &rhs->_vec,
-		  m_its,
-		  _precond_type,
-		  1.);
-	break;
+        SSORIter (&matrix->_QMat,
+                  &solution->_vec,
+                  &rhs->_vec,
+                  m_its,
+                  _precond_type,
+                  1.);
+        break;
       }
 
       // Jacobi Relaxation
     case JACOBI:
       {
-	JacobiIter (&matrix->_QMat,
-		    &solution->_vec,
-		    &rhs->_vec,
-		    m_its,
-		    _precond_type,
-		    1.);
-	break;
+        JacobiIter (&matrix->_QMat,
+                    &solution->_vec,
+                    &rhs->_vec,
+                    m_its,
+                    _precond_type,
+                    1.);
+        break;
       }
 
       // Generalized Minimum Residual
     case GMRES:
       {
-	SetGMRESRestart (30);
-	GMRESIter (&matrix->_QMat,
-		   &solution->_vec,
-		   &rhs->_vec,
-		   m_its,
-		   _precond_type,
-		   1.);
-	break;
+        SetGMRESRestart (30);
+        GMRESIter (&matrix->_QMat,
+                   &solution->_vec,
+                   &rhs->_vec,
+                   m_its,
+                   _precond_type,
+                   1.);
+        break;
       }
 
       // Unknown solver, use GMRES
     default:
       {
-	libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
-		      << Utility::enum_to_string(this->_solver_type) << std::endl
-		      << "Continuing with GMRES" << std::endl;
+        libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
+                     << Utility::enum_to_string(this->_solver_type) << std::endl
+                     << "Continuing with GMRES" << std::endl;
 
-	this->_solver_type = GMRES;
+        this->_solver_type = GMRES;
 
-	return this->solve (*matrix,
-			    *solution,
-			    *rhs,
-			    tol,
-			    m_its);
+        return this->solve (*matrix,
+                            *solution,
+                            *rhs,
+                            tol,
+                            m_its);
       }
     }
 
@@ -283,10 +283,10 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
 template <typename T>
 std::pair<unsigned int, Real>
 LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
-			               NumericVector<T> &solution_in,
-			               NumericVector<T> &rhs_in,
-			               const double tol,
-			               const unsigned int m_its)
+                                       NumericVector<T> &solution_in,
+                                       NumericVector<T> &rhs_in,
+                                       const double tol,
+                                       const unsigned int m_its)
 {
   START_LOG("adjoint_solve()", "LaspackLinearSolver");
   this->init ();
@@ -318,126 +318,126 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
       // Conjugate-Gradient
     case CG:
       {
-	CGIter (Transp_Q(&matrix->_QMat),
-		&solution->_vec,
-		&rhs->_vec,
-		m_its,
-		_precond_type,
-		1.);
-	break;
+        CGIter (Transp_Q(&matrix->_QMat),
+                &solution->_vec,
+                &rhs->_vec,
+                m_its,
+                _precond_type,
+                1.);
+        break;
       }
 
       // Conjugate-Gradient Normalized
     case CGN:
       {
-	CGNIter (Transp_Q(&matrix->_QMat),
-		 &solution->_vec,
-		 &rhs->_vec,
-		 m_its,
-		 _precond_type,
-		 1.);
-	break;
+        CGNIter (Transp_Q(&matrix->_QMat),
+                 &solution->_vec,
+                 &rhs->_vec,
+                 m_its,
+                 _precond_type,
+                 1.);
+        break;
       }
 
       // Conjugate-Gradient Squared
     case CGS:
       {
-	CGSIter (Transp_Q(&matrix->_QMat),
-		 &solution->_vec,
-		 &rhs->_vec,
-		 m_its,
-		 _precond_type,
-		 1.);
-	break;
+        CGSIter (Transp_Q(&matrix->_QMat),
+                 &solution->_vec,
+                 &rhs->_vec,
+                 m_its,
+                 _precond_type,
+                 1.);
+        break;
       }
 
       // Bi-Conjugate Gradient
     case BICG:
       {
-	BiCGIter (Transp_Q(&matrix->_QMat),
-		  &solution->_vec,
-		  &rhs->_vec,
-		  m_its,
-		  _precond_type,
-		  1.);
-	break;
+        BiCGIter (Transp_Q(&matrix->_QMat),
+                  &solution->_vec,
+                  &rhs->_vec,
+                  m_its,
+                  _precond_type,
+                  1.);
+        break;
       }
 
       // Bi-Conjugate Gradient Stabilized
     case BICGSTAB:
       {
-	BiCGSTABIter (Transp_Q(&matrix->_QMat),
-		      &solution->_vec,
-		      &rhs->_vec,
-		      m_its,
-		      _precond_type,
-		      1.);
-	break;
+        BiCGSTABIter (Transp_Q(&matrix->_QMat),
+                      &solution->_vec,
+                      &rhs->_vec,
+                      m_its,
+                      _precond_type,
+                      1.);
+        break;
       }
 
       // Quasi-Minimum Residual
     case QMR:
       {
-	QMRIter (Transp_Q(&matrix->_QMat),
-		 &solution->_vec,
-		 &rhs->_vec,
-		 m_its,
-		 _precond_type,
-		 1.);
-	break;
+        QMRIter (Transp_Q(&matrix->_QMat),
+                 &solution->_vec,
+                 &rhs->_vec,
+                 m_its,
+                 _precond_type,
+                 1.);
+        break;
       }
 
       // Symmetric over-relaxation
     case SSOR:
       {
-	SSORIter (Transp_Q(&matrix->_QMat),
-		  &solution->_vec,
-		  &rhs->_vec,
-		  m_its,
-		  _precond_type,
-		  1.);
-	break;
+        SSORIter (Transp_Q(&matrix->_QMat),
+                  &solution->_vec,
+                  &rhs->_vec,
+                  m_its,
+                  _precond_type,
+                  1.);
+        break;
       }
 
       // Jacobi Relaxation
     case JACOBI:
       {
-	JacobiIter (Transp_Q(&matrix->_QMat),
-		    &solution->_vec,
-		    &rhs->_vec,
-		    m_its,
-		    _precond_type,
-		    1.);
-	break;
+        JacobiIter (Transp_Q(&matrix->_QMat),
+                    &solution->_vec,
+                    &rhs->_vec,
+                    m_its,
+                    _precond_type,
+                    1.);
+        break;
       }
 
       // Generalized Minimum Residual
     case GMRES:
       {
-	SetGMRESRestart (30);
-	GMRESIter (Transp_Q(&matrix->_QMat),
-		   &solution->_vec,
-		   &rhs->_vec,
-		   m_its,
-		   _precond_type,
-		   1.);
-	break;
+        SetGMRESRestart (30);
+        GMRESIter (Transp_Q(&matrix->_QMat),
+                   &solution->_vec,
+                   &rhs->_vec,
+                   m_its,
+                   _precond_type,
+                   1.);
+        break;
       }
 
       // Unknown solver, use GMRES
     default:
       {
-	libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
-		      << Utility::enum_to_string(this->_solver_type) << std::endl
-		      << "Continuing with GMRES" << std::endl;
+        libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
+                     << Utility::enum_to_string(this->_solver_type) << std::endl
+                     << "Continuing with GMRES" << std::endl;
 
-	this->_solver_type = GMRES;
+        this->_solver_type = GMRES;
 
-	return this->solve (*matrix,
-			    *solution,
-			    *rhs,
-			    tol,
-			    m_its);
+        return this->solve (*matrix,
+                            *solution,
+                            *rhs,
+                            tol,
+                            m_its);
       }
     }
 
@@ -460,10 +460,10 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
 template <typename T>
 std::pair<unsigned int, Real>
 LaspackLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
-			       NumericVector<T>& /*solution_in*/,
-			       NumericVector<T>& /*rhs_in*/,
-			       const double /*tol*/,
-			       const unsigned int /*m_its*/)
+                               NumericVector<T>& /*solution_in*/,
+                               NumericVector<T>& /*rhs_in*/,
+                               const double /*tol*/,
+                               const unsigned int /*m_its*/)
 {
   libmesh_not_implemented();
   return std::make_pair(0,0.0);
@@ -474,11 +474,11 @@ LaspackLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
 template <typename T>
 std::pair<unsigned int, Real>
 LaspackLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
-			       const SparseMatrix<T>& /*precond_matrix*/,
-			       NumericVector<T>& /*solution_in*/,
-			       NumericVector<T>& /*rhs_in*/,
-			       const double /*tol*/,
-			       const unsigned int /*m_its*/)
+                               const SparseMatrix<T>& /*precond_matrix*/,
+                               NumericVector<T>& /*solution_in*/,
+                               NumericVector<T>& /*rhs_in*/,
+                               const double /*tol*/,
+                               const unsigned int /*m_its*/)
 {
   libmesh_not_implemented();
   return std::make_pair(0,0.0);
@@ -506,8 +506,8 @@ void LaspackLinearSolver<T>::set_laspack_preconditioner_type ()
 
     default:
       libMesh::err << "ERROR:  Unsupported LASPACK Preconditioner: "
-		    << this->_preconditioner_type << std::endl
-		    << "Continuing with ILU"      << std::endl;
+                   << this->_preconditioner_type << std::endl
+                   << "Continuing with ILU"      << std::endl;
       this->_preconditioner_type = ILU_PRECOND;
       this->set_laspack_preconditioner_type();
     }

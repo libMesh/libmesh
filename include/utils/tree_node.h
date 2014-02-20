@@ -54,8 +54,8 @@ public:
    * for the top-level (root) node.
    */
   TreeNode (const MeshBase& m,
-	    const unsigned int tbs,
-	    const TreeNode<N> *p = NULL);
+            const unsigned int tbs,
+            const TreeNode<N> *p = NULL);
 
   /**
    * Destructor.  Deletes all children, if any.  Thus
@@ -131,7 +131,7 @@ public:
    * Transforms node numbers to element pointers.
    */
   void transform_nodes_to_elements (std::vector<std::vector<const Elem*> >&
-				    nodes_to_elem);
+                                    nodes_to_elem);
 
   /**
    * @returns the number of active bins below
@@ -213,8 +213,8 @@ private:
 template <unsigned int N>
 inline
 TreeNode<N>::TreeNode (const MeshBase& m,
-		       const unsigned int tbs,
-		       const TreeNode<N>* p) :
+                       const unsigned int tbs,
+                       const TreeNode<N>* p) :
   mesh           (m),
   tgt_bin_size   (tbs),
   parent         (p),

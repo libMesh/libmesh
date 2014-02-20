@@ -55,9 +55,9 @@ void UCDIO::read (const std::string& file_name)
 #else
 
       libMesh::err << "ERROR:  You must have the zlib.h header "
-		    << "files and libraries to read and write "
-		    << "compressed streams."
-		    << std::endl;
+                   << "files and libraries to read and write "
+                   << "compressed streams."
+                   << std::endl;
       libmesh_error();
 
 #endif
@@ -86,9 +86,9 @@ void UCDIO::write (const std::string& file_name)
 #else
 
       libMesh::err << "ERROR:  You must have the zlib.h header "
-		    << "files and libraries to read and write "
-		    << "compressed streams."
-		    << std::endl;
+                   << "files and libraries to read and write "
+                   << "compressed streams."
+                   << std::endl;
       libmesh_error();
 
 #endif
@@ -141,15 +141,15 @@ void UCDIO::read_implementation (std::istream& in)
 
     for (unsigned int i=0; i<nNodes; i++)
       {
-	libmesh_assert (in.good());
+        libmesh_assert (in.good());
 
-	in >> dummy   // Point number
-	   >> xyz(0)  // x-coordinate value
-	   >> xyz(1)  // y-coordinate value
-	   >> xyz(2); // z-coordinate value
+        in >> dummy   // Point number
+           >> xyz(0)  // x-coordinate value
+           >> xyz(1)  // y-coordinate value
+           >> xyz(2); // z-coordinate value
 
-	// Build the node
-	mesh.add_point (xyz, i);
+        // Build the node
+        mesh.add_point (xyz, i);
       }
   }
 
@@ -166,49 +166,49 @@ void UCDIO::read_implementation (std::istream& in)
 
     for (unsigned int i=0; i<nElem; i++)
       {
-	Elem* elem = NULL;
+        Elem* elem = NULL;
 
-	libmesh_assert (in.good());
+        libmesh_assert (in.good());
 
-	in >> dummy        // Cell number, means nothing to us
-	   >> material_id  // doesn't mean anything at present, might later
-	   >> type;        // string describing cell type:
-	                   // either tri, quad, tet, hex, or prism for the
-	                   // obvious cases
+        in >> dummy        // Cell number, means nothing to us
+           >> material_id  // doesn't mean anything at present, might later
+           >> type;        // string describing cell type:
+        // either tri, quad, tet, hex, or prism for the
+        // obvious cases
 
 
-	                   // Now read the connectivity.
-	if (type == "quad")
-	  elem = new Quad4;
-	else if (type == "tri")
-	  elem = new Tri3;
-	else if (type == "hex")
-	  elem = new Hex8;
-	else if (type == "tet")
-	  elem = new Tet4;
-	else if (type == "prism")
-	  elem = new Prism6;
-	else
-	  libmesh_error();
+        // Now read the connectivity.
+        if (type == "quad")
+          elem = new Quad4;
+        else if (type == "tri")
+          elem = new Tri3;
+        else if (type == "hex")
+          elem = new Hex8;
+        else if (type == "tet")
+          elem = new Tet4;
+        else if (type == "prism")
+          elem = new Prism6;
+        else
+          libmesh_error();
 
-	for (unsigned int n=0; n<elem->n_nodes(); n++)
-	  {
-	    libmesh_assert (in.good());
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
+          {
+            libmesh_assert (in.good());
 
-	    in >> node; // read the current node
-	    node -= 1;  // UCD is 1-based, so subtract
+            in >> node; // read the current node
+            node -= 1;  // UCD is 1-based, so subtract
 
-	    libmesh_assert_less (node, mesh.n_nodes());
+            libmesh_assert_less (node, mesh.n_nodes());
 
-	    elem->set_node(n) =
-	      mesh.node_ptr(node); // assign the node
-	  }
+            elem->set_node(n) =
+              mesh.node_ptr(node); // assign the node
+          }
 
         elems_of_dimension[elem->dim()] = true;
 
-	// Add the element to the mesh
-	elem->set_id(i);
-	mesh.add_elem (elem);
+        // Add the element to the mesh
+        elem->set_id(i);
+        mesh.add_elem (elem);
       }
 
     // Set the mesh dimension to the largest encountered for an element
@@ -220,8 +220,8 @@ void UCDIO::read_implementation (std::istream& in)
     if (mesh.mesh_dimension() > LIBMESH_DIM)
       {
         libMesh::err << "Cannot open dimension " <<
-		        mesh.mesh_dimension() <<
-		        " mesh file when configured without " <<
+          mesh.mesh_dimension() <<
+          " mesh file when configured without " <<
                         mesh.mesh_dimension() << "D support." <<
                         std::endl;
         libmesh_error();
@@ -243,8 +243,8 @@ void UCDIO::write_implementation (std::ostream& out_stream)
   if(mesh.mesh_dimension() != 3)
     {
       libMesh::err << "Error: Can't write boundary elements for meshes of dimension less than 3"
-		   << "Mesh dimension = " << mesh.mesh_dimension()
-		   << std::endl;
+                   << "Mesh dimension = " << mesh.mesh_dimension()
+                   << std::endl;
       libmesh_error();
     }
 
@@ -261,7 +261,7 @@ void UCDIO::write_implementation (std::ostream& out_stream)
 }
 
 void UCDIO::write_header(std::ostream& out_stream, const MeshBase& mesh,
-			 dof_id_type n_elems, unsigned int n_vars )
+                         dof_id_type n_elems, unsigned int n_vars )
 {
   libmesh_assert (out_stream.good());
   // TODO: We used to print out the SVN revision here when we did keyword expansions...
@@ -319,13 +319,13 @@ void UCDIO::write_interior_elems(std::ostream& out_stream, const MeshBase& mesh)
       // PB: I believe these are the only supported ElemTypes.
       const ElemType etype = (*it)->type();
       if( (etype != TRI3) && (etype != QUAD4) &&
-	  (etype != TET4) && (etype != HEX8) &&
+          (etype != TET4) && (etype != HEX8) &&
           (etype != PRISM6) && (etype != PYRAMID5) )
-	{
-	  libMesh::err << "Error: Unsupported ElemType for UCDIO."
-		       << std::endl;
-	  libmesh_error();
-	}
+        {
+          libMesh::err << "Error: Unsupported ElemType for UCDIO."
+                       << std::endl;
+          libmesh_error();
+        }
 
       out_stream << e++ << " 0 " << type[etype] << "\t";
       // (*it)->write_ucd_connectivity(out_stream);
@@ -336,8 +336,8 @@ void UCDIO::write_interior_elems(std::ostream& out_stream, const MeshBase& mesh)
 }
 
 void UCDIO::write_nodal_data(const std::string& fname,
-			     const std::vector<Number>&soln,
-			     const std::vector<std::string>& names)
+                             const std::vector<Number>&soln,
+                             const std::vector<std::string>& names)
 {
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
@@ -368,8 +368,8 @@ void UCDIO::write_nodal_data(const std::string& fname,
 }
 
 void UCDIO::write_soln(std::ostream& out_stream, const MeshBase& mesh,
-		       const std::vector<std::string>& names,
-		       const std::vector<Number>&soln)
+                       const std::vector<std::string>& names,
+                       const std::vector<Number>&soln)
 {
   libmesh_assert (out_stream.good());
 
@@ -402,11 +402,11 @@ void UCDIO::write_soln(std::ostream& out_stream, const MeshBase& mesh,
       out_stream << n;
 
       for( std::size_t var = 0; var != nv; var++ )
-	{
-	  std::size_t idx = nv*(n-1) + var;
+        {
+          std::size_t idx = nv*(n-1) + var;
 
-	  out_stream << " " << soln[idx];
-	}
+          out_stream << " " << soln[idx];
+        }
       out_stream << std::endl;
     }
 

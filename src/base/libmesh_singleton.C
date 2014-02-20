@@ -84,10 +84,10 @@ namespace libMesh
     SetupList& setup_cache = get_setup_cache();
 
     for (SetupList::iterator it = setup_cache.begin();
-	 it!=setup_cache.end(); ++it)
+         it!=setup_cache.end(); ++it)
       {
-	libmesh_assert (*it != NULL);
-	(*it)->setup();
+        libmesh_assert (*it != NULL);
+        (*it)->setup();
       }
   }
 
@@ -100,11 +100,11 @@ namespace libMesh
     SingletonList& singleton_cache = get_singleton_cache();
 
     for (SingletonList::reverse_iterator it = singleton_cache.rbegin();
-	 it!=singleton_cache.rend(); ++it)
+         it!=singleton_cache.rend(); ++it)
       {
-	libmesh_assert (*it != NULL);
-	delete *it;
-	*it = NULL;
+        libmesh_assert (*it != NULL);
+        delete *it;
+        *it = NULL;
       }
 
     singleton_cache.clear();

@@ -30,7 +30,7 @@ namespace libMesh
 
 // Constructor
 QGrundmann_Moller::QGrundmann_Moller(const unsigned int d,
-				     const Order o) : QBase(d,o)
+                                     const Order o) : QBase(d,o)
 {
 }
 
@@ -80,14 +80,14 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
       //libMesh::out << "n. permutations=" << permutations.size() << std::endl;
 
       for (unsigned int p=0; p<permutations.size(); ++p)
-	{
-	  // We use the first dim=3 entries of each permutation to
-	  // construct an integration point.
-	  for (unsigned int j=0; j<3; ++j)
-	    _points[offset+p](j) =
-	      static_cast<Real>(2.*permutations[p][j] + 1.) /
-	      static_cast<Real>(  degree + dim - 2.*i     );
-	}
+        {
+          // We use the first dim=3 entries of each permutation to
+          // construct an integration point.
+          for (unsigned int j=0; j<3; ++j)
+            _points[offset+p](j) =
+              static_cast<Real>(2.*permutations[p][j] + 1.) /
+              static_cast<Real>(  degree + dim - 2.*i     );
+        }
 
       // Compute the weight for this i, being careful to avoid overflow.
       // This technique is borrowed from Burkardt's code as well.
@@ -97,26 +97,26 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
       // This for loop needs to run for dim, degree, or dim+degree-i iterations,
       // whichever is largest.
       const unsigned int weight_loop_index =
-	std::max(dim, std::max(degree, degree+dim-i));
+        std::max(dim, std::max(degree, degree+dim-i));
 
       for (unsigned int j=1; j<=weight_loop_index; ++j)
-	{
-	  if (j <= degree) // Accumulate (d+n-2i)^d term
-	    weight *= static_cast<Real>(degree+dim-2*i);
+        {
+          if (j <= degree) // Accumulate (d+n-2i)^d term
+            weight *= static_cast<Real>(degree+dim-2*i);
 
-	  if (j <= 2*s) // Accumulate 2^{-2s}
-	    weight *= 0.5;
+          if (j <= 2*s) // Accumulate 2^{-2s}
+            weight *= 0.5;
 
-	  if (j <= i) // Accumulate (i!)^{-1}
-	    weight /= static_cast<Real>(j);
+          if (j <= i) // Accumulate (i!)^{-1}
+            weight /= static_cast<Real>(j);
 
-	  if (j <= degree+dim-i) // Accumulate ( (d+n-i)! )^{-1}
-	    weight /= static_cast<Real>(j);
-	}
+          if (j <= degree+dim-i) // Accumulate ( (d+n-i)! )^{-1}
+            weight /= static_cast<Real>(j);
+        }
 
       // This is the weight for each of the points computed previously
       for (unsigned int j=0; j<permutations.size(); ++j)
-	_weights[offset+j] = weight;
+        _weights[offset+j] = weight;
 
       // Change sign for next iteration
       one_pm = -one_pm;
@@ -142,8 +142,8 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
 // The routine is deceptively simple: I still don't understand exactly
 // why it works, but it does.
 void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositioned
-				    unsigned int p, // # of partitions
-				    std::vector<std::vector<unsigned int> >& result)
+                                    unsigned int p, // # of partitions
+                                    std::vector<std::vector<unsigned int> >& result)
 {
   // Clear out results remaining from previous calls
   result.clear();
@@ -174,7 +174,7 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
       // If the previous head value is still larger than 1, reset the index
       // to "off the front" of the array
       if (head_value > 1)
-	head_index = -1;
+        head_index = -1;
 
       // Either move the index onto the front of the array or on to
       // the next value.

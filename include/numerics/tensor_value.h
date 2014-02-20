@@ -52,14 +52,14 @@ public:
    * entries to 0.
    */
   explicit TensorValue  (const T xx,
-		         const T xy=0,
-		         const T xz=0,
-		         const T yx=0,
-		         const T yy=0,
-		         const T yz=0,
-		         const T zx=0,
-		         const T zy=0,
-		         const T zz=0);
+                         const T xy=0,
+                         const T xz=0,
+                         const T yx=0,
+                         const T yy=0,
+                         const T yz=0,
+                         const T zx=0,
+                         const T zy=0,
+                         const T zz=0);
 
   /**
    * Constructor-from-scalars.  By default sets higher dimensional
@@ -67,13 +67,13 @@ public:
    */
   template <typename Scalar>
   explicit TensorValue  (const Scalar xx,
-		         const Scalar xy=0,
-		         const Scalar xz=0,
-		         const Scalar yx=0,
-		         const Scalar yy=0,
-		         const Scalar yz=0,
-		         const Scalar zx=0,
-		         const Scalar zy=0,
+                         const Scalar xy=0,
+                         const Scalar xz=0,
+                         const Scalar yx=0,
+                         const Scalar yy=0,
+                         const Scalar yz=0,
+                         const Scalar zx=0,
+                         const Scalar zy=0,
                          typename
                            boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
                                                   const Scalar>::type zz=0);
@@ -117,7 +117,7 @@ public:
    * arguments.
    */
   TensorValue (const TypeTensor<Real>& p_re,
-	       const TypeTensor<Real>& p_im);
+               const TypeTensor<Real>& p_im);
 #endif
 
 
@@ -223,7 +223,7 @@ template <typename T>
 template <typename T2>
 inline
 TensorValue<T>::TensorValue (const TypeVector<T2>& vx,
-			     const TypeVector<T2>& vy) :
+                             const TypeVector<T2>& vy) :
   TypeTensor<T> (vx, vy)
 {
 }
@@ -234,8 +234,8 @@ template <typename T>
 template <typename T2>
 inline
 TensorValue<T>::TensorValue (const TypeVector<T2>& vx,
-			     const TypeVector<T2>& vy,
-			     const TypeVector<T2>& vz) :
+                             const TypeVector<T2>& vy,
+                             const TypeVector<T2>& vz) :
   TypeTensor<T> (vx, vy, vz)
 {
 }
@@ -255,16 +255,16 @@ TensorValue<T>::TensorValue (const TypeTensor<T2>& p) :
 template <typename T>
 inline
 TensorValue<T>::TensorValue (const TypeTensor<Real>& p_re,
-			     const TypeTensor<Real>& p_im) :
+                             const TypeTensor<Real>& p_im) :
   TypeTensor<T> (Complex (p_re(0,0), p_im(0,0)),
-		 Complex (p_re(0,1), p_im(0,1)),
-		 Complex (p_re(0,2), p_im(0,2)),
-		 Complex (p_re(1,0), p_im(1,0)),
-		 Complex (p_re(1,1), p_im(1,1)),
-		 Complex (p_re(1,2), p_im(1,2)),
-		 Complex (p_re(2,0), p_im(2,0)),
-		 Complex (p_re(2,1), p_im(2,1)),
-		 Complex (p_re(2,2), p_im(2,2)))
+                 Complex (p_re(0,1), p_im(0,1)),
+                 Complex (p_re(0,2), p_im(0,2)),
+                 Complex (p_re(1,0), p_im(1,0)),
+                 Complex (p_re(1,1), p_im(1,1)),
+                 Complex (p_re(1,2), p_im(1,2)),
+                 Complex (p_re(2,0), p_im(2,0)),
+                 Complex (p_re(2,1), p_im(2,1)),
+                 Complex (p_re(2,2), p_im(2,2)))
 {
 }
 #endif

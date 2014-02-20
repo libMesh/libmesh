@@ -91,7 +91,7 @@ class PointLocatorBase;
 // ------------------------------------------------------------
 // Elem class definition
 class Elem : public ReferenceCountedObject<Elem>,
-	     public DofObject
+  public DofObject
 {
  protected:
 
@@ -102,10 +102,10 @@ class Elem : public ReferenceCountedObject<Elem>,
    * to support this data.
    */
   Elem (const unsigned int n_nodes,
-	const unsigned int n_sides,
-	Elem* parent,
-	Elem** elemlinkdata,
-	Node** nodelinkdata);
+        const unsigned int n_sides,
+        Elem* parent,
+        Elem** elemlinkdata,
+        Node** nodelinkdata);
 
  public:
 
@@ -318,7 +318,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   void find_edge_neighbors(const Point& p1,
                            const Point& p2,
-			   std::set<const Elem *> &neighbor_set) const;
+                           std::set<const Elem *> &neighbor_set) const;
 
   /**
    * This function finds all active elements which touch the current
@@ -364,8 +364,8 @@ class Elem : public ReferenceCountedObject<Elem>,
    * routines.
    */
   virtual void connectivity(const unsigned int sc,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const = 0;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const = 0;
 
   /**
    * Writes the element connectivity for various IO packages
@@ -375,7 +375,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * routines.
    */
   void write_connectivity (std::ostream& out,
-			   const IOPackage iop) const;
+                           const IOPackage iop) const;
 
 //   /**
 //    * @returns the VTK element type of the sc-th sub-element.
@@ -476,20 +476,20 @@ class Elem : public ReferenceCountedObject<Elem>,
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const = 0;
+                               const unsigned int s) const = 0;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const = 0;
+                               const unsigned int e) const = 0;
 
   /*
    * @returns true iff the specified edge is on the specified side
    */
   virtual bool is_edge_on_side(const unsigned int e,
-			       const unsigned int s) const = 0;
+                               const unsigned int s) const = 0;
 
   /*
    * @returns the side number opposite to \p s (for a tensor product
@@ -545,7 +545,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * this function with proxy=false.
    */
   virtual AutoPtr<Elem> build_side (const unsigned int i,
-				    bool proxy=true) const = 0;
+                                    bool proxy=true) const = 0;
 
   /**
    * Creates an element coincident with edge \p i. The element returned is
@@ -746,7 +746,7 @@ public:
    * Useful for computing the lengths of the sides of elements.
    */
   Real length (const unsigned int n1,
-	       const unsigned int n2) const;
+               const unsigned int n2) const;
 
   /**
    * @returns the number of adjacent vertices, that uniquely define
@@ -766,7 +766,7 @@ public:
    * linear elements this returns 0.
    */
   virtual unsigned short int second_order_adjacent_vertex (const unsigned int n,
-							   const unsigned int v) const;
+                                                           const unsigned int v) const;
 
   /**
    * @returns the child number \p c and element-local index \p v of the
@@ -778,7 +778,7 @@ public:
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
-	  second_order_child_vertex (const unsigned int n) const;
+    second_order_child_vertex (const unsigned int n) const;
 
   /**
    * @returns the element type of the associated second-order element,
@@ -792,7 +792,7 @@ public:
    * \p full_ordered is \p false, then \p QUAD8 is returned.
    */
   static ElemType second_order_equivalent_type (const ElemType et,
-						const bool full_ordered=true);
+                                                const bool full_ordered=true);
 
   /**
    * @returns the element type of the associated first-order element,
@@ -825,10 +825,10 @@ public:
    * an element.
    */
   enum RefinementState { COARSEN = 0,
-			 DO_NOTHING,
-			 REFINE,
-			 JUST_REFINED,
-			 JUST_COARSENED,
+                         DO_NOTHING,
+                         REFINE,
+                         JUST_REFINED,
+                         JUST_COARSENED,
                          INACTIVE,
                          COARSEN_INACTIVE,
                          INVALID_REFINEMENTSTATE };
@@ -859,14 +859,14 @@ public:
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-			        const unsigned int s) const = 0;
+                                const unsigned int s) const = 0;
 
   /**
    * @returns true iff the specified child is on the
    * specified edge
    */
   virtual bool is_child_on_edge(const unsigned int c,
-			        const unsigned int e) const;
+                                const unsigned int e) const;
 
   /**
    * Adds a child pointer to the array of children of this element.
@@ -902,14 +902,14 @@ public:
    * subactive elements as well, use total_family_tree.
    */
   void family_tree (std::vector<const Elem*>& family,
-		    const bool reset=true) const;
+                    const bool reset=true) const;
 
   /**
    * Same as the \p family_tree() member, but also adds any subactive
    * descendants.
    */
   void total_family_tree (std::vector<const Elem*>& active_family,
-			  const bool reset=true) const;
+                          const bool reset=true) const;
 
   /**
    * Same as the \p family_tree() member, but only adds the active
@@ -918,7 +918,7 @@ public:
    * implemented more efficiently.
    */
   void active_family_tree (std::vector<const Elem*>& active_family,
-			   const bool reset=true) const;
+                           const bool reset=true) const;
 
   /**
    * Same as the \p family_tree() member, but only adds elements
@@ -941,8 +941,8 @@ public:
    * which are next to \p neighbor.
    */
   void family_tree_by_neighbor (std::vector<const Elem*>& family,
-		                const Elem *neighbor,
-		                const bool reset=true) const;
+                                const Elem *neighbor,
+                                const bool reset=true) const;
 
   /**
    * Same as the \p family_tree() member, but only adds elements
@@ -951,17 +951,17 @@ public:
    * \p neighbor->is_ancestor(subneighbor)
    */
   void family_tree_by_subneighbor (std::vector<const Elem*>& family,
-		                   const Elem *neighbor,
-		                   const Elem *subneighbor,
-		                   const bool reset=true) const;
+                                   const Elem *neighbor,
+                                   const Elem *subneighbor,
+                                   const bool reset=true) const;
 
   /**
    * Same as the \p active_family_tree() member, but only adds elements
    * which are next to \p neighbor.
    */
   void active_family_tree_by_neighbor (std::vector<const Elem*>& family,
-		                       const Elem *neighbor,
-		                       const bool reset=true) const;
+                                       const Elem *neighbor,
+                                       const bool reset=true) const;
 
   /**
    * Returns the value of the refinement flag for the element.
@@ -995,7 +995,7 @@ public:
    * active \p neighbor
    */
   unsigned int min_p_level_by_neighbor (const Elem* neighbor,
-					unsigned int current_min) const;
+                                        unsigned int current_min) const;
 
   /**
    * Returns the minimum new p refinement level (i.e. after
@@ -1004,7 +1004,7 @@ public:
    * active \p neighbor
    */
   unsigned int min_new_p_level_by_neighbor (const Elem* neighbor,
-					    unsigned int current_min) const;
+                                            unsigned int current_min) const;
 
   /**
    * Sets the value of the p refinement level for the element
@@ -1126,7 +1126,7 @@ public:
    * \p AutoPtr<>
    */
   static AutoPtr<Elem> build (const ElemType type,
-			      Elem* p=NULL);
+                              Elem* p=NULL);
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -1135,8 +1135,8 @@ public:
    * nodes
    */
   virtual float embedding_matrix (const unsigned int i,
-				  const unsigned int j,
-				  const unsigned int k) const = 0;
+                                  const unsigned int j,
+                                  const unsigned int k) const = 0;
 
 #endif
 
@@ -1169,22 +1169,22 @@ public:
    * Compute a key from the specified nodes.
    */
   static dof_id_type compute_key (dof_id_type n0,
-				  dof_id_type n1);
+                                  dof_id_type n1);
 
   /**
    * Compute a key from the specified nodes.
    */
   static dof_id_type compute_key (dof_id_type n0,
-				  dof_id_type n1,
-				  dof_id_type n2);
+                                  dof_id_type n1,
+                                  dof_id_type n2);
 
   /**
    * Compute a key from the specified nodes.
    */
   static dof_id_type compute_key (dof_id_type n0,
-				  dof_id_type n1,
-				  dof_id_type n2,
-				  dof_id_type n3);
+                                  dof_id_type n1,
+                                  dof_id_type n2,
+                                  dof_id_type n3);
   //-------------------------------------------------------
 
 
@@ -1274,8 +1274,8 @@ std::ostream& operator << (std::ostream& os, const Elem& e)
 // Elem class member functions
 inline
 Elem::Elem(const unsigned int nn,
-	   const unsigned int ns,
-	   Elem* p,
+           const unsigned int ns,
+           Elem* p,
            Elem** elemlinkdata,
            Node** nodelinkdata) :
   _nodes(nodelinkdata),
@@ -1294,7 +1294,7 @@ Elem::Elem(const unsigned int nn,
   if (_nodes)
     {
       for (unsigned int n=0; n<nn; n++)
-	_nodes[n] = NULL;
+        _nodes[n] = NULL;
     }
 
   // Initialize the neighbors/parent data structure
@@ -1479,7 +1479,7 @@ Elem* Elem::child_neighbor (Elem* elem) const
 {
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
     if (elem->neighbor(n) &&
-	elem->neighbor(n)->parent() == this)
+        elem->neighbor(n)->parent() == this)
       return elem->neighbor(n);
 
   return NULL;
@@ -1492,7 +1492,7 @@ const Elem* Elem::child_neighbor (const Elem* elem) const
 {
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
     if (elem->neighbor(n) &&
-	elem->neighbor(n)->parent() == this)
+        elem->neighbor(n)->parent() == this)
       return elem->neighbor(n);
 
   return NULL;
@@ -1644,7 +1644,7 @@ bool Elem::has_ancestor_children() const
   else
     for (unsigned int c=0; c != this->n_children(); c++)
       if (this->child(c)->has_children())
-	return true;
+        return true;
 #endif
   return false;
 }
@@ -1654,9 +1654,9 @@ bool Elem::has_ancestor_children() const
 inline
 bool Elem::is_ancestor_of(const Elem *
 #ifdef LIBMESH_ENABLE_AMR
-			  descendant
+                          descendant
 #endif
-			  ) const
+                          ) const
 {
 #ifdef LIBMESH_ENABLE_AMR
   const Elem *e = descendant;
@@ -1833,7 +1833,7 @@ unsigned int Elem::which_child_am_i (const Elem* e) const
       return c;
 
   libMesh::err << "ERROR:  which_child_am_i() was called with a non-child!"
-	        << std::endl;
+               << std::endl;
 
   libmesh_error();
 
@@ -1886,7 +1886,7 @@ unsigned int Elem::max_descendant_p_level () const
   unsigned int max_p_level = _p_level;
   for (unsigned int c=0; c != this->n_children(); c++)
     max_p_level = std::max(max_p_level,
-			   this->child(c)->max_descendant_p_level());
+                           this->child(c)->max_descendant_p_level());
   return max_p_level;
 }
 
@@ -1902,24 +1902,24 @@ void Elem::set_p_level(unsigned int p)
 
       // If our new p level is less than our parents, our parents drops
       if (parent_p_level > p)
-	{
+        {
           this->parent()->set_p_level(p);
-	}
+        }
       // If we are the lowest p level and it increases, so might
       // our parent's, but we have to check every other child to see
       else if (parent_p_level == _p_level && _p_level < p)
-	{
-	  _p_level = libmesh_cast_int<unsigned char>(p);
-	  parent_p_level = libmesh_cast_int<unsigned char>(p);
-	  for (unsigned int c=0; c != this->parent()->n_children(); c++)
-	    parent_p_level = std::min(parent_p_level,
-				      this->parent()->child(c)->p_level());
+        {
+          _p_level = libmesh_cast_int<unsigned char>(p);
+          parent_p_level = libmesh_cast_int<unsigned char>(p);
+          for (unsigned int c=0; c != this->parent()->n_children(); c++)
+            parent_p_level = std::min(parent_p_level,
+                                      this->parent()->child(c)->p_level());
 
-	  if (parent_p_level != this->parent()->p_level())
-	    this->parent()->set_p_level(parent_p_level);
+          if (parent_p_level != this->parent()->p_level())
+            this->parent()->set_p_level(parent_p_level);
 
-	  return;
-	}
+          return;
+        }
     }
 
   _p_level = libmesh_cast_int<unsigned char>(p);
@@ -1948,7 +1948,7 @@ dof_id_type Elem::compute_key (dof_id_type n0)
 
 inline
 dof_id_type Elem::compute_key (dof_id_type n0,
-			       dof_id_type n1)
+                               dof_id_type n1)
 {
   // Order the two so that n0 < n1
   if (n0 > n1) std::swap (n0, n1);
@@ -1960,8 +1960,8 @@ dof_id_type Elem::compute_key (dof_id_type n0,
 
 inline
 dof_id_type Elem::compute_key (dof_id_type n0,
-			       dof_id_type n1,
-			       dof_id_type n2)
+                               dof_id_type n1,
+                               dof_id_type n2)
 {
   // Order the numbers such that n0 < n1 < n2.
   // We'll do it in 3 steps like this:
@@ -1994,9 +1994,9 @@ dof_id_type Elem::compute_key (dof_id_type n0,
 
 inline
 dof_id_type Elem::compute_key (dof_id_type n0,
-			       dof_id_type n1,
-			       dof_id_type n2,
-			       dof_id_type n3)
+                               dof_id_type n1,
+                               dof_id_type n2,
+                               dof_id_type n3)
 {
   // Sort first
   // Step 1
@@ -2220,7 +2220,7 @@ class Elem::SideIter
 public:
   // Constructor with arguments.
   SideIter(const unsigned int side_number,
-	   Elem* parent)
+           Elem* parent)
     : _side(),
       _side_ptr(NULL),
       _parent(parent),
@@ -2276,7 +2276,7 @@ public:
   bool operator == (const SideIter& other) const
   {
     return (this->_side_number == other._side_number &&
-	    this->_parent      == other._parent);
+            this->_parent      == other._parent);
   }
 
 
@@ -2353,15 +2353,15 @@ Elem::SideIter Elem::_last_side()
 struct
 Elem::side_iterator :
 variant_filter_iterator<Elem::Predicate,
-			Elem*>
+  Elem*>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
   side_iterator (const IterType& d,
-		 const IterType& e,
-		 const PredType& p ) :
+                 const IterType& e,
+                 const PredType& p ) :
     variant_filter_iterator<Elem::Predicate,
-			    Elem*>(d,e,p) {}
+      Elem*>(d,e,p) {}
 };
 
 

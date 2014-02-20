@@ -32,10 +32,10 @@ namespace libMesh
   namespace {
 
     void hierarchic_nodal_soln(const Elem* elem,
-			       const Order order,
-			       const std::vector<Number>& elem_soln,
-			       std::vector<Number>&       nodal_soln,
-			       unsigned Dim)
+                               const Order order,
+                               const std::vector<Number>& elem_soln,
+                               std::vector<Number>&       nodal_soln,
+                               unsigned Dim)
     {
       const unsigned int n_nodes = elem->n_nodes();
 
@@ -49,51 +49,51 @@ namespace libMesh
       FEType fe_type(totalorder, HIERARCHIC);
 
       switch (totalorder)
-	{
-	  // Constant shape functions
-	case CONSTANT:
-	  {
-	    libmesh_assert_equal_to (elem_soln.size(), 1);
+        {
+          // Constant shape functions
+        case CONSTANT:
+          {
+            libmesh_assert_equal_to (elem_soln.size(), 1);
 
-	    const Number val = elem_soln[0];
+            const Number val = elem_soln[0];
 
-	    for (unsigned int n=0; n<n_nodes; n++)
-	      nodal_soln[n] = val;
+            for (unsigned int n=0; n<n_nodes; n++)
+              nodal_soln[n] = val;
 
-	    return;
-	  }
+            return;
+          }
 
 
-	  // For other orders do interpolation at the nodes
-	  // explicitly.
-	default:
-	  {
+          // For other orders do interpolation at the nodes
+          // explicitly.
+        default:
+          {
 
-	    const unsigned int n_sf =
-	      // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
-	      FEInterface::n_shape_functions(Dim, fe_type, elem_type);
+            const unsigned int n_sf =
+              // FE<Dim,T>::n_shape_functions(elem_type, totalorder);
+              FEInterface::n_shape_functions(Dim, fe_type, elem_type);
 
-	    std::vector<Point> refspace_nodes;
-	    FEBase::get_refspace_nodes(elem_type,refspace_nodes);
-	    libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
+            std::vector<Point> refspace_nodes;
+            FEBase::get_refspace_nodes(elem_type,refspace_nodes);
+            libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
 
-	    for (unsigned int n=0; n<n_nodes; n++)
-	      {
-		libmesh_assert_equal_to (elem_soln.size(), n_sf);
+            for (unsigned int n=0; n<n_nodes; n++)
+              {
+                libmesh_assert_equal_to (elem_soln.size(), n_sf);
 
-		// Zero before summation
-		nodal_soln[n] = 0;
+                // Zero before summation
+                nodal_soln[n] = 0;
 
-		// u_i = Sum (alpha_i phi_i)
-		for (unsigned int i=0; i<n_sf; i++)
-		  nodal_soln[n] += elem_soln[i] *
-		    // FE<Dim,T>::shape(elem, order, i, mapped_point);
-		    FEInterface::shape(Dim, fe_type, elem, i, refspace_nodes[n]);
-	      }
+                // u_i = Sum (alpha_i phi_i)
+                for (unsigned int i=0; i<n_sf; i++)
+                  nodal_soln[n] += elem_soln[i] *
+                    // FE<Dim,T>::shape(elem, order, i, mapped_point);
+                    FEInterface::shape(Dim, fe_type, elem, i, refspace_nodes[n]);
+              }
 
-	    return;
-	  }
-	}
+            return;
+          }
+        }
     } // hierarchic_nodal_soln()
 
 
@@ -103,28 +103,28 @@ namespace libMesh
     {
       libmesh_assert_greater (o, 0);
       switch (t)
-	{
-	case NODEELEM:
-	  return 1;
-	case EDGE2:
-	case EDGE3:
-	  return (o+1);
-	case QUAD4:
-	  libmesh_assert_less (o, 2);
-	case QUAD8:
-	case QUAD9:
-	  return ((o+1)*(o+1));
-	case HEX8:
-	  libmesh_assert_less (o, 2);
-	case HEX20:
-	  libmesh_assert_less (o, 2);
-	case HEX27:
-	  return ((o+1)*(o+1)*(o+1));
-	case TRI6:
-	  return ((o+1)*(o+2)/2);
-	default:
-	  libmesh_error();
-	}
+        {
+        case NODEELEM:
+          return 1;
+        case EDGE2:
+        case EDGE3:
+          return (o+1);
+        case QUAD4:
+          libmesh_assert_less (o, 2);
+        case QUAD8:
+        case QUAD9:
+          return ((o+1)*(o+1));
+        case HEX8:
+          libmesh_assert_less (o, 2);
+        case HEX20:
+          libmesh_assert_less (o, 2);
+        case HEX27:
+          return ((o+1)*(o+1)*(o+1));
+        case TRI6:
+          return ((o+1)*(o+2)/2);
+        default:
+          libmesh_error();
+        }
 
       libmesh_error();
       return 0;
@@ -134,124 +134,124 @@ namespace libMesh
 
 
     unsigned int hierarchic_n_dofs_at_node(const ElemType t,
-					   const Order o,
-					   const unsigned int n)
+                                           const Order o,
+                                           const unsigned int n)
     {
       libmesh_assert_greater (o, 0);
       switch (t)
-	{
-	case NODEELEM:
-	  return 1;
-	case EDGE2:
-	case EDGE3:
-	  switch (n)
-	    {
-	    case 0:
-	    case 1:
-	      return 1;
-	      // Internal DoFs are associated with the elem, not its nodes
-	    case 2:
-	      return 0;
-	    default:
-	      libmesh_error();
-	    }
-	case TRI6:
-	  switch (n)
-	    {
-	    case 0:
-	    case 1:
-	    case 2:
-	      return 1;
+        {
+        case NODEELEM:
+          return 1;
+        case EDGE2:
+        case EDGE3:
+          switch (n)
+            {
+            case 0:
+            case 1:
+              return 1;
+              // Internal DoFs are associated with the elem, not its nodes
+            case 2:
+              return 0;
+            default:
+              libmesh_error();
+            }
+        case TRI6:
+          switch (n)
+            {
+            case 0:
+            case 1:
+            case 2:
+              return 1;
 
-	    case 3:
-	    case 4:
-	    case 5:
-	      return (o-1);
+            case 3:
+            case 4:
+            case 5:
+              return (o-1);
 
-	      // Internal DoFs are associated with the elem, not its nodes
-	    default:
-	      libmesh_error();
-	    }
-	case QUAD4:
-	  libmesh_assert_less (n, 4);
-	  libmesh_assert_less (o, 2);
-	case QUAD8:
-	case QUAD9:
-	  switch (n)
-	    {
-	    case 0:
-	    case 1:
-	    case 2:
-	    case 3:
-	      return 1;
+              // Internal DoFs are associated with the elem, not its nodes
+            default:
+              libmesh_error();
+            }
+        case QUAD4:
+          libmesh_assert_less (n, 4);
+          libmesh_assert_less (o, 2);
+        case QUAD8:
+        case QUAD9:
+          switch (n)
+            {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+              return 1;
 
-	    case 4:
-	    case 5:
-	    case 6:
-	    case 7:
-	      return (o-1);
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+              return (o-1);
 
-	      // Internal DoFs are associated with the elem, not its nodes
-	    case 8:
-	      return 0;
+              // Internal DoFs are associated with the elem, not its nodes
+            case 8:
+              return 0;
 
-	    default:
-	      libmesh_error();
-	    }
-	case HEX8:
-	  libmesh_assert_less (n, 8);
-	  libmesh_assert_less (o, 2);
-	case HEX20:
-	  libmesh_assert_less (n, 20);
-	  libmesh_assert_less (o, 2);
-	case HEX27:
-	  switch (n)
-	    {
-	    case 0:
-	    case 1:
-	    case 2:
-	    case 3:
-	    case 4:
-	    case 5:
-	    case 6:
-	    case 7:
-	      return 1;
+            default:
+              libmesh_error();
+            }
+        case HEX8:
+          libmesh_assert_less (n, 8);
+          libmesh_assert_less (o, 2);
+        case HEX20:
+          libmesh_assert_less (n, 20);
+          libmesh_assert_less (o, 2);
+        case HEX27:
+          switch (n)
+            {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+              return 1;
 
-	    case 8:
-	    case 9:
-	    case 10:
-	    case 11:
-	    case 12:
-	    case 13:
-	    case 14:
-	    case 15:
-	    case 16:
-	    case 17:
-	    case 18:
-	    case 19:
-	      return (o-1);
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+            case 17:
+            case 18:
+            case 19:
+              return (o-1);
 
-	    case 20:
-	    case 21:
-	    case 22:
-	    case 23:
-	    case 24:
-	    case 25:
-	      return ((o-1)*(o-1));
+            case 20:
+            case 21:
+            case 22:
+            case 23:
+            case 24:
+            case 25:
+              return ((o-1)*(o-1));
 
-	      // Internal DoFs are associated with the elem, not its nodes
-	    case 26:
-	      return 0;
-	    default:
-	      libmesh_error();
-	    }
-	default:
+              // Internal DoFs are associated with the elem, not its nodes
+            case 26:
+              return 0;
+            default:
+              libmesh_error();
+            }
+        default:
 #ifdef DEBUG
-	  libMesh::err << "ERROR: Bad ElemType = " << t
-		       << std::endl;
+          libMesh::err << "ERROR: Bad ElemType = " << t
+                       << std::endl;
 #endif
-	  libmesh_error();
-	}
+          libmesh_error();
+        }
 
       libmesh_error();
 
@@ -262,37 +262,37 @@ namespace libMesh
 
 
     unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
-					    const Order o)
+                                            const Order o)
     {
       libmesh_assert_greater (o, 0);
       switch (t)
-	{
-	case NODEELEM:
-	  return 0;
-	case EDGE2:
-	case EDGE3:
-	  return (o-1);
-	case TRI3:
-	case QUAD4:
-	  return 0;
-	case TRI6:
-	  return ((o-1)*(o-2)/2);
-	case QUAD8:
-	case QUAD9:
-	  return ((o-1)*(o-1));
-	case HEX8:
-	case HEX20:
-	  libmesh_assert_less (o, 2);
-	  return 0;
-	case HEX27:
-	  return ((o-1)*(o-1)*(o-1));
-	default:
+        {
+        case NODEELEM:
+          return 0;
+        case EDGE2:
+        case EDGE3:
+          return (o-1);
+        case TRI3:
+        case QUAD4:
+          return 0;
+        case TRI6:
+          return ((o-1)*(o-2)/2);
+        case QUAD8:
+        case QUAD9:
+          return ((o-1)*(o-1));
+        case HEX8:
+        case HEX20:
+          libmesh_assert_less (o, 2);
+          return 0;
+        case HEX27:
+          return ((o-1)*(o-1)*(o-1));
+        default:
 #ifdef DEBUG
-	  libMesh::err << "ERROR: Bad ElemType = " << t
-		       << std::endl;
+          libMesh::err << "ERROR: Bad ElemType = " << t
+                       << std::endl;
 #endif
-	  libmesh_error();
-	}
+          libmesh_error();
+        }
 
       // Will never get here...
       libmesh_error();
@@ -310,30 +310,30 @@ namespace libMesh
   // This could be macro-ified so that it fits on one line...
   template <>
   void FE<0,HIERARCHIC>::nodal_soln(const Elem* elem,
-				  const Order order,
-				  const std::vector<Number>& elem_soln,
-				  std::vector<Number>& nodal_soln)
+                                    const Order order,
+                                    const std::vector<Number>& elem_soln,
+                                    std::vector<Number>& nodal_soln)
   { hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/0); }
 
   template <>
   void FE<1,HIERARCHIC>::nodal_soln(const Elem* elem,
-				  const Order order,
-				  const std::vector<Number>& elem_soln,
-				  std::vector<Number>& nodal_soln)
+                                    const Order order,
+                                    const std::vector<Number>& elem_soln,
+                                    std::vector<Number>& nodal_soln)
   { hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/1); }
 
   template <>
   void FE<2,HIERARCHIC>::nodal_soln(const Elem* elem,
-				  const Order order,
-				  const std::vector<Number>& elem_soln,
-				  std::vector<Number>& nodal_soln)
+                                    const Order order,
+                                    const std::vector<Number>& elem_soln,
+                                    std::vector<Number>& nodal_soln)
   { hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/2); }
 
   template <>
   void FE<3,HIERARCHIC>::nodal_soln(const Elem* elem,
-				  const Order order,
-				  const std::vector<Number>& elem_soln,
-				  std::vector<Number>& nodal_soln)
+                                    const Order order,
+                                    const std::vector<Number>& elem_soln,
+                                    std::vector<Number>& nodal_soln)
   { hierarchic_nodal_soln(elem, order, elem_soln, nodal_soln, /*Dim=*/3); }
 
 
@@ -371,16 +371,16 @@ namespace libMesh
   // compute_constraints() specializations are only needed for 2 and 3D
   template <>
   void FE<2,HIERARCHIC>::compute_constraints (DofConstraints &constraints,
-					      DofMap &dof_map,
-					      const unsigned int variable_number,
-					      const Elem* elem)
+                                              DofMap &dof_map,
+                                              const unsigned int variable_number,
+                                              const Elem* elem)
   { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
 
   template <>
   void FE<3,HIERARCHIC>::compute_constraints (DofConstraints &constraints,
-					      DofMap &dof_map,
-					      const unsigned int variable_number,
-					      const Elem* elem)
+                                              DofMap &dof_map,
+                                              const unsigned int variable_number,
+                                              const Elem* elem)
   { compute_proj_constraints(constraints, dof_map, variable_number, elem); }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 

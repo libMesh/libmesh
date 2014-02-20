@@ -25,7 +25,7 @@ namespace libMesh
 
 template <typename T>
 void TensorShellMatrix<T>::vector_mult (NumericVector<T>& dest,
-					const NumericVector<T>& arg) const
+                                        const NumericVector<T>& arg) const
 {
   dest = _v;
   dest.scale(_w.dot(arg));
@@ -35,7 +35,7 @@ void TensorShellMatrix<T>::vector_mult (NumericVector<T>& dest,
 
 template <typename T>
 void TensorShellMatrix<T>::vector_mult_add (NumericVector<T>& dest,
-					    const NumericVector<T>& arg) const
+                                            const NumericVector<T>& arg) const
 {
   dest.add(_w.dot(arg),_v);
 }

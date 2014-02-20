@@ -45,8 +45,8 @@ namespace Trees
    * directly.
    */
   enum BuildType {NODES=0,
-		  ELEMENTS,
-		  INVALID_BUILD_TYPE };
+                  ELEMENTS,
+                  INVALID_BUILD_TYPE };
 }
 
 /**

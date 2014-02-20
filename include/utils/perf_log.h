@@ -133,7 +133,7 @@ class PerfLog
    * logging without touching any other code.
    */
   PerfLog(const std::string& label_name="",
-	  const bool log_events=true);
+          const bool log_events=true);
 
   /**
    * Destructor. Calls \p clear() and \p print_log().
@@ -168,37 +168,37 @@ class PerfLog
    * Push the event \p label onto the stack, pausing any active event.
    */
   void push (const std::string &label,
-	     const std::string &header="");
+             const std::string &header="");
 
   /**
    * Pop the event \p label off the stack, resuming any lower event.
    */
   void pop (const std::string &label,
-	    const std::string &header="");
+            const std::string &header="");
 
   /**
    * Start monitoring the event named \p label.
    */
   void start_event(const std::string &label,
-		   const std::string &header="");
+                   const std::string &header="");
 
   /**
    * Stop monitoring the event named \p label.
    */
   void stop_event(const std::string &label,
-		  const std::string &header="");
+                  const std::string &header="");
 
   /**
    * Suspend monitoring of the event.
    */
   void pause_event(const std::string &label,
-		   const std::string &header="");
+                   const std::string &header="");
 
   /**
    * Restart monitoring the event.
    */
   void restart_event(const std::string &label,
-		     const std::string &header="");
+                     const std::string &header="");
 
   /**
    * @returns a string containing:
@@ -264,8 +264,8 @@ class PerfLog
    * The actual log.
    */
   std::map<std::pair<std::string,
-		     std::string>,
-	   PerfData> log;
+    std::string>,
+    PerfData> log;
 
   /**
    * A stack to hold the current performance log trace.
@@ -329,14 +329,14 @@ double PerfData::stop_or_pause(const bool do_stop)
   gettimeofday (&(this->tstart), NULL);
 
   const double elapsed_time = (static_cast<double>(this->tstart.tv_sec  - tstart_tv_sec) +
-			       static_cast<double>(this->tstart.tv_usec - tstart_tv_usec)*1.e-6);
+                               static_cast<double>(this->tstart.tv_usec - tstart_tv_usec)*1.e-6);
 
   this->tot_time += elapsed_time;
 
   if(do_stop)
     {
       const double elapsed_time_incl_sub = (static_cast<double>(this->tstart.tv_sec  - this->tstart_incl_sub.tv_sec) +
-					    static_cast<double>(this->tstart.tv_usec - this->tstart_incl_sub.tv_usec)*1.e-6);
+                                            static_cast<double>(this->tstart.tv_usec - this->tstart_incl_sub.tv_usec)*1.e-6);
 
       this->tot_time_incl_sub += elapsed_time_incl_sub;
     }
@@ -362,7 +362,7 @@ double PerfData::stopit ()
 // PerfLog class inline member funcions
 inline
 void PerfLog::push (const std::string &label,
-		    const std::string &header)
+                    const std::string &header)
 {
   if (this->log_events)
     {
@@ -371,8 +371,8 @@ void PerfLog::push (const std::string &label,
       PerfData *perf_data = &(log[std::make_pair(header,label)]);
 
       if (!log_stack.empty())
-	total_time +=
-	  log_stack.top()->pause();
+        total_time +=
+          log_stack.top()->pause();
 
       perf_data->start();
       log_stack.push(perf_data);
@@ -383,7 +383,7 @@ void PerfLog::push (const std::string &label,
 
 inline
 void PerfLog::pop (const std::string &libmesh_dbg_var(label),
-		   const std::string &libmesh_dbg_var(header))
+                   const std::string &libmesh_dbg_var(header))
 {
   if (this->log_events)
     {
@@ -410,7 +410,7 @@ void PerfLog::pop (const std::string &libmesh_dbg_var(label),
       log_stack.pop();
 
       if (!log_stack.empty())
-	log_stack.top()->restart();
+        log_stack.top()->restart();
     }
 }
 
@@ -424,7 +424,7 @@ double PerfLog::get_elapsed_time () const
   gettimeofday (&tnow, NULL);
 
   const double elapsed_time = (static_cast<double>(tnow.tv_sec  - tstart.tv_sec) +
-			       static_cast<double>(tnow.tv_usec - tstart.tv_usec)*1.e-6);
+                               static_cast<double>(tnow.tv_usec - tstart.tv_usec)*1.e-6);
   return elapsed_time;
 }
 

@@ -51,10 +51,10 @@ void Elem::refine (MeshRefinement& mesh_refinement)
       unsigned int parent_p_level = this->p_level();
       for (unsigned int c=0; c<this->n_children(); c++)
         {
-	  _children[c] = Elem::build(this->type(), this).release();
-	  _children[c]->set_refinement_flag(Elem::JUST_REFINED);
-	  _children[c]->set_p_level(parent_p_level);
-	  _children[c]->set_p_refinement_flag(this->p_refinement_flag());
+          _children[c] = Elem::build(this->type(), this).release();
+          _children[c]->set_refinement_flag(Elem::JUST_REFINED);
+          _children[c]->set_p_level(parent_p_level);
+          _children[c]->set_p_refinement_flag(this->p_refinement_flag());
         }
 
       // Compute new nodal locations
@@ -70,52 +70,52 @@ void Elem::refine (MeshRefinement& mesh_refinement)
       for (unsigned int c=0; c<this->n_children(); c++)
         {
           Elem *current_child = this->child(c);
-	  p[c].resize    (current_child->n_nodes());
-	  nodes[c].resize(current_child->n_nodes());
+          p[c].resize    (current_child->n_nodes());
+          nodes[c].resize(current_child->n_nodes());
 
-	  for (unsigned int nc=0; nc<current_child->n_nodes(); nc++)
-	    {
-	      // zero entries
-	      p[c][nc].zero();
-	      nodes[c][nc] = NULL;
+          for (unsigned int nc=0; nc<current_child->n_nodes(); nc++)
+            {
+              // zero entries
+              p[c][nc].zero();
+              nodes[c][nc] = NULL;
 
-	      for (unsigned int n=0; n<this->n_nodes(); n++)
-	        {
-		  // The value from the embedding matrix
-		  const float em_val = this->embedding_matrix(c,nc,n);
+              for (unsigned int n=0; n<this->n_nodes(); n++)
+                {
+                  // The value from the embedding matrix
+                  const float em_val = this->embedding_matrix(c,nc,n);
 
-		  if (em_val != 0.)
-		    {
-		      p[c][nc].add_scaled (this->point(n), em_val);
+                  if (em_val != 0.)
+                    {
+                      p[c][nc].add_scaled (this->point(n), em_val);
 
-		      // We may have found the node, in which case we
-		      // won't need to look it up later.
-		      if (em_val == 1.)
-		        nodes[c][nc] = this->get_node(n);
-		    }
-	        }
-	    }
+                      // We may have found the node, in which case we
+                      // won't need to look it up later.
+                      if (em_val == 1.)
+                        nodes[c][nc] = this->get_node(n);
+                    }
+                }
+            }
 
-	// assign nodes to children & add them to the mesh
+          // assign nodes to children & add them to the mesh
           const Real pointtol = this->hmin() * TOLERANCE;
-	  for (unsigned int nc=0; nc<current_child->n_nodes(); nc++)
-	    {
-	      if (nodes[c][nc] != NULL)
-	        {
-		  current_child->set_node(nc) = nodes[c][nc];
-	        }
-	      else
-	        {
-		  current_child->set_node(nc) =
-		    mesh_refinement.add_point(p[c][nc],
-					      current_child->processor_id(),
+          for (unsigned int nc=0; nc<current_child->n_nodes(); nc++)
+            {
+              if (nodes[c][nc] != NULL)
+                {
+                  current_child->set_node(nc) = nodes[c][nc];
+                }
+              else
+                {
+                  current_child->set_node(nc) =
+                    mesh_refinement.add_point(p[c][nc],
+                                              current_child->processor_id(),
                                               pointtol);
-		  current_child->get_node(nc)->set_n_systems
+                  current_child->get_node(nc)->set_n_systems
                     (this->n_systems());
-	        }
-	    }
+                }
+            }
 
-	  mesh_refinement.add_elem (current_child);
+          mesh_refinement.add_elem (current_child);
           current_child->set_n_systems(this->n_systems());
         }
     }
@@ -176,19 +176,19 @@ void Elem::coarsen()
         // The node location is somewhere between existing vertices
         if ((em_val != 0.) && (em_val != 1.))
         {
-	  new_pos.add_scaled (this->point(n), em_val);
-	  calculated_new_pos = true;
+          new_pos.add_scaled (this->point(n), em_val);
+          calculated_new_pos = true;
         }
       }
 
       if(calculated_new_pos)
       {
-	//Move the existing node back into it's original location
-	for(unsigned int i=0; i<LIBMESH_DIM; i++)
-	{
-	  Point & child_node = *(mychild->get_node(nc));
-	  child_node(i)=new_pos(i);
-	}
+        //Move the existing node back into it's original location
+        for(unsigned int i=0; i<LIBMESH_DIM; i++)
+          {
+            Point & child_node = *(mychild->get_node(nc));
+            child_node(i)=new_pos(i);
+          }
       }
     }
   }

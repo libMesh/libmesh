@@ -48,7 +48,7 @@ void TreeNode<N>::insert (const Node* nd)
 
       // Refine ourself if we reach the target bin size for a TreeNode.
       if (nodes.size() == tgt_bin_size)
-	this->refine();
+        this->refine();
     }
 
   // If we are not active simply pass the node along to
@@ -58,7 +58,7 @@ void TreeNode<N>::insert (const Node* nd)
       libmesh_assert_equal_to (children.size(), N);
 
       for (unsigned int c=0; c<N; c++)
-	children[c]->insert (nd);
+        children[c]->insert (nd);
     }
 }
 
@@ -78,10 +78,10 @@ void TreeNode<N>::insert (const Elem* elem)
     {
       Point p = elem->point(i);
       for(unsigned int d=0; d<dim; d++)
-	{
-	  if(minCoord(d)>p(d)) minCoord(d) = p(d);
-	  if(maxCoord(d)<p(d)) maxCoord(d) = p(d);
-	}
+        {
+          if(minCoord(d)>p(d)) minCoord(d) = p(d);
+          if(maxCoord(d)<p(d)) maxCoord(d) = p(d);
+        }
     }
 
   /* Next, find out whether this cuboid has got non-empty intersection
@@ -90,10 +90,10 @@ void TreeNode<N>::insert (const Elem* elem)
   for(unsigned int d=0; d<dim; d++)
     {
       if(maxCoord(d)<this->bounding_box.first(d) ||
-	 minCoord(d)>this->bounding_box.second(d))
-	{
-	  intersects = false;
-	}
+         minCoord(d)>this->bounding_box.second(d))
+        {
+          intersects = false;
+        }
     }
 
   /* If not, we should not care about this element.  */
@@ -112,13 +112,13 @@ void TreeNode<N>::insert (const Elem* elem)
       // flag indicating this node contains
       // infinite elements
       if (elem->infinite())
-	this->contains_ifems = true;
+        this->contains_ifems = true;
 
 #endif
 
       // Refine ourself if we reach the target bin size for a TreeNode.
       if (elements.size() == tgt_bin_size)
-	this->refine();
+        this->refine();
     }
 
   // If we are not active simply pass the element along to
@@ -128,7 +128,7 @@ void TreeNode<N>::insert (const Elem* elem)
       libmesh_assert_equal_to (children.size(), N);
 
       for (unsigned int c=0; c<N; c++)
-	children[c]->insert (elem);
+        children[c]->insert (elem);
     }
 }
 
@@ -152,11 +152,11 @@ void TreeNode<N>::refine ()
 
       // Pass off our nodes to our children
       for (unsigned int n=0; n<nodes.size(); n++)
-	children[c]->insert(nodes[n]);
+        children[c]->insert(nodes[n]);
 
       // Pass off our elements to our children
       for (unsigned int e=0; e<elements.size(); e++)
-	children[c]->insert(elements[e]);
+        children[c]->insert(elements[e]);
     }
 
   // We don't need to store nodes or elements any more,
@@ -216,181 +216,181 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
       // How to refine an OctTree Node
     case 8:
       {
-	const Real xmin = bounding_box.first(0);
-	const Real ymin = bounding_box.first(1);
-	const Real zmin = bounding_box.first(2);
+        const Real xmin = bounding_box.first(0);
+        const Real ymin = bounding_box.first(1);
+        const Real zmin = bounding_box.first(2);
 
-	const Real xmax = bounding_box.second(0);
-	const Real ymax = bounding_box.second(1);
-	const Real zmax = bounding_box.second(2);
+        const Real xmax = bounding_box.second(0);
+        const Real ymax = bounding_box.second(1);
+        const Real zmax = bounding_box.second(2);
 
-	const Real xc = xmin + .5*(xmax - xmin);
-	const Real yc = ymin + .5*(ymax - ymin);
-	const Real zc = zmin + .5*(zmax - zmin);
-
-
-	switch (c)
-	  {
-
-	  case 0:
-	    {
-	      const Point min(xmin, ymin, zmin);
-	      const Point max(xc,   yc,   zc);
-	      return std::make_pair (min, max);
-	      break;
-	    }
-
-	  case 1:
-	    {
-	      const Point min(xc,   ymin, zmin);
-	      const Point max(xmax, yc,   zc);
-	      return std::make_pair (min, max);
-	      break;
-	    }
-
-	  case 2:
-	    {
-	      const Point min(xmin, yc,   zmin);
-	      const Point max(xc,   ymax, zc);
-	      return std::make_pair (min, max);
-	      break;
-	    }
-
-	  case 3:
-	    {
-	      const Point min(xc,   yc,   zmin);
-	      const Point max(xmax, ymax, zc);
-	      return std::make_pair (min, max);
-	      break;
-	    }
-
-	  case 4:
-	    {
-	      const Point min(xmin, ymin, zc);
-	      const Point max(xc,   yc,   zmax);
-	      return std::make_pair (min, max);
-	      break;
-	    }
-
-	  case 5:
-	    {
-	      const Point min(xc,   ymin, zc);
-	      const Point max(xmax, yc,   zmax);
-	      return std::make_pair (min, max);
-	      break;
-	    }
-
-	  case 6:
-	    {
-	      const Point min(xmin, yc,   zc);
-	      const Point max(xc,   ymax, zmax);
-	      return std::make_pair (min, max);
-	      break;
-	    }
-
-	  case 7:
-	    {
-	      const Point min(xc,   yc,   zc);
-	      const Point max(xmax, ymax, zmax);
-	      return std::make_pair (min, max);
-	      break;
-	    }
-
-	  default:
-	    libMesh::err << "c >= N! : " << c
-		          << std::endl;
-	    libmesh_error();
-	  }
+        const Real xc = xmin + .5*(xmax - xmin);
+        const Real yc = ymin + .5*(ymax - ymin);
+        const Real zc = zmin + .5*(zmax - zmin);
 
 
+        switch (c)
+          {
 
-	break;
+          case 0:
+            {
+              const Point min(xmin, ymin, zmin);
+              const Point max(xc,   yc,   zc);
+              return std::make_pair (min, max);
+              break;
+            }
+
+          case 1:
+            {
+              const Point min(xc,   ymin, zmin);
+              const Point max(xmax, yc,   zc);
+              return std::make_pair (min, max);
+              break;
+            }
+
+          case 2:
+            {
+              const Point min(xmin, yc,   zmin);
+              const Point max(xc,   ymax, zc);
+              return std::make_pair (min, max);
+              break;
+            }
+
+          case 3:
+            {
+              const Point min(xc,   yc,   zmin);
+              const Point max(xmax, ymax, zc);
+              return std::make_pair (min, max);
+              break;
+            }
+
+          case 4:
+            {
+              const Point min(xmin, ymin, zc);
+              const Point max(xc,   yc,   zmax);
+              return std::make_pair (min, max);
+              break;
+            }
+
+          case 5:
+            {
+              const Point min(xc,   ymin, zc);
+              const Point max(xmax, yc,   zmax);
+              return std::make_pair (min, max);
+              break;
+            }
+
+          case 6:
+            {
+              const Point min(xmin, yc,   zc);
+              const Point max(xc,   ymax, zmax);
+              return std::make_pair (min, max);
+              break;
+            }
+
+          case 7:
+            {
+              const Point min(xc,   yc,   zc);
+              const Point max(xmax, ymax, zmax);
+              return std::make_pair (min, max);
+              break;
+            }
+
+          default:
+            libMesh::err << "c >= N! : " << c
+                         << std::endl;
+            libmesh_error();
+          }
+
+
+
+        break;
       } // case 8
 
       // How to refine an QuadTree Node
     case 4:
       {
-	const Real xmin = bounding_box.first(0);
-	const Real ymin = bounding_box.first(1);
+        const Real xmin = bounding_box.first(0);
+        const Real ymin = bounding_box.first(1);
 
-	const Real xmax = bounding_box.second(0);
-	const Real ymax = bounding_box.second(1);
+        const Real xmax = bounding_box.second(0);
+        const Real ymax = bounding_box.second(1);
 
-	const Real xc = xmin + .5*(xmax - xmin);
-	const Real yc = ymin + .5*(ymax - ymin);
+        const Real xc = xmin + .5*(xmax - xmin);
+        const Real yc = ymin + .5*(ymax - ymin);
 
-	switch (c)
-	  {
-	  case 0:
-	    {
-	      const Point min(xmin, ymin);
-	      const Point max(xc,   yc);
-	      return std::make_pair (min, max);
-	      break;
-	    }
+        switch (c)
+          {
+          case 0:
+            {
+              const Point min(xmin, ymin);
+              const Point max(xc,   yc);
+              return std::make_pair (min, max);
+              break;
+            }
 
-	  case 1:
-	    {
-	      const Point min(xc,   ymin);
-	      const Point max(xmax, yc);
-	      return std::make_pair (min, max);
-	      break;
-	    }
+          case 1:
+            {
+              const Point min(xc,   ymin);
+              const Point max(xmax, yc);
+              return std::make_pair (min, max);
+              break;
+            }
 
-	  case 2:
-	    {
-	      const Point min(xmin, yc);
-	      const Point max(xc,   ymax);
-	      return std::make_pair (min, max);
-	      break;
-	    }
+          case 2:
+            {
+              const Point min(xmin, yc);
+              const Point max(xc,   ymax);
+              return std::make_pair (min, max);
+              break;
+            }
 
-	  case 3:
-	    {
-	      const Point min(xc,   yc);
-	      const Point max(xmax, ymax);
-	      return std::make_pair (min, max);
-	      break;
-	    }
+          case 3:
+            {
+              const Point min(xc,   yc);
+              const Point max(xmax, ymax);
+              return std::make_pair (min, max);
+              break;
+            }
 
-	  default:
-	    libMesh::err << "c >= N!" << std::endl;
-	    libmesh_error();
+          default:
+            libMesh::err << "c >= N!" << std::endl;
+            libmesh_error();
 
-	  }
+          }
 
-	break;
+        break;
       } // case 4
 
       // How to refine a BinaryTree Node
     case 2:
       {
-	const Real xmin = bounding_box.first(0);
+        const Real xmin = bounding_box.first(0);
 
-	const Real xmax = bounding_box.second(0);
+        const Real xmax = bounding_box.second(0);
 
-	const Real xc = xmin + .5*(xmax - xmin);
+        const Real xc = xmin + .5*(xmax - xmin);
 
-	switch (c)
-	  {
-	  case 0:
-	    {
-	      return std::make_pair (Point(xmin), Point(xc));
-	      break;
-	    }
+        switch (c)
+          {
+          case 0:
+            {
+              return std::make_pair (Point(xmin), Point(xc));
+              break;
+            }
 
-	  case 1:
-	    {
-	      return std::make_pair (Point(xc), Point(xmax));
-	      break;
-	    }
+          case 1:
+            {
+              return std::make_pair (Point(xc), Point(xmax));
+              break;
+            }
 
-	  default:
-	    libMesh::err << "c >= N!" << std::endl;
-	    libmesh_error();
-	  }
+          default:
+            libMesh::err << "c >= N!" << std::endl;
+            libmesh_error();
+          }
 
-	break;
+        break;
       } // case 2
 
 
@@ -417,7 +417,7 @@ void TreeNode<N>::print_nodes(std::ostream& out_stream) const
       out_stream << "TreeNode Level: " << this->level() << std::endl;
 
       for (unsigned int n=0; n<nodes.size(); n++)
-	out_stream << " " << nodes[n]->id();
+        out_stream << " " << nodes[n]->id();
 
       out_stream << std::endl << std::endl;
 
@@ -425,7 +425,7 @@ void TreeNode<N>::print_nodes(std::ostream& out_stream) const
   else
     {
       for (unsigned int child=0; child<children.size(); child++)
-	children[child]->print_nodes();
+        children[child]->print_nodes();
     }
 }
 
@@ -439,15 +439,15 @@ void TreeNode<N>::print_elements(std::ostream& out_stream) const
       out_stream << "TreeNode Level: " << this->level() << std::endl;
 
       for (std::vector<const Elem*>::const_iterator pos=elements.begin();
-	   pos != elements.end(); ++pos)
-	out_stream << " " << *pos;
+           pos != elements.end(); ++pos)
+        out_stream << " " << *pos;
 
       out_stream << std::endl << std::endl;
     }
   else
     {
       for (unsigned int child=0; child<children.size(); child++)
-	children[child]->print_elements();
+        children[child]->print_elements();
     }
 }
 
@@ -466,17 +466,17 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
       std::set<const Elem*> elements_set;
 
       for (unsigned int n=0; n<nodes.size(); n++)
-	{
-	  // the actual global node number we are replacing
-	  // with the connected elements
-	  const dof_id_type node_number = nodes[n]->id();
+        {
+          // the actual global node number we are replacing
+          // with the connected elements
+          const dof_id_type node_number = nodes[n]->id();
 
-	  libmesh_assert_less (node_number, mesh.n_nodes());
-	  libmesh_assert_less (node_number, nodes_to_elem.size());
+          libmesh_assert_less (node_number, mesh.n_nodes());
+          libmesh_assert_less (node_number, nodes_to_elem.size());
 
-	  for (unsigned int e=0; e<nodes_to_elem[node_number].size(); e++)
-	    elements_set.insert(nodes_to_elem[node_number][e]);
-	}
+          for (unsigned int e=0; e<nodes_to_elem[node_number].size(); e++)
+            elements_set.insert(nodes_to_elem[node_number][e]);
+        }
 
       // Done with the nodes.
       std::vector<const Node*>().swap(nodes);
@@ -488,24 +488,24 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
       elements.reserve(elements_set.size());
 
       for (std::set<const Elem*>::iterator pos=elements_set.begin();
-	   pos != elements_set.end(); ++pos)
-	{
-	  elements.push_back(*pos);
+           pos != elements_set.end(); ++pos)
+        {
+          elements.push_back(*pos);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-	  // flag indicating this node contains
-	  // infinite elements
-	  if ((*pos)->infinite())
-	    this->contains_ifems = true;
+          // flag indicating this node contains
+          // infinite elements
+          if ((*pos)->infinite())
+            this->contains_ifems = true;
 
 #endif
-	}
+        }
     }
   else
     {
       for (unsigned int child=0; child<children.size(); child++)
-	children[child]->transform_nodes_to_elements (nodes_to_elem);
+        children[child]->transform_nodes_to_elements (nodes_to_elem);
     }
 
 }
@@ -523,7 +523,7 @@ unsigned int TreeNode<N>::n_active_bins() const
       unsigned int sum=0;
 
       for (unsigned int c=0; c<children.size(); c++)
-	sum += children[c]->n_active_bins();
+        sum += children[c]->n_active_bins();
 
       return sum;
     }
@@ -539,12 +539,12 @@ const Elem* TreeNode<N>::find_element(const Point& p) const
       // Only check our children if the point is in our bounding box
       // or if the node contains infinite elements
       if (this->bounds_point(p) || this->contains_ifems)
-	// Search the active elements in the active TreeNode.
-	for (std::vector<const Elem*>::const_iterator pos=elements.begin();
-	     pos != elements.end(); ++pos)
-	  if ((*pos)->active())
-	    if ((*pos)->contains_point(p))
-	      return *pos;
+        // Search the active elements in the active TreeNode.
+        for (std::vector<const Elem*>::const_iterator pos=elements.begin();
+             pos != elements.end(); ++pos)
+          if ((*pos)->active())
+            if ((*pos)->contains_point(p))
+              return *pos;
 
       // The point was not found in any element
       return NULL;
@@ -578,27 +578,27 @@ const Elem* TreeNode<N>::find_element_in_children(const Point& p) const
   for (unsigned int c=0; c<children.size(); c++)
     if (children[c]->bounds_point(p))
       {
-	if (children[c]->active())
-	  {
-	    const Elem* e = children[c]->find_element(p);
+        if (children[c]->active())
+          {
+            const Elem* e = children[c]->find_element(p);
 
-	    if (e != NULL)
-	      return e;
-	  }
-	else
-	  {
-	    const Elem* e = children[c]->find_element_in_children(p);
+            if (e != NULL)
+              return e;
+          }
+        else
+          {
+            const Elem* e = children[c]->find_element_in_children(p);
 
-	    if (e != NULL)
-	      return e;
-	  }
+            if (e != NULL)
+              return e;
+          }
 
-	// If we get here than the child that bounds the
-	// point does not have any elements that contain
-	// the point.  So, we will search all our children.
-	// However, we have already searched child c so there
-	// is no use searching her again.
-	excluded_child = c;
+        // If we get here than the child that bounds the
+        // point does not have any elements that contain
+        // the point.  So, we will search all our children.
+        // However, we have already searched child c so there
+        // is no use searching her again.
+        excluded_child = c;
       }
 
 
@@ -609,20 +609,20 @@ const Elem* TreeNode<N>::find_element_in_children(const Point& p) const
   for (unsigned int c=0; c<children.size(); c++)
     if (c != excluded_child)
       {
-	if (children[c]->active())
-	  {
-	    const Elem* e = children[c]->find_element(p);
+        if (children[c]->active())
+          {
+            const Elem* e = children[c]->find_element(p);
 
-	    if (e != NULL)
-	      return e;
-	  }
-	else
-	  {
-	    const Elem* e = children[c]->find_element_in_children(p);
+            if (e != NULL)
+              return e;
+          }
+        else
+          {
+            const Elem* e = children[c]->find_element_in_children(p);
 
-	    if (e != NULL)
-	      return e;
-	  }
+            if (e != NULL)
+              return e;
+          }
       }
 
   // If we get here we have searched all our children.

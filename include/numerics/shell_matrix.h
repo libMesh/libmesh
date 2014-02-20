@@ -52,7 +52,7 @@ public:
    * Constructor; does nothing.
    */
   ShellMatrix (const Parallel::Communicator &comm_in
-	       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.
@@ -76,13 +76,13 @@ public:
    * dest.
    */
   virtual void vector_mult (NumericVector<T>& dest,
-			    const NumericVector<T>& arg) const = 0;
+                            const NumericVector<T>& arg) const = 0;
 
   /**
    * Multiplies the matrix with \p arg and adds the result to \p dest.
    */
   virtual void vector_mult_add (NumericVector<T>& dest,
-				const NumericVector<T>& arg) const = 0;
+                                const NumericVector<T>& arg) const = 0;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.

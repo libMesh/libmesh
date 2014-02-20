@@ -52,7 +52,7 @@ namespace {
      FEMContext &_femcontext)
     {
       bool jacobian_computed =
-	_sys.time_solver->element_residual(_get_jacobian, _femcontext);
+        _sys.time_solver->element_residual(_get_jacobian, _femcontext);
 
       // Compute a numeric jacobian if we have to
       if (_get_jacobian && !jacobian_computed)
@@ -93,12 +93,12 @@ namespace {
                            << " detected in analytic jacobian on element "
                            << _femcontext.get_elem().id() << '!' << std::endl;
 
-	      std::streamsize old_precision = libMesh::out.precision();
+              std::streamsize old_precision = libMesh::out.precision();
               libMesh::out.precision(16);
-	      libMesh::out << "J_analytic " << _femcontext.get_elem().id() << " = "
+              libMesh::out << "J_analytic " << _femcontext.get_elem().id() << " = "
                            << _femcontext.get_elem_jacobian() << std::endl;
               analytic_jacobian.add(1.0, _femcontext.get_elem_jacobian());
-	      libMesh::out << "J_numeric " << _femcontext.get_elem().id() << " = "
+              libMesh::out << "J_numeric " << _femcontext.get_elem().id() << " = "
                            << analytic_jacobian << std::endl;
 
               libMesh::out.precision(old_precision);
@@ -123,29 +123,29 @@ namespace {
 
           DenseMatrix<Number> old_jacobian;
           // If we're in DEBUG mode, we should always verify that the
-	  // user's side_residual function doesn't alter our existing
+          // user's side_residual function doesn't alter our existing
           // jacobian and then lie about it
 #ifndef DEBUG
-	  // Even if we're not in DEBUG mode, when we're verifying
-	  // analytic jacobians we'll want to verify each side's
+          // Even if we're not in DEBUG mode, when we're verifying
+          // analytic jacobians we'll want to verify each side's
           // jacobian contribution separately.
-	  /* PB: We also need to account for the case when the user wants to
-		 use numerical Jacobians and not analytic Jacobians */
+          /* PB: We also need to account for the case when the user wants to
+             use numerical Jacobians and not analytic Jacobians */
           if ( (_sys.verify_analytic_jacobians != 0.0 && _get_jacobian) ||
-	       (!jacobian_computed && _get_jacobian) )
+               (!jacobian_computed && _get_jacobian) )
 #endif // ifndef DEBUG
             {
               old_jacobian = _femcontext.get_elem_jacobian();
               _femcontext.get_elem_jacobian().zero();
             }
-	  jacobian_computed =
+          jacobian_computed =
             _sys.time_solver->side_residual(_get_jacobian, _femcontext);
 
           // Compute a numeric jacobian if we have to
           if (_get_jacobian && !jacobian_computed)
             {
-	      // In DEBUG mode, we've already set elem_jacobian == 0,
-	      // so we can make sure side_residual didn't compute a
+              // In DEBUG mode, we've already set elem_jacobian == 0,
+              // so we can make sure side_residual didn't compute a
               // jacobian and lie about it
 #ifdef DEBUG
               libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
@@ -153,16 +153,16 @@ namespace {
               // Logging of numerical jacobians is done separately
               _sys.numerical_side_jacobian(_femcontext);
 
-	      // Add back in element interior numerical Jacobian
-	      _femcontext.get_elem_jacobian() += old_jacobian;
+              // Add back in element interior numerical Jacobian
+              _femcontext.get_elem_jacobian() += old_jacobian;
             }
 
           // Compute a numeric jacobian if we're asked to verify the
           // analytic jacobian we got
-	  if (_get_jacobian && jacobian_computed &&
+          if (_get_jacobian && jacobian_computed &&
               _sys.verify_analytic_jacobians != 0.0)
             {
-	      DenseMatrix<Number> analytic_jacobian(_femcontext.get_elem_jacobian());
+              DenseMatrix<Number> analytic_jacobian(_femcontext.get_elem_jacobian());
 
               _femcontext.get_elem_jacobian().zero();
               // Logging of numerical jacobians is done separately
@@ -186,15 +186,15 @@ namespace {
                   libMesh::err << "Relative error " << relative_error
                                << " detected in analytic jacobian on element "
                                << _femcontext.get_elem().id()
-			       << ", side "
+                               << ", side "
                                << static_cast<unsigned int>(_femcontext.side) << '!' << std::endl;
 
-		  std::streamsize old_precision = libMesh::out.precision();
+                  std::streamsize old_precision = libMesh::out.precision();
                   libMesh::out.precision(16);
-	          libMesh::out << "J_analytic " << _femcontext.get_elem().id() << " = "
+                  libMesh::out << "J_analytic " << _femcontext.get_elem().id() << " = "
                                << _femcontext.get_elem_jacobian() << std::endl;
                   analytic_jacobian.add(1.0, _femcontext.get_elem_jacobian());
-	          libMesh::out << "J_numeric " << _femcontext.get_elem().id() << " = "
+                  libMesh::out << "J_numeric " << _femcontext.get_elem().id() << " = "
                                << analytic_jacobian << std::endl;
                   libMesh::out.precision(old_precision);
 
@@ -204,10 +204,10 @@ namespace {
               // rest of the accumulated jacobian
               _femcontext.get_elem_jacobian() += old_jacobian;
             }
-	  // In DEBUG mode, we've set elem_jacobian == 0, and we
+          // In DEBUG mode, we've set elem_jacobian == 0, and we
           // may still need to add the old jacobian back
 #ifdef DEBUG
-	  if (_get_jacobian && jacobian_computed &&
+          if (_get_jacobian && jacobian_computed &&
               _sys.verify_analytic_jacobians == 0.0)
             {
               _femcontext.get_elem_jacobian() += old_jacobian;
@@ -266,9 +266,9 @@ namespace {
 
           if (_get_jacobian && _sys.print_element_jacobians)
             {
-	      std::streamsize old_precision = libMesh::out.precision();
+              std::streamsize old_precision = libMesh::out.precision();
               libMesh::out.precision(16);
-	      libMesh::out << "J_elem " << _femcontext.get_elem().id() << " = "
+              libMesh::out << "J_elem " << _femcontext.get_elem().id() << " = "
                         << _femcontext.get_elem_jacobian() << std::endl;
               libMesh::out.precision(old_precision);
             }
@@ -356,7 +356,7 @@ namespace {
      */
     explicit
     QoIContributions(FEMSystem &sys, DifferentiableQoI &diff_qoi,
-		     const QoISet &qoi_indices) :
+                     const QoISet &qoi_indices) :
       qoi(sys.qoi.size(), 0.), _sys(sys), _diff_qoi(diff_qoi),_qoi_indices(qoi_indices) {}
 
     /**
@@ -431,7 +431,7 @@ namespace {
      * constructor to set context
      */
     QoIDerivativeContributions(FEMSystem &sys, const QoISet& qoi_indices,
-			       DifferentiableQoI &qoi ) :
+                               DifferentiableQoI &qoi ) :
       _sys(sys), _qoi_indices(qoi_indices), _qoi(qoi) {}
 
     /**
@@ -820,7 +820,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
   Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
                                          mesh.active_local_elements_end()),
                         QoIDerivativeContributions(*this, qoi_indices,
-						   *(this->diff_qoi)));
+                                                   *(this->diff_qoi)));
 
   STOP_LOG("assemble_qoi_derivative()", "FEMSystem");
 }
@@ -870,7 +870,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
           if (_mesh_z_var != libMesh::invalid_uint)
             for (unsigned int k = 0;
                  k != context.get_dof_indices( _mesh_z_var ).size(); ++k)
-	      if (context.get_dof_indices( _mesh_z_var )[k] ==
+              if (context.get_dof_indices( _mesh_z_var )[k] ==
                   context.get_dof_indices()[j])
                 coord = &(context.get_elem().point(k)(2));
         }
@@ -906,7 +906,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
       if (coord)
         {
           *coord = libmesh_real(context.get_elem_solution()(j));
-	  for (unsigned int i = 0; i != context.get_dof_indices().size(); ++i)
+          for (unsigned int i = 0; i != context.get_dof_indices().size(); ++i)
             {
               numeric_jacobian(i,j) =
                 (context.get_elem_residual()(i) - backwards_residual(i)) /

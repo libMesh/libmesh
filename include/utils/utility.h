@@ -59,8 +59,8 @@ namespace Utility
   {
     while (first != last)
       {
-	*first = value++;
-	++first;
+        *first = value++;
+        ++first;
       }
   }
 
@@ -92,7 +92,7 @@ namespace Utility
     InputIterator prev( first );
     for ( ++first; first != last; ++prev, ++first )
       if ( *first < *prev  )    // Note: this is the same as *prev > *first,
-	   return false;        // but we only require op< to be defined.
+        return false;        // but we only require op< to be defined.
 
     // If we haven't returned yet, it's sorted!
     return true;
@@ -207,10 +207,10 @@ namespace Utility
       unsigned int factorial_n = 1;
 
       if (n==0)
-	return factorial_n;
+        return factorial_n;
 
       for (unsigned int i=1; i<n; i++)
-	factorial_n *= i+1;
+        factorial_n *= i+1;
 
       return factorial_n;
     }
@@ -238,14 +238,14 @@ namespace Utility
    * part.
    */
   std::string complex_filename (const std::string& basename,
-				unsigned int r_o_c=0);
+                                unsigned int r_o_c=0);
 
   /**
    * Prepare complex data for writing.
    */
   void prepare_complex_data (const std::vector<Complex>& source,
-			     std::vector<Real>& real_part,
-			     std::vector<Real>& imag_part);
+                             std::vector<Real>& real_part,
+                             std::vector<Real>& imag_part);
 
 #endif // #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
@@ -308,16 +308,16 @@ namespace Utility
     // Possibly reverse the byte ordering
     if (this->reverse())
       {
-	unsigned char* b = (unsigned char*) &data;
+        unsigned char* b = (unsigned char*) &data;
 
-	register int i=0;
-	register int j=(sizeof(T) - 1);
+        register int i=0;
+        register int j=(sizeof(T) - 1);
 
-	while (i < j)
-	  {
-	    std::swap (b[i], b[j]);
-	    i++; j--;
-	  }
+        while (i < j)
+          {
+            std::swap (b[i], b[j]);
+            i++; j--;
+          }
       }
 
     return data;

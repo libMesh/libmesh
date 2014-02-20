@@ -27,14 +27,14 @@ namespace libMesh
 
 template <>
 RealGradient FE<3,NEDELEC_ONE>::shape(const ElemType,
-				      const Order,
-				      const unsigned int,
-				      const Point&)
+                                      const Order,
+                                      const unsigned int,
+                                      const Point&)
 {
 #if LIBMESH_DIM == 3
   libMesh::err << "Nedelec elements require the element type\n"
-	       << "because edge orientation is needed."
-	       << std::endl;
+               << "because edge orientation is needed."
+               << std::endl;
   libmesh_error();
 #endif
 
@@ -46,9 +46,9 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const ElemType,
 
 template <>
 RealGradient FE<3,NEDELEC_ONE>::shape(const Elem* elem,
-				      const Order order,
-				      const unsigned int i,
-				      const Point& p)
+                                      const Order order,
+                                      const unsigned int i,
+                                      const Point& p)
 {
 #if LIBMESH_DIM == 3
   libmesh_assert(elem);
@@ -60,142 +60,142 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem* elem,
       // linear Lagrange shape functions
     case FIRST:
       {
-	switch (elem->type())
-	  {
-	  case HEX20:
-	  case HEX27:
-	    {
-	      libmesh_assert_less (i, 12);
+        switch (elem->type())
+          {
+          case HEX20:
+          case HEX27:
+            {
+              libmesh_assert_less (i, 12);
 
               const Real xi   = p(0);
-	      const Real eta  = p(1);
+              const Real eta  = p(1);
               const Real zeta = p(2);
 
               // Even with a loose inverse_map tolerance we ought to
               // be nearly on the element interior in master
               // coordinates
-	      libmesh_assert_less_equal ( std::fabs(xi),   1.0+10*TOLERANCE );
-	      libmesh_assert_less_equal ( std::fabs(eta),  1.0+10*TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(xi),   1.0+10*TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(eta),  1.0+10*TOLERANCE );
               libmesh_assert_less_equal ( std::fabs(zeta), 1.0+10*TOLERANCE );
 
               switch(i)
-		{
+                {
                 case 0:
                   {
                     if( elem->point(0) > elem->point(1) )
-		      return RealGradient( -0.125*(1.0-eta-zeta+eta*zeta), 0.0, 0.0 );
-		    else
-		      return RealGradient(  0.125*(1.0-eta-zeta+eta*zeta), 0.0, 0.0 );
+                      return RealGradient( -0.125*(1.0-eta-zeta+eta*zeta), 0.0, 0.0 );
+                    else
+                      return RealGradient(  0.125*(1.0-eta-zeta+eta*zeta), 0.0, 0.0 );
                   }
                 case 1:
-		  {
-		    if( elem->point(1) > elem->point(2) )
-		      return RealGradient( 0.0, -0.125*(1.0+xi-zeta-xi*zeta), 0.0 );
-		    else
-		      return RealGradient( 0.0,  0.125*(1.0+xi-zeta-xi*zeta), 0.0 );
-		  }
-		case 2:
-		  {
-		    if( elem->point(2) > elem->point(3) )
-		      return RealGradient(  0.125*(1.0+eta-zeta-eta*zeta), 0.0, 0.0 );
-		    else
-		      return RealGradient( -0.125*(1.0+eta-zeta-eta*zeta), 0.0, 0.0 );
-		  }
-		case 3:
-		  {
-		    if( elem->point(3) > elem->point(0) )
-		      return RealGradient( 0.0,  0.125*(1.0-xi-zeta+xi*zeta), 0.0 );
-		    else
-		      return RealGradient( 0.0, -0.125*(1.0-xi-zeta+xi*zeta), 0.0 );
-		  }
+                  {
+                    if( elem->point(1) > elem->point(2) )
+                      return RealGradient( 0.0, -0.125*(1.0+xi-zeta-xi*zeta), 0.0 );
+                    else
+                      return RealGradient( 0.0,  0.125*(1.0+xi-zeta-xi*zeta), 0.0 );
+                  }
+                case 2:
+                  {
+                    if( elem->point(2) > elem->point(3) )
+                      return RealGradient(  0.125*(1.0+eta-zeta-eta*zeta), 0.0, 0.0 );
+                    else
+                      return RealGradient( -0.125*(1.0+eta-zeta-eta*zeta), 0.0, 0.0 );
+                  }
+                case 3:
+                  {
+                    if( elem->point(3) > elem->point(0) )
+                      return RealGradient( 0.0,  0.125*(1.0-xi-zeta+xi*zeta), 0.0 );
+                    else
+                      return RealGradient( 0.0, -0.125*(1.0-xi-zeta+xi*zeta), 0.0 );
+                  }
                 case 4:
-		  {
-		    if( elem->point(0) > elem->point(4) )
-		      return RealGradient( 0.0, 0.0, -0.125*(1.0-xi-eta+xi*eta) );
-		    else
-		      return RealGradient( 0.0, 0.0,  0.125*(1.0-xi-eta+xi*eta) );
-		  }
+                  {
+                    if( elem->point(0) > elem->point(4) )
+                      return RealGradient( 0.0, 0.0, -0.125*(1.0-xi-eta+xi*eta) );
+                    else
+                      return RealGradient( 0.0, 0.0,  0.125*(1.0-xi-eta+xi*eta) );
+                  }
                 case 5:
-		  {
-		    if( elem->point(1) > elem->point(5) )
-		      return RealGradient( 0.0, 0.0, -0.125*(1.0+xi-eta-xi*eta) );
-		    else
-		      return RealGradient( 0.0, 0.0,  0.125*(1.0+xi-eta-xi*eta) );
-		  }
+                  {
+                    if( elem->point(1) > elem->point(5) )
+                      return RealGradient( 0.0, 0.0, -0.125*(1.0+xi-eta-xi*eta) );
+                    else
+                      return RealGradient( 0.0, 0.0,  0.125*(1.0+xi-eta-xi*eta) );
+                  }
                 case 6:
-		  {
-		    if( elem->point(2) > elem->point(6) )
-		      return RealGradient( 0.0, 0.0, -0.125*(1.0+xi+eta+xi*eta) );
-		    else
-		      return RealGradient( 0.0, 0.0,  0.125*(1.0+xi+eta+xi*eta) );
-		  }
+                  {
+                    if( elem->point(2) > elem->point(6) )
+                      return RealGradient( 0.0, 0.0, -0.125*(1.0+xi+eta+xi*eta) );
+                    else
+                      return RealGradient( 0.0, 0.0,  0.125*(1.0+xi+eta+xi*eta) );
+                  }
                 case 7:
-		  {
-		    if( elem->point(3) > elem->point(7) )
-		      return RealGradient( 0.0, 0.0, -0.125*(1.0-xi+eta-xi*eta) );
-		    else
-		      return RealGradient( 0.0, 0.0,  0.125*(1.0-xi+eta-xi*eta) );
-		  }
+                  {
+                    if( elem->point(3) > elem->point(7) )
+                      return RealGradient( 0.0, 0.0, -0.125*(1.0-xi+eta-xi*eta) );
+                    else
+                      return RealGradient( 0.0, 0.0,  0.125*(1.0-xi+eta-xi*eta) );
+                  }
                 case 8:
                   {
                     if( elem->point(4) > elem->point(5) )
-		      return RealGradient( -0.125*(1.0-eta+zeta-eta*zeta), 0.0, 0.0 );
-		    else
-		      return RealGradient(  0.125*(1.0-eta+zeta-eta*zeta), 0.0, 0.0 );
+                      return RealGradient( -0.125*(1.0-eta+zeta-eta*zeta), 0.0, 0.0 );
+                    else
+                      return RealGradient(  0.125*(1.0-eta+zeta-eta*zeta), 0.0, 0.0 );
                   }
                 case 9:
-		  {
-		    if( elem->point(5) > elem->point(6) )
-		      return RealGradient( 0.0, -0.125*(1.0+xi+zeta+xi*zeta), 0.0 );
-		    else
-		      return RealGradient( 0.0,  0.125*(1.0+xi+zeta+xi*zeta), 0.0 );
-		  }
-		case 10:
-		  {
-		    if( elem->point(7) > elem->point(6) )
-		      return RealGradient( -0.125*(1.0+eta+zeta+eta*zeta), 0.0, 0.0 );
-		    else
-		      return RealGradient(  0.125*(1.0+eta+zeta+eta*zeta), 0.0, 0.0 );
-		  }
-		case 11:
-		  {
-		    if( elem->point(4) > elem->point(7) )
-		      return RealGradient( 0.0, -0.125*(1.0-xi+zeta-xi*zeta), 0.0 );
-		    else
-		      return RealGradient( 0.0,  0.125*(1.0-xi+zeta-xi*zeta), 0.0 );
-		  }
+                  {
+                    if( elem->point(5) > elem->point(6) )
+                      return RealGradient( 0.0, -0.125*(1.0+xi+zeta+xi*zeta), 0.0 );
+                    else
+                      return RealGradient( 0.0,  0.125*(1.0+xi+zeta+xi*zeta), 0.0 );
+                  }
+                case 10:
+                  {
+                    if( elem->point(7) > elem->point(6) )
+                      return RealGradient( -0.125*(1.0+eta+zeta+eta*zeta), 0.0, 0.0 );
+                    else
+                      return RealGradient(  0.125*(1.0+eta+zeta+eta*zeta), 0.0, 0.0 );
+                  }
+                case 11:
+                  {
+                    if( elem->point(4) > elem->point(7) )
+                      return RealGradient( 0.0, -0.125*(1.0-xi+zeta-xi*zeta), 0.0 );
+                    else
+                      return RealGradient( 0.0,  0.125*(1.0-xi+zeta-xi*zeta), 0.0 );
+                  }
 
                 default:
-		  libmesh_error();
+                  libmesh_error();
                 }
 
-	      return RealGradient();
-	    }
+              return RealGradient();
+            }
 
-	  case TET10:
-	    {
-	      libmesh_assert_less (i, 6);
+          case TET10:
+            {
+              libmesh_assert_less (i, 6);
 
-	      libmesh_not_implemented();
-	      return RealGradient();
-	    }
+              libmesh_not_implemented();
+              return RealGradient();
+            }
 
-	  default:
-	    {
-	      libMesh::err << "ERROR: Unsupported 3D element type!: " << elem->type()
-			    << std::endl;
-	      libmesh_error();
-	    }
-	  }
+          default:
+            {
+              libMesh::err << "ERROR: Unsupported 3D element type!: " << elem->type()
+                           << std::endl;
+              libmesh_error();
+            }
+          }
       }
 
       // unsupported order
     default:
       {
-	libMesh::err << "ERROR: Unsupported 3D FE order!: " << totalorder
-		      << std::endl;
+        libMesh::err << "ERROR: Unsupported 3D FE order!: " << totalorder
+                     << std::endl;
 
-	libmesh_error();
+        libmesh_error();
       }
     }
 #endif
@@ -209,15 +209,15 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem* elem,
 
 template <>
 RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const ElemType,
-					    const Order,
-					    const unsigned int,
-					    const unsigned int,
-					    const Point&)
+                                            const Order,
+                                            const unsigned int,
+                                            const unsigned int,
+                                            const Point&)
 {
 #if LIBMESH_DIM == 3
   libMesh::err << "Nedelec elements require the element type\n"
-	       << "because edge orientation is needed."
-	       << std::endl;
+               << "because edge orientation is needed."
+               << std::endl;
   libmesh_error();
 #endif
 
@@ -227,10 +227,10 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const ElemType,
 
 template <>
 RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
-					    const Order order,
-					    const unsigned int i,
-					    const unsigned int j,
-					    const Point& p)
+                                            const Order order,
+                                            const unsigned int i,
+                                            const unsigned int j,
+                                            const Point& p)
 {
 #if LIBMESH_DIM == 3
   libmesh_assert(elem);
@@ -242,50 +242,50 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
     {
     case FIRST:
       {
-	switch (elem->type())
-	  {
-	  case HEX20:
-	  case HEX27:
-	    {
-	      libmesh_assert_less (i, 12);
+        switch (elem->type())
+          {
+          case HEX20:
+          case HEX27:
+            {
+              libmesh_assert_less (i, 12);
 
-	      const Real xi   = p(0);
-	      const Real eta  = p(1);
+              const Real xi   = p(0);
+              const Real eta  = p(1);
               const Real zeta = p(2);
 
               // Even with a loose inverse_map tolerance we ought to
               // be nearly on the element interior in master
               // coordinates
-	      libmesh_assert_less_equal ( std::fabs(xi),   1.0+TOLERANCE );
-	      libmesh_assert_less_equal ( std::fabs(eta),  1.0+TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(xi),   1.0+TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(eta),  1.0+TOLERANCE );
               libmesh_assert_less_equal ( std::fabs(zeta), 1.0+TOLERANCE );
 
-	      switch (j)
-		{
-		  // d()/dxi
-		case 0:
-		  {
-		    switch(i)
-		      {
-		      case 0:
-		      case 2:
+              switch (j)
+                {
+                  // d()/dxi
+                case 0:
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                      case 2:
                       case 8:
                       case 10:
-			return RealGradient();
-		      case 1:
-			{
-			  if( elem->point(1) > elem->point(2) )
-			    return RealGradient( 0.0, -0.125*(1.0-zeta) );
-			  else
-			    return RealGradient( 0.0, 0.125*(1.0-zeta) );
-			}
-		      case 3:
-			{
-			  if( elem->point(3) > elem->point(0) )
-			    return RealGradient( 0.0, 0.125*(-1.0+zeta) );
-			  else
-			    return RealGradient( 0.0, -0.125*(-1.0+zeta) );
-			}
+                        return RealGradient();
+                      case 1:
+                        {
+                          if( elem->point(1) > elem->point(2) )
+                            return RealGradient( 0.0, -0.125*(1.0-zeta) );
+                          else
+                            return RealGradient( 0.0, 0.125*(1.0-zeta) );
+                        }
+                      case 3:
+                        {
+                          if( elem->point(3) > elem->point(0) )
+                            return RealGradient( 0.0, 0.125*(-1.0+zeta) );
+                          else
+                            return RealGradient( 0.0, -0.125*(-1.0+zeta) );
+                        }
                       case 4:
                         {
                           if( elem->point(0) > elem->point(4) )
@@ -328,30 +328,30 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
                           else
                             return RealGradient( 0.0,  0.125*(-1.0-zeta), 0.0 );
                         }
-		      default:
-			libmesh_error();
-		      } // switch(i)
+                      default:
+                        libmesh_error();
+                      } // switch(i)
 
-		  } // j=0
+                  } // j=0
 
-		  // d()/deta
-		case 1:
-		  {
-		    switch(i)
-		      {
-		      case 1:
-		      case 3:
+                  // d()/deta
+                case 1:
+                  {
+                    switch(i)
+                      {
+                      case 1:
+                      case 3:
                       case 9:
                       case 11:
-			return RealGradient();
-		      case 0:
+                        return RealGradient();
+                      case 0:
                         {
                           if( elem->point(0) > elem->point(1) )
                             return RealGradient( -0.125*(-1.0+zeta), 0.0, 0.0 );
                           else
                             return RealGradient(  0.125*(-1.0+zeta), 0.0, 0.0 );
                         }
-		      case 2:
+                      case 2:
                         {
                           if( elem->point(2) > elem->point(3) )
                             return RealGradient( 0.125*(1.0-zeta), 0.0, 0.0 );
@@ -400,22 +400,22 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
                           else
                             return RealGradient(  0.125*(1.0+zeta), 0.0, 0.0 );
                         }
-		      default:
-			libmesh_error();
-		      } // switch(i)
+                      default:
+                        libmesh_error();
+                      } // switch(i)
 
-		  } // j=1
+                  } // j=1
 
                   // d()/dzeta
-		case 2:
-		  {
-		    switch(i)
-		      {
+                case 2:
+                  {
+                    switch(i)
+                      {
                       case 4:
                       case 5:
                       case 6:
                       case 7:
-			return RealGradient();
+                        return RealGradient();
 
                       case 0:
                         {
@@ -474,41 +474,41 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
                             return RealGradient( 0.0,  0.125*(1.0-xi), 0.0 );
                         }
                       default:
-			libmesh_error();
-		      } // switch(i)
+                        libmesh_error();
+                      } // switch(i)
 
                   } // j = 2
 
-		default:
-		  libmesh_error();
-		}
+                default:
+                  libmesh_error();
+                }
 
-	      return RealGradient();
-	    }
+              return RealGradient();
+            }
 
-	  case TET10:
-	    {
-	      libmesh_assert_less (i, 6);
+          case TET10:
+            {
+              libmesh_assert_less (i, 6);
 
-	      libmesh_not_implemented();
-	      return RealGradient();
-	    }
+              libmesh_not_implemented();
+              return RealGradient();
+            }
 
-	  default:
-	    {
-	      libMesh::err << "ERROR: Unsupported 3D element type!: " << elem->type()
-			    << std::endl;
-	      libmesh_error();
-	    }
-	  }
+          default:
+            {
+              libMesh::err << "ERROR: Unsupported 3D element type!: " << elem->type()
+                           << std::endl;
+              libmesh_error();
+            }
+          }
       }
 
       // unsupported order
     default:
       {
-	libMesh::err << "ERROR: Unsupported 3D FE order!: " << totalorder
-		      << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: Unsupported 3D FE order!: " << totalorder
+                     << std::endl;
+        libmesh_error();
       }
     }
 
@@ -522,15 +522,15 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
 
 template <>
 RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const ElemType,
-						   const Order,
-						   const unsigned int,
-						   const unsigned int,
-						   const Point&)
+                                                   const Order,
+                                                   const unsigned int,
+                                                   const unsigned int,
+                                                   const Point&)
 {
 #if LIBMESH_DIM == 3
   libMesh::err << "Nedelec elements require the element type\n"
-	       << "because edge orientation is needed."
-	       << std::endl;
+               << "because edge orientation is needed."
+               << std::endl;
   libmesh_error();
 #endif
 
@@ -542,10 +542,10 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const ElemType,
 
 template <>
 RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
-						   const Order order,
-						   const unsigned int i,
-						   const unsigned int j,
-						   const Point& p)
+                                                   const Order order,
+                                                   const unsigned int i,
+                                                   const unsigned int j,
+                                                   const Point& p)
 {
 #if LIBMESH_DIM == 3
 
@@ -566,44 +566,44 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
       // linear Lagrange shape functions
     case FIRST:
       {
-	switch (elem->type())
-	  {
-	  case HEX20:
-	  case HEX27:
-	    {
-	      libmesh_assert_less (i, 12);
+        switch (elem->type())
+          {
+          case HEX20:
+          case HEX27:
+            {
+              libmesh_assert_less (i, 12);
 
               const Real xi   = p(0);
-	      const Real eta  = p(1);
+              const Real eta  = p(1);
               const Real zeta = p(2);
 
-	      libmesh_assert_less_equal ( std::fabs(xi),   1.0+TOLERANCE );
-	      libmesh_assert_less_equal ( std::fabs(eta),  1.0+TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(xi),   1.0+TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(eta),  1.0+TOLERANCE );
               libmesh_assert_less_equal ( std::fabs(zeta), 1.0+TOLERANCE );
 
-	      switch (j)
-		{
-		  // d^2()/dxi^2
-		case 0:
-		  {
+              switch (j)
+                {
+                  // d^2()/dxi^2
+                case 0:
+                  {
                     // All d^2()/dxi^2 derivatives for linear hexes are zero.
                     return RealGradient();
                   } // j=0
 
-		  // d^2()/dxideta
-		case 1:
-		  {
-		    switch(i)
-		      {
+                  // d^2()/dxideta
+                case 1:
+                  {
+                    switch(i)
+                      {
                       case 0:
-		      case 1:
+                      case 1:
                       case 2:
-		      case 3:
+                      case 3:
                       case 8:
                       case 9:
                       case 10:
                       case 11:
-			return RealGradient();
+                        return RealGradient();
                       case 4:
                         {
                           if( elem->point(0) > elem->point(4) )
@@ -632,48 +632,48 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
                           else
                             return RealGradient( 0.0, 0.0, -0.125 );
                         }
-		      default:
-			libmesh_error();
-		      } // switch(i)
+                      default:
+                        libmesh_error();
+                      } // switch(i)
 
-		  } // j=1
+                  } // j=1
 
                   // d^2()/deta^2
-		case 2:
-		  {
-		    // All d^2()/deta^2 derivatives for linear hexes are zero.
+                case 2:
+                  {
+                    // All d^2()/deta^2 derivatives for linear hexes are zero.
                     return RealGradient();
                   } // j = 2
 
                   // d^2()/dxidzeta
-		case 3:
+                case 3:
                   {
                     switch(i)
-		      {
+                      {
                       case 0:
-		      case 2:
+                      case 2:
                       case 4:
                       case 5:
                       case 6:
                       case 7:
                       case 8:
                       case 10:
-			return RealGradient();
+                        return RealGradient();
 
                       case 1:
-			{
-			  if( elem->point(1) > elem->point(2) )
-			    return RealGradient( 0.0,  0.125 );
-			  else
-			    return RealGradient( 0.0, -0.125 );
-			}
-		      case 3:
-			{
-			  if( elem->point(3) > elem->point(0) )
-			    return RealGradient( 0.0, -0.125 );
-			  else
-			    return RealGradient( 0.0,  0.125 );
-			}
+                        {
+                          if( elem->point(1) > elem->point(2) )
+                            return RealGradient( 0.0,  0.125 );
+                          else
+                            return RealGradient( 0.0, -0.125 );
+                        }
+                      case 3:
+                        {
+                          if( elem->point(3) > elem->point(0) )
+                            return RealGradient( 0.0, -0.125 );
+                          else
+                            return RealGradient( 0.0,  0.125 );
+                        }
                       case 9:
                         {
                           if( elem->point(5) > elem->point(6) )
@@ -689,25 +689,25 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
                             return RealGradient( 0.0, -0.125, 0.0 );
                         }
                       default:
-			libmesh_error();
-		      } // switch(i)
+                        libmesh_error();
+                      } // switch(i)
 
                   } // j = 3
 
                   // d^2()/detadzeta
-		case 4:
+                case 4:
                   {
                     switch(i)
-		      {
-		      case 1:
-		      case 3:
+                      {
+                      case 1:
+                      case 3:
                       case 4:
                       case 5:
                       case 6:
                       case 7:
                       case 9:
                       case 11:
-			return RealGradient();
+                        return RealGradient();
 
                       case 0:
                         {
@@ -716,7 +716,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
                           else
                             return RealGradient(  0.125, 0.0, 0.0 );
                         }
-		      case 2:
+                      case 2:
                         {
                           if( elem->point(2) > elem->point(3) )
                             return RealGradient(  0.125, 0.0, 0.0 );
@@ -738,49 +738,49 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
                             return RealGradient(  0.125, 0.0, 0.0 );
                         }
                       default:
-			libmesh_error();
-		      } // switch(i)
+                        libmesh_error();
+                      } // switch(i)
 
                   } // j = 4
 
                   // d^2()/dzeta^2
-		case 5:
+                case 5:
                   {
                     // All d^2()/dzeta^2 derivatives for linear hexes are zero.
                     return RealGradient();
                   } // j = 5
 
-		default:
-		  libmesh_error();
-		}
+                default:
+                  libmesh_error();
+                }
 
-	      return RealGradient();
-	    }
+              return RealGradient();
+            }
 
-	  case TET10:
-	    {
-	      libmesh_assert_less (i, 6);
+          case TET10:
+            {
+              libmesh_assert_less (i, 6);
 
-	      libmesh_not_implemented();
-	      return RealGradient();
-	    }
+              libmesh_not_implemented();
+              return RealGradient();
+            }
 
-	  default:
-	    {
-	      libMesh::err << "ERROR: Unsupported 3D element type!: " << elem->type()
-			    << std::endl;
-	      libmesh_error();
-	    }
+          default:
+            {
+              libMesh::err << "ERROR: Unsupported 3D element type!: " << elem->type()
+                           << std::endl;
+              libmesh_error();
+            }
 
-	  } //switch(type)
+          } //switch(type)
 
       } // case FIRST:
       // unsupported order
     default:
       {
-	libMesh::err << "ERROR: Unsupported 3D FE order!: " << totalorder
-		      << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: Unsupported 3D FE order!: " << totalorder
+                     << std::endl;
+        libmesh_error();
       }
     }
 

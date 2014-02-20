@@ -47,15 +47,15 @@ void Patch::find_face_neighbors(std::set<const Elem *> &new_neighbors)
       for (unsigned int s=0; s<elem->n_sides(); s++)
         if (elem->neighbor(s) != NULL)        // we have a neighbor on this side
           {
-	    const Elem* neighbor = elem->neighbor(s);
+            const Elem* neighbor = elem->neighbor(s);
 
 #ifdef LIBMESH_ENABLE_AMR
-	    if (!neighbor->active())          // the neighbor is *not* active,
-	      {                               // so add *all* neighboring
+            if (!neighbor->active())          // the neighbor is *not* active,
+              {                               // so add *all* neighboring
                                               // active children to the patch
-	        std::vector<const Elem*> active_neighbor_children;
+                std::vector<const Elem*> active_neighbor_children;
 
-	        neighbor->active_family_tree_by_neighbor
+                neighbor->active_family_tree_by_neighbor
                   (active_neighbor_children, elem);
 
                 std::vector<const Elem*>::const_iterator
@@ -63,11 +63,11 @@ void Patch::find_face_neighbors(std::set<const Elem *> &new_neighbors)
                 const std::vector<const Elem*>::const_iterator
                   child_end = active_neighbor_children.end();
                 for (; child_it != child_end; ++child_it)
-		  new_neighbors.insert(*child_it);
-	      }
+                  new_neighbors.insert(*child_it);
+              }
             else
 #endif // #ifdef LIBMESH_ENABLE_AMR
-	      new_neighbors.insert (neighbor); // add active neighbors
+              new_neighbors.insert (neighbor); // add active neighbors
           }
     }
 }
@@ -98,8 +98,8 @@ void Patch::add_local_face_neighbors()
     {
       const Elem* neighbor = *it;
       if (neighbor->processor_id() ==
-	  _my_procid) // ... if the neighbor belongs to this processor
-	this->insert (neighbor);   // ... then add it to the patch
+          _my_procid) // ... if the neighbor belongs to this processor
+        this->insert (neighbor);   // ... then add it to the patch
     }
 }
 
@@ -118,7 +118,7 @@ void Patch::add_semilocal_face_neighbors()
     {
       const Elem* neighbor = *it;
       if (neighbor->is_semilocal(_my_procid))
-	this->insert (neighbor);
+        this->insert (neighbor);
     }
 }
 
@@ -168,8 +168,8 @@ void Patch::add_local_point_neighbors()
     {
       const Elem* neighbor = *it;
       if (neighbor->processor_id() ==
-	  _my_procid) // ... if the neighbor belongs to this processor
-	this->insert (neighbor);   // ... then add it to the patch
+          _my_procid) // ... if the neighbor belongs to this processor
+        this->insert (neighbor);   // ... then add it to the patch
     }
 }
 
@@ -188,7 +188,7 @@ void Patch::add_semilocal_point_neighbors()
     {
       const Elem* neighbor = *it;
       if (neighbor->is_semilocal(_my_procid))
-	this->insert (neighbor);
+        this->insert (neighbor);
     }
 }
 
@@ -228,15 +228,15 @@ void Patch::build_around_element (const Elem* e0,
 
       // Check for a "stagnant" patch
       if (this->size() == old_patch_size)
-	{
-	  libmesh_do_once(libMesh::err <<
+        {
+          libmesh_do_once(libMesh::err <<
             "WARNING: stagnant patch of " << this->size() << " elements."
             << std::endl <<
             "Does the target patch size exceed the number of local elements?"
-	    << std::endl;
-	  libmesh_here(););
-	  break;
-	}
+                          << std::endl;
+                          libmesh_here(););
+          break;
+        }
     } // end while loop
 
 
@@ -249,13 +249,13 @@ void Patch::build_around_element (const Elem* e0,
 
     for (; it != end_it; ++it)
       {
-	// Convenience.  Keep the syntax simple.
-	const Elem* elem = *it;
+        // Convenience.  Keep the syntax simple.
+        const Elem* elem = *it;
 
-	libmesh_assert (elem->active());
+        libmesh_assert (elem->active());
         if ((patchtype == &Patch::add_local_face_neighbors ||
              patchtype == &Patch::add_local_point_neighbors))
-	  libmesh_assert_equal_to (elem->processor_id(), _my_procid);
+          libmesh_assert_equal_to (elem->processor_id(), _my_procid);
       }
   }
 #endif

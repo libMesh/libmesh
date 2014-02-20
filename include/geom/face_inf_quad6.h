@@ -100,14 +100,14 @@ public:
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge (== is_node_on_side in 2D)
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const
+                               const unsigned int e) const
   { return this->is_node_on_side(n,e); }
 
 
@@ -121,11 +121,11 @@ public:
    * the sides 1, 2.
    */
   AutoPtr<Elem> build_side (const unsigned int i,
-			    bool proxy) const;
+                            bool proxy) const;
 
   virtual void connectivity(const unsigned int sf,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
   /**
    * @returns 2 for all \p n
@@ -139,7 +139,7 @@ public:
    * Note that \p n is counted as depicted above, \f$ 4 \le n < 6 \f$.
    */
   unsigned short int second_order_adjacent_vertex (const unsigned int n,
-						   const unsigned int v) const;
+                                                   const unsigned int v) const;
 
   /**
    * @returns the child number \p c and element-local index \p v of the
@@ -151,7 +151,7 @@ public:
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
-	  second_order_child_vertex (const unsigned int n) const;
+    second_order_child_vertex (const unsigned int n) const;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -176,8 +176,8 @@ protected:
    * Matrix used to create the elements children.
    */
   float embedding_matrix (const unsigned int i,
-			  const unsigned int j,
-			  const unsigned int k) const
+                          const unsigned int j,
+                          const unsigned int k) const
   { return _embedding_matrix[i][j][k]; }
 
   /**

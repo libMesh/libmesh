@@ -71,9 +71,9 @@ public:
    * \p error_per_cell
    */
   virtual void estimate_error (const System& system,
-			       ErrorVector& error_per_cell,
-			       const NumericVector<Number>* solution_vector = NULL,
-			       bool estimate_parent_error = false);
+                               ErrorVector& error_per_cell,
+                               const NumericVector<Number>* solution_vector = NULL,
+                               bool estimate_parent_error = false);
 
   /**
      Vector of fem function base pointers, the user will fill this in
@@ -91,8 +91,8 @@ public:
   {
   public:
     EstimateError (const System& sys,
-		   const WeightedPatchRecoveryErrorEstimator &ee,
-		   ErrorVector& epc) :
+                   const WeightedPatchRecoveryErrorEstimator &ee,
+                   ErrorVector& epc) :
       system(sys),
       error_estimator(ee),
       error_per_cell(epc)

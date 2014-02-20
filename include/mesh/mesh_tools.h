@@ -87,10 +87,10 @@ namespace MeshTools
     void invalidate ()
     {
       for (unsigned int i=0; i<LIBMESH_DIM; i++)
-	{
-	  this->first(i)  =  std::numeric_limits<Real>::max();
-	  this->second(i) = -std::numeric_limits<Real>::max();
-	}
+        {
+          this->first(i)  =  std::numeric_limits<Real>::max();
+          this->second(i) = -std::numeric_limits<Real>::max();
+        }
     }
 
     const Point & min() const
@@ -142,13 +142,13 @@ namespace MeshTools
    * element connected to node \p i.
    */
   void build_nodes_to_elem_map (const MeshBase &mesh,
-				std::vector<std::vector<dof_id_type> > &nodes_to_elem_map);
+                                std::vector<std::vector<dof_id_type> > &nodes_to_elem_map);
 
   /**
    * The same, except element pointers are returned instead of indices.
    */
   void build_nodes_to_elem_map (const MeshBase &mesh,
-				std::vector<std::vector<const Elem*> >&	nodes_to_elem_map);
+                                std::vector<std::vector<const Elem*> >&nodes_to_elem_map);
 
 
 //   /**
@@ -163,7 +163,7 @@ namespace MeshTools
    * is on the domain boundary (true)) or not (false).
    */
   void find_boundary_nodes (const MeshBase &mesh,
-			    std::vector<bool> &on_boundary);
+                            std::vector<bool> &on_boundary);
 
   /**
    * @returns two points defining a cartesian box that bounds the
@@ -185,14 +185,14 @@ namespace MeshTools
    */
   BoundingBox
   processor_bounding_box (const MeshBase &mesh,
-			  const processor_id_type pid);
+                          const processor_id_type pid);
 
   /**
    * Same, but returns a sphere instead of a box.
    */
   Sphere
   processor_bounding_sphere (const MeshBase &mesh,
-			     const processor_id_type pid);
+                             const processor_id_type pid);
 
   /**
    * @returns two points defining a Cartesian box that bounds the
@@ -200,14 +200,14 @@ namespace MeshTools
    */
   BoundingBox
   subdomain_bounding_box (const MeshBase &mesh,
-			  const subdomain_id_type sid);
+                          const subdomain_id_type sid);
 
   /**
    * Same, but returns a sphere instead of a box.
    */
   Sphere
   subdomain_bounding_sphere (const MeshBase &mesh,
-			     const subdomain_id_type sid);
+                             const subdomain_id_type sid);
 
 
   /**
@@ -215,21 +215,21 @@ namespace MeshTools
    * in terms of element_iterators.
    */
   void elem_types (const MeshBase &mesh,
-		   std::vector<ElemType> &et);
+                   std::vector<ElemType> &et);
 
   /**
    * Return the number of elements of type \p type.  Implemented
    * in terms of type_element_iterators.
    */
   dof_id_type n_elem_of_type (const MeshBase &mesh,
-			       const ElemType type);
+                              const ElemType type);
 
   /**
    * Return the number of active elements of type \p type.
    * Implemented in terms of active_type_element_iterators.
    */
   dof_id_type n_active_elem_of_type (const MeshBase &mesh,
-				      const ElemType type);
+                                     const ElemType type);
 
   /**
    * Return the number of elements of type \p type at the specified
@@ -307,7 +307,7 @@ namespace MeshTools
    * (as defined by an iterator range).
    */
    dof_id_type n_nodes (const MeshBase::const_node_iterator &begin,
-			const MeshBase::const_node_iterator &end);
+                        const MeshBase::const_node_iterator &end);
 
 
   /**

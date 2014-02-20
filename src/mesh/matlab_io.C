@@ -78,10 +78,10 @@ void MatlabIO::read_stream(std::istream& in)
 
     for (unsigned int i=0; i<nNodes; i++)
       {
-	in >> x   // x-coordinate value
-	   >> y;  // y-coordinate value
+        in >> x   // x-coordinate value
+           >> y;  // y-coordinate value
 
-	the_mesh.add_point ( Point(x,y,z), i);
+        the_mesh.add_point ( Point(x,y,z), i);
       }
   }
 
@@ -91,19 +91,19 @@ void MatlabIO::read_stream(std::istream& in)
 
     for (unsigned int i=0; i<nElem; i++)
       {
-	Elem* elem = new Tri3; // Always build a triangle
+        Elem* elem = new Tri3; // Always build a triangle
         elem->set_id(i);
-	the_mesh.add_elem (elem);
+        the_mesh.add_elem (elem);
 
-	for (unsigned int n=0; n<3; n++)  // Always read three 3 nodes
-	  {
-	    in >> node;
-	    elem->set_node(n) = the_mesh.node_ptr(node-1);  // Assign the node number
-	  }
+        for (unsigned int n=0; n<3; n++)  // Always read three 3 nodes
+          {
+            in >> node;
+            elem->set_node(n) = the_mesh.node_ptr(node-1);  // Assign the node number
+          }
 
-	// There is an additional subdomain number here,
-	// so we read it and get rid of it!
-	in >> dummy;
+        // There is an additional subdomain number here,
+        // so we read it and get rid of it!
+        in >> dummy;
       }
   }
 

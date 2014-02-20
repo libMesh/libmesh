@@ -167,8 +167,8 @@ KellyErrorEstimator::boundary_side_integration ()
 
 void
 KellyErrorEstimator::attach_flux_bc_function (std::pair<bool,Real> fptr(const System& system,
-									const Point& p,
-									const std::string& var_name))
+                                                                        const Point& p,
+                                                                        const std::string& var_name))
 {
   _bc_function = fptr;
 

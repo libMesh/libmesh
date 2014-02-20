@@ -39,13 +39,13 @@ namespace libMesh
 // Full specialization for 0D when this is a useless method
 template <>
 void FEXYZ<0>::reinit(const Elem*,
-		      const unsigned int,
-		      const Real,
+                      const unsigned int,
+                      const Real,
                       const std::vector<Point>* const,
                       const std::vector<Real>* const)
 {
   libMesh::err << "ERROR: This method only makes sense for 2D/3D elements!"
-	        << std::endl;
+               << std::endl;
   libmesh_error();
 }
 
@@ -54,13 +54,13 @@ void FEXYZ<0>::reinit(const Elem*,
 // Full specialization for 1D when this is a useless method
 template <>
 void FEXYZ<1>::reinit(const Elem*,
-		      const unsigned int,
-		      const Real,
+                      const unsigned int,
+                      const Real,
                       const std::vector<Point>* const,
                       const std::vector<Real>* const)
 {
   libMesh::err << "ERROR: This method only makes sense for 2D/3D elements!"
-	        << std::endl;
+               << std::endl;
   libmesh_error();
 }
 
@@ -69,8 +69,8 @@ void FEXYZ<1>::reinit(const Elem*,
 // Method for 2D, 3D
 template <unsigned int Dim>
 void FEXYZ<Dim>::reinit(const Elem* elem,
-			const unsigned int s,
-			const Real,
+                        const unsigned int s,
+                        const Real,
                         const std::vector<Point>* const pts,
                         const std::vector<Real>* const weights)
 {
@@ -102,7 +102,7 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
       else
         {
           std::vector<Real> dummy_weights (pts->size(), 1.);
-	  // Compute data on the face for integration
+          // Compute data on the face for integration
           this->compute_face_values (elem, side.get(), dummy_weights);
         }
     }
@@ -130,7 +130,7 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
 
 template <unsigned int Dim>
 void FEXYZ<Dim>::compute_face_values(const Elem* elem,
-				     const Elem* side,
+                                     const Elem* side,
                                      const std::vector<Real>& qw)
 {
   libmesh_assert(elem);
@@ -145,7 +145,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
   // space.
   const unsigned int n_approx_shape_functions =
     this->n_shape_functions(this->get_type(),
-			    this->get_order());
+                            this->get_order());
 
   // Resize the shape functions and their gradients
   this->phi.resize    (n_approx_shape_functions);
@@ -174,49 +174,49 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
       // and EDGE2 or EDGE3.
     case 2:
       {
-	// compute the shape function values & gradients
-	for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	  for (std::size_t p=0; p<n_qp; p++)
-	    {
-	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz[p]);
+        // compute the shape function values & gradients
+        for (unsigned int i=0; i<n_approx_shape_functions; i++)
+          for (std::size_t p=0; p<n_qp; p++)
+            {
+              this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz[p]);
 
-	      this->dphi[i][p](0) =
-		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz[p]);
+              this->dphi[i][p](0) =
+                this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz[p]);
 
-	      this->dphi[i][p](1) =
-		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, xyz[p]);
+              this->dphi[i][p](1) =
+                this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, xyz[p]);
 
 #if LIBMESH_DIM == 3
-	      this->dphi[i][p](2) = // can only assign to the Z component if LIBMESH_DIM==3
+              this->dphi[i][p](2) = // can only assign to the Z component if LIBMESH_DIM==3
 #endif
-		this->dphidz[i][p] = 0.;
-	    }
+                this->dphidz[i][p] = 0.;
+            }
 
-	// done computing face values
-	break;
+        // done computing face values
+        break;
       }
 
       // A 3D finite element living in 3D space.
     case 3:
       {
-	// compute the shape function values & gradients
-	for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	  for (std::size_t p=0; p<n_qp; p++)
-	    {
-	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz[p]);
+        // compute the shape function values & gradients
+        for (unsigned int i=0; i<n_approx_shape_functions; i++)
+          for (std::size_t p=0; p<n_qp; p++)
+            {
+              this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz[p]);
 
-	      this->dphi[i][p](0) =
-		this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz[p]);
+              this->dphi[i][p](0) =
+                this->dphidx[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 0, xyz[p]);
 
-	      this->dphi[i][p](1) =
-		this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, xyz[p]);
+              this->dphi[i][p](1) =
+                this->dphidy[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 1, xyz[p]);
 
-	      this->dphi[i][p](2) =
-		this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 2, xyz[p]);
-	    }
+              this->dphi[i][p](2) =
+                this->dphidz[i][p] = FE<Dim,XYZ>::shape_deriv (elem, this->fe_type.order, i, 2, xyz[p]);
+            }
 
-	// done computing face values
-	break;
+        // done computing face values
+        break;
       }
 
 

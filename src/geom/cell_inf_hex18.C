@@ -84,7 +84,7 @@ bool InfHex18::is_face(const unsigned int i) const
 }
 
 bool InfHex18::is_node_on_side(const unsigned int n,
-			       const unsigned int s) const
+                               const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 9; ++i)
@@ -94,7 +94,7 @@ bool InfHex18::is_node_on_side(const unsigned int n,
 }
 
 bool InfHex18::is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const
+                               const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 3; ++i)
@@ -113,40 +113,40 @@ dof_id_type InfHex18::key (const unsigned int s) const
     case 0: // the base face
 
       return
-	this->compute_key (this->node(16));
+        this->compute_key (this->node(16));
 
 
     case 1:  // the face at y = -1
 
       return
-	this->compute_key (this->node(0),
-			   this->node(1),
-			   this->node(5),
-			   this->node(4));
+        this->compute_key (this->node(0),
+                           this->node(1),
+                           this->node(5),
+                           this->node(4));
 
     case 2:  // the face at x = 1
 
       return
-	this->compute_key (this->node(1),
-			   this->node(2),
-			   this->node(6),
-			   this->node(5));
+        this->compute_key (this->node(1),
+                           this->node(2),
+                           this->node(6),
+                           this->node(5));
 
     case 3: // the face at y = 1
 
       return
-	this->compute_key (this->node(2),
-			   this->node(3),
-			   this->node(7),
-			   this->node(6));
+        this->compute_key (this->node(2),
+                           this->node(3),
+                           this->node(7),
+                           this->node(6));
 
     case 4: // the face at x = -1
 
       return
-	this->compute_key (this->node(3),
-			   this->node(0),
-			   this->node(4),
-			   this->node(7));
+        this->compute_key (this->node(3),
+                           this->node(0),
+                           this->node(4),
+                           this->node(7));
     }
 
   // We'll never get here.
@@ -157,32 +157,32 @@ dof_id_type InfHex18::key (const unsigned int s) const
 
 
 AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
-				    bool proxy) const
+                                    bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
       switch (i)
-	{
-	  // base
-	case 0:
-	  {
-	    AutoPtr<Elem> ap(new Side<Quad9,InfHex18>(this,i));
-	    return ap;
-	  }
-	  // ifem sides
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	  {
-	    AutoPtr<Elem> ap(new Side<InfQuad6,InfHex18>(this,i));
-	    return ap;
-	  }
-	default:
-	  libmesh_error();
-	}
+        {
+          // base
+        case 0:
+          {
+            AutoPtr<Elem> ap(new Side<Quad9,InfHex18>(this,i));
+            return ap;
+          }
+          // ifem sides
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+          {
+            AutoPtr<Elem> ap(new Side<InfQuad6,InfHex18>(this,i));
+            return ap;
+          }
+        default:
+          libmesh_error();
+        }
     }
 
   else
@@ -192,87 +192,87 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
 
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
       switch (i)
-	{
-	case 0: // the base face
-	  {
+        {
+        case 0: // the base face
+          {
             face.reset(new Quad9);
 
-	    // This is the exception: all other face elements' normals
-	    // point outwards; but the base element's normal points inward
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(2);
-	    face->set_node(3) = this->get_node(3);
-	    face->set_node(4) = this->get_node(8);
-	    face->set_node(5) = this->get_node(9);
-	    face->set_node(6) = this->get_node(10);
-	    face->set_node(7) = this->get_node(11);
-	    face->set_node(8) = this->get_node(16);
+            // This is the exception: all other face elements' normals
+            // point outwards; but the base element's normal points inward
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(2);
+            face->set_node(3) = this->get_node(3);
+            face->set_node(4) = this->get_node(8);
+            face->set_node(5) = this->get_node(9);
+            face->set_node(6) = this->get_node(10);
+            face->set_node(7) = this->get_node(11);
+            face->set_node(8) = this->get_node(16);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 1:  // connecting to another infinite element
-	  {
+        case 1:  // connecting to another infinite element
+          {
             face.reset(new InfQuad6);
 
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(4);
-	    face->set_node(3) = this->get_node(5);
-	    face->set_node(4) = this->get_node(8);
-	    face->set_node(5) = this->get_node(12);
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(4);
+            face->set_node(3) = this->get_node(5);
+            face->set_node(4) = this->get_node(8);
+            face->set_node(5) = this->get_node(12);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 2:  // connecting to another infinite element
-	  {
+        case 2:  // connecting to another infinite element
+          {
             face.reset(new InfQuad6);
 
-	    face->set_node(0) = this->get_node(1);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(5);
-	    face->set_node(3) = this->get_node(6);
-	    face->set_node(4) = this->get_node(9);
-	    face->set_node(5) = this->get_node(13);
+            face->set_node(0) = this->get_node(1);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(5);
+            face->set_node(3) = this->get_node(6);
+            face->set_node(4) = this->get_node(9);
+            face->set_node(5) = this->get_node(13);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 3:  // connecting to another infinite element
-	  {
+        case 3:  // connecting to another infinite element
+          {
             face.reset(new InfQuad6);
 
-	    face->set_node(0) = this->get_node(2);
-	    face->set_node(1) = this->get_node(3);
-	    face->set_node(2) = this->get_node(6);
-	    face->set_node(3) = this->get_node(7);
-	    face->set_node(4) = this->get_node(10);
-	    face->set_node(5) = this->get_node(14);
+            face->set_node(0) = this->get_node(2);
+            face->set_node(1) = this->get_node(3);
+            face->set_node(2) = this->get_node(6);
+            face->set_node(3) = this->get_node(7);
+            face->set_node(4) = this->get_node(10);
+            face->set_node(5) = this->get_node(14);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 4:  // connecting to another infinite element
-	  {
+        case 4:  // connecting to another infinite element
+          {
             face.reset(new InfQuad6);
 
-	    face->set_node(0) = this->get_node(3);
-	    face->set_node(1) = this->get_node(0);
-	    face->set_node(2) = this->get_node(7);
-	    face->set_node(3) = this->get_node(4);
-	    face->set_node(4) = this->get_node(11);
-	    face->set_node(5) = this->get_node(15);
+            face->set_node(0) = this->get_node(3);
+            face->set_node(1) = this->get_node(0);
+            face->set_node(2) = this->get_node(7);
+            face->set_node(3) = this->get_node(4);
+            face->set_node(4) = this->get_node(11);
+            face->set_node(5) = this->get_node(15);
 
-	    break;
-	  }
+            break;
+          }
 
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+        default:
+          {
+            libmesh_error();
+          }
+        }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
@@ -298,8 +298,8 @@ AutoPtr<Elem> InfHex18::build_edge (const unsigned int i) const
 
 
 void InfHex18::connectivity(const unsigned int sc,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -309,63 +309,63 @@ void InfHex18::connectivity(const unsigned int sc,
     {
     case TECPLOT:
       {
-	switch (sc)
-	  {
-	  case 0:
+        switch (sc)
+          {
+          case 0:
 
-	    conn[0] = this->node(0)+1;
-	    conn[1] = this->node(8)+1;
-	    conn[2] = this->node(16)+1;
-	    conn[3] = this->node(11)+1;
-	    conn[4] = this->node(4)+1;
-	    conn[5] = this->node(12)+1;
-	    conn[6] = this->node(17)+1;
-	    conn[7] = this->node(15)+1;
+            conn[0] = this->node(0)+1;
+            conn[1] = this->node(8)+1;
+            conn[2] = this->node(16)+1;
+            conn[3] = this->node(11)+1;
+            conn[4] = this->node(4)+1;
+            conn[5] = this->node(12)+1;
+            conn[6] = this->node(17)+1;
+            conn[7] = this->node(15)+1;
 
-	    return;
+            return;
 
-	  case 1:
+          case 1:
 
-	    conn[0] = this->node(8)+1;
-	    conn[1] = this->node(1)+1;
-	    conn[2] = this->node(9)+1;
-	    conn[3] = this->node(16)+1;
-	    conn[4] = this->node(12)+1;
-	    conn[5] = this->node(5)+1;
-	    conn[6] = this->node(13)+1;
-	    conn[7] = this->node(17)+1;
+            conn[0] = this->node(8)+1;
+            conn[1] = this->node(1)+1;
+            conn[2] = this->node(9)+1;
+            conn[3] = this->node(16)+1;
+            conn[4] = this->node(12)+1;
+            conn[5] = this->node(5)+1;
+            conn[6] = this->node(13)+1;
+            conn[7] = this->node(17)+1;
 
-	    return;
+            return;
 
-	  case 2:
+          case 2:
 
-	    conn[0] = this->node(11)+1;
-	    conn[1] = this->node(16)+1;
-	    conn[2] = this->node(10)+1;
-	    conn[3] = this->node(3)+1;
-	    conn[4] = this->node(15)+1;
-	    conn[5] = this->node(17)+1;
-	    conn[6] = this->node(14)+1;
-	    conn[7] = this->node(7)+1;
+            conn[0] = this->node(11)+1;
+            conn[1] = this->node(16)+1;
+            conn[2] = this->node(10)+1;
+            conn[3] = this->node(3)+1;
+            conn[4] = this->node(15)+1;
+            conn[5] = this->node(17)+1;
+            conn[6] = this->node(14)+1;
+            conn[7] = this->node(7)+1;
 
-	    return;
+            return;
 
-	  case 3:
+          case 3:
 
-	    conn[0] = this->node(16)+1;
-	    conn[1] = this->node(9)+1;
-	    conn[2] = this->node(2)+1;
-	    conn[3] = this->node(10)+1;
-	    conn[4] = this->node(17)+1;
-	    conn[5] = this->node(13)+1;
-	    conn[6] = this->node(6)+1;
-	    conn[7] = this->node(14)+1;
+            conn[0] = this->node(16)+1;
+            conn[1] = this->node(9)+1;
+            conn[2] = this->node(2)+1;
+            conn[3] = this->node(10)+1;
+            conn[4] = this->node(17)+1;
+            conn[5] = this->node(13)+1;
+            conn[6] = this->node(6)+1;
+            conn[7] = this->node(14)+1;
 
-	    return;
+            return;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
     default:
@@ -390,14 +390,14 @@ unsigned int InfHex18::n_second_order_adjacent_vertices (const unsigned int n) c
       case 13:
       case 14:
       case 15:
-	return 2;
+        return 2;
 
       case 16:
       case 17:
-	return 4;
+        return 4;
 
       default:
-	libmesh_error();
+        libmesh_error();
     }
 
   libmesh_error();
@@ -407,7 +407,7 @@ unsigned int InfHex18::n_second_order_adjacent_vertices (const unsigned int n) c
 
 
 unsigned short int InfHex18::second_order_adjacent_vertex (const unsigned int n,
-							   const unsigned int v) const
+                                                           const unsigned int v) const
 {
   libmesh_assert_greater_equal (n, this->n_vertices());
   libmesh_assert_less (n, this->n_nodes());

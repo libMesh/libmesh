@@ -64,8 +64,8 @@ public:
    * data structures.
    */
   DifferentiableSystem (EquationSystems& es,
-			const std::string& name,
-			const unsigned int number);
+                        const std::string& name,
+                        const unsigned int number);
 
   /**
    * Destructor.

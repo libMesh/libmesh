@@ -127,7 +127,7 @@ namespace libMesh
      * and a reference to a vector of Points defining the hole.
      */
     ArbitraryHole(const Point center,
-		  const std::vector<Point>& points);
+                  const std::vector<Point>& points);
 
     virtual unsigned int n_points() const;
 

@@ -86,14 +86,14 @@ class Edge3 : public Edge
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge (i.e. "returns true" in 1D)
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const;
+                               const unsigned int e) const;
 
   /*
    * @returns true iff the element map is definitely affine within
@@ -112,8 +112,8 @@ class Edge3 : public Edge
   Order default_order() const { return SECOND; }
 
   virtual void connectivity(const unsigned int sc,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
   /**
    * @returns 2 for all \p n
@@ -126,7 +126,7 @@ class Edge3 : public Edge
    * that defines the \f$ n^{th} \f$ second-order node.
    */
   unsigned short int second_order_adjacent_vertex (const unsigned int,
-						   const unsigned int v) const
+                                                   const unsigned int v) const
       { return static_cast<unsigned short int>(v); }
 
   /**
@@ -139,7 +139,7 @@ class Edge3 : public Edge
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
-	  second_order_child_vertex (const unsigned int n) const;
+    second_order_child_vertex (const unsigned int n) const;
 
   /**
    * An optimized method for computing the length of a 3-node edge.
@@ -171,8 +171,8 @@ protected:
    * Matrix used to create the elements children.
    */
   float embedding_matrix (const unsigned int i,
-			 const unsigned int j,
-			 const unsigned int k) const
+                          const unsigned int j,
+                          const unsigned int k) const
   { return _embedding_matrix[i][j][k]; }
 
   /**

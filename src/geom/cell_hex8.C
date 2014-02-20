@@ -78,7 +78,7 @@ bool Hex8::is_face(const unsigned int) const
 }
 
 bool Hex8::is_node_on_side(const unsigned int n,
-			   const unsigned int s) const
+                           const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 4; ++i)
@@ -88,7 +88,7 @@ bool Hex8::is_node_on_side(const unsigned int n,
 }
 
 bool Hex8::is_node_on_edge(const unsigned int n,
-			   const unsigned int e) const
+                           const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 2; ++i)
@@ -118,7 +118,7 @@ bool Hex8::has_affine_map() const
 
 
 AutoPtr<Elem> Hex8::build_side (const unsigned int i,
-				bool proxy) const
+                                bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -135,67 +135,67 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
 
       // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
       switch (i)
-	{
-	case 0:  // the face at z = -1
-	  {
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(3);
-	    face->set_node(2) = this->get_node(2);
-	    face->set_node(3) = this->get_node(1);
+        {
+        case 0:  // the face at z = -1
+          {
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(3);
+            face->set_node(2) = this->get_node(2);
+            face->set_node(3) = this->get_node(1);
 
-	    return face;
-	  }
-	case 1:  // the face at y = -1
-	  {
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(5);
-	    face->set_node(3) = this->get_node(4);
+            return face;
+          }
+        case 1:  // the face at y = -1
+          {
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(5);
+            face->set_node(3) = this->get_node(4);
 
-	    return face;
-	  }
-	case 2:  // the face at x = 1
-	  {
-	    face->set_node(0) = this->get_node(1);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(6);
-	    face->set_node(3) = this->get_node(5);
+            return face;
+          }
+        case 2:  // the face at x = 1
+          {
+            face->set_node(0) = this->get_node(1);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(6);
+            face->set_node(3) = this->get_node(5);
 
-	    return face;
-	  }
-	case 3: // the face at y = 1
-	  {
-	    face->set_node(0) = this->get_node(2);
-	    face->set_node(1) = this->get_node(3);
-	    face->set_node(2) = this->get_node(7);
-	    face->set_node(3) = this->get_node(6);
+            return face;
+          }
+        case 3: // the face at y = 1
+          {
+            face->set_node(0) = this->get_node(2);
+            face->set_node(1) = this->get_node(3);
+            face->set_node(2) = this->get_node(7);
+            face->set_node(3) = this->get_node(6);
 
-	    return face;
-	  }
-	case 4: // the face at x = -1
-	  {
-	    face->set_node(0) = this->get_node(3);
-	    face->set_node(1) = this->get_node(0);
-	    face->set_node(2) = this->get_node(4);
-	    face->set_node(3) = this->get_node(7);
+            return face;
+          }
+        case 4: // the face at x = -1
+          {
+            face->set_node(0) = this->get_node(3);
+            face->set_node(1) = this->get_node(0);
+            face->set_node(2) = this->get_node(4);
+            face->set_node(3) = this->get_node(7);
 
-	    return face;
-	  }
-	case 5: // the face at z = 1
-	  {
-	    face->set_node(0) = this->get_node(4);
-	    face->set_node(1) = this->get_node(5);
-	    face->set_node(2) = this->get_node(6);
-	    face->set_node(3) = this->get_node(7);
+            return face;
+          }
+        case 5: // the face at z = 1
+          {
+            face->set_node(0) = this->get_node(4);
+            face->set_node(1) = this->get_node(5);
+            face->set_node(2) = this->get_node(6);
+            face->set_node(3) = this->get_node(7);
 
-	    return face;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	    return face;
-	  }
-	}
+            return face;
+          }
+        default:
+          {
+            libmesh_error();
+            return face;
+          }
+        }
     }
 
   // We'll never get here.
@@ -216,8 +216,8 @@ AutoPtr<Elem> Hex8::build_edge (const unsigned int i) const
 
 
 void Hex8::connectivity(const unsigned int libmesh_dbg_var(sc),
-			const IOPackage iop,
-			std::vector<dof_id_type>& conn) const
+                        const IOPackage iop,
+                        std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -229,27 +229,27 @@ void Hex8::connectivity(const unsigned int libmesh_dbg_var(sc),
     {
     case TECPLOT:
       {
-	conn[0] = this->node(0)+1;
-	conn[1] = this->node(1)+1;
-	conn[2] = this->node(2)+1;
-	conn[3] = this->node(3)+1;
-	conn[4] = this->node(4)+1;
-	conn[5] = this->node(5)+1;
-	conn[6] = this->node(6)+1;
-	conn[7] = this->node(7)+1;
-	return;
+        conn[0] = this->node(0)+1;
+        conn[1] = this->node(1)+1;
+        conn[2] = this->node(2)+1;
+        conn[3] = this->node(3)+1;
+        conn[4] = this->node(4)+1;
+        conn[5] = this->node(5)+1;
+        conn[6] = this->node(6)+1;
+        conn[7] = this->node(7)+1;
+        return;
       }
 
     case VTK:
       {
-	conn[0] = this->node(0);
-	conn[1] = this->node(1);
-	conn[2] = this->node(2);
-	conn[3] = this->node(3);
-	conn[4] = this->node(4);
-	conn[5] = this->node(5);
-	conn[6] = this->node(6);
-	conn[7] = this->node(7);
+        conn[0] = this->node(0);
+        conn[1] = this->node(1);
+        conn[2] = this->node(2);
+        conn[3] = this->node(3);
+        conn[4] = this->node(4);
+        conn[5] = this->node(5);
+        conn[6] = this->node(6);
+        conn[7] = this->node(7);
         return;
       }
 
@@ -413,7 +413,7 @@ Real Hex8::volume () const
     {
       // Set the nodes of the pyramid base
       for (unsigned int i=0; i<4; ++i)
-	pyr_base[i] = this->_nodes[sub_pyr[n][i]];
+        pyr_base[i] = this->_nodes[sub_pyr[n][i]];
 
       // Compute diff vectors
       Point a ( *pyr_base[0] - R );

@@ -53,8 +53,8 @@ public:
    * at the \f$(ioff,joff)\f$ location in the parent vector.
    */
   DenseSubVector(DenseVector<T>& new_parent,
-		 const unsigned int ioff=0,
-		 const unsigned int n=0);
+                 const unsigned int ioff=0,
+                 const unsigned int n=0);
 
   /**
    * Destructor.  Does nothing.
@@ -106,7 +106,7 @@ public:
    * Changes the location of the subvector in the parent vector.
    */
   void reposition(const unsigned int ioff,
-		  const unsigned int n);
+                  const unsigned int n);
 
   /**
    * @returns the minimum element in the vector.
@@ -168,8 +168,8 @@ private:
 template<typename T>
 inline
 DenseSubVector<T>::DenseSubVector(DenseVector<T>& new_parent,
-				  const unsigned int ioff,
-				  const unsigned int n) :
+                                  const unsigned int ioff,
+                                  const unsigned int n) :
   _parent_vector(new_parent)
 {
   reposition (ioff, n);
@@ -180,7 +180,7 @@ DenseSubVector<T>::DenseSubVector(DenseVector<T>& new_parent,
 template<typename T>
 inline
 void DenseSubVector<T>::reposition(const unsigned int ioff,
-				   const unsigned int n)
+                                   const unsigned int n)
 {
   _i_off = ioff;
   _n = n;

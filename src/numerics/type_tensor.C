@@ -81,7 +81,7 @@ void TypeTensor<T>::print(std::ostream& os) const
 
 template <typename T>
 void TypeTensor<T>::write_unformatted (std::ostream &out_stream,
-				       const bool newline) const
+                                       const bool newline) const
 {
   libmesh_assert (out_stream);
 

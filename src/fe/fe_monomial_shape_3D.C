@@ -30,9 +30,9 @@ namespace libMesh
 
 template <>
 Real FE<3,MONOMIAL>::shape(const ElemType,
-			   const Order libmesh_dbg_var(order),
-			   const unsigned int i,
-			   const Point& p)
+                           const Order libmesh_dbg_var(order),
+                           const unsigned int i,
+                           const Point& p)
 {
 #if LIBMESH_DIM == 3
 
@@ -185,9 +185,9 @@ Real FE<3,MONOMIAL>::shape(const ElemType,
 
 template <>
 Real FE<3,MONOMIAL>::shape(const Elem* elem,
-			   const Order order,
-			   const unsigned int i,
-			   const Point& p)
+                           const Order order,
+                           const unsigned int i,
+                           const Point& p)
 {
   libmesh_assert(elem);
 
@@ -199,10 +199,10 @@ Real FE<3,MONOMIAL>::shape(const Elem* elem,
 
 template <>
 Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
-				 const Order libmesh_dbg_var(order),
-				 const unsigned int i,
-				 const unsigned int j,
-				 const Point& p)
+                                 const Order libmesh_dbg_var(order),
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point& p)
 {
 #if LIBMESH_DIM == 3
 
@@ -224,118 +224,118 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
     case 0:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
-  	  return 0.;
+          {
+            // constant
+          case 0:
+            return 0.;
 
-  	  // linear
-  	case 1:
-  	  return 1.;
+            // linear
+          case 1:
+            return 1.;
 
-  	case 2:
-  	  return 0.;
+          case 2:
+            return 0.;
 
-  	case 3:
-  	  return 0.;
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	  return 2.*xi;
+            // quadratic
+          case 4:
+            return 2.*xi;
 
-  	case 5:
-  	  return eta;
+          case 5:
+            return eta;
 
-  	case 6:
-  	  return 0.;
+          case 6:
+            return 0.;
 
-  	case 7:
-  	  return zeta;
+          case 7:
+            return zeta;
 
-  	case 8:
-  	  return 0.;
+          case 8:
+            return 0.;
 
-  	case 9:
-  	  return 0.;
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	  return 3.*xi*xi;
+            // cubic
+          case 10:
+            return 3.*xi*xi;
 
-  	case 11:
-  	  return 2.*xi*eta;
+          case 11:
+            return 2.*xi*eta;
 
-  	case 12:
-  	  return eta*eta;
+          case 12:
+            return eta*eta;
 
-  	case 13:
-  	  return 0.;
+          case 13:
+            return 0.;
 
-  	case 14:
-  	  return 2.*xi*zeta;
+          case 14:
+            return 2.*xi*zeta;
 
-  	case 15:
-  	  return eta*zeta;
+          case 15:
+            return eta*zeta;
 
-  	case 16:
-  	  return 0.;
+          case 16:
+            return 0.;
 
-  	case 17:
-  	  return zeta*zeta;
+          case 17:
+            return zeta*zeta;
 
-  	case 18:
-  	  return 0.;
+          case 18:
+            return 0.;
 
-  	case 19:
-  	  return 0.;
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	  return 4.*xi*xi*xi;
+            // quartics
+          case 20:
+            return 4.*xi*xi*xi;
 
-  	case 21:
-  	  return 3.*xi*xi*eta;
+          case 21:
+            return 3.*xi*xi*eta;
 
-  	case 22:
-  	  return 2.*xi*eta*eta;
+          case 22:
+            return 2.*xi*eta*eta;
 
-  	case 23:
-  	  return eta*eta*eta;
+          case 23:
+            return eta*eta*eta;
 
-  	case 24:
-  	  return 0.;
+          case 24:
+            return 0.;
 
-  	case 25:
-  	  return 3.*xi*xi*zeta;
+          case 25:
+            return 3.*xi*xi*zeta;
 
-  	case 26:
-  	  return 2.*xi*eta*zeta;
+          case 26:
+            return 2.*xi*eta*zeta;
 
-  	case 27:
-  	  return eta*eta*zeta;
+          case 27:
+            return eta*eta*zeta;
 
-  	case 28:
-  	  return 0.;
+          case 28:
+            return 0.;
 
-  	case 29:
-  	  return 2.*xi*zeta*zeta;
+          case 29:
+            return 2.*xi*zeta*zeta;
 
-  	case 30:
-  	  return eta*zeta*zeta;
+          case 30:
+            return eta*zeta*zeta;
 
-  	case 31:
-  	  return 0.;
+          case 31:
+            return 0.;
 
-  	case 32:
-  	  return zeta*zeta*zeta;
+          case 32:
+            return zeta*zeta*zeta;
 
-  	case 33:
-  	  return 0.;
+          case 33:
+            return 0.;
 
-  	case 34:
-  	  return 0.;
+          case 34:
+            return 0.;
 
-  	default:
+          default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
           unsigned int i2 = i - (o*(o+1)*(o+2)/6);
@@ -351,7 +351,7 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
           for (unsigned int index=0; index != nz; index++)
             val *= zeta;
           return val;
-  	}
+          }
       }
 
 
@@ -359,118 +359,118 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
     case 1:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
-  	  return 0.;
+          {
+            // constant
+          case 0:
+            return 0.;
 
-  	  // linear
-  	case 1:
-  	  return 0.;
+            // linear
+          case 1:
+            return 0.;
 
-  	case 2:
-  	  return 1.;
+          case 2:
+            return 1.;
 
-  	case 3:
-  	  return 0.;
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	  return 0.;
+            // quadratic
+          case 4:
+            return 0.;
 
-  	case 5:
-  	  return xi;
+          case 5:
+            return xi;
 
-  	case 6:
-  	  return 2.*eta;
+          case 6:
+            return 2.*eta;
 
-  	case 7:
-  	  return 0.;
+          case 7:
+            return 0.;
 
-  	case 8:
-  	  return zeta;
+          case 8:
+            return zeta;
 
-  	case 9:
-  	  return 0.;
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	  return 0.;
+            // cubic
+          case 10:
+            return 0.;
 
-  	case 11:
-  	  return xi*xi;
+          case 11:
+            return xi*xi;
 
-  	case 12:
-  	  return 2.*xi*eta;
+          case 12:
+            return 2.*xi*eta;
 
-  	case 13:
-  	  return 3.*eta*eta;
+          case 13:
+            return 3.*eta*eta;
 
-  	case 14:
-  	  return 0.;
+          case 14:
+            return 0.;
 
-  	case 15:
-  	  return xi*zeta;
+          case 15:
+            return xi*zeta;
 
-  	case 16:
-  	  return 2.*eta*zeta;
+          case 16:
+            return 2.*eta*zeta;
 
-  	case 17:
-  	  return 0.;
+          case 17:
+            return 0.;
 
-  	case 18:
-  	  return zeta*zeta;
+          case 18:
+            return zeta*zeta;
 
-  	case 19:
-  	  return 0.;
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	  return 0.;
+            // quartics
+          case 20:
+            return 0.;
 
-  	case 21:
-  	  return xi*xi*xi;
+          case 21:
+            return xi*xi*xi;
 
-  	case 22:
-  	  return 2.*xi*xi*eta;
+          case 22:
+            return 2.*xi*xi*eta;
 
-  	case 23:
-  	  return 3.*xi*eta*eta;
+          case 23:
+            return 3.*xi*eta*eta;
 
-  	case 24:
-  	  return 4.*eta*eta*eta;
+          case 24:
+            return 4.*eta*eta*eta;
 
-  	case 25:
-  	  return 0.;
+          case 25:
+            return 0.;
 
-  	case 26:
-  	  return xi*xi*zeta;
+          case 26:
+            return xi*xi*zeta;
 
-  	case 27:
-  	  return 2.*xi*eta*zeta;
+          case 27:
+            return 2.*xi*eta*zeta;
 
-  	case 28:
-  	  return 3.*eta*eta*zeta;
+          case 28:
+            return 3.*eta*eta*zeta;
 
-  	case 29:
-  	  return 0.;
+          case 29:
+            return 0.;
 
-  	case 30:
-  	  return xi*zeta*zeta;
+          case 30:
+            return xi*zeta*zeta;
 
-  	case 31:
-  	  return 2.*eta*zeta*zeta;
+          case 31:
+            return 2.*eta*zeta*zeta;
 
-  	case 32:
-  	  return 0.;
+          case 32:
+            return 0.;
 
-  	case 33:
-  	  return zeta*zeta*zeta;
+          case 33:
+            return zeta*zeta*zeta;
 
-  	case 34:
-  	  return 0.;
+          case 34:
+            return 0.;
 
-  	default:
+          default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
           unsigned int i2 = i - (o*(o+1)*(o+2)/6);
@@ -486,7 +486,7 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
           for (unsigned int index=0; index != nz; index++)
             val *= zeta;
           return val;
-  	}
+          }
       }
 
 
@@ -494,118 +494,118 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
     case 2:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
-  	  return 0.;
+          {
+            // constant
+          case 0:
+            return 0.;
 
-  	  // linear
-  	case 1:
-  	  return 0.;
+            // linear
+          case 1:
+            return 0.;
 
-  	case 2:
-  	  return 0.;
+          case 2:
+            return 0.;
 
-  	case 3:
-  	  return 1.;
+          case 3:
+            return 1.;
 
-  	  // quadratic
-  	case 4:
-  	  return 0.;
+            // quadratic
+          case 4:
+            return 0.;
 
-  	case 5:
-  	  return 0.;
+          case 5:
+            return 0.;
 
-  	case 6:
-  	  return 0.;
+          case 6:
+            return 0.;
 
-  	case 7:
-  	  return xi;
+          case 7:
+            return xi;
 
-  	case 8:
-  	  return eta;
+          case 8:
+            return eta;
 
-  	case 9:
-  	  return 2.*zeta;
+          case 9:
+            return 2.*zeta;
 
-  	  // cubic
-  	case 10:
-  	  return 0.;
+            // cubic
+          case 10:
+            return 0.;
 
-  	case 11:
-  	  return 0.;
+          case 11:
+            return 0.;
 
-  	case 12:
-  	  return 0.;
+          case 12:
+            return 0.;
 
-  	case 13:
-  	  return 0.;
+          case 13:
+            return 0.;
 
-  	case 14:
-  	  return xi*xi;
+          case 14:
+            return xi*xi;
 
-  	case 15:
-  	  return xi*eta;
+          case 15:
+            return xi*eta;
 
-  	case 16:
-  	  return eta*eta;
+          case 16:
+            return eta*eta;
 
-  	case 17:
-  	  return 2.*xi*zeta;
+          case 17:
+            return 2.*xi*zeta;
 
-  	case 18:
-  	  return 2.*eta*zeta;
+          case 18:
+            return 2.*eta*zeta;
 
-  	case 19:
-  	  return 3.*zeta*zeta;
+          case 19:
+            return 3.*zeta*zeta;
 
-  	  // quartics
-  	case 20:
-  	  return 0.;
+            // quartics
+          case 20:
+            return 0.;
 
-  	case 21:
-  	  return 0.;
+          case 21:
+            return 0.;
 
-  	case 22:
-  	  return 0.;
+          case 22:
+            return 0.;
 
-  	case 23:
-  	  return 0.;
+          case 23:
+            return 0.;
 
-  	case 24:
-  	  return 0.;
+          case 24:
+            return 0.;
 
-  	case 25:
-  	  return xi*xi*xi;
+          case 25:
+            return xi*xi*xi;
 
-  	case 26:
-  	  return xi*xi*eta;
+          case 26:
+            return xi*xi*eta;
 
-  	case 27:
-  	  return xi*eta*eta;
+          case 27:
+            return xi*eta*eta;
 
-  	case 28:
-  	  return eta*eta*eta;
+          case 28:
+            return eta*eta*eta;
 
-  	case 29:
-  	  return 2.*xi*xi*zeta;
+          case 29:
+            return 2.*xi*xi*zeta;
 
-  	case 30:
-  	  return 2.*xi*eta*zeta;
+          case 30:
+            return 2.*xi*eta*zeta;
 
-  	case 31:
-  	  return 2.*eta*eta*zeta;
+          case 31:
+            return 2.*eta*eta*zeta;
 
-  	case 32:
-  	  return 3.*xi*zeta*zeta;
+          case 32:
+            return 3.*xi*zeta*zeta;
 
-  	case 33:
-  	  return 3.*eta*zeta*zeta;
+          case 33:
+            return 3.*eta*zeta*zeta;
 
-  	case 34:
-  	  return 4.*zeta*zeta*zeta;
+          case 34:
+            return 4.*zeta*zeta*zeta;
 
-  	default:
+          default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
           unsigned int i2 = i - (o*(o+1)*(o+2)/6);
@@ -621,7 +621,7 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
           for (unsigned int index=1; index < nz; index++)
             val *= zeta;
           return val;
-  	}
+          }
       }
     }
 
@@ -635,10 +635,10 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
 
 template <>
 Real FE<3,MONOMIAL>::shape_deriv(const Elem* elem,
-				 const Order order,
-				 const unsigned int i,
-				 const unsigned int j,
-				 const Point& p)
+                                 const Order order,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point& p)
 {
   libmesh_assert(elem);
 
@@ -650,10 +650,10 @@ Real FE<3,MONOMIAL>::shape_deriv(const Elem* elem,
 
 template <>
 Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
-				        const Order libmesh_dbg_var(order),
-				        const unsigned int i,
-				        const unsigned int j,
-				        const Point& p)
+                                        const Order libmesh_dbg_var(order),
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point& p)
 {
 #if LIBMESH_DIM == 3
 
@@ -674,83 +674,83 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
     case 0:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
+          {
+            // constant
+          case 0:
 
-  	  // linear
-  	case 1:
-  	case 2:
-  	case 3:
-  	  return 0.;
+            // linear
+          case 1:
+          case 2:
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	  return 2.;
+            // quadratic
+          case 4:
+            return 2.;
 
-  	case 5:
-  	case 6:
-  	case 7:
-  	case 8:
-  	case 9:
-  	  return 0.;
+          case 5:
+          case 6:
+          case 7:
+          case 8:
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	  return 6.*xi;
+            // cubic
+          case 10:
+            return 6.*xi;
 
-  	case 11:
-  	  return 2.*eta;
+          case 11:
+            return 2.*eta;
 
-  	case 12:
-  	case 13:
-  	  return 0.;
+          case 12:
+          case 13:
+            return 0.;
 
-  	case 14:
-  	  return 2.*zeta;
+          case 14:
+            return 2.*zeta;
 
-  	case 15:
-  	case 16:
-  	case 17:
-  	case 18:
-  	case 19:
-  	  return 0.;
+          case 15:
+          case 16:
+          case 17:
+          case 18:
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	  return 12.*xi*xi;
+            // quartics
+          case 20:
+            return 12.*xi*xi;
 
-  	case 21:
-  	  return 6.*xi*eta;
+          case 21:
+            return 6.*xi*eta;
 
-  	case 22:
-  	  return 2.*eta*eta;
+          case 22:
+            return 2.*eta*eta;
 
-  	case 23:
-  	case 24:
-  	  return 0.;
+          case 23:
+          case 24:
+            return 0.;
 
-  	case 25:
-  	  return 6.*xi*zeta;
+          case 25:
+            return 6.*xi*zeta;
 
-  	case 26:
-  	  return 2.*eta*zeta;
+          case 26:
+            return 2.*eta*zeta;
 
-  	case 27:
-  	case 28:
-  	  return 0.;
+          case 27:
+          case 28:
+            return 0.;
 
-  	case 29:
-  	  return 2.*zeta*zeta;
+          case 29:
+            return 2.*zeta*zeta;
 
-  	case 30:
-  	case 31:
-  	case 32:
-  	case 33:
-  	case 34:
-  	  return 0.;
+          case 30:
+          case 31:
+          case 32:
+          case 33:
+          case 34:
+            return 0.;
 
-  	default:
+          default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
           unsigned int i2 = i - (o*(o+1)*(o+2)/6);
@@ -766,7 +766,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
           for (unsigned int index=0; index != nz; index++)
             val *= zeta;
           return val;
-  	}
+          }
       }
 
 
@@ -774,89 +774,89 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
     case 1:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
+          {
+            // constant
+          case 0:
 
-  	  // linear
-  	case 1:
-  	case 2:
-  	case 3:
-  	  return 0.;
+            // linear
+          case 1:
+          case 2:
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	  return 0.;
+            // quadratic
+          case 4:
+            return 0.;
 
-  	case 5:
-  	  return 1.;
+          case 5:
+            return 1.;
 
-  	case 6:
-  	case 7:
-  	case 8:
-  	case 9:
-  	  return 0.;
+          case 6:
+          case 7:
+          case 8:
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	  return 0.;
+            // cubic
+          case 10:
+            return 0.;
 
-  	case 11:
-  	  return 2.*xi;
+          case 11:
+            return 2.*xi;
 
-  	case 12:
-  	  return 2.*eta;
+          case 12:
+            return 2.*eta;
 
-  	case 13:
-  	case 14:
-  	  return 0.;
+          case 13:
+          case 14:
+            return 0.;
 
-  	case 15:
-  	  return zeta;
+          case 15:
+            return zeta;
 
-  	case 16:
-  	case 17:
-  	case 18:
-  	case 19:
-  	  return 0.;
+          case 16:
+          case 17:
+          case 18:
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	  return 0.;
+            // quartics
+          case 20:
+            return 0.;
 
-  	case 21:
-  	  return 3.*xi*xi;
+          case 21:
+            return 3.*xi*xi;
 
-  	case 22:
-  	  return 4.*xi*eta;
+          case 22:
+            return 4.*xi*eta;
 
-  	case 23:
-  	  return 3.*eta*eta;
+          case 23:
+            return 3.*eta*eta;
 
-  	case 24:
-  	case 25:
-  	  return 0.;
+          case 24:
+          case 25:
+            return 0.;
 
-  	case 26:
-  	  return 2.*xi*zeta;
+          case 26:
+            return 2.*xi*zeta;
 
-  	case 27:
-  	  return 2.*eta*zeta;
+          case 27:
+            return 2.*eta*zeta;
 
-  	case 28:
-  	case 29:
-  	  return 0.;
+          case 28:
+          case 29:
+            return 0.;
 
-  	case 30:
-  	  return zeta*zeta;
+          case 30:
+            return zeta*zeta;
 
-  	case 31:
-  	case 32:
-  	case 33:
-  	case 34:
-  	  return 0.;
+          case 31:
+          case 32:
+          case 33:
+          case 34:
+            return 0.;
 
-  	default:
+          default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
           unsigned int i2 = i - (o*(o+1)*(o+2)/6);
@@ -872,7 +872,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
           for (unsigned int index=0; index != nz; index++)
             val *= zeta;
           return val;
-  	}
+          }
       }
 
 
@@ -880,88 +880,88 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
     case 2:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
+          {
+            // constant
+          case 0:
 
-  	  // linear
-  	case 1:
-  	case 2:
-  	case 3:
-  	  return 0.;
+            // linear
+          case 1:
+          case 2:
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	case 5:
-  	  return 0.;
+            // quadratic
+          case 4:
+          case 5:
+            return 0.;
 
-  	case 6:
-  	  return 2.;
+          case 6:
+            return 2.;
 
-  	case 7:
-  	case 8:
-  	case 9:
-  	  return 0.;
+          case 7:
+          case 8:
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	case 11:
-  	  return 0.;
+            // cubic
+          case 10:
+          case 11:
+            return 0.;
 
-  	case 12:
-  	  return 2.*xi;
-  	case 13:
-  	  return 6.*eta;
+          case 12:
+            return 2.*xi;
+          case 13:
+            return 6.*eta;
 
-  	case 14:
-  	case 15:
-  	  return 0.;
+          case 14:
+          case 15:
+            return 0.;
 
-  	case 16:
-  	  return 2.*zeta;
+          case 16:
+            return 2.*zeta;
 
-  	case 17:
-  	case 18:
-  	case 19:
-  	  return 0.;
+          case 17:
+          case 18:
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	case 21:
-  	  return 0.;
+            // quartics
+          case 20:
+          case 21:
+            return 0.;
 
-  	case 22:
-  	  return 2.*xi*xi;
+          case 22:
+            return 2.*xi*xi;
 
-  	case 23:
-  	  return 6.*xi*eta;
+          case 23:
+            return 6.*xi*eta;
 
-  	case 24:
-  	  return 12.*eta*eta;
+          case 24:
+            return 12.*eta*eta;
 
-  	case 25:
-  	case 26:
-  	  return 0.;
+          case 25:
+          case 26:
+            return 0.;
 
-  	case 27:
-  	  return 2.*xi*zeta;
+          case 27:
+            return 2.*xi*zeta;
 
-  	case 28:
-  	  return 6.*eta*zeta;
+          case 28:
+            return 6.*eta*zeta;
 
-  	case 29:
-  	case 30:
-  	  return 0.;
+          case 29:
+          case 30:
+            return 0.;
 
-  	case 31:
-  	  return 2.*zeta*zeta;
+          case 31:
+            return 2.*zeta*zeta;
 
-  	case 32:
-  	case 33:
-  	case 34:
-  	  return 0.;
+          case 32:
+          case 33:
+          case 34:
+            return 0.;
 
-  	default:
+          default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
           unsigned int i2 = i - (o*(o+1)*(o+2)/6);
@@ -977,7 +977,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
           for (unsigned int index=0; index != nz; index++)
             val *= zeta;
           return val;
-  	}
+          }
       }
 
 
@@ -985,89 +985,89 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
     case 3:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
+          {
+            // constant
+          case 0:
 
-  	  // linear
-  	case 1:
-  	case 2:
-  	case 3:
-  	  return 0.;
+            // linear
+          case 1:
+          case 2:
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	case 5:
-  	case 6:
-  	  return 0.;
+            // quadratic
+          case 4:
+          case 5:
+          case 6:
+            return 0.;
 
-  	case 7:
-  	  return 1.;
+          case 7:
+            return 1.;
 
-  	case 8:
-  	case 9:
-  	  return 0.;
+          case 8:
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	case 11:
-  	case 12:
-  	case 13:
-  	  return 0.;
+            // cubic
+          case 10:
+          case 11:
+          case 12:
+          case 13:
+            return 0.;
 
-  	case 14:
-  	  return 2.*xi;
+          case 14:
+            return 2.*xi;
 
-  	case 15:
-  	  return eta;
+          case 15:
+            return eta;
 
-  	case 16:
-  	  return 0.;
+          case 16:
+            return 0.;
 
-  	case 17:
-  	  return 2.*zeta;
+          case 17:
+            return 2.*zeta;
 
-  	case 18:
-  	case 19:
-  	  return 0.;
+          case 18:
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	case 21:
-  	case 22:
-  	case 23:
-  	case 24:
-  	  return 0.;
+            // quartics
+          case 20:
+          case 21:
+          case 22:
+          case 23:
+          case 24:
+            return 0.;
 
-  	case 25:
-  	  return 3.*xi*xi;
+          case 25:
+            return 3.*xi*xi;
 
-  	case 26:
-  	  return 2.*xi*eta;
+          case 26:
+            return 2.*xi*eta;
 
-  	case 27:
-  	  return eta*eta;
+          case 27:
+            return eta*eta;
 
-  	case 28:
-  	  return 0.;
+          case 28:
+            return 0.;
 
-  	case 29:
-  	  return 4.*xi*zeta;
+          case 29:
+            return 4.*xi*zeta;
 
-  	case 30:
-  	  return 2.*eta*zeta;
+          case 30:
+            return 2.*eta*zeta;
 
-  	case 31:
-  	  return 0.;
+          case 31:
+            return 0.;
 
-  	case 32:
-  	  return 3.*zeta*zeta;
+          case 32:
+            return 3.*zeta*zeta;
 
-  	case 33:
-  	case 34:
-  	  return 0.;
+          case 33:
+          case 34:
+            return 0.;
 
-  	default:
+          default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
           unsigned int i2 = i - (o*(o+1)*(o+2)/6);
@@ -1083,96 +1083,96 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
           for (unsigned int index=1; index < nz; index++)
             val *= zeta;
           return val;
-  	}
+          }
       }
 
       // d^2()/detadzeta
     case 4:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
+          {
+            // constant
+          case 0:
 
-  	  // linear
-  	case 1:
-  	case 2:
-  	case 3:
-  	  return 0.;
+            // linear
+          case 1:
+          case 2:
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	case 5:
-  	case 6:
-  	case 7:
-  	  return 0.;
+            // quadratic
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+            return 0.;
 
-  	case 8:
-  	  return 1.;
+          case 8:
+            return 1.;
 
-  	case 9:
-  	  return 0.;
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	case 11:
-  	case 12:
-  	case 13:
-  	case 14:
-  	  return 0.;
+            // cubic
+          case 10:
+          case 11:
+          case 12:
+          case 13:
+          case 14:
+            return 0.;
 
-  	case 15:
-  	  return xi;
+          case 15:
+            return xi;
 
-  	case 16:
-  	  return 2.*eta;
+          case 16:
+            return 2.*eta;
 
-  	case 17:
-  	  return 0.;
+          case 17:
+            return 0.;
 
-  	case 18:
-  	  return 2.*zeta;
+          case 18:
+            return 2.*zeta;
 
-  	case 19:
-  	  return 0.;
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	case 21:
-  	case 22:
-  	case 23:
-  	case 24:
-  	case 25:
-  	  return 0.;
+            // quartics
+          case 20:
+          case 21:
+          case 22:
+          case 23:
+          case 24:
+          case 25:
+            return 0.;
 
-  	case 26:
-  	  return xi*xi;
+          case 26:
+            return xi*xi;
 
-  	case 27:
-  	  return 2.*xi*eta;
+          case 27:
+            return 2.*xi*eta;
 
-  	case 28:
-  	  return 3.*eta*eta;
+          case 28:
+            return 3.*eta*eta;
 
-  	case 29:
-  	  return 0.;
+          case 29:
+            return 0.;
 
-  	case 30:
-  	  return 2.*xi*zeta;
+          case 30:
+            return 2.*xi*zeta;
 
-  	case 31:
-  	  return 4.*eta*zeta;
+          case 31:
+            return 4.*eta*zeta;
 
-  	case 32:
-  	  return 0.;
+          case 32:
+            return 0.;
 
-  	case 33:
-  	  return 3.*zeta*zeta;
+          case 33:
+            return 3.*zeta*zeta;
 
-  	case 34:
-  	  return 0.;
+          case 34:
+            return 0.;
 
-  	default:
+          default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
           unsigned int i2 = i - (o*(o+1)*(o+2)/6);
@@ -1188,7 +1188,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
           for (unsigned int index=1; index < nz; index++)
             val *= zeta;
           return val;
-  	}
+          }
       }
 
 
@@ -1196,77 +1196,77 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
     case 5:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
+          {
+            // constant
+          case 0:
 
-  	  // linear
-  	case 1:
-  	case 2:
-  	case 3:
-  	  return 0.;
+            // linear
+          case 1:
+          case 2:
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	case 5:
-  	case 6:
-  	case 7:
-  	case 8:
-  	  return 0.;
+            // quadratic
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+          case 8:
+            return 0.;
 
-  	case 9:
-  	  return 2.;
+          case 9:
+            return 2.;
 
-  	  // cubic
-  	case 10:
-  	case 11:
-  	case 12:
-  	case 13:
-  	case 14:
-  	case 15:
-  	case 16:
-  	  return 0.;
+            // cubic
+          case 10:
+          case 11:
+          case 12:
+          case 13:
+          case 14:
+          case 15:
+          case 16:
+            return 0.;
 
-  	case 17:
-  	  return 2.*xi;
+          case 17:
+            return 2.*xi;
 
-  	case 18:
-  	  return 2.*eta;
+          case 18:
+            return 2.*eta;
 
-  	case 19:
-  	  return 6.*zeta;
+          case 19:
+            return 6.*zeta;
 
-  	  // quartics
-  	case 20:
-  	case 21:
-  	case 22:
-  	case 23:
-  	case 24:
-  	case 25:
-  	case 26:
-  	case 27:
-  	case 28:
-  	  return 0.;
+            // quartics
+          case 20:
+          case 21:
+          case 22:
+          case 23:
+          case 24:
+          case 25:
+          case 26:
+          case 27:
+          case 28:
+            return 0.;
 
-  	case 29:
-  	  return 2.*xi*xi;
+          case 29:
+            return 2.*xi*xi;
 
-  	case 30:
-  	  return 2.*xi*eta;
+          case 30:
+            return 2.*xi*eta;
 
-  	case 31:
-  	  return 2.*eta*eta;
+          case 31:
+            return 2.*eta*eta;
 
-  	case 32:
-  	  return 6.*xi*zeta;
+          case 32:
+            return 6.*xi*zeta;
 
-  	case 33:
-  	  return 6.*eta*zeta;
+          case 33:
+            return 6.*eta*zeta;
 
-  	case 34:
-  	  return 12.*zeta*zeta;
+          case 34:
+            return 12.*zeta*zeta;
 
-  	default:
+          default:
           unsigned int o = 0;
           for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
           unsigned int i2 = i - (o*(o+1)*(o+2)/6);
@@ -1282,7 +1282,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
           for (unsigned int index=2; index < nz; index++)
             val *= zeta;
           return val;
-  	}
+          }
       }
 
 
@@ -1300,10 +1300,10 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
 
 template <>
 Real FE<3,MONOMIAL>::shape_second_deriv(const Elem* elem,
-				        const Order order,
-				        const unsigned int i,
-				        const unsigned int j,
-				        const Point& p)
+                                        const Order order,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point& p)
 {
   libmesh_assert(elem);
 

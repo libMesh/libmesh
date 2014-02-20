@@ -131,7 +131,7 @@ bool Quad9::is_face(const unsigned int i) const
 }
 
 bool Quad9::is_node_on_side(const unsigned int n,
-			    const unsigned int s) const
+                            const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 3; ++i)
@@ -174,22 +174,22 @@ dof_id_type Quad9::key (const unsigned int s) const
     case 0:
 
       return
-	this->compute_key (this->node(4));
+        this->compute_key (this->node(4));
 
     case 1:
 
       return
-	this->compute_key (this->node(5));
+        this->compute_key (this->node(5));
 
     case 2:
 
       return
-	this->compute_key (this->node(6));
+        this->compute_key (this->node(6));
 
     case 3:
 
       return
-	this->compute_key (this->node(7));
+        this->compute_key (this->node(7));
     }
 
 
@@ -201,7 +201,7 @@ dof_id_type Quad9::key (const unsigned int s) const
 
 
 AutoPtr<Elem> Quad9::build_side (const unsigned int i,
-				 bool proxy) const
+                                 bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -217,44 +217,44 @@ AutoPtr<Elem> Quad9::build_side (const unsigned int i,
       edge->subdomain_id() = this->subdomain_id();
 
       switch (i)
-	{
-	case 0:
-	  {
-	    edge->set_node(0) = this->get_node(0);
-	    edge->set_node(1) = this->get_node(1);
-	    edge->set_node(2) = this->get_node(4);
+        {
+        case 0:
+          {
+            edge->set_node(0) = this->get_node(0);
+            edge->set_node(1) = this->get_node(1);
+            edge->set_node(2) = this->get_node(4);
 
-	    return edge;
-	  }
-	case 1:
-	  {
-	    edge->set_node(0) = this->get_node(1);
-	    edge->set_node(1) = this->get_node(2);
-	    edge->set_node(2) = this->get_node(5);
+            return edge;
+          }
+        case 1:
+          {
+            edge->set_node(0) = this->get_node(1);
+            edge->set_node(1) = this->get_node(2);
+            edge->set_node(2) = this->get_node(5);
 
-	    return edge;
-	  }
-	case 2:
-	  {
-	    edge->set_node(0) = this->get_node(2);
-	    edge->set_node(1) = this->get_node(3);
-	    edge->set_node(2) = this->get_node(6);
+            return edge;
+          }
+        case 2:
+          {
+            edge->set_node(0) = this->get_node(2);
+            edge->set_node(1) = this->get_node(3);
+            edge->set_node(2) = this->get_node(6);
 
-	    return edge;
-	  }
-	case 3:
-	  {
-	    edge->set_node(0) = this->get_node(3);
-	    edge->set_node(1) = this->get_node(0);
-	    edge->set_node(2) = this->get_node(7);
+            return edge;
+          }
+        case 3:
+          {
+            edge->set_node(0) = this->get_node(3);
+            edge->set_node(1) = this->get_node(0);
+            edge->set_node(2) = this->get_node(7);
 
-	    return edge;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+            return edge;
+          }
+        default:
+          {
+            libmesh_error();
+          }
+        }
     }
 
   // We will never get here...
@@ -268,8 +268,8 @@ AutoPtr<Elem> Quad9::build_side (const unsigned int i,
 
 
 void Quad9::connectivity(const unsigned int sf,
-			 const IOPackage iop,
-			 std::vector<dof_id_type>& conn) const
+                         const IOPackage iop,
+                         std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_less (sf, this->n_sub_elem());
   libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
@@ -280,43 +280,43 @@ void Quad9::connectivity(const unsigned int sf,
     {
     case TECPLOT:
       {
-	switch(sf)
-	  {
-	  case 0:
-	    // linear sub-quad 0
-	    conn[0] = this->node(0)+1;
-	    conn[1] = this->node(4)+1;
-	    conn[2] = this->node(8)+1;
-	    conn[3] = this->node(7)+1;
-	    return;
+        switch(sf)
+          {
+          case 0:
+            // linear sub-quad 0
+            conn[0] = this->node(0)+1;
+            conn[1] = this->node(4)+1;
+            conn[2] = this->node(8)+1;
+            conn[3] = this->node(7)+1;
+            return;
 
-	  case 1:
-	    // linear sub-quad 1
-	    conn[0] = this->node(4)+1;
-	    conn[1] = this->node(1)+1;
-	    conn[2] = this->node(5)+1;
-	    conn[3] = this->node(8)+1;
-	    return;
+          case 1:
+            // linear sub-quad 1
+            conn[0] = this->node(4)+1;
+            conn[1] = this->node(1)+1;
+            conn[2] = this->node(5)+1;
+            conn[3] = this->node(8)+1;
+            return;
 
-	  case 2:
-	    // linear sub-quad 2
-	    conn[0] = this->node(7)+1;
-	    conn[1] = this->node(8)+1;
-	    conn[2] = this->node(6)+1;
-	    conn[3] = this->node(3)+1;
-	    return;
+          case 2:
+            // linear sub-quad 2
+            conn[0] = this->node(7)+1;
+            conn[1] = this->node(8)+1;
+            conn[2] = this->node(6)+1;
+            conn[3] = this->node(3)+1;
+            return;
 
-	  case 3:
-	    // linear sub-quad 3
-	    conn[0] = this->node(8)+1;
-	    conn[1] = this->node(5)+1;
-	    conn[2] = this->node(2)+1;
-	    conn[3] = this->node(6)+1;
-	    return;
+          case 3:
+            // linear sub-quad 3
+            conn[0] = this->node(8)+1;
+            conn[1] = this->node(5)+1;
+            conn[2] = this->node(2)+1;
+            conn[3] = this->node(6)+1;
+            return;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
     case VTK:
@@ -331,55 +331,55 @@ void Quad9::connectivity(const unsigned int sf,
         conn[6] = this->node(6);
         conn[7] = this->node(7);
         conn[8] = this->node(8);
-	return;
+        return;
 
-	  /*
-	switch(sf)
-	  {
-	  case 0:
-	    // linear sub-quad 0
-	    conn[0] = this->node(0);
-	    conn[1] = this->node(4);
-	    conn[2] = this->node(8);
-	    conn[3] = this->node(7);
+        /*
+          switch(sf)
+          {
+          case 0:
+          // linear sub-quad 0
+          conn[0] = this->node(0);
+          conn[1] = this->node(4);
+          conn[2] = this->node(8);
+          conn[3] = this->node(7);
 
-	    return;
+          return;
 
-	  case 1:
-	    // linear sub-quad 1
-	    conn[0] = this->node(4);
-	    conn[1] = this->node(1);
-	    conn[2] = this->node(5);
-	    conn[3] = this->node(8);
+          case 1:
+          // linear sub-quad 1
+          conn[0] = this->node(4);
+          conn[1] = this->node(1);
+          conn[2] = this->node(5);
+          conn[3] = this->node(8);
 
-	    return;
+          return;
 
-	  case 2:
-	    // linear sub-quad 2
-	    conn[0] = this->node(7);
-	    conn[1] = this->node(8);
-	    conn[2] = this->node(6);
-	    conn[3] = this->node(3);
+          case 2:
+          // linear sub-quad 2
+          conn[0] = this->node(7);
+          conn[1] = this->node(8);
+          conn[2] = this->node(6);
+          conn[3] = this->node(3);
 
-	    return;
+          return;
 
-	  case 3:
-	    // linear sub-quad 3
-	    conn[0] = this->node(8);
-	    conn[1] = this->node(5);
-	    conn[2] = this->node(2);
-	    conn[3] = this->node(6);
+          case 3:
+          // linear sub-quad 3
+          conn[0] = this->node(8);
+          conn[1] = this->node(5);
+          conn[2] = this->node(2);
+          conn[3] = this->node(6);
 
-	    return;
+          return;
 
-	  default:
-	    libmesh_error();
-	  }*/
+          default:
+          libmesh_error();
+          }*/
       }
 
     default:
       {
-	libmesh_error();
+        libmesh_error();
       }
     }
 
@@ -397,13 +397,13 @@ unsigned int Quad9::n_second_order_adjacent_vertices (const unsigned int n) cons
       case 5:
       case 6:
       case 7:
-	return 2;
+        return 2;
 
       case 8:
-	return 4;
+        return 4;
 
       default:
-	libmesh_error();
+        libmesh_error();
     }
 
   libmesh_error();
@@ -413,7 +413,7 @@ unsigned int Quad9::n_second_order_adjacent_vertices (const unsigned int n) cons
 
 
 unsigned short int Quad9::second_order_adjacent_vertex (const unsigned int n,
-							const unsigned int v) const
+                                                        const unsigned int v) const
 {
   libmesh_assert_greater_equal (n, this->n_vertices());
   libmesh_assert_less (n, this->n_nodes());
@@ -422,15 +422,15 @@ unsigned short int Quad9::second_order_adjacent_vertex (const unsigned int n,
     {
       case 8:
       {
-	libmesh_assert_less (v, 4);
-	return static_cast<unsigned short int>(v);
+        libmesh_assert_less (v, 4);
+        return static_cast<unsigned short int>(v);
       }
 
       default:
       {
-	libmesh_assert_less (v, 2);
-	// use the matrix that we inherited from \p Quad
-	return _second_order_adjacent_vertices[n-this->n_vertices()][v];
+        libmesh_assert_less (v, 2);
+        // use the matrix that we inherited from \p Quad
+        return _second_order_adjacent_vertices[n-this->n_vertices()][v];
       }
     }
 }

@@ -39,8 +39,8 @@ namespace libMesh
 // ------------------------------------------------------------
 // ImplicitSystem implementation
 ImplicitSystem::ImplicitSystem (EquationSystems& es,
-				const std::string& name_in,
-				const unsigned int number_in) :
+                                const std::string& name_in,
+                                const unsigned int number_in) :
 
   Parent            (es, name_in, number_in),
   matrix            (NULL),
@@ -66,11 +66,11 @@ void ImplicitSystem::clear ()
   // clear any user-added matrices
   {
     for (matrices_iterator pos = _matrices.begin();
-	 pos != _matrices.end(); ++pos)
+         pos != _matrices.end(); ++pos)
       {
         pos->second->clear ();
-	delete pos->second;
-	pos->second = NULL;
+        delete pos->second;
+        pos->second = NULL;
       }
 
     _matrices.clear();
@@ -210,9 +210,9 @@ SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string& mat_name)
   if (!_can_add_matrices)
     {
       libMesh::err << "ERROR: Too late.  Cannot add matrices to the system after initialization"
-		    << std::endl
-		    << " any more.  You should have done this earlier."
-		    << std::endl;
+                   << std::endl
+                   << " any more.  You should have done this earlier."
+                   << std::endl;
       libmesh_error();
     }
 
@@ -263,9 +263,9 @@ const SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string& mat_
   if (pos == _matrices.end())
     {
       libMesh::err << "ERROR: matrix "
-		    << mat_name
-		    << " does not exist in this system!"
-		    << std::endl;
+                   << mat_name
+                   << " does not exist in this system!"
+                   << std::endl;
       libmesh_error();
     }
 
@@ -282,9 +282,9 @@ SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string& mat_name)
   if (pos == _matrices.end())
     {
       libMesh::err << "ERROR: matrix "
-		    << mat_name
-		    << " does not exist in this system!"
-		    << std::endl;
+                   << mat_name
+                   << " does not exist in this system!"
+                   << std::endl;
       libmesh_error();
     }
 
@@ -404,14 +404,14 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
   for (unsigned int i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       {
-	const std::pair<unsigned int, Real> rval =
-	  linear_solver->adjoint_solve (*matrix, this->add_adjoint_solution(i),
-					this->get_adjoint_rhs(i),
-					solver_params.second,
-					solver_params.first);
+        const std::pair<unsigned int, Real> rval =
+          linear_solver->adjoint_solve (*matrix, this->add_adjoint_solution(i),
+                                        this->get_adjoint_rhs(i),
+                                        solver_params.second,
+                                        solver_params.first);
 
-	    totalrval.first  += rval.first;
-	    totalrval.second += rval.second;
+        totalrval.first  += rval.first;
+        totalrval.second += rval.second;
       }
 
   this->release_linear_solver(linear_solver);
@@ -795,20 +795,20 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
           {
             
             if (this->get_dof_map().has_adjoint_dirichlet_boundaries(i))
-	      {
+              {
                 AutoPtr<NumericVector<Number> > lift_func =
-		  this->get_adjoint_solution(i).zero_clone();
+                  this->get_adjoint_solution(i).zero_clone();
                 this->get_dof_map().enforce_constraints_exactly
-		  (*this, lift_func.get(),
-		   /* homogeneous = */ false);
+                  (*this, lift_func.get(),
+                   /* homogeneous = */ false);
                 sensitivities[i][j] = partialq_partialp[i] -
                   partialR_partialp->dot(*lift_func) -
                   partialR_partialp->dot(this->get_adjoint_solution(i));
               }
-	    else
+            else
               sensitivities[i][j] = partialq_partialp[i] -
                 partialR_partialp->dot(this->get_adjoint_solution(i));
-	  }
+          }
     }
 
   // All parameters have been reset.
@@ -1170,16 +1170,16 @@ void ImplicitSystem::qoi_parameter_hessian
 
       for (unsigned int l=0; l != k+1; ++l)
         {
-	  // The second partial derivatives with respect to parameters
-	  // are all calculated via a central finite difference
-	  // stencil:
+          // The second partial derivatives with respect to parameters
+          // are all calculated via a central finite difference
+          // stencil:
           // F''_{kl} ~= (F(p+dp*e_k+dp*e_l) - F(p+dp*e_k-dp*e_l) -
           //              F(p-dp*e_k+dp*e_l) + F(p-dp*e_k-dp*e_l))/(4*dp^2)
-	  // We will add Q''_{kl}(u) and subtract R''_{kl}(u,z) at the
-	  // same time.
-	  //
-	  // We have to be careful with the perturbations to handle
-	  // the k=l case
+          // We will add Q''_{kl}(u) and subtract R''_{kl}(u,z) at the
+          // same time.
+          //
+          // We have to be careful with the perturbations to handle
+          // the k=l case
 
           Number old_parameterl = *parameters[l];
 
@@ -1273,8 +1273,8 @@ void ImplicitSystem::qoi_parameter_hessian
                    tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
                 sensitivities.second_derivative(i,k,l) += current_terms;
 
-		// We use the _uk terms twice; symmetry lets us reuse
-		// these calculations for the _ul terms.
+                // We use the _uk terms twice; symmetry lets us reuse
+                // these calculations for the _ul terms.
 
                 sensitivities.second_derivative(i,l,k) += current_terms;
               }
@@ -1297,8 +1297,8 @@ void ImplicitSystem::qoi_parameter_hessian
                    tempvec->dot(this->get_adjoint_solution(i))) / (2.*delta_p);
                 sensitivities.second_derivative(i,k,l) += current_terms;
 
-		// We use the _uk terms twice; symmetry lets us reuse
-		// these calculations for the _ul terms.
+                // We use the _uk terms twice; symmetry lets us reuse
+                // these calculations for the _ul terms.
 
                 sensitivities.second_derivative(i,l,k) += current_terms;
               }

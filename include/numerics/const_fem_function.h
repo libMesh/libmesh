@@ -38,12 +38,12 @@ public:
   {return AutoPtr<FEMFunctionBase<Output> >( new ConstFEMFunction(*this) ); }
 
   virtual Output operator() (const FEMContext&, const Point&,
-			     const Real /* time */ = 0.)
+                             const Real /* time */ = 0.)
     { return _c; }
 
   virtual void operator() (const FEMContext&, const Point&,
-			   const Real,
-			   DenseVector<Output>& output)
+                           const Real,
+                           DenseVector<Output>& output)
   {for(unsigned int i = 0; i < output.size(); i++ )
       output(i) = _c;}
 

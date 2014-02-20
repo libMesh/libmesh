@@ -55,7 +55,7 @@ public:
    * the output data using \p clear().
    */
   FEComputeData (const EquationSystems& es,
-		 const Point& pin) :
+                 const Point& pin) :
     equation_systems(es),
     p(pin)
   {

@@ -45,7 +45,7 @@ class MeshBase;
 // ------------------------------------------------------------
 // UCDIO class definition
 class UCDIO : public MeshInput<MeshBase>,
-	      public MeshOutput<MeshBase>
+  public MeshOutput<MeshBase>
 {
  public:
 
@@ -80,8 +80,8 @@ class UCDIO : public MeshInput<MeshBase>,
    * in UCD format. This is internally called by MeshOutput::write_equation_systems
    */
   virtual void write_nodal_data(const std::string& fname,
-				const std::vector<Number>&soln,
-				const std::vector<std::string>& names);
+                                const std::vector<Number>&soln,
+                                const std::vector<std::string>& names);
 
 
  private:
@@ -104,7 +104,7 @@ class UCDIO : public MeshInput<MeshBase>,
    * Write UCD format header
    */
   void write_header(std::ostream& out, const MeshBase& mesh,
-		    dof_id_type n_elems, unsigned int n_vars );
+                    dof_id_type n_elems, unsigned int n_vars );
 
   /**
    * Write node information
@@ -120,8 +120,8 @@ class UCDIO : public MeshInput<MeshBase>,
    * Writes all nodal solution variables
    */
   void write_soln(std::ostream& out, const MeshBase& mesh,
-		  const std::vector<std::string>& names,
-		  const std::vector<Number>&soln);
+                  const std::vector<std::string>& names,
+                  const std::vector<Number>&soln);
 
  };
 

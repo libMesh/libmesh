@@ -98,7 +98,7 @@ void RBConstructionBase<Base>::init_data ()
 
 template <class Base>
 void RBConstructionBase<Base>::get_global_max_error_pair(const Parallel::Communicator &communicator,
-							 std::pair<unsigned int, Real>& error_pair)
+                                                         std::pair<unsigned int, Real>& error_pair)
 {
   // Set error_pair.second to the maximum global value and also
   // find which processor contains the maximum value
@@ -214,7 +214,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
   if(deterministic)
   {
     generate_training_parameters_deterministic(this->comm(),
-					       log_param_scale,
+                                               log_param_scale,
                                                training_parameters,
                                                n_training_samples,
                                                mu_min,
@@ -227,7 +227,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
     {
       // Generate random training samples for all parameters
       generate_training_parameters_random(this->comm(),
-					  log_param_scale,
+                                          log_param_scale,
                                           training_parameters,
                                           n_training_samples,
                                           mu_min,
@@ -240,7 +240,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
       // Here we generate a "partially random" training set.
       // Generate deterministic training samples for specified parameter, random for the rest.
       generate_training_parameters_partially_random(this->comm(),
-						    get_deterministic_training_parameter_name(),
+                                                    get_deterministic_training_parameter_name(),
                                                     get_deterministic_training_parameter_repeats(),
                                                     log_param_scale,
                                                     training_parameters,
@@ -319,7 +319,7 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
 
 template <class Base>
 void RBConstructionBase<Base>::generate_training_parameters_random(const Parallel::Communicator &communicator,
-								   std::map<std::string, bool> log_param_scale,
+                                                                   std::map<std::string, bool> log_param_scale,
                                                                    std::map< std::string, NumericVector<Number>* >& training_parameters_in,
                                                                    unsigned int n_training_samples_in,
                                                                    const RBParameters& min_parameters,
@@ -449,7 +449,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
 
 template <class Base>
 void RBConstructionBase<Base>::generate_training_parameters_partially_random(const Parallel::Communicator &communicator,
-									     const std::string& deterministic_training_parameter_name,
+                                                                             const std::string& deterministic_training_parameter_name,
                                                                              const unsigned int deterministic_training_parameter_repeats,
                                                                              std::map<std::string, bool> log_param_scale,
                                                                              std::map< std::string, NumericVector<Number>* >& training_parameters_in,
@@ -636,7 +636,7 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
 
 template <class Base>
 void RBConstructionBase<Base>::generate_training_parameters_deterministic(const Parallel::Communicator &communicator,
-									  std::map<std::string, bool> log_param_scale,
+                                                                          std::map<std::string, bool> log_param_scale,
                                                                           std::map< std::string, NumericVector<Number>* >& training_parameters_in,
                                                                           unsigned int n_training_samples_in,
                                                                           const RBParameters& min_parameters,
@@ -890,31 +890,31 @@ RBConstructionBase<Base>::set_alternative_solver
 #ifdef LIBMESH_HAVE_PETSC_HYPRE
       // Set solver/PC combo specified in input file...
       if (this->alternative_solver == "amg")
-	{
-	  // Set HYPRE and boomeramg PC types
-	  ierr = PCSetType(pc, PCHYPRE); LIBMESH_CHKERRABORT(ierr);
-	  ierr = PCHYPRESetType(pc, "boomeramg"); LIBMESH_CHKERRABORT(ierr);
-	}
+        {
+          // Set HYPRE and boomeramg PC types
+          ierr = PCSetType(pc, PCHYPRE); LIBMESH_CHKERRABORT(ierr);
+          ierr = PCHYPRESetType(pc, "boomeramg"); LIBMESH_CHKERRABORT(ierr);
+        }
 #endif // LIBMESH_HAVE_PETSC_HYPRE
       if (this->alternative_solver == "mumps")
-	{
-	  // We'll use MUMPS... TODO: configure libmesh to detect
-	  // when MUMPS is available via PETSc.
+        {
+          // We'll use MUMPS... TODO: configure libmesh to detect
+          // when MUMPS is available via PETSc.
 
-	  // No initial guesses can be specified with KSPPREONLY.  We
-	  // can leave the solver as gmres or whatever and it should
-	  // converge in 1 iteration.  Otherwise, to use KSPPREONLY,
-	  // you may need to do:
-	  // KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
-	  // ierr = KSPSetType(ksp, KSPPREONLY); LIBMESH_CHKERRABORT(ierr);
+          // No initial guesses can be specified with KSPPREONLY.  We
+          // can leave the solver as gmres or whatever and it should
+          // converge in 1 iteration.  Otherwise, to use KSPPREONLY,
+          // you may need to do:
+          // KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
+          // ierr = KSPSetType(ksp, KSPPREONLY); LIBMESH_CHKERRABORT(ierr);
 
-	  // Need to call the equivalent for the command line options:
-	  // -ksp_type preonly -pc_type lu -pc_factor_mat_solver_package mumps
-	  ierr = PCSetType(pc, PCLU); LIBMESH_CHKERRABORT(ierr);
+          // Need to call the equivalent for the command line options:
+          // -ksp_type preonly -pc_type lu -pc_factor_mat_solver_package mumps
+          ierr = PCSetType(pc, PCLU); LIBMESH_CHKERRABORT(ierr);
 #if !(PETSC_VERSION_LESS_THAN(3,0,0))
-	  ierr = PCFactorSetMatSolverPackage(pc,"mumps"); LIBMESH_CHKERRABORT(ierr);
+          ierr = PCFactorSetMatSolverPackage(pc,"mumps"); LIBMESH_CHKERRABORT(ierr);
 #endif
-	}
+        }
     }
   else
     {
@@ -949,20 +949,20 @@ void RBConstructionBase<Base>::reset_alternative_solver(
       // this->linear_solver->set_preconditioner_type(orig_pc);
       // Set PC back to its previous type
       PetscLinearSolver<Number>* petsc_linear_solver =
-	libmesh_cast_ptr<PetscLinearSolver<Number>*>(ls.get());
+        libmesh_cast_ptr<PetscLinearSolver<Number>*>(ls.get());
 
       int ierr = 0;
       PC pc;
       KSP ksp;
 
       if (petsc_linear_solver)
-	{
-	  pc = petsc_linear_solver->pc();
-	  ierr = PCSetType(pc, orig.first.c_str()); LIBMESH_CHKERRABORT(ierr);
+        {
+          pc = petsc_linear_solver->pc();
+          ierr = PCSetType(pc, orig.first.c_str()); LIBMESH_CHKERRABORT(ierr);
 
-	  ksp = petsc_linear_solver->ksp();
-	  ierr = KSPSetType(ksp, orig.second.c_str()); LIBMESH_CHKERRABORT(ierr);
-	}
+          ksp = petsc_linear_solver->ksp();
+          ierr = KSPSetType(ksp, orig.second.c_str()); LIBMESH_CHKERRABORT(ierr);
+        }
     }
 
 #endif

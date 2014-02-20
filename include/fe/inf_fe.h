@@ -147,7 +147,7 @@ protected:
      * Therefore, we have a total of \p o_radial+1 modes in radial direction.
      */
     static unsigned int n_dofs (const Order o_radial)
-	{ return static_cast<unsigned int>(o_radial)+1; }
+    { return static_cast<unsigned int>(o_radial)+1; }
 
     /**
      * @returns the number of dofs in radial direction on "onion slice"
@@ -159,7 +159,7 @@ protected:
      * the physically existing nodes further out.
      */
     static unsigned int n_dofs_at_node (const Order o_radial,
-					const unsigned int n_onion);
+                                        const unsigned int n_onion);
 
     /**
      * @returns the number of modes in radial direction interior to the element,
@@ -169,7 +169,7 @@ protected:
      * case of associating (possibly) multiple dofs per (outer) node.
      */
     static unsigned int n_dofs_per_elem (const Order o_radial)
-	{ return static_cast<unsigned int>(o_radial)+1; }
+    { return static_cast<unsigned int>(o_radial)+1; }
 
   };
 
@@ -216,7 +216,7 @@ protected:
      * mapped with order \p base_mapping_order
      */
     static unsigned int n_base_mapping_sf (const ElemType base_elem_type,
-					   const Order base_mapping_order);
+                                           const Order base_mapping_order);
 
   };
 
@@ -270,9 +270,9 @@ public:
    * methods should only be used for mapping.
    */
   static Real shape(const FEType& fet,
-		    const ElemType t,
-		    const unsigned int i,
-		    const Point& p);
+                    const ElemType t,
+                    const unsigned int i,
+                    const Point& p);
 
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
@@ -286,9 +286,9 @@ public:
    * methods should only be used for mapping.
    */
   static Real shape(const FEType& fet,
-		    const Elem* elem,
-		    const unsigned int i,
-		    const Point& p);
+                    const Elem* elem,
+                    const unsigned int i,
+                    const Point& p);
 
   /**
    * Generalized version of \p shape(), takes an \p Elem*.  The \p data
@@ -300,15 +300,15 @@ public:
    * the results are.  Pretty weird, hm!?
    */
   static void compute_data(const FEType& fe_t,
-			   const Elem* inf_elem,
-			   FEComputeData& data);
+                           const Elem* inf_elem,
+                           FEComputeData& data);
 
   /**
    * @returns the number of shape functions associated with
    * a finite element of type \p t and approximation order \p o.
    */
   static unsigned int n_shape_functions (const FEType& fet,
-					 const ElemType t)
+                                         const ElemType t)
     { return n_dofs(fet, t); }
 
   /**
@@ -317,22 +317,22 @@ public:
    * radial direction, and \p FE<Dim-1,T>::n_dofs(...) in the base.
    */
   static unsigned int n_dofs(const FEType& fet,
-			     const ElemType inf_elem_type);
+                             const ElemType inf_elem_type);
 
   /**
    * @returns the number of dofs at infinite element @e node \p n
    * (not dof!) for an element of type \p t and order \p o.
    */
   static unsigned int n_dofs_at_node(const FEType& fet,
-				     const ElemType inf_elem_type,
-				     const unsigned int n);
+                                     const ElemType inf_elem_type,
+                                     const unsigned int n);
 
   /**
    * @returns the number of dofs interior to the element,
    * not associated with any interior nodes.
    */
   static unsigned int n_dofs_per_elem(const FEType& fet,
-				      const ElemType inf_elem_type);
+                                      const ElemType inf_elem_type);
 
   /**
    * @returns the continuity of the element.
@@ -355,9 +355,9 @@ public:
    * compatibility an empty vector is returned.
    */
   static void nodal_soln(const FEType& fet,
-			 const Elem* elem,
-			 const std::vector<Number>& elem_soln,
-			 std::vector<Number>& nodal_soln);
+                         const Elem* elem,
+                         const std::vector<Number>& elem_soln,
+                         std::vector<Number>& nodal_soln);
 
   /**
    * @returns the location (on the reference element) of the
@@ -375,10 +375,10 @@ public:
    * in radial direction.
    */
   static Point inverse_map (const Elem* elem,
-			    const Point& p,
-			    const Real tolerance = TOLERANCE,
-			    const bool secure = true,
-			    const bool interpolated = true);
+                            const Point& p,
+                            const Real tolerance = TOLERANCE,
+                            const bool secure = true,
+                            const bool interpolated = true);
 
 
   /**
@@ -388,10 +388,10 @@ public:
    * returned in the vector \p reference_points
    */
   static void inverse_map (const Elem* elem,
-			   const std::vector<Point>& physical_points,
-			   std::vector<Point>&       reference_points,
-			   const Real tolerance = TOLERANCE,
-			   const bool secure = true);
+                           const std::vector<Point>& physical_points,
+                           std::vector<Point>&       reference_points,
+                           const Real tolerance = TOLERANCE,
+                           const bool secure = true);
 
 
   //-------------------------------------------------------------
@@ -403,7 +403,7 @@ public:
    * \p elem.
    */
   virtual void reinit (const Elem* elem,
-		       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Point>* const pts = NULL,
                        const std::vector<Real>* const weights = NULL);
 
   /**
@@ -412,8 +412,8 @@ public:
    * element.
    */
   virtual void reinit (const Elem* elem,
-		       const unsigned int side,
-		       const Real tolerance = TOLERANCE,
+                       const unsigned int side,
+                       const Real tolerance = TOLERANCE,
                        const std::vector<Point>* const pts = NULL,
                        const std::vector<Real>* const weights = NULL);
 
@@ -423,8 +423,8 @@ public:
    * element.
    */
   virtual void edge_reinit (const Elem* elem,
-		            const unsigned int edge,
-			    const Real tolerance = TOLERANCE,
+                            const unsigned int edge,
+                            const Real tolerance = TOLERANCE,
                             const std::vector<Point>* const pts = NULL,
                             const std::vector<Real>* const weights = NULL);
 
@@ -492,8 +492,8 @@ protected:
    * @e Computers @e and @e Structures, 1984.
    */
   static Real eval(Real v,
-		   Order o_radial,
-		   unsigned int i);
+                   Order o_radial,
+                   unsigned int i);
 
   /**
    * @returns the value of the first derivative of the
@@ -501,8 +501,8 @@ protected:
    * See \p eval for details.
    */
   static Real eval_deriv(Real v,
-			 Order o_radial,
-			 unsigned int i);
+                         Order o_radial,
+                         unsigned int i);
 
 
 
@@ -518,7 +518,7 @@ protected:
    * Do not use this derived member in \p InfFE<Dim,T_radial,T_map>.
    */
   virtual void init_base_shape_functions(const std::vector<Point>&,
-					 const Elem*)
+                                         const Elem*)
   { libmesh_error(); }
 
   /**
@@ -541,7 +541,7 @@ protected:
    * \p phi, etc for the side \p s.
    */
   void init_face_shape_functions (const std::vector<Point>& qp,
-				  const Elem* side);
+                                  const Elem* side);
 
   /**
    * Combines the shape functions, which were formed in
@@ -576,7 +576,7 @@ protected:
    * \p p located on the reference element.
    */
   static Point map (const Elem* inf_elem,
-		    const Point& reference_point);
+                    const Point& reference_point);
 
   /**
    * Computes the indices in the base \p base_node and in radial
@@ -585,9 +585,9 @@ protected:
    * \p inf_elem_type.
    */
   static void compute_node_indices (const ElemType inf_elem_type,
-				    const unsigned int outer_node_index,
-				    unsigned int& base_node,
-				    unsigned int& radial_node);
+                                    const unsigned int outer_node_index,
+                                    unsigned int& base_node,
+                                    unsigned int& radial_node);
 
   /**
    * Does the same as \p compute_node_indices(), but stores
@@ -598,9 +598,9 @@ protected:
    * to change.
    */
   static void compute_node_indices_fast (const ElemType inf_elem_type,
-					 const unsigned int outer_node_index,
-					 unsigned int& base_node,
-					 unsigned int& radial_node);
+                                         const unsigned int outer_node_index,
+                                         unsigned int& base_node,
+                                         unsigned int& radial_node);
 
   /**
    * Computes the indices of shape functions in the base \p base_shape and
@@ -609,10 +609,10 @@ protected:
    * of type \p inf_elem_type.
    */
   static void compute_shape_indices (const FEType& fet,
-				     const ElemType inf_elem_type,
-				     const unsigned int i,
-				     unsigned int& base_shape,
-				     unsigned int& radial_shape);
+                                     const ElemType inf_elem_type,
+                                     const unsigned int i,
+                                     unsigned int& base_shape,
+                                     unsigned int& radial_shape);
 
   //--------------------------------------------------------------
   // protected members, which are not to be accessed from outside

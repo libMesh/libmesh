@@ -60,7 +60,7 @@ class GnuPlotIO : public MeshOutput<MeshBase>
    */
   explicit
   GnuPlotIO (const MeshBase&,
-	     const std::string& = std::string("FE 1D Solution"),
+             const std::string& = std::string("FE 1D Solution"),
              int properties=0);
 
   /**
@@ -73,8 +73,8 @@ class GnuPlotIO : public MeshOutput<MeshBase>
    * specified file where the nodal data and variable names are provided.
    */
   virtual void write_nodal_data (const std::string&,
-				 const std::vector<Number>&,
-				 const std::vector<std::string>&);
+                                 const std::vector<Number>&,
+                                 const std::vector<std::string>&);
 
   /**
    * Set title of plot
@@ -109,8 +109,8 @@ class GnuPlotIO : public MeshOutput<MeshBase>
    * provided.  This will write an ASCII file.
    */
   void write_solution (const std::string&,
-		       const std::vector<Number>* = NULL,
-		       const std::vector<std::string>* = NULL);
+                       const std::vector<Number>* = NULL,
+                       const std::vector<std::string>* = NULL);
 
   std::string _title;
 

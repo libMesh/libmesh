@@ -36,7 +36,7 @@ typedef std::vector<Point>::const_iterator   const_list_iterator;
 //------------------------------------------------------------------
 // PointLocator methods
 PointLocatorList::PointLocatorList (const MeshBase& mesh,
-				    const PointLocatorBase* master) :
+                                    const PointLocatorBase* master) :
   PointLocatorBase (mesh,master),
   _list            (NULL)
 {
@@ -67,13 +67,13 @@ void PointLocatorList::clear ()
     {
       if (this->_master == NULL)
         {
-	  // we own the list
-	  this->_list->clear();
-	  delete this->_list;
-	}
+          // we own the list
+          this->_list->clear();
+          delete this->_list;
+        }
       else
-	  // someone else owns and therefore deletes the list
-	  this->_list = NULL;
+        // someone else owns and therefore deletes the list
+        this->_list = NULL;
     }
 }
 
@@ -88,7 +88,7 @@ void PointLocatorList::init ()
   if (this->_initialized)
     {
       libMesh::err << "ERROR: Already initialized!  Will ignore this call..."
-		    << std::endl;
+                   << std::endl;
     }
 
   else
@@ -99,49 +99,49 @@ void PointLocatorList::init ()
         {
           START_LOG("init(no master)", "PointLocatorList");
 
-	  // We are the master, so we have to build the list.
-	  // First create it, then get a handy reference, and
-	  // then try to speed up by reserving space...
-	  this->_list = new std::vector<std::pair<Point, const Elem *> >;
-	  std::vector<std::pair<Point, const Elem *> >& my_list = *(this->_list);
+          // We are the master, so we have to build the list.
+          // First create it, then get a handy reference, and
+          // then try to speed up by reserving space...
+          this->_list = new std::vector<std::pair<Point, const Elem *> >;
+          std::vector<std::pair<Point, const Elem *> >& my_list = *(this->_list);
 
-	  my_list.clear();
-	  my_list.reserve(this->_mesh.n_active_elem());
+          my_list.clear();
+          my_list.reserve(this->_mesh.n_active_elem());
 
-	  // fill our list with the centroids and element
-	  // pointers of the mesh.  For this use the handy
-	  // element iterators.
-// 	  const_active_elem_iterator       el (this->_mesh.elements_begin());
-// 	  const const_active_elem_iterator end(this->_mesh.elements_end());
+          // fill our list with the centroids and element
+          // pointers of the mesh.  For this use the handy
+          // element iterators.
+          //   const_active_elem_iterator       el (this->_mesh.elements_begin());
+          //   const const_active_elem_iterator end(this->_mesh.elements_end());
 
-	  MeshBase::const_element_iterator       el  = _mesh.active_elements_begin();
-	  const MeshBase::const_element_iterator end = _mesh.active_elements_end();
+          MeshBase::const_element_iterator       el  = _mesh.active_elements_begin();
+          const MeshBase::const_element_iterator end = _mesh.active_elements_end();
 
-	  for (; el!=end; ++el)
-	    my_list.push_back(std::make_pair((*el)->centroid(), *el));
+          for (; el!=end; ++el)
+            my_list.push_back(std::make_pair((*el)->centroid(), *el));
 
           STOP_LOG("init(no master)", "PointLocatorList");
-	}
+        }
 
       else
 
         {
-	  // We are _not_ the master.  Let our _list point to
-	  // the master's list.  But for this we first transform
-	  // the master in a state for which we are friends
-	  // (this should also beware of a bad master pointer?).
-	  // And make sure the master @e has a list!
-	  const PointLocatorList* my_master =
-	    libmesh_cast_ptr<const PointLocatorList*>(this->_master);
+          // We are _not_ the master.  Let our _list point to
+          // the master's list.  But for this we first transform
+          // the master in a state for which we are friends
+          // (this should also beware of a bad master pointer?).
+          // And make sure the master @e has a list!
+          const PointLocatorList* my_master =
+            libmesh_cast_ptr<const PointLocatorList*>(this->_master);
 
-	  if (my_master->initialized())
-	    this->_list = my_master->_list;
-	  else
-	    {
-	      libMesh::err << "ERROR: Initialize master first, then servants!"
-			    << std::endl;
-	      libmesh_error();
-	    }
+          if (my_master->initialized())
+            this->_list = my_master->_list;
+          else
+            {
+              libMesh::err << "ERROR: Initialize master first, then servants!"
+                           << std::endl;
+              libmesh_error();
+            }
         }
 
     }
@@ -189,13 +189,13 @@ const Elem* PointLocatorList::operator() (const Point& p) const
 
     for (std::size_t n=1; n<max_index; n++)
       {
-	const Real current_distance_sq = Point(my_list[n].first -p).size_sq();
+        const Real current_distance_sq = Point(my_list[n].first -p).size_sq();
 
-	if (current_distance_sq < last_distance_sq)
-	  {
-	    last_distance_sq = current_distance_sq;
-	    last_elem        = my_list[n].second;
-	  }
+        if (current_distance_sq < last_distance_sq)
+          {
+            last_distance_sq = current_distance_sq;
+            last_elem        = my_list[n].second;
+          }
       }
 
     // If we found an element, it should be active

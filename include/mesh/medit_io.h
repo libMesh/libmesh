@@ -76,8 +76,8 @@ class MEDITIO : public MeshOutput<MeshBase>
    * specified file where the nodal data and variable names are provided.
    */
   virtual void write_nodal_data (const std::string&,
-				 const std::vector<Number>&,
-				 const std::vector<std::string>&);
+                                 const std::vector<Number>&,
+                                 const std::vector<std::string>&);
 
   /**
    * Flag indicating whether or not to write a binary file
@@ -92,8 +92,8 @@ private:
    * provided.  This will write an ASCII file.
    */
   virtual void write_ascii (const std::string&,
-			    const std::vector<Number>* = NULL,
-			    const std::vector<std::string>* = NULL);
+                            const std::vector<Number>* = NULL,
+                            const std::vector<std::string>* = NULL);
 
   /**
    * Flag to write binary data.

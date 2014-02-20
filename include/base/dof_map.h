@@ -119,7 +119,7 @@ class AdjointDofConstraintValues :
   public std::map<unsigned int, DofConstraintValueMap,
                   std::less<unsigned int>,
                   Threads::scalable_allocator
-	            <std::pair<const unsigned int, DofConstraintValueMap> > >
+    <std::pair<const unsigned int, DofConstraintValueMap> > >
 {
 };
 
@@ -165,7 +165,7 @@ class NodeConstraints : public std::map<const Node *,
  * @author Benjamin S. Kirk, 2002-2007
  */
   class DofMap : public ReferenceCountedObject<DofMap>,
-		 public ParallelObject
+  public ParallelObject
 {
 public:
 
@@ -176,7 +176,7 @@ public:
    */
   explicit
   DofMap(const unsigned int sys_number,
-	 const ParallelObject &parent_decomp);
+         const ParallelObject &parent_decomp);
 
   /**
    * Destructor.
@@ -196,8 +196,8 @@ public:
      * User-defined function to augment the sparsity pattern.
      */
     virtual void augment_sparsity_pattern (SparsityPattern::Graph & sparsity,
-					   std::vector<dof_id_type> & n_nz,
-					   std::vector<dof_id_type> & n_oz) = 0;
+                                           std::vector<dof_id_type> & n_nz,
+                                           std::vector<dof_id_type> & n_oz) = 0;
   };
 
   /**
@@ -509,15 +509,15 @@ public:
    * for the element.
    */
   void dof_indices (const Elem* const elem,
-		    std::vector<dof_id_type>& di) const;
+                    std::vector<dof_id_type>& di) const;
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
    * for the element.  For one variable
    */
   void dof_indices (const Elem* const elem,
-		    std::vector<dof_id_type>& di,
-		    const unsigned int vn) const;
+                    std::vector<dof_id_type>& di,
+                    const unsigned int vn) const;
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
@@ -526,8 +526,8 @@ public:
    * need to pass in an element since SCALARs are global variables.
    */
   void SCALAR_dof_indices (std::vector<dof_id_type>& di,
-		           const unsigned int vn,
-		           const bool old_dofs=false) const;
+                           const unsigned int vn,
+                           const bool old_dofs=false) const;
 
   /**
    * Returns \p true iff all degree of freedom indices in
@@ -556,8 +556,8 @@ public:
    * is no \p resize() method in the \p DenseVectorBase<> class.
    */
   void extract_local_vector (const NumericVector<Number>& Ug,
-			     const std::vector<dof_id_type>& dof_indices,
-			     DenseVectorBase<Number>& Ue) const;
+                             const std::vector<dof_id_type>& dof_indices,
+                             DenseVectorBase<Number>& Ue) const;
 
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -717,7 +717,7 @@ public:
    * If \p v == NULL, the system solution vector is tested.
    */
   std::pair<Real, Real> max_constraint_error(const System &system,
-					     NumericVector<Number> *v = NULL) const;
+                                             NumericVector<Number> *v = NULL) const;
 
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 
@@ -742,8 +742,8 @@ public:
    * solutions more likely to satisfy hanging node constraints.
    */
   void constrain_element_matrix (DenseMatrix<Number>& matrix,
-				 std::vector<dof_id_type>& elem_dofs,
-				 bool asymmetric_constraint_rows = true) const;
+                                 std::vector<dof_id_type>& elem_dofs,
+                                 bool asymmetric_constraint_rows = true) const;
 
   /**
    * Constrains the element matrix.  This method allows the
@@ -752,16 +752,16 @@ public:
    * variables approximated in different spaces.
    */
   void constrain_element_matrix (DenseMatrix<Number>& matrix,
-				 std::vector<dof_id_type>& row_dofs,
-				 std::vector<dof_id_type>& col_dofs,
-				 bool asymmetric_constraint_rows = true) const;
+                                 std::vector<dof_id_type>& row_dofs,
+                                 std::vector<dof_id_type>& col_dofs,
+                                 bool asymmetric_constraint_rows = true) const;
 
   /**
    * Constrains the element vector.
    */
   void constrain_element_vector (DenseVector<Number>&       rhs,
-				 std::vector<dof_id_type>& dofs,
-				 bool asymmetric_constraint_rows = true) const;
+                                 std::vector<dof_id_type>& dofs,
+                                 bool asymmetric_constraint_rows = true) const;
 
   /**
    * Constrains the element matrix and vector.  This method requires
@@ -772,9 +772,9 @@ public:
    * of the same approximation order.
    */
   void constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
-					    DenseVector<Number>& rhs,
-					    std::vector<dof_id_type>& elem_dofs,
-					    bool asymmetric_constraint_rows = true) const;
+                                            DenseVector<Number>& rhs,
+                                            std::vector<dof_id_type>& elem_dofs,
+                                            bool asymmetric_constraint_rows = true) const;
 
   /**
    * Constrains the element matrix and vector.  This method requires
@@ -843,9 +843,9 @@ public:
    * same approximation order.
    */
   void constrain_element_dyad_matrix (DenseVector<Number>& v,
-				      DenseVector<Number>& w,
-				      std::vector<dof_id_type>& row_dofs,
-				      bool asymmetric_constraint_rows = true) const;
+                                      DenseVector<Number>& w,
+                                      std::vector<dof_id_type>& row_dofs,
+                                      bool asymmetric_constraint_rows = true) const;
 
   /**
    * Does not actually constrain anything, but modifies \p dofs in the
@@ -869,7 +869,7 @@ public:
    * heterogeneously-constrained solutions.
    */
   void enforce_constraints_exactly (const System &system,
-				    NumericVector<Number> *v = NULL,
+                                    NumericVector<Number> *v = NULL,
                                     bool homogeneous = false) const;
 
   /**
@@ -931,7 +931,7 @@ public:
    * Interest \p q.
    */
   void add_adjoint_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary,
-				       unsigned int q);
+                                       unsigned int q);
 
   /**
    * Removes the specified Dirichlet boundary from the system.
@@ -943,7 +943,7 @@ public:
    * adjoint equation defined by Quantity of interest index q
    */
   void remove_adjoint_dirichlet_boundary (const DirichletBoundary& dirichlet_boundary,
-					  unsigned int q);
+                                          unsigned int q);
 
   const DirichletBoundaries * get_dirichlet_boundaries() const
     {
@@ -988,8 +988,8 @@ public:
    * variables are returned.
    */
   void old_dof_indices (const Elem* const elem,
-			std::vector<dof_id_type>& di,
-			const unsigned int vn = libMesh::invalid_uint) const;
+                        std::vector<dof_id_type>& di,
+                        const unsigned int vn = libMesh::invalid_uint) const;
   /**
    * @returns the total number of degrees of freedom on old_dof_objects
    *
@@ -1002,9 +1002,9 @@ public:
    * above \p p.
    */
   void constrain_p_dofs (unsigned int var,
-			 const Elem *elem,
-			 unsigned int s,
-			 unsigned int p);
+                         const Elem *elem,
+                         unsigned int s,
+                         unsigned int p);
 
 #endif // LIBMESH_ENABLE_AMR
 
@@ -1094,9 +1094,9 @@ private:
    */
   template<typename iterator_type>
   void set_nonlocal_dof_objects(iterator_type objects_begin,
-			        iterator_type objects_end,
-			        MeshBase &mesh,
-			        dofobject_accessor objects);
+                                iterator_type objects_end,
+                                MeshBase &mesh,
+                                dofobject_accessor objects);
 
   /**
    * Distributes the global degrees of freedom, for dofs on
@@ -1107,7 +1107,7 @@ private:
    * the post-final index.
    */
   void distribute_local_dofs_var_major (dof_id_type& next_free_dof,
-				        MeshBase& mesh);
+                                        MeshBase& mesh);
 
   /**
    * Distributes the global degrees of freedom, for dofs on
@@ -1122,7 +1122,7 @@ private:
    * false, clears and reserves the send list
    */
   void distribute_local_dofs_node_major (dof_id_type& next_free_dof,
-				         MeshBase& mesh);
+                                         MeshBase& mesh);
 
   /**
    * Adds entries to the \p _send_list vector corresponding to DoFs
@@ -1143,8 +1143,8 @@ private:
    * external DOFs.
    */
   void build_constraint_matrix (DenseMatrix<Number>& C,
-				std::vector<dof_id_type>& elem_dofs,
-				const bool called_recursively=false) const;
+                                std::vector<dof_id_type>& elem_dofs,
+                                const bool called_recursively=false) const;
 
   /**
    * Build the constraint matrix C and the forcing vector H
@@ -1478,30 +1478,30 @@ bool DofMap::has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
   // use them.
 
 inline void DofMap::constrain_element_matrix (DenseMatrix<Number>&,
-				              std::vector<dof_id_type>&,
-				              bool) const {}
+                                              std::vector<dof_id_type>&,
+                                              bool) const {}
 
 inline void DofMap::constrain_element_matrix (DenseMatrix<Number>&,
-				              std::vector<dof_id_type>&,
-				              std::vector<dof_id_type>&,
-				              bool) const {}
+                                              std::vector<dof_id_type>&,
+                                              std::vector<dof_id_type>&,
+                                              bool) const {}
 
 inline void DofMap::constrain_element_vector (DenseVector<Number>&,
-				              std::vector<dof_id_type>&,
-				              bool) const {}
+                                              std::vector<dof_id_type>&,
+                                              bool) const {}
 
 inline void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>&,
-					                 DenseVector<Number>&,
-					                 std::vector<dof_id_type>&,
-					                 bool) const {}
+                                                         DenseVector<Number>&,
+                                                         std::vector<dof_id_type>&,
+                                                         bool) const {}
 
 inline void DofMap::constrain_element_dyad_matrix (DenseVector<Number>&,
-				                   DenseVector<Number>&,
-				                   std::vector<dof_id_type>&,
-				                   bool) const {}
+                                                   DenseVector<Number>&,
+                                                   std::vector<dof_id_type>&,
+                                                   bool) const {}
 
 inline void DofMap::enforce_constraints_exactly (const System &,
-				                 NumericVector<Number> *,
+                                                 NumericVector<Number> *,
                                                  bool = false) const {}
 
 inline void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> *,

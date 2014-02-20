@@ -72,8 +72,8 @@ namespace
             continue;
 
           // Otherwise, we will defer to the point neighbor, but only if
-	  // one of its sides is on a relevant boundary and that side
-	  // contains this vertex
+          // one of its sides is on a relevant boundary and that side
+          // contains this vertex
           bool vertex_on_periodic_side = false;
           for (unsigned int ns = 0;
                ns != pt_neighbor->n_sides(); ++ns)
@@ -81,15 +81,15 @@ namespace
               const std::vector<boundary_id_type> bc_ids =
                 boundary_info.boundary_ids (pt_neighbor, ns);
 
-	      bool on_relevant_boundary = false;
-	      for (std::set<boundary_id_type>::const_iterator i =
-		   boundary_ids.begin(); i != boundary_ids.end(); ++i)
+              bool on_relevant_boundary = false;
+              for (std::set<boundary_id_type>::const_iterator i =
+                     boundary_ids.begin(); i != boundary_ids.end(); ++i)
                 if (std::find(bc_ids.begin(), bc_ids.end(), *i)
                     != bc_ids.end())
                   on_relevant_boundary = true;
 
-	      if (!on_relevant_boundary)
-		continue;
+              if (!on_relevant_boundary)
+                continue;
 
               if (!pt_neighbor->build_side(ns)->contains_point(p))
                 continue;
@@ -144,15 +144,15 @@ namespace
               const std::vector<boundary_id_type>& bc_ids =
                 boundary_info.boundary_ids (e_neighbor, ns);
 
-	      bool on_relevant_boundary = false;
-	      for (std::set<boundary_id_type>::const_iterator i =
-		   boundary_ids.begin(); i != boundary_ids.end(); ++i)
+              bool on_relevant_boundary = false;
+              for (std::set<boundary_id_type>::const_iterator i =
+                     boundary_ids.begin(); i != boundary_ids.end(); ++i)
               if (std::find(bc_ids.begin(), bc_ids.end(), *i)
                   != bc_ids.end())
                 on_relevant_boundary = true;
 
-	      if (!on_relevant_boundary)
-		continue;
+              if (!on_relevant_boundary)
+                continue;
 
               AutoPtr<Elem> periodic_side = e_neighbor->build_side(ns);
               if (!(periodic_side->contains_point(p1) &&
@@ -182,7 +182,7 @@ namespace libMesh
 template <>
 AutoPtr<FEGenericBase<Real> >
 FEGenericBase<Real>::build (const unsigned int dim,
-			    const FEType& fet)
+                            const FEType& fet)
 {
   // The stupid AutoPtr<FEBase> ap(); return ap;
   // construct is required to satisfy IBM's xlC
@@ -192,318 +192,318 @@ FEGenericBase<Real>::build (const unsigned int dim,
       // 0D
     case 0:
       {
-	switch (fet.family)
-	  {
-	  case CLOUGH:
-	    {
-	      AutoPtr<FEBase> ap(new FE<0,CLOUGH>(fet));
-	      return ap;
-	    }
+        switch (fet.family)
+          {
+          case CLOUGH:
+            {
+              AutoPtr<FEBase> ap(new FE<0,CLOUGH>(fet));
+              return ap;
+            }
 
-	  case HERMITE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<0,HERMITE>(fet));
-	      return ap;
-	    }
+          case HERMITE:
+            {
+              AutoPtr<FEBase> ap(new FE<0,HERMITE>(fet));
+              return ap;
+            }
 
-	  case LAGRANGE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<0,LAGRANGE>(fet));
-	      return ap;
-	    }
+          case LAGRANGE:
+            {
+              AutoPtr<FEBase> ap(new FE<0,LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case L2_LAGRANGE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<0,L2_LAGRANGE>(fet));
-	      return ap;
-	    }
+          case L2_LAGRANGE:
+            {
+              AutoPtr<FEBase> ap(new FE<0,L2_LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case HIERARCHIC:
-	    {
-	      AutoPtr<FEBase> ap(new FE<0,HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case HIERARCHIC:
+            {
+              AutoPtr<FEBase> ap(new FE<0,HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case L2_HIERARCHIC:
-	    {
-	      AutoPtr<FEBase> ap(new FE<0,L2_HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case L2_HIERARCHIC:
+            {
+              AutoPtr<FEBase> ap(new FE<0,L2_HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case MONOMIAL:
-	    {
-	      AutoPtr<FEBase> ap(new FE<0,MONOMIAL>(fet));
-	      return ap;
-	    }
+          case MONOMIAL:
+            {
+              AutoPtr<FEBase> ap(new FE<0,MONOMIAL>(fet));
+              return ap;
+            }
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-	  case SZABAB:
-	    {
-	      AutoPtr<FEBase> ap(new FE<0,SZABAB>(fet));
-	      return ap;
-	    }
+          case SZABAB:
+            {
+              AutoPtr<FEBase> ap(new FE<0,SZABAB>(fet));
+              return ap;
+            }
 
-	  case BERNSTEIN:
-	    {
-	      AutoPtr<FEBase> ap(new FE<0,BERNSTEIN>(fet));
-	      return ap;
-	    }
+          case BERNSTEIN:
+            {
+              AutoPtr<FEBase> ap(new FE<0,BERNSTEIN>(fet));
+              return ap;
+            }
 #endif
 
-	  case XYZ:
-	    {
-	      AutoPtr<FEBase> ap(new FEXYZ<0>(fet));
-	      return ap;
-	    }
+          case XYZ:
+            {
+              AutoPtr<FEBase> ap(new FEXYZ<0>(fet));
+              return ap;
+            }
 
           case SCALAR:
           {
-	      AutoPtr<FEBase> ap(new FEScalar<0>(fet));
-	      return ap;
+            AutoPtr<FEBase> ap(new FEScalar<0>(fet));
+            return ap;
           }
 
-	  default:
-	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-	    libmesh_error();
-	  }
+          default:
+            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+            libmesh_error();
+          }
       }
       // 1D
     case 1:
       {
-	switch (fet.family)
-	  {
-	  case CLOUGH:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,CLOUGH>(fet));
-	      return ap;
-	    }
+        switch (fet.family)
+          {
+          case CLOUGH:
+            {
+              AutoPtr<FEBase> ap(new FE<1,CLOUGH>(fet));
+              return ap;
+            }
 
-	  case HERMITE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,HERMITE>(fet));
-	      return ap;
-	    }
+          case HERMITE:
+            {
+              AutoPtr<FEBase> ap(new FE<1,HERMITE>(fet));
+              return ap;
+            }
 
-	  case LAGRANGE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,LAGRANGE>(fet));
-	      return ap;
-	    }
+          case LAGRANGE:
+            {
+              AutoPtr<FEBase> ap(new FE<1,LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case L2_LAGRANGE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,L2_LAGRANGE>(fet));
-	      return ap;
-	    }
+          case L2_LAGRANGE:
+            {
+              AutoPtr<FEBase> ap(new FE<1,L2_LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case HIERARCHIC:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case HIERARCHIC:
+            {
+              AutoPtr<FEBase> ap(new FE<1,HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case L2_HIERARCHIC:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,L2_HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case L2_HIERARCHIC:
+            {
+              AutoPtr<FEBase> ap(new FE<1,L2_HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case MONOMIAL:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,MONOMIAL>(fet));
-	      return ap;
-	    }
+          case MONOMIAL:
+            {
+              AutoPtr<FEBase> ap(new FE<1,MONOMIAL>(fet));
+              return ap;
+            }
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-	  case SZABAB:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,SZABAB>(fet));
-	      return ap;
-	    }
+          case SZABAB:
+            {
+              AutoPtr<FEBase> ap(new FE<1,SZABAB>(fet));
+              return ap;
+            }
 
-	  case BERNSTEIN:
-	    {
-	      AutoPtr<FEBase> ap(new FE<1,BERNSTEIN>(fet));
-	      return ap;
-	    }
+          case BERNSTEIN:
+            {
+              AutoPtr<FEBase> ap(new FE<1,BERNSTEIN>(fet));
+              return ap;
+            }
 #endif
 
-	  case XYZ:
-	    {
-	      AutoPtr<FEBase> ap(new FEXYZ<1>(fet));
-	      return ap;
-	    }
+          case XYZ:
+            {
+              AutoPtr<FEBase> ap(new FEXYZ<1>(fet));
+              return ap;
+            }
 
           case SCALAR:
           {
-	      AutoPtr<FEBase> ap(new FEScalar<1>(fet));
-	      return ap;
+            AutoPtr<FEBase> ap(new FEScalar<1>(fet));
+            return ap;
           }
 
-	  default:
-	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-	    libmesh_error();
-	  }
+          default:
+            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+            libmesh_error();
+          }
       }
 
 
       // 2D
     case 2:
       {
-	switch (fet.family)
-	  {
-	  case CLOUGH:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,CLOUGH>(fet));
-	      return ap;
-	    }
+        switch (fet.family)
+          {
+          case CLOUGH:
+            {
+              AutoPtr<FEBase> ap(new FE<2,CLOUGH>(fet));
+              return ap;
+            }
 
-	  case HERMITE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,HERMITE>(fet));
-	      return ap;
-	    }
+          case HERMITE:
+            {
+              AutoPtr<FEBase> ap(new FE<2,HERMITE>(fet));
+              return ap;
+            }
 
-	  case LAGRANGE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,LAGRANGE>(fet));
-	      return ap;
-	    }
+          case LAGRANGE:
+            {
+              AutoPtr<FEBase> ap(new FE<2,LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case L2_LAGRANGE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,L2_LAGRANGE>(fet));
-	      return ap;
-	    }
+          case L2_LAGRANGE:
+            {
+              AutoPtr<FEBase> ap(new FE<2,L2_LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case HIERARCHIC:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case HIERARCHIC:
+            {
+              AutoPtr<FEBase> ap(new FE<2,HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case L2_HIERARCHIC:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,L2_HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case L2_HIERARCHIC:
+            {
+              AutoPtr<FEBase> ap(new FE<2,L2_HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case MONOMIAL:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,MONOMIAL>(fet));
-	      return ap;
-	    }
+          case MONOMIAL:
+            {
+              AutoPtr<FEBase> ap(new FE<2,MONOMIAL>(fet));
+              return ap;
+            }
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-	  case SZABAB:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,SZABAB>(fet));
-	      return ap;
-	    }
+          case SZABAB:
+            {
+              AutoPtr<FEBase> ap(new FE<2,SZABAB>(fet));
+              return ap;
+            }
 
-	  case BERNSTEIN:
-	    {
-	      AutoPtr<FEBase> ap(new FE<2,BERNSTEIN>(fet));
-	      return ap;
-	    }
+          case BERNSTEIN:
+            {
+              AutoPtr<FEBase> ap(new FE<2,BERNSTEIN>(fet));
+              return ap;
+            }
 #endif
 
-	  case XYZ:
-	    {
-	      AutoPtr<FEBase> ap(new FEXYZ<2>(fet));
-	      return ap;
-	    }
+          case XYZ:
+            {
+              AutoPtr<FEBase> ap(new FEXYZ<2>(fet));
+              return ap;
+            }
 
           case SCALAR:
-	    {
-	      AutoPtr<FEBase> ap(new FEScalar<2>(fet));
-	      return ap;
-	    }
-	  default:
-	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-	    libmesh_error();
-	  }
+            {
+              AutoPtr<FEBase> ap(new FEScalar<2>(fet));
+              return ap;
+            }
+          default:
+            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+            libmesh_error();
+          }
       }
 
 
       // 3D
     case 3:
       {
-	switch (fet.family)
-	  {
-	  case CLOUGH:
-	    {
-	      libMesh::out << "ERROR: Clough-Tocher elements currently only support 1D and 2D"
+        switch (fet.family)
+          {
+          case CLOUGH:
+            {
+              libMesh::out << "ERROR: Clough-Tocher elements currently only support 1D and 2D"
                             << std::endl;
-	      libmesh_error();
-	    }
+              libmesh_error();
+            }
 
-	  case HERMITE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<3,HERMITE>(fet));
-	      return ap;
-	    }
+          case HERMITE:
+            {
+              AutoPtr<FEBase> ap(new FE<3,HERMITE>(fet));
+              return ap;
+            }
 
-	  case LAGRANGE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<3,LAGRANGE>(fet));
-	      return ap;
-	    }
+          case LAGRANGE:
+            {
+              AutoPtr<FEBase> ap(new FE<3,LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case L2_LAGRANGE:
-	    {
-	      AutoPtr<FEBase> ap(new FE<3,L2_LAGRANGE>(fet));
-	      return ap;
-	    }
+          case L2_LAGRANGE:
+            {
+              AutoPtr<FEBase> ap(new FE<3,L2_LAGRANGE>(fet));
+              return ap;
+            }
 
-	  case HIERARCHIC:
-	    {
-	      AutoPtr<FEBase> ap(new FE<3,HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case HIERARCHIC:
+            {
+              AutoPtr<FEBase> ap(new FE<3,HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case L2_HIERARCHIC:
-	    {
-	      AutoPtr<FEBase> ap(new FE<3,L2_HIERARCHIC>(fet));
-	      return ap;
-	    }
+          case L2_HIERARCHIC:
+            {
+              AutoPtr<FEBase> ap(new FE<3,L2_HIERARCHIC>(fet));
+              return ap;
+            }
 
-	  case MONOMIAL:
-	    {
-	      AutoPtr<FEBase> ap(new FE<3,MONOMIAL>(fet));
-	      return ap;
-	    }
+          case MONOMIAL:
+            {
+              AutoPtr<FEBase> ap(new FE<3,MONOMIAL>(fet));
+              return ap;
+            }
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-	  case SZABAB:
-	    {
-	      AutoPtr<FEBase> ap(new FE<3,SZABAB>(fet));
-	      return ap;
-	    }
+          case SZABAB:
+            {
+              AutoPtr<FEBase> ap(new FE<3,SZABAB>(fet));
+              return ap;
+            }
 
-	  case BERNSTEIN:
-	    {
-	      AutoPtr<FEBase> ap(new FE<3,BERNSTEIN>(fet));
-	      return ap;
-	    }
+          case BERNSTEIN:
+            {
+              AutoPtr<FEBase> ap(new FE<3,BERNSTEIN>(fet));
+              return ap;
+            }
 #endif
 
-	  case XYZ:
-	    {
-	      AutoPtr<FEBase> ap(new FEXYZ<3>(fet));
-	      return ap;
-	    }
+          case XYZ:
+            {
+              AutoPtr<FEBase> ap(new FEXYZ<3>(fet));
+              return ap;
+            }
 
           case SCALAR:
           {
-	      AutoPtr<FEBase> ap(new FEScalar<3>(fet));
-	      return ap;
+            AutoPtr<FEBase> ap(new FEScalar<3>(fet));
+            return ap;
           }
 
-	  default:
-	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-	    libmesh_error();
-	  }
+          default:
+            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+            libmesh_error();
+          }
       }
 
     default:
@@ -530,77 +530,77 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
       // 0D
     case 0:
       {
-	switch (fet.family)
-	  {
-	  case LAGRANGE_VEC:
-	    {
-	      AutoPtr<FEVectorBase> ap( new FELagrangeVec<0>(fet) );
-	      return ap;
-	    }
-	  default:
-	    {
-	      libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-	      libmesh_error();
-	    }
-	  }
+        switch (fet.family)
+          {
+          case LAGRANGE_VEC:
+            {
+              AutoPtr<FEVectorBase> ap( new FELagrangeVec<0>(fet) );
+              return ap;
+            }
+          default:
+            {
+              libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+              libmesh_error();
+            }
+          }
       }
     case 1:
       {
-	switch (fet.family)
-	  {
-	  case LAGRANGE_VEC:
-	    {
-	      AutoPtr<FEVectorBase> ap( new FELagrangeVec<1>(fet) );
-	      return ap;
-	    }
-	  default:
-	    {
-	      libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-	      libmesh_error();
-	    }
-	  }
+        switch (fet.family)
+          {
+          case LAGRANGE_VEC:
+            {
+              AutoPtr<FEVectorBase> ap( new FELagrangeVec<1>(fet) );
+              return ap;
+            }
+          default:
+            {
+              libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+              libmesh_error();
+            }
+          }
       }
     case 2:
       {
-	switch (fet.family)
-	  {
-	  case LAGRANGE_VEC:
-	    {
-	      AutoPtr<FEVectorBase> ap( new FELagrangeVec<2>(fet) );
-	      return ap;
-	    }
-	  case NEDELEC_ONE:
-	    {
-	      AutoPtr<FEVectorBase> ap( new FENedelecOne<2>(fet) );
-	      return ap;
-	    }
-	  default:
-	    {
-	      libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-	      libmesh_error();
-	    }
-	  }
+        switch (fet.family)
+          {
+          case LAGRANGE_VEC:
+            {
+              AutoPtr<FEVectorBase> ap( new FELagrangeVec<2>(fet) );
+              return ap;
+            }
+          case NEDELEC_ONE:
+            {
+              AutoPtr<FEVectorBase> ap( new FENedelecOne<2>(fet) );
+              return ap;
+            }
+          default:
+            {
+              libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+              libmesh_error();
+            }
+          }
       }
     case 3:
       {
-	switch (fet.family)
-	  {
-	  case LAGRANGE_VEC:
-	    {
-	      AutoPtr<FEVectorBase> ap( new FELagrangeVec<3>(fet) );
-	      return ap;
-	    }
-	  case NEDELEC_ONE:
-	    {
-	      AutoPtr<FEVectorBase> ap( new FENedelecOne<3>(fet) );
-	      return ap;
-	    }
-	  default:
-	    {
-	      libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-	      libmesh_error();
-	    }
-	  }
+        switch (fet.family)
+          {
+          case LAGRANGE_VEC:
+            {
+              AutoPtr<FEVectorBase> ap( new FELagrangeVec<3>(fet) );
+              return ap;
+            }
+          case NEDELEC_ONE:
+            {
+              AutoPtr<FEVectorBase> ap( new FENedelecOne<3>(fet) );
+              return ap;
+            }
+          default:
+            {
+              libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+              libmesh_error();
+            }
+          }
       }
 
     default:
@@ -625,7 +625,7 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
 template <>
 AutoPtr<FEGenericBase<Real> >
 FEGenericBase<Real>::build_InfFE (const unsigned int dim,
-				  const FEType& fet)
+                                  const FEType& fet)
 {
   // The stupid AutoPtr<FEBase> ap(); return ap;
   // construct is required to satisfy IBM's xlC
@@ -636,85 +636,85 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
       // 1D
     case 1:
       {
-	switch (fet.radial_family)
-	  {
-	  case INFINITE_MAP:
-	    {
-	      libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			    << " with FEFamily = " << fet.radial_family << std::endl;
-	      libmesh_error();
-	    }
+        switch (fet.radial_family)
+          {
+          case INFINITE_MAP:
+            {
+              libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                           << " with FEFamily = " << fet.radial_family << std::endl;
+              libmesh_error();
+            }
 
-	  case JACOBI_20_00:
-	    {
-	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<1,JACOBI_20_00,CARTESIAN>(fet));
-		      return ap;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			          << " with InfMapType = " << fet.inf_map << std::endl;
-		    libmesh_error();
-		}
-	    }
+          case JACOBI_20_00:
+            {
+              switch (fet.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    AutoPtr<FEBase> ap(new InfFE<1,JACOBI_20_00,CARTESIAN>(fet));
+                    return ap;
+                  }
+                default:
+                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                               << " with InfMapType = " << fet.inf_map << std::endl;
+                  libmesh_error();
+                }
+            }
 
-	  case JACOBI_30_00:
-	    {
-	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<1,JACOBI_30_00,CARTESIAN>(fet));
-		      return ap;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			          << " with InfMapType = " << fet.inf_map << std::endl;
-		    libmesh_error();
-		}
-	    }
+          case JACOBI_30_00:
+            {
+              switch (fet.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    AutoPtr<FEBase> ap(new InfFE<1,JACOBI_30_00,CARTESIAN>(fet));
+                    return ap;
+                  }
+                default:
+                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                               << " with InfMapType = " << fet.inf_map << std::endl;
+                  libmesh_error();
+                }
+            }
 
-	  case LEGENDRE:
-	    {
-	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<1,LEGENDRE,CARTESIAN>(fet));
-		      return ap;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			          << " with InfMapType = " << fet.inf_map << std::endl;
-		    libmesh_error();
-		}
-	    }
+          case LEGENDRE:
+            {
+              switch (fet.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    AutoPtr<FEBase> ap(new InfFE<1,LEGENDRE,CARTESIAN>(fet));
+                    return ap;
+                  }
+                default:
+                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                               << " with InfMapType = " << fet.inf_map << std::endl;
+                  libmesh_error();
+                }
+            }
 
-	  case LAGRANGE:
-	    {
-	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<1,LAGRANGE,CARTESIAN>(fet));
-		      return ap;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			          << " with InfMapType = " << fet.inf_map << std::endl;
-		    libmesh_error();
-		}
-	    }
+          case LAGRANGE:
+            {
+              switch (fet.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    AutoPtr<FEBase> ap(new InfFE<1,LAGRANGE,CARTESIAN>(fet));
+                    return ap;
+                  }
+                default:
+                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                               << " with InfMapType = " << fet.inf_map << std::endl;
+                  libmesh_error();
+                }
+            }
 
 
 
-	  default:
-	    libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
-	    libmesh_error();
-	  }
+          default:
+            libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
+            libmesh_error();
+          }
 
       }
 
@@ -724,85 +724,85 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
       // 2D
     case 2:
       {
-	switch (fet.radial_family)
-	  {
-	  case INFINITE_MAP:
-	    {
-	      libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			    << " with FEFamily = " << fet.radial_family << std::endl;
-	      libmesh_error();
-	    }
+        switch (fet.radial_family)
+          {
+          case INFINITE_MAP:
+            {
+              libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                           << " with FEFamily = " << fet.radial_family << std::endl;
+              libmesh_error();
+            }
 
-	  case JACOBI_20_00:
-	    {
-	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<2,JACOBI_20_00,CARTESIAN>(fet));
-		      return ap;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			          << " with InfMapType = " << fet.inf_map << std::endl;
-		    libmesh_error();
-		}
-	    }
+          case JACOBI_20_00:
+            {
+              switch (fet.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    AutoPtr<FEBase> ap(new InfFE<2,JACOBI_20_00,CARTESIAN>(fet));
+                    return ap;
+                  }
+                default:
+                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                               << " with InfMapType = " << fet.inf_map << std::endl;
+                  libmesh_error();
+                }
+            }
 
-	  case JACOBI_30_00:
-	    {
-	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<2,JACOBI_30_00,CARTESIAN>(fet));
-		      return ap;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			          << " with InfMapType = " << fet.inf_map << std::endl;
-		    libmesh_error();
-		}
-	    }
+          case JACOBI_30_00:
+            {
+              switch (fet.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    AutoPtr<FEBase> ap(new InfFE<2,JACOBI_30_00,CARTESIAN>(fet));
+                    return ap;
+                  }
+                default:
+                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                               << " with InfMapType = " << fet.inf_map << std::endl;
+                  libmesh_error();
+                }
+            }
 
-	  case LEGENDRE:
-	    {
-	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<2,LEGENDRE,CARTESIAN>(fet));
-		      return ap;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			          << " with InfMapType = " << fet.inf_map << std::endl;
-		    libmesh_error();
-		}
-	    }
+          case LEGENDRE:
+            {
+              switch (fet.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    AutoPtr<FEBase> ap(new InfFE<2,LEGENDRE,CARTESIAN>(fet));
+                    return ap;
+                  }
+                default:
+                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                               << " with InfMapType = " << fet.inf_map << std::endl;
+                  libmesh_error();
+                }
+            }
 
-	  case LAGRANGE:
-	    {
-	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<2,LAGRANGE,CARTESIAN>(fet));
-		      return ap;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			          << " with InfMapType = " << fet.inf_map << std::endl;
-		    libmesh_error();
-		}
-	    }
+          case LAGRANGE:
+            {
+              switch (fet.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    AutoPtr<FEBase> ap(new InfFE<2,LAGRANGE,CARTESIAN>(fet));
+                    return ap;
+                  }
+                default:
+                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                               << " with InfMapType = " << fet.inf_map << std::endl;
+                  libmesh_error();
+                }
+            }
 
 
 
-	  default:
-	    libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
-	    libmesh_error();
-	  }
+          default:
+            libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
+            libmesh_error();
+          }
 
       }
 
@@ -812,85 +812,85 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
       // 3D
     case 3:
       {
-	switch (fet.radial_family)
-	  {
-	  case INFINITE_MAP:
-	    {
-	      libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			    << " with FEFamily = " << fet.radial_family << std::endl;
-	      libmesh_error();
-	    }
+        switch (fet.radial_family)
+          {
+          case INFINITE_MAP:
+            {
+              libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                           << " with FEFamily = " << fet.radial_family << std::endl;
+              libmesh_error();
+            }
 
-	  case JACOBI_20_00:
-	    {
-	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<3,JACOBI_20_00,CARTESIAN>(fet));
-		      return ap;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			          << " with InfMapType = " << fet.inf_map << std::endl;
-		    libmesh_error();
-		}
-	    }
+          case JACOBI_20_00:
+            {
+              switch (fet.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    AutoPtr<FEBase> ap(new InfFE<3,JACOBI_20_00,CARTESIAN>(fet));
+                    return ap;
+                  }
+                default:
+                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                               << " with InfMapType = " << fet.inf_map << std::endl;
+                  libmesh_error();
+                }
+            }
 
-	  case JACOBI_30_00:
-	    {
-	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<3,JACOBI_30_00,CARTESIAN>(fet));
-		      return ap;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			          << " with InfMapType = " << fet.inf_map << std::endl;
-		    libmesh_error();
-		}
-	    }
+          case JACOBI_30_00:
+            {
+              switch (fet.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    AutoPtr<FEBase> ap(new InfFE<3,JACOBI_30_00,CARTESIAN>(fet));
+                    return ap;
+                  }
+                default:
+                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                               << " with InfMapType = " << fet.inf_map << std::endl;
+                  libmesh_error();
+                }
+            }
 
-	  case LEGENDRE:
-	    {
-	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<3,LEGENDRE,CARTESIAN>(fet));
-		      return ap;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			          << " with InfMapType = " << fet.inf_map << std::endl;
-		    libmesh_error();
-		}
-	    }
+          case LEGENDRE:
+            {
+              switch (fet.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    AutoPtr<FEBase> ap(new InfFE<3,LEGENDRE,CARTESIAN>(fet));
+                    return ap;
+                  }
+                default:
+                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                               << " with InfMapType = " << fet.inf_map << std::endl;
+                  libmesh_error();
+                }
+            }
 
-	  case LAGRANGE:
-	    {
-	      switch (fet.inf_map)
-	        {
-		  case CARTESIAN:
-		    {
-		      AutoPtr<FEBase> ap(new InfFE<3,LAGRANGE,CARTESIAN>(fet));
-		      return ap;
-		    }
-		  default:
-		    libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-			          << " with InfMapType = " << fet.inf_map << std::endl;
-		    libmesh_error();
-		}
-	    }
+          case LAGRANGE:
+            {
+              switch (fet.inf_map)
+                {
+                case CARTESIAN:
+                  {
+                    AutoPtr<FEBase> ap(new InfFE<3,LAGRANGE,CARTESIAN>(fet));
+                    return ap;
+                  }
+                default:
+                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
+                               << " with InfMapType = " << fet.inf_map << std::endl;
+                  libmesh_error();
+                }
+            }
 
 
 
-	  default:
-	    libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
-	    libmesh_error();
-	  }
+          default:
+            libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
+            libmesh_error();
+          }
       }
 
     default:
@@ -907,7 +907,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 template <>
 AutoPtr<FEGenericBase<RealGradient> >
 FEGenericBase<RealGradient>::build_InfFE (const unsigned int,
-			                  const FEType& )
+                                          const FEType& )
 {
   // No vector types defined... YET.
   libmesh_error();
@@ -920,7 +920,7 @@ FEGenericBase<RealGradient>::build_InfFE (const unsigned int,
 
 template <typename OutputType>
 void FEGenericBase<OutputType> ::compute_shape_functions (const Elem* elem,
-							  const std::vector<Point>& qp)
+                                                          const std::vector<Point>& qp)
 {
   //-------------------------------------------------------------------------
   // Compute the shape function values (and derivatives)
@@ -940,10 +940,10 @@ void FEGenericBase<OutputType> ::compute_shape_functions (const Elem* elem,
       calculate_phi = calculate_dphi = calculate_d2phi = true;
       // Only compute curl, div for vector-valued elements
       if( TypesEqual<OutputType,RealGradient>::value )
-	{
-	  calculate_curl_phi = true;
-	  calculate_div_phi  = true;
-	}
+        {
+          calculate_curl_phi = true;
+          calculate_div_phi  = true;
+        }
     }
 #else
   if (!calculate_phi && !calculate_dphi && !calculate_curl_phi && !calculate_div_phi)
@@ -951,10 +951,10 @@ void FEGenericBase<OutputType> ::compute_shape_functions (const Elem* elem,
       calculate_phi = calculate_dphi = true;
       // Only compute curl for vector-valued elements
       if( TypesEqual<OutputType,RealGradient>::value )
-	{
-	  calculate_curl_phi = true;
-	  calculate_div_phi  = true;
-	}
+        {
+          calculate_curl_phi = true;
+          calculate_div_phi  = true;
+        }
     }
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -964,13 +964,13 @@ void FEGenericBase<OutputType> ::compute_shape_functions (const Elem* elem,
 
   if( calculate_dphi )
     this->_fe_trans->map_dphi( this->dim, elem, qp, (*this), this->dphi,
-			       this->dphidx, this->dphidy, this->dphidz );
+                               this->dphidx, this->dphidy, this->dphidz );
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   if( calculate_d2phi )
     this->_fe_trans->map_d2phi( this->dim, elem, qp, (*this), this->d2phi,
-				this->d2phidx2, this->d2phidxdy, this->d2phidxdz,
-				this->d2phidy2, this->d2phidydz, this->d2phidz2 );
+                                this->d2phidx2, this->d2phidxdy, this->d2phidxdz,
+                                this->d2phidy2, this->d2phidydz, this->d2phidz2 );
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   // Only compute curl for vector-valued elements
@@ -1202,8 +1202,8 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
               dof_map.dof_indices (child,
                 child_dof_indices, var);
             const unsigned int child_n_dofs =
-	      libmesh_cast_int<unsigned int>
-	        (child_dof_indices.size());
+              libmesh_cast_int<unsigned int>
+              (child_dof_indices.size());
 
             temp_fe_type = base_fe_type;
             temp_fe_type.order =
@@ -1264,31 +1264,31 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                         if (dof_is_fixed[j])
                           Fe(freei) -=
                             TensorTools::inner_product(phi_coarse[i][qp],
-						       phi_coarse[j][qp]) *
+                                                       phi_coarse[j][qp]) *
                             JxW[qp] * Ue(j);
                         else
                           Ke(freei,freej) +=
                             TensorTools::inner_product(phi_coarse[i][qp],
-						       phi_coarse[j][qp]) *
+                                                       phi_coarse[j][qp]) *
                             JxW[qp];
                         if (cont == C_ONE)
                           {
                             if (dof_is_fixed[j])
                               Fe(freei) -=
                                 TensorTools::inner_product((*dphi_coarse)[i][qp],
-							   (*dphi_coarse)[j][qp]) *
+                                                           (*dphi_coarse)[j][qp]) *
                                 JxW[qp] * Ue(j);
                             else
                               Ke(freei,freej) +=
                                 TensorTools::inner_product((*dphi_coarse)[i][qp],
-							   (*dphi_coarse)[j][qp]) *
+                                                           (*dphi_coarse)[j][qp]) *
                                 JxW[qp];
                           }
                         if (!dof_is_fixed[j])
                           freej++;
                       }
                     Fe(freei) += TensorTools::inner_product(phi_coarse[i][qp],
-							    fineval) * JxW[qp];
+                                                            fineval) * JxW[qp];
                     if (cont == C_ONE)
                       Fe(freei) +=
                         TensorTools::inner_product(finegrad, (*dphi_coarse)[i][qp]) * JxW[qp];
@@ -1346,8 +1346,8 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
               dof_map.dof_indices (child,
                 child_dof_indices, var);
             const unsigned int child_n_dofs =
-	      libmesh_cast_int<unsigned int>
-	        (child_dof_indices.size());
+              libmesh_cast_int<unsigned int>
+              (child_dof_indices.size());
 
             temp_fe_type = base_fe_type;
             temp_fe_type.order =
@@ -1408,24 +1408,24 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                         if (dof_is_fixed[j])
                           Fe(freei) -=
                             TensorTools::inner_product(phi_coarse[i][qp],
-						       phi_coarse[j][qp]) *
+                                                       phi_coarse[j][qp]) *
                             JxW[qp] * Ue(j);
                         else
                           Ke(freei,freej) +=
                             TensorTools::inner_product(phi_coarse[i][qp],
-						       phi_coarse[j][qp]) *
+                                                       phi_coarse[j][qp]) *
                             JxW[qp];
                         if (cont == C_ONE)
                           {
                             if (dof_is_fixed[j])
                               Fe(freei) -=
                                 TensorTools::inner_product((*dphi_coarse)[i][qp],
-							   (*dphi_coarse)[j][qp]) *
+                                                           (*dphi_coarse)[j][qp]) *
                                 JxW[qp] * Ue(j);
                             else
                               Ke(freei,freej) +=
                                 TensorTools::inner_product((*dphi_coarse)[i][qp],
-							   (*dphi_coarse)[j][qp]) *
+                                                           (*dphi_coarse)[j][qp]) *
                                 JxW[qp];
                           }
                         if (!dof_is_fixed[j])
@@ -1527,30 +1527,30 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                   if (dof_is_fixed[j])
                     Fe(freei) -=
                       TensorTools::inner_product(phi_coarse[i][qp],
-						 phi_coarse[j][qp]) *
+                                                 phi_coarse[j][qp]) *
                       JxW[qp] * Ue(j);
                   else
                     Ke(freei,freej) +=
                       TensorTools::inner_product(phi_coarse[i][qp],
-						 phi_coarse[j][qp]) *
+                                                 phi_coarse[j][qp]) *
                       JxW[qp];
                   if (cont == C_ONE)
                     {
                       if (dof_is_fixed[j])
                         Fe(freei) -=
                           TensorTools::inner_product((*dphi_coarse)[i][qp],
-						     (*dphi_coarse)[j][qp]) *
+                                                     (*dphi_coarse)[j][qp]) *
                           JxW[qp] * Ue(j);
                       else
                         Ke(freei,freej) +=
                           TensorTools::inner_product((*dphi_coarse)[i][qp],
-						     (*dphi_coarse)[j][qp]) *
+                                                     (*dphi_coarse)[j][qp]) *
                           JxW[qp];
                     }
                   if (!dof_is_fixed[j])
                     freej++;
                 }
-	      Fe(freei) += TensorTools::inner_product(phi_coarse[i][qp], fineval) *
+              Fe(freei) += TensorTools::inner_product(phi_coarse[i][qp], fineval) *
                            JxW[qp];
               if (cont == C_ONE)
                 Fe(freei) += TensorTools::inner_product(finegrad, (*dphi_coarse)[i][qp]) * JxW[qp];
@@ -1580,9 +1580,9 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
 template <typename OutputType>
 void
 FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints,
-				                     DofMap &dof_map,
-				                     const unsigned int variable_number,
-				                     const Elem* elem)
+                                                     DofMap &dof_map,
+                                                     const unsigned int variable_number,
+                                                     const Elem* elem)
 {
   libmesh_assert(elem);
 
@@ -1619,7 +1619,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
   const std::vector<Point>& q_point = my_fe->get_xyz();
   const std::vector<std::vector<OutputShape> >& phi = my_fe->get_phi();
   const std::vector<std::vector<OutputShape> >& neigh_phi =
-		  neigh_fe->get_phi();
+    neigh_fe->get_phi();
   const std::vector<Point> *face_normals = NULL;
   const std::vector<std::vector<OutputGradient> > *dphi = NULL;
   const std::vector<std::vector<OutputGradient> > *neigh_dphi = NULL;
@@ -1633,10 +1633,10 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
         my_fe->get_normals();
       face_normals = &ref_face_normals;
       const std::vector<std::vector<OutputGradient> >& ref_dphi =
-	my_fe->get_dphi();
+        my_fe->get_dphi();
       dphi = &ref_dphi;
       const std::vector<std::vector<OutputGradient> >& ref_neigh_dphi =
-	neigh_fe->get_dphi();
+        neigh_fe->get_dphi();
       neigh_dphi = &ref_neigh_dphi;
     }
 
@@ -1658,7 +1658,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
         // than this element.
         if (neigh->level() < elem->level())
           {
-	    unsigned int s_neigh = neigh->which_neighbor_am_i(elem);
+            unsigned int s_neigh = neigh->which_neighbor_am_i(elem);
             libmesh_assert_less (s_neigh, neigh->n_neighbors());
 
             // Find the minimum p level; we build the h constraint
@@ -1680,33 +1680,33 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
             if (old_neigh_level != min_p_level)
               (const_cast<Elem *>(neigh))->hack_p_level(min_p_level);
 
-	    my_fe->reinit(elem, s);
+            my_fe->reinit(elem, s);
 
-	    // This function gets called element-by-element, so there
-	    // will be a lot of memory allocation going on.  We can
-	    // at least minimize this for the case of the dof indices
-	    // by efficiently preallocating the requisite storage.
-	    // n_nodes is not necessarily n_dofs, but it is better
-	    // than nothing!
-	    my_dof_indices.reserve    (elem->n_nodes());
-	    neigh_dof_indices.reserve (neigh->n_nodes());
+            // This function gets called element-by-element, so there
+            // will be a lot of memory allocation going on.  We can
+            // at least minimize this for the case of the dof indices
+            // by efficiently preallocating the requisite storage.
+            // n_nodes is not necessarily n_dofs, but it is better
+            // than nothing!
+            my_dof_indices.reserve    (elem->n_nodes());
+            neigh_dof_indices.reserve (neigh->n_nodes());
 
-	    dof_map.dof_indices (elem, my_dof_indices,
-			         variable_number);
-	    dof_map.dof_indices (neigh, neigh_dof_indices,
-			         variable_number);
+            dof_map.dof_indices (elem, my_dof_indices,
+                                 variable_number);
+            dof_map.dof_indices (neigh, neigh_dof_indices,
+                                 variable_number);
 
-	    const unsigned int n_qp = my_qface.n_points();
+            const unsigned int n_qp = my_qface.n_points();
 
-	    FEInterface::inverse_map (Dim, base_fe_type, neigh,
+            FEInterface::inverse_map (Dim, base_fe_type, neigh,
                                       q_point, neigh_qface);
 
-	    neigh_fe->reinit(neigh, &neigh_qface);
+            neigh_fe->reinit(neigh, &neigh_qface);
 
-	    // We're only concerned with DOFs whose values (and/or first
-	    // derivatives for C1 elements) are supported on side nodes
-	    FEInterface::dofs_on_side(elem,  Dim, base_fe_type, s,       my_side_dofs);
-	    FEInterface::dofs_on_side(neigh, Dim, base_fe_type, s_neigh, neigh_side_dofs);
+            // We're only concerned with DOFs whose values (and/or first
+            // derivatives for C1 elements) are supported on side nodes
+            FEInterface::dofs_on_side(elem,  Dim, base_fe_type, s,       my_side_dofs);
+            FEInterface::dofs_on_side(neigh, Dim, base_fe_type, s_neigh, neigh_side_dofs);
 
             // We're done with functions that examine Elem::p_level(),
             // so let's unhack those levels
@@ -1715,127 +1715,127 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
             if (neigh->p_level() != old_neigh_level)
               (const_cast<Elem *>(neigh))->hack_p_level(old_neigh_level);
 
-	    const unsigned int n_side_dofs =
-	      libmesh_cast_int<unsigned int>(my_side_dofs.size());
-	    libmesh_assert_equal_to (n_side_dofs, neigh_side_dofs.size());
+            const unsigned int n_side_dofs =
+              libmesh_cast_int<unsigned int>(my_side_dofs.size());
+            libmesh_assert_equal_to (n_side_dofs, neigh_side_dofs.size());
 
-	    Ke.resize (n_side_dofs, n_side_dofs);
-	    Ue.resize(n_side_dofs);
+            Ke.resize (n_side_dofs, n_side_dofs);
+            Ue.resize(n_side_dofs);
 
-	    // Form the projection matrix, (inner product of fine basis
-	    // functions against fine test functions)
-	    for (unsigned int is = 0; is != n_side_dofs; ++is)
-	      {
-	        const unsigned int i = my_side_dofs[is];
-	        for (unsigned int js = 0; js != n_side_dofs; ++js)
-	          {
-	            const unsigned int j = my_side_dofs[js];
-		    for (unsigned int qp = 0; qp != n_qp; ++qp)
+            // Form the projection matrix, (inner product of fine basis
+            // functions against fine test functions)
+            for (unsigned int is = 0; is != n_side_dofs; ++is)
+              {
+                const unsigned int i = my_side_dofs[is];
+                for (unsigned int js = 0; js != n_side_dofs; ++js)
+                  {
+                    const unsigned int j = my_side_dofs[js];
+                    for (unsigned int qp = 0; qp != n_qp; ++qp)
                       {
-		        Ke(is,js) += JxW[qp] * TensorTools::inner_product(phi[i][qp], phi[j][qp]);
+                        Ke(is,js) += JxW[qp] * TensorTools::inner_product(phi[i][qp], phi[j][qp]);
                         if (cont != C_ZERO)
-		          Ke(is,js) += JxW[qp] *
+                          Ke(is,js) += JxW[qp] *
                                        TensorTools::inner_product((*dphi)[i][qp] *
-								  (*face_normals)[qp],
-								  (*dphi)[j][qp] *
-								  (*face_normals)[qp]);
+                                                                  (*face_normals)[qp],
+                                                                  (*dphi)[j][qp] *
+                                                                  (*face_normals)[qp]);
                       }
-		  }
-	      }
+                  }
+              }
 
-	    // Form the right hand sides, (inner product of coarse basis
-	    // functions against fine test functions)
-	    for (unsigned int is = 0; is != n_side_dofs; ++is)
-	      {
-	        const unsigned int i = neigh_side_dofs[is];
-	        Fe.resize (n_side_dofs);
-	        for (unsigned int js = 0; js != n_side_dofs; ++js)
-		  {
-	            const unsigned int j = my_side_dofs[js];
-	            for (unsigned int qp = 0; qp != n_qp; ++qp)
+            // Form the right hand sides, (inner product of coarse basis
+            // functions against fine test functions)
+            for (unsigned int is = 0; is != n_side_dofs; ++is)
+              {
+                const unsigned int i = neigh_side_dofs[is];
+                Fe.resize (n_side_dofs);
+                for (unsigned int js = 0; js != n_side_dofs; ++js)
+                  {
+                    const unsigned int j = my_side_dofs[js];
+                    for (unsigned int qp = 0; qp != n_qp; ++qp)
                       {
-		        Fe(js) += JxW[qp] *
+                        Fe(js) += JxW[qp] *
                                   TensorTools::inner_product(neigh_phi[i][qp],
-							     phi[j][qp]);
+                                                             phi[j][qp]);
                         if (cont != C_ZERO)
-		          Fe(js) += JxW[qp] *
+                          Fe(js) += JxW[qp] *
                                     TensorTools::inner_product((*neigh_dphi)[i][qp] *
-							       (*face_normals)[qp],
-							       (*dphi)[j][qp] *
-							       (*face_normals)[qp]);
+                                                               (*face_normals)[qp],
+                                                               (*dphi)[j][qp] *
+                                                               (*face_normals)[qp]);
                       }
-		  }
-	        Ke.cholesky_solve(Fe, Ue[is]);
-	      }
+                  }
+                Ke.cholesky_solve(Fe, Ue[is]);
+              }
 
-	    for (unsigned int js = 0; js != n_side_dofs; ++js)
-	      {
-	        const unsigned int j = my_side_dofs[js];
-	        const dof_id_type my_dof_g = my_dof_indices[j];
+            for (unsigned int js = 0; js != n_side_dofs; ++js)
+              {
+                const unsigned int j = my_side_dofs[js];
+                const dof_id_type my_dof_g = my_dof_indices[j];
                 libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
 
                 // Hunt for "constraining against myself" cases before
                 // we bother creating a constraint row
                 bool self_constraint = false;
-	        for (unsigned int is = 0; is != n_side_dofs; ++is)
-	          {
-	            const unsigned int i = neigh_side_dofs[is];
-	            const dof_id_type their_dof_g = neigh_dof_indices[i];
+                for (unsigned int is = 0; is != n_side_dofs; ++is)
+                  {
+                    const unsigned int i = neigh_side_dofs[is];
+                    const dof_id_type their_dof_g = neigh_dof_indices[i];
                     libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
 
-		    if (their_dof_g == my_dof_g)
-		      {
+                    if (their_dof_g == my_dof_g)
+                      {
 #ifndef NDEBUG
-		        const Real their_dof_value = Ue[is](js);
-		        libmesh_assert_less (std::abs(their_dof_value-1.),
+                        const Real their_dof_value = Ue[is](js);
+                        libmesh_assert_less (std::abs(their_dof_value-1.),
                                              10*TOLERANCE);
 
-		        for (unsigned int k = 0; k != n_side_dofs; ++k)
-		          libmesh_assert(k == is ||
+                        for (unsigned int k = 0; k != n_side_dofs; ++k)
+                          libmesh_assert(k == is ||
                                          std::abs(Ue[k](js)) <
                                          10*TOLERANCE);
 #endif
 
                         self_constraint = true;
-		        break;
-		      }
-	          }
+                        break;
+                      }
+                  }
 
-		if (self_constraint)
-		  continue;
+                if (self_constraint)
+                  continue;
 
-		DofConstraintRow* constraint_row;
+                DofConstraintRow* constraint_row;
 
-		// we may be running constraint methods concurrently
+                // we may be running constraint methods concurrently
                 // on multiple threads, so we need a lock to
                 // ensure that this constraint is "ours"
-		{
-		  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                {
+                  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
                   if (dof_map.is_constrained_dof(my_dof_g))
                     continue;
 
-		  constraint_row = &(constraints[my_dof_g]);
+                  constraint_row = &(constraints[my_dof_g]);
                   libmesh_assert(constraint_row->empty());
                 }
 
-	        for (unsigned int is = 0; is != n_side_dofs; ++is)
-	          {
-	            const unsigned int i = neigh_side_dofs[is];
-	            const dof_id_type their_dof_g = neigh_dof_indices[i];
+                for (unsigned int is = 0; is != n_side_dofs; ++is)
+                  {
+                    const unsigned int i = neigh_side_dofs[is];
+                    const dof_id_type their_dof_g = neigh_dof_indices[i];
                     libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
-		    libmesh_assert_not_equal_to (their_dof_g, my_dof_g);
+                    libmesh_assert_not_equal_to (their_dof_g, my_dof_g);
 
-		    const Real their_dof_value = Ue[is](js);
+                    const Real their_dof_value = Ue[is](js);
 
-		    if (std::abs(their_dof_value) < 10*TOLERANCE)
-		      continue;
+                    if (std::abs(their_dof_value) < 10*TOLERANCE)
+                      continue;
 
-		    constraint_row->insert(std::make_pair(their_dof_g,
-							  their_dof_value));
-		  }
-	      }
-	  }
+                    constraint_row->insert(std::make_pair(their_dof_g,
+                                                          their_dof_value));
+                  }
+              }
+          }
         // p refinement constraints:
         // constrain dofs shared between
         // active elements and neighbors with
@@ -1867,7 +1867,7 @@ compute_periodic_constraints (DofConstraints &constraints,
                               const MeshBase &mesh,
                               const PointLocatorBase *point_locator,
                               const unsigned int variable_number,
-			      const Elem* elem)
+                              const Elem* elem)
 {
   // Only bother if we truly have periodic boundaries
   if (boundaries.empty())
@@ -1911,7 +1911,7 @@ compute_periodic_constraints (DofConstraints &constraints,
   const std::vector<Point>& q_point = my_fe->get_xyz();
   const std::vector<std::vector<OutputShape> >& phi = my_fe->get_phi();
   const std::vector<std::vector<OutputShape> >& neigh_phi =
-		  neigh_fe->get_phi();
+    neigh_fe->get_phi();
   const std::vector<Point> *face_normals = NULL;
   const std::vector<std::vector<OutputGradient> > *dphi = NULL;
   const std::vector<std::vector<OutputGradient> > *neigh_dphi = NULL;
@@ -1924,10 +1924,10 @@ compute_periodic_constraints (DofConstraints &constraints,
         my_fe->get_normals();
       face_normals = &ref_face_normals;
       const std::vector<std::vector<OutputGradient> >& ref_dphi =
-	my_fe->get_dphi();
+        my_fe->get_dphi();
       dphi = &ref_dphi;
       const std::vector<std::vector<OutputGradient> >& ref_neigh_dphi =
-	neigh_fe->get_dphi();
+        neigh_fe->get_dphi();
       neigh_dphi = &ref_neigh_dphi;
     }
 
@@ -1966,7 +1966,7 @@ compute_periodic_constraints (DofConstraints &constraints,
               // as or coarser than this element.
               if (neigh->level() <= elem->level())
                 {
-	          unsigned int s_neigh =
+                  unsigned int s_neigh =
                     mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
                   libmesh_assert_not_equal_to (s_neigh, libMesh::invalid_uint);
 
@@ -1991,20 +1991,20 @@ compute_periodic_constraints (DofConstraints &constraints,
                     (const_cast<Elem *>(neigh))->hack_p_level(min_p_level);
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-		  // We can do a projection with a single integration,
-		  // due to the assumption of nested finite element
-		  // subspaces.
-		  // FIXME: it might be more efficient to do nodes,
-		  // then edges, then side, to reduce the size of the
-		  // Cholesky factorization(s)
-	          my_fe->reinit(elem, s);
+                  // We can do a projection with a single integration,
+                  // due to the assumption of nested finite element
+                  // subspaces.
+                  // FIXME: it might be more efficient to do nodes,
+                  // then edges, then side, to reduce the size of the
+                  // Cholesky factorization(s)
+                  my_fe->reinit(elem, s);
 
-	          dof_map.dof_indices (elem, my_dof_indices,
-			               variable_number);
-	          dof_map.dof_indices (neigh, neigh_dof_indices,
-			               variable_number);
+                  dof_map.dof_indices (elem, my_dof_indices,
+                                       variable_number);
+                  dof_map.dof_indices (neigh, neigh_dof_indices,
+                                       variable_number);
 
-	          const unsigned int n_qp = my_qface.n_points();
+                  const unsigned int n_qp = my_qface.n_points();
 
                   // Translate the quadrature points over to the
                   // neighbor's boundary
@@ -2012,15 +2012,15 @@ compute_periodic_constraints (DofConstraints &constraints,
                   for (unsigned int i=0; i != neigh_point.size(); ++i)
                     neigh_point[i] = periodic->get_corresponding_pos(q_point[i]);
 
-	          FEInterface::inverse_map (Dim, base_fe_type, neigh,
+                  FEInterface::inverse_map (Dim, base_fe_type, neigh,
                                             neigh_point, neigh_qface);
 
-	          neigh_fe->reinit(neigh, &neigh_qface);
+                  neigh_fe->reinit(neigh, &neigh_qface);
 
-	          // We're only concerned with DOFs whose values (and/or first
-	          // derivatives for C1 elements) are supported on side nodes
-	          FEInterface::dofs_on_side(elem, Dim, base_fe_type, s, my_side_dofs);
-	          FEInterface::dofs_on_side(neigh, Dim, base_fe_type, s_neigh, neigh_side_dofs);
+                  // We're only concerned with DOFs whose values (and/or first
+                  // derivatives for C1 elements) are supported on side nodes
+                  FEInterface::dofs_on_side(elem, Dim, base_fe_type, s, my_side_dofs);
+                  FEInterface::dofs_on_side(neigh, Dim, base_fe_type, s_neigh, neigh_side_dofs);
 
                   // We're done with functions that examine Elem::p_level(),
                   // so let's unhack those levels
@@ -2031,71 +2031,71 @@ compute_periodic_constraints (DofConstraints &constraints,
                     (const_cast<Elem *>(neigh))->hack_p_level(old_neigh_level);
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-	          const unsigned int n_side_dofs =
-		    libmesh_cast_int<unsigned int>
-		      (my_side_dofs.size());
-	          libmesh_assert_equal_to (n_side_dofs, neigh_side_dofs.size());
+                  const unsigned int n_side_dofs =
+                    libmesh_cast_int<unsigned int>
+                    (my_side_dofs.size());
+                  libmesh_assert_equal_to (n_side_dofs, neigh_side_dofs.size());
 
-	          Ke.resize (n_side_dofs, n_side_dofs);
-	          Ue.resize(n_side_dofs);
+                  Ke.resize (n_side_dofs, n_side_dofs);
+                  Ue.resize(n_side_dofs);
 
-	          // Form the projection matrix, (inner product of fine basis
-	          // functions against fine test functions)
-	          for (unsigned int is = 0; is != n_side_dofs; ++is)
-	            {
-	              const unsigned int i = my_side_dofs[is];
-	              for (unsigned int js = 0; js != n_side_dofs; ++js)
-	                {
-	                  const unsigned int j = my_side_dofs[js];
-		          for (unsigned int qp = 0; qp != n_qp; ++qp)
+                  // Form the projection matrix, (inner product of fine basis
+                  // functions against fine test functions)
+                  for (unsigned int is = 0; is != n_side_dofs; ++is)
+                    {
+                      const unsigned int i = my_side_dofs[is];
+                      for (unsigned int js = 0; js != n_side_dofs; ++js)
+                        {
+                          const unsigned int j = my_side_dofs[js];
+                          for (unsigned int qp = 0; qp != n_qp; ++qp)
                             {
-		              Ke(is,js) += JxW[qp] *
-					   TensorTools::inner_product(phi[i][qp],
-								      phi[j][qp]);
+                              Ke(is,js) += JxW[qp] *
+                                TensorTools::inner_product(phi[i][qp],
+                                                           phi[j][qp]);
                               if (cont != C_ZERO)
-		                Ke(is,js) += JxW[qp] *
+                                Ke(is,js) += JxW[qp] *
                                              TensorTools::inner_product((*dphi)[i][qp] *
-									(*face_normals)[qp],
-									(*dphi)[j][qp] *
-									(*face_normals)[qp]);
+                                                                        (*face_normals)[qp],
+                                                                        (*dphi)[j][qp] *
+                                                                        (*face_normals)[qp]);
                             }
-		        }
-	            }
+                        }
+                    }
 
-	          // Form the right hand sides, (inner product of coarse basis
-	          // functions against fine test functions)
-	          for (unsigned int is = 0; is != n_side_dofs; ++is)
-	            {
-	              const unsigned int i = neigh_side_dofs[is];
-	              Fe.resize (n_side_dofs);
-	              for (unsigned int js = 0; js != n_side_dofs; ++js)
-		        {
-	                  const unsigned int j = my_side_dofs[js];
-	                  for (unsigned int qp = 0; qp != n_qp; ++qp)
+                  // Form the right hand sides, (inner product of coarse basis
+                  // functions against fine test functions)
+                  for (unsigned int is = 0; is != n_side_dofs; ++is)
+                    {
+                      const unsigned int i = neigh_side_dofs[is];
+                      Fe.resize (n_side_dofs);
+                      for (unsigned int js = 0; js != n_side_dofs; ++js)
+                        {
+                          const unsigned int j = my_side_dofs[js];
+                          for (unsigned int qp = 0; qp != n_qp; ++qp)
                             {
-		              Fe(js) += JxW[qp] *
+                              Fe(js) += JxW[qp] *
                                         TensorTools::inner_product(neigh_phi[i][qp],
-								   phi[j][qp]);
+                                                                   phi[j][qp]);
                               if (cont != C_ZERO)
-		                Fe(js) += JxW[qp] *
+                                Fe(js) += JxW[qp] *
                                           TensorTools::inner_product((*neigh_dphi)[i][qp] *
-								     (*face_normals)[qp],
-								     (*dphi)[j][qp] *
-								     (*face_normals)[qp]);
+                                                                     (*face_normals)[qp],
+                                                                     (*dphi)[j][qp] *
+                                                                     (*face_normals)[qp]);
                             }
-		        }
-	              Ke.cholesky_solve(Fe, Ue[is]);
-	            }
+                        }
+                      Ke.cholesky_solve(Fe, Ue[is]);
+                    }
 
                   // Make sure we're not adding recursive constraints
                   // due to the redundancy in the way we add periodic
                   // boundary constraints
-		  //
-		  // In order for this to work while threaded or on
-		  // distributed meshes, we need a rigorous way to
-		  // avoid recursive constraints.  Here it is:
-		  //
-		  // For vertex DoFs, if there is a "prior" element
+                  //
+                  // In order for this to work while threaded or on
+                  // distributed meshes, we need a rigorous way to
+                  // avoid recursive constraints.  Here it is:
+                  //
+                  // For vertex DoFs, if there is a "prior" element
                   // (i.e. a coarser element or an equally refined
                   // element with a lower id) on this boundary which
                   // contains the vertex point, then we will avoid
@@ -2107,25 +2107,25 @@ compute_periodic_constraints (DofConstraints &constraints,
                   // element there, and if that primary is coarser or
                   // equal-but-lower-id, then our vertex dofs are
                   // constrained in terms of that element.
-		  //
-		  // For edge DoFs, if there is a coarser element
-		  // on this boundary sharing this edge, then we will
-		  // avoid generating constraints (we will be
-		  // constrained indirectly via AMR constraints
-		  // connecting us to the coarser element's DoFs).  If
-		  // we are the coarsest element sharing this edge,
-		  // then we generate constraints if and only if we
-		  // are finer than the coarsest element on the
-		  // boundary periodic to us sharing the corresponding
-		  // periodic edge, or if we are at equal level but
-		  // our edge nodes have higher ids than the periodic
-		  // edge nodes (sorted from highest to lowest, then
-		  // compared lexicographically)
-		  //
-		  // For face DoFs, we generate constraints if we are
-		  // finer than our periodic neighbor, or if we are at
-		  // equal level but our element id is higher than its
-		  // element id.
+                  //
+                  // For edge DoFs, if there is a coarser element
+                  // on this boundary sharing this edge, then we will
+                  // avoid generating constraints (we will be
+                  // constrained indirectly via AMR constraints
+                  // connecting us to the coarser element's DoFs).  If
+                  // we are the coarsest element sharing this edge,
+                  // then we generate constraints if and only if we
+                  // are finer than the coarsest element on the
+                  // boundary periodic to us sharing the corresponding
+                  // periodic edge, or if we are at equal level but
+                  // our edge nodes have higher ids than the periodic
+                  // edge nodes (sorted from highest to lowest, then
+                  // compared lexicographically)
+                  //
+                  // For face DoFs, we generate constraints if we are
+                  // finer than our periodic neighbor, or if we are at
+                  // equal level but our element id is higher than its
+                  // element id.
                   //
                   // If the primary neighbor is also the current elem
                   // (a 1-element-thick mesh) then we choose which
@@ -2137,9 +2137,9 @@ compute_periodic_constraints (DofConstraints &constraints,
                   // intersect.
                   std::set<dof_id_type> my_constrained_dofs;
 
-		  for (unsigned int n = 0; n != elem->n_nodes(); ++n)
+                  for (unsigned int n = 0; n != elem->n_nodes(); ++n)
                     {
-		      if (!elem->is_node_on_side(n,s))
+                      if (!elem->is_node_on_side(n,s))
                         continue;
 
                       const Node* my_node = elem->get_node(n);
@@ -2147,29 +2147,29 @@ compute_periodic_constraints (DofConstraints &constraints,
                       if (elem->is_vertex(n))
                         {
                           // Find all boundary ids that include this
-			  // point and have periodic boundary
-			  // conditions for this variable
-			  std::set<boundary_id_type> point_bcids;
+                          // point and have periodic boundary
+                          // conditions for this variable
+                          std::set<boundary_id_type> point_bcids;
 
-			  for (unsigned int new_s = 0; new_s !=
-			       elem->n_sides(); ++new_s)
-			    {
-			      if (!elem->is_node_on_side(n,new_s))
-			        continue;
+                          for (unsigned int new_s = 0; new_s !=
+                                 elem->n_sides(); ++new_s)
+                            {
+                              if (!elem->is_node_on_side(n,new_s))
+                                continue;
 
-			      const std::vector<boundary_id_type>
-				new_bc_ids = mesh.boundary_info->boundary_ids (elem, s);
+                              const std::vector<boundary_id_type>
+                                new_bc_ids = mesh.boundary_info->boundary_ids (elem, s);
                               for (std::vector<boundary_id_type>::const_iterator
-			           new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
+                                     new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
                                 {
                                   const boundary_id_type new_boundary_id = *new_id_it;
                                   const PeriodicBoundaryBase *new_periodic = boundaries.boundary(new_boundary_id);
                                   if (new_periodic && new_periodic->is_my_variable(variable_number))
                                     {
-				      point_bcids.insert(new_boundary_id);
+                                      point_bcids.insert(new_boundary_id);
                                     }
                                 }
-			    }
+                            }
 
                           // See if this vertex has point neighbors to
                           // defer to
@@ -2177,25 +2177,25 @@ compute_periodic_constraints (DofConstraints &constraints,
                                 (elem, *my_node, *mesh.boundary_info, point_bcids) != elem)
                             continue;
 
-			  // Find the complementary boundary id set
-			  std::set<boundary_id_type> point_pairedids;
-	                  for (std::set<boundary_id_type>::const_iterator i =
-		               point_bcids.begin(); i != point_bcids.end(); ++i)
-			    {
+                          // Find the complementary boundary id set
+                          std::set<boundary_id_type> point_pairedids;
+                          for (std::set<boundary_id_type>::const_iterator i =
+                                 point_bcids.begin(); i != point_bcids.end(); ++i)
+                            {
                               const boundary_id_type new_boundary_id = *i;
                               const PeriodicBoundaryBase *new_periodic = boundaries.boundary(new_boundary_id);
                               point_pairedids.insert(new_periodic->pairedboundary);
-			    }
+                            }
 
-			  // What do we want to constrain against?
-			  const Elem* primary_elem = NULL;
-			  const Elem* main_neigh = NULL;
-			  Point main_pt = *my_node,
-			        primary_pt = *my_node;
+                          // What do we want to constrain against?
+                          const Elem* primary_elem = NULL;
+                          const Elem* main_neigh = NULL;
+                          Point main_pt = *my_node,
+                            primary_pt = *my_node;
 
-	                  for (std::set<boundary_id_type>::const_iterator i =
-		               point_bcids.begin(); i != point_bcids.end(); ++i)
-			    {
+                          for (std::set<boundary_id_type>::const_iterator i =
+                                 point_bcids.begin(); i != point_bcids.end(); ++i)
+                            {
                               // Find the corresponding periodic point and
                               // its primary neighbor
                               const boundary_id_type new_boundary_id = *i;
@@ -2204,17 +2204,17 @@ compute_periodic_constraints (DofConstraints &constraints,
                               const Point neigh_pt =
                                 new_periodic->get_corresponding_pos(*my_node);
 
-			      // If the point is getting constrained
-			      // to itself by this PBC then we don't
-			      // generate any constraints
-			      if (neigh_pt.absolute_fuzzy_equals
-				   (*my_node, primary_hmin*TOLERANCE))
-				continue;
+                              // If the point is getting constrained
+                              // to itself by this PBC then we don't
+                              // generate any constraints
+                              if (neigh_pt.absolute_fuzzy_equals
+                                  (*my_node, primary_hmin*TOLERANCE))
+                                continue;
 
-			      // Otherwise we'll have a constraint in
-			      // one direction or another
-			      if (!primary_elem)
-				primary_elem = elem;
+                              // Otherwise we'll have a constraint in
+                              // one direction or another
+                              if (!primary_elem)
+                                primary_elem = elem;
 
                               const Elem *primary_neigh = primary_boundary_point_neighbor
                                 (neigh, neigh_pt, *mesh.boundary_info,
@@ -2222,15 +2222,15 @@ compute_periodic_constraints (DofConstraints &constraints,
 
                               libmesh_assert(primary_neigh);
 
-			      if (new_boundary_id == boundary_id)
-				{
-			          main_neigh = primary_neigh;
-			          main_pt = neigh_pt;
-				}
+                              if (new_boundary_id == boundary_id)
+                                {
+                                  main_neigh = primary_neigh;
+                                  main_pt = neigh_pt;
+                                }
 
                               // Finer elements will get constrained in
-			      // terms of coarser neighbors, not the
-			      // other way around
+                              // terms of coarser neighbors, not the
+                              // other way around
                               if ((primary_neigh->level() > primary_elem->level()) ||
 
                               // For equal-level elements, the one with
@@ -2243,16 +2243,16 @@ compute_periodic_constraints (DofConstraints &constraints,
                               // points to see what side gets constrained
                                   (primary_neigh == primary_elem &&
                                    (neigh_pt > primary_pt)))
-				continue;
+                                continue;
 
-			      primary_elem = primary_neigh;
+                              primary_elem = primary_neigh;
                               primary_pt = neigh_pt;
                             }
 
-		          if (!primary_elem ||
-			      primary_elem != main_neigh ||
-			      primary_pt != main_pt)
-			    continue;
+                          if (!primary_elem ||
+                              primary_elem != main_neigh ||
+                              primary_pt != main_pt)
+                            continue;
                         }
                       else if (elem->is_edge(n))
                         {
@@ -2289,29 +2289,29 @@ compute_periodic_constraints (DofConstraints &constraints,
                           libmesh_assert (e1 && e2);
 
                           // Find all boundary ids that include this
-			  // edge and have periodic boundary
-			  // conditions for this variable
-			  std::set<boundary_id_type> edge_bcids;
+                          // edge and have periodic boundary
+                          // conditions for this variable
+                          std::set<boundary_id_type> edge_bcids;
 
-			  for (unsigned int new_s = 0; new_s !=
-			       elem->n_sides(); ++new_s)
-			    {
-			      if (!elem->is_node_on_side(n,new_s))
-			        continue;
+                          for (unsigned int new_s = 0; new_s !=
+                                 elem->n_sides(); ++new_s)
+                            {
+                              if (!elem->is_node_on_side(n,new_s))
+                                continue;
 
-			      const std::vector<boundary_id_type>&
-				new_bc_ids = mesh.boundary_info->boundary_ids (elem, s);
+                              const std::vector<boundary_id_type>&
+                                new_bc_ids = mesh.boundary_info->boundary_ids (elem, s);
                               for (std::vector<boundary_id_type>::const_iterator
-			           new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
+                                     new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
                                 {
                                   const boundary_id_type new_boundary_id = *new_id_it;
                                   const PeriodicBoundaryBase *new_periodic = boundaries.boundary(new_boundary_id);
                                   if (new_periodic && new_periodic->is_my_variable(variable_number))
                                     {
-				      edge_bcids.insert(new_boundary_id);
+                                      edge_bcids.insert(new_boundary_id);
                                     }
                                 }
-			    }
+                            }
 
 
                           // See if this edge has neighbors to defer to
@@ -2319,27 +2319,27 @@ compute_periodic_constraints (DofConstraints &constraints,
                                (elem, *e1, *e2, *mesh.boundary_info, edge_bcids) != elem)
                             continue;
 
-			  // Find the complementary boundary id set
-			  std::set<boundary_id_type> edge_pairedids;
-	                  for (std::set<boundary_id_type>::const_iterator i =
-		               edge_bcids.begin(); i != edge_bcids.end(); ++i)
-			    {
+                          // Find the complementary boundary id set
+                          std::set<boundary_id_type> edge_pairedids;
+                          for (std::set<boundary_id_type>::const_iterator i =
+                                 edge_bcids.begin(); i != edge_bcids.end(); ++i)
+                            {
                               const boundary_id_type new_boundary_id = *i;
                               const PeriodicBoundaryBase *new_periodic = boundaries.boundary(new_boundary_id);
                               edge_pairedids.insert(new_periodic->pairedboundary);
-			    }
+                            }
 
-			  // What do we want to constrain against?
-			  const Elem* primary_elem = NULL;
-			  const Elem* main_neigh = NULL;
-			  Point main_pt1 = *e1,
-			        main_pt2 = *e2,
-			        primary_pt1 = *e1,
-			        primary_pt2 = *e2;
+                          // What do we want to constrain against?
+                          const Elem* primary_elem = NULL;
+                          const Elem* main_neigh = NULL;
+                          Point main_pt1 = *e1,
+                            main_pt2 = *e2,
+                            primary_pt1 = *e1,
+                            primary_pt2 = *e2;
 
-	                  for (std::set<boundary_id_type>::const_iterator i =
-		               edge_bcids.begin(); i != edge_bcids.end(); ++i)
-			    {
+                          for (std::set<boundary_id_type>::const_iterator i =
+                                 edge_bcids.begin(); i != edge_bcids.end(); ++i)
+                            {
                               // Find the corresponding periodic edge and
                               // its primary neighbor
                               const boundary_id_type new_boundary_id = *i;
@@ -2348,19 +2348,19 @@ compute_periodic_constraints (DofConstraints &constraints,
                               Point neigh_pt1 = new_periodic->get_corresponding_pos(*e1),
                                     neigh_pt2 = new_periodic->get_corresponding_pos(*e2);
 
-			      // If the edge is getting constrained
-			      // to itself by this PBC then we don't
-			      // generate any constraints
-			      if (neigh_pt1.absolute_fuzzy_equals
-				   (*e1, primary_hmin*TOLERANCE) &&
-			          neigh_pt2.absolute_fuzzy_equals
-				   (*e2, primary_hmin*TOLERANCE))
-				continue;
+                              // If the edge is getting constrained
+                              // to itself by this PBC then we don't
+                              // generate any constraints
+                              if (neigh_pt1.absolute_fuzzy_equals
+                                  (*e1, primary_hmin*TOLERANCE) &&
+                                  neigh_pt2.absolute_fuzzy_equals
+                                  (*e2, primary_hmin*TOLERANCE))
+                                continue;
 
-			      // Otherwise we'll have a constraint in
-			      // one direction or another
-			      if (!primary_elem)
-				primary_elem = elem;
+                              // Otherwise we'll have a constraint in
+                              // one direction or another
+                              if (!primary_elem)
+                                primary_elem = elem;
 
                               const Elem *primary_neigh = primary_boundary_edge_neighbor
                                 (neigh, neigh_pt1, neigh_pt2, *mesh.boundary_info,
@@ -2368,12 +2368,12 @@ compute_periodic_constraints (DofConstraints &constraints,
 
                               libmesh_assert(primary_neigh);
 
-			      if (new_boundary_id == boundary_id)
-				{
-			          main_neigh = primary_neigh;
-			          main_pt1 = neigh_pt1;
-			          main_pt2 = neigh_pt2;
-				}
+                              if (new_boundary_id == boundary_id)
+                                {
+                                  main_neigh = primary_neigh;
+                                  main_pt1 = neigh_pt1;
+                                  main_pt2 = neigh_pt2;
+                                }
 
                               // If we have a one-element thick mesh,
                               // we'll need to sort our points to get a
@@ -2406,16 +2406,16 @@ compute_periodic_constraints (DofConstraints &constraints,
                                    primary_neigh->id() > primary_elem->id()))
                                 continue;
 
-			      primary_elem = primary_neigh;
+                              primary_elem = primary_neigh;
                               primary_pt1 = neigh_pt1;
                               primary_pt2 = neigh_pt2;
                             }
 
-		          if (!primary_elem ||
-			      primary_elem != main_neigh ||
-			      primary_pt1 != main_pt1 ||
-			      primary_pt2 != main_pt2)
-			    continue;
+                          if (!primary_elem ||
+                              primary_elem != main_neigh ||
+                              primary_pt1 != main_pt1 ||
+                              primary_pt2 != main_pt2)
+                            continue;
                         }
                       else if (elem->is_face(n))
                         {
@@ -2461,17 +2461,17 @@ compute_periodic_constraints (DofConstraints &constraints,
                   // FIXME: old code for disambiguating periodic BCs:
                   // this is not threadsafe nor safe to run on a
                   // non-serialized mesh.
-		  /*
+                  /*
                   std::vector<bool> recursive_constraint(n_side_dofs, false);
 
-	          for (unsigned int is = 0; is != n_side_dofs; ++is)
-	            {
-	              const unsigned int i = neigh_side_dofs[is];
-	              const dof_id_type their_dof_g = neigh_dof_indices[i];
+                  for (unsigned int is = 0; is != n_side_dofs; ++is)
+                  {
+                  const unsigned int i = neigh_side_dofs[is];
+                  const dof_id_type their_dof_g = neigh_dof_indices[i];
                       libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
 
-		      {
-			Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                      {
+                      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
                         if (!dof_map.is_constrained_dof(their_dof_g))
                           continue;
@@ -2480,75 +2480,75 @@ compute_periodic_constraints (DofConstraints &constraints,
                       DofConstraintRow& their_constraint_row =
                         constraints[their_dof_g].first;
 
-	              for (unsigned int js = 0; js != n_side_dofs; ++js)
-	                {
-	                  const unsigned int j = my_side_dofs[js];
-	                  const dof_id_type my_dof_g = my_dof_indices[j];
+                        for (unsigned int js = 0; js != n_side_dofs; ++js)
+                        {
+                        const unsigned int j = my_side_dofs[js];
+                        const dof_id_type my_dof_g = my_dof_indices[j];
                           libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
 
                           if (their_constraint_row.count(my_dof_g))
                             recursive_constraint[js] = true;
-	                }
+                            }
                     }
-		  */
+                  */
 
-	          for (unsigned int js = 0; js != n_side_dofs; ++js)
-	            {
+                  for (unsigned int js = 0; js != n_side_dofs; ++js)
+                    {
                       // FIXME: old code path
                       // if (recursive_constraint[js])
                       //  continue;
 
-	              const unsigned int j = my_side_dofs[js];
-	              const dof_id_type my_dof_g = my_dof_indices[j];
+                      const unsigned int j = my_side_dofs[js];
+                      const dof_id_type my_dof_g = my_dof_indices[j];
                       libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
 
                       // FIXME: new code path
                       if (!my_constrained_dofs.count(my_dof_g))
                         continue;
 
-		      DofConstraintRow* constraint_row;
+                      DofConstraintRow* constraint_row;
 
-		      // we may be running constraint methods concurretly
+                      // we may be running constraint methods concurretly
                       // on multiple threads, so we need a lock to
                       // ensure that this constraint is "ours"
-		      {
-			Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                      {
+                        Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
                         if (dof_map.is_constrained_dof(my_dof_g))
                           continue;
 
-		        constraint_row = &(constraints[my_dof_g]);
+                        constraint_row = &(constraints[my_dof_g]);
                         libmesh_assert(constraint_row->empty());
                       }
 
-	              for (unsigned int is = 0; is != n_side_dofs; ++is)
-	                {
-	                  const unsigned int i = neigh_side_dofs[is];
-	                  const dof_id_type their_dof_g = neigh_dof_indices[i];
+                      for (unsigned int is = 0; is != n_side_dofs; ++is)
+                        {
+                          const unsigned int i = neigh_side_dofs[is];
+                          const dof_id_type their_dof_g = neigh_dof_indices[i];
                           libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
 
                           // Periodic constraints should never be
                           // self-constraints
-		          // libmesh_assert_not_equal_to (their_dof_g, my_dof_g);
+                          // libmesh_assert_not_equal_to (their_dof_g, my_dof_g);
 
-		          const Real their_dof_value = Ue[is](js);
+                          const Real their_dof_value = Ue[is](js);
 
-		          if (their_dof_g == my_dof_g)
-		            {
-		              libmesh_assert_less (std::abs(their_dof_value-1.), 1.e-5);
-		              for (unsigned int k = 0; k != n_side_dofs; ++k)
-		                libmesh_assert(k == is || std::abs(Ue[k](js)) < 1.e-5);
-		              continue;
-		            }
+                          if (their_dof_g == my_dof_g)
+                            {
+                              libmesh_assert_less (std::abs(their_dof_value-1.), 1.e-5);
+                              for (unsigned int k = 0; k != n_side_dofs; ++k)
+                                libmesh_assert(k == is || std::abs(Ue[k](js)) < 1.e-5);
+                              continue;
+                            }
 
-		          if (std::abs(their_dof_value) < 10*TOLERANCE)
-		            continue;
+                          if (std::abs(their_dof_value) < 10*TOLERANCE)
+                            continue;
 
-			  constraint_row->insert(std::make_pair(their_dof_g,
-							        their_dof_value));
-		        }
-	            }
-	        }
+                          constraint_row->insert(std::make_pair(their_dof_g,
+                                                                their_dof_value));
+                        }
+                    }
+                }
               // p refinement constraints:
               // constrain dofs shared between
               // active elements and neighbors with

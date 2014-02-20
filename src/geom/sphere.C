@@ -41,7 +41,7 @@ Sphere::Sphere () :
 
 
 Sphere::Sphere (const Point& c,
-		const Real   r)
+                const Real   r)
 {
   libmesh_assert_greater (r, 0.);
 
@@ -54,15 +54,15 @@ Sphere::Sphere (const Sphere& other_sphere) :
   Surface()
 {
   this->create_from_center_radius (other_sphere.center(),
-				   other_sphere.radius());
+                                   other_sphere.radius());
 }
 
 
 
 Sphere::Sphere(const Point& pa,
-	       const Point& pb,
-	       const Point& pc,
-	       const Point& pd)
+               const Point& pb,
+               const Point& pc,
+               const Point& pd)
 {
   Point pad = pa - pd;
   Point pbd = pb - pd;
@@ -80,18 +80,18 @@ Sphere::Sphere(const Point& pa,
   Real g = 0.5*(pc.size_sq() - pd.size_sq());
 
   TensorValue<Real> T1(e,pad(1),pad(2),
-		       f,pbd(1),pbd(2),
-		       g,pcd(1),pcd(2));
+                       f,pbd(1),pbd(2),
+                       g,pcd(1),pcd(2));
   Real sx = T1.det()/D;
 
   TensorValue<Real> T2(pad(0),e,pad(2),
-		       pbd(0),f,pbd(2),
-		       pcd(0),g,pcd(2));
+                       pbd(0),f,pbd(2),
+                       pcd(0),g,pcd(2));
   Real sy = T2.det()/D;
 
   TensorValue<Real> T3(pad(0),pad(1),e,
-		       pbd(0),pbd(1),f,
-		       pcd(0),pcd(1),g);
+                       pbd(0),pbd(1),f,
+                       pcd(0),pcd(1),g);
   Real sz = T3.det()/D;
 
   Point c(sx,sy,sz);

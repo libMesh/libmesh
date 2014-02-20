@@ -61,10 +61,10 @@ extern "C"
 
     //if (its > 0)
       libMesh::out << "  NL step "
-		    << std::setw(2) << its
-		    << std::scientific
-		    << ", |residual|_2 = " << fnorm
-		    << std::endl;
+                   << std::setw(2) << its
+                   << std::scientific
+                   << ", |residual|_2 = " << fnorm
+                   << std::endl;
 
     //return ierr;
     return 0;
@@ -124,14 +124,14 @@ extern "C"
     // will be used, so catch that as an error
     if (solver->residual && solver->residual_object)
       {
-	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Residual!" << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Residual!" << std::endl;
+        libmesh_error();
       }
 
     if (solver->matvec && solver->residual_and_jacobian_object)
       {
-	libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
+        libmesh_error();
       }
     //-----------------------------------------------------------------------------
 
@@ -205,14 +205,14 @@ extern "C"
     // will be used, so catch that as an error
     if (solver->jacobian && solver->jacobian_object)
       {
-	libMesh::err << "ERROR: cannot specify both a function and object to compute the Jacobian!" << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: cannot specify both a function and object to compute the Jacobian!" << std::endl;
+        libmesh_error();
       }
 
     if (solver->matvec && solver->residual_and_jacobian_object)
       {
-	libMesh::err << "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!" << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!" << std::endl;
+        libmesh_error();
       }
     //-----------------------------------------------------------------------------
 
@@ -311,11 +311,11 @@ void PetscNonlinearSolver<T>::init ()
       {
 #if PETSC_VERSION_LESS_THAN(2,3,3)
         ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
-			       this, PETSC_NULL);
+                               this, PETSC_NULL);
 #else
         // API name change in PETSc 2.3.3
         ierr = SNESMonitorSet (_snes, __libmesh_petsc_snes_monitor,
-			       this, PETSC_NULL);
+                               this, PETSC_NULL);
 #endif
         LIBMESH_CHKERRABORT(ierr);
       }
@@ -426,10 +426,10 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
 template <typename T>
 std::pair<unsigned int, Real>
 PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Matrix
-				NumericVector<T>& x_in,    // Solution vector
-				NumericVector<T>& r_in,    // Residual vector
-				const double,              // Stopping tolerance
-				const unsigned int)
+                                NumericVector<T>& x_in,    // Solution vector
+                                NumericVector<T>& r_in,    // Residual vector
+                                const double,              // Stopping tolerance
+                                const unsigned int)
 {
   START_LOG("solve()", "PetscNonlinearSolver");
   this->init ();
@@ -544,7 +544,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
          LIBMESH_CHKERRABORT(ierr);
 
   ierr = SNESGetFunctionNorm(_snes,&final_residual_norm);
-	 LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
 #endif
 

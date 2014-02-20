@@ -54,10 +54,10 @@ public:
    * at the \f$(ioff,joff)\f$ location in the parent matrix.
    */
   DenseSubMatrix(DenseMatrix<T>& new_parent,
-		 const unsigned int ioff=0,
-		 const unsigned int joff=0,
-		 const unsigned int m=0,
-		 const unsigned int n=0);
+                 const unsigned int ioff=0,
+                 const unsigned int joff=0,
+                 const unsigned int m=0,
+                 const unsigned int n=0);
 
   /**
    * Copy Constructor.
@@ -84,25 +84,25 @@ public:
    * @returns the \p (i,j) element of the submatrix.
    */
   T operator() (const unsigned int i,
-		const unsigned int j) const;
+                const unsigned int j) const;
 
   /**
    * @returns the \p (i,j) element of the submatrix as a writeable reference.
    */
   T & operator() (const unsigned int i,
-		  const unsigned int j);
+                  const unsigned int j);
 
   /**
    * @returns the \p (i,j) element of the matrix as a writeable reference.
    */
   virtual T el(const unsigned int i,
-	       const unsigned int j) const { return (*this)(i,j); }
+               const unsigned int j) const { return (*this)(i,j); }
 
   /**
    * @returns the \p (i,j) element of the matrix as a writeable reference.
    */
   virtual T & el(const unsigned int i,
-		 const unsigned int j)     { return (*this)(i,j); }
+                 const unsigned int j)     { return (*this)(i,j); }
 
   /**
    * Performs the operation: (*this) <- M2 * (*this)
@@ -118,9 +118,9 @@ public:
    * Changes the location of the submatrix in the parent matrix.
    */
   void reposition(const unsigned int ioff,
-		  const unsigned int joff,
-		  const unsigned int new_m,
-		  const unsigned int new_n);
+                  const unsigned int joff,
+                  const unsigned int new_m,
+                  const unsigned int new_n);
 
   /**
    * @returns the row offset into the parent matrix.
@@ -139,13 +139,13 @@ public:
    * symmetry of the matrix.
    */
   void condense(const unsigned int i,
-		const unsigned int j,
-		const T val,
-		DenseSubVector<T>& rhs)
+                const unsigned int j,
+                const T val,
+                DenseSubVector<T>& rhs)
   {
     this->parent().condense(this->i_off()+i,
-			    this->j_off()+j,
-			    val, rhs.parent());
+                            this->j_off()+j,
+                            val, rhs.parent());
   }
 
 private:
@@ -172,10 +172,10 @@ private:
 template<typename T>
 inline
 DenseSubMatrix<T>::DenseSubMatrix(DenseMatrix<T>& new_parent,
-				  const unsigned int ioff,
-				  const unsigned int joff,
-				  const unsigned int new_m,
-				  const unsigned int new_n)
+                                  const unsigned int ioff,
+                                  const unsigned int joff,
+                                  const unsigned int new_m,
+                                  const unsigned int new_n)
   : DenseMatrixBase<T>(new_m,new_n),
     _parent_matrix(new_parent)
 {
@@ -198,9 +198,9 @@ DenseSubMatrix<T>::DenseSubMatrix(const DenseSubMatrix<T>& other_matrix)
 template<typename T>
 inline
 void DenseSubMatrix<T>::reposition(const unsigned int ioff,
-				   const unsigned int joff,
-				   const unsigned int new_m,
-				   const unsigned int new_n)
+                                   const unsigned int joff,
+                                   const unsigned int new_m,
+                                   const unsigned int new_n)
 {
   _i_off = ioff;
   _j_off = joff;
@@ -221,7 +221,7 @@ void DenseSubMatrix<T>::zero()
   for (unsigned int i=0; i<this->m(); i++)
     for (unsigned int j=0; j<this->n(); j++)
       _parent_matrix(i + this->i_off(),
-		     j + this->j_off()) = 0.;
+                     j + this->j_off()) = 0.;
 }
 
 
@@ -229,7 +229,7 @@ void DenseSubMatrix<T>::zero()
 template<typename T>
 inline
 T DenseSubMatrix<T>::operator () (const unsigned int i,
-				  const unsigned int j) const
+                                  const unsigned int j) const
 {
   libmesh_assert_less (i, this->m());
   libmesh_assert_less (j, this->n());
@@ -237,14 +237,14 @@ T DenseSubMatrix<T>::operator () (const unsigned int i,
   libmesh_assert_less (j + this->j_off(), _parent_matrix.n());
 
   return _parent_matrix (i + this->i_off(),
-			 j + this->j_off());
+                         j + this->j_off());
 }
 
 
 template<typename T>
 inline
 T & DenseSubMatrix<T>::operator () (const unsigned int i,
-				    const unsigned int j)
+                                    const unsigned int j)
 {
   libmesh_assert_less (i, this->m());
   libmesh_assert_less (j, this->n());
@@ -252,7 +252,7 @@ T & DenseSubMatrix<T>::operator () (const unsigned int i,
   libmesh_assert_less (j + this->j_off(), _parent_matrix.n());
 
   return _parent_matrix (i + this->i_off(),
-			 j + this->j_off());
+                         j + this->j_off());
 }
 
 

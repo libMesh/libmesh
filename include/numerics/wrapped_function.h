@@ -72,7 +72,7 @@ public:
    * and time \p time.
    */
   virtual Output operator() (const Point& p,
-			     const Real time = 0.);
+                             const Real time = 0.);
 
   /**
    * Return function for vectors.
@@ -80,8 +80,8 @@ public:
    * coordinate \p p and for time \p time.
    */
   virtual void operator() (const Point& p,
-			   const Real time,
-			   DenseVector<Output>& output);
+                           const Real time,
+                           DenseVector<Output>& output);
 
   /**
    * @returns the vector component \p i at coordinate
@@ -89,7 +89,7 @@ public:
    */
   virtual Output component (unsigned int i,
                             const Point& p,
-			    Real time=0.);
+                            Real time=0.);
 
 protected:
 
@@ -113,7 +113,7 @@ protected:
 template <typename Output>
 inline
 Output WrappedFunction<Output>::operator() (const Point& p,
-			                    const Real /*time*/)
+                                            const Real /*time*/)
 {
   libmesh_assert(_fptr);
   libmesh_assert(_parameters);
@@ -143,8 +143,8 @@ WrappedFunction<Output>::clone () const
 template <typename Output>
 inline
 void WrappedFunction<Output>::operator() (const Point& p,
-			                  const Real /*time*/,
-			                  DenseVector<Output>& output)
+                                          const Real /*time*/,
+                                          DenseVector<Output>& output)
 {
   libmesh_assert(_fptr);
   libmesh_assert(_parameters);
@@ -163,19 +163,19 @@ void WrappedFunction<Output>::operator() (const Point& p,
         _sys.variable(v).n_components();
       if (n_components == 1)
         output(_sys.variable_scalar_number(v,0)) =
-	   _fptr(p, *_parameters, _sys.name(), _sys.variable_name(v));
+          _fptr(p, *_parameters, _sys.name(), _sys.variable_name(v));
       else
         {
           // Right now our only non-scalar variable type is the
           // SCALAR variables.  The irony is priceless.
           libmesh_assert_equal_to (_sys.variable(v).type().family, SCALAR);
 
-	  // We pass the point (j,0,0) to an old-style fptr function
-	  // pointer to distinguish the different scalars within the
-	  // SCALAR variable.
+          // We pass the point (j,0,0) to an old-style fptr function
+          // pointer to distinguish the different scalars within the
+          // SCALAR variable.
           for (unsigned int j=0; j != n_components; ++j)
             output(_sys.variable_scalar_number(v,j)) =
-	       _fptr(Point(j,0,0), *_parameters,
+              _fptr(Point(j,0,0), *_parameters,
                      _sys.name(), _sys.variable_name(v));
         }
     }
@@ -190,7 +190,7 @@ template <typename Output>
 inline
 Output WrappedFunction<Output>::component (unsigned int i,
                                            const Point& p,
-			                   Real /*time*/)
+                                           Real /*time*/)
 {
   libmesh_assert(_fptr);
   libmesh_assert(_parameters);
@@ -212,17 +212,17 @@ Output WrappedFunction<Output>::component (unsigned int i,
           // SCALAR variables.  The irony is priceless.
           libmesh_assert_equal_to (_sys.variable(i).type().family, SCALAR);
 
-	  // We pass the point (j,0,0) to an old-style fptr function
-	  // pointer to distinguish the different scalars within the
-	  // SCALAR variable.
+          // We pass the point (j,0,0) to an old-style fptr function
+          // pointer to distinguish the different scalars within the
+          // SCALAR variable.
           for (unsigned int j=0; j != n_components; ++j)
             if (i == _sys.variable_scalar_number(v,j))
               return _fptr(Point(j,0,0), *_parameters,
-			   _sys.name(), _sys.variable_name(v));
+                           _sys.name(), _sys.variable_name(v));
         }
     }
   libMesh::err << "Component index " << i <<
-		  " not found in system " << _sys.name() << std::endl;
+    " not found in system " << _sys.name() << std::endl;
   libmesh_error();
   return Output();
 }

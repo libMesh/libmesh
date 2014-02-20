@@ -76,231 +76,231 @@ namespace
   {
     if (eletypes_exp.empty() && eletypes_imp.empty())
       {
-	// This should happen only once.  The first time this method
-	// is called the eletypes data struture will be empty, and
-	// we will fill it.  Any subsequent calls will find an initialized
-	// eletypes map and will do nothing.
+        // This should happen only once.  The first time this method
+        // is called the eletypes data struture will be empty, and
+        // we will fill it.  Any subsequent calls will find an initialized
+        // eletypes map and will do nothing.
 
-	//==============================
-	// setup the element definitions
-	elementDefinition eledef;
+        //==============================
+        // setup the element definitions
+        elementDefinition eledef;
 
-	// use "swap trick" from Scott Meyer's "Effective STL" to initialize
-	// eledef.nodes vector
+        // use "swap trick" from Scott Meyer's "Effective STL" to initialize
+        // eledef.nodes vector
 
-	// POINT (only Gmsh)
-	{
-	  eledef.exptype = 15;
+        // POINT (only Gmsh)
+        {
+          eledef.exptype = 15;
           eledef.dim     = 0;
           eledef.nnodes  = 1;
-	  eledef.nodes.clear();
+          eledef.nodes.clear();
 
           // import only
           eletypes_imp[15] = eledef;
-	}
+        }
 
-	// EDGE2
-	{
-	  eledef.type    = EDGE2;
+        // EDGE2
+        {
+          eledef.type    = EDGE2;
           eledef.dim     = 1;
           eledef.nnodes  = 2;
-	  eledef.exptype = 1;
-	  eledef.nodes.clear();
+          eledef.exptype = 1;
+          eledef.nodes.clear();
 
-	  eletypes_exp[EDGE2] = eledef;
+          eletypes_exp[EDGE2] = eledef;
           eletypes_imp[1]     = eledef;
-	}
+        }
 
-	// EDGE3
-	{
-	  eledef.type    = EDGE3;
+        // EDGE3
+        {
+          eledef.type    = EDGE3;
           eledef.dim     = 1;
           eledef.nnodes  = 3;
-	  eledef.exptype = 8;
-	  eledef.nodes.clear();
+          eledef.exptype = 8;
+          eledef.nodes.clear();
 
-	  eletypes_exp[EDGE3] = eledef;
+          eletypes_exp[EDGE3] = eledef;
           eletypes_imp[8]     = eledef;
-	}
+        }
 
-	// TRI3
-	{
+        // TRI3
+        {
           eledef.type    = TRI3;
           eledef.dim     = 2;
           eledef.nnodes  = 3;
-	  eledef.exptype = 2;
-	  eledef.nodes.clear();
+          eledef.exptype = 2;
+          eledef.nodes.clear();
 
-	  eletypes_exp[TRI3] = eledef;
+          eletypes_exp[TRI3] = eledef;
           eletypes_imp[2] = eledef;
-	}
+        }
 
-	// TRI6
-	{
+        // TRI6
+        {
           eledef.type    = TRI6;
           eledef.dim     = 2;
           eledef.nnodes  = 6;
-	  eledef.exptype = 9;
-	  eledef.nodes.clear();
+          eledef.exptype = 9;
+          eledef.nodes.clear();
 
-	  eletypes_exp[TRI6] = eledef;
+          eletypes_exp[TRI6] = eledef;
           eletypes_imp[9]    = eledef;
-	}
+        }
 
-	// QUAD4
-	{
+        // QUAD4
+        {
           eledef.type    = QUAD4;
           eledef.dim     = 2;
           eledef.nnodes  = 4;
-	  eledef.exptype = 3;
-	  eledef.nodes.clear();
+          eledef.exptype = 3;
+          eledef.nodes.clear();
 
-	  eletypes_exp[QUAD4] = eledef;
+          eletypes_exp[QUAD4] = eledef;
           eletypes_imp[3]     = eledef;
-	}
+        }
 
-	// QUAD8
+        // QUAD8
         // TODO: what should be done with this on writing?
-	{
+        {
           eledef.type    = QUAD8;
           eledef.dim     = 2;
           eledef.nnodes  = 8;
-	  eledef.exptype = 100;
-	  const unsigned int nodes[] = {1,2,3,4,5,6,7,8};
-	  std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
+          eledef.exptype = 100;
+          const unsigned int nodes[] = {1,2,3,4,5,6,7,8};
+          std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
-	  eletypes_exp[QUAD8] = eledef;
+          eletypes_exp[QUAD8] = eledef;
           eletypes_imp[10]    = eledef;
-	}
+        }
 
-	// QUAD9
-	{
+        // QUAD9
+        {
           eledef.type    = QUAD9;
           eledef.dim     = 2;
           eledef.nnodes  = 9;
-	  eledef.exptype = 10;
-	  eledef.nodes.clear();
+          eledef.exptype = 10;
+          eledef.nodes.clear();
 
-	  eletypes_exp[QUAD9] = eledef;
+          eletypes_exp[QUAD9] = eledef;
           eletypes_imp[10]    = eledef;
-	}
+        }
 
-	// HEX8
-	{
+        // HEX8
+        {
           eledef.type    = HEX8;
           eledef.dim     = 3;
           eledef.nnodes  = 8;
-	  eledef.exptype = 5;
-	  eledef.nodes.clear();
+          eledef.exptype = 5;
+          eledef.nodes.clear();
 
-	  eletypes_exp[HEX8] = eledef;
+          eletypes_exp[HEX8] = eledef;
           eletypes_imp[5]    = eledef;
-	}
+        }
 
-	// HEX20
+        // HEX20
         // TODO: what should be done with this on writing?
-	{
+        {
           eledef.type    = HEX20;
           eledef.dim     = 3;
           eledef.nnodes  = 20;
-	  eledef.exptype = 101;
-	  const unsigned int nodes[] = {1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15,16};
-	  std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
+          eledef.exptype = 101;
+          const unsigned int nodes[] = {1,2,3,4,5,6,7,8,9,10,11,16,17,18,19,12,13,14,15,16};
+          std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
-	  eletypes_exp[HEX20] = eledef;
+          eletypes_exp[HEX20] = eledef;
           eletypes_imp[12]    = eledef;
-	}
+        }
 
-	// HEX27
-	{
+        // HEX27
+        {
           eledef.type    = HEX27;
           eledef.dim     = 3;
           eledef.nnodes  = 27;
-	  eledef.exptype = 12;
+          eledef.exptype = 12;
           const unsigned int nodes[] = {0,1,2,3,4,5,6,7,8,11,12,9,13,10,14,
                                         15,16,19,17,18,20,21,24,22,23,25,26};
-	  std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
+          std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
-	  eletypes_exp[HEX27] = eledef;
+          eletypes_exp[HEX27] = eledef;
           eletypes_imp[12]    = eledef;
-	}
+        }
 
-	// TET4
-	{
+        // TET4
+        {
           eledef.type    = TET4;
           eledef.dim     = 3;
           eledef.nnodes  = 4;
-	  eledef.exptype = 4;
-	  eledef.nodes.clear();
+          eledef.exptype = 4;
+          eledef.nodes.clear();
 
           eletypes_exp[TET4] = eledef;
           eletypes_imp[4]    = eledef;
-	}
+        }
 
-	// TET10
-	{
+        // TET10
+        {
           eledef.type    = TET10;
           eledef.dim     = 3;
           eledef.nnodes  = 10;
-	  eledef.exptype = 11;
+          eledef.exptype = 11;
           const unsigned int nodes[] = {0,1,2,3,4,5,6,7,9,8};
-	  std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
-	  eletypes_exp[TET10] = eledef;
+          std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
+          eletypes_exp[TET10] = eledef;
           eletypes_imp[11]    = eledef;
-	}
+        }
 
-	// PRISM6
-	{
+        // PRISM6
+        {
           eledef.type    = PRISM6;
           eledef.dim     = 3;
           eledef.nnodes  = 6;
-	  eledef.exptype = 6;
-	  eledef.nodes.clear();
+          eledef.exptype = 6;
+          eledef.nodes.clear();
 
-	  eletypes_exp[PRISM6] = eledef;
+          eletypes_exp[PRISM6] = eledef;
           eletypes_imp[6]      = eledef;
-	}
+        }
 
-	// PRISM15
+        // PRISM15
         // TODO: what should be done with this on writing?
-	{
+        {
           eledef.type    = PRISM15;
           eledef.dim     = 3;
           eledef.nnodes  = 15;
-	  eledef.exptype = 103;
-	  eledef.nodes.clear();
+          eledef.exptype = 103;
+          eledef.nodes.clear();
 
-	  eletypes_exp[PRISM15] = eledef;
+          eletypes_exp[PRISM15] = eledef;
           eletypes_imp[13] = eledef;
-	}
+        }
 
-	// PRISM18
-	{
+        // PRISM18
+        {
           eledef.type    = PRISM18;
           eledef.dim     = 3;
           eledef.nnodes  = 18;
-	  eledef.exptype = 13;
+          eledef.exptype = 13;
           const unsigned int nodes[] = {0,1,2,3,4,5,6,8,9,7,10,11,
                                         12,14,13,15,17,16};
-	  std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
+          std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes);
 
-	  eletypes_exp[PRISM18] = eledef;
+          eletypes_exp[PRISM18] = eledef;
           eletypes_imp[13]      = eledef;
-	}
+        }
 
-	// PYRAMID5
-	{
+        // PYRAMID5
+        {
           eledef.type    = PYRAMID5;
           eledef.dim     = 3;
           eledef.nnodes  = 5;
-	  eledef.exptype = 7;
-	  eledef.nodes.clear();
+          eledef.exptype = 7;
+          eledef.nodes.clear();
 
-	  eletypes_exp[PYRAMID5] = eledef;
+          eletypes_exp[PYRAMID5] = eledef;
           eletypes_imp[7]        = eledef;
-	}
+        }
 
-	//==============================
+        //==============================
       }
   }
 
@@ -355,19 +355,19 @@ void GmshIO::read_mesh(std::istream& in)
         {
           in >> version >> format >> size;
           if ((version != 2.0) && (version != 2.1) && (version != 2.2)) {
-	    // Some notes on gmsh mesh versions:
-	    //
-	    // Mesh version 2.0 goes back as far as I know.  It's not explicitly
-	    // mentioned here: http://www.geuz.org/gmsh/doc/VERSIONS.txt
-	    //
-	    // As of gmsh-2.4.0:
-	    // bumped mesh version format to 2.1 (small change in the $PhysicalNames
+            // Some notes on gmsh mesh versions:
+            //
+            // Mesh version 2.0 goes back as far as I know.  It's not explicitly
+            // mentioned here: http://www.geuz.org/gmsh/doc/VERSIONS.txt
+            //
+            // As of gmsh-2.4.0:
+            // bumped mesh version format to 2.1 (small change in the $PhysicalNames
             // section, where the group dimension is now required);
-	    // [Since we don't even parse the PhysicalNames section at the time
-	    //  of this writing, I don't think this change affects us.]
-	    //
-	    // Mesh version 2.2 tested by Manav Bhatia; no other
-	    // libMesh code changes were required for support
+            // [Since we don't even parse the PhysicalNames section at the time
+            //  of this writing, I don't think this change affects us.]
+            //
+            // Mesh version 2.2 tested by Manav Bhatia; no other
+            // libMesh code changes were required for support
             libMesh::err << "Error: Wrong msh file version " << version << "\n";
             libmesh_error();
           }
@@ -379,9 +379,9 @@ void GmshIO::read_mesh(std::istream& in)
 
       // read the node block
       else if (!std::strncmp(buf,"$NOD",4) ||
-	       !std::strncmp(buf,"$NOE",4) ||
-	       !std::strncmp(buf,"$Nodes",6)
-	       )
+               !std::strncmp(buf,"$NOE",4) ||
+               !std::strncmp(buf,"$Nodes",6)
+               )
         {
           unsigned int numNodes = 0;
           in >> numNodes;
@@ -424,12 +424,12 @@ void GmshIO::read_mesh(std::istream& in)
           mesh.reserve_elem (numElem);
 
           // read the elements
-	  unsigned int elem_id_counter = 0;
+          unsigned int elem_id_counter = 0;
           for (unsigned int iel=0; iel<numElem; ++iel)
             {
               unsigned int id, type, physical, elementary,
                 /* partition = 1,*/ nnodes, ntags;
-	      // note - partition was assigned but never used - BSK
+              // note - partition was assigned but never used - BSK
               if(version <= 1.0)
                 {
                   in >> id >> type >> physical >> elementary >> nnodes;
@@ -466,8 +466,8 @@ void GmshIO::read_mesh(std::istream& in)
                   elem->set_id(elem_id_counter);
                   mesh.add_elem(elem);
 
-		  // different to iel, lower dimensional elems aren't added
-		  elem_id_counter++;
+                  // different to iel, lower dimensional elems aren't added
+                  elem_id_counter++;
 
                   // check number of nodes. We cannot do that for version 2.0
                   if (version <= 1.0)
@@ -503,7 +503,7 @@ void GmshIO::read_mesh(std::istream& in)
                     }
 
                     // Finally, set the subdomain ID to physical
-		    elem->subdomain_id() = static_cast<subdomain_id_type>(physical);
+                  elem->subdomain_id() = static_cast<subdomain_id_type>(physical);
                 } // if element.dim == dim
               // if this is a boundary
               else if (eletype.dim == dim-1)
@@ -672,9 +672,9 @@ void GmshIO::write_mesh (std::ostream& out_stream)
 
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
       out_stream << mesh.node(v).id()+1 << " "
-	  << mesh.node(v)(0) << " "
-	  << mesh.node(v)(1) << " "
-	  << mesh.node(v)(2) << '\n';
+                 << mesh.node(v)(0) << " "
+                 << mesh.node(v)(1) << " "
+                 << mesh.node(v)(2) << '\n';
     out_stream << "$EndNodes\n";
   }
 
@@ -691,15 +691,15 @@ void GmshIO::write_mesh (std::ostream& out_stream)
       {
         const Elem* elem = *it;
 
-	// Make sure we have a valid entry for
-	// the current element type.
-	libmesh_assert (eletypes_exp.count(elem->type()));
+        // Make sure we have a valid entry for
+        // the current element type.
+        libmesh_assert (eletypes_exp.count(elem->type()));
 
         // consult the export element table
         const elementDefinition& eletype = eletypes_exp[elem->type()];
 
-	// The element mapper better not require any more nodes
-	// than are present in the current element!
+        // The element mapper better not require any more nodes
+        // than are present in the current element!
         libmesh_assert_less_equal (eletype.nodes.size(), elem->n_nodes());
 
         // elements ids are 1 based in Gmsh
@@ -942,23 +942,23 @@ void GmshIO::write_post (const std::string& fname,
                 if (this->binary())
                   {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-		    libMesh::out << "WARNING: Gmsh::write_post does not fully support "
-			          << "complex numbers. Will only write the real part of "
-			          << "variable " << varname << std::endl;
+                    libMesh::out << "WARNING: Gmsh::write_post does not fully support "
+                                 << "complex numbers. Will only write the real part of "
+                                 << "variable " << varname << std::endl;
 #endif
                     double tmp = libmesh_real((*v)[elem->node(i)*n_vars + ivar]);
                     std::memcpy(buf, &tmp, sizeof(double));
                     out_stream.write(reinterpret_cast<char *>(buf), sizeof(double));
                   }
                 else
-		  {
+                  {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-		    libMesh::out << "WARNING: Gmsh::write_post does not fully support "
-			          << "complex numbers. Will only write the real part of "
-			          << "variable " << varname << std::endl;
+                    libMesh::out << "WARNING: Gmsh::write_post does not fully support "
+                                 << "complex numbers. Will only write the real part of "
+                                 << "variable " << varname << std::endl;
 #endif
-		    out_stream << libmesh_real((*v)[elem->node(i)*n_vars + ivar]) << "\n";
-		  }
+                    out_stream << libmesh_real((*v)[elem->node(i)*n_vars + ivar]) << "\n";
+                  }
             }
           if (this->binary())
             out_stream << "\n";

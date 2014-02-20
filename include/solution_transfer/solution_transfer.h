@@ -37,7 +37,7 @@ class SolutionTransfer : public ParallelObject
 public:
 
   SolutionTransfer(const libMesh::Parallel::Communicator &comm_in
-		   LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
+                   LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
     ParallelObject(comm_in)
   {}
 

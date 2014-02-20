@@ -68,7 +68,7 @@ public:
    */
   explicit
   InfQuad (const unsigned int nn,
-	   Elem* p,
+           Elem* p,
            Node** nodelinkdata) :
     Elem(nn, InfQuad::n_sides(), p, _elemlinks_data, nodelinkdata) {}
 
@@ -116,7 +116,7 @@ public:
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-			        const unsigned int s) const;
+                                const unsigned int s) const;
 
   /**
    * @returns an id associated with the \p s side of this element.
@@ -141,7 +141,7 @@ public:
    * is_edge_on_side is trivial in 2D
    */
   virtual bool is_edge_on_side(const unsigned int e,
-			       const unsigned int s) const
+                               const unsigned int s) const
     { return (e == s); }
 
   /**

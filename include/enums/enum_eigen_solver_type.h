@@ -33,19 +33,19 @@ namespace libMeshEnums {
    * Defines an \p enum for iterative eigenproblem solver types
    */
   enum EigenSolverType {POWER=0,
-			LAPACK,
-			SUBSPACE,
-			ARNOLDI,
-			LANCZOS,
-			KRYLOVSCHUR,
-			// SLEPc optional packages
-			// EPSARPACK,
-			// EPSLAPACK,
-			// EPSBLZPACK,
-			// EPSPLANSO,
-			// EPSTRLAN,
+                        LAPACK,
+                        SUBSPACE,
+                        ARNOLDI,
+                        LANCZOS,
+                        KRYLOVSCHUR,
+                        // SLEPc optional packages
+                        // EPSARPACK,
+                        // EPSLAPACK,
+                        // EPSBLZPACK,
+                        // EPSPLANSO,
+                        // EPSTRLAN,
 
-			INVALID_EIGENSOLVER};
+                        INVALID_EIGENSOLVER};
 
   /**
    * Defines an \p enum for  eigenproblem  types.
@@ -53,11 +53,11 @@ namespace libMeshEnums {
    * non-Hermitian (NHEP), and generalized non-Hermitian (GNHEP)
    */
   enum EigenProblemType {NHEP=0,
-			 HEP,
-			 GNHEP,
-			 GHEP,
+                         HEP,
+                         GNHEP,
+                         GHEP,
 
-			 INVALID_EIGENPROBLEMTYPE};
+                         INVALID_EIGENPROBLEMTYPE};
 
 
 
@@ -66,13 +66,13 @@ namespace libMeshEnums {
    * the spectrum, i.e. the eigenvalues to be computed.
    */
   enum PositionOfSpectrum {LARGEST_MAGNITUDE=0,
-			   SMALLEST_MAGNITUDE,
-			   LARGEST_REAL,
-			   SMALLEST_REAL,
-			   LARGEST_IMAGINARY,
-			   SMALLEST_IMAGINARY,
+                           SMALLEST_MAGNITUDE,
+                           LARGEST_REAL,
+                           SMALLEST_REAL,
+                           LARGEST_IMAGINARY,
+                           SMALLEST_IMAGINARY,
 
-			   INVALID_Postion_of_Spectrum};
+                           INVALID_Postion_of_Spectrum};
 }
 
 using namespace libMeshEnums;

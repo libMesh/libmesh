@@ -55,7 +55,7 @@ class PointLocatorBase;
 // ------------------------------------------------------------
 // MeshFunction class definition
 class MeshFunction : public FunctionBase<Number>,
-		     public ParallelObject
+  public ParallelObject
 {
 public:
 
@@ -68,10 +68,10 @@ public:
    * should be serialized.
    */
   MeshFunction (const EquationSystems& eqn_systems,
-		const NumericVector<Number>& vec,
-		const DofMap& dof_map,
-		const std::vector<unsigned int>& vars,
-		const FunctionBase<Number>* master=NULL);
+                const NumericVector<Number>& vec,
+                const DofMap& dof_map,
+                const std::vector<unsigned int>& vars,
+                const FunctionBase<Number>* master=NULL);
 
   /**
    * Constructor for mesh based functions with a number
@@ -82,10 +82,10 @@ public:
    * should be serialized.
    */
   MeshFunction (const EquationSystems& eqn_systems,
-		const NumericVector<Number>& vec,
-		const DofMap& dof_map,
-		const unsigned int var,
-		const FunctionBase<Number>* master=NULL);
+                const NumericVector<Number>& vec,
+                const DofMap& dof_map,
+                const unsigned int var,
+                const FunctionBase<Number>* master=NULL);
 
   /**
    * Destructor.
@@ -126,14 +126,14 @@ public:
    * \p p and for \p time, which defaults to zero.
    */
   Number operator() (const Point& p,
-		     const Real time=0.);
+                     const Real time=0.);
 
   /**
    * @returns the first derivatives of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
   Gradient gradient (const Point& p,
-		     const Real time=0.);
+                     const Real time=0.);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -141,7 +141,7 @@ public:
    * \p p and for \p time, which defaults to zero.
    */
   Tensor hessian (const Point& p,
-		  const Real time=0.);
+                  const Real time=0.);
 #endif
 
   /**
@@ -149,24 +149,24 @@ public:
    * defaults to zero.
    */
   void operator() (const Point& p,
-		   const Real time,
-		   DenseVector<Number>& output);
+                   const Real time,
+                   DenseVector<Number>& output);
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
    * defaults to zero.
    */
   void gradient (const Point& p,
-		 const Real time,
-		 std::vector<Gradient>& output);
+                 const Real time,
+                 std::vector<Gradient>& output);
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
    * defaults to zero.
    */
   void hessian (const Point& p,
-		const Real time,
-		std::vector<Tensor>& output);
+                const Real time,
+                std::vector<Tensor>& output);
 
   /**
    * Returns the current \p PointLocator object, for you might want to

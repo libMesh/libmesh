@@ -41,14 +41,14 @@ void QGrid::init_3D(const ElemType type_in,
     case HEX20:
     case HEX27:
       {
-	// We compute the 3D quadrature rule as a tensor
-	// product of the 1D quadrature rule.
-	QGrid q1D(1,_order);
-	q1D.init(EDGE2);
+        // We compute the 3D quadrature rule as a tensor
+        // product of the 1D quadrature rule.
+        QGrid q1D(1,_order);
+        q1D.init(EDGE2);
 
-	tensor_product_hex( q1D );
+        tensor_product_hex( q1D );
 
-	return;
+        return;
       }
 
 
@@ -77,7 +77,7 @@ void QGrid::init_3D(const ElemType type_in,
                   }
               }
           }
-	return;
+        return;
       }
 
 
@@ -86,20 +86,20 @@ void QGrid::init_3D(const ElemType type_in,
     case PRISM15:
     case PRISM18:
       {
-	// We compute the 3D quadrature rule as a tensor
-	// product of the 1D quadrature rule and a 2D
-	// triangle quadrature rule
+        // We compute the 3D quadrature rule as a tensor
+        // product of the 1D quadrature rule and a 2D
+        // triangle quadrature rule
 
-	QGrid q1D(1,_order);
-	QGrid q2D(2,_order);
+        QGrid q1D(1,_order);
+        QGrid q2D(2,_order);
 
-	// Initialize
-	q1D.init(EDGE2);
-	q2D.init(TRI3);
+        // Initialize
+        q1D.init(EDGE2);
+        q2D.init(TRI3);
 
-	tensor_product_prism(q1D, q2D);
+        tensor_product_prism(q1D, q2D);
 
-	return;
+        return;
       }
 
 
@@ -130,7 +130,7 @@ void QGrid::init_3D(const ElemType type_in,
                   }
               }
           }
-	return;
+        return;
       }
 
 
@@ -139,8 +139,8 @@ void QGrid::init_3D(const ElemType type_in,
       // Unsupported type
     default:
       {
-	libMesh::err << "ERROR: Unsupported type: " << type_in << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: Unsupported type: " << type_in << std::endl;
+        libmesh_error();
       }
     }
 

@@ -39,39 +39,39 @@ dof_id_type Prism::key (const unsigned int s) const
     case 0:  // the triangular face at z=0
 
       return
-	this->compute_key (this->node(0),
-			   this->node(2),
-			   this->node(1));
+        this->compute_key (this->node(0),
+                           this->node(2),
+                           this->node(1));
 
     case 1:  // the quad face at y=0
 
       return
-	this->compute_key (this->node(0),
-			   this->node(1),
-			   this->node(4),
-			   this->node(3));
+        this->compute_key (this->node(0),
+                           this->node(1),
+                           this->node(4),
+                           this->node(3));
 
     case 2:  // the other quad face
 
       return
-	this->compute_key (this->node(1),
-			   this->node(2),
-			   this->node(5),
-			   this->node(4));
+        this->compute_key (this->node(1),
+                           this->node(2),
+                           this->node(5),
+                           this->node(4));
 
     case 3: // the quad face at x=0
 
       return
-	this->compute_key (this->node(2),
-			   this->node(0),
-			   this->node(3),
-			   this->node(5));
+        this->compute_key (this->node(2),
+                           this->node(0),
+                           this->node(3),
+                           this->node(5));
     case 4: // the triangular face at z=1
 
       return
-	this->compute_key (this->node(3),
-			   this->node(4),
-			   this->node(5));
+        this->compute_key (this->node(3),
+                           this->node(4),
+                           this->node(5));
     }
 
   // We'll never get here.
@@ -92,9 +92,9 @@ AutoPtr<Elem> Prism::side (const unsigned int i) const
         Elem* facet = new Tri3;
         AutoPtr<Elem> ap_facet(facet);
 
-	facet->set_node(0) = this->get_node(0);
-	facet->set_node(1) = this->get_node(2);
-	facet->set_node(2) = this->get_node(1);
+        facet->set_node(0) = this->get_node(0);
+        facet->set_node(1) = this->get_node(2);
+        facet->set_node(2) = this->get_node(1);
 
         return ap_facet;
       }
@@ -103,51 +103,51 @@ AutoPtr<Elem> Prism::side (const unsigned int i) const
         Elem* faceq = new Quad4;
         AutoPtr<Elem> ap_faceq(faceq);
 
-	faceq->set_node(0) = this->get_node(0);
-	faceq->set_node(1) = this->get_node(1);
-	faceq->set_node(2) = this->get_node(4);
-	faceq->set_node(3) = this->get_node(3);
+        faceq->set_node(0) = this->get_node(0);
+        faceq->set_node(1) = this->get_node(1);
+        faceq->set_node(2) = this->get_node(4);
+        faceq->set_node(3) = this->get_node(3);
 
-	return ap_faceq;
+        return ap_faceq;
       }
     case 2:  // the other quad face
       {
         Elem* faceq = new Quad4;
         AutoPtr<Elem> ap_faceq(faceq);
 
-	faceq->set_node(0) = this->get_node(1);
-	faceq->set_node(1) = this->get_node(2);
-	faceq->set_node(2) = this->get_node(5);
-	faceq->set_node(3) = this->get_node(4);
+        faceq->set_node(0) = this->get_node(1);
+        faceq->set_node(1) = this->get_node(2);
+        faceq->set_node(2) = this->get_node(5);
+        faceq->set_node(3) = this->get_node(4);
 
-	return ap_faceq;
+        return ap_faceq;
       }
     case 3: // the quad face at x=0
       {
         Elem* faceq = new Quad4;
         AutoPtr<Elem> ap_faceq(faceq);
 
-	faceq->set_node(0) = this->get_node(2);
-	faceq->set_node(1) = this->get_node(0);
-	faceq->set_node(2) = this->get_node(3);
-	faceq->set_node(3) = this->get_node(5);
+        faceq->set_node(0) = this->get_node(2);
+        faceq->set_node(1) = this->get_node(0);
+        faceq->set_node(2) = this->get_node(3);
+        faceq->set_node(3) = this->get_node(5);
 
-	return ap_faceq;
+        return ap_faceq;
       }
     case 4: // the triangular face at z=1
       {
         Elem* facet = new Tri3;
         AutoPtr<Elem> ap_facet(facet);
 
-	facet->set_node(0) = this->get_node(3);
-	facet->set_node(1) = this->get_node(4);
-	facet->set_node(2) = this->get_node(5);
+        facet->set_node(0) = this->get_node(3);
+        facet->set_node(1) = this->get_node(4);
+        facet->set_node(2) = this->get_node(5);
 
         return ap_facet;
       }
     default:
       {
-	libmesh_error();
+        libmesh_error();
         Elem* facet = new Tri3;
         AutoPtr<Elem> ap_facet(facet);
         return ap_facet;

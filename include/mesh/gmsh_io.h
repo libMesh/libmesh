@@ -89,8 +89,8 @@ class GmshIO : public MeshInput<MeshBase>,
    * specified file where the nodal data and variable names are provided.
    */
   virtual void write_nodal_data (const std::string&,
-				 const std::vector<Number>&,
-				 const std::vector<std::string>&);
+                                 const std::vector<Number>&,
+                                 const std::vector<std::string>&);
 
   /**
    * Flag indicating whether or not to write a binary file.  While binary

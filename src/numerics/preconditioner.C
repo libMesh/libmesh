@@ -36,7 +36,7 @@ namespace libMesh
 template <typename T>
 Preconditioner<T> *
 Preconditioner<T>::build(const libMesh::Parallel::Communicator &comm,
-			 const SolverPackage solver_package)
+                         const SolverPackage solver_package)
 {
   // Build the appropriate solver
   switch (solver_package)
@@ -46,8 +46,8 @@ Preconditioner<T>::build(const libMesh::Parallel::Communicator &comm,
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<Preconditioner<T> > ap(new LaspackPreconditioner<T>(comm));
-	return ap;
+      AutoPtr<Preconditioner<T> > ap(new LaspackPreconditioner<T>(comm));
+      return ap;
       }
 #endif
 */
@@ -55,7 +55,7 @@ Preconditioner<T>::build(const libMesh::Parallel::Communicator &comm,
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	return new PetscPreconditioner<T>(comm);
+        return new PetscPreconditioner<T>(comm);
       }
 #endif
 
@@ -71,8 +71,8 @@ Preconditioner<T>::build(const libMesh::Parallel::Communicator &comm,
 
     default:
       libMesh::err << "ERROR:  Unrecognized solver package: "
-		    << solver_package
-		    << std::endl;
+                   << solver_package
+                   << std::endl;
       libmesh_error();
     }
 

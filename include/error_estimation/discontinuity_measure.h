@@ -69,8 +69,8 @@ public:
    * The return value is std::pair<bool, Real>
    */
   void attach_essential_bc_function (std::pair<bool,Real> fptr(const System& system,
-							       const Point& p,
-							       const std::string& var_name));
+                                                               const Point& p,
+                                                               const std::string& var_name));
 
 protected:
 
@@ -104,8 +104,8 @@ protected:
    * Pointer to function that returns BC information.
    */
   std::pair<bool,Real> (* _bc_function) (const System& system,
-					 const Point& p,
-					 const std::string& var_name);
+                                         const Point& p,
+                                         const std::string& var_name);
 };
 
 

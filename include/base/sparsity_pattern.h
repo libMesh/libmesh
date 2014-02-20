@@ -62,8 +62,8 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
    */
   template<typename BidirectionalIterator>
   static void sort_row (const BidirectionalIterator begin,
-			BidirectionalIterator       middle,
-			const BidirectionalIterator end);
+                        BidirectionalIterator       middle,
+                        const BidirectionalIterator end);
 
   /**
    * This helper class can be called on multiple threads to compute
@@ -94,10 +94,10 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
     std::vector<dof_id_type> n_oz;
 
     Build (const MeshBase &mesh_in,
-	   const DofMap &dof_map_in,
-	   const CouplingMatrix *dof_coupling_in,
-	   const bool implicit_neighbor_dofs_in,
-	   const bool need_full_sparsity_pattern_in);
+           const DofMap &dof_map_in,
+           const CouplingMatrix *dof_coupling_in,
+           const bool implicit_neighbor_dofs_in,
+           const bool need_full_sparsity_pattern_in);
 
     Build (Build &other, Threads::split);
 
@@ -126,8 +126,8 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
 template<typename BidirectionalIterator>
 inline
 void SparsityPattern::sort_row (const BidirectionalIterator begin,
-				BidirectionalIterator       middle,
-				const BidirectionalIterator end)
+                                BidirectionalIterator       middle,
+                                const BidirectionalIterator end)
 {
   if ((begin == middle) || (middle == end)) return;
 
@@ -139,25 +139,25 @@ void SparsityPattern::sort_row (const BidirectionalIterator begin,
   while (middle != end)
     {
       BidirectionalIterator
-	b = middle,
-	a = b-1;
+        b = middle,
+        a = b-1;
 
       // Bubble-sort the middle value downward
       while (!(*a < *b)) // *a & *b are less-than comparable, so use <
-	{
-	  std::swap (*a, *b);
+        {
+          std::swap (*a, *b);
 
 #if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
-	  /* Prohibit optimization at this point since gcc 3.3.5 seems
-	     to have a bug.  */
-	  SparsityPattern::_dummy_function();
+          /* Prohibit optimization at this point since gcc 3.3.5 seems
+             to have a bug.  */
+          SparsityPattern::_dummy_function();
 #endif
 
-	  if (a == begin) break;
+          if (a == begin) break;
 
-	  b=a;
-	  --a;
-	}
+          b=a;
+          --a;
+        }
 
       ++middle;
     }
@@ -174,7 +174,7 @@ void SparsityPattern::sort_row (const BidirectionalIterator begin,
 
     for (++first; first != end; prev=first, ++first)
       if (*first < *prev)
-	libmesh_assert(false);
+        libmesh_assert(false);
   }
 #endif
 

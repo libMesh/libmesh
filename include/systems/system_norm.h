@@ -194,7 +194,7 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms) :
 
 inline
 SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
-		       std::vector<Real> &weights) :
+                       std::vector<Real> &weights) :
     _norms(norms), _weights(weights), _weights_sq(_weights.size(), 0.0)
 {
   if (_norms.empty())
@@ -212,7 +212,7 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
 
 inline
   SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
-			 std::vector<std::vector<Real> > &weights):
+                         std::vector<std::vector<Real> > &weights):
   _norms(norms), _weights(weights.size()), _off_diagonal_weights(weights)
 {
   if(_norms.empty())

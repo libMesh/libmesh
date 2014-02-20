@@ -101,7 +101,7 @@ class TetGenIO : public MeshInput<MeshBase>,
    * provided through \p node_stream and ele_stream.
    */
   void read_nodes_and_elem (std::istream& node_stream,
-			    std::istream& ele_stream);
+                            std::istream& ele_stream);
 
   /**
    * Method reads nodes from \p node_stream and stores them in

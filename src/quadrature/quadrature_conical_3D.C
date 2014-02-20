@@ -25,23 +25,23 @@ namespace libMesh
 
 
 void QConical::init_3D(const ElemType type_in,
-		       unsigned int p)
+                       unsigned int p)
 {
   switch (type_in)
     {
     case TET4:
     case TET10:
       {
-	this->conical_product_tet(p);
-	return;
+        this->conical_product_tet(p);
+        return;
 
       } // end case TET4, TET10
 
     case PYRAMID5:
     case PYRAMID14:
       {
-	this->conical_product_pyramid(p);
-	return;
+        this->conical_product_pyramid(p);
+        return;
 
       } // end case PYRAMID5
 
@@ -50,8 +50,8 @@ void QConical::init_3D(const ElemType type_in,
       // Unsupported element type
     default:
       {
-	libMesh::err << "ERROR: Unsupported element type: " << type_in << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: Unsupported element type: " << type_in << std::endl;
+        libmesh_error();
       }
     } // end switch (type_in)
 

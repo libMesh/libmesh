@@ -29,8 +29,8 @@ namespace libMesh
 
 template<typename T>
 void DenseMatrixBase<T>::multiply (DenseMatrixBase<T>& M1,
-				   const DenseMatrixBase<T>& M2,
-				   const DenseMatrixBase<T>& M3)
+                                   const DenseMatrixBase<T>& M2,
+                                   const DenseMatrixBase<T>& M3)
 {
   // Assertions to make sure we have been
   // passed matrices of the correct dimension.
@@ -48,17 +48,17 @@ void DenseMatrixBase<T>::multiply (DenseMatrixBase<T>& M1,
   for (unsigned int k=0; k<p_s; k++)
     for (unsigned int j=0; j<n_s; j++)
       if (M3.el(k,j) != 0.)
-	for (unsigned int i=0; i<m_s; i++)
-	  M1.el(i,j) += M2.el(i,k) * M3.el(k,j);
+        for (unsigned int i=0; i<m_s; i++)
+          M1.el(i,j) += M2.el(i,k) * M3.el(k,j);
 }
 
 
 
 template<typename T>
 void DenseMatrixBase<T>::condense(const unsigned int iv,
-				  const unsigned int jv,
-				  const T val,
-				  DenseVectorBase<T>& rhs)
+                                  const unsigned int jv,
+                                  const T val,
+                                  DenseVectorBase<T>& rhs)
 {
   libmesh_assert_equal_to (this->_m, rhs.size());
   libmesh_assert_equal_to (iv, jv);
@@ -94,10 +94,10 @@ void DenseMatrixBase<T>::print_scientific (std::ostream& os) const
   for (unsigned int i=0; i<this->m(); i++)
     {
       for (unsigned int j=0; j<this->n(); j++)
-	os << std::setw(15)
-	   << std::scientific
-	   << std::setprecision(8)
-	   << this->el(i,j) << " ";
+        os << std::setw(15)
+           << std::scientific
+           << std::setprecision(8)
+           << this->el(i,j) << " ";
 
       os << std::endl;
     }
@@ -111,9 +111,9 @@ void DenseMatrixBase<T>::print_scientific (std::ostream& os) const
   for (unsigned int i=0; i<this->m(); i++)
     {
       for (unsigned int j=0; j<this->n(); j++)
-	os << std::setprecision(8)
-	   << this->el(i,j)
-	   << " ";
+        os << std::setprecision(8)
+           << this->el(i,j)
+           << " ";
 
       os << std::endl;
     }
@@ -130,8 +130,8 @@ void DenseMatrixBase<T>::print (std::ostream& os) const
   for (unsigned int i=0; i<this->m(); i++)
     {
       for (unsigned int j=0; j<this->n(); j++)
-	os << std::setw(8)
-	   << this->el(i,j) << " ";
+        os << std::setw(8)
+           << this->el(i,j) << " ";
 
       os << std::endl;
     }

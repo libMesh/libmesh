@@ -77,9 +77,9 @@ public:
    * \p error_per_cell
    */
   virtual void estimate_error (const System& system,
-			       ErrorVector& error_per_cell,
-			       const NumericVector<Number>* solution_vector = NULL,
-			       bool estimate_parent_error = false);
+                               ErrorVector& error_per_cell,
+                               const NumericVector<Number>* solution_vector = NULL,
+                               bool estimate_parent_error = false);
 
   /**
    * Currently this function ignores the error_norm member variable,
@@ -89,10 +89,10 @@ public:
    * because otherwise C++ can get confused.
    */
   virtual void estimate_errors (const EquationSystems& equation_systems,
-				ErrorVector& error_per_cell,
-			        const std::map<const System*, SystemNorm>& error_norms,
-			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
-				bool estimate_parent_error = false);
+                                ErrorVector& error_per_cell,
+                                const std::map<const System*, SystemNorm>& error_norms,
+                                const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
+                                bool estimate_parent_error = false);
 
   /**
    * Currently this function ignores the component_scale member variable,
@@ -103,9 +103,9 @@ public:
    * error values in variable \p v of \p system
    */
   virtual void estimate_errors (const EquationSystems& equation_systems,
-			        ErrorMap& errors_per_cell,
-			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
-			        bool estimate_parent_error = false);
+                                ErrorMap& errors_per_cell,
+                                const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
+                                bool estimate_parent_error = false);
 
   /**
    * How many h refinements to perform to get the fine grid
@@ -124,11 +124,11 @@ protected:
    */
   virtual void _estimate_error (const EquationSystems *equation_systems,
                                 const System* system,
-				ErrorVector* error_per_cell,
-			        std::map<std::pair<const System*, unsigned int>, ErrorVector*>* errors_per_cell,
-				const std::map<const System*, SystemNorm >* error_norms,
-			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
-				bool estimate_parent_error = false);
+                                ErrorVector* error_per_cell,
+                                std::map<std::pair<const System*, unsigned int>, ErrorVector*>* errors_per_cell,
+                                const std::map<const System*, SystemNorm >* error_norms,
+                                const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
+                                bool estimate_parent_error = false);
 };
 
 } // namespace libMesh

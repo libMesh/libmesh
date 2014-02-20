@@ -98,21 +98,21 @@ public:
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const;
+                               const unsigned int e) const;
 
   /*
    * @returns true iff the specified child is on the
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-			        const unsigned int s) const;
+                                const unsigned int s) const;
 
   /*
    * @returns true iff the element map is definitely affine within
@@ -136,7 +136,7 @@ public:
    * The \p AutoPtr<Elem> handles the memory aspect.
    */
   AutoPtr<Elem> build_side (const unsigned int i,
-			    bool proxy) const;
+                            bool proxy) const;
 
   /**
    * Builds a \p EDGE2 built coincident with face i.
@@ -145,8 +145,8 @@ public:
   AutoPtr<Elem> build_edge (const unsigned int i) const;
 
   virtual void connectivity(const unsigned int sc,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -191,8 +191,8 @@ protected:
    * Matrix used to create the elements children.
    */
   float embedding_matrix (const unsigned int i,
-			  const unsigned int j,
-			  const unsigned int k) const;
+                          const unsigned int j,
+                          const unsigned int k) const;
 
   /**
    * Matrix that computes new nodal locations/solution values

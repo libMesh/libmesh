@@ -83,8 +83,8 @@ namespace libMesh
      * MeshTools::Generation::build_delaunay_square_with_hole(...) routines.
      */
     void copy_tri_to_mesh(const triangulateio& triangle_data_input,
-			  UnstructuredMesh& mesh_output,
-			  const ElemType type);
+                          UnstructuredMesh& mesh_output,
+                          const ElemType type);
   } // namespace TriangleWrapper
 } // namespace libMesh
 

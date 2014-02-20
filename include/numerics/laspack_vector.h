@@ -63,14 +63,14 @@ class LaspackVector : public NumericVector<T>
    */
   explicit
   LaspackVector (const Parallel::Communicator &comm,
-		 const ParallelType = AUTOMATIC);
+                 const ParallelType = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   LaspackVector (const Parallel::Communicator &comm,
-		 const numeric_index_type n,
+                 const numeric_index_type n,
                  const ParallelType = AUTOMATIC);
 
   /**
@@ -78,8 +78,8 @@ class LaspackVector : public NumericVector<T>
    * to \p n, and initialize all elements with zero.
    */
   LaspackVector (const Parallel::Communicator &comm,
-		 const numeric_index_type n,
-		 const numeric_index_type n_local,
+                 const numeric_index_type n,
+                 const numeric_index_type n_local,
                  const ParallelType = AUTOMATIC);
 
   /**
@@ -88,9 +88,9 @@ class LaspackVector : public NumericVector<T>
    * indices specified by the \p ghost argument.
    */
   LaspackVector (const Parallel::Communicator &comm,
-		 const numeric_index_type N,
-		 const numeric_index_type n_local,
-		 const std::vector<numeric_index_type>& ghost,
+                 const numeric_index_type N,
+                 const numeric_index_type n_local,
+                 const std::vector<numeric_index_type>& ghost,
                  const ParallelType = AUTOMATIC);
 
   /**
@@ -141,15 +141,15 @@ class LaspackVector : public NumericVector<T>
    */
 
   void init (const numeric_index_type N,
-	     const numeric_index_type n_local,
-	     const bool         fast=false,
+             const numeric_index_type n_local,
+             const bool         fast=false,
              const ParallelType ptype=AUTOMATIC);
 
   /**
    * call init with n_local = N,
    */
   void init (const numeric_index_type N,
-	     const bool         fast=false,
+             const bool         fast=false,
              const ParallelType ptype=AUTOMATIC);
 
   /**
@@ -157,9 +157,9 @@ class LaspackVector : public NumericVector<T>
    * in the \p ghost argument.
    */
   void init (const numeric_index_type /*N*/,
-	     const numeric_index_type /*n_local*/,
-	     const std::vector<numeric_index_type>& /*ghost*/,
-	     const bool /*fast*/ = false,
+             const numeric_index_type /*n_local*/,
+             const std::vector<numeric_index_type>& /*ghost*/,
+             const bool /*fast*/ = false,
              const ParallelType = AUTOMATIC);
 
   /**
@@ -325,7 +325,7 @@ class LaspackVector : public NumericVector<T>
    * want to specify WHERE to add it
    */
   void add_vector (const std::vector<T>& v,
-		   const std::vector<numeric_index_type>& dof_indices);
+                   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U+=V \f$ where U and V are type
@@ -334,14 +334,14 @@ class LaspackVector : public NumericVector<T>
    * the NumericVector<T> V
    */
   void add_vector (const NumericVector<T>& V,
-		   const std::vector<numeric_index_type>& dof_indices);
+                   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U+=A*V\f$, add the product of a \p SparseMatrix \p A
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
   void add_vector (const NumericVector<T> &,
-		   const SparseMatrix<T> &);
+                   const SparseMatrix<T> &);
 
   /**
    * \f$U+=V \f$ where U and V are type
@@ -350,21 +350,21 @@ class LaspackVector : public NumericVector<T>
    * the DenseVector<T> V
    */
   void add_vector (const DenseVector<T>& V,
-		   const std::vector<numeric_index_type>& dof_indices);
+                   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U+=A^T*V\f$, add the product of the transpose of a \p SparseMatrix \p A_trans
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
   void add_vector_transpose (const NumericVector<T> &,
-		             const SparseMatrix<T> &);
+                             const SparseMatrix<T> &);
 
   /**
    * \f$ U=v \f$ where v is a \p std::vector<T>
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
-		       const std::vector<numeric_index_type>& dof_indices);
+                       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U=V\f$, where U and V are type
@@ -373,7 +373,7 @@ class LaspackVector : public NumericVector<T>
    * the NumericVector<T> V
    */
   virtual void insert (const NumericVector<T>& V,
-		       const std::vector<numeric_index_type>& dof_indices);
+                       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U=V \f$ where V is type
@@ -381,7 +381,7 @@ class LaspackVector : public NumericVector<T>
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseVector<T>& V,
-		       const std::vector<numeric_index_type>& dof_indices);
+                       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U=V \f$ where V is type
@@ -389,7 +389,7 @@ class LaspackVector : public NumericVector<T>
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseSubVector<T>& V,
-		       const std::vector<numeric_index_type>& dof_indices);
+                       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * Scale each element of the
@@ -426,15 +426,15 @@ class LaspackVector : public NumericVector<T>
    * defined by the \p send_list.
    */
   void localize (NumericVector<T>& v_local,
-		 const std::vector<numeric_index_type>& send_list) const;
+                 const std::vector<numeric_index_type>& send_list) const;
 
   /**
    * Updates a local vector with selected values from neighboring
    * processors, as defined by \p send_list.
    */
   void localize (const numeric_index_type first_local_idx,
-		 const numeric_index_type last_local_idx,
-		 const std::vector<numeric_index_type>& send_list);
+                 const numeric_index_type last_local_idx,
+                 const std::vector<numeric_index_type>& send_list);
 
 
   /**
@@ -444,14 +444,14 @@ class LaspackVector : public NumericVector<T>
    * is useful for outputting data from one processor.
    */
   void localize_to_one (std::vector<T>& v_local,
-			const processor_id_type proc_id=0) const;
+                        const processor_id_type proc_id=0) const;
 
   /**
    * Computes the pointwise (i.e. component-wise) product of \p vec1
    * and \p vec2 and stores the result in \p *this.
    */
   virtual void pointwise_mult (const NumericVector<T>& vec1,
-			       const NumericVector<T>& vec2);
+                               const NumericVector<T>& vec2);
 
   /**
    * Swaps the raw QVector contents.
@@ -479,7 +479,7 @@ class LaspackVector : public NumericVector<T>
 template <typename T>
 inline
 LaspackVector<T>::LaspackVector (const Parallel::Communicator &comm,
-				 const ParallelType ptype)
+                                 const ParallelType ptype)
   : NumericVector<T>(comm, ptype)
 {
   this->_type = ptype;
@@ -490,7 +490,7 @@ LaspackVector<T>::LaspackVector (const Parallel::Communicator &comm,
 template <typename T>
 inline
 LaspackVector<T>::LaspackVector (const Parallel::Communicator &comm,
-				 const numeric_index_type n,
+                                 const numeric_index_type n,
                                  const ParallelType ptype)
   : NumericVector<T>(comm, ptype)
 {
@@ -502,8 +502,8 @@ LaspackVector<T>::LaspackVector (const Parallel::Communicator &comm,
 template <typename T>
 inline
 LaspackVector<T>::LaspackVector (const Parallel::Communicator &comm,
-				 const numeric_index_type n,
-				 const numeric_index_type n_local,
+                                 const numeric_index_type n,
+                                 const numeric_index_type n_local,
                                  const ParallelType ptype)
   : NumericVector<T>(comm, ptype)
 {
@@ -515,9 +515,9 @@ LaspackVector<T>::LaspackVector (const Parallel::Communicator &comm,
 template <typename T>
 inline
 LaspackVector<T>::LaspackVector (const Parallel::Communicator &comm,
-				 const numeric_index_type N,
-	                         const numeric_index_type n_local,
-	                         const std::vector<numeric_index_type>& ghost,
+                                 const numeric_index_type N,
+                                 const numeric_index_type n_local,
+                                 const std::vector<numeric_index_type>& ghost,
                                  const ParallelType ptype)
   : NumericVector<T>(comm, ptype)
 {
@@ -538,8 +538,8 @@ LaspackVector<T>::~LaspackVector ()
 template <typename T>
 inline
 void LaspackVector<T>::init (const numeric_index_type n,
-			     const numeric_index_type libmesh_dbg_var(n_local),
-			     const bool fast,
+                             const numeric_index_type libmesh_dbg_var(n_local),
+                             const bool fast,
                              const ParallelType)
 {
   // Laspack vectors only for serial cases,
@@ -577,7 +577,7 @@ void LaspackVector<T>::init (const numeric_index_type n,
 template <typename T>
 inline
 void LaspackVector<T>::init (const numeric_index_type n,
-			     const bool fast,
+                             const bool fast,
                              const ParallelType ptype)
 {
   this->init(n,n,fast,ptype);
@@ -587,9 +587,9 @@ void LaspackVector<T>::init (const numeric_index_type n,
 template <typename T>
 inline
 void LaspackVector<T>::init (const numeric_index_type n,
-			     const numeric_index_type n_local,
-	                     const std::vector<numeric_index_type>& libmesh_dbg_var(ghost),
-			     const bool fast,
+                             const numeric_index_type n_local,
+                             const std::vector<numeric_index_type>& libmesh_dbg_var(ghost),
+                             const bool fast,
                              const ParallelType ptype)
 {
   libmesh_assert(ghost.empty());
@@ -762,7 +762,7 @@ T LaspackVector<T>::operator() (const numeric_index_type i) const
 {
   libmesh_assert (this->initialized());
   libmesh_assert ( ((i >= this->first_local_index()) &&
-	    (i <  this->last_local_index())) );
+                    (i <  this->last_local_index())) );
 
 
   return static_cast<T>(V_GetCmp(const_cast<QVector*>(&_vec), i+1));

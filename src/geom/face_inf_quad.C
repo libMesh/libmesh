@@ -43,20 +43,20 @@ dof_id_type InfQuad::key (const unsigned int s) const
     case 0:
 
       return
-	this->compute_key (this->node(0),
-			   this->node(1));
+        this->compute_key (this->node(0),
+                           this->node(1));
 
     case 1:
 
       return
-	this->compute_key (this->node(1),
-			   this->node(3));
+        this->compute_key (this->node(1),
+                           this->node(3));
 
     case 2:
 
       return
-	this->compute_key (this->node(0),
-			   this->node(2));
+        this->compute_key (this->node(0),
+                           this->node(2));
     }
 
   // We will never get here...  Look at the code above.
@@ -75,41 +75,41 @@ AutoPtr<Elem> InfQuad::side (const unsigned int i) const
     {
     case 0:
       {
-	// base face
-	Edge2* edge = new Edge2;
+        // base face
+        Edge2* edge = new Edge2;
 
-	edge->set_node(0) = this->get_node(0);
-	edge->set_node(1) = this->get_node(1);
+        edge->set_node(0) = this->get_node(0);
+        edge->set_node(1) = this->get_node(1);
 
-	AutoPtr<Elem> ap(edge);  return ap;
+        AutoPtr<Elem> ap(edge);  return ap;
       }
 
     case 1:
       {
-	// adjacent to another infinite element
+        // adjacent to another infinite element
         InfEdge2* edge = new InfEdge2;
 
-	edge->set_node(0) = this->get_node(1);
-	edge->set_node(1) = this->get_node(3);
+        edge->set_node(0) = this->get_node(1);
+        edge->set_node(1) = this->get_node(3);
 
-	AutoPtr<Elem> ap(edge);  return ap;
+        AutoPtr<Elem> ap(edge);  return ap;
       }
 
     case 2:
       {
-	// adjacent to another infinite element
-	InfEdge2* edge = new InfEdge2;
+        // adjacent to another infinite element
+        InfEdge2* edge = new InfEdge2;
 
-	edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
-	edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
+        edge->set_node(0) = this->get_node(0); // be aware of swapped nodes,
+        edge->set_node(1) = this->get_node(2); // compared to conventional side numbering
 
-	AutoPtr<Elem> ap(edge);  return ap;
+        AutoPtr<Elem> ap(edge);  return ap;
       }
 
     default:
       {
-	libmesh_error();
-	AutoPtr<Elem> ap(NULL);  return ap;
+        libmesh_error();
+        AutoPtr<Elem> ap(NULL);  return ap;
       }
     }
 

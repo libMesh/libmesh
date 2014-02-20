@@ -82,7 +82,7 @@ bool InfPrism12::is_face(const unsigned int i) const
 }
 
 bool InfPrism12::is_node_on_side(const unsigned int n,
-				 const unsigned int s) const
+                                 const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 6; ++i)
@@ -92,7 +92,7 @@ bool InfPrism12::is_node_on_side(const unsigned int n,
 }
 
 bool InfPrism12::is_node_on_edge(const unsigned int n,
-				 const unsigned int e) const
+                                 const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 3; ++i)
@@ -102,31 +102,31 @@ bool InfPrism12::is_node_on_edge(const unsigned int n,
 }
 
 AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
-				      bool proxy) const
+                                      bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
       switch (i)
-	{
-	  // base
-	case 0:
-	  {
-	    AutoPtr<Elem> ap(new Side<Tri6,InfPrism12>(this,i));
-	    return ap;
-	  }
-	  // ifem sides
-	case 1:
-	case 2:
-	case 3:
-	  {
-	    AutoPtr<Elem> ap(new Side<InfQuad6,InfPrism12>(this,i));
-	    return ap;
-	  }
-	default:
-	  libmesh_error();
-	}
+        {
+          // base
+        case 0:
+          {
+            AutoPtr<Elem> ap(new Side<Tri6,InfPrism12>(this,i));
+            return ap;
+          }
+          // ifem sides
+        case 1:
+        case 2:
+        case 3:
+          {
+            AutoPtr<Elem> ap(new Side<InfQuad6,InfPrism12>(this,i));
+            return ap;
+          }
+        default:
+          libmesh_error();
+        }
     }
 
   else
@@ -135,69 +135,69 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
       AutoPtr<Elem> face(NULL);
 
       switch (i)
-	{
-	case 0:  // the triangular face at z=-1, base face
-	  {
+        {
+        case 0:  // the triangular face at z=-1, base face
+          {
             face.reset(new Tri6);
 
-	    // Note that for this face element, the normal points inward
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(2);
-	    face->set_node(3) = this->get_node(6);
-	    face->set_node(4) = this->get_node(7);
-	    face->set_node(5) = this->get_node(8);
+            // Note that for this face element, the normal points inward
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(2);
+            face->set_node(3) = this->get_node(6);
+            face->set_node(4) = this->get_node(7);
+            face->set_node(5) = this->get_node(8);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 1:  // the quad face at y=0
-	  {
+        case 1:  // the quad face at y=0
+          {
             face.reset(new InfQuad6);
 
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(3);
-	    face->set_node(3) = this->get_node(4);
-	    face->set_node(4) = this->get_node(6);
-	    face->set_node(5) = this->get_node(9);
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(3);
+            face->set_node(3) = this->get_node(4);
+            face->set_node(4) = this->get_node(6);
+            face->set_node(5) = this->get_node(9);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 2:  // the other quad face
-	  {
+        case 2:  // the other quad face
+          {
             face.reset(new InfQuad6);
 
-	    face->set_node(0) = this->get_node(1);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(4);
-	    face->set_node(3) = this->get_node(5);
-	    face->set_node(4) = this->get_node(7);
-	    face->set_node(5) = this->get_node(10);
+            face->set_node(0) = this->get_node(1);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(4);
+            face->set_node(3) = this->get_node(5);
+            face->set_node(4) = this->get_node(7);
+            face->set_node(5) = this->get_node(10);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 3: // the quad face at x=0
-	  {
+        case 3: // the quad face at x=0
+          {
             face.reset(new InfQuad6);
 
-	    face->set_node(0) = this->get_node(2);
-	    face->set_node(1) = this->get_node(0);
-	    face->set_node(2) = this->get_node(5);
-	    face->set_node(3) = this->get_node(3);
-	    face->set_node(4) = this->get_node(8);
-	    face->set_node(5) = this->get_node(11);
+            face->set_node(0) = this->get_node(2);
+            face->set_node(1) = this->get_node(0);
+            face->set_node(2) = this->get_node(5);
+            face->set_node(3) = this->get_node(3);
+            face->set_node(4) = this->get_node(8);
+            face->set_node(5) = this->get_node(11);
 
-	    break;
-	  }
+            break;
+          }
 
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+        default:
+          {
+            libmesh_error();
+          }
+        }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
@@ -222,8 +222,8 @@ AutoPtr<Elem> InfPrism12::build_edge (const unsigned int i) const
 
 
 void InfPrism12::connectivity(const unsigned int sc,
-			      const IOPackage iop,
-			      std::vector<dof_id_type>& conn) const
+                              const IOPackage iop,
+                              std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -233,66 +233,66 @@ void InfPrism12::connectivity(const unsigned int sc,
     {
     case TECPLOT:
       {
-	conn.resize(8);
-	switch (sc)
-	  {
-	  case 0:
+        conn.resize(8);
+        switch (sc)
+          {
+          case 0:
 
-	    // guess this is a collapsed hex8
-	    conn[0] = this->node(0)+1;
-	    conn[1] = this->node(6)+1;
-	    conn[2] = this->node(8)+1;
-	    conn[3] = this->node(8)+1;
-	    conn[4] = this->node(3)+1;
-	    conn[5] = this->node(9)+1;
-	    conn[6] = this->node(11)+1;
-	    conn[7] = this->node(11)+1;
+            // guess this is a collapsed hex8
+            conn[0] = this->node(0)+1;
+            conn[1] = this->node(6)+1;
+            conn[2] = this->node(8)+1;
+            conn[3] = this->node(8)+1;
+            conn[4] = this->node(3)+1;
+            conn[5] = this->node(9)+1;
+            conn[6] = this->node(11)+1;
+            conn[7] = this->node(11)+1;
 
-	    return;
+            return;
 
-	  case 1:
+          case 1:
 
-	    conn[0] = this->node(6)+1;
-	    conn[1] = this->node(7)+1;
-	    conn[2] = this->node(8)+1;
-	    conn[3] = this->node(8)+1;
-	    conn[4] = this->node(9)+1;
-	    conn[5] = this->node(10)+1;
-	    conn[6] = this->node(11)+1;
-	    conn[7] = this->node(11)+1;
+            conn[0] = this->node(6)+1;
+            conn[1] = this->node(7)+1;
+            conn[2] = this->node(8)+1;
+            conn[3] = this->node(8)+1;
+            conn[4] = this->node(9)+1;
+            conn[5] = this->node(10)+1;
+            conn[6] = this->node(11)+1;
+            conn[7] = this->node(11)+1;
 
-	    return;
+            return;
 
-	  case 2:
+          case 2:
 
-	    conn[0] = this->node(6)+1;
-	    conn[1] = this->node(1)+1;
-	    conn[2] = this->node(7)+1;
-	    conn[3] = this->node(7)+1;
-	    conn[4] = this->node(9)+1;
-	    conn[5] = this->node(4)+1;
-	    conn[6] = this->node(10)+1;
-	    conn[7] = this->node(10)+1;
+            conn[0] = this->node(6)+1;
+            conn[1] = this->node(1)+1;
+            conn[2] = this->node(7)+1;
+            conn[3] = this->node(7)+1;
+            conn[4] = this->node(9)+1;
+            conn[5] = this->node(4)+1;
+            conn[6] = this->node(10)+1;
+            conn[7] = this->node(10)+1;
 
-	    return;
+            return;
 
-	  case 3:
+          case 3:
 
-	    conn[0] = this->node(8)+1;
-	    conn[1] = this->node(7)+1;
-	    conn[2] = this->node(2)+1;
-	    conn[3] = this->node(2)+1;
-	    conn[4] = this->node(11)+1;
-	    conn[5] = this->node(10)+1;
-	    conn[6] = this->node(5)+1;
-	    conn[7] = this->node(5)+1;
+            conn[0] = this->node(8)+1;
+            conn[1] = this->node(7)+1;
+            conn[2] = this->node(2)+1;
+            conn[3] = this->node(2)+1;
+            conn[4] = this->node(11)+1;
+            conn[5] = this->node(10)+1;
+            conn[6] = this->node(5)+1;
+            conn[7] = this->node(5)+1;
 
-	    return;
+            return;
 
-	  default:
-	    libmesh_error();
+          default:
+            libmesh_error();
 
-	  }
+          }
 
       }
 
@@ -308,7 +308,7 @@ void InfPrism12::connectivity(const unsigned int sc,
 
 
 unsigned short int InfPrism12::second_order_adjacent_vertex (const unsigned int n,
-							     const unsigned int v) const
+                                                             const unsigned int v) const
 {
   libmesh_assert_greater_equal (n, this->n_vertices());
   libmesh_assert_less (n, this->n_nodes());

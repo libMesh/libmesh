@@ -32,17 +32,17 @@ namespace libMesh
       libmesh_assert (-1.-1.e-5 <= v && v < 1.);
 
       switch (i)
-	{
-	case 0:
-	  return -2.*v/(1.-v);
-	case 1:
-	  return (1.+v)/(1.-v);
+        {
+        case 0:
+          return -2.*v/(1.-v);
+        case 1:
+          return (1.+v)/(1.-v);
 
-	default:
-	  libMesh::err << "bad index i = " << i << std::endl;
-	  libmesh_error();
+        default:
+          libMesh::err << "bad index i = " << i << std::endl;
+          libmesh_error();
 
-	}
+        }
 
       // we never end up here.
       libmesh_error();
@@ -56,17 +56,17 @@ namespace libMesh
       libmesh_assert (-1.-1.e-5 <= v && v < 1.);
 
       switch (i)
-	{
-	case 0:
-	  return -2./((1.-v)*(1.-v));
-	case 1:
-	  return 2./((1.-v)*(1.-v));
+        {
+        case 0:
+          return -2./((1.-v)*(1.-v));
+        case 1:
+          return 2./((1.-v)*(1.-v));
 
-	default:
-	  libMesh::err << "bad index i = " << i << std::endl;
-	  libmesh_error();
+        default:
+          libMesh::err << "bad index i = " << i << std::endl;
+          libmesh_error();
 
-	}
+        }
 
       // we never end up here.
       libmesh_error();

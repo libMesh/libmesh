@@ -45,8 +45,8 @@ namespace libMesh
 {
 
 RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
-		                      const std::string& name_in,
-		                      const unsigned int number_in)
+                                      const std::string& name_in,
+                                      const unsigned int number_in)
   : Parent(es, name_in, number_in),
     best_fit_type_flag(PROJECTION_BEST_FIT),
     _parametrized_functions_in_training_set_initialized(false),
@@ -532,7 +532,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
         unsigned int n_qpoints = context.get_element_qrule().n_points();
         unsigned int n_var_dofs = libmesh_cast_int<unsigned int>
-	  (context.get_dof_indices( var ).size());
+          (context.get_dof_indices( var ).size());
 
         DenseSubVector<Number>& subresidual_var = context.get_elem_residual( var );
 

@@ -111,9 +111,9 @@ public:
    * On a p-refined element, \p o should be the total order of the element.
    */
   static OutputShape shape(const ElemType t,
-		           const Order o,
-		           const unsigned int i,
-		           const Point& p);
+                           const Order o,
+                           const unsigned int i,
+                           const Point& p);
 
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
@@ -124,9 +124,9 @@ public:
    * On a p-refined element, \p o should be the base order of the element.
    */
   static OutputShape shape(const Elem* elem,
-		           const Order o,
-		           const unsigned int i,
-		           const Point& p);
+                           const Order o,
+                           const unsigned int i,
+                           const Point& p);
 
   /**
    * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
@@ -136,10 +136,10 @@ public:
    * On a p-refined element, \p o should be the total order of the element.
    */
   static OutputShape shape_deriv(const ElemType t,
-			         const Order o,
-			         const unsigned int i,
-			         const unsigned int j,
-			         const Point& p);
+                                 const Order o,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point& p);
 
   /**
    * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
@@ -148,10 +148,10 @@ public:
    * On a p-refined element, \p o should be the base order of the element.
    */
   static OutputShape shape_deriv(const Elem* elem,
-			         const Order o,
-			         const unsigned int i,
-			         const unsigned int j,
-			         const Point& p);
+                                 const Order o,
+                                 const unsigned int i,
+                                 const unsigned int j,
+                                 const Point& p);
 
   /**
    * @returns the second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
@@ -172,10 +172,10 @@ public:
    * On a p-refined element, \p o should be the total order of the element.
    */
   static OutputShape shape_second_deriv(const ElemType t,
-				        const Order o,
-				        const unsigned int i,
-				        const unsigned int j,
-				        const Point& p);
+                                        const Order o,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point& p);
 
   /**
    * @returns the second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
@@ -196,10 +196,10 @@ public:
    * On a p-refined element, \p o should be the base order of the element.
    */
   static OutputShape shape_second_deriv(const Elem* elem,
-				        const Order o,
-				        const unsigned int i,
-				        const unsigned int j,
-				        const Point& p);
+                                        const Order o,
+                                        const unsigned int i,
+                                        const unsigned int j,
+                                        const Point& p);
 
   /**
    * Build the nodal soln from the element soln.
@@ -208,8 +208,8 @@ public:
    * On a p-refined element, \p o should be the base order of the element.
    */
   static void nodal_soln(const Elem* elem, const Order o,
-			 const std::vector<Number>& elem_soln,
-			 std::vector<Number>& nodal_soln);
+                         const std::vector<Number>& elem_soln,
+                         std::vector<Number>& nodal_soln);
 
   /**
    * @returns the number of shape functions associated with
@@ -224,7 +224,7 @@ public:
    * On a p-refined element, \p o should be the total order of the element.
    */
   static unsigned int n_shape_functions (const ElemType t,
-					 const Order o)
+                                         const Order o)
   { return FE<Dim,T>::n_dofs (t,o); }
 
   /**
@@ -234,7 +234,7 @@ public:
    * On a p-refined element, \p o should be the total order of the element.
    */
   static unsigned int n_dofs(const ElemType t,
-			     const Order o);
+                             const Order o);
 
   /**
    * @returns the number of dofs at node \p n for a finite element
@@ -243,8 +243,8 @@ public:
    * On a p-refined element, \p o should be the total order of the element.
    */
   static unsigned int n_dofs_at_node(const ElemType t,
-				     const Order o,
-				     const unsigned int n);
+                                     const Order o,
+                                     const unsigned int n);
 
   /**
    * @returns the number of dofs interior to the element,
@@ -253,7 +253,7 @@ public:
    * On a p-refined element, \p o should be the total order of the element.
    */
   static unsigned int n_dofs_per_elem(const ElemType t,
-				      const Order o);
+                                      const Order o);
 
   /**
    * @returns the continuity level of the finite element.
@@ -273,9 +273,9 @@ public:
    * On a p-refined element, \p o should be the base order of the element.
    */
   static void dofs_on_side(const Elem* const elem,
-		           const Order o,
-		           unsigned int s,
-		           std::vector<unsigned int>& di);
+                           const Order o,
+                           unsigned int s,
+                           std::vector<unsigned int>& di);
   /**
    * Fills the vector di with the local degree of freedom indices
    * associated with edge \p e of element \p elem
@@ -283,9 +283,9 @@ public:
    * On a p-refined element, \p o should be the base order of the element.
    */
   static void dofs_on_edge(const Elem* const elem,
-		           const Order o,
-		           unsigned int e,
-		           std::vector<unsigned int>& di);
+                           const Order o,
+                           unsigned int e,
+                           std::vector<unsigned int>& di);
 
   /**
    * @returns the location (on the reference element) of the
@@ -297,9 +297,9 @@ public:
    * terminated when \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
    */
   static Point inverse_map (const Elem* elem,
-			    const Point& p,
-			    const Real tolerance = TOLERANCE,
-			    const bool secure = true);
+                            const Point& p,
+                            const Real tolerance = TOLERANCE,
+                            const bool secure = true);
 
   /**
    * Takes a number points in physical space (in the \p
@@ -312,10 +312,10 @@ public:
    * \f$ \|p - p_n\| < \mbox{\texttt{tolerance}} \f$
    */
   static void inverse_map (const Elem* elem,
-			   const std::vector<Point>& physical_points,
-			   std::vector<Point>&       reference_points,
-			   const Real tolerance = TOLERANCE,
-			   const bool secure = true);
+                           const std::vector<Point>& physical_points,
+                           std::vector<Point>&       reference_points,
+                           const Real tolerance = TOLERANCE,
+                           const bool secure = true);
 
   /**
    * This is at the core of this class. Use this for each
@@ -328,7 +328,7 @@ public:
    * argument \p pts.
    */
   virtual void reinit (const Elem* elem,
-		       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Point>* const pts = NULL,
                        const std::vector<Real>* const weights = NULL);
 
   /**
@@ -341,8 +341,8 @@ public:
    * the optional argument \p pts.
    */
   virtual void reinit (const Elem* elem,
-		       const unsigned int side,
-		       const Real tolerance = TOLERANCE,
+                       const unsigned int side,
+                       const Real tolerance = TOLERANCE,
                        const std::vector<Point>* const pts = NULL,
                        const std::vector<Real>* const weights = NULL);
 
@@ -356,8 +356,8 @@ public:
    * the optional argument \p pts.
    */
   virtual void edge_reinit (const Elem* elem,
-		            const unsigned int edge,
-			    const Real tolerance = TOLERANCE,
+                            const unsigned int edge,
+                            const Real tolerance = TOLERANCE,
                             const std::vector<Point>* const pts = NULL,
                             const std::vector<Real>* const weights = NULL);
 
@@ -393,9 +393,9 @@ public:
    * optimizations if possible.
    */
   static void compute_constraints (DofConstraints &constraints,
-				   DofMap &dof_map,
-				   const unsigned int variable_number,
-				   const Elem* elem);
+                                   DofMap &dof_map,
+                                   const unsigned int variable_number,
+                                   const Elem* elem);
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -411,28 +411,28 @@ public:
    * \p p located on the reference element.
    */
   static Point map (const Elem* elem,
-		    const Point& reference_point);
+                    const Point& reference_point);
 
   /**
    * @returns d(xyz)/dxi (in physical space) of the point
    * \p p located on the reference element.
    */
   static Point map_xi (const Elem* elem,
-		       const Point& reference_point);
+                       const Point& reference_point);
 
   /**
    * @returns d(xyz)/deta (in physical space) of the point
    * \p p located on the reference element.
    */
   static Point map_eta (const Elem* elem,
-			const Point& reference_point);
+                        const Point& reference_point);
 
   /**
    * @returns d(xyz)/dzeta (in physical space) of the point
    * \p p located on the reference element.
    */
   static Point map_zeta (const Elem* elem,
-			 const Point& reference_point);
+                         const Point& reference_point);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   /**
@@ -453,7 +453,7 @@ protected:
    * the quadrature points.
    */
   virtual void init_shape_functions(const std::vector<Point>& qp,
-				    const Elem* e);
+                                    const Elem* e);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -462,7 +462,7 @@ protected:
    * an infinite element.
    */
   virtual void init_base_shape_functions(const std::vector<Point>& qp,
-					 const Elem* e);
+                                         const Elem* e);
 
 #endif
 
@@ -533,11 +533,11 @@ public:
    * 1D hermite functions on unit interval
    */
   static Real hermite_raw_shape_second_deriv(const unsigned int basis_num,
-					     const Real xi);
+                                             const Real xi);
   static Real hermite_raw_shape_deriv(const unsigned int basis_num,
-				      const Real xi);
+                                      const Real xi);
   static Real hermite_raw_shape(const unsigned int basis_num,
-				const Real xi);
+                                const Real xi);
 };
 
 
@@ -705,7 +705,7 @@ public:
    * compilers being confused by partially overriding this virtual function.
    */
   virtual void reinit (const Elem* elem,
-		       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Point>* const pts = NULL,
                        const std::vector<Real>* const weights = NULL)
   { FE<Dim,XYZ>::reinit (elem, pts, weights); }
 
@@ -714,8 +714,8 @@ public:
    * the \p side of \p face.
    */
   virtual void reinit (const Elem* elem,
-		       const unsigned int side,
-		       const Real tolerance = TOLERANCE,
+                       const unsigned int side,
+                       const Real tolerance = TOLERANCE,
                        const std::vector<Point>* const pts = NULL,
                        const std::vector<Real>* const weights = NULL);
 
@@ -730,7 +730,7 @@ protected:
    * the quadrature points.
    */
   virtual void init_shape_functions(const std::vector<Point>& qp,
-				    const Elem* e);
+                                    const Elem* e);
 
   /**
    * After having updated the jacobian and the transformation
@@ -748,7 +748,7 @@ protected:
    * Compute the map & shape functions for this face.
    */
   void compute_face_values (const Elem* elem,
-			    const Elem* side,
+                            const Elem* side,
                             const std::vector<Real>& weights);
 };
 

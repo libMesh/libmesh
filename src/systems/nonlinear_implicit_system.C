@@ -33,8 +33,8 @@ namespace libMesh
 // ------------------------------------------------------------
 // NonlinearImplicitSystem implementation
 NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems& es,
-						  const std::string& name_in,
-						  const unsigned int number_in) :
+                                                  const std::string& name_in,
+                                                  const unsigned int number_in) :
 
   Parent                    (es, name_in, number_in),
   nonlinear_solver          (NonlinearSolver<Number>::build(*this)),
@@ -174,7 +174,7 @@ void NonlinearImplicitSystem::solve ()
       // Solve the nonlinear system.
       const std::pair<unsigned int, Real> rval =
         nonlinear_solver->solve (*matrix, *solution, *rhs,
-			         nonlinear_solver->relative_residual_tolerance,
+                                 nonlinear_solver->relative_residual_tolerance,
                                  nonlinear_solver->max_linear_iterations);
 
       // Store the number of nonlinear iterations required to
@@ -204,7 +204,7 @@ std::pair<unsigned int, Real> NonlinearImplicitSystem::get_linear_solve_paramete
 
 
 void NonlinearImplicitSystem::assembly(bool get_residual,
-				       bool get_jacobian)
+                                       bool get_jacobian)
 {
   // Get current_local_solution in sync
   this->update();
@@ -238,16 +238,16 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
         nonlinear_solver->jacobian (*current_local_solution.get(), *matrix, *this);
 
       else if (nonlinear_solver->jacobian_object != NULL)
-	nonlinear_solver->jacobian_object->jacobian (*current_local_solution.get(), *matrix, *this);
+        nonlinear_solver->jacobian_object->jacobian (*current_local_solution.get(), *matrix, *this);
 
       else if (nonlinear_solver->matvec != NULL)
         nonlinear_solver->matvec (*current_local_solution.get(), get_residual?rhs:NULL, matrix, *this);
 
       else if (nonlinear_solver->residual_and_jacobian_object != NULL)
-	nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian (*current_local_solution.get(), get_residual?rhs:NULL, matrix, *this);
+        nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian (*current_local_solution.get(), get_residual?rhs:NULL, matrix, *this);
 
       else
-	libmesh_error();
+        libmesh_error();
     }
 
   if (get_residual)
@@ -256,7 +256,7 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
         nonlinear_solver->residual (*current_local_solution.get(), *rhs, *this);
 
       else if (nonlinear_solver->residual_object != NULL)
-	nonlinear_solver->residual_object->residual (*current_local_solution.get(), *rhs, *this);
+        nonlinear_solver->residual_object->residual (*current_local_solution.get(), *rhs, *this);
 
       else if (nonlinear_solver->matvec != NULL)
         {
@@ -266,11 +266,11 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
         }
 
       else if (nonlinear_solver->residual_and_jacobian_object != NULL)
-	{
+        {
           // we might have already grabbed the residual and jacobian together
           if (!get_jacobian)
-	    nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian (*current_local_solution.get(), rhs, NULL, *this);
-	}
+            nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian (*current_local_solution.get(), rhs, NULL, *this);
+        }
 
       else
         libmesh_error();

@@ -281,7 +281,7 @@ inline void send_receive_vec_of_vec
   // ... the size of the outer buffer
   sendsize = libmesh_cast_int<int>(send.size());
   MPI_Pack (&sendsize, 1, Parallel::StandardType<unsigned int>(),
-	    &sendbuf[0], libmesh_cast_int<int>(sendbuf.size()), &pos,
+            &sendbuf[0], libmesh_cast_int<int>(sendbuf.size()), &pos,
             comm.get());
 
   for (std::size_t i=0; i<send.size(); i++)
@@ -1045,11 +1045,11 @@ inline void allgather(std::vector<T> &r,
 
 template <typename Context, typename Iter, typename OutputIter>
 inline void gather_packed_range (const unsigned int root_id,
-				 Context *context,
-				 Iter range_begin,
-				 const Iter range_end,
-				 OutputIter out,
-				 const Communicator &comm = Communicator_World)
+                                 Context *context,
+                                 Iter range_begin,
+                                 const Iter range_end,
+                                 OutputIter out,
+                                 const Communicator &comm = Communicator_World)
 { comm.gather_packed_range(root_id, context, range_begin, range_end, out); }
 
 template <typename Context, typename Iter, typename OutputIter>
@@ -1899,11 +1899,11 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 #endif
     ((this->send_mode() == SYNCHRONOUS) ?
      MPI_Ssend : MPI_Send) (dataptr,
-			    libmesh_cast_int<int>(buf.size()),
-			    StandardType<T>(dataptr),
-			    dest_processor_id,
-			    tag.value(),
-			    this->get());
+                            libmesh_cast_int<int>(buf.size()),
+                            StandardType<T>(dataptr),
+                            dest_processor_id,
+                            tag.value(),
+                            this->get());
 
   libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -1928,12 +1928,12 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 #endif
     ((this->send_mode() == SYNCHRONOUS) ?
      MPI_Issend : MPI_Isend) (dataptr,
-			      libmesh_cast_int<int>(buf.size()),
-			      StandardType<T>(dataptr),
-			      dest_processor_id,
-			      tag.value(),
-			      this->get(),
-			      req.get());
+                              libmesh_cast_int<int>(buf.size()),
+                              StandardType<T>(dataptr),
+                              dest_processor_id,
+                              tag.value(),
+                              this->get(),
+                              req.get());
 
   libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -1957,11 +1957,11 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 #endif
     ((this->send_mode() == SYNCHRONOUS) ?
      MPI_Ssend : MPI_Send) (dataptr,
-			    1,
-			    StandardType<T>(dataptr),
-			    dest_processor_id,
-			    tag.value(),
-			    this->get());
+                            1,
+                            StandardType<T>(dataptr),
+                            dest_processor_id,
+                            tag.value(),
+                            this->get());
 
   libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -1986,12 +1986,12 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 #endif
     ((this->send_mode() == SYNCHRONOUS) ?
      MPI_Issend : MPI_Isend) (dataptr,
-			      1,
-			      StandardType<T>(dataptr),
-			      dest_processor_id,
-			      tag.value(),
-			      this->get(),
-			      req.get());
+                              1,
+                              StandardType<T>(dataptr),
+                              dest_processor_id,
+                              tag.value(),
+                              this->get(),
+                              req.get());
 
   libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -2101,11 +2101,11 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 #endif
     ((this->send_mode() == SYNCHRONOUS) ?
      MPI_Ssend : MPI_Send) (buf.empty() ? NULL : &buf[0],
-			    libmesh_cast_int<int>(buf.size()),
-			    type,
-			    dest_processor_id,
-			    tag.value(),
-			    this->get());
+                            libmesh_cast_int<int>(buf.size()),
+                            type,
+                            dest_processor_id,
+                            tag.value(),
+                            this->get());
 
   libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -2129,12 +2129,12 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 #endif
     ((this->send_mode() == SYNCHRONOUS) ?
      MPI_Issend : MPI_Isend) (buf.empty() ? NULL : &buf[0],
-			      libmesh_cast_int<int>(buf.size()),
-			      type,
-			      dest_processor_id,
-			      tag.value(),
-			      this->get(),
-			      req.get());
+                              libmesh_cast_int<int>(buf.size()),
+                              type,
+                              dest_processor_id,
+                              tag.value(),
+                              this->get(),
+                              req.get());
 
   libmesh_assert (ierr == MPI_SUCCESS);
 
@@ -3060,7 +3060,7 @@ inline void Communicator::broadcast (std::vector<T> &data,
   const int ierr =
 #endif
     MPI_Bcast (data_ptr, libmesh_cast_int<int>(data.size()),
-	       StandardType<T>(data_ptr), root_id, this->get());
+               StandardType<T>(data_ptr), root_id, this->get());
 
   libmesh_assert (ierr == MPI_SUCCESS);
 

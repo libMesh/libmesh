@@ -26,17 +26,17 @@ namespace libMesh
 
 
 void QGrundmann_Moller::init_3D(const ElemType type_in,
-				unsigned int p)
+                                unsigned int p)
 {
   // Nearly all GM rules contain negative weights, so if you are not
   // allowing rules with negative weights, we cannot continue!
   if (!allow_rules_with_negative_weights)
     {
       libMesh::err << "You requested a Grundmann-Moller rule but\n"
-		    << "are not allowing rules with negative weights!\n"
-		    << "Either select a different quadrature class or\n"
-		    << "set allow_rules_with_negative_weights==true."
-		    << std::endl;
+                   << "are not allowing rules with negative weights!\n"
+                   << "Either select a different quadrature class or\n"
+                   << "set allow_rules_with_negative_weights==true."
+                   << std::endl;
 
       libmesh_error();
     }
@@ -46,9 +46,9 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
     case TET4:
     case TET10:
       {
-	// Untested above _order=23 but should work...
-	gm_rule( (_order + 2*p)/2 );
-	return;
+        // Untested above _order=23 but should work...
+        gm_rule( (_order + 2*p)/2 );
+        return;
 
       } // end case TET4, TET10
 
@@ -58,8 +58,8 @@ void QGrundmann_Moller::init_3D(const ElemType type_in,
       // Unsupported element type
     default:
       {
-	libMesh::err << "ERROR: Unsupported element type: " << type_in << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: Unsupported element type: " << type_in << std::endl;
+        libmesh_error();
       }
     } // end switch (type_in)
 

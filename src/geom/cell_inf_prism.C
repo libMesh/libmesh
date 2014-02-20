@@ -46,33 +46,33 @@ dof_id_type InfPrism::key (const unsigned int s) const
     case 0:  // the triangular face at z=-1, base face
 
       return
-	this->compute_key (this->node(0),
-			   this->node(2),
-			   this->node(1));
+        this->compute_key (this->node(0),
+                           this->node(2),
+                           this->node(1));
 
     case 1:  // the quad face at y=0
 
       return
-	this->compute_key (this->node(0),
-			   this->node(1),
-			   this->node(4),
-			   this->node(3));
+        this->compute_key (this->node(0),
+                           this->node(1),
+                           this->node(4),
+                           this->node(3));
 
     case 2:  // the other quad face
 
       return
-	this->compute_key (this->node(1),
-			   this->node(2),
-			   this->node(5),
-			   this->node(4));
+        this->compute_key (this->node(1),
+                           this->node(2),
+                           this->node(5),
+                           this->node(4));
 
     case 3: // the quad face at x=0
 
       return
-	this->compute_key (this->node(2),
-			   this->node(0),
-			   this->node(3),
-			   this->node(5));
+        this->compute_key (this->node(2),
+                           this->node(0),
+                           this->node(3),
+                           this->node(5));
     }
 
   // We'll never get here.
@@ -92,62 +92,62 @@ AutoPtr<Elem> InfPrism::side (const unsigned int i) const
       {
         Elem* face = new Tri3;
         AutoPtr<Elem> ap_face(face);
-	//AutoPtr<Elem> face(new Tri3);
+        //AutoPtr<Elem> face(new Tri3);
 
-	// Note that for this face element, the normal points inward
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(2);
+        // Note that for this face element, the normal points inward
+        face->set_node(0) = this->get_node(0);
+        face->set_node(1) = this->get_node(1);
+        face->set_node(2) = this->get_node(2);
 
-	return ap_face;
+        return ap_face;
       }
 
     case 1:  // the quad face at y=0
       {
         Elem* face = new InfQuad4;
         AutoPtr<Elem> ap_face(face);
-	//AutoPtr<Elem> face(new InfQuad4);
+        //AutoPtr<Elem> face(new InfQuad4);
 
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(3);
-	face->set_node(3) = this->get_node(4);
+        face->set_node(0) = this->get_node(0);
+        face->set_node(1) = this->get_node(1);
+        face->set_node(2) = this->get_node(3);
+        face->set_node(3) = this->get_node(4);
 
-	return ap_face;
+        return ap_face;
       }
 
     case 2:  // the other quad face
       {
         Elem* face = new InfQuad4;
         AutoPtr<Elem> ap_face(face);
-	//AutoPtr<Elem> face(new InfQuad4);
+        //AutoPtr<Elem> face(new InfQuad4);
 
-	face->set_node(0) = this->get_node(1);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(4);
-	face->set_node(3) = this->get_node(5);
+        face->set_node(0) = this->get_node(1);
+        face->set_node(1) = this->get_node(2);
+        face->set_node(2) = this->get_node(4);
+        face->set_node(3) = this->get_node(5);
 
-	return ap_face;
+        return ap_face;
       }
 
     case 3: // the quad face at x=0
       {
         Elem* face = new InfQuad4;
         AutoPtr<Elem> ap_face(face);
-	//AutoPtr<Elem> face(new InfQuad4);
+        //AutoPtr<Elem> face(new InfQuad4);
 
-	face->set_node(0) = this->get_node(2);
-	face->set_node(1) = this->get_node(0);
-	face->set_node(2) = this->get_node(5);
-	face->set_node(3) = this->get_node(3);
+        face->set_node(0) = this->get_node(2);
+        face->set_node(1) = this->get_node(0);
+        face->set_node(2) = this->get_node(5);
+        face->set_node(3) = this->get_node(3);
 
-	return ap_face;
+        return ap_face;
       }
 
     default:
       {
-	libmesh_error();
-	AutoPtr<Elem> ap(NULL);  return ap;
+        libmesh_error();
+        AutoPtr<Elem> ap(NULL);  return ap;
       }
     }
 

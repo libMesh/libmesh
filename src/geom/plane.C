@@ -36,7 +36,7 @@ Plane::Plane ()
 
 
 Plane::Plane (const Point& p,
-	      const Point& n)
+              const Point& n)
 {
   this->create_from_point_normal (p, n);
 }
@@ -44,8 +44,8 @@ Plane::Plane (const Point& p,
 
 
 Plane::Plane (const Point& p0,
-	      const Point& p1,
-	      const Point& p2)
+              const Point& p1,
+              const Point& p2)
 {
   this->create_from_three_points (p0, p1, p2);
 }
@@ -56,7 +56,7 @@ Plane::Plane (const Plane& other_plane) :
   Surface()
 {
   this->create_from_point_normal(other_plane._point,
-				 other_plane._normal);
+                                 other_plane._normal);
 }
 
 
@@ -76,8 +76,8 @@ void Plane::create_from_point_normal (const Point& p, const Point& n)
 
 
 void Plane::create_from_three_points (const Point& p0,
-				      const Point& p1,
-				      const Point& p2)
+                                      const Point& p1,
+                                      const Point& p2)
 {
   // Just use p0 for the point.
   _point = p0;

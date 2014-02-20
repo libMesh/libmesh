@@ -440,14 +440,14 @@ unsigned int NewtonSolver::solve()
                         << max_nonlinear_iterations << ", latest evaluated residual "
                         << current_residual << std::endl;
           if (continue_after_max_iterations)
-	    {
-	      _solve_result = DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
-	      libMesh::out << "  Continuing..." << std::endl;
-	    }
+            {
+              _solve_result = DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
+              libMesh::out << "  Continuing..." << std::endl;
+            }
           else
-	    {
-	      libmesh_convergence_failure();
-	    }
+            {
+              libmesh_convergence_failure();
+            }
           continue;
         }
 
@@ -474,7 +474,7 @@ unsigned int NewtonSolver::solve()
                               norm_delta / steplength,
                               linear_solve_finished);
           _outer_iterations++;
-	  break; // out of _outer_iterations for loop
+          break; // out of _outer_iterations for loop
         }
     } // end nonlinear loop
 

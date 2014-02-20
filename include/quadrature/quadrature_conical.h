@@ -48,7 +48,7 @@ class QConical : public QBase
    * Constructor.  Declares the order of the quadrature rule.
    */
   QConical (const unsigned int _dim,
-	    const Order _order=INVALID_ORDER);
+            const Order _order=INVALID_ORDER);
 
   /**
    * Destructor.
@@ -63,7 +63,7 @@ class QConical : public QBase
  private:
 
   void init_1D (const ElemType,
-		unsigned int =0)
+                unsigned int =0)
   {
     // See about making this non-pure virtual in the base class
     libmesh_error();
@@ -73,12 +73,12 @@ class QConical : public QBase
    * The conical product rules are defined in 2D only for Tris.
    */
   void init_2D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
   /**
    * The conical product rules are defined in 3D only for Tets.
    */
   void init_3D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
 
   /**
    * Implementation of conical product rule for a Tri in 2D of

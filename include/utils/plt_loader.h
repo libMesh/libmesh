@@ -77,7 +77,7 @@ public:
    * specifies the version format to write.
    */
   void write_dat (const std::string& name,
-		  const unsigned int version=10) const;
+                  const unsigned int version=10) const;
 
 // BSK - this functionality requires FORTRAN subrouitine calls,
 //       and there is no need to "dirty up" \p libMesh with FORTRAN
@@ -90,16 +90,16 @@ public:
 //    * specifies if the output file will have reversed byte ordering.
 //    */
 //   void write_plot3d (const std::string& basename,
-// 		     const bool reverse=false,
-// 		     const bool gridonly=false) const;
+//      const bool reverse=false,
+//      const bool gridonly=false) const;
 
 //   /**
 //    * Writes a Cart3D .tri component file.  The number of components
 //    * will be the number of zones in the .plt file.
 //    */
 //   void write_tri (const std::string& name,
-// 		  const bool reverse=false,
-// 		  const bool gridonly=false) const;
+//   const bool reverse=false,
+//   const bool gridonly=false) const;
 
 
 
@@ -113,38 +113,38 @@ public:
    * for use with the old .plt format.
    */
   enum OldZoneType { BLOCK=0,
-		     POINT,
-		     FEBLOCK,
-		     FEPOINT };
+                     POINT,
+                     FEBLOCK,
+                     FEPOINT };
 
   /**
    * Enum defining the zone type in the Tecplot binary file,
    * for use with the new .plt format.
    */
   enum NewZoneType { ORDERED=0,
-		     FELINESEG,
-		     FETRIANGLE,
-		     FEQUADRILATERAL,
-		     FETETRAHEDRON,
-		     FEBRICK };
+                     FELINESEG,
+                     FETRIANGLE,
+                     FEQUADRILATERAL,
+                     FETETRAHEDRON,
+                     FEBRICK };
 
   /**
    * Enum defining the data type of each variable.
    */
   enum DataType { FLOAT=1,
-		  DOUBLE,
-		  LONGINT,
-		  SHORTINT,
-		  BYTE,
-		  BIT};
+                  DOUBLE,
+                  LONGINT,
+                  SHORTINT,
+                  BYTE,
+                  BIT};
 
   /**
    * Enum defining the finite element types
    */
   enum FEType { TRI=0,
-		QUAD,
-		TET,
-		HEX };
+                QUAD,
+                TET,
+                HEX };
 
 
 

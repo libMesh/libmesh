@@ -55,7 +55,7 @@ class SerialMesh : public UnstructuredMesh
    */
   explicit
   SerialMesh (const Parallel::Communicator &comm,
-	      unsigned int dim=1);
+              unsigned int dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
@@ -145,10 +145,10 @@ class SerialMesh : public UnstructuredMesh
    * functions for adding /deleting nodes elements.
    */
   virtual Node* add_point (const Point& p,
-			   const dof_id_type id =
-			     DofObject::invalid_id,
-			   const processor_id_type proc_id =
-			     DofObject::invalid_processor_id);
+                           const dof_id_type id =
+                           DofObject::invalid_id,
+                           const processor_id_type proc_id =
+                           DofObject::invalid_processor_id);
   virtual Node* add_node (Node* n) ;
 
   /**

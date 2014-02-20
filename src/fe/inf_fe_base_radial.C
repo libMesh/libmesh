@@ -50,42 +50,42 @@ ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type (const ElemType type)
       // 3D infinite elements:
       // with Dim=3 -> infinite elements on their own
       case INFHEX8:
-	  return QUAD4;
+        return QUAD4;
 
       case INFHEX16:
-	  return QUAD8;
+        return QUAD8;
 
       case INFHEX18:
-	  return QUAD9;
+        return QUAD9;
 
       case INFPRISM6:
-	  return TRI3;
+        return TRI3;
 
       case INFPRISM12:
-	  return TRI6;
+        return TRI6;
 
       // 2D infinite elements:
       // with Dim=3 -> used as boundary condition,
       // with Dim=2 -> infinite elements on their own
       case INFQUAD4:
-	  return EDGE2;
+        return EDGE2;
 
       case INFQUAD6:
-	  return EDGE3;
+        return EDGE3;
 
       // 1D infinite elements:
       // with Dim=2 -> used as boundary condition,
       // with Dim=1 -> infinite elements on their own,
       //               but no base element!
       case INFEDGE2:
-	  return INVALID_ELEM;
+        return INVALID_ELEM;
 
       default:
-	{
-	  libMesh::err << "ERROR: Unsupported element type!: " << type
-		        << std::endl;
-	  libmesh_error();
-	}
+        {
+          libMesh::err << "ERROR: Unsupported element type!: " << type
+                       << std::endl;
+          libmesh_error();
+        }
     }
 
 
@@ -99,17 +99,17 @@ ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type (const ElemType type)
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 unsigned int InfFE<Dim,T_radial,T_base>::Base::n_base_mapping_sf (const ElemType base_elem_type,
-								  const Order base_mapping_order)
+                                                                  const Order base_mapping_order)
 {
   if (Dim == 1)
     return 1;
 
   else if (Dim == 2)
     return FE<1,LAGRANGE>::n_shape_functions (base_elem_type,
-					      base_mapping_order);
+                                              base_mapping_order);
   else if (Dim == 3)
     return FE<2,LAGRANGE>::n_shape_functions (base_elem_type,
-					      base_mapping_order);
+                                              base_mapping_order);
   else
     {
       // whoa, cool infinite element!
@@ -126,7 +126,7 @@ unsigned int InfFE<Dim,T_radial,T_base>::Base::n_base_mapping_sf (const ElemType
 // InfFE::Radial class members
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::Radial::n_dofs_at_node (const Order o_radial,
-								const unsigned int n_onion)
+                                                                const unsigned int n_onion)
 {
   libmesh_assert_less (n_onion, 2);
 

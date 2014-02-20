@@ -82,13 +82,13 @@ public:
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-			        const unsigned int s) const;
+                                const unsigned int s) const;
 
   /*
    * @returns true iff the specified edge is on the specified side
    */
   virtual bool is_edge_on_side(const unsigned int e,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /**
    * @returns an id associated with the \p s side of this element.
@@ -118,7 +118,7 @@ public:
    * Matrix that allows children to inherit boundary conditions.
    */
   unsigned int side_children_matrix (const unsigned int,
-				     const unsigned int) const
+                                     const unsigned int) const
   { libmesh_error(); return 0; }
 
 #endif

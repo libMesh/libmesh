@@ -52,8 +52,8 @@ class MeshRefinement;
  */
 
 class Node : public Point,
-	     public DofObject,
-	     public ReferenceCountedObject<Node>
+  public DofObject,
+  public ReferenceCountedObject<Node>
 {
 
 public:
@@ -64,9 +64,9 @@ public:
    */
   explicit
   Node  (const Real x=0,
-	 const Real y=0,
-	 const Real z=0,
-	 const dof_id_type id = invalid_id);
+         const Real y=0,
+         const Real z=0,
+         const dof_id_type id = invalid_id);
 
   /**
    * Copy-constructor.
@@ -77,7 +77,7 @@ public:
    * Copy-constructor from a \p Point.  Optionally assigned the \p id.
    */
   explicit Node (const Point& p,
-	         const dof_id_type id = invalid_id);
+                 const dof_id_type id = invalid_id);
 
   /**
    * Destructor.
@@ -100,16 +100,16 @@ public:
    * to the newly-created object.  Optionally assignes the \p id.
    */
   static AutoPtr<Node> build (const Point& p,
-			      const dof_id_type id);
+                              const dof_id_type id);
 
   /**
    * Builds a \p Node from specified points and returns an \p AutoPtr<Node>
    * to the newly-created object.  Optionally assigned the \p id.
    */
   static AutoPtr<Node> build (const Real x,
-			      const Real y,
-			      const Real z,
-			      const dof_id_type id);
+                              const Real y,
+                              const Real z,
+                              const dof_id_type id);
 
   /**
    * @returns \p true if the node is active.  An active node is
@@ -246,9 +246,9 @@ std::ostream& operator << (std::ostream& os, const Node& n)
 // Inline functions
 inline
 Node::Node (const Real x,
-	    const Real y,
-	    const Real z,
-	    const dof_id_type dofid) :
+            const Real y,
+            const Real z,
+            const dof_id_type dofid) :
   Point(x,y,z)
 {
   this->set_id() = dofid;
@@ -268,7 +268,7 @@ Node::Node (const Node& n) :
 
 inline
 Node::Node (const Point& p,
-	    const dof_id_type dofid) :
+            const dof_id_type dofid) :
   Point(p)
 {
   // optionally assign the id.  We have
@@ -315,7 +315,7 @@ AutoPtr<Node> Node::build(const Node& n)
 
 inline
 AutoPtr<Node> Node::build(const Point& p,
-			  const dof_id_type id)
+                          const dof_id_type id)
 {
 
   AutoPtr<Node> ap(new Node(p,id));
@@ -326,9 +326,9 @@ AutoPtr<Node> Node::build(const Point& p,
 
 inline
 AutoPtr<Node> Node::build(const Real x,
-			  const Real y,
-			  const Real z,
-			  const dof_id_type id)
+                          const Real y,
+                          const Real z,
+                          const dof_id_type id)
 {
   AutoPtr<Node> ap(new Node(x,y,z,id));
   return ap;

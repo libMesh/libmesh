@@ -117,25 +117,25 @@ void PostscriptIO::write (const std::string& fname)
       std::time_t  time1= std::time (0);
       std::tm     *time = std::localtime(&time1);
       _out << "%!PS-Adobe-2.0 EPSF-1.2" << '\n'
-	//<< "%!PS-Adobe-1.0" << '\n' // Lars' PS version
-	  << "%%Filename: " << fname << '\n'
-	  << "%%Title: LibMesh Output" << '\n'
-	  << "%%Creator: LibMesh: A C++ finite element library" << '\n'
-	  << "%%Creation Date: "
-	  << time->tm_year+1900 << "/"
-	  << time->tm_mon+1 << "/"
-	  << time->tm_mday << " - "
-	  << time->tm_hour << ":"
-	  << std::setw(2) << time->tm_min << ":"
-	  << std::setw(2) << time->tm_sec << '\n'
-	  << "%%BoundingBox: "
-	// lower left corner
-	  << "0 0 "
-	// upper right corner
-	  << static_cast<unsigned int>( rint((x_max-x_min) * _scale ))
-	  << ' '
-	  << static_cast<unsigned int>( rint((y_max-y_min) * _scale ))
-	  << '\n';
+        //<< "%!PS-Adobe-1.0" << '\n' // Lars' PS version
+           << "%%Filename: " << fname << '\n'
+           << "%%Title: LibMesh Output" << '\n'
+           << "%%Creator: LibMesh: A C++ finite element library" << '\n'
+           << "%%Creation Date: "
+           << time->tm_year+1900 << "/"
+           << time->tm_mon+1 << "/"
+           << time->tm_mday << " - "
+           << time->tm_hour << ":"
+           << std::setw(2) << time->tm_min << ":"
+           << std::setw(2) << time->tm_sec << '\n'
+           << "%%BoundingBox: "
+        // lower left corner
+           << "0 0 "
+        // upper right corner
+           << static_cast<unsigned int>( rint((x_max-x_min) * _scale ))
+           << ' '
+           << static_cast<unsigned int>( rint((y_max-y_min) * _scale ))
+           << '\n';
 
       // define some abbreviations to keep
       // the output small:
@@ -146,15 +146,15 @@ void PostscriptIO::write (const std::string& fname)
       // lx=close the line and plot the line
       // lf=close the line and fill the interior
       _out << "/m {moveto} bind def"      << '\n'
-	  << "/l {lineto} bind def"      << '\n'
-	  << "/s {setrgbcolor} bind def" << '\n'
-	  << "/sg {setgray} bind def"    << '\n'
-	  << "/cs {curveto stroke} bind def" << '\n'
-	  << "/lx {lineto closepath stroke} bind def" << '\n'
-	  << "/lf {lineto closepath fill} bind def"   << '\n';
+           << "/l {lineto} bind def"      << '\n'
+           << "/s {setrgbcolor} bind def" << '\n'
+           << "/sg {setgray} bind def"    << '\n'
+           << "/cs {curveto stroke} bind def" << '\n'
+           << "/lx {lineto closepath stroke} bind def" << '\n'
+           << "/lf {lineto closepath fill} bind def"   << '\n';
 
       _out << "%%EndProlog" << '\n';
-      //	  << '\n';
+      //  << '\n';
 
       // Set line width in the postscript file.
       _out << line_width << " setlinewidth" << '\n';
@@ -176,12 +176,12 @@ void PostscriptIO::write (const std::string& fname)
       MeshBase::const_element_iterator       el     = the_mesh.active_elements_begin();
       const MeshBase::const_element_iterator end_el = the_mesh.active_elements_end();
       for ( ; el != end_el; ++el)
-	{
-	  //const Elem* elem = *el;
+        {
+          //const Elem* elem = *el;
 
-	  this->plot_linear_elem(*el);
-	  //this->plot_quadratic_elem(*el); // Experimental
-	}
+          this->plot_linear_elem(*el);
+          //this->plot_quadratic_elem(*el); // Experimental
+        }
 
       // Issue the showpage command, and we're done.
       _out << "showpage" << std::endl;
@@ -260,7 +260,7 @@ void PostscriptIO::plot_quadratic_elem(const Elem* elem)
 
       // Print curveto path to file
       for (unsigned int i=0; i<_bezier_coeffs.size(); ++i)
-	_out << _bezier_coeffs[i](0) << " " << _bezier_coeffs[i](1) << " ";
+        _out << _bezier_coeffs[i](0) << " " << _bezier_coeffs[i](1) << " ";
       _out << " cs\n";
     }
 }
@@ -284,19 +284,19 @@ void PostscriptIO::_compute_edge_bezier_coeffs(const Elem* elem)
       // Initialize vectors.  Physical coordinates are initialized
       // by their postscript-scaled values.
       for (unsigned int j=0; j<3; ++j)
-	{
-	  phys_coords[j] = (elem->point(j)(i) - _offset(i)) * _scale;
-	  bez_coords[j] = 0.; // zero out result vector
-	}
+        {
+          phys_coords[j] = (elem->point(j)(i) - _offset(i)) * _scale;
+          bez_coords[j] = 0.; // zero out result vector
+        }
 
       // Multiply matrix times vector
       for (unsigned int j=0; j<3; ++j)
-	for (unsigned int k=0; k<3; ++k)
-	  bez_coords[j] += _bezier_transform[j][k]*phys_coords[k];
+        for (unsigned int k=0; k<3; ++k)
+          bez_coords[j] += _bezier_transform[j][k]*phys_coords[k];
 
       // Store result in _bezier_coeffs
       for (unsigned int j=0; j<3; ++j)
-	_bezier_coeffs[j](i) = phys_coords[j];
+        _bezier_coeffs[j](i) = phys_coords[j];
     }
 }
 

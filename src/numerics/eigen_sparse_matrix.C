@@ -38,12 +38,12 @@ namespace libMesh
 // EigenSparseMatrix members
 template <typename T>
 void EigenSparseMatrix<T>::init (const numeric_index_type m_in,
-				 const numeric_index_type n_in,
-				 const numeric_index_type m_l,
-				 const numeric_index_type n_l,
-				 const numeric_index_type nnz,
-				 const numeric_index_type,
-				 const numeric_index_type)
+                                 const numeric_index_type n_in,
+                                 const numeric_index_type m_l,
+                                 const numeric_index_type n_l,
+                                 const numeric_index_type nnz,
+                                 const numeric_index_type,
+                                 const numeric_index_type)
 {
   // noz ignored...  only used for multiple processors!
   libmesh_assert_equal_to (m_in, m_l);
@@ -119,8 +119,8 @@ void EigenSparseMatrix<T>::init ()
 
 template <typename T>
 void EigenSparseMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-				      const std::vector<numeric_index_type>& rows,
-				      const std::vector<numeric_index_type>& cols)
+                                      const std::vector<numeric_index_type>& rows,
+                                      const std::vector<numeric_index_type>& cols)
 
 {
   libmesh_assert (this->initialized());
@@ -231,8 +231,8 @@ numeric_index_type EigenSparseMatrix<T>::row_stop () const
 
 template <typename T>
 void EigenSparseMatrix<T>::set (const numeric_index_type i,
-				const numeric_index_type j,
-				const T value)
+                                const numeric_index_type j,
+                                const T value)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->m());
@@ -245,8 +245,8 @@ void EigenSparseMatrix<T>::set (const numeric_index_type i,
 
 template <typename T>
 void EigenSparseMatrix<T>::add (const numeric_index_type i,
-				const numeric_index_type j,
-				const T value)
+                                const numeric_index_type j,
+                                const T value)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->m());
@@ -259,7 +259,7 @@ void EigenSparseMatrix<T>::add (const numeric_index_type i,
 
 template <typename T>
 void EigenSparseMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-				      const std::vector<numeric_index_type>& dof_indices)
+                                      const std::vector<numeric_index_type>& dof_indices)
 {
   this->add_matrix (dm, dof_indices, dof_indices);
 }
@@ -283,7 +283,7 @@ void EigenSparseMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 
   template <typename T>
 T EigenSparseMatrix<T>::operator () (const numeric_index_type i,
-				     const numeric_index_type j) const
+                                     const numeric_index_type j) const
 {
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->m());

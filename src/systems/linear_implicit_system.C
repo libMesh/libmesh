@@ -35,8 +35,8 @@ namespace libMesh
 // ------------------------------------------------------------
 // LinearImplicitSystem implementation
 LinearImplicitSystem::LinearImplicitSystem (EquationSystems& es,
-					    const std::string& name_in,
-					    const unsigned int number_in) :
+                                            const std::string& name_in,
+                                            const unsigned int number_in) :
 
   Parent                 (es, name_in, number_in),
   linear_solver          (LinearSolver<Number>::build(es.comm())),
@@ -94,7 +94,7 @@ void LinearImplicitSystem::reinit ()
 
 
 void LinearImplicitSystem::restrict_solve_to (const SystemSubset* subset,
-					      const SubsetSolveMode subset_solve_mode)
+                                              const SubsetSolveMode subset_solve_mode)
 {
   _subset = subset;
   _subset_solve_mode = subset_solve_mode;
@@ -204,7 +204,7 @@ void LinearImplicitSystem::sensitivity_solve (const ParameterVector& parameters)
   for (unsigned int p=0; p != parameters.size(); ++p)
     {
       rval = linear_solver->solve (*matrix, pc,
-				   this->get_sensitivity_solution(p),
+      this->get_sensitivity_solution(p),
                                    this->get_sensitivity_rhs(p), tol, maxits);
       _n_linear_iterations   += rval.first;
       _final_linear_residual += rval.second;
@@ -271,8 +271,8 @@ void LinearImplicitSystem::adjoint_solve (const QoISet &qoi_indices)
   for (unsigned int i=0; i != Nq; ++i)
     if (qoi_indices.has_index(i))
       {
-	rval = linear_solver->solve (*matrix, pc,
-				     this->add_adjoint_solution(i),
+      rval = linear_solver->solve (*matrix, pc,
+      this->add_adjoint_solution(i),
                                      this->get_adjoint_rhs(i), tol, maxits);
         _n_linear_iterations   += rval.first;
         _final_linear_residual += rval.second;
@@ -371,7 +371,7 @@ void LinearImplicitSystem::release_linear_solver(LinearSolver<Number>*) const
 
 
 void LinearImplicitSystem::assembly(bool,
-				    bool)
+                                    bool)
 {
   // Residual R(u(p),p) := A(p)*u(p) - b(p)
   // partial R / partial u = A

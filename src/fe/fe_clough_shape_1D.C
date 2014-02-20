@@ -63,7 +63,7 @@ void clough_compute_coefs(const Elem* elem)
   const ElemType mapping_elem_type (elem->type());
   const int n_mapping_shape_functions =
     FE<1,LAGRANGE>::n_shape_functions(mapping_elem_type,
-				      mapping_order);
+                                      mapping_order);
 
   // Degrees of freedom are at vertices and edge midpoints
   std::vector<Point> dofpt;
@@ -179,13 +179,13 @@ namespace libMesh
 
 template <>
 Real FE<1,CLOUGH>::shape(const ElemType,
-			     const Order,
-			     const unsigned int,
-			     const Point&)
+                         const Order,
+                         const unsigned int,
+                         const Point&)
 {
   libMesh::err << "Clough-Tocher elements require the real element\n"
-	        << "to construct gradient-based degrees of freedom."
-	        << std::endl;
+               << "to construct gradient-based degrees of freedom."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -195,9 +195,9 @@ Real FE<1,CLOUGH>::shape(const ElemType,
 
 template <>
 Real FE<1,CLOUGH>::shape(const Elem* elem,
-			     const Order order,
-			     const unsigned int i,
-			     const Point& p)
+                         const Order order,
+                         const unsigned int i,
+                         const Point& p)
 {
   libmesh_assert(elem);
 
@@ -212,32 +212,32 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
       // 3rd-order C1 cubic element
     case THIRD:
       {
-	switch (type)
-	  {
-	    // C1 functions on the C1 cubic edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      libmesh_assert_less (i, 4);
+        switch (type)
+          {
+            // C1 functions on the C1 cubic edge
+          case EDGE2:
+          case EDGE3:
+            {
+              libmesh_assert_less (i, 4);
 
-	      switch (i)
-		{
-		case 0:
-		  return clough_raw_shape(0, p);
-		case 1:
-		  return clough_raw_shape(1, p);
-		case 2:
-		  return d1xd1x * clough_raw_shape(2, p);
-		case 3:
+              switch (i)
+                {
+                case 0:
+                  return clough_raw_shape(0, p);
+                case 1:
+                  return clough_raw_shape(1, p);
+                case 2:
+                  return d1xd1x * clough_raw_shape(2, p);
+                case 3:
                   return d2xd2x * clough_raw_shape(3, p);
-		default:
-		  libmesh_error();
-		}
-	    }
-	  default:
+                default:
+                  libmesh_error();
+                }
+            }
+          default:
             libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-	    libmesh_error();
-	  }
+            libmesh_error();
+          }
       }
       // by default throw an error
     default:
@@ -253,14 +253,14 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
 
 template <>
 Real FE<1,CLOUGH>::shape_deriv(const ElemType,
-				   const Order,
-				   const unsigned int,
-				   const unsigned int,
-				   const Point&)
+                               const Order,
+                               const unsigned int,
+                               const unsigned int,
+                               const Point&)
 {
   libMesh::err << "Clough-Tocher elements require the real element\n"
-	        << "to construct gradient-based degrees of freedom."
-	        << std::endl;
+               << "to construct gradient-based degrees of freedom."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -270,10 +270,10 @@ Real FE<1,CLOUGH>::shape_deriv(const ElemType,
 
 template <>
 Real FE<1,CLOUGH>::shape_deriv(const Elem* elem,
-				   const Order order,
-				   const unsigned int i,
-				   const unsigned int j,
-				   const Point& p)
+                               const Order order,
+                               const unsigned int i,
+                               const unsigned int j,
+                               const Point& p)
 {
   libmesh_assert(elem);
 
@@ -288,30 +288,30 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem* elem,
       // 3rd-order C1 cubic element
     case THIRD:
       {
-	switch (type)
-	  {
-	    // C1 functions on the C1 cubic edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (i)
-		{
-		case 0:
-		  return clough_raw_shape_deriv(0, j, p);
-		case 1:
-		  return clough_raw_shape_deriv(1, j, p);
-		case 2:
-		  return d1xd1x * clough_raw_shape_deriv(2, j, p);
-		case 3:
+        switch (type)
+          {
+            // C1 functions on the C1 cubic edge
+          case EDGE2:
+          case EDGE3:
+            {
+              switch (i)
+                {
+                case 0:
+                  return clough_raw_shape_deriv(0, j, p);
+                case 1:
+                  return clough_raw_shape_deriv(1, j, p);
+                case 2:
+                  return d1xd1x * clough_raw_shape_deriv(2, j, p);
+                case 3:
                   return d2xd2x * clough_raw_shape_deriv(3, j, p);
-		default:
-		  libmesh_error();
-		}
-	    }
-	  default:
+                default:
+                  libmesh_error();
+                }
+            }
+          default:
             libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-	    libmesh_error();
-	  }
+            libmesh_error();
+          }
       }
       // by default throw an error
     default:
@@ -345,30 +345,30 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem* elem,
       // 3rd-order C1 cubic element
     case THIRD:
       {
-	switch (type)
-	  {
-	    // C1 functions on the C1 cubic edge
-	  case EDGE2:
-	  case EDGE3:
-	    {
-	      switch (i)
-		{
-		case 0:
-		  return clough_raw_shape_second_deriv(0, j, p);
-		case 1:
-		  return clough_raw_shape_second_deriv(1, j, p);
-		case 2:
-		  return d1xd1x * clough_raw_shape_second_deriv(2, j, p);
-		case 3:
+        switch (type)
+          {
+            // C1 functions on the C1 cubic edge
+          case EDGE2:
+          case EDGE3:
+            {
+              switch (i)
+                {
+                case 0:
+                  return clough_raw_shape_second_deriv(0, j, p);
+                case 1:
+                  return clough_raw_shape_second_deriv(1, j, p);
+                case 2:
+                  return d1xd1x * clough_raw_shape_second_deriv(2, j, p);
+                case 3:
                   return d2xd2x * clough_raw_shape_second_deriv(3, j, p);
-		default:
-		  libmesh_error();
-		}
-	    }
-	  default:
+                default:
+                  libmesh_error();
+                }
+            }
+          default:
             libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-	    libmesh_error();
-	  }
+            libmesh_error();
+          }
       }
       // by default throw an error
     default:

@@ -147,10 +147,10 @@ public:
     {
 #ifdef __SUNPRO_CC
       variant_filter_iterator::Iter<IterType> *copy =
-	new variant_filter_iterator::Iter<IterType>(iter_data);
+        new variant_filter_iterator::Iter<IterType>(iter_data);
 #else
       Iter<IterType> *copy =
-	new Iter<IterType>(iter_data);
+        new Iter<IterType>(iter_data);
 #endif
 
       return copy;
@@ -169,7 +169,7 @@ public:
       typedef typename variant_filter_iterator<Predicate, Type const, Type const &,  Type const *>::template Iter<IterType> const_Iter;
 
       typename IterBase::const_IterBase* copy =
-	new const_Iter(iter_data);
+        new const_Iter(iter_data);
 
       return copy;
     }
@@ -201,10 +201,10 @@ public:
     {
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
       const variant_filter_iterator::Iter<IterType>* p =
-	libMesh::libmesh_cast_ptr<const variant_filter_iterator::Iter<IterType>*>(other);
+        libMesh::libmesh_cast_ptr<const variant_filter_iterator::Iter<IterType>*>(other);
 #else
       const Iter<IterType>* p =
-	libMesh::libmesh_cast_ptr<const Iter<IterType>*>(other);
+        libMesh::libmesh_cast_ptr<const Iter<IterType>*>(other);
 #endif
 
       return (iter_data == p->iter_data);
@@ -245,10 +245,10 @@ public:
     {
 #ifdef __SUNPRO_CC
       variant_filter_iterator::Pred<IterType,PredType> *copy =
-	new variant_filter_iterator::Pred<IterType,PredType>(pred_data);
+        new variant_filter_iterator::Pred<IterType,PredType>(pred_data);
 #else
       Pred<IterType,PredType> *copy =
-	new Pred<IterType,PredType>(pred_data);
+        new Pred<IterType,PredType>(pred_data);
 #endif
 
       return copy;
@@ -269,7 +269,7 @@ public:
 
 
       typename PredBase::const_PredBase* copy =
-	new const_Pred(pred_data);
+        new const_Pred(pred_data);
 
       return copy;
     }
@@ -287,10 +287,10 @@ public:
       // Attempt downcast
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))
       const variant_filter_iterator::Iter<IterType>* p =
-	libMesh::libmesh_cast_ptr<const variant_filter_iterator::Iter<IterType>* >(in);
+        libMesh::libmesh_cast_ptr<const variant_filter_iterator::Iter<IterType>* >(in);
 #else
       const Iter<IterType>* p =
-	libMesh::libmesh_cast_ptr<const Iter<IterType>* >(in);
+        libMesh::libmesh_cast_ptr<const Iter<IterType>* >(in);
 #endif
 
       // Return result of op() for the user's predicate.
@@ -340,8 +340,8 @@ public:
    */
   template<typename PredType, typename IterType>
   variant_filter_iterator (const IterType& d,
-			   const IterType& e,
-			   const PredType& p ):
+                           const IterType& e,
+                           const PredType& p ):
     data ( new Iter<IterType>(d) ), // note: uses default IterBase copy constructor
     end  ( new Iter<IterType>(e) ),
     pred ( new Pred<IterType,PredType>(p) )
@@ -502,7 +502,7 @@ private:
 template<class Predicate, class Type, class ReferenceType, class PointerType>
 inline
 bool operator==(const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType>& x,
-		const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType>& y)
+                const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType>& y)
 {
   return x.equal(y);
 }
@@ -513,7 +513,7 @@ bool operator==(const variant_filter_iterator<Predicate, Type, ReferenceType, Po
 template<class Predicate, class Type, class ReferenceType, class PointerType>
 inline
 bool operator!=(const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType>& x,
-		const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType>& y)
+                const variant_filter_iterator<Predicate, Type, ReferenceType, PointerType>& y)
 {
   return !(x == y);
 }

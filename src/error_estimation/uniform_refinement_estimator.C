@@ -47,49 +47,49 @@ namespace libMesh
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
 void UniformRefinementEstimator::estimate_error (const System& _system,
-					         ErrorVector& error_per_cell,
-					         const NumericVector<Number>* solution_vector,
-					         bool estimate_parent_error)
+                                                 ErrorVector& error_per_cell,
+                                                 const NumericVector<Number>* solution_vector,
+                                                 bool estimate_parent_error)
 {
   START_LOG("estimate_error()", "UniformRefinementEstimator");
   std::map<const System*, const NumericVector<Number>* > solution_vectors;
   solution_vectors[&_system] = solution_vector;
   this->_estimate_error (NULL, &_system, &error_per_cell, NULL, NULL,
-			 &solution_vectors, estimate_parent_error);
+                         &solution_vectors, estimate_parent_error);
   STOP_LOG("estimate_error()", "UniformRefinementEstimator");
 }
 
 void UniformRefinementEstimator::estimate_errors (const EquationSystems& _es,
-					         ErrorVector& error_per_cell,
+                                                  ErrorVector& error_per_cell,
                                                  const std::map<const System*, SystemNorm>& error_norms,
-			                         const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
-					         bool estimate_parent_error)
+                                                  const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
+                                                  bool estimate_parent_error)
 {
   START_LOG("estimate_errors()", "UniformRefinementEstimator");
   this->_estimate_error (&_es, NULL, &error_per_cell, NULL,
-			 &error_norms, solution_vectors,
-			 estimate_parent_error);
+                         &error_norms, solution_vectors,
+                         estimate_parent_error);
   STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
 }
 
 void UniformRefinementEstimator::estimate_errors (const EquationSystems& _es,
                                                   ErrorMap& errors_per_cell,
-			                          const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
+                                                  const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
                                                   bool estimate_parent_error)
 {
   START_LOG("estimate_errors()", "UniformRefinementEstimator");
   this->_estimate_error (&_es, NULL, NULL, &errors_per_cell, NULL,
-			 solution_vectors, estimate_parent_error);
+                         solution_vectors, estimate_parent_error);
   STOP_LOG("estimate_errors()", "UniformRefinementEstimator");
 }
 
 void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                                                  const System* _system,
-					         ErrorVector* error_per_cell,
+                                                  ErrorVector* error_per_cell,
                                                  ErrorMap* errors_per_cell,
                                                  const std::map<const System*, SystemNorm > *_error_norms,
-			                         const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
-					         bool)
+                                                  const std::map<const System*, const NumericVector<Number>* >* solution_vectors,
+                                                  bool)
 {
   // Get a vector of the Systems we're going to work on,
   // and set up a error_norms map if necessary
@@ -138,7 +138,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
                   weights[v] = 1.0;
                 }
-	      (*error_norms)[&sys] =
+              (*error_norms)[&sys] =
                 SystemNorm(std::vector<FEMNormType>(n_vars, error_norm.type(0)),
                            weights);
             }
@@ -209,7 +209,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
       // Check for valid error_norms
       libmesh_assert (_error_norms->find(&system) !=
-		      _error_norms->end());
+                      _error_norms->end());
 
       // Back up the solution vector
       coarse_solutions[i] = system.solution->clone().release();
@@ -228,15 +228,15 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
       // Use a non-standard solution vector if necessary
       if (solution_vectors &&
-	  solution_vectors->find(&system) != solution_vectors->end() &&
-	  solution_vectors->find(&system)->second &&
-	  solution_vectors->find(&system)->second != system.solution.get())
+          solution_vectors->find(&system) != solution_vectors->end() &&
+          solution_vectors->find(&system)->second &&
+          solution_vectors->find(&system)->second != system.solution.get())
         {
           NumericVector<Number>* newsol =
             const_cast<NumericVector<Number>*>
-	    (solution_vectors->find(&system)->second);
-	  newsol->swap(*system.solution);
-	  system.update();
+            (solution_vectors->find(&system)->second);
+          newsol->swap(*system.solution);
+          system.update();
         }
 
       // Make sure the solution is projected when we refine the mesh
@@ -322,24 +322,24 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       else
         {
           libmesh_assert_equal_to (solution_vectors->size(), es.n_systems());
-	  libmesh_assert (solution_vectors->find(system_list[0]) !=
-			  solution_vectors->end());
-	  libmesh_assert(solve_adjoint ||
-	    (solution_vectors->find(system_list[0])->second ==
-	     system_list[0]->solution.get()) ||
-	     !solution_vectors->find(system_list[0])->second);
+          libmesh_assert (solution_vectors->find(system_list[0]) !=
+                          solution_vectors->end());
+          libmesh_assert(solve_adjoint ||
+                         (solution_vectors->find(system_list[0])->second ==
+                          system_list[0]->solution.get()) ||
+                         !solution_vectors->find(system_list[0])->second);
 
 #ifdef DEBUG
-	  for (unsigned int i=0; i != system_list.size(); ++i)
-	    {
+          for (unsigned int i=0; i != system_list.size(); ++i)
+            {
               System *sys = system_list[i];
-	      libmesh_assert (solution_vectors->find(sys) !=
-			      solution_vectors->end());
+              libmesh_assert (solution_vectors->find(sys) !=
+                              solution_vectors->end());
               const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
               if (solve_adjoint)
                 {
                   bool found_vec = false;
-	          for (unsigned int j=0; j != sys->qoi.size(); ++j)
+                  for (unsigned int j=0; j != sys->qoi.size(); ++j)
                     {
                       std::ostringstream adjoint_name;
                       adjoint_name << "adjoint_solution" << j;
@@ -350,25 +350,25 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                           break;
                         }
                     }
-	          libmesh_assert(found_vec);
+                  libmesh_assert(found_vec);
                 }
               else
-	        libmesh_assert(vec == sys->solution.get() || !vec);
-	    }
+                libmesh_assert(vec == sys->solution.get() || !vec);
+            }
 #endif
 
           if (solve_adjoint)
             {
-	      std::vector<unsigned int> adjs(system_list.size(),
+              std::vector<unsigned int> adjs(system_list.size(),
                                              libMesh::invalid_uint);
               // Set up proper initial guesses
-	      for (unsigned int i=0; i != system_list.size(); ++i)
+              for (unsigned int i=0; i != system_list.size(); ++i)
                 {
                   System *sys = system_list[i];
-	          libmesh_assert (solution_vectors->find(sys) !=
-			          solution_vectors->end());
+                  libmesh_assert (solution_vectors->find(sys) !=
+                                  solution_vectors->end());
                   const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
-	          for (unsigned int j=0; j != sys->qoi.size(); ++j)
+                  for (unsigned int j=0; j != sys->qoi.size(); ++j)
                     {
                       std::ostringstream adjoint_name;
                       adjoint_name << "adjoint_solution" << j;
@@ -380,7 +380,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                         }
                     }
                   libmesh_assert_not_equal_to (adjs[i], libMesh::invalid_uint);
-		  system_list[i]->get_adjoint_solution(adjs[i]) =
+                  system_list[i]->get_adjoint_solution(adjs[i]) =
                     *system_list[i]->solution;
                 }
 
@@ -388,15 +388,15 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
               // Put the adjoint_solution into solution for
               // comparisons
-	      for (unsigned int i=0; i != system_list.size(); ++i)
+              for (unsigned int i=0; i != system_list.size(); ++i)
                 {
-	          system_list[i]->get_adjoint_solution(adjs[i]).swap(*system_list[i]->solution);
-	          system_list[i]->update();
+                  system_list[i]->get_adjoint_solution(adjs[i]).swap(*system_list[i]->solution);
+                  system_list[i]->update();
                 }
             }
-	  else
+          else
             es.solve();
-	}
+        }
     }
   else
     {
@@ -411,20 +411,20 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
         sys->solve();
       else
         {
-	  libmesh_assert (solution_vectors->find(sys) !=
-			  solution_vectors->end());
+          libmesh_assert (solution_vectors->find(sys) !=
+                          solution_vectors->end());
 
           const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
 
-	  libmesh_assert(solve_adjoint ||
-	    (solution_vectors->find(sys)->second ==
-	     sys->solution.get()) ||
-	    !solution_vectors->find(sys)->second);
+          libmesh_assert(solve_adjoint ||
+                         (solution_vectors->find(sys)->second ==
+                          sys->solution.get()) ||
+                         !solution_vectors->find(sys)->second);
 
           if (solve_adjoint)
             {
               unsigned int adj = libMesh::invalid_uint;
-	      for (unsigned int j=0; j != sys->qoi.size(); ++j)
+              for (unsigned int j=0; j != sys->qoi.size(); ++j)
                 {
                   std::ostringstream adjoint_name;
                   adjoint_name << "adjoint_solution" << j;
@@ -438,14 +438,14 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
               libmesh_assert_not_equal_to (adj, libMesh::invalid_uint);
 
               // Set up proper initial guess
-	      sys->get_adjoint_solution(adj) = *sys->solution;
+              sys->get_adjoint_solution(adj) = *sys->solution;
               sys->adjoint_solve();
               // Put the adjoint_solution into solution for
               // comparisons
-	      sys->get_adjoint_solution(adj).swap(*sys->solution);
-	      sys->update();
+              sys->get_adjoint_solution(adj).swap(*sys->solution);
+              sys->update();
             }
-	  else
+          else
             sys->solve();
         }
     }
@@ -473,8 +473,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
           if (!err_vec)
             {
               libmesh_assert(errors_per_cell);
-	      err_vec =
-		(*errors_per_cell)[std::make_pair(&system,var)];
+              err_vec =
+                (*errors_per_cell)[std::make_pair(&system,var)];
             }
 
           // The type of finite element to use for this variable
@@ -505,9 +505,9 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
           const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
           for (; elem_it != elem_end; ++elem_it)
-	    {
-	      // e is necessarily an active element on the local processor
-	      const Elem* elem = *elem_it;
+            {
+              // e is necessarily an active element on the local processor
+              const Elem* elem = *elem_it;
 
               // Find the element id for the corresponding coarse grid element
               const Elem* coarse = elem;
@@ -571,7 +571,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                       system_i_norm.type(var) == H1 ||
                       system_i_norm.type(var) == H2)
                     {
-		      L2normsq += JxW[qp] * system_i_norm.weight_sq(var) *
+                      L2normsq += JxW[qp] * system_i_norm.weight_sq(var) *
                                   TensorTools::norm_sq(val_error);
                       libmesh_assert_greater_equal (L2normsq, 0.);
                     }
@@ -598,7 +598,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                     {
                       Tensor grad2_error = grad2_u_fine - grad2_u_coarse;
 
-		      H2seminormsq += JxW[qp] * system_i_norm.weight_sq(var) *
+                      H2seminormsq += JxW[qp] * system_i_norm.weight_sq(var) *
                         grad2_error.size_sq();
                       libmesh_assert_greater_equal (H2seminormsq, 0.);
                     }
@@ -609,17 +609,17 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                   system_i_norm.type(var) == H1 ||
                   system_i_norm.type(var) == H2)
                 (*err_vec)[e_id] +=
-		  static_cast<ErrorVectorReal>(L2normsq);
+                  static_cast<ErrorVectorReal>(L2normsq);
               if (system_i_norm.type(var) == H1 ||
                   system_i_norm.type(var) == H2 ||
                   system_i_norm.type(var) == H1_SEMINORM)
                 (*err_vec)[e_id] +=
-		  static_cast<ErrorVectorReal>(H1seminormsq);
+                  static_cast<ErrorVectorReal>(H1seminormsq);
 
               if (system_i_norm.type(var) == H2 ||
                   system_i_norm.type(var) == H2_SEMINORM)
                 (*err_vec)[e_id] +=
-		  static_cast<ErrorVectorReal>(H2seminormsq);
+                  static_cast<ErrorVectorReal>(H2seminormsq);
             } // End loop over active local elements
         } // End loop over variables
 

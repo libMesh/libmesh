@@ -59,20 +59,20 @@ namespace
     ~SingletonCache()
     {
       for (unsigned int e=0; e<elem_list.size(); e++)
-	if (elem_list[e])
-	  {
-	    delete elem_list[e];
-	    elem_list[e] = NULL;
-	  }
+        if (elem_list[e])
+          {
+            delete elem_list[e];
+            elem_list[e] = NULL;
+          }
 
       elem_list.clear();
 
       for (unsigned int n=0; n<node_list.size(); n++)
-	if (node_list[n])
-	  {
-	    delete node_list[n];
-	    node_list[n] = NULL;
-	  }
+        if (node_list[n])
+          {
+            delete node_list[n];
+            node_list[n] = NULL;
+          }
 
       node_list.clear();
     }
@@ -88,7 +88,7 @@ namespace
 
 
   Elem* read_ref_elem (const ElemType Type,
-		       std::istream &in)
+                       std::istream &in)
   {
     libmesh_assert (singleton_cache != NULL);
 
@@ -120,18 +120,18 @@ namespace
     // We are expecing an identity map, so assert it!
     for (unsigned int n=0; n<n_nodes; n++)
       {
-	in >> nn;
-	libmesh_assert_equal_to (n,nn);
+        in >> nn;
+        libmesh_assert_equal_to (n,nn);
       }
 
     for (unsigned int n=0; n<n_nodes; n++)
       {
-	in >> x >> y >> z;
+        in >> x >> y >> z;
 
-	Node *node = new Node(x,y,z,n);
-	singleton_cache->node_list.push_back(node);
+        Node *node = new Node(x,y,z,n);
+        singleton_cache->node_list.push_back(node);
 
-	elem->set_node(n) = node;
+        elem->set_node(n) = node;
       }
 
 
@@ -139,10 +139,10 @@ namespace
     // another error.  If so, cleanly abort.
     if (!in)
       {
-	delete elem;
-	elem = NULL;
-	libMesh::err << "ERROR while creating element singleton!\n";
-	libmesh_error();
+        delete elem;
+        elem = NULL;
+        libMesh::err << "ERROR while creating element singleton!\n";
+        libmesh_error();
       }
 
     else
@@ -207,12 +207,12 @@ namespace
 
     // Read'em
     for (FileMapType::const_iterator it=ref_elem_file.begin();
-	 it != ref_elem_file.end(); ++it)
+         it != ref_elem_file.end(); ++it)
       {
-	std::istringstream stream(it->second);
+        std::istringstream stream(it->second);
 
-	read_ref_elem(it->first,
-		      stream);
+        read_ref_elem(it->first,
+                      stream);
       }
   }
 

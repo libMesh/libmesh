@@ -38,22 +38,22 @@ namespace libMesh
 // Method for 2D, 3D -- see inf_fe_1D.C for a 1D version of this
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
-					const unsigned int s,
-					const Real tolerance,
+                                        const unsigned int s,
+                                        const Real tolerance,
                                         const std::vector<Point>* const pts,
                                         const std::vector<Real>* const weights)
 {
   if (weights != NULL)
     {
       libMesh::err << "ERROR: User-specified weights for infinite elements "
-	           << "are not implemented!" << std::endl;
+                   << "are not implemented!" << std::endl;
       libmesh_not_implemented();
     }
 
   if (pts != NULL)
     {
       libMesh::err << "ERROR: User-specified points for infinite elements "
-	           << "are not implemented!" << std::endl;
+                   << "are not implemented!" << std::endl;
       libmesh_not_implemented();
     }
 
@@ -98,7 +98,7 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
   // Find where the integration points are located on the
   // full element.
   std::vector<Point> qp; this->inverse_map (inf_elem, this->_fe_map->get_xyz(),
-					    qp, tolerance);
+                                            qp, tolerance);
 
   // compute the shape function and derivative values
   // at the points qp
@@ -115,8 +115,8 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
 // Method for 2D, 3D -- see inf_fe_1D.C for a 1D version of this
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem*,
-					     const unsigned int,
-					     const Real,
+                                             const unsigned int,
+                                             const Real,
                                              const std::vector<Point>* const pts,
                                              const std::vector<Real>* const /*weights*/)
 {
@@ -124,13 +124,13 @@ void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem*,
   //libmesh_assert_not_equal_to (Dim, 1);
 
   libMesh::err << "ERROR: Edge conditions for infinite elements "
-	        << "not implemented!" << std::endl;
+               << "not implemented!" << std::endl;
   libmesh_error();
 
   if (pts != NULL)
     {
       libMesh::err << "ERROR: User-specified points for infinite elements "
-	           << "not implemented!" << std::endl;
+                   << "not implemented!" << std::endl;
       libmesh_error();
     }
 }
@@ -140,7 +140,7 @@ void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem*,
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Point>&,
-							   const Elem* inf_side)
+                                                           const Elem* inf_side)
 {
   libmesh_assert(inf_side);
 
@@ -170,7 +170,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
   // initialize the shape functions on the base
   base_fe->init_base_shape_functions(base_fe->qrule->get_points(),
-				     base_elem);
+                                     base_elem);
 
   // the number of quadrature points
   const unsigned int n_radial_qp =
@@ -193,7 +193,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
     const unsigned int n_radial_mapping_sf =
       libmesh_cast_int<unsigned int>(radial_map.size());
     const unsigned int n_base_mapping_shape_functions = Base::n_base_mapping_sf(base_mapping_elem_type,
-										base_mapping_order);
+                                                                                base_mapping_order);
 
     const unsigned int n_total_mapping_shape_functions =
       n_radial_mapping_sf * n_base_mapping_shape_functions;
@@ -208,15 +208,15 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
       // fill the node index map
       for (unsigned int n=0; n<n_total_mapping_shape_functions; n++)
-	{
-	  compute_node_indices (inf_face_elem_type,
-				n,
-				_base_node_index[n],
-				_radial_node_index[n]);
+        {
+          compute_node_indices (inf_face_elem_type,
+                                n,
+                                _base_node_index[n],
+                                _radial_node_index[n]);
 
-	  libmesh_assert_less (_base_node_index[n], n_base_mapping_shape_functions);
-	  libmesh_assert_less (_radial_node_index[n], n_radial_mapping_sf);
-	}
+          libmesh_assert_less (_base_node_index[n], n_base_mapping_shape_functions);
+          libmesh_assert_less (_radial_node_index[n], n_radial_mapping_sf);
+        }
 
     }
 
@@ -231,30 +231,30 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
       //  if (Dim == 3)
       {
-	std::vector<std::vector<Real> >& dpsideta_map = this->_fe_map->get_dpsideta();
-	std::vector<std::vector<Real> >& d2psidxideta_map = this->_fe_map->get_d2psidxideta();
-	std::vector<std::vector<Real> >& d2psideta2_map = this->_fe_map->get_d2psideta2();
-	dpsideta_map.resize     (n_total_mapping_shape_functions);
-	d2psidxideta_map.resize (n_total_mapping_shape_functions);
-	d2psideta2_map.resize   (n_total_mapping_shape_functions);
+        std::vector<std::vector<Real> >& dpsideta_map = this->_fe_map->get_dpsideta();
+        std::vector<std::vector<Real> >& d2psidxideta_map = this->_fe_map->get_d2psidxideta();
+        std::vector<std::vector<Real> >& d2psideta2_map = this->_fe_map->get_d2psideta2();
+        dpsideta_map.resize     (n_total_mapping_shape_functions);
+        d2psidxideta_map.resize (n_total_mapping_shape_functions);
+        d2psideta2_map.resize   (n_total_mapping_shape_functions);
       }
 
       for (unsigned int i=0; i<n_total_mapping_shape_functions; i++)
-	{
-	  psi_map[i].resize         (n_total_qp);
-	  dpsidxi_map[i].resize     (n_total_qp);
-	  d2psidxi2_map[i].resize   (n_total_qp);
+        {
+          psi_map[i].resize         (n_total_qp);
+          dpsidxi_map[i].resize     (n_total_qp);
+          d2psidxi2_map[i].resize   (n_total_qp);
 
-	  // if (Dim == 3)
-	  {
-	    std::vector<std::vector<Real> >& dpsideta_map = this->_fe_map->get_dpsideta();
-	    std::vector<std::vector<Real> >& d2psidxideta_map = this->_fe_map->get_d2psidxideta();
-	    std::vector<std::vector<Real> >& d2psideta2_map = this->_fe_map->get_d2psideta2();
-	    dpsideta_map[i].resize     (n_total_qp);
-	    d2psidxideta_map[i].resize (n_total_qp);
-	    d2psideta2_map[i].resize   (n_total_qp);
-	  }
-	}
+          // if (Dim == 3)
+          {
+            std::vector<std::vector<Real> >& dpsideta_map = this->_fe_map->get_dpsideta();
+            std::vector<std::vector<Real> >& d2psidxideta_map = this->_fe_map->get_d2psidxideta();
+            std::vector<std::vector<Real> >& d2psideta2_map = this->_fe_map->get_d2psideta2();
+            dpsideta_map[i].resize     (n_total_qp);
+            d2psidxideta_map[i].resize (n_total_qp);
+            d2psideta2_map[i].resize   (n_total_qp);
+          }
+        }
     }
 
 
@@ -268,21 +268,21 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
       std::vector<std::vector<Real> >& dpsideta_map = this->_fe_map->get_dpsideta();
 
       for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-	for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
-	  for (unsigned int ti=0; ti<n_total_mapping_shape_functions; ti++)  // over all mapping shapes
-	    {
-	      // let the index vectors take care of selecting the appropriate base/radial mapping shape
-	      const unsigned int bi = _base_node_index  [ti];
-	      const unsigned int ri = _radial_node_index[ti];
-	      psi_map          [ti][bp+rp*n_base_qp] = S_map [bi][bp] * radial_map   [ri][rp];
-	      dpsidxi_map      [ti][bp+rp*n_base_qp] = Ss_map[bi][bp] * radial_map   [ri][rp];
-	      dpsideta_map     [ti][bp+rp*n_base_qp] = S_map [bi][bp] * dradialdv_map[ri][rp];
+        for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
+          for (unsigned int ti=0; ti<n_total_mapping_shape_functions; ti++)  // over all mapping shapes
+            {
+              // let the index vectors take care of selecting the appropriate base/radial mapping shape
+              const unsigned int bi = _base_node_index  [ti];
+              const unsigned int ri = _radial_node_index[ti];
+              psi_map          [ti][bp+rp*n_base_qp] = S_map [bi][bp] * radial_map   [ri][rp];
+              dpsidxi_map      [ti][bp+rp*n_base_qp] = Ss_map[bi][bp] * radial_map   [ri][rp];
+              dpsideta_map     [ti][bp+rp*n_base_qp] = S_map [bi][bp] * dradialdv_map[ri][rp];
 
-	      // second derivatives are not implemented for infinite elements
-	      // d2psidxi2_map    [ti][bp+rp*n_base_qp] = 0.;
-	      // d2psidxideta_map [ti][bp+rp*n_base_qp] = 0.;
-	      // d2psideta2_map   [ti][bp+rp*n_base_qp] = 0.;
-	    }
+              // second derivatives are not implemented for infinite elements
+              // d2psidxi2_map    [ti][bp+rp*n_base_qp] = 0.;
+              // d2psidxideta_map [ti][bp+rp*n_base_qp] = 0.;
+              // d2psideta2_map   [ti][bp+rp*n_base_qp] = 0.;
+            }
 
     }
 
@@ -299,8 +299,8 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
     for (unsigned int rp=0; rp<n_radial_qp; rp++)
       for (unsigned int bp=0; bp<n_base_qp; bp++)
         {
-	  _total_qrule_weights[  bp+rp*n_base_qp ] = radial_qw[rp] * base_qw[bp];
-	}
+          _total_qrule_weights[  bp+rp*n_base_qp ] = radial_qw[rp] * base_qw[bp];
+        }
   }
 
 }

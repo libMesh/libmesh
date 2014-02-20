@@ -30,8 +30,8 @@ namespace libMesh
 
 
 void NodeElem::connectivity(const unsigned int,
-			    const IOPackage,
-			    std::vector<dof_id_type>&) const
+                            const IOPackage,
+                            std::vector<dof_id_type>&) const
 {
   libmesh_error();
 }

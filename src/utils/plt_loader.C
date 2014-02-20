@@ -73,7 +73,7 @@ void PltLoader::set_n_vars (const unsigned int nv)
       _data.resize  (this->n_zones());
 
       for (unsigned int z=0; z<this->n_zones(); z++)
-	_data[z].resize  (this->n_vars());
+        _data[z].resize  (this->n_vars());
     }
 }
 

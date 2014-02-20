@@ -103,14 +103,14 @@ public:
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const;
+                               const unsigned int e) const;
 
   /**
    * @returns FIRST
@@ -123,7 +123,7 @@ public:
    * takes care of freeing memory.
    */
   AutoPtr<Elem> build_side (const unsigned int i,
-			    bool proxy) const;
+                            bool proxy) const;
 /*   {  */
 /*     // side() returns an AutoPtr to a DofObject, hence need to cast to Elem* */
 /*     AutoPtr<DofObject> ap_dof_object(this->side(i)); */
@@ -142,14 +142,14 @@ public:
   AutoPtr<Elem> build_edge (const unsigned int i) const;
 
   virtual void connectivity(const unsigned int sc,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
 //   void tecplot_connectivity(const unsigned int sc,
-// 			    std::vector<unsigned int>& conn) const;
+//     std::vector<unsigned int>& conn) const;
 
 //   void vtk_connectivity(const unsigned int,
-// 			std::vector<unsigned int>*) const
+// std::vector<unsigned int>*) const
 //   { libmesh_error(); }
 
   unsigned int vtk_element_type (const unsigned int) const
@@ -190,8 +190,8 @@ protected:
    * Matrix used to create the elements children.
    */
   float embedding_matrix (const unsigned int i,
-			  const unsigned int j,
-			  const unsigned int k) const
+                          const unsigned int j,
+                          const unsigned int k) const
   { return _embedding_matrix[i][j][k]; }
 
   /**

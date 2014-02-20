@@ -142,8 +142,8 @@ void LegacyXdrIO::write_mgf (const std::string& name)
 
 
 void LegacyXdrIO::read_mgf_soln (const std::string& name,
-				 std::vector<Number>& soln,
-				 std::vector<std::string>& var_names) const
+                                 std::vector<Number>& soln,
+                                 std::vector<std::string>& var_names) const
 {
   libmesh_deprecated();
 
@@ -156,12 +156,12 @@ void LegacyXdrIO::read_mgf_soln (const std::string& name,
   Utility::prepare_complex_data (soln, real_soln, imag_soln);
 
   this->read_soln (Utility::complex_filename(name, 0),
-		   real_soln,
-		   var_names);
+                   real_soln,
+                   var_names);
 
   this->read_soln (Utility::complex_filename(name, 1),
-		   imag_soln,
-		   var_names);
+                   imag_soln,
+                   var_names);
 
 #else
 
@@ -173,8 +173,8 @@ void LegacyXdrIO::read_mgf_soln (const std::string& name,
 
 
 void LegacyXdrIO::write_mgf_soln (const std::string& name,
-				  std::vector<Number>& soln,
-				  std::vector<std::string>& var_names) const
+                                  std::vector<Number>& soln,
+                                  std::vector<std::string>& var_names) const
 {
   libmesh_deprecated();
 
@@ -187,12 +187,12 @@ void LegacyXdrIO::write_mgf_soln (const std::string& name,
   Utility::prepare_complex_data (soln, real_soln, imag_soln);
 
   this->write_soln (Utility::complex_filename(name, 0),
-		    real_soln,
-		    var_names);
+                    real_soln,
+                    var_names);
 
   this->write_soln (Utility::complex_filename(name, 1),
-		    imag_soln,
-		    var_names);
+                    imag_soln,
+                    var_names);
 
 #else
 
@@ -222,7 +222,7 @@ void LegacyXdrIO::read_binary (const std::string& name, const LegacyXdrIO::FileF
 {
 
   libMesh::err << "WARNING: Compiled without XDR binary support.\n"
-	        << "Will try ASCII instead" << std::endl << std::endl;
+               << "Will try ASCII instead" << std::endl << std::endl;
 
   this->read_ascii (name);
 }
@@ -253,7 +253,7 @@ void LegacyXdrIO::write_ascii (const std::string& name, const LegacyXdrIO::FileF
 void LegacyXdrIO::write_binary (const std::string& name, const LegacyXdrIO::FileFormat)
 {
   libMesh::err << "WARNING: Compiled without XDR binary support.\n"
-	        << "Will try ASCII instead" << std::endl << std::endl;
+               << "Will try ASCII instead" << std::endl << std::endl;
 
   this->write_ascii (name);
 }
@@ -267,8 +267,8 @@ void LegacyXdrIO::write_binary (const std::string& name, const LegacyXdrIO::File
 
 
 void LegacyXdrIO::read_mesh (const std::string& name,
-			     const LegacyXdrIO::FileFormat originator,
-			     MeshData* mesh_data)
+                             const LegacyXdrIO::FileFormat originator,
+                             MeshData* mesh_data)
 {
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
@@ -407,19 +407,19 @@ void LegacyXdrIO::read_mesh (const std::string& name,
     // to its map.
     for (int innd=0; innd<numNodes; ++innd)
       {
-	Node* node = mesh.add_point (Point(coords[0+innd*3],
-					   coords[1+innd*3],
-					   coords[2+innd*3]), innd);
+        Node* node = mesh.add_point (Point(coords[0+innd*3],
+                                           coords[1+innd*3],
+                                           coords[2+innd*3]), innd);
 
-	if (mesh_data != NULL)
-	  if (mesh_data->active())
-	    {
-	      // add the id to the MeshData, so that
-	      // it knows the foreign id, even when
-	      // the underlying mesh got re-numbered,
-	      // refined, elements/nodes added...
-	      mesh_data->add_foreign_node_id(node, innd);
-	    }
+        if (mesh_data != NULL)
+          if (mesh_data->active())
+            {
+              // add the id to the MeshData, so that
+              // it knows the foreign id, even when
+              // the underlying mesh got re-numbered,
+              // refined, elements/nodes added...
+              mesh_data->add_foreign_node_id(node, innd);
+            }
       }
   }
 
@@ -592,26 +592,26 @@ void LegacyXdrIO::read_mesh (const std::string& name,
 
 #ifdef DEBUG
       if (mesh_data != NULL)
-	if (mesh_data->active())
-	  {
-	    libMesh::err << "ERROR: MeshData not implemented for MGF-style mesh."
-		          << std::endl;
-	    libmesh_error();
-	  }
+        if (mesh_data->active())
+          {
+            libMesh::err << "ERROR: MeshData not implemented for MGF-style mesh."
+                         << std::endl;
+            libmesh_error();
+          }
 #endif
 
       for (int ielm=0; ielm < numElem; ++ielm)
-	{
-	  Elem* elem = new Hex27;
+        {
+          Elem* elem = new Hex27;
           elem->set_id(ielm);
 
           elems_of_dimension[elem->dim()] = true;
 
-	  mesh.add_elem(elem);
+          mesh.add_elem(elem);
 
-	  for (int innd=0; innd < 27; ++innd)
-	    elem->set_node(innd) = mesh.node_ptr(conn[innd+2+(27+2)*ielm]);
-	}
+          for (int innd=0; innd < 27; ++innd)
+            elem->set_node(innd) = mesh.node_ptr(conn[innd+2+(27+2)*ielm]);
+        }
     }
 
   // Set the mesh dimension to the largest encountered for an element
@@ -623,8 +623,8 @@ void LegacyXdrIO::read_mesh (const std::string& name,
   if (mesh.mesh_dimension() > LIBMESH_DIM)
     {
       libMesh::err << "Cannot open dimension " <<
-		      mesh.mesh_dimension() <<
-		      " mesh file when configured without " <<
+        mesh.mesh_dimension() <<
+        " mesh file when configured without " <<
                       mesh.mesh_dimension() << "D support." <<
                       std::endl;
       libmesh_error();
@@ -658,14 +658,14 @@ void LegacyXdrIO::read_mesh (const std::string& name,
 
       // Add to the boundary_info
       for (int ibc=0; ibc < numBCs; ibc++)
-	mesh.boundary_info->add_side(bcs[0+ibc*3], bcs[1+ibc*3], bcs[2+ibc*3]);
+        mesh.boundary_info->add_side(bcs[0+ibc*3], bcs[1+ibc*3], bcs[2+ibc*3]);
     }
 }
 
 
 
 void LegacyXdrIO::write_mesh (const std::string& name,
-			      const LegacyXdrIO::FileFormat originator)
+                              const LegacyXdrIO::FileFormat originator)
 {
   // get a read-only reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
@@ -953,11 +953,11 @@ void LegacyXdrIO::write_mesh (const std::string& name,
       mesh.boundary_info->build_side_list (elem_list, side_list, elem_id_list);
 
       for (int ibc=0;  ibc<numBCs; ibc++)
-	{
-	  bcs[0+ibc*3] = elem_list[ibc];
-	  bcs[1+ibc*3] = side_list[ibc];
-	  bcs[2+ibc*3] = elem_id_list[ibc];
-	}
+        {
+          bcs[0+ibc*3] = elem_list[ibc];
+          bcs[1+ibc*3] = side_list[ibc];
+          bcs[2+ibc*3] = elem_id_list[ibc];
+        }
 
       // Put the BCs in the XDR file
       m.BC(&bcs[0], numBCs);
@@ -967,8 +967,8 @@ void LegacyXdrIO::write_mesh (const std::string& name,
 
 
 void LegacyXdrIO::read_soln (const std::string& name,
-			     std::vector<Real>& soln,
-			     std::vector<std::string>& var_names) const
+                             std::vector<Real>& soln,
+                             std::vector<std::string>& var_names) const
 {
   // Create an XdrSOLN object.
   XdrSOLN s;
@@ -1014,8 +1014,8 @@ void LegacyXdrIO::read_soln (const std::string& name,
 
     for (int i=0; i<numVar; i++)
       {
-	var_names[i] = p;
-	p += std::strlen(p) + 1;
+        var_names[i] = p;
+        p += std::strlen(p) + 1;
       }
   }
 
@@ -1028,8 +1028,8 @@ void LegacyXdrIO::read_soln (const std::string& name,
 
 
 void LegacyXdrIO::write_soln (const std::string& name,
-			      std::vector<Real>& soln,
-			      std::vector<std::string>& var_names) const
+                              std::vector<Real>& soln,
+                              std::vector<std::string>& var_names) const
 {
   // get a read-only reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
@@ -1058,7 +1058,7 @@ void LegacyXdrIO::write_soln (const std::string& name,
   sh.setKstep(0);
   sh.setTime(0.);
   sh.setStrSize(65536);
-  sh.setId("Id String");	               // Ignored
+  sh.setId("Id String");               // Ignored
   sh.setTitle("Title String");          // Ignored
   sh.setUserTitle("User Title String"); // Ignored
 
@@ -1068,10 +1068,10 @@ void LegacyXdrIO::write_soln (const std::string& name,
 
     for (unsigned int var=0; var<var_names.size(); var++)
       {
-	for (unsigned int c=0; c<var_names[var].size(); c++)
-	  var_title += var_names[var][c];
+        for (unsigned int c=0; c<var_names[var].size(); c++)
+          var_title += var_names[var][c];
 
-	var_title += '\0';
+        var_title += '\0';
       }
 
     sh.setVarTitle(var_title.c_str(), var_title.size());

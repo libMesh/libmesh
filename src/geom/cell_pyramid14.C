@@ -126,27 +126,27 @@ AutoPtr<Elem> Pyramid14::build_side (const unsigned int i, bool proxy) const
   if (proxy)
     {
       switch (i)
-	{
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-	  {
-	    AutoPtr<Elem> face(new Side<Tri6,Pyramid14>(this,i));
-	    return face;
-	  }
+        {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+          {
+            AutoPtr<Elem> face(new Side<Tri6,Pyramid14>(this,i));
+            return face;
+          }
 
-	case 4:
-	  {
-	    AutoPtr<Elem> face(new Side<Quad9,Pyramid14>(this,i));
-	    return face;
-	  }
+        case 4:
+          {
+            AutoPtr<Elem> face(new Side<Quad9,Pyramid14>(this,i));
+            return face;
+          }
 
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+        default:
+          {
+            libmesh_error();
+          }
+        }
     }
 
   else
@@ -155,80 +155,80 @@ AutoPtr<Elem> Pyramid14::build_side (const unsigned int i, bool proxy) const
       AutoPtr<Elem> face(NULL);
 
       switch (i)
-	{
-	case 0:  // triangular face 1
-	  {
+        {
+        case 0:  // triangular face 1
+          {
             face.reset(new Tri6);
 
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(4);
-	    face->set_node(3) = this->get_node(5);
-	    face->set_node(4) = this->get_node(10);
-	    face->set_node(5) = this->get_node(9);
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(4);
+            face->set_node(3) = this->get_node(5);
+            face->set_node(4) = this->get_node(10);
+            face->set_node(5) = this->get_node(9);
 
-	    break;
-	  }
-	case 1:  // triangular face 2
-	  {
+            break;
+          }
+        case 1:  // triangular face 2
+          {
             face.reset(new Tri6);
 
-	    face->set_node(0) = this->get_node(1);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(4);
-	    face->set_node(3) = this->get_node(6);
-	    face->set_node(4) = this->get_node(11);
-	    face->set_node(5) = this->get_node(10);
+            face->set_node(0) = this->get_node(1);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(4);
+            face->set_node(3) = this->get_node(6);
+            face->set_node(4) = this->get_node(11);
+            face->set_node(5) = this->get_node(10);
 
-	    break;
-	  }
-	case 2:  // triangular face 3
-	  {
+            break;
+          }
+        case 2:  // triangular face 3
+          {
             face.reset(new Tri6);
 
-	    face->set_node(0) = this->get_node(2);
-	    face->set_node(1) = this->get_node(3);
-	    face->set_node(2) = this->get_node(4);
-	    face->set_node(3) = this->get_node(7);
-	    face->set_node(4) = this->get_node(12);
-	    face->set_node(5) = this->get_node(11);
+            face->set_node(0) = this->get_node(2);
+            face->set_node(1) = this->get_node(3);
+            face->set_node(2) = this->get_node(4);
+            face->set_node(3) = this->get_node(7);
+            face->set_node(4) = this->get_node(12);
+            face->set_node(5) = this->get_node(11);
 
-	    break;
-	  }
-	case 3:  // triangular face 4
-	  {
+            break;
+          }
+        case 3:  // triangular face 4
+          {
             face.reset(new Tri6);
 
-	    face->set_node(0) = this->get_node(3);
-	    face->set_node(1) = this->get_node(0);
-	    face->set_node(2) = this->get_node(4);
-	    face->set_node(3) = this->get_node(8);
-	    face->set_node(4) = this->get_node(9);
-	    face->set_node(5) = this->get_node(12);
+            face->set_node(0) = this->get_node(3);
+            face->set_node(1) = this->get_node(0);
+            face->set_node(2) = this->get_node(4);
+            face->set_node(3) = this->get_node(8);
+            face->set_node(4) = this->get_node(9);
+            face->set_node(5) = this->get_node(12);
 
-	    break;
-	  }
-	case 4:  // the quad face at z=0
-	  {
+            break;
+          }
+        case 4:  // the quad face at z=0
+          {
             face.reset(new Quad9);
 
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(3);
-	    face->set_node(2) = this->get_node(2);
-	    face->set_node(3) = this->get_node(1);
-	    face->set_node(4) = this->get_node(8);
-	    face->set_node(5) = this->get_node(7);
-	    face->set_node(6) = this->get_node(6);
-	    face->set_node(7) = this->get_node(5);
-	    face->set_node(8) = this->get_node(13);
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(3);
+            face->set_node(2) = this->get_node(2);
+            face->set_node(3) = this->get_node(1);
+            face->set_node(4) = this->get_node(8);
+            face->set_node(5) = this->get_node(7);
+            face->set_node(6) = this->get_node(6);
+            face->set_node(7) = this->get_node(5);
+            face->set_node(8) = this->get_node(13);
 
-	    break;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+            break;
+          }
+        default:
+          {
+            libmesh_error();
+          }
+        }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
@@ -263,29 +263,29 @@ void Pyramid14::connectivity(const unsigned int libmesh_dbg_var(sc),
     {
     case TECPLOT:
       {
-	// FIXME
+        // FIXME
         conn.resize(8);
-	conn[0] = this->node(0)+1;
-	conn[1] = this->node(1)+1;
-	conn[2] = this->node(2)+1;
-	conn[3] = this->node(3)+1;
-	conn[4] = this->node(4)+1;
-	conn[5] = this->node(4)+1;
-	conn[6] = this->node(4)+1;
-	conn[7] = this->node(4)+1;
-	return;
+        conn[0] = this->node(0)+1;
+        conn[1] = this->node(1)+1;
+        conn[2] = this->node(2)+1;
+        conn[3] = this->node(3)+1;
+        conn[4] = this->node(4)+1;
+        conn[5] = this->node(4)+1;
+        conn[6] = this->node(4)+1;
+        conn[7] = this->node(4)+1;
+        return;
       }
 
     case VTK:
       {
-	// FIXME
-	conn.resize(5);
-	conn[0] = this->node(3);
-	conn[1] = this->node(2);
-	conn[2] = this->node(1);
-	conn[3] = this->node(0);
-	conn[4] = this->node(4);
-	return;
+        // FIXME
+        conn.resize(5);
+        conn[0] = this->node(3);
+        conn[1] = this->node(2);
+        conn[2] = this->node(1);
+        conn[3] = this->node(0);
+        conn[4] = this->node(4);
+        return;
       }
 
     default:
@@ -309,13 +309,13 @@ void Pyramid14::connectivity(const unsigned int libmesh_dbg_var(sc),
       case 10:
       case 11:
       case 12:
-	return 2;
+        return 2;
 
       case 13:
-	return 4;
+        return 4;
 
       default:
-	libmesh_error();
+        libmesh_error();
       }
 
     // We'll never get here

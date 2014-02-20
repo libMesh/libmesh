@@ -57,7 +57,7 @@ class ParallelMesh : public UnstructuredMesh
    */
   explicit
   ParallelMesh (const Parallel::Communicator &comm,
-		unsigned int dim=1);
+                unsigned int dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
@@ -212,10 +212,10 @@ class ParallelMesh : public UnstructuredMesh
    * functions for adding /deleting nodes elements.
    */
   virtual Node* add_point (const Point& p,
-			   const dof_id_type id =
-			     DofObject::invalid_id,
-			   const processor_id_type proc_id =
-			     DofObject::invalid_processor_id);
+                           const dof_id_type id =
+                           DofObject::invalid_id,
+                           const processor_id_type proc_id =
+                           DofObject::invalid_processor_id);
   virtual Node* add_node (Node* n) ;
 
   /**
@@ -447,9 +447,9 @@ protected:
    * nodes or elements.
    */
   dof_id_type _next_free_local_node_id,
-	      _next_free_local_elem_id;
+    _next_free_local_elem_id;
   dof_id_type _next_free_unpartitioned_node_id,
-	      _next_free_unpartitioned_elem_id;
+    _next_free_unpartitioned_elem_id;
 
   /**
    * These are extra ghost elements that we want to make sure

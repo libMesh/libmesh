@@ -64,7 +64,7 @@ protected:
    * Partition the \p MeshBase into \p n subdomains.
    */
   virtual void _do_partition (MeshBase& mesh,
-			      const unsigned int n)
+                              const unsigned int n)
   { SFCPartitioner::_do_partition (mesh, n); }
 
 

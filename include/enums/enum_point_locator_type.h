@@ -30,8 +30,8 @@ namespace libMeshEnums {
    * locate the corresponding element in space) available in libMesh.
    */
   enum PointLocatorType {TREE = 0,
-			 LIST,
-			 INVALID_LOCATOR};
+                         LIST,
+                         INVALID_LOCATOR};
 }
 
 using namespace libMeshEnums;

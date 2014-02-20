@@ -44,8 +44,8 @@ namespace libMesh
 // ------------------------------------------------------------
 // FrequencySystem implementation
 FrequencySystem::FrequencySystem (EquationSystems& es,
-				  const std::string& name,
-				  const unsigned int number) :
+                                  const std::string& name,
+                                  const unsigned int number) :
   LinearImplicitSystem      (es, name, number),
   solve_system              (NULL),
   _finished_set_frequencies (false),
@@ -107,7 +107,7 @@ void FrequencySystem::clear_all ()
     {
       unsigned int n_frequencies = es.parameters.get<unsigned int>("n_frequencies");
       for (unsigned int n=0; n < n_frequencies; n++)
-	es.parameters.remove(this->form_freq_param_name(n));
+        es.parameters.remove(this->form_freq_param_name(n));
       es.parameters.remove("current frequency");
     }
 }
@@ -136,20 +136,20 @@ void FrequencySystem::init_data ()
        */
       if (es.parameters.have_parameter<unsigned int> ("n_frequencies"))
         {
-	  const unsigned int n_freq =
-	    es.parameters.get<unsigned int>("n_frequencies");
+          const unsigned int n_freq =
+            es.parameters.get<unsigned int>("n_frequencies");
 
-	  libmesh_assert_greater (n_freq, 0);
+          libmesh_assert_greater (n_freq, 0);
 
-	  _finished_set_frequencies = true;
+          _finished_set_frequencies = true;
 
-	  this->set_current_frequency(0);
+          this->set_current_frequency(0);
         }
       else
         {
-	  libMesh::err << "ERROR: Need to set frequencies before calling init(). " << std::endl;
-	  libmesh_error();
-	}
+          libMesh::err << "ERROR: Need to set frequencies before calling init(). " << std::endl;
+          libmesh_error();
+        }
     }
 
   _finished_init = true;
@@ -190,9 +190,9 @@ void FrequencySystem::assemble ()
 
 
 void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
-						const Real freq_step,
-						const unsigned int n_freq,
-						const bool allocate_solution_duplicates)
+                                                const Real freq_step,
+                                                const unsigned int n_freq,
+                                                const bool allocate_solution_duplicates)
 {
   this->_keep_solution_duplicates = allocate_solution_duplicates;
 
@@ -200,7 +200,7 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
   if (_finished_set_frequencies)
     {
       libMesh::err << "ERROR: frequencies already initialized."
-		    << std::endl;
+                   << std::endl;
       libmesh_error();
     }
 
@@ -214,11 +214,11 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
     {
       // remember frequencies as parameters
       es.parameters.set<Real>(this->form_freq_param_name(n)) =
-	  base_freq + n * freq_step;
+        base_freq + n * freq_step;
 
       // build storage for solution vector, if wanted
       if (this->_keep_solution_duplicates)
-	  this->add_vector(this->form_solu_vec_name(n));
+        this->add_vector(this->form_solu_vec_name(n));
     }
 
   _finished_set_frequencies = true;
@@ -230,9 +230,9 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
 
 
 void FrequencySystem::set_frequencies_by_range (const Real min_freq,
-						const Real max_freq,
-						const unsigned int n_freq,
-						const bool allocate_solution_duplicates)
+                                                const Real max_freq,
+                                                const unsigned int n_freq,
+                                                const bool allocate_solution_duplicates)
 {
   this->_keep_solution_duplicates = allocate_solution_duplicates;
 
@@ -257,11 +257,11 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
     {
       // remember frequencies as parameters
       es.parameters.set<Real>(this->form_freq_param_name(n)) =
-	  min_freq + n*(max_freq-min_freq)/(n_freq-1);
+        min_freq + n*(max_freq-min_freq)/(n_freq-1);
 
       // build storage for solution vector, if wanted
       if (this->_keep_solution_duplicates)
-	  System::add_vector(this->form_solu_vec_name(n));
+        System::add_vector(this->form_solu_vec_name(n));
     }
 
   _finished_set_frequencies = true;
@@ -273,7 +273,7 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
 
 
 void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
-				       const bool allocate_solution_duplicates)
+                                       const bool allocate_solution_duplicates)
 {
   this->_keep_solution_duplicates = allocate_solution_duplicates;
 
@@ -300,7 +300,7 @@ void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
 
       // build storage for solution vector, if wanted
       if (this->_keep_solution_duplicates)
-	  System::add_vector(this->form_solu_vec_name(n));
+        System::add_vector(this->form_solu_vec_name(n));
     }
 
   _finished_set_frequencies = true;
@@ -331,7 +331,7 @@ void FrequencySystem::solve ()
 
 
 void FrequencySystem::solve (const unsigned int n_start,
-			     const unsigned int n_stop)
+                             const unsigned int n_stop)
 {
   // Assemble the linear system, if not already done
   if (!_finished_assemble)
@@ -375,7 +375,7 @@ void FrequencySystem::solve (const unsigned int n_start,
 
       // Solve the linear system for this specific frequency
       const std::pair<unsigned int, Real> rval =
-	linear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
+        linear_solver->solve (*matrix, *solution, *rhs, tol, maxits);
 
       _n_linear_iterations   = rval.first;
       _final_linear_residual = rval.second;
@@ -386,7 +386,7 @@ void FrequencySystem::solve (const unsigned int n_start,
        * store the current solution in the additional vector
        */
       if (this->_keep_solution_duplicates)
-	this->get_vector(this->form_solu_vec_name(n)) = *solution;
+        this->get_vector(this->form_solu_vec_name(n)) = *solution;
     }
 
   // sanity check
@@ -398,7 +398,7 @@ void FrequencySystem::solve (const unsigned int n_start,
 
 
 void FrequencySystem::attach_solve_function(void fptr(EquationSystems& es,
-						      const std::string& name))
+                                                      const std::string& name))
 {
   libmesh_assert(fptr);
 

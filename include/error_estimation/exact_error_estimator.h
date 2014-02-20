@@ -179,9 +179,9 @@ public:
    * \p error_per_cell
    */
   virtual void estimate_error (const System& system,
-			       ErrorVector& error_per_cell,
-			       const NumericVector<Number>* solution_vector = NULL,
-			       bool estimate_parent_error = false);
+                               ErrorVector& error_per_cell,
+                               const NumericVector<Number>* solution_vector = NULL,
+                               bool estimate_parent_error = false);
 
 private:
 
@@ -190,27 +190,27 @@ private:
    * computes the exact value of the solution.
    */
   Number (* _exact_value) (const Point& p,
-			   const Parameters& parameters,
-			   const std::string& sys_name,
-			   const std::string& unknown_name);
+                           const Parameters& parameters,
+                           const std::string& sys_name,
+                           const std::string& unknown_name);
 
   /**
    * Function pointer to user-provided function which
    * computes the exact derivative of the solution.
    */
   Gradient (* _exact_deriv) (const Point& p,
-			     const Parameters& parameters,
-			     const std::string& sys_name,
-			     const std::string& unknown_name);
+                             const Parameters& parameters,
+                             const std::string& sys_name,
+                             const std::string& unknown_name);
 
   /**
    * Function pointer to user-provided function which
    * computes the exact hessian of the solution.
    */
   Tensor (* _exact_hessian) (const Point& p,
-			     const Parameters& parameters,
-			     const std::string& sys_name,
-			     const std::string& unknown_name);
+                             const Parameters& parameters,
+                             const std::string& sys_name,
+                             const std::string& unknown_name);
 
   /**
    * User-provided functors which compute the exact value of the
@@ -240,11 +240,11 @@ private:
    * Helper method for calculating on each element
    */
   Real find_squared_element_error (const System& system,
-				   const std::string& var_name,
-				   const Elem *elem,
+                                   const std::string& var_name,
+                                   const Elem *elem,
                                    const DenseVector<Number> &Uelem,
                                    FEBase *fe,
-				   MeshFunction *fine_values) const;
+                                   MeshFunction *fine_values) const;
 
   /**
    * Helper method for cleanup

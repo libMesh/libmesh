@@ -97,10 +97,10 @@ void SlepcEigenSolver<T>::init ()
 template <typename T>
 std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
-				     int nev,                  // number of requested eigenpairs
-				     int ncv,                  // number of basis vectors
-				     const double tol,         // solver tolerance
-				     const unsigned int m_its) // maximum number of iterations
+                                     int nev,                  // number of requested eigenpairs
+                                     int ncv,                  // number of basis vectors
+                                     const double tol,         // solver tolerance
+                                     const unsigned int m_its) // maximum number of iterations
 {
 //   START_LOG("solve_standard()", "SlepcEigenSolver");
 
@@ -127,10 +127,10 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
 template <typename T>
 std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
-				     int nev,                  // number of requested eigenpairs
-				     int ncv,                  // number of basis vectors
-				     const double tol,         // solver tolerance
-				     const unsigned int m_its) // maximum number of iterations
+                                     int nev,                  // number of requested eigenpairs
+                                     int ncv,                  // number of basis vectors
+                                     const double tol,         // solver tolerance
+                                     const unsigned int m_its) // maximum number of iterations
 {
   this->init ();
 
@@ -163,11 +163,11 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
 template <typename T>
 std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::_solve_standard_helper
-				    (Mat mat,
-				     int nev,                  // number of requested eigenpairs
-				     int ncv,                  // number of basis vectors
-				     const double tol,         // solver tolerance
-				     const unsigned int m_its) // maximum number of iterations
+(Mat mat,
+ int nev,                  // number of requested eigenpairs
+ int ncv,                  // number of basis vectors
+ const double tol,         // solver tolerance
+ const unsigned int m_its) // maximum number of iterations
 {
   START_LOG("solve_standard()", "SlepcEigenSolver");
 
@@ -226,14 +226,14 @@ SlepcEigenSolver<T>::_solve_standard_helper
 
 
 #ifdef DEBUG
-	 // ierr = PetscPrintf(this->comm().get(),
-	 //         "\n Number of iterations: %d\n"
-	 //         " Number of converged eigenpairs: %d\n\n", its, nconv);
+         // ierr = PetscPrintf(this->comm().get(),
+         //         "\n Number of iterations: %d\n"
+         //         " Number of converged eigenpairs: %d\n\n", its, nconv);
 
   // Display eigenvalues and relative errors.
   ierr = PetscPrintf(this->comm().get(),
-		     "           k           ||Ax-kx||/|kx|\n"
-		     "   ----------------- -----------------\n" );
+                     "           k           ||Ax-kx||/|kx|\n"
+                     "   ----------------- -----------------\n" );
          LIBMESH_CHKERRABORT(ierr);
 
   for(PetscInt i=0; i<nconv; i++ )
@@ -253,15 +253,15 @@ SlepcEigenSolver<T>::_solve_standard_helper
 #endif
 
       if (im != .0)
-	{
-	  ierr = PetscPrintf(this->comm().get()," %9f%+9f i %12f\n", re, im, error);
-	         LIBMESH_CHKERRABORT(ierr);
-	}
+        {
+          ierr = PetscPrintf(this->comm().get()," %9f%+9f i %12f\n", re, im, error);
+          LIBMESH_CHKERRABORT(ierr);
+        }
       else
-	{
-	  ierr = PetscPrintf(this->comm().get(),"   %12f       %12f\n", re, error);
-	         LIBMESH_CHKERRABORT(ierr);
-	}
+        {
+          ierr = PetscPrintf(this->comm().get(),"   %12f       %12f\n", re, error);
+          LIBMESH_CHKERRABORT(ierr);
+        }
     }
 
   ierr = PetscPrintf(this->comm().get(),"\n" );
@@ -284,11 +284,11 @@ SlepcEigenSolver<T>::_solve_standard_helper
 template <typename T>
 std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
-					SparseMatrix<T> &matrix_B_in,
-					int nev,                  // number of requested eigenpairs
-					int ncv,                  // number of basis vectors
-					const double tol,         // solver tolerance
-					const unsigned int m_its) // maximum number of iterations
+                                        SparseMatrix<T> &matrix_B_in,
+                                        int nev,                  // number of requested eigenpairs
+                                        int ncv,                  // number of basis vectors
+                                        const double tol,         // solver tolerance
+                                        const unsigned int m_its) // maximum number of iterations
 {
   this->init ();
 
@@ -307,11 +307,11 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 template <typename T>
 std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
-					SparseMatrix<T> &matrix_B_in,
-					int nev,                  // number of requested eigenpairs
-					int ncv,                  // number of basis vectors
-					const double tol,         // solver tolerance
-					const unsigned int m_its) // maximum number of iterations
+                                        SparseMatrix<T> &matrix_B_in,
+                                        int nev,                  // number of requested eigenpairs
+                                        int ncv,                  // number of basis vectors
+                                        const double tol,         // solver tolerance
+                                        const unsigned int m_its) // maximum number of iterations
 {
   this->init ();
 
@@ -348,11 +348,11 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 template <typename T>
 std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
-					ShellMatrix<T> &shell_matrix_B,
-					int nev,                  // number of requested eigenpairs
-					int ncv,                  // number of basis vectors
-					const double tol,         // solver tolerance
-					const unsigned int m_its) // maximum number of iterations
+                                        ShellMatrix<T> &shell_matrix_B,
+                                        int nev,                  // number of requested eigenpairs
+                                        int ncv,                  // number of basis vectors
+                                        const double tol,         // solver tolerance
+                                        const unsigned int m_its) // maximum number of iterations
 {
   this->init ();
 
@@ -390,11 +390,11 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 template <typename T>
 std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
-					ShellMatrix<T> &shell_matrix_B,
-					int nev,                  // number of requested eigenpairs
-					int ncv,                  // number of basis vectors
-					const double tol,         // solver tolerance
-					const unsigned int m_its) // maximum number of iterations
+                                        ShellMatrix<T> &shell_matrix_B,
+                                        int nev,                  // number of requested eigenpairs
+                                        int ncv,                  // number of basis vectors
+                                        const double tol,         // solver tolerance
+                                        const unsigned int m_its) // maximum number of iterations
 {
   this->init ();
 
@@ -442,11 +442,11 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 template <typename T>
 std::pair<unsigned int, unsigned int>
 SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
-					        Mat mat_B,
-					        int nev,                  // number of requested eigenpairs
-					        int ncv,                  // number of basis vectors
-					        const double tol,         // solver tolerance
-					        const unsigned int m_its) // maximum number of iterations
+                                                Mat mat_B,
+                                                int nev,                  // number of requested eigenpairs
+                                                int ncv,                  // number of basis vectors
+                                                const double tol,         // solver tolerance
+                                                const unsigned int m_its) // maximum number of iterations
 {
   START_LOG("solve_generalized()", "SlepcEigenSolver");
 
@@ -507,14 +507,14 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 
 
 #ifdef DEBUG
-	 // ierr = PetscPrintf(this->comm().get(),
-	 //         "\n Number of iterations: %d\n"
-	 //         " Number of converged eigenpairs: %d\n\n", its, nconv);
+         // ierr = PetscPrintf(this->comm().get(),
+         //         "\n Number of iterations: %d\n"
+         //         " Number of converged eigenpairs: %d\n\n", its, nconv);
 
   // Display eigenvalues and relative errors.
   ierr = PetscPrintf(this->comm().get(),
-		     "           k           ||Ax-kx||/|kx|\n"
-		     "   ----------------- -----------------\n" );
+                     "           k           ||Ax-kx||/|kx|\n"
+                     "   ----------------- -----------------\n" );
          LIBMESH_CHKERRABORT(ierr);
 
   for(PetscInt i=0; i<nconv; i++ )
@@ -534,15 +534,15 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 #endif
 
       if (im != .0)
-	{
-	  ierr = PetscPrintf(this->comm().get()," %9f%+9f i %12f\n", re, im, error);
-	         LIBMESH_CHKERRABORT(ierr);
-	}
+        {
+          ierr = PetscPrintf(this->comm().get()," %9f%+9f i %12f\n", re, im, error);
+          LIBMESH_CHKERRABORT(ierr);
+        }
       else
-	{
-	  ierr = PetscPrintf(this->comm().get(),"   %12f       %12f\n", re, error);
-	         LIBMESH_CHKERRABORT(ierr);
-	}
+        {
+          ierr = PetscPrintf(this->comm().get(),"   %12f       %12f\n", re, error);
+          LIBMESH_CHKERRABORT(ierr);
+        }
     }
 
   ierr = PetscPrintf(this->comm().get(),"\n" );
@@ -594,8 +594,8 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
 
     default:
       libMesh::err << "ERROR:  Unsupported SLEPc Eigen Solver: "
-		    << Utility::enum_to_string(this->_eigen_solver_type) << std::endl
-		    << "Continuing with SLEPc defaults" << std::endl;
+                   << Utility::enum_to_string(this->_eigen_solver_type) << std::endl
+                   << "Continuing with SLEPc defaults" << std::endl;
     }
 }
 
@@ -620,8 +620,8 @@ void SlepcEigenSolver<T>:: set_slepc_problem_type()
 
     default:
       libMesh::err << "ERROR:  Unsupported SLEPc Eigen Problem: "
-		    << this->_eigen_problem_type        << std::endl
-		    << "Continuing with SLEPc defaults" << std::endl;
+                   << this->_eigen_problem_type        << std::endl
+                   << "Continuing with SLEPc defaults" << std::endl;
     }
 }
 
@@ -650,7 +650,7 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
 
     default:
       libMesh::err << "ERROR:  Unsupported SLEPc position of spectrum: "
-		    << this->_position_of_spectrum        << std::endl;
+                   << this->_position_of_spectrum        << std::endl;
       libmesh_error();
     }
 }
@@ -662,7 +662,7 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
 
 template <typename T>
 std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
-							 NumericVector<T> &solution_in)
+                                                         NumericVector<T> &solution_in)
 {
   PetscErrorCode ierr=0;
 

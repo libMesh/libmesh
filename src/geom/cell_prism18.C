@@ -82,7 +82,7 @@ bool Prism18::is_face(const unsigned int i) const
 }
 
 bool Prism18::is_node_on_side(const unsigned int n,
-			      const unsigned int s) const
+                              const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 9; ++i)
@@ -92,7 +92,7 @@ bool Prism18::is_node_on_side(const unsigned int n,
 }
 
 bool Prism18::is_node_on_edge(const unsigned int n,
-			      const unsigned int e) const
+                              const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 3; ++i)
@@ -144,23 +144,23 @@ dof_id_type Prism18::key (const unsigned int s) const
     {
     case 0:  // the triangular face at z=0
       {
-	return Prism::key(0);
+        return Prism::key(0);
       }
     case 1:  // the quad face at y=0
       {
-	return Elem::compute_key (this->node(15));
+        return Elem::compute_key (this->node(15));
       }
     case 2:  // the other quad face
       {
-	return Elem::compute_key (this->node(16));
+        return Elem::compute_key (this->node(16));
       }
     case 3: // the quad face at x=0
       {
-	return Elem::compute_key (this->node(17));
+        return Elem::compute_key (this->node(17));
       }
     case 4: // the triangular face at z=1
       {
-	return Prism::key(4);
+        return Prism::key(4);
       }
     }
 
@@ -174,34 +174,34 @@ dof_id_type Prism18::key (const unsigned int s) const
 
 
 AutoPtr<Elem> Prism18::build_side (const unsigned int i,
-				   bool proxy) const
+                                   bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
       switch(i)
-	{
-	case 0:
-	case 4:
-	  {
-	    AutoPtr<Elem> face(new Side<Tri6,Prism18>(this,i));
-	    return face;
-	  }
+        {
+        case 0:
+        case 4:
+          {
+            AutoPtr<Elem> face(new Side<Tri6,Prism18>(this,i));
+            return face;
+          }
 
-	case 1:
-	case 2:
-	case 3:
-	  {
-	    AutoPtr<Elem> face(new Side<Quad9,Prism18>(this,i));
-	    return face;
-	  }
+        case 1:
+        case 2:
+        case 3:
+          {
+            AutoPtr<Elem> face(new Side<Quad9,Prism18>(this,i));
+            return face;
+          }
 
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+        default:
+          {
+            libmesh_error();
+          }
+        }
     }
 
   else
@@ -210,86 +210,86 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
       AutoPtr<Elem> face(NULL);
 
       switch (i)
-	{
-	case 0:  // the triangular face at z=-1
-	  {
+        {
+        case 0:  // the triangular face at z=-1
+          {
             face.reset(new Tri6);
 
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(1);
-	    face->set_node(3) = this->get_node(8);
-	    face->set_node(4) = this->get_node(7);
-	    face->set_node(5) = this->get_node(6);
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(1);
+            face->set_node(3) = this->get_node(8);
+            face->set_node(4) = this->get_node(7);
+            face->set_node(5) = this->get_node(6);
 
-	    break;
-	  }
-	case 1:  // the quad face at y=0
-	  {
+            break;
+          }
+        case 1:  // the quad face at y=0
+          {
             face.reset(new Quad9);
 
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(4);
-	    face->set_node(3) = this->get_node(3);
-	    face->set_node(4) = this->get_node(6);
-	    face->set_node(5) = this->get_node(10);
-	    face->set_node(6) = this->get_node(12);
-	    face->set_node(7) = this->get_node(9);
-	    face->set_node(8) = this->get_node(15);
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(4);
+            face->set_node(3) = this->get_node(3);
+            face->set_node(4) = this->get_node(6);
+            face->set_node(5) = this->get_node(10);
+            face->set_node(6) = this->get_node(12);
+            face->set_node(7) = this->get_node(9);
+            face->set_node(8) = this->get_node(15);
 
-	    break;
-	  }
-	case 2:  // the other quad face
-	  {
+            break;
+          }
+        case 2:  // the other quad face
+          {
             face.reset(new Quad9);
 
-	    face->set_node(0) = this->get_node(1);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(5);
-	    face->set_node(3) = this->get_node(4);
-	    face->set_node(4) = this->get_node(7);
-	    face->set_node(5) = this->get_node(11);
-	    face->set_node(6) = this->get_node(13);
-	    face->set_node(7) = this->get_node(10);
-	    face->set_node(8) = this->get_node(16);
+            face->set_node(0) = this->get_node(1);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(5);
+            face->set_node(3) = this->get_node(4);
+            face->set_node(4) = this->get_node(7);
+            face->set_node(5) = this->get_node(11);
+            face->set_node(6) = this->get_node(13);
+            face->set_node(7) = this->get_node(10);
+            face->set_node(8) = this->get_node(16);
 
-	    break;
-	  }
-	case 3: // the quad face at x=0
-	  {
+            break;
+          }
+        case 3: // the quad face at x=0
+          {
             face.reset(new Quad9);
 
-	    face->set_node(0) = this->get_node(2);
-	    face->set_node(1) = this->get_node(0);
-	    face->set_node(2) = this->get_node(3);
-	    face->set_node(3) = this->get_node(5);
-	    face->set_node(4) = this->get_node(8);
-	    face->set_node(5) = this->get_node(9);
-	    face->set_node(6) = this->get_node(14);
-	    face->set_node(7) = this->get_node(11);
-	    face->set_node(8) = this->get_node(17);
+            face->set_node(0) = this->get_node(2);
+            face->set_node(1) = this->get_node(0);
+            face->set_node(2) = this->get_node(3);
+            face->set_node(3) = this->get_node(5);
+            face->set_node(4) = this->get_node(8);
+            face->set_node(5) = this->get_node(9);
+            face->set_node(6) = this->get_node(14);
+            face->set_node(7) = this->get_node(11);
+            face->set_node(8) = this->get_node(17);
 
-	    break;
-	  }
-	case 4: // the triangular face at z=1
-	  {
+            break;
+          }
+        case 4: // the triangular face at z=1
+          {
             face.reset(new Tri6);
 
-	    face->set_node(0) = this->get_node(3);
-	    face->set_node(1) = this->get_node(4);
-	    face->set_node(2) = this->get_node(5);
-	    face->set_node(3) = this->get_node(12);
-	    face->set_node(4) = this->get_node(13);
-	    face->set_node(5) = this->get_node(14);
+            face->set_node(0) = this->get_node(3);
+            face->set_node(1) = this->get_node(4);
+            face->set_node(2) = this->get_node(5);
+            face->set_node(3) = this->get_node(12);
+            face->set_node(4) = this->get_node(13);
+            face->set_node(5) = this->get_node(14);
 
-	    break;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+            break;
+          }
+        default:
+          {
+            libmesh_error();
+          }
+        }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
@@ -312,8 +312,8 @@ AutoPtr<Elem> Prism18::build_edge (const unsigned int i) const
 
 
 void Prism18::connectivity(const unsigned int sc,
-			   const IOPackage iop,
-			   std::vector<dof_id_type>& conn) const
+                           const IOPackage iop,
+                           std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -323,256 +323,256 @@ void Prism18::connectivity(const unsigned int sc,
     {
     case TECPLOT:
       {
-	conn.resize(8);
-	switch (sc)
-	  {
+        conn.resize(8);
+        switch (sc)
+          {
 
-	  case 0:
-	    {
-	      conn[0] = this->node(0)+1;
-	      conn[1] = this->node(6)+1;
-	      conn[2] = this->node(8)+1;
-	      conn[3] = this->node(8)+1;
-	      conn[4] = this->node(9)+1;
-	      conn[5] = this->node(15)+1;
-	      conn[6] = this->node(17)+1;
-	      conn[7] = this->node(17)+1;
+          case 0:
+            {
+              conn[0] = this->node(0)+1;
+              conn[1] = this->node(6)+1;
+              conn[2] = this->node(8)+1;
+              conn[3] = this->node(8)+1;
+              conn[4] = this->node(9)+1;
+              conn[5] = this->node(15)+1;
+              conn[6] = this->node(17)+1;
+              conn[7] = this->node(17)+1;
 
-	      return;
-	    }
+              return;
+            }
 
-	  case 1:
-	    {
-	      conn[0] = this->node(6)+1;
-	      conn[1] = this->node(1)+1;
-	      conn[2] = this->node(7)+1;
-	      conn[3] = this->node(7)+1;
-	      conn[4] = this->node(15)+1;
-	      conn[5] = this->node(10)+1;
-	      conn[6] = this->node(16)+1;
-	      conn[7] = this->node(16)+1;
+          case 1:
+            {
+              conn[0] = this->node(6)+1;
+              conn[1] = this->node(1)+1;
+              conn[2] = this->node(7)+1;
+              conn[3] = this->node(7)+1;
+              conn[4] = this->node(15)+1;
+              conn[5] = this->node(10)+1;
+              conn[6] = this->node(16)+1;
+              conn[7] = this->node(16)+1;
 
-	      return;
-	    }
+              return;
+            }
 
-	  case 2:
-	    {
-	      conn[0] = this->node(8)+1;
-	      conn[1] = this->node(7)+1;
-	      conn[2] = this->node(2)+1;
-	      conn[3] = this->node(2)+1;
-	      conn[4] = this->node(17)+1;
-	      conn[5] = this->node(16)+1;
-	      conn[6] = this->node(11)+1;
-	      conn[7] = this->node(11)+1;
+          case 2:
+            {
+              conn[0] = this->node(8)+1;
+              conn[1] = this->node(7)+1;
+              conn[2] = this->node(2)+1;
+              conn[3] = this->node(2)+1;
+              conn[4] = this->node(17)+1;
+              conn[5] = this->node(16)+1;
+              conn[6] = this->node(11)+1;
+              conn[7] = this->node(11)+1;
 
-	      return;
-	    }
+              return;
+            }
 
-	  case 3:
-	    {
-	      conn[0] = this->node(6)+1;
-	      conn[1] = this->node(7)+1;
-	      conn[2] = this->node(8)+1;
-	      conn[3] = this->node(8)+1;
-	      conn[4] = this->node(15)+1;
-	      conn[5] = this->node(16)+1;
-	      conn[6] = this->node(17)+1;
-	      conn[7] = this->node(17)+1;
+          case 3:
+            {
+              conn[0] = this->node(6)+1;
+              conn[1] = this->node(7)+1;
+              conn[2] = this->node(8)+1;
+              conn[3] = this->node(8)+1;
+              conn[4] = this->node(15)+1;
+              conn[5] = this->node(16)+1;
+              conn[6] = this->node(17)+1;
+              conn[7] = this->node(17)+1;
 
-	      return;
-	    }
+              return;
+            }
 
-	  case 4:
-	    {
-	      conn[0] = this->node(9)+1;
-	      conn[1] = this->node(15)+1;
-	      conn[2] = this->node(17)+1;
-	      conn[3] = this->node(17)+1;
-	      conn[4] = this->node(3)+1;
-	      conn[5] = this->node(12)+1;
-	      conn[6] = this->node(14)+1;
-	      conn[7] = this->node(14)+1;
+          case 4:
+            {
+              conn[0] = this->node(9)+1;
+              conn[1] = this->node(15)+1;
+              conn[2] = this->node(17)+1;
+              conn[3] = this->node(17)+1;
+              conn[4] = this->node(3)+1;
+              conn[5] = this->node(12)+1;
+              conn[6] = this->node(14)+1;
+              conn[7] = this->node(14)+1;
 
-	      return;
-	    }
+              return;
+            }
 
-	  case 5:
-	    {
-	      conn[0] = this->node(15)+1;
-	      conn[1] = this->node(10)+1;
-	      conn[2] = this->node(16)+1;
-	      conn[3] = this->node(16)+1;
-	      conn[4] = this->node(12)+1;
-	      conn[5] = this->node(4)+1;
-	      conn[6] = this->node(13)+1;
-	      conn[7] = this->node(13)+1;
+          case 5:
+            {
+              conn[0] = this->node(15)+1;
+              conn[1] = this->node(10)+1;
+              conn[2] = this->node(16)+1;
+              conn[3] = this->node(16)+1;
+              conn[4] = this->node(12)+1;
+              conn[5] = this->node(4)+1;
+              conn[6] = this->node(13)+1;
+              conn[7] = this->node(13)+1;
 
-	      return;
-	    }
+              return;
+            }
 
-	  case 6:
-	    {
-	      conn[0] = this->node(17)+1;
-	      conn[1] = this->node(16)+1;
-	      conn[2] = this->node(11)+1;
-	      conn[3] = this->node(11)+1;
-	      conn[4] = this->node(14)+1;
-	      conn[5] = this->node(13)+1;
-	      conn[6] = this->node(5)+1;
-	      conn[7] = this->node(5)+1;
+          case 6:
+            {
+              conn[0] = this->node(17)+1;
+              conn[1] = this->node(16)+1;
+              conn[2] = this->node(11)+1;
+              conn[3] = this->node(11)+1;
+              conn[4] = this->node(14)+1;
+              conn[5] = this->node(13)+1;
+              conn[6] = this->node(5)+1;
+              conn[7] = this->node(5)+1;
 
-	      return;
-	    }
+              return;
+            }
 
-	  case 7:
-	    {
-	      conn[0] = this->node(15)+1;
-	      conn[1] = this->node(16)+1;
-	      conn[2] = this->node(17)+1;
-	      conn[3] = this->node(17)+1;
-	      conn[4] = this->node(12)+1;
-	      conn[5] = this->node(13)+1;
-	      conn[6] = this->node(14)+1;
-	      conn[7] = this->node(14)+1;
+          case 7:
+            {
+              conn[0] = this->node(15)+1;
+              conn[1] = this->node(16)+1;
+              conn[2] = this->node(17)+1;
+              conn[3] = this->node(17)+1;
+              conn[4] = this->node(12)+1;
+              conn[5] = this->node(13)+1;
+              conn[6] = this->node(14)+1;
+              conn[7] = this->node(14)+1;
 
-	      return;
-	    }
+              return;
+            }
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
       }
 
     case VTK:
       {
-	// VTK now supports VTK_BIQUADRATIC_QUADRATIC_WEDGE directly
-	conn.resize(18);
+        // VTK now supports VTK_BIQUADRATIC_QUADRATIC_WEDGE directly
+        conn.resize(18);
 
-	// VTK's VTK_BIQUADRATIC_QUADRATIC_WEDGE first 9 (vertex) and
-	// last 3 (mid-face) nodes match.  The middle and top layers
-	// of mid-edge nodes are reversed from LibMesh's.
-	for (unsigned i=0; i<conn.size(); ++i)
-	  conn[i] = this->node(i);
+        // VTK's VTK_BIQUADRATIC_QUADRATIC_WEDGE first 9 (vertex) and
+        // last 3 (mid-face) nodes match.  The middle and top layers
+        // of mid-edge nodes are reversed from LibMesh's.
+        for (unsigned i=0; i<conn.size(); ++i)
+          conn[i] = this->node(i);
 
-	// top "ring" of mid-edge nodes
-	conn[9]  = this->node(12);
-	conn[10] = this->node(13);
-	conn[11] = this->node(14);
+        // top "ring" of mid-edge nodes
+        conn[9]  = this->node(12);
+        conn[10] = this->node(13);
+        conn[11] = this->node(14);
 
-	// middle "ring" of mid-edge nodes
-	conn[12] = this->node(9);
-	conn[13] = this->node(10);
-	conn[14] = this->node(11);
+        // middle "ring" of mid-edge nodes
+        conn[12] = this->node(9);
+        conn[13] = this->node(10);
+        conn[14] = this->node(11);
 
-	return;
+        return;
 
-	/*
-	conn.resize(6);
-	switch (sc)
-	  {
+        /*
+          conn.resize(6);
+          switch (sc)
+          {
 
-	  case 0:
-	    {
-	      conn[0] = this->node(0);
-	      conn[1] = this->node(6);
-	      conn[2] = this->node(8);
-	      conn[3] = this->node(9);
-	      conn[4] = this->node(15);
-	      conn[5] = this->node(17);
+          case 0:
+          {
+          conn[0] = this->node(0);
+          conn[1] = this->node(6);
+          conn[2] = this->node(8);
+          conn[3] = this->node(9);
+          conn[4] = this->node(15);
+          conn[5] = this->node(17);
 
-	      return;
-	    }
+          return;
+          }
 
-	  case 1:
-	    {
-	      conn[0] = this->node(6);
-	      conn[1] = this->node(1);
-	      conn[2] = this->node(7);
-	      conn[3] = this->node(15);
-	      conn[4] = this->node(10);
-	      conn[5] = this->node(16);
+          case 1:
+          {
+          conn[0] = this->node(6);
+          conn[1] = this->node(1);
+          conn[2] = this->node(7);
+          conn[3] = this->node(15);
+          conn[4] = this->node(10);
+          conn[5] = this->node(16);
 
-	      return;
-	    }
+          return;
+          }
 
-	  case 2:
-	    {
-	      conn[0] = this->node(8);
-	      conn[1] = this->node(7);
-	      conn[2] = this->node(2);
-	      conn[3] = this->node(17);
-	      conn[4] = this->node(16);
-	      conn[5] = this->node(11);
+          case 2:
+          {
+          conn[0] = this->node(8);
+          conn[1] = this->node(7);
+          conn[2] = this->node(2);
+          conn[3] = this->node(17);
+          conn[4] = this->node(16);
+          conn[5] = this->node(11);
 
-	      return;
-	    }
+          return;
+          }
 
-	  case 3:
-	    {
-	      conn[0] = this->node(6);
-	      conn[1] = this->node(7);
-	      conn[2] = this->node(8);
-	      conn[3] = this->node(15);
-	      conn[4] = this->node(16);
-	      conn[5] = this->node(17);
+          case 3:
+          {
+          conn[0] = this->node(6);
+          conn[1] = this->node(7);
+          conn[2] = this->node(8);
+          conn[3] = this->node(15);
+          conn[4] = this->node(16);
+          conn[5] = this->node(17);
 
-	      return;
-	    }
+          return;
+          }
 
-	  case 4:
-	    {
-	      conn[0] = this->node(9);
-	      conn[1] = this->node(15);
-	      conn[2] = this->node(17);
-	      conn[3] = this->node(3);
-	      conn[4] = this->node(12);
-	      conn[5] = this->node(14);
+          case 4:
+          {
+          conn[0] = this->node(9);
+          conn[1] = this->node(15);
+          conn[2] = this->node(17);
+          conn[3] = this->node(3);
+          conn[4] = this->node(12);
+          conn[5] = this->node(14);
 
-	      return;
-	    }
+          return;
+          }
 
-	  case 5:
-	    {
-	      conn[0] = this->node(15);
-	      conn[1] = this->node(10);
-	      conn[2] = this->node(16);
-	      conn[3] = this->node(12);
-	      conn[4] = this->node(4);
-	      conn[5] = this->node(13);
+          case 5:
+          {
+          conn[0] = this->node(15);
+          conn[1] = this->node(10);
+          conn[2] = this->node(16);
+          conn[3] = this->node(12);
+          conn[4] = this->node(4);
+          conn[5] = this->node(13);
 
-	      return;
-	    }
+          return;
+          }
 
-	  case 6:
-	    {
-	      conn[0] = this->node(17);
-	      conn[1] = this->node(16);
-	      conn[2] = this->node(11);
-	      conn[3] = this->node(14);
-	      conn[4] = this->node(13);
-	      conn[5] = this->node(5);
+          case 6:
+          {
+          conn[0] = this->node(17);
+          conn[1] = this->node(16);
+          conn[2] = this->node(11);
+          conn[3] = this->node(14);
+          conn[4] = this->node(13);
+          conn[5] = this->node(5);
 
-	      return;
-	    }
+          return;
+          }
 
-	  case 7:
-	    {
-	      conn[0] = this->node(15);
-	      conn[1] = this->node(16);
-	      conn[2] = this->node(17);
-	      conn[3] = this->node(12);
-	      conn[4] = this->node(13);
-	      conn[5] = this->node(14);
+          case 7:
+          {
+          conn[0] = this->node(15);
+          conn[1] = this->node(16);
+          conn[2] = this->node(17);
+          conn[3] = this->node(12);
+          conn[4] = this->node(13);
+          conn[5] = this->node(14);
 
-	      return;
-	    }
+          return;
+          }
 
-	  default:
-	    libmesh_error();
-	  }
-	*/
+          default:
+          libmesh_error();
+          }
+        */
       }
 
     default:
@@ -599,15 +599,15 @@ unsigned int Prism18::n_second_order_adjacent_vertices (const unsigned int n) co
       case 12:
       case 13:
       case 14:
-	return 2;
+        return 2;
 
       case 15:
       case 16:
       case 17:
-	return 4;
+        return 4;
 
       default:
-	libmesh_error();
+        libmesh_error();
     }
   libmesh_error();
   return static_cast<unsigned int>(-1);
@@ -618,7 +618,7 @@ unsigned int Prism18::n_second_order_adjacent_vertices (const unsigned int n) co
 
 
 unsigned short int Prism18::second_order_adjacent_vertex (const unsigned int n,
-							  const unsigned int v) const
+                                                          const unsigned int v) const
 {
   libmesh_assert_greater_equal (n, this->n_vertices());
   libmesh_assert_less (n, this->n_nodes());
@@ -634,8 +634,8 @@ unsigned short int Prism18::second_order_adjacent_vertex (const unsigned int n,
       case 16:
       case 17:
       {
-	libmesh_assert_less (v, 4);
-	return _remaining_second_order_adjacent_vertices[n-15][v];
+        libmesh_assert_less (v, 4);
+        return _remaining_second_order_adjacent_vertices[n-15][v];
       }
 
       /*
@@ -646,8 +646,8 @@ unsigned short int Prism18::second_order_adjacent_vertex (const unsigned int n,
        */
       default:
       {
-	libmesh_assert_less (v, 2);
-	return _second_order_adjacent_vertices[n-this->n_vertices()][v];
+        libmesh_assert_less (v, 2);
+        return _second_order_adjacent_vertices[n-this->n_vertices()][v];
       }
 
     }

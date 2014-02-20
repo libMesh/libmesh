@@ -41,7 +41,7 @@ void hermite_compute_coefs(const Elem* elem, std::vector<std::vector<Real> > & d
   const ElemType mapping_elem_type (elem->type());
   const int n_mapping_shape_functions =
     FE<3,LAGRANGE>::n_shape_functions(mapping_elem_type,
-				      mapping_order);
+                                      mapping_order);
 
   static const Point dofpt[2] = {Point(-1,-1,-1), Point(1,1,1)};
 
@@ -67,7 +67,7 @@ void hermite_compute_coefs(const Elem* elem, std::vector<std::vector<Real> > & d
           const Real ddzeta = FE<3,LAGRANGE>::shape_deriv
             (mapping_elem_type, mapping_order, i, 2, dofpt[p]);
 
-	  // dxdeta, dxdzeta, dydxi, dydzeta, dzdxi, dzdeta should all
+          // dxdeta, dxdzeta, dydxi, dydzeta, dzdxi, dzdeta should all
           // be 0!
           const Point &point_i = elem->point(i);
           dxdxi[0][p] += point_i(0) * ddxi;
@@ -367,13 +367,13 @@ namespace libMesh
 
 template <>
 Real FE<3,HERMITE>::shape(const ElemType,
-			  const Order,
-			  const unsigned int,
-			  const Point&)
+                          const Order,
+                          const unsigned int,
+                          const Point&)
 {
   libMesh::err << "Hermite elements require the real element\n"
-	        << "to construct gradient-based degrees of freedom."
-	        << std::endl;
+               << "to construct gradient-based degrees of freedom."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -383,9 +383,9 @@ Real FE<3,HERMITE>::shape(const ElemType,
 
 template <>
 Real FE<3,HERMITE>::shape(const Elem* elem,
-			  const Order order,
-			  const unsigned int i,
-			  const Point& p)
+                          const Order order,
+                          const unsigned int i,
+                          const Point& p)
 {
   libmesh_assert(elem);
 
@@ -411,27 +411,27 @@ Real FE<3,HERMITE>::shape(const Elem* elem,
       // 3rd-order tricubic Hermite functions
     case THIRD:
       {
-	switch (type)
-	  {
-	  case HEX8:
-	  case HEX20:
-	  case HEX27:
-	    {
-	      libmesh_assert_less (i, 64);
+        switch (type)
+          {
+          case HEX8:
+          case HEX20:
+          case HEX27:
+            {
+              libmesh_assert_less (i, 64);
 
               std::vector<unsigned int> bases1D;
 
               Real coef = hermite_bases_3D(bases1D, dxdxi, totalorder, i);
 
-	      return coef *
+              return coef *
                      FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
                      FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
                      FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
-	    }
-	  default:
+            }
+          default:
             libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-	    libmesh_error();
-	  }
+            libmesh_error();
+          }
       }
       // by default throw an error
     default:
@@ -447,14 +447,14 @@ Real FE<3,HERMITE>::shape(const Elem* elem,
 
 template <>
 Real FE<3,HERMITE>::shape_deriv(const ElemType,
-				const Order,
-				const unsigned int,
-				const unsigned int,
-				const Point&)
+                                const Order,
+                                const unsigned int,
+                                const unsigned int,
+                                const Point&)
 {
   libMesh::err << "Hermite elements require the real element\n"
-	        << "to construct gradient-based degrees of freedom."
-	        << std::endl;
+               << "to construct gradient-based degrees of freedom."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -464,10 +464,10 @@ Real FE<3,HERMITE>::shape_deriv(const ElemType,
 
 template <>
 Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
-				const Order order,
-				const unsigned int i,
-				const unsigned int j,
-				const Point& p)
+                                const Order order,
+                                const unsigned int i,
+                                const unsigned int j,
+                                const Point& p)
 {
   libmesh_assert(elem);
   libmesh_assert (j == 0 || j == 1 || j == 2);
@@ -494,33 +494,33 @@ Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
       // 3rd-order tricubic Hermite functions
     case THIRD:
       {
-	switch (type)
-	  {
-	  case HEX8:
-	  case HEX20:
-	  case HEX27:
-	    {
-	      libmesh_assert_less (i, 64);
+        switch (type)
+          {
+          case HEX8:
+          case HEX20:
+          case HEX27:
+            {
+              libmesh_assert_less (i, 64);
 
               std::vector<unsigned int> bases1D;
 
               Real coef = hermite_bases_3D(bases1D, dxdxi, totalorder, i);
 
               switch (j) // Derivative type
-		{
-		case 0:
+                {
+                case 0:
                   return coef *
                     FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
                     FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
                     FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
                   break;
-		case 1:
+                case 1:
                   return coef *
                     FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
                     FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1)) *
                     FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
                   break;
-		case 2:
+                case 2:
                   return coef *
                     FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
                     FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
@@ -528,11 +528,11 @@ Real FE<3,HERMITE>::shape_deriv(const Elem* elem,
                   break;
                 }
 
-	    }
-	  default:
+            }
+          default:
             libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-	    libmesh_error();
-	  }
+            libmesh_error();
+          }
       }
       // by default throw an error
     default:
@@ -577,51 +577,51 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
       // 3rd-order tricubic Hermite functions
     case THIRD:
       {
-	switch (type)
-	  {
-	  case HEX8:
-	  case HEX20:
-	  case HEX27:
-	    {
-	      libmesh_assert_less (i, 64);
+        switch (type)
+          {
+          case HEX8:
+          case HEX20:
+          case HEX27:
+            {
+              libmesh_assert_less (i, 64);
 
               std::vector<unsigned int> bases1D;
 
               Real coef = hermite_bases_3D(bases1D, dxdxi, totalorder, i);
 
               switch (j) // Derivative type
-		{
-		case 0:
+                {
+                case 0:
                   return coef *
                     FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[0],p(0)) *
                     FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
                     FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
                   break;
-		case 1:
+                case 1:
                   return coef *
                     FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
                     FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1)) *
                     FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
                   break;
-		case 2:
+                case 2:
                   return coef *
                     FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
                     FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[1],p(1)) *
                     FEHermite<1>::hermite_raw_shape(bases1D[2],p(2));
                   break;
-		case 3:
+                case 3:
                   return coef *
                     FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
                     FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
                     FEHermite<1>::hermite_raw_shape_deriv(bases1D[2],p(2));
                   break;
-		case 4:
+                case 4:
                   return coef *
                     FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
                     FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1)) *
                     FEHermite<1>::hermite_raw_shape_deriv(bases1D[2],p(2));
                   break;
-		case 5:
+                case 5:
                   return coef *
                     FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
                     FEHermite<1>::hermite_raw_shape(bases1D[1],p(1)) *
@@ -629,11 +629,11 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem* elem,
                   break;
                 }
 
-	    }
-	  default:
+            }
+          default:
             libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-	    libmesh_error();
-	  }
+            libmesh_error();
+          }
       }
       // by default throw an error
     default:

@@ -35,7 +35,7 @@ namespace libMesh
 //------------------------------------------------------------------
 // PointLocator methods
 PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
-				    const PointLocatorBase* master) :
+                                    const PointLocatorBase* master) :
   PointLocatorBase (mesh,master),
   _tree            (NULL),
   _element         (NULL),
@@ -48,8 +48,8 @@ PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
 
 
 PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
-				    const Trees::BuildType build_type,
-				    const PointLocatorBase* master) :
+                                    const Trees::BuildType build_type,
+                                    const PointLocatorBase* master) :
   PointLocatorBase (mesh,master),
   _tree            (NULL),
   _element         (NULL),
@@ -75,11 +75,11 @@ void PointLocatorTree::clear ()
   if (this->_tree != NULL)
     {
       if (this->_master == NULL)
-	  // we own the tree
-	  delete this->_tree;
+        // we own the tree
+        delete this->_tree;
       else
-	  // someone else owns and therefore deletes the tree
-	  this->_tree = NULL;
+        // someone else owns and therefore deletes the tree
+        this->_tree = NULL;
     }
 }
 
@@ -94,7 +94,7 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
   if (this->_initialized)
     {
       libMesh::err << "ERROR: Already initialized!  Will ignore this call..."
-		    << std::endl;
+                   << std::endl;
     }
 
   else
@@ -105,62 +105,62 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
         {
           START_LOG("init(no master)", "PointLocatorTree");
 
-	  if (this->_mesh.mesh_dimension() == 3)
-	    _tree = new Trees::OctTree (this->_mesh, 200, build_type);
-	  else
-	    {
-	      // A 1D/2D mesh in 3D space needs special consideration.
-	      // If the mesh is planar XY, we want to build a QuadTree
-	      // to search efficiently.  If the mesh is truly a manifold,
-	      // then we need an octree
+          if (this->_mesh.mesh_dimension() == 3)
+            _tree = new Trees::OctTree (this->_mesh, 200, build_type);
+          else
+            {
+              // A 1D/2D mesh in 3D space needs special consideration.
+              // If the mesh is planar XY, we want to build a QuadTree
+              // to search efficiently.  If the mesh is truly a manifold,
+              // then we need an octree
 #if LIBMESH_DIM > 2
-	      bool is_planar_xy = false;
+              bool is_planar_xy = false;
 
-	      // Build the bounding box for the mesh.  If the delta-z bound is
-	      // negligibly small then we can use a quadtree.
-	      {
-		MeshTools::BoundingBox bbox = MeshTools::bounding_box(this->_mesh);
+              // Build the bounding box for the mesh.  If the delta-z bound is
+              // negligibly small then we can use a quadtree.
+              {
+                MeshTools::BoundingBox bbox = MeshTools::bounding_box(this->_mesh);
 
-		const Real
-		  Dx = bbox.second(0) - bbox.first(0),
-		  Dz = bbox.second(2) - bbox.first(2);
+                const Real
+                  Dx = bbox.second(0) - bbox.first(0),
+                  Dz = bbox.second(2) - bbox.first(2);
 
-		if (std::abs(Dz/(Dx + 1.e-20)) < 1e-10)
-		  is_planar_xy = true;
-	      }
+                if (std::abs(Dz/(Dx + 1.e-20)) < 1e-10)
+                  is_planar_xy = true;
+              }
 
-	      if (!is_planar_xy)
-		_tree = new Trees::OctTree (this->_mesh, 200, build_type);
-	      else
+              if (!is_planar_xy)
+                _tree = new Trees::OctTree (this->_mesh, 200, build_type);
+              else
 #endif
 #if LIBMESH_DIM > 1
-		_tree = new Trees::QuadTree (this->_mesh, 200, build_type);
+                _tree = new Trees::QuadTree (this->_mesh, 200, build_type);
 #else
-		_tree = new Trees::BinaryTree (this->_mesh, 200, build_type);
+              _tree = new Trees::BinaryTree (this->_mesh, 200, build_type);
 #endif
-	    }
+            }
 
           STOP_LOG("init(no master)", "PointLocatorTree");
-	}
+        }
 
       else
 
         {
-	  // We are _not_ the master.  Let our Tree point to
-	  // the master's tree.  But for this we first transform
-	  // the master in a state for which we are friends.
-	  // And make sure the master @e has a tree!
-	  const PointLocatorTree* my_master =
-	    libmesh_cast_ptr<const PointLocatorTree*>(this->_master);
+          // We are _not_ the master.  Let our Tree point to
+          // the master's tree.  But for this we first transform
+          // the master in a state for which we are friends.
+          // And make sure the master @e has a tree!
+          const PointLocatorTree* my_master =
+            libmesh_cast_ptr<const PointLocatorTree*>(this->_master);
 
-	  if (my_master->initialized())
-	    this->_tree = my_master->_tree;
-	  else
-	    {
-	      libMesh::err << "ERROR: Initialize master first, then servants!"
-			    << std::endl;
-	      libmesh_error();
-	    }
+          if (my_master->initialized())
+            this->_tree = my_master->_tree;
+          else
+            {
+              libMesh::err << "ERROR: Initialize master first, then servants!"
+                           << std::endl;
+              libmesh_error();
+            }
         }
 
 
@@ -191,46 +191,46 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
   // First check the element from last time before asking the tree
   if (this->_element==NULL || !(this->_element->contains_point(p)))
     {
-	// ask the tree
-	this->_element = this->_tree->find_element (p);
+      // ask the tree
+      this->_element = this->_tree->find_element (p);
 
-	if (this->_element == NULL)
-	  {
-	    /* No element seems to contain this point.  If out-of-mesh
-	       mode is enabled, just return NULL.  If not, however, we
-	       have to perform a linear search before we call \p
-	       libmesh_error() since in the case of curved elements, the
-	       bounding box computed in \p TreeNode::insert(const
-	       Elem*) might be slightly inaccurate.  */
-	    if(!_out_of_mesh_mode)
-	      {
+      if (this->_element == NULL)
+        {
+          /* No element seems to contain this point.  If out-of-mesh
+             mode is enabled, just return NULL.  If not, however, we
+             have to perform a linear search before we call \p
+             libmesh_error() since in the case of curved elements, the
+             bounding box computed in \p TreeNode::insert(const
+             Elem*) might be slightly inaccurate.  */
+          if(!_out_of_mesh_mode)
+            {
                 START_LOG("linear search", "PointLocatorTree");
-		MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
-		const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
+                MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
+                const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
 
-		for ( ; pos != end_pos; ++pos)
-		  if ((*pos)->contains_point(p))
+                for ( ; pos != end_pos; ++pos)
+                  if ((*pos)->contains_point(p))
                     {
                       STOP_LOG("linear search", "PointLocatorTree");
                       STOP_LOG("operator()", "PointLocatorTree");
-		      return this->_element = (*pos);
+                      return this->_element = (*pos);
                     }
 
 /*
-		if (this->_element == NULL)
-		  {
-		    libMesh::err << std::endl
-			          << " ******** Serious Problem.  Could not find an Element "
-			          << "in the Mesh"
-			          << std:: endl
-			          << " ******** that contains the Point "
-			          << p;
-		    libmesh_error();
-		  }
+  if (this->_element == NULL)
+  {
+  libMesh::err << std::endl
+  << " ******** Serious Problem.  Could not find an Element "
+  << "in the Mesh"
+  << std:: endl
+  << " ******** that contains the Point "
+  << p;
+  libmesh_error();
+  }
 */
                 STOP_LOG("linear search", "PointLocatorTree");
-	      }
-	  }
+            }
+        }
     }
 
   // If we found an element, it should be active
@@ -256,11 +256,11 @@ void PointLocatorTree::enable_out_of_mesh_mode (void)
       MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
       const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
       for ( ; pos != end_pos; ++pos)
-	if (!(*pos)->has_affine_map())
-	  {
-	    libMesh::err << "ERROR: Out-of-mesh mode is currently only supported if all elements have affine mappings." << std::endl;
-	    libmesh_error();
-	  }
+        if (!(*pos)->has_affine_map())
+          {
+            libMesh::err << "ERROR: Out-of-mesh mode is currently only supported if all elements have affine mappings." << std::endl;
+            libmesh_error();
+          }
 #endif
 
       _out_of_mesh_mode = true;

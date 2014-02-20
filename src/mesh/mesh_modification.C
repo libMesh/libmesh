@@ -45,8 +45,8 @@ namespace libMesh
 // ------------------------------------------------------------
 // MeshTools::Modification functions for mesh modification
 void MeshTools::Modification::distort (MeshBase& mesh,
-				       const Real factor,
-				       const bool perturb_boundary)
+                                       const Real factor,
+                                       const bool perturb_boundary)
 {
   libmesh_assert (mesh.n_nodes());
   libmesh_assert (mesh.n_elem());
@@ -67,7 +67,7 @@ void MeshTools::Modification::distort (MeshBase& mesh,
   // neighboring nodes for each node.
   // hmin holds these distances.
   std::vector<float> hmin (mesh.n_nodes(),
-			   std::numeric_limits<float>::max());
+                           std::numeric_limits<float>::max());
 
   MeshBase::element_iterator       el  = mesh.active_elements_begin();
   const MeshBase::element_iterator end = mesh.active_elements_end();
@@ -95,36 +95,36 @@ void MeshTools::Modification::distort (MeshBase& mesh,
     // (different types, namely float and double)]
     for (unsigned int n=0; n<mesh.n_nodes(); n++)
       if (!on_boundary[n] && (hmin[n] < 1.e20) )
-	{
-	  // the direction, random but unit normalized
+        {
+          // the direction, random but unit normalized
 
-	  Point dir( static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX),
-		     (mesh.mesh_dimension() > 1) ?
-		     static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX)
-		     : 0.,
-		     ((mesh.mesh_dimension() == 3) ?
-		      static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX)
-		      : 0.)
-		     );
+          Point dir( static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX),
+                     (mesh.mesh_dimension() > 1) ?
+                     static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX)
+                     : 0.,
+                     ((mesh.mesh_dimension() == 3) ?
+                      static_cast<Real>(std::rand())/static_cast<Real>(RAND_MAX)
+                      : 0.)
+                     );
 
-	  dir(0) = (dir(0)-.5)*2.;
-	  if (mesh.mesh_dimension() > 1)
-	    dir(1) = (dir(1)-.5)*2.;
-	  if (mesh.mesh_dimension() == 3)
-	    dir(2) = (dir(2)-.5)*2.;
+          dir(0) = (dir(0)-.5)*2.;
+          if (mesh.mesh_dimension() > 1)
+            dir(1) = (dir(1)-.5)*2.;
+          if (mesh.mesh_dimension() == 3)
+            dir(2) = (dir(2)-.5)*2.;
 
-	  dir = dir.unit();
+          dir = dir.unit();
 
           Node *node = mesh.node_ptr(n);
           if (!node)
             continue;
 
           (*node)(0) += dir(0)*factor*hmin[n];
-	  if (mesh.mesh_dimension() > 1)
+          if (mesh.mesh_dimension() > 1)
             (*node)(1) += dir(1)*factor*hmin[n];
           if (mesh.mesh_dimension() == 3)
             (*node)(2) += dir(2)*factor*hmin[n];
-	}
+        }
   }
 
 
@@ -135,9 +135,9 @@ void MeshTools::Modification::distort (MeshBase& mesh,
 
 
 void MeshTools::Modification::translate (MeshBase& mesh,
-					 const Real xt,
-					 const Real yt,
-					 const Real zt)
+                                         const Real xt,
+                                         const Real yt,
+                                         const Real zt)
 {
   const Point p(xt, yt, zt);
 
@@ -172,9 +172,9 @@ void MeshTools::Modification::translate (MeshBase& mesh,
 
 
 void MeshTools::Modification::rotate (MeshBase& mesh,
-				      const Real phi,
-				      const Real theta,
-				      const Real psi)
+                                      const Real phi,
+                                      const Real theta,
+                                      const Real psi)
 {
   libmesh_assert_not_equal_to (mesh.mesh_dimension(), 1);
 
@@ -206,9 +206,9 @@ void MeshTools::Modification::rotate (MeshBase& mesh,
 
 
 void MeshTools::Modification::scale (MeshBase& mesh,
-				     const Real xs,
-				     const Real ys,
-				     const Real zs)
+                                     const Real xs,
+                                     const Real ys,
+                                     const Real zs)
 {
   const Real x_scale = xs;
   Real y_scale       = ys;
@@ -332,7 +332,7 @@ void UnstructuredMesh::all_first_order ()
        */
       for (unsigned int v=0; v < so_elem->n_vertices(); v++)
         {
-	  lo_elem->set_node(v) = so_elem->get_node(v);
+          lo_elem->set_node(v) = so_elem->get_node(v);
           node_touched_by_me[lo_elem->node(v)] = true;
         }
 
@@ -345,12 +345,12 @@ void UnstructuredMesh::all_first_order ()
       libmesh_assert_equal_to (lo_elem->n_sides(), so_elem->n_sides());
 
       for (unsigned int s=0; s<so_elem->n_sides(); s++)
-	{
-	  const std::vector<boundary_id_type> boundary_ids =
-	    this->boundary_info->raw_boundary_ids (so_elem, s);
+        {
+          const std::vector<boundary_id_type> boundary_ids =
+            this->boundary_info->raw_boundary_ids (so_elem, s);
 
-	  this->boundary_info->add_side (lo_elem, s, boundary_ids);
-	}
+          this->boundary_info->add_side (lo_elem, s, boundary_ids);
+        }
 
       /*
        * The new first-order element is ready.
@@ -451,7 +451,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * to be added
        */
       this->reserve_nodes(static_cast<unsigned int>
-			  (1.5*static_cast<double>(this->n_nodes())));
+                          (1.5*static_cast<double>(this->n_nodes())));
       break;
 
     case 2:
@@ -460,7 +460,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * or from Quad4 to Quad8 (again, double) or Quad9 (2.25 that much)
        */
       this->reserve_nodes(static_cast<unsigned int>
-			  (2*static_cast<double>(this->n_nodes())));
+                          (2*static_cast<double>(this->n_nodes())));
       break;
 
 
@@ -472,7 +472,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * a too conservative guess, use the lower bound
        */
       this->reserve_nodes(static_cast<unsigned int>
-			  (2.5*static_cast<double>(this->n_nodes())));
+                          (2.5*static_cast<double>(this->n_nodes())));
       break;
 
     default:
@@ -509,10 +509,10 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
       // make sure it is linear order
       if (lo_elem->default_order() != FIRST)
         {
-	  libMesh::err << "ERROR: This is not a linear element: type="
-		        << lo_elem->type() << std::endl;
-	  libmesh_error();
-	}
+          libMesh::err << "ERROR: This is not a linear element: type="
+                       << lo_elem->type() << std::endl;
+          libmesh_error();
+        }
 
       // this does _not_ work for refined elements
       libmesh_assert_equal_to (lo_elem->level (), 0);
@@ -526,8 +526,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * Hex20 or Hex27, as equivalents for Hex8
        */
       Elem* so_elem =
-	Elem::build (Elem::second_order_equivalent_type(lo_elem->type(),
-							full_ordered) ).release();
+        Elem::build (Elem::second_order_equivalent_type(lo_elem->type(),
+                                                        full_ordered) ).release();
 
       libmesh_assert_equal_to (lo_elem->n_vertices(), so_elem->n_vertices());
 
@@ -538,7 +538,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * transfer these.
        */
       for (unsigned int v=0; v < lo_elem->n_vertices(); v++)
-	so_elem->set_node(v) = lo_elem->get_node(v);
+        so_elem->set_node(v) = lo_elem->get_node(v);
 
       /*
        * Now handle the additional mid-side nodes.  This
@@ -554,73 +554,73 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
       for (unsigned int son=son_begin; son<son_end; son++)
         {
-	  const unsigned int n_adjacent_vertices =
-	    so_elem->n_second_order_adjacent_vertices(son);
+          const unsigned int n_adjacent_vertices =
+            so_elem->n_second_order_adjacent_vertices(son);
 
-	  adjacent_vertices_ids.resize(n_adjacent_vertices);
+          adjacent_vertices_ids.resize(n_adjacent_vertices);
 
-	  for (unsigned int v=0; v<n_adjacent_vertices; v++)
-	    adjacent_vertices_ids[v] =
-	      so_elem->node( so_elem->second_order_adjacent_vertex(son,v) );
+          for (unsigned int v=0; v<n_adjacent_vertices; v++)
+            adjacent_vertices_ids[v] =
+              so_elem->node( so_elem->second_order_adjacent_vertex(son,v) );
 
-	  /*
-	   * \p adjacent_vertices_ids is now in order of the current
-	   * side.  sort it, so that comparisons  with the
-	   * \p adjacent_vertices_ids created through other elements'
-	   * sides can match
-	   */
-	  std::sort(adjacent_vertices_ids.begin(),
-		    adjacent_vertices_ids.end());
+          /*
+           * \p adjacent_vertices_ids is now in order of the current
+           * side.  sort it, so that comparisons  with the
+           * \p adjacent_vertices_ids created through other elements'
+           * sides can match
+           */
+          std::sort(adjacent_vertices_ids.begin(),
+                    adjacent_vertices_ids.end());
 
 
-	  // does this set of vertices already has a mid-node added?
-	  std::pair<std::map<std::vector<dof_id_type>, Node*>::iterator,
+          // does this set of vertices already has a mid-node added?
+          std::pair<std::map<std::vector<dof_id_type>, Node*>::iterator,
                     std::map<std::vector<dof_id_type>, Node*>::iterator>
-	    pos = adj_vertices_to_so_nodes.equal_range (adjacent_vertices_ids);
+            pos = adj_vertices_to_so_nodes.equal_range (adjacent_vertices_ids);
 
-	  // no, not added yet
-	  if (pos.first == pos.second)
-	    {
-	      /*
-	       * for this set of vertices, there is no
-	       * second_order node yet.  Add it.
-	       *
-	       * compute the location of the new node as
-	       * the average over the adjacent vertices.
-	       */
-	      Point new_location = this->point(adjacent_vertices_ids[0]);
-	      for (unsigned int v=1; v<n_adjacent_vertices; v++)
-		new_location += this->point(adjacent_vertices_ids[v]);
+          // no, not added yet
+          if (pos.first == pos.second)
+            {
+              /*
+               * for this set of vertices, there is no
+               * second_order node yet.  Add it.
+               *
+               * compute the location of the new node as
+               * the average over the adjacent vertices.
+               */
+              Point new_location = this->point(adjacent_vertices_ids[0]);
+              for (unsigned int v=1; v<n_adjacent_vertices; v++)
+                new_location += this->point(adjacent_vertices_ids[v]);
 
-	      new_location /= static_cast<Real>(n_adjacent_vertices);
+              new_location /= static_cast<Real>(n_adjacent_vertices);
 
-	      /* Add the new point to the mesh, giving it a globally
+              /* Add the new point to the mesh, giving it a globally
                * well-defined processor id.
-	       */
-	      Node* so_node = this->add_point
+               */
+              Node* so_node = this->add_point
                 (new_location, DofObject::invalid_id,
                 this->node(adjacent_vertices_ids[0]).processor_id());
 
-	      /*
-	       * insert the new node with its defining vertex
-	       * set into the map, and relocate pos to this
-	       * new entry, so that the so_elem can use
-	       * \p pos for inserting the node
-	       */
-	      adj_vertices_to_so_nodes.insert(pos.first,
-					      std::make_pair(adjacent_vertices_ids,
-							     so_node));
+              /*
+               * insert the new node with its defining vertex
+               * set into the map, and relocate pos to this
+               * new entry, so that the so_elem can use
+               * \p pos for inserting the node
+               */
+              adj_vertices_to_so_nodes.insert(pos.first,
+                                              std::make_pair(adjacent_vertices_ids,
+                                                             so_node));
 
-	      so_elem->set_node(son) = so_node;
-	    }
-	  // yes, already added.
-	  else
-	    {
-	      libmesh_assert(pos.first->second);
+              so_elem->set_node(son) = so_node;
+            }
+          // yes, already added.
+          else
+            {
+              libmesh_assert(pos.first->second);
 
-	      so_elem->set_node(son) = pos.first->second;
-	    }
-	}
+              so_elem->set_node(son) = pos.first->second;
+            }
+        }
 
 
       /**
@@ -637,15 +637,15 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
       libmesh_assert_equal_to (lo_elem->n_sides(), so_elem->n_sides());
 
       for (unsigned int s=0; s<lo_elem->n_sides(); s++)
-	{
-	  const std::vector<boundary_id_type> boundary_ids =
-	    this->boundary_info->raw_boundary_ids (lo_elem, s);
+        {
+          const std::vector<boundary_id_type> boundary_ids =
+            this->boundary_info->raw_boundary_ids (lo_elem, s);
 
-	  this->boundary_info->add_side (so_elem, s, boundary_ids);
+          this->boundary_info->add_side (so_elem, s, boundary_ids);
 
-	  if (lo_elem->neighbor(s) == remote_elem)
+          if (lo_elem->neighbor(s) == remote_elem)
             so_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
-	}
+        }
 
       /*
        * The new second-order element is ready.
@@ -714,301 +714,301 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
     for (; el!=end; ++el)
       {
-	Elem* elem = *el;
+        Elem* elem = *el;
 
-	const ElemType etype = elem->type();
+        const ElemType etype = elem->type();
 
-	// all_tri currently only works on coarse meshes
-	libmesh_assert (!elem->parent());
+        // all_tri currently only works on coarse meshes
+        libmesh_assert (!elem->parent());
 
-	// We split the quads using the shorter of the two diagonals
-	// to maintain the best angle properties.
-	bool edge_swap = false;
+        // We split the quads using the shorter of the two diagonals
+        // to maintain the best angle properties.
+        bool edge_swap = false;
 
-	// True if we actually split the current element.
-	bool split_elem = false;
+        // True if we actually split the current element.
+        bool split_elem = false;
 
-	// The two new triangular elements we will split the quad into.
-	Elem* tri0 = NULL;
-	Elem* tri1 = NULL;
-
-
-	switch (etype)
-	  {
-	  case QUAD4:
-	    {
-	      split_elem = true;
-
-	      tri0 = new Tri3;
-	      tri1 = new Tri3;
-
-	      // Check for possible edge swap
-	      if ((elem->point(0) - elem->point(2)).size() <
-		  (elem->point(1) - elem->point(3)).size())
-		{
-		  tri0->set_node(0) = elem->get_node(0);
-		  tri0->set_node(1) = elem->get_node(1);
-		  tri0->set_node(2) = elem->get_node(2);
-
-		  tri1->set_node(0) = elem->get_node(0);
-		  tri1->set_node(1) = elem->get_node(2);
-		  tri1->set_node(2) = elem->get_node(3);
-		}
-
-	      else
-		{
-		  edge_swap=true;
-
-		  tri0->set_node(0) = elem->get_node(0);
-		  tri0->set_node(1) = elem->get_node(1);
-		  tri0->set_node(2) = elem->get_node(3);
-
-		  tri1->set_node(0) = elem->get_node(1);
-		  tri1->set_node(1) = elem->get_node(2);
-		  tri1->set_node(2) = elem->get_node(3);
-		}
+        // The two new triangular elements we will split the quad into.
+        Elem* tri0 = NULL;
+        Elem* tri1 = NULL;
 
 
-	      break;
-	    }
+        switch (etype)
+          {
+          case QUAD4:
+            {
+              split_elem = true;
 
-	  case QUAD8:
-	    {
-	      split_elem =  true;
+              tri0 = new Tri3;
+              tri1 = new Tri3;
 
-	      tri0 = new Tri6;
-	      tri1 = new Tri6;
+              // Check for possible edge swap
+              if ((elem->point(0) - elem->point(2)).size() <
+                  (elem->point(1) - elem->point(3)).size())
+                {
+                  tri0->set_node(0) = elem->get_node(0);
+                  tri0->set_node(1) = elem->get_node(1);
+                  tri0->set_node(2) = elem->get_node(2);
 
-	      Node* new_node = mesh.add_point( (mesh.node(elem->node(0)) +
-						mesh.node(elem->node(1)) +
-						mesh.node(elem->node(2)) +
-						mesh.node(elem->node(3)) / 4)
-					       );
+                  tri1->set_node(0) = elem->get_node(0);
+                  tri1->set_node(1) = elem->get_node(2);
+                  tri1->set_node(2) = elem->get_node(3);
+                }
 
-	      // Check for possible edge swap
-	      if ((elem->point(0) - elem->point(2)).size() <
-		  (elem->point(1) - elem->point(3)).size())
-		{
-		  tri0->set_node(0) = elem->get_node(0);
-		  tri0->set_node(1) = elem->get_node(1);
-		  tri0->set_node(2) = elem->get_node(2);
-		  tri0->set_node(3) = elem->get_node(4);
-		  tri0->set_node(4) = elem->get_node(5);
-		  tri0->set_node(5) = new_node;
+              else
+                {
+                  edge_swap=true;
 
-		  tri1->set_node(0) = elem->get_node(0);
-		  tri1->set_node(1) = elem->get_node(2);
-		  tri1->set_node(2) = elem->get_node(3);
-		  tri1->set_node(3) = new_node;
-		  tri1->set_node(4) = elem->get_node(6);
-		  tri1->set_node(5) = elem->get_node(7);
+                  tri0->set_node(0) = elem->get_node(0);
+                  tri0->set_node(1) = elem->get_node(1);
+                  tri0->set_node(2) = elem->get_node(3);
 
-		}
+                  tri1->set_node(0) = elem->get_node(1);
+                  tri1->set_node(1) = elem->get_node(2);
+                  tri1->set_node(2) = elem->get_node(3);
+                }
 
-	      else
-		{
-		  edge_swap=true;
 
-		  tri0->set_node(0) = elem->get_node(3);
-		  tri0->set_node(1) = elem->get_node(0);
-		  tri0->set_node(2) = elem->get_node(1);
-		  tri0->set_node(3) = elem->get_node(7);
-		  tri0->set_node(4) = elem->get_node(4);
-		  tri0->set_node(5) = new_node;
+              break;
+            }
 
-		  tri1->set_node(0) = elem->get_node(1);
-		  tri1->set_node(1) = elem->get_node(2);
-		  tri1->set_node(2) = elem->get_node(3);
-		  tri1->set_node(3) = elem->get_node(5);
-		  tri1->set_node(4) = elem->get_node(6);
-		  tri1->set_node(5) = new_node;
-		}
+          case QUAD8:
+            {
+              split_elem =  true;
 
-	      break;
-	    }
+              tri0 = new Tri6;
+              tri1 = new Tri6;
 
-	  case QUAD9:
-	    {
-	      split_elem =  true;
+              Node* new_node = mesh.add_point( (mesh.node(elem->node(0)) +
+                                                mesh.node(elem->node(1)) +
+                                                mesh.node(elem->node(2)) +
+                                                mesh.node(elem->node(3)) / 4)
+                                               );
 
-	      tri0 = new Tri6;
-	      tri1 = new Tri6;
+              // Check for possible edge swap
+              if ((elem->point(0) - elem->point(2)).size() <
+                  (elem->point(1) - elem->point(3)).size())
+                {
+                  tri0->set_node(0) = elem->get_node(0);
+                  tri0->set_node(1) = elem->get_node(1);
+                  tri0->set_node(2) = elem->get_node(2);
+                  tri0->set_node(3) = elem->get_node(4);
+                  tri0->set_node(4) = elem->get_node(5);
+                  tri0->set_node(5) = new_node;
 
-	      // Check for possible edge swap
-	      if ((elem->point(0) - elem->point(2)).size() <
-		  (elem->point(1) - elem->point(3)).size())
-		{
-		  tri0->set_node(0) = elem->get_node(0);
-		  tri0->set_node(1) = elem->get_node(1);
-		  tri0->set_node(2) = elem->get_node(2);
-		  tri0->set_node(3) = elem->get_node(4);
-		  tri0->set_node(4) = elem->get_node(5);
-		  tri0->set_node(5) = elem->get_node(8);
+                  tri1->set_node(0) = elem->get_node(0);
+                  tri1->set_node(1) = elem->get_node(2);
+                  tri1->set_node(2) = elem->get_node(3);
+                  tri1->set_node(3) = new_node;
+                  tri1->set_node(4) = elem->get_node(6);
+                  tri1->set_node(5) = elem->get_node(7);
 
-		  tri1->set_node(0) = elem->get_node(0);
-		  tri1->set_node(1) = elem->get_node(2);
-		  tri1->set_node(2) = elem->get_node(3);
-		  tri1->set_node(3) = elem->get_node(8);
-		  tri1->set_node(4) = elem->get_node(6);
-		  tri1->set_node(5) = elem->get_node(7);
-		}
+                }
 
-	      else
-		{
-		  edge_swap=true;
+              else
+                {
+                  edge_swap=true;
 
-		  tri0->set_node(0) = elem->get_node(0);
-		  tri0->set_node(1) = elem->get_node(1);
-		  tri0->set_node(2) = elem->get_node(3);
-		  tri0->set_node(3) = elem->get_node(4);
-		  tri0->set_node(4) = elem->get_node(8);
-		  tri0->set_node(5) = elem->get_node(7);
+                  tri0->set_node(0) = elem->get_node(3);
+                  tri0->set_node(1) = elem->get_node(0);
+                  tri0->set_node(2) = elem->get_node(1);
+                  tri0->set_node(3) = elem->get_node(7);
+                  tri0->set_node(4) = elem->get_node(4);
+                  tri0->set_node(5) = new_node;
 
-		  tri1->set_node(0) = elem->get_node(1);
-		  tri1->set_node(1) = elem->get_node(2);
-		  tri1->set_node(2) = elem->get_node(3);
-		  tri1->set_node(3) = elem->get_node(5);
-		  tri1->set_node(4) = elem->get_node(6);
-		  tri1->set_node(5) = elem->get_node(8);
-		}
+                  tri1->set_node(0) = elem->get_node(1);
+                  tri1->set_node(1) = elem->get_node(2);
+                  tri1->set_node(2) = elem->get_node(3);
+                  tri1->set_node(3) = elem->get_node(5);
+                  tri1->set_node(4) = elem->get_node(6);
+                  tri1->set_node(5) = new_node;
+                }
 
-	      break;
-	    }
+              break;
+            }
+
+          case QUAD9:
+            {
+              split_elem =  true;
+
+              tri0 = new Tri6;
+              tri1 = new Tri6;
+
+              // Check for possible edge swap
+              if ((elem->point(0) - elem->point(2)).size() <
+                  (elem->point(1) - elem->point(3)).size())
+                {
+                  tri0->set_node(0) = elem->get_node(0);
+                  tri0->set_node(1) = elem->get_node(1);
+                  tri0->set_node(2) = elem->get_node(2);
+                  tri0->set_node(3) = elem->get_node(4);
+                  tri0->set_node(4) = elem->get_node(5);
+                  tri0->set_node(5) = elem->get_node(8);
+
+                  tri1->set_node(0) = elem->get_node(0);
+                  tri1->set_node(1) = elem->get_node(2);
+                  tri1->set_node(2) = elem->get_node(3);
+                  tri1->set_node(3) = elem->get_node(8);
+                  tri1->set_node(4) = elem->get_node(6);
+                  tri1->set_node(5) = elem->get_node(7);
+                }
+
+              else
+                {
+                  edge_swap=true;
+
+                  tri0->set_node(0) = elem->get_node(0);
+                  tri0->set_node(1) = elem->get_node(1);
+                  tri0->set_node(2) = elem->get_node(3);
+                  tri0->set_node(3) = elem->get_node(4);
+                  tri0->set_node(4) = elem->get_node(8);
+                  tri0->set_node(5) = elem->get_node(7);
+
+                  tri1->set_node(0) = elem->get_node(1);
+                  tri1->set_node(1) = elem->get_node(2);
+                  tri1->set_node(2) = elem->get_node(3);
+                  tri1->set_node(3) = elem->get_node(5);
+                  tri1->set_node(4) = elem->get_node(6);
+                  tri1->set_node(5) = elem->get_node(8);
+                }
+
+              break;
+            }
           // No need to split elements that are already triangles
           case TRI3:
           case TRI6:
             continue;
           // Try to ignore non-2D elements for now
-	  default:
-	    {
-	      libMesh::err << "Warning, encountered non-2D element "
+          default:
+            {
+              libMesh::err << "Warning, encountered non-2D element "
                             << Utility::enum_to_string<ElemType>(etype)
-			    << " in MeshTools::Modification::all_tri(), hope that's OK..."
-			    << std::endl;
-	    }
-	  } // end switch (etype)
+                           << " in MeshTools::Modification::all_tri(), hope that's OK..."
+                           << std::endl;
+            }
+          } // end switch (etype)
 
 
 
-	if (split_elem)
-	  {
-	    // Be sure the correct ID's are also set for tri0 and
-	    // tri1.
+        if (split_elem)
+          {
+            // Be sure the correct ID's are also set for tri0 and
+            // tri1.
             tri0->processor_id() = elem->processor_id();
             tri0->subdomain_id() = elem->subdomain_id();
             tri1->processor_id() = elem->processor_id();
             tri1->subdomain_id() = elem->subdomain_id();
 
-	    if (mesh_has_boundary_data)
-	      {
-		for (unsigned int sn=0; sn<elem->n_sides(); ++sn)
-		  {
+            if (mesh_has_boundary_data)
+              {
+                for (unsigned int sn=0; sn<elem->n_sides(); ++sn)
+                  {
                     const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids(*el, sn);
                     for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
                       {
                         const boundary_id_type b_id = *id_it;
 
-		        if (b_id != BoundaryInfo::invalid_id)
-		          {
-			    // Add the boundary ID to the list of new boundary ids
-			    new_bndry_ids.push_back(b_id);
+                        if (b_id != BoundaryInfo::invalid_id)
+                          {
+                            // Add the boundary ID to the list of new boundary ids
+                            new_bndry_ids.push_back(b_id);
 
-			    // Convert the boundary side information of the old element to
-			    // boundary side information for the new element.
-			    if (!edge_swap)
-			      {
-			        switch (sn)
-			          {
-			          case 0:
-				    {
-				      // New boundary side is Tri 0, side 0
-				      new_bndry_elements.push_back(tri0);
-				      new_bndry_sides.push_back(0);
-				      break;
-				    }
-			          case 1:
-				    {
-				      // New boundary side is Tri 0, side 1
-				      new_bndry_elements.push_back(tri0);
-				      new_bndry_sides.push_back(1);
-				      break;
-				    }
-			          case 2:
-				    {
-				      // New boundary side is Tri 1, side 1
-				      new_bndry_elements.push_back(tri1);
-				      new_bndry_sides.push_back(1);
-				      break;
-				    }
-			          case 3:
-				    {
-				      // New boundary side is Tri 1, side 2
-				      new_bndry_elements.push_back(tri1);
-				      new_bndry_sides.push_back(2);
-				      break;
-				    }
+                            // Convert the boundary side information of the old element to
+                            // boundary side information for the new element.
+                            if (!edge_swap)
+                              {
+                                switch (sn)
+                                  {
+                                  case 0:
+                                    {
+                                      // New boundary side is Tri 0, side 0
+                                      new_bndry_elements.push_back(tri0);
+                                      new_bndry_sides.push_back(0);
+                                      break;
+                                    }
+                                  case 1:
+                                    {
+                                      // New boundary side is Tri 0, side 1
+                                      new_bndry_elements.push_back(tri0);
+                                      new_bndry_sides.push_back(1);
+                                      break;
+                                    }
+                                  case 2:
+                                    {
+                                      // New boundary side is Tri 1, side 1
+                                      new_bndry_elements.push_back(tri1);
+                                      new_bndry_sides.push_back(1);
+                                      break;
+                                    }
+                                  case 3:
+                                    {
+                                      // New boundary side is Tri 1, side 2
+                                      new_bndry_elements.push_back(tri1);
+                                      new_bndry_sides.push_back(2);
+                                      break;
+                                    }
 
-			          default:
-				    {
-				      libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
-				      libmesh_error();
-				    }
-			          }
-			      }
+                                  default:
+                                    {
+                                      libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
+                                      libmesh_error();
+                                    }
+                                  }
+                              }
 
-			    else // edge_swap==true
-			      {
-			        switch (sn)
-			          {
-			          case 0:
-				    {
-				      // New boundary side is Tri 0, side 0
-				      new_bndry_elements.push_back(tri0);
-				      new_bndry_sides.push_back(0);
-				      break;
-				    }
-			          case 1:
-				    {
-				      // New boundary side is Tri 1, side 0
-				      new_bndry_elements.push_back(tri1);
-				      new_bndry_sides.push_back(0);
-				      break;
-				    }
-			          case 2:
-				    {
-				      // New boundary side is Tri 1, side 1
-				      new_bndry_elements.push_back(tri1);
-				      new_bndry_sides.push_back(1);
-				      break;
-				    }
-			          case 3:
-				    {
-				      // New boundary side is Tri 0, side 2
-				      new_bndry_elements.push_back(tri0);
-				      new_bndry_sides.push_back(2);
-				      break;
-				    }
+                            else // edge_swap==true
+                              {
+                                switch (sn)
+                                  {
+                                  case 0:
+                                    {
+                                      // New boundary side is Tri 0, side 0
+                                      new_bndry_elements.push_back(tri0);
+                                      new_bndry_sides.push_back(0);
+                                      break;
+                                    }
+                                  case 1:
+                                    {
+                                      // New boundary side is Tri 1, side 0
+                                      new_bndry_elements.push_back(tri1);
+                                      new_bndry_sides.push_back(0);
+                                      break;
+                                    }
+                                  case 2:
+                                    {
+                                      // New boundary side is Tri 1, side 1
+                                      new_bndry_elements.push_back(tri1);
+                                      new_bndry_sides.push_back(1);
+                                      break;
+                                    }
+                                  case 3:
+                                    {
+                                      // New boundary side is Tri 0, side 2
+                                      new_bndry_elements.push_back(tri0);
+                                      new_bndry_sides.push_back(2);
+                                      break;
+                                    }
 
-			          default:
-				    {
-				      libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
-				      libmesh_error();
-				    }
-			          }
-			      } // end edge_swap==true
-		          } // end if (b_id != BoundaryInfo::invalid_id)
+                                  default:
+                                    {
+                                      libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
+                                      libmesh_error();
+                                    }
+                                  }
+                              } // end edge_swap==true
+                          } // end if (b_id != BoundaryInfo::invalid_id)
                       } // end for loop over boundary IDs
-		  } // end for loop over sides
+                  } // end for loop over sides
 
-		// Remove the original element from the BoundaryInfo structure.
-		mesh.boundary_info->remove(elem);
+                // Remove the original element from the BoundaryInfo structure.
+                mesh.boundary_info->remove(elem);
 
-	      } // end if (mesh_has_boundary_data)
+              } // end if (mesh_has_boundary_data)
 
 
-	    // On a distributed mesh, we need to preserve remote_elem
-	    // links, since prepare_for_use can't reconstruct them for
-	    // us.
+            // On a distributed mesh, we need to preserve remote_elem
+            // links, since prepare_for_use can't reconstruct them for
+            // us.
             for (unsigned int sn=0; sn<elem->n_sides(); ++sn)
               {
                 if (elem->neighbor(sn) == remote_elem)
@@ -1092,21 +1092,21 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                       } // end if (elem->neighbor(sn) == remote_elem)
               } // end for loop over sides
 
-	    // Determine new IDs for the split elements which will be
-	    // the same on all processors, therefore keeping the Mesh
-	    // in sync.  Note: we offset the new IDs by n_orig_elem to
-	    // avoid overwriting any of the original IDs, this assumes
-	    // they were contiguously-numbered to begin with...
-	    tri0->set_id( n_orig_elem + 2*elem->id() + 0 );
-	    tri1->set_id( n_orig_elem + 2*elem->id() + 1 );
+            // Determine new IDs for the split elements which will be
+            // the same on all processors, therefore keeping the Mesh
+            // in sync.  Note: we offset the new IDs by n_orig_elem to
+            // avoid overwriting any of the original IDs, this assumes
+            // they were contiguously-numbered to begin with...
+            tri0->set_id( n_orig_elem + 2*elem->id() + 0 );
+            tri1->set_id( n_orig_elem + 2*elem->id() + 1 );
 
-	    // Add the newly-created triangles to the temporary vector of new elements.
-	    new_elements.push_back(tri0);
-	    new_elements.push_back(tri1);
+            // Add the newly-created triangles to the temporary vector of new elements.
+            new_elements.push_back(tri0);
+            new_elements.push_back(tri1);
 
-	    // Delete the original element
-	    mesh.delete_elem(elem);
-	  } // end if (split_elem)
+            // Delete the original element
+            mesh.delete_elem(elem);
+          } // end if (split_elem)
       } // End for loop over elements
   } // end scope
 
@@ -1139,9 +1139,9 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
       // Add the new boundary info to the mesh
       for (unsigned int s=0; s<new_bndry_elements.size(); ++s)
-	mesh.boundary_info->add_side(new_bndry_elements[s],
-				     new_bndry_sides[s],
-				     new_bndry_ids[s]);
+        mesh.boundary_info->add_side(new_bndry_elements[s],
+                                     new_bndry_sides[s],
+                                     new_bndry_ids[s]);
     }
 
 
@@ -1364,51 +1364,51 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 
     for (; it != end; ++it)
       {
-	Elem* elem = *it;
+        Elem* elem = *it;
 
-	// Make a new element of the same type
-	Elem* copy = Elem::build(elem->type()).release();
+        // Make a new element of the same type
+        Elem* copy = Elem::build(elem->type()).release();
 
-	// Set node pointers (they still point to nodes in the original mesh)
-	for(unsigned int n=0; n<elem->n_nodes(); n++)
-	  copy->set_node(n) = elem->get_node(n);
+        // Set node pointers (they still point to nodes in the original mesh)
+        for(unsigned int n=0; n<elem->n_nodes(); n++)
+          copy->set_node(n) = elem->get_node(n);
 
-	// Copy over ids
+        // Copy over ids
         copy->processor_id() = elem->processor_id();
         copy->subdomain_id() = elem->subdomain_id();
 
-	// Retain the original element's ID as well, otherwise ParallelMesh will
-	// try to create one for you...
-	copy->set_id( elem->id() );
+        // Retain the original element's ID as well, otherwise ParallelMesh will
+        // try to create one for you...
+        copy->set_id( elem->id() );
 
-	// This element could have boundary info or ParallelMesh
-	// remote_elem links as well.  We need to save the (elem,
-	// side, bc_id) triples and those links
-	for (unsigned int s=0; s<elem->n_sides(); s++)
-	  {
+        // This element could have boundary info or ParallelMesh
+        // remote_elem links as well.  We need to save the (elem,
+        // side, bc_id) triples and those links
+        for (unsigned int s=0; s<elem->n_sides(); s++)
+          {
             if (elem->neighbor(s) == remote_elem)
               copy->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
 
-	    const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids(elem,s);
-	    for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
-	      {
-		const boundary_id_type bc_id = *id_it;
+            const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids(elem,s);
+            for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+              {
+                const boundary_id_type bc_id = *id_it;
 
-		if (bc_id != BoundaryInfo::invalid_id)
-		  {
-		    saved_boundary_elements.push_back(copy);
-		    saved_bc_ids.push_back(bc_id);
-		    saved_bc_sides.push_back(s);
-		  }
-	      }
-	  }
+                if (bc_id != BoundaryInfo::invalid_id)
+                  {
+                    saved_boundary_elements.push_back(copy);
+                    saved_bc_ids.push_back(bc_id);
+                    saved_bc_sides.push_back(s);
+                  }
+              }
+          }
 
 
-	// We're done with this element
-	mesh.delete_elem(elem);
+        // We're done with this element
+        mesh.delete_elem(elem);
 
-	// But save the copy
-	new_elements.push_back(copy);
+        // But save the copy
+        new_elements.push_back(copy);
       }
 
     // Make sure we saved the same number of boundary conditions
@@ -1431,27 +1431,27 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
   // Add the copied (now level-0) elements back to the mesh
   {
     for (std::vector<Elem*>::iterator it = new_elements.begin();
-	 it != new_elements.end();
-	 ++it)
+         it != new_elements.end();
+         ++it)
       {
-	dof_id_type orig_id = (*it)->id();
+        dof_id_type orig_id = (*it)->id();
 
-	Elem* added_elem = mesh.add_elem(*it);
+        Elem* added_elem = mesh.add_elem(*it);
 
-	dof_id_type added_id = added_elem->id();
+        dof_id_type added_id = added_elem->id();
 
-	// If the Elem, as it was re-added to the mesh, now has a
-	// different ID (this is unlikely, so it's just an assert)
-	// the boundary information will no longer be correct.
-	libmesh_assert_equal_to (orig_id, added_id);
+        // If the Elem, as it was re-added to the mesh, now has a
+        // different ID (this is unlikely, so it's just an assert)
+        // the boundary information will no longer be correct.
+        libmesh_assert_equal_to (orig_id, added_id);
       }
   }
 
   // Finally, also add back the saved boundary information
   for (unsigned int e=0; e<saved_boundary_elements.size(); ++e)
     mesh.boundary_info->add_side(saved_boundary_elements[e],
-				 saved_bc_sides[e],
-				 saved_bc_ids[e]);
+                                 saved_bc_sides[e],
+                                 saved_bc_ids[e]);
 
   // Trim unused and renumber nodes and elements
   mesh.prepare_for_use(/*skip_renumber =*/ false);
@@ -1515,8 +1515,8 @@ void MeshTools::Modification::change_boundary_id (MeshBase& mesh,
 
 
 void MeshTools::Modification::change_subdomain_id (MeshBase& mesh,
-						   const subdomain_id_type old_id,
-						   const subdomain_id_type new_id)
+                                                   const subdomain_id_type old_id,
+                                                   const subdomain_id_type new_id)
 {
   MeshBase::element_iterator           el = mesh.elements_begin();
   const MeshBase::element_iterator end_el = mesh.elements_end();
@@ -1526,7 +1526,7 @@ void MeshTools::Modification::change_subdomain_id (MeshBase& mesh,
       Elem *elem = *el;
 
       if (elem->subdomain_id() == old_id)
-	elem->subdomain_id() = new_id;
+        elem->subdomain_id() = new_id;
     }
 }
 

@@ -43,7 +43,7 @@ class MeshData;
 // ------------------------------------------------------------
 // LegacyXdrIO class definition
 class LegacyXdrIO : public MeshInput<MeshBase>,
-	            public MeshOutput<MeshBase>
+  public MeshOutput<MeshBase>
 {
 
  public:
@@ -114,8 +114,8 @@ class LegacyXdrIO : public MeshInput<MeshBase>,
    * deprecated at any time.
    */
   void read_mgf_soln (const std::string& name,
-		      std::vector<Number>& soln,
-		      std::vector<std::string>& var_names) const;
+                      std::vector<Number>& soln,
+                      std::vector<std::string>& var_names) const;
 
   /**
    * Write solutions in mgflo's XDR format.
@@ -127,8 +127,8 @@ class LegacyXdrIO : public MeshInput<MeshBase>,
    * deprecated at any time.
    */
   void write_mgf_soln (const std::string& name,
-		       std::vector<Number>& soln,
-		       std::vector<std::string>& var_names) const;
+                       std::vector<Number>& soln,
+                       std::vector<std::string>& var_names) const;
 
   /**
    * Set the flag indicating if we should read/write binary.
@@ -185,28 +185,28 @@ class LegacyXdrIO : public MeshInput<MeshBase>,
    * Implements reading either a binary \p XDR or ASCII \p XDA mesh.
    */
   void read_mesh (const std::string&,
-		  const LegacyXdrIO::FileFormat = LegacyXdrIO::LIBM,
-		  MeshData* = NULL);
+                  const LegacyXdrIO::FileFormat = LegacyXdrIO::LIBM,
+                  MeshData* = NULL);
 
   /**
    * Implements writing either a binary \p XDR or ASCII \p XDA mesh.
    */
   void write_mesh (const std::string&,
-		   const LegacyXdrIO::FileFormat = LegacyXdrIO::LIBM);
+                   const LegacyXdrIO::FileFormat = LegacyXdrIO::LIBM);
 
   /**
    * Implements reading either a binary or ASCII MGF solution.
    */
   void read_soln  (const std::string&,
-		   std::vector<Real>&,
-		   std::vector<std::string>&) const;
+                   std::vector<Real>&,
+                   std::vector<std::string>&) const;
 
   /**
    * Implements writing either a binary or ASCII MGF solution.
    */
   void write_soln (const std::string& name,
-		   std::vector<Real>& soln,
-		   std::vector<std::string>&) const;
+                   std::vector<Real>& soln,
+                   std::vector<std::string>&) const;
 
   //-------------------------------------------------------------
   // local data

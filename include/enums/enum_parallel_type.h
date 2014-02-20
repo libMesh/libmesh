@@ -34,10 +34,10 @@ namespace libMeshEnums {
    */
   enum ParallelType {AUTOMATIC=0,
                      SERIAL,
-		     PARALLEL,
-		     GHOSTED,
+                     PARALLEL,
+                     GHOSTED,
 
-		     INVALID_PARALLELIZATION};
+                     INVALID_PARALLELIZATION};
 }
 
 using namespace libMeshEnums;

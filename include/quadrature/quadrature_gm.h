@@ -105,7 +105,7 @@ class QGrundmann_Moller : public QBase
    * Constructor.  Declares the order of the quadrature rule.
    */
   QGrundmann_Moller (const unsigned int _dim,
-		     const Order _order=INVALID_ORDER);
+                     const Order _order=INVALID_ORDER);
 
   /**
    * Destructor.
@@ -121,7 +121,7 @@ class QGrundmann_Moller : public QBase
  private:
 
   void init_1D (const ElemType,
-		unsigned int =0)
+                unsigned int =0)
   {
     // See about making this non-pure virtual in the base class
     libmesh_error();
@@ -132,7 +132,7 @@ class QGrundmann_Moller : public QBase
    * for simplexes are available.
    */
   void init_3D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
 
   /**
    * This routine is called from the different cases of init_3D().
@@ -147,8 +147,8 @@ class QGrundmann_Moller : public QBase
    * the gm_rule() routine, you should not call this yourself!
    */
   void compose_all(unsigned int s, // number to be compositioned
-		   unsigned int p, // # of partitions
-		   std::vector<std::vector<unsigned int> >& result);
+                   unsigned int p, // # of partitions
+                   std::vector<std::vector<unsigned int> >& result);
 
 };
 

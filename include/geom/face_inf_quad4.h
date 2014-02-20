@@ -98,14 +98,14 @@ public:
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge (== is_node_on_side in 2D)
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const
+                               const unsigned int e) const
   { return this->is_node_on_side(n,e); }
 
   /**
@@ -118,17 +118,17 @@ public:
    * the sides 1, 2.
    */
   AutoPtr<Elem> build_side (const unsigned int i,
-			    bool proxy) const;
+                            bool proxy) const;
 
   virtual void connectivity(const unsigned int sf,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
 //   void tecplot_connectivity(const unsigned int sf,
-// 			    std::vector<unsigned int>& conn) const;
+//     std::vector<unsigned int>& conn) const;
 
 //   void vtk_connectivity(const unsigned int sc,
-// 			std::vector<unsigned int>*conn = NULL) const;
+// std::vector<unsigned int>*conn = NULL) const;
 
 //   unsigned int vtk_element_type (const unsigned int) const
 //   { return 9; }
@@ -163,8 +163,8 @@ protected:
    * Matrix used to create the elements children.
    */
   float embedding_matrix (const unsigned int i,
-			  const unsigned int j,
-			  const unsigned int k) const
+                          const unsigned int j,
+                          const unsigned int k) const
   { return _embedding_matrix[i][j][k]; }
 
   /**

@@ -48,7 +48,7 @@ class BoundaryMesh : public Mesh
    */
   explicit
   BoundaryMesh (const Parallel::Communicator &comm,
-		unsigned int dim=1);
+                unsigned int dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**

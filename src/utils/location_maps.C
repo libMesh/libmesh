@@ -138,8 +138,8 @@ T* LocationMap<T>::find(const Point& p,
     if (p.absolute_fuzzy_equals
          (this->point_of(*(pos.first->second)), tol))
       {
-	STOP_LOG("find()","LocationMap");
-	return pos.first->second;
+        STOP_LOG("find()","LocationMap");
+        return pos.first->second;
       }
     else
       ++pos.first;
@@ -154,16 +154,16 @@ T* LocationMap<T>::find(const Point& p,
               std::pair<typename map_type::iterator,
                         typename map_type::iterator>
                 key_pos = _map.equal_range(pointkey +
-				       xoffset*chunkmax*chunkmax +
-				       yoffset*chunkmax +
-				       zoffset);
+                                           xoffset*chunkmax*chunkmax +
+                                           yoffset*chunkmax +
+                                           zoffset);
               while (key_pos.first != key_pos.second)
                 if (p.absolute_fuzzy_equals
                      (this->point_of(*(key_pos.first->second)), tol))
-		  {
-		    STOP_LOG("find()","LocationMap");
-		    return key_pos.first->second;
-		  }
+                  {
+                    STOP_LOG("find()","LocationMap");
+                    return key_pos.first->second;
+                  }
                 else
                   ++key_pos.first;
             }

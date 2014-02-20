@@ -103,45 +103,45 @@ void UnsteadySolver::solve ()
   if (reduce_deltat_on_diffsolver_failure)
     {
       bool backtracking_failed =
-	solve_result & DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
+        solve_result & DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
 
       bool max_iterations =
-	solve_result & DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
+        solve_result & DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
 
       if (backtracking_failed || max_iterations)
-	{
-	  // Cut timestep in half
-	  for (unsigned int nr=0; nr<reduce_deltat_on_diffsolver_failure; ++nr)
-	    {
-	      _system.deltat *= 0.5;
-	      libMesh::out << "Newton backtracking failed.  Trying with smaller timestep, dt="
-			    << _system.deltat << std::endl;
+        {
+          // Cut timestep in half
+          for (unsigned int nr=0; nr<reduce_deltat_on_diffsolver_failure; ++nr)
+            {
+              _system.deltat *= 0.5;
+              libMesh::out << "Newton backtracking failed.  Trying with smaller timestep, dt="
+                           << _system.deltat << std::endl;
 
-	      solve_result = _diff_solver->solve();
+              solve_result = _diff_solver->solve();
 
-	      // Check solve results with reduced timestep
-	      bool backtracking_still_failed =
-		solve_result & DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
+              // Check solve results with reduced timestep
+              bool backtracking_still_failed =
+                solve_result & DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
 
-	      bool backtracking_max_iterations =
-		solve_result & DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
+              bool backtracking_max_iterations =
+                solve_result & DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
 
-	      if (!backtracking_still_failed && !backtracking_max_iterations)
-		{
-		  if (!quiet)
-		    libMesh::out << "Reduced dt solve succeeded." << std::endl;
-		  return;
-		}
-	    }
+              if (!backtracking_still_failed && !backtracking_max_iterations)
+                {
+                  if (!quiet)
+                    libMesh::out << "Reduced dt solve succeeded." << std::endl;
+                  return;
+                }
+            }
 
-	  // If we made it here, we still couldn't converge the solve after
-	  // reducing deltat
-	  libMesh::out << "DiffSolver::solve() did not succeed after "
-		        << reduce_deltat_on_diffsolver_failure
-		        << " attempts." << std::endl;
-	  libmesh_convergence_failure();
+          // If we made it here, we still couldn't converge the solve after
+          // reducing deltat
+          libMesh::out << "DiffSolver::solve() did not succeed after "
+                       << reduce_deltat_on_diffsolver_failure
+                       << " attempts." << std::endl;
+          libmesh_convergence_failure();
 
-  	} // end if (backtracking_failed || max_iterations)
+        } // end if (backtracking_failed || max_iterations)
     } // end if (reduce_deltat_on_diffsolver_failure)
 }
 

@@ -98,10 +98,10 @@ struct CompareTypes<std::complex<T>, T> {
 // with older compilers
 
 #define CompareTypes_super(a,b,super) \
-	template<> \
-	struct CompareTypes<a, b> { \
-	  typedef super supertype; \
-	}
+  template<>                          \
+    struct CompareTypes<a, b> {       \
+    typedef super supertype;          \
+  }
 
 #define SUPERTYPE(mysub,mysuper) \
         CompareTypes_super(mysub, mysuper, mysuper); \

@@ -80,7 +80,7 @@ void QBase::init_0D(const ElemType,
 
 
 void QBase::scale(std::pair<Real, Real> old_range,
-		  std::pair<Real, Real> new_range)
+                  std::pair<Real, Real> new_range)
 {
   // Make sure we are in 1D
   libmesh_assert_equal_to (_dim, 1);
@@ -96,10 +96,10 @@ void QBase::scale(std::pair<Real, Real> old_range,
   for (unsigned int i=0; i<_points.size(); i++)
     {
       _points[i](0) =
-	(_points[i](0) - old_range.first) *
-	(new_range.second - new_range.first) /
-	(old_range.second - old_range.first) +
-	new_range.first;
+        (_points[i](0) - old_range.first) *
+        (new_range.second - new_range.first) /
+        (old_range.second - old_range.first) +
+        new_range.first;
     }
 
   // Compute the scale factor and scale the weights
@@ -127,12 +127,12 @@ void QBase::tensor_product_quad(const QBase& q1D)
   for (unsigned int j=0; j<np; j++)
     for (unsigned int i=0; i<np; i++)
       {
-	_points[q](0) = q1D.qp(i)(0);
-	_points[q](1) = q1D.qp(j)(0);
+        _points[q](0) = q1D.qp(i)(0);
+        _points[q](1) = q1D.qp(j)(0);
 
-	_weights[q] = q1D.w(i)*q1D.w(j);
+        _weights[q] = q1D.w(i)*q1D.w(j);
 
-	q++;
+        q++;
       }
 }
 
@@ -153,15 +153,15 @@ void QBase::tensor_product_hex(const QBase& q1D)
   for (unsigned int k=0; k<np; k++)
     for (unsigned int j=0; j<np; j++)
       for (unsigned int i=0; i<np; i++)
-	{
-	  _points[q](0) = q1D.qp(i)(0);
-	  _points[q](1) = q1D.qp(j)(0);
-	  _points[q](2) = q1D.qp(k)(0);
+        {
+          _points[q](0) = q1D.qp(i)(0);
+          _points[q](1) = q1D.qp(j)(0);
+          _points[q](2) = q1D.qp(k)(0);
 
-	  _weights[q] = q1D.w(i) * q1D.w(j) * q1D.w(k);
+          _weights[q] = q1D.w(i) * q1D.w(j) * q1D.w(k);
 
-	  q++;
-	}
+          q++;
+        }
 }
 
 
@@ -180,13 +180,13 @@ void QBase::tensor_product_prism(const QBase& q1D, const QBase& q2D)
   for (unsigned int j=0; j<n_points1D; j++)
     for (unsigned int i=0; i<n_points2D; i++)
       {
-	_points[q](0) = q2D.qp(i)(0);
-	_points[q](1) = q2D.qp(i)(1);
-	_points[q](2) = q1D.qp(j)(0);
+        _points[q](0) = q2D.qp(i)(0);
+        _points[q](1) = q2D.qp(i)(1);
+        _points[q](2) = q1D.qp(j)(0);
 
-	_weights[q] = q2D.w(i) * q1D.w(j);
+        _weights[q] = q2D.w(i) * q1D.w(j);
 
-	q++;
+        q++;
       }
 
 }

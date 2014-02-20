@@ -30,39 +30,39 @@ namespace libMeshEnums {
    */
                  // vanilla C0
   enum FEFamily {LAGRANGE     = 0,
-		 HIERARCHIC   = 1,
+                 HIERARCHIC   = 1,
 
-		 // discontinuous, in local coordinates
-		 MONOMIAL      = 2,
+                 // discontinuous, in local coordinates
+                 MONOMIAL      = 2,
                  L2_HIERARCHIC = 6,
                  L2_LAGRANGE   = 7,
 
-		 // higher-order
-		 BERNSTEIN    = 3,
-		 SZABAB       = 4,
+                 // higher-order
+                 BERNSTEIN    = 3,
+                 SZABAB       = 4,
 
-		 // discontinuous, in global coordinates
-		 XYZ          = 5,
+                 // discontinuous, in global coordinates
+                 XYZ          = 5,
 
-		 // infinite element stuff
-		 INFINITE_MAP = 11,     //   for 1/r-map
-		 JACOBI_20_00 = 12,     //   i_max = 19
+                 // infinite element stuff
+                 INFINITE_MAP = 11,     //   for 1/r-map
+                 JACOBI_20_00 = 12,     //   i_max = 19
                  JACOBI_30_00 = 13,     //   i_max = 19
-		 LEGENDRE     = 14,     //   i_max = 19
+                 LEGENDRE     = 14,     //   i_max = 19
 
-		 // C1 elements
-		 CLOUGH       = 21,
-		 HERMITE      = 22,
+                 // C1 elements
+                 CLOUGH       = 21,
+                 HERMITE      = 22,
 
                  // A scalar variable that couples to
                  // all other DOFs in the system
-		 SCALAR       = 31,
+                 SCALAR       = 31,
 
-		 // Vector-valued elements
-		 LAGRANGE_VEC = 41,
-		 NEDELEC_ONE  = 42,
+                 // Vector-valued elements
+                 LAGRANGE_VEC = 41,
+                 NEDELEC_ONE  = 42,
 
-		 INVALID_FE   = 99};
+                 INVALID_FE   = 99};
 
   /**
    * \enum libMeshEnums::FEContinuity defines an \p enum for finite element
@@ -70,15 +70,15 @@ namespace libMeshEnums {
    */
   enum FEContinuity {DISCONTINUOUS,
                      C_ZERO,
-		     C_ONE,
-		     H_CURL};
+                     C_ONE,
+                     H_CURL};
 
   /**
    * \enum libMeshEnums::FEFieldType defines an \p enum for finite element
    * field types - i.e. is it a scalar element, vector, tensor, etc.
    */
   enum FEFieldType {TYPE_SCALAR = 0,
-		    TYPE_VECTOR};
+                    TYPE_VECTOR};
 
 }
 

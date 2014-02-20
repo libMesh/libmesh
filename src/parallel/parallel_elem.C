@@ -51,7 +51,7 @@ namespace Parallel
 
 template <>
 unsigned int packed_size (const Elem*,
-			  std::vector<largest_id_type>::const_iterator in)
+                          std::vector<largest_id_type>::const_iterator in)
 {
 #ifndef NDEBUG
   const largest_id_type packed_header = *in++;
@@ -89,19 +89,19 @@ unsigned int packed_size (const Elem*,
     {
       for (unsigned int s = 0; s != n_sides; ++s)
         {
-	  const int n_bcs =
-	    *(in + pre_indexing_size + indexing_size +
-	      total_packed_bc_data++);
-	  libmesh_assert_greater_equal (n_bcs, 0);
+          const int n_bcs =
+            *(in + pre_indexing_size + indexing_size +
+              total_packed_bc_data++);
+          libmesh_assert_greater_equal (n_bcs, 0);
           total_packed_bc_data += n_bcs;
         }
 
       for (unsigned int e = 0; e != n_edges; ++e)
         {
-	  const int n_bcs =
-	    *(in + pre_indexing_size + indexing_size +
-	      total_packed_bc_data++);
-	  libmesh_assert_greater_equal (n_bcs, 0);
+          const int n_bcs =
+            *(in + pre_indexing_size + indexing_size +
+              total_packed_bc_data++);
+          libmesh_assert_greater_equal (n_bcs, 0);
           total_packed_bc_data += n_bcs;
         }
     }
@@ -117,7 +117,7 @@ unsigned int packed_size (const Elem*,
 
 template <>
 unsigned int packed_size (const Elem* e,
-			  std::vector<largest_id_type>::iterator in)
+                          std::vector<largest_id_type>::iterator in)
 {
   return packed_size(e, std::vector<largest_id_type>::const_iterator(in));
 }
@@ -143,7 +143,7 @@ unsigned int packable_size (const Elem* elem, const MeshBase* mesh)
 #ifndef NDEBUG
          1 + // add an int for the magic header when testing
 #endif
-	 header_size + elem->n_nodes() +
+    header_size + elem->n_nodes() +
          elem->n_neighbors() +
          elem->packed_indexing_size() + total_packed_bcs;
 }
@@ -232,11 +232,11 @@ void pack (const Elem* elem,
   elem->pack_indexing(std::back_inserter(data));
 
   libmesh_assert(elem->packed_indexing_size() ==
-		 DofObject::unpackable_indexing_size(data.begin() +
-						     start_indices));
+                 DofObject::unpackable_indexing_size(data.begin() +
+                                                     start_indices));
 
   libmesh_assert_equal_to (elem->packed_indexing_size(),
-		          data.size() - start_indices);
+                           data.size() - start_indices);
 
 
   // If this is a coarse element,
@@ -410,17 +410,17 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
           const dof_id_type neighbor_id =
             static_cast<dof_id_type>(*in++);
 
-	  // If the sending processor sees a domain boundary here,
-	  // we'd better agree.
+          // If the sending processor sees a domain boundary here,
+          // we'd better agree.
           if (neighbor_id == DofObject::invalid_id)
             {
               libmesh_assert (!(elem->neighbor(n)));
               continue;
             }
 
-	  // If the sending processor has a remote_elem neighbor here,
-	  // then all we know is that we'd better *not* have a domain
-	  // boundary.
+          // If the sending processor has a remote_elem neighbor here,
+          // then all we know is that we'd better *not* have a domain
+          // boundary.
           if (neighbor_id == remote_elem->id())
             {
               libmesh_assert(elem->neighbor(n));
@@ -440,22 +440,22 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
 
           // The sending processor has a neighbor here, and we have
           // that element, but that does *NOT* mean we're already
-	  // linking to it.  Perhaps we initially received both elem
-	  // and neigh from processors on which their mutual link was
-	  // remote?
+          // linking to it.  Perhaps we initially received both elem
+          // and neigh from processors on which their mutual link was
+          // remote?
           libmesh_assert(elem->neighbor(n) == neigh ||
-			 elem->neighbor(n) == remote_elem);
+                         elem->neighbor(n) == remote_elem);
 
-	  // If the link was originally remote, we should update it,
-	  // and make sure the appropriate parts of its family link
-	  // back to us.
-	  if (elem->neighbor(n) == remote_elem)
+          // If the link was originally remote, we should update it,
+          // and make sure the appropriate parts of its family link
+          // back to us.
+          if (elem->neighbor(n) == remote_elem)
             {
               elem->set_neighbor(n, neigh);
 
               elem->make_links_to_me_local(n);
-	    }
-	}
+            }
+        }
 
       // FIXME: We should add some debug mode tests to ensure that the
       // encoded indexing and boundary conditions are consistent.
@@ -470,10 +470,10 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
       // Find a child element's parent
       if (level > 0)
         {
-	  // Note that we must be very careful to construct the send
-	  // connectivity so that parents are encountered before
-	  // children.  If we get here and can't find the parent that
-	  // is a fatal error.
+          // Note that we must be very careful to construct the send
+          // connectivity so that parents are encountered before
+          // children.  If we get here and can't find the parent that
+          // is a fatal error.
           parent = mesh->elem(parent_id);
         }
       // Or assert that the sending processor sees no parent
@@ -526,7 +526,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
       for (unsigned int n=0; n != n_nodes; n++)
         elem->set_node(n) =
           mesh->node_ptr
-	    (static_cast<dof_id_type>(*in++));
+          (static_cast<dof_id_type>(*in++));
 
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
         {
@@ -534,7 +534,7 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
             static_cast<dof_id_type>(*in++);
 
           if (neighbor_id == DofObject::invalid_id)
-	    continue;
+            continue;
 
           // We may be unpacking an element that was a ghost element on the
           // sender, in which case the element's neighbors may not all be
@@ -544,8 +544,8 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
           if (neighbor_id == remote_elem->id())
             {
               elem->set_neighbor(n, const_cast<RemoteElem*>(remote_elem));
-	      continue;
-	    }
+              continue;
+            }
 
           // If we don't have the neighbor element, then it's a
           // remote_elem until we get it.
@@ -553,8 +553,8 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
           if (!neigh)
             {
               elem->set_neighbor(n, const_cast<RemoteElem*>(remote_elem));
-	      continue;
-	    }
+              continue;
+            }
 
           // If we have the neighbor element, then link to it, and
           // make sure the appropriate parts of its family link back

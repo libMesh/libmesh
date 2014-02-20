@@ -71,7 +71,7 @@ protected:
    * entries to 0.
    */
   TypeVector (const T x,
-	      const T y=0,
+              const T y=0,
               const T z=0);
 
 
@@ -81,7 +81,7 @@ protected:
    */
   template <typename Scalar>
   TypeVector (const Scalar x,
-	      const Scalar y=0,
+              const Scalar y=0,
               typename
                 boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
                                        const Scalar>::type z=0);
@@ -374,8 +374,8 @@ TypeVector<T>::TypeVector ()
 template <typename T>
 inline
 TypeVector<T>::TypeVector (const T x,
-	                   const T y,
-	                   const T z)
+                           const T y,
+                           const T z)
 {
   _coords[0] = x;
 
@@ -397,7 +397,7 @@ template <typename T>
 template <typename Scalar>
 inline
 TypeVector<T>::TypeVector (const Scalar x,
-	                   const Scalar y,
+                           const Scalar y,
                            typename
                              boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
                                                     const Scalar>::type z)
@@ -572,13 +572,13 @@ TypeVector<T>::operator - (const TypeVector<T2> &p) const
 
 #if LIBMESH_DIM == 2
   return TypeVector<TS>(_coords[0] - p._coords[0],
-		        _coords[1] - p._coords[1]);
+                        _coords[1] - p._coords[1]);
 #endif
 
 #if LIBMESH_DIM == 3
   return TypeVector<TS>(_coords[0] - p._coords[0],
-		        _coords[1] - p._coords[1],
-		        _coords[2] - p._coords[2]);
+                        _coords[1] - p._coords[1],
+                        _coords[2] - p._coords[2]);
 #endif
 
 }
@@ -630,13 +630,13 @@ TypeVector<T> TypeVector<T>::operator - () const
 
 #if LIBMESH_DIM == 2
   return TypeVector(-_coords[0],
-		    -_coords[1]);
+                    -_coords[1]);
 #endif
 
 #if LIBMESH_DIM == 3
   return TypeVector(-_coords[0],
-		    -_coords[1],
-		    -_coords[2]);
+                    -_coords[1],
+                    -_coords[2]);
 #endif
 
 }
@@ -659,13 +659,13 @@ TypeVector<T>::operator * (const Scalar factor) const
 
 #if LIBMESH_DIM == 2
   return TypeVector<SuperType>(_coords[0]*factor,
-		        _coords[1]*factor);
+                               _coords[1]*factor);
 #endif
 
 #if LIBMESH_DIM == 3
   return TypeVector<SuperType>(_coords[0]*factor,
-		        _coords[1]*factor,
-		        _coords[2]*factor);
+                               _coords[1]*factor,
+                               _coords[2]*factor);
 #endif
 }
 
@@ -726,13 +726,13 @@ TypeVector<T>::operator / (const Scalar factor) const
 
 #if LIBMESH_DIM == 2
   return TypeVector<TS>(_coords[0]/factor,
-		        _coords[1]/factor);
+                        _coords[1]/factor);
 #endif
 
 #if LIBMESH_DIM == 3
   return TypeVector<TS>(_coords[0]/factor,
-		        _coords[1]/factor,
-		        _coords[2]/factor);
+                        _coords[1]/factor,
+                        _coords[2]/factor);
 #endif
 
 }
@@ -768,13 +768,13 @@ TypeVector<T>::operator * (const TypeVector<T2> &p) const
 
 #if LIBMESH_DIM == 2
   return (_coords[0]*p._coords[0] +
-	  _coords[1]*p._coords[1]);
+          _coords[1]*p._coords[1]);
 #endif
 
 #if LIBMESH_DIM == 3
   return (_coords[0]*p(0) +
-	  _coords[1]*p(1) +
-	  _coords[2]*p(2));
+          _coords[1]*p(1) +
+          _coords[2]*p(2));
 #endif
 }
 
@@ -837,13 +837,13 @@ Real TypeVector<T>::size_sq() const
 
 #if LIBMESH_DIM == 2
   return (TensorTools::norm_sq(_coords[0]) +
-	  TensorTools::norm_sq(_coords[1]));
+          TensorTools::norm_sq(_coords[1]));
 #endif
 
 #if LIBMESH_DIM == 3
   return (TensorTools::norm_sq(_coords[0]) +
-	  TensorTools::norm_sq(_coords[1]) +
-	  TensorTools::norm_sq(_coords[2]));
+          TensorTools::norm_sq(_coords[1]) +
+          TensorTools::norm_sq(_coords[2]));
 #endif
 }
 
@@ -855,20 +855,20 @@ bool TypeVector<T>::absolute_fuzzy_equals(const TypeVector<T>& rhs, Real tol) co
 {
 #if LIBMESH_DIM == 1
   return (std::abs(_coords[0] - rhs._coords[0])
-	  <= tol);
+          <= tol);
 #endif
 
 #if LIBMESH_DIM == 2
   return (std::abs(_coords[0] - rhs._coords[0]) +
-	  std::abs(_coords[1] - rhs._coords[1])
-	  <= tol);
+          std::abs(_coords[1] - rhs._coords[1])
+          <= tol);
 #endif
 
 #if LIBMESH_DIM == 3
   return (std::abs(_coords[0] - rhs._coords[0]) +
-	  std::abs(_coords[1] - rhs._coords[1]) +
-	  std::abs(_coords[2] - rhs._coords[2])
-	  <= tol);
+          std::abs(_coords[1] - rhs._coords[1]) +
+          std::abs(_coords[2] - rhs._coords[2])
+          <= tol);
 #endif
 }
 
@@ -880,20 +880,20 @@ bool TypeVector<T>::relative_fuzzy_equals(const TypeVector<T>& rhs, Real tol) co
 {
 #if LIBMESH_DIM == 1
   return this->absolute_fuzzy_equals(rhs, tol *
-				     (std::abs(_coords[0]) + std::abs(rhs._coords[0])));
+                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0])));
 #endif
 
 #if LIBMESH_DIM == 2
   return this->absolute_fuzzy_equals(rhs, tol *
-				     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
-				      std::abs(_coords[1]) + std::abs(rhs._coords[1])));
+                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
+                                      std::abs(_coords[1]) + std::abs(rhs._coords[1])));
 #endif
 
 #if LIBMESH_DIM == 3
   return this->absolute_fuzzy_equals(rhs, tol *
-				     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
-				      std::abs(_coords[1]) + std::abs(rhs._coords[1]) +
-				      std::abs(_coords[2]) + std::abs(rhs._coords[2])));
+                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
+                                      std::abs(_coords[1]) + std::abs(rhs._coords[1]) +
+                                      std::abs(_coords[2]) + std::abs(rhs._coords[2])));
 #endif
 }
 
@@ -909,13 +909,13 @@ bool TypeVector<T>::operator == (const TypeVector<T>& rhs) const
 
 #if LIBMESH_DIM == 2
   return (_coords[0] == rhs._coords[0] &&
-	  _coords[1] == rhs._coords[1]);
+          _coords[1] == rhs._coords[1]);
 #endif
 
 #if LIBMESH_DIM == 3
   return (_coords[0] == rhs._coords[0] &&
-	  _coords[1] == rhs._coords[1] &&
-	  _coords[2] == rhs._coords[2]);
+          _coords[1] == rhs._coords[1] &&
+          _coords[2] == rhs._coords[2]);
 #endif
 }
 

@@ -122,7 +122,7 @@ Real StatisticsVector<T>::median()
   else
     {
       the_median = ( static_cast<Real>((*this)[lhs]) +
-		 static_cast<Real>((*this)[rhs]) ) / 2.0;
+                     static_cast<Real>((*this)[rhs]) ) / 2.0;
     }
 
   STOP_LOG ("median()", "StatisticsVector");
@@ -157,7 +157,7 @@ Real StatisticsVector<T>::variance(const Real mean_in) const
     {
       const Real delta = ( static_cast<Real>((*this)[i]) - mean_in );
       the_variance += (delta * delta - the_variance) /
-		    static_cast<Real>(i + 1);
+        static_cast<Real>(i + 1);
     }
 
   if (n > 1)
@@ -187,7 +187,7 @@ template <typename T>
 
 template <typename T>
 void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
-				    unsigned int n_bins)
+                                    unsigned int n_bins)
 {
   // Must have at least 1 bin
   libmesh_assert (n_bins>0);
@@ -222,53 +222,53 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
       // libMesh::out << "(debug) Filling bin " << j << std::endl;
 
       for (dof_id_type i=data_index; i<n; i++) // data vector indexing
-	{
-	  //	libMesh::out << "(debug) Processing index=" << i << std::endl;
-	  Real current_val = static_cast<Real>( (*this)[i] );
+        {
+          //libMesh::out << "(debug) Processing index=" << i << std::endl;
+          Real current_val = static_cast<Real>( (*this)[i] );
 
-	  // There may be entries in the vector smaller than the value
-	  // reported by this->minimum().  (e.g. inactive elements in an
-	  // ErrorVector.)  We just skip entries like that.
-	  if ( current_val < min )
-	    {
-	      // 	    libMesh::out << "(debug) Skipping entry v[" << i << "]="
-	      // 		      << (*this)[i]
-	      // 		      << " which is less than the min value: min="
-	      // 		      << min << std::endl;
-	      continue;
-	    }
+          // There may be entries in the vector smaller than the value
+          // reported by this->minimum().  (e.g. inactive elements in an
+          // ErrorVector.)  We just skip entries like that.
+          if ( current_val < min )
+            {
+              //     libMesh::out << "(debug) Skipping entry v[" << i << "]="
+              //       << (*this)[i]
+              //       << " which is less than the min value: min="
+              //       << min << std::endl;
+              continue;
+            }
 
-	  if ( current_val > bin_bounds[j+1] ) // if outside the current bin (bin[j] is bounded
-	                                       // by bin_bounds[j] and bin_bounds[j+1])
-	    {
-	      // libMesh::out.precision(16);
-	      // 	    libMesh::out.setf(std::ios_base::fixed);
-	      // 	    libMesh::out << "(debug) (*this)[i]= " << (*this)[i]
-	      // 		      << " is greater than bin_bounds[j+1]="
-	      //		      << bin_bounds[j+1]	 << std::endl;
-	      data_index = i; // start searching here for next bin
-	      break; // go to next bin
-	    }
+          if ( current_val > bin_bounds[j+1] ) // if outside the current bin (bin[j] is bounded
+            // by bin_bounds[j] and bin_bounds[j+1])
+            {
+              // libMesh::out.precision(16);
+              //     libMesh::out.setf(std::ios_base::fixed);
+              //     libMesh::out << "(debug) (*this)[i]= " << (*this)[i]
+              //       << " is greater than bin_bounds[j+1]="
+              //      << bin_bounds[j+1] << std::endl;
+              data_index = i; // start searching here for next bin
+              break; // go to next bin
+            }
 
-	  // Otherwise, increment current bin's count
-	  bin_members[j]++;
-	  // libMesh::out << "(debug) Binned index=" << i << std::endl;
-	}
+          // Otherwise, increment current bin's count
+          bin_members[j]++;
+          // libMesh::out << "(debug) Binned index=" << i << std::endl;
+        }
     }
 
 #ifdef DEBUG
   // Check the number of binned entries
   const dof_id_type n_binned = std::accumulate(bin_members.begin(),
-					       bin_members.end(),
-					       static_cast<dof_id_type>(0),
-					       std::plus<dof_id_type>());
+                                               bin_members.end(),
+                                               static_cast<dof_id_type>(0),
+                                               std::plus<dof_id_type>());
 
   if (n != n_binned)
     {
       libMesh::out << "Warning: The number of binned entries, n_binned="
-		<< n_binned
-		<< ", did not match the total number of entries, n="
-		<< n << "." << std::endl;
+                   << n_binned
+                   << ", did not match the total number of entries, n="
+                   << n << "." << std::endl;
       //libmesh_error();
     }
 #endif
@@ -283,8 +283,8 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
 
 template <typename T>
 void StatisticsVector<T>::plot_histogram(const processor_id_type my_procid,
-					 const std::string& filename,
-					 unsigned int n_bins)
+                                         const std::string& filename,
+                                         unsigned int n_bins)
 {
   // First generate the histogram with the desired number of bins
   std::vector<dof_id_type> bin_members;
@@ -307,16 +307,16 @@ void StatisticsVector<T>::plot_histogram(const processor_id_type my_procid,
       // abscissa values are located at the center of each bin.
       out_stream << "x=[";
       for (unsigned int i=0; i<bin_members.size(); ++i)
-	{
-	  out_stream << min + (i+0.5)*bin_size << " ";
-	}
+        {
+          out_stream << min + (i+0.5)*bin_size << " ";
+        }
       out_stream << "];\n";
 
       out_stream << "y=[";
       for (unsigned int i=0; i<bin_members.size(); ++i)
-	{
-	  out_stream << bin_members[i] << " ";
-	}
+        {
+          out_stream << bin_members[i] << " ";
+        }
       out_stream << "];\n";
       out_stream << "bar(x,y);\n";
     }
@@ -326,7 +326,7 @@ void StatisticsVector<T>::plot_histogram(const processor_id_type my_procid,
 
 template <typename T>
 void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
-				    unsigned int n_bins) const
+                                    unsigned int n_bins) const
 {
   StatisticsVector<T> sv = (*this);
 
@@ -349,9 +349,9 @@ std::vector<dof_id_type> StatisticsVector<T>::cut_below(Real cut) const
   for (dof_id_type i=0; i<n; i++)
     {
       if ((*this)[i] < cut)
-	{
-	  cut_indices.push_back(i);
-	}
+        {
+          cut_indices.push_back(i);
+        }
     }
 
   STOP_LOG ("cut_below()", "StatisticsVector");
@@ -375,9 +375,9 @@ std::vector<dof_id_type> StatisticsVector<T>::cut_above(Real cut) const
   for (dof_id_type i=0; i<n; i++)
     {
       if ((*this)[i] > cut)
-	{
-	  cut_indices.push_back(i);
-	}
+        {
+          cut_indices.push_back(i);
+        }
     }
 
   STOP_LOG ("cut_above()", "StatisticsVector");

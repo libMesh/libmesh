@@ -69,7 +69,7 @@ namespace {
     void operator()(const ConstElemRange &range)
     {
       for (ConstElemRange::const_iterator it = range.begin(); it !=range.end(); ++it)
-	_weight += (*it)->n_nodes();
+        _weight += (*it)->n_nodes();
     }
 
     dof_id_type weight() const
@@ -112,35 +112,35 @@ namespace {
     void operator()(const ConstNodeRange &range)
     {
       for (ConstNodeRange::const_iterator it = range.begin(); it != range.end(); ++it)
-	{
+        {
           const Node *node = *it;
-	  libmesh_assert(node);
+          libmesh_assert(node);
 
-	  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-	    {
-	      _vmin[i] = std::min(_vmin[i], (*node)(i));
-	      _vmax[i] = std::max(_vmax[i], (*node)(i));
-	    }
+          for (unsigned int i=0; i<LIBMESH_DIM; i++)
+            {
+              _vmin[i] = std::min(_vmin[i], (*node)(i));
+              _vmax[i] = std::max(_vmax[i], (*node)(i));
+            }
         }
     }
 
     void operator()(const ConstElemRange &range)
     {
       for (ConstElemRange::const_iterator it = range.begin(); it != range.end(); ++it)
-	{
+        {
           const Elem *elem = *it;
-	  libmesh_assert(elem);
+          libmesh_assert(elem);
 
-	  for (unsigned int n=0; n<elem->n_nodes(); n++)
-	    {
-	      const Point &point = elem->point(n);
+          for (unsigned int n=0; n<elem->n_nodes(); n++)
+            {
+              const Point &point = elem->point(n);
 
-	      for (unsigned int i=0; i<LIBMESH_DIM; i++)
-		{
-		  _vmin[i] = std::min(_vmin[i], point(i));
-		  _vmax[i] = std::max(_vmax[i], point(i));
-		}
-	    }
+              for (unsigned int i=0; i<LIBMESH_DIM; i++)
+                {
+                  _vmin[i] = std::min(_vmin[i], point(i));
+                  _vmax[i] = std::max(_vmax[i], point(i));
+                }
+            }
         }
     }
 
@@ -150,10 +150,10 @@ namespace {
     void join (const FindBBox &other)
     {
       for (unsigned int i=0; i<LIBMESH_DIM; i++)
-	{
-	  _vmin[i] = std::min(_vmin[i], other._vmin[i]);
-	  _vmax[i] = std::max(_vmax[i], other._vmax[i]);
-	}
+        {
+          _vmin[i] = std::min(_vmin[i], other._vmin[i]);
+          _vmax[i] = std::max(_vmax[i], other._vmax[i]);
+        }
     }
 #endif
 
@@ -188,7 +188,7 @@ namespace {
 
 #ifdef DEBUG
   void assert_semiverify_dofobj(const Parallel::Communicator &communicator,
-				const DofObject *d)
+                                const DofObject *d)
     {
       if (d)
         {
@@ -198,7 +198,7 @@ namespace {
           for (unsigned int s = 0; s != n_sys; ++s)
             n_vars[s] = d->n_vars(s);
 
-	  const unsigned int tot_n_vars =
+          const unsigned int tot_n_vars =
             std::accumulate(n_vars.begin(), n_vars.end(), 0);
 
           std::vector<unsigned int> n_comp (tot_n_vars, 0);
@@ -327,8 +327,8 @@ dof_id_type MeshTools::total_weight(const MeshBase& mesh)
   SumElemWeight sew;
 
   Threads::parallel_reduce (ConstElemRange (mesh.elements_begin(),
-					    mesh.elements_end()),
-			    sew);
+                                            mesh.elements_end()),
+                            sew);
   return sew.weight();
 
 }
@@ -340,15 +340,15 @@ dof_id_type MeshTools::weight(const MeshBase& mesh, const processor_id_type pid)
   SumElemWeight sew;
 
   Threads::parallel_reduce (ConstElemRange (mesh.pid_elements_begin(pid),
-					    mesh.pid_elements_end(pid)),
-			    sew);
+                                            mesh.pid_elements_end(pid)),
+                            sew);
   return sew.weight();
 }
 
 
 
 void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
-					 std::vector<std::vector<dof_id_type> >& nodes_to_elem_map)
+                                         std::vector<std::vector<dof_id_type> >& nodes_to_elem_map)
 {
   nodes_to_elem_map.resize (mesh.n_nodes());
 
@@ -358,17 +358,17 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
   for (; el != end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
       {
-	libmesh_assert_less ((*el)->node(n), nodes_to_elem_map.size());
-	libmesh_assert_less ((*el)->id(), mesh.n_elem());
+        libmesh_assert_less ((*el)->node(n), nodes_to_elem_map.size());
+        libmesh_assert_less ((*el)->id(), mesh.n_elem());
 
-	nodes_to_elem_map[(*el)->node(n)].push_back((*el)->id());
+        nodes_to_elem_map[(*el)->node(n)].push_back((*el)->id());
       }
 }
 
 
 
 void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
-					 std::vector<std::vector<const Elem*> >& nodes_to_elem_map)
+                                         std::vector<std::vector<const Elem*> >& nodes_to_elem_map)
 {
   nodes_to_elem_map.resize (mesh.n_nodes());
 
@@ -378,22 +378,22 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
   for (; el != end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
       {
-	libmesh_assert_less ((*el)->node(n), nodes_to_elem_map.size());
+        libmesh_assert_less ((*el)->node(n), nodes_to_elem_map.size());
 
-	nodes_to_elem_map[(*el)->node(n)].push_back(*el);
+        nodes_to_elem_map[(*el)->node(n)].push_back(*el);
       }
 }
 
 
 
 void MeshTools::find_boundary_nodes (const MeshBase& mesh,
-				     std::vector<bool>& on_boundary)
+                                     std::vector<bool>& on_boundary)
 {
   // Resize the vector which holds boundary nodes and fill with false.
   on_boundary.resize(mesh.n_nodes());
   std::fill(on_boundary.begin(),
-	    on_boundary.end(),
-	    false);
+            on_boundary.end(),
+            false);
 
   // Loop over elements, find those on boundary, and
   // mark them as true in on_boundary.
@@ -403,12 +403,12 @@ void MeshTools::find_boundary_nodes (const MeshBase& mesh,
   for (; el != end; ++el)
     for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
       if ((*el)->neighbor(s) == NULL) // on the boundary
-	{
-	  const AutoPtr<Elem> side((*el)->build_side(s));
+        {
+          const AutoPtr<Elem> side((*el)->build_side(s));
 
-	  for (unsigned int n=0; n<side->n_nodes(); n++)
-	    on_boundary[side->node(n)] = true;
-	}
+          for (unsigned int n=0; n<side->n_nodes(); n++)
+            on_boundary[side->node(n)] = true;
+        }
 }
 
 
@@ -422,13 +422,13 @@ MeshTools::bounding_box(const MeshBase& mesh)
   FindBBox find_bbox;
 
   Threads::parallel_reduce (ConstNodeRange (mesh.local_nodes_begin(),
-					    mesh.local_nodes_end()),
-			    find_bbox);
+                                            mesh.local_nodes_end()),
+                            find_bbox);
 
   // and the unpartitioned nodes
   Threads::parallel_reduce (ConstNodeRange (mesh.pid_nodes_begin(DofObject::invalid_processor_id),
-					    mesh.pid_nodes_end(DofObject::invalid_processor_id)),
-			    find_bbox);
+                                            mesh.pid_nodes_end(DofObject::invalid_processor_id)),
+                            find_bbox);
 
   // Compare the bounding boxes across processors
   mesh.comm().min(find_bbox.min());
@@ -454,15 +454,15 @@ MeshTools::bounding_sphere(const MeshBase& mesh)
 
 MeshTools::BoundingBox
 MeshTools::processor_bounding_box (const MeshBase& mesh,
-				   const processor_id_type pid)
+                                   const processor_id_type pid)
 {
   libmesh_assert_less (pid, mesh.n_processors());
 
   FindBBox find_bbox;
 
   Threads::parallel_reduce (ConstElemRange (mesh.pid_elements_begin(pid),
-					    mesh.pid_elements_end(pid)),
-			    find_bbox);
+                                            mesh.pid_elements_end(pid)),
+                            find_bbox);
 
   return find_bbox.bbox();
 }
@@ -471,7 +471,7 @@ MeshTools::processor_bounding_box (const MeshBase& mesh,
 
 Sphere
 MeshTools::processor_bounding_sphere (const MeshBase& mesh,
-				      const processor_id_type pid)
+                                      const processor_id_type pid)
 {
   BoundingBox bbox = processor_bounding_box(mesh,pid);
 
@@ -485,7 +485,7 @@ MeshTools::processor_bounding_sphere (const MeshBase& mesh,
 
 MeshTools::BoundingBox
 MeshTools::subdomain_bounding_box (const MeshBase& mesh,
-				   const subdomain_id_type sid)
+                                   const subdomain_id_type sid)
 {
   libmesh_assert_not_equal_to (mesh.n_nodes(), 0);
 
@@ -495,11 +495,11 @@ MeshTools::subdomain_bounding_box (const MeshBase& mesh,
   for (unsigned int e=0; e<mesh.n_elem(); e++)
     if (mesh.elem(e)->subdomain_id() == sid)
       for (unsigned int n=0; n<mesh.elem(e)->n_nodes(); n++)
-	for (unsigned int i=0; i<mesh.spatial_dimension(); i++)
-	  {
-	    min(i) = std::min(min(i), mesh.point(mesh.elem(e)->node(n))(i));
-	    max(i) = std::max(max(i), mesh.point(mesh.elem(e)->node(n))(i));
-	  }
+        for (unsigned int i=0; i<mesh.spatial_dimension(); i++)
+          {
+            min(i) = std::min(min(i), mesh.point(mesh.elem(e)->node(n))(i));
+            max(i) = std::max(max(i), mesh.point(mesh.elem(e)->node(n))(i));
+          }
 
   return BoundingBox (min, max);
 }
@@ -508,7 +508,7 @@ MeshTools::subdomain_bounding_box (const MeshBase& mesh,
 
 Sphere
 MeshTools::subdomain_bounding_sphere (const MeshBase& mesh,
-				      const subdomain_id_type sid)
+                                      const subdomain_id_type sid)
 {
   BoundingBox bbox = subdomain_bounding_box(mesh,sid);
 
@@ -521,7 +521,7 @@ MeshTools::subdomain_bounding_sphere (const MeshBase& mesh,
 
 
 void MeshTools::elem_types (const MeshBase& mesh,
-			    std::vector<ElemType>& et)
+                            std::vector<ElemType>& et)
 {
   MeshBase::const_element_iterator       el  = mesh.elements_begin();
   const MeshBase::const_element_iterator end = mesh.elements_end();
@@ -540,19 +540,19 @@ void MeshTools::elem_types (const MeshBase& mesh,
 
 
 dof_id_type MeshTools::n_elem_of_type (const MeshBase& mesh,
-				       const ElemType type)
+                                       const ElemType type)
 {
   return static_cast<dof_id_type>(std::distance(mesh.type_elements_begin(type),
-						mesh.type_elements_end  (type)));
+                                                mesh.type_elements_end  (type)));
 }
 
 
 
 dof_id_type MeshTools::n_active_elem_of_type (const MeshBase& mesh,
-					      const ElemType type)
+                                              const ElemType type)
 {
   return static_cast<dof_id_type>(std::distance(mesh.active_type_elements_begin(type),
-						mesh.active_type_elements_end  (type)));
+                                                mesh.active_type_elements_end  (type)));
 }
 
 dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase& mesh,
@@ -668,7 +668,7 @@ dof_id_type MeshTools::n_elem (const MeshBase::const_element_iterator &begin,
 
 
 dof_id_type MeshTools::n_nodes (const MeshBase::const_node_iterator &begin,
-				const MeshBase::const_node_iterator &end)
+                                const MeshBase::const_node_iterator &end)
 {
   return std::distance(begin, end);
 }
@@ -989,18 +989,18 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &mesh)
       const Elem *elem = *el;
 
       if (elem->refinement_flag() == Elem::JUST_REFINED ||
-	  elem->refinement_flag() == Elem::INACTIVE)
+          elem->refinement_flag() == Elem::INACTIVE)
         continue;
 
       if (elem->has_dofs())
         libmesh_assert(elem->old_dof_object);
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
-	{
+        {
           const Node *node = elem->get_node(n);
-	  if (node->has_dofs())
+          if (node->has_dofs())
             libmesh_assert(elem->get_node(n)->old_dof_object);
-	}
+        }
     }
 #endif // LIBMESH_ENABLE_AMR
 }
@@ -1017,16 +1017,16 @@ void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase &mesh)
       const Elem* elem = *el;
       libmesh_assert (elem);
       while (elem)
-	{
-	  elem->libmesh_assert_valid_node_pointers();
+        {
+          elem->libmesh_assert_valid_node_pointers();
           for (unsigned int n=0; n != elem->n_neighbors(); ++n)
             if (elem->neighbor(n) &&
                 elem->neighbor(n) != remote_elem)
-	      elem->neighbor(n)->libmesh_assert_valid_node_pointers();
+              elem->neighbor(n)->libmesh_assert_valid_node_pointers();
 
           libmesh_assert_not_equal_to (elem->parent(), remote_elem);
-	  elem = elem->parent();
-	}
+          elem = elem->parent();
+        }
     }
 }
 
@@ -1041,15 +1041,15 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase &mesh)
       const Elem* elem = *el;
       libmesh_assert (elem);
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-	libmesh_assert_not_equal_to (elem->neighbor(n), remote_elem);
+        libmesh_assert_not_equal_to (elem->neighbor(n), remote_elem);
 #ifdef LIBMESH_ENABLE_AMR
       const Elem* parent = elem->parent();
       if (parent)
-	{
+        {
           libmesh_assert_not_equal_to (parent, remote_elem);
           for (unsigned int c=0; c != elem->n_children(); ++c)
-	    libmesh_assert_not_equal_to (parent->child(c), remote_elem);
-	}
+            libmesh_assert_not_equal_to (parent->child(c), remote_elem);
+        }
 #endif
     }
 }
@@ -1067,11 +1067,11 @@ void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase &mesh,
       libmesh_assert (elem);
       libmesh_assert_not_equal_to (elem->parent(), bad_elem);
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-	libmesh_assert_not_equal_to (elem->neighbor(n), bad_elem);
+        libmesh_assert_not_equal_to (elem->neighbor(n), bad_elem);
 #ifdef LIBMESH_ENABLE_AMR
       if (elem->has_children())
         for (unsigned int c=0; c != elem->n_children(); ++c)
-	  libmesh_assert_not_equal_to (elem->child(c), bad_elem);
+          libmesh_assert_not_equal_to (elem->child(c), bad_elem);
 #endif
     }
 }
@@ -1168,14 +1168,14 @@ void libmesh_assert_valid_dof_ids(const MeshBase &mesh)
 
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     assert_semiverify_dofobj(mesh.comm(),
-			     mesh.query_elem(i));
+                             mesh.query_elem(i));
 
   dof_id_type pmax_node_id = mesh.max_node_id();
   mesh.comm().max(pmax_node_id);
 
   for (dof_id_type i=0; i != pmax_node_id; ++i)
     assert_semiverify_dofobj(mesh.comm(),
-			     mesh.query_node_ptr(i));
+                             mesh.query_node_ptr(i));
 }
 
 template <>
@@ -1214,7 +1214,7 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
         }
 
       if (min_id == mesh.processor_id())
-	libmesh_assert(elem);
+        libmesh_assert(elem);
     }
 
   // If we're adaptively refining, check processor ids for consistency
@@ -1249,8 +1249,8 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
 
               // If we've got a remote_elem then we don't know whether
               // it's responsible for the parent's processor id; all
-	      // we can do is assume it is and let its processor fail
-	      // an assert if there's something wrong.
+              // we can do is assume it is and let its processor fail
+              // an assert if there's something wrong.
               if (child == remote_elem ||
                   child->processor_id() == parent_procid)
                 matching_child_id = true;
@@ -1299,7 +1299,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
         }
 
       if (min_id == mesh.processor_id())
-	libmesh_assert(node);
+        libmesh_assert(node);
     }
 
   std::vector<bool> node_touched_by_me(parallel_max_node_id, false);

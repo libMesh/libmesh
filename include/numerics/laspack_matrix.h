@@ -76,7 +76,7 @@ public:
    * \p init(...).
    */
   LaspackMatrix (const Parallel::Communicator &comm
-		 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor. Free all memory, but do not
@@ -109,12 +109,12 @@ public:
    * for systems with multiple variables all of the same type.
    */
   void init (const numeric_index_type m,
-	     const numeric_index_type n,
-	     const numeric_index_type m_l,
-	     const numeric_index_type n_l,
-	     const numeric_index_type nnz=30,
-	     const numeric_index_type noz=10,
-	     const numeric_index_type blocksize=1);
+             const numeric_index_type n,
+             const numeric_index_type m_l,
+             const numeric_index_type n_l,
+             const numeric_index_type nnz=30,
+             const numeric_index_type noz=10,
+             const numeric_index_type blocksize=1);
 
   /**
    * Initialize using sparsity structure computed by \p dof_map.
@@ -172,8 +172,8 @@ public:
    * zero values in non-existent fields.
    */
   void set (const numeric_index_type i,
-	    const numeric_index_type j,
-	    const T value);
+            const numeric_index_type j,
+            const T value);
 
   /**
    * Add \p value to the element
@@ -184,8 +184,8 @@ public:
    * non-existent fields.
    */
   void add (const numeric_index_type i,
-	    const numeric_index_type j,
-	    const T value);
+            const numeric_index_type j,
+            const T value);
 
   /**
    * Add the full matrix to the
@@ -195,15 +195,15 @@ public:
    */
 
   void add_matrix (const DenseMatrix<T> &dm,
-		   const std::vector<numeric_index_type> &rows,
-		   const std::vector<numeric_index_type> &cols);
+                   const std::vector<numeric_index_type> &rows,
+                   const std::vector<numeric_index_type> &cols);
 
   /**
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
   void add_matrix (const DenseMatrix<T> &dm,
-		   const std::vector<numeric_index_type> &dof_indices);
+                   const std::vector<numeric_index_type> &dof_indices);
 
   /**
    * Add a Sparse matrix \p X, scaled with \p a, to \p this,
@@ -222,7 +222,7 @@ public:
    * you call this function.
    */
   T operator () (const numeric_index_type i,
-		 const numeric_index_type j) const;
+                 const numeric_index_type j) const;
 
   /**
    * Return the l1-norm of the matrix, that is
@@ -279,7 +279,7 @@ private:
    * storage scheme of the \f$ (i,j) \f$ element.
    */
   numeric_index_type pos (const numeric_index_type i,
-		          const numeric_index_type j) const;
+                          const numeric_index_type j) const;
 
   /**
    *  The Laspack sparse matrix pointer.

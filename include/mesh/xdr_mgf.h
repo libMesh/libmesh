@@ -96,7 +96,7 @@ public:
    */
 
   enum XdrIO_TYPE {UNKNOWN = -1, ENCODE=0, DECODE,
-		   W_ASCII , R_ASCII};
+                   W_ASCII , R_ASCII};
 
 
   /**

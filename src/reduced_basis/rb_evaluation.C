@@ -939,8 +939,8 @@ void RBEvaluation::write_out_vectors(System& sys,
   //               write_binary_vectors ? ENCODE : WRITE);
   //   // set the current version
   //   bf_data.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
-  // 					   LIBMESH_MINOR_VERSION,
-  // 					   LIBMESH_MICRO_VERSION));
+  //    LIBMESH_MINOR_VERSION,
+  //    LIBMESH_MICRO_VERSION));
 
   //   sys.write_serialized_data(bf_data, false);
 
@@ -954,13 +954,13 @@ void RBEvaluation::write_out_vectors(System& sys,
   file_name << directory_name << "/" << data_name << "_data" << basis_function_suffix;
 
   Xdr bf_data(file_name.str(),
-	      write_binary_vectors ? ENCODE : WRITE);
+              write_binary_vectors ? ENCODE : WRITE);
 
   // Write all vectors at once.
   {
     // Note the API wants pointers to constant vectors, hence this...
     std::vector<const NumericVector<Number>*> bf_out(vectors.begin(),
-						     vectors.end());
+                                                     vectors.end());
     // for(unsigned int i=0; i<vectors.size(); i++)
     //   bf_out.push_back(vectors[i]);
     sys.write_serialized_vectors (bf_data, bf_out);
@@ -969,8 +969,8 @@ void RBEvaluation::write_out_vectors(System& sys,
 
   // set the current version
   bf_data.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
-					 LIBMESH_MINOR_VERSION,
-					 LIBMESH_MICRO_VERSION));
+                                         LIBMESH_MINOR_VERSION,
+                                         LIBMESH_MICRO_VERSION));
 
 
   // Undo the temporary renumbering
@@ -1041,37 +1041,37 @@ void RBEvaluation::read_in_vectors(System& sys,
       // into this->solution and then swap with the appropriate
       // of basis function.
       for(unsigned int i=0; i<vectors.size(); i++)
-	{
-	  file_name.str(""); // reset the string
-	  file_name << directory_name << "/" << data_name << i << basis_function_suffix;
+        {
+          file_name.str(""); // reset the string
+          file_name << directory_name << "/" << data_name << i << basis_function_suffix;
 
-	  // On processor zero check to be sure the file exists
-	  if (this->processor_id() == 0)
-	    {
-	      int stat_result = stat(file_name.str().c_str(), &stat_info);
+          // On processor zero check to be sure the file exists
+          if (this->processor_id() == 0)
+            {
+              int stat_result = stat(file_name.str().c_str(), &stat_info);
 
-	      if (stat_result != 0)
-		{
-		  libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-		  libmesh_error();
-		}
-	    }
+              if (stat_result != 0)
+                {
+                  libMesh::out << "File does not exist: " << file_name.str() << std::endl;
+                  libmesh_error();
+                }
+            }
 
-	  Xdr vector_data(file_name.str(),
-		          read_binary_vectors ? DECODE : READ);
+          Xdr vector_data(file_name.str(),
+                          read_binary_vectors ? DECODE : READ);
 
-	  // The bf_data needs to know which version to read.
-	  vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
+          // The bf_data needs to know which version to read.
+          vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
 
-	  sys.read_serialized_data(vector_data, false);
+          sys.read_serialized_data(vector_data, false);
 
-	  vectors[i] = NumericVector<Number>::build(sys.comm()).release();
-	  vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
+          vectors[i] = NumericVector<Number>::build(sys.comm()).release();
+          vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
 
-	  // No need to copy, just swap
-	  // *vectors[i] = *solution;
-	  vectors[i]->swap(*sys.solution);
-	}
+          // No need to copy, just swap
+          // *vectors[i] = *solution;
+          vectors[i]->swap(*sys.solution);
+        }
     }
 
   //------------------------------------------------------
@@ -1080,28 +1080,28 @@ void RBEvaluation::read_in_vectors(System& sys,
     {
       // Allocate storage for each vector
       for(unsigned int i=0; i<vectors.size(); i++)
-	{
-	  vectors[i] = NumericVector<Number>::build(sys.comm()).release();
-	  vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
-	}
+        {
+          vectors[i] = NumericVector<Number>::build(sys.comm()).release();
+          vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
+        }
 
       file_name.str("");
       file_name << directory_name << "/" << data_name << "_data" << basis_function_suffix;
 
       // On processor zero check to be sure the file exists
       if (this->processor_id() == 0)
-	{
-	  int stat_result = stat(file_name.str().c_str(), &stat_info);
+        {
+          int stat_result = stat(file_name.str().c_str(), &stat_info);
 
-	  if (stat_result != 0)
-	    {
-	      libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-	      libmesh_error();
-	    }
-	}
+          if (stat_result != 0)
+            {
+              libMesh::out << "File does not exist: " << file_name.str() << std::endl;
+              libmesh_error();
+            }
+        }
 
       Xdr vector_data(file_name.str(),
-		      read_binary_vectors ? DECODE : READ);
+                      read_binary_vectors ? DECODE : READ);
 
       // The vector_data needs to know which version to read.
       vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));

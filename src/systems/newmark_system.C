@@ -43,8 +43,8 @@ const Real NewmarkSystem::_default_timestep = 1.;
 // ------------------------------------------------------------
 // NewmarkSystem implementation
 NewmarkSystem::NewmarkSystem (EquationSystems& es,
-			      const std::string& name_in,
-			      const unsigned int number_in) :
+                              const std::string& name_in,
+                              const unsigned int number_in) :
   LinearImplicitSystem (es, name_in, number_in),
   _a_0                 (1./(_default_alpha*_default_timestep*_default_timestep)),
   _a_1                 (_default_delta/(_default_alpha*_default_timestep)),
@@ -263,8 +263,8 @@ void NewmarkSystem::update_u_v_a ()
 
 
 void NewmarkSystem::set_newmark_parameters (const Real delta_T,
-					    const Real alpha,
-					    const Real delta)
+                                            const Real alpha,
+                                            const Real delta)
 {
   libmesh_assert_not_equal_to (delta_T, 0.);
 

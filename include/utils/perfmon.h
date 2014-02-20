@@ -44,8 +44,8 @@ class PerfMon
 {
  public:
   PerfMon  (std::string id,
-	    const unsigned int v=1,
-	    const unsigned int pid=0);
+            const unsigned int v=1,
+            const unsigned int pid=0);
 
   ~PerfMon ();
   void reset ();
@@ -99,32 +99,32 @@ PerfMon::print (std::string msg, std::ostream &my_out)
     {
 
       if (proc_id == 0)
-	{
-	  if (msg == "NULL")
-	    my_out << " " << id_string
-		   << ": elapsed time: "
-		   << elapsed_time << " (sec)"
-		   << std::endl;
-	  else
-	    my_out << " " << msg
-		   << ": elapsed time: "
-		   << elapsed_time << " (sec)"
-		   << std::endl;
+        {
+          if (msg == "NULL")
+            my_out << " " << id_string
+                   << ": elapsed time: "
+                   << elapsed_time << " (sec)"
+                   << std::endl;
+          else
+            my_out << " " << msg
+                   << ": elapsed time: "
+                   << elapsed_time << " (sec)"
+                   << std::endl;
 
 #ifdef HAVE_PAPI_H
-	  if (msg == "NULL")
-	    my_out << " " << id_string
-		   << ": mflops: "
-		   << mflops
-		   << std::endl;
-	  else
-	    my_out << " " << msg
-		   << ": mflops: "
-		   << mflops
-		   << std::endl;
+          if (msg == "NULL")
+            my_out << " " << id_string
+                   << ": mflops: "
+                   << mflops
+                   << std::endl;
+          else
+            my_out << " " << msg
+                   << ": mflops: "
+                   << mflops
+                   << std::endl;
 #endif
 
-	}
+        }
     }
 
   return elapsed_time;
@@ -133,8 +133,8 @@ PerfMon::print (std::string msg, std::ostream &my_out)
 
 inline
 PerfMon::PerfMon (std::string id,
-		  const unsigned int v,
-		  const unsigned int pid) :
+                  const unsigned int v,
+                  const unsigned int pid) :
   id_string(id),
   verbose(v),
   proc_id(pid)

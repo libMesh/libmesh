@@ -39,9 +39,9 @@ namespace libMesh
 // ------------------------------------------------------------
 // EigenSystem implementation
 EigenSystem::EigenSystem (EquationSystems& es,
-			  const std::string& name,
-			  const unsigned int number
-			  ) :
+                          const std::string& name,
+                          const unsigned int number
+                          ) :
   Parent           (es, name, number),
   matrix_A         (NULL),
   matrix_B         (NULL),

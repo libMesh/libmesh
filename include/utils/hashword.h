@@ -98,25 +98,25 @@ namespace libMesh
 
       //------------------------------------------------- handle most of the key
       while (length > 3)
-	{
-	  a += k[0];
-	  b += k[1];
-	  c += k[2];
-	  mix(a,b,c);
-	  length -= 3;
-	  k += 3;
-	}
+        {
+          a += k[0];
+          b += k[1];
+          c += k[2];
+          mix(a,b,c);
+          length -= 3;
+          k += 3;
+        }
 
       //------------------------------------------- handle the last 3 uint32_t's
       switch(length)                     // all the case statements fall through
-	{
-	case 3 : c+=k[2];
-	case 2 : b+=k[1];
-	case 1 : a+=k[0];
-	  final(a,b,c);
-	default:     // case 0: nothing left to add
-	  break;
-	}
+        {
+        case 3 : c+=k[2];
+        case 2 : b+=k[1];
+        case 1 : a+=k[0];
+          final(a,b,c);
+        default:     // case 0: nothing left to add
+          break;
+        }
 
       //------------------------------------------------------ report the result
       return c;
@@ -170,9 +170,9 @@ namespace libMesh
       uint64_t c = 0;
       unsigned int shift=0;
       for (size_t i=0; i != length; ++i)
-	{
-	  c += (k[i] << shift) % bp;
-	  shift += 5;
+        {
+          c += (k[i] << shift) % bp;
+          shift += 5;
         }
 
       return c;
@@ -188,10 +188,10 @@ namespace libMesh
       uint16_t c = 0;
       uint16_t shift=0;
       for (size_t i=0; i != length; ++i)
-	{
-	  c = static_cast<uint16_t>
-	    (c + static_cast<uint16_t>(k[i] << shift) % bp);
-	  shift = static_cast<uint16_t>(shift+3);
+        {
+          c = static_cast<uint16_t>
+            (c + static_cast<uint16_t>(k[i] << shift) % bp);
+          shift = static_cast<uint16_t>(shift+3);
         }
 
       return c;

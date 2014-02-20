@@ -29,7 +29,7 @@ DifferentiableQoI::DifferentiableQoI () :
 }
 
 void DifferentiableQoI::thread_join( std::vector<Number>& qoi, const std::vector<Number>& other_qoi,
-				     const QoISet& )
+                                     const QoISet& )
 {
   for (unsigned int i=0; i != qoi.size(); ++i)
     qoi[i] += other_qoi[i];
@@ -38,8 +38,8 @@ void DifferentiableQoI::thread_join( std::vector<Number>& qoi, const std::vector
 }
 
   void DifferentiableQoI::parallel_op(const Parallel::Communicator &communicator,
-				    std::vector<Number>& sys_qoi, std::vector<Number>& local_qoi,
-				     const QoISet& )
+                                      std::vector<Number>& sys_qoi, std::vector<Number>& local_qoi,
+                                      const QoISet& )
 {
   // Sum everything into local_qoi
   communicator.sum(local_qoi);

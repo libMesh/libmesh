@@ -62,14 +62,14 @@ namespace MeshTools
      * master hex
      */
     void build_cube (UnstructuredMesh& mesh,
-		     const unsigned int nx=0,
-		     const unsigned int ny=0,
-		     const unsigned int nz=0,
-		     const Real xmin=0., const Real xmax=1.,
-		     const Real ymin=0., const Real ymax=1.,
-		     const Real zmin=0., const Real zmax=1.,
-		     const ElemType type=INVALID_ELEM,
-		     const bool gauss_lobatto_grid=false);
+                     const unsigned int nx=0,
+                     const unsigned int ny=0,
+                     const unsigned int nz=0,
+                     const Real xmin=0., const Real xmax=1.,
+                     const Real ymin=0., const Real ymax=1.,
+                     const Real zmin=0., const Real zmax=1.,
+                     const ElemType type=INVALID_ELEM,
+                     const bool gauss_lobatto_grid=false);
 
     /**
      * A specialized \p build_cube() for 0D meshes.  The resulting
@@ -98,22 +98,22 @@ namespace MeshTools
      * master quad
      */
     void build_square (UnstructuredMesh& mesh,
-		       const unsigned int nx,
-		       const unsigned int ny,
-		       const Real xmin=0., const Real xmax=1.,
-		       const Real ymin=0., const Real ymax=1.,
-		       const ElemType type=INVALID_ELEM,
-		       const bool gauss_lobatto_grid=false);
+                       const unsigned int nx,
+                       const unsigned int ny,
+                       const Real xmin=0., const Real xmax=1.,
+                       const Real ymin=0., const Real ymax=1.,
+                       const ElemType type=INVALID_ELEM,
+                       const bool gauss_lobatto_grid=false);
 
     /**
      * Meshes a spherical or mapped-spherical domain.
      */
     void build_sphere (UnstructuredMesh& mesh,
-		       const Real rad=1,
-		       const unsigned int nr=2,
-		       const ElemType type=INVALID_ELEM,
-		       const unsigned int n_smooth=2,
-		       const bool flat=true);
+                       const Real rad=1,
+                       const unsigned int nr=2,
+                       const ElemType type=INVALID_ELEM,
+                       const unsigned int n_smooth=2,
+                       const bool flat=true);
 
     /**
      * Meshes the tensor product of a 1D and a 1D-or-2D domain.
@@ -130,12 +130,12 @@ namespace MeshTools
      * triangle library written by J.R. Shewchuk.
      */
     void build_delaunay_square(UnstructuredMesh& mesh,
-			       const unsigned int nx, // num. of elements in x-dir
-			       const unsigned int ny, // num. of elements in y-dir
-			       const Real xmin, const Real xmax,
-			       const Real ymin, const Real ymax,
-			       const ElemType type,
-			       const std::vector<TriangleInterface::Hole*>* holes=NULL);
+                               const unsigned int nx, // num. of elements in x-dir
+                               const unsigned int ny, // num. of elements in y-dir
+                               const Real xmin, const Real xmax,
+                               const Real ymin, const Real ymax,
+                               const ElemType type,
+                               const std::vector<TriangleInterface::Hole*>* holes=NULL);
 #endif // #define LIBMESH_HAVE_TRIANGLE
 
   } // end namespace Meshtools::Generation

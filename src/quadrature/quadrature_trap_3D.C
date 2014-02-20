@@ -42,14 +42,14 @@ void QTrap::init_3D(const ElemType type_in,
     case HEX20:
     case HEX27:
       {
-	// We compute the 3D quadrature rule as a tensor
-	// product of the 1D quadrature rule.
-	QTrap q1D(1);
-	q1D.init(EDGE2);
+        // We compute the 3D quadrature rule as a tensor
+        // product of the 1D quadrature rule.
+        QTrap q1D(1);
+        q1D.init(EDGE2);
 
-	tensor_product_hex( q1D );
+        tensor_product_hex( q1D );
 
-	return;
+        return;
       }
 
 
@@ -59,33 +59,33 @@ void QTrap::init_3D(const ElemType type_in,
     case TET4:
     case TET10:
       {
-	_points.resize(4);
-	_weights.resize(4);
+        _points.resize(4);
+        _weights.resize(4);
 
-	_points[0](0) = 0.;
-	_points[0](1) = 0.;
-	_points[0](2) = 0.;
+        _points[0](0) = 0.;
+        _points[0](1) = 0.;
+        _points[0](2) = 0.;
 
-	_points[1](0) = 1.;
-	_points[1](1) = 0.;
-	_points[1](2) = 0.;
+        _points[1](0) = 1.;
+        _points[1](1) = 0.;
+        _points[1](2) = 0.;
 
-	_points[2](0) = 0.;
-	_points[2](1) = 1.;
-	_points[2](2) = 0.;
+        _points[2](0) = 0.;
+        _points[2](1) = 1.;
+        _points[2](2) = 0.;
 
-	_points[3](0) = 0.;
-	_points[3](1) = 0.;
-	_points[3](2) = 1.;
+        _points[3](0) = 0.;
+        _points[3](1) = 0.;
+        _points[3](2) = 1.;
 
 
 
-	_weights[0] = .0416666666666666666666666666666666666666666667;
-	_weights[1] = _weights[0];
-	_weights[2] = _weights[0];
-	_weights[3] = _weights[0];
+        _weights[0] = .0416666666666666666666666666666666666666666667;
+        _weights[1] = _weights[0];
+        _weights[2] = _weights[0];
+        _weights[3] = _weights[0];
 
-	return;
+        return;
       }
 
 
@@ -96,20 +96,20 @@ void QTrap::init_3D(const ElemType type_in,
     case PRISM15:
     case PRISM18:
       {
-	// We compute the 3D quadrature rule as a tensor
-	// product of the 1D quadrature rule and a 2D
-	// triangle quadrature rule
+        // We compute the 3D quadrature rule as a tensor
+        // product of the 1D quadrature rule and a 2D
+        // triangle quadrature rule
 
-	QTrap q1D(1);
-	QTrap q2D(2);
+        QTrap q1D(1);
+        QTrap q2D(2);
 
-	// Initialize
-	q1D.init(EDGE2);
-	q2D.init(TRI3);
+        // Initialize
+        q1D.init(EDGE2);
+        q2D.init(TRI3);
 
-	tensor_product_prism(q1D, q2D);
+        tensor_product_prism(q1D, q2D);
 
-	return;
+        return;
       }
 
 
@@ -117,8 +117,8 @@ void QTrap::init_3D(const ElemType type_in,
       // Unsupported type
     default:
       {
-	libMesh::err << "ERROR: Unsupported type: " << type_in << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: Unsupported type: " << type_in << std::endl;
+        libmesh_error();
       }
     }
 

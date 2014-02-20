@@ -105,7 +105,7 @@ bool Quad4::is_face(const unsigned int) const
 }
 
 bool Quad4::is_node_on_side(const unsigned int n,
-			    const unsigned int s) const
+                            const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 2; ++i)
@@ -125,7 +125,7 @@ bool Quad4::has_affine_map() const
 
 
 AutoPtr<Elem> Quad4::build_side (const unsigned int i,
-				 bool proxy) const
+                                 bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -141,40 +141,40 @@ AutoPtr<Elem> Quad4::build_side (const unsigned int i,
       edge->subdomain_id() = this->subdomain_id();
 
       switch (i)
-	{
-	case 0:
-	  {
-	    edge->set_node(0) = this->get_node(0);
-	    edge->set_node(1) = this->get_node(1);
+        {
+        case 0:
+          {
+            edge->set_node(0) = this->get_node(0);
+            edge->set_node(1) = this->get_node(1);
 
             return edge;
-	  }
-	case 1:
-	  {
-	    edge->set_node(0) = this->get_node(1);
-	    edge->set_node(1) = this->get_node(2);
+          }
+        case 1:
+          {
+            edge->set_node(0) = this->get_node(1);
+            edge->set_node(1) = this->get_node(2);
 
-	    return edge;
-	  }
-	case 2:
-	  {
-	    edge->set_node(0) = this->get_node(2);
-	    edge->set_node(1) = this->get_node(3);
+            return edge;
+          }
+        case 2:
+          {
+            edge->set_node(0) = this->get_node(2);
+            edge->set_node(1) = this->get_node(3);
 
-	    return edge;
-	  }
-	case 3:
-	  {
-	    edge->set_node(0) = this->get_node(3);
-	    edge->set_node(1) = this->get_node(0);
+            return edge;
+          }
+        case 3:
+          {
+            edge->set_node(0) = this->get_node(3);
+            edge->set_node(1) = this->get_node(0);
 
-	    return edge;
-	  }
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+            return edge;
+          }
+        default:
+          {
+            libmesh_error();
+          }
+        }
     }
 
   // We will never get here...
@@ -186,8 +186,8 @@ AutoPtr<Elem> Quad4::build_side (const unsigned int i,
 
 
 void Quad4::connectivity(const unsigned int libmesh_dbg_var(sf),
-			 const IOPackage iop,
-			 std::vector<dof_id_type>& conn) const
+                         const IOPackage iop,
+                         std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_less (sf, this->n_sub_elem());
   libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
@@ -199,20 +199,20 @@ void Quad4::connectivity(const unsigned int libmesh_dbg_var(sf),
     {
     case TECPLOT:
       {
-	conn[0] = this->node(0)+1;
-	conn[1] = this->node(1)+1;
-	conn[2] = this->node(2)+1;
-	conn[3] = this->node(3)+1;
-	return;
+        conn[0] = this->node(0)+1;
+        conn[1] = this->node(1)+1;
+        conn[2] = this->node(2)+1;
+        conn[3] = this->node(3)+1;
+        return;
       }
 
     case VTK:
       {
-	conn[0] = this->node(0);
-	conn[1] = this->node(1);
-	conn[2] = this->node(2);
-	conn[3] = this->node(3);
-	return;
+        conn[0] = this->node(0);
+        conn[1] = this->node(1);
+        conn[2] = this->node(2);
+        conn[3] = this->node(3);
+        return;
       }
 
     default:
@@ -230,14 +230,14 @@ Real Quad4::volume () const
   // libmesh counter-clockwise numbering scheme.
 
   //        3           2        D           C
-  // QUAD4: o-----------o	 o-----------o
-  //        |           |	 |           |
-  //        |           |	 |           |
-  //        |           | 	 |           |
-  //        |           |	 |           |
-  //        |           |	 |           |
-  //        o-----------o	 o-----------o
-  //        0           1	 A           B
+  // QUAD4: o-----------o o-----------o
+  //        |           | |           |
+  //        |           | |           |
+  //        |           |  |           |
+  //        |           | |           |
+  //        |           | |           |
+  //        o-----------o o-----------o
+  //        0           1 A           B
 
   // Vector pointing from A to C
   Point AC ( this->point(2) - this->point(0) );
@@ -274,12 +274,12 @@ Real Quad4::volume () const
 
       // 4-point rule
       const Real q[2] = {0.5 - std::sqrt(3.) / 6.,
-			 0.5 + std::sqrt(3.) / 6.};
+                         0.5 + std::sqrt(3.) / 6.};
 
       Real vol=0.;
       for (unsigned int i=0; i<2; ++i)
-	for (unsigned int j=0; j<2; ++j)
-	  vol += (AB + q[i]*AC_AB_AD).cross(AD + q[j]*AC_AB_AD).size();
+        for (unsigned int j=0; j<2; ++j)
+          vol += (AB + q[i]*AC_AB_AD).cross(AD + q[j]*AC_AB_AD).size();
 
       return 0.25*vol;
     }

@@ -96,7 +96,7 @@ namespace libMesh
 
     RawAccessor( FieldType& data, const unsigned int dim )
       : _data(data),
-	_dim(dim)
+      _dim(dim)
     {}
 
     ~RawAccessor(){}

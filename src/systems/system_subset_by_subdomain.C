@@ -58,8 +58,8 @@ namespace libMesh
 
   SystemSubsetBySubdomain::
   SystemSubsetBySubdomain (const System& system,
-			   const SubdomainSelection& subdomain_selection,
-			   const std::set<unsigned int>* const var_nums):
+                           const SubdomainSelection& subdomain_selection,
+                           const std::set<unsigned int>* const var_nums):
     SystemSubset(system),
     ParallelObject(system),
     _var_nums(),
@@ -71,8 +71,8 @@ namespace libMesh
 
   SystemSubsetBySubdomain::
   SystemSubsetBySubdomain (const System& system,
-			   const std::set<subdomain_id_type>& subdomain_ids,
-			   const std::set<unsigned int>* const var_nums):
+                           const std::set<subdomain_id_type>& subdomain_ids,
+                           const std::set<unsigned int>* const var_nums):
     SystemSubset(system),
     ParallelObject(system),
     _var_nums(),
@@ -101,14 +101,14 @@ namespace libMesh
     _var_nums.clear();
     if(var_nums!=NULL)
       {
-	_var_nums = *var_nums;
+        _var_nums = *var_nums;
       }
     else
       {
-	for(unsigned int i=0; i<_system.n_vars(); i++)
-	  {
-	    _var_nums.insert(i);
-	  }
+        for(unsigned int i=0; i<_system.n_vars(); i++)
+          {
+            _var_nums.insert(i);
+          }
       }
   }
 
@@ -129,52 +129,52 @@ namespace libMesh
     for ( ; el != end_el; ++el)
       {
         const Elem* elem = *el;
-	if(subdomain_selection(elem->subdomain_id()))
-	  {
-	    std::set<unsigned int>::const_iterator it = _var_nums.begin();
-	    const std::set<unsigned int>::const_iterator itEnd = _var_nums.end();
-	    for (; it!=itEnd; ++it)
-	      {
-		dof_map.dof_indices (elem, dof_indices, *it);
-		for(size_t i=0; i<dof_indices.size(); i++)
-		  {
-		    const dof_id_type dof = dof_indices[i];
-		    for(unsigned int proc=0; proc<this->n_processors(); proc++)
-		      {
-			if((dof>=dof_map.first_dof(proc)) && (dof<dof_map.end_dof(proc)))
-			  {
-			    dof_ids_per_processor[proc].push_back(dof);
-			  }
-		      }
-		  }
-	      }
-	  }
+        if(subdomain_selection(elem->subdomain_id()))
+          {
+            std::set<unsigned int>::const_iterator it = _var_nums.begin();
+            const std::set<unsigned int>::const_iterator itEnd = _var_nums.end();
+            for (; it!=itEnd; ++it)
+              {
+                dof_map.dof_indices (elem, dof_indices, *it);
+                for(size_t i=0; i<dof_indices.size(); i++)
+                  {
+                    const dof_id_type dof = dof_indices[i];
+                    for(unsigned int proc=0; proc<this->n_processors(); proc++)
+                      {
+                        if((dof>=dof_map.first_dof(proc)) && (dof<dof_map.end_dof(proc)))
+                          {
+                            dof_ids_per_processor[proc].push_back(dof);
+                          }
+                      }
+                  }
+              }
+          }
       }
 
     /* Distribute information among processors.  */
     std::vector<Parallel::Request> request_per_processor(this->n_processors());
     for(unsigned int proc=0; proc<this->n_processors(); proc++)
       {
-	if(proc!=this->processor_id())
-	  {
-	    this->comm().send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
-	  }
+        if(proc!=this->processor_id())
+          {
+            this->comm().send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
+          }
       }
     for(unsigned int proc=0; proc<this->n_processors(); proc++)
       {
-	std::vector<dof_id_type> received_dofs;
-	if(proc==this->processor_id())
-	  {
-	    received_dofs = dof_ids_per_processor[proc];
-	  }
-	else
-	  {
-	    this->comm().receive(proc,received_dofs);
-	  }
-	for(unsigned int i=0; i<received_dofs.size(); i++)
-	  {
-	    _dof_ids.push_back(received_dofs[i]);
-	  }
+        std::vector<dof_id_type> received_dofs;
+        if(proc==this->processor_id())
+          {
+            received_dofs = dof_ids_per_processor[proc];
+          }
+        else
+          {
+            this->comm().receive(proc,received_dofs);
+          }
+        for(unsigned int i=0; i<received_dofs.size(); i++)
+          {
+            _dof_ids.push_back(received_dofs[i]);
+          }
       }
 
     /* Sort and unique the vector (using the same mechanism as in \p
@@ -186,10 +186,10 @@ namespace libMesh
     /* Wait for sends to be complete.  */
     for(unsigned int proc=0; proc<this->n_processors(); proc++)
       {
-	if(proc!=this->processor_id())
-	  {
-	    request_per_processor[proc].wait();
-	  }
+        if(proc!=this->processor_id())
+          {
+            request_per_processor[proc].wait();
+          }
       }
   }
 

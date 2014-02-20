@@ -60,10 +60,10 @@ public:
    * will be sorted according to their X-location, etc...
    */
   enum CentroidSortMethod {X=0,
-			   Y,
-			   Z,
-			   RADIAL,
-			   INVALID_METHOD};
+                           Y,
+                           Z,
+                           RADIAL,
+                           INVALID_METHOD};
 
   /**
    * Constructor.  Takes the \p CentroidSortMethod to use, which
@@ -99,7 +99,7 @@ protected:
    * a required interface for the class.
    */
   virtual void _do_partition (MeshBase& mesh,
-			      const unsigned int n);
+                              const unsigned int n);
 
 private:
 
@@ -117,7 +117,7 @@ private:
    * routine for sorting the elements by centroid.
    */
   static bool sort_x (const std::pair<Point, Elem*>& lhs,
-		      const std::pair<Point, Elem*>& rhs);
+                      const std::pair<Point, Elem*>& rhs);
 
   /**
    * Partition the list of centroids based on the
@@ -126,7 +126,7 @@ private:
    * routine for sorting the elements by centroid.
    */
   static bool sort_y (const std::pair<Point, Elem*>& lhs,
-		      const std::pair<Point, Elem*>& rhs);
+                      const std::pair<Point, Elem*>& rhs);
 
   /**
    * Partition the list of centroids based on the
@@ -135,7 +135,7 @@ private:
    * routine for sorting the elements by centroid.
    */
   static bool sort_z (const std::pair<Point, Elem*>& lhs,
-		      const std::pair<Point, Elem*>& rhs);
+                      const std::pair<Point, Elem*>& rhs);
 
 
   /**
@@ -145,7 +145,7 @@ private:
    * routine for sorting the elements by centroid.
    */
   static bool sort_radial (const std::pair<Point, Elem*>& lhs,
-			   const std::pair<Point, Elem*>& rhs);
+                           const std::pair<Point, Elem*>& rhs);
 
   /**
    * Store a flag which tells which type of

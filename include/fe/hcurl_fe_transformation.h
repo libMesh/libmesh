@@ -47,25 +47,25 @@ namespace libMesh
      * vectors.
      */
     virtual void map_phi( const unsigned int dim,
-			  const Elem* const elem,
-			  const std::vector<Point>& qp,
-			  const FEGenericBase<OutputShape>& fe,
-			  std::vector<std::vector<OutputShape> >& phi ) const;
+                          const Elem* const elem,
+                          const std::vector<Point>& qp,
+                          const FEGenericBase<OutputShape>& fe,
+                          std::vector<std::vector<OutputShape> >& phi ) const;
 
     /**
      * Evaluates shape function gradients in physical coordinates for HCurl conforming
      * elements.
      */
     virtual void map_dphi( const unsigned int /*dim*/,
-			   const Elem* const /*elem*/,
-			   const std::vector<Point>& /*qp*/,
-			   const FEGenericBase<OutputShape>& /*fe*/,
-			   std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >& /*dphi*/,
-			   std::vector<std::vector<OutputShape> >& /*dphidx*/,
-			   std::vector<std::vector<OutputShape> >& /*dphidy*/,
-			   std::vector<std::vector<OutputShape> >& /*dphidz*/) const
+                           const Elem* const /*elem*/,
+                           const std::vector<Point>& /*qp*/,
+                           const FEGenericBase<OutputShape>& /*fe*/,
+                           std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >& /*dphi*/,
+                           std::vector<std::vector<OutputShape> >& /*dphidx*/,
+                           std::vector<std::vector<OutputShape> >& /*dphidy*/,
+                           std::vector<std::vector<OutputShape> >& /*dphidz*/) const
     { libmesh_do_once( libMesh::err << "WARNING: Shape function gradients for HCurl elements are not currently "
-		       << "being computed!" << std::endl; ); return; }
+                       << "being computed!" << std::endl; ); return; }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     /**
@@ -73,18 +73,18 @@ namespace libMesh
      * finite element transformation.
      */
     virtual void map_d2phi( const unsigned int /*dim*/,
-			    const Elem* const /*elem*/,
-			    const std::vector<Point>& /*qp*/,
-			    const FEGenericBase<OutputShape>& /*fe*/,
-			    std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >& /*d2phi*/,
-			    std::vector<std::vector<OutputShape> >& /*d2phidx2*/,
-			    std::vector<std::vector<OutputShape> >& /*d2phidxdy*/,
-			    std::vector<std::vector<OutputShape> >& /*d2phidxdz*/,
-			    std::vector<std::vector<OutputShape> >& /*d2phidy2*/,
-			    std::vector<std::vector<OutputShape> >& /*d2phidydz*/,
-			    std::vector<std::vector<OutputShape> >& /*d2phidz2*/  ) const
+                            const Elem* const /*elem*/,
+                            const std::vector<Point>& /*qp*/,
+                            const FEGenericBase<OutputShape>& /*fe*/,
+                            std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >& /*d2phi*/,
+                            std::vector<std::vector<OutputShape> >& /*d2phidx2*/,
+                            std::vector<std::vector<OutputShape> >& /*d2phidxdy*/,
+                            std::vector<std::vector<OutputShape> >& /*d2phidxdz*/,
+                            std::vector<std::vector<OutputShape> >& /*d2phidy2*/,
+                            std::vector<std::vector<OutputShape> >& /*d2phidydz*/,
+                            std::vector<std::vector<OutputShape> >& /*d2phidz2*/  ) const
     { libmesh_do_once( libMesh::err << "WARNING: Shape function Hessians for HCurl elements are not currently "
-		       << "being computed!" << std::endl; ); return; }
+                       << "being computed!" << std::endl; ); return; }
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
     /**
@@ -95,22 +95,22 @@ namespace libMesh
      * In 3-D, the transformation is \f$ \nabla \times \phi = J^{-1} dx/d\xi \nabla \times \hat{\phi} \f$
      */
     virtual void map_curl( const unsigned int dim,
-			   const Elem* const elem,
-			   const std::vector<Point>& qp,
-			   const FEGenericBase<OutputShape>& fe,
-			   std::vector<std::vector<OutputShape> >& curl_phi ) const;
+                           const Elem* const elem,
+                           const std::vector<Point>& qp,
+                           const FEGenericBase<OutputShape>& fe,
+                           std::vector<std::vector<OutputShape> >& curl_phi ) const;
 
     /**
      * Evaluates the shape function divergence in physical coordinates based on HCurl conforming
      * finite element transformation.
      */
     virtual void map_div( const unsigned int /*dim*/,
-			  const Elem* const /*elem*/,
-			  const std::vector<Point>& /*qp*/,
-			  const FEGenericBase<OutputShape>& /*fe*/,
-			  std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> >& /*div_phi*/ ) const
+                          const Elem* const /*elem*/,
+                          const std::vector<Point>& /*qp*/,
+                          const FEGenericBase<OutputShape>& /*fe*/,
+                          std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> >& /*div_phi*/ ) const
     { libmesh_do_once( libMesh::err << "WARNING: Shape function divergences for HCurl elements are not currently "
-		       << "being computed!" << std::endl; ); return; }
+                       << "being computed!" << std::endl; ); return; }
 
   }; // class HCurlFETransformation
 

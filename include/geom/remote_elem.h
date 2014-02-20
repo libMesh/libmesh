@@ -48,7 +48,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // RemoteElem class definition
 class RemoteElem : public Elem,
-		   public Singleton
+    public Singleton
 {
  public:
 
@@ -98,8 +98,8 @@ public:
   { return true; }
 
   virtual void connectivity(const unsigned int,
-			    const IOPackage,
-			    std::vector<dof_id_type>&) const
+                            const IOPackage,
+                            std::vector<dof_id_type>&) const
   { libmesh_error(); }
 
   virtual ElemType type () const
@@ -136,19 +136,19 @@ public:
   { libmesh_error(); return false; }
 
   virtual bool is_node_on_side(const unsigned int,
-			       const unsigned int) const
+                               const unsigned int) const
   { libmesh_error(); return false; }
 
   virtual bool is_child_on_side(const unsigned int,
-			        const unsigned int) const
+                                const unsigned int) const
   { libmesh_error(); return false; }
 
   virtual bool is_edge_on_side(const unsigned int,
-			       const unsigned int) const
+                               const unsigned int) const
   { libmesh_error(); return false; }
 
   virtual bool is_node_on_edge(const unsigned int,
-			       const unsigned int) const
+                               const unsigned int) const
   { libmesh_error(); return false; }
 
   virtual unsigned int n_sub_elem () const
@@ -158,7 +158,7 @@ public:
   { libmesh_error(); return AutoPtr<Elem>(NULL); }
 
   virtual AutoPtr<Elem> build_side (const unsigned int,
-				    bool) const
+                                    bool) const
   { libmesh_error(); return AutoPtr<Elem>(NULL); }
 
   virtual AutoPtr<Elem> build_edge (const unsigned int) const
@@ -181,8 +181,8 @@ public:
    * nodes
    */
   virtual float embedding_matrix (const unsigned int,
-				  const unsigned int,
-				  const unsigned int) const
+                                  const unsigned int,
+                                  const unsigned int) const
   { libmesh_error(); return 0.; }
 
 #endif

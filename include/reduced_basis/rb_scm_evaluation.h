@@ -47,7 +47,7 @@ namespace libMesh
 // RBSCMEvaluation class definition
 
 class RBSCMEvaluation : public RBParametrized,
-			public ParallelObject
+    public ParallelObject
 {
 public:
 
@@ -55,7 +55,7 @@ public:
    * Constructor.
    */
   RBSCMEvaluation (const Parallel::Communicator &comm
-		   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.

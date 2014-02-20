@@ -62,10 +62,10 @@ void EigenSparseLinearSolver<T>::init ()
 template <typename T>
 std::pair<unsigned int, Real>
 EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
-				   NumericVector<T> &solution_in,
-				   NumericVector<T> &rhs_in,
-				   const double tol,
-				   const unsigned int m_its)
+                                   NumericVector<T> &solution_in,
+                                   NumericVector<T> &rhs_in,
+                                   const double tol,
+                                   const unsigned int m_its)
 {
   START_LOG("solve()", "EigenSparseLinearSolver");
   this->init ();
@@ -88,52 +88,52 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
       // Conjugate-Gradient
     case CG:
       {
-	Eigen::ConjugateGradient<EigenSM> solver (matrix._mat);
-	solver.setMaxIterations(m_its);
-	solver.setTolerance(tol);
-	solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
-	libMesh::out << "#iterations: " << solver.iterations() << std::endl;
-	libMesh::out << "estimated error: " << solver.error() << std::endl;
-	retval = std::make_pair(solver.iterations(), solver.error());
-  	break;
+        Eigen::ConjugateGradient<EigenSM> solver (matrix._mat);
+        solver.setMaxIterations(m_its);
+        solver.setTolerance(tol);
+        solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
+        libMesh::out << "#iterations: " << solver.iterations() << std::endl;
+        libMesh::out << "estimated error: " << solver.error() << std::endl;
+        retval = std::make_pair(solver.iterations(), solver.error());
+        break;
       }
 
       // Bi-Conjugate Gradient Stabilized
     case BICGSTAB:
       {
-	Eigen::BiCGSTAB<EigenSM> solver (matrix._mat);
-	solver.setMaxIterations(m_its);
-	solver.setTolerance(tol);
-	solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
-	libMesh::out << "#iterations: " << solver.iterations() << std::endl;
-	libMesh::out << "estimated error: " << solver.error() << std::endl;
-	retval = std::make_pair(solver.iterations(), solver.error());
-  	break;
+        Eigen::BiCGSTAB<EigenSM> solver (matrix._mat);
+        solver.setMaxIterations(m_its);
+        solver.setTolerance(tol);
+        solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
+        libMesh::out << "#iterations: " << solver.iterations() << std::endl;
+        libMesh::out << "estimated error: " << solver.error() << std::endl;
+        retval = std::make_pair(solver.iterations(), solver.error());
+        break;
       }
 
     //   // Generalized Minimum Residual
     // case GMRES:
     //   {
-    // 	libmesh_not_implemented();
-    // 	break;
+    // libmesh_not_implemented();
+    // break;
     //   }
 
       // Unknown solver, use BICGSTAB
     default:
       {
-  	libMesh::err << "ERROR:  Unsupported Eigen Solver: "
-		     << Utility::enum_to_string(this->_solver_type) << std::endl
-		     << "Continuing with BICGSTAB" << std::endl;
+        libMesh::err << "ERROR:  Unsupported Eigen Solver: "
+                     << Utility::enum_to_string(this->_solver_type) << std::endl
+                     << "Continuing with BICGSTAB" << std::endl;
 
-  	this->_solver_type = BICGSTAB;
+        this->_solver_type = BICGSTAB;
 
-	STOP_LOG("solve()", "EigenSparseLinearSolver");
+        STOP_LOG("solve()", "EigenSparseLinearSolver");
 
-  	return this->solve (matrix,
-  			    solution,
-  			    rhs,
-  			    tol,
-  			    m_its);
+        return this->solve (matrix,
+                            solution,
+                            rhs,
+                            tol,
+                            m_its);
       }
     }
 
@@ -146,10 +146,10 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
 template <typename T>
 std::pair<unsigned int, Real>
 EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
-					   NumericVector<T> &solution_in,
-					   NumericVector<T> &rhs_in,
-					   const double tol,
-					   const unsigned int m_its)
+                                           NumericVector<T> &solution_in,
+                                           NumericVector<T> &rhs_in,
+                                           const double tol,
+                                           const unsigned int m_its)
 {
 
   START_LOG("adjoint_solve()", "EigenSparseLinearSolver");
@@ -159,10 +159,10 @@ EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
   matrix_in.get_transpose(mat_trans);
 
   std::pair<unsigned int, Real> retval = this->solve (mat_trans,
-						      solution_in,
-						      rhs_in,
-						      tol,
-						      m_its);
+                                                      solution_in,
+                                                      rhs_in,
+                                                      tol,
+                                                      m_its);
 
   STOP_LOG("adjoint_solve()", "EigenSparseLinearSolver");
 
@@ -175,10 +175,10 @@ EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
 template <typename T>
 std::pair<unsigned int, Real>
 EigenSparseLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
-				   NumericVector<T>& /*solution_in*/,
-				   NumericVector<T>& /*rhs_in*/,
-				   const double /*tol*/,
-				   const unsigned int /*m_its*/)
+                                   NumericVector<T>& /*solution_in*/,
+                                   NumericVector<T>& /*rhs_in*/,
+                                   const double /*tol*/,
+                                   const unsigned int /*m_its*/)
 {
   libmesh_not_implemented();
   return std::make_pair(0,0.0);
@@ -189,11 +189,11 @@ EigenSparseLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
 template <typename T>
 std::pair<unsigned int, Real>
 EigenSparseLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
-				   const SparseMatrix<T>& /*precond_matrix*/,
-				   NumericVector<T>& /*solution_in*/,
-				   NumericVector<T>& /*rhs_in*/,
-				   const double /*tol*/,
-				   const unsigned int /*m_its*/)
+                                   const SparseMatrix<T>& /*precond_matrix*/,
+                                   NumericVector<T>& /*solution_in*/,
+                                   NumericVector<T>& /*rhs_in*/,
+                                   const double /*tol*/,
+                                   const unsigned int /*m_its*/)
 {
   libmesh_not_implemented();
   return std::make_pair(0,0.0);
@@ -223,8 +223,8 @@ void EigenSparseLinearSolver<T>::set_eigen_preconditioner_type ()
 
   //   default:
   //     libMesh::err << "ERROR:  Unsupported LASPACK Preconditioner: "
-  // 		    << this->_preconditioner_type << std::endl
-  // 		    << "Continuing with ILU"      << std::endl;
+  //     << this->_preconditioner_type << std::endl
+  //     << "Continuing with ILU"      << std::endl;
   //     this->_preconditioner_type = ILU_PRECOND;
   //     this->set_laspack_preconditioner_type();
   //   }
@@ -236,7 +236,7 @@ template <typename T>
 void EigenSparseLinearSolver<T>::print_converged_reason()
 {
   libMesh::out << "print_converged_reason() is currently only supported"
-	       << "with Petsc 2.3.1 and later." << std::endl;
+               << "with Petsc 2.3.1 and later." << std::endl;
 }
 
 

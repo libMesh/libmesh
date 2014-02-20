@@ -66,14 +66,14 @@ public:
    */
   explicit
   EpetraVector (const Parallel::Communicator &comm,
-		const ParallelType type = AUTOMATIC);
+                const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   EpetraVector (const Parallel::Communicator &comm,
-		const numeric_index_type n,
+                const numeric_index_type n,
                 const ParallelType type = AUTOMATIC);
 
   /**
@@ -81,8 +81,8 @@ public:
    * to \p n, and initialize all elements with zero.
    */
   EpetraVector (const Parallel::Communicator &comm,
-		const numeric_index_type n,
-	        const numeric_index_type n_local,
+                const numeric_index_type n,
+                const numeric_index_type n_local,
                 const ParallelType type = AUTOMATIC);
 
   /**
@@ -91,9 +91,9 @@ public:
    * indices specified by the \p ghost argument.
    */
   EpetraVector (const Parallel::Communicator &comm,
-		const numeric_index_type N,
-		const numeric_index_type n_local,
-		const std::vector<numeric_index_type>& ghost,
+                const numeric_index_type N,
+                const numeric_index_type n_local,
+                const std::vector<numeric_index_type>& ghost,
                 const ParallelType type = AUTOMATIC);
 
   /**
@@ -104,8 +104,8 @@ public:
    * and to simply provide additional functionality with the EpetraVector.
    */
   EpetraVector(Epetra_Vector & v,
-	       const Parallel::Communicator &comm
-	       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+               const Parallel::Communicator &comm
+               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -155,26 +155,26 @@ public:
    */
 
   void init (const numeric_index_type N,
-	     const numeric_index_type n_local,
-	     const bool         fast=false,
-	     const ParallelType type=AUTOMATIC);
+             const numeric_index_type n_local,
+             const bool         fast=false,
+             const ParallelType type=AUTOMATIC);
 
   /**
    * call init with n_local = N,
    */
   void init (const numeric_index_type N,
-	     const bool         fast=false,
-	     const ParallelType type=AUTOMATIC);
+             const bool         fast=false,
+             const ParallelType type=AUTOMATIC);
 
   /**
    * Create a vector that holds the local indices plus those specified
    * in the \p ghost argument.
    */
   void init (const numeric_index_type /*N*/,
-	     const numeric_index_type /*n_local*/,
-	     const std::vector<numeric_index_type>& /*ghost*/,
-	     const bool /*fast*/ = false,
-	     const ParallelType = AUTOMATIC);
+             const numeric_index_type /*n_local*/,
+             const std::vector<numeric_index_type>& /*ghost*/,
+             const bool /*fast*/ = false,
+             const ParallelType = AUTOMATIC);
 
   /**
    * Creates a vector that has the same dimension and storage type as
@@ -193,7 +193,7 @@ public:
   //    * \p init(V.size(),fast).
   //    */
   //   void init (const NumericVector<T>& V,
-  // 	     const bool fast=false);
+  //      const bool fast=false);
 
   /**
    * \f$U(0-N) = s\f$: fill all components.
@@ -352,7 +352,7 @@ public:
    * want to specify WHERE to add it
    */
   void add_vector (const std::vector<T>& v,
-		   const std::vector<numeric_index_type>& dof_indices);
+                   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U+=V \f$ where U and V are type
@@ -361,7 +361,7 @@ public:
    * the \p NumericVector<T> V
    */
   void add_vector (const NumericVector<T>& V,
-		   const std::vector<numeric_index_type>& dof_indices);
+                   const std::vector<numeric_index_type>& dof_indices);
 
 
   /**
@@ -369,7 +369,7 @@ public:
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
   void add_vector (const NumericVector<T> &V,
-		   const SparseMatrix<T> &A);
+                   const SparseMatrix<T> &A);
 
   /**
    * \f$U+=V \f$ where U and V are type
@@ -378,21 +378,21 @@ public:
    * the DenseVector<T> V
    */
   void add_vector (const DenseVector<T>& V,
-		   const std::vector<numeric_index_type>& dof_indices);
+                   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U+=A*V\f$, add the product of the transpose of a \p SparseMatrix \p A_trans
    * and a \p NumericVector \p V to \p this, where \p this=U.
    */
   void add_vector_transpose (const NumericVector<T> &V,
-		             const SparseMatrix<T> &A_trans);
+                             const SparseMatrix<T> &A_trans);
 
   /**
    * \f$ U=v \f$ where v is a \p std::vector<T>
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
-		       const std::vector<numeric_index_type>& dof_indices);
+                       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U=V\f$, where U and V are type
@@ -401,7 +401,7 @@ public:
    * the NumericVector<T> V
    */
   virtual void insert (const NumericVector<T>& V,
-		       const std::vector<numeric_index_type>& dof_indices);
+                       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U=V \f$ where V is type
@@ -409,7 +409,7 @@ public:
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseVector<T>& V,
-		       const std::vector<numeric_index_type>& dof_indices);
+                       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U=V \f$ where V is type
@@ -417,7 +417,7 @@ public:
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseSubVector<T>& V,
-		       const std::vector<numeric_index_type>& dof_indices);
+                       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * Scale each element of the
@@ -455,15 +455,15 @@ public:
    * defined by the \p send_list.
    */
   void localize (NumericVector<T>& v_local,
-		 const std::vector<numeric_index_type>& send_list) const;
+                 const std::vector<numeric_index_type>& send_list) const;
 
   /**
    * Updates a local vector with selected values from neighboring
    * processors, as defined by \p send_list.
    */
   void localize (const numeric_index_type first_local_idx,
-		 const numeric_index_type last_local_idx,
-		 const std::vector<numeric_index_type>& send_list);
+                 const numeric_index_type last_local_idx,
+                 const std::vector<numeric_index_type>& send_list);
 
   /**
    * Creates a local copy of the global vector in
@@ -472,14 +472,14 @@ public:
    * is useful for outputting data from one processor.
    */
   void localize_to_one (std::vector<T>& v_local,
-			const processor_id_type proc_id=0) const;
+                        const processor_id_type proc_id=0) const;
 
   /**
    * Computes the pointwise (i.e. component-wise) product of \p vec1
    * and \p vec2 and stores the result in \p *this.
    */
   virtual void pointwise_mult (const NumericVector<T>& vec1,
-			       const NumericVector<T>& vec2);
+                               const NumericVector<T>& vec2);
 
   /**
    * Print the contents of the vector in Matlab
@@ -494,7 +494,7 @@ public:
    * of the "rows" array.
    */
   virtual void create_subvector (NumericVector<T>& subvector,
-				 const std::vector<numeric_index_type>& rows) const;
+                                 const std::vector<numeric_index_type>& rows) const;
 
   /**
    * Swaps the raw Epetra vector context pointers.
@@ -601,13 +601,13 @@ private:
 
   int inputValues(int numIDs,
                   const int* GIDs, const int* numValuesPerID,
-		  const double* values,
+                  const double* values,
                   bool accumulate);
 
   int inputNonlocalValue(int GID, double value, bool accumulate);
 
   int inputNonlocalValues(int GID, int numValues, const double* values,
-			  bool accumulate);
+                          bool accumulate);
 
   void destroyNonlocalData();
 
@@ -639,7 +639,7 @@ private:
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
-			       const ParallelType type)
+                               const ParallelType type)
 : NumericVector<T>(comm, type),
   _destroy_vec_on_exit(true),
   myFirstID_(0),
@@ -661,7 +661,7 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
-			       const numeric_index_type n,
+                               const numeric_index_type n,
                                const ParallelType type)
 : NumericVector<T>(comm, type),
   _destroy_vec_on_exit(true),
@@ -685,8 +685,8 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
-			       const numeric_index_type n,
-			       const numeric_index_type n_local,
+                               const numeric_index_type n,
+                               const numeric_index_type n_local,
                                const ParallelType type)
 : NumericVector<T>(comm, type),
   _destroy_vec_on_exit(true),
@@ -710,7 +710,7 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector(Epetra_Vector & v,
-			      const Parallel::Communicator &comm)
+                              const Parallel::Communicator &comm)
   : NumericVector<T>(comm, AUTOMATIC),
     _destroy_vec_on_exit(false),
     myFirstID_(0),
@@ -750,9 +750,9 @@ EpetraVector<T>::EpetraVector(Epetra_Vector & v,
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
-			       const numeric_index_type n,
-			       const numeric_index_type n_local,
-		               const std::vector<numeric_index_type>& ghost,
+                               const numeric_index_type n,
+                               const numeric_index_type n_local,
+                               const std::vector<numeric_index_type>& ghost,
                                const ParallelType type)
 : NumericVector<T>(comm, AUTOMATIC),
   _destroy_vec_on_exit(true),
@@ -795,8 +795,8 @@ EpetraVector<T>::~EpetraVector ()
 template <typename T>
 inline
 void EpetraVector<T>::init (const numeric_index_type n,
-			    const numeric_index_type n_local,
-			    const bool fast,
+                            const numeric_index_type n_local,
+                            const bool fast,
                             const ParallelType type)
 {
   // We default to allocating n_local local storage
@@ -850,9 +850,9 @@ void EpetraVector<T>::init (const numeric_index_type n,
 template <typename T>
 inline
 void EpetraVector<T>::init (const numeric_index_type n,
-			    const numeric_index_type n_local,
-		            const std::vector<numeric_index_type>& /*ghost*/,
-			    const bool fast,
+                            const numeric_index_type n_local,
+                            const std::vector<numeric_index_type>& /*ghost*/,
+                            const bool fast,
                             const ParallelType type)
 {
   // TODO: we shouldn't ignore the ghost sparsity pattern
@@ -864,7 +864,7 @@ void EpetraVector<T>::init (const numeric_index_type n,
 template <typename T>
 inline
 void EpetraVector<T>::init (const numeric_index_type n,
-			    const bool fast,
+                            const bool fast,
                             const ParallelType type)
 {
   this->init(n,n,fast,type);
@@ -1008,7 +1008,7 @@ T EpetraVector<T>::operator() (const numeric_index_type i) const
 {
   libmesh_assert (this->initialized());
   libmesh_assert ( ((i >= this->first_local_index()) &&
-		    (i <  this->last_local_index())) );
+                    (i <  this->last_local_index())) );
 
   return (*_vec)[i-this->first_local_index()];
 }

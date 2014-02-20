@@ -58,7 +58,7 @@ class Side : public SideType
    * Constructor.  Creates a side from an element.
    */
   Side (const Elem* parent_in,
-	const unsigned int side_in) :
+        const unsigned int side_in) :
     SideType(const_cast<Elem*>(parent_in)),
     _side_number(side_in)
   {
@@ -121,7 +121,7 @@ class Side : public SideType
   { return 0; }
 
   virtual bool is_child_on_side(const unsigned int,
-			        const unsigned int) const
+                                const unsigned int) const
   { libmesh_error(); return false; }
 
 
@@ -158,7 +158,7 @@ class SideEdge : public EdgeType
    * Constructor.  Creates a side from an element.
    */
   SideEdge (const Elem* my_parent,
-	    const unsigned int my_edge) :
+            const unsigned int my_edge) :
     EdgeType(const_cast<Elem*>(my_parent)),
     _edge_number(my_edge)
   {

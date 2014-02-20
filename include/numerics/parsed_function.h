@@ -90,8 +90,8 @@ public:
         if (nextstart >= expression.size())
           break;
 
-	// If we're at the start of a brace delimited section, then we
-	// parse just that section:
+        // If we're at the start of a brace delimited section, then we
+        // parse just that section:
         if (expression[nextstart] == '{')
           {
             nextstart++;
@@ -101,8 +101,8 @@ public:
         else
           end = std::string::npos;
 
-	// We either want the whole end of the string (end == npos) or
-	// a substring in the middle.
+        // We either want the whole end of the string (end == npos) or
+        // a substring in the middle.
         std::string subexpression =
           expression.substr(nextstart, (end == std::string::npos) ?
                                         std::string::npos : end - nextstart);
@@ -119,8 +119,8 @@ public:
         fp.Optimize();
         parsers.push_back(fp);
 
-	// If at end, use nextstart=maxSize.  Else start at next
-	// character.
+        // If at end, use nextstart=maxSize.  Else start at next
+        // character.
         nextstart = (end == std::string::npos) ?
                     std::string::npos : end + 1;
       }

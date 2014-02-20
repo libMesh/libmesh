@@ -61,9 +61,9 @@ unsigned int FE<Dim,T>::n_quadrature_points () const
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::dofs_on_side(const Elem* const elem,
-			     const Order o,
-			     unsigned int s,
-			     std::vector<unsigned int>& di)
+                             const Order o,
+                             unsigned int s,
+                             std::vector<unsigned int>& di)
 {
   libmesh_assert(elem);
   libmesh_assert_less (s, elem->n_sides());
@@ -74,12 +74,12 @@ void FE<Dim,T>::dofs_on_side(const Elem* const elem,
   for (unsigned int n = 0; n != n_nodes; ++n)
     {
       const unsigned int n_dofs = n_dofs_at_node(elem->type(),
-						 static_cast<Order>(o + elem->p_level()), n);
+                                                 static_cast<Order>(o + elem->p_level()), n);
       if (elem->is_node_on_side(n, s))
-	for (unsigned int i = 0; i != n_dofs; ++i)
-	  di.push_back(nodenum++);
+        for (unsigned int i = 0; i != n_dofs; ++i)
+          di.push_back(nodenum++);
       else
-	nodenum += n_dofs;
+        nodenum += n_dofs;
     }
 }
 
@@ -87,9 +87,9 @@ void FE<Dim,T>::dofs_on_side(const Elem* const elem,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::dofs_on_edge(const Elem* const elem,
-			     const Order o,
-			     unsigned int e,
-			     std::vector<unsigned int>& di)
+                             const Order o,
+                             unsigned int e,
+                             std::vector<unsigned int>& di)
 {
   libmesh_assert(elem);
   libmesh_assert_less (e, elem->n_edges());
@@ -100,12 +100,12 @@ void FE<Dim,T>::dofs_on_edge(const Elem* const elem,
   for (unsigned int n = 0; n != n_nodes; ++n)
     {
       const unsigned int n_dofs = n_dofs_at_node(elem->type(),
-						 static_cast<Order>(o + elem->p_level()), n);
+                                                 static_cast<Order>(o + elem->p_level()), n);
       if (elem->is_node_on_edge(n, e))
-	for (unsigned int i = 0; i != n_dofs; ++i)
-	  di.push_back(nodenum++);
+        for (unsigned int i = 0; i != n_dofs; ++i)
+          di.push_back(nodenum++);
       else
-	nodenum += n_dofs;
+        nodenum += n_dofs;
     }
 }
 
@@ -113,7 +113,7 @@ void FE<Dim,T>::dofs_on_edge(const Elem* const elem,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit(const Elem* elem,
-		       const std::vector<Point>* const pts,
+                       const std::vector<Point>* const pts,
                        const std::vector<Real>* const weights)
 {
   libmesh_assert(elem);
@@ -161,7 +161,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
           this->elem_type = elem->type();
           this->_p_level = elem->p_level();
           // Initialize the shape functions
-	  this->_fe_map->template init_reference_to_physical_map<Dim>(this->qrule->get_points(), elem);
+          this->_fe_map->template init_reference_to_physical_map<Dim>(this->qrule->get_points(), elem);
           this->init_shape_functions (this->qrule->get_points(), elem);
 
           if (this->shapes_need_reinit())
@@ -193,7 +193,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
           if (this->shapes_need_reinit() && !cached_nodes_still_fit)
             {
-	      this->_fe_map->template init_reference_to_physical_map<Dim>(this->qrule->get_points(), elem);
+              this->_fe_map->template init_reference_to_physical_map<Dim>(this->qrule->get_points(), elem);
               this->init_shape_functions (this->qrule->get_points(), elem);
               cached_nodes.resize(elem->n_nodes());
               for (unsigned int n = 0; n != elem->n_nodes(); ++n)
@@ -229,9 +229,9 @@ void FE<Dim,T>::reinit(const Elem* elem,
   if (!cached_nodes_still_fit)
     {
       if (pts != NULL)
-	  this->compute_shape_functions (elem,*pts);
+        this->compute_shape_functions (elem,*pts);
       else
-	this->compute_shape_functions(elem,this->qrule->get_points());
+        this->compute_shape_functions(elem,this->qrule->get_points());
     }
 }
 
@@ -239,7 +239,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
-				     const Elem* elem)
+                                     const Elem* elem)
 {
   libmesh_assert(elem);
   this->calculations_started = true;
@@ -252,20 +252,20 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
     {
       this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = this->calculate_dphiref = true;
       if( FEInterface::field_type(T) == TYPE_VECTOR )
-	{
-	  this->calculate_curl_phi = true;
-	  this->calculate_div_phi  = true;
-	}
+        {
+          this->calculate_curl_phi = true;
+          this->calculate_div_phi  = true;
+        }
     }
 #else
   if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_curl_phi && !this->calculate_div_phi)
     {
       this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
       if( FEInterface::field_type(T) == TYPE_VECTOR )
-	{
-	  this->calculate_curl_phi = true;
-	  this->calculate_div_phi  = true;
-	}
+        {
+          this->calculate_curl_phi = true;
+          this->calculate_div_phi  = true;
+        }
     }
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -280,7 +280,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   // space.
   const unsigned int n_approx_shape_functions =
     this->n_shape_functions(this->get_type(),
-			    this->get_order());
+                            this->get_order());
 
   // resize the vectors to hold current data
   // Phi are the shape functions used for the FE approximation
@@ -355,22 +355,22 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
         }
 
       if(this->calculate_dphiref)
-	{
-	  if (Dim > 0)
-	    this->dphidxi[i].resize(n_qp);
+        {
+          if (Dim > 0)
+            this->dphidxi[i].resize(n_qp);
 
           if (Dim > 1)
             this->dphideta[i].resize(n_qp);
 
           if (Dim > 2)
             this->dphidzeta[i].resize(n_qp);
-	}
+        }
 
       if(this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
-	this->curl_phi[i].resize(n_qp);
+        this->curl_phi[i].resize(n_qp);
 
       if(this->calculate_div_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
-	this->div_phi[i].resize(n_qp);
+        this->div_phi[i].resize(n_qp);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       if (this->calculate_d2phi)
@@ -415,8 +415,8 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
     for (unsigned int p=0; p<n_qp; p++)
       {
         this->weight[p] = 1.;
-	this->dweight[p].zero();
-	this->dphase[p].zero();
+        this->dweight[p].zero();
+        this->dphase[p].zero();
       }
 
  }
@@ -429,26 +429,26 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
       // 0D
     case 0:
       {
-	break;
+        break;
       }
 
       //------------------------------------------------------------
       // 1D
     case 1:
       {
-	// Compute the value of the approximation shape function i at quadrature point p
-	if (this->calculate_dphiref)
-	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
-	      this->dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 0, qp[p]);
+        // Compute the value of the approximation shape function i at quadrature point p
+        if (this->calculate_dphiref)
+          for (unsigned int i=0; i<n_approx_shape_functions; i++)
+            for (unsigned int p=0; p<n_qp; p++)
+              this->dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 0, qp[p]);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	if (this->calculate_d2phi)
-	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
+        if (this->calculate_d2phi)
+          for (unsigned int i=0; i<n_approx_shape_functions; i++)
+            for (unsigned int p=0; p<n_qp; p++)
               this->d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 0, qp[p]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-	break;
+        break;
       }
 
 
@@ -457,27 +457,27 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
       // 2D
     case 2:
       {
-	// Compute the value of the approximation shape function i at quadrature point p
-	if (this->calculate_dphiref)
-	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
-	      {
-	        this->dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 0, qp[p]);
-	        this->dphideta[i][p] = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 1, qp[p]);
-	      }
+        // Compute the value of the approximation shape function i at quadrature point p
+        if (this->calculate_dphiref)
+          for (unsigned int i=0; i<n_approx_shape_functions; i++)
+            for (unsigned int p=0; p<n_qp; p++)
+              {
+                this->dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 0, qp[p]);
+                this->dphideta[i][p] = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 1, qp[p]);
+              }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	if (this->calculate_d2phi)
-	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
-	      {
+        if (this->calculate_d2phi)
+          for (unsigned int i=0; i<n_approx_shape_functions; i++)
+            for (unsigned int p=0; p<n_qp; p++)
+              {
                 this->d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 0, qp[p]);
                 this->d2phidxideta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 1, qp[p]);
                 this->d2phideta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 2, qp[p]);
-	      }
+              }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
-       	break;
+        break;
       }
 
 
@@ -486,30 +486,30 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
       // 3D
     case 3:
       {
-	// Compute the value of the approximation shape function i at quadrature point p
-	if (this->calculate_dphiref)
-	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
-	      {
-	        this->dphidxi[i][p]   = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 0, qp[p]);
-	        this->dphideta[i][p]  = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 1, qp[p]);
-	        this->dphidzeta[i][p] = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 2, qp[p]);
-	      }
+        // Compute the value of the approximation shape function i at quadrature point p
+        if (this->calculate_dphiref)
+          for (unsigned int i=0; i<n_approx_shape_functions; i++)
+            for (unsigned int p=0; p<n_qp; p++)
+              {
+                this->dphidxi[i][p]   = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 0, qp[p]);
+                this->dphideta[i][p]  = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 1, qp[p]);
+                this->dphidzeta[i][p] = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 2, qp[p]);
+              }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	if (this->calculate_d2phi)
-	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
-	      {
+        if (this->calculate_d2phi)
+          for (unsigned int i=0; i<n_approx_shape_functions; i++)
+            for (unsigned int p=0; p<n_qp; p++)
+              {
                 this->d2phidxi2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 0, qp[p]);
                 this->d2phidxideta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 1, qp[p]);
                 this->d2phideta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 2, qp[p]);
                 this->d2phidxidzeta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 3, qp[p]);
                 this->d2phidetadzeta[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 4, qp[p]);
                 this->d2phidzeta2[i][p] = FE<Dim,T>::shape_second_deriv (elem, this->fe_type.order, i, 5, qp[p]);
-	      }
+              }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-	break;
+        break;
       }
 
 
@@ -528,7 +528,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_base_shape_functions(const std::vector<Point>& qp,
-					  const Elem* e)
+                                          const Elem* e)
 {
   // I don't understand infinite elements well enough to risk
   // calculating too little.  :-(  RHS

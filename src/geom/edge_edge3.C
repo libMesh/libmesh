@@ -66,7 +66,7 @@ bool Edge3::is_face(const unsigned int ) const
 }
 
 bool Edge3::is_node_on_side(const unsigned int n,
-			    const unsigned int s) const
+                            const unsigned int s) const
 {
   libmesh_assert_less (s, 2);
   libmesh_assert_less (n, 3);
@@ -74,7 +74,7 @@ bool Edge3::is_node_on_side(const unsigned int n,
 }
 
 bool Edge3::is_node_on_edge(const unsigned int,
-			    const unsigned int libmesh_dbg_var(e)) const
+                            const unsigned int libmesh_dbg_var(e)) const
 {
   libmesh_assert_equal_to (e, 0);
   return true;
@@ -91,8 +91,8 @@ bool Edge3::has_affine_map() const
 
 
 void Edge3::connectivity(const unsigned int sc,
-			 const IOPackage iop,
-			 std::vector<dof_id_type>& conn) const
+                         const IOPackage iop,
+                         std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_less_equal (sc, 1);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -105,21 +105,21 @@ void Edge3::connectivity(const unsigned int sc,
     {
     case TECPLOT:
       {
-	switch (sc)
-	  {
-	  case 0:
-	    conn[0] = this->node(0)+1;
-	    conn[1] = this->node(2)+1;
-	    return;
+        switch (sc)
+          {
+          case 0:
+            conn[0] = this->node(0)+1;
+            conn[1] = this->node(2)+1;
+            return;
 
-	  case 1:
-	    conn[0] = this->node(2)+1;
-	    conn[1] = this->node(1)+1;
-	    return;
+          case 1:
+            conn[0] = this->node(2)+1;
+            conn[1] = this->node(1)+1;
+            return;
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
 
@@ -132,29 +132,29 @@ void Edge3::connectivity(const unsigned int sc,
         return;
 
         /*
-	switch (sc)
-	  {
-	  case 0:
-	    conn[0] = this->node(0);
-	    conn[1] = this->node(2);
+          switch (sc)
+          {
+          case 0:
+          conn[0] = this->node(0);
+          conn[1] = this->node(2);
 
-	    return;
+          return;
 
-	  case 1:
-	    conn[0] = this->node(2);
-	    conn[1] = this->node(1);
+          case 1:
+          conn[0] = this->node(2);
+          conn[1] = this->node(1);
 
-	    return;
+          return;
 
-	  default:
-	    libmesh_error();
+          default:
+          libmesh_error();
           }
         */
       }
 
     default:
       {
-	libmesh_error();
+        libmesh_error();
       }
     }
 }
@@ -193,9 +193,9 @@ Real Edge3::volume () const
   const Real s2 = std::sqrt(1. + ba + ca);
 
   return 0.5*std::sqrt(a)*((1.-0.5*ba)*s1 +
-			   (1.+0.5*ba)*s2 +
-			   (ca - 0.25*ba*ba)*std::log( (1.-0.5*ba+s1)/(-1.-0.5*ba+s2) )
-			   );
+                           (1.+0.5*ba)*s2 +
+                           (ca - 0.25*ba*ba)*std::log( (1.-0.5*ba+s1)/(-1.-0.5*ba+s2) )
+                           );
 }
 
 } // namespace libMesh

@@ -66,24 +66,24 @@ namespace libMesh
 
     {
       Point
-	&p_min(_src_bbox.min()),
-	&p_max(_src_bbox.max());
+        &p_min(_src_bbox.min()),
+        &p_max(_src_bbox.max());
 
       for (unsigned int p=0; p<n_src_pts; p++)
-	{
-	  const Point &p_src(_src_pts[p]);
+        {
+          const Point &p_src(_src_pts[p]);
 
-	  for (unsigned int d=0; d<LIBMESH_DIM; d++)
-	    {
-	      p_min(d) = std::min(p_min(d), p_src(d));
-	      p_max(d) = std::max(p_max(d), p_src(d));
-	    }
-	}
+          for (unsigned int d=0; d<LIBMESH_DIM; d++)
+            {
+              p_min(d) = std::min(p_min(d), p_src(d));
+              p_max(d) = std::max(p_max(d), p_src(d));
+            }
+        }
     }
 
     libMesh::out << "bounding box is \n"
-	         << _src_bbox.min() << '\n'
-	         << _src_bbox.max() << std::endl;
+                 << _src_bbox.min() << '\n'
+                 << _src_bbox.max() << std::endl;
 
 
     // Construct the Radial Basis Function, giving it the size of the domain
@@ -95,10 +95,10 @@ namespace libMesh
     RBF rbf(_r_bbox);
 
     libMesh::out << "bounding box is \n"
-	         << _src_bbox.min() << '\n'
-	         << _src_bbox.max() << '\n'
-	         << "r_bbox = " << _r_bbox << '\n'
-	         << "rbf(r_bbox/2) = " << rbf(_r_bbox/2) << std::endl;
+                 << _src_bbox.min() << '\n'
+                 << _src_bbox.max() << '\n'
+                 << "r_bbox = " << _r_bbox << '\n'
+                 << "rbf(r_bbox/2) = " << rbf(_r_bbox/2) << std::endl;
 
 
     // Construct the projection Matrix
@@ -109,23 +109,23 @@ namespace libMesh
 
     for (unsigned int i=0; i<n_src_pts; i++)
       {
-	const Point &x_i (_src_pts[i]);
+        const Point &x_i (_src_pts[i]);
 
-	// Diagonal
-	A(i,i) = rbf(0.);
+        // Diagonal
+        A(i,i) = rbf(0.);
 
-	for (unsigned int j=i+1; j<n_src_pts; j++)
-	  {
-	    const Point &x_j (_src_pts[j]);
+        for (unsigned int j=i+1; j<n_src_pts; j++)
+          {
+            const Point &x_j (_src_pts[j]);
 
-	    const Real r_ij = (x_j - x_i).size();
+            const Real r_ij = (x_j - x_i).size();
 
-	    A(i,j) = A(j,i) = rbf(r_ij);
-	  }
+            A(i,j) = A(j,i) = rbf(r_ij);
+          }
 
-	// set source data
-	for (unsigned int var=0; var<n_vars; var++)
-	  b(i,var) = _src_vals[i*n_vars + var];
+        // set source data
+        for (unsigned int var=0; var<n_vars; var++)
+          b(i,var) = _src_vals[i*n_vars + var];
       }
 
 
@@ -138,7 +138,7 @@ namespace libMesh
 
     for (unsigned int i=0; i<n_src_pts; i++)
       for (unsigned int var=0; var<n_vars; var++)
-	_weights[i*n_vars + var] = x(i,var);
+        _weights[i*n_vars + var] = x(i,var);
 
 
     STOP_LOG  ("prepare_for_use()", "RadialBasisInterpolation<>");
@@ -150,8 +150,8 @@ namespace libMesh
 
   template <unsigned int KDDim, class RBF>
   void RadialBasisInterpolation<KDDim,RBF>::interpolate_field_data (const std::vector<std::string> &field_names,
-								    const std::vector<Point>  &tgt_pts,
-								    std::vector<Number> &tgt_vals) const
+                                                                    const std::vector<Point>  &tgt_pts,
+                                                                    std::vector<Number> &tgt_vals) const
   {
     START_LOG ("interpolate_field_data()", "RadialBasisInterpolation<>");
 
@@ -169,17 +169,17 @@ namespace libMesh
     // that means the names and ordering better be identical!
     if (this->_names.size() != field_names.size())
       {
-	libMesh::err << "ERROR:  when adding field data to an existing list the\n"
-		     << "varaible list must be the same!\n";
-	libmesh_error();
+        libMesh::err << "ERROR:  when adding field data to an existing list the\n"
+                     << "varaible list must be the same!\n";
+        libmesh_error();
       }
     for (unsigned int v=0; v<this->_names.size(); v++)
       if (_names[v] != field_names[v])
-	{
-	  libMesh::err << "ERROR:  when adding field data to an existing list the\n"
-		       << "varaible list must be the same!\n";
-	  libmesh_error();
-	}
+        {
+          libMesh::err << "ERROR:  when adding field data to an existing list the\n"
+                       << "varaible list must be the same!\n";
+          libmesh_error();
+        }
 
 
     RBF rbf(_r_bbox);
@@ -188,18 +188,18 @@ namespace libMesh
 
     for (unsigned int tgt=0; tgt<n_tgt_pts; tgt++)
       {
-	const Point &p (tgt_pts[tgt]);
+        const Point &p (tgt_pts[tgt]);
 
-	for (unsigned int i=0; i<n_src_pts; i++)
-	  {
-	    const Point &x_i(_src_pts[i]);
-	    const Real
-	      r_i   = (p - x_i).size(),
-	      phi_i = rbf(r_i);
+        for (unsigned int i=0; i<n_src_pts; i++)
+          {
+            const Point &x_i(_src_pts[i]);
+            const Real
+              r_i   = (p - x_i).size(),
+              phi_i = rbf(r_i);
 
-	    for (unsigned int var=0; var<n_vars; var++)
-	      tgt_vals[tgt*n_vars + var] += _weights[i*n_vars + var]*phi_i;
-	  }
+            for (unsigned int var=0; var<n_vars; var++)
+              tgt_vals[tgt*n_vars + var] += _weights[i*n_vars + var]*phi_i;
+          }
       }
 
     STOP_LOG ("interpolate_field_data()", "RadialBasisInterpolation<>");

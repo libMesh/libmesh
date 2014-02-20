@@ -76,7 +76,7 @@ namespace libMesh
     struct FirstOrder
     {
       bool operator()(const value_type &lhs,
-		      const value_type &rhs) const
+                      const value_type &rhs) const
       { return lhs.first < rhs.first; }
     };
 
@@ -86,7 +86,7 @@ namespace libMesh
     struct FirstCompare
     {
       bool operator()(const value_type &lhs,
-		      const value_type &rhs) const
+                      const value_type &rhs) const
       { return lhs.first == rhs.first; }
     };
 
@@ -137,7 +137,7 @@ namespace libMesh
     const Tp & operator[](const key_type &key) const
     {
       if (!_sorted)
-	const_cast<vectormap<Key, Tp>*>(this)->sort();
+        const_cast<vectormap<Key, Tp>*>(this)->sort();
 
       libmesh_assert (_sorted);
 
@@ -147,7 +147,7 @@ namespace libMesh
       FirstOrder order;
 
       typename vectormap<Key,Tp>::const_iterator
-	lower_bound = std::lower_bound (this->begin(), this->end(), to_find, order);
+        lower_bound = std::lower_bound (this->begin(), this->end(), to_find, order);
 
       libmesh_assert (lower_bound != this->end());
       libmesh_assert_equal_to (lower_bound->first, key);
@@ -162,7 +162,7 @@ namespace libMesh
     unsigned int count (const key_type &key) const
     {
       if (!_sorted)
-	const_cast<vectormap<Key, Tp>*>(this)->sort();
+        const_cast<vectormap<Key, Tp>*>(this)->sort();
 
       libmesh_assert (_sorted);
 
@@ -172,8 +172,8 @@ namespace libMesh
       FirstOrder order;
 
       std::pair<typename vectormap<Key,Tp>::const_iterator,
-		typename vectormap<Key,Tp>::const_iterator>
-	bounds = std::equal_range (this->begin(), this->end(), to_find, order);
+        typename vectormap<Key,Tp>::const_iterator>
+        bounds = std::equal_range (this->begin(), this->end(), to_find, order);
 
       return std::distance (bounds.first, bounds.second);
     }

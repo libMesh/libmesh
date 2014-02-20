@@ -83,7 +83,7 @@ bool InfHex8::is_face(const unsigned int) const
 }
 
 bool InfHex8::is_node_on_side(const unsigned int n,
-			      const unsigned int s) const
+                              const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 4; ++i)
@@ -93,7 +93,7 @@ bool InfHex8::is_node_on_side(const unsigned int n,
 }
 
 bool InfHex8::is_node_on_edge(const unsigned int n,
-			      const unsigned int e) const
+                              const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 2; ++i)
@@ -103,32 +103,32 @@ bool InfHex8::is_node_on_edge(const unsigned int n,
 }
 
 AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
-				   bool proxy) const
+                                   bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
       switch (i)
-	{
-	  // base
-	case 0:
-	  {
-	    AutoPtr<Elem> ap(new Side<Quad4,InfHex8>(this,i));
-	    return ap;
-	  }
-	  // ifem sides
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	  {
-	    AutoPtr<Elem> ap(new Side<InfQuad4,InfHex8>(this,i));
-	    return ap;
-	  }
-	default:
-	  libmesh_error();
-	}
+        {
+          // base
+        case 0:
+          {
+            AutoPtr<Elem> ap(new Side<Quad4,InfHex8>(this,i));
+            return ap;
+          }
+          // ifem sides
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+          {
+            AutoPtr<Elem> ap(new Side<InfQuad4,InfHex8>(this,i));
+            return ap;
+          }
+        default:
+          libmesh_error();
+        }
     }
 
   else
@@ -138,73 +138,73 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
 
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
       switch (i)
-	{
-	case 0: // the base face
-	  {
+        {
+        case 0: // the base face
+          {
             face.reset(new Quad4);
 
-	    // Only here, the face element's normal points inward
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(2);
-	    face->set_node(3) = this->get_node(3);
+            // Only here, the face element's normal points inward
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(2);
+            face->set_node(3) = this->get_node(3);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 1:  // connecting to another infinite element
-	  {
+        case 1:  // connecting to another infinite element
+          {
             face.reset(new InfQuad4);
 
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(4);
-	    face->set_node(3) = this->get_node(5);
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(4);
+            face->set_node(3) = this->get_node(5);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 2:  // connecting to another infinite element
-	  {
+        case 2:  // connecting to another infinite element
+          {
             face.reset(new InfQuad4);
 
-	    face->set_node(0) = this->get_node(1);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(5);
-	    face->set_node(3) = this->get_node(6);
+            face->set_node(0) = this->get_node(1);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(5);
+            face->set_node(3) = this->get_node(6);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 3:  // connecting to another infinite element
-	  {
+        case 3:  // connecting to another infinite element
+          {
             face.reset(new InfQuad4);
 
-	    face->set_node(0) = this->get_node(2);
-	    face->set_node(1) = this->get_node(3);
-	    face->set_node(2) = this->get_node(6);
-	    face->set_node(3) = this->get_node(7);
+            face->set_node(0) = this->get_node(2);
+            face->set_node(1) = this->get_node(3);
+            face->set_node(2) = this->get_node(6);
+            face->set_node(3) = this->get_node(7);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 4:  // connecting to another infinite element
-	  {
+        case 4:  // connecting to another infinite element
+          {
             face.reset(new InfQuad4);
 
-	    face->set_node(0) = this->get_node(3);
-	    face->set_node(1) = this->get_node(0);
-	    face->set_node(2) = this->get_node(7);
-	    face->set_node(3) = this->get_node(4);
+            face->set_node(0) = this->get_node(3);
+            face->set_node(1) = this->get_node(0);
+            face->set_node(2) = this->get_node(7);
+            face->set_node(3) = this->get_node(4);
 
-	    break;
-	  }
+            break;
+          }
 
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+        default:
+          {
+            libmesh_error();
+          }
+        }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
@@ -250,9 +250,9 @@ bool InfHex8::contains_point (const Point& p, Real tol) const
    * Use size_sq() instead of size(), it is faster
    */
   const Real min_distance_sq = std::min((Point(this->point(0)-origin)).size_sq(),
-					std::min((Point(this->point(1)-origin)).size_sq(),
-						 std::min((Point(this->point(2)-origin)).size_sq(),
-							  (Point(this->point(3)-origin)).size_sq())));
+                                        std::min((Point(this->point(1)-origin)).size_sq(),
+                                                 std::min((Point(this->point(2)-origin)).size_sq(),
+                                                          (Point(this->point(3)-origin)).size_sq())));
 
   /*
    * work with 1% allowable deviation.  We can still fall
@@ -278,11 +278,11 @@ bool InfHex8::contains_point (const Point& p, Real tol) const
       FEType fe_type(default_order());
 
       const Point mapped_point = FEInterface::inverse_map(dim(),
-							  fe_type,
-							  this,
-							  p,
-							  tol,
-							  false);
+                                                          fe_type,
+                                                          this,
+                                                          p,
+                                                          tol,
+                                                          false);
 
       return FEInterface::on_reference_element(mapped_point, this->type(), tol);
     }
@@ -290,8 +290,8 @@ bool InfHex8::contains_point (const Point& p, Real tol) const
 
 
 void InfHex8::connectivity(const unsigned int libmesh_dbg_var(sc),
-			   const IOPackage iop,
-			   std::vector<dof_id_type>& conn) const
+                           const IOPackage iop,
+                           std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -301,16 +301,16 @@ void InfHex8::connectivity(const unsigned int libmesh_dbg_var(sc),
     {
     case TECPLOT:
       {
-	conn.resize(8);
-	conn[0] = this->node(0)+1;
-	conn[1] = this->node(1)+1;
-	conn[2] = this->node(2)+1;
-	conn[3] = this->node(3)+1;
-	conn[4] = this->node(4)+1;
-	conn[5] = this->node(5)+1;
-	conn[6] = this->node(6)+1;
-	conn[7] = this->node(7)+1;
-	return;
+        conn.resize(8);
+        conn[0] = this->node(0)+1;
+        conn[1] = this->node(1)+1;
+        conn[2] = this->node(2)+1;
+        conn[3] = this->node(3)+1;
+        conn[4] = this->node(4)+1;
+        conn[5] = this->node(5)+1;
+        conn[6] = this->node(6)+1;
+        conn[7] = this->node(7)+1;
+        return;
       }
 
 

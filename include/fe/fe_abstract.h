@@ -104,7 +104,7 @@ protected:
    * cannot be explicitly instantiated.
    */
   FEAbstract (const unsigned int dim,
-	      const FEType& fet);
+              const FEType& fet);
 
 public:
 
@@ -119,7 +119,7 @@ public:
    * way the user need not remember to delete the object.
    */
   static AutoPtr<FEAbstract> build (const unsigned int dim,
-				    const FEType& type);
+                                    const FEType& type);
 
   /**
    * This is at the core of this class. Use this for each
@@ -136,7 +136,7 @@ public:
    * \p reinit().
    */
   virtual void reinit (const Elem* elem,
-		       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Point>* const pts = NULL,
                        const std::vector<Real>* const weights = NULL) = 0;
 
   /**
@@ -148,8 +148,8 @@ public:
    * \em side element may be specified in the optional argument \p pts.
    */
   virtual void reinit (const Elem* elem,
-		       const unsigned int side,
-		       const Real tolerance = TOLERANCE,
+                       const unsigned int side,
+                       const Real tolerance = TOLERANCE,
                        const std::vector<Point>* const pts = NULL,
                        const std::vector<Real>* const weights = NULL) = 0;
 
@@ -162,8 +162,8 @@ public:
    * \em edge element may be specified in the optional argument \p pts.
    */
   virtual void edge_reinit (const Elem* elem,
-		            const unsigned int edge,
-			    const Real tolerance = TOLERANCE,
+                            const unsigned int edge,
+                            const Real tolerance = TOLERANCE,
                             const std::vector<Point>* pts = NULL,
                             const std::vector<Real>* weights = NULL) = 0;
 
@@ -185,14 +185,14 @@ public:
    * \f$ x \le 1 + \epsilon \f$.
    */
   static bool on_reference_element(const Point& p,
-				   const ElemType t,
-				   const Real eps = TOLERANCE);
+                                   const ElemType t,
+                                   const Real eps = TOLERANCE);
   /**
    * returns the reference space nodes coordinates
    * given the element type
    */
   static void get_refspace_nodes(const ElemType t,
-	                         std::vector<Point>& nodes);
+                                 std::vector<Point>& nodes);
 
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -597,7 +597,7 @@ protected:
 // FEAbstract class inline members
 inline
 FEAbstract::FEAbstract(const unsigned int d,
-		       const FEType& fet) :
+                       const FEType& fet) :
   _fe_map( FEMap::build(fet) ),
   dim(d),
   calculations_started(false),

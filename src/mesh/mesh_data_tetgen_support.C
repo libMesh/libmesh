@@ -58,7 +58,7 @@ void MeshData::read_tetgen (const std::string& name)
   else
     {
       libMesh::err << "ERROR: Unrecognized file name: "
-		    << name << std::endl;
+                   << name << std::endl;
       libmesh_error();
     }
 
@@ -69,9 +69,9 @@ void MeshData::read_tetgen (const std::string& name)
   if ( !node_stream.good() || !ele_stream.good() )
     {
       libMesh::err << "ERROR: One or both Input file(s) not good." << std::endl
-		    << "Error checking files "
-		    << name_node << " and "
-		    << name_ele  << std::endl;
+                   << "Error checking files "
+                   << name_node << " and "
+                   << name_ele  << std::endl;
       libmesh_error();
     }
 
@@ -90,36 +90,36 @@ void MeshData::read_tetgen (const std::string& name)
 
     // Read the parameters from the node_stream.
     node_stream >> n_node     // Read the number of nodes
-		>> dummy_val  // Read the dimension
-		>> nAttri     // Read the number of attributes
-		>> BoundMark; // (0 or 1) boundary markers are in the stream or not.
+                >> dummy_val  // Read the dimension
+                >> nAttri     // Read the number of attributes
+                >> BoundMark; // (0 or 1) boundary markers are in the stream or not.
 
     // Resize the values vector.
     AttriValue.resize(nAttri);
 
     for (unsigned int i=0; i<n_node; i++)
       {
-	node_stream >> f_n_id;
+        node_stream >> f_n_id;
 
 
-	// Read the nodal coordinates for this node into dummy_val,
-	// since we don't need them.
-	for (unsigned int j=0; j<3; j++)
-	  node_stream >> dummy_val;
-
-	// Read the attributes from the stream.
-	for (unsigned int j=0; j<nAttri; j++)
-	  node_stream >> AttriValue[j];
-
-	// Read boundary marker if BoundaryMarker=1.
-	if (BoundMark == 1)
+        // Read the nodal coordinates for this node into dummy_val,
+        // since we don't need them.
+        for (unsigned int j=0; j<3; j++)
           node_stream >> dummy_val;
 
-	// For the foreign node id locate the Node*.
-     	const Node* node = foreign_id_to_node(f_n_id);
+        // Read the attributes from the stream.
+        for (unsigned int j=0; j<nAttri; j++)
+          node_stream >> AttriValue[j];
 
-	// Insert this node and the values in our _node_data.
-	_node_data.insert (std::make_pair(node, AttriValue));
+        // Read boundary marker if BoundaryMarker=1.
+        if (BoundMark == 1)
+          node_stream >> dummy_val;
+
+        // For the foreign node id locate the Node*.
+        const Node* node = foreign_id_to_node(f_n_id);
+
+        // Insert this node and the values in our _node_data.
+        _node_data.insert (std::make_pair(node, AttriValue));
       }
   }
 
@@ -133,30 +133,30 @@ void MeshData::read_tetgen (const std::string& name)
 
     // Read the parameters from the ele_stream.
     ele_stream >> n_elem   // Read the number of tetrahedrons
-	       >> n_nodes  // Read the points per tetrahedron
-	       >> nAttri;  // Read the number of attributes
+               >> n_nodes  // Read the points per tetrahedron
+               >> nAttri;  // Read the number of attributes
 
     // Resize the values vector.
     AttriValue.resize(nAttri);
 
     for (unsigned int i=0; i<n_elem; i++)
       {
-	ele_stream >> f_e_id;
+        ele_stream >> f_e_id;
 
-	// For the number of nodes for this element read them into dummy_val,
-	// since we don't need them.
-	for (unsigned int n=0; n<n_nodes; n++)
+        // For the number of nodes for this element read them into dummy_val,
+        // since we don't need them.
+        for (unsigned int n=0; n<n_nodes; n++)
           ele_stream >> dummy_val;
 
-	// Read the attributes from the stream.
-	for (unsigned int j=0; j<nAttri; j++)
+        // Read the attributes from the stream.
+        for (unsigned int j=0; j<nAttri; j++)
           ele_stream >> AttriValue[j];
 
-	// For the foreign elem id locate the Elem*.
-     	const Elem* elem = foreign_id_to_elem(f_e_id);
+        // For the foreign elem id locate the Elem*.
+        const Elem* elem = foreign_id_to_elem(f_e_id);
 
-	// Insert this elem and the values in our _elem_data.
-	_elem_data.insert (std::make_pair(elem, AttriValue));
+        // Insert this elem and the values in our _elem_data.
+        _elem_data.insert (std::make_pair(elem, AttriValue));
       }
   }
 

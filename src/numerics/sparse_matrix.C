@@ -59,8 +59,8 @@ SparseMatrix<T>::~SparseMatrix ()
 // default implementation is to fall back to non-blocked method
 template <typename T>
 void SparseMatrix<T>::add_block_matrix (const DenseMatrix<T> &dm,
-					const std::vector<numeric_index_type> &brows,
-					const std::vector<numeric_index_type> &bcols)
+                                        const std::vector<numeric_index_type> &brows,
+                                        const std::vector<numeric_index_type> &bcols)
 {
   libmesh_assert_equal_to (dm.m() / brows.size(), dm.n() / bcols.size());
 
@@ -79,7 +79,7 @@ void SparseMatrix<T>::add_block_matrix (const DenseMatrix<T> &dm,
       numeric_index_type i=brows[ib]*blocksize;
 
       for (unsigned int v=0; v<blocksize; v++)
-	rows.push_back(i++);
+        rows.push_back(i++);
     }
 
   for (unsigned int jb=0; jb<bcols.size(); jb++)
@@ -87,7 +87,7 @@ void SparseMatrix<T>::add_block_matrix (const DenseMatrix<T> &dm,
       numeric_index_type j=bcols[jb]*blocksize;
 
       for (unsigned int v=0; v<blocksize; v++)
-	cols.push_back(j++);
+        cols.push_back(j++);
     }
 
   this->add_matrix (dm, rows, cols);
@@ -110,7 +110,7 @@ void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
   for (numeric_index_type i=0; i<this->m(); i++)
     {
       for (numeric_index_type j=0; j<this->n(); j++)
-	os << std::setw(8) << (*this)(i,j).real() << " ";
+        os << std::setw(8) << (*this)(i,j).real() << " ";
       os << std::endl;
     }
 
@@ -118,7 +118,7 @@ void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
   for (numeric_index_type i=0; i<this->m(); i++)
     {
       for (numeric_index_type j=0; j<this->n(); j++)
-	os << std::setw(8) << (*this)(i,j).imag() << " ";
+        os << std::setw(8) << (*this)(i,j).imag() << " ";
       os << std::endl;
     }
 }
@@ -132,7 +132,7 @@ void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
 template <typename T>
 AutoPtr<SparseMatrix<T> >
 SparseMatrix<T>::build(const Parallel::Communicator &comm,
-		       const SolverPackage solver_package)
+                       const SolverPackage solver_package)
 {
   // Build the appropriate vector
   switch (solver_package)
@@ -142,8 +142,8 @@ SparseMatrix<T>::build(const Parallel::Communicator &comm,
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new LaspackMatrix<T>(comm));
-	return ap;
+        AutoPtr<SparseMatrix<T> > ap(new LaspackMatrix<T>(comm));
+        return ap;
       }
 #endif
 
@@ -151,8 +151,8 @@ SparseMatrix<T>::build(const Parallel::Communicator &comm,
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new PetscMatrix<T>(comm));
-	return ap;
+        AutoPtr<SparseMatrix<T> > ap(new PetscMatrix<T>(comm));
+        return ap;
       }
 #endif
 
@@ -160,8 +160,8 @@ SparseMatrix<T>::build(const Parallel::Communicator &comm,
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new EpetraMatrix<T>(comm));
-	return ap;
+        AutoPtr<SparseMatrix<T> > ap(new EpetraMatrix<T>(comm));
+        return ap;
       }
 #endif
 
@@ -169,16 +169,16 @@ SparseMatrix<T>::build(const Parallel::Communicator &comm,
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new EigenSparseMatrix<T>(comm));
-	return ap;
+        AutoPtr<SparseMatrix<T> > ap(new EigenSparseMatrix<T>(comm));
+        return ap;
       }
 #endif
 
 
     default:
       libMesh::err << "ERROR:  Unrecognized solver package: "
-		    << solver_package
-		    << std::endl;
+                   << solver_package
+                   << std::endl;
       libmesh_error();
     }
 
@@ -189,7 +189,7 @@ SparseMatrix<T>::build(const Parallel::Communicator &comm,
 
 template <typename T>
 void SparseMatrix<T>::vector_mult (NumericVector<T>& dest,
-				   const NumericVector<T>& arg) const
+                                   const NumericVector<T>& arg) const
 {
   dest.zero();
   this->vector_mult_add(dest,arg);
@@ -199,7 +199,7 @@ void SparseMatrix<T>::vector_mult (NumericVector<T>& dest,
 
 template <typename T>
 void SparseMatrix<T>::vector_mult_add (NumericVector<T>& dest,
-				       const NumericVector<T>& arg) const
+                                       const NumericVector<T>& arg) const
 {
   /* This functionality is actually implemented in the \p
      NumericVector class.  */
@@ -238,23 +238,23 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
       for (numeric_index_type i=this->_dof_map->first_dof();
            i!=this->_dof_map->end_dof(); ++i)
         {
-	  if(sparse)
-	    {
-	      for (numeric_index_type j=0; j<this->n(); j++)
-		{
-		  T c = (*this)(i,j);
-		  if (c != static_cast<T>(0.0))
-		    {
-		      os << i << " " << j << " " << c << std::endl;
-		    }
-		}
-	    }
-	  else
-	    {
-	      for (numeric_index_type j=0; j<this->n(); j++)
-		os << (*this)(i,j) << " ";
-	      os << std::endl;
-	    }
+          if(sparse)
+            {
+              for (numeric_index_type j=0; j<this->n(); j++)
+                {
+                  T c = (*this)(i,j);
+                  if (c != static_cast<T>(0.0))
+                    {
+                      os << i << " " << j << " " << c << std::endl;
+                    }
+                }
+            }
+          else
+            {
+              for (numeric_index_type j=0; j<this->n(); j++)
+                os << (*this)(i,j) << " ";
+              os << std::endl;
+            }
         }
 
       std::vector<numeric_index_type> ibuf, jbuf;
@@ -273,49 +273,49 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
           libmesh_assert_greater_equal (ibuf.front(), currenti);
           libmesh_assert_greater_equal (ibuf.back(), ibuf.front());
 
-	  std::size_t currentb = 0;
+          std::size_t currentb = 0;
           for (;currenti <= ibuf.back(); ++currenti)
             {
-	      if(sparse)
-		{
-		  for (numeric_index_type j=0; j<this->n(); j++)
-		    {
-		      if (currentb < ibuf.size() &&
-			  ibuf[currentb] == currenti &&
-			  jbuf[currentb] == j)
-			{
-			  os << currenti << " " << j << " " << cbuf[currentb] << std::endl;
-			  currentb++;
-			}
-		    }
-		}
-	      else
-		{
-		  for (numeric_index_type j=0; j<this->n(); j++)
-		    {
-		      if (currentb < ibuf.size() &&
-			  ibuf[currentb] == currenti &&
-			  jbuf[currentb] == j)
-			{
-			  os << cbuf[currentb] << " ";
-			  currentb++;
-			}
-		      else
-			os << static_cast<T>(0.0) << " ";
-		    }
-		  os << std::endl;
-		}
+              if(sparse)
+                {
+                  for (numeric_index_type j=0; j<this->n(); j++)
+                    {
+                      if (currentb < ibuf.size() &&
+                          ibuf[currentb] == currenti &&
+                          jbuf[currentb] == j)
+                        {
+                          os << currenti << " " << j << " " << cbuf[currentb] << std::endl;
+                          currentb++;
+                        }
+                    }
+                }
+              else
+                {
+                  for (numeric_index_type j=0; j<this->n(); j++)
+                    {
+                      if (currentb < ibuf.size() &&
+                          ibuf[currentb] == currenti &&
+                          jbuf[currentb] == j)
+                        {
+                          os << cbuf[currentb] << " ";
+                          currentb++;
+                        }
+                      else
+                        os << static_cast<T>(0.0) << " ";
+                    }
+                  os << std::endl;
+                }
             }
         }
       if(!sparse)
-	{
-	  for (; currenti != this->m(); ++currenti)
-	    {
-	      for (numeric_index_type j=0; j<this->n(); j++)
-		os << static_cast<T>(0.0) << " ";
-	      os << std::endl;
-	    }
-	}
+        {
+          for (; currenti != this->m(); ++currenti)
+            {
+              for (numeric_index_type j=0; j<this->n(); j++)
+                os << static_cast<T>(0.0) << " ";
+              os << std::endl;
+            }
+        }
     }
   else
     {
@@ -328,7 +328,7 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
            i!=this->_dof_map->end_dof(); ++i)
         {
           for (numeric_index_type j=0; j<this->n(); j++)
-	    {
+            {
               T c = (*this)(i,j);
               if (c != static_cast<T>(0.0))
                 {
@@ -336,7 +336,7 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
                   jbuf.push_back(j);
                   cbuf.push_back(c);
                 }
-	    }
+            }
         }
       this->comm().send(0,ibuf);
       this->comm().send(0,jbuf);

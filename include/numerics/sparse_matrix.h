@@ -63,7 +63,7 @@ std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
 
 template <typename T>
 class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T> >,
-		     public ParallelObject
+  public ParallelObject
 {
 public:
   /**
@@ -83,7 +83,7 @@ public:
    */
   explicit
   SparseMatrix (const Parallel::Communicator &comm
-		LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor. Free all memory, but do not
@@ -98,7 +98,7 @@ public:
    */
   static AutoPtr<SparseMatrix<T> >
   build(const Parallel::Communicator &comm,
-	const SolverPackage solver_package = libMesh::default_solver_package());
+        const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
    * @returns true if the matrix has been initialized,
@@ -140,12 +140,12 @@ public:
    * for systems with multiple variables all of the same type.
    */
   virtual void init (const numeric_index_type m,
-		     const numeric_index_type n,
-		     const numeric_index_type m_l,
-		     const numeric_index_type n_l,
-		     const numeric_index_type nnz=30,
-		     const numeric_index_type noz=10,
-		     const numeric_index_type blocksize=1) = 0;
+                     const numeric_index_type n,
+                     const numeric_index_type m_l,
+                     const numeric_index_type n_l,
+                     const numeric_index_type nnz=30,
+                     const numeric_index_type noz=10,
+                     const numeric_index_type blocksize=1) = 0;
 
   /**
    * Initialize using sparsity structure computed by \p dof_map.
@@ -208,8 +208,8 @@ public:
    * zero values in non-existent fields.
    */
   virtual void set (const numeric_index_type i,
-		    const numeric_index_type j,
-		    const T value) = 0;
+                    const numeric_index_type j,
+                    const T value) = 0;
 
   /**
    * Add \p value to the element
@@ -220,8 +220,8 @@ public:
    * non-existent fields.
    */
   virtual void add (const numeric_index_type i,
-		    const numeric_index_type j,
-		    const T value) = 0;
+                    const numeric_index_type j,
+                    const T value) = 0;
 
   /**
    * Add the full matrix \p dm to the
@@ -230,15 +230,15 @@ public:
    * at assembly time
    */
   virtual void add_matrix (const DenseMatrix<T> &dm,
-			   const std::vector<numeric_index_type> &rows,
-			   const std::vector<numeric_index_type> &cols) = 0;
+                           const std::vector<numeric_index_type> &rows,
+                           const std::vector<numeric_index_type> &cols) = 0;
 
   /**
    * Same as \p add_matrix, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
   virtual void add_matrix (const DenseMatrix<T> &dm,
-			   const std::vector<numeric_index_type> &dof_indices) = 0;
+                           const std::vector<numeric_index_type> &dof_indices) = 0;
 
   /**
    * Add the full matrix \p dm to the
@@ -248,15 +248,15 @@ public:
    * correspond to the *block* row, columm indices.
    */
   virtual void add_block_matrix (const DenseMatrix<T> &dm,
-				 const std::vector<numeric_index_type> &brows,
-				 const std::vector<numeric_index_type> &bcols);
+                                 const std::vector<numeric_index_type> &brows,
+                                 const std::vector<numeric_index_type> &bcols);
 
   /**
    * Same as \p add_block_matrix , but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
   virtual void add_block_matrix (const DenseMatrix<T> &dm,
-				 const std::vector<numeric_index_type> &dof_indices)
+                                 const std::vector<numeric_index_type> &dof_indices)
   { this->add_block_matrix (dm, dof_indices, dof_indices); }
 
   /**
@@ -274,7 +274,7 @@ public:
    * you call this function.
    */
   virtual T operator () (const numeric_index_type i,
-			 const numeric_index_type j) const = 0;
+                         const numeric_index_type j) const = 0;
 
   /**
    * Return the l1-norm of the matrix, that is
@@ -366,13 +366,13 @@ public:
    * Currently this operation is only defined for the PetscMatrix type.
    */
   virtual void create_submatrix(SparseMatrix<T>& submatrix,
-				const std::vector<numeric_index_type>& rows,
-				const std::vector<numeric_index_type>& cols) const
+                                const std::vector<numeric_index_type>& rows,
+                                const std::vector<numeric_index_type>& cols) const
   {
     this->_get_submatrix(submatrix,
-			 rows,
-			 cols,
-			 false); // false means DO NOT REUSE submatrix
+                         rows,
+                         cols,
+                         false); // false means DO NOT REUSE submatrix
   }
 
   /**
@@ -382,13 +382,13 @@ public:
    * extracting submatrices of the same size.
    */
   virtual void reinit_submatrix(SparseMatrix<T>& submatrix,
-				const std::vector<numeric_index_type>& rows,
-				const std::vector<numeric_index_type>& cols) const
+                                const std::vector<numeric_index_type>& rows,
+                                const std::vector<numeric_index_type>& cols) const
   {
     this->_get_submatrix(submatrix,
-			 rows,
-			 cols,
-			 true); // true means REUSE submatrix
+                         rows,
+                         cols,
+                         true); // true means REUSE submatrix
   }
 
   /**
@@ -396,13 +396,13 @@ public:
    * dest.
    */
   void vector_mult (NumericVector<T>& dest,
-		    const NumericVector<T>& arg) const;
+                    const NumericVector<T>& arg) const;
 
   /**
    * Multiplies the matrix with \p arg and adds the result to \p dest.
    */
   void vector_mult_add (NumericVector<T>& dest,
-			const NumericVector<T>& arg) const;
+                        const NumericVector<T>& arg) const;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.
@@ -423,12 +423,12 @@ protected:
    * for it to work properly!
    */
   virtual void _get_submatrix(SparseMatrix<T>& ,
-			      const std::vector<numeric_index_type>& ,
-			      const std::vector<numeric_index_type>& ,
-			      const bool) const
+                              const std::vector<numeric_index_type>& ,
+                              const std::vector<numeric_index_type>& ,
+                              const bool) const
   {
     libMesh::err << "Error! This function is not yet implemented in the base class!"
-	          << std::endl;
+                 << std::endl;
     libmesh_error();
   }
 

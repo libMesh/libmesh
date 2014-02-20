@@ -30,7 +30,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // BoundaryMesh class member functions
 BoundaryMesh::BoundaryMesh(const Parallel::Communicator &comm,
-			   unsigned int d) :
+                           unsigned int d) :
   Mesh(comm,d)
 {
 }

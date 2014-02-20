@@ -27,8 +27,8 @@ namespace libMesh
 {
 
 ContinuationSystem::ContinuationSystem (EquationSystems& es,
-					const std::string& name_in,
-					const unsigned int number_in)
+                                        const std::string& name_in,
+                                        const unsigned int number_in)
   : Parent(es, name_in, number_in),
     continuation_parameter(NULL),
     quiet(true),
@@ -149,16 +149,16 @@ void ContinuationSystem::initialize_tangent()
 //   if (norm_u == norm_previous_u)
 //     {
 //       libMesh::err << "Warning, it appears u and previous_u are the "
-//   		<< "same, are you sure this is correct?"
-//   		<< "It's possible you forgot to set one or the other..."
-//   		<< std::endl;
+//   << "same, are you sure this is correct?"
+//   << "It's possible you forgot to set one or the other..."
+//   << std::endl;
 //     }
 
 //   Real delta_s_zero = std::sqrt(
-//   				(norm_u - norm_previous_u)*(norm_u - norm_previous_u) +
-//   				(*continuation_parameter-old_continuation_parameter)*
-//   				(*continuation_parameter-old_continuation_parameter)
-//   				);
+//   (norm_u - norm_previous_u)*(norm_u - norm_previous_u) +
+//   (*continuation_parameter-old_continuation_parameter)*
+//   (*continuation_parameter-old_continuation_parameter)
+//   );
 
 //   // 2.) Compute delta_s_zero as ||u -u_old|| + ...
 //   *delta_u = *solution;
@@ -186,9 +186,9 @@ void ContinuationSystem::initialize_tangent()
 //     libMesh::out << "dlambda=" << dlambda << std::endl;
 
 //   Real delta_s_zero = std::sqrt(
-//   				(norm_delta_u*norm_delta_u) +
-//   				(dlambda*dlambda)
-//   				);
+//   (norm_delta_u*norm_delta_u) +
+//   (dlambda*dlambda)
+//   );
 
 //   if (!quiet)
 //     libMesh::out << "delta_s_zero=" << delta_s_zero << std::endl;
@@ -225,7 +225,7 @@ void ContinuationSystem::initialize_tangent()
 //       Theta = 1./solution_size;
 
 //       if (!quiet)
-// 	libMesh::out << "Setting Normalization Parameter Theta=" << Theta << std::endl;
+// libMesh::out << "Setting Normalization Parameter Theta=" << Theta << std::endl;
 //     }
 
 //   // Compute d(lambda)/ds
@@ -256,9 +256,9 @@ void ContinuationSystem::initialize_tangent()
 //     libMesh::out << "dlambda=" << dlambda << std::endl;
 
 //   Real delta_s_zero = std::sqrt(
-//   				(Theta_LOCA*Theta_LOCA*Theta*norm_delta_u*norm_delta_u) +
-//   				(dlambda*dlambda)
-//   				);
+//   (Theta_LOCA*Theta_LOCA*Theta*norm_delta_u*norm_delta_u) +
+//   (dlambda*dlambda)
+//   );
 //   *du_ds = *delta_u;
 //   du_ds->scale(1./delta_s_zero);
 //   dlambda_ds = dlambda / delta_s_zero;
@@ -357,10 +357,10 @@ void ContinuationSystem::continuation_solve()
   if (!continuation_parameter)
     {
       libMesh::err << "You must set the continuation_parameter pointer "
-		    << "to a member variable of the derived class, preferably in the "
-		    << "Derived class's init_data function.  This is how the ContinuationSystem "
-		    << "updates the continuation parameter."
-		    << std::endl;
+                   << "to a member variable of the derived class, preferably in the "
+                   << "Derived class's init_data function.  This is how the ContinuationSystem "
+                   << "updates the continuation parameter."
+                   << std::endl;
 
       libmesh_error();
     }
@@ -398,10 +398,10 @@ void ContinuationSystem::continuation_solve()
   for (unsigned int ns=0; ns<n_arclength_reductions; ++ns)
     {
       if (!quiet)
-	{
-	  libMesh::out << "Current arclength stepsize, ds_current=" << ds_current << std::endl;
-	  libMesh::out << "Current parameter value, lambda=" << *continuation_parameter << std::endl;
-	}
+        {
+          libMesh::out << "Current arclength stepsize, ds_current=" << ds_current << std::endl;
+          libMesh::out << "Current parameter value, lambda=" << *continuation_parameter << std::endl;
+        }
 
       // Upon exit from the nonlinear loop, the newton_converged flag
       // will tell us the convergence status of Newton's method.
@@ -421,503 +421,503 @@ void ContinuationSystem::continuation_solve()
 
       // The nonlinear loop
       for (newton_step=0; newton_step<newton_solver->max_nonlinear_iterations; ++newton_step)
-	{
-	  libMesh::out << "\n === Starting Newton step " << newton_step << " ===" << std::endl;
+        {
+          libMesh::out << "\n === Starting Newton step " << newton_step << " ===" << std::endl;
 
-	  // Set the linear system solver tolerance
-// 	  // 1.) Set the current linear tolerance based as a multiple of the current residual of the system.
-// 	  const Real residual_multiple = 1.e-4;
-// 	  Real current_linear_tolerance = residual_multiple*nonlinear_residual_beforestep;
+          // Set the linear system solver tolerance
+          //   // 1.) Set the current linear tolerance based as a multiple of the current residual of the system.
+          //   const Real residual_multiple = 1.e-4;
+          //   Real current_linear_tolerance = residual_multiple*nonlinear_residual_beforestep;
 
-// 	  // But if the current residual isn't small, don't let the solver exit with zero iterations!
-// 	  if (current_linear_tolerance > 1.)
-// 	    current_linear_tolerance = residual_multiple;
+          //   // But if the current residual isn't small, don't let the solver exit with zero iterations!
+          //   if (current_linear_tolerance > 1.)
+          //     current_linear_tolerance = residual_multiple;
 
-	  // 2.) Set the current linear tolerance based on the method based on technique of Eisenstat & Walker.
-	  if (newton_step==0)
-	    {
-	      // At first step, only try reducing the residual by a small amount
-	      current_linear_tolerance = initial_newton_tolerance;//0.01;
-	    }
+          // 2.) Set the current linear tolerance based on the method based on technique of Eisenstat & Walker.
+          if (newton_step==0)
+            {
+              // At first step, only try reducing the residual by a small amount
+              current_linear_tolerance = initial_newton_tolerance;//0.01;
+            }
 
-	  else
-	    {
-	      // The new tolerance is based on the ratio of the most recent tolerances
-	      const Real alp=0.5*(1.+std::sqrt(5.));
-	      const Real gam=0.9;
+          else
+            {
+              // The new tolerance is based on the ratio of the most recent tolerances
+              const Real alp=0.5*(1.+std::sqrt(5.));
+              const Real gam=0.9;
 
-	      libmesh_assert_not_equal_to (nonlinear_residual_beforestep, 0.0);
-	      libmesh_assert_not_equal_to (nonlinear_residual_afterstep, 0.0);
+              libmesh_assert_not_equal_to (nonlinear_residual_beforestep, 0.0);
+              libmesh_assert_not_equal_to (nonlinear_residual_afterstep, 0.0);
 
-	      current_linear_tolerance = std::min(gam*std::pow(nonlinear_residual_afterstep/nonlinear_residual_beforestep, alp),
-						  current_linear_tolerance*current_linear_tolerance
-						  );
+              current_linear_tolerance = std::min(gam*std::pow(nonlinear_residual_afterstep/nonlinear_residual_beforestep, alp),
+                                                  current_linear_tolerance*current_linear_tolerance
+                                                  );
 
-	      // Don't let it get ridiculously small!!
-	      if (current_linear_tolerance < 1.e-12)
-		current_linear_tolerance = 1.e-12;
-	    }
+              // Don't let it get ridiculously small!!
+              if (current_linear_tolerance < 1.e-12)
+                current_linear_tolerance = 1.e-12;
+            }
 
-	  if (!quiet)
-	    libMesh::out << "Using current_linear_tolerance=" << current_linear_tolerance << std::endl;
-
-
-	  // Assemble the residual (and Jacobian).
-	  rhs_mode = Residual;
-	  assembly(true,   // Residual
-		   true); // Jacobian
-	  rhs->close();
-
-	  // Save the current nonlinear residual.  We don't need to recompute the residual unless
-	  // this is the first step, since it was already computed as part of the convergence check
-	  // at the end of the last loop iteration.
-	  if (newton_step==0)
-	    {
-	      nonlinear_residual_beforestep = rhs->l2_norm();
-
-	      // Store the residual before any steps have been taken.  This will *not*
-	      // be updated at each step, and can be used to see if any progress has
-	      // been made from the initial residual at later steps.
-	      nonlinear_residual_firststep = nonlinear_residual_beforestep;
-
-	      const Real old_norm_u = solution->l2_norm();
-	      libMesh::out << "  (before step) ||R||_{L2} = " << nonlinear_residual_beforestep << std::endl;
-	      libMesh::out << "  (before step) ||R||_{L2}/||u|| = " << nonlinear_residual_beforestep / old_norm_u << std::endl;
-
-	      // In rare cases (very small arcsteps), it's possible that the residual is
-	      // already below our absolute linear tolerance.
-	      if (nonlinear_residual_beforestep  < solution_tolerance)
-		{
-		  if (!quiet)
-		    libMesh::out << "Initial guess satisfied linear tolerance, exiting with zero Newton iterations!" << std::endl;
-
-		  // Since we go straight from here to the solve of the next tangent, we
-		  // have to close the matrix before it can be assembled again.
-		  matrix->close();
-		  newton_converged=true;
-		  break; // out of Newton iterations, with newton_converged=true
-		}
-	    }
-
-	  else
-	    {
-	      nonlinear_residual_beforestep = nonlinear_residual_afterstep;
-	    }
+          if (!quiet)
+            libMesh::out << "Using current_linear_tolerance=" << current_linear_tolerance << std::endl;
 
 
-	  // Solve the linear system G_u*z = G
-	  // Initial guess?
-	  z->zero(); // It seems to be extremely important to zero z here, otherwise the solver quits early.
-	  z->close();
+          // Assemble the residual (and Jacobian).
+          rhs_mode = Residual;
+          assembly(true,   // Residual
+                   true); // Jacobian
+          rhs->close();
 
-	  // It's possible that we have selected the current_linear_tolerance so large that
-	  // a guess of z=zero yields a linear system residual |Az + R| small enough that the
-	  // linear solver exits in zero iterations.  If this happens, we will reduce the
-	  // current_linear_tolerance until the linear solver does at least 1 iteration.
-	  do
-	    {
-	      rval =
-		linear_solver->solve(*matrix,
-				     *z,
-				     *rhs,
-				     //1.e-12,
-				     current_linear_tolerance,
-				     newton_solver->max_linear_iterations);   // max linear iterations
+          // Save the current nonlinear residual.  We don't need to recompute the residual unless
+          // this is the first step, since it was already computed as part of the convergence check
+          // at the end of the last loop iteration.
+          if (newton_step==0)
+            {
+              nonlinear_residual_beforestep = rhs->l2_norm();
 
-	      if (rval.first==0)
-		{
-		  if (newton_step==0)
-		    {
-		      libMesh::out << "Repeating initial solve with smaller linear tolerance!" << std::endl;
-		      current_linear_tolerance *= initial_newton_tolerance; // reduce the linear tolerance to force the solver to do some work
-		    }
-		  else
-		    {
-		      // We shouldn't get here ... it means the linear solver did no work on a Newton
-		      // step other than the first one.  If this happens, we need to think more about our
-		      // tolerance selection.
-		      libmesh_error();
-		    }
-		}
+              // Store the residual before any steps have been taken.  This will *not*
+              // be updated at each step, and can be used to see if any progress has
+              // been made from the initial residual at later steps.
+              nonlinear_residual_firststep = nonlinear_residual_beforestep;
 
-	    } while (rval.first==0);
+              const Real old_norm_u = solution->l2_norm();
+              libMesh::out << "  (before step) ||R||_{L2} = " << nonlinear_residual_beforestep << std::endl;
+              libMesh::out << "  (before step) ||R||_{L2}/||u|| = " << nonlinear_residual_beforestep / old_norm_u << std::endl;
 
+              // In rare cases (very small arcsteps), it's possible that the residual is
+              // already below our absolute linear tolerance.
+              if (nonlinear_residual_beforestep  < solution_tolerance)
+                {
+                  if (!quiet)
+                    libMesh::out << "Initial guess satisfied linear tolerance, exiting with zero Newton iterations!" << std::endl;
 
-	  if (!quiet)
-	    libMesh::out << "  G_u*z = G solver converged at step "
-		          << rval.first
-		          << " linear tolerance = "
-		          << rval.second
-		          << "."
-		          << std::endl;
+                  // Since we go straight from here to the solve of the next tangent, we
+                  // have to close the matrix before it can be assembled again.
+                  matrix->close();
+                  newton_converged=true;
+                  break; // out of Newton iterations, with newton_converged=true
+                }
+            }
 
-	  // Sometimes (I am not sure why) the linear solver exits after zero iterations.
-	  // Perhaps it is hitting PETSc's divergence tolerance dtol???  If this occurs,
-	  // we should break out of the Newton iteration loop because nothing further is
-	  // going to happen...  Of course if the tolerance is already small enough after
-	  // zero iterations (how can this happen?!) we should not quit.
-	  if ((rval.first == 0) && (rval.second > current_linear_tolerance*nonlinear_residual_beforestep))
-	    {
-	      if (!quiet)
-		libMesh::out << "Linear solver exited in zero iterations!" << std::endl;
-
-	      // Try to find out the reason for convergence/divergence
-	      linear_solver->print_converged_reason();
-
-	      break; // out of Newton iterations
-	    }
-
-	  // Note: need to scale z by -1 since our code always solves Jx=R
-	  // instead of Jx=-R.
-	  z->scale(-1.);
-	  z->close();
+          else
+            {
+              nonlinear_residual_beforestep = nonlinear_residual_afterstep;
+            }
 
 
+          // Solve the linear system G_u*z = G
+          // Initial guess?
+          z->zero(); // It seems to be extremely important to zero z here, otherwise the solver quits early.
+          z->close();
+
+          // It's possible that we have selected the current_linear_tolerance so large that
+          // a guess of z=zero yields a linear system residual |Az + R| small enough that the
+          // linear solver exits in zero iterations.  If this happens, we will reduce the
+          // current_linear_tolerance until the linear solver does at least 1 iteration.
+          do
+            {
+              rval =
+                linear_solver->solve(*matrix,
+                                     *z,
+                                     *rhs,
+                                     //1.e-12,
+                                     current_linear_tolerance,
+                                     newton_solver->max_linear_iterations);   // max linear iterations
+
+              if (rval.first==0)
+                {
+                  if (newton_step==0)
+                    {
+                      libMesh::out << "Repeating initial solve with smaller linear tolerance!" << std::endl;
+                      current_linear_tolerance *= initial_newton_tolerance; // reduce the linear tolerance to force the solver to do some work
+                    }
+                  else
+                    {
+                      // We shouldn't get here ... it means the linear solver did no work on a Newton
+                      // step other than the first one.  If this happens, we need to think more about our
+                      // tolerance selection.
+                      libmesh_error();
+                    }
+                }
+
+            } while (rval.first==0);
 
 
+          if (!quiet)
+            libMesh::out << "  G_u*z = G solver converged at step "
+                         << rval.first
+                         << " linear tolerance = "
+                         << rval.second
+                         << "."
+                         << std::endl;
 
+          // Sometimes (I am not sure why) the linear solver exits after zero iterations.
+          // Perhaps it is hitting PETSc's divergence tolerance dtol???  If this occurs,
+          // we should break out of the Newton iteration loop because nothing further is
+          // going to happen...  Of course if the tolerance is already small enough after
+          // zero iterations (how can this happen?!) we should not quit.
+          if ((rval.first == 0) && (rval.second > current_linear_tolerance*nonlinear_residual_beforestep))
+            {
+              if (!quiet)
+                libMesh::out << "Linear solver exited in zero iterations!" << std::endl;
 
-	  // Assemble the G_Lambda vector, skip residual.
-	  rhs_mode = G_Lambda;
+              // Try to find out the reason for convergence/divergence
+              linear_solver->print_converged_reason();
 
-	  // Assemble both rhs and Jacobian
-	  assembly(true,  // Residual
-		   false); // Jacobian
+              break; // out of Newton iterations
+            }
 
-	  // Not sure if this is really necessary
-	  rhs->close();
-	  const Real yrhsnorm=rhs->l2_norm();
-	  if (yrhsnorm == 0.0)
-	    {
-	      libMesh::out << "||G_Lambda|| = 0" << std::endl;
-	      libmesh_error();
-	    }
-
-	  // We select a tolerance for the y-system which is based on the inexact Newton
-	  // tolerance but scaled by an extra term proportional to the RHS (which is not -> 0 in this case)
-	  const Real ysystemtol=current_linear_tolerance*(nonlinear_residual_beforestep/yrhsnorm);
-	  if (!quiet)
-	    libMesh::out << "ysystemtol=" << ysystemtol << std::endl;
-
-	  // Solve G_u*y = G_{\lambda}
-	  // FIXME: Initial guess?  This is really a solve for -du/dlambda so we could try
-	  // initializing it with the latest approximation to that... du/dlambda ~ du/ds * ds/dlambda
-	  //*y = *solution;
-	  //y->add(-1., *previous_u);
-	  //y->scale(-1. / (*continuation_parameter - old_continuation_parameter)); // Be careful of divide by zero...
-	  //y->close();
-
-	  //	  const unsigned int max_attempts=1;
-	  // unsigned int attempt=0;
-	  // 	  do
-	  // 	    {
-	  // 	      if (!quiet)
-	  // 		libMesh::out << "Trying to solve tangent system, attempt " << attempt << std::endl;
-
-	      rval =
-		linear_solver->solve(*matrix,
-				     *y,
-				     *rhs,
-				     //1.e-12,
-				     ysystemtol,
-				     newton_solver->max_linear_iterations);   // max linear iterations
-
-	      if (!quiet)
-		libMesh::out << "  G_u*y = G_{lambda} solver converged at step "
-			  << rval.first
-			  << ", linear tolerance = "
-			  << rval.second
-			  << "."
-			  << std::endl;
-
-	      // Sometimes (I am not sure why) the linear solver exits after zero iterations.
-	      // Perhaps it is hitting PETSc's divergence tolerance dtol???  If this occurs,
-	      // we should break out of the Newton iteration loop because nothing further is
-	      // going to happen...
-	      if ((rval.first == 0) && (rval.second > ysystemtol))
-		{
-		  if (!quiet)
-		    libMesh::out << "Linear solver exited in zero iterations!" << std::endl;
-
-		  break; // out of Newton iterations
-		}
-
-// 	      ++attempt;
-// 	    } while ((attempt<max_attempts) && (rval.first==newton_solver->max_linear_iterations));
+          // Note: need to scale z by -1 since our code always solves Jx=R
+          // instead of Jx=-R.
+          z->scale(-1.);
+          z->close();
 
 
 
 
 
-	  // Compute N, the residual of the arclength constraint eqn.
-	  // Note 1: N(u,lambda,s) := (u-u_{old}, du_ds) + (lambda-lambda_{old}, dlambda_ds) - _ds
-	  // We temporarily use the delta_u vector as a temporary vector for this calculation.
-	  *delta_u = *solution;
-	  delta_u->add(-1., *previous_u);
 
-	  // First part of the arclength constraint
-	  const Number N1 = Theta_LOCA*Theta_LOCA*Theta*delta_u->dot(*du_ds);
-	  const Number N2 = ((*continuation_parameter) - old_continuation_parameter)*dlambda_ds;
-	  const Number N3 = ds_current;
+          // Assemble the G_Lambda vector, skip residual.
+          rhs_mode = G_Lambda;
 
-	  if (!quiet)
-	    {
-	      libMesh::out << "  N1=" << N1 << std::endl;
-	      libMesh::out << "  N2=" << N2 << std::endl;
-	      libMesh::out << "  N3=" << N3 << std::endl;
-	    }
+          // Assemble both rhs and Jacobian
+          assembly(true,  // Residual
+                   false); // Jacobian
 
-	  // The arclength constraint value
-	  const Number N = N1+N2-N3;
+          // Not sure if this is really necessary
+          rhs->close();
+          const Real yrhsnorm=rhs->l2_norm();
+          if (yrhsnorm == 0.0)
+            {
+              libMesh::out << "||G_Lambda|| = 0" << std::endl;
+              libmesh_error();
+            }
 
-	  if (!quiet)
-	    libMesh::out << "  N=" << N << std::endl;
+          // We select a tolerance for the y-system which is based on the inexact Newton
+          // tolerance but scaled by an extra term proportional to the RHS (which is not -> 0 in this case)
+          const Real ysystemtol=current_linear_tolerance*(nonlinear_residual_beforestep/yrhsnorm);
+          if (!quiet)
+            libMesh::out << "ysystemtol=" << ysystemtol << std::endl;
 
-	  const Number duds_dot_z = du_ds->dot(*z);
-	  const Number duds_dot_y = du_ds->dot(*y);
+          // Solve G_u*y = G_{\lambda}
+          // FIXME: Initial guess?  This is really a solve for -du/dlambda so we could try
+          // initializing it with the latest approximation to that... du/dlambda ~ du/ds * ds/dlambda
+          //*y = *solution;
+          //y->add(-1., *previous_u);
+          //y->scale(-1. / (*continuation_parameter - old_continuation_parameter)); // Be careful of divide by zero...
+          //y->close();
 
-	  //libMesh::out << "duds_dot_z=" << duds_dot_z << std::endl;
-	  //libMesh::out << "duds_dot_y=" << duds_dot_y << std::endl;
-	  //libMesh::out << "dlambda_ds=" << dlambda_ds << std::endl;
+          //  const unsigned int max_attempts=1;
+          // unsigned int attempt=0;
+          //   do
+          //     {
+          //       if (!quiet)
+          // libMesh::out << "Trying to solve tangent system, attempt " << attempt << std::endl;
 
-	  const Number delta_lambda_numerator   = -(N          + Theta_LOCA*Theta_LOCA*Theta*duds_dot_z);
-	  const Number delta_lambda_denominator =  (dlambda_ds - Theta_LOCA*Theta_LOCA*Theta*duds_dot_y);
+          rval =
+            linear_solver->solve(*matrix,
+                                 *y,
+                                 *rhs,
+                                 //1.e-12,
+                                 ysystemtol,
+                                 newton_solver->max_linear_iterations);   // max linear iterations
 
-	  libmesh_assert_not_equal_to (delta_lambda_denominator, 0.0);
+          if (!quiet)
+            libMesh::out << "  G_u*y = G_{lambda} solver converged at step "
+                         << rval.first
+                         << ", linear tolerance = "
+                         << rval.second
+                         << "."
+                         << std::endl;
 
-	  // Now, we are ready to compute the step delta_lambda
-	  const Number delta_lambda_comp = delta_lambda_numerator /
+          // Sometimes (I am not sure why) the linear solver exits after zero iterations.
+          // Perhaps it is hitting PETSc's divergence tolerance dtol???  If this occurs,
+          // we should break out of the Newton iteration loop because nothing further is
+          // going to happen...
+          if ((rval.first == 0) && (rval.second > ysystemtol))
+            {
+              if (!quiet)
+                libMesh::out << "Linear solver exited in zero iterations!" << std::endl;
+
+              break; // out of Newton iterations
+            }
+
+          //       ++attempt;
+          //     } while ((attempt<max_attempts) && (rval.first==newton_solver->max_linear_iterations));
+
+
+
+
+
+          // Compute N, the residual of the arclength constraint eqn.
+          // Note 1: N(u,lambda,s) := (u-u_{old}, du_ds) + (lambda-lambda_{old}, dlambda_ds) - _ds
+          // We temporarily use the delta_u vector as a temporary vector for this calculation.
+          *delta_u = *solution;
+          delta_u->add(-1., *previous_u);
+
+          // First part of the arclength constraint
+          const Number N1 = Theta_LOCA*Theta_LOCA*Theta*delta_u->dot(*du_ds);
+          const Number N2 = ((*continuation_parameter) - old_continuation_parameter)*dlambda_ds;
+          const Number N3 = ds_current;
+
+          if (!quiet)
+            {
+              libMesh::out << "  N1=" << N1 << std::endl;
+              libMesh::out << "  N2=" << N2 << std::endl;
+              libMesh::out << "  N3=" << N3 << std::endl;
+            }
+
+          // The arclength constraint value
+          const Number N = N1+N2-N3;
+
+          if (!quiet)
+            libMesh::out << "  N=" << N << std::endl;
+
+          const Number duds_dot_z = du_ds->dot(*z);
+          const Number duds_dot_y = du_ds->dot(*y);
+
+          //libMesh::out << "duds_dot_z=" << duds_dot_z << std::endl;
+          //libMesh::out << "duds_dot_y=" << duds_dot_y << std::endl;
+          //libMesh::out << "dlambda_ds=" << dlambda_ds << std::endl;
+
+          const Number delta_lambda_numerator   = -(N          + Theta_LOCA*Theta_LOCA*Theta*duds_dot_z);
+          const Number delta_lambda_denominator =  (dlambda_ds - Theta_LOCA*Theta_LOCA*Theta*duds_dot_y);
+
+          libmesh_assert_not_equal_to (delta_lambda_denominator, 0.0);
+
+          // Now, we are ready to compute the step delta_lambda
+          const Number delta_lambda_comp = delta_lambda_numerator /
                                            delta_lambda_denominator;
           // Lambda is real-valued
           const Real delta_lambda = libmesh_real(delta_lambda_comp);
 
-	  // Knowing delta_lambda, we are ready to update delta_u
-	  // delta_u = z - delta_lambda*y
-	  delta_u->zero();
-	  delta_u->add(1., *z);
-	  delta_u->add(-delta_lambda, *y);
-	  delta_u->close();
+          // Knowing delta_lambda, we are ready to update delta_u
+          // delta_u = z - delta_lambda*y
+          delta_u->zero();
+          delta_u->add(1., *z);
+          delta_u->add(-delta_lambda, *y);
+          delta_u->close();
 
-	  // Update the system solution and the continuation parameter.
-	  solution->add(1., *delta_u);
-	  solution->close();
-	  *continuation_parameter += delta_lambda;
+          // Update the system solution and the continuation parameter.
+          solution->add(1., *delta_u);
+          solution->close();
+          *continuation_parameter += delta_lambda;
 
-	  // Did the Newton step actually reduce the residual?
-	  rhs_mode = Residual;
-	  assembly(true,   // Residual
-		   false); // Jacobian
-	  rhs->close();
-	  nonlinear_residual_afterstep = rhs->l2_norm();
-
-
-	  // In a "normal" Newton step, ||du||/||R|| > 1 since the most recent
-	  // step is where you "just were" and the current residual is where
-	  // you are now.  It can occur that ||du||/||R|| < 1, but these are
-	  // likely not good cases to attempt backtracking (?).
-	  const Real norm_du_norm_R = delta_u->l2_norm() / nonlinear_residual_afterstep;
-	  if (!quiet)
-	    libMesh::out << "  norm_du_norm_R=" << norm_du_norm_R << std::endl;
+          // Did the Newton step actually reduce the residual?
+          rhs_mode = Residual;
+          assembly(true,   // Residual
+                   false); // Jacobian
+          rhs->close();
+          nonlinear_residual_afterstep = rhs->l2_norm();
 
 
-	  // Factor to decrease the stepsize by for backtracking
-	  Real newton_stepfactor = 1.;
-
-	  const bool attempt_backtracking =
-	    (nonlinear_residual_afterstep > solution_tolerance)
-	    && (nonlinear_residual_afterstep > nonlinear_residual_beforestep)
-	    && (n_backtrack_steps>0)
-	    && (norm_du_norm_R > 1.)
-	    ;
-
-	  // If residual is not reduced, do Newton back tracking.
-	  if (attempt_backtracking)
-	    {
-	      if (!quiet)
-		libMesh::out << "Newton step did not reduce residual." << std::endl;
-
-	      // back off the previous step.
-	      solution->add(-1., *delta_u);
-	      solution->close();
-	      *continuation_parameter -= delta_lambda;
-
-	      // Backtracking: start cutting the Newton stepsize by halves until
-	      // the new residual is actually smaller...
-	      for (unsigned int backtrack_step=0; backtrack_step<n_backtrack_steps; ++backtrack_step)
-		{
-		  newton_stepfactor *= 0.5;
-
-		  if (!quiet)
-		    libMesh::out << "Shrinking step size by " << newton_stepfactor << std::endl;
-
-		  // Take fractional step
-		  solution->add(newton_stepfactor, *delta_u);
-		  solution->close();
-		  *continuation_parameter += newton_stepfactor*delta_lambda;
-
-		  rhs_mode = Residual;
-		  assembly(true,   // Residual
-			   false); // Jacobian
-		  rhs->close();
-		  nonlinear_residual_afterstep = rhs->l2_norm();
-
-		  if (!quiet)
-		    libMesh::out << "At shrink step "
-			      << backtrack_step
-			      << ", nonlinear_residual_afterstep="
-			      << nonlinear_residual_afterstep
-			      << std::endl;
-
-		  if (nonlinear_residual_afterstep < nonlinear_residual_beforestep)
-		    {
-		      if (!quiet)
-			libMesh::out << "Backtracking succeeded!" << std::endl;
-
-		      break; // out of backtracking loop
-		    }
-
-		  else
-		    {
-		      // Back off that step
-		      solution->add(-newton_stepfactor, *delta_u);
-		      solution->close();
-		      *continuation_parameter -= newton_stepfactor*delta_lambda;
-		    }
-
-		  // Save a copy of the solution from before the Newton step.
-		  //AutoPtr<NumericVector<Number> > prior_iterate = solution->clone();
-		}
-	    } // end if (attempte_backtracking)
+          // In a "normal" Newton step, ||du||/||R|| > 1 since the most recent
+          // step is where you "just were" and the current residual is where
+          // you are now.  It can occur that ||du||/||R|| < 1, but these are
+          // likely not good cases to attempt backtracking (?).
+          const Real norm_du_norm_R = delta_u->l2_norm() / nonlinear_residual_afterstep;
+          if (!quiet)
+            libMesh::out << "  norm_du_norm_R=" << norm_du_norm_R << std::endl;
 
 
-	  // If we tried backtracking but the residual is still not reduced, print message.
-	  if ((attempt_backtracking) && (nonlinear_residual_afterstep > nonlinear_residual_beforestep))
-	    {
-	      //libMesh::err << "Backtracking failed." << std::endl;
-	      libMesh::out << "Backtracking failed." << std::endl;
+          // Factor to decrease the stepsize by for backtracking
+          Real newton_stepfactor = 1.;
 
-	      // 1.) Quit, exit program.
-	      //libmesh_error();
+          const bool attempt_backtracking =
+            (nonlinear_residual_afterstep > solution_tolerance)
+            && (nonlinear_residual_afterstep > nonlinear_residual_beforestep)
+            && (n_backtrack_steps>0)
+            && (norm_du_norm_R > 1.)
+            ;
 
-	      // 2.) Continue with last newton_stepfactor
-	      if (newton_step<3)
-		{
-		  solution->add(newton_stepfactor, *delta_u);
-		  solution->close();
-		  *continuation_parameter += newton_stepfactor*delta_lambda;
-		  if (!quiet)
-		    libMesh::out << "Backtracking could not reduce residual ... continuing anyway!" << std::endl;
-		}
+          // If residual is not reduced, do Newton back tracking.
+          if (attempt_backtracking)
+            {
+              if (!quiet)
+                libMesh::out << "Newton step did not reduce residual." << std::endl;
 
-	      // 3.) Break out of Newton iteration loop with newton_converged = false,
-	      //     reduce the arclength stepsize, and try again.
-	      else
-		{
-		  break; // out of Newton iteration loop, with newton_converged=false
-		}
-	    }
+              // back off the previous step.
+              solution->add(-1., *delta_u);
+              solution->close();
+              *continuation_parameter -= delta_lambda;
 
-	  // Another type of convergence check: suppose the residual has not been reduced
-	  // from its initial value after half of the allowed Newton steps have occurred.
-	  // In our experience, this typically means that it isn't going to converge and
-	  // we could probably save time by dropping out of the Newton iteration loop and
-	  // trying a smaller arcstep.
-	  if (this->newton_progress_check)
-	    {
-	      if ((nonlinear_residual_afterstep > nonlinear_residual_firststep) &&
-		  (newton_step+1 > static_cast<unsigned int>(0.5*newton_solver->max_nonlinear_iterations)))
-		{
-		  libMesh::out << "Progress check failed: the current residual: "
-			        << nonlinear_residual_afterstep
-			        << ", is\n"
-			        << "larger than the initial residual, and half of the allowed\n"
-			        << "number of Newton iterations have elapsed.\n"
-			        << "Exiting Newton iterations with converged==false." << std::endl;
+              // Backtracking: start cutting the Newton stepsize by halves until
+              // the new residual is actually smaller...
+              for (unsigned int backtrack_step=0; backtrack_step<n_backtrack_steps; ++backtrack_step)
+                {
+                  newton_stepfactor *= 0.5;
 
-		  break; // out of Newton iteration loop, newton_converged = false
-		}
-	    }
+                  if (!quiet)
+                    libMesh::out << "Shrinking step size by " << newton_stepfactor << std::endl;
 
-	  // Safety check: Check the current continuation parameter against user-provided min-allowable parameter value
-	  if (*continuation_parameter < min_continuation_parameter)
-	    {
-	      libMesh::out << "Continuation parameter fell below min-allowable value." << std::endl;
-	      // libmesh_error();
-	      break; // out of Newton iteration loop, newton_converged = false
-	    }
+                  // Take fractional step
+                  solution->add(newton_stepfactor, *delta_u);
+                  solution->close();
+                  *continuation_parameter += newton_stepfactor*delta_lambda;
 
-	  // Safety check: Check the current continuation parameter against user-provided max-allowable parameter value
-	  if ( (max_continuation_parameter != 0.0) &&
-	       (*continuation_parameter > max_continuation_parameter) )
-	    {
-	      libMesh::out << "Current continuation parameter value: "
-			    << *continuation_parameter
-			    << " exceeded max-allowable value."
-			    << std::endl;
-	      // libmesh_error();
-	      break; // out of Newton iteration loop, newton_converged = false
-	    }
+                  rhs_mode = Residual;
+                  assembly(true,   // Residual
+                           false); // Jacobian
+                  rhs->close();
+                  nonlinear_residual_afterstep = rhs->l2_norm();
 
+                  if (!quiet)
+                    libMesh::out << "At shrink step "
+                                 << backtrack_step
+                                 << ", nonlinear_residual_afterstep="
+                                 << nonlinear_residual_afterstep
+                                 << std::endl;
 
-	  // Check the convergence of the parameter and the solution.  If they are small
-	  // enough, we can break out of the Newton iteration loop.
-	  const Real norm_delta_u = delta_u->l2_norm();
-	  const Real norm_u = solution->l2_norm();
-	  libMesh::out << "  delta_lambda                   = " << delta_lambda << std::endl;
-	  libMesh::out << "  newton_stepfactor*delta_lambda = " << newton_stepfactor*delta_lambda << std::endl;
-	  libMesh::out << "  lambda_current                 = " << *continuation_parameter << std::endl;
-	  libMesh::out << "  ||delta_u||                    = " << norm_delta_u << std::endl;
-	  libMesh::out << "  ||delta_u||/||u||              = " << norm_delta_u / norm_u << std::endl;
+                  if (nonlinear_residual_afterstep < nonlinear_residual_beforestep)
+                    {
+                      if (!quiet)
+                        libMesh::out << "Backtracking succeeded!" << std::endl;
+
+                      break; // out of backtracking loop
+                    }
+
+                  else
+                    {
+                      // Back off that step
+                      solution->add(-newton_stepfactor, *delta_u);
+                      solution->close();
+                      *continuation_parameter -= newton_stepfactor*delta_lambda;
+                    }
+
+                  // Save a copy of the solution from before the Newton step.
+                  //AutoPtr<NumericVector<Number> > prior_iterate = solution->clone();
+                }
+            } // end if (attempte_backtracking)
 
 
-	  // Evaluate the residual at the current Newton iterate.  We don't want to detect
-	  // convergence due to a small Newton step when the residual is still not small.
-	  rhs_mode = Residual;
-	  assembly(true,   // Residual
-		   false); // Jacobian
-	  rhs->close();
-	  const Real norm_residual = rhs->l2_norm();
-	  libMesh::out << "  ||R||_{L2} = " << norm_residual << std::endl;
-	  libMesh::out << "  ||R||_{L2}/||u|| = " << norm_residual / norm_u << std::endl;
+          // If we tried backtracking but the residual is still not reduced, print message.
+          if ((attempt_backtracking) && (nonlinear_residual_afterstep > nonlinear_residual_beforestep))
+            {
+              //libMesh::err << "Backtracking failed." << std::endl;
+              libMesh::out << "Backtracking failed." << std::endl;
+
+              // 1.) Quit, exit program.
+              //libmesh_error();
+
+              // 2.) Continue with last newton_stepfactor
+              if (newton_step<3)
+                {
+                  solution->add(newton_stepfactor, *delta_u);
+                  solution->close();
+                  *continuation_parameter += newton_stepfactor*delta_lambda;
+                  if (!quiet)
+                    libMesh::out << "Backtracking could not reduce residual ... continuing anyway!" << std::endl;
+                }
+
+              // 3.) Break out of Newton iteration loop with newton_converged = false,
+              //     reduce the arclength stepsize, and try again.
+              else
+                {
+                  break; // out of Newton iteration loop, with newton_converged=false
+                }
+            }
+
+          // Another type of convergence check: suppose the residual has not been reduced
+          // from its initial value after half of the allowed Newton steps have occurred.
+          // In our experience, this typically means that it isn't going to converge and
+          // we could probably save time by dropping out of the Newton iteration loop and
+          // trying a smaller arcstep.
+          if (this->newton_progress_check)
+            {
+              if ((nonlinear_residual_afterstep > nonlinear_residual_firststep) &&
+                  (newton_step+1 > static_cast<unsigned int>(0.5*newton_solver->max_nonlinear_iterations)))
+                {
+                  libMesh::out << "Progress check failed: the current residual: "
+                               << nonlinear_residual_afterstep
+                               << ", is\n"
+                               << "larger than the initial residual, and half of the allowed\n"
+                               << "number of Newton iterations have elapsed.\n"
+                               << "Exiting Newton iterations with converged==false." << std::endl;
+
+                  break; // out of Newton iteration loop, newton_converged = false
+                }
+            }
+
+          // Safety check: Check the current continuation parameter against user-provided min-allowable parameter value
+          if (*continuation_parameter < min_continuation_parameter)
+            {
+              libMesh::out << "Continuation parameter fell below min-allowable value." << std::endl;
+              // libmesh_error();
+              break; // out of Newton iteration loop, newton_converged = false
+            }
+
+          // Safety check: Check the current continuation parameter against user-provided max-allowable parameter value
+          if ( (max_continuation_parameter != 0.0) &&
+               (*continuation_parameter > max_continuation_parameter) )
+            {
+              libMesh::out << "Current continuation parameter value: "
+                           << *continuation_parameter
+                           << " exceeded max-allowable value."
+                           << std::endl;
+              // libmesh_error();
+              break; // out of Newton iteration loop, newton_converged = false
+            }
 
 
-	  // FIXME: The norm_delta_u tolerance (at least) should be relative.
-	  // It doesn't make sense to converge a solution whose size is ~ 10^5 to
-	  // a tolerance of 1.e-6.  Oh, and we should also probably check the
-	  // (relative) size of the residual as well, instead of just the step.
-	  if ((std::abs(delta_lambda) < continuation_parameter_tolerance) &&
-	      //(norm_delta_u       < solution_tolerance)               && // This is a *very* strict criterion we can probably skip
-	      (norm_residual      < solution_tolerance))
-	    {
-	      if (!quiet)
-		libMesh::out << "Newton iterations converged!" << std::endl;
+          // Check the convergence of the parameter and the solution.  If they are small
+          // enough, we can break out of the Newton iteration loop.
+          const Real norm_delta_u = delta_u->l2_norm();
+          const Real norm_u = solution->l2_norm();
+          libMesh::out << "  delta_lambda                   = " << delta_lambda << std::endl;
+          libMesh::out << "  newton_stepfactor*delta_lambda = " << newton_stepfactor*delta_lambda << std::endl;
+          libMesh::out << "  lambda_current                 = " << *continuation_parameter << std::endl;
+          libMesh::out << "  ||delta_u||                    = " << norm_delta_u << std::endl;
+          libMesh::out << "  ||delta_u||/||u||              = " << norm_delta_u / norm_u << std::endl;
 
-	      newton_converged = true;
-	      break; // out of Newton iterations
-	    }
-	} // end nonlinear loop
+
+          // Evaluate the residual at the current Newton iterate.  We don't want to detect
+          // convergence due to a small Newton step when the residual is still not small.
+          rhs_mode = Residual;
+          assembly(true,   // Residual
+                   false); // Jacobian
+          rhs->close();
+          const Real norm_residual = rhs->l2_norm();
+          libMesh::out << "  ||R||_{L2} = " << norm_residual << std::endl;
+          libMesh::out << "  ||R||_{L2}/||u|| = " << norm_residual / norm_u << std::endl;
+
+
+          // FIXME: The norm_delta_u tolerance (at least) should be relative.
+          // It doesn't make sense to converge a solution whose size is ~ 10^5 to
+          // a tolerance of 1.e-6.  Oh, and we should also probably check the
+          // (relative) size of the residual as well, instead of just the step.
+          if ((std::abs(delta_lambda) < continuation_parameter_tolerance) &&
+              //(norm_delta_u       < solution_tolerance)               && // This is a *very* strict criterion we can probably skip
+              (norm_residual      < solution_tolerance))
+            {
+              if (!quiet)
+                libMesh::out << "Newton iterations converged!" << std::endl;
+
+              newton_converged = true;
+              break; // out of Newton iterations
+            }
+        } // end nonlinear loop
 
       if (!newton_converged)
-	{
-	  libMesh::out << "Newton iterations of augmented system did not converge!" << std::endl;
+        {
+          libMesh::out << "Newton iterations of augmented system did not converge!" << std::endl;
 
-	  // Reduce ds_current, recompute the solution and parameter, and continue to next
-	  // arcstep, if there is one.
-	  ds_current *= 0.5;
+          // Reduce ds_current, recompute the solution and parameter, and continue to next
+          // arcstep, if there is one.
+          ds_current *= 0.5;
 
-	  // Go back to previous solution and parameter value.
-	  *solution = *previous_u;
-	  *continuation_parameter = old_continuation_parameter;
+          // Go back to previous solution and parameter value.
+          *solution = *previous_u;
+          *continuation_parameter = old_continuation_parameter;
 
-	  // Compute new predictor with smaller ds
-	  apply_predictor();
-	}
+          // Compute new predictor with smaller ds
+          apply_predictor();
+        }
       else
-	{
-	  // Set step convergence and break out
-	  arcstep_converged=true;
-	  break; // out of arclength reduction loop
-	}
+        {
+          // Set step convergence and break out
+          arcstep_converged=true;
+          break; // out of arclength reduction loop
+        }
 
     } // end loop over arclength reductions
 
@@ -979,7 +979,7 @@ void ContinuationSystem::solve_tangent()
 
   // Assemble Residual and Jacobian
   this->assembly(true,   // Residual
-		 true); // Jacobian
+                 true); // Jacobian
 
   // Not sure if this is really necessary
   rhs->close();
@@ -987,21 +987,21 @@ void ContinuationSystem::solve_tangent()
   // Solve G_u*y =  G_{\lambda}
   std::pair<unsigned int, Real> rval =
     linear_solver->solve(*matrix,
-			 *y,
-			 *rhs,
-			 1.e-12, // relative linear tolerance
-			 2*newton_solver->max_linear_iterations);   // max linear iterations
+                         *y,
+                         *rhs,
+                         1.e-12, // relative linear tolerance
+                         2*newton_solver->max_linear_iterations);   // max linear iterations
 
   // FIXME: If this doesn't converge at all, the new tangent vector is
   // going to be really bad...
 
   if (!quiet)
     libMesh::out << "G_u*y = G_{lambda} solver converged at step "
-	          << rval.first
-	          << " linear tolerance = "
-	          << rval.second
-	          << "."
-	          << std::endl;
+                 << rval.first
+                 << " linear tolerance = "
+                 << rval.second
+                 << "."
+                 << std::endl;
 
   // Save old solution and parameter tangents for possible use in higher-order
   // predictor schemes.
@@ -1050,7 +1050,7 @@ void ContinuationSystem::solve_tangent()
   if (sgn_dlambda_ds < 0.)
     {
       if (!quiet)
-	libMesh::out << "dlambda_ds is negative." << std::endl;
+        libMesh::out << "dlambda_ds is negative." << std::endl;
 
       dlambda_ds *= -1.;
     }
@@ -1120,9 +1120,9 @@ void ContinuationSystem::set_Theta()
 
 //       // Don't use this scaling if the solution delta is already O(1)
 //       if (normdu > 1.)
-// 	Theta = 1./normdu/normdu;
+// Theta = 1./normdu/normdu;
 //       else
-// 	Theta = 1.;
+// Theta = 1.;
 //     }
 //   else
 //     {
@@ -1132,9 +1132,9 @@ void ContinuationSystem::set_Theta()
 
 //       // Don't use this scaling if the solution delta is already O(1)
 //       if ((normdu>1.) || (normduds>1.))
-// 	Theta = 1./normdu/normduds;
+// Theta = 1./normdu/normduds;
 //       else
-// 	Theta = 1.;
+// Theta = 1.;
 //     }
 
  if (!quiet)
@@ -1166,12 +1166,12 @@ void ContinuationSystem::set_Theta_LOCA()
 
 //       // Suggested max-allowable value for Theta_LOCA
 //       if (Theta_LOCA > 1.e8)
-// 	{
-// 	  Theta_LOCA = 1.e8;
+// {
+//   Theta_LOCA = 1.e8;
 
-// 	  if (!quiet)
-// 	    libMesh::out << "max Theta_LOCA=" << Theta_LOCA << " has been selected." << std::endl;
-// 	}
+//   if (!quiet)
+//     libMesh::out << "max Theta_LOCA=" << Theta_LOCA << " has been selected." << std::endl;
+// }
 //     }
 //   else
 //     Theta_LOCA=1.0;
@@ -1188,7 +1188,7 @@ void ContinuationSystem::set_Theta_LOCA()
       Theta_LOCA = 1.e8;
 
       if (!quiet)
-	libMesh::out << "max Theta_LOCA=" << Theta_LOCA << " has been selected." << std::endl;
+        libMesh::out << "max Theta_LOCA=" << Theta_LOCA << " has been selected." << std::endl;
     }
 
   // 3.) Use 1.0, i.e. don't scale
@@ -1254,55 +1254,55 @@ void ContinuationSystem::update_solution()
       // // 1.) Scale current ds by the ratio of successive tangents.
       //       ds_current *= yold_over_y;
       //       if (ds_current > ds)
-      // 	ds_current = ds;
+      // ds_current = ds;
 
       // 2.) Technique 1 tends to shrink the step fairly well (and even if it doesn't
       // get very small, we still have step reduction) but it seems to grow the step
       // very slowly.  Another possible technique is step-doubling:
 //       if (yold_over_y > 1.)
-//       	ds_current *= 2.;
+//       ds_current *= 2.;
 //       else
-// 	ds_current *= yold_over_y;
+// ds_current *= yold_over_y;
 
       // 3.) Technique 2 may over-zealous when we are also using the Newton stepgrowth
       // factor.  For technique 3 we multiply by yold_over_y unless yold_over_y > 2
       // in which case we use 2.
       //       if (yold_over_y > 2.)
-      // 	ds_current *= 2.;
+      // ds_current *= 2.;
       //       else
-      // 	ds_current *= yold_over_y;
+      // ds_current *= yold_over_y;
 
       // 4.) Double-or-halve.  We double the arc-step if the ratio of successive tangents
       // is larger than 'double_threshold', halve it if it is less than 'halve_threshold'
       const Real double_threshold = 0.5;
       const Real halve_threshold  = 0.5;
       if (yold_over_y > double_threshold)
-      	ds_current *= 2.;
+        ds_current *= 2.;
       else if (yold_over_y < halve_threshold)
-      	ds_current *= 0.5;
+        ds_current *= 0.5;
 
 
       // Also possibly use the number of Newton iterations required to compute the previous
       // step (relative to the maximum-allowed number of Newton iterations) to grow the step.
       if (newton_stepgrowth_aggressiveness > 0.)
-	{
-	  libmesh_assert(newton_solver);
-	  const unsigned int Nmax = newton_solver->max_nonlinear_iterations;
+        {
+          libmesh_assert(newton_solver);
+          const unsigned int Nmax = newton_solver->max_nonlinear_iterations;
 
-	  // // The LOCA Newton step growth technique (note: only grows step length)
-	  // const Real stepratio = static_cast<Real>(Nmax-(newton_step+1))/static_cast<Real>(Nmax-1.);
-	  // const Real newtonstep_growthfactor = 1. + newton_stepgrowth_aggressiveness*stepratio*stepratio;
+          // // The LOCA Newton step growth technique (note: only grows step length)
+          // const Real stepratio = static_cast<Real>(Nmax-(newton_step+1))/static_cast<Real>(Nmax-1.);
+          // const Real newtonstep_growthfactor = 1. + newton_stepgrowth_aggressiveness*stepratio*stepratio;
 
-	  // The "Nopt/N" method, may grow or shrink the step.  Assume Nopt=Nmax/2.
-	  const Real newtonstep_growthfactor =
-	    newton_stepgrowth_aggressiveness * 0.5 *
-	    static_cast<Real>(Nmax) / static_cast<Real>(newton_step+1);
+          // The "Nopt/N" method, may grow or shrink the step.  Assume Nopt=Nmax/2.
+          const Real newtonstep_growthfactor =
+            newton_stepgrowth_aggressiveness * 0.5 *
+            static_cast<Real>(Nmax) / static_cast<Real>(newton_step+1);
 
-	  if (!quiet)
-	    libMesh::out << "newtonstep_growthfactor=" << newtonstep_growthfactor << std::endl;
+          if (!quiet)
+            libMesh::out << "newtonstep_growthfactor=" << newtonstep_growthfactor << std::endl;
 
-	  ds_current *= newtonstep_growthfactor;
-	}
+          ds_current *= newtonstep_growthfactor;
+        }
     }
 
 
@@ -1339,7 +1339,7 @@ void ContinuationSystem::update_solution()
   delta_u->close();
   const Real normdu   = delta_u->l2_norm();
   const Real C = (std::log (Theta_LOCA*normdu) /
-		  std::log (std::abs(*continuation_parameter-old_continuation_parameter))) - 1.0;
+                  std::log (std::abs(*continuation_parameter-old_continuation_parameter))) - 1.0;
   if (!quiet)
     libMesh::out << "C=" << C << std::endl;
 
@@ -1410,8 +1410,8 @@ void ContinuationSystem::apply_predictor()
 
       // Next parameter value
       *continuation_parameter +=
-	0.5*ds_current*((2.+stepratio)*dlambda_ds -
-			stepratio*previous_dlambda_ds);
+        0.5*ds_current*((2.+stepratio)*dlambda_ds -
+                        stepratio*previous_dlambda_ds);
     }
 
   else

@@ -47,8 +47,8 @@ namespace libMesh
     const Real theta = static_cast<Real>(n) * 2.0 * libMesh::pi / static_cast<Real>(_n_points);
 
     return Point(_center(0) + _radius*std::cos(theta), // x=r*cos(theta)
-		 _center(1) + _radius*std::sin(theta), // y=r*sin(theta)
-		 0.);
+                 _center(1) + _radius*std::sin(theta), // y=r*sin(theta)
+                 0.);
   }
 
 
@@ -66,9 +66,9 @@ namespace libMesh
   // ArbitraryHole member functions
   //
   TriangleInterface::ArbitraryHole::ArbitraryHole(const Point center,
-						  const std::vector<Point>& points)
-    : 	_center(center),
-	_points(points)
+                                                  const std::vector<Point>& points)
+    : _center(center),
+      _points(points)
   {}
 
 

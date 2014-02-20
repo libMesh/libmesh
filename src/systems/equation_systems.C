@@ -175,7 +175,7 @@ void EquationSystems::reinit ()
   {
     for (unsigned int i=0; i != this->n_systems(); ++i)
       {
-	System &sys = this->get_system(i);
+        System &sys = this->get_system(i);
 
         // Don't do anything if the system doesn't have any variables in it
         if(!sys.n_vars())
@@ -214,7 +214,7 @@ void EquationSystems::reinit ()
     {
       for (unsigned int i=0; i != this->n_systems(); ++i)
         {
-	  System &sys = this->get_system(i);
+          System &sys = this->get_system(i);
           if (!dof_constraints_created)
             {
               sys.get_dof_map().distribute_dofs(_mesh);
@@ -241,7 +241,7 @@ void EquationSystems::reinit ()
     {
       for (unsigned int i=0; i != this->n_systems(); ++i)
         {
-	  System &sys = this->get_system(i);
+          System &sys = this->get_system(i);
           if (!dof_constraints_created)
             {
               sys.get_dof_map().distribute_dofs(_mesh);
@@ -334,7 +334,7 @@ void EquationSystems::update ()
 
 
 System & EquationSystems::add_system (const std::string& sys_type,
-				      const std::string& name)
+                                      const std::string& name)
 {
   // If the user already built a system with this name, we'll
   // trust them and we'll use it.  That way they can pre-add
@@ -358,13 +358,13 @@ System & EquationSystems::add_system (const std::string& sys_type,
 
   // Build an Implicit system
   else if ((sys_type == "Implicit") ||
-	   (sys_type == "Steady"  ))
+           (sys_type == "Steady"  ))
     this->add_system<ImplicitSystem> (name);
 
   // build a transient implicit linear system
   else if ((sys_type == "Transient") ||
-	   (sys_type == "TransientImplicit") ||
-	   (sys_type == "TransientLinearImplicit"))
+           (sys_type == "TransientImplicit") ||
+           (sys_type == "TransientLinearImplicit"))
     this->add_system<TransientLinearImplicitSystem> (name);
 
   // build a transient implicit nonlinear system
@@ -406,8 +406,8 @@ System & EquationSystems::add_system (const std::string& sys_type,
   else
     {
       libMesh::err << "ERROR: Unknown system type: "
-		    << sys_type
-		    << std::endl;
+                   << sys_type
+                   << std::endl;
       libmesh_error();
     }
 
@@ -502,13 +502,13 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
       }
 
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
-	{
-	  if( FEInterface::field_type(pos->second->variable_type(vn)) ==
-	      TYPE_VECTOR )
-	    n_vector_vars++;
-	  else
-	    n_scalar_vars++;
-	}
+        {
+          if( FEInterface::field_type(pos->second->variable_type(vn)) ==
+              TYPE_VECTOR )
+            n_vector_vars++;
+          else
+            n_scalar_vars++;
+        }
     }
 
     // Here, we're assuming the number of vector components is the same
@@ -542,41 +542,41 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
       }
 
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
-	{
-	  std::string var_name = pos->second->variable_name(vn);
-	  FEType fe_type = pos->second->variable_type(vn);
+        {
+          std::string var_name = pos->second->variable_name(vn);
+          FEType fe_type = pos->second->variable_type(vn);
 
-	  unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type);
+          unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type);
 
           // Filter on the type if requested
           if (type == NULL || (type && *type == fe_type))
             {
             if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
-	      {
-	        switch(n_vec_dim)
-		  {
-		  case 0:
-		  case 1:
-		    var_names[var_num++] = var_name;
-		    break;
-		  case 2:
-		    var_names[var_num++] = var_name+"_x";
-		    var_names[var_num++] = var_name+"_y";
-		    break;
-		  case 3:
-		    var_names[var_num++] = var_name+"_x";
-		    var_names[var_num++] = var_name+"_y";
-		    var_names[var_num++] = var_name+"_z";
-		    break;
-		  default:
-		    libMesh::err << "Invalid dim in build_variable_names" << std::endl;
-		    libmesh_error();
-		  }
-	      }
-	    else
-	      var_names[var_num++] = var_name;
+              {
+                switch(n_vec_dim)
+                  {
+                  case 0:
+                  case 1:
+                    var_names[var_num++] = var_name;
+                    break;
+                  case 2:
+                    var_names[var_num++] = var_name+"_x";
+                    var_names[var_num++] = var_name+"_y";
+                    break;
+                  case 3:
+                    var_names[var_num++] = var_name+"_x";
+                    var_names[var_num++] = var_name+"_y";
+                    var_names[var_num++] = var_name+"_z";
+                    break;
+                  default:
+                    libMesh::err << "Invalid dim in build_variable_names" << std::endl;
+                    libmesh_error();
+                  }
+              }
+            else
+              var_names[var_num++] = var_name;
             }
-	}
+        }
     }
   // Now resize again in case we filtered any names
   var_names.resize(var_num);
@@ -585,8 +585,8 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
 
 
 void EquationSystems::build_solution_vector (std::vector<Number>&,
-					     const std::string&,
-					     const std::string&) const
+                                             const std::string&,
+                                             const std::string&) const
 {
   //TODO:[BSK] re-implement this from the method below
   libmesh_error();
@@ -636,8 +636,8 @@ void EquationSystems::build_solution_vector (std::vector<Number>&,
 
 //       // Fill the dof_indices vector for this variable
 //       system.get_dof_map().dof_indices(elem,
-// 				       dof_indices,
-// 				       variable_num);
+//        dof_indices,
+//        variable_num);
 
 //       // Resize the element solution vector to fit the
 //       // dof_indices for this element.
@@ -646,15 +646,15 @@ void EquationSystems::build_solution_vector (std::vector<Number>&,
 //       // Transfer the system solution to the element
 //       // solution by mapping it through the dof_indices vector.
 //       for (unsigned int i=0; i<dof_indices.size(); i++)
-// 	elem_soln[i] = sys_soln[dof_indices[i]];
+// elem_soln[i] = sys_soln[dof_indices[i]];
 
 //       // Using the FE interface, compute the nodal_soln
 //       // for the current elemnt type given the elem_soln
 //       FEInterface::nodal_soln (dim,
-// 			       fe_type,
-// 			       elem,
-// 			       elem_soln,
-// 			       nodal_soln);
+//        fe_type,
+//        elem,
+//        elem_soln,
+//        nodal_soln);
 
 //       // Sanity check -- make sure that there are the same number
 //       // of entries in the nodal_soln as there are nodes in the
@@ -664,7 +664,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>&,
 //       // Copy the nodal solution over into the correct place in
 //       // the global soln vector which will be returned to the user.
 //       for (unsigned int n=0; n<elem->n_nodes(); n++)
-// 	soln[elem->node(n)] = nodal_soln[n];
+// soln[elem->node(n)] = nodal_soln[n];
 //     }
 }
 
@@ -716,13 +716,13 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
       }
 
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
-	{
-	  if( FEInterface::field_type(pos->second->variable_type(vn)) ==
-	      TYPE_VECTOR )
-	    n_vector_vars++;
-	  else
-	    n_scalar_vars++;
-	}
+        {
+          if( FEInterface::field_type(pos->second->variable_type(vn)) ==
+              TYPE_VECTOR )
+            n_vector_vars++;
+          else
+            n_scalar_vars++;
+        }
     }
     // Here, we're assuming the number of vector components is the same
     // as the mesh dimension. Will break for mixed dimension meshes.
@@ -782,13 +782,13 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
       unsigned int n_scalar_vars = 0;
       unsigned int n_vector_vars = 0;
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
-	{
-	  if( FEInterface::field_type(pos->second->variable_type(vn)) ==
-	      TYPE_VECTOR )
-	    n_vector_vars++;
-	  else
-	    n_scalar_vars++;
-	}
+        {
+          if( FEInterface::field_type(pos->second->variable_type(vn)) ==
+              TYPE_VECTOR )
+            n_vector_vars++;
+          else
+            n_scalar_vars++;
+        }
 
       // Here, we're assuming the number of vector components is the same
       // as the mesh dimension. Will break for mixed dimension meshes.
@@ -808,55 +808,55 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
       std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
 
       for (unsigned int var=0; var<nv_sys; var++)
-	{
-	  const FEType& fe_type           = system.variable_type(var);
-	  const Variable &var_description = system.variable(var);
-	  const DofMap &dof_map           = system.get_dof_map();
+        {
+          const FEType& fe_type           = system.variable_type(var);
+          const Variable &var_description = system.variable(var);
+          const DofMap &dof_map           = system.get_dof_map();
 
-	  unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type );
+          unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type );
 
-	  MeshBase::element_iterator       it       = _mesh.active_local_elements_begin();
-	  const MeshBase::element_iterator end_elem = _mesh.active_local_elements_end();
+          MeshBase::element_iterator       it       = _mesh.active_local_elements_begin();
+          const MeshBase::element_iterator end_elem = _mesh.active_local_elements_end();
 
-	  for ( ; it != end_elem; ++it)
+          for ( ; it != end_elem; ++it)
           {
             const Elem* elem = *it;
 
-	    if (var_description.active_on_subdomain((*it)->subdomain_id()))
-	      {
-		dof_map.dof_indices (elem, dof_indices, var);
+            if (var_description.active_on_subdomain((*it)->subdomain_id()))
+              {
+                dof_map.dof_indices (elem, dof_indices, var);
 
-		elem_soln.resize(dof_indices.size());
+                elem_soln.resize(dof_indices.size());
 
-		for (unsigned int i=0; i<dof_indices.size(); i++)
-		  elem_soln[i] = sys_soln(dof_indices[i]);
+                for (unsigned int i=0; i<dof_indices.size(); i++)
+                  elem_soln[i] = sys_soln(dof_indices[i]);
 
-		FEInterface::nodal_soln (dim,
-					 fe_type,
-					 elem,
-					 elem_soln,
-					 nodal_soln);
+                FEInterface::nodal_soln (dim,
+                                         fe_type,
+                                         elem,
+                                         elem_soln,
+                                         nodal_soln);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-		// infinite elements should be skipped...
-		if (!elem->infinite())
+                // infinite elements should be skipped...
+                if (!elem->infinite())
 #endif
-		  {
-		    libmesh_assert_equal_to (nodal_soln.size(), n_vec_dim*elem->n_nodes());
+                  {
+                    libmesh_assert_equal_to (nodal_soln.size(), n_vec_dim*elem->n_nodes());
 
-		    for (unsigned int n=0; n<elem->n_nodes(); n++)
-		      {
-			for( unsigned int d=0; d < n_vec_dim; d++ )
-			  {
-			    // For vector-valued elements, all components are in nodal_soln. For each
-			    // node, the components are stored in order, i.e. node_0 -> s0_x, s0_y, s0_z
-			    parallel_soln.add(nv*(elem->node(n)) + (var+d + var_num), nodal_soln[n_vec_dim*n+d]);
+                    for (unsigned int n=0; n<elem->n_nodes(); n++)
+                      {
+                        for( unsigned int d=0; d < n_vec_dim; d++ )
+                          {
+                            // For vector-valued elements, all components are in nodal_soln. For each
+                            // node, the components are stored in order, i.e. node_0 -> s0_x, s0_y, s0_z
+                            parallel_soln.add(nv*(elem->node(n)) + (var+d + var_num), nodal_soln[n_vec_dim*n+d]);
 
                             // Increment the repeat count for this position
                             repeat_count.add(nv*(elem->node(n)) + (var+d + var_num), 1);
-			  }
-		      }
-		  }
+                          }
+                      }
+                  }
               }
             else // If this variable doesn't exist on this subdomain we have to still increment repeat_count so that we won't divide by 0 later:
               for (unsigned int n=0; n<elem->n_nodes(); n++)
@@ -866,7 +866,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
                     repeat_count.add(nv*(elem->node(n)) + (var+d + var_num), 1);
 
           } // end loop over elements
-	} // end loop on variables in this system
+        } // end loop on variables in this system
 
       var_num += nv_sys_split;
     } // end loop over systems
@@ -1051,52 +1051,52 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
       system.update_global_solution (sys_soln, 0);
 
       if (_mesh.processor_id() == 0)
-	{
-	  std::vector<Number>       elem_soln;   // The finite element solution
-	  std::vector<Number>       nodal_soln;  // The FE solution interpolated to the nodes
-	  std::vector<dof_id_type>  dof_indices; // The DOF indices for the finite element
+        {
+          std::vector<Number>       elem_soln;   // The finite element solution
+          std::vector<Number>       nodal_soln;  // The FE solution interpolated to the nodes
+          std::vector<dof_id_type>  dof_indices; // The DOF indices for the finite element
 
-	  for (unsigned int var=0; var<nv_sys; var++)
-	    {
-	      const FEType& fe_type    = system.variable_type(var);
+          for (unsigned int var=0; var<nv_sys; var++)
+            {
+              const FEType& fe_type    = system.variable_type(var);
 
-	      MeshBase::element_iterator       it       = _mesh.active_elements_begin();
-	      const MeshBase::element_iterator end_elem = _mesh.active_elements_end();
+              MeshBase::element_iterator       it       = _mesh.active_elements_begin();
+              const MeshBase::element_iterator end_elem = _mesh.active_elements_end();
 
-	      unsigned int nn=0;
+              unsigned int nn=0;
 
-	      for ( ; it != end_elem; ++it)
-		{
-		  const Elem* elem = *it;
-		  system.get_dof_map().dof_indices (elem, dof_indices, var);
+              for ( ; it != end_elem; ++it)
+                {
+                  const Elem* elem = *it;
+                  system.get_dof_map().dof_indices (elem, dof_indices, var);
 
-		  elem_soln.resize(dof_indices.size());
+                  elem_soln.resize(dof_indices.size());
 
-		  for (unsigned int i=0; i<dof_indices.size(); i++)
-		    elem_soln[i] = sys_soln[dof_indices[i]];
+                  for (unsigned int i=0; i<dof_indices.size(); i++)
+                    elem_soln[i] = sys_soln[dof_indices[i]];
 
-		  FEInterface::nodal_soln (dim,
-					   fe_type,
-					   elem,
-					   elem_soln,
-					   nodal_soln);
+                  FEInterface::nodal_soln (dim,
+                                           fe_type,
+                                           elem,
+                                           elem_soln,
+                                           nodal_soln);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-		  // infinite elements should be skipped...
-		  if (!elem->infinite())
+                  // infinite elements should be skipped...
+                  if (!elem->infinite())
 #endif
-		    {
-		      libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
+                    {
+                      libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
 
-		      for (unsigned int n=0; n<elem->n_nodes(); n++)
-			{
-			  soln[nv*(nn++) + (var + var_num)] +=
-			    nodal_soln[n];
-			}
-		    }
-		}
-	    }
-	}
+                      for (unsigned int n=0; n<elem->n_nodes(); n++)
+                        {
+                          soln[nv*(nn++) + (var + var_num)] +=
+                            nodal_soln[n];
+                        }
+                    }
+                }
+            }
+        }
 
       var_num += nv_sys;
     }
@@ -1107,8 +1107,8 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 
 
 bool EquationSystems::compare (const EquationSystems& other_es,
-			       const Real threshold,
-			       const bool verbose) const
+                               const Real threshold,
+                               const bool verbose) const
 {
   // safety check, whether we handle at least the same number
   // of systems
@@ -1118,13 +1118,13 @@ bool EquationSystems::compare (const EquationSystems& other_es,
     {
       if (verbose)
         {
-	  libMesh::out << "  Fatal difference. This system handles "
-		        << this->n_systems() << " systems," << std::endl
-		        << "  while the other system handles "
-		        << other_es.n_systems()
-		        << " systems." << std::endl
-		        << "  Aborting comparison." << std::endl;
-	}
+          libMesh::out << "  Fatal difference. This system handles "
+                       << this->n_systems() << " systems," << std::endl
+                       << "  while the other system handles "
+                       << other_es.n_systems()
+                       << " systems." << std::endl
+                       << "  Aborting comparison." << std::endl;
+        }
       return false;
     }
   else
@@ -1135,15 +1135,15 @@ bool EquationSystems::compare (const EquationSystems& other_es,
 
       for (; pos != end; ++pos)
         {
-	  const std::string& sys_name = pos->first;
-	  const System&  system        = *(pos->second);
+          const std::string& sys_name = pos->first;
+          const System&  system        = *(pos->second);
 
-	  // get the other system
-	  const System& other_system   = other_es.get_system (sys_name);
+          // get the other system
+          const System& other_system   = other_es.get_system (sys_name);
 
-	  os_result.push_back (system.compare (other_system, threshold, verbose));
+          os_result.push_back (system.compare (other_system, threshold, verbose));
 
-	}
+        }
 
     }
 
@@ -1155,14 +1155,14 @@ bool EquationSystems::compare (const EquationSystems& other_es,
     {
       bool os_identical;
       unsigned int n = 0;
-	  do
-	    {
-	      os_identical = os_result[n];
-	      n++;
-	    }
-	  while (os_identical && n<os_result.size());
-	  return os_identical;
-	}
+      do
+        {
+          os_identical = os_result[n];
+          n++;
+        }
+      while (os_identical && n<os_result.size());
+      return os_identical;
+    }
 }
 
 
@@ -1189,15 +1189,15 @@ std::string EquationSystems::get_info () const
 //       oss << "   Parameters:\n";
 
 //       for (std::map<std::string, Real>::const_iterator
-// 	     param = _parameters.begin(); param != _parameters.end();
-// 	   ++param)
-// 	oss << "    "
-// 	    << "\""
-// 	    << param->first
-// 	    << "\""
-// 	    << "="
-// 	    << param->second
-// 	    << '\n';
+//      param = _parameters.begin(); param != _parameters.end();
+//    ++param)
+// oss << "    "
+//     << "\""
+//     << param->first
+//     << "\""
+//     << "="
+//     << param->second
+//     << '\n';
 //     }
 
   return oss.str();

@@ -33,7 +33,7 @@ namespace libMesh
 //------------------------------------------------------
 // MeshData functions
 void MeshData::read_xdr (const std::string& name,
-			 const XdrMODE mode)
+                         const XdrMODE mode)
 {
   /**
    * This code implements the output of the MeshData
@@ -126,16 +126,16 @@ void MeshData::read_xdr (const std::string& name,
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
     if (vtype != "COMPLEX")
       {
-	libMesh::err << "ERROR: File does not contain complex-valued data!"
-		      << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: File does not contain complex-valued data!"
+                     << std::endl;
+        libmesh_error();
       }
 #elif LIBMESH_USE_REAL_NUMBERS
     if (vtype != "REAL")
       {
-	libMesh::err << "ERROR: File does not contain real-valued data!"
-		      << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: File does not contain real-valued data!"
+                     << std::endl;
+        libmesh_error();
       }
 #else
     /*
@@ -190,31 +190,31 @@ void MeshData::read_xdr (const std::string& name,
        */
       {
         std::vector<Number> values;
-	io.data (values);
+        io.data (values);
 
 
 #ifdef DEBUG
-	/*
-	 * make sure the size of the values vectors
-	 * are identical for all nodes
-	 */
-	if (n_cnt == 0)
-	    previous_values_size = values.size();
-	else
-	  {
-	    if (previous_values_size != values.size())
-	      {
-		libMesh::err << "ERROR: Size mismatch for n_cnt = " << n_cnt << std::endl;
-		libmesh_error();
-	      }
-	  }
+        /*
+         * make sure the size of the values vectors
+         * are identical for all nodes
+         */
+        if (n_cnt == 0)
+          previous_values_size = values.size();
+        else
+          {
+            if (previous_values_size != values.size())
+              {
+                libMesh::err << "ERROR: Size mismatch for n_cnt = " << n_cnt << std::endl;
+                libmesh_error();
+              }
+          }
 #endif
 
 
-	/**
-	 * insert this node and the values in the _node_data
-	 */
-	_node_data.insert (std::make_pair(node, values));
+        /**
+         * insert this node and the values in the _node_data
+         */
+        _node_data.insert (std::make_pair(node, values));
       }
     }
 
@@ -245,33 +245,33 @@ void MeshData::read_xdr (const std::string& name,
        */
       {
         std::vector<Number> values;
-	io.data (values);
+        io.data (values);
 
 
 #ifdef DEBUG
-	/*
-	 * make sure the size of the values vectors
-	 * are identical for all elements
-	 */
-	if (n_cnt == 0)
-	    previous_values_size = values.size();
-	else
-	  {
-	    if (previous_values_size != values.size())
-	      {
-		libMesh::err << "ERROR: Size mismatch for n_cnt = " << n_cnt << std::endl;
-		libmesh_error();
-	      }
-	  }
+        /*
+         * make sure the size of the values vectors
+         * are identical for all elements
+         */
+        if (n_cnt == 0)
+          previous_values_size = values.size();
+        else
+          {
+            if (previous_values_size != values.size())
+              {
+                libMesh::err << "ERROR: Size mismatch for n_cnt = " << n_cnt << std::endl;
+                libmesh_error();
+              }
+          }
 #endif
 
 
-	/**
-	 * insert this elem and the values in our _elem_data
-	 * @e only when we own this element!
-	 */
-	if (elem->processor_id() == proc_id)
-	  _elem_data.insert (std::make_pair(elem, values));
+        /**
+         * insert this elem and the values in our _elem_data
+         * @e only when we own this element!
+         */
+        if (elem->processor_id() == proc_id)
+          _elem_data.insert (std::make_pair(elem, values));
       }
     }
 
@@ -292,7 +292,7 @@ void MeshData::read_xdr (const std::string& name,
 
 
 void MeshData::write_xdr (const std::string& name,
-			  const XdrMODE mode)
+                          const XdrMODE mode)
 {
   /**
    * This code implements the output of the MeshData
@@ -416,8 +416,8 @@ better_you_choke_this...
        * Write the foreign node id
        */
       {
-	unsigned int f_id = node_to_foreign_id (node);
-	io.data (f_id, "# Foreign node id");
+        unsigned int f_id = node_to_foreign_id (node);
+        io.data (f_id, "# Foreign node id");
       }
 
 
@@ -427,21 +427,21 @@ better_you_choke_this...
        * the actual values for this node
        */
       {
-	/*
-	 * since we are iterating over our @e own
-	 * map, this libmesh_assert should never break...
-	 */
-	libmesh_assert (this->has_data(node));
+        /*
+         * since we are iterating over our @e own
+         * map, this libmesh_assert should never break...
+         */
+        libmesh_assert (this->has_data(node));
 
-	const std::vector<Number>& values = this->get_data(node);
+        const std::vector<Number>& values = this->get_data(node);
 
-	/*
-	 * copy the data to a local buf, since
-	 * the Xdr class needs write access, even
-	 * when only reading data
-	 */
-	std::vector<Number> buf = values;
-	io.data (buf, "# Values");
+        /*
+         * copy the data to a local buf, since
+         * the Xdr class needs write access, even
+         * when only reading data
+         */
+        std::vector<Number> buf = values;
+        io.data (buf, "# Values");
       }
     }
 
@@ -464,8 +464,8 @@ better_you_choke_this...
        * Write the foreign element id
        */
       {
-	unsigned int f_id = elem_to_foreign_id (elem);
-	io.data (f_id, "# Foreign element id");
+        unsigned int f_id = elem_to_foreign_id (elem);
+        io.data (f_id, "# Foreign element id");
       }
 
 
@@ -475,21 +475,21 @@ better_you_choke_this...
        * the actual values for this element
        */
       {
-	/*
-	 * since we are iterating over our @e own
-	 * map, this libmesh_assert should never break...
-	 */
-	libmesh_assert (this->has_data(elem));
+        /*
+         * since we are iterating over our @e own
+         * map, this libmesh_assert should never break...
+         */
+        libmesh_assert (this->has_data(elem));
 
-	const std::vector<Number>& values = this->get_data(elem);
+        const std::vector<Number>& values = this->get_data(elem);
 
-	/*
-	 * copy the data to a local buf, since
-	 * the Xdr class needs write access, even
-	 * when only reading data
-	 */
-	std::vector<Number> buf = values;
-	io.data (buf, "# Values");
+        /*
+         * copy the data to a local buf, since
+         * the Xdr class needs write access, even
+         * when only reading data
+         */
+        std::vector<Number> buf = values;
+        io.data (buf, "# Values");
       }
     }
 }
