@@ -100,7 +100,7 @@ void process_cmd_line(int argc, char **argv,
                       std::vector<std::string>& names,
                       unsigned int& dim,
                       double& threshold,
-                      libMeshEnums::XdrMODE& format,
+                      XdrMODE& format,
                       bool& verbose,
                       bool& quiet)
 {
@@ -204,7 +204,7 @@ void process_cmd_line(int argc, char **argv,
               }
             else
               {
-                format = libMeshEnums::READ;
+                format = READ;
                 format_set = true;
               }
             break;
@@ -223,7 +223,7 @@ void process_cmd_line(int argc, char **argv,
               }
             else
               {
-                format = libMeshEnums::DECODE;
+                format = DECODE;
                 format_set = true;
               }
             break;
@@ -318,7 +318,7 @@ int main (int argc, char** argv)
   std::vector<std::string> names;
   unsigned int dim                = static_cast<unsigned int>(-1);
   double threshold                = TOLERANCE;
-  libMeshEnums::XdrMODE format    = libMeshEnums::READ;
+  XdrMODE format                  = READ;
   bool verbose                    = false;
 
   // get commands

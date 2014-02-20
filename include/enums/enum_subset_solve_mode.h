@@ -22,10 +22,10 @@
 
 // ------------------------------------------------------------
 // enum SubsetSolveMode definition
-namespace libMeshEnums {
+namespace libMesh {
 
   /**
-   * \enum libMeshEnums::SubsetSolveMode defines an \p enum for the
+   * \enum SubsetSolveMode defines an \p enum for the
    * question what happens to the dofs outside the given subset when a
    * system is solved on a subset.
    */
@@ -36,7 +36,5 @@ namespace libMeshEnums {
   };
 
 }
-
-using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_SUBSET_SOLVE_MODE_H

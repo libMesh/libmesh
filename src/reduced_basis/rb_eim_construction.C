@@ -357,7 +357,7 @@ void RBEIMConstruction::enrich_RB_space()
     eim_eval.interpolation_points_elem.push_back( elem_ptr );
 
     NumericVector<Number>* new_bf = NumericVector<Number>::build(this->comm()).release();
-    new_bf->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    new_bf->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
     *new_bf = *solution;
     get_rb_evaluation().basis_functions.push_back( new_bf );
   }

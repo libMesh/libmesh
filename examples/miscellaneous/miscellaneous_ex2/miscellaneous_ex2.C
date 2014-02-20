@@ -264,7 +264,7 @@ int main (int argc, char** argv)
   // written to disk.  By default, the additional vectors are also
   // saved.
 
-  equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
+  equation_systems.write ("eqn_sys.dat", WRITE);
 
   // All done.
   return 0;

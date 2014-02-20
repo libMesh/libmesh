@@ -197,7 +197,7 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
   unsigned int n       = n_local;
   this->comm().sum(n);
 
-  temp->init (n, n_local, false, libMeshEnums::PARALLEL);
+  temp->init (n, n_local, false, PARALLEL);
 
   std::pair<Real, Real> eval = eigen_solver->get_eigenpair (i, *temp);
 

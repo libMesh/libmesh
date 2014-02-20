@@ -265,7 +265,7 @@ int main (int argc, char** argv)
       mesh.print_info();
 
       // Read in the solution stored in "saved_solution.xda"
-      equation_systems.read("saved_solution.xdr", libMeshEnums::DECODE);
+      equation_systems.read("saved_solution.xdr", DECODE);
     }
 
   // Get a reference to the system so that we can attach things to it
@@ -516,7 +516,7 @@ int main (int argc, char** argv)
       std::cout << "Final H1 norm = " << H1norm << std::endl << std::endl;
 
       mesh.write("saved_mesh.xdr");
-      equation_systems.write("saved_solution.xdr", libMeshEnums::ENCODE);
+      equation_systems.write("saved_solution.xdr", ENCODE);
 #ifdef LIBMESH_HAVE_GMV
       GMVIO(mesh).write_equation_systems ("saved_solution.gmv",
                                           equation_systems);

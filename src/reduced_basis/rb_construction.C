@@ -572,7 +572,7 @@ void RBConstruction::allocate_data_structures()
   {
     // Initialize the memory for the vectors
     Fq_vector[q] = NumericVector<Number>::build(this->comm()).release();
-    Fq_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    Fq_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
   }
 
   // We also need to initialize a second set of non-Dirichlet operators
@@ -583,7 +583,7 @@ void RBConstruction::allocate_data_structures()
     {
       // Initialize the memory for the vectors
       non_dirichlet_Fq_vector[q] = NumericVector<Number>::build(this->comm()).release();
-      non_dirichlet_Fq_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      non_dirichlet_Fq_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
     }
   }
 
@@ -592,7 +592,7 @@ void RBConstruction::allocate_data_structures()
     {
       // Initialize the memory for the truth output vectors
       outputs_vector[n][q_l] = (NumericVector<Number>::build(this->comm()).release());
-      outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
     }
 
   if(store_non_dirichlet_operators)
@@ -605,7 +605,7 @@ void RBConstruction::allocate_data_structures()
       {
         // Initialize the memory for the truth output vectors
         non_dirichlet_outputs_vector[n][q_l] = (NumericVector<Number>::build(this->comm()).release());
-        non_dirichlet_outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+        non_dirichlet_outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       }
     }
   }
@@ -848,7 +848,7 @@ void RBConstruction::truth_assembly()
     }
 
     AutoPtr< NumericVector<Number> > temp_vec = NumericVector<Number>::build(this->comm());
-    temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
     for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
     {
       *temp_vec = *get_Fq(q_f);
@@ -1275,7 +1275,7 @@ void RBConstruction::enrich_RB_space()
   START_LOG("enrich_RB_space()", "RBConstruction");
 
   NumericVector<Number>* new_bf = NumericVector<Number>::build(this->comm()).release();
-  new_bf->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+  new_bf->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
   *new_bf = *solution;
 
   for(unsigned int index=0; index<get_rb_evaluation().get_n_basis_functions(); index++)
@@ -1446,7 +1446,7 @@ void RBConstruction::update_RB_system_matrices()
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
   AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->comm());
-  temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+  temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
   {
@@ -1537,7 +1537,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
       if(!get_rb_evaluation().Aq_representor[q_a][i])
       {
         get_rb_evaluation().Aq_representor[q_a][i] = (NumericVector<Number>::build(this->comm()).release());
-        get_rb_evaluation().Aq_representor[q_a][i]->init(this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+        get_rb_evaluation().Aq_representor[q_a][i]->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       }
 
       libmesh_assert(get_rb_evaluation().Aq_representor[q_a][i]->size()       == this->n_dofs()       &&
@@ -1685,7 +1685,7 @@ void RBConstruction::compute_output_dual_innerprods()
     for(unsigned int q=0; q<max_Q_l; q++)
     {
       L_q_representor[q] = (NumericVector<Number>::build(this->comm()).release());
-      L_q_representor[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      L_q_representor[q]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
     }
 
     if(reuse_preconditioner)
@@ -1831,7 +1831,7 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
       if(!Fq_representor[q_f])
       {
         Fq_representor[q_f] = (NumericVector<Number>::build(this->comm()).release());
-        Fq_representor[q_f]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+        Fq_representor[q_f]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       }
 
       libmesh_assert(Fq_representor[q_f]->size()       == this->n_dofs()       &&
@@ -1949,10 +1949,10 @@ void RBConstruction::load_rb_solution()
 //   // have a different parameter value during the Greedy training.
 //
 //   AutoPtr< NumericVector<Number> > RB_sol = NumericVector<Number>::build();
-//   RB_sol->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+//   RB_sol->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 //
 //   AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build();
-//   temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+//   temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 //
 //   for(unsigned int i=0; i<N; i++)
 //   {
@@ -2262,7 +2262,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
     read_serialized_data(fqr_data, false);
 
     Fq_representor[i] = NumericVector<Number>::build(this->comm()).release();
-    Fq_representor[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    Fq_representor[i]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
     // No need to copy, just swap
     // *Fq_representor[i] = *solution;
@@ -2316,7 +2316,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
 
       get_rb_evaluation().Aq_representor[i][j] = NumericVector<Number>::build(this->comm()).release();
       get_rb_evaluation().Aq_representor[i][j]->init (n_dofs(), n_local_dofs(),
-                                            false, libMeshEnums::PARALLEL);
+                                            false, PARALLEL);
 
       // No need to copy, just swap
       //*Aq_representor[i][j] = *solution;

@@ -202,7 +202,7 @@ int main (int argc, char** argv)
   // use the FEInterface::compute_data() methods to
   // determine physically correct results within an
   // infinite element.
-  equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
+  equation_systems.write ("eqn_sys.dat", WRITE);
 
   // All done.
   return 0;
