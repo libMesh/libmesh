@@ -139,9 +139,9 @@ int main (int argc, char** argv)
 
   // Write the equation system if the user specified an
   // output file name.  Note that there are two possible
-  // formats to write to.  Specifying libMeshEnums::WRITE will
+  // formats to write to.  Specifying WRITE will
   // create a formatted ASCII file.  Optionally, you can specify
-  // libMeshEnums::ENCODE and get an XDR-encoded binary file.
+  // ENCODE and get an XDR-encoded binary file.
   //
   // We will write the data, clear the object, and read the file
   // we just wrote.  This is simply to demonstrate capability.
@@ -155,7 +155,7 @@ int main (int argc, char** argv)
                   << std::endl;
 
         // Write the system.
-        equation_systems.write (argv[1], libMeshEnums::WRITE);
+        equation_systems.write (argv[1], WRITE);
 
         // Clear the equation systems data structure.
         equation_systems.clear ();
@@ -165,7 +165,7 @@ int main (int argc, char** argv)
 
         // Read the file we just wrote.  This better
         // work!
-        equation_systems.read (argv[1], libMeshEnums::READ);
+        equation_systems.read (argv[1], READ);
 
         // Print the information again.
         equation_systems.print_info();

@@ -20,14 +20,9 @@
 #ifndef LIBMESH_ENUM_ELEM_TYPE_H
 #define LIBMESH_ENUM_ELEM_TYPE_H
 
-/**
- * The \p libMeshEnums namespace is the namespace all \p enum definitions
- * should be put into.
- */
-
 // ------------------------------------------------------------
 // enum ElemType definition
-namespace libMeshEnums {
+namespace libMesh {
 
   /**
    * Defines an \p enum for geometric element types.
@@ -75,7 +70,5 @@ namespace libMeshEnums {
 
                  INVALID_ELEM};  // 28 - should always be last
 }
-
-using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_ELEM_TYPE_H

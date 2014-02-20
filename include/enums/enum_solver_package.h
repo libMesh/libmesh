@@ -20,14 +20,9 @@
 #ifndef LIBMESH_ENUM_SOLVER_PACKAGE_H
 #define LIBMESH_ENUM_SOLVER_PACKAGE_H
 
-/*
- * The \p libMeshEnums namespace is the namespace all \p enum definitions
- * should be put into.
- */
-
 // ------------------------------------------------------------
 // enum SolverType definition
-namespace libMeshEnums {
+namespace libMesh {
 
   /**
    * Defines an \p enum for various linear solver packages.
@@ -45,8 +40,5 @@ namespace libMeshEnums {
       INVALID_SOLVER_PACKAGE
     };
 }
-
-using namespace libMeshEnums;
-
 
 #endif // LIBMESH_ENUM_SOLVER_PACKAGE_H

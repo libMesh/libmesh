@@ -795,8 +795,8 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<do
     const Elem* elem = (*it);
 
     //Right now this only works for quad4's
-    //libmesh_assert_equal_to (elem->type(), libMeshEnums::QUAD4);
-    if(elem->type() == libMeshEnums::QUAD4)
+    //libmesh_assert_equal_to (elem->type(), QUAD4);
+    if(elem->type() == QUAD4)
     {
       //Loop over the sides looking for sides that have hanging nodes
       //This code is inspired by compute_proj_constraints()

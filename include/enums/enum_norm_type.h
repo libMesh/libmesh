@@ -22,10 +22,10 @@
 
 // ------------------------------------------------------------
 // enum FEMNormType definition
-namespace libMeshEnums {
+namespace libMesh {
 
   /**
-   * \enum libMeshEnums::FEMNormType defines an \p enum for norms
+   * \enum libMesh::FEMNormType defines an \p enum for norms
    * defined on vectors of finite element coefficients
    */
   // Hilbert norms and seminorms in FE space
@@ -62,7 +62,5 @@ namespace libMeshEnums {
 
                     INVALID_NORM    = 42};
 }
-
-using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_NORM_TYPE_H

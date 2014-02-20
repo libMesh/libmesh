@@ -22,10 +22,10 @@
 
 // ------------------------------------------------------------
 // enum Order definition
-namespace libMeshEnums {
+namespace libMesh {
 
   /**
-   * \enum libMeshEnums::Order defines an \p enum for polynomial orders.
+   * \enum libMesh::Order defines an \p enum for polynomial orders.
    * Fixing each label to a specific int, since \p InfFE and p refinement
    * may cast between them
    */
@@ -81,7 +81,5 @@ namespace libMeshEnums {
               INVALID_ORDER};
 
 }
-
-using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_ORDER_H

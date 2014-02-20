@@ -22,10 +22,10 @@
 
 // ------------------------------------------------------------
 // enum FEFamily definition
-namespace libMeshEnums {
+namespace libMesh {
 
   /**
-   * \enum libMeshEnums::FEFamily defines an \p enum for finite
+   * \enum libMesh::FEFamily defines an \p enum for finite
    * element families.
    */
                  // vanilla C0
@@ -65,7 +65,7 @@ namespace libMeshEnums {
                  INVALID_FE   = 99};
 
   /**
-   * \enum libMeshEnums::FEContinuity defines an \p enum for finite element
+   * \enum libMesh::FEContinuity defines an \p enum for finite element
    * types to libmesh_assert a certain level (or type? Hcurl?) of continuity.
    */
   enum FEContinuity {DISCONTINUOUS,
@@ -74,14 +74,12 @@ namespace libMeshEnums {
                      H_CURL};
 
   /**
-   * \enum libMeshEnums::FEFieldType defines an \p enum for finite element
+   * \enum libMesh::FEFieldType defines an \p enum for finite element
    * field types - i.e. is it a scalar element, vector, tensor, etc.
    */
   enum FEFieldType {TYPE_SCALAR = 0,
                     TYPE_VECTOR};
 
 }
-
-using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_FE_FAMILY_H
