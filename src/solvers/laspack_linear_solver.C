@@ -99,7 +99,7 @@ void LaspackLinearSolver<T>::init ()
       this->_is_initialized = true;
     }
 
- // SetRTCAuxProc (print_iter_accuracy);
+  // SetRTCAuxProc (print_iter_accuracy);
 }
 
 
@@ -519,7 +519,7 @@ template <typename T>
 void LaspackLinearSolver<T>::print_converged_reason()
 {
   libMesh::out << "print_converged_reason() is currently only supported"
-                << "with Petsc 2.3.1 and later." << std::endl;
+               << "with Petsc 2.3.1 and later." << std::endl;
 }
 
 

@@ -190,35 +190,35 @@ bool Prism::is_edge_on_side(const unsigned int e,
 
 
 const unsigned short int Prism::_second_order_vertex_child_number[18] =
-{
-  99,99,99,99,99,99, // Vertices
-  0,1,0,0,1,2,3,4,3, // Edges
-  0,1,0              // Faces
-};
+  {
+    99,99,99,99,99,99, // Vertices
+    0,1,0,0,1,2,3,4,3, // Edges
+    0,1,0              // Faces
+  };
 
 
 
 const unsigned short int Prism::_second_order_vertex_child_index[18] =
-{
-  99,99,99,99,99,99, // Vertices
-  1,2,2,3,4,5,4,5,5, // Edges
-  4,5,5              // Faces
-};
+  {
+    99,99,99,99,99,99, // Vertices
+    1,2,2,3,4,5,4,5,5, // Edges
+    4,5,5              // Faces
+  };
 
 
 const unsigned short int Prism::_second_order_adjacent_vertices[9][2] =
-{
-  { 0,  1}, // vertices adjacent to node 6
-  { 1,  2}, // vertices adjacent to node 7
-  { 0,  2}, // vertices adjacent to node 8
+  {
+    { 0,  1}, // vertices adjacent to node 6
+    { 1,  2}, // vertices adjacent to node 7
+    { 0,  2}, // vertices adjacent to node 8
 
-  { 0,  3}, // vertices adjacent to node 9
-  { 1,  4}, // vertices adjacent to node 10
-  { 2,  5}, // vertices adjacent to node 11
+    { 0,  3}, // vertices adjacent to node 9
+    { 1,  4}, // vertices adjacent to node 10
+    { 2,  5}, // vertices adjacent to node 11
 
-  { 3,  4}, // vertices adjacent to node 12
-  { 4,  5}, // vertices adjacent to node 13
-  { 3,  5}  // vertices adjacent to node 14
-};
+    { 3,  4}, // vertices adjacent to node 12
+    { 4,  5}, // vertices adjacent to node 13
+    { 3,  5}  // vertices adjacent to node 14
+  };
 
 } // namespace libMesh

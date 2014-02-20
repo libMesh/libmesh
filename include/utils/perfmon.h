@@ -42,7 +42,7 @@ namespace libMesh
 
 class PerfMon
 {
- public:
+public:
   PerfMon  (std::string id,
             const unsigned int v=1,
             const unsigned int pid=0);
@@ -51,7 +51,7 @@ class PerfMon
   void reset ();
   double print (std::string msg="NULL", std::ostream &out = libMesh::out);
 
- private:
+private:
 
   const std::string id_string;
 
@@ -93,7 +93,7 @@ PerfMon::print (std::string msg, std::ostream &my_out)
 #endif
 
   const double elapsed_time = ((double) (the_time_stop.tv_sec - the_time_start.tv_sec)) +
-                              ((double) (the_time_stop.tv_usec - the_time_start.tv_usec))/1000000.;
+    ((double) (the_time_stop.tv_usec - the_time_start.tv_usec))/1000000.;
 
   if (verbose)
     {

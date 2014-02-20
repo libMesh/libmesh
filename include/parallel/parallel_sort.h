@@ -33,17 +33,17 @@ namespace libMesh
 
 namespace Parallel
 {
-  /**
-   * The parallel sorting method is templated on the
-   * type of data which is to be sorted.  It may later
-   * be templated on other things if we are ambitious.
-   * This class knows about MPI, and knows how many
-   * processors there are.  It is responsible for
-   * transmitting data between the processors and
-   * ensuring that the data is properly sorted between
-   * all the processors.  We assume that a Sort
-   * is instantiated on all processors.
-   */
+/**
+ * The parallel sorting method is templated on the
+ * type of data which is to be sorted.  It may later
+ * be templated on other things if we are ambitious.
+ * This class knows about MPI, and knows how many
+ * processors there are.  It is responsible for
+ * transmitting data between the processors and
+ * ensuring that the data is properly sorted between
+ * all the processors.  We assume that a Sort
+ * is instantiated on all processors.
+ */
 template <typename KeyType, typename IdxType=unsigned int>
 class Sort : public ParallelObject
 {

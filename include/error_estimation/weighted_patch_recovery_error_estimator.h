@@ -56,7 +56,7 @@ public:
    * be natural to support if any contributors make the effort.
    */
   WeightedPatchRecoveryErrorEstimator() :
-   PatchRecoveryErrorEstimator()
+    PatchRecoveryErrorEstimator()
   {}
 
   /**
@@ -81,7 +81,7 @@ public:
   */
   std::vector<FEMFunctionBase<Number>*> weight_functions;
 
- private:
+private:
 
   /**
    * Class to compute the error contribution for a range

@@ -15,21 +15,21 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Systems Example 2 - Unsteady Nonlinear Navier-Stokes</h1>
- //
- // This example shows how a simple, unsteady, nonlinear system of equations
- // can be solved in parallel.  The system of equations are the familiar
- // Navier-Stokes equations for low-speed incompressible fluid flow.  This
- // example introduces the concept of the inner nonlinear loop for each
- // timestep, and requires a good deal of linear algebra number-crunching
- // at each step.  If you have a ExodusII viewer such as ParaView installed,
- // the script movie.sh in this directory will also take appropriate screen
- // shots of each of the solution files in the time sequence.  These rgb files
- // can then be animated with the "animate" utility of ImageMagick if it is
- // installed on your system.  On a PIII 1GHz machine in debug mode, this
- // example takes a little over a minute to run.  If you would like to see
- // a more detailed time history, or compute more timesteps, that is certainly
- // possible by changing the n_timesteps and dt variables below.
+// <h1>Systems Example 2 - Unsteady Nonlinear Navier-Stokes</h1>
+//
+// This example shows how a simple, unsteady, nonlinear system of equations
+// can be solved in parallel.  The system of equations are the familiar
+// Navier-Stokes equations for low-speed incompressible fluid flow.  This
+// example introduces the concept of the inner nonlinear loop for each
+// timestep, and requires a good deal of linear algebra number-crunching
+// at each step.  If you have a ExodusII viewer such as ParaView installed,
+// the script movie.sh in this directory will also take appropriate screen
+// shots of each of the solution files in the time sequence.  These rgb files
+// can then be animated with the "animate" utility of ImageMagick if it is
+// installed on your system.  On a PIII 1GHz machine in debug mode, this
+// example takes a little over a minute to run.  If you would like to see
+// a more detailed time history, or compute more timesteps, that is certainly
+// possible by changing the n_timesteps and dt variables below.
 
 // C++ include files that we need
 #include <iostream>
@@ -145,7 +145,7 @@ int main (int argc, char** argv)
 
   // Get a reference to the Stokes system to use later.
   TransientLinearImplicitSystem&  navier_stokes_system =
-        equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
+    equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
 
   // Now we begin the timestep loop to compute the time-accurate
   // solution of the equations.
@@ -181,8 +181,8 @@ int main (int argc, char** argv)
 
       // A pretty update message
       std::cout << "\n\n*** Solving time step " << t_step <<
-                   ", time = " << navier_stokes_system.time <<
-                   " ***" << std::endl;
+        ", time = " << navier_stokes_system.time <<
+        " ***" << std::endl;
 
       // Now we need to update the solution vector from the
       // previous time step.  This is done directly through
@@ -271,7 +271,7 @@ int main (int argc, char** argv)
                     << ".e";
 
           ExodusII_IO(mesh).write_equation_systems (file_name.str(),
-                                              equation_systems);
+                                                    equation_systems);
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     } // end timestep loop.

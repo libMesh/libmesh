@@ -38,36 +38,36 @@ namespace libMesh
 // ------------------------------------------------------------
 // InfQuad4 class static member initializations
 const unsigned int InfQuad4::side_nodes_map[3][2] =
-{
-  {0, 1}, // Side 0
-  {1, 3}, // Side 1
-  {0, 2}  // Side 2
-};
+  {
+    {0, 1}, // Side 0
+    {1, 3}, // Side 1
+    {0, 2}  // Side 2
+  };
 
 
 
 #ifdef LIBMESH_ENABLE_AMR
 
 const float InfQuad4::_embedding_matrix[2][4][4] =
-{
-  // embedding matrix for child 0
   {
-    // 0    1    2    3rd parent node
-    {1.0, 0.0, 0.0, 0.0}, // 0th child node
-    {0.5, 0.5, 0.0, 0.0}, // 1
-    {0.0, 0.0, 1.0, 0.0}, // 2
-    {0.0, 0.0, 0.5, 0.5}  // 3
-  },
+    // embedding matrix for child 0
+    {
+      // 0    1    2    3rd parent node
+      {1.0, 0.0, 0.0, 0.0}, // 0th child node
+      {0.5, 0.5, 0.0, 0.0}, // 1
+      {0.0, 0.0, 1.0, 0.0}, // 2
+      {0.0, 0.0, 0.5, 0.5}  // 3
+    },
 
-  // embedding matrix for child 1
-  {
-    // 0    1    2    3
-    {0.5, 0.5, 0.0, 0.0}, // 0
-    {0.0, 1.0, 0.0, 0.0}, // 1
-    {0.0, 0.0, 0.5, 0.5}, // 2
-    {0.0, 0.0, 0.0, 1.0}  // 3
-  }
-};
+    // embedding matrix for child 1
+    {
+      // 0    1    2    3
+      {0.5, 0.5, 0.0, 0.0}, // 0
+      {0.0, 1.0, 0.0, 0.0}, // 1
+      {0.0, 0.0, 0.5, 0.5}, // 2
+      {0.0, 0.0, 0.0, 1.0}  // 3
+    }
+  };
 
 #endif
 

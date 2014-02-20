@@ -188,11 +188,11 @@ public:
    * This function solves a system whose matrix is a shell matrix.
    */
   std::pair<unsigned int, Real>
-    solve (const ShellMatrix<T>& shell_matrix,
-           NumericVector<T>& solution_in,
-           NumericVector<T>& rhs_in,
-           const double tol,
-           const unsigned int m_its);
+  solve (const ShellMatrix<T>& shell_matrix,
+         NumericVector<T>& solution_in,
+         NumericVector<T>& rhs_in,
+         const double tol,
+         const unsigned int m_its);
 
   /**
    * This function solves a system whose matrix is a shell matrix, but
@@ -200,12 +200,12 @@ public:
    * other preconditioners than JACOBI.
    */
   virtual std::pair<unsigned int, Real>
-    solve (const ShellMatrix<T>& shell_matrix,
-           const SparseMatrix<T>& precond_matrix,
-           NumericVector<T>& solution_in,
-           NumericVector<T>& rhs_in,
-           const double tol,
-           const unsigned int m_its);
+  solve (const ShellMatrix<T>& shell_matrix,
+         const SparseMatrix<T>& precond_matrix,
+         NumericVector<T>& solution_in,
+         NumericVector<T>& rhs_in,
+         const double tol,
+         const unsigned int m_its);
 
   /**
    * Returns the raw PETSc preconditioner context pointer.  This allows
@@ -322,11 +322,11 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-  PetscLinearSolver<T>::PetscLinearSolver (const libMesh::Parallel::Communicator &comm):
-    LinearSolver<T>(comm),
-    _restrict_solve_to_is(NULL),
-    _restrict_solve_to_is_complement(NULL),
-    _subset_solve_mode(SUBSET_ZERO)
+PetscLinearSolver<T>::PetscLinearSolver (const libMesh::Parallel::Communicator &comm):
+  LinearSolver<T>(comm),
+  _restrict_solve_to_is(NULL),
+  _restrict_solve_to_is_complement(NULL),
+  _subset_solve_mode(SUBSET_ZERO)
 {
   if (this->n_processors() == 1)
     this->_preconditioner_type = ILU_PRECOND;
@@ -369,7 +369,7 @@ PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
 #else
                                              vec_in
 #endif
-  )
+                                             )
 {
   libmesh_assert(_restrict_solve_to_is);
 #if PETSC_VERSION_LESS_THAN(3,0,0)

@@ -26,12 +26,12 @@
 // C/C++ includes everyone should know about
 #include <cstdlib>
 #ifdef __PGI
-   // BSK, Thu Feb 20 08:32:06 CST 2014 - For some reason, unless PGI gets
-   // <cmath> early this nonsense shows up:
-   // "/software/x86_64/pgi/12.9/linux86-64/12.9/include/CC/cmath", line 57: error:
-   //           the global scope has no "abs"
-   //   using _STLP_VENDOR_CSTD::abs;
-   // So include <cmath> as early as possible under the PGI compilers.
+// BSK, Thu Feb 20 08:32:06 CST 2014 - For some reason, unless PGI gets
+// <cmath> early this nonsense shows up:
+// "/software/x86_64/pgi/12.9/linux86-64/12.9/include/CC/cmath", line 57: error:
+//           the global scope has no "abs"
+//   using _STLP_VENDOR_CSTD::abs;
+// So include <cmath> as early as possible under the PGI compilers.
 #  include <cmath>
 #endif
 #include <complex>
@@ -79,9 +79,9 @@ namespace libMesh
 // libmesh_common.C.
 namespace MacroFunctions
 {
-  void here(const char* file, int line, const char* date, const char* time);
-  void stop(const char* file, int line, const char* date, const char* time);
-  void report_error(const char* file, int line, const char* date, const char* time);
+void here(const char* file, int line, const char* date, const char* time);
+void stop(const char* file, int line, const char* date, const char* time);
+void report_error(const char* file, int line, const char* date, const char* time);
 }
 
 // Undefine any existing macros
@@ -108,7 +108,7 @@ namespace MacroFunctions
 // Check to see if TOLERANCE has been defined by another
 // package, if so we might want to change the name...
 #ifdef TOLERANCE
-   DIE A HORRIBLE DEATH HERE...
+DIE A HORRIBLE DEATH HERE...
 #  undef TOLERANCE
 #endif
 
@@ -123,16 +123,16 @@ typedef LIBMESH_DEFAULT_SCALAR_TYPE Real;
 // For example, v == 0 is changed to std::abs(v) < TOLERANCE.
 
 #ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
-  #ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
+#ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
 static const Real TOLERANCE = 1.e-8;
-  # define MPI_REAL MPI_LONG_DOUBLE
-  #else
+# define MPI_REAL MPI_LONG_DOUBLE
+#else
 static const Real TOLERANCE = 1.e-6;
-  # define MPI_REAL MPI_DOUBLE
-  #endif
+# define MPI_REAL MPI_DOUBLE
+#endif
 #else
 static const Real TOLERANCE = 2.5e-3;
-  # define MPI_REAL MPI_FLOAT
+# define MPI_REAL MPI_FLOAT
 #endif
 
 // Define the type to use for complex numbers
@@ -169,11 +169,11 @@ inline bool libmesh_isnan(std::complex<T> a) { return (libmesh_isnan(std::real(a
 // This is either Real or Complex, depending on how
 // the library was configures
 #if   defined (LIBMESH_USE_REAL_NUMBERS)
-  typedef Real Number;
+typedef Real Number;
 #elif defined (LIBMESH_USE_COMPLEX_NUMBERS)
-  typedef Complex Number;
+typedef Complex Number;
 #else
-  DIE A HORRIBLE DEATH HERE...
+DIE A HORRIBLE DEATH HERE...
 #endif
 
 
@@ -185,31 +185,31 @@ typedef float ErrorVectorReal;
 
 
 #ifdef LIBMESH_HAVE_MPI
-  #ifndef LIBMESH_DISABLE_COMMWORLD
-    /**
-     * MPI Communicator to be used in the library.
-     */
-    extern MPI_Comm COMM_WORLD;
-  #endif
-
-  /**
-   * MPI Communicator used to initialize libMesh.
-   */
-  extern MPI_Comm GLOBAL_COMM_WORLD;
-#else
-  #ifndef LIBMESH_DISABLE_COMMWORLD
-    /**
-     * Something to use with CHKERRABORT if we're just using PETSc's MPI
-     * "uni" stub.
-     */
-    extern int COMM_WORLD;
-  #endif
+#ifndef LIBMESH_DISABLE_COMMWORLD
+/**
+ * MPI Communicator to be used in the library.
+ */
+extern MPI_Comm COMM_WORLD;
+#endif
 
 /**
-   * Something to use with CHKERRABORT if we're just using PETSc's MPI
-   * "uni" stub.
-   */
-  extern int GLOBAL_COMM_WORLD;
+ * MPI Communicator used to initialize libMesh.
+ */
+extern MPI_Comm GLOBAL_COMM_WORLD;
+#else
+#ifndef LIBMESH_DISABLE_COMMWORLD
+/**
+ * Something to use with CHKERRABORT if we're just using PETSc's MPI
+ * "uni" stub.
+ */
+extern int COMM_WORLD;
+#endif
+
+/**
+ * Something to use with CHKERRABORT if we're just using PETSc's MPI
+ * "uni" stub.
+ */
+extern int GLOBAL_COMM_WORLD;
 #endif
 
 // Let's define a couple output streams - these will default
@@ -225,8 +225,8 @@ extern OStreamProxy err;
 // These are useful macros that behave like functions in the code.
 // If you want to make sure you are accessing a section of code just
 // stick a libmesh_here(); in it, for example
-#define libmesh_here() \
-  do { \
+#define libmesh_here()                                                  \
+  do {                                                                  \
     libMesh::MacroFunctions::here(__FILE__, __LINE__, __DATE__, __TIME__); \
   } while(0)
 
@@ -236,8 +236,8 @@ extern OStreamProxy err;
 // instered before and after a questionable operation and the delta
 // memory can be obtained from a ps or top.  This macro only works for
 // serial cases.
-#define libmesh_stop() \
-  do { \
+#define libmesh_stop()                                                  \
+  do {                                                                  \
     libMesh::MacroFunctions::stop(__FILE__, __LINE__, __DATE__, __TIME__); \
   } while(0)
 
@@ -272,61 +272,61 @@ extern OStreamProxy err;
 
 #else
 
-#define libmesh_assert(asserted) \
-  do { \
-    if (!(asserted)) { \
+#define libmesh_assert(asserted)                                        \
+  do {                                                                  \
+    if (!(asserted)) {                                                  \
       libMesh::err << "Assertion `" #asserted "' failed." << std::endl; \
-      libmesh_error(); \
-  } } while(0)
+      libmesh_error();                                                  \
+    } } while(0)
 
-#define libmesh_assert_msg(asserted, msg) \
-  do { \
-    if (!(asserted)) { \
+#define libmesh_assert_msg(asserted, msg)                               \
+  do {                                                                  \
+    if (!(asserted)) {                                                  \
       libMesh::err << "Assertion `" #asserted "' failed." << std::endl; \
-      libmesh_error_msg(msg); \
-  } } while(0)
+      libmesh_error_msg(msg);                                           \
+    } } while(0)
 
-#define libmesh_assert_equal_to(expr1,expr2) \
-  do { \
-    if (!(expr1 == expr2)) { \
+#define libmesh_assert_equal_to(expr1,expr2)                            \
+  do {                                                                  \
+    if (!(expr1 == expr2)) {                                            \
       libMesh::err << "Assertion `" #expr1 " == " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; \
-      libmesh_error(); \
-  } } while(0)
+      libmesh_error();                                                  \
+    } } while(0)
 
-#define libmesh_assert_not_equal_to(expr1,expr2) \
-  do { \
-    if (!(expr1 != expr2)) { \
+#define libmesh_assert_not_equal_to(expr1,expr2)                        \
+  do {                                                                  \
+    if (!(expr1 != expr2)) {                                            \
       libMesh::err << "Assertion `" #expr1 " != " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; \
-      libmesh_error(); \
-  } } while(0)
+      libmesh_error();                                                  \
+    } } while(0)
 
-#define libmesh_assert_less(expr1,expr2) \
-  do { \
-    if (!(expr1 < expr2)) { \
+#define libmesh_assert_less(expr1,expr2)                                \
+  do {                                                                  \
+    if (!(expr1 < expr2)) {                                             \
       libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; \
-      libmesh_error(); \
-  } } while(0)
+      libmesh_error();                                                  \
+    } } while(0)
 
-#define libmesh_assert_greater(expr1,expr2) \
-  do { \
-    if (!(expr1 > expr2)) { \
+#define libmesh_assert_greater(expr1,expr2)                             \
+  do {                                                                  \
+    if (!(expr1 > expr2)) {                                             \
       libMesh::err << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; \
-      libmesh_error(); \
-  } } while(0)
+      libmesh_error();                                                  \
+    } } while(0)
 
-#define libmesh_assert_less_equal(expr1,expr2) \
-  do { \
-    if (!(expr1 <= expr2)) { \
+#define libmesh_assert_less_equal(expr1,expr2)                          \
+  do {                                                                  \
+    if (!(expr1 <= expr2)) {                                            \
       libMesh::err << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; \
-      libmesh_error(); \
-  } } while(0)
+      libmesh_error();                                                  \
+    } } while(0)
 
-#define libmesh_assert_greater_equal(expr1,expr2) \
-  do { \
-    if (!(expr1 >= expr2)) { \
+#define libmesh_assert_greater_equal(expr1,expr2)                       \
+  do {                                                                  \
+    if (!(expr1 >= expr2)) {                                            \
       libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; \
-      libmesh_error(); \
-  } } while(0)
+      libmesh_error();                                                  \
+    } } while(0)
 
 #endif
 
@@ -341,48 +341,48 @@ extern OStreamProxy err;
 //
 // The libmesh_convergence_failure() macro
 // throws a ConvergenceFailure exception
-#define libmesh_error() \
-  do { \
+#define libmesh_error()                                                 \
+  do {                                                                  \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
-    LIBMESH_THROW(libMesh::LogicError()); \
+    LIBMESH_THROW(libMesh::LogicError());                               \
   } while(0)
 
-#define libmesh_error_msg(msg) \
-  do { \
+#define libmesh_error_msg(msg)                                          \
+  do {                                                                  \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
-    libMesh::err << msg << std::endl; \
-    LIBMESH_THROW(libMesh::LogicError()); \
+    libMesh::err << msg << std::endl;                                   \
+    LIBMESH_THROW(libMesh::LogicError());                               \
   } while(0)
 
-#define libmesh_not_implemented() \
-  do { \
+#define libmesh_not_implemented()                                       \
+  do {                                                                  \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
-    LIBMESH_THROW(libMesh::NotImplemented()); \
+    LIBMESH_THROW(libMesh::NotImplemented());                           \
   } while(0)
 
-#define libmesh_not_implemented_msg(msg) \
-  do { \
+#define libmesh_not_implemented_msg(msg)                                \
+  do {                                                                  \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
-    libMesh::err << msg << std::endl; \
-    LIBMESH_THROW(libMesh::NotImplemented()); \
+    libMesh::err << msg << std::endl;                                   \
+    LIBMESH_THROW(libMesh::NotImplemented());                           \
   } while(0)
 
-#define libmesh_file_error(filename) \
-  do { \
+#define libmesh_file_error(filename)                                    \
+  do {                                                                  \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
-    LIBMESH_THROW(libMesh::FileError(filename)); \
+    LIBMESH_THROW(libMesh::FileError(filename));                        \
   } while(0)
 
-#define libmesh_file_error_msg(filename, msg) \
-  do { \
+#define libmesh_file_error_msg(filename, msg)                           \
+  do {                                                                  \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, __DATE__, __TIME__); \
-    libMesh:err << msg << std::endl; \
-    LIBMESH_THROW(libMesh::FileError(filename)); \
+  libMesh:err << msg << std::endl;                                      \
+    LIBMESH_THROW(libMesh::FileError(filename));                        \
   } while(0)
 
-#define libmesh_convergence_failure() \
-  do { \
-    LIBMESH_THROW(libMesh::ConvergenceFailure()); \
+#define libmesh_convergence_failure()                   \
+  do {                                                  \
+    LIBMESH_THROW(libMesh::ConvergenceFailure());       \
   } while(0)
 
 // The libmesh_example_assert() macro prints a message and calls
@@ -397,12 +397,12 @@ extern OStreamProxy err;
 //
 // We now return 77, the automake code for a skipped test.
 
-#define libmesh_example_assert(asserted, requirement) \
-  do { \
-    if (!(asserted)) { \
+#define libmesh_example_assert(asserted, requirement)                   \
+  do {                                                                  \
+    if (!(asserted)) {                                                  \
       libMesh::out << "Assertion `" #asserted "' failed.  Configuring libMesh with " requirement " may be required to run this code." << std::endl; \
-      return 77; \
-  } } while(0)
+      return 77;                                                        \
+    } } while(0)
 
 // libmesh_cast_ref and libmesh_cast_ptr do a dynamic cast and assert
 // the result, if we have RTTI enabled and we're in debug or
@@ -479,22 +479,22 @@ inline Tnew libmesh_cast_int (Told oldvar)
 // The libmesh_do_once macro helps us avoid redundant repeated
 // repetitions of the same warning messages
 #undef libmesh_do_once
-#define libmesh_do_once(do_this) \
-  do { \
-    static bool did_this_already = false; \
-    if (!did_this_already) { \
-      did_this_already = true; \
-      do_this; \
-  } } while (0)
+#define libmesh_do_once(do_this)                \
+  do {                                          \
+    static bool did_this_already = false;       \
+    if (!did_this_already) {                    \
+      did_this_already = true;                  \
+      do_this;                                  \
+    } } while (0)
 
 
 // The libmesh_experimental macro warns that you are using
 // bleeding-edge code
 #undef libmesh_experimental
 #ifdef LIBMESH_ENABLE_WARNINGS
-#define libmesh_experimental() \
+#define libmesh_experimental()                                          \
   libmesh_do_once(libMesh::out << "*** Warning, This code is untested, experimental, or likely to see future API changes: " \
-                               << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
+                  << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
 #else
 #define libmesh_experimental()  ((void) 0)
 #endif
@@ -503,9 +503,9 @@ inline Tnew libmesh_cast_int (Told oldvar)
 // The libmesh_deprecated macro warns that you are using obsoleted code
 #undef libmesh_deprecated
 #ifdef LIBMESH_ENABLE_WARNINGS
-#define libmesh_deprecated() \
+#define libmesh_deprecated()                                            \
   libmesh_do_once(libMesh::out << "*** Warning, This code is deprecated, and likely to be removed in future library versions! " \
-                               << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
+                  << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
 #else
 #define libmesh_deprecated()  ((void) 0)
 #endif

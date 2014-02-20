@@ -281,7 +281,7 @@ void EigenSparseMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 
 
 
-  template <typename T>
+template <typename T>
 T EigenSparseMatrix<T>::operator () (const numeric_index_type i,
                                      const numeric_index_type j) const
 {

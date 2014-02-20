@@ -29,7 +29,7 @@ class SolidSystem: public FEMSystem {
 public:
   // Constructor
   SolidSystem(EquationSystems& es, const std::string& name,
-      const unsigned int number);
+              const unsigned int number);
 
   // System initialization
   virtual void init_data();
@@ -39,11 +39,11 @@ public:
 
   // Element residual and jacobian calculations
   virtual bool element_time_derivative(bool request_jacobian,
-      DiffContext& context);
+                                       DiffContext& context);
 
   // Contributions for adding boundary conditions
   virtual bool side_time_derivative(bool request_jacobian,
-      DiffContext& context);
+                                    DiffContext& context);
 
   virtual bool eulerian_residual(bool, DiffContext &) {
     return false;

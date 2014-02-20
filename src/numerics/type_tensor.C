@@ -86,23 +86,23 @@ void TypeTensor<T>::write_unformatted (std::ostream &out_stream,
   libmesh_assert (out_stream);
 
   out_stream << std::setiosflags(std::ios::showpoint)
-      << (*this)(0,0) << " "
-      << (*this)(0,1) << " "
-      << (*this)(0,2) << " ";
+             << (*this)(0,0) << " "
+             << (*this)(0,1) << " "
+             << (*this)(0,2) << " ";
   if (newline)
     out_stream << '\n';
 
   out_stream << std::setiosflags(std::ios::showpoint)
-      << (*this)(1,0) << " "
-      << (*this)(1,1) << " "
-      << (*this)(1,2) << " ";
+             << (*this)(1,0) << " "
+             << (*this)(1,1) << " "
+             << (*this)(1,2) << " ";
   if (newline)
     out_stream << '\n';
 
   out_stream << std::setiosflags(std::ios::showpoint)
-      << (*this)(2,0) << " "
-      << (*this)(2,1) << " "
-      << (*this)(2,2) << " ";
+             << (*this)(2,0) << " "
+             << (*this)(2,1) << " "
+             << (*this)(2,2) << " ";
   if (newline)
     out_stream << '\n';
 }

@@ -20,7 +20,7 @@
 #ifndef LIBMESH_RAW_ACCESSOR_H
 #define LIBMESH_RAW_ACCESSOR_H
 
-  // Local includes
+// Local includes
 #include "libmesh/libmesh_common.h"
 
 #include "libmesh/tensor_value.h"
@@ -30,86 +30,86 @@
 namespace libMesh
 {
 
-  /**
-   * What underlying data type would we need to access in each field?
-   */
-  template <typename FieldType>
-  struct RawFieldType {};
+/**
+ * What underlying data type would we need to access in each field?
+ */
+template <typename FieldType>
+struct RawFieldType {};
 
-  template <>
-  struct RawFieldType<Number>
-  {
-    typedef Number type;
-  };
+template <>
+struct RawFieldType<Number>
+{
+  typedef Number type;
+};
 
-  template <>
-  struct RawFieldType<Gradient>
-  {
-    typedef Number type;
-  };
+template <>
+struct RawFieldType<Gradient>
+{
+  typedef Number type;
+};
 
-  template <>
-  struct RawFieldType<Tensor>
-  {
-    typedef Number type;
-  };
+template <>
+struct RawFieldType<Tensor>
+{
+  typedef Number type;
+};
 
-  template<>
-  struct RawFieldType<TypeNTensor<3, Number> >
-  {
-    typedef Number type;
-  };
+template<>
+struct RawFieldType<TypeNTensor<3, Number> >
+{
+  typedef Number type;
+};
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  template <>
-  struct RawFieldType<Real>
-  {
-    typedef Real type;
-  };
+template <>
+struct RawFieldType<Real>
+{
+  typedef Real type;
+};
 
-  template <>
-  struct RawFieldType<RealGradient>
-  {
-    typedef Real type;
-  };
+template <>
+struct RawFieldType<RealGradient>
+{
+  typedef Real type;
+};
 
-  template <>
-  struct RawFieldType<RealTensor>
-  {
-    typedef Real type;
-  };
+template <>
+struct RawFieldType<RealTensor>
+{
+  typedef Real type;
+};
 
-  template<>
-  struct RawFieldType<TypeNTensor<3, Real> >
-  {
-    typedef Real type;
-  };
+template<>
+struct RawFieldType<TypeNTensor<3, Real> >
+{
+  typedef Real type;
+};
 #endif
 
-  /**
-   * This class provides single index access to FieldType (i.e. Number, Gradient, Tensor, etc.).
-   */
-  template <typename FieldType>
-  class RawAccessor
-  {
-  public:
+/**
+ * This class provides single index access to FieldType (i.e. Number, Gradient, Tensor, etc.).
+ */
+template <typename FieldType>
+class RawAccessor
+{
+public:
 
-    RawAccessor( FieldType& data, const unsigned int dim )
-      : _data(data),
+  RawAccessor( FieldType& data, const unsigned int dim )
+    : _data(data),
       _dim(dim)
-    {}
+  {}
 
-    ~RawAccessor(){}
+  ~RawAccessor(){}
 
-    typename RawFieldType<FieldType>::type& operator()( unsigned int i );
-    const typename RawFieldType<FieldType>::type& operator()( unsigned int i ) const;
+  typename RawFieldType<FieldType>::type& operator()( unsigned int i );
+  const typename RawFieldType<FieldType>::type& operator()( unsigned int i ) const;
 
-  private:
-    RawAccessor();
+private:
+  RawAccessor();
 
-    FieldType& _data;
-    const unsigned int _dim;
-  };
+  FieldType& _data;
+  const unsigned int _dim;
+};
 
 // Specialize for specific cases
 template<>

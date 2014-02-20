@@ -69,13 +69,13 @@ public:
    * Return a proxy for the \f$ i^{th} \f$ slice of the tensor.
    */
   const TypeNTensor<N-1,T> slice (const unsigned int /*i*/) const
-    { return TypeNTensor<N-1,T>(); }
+  { return TypeNTensor<N-1,T>(); }
 
   /**
    * Return a writeable proxy for the \f$ i^{th} \f$ slice of the tensor.
    */
   TypeNTensor<N-1,T> slice (const unsigned int /*i*/)
-    { return TypeNTensor<N-1,T>(); }
+  { return TypeNTensor<N-1,T>(); }
 
   /**
    * Add two tensors.
@@ -83,14 +83,14 @@ public:
   template<typename T2>
   TypeNTensor<N,typename CompareTypes<T, T2>::supertype>
   operator + (const TypeNTensor<N,T2> &) const
-    { return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>(); }
+  { return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>(); }
 
   /**
    * Add to this tensor.
    */
   template<typename T2>
   const TypeNTensor<N,T> & operator += (const TypeNTensor<N,T2> &/*rhs*/)
-    { return *this; }
+  { return *this; }
 
   /**
    * Subtract two tensors.
@@ -98,20 +98,20 @@ public:
   template<typename T2>
   TypeNTensor<N,typename CompareTypes<T, T2>::supertype>
   operator - (const TypeNTensor<N,T2> &) const
-    { return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>(); }
+  { return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>(); }
 
   /**
    * Subtract from this tensor.
    */
   template<typename T2>
   const TypeNTensor<N,T> & operator -= (const TypeNTensor<N,T2> &)
-    { return *this; }
+  { return *this; }
 
   /**
    * Return the opposite of a tensor
    */
   TypeNTensor<N,T> operator - () const
-    { return *this; }
+  { return *this; }
 
   /**
    * Multiply a tensor by a number, i.e. scale.
@@ -121,7 +121,7 @@ public:
     ScalarTraits<Scalar>::value,
     TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype> >::type
   operator * (const Scalar) const
-    { return TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>(); }
+  { return TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>(); }
 
   /**
    * Multiply this tensor by a number, i.e. scale.
@@ -162,21 +162,21 @@ public:
    * @returns \p true if two tensors are equal valued.
    */
   bool operator == (const TypeNTensor<N,T>& /*rhs*/) const
-    { return true; }
+  { return true; }
 
   /**
    * @returns \p true if this tensor is "less"
    * than another.  Useful for sorting.
    */
   bool operator < (const TypeNTensor<N,T>& /*rhs*/) const
-    { return false; }
+  { return false; }
 
   /**
    * @returns \p true if this tensor is "greater"
    * than another.
    */
   bool operator > (const TypeNTensor<N,T>& /*rhs*/) const
-    { return false; }
+  { return false; }
 
   /**
    * Formatted print, by default to \p libMesh::out.

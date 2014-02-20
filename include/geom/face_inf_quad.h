@@ -43,20 +43,20 @@ namespace libMesh
  * so this class is directly derived from \p Elem, without an intermediate
  * \p InfFace class or so.
  * It looks like this:
-   \verbatim
+ \verbatim
 
-                                   closer to infinity
-          |           |
-          |           |
-   side 2 |           | side 1
-          |           |
-          |           |
-           -----------             base side
+ closer to infinity
+ |           |
+ |           |
+ side 2 |           | side 1
+ |           |
+ |           |
+ -----------             base side
 
-             side 0
+ side 0
 
-  \endverbatim
- */
+ \endverbatim
+*/
 // ------------------------------------------------------------
 // InfQuad class definition
 class InfQuad : public Elem
@@ -77,10 +77,10 @@ public:
    */
   unsigned int dim() const { return 2; }
 
-//   /**
-//    * @returns 2 for the base, 1 otherwise
-//    */
-//   unsigned int n_children_per_side(const unsigned int s) const;
+  //   /**
+  //    * @returns 2 for the base, 1 otherwise
+  //    */
+  //   unsigned int n_children_per_side(const unsigned int s) const;
 
   /**
    * @returns 3.  Infinite faces have one side less
@@ -135,14 +135,14 @@ public:
    * build_edge and build_side are identical in 2D
    */
   AutoPtr<Elem> build_edge (const unsigned int i) const
-    { return build_side(i); }
+  { return build_side(i); }
 
   /*
    * is_edge_on_side is trivial in 2D
    */
   virtual bool is_edge_on_side(const unsigned int e,
                                const unsigned int s) const
-    { return (e == s); }
+  { return (e == s); }
 
   /**
    * Based on the quality metric \p q specified by the user,

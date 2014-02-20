@@ -39,7 +39,7 @@ public:
 
   virtual Output operator() (const FEMContext&, const Point&,
                              const Real /* time */ = 0.)
-    { return _c; }
+  { return _c; }
 
   virtual void operator() (const FEMContext&, const Point&,
                            const Real,

@@ -41,134 +41,134 @@
 // constraint calculations
 namespace
 {
-  using namespace libMesh;
+using namespace libMesh;
 
-  // Find the "primary" element around a boundary point:
-  const Elem* primary_boundary_point_neighbor
-    (const Elem* elem,
-     const Point& p,
-     const BoundaryInfo& boundary_info,
-     const std::set<boundary_id_type>& boundary_ids)
+// Find the "primary" element around a boundary point:
+const Elem* primary_boundary_point_neighbor
+(const Elem* elem,
+ const Point& p,
+ const BoundaryInfo& boundary_info,
+ const std::set<boundary_id_type>& boundary_ids)
+{
+  // If we don't find a better alternative, the user will have
+  // provided the primary element
+  const Elem *primary = elem;
+
+  std::set<const Elem*> point_neighbors;
+  elem->find_point_neighbors(p, point_neighbors);
+  for (std::set<const Elem*>::const_iterator point_neighbors_iter =
+         point_neighbors.begin();
+       point_neighbors_iter != point_neighbors.end(); ++point_neighbors_iter)
     {
-      // If we don't find a better alternative, the user will have
-      // provided the primary element
-      const Elem *primary = elem;
+      const Elem* pt_neighbor = *point_neighbors_iter;
 
-      std::set<const Elem*> point_neighbors;
-      elem->find_point_neighbors(p, point_neighbors);
-      for (std::set<const Elem*>::const_iterator point_neighbors_iter =
-           point_neighbors.begin();
-           point_neighbors_iter != point_neighbors.end(); ++point_neighbors_iter)
+      // If this point neighbor isn't at least
+      // as coarse as the current primary elem, or if it is at
+      // the same level but has a lower id, then
+      // we won't defer to it.
+      if ((pt_neighbor->level() > primary->level()) ||
+          (pt_neighbor->level() == primary->level() &&
+           pt_neighbor->id() < primary->id()))
+        continue;
+
+      // Otherwise, we will defer to the point neighbor, but only if
+      // one of its sides is on a relevant boundary and that side
+      // contains this vertex
+      bool vertex_on_periodic_side = false;
+      for (unsigned int ns = 0;
+           ns != pt_neighbor->n_sides(); ++ns)
         {
-          const Elem* pt_neighbor = *point_neighbors_iter;
+          const std::vector<boundary_id_type> bc_ids =
+            boundary_info.boundary_ids (pt_neighbor, ns);
 
-          // If this point neighbor isn't at least
-          // as coarse as the current primary elem, or if it is at
-          // the same level but has a lower id, then
-          // we won't defer to it.
-          if ((pt_neighbor->level() > primary->level()) ||
-              (pt_neighbor->level() == primary->level() &&
-               pt_neighbor->id() < primary->id()))
+          bool on_relevant_boundary = false;
+          for (std::set<boundary_id_type>::const_iterator i =
+                 boundary_ids.begin(); i != boundary_ids.end(); ++i)
+            if (std::find(bc_ids.begin(), bc_ids.end(), *i)
+                != bc_ids.end())
+              on_relevant_boundary = true;
+
+          if (!on_relevant_boundary)
             continue;
 
-          // Otherwise, we will defer to the point neighbor, but only if
-          // one of its sides is on a relevant boundary and that side
-          // contains this vertex
-          bool vertex_on_periodic_side = false;
-          for (unsigned int ns = 0;
-               ns != pt_neighbor->n_sides(); ++ns)
-            {
-              const std::vector<boundary_id_type> bc_ids =
-                boundary_info.boundary_ids (pt_neighbor, ns);
-
-              bool on_relevant_boundary = false;
-              for (std::set<boundary_id_type>::const_iterator i =
-                     boundary_ids.begin(); i != boundary_ids.end(); ++i)
-                if (std::find(bc_ids.begin(), bc_ids.end(), *i)
-                    != bc_ids.end())
-                  on_relevant_boundary = true;
-
-              if (!on_relevant_boundary)
-                continue;
-
-              if (!pt_neighbor->build_side(ns)->contains_point(p))
-                continue;
-
-              vertex_on_periodic_side = true;
-              break;
-            }
-
-          if (vertex_on_periodic_side)
-            primary = pt_neighbor;
-        }
-
-      return primary;
-    }
-
-  // Find the "primary" element around a boundary edge:
-  const Elem* primary_boundary_edge_neighbor
-    (const Elem* elem,
-     const Point& p1,
-     const Point& p2,
-     const BoundaryInfo& boundary_info,
-     const std::set<boundary_id_type>& boundary_ids)
-    {
-      // If we don't find a better alternative, the user will have
-      // provided the primary element
-      const Elem *primary = elem;
-
-      std::set<const Elem*> edge_neighbors;
-      elem->find_edge_neighbors(p1, p2, edge_neighbors);
-      for (std::set<const Elem*>::const_iterator edge_neighbors_iter =
-           edge_neighbors.begin();
-           edge_neighbors_iter != edge_neighbors.end(); ++edge_neighbors_iter)
-        {
-          const Elem* e_neighbor = *edge_neighbors_iter;
-
-          // If this edge neighbor isn't at least
-          // as coarse as the current primary elem, or if it is at
-          // the same level but has a lower id, then
-          // we won't defer to it.
-          if ((e_neighbor->level() > primary->level()) ||
-              (e_neighbor->level() == primary->level() &&
-               e_neighbor->id() < primary->id()))
+          if (!pt_neighbor->build_side(ns)->contains_point(p))
             continue;
 
-          // Otherwise, we will defer to the edge neighbor, but only if
-          // one of its sides is on this periodic boundary and that
-          // side contains this edge
-          bool vertex_on_periodic_side = false;
-          for (unsigned int ns = 0;
-               ns != e_neighbor->n_sides(); ++ns)
-            {
-              const std::vector<boundary_id_type>& bc_ids =
-                boundary_info.boundary_ids (e_neighbor, ns);
-
-              bool on_relevant_boundary = false;
-              for (std::set<boundary_id_type>::const_iterator i =
-                     boundary_ids.begin(); i != boundary_ids.end(); ++i)
-              if (std::find(bc_ids.begin(), bc_ids.end(), *i)
-                  != bc_ids.end())
-                on_relevant_boundary = true;
-
-              if (!on_relevant_boundary)
-                continue;
-
-              AutoPtr<Elem> periodic_side = e_neighbor->build_side(ns);
-              if (!(periodic_side->contains_point(p1) &&
-                    periodic_side->contains_point(p2)))
-                continue;
-
-              vertex_on_periodic_side = true;
-              break;
-            }
-
-          if (vertex_on_periodic_side)
-            primary = e_neighbor;
+          vertex_on_periodic_side = true;
+          break;
         }
 
-      return primary;
+      if (vertex_on_periodic_side)
+        primary = pt_neighbor;
     }
+
+  return primary;
+}
+
+// Find the "primary" element around a boundary edge:
+const Elem* primary_boundary_edge_neighbor
+(const Elem* elem,
+ const Point& p1,
+ const Point& p2,
+ const BoundaryInfo& boundary_info,
+ const std::set<boundary_id_type>& boundary_ids)
+{
+  // If we don't find a better alternative, the user will have
+  // provided the primary element
+  const Elem *primary = elem;
+
+  std::set<const Elem*> edge_neighbors;
+  elem->find_edge_neighbors(p1, p2, edge_neighbors);
+  for (std::set<const Elem*>::const_iterator edge_neighbors_iter =
+         edge_neighbors.begin();
+       edge_neighbors_iter != edge_neighbors.end(); ++edge_neighbors_iter)
+    {
+      const Elem* e_neighbor = *edge_neighbors_iter;
+
+      // If this edge neighbor isn't at least
+      // as coarse as the current primary elem, or if it is at
+      // the same level but has a lower id, then
+      // we won't defer to it.
+      if ((e_neighbor->level() > primary->level()) ||
+          (e_neighbor->level() == primary->level() &&
+           e_neighbor->id() < primary->id()))
+        continue;
+
+      // Otherwise, we will defer to the edge neighbor, but only if
+      // one of its sides is on this periodic boundary and that
+      // side contains this edge
+      bool vertex_on_periodic_side = false;
+      for (unsigned int ns = 0;
+           ns != e_neighbor->n_sides(); ++ns)
+        {
+          const std::vector<boundary_id_type>& bc_ids =
+            boundary_info.boundary_ids (e_neighbor, ns);
+
+          bool on_relevant_boundary = false;
+          for (std::set<boundary_id_type>::const_iterator i =
+                 boundary_ids.begin(); i != boundary_ids.end(); ++i)
+            if (std::find(bc_ids.begin(), bc_ids.end(), *i)
+                != bc_ids.end())
+              on_relevant_boundary = true;
+
+          if (!on_relevant_boundary)
+            continue;
+
+          AutoPtr<Elem> periodic_side = e_neighbor->build_side(ns);
+          if (!(periodic_side->contains_point(p1) &&
+                periodic_side->contains_point(p2)))
+            continue;
+
+          vertex_on_periodic_side = true;
+          break;
+        }
+
+      if (vertex_on_periodic_side)
+        primary = e_neighbor;
+    }
+
+  return primary;
+}
 
 }
 
@@ -257,10 +257,10 @@ FEGenericBase<Real>::build (const unsigned int dim,
             }
 
           case SCALAR:
-          {
-            AutoPtr<FEBase> ap(new FEScalar<0>(fet));
-            return ap;
-          }
+            {
+              AutoPtr<FEBase> ap(new FEScalar<0>(fet));
+              return ap;
+            }
 
           default:
             libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
@@ -335,10 +335,10 @@ FEGenericBase<Real>::build (const unsigned int dim,
             }
 
           case SCALAR:
-          {
-            AutoPtr<FEBase> ap(new FEScalar<1>(fet));
-            return ap;
-          }
+            {
+              AutoPtr<FEBase> ap(new FEScalar<1>(fet));
+              return ap;
+            }
 
           default:
             libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
@@ -434,7 +434,7 @@ FEGenericBase<Real>::build (const unsigned int dim,
           case CLOUGH:
             {
               libMesh::out << "ERROR: Clough-Tocher elements currently only support 1D and 2D"
-                            << std::endl;
+                           << std::endl;
               libmesh_error();
             }
 
@@ -495,10 +495,10 @@ FEGenericBase<Real>::build (const unsigned int dim,
             }
 
           case SCALAR:
-          {
-            AutoPtr<FEBase> ap(new FEScalar<3>(fet));
-            return ap;
-          }
+            {
+              AutoPtr<FEBase> ap(new FEScalar<3>(fet));
+              return ap;
+            }
 
           default:
             libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
@@ -1078,14 +1078,14 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
       dphi_coarse = &ref_dphi_coarse;
     }
 
-      // The Jacobian * quadrature weight at the quadrature points
-      const std::vector<Real>& JxW =
-        fe->get_JxW();
+  // The Jacobian * quadrature weight at the quadrature points
+  const std::vector<Real>& JxW =
+    fe->get_JxW();
 
-      // The XYZ locations of the quadrature points on the
-      // child element
-      const std::vector<Point>& xyz_values =
-        fe->get_xyz();
+  // The XYZ locations of the quadrature points on the
+  // child element
+  const std::vector<Point>& xyz_values =
+    fe->get_xyz();
 
 
 
@@ -1119,51 +1119,51 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
 
   // Copy node values first
   {
-  std::vector<dof_id_type> node_dof_indices;
-  if (use_old_dof_indices)
-    dof_map.old_dof_indices (elem, node_dof_indices, var);
-  else
-    dof_map.dof_indices (elem, node_dof_indices, var);
+    std::vector<dof_id_type> node_dof_indices;
+    if (use_old_dof_indices)
+      dof_map.old_dof_indices (elem, node_dof_indices, var);
+    else
+      dof_map.dof_indices (elem, node_dof_indices, var);
 
-  unsigned int current_dof = 0;
-  for (unsigned int n=0; n!= n_nodes; ++n)
-    {
-      // FIXME: this should go through the DofMap,
-      // not duplicate dof_indices code badly!
-      const unsigned int my_nc =
-        FEInterface::n_dofs_at_node (dim, fe_type,
-                                     elem_type, n);
-      if (!elem->is_vertex(n))
-        {
-          current_dof += my_nc;
-          continue;
-        }
+    unsigned int current_dof = 0;
+    for (unsigned int n=0; n!= n_nodes; ++n)
+      {
+        // FIXME: this should go through the DofMap,
+        // not duplicate dof_indices code badly!
+        const unsigned int my_nc =
+          FEInterface::n_dofs_at_node (dim, fe_type,
+                                       elem_type, n);
+        if (!elem->is_vertex(n))
+          {
+            current_dof += my_nc;
+            continue;
+          }
 
-      temp_fe_type = base_fe_type;
-      // We're assuming here that child n shares vertex n,
-      // which is wrong on non-simplices right now
-      // ... but this code isn't necessary except on elements
-      // where p refinement creates more vertex dofs; we have
-      // no such elements yet.
-/*
-      if (elem->child(n)->p_level() < elem->p_level())
-        {
+        temp_fe_type = base_fe_type;
+        // We're assuming here that child n shares vertex n,
+        // which is wrong on non-simplices right now
+        // ... but this code isn't necessary except on elements
+        // where p refinement creates more vertex dofs; we have
+        // no such elements yet.
+        /*
+          if (elem->child(n)->p_level() < elem->p_level())
+          {
           temp_fe_type.order =
-            static_cast<Order>(temp_fe_type.order +
-                               elem->child(n)->p_level());
-        }
-*/
-      const unsigned int nc =
-        FEInterface::n_dofs_at_node (dim, temp_fe_type,
-                                     elem_type, n);
-      for (unsigned int i=0; i!= nc; ++i)
-        {
-          Ue(current_dof) =
-            old_vector(node_dof_indices[current_dof]);
-          dof_is_fixed[current_dof] = true;
-          current_dof++;
-        }
-    }
+          static_cast<Order>(temp_fe_type.order +
+          elem->child(n)->p_level());
+          }
+        */
+        const unsigned int nc =
+          FEInterface::n_dofs_at_node (dim, temp_fe_type,
+                                       elem_type, n);
+        for (unsigned int i=0; i!= nc; ++i)
+          {
+            Ue(current_dof) =
+              old_vector(node_dof_indices[current_dof]);
+            dof_is_fixed[current_dof] = true;
+            current_dof++;
+          }
+      }
   }
 
   // In 3D, project any edge values next
@@ -1177,7 +1177,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
         // fixed, others are free to calculate
         unsigned int free_dofs = 0;
         for (unsigned int i=0; i !=
-             new_side_dofs.size(); ++i)
+               new_side_dofs.size(); ++i)
           if (!dof_is_fixed[new_side_dofs[i]])
             free_dof[free_dofs++] = i;
         Ke.resize (free_dofs, free_dofs); Ke.zero();
@@ -1197,10 +1197,10 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
             std::vector<dof_id_type> child_dof_indices;
             if (use_old_dof_indices)
               dof_map.old_dof_indices (child,
-                child_dof_indices, var);
+                                       child_dof_indices, var);
             else
               dof_map.dof_indices (child,
-                child_dof_indices, var);
+                                   child_dof_indices, var);
             const unsigned int child_n_dofs =
               libmesh_cast_int<unsigned int>
               (child_dof_indices.size());
@@ -1211,7 +1211,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                                  child->p_level());
 
             FEInterface::dofs_on_edge(child, dim,
-              temp_fe_type, e, old_side_dofs);
+                                      temp_fe_type, e, old_side_dofs);
 
             // Initialize both child and parent FE data
             // on the child's edge
@@ -1220,7 +1220,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
             const unsigned int n_qp = qedgerule->n_points();
 
             FEInterface::inverse_map (dim, fe_type, elem,
-                            xyz_values, coarse_qpoints);
+                                      xyz_values, coarse_qpoints);
 
             fe_coarse->reinit(elem, &coarse_qpoints);
 
@@ -1240,10 +1240,10 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                   {
                     fineval +=
                       (old_vector(child_dof_indices[i])*
-                      phi_values[i][qp]);
+                       phi_values[i][qp]);
                     if (cont == C_ONE)
                       finegrad += (*dphi_values)[i][qp] *
-                                   old_vector(child_dof_indices[i]);
+                        old_vector(child_dof_indices[i]);
                   }
 
                 // Form edge projection matrix
@@ -1303,7 +1303,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
           {
             Number &ui = Ue(new_side_dofs[free_dof[i]]);
             libmesh_assert(std::abs(ui) < TOLERANCE ||
-                   std::abs(ui - Uedge(i)) < TOLERANCE);
+                           std::abs(ui - Uedge(i)) < TOLERANCE);
             ui = Uedge(i);
             dof_is_fixed[new_side_dofs[free_dof[i]]] =
               true;
@@ -1321,7 +1321,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
         // fixed, others are free to calculate
         unsigned int free_dofs = 0;
         for (unsigned int i=0; i !=
-             new_side_dofs.size(); ++i)
+               new_side_dofs.size(); ++i)
           if (!dof_is_fixed[new_side_dofs[i]])
             free_dof[free_dofs++] = i;
         Ke.resize (free_dofs, free_dofs); Ke.zero();
@@ -1341,10 +1341,10 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
             std::vector<dof_id_type> child_dof_indices;
             if (use_old_dof_indices)
               dof_map.old_dof_indices (child,
-                child_dof_indices, var);
+                                       child_dof_indices, var);
             else
               dof_map.dof_indices (child,
-                child_dof_indices, var);
+                                   child_dof_indices, var);
             const unsigned int child_n_dofs =
               libmesh_cast_int<unsigned int>
               (child_dof_indices.size());
@@ -1355,7 +1355,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                                  child->p_level());
 
             FEInterface::dofs_on_side(child, dim,
-              temp_fe_type, s, old_side_dofs);
+                                      temp_fe_type, s, old_side_dofs);
 
             // Initialize both child and parent FE data
             // on the child's side
@@ -1364,7 +1364,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
             const unsigned int n_qp = qsiderule->n_points();
 
             FEInterface::inverse_map (dim, fe_type, elem,
-                            xyz_values, coarse_qpoints);
+                                      xyz_values, coarse_qpoints);
 
             fe_coarse->reinit(elem, &coarse_qpoints);
 
@@ -1387,7 +1387,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                       phi_values[i][qp];
                     if (cont == C_ONE)
                       finegrad += (*dphi_values)[i][qp] *
-                                  old_vector(child_dof_indices[i]);
+                        old_vector(child_dof_indices[i]);
                   }
 
                 // Form side projection matrix
@@ -1446,7 +1446,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
           {
             Number &ui = Ue(new_side_dofs[free_dof[i]]);
             libmesh_assert(std::abs(ui) < TOLERANCE ||
-                   std::abs(ui - Uside(i)) < TOLERANCE);
+                           std::abs(ui - Uside(i)) < TOLERANCE);
             ui = Uside(i);
             dof_is_fixed[new_side_dofs[free_dof[i]]] =
               true;
@@ -1474,13 +1474,13 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
       std::vector<dof_id_type> child_dof_indices;
       if (use_old_dof_indices)
         dof_map.old_dof_indices (child,
-          child_dof_indices, var);
+                                 child_dof_indices, var);
       else
         dof_map.dof_indices (child,
-          child_dof_indices, var);
+                             child_dof_indices, var);
       const unsigned int child_n_dofs =
         libmesh_cast_int<unsigned int>
-          (child_dof_indices.size());
+        (child_dof_indices.size());
 
       // Initialize both child and parent FE data
       // on the child's quadrature points
@@ -1489,7 +1489,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
       const unsigned int n_qp = qrule->n_points();
 
       FEInterface::inverse_map (dim, fe_type, elem,
-        xyz_values, coarse_qpoints);
+                                xyz_values, coarse_qpoints);
 
       fe_coarse->reinit(elem, &coarse_qpoints);
 
@@ -1511,7 +1511,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                  phi_values[i][qp]);
               if (cont == C_ONE)
                 finegrad += (*dphi_values)[i][qp] *
-                            old_vector(child_dof_indices[i]);
+                  old_vector(child_dof_indices[i]);
             }
 
           // Form interior projection matrix
@@ -1522,7 +1522,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
               if (dof_is_fixed[i])
                 continue;
               for (unsigned int j=0, freej=0; j !=
-                   new_n_dofs; ++j)
+                     new_n_dofs; ++j)
                 {
                   if (dof_is_fixed[j])
                     Fe(freei) -=
@@ -1551,7 +1551,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                     freej++;
                 }
               Fe(freei) += TensorTools::inner_product(phi_coarse[i][qp], fineval) *
-                           JxW[qp];
+                JxW[qp];
               if (cont == C_ONE)
                 Fe(freei) += TensorTools::inner_product(finegrad, (*dphi_coarse)[i][qp]) * JxW[qp];
               freei++;
@@ -1565,7 +1565,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
     {
       Number &ui = Ue(free_dof[i]);
       libmesh_assert(std::abs(ui) < TOLERANCE ||
-             std::abs(ui - Uint(i)) < TOLERANCE);
+                     std::abs(ui - Uint(i)) < TOLERANCE);
       ui = Uint(i);
       dof_is_fixed[free_dof[i]] = true;
     }
@@ -1735,10 +1735,10 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
                         Ke(is,js) += JxW[qp] * TensorTools::inner_product(phi[i][qp], phi[j][qp]);
                         if (cont != C_ZERO)
                           Ke(is,js) += JxW[qp] *
-                                       TensorTools::inner_product((*dphi)[i][qp] *
-                                                                  (*face_normals)[qp],
-                                                                  (*dphi)[j][qp] *
-                                                                  (*face_normals)[qp]);
+                            TensorTools::inner_product((*dphi)[i][qp] *
+                                                       (*face_normals)[qp],
+                                                       (*dphi)[j][qp] *
+                                                       (*face_normals)[qp]);
                       }
                   }
               }
@@ -1755,14 +1755,14 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
                     for (unsigned int qp = 0; qp != n_qp; ++qp)
                       {
                         Fe(js) += JxW[qp] *
-                                  TensorTools::inner_product(neigh_phi[i][qp],
-                                                             phi[j][qp]);
+                          TensorTools::inner_product(neigh_phi[i][qp],
+                                                     phi[j][qp]);
                         if (cont != C_ZERO)
                           Fe(js) += JxW[qp] *
-                                    TensorTools::inner_product((*neigh_dphi)[i][qp] *
-                                                               (*face_normals)[qp],
-                                                               (*dphi)[j][qp] *
-                                                               (*face_normals)[qp]);
+                            TensorTools::inner_product((*neigh_dphi)[i][qp] *
+                                                       (*face_normals)[qp],
+                                                       (*dphi)[j][qp] *
+                                                       (*face_normals)[qp]);
                       }
                   }
                 Ke.cholesky_solve(Fe, Ue[is]);
@@ -2054,10 +2054,10 @@ compute_periodic_constraints (DofConstraints &constraints,
                                                            phi[j][qp]);
                               if (cont != C_ZERO)
                                 Ke(is,js) += JxW[qp] *
-                                             TensorTools::inner_product((*dphi)[i][qp] *
-                                                                        (*face_normals)[qp],
-                                                                        (*dphi)[j][qp] *
-                                                                        (*face_normals)[qp]);
+                                  TensorTools::inner_product((*dphi)[i][qp] *
+                                                             (*face_normals)[qp],
+                                                             (*dphi)[j][qp] *
+                                                             (*face_normals)[qp]);
                             }
                         }
                     }
@@ -2074,14 +2074,14 @@ compute_periodic_constraints (DofConstraints &constraints,
                           for (unsigned int qp = 0; qp != n_qp; ++qp)
                             {
                               Fe(js) += JxW[qp] *
-                                        TensorTools::inner_product(neigh_phi[i][qp],
-                                                                   phi[j][qp]);
+                                TensorTools::inner_product(neigh_phi[i][qp],
+                                                           phi[j][qp]);
                               if (cont != C_ZERO)
                                 Fe(js) += JxW[qp] *
-                                          TensorTools::inner_product((*neigh_dphi)[i][qp] *
-                                                                     (*face_normals)[qp],
-                                                                     (*dphi)[j][qp] *
-                                                                     (*face_normals)[qp]);
+                                  TensorTools::inner_product((*neigh_dphi)[i][qp] *
+                                                             (*face_normals)[qp],
+                                                             (*dphi)[j][qp] *
+                                                             (*face_normals)[qp]);
                             }
                         }
                       Ke.cholesky_solve(Fe, Ue[is]);
@@ -2174,7 +2174,7 @@ compute_periodic_constraints (DofConstraints &constraints,
                           // See if this vertex has point neighbors to
                           // defer to
                           if (primary_boundary_point_neighbor
-                                (elem, *my_node, *mesh.boundary_info, point_bcids) != elem)
+                              (elem, *my_node, *mesh.boundary_info, point_bcids) != elem)
                             continue;
 
                           // Find the complementary boundary id set
@@ -2233,14 +2233,14 @@ compute_periodic_constraints (DofConstraints &constraints,
                               // other way around
                               if ((primary_neigh->level() > primary_elem->level()) ||
 
-                              // For equal-level elements, the one with
-                              // higher id gets constrained in terms of
-                              // the one with lower id
+                                  // For equal-level elements, the one with
+                                  // higher id gets constrained in terms of
+                                  // the one with lower id
                                   (primary_neigh->level() == primary_elem->level() &&
                                    primary_neigh->id() > primary_elem->id()) ||
 
-                              // On a one-element-thick mesh, we compare
-                              // points to see what side gets constrained
+                                  // On a one-element-thick mesh, we compare
+                                  // points to see what side gets constrained
                                   (primary_neigh == primary_elem &&
                                    (neigh_pt > primary_pt)))
                                 continue;
@@ -2267,7 +2267,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 
                           // Find the edge end nodes
                           Node *e1 = NULL,
-                               *e2 = NULL;
+                            *e2 = NULL;
                           for (unsigned int nn = 0; nn != elem->n_nodes(); ++nn)
                             {
                               if (nn == n)
@@ -2316,7 +2316,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 
                           // See if this edge has neighbors to defer to
                           if (primary_boundary_edge_neighbor
-                               (elem, *e1, *e2, *mesh.boundary_info, edge_bcids) != elem)
+                              (elem, *e1, *e2, *mesh.boundary_info, edge_bcids) != elem)
                             continue;
 
                           // Find the complementary boundary id set
@@ -2346,7 +2346,7 @@ compute_periodic_constraints (DofConstraints &constraints,
                               const PeriodicBoundaryBase *new_periodic = boundaries.boundary(new_boundary_id);
 
                               Point neigh_pt1 = new_periodic->get_corresponding_pos(*e1),
-                                    neigh_pt2 = new_periodic->get_corresponding_pos(*e2);
+                                neigh_pt2 = new_periodic->get_corresponding_pos(*e2);
 
                               // If the edge is getting constrained
                               // to itself by this PBC then we don't
@@ -2399,9 +2399,9 @@ compute_periodic_constraints (DofConstraints &constraints,
                               // around
                               if ((primary_neigh->level() > primary_elem->level()) ||
 
-                              // For equal-level elements, the one with
-                              // higher id gets constrained in terms of
-                              // the one with lower id
+                                  // For equal-level elements, the one with
+                                  // higher id gets constrained in terms of
+                                  // the one with lower id
                                   (primary_neigh->level() == primary_elem->level() &&
                                    primary_neigh->id() > primary_elem->id()))
                                 continue;
@@ -2437,9 +2437,9 @@ compute_periodic_constraints (DofConstraints &constraints,
                           // around
                           if ((neigh->level() > elem->level()) ||
 
-                          // For equal-level elements, the one with
-                          // higher id gets constrained in terms of
-                          // the one with lower id
+                              // For equal-level elements, the one with
+                              // higher id gets constrained in terms of
+                              // the one with lower id
                               (neigh->level() == elem->level() &&
                                neigh->id() > elem->id()))
                             continue;
@@ -2455,40 +2455,40 @@ compute_periodic_constraints (DofConstraints &constraints,
                       for (unsigned int i=0; i != n_comp; ++i)
                         my_constrained_dofs.insert
                           (my_node->dof_number
-                             (sys_number, variable_number, i));
+                           (sys_number, variable_number, i));
                     }
 
                   // FIXME: old code for disambiguating periodic BCs:
                   // this is not threadsafe nor safe to run on a
                   // non-serialized mesh.
                   /*
-                  std::vector<bool> recursive_constraint(n_side_dofs, false);
+                    std::vector<bool> recursive_constraint(n_side_dofs, false);
 
-                  for (unsigned int is = 0; is != n_side_dofs; ++is)
-                  {
-                  const unsigned int i = neigh_side_dofs[is];
-                  const dof_id_type their_dof_g = neigh_dof_indices[i];
-                      libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
+                    for (unsigned int is = 0; is != n_side_dofs; ++is)
+                    {
+                    const unsigned int i = neigh_side_dofs[is];
+                    const dof_id_type their_dof_g = neigh_dof_indices[i];
+                    libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
 
-                      {
-                      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+                    {
+                    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
-                        if (!dof_map.is_constrained_dof(their_dof_g))
-                          continue;
-                      }
+                    if (!dof_map.is_constrained_dof(their_dof_g))
+                    continue;
+                    }
 
-                      DofConstraintRow& their_constraint_row =
-                        constraints[their_dof_g].first;
+                    DofConstraintRow& their_constraint_row =
+                    constraints[their_dof_g].first;
 
-                        for (unsigned int js = 0; js != n_side_dofs; ++js)
-                        {
-                        const unsigned int j = my_side_dofs[js];
-                        const dof_id_type my_dof_g = my_dof_indices[j];
-                          libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
+                    for (unsigned int js = 0; js != n_side_dofs; ++js)
+                    {
+                    const unsigned int j = my_side_dofs[js];
+                    const dof_id_type my_dof_g = my_dof_indices[j];
+                    libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
 
-                          if (their_constraint_row.count(my_dof_g))
-                            recursive_constraint[js] = true;
-                            }
+                    if (their_constraint_row.count(my_dof_g))
+                    recursive_constraint[js] = true;
+                    }
                     }
                   */
 

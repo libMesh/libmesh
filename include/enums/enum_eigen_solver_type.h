@@ -24,50 +24,50 @@
 // enum SolverType definition
 namespace libMesh {
 
-  /**
-   * Defines an \p enum for iterative eigenproblem solver types
-   */
-  enum EigenSolverType {POWER=0,
-                        LAPACK,
-                        SUBSPACE,
-                        ARNOLDI,
-                        LANCZOS,
-                        KRYLOVSCHUR,
-                        // SLEPc optional packages
-                        // EPSARPACK,
-                        // EPSLAPACK,
-                        // EPSBLZPACK,
-                        // EPSPLANSO,
-                        // EPSTRLAN,
+/**
+ * Defines an \p enum for iterative eigenproblem solver types
+ */
+enum EigenSolverType {POWER=0,
+                      LAPACK,
+                      SUBSPACE,
+                      ARNOLDI,
+                      LANCZOS,
+                      KRYLOVSCHUR,
+                      // SLEPc optional packages
+                      // EPSARPACK,
+                      // EPSLAPACK,
+                      // EPSBLZPACK,
+                      // EPSPLANSO,
+                      // EPSTRLAN,
 
-                        INVALID_EIGENSOLVER};
+                      INVALID_EIGENSOLVER};
 
-  /**
-   * Defines an \p enum for  eigenproblem  types.
-   * This can be Hermitian (HEP), generalized Hermitian (GHEP),
-   * non-Hermitian (NHEP), and generalized non-Hermitian (GNHEP)
-   */
-  enum EigenProblemType {NHEP=0,
-                         HEP,
-                         GNHEP,
-                         GHEP,
+/**
+ * Defines an \p enum for  eigenproblem  types.
+ * This can be Hermitian (HEP), generalized Hermitian (GHEP),
+ * non-Hermitian (NHEP), and generalized non-Hermitian (GNHEP)
+ */
+enum EigenProblemType {NHEP=0,
+                       HEP,
+                       GNHEP,
+                       GHEP,
 
-                         INVALID_EIGENPROBLEMTYPE};
+                       INVALID_EIGENPROBLEMTYPE};
 
 
 
-  /**
-   * Defines an \p enum for the position of
-   * the spectrum, i.e. the eigenvalues to be computed.
-   */
-  enum PositionOfSpectrum {LARGEST_MAGNITUDE=0,
-                           SMALLEST_MAGNITUDE,
-                           LARGEST_REAL,
-                           SMALLEST_REAL,
-                           LARGEST_IMAGINARY,
-                           SMALLEST_IMAGINARY,
+/**
+ * Defines an \p enum for the position of
+ * the spectrum, i.e. the eigenvalues to be computed.
+ */
+enum PositionOfSpectrum {LARGEST_MAGNITUDE=0,
+                         SMALLEST_MAGNITUDE,
+                         LARGEST_REAL,
+                         SMALLEST_REAL,
+                         LARGEST_IMAGINARY,
+                         SMALLEST_IMAGINARY,
 
-                           INVALID_Postion_of_Spectrum};
+                         INVALID_Postion_of_Spectrum};
 }
 
 #endif // LIBMESH_ENUM_EIGENSOLVER_TYPE_H

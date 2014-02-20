@@ -748,36 +748,36 @@ NumericVector<T>::~NumericVector ()
 
 // These should be pure virtual, not bugs waiting to happen - RHS
 /*
-template <typename T>
-inline
-NumericVector<T> & NumericVector<T>::operator= (const T)
-{
+  template <typename T>
+  inline
+  NumericVector<T> & NumericVector<T>::operator= (const T)
+  {
   //  libmesh_error();
 
   return *this;
-}
+  }
 
 
 
-template <typename T>
-inline
-NumericVector<T> & NumericVector<T>::operator= (const NumericVector<T>&)
-{
+  template <typename T>
+  inline
+  NumericVector<T> & NumericVector<T>::operator= (const NumericVector<T>&)
+  {
   //  libmesh_error();
 
   return *this;
-}
+  }
 
 
 
-template <typename T>
-inline
-NumericVector<T> & NumericVector<T>::operator= (const std::vector<T>&)
-{
+  template <typename T>
+  inline
+  NumericVector<T> & NumericVector<T>::operator= (const std::vector<T>&)
+  {
   //  libmesh_error();
 
   return *this;
-}
+  }
 */
 
 

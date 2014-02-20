@@ -36,110 +36,110 @@
 // Anonymous namespace for implementation details.
 namespace {
 
-  // Nasty hacks for reading/writing zipped files
-  void bzip_file (const std::string &unzipped_name)
-  {
+// Nasty hacks for reading/writing zipped files
+void bzip_file (const std::string &unzipped_name)
+{
 #ifdef LIBMESH_HAVE_BZIP
-    START_LOG("system(bzip2)", "XdrIO");
+  START_LOG("system(bzip2)", "XdrIO");
 
-    std::string system_string = "bzip2 -f ";
-    system_string += unzipped_name;
-    if (std::system(system_string.c_str()))
-      libmesh_file_error(system_string);
+  std::string system_string = "bzip2 -f ";
+  system_string += unzipped_name;
+  if (std::system(system_string.c_str()))
+    libmesh_file_error(system_string);
 
-    STOP_LOG("system(bzip2)", "XdrIO");
+  STOP_LOG("system(bzip2)", "XdrIO");
 #else
-    libMesh::err << "ERROR: need bzip2/bunzip2 to create "
-                 << unzipped_name << ".bz2"
-                 << std::endl;
-    libmesh_error();
+  libMesh::err << "ERROR: need bzip2/bunzip2 to create "
+               << unzipped_name << ".bz2"
+               << std::endl;
+  libmesh_error();
 #endif
-  }
+}
 
-  std::string unzip_file (const std::string &name)
-  {
-    std::ostringstream pid_suffix;
-    pid_suffix << '_' << getpid();
+std::string unzip_file (const std::string &name)
+{
+  std::ostringstream pid_suffix;
+  pid_suffix << '_' << getpid();
 
-    std::string new_name = name;
-    if (name.size() - name.rfind(".bz2") == 4)
-      {
+  std::string new_name = name;
+  if (name.size() - name.rfind(".bz2") == 4)
+    {
 #ifdef LIBMESH_HAVE_BZIP
-        new_name.erase(new_name.end() - 4, new_name.end());
-        new_name += pid_suffix.str();
-        START_LOG("system(bunzip2)", "XdrIO");
-        std::string system_string = "bunzip2 -f -k -c ";
-        system_string += name + " > " + new_name;
-        if (std::system(system_string.c_str()))
-          libmesh_file_error(system_string);
-        STOP_LOG("system(bunzip2)", "XdrIO");
+      new_name.erase(new_name.end() - 4, new_name.end());
+      new_name += pid_suffix.str();
+      START_LOG("system(bunzip2)", "XdrIO");
+      std::string system_string = "bunzip2 -f -k -c ";
+      system_string += name + " > " + new_name;
+      if (std::system(system_string.c_str()))
+        libmesh_file_error(system_string);
+      STOP_LOG("system(bunzip2)", "XdrIO");
 #else
-        libMesh::err << "ERROR: need bzip2/bunzip2 to open .bz2 file "
-                     << name << std::endl;
-        libmesh_error();
+      libMesh::err << "ERROR: need bzip2/bunzip2 to open .bz2 file "
+                   << name << std::endl;
+      libmesh_error();
 #endif
-      }
-    else if (name.size() - name.rfind(".xz") == 3)
-      {
+    }
+  else if (name.size() - name.rfind(".xz") == 3)
+    {
 #ifdef LIBMESH_HAVE_XZ
-        new_name.erase(new_name.end() - 3, new_name.end());
-        new_name += pid_suffix.str();
-        START_LOG("system(xz -d)", "XdrIO");
-        std::string system_string = "xz -f -d -k -c ";
-        system_string += name + " > " + new_name;
-        if (std::system(system_string.c_str()))
-          libmesh_file_error(system_string);
-        STOP_LOG("system(xz -d)", "XdrIO");
+      new_name.erase(new_name.end() - 3, new_name.end());
+      new_name += pid_suffix.str();
+      START_LOG("system(xz -d)", "XdrIO");
+      std::string system_string = "xz -f -d -k -c ";
+      system_string += name + " > " + new_name;
+      if (std::system(system_string.c_str()))
+        libmesh_file_error(system_string);
+      STOP_LOG("system(xz -d)", "XdrIO");
 #else
-        libMesh::err << "ERROR: need xz to open .xz file "
-                     << name << std::endl;
-        libmesh_error();
+      libMesh::err << "ERROR: need xz to open .xz file "
+                   << name << std::endl;
+      libmesh_error();
 #endif
-      }
-    return new_name;
-  }
+    }
+  return new_name;
+}
 
-  void xzip_file (const std::string &unzipped_name)
-  {
+void xzip_file (const std::string &unzipped_name)
+{
 #ifdef LIBMESH_HAVE_XZ
-    START_LOG("system(xz)", "XdrIO");
+  START_LOG("system(xz)", "XdrIO");
 
-    std::string system_string = "xz -f ";
-    system_string += unzipped_name;
-    if (std::system(system_string.c_str()))
-      libmesh_file_error(system_string);
+  std::string system_string = "xz -f ";
+  system_string += unzipped_name;
+  if (std::system(system_string.c_str()))
+    libmesh_file_error(system_string);
 
-    STOP_LOG("system(xz)", "XdrIO");
+  STOP_LOG("system(xz)", "XdrIO");
 #else
-    libMesh::err << "ERROR: need xz to create "
-                 << unzipped_name << ".xz"
-                 << std::endl;
-    libmesh_error();
+  libMesh::err << "ERROR: need xz to create "
+               << unzipped_name << ".xz"
+               << std::endl;
+  libmesh_error();
 #endif
-  }
+}
 
 
-  // remove an unzipped file
-  void remove_unzipped_file (const std::string &name)
-  {
-    std::ostringstream pid_suffix;
-    pid_suffix << '_' << getpid();
+// remove an unzipped file
+void remove_unzipped_file (const std::string &name)
+{
+  std::ostringstream pid_suffix;
+  pid_suffix << '_' << getpid();
 
-    // If we temporarily decompressed a file, remove the
-    // uncompressed version
-    if (name.size() - name.rfind(".bz2") == 4)
-      {
-        std::string new_name(name.begin(), name.end()-4);
-        new_name += pid_suffix.str();
-        std::remove(new_name.c_str());
-      }
-    if (name.size() - name.rfind(".xz") == 3)
-      {
-        std::string new_name(name.begin(), name.end()-3);
-        new_name += pid_suffix.str();
-        std::remove(new_name.c_str());
-      }
-  }
+  // If we temporarily decompressed a file, remove the
+  // uncompressed version
+  if (name.size() - name.rfind(".bz2") == 4)
+    {
+      std::string new_name(name.begin(), name.end()-4);
+      new_name += pid_suffix.str();
+      std::remove(new_name.c_str());
+    }
+  if (name.size() - name.rfind(".xz") == 3)
+    {
+      std::string new_name(name.begin(), name.end()-3);
+      new_name += pid_suffix.str();
+      std::remove(new_name.c_str());
+    }
+}
 }
 
 namespace libMesh
@@ -459,11 +459,11 @@ bool xdr_translate(XDR* x, std::vector<T>& a) {
   unsigned int length = libmesh_cast_int<unsigned int>(a.size());
   xdr_u_int(x, &length);
   if (length > 0)
-  {
-    a.resize(length);
-    return xdr_vector(x, (char*) &a[0], length, sizeof(T),
-                      xdr_translator<T>());
-  }
+    {
+      a.resize(length);
+      return xdr_vector(x, (char*) &a[0], length, sizeof(T),
+                        xdr_translator<T>());
+    }
   else
     return true;
 }
@@ -703,21 +703,21 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
         size_t size_of_type = sizeof(T);
 
         if (size_of_type <= 4) // 32-bit types
-        {
-          xdr_vector(xdrs,
-                     (char*) val,
-                     len,
-                     size_of_type,
-                     (xdrproc_t) xdr_u_int);
-        }
+          {
+            xdr_vector(xdrs,
+                       (char*) val,
+                       len,
+                       size_of_type,
+                       (xdrproc_t) xdr_u_int);
+          }
         else // 64-bit types
-        {
-          xdr_vector(xdrs,
-                     (char*) val,
-                     len,
-                     size_of_type,
-                     (xdrproc_t) xdr_u_hyper);
-        }
+          {
+            xdr_vector(xdrs,
+                       (char*) val,
+                       len,
+                       size_of_type,
+                       (xdrproc_t) xdr_u_hyper);
+          }
 
 #else
 
@@ -742,24 +742,24 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
         size_t size_of_type = sizeof(T);
 
         if (size_of_type <= 4) // 32-bit types
-        {
-          if (len > 0)
-            xdr_vector(xdrs,
-                       (char*) val,
-                       len,
-                       size_of_type,
-                       (xdrproc_t) xdr_u_int);
-        }
+          {
+            if (len > 0)
+              xdr_vector(xdrs,
+                         (char*) val,
+                         len,
+                         size_of_type,
+                         (xdrproc_t) xdr_u_int);
+          }
         else // 64-bit types
-        {
-          if (len > 0)
-            xdr_vector(xdrs,
-                       (char*) val,
-                       len,
-                       size_of_type,
-                       (xdrproc_t) xdr_u_hyper);
+          {
+            if (len > 0)
+              xdr_vector(xdrs,
+                         (char*) val,
+                         len,
+                         size_of_type,
+                         (xdrproc_t) xdr_u_hyper);
 
-        }
+          }
 
 #else
 

@@ -64,50 +64,50 @@ void DerivedRBEvaluation<Base>::write_out_basis_functions(System& ,
                                                           const bool )
 {
   if( this->processor_id() == 0 ) // Only write out on proc 0
-  {
-    libMesh::out << "Writing out the basis functions..." << std::endl;
-
-    const unsigned int precision_level = 14;
-
-    std::ostringstream file_name;
-
-    for(unsigned int i=0; i<derived_basis_functions.size(); i++)
     {
-      file_name.str(""); // reset the string
-      file_name << directory_name << "/derived_bf" << i << ".dat";
-      std::ofstream derived_bf_out(file_name.str().c_str());
+      libMesh::out << "Writing out the basis functions..." << std::endl;
 
-      if ( !derived_bf_out.good() )
-      {
-        libMesh::err << "Error opening derived_bf" << i << ".dat" << std::endl;
-        libmesh_error();
-      }
+      const unsigned int precision_level = 14;
 
-      derived_bf_out.precision(precision_level);
-      for(unsigned int j=0; j<derived_basis_functions[i].size(); j++)
+      std::ostringstream file_name;
+
+      for(unsigned int i=0; i<derived_basis_functions.size(); i++)
+        {
+          file_name.str(""); // reset the string
+          file_name << directory_name << "/derived_bf" << i << ".dat";
+          std::ofstream derived_bf_out(file_name.str().c_str());
+
+          if ( !derived_bf_out.good() )
+            {
+              libMesh::err << "Error opening derived_bf" << i << ".dat" << std::endl;
+              libmesh_error();
+            }
+
+          derived_bf_out.precision(precision_level);
+          for(unsigned int j=0; j<derived_basis_functions[i].size(); j++)
+            {
+              derived_bf_out << std::scientific << derived_basis_functions[i](j) << " ";
+            }
+          derived_bf_out.close();
+        }
+
+      // Also, need to write out the size of the derived basis functions
       {
-        derived_bf_out << std::scientific << derived_basis_functions[i](j) << " ";
+        std::ofstream derived_bf_size_out;
+        {
+          std::ostringstream bf_file_name;
+          bf_file_name << directory_name << "/derived_bf_size.dat";
+          derived_bf_size_out.open(bf_file_name.str().c_str());
+        }
+        if ( !derived_bf_size_out.good() )
+          {
+            libMesh::err << "Error opening derived_bf_size.dat" << std::endl;
+            libmesh_error();
+          }
+        derived_bf_size_out << derived_basis_functions[0].size();
+        derived_bf_size_out.close();
       }
-      derived_bf_out.close();
     }
-
-    // Also, need to write out the size of the derived basis functions
-    {
-      std::ofstream derived_bf_size_out;
-      {
-        std::ostringstream bf_file_name;
-        bf_file_name << directory_name << "/derived_bf_size.dat";
-        derived_bf_size_out.open(bf_file_name.str().c_str());
-      }
-      if ( !derived_bf_size_out.good() )
-      {
-        libMesh::err << "Error opening derived_bf_size.dat" << std::endl;
-        libmesh_error();
-      }
-      derived_bf_size_out << derived_basis_functions[0].size();
-      derived_bf_size_out.close();
-    }
-  }
 }
 
 template <class Base>
@@ -125,10 +125,10 @@ void DerivedRBEvaluation<Base>::read_in_basis_functions(System& ,
     std::ifstream derived_bf_size_in(file_name.str().c_str());
 
     if ( !derived_bf_size_in.good() )
-    {
-      libMesh::err << "Error opening derived_bf_size.dat" << std::endl;
-      libmesh_error();
-    }
+      {
+        libMesh::err << "Error opening derived_bf_size.dat" << std::endl;
+        libmesh_error();
+      }
 
     derived_bf_size_in >> derived_bf_size;
     derived_bf_size_in.close();
@@ -138,35 +138,35 @@ void DerivedRBEvaluation<Base>::read_in_basis_functions(System& ,
   struct stat stat_info;
 
   for(unsigned int i=0; i<derived_basis_functions.size(); i++)
-  {
-    file_name.str(""); // reset the string
-    file_name << directory_name << "/derived_bf" << i << ".dat";
-
-    // On processor zero check to be sure the file exists
-    if (this->processor_id() == 0)
     {
-      int stat_result = stat(file_name.str().c_str(), &stat_info);
+      file_name.str(""); // reset the string
+      file_name << directory_name << "/derived_bf" << i << ".dat";
 
-      if (stat_result != 0)
-      {
-        libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-        libmesh_error();
-      }
+      // On processor zero check to be sure the file exists
+      if (this->processor_id() == 0)
+        {
+          int stat_result = stat(file_name.str().c_str(), &stat_info);
+
+          if (stat_result != 0)
+            {
+              libMesh::out << "File does not exist: " << file_name.str() << std::endl;
+              libmesh_error();
+            }
+        }
+
+      derived_basis_functions[i].resize(derived_bf_size);
+
+      std::ifstream derived_bf_size_in(file_name.str().c_str());
+
+      for(unsigned int j=0; j<derived_bf_size; j++)
+        {
+          Number  value;
+          derived_bf_size_in >> value;
+          derived_basis_functions[i](j) = value;
+        }
+      derived_bf_size_in.close();
+
     }
-
-    derived_basis_functions[i].resize(derived_bf_size);
-
-    std::ifstream derived_bf_size_in(file_name.str().c_str());
-
-    for(unsigned int j=0; j<derived_bf_size; j++)
-    {
-      Number  value;
-      derived_bf_size_in >> value;
-      derived_basis_functions[i](j) = value;
-    }
-    derived_bf_size_in.close();
-
-  }
 }
 
 template class DerivedRBEvaluation<RBEvaluation>;

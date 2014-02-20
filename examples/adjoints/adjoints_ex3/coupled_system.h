@@ -34,39 +34,39 @@ class CoupledSystem : public FEMSystem
 public:
   // Constructor
   CoupledSystem(EquationSystems& es,
-               const std::string& name_in,
-               const unsigned int number_in)
+                const std::string& name_in,
+                const unsigned int number_in)
     : FEMSystem(es, name_in, number_in), Peclet(1.) {qoi.resize(1);}
 
   // Function to get computed QoI values
 
   Number &get_QoI_value()
-    {
-      return computed_QoI;
-    }
+  {
+    return computed_QoI;
+  }
 
   Number &get_parameter_value(unsigned int parameter_index)
-    {
-      return parameters[parameter_index];
-    }
+  {
+    return parameters[parameter_index];
+  }
 
   ParameterVector &get_parameter_vector()
-    {
-      parameter_vector.resize(parameters.size());
-      for(unsigned int i = 0; i != parameters.size(); ++i)
-	{
-	  parameter_vector[i] = &parameters[i];
-	}
+  {
+    parameter_vector.resize(parameters.size());
+    for(unsigned int i = 0; i != parameters.size(); ++i)
+      {
+        parameter_vector[i] = &parameters[i];
+      }
 
-      return parameter_vector;
-    }
+    return parameter_vector;
+  }
 
   Real &get_Pe()
-    {
-      return Peclet;
-    }
+  {
+    return Peclet;
+  }
 
- protected:
+protected:
 
   // System initialization
   virtual void init_data ();
@@ -124,7 +124,7 @@ public:
   virtual Number operator() (const FEMContext&, const Point& p,
 			     const Real time = 0.);
 
- private:
+private:
 
   unsigned int var;
 
@@ -151,7 +151,7 @@ public:
   virtual Number operator() (const FEMContext&, const Point& p,
 			     const Real time = 0.);
 
- private:
+private:
 
   unsigned int var;
 

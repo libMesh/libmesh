@@ -78,16 +78,16 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType& fet,
   unsigned int n_base, n_radial;
   compute_node_indices(inf_elem_type, n, n_base, n_radial);
 
-//   libMesh::out << "elem_type=" << inf_elem_type
-//     << ",  fet.radial_order=" << fet.radial_order
-//     << ",  n=" << n
-//     << ",  n_radial=" << n_radial
-//     << ",  n_base=" << n_base
-//     << std::endl;
+  //   libMesh::out << "elem_type=" << inf_elem_type
+  //     << ",  fet.radial_order=" << fet.radial_order
+  //     << ",  n=" << n
+  //     << ",  n_radial=" << n_radial
+  //     << ",  n_base=" << n_base
+  //     << std::endl;
 
   if (Dim > 1)
     return FEInterface::n_dofs_at_node(Dim-1, fet, base_et, n_base)
-        * Radial::n_dofs_at_node(fet.radial_order, n_radial);
+      * Radial::n_dofs_at_node(fet.radial_order, n_radial);
   else
     return Radial::n_dofs_at_node(fet.radial_order, n_radial);
 }
@@ -105,7 +105,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType& fet,
 
   if (Dim > 1)
     return FEInterface::n_dofs_per_elem(Dim-1, fet, base_et)
-        * Radial::n_dofs_per_elem(fet.radial_order);
+      * Radial::n_dofs_per_elem(fet.radial_order);
   else
     return Radial::n_dofs_per_elem(fet.radial_order);
 }
@@ -180,11 +180,11 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
   //TODO:[SP/DD]  exp(ikr) is still missing here!
   if (Dim > 1)
     return FEInterface::shape(Dim-1, fet, base_et, i_base, p)
-        * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-        * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
+      * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
+      * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
   else
     return InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-        * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
+      * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
 }
 
 
@@ -222,11 +222,11 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 
   if (Dim > 1)
     return FEInterface::shape(Dim-1, fet, base_el.get(), i_base, p)
-        * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-        * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
+      * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
+      * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
   else
     return InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
-        * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
+      * InfFE<Dim,T_radial,T_map>::Radial::decay(v);
 }
 
 
@@ -312,9 +312,9 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 
   // the exponent for time-harmonic behavior
   const Real exponent = sign                                                            /* +1. or -1.                */
-      * wavenumber                                                                      /* k                         */
-      * interpolated_dist                                                               /* together with next line:  */
-      * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1);                /* phase(s,t,v)              */
+    * wavenumber                                                                      /* k                         */
+    * interpolated_dist                                                               /* together with next line:  */
+    * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1);                /* phase(s,t,v)              */
 
   const Number time_harmonic = Number(cos(exponent), sin(exponent));                    /* e^(sign*i*k*phase(s,t,v)) */
 
@@ -356,7 +356,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
    * the future...
    */
   data.phase = interpolated_dist                                                       /* phase(s,t,v)/c  */
-      * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1) / speed;
+    * InfFE<Dim,INFINITE_MAP,T_map>::eval(v, radial_mapping_order, 1) / speed;
 
   if (Dim > 1)
     {
@@ -405,7 +405,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
       }
 
 
-    // linear base approximation, easy to determine
+      // linear base approximation, easy to determine
     case INFQUAD4:
       {
         libmesh_assert_less (outer_node_index, 4);
@@ -431,7 +431,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
       }
 
 
-    // higher order base approximation, more work necessary
+      // higher order base approximation, more work necessary
     case INFQUAD6:
       {
         switch (outer_node_index)

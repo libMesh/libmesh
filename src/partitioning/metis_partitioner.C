@@ -35,13 +35,13 @@
 # ifdef __sgi
 #  include <cstdarg>
 # endif
-  namespace Metis {
-    extern "C" {
+namespace Metis {
+extern "C" {
 #     include "libmesh/ignore_warnings.h"
 #     include "metis.h"
 #     include "libmesh/restore_warnings.h"
-    }
-  }
+}
+}
 #else
 #  include "libmesh/sfc_partitioner.h"
 #endif
@@ -68,7 +68,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
       return;
     }
 
-// What to do if the Metis library IS NOT present
+  // What to do if the Metis library IS NOT present
 #ifndef LIBMESH_HAVE_METIS
 
   libmesh_here();
@@ -80,7 +80,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 
   sfcp.partition (mesh, n_pieces);
 
-// What to do if the Metis library IS present
+  // What to do if the Metis library IS present
 #else
 
   START_LOG("partition()", "MetisPartitioner");
@@ -95,9 +95,9 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   int
     n = static_cast<int>(n_active_elem),  // number of "nodes" (elements)
                                           //   in the graph
-//    wgtflag = 2,                          // weights on vertices only,
-//                                          //   none on edges
-//    numflag = 0,                          // C-style 0-based numbering
+    //    wgtflag = 2,                          // weights on vertices only,
+    //                                          //   none on edges
+    //    numflag = 0,                          // C-style 0-based numbering
     nparts  = static_cast<int>(n_pieces), // number of subdomains to create
     edgecut = 0;                          // the numbers of edges cut by the
                                           //   resulting partition

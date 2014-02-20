@@ -41,7 +41,7 @@ namespace libMesh
 // LinearPartitioner class definition
 class LinearPartitioner : public Partitioner
 {
- public:
+public:
 
   /**
    * Constructor.

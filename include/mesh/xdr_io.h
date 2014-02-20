@@ -49,10 +49,10 @@ class Elem;
 // ------------------------------------------------------------
 // XdrIO class definition
 class XdrIO : public MeshInput<MeshBase>,
-  public MeshOutput<MeshBase>,
-  public ParallelObject
+              public MeshOutput<MeshBase>,
+              public ParallelObject
 {
- public:
+public:
   // The size used for encoding all id types in this file
   typedef largest_id_type xdr_id_type;
 
@@ -124,16 +124,16 @@ class XdrIO : public MeshInput<MeshBase>,
 
   /**
    * Get/Set the version string.  Vailid version strings:
-     \verbatim
+   \verbatim
 
-     "libMesh-0.7.0+"
-     "libMesh-0.7.0+ parallel"
+   "libMesh-0.7.0+"
+   "libMesh-0.7.0+ parallel"
 
-     \endverbatim
-     If "libMesh" is not detected in the version string the
-     \p LegacyXdrIO class will be used to read older
-     (pre version 0.7.0) mesh files.
-   */
+   \endverbatim
+   If "libMesh" is not detected in the version string the
+   \p LegacyXdrIO class will be used to read older
+   (pre version 0.7.0) mesh files.
+  */
   const std::string & version () const { return _version; }
   std::string &       version ()       { return _version; }
 
@@ -162,7 +162,7 @@ class XdrIO : public MeshInput<MeshBase>,
   std::string &       polynomial_level_file_name()       { return _p_level_file; }
 
 
- private:
+private:
 
 
   //---------------------------------------------------------------------------

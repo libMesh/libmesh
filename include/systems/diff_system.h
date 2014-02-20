@@ -112,7 +112,7 @@ public:
    * be used in linear adjoint and/or sensitivity solves
    */
   virtual std::pair<unsigned int, Real>
-    get_linear_solve_parameters() const;
+  get_linear_solve_parameters() const;
 
   /**
    * Releases a pointer to a linear solver acquired by
@@ -325,7 +325,7 @@ protected:
 // --------------------------------------------------------------
 // DifferentiableSystem inline methods
 inline
-  TimeSolver& DifferentiableSystem::get_time_solver()
+TimeSolver& DifferentiableSystem::get_time_solver()
 {
   libmesh_assert(time_solver.get());
   libmesh_assert_equal_to (&(time_solver->system()), this);
@@ -333,7 +333,7 @@ inline
 }
 
 inline
- const TimeSolver& DifferentiableSystem::get_time_solver() const
+const TimeSolver& DifferentiableSystem::get_time_solver() const
 {
   libmesh_assert(time_solver.get());
   libmesh_assert_equal_to (&(time_solver->system()), this);

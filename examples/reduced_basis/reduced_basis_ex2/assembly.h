@@ -98,10 +98,10 @@ struct A0 : ElemAssembly
 
     Point centroid = c.get_elem().centroid();
     if( (min_x <= centroid(0)) && (centroid(0) < max_x) )
-    for (unsigned int qp=0; qp != n_qpoints; qp++)
-      for (unsigned int i=0; i != n_u_dofs; i++)
-        for (unsigned int j=0; j != n_u_dofs; j++)
-          c.get_elem_jacobian()(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
+      for (unsigned int qp=0; qp != n_qpoints; qp++)
+        for (unsigned int i=0; i != n_u_dofs; i++)
+          for (unsigned int j=0; j != n_u_dofs; j++)
+            c.get_elem_jacobian()(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
   }
 };
 
@@ -133,10 +133,10 @@ struct A1 : ElemAssembly
 
     Point centroid = c.get_elem().centroid();
     if( (min_x <= centroid(0)) && (centroid(0) <= max_x) )
-    for (unsigned int qp=0; qp != n_qpoints; qp++)
-      for (unsigned int i=0; i != n_u_dofs; i++)
-        for (unsigned int j=0; j != n_u_dofs; j++)
-          c.get_elem_jacobian()(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
+      for (unsigned int qp=0; qp != n_qpoints; qp++)
+        for (unsigned int i=0; i != n_u_dofs; i++)
+          for (unsigned int j=0; j != n_u_dofs; j++)
+            c.get_elem_jacobian()(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
   }
 };
 
@@ -205,11 +205,11 @@ struct OutputAssembly : ElemAssembly
 {
   OutputAssembly(Real min_x_in, Real max_x_in,
                  Real min_y_in, Real max_y_in)
-                :
-                min_x(min_x_in),
-                max_x(max_x_in),
-                min_y(min_y_in),
-                max_y(max_y_in)
+    :
+    min_x(min_x_in),
+    max_x(max_x_in),
+    min_y(min_y_in),
+    max_y(max_y_in)
   {}
 
   // Output: Average value over the region [min_x,max_x]x[min_y,max_y]

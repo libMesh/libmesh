@@ -24,47 +24,47 @@
 // For some reason the real std::max, std::min
 // don't handle mixed compatible types
 namespace std {
-  inline long double max(long double a, double b)
-  { return (a>b?a:b); }
-  inline long double min(long double a, double b)
-  { return (a<b?a:b); }
+inline long double max(long double a, double b)
+{ return (a>b?a:b); }
+inline long double min(long double a, double b)
+{ return (a<b?a:b); }
 
-  inline long double max(double a, long double b)
-  { return (a>b?a:b); }
-  inline long double min(double a, long double b)
-  { return (a<b?a:b); }
+inline long double max(double a, long double b)
+{ return (a>b?a:b); }
+inline long double min(double a, long double b)
+{ return (a<b?a:b); }
 
-  inline double max(double a, float b)
-  { return (a>b?a:b); }
-  inline double min(double a, float b)
-  { return (a<b?a:b); }
+inline double max(double a, float b)
+{ return (a>b?a:b); }
+inline double min(double a, float b)
+{ return (a<b?a:b); }
 
-  inline double max(float a, double b)
-  { return (a>b?a:b); }
-  inline double min(float a, double b)
-  { return (a<b?a:b); }
+inline double max(float a, double b)
+{ return (a>b?a:b); }
+inline double min(float a, double b)
+{ return (a<b?a:b); }
 
-  inline long double max(long double a, float b)
-  { return (a>b?a:b); }
-  inline long double min(long double a, float b)
-  { return (a<b?a:b); }
+inline long double max(long double a, float b)
+{ return (a>b?a:b); }
+inline long double min(long double a, float b)
+{ return (a<b?a:b); }
 
-  inline long double max(float a, long double b)
-  { return (a>b?a:b); }
-  inline long double min(float a, long double b)
-  { return (a<b?a:b); }
+inline long double max(float a, long double b)
+{ return (a>b?a:b); }
+inline long double min(float a, long double b)
+{ return (a<b?a:b); }
 
-  // fix for std::abs() overload ambiguity
+// fix for std::abs() overload ambiguity
 #if defined (__SUNPRO_CC) || defined(__PGI)
-  inline double abs(double a)
-  { return ::fabs(a); }
+inline double abs(double a)
+{ return ::fabs(a); }
 
 #endif
 
-  // fix for std::pow() overload ambiguity
+// fix for std::pow() overload ambiguity
 #if defined (__SUNPRO_CC)
-  inline double pow(double a, int b)
-  { return std::pow(a, static_cast<double>(b)); }
+inline double pow(double a, int b)
+{ return std::pow(a, static_cast<double>(b)); }
 #endif
 }
 

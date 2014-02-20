@@ -61,17 +61,17 @@
 // ------------------------------------------------------------
 // Anonymous namespace for implementation details
 namespace {
-  bool is_parallel_file_format (const std::string &name)
-  {
-    // Certain mesh formats can support parallel I/O, including the
-    // "new" Xdr format and the Nemesis format.
-    return ((name.rfind(".xda") < name.size()) ||
-            (name.rfind(".xdr") < name.size()) ||
-            (name.rfind(".nem") < name.size()) ||
-            (name.rfind(".n") < name.size())   ||
-            (name.rfind(".cp") < name.size())
-            );
-  }
+bool is_parallel_file_format (const std::string &name)
+{
+  // Certain mesh formats can support parallel I/O, including the
+  // "new" Xdr format and the Nemesis format.
+  return ((name.rfind(".xda") < name.size()) ||
+          (name.rfind(".xdr") < name.size()) ||
+          (name.rfind(".nem") < name.size()) ||
+          (name.rfind(".n") < name.size())   ||
+          (name.rfind(".cp") < name.size())
+          );
+}
 }
 
 
@@ -101,7 +101,7 @@ UnstructuredMesh::UnstructuredMesh (unsigned int d) :
 
 
 void UnstructuredMesh::copy_nodes_and_elements
-  (const UnstructuredMesh& other_mesh, const bool skip_find_neighbors)
+(const UnstructuredMesh& other_mesh, const bool skip_find_neighbors)
 {
   // We're assuming our subclass data needs no copy
   libmesh_assert_equal_to (_n_parts, other_mesh._n_parts);
@@ -130,7 +130,7 @@ void UnstructuredMesh::copy_nodes_and_elements
         /*Node *newn =*/ this->add_point(*oldn, oldn->id(), oldn->processor_id());
 
         // And start them off in the same subdomain
-//        newn->processor_id() = oldn->processor_id();
+        //        newn->processor_id() = oldn->processor_id();
       }
   }
 
@@ -148,81 +148,81 @@ void UnstructuredMesh::copy_nodes_and_elements
 
     // FIXME: Where do we set element IDs??
     for (; it != end; ++it)
-    {
-      //Look at the old element
-      const Elem *old = *it;
-      //Build a new element
-      Elem *newparent = old->parent() ?
+      {
+        //Look at the old element
+        const Elem *old = *it;
+        //Build a new element
+        Elem *newparent = old->parent() ?
           this->elem(old->parent()->id()) : NULL;
-      AutoPtr<Elem> ap = Elem::build(old->type(), newparent);
-      Elem * el = ap.release();
+        AutoPtr<Elem> ap = Elem::build(old->type(), newparent);
+        Elem * el = ap.release();
 
-      el->subdomain_id() = old->subdomain_id();
+        el->subdomain_id() = old->subdomain_id();
 
-      for (unsigned int s=0; s != old->n_sides(); ++s)
-        if (old->neighbor(s) == remote_elem)
-          el->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
+        for (unsigned int s=0; s != old->n_sides(); ++s)
+          if (old->neighbor(s) == remote_elem)
+            el->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
 
 #ifdef LIBMESH_ENABLE_AMR
-      if (old->has_children())
-        for (unsigned int c=0; c != old->n_children(); ++c)
-          if (old->child(c) == remote_elem)
-            el->add_child(const_cast<RemoteElem*>(remote_elem), c);
+        if (old->has_children())
+          for (unsigned int c=0; c != old->n_children(); ++c)
+            if (old->child(c) == remote_elem)
+              el->add_child(const_cast<RemoteElem*>(remote_elem), c);
 
-      //Create the parent's child pointers if necessary
-      if (newparent)
-        {
-          unsigned int oldc = old->parent()->which_child_am_i(old);
-          newparent->add_child(el, oldc);
-        }
+        //Create the parent's child pointers if necessary
+        if (newparent)
+          {
+            unsigned int oldc = old->parent()->which_child_am_i(old);
+            newparent->add_child(el, oldc);
+          }
 
-      // Copy the refinement flags
-      el->set_refinement_flag(old->refinement_flag());
-      el->set_p_refinement_flag(old->p_refinement_flag());
+        // Copy the refinement flags
+        el->set_refinement_flag(old->refinement_flag());
+        el->set_p_refinement_flag(old->p_refinement_flag());
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-      //Assign all the nodes
-      for(unsigned int i=0;i<el->n_nodes();i++)
-        el->set_node(i) = &this->node(old->node(i));
+        //Assign all the nodes
+        for(unsigned int i=0;i<el->n_nodes();i++)
+          el->set_node(i) = &this->node(old->node(i));
 
-      // And start it off in the same subdomain
-      el->processor_id() = old->processor_id();
+        // And start it off in the same subdomain
+        el->processor_id() = old->processor_id();
 
-      // Give it the same id
-      el->set_id(old->id());
+        // Give it the same id
+        el->set_id(old->id());
 
-      //Hold onto it
-      if(!skip_find_neighbors)
-      {
-        this->add_elem(el);
+        //Hold onto it
+        if(!skip_find_neighbors)
+          {
+            this->add_elem(el);
+          }
+        else
+          {
+            Elem* new_el = this->add_elem(el);
+            old_elems_to_new_elems[old] = new_el;
+          }
+
+        // Add the link between the original element and this copy to the map
+        if(skip_find_neighbors)
+          old_elems_to_new_elems[old] = el;
       }
-      else
-      {
-        Elem* new_el = this->add_elem(el);
-        old_elems_to_new_elems[old] = new_el;
-      }
-
-      // Add the link between the original element and this copy to the map
-      if(skip_find_neighbors)
-        old_elems_to_new_elems[old] = el;
-    }
 
     // Loop (again) over the elements to fill in the neighbors
     if(skip_find_neighbors)
-    {
-      it = other_mesh.elements_begin();
-      for (; it != end; ++it)
       {
-        Elem* old_elem = *it;
-        Elem* new_elem = old_elems_to_new_elems[old_elem];
-        for (unsigned int s=0; s != old_elem->n_neighbors(); ++s)
-        {
-          const Elem* old_neighbor = old_elem->neighbor(s);
-          Elem* new_neighbor = old_elems_to_new_elems[old_neighbor];
-          new_elem->set_neighbor(s, new_neighbor);
-        }
+        it = other_mesh.elements_begin();
+        for (; it != end; ++it)
+          {
+            Elem* old_elem = *it;
+            Elem* new_elem = old_elems_to_new_elems[old_elem];
+            for (unsigned int s=0; s != old_elem->n_neighbors(); ++s)
+              {
+                const Elem* old_neighbor = old_elem->neighbor(s);
+                Elem* new_neighbor = old_elems_to_new_elems[old_neighbor];
+                new_elem->set_neighbor(s, new_neighbor);
+              }
+          }
       }
-    }
   }
 
   //Finally prepare the new Mesh for use.  Keep the same numbering and
@@ -239,7 +239,7 @@ void UnstructuredMesh::copy_nodes_and_elements
 
 UnstructuredMesh::~UnstructuredMesh ()
 {
-//  this->clear ();  // Nothing to clear at this level
+  //  this->clear ();  // Nothing to clear at this level
 
   libmesh_assert (!libMesh::closed());
 }
@@ -347,26 +347,26 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                             // If not, then we're neighbors.
                             // If so, then the subactive's neighbor is
 
-                              if (element->subactive() ==
-                                  neighbor->subactive())
+                            if (element->subactive() ==
+                                neighbor->subactive())
                               {
-                              // an element is only subactive if it has
-                              // been coarsened but not deleted
+                                // an element is only subactive if it has
+                                // been coarsened but not deleted
                                 element->set_neighbor (ms,neighbor);
                                 neighbor->set_neighbor(ns,element);
                               }
-                              else if (element->subactive())
+                            else if (element->subactive())
                               {
                                 element->set_neighbor(ms,neighbor);
                               }
-                              else if (neighbor->subactive())
+                            else if (neighbor->subactive())
                               {
                                 neighbor->set_neighbor(ns,element);
                               }
-                              side_to_elem_map.erase (bounds.first);
+                            side_to_elem_map.erase (bounds.first);
 
-                              // get out of this nested crap
-                              goto next_side;
+                            // get out of this nested crap
+                            goto next_side;
                           }
 
                         ++bounds.first;
@@ -470,26 +470,26 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                     if ((!neigh->active()) && (!current_elem->subactive()))
                       {
                         libMesh::err << "On processor " << this->processor_id()
-                                      << std::endl;
+                                     << std::endl;
                         libMesh::err << "Bad element ID = " << current_elem->id()
-                          << ", Side " << s << ", Bad neighbor ID = " << neigh->id() << std::endl;
+                                     << ", Side " << s << ", Bad neighbor ID = " << neigh->id() << std::endl;
                         libMesh::err << "Bad element proc_ID = " << current_elem->processor_id()
-                          << ", Bad neighbor proc_ID = " << neigh->processor_id() << std::endl;
+                                     << ", Bad neighbor proc_ID = " << neigh->processor_id() << std::endl;
                         libMesh::err << "Bad element size = " << current_elem->hmin()
-                          << ", Bad neighbor size = " << neigh->hmin() << std::endl;
+                                     << ", Bad neighbor size = " << neigh->hmin() << std::endl;
                         libMesh::err << "Bad element center = " << current_elem->centroid()
-                          << ", Bad neighbor center = " << neigh->centroid() << std::endl;
+                                     << ", Bad neighbor center = " << neigh->centroid() << std::endl;
                         libMesh::err << "ERROR: "
-                          << (current_elem->active()?"Active":"Ancestor")
-                          << " Element at level "
-                          << current_elem->level() << std::endl;
+                                     << (current_elem->active()?"Active":"Ancestor")
+                                     << " Element at level "
+                                     << current_elem->level() << std::endl;
                         libMesh::err << "with "
-                          << (parent->active()?"active":
-                              (parent->subactive()?"subactive":"ancestor"))
-                          << " parent share "
-                          << (neigh->subactive()?"subactive":"ancestor")
-                          << " neighbor at level " << neigh->level()
-                          << std::endl;
+                                     << (parent->active()?"active":
+                                         (parent->subactive()?"subactive":"ancestor"))
+                                     << " parent share "
+                                     << (neigh->subactive()?"subactive":"ancestor")
+                                     << " neighbor at level " << neigh->level()
+                                     << std::endl;
                         GMVIO(*this).write ("bad_mesh.gmv");
                         libmesh_error();
                       }
@@ -503,7 +503,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
 
 #ifdef DEBUG
-MeshTools::libmesh_assert_valid_neighbors(*this);
+  MeshTools::libmesh_assert_valid_neighbors(*this);
 #endif
 
   STOP_LOG("find_neighbors()", "Mesh");
@@ -623,12 +623,12 @@ void UnstructuredMesh::read (const std::string& name,
                name.rfind(".n")   < name.size())
         Nemesis_IO(*this).read (name);
       else if (name.rfind(".cp") < name.size())
-      {
-        if(name.rfind(".cpa") < name.size())
-          CheckpointIO(*this, false).read(name);
-        else
-          CheckpointIO(*this, true).read(name);
-      }
+        {
+          if(name.rfind(".cpa") < name.size())
+            CheckpointIO(*this, false).read(name);
+          else
+            CheckpointIO(*this, true).read(name);
+        }
     }
 
   // Serial mesh formats
@@ -746,8 +746,8 @@ void UnstructuredMesh::read (const std::string& name,
                            << "     *.gz   -- any above format gzipped\n"
                            << "     *.bz2  -- any above format bzip2'ed\n"
                            << "     *.xz   -- any above format xzipped\n"
-                        << "     *.cpa  -- libMesh Checkpoint ASCII format\n"
-                        << "     *.cpr  -- libMesh Checkpoint binary format\n"
+                           << "     *.cpa  -- libMesh Checkpoint ASCII format\n"
+                           << "     *.cpr  -- libMesh Checkpoint binary format\n"
 
                            << std::endl;
               libmesh_error();
@@ -1019,8 +1019,8 @@ void UnstructuredMesh::create_pid_mesh(UnstructuredMesh& pid_mesh,
 #endif
 
   // Create iterators to loop over the list of elements
-//   const_active_pid_elem_iterator       it(this->elements_begin(),   pid);
-//   const const_active_pid_elem_iterator it_end(this->elements_end(), pid);
+  //   const_active_pid_elem_iterator       it(this->elements_begin(),   pid);
+  //   const const_active_pid_elem_iterator it_end(this->elements_end(), pid);
 
   const_element_iterator       it     = this->active_pid_elements_begin(pid);
   const const_element_iterator it_end = this->active_pid_elements_end(pid);
@@ -1104,19 +1104,19 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
 
       // Maybe add boundary conditions for this element
       for (unsigned int s=0; s<old_elem->n_sides(); s++)
-// We're supporting boundary ids on internal sides now
-//if (old_elem->neighbor(s) == NULL)
-          {
-            const std::vector<boundary_id_type>& bc_ids = this->boundary_info->boundary_ids(old_elem, s);
-            for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
-              {
-                const boundary_id_type bc_id = *id_it;
-                if (bc_id != this->boundary_info->invalid_id)
-                  new_mesh.boundary_info->add_side (new_elem,
-                                                    s,
-                                                    bc_id);
-              }
-          }
+        // We're supporting boundary ids on internal sides now
+        //if (old_elem->neighbor(s) == NULL)
+        {
+          const std::vector<boundary_id_type>& bc_ids = this->boundary_info->boundary_ids(old_elem, s);
+          for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+            {
+              const boundary_id_type bc_id = *id_it;
+              if (bc_id != this->boundary_info->invalid_id)
+                new_mesh.boundary_info->add_side (new_elem,
+                                                  s,
+                                                  bc_id);
+            }
+        }
     } // end loop over elements
 
 

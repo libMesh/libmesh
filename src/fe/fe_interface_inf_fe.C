@@ -492,13 +492,13 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
               libmesh_error();
             }
 
-/*
-  case SPHERICAL:
-  return InfFE<1,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
+            /*
+              case SPHERICAL:
+              return InfFE<1,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
 
-  case ELLIPSOIDAL:
-  return InfFE<1,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
-*/
+              case ELLIPSOIDAL:
+              return InfFE<1,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
+            */
 
           default:
             libmesh_error();
@@ -522,13 +522,13 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
               libmesh_error();
             }
 
-/*
-  case SPHERICAL:
-  return InfFE<2,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
+            /*
+              case SPHERICAL:
+              return InfFE<2,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
 
-  case ELLIPSOIDAL:
-  return InfFE<2,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
-*/
+              case ELLIPSOIDAL:
+              return InfFE<2,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
+            */
 
           default:
             libmesh_error();
@@ -553,13 +553,13 @@ Point FEInterface::ifem_inverse_map (const unsigned int dim,
               libmesh_error();
             }
 
-/*
-  case SPHERICAL:
-  return InfFE<3,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
+            /*
+              case SPHERICAL:
+              return InfFE<3,JACOBI_20_00,SPHERICAL>::inverse_map(elem, p, tolerance);
 
-  case ELLIPSOIDAL:
-  return InfFE<3,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
-*/
+              case ELLIPSOIDAL:
+              return InfFE<3,JACOBI_20_00,ELLIPSOIDAL>::inverse_map(elem, p, tolerance);
+            */
 
           default:
             libmesh_error();

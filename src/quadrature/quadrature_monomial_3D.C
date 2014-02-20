@@ -259,18 +259,18 @@ void QMonomial::init_3D(const ElemType type_in,
               //  {4.08372221499474674069588900002128e-01L, 4.08372221499474674069588900002128e-01L, 4.08372221499474674069588900002128e-01L, 4.04055417266200582425904380777126e-01L},
               //  {8.59523090201054193116477875786220e-01L, 8.59523090201054193116477875786220e-01L, 4.14735913727987720499709244748633e-01L, 1.24850759678944080062624098058597e-01L}
               //};
-//
-//      const unsigned int rule_id[3] = {
-//1, // (x,0,0) -> 6 permutations
-//4, // (x,x,x) -> 8 permutations
-//5  // (x,x,z) -> 24 permutations
-//      };
-//
-//      _points.resize(38);
-//      _weights.resize(38);
-//
-//      kim_rule(data, rule_id, 3);
-//      return;
+              //
+              //      const unsigned int rule_id[3] = {
+              //1, // (x,0,0) -> 6 permutations
+              //4, // (x,x,x) -> 8 permutations
+              //5  // (x,x,z) -> 24 permutations
+              //      };
+              //
+              //      _points.resize(38);
+              //      _weights.resize(38);
+              //
+              //      kim_rule(data, rule_id, 3);
+              //      return;
             } // end case SIXTH,SEVENTH
 
           case EIGHTH:

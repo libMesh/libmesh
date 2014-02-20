@@ -38,15 +38,15 @@ class Elem;
 
 namespace Trees
 {
-  /**
-   * \p enum defining how to build the tree.  \p NODES will populate
-   * the tree with nodes and then replace the nodes with element
-   * connectivity, \p ELEMENTS will populate the tree with the elements
-   * directly.
-   */
-  enum BuildType {NODES=0,
-                  ELEMENTS,
-                  INVALID_BUILD_TYPE };
+/**
+ * \p enum defining how to build the tree.  \p NODES will populate
+ * the tree with nodes and then replace the nodes with element
+ * connectivity, \p ELEMENTS will populate the tree with the elements
+ * directly.
+ */
+enum BuildType {NODES=0,
+                ELEMENTS,
+                INVALID_BUILD_TYPE };
 }
 
 /**

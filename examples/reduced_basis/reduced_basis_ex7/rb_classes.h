@@ -79,7 +79,7 @@ public:
   SimpleRBConstruction (EquationSystems& es,
                         const std::string& name,
                         const unsigned int number)
-  : Parent(es, name, number)
+    : Parent(es, name, number)
   {}
 
   /**

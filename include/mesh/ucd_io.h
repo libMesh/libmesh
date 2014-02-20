@@ -45,9 +45,9 @@ class MeshBase;
 // ------------------------------------------------------------
 // UCDIO class definition
 class UCDIO : public MeshInput<MeshBase>,
-  public MeshOutput<MeshBase>
+              public MeshOutput<MeshBase>
 {
- public:
+public:
 
   /**
    * Constructor.  Takes a writeable reference to a mesh object.
@@ -84,7 +84,7 @@ class UCDIO : public MeshInput<MeshBase>,
                                 const std::vector<std::string>& names);
 
 
- private:
+private:
 
   /**
    * The actual implementation of the read function.
@@ -123,7 +123,7 @@ class UCDIO : public MeshInput<MeshBase>,
                   const std::vector<std::string>& names,
                   const std::vector<Number>&soln);
 
- };
+};
 
 
 

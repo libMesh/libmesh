@@ -221,24 +221,24 @@ int main (int argc, char** argv)
   std::ofstream evals_file(eigenvalue_output_name.str().c_str());
 
   for(unsigned int i=0; i<nconv; i++)
-  {
-    std::pair<Real,Real> eval = eigen_system.get_eigenpair(i);
-
-    // The eigenvalues should be real!
-    libmesh_assert_less (eval.second, TOLERANCE);
-    evals_file << eval.first << std::endl;
-
-    // plot the specified eigenvector
-    if(i == plotting_index)
     {
+      std::pair<Real,Real> eval = eigen_system.get_eigenpair(i);
+
+      // The eigenvalues should be real!
+      libmesh_assert_less (eval.second, TOLERANCE);
+      evals_file << eval.first << std::endl;
+
+      // plot the specified eigenvector
+      if(i == plotting_index)
+        {
 #ifdef LIBMESH_HAVE_EXODUS_API
-      // Write the eigen vector to file.
-      std::ostringstream eigenvector_output_name;
-      eigenvector_output_name << mesh_name << "_evec.e";
-      ExodusII_IO (mesh).write_equation_systems (eigenvector_output_name.str(), equation_systems);
+          // Write the eigen vector to file.
+          std::ostringstream eigenvector_output_name;
+          eigenvector_output_name << mesh_name << "_evec.e";
+          ExodusII_IO (mesh).write_equation_systems (eigenvector_output_name.str(), equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
+        }
     }
-  }
 
   evals_file.close();
 
@@ -448,7 +448,7 @@ void get_dirichlet_dofs(EquationSystems& es,
       // contribute to.
       dof_map.dof_indices (elem, dof_indices);
 
-     {
+      {
         // All boundary dofs are Dirichlet dofs in this case
         for (unsigned int s=0; s<elem->n_sides(); s++)
           if (elem->neighbor(s) == NULL)

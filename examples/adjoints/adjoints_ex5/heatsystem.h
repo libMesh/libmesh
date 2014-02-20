@@ -28,12 +28,12 @@ class HeatSystem : public FEMSystem
 public:
   // Constructor
   HeatSystem(EquationSystems& es,
-               const std::string& name_in,
-               const unsigned int number_in)
-  : FEMSystem(es, name_in, number_in),
-    _k(1.0),
-    _fe_family("LAGRANGE"), _fe_order(1),
-    _analytic_jacobians(true), R_plus_dp(0.0), R_minus_dp(0.0), dp(1.e-6) { qoi.resize(1); }
+             const std::string& name_in,
+             const unsigned int number_in)
+    : FEMSystem(es, name_in, number_in),
+      _k(1.0),
+      _fe_family("LAGRANGE"), _fe_order(1),
+      _analytic_jacobians(true), R_plus_dp(0.0), R_minus_dp(0.0), dp(1.e-6) { qoi.resize(1); }
 
   std::string & fe_family() { return _fe_family;  }
   unsigned int & fe_order() { return _fe_order;  }
@@ -45,32 +45,32 @@ public:
 
   // Sensitivity Calculation
   Number & compute_final_sensitivity()
-    {
-      final_sensitivity = -(R_plus_dp - R_minus_dp)/(2*dp);
+  {
+    final_sensitivity = -(R_plus_dp - R_minus_dp)/(2*dp);
 
-      return final_sensitivity;
-    }
+    return final_sensitivity;
+  }
 
-    void set_tf(Real val)
+  void set_tf(Real val)
   {
     tf = val;
   }
 
-    ParameterVector &get_parameter_vector()
-    {
-      parameter_vector.resize(parameters.size());
-      for(unsigned int i = 0; i != parameters.size(); ++i)
-	{
-	  parameter_vector[i] = &parameters[i];
-	}
+  ParameterVector &get_parameter_vector()
+  {
+    parameter_vector.resize(parameters.size());
+    for(unsigned int i = 0; i != parameters.size(); ++i)
+      {
+        parameter_vector[i] = &parameters[i];
+      }
 
-      return parameter_vector;
-    }
+    return parameter_vector;
+  }
 
   Number &get_QoI_value(unsigned int QoI_index)
-    {
-      return computed_QoI[QoI_index];
-    }
+  {
+    return computed_QoI[QoI_index];
+  }
 
 protected:
   // System initialization

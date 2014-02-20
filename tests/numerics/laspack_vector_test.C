@@ -14,9 +14,9 @@ public:
   CPPUNIT_TEST_SUITE( LaspackVectorTest );
 
   if (libMesh::n_processors() == 1)
-  {
-    NUMERICVECTORTEST
-  }
+    {
+      NUMERICVECTORTEST
+        }
 
   CPPUNIT_TEST_SUITE_END();
 };

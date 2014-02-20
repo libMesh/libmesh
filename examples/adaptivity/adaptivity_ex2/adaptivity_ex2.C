@@ -15,18 +15,18 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-  // <h1>Adaptivity Example 2 - Solving a Transient System with Adaptive Mesh Refinement</h1>
-  //
-  // This example shows how a simple, linear transient
-  // system can be solved in parallel.  The system is simple
-  // scalar convection-diffusion with a specified external
-  // velocity.  The initial condition is given, and the
-  // solution is advanced in time with a standard Crank-Nicolson
-  // time-stepping strategy.
-  //
-  // Also, we use this example to demonstrate writing out and reading
-  // in of solutions. We do 25 time steps, then save the solution
-  // and do another 25 time steps starting from the saved solution.
+// <h1>Adaptivity Example 2 - Solving a Transient System with Adaptive Mesh Refinement</h1>
+//
+// This example shows how a simple, linear transient
+// system can be solved in parallel.  The system is simple
+// scalar convection-diffusion with a specified external
+// velocity.  The initial condition is given, and the
+// solution is advanced in time with a standard Crank-Nicolson
+// time-stepping strategy.
+//
+// Also, we use this example to demonstrate writing out and reading
+// in of solutions. We do 25 time steps, then save the solution
+// and do another 25 time steps starting from the saved solution.
 
 // C++ include files that we need
 #include <iostream>
@@ -127,10 +127,10 @@ int main (int argc, char** argv)
   // Use commandline parameter to specify if we are to
   // read in an initial solution or generate it ourself
   std::cout << "Usage:\n"
-    <<"\t " << argv[0] << " -init_timestep 0\n"
-    << "OR\n"
-    <<"\t " << argv[0] << " -read_solution -init_timestep 26\n"
-    << std::endl;
+            <<"\t " << argv[0] << " -init_timestep 0\n"
+            << "OR\n"
+            <<"\t " << argv[0] << " -read_solution -init_timestep 26\n"
+            << std::endl;
 
   std::cout << "Running: " << argv[0];
 
@@ -315,8 +315,8 @@ int main (int argc, char** argv)
   // We do 25 timesteps both before and after writing out the
   // intermediate solution
   for(unsigned int t_step=init_timestep;
-                   t_step<(init_timestep+n_timesteps);
-                   t_step++)
+      t_step<(init_timestep+n_timesteps);
+      t_step++)
     {
       // Increment the time counter, set the time and the
       // time step size as parameters in the EquationSystem.

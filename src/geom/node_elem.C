@@ -39,13 +39,13 @@ void NodeElem::connectivity(const unsigned int,
 #ifdef LIBMESH_ENABLE_AMR
 
 const float NodeElem::_embedding_matrix[1][1][1] =
-{
-  // embedding matrix for child 0
   {
-    // 0
-    {1.0}, // 0
-  }
-};
+    // embedding matrix for child 0
+    {
+      // 0
+      {1.0}, // 0
+    }
+  };
 
 #endif
 

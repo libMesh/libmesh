@@ -50,10 +50,10 @@ class System;
 // ------------------------------------------------------------
 // ExodusII_IO class definition
 class ExodusII_IO : public MeshInput<MeshBase>,
-  public MeshOutput<MeshBase>,
-  public ParallelObject
+                    public MeshOutput<MeshBase>,
+                    public ParallelObject
 {
- public:
+public:
 
   /**
    * Constructor.  Takes a writeable reference to a mesh object.
@@ -197,7 +197,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    */
   void append(bool val);
 
- private:
+private:
   /**
    * Only attempt to instantiate an ExodusII helper class
    * if the Exodus API is defined.  This class will have no

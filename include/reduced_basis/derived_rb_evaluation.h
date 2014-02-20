@@ -96,7 +96,7 @@ public:
    * The dense vectors that define the derived basis
    * functions based on the uber system.
    */
-   std::vector< DenseVector<Number> > derived_basis_functions;
+  std::vector< DenseVector<Number> > derived_basis_functions;
 
   /**
    * Define an enumeration for the two types of residuals we can

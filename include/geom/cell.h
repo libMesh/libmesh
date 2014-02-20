@@ -59,10 +59,10 @@ public:
    */
   unsigned int dim () const { return 3; }
 
-//   /**
-//    * @returns 4
-//    */
-//   unsigned int n_children_per_side(const unsigned int) const { return 4; }
+  //   /**
+  //    * @returns 4
+  //    */
+  //   unsigned int n_children_per_side(const unsigned int) const { return 4; }
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

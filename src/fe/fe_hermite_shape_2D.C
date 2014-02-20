@@ -32,7 +32,7 @@ void hermite_compute_coefs(const Elem* elem,  std::vector<std::vector<Real> > & 
 #ifdef DEBUG
                            , std::vector<Real> & dxdeta, std::vector<Real> & dydxi
 #endif
-                          )
+                           )
 {
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
@@ -61,7 +61,7 @@ void hermite_compute_coefs(const Elem* elem,  std::vector<std::vector<Real> > & 
 
           dxdxi[0][p] += elem->point(i)(0) * ddxi;
           dxdxi[1][p] += elem->point(i)(1) * ddeta;
-// dxdeta and dydxi should be 0!
+          // dxdeta and dydxi should be 0!
 #ifdef DEBUG
           dxdeta[p] += elem->point(i)(0) * ddeta;
           dydxi[p] += elem->point(i)(1) * ddxi;
@@ -81,10 +81,10 @@ void hermite_compute_coefs(const Elem* elem,  std::vector<std::vector<Real> > & 
 
 
 Real hermite_bases_2D
- (std::vector<unsigned int> &bases1D,
-  const std::vector<std::vector<Real> > &dxdxi,
-  const Order &o,
-  unsigned int i)
+(std::vector<unsigned int> &bases1D,
+ const std::vector<std::vector<Real> > &dxdxi,
+ const Order &o,
+ unsigned int i)
 {
   bases1D.clear();
   bases1D.resize(2,0);
@@ -114,20 +114,20 @@ Real hermite_bases_2D
       unsigned int basisnum = i%4;
       switch (basisnum)
         {
-          case 0: // DoF = value at node
-            coef = 1.0;
-            break;
-          case 1: // DoF = x derivative at node
-            coef = dxdxi[0][bases1D[0]];
-            bases1D[0] += 2; break;
-          case 2: // DoF = y derivative at node
-            coef = dxdxi[1][bases1D[1]];
-            bases1D[1] += 2; break;
-          case 3: // DoF = xy derivative at node
-            coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]];
-            bases1D[0] += 2; bases1D[1] += 2; break;
-          default:
-            libmesh_error();
+        case 0: // DoF = value at node
+          coef = 1.0;
+          break;
+        case 1: // DoF = x derivative at node
+          coef = dxdxi[0][bases1D[0]];
+          bases1D[0] += 2; break;
+        case 2: // DoF = y derivative at node
+          coef = dxdxi[1][bases1D[1]];
+          bases1D[1] += 2; break;
+        case 3: // DoF = xy derivative at node
+          coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]];
+          bases1D[0] += 2; bases1D[1] += 2; break;
+        default:
+          libmesh_error();
         }
     }
   // Edges
@@ -218,7 +218,7 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 #ifdef DEBUG
                         ,dxdeta,dydxi
 #endif
-    );
+                        );
 
   const ElemType type = elem->type();
 
@@ -238,7 +238,7 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
         Real coef = hermite_bases_2D(bases1D, dxdxi, totalorder, i);
 
         return coef * FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
-               FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
+          FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
       }
     default:
       libMesh::err << "ERROR: Unsupported element type!" << std::endl;
@@ -288,7 +288,7 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
 #ifdef DEBUG
                         ,dxdeta,dydxi
 #endif
-    );
+                        );
 
   const ElemType type = elem->type();
 
@@ -309,16 +309,16 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
 
         switch (j)
           {
-            case 0:
-              return coef *
-                FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
-                FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
-            case 1:
-              return coef *
-                FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
-                FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1));
-            default:
-              libmesh_error();
+          case 0:
+            return coef *
+              FEHermite<1>::hermite_raw_shape_deriv(bases1D[0],p(0)) *
+              FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
+          case 1:
+            return coef *
+              FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
+              FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1));
+          default:
+            libmesh_error();
           }
       }
     default:
@@ -352,7 +352,7 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
 #ifdef DEBUG
                         ,dxdeta,dydxi
 #endif
-                       );
+                        );
 
   const ElemType type = elem->type();
 

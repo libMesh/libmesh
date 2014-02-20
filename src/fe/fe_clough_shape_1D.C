@@ -28,13 +28,13 @@
 // This should also screw up multithreading royally
 namespace
 {
-  using namespace libMesh;
+using namespace libMesh;
 
-  static dof_id_type old_elem_id = DofObject::invalid_id;
-  // Coefficient naming: d(1)d(2n) is the coefficient of the
-  // global shape function corresponding to value 1 in terms of the
-  // local shape function corresponding to normal derivative 2
-  static Real d1xd1x, d2xd2x;
+static dof_id_type old_elem_id = DofObject::invalid_id;
+// Coefficient naming: d(1)d(2n) is the coefficient of the
+// global shape function corresponding to value 1 in terms of the
+// local shape function corresponding to normal derivative 2
+static Real d1xd1x, d2xd2x;
 
 Real clough_raw_shape_second_deriv(const unsigned int basis_num,
                                    const unsigned int deriv_type,
@@ -91,30 +91,30 @@ void clough_compute_coefs(const Elem* elem)
 }
 
 
-  // Return shape function second derivatives on the unit interval
+// Return shape function second derivatives on the unit interval
 Real clough_raw_shape_second_deriv(const unsigned int basis_num,
-                            const unsigned int deriv_type,
-                            const Point& p)
+                                   const unsigned int deriv_type,
+                                   const Point& p)
 {
   Real xi = p(0);
 
   switch (deriv_type)
-  {
-
-  // second derivative in xi-xi direction
-  case 0:
-  switch (basis_num)
     {
-      case 0:
-        return -6 + 12*xi;
-      case 1:
-        return 6 - 12*xi;
-      case 2:
-        return -4 + 6*xi;
-      case 3:
-        return -2 + 6*xi;
+
+      // second derivative in xi-xi direction
+    case 0:
+      switch (basis_num)
+        {
+        case 0:
+          return -6 + 12*xi;
+        case 1:
+          return 6 - 12*xi;
+        case 2:
+          return -4 + 6*xi;
+        case 3:
+          return -2 + 6*xi;
+        }
     }
-  }
 
   libmesh_error();
   return 0.;
@@ -129,20 +129,20 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
   Real xi = p(0);
 
   switch (deriv_type)
-  {
-  case 0:
-  switch (basis_num)
     {
-      case 0:
-        return -6*xi + 6*xi*xi;
-      case 1:
-        return 6*xi - 6*xi*xi;
-      case 2:
-        return 1 - 4*xi + 3*xi*xi;
-      case 3:
-        return -2*xi + 3*xi*xi;
+    case 0:
+      switch (basis_num)
+        {
+        case 0:
+          return -6*xi + 6*xi*xi;
+        case 1:
+          return 6*xi - 6*xi*xi;
+        case 2:
+          return 1 - 4*xi + 3*xi*xi;
+        case 3:
+          return -2*xi + 3*xi*xi;
+        }
     }
-  }
 
   libmesh_error();
   return 0.;
@@ -155,14 +155,14 @@ Real clough_raw_shape(const unsigned int basis_num,
 
   switch (basis_num)
     {
-      case 0:
-        return 1 - 3*xi*xi + 2*xi*xi*xi;
-      case 1:
-        return 3*xi*xi - 2*xi*xi*xi;
-      case 2:
-        return xi - 2*xi*xi + xi*xi*xi;
-      case 3:
-        return -xi*xi + xi*xi*xi;
+    case 0:
+      return 1 - 3*xi*xi + 2*xi*xi*xi;
+    case 1:
+      return 3*xi*xi - 2*xi*xi*xi;
+    case 2:
+      return xi - 2*xi*xi + xi*xi*xi;
+    case 3:
+      return -xi*xi + xi*xi*xi;
     }
 
   libmesh_error();

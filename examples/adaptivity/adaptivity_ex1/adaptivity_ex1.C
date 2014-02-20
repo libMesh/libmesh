@@ -15,17 +15,17 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Adaptivity Example 1 - Solving 1D PDE Using Adaptive Mesh Refinement</h1>
- //
- // This example demonstrates how to solve a simple 1D problem
- // using adaptive mesh refinement. The PDE that is solved is:
- // -epsilon*u''(x) + u(x) = 1, on the domain [0,1] with boundary conditions
- // u(0) = u(1) = 0 and where epsilon << 1.
- //
- // The approach used to solve 1D problems in libMesh is virtually identical to
- // solving 2D or 3D problems, so in this sense this example represents a good
- // starting point for new users. Note that many concepts are used in this
- // example which are explained more fully in subsequent examples.
+// <h1>Adaptivity Example 1 - Solving 1D PDE Using Adaptive Mesh Refinement</h1>
+//
+// This example demonstrates how to solve a simple 1D problem
+// using adaptive mesh refinement. The PDE that is solved is:
+// -epsilon*u''(x) + u(x) = 1, on the domain [0,1] with boundary conditions
+// u(0) = u(1) = 0 and where epsilon << 1.
+//
+// The approach used to solve 1D problems in libMesh is virtually identical to
+// solving 2D or 3D problems, so in this sense this example represents a good
+// starting point for new users. Note that many concepts are used in this
+// example which are explained more fully in subsequent examples.
 
 // Libmesh includes
 #include "libmesh/mesh.h"
@@ -235,78 +235,78 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
 
   // Note that ++el is preferred to el++ when using loops with iterators
   for( ; el != el_end; ++el)
-  {
-    // It is convenient to store a pointer to the current element
-    const Elem* elem = *el;
-
-    // Get the degree of freedom indices for the current element.
-    // These define where in the global matrix and right-hand-side this
-    // element will contribute to.
-    dof_map.dof_indices(elem, dof_indices);
-
-    // Compute the element-specific data for the current element. This
-    // involves computing the location of the quadrature points (q_point)
-    // and the shape functions (phi, dphi) for the current element.
-    fe->reinit(elem);
-
-    // Store the number of local degrees of freedom contained in this element
-    const int n_dofs = dof_indices.size();
-
-    // We resize and zero out Ke and Fe (resize() also clears the matrix and
-    // vector). In this example, all elements in the mesh are EDGE3's, so
-    // Ke will always be 3x3, and Fe will always be 3x1. If the mesh contained
-    // different element types, then the size of Ke and Fe would change.
-    Ke.resize(n_dofs, n_dofs);
-    Fe.resize(n_dofs);
-
-
-    // Now loop over quadrature points to handle numerical integration
-    for(unsigned int qp=0; qp<qrule.n_points(); qp++)
     {
-      // Now build the element matrix and right-hand-side using loops to
-      // integrate the test functions (i) against the trial functions (j).
-      for(unsigned int i=0; i<phi.size(); i++)
-      {
-        Fe(i) += JxW[qp]*phi[i][qp];
+      // It is convenient to store a pointer to the current element
+      const Elem* elem = *el;
 
-        for(unsigned int j=0; j<phi.size(); j++)
+      // Get the degree of freedom indices for the current element.
+      // These define where in the global matrix and right-hand-side this
+      // element will contribute to.
+      dof_map.dof_indices(elem, dof_indices);
+
+      // Compute the element-specific data for the current element. This
+      // involves computing the location of the quadrature points (q_point)
+      // and the shape functions (phi, dphi) for the current element.
+      fe->reinit(elem);
+
+      // Store the number of local degrees of freedom contained in this element
+      const int n_dofs = dof_indices.size();
+
+      // We resize and zero out Ke and Fe (resize() also clears the matrix and
+      // vector). In this example, all elements in the mesh are EDGE3's, so
+      // Ke will always be 3x3, and Fe will always be 3x1. If the mesh contained
+      // different element types, then the size of Ke and Fe would change.
+      Ke.resize(n_dofs, n_dofs);
+      Fe.resize(n_dofs);
+
+
+      // Now loop over quadrature points to handle numerical integration
+      for(unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
-          Ke(i,j) += JxW[qp]*(1.e-3*dphi[i][qp]*dphi[j][qp] +
-                                     phi[i][qp]*phi[j][qp]);
+          // Now build the element matrix and right-hand-side using loops to
+          // integrate the test functions (i) against the trial functions (j).
+          for(unsigned int i=0; i<phi.size(); i++)
+            {
+              Fe(i) += JxW[qp]*phi[i][qp];
+
+              for(unsigned int j=0; j<phi.size(); j++)
+                {
+                  Ke(i,j) += JxW[qp]*(1.e-3*dphi[i][qp]*dphi[j][qp] +
+                                      phi[i][qp]*phi[j][qp]);
+                }
+            }
         }
-      }
+
+
+      // At this point we have completed the matrix and RHS summation. The
+      // final step is to apply boundary conditions, which in this case are
+      // simple Dirichlet conditions with u(0) = u(1) = 0.
+
+      // Define the penalty parameter used to enforce the BC's
+      double penalty = 1.e10;
+
+      // Loop over the sides of this element. For a 1D element, the "sides"
+      // are defined as the nodes on each edge of the element, i.e. 1D elements
+      // have 2 sides.
+      for(unsigned int s=0; s<elem->n_sides(); s++)
+        {
+          // If this element has a NULL neighbor, then it is on the edge of the
+          // mesh and we need to enforce a boundary condition using the penalty
+          // method.
+          if(elem->neighbor(s) == NULL)
+            {
+              Ke(s,s) += penalty;
+              Fe(s)   += 0*penalty;
+            }
+        }
+
+      // This is a function call that is necessary when using adaptive
+      // mesh refinement. See Adaptivity Example 2 for more details.
+      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+
+      // Add Ke and Fe to the global matrix and right-hand-side.
+      system.matrix->add_matrix(Ke, dof_indices);
+      system.rhs->add_vector(Fe, dof_indices);
     }
-
-
-    // At this point we have completed the matrix and RHS summation. The
-    // final step is to apply boundary conditions, which in this case are
-    // simple Dirichlet conditions with u(0) = u(1) = 0.
-
-    // Define the penalty parameter used to enforce the BC's
-    double penalty = 1.e10;
-
-    // Loop over the sides of this element. For a 1D element, the "sides"
-    // are defined as the nodes on each edge of the element, i.e. 1D elements
-    // have 2 sides.
-    for(unsigned int s=0; s<elem->n_sides(); s++)
-    {
-      // If this element has a NULL neighbor, then it is on the edge of the
-      // mesh and we need to enforce a boundary condition using the penalty
-      // method.
-      if(elem->neighbor(s) == NULL)
-      {
-        Ke(s,s) += penalty;
-        Fe(s)   += 0*penalty;
-      }
-    }
-
-    // This is a function call that is necessary when using adaptive
-    // mesh refinement. See Adaptivity Example 2 for more details.
-    dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-
-    // Add Ke and Fe to the global matrix and right-hand-side.
-    system.matrix->add_matrix(Ke, dof_indices);
-    system.rhs->add_vector(Fe, dof_indices);
-  }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 }

@@ -17,12 +17,12 @@
 
 
 
- // <h1>Miscellaneous Example 10 - Stitching meshes </h1>
- //
- // This example shows how to generate a domain by stitching 8 cubic meshes
- // together.  Then a Poisson problem is solved on the stitched domain,
- // and compared to the Poisson problem on a reference (unstitched) mesh
- // to verify that the results match.
+// <h1>Miscellaneous Example 10 - Stitching meshes </h1>
+//
+// This example shows how to generate a domain by stitching 8 cubic meshes
+// together.  Then a Poisson problem is solved on the stitched domain,
+// and compared to the Poisson problem on a reference (unstitched) mesh
+// to verify that the results match.
 
 
 // C++ include files that we need
@@ -74,23 +74,23 @@ int main (int argc, char** argv)
 
   // Check for proper calling arguments.
   if (argc < 3)
-  {
-    std::cout << "Usage:\n"
-	      <<"\t " << argv[0] << " -n 15"
-	      << std::endl;
-    libmesh_error();
-  }
+    {
+      std::cout << "Usage:\n"
+                <<"\t " << argv[0] << " -n 15"
+                << std::endl;
+      libmesh_error();
+    }
   // Brief message to the user regarding the program name
   // and command line arguments.
   else
-  {
-    std::cout << "Running " << argv[0];
+    {
+      std::cout << "Running " << argv[0];
 
-    for (int i=1; i<argc; i++)
-      std::cout << " " << argv[i];
+      for (int i=1; i<argc; i++)
+        std::cout << " " << argv[i];
 
-    std::cout << std::endl << std::endl;
-  }
+      std::cout << std::endl << std::endl;
+    }
 
   // This is 3D-only problem
   const unsigned int dim = 3;
@@ -158,11 +158,11 @@ int main (int argc, char** argv)
   START_LOG("Output", "main");
 #ifdef LIBMESH_HAVE_EXODUS_API
   ExodusII_IO(mesh).write_equation_systems(
-    "solution_stitch.exo",
-    equation_systems_stitch);
+                                           "solution_stitch.exo",
+                                           equation_systems_stitch);
   ExodusII_IO(mesh).write_equation_systems(
-    "solution_nostitch.exo",
-    equation_systems_nostitch);
+                                           "solution_nostitch.exo",
+                                           equation_systems_nostitch);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   STOP_LOG("Output", "main");
 
@@ -183,9 +183,9 @@ void assemble_and_solve(Mesh& mesh, EquationSystems& equation_systems)
   std::set<boundary_id_type> boundary_ids;
   // the cube has boundaries IDs 0, 1, 2, 3, 4 and 5
   for(int j = 0; j<6; ++j)
-  {
-    boundary_ids.insert(j);
-  }
+    {
+      boundary_ids.insert(j);
+    }
 
   // Create a vector storing the variable numbers which the BC applies to
   std::vector<unsigned int> variables(1);
@@ -210,27 +210,27 @@ void assemble_and_solve(Mesh& mesh, EquationSystems& equation_systems)
   const unsigned int max_r_steps = 2;
 
   for(unsigned int r_step=0; r_step<=max_r_steps; r_step++)
-  {
-    system.solve();
-    if(r_step != max_r_steps)
     {
-      ErrorVector error;
-      KellyErrorEstimator error_estimator;
+      system.solve();
+      if(r_step != max_r_steps)
+        {
+          ErrorVector error;
+          KellyErrorEstimator error_estimator;
 
-      error_estimator.estimate_error(system, error);
+          error_estimator.estimate_error(system, error);
 
-      libMesh::out << "Error estimate\nl2 norm = " << error.l2_norm() <<
-        "\nmaximum = " << error.maximum() << std::endl;
+          libMesh::out << "Error estimate\nl2 norm = " << error.l2_norm() <<
+            "\nmaximum = " << error.maximum() << std::endl;
 
-      mesh_refinement.flag_elements_by_error_fraction (error);
+          mesh_refinement.flag_elements_by_error_fraction (error);
 
-      mesh_refinement.refine_and_coarsen_elements();
+          mesh_refinement.refine_and_coarsen_elements();
 
-      equation_systems.reinit();
+          equation_systems.reinit();
+        }
     }
-  }
 #else
-    system.solve();
+  system.solve();
 #endif
 }
 
@@ -266,35 +266,35 @@ void assemble_poisson(EquationSystems& es,
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
   for ( ; el != end_el; ++el)
-  {
-    const Elem* elem = *el;
-
-    dof_map.dof_indices (elem, dof_indices);
-
-    fe->reinit (elem);
-
-    Ke.resize (dof_indices.size(),
-               dof_indices.size());
-
-    Fe.resize (dof_indices.size());
-
-    for (unsigned int qp=0; qp<qrule.n_points(); qp++)
     {
-      for (unsigned int i=0; i<phi.size(); i++)
-      {
-        Fe(i) += JxW[qp]*phi[i][qp];
-        for (unsigned int j=0; j<phi.size(); j++)
+      const Elem* elem = *el;
+
+      dof_map.dof_indices (elem, dof_indices);
+
+      fe->reinit (elem);
+
+      Ke.resize (dof_indices.size(),
+                 dof_indices.size());
+
+      Fe.resize (dof_indices.size());
+
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
-          Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+          for (unsigned int i=0; i<phi.size(); i++)
+            {
+              Fe(i) += JxW[qp]*phi[i][qp];
+              for (unsigned int j=0; j<phi.size(); j++)
+                {
+                  Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+                }
+            }
         }
-      }
+
+      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+
+      system.matrix->add_matrix (Ke, dof_indices);
+      system.rhs->add_vector    (Fe, dof_indices);
     }
-
-    dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-
-    system.matrix->add_matrix (Ke, dof_indices);
-    system.rhs->add_vector    (Fe, dof_indices);
-  }
 }
 
 

@@ -95,9 +95,9 @@ void TypeVector<T>::write_unformatted (std::ostream &os,
   libmesh_assert (os);
 
   os << std::setiosflags(std::ios::showpoint)
-      << (*this)(0) << " "
-      << (*this)(1) << " "
-      << (*this)(2) << " ";
+     << (*this)(0) << " "
+     << (*this)(1) << " "
+     << (*this)(2) << " ";
 
   if (newline)
     os << '\n';

@@ -18,12 +18,12 @@
 
 
 
- // <h1>Introduction Example 5 - Run-Time Quadrature Rule Selection</h1>
- //
- // This is the fifth example program.  It builds on
- // the previous two examples, and extends the use
- // of the \p AutoPtr as a convenient build method to
- // determine the quadrature rule at run time.
+// <h1>Introduction Example 5 - Run-Time Quadrature Rule Selection</h1>
+//
+// This is the fifth example program.  It builds on
+// the previous two examples, and extends the use
+// of the \p AutoPtr as a convenient build method to
+// determine the quadrature rule at run time.
 
 
 // C++ include files that we need
@@ -223,7 +223,7 @@ int main (int argc, char** argv)
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   ExodusII_IO(mesh).write_equation_systems (f_name.str(),
-                                      equation_systems);
+                                            equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // All done.

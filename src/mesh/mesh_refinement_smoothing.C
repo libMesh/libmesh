@@ -280,7 +280,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
       // and p refinement, then change our minds if we see any
       // neighbors that are as coarse or coarser than us.
       bool h_flag_me = true,
-           p_flag_me = true;
+        p_flag_me = true;
 
 
       // Skip the element if it is already fully flagged for refinement
@@ -313,7 +313,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
           my_p_adjustment = -1;
         }
       const unsigned int my_new_p_level = elem->p_level() +
-                                          my_p_adjustment;
+        my_p_adjustment;
 
       // Check all the element neighbors
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
@@ -330,19 +330,19 @@ bool MeshRefinement::eliminate_unrefined_patches ()
           // we are, then we will not become an unrefined island.
           // So if we are still considering h refinement:
           if (h_flag_me &&
-            // If our neighbor is already at a lower level,
-            // it can't end up at a higher level even if it
-            // is flagged for refinement once
-             ((neighbor->level() < my_level) ||
-            // If our neighbor is at the same level but isn't
-            // flagged for refinement, it won't end up at a
-            // higher level
-             ((neighbor->active()) &&
-              (neighbor->refinement_flag() != Elem::REFINE)) ||
-            // If our neighbor is currently more refined but is
-            // a parent flagged for coarsening, it will end up
-            // at the same level.
-             (neighbor->refinement_flag() == Elem::COARSEN_INACTIVE)))
+              // If our neighbor is already at a lower level,
+              // it can't end up at a higher level even if it
+              // is flagged for refinement once
+              ((neighbor->level() < my_level) ||
+               // If our neighbor is at the same level but isn't
+               // flagged for refinement, it won't end up at a
+               // higher level
+               ((neighbor->active()) &&
+                (neighbor->refinement_flag() != Elem::REFINE)) ||
+               // If our neighbor is currently more refined but is
+               // a parent flagged for coarsening, it will end up
+               // at the same level.
+               (neighbor->refinement_flag() == Elem::COARSEN_INACTIVE)))
             {
               // We've proven we won't become an unrefined island,
               // so don't h refine to avoid that.
@@ -380,7 +380,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
               else if (neighbor->ancestor())
                 {
                   if (neighbor->min_new_p_level_by_neighbor(elem,
-                      my_new_p_level + 2) <= my_new_p_level)
+                                                            my_new_p_level + 2) <= my_new_p_level)
                     {
                       p_flag_me = false;
                       if (!h_flag_me)
@@ -399,7 +399,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
               for (unsigned int c=0; c<elem->n_children(); c++)
                 {
                   libmesh_assert_equal_to (elem->child(c)->refinement_flag(),
-                                          Elem::COARSEN);
+                                           Elem::COARSEN);
                   elem->child(c)->set_refinement_flag(Elem::DO_NOTHING);
                 }
               elem->set_refinement_flag(Elem::INACTIVE);

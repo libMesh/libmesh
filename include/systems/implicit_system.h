@@ -97,10 +97,10 @@ public:
    */
   virtual void assemble ();
 
-//   /**
-//    * Assembles & solves the linear system Ax=b.
-//    */
-//   virtual void solve ();
+  //   /**
+  //    * Assembles & solves the linear system Ax=b.
+  //    */
+  //   virtual void solve ();
 
 
   /**
@@ -131,7 +131,7 @@ public:
    * be used in linear adjoint and/or sensitivity solves
    */
   virtual std::pair<unsigned int, Real>
-    get_linear_solve_parameters() const;
+  get_linear_solve_parameters() const;
 
   /**
    * Releases a pointer to a linear solver acquired by
@@ -147,7 +147,7 @@ public:
    * own way of handling assembly.
    */
   virtual void assembly(bool /* get_residual */ , bool /* get_jacobian */)
-    { libmesh_error(); }
+  { libmesh_error(); }
 
   /**
    * Residual parameter derivative function.
@@ -170,7 +170,7 @@ public:
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
-    sensitivity_solve (const ParameterVector& parameters);
+  sensitivity_solve (const ParameterVector& parameters);
 
   /**
    * Assembles & solves the linear system(s) (dR/du)*u_w = sum(w_p*-dR/dp), for
@@ -181,8 +181,8 @@ public:
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
-    weighted_sensitivity_solve (const ParameterVector& parameters,
-                                const ParameterVector& weights);
+  weighted_sensitivity_solve (const ParameterVector& parameters,
+                              const ParameterVector& weights);
 
   /**
    * Assembles & solves the linear system (dR/du)^T*z = dq/du, for
@@ -194,7 +194,7 @@ public:
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
-    adjoint_solve (const QoISet& qoi_indices = QoISet());
+  adjoint_solve (const QoISet& qoi_indices = QoISet());
 
   /**
    * Assembles & solves the linear system(s)
@@ -209,9 +209,9 @@ public:
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
-    weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
-                                        const ParameterVector& weights,
-                                        const QoISet& qoi_indices = QoISet());
+  weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
+                                      const ParameterVector& weights,
+                                      const QoISet& qoi_indices = QoISet());
 
   /**
    * Solves for the derivative of each of the system's quantities of
@@ -384,7 +384,7 @@ bool ImplicitSystem::have_matrix (const std::string& mat_name) const
 inline
 unsigned int ImplicitSystem::n_matrices () const
 {
- return libmesh_cast_int<unsigned int>(_matrices.size());
+  return libmesh_cast_int<unsigned int>(_matrices.size());
 }
 
 } // namespace libMesh

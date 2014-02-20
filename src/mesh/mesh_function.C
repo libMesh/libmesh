@@ -73,9 +73,9 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
   _out_of_mesh_mode    (false),
   _out_of_mesh_value   ()
 {
-//   std::vector<unsigned int> buf (1);
-//   buf[0] = var;
-//   _system_vars (buf);
+  //   std::vector<unsigned int> buf (1);
+  //   buf[0] = var;
+  //   _system_vars (buf);
 }
 
 
@@ -142,7 +142,7 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
       //AutoPtr<PointLocatorBase> ap (PointLocatorBase::build (TREE, mesh));
       //this->_point_locator = ap.release();
       // this->_point_locator = new PointLocatorTree (mesh, point_locator_build_type);
-       this->_point_locator = mesh.sub_point_locator().release();
+      this->_point_locator = mesh.sub_point_locator().release();
 
       // Point locator no longer needs to be initialized.
       //      this->_point_locator->init();
@@ -172,7 +172,7 @@ AutoPtr<FunctionBase<Number> > MeshFunction::clone () const
 {
   return AutoPtr<FunctionBase<Number> >
     (new MeshFunction
-      (_eqn_systems, _vector, _dof_map, _system_vars, this));
+     (_eqn_systems, _vector, _dof_map, _system_vars, this));
 }
 
 
@@ -246,8 +246,8 @@ void MeshFunction::operator() (const Point& p,
   // either need to have a serialized vector or we need to find a
   // local element sharing the same point.
   if (element &&
-     (element->processor_id() != this->processor_id()) &&
-     _vector.type() != SERIAL)
+      (element->processor_id() != this->processor_id()) &&
+      _vector.type() != SERIAL)
     {
       // look for a local element containing the point
       std::set<const Elem*> point_neighbors;
@@ -369,8 +369,8 @@ void MeshFunction::gradient (const Point& p,
   // either need to have a serialized vector or we need to find a
   // local element sharing the same point.
   if (element &&
-     (element->processor_id() != this->processor_id()) &&
-     _vector.type() != SERIAL)
+      (element->processor_id() != this->processor_id()) &&
+      _vector.type() != SERIAL)
     {
       // look for a local element containing the point
       std::set<const Elem*> point_neighbors;
@@ -482,8 +482,8 @@ void MeshFunction::hessian (const Point& p,
   // either need to have a serialized vector or we need to find a
   // local element sharing the same point.
   if (element &&
-     (element->processor_id() != this->processor_id()) &&
-     _vector.type() != SERIAL)
+      (element->processor_id() != this->processor_id()) &&
+      _vector.type() != SERIAL)
     {
       // look for a local element containing the point
       std::set<const Elem*> point_neighbors;

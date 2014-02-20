@@ -35,14 +35,14 @@
 // Anonymous namespace to hold static std::sqrt values
 namespace
 {
-  using libMesh::Real;
+using libMesh::Real;
 
-  static const Real sqrt2  = std::sqrt(2.);
-  static const Real sqrt6  = std::sqrt(6.);
-  static const Real sqrt10 = std::sqrt(10.);
-  static const Real sqrt14 = std::sqrt(14.);
-  static const Real sqrt22 = std::sqrt(22.);
-  static const Real sqrt26 = std::sqrt(26.);
+static const Real sqrt2  = std::sqrt(2.);
+static const Real sqrt6  = std::sqrt(6.);
+static const Real sqrt10 = std::sqrt(10.);
+static const Real sqrt14 = std::sqrt(14.);
+static const Real sqrt22 = std::sqrt(22.);
+static const Real sqrt26 = std::sqrt(26.);
 }
 
 
@@ -1147,7 +1147,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
       }
 
 
-    // 6th-order Szabo-Babuska.
+      // 6th-order Szabo-Babuska.
     case SIXTH:
       {
         // Szabo-Babuska shape functions on the quadrilateral.
@@ -1252,7 +1252,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem* elem,
       }
 
 
-    // 7th-order Szabo-Babuska.
+      // 7th-order Szabo-Babuska.
     case SEVENTH:
       {
         // Szabo-Babuska shape functions on the quadrilateral.
@@ -1385,9 +1385,9 @@ Real FE<2,SZABAB>::shape_second_deriv(const ElemType,
   static bool warning_given = false;
 
   if (!warning_given)
-  libMesh::err << "Second derivatives for Szabab elements "
-                << " are not yet implemented!"
-                << std::endl;
+    libMesh::err << "Second derivatives for Szabab elements "
+                 << " are not yet implemented!"
+                 << std::endl;
 
   warning_given = true;
   return 0.;
@@ -1405,9 +1405,9 @@ Real FE<2,SZABAB>::shape_second_deriv(const Elem*,
   static bool warning_given = false;
 
   if (!warning_given)
-  libMesh::err << "Second derivatives for Szabab elements "
-                << " are not yet implemented!"
-                << std::endl;
+    libMesh::err << "Second derivatives for Szabab elements "
+                 << " are not yet implemented!"
+                 << std::endl;
 
   warning_given = true;
   return 0.;

@@ -18,24 +18,24 @@
 
 
 
- // <h1>Miscellaneous Example 2 - Complex Numbers and the "FrequencySystem"</h1>
- //
- // This is the seventh example program.  It builds on
- // the previous example programs, introduces complex
- // numbers and the FrequencySystem class to solve a
- // simple Helmholtz equation grad(p)*grad(p)+(omega/c)^2*p=0,
- // for multiple frequencies rather efficiently.
- //
- // The FrequencySystem class offers two solution styles,
- // namely to solve large systems, or to solve
- // moderately-sized systems fast, for multiple frequencies.
- // The latter approach is implemented here.
- //
- // This example uses an L--shaped mesh and nodal boundary data
- // given in the files lshape.un and lshape_data.unv
- //
- // For this example the library has to be compiled with
- // complex numbers enabled.
+// <h1>Miscellaneous Example 2 - Complex Numbers and the "FrequencySystem"</h1>
+//
+// This is the seventh example program.  It builds on
+// the previous example programs, introduces complex
+// numbers and the FrequencySystem class to solve a
+// simple Helmholtz equation grad(p)*grad(p)+(omega/c)^2*p=0,
+// for multiple frequencies rather efficiently.
+//
+// The FrequencySystem class offers two solution styles,
+// namely to solve large systems, or to solve
+// moderately-sized systems fast, for multiple frequencies.
+// The latter approach is implemented here.
+//
+// This example uses an L--shaped mesh and nodal boundary data
+// given in the files lshape.un and lshape_data.unv
+//
+// For this example the library has to be compiled with
+// complex numbers enabled.
 
 // C++ include files that we need
 #include <iostream>
@@ -256,7 +256,7 @@ int main (int argc, char** argv)
       sprintf (buf, "out%04d.exd", n);
 
       ExodusII_IO(mesh).write_equation_systems (buf,
-                                          equation_systems);
+                                                equation_systems);
 #endif
     }
 

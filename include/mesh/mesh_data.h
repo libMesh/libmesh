@@ -647,24 +647,24 @@ protected:
  *
  \verbatim
 
-      -1                                                                              # beginning of dataset
-    2414                                                                              # type of dataset: data at mesh entities
-           1                                                                          # R.  1: unique number of dataset (dataset_label)
-  STRUCTURAL MODE     1                                                               # R.  2: text describing content (dataset_name)
-           1                                                                          # R.  3: data belongs to: nodes, elements,...
-                                                                                      #        (dataset_location)
-  Default Model                                                                       # R.  4: user-specified text (id_lines_1_to_5[0])
-  I-DEAS Master Series                                                                # R.  5: user-specified text (id_lines_1_to_5[1])
-  18-AUG-2003 20:00:12    HPUX11_64     MAR2003                                       # R.  6: user-specified text (id_lines_1_to_5[2])
-  MODE   1 FREQUENCY       501.25 Hz                                                  # R.  7: user-specified text (id_lines_1_to_5[3])
-  STRUCTURAL MODE     1                                                               # R.  8: user-specified text (id_lines_1_to_5[4])
-           0         2         3         8         2         6                        # R.  9: (model_type) (analysis_type)
-                                                                                      #        (data_characteristic) (result_type)
-                                                                                      #        (data_type) (nvaldc)
-           0         0         0         0         0         1         0         0    # R. 10: analysis-specific data (record_10)
-           0         0                                                                # R. 11: analysis-specific data (record_11)
-    0.00000E+00  0.50125E+03  0.99192E+07  0.10000E+01  0.00000E+00  0.00000E+00      # R. 12: analysis-specific data (record_12)
-    0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00      # R. 13: analysis-specific data (record_13)
+ -1                                                                              # beginning of dataset
+ 2414                                                                              # type of dataset: data at mesh entities
+ 1                                                                          # R.  1: unique number of dataset (dataset_label)
+ STRUCTURAL MODE     1                                                               # R.  2: text describing content (dataset_name)
+ 1                                                                          # R.  3: data belongs to: nodes, elements,...
+ #        (dataset_location)
+ Default Model                                                                       # R.  4: user-specified text (id_lines_1_to_5[0])
+ I-DEAS Master Series                                                                # R.  5: user-specified text (id_lines_1_to_5[1])
+ 18-AUG-2003 20:00:12    HPUX11_64     MAR2003                                       # R.  6: user-specified text (id_lines_1_to_5[2])
+ MODE   1 FREQUENCY       501.25 Hz                                                  # R.  7: user-specified text (id_lines_1_to_5[3])
+ STRUCTURAL MODE     1                                                               # R.  8: user-specified text (id_lines_1_to_5[4])
+ 0         2         3         8         2         6                        # R.  9: (model_type) (analysis_type)
+ #        (data_characteristic) (result_type)
+ #        (data_type) (nvaldc)
+ 0         0         0         0         0         1         0         0    # R. 10: analysis-specific data (record_10)
+ 0         0                                                                # R. 11: analysis-specific data (record_11)
+ 0.00000E+00  0.50125E+03  0.99192E+07  0.10000E+01  0.00000E+00  0.00000E+00      # R. 12: analysis-specific data (record_12)
+ 0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00      # R. 13: analysis-specific data (record_13)
  \endverbatim
  *
  * For more details we refer to the general description of the I-DEAS
@@ -720,7 +720,7 @@ public:
   /**
    * @returns \p true when \p this and \p omduh are equal,
    * \p false otherwise.
-  */
+   */
   bool operator == (const MeshDataUnvHeader& omduh) const;
 
   /**
@@ -754,9 +754,9 @@ public:
    * the result type (e.g. stress, strain, velocity, etc.).
    */
   unsigned int model_type,
-               analysis_type,
-               data_characteristic,
-               result_type;
+    analysis_type,
+    data_characteristic,
+    result_type;
 
   /**
    * Record 9, second part. See first part, then we have:
@@ -776,14 +776,14 @@ public:
    * type integer.
    */
   std::vector<int> record_10,
-                   record_11;
+    record_11;
 
   /**
    * Record 12 and 13 are analysis specific data of
    * type Real.
    */
   std::vector<Real> record_12,
-                    record_13;
+    record_13;
 
 
 protected:
@@ -842,10 +842,10 @@ Number MeshData::operator() (const Node* node,
   libmesh_assert (_node_data_closed);
 
   std::map<const Node*,
-           std::vector<Number> >::const_iterator pos = _node_data.find(node);
+    std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
   if (pos == _node_data.end())
-      return libMesh::zero;
+    return libMesh::zero;
 
   // we only get here when pos != _node_data.end()
   libmesh_assert_less (i, pos->second.size());
@@ -861,7 +861,7 @@ bool MeshData::has_data (const Node* node) const
   libmesh_assert (_node_data_closed);
 
   std::map<const Node*,
-           std::vector<Number> >::const_iterator pos = _node_data.find(node);
+    std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
   return (pos != _node_data.end());
 }
@@ -875,7 +875,7 @@ const std::vector<Number>& MeshData::get_data (const Node* node) const
   libmesh_assert (_node_data_closed);
 
   std::map<const Node*,
-           std::vector<Number> >::const_iterator pos = _node_data.find(node);
+    std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
 #ifdef DEBUG
   if (pos == _node_data.end())
@@ -925,7 +925,7 @@ Number MeshData::operator() (const Elem* elem,
   libmesh_assert (_elem_data_closed);
 
   std::map<const Elem*,
-           std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
+    std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
   if (pos == _elem_data.end())
     return libMesh::zero;
@@ -944,7 +944,7 @@ bool MeshData::has_data (const Elem* elem) const
   libmesh_assert (_elem_data_closed);
 
   std::map<const Elem*,
-           std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
+    std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
   return (pos != _elem_data.end());
 }
@@ -958,7 +958,7 @@ const std::vector<Number>& MeshData::get_data (const Elem* elem) const
   libmesh_assert (_elem_data_closed);
 
   std::map<const Elem*,
-           std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
+    std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
 #ifdef DEBUG
   if (pos == _elem_data.end())

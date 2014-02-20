@@ -41,7 +41,7 @@ class TensorValue : public TypeTensor<T>
 {
 public:
 
- /**
+  /**
    * Empty constructor.
    * Gives the tensor 0 in \p LIBMESH_DIM dimensional T space.
    */
@@ -75,8 +75,8 @@ public:
                          const Scalar zx=0,
                          const Scalar zy=0,
                          typename
-                           boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                                                  const Scalar>::type zz=0);
+                         boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                         const Scalar>::type zz=0);
 
   /**
    * Constructor.  Takes 1 row vector for LIBMESH_DIM=1
@@ -164,15 +164,15 @@ TensorValue<T>::TensorValue () :
 template <typename T>
 inline
 TensorValue<T>::TensorValue
-  (const T xx,
-   const T xy,
-   const T xz,
-   const T yx,
-   const T yy,
-   const T yz,
-   const T zx,
-   const T zy,
-   const T zz) :
+(const T xx,
+ const T xy,
+ const T xz,
+ const T yx,
+ const T yy,
+ const T yz,
+ const T zx,
+ const T zy,
+ const T zz) :
   TypeTensor<T> (xx,xy,xz,yx,yy,yz,zx,zy,zz)
 {
 }
@@ -182,17 +182,17 @@ template <typename T>
 template <typename Scalar>
 inline
 TensorValue<T>::TensorValue
-  (const Scalar xx,
-   const Scalar xy,
-   const Scalar xz,
-   const Scalar yx,
-   const Scalar yy,
-   const Scalar yz,
-   const Scalar zx,
-   const Scalar zy,
-   typename
-     boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                            const Scalar>::type zz) :
+(const Scalar xx,
+ const Scalar xy,
+ const Scalar xz,
+ const Scalar yx,
+ const Scalar yy,
+ const Scalar yz,
+ const Scalar zx,
+ const Scalar zy,
+ typename
+ boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+ const Scalar>::type zz) :
   TypeTensor<T> (xx,xy,xz,yx,yy,yz,zx,zy,zz)
 {
 }

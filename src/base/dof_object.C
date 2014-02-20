@@ -432,12 +432,12 @@ void DofObject::set_dof_number(const unsigned int s,
   else
     base_idx = dn;
 
-// #ifdef DEBUG
-//   libMesh::out << " [ ";
-//   for (unsigned int i=0; i<_idx_buf.size(); i++)
-//     libMesh::out << _idx_buf[i] << " ";
-//   libMesh::out << "]\n";
-// #endif
+  // #ifdef DEBUG
+  //   libMesh::out << " [ ";
+  //   for (unsigned int i=0; i<_idx_buf.size(); i++)
+  //     libMesh::out << _idx_buf[i] << " ";
+  //   libMesh::out << "]\n";
+  // #endif
 
   libmesh_assert_equal_to (this->dof_number(s, var, comp), dn);
 }
@@ -460,7 +460,7 @@ unsigned int DofObject::packed_indexing_size() const
 
 // FIXME: it'll be tricky getting this to work with 64-bit dof_id_type
 unsigned int DofObject::unpackable_indexing_size
-  (std::vector<largest_id_type>::const_iterator begin)
+(std::vector<largest_id_type>::const_iterator begin)
 {
 #ifdef LIBMESH_ENABLE_AMR
   const int has_old_dof_object = *begin++;
@@ -477,7 +477,7 @@ unsigned int DofObject::unpackable_indexing_size
 
   return dof_header_size + this_indexing_size +
     (has_old_dof_object ?
-      unpackable_indexing_size(begin+this_indexing_size) : 0);
+     unpackable_indexing_size(begin+this_indexing_size) : 0);
 }
 
 
@@ -522,7 +522,7 @@ void DofObject::unpack_indexing(std::vector<largest_id_type>::const_iterator beg
 
 // FIXME: it'll be tricky getting this to work with 64-bit dof_id_type
 void DofObject::pack_indexing
-  (std::back_insert_iterator<std::vector<largest_id_type> > target) const
+(std::back_insert_iterator<std::vector<largest_id_type> > target) const
 {
 #ifdef LIBMESH_ENABLE_AMR
   // We might need to pack old_dof_object too

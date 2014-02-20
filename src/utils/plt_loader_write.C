@@ -453,9 +453,9 @@ void PltLoader::write_dat (const std::string& name,
   std::ofstream out_stream (name.c_str());
 
   out_stream << "TITLE=\""
-      << this->title()
-      << "\""
-      << '\n';
+             << this->title()
+             << "\""
+             << '\n';
 
   out_stream << "VARIABLES = ";
 

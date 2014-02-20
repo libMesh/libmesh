@@ -85,7 +85,7 @@ Real StatisticsVector<T>::mean() const
   for (dof_id_type i=0; i<n; i++)
     {
       the_mean += ( static_cast<Real>((*this)[i]) - the_mean ) /
-                static_cast<Real>(i + 1);
+        static_cast<Real>(i + 1);
     }
 
   STOP_LOG ("mean()", "StatisticsVector");
@@ -170,15 +170,15 @@ Real StatisticsVector<T>::variance(const Real mean_in) const
 
 
 template <typename T>
-    void StatisticsVector<T>::normalize()
+void StatisticsVector<T>::normalize()
 {
   const dof_id_type n   = this->size();
   const Real max = this->maximum();
 
   for (dof_id_type i=0; i<n; i++)
-  {
-    (*this)[i] = static_cast<T>((*this)[i] / max);
-  }
+    {
+      (*this)[i] = static_cast<T>((*this)[i] / max);
+    }
 }
 
 

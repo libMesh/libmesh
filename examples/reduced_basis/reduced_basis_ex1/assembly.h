@@ -153,11 +153,11 @@ struct OutputAssembly : ElemAssembly
 {
   OutputAssembly(Real min_x_in, Real max_x_in,
                  Real min_y_in, Real max_y_in)
-                :
-                min_x(min_x_in),
-                max_x(max_x_in),
-                min_y(min_y_in),
-                max_y(max_y_in)
+    :
+    min_x(min_x_in),
+    max_x(max_x_in),
+    min_y(min_y_in),
+    max_y(max_y_in)
   {}
 
   // Output: Average value over the region [min_x,max_x]x[min_y,max_y]

@@ -38,23 +38,23 @@ namespace libMesh
  * The \p InfEdge2 is an infinte element in 1D composed of 2 nodes.
  * It is numbered like this:
  *
-   \verbatim
-    INFEDGE2:
+ \verbatim
+ INFEDGE2:
 
-        o         closer to infinity
-        | 1
-        |
-        |
-        |
-        o         base node
-          0
-   \endverbatim
- */
+ o         closer to infinity
+ | 1
+ |
+ |
+ |
+ o         base node
+ 0
+ \endverbatim
+*/
 // ------------------------------------------------------------
 // InfEdge2 class definition
 class InfEdge2 : public Edge
 {
- public:
+public:
 
   /**
    * Constructor.  By default this element has no parent.
@@ -111,13 +111,13 @@ class InfEdge2 : public Edge
                             const IOPackage iop,
                             std::vector<dof_id_type>& conn) const;
 
-//   const std::vector<unsigned int> tecplot_connectivity(const unsigned int se=0) const;
+  //   const std::vector<unsigned int> tecplot_connectivity(const unsigned int se=0) const;
 
-//   void vtk_connectivity(const unsigned int se,
-// std::vector<unsigned int>*conn = NULL) const;
+  //   void vtk_connectivity(const unsigned int se,
+  // std::vector<unsigned int>*conn = NULL) const;
 
-//   unsigned int vtk_element_type (const unsigned int) const
-//   { return 3; }
+  //   unsigned int vtk_element_type (const unsigned int) const
+  //   { return 3; }
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

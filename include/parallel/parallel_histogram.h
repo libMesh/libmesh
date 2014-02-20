@@ -37,10 +37,10 @@ namespace libMesh
 
 namespace Parallel {
 
-  /**
-   * Defines a histogram to be used in parallel in conjuction with
-   * a \p BinSorter.
-   */
+/**
+ * Defines a histogram to be used in parallel in conjuction with
+ * a \p BinSorter.
+ */
 template <typename KeyType, typename IdxType=unsigned int>
 class Histogram : public ParallelObject
 {

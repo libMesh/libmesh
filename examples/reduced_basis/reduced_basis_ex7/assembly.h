@@ -74,7 +74,7 @@ struct AcousticsInnerProduct : ElemAssembly
       for (unsigned int i=0; i != n_p_dofs; i++)
         for (unsigned int j=0; j != n_p_dofs; j++)
           c.get_elem_jacobian()(i,j) += JxW[qp] * ( (dphi[j][qp]*dphi[i][qp]) +
-                                               (phi[j][qp]*phi[i][qp]) );
+                                                    (phi[j][qp]*phi[i][qp]) );
   }
 };
 
@@ -142,29 +142,29 @@ struct A2 : ElemAssembly
   virtual void boundary_assembly(FEMContext &c)
   {
     if( c.has_side_boundary_id(1) ) // Forcing on the horn "inlet"
-    {
-      const unsigned int p_var = 0;
+      {
+        const unsigned int p_var = 0;
 
-      FEBase* side_fe = NULL;
-      c.get_side_fe( p_var, side_fe );
+        FEBase* side_fe = NULL;
+        c.get_side_fe( p_var, side_fe );
 
-      const std::vector<Real> &JxW_face =
-        side_fe->get_JxW();
+        const std::vector<Real> &JxW_face =
+          side_fe->get_JxW();
 
-      const std::vector<std::vector<Real> >& phi_face =
-        side_fe->get_phi();
+        const std::vector<std::vector<Real> >& phi_face =
+          side_fe->get_phi();
 
-      // The number of local degrees of freedom in each variable
-      const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
+        // The number of local degrees of freedom in each variable
+        const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
-      // Now we will build the affine operator
-      unsigned int n_sidepoints = c.get_side_qrule().n_points();
+        // Now we will build the affine operator
+        unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
-      for (unsigned int qp=0; qp != n_sidepoints; qp++)
-        for (unsigned int i=0; i != n_p_dofs; i++)
-          for (unsigned int j=0; j != n_p_dofs; j++)
-            c.get_elem_jacobian()(i,j) += JxW_face[qp] * phi_face[j][qp] * phi_face[i][qp];
-    }
+        for (unsigned int qp=0; qp != n_sidepoints; qp++)
+          for (unsigned int i=0; i != n_p_dofs; i++)
+            for (unsigned int j=0; j != n_p_dofs; j++)
+              c.get_elem_jacobian()(i,j) += JxW_face[qp] * phi_face[j][qp] * phi_face[i][qp];
+      }
   }
 };
 
@@ -173,29 +173,29 @@ struct A3 : ElemAssembly
   virtual void boundary_assembly(FEMContext &c)
   {
     if( c.has_side_boundary_id(2) ) // Radiation condition on the "bubble"
-    {
-      const unsigned int p_var = 0;
+      {
+        const unsigned int p_var = 0;
 
-      FEBase* side_fe = NULL;
-      c.get_side_fe( p_var, side_fe );
+        FEBase* side_fe = NULL;
+        c.get_side_fe( p_var, side_fe );
 
-      const std::vector<Real> &JxW_face =
-        side_fe->get_JxW();
+        const std::vector<Real> &JxW_face =
+          side_fe->get_JxW();
 
-      const std::vector<std::vector<Real> >& phi_face =
-        side_fe->get_phi();
+        const std::vector<std::vector<Real> >& phi_face =
+          side_fe->get_phi();
 
-      // The number of local degrees of freedom in each variable
-      const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
+        // The number of local degrees of freedom in each variable
+        const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
-      // Now we will build the affine operator
-      unsigned int n_sidepoints = c.get_side_qrule().n_points();
+        // Now we will build the affine operator
+        unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
-      for (unsigned int qp=0; qp != n_sidepoints; qp++)
-        for (unsigned int i=0; i != n_p_dofs; i++)
-          for (unsigned int j=0; j != n_p_dofs; j++)
-            c.get_elem_jacobian()(i,j) += JxW_face[qp] * phi_face[j][qp] * phi_face[i][qp];
-    }
+        for (unsigned int qp=0; qp != n_sidepoints; qp++)
+          for (unsigned int i=0; i != n_p_dofs; i++)
+            for (unsigned int j=0; j != n_p_dofs; j++)
+              c.get_elem_jacobian()(i,j) += JxW_face[qp] * phi_face[j][qp] * phi_face[i][qp];
+      }
   }
 };
 
@@ -204,28 +204,28 @@ struct F0 : ElemAssembly
   virtual void boundary_assembly(FEMContext &c)
   {
     if( c.has_side_boundary_id(1) ) // Output is calculated on the horn "inlet"
-    {
-      const unsigned int p_var = 0;
+      {
+        const unsigned int p_var = 0;
 
-      FEBase* side_fe = NULL;
-      c.get_side_fe( p_var, side_fe );
+        FEBase* side_fe = NULL;
+        c.get_side_fe( p_var, side_fe );
 
-      const std::vector<Real> &JxW_face =
-        side_fe->get_JxW();
+        const std::vector<Real> &JxW_face =
+          side_fe->get_JxW();
 
-      const std::vector<std::vector<Real> >& phi_face =
-        side_fe->get_phi();
+        const std::vector<std::vector<Real> >& phi_face =
+          side_fe->get_phi();
 
-      // The number of local degrees of freedom in each variable
-      const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
+        // The number of local degrees of freedom in each variable
+        const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
-      // Now we will build the affine operator
-      unsigned int n_sidepoints = c.get_side_qrule().n_points();
+        // Now we will build the affine operator
+        unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
-      for (unsigned int qp=0; qp != n_sidepoints; qp++)
-        for (unsigned int i=0; i != n_p_dofs; i++)
+        for (unsigned int qp=0; qp != n_sidepoints; qp++)
+          for (unsigned int i=0; i != n_p_dofs; i++)
             c.get_elem_residual()(i) += JxW_face[qp] * phi_face[i][qp];
-    }
+      }
   }
 };
 
@@ -234,28 +234,28 @@ struct Output0 : ElemAssembly
   virtual void boundary_assembly(FEMContext &c)
   {
     if( c.has_side_boundary_id(1) ) // Forcing on the horn "inlet"
-    {
-      const unsigned int p_var = 0;
+      {
+        const unsigned int p_var = 0;
 
-      FEBase* side_fe = NULL;
-      c.get_side_fe( p_var, side_fe );
+        FEBase* side_fe = NULL;
+        c.get_side_fe( p_var, side_fe );
 
-      const std::vector<Real> &JxW_face =
-        side_fe->get_JxW();
+        const std::vector<Real> &JxW_face =
+          side_fe->get_JxW();
 
-      const std::vector<std::vector<Real> >& phi_face =
-        side_fe->get_phi();
+        const std::vector<std::vector<Real> >& phi_face =
+          side_fe->get_phi();
 
-      // The number of local degrees of freedom in each variable
-      const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
+        // The number of local degrees of freedom in each variable
+        const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
-      // Now we will build the affine operator
-      unsigned int n_sidepoints = c.get_side_qrule().n_points();
+        // Now we will build the affine operator
+        unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
-      for (unsigned int qp=0; qp != n_sidepoints; qp++)
-        for (unsigned int i=0; i != n_p_dofs; i++)
+        for (unsigned int qp=0; qp != n_sidepoints; qp++)
+          for (unsigned int i=0; i != n_p_dofs; i++)
             c.get_elem_residual()(i) += JxW_face[qp] * phi_face[i][qp];
-    }
+      }
   }
 };
 

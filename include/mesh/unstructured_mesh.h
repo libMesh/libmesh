@@ -44,13 +44,13 @@ class MeshData;
  * refinement functions from that object.  To interact with the
  * boundary, instantiate a BoundaryMesh with a reference to
  * this class, and then use that object's functionality.
-*/
+ */
 
 // ------------------------------------------------------------
 // UnstructuredMesh class definition
 class UnstructuredMesh : public MeshBase
 {
- public:
+public:
 
   /**
    * Constructor.  Takes \p dim, the dimension of the mesh.

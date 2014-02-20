@@ -6,15 +6,15 @@
 namespace libMesh
 {
 
-  void NoSolutionHistory::store()
-  {
-    // Do nothing
-  }
+void NoSolutionHistory::store()
+{
+  // Do nothing
+}
 
-  void NoSolutionHistory::retrieve()
-  {
-    // Nothing was stored, so nothing can be retrieved
-    libmesh_error();
-  }
+void NoSolutionHistory::retrieve()
+{
+  // Nothing was stored, so nothing can be retrieved
+  libmesh_error();
+}
 
 }

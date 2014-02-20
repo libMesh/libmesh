@@ -25,46 +25,46 @@
 
 namespace libMesh
 {
-  namespace SparsityPattern
-  {
+namespace SparsityPattern
+{
 
 
-    //-------------------------------------------------------
-    // we need to implement these constructors here so that
-    // a full DofMap definition is available.
-    Build::Build (const MeshBase &mesh_in,
-                  const DofMap &dof_map_in,
-                  const CouplingMatrix *dof_coupling_in,
-                  const bool implicit_neighbor_dofs_in,
-                  const bool need_full_sparsity_pattern_in) :
-      ParallelObject(dof_map_in),
-      mesh(mesh_in),
-      dof_map(dof_map_in),
-      dof_coupling(dof_coupling_in),
-      implicit_neighbor_dofs(implicit_neighbor_dofs_in),
-      need_full_sparsity_pattern(need_full_sparsity_pattern_in),
-      sparsity_pattern(),
-      nonlocal_pattern(),
-      n_nz(),
-      n_oz()
-    {}
-
-
-
-    Build::Build (Build &other, Threads::split) :
-      ParallelObject(other),
-      mesh(other.mesh),
-      dof_map(other.dof_map),
-      dof_coupling(other.dof_coupling),
-      implicit_neighbor_dofs(other.implicit_neighbor_dofs),
-      need_full_sparsity_pattern(other.need_full_sparsity_pattern),
-      sparsity_pattern(),
-      nonlocal_pattern(),
-      n_nz(),
-      n_oz()
-    {}
+//-------------------------------------------------------
+// we need to implement these constructors here so that
+// a full DofMap definition is available.
+Build::Build (const MeshBase &mesh_in,
+              const DofMap &dof_map_in,
+              const CouplingMatrix *dof_coupling_in,
+              const bool implicit_neighbor_dofs_in,
+              const bool need_full_sparsity_pattern_in) :
+  ParallelObject(dof_map_in),
+  mesh(mesh_in),
+  dof_map(dof_map_in),
+  dof_coupling(dof_coupling_in),
+  implicit_neighbor_dofs(implicit_neighbor_dofs_in),
+  need_full_sparsity_pattern(need_full_sparsity_pattern_in),
+  sparsity_pattern(),
+  nonlocal_pattern(),
+  n_nz(),
+  n_oz()
+{}
 
 
 
-  } // namespace SparsityPattern
+Build::Build (Build &other, Threads::split) :
+  ParallelObject(other),
+  mesh(other.mesh),
+  dof_map(other.dof_map),
+  dof_coupling(other.dof_coupling),
+  implicit_neighbor_dofs(other.implicit_neighbor_dofs),
+  need_full_sparsity_pattern(other.need_full_sparsity_pattern),
+  sparsity_pattern(),
+  nonlocal_pattern(),
+  n_nz(),
+  n_oz()
+{}
+
+
+
+} // namespace SparsityPattern
 } // namespace libMesh

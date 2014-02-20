@@ -63,8 +63,8 @@ public:
   VectorValue (const Scalar x,
                const Scalar y=0,
                typename
-                 boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                                        const Scalar>::type z=0);
+               boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+               const Scalar>::type z=0);
 
   /**
    * Copy-constructor.
@@ -145,8 +145,8 @@ inline
 VectorValue<T>::VectorValue (const Scalar x,
                              const Scalar y,
                              typename
-                              boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                                                     const Scalar>::type z) :
+                             boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                             const Scalar>::type z) :
   TypeVector<T> (x,y,z)
 {
 }

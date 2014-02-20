@@ -91,9 +91,9 @@ class PointLocatorBase;
 // ------------------------------------------------------------
 // Elem class definition
 class Elem : public ReferenceCountedObject<Elem>,
-  public DofObject
+             public DofObject
 {
- protected:
+protected:
 
   /**
    * Constructor.  Creates an element with \p n_nodes nodes,
@@ -107,7 +107,7 @@ class Elem : public ReferenceCountedObject<Elem>,
         Elem** elemlinkdata,
         Node** nodelinkdata);
 
- public:
+public:
 
   /**
    * Destructor.  Frees all the memory associated with the element.
@@ -377,10 +377,10 @@ class Elem : public ReferenceCountedObject<Elem>,
   void write_connectivity (std::ostream& out,
                            const IOPackage iop) const;
 
-//   /**
-//    * @returns the VTK element type of the sc-th sub-element.
-//    */
-//   virtual unsigned int vtk_element_type (const unsigned int sc) const = 0;
+  //   /**
+  //    * @returns the VTK element type of the sc-th sub-element.
+  //    */
+  //   virtual unsigned int vtk_element_type (const unsigned int sc) const = 0;
 
   /**
    * @returns the type of element that has been derived from this
@@ -505,11 +505,11 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual unsigned int opposite_node(const unsigned int n,
                                      const unsigned int s) const;
 
-//   /**
-//    * @returns the number of children this element has that
-//    * share side \p s
-//    */
-//   virtual unsigned int n_children_per_side (const unsigned int) const = 0;
+  //   /**
+  //    * @returns the number of children this element has that
+  //    * share side \p s
+  //    */
+  //   virtual unsigned int n_children_per_side (const unsigned int) const = 0;
 
   /**
    * @returns the number of sub-elements this element may be broken
@@ -778,7 +778,7 @@ public:
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
-    second_order_child_vertex (const unsigned int n) const;
+  second_order_child_vertex (const unsigned int n) const;
 
   /**
    * @returns the element type of the associated second-order element,
@@ -1154,7 +1154,7 @@ public:
 
   unsigned int packed_size() const;
 
- protected:
+protected:
 
   //-------------------------------------------------------
   // These methods compute has keys from the specified
@@ -1722,7 +1722,7 @@ const Elem* Elem::interior_parent () const
 
   // // and they [USED TO BE] only good for level-0 elements
   // if (this->level() != 0)
-    // return this->parent()->interior_parent();
+  // return this->parent()->interior_parent();
 
   // We store the interior_parent pointer after both the parent
   // neighbor and neighbor pointers
@@ -2128,7 +2128,7 @@ public:
     // libmesh_assert_greater_equal (*(_buf_begin+5), 0);
     libmesh_assert_less (static_cast<unsigned int>(*(_buf_begin+5)),
                          libMesh::global_n_processors() ||
-                   static_cast<processor_id_type>(*(_buf_begin+5)) == DofObject::invalid_processor_id);
+                         static_cast<processor_id_type>(*(_buf_begin+5)) == DofObject::invalid_processor_id);
     return static_cast<processor_id_type>(*(_buf_begin+5));
   }
 
@@ -2201,14 +2201,14 @@ public:
   std::vector<largest_id_type>::const_iterator indices() const
   {
     return _buf_begin + header_size + this->n_nodes() +
-           this->n_neighbors();
+      this->n_neighbors();
   }
 
   unsigned int packed_size() const
   {
     return this->header_size + this->n_nodes() +
-           this->n_neighbors() +
-           DofObject::unpackable_indexing_size(this->indices());
+      this->n_neighbors() +
+      DofObject::unpackable_indexing_size(this->indices());
   }
 }; // end class PackedElem
 
@@ -2353,7 +2353,7 @@ Elem::SideIter Elem::_last_side()
 struct
 Elem::side_iterator :
 variant_filter_iterator<Elem::Predicate,
-  Elem*>
+                        Elem*>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
@@ -2361,7 +2361,7 @@ variant_filter_iterator<Elem::Predicate,
                  const IterType& e,
                  const PredType& p ) :
     variant_filter_iterator<Elem::Predicate,
-      Elem*>(d,e,p) {}
+    Elem*>(d,e,p) {}
 };
 
 
@@ -2370,7 +2370,7 @@ unsigned int
 Elem::packed_size() const
 {
   return PackedElem::header_size + this->n_nodes() +
-         this->n_neighbors() + this->packed_indexing_size();
+    this->n_neighbors() + this->packed_indexing_size();
 }
 
 

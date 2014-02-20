@@ -50,7 +50,7 @@ template <typename T> class NumericVector;
 // ------------------------------------------------------------
 // RBEvaluation class definition
 class RBEvaluation : public RBParametrized,
-  public ParallelObject
+                     public ParallelObject
 {
 public:
 

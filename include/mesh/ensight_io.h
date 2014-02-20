@@ -42,7 +42,7 @@ class EquationSystems;
  */
 class EnsightIO : public MeshOutput<MeshBase>
 {
- public:
+public:
 
   /**
    * Constructor.

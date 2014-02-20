@@ -160,7 +160,7 @@ void UnsteadySolver::advance_timestep ()
     }
 
   NumericVector<Number> &old_nonlinear_soln =
-  _system.get_vector("_old_nonlinear_solution");
+    _system.get_vector("_old_nonlinear_solution");
   NumericVector<Number> &nonlinear_solution =
     *(_system.solution);
 
@@ -199,20 +199,20 @@ void UnsteadySolver::adjoint_advance_timestep ()
      _system.get_dof_map().get_send_list());
 }
 
-  void UnsteadySolver::retrieve_timestep()
-  {
-    // Retrieve all the stored vectors at the current time
-    solution_history->retrieve();
+void UnsteadySolver::retrieve_timestep()
+{
+  // Retrieve all the stored vectors at the current time
+  solution_history->retrieve();
 
-    // Dont forget to localize the old_nonlinear_solution !
-    _system.get_vector("_old_nonlinear_solution").localize
+  // Dont forget to localize the old_nonlinear_solution !
+  _system.get_vector("_old_nonlinear_solution").localize
     (*old_local_nonlinear_solution,
      _system.get_dof_map().get_send_list());
-  }
+}
 
 
 Number UnsteadySolver::old_nonlinear_solution(const dof_id_type global_dof_number)
-const
+  const
 {
   libmesh_assert_less (global_dof_number, _system.get_dof_map().n_dofs());
   libmesh_assert_less (global_dof_number, old_local_nonlinear_solution->size());

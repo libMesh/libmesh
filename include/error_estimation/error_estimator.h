@@ -49,7 +49,7 @@ template <typename T> class NumericVector;
  *
  * @author Benjamin S. Kirk, 2003.
  */
-  class ErrorEstimator
+class ErrorEstimator
 {
 public:
 

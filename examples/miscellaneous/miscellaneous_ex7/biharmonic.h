@@ -15,18 +15,18 @@ using libMesh::Real;
 using libMesh::UnstructuredMesh;
 
 // libmesh_error() and libmesh_assert() macros with a message
-#define ERROR(message)                                                                                         \
-  do {                                                                                                         \
-    libMesh::err << "Error: " << message << "\n";                                                              \
-    libmesh_error();							                                       \
+#define ERROR(message)                                  \
+  do {                                                  \
+    libMesh::err << "Error: " << message << "\n";       \
+    libmesh_error();                                    \
   } while(0)
 
-#define ASSERT(asserted, message) \
-  do {                    \
-    if(!(asserted)) {     \
-      libMesh::err << "Assertion '" #asserted "' violated: " #message; \
-      libmesh_error();    \
-    }                     \
+#define ASSERT(asserted, message)                                       \
+  do {                                                                  \
+    if(!(asserted)) {                                                   \
+      libMesh::err << "Assertion '" #asserted "' violated: " #message;  \
+      libmesh_error();                                                  \
+    }                                                                   \
   } while(0)
 
 

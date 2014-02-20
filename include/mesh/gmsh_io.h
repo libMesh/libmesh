@@ -51,7 +51,7 @@ class MeshBase;
 class GmshIO : public MeshInput<MeshBase>,
                public MeshOutput<MeshBase>
 {
- public:
+public:
 
   /**
    * Constructor.  Takes a non-const Mesh reference which it

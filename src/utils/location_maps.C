@@ -33,11 +33,11 @@
 //--------------------------------------------------------------------------
 namespace
 {
-  using libMesh::Real;
+using libMesh::Real;
 
-  // 10 bits per coordinate, to work with 32+ bit machines
-  const unsigned int chunkmax = 1024;
-  const Real chunkfloat = 1024.0;
+// 10 bits per coordinate, to work with 32+ bit machines
+const unsigned int chunkmax = 1024;
+const Real chunkfloat = 1024.0;
 }
 
 
@@ -122,7 +122,7 @@ Point LocationMap<Elem>::point_of(const Elem& elem) const
 
 template <typename T>
 T* LocationMap<T>::find(const Point& p,
-                     const Real tol)
+                        const Real tol)
 {
   START_LOG("find()","LocationMap");
 
@@ -131,12 +131,12 @@ T* LocationMap<T>::find(const Point& p,
 
   // Look for the exact key first
   std::pair<typename map_type::iterator,
-            typename map_type::iterator>
+    typename map_type::iterator>
     pos = _map.equal_range(pointkey);
 
   while (pos.first != pos.second)
     if (p.absolute_fuzzy_equals
-         (this->point_of(*(pos.first->second)), tol))
+        (this->point_of(*(pos.first->second)), tol))
       {
         STOP_LOG("find()","LocationMap");
         return pos.first->second;
@@ -152,14 +152,14 @@ T* LocationMap<T>::find(const Point& p,
           for (int zoffset = -1; zoffset != 2; ++zoffset)
             {
               std::pair<typename map_type::iterator,
-                        typename map_type::iterator>
+                typename map_type::iterator>
                 key_pos = _map.equal_range(pointkey +
                                            xoffset*chunkmax*chunkmax +
                                            yoffset*chunkmax +
                                            zoffset);
               while (key_pos.first != key_pos.second)
                 if (p.absolute_fuzzy_equals
-                     (this->point_of(*(key_pos.first->second)), tol))
+                    (this->point_of(*(key_pos.first->second)), tol))
                   {
                     STOP_LOG("find()","LocationMap");
                     return key_pos.first->second;
@@ -203,8 +203,8 @@ unsigned int LocationMap<T>::key(const Point& p)
 #endif
 
   unsigned int n0 = static_cast<unsigned int> (chunkfloat * xscaled),
-               n1 = static_cast<unsigned int> (chunkfloat * yscaled),
-               n2 = static_cast<unsigned int> (chunkfloat * zscaled);
+    n1 = static_cast<unsigned int> (chunkfloat * yscaled),
+    n2 = static_cast<unsigned int> (chunkfloat * zscaled);
 
   return chunkmax*chunkmax*n0 + chunkmax*n1 + n2;
 }
@@ -216,7 +216,7 @@ void LocationMap<Node>::fill(MeshBase& mesh)
 {
   // Populate the nodes map
   MeshBase::node_iterator  it = mesh.nodes_begin(),
-                          end = mesh.nodes_end();
+    end = mesh.nodes_end();
   for (; it != end; ++it)
     this->insert(**it);
 }
@@ -228,7 +228,7 @@ void LocationMap<Elem>::fill(MeshBase& mesh)
 {
   // Populate the elem map
   MeshBase::element_iterator       it  = mesh.active_elements_begin(),
-                                   end = mesh.active_elements_end();
+    end = mesh.active_elements_end();
   for (; it != end; ++it)
     this->insert(**it);
 }

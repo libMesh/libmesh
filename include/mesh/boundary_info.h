@@ -56,7 +56,7 @@ class MeshData;
 
 //------------------------------------------------------
 // BoundaryInfo class definition
-  class BoundaryInfo : public ParallelObject
+class BoundaryInfo : public ParallelObject
 {
 protected:
   friend class MeshBase;
@@ -473,7 +473,7 @@ public:
   static const boundary_id_type invalid_id;
 
 
- private:
+private:
 
 
   /**
@@ -494,7 +494,7 @@ public:
    */
   std::multimap<const Elem*,
                 std::pair<unsigned short int, boundary_id_type> >
-                                             _boundary_edge_id;
+  _boundary_edge_id;
 
   /**
    * Data structure that maps sides of elements
@@ -502,7 +502,7 @@ public:
    */
   std::multimap<const Elem*,
                 std::pair<unsigned short int, boundary_id_type> >
-                                             _boundary_side_id;
+  _boundary_side_id;
 
   /**
    * A collection of user-specified boundary ids for sides, edges and nodes.
@@ -546,40 +546,40 @@ public:
   std::map<boundary_id_type, std::string> _ns_id_to_name;
 
 
-//   /**
-//    * Functor class for printing a single node's info
-//    * To be used with "for_each".
-//    */
-//   class PrintNodeInfo
-//   {
-//   public:
-//     inline
-//     void operator() (const std::pair<const Node*, short int>& np) const
-//     {
-//       libMesh::out << "  (" << np.first->id()
-//      << ", "  << np.second
-//      << ")"  << std::endl;
-//     }
-//   };
+  //   /**
+  //    * Functor class for printing a single node's info
+  //    * To be used with "for_each".
+  //    */
+  //   class PrintNodeInfo
+  //   {
+  //   public:
+  //     inline
+  //     void operator() (const std::pair<const Node*, short int>& np) const
+  //     {
+  //       libMesh::out << "  (" << np.first->id()
+  //      << ", "  << np.second
+  //      << ")"  << std::endl;
+  //     }
+  //   };
 
 
-//   /**
-//    * Functor class for printing a single side's info.
-//    * To be used with "for_each".
-//    */
-//   class PrintSideInfo
-//   {
-//   public:
-//     PrintSideInfo() {}
-//     inline
-//     void operator() (const std::pair<const Elem*, std::pair<unsigned short int,short int> >& sp) const
-//     {
-//       libMesh::out << "  (" << sp.first->id()
-//      << ", "  << sp.second.first
-//      << ", "  << sp.second.second
-//      << ")"   << std::endl;
-//     }
-//   };
+  //   /**
+  //    * Functor class for printing a single side's info.
+  //    * To be used with "for_each".
+  //    */
+  //   class PrintSideInfo
+  //   {
+  //   public:
+  //     PrintSideInfo() {}
+  //     inline
+  //     void operator() (const std::pair<const Elem*, std::pair<unsigned short int,short int> >& sp) const
+  //     {
+  //       libMesh::out << "  (" << sp.first->id()
+  //      << ", "  << sp.second.first
+  //      << ", "  << sp.second.second
+  //      << ")"   << std::endl;
+  //     }
+  //   };
 
 
 

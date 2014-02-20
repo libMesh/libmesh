@@ -27,22 +27,22 @@
 namespace libMesh
 {
 
-  class FEXYZMap : public FEMap
-  {
-  public:
+class FEXYZMap : public FEMap
+{
+public:
 
-    FEXYZMap()
-      : FEMap(){}
+  FEXYZMap()
+    : FEMap(){}
 
-    virtual ~FEXYZMap(){}
+  virtual ~FEXYZMap(){}
 
-    /**
-     * Special implementation for XYZ finite elements
-     */
-    virtual void compute_face_map(int dim, const std::vector<Real>& qw,
-                                  const Elem* side);
+  /**
+   * Special implementation for XYZ finite elements
+   */
+  virtual void compute_face_map(int dim, const std::vector<Real>& qw,
+                                const Elem* side);
 
-  }; // class FEXYZMap
+}; // class FEXYZMap
 } // namespace libMesh
 
 #endif // LIBMESH_FE_XYZ_MAP_H

@@ -102,20 +102,20 @@ public:
    * @returns the current element type we're set up for
    */
   ElemType get_elem_type() const
-    { return _type; }
+  { return _type; }
 
   /**
    * @returns the current p refinement level we're initialized with
    */
   unsigned int get_p_level() const
-    { return _p_level; }
+  { return _p_level; }
 
   /**
    * @returns the number of points associated with the quadrature rule.
    */
   unsigned int n_points() const
-    { libmesh_assert (!_points.empty());
-      return libmesh_cast_int<unsigned int>(_points.size()); }
+  { libmesh_assert (!_points.empty());
+    return libmesh_cast_int<unsigned int>(_points.size()); }
 
   /**
    * @returns the dimension of the quadrature rule.
@@ -148,13 +148,13 @@ public:
    * @returns the \f$ i^{th} \f$ quadrature point on the reference object.
    */
   Point qp(const unsigned int i) const
-    { libmesh_assert_less (i, _points.size()); return _points[i]; }
+  { libmesh_assert_less (i, _points.size()); return _points[i]; }
 
   /**
    * @returns the \f$ i^{th} \f$ quadrature weight.
    */
   Real w(const unsigned int i) const
-    { libmesh_assert_less (i, _weights.size()); return _weights[i]; }
+  { libmesh_assert_less (i, _weights.size()); return _weights[i]; }
 
   /**
    * Initializes the data structures to contain a quadrature rule

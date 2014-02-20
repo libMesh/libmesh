@@ -2990,9 +2990,9 @@ Real FE<3,BERNSTEIN>::shape_second_deriv(const ElemType,
   static bool warning_given = false;
 
   if (!warning_given)
-  libMesh::err << "Second derivatives for Bernstein elements "
-                << "are not yet implemented!"
-                << std::endl;
+    libMesh::err << "Second derivatives for Bernstein elements "
+                 << "are not yet implemented!"
+                 << std::endl;
 
   warning_given = true;
   return 0.;
@@ -3010,9 +3010,9 @@ Real FE<3,BERNSTEIN>::shape_second_deriv(const Elem*,
   static bool warning_given = false;
 
   if (!warning_given)
-  libMesh::err << "Second derivatives for Bernstein elements "
-                << "are not yet implemented!"
-                << std::endl;
+    libMesh::err << "Second derivatives for Bernstein elements "
+                 << "are not yet implemented!"
+                 << std::endl;
 
   warning_given = true;
   return 0.;

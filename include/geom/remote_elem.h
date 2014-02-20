@@ -48,9 +48,9 @@ namespace libMesh
 // ------------------------------------------------------------
 // RemoteElem class definition
 class RemoteElem : public Elem,
-    public Singleton
+                   public Singleton
 {
- public:
+public:
 
   /**
    * A unique \p id to distinguish remote element links

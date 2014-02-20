@@ -42,7 +42,7 @@ namespace libMesh
 // NodeElem class definition
 class NodeElem : public Elem
 {
- public:
+public:
 
   /**
    * Constructor.  By default this element has no parent.

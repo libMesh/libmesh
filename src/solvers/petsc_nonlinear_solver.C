@@ -60,11 +60,11 @@ extern "C"
     //PetscErrorCode ierr=0;
 
     //if (its > 0)
-      libMesh::out << "  NL step "
-                   << std::setw(2) << its
-                   << std::scientific
-                   << ", |residual|_2 = " << fnorm
-                   << std::endl;
+    libMesh::out << "  NL step "
+                 << std::setw(2) << its
+                 << std::scientific
+                 << ", |residual|_2 = " << fnorm
+                 << std::endl;
 
     //return ierr;
     return 0;
@@ -242,13 +242,13 @@ extern "C"
 // PetscNonlinearSolver<> methods
 template <typename T>
 PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type& system_in) :
-    NonlinearSolver<T>(system_in),
-    _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
-    _n_linear_iterations(0),
-    _current_nonlinear_iteration_number(0),
-    _zero_out_residual(true),
-    _zero_out_jacobian(true),
-    _default_monitor(true)
+  NonlinearSolver<T>(system_in),
+  _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
+  _n_linear_iterations(0),
+  _current_nonlinear_iteration_number(0),
+  _zero_out_residual(true),
+  _zero_out_jacobian(true),
+  _default_monitor(true)
 {
 }
 
@@ -272,7 +272,7 @@ void PetscNonlinearSolver<T>::clear ()
       PetscErrorCode ierr=0;
 
       ierr = LibMeshSNESDestroy(&_snes);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       // Reset the nonlinear iteration counter.  This information is only relevant
       // *during* the solve().  After the solve is completed it should return to
@@ -298,53 +298,53 @@ void PetscNonlinearSolver<T>::init ()
       // The second argument was of type SNESProblemType, and could have a value of
       // either SNES_NONLINEAR_EQUATIONS or SNES_UNCONSTRAINED_MINIMIZATION.
       ierr = SNESCreate(this->comm().get(), SNES_NONLINEAR_EQUATIONS, &_snes);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
 #else
 
       ierr = SNESCreate(this->comm().get(),&_snes);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
 #endif
 
       if (_default_monitor)
-      {
+        {
 #if PETSC_VERSION_LESS_THAN(2,3,3)
-        ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
-                               this, PETSC_NULL);
+          ierr = SNESSetMonitor (_snes, __libmesh_petsc_snes_monitor,
+                                 this, PETSC_NULL);
 #else
-        // API name change in PETSc 2.3.3
-        ierr = SNESMonitorSet (_snes, __libmesh_petsc_snes_monitor,
-                               this, PETSC_NULL);
+          // API name change in PETSc 2.3.3
+          ierr = SNESMonitorSet (_snes, __libmesh_petsc_snes_monitor,
+                                 this, PETSC_NULL);
 #endif
-        LIBMESH_CHKERRABORT(ierr);
-      }
+          LIBMESH_CHKERRABORT(ierr);
+        }
 
 #if PETSC_VERSION_LESS_THAN(3,1,0)
       // Cannot call SNESSetOptions before SNESSetFunction when using
       // any matrix free options with PETSc 3.1.0+
       ierr = SNESSetFromOptions(_snes);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 #endif
 
       if(this->_preconditioner)
-      {
-        KSP ksp;
-        ierr = SNESGetKSP (_snes, &ksp);
-               LIBMESH_CHKERRABORT(ierr);
-        PC pc;
-        ierr = KSPGetPC(ksp,&pc);
-               LIBMESH_CHKERRABORT(ierr);
+        {
+          KSP ksp;
+          ierr = SNESGetKSP (_snes, &ksp);
+          LIBMESH_CHKERRABORT(ierr);
+          PC pc;
+          ierr = KSPGetPC(ksp,&pc);
+          LIBMESH_CHKERRABORT(ierr);
 
-        this->_preconditioner->init();
+          this->_preconditioner->init();
 
-        PCSetType(pc, PCSHELL);
-        PCShellSetContext(pc,(void*)this->_preconditioner);
+          PCSetType(pc, PCSHELL);
+          PCShellSetContext(pc,(void*)this->_preconditioner);
 
-        //Re-Use the shell functions from petsc_linear_solver
-        PCShellSetSetUp(pc,__libmesh_petsc_preconditioner_setup);
-        PCShellSetApply(pc,__libmesh_petsc_preconditioner_apply);
-      }
+          //Re-Use the shell functions from petsc_linear_solver
+          PCShellSetSetUp(pc,__libmesh_petsc_preconditioner_setup);
+          PCShellSetApply(pc,__libmesh_petsc_preconditioner_apply);
+        }
     }
 }
 
@@ -445,61 +445,61 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   Real final_residual_norm=0.;
 
   ierr = SNESSetFunction (_snes, r->vec(), __libmesh_petsc_snes_residual, this);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
-   // Only set the jacobian function if we've been provided with something to call.
-   // This allows a user to set their own jacobian function if they want to
-   if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
-   {
-     ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
-     LIBMESH_CHKERRABORT(ierr);
-   }
+  // Only set the jacobian function if we've been provided with something to call.
+  // This allows a user to set their own jacobian function if they want to
+  if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
+    {
+      ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
+      LIBMESH_CHKERRABORT(ierr);
+    }
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
-   // Only set the nullspace if we have a way of computing it and the result is non-empty.
-   if (this->nullspace || this->nullspace_object)
-   {
-     MatNullSpace msp;
-     this->build_mat_null_space(this->nullspace_object, this->nullspace, &msp);
-     if (msp)
-       {
-         ierr = MatSetNullSpace(jac->mat(), msp);
-         LIBMESH_CHKERRABORT(ierr);
-
-         ierr = MatNullSpaceDestroy(&msp);
-         LIBMESH_CHKERRABORT(ierr);
-       }
-   }
-
-   // Only set the nearnullspace if we have a way of computing it and the result is non-empty.
-   if (this->nearnullspace || this->nearnullspace_object)
-   {
-     MatNullSpace msp = PETSC_NULL;
-     this->build_mat_null_space(this->nearnullspace_object, this->nearnullspace, &msp);
-
-     if(msp) {
-       ierr = MatSetNearNullSpace(jac->mat(), msp);
-       LIBMESH_CHKERRABORT(ierr);
-
-       ierr = MatNullSpaceDestroy(&msp);
-       LIBMESH_CHKERRABORT(ierr);
-     }
-   }
-#endif
-   // Have the Krylov subspace method use our good initial guess rather than 0
-   KSP ksp;
-   ierr = SNESGetKSP (_snes, &ksp);
+  // Only set the nullspace if we have a way of computing it and the result is non-empty.
+  if (this->nullspace || this->nullspace_object)
+    {
+      MatNullSpace msp;
+      this->build_mat_null_space(this->nullspace_object, this->nullspace, &msp);
+      if (msp)
+        {
+          ierr = MatSetNullSpace(jac->mat(), msp);
           LIBMESH_CHKERRABORT(ierr);
+
+          ierr = MatNullSpaceDestroy(&msp);
+          LIBMESH_CHKERRABORT(ierr);
+        }
+    }
+
+  // Only set the nearnullspace if we have a way of computing it and the result is non-empty.
+  if (this->nearnullspace || this->nearnullspace_object)
+    {
+      MatNullSpace msp = PETSC_NULL;
+      this->build_mat_null_space(this->nearnullspace_object, this->nearnullspace, &msp);
+
+      if(msp) {
+        ierr = MatSetNearNullSpace(jac->mat(), msp);
+        LIBMESH_CHKERRABORT(ierr);
+
+        ierr = MatNullSpaceDestroy(&msp);
+        LIBMESH_CHKERRABORT(ierr);
+      }
+    }
+#endif
+  // Have the Krylov subspace method use our good initial guess rather than 0
+  KSP ksp;
+  ierr = SNESGetKSP (_snes, &ksp);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values
   ierr = KSPSetTolerances (ksp, this->initial_linear_tolerance, PETSC_DEFAULT,
                            PETSC_DEFAULT, this->max_linear_iterations);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Set the tolerances for the non-linear solver.
   ierr = SNESSetTolerances(_snes, this->absolute_residual_tolerance, this->relative_residual_tolerance,
                            this->relative_step_tolerance, this->max_nonlinear_iterations, this->max_function_evaluations);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   //Pull in command-line options
   KSPSetFromOptions(ksp);
@@ -510,38 +510,38 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
   //Set the preconditioning matrix
   if(this->_preconditioner)
-  {
-    this->_preconditioner->set_matrix(jac_in);
-    this->_preconditioner->init();
-  }
+    {
+      this->_preconditioner->set_matrix(jac_in);
+      this->_preconditioner->init();
+    }
 
-//    ierr = KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
-//           LIBMESH_CHKERRABORT(ierr);
+  //    ierr = KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
+  //           LIBMESH_CHKERRABORT(ierr);
 
-// Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
-// the last one being a pointer to an int to hold the number of iterations required.
+  // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
+  // the last one being a pointer to an int to hold the number of iterations required.
 # if PETSC_VERSION_LESS_THAN(2,2,0)
 
- ierr = SNESSolve (_snes, x->vec(), &n_iterations);
-        LIBMESH_CHKERRABORT(ierr);
+  ierr = SNESSolve (_snes, x->vec(), &n_iterations);
+  LIBMESH_CHKERRABORT(ierr);
 
-// 2.2.x style
+  // 2.2.x style
 #elif PETSC_VERSION_LESS_THAN(2,3,0)
 
- ierr = SNESSolve (_snes, x->vec());
-        LIBMESH_CHKERRABORT(ierr);
+  ierr = SNESSolve (_snes, x->vec());
+  LIBMESH_CHKERRABORT(ierr);
 
-// 2.3.x & newer style
+  // 2.3.x & newer style
 #else
 
   ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   ierr = SNESGetIterationNumber(_snes,&n_iterations);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   ierr = SNESGetLinearSolveIterations(_snes, &_n_linear_iterations);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   ierr = SNESGetFunctionNorm(_snes,&final_residual_norm);
   LIBMESH_CHKERRABORT(ierr);

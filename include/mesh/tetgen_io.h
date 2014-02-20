@@ -50,7 +50,7 @@ class MeshData;
 class TetGenIO : public MeshInput<MeshBase>,
                  public MeshOutput<MeshBase>
 {
- public:
+public:
 
   /**
    * Constructor.  Takes a writeable reference to a mesh object.
@@ -90,7 +90,7 @@ class TetGenIO : public MeshInput<MeshBase>,
    */
   std::vector<std::vector<Real> > element_attributes;
 
- private:
+private:
 
 
   //-------------------------------------------------------------

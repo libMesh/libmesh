@@ -30,17 +30,17 @@ class ExampleOneFunction : public FunctionBase<Number>
 {
   virtual Number operator() (const Point&  /*p*/,
                              const Real /*time*/)
-    {
-      return 1;
-    }
+  {
+    return 1;
+  }
 
   virtual void operator() (const Point&  /*p*/,
                            const Real /*time*/,
                            DenseVector<Number>& output)
-    {
-      for (unsigned int i=0; i != output.size(); ++i)
-        output(i) = 1;
-    }
+  {
+    for (unsigned int i=0; i != output.size(); ++i)
+      output(i) = 1;
+  }
 
   virtual void init() {}
   virtual void clear() {}

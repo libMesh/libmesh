@@ -17,14 +17,14 @@
 
 
 
- // <h1>Transient Example 1 - Solving a Transient Linear System in Parallel</h1>
- //
- // This example shows how a simple, linear transient
- // system can be solved in parallel.  The system is simple
- // scalar convection-diffusion with a specified external
- // velocity.  The initial condition is given, and the
- // solution is advanced in time with a standard Crank-Nicolson
- // time-stepping strategy.
+// <h1>Transient Example 1 - Solving a Transient Linear System in Parallel</h1>
+//
+// This example shows how a simple, linear transient
+// system can be solved in parallel.  The system is simple
+// scalar convection-diffusion with a specified external
+// velocity.  The initial condition is given, and the
+// solution is advanced in time with a standard Crank-Nicolson
+// time-stepping strategy.
 
 // C++ include files that we need
 #include <iostream>

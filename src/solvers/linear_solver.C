@@ -116,21 +116,21 @@ void
 LinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
 {
   if(this->_is_initialized)
-  {
-    libMesh::err<<"Preconditioner must be attached before the solver is initialized!"<<std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err<<"Preconditioner must be attached before the solver is initialized!"<<std::endl;
+      libmesh_error();
+    }
 
   _preconditioner_type = SHELL_PRECOND;
   _preconditioner = preconditioner;
 }
 
-  template <typename T>
+template <typename T>
 void
-  LinearSolver<T>::reuse_preconditioner(bool reuse_flag)
-  {
-    same_preconditioner = reuse_flag;
-  }
+LinearSolver<T>::reuse_preconditioner(bool reuse_flag)
+{
+  same_preconditioner = reuse_flag;
+}
 
 template <typename T>
 void
@@ -144,34 +144,34 @@ LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int>* const dofs,
 }
 
 
-  template <typename T>
-  std::pair<unsigned int, Real> LinearSolver<T>::adjoint_solve (SparseMatrix<T> & mat,
-                                                                NumericVector<T>& sol,
-                                                                NumericVector<T>& rhs,
-                                                                const double tol,
-                                                                const unsigned int n_iter)
-  {
-    // Log how long the linear solve takes.
-    START_LOG("adjoint_solve()", "LinearSolver");
+template <typename T>
+std::pair<unsigned int, Real> LinearSolver<T>::adjoint_solve (SparseMatrix<T> & mat,
+                                                              NumericVector<T>& sol,
+                                                              NumericVector<T>& rhs,
+                                                              const double tol,
+                                                              const unsigned int n_iter)
+{
+  // Log how long the linear solve takes.
+  START_LOG("adjoint_solve()", "LinearSolver");
 
-    // Take the discrete adjoint
-    mat.close();
-    mat.get_transpose(mat);
+  // Take the discrete adjoint
+  mat.close();
+  mat.get_transpose(mat);
 
-    // Call the solve function for the relevant linear algebra library and
-    // solve the transpose matrix
-    const std::pair<unsigned int, Real> totalrval =  this->solve (mat, sol, rhs, tol, n_iter);
+  // Call the solve function for the relevant linear algebra library and
+  // solve the transpose matrix
+  const std::pair<unsigned int, Real> totalrval =  this->solve (mat, sol, rhs, tol, n_iter);
 
-    // Now transpose back and restore the original matrix
-    // by taking the discrete adjoint
-    mat.get_transpose(mat);
+  // Now transpose back and restore the original matrix
+  // by taking the discrete adjoint
+  mat.get_transpose(mat);
 
-    // Stop logging the nonlinear solve
-    STOP_LOG("adjoint_solve()", "LinearSolver");
+  // Stop logging the nonlinear solve
+  STOP_LOG("adjoint_solve()", "LinearSolver");
 
-    return totalrval;
+  return totalrval;
 
-  }
+}
 
 
 //------------------------------------------------------------------

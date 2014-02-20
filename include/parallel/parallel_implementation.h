@@ -35,62 +35,62 @@ namespace Parallel {
 
 #ifdef LIBMESH_HAVE_MPI
 
-#define STANDARD_TYPE(cxxtype,mpitype) \
-template<> \
-class StandardType<cxxtype> : public DataType \
-{ \
-public: \
-  explicit \
-  StandardType(const cxxtype* = NULL) : DataType(mpitype) {} \
-}
+#define STANDARD_TYPE(cxxtype,mpitype)                                  \
+  template<>                                                            \
+  class StandardType<cxxtype> : public DataType                         \
+  {                                                                     \
+  public:                                                               \
+    explicit                                                            \
+      StandardType(const cxxtype* = NULL) : DataType(mpitype) {}        \
+  }
 
 #else
 
-#define STANDARD_TYPE(cxxtype,mpitype) \
-template<> \
-class StandardType<cxxtype> : public DataType \
-{ \
-public: \
-  explicit \
-  StandardType(const cxxtype* = NULL) : DataType() {} \
-}
+#define STANDARD_TYPE(cxxtype,mpitype)                          \
+  template<>                                                    \
+  class StandardType<cxxtype> : public DataType                 \
+  {                                                             \
+  public:                                                       \
+    explicit                                                    \
+      StandardType(const cxxtype* = NULL) : DataType() {}       \
+  }
 
 #endif
 
-#define INT_TYPE(cxxtype,mpitype) \
-STANDARD_TYPE(cxxtype,mpitype); \
- \
-template<> \
-struct Attributes<cxxtype> \
-{ \
-  static const bool has_min_max = true; \
-  static void set_lowest(cxxtype& x) { x = std::numeric_limits<cxxtype>::min(); } \
-  static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::max(); } \
-}
+#define INT_TYPE(cxxtype,mpitype)                                       \
+  STANDARD_TYPE(cxxtype,mpitype);                                       \
+                                                                        \
+  template<>                                                            \
+  struct Attributes<cxxtype>                                            \
+  {                                                                     \
+    static const bool has_min_max = true;                               \
+    static void set_lowest(cxxtype& x) { x = std::numeric_limits<cxxtype>::min(); } \
+    static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::max(); } \
+  }
 
-#define FLOAT_TYPE(cxxtype,mpitype) \
-STANDARD_TYPE(cxxtype,mpitype); \
- \
-template<> \
-struct Attributes<cxxtype> \
-{ \
-  static const bool has_min_max = true; \
-  static void set_lowest(cxxtype& x) { x = -std::numeric_limits<cxxtype>::max(); } \
-  static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::max(); } \
-}
+#define FLOAT_TYPE(cxxtype,mpitype)                                     \
+  STANDARD_TYPE(cxxtype,mpitype);                                       \
+                                                                        \
+  template<>                                                            \
+  struct Attributes<cxxtype>                                            \
+  {                                                                     \
+    static const bool has_min_max = true;                               \
+    static void set_lowest(cxxtype& x) { x = -std::numeric_limits<cxxtype>::max(); } \
+    static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::max(); } \
+  }
 
-#define CONTAINER_TYPE(cxxtype) \
-template<typename T> \
-struct Attributes<cxxtype<T> > \
-{ \
-  static const bool has_min_max = Attributes<T>::has_min_max; \
-  static void set_lowest(cxxtype<T>& x) { \
-    for (typename cxxtype<T>::iterator i = x.begin(); i != x.end(); ++i) \
-      Attributes<T>::set_lowest(*i); } \
-  static void set_highest(cxxtype<T>& x) { \
-    for (typename cxxtype<T>::iterator i = x.begin(); i != x.end(); ++i) \
-      Attributes<T>::set_highest(*i); } \
-}
+#define CONTAINER_TYPE(cxxtype)                                         \
+  template<typename T>                                                  \
+  struct Attributes<cxxtype<T> >                                        \
+  {                                                                     \
+    static const bool has_min_max = Attributes<T>::has_min_max;         \
+    static void set_lowest(cxxtype<T>& x) {                             \
+      for (typename cxxtype<T>::iterator i = x.begin(); i != x.end(); ++i) \
+        Attributes<T>::set_lowest(*i); }                                \
+    static void set_highest(cxxtype<T>& x) {                            \
+      for (typename cxxtype<T>::iterator i = x.begin(); i != x.end(); ++i) \
+        Attributes<T>::set_highest(*i); }                               \
+  }
 
 
 INT_TYPE(char,MPI_CHAR);
@@ -222,13 +222,13 @@ inline void unpack_vector_bool(const std::vector<T> &in,
 // send_receive of (vector<vector<T>>,vector<vector<T>>)
 template <typename T1, typename T2>
 inline void send_receive_vec_of_vec
-  (const unsigned int dest_processor_id,
-   std::vector<std::vector<T1> > &send,
-   const unsigned int source_processor_id,
-   std::vector<std::vector<T2> > &recv,
-   const Parallel::MessageTag &send_tag,
-   const Parallel::MessageTag &recv_tag,
-   const Parallel::Communicator &comm)
+(const unsigned int dest_processor_id,
+ std::vector<std::vector<T1> > &send,
+ const unsigned int source_processor_id,
+ std::vector<std::vector<T2> > &recv,
+ const Parallel::MessageTag &send_tag,
+ const Parallel::MessageTag &recv_tag,
+ const Parallel::Communicator &comm)
 {
   START_LOG("send_receive()", "Parallel");
 
@@ -266,7 +266,7 @@ inline void send_receive_vec_of_vec
       // The data for each inner buffer
       MPI_Pack_size (libmesh_cast_int<int>(send[i].size()),
                      Parallel::StandardType<T1>
-                       (send[i].empty() ? NULL : &send[i][0]),
+                     (send[i].empty() ? NULL : &send[i][0]),
                      comm.get(),
                      &packedsize);
       sendsize += packedsize;
@@ -439,23 +439,23 @@ inline void unpack_range (const std::vector<buffertype>& buffer,
 
 inline Communicator::Communicator () :
 #ifdef LIBMESH_HAVE_MPI
-      _communicator(MPI_COMM_NULL),
+  _communicator(MPI_COMM_NULL),
 #endif
-      _rank(0),
-      _size(1),
-      _send_mode(DEFAULT),
-      used_tag_values(),
-      _I_duped_it(false) {}
+  _rank(0),
+  _size(1),
+  _send_mode(DEFAULT),
+  used_tag_values(),
+  _I_duped_it(false) {}
 
 inline Communicator::Communicator (const communicator &comm) :
 #ifdef LIBMESH_HAVE_MPI
-      _communicator(MPI_COMM_NULL),
+  _communicator(MPI_COMM_NULL),
 #endif
-      _rank(0),
-      _size(1),
-      _send_mode(DEFAULT),
-      used_tag_values(),
-      _I_duped_it(false)
+  _rank(0),
+  _size(1),
+  _send_mode(DEFAULT),
+  used_tag_values(),
+  _I_duped_it(false)
 {
   this->assign(comm);
 }
@@ -567,7 +567,7 @@ inline Status::Status (const status &stat) :
 {}
 
 inline Status::Status (const status &stat,
- const data_type &type) :
+                       const data_type &type) :
   _status(stat),
   _datatype(type)
 {}
@@ -659,9 +659,9 @@ inline void Request::cleanup()
           // If we're done using this request, then we'd better have
           // done the work we waited for
           for (std::vector<PostWaitWork*>::iterator i =
-                   post_wait_work->first.begin();
+                 post_wait_work->first.begin();
                i != post_wait_work->first.end(); ++i)
-                libmesh_assert(!(*i));
+            libmesh_assert(!(*i));
 #endif
           delete post_wait_work;
           post_wait_work = NULL;
@@ -704,13 +704,13 @@ inline Status Request::wait ()
 #endif
   if (post_wait_work)
     for (std::vector<PostWaitWork*>::iterator i =
-             post_wait_work->first.begin();
+           post_wait_work->first.begin();
          i != post_wait_work->first.end(); ++i)
       {
         // The user should never try to give us NULL work or try
         // to wait() twice.
         libmesh_assert (*i);
-            (*i)->run();
+        (*i)->run();
         delete (*i);
         *i = NULL;
       }
@@ -725,13 +725,13 @@ inline bool Request::test ()
   int val=0;
 
   MPI_Test (&_request,
-                &val,
-                MPI_STATUS_IGNORE);
+            &val,
+            MPI_STATUS_IGNORE);
   if (val)
-        {
-          libmesh_assert          (_request == MPI_REQUEST_NULL);
-          libmesh_assert_equal_to (val, 1);
-        }
+    {
+      libmesh_assert          (_request == MPI_REQUEST_NULL);
+      libmesh_assert_equal_to (val, 1);
+    }
 
   return val;
 #else
@@ -762,7 +762,7 @@ inline void Request::add_post_wait_work(PostWaitWork* work)
   if (!post_wait_work)
     post_wait_work = new
       std::pair<std::vector <PostWaitWork* >, unsigned int>
-        (std::vector <PostWaitWork* >(), 1);
+      (std::vector <PostWaitWork* >(), 1);
   post_wait_work->first.push_back(work);
 }
 
@@ -1072,10 +1072,10 @@ inline void broadcast(T &data, const unsigned int root_id=0,
 
 template <typename Context, typename OutputContext, typename Iter, typename OutputIter>
 inline void broadcast_packed_range (const Context *context1,
-                                      Iter range_begin,
-                                      const Iter range_end,
-                                      OutputContext *context2,
-                                      OutputIter out,
+                                    Iter range_begin,
+                                    const Iter range_end,
+                                    OutputContext *context2,
+                                    OutputIter out,
                                     const unsigned int root_id = 0,
                                     const Communicator &comm = Communicator_World)
 { comm.broadcast_packed_range(context1, range_begin, range_end, context2, out, root_id); }
@@ -1114,13 +1114,13 @@ MessageTag Communicator::get_unique_tag(int tagvalue) const
     }
   used_tag_values[tagvalue] = 1;
 
-// #ifndef NDEBUG
-//   // Make sure everyone called get_unique_tag and make sure
-//   // everyone got the same value
-//   int maxval = tagvalue;
-//   this->max(maxval);
-//   libmesh_assert_equal_to (tagvalue, maxval);
-// #endif
+  // #ifndef NDEBUG
+  //   // Make sure everyone called get_unique_tag and make sure
+  //   // everyone got the same value
+  //   int maxval = tagvalue;
+  //   this->max(maxval);
+  //   libmesh_assert_equal_to (tagvalue, maxval);
+  // #endif
 
   return MessageTag(tagvalue, this);
 }
@@ -1178,7 +1178,7 @@ inline bool Communicator::verify(const T &r) const
       this->min(tempmin);
       this->max(tempmax);
       bool verified = (r == tempmin) &&
-                      (r == tempmax);
+        (r == tempmax);
       this->min(verified);
       return verified;
     }
@@ -1363,7 +1363,7 @@ inline void Communicator::min(std::vector<bool> &r) const
 {
   if (this->size() > 1 && !r.empty())
     {
-        START_LOG("min(vector<bool>)", "Parallel");
+      START_LOG("min(vector<bool>)", "Parallel");
 
       libmesh_assert(this->verify(r.size()));
 
@@ -1467,7 +1467,7 @@ inline void Communicator::minloc(std::vector<T> &r,
           min_id[i] = out[i].rank;
         }
 
-        STOP_LOG("minloc(vector)", "Parallel");
+      STOP_LOG("minloc(vector)", "Parallel");
     }
   else if (!r.empty())
     {
@@ -1674,13 +1674,13 @@ inline void Communicator::maxloc(std::vector<T> &r,
           in[i].val  = r[i];
           in[i].rank = this->rank();
         }
-        std::vector<DataPlusInt<T> > out(r.size());
-        MPI_Allreduce (&in[0],
-                       &out[0],
-                       libmesh_cast_int<int>(r.size()),
-                       dataplusint_type<T>(),
-                       MPI_MAXLOC,
-                       this->get());
+      std::vector<DataPlusInt<T> > out(r.size());
+      MPI_Allreduce (&in[0],
+                     &out[0],
+                     libmesh_cast_int<int>(r.size()),
+                     dataplusint_type<T>(),
+                     MPI_MAXLOC,
+                     this->get());
       for (std::size_t i=0; i != r.size(); ++i)
         {
           r[i]      = out[i].val;
@@ -2180,7 +2180,7 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
   // Make the Request::wait() handle deleting the buffer
   req.add_post_wait_work
     (new Parallel::PostWaitDeleteBuffer<std::vector<buffer_t> >
-       (buffer));
+     (buffer));
 
   // Non-blocking send of the buffer
   this->send(dest_processor_id, *buffer, req, tag);
@@ -2220,8 +2220,8 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
   req.add_post_wait_work
     (new Parallel::PostWaitCopyBuffer<std::vector<T>,
-       std::back_insert_iterator<std::basic_string<T> > >
-           (tempbuf, std::back_inserter(buf)));
+     std::back_insert_iterator<std::basic_string<T> > >
+     (tempbuf, std::back_inserter(buf)));
 
   // Make the Request::wait() then handle deleting the buffer
   req.add_post_wait_work
@@ -2265,9 +2265,9 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline void Communicator::receive (const unsigned int src_processor_id,
-                                     T &buf,
-                                     Request &req,
-                                     const MessageTag &tag) const
+                                   T &buf,
+                                   Request &req,
+                                   const MessageTag &tag) const
 {
   START_LOG("receive()", "Parallel");
 
@@ -2352,8 +2352,8 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
   req.add_post_wait_work
     (new Parallel::PostWaitCopyBuffer<std::vector<T>,
-       std::back_insert_iterator<std::set<T> > >
-           (vecbuf, std::back_inserter(buf)));
+     std::back_insert_iterator<std::set<T> > >
+     (vecbuf, std::back_inserter(buf)));
 
   // Make the Request::wait() then handle deleting the buffer
   req.add_post_wait_work
@@ -2368,8 +2368,8 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline Status Communicator::receive (const unsigned int src_processor_id,
-                         std::vector<T> &buf,
-                         const MessageTag &tag) const
+                                     std::vector<T> &buf,
+                                     const MessageTag &tag) const
 {
   return this->receive
     (src_processor_id, buf,
@@ -2392,9 +2392,9 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline Status Communicator::receive (const unsigned int src_processor_id,
-                         std::vector<T> &buf,
-                         const DataType &type,
-                         const MessageTag &tag) const
+                                     std::vector<T> &buf,
+                                     const DataType &type,
+                                     const MessageTag &tag) const
 {
   START_LOG("receive()", "Parallel");
 
@@ -2487,7 +2487,7 @@ inline void Communicator::receive_packed_range (const unsigned int src_processor
   // Make the Request::wait() handle unpacking the buffer
   req.add_post_wait_work
     (new Parallel::PostWaitUnpackBuffer<std::vector<buffer_t>, Context, OutputIter>
-      (buffer, context, out));
+     (buffer, context, out));
 
   // Make the Request::wait() then handle deleting the buffer
   req.add_post_wait_work
@@ -2575,7 +2575,7 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
                                        const MessageTag &recv_tag) const
 {
   if (dest_processor_id   == this->rank() &&
-        source_processor_id == this->rank())
+      source_processor_id == this->rank())
     {
       START_LOG("send_receive()", "Parallel");
       recv = sendvec;
@@ -2652,15 +2652,15 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
 
 template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
 inline void Communicator::send_receive_packed_range
-  (const unsigned int dest_processor_id,
-   const Context1* context1,
-   RangeIter send_begin,
-   const RangeIter send_end,
-   const unsigned int source_processor_id,
-   Context2* context2,
-   OutputIter out,
-   const MessageTag &send_tag,
-   const MessageTag &recv_tag) const
+(const unsigned int dest_processor_id,
+ const Context1* context1,
+ RangeIter send_begin,
+ const RangeIter send_end,
+ const unsigned int source_processor_id,
+ Context2* context2,
+ OutputIter out,
+ const MessageTag &send_tag,
+ const MessageTag &recv_tag) const
 {
   START_LOG("send_receive()", "Parallel");
 
@@ -2807,8 +2807,8 @@ inline void Communicator::allgather(T sendval,
 
 template <typename T>
 inline void Communicator::allgather
-  (std::vector<T> &r,
-   const bool identical_buffer_sizes) const
+(std::vector<T> &r,
+ const bool identical_buffer_sizes) const
 {
   if (this->size() < 2)
     return;
@@ -2885,11 +2885,11 @@ inline void Communicator::allgather
 
 template <typename Context, typename Iter, typename OutputIter>
 inline void Communicator::gather_packed_range
-  (const unsigned int root_id,
-   Context *context,
-   Iter range_begin,
-   const Iter range_end,
-   OutputIter out) const
+(const unsigned int root_id,
+ Context *context,
+ Iter range_begin,
+ const Iter range_end,
+ OutputIter out) const
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
   typedef typename Parallel::BufferType<T>::type buffer_t;
@@ -2908,10 +2908,10 @@ inline void Communicator::gather_packed_range
 
 template <typename Context, typename Iter, typename OutputIter>
 inline void Communicator::allgather_packed_range
-  (Context *context,
-   Iter range_begin,
-   const Iter range_end,
-   OutputIter out) const
+(Context *context,
+ Iter range_begin,
+ const Iter range_end,
+ OutputIter out) const
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
   typedef typename Parallel::BufferType<T>::type buffer_t;
@@ -2973,9 +2973,9 @@ inline void Communicator::broadcast (T &data, const unsigned int root_id) const
 {
   if (this->size() == 1)
     {
-        libmesh_assert (!this->rank());
-        libmesh_assert (!root_id);
-        return;
+      libmesh_assert (!this->rank());
+      libmesh_assert (!root_id);
+      return;
     }
 
   libmesh_assert_less (root_id, this->size());
@@ -3001,9 +3001,9 @@ inline void Communicator::broadcast (std::basic_string<T> &data,
 {
   if (this->size() == 1)
     {
-        libmesh_assert (!this->rank());
-        libmesh_assert (!root_id);
-        return;
+      libmesh_assert (!this->rank());
+      libmesh_assert (!root_id);
+      return;
     }
 
   libmesh_assert_less (root_id, this->size());
@@ -3020,7 +3020,7 @@ inline void Communicator::broadcast (std::basic_string<T> &data,
 
   if (this->rank() == root_id)
     for(std::size_t i=0; i<data.size(); i++)
-        data_c[i] = data[i];
+      data_c[i] = data[i];
 
   this->broadcast (data_c, root_id);
 
@@ -3158,10 +3158,10 @@ inline void Communicator::broadcast (std::set<T> &data,
 
   this->broadcast(vecdata, root_id);
   if (this->rank() != root_id)
-  {
-    data.clear();
-    data.insert(vecdata.begin(), vecdata.end());
-  }
+    {
+      data.clear();
+      data.insert(vecdata.begin(), vecdata.end());
+    }
 
   STOP_LOG("broadcast()", "Parallel");
 }
@@ -3223,12 +3223,12 @@ inline void Communicator::broadcast(std::map<T1, T2> &data,
 template <typename Context, typename OutputContext,
           typename Iter, typename OutputIter>
 inline void Communicator::broadcast_packed_range
-  (const Context *context1,
-   Iter range_begin,
-   const Iter range_end,
-   OutputContext *context2,
-   OutputIter out,
-   const unsigned int root_id) const
+(const Context *context1,
+ Iter range_begin,
+ const Iter range_end,
+ OutputContext *context2,
+ OutputIter out,
+ const unsigned int root_id) const
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
   typedef typename Parallel::BufferType<T>::type buffer_t;
@@ -3270,8 +3270,8 @@ inline void Communicator::minloc(T &, unsigned int &min_id) const { min_id = 0; 
 
 template <typename T>
 inline void Communicator::minloc
-  (std::vector<T> &r, std::vector<unsigned int> &min_id) const
-  { for (std::size_t i=0; i!= r.size(); ++i) min_id[i] = 0; }
+(std::vector<T> &r, std::vector<unsigned int> &min_id) const
+{ for (std::size_t i=0; i!= r.size(); ++i) min_id[i] = 0; }
 
 template <typename T>
 inline void Communicator::max(T &) const {}
@@ -3281,8 +3281,8 @@ inline void Communicator::maxloc(T &, unsigned int &max_id) const { max_id = 0; 
 
 template <typename T>
 inline void Communicator::maxloc
-  (std::vector<T> &r, std::vector<unsigned int> &max_id) const
-  { for (std::size_t i=0; i!= r.size(); ++i) max_id[i] = 0; }
+(std::vector<T> &r, std::vector<unsigned int> &max_id) const
+{ for (std::size_t i=0; i!= r.size(); ++i) max_id[i] = 0; }
 
 template <typename T>
 inline void Communicator::sum(T &) const {}
@@ -3325,13 +3325,13 @@ inline void Communicator::send (const unsigned int, T&, const DataType&, Request
 
 template <typename Context, typename Iter>
 inline void Communicator::send_packed_range
-  (const unsigned int, const Context*, Iter, const Iter, const MessageTag&) const
+(const unsigned int, const Context*, Iter, const Iter, const MessageTag&) const
 { libmesh_error(); }
 
 template <typename Context, typename Iter>
 inline void Communicator::send_packed_range
-  (const unsigned int, const Context*, Iter, const Iter, Request&,
-   const MessageTag&) const
+(const unsigned int, const Context*, Iter, const Iter, Request&,
+ const MessageTag&) const
 { libmesh_error(); }
 
 /**
@@ -3343,27 +3343,27 @@ inline Status Communicator::receive (const unsigned int, T&, const MessageTag&) 
 
 template <typename T>
 inline void Communicator::receive
-  (const unsigned int, T&, Request&, const MessageTag&) const
+(const unsigned int, T&, Request&, const MessageTag&) const
 { libmesh_error(); }
 
 template <typename T>
 inline Status Communicator::receive
-  (const unsigned int, T&, const DataType&, const MessageTag&) const
+(const unsigned int, T&, const DataType&, const MessageTag&) const
 { libmesh_error(); return Status(); }
 
 template <typename T>
 inline void Communicator::receive
-  (const unsigned int, T&, const DataType&, Request&, const MessageTag&) const
+(const unsigned int, T&, const DataType&, Request&, const MessageTag&) const
 { libmesh_error(); }
 
 template <typename Context, typename OutputIter>
 inline void Communicator::receive_packed_range
-  (const unsigned int, Context*, OutputIter, const MessageTag&) const
+(const unsigned int, Context*, OutputIter, const MessageTag&) const
 { libmesh_error(); }
 
 template <typename Context, typename OutputIter>
 inline void Communicator::receive_packed_range
-  (const unsigned int, Context*, OutputIter, Request&, const MessageTag&) const
+(const unsigned int, Context*, OutputIter, Request&, const MessageTag&) const
 { libmesh_error(); }
 
 /**
@@ -3390,10 +3390,10 @@ inline void Communicator::send_receive (const unsigned int send_tgt,
 template <typename Context1, typename RangeIter,
           typename Context2, typename OutputIter>
 inline void Communicator::send_receive_packed_range
-  (const unsigned int /* dest_processor_id */, const Context1*,
-   RangeIter /* send_begin */, const RangeIter /* send_end */,
-   const unsigned int /* source_processor_id */, Context2*,
-   OutputIter /* out */, const MessageTag &, const MessageTag &) const
+(const unsigned int /* dest_processor_id */, const Context1*,
+ RangeIter /* send_begin */, const RangeIter /* send_end */,
+ const unsigned int /* source_processor_id */, Context2*,
+ OutputIter /* out */, const MessageTag &, const MessageTag &) const
 { libmesh_error(); }
 
 /**

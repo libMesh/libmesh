@@ -288,7 +288,7 @@ void UnstructuredMesh::all_first_order ()
        */
       Elem* lo_elem = Elem::build
         (Elem::first_order_equivalent_type
-          (so_elem->type()), so_elem->parent()).release();
+         (so_elem->type()), so_elem->parent()).release();
 
       for (unsigned int s=0; s != so_elem->n_sides(); ++s)
         if (so_elem->neighbor(s) == remote_elem)
@@ -365,7 +365,7 @@ void UnstructuredMesh::all_first_order ()
 
   const MeshBase::node_iterator nd_end = this->nodes_end();
   MeshBase::node_iterator nd = this->nodes_begin();
-    while (nd != nd_end)
+  while (nd != nd_end)
     {
       Node *the_node = *nd;
       ++nd;
@@ -443,7 +443,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    * nodes for different dimensions
    */
   switch (this->mesh_dimension())
-  {
+    {
     case 1:
       /*
        * in 1D, there can only be order-increase from Edge2
@@ -478,7 +478,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
     default:
       // Hm?
       libmesh_error();
-  }
+    }
 
 
 
@@ -575,7 +575,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
           // does this set of vertices already has a mid-node added?
           std::pair<std::map<std::vector<dof_id_type>, Node*>::iterator,
-                    std::map<std::vector<dof_id_type>, Node*>::iterator>
+            std::map<std::vector<dof_id_type>, Node*>::iterator>
             pos = adj_vertices_to_so_nodes.equal_range (adjacent_vertices_ids);
 
           // no, not added yet
@@ -599,7 +599,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
                */
               Node* so_node = this->add_point
                 (new_location, DofObject::invalid_id,
-                this->node(adjacent_vertices_ids[0]).processor_id());
+                 this->node(adjacent_vertices_ids[0]).processor_id());
 
               /*
                * insert the new node with its defining vertex
@@ -874,15 +874,15 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
               break;
             }
-          // No need to split elements that are already triangles
+            // No need to split elements that are already triangles
           case TRI3:
           case TRI6:
             continue;
-          // Try to ignore non-2D elements for now
+            // Try to ignore non-2D elements for now
           default:
             {
               libMesh::err << "Warning, encountered non-2D element "
-                            << Utility::enum_to_string<ElemType>(etype)
+                           << Utility::enum_to_string<ElemType>(etype)
                            << " in MeshTools::Modification::all_tri(), hope that's OK..."
                            << std::endl;
             }
@@ -1019,77 +1019,77 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                     if (!edge_swap)
                       {
                         switch (sn)
-                              {
-                              case 0:
-                                {
-                                  // New remote side is Tri 0, side 0
-                                  tri0->set_neighbor(0, const_cast<RemoteElem*>(remote_elem));
-                                  break;
-                                }
-                              case 1:
-                                {
-                                  // New remote side is Tri 0, side 1
-                                  tri0->set_neighbor(1, const_cast<RemoteElem*>(remote_elem));
-                                  break;
-                                }
-                              case 2:
-                                {
-                                  // New remote side is Tri 1, side 1
-                                  tri1->set_neighbor(1, const_cast<RemoteElem*>(remote_elem));
-                                  break;
-                                }
-                              case 3:
-                                {
-                                  // New remote side is Tri 1, side 2
-                                  tri1->set_neighbor(2, const_cast<RemoteElem*>(remote_elem));
-                                  break;
-                                }
-
-                              default:
-                                {
-                                  libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
-                                  libmesh_error();
-                                }
-                              }
-                          }
-
-                        else // edge_swap==true
                           {
-                            switch (sn)
-                              {
-                              case 0:
-                                {
-                                  // New remote side is Tri 0, side 0
-                                  tri0->set_neighbor(0, const_cast<RemoteElem*>(remote_elem));
-                                  break;
-                                }
-                              case 1:
-                                {
-                                  // New remote side is Tri 1, side 0
-                                  tri1->set_neighbor(0, const_cast<RemoteElem*>(remote_elem));
-                                  break;
-                                }
-                              case 2:
-                                {
-                                  // New remote side is Tri 1, side 1
-                                  tri1->set_neighbor(1, const_cast<RemoteElem*>(remote_elem));
-                                  break;
-                                }
-                              case 3:
-                                {
-                                  // New remote side is Tri 0, side 2
-                                  tri0->set_neighbor(2, const_cast<RemoteElem*>(remote_elem));
-                                  break;
-                                }
+                          case 0:
+                            {
+                              // New remote side is Tri 0, side 0
+                              tri0->set_neighbor(0, const_cast<RemoteElem*>(remote_elem));
+                              break;
+                            }
+                          case 1:
+                            {
+                              // New remote side is Tri 0, side 1
+                              tri0->set_neighbor(1, const_cast<RemoteElem*>(remote_elem));
+                              break;
+                            }
+                          case 2:
+                            {
+                              // New remote side is Tri 1, side 1
+                              tri1->set_neighbor(1, const_cast<RemoteElem*>(remote_elem));
+                              break;
+                            }
+                          case 3:
+                            {
+                              // New remote side is Tri 1, side 2
+                              tri1->set_neighbor(2, const_cast<RemoteElem*>(remote_elem));
+                              break;
+                            }
 
-                              default:
-                                {
-                                  libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
-                                  libmesh_error();
-                                }
-                              }
-                          } // end edge_swap==true
-                      } // end if (elem->neighbor(sn) == remote_elem)
+                          default:
+                            {
+                              libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
+                              libmesh_error();
+                            }
+                          }
+                      }
+
+                    else // edge_swap==true
+                      {
+                        switch (sn)
+                          {
+                          case 0:
+                            {
+                              // New remote side is Tri 0, side 0
+                              tri0->set_neighbor(0, const_cast<RemoteElem*>(remote_elem));
+                              break;
+                            }
+                          case 1:
+                            {
+                              // New remote side is Tri 1, side 0
+                              tri1->set_neighbor(0, const_cast<RemoteElem*>(remote_elem));
+                              break;
+                            }
+                          case 2:
+                            {
+                              // New remote side is Tri 1, side 1
+                              tri1->set_neighbor(1, const_cast<RemoteElem*>(remote_elem));
+                              break;
+                            }
+                          case 3:
+                            {
+                              // New remote side is Tri 0, side 2
+                              tri0->set_neighbor(2, const_cast<RemoteElem*>(remote_elem));
+                              break;
+                            }
+
+                          default:
+                            {
+                              libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
+                              libmesh_error();
+                            }
+                          }
+                      } // end edge_swap==true
+                  } // end if (elem->neighbor(sn) == remote_elem)
               } // end for loop over sides
 
             // Determine new IDs for the split elements which will be

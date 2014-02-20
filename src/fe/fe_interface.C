@@ -38,336 +38,336 @@ FEInterface::FEInterface()
 
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-#define fe_family_switch(dim, func_and_args, prefix, suffix) \
-      do { \
-        switch (fe_t.family)                    \
-          {                                     \
-          case CLOUGH:                          \
-            prefix FE<dim,CLOUGH>::func_and_args suffix \
-          case HERMITE:                                 \
-            prefix FE<dim,HERMITE>::func_and_args suffix        \
-          case HIERARCHIC:                                      \
-            prefix FE<dim,HIERARCHIC>::func_and_args suffix     \
-          case L2_HIERARCHIC:                                   \
-            prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix  \
-          case LAGRANGE:                                        \
-            prefix FE<dim,LAGRANGE>::func_and_args suffix       \
-          case L2_LAGRANGE:                                     \
-            prefix FE<dim,L2_LAGRANGE>::func_and_args suffix    \
-          case MONOMIAL:                                        \
-            prefix FE<dim,MONOMIAL>::func_and_args suffix       \
-          case SCALAR: \
-            prefix FE<dim,SCALAR>::func_and_args suffix \
-          case BERNSTEIN:                               \
-            prefix FE<dim,BERNSTEIN>::func_and_args suffix      \
-          case SZABAB:                                          \
-            prefix FE<dim,SZABAB>::func_and_args suffix         \
-          case XYZ:                                             \
-            prefix FEXYZ<dim>::func_and_args suffix             \
-          default:                                              \
-            libmesh_error();                                    \
-          }                                                     \
-      } while (0)
+#define fe_family_switch(dim, func_and_args, prefix, suffix)    \
+  do {                                                          \
+    switch (fe_t.family)                                        \
+      {                                                         \
+      case CLOUGH:                                              \
+        prefix FE<dim,CLOUGH>::func_and_args suffix             \
+      case HERMITE:                                             \
+        prefix FE<dim,HERMITE>::func_and_args suffix            \
+      case HIERARCHIC:                                          \
+        prefix FE<dim,HIERARCHIC>::func_and_args suffix         \
+      case L2_HIERARCHIC:                                       \
+        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix      \
+      case LAGRANGE:                                            \
+        prefix FE<dim,LAGRANGE>::func_and_args suffix           \
+      case L2_LAGRANGE:                                         \
+        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix        \
+      case MONOMIAL:                                            \
+        prefix FE<dim,MONOMIAL>::func_and_args suffix           \
+      case SCALAR:                                              \
+        prefix FE<dim,SCALAR>::func_and_args suffix             \
+      case BERNSTEIN:                                           \
+        prefix FE<dim,BERNSTEIN>::func_and_args suffix          \
+      case SZABAB:                                              \
+        prefix FE<dim,SZABAB>::func_and_args suffix             \
+      case XYZ:                                                 \
+        prefix FEXYZ<dim>::func_and_args suffix                 \
+      default:                                                  \
+        libmesh_error();                                        \
+      }                                                         \
+  } while (0)
 
-#define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix) \
-      do { \
-        switch (fe_t.family)                    \
-          {                                     \
-          case CLOUGH:                          \
-            prefix FE<dim,CLOUGH>::func_and_args suffix \
-          case HERMITE:                                 \
-            prefix FE<dim,HERMITE>::func_and_args suffix        \
-          case HIERARCHIC:                                      \
-            prefix FE<dim,HIERARCHIC>::func_and_args suffix     \
-          case L2_HIERARCHIC:                                   \
-            prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix  \
-          case LAGRANGE:                                        \
-            prefix FE<dim,LAGRANGE>::func_and_args suffix       \
-          case LAGRANGE_VEC:                                    \
-            prefix FELagrangeVec<dim>::func_and_args suffix     \
-          case L2_LAGRANGE:                                     \
-            prefix FE<dim,L2_LAGRANGE>::func_and_args suffix    \
-          case MONOMIAL:                                        \
-            prefix FE<dim,MONOMIAL>::func_and_args suffix       \
-          case SCALAR: \
-            prefix FE<dim,SCALAR>::func_and_args suffix \
-          case BERNSTEIN:                               \
-            prefix FE<dim,BERNSTEIN>::func_and_args suffix      \
-          case SZABAB:                                          \
-            prefix FE<dim,SZABAB>::func_and_args suffix         \
-          case XYZ:                                             \
-            prefix FEXYZ<dim>::func_and_args suffix             \
-          case NEDELEC_ONE:                                     \
-            prefix FENedelecOne<dim>::func_and_args suffix \
-          default:                                         \
-            libmesh_error();                               \
-          }                                                \
-      } while (0)
+#define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix)   \
+  do {                                                                  \
+    switch (fe_t.family)                                                \
+      {                                                                 \
+      case CLOUGH:                                                      \
+        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
+      case HERMITE:                                                     \
+        prefix FE<dim,HERMITE>::func_and_args suffix                    \
+      case HIERARCHIC:                                                  \
+        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
+      case L2_HIERARCHIC:                                               \
+        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
+      case LAGRANGE:                                                    \
+        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
+      case LAGRANGE_VEC:                                                \
+        prefix FELagrangeVec<dim>::func_and_args suffix                 \
+      case L2_LAGRANGE:                                                 \
+        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
+      case MONOMIAL:                                                    \
+        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
+      case SCALAR:                                                      \
+        prefix FE<dim,SCALAR>::func_and_args suffix                     \
+      case BERNSTEIN:                                                   \
+        prefix FE<dim,BERNSTEIN>::func_and_args suffix                  \
+      case SZABAB:                                                      \
+        prefix FE<dim,SZABAB>::func_and_args suffix                     \
+      case XYZ:                                                         \
+        prefix FEXYZ<dim>::func_and_args suffix                         \
+      case NEDELEC_ONE:                                                 \
+        prefix FENedelecOne<dim>::func_and_args suffix                  \
+      default:                                                          \
+        libmesh_error();                                                \
+      }                                                                 \
+  } while (0)
 
-#define fe_scalar_vec_error_switch(dim, func_and_args, prefix, suffix) \
-  do { \
-  switch (fe_t.family)  \
-    {  \
-    case CLOUGH: \
-      prefix FE<dim,CLOUGH>::func_and_args suffix \
-    case HERMITE: \
-      prefix FE<dim,HERMITE>::func_and_args suffix \
-    case HIERARCHIC: \
-      prefix FE<dim,HIERARCHIC>::func_and_args suffix \
-    case L2_HIERARCHIC: \
-      prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix\
-    case LAGRANGE: \
-      prefix FE<dim,LAGRANGE>::func_and_args suffix\
-    case L2_LAGRANGE: \
-      prefix FE<dim,L2_LAGRANGE>::func_and_args suffix\
-    case MONOMIAL: \
-      prefix FE<dim,MONOMIAL>::func_and_args suffix\
-    case SCALAR: \
-      prefix FE<dim,SCALAR>::func_and_args suffix\
-    case BERNSTEIN: \
-      prefix FE<dim,BERNSTEIN>::func_and_args suffix\
-    case SZABAB: \
-      prefix FE<dim,SZABAB>::func_and_args suffix\
-    case XYZ: \
-      prefix FEXYZ<dim>::func_and_args suffix \
-    case LAGRANGE_VEC: \
-    case NEDELEC_ONE: \
-      libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args"\
-                   << std::endl;                                        \
-      libmesh_error();\
-    default: \
-      libmesh_error(); \
-    }\
-    } while(0)
+#define fe_scalar_vec_error_switch(dim, func_and_args, prefix, suffix)  \
+  do {                                                                  \
+    switch (fe_t.family)                                                \
+      {                                                                 \
+      case CLOUGH:                                                      \
+        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
+      case HERMITE:                                                     \
+        prefix FE<dim,HERMITE>::func_and_args suffix                    \
+      case HIERARCHIC:                                                  \
+        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
+      case L2_HIERARCHIC:                                               \
+        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
+      case LAGRANGE:                                                    \
+        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
+      case L2_LAGRANGE:                                                 \
+        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
+      case MONOMIAL:                                                    \
+        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
+      case SCALAR:                                                      \
+        prefix FE<dim,SCALAR>::func_and_args suffix                     \
+      case BERNSTEIN:                                                   \
+        prefix FE<dim,BERNSTEIN>::func_and_args suffix                  \
+      case SZABAB:                                                      \
+        prefix FE<dim,SZABAB>::func_and_args suffix                     \
+      case XYZ:                                                         \
+        prefix FEXYZ<dim>::func_and_args suffix                         \
+      case LAGRANGE_VEC:                                                \
+      case NEDELEC_ONE:                                                 \
+        libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args" \
+                     << std::endl;                                      \
+        libmesh_error();                                                \
+      default:                                                          \
+        libmesh_error();                                                \
+      }                                                                 \
+  } while(0)
 
 
 #define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
   do {                                                                  \
     switch (fe_t.family)                                                \
-    { \
-    case LAGRANGE_VEC: \
-      prefix FELagrangeVec<dim>::func_and_args suffix \
-    case NEDELEC_ONE:                                 \
-      prefix FENedelecOne<dim>::func_and_args suffix  \
-    case HERMITE: \
-    case HIERARCHIC: \
-    case L2_HIERARCHIC: \
-    case LAGRANGE: \
-    case L2_LAGRANGE: \
-    case MONOMIAL: \
-    case SCALAR: \
-    case BERNSTEIN: \
-    case SZABAB: \
-    case XYZ: \
-      libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::shape" \
-                   << std::endl;                                        \
-      libmesh_error();\
-    default: \
-      libmesh_error(); \
-    } \
-    } while(0)
+      {                                                                 \
+      case LAGRANGE_VEC:                                                \
+        prefix FELagrangeVec<dim>::func_and_args suffix                 \
+      case NEDELEC_ONE:                                                 \
+        prefix FENedelecOne<dim>::func_and_args suffix                  \
+      case HERMITE:                                                     \
+      case HIERARCHIC:                                                  \
+      case L2_HIERARCHIC:                                               \
+      case LAGRANGE:                                                    \
+      case L2_LAGRANGE:                                                 \
+      case MONOMIAL:                                                    \
+      case SCALAR:                                                      \
+      case BERNSTEIN:                                                   \
+      case SZABAB:                                                      \
+      case XYZ:                                                         \
+        libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::shape" \
+                     << std::endl;                                      \
+        libmesh_error();                                                \
+      default:                                                          \
+        libmesh_error();                                                \
+      }                                                                 \
+  } while(0)
 
 #else
-#define fe_family_switch(dim, func_and_args, prefix, suffix) \
-      do { \
-        switch (fe_t.family)                    \
-          {                                     \
-          case CLOUGH:                          \
-            prefix FE<dim,CLOUGH>::func_and_args suffix \
-          case HERMITE:                                 \
-            prefix FE<dim,HERMITE>::func_and_args suffix        \
-          case HIERARCHIC:                                      \
-            prefix FE<dim,HIERARCHIC>::func_and_args suffix     \
-          case L2_HIERARCHIC:                                   \
-            prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix  \
-          case LAGRANGE:                                        \
-            prefix FE<dim,LAGRANGE>::func_and_args suffix       \
-          case L2_LAGRANGE:                                     \
-            prefix FE<dim,L2_LAGRANGE>::func_and_args suffix    \
-          case MONOMIAL:                                        \
-            prefix FE<dim,MONOMIAL>::func_and_args suffix       \
-          case SCALAR: \
-            prefix FE<dim,SCALAR>::func_and_args suffix \
-          case XYZ:                                     \
-            prefix FEXYZ<dim>::func_and_args suffix     \
-          default:                                      \
-            libmesh_error();                            \
-          }                                             \
-      } while (0)
+#define fe_family_switch(dim, func_and_args, prefix, suffix)    \
+  do {                                                          \
+    switch (fe_t.family)                                        \
+      {                                                         \
+      case CLOUGH:                                              \
+        prefix FE<dim,CLOUGH>::func_and_args suffix             \
+      case HERMITE:                                             \
+        prefix FE<dim,HERMITE>::func_and_args suffix            \
+      case HIERARCHIC:                                          \
+        prefix FE<dim,HIERARCHIC>::func_and_args suffix         \
+      case L2_HIERARCHIC:                                       \
+        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix      \
+      case LAGRANGE:                                            \
+        prefix FE<dim,LAGRANGE>::func_and_args suffix           \
+      case L2_LAGRANGE:                                         \
+        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix        \
+      case MONOMIAL:                                            \
+        prefix FE<dim,MONOMIAL>::func_and_args suffix           \
+      case SCALAR:                                              \
+        prefix FE<dim,SCALAR>::func_and_args suffix             \
+      case XYZ:                                                 \
+        prefix FEXYZ<dim>::func_and_args suffix                 \
+      default:                                                  \
+        libmesh_error();                                        \
+      }                                                         \
+  } while (0)
 
-#define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix) \
-      do { \
-        switch (fe_t.family)                    \
-          {                                     \
-          case CLOUGH:                          \
-            prefix FE<dim,CLOUGH>::func_and_args suffix \
-          case HERMITE:                                 \
-            prefix FE<dim,HERMITE>::func_and_args suffix        \
-          case HIERARCHIC:                                      \
-            prefix FE<dim,HIERARCHIC>::func_and_args suffix     \
-          case L2_HIERARCHIC:                                   \
-            prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix  \
-          case LAGRANGE:                                        \
-            prefix FE<dim,LAGRANGE>::func_and_args suffix       \
-          case LAGRANGE_VEC:                                    \
-            prefix FELagrangeVec<dim>::func_and_args suffix     \
-          case L2_LAGRANGE:                                     \
-            prefix FE<dim,L2_LAGRANGE>::func_and_args suffix    \
-          case MONOMIAL:                                        \
-            prefix FE<dim,MONOMIAL>::func_and_args suffix       \
-          case SCALAR: \
-            prefix FE<dim,SCALAR>::func_and_args suffix \
-          case XYZ:                                     \
-            prefix FEXYZ<dim>::func_and_args suffix     \
-          case NEDELEC_ONE:                                \
-            prefix FENedelecOne<dim>::func_and_args suffix \
-          default:                                         \
-            libmesh_error();                               \
-          }                                                \
-      } while (0)
+#define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix)   \
+  do {                                                                  \
+    switch (fe_t.family)                                                \
+      {                                                                 \
+      case CLOUGH:                                                      \
+        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
+      case HERMITE:                                                     \
+        prefix FE<dim,HERMITE>::func_and_args suffix                    \
+      case HIERARCHIC:                                                  \
+        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
+      case L2_HIERARCHIC:                                               \
+        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
+      case LAGRANGE:                                                    \
+        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
+      case LAGRANGE_VEC:                                                \
+        prefix FELagrangeVec<dim>::func_and_args suffix                 \
+      case L2_LAGRANGE:                                                 \
+        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
+      case MONOMIAL:                                                    \
+        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
+      case SCALAR:                                                      \
+        prefix FE<dim,SCALAR>::func_and_args suffix                     \
+      case XYZ:                                                         \
+        prefix FEXYZ<dim>::func_and_args suffix                         \
+      case NEDELEC_ONE:                                                 \
+        prefix FENedelecOne<dim>::func_and_args suffix                  \
+      default:                                                          \
+        libmesh_error();                                                \
+      }                                                                 \
+  } while (0)
 
-#define fe_scalar_vec_error_switch(dim, func_and_args, prefix, suffix) \
-  do { \
-  switch (fe_t.family)  \
-    {  \
-    case CLOUGH: \
-      prefix  FE<dim,CLOUGH>::func_and_args suffix \
-    case HERMITE: \
-      prefix  FE<dim,HERMITE>::func_and_args suffix \
-    case HIERARCHIC: \
-      prefix  FE<dim,HIERARCHIC>::func_and_args suffix \
-    case L2_HIERARCHIC: \
-      prefix  FE<dim,L2_HIERARCHIC>::func_and_args suffix\
-    case LAGRANGE: \
-      prefix  FE<dim,LAGRANGE>::func_and_args suffix\
-    case L2_LAGRANGE: \
-      prefix  FE<dim,L2_LAGRANGE>::func_and_args suffix\
-    case MONOMIAL: \
-      prefix  FE<dim,MONOMIAL>::func_and_args suffix\
-    case SCALAR: \
-      prefix  FE<dim,SCALAR>::func_and_args suffix \
-    case XYZ: \
-      prefix  FEXYZ<dim>::func_and_args suffix \
-    case LAGRANGE_VEC: \
-    case NEDELEC_ONE: \
-      libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args"\
-                   << std::endl;                                        \
-      libmesh_error();\
-    default: \
-      libmesh_error(); \
-    }\
-    } while(0)
+#define fe_scalar_vec_error_switch(dim, func_and_args, prefix, suffix)  \
+  do {                                                                  \
+    switch (fe_t.family)                                                \
+      {                                                                 \
+      case CLOUGH:                                                      \
+        prefix  FE<dim,CLOUGH>::func_and_args suffix                    \
+      case HERMITE:                                                     \
+        prefix  FE<dim,HERMITE>::func_and_args suffix                   \
+      case HIERARCHIC:                                                  \
+        prefix  FE<dim,HIERARCHIC>::func_and_args suffix                \
+      case L2_HIERARCHIC:                                               \
+        prefix  FE<dim,L2_HIERARCHIC>::func_and_args suffix             \
+      case LAGRANGE:                                                    \
+        prefix  FE<dim,LAGRANGE>::func_and_args suffix                  \
+      case L2_LAGRANGE:                                                 \
+        prefix  FE<dim,L2_LAGRANGE>::func_and_args suffix               \
+      case MONOMIAL:                                                    \
+        prefix  FE<dim,MONOMIAL>::func_and_args suffix                  \
+      case SCALAR:                                                      \
+        prefix  FE<dim,SCALAR>::func_and_args suffix                    \
+      case XYZ:                                                         \
+        prefix  FEXYZ<dim>::func_and_args suffix                        \
+      case LAGRANGE_VEC:                                                \
+      case NEDELEC_ONE:                                                 \
+        libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args" \
+                     << std::endl;                                      \
+        libmesh_error();                                                \
+      default:                                                          \
+        libmesh_error();                                                \
+      }                                                                 \
+  } while(0)
 
 
 #define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
   do {                                                                  \
     switch (fe_t.family)                                                \
-    { \
-    case LAGRANGE_VEC: \
-      prefix FELagrangeVec<dim>::func_and_args suffix \
-    case NEDELEC_ONE:                                 \
-      prefix FENedelecOne<dim>::func_and_args suffix \
-    case HERMITE: \
-    case HIERARCHIC: \
-    case L2_HIERARCHIC: \
-    case LAGRANGE: \
-    case L2_LAGRANGE: \
-    case MONOMIAL: \
-    case SCALAR: \
-    case XYZ: \
-      libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::func_and_args" \
-                   << std::endl;                                        \
-      libmesh_error();\
-    default: \
-      libmesh_error(); \
-    } \
-    } while(0)
+      {                                                                 \
+      case LAGRANGE_VEC:                                                \
+        prefix FELagrangeVec<dim>::func_and_args suffix                 \
+      case NEDELEC_ONE:                                                 \
+        prefix FENedelecOne<dim>::func_and_args suffix                  \
+      case HERMITE:                                                     \
+      case HIERARCHIC:                                                  \
+      case L2_HIERARCHIC:                                               \
+      case LAGRANGE:                                                    \
+      case L2_LAGRANGE:                                                 \
+      case MONOMIAL:                                                    \
+      case SCALAR:                                                      \
+      case XYZ:                                                         \
+        libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::func_and_args" \
+                     << std::endl;                                      \
+        libmesh_error();                                                \
+      default:                                                          \
+        libmesh_error();                                                \
+      }                                                                 \
+  } while(0)
 #endif
 
 
-#define fe_switch(func_and_args) \
-  do { \
-    switch (dim) \
-      { \
-        /* 0D */ \
-      case 0: \
+#define fe_switch(func_and_args)                        \
+  do {                                                  \
+    switch (dim)                                        \
+      {                                                 \
+        /* 0D */                                        \
+      case 0:                                           \
         fe_family_switch (0, func_and_args, return, ;); \
-        /* 1D */ \
-      case 1: \
+        /* 1D */                                        \
+      case 1:                                           \
         fe_family_switch (1, func_and_args, return, ;); \
-        /* 2D */ \
-      case 2: \
+        /* 2D */                                        \
+      case 2:                                           \
         fe_family_switch (2, func_and_args, return, ;); \
-        /* 3D */ \
-      case 3: \
+        /* 3D */                                        \
+      case 3:                                           \
         fe_family_switch (3, func_and_args, return, ;); \
-      default: \
-        libmesh_error(); \
-      } \
+      default:                                          \
+        libmesh_error();                                \
+      }                                                 \
   } while (0)
 
-#define fe_with_vec_switch(func_and_args) \
-  do { \
-    switch (dim) \
-      { \
-        /* 0D */ \
-      case 0: \
-        fe_family_with_vec_switch (0, func_and_args, return, ;); \
-        /* 1D */ \
-      case 1: \
-        fe_family_with_vec_switch (1, func_and_args, return, ;); \
-        /* 2D */ \
-      case 2: \
-        fe_family_with_vec_switch (2, func_and_args, return, ;); \
-        /* 3D */ \
-      case 3: \
-        fe_family_with_vec_switch (3, func_and_args, return, ;); \
-      default: \
-        libmesh_error(); \
-      } \
+#define fe_with_vec_switch(func_and_args)                               \
+  do {                                                                  \
+    switch (dim)                                                        \
+      {                                                                 \
+        /* 0D */                                                        \
+      case 0:                                                           \
+        fe_family_with_vec_switch (0, func_and_args, return, ;);        \
+        /* 1D */                                                        \
+      case 1:                                                           \
+        fe_family_with_vec_switch (1, func_and_args, return, ;);        \
+        /* 2D */                                                        \
+      case 2:                                                           \
+        fe_family_with_vec_switch (2, func_and_args, return, ;);        \
+        /* 3D */                                                        \
+      case 3:                                                           \
+        fe_family_with_vec_switch (3, func_and_args, return, ;);        \
+      default:                                                          \
+        libmesh_error();                                                \
+      }                                                                 \
   } while (0)
 
 
-#define void_fe_switch(func_and_args) \
-  do { \
-    switch (dim) \
-      { \
-        /* 0D */ \
-      case 0: \
-        fe_family_switch (0, func_and_args, ;, ; return;); \
-        /* 1D */ \
-      case 1: \
-        fe_family_switch (1, func_and_args, ;, ; return;); \
-        /* 2D */ \
-      case 2: \
-        fe_family_switch (2, func_and_args, ;, ; return;); \
-        /* 3D */ \
-      case 3: \
-        fe_family_switch (3, func_and_args, ;, ; return;); \
-      default: \
-        libmesh_error(); \
-      } \
+#define void_fe_switch(func_and_args)                           \
+  do {                                                          \
+    switch (dim)                                                \
+      {                                                         \
+        /* 0D */                                                \
+      case 0:                                                   \
+        fe_family_switch (0, func_and_args, ;, ; return;);      \
+        /* 1D */                                                \
+      case 1:                                                   \
+        fe_family_switch (1, func_and_args, ;, ; return;);      \
+        /* 2D */                                                \
+      case 2:                                                   \
+        fe_family_switch (2, func_and_args, ;, ; return;);      \
+        /* 3D */                                                \
+      case 3:                                                   \
+        fe_family_switch (3, func_and_args, ;, ; return;);      \
+      default:                                                  \
+        libmesh_error();                                        \
+      }                                                         \
   } while (0)
 
-#define void_fe_with_vec_switch(func_and_args) \
-  do { \
-    switch (dim) \
-      { \
-        /* 0D */ \
-      case 0: \
-        fe_family_with_vec_switch (0, func_and_args, ;, ; return;); \
-        /* 1D */ \
-      case 1: \
-        fe_family_with_vec_switch (1, func_and_args, ;, ; return;); \
-        /* 2D */ \
-      case 2: \
-        fe_family_with_vec_switch (2, func_and_args, ;, ; return;); \
-        /* 3D */ \
-      case 3: \
-        fe_family_with_vec_switch (3, func_and_args, ;, ; return;); \
-      default: \
-        libmesh_error(); \
-      } \
+#define void_fe_with_vec_switch(func_and_args)                          \
+  do {                                                                  \
+    switch (dim)                                                        \
+      {                                                                 \
+        /* 0D */                                                        \
+      case 0:                                                           \
+        fe_family_with_vec_switch (0, func_and_args, ;, ; return;);     \
+        /* 1D */                                                        \
+      case 1:                                                           \
+        fe_family_with_vec_switch (1, func_and_args, ;, ; return;);     \
+        /* 2D */                                                        \
+      case 2:                                                           \
+        fe_family_with_vec_switch (2, func_and_args, ;, ; return;);     \
+        /* 3D */                                                        \
+      case 3:                                                           \
+        fe_family_with_vec_switch (3, func_and_args, ;, ; return;);     \
+      default:                                                          \
+        libmesh_error();                                                \
+      }                                                                 \
   } while (0)
 
 
@@ -509,10 +509,10 @@ void FEInterface::nodal_soln(const unsigned int dim,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if ( is_InfFE_elem(elem->type()) )
-  {
-    ifem_nodal_soln(dim, fe_t, elem, elem_soln, nodal_soln);
-    return;
-  }
+    {
+      ifem_nodal_soln(dim, fe_t, elem, elem_soln, nodal_soln);
+      return;
+    }
 
 #endif
 
@@ -590,9 +590,9 @@ void FEInterface::inverse_map (const unsigned int dim,
       ifem_inverse_map(dim, fe_t, elem, physical_points, reference_points, tolerance, secure);
       return;
 
-//       libMesh::err << "ERROR: Not implemented!"
-// << std::endl;
-//       libmesh_error();
+      //       libMesh::err << "ERROR: Not implemented!"
+      // << std::endl;
+      //       libmesh_error();
     }
 
 #endif
@@ -814,9 +814,9 @@ void FEInterface::compute_data(const unsigned int dim,
   data.init();
 
   for (unsigned int n=0; n<n_dof; n++)
-      data.shape[n] = shape(dim, p_refined, elem, n, p);
+    data.shape[n] = shape(dim, p_refined, elem, n, p);
 
-   return;
+  return;
 }
 
 
@@ -1004,297 +1004,297 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 
   switch (fe_t.family)
     {
-      case LAGRANGE:
-      case L2_LAGRANGE: // TODO: L2_LAGRANGE can have higher "max_order" than LAGRANGE
-      case LAGRANGE_VEC:
-        switch (el_t)
-          {
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 3;
-          case TRI3:
-            return 1;
-          case TRI6:
-            return 2;
-          case QUAD4:
-            return 1;
-          case QUAD8:
-          case QUAD9:
-            return 2;
-          case TET4:
-            return 1;
-          case TET10:
-            return 2;
-          case HEX8:
-            return 1;
-          case HEX20:
-          case HEX27:
-            return 2;
-          case PRISM6:
-            return 1;
-          case PRISM15:
-          case PRISM18:
-            return 2;
-          case PYRAMID5:
-            return 1;
-            case PYRAMID14:
-              return 2;
-          default:
-            return unknown;
-          }
-        break;
-      case MONOMIAL:
-        switch (el_t)
-          {
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-            case PYRAMID14:
-              return unlimited;
-          default:
-            return unknown;
-          }
-        break;
+    case LAGRANGE:
+    case L2_LAGRANGE: // TODO: L2_LAGRANGE can have higher "max_order" than LAGRANGE
+    case LAGRANGE_VEC:
+      switch (el_t)
+        {
+        case EDGE2:
+        case EDGE3:
+        case EDGE4:
+          return 3;
+        case TRI3:
+          return 1;
+        case TRI6:
+          return 2;
+        case QUAD4:
+          return 1;
+        case QUAD8:
+        case QUAD9:
+          return 2;
+        case TET4:
+          return 1;
+        case TET10:
+          return 2;
+        case HEX8:
+          return 1;
+        case HEX20:
+        case HEX27:
+          return 2;
+        case PRISM6:
+          return 1;
+        case PRISM15:
+        case PRISM18:
+          return 2;
+        case PYRAMID5:
+          return 1;
+        case PYRAMID14:
+          return 2;
+        default:
+          return unknown;
+        }
+      break;
+    case MONOMIAL:
+      switch (el_t)
+        {
+        case EDGE2:
+        case EDGE3:
+        case EDGE4:
+        case TRI3:
+        case TRI6:
+        case QUAD4:
+        case QUAD8:
+        case QUAD9:
+        case TET4:
+        case TET10:
+        case HEX8:
+        case HEX20:
+        case HEX27:
+        case PRISM6:
+        case PRISM15:
+        case PRISM18:
+        case PYRAMID5:
+        case PYRAMID14:
+          return unlimited;
+        default:
+          return unknown;
+        }
+      break;
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-      case BERNSTEIN:
-        switch (el_t)
-          {
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return unlimited;
-          case TRI3:
-            return 0;
-          case TRI6:
-            return 6;
-          case QUAD4:
-            return 0;
-          case QUAD8:
-          case QUAD9:
-            return unlimited;
-          case TET4:
-            return 1;
-          case TET10:
-            return 2;
-          case HEX8:
-            return 0;
-          case HEX20:
-            return 2;
-          case HEX27:
-            return 4;
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-            case PYRAMID14:
-              return 0;
-          default:
-            return unknown;
-          }
-        break;
-      case SZABAB:
-        switch (el_t)
-          {
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 7;
-          case TRI3:
-            return 0;
-          case TRI6:
-            return 7;
-          case QUAD4:
-            return 0;
-          case QUAD8:
-          case QUAD9:
-            return 7;
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-            case PYRAMID14:
-              return 0;
-          default:
-            return unknown;
-          }
-        break;
+    case BERNSTEIN:
+      switch (el_t)
+        {
+        case EDGE2:
+        case EDGE3:
+        case EDGE4:
+          return unlimited;
+        case TRI3:
+          return 0;
+        case TRI6:
+          return 6;
+        case QUAD4:
+          return 0;
+        case QUAD8:
+        case QUAD9:
+          return unlimited;
+        case TET4:
+          return 1;
+        case TET10:
+          return 2;
+        case HEX8:
+          return 0;
+        case HEX20:
+          return 2;
+        case HEX27:
+          return 4;
+        case PRISM6:
+        case PRISM15:
+        case PRISM18:
+        case PYRAMID5:
+        case PYRAMID14:
+          return 0;
+        default:
+          return unknown;
+        }
+      break;
+    case SZABAB:
+      switch (el_t)
+        {
+        case EDGE2:
+        case EDGE3:
+        case EDGE4:
+          return 7;
+        case TRI3:
+          return 0;
+        case TRI6:
+          return 7;
+        case QUAD4:
+          return 0;
+        case QUAD8:
+        case QUAD9:
+          return 7;
+        case TET4:
+        case TET10:
+        case HEX8:
+        case HEX20:
+        case HEX27:
+        case PRISM6:
+        case PRISM15:
+        case PRISM18:
+        case PYRAMID5:
+        case PYRAMID14:
+          return 0;
+        default:
+          return unknown;
+        }
+      break;
 #endif
-      case XYZ:
-        switch (el_t)
-          {
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-          case TRI3:
-          case TRI6:
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-            case PYRAMID14:
-              return unlimited;
-          default:
-            return unknown;
-          }
-        break;
-      case CLOUGH:
-        switch (el_t)
-          {
-          case EDGE2:
-          case EDGE3:
-            return 3;
-          case EDGE4:
-          case TRI3:
-            return 0;
-          case TRI6:
-            return 3;
-          case QUAD4:
-          case QUAD8:
-          case QUAD9:
-          case TET4:
-          case TET10:
-          case HEX8:
-          case HEX20:
-          case HEX27:
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-            case PYRAMID14:
-              return 0;
-          default:
-            return unknown;
-          }
-        break;
-      case HERMITE:
-        switch (el_t)
-          {
-          case EDGE2:
-          case EDGE3:
-            return unlimited;
-          case EDGE4:
-          case TRI3:
-          case TRI6:
-            return 0;
-          case QUAD4:
-            return 3;
-          case QUAD8:
-          case QUAD9:
-            return unlimited;
-          case TET4:
-          case TET10:
-            return 0;
-          case HEX8:
-            return 3;
-          case HEX20:
-          case HEX27:
-            return unlimited;
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-            case PYRAMID14:
-              return 0;
-          default:
-            return unknown;
-          }
-        break;
-      case HIERARCHIC:
-        switch (el_t)
-          {
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return unlimited;
-          case TRI3:
-            return 1;
-          case TRI6:
-            return unlimited;
-          case QUAD4:
-            return 1;
-          case QUAD8:
-          case QUAD9:
-            return unlimited;
-          case TET4:
-          case TET10:
-            return 0;
-          case HEX8:
-          case HEX20:
-            return 1;
-          case HEX27:
-            return unlimited;
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID14:
-            return 0;
-          default:
-            return unknown;
-          }
-        break;
-      case L2_HIERARCHIC:
-        switch (el_t)
-          {
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return unlimited;
-          case TRI3:
-            return 1;
-          case TRI6:
-            return unlimited;
-          case QUAD4:
-            return 1;
-          case QUAD8:
-          case QUAD9:
-            return unlimited;
-          case TET4:
-          case TET10:
-            return 0;
-          case HEX8:
-          case HEX20:
-            return 1;
-          case HEX27:
-            return unlimited;
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PYRAMID5:
-          case PYRAMID14:
-            return 0;
-          default:
-            return unknown;
-          }
-        break;
+    case XYZ:
+      switch (el_t)
+        {
+        case EDGE2:
+        case EDGE3:
+        case EDGE4:
+        case TRI3:
+        case TRI6:
+        case QUAD4:
+        case QUAD8:
+        case QUAD9:
+        case TET4:
+        case TET10:
+        case HEX8:
+        case HEX20:
+        case HEX27:
+        case PRISM6:
+        case PRISM15:
+        case PRISM18:
+        case PYRAMID5:
+        case PYRAMID14:
+          return unlimited;
+        default:
+          return unknown;
+        }
+      break;
+    case CLOUGH:
+      switch (el_t)
+        {
+        case EDGE2:
+        case EDGE3:
+          return 3;
+        case EDGE4:
+        case TRI3:
+          return 0;
+        case TRI6:
+          return 3;
+        case QUAD4:
+        case QUAD8:
+        case QUAD9:
+        case TET4:
+        case TET10:
+        case HEX8:
+        case HEX20:
+        case HEX27:
+        case PRISM6:
+        case PRISM15:
+        case PRISM18:
+        case PYRAMID5:
+        case PYRAMID14:
+          return 0;
+        default:
+          return unknown;
+        }
+      break;
+    case HERMITE:
+      switch (el_t)
+        {
+        case EDGE2:
+        case EDGE3:
+          return unlimited;
+        case EDGE4:
+        case TRI3:
+        case TRI6:
+          return 0;
+        case QUAD4:
+          return 3;
+        case QUAD8:
+        case QUAD9:
+          return unlimited;
+        case TET4:
+        case TET10:
+          return 0;
+        case HEX8:
+          return 3;
+        case HEX20:
+        case HEX27:
+          return unlimited;
+        case PRISM6:
+        case PRISM15:
+        case PRISM18:
+        case PYRAMID5:
+        case PYRAMID14:
+          return 0;
+        default:
+          return unknown;
+        }
+      break;
+    case HIERARCHIC:
+      switch (el_t)
+        {
+        case EDGE2:
+        case EDGE3:
+        case EDGE4:
+          return unlimited;
+        case TRI3:
+          return 1;
+        case TRI6:
+          return unlimited;
+        case QUAD4:
+          return 1;
+        case QUAD8:
+        case QUAD9:
+          return unlimited;
+        case TET4:
+        case TET10:
+          return 0;
+        case HEX8:
+        case HEX20:
+          return 1;
+        case HEX27:
+          return unlimited;
+        case PRISM6:
+        case PRISM15:
+        case PRISM18:
+        case PYRAMID5:
+        case PYRAMID14:
+          return 0;
+        default:
+          return unknown;
+        }
+      break;
+    case L2_HIERARCHIC:
+      switch (el_t)
+        {
+        case EDGE2:
+        case EDGE3:
+        case EDGE4:
+          return unlimited;
+        case TRI3:
+          return 1;
+        case TRI6:
+          return unlimited;
+        case QUAD4:
+          return 1;
+        case QUAD8:
+        case QUAD9:
+          return unlimited;
+        case TET4:
+        case TET10:
+          return 0;
+        case HEX8:
+        case HEX20:
+          return 1;
+        case HEX27:
+          return unlimited;
+        case PRISM6:
+        case PRISM15:
+        case PRISM18:
+        case PYRAMID5:
+        case PYRAMID14:
+          return 0;
+        default:
+          return unknown;
+        }
+      break;
     case NEDELEC_ONE:
       switch (el_t)
         {
@@ -1308,9 +1308,9 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
           return 0;
         }
       break;
-      default:
-        return 0;
-        break;
+    default:
+      return 0;
+      break;
     }
 }
 

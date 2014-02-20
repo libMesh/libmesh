@@ -38,14 +38,14 @@ EXTERN_C_FOR_PETSC_END
 
 namespace libMesh
 {
-  // Allow users access to these functions in case they want to reuse them.  Note that users shouldn't
-  // need access to these most of the time as they are used internally by this object.
-  extern "C"
-  {
-    PetscErrorCode __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *);
-    PetscErrorCode __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void *ctx);
-    PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx);
-  }
+// Allow users access to these functions in case they want to reuse them.  Note that users shouldn't
+// need access to these most of the time as they are used internally by this object.
+extern "C"
+{
+  PetscErrorCode __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *);
+  PetscErrorCode __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void *ctx);
+  PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx);
+}
 
 /**
  * This class provides an interface to PETSc
@@ -180,7 +180,7 @@ protected:
    */
   bool _default_monitor;
 
- private:
+private:
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
   void build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject,
                             void (*)(std::vector<NumericVector<Number>*>&, sys_type&),

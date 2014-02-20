@@ -45,40 +45,40 @@ Real FE<1,SZABAB>::shape(const ElemType,
   // It will go away in optimized mode, essentially has the same effect.
   libmesh_assert_less_equal (order, SEVENTH);
 
-//   switch (order)
-//     {
-//     case FIRST:
-//     case SECOND:
-//     case THIRD:
-//     case FOURTH:
-//     case FIFTH:
-//     case SIXTH:
-//     case SEVENTH:
+  //   switch (order)
+  //     {
+  //     case FIRST:
+  //     case SECOND:
+  //     case THIRD:
+  //     case FOURTH:
+  //     case FIFTH:
+  //     case SIXTH:
+  //     case SEVENTH:
 
-      switch(i)
-        {
-          //nodal shape functions
-        case 0: return 1./2.-1./2.*xi;
-        case 1: return 1./2.+1./2.*xi;
-        case 2: return 1./4.  *2.4494897427831780982*(xi2-1.);
-        case 3: return 1./4.  *3.1622776601683793320*(xi2-1.)*xi;
-        case 4: return 1./16. *3.7416573867739413856*((5.*xi2-6.)*xi2+1.);
-        case 5: return 3./16. *1.4142135623730950488*(3.+(-10.+7.*xi2)*xi2)*xi;
-        case 6: return 1./32. *4.6904157598234295546*(-1.+(15.+(-35.+21.*xi2)*xi2)*xi2);
-        case 7: return 1./32. *5.0990195135927848300*(-5.+(35.+(-63.+33.*xi2)*xi2)*xi2)*xi;
-        case 8: return 1./256.*5.4772255750516611346*(5.+(-140.+(630.+(-924.+429.*xi2)*xi2)*xi2)*xi2);
+  switch(i)
+    {
+      //nodal shape functions
+    case 0: return 1./2.-1./2.*xi;
+    case 1: return 1./2.+1./2.*xi;
+    case 2: return 1./4.  *2.4494897427831780982*(xi2-1.);
+    case 3: return 1./4.  *3.1622776601683793320*(xi2-1.)*xi;
+    case 4: return 1./16. *3.7416573867739413856*((5.*xi2-6.)*xi2+1.);
+    case 5: return 3./16. *1.4142135623730950488*(3.+(-10.+7.*xi2)*xi2)*xi;
+    case 6: return 1./32. *4.6904157598234295546*(-1.+(15.+(-35.+21.*xi2)*xi2)*xi2);
+    case 7: return 1./32. *5.0990195135927848300*(-5.+(35.+(-63.+33.*xi2)*xi2)*xi2)*xi;
+    case 8: return 1./256.*5.4772255750516611346*(5.+(-140.+(630.+(-924.+429.*xi2)*xi2)*xi2)*xi2);
 
-        default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
-        }
+    default:
+      libMesh::err << "Invalid shape function index!" << std::endl;
+      libmesh_error();
+    }
 
-//     default:
-//       {
-// libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
-// libmesh_error();
-//       }
-//     }
+  //     default:
+  //       {
+  // libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
+  // libmesh_error();
+  //       }
+  //     }
 
   libmesh_error();
   return 0.;
@@ -116,39 +116,39 @@ Real FE<1,SZABAB>::shape_deriv(const ElemType,
   // It will go away in optimized mode, essentially has the same effect.
   libmesh_assert_less_equal (order, SEVENTH);
 
-//   switch (order)
-//     {
-//     case FIRST:
-//     case SECOND:
-//     case THIRD:
-//     case FOURTH:
-//     case FIFTH:
-//     case SIXTH:
-//     case SEVENTH:
+  //   switch (order)
+  //     {
+  //     case FIRST:
+  //     case SECOND:
+  //     case THIRD:
+  //     case FOURTH:
+  //     case FIFTH:
+  //     case SIXTH:
+  //     case SEVENTH:
 
-      switch(i)
-        {
-        case 0:return -1./2.;
-        case 1:return 1./2.;
-        case 2:return 1./2.*2.4494897427831780982*xi;
-        case 3:return -1./4.*3.1622776601683793320+3./4.*3.1622776601683793320*xi2;
-        case 4:return 1./16.*3.7416573867739413856*(-12.+20*xi2)*xi;
-        case 5:return 9./16.*1.4142135623730950488+(-45./8.*1.4142135623730950488+105./16.*1.4142135623730950488*xi2)*xi2;
-        case 6:return 1./32.*4.6904157598234295546*(30.+(-140.+126.*xi2)*xi2)*xi;
-        case 7:return -5./32.*5.0990195135927848300+(105./32.*5.0990195135927848300+(-315./32.*5.0990195135927848300+231./32.*5.0990195135927848300*xi2)*xi2)*xi2;
-        case 8:return 1./256.*5.4772255750516611346*(-280.+(2520.+(-5544.+3432.*xi2)*xi2)*xi2)*xi;
+  switch(i)
+    {
+    case 0:return -1./2.;
+    case 1:return 1./2.;
+    case 2:return 1./2.*2.4494897427831780982*xi;
+    case 3:return -1./4.*3.1622776601683793320+3./4.*3.1622776601683793320*xi2;
+    case 4:return 1./16.*3.7416573867739413856*(-12.+20*xi2)*xi;
+    case 5:return 9./16.*1.4142135623730950488+(-45./8.*1.4142135623730950488+105./16.*1.4142135623730950488*xi2)*xi2;
+    case 6:return 1./32.*4.6904157598234295546*(30.+(-140.+126.*xi2)*xi2)*xi;
+    case 7:return -5./32.*5.0990195135927848300+(105./32.*5.0990195135927848300+(-315./32.*5.0990195135927848300+231./32.*5.0990195135927848300*xi2)*xi2)*xi2;
+    case 8:return 1./256.*5.4772255750516611346*(-280.+(2520.+(-5544.+3432.*xi2)*xi2)*xi2)*xi;
 
-        default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
-        }
+    default:
+      libMesh::err << "Invalid shape function index!" << std::endl;
+      libmesh_error();
+    }
 
-//     default:
-//       {
-// libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
-// libmesh_error();
-//       }
-//     }
+  //     default:
+  //       {
+  // libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
+  // libmesh_error();
+  //       }
+  //     }
 
   libmesh_error();
   return 0.;
@@ -181,9 +181,9 @@ Real FE<1,SZABAB>::shape_second_deriv(const ElemType,
   static bool warning_given = false;
 
   if (!warning_given)
-  libMesh::err << "Second derivatives for Szabab elements "
-            << " are not yet implemented!"
-            << std::endl;
+    libMesh::err << "Second derivatives for Szabab elements "
+                 << " are not yet implemented!"
+                 << std::endl;
 
   warning_given = true;
   return 0.;
@@ -201,9 +201,9 @@ Real FE<1,SZABAB>::shape_second_deriv(const Elem*,
   static bool warning_given = false;
 
   if (!warning_given)
-  libMesh::err << "Second derivatives for Szabab elements "
-            << " are not yet implemented!"
-            << std::endl;
+    libMesh::err << "Second derivatives for Szabab elements "
+                 << " are not yet implemented!"
+                 << std::endl;
 
   warning_given = true;
   return 0.;

@@ -50,7 +50,7 @@ namespace libMesh
 template <class MT>
 class MeshInput
 {
- protected:
+protected:
 
   /**
    * Default constructor. Will set the _obj to NULL, effectively
@@ -66,7 +66,7 @@ class MeshInput
   explicit
   MeshInput (MT&, const bool is_parallel_format = false);
 
- public:
+public:
 
   /**
    * Destructor.
@@ -79,7 +79,7 @@ class MeshInput
   virtual void read (const std::string&) = 0;
 
 
- protected:
+protected:
 
   /**
    * Returns the object as a writeable reference.
@@ -100,7 +100,7 @@ class MeshInput
                            const char comment_start);
 
 
- private:
+private:
 
 
   /**
@@ -144,8 +144,8 @@ MeshInput<MT>::MeshInput (MT& obj, const bool is_parallel_format) :
       if (this->mesh().processor_id() == 0)
         {
           libmesh_do_once(libMesh::out <<
-            "Warning:  This MeshOutput subclass only supports meshes which have been serialized!"
-            << std::endl;);
+                          "Warning:  This MeshOutput subclass only supports meshes which have been serialized!"
+                          << std::endl;);
         }
     }
 }

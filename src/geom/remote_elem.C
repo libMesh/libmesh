@@ -26,25 +26,25 @@
 
 namespace
 {
-  using namespace libMesh;
+using namespace libMesh;
 
-  typedef Threads::spin_mutex RemoteElemMutex;
-  RemoteElemMutex remote_elem_mtx;
+typedef Threads::spin_mutex RemoteElemMutex;
+RemoteElemMutex remote_elem_mtx;
 
 
-  // Class to be dispatched by Singleton::setup()
-  // to create the \p RemoteElem singleton.
-  // While this actual object has file-level static
-  // scope and will be initialized before main(),
-  // importantly the setup() method will not be invoked
-  // until after main().
-  class RemoteElemSetup : public Singleton::Setup
+// Class to be dispatched by Singleton::setup()
+// to create the \p RemoteElem singleton.
+// While this actual object has file-level static
+// scope and will be initialized before main(),
+// importantly the setup() method will not be invoked
+// until after main().
+class RemoteElemSetup : public Singleton::Setup
+{
+  void setup ()
   {
-    void setup ()
-    {
-      RemoteElem::create();
-    }
-  } remote_elem_setup;
+    RemoteElem::create();
+  }
+} remote_elem_setup;
 }
 
 
@@ -52,34 +52,34 @@ namespace
 namespace libMesh
 {
 
-  // Pointer to singleton Remote Element (to be created in
-  // libMesh::init()
-  const RemoteElem* remote_elem;
+// Pointer to singleton Remote Element (to be created in
+// libMesh::init()
+const RemoteElem* remote_elem;
 
 
-  RemoteElem::~RemoteElem()
-  {
-    RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
+RemoteElem::~RemoteElem()
+{
+  RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
 
-    remote_elem = NULL;
-  }
+  remote_elem = NULL;
+}
 
 
 
-  const Elem & RemoteElem::create ()
-  {
-    if (remote_elem != NULL)
-      return *remote_elem;
-
-    RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
-
-    // check again - object could have been created while waiting
-    // for the lock to acquire!
-    if (remote_elem == NULL)
-      remote_elem = new RemoteElem;
-
+const Elem & RemoteElem::create ()
+{
+  if (remote_elem != NULL)
     return *remote_elem;
-  }
+
+  RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
+
+  // check again - object could have been created while waiting
+  // for the lock to acquire!
+  if (remote_elem == NULL)
+    remote_elem = new RemoteElem;
+
+  return *remote_elem;
+}
 
 
 } // namespace libMesh

@@ -4,10 +4,10 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
-#define NUMERICVECTORTEST \
-  CPPUNIT_TEST( testLocalize ); \
-  CPPUNIT_TEST( testLocalizeBase ); \
-  CPPUNIT_TEST( testLocalizeToOne ); \
+#define NUMERICVECTORTEST                       \
+  CPPUNIT_TEST( testLocalize );                 \
+  CPPUNIT_TEST( testLocalizeBase );             \
+  CPPUNIT_TEST( testLocalizeToOne );            \
   CPPUNIT_TEST( testLocalizeToOneBase );
 
 using namespace libMesh;
@@ -32,7 +32,7 @@ public:
 
     // a different size on each processor.
     unsigned int local_size  = block_size +
-		    static_cast<unsigned int>(libMesh::global_processor_id());
+      static_cast<unsigned int>(libMesh::global_processor_id());
     unsigned int global_size = 0;
 
     for (processor_id_type p=0; p<libMesh::global_n_processors(); p++)

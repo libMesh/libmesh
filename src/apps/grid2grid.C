@@ -271,7 +271,7 @@ int main (int argc, char** argv)
                     // Interpolate the coarse grid solution.
                     for (unsigned int i=0; i<fe_coarse.n_shape_functions(); i++)
                       coarse_soln += coarse_solution[coarse_element->node(i)*nv + c]*
-                                     fe_coarse.shape(coarse_element, SECOND, i, mapped_point);
+                        fe_coarse.shape(coarse_element, SECOND, i, mapped_point);
 
                     diff_solution[gn*nv + c] = coarse_soln - fine_solution[gn*nv + c];
                   }

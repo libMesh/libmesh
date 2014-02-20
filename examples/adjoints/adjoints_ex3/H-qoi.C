@@ -16,7 +16,7 @@ void CoupledSystemQoI::init_qoi( std::vector<Number>& sys_qoi)
 // We only have one QoI, so we don't bother checking the qois argument
 // to see if it was requested from us
 void CoupledSystemQoI::side_qoi_derivative (DiffContext &context,
-					 const QoISet & /* qois */)
+                                            const QoISet & /* qois */)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 

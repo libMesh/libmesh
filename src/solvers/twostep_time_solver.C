@@ -55,7 +55,7 @@ void TwostepTimeSolver::solve()
 
   // Calculating error values each time
   Real single_norm(0.), double_norm(0.), error_norm(0.),
-       relative_error(0.);
+    relative_error(0.);
 
   while (!max_tolerance_met)
     {
@@ -67,7 +67,7 @@ void TwostepTimeSolver::solve()
       if (!quiet)
         {
           libMesh::out << "\n === Computing adaptive timestep === "
-                        << std::endl;
+                       << std::endl;
         }
 
       // Use the double-length timestep first (so the
@@ -137,12 +137,12 @@ void TwostepTimeSolver::solve()
           libMesh::out << "Error norm = " << error_norm << std::endl;
           libMesh::out << "Local relative error = "
                        << (error_norm /
-                            std::max(double_norm, single_norm))
-                        << std::endl;
+                           std::max(double_norm, single_norm))
+                       << std::endl;
           libMesh::out << "Global relative error = "
                        << (error_norm / _system.deltat /
-                            std::max(double_norm, single_norm))
-                        << std::endl;
+                           std::max(double_norm, single_norm))
+                       << std::endl;
           libMesh::out << "old delta t = " << _system.deltat << std::endl;
         }
 
@@ -165,9 +165,9 @@ void TwostepTimeSolver::solve()
           if (!quiet)
             {
               libMesh::out << "Failed to meet upper error tolerance"
-                            << std::endl;
+                           << std::endl;
               libMesh::out << "Retrying with delta t = "
-                            << _system.deltat << std::endl;
+                           << _system.deltat << std::endl;
             }
         }
       else
@@ -209,7 +209,7 @@ void TwostepTimeSolver::solve()
 
   Real shrink_or_growth_factor =
     this->global_tolerance ? global_shrink_or_growth_factor :
-                             local_shrink_or_growth_factor;
+    local_shrink_or_growth_factor;
 
   if (this->max_growth && this->max_growth < shrink_or_growth_factor)
     {
@@ -217,7 +217,7 @@ void TwostepTimeSolver::solve()
         {
           libMesh::out << "delta t is constrained by max_growth" << std::endl;
         }
-        shrink_or_growth_factor = this->max_growth;
+      shrink_or_growth_factor = this->max_growth;
     }
 
   _system.deltat *= shrink_or_growth_factor;
@@ -228,7 +228,7 @@ void TwostepTimeSolver::solve()
       if (!quiet)
         {
           libMesh::out << "delta t is constrained by maximum-allowable delta t."
-                        << std::endl;
+                       << std::endl;
         }
       _system.deltat = this->max_deltat;
     }
@@ -239,7 +239,7 @@ void TwostepTimeSolver::solve()
       if (!quiet)
         {
           libMesh::out << "delta t is constrained by minimum-allowable delta t."
-                        << std::endl;
+                       << std::endl;
         }
       _system.deltat = this->min_deltat;
     }

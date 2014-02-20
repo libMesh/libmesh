@@ -83,7 +83,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
   const std::vector<numeric_index_type>& n_nz = this->_dof_map->get_n_nz();
   const std::vector<numeric_index_type>& n_oz = this->_dof_map->get_n_oz();
 
-   // Make sure the sparsity pattern isn't empty
+  // Make sure the sparsity pattern isn't empty
   libmesh_assert_equal_to (n_nz.size(), n_l);
   libmesh_assert_equal_to (n_oz.size(), n_l);
 
@@ -203,8 +203,8 @@ void EpetraMatrix<T>::zero ()
 template <typename T>
 void EpetraMatrix<T>::clear ()
 {
-//  delete _mat;
-//  delete _map;
+  //  delete _mat;
+  //  delete _map;
 
   this->_is_initialized = false;
 
@@ -313,9 +313,9 @@ EpetraMatrix<T>::EpetraMatrix(const Parallel::Communicator &comm)
 template <typename T>
 EpetraMatrix<T>::EpetraMatrix(Epetra_FECrsMatrix * m,
                               const Parallel::Communicator &comm)
- : SparseMatrix<T>(comm),
-   _destroy_mat_on_exit(false),
-   _use_transpose(false) // dumb guess is the best we can do...
+  : SparseMatrix<T>(comm),
+    _destroy_mat_on_exit(false),
+    _use_transpose(false) // dumb guess is the best we can do...
 {
   this->_mat = m;
   this->_is_initialized = true;
@@ -497,8 +497,8 @@ bool EpetraMatrix<T>::closed() const
 template <typename T>
 void EpetraMatrix<T>::swap(EpetraMatrix<T> & m)
 {
-   std::swap(_mat, m._mat);
-   std::swap(_destroy_mat_on_exit, m._destroy_mat_on_exit);
+  std::swap(_mat, m._mat);
+  std::swap(_destroy_mat_on_exit, m._destroy_mat_on_exit);
 }
 
 

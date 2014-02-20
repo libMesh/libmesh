@@ -17,11 +17,11 @@
 
 
 
- // <h1> Systems Example 6 - 3D Linear Elastic Cantilever </h1>
- //      By David Knezevic
- //
- // This is a 3D version of systems_of_equations_ex4.
- // In this case we also compute and plot stresses.
+// <h1> Systems Example 6 - 3D Linear Elastic Cantilever </h1>
+//      By David Knezevic
+//
+// This is a 3D version of systems_of_equations_ex4.
+// In this case we also compute and plot stresses.
 
 
 // C++ include files that we need
@@ -121,72 +121,72 @@ int main (int argc, char** argv)
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
   for ( ; el != end_el; ++el)
-  {
-    const Elem* elem = *el;
-
-    unsigned int side_max_x = 0, side_min_y = 0,
-                 side_max_y = 0, side_max_z = 0;
-    bool found_side_max_x = false, found_side_max_y = false,
-         found_side_min_y = false, found_side_max_z = false;
-    for(unsigned int side=0; side<elem->n_sides(); side++)
     {
-      if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
-      {
-        side_max_x = side;
-        found_side_max_x = true;
-      }
+      const Elem* elem = *el;
 
-      if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
-      {
-        side_min_y = side;
-        found_side_min_y = true;
-      }
-
-      if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
-      {
-        side_max_y = side;
-        found_side_max_y = true;
-      }
-
-      if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
-      {
-        side_max_z = side;
-        found_side_max_z = true;
-      }
-    }
-
-    // If elem has sides on boundaries
-    // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
-    // then let's set a node boundary condition
-    if(found_side_max_x && found_side_max_y && found_side_max_z)
-    {
-      for(unsigned int n=0; n<elem->n_nodes(); n++)
-      {
-        if (elem->is_node_on_side(n, side_max_x) &&
-            elem->is_node_on_side(n, side_max_y) &&
-            elem->is_node_on_side(n, side_max_z) )
+      unsigned int side_max_x = 0, side_min_y = 0,
+        side_max_y = 0, side_max_z = 0;
+      bool found_side_max_x = false, found_side_max_y = false,
+        found_side_min_y = false, found_side_max_z = false;
+      for(unsigned int side=0; side<elem->n_sides(); side++)
         {
-          mesh.boundary_info->add_node(elem->get_node(n), NODE_BOUNDARY_ID);
+          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+            {
+              side_max_x = side;
+              found_side_max_x = true;
+            }
+
+          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MIN_Y))
+            {
+              side_min_y = side;
+              found_side_min_y = true;
+            }
+
+          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+            {
+              side_max_y = side;
+              found_side_max_y = true;
+            }
+
+          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+            {
+              side_max_z = side;
+              found_side_max_z = true;
+            }
         }
-      }
-    }
 
-
-    // If elem has sides on boundaries
-    // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Y
-    // then let's set an edge boundary condition
-    if(found_side_max_x && found_side_min_y)
-    {
-      for(unsigned int e=0; e<elem->n_edges(); e++)
-      {
-        if (elem->is_edge_on_side(e, side_max_x) &&
-            elem->is_edge_on_side(e, side_min_y) )
+      // If elem has sides on boundaries
+      // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
+      // then let's set a node boundary condition
+      if(found_side_max_x && found_side_max_y && found_side_max_z)
         {
-          mesh.boundary_info->add_edge(elem, e, EDGE_BOUNDARY_ID);
+          for(unsigned int n=0; n<elem->n_nodes(); n++)
+            {
+              if (elem->is_node_on_side(n, side_max_x) &&
+                  elem->is_node_on_side(n, side_max_y) &&
+                  elem->is_node_on_side(n, side_max_z) )
+                {
+                  mesh.boundary_info->add_node(elem->get_node(n), NODE_BOUNDARY_ID);
+                }
+            }
         }
-      }
+
+
+      // If elem has sides on boundaries
+      // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Y
+      // then let's set an edge boundary condition
+      if(found_side_max_x && found_side_min_y)
+        {
+          for(unsigned int e=0; e<elem->n_edges(); e++)
+            {
+              if (elem->is_edge_on_side(e, side_max_x) &&
+                  elem->is_edge_on_side(e, side_min_y) )
+                {
+                  mesh.boundary_info->add_edge(elem, e, EDGE_BOUNDARY_ID);
+                }
+            }
+        }
     }
-  }
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
@@ -350,130 +350,130 @@ void assemble_elasticity(EquationSystems& es,
       Fw.reposition (w_var*n_u_dofs, n_w_dofs);
 
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-      {
+        {
           for (unsigned int i=0; i<n_u_dofs; i++)
             for (unsigned int j=0; j<n_u_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i=0, C_k=0;
+              {
+                // Tensor indices
+                unsigned int C_i=0, C_k=0;
 
-              for(unsigned int C_j=0; C_j<n_components; C_j++)
-                for(unsigned int C_l=0; C_l<n_components; C_l++)
-                {
-                  Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-                }
-            }
+                for(unsigned int C_j=0; C_j<n_components; C_j++)
+                  for(unsigned int C_l=0; C_l<n_components; C_l++)
+                    {
+                      Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                    }
+              }
 
           for (unsigned int i=0; i<n_u_dofs; i++)
             for (unsigned int j=0; j<n_v_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i=0, C_k=1;
+              {
+                // Tensor indices
+                unsigned int C_i=0, C_k=1;
 
-              for(unsigned int C_j=0; C_j<n_components; C_j++)
-                for(unsigned int C_l=0; C_l<n_components; C_l++)
-                {
-                  Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-                }
-            }
+                for(unsigned int C_j=0; C_j<n_components; C_j++)
+                  for(unsigned int C_l=0; C_l<n_components; C_l++)
+                    {
+                      Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                    }
+              }
 
           for (unsigned int i=0; i<n_u_dofs; i++)
             for (unsigned int j=0; j<n_w_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i=0, C_k=2;
+              {
+                // Tensor indices
+                unsigned int C_i=0, C_k=2;
 
-              for(unsigned int C_j=0; C_j<n_components; C_j++)
-                for(unsigned int C_l=0; C_l<n_components; C_l++)
-                {
-                  Kuw(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-                }
-            }
+                for(unsigned int C_j=0; C_j<n_components; C_j++)
+                  for(unsigned int C_l=0; C_l<n_components; C_l++)
+                    {
+                      Kuw(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                    }
+              }
 
           for (unsigned int i=0; i<n_v_dofs; i++)
             for (unsigned int j=0; j<n_u_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i = 1, C_k = 0;
+              {
+                // Tensor indices
+                unsigned int C_i = 1, C_k = 0;
 
-              for(unsigned int C_j=0; C_j<n_components; C_j++)
-                for(unsigned int C_l=0; C_l<n_components; C_l++)
-                {
-                  Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-                }
-            }
+                for(unsigned int C_j=0; C_j<n_components; C_j++)
+                  for(unsigned int C_l=0; C_l<n_components; C_l++)
+                    {
+                      Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                    }
+              }
 
           for (unsigned int i=0; i<n_v_dofs; i++)
             for (unsigned int j=0; j<n_v_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i = 1, C_k = 1;
+              {
+                // Tensor indices
+                unsigned int C_i = 1, C_k = 1;
 
-              for(unsigned int C_j=0; C_j<n_components; C_j++)
-                for(unsigned int C_l=0; C_l<n_components; C_l++)
-                {
-                  Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-                }
-            }
+                for(unsigned int C_j=0; C_j<n_components; C_j++)
+                  for(unsigned int C_l=0; C_l<n_components; C_l++)
+                    {
+                      Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                    }
+              }
 
           for (unsigned int i=0; i<n_v_dofs; i++)
             for (unsigned int j=0; j<n_w_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i = 1, C_k = 2;
+              {
+                // Tensor indices
+                unsigned int C_i = 1, C_k = 2;
 
-              for(unsigned int C_j=0; C_j<n_components; C_j++)
-                for(unsigned int C_l=0; C_l<n_components; C_l++)
-                {
-                  Kvw(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-                }
-            }
+                for(unsigned int C_j=0; C_j<n_components; C_j++)
+                  for(unsigned int C_l=0; C_l<n_components; C_l++)
+                    {
+                      Kvw(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                    }
+              }
 
           for (unsigned int i=0; i<n_w_dofs; i++)
             for (unsigned int j=0; j<n_u_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i = 2, C_k = 0;
+              {
+                // Tensor indices
+                unsigned int C_i = 2, C_k = 0;
 
-              for(unsigned int C_j=0; C_j<n_components; C_j++)
-                for(unsigned int C_l=0; C_l<n_components; C_l++)
-                {
-                  Kwu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-                }
-            }
+                for(unsigned int C_j=0; C_j<n_components; C_j++)
+                  for(unsigned int C_l=0; C_l<n_components; C_l++)
+                    {
+                      Kwu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                    }
+              }
 
           for (unsigned int i=0; i<n_w_dofs; i++)
             for (unsigned int j=0; j<n_v_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i = 2, C_k = 1;
+              {
+                // Tensor indices
+                unsigned int C_i = 2, C_k = 1;
 
-              for(unsigned int C_j=0; C_j<n_components; C_j++)
-                for(unsigned int C_l=0; C_l<n_components; C_l++)
-                {
-                  Kwv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-                }
-            }
+                for(unsigned int C_j=0; C_j<n_components; C_j++)
+                  for(unsigned int C_l=0; C_l<n_components; C_l++)
+                    {
+                      Kwv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                    }
+              }
 
           for (unsigned int i=0; i<n_w_dofs; i++)
             for (unsigned int j=0; j<n_w_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i = 2, C_k = 2;
+              {
+                // Tensor indices
+                unsigned int C_i = 2, C_k = 2;
 
-              for(unsigned int C_j=0; C_j<n_components; C_j++)
-                for(unsigned int C_l=0; C_l<n_components; C_l++)
-                {
-                  Kww(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-                }
-            }
+                for(unsigned int C_j=0; C_j<n_components; C_j++)
+                  for(unsigned int C_l=0; C_l<n_components; C_l++)
+                    {
+                      Kww(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
+                    }
+              }
 
           // Volumetric load
           for (unsigned int i=0; i<n_w_dofs; i++)
-          {
-            Fw(i) -= JxW[qp] * phi[i][qp];
-          }
-      }
+            {
+              Fw(i) -= JxW[qp] * phi[i][qp];
+            }
+        }
 
       {
         for (unsigned int side=0; side<elem->n_sides(); side++)
@@ -485,24 +485,24 @@ void assemble_elasticity(EquationSystems& es,
               fe_face->reinit(elem, side);
 
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
-              {
-                // Apply a traction
-                if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_X) )
                 {
-                  for (unsigned int i=0; i<n_v_dofs; i++)
-                  {
-                    Fu(i) += JxW_face[qp] * x_load * phi_face[i][qp];
-                  }
-                  for (unsigned int i=0; i<n_v_dofs; i++)
-                  {
-                    Fv(i) += JxW_face[qp] * y_load * phi_face[i][qp];
-                  }
-                  for (unsigned int i=0; i<n_v_dofs; i++)
-                  {
-                    Fw(i) += JxW_face[qp] * z_load * phi_face[i][qp];
-                  }
+                  // Apply a traction
+                  if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_X) )
+                    {
+                      for (unsigned int i=0; i<n_v_dofs; i++)
+                        {
+                          Fu(i) += JxW_face[qp] * x_load * phi_face[i][qp];
+                        }
+                      for (unsigned int i=0; i<n_v_dofs; i++)
+                        {
+                          Fv(i) += JxW_face[qp] * y_load * phi_face[i][qp];
+                        }
+                      for (unsigned int i=0; i<n_v_dofs; i++)
+                        {
+                          Fw(i) += JxW_face[qp] * z_load * phi_face[i][qp];
+                        }
+                    }
                 }
-              }
             }
       }
 
@@ -562,77 +562,77 @@ void compute_stresses(EquationSystems& es)
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
   for ( ; el != end_el; ++el)
-  {
-    const Elem* elem = *el;
-
-    for(unsigned int var=0; var<3; var++)
     {
-      dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
-    }
+      const Elem* elem = *el;
 
-    fe->reinit (elem);
-
-    elem_sigma.resize(3,3);
-
-    for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-    {
-      for(unsigned int C_i=0; C_i<3; C_i++)
-        for(unsigned int C_j=0; C_j<3; C_j++)
-          for(unsigned int C_k=0; C_k<3; C_k++)
-          {
-            const unsigned int n_var_dofs = dof_indices_var[C_k].size();
-
-            // Get the gradient at this quadrature point
-            Gradient displacement_gradient;
-            for(unsigned int l=0; l<n_var_dofs; l++)
-            {
-              displacement_gradient.add_scaled(dphi[l][qp], system.current_solution(dof_indices_var[C_k][l]));
-            }
-
-            for(unsigned int C_l=0; C_l<3; C_l++)
-            {
-              elem_sigma(C_i,C_j) += JxW[qp]*( eval_elasticity_tensor(C_i,C_j,C_k,C_l) * displacement_gradient(C_l) );
-            }
-
-          }
-    }
-
-    // Get the average stresses by dividing by the element volume
-    elem_sigma.scale(1./elem->volume());
-
-    // load elem_sigma data into stress_system
-    for(unsigned int i=0; i<3; i++)
-      for(unsigned int j=0; j<3; j++)
-      {
-        stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[i][j]);
-
-        // We are using CONSTANT MONOMIAL basis functions, hence we only need to get
-        // one dof index per variable
-        dof_id_type dof_index = stress_dof_indices_var[0];
-
-        if( (stress_system.solution->first_local_index() <= dof_index) &&
-            (dof_index < stress_system.solution->last_local_index()) )
+      for(unsigned int var=0; var<3; var++)
         {
-          stress_system.solution->set(dof_index, elem_sigma(i,j));
+          dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
         }
 
-      }
+      fe->reinit (elem);
 
-    // Also, the von Mises stress
-    Number vonMises_value = std::sqrt( 0.5*( pow(elem_sigma(0,0) - elem_sigma(1,1),2.) +
-                                             pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
-                                             pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
-                                             6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
-                                           ) );
-    stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
-    dof_id_type dof_index = stress_dof_indices_var[0];
-    if( (stress_system.solution->first_local_index() <= dof_index) &&
-        (dof_index < stress_system.solution->last_local_index()) )
-    {
-      stress_system.solution->set(dof_index, vonMises_value);
+      elem_sigma.resize(3,3);
+
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+        {
+          for(unsigned int C_i=0; C_i<3; C_i++)
+            for(unsigned int C_j=0; C_j<3; C_j++)
+              for(unsigned int C_k=0; C_k<3; C_k++)
+                {
+                  const unsigned int n_var_dofs = dof_indices_var[C_k].size();
+
+                  // Get the gradient at this quadrature point
+                  Gradient displacement_gradient;
+                  for(unsigned int l=0; l<n_var_dofs; l++)
+                    {
+                      displacement_gradient.add_scaled(dphi[l][qp], system.current_solution(dof_indices_var[C_k][l]));
+                    }
+
+                  for(unsigned int C_l=0; C_l<3; C_l++)
+                    {
+                      elem_sigma(C_i,C_j) += JxW[qp]*( eval_elasticity_tensor(C_i,C_j,C_k,C_l) * displacement_gradient(C_l) );
+                    }
+
+                }
+        }
+
+      // Get the average stresses by dividing by the element volume
+      elem_sigma.scale(1./elem->volume());
+
+      // load elem_sigma data into stress_system
+      for(unsigned int i=0; i<3; i++)
+        for(unsigned int j=0; j<3; j++)
+          {
+            stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[i][j]);
+
+            // We are using CONSTANT MONOMIAL basis functions, hence we only need to get
+            // one dof index per variable
+            dof_id_type dof_index = stress_dof_indices_var[0];
+
+            if( (stress_system.solution->first_local_index() <= dof_index) &&
+                (dof_index < stress_system.solution->last_local_index()) )
+              {
+                stress_system.solution->set(dof_index, elem_sigma(i,j));
+              }
+
+          }
+
+      // Also, the von Mises stress
+      Number vonMises_value = std::sqrt( 0.5*( pow(elem_sigma(0,0) - elem_sigma(1,1),2.) +
+                                               pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
+                                               pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
+                                               6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
+                                               ) );
+      stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
+      dof_id_type dof_index = stress_dof_indices_var[0];
+      if( (stress_system.solution->first_local_index() <= dof_index) &&
+          (dof_index < stress_system.solution->last_local_index()) )
+        {
+          stress_system.solution->set(dof_index, vonMises_value);
+        }
+
     }
-
-  }
 
   // Should call close and update when we set vector entries directly
   stress_system.solution->close();
@@ -659,5 +659,5 @@ Real eval_elasticity_tensor(unsigned int i,
   const Real lambda_2 = 0.5 * E / (1. + nu);
 
   return lambda_1 * kronecker_delta(i,j) * kronecker_delta(k,l)
-       + lambda_2 * (kronecker_delta(i,k) * kronecker_delta(j,l) + kronecker_delta(i,l) * kronecker_delta(j,k));
+    + lambda_2 * (kronecker_delta(i,k) * kronecker_delta(j,l) + kronecker_delta(i,l) * kronecker_delta(j,k));
 }

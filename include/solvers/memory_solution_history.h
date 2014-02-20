@@ -27,53 +27,53 @@
 
 namespace libMesh
 {
-  /**
-   * Subclass of Solution History that stores the solutions
-   * and other important vectors in memory.
-   */
-  class MemorySolutionHistory : public SolutionHistory
-  {
-  public:
+/**
+ * Subclass of Solution History that stores the solutions
+ * and other important vectors in memory.
+ */
+class MemorySolutionHistory : public SolutionHistory
+{
+public:
 
-    // Constructor, reference to system to be passed by user, set the
-    // stored_sols iterator to some initial value
+  // Constructor, reference to system to be passed by user, set the
+  // stored_sols iterator to some initial value
   MemorySolutionHistory(System & system_) : stored_sols(stored_solutions.end()), _system(system_)
   { libmesh_experimental(); }
 
-    // Destructor
-    ~MemorySolutionHistory();
+  // Destructor
+  ~MemorySolutionHistory();
 
-    // Virtual function store which we will be overriding to store timesteps
-    virtual void store();
+  // Virtual function store which we will be overriding to store timesteps
+  virtual void store();
 
-    // Virtual function retrieve which we will be overriding to retrieve timesteps
-    virtual void retrieve();
+  // Virtual function retrieve which we will be overriding to retrieve timesteps
+  virtual void retrieve();
 
-    // Typedef for Stored Solutions iterator, a list of pairs of the current
-    // system time, map of strings and saved vectors
-    typedef std::list<std::pair<Real, std::map<std::string, NumericVector<Number>*> > >::iterator stored_solutions_iterator;
+  // Typedef for Stored Solutions iterator, a list of pairs of the current
+  // system time, map of strings and saved vectors
+  typedef std::list<std::pair<Real, std::map<std::string, NumericVector<Number>*> > >::iterator stored_solutions_iterator;
 
-    // Definition of the clone function needed for the setter function
-    virtual AutoPtr<SolutionHistory > clone() const {
+  // Definition of the clone function needed for the setter function
+  virtual AutoPtr<SolutionHistory > clone() const {
     return AutoPtr<SolutionHistory >
       (new MemorySolutionHistory(_system));}
 
-  private:
+private:
 
-    // This list of pairs will hold the current time and stored vectors
-    // from each timestep
-    std::list<std::pair<Real, std::map<std::string, NumericVector<Number>*> > > stored_solutions;
+  // This list of pairs will hold the current time and stored vectors
+  // from each timestep
+  std::list<std::pair<Real, std::map<std::string, NumericVector<Number>*> > > stored_solutions;
 
-    // The stored solutions iterator
-    stored_solutions_iterator stored_sols;
+  // The stored solutions iterator
+  stored_solutions_iterator stored_sols;
 
-    // A helper function to locate entries at a given time
-    void find_stored_entry();
+  // A helper function to locate entries at a given time
+  void find_stored_entry();
 
-    // A system reference
-    System & _system ;
+  // A system reference
+  System & _system ;
 
-  };
+};
 
 } // end namespace libMesh
 

@@ -37,35 +37,35 @@ namespace libMesh
 namespace QuadratureRules
 {
 
-  /**
-   * The number of quadrature rules that
-   * are defined (INVALD_Q_RULE excluded).
-   * You might have to update this if you
-   * add a new one!
-   */
-  const unsigned int num_rules = 5;
+/**
+ * The number of quadrature rules that
+ * are defined (INVALD_Q_RULE excluded).
+ * You might have to update this if you
+ * add a new one!
+ */
+const unsigned int num_rules = 5;
 
-  /**
-   * The types of quadrature rules that may
-   * be used for numerical integration
-   * over geometric entities.
-   */
-  const QuadratureType valid_elem_rules[] = {QGAUSS,
-                                             QSIMPSON,
-                                             QTRAP};
+/**
+ * The types of quadrature rules that may
+ * be used for numerical integration
+ * over geometric entities.
+ */
+const QuadratureType valid_elem_rules[] = {QGAUSS,
+                                           QSIMPSON,
+                                           QTRAP};
 
-  /**
-   * The number of valid quadrature rules for
-   * numerical integration over geometric entities.
-   */
-  const unsigned int num_valid_elem_rules = 3;
+/**
+ * The number of valid quadrature rules for
+ * numerical integration over geometric entities.
+ */
+const unsigned int num_valid_elem_rules = 3;
 
 
-  /**
-   * Returns a standard string representation
-   * for the specific quadrature rule.
-   */
-  std::string name (const QuadratureType t);
+/**
+ * Returns a standard string representation
+ * for the specific quadrature rule.
+ */
+std::string name (const QuadratureType t);
 }
 
 } // namespace libMesh

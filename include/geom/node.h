@@ -52,8 +52,8 @@ class MeshRefinement;
  */
 
 class Node : public Point,
-  public DofObject,
-  public ReferenceCountedObject<Node>
+             public DofObject,
+             public ReferenceCountedObject<Node>
 {
 
 public:
@@ -151,7 +151,7 @@ public:
     dof_id_type id;
     processor_id_type pid;
     Real x;
-// FIXME: We should drop z (and y) if libMesh is built 2D (or 1D) only
+    // FIXME: We should drop z (and y) if libMesh is built 2D (or 1D) only
     Real y;
     Real z;
 
@@ -206,15 +206,15 @@ public:
     static void unpack (std::vector<largest_id_type>::const_iterator start, Node& node);
   };
 
-unsigned int packed_size() const
-{
-  // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int idtypes_per_Real =
-    (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
+  unsigned int packed_size() const
+  {
+    // use "(a+b-1)/b" trick to get a/b to round up
+    static const unsigned int idtypes_per_Real =
+      (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
 
-  return PackedNode::header_size + LIBMESH_DIM*idtypes_per_Real +
-         this->packed_indexing_size();
-}
+    return PackedNode::header_size + LIBMESH_DIM*idtypes_per_Real +
+      this->packed_indexing_size();
+  }
 
 #endif // #ifdef LIBMESH_HAVE_MPI
 

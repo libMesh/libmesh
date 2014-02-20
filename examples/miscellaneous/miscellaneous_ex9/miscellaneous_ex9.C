@@ -17,29 +17,29 @@
 
 
 
- // <h1>Miscellaneous Example 9 - Implement an interface term to model a thermal "film resistance"</h1>
- //
- // In this example we solve a Poisson problem, -\Laplacian u = f, with a non-standard interface
- // condition on the domain interior which models a thermal "film resistance". The interface condition
- // requires continuity of flux, and a jump in temperature proportional to the flux:
- //  \nabla u_1 \cdot n = \nabla u_2 \cdot n,
- //  u_1 - u_2 = R * \nabla u \cdot n
- //
- // To implement this PDE, we use two mesh subdomains, \Omega_1 and \Omega_2, with coincident boundaries,
- // but which are not connected in the FE sense. Let \Gamma denote the coincident boundary.
- // The term on \Gamma takes the form:
- //
- //  1/R * \int_\Gamma (u_1 - u_2) (v_1 - v_2) ds,
- //
- // where u_1, u_2 (resp. v_1, v_2) are the trial (resp. test) functions on either side of \Gamma.
- // We implement this condition using C0 basis functions, but the "crack" in the mesh at \Gamma permits
- // a discontinuity in the solution. We also impose a heat flux on the bottom surface of the mesh, and a zero Dirichlet
- // condition on the top surface.
- //
- // In order to implement the interface condition, we need to augment the matrix sparsity pattern,
- // which is handled by the class AugmentSparsityPatternOnInterface. (We do not need to augment the
- // send-list in this case since the PDE is linear and hence there is no need to broadcast non-local
- // solution values).
+// <h1>Miscellaneous Example 9 - Implement an interface term to model a thermal "film resistance"</h1>
+//
+// In this example we solve a Poisson problem, -\Laplacian u = f, with a non-standard interface
+// condition on the domain interior which models a thermal "film resistance". The interface condition
+// requires continuity of flux, and a jump in temperature proportional to the flux:
+//  \nabla u_1 \cdot n = \nabla u_2 \cdot n,
+//  u_1 - u_2 = R * \nabla u \cdot n
+//
+// To implement this PDE, we use two mesh subdomains, \Omega_1 and \Omega_2, with coincident boundaries,
+// but which are not connected in the FE sense. Let \Gamma denote the coincident boundary.
+// The term on \Gamma takes the form:
+//
+//  1/R * \int_\Gamma (u_1 - u_2) (v_1 - v_2) ds,
+//
+// where u_1, u_2 (resp. v_1, v_2) are the trial (resp. test) functions on either side of \Gamma.
+// We implement this condition using C0 basis functions, but the "crack" in the mesh at \Gamma permits
+// a discontinuity in the solution. We also impose a heat flux on the bottom surface of the mesh, and a zero Dirichlet
+// condition on the top surface.
+//
+// In order to implement the interface condition, we need to augment the matrix sparsity pattern,
+// which is handled by the class AugmentSparsityPatternOnInterface. (We do not need to augment the
+// send-list in this case since the PDE is linear and hence there is no need to broadcast non-local
+// solution values).
 
 
 // C++ include files that we need
@@ -236,17 +236,17 @@ void assemble_poisson(EquationSystems& es,
           if (elem->neighbor(side) == NULL)
             {
               if( mesh.boundary_info->has_boundary_id (elem,side,MIN_Z_BOUNDARY) )
-              {
-                fe_elem_face->reinit(elem, side);
-
-                for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
-                  for (unsigned int i=0; i<phi.size(); i++)
-                  {
-                    Fe(i) += JxW_face[qp] * phi_face[i][qp];
-                  }
+                  fe_elem_face->reinit(elem, side);
+
+                  for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                    {
+                      for (unsigned int i=0; i<phi.size(); i++)
+                        {
+                          Fe(i) += JxW_face[qp] * phi_face[i][qp];
+                        }
+                    }
                 }
-              }
 
             }
       }
@@ -258,73 +258,73 @@ void assemble_poisson(EquationSystems& es,
             {
               // Found the lower side of the crack. Assemble terms due to lower and upper in here.
               if( mesh.boundary_info->has_boundary_id (elem,side,CRACK_BOUNDARY_LOWER) )
-              {
-                fe_elem_face->reinit(elem, side);
-
-                ElementIdMap::const_iterator ltu_it =
-                  lower_to_upper.find(std::make_pair(elem->id(),side));
-                dof_id_type upper_elem_id = ltu_it->second;
-                const Elem* neighbor = mesh.elem(upper_elem_id);
-
-                std::vector<Point> qface_neighbor_points;
-                FEInterface::inverse_map (elem->dim(), fe->get_fe_type(),
-                                          neighbor, qface_points, qface_neighbor_points);
-                fe_neighbor_face->reinit(neighbor, &qface_neighbor_points);
-
-                std::vector<dof_id_type> neighbor_dof_indices;
-                dof_map.dof_indices (neighbor, neighbor_dof_indices);
-                const unsigned int n_neighbor_dofs = neighbor_dof_indices.size();
-
-                Kne.resize (n_neighbor_dofs, n_dofs);
-                Ken.resize (n_dofs, n_neighbor_dofs);
-                Kee.resize (n_dofs, n_dofs);
-                Knn.resize (n_neighbor_dofs, n_neighbor_dofs);
-
-                // Lower-to-lower coupling term
-                for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
-                  for (unsigned int i=0; i<n_dofs; i++)
-                    for (unsigned int j=0; j<n_dofs; j++)
-                    {
-                      Kee(i,j) -= JxW_face[qp] * (1./R)*(phi_face[i][qp] * phi_face[j][qp]);
-                    }
-                }
+                  fe_elem_face->reinit(elem, side);
 
-                // Lower-to-upper coupling term
-                for (unsigned int qp=0; qp<qface.n_points(); qp++)
-                {
-                  for (unsigned int i=0; i<n_dofs; i++)
-                    for (unsigned int j=0; j<n_neighbor_dofs; j++)
-                    {
-                      Ken(i,j) += JxW_face[qp] * (1./R)*(phi_face[i][qp] * phi_neighbor_face[j][qp]);
-                    }
-                }
+                  ElementIdMap::const_iterator ltu_it =
+                    lower_to_upper.find(std::make_pair(elem->id(),side));
+                  dof_id_type upper_elem_id = ltu_it->second;
+                  const Elem* neighbor = mesh.elem(upper_elem_id);
 
-                // Upper-to-upper coupling term
-                for (unsigned int qp=0; qp<qface.n_points(); qp++)
-                {
-                  for (unsigned int i=0; i<n_neighbor_dofs; i++)
-                    for (unsigned int j=0; j<n_neighbor_dofs; j++)
-                    {
-                      Knn(i,j) -= JxW_face[qp] * (1./R)*(phi_neighbor_face[i][qp] * phi_neighbor_face[j][qp]);
-                    }
-                }
+                  std::vector<Point> qface_neighbor_points;
+                  FEInterface::inverse_map (elem->dim(), fe->get_fe_type(),
+                                            neighbor, qface_points, qface_neighbor_points);
+                  fe_neighbor_face->reinit(neighbor, &qface_neighbor_points);
 
-                // Upper-to-lower coupling term
-                for (unsigned int qp=0; qp<qface.n_points(); qp++)
-                {
-                  for (unsigned int i=0; i<n_neighbor_dofs; i++)
-                    for (unsigned int j=0; j<n_dofs; j++)
-                    {
-                      Kne(i,j) += JxW_face[qp] * (1./R)*(phi_neighbor_face[i][qp] * phi_face[j][qp]);
-                    }
-                }
+                  std::vector<dof_id_type> neighbor_dof_indices;
+                  dof_map.dof_indices (neighbor, neighbor_dof_indices);
+                  const unsigned int n_neighbor_dofs = neighbor_dof_indices.size();
 
-                system.matrix->add_matrix(Kne,neighbor_dof_indices,dof_indices);
-                system.matrix->add_matrix(Ken,dof_indices,neighbor_dof_indices);
-                system.matrix->add_matrix(Kee,dof_indices);
-                system.matrix->add_matrix(Knn,neighbor_dof_indices);
-              }
+                  Kne.resize (n_neighbor_dofs, n_dofs);
+                  Ken.resize (n_dofs, n_neighbor_dofs);
+                  Kee.resize (n_dofs, n_dofs);
+                  Knn.resize (n_neighbor_dofs, n_neighbor_dofs);
+
+                  // Lower-to-lower coupling term
+                  for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                    {
+                      for (unsigned int i=0; i<n_dofs; i++)
+                        for (unsigned int j=0; j<n_dofs; j++)
+                          {
+                            Kee(i,j) -= JxW_face[qp] * (1./R)*(phi_face[i][qp] * phi_face[j][qp]);
+                          }
+                    }
+
+                  // Lower-to-upper coupling term
+                  for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                    {
+                      for (unsigned int i=0; i<n_dofs; i++)
+                        for (unsigned int j=0; j<n_neighbor_dofs; j++)
+                          {
+                            Ken(i,j) += JxW_face[qp] * (1./R)*(phi_face[i][qp] * phi_neighbor_face[j][qp]);
+                          }
+                    }
+
+                  // Upper-to-upper coupling term
+                  for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                    {
+                      for (unsigned int i=0; i<n_neighbor_dofs; i++)
+                        for (unsigned int j=0; j<n_neighbor_dofs; j++)
+                          {
+                            Knn(i,j) -= JxW_face[qp] * (1./R)*(phi_neighbor_face[i][qp] * phi_neighbor_face[j][qp]);
+                          }
+                    }
+
+                  // Upper-to-lower coupling term
+                  for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                    {
+                      for (unsigned int i=0; i<n_neighbor_dofs; i++)
+                        for (unsigned int j=0; j<n_dofs; j++)
+                          {
+                            Kne(i,j) += JxW_face[qp] * (1./R)*(phi_neighbor_face[i][qp] * phi_face[j][qp]);
+                          }
+                    }
+
+                  system.matrix->add_matrix(Kne,neighbor_dof_indices,dof_indices);
+                  system.matrix->add_matrix(Ken,dof_indices,neighbor_dof_indices);
+                  system.matrix->add_matrix(Kee,dof_indices);
+                  system.matrix->add_matrix(Knn,neighbor_dof_indices);
+                }
             }
       }
 

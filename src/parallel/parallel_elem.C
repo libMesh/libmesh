@@ -32,12 +32,12 @@
 namespace
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  static const unsigned int header_size = 11;
+static const unsigned int header_size = 11;
 #else
-  static const unsigned int header_size = 10;
+static const unsigned int header_size = 10;
 #endif
 
-  static const largest_id_type elem_magic_header = 987654321;
+static const largest_id_type elem_magic_header = 987654321;
 }
 
 
@@ -141,11 +141,11 @@ unsigned int packable_size (const Elem* elem, const MeshBase* mesh)
 
   return
 #ifndef NDEBUG
-         1 + // add an int for the magic header when testing
+    1 + // add an int for the magic header when testing
 #endif
     header_size + elem->n_nodes() +
-         elem->n_neighbors() +
-         elem->packed_indexing_size() + total_packed_bcs;
+    elem->n_neighbors() +
+    elem->packed_indexing_size() + total_packed_bcs;
 }
 
 
@@ -376,9 +376,9 @@ void unpack(std::vector<largest_id_type>::const_iterator in,
     {
       libmesh_assert_equal_to (elem->level(), level);
       libmesh_assert_equal_to (elem->id(), id);
-//#ifdef LIBMESH_ENABLE_UNIQUE_ID
+      //#ifdef LIBMESH_ENABLE_UNIQUE_ID
       // No check for unqiue id sanity
-//#endif
+      //#endif
       libmesh_assert_equal_to (elem->processor_id(), processor_id);
       libmesh_assert_equal_to (elem->subdomain_id(), subdomain_id);
       libmesh_assert_equal_to (elem->type(), type);

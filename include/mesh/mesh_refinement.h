@@ -59,7 +59,7 @@ class PeriodicBoundaries;
 
 // ------------------------------------------------------------
 // MeshRefinement class definition
-  class MeshRefinement : public ParallelObject
+class MeshRefinement : public ParallelObject
 {
 public:
 
@@ -526,7 +526,7 @@ private:
    \endverbatim
    by refining the indicated element
 
-   */
+  */
   bool limit_level_mismatch_at_node (const unsigned int max_mismatch);
 
   /*
@@ -587,7 +587,7 @@ private:
 
    by refining the indicated element
 
-   */
+  */
   bool eliminate_unrefined_patches ();
 
 

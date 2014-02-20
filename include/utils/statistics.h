@@ -76,7 +76,7 @@ namespace libMesh
 template <typename T>
 class StatisticsVector : public std::vector<T>
 {
- public:
+public:
 
   /**
    * Call the std::vector constructor.
@@ -226,7 +226,7 @@ class StatisticsVector : public std::vector<T>
   virtual std::vector<dof_id_type> cut_above(Real cut) const;
 
 
- private:
+private:
 
 };
 

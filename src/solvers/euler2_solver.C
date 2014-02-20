@@ -25,7 +25,7 @@ namespace libMesh
 
 
 Euler2Solver::Euler2Solver (sys_type& s)
- : UnsteadySolver(s), theta(1.)
+  : UnsteadySolver(s), theta(1.)
 {
 }
 
@@ -318,7 +318,7 @@ bool Euler2Solver::side_residual (bool request_jacobian,
       context.elem_solution_derivative = 0.0;
       jacobian_computed =
         _system.side_time_derivative(jacobian_computed, context) &&
-          jacobian_computed;
+        jacobian_computed;
       context.elem_solution_derivative = 1.0;
       context.get_elem_residual() *= ((1. - theta) * _system.deltat);
       total_elem_residual += context.get_elem_residual();
@@ -347,7 +347,7 @@ bool Euler2Solver::side_residual (bool request_jacobian,
 
   jacobian_computed =
     _system.side_mass_residual(jacobian_computed, context) &&
-      jacobian_computed;
+    jacobian_computed;
 
   context.get_elem_residual() *= -(1. - theta);
   total_elem_residual += context.get_elem_residual();

@@ -25,58 +25,58 @@
 namespace libMesh {
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
-  /**
-   * @returns the number of processors used in the current simulation.
-   */
-  processor_id_type n_processors();
+/**
+ * @returns the number of processors used in the current simulation.
+ */
+processor_id_type n_processors();
 
-  /**
-   * @returns the index of the local processor.
-   */
-  processor_id_type processor_id();
+/**
+ * @returns the index of the local processor.
+ */
+processor_id_type processor_id();
 #endif
 
-  /**
-   * @returns the number of processors libMesh was initialized with.
-   */
-  processor_id_type global_n_processors();
+/**
+ * @returns the number of processors libMesh was initialized with.
+ */
+processor_id_type global_n_processors();
 
-  /**
-   * @returns the index of the local processor with respect to the
-   * original MPI pool libMesh was initialized with.
-   */
-  processor_id_type global_processor_id();
+/**
+ * @returns the index of the local processor with respect to the
+ * original MPI pool libMesh was initialized with.
+ */
+processor_id_type global_processor_id();
 
-  /**
-   * @returns the maximum number of threads used in the simulation.
-   */
-  unsigned int n_threads();
+/**
+ * @returns the maximum number of threads used in the simulation.
+ */
+unsigned int n_threads();
 
-  /**
-   * Namespaces don't provide private data,
-   * so let's take the data we would like
-   * private and put it in an obnoxious
-   * namespace.  At least that way it is a
-   * pain to use, thus discouraging errors.
-   */
-  namespace libMeshPrivateData {
+/**
+ * Namespaces don't provide private data,
+ * so let's take the data we would like
+ * private and put it in an obnoxious
+ * namespace.  At least that way it is a
+ * pain to use, thus discouraging errors.
+ */
+namespace libMeshPrivateData {
 #ifdef LIBMESH_HAVE_MPI
-    /**
-     * Total number of processors used.
-     */
-    extern processor_id_type _n_processors;
+/**
+ * Total number of processors used.
+ */
+extern processor_id_type _n_processors;
 
-    /**
-     * The local processor id.
-     */
-    extern processor_id_type _processor_id;
+/**
+ * The local processor id.
+ */
+extern processor_id_type _processor_id;
 #endif
 
-    /**
-     * Total number of threads possible.
-     */
-    extern int _n_threads;
-  }
+/**
+ * Total number of threads possible.
+ */
+extern int _n_threads;
+}
 }
 
 

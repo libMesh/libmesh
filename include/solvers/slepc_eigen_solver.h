@@ -105,7 +105,7 @@ public:
                                                          const unsigned int m_its);
 
 
- /**
+  /**
    * This function calls the SLEPc solver to compute
    * the eigenpairs for the generalized eigenproblem
    * defined by the matrix_A and matrix_B,
@@ -128,12 +128,12 @@ public:
    * Solve generalized eigenproblem when matrix_A is of
    * type ShellMatrix, matrix_B is of type SparseMatrix.
    */
-    std::pair<unsigned int, unsigned int>  solve_generalized(ShellMatrix<T> &matrix_A,
-                                                             SparseMatrix<T> &matrix_B,
-                                                             int nev,
-                                                             int ncv,
-                                                             const double tol,
-                                                             const unsigned int m_its);
+  std::pair<unsigned int, unsigned int>  solve_generalized(ShellMatrix<T> &matrix_A,
+                                                           SparseMatrix<T> &matrix_B,
+                                                           int nev,
+                                                           int ncv,
+                                                           const double tol,
+                                                           const unsigned int m_its);
 
   /**
    * Solve generalized eigenproblem when matrix_A is of
@@ -145,12 +145,12 @@ public:
    * -st_ksp_type gmres -st_pc_type jacobi
    * or similar.
    */
-    std::pair<unsigned int, unsigned int>  solve_generalized(SparseMatrix<T> &matrix_A,
-                                                             ShellMatrix<T> &matrix_B,
-                                                             int nev,
-                                                             int ncv,
-                                                             const double tol,
-                                                             const unsigned int m_its);
+  std::pair<unsigned int, unsigned int>  solve_generalized(SparseMatrix<T> &matrix_A,
+                                                           ShellMatrix<T> &matrix_B,
+                                                           int nev,
+                                                           int ncv,
+                                                           const double tol,
+                                                           const unsigned int m_its);
 
   /**
    * Solve generalized eigenproblem when both matrix_A and
@@ -162,12 +162,12 @@ public:
    * -st_ksp_type gmres -st_pc_type jacobi
    * or similar.
    */
-    std::pair<unsigned int, unsigned int>  solve_generalized(ShellMatrix<T> &matrix_A,
-                                                             ShellMatrix<T> &matrix_B,
-                                                             int nev,
-                                                             int ncv,
-                                                             const double tol,
-                                                             const unsigned int m_its);
+  std::pair<unsigned int, unsigned int>  solve_generalized(ShellMatrix<T> &matrix_A,
+                                                           ShellMatrix<T> &matrix_B,
+                                                           int nev,
+                                                           int ncv,
+                                                           const double tol,
+                                                           const unsigned int m_its);
 
 
 

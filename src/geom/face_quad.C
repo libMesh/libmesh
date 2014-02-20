@@ -118,7 +118,7 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
 
 
 bool Quad::is_child_on_side(const unsigned int c,
-                             const unsigned int s) const
+                            const unsigned int s) const
 {
   libmesh_assert_less (c, this->n_children());
   libmesh_assert_less (s, this->n_sides());
@@ -156,16 +156,16 @@ unsigned int Quad::opposite_node(const unsigned int node_in,
     {1, 0, 3, 2, 255, 7, 255, 5};
 
   switch (side_in)
-  {
-  case 0:
-  case 2:
-    return side02_nodes_map[node_in];
-    break;
-  case 1:
-  case 3:
-    return side13_nodes_map[node_in];
-    break;
-  }
+    {
+    case 0:
+    case 2:
+      return side02_nodes_map[node_in];
+      break;
+    case 1:
+    case 3:
+      return side13_nodes_map[node_in];
+      break;
+    }
 
   libmesh_error();
   return 255;
@@ -294,29 +294,29 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
 
 
 const unsigned short int Quad::_second_order_adjacent_vertices[4][2] =
-{
-  {0, 1}, // vertices adjacent to node 4
-  {1, 2}, // vertices adjacent to node 5
-  {2, 3}, // vertices adjacent to node 6
-  {0, 3}  // vertices adjacent to node 7
-};
+  {
+    {0, 1}, // vertices adjacent to node 4
+    {1, 2}, // vertices adjacent to node 5
+    {2, 3}, // vertices adjacent to node 6
+    {0, 3}  // vertices adjacent to node 7
+  };
 
 
 
 const unsigned short int Quad::_second_order_vertex_child_number[9] =
-{
-  99,99,99,99, // Vertices
-  0,1,2,0,     // Edges
-  0            // Interior
-};
+  {
+    99,99,99,99, // Vertices
+    0,1,2,0,     // Edges
+    0            // Interior
+  };
 
 
 
 const unsigned short int Quad::_second_order_vertex_child_index[9] =
-{
-  99,99,99,99, // Vertices
-  1,2,3,3,     // Edges
-  2            // Interior
-};
+  {
+    99,99,99,99, // Vertices
+    1,2,3,3,     // Edges
+    2            // Interior
+  };
 
 } // namespace libMesh

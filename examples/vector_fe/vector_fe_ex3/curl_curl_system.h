@@ -37,8 +37,8 @@ public:
 
   // Constructor
   CurlCurlSystem( EquationSystems& es,
-		 const std::string& name,
-		 const unsigned int number );
+                  const std::string& name,
+                  const unsigned int number );
 
   // System initialization
   virtual void init_data ();

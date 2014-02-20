@@ -59,14 +59,14 @@ void Partitioner::partition (MeshBase& mesh,
 
   // BSK - temporary fix while redistribution is integrated 6/26/2008
   // Uncomment this to not repartition in parallel
-//   if (!mesh.is_serial())
-//     return;
+  //   if (!mesh.is_serial())
+  //     return;
 
   // we cannot partition into more pieces than we have
   // active elements!
   const unsigned int n_parts =
     static_cast<unsigned int>
-      (std::min(mesh.n_active_elem(), static_cast<dof_id_type>(n)));
+    (std::min(mesh.n_active_elem(), static_cast<dof_id_type>(n)));
 
   // Set the number of partitions in the mesh
   mesh.set_n_partitions()=n_parts;
@@ -126,7 +126,7 @@ void Partitioner::repartition (MeshBase& mesh,
   // active elements!
   const unsigned int n_parts =
     static_cast<unsigned int>
-      (std::min(mesh.n_active_elem(), static_cast<dof_id_type>(n)));
+    (std::min(mesh.n_active_elem(), static_cast<dof_id_type>(n)));
 
   // Set the number of partitions in the mesh
   mesh.set_n_partitions()=n_parts;
@@ -260,9 +260,9 @@ void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
 
 void Partitioner::set_parent_processor_ids(MeshBase&
 #ifdef LIBMESH_ENABLE_AMR
-mesh
+                                           mesh
 #endif
-)
+                                           )
 {
   START_LOG("set_parent_processor_ids()","Partitioner");
 
@@ -449,10 +449,10 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
                                     mesh.unpartitioned_elements_end()) == 0);
 
 
-//   const dof_id_type orig_n_local_nodes = mesh.n_local_nodes();
+  //   const dof_id_type orig_n_local_nodes = mesh.n_local_nodes();
 
-//   libMesh::err << "[" << mesh.processor_id() << "]: orig_n_local_nodes="
-//     << orig_n_local_nodes << std::endl;
+  //   libMesh::err << "[" << mesh.processor_id() << "]: orig_n_local_nodes="
+  //     << orig_n_local_nodes << std::endl;
 
   // Build up request sets.  Each node is currently owned by a processor because
   // it is connected to an element owned by that processor.  However, during the
@@ -583,10 +583,10 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
     {
       // Trade my requests with processor procup and procdown
       processor_id_type procup = (mesh.processor_id() + p) %
-                                  mesh.n_processors();
+        mesh.n_processors();
       processor_id_type procdown = (mesh.n_processors() +
                                     mesh.processor_id() - p) %
-                                    mesh.n_processors();
+        mesh.n_processors();
       std::vector<dof_id_type> request_to_fill;
       mesh.comm().send_receive(procup, requested_node_ids[procup],
                                procdown, request_to_fill);

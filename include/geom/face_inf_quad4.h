@@ -38,18 +38,18 @@ namespace libMesh
 /**
  * The \p INFQUAD4 is an infinite element in 2D composed of 4 nodes.
  * It is numbered like this:
-   \verbatim
-             2           3
-   INFQUAD4: o           o   closer to infinity
-             |           |
-             |           |
-             |           |
-             |           |
-             |           |
-             o-----------o   base side
-             0           1
-   \endverbatim
- */
+ \verbatim
+ 2           3
+ INFQUAD4: o           o   closer to infinity
+ |           |
+ |           |
+ |           |
+ |           |
+ |           |
+ o-----------o   base side
+ 0           1
+ \endverbatim
+*/
 // ------------------------------------------------------------
 // InfQuad4 class definition
 class InfQuad4 : public InfQuad
@@ -124,14 +124,14 @@ public:
                             const IOPackage iop,
                             std::vector<dof_id_type>& conn) const;
 
-//   void tecplot_connectivity(const unsigned int sf,
-//     std::vector<unsigned int>& conn) const;
+  //   void tecplot_connectivity(const unsigned int sf,
+  //     std::vector<unsigned int>& conn) const;
 
-//   void vtk_connectivity(const unsigned int sc,
-// std::vector<unsigned int>*conn = NULL) const;
+  //   void vtk_connectivity(const unsigned int sc,
+  // std::vector<unsigned int>*conn = NULL) const;
 
-//   unsigned int vtk_element_type (const unsigned int) const
-//   { return 9; }
+  //   unsigned int vtk_element_type (const unsigned int) const
+  //   { return 9; }
 
   /**
    * @returns \p true when this element contains the point

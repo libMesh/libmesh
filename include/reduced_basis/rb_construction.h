@@ -172,7 +172,7 @@ public:
    * Get/set the tolerance for the basis training.
    */
   void set_training_tolerance(Real new_training_tolerance)
-    {this->training_tolerance = new_training_tolerance; }
+  {this->training_tolerance = new_training_tolerance; }
   Real get_training_tolerance() { return training_tolerance; }
 
   /**
@@ -188,13 +188,13 @@ public:
    * during the Offline stage.
    */
   void set_quiet_mode(bool quiet_mode_in)
-    { this->quiet_mode = quiet_mode_in; }
+  { this->quiet_mode = quiet_mode_in; }
 
   /**
    * Is the system in quiet mode?
    */
   bool is_quiet() const
-    { return this->quiet_mode; }
+  { return this->quiet_mode; }
 
   /**
    * Load the i^th RB function into the RBConstruction
@@ -334,22 +334,22 @@ public:
    * to this function.
    */
   void set_rb_construction_parameters(
-                                 unsigned int n_training_samples_in,
-                                 bool deterministic_training_in,
-                                 std::string deterministic_training_parameter_name_in,
-                                 unsigned int deterministic_training_parameter_repeats_in,
-                                 std::string alternative_solver_in,
-                                 bool reuse_preconditioner_in,
-                                 bool use_relative_bound_in_greedy_in,
-                                 bool write_data_during_training_in,
-                                 unsigned int training_parameters_random_seed_in,
-                                 bool quiet_mode_in,
-                                 unsigned int Nmax_in,
-                                 Real training_tolerance_in,
-                                 RBParameters mu_min_in,
-                                 RBParameters mu_max_in,
-                                 RBParameters initial_mu_in,
-                                 std::map<std::string,bool> log_scaling);
+                                      unsigned int n_training_samples_in,
+                                      bool deterministic_training_in,
+                                      std::string deterministic_training_parameter_name_in,
+                                      unsigned int deterministic_training_parameter_repeats_in,
+                                      std::string alternative_solver_in,
+                                      bool reuse_preconditioner_in,
+                                      bool use_relative_bound_in_greedy_in,
+                                      bool write_data_during_training_in,
+                                      unsigned int training_parameters_random_seed_in,
+                                      bool quiet_mode_in,
+                                      unsigned int Nmax_in,
+                                      Real training_tolerance_in,
+                                      RBParameters mu_min_in,
+                                      RBParameters mu_max_in,
+                                      RBParameters initial_mu_in,
+                                      std::map<std::string,bool> log_scaling);
 
   /**
    * Print out info that describes the current setup of this RBConstruction.
@@ -709,7 +709,7 @@ protected:
    */
   unsigned int Nmax;
 
- /**
+  /**
    * The number of basis functions that we add at each greedy step.
    * This defaults to 1 in the steady case.
    */

@@ -25,7 +25,7 @@ namespace libMesh
 
 
 EulerSolver::EulerSolver (sys_type& s)
- : UnsteadySolver(s), theta(1.)
+  : UnsteadySolver(s), theta(1.)
 {
 }
 
@@ -68,9 +68,9 @@ bool EulerSolver::element_residual (bool request_jacobian,
   // ourselves
   context.elem_solution_derivative = 1.0;
 
-// Technically the fixed_solution_derivative is always theta,
-// but we're scaling a whole jacobian by theta after these first
-// evaluations
+  // Technically the fixed_solution_derivative is always theta,
+  // but we're scaling a whole jacobian by theta after these first
+  // evaluations
   context.fixed_solution_derivative = 1.0;
 
   // If a fixed solution is requested, we'll use theta_solution
@@ -176,9 +176,9 @@ bool EulerSolver::side_residual (bool request_jacobian,
   // ourselves
   context.elem_solution_derivative = 1.0;
 
-// Technically the fixed_solution_derivative is always theta,
-// but we're scaling a whole jacobian by theta after these first
-// evaluations
+  // Technically the fixed_solution_derivative is always theta,
+  // but we're scaling a whole jacobian by theta after these first
+  // evaluations
   context.fixed_solution_derivative = 1.0;
 
   // If a fixed solution is requested, we'll use theta_solution

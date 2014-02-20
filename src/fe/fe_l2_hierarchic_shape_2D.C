@@ -93,8 +93,8 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
               crossfunc *= (zeta0 + zeta1);
 
             return f0 * crossfunc *
-                   FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder,
-                                           basisorder, edgeval);
+              FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder,
+                                         basisorder, edgeval);
           }
         else if (i < 2u*totalorder + 1)
           {
@@ -114,8 +114,8 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
               crossfunc *= (zeta2 + zeta1);
 
             return f1 * crossfunc *
-                   FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder,
-                                           basisorder, edgeval);
+              FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder,
+                                         basisorder, edgeval);
           }
         else if (i < 3u*totalorder)
           {
@@ -135,8 +135,8 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
               crossfunc *= (zeta0 + zeta2);
 
             return f2 * crossfunc *
-                   FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder,
-                                           basisorder, edgeval);
+              FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder,
+                                         basisorder, edgeval);
           }
         // Interior DoFs
         else
@@ -144,7 +144,7 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
             const unsigned int basisnum = i - (3u*totalorder);
             unsigned int exp0 = triangular_number_column[basisnum] + 1;
             unsigned int exp1 = triangular_number_row[basisnum] + 1 -
-                                triangular_number_column[basisnum];
+              triangular_number_column[basisnum];
 
             Real returnval = 1;
             for (unsigned int n = 0; n != exp0; ++n)
@@ -156,7 +156,7 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
           }
       }
 
-    // Hierarchic shape functions on the quadrilateral.
+      // Hierarchic shape functions on the quadrilateral.
     case QUAD4:
       libmesh_assert_less (totalorder, 2);
     case QUAD8:
@@ -168,10 +168,10 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
 
         libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
 
-// Example i, i0, i1 values for totalorder = 5:
-//                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
-//  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 3, 2, 4, 4, 4, 3, 2, 5, 5, 5, 5, 4, 3, 2};
-//  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 3, 3, 2, 3, 4, 4, 4, 2, 3, 4, 5, 5, 5, 5};
+        // Example i, i0, i1 values for totalorder = 5:
+        //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
+        //  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 3, 2, 4, 4, 4, 3, 2, 5, 5, 5, 5, 4, 3, 2};
+        //  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 3, 3, 2, 3, 4, 4, 4, 2, 3, 4, 5, 5, 5, 5};
 
         unsigned int i0, i1;
 
@@ -309,10 +309,10 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem* elem,
 
         libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
 
-// Example i, i0, i1 values for totalorder = 5:
-//                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
-//  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
-//  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
+        // Example i, i0, i1 values for totalorder = 5:
+        //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
+        //  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
+        //  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
 
         unsigned int i0, i1;
 
@@ -416,8 +416,8 @@ Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const Elem* elem,
   unsigned int prevj = libMesh::invalid_uint;
 
   switch (j)
-  {
-    //  d^2()/dxi^2
+    {
+      //  d^2()/dxi^2
     case 0:
       {
         pp = Point(p(0)+eps, p(1));
@@ -426,7 +426,7 @@ Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const Elem* elem,
         break;
       }
 
-    // d^2()/dxideta
+      // d^2()/dxideta
     case 1:
       {
         pp = Point(p(0), p(1)+eps);
@@ -435,7 +435,7 @@ Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const Elem* elem,
         break;
       }
 
-    // d^2()/deta^2
+      // d^2()/deta^2
     case 2:
       {
         pp = Point(p(0), p(1)+eps);
@@ -445,7 +445,7 @@ Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const Elem* elem,
       }
     default:
       libmesh_error();
-  }
+    }
   return (FE<2,L2_HIERARCHIC>::shape_deriv(elem, order, i, prevj, pp) -
           FE<2,L2_HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm)
           )/2./eps;

@@ -110,8 +110,8 @@ struct EIM_F : RBEIMAssembly
 
   EIM_F(RBEIMConstruction& rb_eim_con_in,
         unsigned int basis_function_index_in)
-  : RBEIMAssembly(rb_eim_con_in,
-                  basis_function_index_in)
+    : RBEIMAssembly(rb_eim_con_in,
+                    basis_function_index_in)
   {}
 
   virtual void interior_assembly(FEMContext &c)

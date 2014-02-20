@@ -30,49 +30,49 @@ namespace libMesh
 // ------------------------------------------------------------
 // Tri3 class static member initializations
 const unsigned int Tri3::side_nodes_map[3][2] =
-{
-  {0, 1}, // Side 0
-  {1, 2}, // Side 1
-  {2, 0}  // Side 2
-};
+  {
+    {0, 1}, // Side 0
+    {1, 2}, // Side 1
+    {2, 0}  // Side 2
+  };
 
 
 #ifdef LIBMESH_ENABLE_AMR
 
 const float Tri3::_embedding_matrix[4][3][3] =
-{
-  // embedding matrix for child 0
   {
-    // 0    1    2
-    {1.0, 0.0, 0.0}, // 0
-    {0.5, 0.5, 0.0}, // 1
-    {0.5, 0.0, 0.5}  // 2
-  },
+    // embedding matrix for child 0
+    {
+      // 0    1    2
+      {1.0, 0.0, 0.0}, // 0
+      {0.5, 0.5, 0.0}, // 1
+      {0.5, 0.0, 0.5}  // 2
+    },
 
-  // embedding matrix for child 1
-  {
-    // 0    1    2
-    {0.5, 0.5, 0.0}, // 0
-    {0.0, 1.0, 0.0}, // 1
-    {0.0, 0.5, 0.5}  // 2
-  },
+    // embedding matrix for child 1
+    {
+      // 0    1    2
+      {0.5, 0.5, 0.0}, // 0
+      {0.0, 1.0, 0.0}, // 1
+      {0.0, 0.5, 0.5}  // 2
+    },
 
-  // embedding matrix for child 2
-  {
-    // 0    1    2
-    {0.5, 0.0, 0.5}, // 0
-    {0.0, 0.5, 0.5}, // 1
-    {0.0, 0.0, 1.0}  // 2
-  },
+    // embedding matrix for child 2
+    {
+      // 0    1    2
+      {0.5, 0.0, 0.5}, // 0
+      {0.0, 0.5, 0.5}, // 1
+      {0.0, 0.0, 1.0}  // 2
+    },
 
-  // embedding matrix for child 3
-  {
-    // 0    1    2
-    {0.5, 0.5, 0.0}, // 0
-    {0.0, 0.5, 0.5}, // 1
-    {0.5, 0.0, 0.5}  // 2
-  }
-};
+    // embedding matrix for child 3
+    {
+      // 0    1    2
+      {0.5, 0.5, 0.0}, // 0
+      {0.0, 0.5, 0.5}, // 1
+      {0.5, 0.0, 0.5}  // 2
+    }
+  };
 
 #endif
 

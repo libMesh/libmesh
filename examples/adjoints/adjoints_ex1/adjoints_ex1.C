@@ -15,38 +15,38 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  U$ */
 
- // <h1>Adjoints Example 1 - Laplace Equation in the L-Shaped Domain with Adjoint based mesh refinement</h1>
- //
- // This example solves the Laplace equation on the classic "L-shaped"
- // domain with adaptive mesh refinement. The exact
- // solution is u(r,\theta) = r^{2/3} * \sin ( (2/3) * \theta). The kelly and
- // adjoint residual error estimators are used to develop error indicators and
- // guide mesh adaptation. Since we use the adjoint capabilities of libMesh in
- // this example, we use the DiffSystem framework. This file (adjoints_ex1.C)
- // contains the declaration of mesh and equation system objects, L-shaped.C
- // contains the assembly of the system, element_qoi_derivative.C and
- // side_qoi_derivative.C contain the RHS for the adjoint systems.
- // Postprocessing to compute the QoIs is done in element_postprocess.C and
- // side_postprocess.C.
+// <h1>Adjoints Example 1 - Laplace Equation in the L-Shaped Domain with Adjoint based mesh refinement</h1>
+//
+// This example solves the Laplace equation on the classic "L-shaped"
+// domain with adaptive mesh refinement. The exact
+// solution is u(r,\theta) = r^{2/3} * \sin ( (2/3) * \theta). The kelly and
+// adjoint residual error estimators are used to develop error indicators and
+// guide mesh adaptation. Since we use the adjoint capabilities of libMesh in
+// this example, we use the DiffSystem framework. This file (adjoints_ex1.C)
+// contains the declaration of mesh and equation system objects, L-shaped.C
+// contains the assembly of the system, element_qoi_derivative.C and
+// side_qoi_derivative.C contain the RHS for the adjoint systems.
+// Postprocessing to compute the QoIs is done in element_postprocess.C and
+// side_postprocess.C.
 
- // The initial mesh contains three QUAD9 elements which represent the
- // standard quadrants I, II, and III of the domain [-1,1]x[-1,1],
- // i.e.
- // Element 0: [-1,0]x[ 0,1]
- // Element 1: [ 0,1]x[ 0,1]
- // Element 2: [-1,0]x[-1,0]
- // The mesh is provided in the standard libMesh ASCII format file
- // named "lshaped.xda".  In addition, an input file named "general.in"
- // is provided which allows the user to set several parameters for
- // the solution so that the problem can be re-run without a
- // re-compile.  The solution technique employed is to have a
- // refinement loop with a linear (forward and adjoint) solve inside followed by a
- // refinement of the grid and projection of the solution to the new grid
- // In the final loop iteration, there is no additional
- // refinement after the solve.  In the input file "general.in", the variable
- // "max_adaptivesteps" controls the number of refinement steps, and
- // "refine_fraction" / "coarsen_fraction" determine the number of
- // elements which will be refined / coarsened at each step.
+// The initial mesh contains three QUAD9 elements which represent the
+// standard quadrants I, II, and III of the domain [-1,1]x[-1,1],
+// i.e.
+// Element 0: [-1,0]x[ 0,1]
+// Element 1: [ 0,1]x[ 0,1]
+// Element 2: [-1,0]x[-1,0]
+// The mesh is provided in the standard libMesh ASCII format file
+// named "lshaped.xda".  In addition, an input file named "general.in"
+// is provided which allows the user to set several parameters for
+// the solution so that the problem can be re-run without a
+// re-compile.  The solution technique employed is to have a
+// refinement loop with a linear (forward and adjoint) solve inside followed by a
+// refinement of the grid and projection of the solution to the new grid
+// In the final loop iteration, there is no additional
+// refinement after the solve.  In the input file "general.in", the variable
+// "max_adaptivesteps" controls the number of refinement steps, and
+// "refine_fraction" / "coarsen_fraction" determine the number of
+// elements which will be refined / coarsened at each step.
 
 // C++ includes
 #include <iostream>
@@ -133,7 +133,7 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
 
   // No transient time solver
   system.time_solver =
-      AutoPtr<TimeSolver>(new SteadySolver(system));
+    AutoPtr<TimeSolver>(new SteadySolver(system));
 
   // Nonlinear solver options
   {
@@ -277,7 +277,7 @@ int main (int argc, char** argv)
 
   std::cout << "Reading in and building the mesh" << std::endl;
 
-   // Read in the mesh
+  // Read in the mesh
   mesh.read(param.domainfile.c_str());
   // Make all the elements of the mesh second order so we can compute
   // with a higher order basis
@@ -316,8 +316,8 @@ int main (int argc, char** argv)
 	  libmesh_assert_equal_to (param.nelem_target, 0);
 	// If we aren't adapting to a tolerance we need a
 	// target mesh size
-            else
-              libmesh_assert_greater (param.nelem_target, 0);
+        else
+          libmesh_assert_greater (param.nelem_target, 0);
 
 	linear_solver->reuse_preconditioner(false);
 
@@ -379,8 +379,8 @@ int main (int argc, char** argv)
 	primal_solution.swap(dual_solution_1);
 
 	std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
-                      << " active elements and "
-                      << equation_systems.n_active_dofs()
+                  << " active elements and "
+                  << equation_systems.n_active_dofs()
 		  << " active dofs." << std::endl ;
 
 	// Postprocess, compute the approximate QoIs and write them out to the console
@@ -394,11 +394,11 @@ int main (int argc, char** argv)
 
 	std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
                  << std::abs(QoI_0_computed - QoI_0_exact) /
-                    std::abs(QoI_0_exact) << std::endl;
+          std::abs(QoI_0_exact) << std::endl;
 
 	std::cout<< "The relative error in QoI 1 is " << std::setprecision(17)
                  << std::abs(QoI_1_computed - QoI_1_exact) /
-                    std::abs(QoI_1_exact) << std::endl << std::endl;
+          std::abs(QoI_1_exact) << std::endl << std::endl;
 
 	// Now we construct the data structures for the mesh refinement process
 	ErrorVector error;
@@ -507,11 +507,11 @@ int main (int argc, char** argv)
 
 	std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
                  << std::abs(QoI_0_computed - QoI_0_exact) /
-                    std::abs(QoI_0_exact) << std::endl;
+          std::abs(QoI_0_exact) << std::endl;
 
 	std::cout<< "The relative error in QoI 1 is " << std::setprecision(17)
                  << std::abs(QoI_1_computed - QoI_1_exact) /
-                    std::abs(QoI_1_exact) << std::endl << std::endl;
+          std::abs(QoI_1_exact) << std::endl << std::endl;
       }
   }
 

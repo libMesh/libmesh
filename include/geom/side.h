@@ -52,7 +52,7 @@ class Node;
 template <class SideType, class ParentType>
 class Side : public SideType
 {
- public:
+public:
 
   /**
    * Constructor.  Creates a side from an element.
@@ -125,7 +125,7 @@ class Side : public SideType
   { libmesh_error(); return false; }
 
 
- private:
+private:
 
 
   /**
@@ -152,7 +152,7 @@ class Side : public SideType
 template <class EdgeType, class ParentType>
 class SideEdge : public EdgeType
 {
- public:
+public:
 
   /**
    * Constructor.  Creates a side from an element.
@@ -220,7 +220,7 @@ class SideEdge : public EdgeType
   virtual unsigned int n_sides () const { return 0; }
 
 
- private:
+private:
 
 
   /**

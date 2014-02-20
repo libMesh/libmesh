@@ -104,9 +104,9 @@ public:
    * QoI error estimates
    */
   Number &get_global_QoI_error_estimate(unsigned int qoi_index)
-    {
-      return computed_global_QoI_errors[qoi_index];
-    }
+  {
+    return computed_global_QoI_errors[qoi_index];
+  }
 
   /**
    * How many h refinements to perform to get the fine grid
@@ -142,6 +142,6 @@ protected:
 
 } // namespace libMesh
 
- #endif // #ifdef LIBMESH_ENABLE_AMR
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
 #endif // LIBMESH_ADJOINT_REFINEMENT_ESTIMATOR_H

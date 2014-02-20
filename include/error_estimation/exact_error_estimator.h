@@ -162,7 +162,7 @@ public:
    * integration.
    */
   void extra_quadrature_order (const int extraorder)
-    { _extra_order = extraorder; }
+  { _extra_order = extraorder; }
 
 
   // Bring the base class functionality into the name lookup

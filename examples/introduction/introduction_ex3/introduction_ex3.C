@@ -16,15 +16,15 @@
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 
- // <h1>Introduction Example 3 - Solving a Poisson Problem</h1>
- //
- // This is the third example program.  It builds on
- // the second example program by showing how to solve a simple
- // Poisson system.  This example also introduces the notion
- // of customized matrix assembly functions, working with an
- // exact solution, and using element iterators.
- // We will not comment on things that
- // were already explained in the second example.
+// <h1>Introduction Example 3 - Solving a Poisson Problem</h1>
+//
+// This is the third example program.  It builds on
+// the second example program by showing how to solve a simple
+// Poisson system.  This example also introduces the notion
+// of customized matrix assembly functions, working with an
+// exact solution, and using element iterators.
+// We will not comment on things that
+// were already explained in the second example.
 
 // C++ include files that we need
 #include <iostream>

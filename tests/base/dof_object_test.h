@@ -4,15 +4,15 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
-#define DOFOBJECTTEST \
-  CPPUNIT_TEST( testSetId ); \
-  CPPUNIT_TEST( testValidId ); \
-  CPPUNIT_TEST( testInvalidateId ); \
-  CPPUNIT_TEST( testSetProcId ); \
-  CPPUNIT_TEST( testValidProcId ); \
-  CPPUNIT_TEST( testInvalidateProcId ); \
-  CPPUNIT_TEST( testSetNSystems ); \
-  CPPUNIT_TEST( testSetNVariableGroups ); \
+#define DOFOBJECTTEST                           \
+  CPPUNIT_TEST( testSetId );                    \
+  CPPUNIT_TEST( testValidId );                  \
+  CPPUNIT_TEST( testInvalidateId );             \
+  CPPUNIT_TEST( testSetProcId );                \
+  CPPUNIT_TEST( testValidProcId );              \
+  CPPUNIT_TEST( testInvalidateProcId );         \
+  CPPUNIT_TEST( testSetNSystems );              \
+  CPPUNIT_TEST( testSetNVariableGroups );       \
   CPPUNIT_TEST( testJensEftangBug );
 
 using namespace libMesh;

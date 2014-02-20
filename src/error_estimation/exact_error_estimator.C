@@ -82,7 +82,7 @@ void ExactErrorEstimator::attach_exact_value (unsigned int sys_num,
                                               FunctionBase<Number> * f)
 {
   if (_exact_values.size() <= sys_num)
-  _exact_values.resize(sys_num+1, NULL);
+    _exact_values.resize(sys_num+1, NULL);
 
   if (f)
     _exact_values[sys_num] = f->clone().release();
@@ -128,7 +128,7 @@ void ExactErrorEstimator::attach_exact_deriv (unsigned int sys_num,
                                               FunctionBase<Gradient>* g)
 {
   if (_exact_derivs.size() <= sys_num)
-  _exact_derivs.resize(sys_num+1, NULL);
+    _exact_derivs.resize(sys_num+1, NULL);
 
   if (g)
     _exact_derivs[sys_num] = g->clone().release();
@@ -176,7 +176,7 @@ void ExactErrorEstimator::attach_exact_hessian (unsigned int sys_num,
                                                 FunctionBase<Tensor>* h)
 {
   if (_exact_hessians.size() <= sys_num)
-  _exact_hessians.resize(sys_num+1, NULL);
+    _exact_hessians.resize(sys_num+1, NULL);
 
   if (h)
     _exact_hessians[sys_num] = h->clone().release();
@@ -203,10 +203,10 @@ void ExactErrorEstimator::estimate_error (const System& system,
                                           const NumericVector<Number>* solution_vector,
                                           bool estimate_parent_error)
 #else
-void ExactErrorEstimator::estimate_error (const System& system,
-                                          ErrorVector& error_per_cell,
-                                          const NumericVector<Number>* solution_vector,
-                                          bool /* estimate_parent_error */ )
+  void ExactErrorEstimator::estimate_error (const System& system,
+                                            ErrorVector& error_per_cell,
+                                            const NumericVector<Number>* solution_vector,
+                                            bool /* estimate_parent_error */ )
 #endif
 {
   // The current mesh
@@ -262,24 +262,24 @@ void ExactErrorEstimator::estimate_error (const System& system,
       AutoPtr<MeshFunction> fine_values;
       AutoPtr<NumericVector<Number> > fine_soln = NumericVector<Number>::build(system.comm());
       if (_equation_systems_fine)
-      {
-        const System& fine_system = _equation_systems_fine->get_system(system.name());
+        {
+          const System& fine_system = _equation_systems_fine->get_system(system.name());
 
-        std::vector<Number> global_soln;
-        // FIXME - we're assuming that the fine system solution gets
-        // used even when a different vector is used for the coarse
-        // system
-        fine_system.update_global_solution(global_soln);
-        fine_soln->init (global_soln.size(), true, SERIAL);
-        (*fine_soln) = global_soln;
+          std::vector<Number> global_soln;
+          // FIXME - we're assuming that the fine system solution gets
+          // used even when a different vector is used for the coarse
+          // system
+          fine_system.update_global_solution(global_soln);
+          fine_soln->init (global_soln.size(), true, SERIAL);
+          (*fine_soln) = global_soln;
 
-        fine_values = AutoPtr<MeshFunction>
-          (new MeshFunction(*_equation_systems_fine,
-                            *fine_soln,
-                            fine_system.get_dof_map(),
-                            fine_system.variable_number(var_name)));
-        fine_values->init();
-      } else {
+          fine_values = AutoPtr<MeshFunction>
+            (new MeshFunction(*_equation_systems_fine,
+                              *fine_soln,
+                              fine_system.get_dof_map(),
+                              fine_system.variable_number(var_name)));
+          fine_values->init();
+        } else {
         // Initialize functors if we're using them
         for (unsigned int i=0; i != _exact_values.size(); ++i)
           if (_exact_values[i])

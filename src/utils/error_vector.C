@@ -235,23 +235,23 @@ void ErrorVector::plot_error(const std::string& filename,
   std::vector<dof_id_type> dof_indices;
 
   for ( ; el != end_el; ++el)
-  {
-    const Elem* elem = *el;
+    {
+      const Elem* elem = *el;
 
-    error_dof_map.dof_indices(elem, dof_indices);
+      error_dof_map.dof_indices(elem, dof_indices);
 
-    const dof_id_type elem_id = elem->id();
+      const dof_id_type elem_id = elem->id();
 
-    //0 for the monomial basis
-    const dof_id_type solution_index = dof_indices[0];
+      //0 for the monomial basis
+      const dof_id_type solution_index = dof_indices[0];
 
-    // libMesh::out << "elem_number=" << elem_number << std::endl;
-    libmesh_assert_less (elem_id, (*this).size());
+      // libMesh::out << "elem_number=" << elem_number << std::endl;
+      libmesh_assert_less (elem_id, (*this).size());
 
-    // We may have zero error values in special circumstances
-    // libmesh_assert_greater ((*this)[elem_id], 0.);
-    error_system.solution->set(solution_index, (*this)[elem_id]);
-  }
+      // We may have zero error values in special circumstances
+      // libmesh_assert_greater ((*this)[elem_id], 0.);
+      error_system.solution->set(solution_index, (*this)[elem_id]);
+    }
 
   // We may have to renumber if the original numbering was not
   // contiguous.  Since this is just a temporary mesh, that's probably
@@ -286,9 +286,9 @@ void ErrorVector::plot_error(const std::string& filename,
     {
       libmesh_here();
       libMesh::err << "Warning: ErrorVector::plot_error currently only"
-                    << " supports .gmv and .plt and .exo/.e (if enabled) output;" << std::endl;
+                   << " supports .gmv and .plt and .exo/.e (if enabled) output;" << std::endl;
       libMesh::err << "Could not recognize filename: " << filename
-                    << std::endl;
+                   << std::endl;
     }
 }
 

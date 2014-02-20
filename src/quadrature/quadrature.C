@@ -104,7 +104,7 @@ void QBase::scale(std::pair<Real, Real> old_range,
 
   // Compute the scale factor and scale the weights
   const Real scfact = (new_range.second - new_range.first) /
-                      (old_range.second - old_range.first);
+    (old_range.second - old_range.first);
 
   for (unsigned int i=0; i<_points.size(); i++)
     _weights[i] *= scfact;

@@ -30,11 +30,11 @@
 // to be recalculated.
 namespace
 {
-  using namespace libMesh;
+using namespace libMesh;
 
-  static dof_id_type old_elem_id = DofObject::invalid_id;
-  static Point centroid;
-  static Point max_distance;
+static dof_id_type old_elem_id = DofObject::invalid_id;
+static Point centroid;
+static Point max_distance;
 }
 
 
@@ -49,8 +49,8 @@ Real FE<3,XYZ>::shape(const ElemType,
                       const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
-                << "because the centroid is needed."
-                << std::endl;
+               << "because the centroid is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -78,10 +78,10 @@ Real FE<3,XYZ>::shape(const Elem* elem,
       max_distance = Point(0.,0.,0.);
       for (unsigned int p = 0; p < elem->n_nodes(); p++)
         for (unsigned int d = 0; d < 3; d++)
-        {
-           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
-           max_distance(d) = std::max(distance, max_distance(d));
-        }
+          {
+            const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+            max_distance(d) = std::max(distance, max_distance(d));
+          }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -107,8 +107,8 @@ Real FE<3,XYZ>::shape(const Elem* elem,
   const unsigned int totalorder = order + elem->p_level();
 #endif
   libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
-              (static_cast<unsigned int>(totalorder)+2)*
-              (static_cast<unsigned int>(totalorder)+3)/6);
+                       (static_cast<unsigned int>(totalorder)+2)*
+                       (static_cast<unsigned int>(totalorder)+3)/6);
 
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
@@ -257,8 +257,8 @@ Real FE<3,XYZ>::shape_deriv(const ElemType,
                             const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
-                << "because the centroid is needed."
-                << std::endl;
+               << "because the centroid is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -289,10 +289,10 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
       max_distance = Point(0.,0.,0.);
       for (unsigned int p = 0; p < elem->n_nodes(); p++)
         for (unsigned int d = 0; d < 3; d++)
-        {
-           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
-           max_distance(d) = std::max(distance, max_distance(d));
-        }
+          {
+            const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+            max_distance(d) = std::max(distance, max_distance(d));
+          }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -318,8 +318,8 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   const unsigned int totalorder = static_cast<Order>(order + elem->p_level());
 #endif
   libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
-              (static_cast<unsigned int>(totalorder)+2)*
-              (static_cast<unsigned int>(totalorder)+3)/6);
+                       (static_cast<unsigned int>(totalorder)+2)*
+                       (static_cast<unsigned int>(totalorder)+3)/6);
 
   switch (j)
     {
@@ -438,22 +438,22 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
           case 34:
             return 0.;
 
-        default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = nx;
-          for (unsigned int index=1; index < nx; index++)
-            val *= dx;
-          for (unsigned int index=0; index != ny; index++)
-            val *= dy;
-          for (unsigned int index=0; index != nz; index++)
-            val *= dz;
-          return val/distx;
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = nx;
+            for (unsigned int index=1; index < nx; index++)
+              val *= dx;
+            for (unsigned int index=0; index != ny; index++)
+              val *= dy;
+            for (unsigned int index=0; index != nz; index++)
+              val *= dz;
+            return val/distx;
           }
       }
 
@@ -574,21 +574,21 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
             return 0.;
 
           default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = ny;
-          for (unsigned int index=0; index != nx; index++)
-            val *= dx;
-          for (unsigned int index=1; index < ny; index++)
-            val *= dy;
-          for (unsigned int index=0; index != nz; index++)
-            val *= dz;
-          return val/disty;
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = ny;
+            for (unsigned int index=0; index != nx; index++)
+              val *= dx;
+            for (unsigned int index=1; index < ny; index++)
+              val *= dy;
+            for (unsigned int index=0; index != nz; index++)
+              val *= dz;
+            return val/disty;
           }
       }
 
@@ -709,21 +709,21 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
             return 4.*dz*dz*dz/distz;
 
           default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = nz;
-          for (unsigned int index=0; index != nx; index++)
-            val *= dx;
-          for (unsigned int index=0; index != ny; index++)
-            val *= dy;
-          for (unsigned int index=1; index < nz; index++)
-            val *= dz;
-          return val/distz;
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = nz;
+            for (unsigned int index=0; index != nx; index++)
+              val *= dx;
+            for (unsigned int index=0; index != ny; index++)
+              val *= dy;
+            for (unsigned int index=1; index < nz; index++)
+              val *= dz;
+            return val/distz;
           }
       }
 
@@ -748,8 +748,8 @@ Real FE<3,XYZ>::shape_second_deriv(const ElemType,
                                    const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
-                << "because the centroid is needed."
-                << std::endl;
+               << "because the centroid is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -780,10 +780,10 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
       max_distance = Point(0.,0.,0.);
       for (unsigned int p = 0; p < elem->n_nodes(); p++)
         for (unsigned int d = 0; d < 3; d++)
-        {
-           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
-           max_distance(d) = std::max(distance, max_distance(d));
-        }
+          {
+            const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+            max_distance(d) = std::max(distance, max_distance(d));
+          }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -815,10 +815,10 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   const unsigned int totalorder = static_cast<Order>(order + elem->p_level());
 #endif
   libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
-              (static_cast<unsigned int>(totalorder)+2)*
-              (static_cast<unsigned int>(totalorder)+3)/6);
+                       (static_cast<unsigned int>(totalorder)+2)*
+                       (static_cast<unsigned int>(totalorder)+3)/6);
 
-    // monomials. since they are hierarchic we only need one case block.
+  // monomials. since they are hierarchic we only need one case block.
   switch (j)
     {
       // d^2()/dx^2
@@ -902,21 +902,21 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
             return 0.;
 
           default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = nx * (nx - 1);
-          for (unsigned int index=2; index < nx; index++)
-            val *= dx;
-          for (unsigned int index=0; index != ny; index++)
-            val *= dy;
-          for (unsigned int index=0; index != nz; index++)
-            val *= dz;
-          return val/dist2x;
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = nx * (nx - 1);
+            for (unsigned int index=2; index < nx; index++)
+              val *= dx;
+            for (unsigned int index=0; index != ny; index++)
+              val *= dy;
+            for (unsigned int index=0; index != nz; index++)
+              val *= dz;
+            return val/dist2x;
           }
       }
 
@@ -1008,21 +1008,21 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
             return 0.;
 
           default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = nx * ny;
-          for (unsigned int index=1; index < nx; index++)
-            val *= dx;
-          for (unsigned int index=1; index < ny; index++)
-            val *= dy;
-          for (unsigned int index=0; index != nz; index++)
-            val *= dz;
-          return val/distxy;
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = nx * ny;
+            for (unsigned int index=1; index < nx; index++)
+              val *= dx;
+            for (unsigned int index=1; index < ny; index++)
+              val *= dy;
+            for (unsigned int index=0; index != nz; index++)
+              val *= dz;
+            return val/distxy;
           }
       }
 
@@ -1113,21 +1113,21 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
             return 0.;
 
           default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = ny * (ny - 1);
-          for (unsigned int index=0; index != nx; index++)
-            val *= dx;
-          for (unsigned int index=2; index < ny; index++)
-            val *= dy;
-          for (unsigned int index=0; index != nz; index++)
-            val *= dz;
-          return val/dist2y;
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = ny * (ny - 1);
+            for (unsigned int index=0; index != nx; index++)
+              val *= dx;
+            for (unsigned int index=2; index < ny; index++)
+              val *= dy;
+            for (unsigned int index=0; index != nz; index++)
+              val *= dz;
+            return val/dist2y;
           }
       }
 
@@ -1219,21 +1219,21 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
             return 0.;
 
           default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = nx * nz;
-          for (unsigned int index=1; index < nx; index++)
-            val *= dx;
-          for (unsigned int index=0; index != ny; index++)
-            val *= dy;
-          for (unsigned int index=1; index < nz; index++)
-            val *= dz;
-          return val/distxz;
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = nx * nz;
+            for (unsigned int index=1; index < nx; index++)
+              val *= dx;
+            for (unsigned int index=0; index != ny; index++)
+              val *= dy;
+            for (unsigned int index=1; index < nz; index++)
+              val *= dz;
+            return val/distxz;
           }
       }
 
@@ -1324,21 +1324,21 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
             return 0.;
 
           default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = ny * nz;
-          for (unsigned int index=0; index != nx; index++)
-            val *= dx;
-          for (unsigned int index=1; index < ny; index++)
-            val *= dy;
-          for (unsigned int index=1; index < nz; index++)
-            val *= dz;
-          return val/distyz;
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = ny * nz;
+            for (unsigned int index=0; index != nx; index++)
+              val *= dx;
+            for (unsigned int index=1; index < ny; index++)
+              val *= dy;
+            for (unsigned int index=1; index < nz; index++)
+              val *= dz;
+            return val/distyz;
           }
       }
 
@@ -1418,21 +1418,21 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
             return 12.*dz*dz/dist2z;
 
           default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = nz * (nz - 1);
-          for (unsigned int index=0; index != nx; index++)
-            val *= dx;
-          for (unsigned int index=0; index != ny; index++)
-            val *= dy;
-          for (unsigned int index=2; index < nz; index++)
-            val *= dz;
-          return val/dist2z;
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = nz * (nz - 1);
+            for (unsigned int index=0; index != nx; index++)
+              val *= dx;
+            for (unsigned int index=0; index != ny; index++)
+              val *= dy;
+            for (unsigned int index=2; index < nz; index++)
+              val *= dz;
+            return val/dist2z;
           }
       }
 

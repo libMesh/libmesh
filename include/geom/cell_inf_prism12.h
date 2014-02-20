@@ -39,27 +39,27 @@ namespace libMesh
 /**
  * The \p InfPrism12 is an infinite element in 3D composed of 12 nodes.
  * It is numbered like this:
-   \verbatim
-   INFPRISM12:
-            5
-            o
-            :
-            :
-            :
-     11 o   :   o 10
-        :  2:   :
-        :   o   :        closer to infinity
-        :  . .  :
-   3o   : . o9. :   o4
-    |   :.  |  .:   |
-    |   o   |   o   |
-    |  . 8  |  7 .  |
-    | .     |     . |
-    |.      |      .|     base face
-    o-------o-------o
-    0       6       1
-   \endverbatim
- */
+ \verbatim
+ INFPRISM12:
+ 5
+ o
+ :
+ :
+ :
+ 11 o   :   o 10
+ :  2:   :
+ :   o   :        closer to infinity
+ :  . .  :
+ 3o   : . o9. :   o4
+ |   :.  |  .:   |
+ |   o   |   o   |
+ |  . 8  |  7 .  |
+ | .     |     . |
+ |.      |      .|     base face
+ o-------o-------o
+ 0       6       1
+ \endverbatim
+*/
 
 // ------------------------------------------------------------
 // InfPrism12 class definition
@@ -141,21 +141,21 @@ public:
                             const IOPackage iop,
                             std::vector<dof_id_type>& conn) const;
 
-//   void tecplot_connectivity(const unsigned int sc,
-//     std::vector<unsigned int>& conn) const;
+  //   void tecplot_connectivity(const unsigned int sc,
+  //     std::vector<unsigned int>& conn) const;
 
-//   void vtk_connectivity(const unsigned int,
-// std::vector<unsigned int>*) const
-//   { libmesh_error(); }
+  //   void vtk_connectivity(const unsigned int,
+  // std::vector<unsigned int>*) const
+  //   { libmesh_error(); }
 
-//   unsigned int vtk_element_type (const unsigned int) const
-//   { return 13; }
+  //   unsigned int vtk_element_type (const unsigned int) const
+  //   { return 13; }
 
   /**
    * @returns 2 for all \p n
    */
   unsigned int n_second_order_adjacent_vertices (const unsigned int) const
-      { return 2; }
+  { return 2; }
 
   /**
    * @returns the element-local number of the  \f$ v^{th} \f$ vertex
@@ -175,7 +175,7 @@ public:
    * \p this->get_node(n)==this->child(c)->get_node(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
-    second_order_child_vertex (const unsigned int n) const;
+  second_order_child_vertex (const unsigned int n) const;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to

@@ -36,15 +36,15 @@
 
 namespace libMesh
 {
-  void        libmesh_version_stdout();
-  int         get_libmesh_version();
+void        libmesh_version_stdout();
+int         get_libmesh_version();
 
-  /**
-   * Specifier for I/O file compatibility features.
-   * This only needs to be changed when new restart file
-   * functionality is added.
-   */
-  std::string get_io_compatibility_version();
+/**
+ * Specifier for I/O file compatibility features.
+ * This only needs to be changed when new restart file
+ * functionality is added.
+ */
+std::string get_io_compatibility_version();
 }
 
 

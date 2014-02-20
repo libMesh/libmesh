@@ -34,25 +34,25 @@ namespace libMesh
 // ------------------------------------------------------------
 // Pyramid5 class static member initializations
 const unsigned int Pyramid5::side_nodes_map[5][4] =
-{
-  {0, 1, 4, 99}, // Side 0
-  {1, 2, 4, 99}, // Side 1
-  {2, 3, 4, 99}, // Side 2
-  {3, 0, 4, 99}, // Side 3
-  {0, 3, 2,  1}  // Side 4
-};
+  {
+    {0, 1, 4, 99}, // Side 0
+    {1, 2, 4, 99}, // Side 1
+    {2, 3, 4, 99}, // Side 2
+    {3, 0, 4, 99}, // Side 3
+    {0, 3, 2,  1}  // Side 4
+  };
 
 const unsigned int Pyramid5::edge_nodes_map[8][2] =
-{
-  {0, 1}, // Side 0
-  {1, 2}, // Side 1
-  {2, 3}, // Side 2
-  {0, 3}, // Side 3
-  {0, 4}, // Side 4
-  {1, 4}, // Side 5
-  {2, 4}, // Side 6
-  {3, 4}  // Side 7
-};
+  {
+    {0, 1}, // Side 0
+    {1, 2}, // Side 1
+    {2, 3}, // Side 2
+    {0, 3}, // Side 3
+    {0, 4}, // Side 4
+    {1, 4}, // Side 5
+    {2, 4}, // Side 6
+    {3, 4}  // Side 7
+  };
 
 
 
@@ -98,8 +98,8 @@ bool Pyramid5::is_node_on_edge(const unsigned int n,
 
 bool Pyramid5::has_affine_map() const
 {
-//  Point v = this->point(3) - this->point(0);
-//  return (v.relative_fuzzy_equals(this->point(2) - this->point(1)));
+  //  Point v = this->point(3) - this->point(0);
+  //  return (v.relative_fuzzy_equals(this->point(2) - this->point(1)));
   return false;
 }
 
@@ -229,7 +229,7 @@ void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
   libmesh_assert_less (sc, this->n_sub_elem());
   libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
-    switch (iop)
+  switch (iop)
     {
     case TECPLOT:
       {
@@ -260,7 +260,7 @@ void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
       libmesh_error();
     }
 
-    libmesh_error();
+  libmesh_error();
 }
 
 

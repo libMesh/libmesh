@@ -47,7 +47,7 @@ class ErrorVector;
 // Partitioner class definition
 class Partitioner
 {
- public:
+public:
 
   /**
    * Constructor.

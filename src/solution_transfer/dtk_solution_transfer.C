@@ -87,15 +87,15 @@ DTKSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var
 
   // If we haven't created a map for this pair of EquationSystems yet, do it now
   if(dtk_maps.find(from_to) == dtk_maps.end())
-  {
-    libmesh_assert(from_es->get_mesh().mesh_dimension() == to_es->get_mesh().mesh_dimension());
+    {
+      libmesh_assert(from_es->get_mesh().mesh_dimension() == to_es->get_mesh().mesh_dimension());
 
-    shared_domain_map_type * map = new shared_domain_map_type(comm_default, from_es->get_mesh().mesh_dimension(), true);
-    dtk_maps[from_to] = map;
+      shared_domain_map_type * map = new shared_domain_map_type(comm_default, from_es->get_mesh().mesh_dimension(), true);
+      dtk_maps[from_to] = map;
 
-    // The tolerance here is for the "contains_point()" implementation in DTK.  Set a larger value for a looser tolerance...
-    map->setup(from_adapter->get_mesh_manager(), to_adapter->get_target_coords(), 30*Teuchos::ScalarTraits<double>::eps());
-  }
+      // The tolerance here is for the "contains_point()" implementation in DTK.  Set a larger value for a looser tolerance...
+      map->setup(from_adapter->get_mesh_manager(), to_adapter->get_target_coords(), 30*Teuchos::ScalarTraits<double>::eps());
+    }
 
   DTKAdapter::RCP_Evaluator from_evaluator = from_adapter->get_variable_evaluator(from_var.name());
   Teuchos::RCP<DataTransferKit::FieldManager<DTKAdapter::FieldContainerType> > to_values = to_adapter->get_values_to_fill(to_var.name());

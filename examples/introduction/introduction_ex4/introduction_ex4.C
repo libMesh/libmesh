@@ -17,21 +17,21 @@
 
 
 
- // <h1>Introduction Example 4 - Solving a 1D, 2D or 3D Poisson Problem in Parallel</h1>
- //
- // This is the fourth example program.  It builds on
- // the third example program by showing how to formulate
- // the code in a dimension-independent way.  Very minor
- // changes to the example will allow the problem to be
- // solved in one, two or three dimensions.
- //
- // This example will also introduce the PerfLog class
- // as a way to monitor your code's performance.  We will
- // use it to instrument the matrix assembly code and look
- // for bottlenecks where we should focus optimization efforts.
- //
- // This example also shows how to extend example 3 to run in
- // parallel.  Notice how little has changed!
+// <h1>Introduction Example 4 - Solving a 1D, 2D or 3D Poisson Problem in Parallel</h1>
+//
+// This is the fourth example program.  It builds on
+// the third example program by showing how to formulate
+// the code in a dimension-independent way.  Very minor
+// changes to the example will allow the problem to be
+// solved in one, two or three dimensions.
+//
+// This example will also introduce the PerfLog class
+// as a way to monitor your code's performance.  We will
+// use it to instrument the matrix assembly code and look
+// for bottlenecks where we should focus optimization efforts.
+//
+// This example also shows how to extend example 3 to run in
+// parallel.  Notice how little has changed!
 
 
 // C++ include files that we need
@@ -259,16 +259,16 @@ int main (int argc, char** argv)
   boundary_ids.insert(1);
   // the dim==2 mesh has four boundaries with IDs 0, 1, 2 and 3
   if(dim>=2)
-  {
-    boundary_ids.insert(2);
-    boundary_ids.insert(3);
-  }
+    {
+      boundary_ids.insert(2);
+      boundary_ids.insert(3);
+    }
   // the dim==3 mesh has four boundaries with IDs 0, 1, 2, 3, 4 and 5
   if(dim==3)
-  {
-    boundary_ids.insert(4);
-    boundary_ids.insert(5);
-  }
+    {
+      boundary_ids.insert(4);
+      boundary_ids.insert(5);
+    }
 
   // Create a vector storing the variable numbers which the BC applies to
   std::vector<unsigned int> variables(1);
@@ -300,16 +300,16 @@ int main (int argc, char** argv)
   // After solving the system write the solution
   // to a GMV-formatted plot file.
   if(dim == 1)
-  {
-    GnuPlotIO plot(mesh,"Introduction Example 4, 1D",GnuPlotIO::GRID_ON);
-    plot.write_equation_systems("gnuplot_script",equation_systems);
-  }
+    {
+      GnuPlotIO plot(mesh,"Introduction Example 4, 1D",GnuPlotIO::GRID_ON);
+      plot.write_equation_systems("gnuplot_script",equation_systems);
+    }
 #ifdef LIBMESH_HAVE_EXODUS_API
   else
-  {
-    ExodusII_IO (mesh).write_equation_systems ((dim == 3) ?
-      "out_3.e" : "out_2.e",equation_systems);
-  }
+    {
+      ExodusII_IO (mesh).write_equation_systems ((dim == 3) ?
+                                                 "out_3.e" : "out_2.e",equation_systems);
+    }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // All done.
@@ -337,7 +337,7 @@ void assemble_poisson(EquationSystems& es,
   // application.
   PerfLog perf_log ("Matrix Assembly");
 
-    // Get a constant reference to the mesh object.
+  // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
 
   // The dimension that we are running
@@ -527,16 +527,16 @@ void assemble_poisson(EquationSystems& es,
 
           Real fxy;
           if(dim==1)
-          {
-            // In 1D, compute the rhs by differentiating the
-            // exact solution twice.
-            const Real pi = libMesh::pi;
-            fxy = (0.25*pi*pi)*sin(.5*pi*x);
-          }
+            {
+              // In 1D, compute the rhs by differentiating the
+              // exact solution twice.
+              const Real pi = libMesh::pi;
+              fxy = (0.25*pi*pi)*sin(.5*pi*x);
+            }
           else
-          {
-            fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
-          }
+            {
+              fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+            }
 
           // Add the RHS contribution
           for (unsigned int i=0; i<phi.size(); i++)

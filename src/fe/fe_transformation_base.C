@@ -22,56 +22,56 @@
 namespace libMesh
 {
 
-  template< typename OutputShape >
-  AutoPtr<FETransformationBase<OutputShape> > FETransformationBase<OutputShape>::build( const FEType& fe_type )
-  {
-    switch( fe_type.family )
+template< typename OutputShape >
+AutoPtr<FETransformationBase<OutputShape> > FETransformationBase<OutputShape>::build( const FEType& fe_type )
+{
+  switch( fe_type.family )
+    {
+      /* H1 Conforming Elements */
+    case LAGRANGE:
+    case HIERARCHIC:
+    case BERNSTEIN:
+    case SZABAB:
+    case CLOUGH: /* PB: Really H2 */
+    case HERMITE: /* PB: Really H2 */
+    case LAGRANGE_VEC:
+    case MONOMIAL: /* PB: Shouldn't this be L2 conforming? */
+    case XYZ: /* PB: Shouldn't this be L2 conforming? */
+    case L2_HIERARCHIC: /* PB: Shouldn't this be L2 conforming? */
+    case L2_LAGRANGE: /* PB: Shouldn't this be L2 conforming? */
+    case JACOBI_20_00: /* PB: For infinite elements... */
+    case JACOBI_30_00: /* PB: For infinite elements... */
       {
-        /* H1 Conforming Elements */
-      case LAGRANGE:
-      case HIERARCHIC:
-      case BERNSTEIN:
-      case SZABAB:
-      case CLOUGH: /* PB: Really H2 */
-      case HERMITE: /* PB: Really H2 */
-      case LAGRANGE_VEC:
-      case MONOMIAL: /* PB: Shouldn't this be L2 conforming? */
-      case XYZ: /* PB: Shouldn't this be L2 conforming? */
-      case L2_HIERARCHIC: /* PB: Shouldn't this be L2 conforming? */
-      case L2_LAGRANGE: /* PB: Shouldn't this be L2 conforming? */
-      case JACOBI_20_00: /* PB: For infinite elements... */
-      case JACOBI_30_00: /* PB: For infinite elements... */
-        {
-          AutoPtr<FETransformationBase<OutputShape> > ap( new H1FETransformation<OutputShape> );
-          return ap;
-        }
-        /* HCurl Conforming Elements */
-      case NEDELEC_ONE:
-        {
-          AutoPtr<FETransformationBase<OutputShape> > ap( new HCurlFETransformation<OutputShape> );
-          return ap;
-        }
-
-        /* HDiv Conforming Elements */
-        /* L2 Conforming Elements */
-
-        /* Other... */
-      case SCALAR:
-        {
-          // Should never need this for SCALARs
-          AutoPtr<FETransformationBase<OutputShape> > ap( new H1FETransformation<OutputShape> );
-          return ap;
-        }
-
-      default:
-        libmesh_error();
+        AutoPtr<FETransformationBase<OutputShape> > ap( new H1FETransformation<OutputShape> );
+        return ap;
+      }
+      /* HCurl Conforming Elements */
+    case NEDELEC_ONE:
+      {
+        AutoPtr<FETransformationBase<OutputShape> > ap( new HCurlFETransformation<OutputShape> );
+        return ap;
       }
 
-    // Should never get here...
-    libmesh_error();
-    AutoPtr<FETransformationBase<OutputShape> > ap( NULL );
-    return ap;
-  }
+      /* HDiv Conforming Elements */
+      /* L2 Conforming Elements */
+
+      /* Other... */
+    case SCALAR:
+      {
+        // Should never need this for SCALARs
+        AutoPtr<FETransformationBase<OutputShape> > ap( new H1FETransformation<OutputShape> );
+        return ap;
+      }
+
+    default:
+      libmesh_error();
+    }
+
+  // Should never get here...
+  libmesh_error();
+  AutoPtr<FETransformationBase<OutputShape> > ap( NULL );
+  return ap;
+}
 
 template class FETransformationBase<Real>;
 template class FETransformationBase<RealGradient>;

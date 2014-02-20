@@ -52,21 +52,21 @@ Factory<Partitioner>::factory_map()
 namespace {
 
 #ifdef LIBMESH_HAVE_METIS
-  FactoryImp<MetisPartitioner,      Partitioner> metis    ("Metis");
+FactoryImp<MetisPartitioner,      Partitioner> metis    ("Metis");
 #endif
 
 #ifdef LIBMESH_HAVE_PARMETIS
-  FactoryImp<ParmetisPartitioner,   Partitioner> parmetis ("Parmetis");
+FactoryImp<ParmetisPartitioner,   Partitioner> parmetis ("Parmetis");
 #endif
 
 #ifdef LIBMESH_HAVE_SFCURVES
-  FactoryImp<SFCPartitioner,        Partitioner> sfc      ("SFCurves");
-  FactoryImp<HilbertSFCPartitioner, Partitioner> hilbert  ("Hilbert");
-  FactoryImp<MortonSFCPartitioner,  Partitioner> morton   ("Morton");
+FactoryImp<SFCPartitioner,        Partitioner> sfc      ("SFCurves");
+FactoryImp<HilbertSFCPartitioner, Partitioner> hilbert  ("Hilbert");
+FactoryImp<MortonSFCPartitioner,  Partitioner> morton   ("Morton");
 #endif
 
-  FactoryImp<LinearPartitioner,     Partitioner> linear   ("Linear");
-  FactoryImp<CentroidPartitioner,   Partitioner> centroid ("Centroid");
+FactoryImp<LinearPartitioner,     Partitioner> linear   ("Linear");
+FactoryImp<CentroidPartitioner,   Partitioner> centroid ("Centroid");
 
 }
 

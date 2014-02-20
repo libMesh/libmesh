@@ -39,8 +39,8 @@ namespace libMesh
 // The parent ExodusII_IO_Helper is created with the run_only_on_proc0
 // flag set to false, so that we can make use of its functionality
 // on multiple processors.
-  Nemesis_IO_Helper::Nemesis_IO_Helper(const ParallelObject &parent,
-                                       bool verbose_in, bool single_precision) :
+Nemesis_IO_Helper::Nemesis_IO_Helper(const ParallelObject &parent,
+                                     bool verbose_in, bool single_precision) :
   ExodusII_IO_Helper(parent, verbose_in, /*run_only_on_proc0=*/false, /*single_precision=*/single_precision),
   nemesis_err_flag(0),
   num_nodes_global(0),
@@ -498,13 +498,13 @@ void Nemesis_IO_Helper::put_ns_param_global(std::vector<int>& global_nodeset_ids
 {
   // Only add nodesets if there are some
   if(global_nodeset_ids.size())
-  {
-    nemesis_err_flag =
-      Nemesis::ne_put_ns_param_global(ex_id,
-                                      &global_nodeset_ids_in[0],
-                                      &num_global_node_counts_in[0],
-                                      &num_global_node_df_counts_in[0]);
-  }
+    {
+      nemesis_err_flag =
+        Nemesis::ne_put_ns_param_global(ex_id,
+                                        &global_nodeset_ids_in[0],
+                                        &num_global_node_counts_in[0],
+                                        &num_global_node_df_counts_in[0]);
+    }
 
   EX_CHECK_ERR(nemesis_err_flag, "Error writing global nodeset parameters!");
 }
@@ -518,13 +518,13 @@ void Nemesis_IO_Helper::put_ss_param_global(std::vector<int>& global_sideset_ids
 {
   // Only add sidesets if there are some
   if(global_sideset_ids.size())
-  {
-    nemesis_err_flag =
-      Nemesis::ne_put_ss_param_global(ex_id,
-                                      &global_sideset_ids_in[0],
-                                      &num_global_side_counts_in[0],
-                                      &num_global_side_df_counts_in[0]);
-  }
+    {
+      nemesis_err_flag =
+        Nemesis::ne_put_ss_param_global(ex_id,
+                                        &global_sideset_ids_in[0],
+                                        &num_global_side_counts_in[0],
+                                        &num_global_side_df_counts_in[0]);
+    }
 
   EX_CHECK_ERR(nemesis_err_flag, "Error writing global sideset parameters!");
 }
@@ -713,15 +713,15 @@ void Nemesis_IO_Helper::create(std::string filename)
   int comp_ws(0), io_ws(0);
 
   if(_single_precision)
-  {
-    comp_ws = sizeof(float);
-    io_ws = sizeof(float);
-  }
+    {
+      comp_ws = sizeof(float);
+      io_ws = sizeof(float);
+    }
   else
-  {
-    comp_ws = libmesh_cast_int<int>(std::min(sizeof(Real), sizeof(double)));
-    io_ws = libmesh_cast_int<int>(std::min(sizeof(Real), sizeof(double)));
-  }
+    {
+      comp_ws = libmesh_cast_int<int>(std::min(sizeof(Real), sizeof(double)));
+      io_ws = libmesh_cast_int<int>(std::min(sizeof(Real), sizeof(double)));
+    }
 
   this->ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
 
@@ -1601,12 +1601,12 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
 
       subdomain_id_type cur_subdomain = elem->subdomain_id();
 
-/*
+      /*
       // We can't have a zero subdomain ID in Exodus (for some reason?)
       // so map zero subdomains to a max value...
       if (cur_subdomain == 0)
       cur_subdomain = std::numeric_limits<subdomain_id_type>::max();
-*/
+      */
 
       global_subdomain_ids.insert(cur_subdomain);
 
@@ -1720,12 +1720,12 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
     {
       subdomain_id_type cur_subdomain = (*it).first;
 
-/*
+      /*
       // We can't have a zero subdomain ID in Exodus (for some reason?)
       // so map zero subdomains to a max value...
       if (cur_subdomain == 0)
       cur_subdomain = std::numeric_limits<subdomain_id_type>::max();
-*/
+      */
 
       if (verbose)
         {
@@ -1754,12 +1754,12 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
 
       unsigned int cur_subdomain = elem->subdomain_id();
 
-/*
+      /*
       // We can't have a zero subdomain ID in Exodus (for some reason?)
       // so map zero subdomains to a max value...
       if(cur_subdomain == 0)
       cur_subdomain = std::numeric_limits<subdomain_id_type>::max();
-*/
+      */
 
       this->subdomain_map[cur_subdomain].push_back(elem->id());
     }
@@ -2089,12 +2089,12 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
       // Convert current global_nodeset_id into an exodus ID, which can't be zero...
       int exodus_id = global_nodeset_ids[i];
 
-/*
+      /*
       // Exodus can't handle zero nodeset IDs (?)  Use max short here since
       // when libmesh reads it back in, it will want to store it as a short...
       if (exodus_id==0)
       exodus_id = std::numeric_limits<short>::max();
-*/
+      */
 
       // Try to find this boundary ID in the local list we created
       local_node_boundary_id_lists_iterator it =
@@ -2231,12 +2231,12 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
       // Convert current global_sideset_id into an exodus ID, which can't be zero...
       int exodus_id = global_sideset_ids[i];
 
-/*
+      /*
       // Exodus can't handle zero sideset IDs (?)  Use max short here since
       // when libmesh reads it back in, it will want to store it as a short...
       if (exodus_id==0)
       exodus_id = std::numeric_limits<short>::max();
-*/
+      */
 
       // Try to find this boundary ID in the local list we created
       local_elem_boundary_id_lists_iterator it =
@@ -2306,46 +2306,46 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 
   // Just loop over our list outputing the nodes the way we built the map
   for (unsigned int i=0; i<local_num_nodes; ++i)
-  {
-    const Node & node = *mesh.node_ptr(this->exodus_node_num_to_libmesh[i]);
-    x[i]=node(0);
-    y[i]=node(1);
-    z[i]=node(2);
-  }
+    {
+      const Node & node = *mesh.node_ptr(this->exodus_node_num_to_libmesh[i]);
+      x[i]=node(0);
+      y[i]=node(1);
+      z[i]=node(2);
+    }
 
   if (local_num_nodes)
-  {
-    if(_single_precision)
     {
-      std::vector<float> x_single(local_num_nodes), y_single(local_num_nodes), z_single(local_num_nodes);
-      for(unsigned int i(0); i < local_num_nodes; ++i)
-      {
-        x_single[i] = static_cast<float>(x[i]);
-        y_single[i] = static_cast<float>(y[i]);
-        z_single[i] = static_cast<float>(z[i]);
-      }
+      if(_single_precision)
+        {
+          std::vector<float> x_single(local_num_nodes), y_single(local_num_nodes), z_single(local_num_nodes);
+          for(unsigned int i(0); i < local_num_nodes; ++i)
+            {
+              x_single[i] = static_cast<float>(x[i]);
+              y_single[i] = static_cast<float>(y[i]);
+              z_single[i] = static_cast<float>(z[i]);
+            }
 
-      ex_err = exII::ex_put_coord(ex_id, &x_single[0], &y_single[0], &z_single[0]);
-    }
-    else
-    {
-      // Call Exodus API to write nodal coordinates...
-      ex_err = exII::ex_put_coord(ex_id, &x[0], &y[0], &z[0]);
-    }
-    EX_CHECK_ERR(ex_err, "Error writing node coordinates");
+          ex_err = exII::ex_put_coord(ex_id, &x_single[0], &y_single[0], &z_single[0]);
+        }
+      else
+        {
+          // Call Exodus API to write nodal coordinates...
+          ex_err = exII::ex_put_coord(ex_id, &x[0], &y[0], &z[0]);
+        }
+      EX_CHECK_ERR(ex_err, "Error writing node coordinates");
 
-    // And write the nodal map we created for them
-    ex_err = exII::ex_put_node_num_map(ex_id, &(this->exodus_node_num_to_libmesh[0]));
-    EX_CHECK_ERR(ex_err, "Error writing node num map");
-  }
+      // And write the nodal map we created for them
+      ex_err = exII::ex_put_node_num_map(ex_id, &(this->exodus_node_num_to_libmesh[0]));
+      EX_CHECK_ERR(ex_err, "Error writing node num map");
+    }
   else // Does the Exodus API want us to write empty nodal coordinates?
-  {
-    ex_err = exII::ex_put_coord(ex_id, NULL, NULL, NULL);
-    EX_CHECK_ERR(ex_err, "Error writing empty node coordinates");
+    {
+      ex_err = exII::ex_put_coord(ex_id, NULL, NULL, NULL);
+      EX_CHECK_ERR(ex_err, "Error writing empty node coordinates");
 
-    ex_err = exII::ex_put_node_num_map(ex_id, NULL);
-    EX_CHECK_ERR(ex_err, "Error writing empty node num map");
-  }
+      ex_err = exII::ex_put_node_num_map(ex_id, NULL);
+      EX_CHECK_ERR(ex_err, "Error writing empty node num map");
+    }
 }
 
 
@@ -2410,7 +2410,7 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh)
 
   // Only call this once, not in the loop above!
   ex_err = exII::ex_put_elem_num_map(ex_id,
-    exodus_elem_num_to_libmesh.empty() ? NULL : &exodus_elem_num_to_libmesh[0]);
+                                     exodus_elem_num_to_libmesh.empty() ? NULL : &exodus_elem_num_to_libmesh[0]);
   EX_CHECK_ERR(ex_err, "Error writing element map");
 }
 
@@ -2424,32 +2424,32 @@ void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values,
   //int num_values = values.size(); // Not used?
 
   for (int c=0; c<num_vars; c++)
-  {
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-    std::vector<Real> real_parts(num_nodes);
-    std::vector<Real> imag_parts(num_nodes);
-    std::vector<Real> magnitudes(num_nodes);
-
-    for(int i(0); i < num_nodes; ++i)
     {
-      Number value = values[this->exodus_node_num_to_libmesh[i]*num_vars + c];
-      real_parts[i] = value.real();
-      imag_parts[i] = value.imag();
-      magnitudes[i] = std::abs(value);
-    }
-    write_nodal_values(3*c+1,real_parts,timestep);
-    write_nodal_values(3*c+2,imag_parts,timestep);
-    write_nodal_values(3*c+3,magnitudes,timestep);
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+      std::vector<Real> real_parts(num_nodes);
+      std::vector<Real> imag_parts(num_nodes);
+      std::vector<Real> magnitudes(num_nodes);
+
+      for(int i(0); i < num_nodes; ++i)
+        {
+          Number value = values[this->exodus_node_num_to_libmesh[i]*num_vars + c];
+          real_parts[i] = value.real();
+          imag_parts[i] = value.imag();
+          magnitudes[i] = std::abs(value);
+        }
+      write_nodal_values(3*c+1,real_parts,timestep);
+      write_nodal_values(3*c+2,imag_parts,timestep);
+      write_nodal_values(3*c+3,magnitudes,timestep);
 #else
-    std::vector<Number> cur_soln(num_nodes);
+      std::vector<Number> cur_soln(num_nodes);
 
-    //Copy out this variable's solution
-    for(int i=0; i<num_nodes; i++)
-      cur_soln[i] = values[this->exodus_node_num_to_libmesh[i]*num_vars + c];
+      //Copy out this variable's solution
+      for(int i=0; i<num_nodes; i++)
+        cur_soln[i] = values[this->exodus_node_num_to_libmesh[i]*num_vars + c];
 
-    write_nodal_values(c+1,cur_soln,timestep);
+      write_nodal_values(c+1,cur_soln,timestep);
 #endif
-  }
+    }
 }
 
 

@@ -215,8 +215,8 @@ AnalyticFunction<Output>::clone () const
 {
   return AutoPtr<FunctionBase<Output> >
     ( _number_fptr ?
-        new AnalyticFunction<Output>(_number_fptr) :
-        new AnalyticFunction<Output>(_vector_fptr) );
+      new AnalyticFunction<Output>(_number_fptr) :
+      new AnalyticFunction<Output>(_vector_fptr) );
 }
 
 

@@ -52,10 +52,10 @@ template <typename T> class TensorValue;
 template <typename T>
 class TypeVector
 {
-template <typename T2>
-friend class TypeVector;
+  template <typename T2>
+  friend class TypeVector;
 
-friend class TypeTensor<T>;
+  friend class TypeTensor<T>;
 
 protected:
 
@@ -83,8 +83,8 @@ protected:
   TypeVector (const Scalar x,
               const Scalar y=0,
               typename
-                boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                                       const Scalar>::type z=0);
+              boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+              const Scalar>::type z=0);
 
 public:
 
@@ -339,7 +339,7 @@ public:
    */
   void write_unformatted (std::ostream &out, const bool newline = true) const;
 
- protected:
+protected:
 
   /**
    * The coordinates of the \p TypeVector
@@ -399,8 +399,8 @@ inline
 TypeVector<T>::TypeVector (const Scalar x,
                            const Scalar y,
                            typename
-                             boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                                                    const Scalar>::type z)
+                           boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                           const Scalar>::type z)
 {
   _coords[0] = x;
 
@@ -802,7 +802,7 @@ TypeVector<T>::cross(const TypeVector<T2>& p) const
   // |   p(0)       p(1)       p(2)   |
 
   return TypeVector<TS>( _coords[1]*p._coords[2] - _coords[2]*p._coords[1],
-                        -_coords[0]*p._coords[2] + _coords[2]*p._coords[0],
+                         -_coords[0]*p._coords[2] + _coords[2]*p._coords[0],
                          _coords[0]*p._coords[1] - _coords[1]*p._coords[0]);
 }
 

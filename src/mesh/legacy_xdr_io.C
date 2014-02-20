@@ -123,10 +123,10 @@ void LegacyXdrIO::read_mgf (const std::string& name)
 
 void LegacyXdrIO::write (const std::string& name)
 {
-    if (this->binary())
-      this->write_binary (name);
-    else
-      this->write_ascii  (name);
+  if (this->binary())
+    this->write_binary (name);
+  else
+    this->write_ascii  (name);
 }
 
 
@@ -449,139 +449,139 @@ void LegacyXdrIO::read_mesh (const std::string& name,
       std::map<unsigned int, Elem*> parents;
 
       {
-      // Keep track of Element ids in MGF-style meshes;
-      unsigned int next_elem_id = 0;
+        // Keep track of Element ids in MGF-style meshes;
+        unsigned int next_elem_id = 0;
 
-      for (unsigned int level=0; level<=n_levels; level++)
-      {
-        for (unsigned int idx=0; idx<n_blocks; idx++)
-        {
-          for (unsigned int e=lastFaceIndex; e<lastFaceIndex+neeb[level*n_blocks+idx]; e++)
+        for (unsigned int level=0; level<=n_levels; level++)
           {
-            // Build a temporary element of the right type, so we know how
-            // connectivity entries will be on the line for this element.
-            AutoPtr<Elem> temp_elem = Elem::build(etypes[idx]);
+            for (unsigned int idx=0; idx<n_blocks; idx++)
+              {
+                for (unsigned int e=lastFaceIndex; e<lastFaceIndex+neeb[level*n_blocks+idx]; e++)
+                  {
+                    // Build a temporary element of the right type, so we know how
+                    // connectivity entries will be on the line for this element.
+                    AutoPtr<Elem> temp_elem = Elem::build(etypes[idx]);
 
-            // A pointer to the element which will eventually be added to the mesh.
-            Elem* elem;
+                    // A pointer to the element which will eventually be added to the mesh.
+                    Elem* elem;
 
-            // New-style libMesh mesh
-            if (m.get_orig_flag() == LegacyXdrIO::LIBM)
-            {
-              unsigned int self_ID   = conn[lastConnIndex + temp_elem->n_nodes()];
+                    // New-style libMesh mesh
+                    if (m.get_orig_flag() == LegacyXdrIO::LIBM)
+                      {
+                        unsigned int self_ID   = conn[lastConnIndex + temp_elem->n_nodes()];
 
 #ifdef LIBMESH_ENABLE_AMR
-              unsigned int parent_ID = conn[lastConnIndex + temp_elem->n_nodes()+1];
+                        unsigned int parent_ID = conn[lastConnIndex + temp_elem->n_nodes()+1];
 
-              if (level > 0)
-              {
-                // Do a linear search for the parent
-                Elem* my_parent;
+                        if (level > 0)
+                          {
+                            // Do a linear search for the parent
+                            Elem* my_parent;
 
-                // Search for parent in the parents map (log(n))
-                START_LOG("log(n) search for parent", "LegacyXdrIO::read_mesh");
-                std::map<unsigned int, Elem*>::iterator it = parents.find(parent_ID);
-                STOP_LOG("log(n) search for parent", "LegacyXdrIO::read_mesh");
+                            // Search for parent in the parents map (log(n))
+                            START_LOG("log(n) search for parent", "LegacyXdrIO::read_mesh");
+                            std::map<unsigned int, Elem*>::iterator it = parents.find(parent_ID);
+                            STOP_LOG("log(n) search for parent", "LegacyXdrIO::read_mesh");
 
-                // If the parent was not previously added, we cannot continue.
-                if (it == parents.end())
-                {
-                  libMesh::err << "Parent element with ID " << parent_ID
-                                << " not found." << std::endl;
-                  libmesh_error();
-                }
+                            // If the parent was not previously added, we cannot continue.
+                            if (it == parents.end())
+                              {
+                                libMesh::err << "Parent element with ID " << parent_ID
+                                             << " not found." << std::endl;
+                                libmesh_error();
+                              }
 
-                // Set the my_parent pointer
-                my_parent = (*it).second;
+                            // Set the my_parent pointer
+                            my_parent = (*it).second;
 
-                // my_parent is now INACTIVE, since he has children
-                my_parent->set_refinement_flag(Elem::INACTIVE);
+                            // my_parent is now INACTIVE, since he has children
+                            my_parent->set_refinement_flag(Elem::INACTIVE);
 
-                // Now that we know the parent, build the child
-                elem = Elem::build(etypes[idx],my_parent).release();
+                            // Now that we know the parent, build the child
+                            elem = Elem::build(etypes[idx],my_parent).release();
 
-                // The new child is marked as JUST_REFINED
-                elem->set_refinement_flag(Elem::JUST_REFINED);
+                            // The new child is marked as JUST_REFINED
+                            elem->set_refinement_flag(Elem::JUST_REFINED);
 
-                // Tell the parent about his new child
-                my_parent->add_child(elem);
+                            // Tell the parent about his new child
+                            my_parent->add_child(elem);
 
-                // sanity check
-                libmesh_assert_equal_to (my_parent->type(), elem->type());
-              }
+                            // sanity check
+                            libmesh_assert_equal_to (my_parent->type(), elem->type());
+                          }
 
-              // Add level-0 elements to the mesh
-              else
+                        // Add level-0 elements to the mesh
+                        else
 #endif // #ifdef LIBMESH_ENABLE_AMR
-              {
-                elem = Elem::build(etypes[idx]).release();
+                          {
+                            elem = Elem::build(etypes[idx]).release();
+                          }
+
+                        // Assign the newly-added element's ID so that future
+                        // children which may be added can find it correctly.
+                        elem->set_id() = self_ID;
+
+                        // Add this element to the map, it may be a parent for a future element
+                        START_LOG("insert elem into map", "LegacyXdrIO::read_mesh");
+                        parents[self_ID] = elem;
+                        STOP_LOG("insert elem into map", "LegacyXdrIO::read_mesh");
+                      }
+
+                    // MGF-style meshes
+                    else
+                      {
+                        elem = Elem::build(etypes[idx]).release();
+                        elem->set_id(next_elem_id++);
+
+                        elems_of_dimension[elem->dim()] = true;
+
+                        mesh.add_elem(elem);
+                      }
+
+                    // Add elements with the same id as in libMesh.
+                    // Provided the data files that MeshData reads
+                    // were only written with MeshData, then this
+                    // should work properly.  This is an inline
+                    // function, so that for disabled MeshData, this
+                    // should not induce too much cost
+                    if (mesh_data != NULL)
+                      mesh_data->add_foreign_elem_id (elem, e);
+
+                    // Set the node pointers of the newly-created element
+                    for (unsigned int innd=0; innd < elem->n_nodes(); innd++)
+                      {
+                        elem->set_node(innd) = mesh.node_ptr(conn[innd+lastConnIndex]);
+                      }
+
+                    lastConnIndex += (m.get_orig_flag() == LegacyXdrIO::LIBM) ? (elem->n_nodes()+2) : elem->n_nodes();
+                  }
+                lastFaceIndex += neeb[idx];
               }
-
-              // Assign the newly-added element's ID so that future
-              // children which may be added can find it correctly.
-              elem->set_id() = self_ID;
-
-              // Add this element to the map, it may be a parent for a future element
-              START_LOG("insert elem into map", "LegacyXdrIO::read_mesh");
-              parents[self_ID] = elem;
-              STOP_LOG("insert elem into map", "LegacyXdrIO::read_mesh");
-            }
-
-            // MGF-style meshes
-            else
-            {
-              elem = Elem::build(etypes[idx]).release();
-              elem->set_id(next_elem_id++);
-
-              elems_of_dimension[elem->dim()] = true;
-
-              mesh.add_elem(elem);
-            }
-
-            // Add elements with the same id as in libMesh.
-            // Provided the data files that MeshData reads
-            // were only written with MeshData, then this
-            // should work properly.  This is an inline
-            // function, so that for disabled MeshData, this
-            // should not induce too much cost
-            if (mesh_data != NULL)
-              mesh_data->add_foreign_elem_id (elem, e);
-
-            // Set the node pointers of the newly-created element
-            for (unsigned int innd=0; innd < elem->n_nodes(); innd++)
-            {
-              elem->set_node(innd) = mesh.node_ptr(conn[innd+lastConnIndex]);
-            }
-
-            lastConnIndex += (m.get_orig_flag() == LegacyXdrIO::LIBM) ? (elem->n_nodes()+2) : elem->n_nodes();
           }
-          lastFaceIndex += neeb[idx];
-        }
       }
-    }
 
       if (m.get_orig_flag() == LegacyXdrIO::LIBM)
         {
           {
-          // Iterate in ascending elem ID order
-          unsigned int next_elem_id = 0;
-          for (std::map<unsigned int, Elem *>::iterator i =
-               parents.begin();
-               i != parents.end(); ++i)
-            {
-              Elem *elem = i->second;
-              if (elem)
-                {
-                  elem->set_id(next_elem_id++);
+            // Iterate in ascending elem ID order
+            unsigned int next_elem_id = 0;
+            for (std::map<unsigned int, Elem *>::iterator i =
+                   parents.begin();
+                 i != parents.end(); ++i)
+              {
+                Elem *elem = i->second;
+                if (elem)
+                  {
+                    elem->set_id(next_elem_id++);
 
-                  elems_of_dimension[elem->dim()] = true;
+                    elems_of_dimension[elem->dim()] = true;
 
-                  mesh.add_elem(elem);
-                }
-              else
-                // We can probably handle this, but we don't expect it
-                libmesh_error();
-            }
+                    mesh.add_elem(elem);
+                  }
+                else
+                  // We can probably handle this, but we don't expect it
+                  libmesh_error();
+              }
           }
         }
     }
@@ -625,8 +625,8 @@ void LegacyXdrIO::read_mesh (const std::string& name,
       libMesh::err << "Cannot open dimension " <<
         mesh.mesh_dimension() <<
         " mesh file when configured without " <<
-                      mesh.mesh_dimension() << "D support." <<
-                      std::endl;
+        mesh.mesh_dimension() << "D support." <<
+        std::endl;
       libmesh_error();
     }
 #endif
@@ -723,17 +723,17 @@ void LegacyXdrIO::write_mesh (const std::string& name,
     MeshBase::const_element_iterator el = mesh.elements_begin();
     const MeshBase::const_element_iterator end_el = mesh.elements_end();
     for( ; el != end_el; ++el)
-    {
-      const Elem* elem = (*el);
-      if(!elem->subactive())
       {
-        n_non_subactive++;
-        non_subactive_weight += elem->n_nodes();
+        const Elem* elem = (*el);
+        if(!elem->subactive())
+          {
+            n_non_subactive++;
+            non_subactive_weight += elem->n_nodes();
 
-        for (unsigned int n=0; n<elem->n_nodes(); ++n)
-          not_subactive_node_ids.insert(elem->node(n));
+            for (unsigned int n=0; n<elem->n_nodes(); ++n)
+              not_subactive_node_ids.insert(elem->node(n));
+          }
       }
-    }
 
     // Now that the set is built, most of the hard work is done.  We build
     // the map next and let the set go out of scope.
@@ -768,7 +768,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
     for (unsigned int el_type=0; el_type<n_el_types; el_type++)
       neeb[level*n_el_types + el_type] =
         MeshTools::n_non_subactive_elem_of_type_at_level(mesh, etypes[el_type], level);
-        // gotta change this function name!!!
+  // gotta change this function name!!!
 
 
   // Now we check to see if we're doing
@@ -833,81 +833,81 @@ void LegacyXdrIO::write_mesh (const std::string& name,
     // Loop over levels and types again, write connectivity information to conn.
     for (unsigned int level=0; level<=n_levels; level++)
       for (unsigned int idx=0; idx<etypes.size(); idx++)
-      {
-        nn = lastConnIndex = 0;
+        {
+          nn = lastConnIndex = 0;
 
-        for (unsigned int e=0; e<mesh.n_elem(); e++)
-          if ((mesh.elem(e)->type()  == etypes[idx]) &&
-              (mesh.elem(e)->level() == level)       &&
-              !mesh.elem(e)->subactive())
-          {
-            int nstart=0;
-
-            if (orig_type == LegacyXdrIO::DEAL)
-              nn = mesh.elem(e)->n_nodes();
-
-            else if (orig_type == LegacyXdrIO::MGF)
-            {
-              nstart=2; // ignore the 27 and 0 entries
-              nn = mesh.elem(e)->n_nodes()+2;
-              conn[lastConnIndex + 0] = 27;
-              conn[lastConnIndex + 1] = 0;
-            }
-
-            else if (orig_type == LegacyXdrIO::LIBM) // LIBMESH format
-              nn = mesh.elem(e)->n_nodes() + 2;
-
-            else
-              libmesh_error();
-
-            // Loop over the connectivity entries for this element and write to conn.
-            START_LOG("set connectivity", "LegacyXdrIO::write_mesh");
-            const unsigned int loopmax = (orig_type==LegacyXdrIO::LIBM) ? nn-2 : nn;
-            for (unsigned int n=nstart; n<loopmax; n++)
-            {
-              unsigned int connectivity_value=0;
-
-              // old-style Libmesh and MGF meshes
-              if (orig_type != LegacyXdrIO::LIBM)
-                connectivity_value = mesh.elem(e)->node(n-nstart);
-
-              // new-style libMesh meshes: compress the connectivity entries to account for
-              // subactive nodes that will not be in the mesh we write out.
-              else
+          for (unsigned int e=0; e<mesh.n_elem(); e++)
+            if ((mesh.elem(e)->type()  == etypes[idx]) &&
+                (mesh.elem(e)->level() == level)       &&
+                !mesh.elem(e)->subactive())
               {
-                std::map<dof_id_type, dof_id_type>::iterator pos =
-                  node_map.find(mesh.elem(e)->node(n-nstart));
+                int nstart=0;
 
-                libmesh_assert (pos != node_map.end());
+                if (orig_type == LegacyXdrIO::DEAL)
+                  nn = mesh.elem(e)->n_nodes();
 
-                connectivity_value = (*pos).second;
+                else if (orig_type == LegacyXdrIO::MGF)
+                  {
+                    nstart=2; // ignore the 27 and 0 entries
+                    nn = mesh.elem(e)->n_nodes()+2;
+                    conn[lastConnIndex + 0] = 27;
+                    conn[lastConnIndex + 1] = 0;
+                  }
+
+                else if (orig_type == LegacyXdrIO::LIBM) // LIBMESH format
+                  nn = mesh.elem(e)->n_nodes() + 2;
+
+                else
+                  libmesh_error();
+
+                // Loop over the connectivity entries for this element and write to conn.
+                START_LOG("set connectivity", "LegacyXdrIO::write_mesh");
+                const unsigned int loopmax = (orig_type==LegacyXdrIO::LIBM) ? nn-2 : nn;
+                for (unsigned int n=nstart; n<loopmax; n++)
+                  {
+                    unsigned int connectivity_value=0;
+
+                    // old-style Libmesh and MGF meshes
+                    if (orig_type != LegacyXdrIO::LIBM)
+                      connectivity_value = mesh.elem(e)->node(n-nstart);
+
+                    // new-style libMesh meshes: compress the connectivity entries to account for
+                    // subactive nodes that will not be in the mesh we write out.
+                    else
+                      {
+                        std::map<dof_id_type, dof_id_type>::iterator pos =
+                          node_map.find(mesh.elem(e)->node(n-nstart));
+
+                        libmesh_assert (pos != node_map.end());
+
+                        connectivity_value = (*pos).second;
+                      }
+                    conn[lastConnIndex + n] = connectivity_value;
+                  }
+                STOP_LOG("set connectivity", "LegacyXdrIO::write_mesh");
+
+                // In the case of an adaptive mesh, set last 2 entries to this ID and parent ID
+                if (orig_type == LegacyXdrIO::LIBM)
+                  {
+                    int self_ID = mesh.elem(e)->id();
+                    int parent_ID = -1;
+                    if(level != 0)
+                      parent_ID = mesh.elem(e)->parent()->id();
+
+                    // Self ID is the second-to-last entry, Parent ID is the last
+                    // entry on each connectivity line
+                    conn[lastConnIndex+nn-2] = self_ID;
+                    conn[lastConnIndex+nn-1] = parent_ID;
+                  }
+
+                lastConnIndex += nn;
               }
-              conn[lastConnIndex + n] = connectivity_value;
-            }
-            STOP_LOG("set connectivity", "LegacyXdrIO::write_mesh");
 
-            // In the case of an adaptive mesh, set last 2 entries to this ID and parent ID
-            if (orig_type == LegacyXdrIO::LIBM)
-            {
-              int self_ID = mesh.elem(e)->id();
-              int parent_ID = -1;
-              if(level != 0)
-                parent_ID = mesh.elem(e)->parent()->id();
-
-              // Self ID is the second-to-last entry, Parent ID is the last
-              // entry on each connectivity line
-              conn[lastConnIndex+nn-2] = self_ID;
-              conn[lastConnIndex+nn-1] = parent_ID;
-            }
-
-            lastConnIndex += nn;
-          }
-
-        // Send conn to the XDR file.  If there are no elements of this level and type,
-        // then nn will be zero, and we there is no connectivity to write.
-        if (nn != 0)
-          m.Icon(&conn[0], nn, lastConnIndex/nn);
-      }
+          // Send conn to the XDR file.  If there are no elements of this level and type,
+          // then nn will be zero, and we there is no connectivity to write.
+          if (nn != 0)
+            m.Icon(&conn[0], nn, lastConnIndex/nn);
+        }
   }
 
   // create the vector of coords and send

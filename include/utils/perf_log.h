@@ -44,7 +44,7 @@ namespace libMesh
 // PerfData class definition
 class PerfData
 {
- public:
+public:
 
   /**
    * Constructor.  Initializes data to be empty.
@@ -57,7 +57,7 @@ class PerfData
     count(0),
     open(false),
     called_recursively(0)
-    {}
+  {}
 
 
   /**
@@ -102,7 +102,7 @@ class PerfData
 
   int called_recursively;
 
- protected:
+protected:
   double stop_or_pause(const bool do_stop);
 };
 
@@ -123,7 +123,7 @@ class PerfData
 class PerfLog
 {
 
- public:
+public:
 
   /**
    * Constructor.  \p label_name is the name of the object, which
@@ -237,7 +237,7 @@ class PerfLog
    */
   PerfData get_perf_data(const std::string &label, const std::string &header="");
 
- private:
+private:
 
 
   /**
@@ -264,8 +264,8 @@ class PerfLog
    * The actual log.
    */
   std::map<std::pair<std::string,
-    std::string>,
-    PerfData> log;
+                     std::string>,
+           PerfData> log;
 
   /**
    * A stack to hold the current performance log trace.

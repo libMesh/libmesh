@@ -116,12 +116,12 @@ public:
    * other preconditioners than JACOBI.
    */
   virtual std::pair<unsigned int, Real>
-    solve (const ShellMatrix<T>& shell_matrix,
-           const SparseMatrix<T>& precond_matrix,
-           NumericVector<T>& solution_in,
-           NumericVector<T>& rhs_in,
-           const double tol,
-           const unsigned int m_its);
+  solve (const ShellMatrix<T>& shell_matrix,
+         const SparseMatrix<T>& precond_matrix,
+         NumericVector<T>& solution_in,
+         NumericVector<T>& rhs_in,
+         const double tol,
+         const unsigned int m_its);
 
   /**
    * Fills the input vector with the sequence of residual norms

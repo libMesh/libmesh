@@ -88,7 +88,7 @@ dof_id_type InfHex::key (const unsigned int s) const
 
   // We'll never get here.
   libmesh_error();
- return 0;
+  return 0;
 }
 
 
@@ -336,9 +336,9 @@ Real InfHex::quality (const ElemQuality q) const
     }
 
 
-    // Will never get here...
-    libmesh_error();
-    return 0.;
+  // Will never get here...
+  libmesh_error();
+  return 0.;
 }
 
 
@@ -349,67 +349,67 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
 
   std::pair<Real, Real> bounds;
 
-/*
-  switch (q)
+  /*
+    switch (q)
     {
 
     case ASPECT_RATIO:
-      bounds.first  = 1.;
-      bounds.second = 4.;
-      break;
+    bounds.first  = 1.;
+    bounds.second = 4.;
+    break;
 
     case SKEW:
-      bounds.first  = 0.;
-      bounds.second = 0.5;
-      break;
+    bounds.first  = 0.;
+    bounds.second = 0.5;
+    break;
 
     case SHEAR:
     case SHAPE:
-      bounds.first  = 0.3;
-      bounds.second = 1.;
-      break;
+    bounds.first  = 0.3;
+    bounds.second = 1.;
+    break;
 
     case CONDITION:
-      bounds.first  = 1.;
-      bounds.second = 8.;
-      break;
+    bounds.first  = 1.;
+    bounds.second = 8.;
+    break;
 
     case JACOBIAN:
-      bounds.first  = 0.5;
-      bounds.second = 1.;
-      break;
+    bounds.first  = 0.5;
+    bounds.second = 1.;
+    break;
 
     case DISTORTION:
-      bounds.first  = 0.6;
-      bounds.second = 1.;
-      break;
+    bounds.first  = 0.6;
+    bounds.second = 1.;
+    break;
 
     case TAPER:
-      bounds.first  = 0.;
-      bounds.second = 0.4;
-      break;
+    bounds.first  = 0.;
+    bounds.second = 0.4;
+    break;
 
     case STRETCH:
-      bounds.first  = 0.25;
-      bounds.second = 1.;
-      break;
+    bounds.first  = 0.25;
+    bounds.second = 1.;
+    break;
 
     case DIAGONAL:
-      bounds.first  = 0.65;
-      bounds.second = 1.;
-      break;
+    bounds.first  = 0.65;
+    bounds.second = 1.;
+    break;
 
     case SIZE:
-      bounds.first  = 0.5;
-      bounds.second = 1.;
-      break;
+    bounds.first  = 0.5;
+    bounds.second = 1.;
+    break;
 
     default:
-      libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
-      bounds.first  = -1;
-      bounds.second = -1;
+    libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
+    bounds.first  = -1;
+    bounds.second = -1;
     }
-*/
+  */
 
   return bounds;
 }
@@ -419,37 +419,37 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
 
 
 const unsigned short int InfHex::_second_order_adjacent_vertices[8][2] =
-{
-  { 0,  1}, // vertices adjacent to node 8
-  { 1,  2}, // vertices adjacent to node 9
-  { 2,  3}, // vertices adjacent to node 10
-  { 0,  3}, // vertices adjacent to node 11
+  {
+    { 0,  1}, // vertices adjacent to node 8
+    { 1,  2}, // vertices adjacent to node 9
+    { 2,  3}, // vertices adjacent to node 10
+    { 0,  3}, // vertices adjacent to node 11
 
-  { 4,  5}, // vertices adjacent to node 12
-  { 5,  6}, // vertices adjacent to node 13
-  { 6,  7}, // vertices adjacent to node 14
-  { 4,  7}  // vertices adjacent to node 15
-};
+    { 4,  5}, // vertices adjacent to node 12
+    { 5,  6}, // vertices adjacent to node 13
+    { 6,  7}, // vertices adjacent to node 14
+    { 4,  7}  // vertices adjacent to node 15
+  };
 
 
 
 const unsigned short int InfHex::_second_order_vertex_child_number[18] =
-{
-  99,99,99,99,99,99,99,99, // Vertices
-  0,1,2,0,                 // Edges
-  0,1,2,0,0,               // Faces
-  0                        // Interior
-};
+  {
+    99,99,99,99,99,99,99,99, // Vertices
+    0,1,2,0,                 // Edges
+    0,1,2,0,0,               // Faces
+    0                        // Interior
+  };
 
 
 
 const unsigned short int InfHex::_second_order_vertex_child_index[18] =
-{
-  99,99,99,99,99,99,99,99, // Vertices
-  1,2,3,3,                 // Edges
-  5,6,7,7,2,               // Faces
-  6                        // Interior
-};
+  {
+    99,99,99,99,99,99,99,99, // Vertices
+    1,2,3,3,                 // Edges
+    5,6,7,7,2,               // Faces
+    6                        // Interior
+  };
 
 } // namespace libMesh
 

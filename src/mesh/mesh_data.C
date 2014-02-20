@@ -65,8 +65,8 @@ void MeshData::activate (const std::string& descriptor)
 {
 #ifdef DEBUG
   if (_compatibility_mode)
-      libMesh::err << "WARNING: MeshData was in compatibility mode, now being activated."
-                   << std::endl;
+    libMesh::err << "WARNING: MeshData was in compatibility mode, now being activated."
+                 << std::endl;
 #endif
 
   _compatibility_mode = false;
@@ -96,8 +96,8 @@ void MeshData::enable_compatibility_mode (const std::string& descriptor)
     }
 #ifdef DEBUG
   else
-      libMesh::err << "WARNING: MeshData was in compatibility mode, now being activated."
-                   << std::endl;
+    libMesh::err << "WARNING: MeshData was in compatibility mode, now being activated."
+                 << std::endl;
 #endif
 }
 
@@ -246,8 +246,8 @@ void MeshData::read (const std::string& name)
 
 #ifdef DEBUG
   if (this->compatibility_mode())
-      libMesh::err << "WARNING: MeshData in compatibility mode, node and element ids" << std::endl
-                   << "         stored in file may be totally different from libMesh ids!" << std::endl;
+    libMesh::err << "WARNING: MeshData in compatibility mode, node and element ids" << std::endl
+                 << "         stored in file may be totally different from libMesh ids!" << std::endl;
 #endif
 
   // Read the file based on extension.  We let all processors read the
@@ -299,9 +299,9 @@ void MeshData::write (const std::string& name)
 
 #ifdef DEBUG
   if (this->compatibility_mode())
-      libMesh::err << "WARNING: MeshData in compatibility mode.  Node and element ids" << std::endl
-                   << "         written to file may differ from libMesh numbering" << std::endl
-                   << "         next time this file is read!" << std::endl;
+    libMesh::err << "WARNING: MeshData in compatibility mode.  Node and element ids" << std::endl
+                 << "         written to file may differ from libMesh numbering" << std::endl
+                 << "         next time this file is read!" << std::endl;
 #endif
 
   // Read the file based on extension
@@ -356,7 +356,7 @@ std::string MeshData::get_info() const
             << "   n_node_data()=" << this->n_node_data() << '\n';
     }
   else
-      oss << " MeshData neither active nor in compatibility mode.\n";
+    oss << " MeshData neither active nor in compatibility mode.\n";
 
   return oss.str();
 }
@@ -402,10 +402,10 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
         return pos->second;
     }
   else if (_compatibility_mode)
-      // when only in compatibility mode,
-      // return the node stored in the MeshBase
-      // under its current id
-      return this->_mesh.node_ptr(fid);
+    // when only in compatibility mode,
+    // return the node stored in the MeshBase
+    // under its current id
+    return this->_mesh.node_ptr(fid);
 
   // should never get here
   libmesh_error();
@@ -502,9 +502,9 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
       // when active, use our _id_elem map
       libmesh_assert (_elem_id_map_closed);
 
-             // look it up in the map
-             std::map<const Elem*,
-               unsigned int>::const_iterator pos = _elem_id.find(e);
+      // look it up in the map
+      std::map<const Elem*,
+        unsigned int>::const_iterator pos = _elem_id.find(e);
 
       if (pos == _elem_id.end())
         {
@@ -553,9 +553,9 @@ void MeshData::insert_node_data (std::map<const Node*,
 
 #ifdef DEBUG
   std::map<const Node*,
-           std::vector<Number> >::const_iterator nd_pos = nd.begin();
+    std::vector<Number> >::const_iterator nd_pos = nd.begin();
   std::map<const Node*,
-           std::vector<Number> >::const_iterator nd_end = nd.end();
+    std::vector<Number> >::const_iterator nd_end = nd.end();
 
   // Compare entity-by-entity that the
   // sizes of the std::vector's are identical.
@@ -617,9 +617,9 @@ void MeshData::insert_elem_data (std::map<const Elem*,
 
 #ifdef DEBUG
   std::map<const Elem*,
-           std::vector<Number> >::const_iterator ed_pos = ed.begin();
+    std::vector<Number> >::const_iterator ed_pos = ed.begin();
   std::map<const Elem*,
-           std::vector<Number> >::const_iterator ed_end = ed.end();
+    std::vector<Number> >::const_iterator ed_end = ed.end();
 
   // Compare entity-by-entity that the
   // sizes of the std::vector's are identical.
@@ -669,7 +669,7 @@ unsigned int MeshData::n_val_per_node () const
       return (pos->second.size());
     }
   else
-      return 0;
+    return 0;
 }
 
 
@@ -699,7 +699,7 @@ unsigned int MeshData::n_val_per_elem () const
       return (pos->second.size());
     }
   else
-      return 0;
+    return 0;
 }
 
 

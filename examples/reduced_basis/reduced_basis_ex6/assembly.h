@@ -83,10 +83,10 @@ struct Gz : public RBParametrizedFunction
 };
 
 struct ThetaA0 : RBTheta {
-virtual Number evaluate(const RBParameters& mu)
-{
-  return mu.get_value("kappa") * mu.get_value("Bi");
-}
+  virtual Number evaluate(const RBParameters& mu)
+  {
+    return mu.get_value("kappa") * mu.get_value("Bi");
+  }
 };
 struct AssemblyA0 : ElemAssemblyWithConstruction
 {
@@ -95,7 +95,7 @@ struct AssemblyA0 : ElemAssemblyWithConstruction
     const std::vector<boundary_id_type> bc_ids =
       rb_con->get_mesh().boundary_info->boundary_ids (&c.get_elem(),c.side);
     for (std::vector<boundary_id_type>::const_iterator b =
-         bc_ids.begin(); b != bc_ids.end(); ++b)
+           bc_ids.begin(); b != bc_ids.end(); ++b)
       if( *b == 1 || *b == 2 || *b == 3 || *b == 4 )
         {
           const unsigned int u_var = 0;
@@ -124,10 +124,10 @@ struct AssemblyA0 : ElemAssemblyWithConstruction
 };
 
 struct ThetaA1 : RBTheta {
-virtual Number evaluate(const RBParameters& mu)
-{
-  return mu.get_value("kappa") * mu.get_value("Bi") * mu.get_value("curvature");
-}
+  virtual Number evaluate(const RBParameters& mu)
+  {
+    return mu.get_value("kappa") * mu.get_value("Bi") * mu.get_value("curvature");
+  }
 };
 struct AssemblyA1 : ElemAssemblyWithConstruction
 {
@@ -136,7 +136,7 @@ struct AssemblyA1 : ElemAssemblyWithConstruction
     const std::vector<boundary_id_type> bc_ids =
       rb_con->get_mesh().boundary_info->boundary_ids (&c.get_elem(),c.side);
     for (std::vector<boundary_id_type>::const_iterator b =
-         bc_ids.begin(); b != bc_ids.end(); ++b)
+           bc_ids.begin(); b != bc_ids.end(); ++b)
       if( *b == 1 || *b == 3 ) // y == -0.2, y == 0.2
         {
           const unsigned int u_var = 0;
@@ -157,13 +157,13 @@ struct AssemblyA1 : ElemAssemblyWithConstruction
           unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
           for (unsigned int qp=0; qp != n_sidepoints; qp++)
-          {
-            Real x_hat = xyz[qp](0);
+            {
+              Real x_hat = xyz[qp](0);
 
-            for (unsigned int i=0; i != n_u_dofs; i++)
-              for (unsigned int j=0; j != n_u_dofs; j++)
-                c.get_elem_jacobian()(i,j) += JxW_side[qp] * x_hat * phi_side[j][qp]*phi_side[i][qp];
-          }
+              for (unsigned int i=0; i != n_u_dofs; i++)
+                for (unsigned int j=0; j != n_u_dofs; j++)
+                  c.get_elem_jacobian()(i,j) += JxW_side[qp] * x_hat * phi_side[j][qp]*phi_side[i][qp];
+            }
 
           break;
         }
@@ -171,10 +171,10 @@ struct AssemblyA1 : ElemAssemblyWithConstruction
 };
 
 struct ThetaA2 : RBTheta {
-virtual Number evaluate(const RBParameters& mu)
-{
-  return 0.2*mu.get_value("kappa") * mu.get_value("Bi") * mu.get_value("curvature");
-}
+  virtual Number evaluate(const RBParameters& mu)
+  {
+    return 0.2*mu.get_value("kappa") * mu.get_value("Bi") * mu.get_value("curvature");
+  }
 };
 struct AssemblyA2 : ElemAssemblyWithConstruction
 {
@@ -183,7 +183,7 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
     const std::vector<boundary_id_type> bc_ids =
       rb_con->get_mesh().boundary_info->boundary_ids (&c.get_elem(),c.side);
     for (std::vector<boundary_id_type>::const_iterator b =
-         bc_ids.begin(); b != bc_ids.end(); ++b)
+           bc_ids.begin(); b != bc_ids.end(); ++b)
       if( *b == 2 || *b == 4) // x == 0.2, x == -0.2
         {
           const unsigned int u_var = 0;
@@ -202,47 +202,47 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
           unsigned int n_sidepoints = c.get_side_qrule().n_points();
 
           if(*b==2)
-          {
-            for (unsigned int qp=0; qp != n_sidepoints; qp++)
             {
-              for (unsigned int i=0; i != n_u_dofs; i++)
-                for (unsigned int j=0; j != n_u_dofs; j++)
-              c.get_elem_jacobian()(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+              for (unsigned int qp=0; qp != n_sidepoints; qp++)
+                {
+                  for (unsigned int i=0; i != n_u_dofs; i++)
+                    for (unsigned int j=0; j != n_u_dofs; j++)
+                      c.get_elem_jacobian()(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+                }
             }
-          }
 
           if(*b==4)
-          {
-            for (unsigned int qp=0; qp != n_sidepoints; qp++)
             {
-              for (unsigned int i=0; i != n_u_dofs; i++)
-                for (unsigned int j=0; j != n_u_dofs; j++)
-              c.get_elem_jacobian()(i,j) -= JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+              for (unsigned int qp=0; qp != n_sidepoints; qp++)
+                {
+                  for (unsigned int i=0; i != n_u_dofs; i++)
+                    for (unsigned int j=0; j != n_u_dofs; j++)
+                      c.get_elem_jacobian()(i,j) -= JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+                }
             }
-          }
         }
   }
 };
 
 struct ThetaEIM : RBEIMTheta {
 
-ThetaEIM(RBEIMEvaluation& rb_eim_eval_in, unsigned int index_in)
+  ThetaEIM(RBEIMEvaluation& rb_eim_eval_in, unsigned int index_in)
 :
-RBEIMTheta(rb_eim_eval_in, index_in)
-{}
+    RBEIMTheta(rb_eim_eval_in, index_in)
+  {}
 
-virtual Number evaluate(const RBParameters& mu)
-{
-  return mu.get_value("kappa") * RBEIMTheta::evaluate(mu);
-}
+  virtual Number evaluate(const RBParameters& mu)
+  {
+    return mu.get_value("kappa") * RBEIMTheta::evaluate(mu);
+  }
 };
 struct AssemblyEIM : RBEIMAssembly
 {
 
   AssemblyEIM(RBEIMConstruction& rb_eim_con_in,
               unsigned int basis_function_index_in)
-  : RBEIMAssembly(rb_eim_con_in,
-                  basis_function_index_in)
+    : RBEIMAssembly(rb_eim_con_in,
+                    basis_function_index_in)
   {}
 
   virtual void interior_assembly(FEMContext &c)
@@ -289,15 +289,15 @@ struct AssemblyEIM : RBEIMAssembly
                             eim_values_Gz);
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
-    {
-      for (unsigned int i=0; i != n_u_dofs; i++)
-        for (unsigned int j=0; j != n_u_dofs; j++)
-        {
-          c.get_elem_jacobian()(i,j) += JxW[qp] * ( eim_values_Gx[qp]*dphi[i][qp](0)*dphi[j][qp](0) +
-                                                    eim_values_Gy[qp]*dphi[i][qp](1)*dphi[j][qp](1) +
-                                                    eim_values_Gz[qp]*dphi[i][qp](2)*dphi[j][qp](2) );
-        }
-    }
+      {
+        for (unsigned int i=0; i != n_u_dofs; i++)
+          for (unsigned int j=0; j != n_u_dofs; j++)
+            {
+              c.get_elem_jacobian()(i,j) += JxW[qp] * ( eim_values_Gx[qp]*dphi[i][qp](0)*dphi[j][qp](0) +
+                                                        eim_values_Gy[qp]*dphi[i][qp](1)*dphi[j][qp](1) +
+                                                        eim_values_Gz[qp]*dphi[i][qp](2)*dphi[j][qp](2) );
+            }
+      }
   }
 
 };
@@ -354,12 +354,12 @@ struct AssemblyF1 : ElemAssembly
     unsigned int n_qpoints = c.get_element_qrule().n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
-    {
-      Real x_hat = xyz[qp](0);
+      {
+        Real x_hat = xyz[qp](0);
 
-      for (unsigned int i=0; i != n_u_dofs; i++)
-        c.get_elem_residual()(i) += JxW[qp] * ( 1.*x_hat*phi[i][qp] );
-    }
+        for (unsigned int i=0; i != n_u_dofs; i++)
+          c.get_elem_residual()(i) += JxW[qp] * ( 1.*x_hat*phi[i][qp] );
+      }
   }
 };
 
@@ -418,11 +418,11 @@ struct Ex6EIMInnerProduct : ElemAssembly
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
         for (unsigned int j=0; j != n_u_dofs; j++)
-        {
-          Kxx(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
-          Kyy(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
-          Kzz(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
-        }
+          {
+            Kxx(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
+            Kyy(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
+            Kzz(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
+          }
   }
 };
 

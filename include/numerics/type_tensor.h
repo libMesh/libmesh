@@ -50,8 +50,8 @@ template <unsigned int N, typename T> class TypeNTensor;
 template <typename T>
 class TypeTensor
 {
-template <typename T2>
-friend class TypeTensor;
+  template <typename T2>
+  friend class TypeTensor;
 
 protected:
 
@@ -91,8 +91,8 @@ protected:
                         const Scalar zx=0,
                         const Scalar zy=0,
                         typename
-                          boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                                                 const Scalar>::type zz=0);
+                        boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                        const Scalar>::type zz=0);
 
   /**
    * Constructor.  Assigns each vector to a different row of the
@@ -361,27 +361,27 @@ public:
 
   TypeTensorColumn(TypeTensor<T> &tensor,
                    unsigned int j) :
-     _tensor(&tensor), _j(j) {}
+    _tensor(&tensor), _j(j) {}
 
   /**
    * Return a writeable reference to the \f$ i,this \f$ element of the
    * tensor.
    */
   T & operator () (const unsigned int i)
-    { return (*_tensor)(i,_j); }
+  { return (*_tensor)(i,_j); }
 
   T & slice (const unsigned int i)
-    { return (*_tensor)(i,_j); }
+  { return (*_tensor)(i,_j); }
 
   /**
    * Assign values to this column of the tensor.
    */
   TypeTensorColumn<T>& operator = (const TypeVector<T>& rhs)
-    {
-      for (unsigned int i=0; i != LIBMESH_DIM; ++i)
-        (*this)(i) = rhs(i);
-      return *this;
-    }
+  {
+    for (unsigned int i=0; i != LIBMESH_DIM; ++i)
+      (*this)(i) = rhs(i);
+    return *this;
+  }
 
 private:
   TypeTensor<T> *_tensor;
@@ -396,16 +396,16 @@ public:
 
   ConstTypeTensorColumn(const TypeTensor<T> &tensor,
                         unsigned int j) :
-     _tensor(&tensor), _j(j) {}
+    _tensor(&tensor), _j(j) {}
 
   /**
    * Return the \f$ i,this \f$ element of the tensor.
    */
   const T & operator () (const unsigned int i) const
-    { return (*_tensor)(i,_j); }
+  { return (*_tensor)(i,_j); }
 
   const T & slice (const unsigned int i) const
-    { return (*_tensor)(i,_j); }
+  { return (*_tensor)(i,_j); }
 
 private:
   const TypeTensor<T> *_tensor;
@@ -440,15 +440,15 @@ TypeTensor<T>::TypeTensor ()
 template <typename T>
 inline
 TypeTensor<T>::TypeTensor
-  (const T xx,
-   const T xy,
-   const T xz,
-   const T yx,
-   const T yy,
-   const T yz,
-   const T zx,
-   const T zy,
-   const T zz)
+(const T xx,
+ const T xy,
+ const T xz,
+ const T yx,
+ const T yy,
+ const T yz,
+ const T zx,
+ const T zy,
+ const T zz)
 {
   _coords[0] = xx;
 
@@ -475,17 +475,17 @@ template <typename T>
 template <typename Scalar>
 inline
 TypeTensor<T>::TypeTensor
-  (const Scalar xx,
-   const Scalar xy,
-   const Scalar xz,
-   const Scalar yx,
-   const Scalar yy,
-   const Scalar yz,
-   const Scalar zx,
-   const Scalar zy,
-   typename
-     boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                            const Scalar>::type zz)
+(const Scalar xx,
+ const Scalar xy,
+ const Scalar xz,
+ const Scalar yx,
+ const Scalar yy,
+ const Scalar yz,
+ const Scalar zx,
+ const Scalar zy,
+ typename
+ boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+ const Scalar>::type zz)
 {
   _coords[0] = xx;
 
@@ -605,9 +605,9 @@ T & TypeTensor<T>::operator () (const unsigned int i,
 
   if (i >= LIBMESH_DIM || j >= LIBMESH_DIM)
     {
-//       libMesh::err << "ERROR:  You are assigning to a tensor component" << std::endl
-// << "that is out of range for the compiled LIBMESH_DIM!"      << std::endl
-// << " LIBMESH_DIM=" << LIBMESH_DIM << " , i=" << i << " , j=" << j << std::endl;
+      //       libMesh::err << "ERROR:  You are assigning to a tensor component" << std::endl
+      // << "that is out of range for the compiled LIBMESH_DIM!"      << std::endl
+      // << " LIBMESH_DIM=" << LIBMESH_DIM << " , i=" << i << " , j=" << j << std::endl;
       libmesh_error();
     }
 
@@ -1004,10 +1004,10 @@ TypeTensor<T> TypeTensor<T>::operator * (const TypeTensor<T2> &p) const
 
 
 
-  /**
-   * Multiply 2 tensors together, i.e. sum Aij*Bij.
-   * The tensors may be of different types.
-   */
+/**
+ * Multiply 2 tensors together, i.e. sum Aij*Bij.
+ * The tensors may be of different types.
+ */
 template <typename T>
 template <typename T2>
 inline

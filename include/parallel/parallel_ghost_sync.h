@@ -37,75 +37,75 @@ namespace libMesh
 //--------------------------------------------------------------------------
 namespace Parallel {
 
-  //------------------------------------------------------------------------
-  /**
-   * Request data about a range of ghost nodes uniquely identified by
-   * their xyz location or a range of active ghost elements uniquely
-   * identified by their centroids' xyz location.  Fulfill requests
-   * with
-   * sync.gather_data(const std::vector<unsigned int>& ids,
-   *                  std::vector<sync::datum>& data),
-   * by resizing and setting the values of the data vector.
-   * Respond to fulfillment with
-   * sync.act_on_data(const std::vector<unsigned int>& ids,
-   *                  std::vector<sync::datum>& data)
-   * The user must define Parallel::StandardType<sync::datum> if
-   * sync::datum isn't a built-in type.
-   * The user-provided location_map will be used and left unchanged
-   * if it is provided, or filled and cleared if it is empty.
-   */
-  template <typename Iterator,
-            typename DofObjType,
-            typename SyncFunctor>
-  void sync_dofobject_data_by_xyz(const Communicator&      communicator,
-                                  const Iterator&          range_begin,
-                                  const Iterator&          range_end,
-                                  LocationMap<DofObjType>* location_map,
-                                  SyncFunctor&             sync);
+//------------------------------------------------------------------------
+/**
+ * Request data about a range of ghost nodes uniquely identified by
+ * their xyz location or a range of active ghost elements uniquely
+ * identified by their centroids' xyz location.  Fulfill requests
+ * with
+ * sync.gather_data(const std::vector<unsigned int>& ids,
+ *                  std::vector<sync::datum>& data),
+ * by resizing and setting the values of the data vector.
+ * Respond to fulfillment with
+ * sync.act_on_data(const std::vector<unsigned int>& ids,
+ *                  std::vector<sync::datum>& data)
+ * The user must define Parallel::StandardType<sync::datum> if
+ * sync::datum isn't a built-in type.
+ * The user-provided location_map will be used and left unchanged
+ * if it is provided, or filled and cleared if it is empty.
+ */
+template <typename Iterator,
+          typename DofObjType,
+          typename SyncFunctor>
+void sync_dofobject_data_by_xyz(const Communicator&      communicator,
+                                const Iterator&          range_begin,
+                                const Iterator&          range_end,
+                                LocationMap<DofObjType>* location_map,
+                                SyncFunctor&             sync);
 
-  //------------------------------------------------------------------------
-  /**
-   * Request data about a range of ghost dofobjects uniquely
-   * identified by their id.  Fulfill requests with
-   * sync.gather_data(const std::vector<unsigned int>& ids,
-   *                  std::vector<sync::datum>& data),
-   * by resizing and setting the values of the data vector.
-   * Respond to fulfillment with
-   * sync.act_on_data(const std::vector<unsigned int>& ids,
-   *                  std::vector<sync::datum>& data)
-   * The user must define Parallel::StandardType<sync::datum> if
-   * sync::datum isn't a built-in type.
-   */
-  template <typename Iterator,
-            typename SyncFunctor>
-  void sync_dofobject_data_by_id(const Communicator& communicator,
-                                 const Iterator&     range_begin,
-                                 const Iterator&     range_end,
-                                 SyncFunctor&        sync);
+//------------------------------------------------------------------------
+/**
+ * Request data about a range of ghost dofobjects uniquely
+ * identified by their id.  Fulfill requests with
+ * sync.gather_data(const std::vector<unsigned int>& ids,
+ *                  std::vector<sync::datum>& data),
+ * by resizing and setting the values of the data vector.
+ * Respond to fulfillment with
+ * sync.act_on_data(const std::vector<unsigned int>& ids,
+ *                  std::vector<sync::datum>& data)
+ * The user must define Parallel::StandardType<sync::datum> if
+ * sync::datum isn't a built-in type.
+ */
+template <typename Iterator,
+          typename SyncFunctor>
+void sync_dofobject_data_by_id(const Communicator& communicator,
+                               const Iterator&     range_begin,
+                               const Iterator&     range_end,
+                               SyncFunctor&        sync);
 
-  //------------------------------------------------------------------------
-  /**
-   * Request data about a range of ghost elements uniquely
-   * identified by their parent id and which child they are.
-   * Fulfill requests with
-   * sync.gather_data(const std::vector<unsigned int>& ids,
-   *                  std::vector<sync::datum>& data),
-   * by resizing and setting the values of the data vector.
-   * Respond to fulfillment with
-   * sync.act_on_data(const std::vector<unsigned int>& ids,
-   *                  std::vector<sync::datum>& data)
-   * The user must define Parallel::StandardType<sync::datum> if
-   * sync::datum isn't a built-in type.
-   */
-  template <typename Iterator,
-            typename SyncFunctor>
-  void sync_element_data_by_parent_id(MeshBase&       mesh,
-                                      const Iterator& range_begin,
-                                      const Iterator& range_end,
-                                      SyncFunctor&    sync);
+//------------------------------------------------------------------------
+/**
+ * Request data about a range of ghost elements uniquely
+ * identified by their parent id and which child they are.
+ * Fulfill requests with
+ * sync.gather_data(const std::vector<unsigned int>& ids,
+ *                  std::vector<sync::datum>& data),
+ * by resizing and setting the values of the data vector.
+ * Respond to fulfillment with
+ * sync.act_on_data(const std::vector<unsigned int>& ids,
+ *                  std::vector<sync::datum>& data)
+ * The user must define Parallel::StandardType<sync::datum> if
+ * sync::datum isn't a built-in type.
+ */
+template <typename Iterator,
+          typename SyncFunctor>
+void sync_element_data_by_parent_id(MeshBase&       mesh,
+                                    const Iterator& range_begin,
+                                    const Iterator& range_end,
+                                    SyncFunctor&    sync);
 
-  //------------------------------------------------------------------------
-  // Parallel members
+//------------------------------------------------------------------------
+// Parallel members
 
 template <typename Iterator,
           typename DofObjType,
@@ -183,10 +183,10 @@ void sync_dofobject_data_by_xyz(const Communicator&      communicator,
       const processor_id_type procdown =
         libmesh_cast_int<processor_id_type>
         ((communicator.size() + communicator.rank() - p) %
-           communicator.size());
+         communicator.size());
       std::vector<Real> request_to_fill_x,
-                        request_to_fill_y,
-                        request_to_fill_z;
+        request_to_fill_y,
+        request_to_fill_z;
       communicator.send_receive(procup, requested_objs_x[procup],
                                 procdown, request_to_fill_x);
       communicator.send_receive(procup, requested_objs_y[procup],
@@ -286,7 +286,7 @@ void sync_dofobject_data_by_id(const Communicator& communicator,
       const processor_id_type procdown =
         libmesh_cast_int<processor_id_type>
         ((communicator.size() + communicator.rank() - p) %
-           communicator.size());
+         communicator.size());
       std::vector<dof_id_type> request_to_fill_id;
       communicator.send_receive(procup, requested_objs_id[procup],
                                 procdown, request_to_fill_id);
@@ -298,7 +298,7 @@ void sync_dofobject_data_by_id(const Communicator& communicator,
       // Trade back the results
       std::vector<typename SyncFunctor::datum> received_data;
       communicator.send_receive(procdown, data,
-                             procup, received_data);
+                                procup, received_data);
       libmesh_assert_equal_to (requested_objs_id[procup].size(),
                                received_data.size());
 
@@ -309,7 +309,7 @@ void sync_dofobject_data_by_id(const Communicator& communicator,
 
 
 
-  // If there's no refined elements, there's nothing to sync
+// If there's no refined elements, there's nothing to sync
 #ifdef LIBMESH_ENABLE_AMR
 template <typename Iterator,
           typename SyncFunctor>
@@ -381,7 +381,7 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
       const processor_id_type procdown =
         libmesh_cast_int<processor_id_type>
         ((communicator.size() + communicator.rank() - p) %
-           communicator.size());
+         communicator.size());
       std::vector<dof_id_type>   request_to_fill_parent_id;
       std::vector<unsigned char> request_to_fill_child_num;
       communicator.send_receive(procup, requested_objs_parent_id[procup],

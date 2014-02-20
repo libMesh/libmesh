@@ -554,13 +554,13 @@ static PetscErrorCode  DMLibMeshParseDecompositionDescriptor_Private(DM dm, cons
   size_t len0, count;
 
   /*
-     Parse the decomposition descriptor.
-     Decomposition names could be of one of two forms:
-     var:v1,v2;v3,v4;v4,v5;
-     block:b1,b2;b3,b4;b4,b5;
-     resulting in an overlapping decomposition that groups
-     variables (v1,v2), (v3,v4), (v4,v5) or
-     blocks    (b1,b2), (b3,b4), (b4,b5).
+    Parse the decomposition descriptor.
+    Decomposition names could be of one of two forms:
+    var:v1,v2;v3,v4;v4,v5;
+    block:b1,b2;b3,b4;b4,b5;
+    resulting in an overlapping decomposition that groups
+    variables (v1,v2), (v3,v4), (v4,v5) or
+    blocks    (b1,b2), (b3,b4), (b4,b5).
   */
   /* Copy the descriptor so that we can manipulate it in place. */
   ierr = PetscStrallocpy(ddesc,&s0);   CHKERRQ(ierr);
@@ -945,7 +945,7 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
 #if PETSC_VERSION_LT(3,5,0)
 static PetscErrorCode DMCreateMatrix_libMesh(DM dm, const MatType, Mat *A)
 #else
-static PetscErrorCode DMCreateMatrix_libMesh(DM dm, Mat *A)
+  static PetscErrorCode DMCreateMatrix_libMesh(DM dm, Mat *A)
 #endif
 {
   PetscFunctionBegin;
@@ -1043,7 +1043,7 @@ static PetscErrorCode  DMSetUp_libMesh(DM dm)
   if (!dlm->sys)
     SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONGSTATE, "No libMesh system set for DM_libMesh");
   /*
-     Do not evaluate function, Jacobian or bounds for an embedded DM -- the subproblem might not have enough information for that.
+    Do not evaluate function, Jacobian or bounds for an embedded DM -- the subproblem might not have enough information for that.
   */
   if(!dlm->embedding) {
 #if PETSC_RELEASE_LESS_THAN(3,3,1)
@@ -1058,11 +1058,11 @@ static PetscErrorCode  DMSetUp_libMesh(DM dm)
   }
   else {
     /*
-       Fow now we don't implement even these, although a linear "Dirichlet" subproblem is well-defined.
-       Creating the submatrix, however, might require extracting the submatrix preallocation from an unassembled matrix.
+      Fow now we don't implement even these, although a linear "Dirichlet" subproblem is well-defined.
+      Creating the submatrix, however, might require extracting the submatrix preallocation from an unassembled matrix.
     */
-      dm->ops->createglobalvector = 0;
-      dm->ops->creatematrix = 0;
+    dm->ops->createglobalvector = 0;
+    dm->ops->creatematrix = 0;
   }
   PetscFunctionReturn(0);
 }

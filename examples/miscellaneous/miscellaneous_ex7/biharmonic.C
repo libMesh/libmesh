@@ -170,137 +170,137 @@ void Biharmonic::run()
 
 
 Biharmonic::Biharmonic(UnstructuredMesh* m) :
-    EquationSystems(*m),
-    _mesh(m)
-  {
-    // Retrieve parameters and set defaults
-    _verbose      = false; if(on_command_line("--verbose")) _verbose = true;
-    _growth       = false; if(on_command_line("--growth"))       _growth = true;
-    _degenerate   = false; if(on_command_line("--degenerate"))   _degenerate = true;
-    _cahn_hillard = false; if(on_command_line("--cahn_hillard")) _cahn_hillard = true;
-    _netforce     = false; if(on_command_line("--netforce"))     _netforce = true;
-    _kappa = command_line_value("kappa", 1.0);
+  EquationSystems(*m),
+  _mesh(m)
+{
+  // Retrieve parameters and set defaults
+  _verbose      = false; if(on_command_line("--verbose")) _verbose = true;
+  _growth       = false; if(on_command_line("--growth"))       _growth = true;
+  _degenerate   = false; if(on_command_line("--degenerate"))   _degenerate = true;
+  _cahn_hillard = false; if(on_command_line("--cahn_hillard")) _cahn_hillard = true;
+  _netforce     = false; if(on_command_line("--netforce"))     _netforce = true;
+  _kappa = command_line_value("kappa", 1.0);
 
-    // "type of energy (double well, double obstacle, logarithmic+double well, logarithmic+double obstacle)"
-    std::string energy = command_line_value("energy", std::string("double_well"));
-    if (energy == "double_well")
-      _energy = DOUBLE_WELL;
-    else if (energy == "double_obstacle")
-      _energy = DOUBLE_OBSTACLE;
-    else if (energy == "log_double_well")
-      _energy = LOG_DOUBLE_WELL;
-    else if (energy == "log_double_obstacle")
-      _energy = LOG_DOUBLE_OBSTACLE;
-    else
-      ERROR(std::string("Unknown energy type: ") + energy);
+  // "type of energy (double well, double obstacle, logarithmic+double well, logarithmic+double obstacle)"
+  std::string energy = command_line_value("energy", std::string("double_well"));
+  if (energy == "double_well")
+    _energy = DOUBLE_WELL;
+  else if (energy == "double_obstacle")
+    _energy = DOUBLE_OBSTACLE;
+  else if (energy == "log_double_well")
+    _energy = LOG_DOUBLE_WELL;
+  else if (energy == "log_double_obstacle")
+    _energy = LOG_DOUBLE_OBSTACLE;
+  else
+    ERROR(std::string("Unknown energy type: ") + energy);
 
-    _tol     = command_line_value("tol",1.0e-8);
-    _theta   = command_line_value("theta", .001);
-    _theta_c = command_line_value("theta_c",1.0);
+  _tol     = command_line_value("tol",1.0e-8);
+  _theta   = command_line_value("theta", .001);
+  _theta_c = command_line_value("theta_c",1.0);
 
-    //"order of log truncation (0=none, 2=quadratic, 3=cubic)"
-    _log_truncation = command_line_value("log_truncation", 2);
+  //"order of log truncation (0=none, 2=quadratic, 3=cubic)"
+  _log_truncation = command_line_value("log_truncation", 2);
 
-    if (!_log_truncation)
-      libMesh::out << "WARNING: no truncation is being used for the logarithmic free energy term.\nWARNING: division by zero possible!\n";
+  if (!_log_truncation)
+    libMesh::out << "WARNING: no truncation is being used for the logarithmic free energy term.\nWARNING: division by zero possible!\n";
 
 
-    // Dimension
-    _dim = command_line_value("dim",1);
+  // Dimension
+  _dim = command_line_value("dim",1);
 
-    ASSERT((_dim <= 3) && (_dim > 0), "Invalid mesh dimension");
+  ASSERT((_dim <= 3) && (_dim > 0), "Invalid mesh dimension");
 
-    // Build the mesh
-    // Yes, it's better to make a coarse mesh and then refine it. We'll get to it later.
-    _N = command_line_value("N", 8);
-    ASSERT(_N > 0, "Invalid mesh size");
+  // Build the mesh
+  // Yes, it's better to make a coarse mesh and then refine it. We'll get to it later.
+  _N = command_line_value("N", 8);
+  ASSERT(_N > 0, "Invalid mesh size");
 
-    switch (_dim)
-      {
-      case 1:
-	MeshTools::Generation::build_line(*_mesh, _N, 0.0, 1.0, EDGE2);
-	break;
-      case 2:
-	MeshTools::Generation::build_square(*_mesh, _N, _N, 0.0, 1.0, 0.0, 1.0, QUAD4);
-	break;
-      case 3:
-	MeshTools::Generation::build_cube(*_mesh, _N, _N, _N, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, HEX8);
-	break;
-      default:
-	ASSERT((_dim <= 3) && (_dim > 0), "Invalid mesh dimension");
-	break;
-      }
+  switch (_dim)
+    {
+    case 1:
+      MeshTools::Generation::build_line(*_mesh, _N, 0.0, 1.0, EDGE2);
+      break;
+    case 2:
+      MeshTools::Generation::build_square(*_mesh, _N, _N, 0.0, 1.0, 0.0, 1.0, QUAD4);
+      break;
+    case 3:
+      MeshTools::Generation::build_cube(*_mesh, _N, _N, _N, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, HEX8);
+      break;
+    default:
+      ASSERT((_dim <= 3) && (_dim > 0), "Invalid mesh dimension");
+      break;
+    }
 
-    // Determine the initial timestep size
-    _dt0 = command_line_value("dt", 1.0/(10*_kappa*_N*_N*_N*_N));
-    ASSERT(_dt0>=0, "Negative initial timestep");
+  // Determine the initial timestep size
+  _dt0 = command_line_value("dt", 1.0/(10*_kappa*_N*_N*_N*_N));
+  ASSERT(_dt0>=0, "Negative initial timestep");
 
-    _t0 = command_line_value("min_time", 0.0);
-    _t1 = command_line_value("max_time", _t0 + 50.0*_dt0);
-    ASSERT(_t1 >= _t0, "Final time less than initial time");
-    _T = _t1 - _t0;
+  _t0 = command_line_value("min_time", 0.0);
+  _t1 = command_line_value("max_time", _t0 + 50.0*_dt0);
+  ASSERT(_t1 >= _t0, "Final time less than initial time");
+  _T = _t1 - _t0;
 
-    _cnWeight = command_line_value("crank_nicholson_weight", 1.0);
-    ASSERT(_cnWeight <= 1 && _cnWeight >= 0, "Crank-Nicholson weight must be between 0 and 1");
+  _cnWeight = command_line_value("crank_nicholson_weight", 1.0);
+  ASSERT(_cnWeight <= 1 && _cnWeight >= 0, "Crank-Nicholson weight must be between 0 and 1");
 
-    // Initial state
+  // Initial state
+  _initialState = STRIP;
+  std::string initialState = command_line_value("initial_state", std::string("strip"));
+  if (initialState == std::string("ball"))
+    _initialState = BALL;
+  else if (initialState == std::string("strip"))
     _initialState = STRIP;
-    std::string initialState = command_line_value("initial_state", std::string("strip"));
-    if (initialState == std::string("ball"))
-      _initialState = BALL;
-    else if (initialState == std::string("strip"))
-      _initialState = STRIP;
-    else if (initialState == std::string("rod"))
-      _initialState = ROD;
-    else
-      ERROR("Unknown initial state: neither ball nor rod nor srip");
+  else if (initialState == std::string("rod"))
+    _initialState = ROD;
+  else
+    ERROR("Unknown initial state: neither ball nor rod nor srip");
 
-    std::vector<Real> icenter;
-    command_line_vector("initial_center", icenter);
+  std::vector<Real> icenter;
+  command_line_vector("initial_center", icenter);
 
-    // Check that the point defining the center was in the right spatial dimension
-    if (icenter.size() > _dim)
-      ASSERT(icenter.size() > _dim, "Invalid dimension for the initial state center of mass");
+  // Check that the point defining the center was in the right spatial dimension
+  if (icenter.size() > _dim)
+    ASSERT(icenter.size() > _dim, "Invalid dimension for the initial state center of mass");
 
-    // Pad
-    icenter.resize(3);
-    for (unsigned int i = icenter.size(); i < _dim; ++i)
-      icenter[i] = 0.5;
+  // Pad
+  icenter.resize(3);
+  for (unsigned int i = icenter.size(); i < _dim; ++i)
+    icenter[i] = 0.5;
 
-    for (unsigned int i = _dim; i < 3; ++i)
-      icenter[i] = 0.0;
+  for (unsigned int i = _dim; i < 3; ++i)
+    icenter[i] = 0.0;
 
-    _initialCenter = Point(icenter[0],icenter[1], icenter[2]);
-    _initialWidth = command_line_value("initial_width", 0.125);
+  _initialCenter = Point(icenter[0],icenter[1], icenter[2]);
+  _initialWidth = command_line_value("initial_width", 0.125);
 
-    // Build the main equation encapsulated in the JR (Jacobian-Residual or J(R) "jet of R") object
-    _jr = &(add_system<Biharmonic::JR>(std::string("Biharmonic::JR")));
+  // Build the main equation encapsulated in the JR (Jacobian-Residual or J(R) "jet of R") object
+  _jr = &(add_system<Biharmonic::JR>(std::string("Biharmonic::JR")));
 
   // Output options
 #ifdef LIBMESH_HAVE_EXODUS_API
-    if (on_command_line("output_base"))
-      _ofile_base = command_line_value("output_base", std::string("bih"));
+  if (on_command_line("output_base"))
+    _ofile_base = command_line_value("output_base", std::string("bih"));
 
-    else
-      {
-	switch(_dim)
-	  {
-	  case 1:
-	    _ofile_base = std::string("bih.1");
-	    break;
-	  case 2:
-	    _ofile_base = std::string("bih.2");
-	    break;
-	  case 3:
-	    _ofile_base = std::string("bih.3");
-	    break;
-	  default:
-	    _ofile_base = std::string("bih");
-	    break;
-	  }
-      }
-    _ofile = _ofile_base + ".e";
-    _exio = new ExodusII_IO(*_mesh);
-    _o_dt = command_line_value("output_dt", 0.0);
+  else
+    {
+      switch(_dim)
+        {
+        case 1:
+          _ofile_base = std::string("bih.1");
+          break;
+        case 2:
+          _ofile_base = std::string("bih.2");
+          break;
+        case 3:
+          _ofile_base = std::string("bih.3");
+          break;
+        default:
+          _ofile_base = std::string("bih");
+          break;
+        }
+    }
+  _ofile = _ofile_base + ".e";
+  _exio = new ExodusII_IO(*_mesh);
+  _o_dt = command_line_value("output_dt", 0.0);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
-  } // constructor
+} // constructor

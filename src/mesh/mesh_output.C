@@ -34,10 +34,10 @@ _build_variable_names_and_solution_vector (const EquationSystems& es,
                                            const std::set<std::string>* system_names)
 {
   if(!_is_parallel_format)
-  {
-    // We need a serial mesh for MeshOutput for now
-    const_cast<EquationSystems&>(es).allgather();
-  }
+    {
+      // We need a serial mesh for MeshOutput for now
+      const_cast<EquationSystems&>(es).allgather();
+    }
 
   es.build_variable_names  (names, NULL, system_names);
   es.build_solution_vector (soln, system_names);
@@ -47,15 +47,15 @@ _build_variable_names_and_solution_vector (const EquationSystems& es,
   // this is TERRIBLE and WASTEFUL but it's only temporary until we redesign the output of build_solution_vector
   // and the inputs to the I/O... both of which should actually be NumericVectors....
   if(_is_parallel_format)
-  {
-    size_t size = soln.size();
-    _obj->comm().broadcast(size);
+    {
+      size_t size = soln.size();
+      _obj->comm().broadcast(size);
 
-    if(_obj->comm().rank())
-      soln.resize(size);
+      if(_obj->comm().rank())
+        soln.resize(size);
 
-    _obj->comm().broadcast(soln);
-  }
+      _obj->comm().broadcast(soln);
+    }
 }
 
 

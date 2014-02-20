@@ -89,9 +89,9 @@ void TimeSolver::solve ()
 
 
 void TimeSolver::set_solution_history (const SolutionHistory & _solution_history)
- {
-   solution_history = _solution_history.clone();
- }
+{
+  solution_history = _solution_history.clone();
+}
 
 void TimeSolver::advance_timestep ()
 {

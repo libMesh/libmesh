@@ -250,7 +250,7 @@ void FEMContext::interior_gradient(unsigned int var, unsigned int qp,
 {
   typedef typename TensorTools::MakeReal
     <typename TensorTools::DecrementRank<OutputType>::type>::type
-      OutputShape;
+    OutputShape;
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
@@ -282,13 +282,13 @@ void FEMContext::interior_gradient(unsigned int var, unsigned int qp,
 
 template<typename OutputType>
 void FEMContext::interior_gradients
-  (unsigned int var,
-   const NumericVector<Number> & _system_vector,
-   std::vector<OutputType>& du_vals) const
+(unsigned int var,
+ const NumericVector<Number> & _system_vector,
+ std::vector<OutputType>& du_vals) const
 {
   typedef typename TensorTools::MakeReal
     <typename TensorTools::DecrementRank<OutputType>::type>::type
-      OutputShape;
+    OutputShape;
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
@@ -336,8 +336,8 @@ void FEMContext::interior_hessian(unsigned int var, unsigned int qp,
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
-      typename TensorTools::DecrementRank<
-        OutputType>::type>::type>::type
+    typename TensorTools::DecrementRank<
+    OutputType>::type>::type>::type
     OutputShape;
 
   // Get local-to-global dof index lookup
@@ -369,14 +369,14 @@ void FEMContext::interior_hessian(unsigned int var, unsigned int qp,
 
 template<typename OutputType>
 void FEMContext::interior_hessians
-  (unsigned int var,
-   const NumericVector<Number> & _system_vector,
-   std::vector<OutputType>& d2u_vals) const
+(unsigned int var,
+ const NumericVector<Number> & _system_vector,
+ std::vector<OutputType>& d2u_vals) const
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
-      typename TensorTools::DecrementRank<
-        OutputType>::type>::type>::type
+    typename TensorTools::DecrementRank<
+    OutputType>::type>::type>::type
     OutputShape;
 
   // Get local-to-global dof index lookup
@@ -452,7 +452,7 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
 {
   typedef typename
     TensorTools::IncrementRank
-      <typename TensorTools::MakeReal<OutputType>::type>::type OutputShape;
+    <typename TensorTools::MakeReal<OutputType>::type>::type OutputShape;
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
@@ -526,9 +526,9 @@ void FEMContext::side_value(unsigned int var, unsigned int qp,
 
 template<typename OutputType>
 void FEMContext::side_values
-  (unsigned int var,
-   const NumericVector<Number> & _system_vector,
-   std::vector<OutputType>& u_vals) const
+(unsigned int var,
+ const NumericVector<Number> & _system_vector,
+ std::vector<OutputType>& u_vals) const
 {
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
@@ -578,7 +578,7 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
 {
   typedef typename TensorTools::MakeReal
     <typename TensorTools::DecrementRank<OutputType>::type>::type
-      OutputShape;
+    OutputShape;
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
@@ -610,13 +610,13 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
 
 template<typename OutputType>
 void FEMContext::side_gradients
-  (unsigned int var,
-   const NumericVector<Number> & _system_vector,
-   std::vector<OutputType>& du_vals) const
+(unsigned int var,
+ const NumericVector<Number> & _system_vector,
+ std::vector<OutputType>& du_vals) const
 {
   typedef typename TensorTools::MakeReal
     <typename TensorTools::DecrementRank<OutputType>::type>::type
-      OutputShape;
+    OutputShape;
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
@@ -664,8 +664,8 @@ void FEMContext::side_hessian(unsigned int var, unsigned int qp,
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
-      typename TensorTools::DecrementRank<
-        OutputType>::type>::type>::type
+    typename TensorTools::DecrementRank<
+    OutputType>::type>::type>::type
     OutputShape;
 
   // Get local-to-global dof index lookup
@@ -697,14 +697,14 @@ void FEMContext::side_hessian(unsigned int var, unsigned int qp,
 
 template<typename OutputType>
 void FEMContext::side_hessians
-  (unsigned int var,
-   const NumericVector<Number> & _system_vector,
-   std::vector<OutputType>& d2u_vals) const
+(unsigned int var,
+ const NumericVector<Number> & _system_vector,
+ std::vector<OutputType>& d2u_vals) const
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
-      typename TensorTools::DecrementRank<
-        OutputType>::type>::type>::type
+    typename TensorTools::DecrementRank<
+    OutputType>::type>::type>::type
     OutputShape;
 
   // Get local-to-global dof index lookup
@@ -805,7 +805,7 @@ void FEMContext::point_gradient(unsigned int var, const Point &p,
 {
   typedef typename TensorTools::MakeReal
     <typename TensorTools::DecrementRank<OutputType>::type>::type
-      OutputShape;
+    OutputShape;
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
@@ -855,8 +855,8 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
-      typename TensorTools::DecrementRank<
-        OutputType>::type>::type>::type
+    typename TensorTools::DecrementRank<
+    OutputType>::type>::type>::type
     OutputShape;
 
   // Get local-to-global dof index lookup
@@ -987,7 +987,7 @@ void FEMContext::FEMContext::fixed_interior_gradient(unsigned int var, unsigned 
 {
   typedef typename TensorTools::MakeReal
     <typename TensorTools::DecrementRank<OutputType>::type>::type
-      OutputShape;
+    OutputShape;
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
@@ -1034,8 +1034,8 @@ void FEMContext::fixed_interior_hessian(unsigned int var, unsigned int qp,
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
-      typename TensorTools::DecrementRank<
-        OutputType>::type>::type>::type
+    typename TensorTools::DecrementRank<
+    OutputType>::type>::type>::type
     OutputShape;
 
   // Get local-to-global dof index lookup
@@ -1127,7 +1127,7 @@ void FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp,
 {
   typedef typename TensorTools::MakeReal
     <typename TensorTools::DecrementRank<OutputType>::type>::type
-      OutputShape;
+    OutputShape;
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
@@ -1173,8 +1173,8 @@ void FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp,
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
-      typename TensorTools::DecrementRank<
-        OutputType>::type>::type>::type
+    typename TensorTools::DecrementRank<
+    OutputType>::type>::type>::type
     OutputShape;
 
   // Get local-to-global dof index lookup
@@ -1268,7 +1268,7 @@ void FEMContext::fixed_point_gradient(unsigned int var, const Point &p,
 {
   typedef typename TensorTools::MakeReal
     <typename TensorTools::DecrementRank<OutputType>::type>::type
-      OutputShape;
+    OutputShape;
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
@@ -1318,8 +1318,8 @@ void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
 {
   typedef typename TensorTools::MakeReal<
     typename TensorTools::DecrementRank<
-      typename TensorTools::DecrementRank<
-        OutputType>::type>::type>::type
+    typename TensorTools::DecrementRank<
+    OutputType>::type>::type>::type
     OutputShape;
 
   // Get local-to-global dof index lookup
@@ -1462,46 +1462,46 @@ void FEMContext::elem_position_get()
 
   // If the coordinate data is in our own system, it's already
   // been set up for us
-//  if (_mesh_sys == this->number())
-//    {
-      unsigned int n_nodes = elem->n_nodes();
-      // For simplicity we demand that mesh coordinates be stored
-      // in a format that allows a direct copy
-      libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
-                     (_element_fe_var[_mesh_x_var]->get_fe_type().family
-                      == LAGRANGE &&
-                      _element_fe_var[_mesh_x_var]->get_fe_type().order
-                      == elem->default_order()));
-      libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
-                     (_element_fe_var[_mesh_y_var]->get_fe_type().family
-                      == LAGRANGE &&
-                      _element_fe_var[_mesh_y_var]->get_fe_type().order
-                      == elem->default_order()));
-      libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
-                     (_element_fe_var[_mesh_z_var]->get_fe_type().family
-                      == LAGRANGE &&
-                      _element_fe_var[_mesh_z_var]->get_fe_type().order
-                      == elem->default_order()));
+  //  if (_mesh_sys == this->number())
+  //    {
+  unsigned int n_nodes = elem->n_nodes();
+  // For simplicity we demand that mesh coordinates be stored
+  // in a format that allows a direct copy
+  libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
+                 (_element_fe_var[_mesh_x_var]->get_fe_type().family
+                  == LAGRANGE &&
+                  _element_fe_var[_mesh_x_var]->get_fe_type().order
+                  == elem->default_order()));
+  libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
+                 (_element_fe_var[_mesh_y_var]->get_fe_type().family
+                  == LAGRANGE &&
+                  _element_fe_var[_mesh_y_var]->get_fe_type().order
+                  == elem->default_order()));
+  libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
+                 (_element_fe_var[_mesh_z_var]->get_fe_type().family
+                  == LAGRANGE &&
+                  _element_fe_var[_mesh_z_var]->get_fe_type().order
+                  == elem->default_order()));
 
-      // Get degree of freedom coefficients from point coordinates
-      if (_mesh_x_var != libMesh::invalid_uint)
-        for (unsigned int i=0; i != n_nodes; ++i)
-          (*elem_subsolutions[_mesh_x_var])(i) = elem->point(i)(0);
+  // Get degree of freedom coefficients from point coordinates
+  if (_mesh_x_var != libMesh::invalid_uint)
+    for (unsigned int i=0; i != n_nodes; ++i)
+      (*elem_subsolutions[_mesh_x_var])(i) = elem->point(i)(0);
 
-      if (_mesh_y_var != libMesh::invalid_uint)
-        for (unsigned int i=0; i != n_nodes; ++i)
-          (*elem_subsolutions[_mesh_y_var])(i) = elem->point(i)(1);
+  if (_mesh_y_var != libMesh::invalid_uint)
+    for (unsigned int i=0; i != n_nodes; ++i)
+      (*elem_subsolutions[_mesh_y_var])(i) = elem->point(i)(1);
 
-      if (_mesh_z_var != libMesh::invalid_uint)
-        for (unsigned int i=0; i != n_nodes; ++i)
-          (*elem_subsolutions[_mesh_z_var])(i) = elem->point(i)(2);
-//    }
+  if (_mesh_z_var != libMesh::invalid_uint)
+    for (unsigned int i=0; i != n_nodes; ++i)
+      (*elem_subsolutions[_mesh_z_var])(i) = elem->point(i)(2);
+  //    }
   // FIXME - If the coordinate data is not in our own system, someone
   // had better get around to implementing that... - RHS
-//  else
-//    {
-//      libmesh_not_implemented();
-//    }
+  //  else
+  //    {
+  //      libmesh_not_implemented();
+  //    }
 }
 
 
@@ -1522,46 +1522,46 @@ void FEMContext::_do_elem_position_set(Real)
 
   // If the coordinate data is in our own system, it's already
   // been set up for us, and we can ignore our input parameter theta
-//  if (_mesh_sys == this->number())
-//    {
-      unsigned int n_nodes = elem->n_nodes();
-      // For simplicity we demand that mesh coordinates be stored
-      // in a format that allows a direct copy
-      libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
-                     (_element_fe_var[_mesh_x_var]->get_fe_type().family
-                      == LAGRANGE &&
-                      elem_subsolutions[_mesh_x_var]->size() == n_nodes));
-      libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
-                     (_element_fe_var[_mesh_y_var]->get_fe_type().family
-                      == LAGRANGE &&
-                      elem_subsolutions[_mesh_y_var]->size() == n_nodes));
-      libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
-                     (_element_fe_var[_mesh_z_var]->get_fe_type().family
-                      == LAGRANGE &&
-                      elem_subsolutions[_mesh_z_var]->size() == n_nodes));
+  //  if (_mesh_sys == this->number())
+  //    {
+  unsigned int n_nodes = elem->n_nodes();
+  // For simplicity we demand that mesh coordinates be stored
+  // in a format that allows a direct copy
+  libmesh_assert(_mesh_x_var == libMesh::invalid_uint ||
+                 (_element_fe_var[_mesh_x_var]->get_fe_type().family
+                  == LAGRANGE &&
+                  elem_subsolutions[_mesh_x_var]->size() == n_nodes));
+  libmesh_assert(_mesh_y_var == libMesh::invalid_uint ||
+                 (_element_fe_var[_mesh_y_var]->get_fe_type().family
+                  == LAGRANGE &&
+                  elem_subsolutions[_mesh_y_var]->size() == n_nodes));
+  libmesh_assert(_mesh_z_var == libMesh::invalid_uint ||
+                 (_element_fe_var[_mesh_z_var]->get_fe_type().family
+                  == LAGRANGE &&
+                  elem_subsolutions[_mesh_z_var]->size() == n_nodes));
 
-      // Set the new point coordinates
-      if (_mesh_x_var != libMesh::invalid_uint)
-        for (unsigned int i=0; i != n_nodes; ++i)
-          const_cast<Elem*>(elem)->point(i)(0) =
-            libmesh_real((*elem_subsolutions[_mesh_x_var])(i));
+  // Set the new point coordinates
+  if (_mesh_x_var != libMesh::invalid_uint)
+    for (unsigned int i=0; i != n_nodes; ++i)
+      const_cast<Elem*>(elem)->point(i)(0) =
+        libmesh_real((*elem_subsolutions[_mesh_x_var])(i));
 
-      if (_mesh_y_var != libMesh::invalid_uint)
-        for (unsigned int i=0; i != n_nodes; ++i)
-          const_cast<Elem*>(elem)->point(i)(1) =
-            libmesh_real((*elem_subsolutions[_mesh_y_var])(i));
+  if (_mesh_y_var != libMesh::invalid_uint)
+    for (unsigned int i=0; i != n_nodes; ++i)
+      const_cast<Elem*>(elem)->point(i)(1) =
+        libmesh_real((*elem_subsolutions[_mesh_y_var])(i));
 
-      if (_mesh_z_var != libMesh::invalid_uint)
-        for (unsigned int i=0; i != n_nodes; ++i)
-          const_cast<Elem*>(elem)->point(i)(2) =
-            libmesh_real((*elem_subsolutions[_mesh_z_var])(i));
-//    }
+  if (_mesh_z_var != libMesh::invalid_uint)
+    for (unsigned int i=0; i != n_nodes; ++i)
+      const_cast<Elem*>(elem)->point(i)(2) =
+        libmesh_real((*elem_subsolutions[_mesh_z_var])(i));
+  //    }
   // FIXME - If the coordinate data is not in our own system, someone
   // had better get around to implementing that... - RHS
-//  else
-//    {
-//      libmesh_not_implemented();
-//    }
+  //  else
+  //    {
+  //      libmesh_not_implemented();
+  //    }
 }
 
 
@@ -1569,15 +1569,15 @@ void FEMContext::_do_elem_position_set(Real)
 
 
 /*
-void FEMContext::reinit(const FEMSystem &sys, Elem *e)
-{
+  void FEMContext::reinit(const FEMSystem &sys, Elem *e)
+  {
   // Initialize our elem pointer, algebraic objects
   this->pre_fe_reinit(e);
 
   // Moving the mesh may be necessary
   // Reinitializing the FE objects is definitely necessary
   this->elem_reinit(1.);
-}
+  }
 */
 
 
@@ -1634,7 +1634,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
           {
             const unsigned int n_dofs_var_j =
               libmesh_cast_int<unsigned int>
-                (dof_indices_var[j].size());
+              (dof_indices_var[j].size());
 
             elem_subjacobians[i][j]->reposition
               (sub_dofs, elem_subresiduals[j]->i_off(),

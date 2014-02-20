@@ -205,8 +205,8 @@ void Patch::build_around_element (const Elem* e0,
   // Make sure we are either starting with a local element or
   // requesting a nonlocal patch
   libmesh_assert ((patchtype != &Patch::add_local_face_neighbors &&
-           patchtype != &Patch::add_local_point_neighbors) ||
-           e0->processor_id() == _my_procid);
+                   patchtype != &Patch::add_local_point_neighbors) ||
+                  e0->processor_id() == _my_procid);
 
   // First clear the current set, then add the element of interest.
   this->clear();
@@ -230,9 +230,9 @@ void Patch::build_around_element (const Elem* e0,
       if (this->size() == old_patch_size)
         {
           libmesh_do_once(libMesh::err <<
-            "WARNING: stagnant patch of " << this->size() << " elements."
-            << std::endl <<
-            "Does the target patch size exceed the number of local elements?"
+                          "WARNING: stagnant patch of " << this->size() << " elements."
+                          << std::endl <<
+                          "Does the target patch size exceed the number of local elements?"
                           << std::endl;
                           libmesh_here(););
           break;

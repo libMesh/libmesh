@@ -42,27 +42,27 @@ namespace libMesh
 
 // Anonymous namespace for implementation details.
 namespace {
-  std::string local_file_name (const unsigned int processor_id,
-                               const std::string &name)
-  {
-    std::string basename(name);
-    char buf[256];
+std::string local_file_name (const unsigned int processor_id,
+                             const std::string &name)
+{
+  std::string basename(name);
+  char buf[256];
 
-    if (basename.size() - basename.rfind(".bz2") == 4)
-      {
-        basename.erase(basename.end()-4, basename.end());
-        std::sprintf(buf, "%s.%04d.bz2", basename.c_str(), processor_id);
-      }
-    else if (basename.size() - basename.rfind(".gz") == 3)
-      {
-        basename.erase(basename.end()-3, basename.end());
-        std::sprintf(buf, "%s.%04d.gz", basename.c_str(), processor_id);
-      }
-    else
-      std::sprintf(buf, "%s.%04d", basename.c_str(), processor_id);
+  if (basename.size() - basename.rfind(".bz2") == 4)
+    {
+      basename.erase(basename.end()-4, basename.end());
+      std::sprintf(buf, "%s.%04d.bz2", basename.c_str(), processor_id);
+    }
+  else if (basename.size() - basename.rfind(".gz") == 3)
+    {
+      basename.erase(basename.end()-3, basename.end());
+      std::sprintf(buf, "%s.%04d.gz", basename.c_str(), processor_id);
+    }
+  else
+    std::sprintf(buf, "%s.%04d", basename.c_str(), processor_id);
 
-    return std::string(buf);
-  }
+  return std::string(buf);
+}
 }
 
 
@@ -70,7 +70,7 @@ namespace {
 
 // ------------------------------------------------------------
 // EquationSystem class implementation
-    template <typename InValType>
+template <typename InValType>
 void EquationSystems::read (const std::string& name,
                             const unsigned int read_flags,
                             bool partition_agnostic)
@@ -150,7 +150,7 @@ void EquationSystems::read (const std::string& name,
 
 
 
-    template <typename InValType>
+template <typename InValType>
 void EquationSystems::_read_impl (const std::string& name,
                                   const XdrMODE mode,
                                   const unsigned int read_flags,
@@ -161,55 +161,55 @@ void EquationSystems::_read_impl (const std::string& name,
    * EquationSystems object.  This warrants some
    * documentation.  The output file essentially
    * consists of 11 sections:
-     \verbatim
-     1.) A version header (for non-'legacy' formats, libMesh-0.7.0 and greater).
-     2.) The number of individual equation systems (unsigned int)
+   \verbatim
+   1.) A version header (for non-'legacy' formats, libMesh-0.7.0 and greater).
+   2.) The number of individual equation systems (unsigned int)
 
-       for each system
+   for each system
 
-        3.)  The name of the system (string)
-        4.)  The type of the system (string)
+   3.)  The name of the system (string)
+   4.)  The type of the system (string)
 
-        handled through System::read():
+   handled through System::read():
 
-     +-------------------------------------------------------------+
-     |  5.) The number of variables in the system (unsigned int)   |
-     |                                                             |
-     |   for each variable in the system                           |
-     |                                                             |
-     |    6.) The name of the variable (string)                    |
-     |                                                             |
-     |    7.) Combined in an FEType:                               |
-     |         - The approximation order(s) of the variable (Order |
-     |           Enum, cast to int/s)                              |
-     |         - The finite element family/ies of the variable     |
-     |           (FEFamily Enum, cast to int/s)                    |
-     |                                                             |
-     |   end variable loop                                         |
-     |                                                             |
-     | 8.) The number of additional vectors (unsigned int),        |
-     |                                                             |
-     |    for each additional vector in the equation system object |
-     |                                                             |
-     |    9.) the name of the additional vector  (string)          |
-     +-------------------------------------------------------------+
+   +-------------------------------------------------------------+
+   |  5.) The number of variables in the system (unsigned int)   |
+   |                                                             |
+   |   for each variable in the system                           |
+   |                                                             |
+   |    6.) The name of the variable (string)                    |
+   |                                                             |
+   |    7.) Combined in an FEType:                               |
+   |         - The approximation order(s) of the variable (Order |
+   |           Enum, cast to int/s)                              |
+   |         - The finite element family/ies of the variable     |
+   |           (FEFamily Enum, cast to int/s)                    |
+   |                                                             |
+   |   end variable loop                                         |
+   |                                                             |
+   | 8.) The number of additional vectors (unsigned int),        |
+   |                                                             |
+   |    for each additional vector in the equation system object |
+   |                                                             |
+   |    9.) the name of the additional vector  (string)          |
+   +-------------------------------------------------------------+
 
-     end system loop
+   end system loop
 
 
-       for each system, handled through System::read_{serialized,parallel}_data():
+   for each system, handled through System::read_{serialized,parallel}_data():
 
-     +--------------------------------------------------------------+
-     | 10.) The global solution vector, re-ordered to be node-major |
-     |     (More on this later.)                                    |
-     |                                                              |
-     |    for each additional vector in the equation system object  |
-     |                                                              |
-     |    11.) The global additional vector, re-ordered to be       |
-     |         node-major (More on this later.)                     |
-     +--------------------------------------------------------------+
+   +--------------------------------------------------------------+
+   | 10.) The global solution vector, re-ordered to be node-major |
+   |     (More on this later.)                                    |
+   |                                                              |
+   |    for each additional vector in the equation system object  |
+   |                                                              |
+   |    11.) The global additional vector, re-ordered to be       |
+   |         node-major (More on this later.)                     |
+   +--------------------------------------------------------------+
 
-     end system loop
+   end system loop
    \endverbatim
    *
    * Note that the actual IO is handled through the Xdr class
@@ -219,14 +219,14 @@ void EquationSystems::_read_impl (const std::string& name,
    * files with no changes.
    */
 
-   // Set booleans from the read_flags argument
-   const bool read_header          = read_flags & EquationSystems::READ_HEADER;
-   const bool read_data            = read_flags & EquationSystems::READ_DATA;
-   const bool read_additional_data = read_flags & EquationSystems::READ_ADDITIONAL_DATA;
-   const bool read_legacy_format   = read_flags & EquationSystems::READ_LEGACY_FORMAT;
-   const bool try_read_ifems       = read_flags & EquationSystems::TRY_READ_IFEMS;
-   const bool read_basic_only      = read_flags & EquationSystems::READ_BASIC_ONLY;
-         bool read_parallel_files  = false;
+  // Set booleans from the read_flags argument
+  const bool read_header          = read_flags & EquationSystems::READ_HEADER;
+  const bool read_data            = read_flags & EquationSystems::READ_DATA;
+  const bool read_additional_data = read_flags & EquationSystems::READ_ADDITIONAL_DATA;
+  const bool read_legacy_format   = read_flags & EquationSystems::READ_LEGACY_FORMAT;
+  const bool try_read_ifems       = read_flags & EquationSystems::TRY_READ_IFEMS;
+  const bool read_basic_only      = read_flags & EquationSystems::READ_BASIC_ONLY;
+  bool read_parallel_files  = false;
 
   std::map<std::string, System*> xda_systems;
 
@@ -279,7 +279,7 @@ void EquationSystems::_read_impl (const std::string& name,
     else
       libmesh_deprecated();
 
-  START_LOG("read()","EquationSystems");
+    START_LOG("read()","EquationSystems");
 
     // 2.)
     // Read the number of equation systems
@@ -397,54 +397,54 @@ void EquationSystems::write(const std::string& name,
    * documentation.  The output file essentially
    * consists of 11 sections:
    \verbatim
-     1.) The version header.
-     2.) The number of individual equation systems (unsigned int)
+   1.) The version header.
+   2.) The number of individual equation systems (unsigned int)
 
-       for each system
+   for each system
 
-        3.)  The name of the system (string)
-        4.)  The type of the system (string)
+   3.)  The name of the system (string)
+   4.)  The type of the system (string)
 
-        handled through System::read():
+   handled through System::read():
 
-     +-------------------------------------------------------------+
-     |  5.) The number of variables in the system (unsigned int)   |
-     |                                                             |
-     |   for each variable in the system                           |
-     |                                                             |
-     |    6.) The name of the variable (string)                    |
-     |                                                             |
-     |    7.) Combined in an FEType:                               |
-     |         - The approximation order(s) of the variable (Order |
-     |           Enum, cast to int/s)                              |
-     |         - The finite element family/ies of the variable     |
-     |           (FEFamily Enum, cast to int/s)                    |
-     |                                                             |
-     |   end variable loop                                         |
-     |                                                             |
-     | 8.) The number of additional vectors (unsigned int),        |
-     |                                                             |
-     |    for each additional vector in the equation system object |
-     |                                                             |
-     |    9.) the name of the additional vector  (string)          |
-     +-------------------------------------------------------------+
+   +-------------------------------------------------------------+
+   |  5.) The number of variables in the system (unsigned int)   |
+   |                                                             |
+   |   for each variable in the system                           |
+   |                                                             |
+   |    6.) The name of the variable (string)                    |
+   |                                                             |
+   |    7.) Combined in an FEType:                               |
+   |         - The approximation order(s) of the variable (Order |
+   |           Enum, cast to int/s)                              |
+   |         - The finite element family/ies of the variable     |
+   |           (FEFamily Enum, cast to int/s)                    |
+   |                                                             |
+   |   end variable loop                                         |
+   |                                                             |
+   | 8.) The number of additional vectors (unsigned int),        |
+   |                                                             |
+   |    for each additional vector in the equation system object |
+   |                                                             |
+   |    9.) the name of the additional vector  (string)          |
+   +-------------------------------------------------------------+
 
-    end system loop
+   end system loop
 
 
-    for each system, handled through System::write_{serialized,parallel}_data():
+   for each system, handled through System::write_{serialized,parallel}_data():
 
-     +--------------------------------------------------------------+
-     | 10.) The global solution vector, re-ordered to be node-major |
-     |     (More on this later.)                                    |
-     |                                                              |
-     |    for each additional vector in the equation system object  |
-     |                                                              |
-     |    11.) The global additional vector, re-ordered to be       |
-     |         node-major (More on this later.)                     |
-     +--------------------------------------------------------------+
+   +--------------------------------------------------------------+
+   | 10.) The global solution vector, re-ordered to be node-major |
+   |     (More on this later.)                                    |
+   |                                                              |
+   |    for each additional vector in the equation system object  |
+   |                                                              |
+   |    11.) The global additional vector, re-ordered to be       |
+   |         node-major (More on this later.)                     |
+   +--------------------------------------------------------------+
 
-    end system loop
+   end system loop
    \endverbatim
    *
    * Note that the actual IO is handled through the Xdr class
@@ -458,23 +458,23 @@ void EquationSystems::write(const std::string& name,
   // but we need to assign a temporary numbering to the nodes
   // and elements in the mesh, which requires that we abuse const_cast
   if(partition_agnostic)
-  {
-    MeshBase &mesh = const_cast<MeshBase&>(this->get_mesh());
-    MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
-  }
+    {
+      MeshBase &mesh = const_cast<MeshBase&>(this->get_mesh());
+      MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
+    }
 
-   // set booleans from write_flags argument
-   const bool write_data            = write_flags & EquationSystems::WRITE_DATA;
-   const bool write_additional_data = write_flags & EquationSystems::WRITE_ADDITIONAL_DATA;
+  // set booleans from write_flags argument
+  const bool write_data            = write_flags & EquationSystems::WRITE_DATA;
+  const bool write_additional_data = write_flags & EquationSystems::WRITE_ADDITIONAL_DATA;
 
-   // always write parallel files if we're instructed to write in
-   // parallel
-   const bool write_parallel_files  =
-     (write_flags & EquationSystems::WRITE_PARALLEL_FILES) ||
-   // but also write parallel files if we haven't been instructed to
-   // write in serial and we're on a distributed mesh
-     (!(write_flags & EquationSystems::WRITE_SERIAL_FILES) &&
-      !this->get_mesh().is_serial());
+  // always write parallel files if we're instructed to write in
+  // parallel
+  const bool write_parallel_files  =
+    (write_flags & EquationSystems::WRITE_PARALLEL_FILES) ||
+    // but also write parallel files if we haven't been instructed to
+    // write in serial and we're on a distributed mesh
+    (!(write_flags & EquationSystems::WRITE_SERIAL_FILES) &&
+     !this->get_mesh().is_serial());
 
   // New scope so that io will close before we try to zip the file
   {

@@ -68,11 +68,11 @@
 // It relies on the VTK version numbers detected during configure.  Note that if
 // LIBMESH_HAVE_VTK is not defined, none of the LIBMESH_DETECTED_VTK_VERSION_* variables will
 // be defined either.
-#define VTK_VERSION_LESS_THAN(major,minor,subminor)                                                     \
-  ((LIBMESH_DETECTED_VTK_VERSION_MAJOR < (major) ||                                                     \
-    (LIBMESH_DETECTED_VTK_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_VTK_VERSION_MINOR < (minor) ||  \
-                                  (LIBMESH_DETECTED_VTK_VERSION_MINOR == (minor) &&                     \
-                                   LIBMESH_DETECTED_VTK_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
+#define VTK_VERSION_LESS_THAN(major,minor,subminor)                     \
+  ((LIBMESH_DETECTED_VTK_VERSION_MAJOR < (major) ||                     \
+    (LIBMESH_DETECTED_VTK_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_VTK_VERSION_MINOR < (minor) || \
+                                                       (LIBMESH_DETECTED_VTK_VERSION_MINOR == (minor) && \
+                                                        LIBMESH_DETECTED_VTK_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
 
 
 
@@ -88,7 +88,7 @@ vtkIdType VTKIO::get_elem_type(ElemType type)
   vtkIdType celltype = VTK_EMPTY_CELL; // initialize to something to avoid compiler warning
 
   switch(type)
-  {
+    {
     case EDGE2:
       celltype = VTK_LINE;
       break;
@@ -158,7 +158,7 @@ vtkIdType VTKIO::get_elem_type(ElemType type)
         libmesh_error();
         break;
       }
-  }
+    }
   return celltype;
 }
 
@@ -548,8 +548,8 @@ void VTKIO::read (const std::string& name)
       libMesh::err << "Cannot open dimension " <<
         mesh.mesh_dimension() <<
         " mesh file when configured without " <<
-                      mesh.mesh_dimension() << "D support." <<
-                      std::endl;
+        mesh.mesh_dimension() << "D support." <<
+        std::endl;
       libmesh_error();
     }
 #endif
@@ -567,7 +567,7 @@ void VTKIO::write_nodal_data (const std::string& fname,
                               const std::vector<Number>&,
                               const std::vector<std::string>&
 #endif
-)
+                              )
 {
 #ifndef LIBMESH_HAVE_VTK
 

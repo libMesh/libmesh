@@ -34,13 +34,13 @@
 namespace libMesh
 {
 
-  RBEIMEvaluation::RBEIMEvaluation(const libMesh::Parallel::Communicator &comm)
+RBEIMEvaluation::RBEIMEvaluation(const libMesh::Parallel::Communicator &comm)
   :
-    RBEvaluation(comm),
-    extra_interpolation_point_elem(NULL),
-    _previous_N(0),
-    _previous_error_bound(-1),
-    _interpolation_points_mesh(comm)
+  RBEvaluation(comm),
+  extra_interpolation_point_elem(NULL),
+  _previous_N(0),
+  _previous_error_bound(-1),
+  _interpolation_points_mesh(comm)
 {
   // Indicate that we need to compute the RB
   // inner product matrix in this case
@@ -69,9 +69,9 @@ void RBEIMEvaluation::clear()
 
   // Delete any RBTheta objects that were created
   for(unsigned int i=0; i<_rb_eim_theta_objects.size(); i++)
-  {
-    delete _rb_eim_theta_objects[i];
-  }
+    {
+      delete _rb_eim_theta_objects[i];
+    }
   _rb_eim_theta_objects.clear();
 }
 
@@ -106,11 +106,11 @@ Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index,
                                                        const Elem& elem)
 {
   if(var_index >= get_n_parametrized_functions())
-  {
-    libMesh::err << "Error: We must have var_index < get_n_parametrized_functions() in evaluate_parametrized_function."
-                 << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "Error: We must have var_index < get_n_parametrized_functions() in evaluate_parametrized_function."
+                   << std::endl;
+      libmesh_error();
+    }
 
   return _parametrized_functions[var_index]->evaluate(get_parameters(), p, elem);
 }
@@ -120,9 +120,9 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
   // Short-circuit if we are using the same parameters and value of N
   if( (_previous_parameters == get_parameters()) &&
       (_previous_N == N) )
-  {
-    return _previous_error_bound;
-  }
+    {
+      return _previous_error_bound;
+    }
 
   // Otherwise, update _previous parameters, _previous_N
   _previous_parameters = get_parameters();
@@ -131,26 +131,26 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
   START_LOG("rb_solve()", "RBEIMEvaluation");
 
   if(N > get_n_basis_functions())
-  {
-    libMesh::err << "ERROR: N cannot be larger than the number "
-                 << "of basis functions in rb_solve" << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "ERROR: N cannot be larger than the number "
+                   << "of basis functions in rb_solve" << std::endl;
+      libmesh_error();
+    }
   if(N==0)
-  {
-    libMesh::err << "ERROR: N must be greater than 0 in rb_solve" << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "ERROR: N must be greater than 0 in rb_solve" << std::endl;
+      libmesh_error();
+    }
 
   // Get the rhs by sampling parametrized_function
   // at the first N interpolation_points
   DenseVector<Number> EIM_rhs(N);
   for(unsigned int i=0; i<N; i++)
-  {
-    EIM_rhs(i) = evaluate_parametrized_function(interpolation_points_var[i],
-                                                interpolation_points[i],
-                                                *interpolation_points_elem[i]);
-  }
+    {
+      EIM_rhs(i) = evaluate_parametrized_function(interpolation_points_var[i],
+                                                  interpolation_points[i],
+                                                  *interpolation_points_elem[i]);
+    }
 
 
 
@@ -161,46 +161,46 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
 
   // Evaluate an a posteriori error bound
   if(evaluate_RB_error_bound)
-  {
-    // Compute the a posteriori error bound
-    // First, sample the parametrized function at x_{N+1}
-    Number g_at_next_x;
-    if(N == get_n_basis_functions())
-      g_at_next_x = evaluate_parametrized_function(extra_interpolation_point_var,
-                                                   extra_interpolation_point,
-                                                   *extra_interpolation_point_elem);
-    else
-      g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N],
-                                                   interpolation_points[N],
-                                                   *interpolation_points_elem[N]);
-
-    // Next, evaluate the EIM approximation at x_{N+1}
-    Number EIM_approx_at_next_x = 0.;
-    for(unsigned int j=0; j<N; j++)
     {
+      // Compute the a posteriori error bound
+      // First, sample the parametrized function at x_{N+1}
+      Number g_at_next_x;
       if(N == get_n_basis_functions())
-      {
-        EIM_approx_at_next_x += RB_solution(j) * extra_interpolation_matrix_row(j);
-      }
+        g_at_next_x = evaluate_parametrized_function(extra_interpolation_point_var,
+                                                     extra_interpolation_point,
+                                                     *extra_interpolation_point_elem);
       else
-      {
-        EIM_approx_at_next_x += RB_solution(j) * interpolation_matrix(N,j);
-      }
+        g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N],
+                                                     interpolation_points[N],
+                                                     *interpolation_points_elem[N]);
+
+      // Next, evaluate the EIM approximation at x_{N+1}
+      Number EIM_approx_at_next_x = 0.;
+      for(unsigned int j=0; j<N; j++)
+        {
+          if(N == get_n_basis_functions())
+            {
+              EIM_approx_at_next_x += RB_solution(j) * extra_interpolation_matrix_row(j);
+            }
+          else
+            {
+              EIM_approx_at_next_x += RB_solution(j) * interpolation_matrix(N,j);
+            }
+        }
+
+      Real error_estimate = std::abs(g_at_next_x - EIM_approx_at_next_x);
+
+      STOP_LOG("rb_solve()", "RBEIMEvaluation");
+
+      _previous_error_bound = error_estimate;
+      return error_estimate;
     }
-
-    Real error_estimate = std::abs(g_at_next_x - EIM_approx_at_next_x);
-
-    STOP_LOG("rb_solve()", "RBEIMEvaluation");
-
-    _previous_error_bound = error_estimate;
-    return error_estimate;
-  }
   else // Don't evaluate an error bound
-  {
-    STOP_LOG("rb_solve()", "RBEIMEvaluation");
-    _previous_error_bound = -1.;
-    return -1.;
-  }
+    {
+      STOP_LOG("rb_solve()", "RBEIMEvaluation");
+      _previous_error_bound = -1.;
+      return -1.;
+    }
 
 }
 
@@ -209,16 +209,16 @@ void RBEIMEvaluation::rb_solve(DenseVector<Number>& EIM_rhs)
   START_LOG("rb_solve()", "RBEIMEvaluation");
 
   if(EIM_rhs.size() > get_n_basis_functions())
-  {
-    libMesh::err << "ERROR: N cannot be larger than the number "
-                 << "of basis functions in rb_solve" << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "ERROR: N cannot be larger than the number "
+                   << "of basis functions in rb_solve" << std::endl;
+      libmesh_error();
+    }
   if(EIM_rhs.size()==0)
-  {
-    libMesh::err << "ERROR: N must be greater than 0 in rb_solve" << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "ERROR: N must be greater than 0 in rb_solve" << std::endl;
+      libmesh_error();
+    }
 
   const unsigned int N = EIM_rhs.size();
   DenseMatrix<Number> interpolation_matrix_N;
@@ -234,9 +234,9 @@ void RBEIMEvaluation::initialize_eim_theta_objects()
   // Initialize the rb_theta objects that access the solution from this rb_eim_evaluation
   _rb_eim_theta_objects.clear();
   for(unsigned int i=0; i<get_n_basis_functions(); i++)
-  {
-    _rb_eim_theta_objects.push_back( build_eim_theta(i).release() );
-  }
+    {
+      _rb_eim_theta_objects.push_back( build_eim_theta(i).release() );
+    }
 }
 
 std::vector<RBTheta*> RBEIMEvaluation::get_eim_theta_objects()
@@ -266,84 +266,84 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
   const std::string suffix = read_binary_data ? ".xdr" : ".dat";
 
   if(this->processor_id() == 0)
-  {
-    std::ostringstream file_name;
-
-    // Next write out the interpolation_matrix
-    file_name.str("");
-    file_name << directory_name << "/interpolation_matrix" << suffix;
-    Xdr interpolation_matrix_out(file_name.str(), mode);
-
-    for(unsigned int i=0; i<n_bfs; i++)
     {
-      for(unsigned int j=0; j<=i; j++)
-      {
-        interpolation_matrix_out << interpolation_matrix(i,j);
-      }
-    }
+      std::ostringstream file_name;
 
-    // Also, write out the "extra" row
-    file_name.str("");
-    file_name << directory_name << "/extra_interpolation_matrix_row" << suffix;
-    Xdr extra_interpolation_matrix_row_out(file_name.str(), mode);
+      // Next write out the interpolation_matrix
+      file_name.str("");
+      file_name << directory_name << "/interpolation_matrix" << suffix;
+      Xdr interpolation_matrix_out(file_name.str(), mode);
 
-    for(unsigned int j=0; j<n_bfs; j++)
-    {
-      extra_interpolation_matrix_row_out << extra_interpolation_matrix_row(j);
-    }
-    extra_interpolation_matrix_row_out.close();
+      for(unsigned int i=0; i<n_bfs; i++)
+        {
+          for(unsigned int j=0; j<=i; j++)
+            {
+              interpolation_matrix_out << interpolation_matrix(i,j);
+            }
+        }
 
-    // Next write out interpolation_points
-    file_name.str("");
-    file_name << directory_name << "/interpolation_points" << suffix;
-    Xdr interpolation_points_out(file_name.str(), mode);
+      // Also, write out the "extra" row
+      file_name.str("");
+      file_name << directory_name << "/extra_interpolation_matrix_row" << suffix;
+      Xdr extra_interpolation_matrix_row_out(file_name.str(), mode);
 
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      interpolation_points_out << interpolation_points[i](0);
+      for(unsigned int j=0; j<n_bfs; j++)
+        {
+          extra_interpolation_matrix_row_out << extra_interpolation_matrix_row(j);
+        }
+      extra_interpolation_matrix_row_out.close();
+
+      // Next write out interpolation_points
+      file_name.str("");
+      file_name << directory_name << "/interpolation_points" << suffix;
+      Xdr interpolation_points_out(file_name.str(), mode);
+
+      for(unsigned int i=0; i<n_bfs; i++)
+        {
+          interpolation_points_out << interpolation_points[i](0);
+
+          if(LIBMESH_DIM >= 2)
+            interpolation_points_out << interpolation_points[i](1);
+
+          if(LIBMESH_DIM >= 3)
+            interpolation_points_out << interpolation_points[i](2);
+        }
+      interpolation_points_out.close();
+
+      // Also, write out the "extra" interpolation point
+      file_name.str("");
+      file_name << directory_name << "/extra_interpolation_point" << suffix;
+      Xdr extra_interpolation_point_out(file_name.str(), mode);
+
+      extra_interpolation_point_out << extra_interpolation_point(0);
 
       if(LIBMESH_DIM >= 2)
-        interpolation_points_out << interpolation_points[i](1);
+        extra_interpolation_point_out << extra_interpolation_point(1);
 
       if(LIBMESH_DIM >= 3)
-        interpolation_points_out << interpolation_points[i](2);
+        extra_interpolation_point_out << extra_interpolation_point(2);
+
+      extra_interpolation_point_out.close();
+
+      // Next write out interpolation_points_var
+      file_name.str("");
+      file_name << directory_name << "/interpolation_points_var" << suffix;
+      Xdr interpolation_points_var_out(file_name.str(), mode);
+
+      for(unsigned int i=0; i<n_bfs; i++)
+        {
+          interpolation_points_var_out << interpolation_points_var[i];
+        }
+      interpolation_points_var_out.close();
+
+      // Also, write out the "extra" interpolation variable
+      file_name.str("");
+      file_name << directory_name << "/extra_interpolation_point_var" << suffix;
+      Xdr extra_interpolation_point_var_out(file_name.str(), mode);
+
+      extra_interpolation_point_var_out << extra_interpolation_point_var;
+      extra_interpolation_point_var_out.close();
     }
-    interpolation_points_out.close();
-
-    // Also, write out the "extra" interpolation point
-    file_name.str("");
-    file_name << directory_name << "/extra_interpolation_point" << suffix;
-    Xdr extra_interpolation_point_out(file_name.str(), mode);
-
-    extra_interpolation_point_out << extra_interpolation_point(0);
-
-    if(LIBMESH_DIM >= 2)
-      extra_interpolation_point_out << extra_interpolation_point(1);
-
-    if(LIBMESH_DIM >= 3)
-      extra_interpolation_point_out << extra_interpolation_point(2);
-
-    extra_interpolation_point_out.close();
-
-    // Next write out interpolation_points_var
-    file_name.str("");
-    file_name << directory_name << "/interpolation_points_var" << suffix;
-    Xdr interpolation_points_var_out(file_name.str(), mode);
-
-    for(unsigned int i=0; i<n_bfs; i++)
-    {
-      interpolation_points_var_out << interpolation_points_var[i];
-    }
-    interpolation_points_var_out.close();
-
-    // Also, write out the "extra" interpolation variable
-    file_name.str("");
-    file_name << directory_name << "/extra_interpolation_point_var" << suffix;
-    Xdr extra_interpolation_point_var_out(file_name.str(), mode);
-
-    extra_interpolation_point_var_out << extra_interpolation_point_var;
-    extra_interpolation_point_var_out.close();
-  }
 
   // Write out the elements associated with the interpolation points.
   // This uses mesh I/O, hence we have to do it on all processors.
@@ -363,35 +363,35 @@ void RBEIMEvaluation::write_out_interpolation_points_elem(const std::string dire
 
   unsigned int new_node_id = 0;
   for(unsigned int i=0; i<(interpolation_points_elem.size()+1); i++)
-  {
-    Elem* old_elem = NULL;
-    if(i < interpolation_points_elem.size())
     {
-      old_elem = interpolation_points_elem[i];
+      Elem* old_elem = NULL;
+      if(i < interpolation_points_elem.size())
+        {
+          old_elem = interpolation_points_elem[i];
+        }
+      else
+        {
+          old_elem = extra_interpolation_point_elem;
+        }
+
+      for(unsigned int n=0; n<old_elem->n_nodes(); n++)
+        {
+          Node* node_ptr = old_elem->get_node(n);
+          dof_id_type old_node_id = node_ptr->id();
+
+          // Check if this node has already been added. This
+          // could happen if some of the elements are neighbors.
+          if( node_ids.find(old_node_id) == node_ids.end() )
+            {
+              node_ids.insert(old_node_id);
+              _interpolation_points_mesh.add_point(*node_ptr, new_node_id, /* proc_id */ 0);
+
+              node_id_map[old_node_id] = new_node_id;
+
+              new_node_id++;
+            }
+        }
     }
-    else
-    {
-      old_elem = extra_interpolation_point_elem;
-    }
-
-    for(unsigned int n=0; n<old_elem->n_nodes(); n++)
-    {
-      Node* node_ptr = old_elem->get_node(n);
-      dof_id_type old_node_id = node_ptr->id();
-
-      // Check if this node has already been added. This
-      // could happen if some of the elements are neighbors.
-      if( node_ids.find(old_node_id) == node_ids.end() )
-      {
-        node_ids.insert(old_node_id);
-        _interpolation_points_mesh.add_point(*node_ptr, new_node_id, /* proc_id */ 0);
-
-        node_id_map[old_node_id] = new_node_id;
-
-        new_node_id++;
-      }
-    }
-  }
 
   // Maintain a map of elem IDs to make sure we don't insert
   // the same elem into _interpolation_points_mesh more than once
@@ -399,52 +399,52 @@ void RBEIMEvaluation::write_out_interpolation_points_elem(const std::string dire
   std::vector<dof_id_type> interpolation_elem_ids(interpolation_points_elem.size()+1);
   dof_id_type new_elem_id = 0;
   for(unsigned int i=0; i<interpolation_elem_ids.size(); i++)
-  {
-    Elem* old_elem = NULL;
-    if(i < interpolation_points_elem.size())
     {
-      old_elem = interpolation_points_elem[i];
+      Elem* old_elem = NULL;
+      if(i < interpolation_points_elem.size())
+        {
+          old_elem = interpolation_points_elem[i];
+        }
+      else
+        {
+          old_elem = extra_interpolation_point_elem;
+        }
+
+      dof_id_type old_elem_id = old_elem->id();
+
+      // Only insert the element into the mesh if it hasn't already been inserted
+      std::map<dof_id_type,dof_id_type>::iterator id_it = elem_id_map.find(old_elem_id);
+      if(id_it == elem_id_map.end())
+        {
+          Elem* new_elem = Elem::build(old_elem->type(), /*parent*/ NULL).release();
+          new_elem->subdomain_id() = old_elem->subdomain_id();
+
+          // Assign all the nodes
+          for(unsigned int n=0; n<new_elem->n_nodes(); n++)
+            {
+              dof_id_type old_node_id = old_elem->node(n);
+              new_elem->set_node(n) = &_interpolation_points_mesh.node( node_id_map[old_node_id] );
+            }
+
+          // Just set all proc_ids to 0
+          new_elem->processor_id() = 0;
+
+          // Add the element to the mesh
+          _interpolation_points_mesh.add_elem(new_elem);
+
+          // Set the id of new_elem appropriately
+          new_elem->set_id(new_elem_id);
+          interpolation_elem_ids[i] = new_elem->id();
+          elem_id_map[old_elem_id] = new_elem->id();
+
+          new_elem_id++;
+        }
+      else
+        {
+          interpolation_elem_ids[i] = id_it->second;
+        }
+
     }
-    else
-    {
-      old_elem = extra_interpolation_point_elem;
-    }
-
-    dof_id_type old_elem_id = old_elem->id();
-
-    // Only insert the element into the mesh if it hasn't already been inserted
-    std::map<dof_id_type,dof_id_type>::iterator id_it = elem_id_map.find(old_elem_id);
-    if(id_it == elem_id_map.end())
-    {
-      Elem* new_elem = Elem::build(old_elem->type(), /*parent*/ NULL).release();
-      new_elem->subdomain_id() = old_elem->subdomain_id();
-
-      // Assign all the nodes
-      for(unsigned int n=0; n<new_elem->n_nodes(); n++)
-      {
-        dof_id_type old_node_id = old_elem->node(n);
-        new_elem->set_node(n) = &_interpolation_points_mesh.node( node_id_map[old_node_id] );
-      }
-
-      // Just set all proc_ids to 0
-      new_elem->processor_id() = 0;
-
-      // Add the element to the mesh
-      _interpolation_points_mesh.add_elem(new_elem);
-
-      // Set the id of new_elem appropriately
-      new_elem->set_id(new_elem_id);
-      interpolation_elem_ids[i] = new_elem->id();
-      elem_id_map[old_elem_id] = new_elem->id();
-
-      new_elem_id++;
-    }
-    else
-    {
-      interpolation_elem_ids[i] = id_it->second;
-    }
-
-  }
 
   libmesh_assert(new_elem_id == _interpolation_points_mesh.n_elem());
 
@@ -454,17 +454,17 @@ void RBEIMEvaluation::write_out_interpolation_points_elem(const std::string dire
   // of interpolation_points_elem corresponds to. This allows us to handle
   // the case in which elements are repeated in interpolation_points_elem.
   if(processor_id() == 0)
-  {
-    // These are just integers, so no need for a binary format here
-    std::ofstream interpolation_elem_ids_out
-      ((directory_name + "/interpolation_elem_ids.dat").c_str(), std::ofstream::out);
-
-    for(unsigned int i=0; i<interpolation_elem_ids.size(); i++)
     {
-      interpolation_elem_ids_out << interpolation_elem_ids[i] << std::endl;
+      // These are just integers, so no need for a binary format here
+      std::ofstream interpolation_elem_ids_out
+        ((directory_name + "/interpolation_elem_ids.dat").c_str(), std::ofstream::out);
+
+      for(unsigned int i=0; i<interpolation_elem_ids.size(); i++)
+        {
+          interpolation_elem_ids_out << interpolation_elem_ids[i] << std::endl;
+        }
+      interpolation_elem_ids_out.close();
     }
-    interpolation_elem_ids_out.close();
-  }
 }
 
 void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_name,
@@ -494,14 +494,14 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   Xdr interpolation_matrix_in(file_name.str(), mode);
 
   for(unsigned int i=0; i<n_bfs; i++)
-  {
-    for(unsigned int j=0; j<=i; j++)
     {
-      Number value;
-      interpolation_matrix_in >> value;
-      interpolation_matrix(i,j) = value;
+      for(unsigned int j=0; j<=i; j++)
+        {
+          Number value;
+          interpolation_matrix_in >> value;
+          interpolation_matrix(i,j) = value;
+        }
     }
-  }
   interpolation_matrix_in.close();
 
   // Also, read in the "extra" row
@@ -510,11 +510,11 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   Xdr extra_interpolation_matrix_row_in(file_name.str(), mode);
 
   for(unsigned int j=0; j<n_bfs; j++)
-  {
-    Number value;
-    extra_interpolation_matrix_row_in >> value;
-    extra_interpolation_matrix_row(j) = value;
-  }
+    {
+      Number value;
+      extra_interpolation_matrix_row_in >> value;
+      extra_interpolation_matrix_row(j) = value;
+    }
   extra_interpolation_matrix_row_in.close();
 
   // Next read in interpolation_points
@@ -523,19 +523,19 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   Xdr interpolation_points_in(file_name.str(), mode);
 
   for(unsigned int i=0; i<n_bfs; i++)
-  {
-    Real x_val, y_val, z_val = 0.;
-    interpolation_points_in >> x_val;
+    {
+      Real x_val, y_val, z_val = 0.;
+      interpolation_points_in >> x_val;
 
-    if(LIBMESH_DIM >= 2)
-      interpolation_points_in >> y_val;
+      if(LIBMESH_DIM >= 2)
+        interpolation_points_in >> y_val;
 
-    if(LIBMESH_DIM >= 3)
-      interpolation_points_in >> z_val;
+      if(LIBMESH_DIM >= 3)
+        interpolation_points_in >> z_val;
 
-    Point p(x_val, y_val, z_val);
-    interpolation_points.push_back(p);
-  }
+      Point p(x_val, y_val, z_val);
+      interpolation_points.push_back(p);
+    }
   interpolation_points_in.close();
 
   // Also, read in the extra interpolation point
@@ -565,11 +565,11 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   Xdr interpolation_points_var_in(file_name.str(), mode);
 
   for(unsigned int i=0; i<n_bfs; i++)
-  {
-    unsigned int var;
-    interpolation_points_var_in >> var;
-    interpolation_points_var.push_back(var);
-  }
+    {
+      unsigned int var;
+      interpolation_points_var_in >> var;
+      interpolation_points_var.push_back(var);
+    }
   interpolation_points_var_in.close();
 
   // Also, read in extra_interpolation_point_var
@@ -605,21 +605,21 @@ void RBEIMEvaluation::read_in_interpolation_points_elem(const std::string direct
       ((directory_name + "/interpolation_elem_ids.dat").c_str(), std::ifstream::in);
 
     for(unsigned int i=0; i<n_bfs; i++)
-    {
-      dof_id_type elem_id;
-      interpolation_elem_ids_in >> elem_id;
-      interpolation_elem_ids.push_back(elem_id);
-    }
+      {
+        dof_id_type elem_id;
+        interpolation_elem_ids_in >> elem_id;
+        interpolation_elem_ids.push_back(elem_id);
+      }
     interpolation_elem_ids_in >> extra_interpolation_elem_id;
     interpolation_elem_ids_in.close();
   }
 
   interpolation_points_elem.resize(n_bfs);
   for(unsigned int i=0; i<n_bfs; i++)
-  {
-    interpolation_points_elem[i] =
-      _interpolation_points_mesh.elem(interpolation_elem_ids[i]);
-  }
+    {
+      interpolation_points_elem[i] =
+        _interpolation_points_mesh.elem(interpolation_elem_ids[i]);
+    }
 
   // Get the extra interpolation point
   extra_interpolation_point_elem =

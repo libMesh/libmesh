@@ -44,11 +44,11 @@ class MeshBase;
 // GnuPlotIO class definition
 class GnuPlotIO : public MeshOutput<MeshBase>
 {
- public:
+public:
 
- /**
-  * Define enumerations to set plotting properties on construction
-  */
+  /**
+   * Define enumerations to set plotting properties on construction
+   */
   enum PlottingProperties { GRID_ON    = 1,
                             PNG_OUTPUT = 2};
 
@@ -102,7 +102,7 @@ class GnuPlotIO : public MeshOutput<MeshBase>
    */
   std::string axes_limits;
 
- private:
+private:
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are optionally

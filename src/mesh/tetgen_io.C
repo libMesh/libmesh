@@ -45,7 +45,7 @@ void TetGenIO::read (const std::string& name)
 
 #if LIBMESH_DIM < 3
   libMesh::err << "Cannot open dimension 3 mesh file when configured without 3D support." <<
-                  std::endl;
+    std::endl;
   libmesh_error();
 #endif
 
@@ -276,7 +276,7 @@ void TetGenIO::write (const std::string& fname)
   if (!(fname.rfind(".poly") < fname.size()))
     {
       libMesh::err << "ERROR: Unrecognized file name: "
-                    << fname << std::endl;
+                   << fname << std::endl;
       libmesh_error();
     }
 
@@ -309,8 +309,8 @@ void TetGenIO::write (const std::string& fname)
     out_stream << "# Facets:\n"
                << mesh.n_elem() << " 0\n";
 
-//     const_active_elem_iterator       it (mesh.elements_begin());
-//     const const_active_elem_iterator end(mesh.elements_end());
+    //     const_active_elem_iterator       it (mesh.elements_begin());
+    //     const const_active_elem_iterator end(mesh.elements_end());
 
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_elements_end();

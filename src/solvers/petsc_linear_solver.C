@@ -49,10 +49,10 @@ extern "C"
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
 
     if(!preconditioner->initialized())
-    {
-      err<<"Preconditioner not initialized!  Make sure you call init() before solve!"<<std::endl;
-      libmesh_error();
-    }
+      {
+        err<<"Preconditioner not initialized!  Make sure you call init() before solve!"<<std::endl;
+        libmesh_error();
+      }
 
     preconditioner->setup();
 
@@ -79,10 +79,10 @@ extern "C"
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
 
     if(!preconditioner->initialized())
-    {
-      err<<"Preconditioner not initialized!  Make sure you call init() before solve!"<<std::endl;
-      libmesh_error();
-    }
+      {
+        err<<"Preconditioner not initialized!  Make sure you call init() before solve!"<<std::endl;
+        libmesh_error();
+      }
 
     preconditioner->setup();
 
@@ -133,15 +133,15 @@ void PetscLinearSolver<T>::clear ()
 
 #if PETSC_VERSION_LESS_THAN(2,2,0)
 
-  // 2.1.x & earlier style
-  ierr = SLESDestroy(_sles);
-         LIBMESH_CHKERRABORT(ierr);
+      // 2.1.x & earlier style
+      ierr = SLESDestroy(_sles);
+      LIBMESH_CHKERRABORT(ierr);
 
 #else
 
-  // 2.2.0 & newer style
-  ierr = LibMeshKSPDestroy(&_ksp);
-         LIBMESH_CHKERRABORT(ierr);
+      // 2.2.0 & newer style
+      ierr = LibMeshKSPDestroy(&_ksp);
+      LIBMESH_CHKERRABORT(ierr);
 
 #endif
 
@@ -150,12 +150,12 @@ void PetscLinearSolver<T>::clear ()
       this->_solver_type           = GMRES;
 
       if(!this->_preconditioner)
-      {
-        if (this->n_processors() == 1)
-          this->_preconditioner_type = ILU_PRECOND;
-        else
-          this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
-      }
+        {
+          if (this->n_processors() == 1)
+            this->_preconditioner_type = ILU_PRECOND;
+          else
+            this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
+        }
     }
 }
 
@@ -171,18 +171,18 @@ void PetscLinearSolver<T>::init ()
 
       PetscErrorCode ierr=0;
 
-// 2.1.x & earlier style
+      // 2.1.x & earlier style
 #if PETSC_VERSION_LESS_THAN(2,2,0)
 
       // Create the linear solver context
       ierr = SLESCreate (this->comm().get(), &_sles);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       // Create the Krylov subspace & preconditioner contexts
       ierr = SLESGetKSP       (_sles, &_ksp);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
       ierr = SLESGetPC        (_sles, &_pc);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
@@ -195,18 +195,18 @@ void PetscLinearSolver<T>::init ()
       //  routines.
 
       ierr = SLESSetFromOptions (_sles);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
-// 2.2.0 & newer style
+      // 2.2.0 & newer style
 #else
 
       // Create the linear solver context
       ierr = KSPCreate (this->comm().get(), &_ksp);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       // Create the preconditioner context
       ierr = KSPGetPC        (_ksp, &_pc);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
@@ -240,12 +240,12 @@ void PetscLinearSolver<T>::init ()
 #endif
 
       ierr = KSPGetType (_ksp, &ksp_type);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       if (strcmp(ksp_type, "preonly"))
         {
           ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-                 LIBMESH_CHKERRABORT(ierr);
+          LIBMESH_CHKERRABORT(ierr);
         }
 
       // Notify PETSc of location to store residual history.
@@ -263,12 +263,12 @@ void PetscLinearSolver<T>::init ()
 
       //If there is a preconditioner object we need to set the internal setup and apply routines
       if(this->_preconditioner)
-      {
-        this->_preconditioner->init();
-        PCShellSetContext(_pc,(void*)this->_preconditioner);
-        PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
-        PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
-      }
+        {
+          this->_preconditioner->init();
+          PCShellSetContext(_pc,(void*)this->_preconditioner);
+          PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
+          PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
+        }
     }
 }
 
@@ -283,18 +283,18 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
 
       PetscErrorCode ierr=0;
 
-// 2.1.x & earlier style
+      // 2.1.x & earlier style
 #if PETSC_VERSION_LESS_THAN(2,2,0)
 
       // Create the linear solver context
       ierr = SLESCreate (this->comm().get(), &_sles);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       // Create the Krylov subspace & preconditioner contexts
       ierr = SLESGetKSP       (_sles, &_ksp);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
       ierr = SLESGetPC        (_sles, &_pc);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
@@ -307,14 +307,14 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       //  routines.
 
       ierr = SLESSetFromOptions (_sles);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
-// 2.2.0 & newer style
+      // 2.2.0 & newer style
 #else
 
       // Create the linear solver context
       ierr = KSPCreate (this->comm().get(), &_ksp);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
 
       //ierr = PCCreate (this->comm().get(), &_pc);
@@ -322,11 +322,11 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
 
       // Create the preconditioner context
       ierr = KSPGetPC        (_ksp, &_pc);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       // Set operators. The input matrix works as the preconditioning matrix
       ierr = KSPSetOperators(_ksp, matrix->mat(), matrix->mat(),DIFFERENT_NONZERO_PATTERN);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
@@ -359,12 +359,12 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
 #endif
 
       ierr = KSPGetType (_ksp, &ksp_type);
-             LIBMESH_CHKERRABORT(ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       if (strcmp(ksp_type, "preonly"))
         {
           ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-                 LIBMESH_CHKERRABORT(ierr);
+          LIBMESH_CHKERRABORT(ierr);
         }
 
       // Notify PETSc of location to store residual history.
@@ -380,13 +380,13 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
 
       PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
       if(this->_preconditioner)
-      {
-        this->_preconditioner->set_matrix(*matrix);
-        this->_preconditioner->init();
-        PCShellSetContext(_pc,(void*)this->_preconditioner);
-        PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
-        PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
-      }
+        {
+          this->_preconditioner->set_matrix(*matrix);
+          this->_preconditioner->init();
+          PCShellSetContext(_pc,(void*)this->_preconditioner);
+          PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
+          PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
+        }
     }
 }
 
@@ -454,15 +454,15 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
   solution->close ();
   rhs->close ();
 
-//   // If matrix != precond, then this means we have specified a
-//   // special preconditioner, so reset preconditioner type to PCMAT.
-//   if (matrix != precond)
-//     {
-//       this->_preconditioner_type = USER_PRECOND;
-//       this->set_petsc_preconditioner_type ();
-//     }
+  //   // If matrix != precond, then this means we have specified a
+  //   // special preconditioner, so reset preconditioner type to PCMAT.
+  //   if (matrix != precond)
+  //     {
+  //       this->_preconditioner_type = USER_PRECOND;
+  //       this->set_petsc_preconditioner_type ();
+  //     }
 
-// 2.1.x & earlier style
+  // 2.1.x & earlier style
 #if PETSC_VERSION_LESS_THAN(2,2,0)
 
   if(_restrict_solve_to_is!=NULL)
@@ -473,25 +473,25 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
   // Set operators. The input matrix works as the preconditioning matrix
   ierr = SLESSetOperators(_sles, matrix->mat(), precond->mat(),
                           DIFFERENT_NONZERO_PATTERN);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
   ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
                            PETSC_DEFAULT, max_its);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
 
   // Solve the linear system
   ierr = SLESSolve (_sles, rhs->vec(), solution->vec(), &its);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
 
   // Get the norm of the final residual to return to the user.
   ierr = KSPGetResidualNorm (_ksp, &final_resid);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
-// 2.2.0
+  // 2.2.0
 #elif PETSC_VERSION_LESS_THAN(2,2,1)
 
   if(_restrict_solve_to_is!=NULL)
@@ -517,30 +517,30 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
                            PETSC_DEFAULT, // abstol = absolute convergence tolerance (1.e-50)
                            PETSC_DEFAULT, // dtol   = divergence tolerance           (1.e+5)
                            max_its);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
 
   // Set the solution vector to use
   ierr = KSPSetSolution (_ksp, solution->vec());
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Set the RHS vector to use
   ierr = KSPSetRhs (_ksp, rhs->vec());
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Solve the linear system
   ierr = KSPSolve (_ksp);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Get the number of iterations required for convergence
   ierr = KSPGetIterationNumber (_ksp, &its);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Get the norm of the final residual to return to the user.
   ierr = KSPGetResidualNorm (_ksp, &final_resid);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
-// 2.2.1 & newer style
+  // 2.2.1 & newer style
 #else
 
   Mat submat = NULL;
@@ -676,17 +676,17 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
       LIBMESH_CHKERRABORT(ierr);
 
       if(this->_preconditioner)
-      {
-        this->_preconditioner->set_matrix(matrix_in);
-        this->_preconditioner->init();
-      }
+        {
+          this->_preconditioner->set_matrix(matrix_in);
+          this->_preconditioner->init();
+        }
     }
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
   ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
                            PETSC_DEFAULT, max_its);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Solve the linear system
   if(_restrict_solve_to_is!=NULL)
@@ -702,11 +702,11 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 
   // Get the number of iterations required for convergence
   ierr = KSPGetIterationNumber (_ksp, &its);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Get the norm of the final residual to return to the user.
   ierr = KSPGetResidualNorm (_ksp, &final_resid);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   if(_restrict_solve_to_is!=NULL)
     {
@@ -791,15 +791,15 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
   solution->close ();
   rhs->close ();
 
-//   // If matrix != precond, then this means we have specified a
-//   // special preconditioner, so reset preconditioner type to PCMAT.
-//   if (matrix != precond)
-//     {
-//       this->_preconditioner_type = USER_PRECOND;
-//       this->set_petsc_preconditioner_type ();
-//     }
+  //   // If matrix != precond, then this means we have specified a
+  //   // special preconditioner, so reset preconditioner type to PCMAT.
+  //   if (matrix != precond)
+  //     {
+  //       this->_preconditioner_type = USER_PRECOND;
+  //       this->set_petsc_preconditioner_type ();
+  //     }
 
-// 2.1.x & earlier style
+  // 2.1.x & earlier style
 #if PETSC_VERSION_LESS_THAN(2,2,0)
 
   if(_restrict_solve_to_is!=NULL)
@@ -827,7 +827,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
   ierr = SLESSolveTrans (ksp, &its);
   LIBMESH_CHKERRABORT(ierr);
 
-// 2.2.0
+  // 2.2.0
 #elif PETSC_VERSION_LESS_THAN(2,2,1)
 
   if(_restrict_solve_to_is!=NULL)
@@ -855,30 +855,30 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
                            PETSC_DEFAULT, // abstol = absolute convergence tolerance (1.e-50)
                            PETSC_DEFAULT, // dtol   = divergence tolerance           (1.e+5)
                            max_its);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
 
   // Set the solution vector to use
   ierr = KSPSetSolution (_ksp, solution->vec());
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Set the RHS vector to use
   ierr = KSPSetRhs (_ksp, rhs->vec());
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Solve the linear system
   ierr = KSPSolveTranspose (_ksp);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Get the number of iterations required for convergence
   ierr = KSPGetIterationNumber (_ksp, &its);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Get the norm of the final residual to return to the user.
   ierr = KSPGetResidualNorm (_ksp, &final_resid);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
-// 2.2.1 & newer style
+  // 2.2.1 & newer style
 #else
 
   Mat submat = NULL;
@@ -1014,17 +1014,17 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
       LIBMESH_CHKERRABORT(ierr);
 
       if(this->_preconditioner)
-      {
-        this->_preconditioner->set_matrix(matrix_in);
-        this->_preconditioner->init();
-      }
+        {
+          this->_preconditioner->set_matrix(matrix_in);
+          this->_preconditioner->init();
+        }
     }
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
   ierr = KSPSetTolerances (_ksp, tol, PETSC_DEFAULT,
                            PETSC_DEFAULT, max_its);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Solve the linear system
   if(_restrict_solve_to_is!=NULL)
@@ -1040,11 +1040,11 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
 
   // Get the number of iterations required for convergence
   ierr = KSPGetIterationNumber (_ksp, &its);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Get the norm of the final residual to return to the user.
   ierr = KSPGetResidualNorm (_ksp, &final_resid);
-         LIBMESH_CHKERRABORT(ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   if(_restrict_solve_to_is!=NULL)
     {
@@ -1592,10 +1592,10 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
       LIBMESH_CHKERRABORT(ierr);
 
       if(this->_preconditioner)
-      {
-        this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number>&>(precond_matrix));
-        this->_preconditioner->init();
-      }
+        {
+          this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number>&>(precond_matrix));
+          this->_preconditioner->init();
+        }
     }
 
   // Set the tolerances for the iterative solver.  Use the user-supplied

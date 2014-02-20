@@ -32,13 +32,13 @@
 namespace libMesh
 {
 
-  // Forward declaractions
-  class QoISet;
+// Forward declaractions
+class QoISet;
 
-  /**
-   * Data structure for holding completed parameter sensitivity
-   * calculations.
-   */
+/**
+ * Data structure for holding completed parameter sensitivity
+ * calculations.
+ */
 class SensitivityData
 {
 public:

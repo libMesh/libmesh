@@ -234,7 +234,7 @@ public:
                     const unsigned int i,
                     const Point& p);
 
- /**
+  /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,
    * element type, and order directly. Automatically passes the
@@ -264,7 +264,7 @@ public:
                     const Point& p,
                     OutputType& phi);
 
-/**
+  /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,
    * element type, and order directly. Automatically passes the

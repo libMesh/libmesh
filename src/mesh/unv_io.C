@@ -116,16 +116,16 @@ void UNVIO::read_implementation (std::istream& in_stream)
   elems_of_dimension.clear();
   elems_of_dimension.resize(4, false);
 
-   // Note that we read this file
-   // @e twice.  First time to
-   // detect the number of nodes
-   // and elements (and possible
-   // conversion tasks like D_to_e)
-   // and the order of datasets
-   // (nodes first, then elements,
-   // or the other way around),
-   // and second to do the actual
-   // read.
+  // Note that we read this file
+  // @e twice.  First time to
+  // detect the number of nodes
+  // and elements (and possible
+  // conversion tasks like D_to_e)
+  // and the order of datasets
+  // (nodes first, then elements,
+  // or the other way around),
+  // and second to do the actual
+  // read.
   std::vector<std::string> order_of_datasets;
   order_of_datasets.reserve(2);
 
@@ -148,7 +148,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
       libMesh::out << "  Counting nodes and elements" << std::endl;
 
 
-//    bool reached_eof = false;
+    //    bool reached_eof = false;
     bool found_node  = false;
     bool found_elem  = false;
 
@@ -269,8 +269,8 @@ void UNVIO::read_implementation (std::istream& in_stream)
         libMesh::err << "Cannot open dimension " <<
           MeshInput<MeshBase>::mesh().mesh_dimension() <<
           " mesh file when configured without " <<
-                        MeshInput<MeshBase>::mesh().mesh_dimension() << "D support." <<
-                        std::endl;
+          MeshInput<MeshBase>::mesh().mesh_dimension() << "D support." <<
+          std::endl;
         libmesh_error();
       }
 #endif
@@ -415,13 +415,13 @@ void UNVIO::count_nodes (std::istream& in_file)
   // line does not contain a "D", then the
   // other lines won't, too.
   {
-// #ifdef __HP_aCC
-//     // Use an "int" instead of unsigned int,
-//     // otherwise HP aCC may crash!
-//     const int position          = data.find("D",6);
-// #else
-//     const unsigned int position = data.find("D",6);
-// #endif
+    // #ifdef __HP_aCC
+    //     // Use an "int" instead of unsigned int,
+    //     // otherwise HP aCC may crash!
+    //     const int position          = data.find("D",6);
+    // #else
+    //     const unsigned int position = data.find("D",6);
+    // #endif
     std::string::size_type position = data.find("D",6);
 
     if (position!=std::string::npos) // npos means no position
@@ -572,8 +572,8 @@ void UNVIO::node_in (std::istream& in_file)
 
   unsigned int node_lab;           // label of the node
   unsigned int exp_coord_sys_num,  // export coordinate system number       (not supported yet)
-               disp_coord_sys_num, // displacement coordinate system number (not supported yet)
-               color;              // color                                 (not supported yet)
+    disp_coord_sys_num, // displacement coordinate system number (not supported yet)
+    color;              // color                                 (not supported yet)
 
   // allocate the correct amount
   // of memory for the node vector
@@ -680,11 +680,11 @@ void UNVIO::element_in (std::istream& in_file)
 
 
   unsigned int      element_lab,       // element label (not supported yet)
-                    n_nodes;           // number of nodes on element
+    n_nodes;           // number of nodes on element
   unsigned long int fe_descriptor_id,  // FE descriptor id
-                    phys_prop_tab_num, // physical property table number (not supported yet)
-                    mat_prop_tab_num,  // material property table number (not supported yet)
-                    color;             // color (not supported yet)
+    phys_prop_tab_num, // physical property table number (not supported yet)
+    mat_prop_tab_num,  // material property table number (not supported yet)
+    color;             // color (not supported yet)
 
 
   // vector that temporarily holds the node labels defining element

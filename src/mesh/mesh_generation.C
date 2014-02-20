@@ -55,94 +55,94 @@ namespace libMesh
 {
 
 namespace MeshTools {
-  namespace Generation {
-    namespace Private {
-      /**
-       * A useful inline function which replaces the #defines
-       * used previously.  Not private since this is a namespace,
-       * but would be if this were a class.  The first one returns
-       * the proper node number for 2D elements while the second
-       * one returns the node number for 3D elements.
-       */
-      inline
-      unsigned int idx(const ElemType type,
-                       const unsigned int nx,
-                       const unsigned int i,
-                       const unsigned int j)
+namespace Generation {
+namespace Private {
+/**
+ * A useful inline function which replaces the #defines
+ * used previously.  Not private since this is a namespace,
+ * but would be if this were a class.  The first one returns
+ * the proper node number for 2D elements while the second
+ * one returns the node number for 3D elements.
+ */
+inline
+unsigned int idx(const ElemType type,
+                 const unsigned int nx,
+                 const unsigned int i,
+                 const unsigned int j)
+{
+  switch(type)
+    {
+    case INVALID_ELEM:
+    case QUAD4:
+    case TRI3:
       {
-        switch(type)
-          {
-          case INVALID_ELEM:
-          case QUAD4:
-          case TRI3:
-            {
-              return i + j*(nx+1);
-              break;
-            }
-
-          case QUAD8:
-          case QUAD9:
-          case TRI6:
-            {
-              return i + j*(2*nx+1);
-              break;
-            }
-
-          default:
-            {
-              libMesh::err << "ERROR: Unrecognized 2D element type." << std::endl;
-              libmesh_error();
-            }
-          }
-
-        return libMesh::invalid_uint;
+        return i + j*(nx+1);
+        break;
       }
 
-
-
-      // Same as the function above, but for 3D elements
-      inline
-      unsigned int idx(const ElemType type,
-                       const unsigned int nx,
-                       const unsigned int ny,
-                       const unsigned int i,
-                       const unsigned int j,
-                       const unsigned int k)
+    case QUAD8:
+    case QUAD9:
+    case TRI6:
       {
-        switch(type)
-          {
-          case INVALID_ELEM:
-          case HEX8:
-          case PRISM6:
-            {
-              return i + (nx+1)*(j + k*(ny+1));
-              break;
-            }
-
-          case HEX20:
-          case HEX27:
-          case TET4:  // TET4's are created from an initial HEX27 discretization
-          case TET10: // TET10's are created from an initial HEX27 discretization
-          case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
-          case PYRAMID14:
-          case PRISM15:
-          case PRISM18:
-            {
-              return i + (2*nx+1)*(j + k*(2*ny+1));
-              break;
-            }
-
-          default:
-            {
-              libMesh::err << "ERROR: Unrecognized element type." << std::endl;
-              libmesh_error();
-            }
-          }
-
-        return libMesh::invalid_uint;
+        return i + j*(2*nx+1);
+        break;
       }
-    } // namespace Private
-  } // namespace Generation
+
+    default:
+      {
+        libMesh::err << "ERROR: Unrecognized 2D element type." << std::endl;
+        libmesh_error();
+      }
+    }
+
+  return libMesh::invalid_uint;
+}
+
+
+
+// Same as the function above, but for 3D elements
+inline
+unsigned int idx(const ElemType type,
+                 const unsigned int nx,
+                 const unsigned int ny,
+                 const unsigned int i,
+                 const unsigned int j,
+                 const unsigned int k)
+{
+  switch(type)
+    {
+    case INVALID_ELEM:
+    case HEX8:
+    case PRISM6:
+      {
+        return i + (nx+1)*(j + k*(ny+1));
+        break;
+      }
+
+    case HEX20:
+    case HEX27:
+    case TET4:  // TET4's are created from an initial HEX27 discretization
+    case TET10: // TET10's are created from an initial HEX27 discretization
+    case PYRAMID5: // PYRAMID5's are created from an initial HEX27 discretization
+    case PYRAMID14:
+    case PRISM15:
+    case PRISM18:
+      {
+        return i + (2*nx+1)*(j + k*(2*ny+1));
+        break;
+      }
+
+    default:
+      {
+        libMesh::err << "ERROR: Unrecognized element type." << std::endl;
+        libmesh_error();
+      }
+    }
+
+  return libMesh::invalid_uint;
+}
+} // namespace Private
+} // namespace Generation
 } // namespace MeshTools
 
 // ------------------------------------------------------------
@@ -264,111 +264,111 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
         // quadratics or cubics and whether using uniform grid or Gauss-Lobatto
         unsigned int node_id = 0;
         switch(type)
-        {
+          {
           case INVALID_ELEM:
           case EDGE2:
             {
               for (unsigned int i=0; i<=nx; i++)
-              {
-                if (gauss_lobatto_grid)
-                  mesh.add_point (Point(0.5*(std::cos(libMesh::pi*static_cast<Real>(nx-i)/static_cast<Real>(nx))+1.0),
-                        0,
-                        0), node_id++);
-                else
-                  mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx),
-                        0,
-                        0), node_id++);
-              }
+                {
+                  if (gauss_lobatto_grid)
+                    mesh.add_point (Point(0.5*(std::cos(libMesh::pi*static_cast<Real>(nx-i)/static_cast<Real>(nx))+1.0),
+                                          0,
+                                          0), node_id++);
+                  else
+                    mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(nx),
+                                          0,
+                                          0), node_id++);
+                }
               break;
             }
 
           case EDGE3:
             {
               for (unsigned int i=0; i<=2*nx; i++)
-              {
-                if (gauss_lobatto_grid)
                 {
-                  // The x location of the point.
-                  Real x=0.;
+                  if (gauss_lobatto_grid)
+                    {
+                      // The x location of the point.
+                      Real x=0.;
 
-                  // Shortcut quantities (do not depend on i)
-                  const Real c = std::cos( libMesh::pi*i / static_cast<Real>(2*nx) );
+                      // Shortcut quantities (do not depend on i)
+                      const Real c = std::cos( libMesh::pi*i / static_cast<Real>(2*nx) );
 
-                  // If i is even, compute a normal Gauss-Lobatto point
-                  if (i%2 == 0)
-                    x = 0.5*(1.0 - c);
+                      // If i is even, compute a normal Gauss-Lobatto point
+                      if (i%2 == 0)
+                        x = 0.5*(1.0 - c);
 
-                  // Otherwise, it is the average of the previous and next points
+                      // Otherwise, it is the average of the previous and next points
+                      else
+                        {
+                          Real cmin = std::cos( libMesh::pi*(i-1) / static_cast<Real>(2*nx) );
+                          Real cmax = std::cos( libMesh::pi*(i+1) / static_cast<Real>(2*nx) );
+
+                          Real gl_xmin = 0.5*(1.0 - cmin);
+                          Real gl_xmax = 0.5*(1.0 - cmax);
+                          x = 0.5*(gl_xmin + gl_xmax);
+                        }
+
+                      mesh.add_point (Point(x,0.,0.), node_id++);
+                    }
                   else
-                  {
-                    Real cmin = std::cos( libMesh::pi*(i-1) / static_cast<Real>(2*nx) );
-                    Real cmax = std::cos( libMesh::pi*(i+1) / static_cast<Real>(2*nx) );
-
-                    Real gl_xmin = 0.5*(1.0 - cmin);
-                    Real gl_xmax = 0.5*(1.0 - cmax);
-                    x = 0.5*(gl_xmin + gl_xmax);
-                  }
-
-                  mesh.add_point (Point(x,0.,0.), node_id++);
+                    mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
+                                          0,
+                                          0), node_id++);
                 }
-                else
-                  mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(2*nx),
-                        0,
-                        0), node_id++);
-              }
               break;
             }
 
           case EDGE4:
             {
               for (unsigned int i=0; i<=3*nx; i++)
-              {
-                if (gauss_lobatto_grid)
                 {
-                  // The x location of the point
-                  Real x=0.;
+                  if (gauss_lobatto_grid)
+                    {
+                      // The x location of the point
+                      Real x=0.;
 
-                  // Shortcut quantities
-                  const Real c = std::cos( libMesh::pi*i / static_cast<Real>(3*nx) );
+                      // Shortcut quantities
+                      const Real c = std::cos( libMesh::pi*i / static_cast<Real>(3*nx) );
 
-                  // If i is multiple of 3, compute a normal Gauss-Lobatto point
-                  if (i%3 == 0)
-                    x = 0.5*(1.0 - c);
+                      // If i is multiple of 3, compute a normal Gauss-Lobatto point
+                      if (i%3 == 0)
+                        x = 0.5*(1.0 - c);
 
-                  // Otherwise, distribute points evenly within the element
+                      // Otherwise, distribute points evenly within the element
+                      else
+                        {
+                          if(i%3 == 1)
+                            {
+                              Real cmin = std::cos( libMesh::pi*(i-1) / static_cast<Real>(3*nx) );
+                              Real cmax = std::cos( libMesh::pi*(i+2) / static_cast<Real>(3*nx) );
+
+                              Real gl_xmin = 0.5*(1.0 - cmin);
+                              Real gl_xmax = 0.5*(1.0 - cmax);
+
+                              x = (2.*gl_xmin + gl_xmax)/3.;
+                            }
+                          else
+                            if(i%3 == 2)
+                              {
+                                Real cmin = std::cos( libMesh::pi*(i-2) / static_cast<Real>(3*nx) );
+                                Real cmax = std::cos( libMesh::pi*(i+1) / static_cast<Real>(3*nx) );
+
+                                Real gl_xmin = 0.5*(1.0 - cmin);
+                                Real gl_xmax = 0.5*(1.0 - cmax);
+
+                                x = (gl_xmin + 2.*gl_xmax)/3.;
+                              }
+
+                        }
+
+                      mesh.add_point (Point(x,0.,0.), node_id++);
+                    }
                   else
-                  {
-                    if(i%3 == 1)
-                    {
-                      Real cmin = std::cos( libMesh::pi*(i-1) / static_cast<Real>(3*nx) );
-                      Real cmax = std::cos( libMesh::pi*(i+2) / static_cast<Real>(3*nx) );
-
-                      Real gl_xmin = 0.5*(1.0 - cmin);
-                      Real gl_xmax = 0.5*(1.0 - cmax);
-
-                      x = (2.*gl_xmin + gl_xmax)/3.;
-                    }
-                    else
-                    if(i%3 == 2)
-                    {
-                      Real cmin = std::cos( libMesh::pi*(i-2) / static_cast<Real>(3*nx) );
-                      Real cmax = std::cos( libMesh::pi*(i+1) / static_cast<Real>(3*nx) );
-
-                      Real gl_xmin = 0.5*(1.0 - cmin);
-                      Real gl_xmax = 0.5*(1.0 - cmax);
-
-                      x = (gl_xmin + 2.*gl_xmax)/3.;
-                    }
-
-                  }
-
-                  mesh.add_point (Point(x,0.,0.), node_id++);
+                    mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(3*nx),
+                                          0,
+                                          0), node_id++);
                 }
-                else
-                mesh.add_point (Point(static_cast<Real>(i)/static_cast<Real>(3*nx),
-                        0,
-                        0), node_id++);
-              }
 
 
 
@@ -381,15 +381,15 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
               libmesh_error();
             }
 
-        }
+          }
 
         // Build the elements of the mesh
         switch(type)
           {
-            case INVALID_ELEM:
-            case EDGE2:
-              {
-                for (unsigned int i=0; i<nx; i++)
+          case INVALID_ELEM:
+          case EDGE2:
+            {
+              for (unsigned int i=0; i<nx; i++)
                 {
                   Elem* elem = mesh.add_elem (new Edge2);
                   elem->set_node(0) = mesh.node_ptr(i);
@@ -402,11 +402,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                     mesh.boundary_info->add_side(elem, 1, 1);
                 }
               break;
-              }
+            }
 
-            case EDGE3:
-              {
-                for (unsigned int i=0; i<nx; i++)
+          case EDGE3:
+            {
+              for (unsigned int i=0; i<nx; i++)
                 {
                   Elem* elem = mesh.add_elem (new Edge3);
                   elem->set_node(0) = mesh.node_ptr(2*i);
@@ -420,11 +420,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                     mesh.boundary_info->add_side(elem, 1, 1);
                 }
               break;
-              }
+            }
 
-            case EDGE4:
-              {
-                for (unsigned int i=0; i<nx; i++)
+          case EDGE4:
+            {
+              for (unsigned int i=0; i<nx; i++)
                 {
                   Elem* elem = mesh.add_elem (new Edge4);
                   elem->set_node(0) = mesh.node_ptr(3*i);
@@ -439,13 +439,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                     mesh.boundary_info->add_side(elem, 1, 1);
                 }
               break;
-              }
+            }
 
-            default:
-              {
-                libMesh::err << "ERROR: Unrecognized 1D element type." << std::endl;
-                libmesh_error();
-              }
+          default:
+            {
+              libMesh::err << "ERROR: Unrecognized 1D element type." << std::endl;
+              libmesh_error();
+            }
           }
 
         // Scale the nodal positions
@@ -1467,17 +1467,17 @@ void MeshTools::Generation::build_point (UnstructuredMesh& mesh,
                                          const ElemType type,
                                          const bool gauss_lobatto_grid)
 {
-    // This method only makes sense in 0D!
-    // But we now just turn a non-0D mesh into a 0D mesh
-    //libmesh_assert_equal_to (mesh.mesh_dimension(), 1);
+  // This method only makes sense in 0D!
+  // But we now just turn a non-0D mesh into a 0D mesh
+  //libmesh_assert_equal_to (mesh.mesh_dimension(), 1);
 
-    build_cube(mesh,
-               0, 0, 0,
-               0., 0.,
-               0., 0.,
-               0., 0.,
-               type,
-               gauss_lobatto_grid);
+  build_cube(mesh,
+             0, 0, 0,
+             0., 0.,
+             0., 0.,
+             0., 0.,
+             type,
+             gauss_lobatto_grid);
 }
 
 
@@ -1487,17 +1487,17 @@ void MeshTools::Generation::build_line (UnstructuredMesh& mesh,
                                         const ElemType type,
                                         const bool gauss_lobatto_grid)
 {
-    // This method only makes sense in 1D!
-    // But we now just turn a non-1D mesh into a 1D mesh
-    //libmesh_assert_equal_to (mesh.mesh_dimension(), 1);
+  // This method only makes sense in 1D!
+  // But we now just turn a non-1D mesh into a 1D mesh
+  //libmesh_assert_equal_to (mesh.mesh_dimension(), 1);
 
-    build_cube(mesh,
-               nx, 0, 0,
-               xmin, xmax,
-               0., 0.,
-               0., 0.,
-               type,
-               gauss_lobatto_grid);
+  build_cube(mesh,
+             nx, 0, 0,
+             xmin, xmax,
+             0., 0.,
+             0., 0.,
+             type,
+             gauss_lobatto_grid);
 }
 
 
@@ -1910,7 +1910,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
                     sphere.closest_point(side->point(n));
               }
         }
-      }
+    }
 
   // The mesh now contains a refinement hierarchy due to the refinements
   // used to generate the grid.  In order to call other support functions

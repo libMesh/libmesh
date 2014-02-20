@@ -294,10 +294,10 @@ void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest,
 {
   // Short-circuit if the matrix is empty
   if(this->m() == 0)
-  {
-    dest.resize(0);
-    return;
-  }
+    {
+      dest.resize(0);
+      return;
+    }
 
   if (this->use_blas_lapack)
     this->_matvec_blas(factor, 1., dest, arg);
@@ -399,7 +399,7 @@ void DenseMatrix<T>::lu_solve (const DenseVector<T>& b,
     }
 
   if (this->use_blas_lapack)
-     this->_lu_back_substitute_lapack (b, x);
+    this->_lu_back_substitute_lapack (b, x);
   else
     this->_lu_back_substitute (b, x);
 }
@@ -581,10 +581,10 @@ T DenseMatrix<T>::det ()
       }
     default:
       {
-      libMesh::err << "Error! Can't compute the determinant under "
-                   << "the current decomposition."
-                   << std::endl;
-      libmesh_error();
+        libMesh::err << "Error! Can't compute the determinant under "
+                     << "the current decomposition."
+                     << std::endl;
+        libmesh_error();
       }
     }
 

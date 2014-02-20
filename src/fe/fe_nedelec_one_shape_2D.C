@@ -388,7 +388,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
                                                    const Point&)
 {
 #if LIBMESH_DIM > 1
-   libmesh_assert(elem);
+  libmesh_assert(elem);
 
   // j = 0 ==> d^2 phi / dxi^2
   // j = 1 ==> d^2 phi / dxi deta

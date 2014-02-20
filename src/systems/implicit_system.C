@@ -524,14 +524,14 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
   oldparameters.value_copy(parameters);
 
   // if (this->assemble_before_solve)
-    {
-      // Build the Jacobian
-      this->assembly(false, true);
-      this->matrix->close();
+  {
+    // Build the Jacobian
+    this->assembly(false, true);
+    this->matrix->close();
 
-      // Take the discrete adjoint
-      matrix->get_transpose(*matrix);
-    }
+    // Take the discrete adjoint
+    matrix->get_transpose(*matrix);
+  }
 
   // The weighted adjoint-adjoint problem is linear
   LinearSolver<Number> *linear_solver = this->get_linear_solver();
@@ -547,9 +547,9 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
       {
         const std::pair<unsigned int, Real> rval =
           linear_solver->solve (*matrix, this->add_weighted_sensitivity_adjoint_solution(i),
-                                 *(temprhs[i]),
-                                 solver_params.second,
-                                 solver_params.first);
+                                *(temprhs[i]),
+                                solver_params.second,
+                                solver_params.first);
 
         totalrval.first  += rval.first;
         totalrval.second += rval.second;
@@ -698,9 +698,9 @@ void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parame
 
 
 void ImplicitSystem::adjoint_qoi_parameter_sensitivity
-  (const QoISet&          qoi_indices,
-   const ParameterVector& parameters,
-   SensitivityData&       sensitivities)
+(const QoISet&          qoi_indices,
+ const ParameterVector& parameters,
+ SensitivityData&       sensitivities)
 {
   const unsigned int Np = libmesh_cast_int<unsigned int>
     (parameters.size());
@@ -824,9 +824,9 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
 
 
 void ImplicitSystem::forward_qoi_parameter_sensitivity
-  (const QoISet&          qoi_indices,
-   const ParameterVector& parameters,
-   SensitivityData&       sensitivities)
+(const QoISet&          qoi_indices,
+ const ParameterVector& parameters,
+ SensitivityData&       sensitivities)
 {
   const unsigned int Np = libmesh_cast_int<unsigned int>
     (parameters.size());
@@ -911,10 +911,10 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
 
 
 void ImplicitSystem::qoi_parameter_hessian_vector_product
-  (const QoISet& qoi_indices,
-   const ParameterVector& parameters,
-   const ParameterVector& vector,
-   SensitivityData& sensitivities)
+(const QoISet& qoi_indices,
+ const ParameterVector& parameters,
+ const ParameterVector& vector,
+ SensitivityData& sensitivities)
 {
   // We currently get partial derivatives via finite differencing
   const Real delta_p = TOLERANCE;
@@ -1111,9 +1111,9 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
 
 
 void ImplicitSystem::qoi_parameter_hessian
-  (const QoISet& qoi_indices,
-   const ParameterVector& parameters,
-   SensitivityData& sensitivities)
+(const QoISet& qoi_indices,
+ const ParameterVector& parameters,
+ SensitivityData& sensitivities)
 {
   // We currently get partial derivatives via finite differencing
   const Real delta_p = TOLERANCE;

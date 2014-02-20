@@ -379,18 +379,18 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma, DenseMatrix<T>& U, Dens
   U.resize(M,min_MN);
   for(unsigned int i=0; i<U.m(); i++)
     for(unsigned int j=0; j<U.n(); j++)
-    {
-      unsigned int index = i + j*U.n();  // Column major storage
-      U(i,j) = U_val[index];
-    }
+      {
+        unsigned int index = i + j*U.n();  // Column major storage
+        U(i,j) = U_val[index];
+      }
 
   VT.resize(min_MN,N);
   for(unsigned int i=0; i<VT.m(); i++)
     for(unsigned int j=0; j<VT.n(); j++)
-    {
-      unsigned int index = i + j*U.n(); // Column major storage
-      VT(i,j) = VT_val[index];
-    }
+      {
+        unsigned int index = i + j*U.n(); // Column major storage
+        VT(i,j) = VT_val[index];
+      }
 
 }
 

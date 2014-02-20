@@ -232,7 +232,7 @@ void write_output_solvedata(EquationSystems &es,
     {
       // Write out the number of elements/dofs used
       std::ofstream activemesh ("out_activemesh.m",
-        std::ios_base::app | std::ios_base::out);
+                                std::ios_base::app | std::ios_base::out);
       activemesh.precision(17);
       activemesh << (a_step + 1) << ' '
                  << n_active_elem << ' '
@@ -240,14 +240,14 @@ void write_output_solvedata(EquationSystems &es,
 
       // Write out the number of solver steps used
       std::ofstream solvesteps ("out_solvesteps.m",
-        std::ios_base::app | std::ios_base::out);
+                                std::ios_base::app | std::ios_base::out);
       solvesteps.precision(17);
       solvesteps << newton_steps << ' '
                  << krylov_steps << std::endl;
 
       // Write out the clock time
       std::ofstream clocktime ("out_clocktime.m",
-        std::ios_base::app | std::ios_base::out);
+                               std::ios_base::app | std::ios_base::out);
       clocktime.precision(17);
       clocktime << tv_sec << '.' << tv_usec << std::endl;
     }
@@ -259,32 +259,32 @@ void write_output_footers(FEMParameters &param)
   if (libMesh::global_processor_id() == 0)
     {
       std::ofstream clocktime ("out_clocktime.m",
-        std::ios_base::app | std::ios_base::out);
+                               std::ios_base::app | std::ios_base::out);
       clocktime << "];" << std::endl;
 
       if (param.run_simulation)
         {
           std::ofstream activemesh ("out_activemesh.m",
-            std::ios_base::app | std::ios_base::out);
+                                    std::ios_base::app | std::ios_base::out);
           activemesh << "];" << std::endl;
 
           std::ofstream solvesteps ("out_solvesteps.m",
-            std::ios_base::app | std::ios_base::out);
+                                    std::ios_base::app | std::ios_base::out);
           solvesteps << "];" << std::endl;
 
           if (param.timesolver_tolerance)
             {
               std::ofstream times ("out_time.m",
-                std::ios_base::app | std::ios_base::out);
+                                   std::ios_base::app | std::ios_base::out);
               times << "];" << std::endl;
               std::ofstream timesteps ("out_timesteps.m",
-                std::ios_base::app | std::ios_base::out);
+                                       std::ios_base::app | std::ios_base::out);
               timesteps << "];" << std::endl;
             }
           if (param.steadystate_tolerance)
             {
               std::ofstream changerate ("out_changerate.m",
-                std::ios_base::app | std::ios_base::out);
+                                        std::ios_base::app | std::ios_base::out);
               changerate << "];" << std::endl;
             }
         }
@@ -303,12 +303,12 @@ void write_error(EquationSystems &es,
                  FEMParameters &param,
                  std::string error_type)
 #else
-void write_error(EquationSystems &,
-                 ErrorVector &,
-                 unsigned int,
-                 unsigned int,
-                 FEMParameters &,
-                 std::string)
+  void write_error(EquationSystems &,
+                   ErrorVector &,
+                   unsigned int,
+                   unsigned int,
+                   FEMParameters &,
+                   std::string)
 #endif
 {
 #ifdef LIBMESH_HAVE_GMV
@@ -502,7 +502,7 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
       AutoPtr<TimeSolver>(new SteadySolver(system));
 
   system.time_solver->reduce_deltat_on_diffsolver_failure =
-                                        param.deltat_reductions;
+    param.deltat_reductions;
   system.time_solver->quiet           = param.time_solver_quiet;
 
   // Set the time stepping options
@@ -582,10 +582,10 @@ AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters& /* param */)
 // the build_error_estimator_component_wise function below
 AutoPtr<ErrorEstimator>
 build_error_estimator_component_wise
-  (FEMParameters &param,
-   std::vector<std::vector<Real> > &term_weights,
-   std::vector<FEMNormType> &primal_error_norm_type,
-   std::vector<FEMNormType> &dual_error_norm_type)
+(FEMParameters &param,
+ std::vector<std::vector<Real> > &term_weights,
+ std::vector<FEMNormType> &primal_error_norm_type,
+ std::vector<FEMNormType> &dual_error_norm_type)
 {
   AutoPtr<ErrorEstimator> error_estimator;
 
@@ -637,11 +637,11 @@ build_error_estimator_component_wise
 // are computed using the build_weighted_error_estimator_component_wise below
 AutoPtr<ErrorEstimator>
 build_weighted_error_estimator_component_wise
-  (FEMParameters &param,
-   std::vector<std::vector<Real> > &term_weights,
-   std::vector<FEMNormType> &primal_error_norm_type,
-   std::vector<FEMNormType> &dual_error_norm_type,
-   std::vector<FEMFunctionBase<Number>*> coupled_system_weight_functions)
+(FEMParameters &param,
+ std::vector<std::vector<Real> > &term_weights,
+ std::vector<FEMNormType> &primal_error_norm_type,
+ std::vector<FEMNormType> &dual_error_norm_type,
+ std::vector<FEMFunctionBase<Number>*> coupled_system_weight_functions)
 {
   AutoPtr<ErrorEstimator> error_estimator;
 
@@ -800,7 +800,7 @@ int main (int argc, char** argv)
       std::cout<< "Solving the forward problem" <<std::endl;
 
       std::cout << "We have " << mesh.n_active_elem()
-                    << " active elements and " << equation_systems.n_active_dofs()
+                << " active elements and " << equation_systems.n_active_dofs()
                 << " active dofs." << std::endl << std::endl;
 
       // Solve the forward system
@@ -839,7 +839,7 @@ int main (int argc, char** argv)
           system.adjoint_solve();
 
 	  // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
-	system.set_adjoint_already_solved(true);
+          system.set_adjoint_already_solved(true);
 
 	  // To plot the adjoint solution, we swap it with the primal solution
 	  // and use the write_output function
@@ -883,7 +883,7 @@ int main (int argc, char** argv)
 
           std::vector<std::vector<Real> >
             weights_matrix_non_pressure(system.n_vars(),
-              std::vector<Real>(system.n_vars(), 0.0));
+                                        std::vector<Real>(system.n_vars(), 0.0));
           weights_matrix_non_pressure[0][0] = 1.;
           weights_matrix_non_pressure[1][1] = 1.;
           weights_matrix_non_pressure[3][3] = 1./Pe;
@@ -892,9 +892,9 @@ int main (int argc, char** argv)
           // to the QoI error from the non pressure term
           AutoPtr<ErrorEstimator> error_estimator_non_pressure =
             build_error_estimator_component_wise
-              (param, weights_matrix_non_pressure,
-               primal_norm_type_vector_non_pressure,
-               dual_norm_type_vector_non_pressure);
+            (param, weights_matrix_non_pressure,
+             primal_norm_type_vector_non_pressure,
+             dual_norm_type_vector_non_pressure);
 
           // Estimate the contributions to the QoI error from the non
           // pressure terms
@@ -925,8 +925,8 @@ int main (int argc, char** argv)
 
           std::vector<std::vector<Real> >
             weights_matrix_with_pressure
-              (system.n_vars(),
-               std::vector<Real>(system.n_vars(), 0.0));
+            (system.n_vars(),
+             std::vector<Real>(system.n_vars(), 0.0));
           weights_matrix_with_pressure[0][2] = 1.;
 
           weights_matrix_with_pressure[1][2] = 1.;
@@ -938,9 +938,9 @@ int main (int argc, char** argv)
           // to the QoI error from the pressure term
           AutoPtr<ErrorEstimator> error_estimator_with_pressure =
             build_error_estimator_component_wise
-              (param, weights_matrix_with_pressure,
-               primal_norm_type_vector_with_pressure,
-               dual_norm_type_vector_with_pressure);
+            (param, weights_matrix_with_pressure,
+             primal_norm_type_vector_with_pressure,
+             dual_norm_type_vector_with_pressure);
 
           // Estimate the contributions to the QoI error from the pressure terms
           error_estimator_with_pressure->estimate_error(system, error_with_pressure);
@@ -970,8 +970,8 @@ int main (int argc, char** argv)
 
           std::vector<std::vector<Real> >
             weights_matrix_convection_diffusion_x
-              (system.n_vars(),
-               std::vector<Real>(system.n_vars(), 0.0));
+            (system.n_vars(),
+             std::vector<Real>(system.n_vars(), 0.0));
 	  weights_matrix_convection_diffusion_x[0][3] = 1.;
           weights_matrix_convection_diffusion_x[3][3] = 1.;
 
@@ -997,7 +997,7 @@ int main (int argc, char** argv)
           // Build the error estimator to estimate the contributions
           // to the QoI error from the convection diffusion x term
           AutoPtr<ErrorEstimator> error_estimator_convection_diffusion_x =
-          build_weighted_error_estimator_component_wise
+            build_weighted_error_estimator_component_wise
             (param, weights_matrix_convection_diffusion_x,
              primal_norm_type_vector_convection_diffusion_x,
              dual_norm_type_vector_convection_diffusion_x,
@@ -1033,7 +1033,7 @@ int main (int argc, char** argv)
 
           std::vector<std::vector<Real> >
             weights_matrix_convection_diffusion_y
-              (system.n_vars(), std::vector<Real>(system.n_vars(), 0.0));
+            (system.n_vars(), std::vector<Real>(system.n_vars(), 0.0));
 	  weights_matrix_convection_diffusion_y[1][3] = 1.;
           weights_matrix_convection_diffusion_y[3][3] = 1.;
 
@@ -1053,10 +1053,10 @@ int main (int argc, char** argv)
           // to the QoI error from the convection diffsion y term
           AutoPtr<ErrorEstimator> error_estimator_convection_diffusion_y =
             build_weighted_error_estimator_component_wise
-              (param, weights_matrix_convection_diffusion_y,
-               primal_norm_type_vector_convection_diffusion_y,
-               dual_norm_type_vector_convection_diffusion_y,
-               coupled_system_weight_functions_y);
+            (param, weights_matrix_convection_diffusion_y,
+             primal_norm_type_vector_convection_diffusion_y,
+             dual_norm_type_vector_convection_diffusion_y,
+             coupled_system_weight_functions_y);
 
           // Estimate the contributions to the QoI error from the
           // convection diffusion y terms

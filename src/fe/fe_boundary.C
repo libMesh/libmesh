@@ -36,41 +36,41 @@ namespace libMesh
 
 //-------------------------------------------------------
 // Full specializations for useless methods in 0D, 1D
-#define REINIT_ERROR(_dim, _type, _func)       \
-template <>                                    \
-void FE<_dim,_type>::_func(const Elem*,        \
-                           const unsigned int, \
-                           const Real,         \
-                           const std::vector<Point>* const,     \
-                           const std::vector<Real>* const)      \
-{                                              \
-  libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
-               << std::endl;                                            \
-  libmesh_error();                                     \
-}
+#define REINIT_ERROR(_dim, _type, _func)                                \
+  template <>                                                           \
+  void FE<_dim,_type>::_func(const Elem*,                               \
+                             const unsigned int,                        \
+                             const Real,                                \
+                             const std::vector<Point>* const,           \
+                             const std::vector<Real>* const)            \
+  {                                                                     \
+    libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
+                 << std::endl;                                          \
+    libmesh_error();                                                    \
+  }
 
-#define SIDEMAP_ERROR(_dim, _type, _func)       \
-template <>                                    \
-void FE<_dim,_type>::_func(const Elem*,        \
-                           const Elem*,        \
-                           const unsigned int,            \
-                           const std::vector<Point>&,     \
-                           std::vector<Point>&)      \
-{                                              \
-  libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
-               << std::endl;                                            \
-  libmesh_error();                                     \
-}
+#define SIDEMAP_ERROR(_dim, _type, _func)                               \
+  template <>                                                           \
+  void FE<_dim,_type>::_func(const Elem*,                               \
+                             const Elem*,                               \
+                             const unsigned int,                        \
+                             const std::vector<Point>&,                 \
+                             std::vector<Point>&)                       \
+  {                                                                     \
+    libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
+                 << std::endl;                                          \
+    libmesh_error();                                                    \
+  }
 
-#define FACE_EDGE_SHAPE_ERROR(_dim, _func)       \
-template <>                                    \
- void FEMap::_func<_dim>(const std::vector<Point>&,     \
-                           const Elem* )        \
-{                                              \
-  libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
-               << std::endl;                                            \
-  libmesh_error();                                     \
-}
+#define FACE_EDGE_SHAPE_ERROR(_dim, _func)                              \
+  template <>                                                           \
+  void FEMap::_func<_dim>(const std::vector<Point>&,                    \
+                          const Elem* )                                 \
+  {                                                                     \
+    libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
+                 << std::endl;                                          \
+    libmesh_error();                                                    \
+  }
 
 
 REINIT_ERROR(0, CLOUGH, reinit)
@@ -368,18 +368,18 @@ void FE<Dim,T>::side_map (const Elem* elem,
   for (unsigned int j = 0; j < side->n_nodes(); j++)
     for (unsigned int i = 0; i < elem->n_nodes(); i++)
       if (side->node(j) == elem->node(i))
-         elem_nodes_map[j] = i;
+        elem_nodes_map[j] = i;
   std::vector<Point> refspace_nodes;
   this->get_refspace_nodes(elem->type(), refspace_nodes);
 
   const std::vector<std::vector<Real> >& psi_map = this->_fe_map->get_psi();
 
   for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
-  {
-    const Point& side_node = refspace_nodes[elem_nodes_map[i]];
-    for (unsigned int p=0; p<n_points; p++)
-      reference_points[p].add_scaled (side_node, psi_map[i][p]);
-  }
+    {
+      const Point& side_node = refspace_nodes[elem_nodes_map[i]];
+      for (unsigned int p=0; p<n_points; p++)
+        reference_points[p].add_scaled (side_node, psi_map[i][p]);
+    }
 }
 
 template<unsigned int Dim>

@@ -69,9 +69,9 @@ template <typename T> class NumericVector;
 // ------------------------------------------------------------
 // Do we need constraints for anything?
 
-#if defined(LIBMESH_ENABLE_AMR) || \
-    defined(LIBMESH_ENABLE_PERIODIC) || \
-    defined(LIBMESH_ENABLE_DIRICHLET)
+#if defined(LIBMESH_ENABLE_AMR) ||              \
+  defined(LIBMESH_ENABLE_PERIODIC) ||           \
+  defined(LIBMESH_ENABLE_DIRICHLET)
 #  define LIBMESH_ENABLE_CONSTRAINTS 1
 #endif
 
@@ -105,9 +105,9 @@ class DofConstraints : public std::map<dof_id_type,
  * stores it in such a structure.
  */
 class DofConstraintValueMap :
-  public std::map<dof_id_type, Number,
-                  std::less<dof_id_type>,
-                  Threads::scalable_allocator<std::pair<const dof_id_type, Number> > >
+    public std::map<dof_id_type, Number,
+                    std::less<dof_id_type>,
+                    Threads::scalable_allocator<std::pair<const dof_id_type, Number> > >
 {
 };
 
@@ -116,10 +116,10 @@ class DofConstraintValueMap :
  * problems.
  */
 class AdjointDofConstraintValues :
-  public std::map<unsigned int, DofConstraintValueMap,
-                  std::less<unsigned int>,
-                  Threads::scalable_allocator
-    <std::pair<const unsigned int, DofConstraintValueMap> > >
+    public std::map<unsigned int, DofConstraintValueMap,
+                    std::less<unsigned int>,
+                    Threads::scalable_allocator
+                    <std::pair<const unsigned int, DofConstraintValueMap> > >
 {
 };
 
@@ -164,8 +164,8 @@ class NodeConstraints : public std::map<const Node *,
  *
  * @author Benjamin S. Kirk, 2002-2007
  */
-  class DofMap : public ReferenceCountedObject<DofMap>,
-  public ParallelObject
+class DofMap : public ReferenceCountedObject<DofMap>,
+               public ParallelObject
 {
 public:
 
@@ -644,32 +644,32 @@ public:
   void add_constraint_row (const dof_id_type dof_number,
                            const DofConstraintRow& constraint_row,
                            const bool forbid_constraint_overwrite = true)
-    { add_constraint_row(dof_number, constraint_row, 0., forbid_constraint_overwrite); }
+  { add_constraint_row(dof_number, constraint_row, 0., forbid_constraint_overwrite); }
 
   /**
    * Returns an iterator pointing to the first DoF constraint row
    */
   DofConstraints::const_iterator constraint_rows_begin() const
-    { return _dof_constraints.begin(); }
+  { return _dof_constraints.begin(); }
 
   /**
    * Returns an iterator pointing just past the last DoF constraint row
    */
   DofConstraints::const_iterator constraint_rows_end() const
-    { return _dof_constraints.end(); }
+  { return _dof_constraints.end(); }
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
    * Returns an iterator pointing to the first Node constraint row
    */
   NodeConstraints::const_iterator node_constraint_rows_begin() const
-    { return _node_constraints.begin(); }
+  { return _node_constraints.begin(); }
 
   /**
    * Returns an iterator pointing just past the last Node constraint row
    */
   NodeConstraints::const_iterator node_constraint_rows_end() const
-    { return _node_constraints.end(); }
+  { return _node_constraints.end(); }
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   /**
@@ -908,9 +908,9 @@ public:
   bool is_periodic_boundary (const boundary_id_type boundaryid) const;
 
   PeriodicBoundaries * get_periodic_boundaries()
-    {
-      return _periodic_boundaries;
-    }
+  {
+    return _periodic_boundaries;
+  }
 
 #endif // LIBMESH_ENABLE_PERIODIC
 
@@ -946,14 +946,14 @@ public:
                                           unsigned int q);
 
   const DirichletBoundaries * get_dirichlet_boundaries() const
-    {
-      return _dirichlet_boundaries;
-    }
+  {
+    return _dirichlet_boundaries;
+  }
 
   DirichletBoundaries * get_dirichlet_boundaries()
-    {
-      return _dirichlet_boundaries;
-    }
+  {
+    return _dirichlet_boundaries;
+  }
 
   bool has_adjoint_dirichlet_boundaries(unsigned int q) const;
 
@@ -1059,9 +1059,9 @@ private:
    */
   void _dof_indices (const Elem* const elem, std::vector<dof_id_type>& di, const unsigned int v
 #ifdef DEBUG
-                           ,unsigned int & tot_size
+                     ,unsigned int & tot_size
 #endif
-    ) const;
+                     ) const;
 
   /**
    * Builds a sparsity pattern
@@ -1433,9 +1433,9 @@ const FEType& DofMap::variable_group_type (const unsigned int vg) const
 inline
 bool DofMap::is_constrained_node (const Node*
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-node
+                                  node
 #endif
-) const
+                                  ) const
 {
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   if (_node_constraints.count(node))
@@ -1472,10 +1472,10 @@ bool DofMap::has_heterogenous_adjoint_constraint (const unsigned int qoi_num,
 
 #else
 
-  //--------------------------------------------------------------------
-  // Constraint-specific methods get inlined into nothing if
-  // constraints are disabled, so there's no reason for users not to
-  // use them.
+//--------------------------------------------------------------------
+// Constraint-specific methods get inlined into nothing if
+// constraints are disabled, so there's no reason for users not to
+// use them.
 
 inline void DofMap::constrain_element_matrix (DenseMatrix<Number>&,
                                               std::vector<dof_id_type>&,

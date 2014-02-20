@@ -163,7 +163,7 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
 
 
 bool Pyramid::is_child_on_side(const unsigned int c,
-                             const unsigned int s) const
+                               const unsigned int s) const
 {
   libmesh_assert_less (c, this->n_children());
   libmesh_assert_less (s, this->n_sides());

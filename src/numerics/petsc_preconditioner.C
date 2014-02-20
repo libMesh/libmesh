@@ -60,28 +60,28 @@ template <typename T>
 void PetscPreconditioner<T>::init ()
 {
   if(!this->_matrix)
-  {
-    libMesh::err << "ERROR: No matrix set for PetscPreconditioner, but init() called" << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "ERROR: No matrix set for PetscPreconditioner, but init() called" << std::endl;
+      libmesh_error();
+    }
 
   // Clear the preconditioner in case it has been created in the past
   if (!this->_is_initialized)
-  {
-    // Should probably use PCReset(), but it's not working at the moment so we'll destroy instead
-    if (_pc)
     {
-      int ierr = LibMeshPCDestroy(&_pc);
+      // Should probably use PCReset(), but it's not working at the moment so we'll destroy instead
+      if (_pc)
+        {
+          int ierr = LibMeshPCDestroy(&_pc);
+          LIBMESH_CHKERRABORT(ierr);
+        }
+
+      int ierr = PCCreate(this->comm().get(),&_pc);
       LIBMESH_CHKERRABORT(ierr);
+
+      PetscMatrix<T> * pmatrix = libmesh_cast_ptr<PetscMatrix<T>*, SparseMatrix<T> >(this->_matrix);
+
+      _mat = pmatrix->mat();
     }
-
-    int ierr = PCCreate(this->comm().get(),&_pc);
-    LIBMESH_CHKERRABORT(ierr);
-
-    PetscMatrix<T> * pmatrix = libmesh_cast_ptr<PetscMatrix<T>*, SparseMatrix<T> >(this->_matrix);
-
-    _mat = pmatrix->mat();
-  }
 
   int ierr = PCSetOperators(_pc,_mat,_mat,SAME_NONZERO_PATTERN);
   LIBMESH_CHKERRABORT(ierr);
@@ -104,10 +104,10 @@ template <typename T>
 void PetscPreconditioner<T>::clear()
 {
   if (_pc)
-  {
-    int ierr = LibMeshPCDestroy(&_pc);
-    LIBMESH_CHKERRABORT(ierr);
-  }
+    {
+      int ierr = LibMeshPCDestroy(&_pc);
+      LIBMESH_CHKERRABORT(ierr);
+    }
 }
 
 
@@ -124,99 +124,99 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
   Parallel::Communicator communicator(comm);
 
   switch (preconditioner_type)
-  {
-  case IDENTITY_PRECOND:
-    ierr = PCSetType (pc, (char*) PCNONE);      CHKERRABORT(comm,ierr); break;
-
-  case CHOLESKY_PRECOND:
-    ierr = PCSetType (pc, (char*) PCCHOLESKY);  CHKERRABORT(comm,ierr); break;
-
-  case ICC_PRECOND:
-    ierr = PCSetType (pc, (char*) PCICC);       CHKERRABORT(comm,ierr); break;
-
-  case ILU_PRECOND:
     {
-      // In serial, just set the ILU preconditioner type
-      if (communicator.size())
-        {
-          ierr = PCSetType (pc, (char*) PCILU);
-          CHKERRABORT(comm,ierr);
-        }
-      else
-        {
-          // But PETSc has no truly parallel ILU, instead you have to set
-          // an actual parallel preconditioner (e.g. block Jacobi) and then
-          // assign ILU sub-preconditioners.
-          ierr = PCSetType (pc, (char*) PCBJACOBI);
-          CHKERRABORT(comm,ierr);
+    case IDENTITY_PRECOND:
+      ierr = PCSetType (pc, (char*) PCNONE);      CHKERRABORT(comm,ierr); break;
 
-          // Set ILU as the sub preconditioner type
-          set_petsc_subpreconditioner_type(PCILU, pc);
-        }
-      break;
-    }
+    case CHOLESKY_PRECOND:
+      ierr = PCSetType (pc, (char*) PCCHOLESKY);  CHKERRABORT(comm,ierr); break;
 
-  case LU_PRECOND:
-    {
-      // In serial, just set the LU preconditioner type
-      if (communicator.size())
-        {
-          ierr = PCSetType (pc, (char*) PCLU);
-          CHKERRABORT(comm,ierr);
-        }
-      else
-        {
-          // But PETSc has no truly parallel LU, instead you have to set
-          // an actual parallel preconditioner (e.g. block Jacobi) and then
-          // assign LU sub-preconditioners.
-          ierr = PCSetType (pc, (char*) PCBJACOBI);
-          CHKERRABORT(comm,ierr);
+    case ICC_PRECOND:
+      ierr = PCSetType (pc, (char*) PCICC);       CHKERRABORT(comm,ierr); break;
 
-          // Set ILU as the sub preconditioner type
-          set_petsc_subpreconditioner_type(PCLU, pc);
-        }
-      break;
-    }
+    case ILU_PRECOND:
+      {
+        // In serial, just set the ILU preconditioner type
+        if (communicator.size())
+          {
+            ierr = PCSetType (pc, (char*) PCILU);
+            CHKERRABORT(comm,ierr);
+          }
+        else
+          {
+            // But PETSc has no truly parallel ILU, instead you have to set
+            // an actual parallel preconditioner (e.g. block Jacobi) and then
+            // assign ILU sub-preconditioners.
+            ierr = PCSetType (pc, (char*) PCBJACOBI);
+            CHKERRABORT(comm,ierr);
 
-  case ASM_PRECOND:
-    {
-      // In parallel, I think ASM uses ILU by default as the sub-preconditioner...
-      // I tried setting a different sub-preconditioner here, but apparently the matrix
-      // is not in the correct state (at this point) to call PCSetUp().
-      ierr = PCSetType (pc, (char*) PCASM);
-      CHKERRABORT(comm,ierr);
-      break;
-    }
+            // Set ILU as the sub preconditioner type
+            set_petsc_subpreconditioner_type(PCILU, pc);
+          }
+        break;
+      }
 
-  case JACOBI_PRECOND:
-    ierr = PCSetType (pc, (char*) PCJACOBI);    CHKERRABORT(comm,ierr); break;
+    case LU_PRECOND:
+      {
+        // In serial, just set the LU preconditioner type
+        if (communicator.size())
+          {
+            ierr = PCSetType (pc, (char*) PCLU);
+            CHKERRABORT(comm,ierr);
+          }
+        else
+          {
+            // But PETSc has no truly parallel LU, instead you have to set
+            // an actual parallel preconditioner (e.g. block Jacobi) and then
+            // assign LU sub-preconditioners.
+            ierr = PCSetType (pc, (char*) PCBJACOBI);
+            CHKERRABORT(comm,ierr);
 
-  case BLOCK_JACOBI_PRECOND:
-    ierr = PCSetType (pc, (char*) PCBJACOBI);   CHKERRABORT(comm,ierr); break;
+            // Set ILU as the sub preconditioner type
+            set_petsc_subpreconditioner_type(PCLU, pc);
+          }
+        break;
+      }
 
-  case SOR_PRECOND:
-    ierr = PCSetType (pc, (char*) PCSOR);       CHKERRABORT(comm,ierr); break;
+    case ASM_PRECOND:
+      {
+        // In parallel, I think ASM uses ILU by default as the sub-preconditioner...
+        // I tried setting a different sub-preconditioner here, but apparently the matrix
+        // is not in the correct state (at this point) to call PCSetUp().
+        ierr = PCSetType (pc, (char*) PCASM);
+        CHKERRABORT(comm,ierr);
+        break;
+      }
 
-  case EISENSTAT_PRECOND:
-    ierr = PCSetType (pc, (char*) PCEISENSTAT); CHKERRABORT(comm,ierr); break;
+    case JACOBI_PRECOND:
+      ierr = PCSetType (pc, (char*) PCJACOBI);    CHKERRABORT(comm,ierr); break;
 
-  case AMG_PRECOND:
-    ierr = PCSetType (pc, (char*) PCHYPRE);     CHKERRABORT(comm,ierr); break;
+    case BLOCK_JACOBI_PRECOND:
+      ierr = PCSetType (pc, (char*) PCBJACOBI);   CHKERRABORT(comm,ierr); break;
+
+    case SOR_PRECOND:
+      ierr = PCSetType (pc, (char*) PCSOR);       CHKERRABORT(comm,ierr); break;
+
+    case EISENSTAT_PRECOND:
+      ierr = PCSetType (pc, (char*) PCEISENSTAT); CHKERRABORT(comm,ierr); break;
+
+    case AMG_PRECOND:
+      ierr = PCSetType (pc, (char*) PCHYPRE);     CHKERRABORT(comm,ierr); break;
 
 #if !(PETSC_VERSION_LESS_THAN(2,1,2))
-    // Only available for PETSC >= 2.1.2
-  case USER_PRECOND:
-    ierr = PCSetType (pc, (char*) PCMAT);       CHKERRABORT(comm,ierr); break;
+      // Only available for PETSC >= 2.1.2
+    case USER_PRECOND:
+      ierr = PCSetType (pc, (char*) PCMAT);       CHKERRABORT(comm,ierr); break;
 #endif
 
-  case SHELL_PRECOND:
-    ierr = PCSetType (pc, (char*) PCSHELL);     CHKERRABORT(comm,ierr); break;
+    case SHELL_PRECOND:
+      ierr = PCSetType (pc, (char*) PCSHELL);     CHKERRABORT(comm,ierr); break;
 
-  default:
-    libMesh::err << "ERROR:  Unsupported PETSC Preconditioner: "
-                  << preconditioner_type       << std::endl
-                  << "Continuing with PETSC defaults" << std::endl;
-  }
+    default:
+      libMesh::err << "ERROR:  Unsupported PETSC Preconditioner: "
+                   << preconditioner_type       << std::endl
+                   << "Continuing with PETSC defaults" << std::endl;
+    }
 
   // Set additional options if we are doing AMG and
   // HYPRE is available
@@ -241,9 +241,9 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
 
 template <typename T>
 #if PETSC_VERSION_LESS_THAN(3,0,0)
- void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(PCType type, PC& pc)
+void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(PCType type, PC& pc)
 #else
- void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type, PC& pc)
+  void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type, PC& pc)
 #endif
 {
   // For catching PETSc error return codes
