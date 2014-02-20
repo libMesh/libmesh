@@ -190,10 +190,6 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
 
   const unsigned int n_training_samples = infile("n_training_samples",0);
   const bool deterministic_training = infile("deterministic_training",false);
-  std::string deterministic_training_parameter_name_in =
-    infile("deterministic_training_parameter_name","NONE");
-  const unsigned int deterministic_training_parameter_repeats_in =
-    infile("deterministic_training_parameter_repeats",1);
   const std::string alternative_solver_in =
     infile("rb_alternative_solver",alternative_solver);
   const bool reuse_preconditioner_in = infile("reuse_preconditioner",
@@ -212,51 +208,58 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
                                             training_tolerance);
 
   // Read in the parameters from the input file too
-  const unsigned int n_parameters = infile("n_parameters",1);
+  unsigned int n_continuous_parameters = infile.vector_variable_size("parameter_names");
   RBParameters mu_min_in;
   RBParameters mu_max_in;
-  RBParameters initial_mu_in;
-  for(unsigned int i=0; i<n_parameters; i++)
-    {
-      // Read in the parameter names
-      std::string param_name = infile("parameter_names", "NONE", i);
+  for(unsigned int i=0; i<n_continuous_parameters; i++)
+  {
+    // Read in the parameter names
+    std::string param_name = infile("parameter_names", "NONE", i);
 
-      for(unsigned int j=0; j<3; j++)
-        {
-          if(j==0)
-            {
-              Real min_val = infile(param_name, 0., j);
-              mu_min_in.set_value(param_name, min_val);
-            }
-          else if(j==1)
-            {
-              Real max_val = infile(param_name, 0., j);
-              mu_max_in.set_value(param_name, max_val);
-            }
-          else
-            {
-              Real init_val = infile(param_name, 0., j);
-              initial_mu_in.set_value(param_name, init_val);
-            }
-        }
+    {
+      Real min_val = infile(param_name, 0., 0);
+      mu_min_in.set_value(param_name, min_val);
     }
+
+    {
+      Real max_val = infile(param_name, 0., 1);
+      mu_max_in.set_value(param_name, max_val);
+    }
+  }
+  
+  std::map< std::string, std::vector<Real> > discrete_parameter_values_in;
+
+  unsigned int n_discrete_parameters = infile.vector_variable_size("discrete_parameter_names");
+  for(unsigned int i=0; i<n_discrete_parameters; i++)
+  {
+    std::string param_name = infile("discrete_parameter_names", "NONE", i);
+    
+    unsigned int n_vals_for_param = infile.vector_variable_size(param_name);
+    std::vector<Real> vals_for_param(n_vals_for_param);
+    for(unsigned int j=0; j<vals_for_param.size(); j++)
+    {
+      vals_for_param[j] = infile(param_name, 0., j);
+    }
+    
+    discrete_parameter_values_in[param_name] = vals_for_param;
+  }
 
   std::map<std::string,bool> log_scaling_in;
   RBParameters::const_iterator it     = mu_min_in.begin();
   RBParameters::const_iterator it_end = mu_min_in.end();
-  unsigned int i=0;
   for( ; it != it_end; ++it)
-    {
-      std::string param_name = it->first;
-      log_scaling_in[param_name] = static_cast<bool>(infile("log_scaling", 0, i));
-      i++;
-    }
+  {
+    std::string param_name = it->first;
+    
+    // For now, just set all entries to false.
+    // TODO: Implement a decent way to specify log-scaling true/false
+    // in the input text file
+    log_scaling_in[param_name] = false;
+  }
 
   // Set the parameters that have been read in
   set_rb_construction_parameters(n_training_samples,
                                  deterministic_training,
-                                 deterministic_training_parameter_name_in,
-                                 deterministic_training_parameter_repeats_in,
                                  alternative_solver_in,
                                  reuse_preconditioner_in,
                                  use_relative_bound_in_greedy_in,
@@ -267,34 +270,26 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
                                  training_tolerance_in,
                                  mu_min_in,
                                  mu_max_in,
-                                 initial_mu_in,
+                                 discrete_parameter_values_in,
                                  log_scaling_in);
 }
 
 void RBConstruction::set_rb_construction_parameters(
-                                                    unsigned int n_training_samples_in,
-                                                    bool deterministic_training_in,
-                                                    std::string deterministic_training_parameter_name_in,
-                                                    unsigned int deterministic_training_parameter_repeats_in,
-                                                    std::string alternative_solver_in,
-                                                    bool reuse_preconditioner_in,
-                                                    bool use_relative_bound_in_greedy_in,
-                                                    bool write_data_during_training_in,
-                                                    unsigned int training_parameters_random_seed_in,
-                                                    bool quiet_mode_in,
-                                                    unsigned int Nmax_in,
-                                                    Real training_tolerance_in,
-                                                    RBParameters mu_min_in,
-                                                    RBParameters mu_max_in,
-                                                    RBParameters initial_mu_in,
-                                                    std::map<std::string,bool> log_scaling_in)
+                                 unsigned int n_training_samples_in,
+                                 bool deterministic_training_in,
+                                 std::string alternative_solver_in,
+                                 bool reuse_preconditioner_in,
+                                 bool use_relative_bound_in_greedy_in,
+                                 bool write_data_during_training_in,
+                                 unsigned int training_parameters_random_seed_in,
+                                 bool quiet_mode_in,
+                                 unsigned int Nmax_in,
+                                 Real training_tolerance_in,
+                                 RBParameters mu_min_in,
+                                 RBParameters mu_max_in,
+                                 std::map< std::string, std::vector<Real> > discrete_parameter_values_in,
+                                 std::map<std::string,bool> log_scaling_in)
 {
-  // Even if deterministic_training==false, we may specify one deterministic parameter
-  set_deterministic_training_parameter_name(deterministic_training_parameter_name_in);
-
-  // We also need to specify how many times each sample of the deterministic parameter is "repeated"
-  set_deterministic_training_parameter_repeats(deterministic_training_parameter_repeats_in);
-
   // String which selects an alternate pc/solver combo for the update_residual_terms solves.
   // Possible values are:
   // "unchanged" -- use whatever we were using for truth solves
@@ -334,7 +329,7 @@ void RBConstruction::set_rb_construction_parameters(
   set_training_tolerance(training_tolerance_in);
 
   // Initialize the parameter ranges and the parameters themselves
-  initialize_parameters(mu_min_in, mu_max_in, initial_mu_in);
+  initialize_parameters(mu_min_in, mu_max_in, discrete_parameter_values_in);
 
   initialize_training_parameters(this->get_parameters_min(),
                                  this->get_parameters_max(),
@@ -353,33 +348,32 @@ void RBConstruction::print_info()
   if(training_tolerance > 0.)
     libMesh::out << "Basis training error tolerance: " << get_training_tolerance() << std::endl;
   if( is_rb_eval_initialized() )
-    {
-      libMesh::out << "Aq operators attached: " << get_rb_theta_expansion().get_n_A_terms() << std::endl;
-      libMesh::out << "Fq functions attached: " << get_rb_theta_expansion().get_n_F_terms() << std::endl;
-      libMesh::out << "n_outputs: " << get_rb_theta_expansion().get_n_outputs() << std::endl;
-      for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
-        libMesh::out << "output " << n << ", Q_l = " << get_rb_theta_expansion().get_n_output_terms(n) << std::endl;
-      libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
-    }
+  {
+    libMesh::out << "Aq operators attached: " << get_rb_theta_expansion().get_n_A_terms() << std::endl;
+    libMesh::out << "Fq functions attached: " << get_rb_theta_expansion().get_n_F_terms() << std::endl;
+    libMesh::out << "n_outputs: " << get_rb_theta_expansion().get_n_outputs() << std::endl;
+    for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
+      libMesh::out << "output " << n << ", Q_l = " << get_rb_theta_expansion().get_n_output_terms(n) << std::endl;
+  }
   else
-    {
-      libMesh::out << "RBThetaExpansion member is not set yet" << std::endl;
-    }
+  {
+    libMesh::out << "RBThetaExpansion member is not set yet" << std::endl;
+  }
+  libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
   RBParameters::const_iterator it     = get_parameters().begin();
   RBParameters::const_iterator it_end = get_parameters().end();
   for( ; it != it_end; ++it)
+  {
+    std::string param_name = it->first;
+    if(!is_discrete_parameter(param_name))
     {
-      std::string param_name = it->first;
       libMesh::out <<   "Parameter " << param_name
                    << ": Min = " << get_parameter_min(param_name)
-                   << ", Max = " << get_parameter_max(param_name)
-                   << ", value = " << get_parameters().get_value(param_name) << std::endl;
+                   << ", Max = " << get_parameter_max(param_name) << std::endl;
     }
+  }
+  print_discrete_parameter_values();
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
-  if( get_deterministic_training_parameter_name() != "NONE" )
-    {
-      libMesh::out << "using partially random training set, deterministic parameter is: " << get_deterministic_training_parameter_name() << std::endl;
-    }
   libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
   libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
