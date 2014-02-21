@@ -15,7 +15,7 @@ echo "# Do not edit - automatically generated from $0" > include_HEADERS
 
 
 echo "# These are headers we need to compile the libMesh library but should" >> include_HEADERS
-echo "# not be installed.  These header files may have implementation" >> include_HEADERS 
+echo "# not be installed.  These header files may have implementation" >> include_HEADERS
 echo "# details which are not required for the public interface" >> include_HEADERS
 
 echo -n "noinst_HEADERS = " >> include_HEADERS
