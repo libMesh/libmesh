@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/enum_convergence_flags.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_solver_type.h"
 #include "libmesh/enum_preconditioner_type.h"
@@ -43,7 +44,6 @@ template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
 template <typename T> class Preconditioner;
-
 
 /**
  * This class provides a uniform interface for linear solvers.  This base
@@ -224,8 +224,12 @@ public:
    * Prints a useful message about why the latest linear solve
    * con(di)verged.
    */
-  virtual void print_converged_reason() = 0;
-
+  virtual void print_converged_reason() const;
+  
+  /**
+   * Returns the solver's convergence flag
+   */
+  virtual LinearConvergenceReason get_converged_reason() const = 0;
 
 protected:
 
