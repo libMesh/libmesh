@@ -4,7 +4,7 @@
 
 #define VECTORMAPOBJECTTEST                     \
   CPPUNIT_TEST( testCreate );			\
-                                                \
+
 using namespace libMesh;
 
 class VectormapTest : public CppUnit::TestCase

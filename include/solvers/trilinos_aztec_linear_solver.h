@@ -138,10 +138,9 @@ public:
   Real get_initial_residual();
 
   /**
-   * Prints a useful message about why the latest linear solve
-   * con(di)verged.
+   * Returns the solver's convergence flag
    */
-  virtual void print_converged_reason();
+  virtual libMeshEnums::LinearConvergenceReason get_converged_reason() const;
 
 private:
 

@@ -60,6 +60,4 @@ namespace libMeshEnums {
 
 }
 
-using namespace libMeshEnums;
-
 #endif // LIBMESH_ENUM_CONVERGENCE_FLAGS

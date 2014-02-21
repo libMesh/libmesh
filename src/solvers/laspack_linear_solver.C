@@ -525,7 +525,7 @@ void LaspackLinearSolver<T>::print_converged_reason() const
 
 
 template <typename T>
-LinearConvergenceReason LaspackLinearSolver<T>::get_converged_reason() const
+libMeshEnums::LinearConvergenceReason LaspackLinearSolver<T>::get_converged_reason() const
 {
   libmesh_not_implemented();
 }

@@ -242,7 +242,7 @@ void EigenSparseLinearSolver<T>::print_converged_reason() const
 
 
 template <typename T>
-LinearConvergenceReason EigenSparseLinearSolver<T>::get_converged_reason() const
+libMeshEnums::LinearConvergenceReason EigenSparseLinearSolver<T>::get_converged_reason() const
 {
   libmesh_not_implemented();
 }

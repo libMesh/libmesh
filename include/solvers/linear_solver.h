@@ -225,11 +225,11 @@ public:
    * con(di)verged.
    */
   virtual void print_converged_reason() const;
-  
+
   /**
    * Returns the solver's convergence flag
    */
-  virtual LinearConvergenceReason get_converged_reason() const = 0;
+  virtual libMeshEnums::LinearConvergenceReason get_converged_reason() const = 0;
 
 protected:
 
