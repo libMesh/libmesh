@@ -1816,8 +1816,10 @@ libMeshEnums::LinearConvergenceReason PetscLinearSolver<T>::get_converged_reason
 
   switch(reason)
   {
+#if !PETSC_VERSION_LESS_THAN(3,2,0)
     case KSP_CONVERGED_RTOL_NORMAL     : return libMeshEnums::CONVERGED_RTOL_NORMAL;
     case KSP_CONVERGED_ATOL_NORMAL     : return libMeshEnums::CONVERGED_ATOL_NORMAL;
+#endif
     case KSP_CONVERGED_RTOL            : return libMeshEnums::CONVERGED_RTOL;
     case KSP_CONVERGED_ATOL            : return libMeshEnums::CONVERGED_ATOL;
     case KSP_CONVERGED_ITS             : return libMeshEnums::CONVERGED_ITS;
