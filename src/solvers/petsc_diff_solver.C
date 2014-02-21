@@ -256,7 +256,7 @@ void PetscDiffSolver::init ()
             idx = reinterpret_cast<PetscInt*>(&var_idx[0]);
 
           ierr = ISCreateLibMesh(this->comm().get(), var_idx.size(),
-                                 idx, PETSC_USE_POINTER, &is);
+                                 idx, PETSC_COPY_VALUES, &is);
           LIBMESH_CHKERRABORT(ierr);
 
           ierr = PCFieldSplitSetIS(my_pc, var_name.c_str(), is);
