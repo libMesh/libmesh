@@ -112,11 +112,10 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
   set_SCM_training_tolerance(SCM_training_tolerance_in);
 
   // Initialize the parameter ranges and the parameters themselves
-  const unsigned int n_parameters = infile("n_parameters",1);
+  unsigned int n_continuous_parameters = infile.vector_variable_size("parameter_names");
   RBParameters mu_min_in;
   RBParameters mu_max_in;
-  RBParameters initial_mu_in;
-  for(unsigned int i=0; i<n_parameters; i++)
+  for(unsigned int i=0; i<n_continuous_parameters; i++)
   {
     // Read in the parameter names
     std::string param_name = infile("parameter_names", "NONE", i);
