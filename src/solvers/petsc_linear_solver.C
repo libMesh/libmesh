@@ -400,11 +400,17 @@ PetscLinearSolver<T>::init_names (const System& sys)
 {
   PetscErrorCode ierr = 0;
 
+  if (libMesh::on_command_line("--solver_system_names"))
+    {
   KSP my_ksp = this->ksp();
-  PC my_pc = this->pc();
 
   ierr = KSPSetOptionsPrefix(my_ksp, (sys.name()+"_").c_str());
   LIBMESH_CHKERRABORT(ierr);
+    }
+
+  if (libMesh::on_command_line("--solver_variable_names"))
+    {
+      PC my_pc = this->pc();
 
   for (unsigned int v = 0; v != sys.n_vars(); ++v)
     {
@@ -425,6 +431,7 @@ PetscLinearSolver<T>::init_names (const System& sys)
 
       ierr = PCFieldSplitSetIS(my_pc, var_name.c_str(), is);
       LIBMESH_CHKERRABORT(ierr);
+    }
     }
 }
 

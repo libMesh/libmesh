@@ -223,8 +223,46 @@ void PetscDiffSolver::init ()
 #endif
   LIBMESH_CHKERRABORT(ierr);
 
+  if (libMesh::on_command_line("--solver_system_names"))
+    {
+      ierr = SNESSetOptionsPrefix(_snes, (_system.name()+"_").c_str());
+      LIBMESH_CHKERRABORT(ierr);
+    }
+
   ierr = SNESSetFromOptions(_snes);
   LIBMESH_CHKERRABORT(ierr);
+
+  if (libMesh::on_command_line("--solver_variable_names"))
+    {
+      KSP my_ksp;
+      ierr = SNESGetKSP(_snes, &my_ksp);
+      LIBMESH_CHKERRABORT(ierr);
+
+      PC my_pc;
+      ierr = KSPGetPC(my_ksp, &my_pc);
+      LIBMESH_CHKERRABORT(ierr);
+
+      for (unsigned int v = 0; v != _system.n_vars(); ++v)
+        {
+          const std::string& var_name = _system.variable_name(v);
+          std::vector<dof_id_type> var_idx;
+          _system.get_dof_map().local_variable_indices
+            (var_idx, _system.get_mesh(), v);
+
+          IS is;
+
+          PetscInt *idx = PETSC_NULL;
+          if (!var_idx.empty())
+            idx = reinterpret_cast<PetscInt*>(&var_idx[0]);
+
+          ierr = ISCreateLibMesh(this->comm().get(), var_idx.size(),
+                                 idx, PETSC_USE_POINTER, &is);
+          LIBMESH_CHKERRABORT(ierr);
+
+          ierr = PCFieldSplitSetIS(my_pc, var_name.c_str(), is);
+          LIBMESH_CHKERRABORT(ierr);
+        }
+    }
 
   STOP_LOG("init()", "PetscDiffSolver");
 }
@@ -254,6 +292,42 @@ void PetscDiffSolver::clear()
 void PetscDiffSolver::reinit()
 {
   Parent::reinit();
+
+  if (libMesh::on_command_line("--solver_variable_names"))
+    {
+      PetscInt ierr;
+      KSP my_ksp;
+      ierr = SNESGetKSP(_snes, &my_ksp);
+      LIBMESH_CHKERRABORT(ierr);
+
+      PC my_pc;
+      ierr = KSPGetPC(my_ksp, &my_pc);
+      LIBMESH_CHKERRABORT(ierr);
+
+
+
+      for (unsigned int v = 0; v != _system.n_vars(); ++v)
+        {
+          const std::string& var_name = _system.variable_name(v);
+          std::vector<dof_id_type> var_idx;
+          _system.get_dof_map().local_variable_indices
+            (var_idx, _system.get_mesh(), v);
+
+          IS is;
+
+          PetscInt *idx = PETSC_NULL;
+          if (!var_idx.empty())
+            idx = reinterpret_cast<PetscInt*>(&var_idx[0]);
+
+          ierr = ISCreateLibMesh(this->comm().get(), var_idx.size(),
+                                 idx, PETSC_USE_POINTER, &is);
+          LIBMESH_CHKERRABORT(ierr);
+
+          ierr = PCFieldSplitSetIS(my_pc, var_name.c_str(), is);
+          LIBMESH_CHKERRABORT(ierr);
+        }
+    }
+
 }
 
 
