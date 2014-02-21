@@ -398,11 +398,13 @@ template <typename T>
 void
 PetscLinearSolver<T>::init_names (const System& sys)
 {
+  PetscErrorCode ierr = 0;
+
   KSP my_ksp = this->ksp();
   PC my_pc = this->pc();
 
-  std::string prefix = sys.name()+"_";
-  KSPSetOptionsPrefix(my_ksp, prefix.c_str());
+  ierr = KSPSetOptionsPrefix(my_ksp, (sys.name()+"_").c_str());
+  LIBMESH_CHKERRABORT(ierr);
 
   for (unsigned int v = 0; v != sys.n_vars(); ++v)
     {
@@ -411,7 +413,6 @@ PetscLinearSolver<T>::init_names (const System& sys)
       sys.get_dof_map().local_variable_indices
         (var_idx, sys.get_mesh(), v);
 
-      PetscErrorCode ierr = 0;
       IS is;
 
       PetscInt *idx = PETSC_NULL;
