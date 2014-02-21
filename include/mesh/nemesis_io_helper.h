@@ -297,7 +297,9 @@ public:
   /**
    * Takes a solution vector containing the solution for all variables and outputs it to the files
    */
-  void write_nodal_solution(const std::vector<Number> & values, const std::vector<std::string> names, int timestep);
+  void write_nodal_solution(const std::vector<Number>& values,
+                            const std::vector<std::string>& names,
+                            int timestep);
 
   /**
    * Given base_filename, foo.e, constructs the Nemesis filename

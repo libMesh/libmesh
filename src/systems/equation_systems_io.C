@@ -51,15 +51,15 @@ std::string local_file_name (const unsigned int processor_id,
   if (basename.size() - basename.rfind(".bz2") == 4)
     {
       basename.erase(basename.end()-4, basename.end());
-      std::sprintf(buf, "%s.%04d.bz2", basename.c_str(), processor_id);
+	std::sprintf(buf, "%s.%04u.bz2", basename.c_str(), processor_id);
     }
   else if (basename.size() - basename.rfind(".gz") == 3)
     {
       basename.erase(basename.end()-3, basename.end());
-      std::sprintf(buf, "%s.%04d.gz", basename.c_str(), processor_id);
+	std::sprintf(buf, "%s.%04u.gz", basename.c_str(), processor_id);
     }
   else
-    std::sprintf(buf, "%s.%04d", basename.c_str(), processor_id);
+      std::sprintf(buf, "%s.%04u", basename.c_str(), processor_id);
 
   return std::string(buf);
 }
@@ -489,9 +489,6 @@ void EquationSystems::write(const std::string& name,
     std::map<std::string, System*>::const_iterator
       pos = _systems.begin();
 
-    std::string comment;
-    char buf[256];
-
     // set the version number in the Xdr object
     io.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
                                       LIBMESH_MINOR_VERSION,
@@ -501,6 +498,9 @@ void EquationSystems::write(const std::string& name,
     // if we are processor 0.
     if (proc_id == 0)
       {
+        std::string comment;
+        char buf[256];
+
         // 1.)
         // Write the version header
         std::string version("libMesh-" + libMesh::get_io_compatibility_version());
@@ -524,7 +524,7 @@ void EquationSystems::write(const std::string& name,
               std::string sys_name       = pos->first;
 
               comment =  "# Name, System No. ";
-              std::sprintf(buf, "%d", sys_num);
+	      std::sprintf(buf, "%u", sys_num);
               comment += buf;
 
               io.data (sys_name, comment.c_str());
@@ -537,7 +537,7 @@ void EquationSystems::write(const std::string& name,
               std::string sys_type       = pos->second->system_type();
 
               comment =  "# Type, System No. ";
-              std::sprintf(buf, "%d", sys_num);
+	      std::sprintf(buf, "%u", sys_num);
               comment += buf;
 
               io.data (sys_type, comment.c_str());

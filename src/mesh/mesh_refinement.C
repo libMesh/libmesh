@@ -1334,10 +1334,6 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
   else
     _maintain_level_one = _face_level_mismatch_limit;
 
-  // Unless we encounter a specific situation level-one
-  // will be satisfied after executing this loop just once
-  bool level_one_satisfied = true;
-
   // Unless we encounter a specific situation we will be compatible
   // with any selected coarsening flags
   bool compatible_with_coarsening = true;
@@ -1346,6 +1342,10 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
   // execute it if the user indeed wants level-1 satisfied!
   if (_maintain_level_one)
     {
+      // Unless we encounter a specific situation level-one
+      // will be satisfied after executing this loop just once
+      bool level_one_satisfied = true;
+
       do
         {
           level_one_satisfied = true;
@@ -1409,10 +1409,12 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
                           // Sanity check. We should never get into a
                           // case when our neighbot is more than one
                           // level away.
+                        /* // We libmesh_error() in the next case anyway
                           else if ((neighbor->level()+1) < my_level)
                             {
                               libmesh_error();
                             }
+                        */
 
 
                           // Note that the only other possibility is that the

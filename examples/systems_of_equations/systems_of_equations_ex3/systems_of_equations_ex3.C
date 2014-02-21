@@ -247,10 +247,10 @@ int main (int argc, char** argv)
 
         } // end nonlinear loop
 
+#ifdef LIBMESH_HAVE_EXODUS_API
       // Write out every nth timestep to file.
       const unsigned int write_interval = 1;
 
-#ifdef LIBMESH_HAVE_EXODUS_API
       if ((t_step+1)%write_interval == 0)
         {
           std::ostringstream file_name;

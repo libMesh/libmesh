@@ -1281,6 +1281,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
           ierr = MatMult(submat1,subvec1,subvec2);
           LIBMESH_CHKERRABORT(ierr);
           ierr = VecAXPY(subrhs,1.0,subvec2);
+	  LIBMESH_CHKERRABORT(ierr);
 
           ierr = LibMeshVecScatterDestroy(&scatter1);
           LIBMESH_CHKERRABORT(ierr);
@@ -1564,6 +1565,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
           ierr = MatMult(submat1,subvec1,subvec2);
           LIBMESH_CHKERRABORT(ierr);
           ierr = VecAXPY(subrhs,1.0,subvec2);
+	  LIBMESH_CHKERRABORT(ierr);
 
           ierr = LibMeshVecScatterDestroy(&scatter1);
           LIBMESH_CHKERRABORT(ierr);

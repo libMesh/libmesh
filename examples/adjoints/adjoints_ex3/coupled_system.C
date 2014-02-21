@@ -40,25 +40,25 @@ class BdyFunction : public FunctionBase<Number>
 public:
   BdyFunction (unsigned int u_var, unsigned int v_var, int sign)
     : _u_var(u_var), _v_var(v_var), _sign(sign)
-  { this->_initialized = true; }
+    { this->_initialized = true; }
 
   virtual Number operator() (const Point&, const Real = 0)
-  { libmesh_not_implemented(); }
+    { libmesh_not_implemented(); }
 
   virtual void operator() (const Point& p,
                            const Real,
                            DenseVector<Number>& output)
-  {
-    output.resize(2);
-    output.zero();
-    const Real y=p(1);
-    // Set the parabolic inflow boundary conditions at stations 0 & 1
-    output(_u_var) = (_sign)*((y-2) * (y-3));
-    output(_v_var) = 0;
-  }
+    {
+      output.resize(2);
+      output.zero();
+      const Real y=p(1);
+      // Set the parabolic inflow boundary conditions at stations 0 & 1
+      output(_u_var) = (_sign)*((y-2) * (y-3));
+      output(_v_var) = 0;
+    }
 
   virtual AutoPtr<FunctionBase<Number> > clone() const
-  { return AutoPtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _sign)); }
+    { return AutoPtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _sign)); }
 
 private:
   const unsigned int _u_var, _v_var;
@@ -146,7 +146,7 @@ void CoupledSystem::init_data ()
 
   // On the walls we will apply the no slip and no penetration boundary condition, u=0, v=0
   this->get_dof_map().add_dirichlet_boundary
-    (DirichletBoundary (wall_bdy, uv, &zero));
+        (DirichletBoundary (wall_bdy, uv, &zero));
 
   // On the inlet (left), we apply parabolic inflow boundary conditions for the velocity, u = - (y-2)*(y-3), v=0
   // and set C = 1
@@ -199,7 +199,7 @@ void CoupledSystem::init_context(DiffContext &context)
 
 
 bool CoupledSystem::element_time_derivative (bool request_jacobian,
-                                             DiffContext &context)
+                                            DiffContext &context)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
@@ -275,17 +275,17 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
         {
 	  // Stokes equations residuals
           Fu(i) += JxW[qp] *
-            (p*dphi[i][qp](0) -                // pressure term
-             (grad_u*dphi[i][qp]));            // diffusion term
+                   (p*dphi[i][qp](0) -                // pressure term
+		    (grad_u*dphi[i][qp]));            // diffusion term
 
           Fv(i) += JxW[qp] *
-            (p*dphi[i][qp](1) -                // pressure term
-             (grad_v*dphi[i][qp]));            // diffusion term
+                   (p*dphi[i][qp](1) -                // pressure term
+		    (grad_v*dphi[i][qp]));            // diffusion term
 
 	  // Concentration Equation Residual
 	  FC(i) += JxW[qp] *
-            ( (U*grad_C)*phi[i][qp] +                // convection term
-              (1./Peclet)*(grad_C*dphi[i][qp]) );     // diffusion term
+	           ( (U*grad_C)*phi[i][qp] +                // convection term
+	            (1./Peclet)*(grad_C*dphi[i][qp]) );     // diffusion term
 
           // Note that the Fp block is identically zero unless we are using
           // some kind of artificial compressibility scheme...
@@ -306,8 +306,8 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
 		  KCv(i,j) += JxW[qp]*( (phi[j][qp]*C_y)*phi[i][qp] );  /* convection term */
 
 		  KCC(i,j) += JxW[qp]*
-                    ( (U*dphi[j][qp])*phi[i][qp] +      /* nonlinear term (convection) */
-                      (1./Peclet)*(dphi[j][qp]*dphi[i][qp]) ); /* diffusion term */
+		              ( (U*dphi[j][qp])*phi[i][qp] +      /* nonlinear term (convection) */
+		              (1./Peclet)*(dphi[j][qp]*dphi[i][qp]) ); /* diffusion term */
 		}
 
 	      // Matrix contributions for the up and vp couplings.
@@ -321,12 +321,12 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
 
     } // end of the quadrature point qp-loop
 
-  return request_jacobian;
+      return request_jacobian;
 }
 
 
 bool CoupledSystem::element_constraint (bool request_jacobian,
-                                        DiffContext &context)
+                                       DiffContext &context)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
@@ -368,7 +368,7 @@ bool CoupledSystem::element_constraint (bool request_jacobian,
       for (unsigned int i=0; i != n_p_dofs; i++)
         {
           Fp(i) += JxW[qp] * psi[i][qp] *
-            (grad_u(0) + grad_v(1));
+                   (grad_u(0) + grad_v(1));
 
           if (request_jacobian && c.elem_solution_derivative)
             {
@@ -390,8 +390,6 @@ void CoupledSystem::postprocess()
 {
   // We need to overload the postprocess function to set the computed_QoI variable of the CoupledSystem class
   // to the qoi value stored in System::qoi[0]
-
-  computed_QoI = 0.0;
 
   computed_QoI = System::qoi[0];
 }

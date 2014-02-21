@@ -69,7 +69,7 @@ Nemesis_IO_Helper::~Nemesis_IO_Helper()
   // Our destructor is called from Nemesis_IO.  We close the Exodus file here since we have
   // responsibility for managing the file's lifetime.
   this->ex_err = exII::ex_update(this->ex_id);
-  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+  EX_EXCEPTIONLESS_CHECK_ERR(ex_err, "Error flushing buffers to file.");
   this->close();
 }
 
@@ -1354,15 +1354,10 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
 
 void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
 {
-  std::set<boundary_id_type> local_side_boundary_ids;
-
   // 1.) Get reference to the set of side boundary IDs
   std::set<boundary_id_type> global_side_boundary_ids
     (pmesh.boundary_info->get_side_boundary_ids().begin(),
      pmesh.boundary_info->get_side_boundary_ids().end());
-
-  // Save this set of local boundary side IDs for later
-  local_side_boundary_ids = global_side_boundary_ids;
 
   // 2.) Gather boundary side IDs from other processors
   this->comm().set_union(global_side_boundary_ids);
@@ -2418,7 +2413,10 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh)
 
 
 
-void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values, const std::vector<std::string> names, int timestep)
+void Nemesis_IO_Helper::write_nodal_solution
+  (const std::vector<Number>& values,
+   const std::vector<std::string>& names,
+   int timestep)
 {
   int num_vars = names.size();
   //int num_values = values.size(); // Not used?

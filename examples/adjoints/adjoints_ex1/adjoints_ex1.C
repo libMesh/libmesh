@@ -93,9 +93,9 @@ void write_output(EquationSystems &es,
 		  unsigned int a_step,       // The adaptive step count
 		  std::string solution_type) // primal or adjoint solve
 {
+#ifdef LIBMESH_HAVE_GMV
   MeshBase &mesh = es.get_mesh();
 
-#ifdef LIBMESH_HAVE_GMV
   std::ostringstream file_name_gmv;
   file_name_gmv << solution_type
                 << ".out.gmv."

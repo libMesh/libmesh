@@ -814,8 +814,6 @@ void ProjectVector::operator()(const ConstElemRange &range) const
 
       // The global DOF indices
       std::vector<dof_id_type> new_dof_indices, old_dof_indices;
-      // Side/edge local DOF indices
-      std::vector<unsigned int> new_side_dofs, old_side_dofs;
 
       // Iterate over the elements in the range
       for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)

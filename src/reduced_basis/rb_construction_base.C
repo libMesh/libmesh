@@ -808,7 +808,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       std::map<std::string, NumericVector<Number>*>::iterator new_it = training_parameters_in.begin();
 
       NumericVector<Number>* training_vector_0 = new_it->second;
-      new_it++;
+    ++new_it;
       NumericVector<Number>* training_vector_1 = new_it->second;
 
       for(unsigned int index1=0; index1<n_training_parameters_per_var; index1++)
@@ -872,15 +872,16 @@ RBConstructionBase<Base>::set_alternative_solver
   const PCType orig_petsc_pc_type;
   const KSPType orig_petsc_ksp_type;
 #endif
-  int ierr = 0;
 
   if (petsc_linear_solver)
     {
       PC pc = petsc_linear_solver->pc();
-      ierr = PCGetType(pc, &orig_petsc_pc_type); LIBMESH_CHKERRABORT(ierr);
+      int ierr = PCGetType(pc, &orig_petsc_pc_type);
+      LIBMESH_CHKERRABORT(ierr);
 
       KSP ksp = petsc_linear_solver->ksp();
-      ierr = KSPGetType(ksp, &orig_petsc_ksp_type); LIBMESH_CHKERRABORT(ierr);
+      ierr = KSPGetType(ksp, &orig_petsc_ksp_type);
+      LIBMESH_CHKERRABORT(ierr);
 
       // libMesh::out << "orig_petsc_pc_type (before)=" << orig_petsc_pc_type << std::endl;
       // Make actual copies of the original PC and KSP types
@@ -892,8 +893,10 @@ RBConstructionBase<Base>::set_alternative_solver
       if (this->alternative_solver == "amg")
         {
           // Set HYPRE and boomeramg PC types
-          ierr = PCSetType(pc, PCHYPRE); LIBMESH_CHKERRABORT(ierr);
-          ierr = PCHYPRESetType(pc, "boomeramg"); LIBMESH_CHKERRABORT(ierr);
+	  ierr = PCSetType(pc, PCHYPRE);
+          LIBMESH_CHKERRABORT(ierr);
+	  ierr = PCHYPRESetType(pc, "boomeramg");
+          LIBMESH_CHKERRABORT(ierr);
         }
 #endif // LIBMESH_HAVE_PETSC_HYPRE
       if (this->alternative_solver == "mumps")
@@ -906,13 +909,16 @@ RBConstructionBase<Base>::set_alternative_solver
           // converge in 1 iteration.  Otherwise, to use KSPPREONLY,
           // you may need to do:
           // KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
-          // ierr = KSPSetType(ksp, KSPPREONLY); LIBMESH_CHKERRABORT(ierr);
+	  // ierr = KSPSetType(ksp, KSPPREONLY);
+          // LIBMESH_CHKERRABORT(ierr);
 
           // Need to call the equivalent for the command line options:
           // -ksp_type preonly -pc_type lu -pc_factor_mat_solver_package mumps
-          ierr = PCSetType(pc, PCLU); LIBMESH_CHKERRABORT(ierr);
+	  ierr = PCSetType(pc, PCLU);
+          LIBMESH_CHKERRABORT(ierr);
 #if !(PETSC_VERSION_LESS_THAN(3,0,0))
-          ierr = PCFactorSetMatSolverPackage(pc,"mumps"); LIBMESH_CHKERRABORT(ierr);
+	  ierr = PCFactorSetMatSolverPackage(pc,"mumps");
+          LIBMESH_CHKERRABORT(ierr);
 #endif
         }
     }
@@ -951,17 +957,19 @@ void RBConstructionBase<Base>::reset_alternative_solver(
       PetscLinearSolver<Number>* petsc_linear_solver =
         libmesh_cast_ptr<PetscLinearSolver<Number>*>(ls.get());
 
-      int ierr = 0;
       PC pc;
       KSP ksp;
 
       if (petsc_linear_solver)
         {
+          int ierr = 0;
           pc = petsc_linear_solver->pc();
-          ierr = PCSetType(pc, orig.first.c_str()); LIBMESH_CHKERRABORT(ierr);
+	  ierr = PCSetType(pc, orig.first.c_str());
+          LIBMESH_CHKERRABORT(ierr);
 
           ksp = petsc_linear_solver->ksp();
-          ierr = KSPSetType(ksp, orig.second.c_str()); LIBMESH_CHKERRABORT(ierr);
+	  ierr = KSPSetType(ksp, orig.second.c_str());
+          LIBMESH_CHKERRABORT(ierr);
         }
     }
 
@@ -1012,7 +1020,9 @@ void RBConstructionBase<Base>::set_training_random_seed(unsigned int seed)
 }
 
 template <class Base>
-void RBConstructionBase<Base>::set_deterministic_training_parameter_name(const std::string name_in)
+void
+RBConstructionBase<Base>::set_deterministic_training_parameter_name
+  (const std::string& name_in)
 {
   this->_deterministic_training_parameter_name = name_in;
 }

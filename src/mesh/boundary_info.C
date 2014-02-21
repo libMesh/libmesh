@@ -167,7 +167,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
    * every processor we'll serialize the interior mesh.  Use a
    * temporary serializer here.
    */
-  MeshSerializer(const_cast<MeshBase&>(_mesh), boundary_mesh.is_serial());
+  MeshSerializer serializer
+    (const_cast<MeshBase&>(_mesh), boundary_mesh.is_serial());
 
   /**
    * The boundary mesh elements will be one lower dimension than the
@@ -874,6 +875,7 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
   const Elem* searched_elem = elem;
+#ifdef LIBMESH_ENABLE_AMR
   if (elem->level() != 0)
     {
       // Find all the sides that contain edge. If one of those is a boundary
@@ -893,7 +895,6 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
             }
         }
 
-#ifdef LIBMESH_ENABLE_AMR
       if(!found_boundary_edge)
         {
           // Child element is not on external edge, but it may have internal
@@ -908,8 +909,8 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem* const
               searched_elem = parent;
             }
         }
-#endif
     }
+#endif
 
   std::pair<std::multimap<const Elem*,
     std::pair<unsigned short int, boundary_id_type> >::const_iterator,
@@ -942,6 +943,7 @@ unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem* const elem,
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
   const Elem* searched_elem = elem;
+#ifdef LIBMESH_ENABLE_AMR
   if (elem->level() != 0)
     {
       // Find all the sides that contain edge. If one of those is a boundary
@@ -961,7 +963,6 @@ unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem* const elem,
             }
         }
 
-#ifdef LIBMESH_ENABLE_AMR
       if(!found_boundary_edge)
         {
           // Child element is not on external edge, but it may have internal
@@ -976,8 +977,8 @@ unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem* const elem,
               searched_elem = parent;
             }
         }
-#endif
     }
+#endif
 
   std::pair<std::multimap<const Elem*,
     std::pair<unsigned short int, boundary_id_type> >::const_iterator,

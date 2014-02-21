@@ -185,7 +185,7 @@ inline void pack_vector_bool(const std::vector<bool> &in,
 {
   unsigned int data_bits = 8*sizeof(T);
   std::size_t in_size = in.size();
-  std::size_t out_size = in_size/data_bits + (in_size%data_bits?1:0);
+  std::size_t out_size = in_size/data_bits + ((in_size%data_bits)?1:0);
   out.clear();
   out.resize(out_size);
   for (std::size_t i=0; i != in_size; ++i)

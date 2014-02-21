@@ -38,7 +38,7 @@ void PltLoader::read (const std::string& name)
   if (!in.good())
     {
       libMesh::err << "Error reading input file " << name
-                   << std::endl;
+                    << std::endl;
 
       libmesh_error();
     }
@@ -46,18 +46,18 @@ void PltLoader::read (const std::string& name)
 
   if (this->verbose())
     libMesh::out << std::endl
-                 << "Reading input file " << name
-                 << std::endl
-                 << "-------------------------------------------------------------------------"
-                 << std::endl;
+                  << "Reading input file " << name
+                  << std::endl
+                  << "-------------------------------------------------------------------------"
+                  << std::endl;
 
   this->read_header (in);
   this->read_data   (in);
 
   if (this->verbose())
     libMesh::out << std::endl
-                 << "-------------------------------------------------------------------------"
-                 << std::endl;
+                  << "-------------------------------------------------------------------------"
+                  << std::endl;
 
 }
 
@@ -82,8 +82,8 @@ void PltLoader::read_header (std::istream& in)
 
     if (this->verbose())
       libMesh::out << "Tecplot Version: "
-                   << this->version()
-                   << std::endl;
+                    << this->version()
+                    << std::endl;
   }
 
 
@@ -93,7 +93,7 @@ void PltLoader::read_header (std::istream& in)
     {
       if (this->verbose())
         libMesh::out << "Reading legacy .plt format (<= v9) ..."
-                     << std::endl;
+                      << std::endl;
 
       // Read the value of 1 to determine byte ordering
       {
@@ -105,7 +105,7 @@ void PltLoader::read_header (std::istream& in)
           {
             if (this->verbose())
               libMesh::out << "Tecplot data is Foreign!"
-                           << std::endl;
+                            << std::endl;
             this->is_foreign() = true;
 
             // Make sure one reversed is one
@@ -199,7 +199,7 @@ void PltLoader::read_header (std::istream& in)
             if (!in.good())
               {
                 libMesh::err << "ERROR: Unexpected end-of-file!"
-                             << std::endl;
+                              << std::endl;
                 libmesh_error();
               }
 
@@ -299,7 +299,7 @@ void PltLoader::read_header (std::istream& in)
     {
       if (this->verbose())
         libMesh::out << "Reading new .plt format (>= v10)..."
-                     << std::endl;
+                      << std::endl;
 
       // Read the value of 1 to determine byte ordering
       {
@@ -312,7 +312,7 @@ void PltLoader::read_header (std::istream& in)
           {
             if (this->verbose())
               libMesh::err << "Tecplot data is Foreign!"
-                           << std::endl;
+                            << std::endl;
             this->is_foreign() = true;
 
             // Make sure one reversed is one
@@ -381,7 +381,7 @@ void PltLoader::read_header (std::istream& in)
       // marker (357.) is found.
       int nz=0;
       std::vector<std::string> zname;
-      std::vector<int>         zpack, ztype, zimax, zjmax, zkmax, znelem, znnodes;
+      std::vector<int>         zpack, ztype, zimax, zjmax, zkmax;
 
       {
         float f=0.;
@@ -405,7 +405,7 @@ void PltLoader::read_header (std::istream& in)
             if (!in.good())
               {
                 libMesh::err << "ERROR: Unexpected end-of-file!"
-                             << std::endl;
+                              << std::endl;
                 libmesh_error();
               }
 
@@ -478,7 +478,7 @@ void PltLoader::read_header (std::istream& in)
                         std::memcpy  (&vl, buf, LIBMESH_SIZEOF_INT);
                         rb(vl);
                         libmesh_assert_equal_to (vl, 0); // Only know about node-based data
-                        // right now
+                                          // right now
                       }
 
                 }
@@ -562,9 +562,9 @@ void PltLoader::read_header (std::istream& in)
   else
     {
       libMesh::err << "ERROR:  This plot file was written by an unrecognized version of Tecplot!:"
-                   << std::endl
-                   << this->version()
-                   << std::endl;
+                    << std::endl
+                    << this->version()
+                    << std::endl;
       libmesh_error();
     }
 
@@ -579,7 +579,7 @@ void PltLoader::read_header (std::istream& in)
   if (this->verbose())
     {
       libMesh::out << "Tecplot Header: "
-                   << this->title() << std::endl;
+                    << this->title() << std::endl;
 
       libMesh::out << "Variables: ";
       for (unsigned int v=0; v<this->n_vars(); v++)
@@ -609,10 +609,10 @@ void PltLoader::read_header (std::istream& in)
       libMesh::out << "Zone Dimensions: " << std::endl;
       for (unsigned int z=0; z<this->n_zones(); z++)
         libMesh::out << "  ("
-                     << this->imax(z) << ","
-                     << this->jmax(z) << ","
-                     << this->kmax(z) << ")"
-                     << std::endl;
+                  << this->imax(z) << ","
+                  << this->jmax(z) << ","
+                  << this->kmax(z) << ")"
+                  << std::endl;
     }
 }
 
@@ -663,7 +663,7 @@ void PltLoader::read_data (std::istream& in)
           if (!in.good())
             {
               libMesh::err << "ERROR: Unexpected end-of-file!"
-                           << std::endl;
+                            << std::endl;
               libmesh_error();
             }
 
@@ -682,7 +682,7 @@ void PltLoader::read_data (std::istream& in)
             for (unsigned int v=0; v<n_rep_vars; v++)
               {
                 libMesh::err << "ERROR:  I don't understand repeated variables yet!"
-                             << std::endl;
+                              << std::endl;
                 libmesh_error();
 
                 in.read (buf, LIBMESH_SIZEOF_INT);
@@ -730,10 +730,10 @@ void PltLoader::read_data (std::istream& in)
                 if (this->verbose())
 
                   libMesh::out << "Zone " << zone << ":" << std::endl
-                               << "  nnodes   =" << this->imax(zone) << std::endl
-                               << "  nelem    =" << this->jmax(zone) << std::endl
-                               << "  elem_type=" << this->kmax(zone) << std::endl
-                               << std::endl;
+                            << "  nnodes   =" << this->imax(zone) << std::endl
+                            << "  nelem    =" << this->jmax(zone) << std::endl
+                            << "  elem_type=" << this->kmax(zone) << std::endl
+                            << std::endl;
                 break;
               }
 
@@ -747,8 +747,8 @@ void PltLoader::read_data (std::istream& in)
             default:
               {
                 libMesh::err << "ERROR: Unsupported Zone type: "
-                             << this->zone_type(zone)
-                             << std::endl;
+                              << this->zone_type(zone)
+                              << std::endl;
                 libmesh_error();
               }
             } // end switch on zone type
@@ -775,7 +775,7 @@ void PltLoader::read_data (std::istream& in)
           if (!in.good())
             {
               libMesh::err << "ERROR: Unexpected end-of-file!"
-                           << std::endl;
+                            << std::endl;
               libmesh_error();
             }
 
@@ -809,7 +809,7 @@ void PltLoader::read_data (std::istream& in)
                     if (sv != -1)
                       {
                         libMesh::err << "ERROR:  I don't understand variable sharing!"
-                                     << std::endl;
+                                      << std::endl;
                         libmesh_error();
                       }
                   }
@@ -830,7 +830,7 @@ void PltLoader::read_data (std::istream& in)
           // Read the data.
           if (this->zone_type(zone) == ORDERED)
             {
-              // Block-based data.  Structured meshes.
+                // Block-based data.  Structured meshes.
               if (this->zone_pack(zone) == 0)
                 this->read_block_data (in, zone);
 
@@ -863,9 +863,9 @@ void PltLoader::read_data (std::istream& in)
       else
         {
           libMesh::err << "ERROR:  This plot file was written by an unrecognized version of Tecplot!:"
-                       << std::endl
-                       << this->version()
-                       << std::endl;
+                        << std::endl
+                        << this->version()
+                        << std::endl;
           libmesh_error();
         }
 
@@ -933,8 +933,8 @@ void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
         default:
           {
             libMesh::err << "ERROR: Unsupported data type: "
-                         << this->var_type(var)
-                         << std::endl;
+                          << this->var_type(var)
+                          << std::endl;
             libmesh_error();
           }
         }
@@ -993,8 +993,8 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
           else
             {
               libMesh::err << "ERROR: unsupported data type: "
-                           << this->var_type(var)
-                           << std::endl;
+                            << this->var_type(var)
+                            << std::endl;
               libmesh_error();
             }
 }
@@ -1051,8 +1051,8 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
         default:
           {
             libMesh::err << "ERROR: Unsupported data type: "
-                         << this->var_type(var)
-                         << std::endl;
+                          << this->var_type(var)
+                          << std::endl;
             libmesh_error();
           }
         }
@@ -1068,7 +1068,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
     if (rep == 1 && this->n_zones() > 1)
       {
         libMesh::err << "ERROR:  Repeated connectivity not supported!"
-                     << std::endl;
+                      << std::endl;
         libmesh_error();
       }
 
@@ -1136,8 +1136,8 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
       else
         {
           libMesh::err << "ERROR: unsupported data type: "
-                       << this->var_type(var)
-                       << std::endl;
+                        << this->var_type(var)
+                        << std::endl;
           libmesh_error();
         }
 
@@ -1152,7 +1152,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
     if (rep == 1)
       {
         libMesh::err << "ERROR:  Repeated connectivity not supported!"
-                     << std::endl;
+                      << std::endl;
         libmesh_error();
       }
 

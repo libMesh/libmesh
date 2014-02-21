@@ -281,7 +281,7 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
   // Create a vector to temporarily hold the results of MPI_Gatherv
   // calls.  The vector dest  may be saved away to _my_bin depending on which
   // processor is being MPI_Gatherv'd.
-  std::vector<Hilbert::HilbertIndices> sendbuf, dest;
+  std::vector<Hilbert::HilbertIndices> dest;
 
   unsigned int local_offset = 0;
 

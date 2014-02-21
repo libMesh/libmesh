@@ -453,6 +453,11 @@ int main (int argc, char** argv)
 {
   LibMeshInit init(argc, argv);
 
+  // Skip adaptive examples on a non-adaptive libMesh build
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_example_assert(false, "--enable-amr");
+#else
+
   //Parse the input file
   GetPot input_file("miscellaneous_ex5.in");
 
@@ -472,10 +477,6 @@ int main (int argc, char** argv)
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
 
-  // Skip adaptive examples on a non-adaptive libMesh build
-#ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
-#else
 
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.

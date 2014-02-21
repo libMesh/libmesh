@@ -352,7 +352,8 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
   STOP_LOG("write_offline_data_to_files()", "RBEIMEvaluation");
 }
 
-void RBEIMEvaluation::write_out_interpolation_points_elem(const std::string directory_name)
+void RBEIMEvaluation::write_out_interpolation_points_elem
+  (const std::string& directory_name)
 {
   _interpolation_points_mesh.clear();
 
@@ -590,7 +591,8 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   STOP_LOG("read_offline_data_from_files()", "RBEIMEvaluation");
 }
 
-void RBEIMEvaluation::read_in_interpolation_points_elem(const std::string directory_name)
+void RBEIMEvaluation::read_in_interpolation_points_elem
+  (const std::string& directory_name)
 {
   _interpolation_points_mesh.read(directory_name + "/interpolation_points_mesh.xda");
 

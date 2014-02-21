@@ -310,10 +310,10 @@ void InverseDistanceInterpolation<KDDim>::interpolate_field_data (const std::vec
 
   tgt_vals.resize (tgt_pts.size()*this->n_field_variables());
 
-  std::vector<Number>::iterator out_it = tgt_vals.begin();
-
 #ifdef LIBMESH_HAVE_NANOFLANN
   {
+      std::vector<Number>::iterator out_it = tgt_vals.begin();
+
     const size_t num_results = std::min((size_t) _n_interp_pts, _src_pts.size());
 
     std::vector<size_t> ret_index(num_results);

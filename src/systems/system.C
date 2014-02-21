@@ -132,7 +132,7 @@ System::~System ()
   // Clear data
   this->clear ();
 
-  libmesh_assert (!libMesh::closed());
+  libmesh_exceptionless_assert (!libMesh::closed());
 }
 
 

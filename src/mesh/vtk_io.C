@@ -178,7 +178,7 @@ void VTKIO::nodes_to_vtk()
 
   MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
   MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
-  for (; nd != nd_end; nd++, local_node_counter++)
+  for (; nd != nd_end; nd++, ++local_node_counter)
     {
       Node* node = (*nd);
 

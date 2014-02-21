@@ -450,15 +450,14 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
             onodes.insert(side->node(sn));
 
           ofaces.insert(p);
-          face_it++;// iteration is done here
+          ++face_it; // iteration is done here
           faces.erase(p);
 
           facesfound++;
         }
 
       else
-        face_it++;// iteration is done here
-
+        ++face_it; // iteration is done here
 
       // If at least one new oface was found in this cycle,
       // do another search cycle.
@@ -542,7 +541,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
       // create cell depending on side type, assign nodes,
       // use braces to force scope.
       bool is_higher_order_elem = false;
-      {
+
         Elem* el;
         switch(side->type())
           {
@@ -634,7 +633,6 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 
         // add infinite element to mesh
         this->_mesh.add_elem(el);
-      } // el goes out of scope
     } // for
 
 

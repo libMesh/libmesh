@@ -254,7 +254,7 @@ void EquationSystems::reinit ()
           sys.prolong_vectors();
         }
       mesh_changed = true;
-      dof_constraints_created = true;
+      // dof_constraints_created = true;
     }
 
   // If the mesh has changed, systems will need to create new dof

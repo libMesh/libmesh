@@ -396,7 +396,9 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
   // face neighbors
   const dof_id_type n_active_local_elem  = mesh.n_active_local_elem();
 
+#ifdef LIBMESH_ENABLE_AMR
   std::vector<const Elem*> neighbors_offspring;
+#endif
 
   std::vector<std::vector<dof_id_type> > graph(n_active_local_elem);
   dof_id_type graph_size=0;

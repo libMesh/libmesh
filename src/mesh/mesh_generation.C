@@ -77,7 +77,6 @@ unsigned int idx(const ElemType type,
     case TRI3:
       {
         return i + j*(nx+1);
-        break;
       }
 
     case QUAD8:
@@ -85,7 +84,6 @@ unsigned int idx(const ElemType type,
     case TRI6:
       {
         return i + j*(2*nx+1);
-        break;
       }
 
     default:
@@ -116,7 +114,6 @@ unsigned int idx(const ElemType type,
     case PRISM6:
       {
         return i + (nx+1)*(j + k*(ny+1));
-        break;
       }
 
     case HEX20:
@@ -129,7 +126,6 @@ unsigned int idx(const ElemType type,
     case PRISM18:
       {
         return i + (2*nx+1)*(j + k*(2*ny+1));
-        break;
       }
 
     default:

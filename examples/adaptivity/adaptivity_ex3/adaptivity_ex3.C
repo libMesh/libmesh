@@ -132,7 +132,11 @@ int main(int argc, char** argv)
   const std::string element_type    = input_file("element_type", "tensor");
   const int extra_error_quadrature  = input_file("extra_error_quadrature", 0);
   const int max_linear_iterations   = input_file("max_linear_iterations", 5000);
+
+#ifdef LIBMESH_HAVE_EXODUS_API
   const bool output_intermediate    = input_file("output_intermediate", false);
+#endif
+
   dim = input_file("dimension", 2);
   const std::string indicator_type = input_file("indicator_type", "kelly");
   singularity = input_file("singularity", true);

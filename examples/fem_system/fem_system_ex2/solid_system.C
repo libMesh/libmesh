@@ -204,10 +204,8 @@ bool SolidSystem::element_time_derivative(bool request_jacobian,
   VectorValue<Gradient> grad_u;
 
   // Instantiate the constitutive law
-  NonlinearNeoHookeCurrentConfig material(dphi, args);
-
   // Just calculate jacobian contribution when we need to
-  material.calculate_linearized_stiffness = request_jacobian;
+  NonlinearNeoHookeCurrentConfig material(dphi, args, request_jacobian);
 
   // Get a reference to the auxiliary system
   TransientExplicitSystem& aux_system = this->get_equation_systems().get_system<

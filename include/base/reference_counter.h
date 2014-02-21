@@ -110,7 +110,7 @@ protected:
    * identified by the class name.
    */
   typedef std::map<std::string, std::pair<unsigned int,
-                                          unsigned int> > Counts;
+    unsigned int> > Counts;
 
   /**
    * Actually holds the data.
@@ -143,14 +143,14 @@ protected:
 // ReferenceCounter class inline methods
 inline ReferenceCounter::ReferenceCounter()
 {
-  _n_objects++;
+  ++_n_objects;
 }
 
 
 
 inline ReferenceCounter::~ReferenceCounter()
 {
-  _n_objects--;
+  --_n_objects;
 }
 
 

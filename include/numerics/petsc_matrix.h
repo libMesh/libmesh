@@ -336,7 +336,7 @@ public:
    * matrix to the file named \p name.  If \p name
    * is not specified it is dumped to the screen.
    */
-  void print_matlab(const std::string name="NULL") const;
+  void print_matlab(const std::string& name = "") const;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.

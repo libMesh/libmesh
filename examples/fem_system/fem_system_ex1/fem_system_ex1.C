@@ -74,11 +74,14 @@ int main (int argc, char** argv)
   const bool transient                 = infile("transient", true);
   const Real deltat                    = infile("deltat", 0.005);
   unsigned int n_timesteps             = infile("n_timesteps", 20);
-  const unsigned int write_interval    = infile("write_interval", 5);
   const unsigned int coarsegridsize    = infile("coarsegridsize", 1);
   const unsigned int coarserefinements = infile("coarserefinements", 0);
   const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
   const unsigned int dim               = infile("dimension", 2);
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+  const unsigned int write_interval    = infile("write_interval", 5);
+#endif
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");

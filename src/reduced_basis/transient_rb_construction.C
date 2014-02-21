@@ -871,9 +871,7 @@ void TransientRBConstruction::enrich_RB_space()
   LAPACKsyevr_(&JOBZ, &RANGE, &UPLO, &eigen_size, &correlation_matrix[0],
                &LDA, &VL, &VU, &IL, &IU, &ABSTOL, &M, &W[0], &Z[0], &LDZ,
                &ISUPPZ[0], &WORK[0], &LWORK, &IWORK[0], &LIWORK, &INFO );
-#endif
-
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS // Use complex numbers
+#elif LIBMESH_USE_COMPLEX_NUMBERS // Use complex numbers
   // Need some extra data in the complex case
 
   // Work array, sized according to lapack documentation
@@ -886,6 +884,8 @@ void TransientRBConstruction::enrich_RB_space()
                &LDA, &VL, &VU, &IL, &IU, &ABSTOL, &M, &W[0], &Z[0], &LDZ,
                &ISUPPZ[0], &WORK[0], &LWORK, &RWORK[0], &LRWORK, &IWORK[0],
                &LIWORK, &INFO );
+#else
+#error libMesh does not yet support quaternions!
 #endif
 
   if (INFO != 0)
@@ -1048,13 +1048,11 @@ void TransientRBConstruction::update_RB_system_matrices()
     {
       for(unsigned int j=0; j<RB_size; j++)
         {
-          Number value = 0.;
-
           // Compute reduced L2 matrix
           temp->zero();
           L2_matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
 
-          value = get_rb_evaluation().get_basis_function(i).dot(*temp);
+      Number value = get_rb_evaluation().get_basis_function(i).dot(*temp);
           trans_rb_eval.RB_L2_matrix(i,j) = value;
           if(i!=j)
             {

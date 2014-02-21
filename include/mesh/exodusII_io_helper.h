@@ -33,13 +33,21 @@
 #include <vector>
 #include <map>
 
-// Macro to simplify checking Exodus error codes
+// Macros to simplify checking Exodus error codes
 #define EX_CHECK_ERR(code, msg)                 \
   do {                                          \
     if ((code) < 0) {                           \
       libMesh::err << (msg) << std::endl;       \
       libmesh_error();                          \
     } } while(0)
+
+#define EX_EXCEPTIONLESS_CHECK_ERR(code, msg) \
+  do { \
+    if ((code) < 0) { \
+      libMesh::err << (msg) << std::endl; \
+      libmesh_exceptionless_error(); \
+    } } while(0)
+
 
 
 namespace libMesh
@@ -363,14 +371,14 @@ public:
    * Prints the message defined in \p msg. Can be turned off if
    * verbosity is set to 0.
    */
-  void message(const std::string msg);
+  void message(const std::string& msg);
 
   /**
    * Prints the message defined in \p msg, and appends the number \p i
    * to the end of the message.  Useful for printing messages in
    * loops.  Can be turned off if verbosity is set to 0.
    */
-  void message(const std::string msg, int i);
+  void message(const std::string& msg, int i);
 
   // File identification flag
   int ex_id;

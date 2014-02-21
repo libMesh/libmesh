@@ -498,7 +498,7 @@ Real PetscMatrix<T>::linfty_norm () const
 
 
 template <typename T>
-void PetscMatrix<T>::print_matlab (const std::string name) const
+void PetscMatrix<T>::print_matlab (const std::string& name) const
 {
   libmesh_assert (this->initialized());
 
@@ -519,7 +519,7 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
    * Create an ASCII file containing the matrix
    * if a filename was provided.
    */
-  if (name != "NULL")
+  if (name != "")
     {
       ierr = PetscViewerASCIIOpen( this->comm().get(),
                                    name.c_str(),

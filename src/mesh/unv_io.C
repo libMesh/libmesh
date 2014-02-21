@@ -1004,7 +1004,7 @@ void UNVIO::node_out (std::ostream& out_file)
       const Node* current_node = *nd;
 
       char buf[78];
-      std::sprintf(buf, "%10d%10d%10d%10d\n",
+      std::sprintf(buf, "%10d%10u%10u%10u\n",
                    this->_mesh_data.node_to_foreign_id(current_node),
                    exp_coord_sys_dummy,
                    disp_coord_sys_dummy,

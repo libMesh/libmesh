@@ -95,7 +95,7 @@ typedef  std::vector<std::string>  STRING_VECTOR;
 
 #define victorate(TYPE, VARIABLE, ITERATOR)                             \
   std::vector<TYPE>::const_iterator ITERATOR = (VARIABLE).begin();      \
-  for (; (ITERATOR) != (VARIABLE).end(); (ITERATOR)++)
+  for (; (ITERATOR) != (VARIABLE).end(); ++(ITERATOR))
 
 // We allow GETPOT_NAMESPACE to be defined before this file is
 // included; if libraries using two different versions of GetPot might
@@ -315,6 +315,7 @@ public:
   inline STRING_VECTOR nominus_vector() const;
   inline unsigned nominus_size() const { return getpot_cast_int<unsigned>(idx_nominus.size()); }
   inline const char* next_nominus();
+  inline std::string next_nominus_string();
 
   /**
    * unidentified flying objects
@@ -815,7 +816,7 @@ GetPot::parse_input_file(const std::string& FileName,
   //    vector.
   _apriori_argv.push_back(FileName);
 
-  STRING_VECTOR args = _read_in_file(FileName.c_str());
+  STRING_VECTOR args = _read_in_file(FileName);
   _apriori_argv.insert(_apriori_argv.begin()+1, args.begin(), args.end());
   _parse_argument_vector(_apriori_argv);
 }
@@ -1235,10 +1236,10 @@ GetPot::_get_next_token(std::istream& istr)
   // whitespaces
   std::string token;
   int    tmp = 0;
-  int    last_letter = 0;
   while (true)
     {
-      last_letter = tmp; tmp = istr.get();
+      int last_letter = tmp;
+      tmp = istr.get();
 
       if (tmp == '=')
         {
@@ -1291,10 +1292,10 @@ GetPot::_get_string(std::istream& istr)
   // parse input until next matching '
   std::string str;
   int    tmp = 0;
-  int    last_letter = 0;
   while (true)
     {
-      last_letter = tmp; tmp = istr.get();
+      int last_letter = tmp;
+      tmp = istr.get();
       if (tmp == EOF)
         return str;
 
@@ -1317,11 +1318,11 @@ GetPot::_get_until_closing_bracket(std::istream& istr)
   // parse input until next matching }
   std::string str = "";
   int    tmp = 0;
-  int    last_letter = 0;
   int    brackets = 1;
   while (true)
     {
-      last_letter = tmp; tmp = istr.get();
+      int last_letter = tmp;
+      tmp = istr.get();
       if (tmp == EOF)
         return str;
 
@@ -1349,11 +1350,10 @@ GetPot::_get_until_closing_square_bracket(std::istream& istr)
 {
   // parse input until next matching ]
   std::string str = "";
-  int    tmp = 0;
   int    brackets = 1;
   while (true)
     {
-      tmp = istr.get();
+      int tmp = istr.get();
       if (tmp == EOF)
         return str;
 
@@ -2062,10 +2062,27 @@ GetPot::next_nominus()
       // (*) record for later ufo-detection
       _record_argument_request(Tmp);
 
-      return Tmp.c_str();
+      return _internal_managed_copy(Tmp);
     }
 
   return 0;
+}
+
+
+inline std::string
+GetPot::next_nominus_string()
+{
+  if (nominus_cursor < int(idx_nominus.size()) - 1)
+    {
+      const std::string Tmp = argv[idx_nominus[++nominus_cursor]];
+
+      // (*) record for later ufo-detection
+      _record_argument_request(Tmp);
+
+      return Tmp;
+    }
+
+  return "";
 }
 
 
@@ -3317,14 +3334,14 @@ inline std::string
 GetPot::unidentified_flags(const char* KnownFlagList, int ArgumentNumber=-1) const
 {
   std::string         ufos;
-  STRING_VECTOR known_arguments;
+  // STRING_VECTOR known_arguments;
   std::string         KFL(KnownFlagList);
 
   // (2) iteration over '-' arguments (options)
   if (ArgumentNumber == -1)
     {
       STRING_VECTOR::const_iterator it = argv.begin();
-      it++; // forget about argv[0] (application or filename)
+      ++it; // forget about argv[0] (application or filename)
       for (; it != argv.end(); ++it)
         {
           // -- argument belongs to prefixed section ?

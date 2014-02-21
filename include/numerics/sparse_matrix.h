@@ -63,7 +63,7 @@ std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
 
 template <typename T>
 class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T> >,
-                     public ParallelObject
+  public ParallelObject
 {
 public:
   /**
@@ -353,11 +353,9 @@ public:
    * matrix to the file named \p name.  If \p name
    * is not specified it is dumped to the screen.
    */
-  virtual void print_matlab(const std::string name="NULL") const
+  virtual void print_matlab(const std::string& /*name*/ = "") const
   {
-    libMesh::err << "ERROR: Not Implemented in base class yet!" << std::endl;
-    libMesh::err << "ERROR writing MATLAB file " << name << std::endl;
-    libmesh_error();
+    libmesh_not_implemented();
   }
 
   /**

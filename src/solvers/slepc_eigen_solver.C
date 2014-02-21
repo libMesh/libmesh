@@ -145,14 +145,15 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
                         PETSC_DETERMINE,
                         const_cast<void*>(static_cast<const void*>(&shell_matrix)),
                         &mat);
+  LIBMESH_CHKERRABORT(ierr);
 
   /* Note that the const_cast above is only necessary because PETSc
      does not accept a const void*.  Inside the member function
      _petsc_shell_matrix() below, the pointer is casted back to a
      const ShellMatrix<T>*.  */
 
-  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
   LIBMESH_CHKERRABORT(ierr);
 
@@ -326,6 +327,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
                         PETSC_DETERMINE,
                         const_cast<void*>(static_cast<const void*>(&shell_matrix_A)),
                         &mat_A);
+  LIBMESH_CHKERRABORT(ierr);
 
   PetscMatrix<T>* matrix_B   = libmesh_cast_ptr<PetscMatrix<T>*>(&matrix_B_in);
 
@@ -337,8 +339,8 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
      _petsc_shell_matrix() below, the pointer is casted back to a
      const ShellMatrix<T>*.  */
 
-  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat_A,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat_A,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
   LIBMESH_CHKERRABORT(ierr);
 
@@ -372,15 +374,15 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
                         PETSC_DETERMINE,
                         const_cast<void*>(static_cast<const void*>(&shell_matrix_B)),
                         &mat_B);
-
+  LIBMESH_CHKERRABORT(ierr);
 
   /* Note that the const_cast above is only necessary because PETSc
      does not accept a const void*.  Inside the member function
      _petsc_shell_matrix() below, the pointer is casted back to a
      const ShellMatrix<T>*.  */
 
-  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat_B,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat_B,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
   LIBMESH_CHKERRABORT(ierr);
 
@@ -409,6 +411,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
                         PETSC_DETERMINE,
                         const_cast<void*>(static_cast<const void*>(&shell_matrix_A)),
                         &mat_A);
+  LIBMESH_CHKERRABORT(ierr);
 
   Mat mat_B;
   ierr = MatCreateShell(this->comm().get(),
@@ -418,19 +421,20 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
                         PETSC_DETERMINE,
                         const_cast<void*>(static_cast<const void*>(&shell_matrix_B)),
                         &mat_B);
+  LIBMESH_CHKERRABORT(ierr);
 
   /* Note that the const_cast above is only necessary because PETSc
      does not accept a const void*.  Inside the member function
      _petsc_shell_matrix() below, the pointer is casted back to a
      const ShellMatrix<T>*.  */
 
-  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat_A,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat_A,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
   LIBMESH_CHKERRABORT(ierr);
 
-  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat_B,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat_B,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
   LIBMESH_CHKERRABORT(ierr);
 

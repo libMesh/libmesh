@@ -130,9 +130,10 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
                                              Parallel::Utils::to_key_type<KeyType>(bin_bounds[b+1]));
         }
 
-      // Just be sure the last boundaries point to the right place
+      // Just be sure the last boundary points to the right place
       bin_iters[nbins]  = data.end();
-      bin_bounds[nbins] = Parallel::Utils::to_double(max);
+      // This gets destructed here anyway
+      // bin_bounds[nbins] = Parallel::Utils::to_double(max);
     }
   }
 }

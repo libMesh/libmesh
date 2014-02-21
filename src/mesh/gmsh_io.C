@@ -347,8 +347,8 @@ void GmshIO::read_mesh(std::istream& in)
   // note the the nodes can be non-consecutive
   std::map<unsigned int, unsigned int> nodetrans;
 
+  while (!in.eof())
   {
-    while (!in.eof()) {
       in >> buf;
 
       if (!std::strncmp(buf,"$MeshFormat",11))
@@ -428,7 +428,7 @@ void GmshIO::read_mesh(std::istream& in)
           for (unsigned int iel=0; iel<numElem; ++iel)
             {
               unsigned int id, type, physical, elementary,
-                /* partition = 1,*/ nnodes, ntags;
+                /* partition = 1,*/ nnodes;
               // note - partition was assigned but never used - BSK
               if(version <= 1.0)
                 {
@@ -436,6 +436,7 @@ void GmshIO::read_mesh(std::istream& in)
                 }
               else
                 {
+                  unsigned int ntags;
                   in >> id >> type >> ntags;
                   elementary = physical = /* partition = */ 1;
                   for(unsigned int j = 0; j < ntags; j++)
@@ -560,7 +561,7 @@ void GmshIO::read_mesh(std::istream& in)
                 {
                   boundaryElementInfo binfo = boundary_elem[i];
                   std::set<dof_id_type>::iterator iter = binfo.nodes.begin();
-                  for (;iter!= binfo.nodes.end(); iter++)
+                  for (;iter!= binfo.nodes.end(); ++iter)
                     node_index[*iter].push_back(i);
                 }
 
@@ -608,8 +609,6 @@ void GmshIO::read_mesh(std::istream& in)
         } // if $ELM
 
     } // while !in.eof()
-
-  }
 
 }
 
@@ -923,7 +922,7 @@ void GmshIO::write_post (const std::string& fname,
                 {
                   for (unsigned int n=0; n < elem->n_vertices(); n++)   // loop over vertices
                     {
-                      const Point vertex = elem->point(n);
+                      const Point& vertex = elem->point(n);
                       if (this->binary())
                         {
                           double tmp = vertex(d);

@@ -946,13 +946,11 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 
   libmesh_assert (mesh.is_prepared());
 
-  const unsigned int dim = mesh.mesh_dimension();
-
   // We might get constraint equations from AMR hanging nodes in 2D/3D
   // or from boundary conditions in any dimension
   const bool possible_local_constraints = false
 #ifdef LIBMESH_ENABLE_AMR
-    || dim > 1
+    || mesh.mesh_dimension() > 1
 #endif
 #ifdef LIBMESH_ENABLE_PERIODIC
     || !_periodic_boundaries->empty()
@@ -2800,10 +2798,6 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
           std::vector<std::vector<dof_id_type> > dof_row_keys(dof_request_to_fill.size()),
             node_row_keys(node_request_to_fill.size());
 
-          // FIXME - this could be an unordered set, given a
-          // hash<pointers> specialization
-          std::set<const Node*> nodes_requested;
-
           std::vector<std::vector<Real> > dof_row_vals(dof_request_to_fill.size()),
             node_row_vals(node_request_to_fill.size());
           std::vector<Number> dof_row_rhss(dof_request_to_fill.size());
@@ -2836,6 +2830,10 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
             }
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+          // FIXME - this could be an unordered set, given a
+          // hash<pointers> specialization
+          std::set<const Node*> nodes_requested;
+
           for (std::size_t i=0; i != node_request_to_fill.size(); ++i)
             {
               dof_id_type constrained_id = node_request_to_fill[i];
@@ -3051,7 +3049,7 @@ void DofMap::process_constraints (MeshBase& mesh)
         if (constraints_to_expand.empty())
           unexpanded_set.erase(i++);
         else
-          i++;
+	  ++i;
       }
 
   // In parallel we can't guarantee that nodes/dofs which constrain

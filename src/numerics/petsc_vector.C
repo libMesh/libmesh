@@ -1329,7 +1329,7 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
 
 
 template <typename T>
-void PetscVector<T>::print_matlab (const std::string name) const
+void PetscVector<T>::print_matlab (const std::string& name) const
 {
   this->_restore_array();
   libmesh_assert (this->closed());
@@ -1346,7 +1346,7 @@ void PetscVector<T>::print_matlab (const std::string name) const
    * Create an ASCII file containing the matrix
    * if a filename was provided.
    */
-  if (name != "NULL")
+  if (name != "")
     {
       ierr = PetscViewerASCIIOpen( this->comm().get(),
                                    name.c_str(),

@@ -239,20 +239,6 @@ Real EpetraMatrix<T>::linfty_norm () const
 
 
 template <typename T>
-void EpetraMatrix<T>::print_matlab (const std::string) const
-{
-  libmesh_assert (this->initialized());
-
-  // libmesh_assert (this->closed());
-  this->close();
-
-  libmesh_not_implemented();
-}
-
-
-
-
-template <typename T>
 void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
                                  const std::vector<numeric_index_type>& rows,
                                  const std::vector<numeric_index_type>& cols)

@@ -82,7 +82,7 @@ public:
    * points which comprise the hole.  The points will all lie
    * on a circle of radius r.
    */
-  PolygonHole(Point center, Real radius, unsigned int n_points);
+    PolygonHole(const Point& center, Real radius, unsigned int n_points);
 
   virtual unsigned int n_points() const;
 
@@ -126,7 +126,7 @@ public:
    * The constructor requires a point which lies in the interior of the hole
    * and a reference to a vector of Points defining the hole.
    */
-  ArbitraryHole(const Point center,
+    ArbitraryHole(const Point& center,
                 const std::vector<Point>& points);
 
   virtual unsigned int n_points() const;
