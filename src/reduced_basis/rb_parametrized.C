@@ -433,7 +433,7 @@ void RBParametrized::read_discrete_parameter_values_from_file(const std::string&
   }
 }
 
-bool RBParametrized::is_discrete_parameter(std::string& mu_name) const
+bool RBParametrized::is_discrete_parameter(const std::string& mu_name) const
 {
   if(!parameters_initialized)
   {

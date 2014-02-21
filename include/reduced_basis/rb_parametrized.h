@@ -148,7 +148,7 @@ public:
   /**
    * Is parameter \p mu_name discrete?
    */
-  bool is_discrete_parameter(std::string& mu_name) const;
+  bool is_discrete_parameter(const std::string& mu_name) const;
 
   /**
    * Get a const reference to the discrete parameter values.
