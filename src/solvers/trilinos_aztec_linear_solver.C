@@ -56,7 +56,7 @@ void AztecLinearSolver<T>::clear ()
 
 
 template <typename T>
-void AztecLinearSolver<T>::init ()
+void AztecLinearSolver<T>::init (const char * /*name*/)
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())

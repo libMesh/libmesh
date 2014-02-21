@@ -263,7 +263,7 @@ void NoxNonlinearSolver<T>::clear ()
 }
 
 template <typename T>
-void NoxNonlinearSolver<T>::init ()
+void NoxNonlinearSolver<T>::init (const char * /*name*/)
 {
   if (!this->initialized())
     _interface = new Problem_Interface(this);

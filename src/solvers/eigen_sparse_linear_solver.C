@@ -48,7 +48,7 @@ void EigenSparseLinearSolver<T>::clear ()
 
 
 template <typename T>
-void EigenSparseLinearSolver<T>::init ()
+void EigenSparseLinearSolver<T>::init (const char* /*name*/)
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())

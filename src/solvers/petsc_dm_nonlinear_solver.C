@@ -80,7 +80,7 @@ PetscDMNonlinearSolver<T>::~PetscDMNonlinearSolver ()
 
 
 template <typename T>
-void PetscDMNonlinearSolver<T>::init()
+void PetscDMNonlinearSolver<T>::init(const char* name)
 {
   PetscErrorCode ierr;
   DM dm;
@@ -88,6 +88,10 @@ void PetscDMNonlinearSolver<T>::init()
 
   // Attaching a DM with the function and Jacobian callbacks to SNES.
   ierr = DMCreateLibMesh(this->comm().get(), this->system(), &dm); LIBMESH_CHKERRABORT(ierr);
+    if (name) 
+      {
+        ierr = DMSetOptionsPrefix(dm,name);    LIBMESH_CHKERRABORT(ierr);
+      }
   ierr = DMSetFromOptions(dm);               LIBMESH_CHKERRABORT(ierr);
   ierr = DMSetUp(dm);                        LIBMESH_CHKERRABORT(ierr);
   ierr = SNESSetDM(this->_snes, dm);         LIBMESH_CHKERRABORT(ierr);

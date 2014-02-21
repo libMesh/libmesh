@@ -91,7 +91,7 @@ void LaspackLinearSolver<T>::clear ()
 
 
 template <typename T>
-void LaspackLinearSolver<T>::init ()
+void LaspackLinearSolver<T>::init (const char* /* name */)
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())

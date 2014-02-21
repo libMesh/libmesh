@@ -116,13 +116,15 @@ public:
 
   /**
    * Initialize data structures if not done so already.
+   * Assigns a name, which is turned into an underscore-separated
+   * prefix for the underlying KSP object.
    */
-  void init ();
+  void init (const char *name = NULL);
 
   /**
    * Initialize data structures if not done so already plus much more
    */
-  void init (PetscMatrix<T>* matrix);
+  void init (PetscMatrix<T>* matrix, const char *name = NULL);
 
   /**
    * Apply names to the system to be solved.  This sets an option
