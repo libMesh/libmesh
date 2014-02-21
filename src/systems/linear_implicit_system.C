@@ -82,6 +82,11 @@ void LinearImplicitSystem::init_data ()
 
   // re-initialize the linear solver interface
   linear_solver->clear();
+
+  if (libMesh::on_command_line("--solver_system_names"))
+    linear_solver->init((this->name()+"_").c_str());
+  else
+    linear_solver->init();
 }
 
 
@@ -93,6 +98,11 @@ void LinearImplicitSystem::reinit ()
 
   // initialize parent data
   Parent::reinit();
+
+  if (libMesh::on_command_line("--solver_system_names"))
+    linear_solver->init((this->name()+"_").c_str());
+  else
+    linear_solver->init();
 }
 
 
