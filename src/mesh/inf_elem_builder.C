@@ -450,14 +450,14 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
             onodes.insert(side->node(sn));
 
           ofaces.insert(p);
-	  ++face_it; // iteration is done here
+          ++face_it; // iteration is done here
           faces.erase(p);
 
           facesfound++;
         }
 
       else
-	++face_it; // iteration is done here
+        ++face_it; // iteration is done here
 
       // If at least one new oface was found in this cycle,
       // do another search cycle.

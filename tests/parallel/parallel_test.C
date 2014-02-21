@@ -45,7 +45,7 @@ public:
 
     if (libMesh::processor_id() == 0)
       for (processor_id_type i=0; i<vals.size(); i++)
-	CPPUNIT_ASSERT_EQUAL( i , vals[i] );
+        CPPUNIT_ASSERT_EQUAL( i , vals[i] );
   }
 
 
@@ -88,18 +88,18 @@ public:
     {
       T val=T(0);
       for (unsigned int i=0; i<3; i++)
-	for (unsigned int j=0; j<LIBMESH_DIM; j++)
-	  src[i](j) = val++;
+        for (unsigned int j=0; j<LIBMESH_DIM; j++)
+          src[i](j) = val++;
 
       if (libMesh::processor_id() == 0)
-	dest = src;
+        dest = src;
     }
 
     CommWorld.broadcast(dest);
 
     for (unsigned int i=0; i<3; i++)
       for (unsigned int j=0; j<LIBMESH_DIM; j++)
-	CPPUNIT_ASSERT_EQUAL (src[i](j), dest[i](j) );
+        CPPUNIT_ASSERT_EQUAL (src[i](j), dest[i](j) );
   }
 
 
@@ -125,18 +125,18 @@ public:
     {
       Real val=0.;
       for (unsigned int i=0; i<3; i++)
-	for (unsigned int j=0; j<LIBMESH_DIM; j++)
-	  src[i](j) = val++;
+        for (unsigned int j=0; j<LIBMESH_DIM; j++)
+          src[i](j) = val++;
 
       if (libMesh::processor_id() == 0)
-	dest = src;
+        dest = src;
     }
 
     CommWorld.broadcast(dest);
 
     for (unsigned int i=0; i<3; i++)
       for (unsigned int j=0; j<LIBMESH_DIM; j++)
-	CPPUNIT_ASSERT_EQUAL (src[i](j), dest[i](j) );
+        CPPUNIT_ASSERT_EQUAL (src[i](j), dest[i](j) );
   }
 
 
@@ -166,7 +166,7 @@ public:
     CommWorld.max(max);
 
     CPPUNIT_ASSERT_EQUAL (static_cast<processor_id_type>(max+1),
-			  libMesh::n_processors());
+                          libMesh::n_processors());
   }
 
 
@@ -174,10 +174,10 @@ public:
   void testIsendRecv ()
   {
     unsigned int procup = (libMesh::processor_id() + 1) %
-      libMesh::n_processors();
+                           libMesh::n_processors();
     unsigned int procdown = (libMesh::n_processors() +
-			     libMesh::processor_id() - 1) %
-      libMesh::n_processors();
+                             libMesh::processor_id() - 1) %
+                             libMesh::n_processors();
 
     std::vector<unsigned int> src_val(3), recv_val(3);
 
@@ -189,15 +189,15 @@ public:
 
     if (libMesh::n_processors() > 1)
       {
-	// Default communication
-	CommWorld.send_mode(Parallel::Communicator::DEFAULT);
+        // Default communication
+        CommWorld.send_mode(Parallel::Communicator::DEFAULT);
 
         CommWorld.send (procup,
-		        src_val,
-		        request);
+                        src_val,
+                        request);
 
         CommWorld.receive (procdown,
-		           recv_val);
+                           recv_val);
 
         Parallel::wait (request);
 
@@ -207,16 +207,16 @@ public:
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
 
-	// Synchronous communication
-	CommWorld.send_mode(Parallel::Communicator::SYNCHRONOUS);
-	std::fill (recv_val.begin(), recv_val.end(), 0);
+        // Synchronous communication
+        CommWorld.send_mode(Parallel::Communicator::SYNCHRONOUS);
+        std::fill (recv_val.begin(), recv_val.end(), 0);
 
         CommWorld.send (procup,
-		        src_val,
-		        request);
+                        src_val,
+                        request);
 
         CommWorld.receive (procdown,
-		           recv_val);
+                           recv_val);
 
         Parallel::wait (request);
 
@@ -225,8 +225,8 @@ public:
         for (unsigned int i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
-	// Restore default communication
-	CommWorld.send_mode(Parallel::Communicator::DEFAULT);
+        // Restore default communication
+        CommWorld.send_mode(Parallel::Communicator::DEFAULT);
       }
   }
 
@@ -235,10 +235,10 @@ public:
   void testIrecvSend ()
   {
     unsigned int procup = (libMesh::processor_id() + 1) %
-      libMesh::n_processors();
+                           libMesh::n_processors();
     unsigned int procdown = (libMesh::n_processors() +
-			     libMesh::processor_id() - 1) %
-      libMesh::n_processors();
+                             libMesh::processor_id() - 1) %
+                             libMesh::n_processors();
 
     std::vector<unsigned int> src_val(3), recv_val(3);
 
@@ -250,15 +250,15 @@ public:
 
     if (libMesh::n_processors() > 1)
       {
-	// Default communication
-	CommWorld.send_mode(Parallel::Communicator::DEFAULT);
+        // Default communication
+        CommWorld.send_mode(Parallel::Communicator::DEFAULT);
 
         CommWorld.receive (procdown,
-		           recv_val,
-		           request);
+                           recv_val,
+                           request);
 
         CommWorld.send (procup,
-		        src_val);
+                        src_val);
 
         Parallel::wait (request);
 
@@ -267,17 +267,17 @@ public:
         for (unsigned int i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
-	// Synchronous communication
-	CommWorld.send_mode(Parallel::Communicator::SYNCHRONOUS);
-	std::fill (recv_val.begin(), recv_val.end(), 0);
+        // Synchronous communication
+        CommWorld.send_mode(Parallel::Communicator::SYNCHRONOUS);
+        std::fill (recv_val.begin(), recv_val.end(), 0);
 
 
         CommWorld.receive (procdown,
-		           recv_val,
-		           request);
+                           recv_val,
+                           request);
 
         CommWorld.send (procup,
-		        src_val);
+                        src_val);
 
         Parallel::wait (request);
 
@@ -286,8 +286,8 @@ public:
         for (unsigned int i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
-	// Restore default communication
-	CommWorld.send_mode(Parallel::Communicator::DEFAULT);
+        // Restore default communication
+        CommWorld.send_mode(Parallel::Communicator::DEFAULT);
       }
   }
 #endif // !LIBMESH_DISABLE_COMMWORLD

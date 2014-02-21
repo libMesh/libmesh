@@ -77,9 +77,9 @@ int XdrSOLN::header(XdrSHEAD *hd)
             char *top = tempTitle;
             for (int ivar = 0; ivar < m_wrtVar; ++ivar)
               {
-		char *p = strchr(tempTitle,' ');
+                char *p = strchr(tempTitle,' ');
                 *p = '\0';
-		int tempSize = std::strlen(tempTitle) ;
+                int tempSize = std::strlen(tempTitle) ;
                 tempTitle+=tempSize+1;
               }
             tempTitle = top;

@@ -2,8 +2,8 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
-#define VECTORMAPOBJECTTEST                     \
-  CPPUNIT_TEST( testCreate );			\
+#define VECTORMAPOBJECTTEST \
+  CPPUNIT_TEST( testCreate );                        \
 
 using namespace libMesh;
 
@@ -52,14 +52,14 @@ private:
     vm.sort();
 
     for (typename vectormap<Key,Val>::const_iterator it=vm.begin();
-	 it != vm.end(); ++it)
+         it != vm.end(); ++it)
       {
-	const Key &ikey = it->first;
-	const Val &ival = it->second;
+        const Key &ikey = it->first;
+        const Val &ival = it->second;
 
-	CPPUNIT_ASSERT       ( vm.count(ikey) == 1 );
-	CPPUNIT_ASSERT_EQUAL (vm[ikey], ival);
-	CPPUNIT_ASSERT_EQUAL (ival, val);
+        CPPUNIT_ASSERT       ( vm.count(ikey) == 1 );
+        CPPUNIT_ASSERT_EQUAL (vm[ikey], ival);
+        CPPUNIT_ASSERT_EQUAL (ival, val);
       }
   }
 
