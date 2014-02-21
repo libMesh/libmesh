@@ -22,7 +22,7 @@
 
 // ------------------------------------------------------------
 // enum QuadratureType definition
-namespace libMeshEnums {
+namespace libMesh {
 
 /**
  * Defines an \p enum for currently available quadrature rules.
