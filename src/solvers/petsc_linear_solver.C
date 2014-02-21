@@ -403,7 +403,6 @@ PetscLinearSolver<T>::init_names (const System& sys)
 
   std::string prefix = sys.name()+"_";
   KSPSetOptionsPrefix(my_ksp, prefix.c_str());
-  PCSetOptionsPrefix (my_pc, prefix.c_str());
 
   for (unsigned int v = 0; v != sys.n_vars(); ++v)
     {
