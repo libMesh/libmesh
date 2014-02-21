@@ -125,6 +125,16 @@ public:
   void init (PetscMatrix<T>* matrix);
 
   /**
+   * Apply names to the system to be solved.  This sets an option
+   * prefix from the system name and sets field names from the
+   * system's variable names.
+   *
+   * Since field names are applied to DoF numberings, this method must
+   * be called again after any System reinit.
+   */
+  virtual void init_names (const System&);
+
+  /**
    * After calling this method, all successive solves will be
    * restricted to the given set of dofs, which must contain local
    * dofs on each processor only and not contain any duplicates.  This

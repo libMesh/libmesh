@@ -24,6 +24,7 @@
 #include <string.h>
 
 // Local Includes
+#include "libmesh/dof_map.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/shell_matrix.h"
@@ -31,6 +32,7 @@
 #include "libmesh/petsc_preconditioner.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/system.h"
 
 namespace libMesh
 {
@@ -387,6 +389,42 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
           PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
           PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
         }
+    }
+}
+
+
+
+template <typename T>
+void
+PetscLinearSolver<T>::init_names (const System& sys)
+{
+  KSP my_ksp = this->ksp();
+  PC my_pc = this->pc();
+
+  std::string prefix = sys.name()+"_";
+  KSPSetOptionsPrefix(my_ksp, prefix.c_str());
+  PCSetOptionsPrefix (my_pc, prefix.c_str());
+
+  for (unsigned int v = 0; v != sys.n_vars(); ++v)
+    {
+      const std::string& var_name = sys.variable_name(v);
+      std::vector<dof_id_type> var_idx;
+      sys.get_dof_map().local_variable_indices
+        (var_idx, sys.get_mesh(), v);
+
+      PetscErrorCode ierr = 0;
+      IS is;
+
+      PetscInt *idx = PETSC_NULL;
+      if (!var_idx.empty())
+        idx = reinterpret_cast<PetscInt*>(&var_idx[0]);
+
+      ierr = ISCreateLibMesh(this->comm().get(), var_idx.size(),
+                             idx, PETSC_USE_POINTER, &is);
+      LIBMESH_CHKERRABORT(ierr);
+
+      ierr = PCFieldSplitSetIS(my_pc, var_name.c_str(), is);
+      LIBMESH_CHKERRABORT(ierr);
     }
 }
 
