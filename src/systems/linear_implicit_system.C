@@ -46,6 +46,10 @@ LinearImplicitSystem::LinearImplicitSystem (EquationSystems& es,
   _subset(NULL),
   _subset_solve_mode(SUBSET_ZERO)
 {
+  if (libMesh::on_command_line("--solver_system_names"))
+    linear_solver->init((this->name()+"_").c_str());
+  else
+    linear_solver->init();
 }
 
 

@@ -69,6 +69,10 @@ void TimeSolver::init ()
     _linear_solver = LinearSolver<Number>::build(_system.comm());
 
   _diff_solver->init();
+
+  if (libMesh::on_command_line("--solver_system_names"))
+    _linear_solver->init((_system.name()+"_").c_str());
+  else
   _linear_solver->init();
 }
 

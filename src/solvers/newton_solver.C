@@ -252,6 +252,11 @@ void NewtonSolver::init()
 {
   Parent::init();
 
+  if (libMesh::on_command_line("--solver_system_names"))
+    linear_solver->init((_system.name()+"_").c_str());
+  else
+    linear_solver->init();
+
   linear_solver->init_names(_system);
 }
 
