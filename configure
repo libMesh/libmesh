@@ -29473,21 +29473,27 @@ getSLEPC_LIBS:
 	echo \$(SLEPC_LIB) \$(ARPACK_LIB)
 EOF
 	SLEPC_LIBS=`make -s -f Makefile_config_slepc getSLEPC_LIBS`
-	rm -f Makefile_config_slepc
+        if (test x$? = x0); then
+	  rm -f Makefile_config_slepc
 
-	#echo " "
-	#echo "SLEPC_INCLUDE=$SLEPC_INCLUDE"
-	#echo "SLEPC_LIBS=$SLEPC_LIBS"
-	#echo " "
+	  #echo " "
+	  #echo "SLEPC_INCLUDE=$SLEPC_INCLUDE"
+	  #echo "SLEPC_LIBS=$SLEPC_LIBS"
+	  #echo " "
 
 
 $as_echo "#define HAVE_SLEPC 1" >>confdefs.h
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with SLEPc version $slepcversion support >>>" >&5
+	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with SLEPc version $slepcversion support >>>" >&5
 $as_echo "<<< Configuring library with SLEPc version $slepcversion support >>>" >&6; }
 
 
 
+        else
+          enableslepc=no
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< SLEPc configuration query failed. SLEPc disabled. >>>" >&5
+$as_echo "<<< SLEPc configuration query failed. SLEPc disabled. >>>" >&6; }
+        fi
       fi
     fi
   fi
