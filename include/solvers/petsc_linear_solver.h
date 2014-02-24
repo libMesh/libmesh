@@ -238,7 +238,7 @@ public:
   /**
    * Returns the solver's convergence flag
    */
-  virtual libMeshEnums::LinearConvergenceReason get_converged_reason() const;
+  virtual LinearConvergenceReason get_converged_reason() const;
 
 private:
 

@@ -20,19 +20,14 @@
 #ifndef LIBMESH_ENUM_CONVERGENCE_FLAGS
 #define LIBMESH_ENUM_CONVERGENCE_FLAGS
 
-/*
- * The \p libMeshEnums namespace is the namespace all \p enum definitions
- * should be put into.
- */
-
 // ------------------------------------------------------------
 // enum ConvergenceFlags definition
-namespace libMeshEnums {
+namespace libMesh {
 
 /**
  * Linear solver convergence flags (taken from the PETSc flags)
  */
-enum LinearConvergenceReason{
+enum LinearConvergenceReason {
   /* converged */
   CONVERGED_RTOL_NORMAL        =  1,
   CONVERGED_ATOL_NORMAL        =  9,
@@ -57,7 +52,6 @@ enum LinearConvergenceReason{
   CONVERGED_ITERATING          =  0,
 
   UNKNOWN_FLAG                 = -128};
-
 }
 
 #endif // LIBMESH_ENUM_CONVERGENCE_FLAGS

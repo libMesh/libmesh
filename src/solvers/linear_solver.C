@@ -177,7 +177,7 @@ std::pair<unsigned int, Real> LinearSolver<T>::adjoint_solve (SparseMatrix<T> & 
 template <typename T>
 void LinearSolver<T>::print_converged_reason() const
 {
-  libMeshEnums::LinearConvergenceReason reason = this->get_converged_reason();
+  LinearConvergenceReason reason = this->get_converged_reason();
   libMesh::out << "Linear solver convergence/divergence reason: " << Utility::enum_to_string(reason) << std::endl;
 }
 

@@ -46,8 +46,6 @@
 namespace libMesh
 {
 
-using namespace libMeshEnums;
-
 // ------------------------------------------------------------
 // Anonymous namespace to hold local data & methods
 namespace {

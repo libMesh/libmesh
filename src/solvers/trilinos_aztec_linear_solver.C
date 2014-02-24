@@ -196,11 +196,11 @@ Real AztecLinearSolver<T>::get_initial_residual()
 
 
 template <typename T>
-libMeshEnums::LinearConvergenceReason AztecLinearSolver<T>::get_converged_reason() const
+LinearConvergenceReason AztecLinearSolver<T>::get_converged_reason() const
 {
   libmesh_not_implemented();
 
-  return libMeshEnums::UNKNOWN_FLAG;
+  return UNKNOWN_FLAG;
 }
 
 
