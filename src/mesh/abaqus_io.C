@@ -427,7 +427,7 @@ void AbaqusIO::read_nodes()
   while (_in.peek() != '*' && _in.peek() != EOF)
     {
       // Re-Initialize variables to be read in from file
-	dof_id_type abaqus_node_id=0;
+      dof_id_type abaqus_node_id=0;
         Real x=0, y=0, z=0;
 
       // Note: we assume *at least* 2D points here, should we worry about

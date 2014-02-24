@@ -532,7 +532,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
           // Write the number of elements at this level.
           {
             char buf[80];
-	    std::sprintf(buf, "# n_elem at level %u", level);
+            std::sprintf(buf, "# n_elem at level %u", level);
             std::string comment(buf), legend  = ", [ type ";
 
             if (_write_unique_id)
@@ -778,7 +778,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
           Parallel::wait (coord_request_handles);
 
           // Write the coordinates in this block.
-	  std::size_t tot_id_size=0;
+          std::size_t tot_id_size=0;
 #ifndef NDEBUG
           std::size_t tot_coord_size=0;
 #endif

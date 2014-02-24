@@ -747,7 +747,7 @@ void System::read_serialized_data (Xdr& io,
 
       for(; pos != this->_vectors.end(); ++pos)
         {
-	  // total_read_size +=
+          // total_read_size +=
             this->read_serialized_vector<InValType>(io, *pos->second);
 
           // get the comment
@@ -1334,7 +1334,7 @@ void System::write_header (Xdr& io,
       {
         // set up the comment
         comment  = "#   Name, Variable No. ";
-	std::sprintf(buf, "%u", var);
+        std::sprintf(buf, "%u", var);
         comment += buf;
         comment += ", System \"";
         comment += this->name();
@@ -1667,7 +1667,7 @@ void System::write_parallel_data (Xdr &io,
 
           io.data (io_buffer, comment.c_str());
 
-	  // total_written_size += io_buffer.size();
+          // total_written_size += io_buffer.size();
         }
     }
 
@@ -1728,7 +1728,7 @@ void System::write_serialized_data (Xdr& io,
 
       for(; pos != this->_vectors.end(); ++pos)
         {
-	  // total_written_size +=
+          // total_written_size +=
             this->write_serialized_vector(io, *pos->second);
 
           // set up the comment

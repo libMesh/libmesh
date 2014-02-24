@@ -212,7 +212,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
   if(deterministic)
   {
     generate_training_parameters_deterministic(this->comm(),
-					       log_param_scale,
+                                               log_param_scale,
                                                training_parameters,
                                                n_training_samples,
                                                mu_min,
@@ -713,9 +713,9 @@ RBConstructionBase<Base>::set_alternative_solver
       if (this->alternative_solver == "amg")
         {
           // Set HYPRE and boomeramg PC types
-	  ierr = PCSetType(pc, PCHYPRE);
+          ierr = PCSetType(pc, PCHYPRE);
           LIBMESH_CHKERRABORT(ierr);
-	  ierr = PCHYPRESetType(pc, "boomeramg");
+          ierr = PCHYPRESetType(pc, "boomeramg");
           LIBMESH_CHKERRABORT(ierr);
         }
 #endif // LIBMESH_HAVE_PETSC_HYPRE
@@ -729,15 +729,15 @@ RBConstructionBase<Base>::set_alternative_solver
           // converge in 1 iteration.  Otherwise, to use KSPPREONLY,
           // you may need to do:
           // KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
-	  // ierr = KSPSetType(ksp, KSPPREONLY);
+          // ierr = KSPSetType(ksp, KSPPREONLY);
           // LIBMESH_CHKERRABORT(ierr);
 
           // Need to call the equivalent for the command line options:
           // -ksp_type preonly -pc_type lu -pc_factor_mat_solver_package mumps
-	  ierr = PCSetType(pc, PCLU);
+          ierr = PCSetType(pc, PCLU);
           LIBMESH_CHKERRABORT(ierr);
 #if !(PETSC_VERSION_LESS_THAN(3,0,0))
-	  ierr = PCFactorSetMatSolverPackage(pc,"mumps");
+          ierr = PCFactorSetMatSolverPackage(pc,"mumps");
           LIBMESH_CHKERRABORT(ierr);
 #endif
         }
@@ -784,11 +784,11 @@ void RBConstructionBase<Base>::reset_alternative_solver(
         {
           int ierr = 0;
           pc = petsc_linear_solver->pc();
-	  ierr = PCSetType(pc, orig.first.c_str());
+          ierr = PCSetType(pc, orig.first.c_str());
           LIBMESH_CHKERRABORT(ierr);
 
           ksp = petsc_linear_solver->ksp();
-	  ierr = KSPSetType(ksp, orig.second.c_str());
+          ierr = KSPSetType(ksp, orig.second.c_str());
           LIBMESH_CHKERRABORT(ierr);
         }
     }

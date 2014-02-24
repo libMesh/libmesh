@@ -51,12 +51,12 @@ std::string local_file_name (const unsigned int processor_id,
   if (basename.size() - basename.rfind(".bz2") == 4)
     {
       basename.erase(basename.end()-4, basename.end());
-	std::sprintf(buf, "%s.%04u.bz2", basename.c_str(), processor_id);
+      std::sprintf(buf, "%s.%04u.bz2", basename.c_str(), processor_id);
     }
   else if (basename.size() - basename.rfind(".gz") == 3)
     {
       basename.erase(basename.end()-3, basename.end());
-	std::sprintf(buf, "%s.%04u.gz", basename.c_str(), processor_id);
+      std::sprintf(buf, "%s.%04u.gz", basename.c_str(), processor_id);
     }
   else
       std::sprintf(buf, "%s.%04u", basename.c_str(), processor_id);
@@ -524,7 +524,7 @@ void EquationSystems::write(const std::string& name,
               std::string sys_name       = pos->first;
 
               comment =  "# Name, System No. ";
-	      std::sprintf(buf, "%u", sys_num);
+              std::sprintf(buf, "%u", sys_num);
               comment += buf;
 
               io.data (sys_name, comment.c_str());
@@ -537,7 +537,7 @@ void EquationSystems::write(const std::string& name,
               std::string sys_type       = pos->second->system_type();
 
               comment =  "# Type, System No. ";
-	      std::sprintf(buf, "%u", sys_num);
+              std::sprintf(buf, "%u", sys_num);
               comment += buf;
 
               io.data (sys_type, comment.c_str());

@@ -3049,7 +3049,7 @@ void DofMap::process_constraints (MeshBase& mesh)
         if (constraints_to_expand.empty())
           unexpanded_set.erase(i++);
         else
-	  ++i;
+          ++i;
       }
 
   // In parallel we can't guarantee that nodes/dofs which constrain

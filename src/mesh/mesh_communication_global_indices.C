@@ -716,7 +716,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
 
         requested_ids[pid].push_back(*hi);
 
-	++hi;
+        ++hi;
         // go ahead and put pid in index_map, that way we
         // don't have to repeat the std::lower_bound()
         index_map.push_back(pid);
