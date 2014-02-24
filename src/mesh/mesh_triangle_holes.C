@@ -30,7 +30,7 @@ namespace libMesh
 // PolygonHole member functions
 //
 TriangleInterface::PolygonHole::PolygonHole
-  (const Point& center, Real radius, unsigned int n_points_in)
+(const Point& center, Real radius, unsigned int n_points_in)
   : _center(center),
     _radius(radius),
     _n_points(n_points_in)

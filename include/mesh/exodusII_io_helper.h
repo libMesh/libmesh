@@ -41,11 +41,11 @@
       libmesh_error();                          \
     } } while(0)
 
-#define EX_EXCEPTIONLESS_CHECK_ERR(code, msg) \
-  do { \
-    if ((code) < 0) { \
-      libMesh::err << (msg) << std::endl; \
-      libmesh_exceptionless_error(); \
+#define EX_EXCEPTIONLESS_CHECK_ERR(code, msg)   \
+  do {                                          \
+    if ((code) < 0) {                           \
+      libMesh::err << (msg) << std::endl;       \
+      libmesh_exceptionless_error();            \
     } } while(0)
 
 

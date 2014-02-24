@@ -210,55 +210,55 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
   libMesh::out << std::endl;
 
   if(deterministic)
-  {
-    generate_training_parameters_deterministic(this->comm(),
-                                               log_param_scale,
-                                               training_parameters,
-                                               n_training_samples,
-                                               mu_min,
-                                               mu_max,
-                                               serial_training_set);
-  }
+    {
+      generate_training_parameters_deterministic(this->comm(),
+                                                 log_param_scale,
+                                                 training_parameters,
+                                                 n_training_samples,
+                                                 mu_min,
+                                                 mu_max,
+                                                 serial_training_set);
+    }
   else
-  {
-    // Generate random training samples for all parameters
-    generate_training_parameters_random(this->comm(),
-                                        log_param_scale,
-                                        training_parameters,
-                                        n_training_samples,
-                                        mu_min,
-                                        mu_max,
-                                        this->training_parameters_random_seed,
-                                        serial_training_set);
-  }
+    {
+      // Generate random training samples for all parameters
+      generate_training_parameters_random(this->comm(),
+                                          log_param_scale,
+                                          training_parameters,
+                                          n_training_samples,
+                                          mu_min,
+                                          mu_max,
+                                          this->training_parameters_random_seed,
+                                          serial_training_set);
+    }
 
   // For each parameter that only allows discrete values, we "snap" to the nearest
   // allowable discrete value
   if(get_n_discrete_params() > 0)
-  {
-    std::map< std::string, NumericVector<Number>* >::iterator it           = training_parameters.begin();
-    std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters.end();
-    for( ; it != it_end; ++it)
     {
-      std::string param_name = it->first;
-      if(is_discrete_parameter(param_name))
-      {
-        std::vector<Real> discrete_values =
-          get_discrete_parameter_values().find(param_name)->second;
-
-        NumericVector<Number>* training_vector = it->second;
-
-        for(numeric_index_type index=training_vector->first_local_index();
-            index<training_vector->last_local_index();
-            index++)
+      std::map< std::string, NumericVector<Number>* >::iterator it           = training_parameters.begin();
+      std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters.end();
+      for( ; it != it_end; ++it)
         {
-          Real value = libmesh_real((*training_vector)(index));
-          Real nearest_discrete_value = get_closest_value(value, discrete_values);
-          training_vector->set(index, nearest_discrete_value);
+          std::string param_name = it->first;
+          if(is_discrete_parameter(param_name))
+            {
+              std::vector<Real> discrete_values =
+                get_discrete_parameter_values().find(param_name)->second;
+
+              NumericVector<Number>* training_vector = it->second;
+
+              for(numeric_index_type index=training_vector->first_local_index();
+                  index<training_vector->last_local_index();
+                  index++)
+                {
+                  Real value = libmesh_real((*training_vector)(index));
+                  Real nearest_discrete_value = get_closest_value(value, discrete_values);
+                  training_vector->set(index, nearest_discrete_value);
+                }
+            }
         }
-      }
     }
-  }
 
   training_parameters_initialized = true;
 }
@@ -628,7 +628,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       std::map<std::string, NumericVector<Number>*>::iterator new_it = training_parameters_in.begin();
 
       NumericVector<Number>* training_vector_0 = new_it->second;
-    ++new_it;
+      ++new_it;
       NumericVector<Number>* training_vector_1 = new_it->second;
 
       for(unsigned int index1=0; index1<n_training_parameters_per_var; index1++)

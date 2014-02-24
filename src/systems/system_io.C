@@ -731,7 +731,7 @@ void System::read_serialized_data (Xdr& io,
   // Read the global solution vector
   {
     // total_read_size +=
-      this->read_serialized_vector<InValType>(io, *this->solution);
+    this->read_serialized_vector<InValType>(io, *this->solution);
 
     // get the comment
     if (this->processor_id() == 0)
@@ -748,7 +748,7 @@ void System::read_serialized_data (Xdr& io,
       for(; pos != this->_vectors.end(); ++pos)
         {
           // total_read_size +=
-            this->read_serialized_vector<InValType>(io, *pos->second);
+          this->read_serialized_vector<InValType>(io, *pos->second);
 
           // get the comment
           if (this->processor_id() == 0)
@@ -1708,7 +1708,7 @@ void System::write_serialized_data (Xdr& io,
   // std::size_t total_written_size = 0;
 
   // total_written_size +=
-    this->write_serialized_vector(io, *this->solution);
+  this->write_serialized_vector(io, *this->solution);
 
   // set up the comment
   if (this->processor_id() == 0)
@@ -1729,7 +1729,7 @@ void System::write_serialized_data (Xdr& io,
       for(; pos != this->_vectors.end(); ++pos)
         {
           // total_written_size +=
-            this->write_serialized_vector(io, *pos->second);
+          this->write_serialized_vector(io, *pos->second);
 
           // set up the comment
           if (this->processor_id() == 0)
@@ -2210,9 +2210,9 @@ std::size_t System::read_serialized_vectors (Xdr &io,
 
   if (this->processor_id() == 0)
     {
-  // sizes
-  unsigned int num_vecs=0;
-  dof_id_type vector_length=0;
+      // sizes
+      unsigned int num_vecs=0;
+      dof_id_type vector_length=0;
 
       // Get the number of vectors
       io.data(num_vecs);

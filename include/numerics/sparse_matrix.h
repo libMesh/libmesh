@@ -63,7 +63,7 @@ std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
 
 template <typename T>
 class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T> >,
-  public ParallelObject
+                     public ParallelObject
 {
 public:
   /**

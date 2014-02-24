@@ -25,7 +25,7 @@ int main(int argc, char** argv)
   EquationSystems es(mesh);
 
   libMesh::out << "Usage: " << argv[0]
-            << " inputmesh inputsolution outputplot" << std::endl;
+               << " inputmesh inputsolution outputplot" << std::endl;
 
   START_LOG("mesh.read()", "main");
   mesh.read(argv[1]);

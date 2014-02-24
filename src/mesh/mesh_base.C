@@ -101,9 +101,9 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _skip_renumber_nodes_and_elements(false)
 {
   if(other_mesh._partitioner.get())
-  {
-    _partitioner = other_mesh._partitioner->clone();
-  }
+    {
+      _partitioner = other_mesh._partitioner->clone();
+    }
 }
 
 
@@ -348,17 +348,17 @@ void MeshBase::partition (const unsigned int n_parts)
   if(!skip_partitioning() &&
      partitioner().get() &&
      this->is_serial())
-  {
-    partitioner()->partition (*this, n_parts);
-  }
+    {
+      partitioner()->partition (*this, n_parts);
+    }
   else
-  {
-    // Make sure locally cached partition count
-    this->recalculate_n_partitions();
+    {
+      // Make sure locally cached partition count
+      this->recalculate_n_partitions();
 
-    // Make sure any other locally cached data is correct
-    this->update_post_partitioning();
-  }
+      // Make sure any other locally cached data is correct
+      this->update_post_partitioning();
+    }
 }
 
 unsigned int MeshBase::recalculate_n_partitions()

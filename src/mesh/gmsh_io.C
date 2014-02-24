@@ -348,7 +348,7 @@ void GmshIO::read_mesh(std::istream& in)
   std::map<unsigned int, unsigned int> nodetrans;
 
   while (!in.eof())
-  {
+    {
       in >> buf;
 
       if (!std::strncmp(buf,"$MeshFormat",11))

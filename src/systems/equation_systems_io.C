@@ -59,7 +59,7 @@ std::string local_file_name (const unsigned int processor_id,
       std::sprintf(buf, "%s.%04u.gz", basename.c_str(), processor_id);
     }
   else
-      std::sprintf(buf, "%s.%04u", basename.c_str(), processor_id);
+    std::sprintf(buf, "%s.%04u", basename.c_str(), processor_id);
 
   return std::string(buf);
 }

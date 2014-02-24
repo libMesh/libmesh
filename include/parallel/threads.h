@@ -100,8 +100,8 @@ public:
   explicit
   BoolAcquire(bool& b) : _b(b) { libmesh_assert(!_b); _b = true; }
 
-    ~BoolAcquire() { libmesh_exceptionless_assert(_b); _b = false; }
-  private:
+  ~BoolAcquire() { libmesh_exceptionless_assert(_b); _b = false; }
+private:
   bool& _b;
 };
 

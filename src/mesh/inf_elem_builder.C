@@ -542,97 +542,97 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
       // use braces to force scope.
       bool is_higher_order_elem = false;
 
-        Elem* el;
-        switch(side->type())
-          {
-            // 3D infinite elements
-            // TRIs
-          case TRI3:
-            el=new InfPrism6;
-            break;
+      Elem* el;
+      switch(side->type())
+        {
+          // 3D infinite elements
+          // TRIs
+        case TRI3:
+          el=new InfPrism6;
+          break;
 
-          case TRI6:
-            el=new InfPrism12;
-            is_higher_order_elem = true;
-            break;
+        case TRI6:
+          el=new InfPrism12;
+          is_higher_order_elem = true;
+          break;
 
-            // QUADs
-          case QUAD4:
-            el=new InfHex8;
-            break;
+          // QUADs
+        case QUAD4:
+          el=new InfHex8;
+          break;
 
-          case QUAD8:
-            el=new InfHex16;
-            is_higher_order_elem = true;
-            break;
+        case QUAD8:
+          el=new InfHex16;
+          is_higher_order_elem = true;
+          break;
 
-          case QUAD9:
-            el=new InfHex18;
+        case QUAD9:
+          el=new InfHex18;
 
-            // the method of assigning nodes (which follows below)
-            // omits in the case of QUAD9 the bubble node; therefore
-            // we assign these first by hand here.
-            el->set_node(16) = side->get_node(8);
-            el->set_node(17) = outer_nodes[side->node(8)];
-            is_higher_order_elem=true;
-            break;
+          // the method of assigning nodes (which follows below)
+          // omits in the case of QUAD9 the bubble node; therefore
+          // we assign these first by hand here.
+          el->set_node(16) = side->get_node(8);
+          el->set_node(17) = outer_nodes[side->node(8)];
+          is_higher_order_elem=true;
+          break;
 
-            // 2D infinite elements
-          case EDGE2:
-            el=new InfQuad4;
-            break;
+          // 2D infinite elements
+        case EDGE2:
+          el=new InfQuad4;
+          break;
 
-          case EDGE3:
-            el=new InfQuad6;
-            el->set_node(4) = side->get_node(2);
-            break;
+        case EDGE3:
+          el=new InfQuad6;
+          el->set_node(4) = side->get_node(2);
+          break;
 
-            // 1D infinite elements not supported
-          default:
-            libMesh::out << "InfElemBuilder::build_inf_elem(Point, bool, bool, bool, bool): "
-                         << "invalid face element "
-                         << std::endl;
-            continue;
-          }
+          // 1D infinite elements not supported
+        default:
+          libMesh::out << "InfElemBuilder::build_inf_elem(Point, bool, bool, bool, bool): "
+                       << "invalid face element "
+                       << std::endl;
+          continue;
+        }
 
-        // In parallel, assign unique ids to the new element
-        if (!_mesh.is_serial())
-          {
-            Elem *belem = _mesh.elem(p.first);
-            el->processor_id() = belem->processor_id();
-            // We'd better not have elements with more than 6 sides
-            el->set_id (belem->id() * 6 + p.second + old_max_elem_id);
-          }
+      // In parallel, assign unique ids to the new element
+      if (!_mesh.is_serial())
+        {
+          Elem *belem = _mesh.elem(p.first);
+          el->processor_id() = belem->processor_id();
+          // We'd better not have elements with more than 6 sides
+          el->set_id (belem->id() * 6 + p.second + old_max_elem_id);
+        }
 
-        // assign vertices to the new infinite element
-        const unsigned int n_base_vertices = side->n_vertices();
-        for(unsigned int i=0; i<n_base_vertices; i++)
-          {
-            el->set_node(i                ) = side->get_node(i);
-            el->set_node(i+n_base_vertices) = outer_nodes[side->node(i)];
-          }
-
-
-        // when this is a higher order element,
-        // assign also the nodes in between
-        if (is_higher_order_elem)
-          {
-            // n_safe_base_nodes is the number of nodes in \p side
-            // that may be safely assigned using below for loop.
-            // Actually, n_safe_base_nodes is _identical_ with el->n_vertices(),
-            // since for QUAD9, the 9th node was already assigned above
-            const unsigned int n_safe_base_nodes   = el->n_vertices();
-
-            for(unsigned int i=n_base_vertices; i<n_safe_base_nodes; i++)
-              {
-                el->set_node(i+n_base_vertices)   = side->get_node(i);
-                el->set_node(i+n_safe_base_nodes) = outer_nodes[side->node(i)];
-              }
-          }
+      // assign vertices to the new infinite element
+      const unsigned int n_base_vertices = side->n_vertices();
+      for(unsigned int i=0; i<n_base_vertices; i++)
+        {
+          el->set_node(i                ) = side->get_node(i);
+          el->set_node(i+n_base_vertices) = outer_nodes[side->node(i)];
+        }
 
 
-        // add infinite element to mesh
-        this->_mesh.add_elem(el);
+      // when this is a higher order element,
+      // assign also the nodes in between
+      if (is_higher_order_elem)
+        {
+          // n_safe_base_nodes is the number of nodes in \p side
+          // that may be safely assigned using below for loop.
+          // Actually, n_safe_base_nodes is _identical_ with el->n_vertices(),
+          // since for QUAD9, the 9th node was already assigned above
+          const unsigned int n_safe_base_nodes   = el->n_vertices();
+
+          for(unsigned int i=n_base_vertices; i<n_safe_base_nodes; i++)
+            {
+              el->set_node(i+n_base_vertices)   = side->get_node(i);
+              el->set_node(i+n_safe_base_nodes) = outer_nodes[side->node(i)];
+            }
+        }
+
+
+      // add infinite element to mesh
+      this->_mesh.add_elem(el);
     } // for
 
 

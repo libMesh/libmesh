@@ -353,7 +353,7 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
 }
 
 void RBEIMEvaluation::write_out_interpolation_points_elem
-  (const std::string& directory_name)
+(const std::string& directory_name)
 {
   _interpolation_points_mesh.clear();
 
@@ -592,7 +592,7 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
 }
 
 void RBEIMEvaluation::read_in_interpolation_points_elem
-  (const std::string& directory_name)
+(const std::string& directory_name)
 {
   _interpolation_points_mesh.read(directory_name + "/interpolation_points_mesh.xda");
 

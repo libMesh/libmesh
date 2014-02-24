@@ -116,37 +116,37 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
   RBParameters mu_min_in;
   RBParameters mu_max_in;
   for(unsigned int i=0; i<n_continuous_parameters; i++)
-  {
-    // Read in the parameter names
-    std::string param_name = infile("parameter_names", "NONE", i);
-
     {
-      Real min_val = infile(param_name, 0., 0);
-      mu_min_in.set_value(param_name, min_val);
-    }
+      // Read in the parameter names
+      std::string param_name = infile("parameter_names", "NONE", i);
 
-    {
-      Real max_val = infile(param_name, 0., 1);
-      mu_max_in.set_value(param_name, max_val);
+      {
+        Real min_val = infile(param_name, 0., 0);
+        mu_min_in.set_value(param_name, min_val);
+      }
+
+      {
+        Real max_val = infile(param_name, 0., 1);
+        mu_max_in.set_value(param_name, max_val);
+      }
     }
-  }
 
   std::map< std::string, std::vector<Real> > discrete_parameter_values_in;
 
   unsigned int n_discrete_parameters = infile.vector_variable_size("discrete_parameter_names");
   for(unsigned int i=0; i<n_discrete_parameters; i++)
-  {
-    std::string param_name = infile("discrete_parameter_names", "NONE", i);
-    
-    unsigned int n_vals_for_param = infile.vector_variable_size(param_name);
-    std::vector<Real> vals_for_param(n_vals_for_param);
-    for(unsigned int j=0; j<vals_for_param.size(); j++)
     {
-      vals_for_param[j] = infile(param_name, 0., j);
-    }
+      std::string param_name = infile("discrete_parameter_names", "NONE", i);
+
+      unsigned int n_vals_for_param = infile.vector_variable_size(param_name);
+      std::vector<Real> vals_for_param(n_vals_for_param);
+      for(unsigned int j=0; j<vals_for_param.size(); j++)
+        {
+          vals_for_param[j] = infile(param_name, 0., j);
+        }
     
-    discrete_parameter_values_in[param_name] = vals_for_param;
-  }
+      discrete_parameter_values_in[param_name] = vals_for_param;
+    }
 
   initialize_parameters(mu_min_in, mu_max_in, discrete_parameter_values_in);
 
@@ -176,23 +176,23 @@ void RBSCMConstruction::print_info()
   libMesh::out << "system name: " << this->name() << std::endl;
   libMesh::out << "SCM Greedy tolerance: " << get_SCM_training_tolerance() << std::endl;
   if(rb_scm_eval)
-  {
-    libMesh::out << "A_q operators attached: " << get_rb_theta_expansion().get_n_A_terms() << std::endl;
-  }
+    {
+      libMesh::out << "A_q operators attached: " << get_rb_theta_expansion().get_n_A_terms() << std::endl;
+    }
   else
-  {
-    libMesh::out << "RBThetaExpansion member is not set yet" << std::endl;
-  }
+    {
+      libMesh::out << "RBThetaExpansion member is not set yet" << std::endl;
+    }
   libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
   RBParameters::const_iterator it     = get_parameters().begin();
   RBParameters::const_iterator it_end = get_parameters().end();
   for( ; it != it_end; ++it)
-  {
-    std::string param_name = it->first;
-    libMesh::out <<   "Parameter " << param_name
-                 << ": Min = " << get_parameter_min(param_name)
-                 << ", Max = " << get_parameter_max(param_name) << std::endl;
-  }
+    {
+      std::string param_name = it->first;
+      libMesh::out <<   "Parameter " << param_name
+                   << ": Min = " << get_parameter_min(param_name)
+                   << ", Max = " << get_parameter_max(param_name) << std::endl;
+    }
   print_discrete_parameter_values();
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << std::endl;

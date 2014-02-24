@@ -1052,7 +1052,7 @@ void TransientRBConstruction::update_RB_system_matrices()
           temp->zero();
           L2_matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
 
-      Number value = get_rb_evaluation().get_basis_function(i).dot(*temp);
+          Number value = get_rb_evaluation().get_basis_function(i).dot(*temp);
           trans_rb_eval.RB_L2_matrix(i,j) = value;
           if(i!=j)
             {

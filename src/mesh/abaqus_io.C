@@ -428,7 +428,7 @@ void AbaqusIO::read_nodes()
     {
       // Re-Initialize variables to be read in from file
       dof_id_type abaqus_node_id=0;
-        Real x=0, y=0, z=0;
+      Real x=0, y=0, z=0;
 
       // Note: we assume *at least* 2D points here, should we worry about
       // trying to read 1D Abaqus meshes?

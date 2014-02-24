@@ -1815,7 +1815,7 @@ libMeshEnums::LinearConvergenceReason PetscLinearSolver<T>::get_converged_reason
   KSPGetConvergedReason(_ksp, &reason);
 
   switch(reason)
-  {
+    {
 #if !PETSC_VERSION_LESS_THAN(3,2,0)
     case KSP_CONVERGED_RTOL_NORMAL     : return libMeshEnums::CONVERGED_RTOL_NORMAL;
     case KSP_CONVERGED_ATOL_NORMAL     : return libMeshEnums::CONVERGED_ATOL_NORMAL;
@@ -1844,7 +1844,7 @@ libMeshEnums::LinearConvergenceReason PetscLinearSolver<T>::get_converged_reason
     default :
       libMesh::err << "Unknown convergence flag!" << std::endl;
       return libMeshEnums::UNKNOWN_FLAG;
-  }
+    }
 }
 
 

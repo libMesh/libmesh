@@ -198,7 +198,7 @@ bool TreeNode<N>::bounds_point (const Point& p) const
       && (p(2) >= min(2))
       && (p(2) <= max(2))
 #endif
-     )
+      )
     return true;
 
   return false;
@@ -442,7 +442,7 @@ void TreeNode<N>::print_elements(std::ostream& out_stream) const
 template <unsigned int N>
 void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Elem*> >& nodes_to_elem)
 {
-   if (this->active())
+  if (this->active())
     {
       elements.clear();
 
