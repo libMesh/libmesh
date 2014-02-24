@@ -97,7 +97,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
       if (compute_jacobian)
         for (unsigned int i=0; i != n_T_dofs; i++)
           for (unsigned int j=0; j != n_T_dofs; ++j)
-	    // The analytic jacobian
+            // The analytic jacobian
             K(i,j) += JxW[qp] * (parameters[0] + (2.*parameters[1])) * ( dphi[i][qp] * dphi[j][qp] );
     } // end of the quadrature point qp-loop
 
@@ -148,12 +148,12 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
 
       // The residual from the boundary terms, penalize non-zero temperature
       for (unsigned int i=0; i != n_T_dofs; i++)
-	F(i) += JxW[qp] * penalty * ( T - u_dirichlet) * phi[i][qp];
+        F(i) += JxW[qp] * penalty * ( T - u_dirichlet) * phi[i][qp];
       if (compute_jacobian)
-	for (unsigned int i=0; i != n_T_dofs; i++)
-	  for (unsigned int j=0; j != n_T_dofs; ++j)
-	    // The analytic jacobian
-	    K(i,j) += JxW[qp] * penalty * phi[i][qp] * phi[j][qp];
+        for (unsigned int i=0; i != n_T_dofs; i++)
+          for (unsigned int j=0; j != n_T_dofs; ++j)
+            // The analytic jacobian
+            K(i,j) += JxW[qp] * penalty * phi[i][qp] * phi[j][qp];
 
     } // end of the quadrature point qp-loop
 

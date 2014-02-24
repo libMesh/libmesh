@@ -90,8 +90,8 @@ using namespace libMesh;
 // Write gmv output
 
 void write_output(EquationSystems &es,
-		  unsigned int a_step,       // The adaptive step count
-		  std::string solution_type) // primal or adjoint solve
+                  unsigned int a_step,       // The adaptive step count
+                  std::string solution_type) // primal or adjoint solve
 {
 #ifdef LIBMESH_HAVE_GMV
   MeshBase &mesh = es.get_mesh();
@@ -149,8 +149,8 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
     solver->linear_tolerance_multiplier = param.linear_tolerance_multiplier;
     if (system.time_solver->reduce_deltat_on_diffsolver_failure)
       {
-	solver->continue_after_max_iterations = true;
-	solver->continue_after_backtrack_failure = true;
+        solver->continue_after_max_iterations = true;
+        solver->continue_after_backtrack_failure = true;
       }
 
     // And the linear solver options
@@ -210,11 +210,11 @@ AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param, QoISet &qois
       adjoint_residual_estimator->error_plot_suffix = "error.gmv";
 
       PatchRecoveryErrorEstimator *p1 =
-	new PatchRecoveryErrorEstimator;
+        new PatchRecoveryErrorEstimator;
       adjoint_residual_estimator->primal_error_estimator().reset(p1);
 
       PatchRecoveryErrorEstimator *p2 =
-	new PatchRecoveryErrorEstimator;
+        new PatchRecoveryErrorEstimator;
       adjoint_residual_estimator->dual_error_estimator().reset(p2);
 
       adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(0, H1_SEMINORM);
@@ -310,138 +310,138 @@ int main (int argc, char** argv)
     unsigned int a_step = 0;
     for (; a_step != param.max_adaptivesteps; ++a_step)
       {
-	// We can't adapt to both a tolerance and a
-	// target mesh size
-	if (param.global_tolerance != 0.)
-	  libmesh_assert_equal_to (param.nelem_target, 0);
-	// If we aren't adapting to a tolerance we need a
-	// target mesh size
+        // We can't adapt to both a tolerance and a
+        // target mesh size
+        if (param.global_tolerance != 0.)
+          libmesh_assert_equal_to (param.nelem_target, 0);
+        // If we aren't adapting to a tolerance we need a
+        // target mesh size
         else
           libmesh_assert_greater (param.nelem_target, 0);
 
-	linear_solver->reuse_preconditioner(false);
+        linear_solver->reuse_preconditioner(false);
 
-	// Solve the forward problem
-	system.solve();
+        // Solve the forward problem
+        system.solve();
 
-	// Write out the computed primal solution
-	write_output(equation_systems, a_step, "primal");
+        // Write out the computed primal solution
+        write_output(equation_systems, a_step, "primal");
 
-	// Get a pointer to the primal solution vector
-	NumericVector<Number> &primal_solution = *system.solution;
+        // Get a pointer to the primal solution vector
+        NumericVector<Number> &primal_solution = *system.solution;
 
-	// Declare a QoISet object, we need this object to set weights for our QoI error contributions
-	QoISet qois;
+        // Declare a QoISet object, we need this object to set weights for our QoI error contributions
+        QoISet qois;
 
-	// Declare a qoi_indices vector, each index will correspond to a QoI
-	std::vector<unsigned int> qoi_indices;
-	qoi_indices.push_back(0);
-	qoi_indices.push_back(1);
-	qois.add_indices(qoi_indices);
+        // Declare a qoi_indices vector, each index will correspond to a QoI
+        std::vector<unsigned int> qoi_indices;
+        qoi_indices.push_back(0);
+        qoi_indices.push_back(1);
+        qois.add_indices(qoi_indices);
 
-	// Set weights for each index, these will weight the contribution of each QoI in the final error
-	// estimate to be used for flagging elements for refinement
-	qois.set_weight(0, 0.5);
-	qois.set_weight(1, 0.5);
+        // Set weights for each index, these will weight the contribution of each QoI in the final error
+        // estimate to be used for flagging elements for refinement
+        qois.set_weight(0, 0.5);
+        qois.set_weight(1, 0.5);
 
-	// Make sure we get the contributions to the adjoint RHS from the sides
-	system.assemble_qoi_sides = true;
+        // Make sure we get the contributions to the adjoint RHS from the sides
+        system.assemble_qoi_sides = true;
 
-	// We are about to solve the adjoint system, but before we do this we see the same preconditioner
-	// flag to reuse the preconditioner from the forward solver
-	linear_solver->reuse_preconditioner(param.reuse_preconditioner);
+        // We are about to solve the adjoint system, but before we do this we see the same preconditioner
+        // flag to reuse the preconditioner from the forward solver
+        linear_solver->reuse_preconditioner(param.reuse_preconditioner);
 
-	// Solve the adjoint system. This takes the transpose of the stiffness matrix and then
-	// solves the resulting system
-	system.adjoint_solve();
+        // Solve the adjoint system. This takes the transpose of the stiffness matrix and then
+        // solves the resulting system
+        system.adjoint_solve();
 
-	// Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
-	system.set_adjoint_already_solved(true);
+        // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+        system.set_adjoint_already_solved(true);
 
-	// Get a pointer to the solution vector of the adjoint problem for QoI 0
-	NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
+        // Get a pointer to the solution vector of the adjoint problem for QoI 0
+        NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
 
-	// Swap the primal and dual solutions so we can write out the adjoint solution
-	primal_solution.swap(dual_solution_0);
-	write_output(equation_systems, a_step, "adjoint_0");
+        // Swap the primal and dual solutions so we can write out the adjoint solution
+        primal_solution.swap(dual_solution_0);
+        write_output(equation_systems, a_step, "adjoint_0");
 
-	// Swap back
-	primal_solution.swap(dual_solution_0);
+        // Swap back
+        primal_solution.swap(dual_solution_0);
 
-	// Get a pointer to the solution vector of the adjoint problem for QoI 0
-	NumericVector<Number> &dual_solution_1 = system.get_adjoint_solution(1);
+        // Get a pointer to the solution vector of the adjoint problem for QoI 0
+        NumericVector<Number> &dual_solution_1 = system.get_adjoint_solution(1);
 
-	// Swap again
-	primal_solution.swap(dual_solution_1);
-	write_output(equation_systems, a_step, "adjoint_1");
+        // Swap again
+        primal_solution.swap(dual_solution_1);
+        write_output(equation_systems, a_step, "adjoint_1");
 
-	// Swap back again
-	primal_solution.swap(dual_solution_1);
+        // Swap back again
+        primal_solution.swap(dual_solution_1);
 
-	std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
+        std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
                   << " active elements and "
                   << equation_systems.n_active_dofs()
-		  << " active dofs." << std::endl ;
+                  << " active dofs." << std::endl ;
 
-	// Postprocess, compute the approximate QoIs and write them out to the console
-	std::cout << "Postprocessing: " << std::endl;
-	system.postprocess_sides = true;
-	system.postprocess();
-	Number QoI_0_computed = system.get_QoI_value("computed", 0);
-	Number QoI_0_exact = system.get_QoI_value("exact", 0);
-	Number QoI_1_computed = system.get_QoI_value("computed", 1);
-	Number QoI_1_exact = system.get_QoI_value("exact", 1);
+        // Postprocess, compute the approximate QoIs and write them out to the console
+        std::cout << "Postprocessing: " << std::endl;
+        system.postprocess_sides = true;
+        system.postprocess();
+        Number QoI_0_computed = system.get_QoI_value("computed", 0);
+        Number QoI_0_exact = system.get_QoI_value("exact", 0);
+        Number QoI_1_computed = system.get_QoI_value("computed", 1);
+        Number QoI_1_exact = system.get_QoI_value("exact", 1);
 
-	std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
+        std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
                  << std::abs(QoI_0_computed - QoI_0_exact) /
           std::abs(QoI_0_exact) << std::endl;
 
-	std::cout<< "The relative error in QoI 1 is " << std::setprecision(17)
+        std::cout<< "The relative error in QoI 1 is " << std::setprecision(17)
                  << std::abs(QoI_1_computed - QoI_1_exact) /
           std::abs(QoI_1_exact) << std::endl << std::endl;
 
-	// Now we construct the data structures for the mesh refinement process
-	ErrorVector error;
+        // Now we construct the data structures for the mesh refinement process
+        ErrorVector error;
 
-	// Build an error estimator object
-	AutoPtr<ErrorEstimator> error_estimator =
-	  build_error_estimator(param, qois);
+        // Build an error estimator object
+        AutoPtr<ErrorEstimator> error_estimator =
+          build_error_estimator(param, qois);
 
-	// Estimate the error in each element using the Adjoint Residual or Kelly error estimator
-	error_estimator->estimate_error(system, error);
+        // Estimate the error in each element using the Adjoint Residual or Kelly error estimator
+        error_estimator->estimate_error(system, error);
 
-	// We have to refine either based on reaching an error tolerance or
-	// a number of elements target, which should be verified above
-	// Otherwise we flag elements by error tolerance or nelem target
+        // We have to refine either based on reaching an error tolerance or
+        // a number of elements target, which should be verified above
+        // Otherwise we flag elements by error tolerance or nelem target
 
-	// Uniform refinement
-	if(param.refine_uniformly)
-	  {
-	    mesh_refinement->uniformly_refine(1);
-	  }
-	// Adaptively refine based on reaching an error tolerance
-	else if(param.global_tolerance >= 0. && param.nelem_target == 0.)
-	  {
-	    mesh_refinement->flag_elements_by_error_tolerance (error);
+        // Uniform refinement
+        if(param.refine_uniformly)
+          {
+            mesh_refinement->uniformly_refine(1);
+          }
+        // Adaptively refine based on reaching an error tolerance
+        else if(param.global_tolerance >= 0. && param.nelem_target == 0.)
+          {
+            mesh_refinement->flag_elements_by_error_tolerance (error);
 
-	    mesh_refinement->refine_and_coarsen_elements();
-	  }
-	// Adaptively refine based on reaching a target number of elements
-	else
-	  {
-	    if (mesh.n_active_elem() >= param.nelem_target)
-	      {
-		std::cout<<"We reached the target number of elements."<<std::endl <<std::endl;
-		break;
-	      }
+            mesh_refinement->refine_and_coarsen_elements();
+          }
+        // Adaptively refine based on reaching a target number of elements
+        else
+          {
+            if (mesh.n_active_elem() >= param.nelem_target)
+              {
+                std::cout<<"We reached the target number of elements."<<std::endl <<std::endl;
+                break;
+              }
 
-	    mesh_refinement->flag_elements_by_nelem_target (error);
+            mesh_refinement->flag_elements_by_nelem_target (error);
 
-	    mesh_refinement->refine_and_coarsen_elements();
-	  }
+            mesh_refinement->refine_and_coarsen_elements();
+          }
 
-	// Dont forget to reinit the system after each adaptive refinement !
-	equation_systems.reinit();
+        // Dont forget to reinit the system after each adaptive refinement !
+        equation_systems.reinit();
 
         std::cout << "Refined mesh to "
                   << mesh.n_active_elem()
@@ -453,63 +453,63 @@ int main (int argc, char** argv)
     // Do one last solve if necessary
     if (a_step == param.max_adaptivesteps)
       {
-	linear_solver->reuse_preconditioner(false);
-	system.solve();
+        linear_solver->reuse_preconditioner(false);
+        system.solve();
 
-	write_output(equation_systems, a_step, "primal");
+        write_output(equation_systems, a_step, "primal");
 
-	NumericVector<Number> &primal_solution = *system.solution;
+        NumericVector<Number> &primal_solution = *system.solution;
 
-	QoISet qois;
-	std::vector<unsigned int> qoi_indices;
+        QoISet qois;
+        std::vector<unsigned int> qoi_indices;
 
-	qoi_indices.push_back(0);
-	qoi_indices.push_back(1);
-	qois.add_indices(qoi_indices);
+        qoi_indices.push_back(0);
+        qoi_indices.push_back(1);
+        qois.add_indices(qoi_indices);
 
-	qois.set_weight(0, 0.5);
-	qois.set_weight(1, 0.5);
+        qois.set_weight(0, 0.5);
+        qois.set_weight(1, 0.5);
 
-	system.assemble_qoi_sides = true;
-	linear_solver->reuse_preconditioner(param.reuse_preconditioner);
-	system.adjoint_solve();
+        system.assemble_qoi_sides = true;
+        linear_solver->reuse_preconditioner(param.reuse_preconditioner);
+        system.adjoint_solve();
 
-	// Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
-	system.set_adjoint_already_solved(true);
+        // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+        system.set_adjoint_already_solved(true);
 
-	NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
+        NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
 
-	primal_solution.swap(dual_solution_0);
-	write_output(equation_systems, a_step, "adjoint_0");
+        primal_solution.swap(dual_solution_0);
+        write_output(equation_systems, a_step, "adjoint_0");
 
-	primal_solution.swap(dual_solution_0);
+        primal_solution.swap(dual_solution_0);
 
-	NumericVector<Number> &dual_solution_1 = system.get_adjoint_solution(1);
+        NumericVector<Number> &dual_solution_1 = system.get_adjoint_solution(1);
 
-	primal_solution.swap(dual_solution_1);
-	write_output(equation_systems, a_step, "adjoint_1");
+        primal_solution.swap(dual_solution_1);
+        write_output(equation_systems, a_step, "adjoint_1");
 
-	primal_solution.swap(dual_solution_1);
+        primal_solution.swap(dual_solution_1);
 
-	std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
-		  << " active elements and "
-		  << equation_systems.n_active_dofs()
-		  << " active dofs." << std::endl ;
+        std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
+                  << " active elements and "
+                  << equation_systems.n_active_dofs()
+                  << " active dofs." << std::endl ;
 
-	std::cout << "Postprocessing: " << std::endl;
-	system.postprocess_sides = true;
-	system.postprocess();
+        std::cout << "Postprocessing: " << std::endl;
+        system.postprocess_sides = true;
+        system.postprocess();
 
-	Number QoI_0_computed = system.get_QoI_value("computed", 0);
-	Number QoI_0_exact = system.get_QoI_value("exact", 0);
-	Number QoI_1_computed = system.get_QoI_value("computed", 1);
-	Number QoI_1_exact = system.get_QoI_value("exact", 1);
+        Number QoI_0_computed = system.get_QoI_value("computed", 0);
+        Number QoI_0_exact = system.get_QoI_value("exact", 0);
+        Number QoI_1_computed = system.get_QoI_value("computed", 1);
+        Number QoI_1_exact = system.get_QoI_value("exact", 1);
 
-	std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
+        std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
                  << std::abs(QoI_0_computed - QoI_0_exact) /
           std::abs(QoI_0_exact) << std::endl;
 
-	std::cout<< "The relative error in QoI 1 is " << std::setprecision(17)
+        std::cout<< "The relative error in QoI 1 is " << std::setprecision(17)
                  << std::abs(QoI_1_computed - QoI_1_exact) /
           std::abs(QoI_1_exact) << std::endl << std::endl;
       }

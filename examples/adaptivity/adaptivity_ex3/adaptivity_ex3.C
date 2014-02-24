@@ -355,11 +355,11 @@ int main(int argc, char** argv)
 
               // Write out the error distribution
               std::ostringstream ss;
-	      ss << r_step;
+              ss << r_step;
 #ifdef LIBMESH_HAVE_EXODUS_API
-	      std::string error_output = "error_"+ss.str()+".e";
+              std::string error_output = "error_"+ss.str()+".e";
 #else
-	      std::string error_output = "error_"+ss.str()+".gmv";
+              std::string error_output = "error_"+ss.str()+".gmv";
 #endif
               error.plot_error( error_output, mesh );
 

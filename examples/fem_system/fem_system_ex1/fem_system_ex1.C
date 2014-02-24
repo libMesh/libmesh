@@ -226,14 +226,14 @@ int main (int argc, char** argv)
             }
 
           // Calculate error based on u and v (and w?) but not p
-	  std::vector<Real> weights(2,1.0);  // u, v
+          std::vector<Real> weights(2,1.0);  // u, v
           if (dim == 3)
             weights.push_back(1.0);          // w
           weights.push_back(0.0);            // p
-	  // Keep the same default norm type.
-	  std::vector<FEMNormType>
-	    norms(1, error_estimator->error_norm.type(0));
-	  error_estimator->error_norm = SystemNorm(norms, weights);
+          // Keep the same default norm type.
+          std::vector<FEMNormType>
+            norms(1, error_estimator->error_norm.type(0));
+          error_estimator->error_norm = SystemNorm(norms, weights);
 
           error_estimator->estimate_error(system, error);
 
@@ -304,10 +304,10 @@ int main (int argc, char** argv)
                     << ".e";
 
           ExodusII_IO(mesh).write_timestep(file_name.str(),
-					   equation_systems,
-					   1, /* This number indicates how many time steps
-						 are being written to the file */
-					   system.time);
+                                           equation_systems,
+                                           1, /* This number indicates how many time steps
+                                                 are being written to the file */
+                                           system.time);
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     }

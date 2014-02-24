@@ -68,7 +68,7 @@ void assemble_poisson(EquationSystems& es,
 
 // Function prototype for the exact solution.
 Real exact_solution (const int component,
-		     const Real x,
+                     const Real x,
                      const Real y,
                      const Real z = 0.);
 
@@ -341,18 +341,18 @@ void assemble_poisson(EquationSystems& es,
             // on the location of the quadrature point (q_point[qp])
             // we will compute it here, outside of the i-loop
             const Real fx = -(exact_solution(0,x,y-eps) +
-			      exact_solution(0,x,y+eps) +
-			      exact_solution(0,x-eps,y) +
-			      exact_solution(0,x+eps,y) -
-			      4.*exact_solution(0,x,y))/eps/eps;
+                              exact_solution(0,x,y+eps) +
+                              exact_solution(0,x-eps,y) +
+                              exact_solution(0,x+eps,y) -
+                              4.*exact_solution(0,x,y))/eps/eps;
 
-	    const Real fy = -(exact_solution(1,x,y-eps) +
-			      exact_solution(1,x,y+eps) +
-			      exact_solution(1,x-eps,y) +
-			      exact_solution(1,x+eps,y) -
-			      4.*exact_solution(1,x,y))/eps/eps;
+            const Real fy = -(exact_solution(1,x,y-eps) +
+                              exact_solution(1,x,y+eps) +
+                              exact_solution(1,x-eps,y) +
+                              exact_solution(1,x+eps,y) -
+                              4.*exact_solution(1,x,y))/eps/eps;
 
-	    const RealGradient f( fx, fy );
+            const RealGradient f( fx, fy );
 
             for (unsigned int i=0; i<phi.size(); i++)
               Fe(i) += JxW[qp]*f*phi[i][qp];
@@ -428,8 +428,8 @@ void assemble_poisson(EquationSystems& es,
                   const Real penalty = 1.e10;
 
                   // The boundary values.
-		  const RealGradient f( exact_solution(0, xf, yf),
-					exact_solution(1, xf, yf) );
+                  const RealGradient f( exact_solution(0, xf, yf),
+                                        exact_solution(1, xf, yf) );
 
                   // Matrix contribution of the L2 projection.
                   for (unsigned int i=0; i<phi_face.size(); i++)

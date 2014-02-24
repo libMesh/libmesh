@@ -118,11 +118,11 @@ public:
   {return AutoPtr<FEMFunctionBase<Number> >( new CoupledFEMFunctionsx(*this) ); }
 
   virtual void operator() (const FEMContext&, const Point&,
-			   const Real, DenseVector<Number>&)
+                           const Real, DenseVector<Number>&)
   {libmesh_error();}
 
   virtual Number operator() (const FEMContext&, const Point& p,
-			     const Real time = 0.);
+                             const Real time = 0.);
 
 private:
 
@@ -144,12 +144,12 @@ public:
   {return AutoPtr<FEMFunctionBase<Number> >( new CoupledFEMFunctionsy(*this) ); }
 
   virtual void operator() (const FEMContext&, const Point&,
-			   const Real,
-			   DenseVector<Number>&)
+                           const Real,
+                           DenseVector<Number>&)
   {libmesh_error();}
 
   virtual Number operator() (const FEMContext&, const Point& p,
-			     const Real time = 0.);
+                             const Real time = 0.);
 
 private:
 

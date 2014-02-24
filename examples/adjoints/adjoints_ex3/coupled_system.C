@@ -40,25 +40,25 @@ class BdyFunction : public FunctionBase<Number>
 public:
   BdyFunction (unsigned int u_var, unsigned int v_var, int sign)
     : _u_var(u_var), _v_var(v_var), _sign(sign)
-    { this->_initialized = true; }
+  { this->_initialized = true; }
 
   virtual Number operator() (const Point&, const Real = 0)
-    { libmesh_not_implemented(); }
+  { libmesh_not_implemented(); }
 
   virtual void operator() (const Point& p,
                            const Real,
                            DenseVector<Number>& output)
-    {
-      output.resize(2);
-      output.zero();
-      const Real y=p(1);
-      // Set the parabolic inflow boundary conditions at stations 0 & 1
-      output(_u_var) = (_sign)*((y-2) * (y-3));
-      output(_v_var) = 0;
-    }
+  {
+    output.resize(2);
+    output.zero();
+    const Real y=p(1);
+    // Set the parabolic inflow boundary conditions at stations 0 & 1
+    output(_u_var) = (_sign)*((y-2) * (y-3));
+    output(_v_var) = 0;
+  }
 
   virtual AutoPtr<FunctionBase<Number> > clone() const
-    { return AutoPtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _sign)); }
+  { return AutoPtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _sign)); }
 
 private:
   const unsigned int _u_var, _v_var;
@@ -85,20 +85,20 @@ void CoupledSystem::init_data ()
   // Add the velocity components "u" & "v".  They
   // will be approximated using second-order approximation.
   u_var = this->add_variable ("u", static_cast<Order>(pressure_p+1),
-			      fefamily);
+                              fefamily);
   v_var = this->add_variable ("v", static_cast<Order>(pressure_p+1),
-			      fefamily);
+                              fefamily);
 
   // Add the pressure variable "p". This will
   // be approximated with a first-order basis,
   // providing an LBB-stable pressure-velocity pair.
   p_var = this->add_variable ("p", static_cast<Order>(pressure_p),
-			      fefamily);
+                              fefamily);
 
   // Add the Concentration variable "C". They will
   // be approximated using second-order approximation, the same as the velocity components
   C_var = this->add_variable ("C", static_cast<Order>(pressure_p+1),
-			      fefamily);
+                              fefamily);
 
   // Tell the system to march velocity forward in time, but
   // leave p as a constraint only
@@ -146,7 +146,7 @@ void CoupledSystem::init_data ()
 
   // On the walls we will apply the no slip and no penetration boundary condition, u=0, v=0
   this->get_dof_map().add_dirichlet_boundary
-        (DirichletBoundary (wall_bdy, uv, &zero));
+    (DirichletBoundary (wall_bdy, uv, &zero));
 
   // On the inlet (left), we apply parabolic inflow boundary conditions for the velocity, u = - (y-2)*(y-3), v=0
   // and set C = 1
@@ -199,7 +199,7 @@ void CoupledSystem::init_context(DiffContext &context)
 
 
 bool CoupledSystem::element_time_derivative (bool request_jacobian,
-                                            DiffContext &context)
+                                             DiffContext &context)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
@@ -256,11 +256,11 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
     {
       // Compute the solution & its gradient at the old Newton iterate
       Number p = c.interior_value(p_var, qp),
-	u = c.interior_value(u_var, qp),
-	v = c.interior_value(v_var, qp);
+        u = c.interior_value(u_var, qp),
+        v = c.interior_value(v_var, qp);
       Gradient grad_u = c.interior_gradient(u_var, qp),
-	grad_v = c.interior_gradient(v_var, qp),
-	grad_C = c.interior_gradient(C_var, qp);
+        grad_v = c.interior_gradient(v_var, qp),
+        grad_C = c.interior_gradient(C_var, qp);
 
       // Definitions for convenience.  It is sometimes simpler to do a
       // dot product if you have the full vector at your disposal.
@@ -273,19 +273,19 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
       // for both at the same time.
       for (unsigned int i=0; i != n_u_dofs; i++)
         {
-	  // Stokes equations residuals
+          // Stokes equations residuals
           Fu(i) += JxW[qp] *
-                   (p*dphi[i][qp](0) -                // pressure term
-		    (grad_u*dphi[i][qp]));            // diffusion term
+            (p*dphi[i][qp](0) -                // pressure term
+             (grad_u*dphi[i][qp]));            // diffusion term
 
           Fv(i) += JxW[qp] *
-                   (p*dphi[i][qp](1) -                // pressure term
-		    (grad_v*dphi[i][qp]));            // diffusion term
+            (p*dphi[i][qp](1) -                // pressure term
+             (grad_v*dphi[i][qp]));            // diffusion term
 
-	  // Concentration Equation Residual
-	  FC(i) += JxW[qp] *
-	           ( (U*grad_C)*phi[i][qp] +                // convection term
-	            (1./Peclet)*(grad_C*dphi[i][qp]) );     // diffusion term
+          // Concentration Equation Residual
+          FC(i) += JxW[qp] *
+            ( (U*grad_C)*phi[i][qp] +                // convection term
+              (1./Peclet)*(grad_C*dphi[i][qp]) );     // diffusion term
 
           // Note that the Fp block is identically zero unless we are using
           // some kind of artificial compressibility scheme...
@@ -301,32 +301,32 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
 
                   Kvv(i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp])); /* diffusion term  */
 
-		  KCu(i,j) += JxW[qp]* ( (phi[j][qp]*C_x)*phi[i][qp] ); /* convection term */
+                  KCu(i,j) += JxW[qp]* ( (phi[j][qp]*C_x)*phi[i][qp] ); /* convection term */
 
-		  KCv(i,j) += JxW[qp]*( (phi[j][qp]*C_y)*phi[i][qp] );  /* convection term */
+                  KCv(i,j) += JxW[qp]*( (phi[j][qp]*C_y)*phi[i][qp] );  /* convection term */
 
-		  KCC(i,j) += JxW[qp]*
-		              ( (U*dphi[j][qp])*phi[i][qp] +      /* nonlinear term (convection) */
-		              (1./Peclet)*(dphi[j][qp]*dphi[i][qp]) ); /* diffusion term */
-		}
+                  KCC(i,j) += JxW[qp]*
+                    ( (U*dphi[j][qp])*phi[i][qp] +      /* nonlinear term (convection) */
+                      (1./Peclet)*(dphi[j][qp]*dphi[i][qp]) ); /* diffusion term */
+                }
 
-	      // Matrix contributions for the up and vp couplings.
-	      for (unsigned int j=0; j != n_p_dofs; j++)
-		{
-		  Kup(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](0);
-		  Kvp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](1);
-		}
-	    }
-	}
+              // Matrix contributions for the up and vp couplings.
+              for (unsigned int j=0; j != n_p_dofs; j++)
+                {
+                  Kup(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](0);
+                  Kvp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](1);
+                }
+            }
+        }
 
     } // end of the quadrature point qp-loop
 
-      return request_jacobian;
+  return request_jacobian;
 }
 
 
 bool CoupledSystem::element_constraint (bool request_jacobian,
-                                       DiffContext &context)
+                                        DiffContext &context)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
@@ -361,14 +361,14 @@ bool CoupledSystem::element_constraint (bool request_jacobian,
     {
       // Compute the velocity gradient at the old Newton iterate
       Gradient grad_u = c.interior_gradient(u_var, qp),
-	grad_v = c.interior_gradient(v_var, qp);
+        grad_v = c.interior_gradient(v_var, qp);
 
       // Now a loop over the pressure degrees of freedom.  This
       // computes the contributions of the continuity equation.
       for (unsigned int i=0; i != n_p_dofs; i++)
         {
           Fp(i) += JxW[qp] * psi[i][qp] *
-                   (grad_u(0) + grad_v(1));
+            (grad_u(0) + grad_v(1));
 
           if (request_jacobian && c.elem_solution_derivative)
             {
@@ -404,7 +404,7 @@ void CoupledSystem::postprocess()
 // distinguishes the behavior of the two objects
 // Same thing for CoupledFEMFunctionsy
 Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
-					const Real /* time */)
+                                        const Real /* time */)
 {
   Number weight = 0.0;
 
@@ -412,24 +412,24 @@ Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
     {
     case 0:
       {
-	Gradient grad_C = c.point_gradient(3, p);
+        Gradient grad_C = c.point_gradient(3, p);
 
-	weight = grad_C(0);
+        weight = grad_C(0);
       }
       break;
 
     case 3:
       {
-	Number u = c.point_value(0, p);
+        Number u = c.point_value(0, p);
 
-	weight = u;
+        weight = u;
       }
       break;
 
     default:
       {
-	std::cout<<"Wrong variable number"<<var<<" passed to CoupledFEMFunctionsx object ! Quitting !"<<std::endl;
-	libmesh_error();
+        std::cout<<"Wrong variable number"<<var<<" passed to CoupledFEMFunctionsx object ! Quitting !"<<std::endl;
+        libmesh_error();
       }
 
     }
@@ -438,7 +438,7 @@ Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
 }
 
 Number CoupledFEMFunctionsy::operator()(const FEMContext& c, const Point& p,
-					const Real /* time */)
+                                        const Real /* time */)
 {
   Number weight = 0.0;
 
@@ -446,24 +446,24 @@ Number CoupledFEMFunctionsy::operator()(const FEMContext& c, const Point& p,
     {
     case 1:
       {
-	Gradient grad_C = c.point_gradient(3, p);
+        Gradient grad_C = c.point_gradient(3, p);
 
-	weight = grad_C(1);
+        weight = grad_C(1);
       }
       break;
 
     case 3:
       {
-	Number v = c.point_value(1, p);
+        Number v = c.point_value(1, p);
 
-	weight = v;
+        weight = v;
       }
       break;
 
     default:
       {
-	std::cout<<"Wrong variable number "<<var<<" passed to CoupledFEMFunctionsy object ! Quitting !"<<std::endl;
-	libmesh_error();
+        std::cout<<"Wrong variable number "<<var<<" passed to CoupledFEMFunctionsy object ! Quitting !"<<std::endl;
+        libmesh_error();
       }
     }
 

@@ -838,11 +838,11 @@ int main (int argc, char** argv)
           std::cout<< "Solving the adjoint problem" <<std::endl;
           system.adjoint_solve();
 
-	  // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+          // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
           system.set_adjoint_already_solved(true);
 
-	  // To plot the adjoint solution, we swap it with the primal solution
-	  // and use the write_output function
+          // To plot the adjoint solution, we swap it with the primal solution
+          // and use the write_output function
           NumericVector<Number> &dual_solution = system.get_adjoint_solution();
           primal_solution.swap(dual_solution);
 
@@ -855,7 +855,7 @@ int main (int argc, char** argv)
           // system for the adjoint error estimate
           Real Pe = (dynamic_cast<CoupledSystem&>(system)).get_Pe();
 
-	  // The total error is the sum: error = error_non_pressure +
+          // The total error is the sum: error = error_non_pressure +
           // error_with_pressure + ...
           // error_estimator_convection_diffusion_x +
           // error_estimator_convection_diffusion_y
@@ -900,13 +900,13 @@ int main (int argc, char** argv)
           // pressure terms
           error_estimator_non_pressure->estimate_error(system, error_non_pressure);
 
-	  // Plot the estimated error from the non_pressure terms
+          // Plot the estimated error from the non_pressure terms
           write_error(equation_systems, error_non_pressure, 0, a_step, param, "_non_pressure");
 
           // Now for the pressure contributions
           ErrorVector error_with_pressure;
 
-	  // Next we build the norm_type_vector_with_pressure vectors and
+          // Next we build the norm_type_vector_with_pressure vectors and
           // weights_matrix_with_pressure matrix for the pressure term
           // error contributions
           std::vector<FEMNormType>
@@ -945,7 +945,7 @@ int main (int argc, char** argv)
           // Estimate the contributions to the QoI error from the pressure terms
           error_estimator_with_pressure->estimate_error(system, error_with_pressure);
 
-	  // Plot the error due to the pressure terms
+          // Plot the error due to the pressure terms
           write_error(equation_systems, error_with_pressure, 0, a_step, param, "_with_pressure");
 
           // Now for the convection diffusion term errors (in the x and y directions)
@@ -972,20 +972,20 @@ int main (int argc, char** argv)
             weights_matrix_convection_diffusion_x
             (system.n_vars(),
              std::vector<Real>(system.n_vars(), 0.0));
-	  weights_matrix_convection_diffusion_x[0][3] = 1.;
+          weights_matrix_convection_diffusion_x[0][3] = 1.;
           weights_matrix_convection_diffusion_x[3][3] = 1.;
 
-	  // We will also have to build and pass the weight functions to the weighted patch recovery estimators
+          // We will also have to build and pass the weight functions to the weighted patch recovery estimators
 
-	  // We pass the identity function as weights to error entries that the above matrix will scale to 0.
+          // We pass the identity function as weights to error entries that the above matrix will scale to 0.
           ConstFEMFunction<Number> identity(1);
 
           // Declare object of class CoupledFEMFunctionsx, the definition of the function contains the weight
-	  // to be applied to the relevant terms
-	  // For ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2} term, returns C,1_h
+          // to be applied to the relevant terms
+          // For ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2} term, returns C,1_h
           CoupledFEMFunctionsx convdiffx0(system, 0);
-	  // For ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} term, returns (u_1)_h
-	  CoupledFEMFunctionsx convdiffx3(system, 3);
+          // For ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} term, returns (u_1)_h
+          CoupledFEMFunctionsx convdiffx3(system, 3);
 
           // Make a vector of pointers to these objects
           std::vector<FEMFunctionBase<Number> *> coupled_system_weight_functions_x;
@@ -1008,11 +1008,11 @@ int main (int argc, char** argv)
           error_estimator_convection_diffusion_x->estimate_error
             (system, error_convection_diffusion_x);
 
-	  // Plot this error
+          // Plot this error
           write_error(equation_systems, error_convection_diffusion_x,
                       0, a_step, param, "_convection_diffusion_x");
 
-	  // Now for the y direction terms
+          // Now for the y direction terms
           ErrorVector error_convection_diffusion_y;
 
           // The norm type vectors and weights matrix for the convection_diffusion_x errors
@@ -1034,13 +1034,13 @@ int main (int argc, char** argv)
           std::vector<std::vector<Real> >
             weights_matrix_convection_diffusion_y
             (system.n_vars(), std::vector<Real>(system.n_vars(), 0.0));
-	  weights_matrix_convection_diffusion_y[1][3] = 1.;
+          weights_matrix_convection_diffusion_y[1][3] = 1.;
           weights_matrix_convection_diffusion_y[3][3] = 1.;
 
-	  // For ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2} term, returns C,2_h
+          // For ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2} term, returns C,2_h
           CoupledFEMFunctionsy convdiffy1(system, 1);
-	  // For ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} term, returns (u_2)_h
-	  CoupledFEMFunctionsy convdiffy3(system, 3);
+          // For ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} term, returns (u_2)_h
+          CoupledFEMFunctionsy convdiffy3(system, 3);
 
           // Make a vector of pointers to these objects
           std::vector<FEMFunctionBase<Number> *> coupled_system_weight_functions_y;
@@ -1062,7 +1062,7 @@ int main (int argc, char** argv)
           // convection diffusion y terms
           error_estimator_convection_diffusion_y->estimate_error(system, error_convection_diffusion_y);
 
-	  // Plot this error
+          // Plot this error
           write_error(equation_systems, error_convection_diffusion_y, 0, a_step, param, "_convection_diffusion_y");
 
           if(param.indicator_type == "adjoint_residual")

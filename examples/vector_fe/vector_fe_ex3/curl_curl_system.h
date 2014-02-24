@@ -52,7 +52,7 @@ public:
                                         DiffContext& context);
 
   virtual bool side_time_derivative(bool request_jacobian,
-				    DiffContext& context);
+                                    DiffContext& context);
 
 protected:
   // Indices for each variable;

@@ -99,8 +99,8 @@ using namespace libMesh;
 // Write gmv output
 
 void write_output(EquationSystems &es,
-		  unsigned int a_step, // The adaptive step count
-		  std::string solution_type) // primal or adjoint solve
+                  unsigned int a_step, // The adaptive step count
+                  std::string solution_type) // primal or adjoint solve
 {
 #ifdef LIBMESH_HAVE_GMV
   MeshBase &mesh = es.get_mesh();
@@ -159,8 +159,8 @@ void set_system_parameters(LaplaceSystem &system, FEMParameters &param)
     solver->linear_tolerance_multiplier = param.linear_tolerance_multiplier;
     if (system.time_solver->reduce_deltat_on_diffsolver_failure)
       {
-	solver->continue_after_max_iterations = true;
-	solver->continue_after_backtrack_failure = true;
+        solver->continue_after_max_iterations = true;
+        solver->continue_after_backtrack_failure = true;
       }
 
     // And the linear solver options
@@ -218,11 +218,11 @@ AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param)
       adjoint_residual_estimator->error_plot_suffix = "error.gmv";
 
       PatchRecoveryErrorEstimator *p1 =
-	new PatchRecoveryErrorEstimator;
+        new PatchRecoveryErrorEstimator;
       adjoint_residual_estimator->primal_error_estimator().reset(p1);
 
       PatchRecoveryErrorEstimator *p2 =
-	new PatchRecoveryErrorEstimator;
+        new PatchRecoveryErrorEstimator;
       adjoint_residual_estimator->dual_error_estimator().reset(p2);
 
       adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(0, H1_SEMINORM);
@@ -329,128 +329,128 @@ int main (int argc, char** argv)
     unsigned int a_step = 0;
     for (; a_step != param.max_adaptivesteps; ++a_step)
       {
-	// We can't adapt to both a tolerance and a
-	// target mesh size
-	if (param.global_tolerance != 0.)
-	  libmesh_assert_equal_to (param.nelem_target, 0);
-	// If we aren't adapting to a tolerance we need a
-	// target mesh size
+        // We can't adapt to both a tolerance and a
+        // target mesh size
+        if (param.global_tolerance != 0.)
+          libmesh_assert_equal_to (param.nelem_target, 0);
+        // If we aren't adapting to a tolerance we need a
+        // target mesh size
         else
           libmesh_assert_greater (param.nelem_target, 0);
 
-	// Solve the forward problem
-	system.solve();
+        // Solve the forward problem
+        system.solve();
 
-	// Write out the computed primal solution
-	write_output(equation_systems, a_step, "primal");
+        // Write out the computed primal solution
+        write_output(equation_systems, a_step, "primal");
 
-	// Get a pointer to the primal solution vector
-	NumericVector<Number> &primal_solution = *system.solution;
+        // Get a pointer to the primal solution vector
+        NumericVector<Number> &primal_solution = *system.solution;
 
-	// A SensitivityData object to hold the qois and parameters
-	SensitivityData sensitivities(qois, system, system.get_parameter_vector());
+        // A SensitivityData object to hold the qois and parameters
+        SensitivityData sensitivities(qois, system, system.get_parameter_vector());
 
-	// Make sure we get the contributions to the adjoint RHS from the sides
-	system.assemble_qoi_sides = true;
+        // Make sure we get the contributions to the adjoint RHS from the sides
+        system.assemble_qoi_sides = true;
 
-	// Here we solve the adjoint problem inside the adjoint_qoi_parameter_sensitivity
-	// function, so we have to set the adjoint_already_solved boolean to false
-	system.set_adjoint_already_solved(false);
+        // Here we solve the adjoint problem inside the adjoint_qoi_parameter_sensitivity
+        // function, so we have to set the adjoint_already_solved boolean to false
+        system.set_adjoint_already_solved(false);
 
-	// Compute the sensitivities
-	system.adjoint_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities);
+        // Compute the sensitivities
+        system.adjoint_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities);
 
-	// Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
-	system.set_adjoint_already_solved(true);
+        // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+        system.set_adjoint_already_solved(true);
 
-	GetPot infile_l_shaped("l-shaped.in");
+        GetPot infile_l_shaped("l-shaped.in");
 
-	Number sensitivity_QoI_0_0_computed = sensitivities[0][0];
-	Number sensitivity_QoI_0_0_exact = infile_l_shaped("sensitivity_0_0", 0.0);
-	Number sensitivity_QoI_0_1_computed = sensitivities[0][1];
-	Number sensitivity_QoI_0_1_exact = infile_l_shaped("sensitivity_0_1", 0.0);
+        Number sensitivity_QoI_0_0_computed = sensitivities[0][0];
+        Number sensitivity_QoI_0_0_exact = infile_l_shaped("sensitivity_0_0", 0.0);
+        Number sensitivity_QoI_0_1_computed = sensitivities[0][1];
+        Number sensitivity_QoI_0_1_exact = infile_l_shaped("sensitivity_0_1", 0.0);
 
-	std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
+        std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
                   << " active elements and "
                   << equation_systems.n_active_dofs()
-		  << " active dofs." << std::endl ;
+                  << " active dofs." << std::endl ;
 
-	std::cout<<"Sensitivity of QoI one to Parameter one is "<<sensitivity_QoI_0_0_computed<<std::endl;
-	std::cout<<"Sensitivity of QoI one to Parameter two is "<<sensitivity_QoI_0_1_computed<<std::endl;
+        std::cout<<"Sensitivity of QoI one to Parameter one is "<<sensitivity_QoI_0_0_computed<<std::endl;
+        std::cout<<"Sensitivity of QoI one to Parameter two is "<<sensitivity_QoI_0_1_computed<<std::endl;
 
-	std::cout<< "The relative error in sensitivity QoI_0_0 is "
-		 << std::setprecision(17)
+        std::cout<< "The relative error in sensitivity QoI_0_0 is "
+                 << std::setprecision(17)
                  << std::abs(sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact) /
           std::abs(sensitivity_QoI_0_0_exact) << std::endl;
-	std::cout<< "The relative error in sensitivity QoI_0_1 is "
+        std::cout<< "The relative error in sensitivity QoI_0_1 is "
                  << std::setprecision(17)
                  << std::abs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact) /
           std::abs(sensitivity_QoI_0_1_exact) << std::endl << std::endl;
 
-	// Get a pointer to the solution vector of the adjoint problem for QoI 0
-	NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
+        // Get a pointer to the solution vector of the adjoint problem for QoI 0
+        NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
 
-	// Swap the primal and dual solutions so we can write out the adjoint solution
-	primal_solution.swap(dual_solution_0);
-	write_output(equation_systems, a_step, "adjoint_0");
+        // Swap the primal and dual solutions so we can write out the adjoint solution
+        primal_solution.swap(dual_solution_0);
+        write_output(equation_systems, a_step, "adjoint_0");
 
-	// Swap back
-	primal_solution.swap(dual_solution_0);
+        // Swap back
+        primal_solution.swap(dual_solution_0);
 
-	// We have to refine either based on reaching an error tolerance or
-	// a number of elements target, which should be verified above
-	// Otherwise we flag elements by error tolerance or nelem target
+        // We have to refine either based on reaching an error tolerance or
+        // a number of elements target, which should be verified above
+        // Otherwise we flag elements by error tolerance or nelem target
 
-	// Uniform refinement
-	if(param.refine_uniformly)
-	  {
-	    std::cout<<"Refining Uniformly"<<std::endl<<std::endl;
+        // Uniform refinement
+        if(param.refine_uniformly)
+          {
+            std::cout<<"Refining Uniformly"<<std::endl<<std::endl;
 
-	    mesh_refinement->uniformly_refine(1);
-	  }
-	// Adaptively refine based on reaching an error tolerance
-	else if(param.global_tolerance >= 0. && param.nelem_target == 0.)
-	  {
-	    // Now we construct the data structures for the mesh refinement process
-	    ErrorVector error;
+            mesh_refinement->uniformly_refine(1);
+          }
+        // Adaptively refine based on reaching an error tolerance
+        else if(param.global_tolerance >= 0. && param.nelem_target == 0.)
+          {
+            // Now we construct the data structures for the mesh refinement process
+            ErrorVector error;
 
-	    // Build an error estimator object
-	    AutoPtr<ErrorEstimator> error_estimator =
-	      build_error_estimator(param);
+            // Build an error estimator object
+            AutoPtr<ErrorEstimator> error_estimator =
+              build_error_estimator(param);
 
-	    // Estimate the error in each element using the Adjoint Residual or Kelly error estimator
-	    error_estimator->estimate_error(system, error);
+            // Estimate the error in each element using the Adjoint Residual or Kelly error estimator
+            error_estimator->estimate_error(system, error);
 
-	    mesh_refinement->flag_elements_by_error_tolerance (error);
+            mesh_refinement->flag_elements_by_error_tolerance (error);
 
-	    mesh_refinement->refine_and_coarsen_elements();
-	  }
-	// Adaptively refine based on reaching a target number of elements
-	else
-	  {
-	    // Now we construct the data structures for the mesh refinement process
-	    ErrorVector error;
+            mesh_refinement->refine_and_coarsen_elements();
+          }
+        // Adaptively refine based on reaching a target number of elements
+        else
+          {
+            // Now we construct the data structures for the mesh refinement process
+            ErrorVector error;
 
-	    // Build an error estimator object
-	    AutoPtr<ErrorEstimator> error_estimator =
-	      build_error_estimator(param);
+            // Build an error estimator object
+            AutoPtr<ErrorEstimator> error_estimator =
+              build_error_estimator(param);
 
-	    // Estimate the error in each element using the Adjoint Residual or Kelly error estimator
-	    error_estimator->estimate_error(system, error);
+            // Estimate the error in each element using the Adjoint Residual or Kelly error estimator
+            error_estimator->estimate_error(system, error);
 
-	    if (mesh.n_active_elem() >= param.nelem_target)
-	      {
-		std::cout<<"We reached the target number of elements."<<std::endl <<std::endl;
-		break;
-	      }
+            if (mesh.n_active_elem() >= param.nelem_target)
+              {
+                std::cout<<"We reached the target number of elements."<<std::endl <<std::endl;
+                break;
+              }
 
-	    mesh_refinement->flag_elements_by_nelem_target (error);
+            mesh_refinement->flag_elements_by_nelem_target (error);
 
-	    mesh_refinement->refine_and_coarsen_elements();
-	  }
+            mesh_refinement->refine_and_coarsen_elements();
+          }
 
-	// Dont forget to reinit the system after each adaptive refinement !
-	equation_systems.reinit();
+        // Dont forget to reinit the system after each adaptive refinement !
+        equation_systems.reinit();
 
         std::cout << "Refined mesh to "
                   << mesh.n_active_elem()
@@ -462,53 +462,53 @@ int main (int argc, char** argv)
     // Do one last solve if necessary
     if (a_step == param.max_adaptivesteps)
       {
-	system.solve();
+        system.solve();
 
-	write_output(equation_systems, a_step, "primal");
+        write_output(equation_systems, a_step, "primal");
 
-	NumericVector<Number> &primal_solution = *system.solution;
+        NumericVector<Number> &primal_solution = *system.solution;
 
-	SensitivityData sensitivities(qois, system, system.get_parameter_vector());
+        SensitivityData sensitivities(qois, system, system.get_parameter_vector());
 
-	system.assemble_qoi_sides = true;
+        system.assemble_qoi_sides = true;
 
-	// Here we solve the adjoint problem inside the adjoint_qoi_parameter_sensitivity
-	// function, so we have to set the adjoint_already_solved boolean to false
-	system.set_adjoint_already_solved(false);
+        // Here we solve the adjoint problem inside the adjoint_qoi_parameter_sensitivity
+        // function, so we have to set the adjoint_already_solved boolean to false
+        system.set_adjoint_already_solved(false);
 
-	system.adjoint_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities);
+        system.adjoint_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities);
 
-	// Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
-	system.set_adjoint_already_solved(true);
+        // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+        system.set_adjoint_already_solved(true);
 
-	GetPot infile_l_shaped("l-shaped.in");
+        GetPot infile_l_shaped("l-shaped.in");
 
-	Number sensitivity_QoI_0_0_computed = sensitivities[0][0];
-	Number sensitivity_QoI_0_0_exact = infile_l_shaped("sensitivity_0_0", 0.0);
-	Number sensitivity_QoI_0_1_computed = sensitivities[0][1];
-	Number sensitivity_QoI_0_1_exact = infile_l_shaped("sensitivity_0_1", 0.0);
+        Number sensitivity_QoI_0_0_computed = sensitivities[0][0];
+        Number sensitivity_QoI_0_0_exact = infile_l_shaped("sensitivity_0_0", 0.0);
+        Number sensitivity_QoI_0_1_computed = sensitivities[0][1];
+        Number sensitivity_QoI_0_1_exact = infile_l_shaped("sensitivity_0_1", 0.0);
 
-	std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
-		  << " active elements and "
-		  << equation_systems.n_active_dofs()
-		  << " active dofs." << std::endl ;
+        std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
+                  << " active elements and "
+                  << equation_systems.n_active_dofs()
+                  << " active dofs." << std::endl ;
 
-	std::cout<<"Sensitivity of QoI one to Parameter one is "<<sensitivity_QoI_0_0_computed<<std::endl;
-	std::cout<<"Sensitivity of QoI one to Parameter two is "<<sensitivity_QoI_0_1_computed<<std::endl;
+        std::cout<<"Sensitivity of QoI one to Parameter one is "<<sensitivity_QoI_0_0_computed<<std::endl;
+        std::cout<<"Sensitivity of QoI one to Parameter two is "<<sensitivity_QoI_0_1_computed<<std::endl;
 
-	std::cout<< "The error in sensitivity QoI_0_0 is "
+        std::cout<< "The error in sensitivity QoI_0_0 is "
                  << std::setprecision(17)
                  << std::abs(sensitivity_QoI_0_0_computed - sensitivity_QoI_0_0_exact)/sensitivity_QoI_0_0_exact << std::endl;
-	std::cout<< "The error in sensitivity QoI_0_1 is "
+        std::cout<< "The error in sensitivity QoI_0_1 is "
                  << std::setprecision(17)
                  << std::abs(sensitivity_QoI_0_1_computed - sensitivity_QoI_0_1_exact)/sensitivity_QoI_0_1_exact << std::endl << std::endl;
 
-	NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
+        NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
 
-	primal_solution.swap(dual_solution_0);
-	write_output(equation_systems, a_step, "adjoint_0");
+        primal_solution.swap(dual_solution_0);
+        write_output(equation_systems, a_step, "adjoint_0");
 
-	primal_solution.swap(dual_solution_0);
+        primal_solution.swap(dual_solution_0);
       }
   }
 

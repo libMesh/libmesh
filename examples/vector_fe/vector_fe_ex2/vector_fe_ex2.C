@@ -64,13 +64,13 @@ int main (int argc, char** argv)
   // elements in 3D.  Building these higher-order elements allows
   // us to use higher-order approximation, as in example 3.
   MeshTools::Generation::build_cube (mesh,
-				     grid_size,
-				     grid_size,
-				     grid_size,
-				     -1., 1.,
-				     -1., 1.,
-				     -1., 1.,
-				     HEX8);
+                                     grid_size,
+                                     grid_size,
+                                     grid_size,
+                                     -1., 1.,
+                                     -1., 1.,
+                                     -1., 1.,
+                                     HEX8);
 
   // Print information about the mesh to the screen.
   mesh.print_info();
@@ -133,11 +133,11 @@ int main (int argc, char** argv)
 
   // Print out the error values
   std::cout << "L2-Error is: "
-	    << exact_sol.l2_error("Laplace", "u")
-	    << std::endl;
+            << exact_sol.l2_error("Laplace", "u")
+            << std::endl;
   std::cout << "H1-Error is: "
-	    << exact_sol.h1_error("Laplace", "u")
-	    << std::endl;
+            << exact_sol.h1_error("Laplace", "u")
+            << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 

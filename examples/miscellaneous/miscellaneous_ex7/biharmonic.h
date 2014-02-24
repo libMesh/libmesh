@@ -59,14 +59,14 @@ class Biharmonic : public EquationSystems
 public:
   // Initial state enumeration
   enum InitialStateEnum {STRIP = 0,
-			 ROD   = 1,
-			 BALL  = 2};
+                         ROD   = 1,
+                         BALL  = 2};
 
   // Free energy enumeration
   enum FreeEnergyEnum {DOUBLE_WELL         = 1,
-		       DOUBLE_OBSTACLE     = 2,
-		       LOG_DOUBLE_WELL     = 3,
-		       LOG_DOUBLE_OBSTACLE = 4};
+                       DOUBLE_OBSTACLE     = 2,
+                       LOG_DOUBLE_WELL     = 3,
+                       LOG_DOUBLE_OBSTACLE = 4};
 
   /**
    * Static creation/destruction routines.  FIXME - this looks like

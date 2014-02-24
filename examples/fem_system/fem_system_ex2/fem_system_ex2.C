@@ -60,7 +60,7 @@ void setup(EquationSystems& systems, Mesh& mesh, GetPot& args)
   double sizey = args("mesh/generation/size", 2.0, 1);
   double sizez = args("mesh/generation/size", 2.0, 2);
   MeshTools::Generation::build_cube(mesh, nx, ny, nz,
-      origx, origx+sizex, origy, origy+sizey, origz, origz+sizez, eltype);
+                                    origx, origx+sizex, origy, origy+sizey, origz, origz+sizez, eltype);
 
   // Creating Systems
   SolidSystem& imms = systems.add_system<SolidSystem> ("solid");

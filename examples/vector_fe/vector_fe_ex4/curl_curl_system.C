@@ -107,7 +107,7 @@ void CurlCurlSystem::init_context(DiffContext &context)
 
 
 bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
-					      DiffContext &context)
+                                              DiffContext &context)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
@@ -169,10 +169,10 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
               for (unsigned int j=0; j != n_u_dofs; j++)
                 {
                   Kuu(i,j) += ( curl_phi[j][qp]*curl_phi[i][qp] +
-			        phi[j][qp]*phi[i][qp] )*JxW[qp];
+                                phi[j][qp]*phi[i][qp] )*JxW[qp];
 
-		}
-	    }
+                }
+            }
 
         }
     } // end of the quadrature point qp-loop
@@ -182,7 +182,7 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
 
 
 bool CurlCurlSystem::side_time_derivative (bool request_jacobian,
-					   DiffContext &context)
+                                           DiffContext &context)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
@@ -228,7 +228,7 @@ bool CurlCurlSystem::side_time_derivative (bool request_jacobian,
 
       for (unsigned int i=0; i != n_u_dofs; i++)
         {
-	  Fu(i) += penalty*Ncu*(phi[i][qp].cross(N))*JxW[qp];
+          Fu(i) += penalty*Ncu*(phi[i][qp].cross(N))*JxW[qp];
 
           if (request_jacobian)
             {

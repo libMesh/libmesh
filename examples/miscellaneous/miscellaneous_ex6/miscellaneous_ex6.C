@@ -117,13 +117,13 @@ void triangulate_domain(const Parallel::Communicator& comm)
 
   // hole_1 is a circle (discretized by 50 points)
   PolygonHole hole_1(Point(-0.5,  0.5), // center
-		     0.25,              // radius
-		     50);               // n. points
+                     0.25,              // radius
+                     50);               // n. points
 
   // hole_2 is itself a triangle
   PolygonHole hole_2(Point(0.5, 0.5),   // center
-		     0.1,               // radius
-		     3);                // n. points
+                     0.1,               // radius
+                     3);                // n. points
 
   // hole_3 is an ellipse of 100 points which we define here
   Point ellipse_center(-0.5,  -0.5);
@@ -136,7 +136,7 @@ void triangulate_domain(const Parallel::Communicator& comm)
 
   for (unsigned int i=0; i<n_ellipse_points; ++i)
     ellipse_points[i]= Point(ellipse_center(0)+a*cos(i*dtheta),
-			     ellipse_center(1)+b*sin(i*dtheta));
+                             ellipse_center(1)+b*sin(i*dtheta));
 
   ArbitraryHole hole_3(ellipse_center, ellipse_points);
 
@@ -203,8 +203,8 @@ void tetrahedralize_domain(const Parallel::Communicator& comm)
   // Construct the Delaunay tetrahedralization
   TetGenMeshInterface t(mesh);
   t.triangulate_conformingDelaunayMesh_carvehole(hole,
-						 quality_constraint,
-						 volume_constraint);
+                                                 quality_constraint,
+                                                 volume_constraint);
 
   // Find neighbors, etc in preparation for writing out the Mesh
   mesh.prepare_for_use();
@@ -234,11 +234,11 @@ void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper
   unsigned n_elem = 1;
 
   MeshTools::Generation::build_cube(cube_mesh,
-				    n_elem,n_elem,n_elem, // n. elements in each direction
-				    lower_limit(0), upper_limit(0),
-				    lower_limit(1), upper_limit(1),
-				    lower_limit(2), upper_limit(2),
-				    HEX8);
+                                    n_elem,n_elem,n_elem, // n. elements in each direction
+                                    lower_limit(0), upper_limit(0),
+                                    lower_limit(1), upper_limit(1),
+                                    lower_limit(2), upper_limit(2),
+                                    HEX8);
 
   // The pointset_convexhull() algorithm will ignore the Hex8s
   // in the Mesh, and just construct the triangulation
@@ -258,17 +258,17 @@ void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper
     const MeshBase::element_iterator end = cube_mesh.elements_end();
     for ( ; it != end; ++it)
       {
-	Elem* elem = *it;
+        Elem* elem = *it;
 
-	for (unsigned s=0; s<elem->n_sides(); ++s)
-	  if (elem->neighbor(s) == NULL)
-	    {
-	      // Add the node IDs of this side to the set
-	      AutoPtr<Elem> side = elem->side(s);
+        for (unsigned s=0; s<elem->n_sides(); ++s)
+          if (elem->neighbor(s) == NULL)
+            {
+              // Add the node IDs of this side to the set
+              AutoPtr<Elem> side = elem->side(s);
 
-	      for (unsigned n=0; n<side->n_nodes(); ++n)
-		node_id_map.insert( std::make_pair(side->node(n), /*dummy_value=*/0) );
-	    }
+              for (unsigned n=0; n<side->n_nodes(); ++n)
+                node_id_map.insert( std::make_pair(side->node(n), /*dummy_value=*/0) );
+            }
       }
   }
 
@@ -298,33 +298,33 @@ void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper
 
     for (; el != end_el; ++el)
       {
-	Elem* old_elem = *el;
+        Elem* old_elem = *el;
 
-	if (old_elem->type() == TRI3)
-	  {
-	    Elem* new_elem = mesh.add_elem(new Tri3);
+        if (old_elem->type() == TRI3)
+          {
+            Elem* new_elem = mesh.add_elem(new Tri3);
 
-	    // Assign nodes in new elements.  Since this is an example,
-	    // we'll do it in several steps.
-	    for (unsigned i=0; i<old_elem->n_nodes(); ++i)
-	      {
-		// Locate old node ID in the map
-		iterator it = node_id_map.find(old_elem->node(i));
+            // Assign nodes in new elements.  Since this is an example,
+            // we'll do it in several steps.
+            for (unsigned i=0; i<old_elem->n_nodes(); ++i)
+              {
+                // Locate old node ID in the map
+                iterator it = node_id_map.find(old_elem->node(i));
 
-		// Check for not found
-		if (it == node_id_map.end())
-		  {
-		    libMesh::err << "Node id " << old_elem->node(i) << " not found in map!" << std::endl;
-		    libmesh_error();
-		  }
+                // Check for not found
+                if (it == node_id_map.end())
+                  {
+                    libMesh::err << "Node id " << old_elem->node(i) << " not found in map!" << std::endl;
+                    libmesh_error();
+                  }
 
-		// Mapping to node ID in input mesh
-		unsigned new_node_id = (*it).second;
+                // Mapping to node ID in input mesh
+                unsigned new_node_id = (*it).second;
 
-		// Node pointer assigned from input mesh
-		new_elem->set_node(i) = mesh.node_ptr(new_node_id);
-	      }
-	  }
+                // Node pointer assigned from input mesh
+                new_elem->set_node(i) = mesh.node_ptr(new_node_id);
+              }
+          }
       }
   }
 #endif // LIBMESH_HAVE_TETGEN

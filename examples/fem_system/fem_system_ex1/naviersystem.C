@@ -90,15 +90,15 @@ void NavierSystem::init_data ()
   // Add the velocity components "u" & "v".  They
   // will be approximated using second-order approximation.
   u_var = this->add_variable ("u", static_cast<Order>(pressure_p+1),
-			      fefamily);
+                              fefamily);
   v_var = this->add_variable ("v",
-			      static_cast<Order>(pressure_p+1),
-			      fefamily);
+                              static_cast<Order>(pressure_p+1),
+                              fefamily);
 
   if (dim == 3)
     w_var = this->add_variable ("w",
-			        static_cast<Order>(pressure_p+1),
-			        fefamily);
+                                static_cast<Order>(pressure_p+1),
+                                fefamily);
   else
     w_var = u_var;
 
@@ -106,8 +106,8 @@ void NavierSystem::init_data ()
   // be approximated with a first-order basis,
   // providing an LBB-stable pressure-velocity pair.
   p_var = this->add_variable ("p",
-			      static_cast<Order>(pressure_p),
-			      fefamily);
+                              static_cast<Order>(pressure_p),
+                              fefamily);
 
   // Tell the system to march velocity forward in time, but
   // leave p as a constraint only
@@ -500,7 +500,7 @@ bool NavierSystem::side_constraint (bool request_jacobian,
               libmesh_assert_equal_to (c.get_elem_solution_derivative(), 1.0);
 
               for (unsigned int j=0; j != n_p_dofs; j++)
-		Kpp(i,j) += penalty * point_phi[i] * point_phi[j];
+                Kpp(i,j) += penalty * point_phi[i] * point_phi[j];
             }
         }
     }
@@ -627,59 +627,59 @@ Point NavierSystem::forcing(const Point& p)
       // lid driven cavity
     case 0:
       {
-	// No forcing
-	return Point(0.,0.,0.);
+        // No forcing
+        return Point(0.,0.,0.);
       }
 
       // Homogeneous Dirichlet BCs + sinusoidal forcing
     case 1:
       {
-	const unsigned int dim = this->get_mesh().mesh_dimension();
+        const unsigned int dim = this->get_mesh().mesh_dimension();
 
-	// This assumes your domain is defined on [0,1]^dim.
-	Point f;
+        // This assumes your domain is defined on [0,1]^dim.
+        Point f;
 
-	// Counter-Clockwise vortex in x-y plane
-	if (dim==2)
-	  {
-	    f(0) =  std::sin(2.*libMesh::pi*p(1));
-	    f(1) = -std::sin(2.*libMesh::pi*p(0));
-	  }
+        // Counter-Clockwise vortex in x-y plane
+        if (dim==2)
+          {
+            f(0) =  std::sin(2.*libMesh::pi*p(1));
+            f(1) = -std::sin(2.*libMesh::pi*p(0));
+          }
 
-	// Counter-Clockwise vortex in x-z plane
-	else if (dim==3)
-	  {
-	    f(0) =  std::sin(2.*libMesh::pi*p(1));
-	    f(1) = 0.;
-	    f(2) = -std::sin(2.*libMesh::pi*p(0));
-	  }
+        // Counter-Clockwise vortex in x-z plane
+        else if (dim==3)
+          {
+            f(0) =  std::sin(2.*libMesh::pi*p(1));
+            f(1) = 0.;
+            f(2) = -std::sin(2.*libMesh::pi*p(0));
+          }
 
-	return f;
+        return f;
       }
 
       // 3D test case with quadratic velocity and linear pressure field
     case 2:
       {
-	// This problem doesn't make sense in 1D...
-	libmesh_assert_not_equal_to (1, this->get_mesh().mesh_dimension());
-	const Real x=p(0), y=p(1), z=p(2);
-	const Real
-	  u=(Reynolds+1)*(y*y + z*z),
-	  v=(Reynolds+1)*(x*x + z*z),
-	  w=(Reynolds+1)*(x*x + y*y);
+        // This problem doesn't make sense in 1D...
+        libmesh_assert_not_equal_to (1, this->get_mesh().mesh_dimension());
+        const Real x=p(0), y=p(1), z=p(2);
+        const Real
+          u=(Reynolds+1)*(y*y + z*z),
+          v=(Reynolds+1)*(x*x + z*z),
+          w=(Reynolds+1)*(x*x + y*y);
 
-	if (this->get_mesh().mesh_dimension() == 2)
-	  return 2*Reynolds*(Reynolds+1)*Point(v*y,
-					       u*x);
-	else
-	  return 2*Reynolds*(Reynolds+1)*Point(v*y + w*z,
-					       u*x + w*z,
-					       u*x + v*y);
+        if (this->get_mesh().mesh_dimension() == 2)
+          return 2*Reynolds*(Reynolds+1)*Point(v*y,
+                                               u*x);
+        else
+          return 2*Reynolds*(Reynolds+1)*Point(v*y + w*z,
+                                               u*x + w*z,
+                                               u*x + v*y);
       }
 
     default:
       {
-	libmesh_error();
+        libmesh_error();
       }
     }
 }

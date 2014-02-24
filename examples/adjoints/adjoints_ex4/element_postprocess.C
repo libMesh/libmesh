@@ -49,13 +49,13 @@ void LaplaceSystem::element_postprocess (DiffContext &context)
 
       // If in the sub-domain omega, add the contribution to the integral R
       if(fabs(x - 0.875) <= 0.125 && fabs(y - 0.125) <= 0.125)
-  	{
-  	  // Get the solution value at the quadrature point
-  	  Number T = c.interior_value(0, qp);
+        {
+          // Get the solution value at the quadrature point
+          Number T = c.interior_value(0, qp);
 
-  	  // Update the elemental increment dR for each qp
-  	  dQoI_0 += JxW[qp] * T;
-  	}
+          // Update the elemental increment dR for each qp
+          dQoI_0 += JxW[qp] * T;
+        }
     }
 
   // Update the computed value of the global functional R, by adding the contribution from this element

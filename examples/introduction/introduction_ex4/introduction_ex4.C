@@ -97,8 +97,8 @@ void assemble_poisson(EquationSystems& es,
 
 // Exact solution function prototype.
 Real exact_solution (const Real x,
-		     const Real y,
-		     const Real z = 0.);
+                     const Real y,
+                     const Real z = 0.);
 
 // Define a wrapper for exact_solution that will be needed below
 void exact_solution_wrapper (DenseVector<Number>& output,
@@ -106,8 +106,8 @@ void exact_solution_wrapper (DenseVector<Number>& output,
                              const Real)
 {
   output(0) = exact_solution(p(0),
-			     (LIBMESH_DIM>1)?p(1):0,
-			     (LIBMESH_DIM>2)?p(2):0);
+                             (LIBMESH_DIM>1)?p(1):0,
+                             (LIBMESH_DIM>2)?p(2):0);
 }
 
 // Begin the main program.
@@ -202,8 +202,8 @@ int main (int argc, char** argv)
       // solving with low-order finite elements.
       MeshTools::Generation::build_cube (mesh,
                                          ps,
-					 (dim>1) ? ps : 0,
-					 (dim>2) ? ps : 0,
+                                         (dim>1) ? ps : 0,
+                                         (dim>2) ? ps : 0,
                                          -1., 1.,
                                          -halfwidth, halfwidth,
                                          -halfheight, halfheight,
@@ -214,9 +214,9 @@ int main (int argc, char** argv)
   else
     {
       MeshTools::Generation::build_cube (mesh,
-					 ps,
-					 (dim>1) ? ps : 0,
-					 (dim>2) ? ps : 0,
+                                         ps,
+                                         (dim>1) ? ps : 0,
+                                         (dim>2) ? ps : 0,
                                          -1., 1.,
                                          -halfwidth, halfwidth,
                                          -halfheight, halfheight,

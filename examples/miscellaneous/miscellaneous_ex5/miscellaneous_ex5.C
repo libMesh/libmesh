@@ -521,12 +521,12 @@ int main (int argc, char** argv)
   if( on_command_line( "element_type" ) )
     {
       std::string fe_str = command_line_value( std::string("element_type"),
-					       std::string("MONOMIAL") );
+                                               std::string("MONOMIAL") );
       if( fe_str != "MONOMIAL" || fe_str != "XYZ" )
-	{
-	  std::cerr << "Error: This example must be run with MONOMIAL or XYZ element types." << std::endl;
-	  libmesh_error();
-	}
+        {
+          std::cerr << "Error: This example must be run with MONOMIAL or XYZ element types." << std::endl;
+          libmesh_error();
+        }
       ellipticdg_system.add_variable ("u", p_order, Utility::string_to_enum<FEFamily>(fe_str) );
     }
   else

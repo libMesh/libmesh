@@ -47,7 +47,7 @@ public:
   }
 
   virtual Number component( unsigned int component_in, const Point& p,
-			    const Real )
+                            const Real )
   {
     const Real x=p(0), y=p(1);
     return soln( x, y )(component_in);

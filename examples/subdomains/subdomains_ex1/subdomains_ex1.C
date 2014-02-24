@@ -191,8 +191,8 @@ int main (int argc, char** argv)
       // solving with low-order finite elements.
       MeshTools::Generation::build_cube (mesh,
                                          ps,
-					 (dim>1) ? ps : 0,
-					 (dim>2) ? ps : 0,
+                                         (dim>1) ? ps : 0,
+                                         (dim>2) ? ps : 0,
                                          -1., 1.,
                                          -halfwidth, halfwidth,
                                          -halfheight, halfheight,
@@ -203,9 +203,9 @@ int main (int argc, char** argv)
   else
     {
       MeshTools::Generation::build_cube (mesh,
-					 ps,
-					 (dim>1) ? ps : 0,
-					 (dim>2) ? ps : 0,
+                                         ps,
+                                         (dim>1) ? ps : 0,
+                                         (dim>2) ? ps : 0,
                                          -1., 1.,
                                          -halfwidth, halfwidth,
                                          -halfheight, halfheight,
@@ -228,38 +228,38 @@ int main (int argc, char** argv)
     const MeshBase::element_iterator elem_end = mesh.elements_end();
     for (; elem_it != elem_end; ++elem_it)
       {
-	Elem* elem = *elem_it;
-	if(elem->active())
-	  {
-	    // Just check whether the current element has at least one
-	    // node inside and one node outside the circle.
-	    bool node_in = false;
-	    bool node_out = false;
-	    for(unsigned int i=0; i<elem->n_nodes(); i++)
-	      {
-		double d = elem->point(i).size();
-		if(d<0.8)
-		  {
-		    node_in = true;
-		  }
-		else
-		  {
-		    node_out = true;
-		  }
-	      }
-	    if(node_in && node_out)
-	      {
-		elem->set_refinement_flag(Elem::REFINE);
-	      }
-	    else
-	      {
-		elem->set_refinement_flag(Elem::DO_NOTHING);
-	      }
-	  }
-	else
-	  {
-	    elem->set_refinement_flag(Elem::INACTIVE);
-	  }
+        Elem* elem = *elem_it;
+        if(elem->active())
+          {
+            // Just check whether the current element has at least one
+            // node inside and one node outside the circle.
+            bool node_in = false;
+            bool node_out = false;
+            for(unsigned int i=0; i<elem->n_nodes(); i++)
+              {
+                double d = elem->point(i).size();
+                if(d<0.8)
+                  {
+                    node_in = true;
+                  }
+                else
+                  {
+                    node_out = true;
+                  }
+              }
+            if(node_in && node_out)
+              {
+                elem->set_refinement_flag(Elem::REFINE);
+              }
+            else
+              {
+                elem->set_refinement_flag(Elem::DO_NOTHING);
+              }
+          }
+        else
+          {
+            elem->set_refinement_flag(Elem::INACTIVE);
+          }
       }
 
     // Now actually refine.
@@ -277,12 +277,12 @@ int main (int argc, char** argv)
     const MeshBase::element_iterator elem_end = mesh.elements_end();
     for (; elem_it != elem_end; ++elem_it)
       {
-	Elem* elem = *elem_it;
-	double d = elem->centroid().size();
-	if(d<0.8)
-	  {
-	    elem->subdomain_id() = 1;
-	  }
+        Elem* elem = *elem_it;
+        double d = elem->centroid().size();
+        if(d<0.8)
+          {
+            elem->subdomain_id() = 1;
+          }
       }
   }
 
@@ -464,229 +464,229 @@ void assemble_poisson(EquationSystems& es,
       // Elements with subdomain_id other than 1 are not in the active
       // subdomain.  We don't assemble anything for them.
       if(elem->subdomain_id()==1)
-	{
-	  // Start logging the shape function initialization.
-	  // This is done through a simple function call with
-	  // the name of the event to log.
-	  perf_log.push("elem init");
+        {
+          // Start logging the shape function initialization.
+          // This is done through a simple function call with
+          // the name of the event to log.
+          perf_log.push("elem init");
 
-	  // Get the degree of freedom indices for the
-	  // current element.  These define where in the global
-	  // matrix and right-hand-side this element will
-	  // contribute to.
-	  dof_map.dof_indices (elem, dof_indices);
+          // Get the degree of freedom indices for the
+          // current element.  These define where in the global
+          // matrix and right-hand-side this element will
+          // contribute to.
+          dof_map.dof_indices (elem, dof_indices);
 
-	  // Compute the element-specific data for the current
-	  // element.  This involves computing the location of the
-	  // quadrature points (q_point) and the shape functions
-	  // (phi, dphi) for the current element.
-	  fe->reinit (elem);
+          // Compute the element-specific data for the current
+          // element.  This involves computing the location of the
+          // quadrature points (q_point) and the shape functions
+          // (phi, dphi) for the current element.
+          fe->reinit (elem);
 
-	  // Zero the element matrix and right-hand side before
-	  // summing them.  We use the resize member here because
-	  // the number of degrees of freedom might have changed from
-	  // the last element.  Note that this will be the case if the
-	  // element type is different (i.e. the last element was a
-	  // triangle, now we are on a quadrilateral).
-	  Ke.resize (dof_indices.size(),
-		     dof_indices.size());
+          // Zero the element matrix and right-hand side before
+          // summing them.  We use the resize member here because
+          // the number of degrees of freedom might have changed from
+          // the last element.  Note that this will be the case if the
+          // element type is different (i.e. the last element was a
+          // triangle, now we are on a quadrilateral).
+          Ke.resize (dof_indices.size(),
+                     dof_indices.size());
 
-	  Fe.resize (dof_indices.size());
+          Fe.resize (dof_indices.size());
 
-	  // Stop logging the shape function initialization.
-	  // If you forget to stop logging an event the PerfLog
-	  // object will probably catch the error and abort.
-	  perf_log.pop("elem init");
+          // Stop logging the shape function initialization.
+          // If you forget to stop logging an event the PerfLog
+          // object will probably catch the error and abort.
+          perf_log.pop("elem init");
 
-	  // Now we will build the element matrix.  This involves
-	  // a double loop to integrate the test funcions (i) against
-	  // the trial functions (j).
-	  //
-	  // We have split the numeric integration into two loops
-	  // so that we can log the matrix and right-hand-side
-	  // computation seperately.
-	  //
-	  // Now start logging the element matrix computation
-	  perf_log.push ("Ke");
+          // Now we will build the element matrix.  This involves
+          // a double loop to integrate the test funcions (i) against
+          // the trial functions (j).
+          //
+          // We have split the numeric integration into two loops
+          // so that we can log the matrix and right-hand-side
+          // computation seperately.
+          //
+          // Now start logging the element matrix computation
+          perf_log.push ("Ke");
 
-	  for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	    for (unsigned int i=0; i<phi.size(); i++)
-	      for (unsigned int j=0; j<phi.size(); j++)
-		Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+          for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+            for (unsigned int i=0; i<phi.size(); i++)
+              for (unsigned int j=0; j<phi.size(); j++)
+                Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 
 
-	  // Stop logging the matrix computation
-	  perf_log.pop ("Ke");
+          // Stop logging the matrix computation
+          perf_log.pop ("Ke");
 
-	  // Now we build the element right-hand-side contribution.
-	  // This involves a single loop in which we integrate the
-	  // "forcing function" in the PDE against the test functions.
-	  //
-	  // Start logging the right-hand-side computation
-	  perf_log.push ("Fe");
+          // Now we build the element right-hand-side contribution.
+          // This involves a single loop in which we integrate the
+          // "forcing function" in the PDE against the test functions.
+          //
+          // Start logging the right-hand-side computation
+          perf_log.push ("Fe");
 
-	  for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-	    {
-	      // fxy is the forcing function for the Poisson equation.
-	      // In this case we set fxy to be a finite difference
-	      // Laplacian approximation to the (known) exact solution.
-	      //
-	      // We will use the second-order accurate FD Laplacian
-	      // approximation, which in 2D on a structured grid is
-	      //
-	      // u_xx + u_yy = (u(i-1,j) + u(i+1,j) +
-	      //                u(i,j-1) + u(i,j+1) +
-	      //                -4*u(i,j))/h^2
-	      //
-	      // Since the value of the forcing function depends only
-	      // on the location of the quadrature point (q_point[qp])
-	      // we will compute it here, outside of the i-loop
-	      const Real x = q_point[qp](0);
+          for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+            {
+              // fxy is the forcing function for the Poisson equation.
+              // In this case we set fxy to be a finite difference
+              // Laplacian approximation to the (known) exact solution.
+              //
+              // We will use the second-order accurate FD Laplacian
+              // approximation, which in 2D on a structured grid is
+              //
+              // u_xx + u_yy = (u(i-1,j) + u(i+1,j) +
+              //                u(i,j-1) + u(i,j+1) +
+              //                -4*u(i,j))/h^2
+              //
+              // Since the value of the forcing function depends only
+              // on the location of the quadrature point (q_point[qp])
+              // we will compute it here, outside of the i-loop
+              const Real x = q_point[qp](0);
 #if LIBMESH_DIM > 1
-	      const Real y = q_point[qp](1);
+              const Real y = q_point[qp](1);
 #else
-	      const Real y = 0.;
+              const Real y = 0.;
 #endif
 #if LIBMESH_DIM > 2
-	      const Real z = q_point[qp](2);
+              const Real z = q_point[qp](2);
 #else
-	      const Real z = 0.;
+              const Real z = 0.;
 #endif
-	      const Real eps = 1.e-3;
+              const Real eps = 1.e-3;
 
-	      const Real uxx = (exact_solution(x-eps,y,z) +
-				exact_solution(x+eps,y,z) +
-				-2.*exact_solution(x,y,z))/eps/eps;
+              const Real uxx = (exact_solution(x-eps,y,z) +
+                                exact_solution(x+eps,y,z) +
+                                -2.*exact_solution(x,y,z))/eps/eps;
 
-	      const Real uyy = (exact_solution(x,y-eps,z) +
-				exact_solution(x,y+eps,z) +
-				-2.*exact_solution(x,y,z))/eps/eps;
+              const Real uyy = (exact_solution(x,y-eps,z) +
+                                exact_solution(x,y+eps,z) +
+                                -2.*exact_solution(x,y,z))/eps/eps;
 
-	      const Real uzz = (exact_solution(x,y,z-eps) +
-				exact_solution(x,y,z+eps) +
-				-2.*exact_solution(x,y,z))/eps/eps;
+              const Real uzz = (exact_solution(x,y,z-eps) +
+                                exact_solution(x,y,z+eps) +
+                                -2.*exact_solution(x,y,z))/eps/eps;
 
-	      Real fxy;
-	      if(dim==1)
-		{
-		  // In 1D, compute the rhs by differentiating the
-		  // exact solution twice.
-		  const Real pi = libMesh::pi;
-		  fxy = (0.25*pi*pi)*sin(.5*pi*x);
-		}
-	      else
-		{
-		  fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
-		}
+              Real fxy;
+              if(dim==1)
+                {
+                  // In 1D, compute the rhs by differentiating the
+                  // exact solution twice.
+                  const Real pi = libMesh::pi;
+                  fxy = (0.25*pi*pi)*sin(.5*pi*x);
+                }
+              else
+                {
+                  fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+                }
 
-	      // Add the RHS contribution
-	      for (unsigned int i=0; i<phi.size(); i++)
-		Fe(i) += JxW[qp]*fxy*phi[i][qp];
-	    }
+              // Add the RHS contribution
+              for (unsigned int i=0; i<phi.size(); i++)
+                Fe(i) += JxW[qp]*fxy*phi[i][qp];
+            }
 
-	  // Stop logging the right-hand-side computation
-	  perf_log.pop ("Fe");
+          // Stop logging the right-hand-side computation
+          perf_log.pop ("Fe");
 
-	  // At this point the interior element integration has
-	  // been completed.  However, we have not yet addressed
-	  // boundary conditions.  For this example we will only
-	  // consider simple Dirichlet boundary conditions imposed
-	  // via the penalty method. This is discussed at length in
-	  // example 3.
-	  {
+          // At this point the interior element integration has
+          // been completed.  However, we have not yet addressed
+          // boundary conditions.  For this example we will only
+          // consider simple Dirichlet boundary conditions imposed
+          // via the penalty method. This is discussed at length in
+          // example 3.
+          {
 
-	    // Start logging the boundary condition computation
-	    perf_log.push ("BCs");
+            // Start logging the boundary condition computation
+            perf_log.push ("BCs");
 
-	    // The following loops over the sides of the element.  If
-	    // the element has no neighbor on a side then that side
-	    // MUST live on a boundary of the domain.  If there is a
-	    // neighbor, check that neighbor's subdomain_id; if that
-	    // is different from 1, the side is also located on the
-	    // boundary.
-	    for (unsigned int side=0; side<elem->n_sides(); side++)
-	      if ((elem->neighbor(side) == NULL) ||
-		  (elem->neighbor(side)->subdomain_id()!=1))
-		{
+            // The following loops over the sides of the element.  If
+            // the element has no neighbor on a side then that side
+            // MUST live on a boundary of the domain.  If there is a
+            // neighbor, check that neighbor's subdomain_id; if that
+            // is different from 1, the side is also located on the
+            // boundary.
+            for (unsigned int side=0; side<elem->n_sides(); side++)
+              if ((elem->neighbor(side) == NULL) ||
+                  (elem->neighbor(side)->subdomain_id()!=1))
+                {
 
-		  // The penalty value.  \frac{1}{\epsilon}
-		  // in the discussion above.
-		  const Real penalty = 1.e10;
+                  // The penalty value.  \frac{1}{\epsilon}
+                  // in the discussion above.
+                  const Real penalty = 1.e10;
 
-		  // The value of the shape functions at the quadrature
-		  // points.
-		  const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+                  // The value of the shape functions at the quadrature
+                  // points.
+                  const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
 
-		  // The Jacobian * Quadrature Weight at the quadrature
-		  // points on the face.
-		  const std::vector<Real>& JxW_face = fe_face->get_JxW();
+                  // The Jacobian * Quadrature Weight at the quadrature
+                  // points on the face.
+                  const std::vector<Real>& JxW_face = fe_face->get_JxW();
 
-		  // The XYZ locations (in physical space) of the
-		  // quadrature points on the face.  This is where
-		  // we will interpolate the boundary value function.
-		  const std::vector<Point >& qface_point = fe_face->get_xyz();
+                  // The XYZ locations (in physical space) of the
+                  // quadrature points on the face.  This is where
+                  // we will interpolate the boundary value function.
+                  const std::vector<Point >& qface_point = fe_face->get_xyz();
 
-		  // Compute the shape function values on the element
-		  // face.
-		  fe_face->reinit(elem, side);
+                  // Compute the shape function values on the element
+                  // face.
+                  fe_face->reinit(elem, side);
 
-		  // Loop over the face quadrature points for integration.
-		  for (unsigned int qp=0; qp<qface.n_points(); qp++)
-		    {
-		      // The location on the boundary of the current
-		      // face quadrature point.
-		      const Real xf = qface_point[qp](0);
+                  // Loop over the face quadrature points for integration.
+                  for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                    {
+                      // The location on the boundary of the current
+                      // face quadrature point.
+                      const Real xf = qface_point[qp](0);
 #if LIBMESH_DIM > 1
-		      const Real yf = qface_point[qp](1);
+                      const Real yf = qface_point[qp](1);
 #else
-		      const Real yf = 0.;
+                      const Real yf = 0.;
 #endif
 #if LIBMESH_DIM > 2
-		      const Real zf = qface_point[qp](2);
+                      const Real zf = qface_point[qp](2);
 #else
-		      const Real zf = 0.;
+                      const Real zf = 0.;
 #endif
 
 
-		      // The boundary value.
-		      const Real value = exact_solution(xf, yf, zf);
+                      // The boundary value.
+                      const Real value = exact_solution(xf, yf, zf);
 
-		      // Matrix contribution of the L2 projection.
-		      for (unsigned int i=0; i<phi_face.size(); i++)
-			for (unsigned int j=0; j<phi_face.size(); j++)
-			  Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+                      // Matrix contribution of the L2 projection.
+                      for (unsigned int i=0; i<phi_face.size(); i++)
+                        for (unsigned int j=0; j<phi_face.size(); j++)
+                          Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
 
-		      // Right-hand-side contribution of the L2
-		      // projection.
-		      for (unsigned int i=0; i<phi_face.size(); i++)
-			Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-		    }
-		}
+                      // Right-hand-side contribution of the L2
+                      // projection.
+                      for (unsigned int i=0; i<phi_face.size(); i++)
+                        Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+                    }
+                }
 
 
-	    // Stop logging the boundary condition computation
-	    perf_log.pop ("BCs");
-	  }
+            // Stop logging the boundary condition computation
+            perf_log.pop ("BCs");
+          }
 
-	  // If this assembly program were to be used on an adaptive mesh,
-	  // we would have to apply any hanging node constraint equations
-	  dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+          // If this assembly program were to be used on an adaptive mesh,
+          // we would have to apply any hanging node constraint equations
+          dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
 
-	  // The element matrix and right-hand-side are now built
-	  // for this element.  Add them to the global matrix and
-	  // right-hand-side vector.  The \p SparseMatrix::add_matrix()
-	  // and \p NumericVector::add_vector() members do this for us.
-	  // Start logging the insertion of the local (element)
-	  // matrix and vector into the global matrix and vector
-	  perf_log.push ("matrix insertion");
+          // The element matrix and right-hand-side are now built
+          // for this element.  Add them to the global matrix and
+          // right-hand-side vector.  The \p SparseMatrix::add_matrix()
+          // and \p NumericVector::add_vector() members do this for us.
+          // Start logging the insertion of the local (element)
+          // matrix and vector into the global matrix and vector
+          perf_log.push ("matrix insertion");
 
-	  system.matrix->add_matrix (Ke, dof_indices);
-	  system.rhs->add_vector    (Fe, dof_indices);
+          system.matrix->add_matrix (Ke, dof_indices);
+          system.rhs->add_vector    (Fe, dof_indices);
 
-	  // Start logging the insertion of the local (element)
-	  // matrix and vector into the global matrix and vector
-	  perf_log.pop ("matrix insertion");
-	}
+          // Start logging the insertion of the local (element)
+          // matrix and vector into the global matrix and vector
+          perf_log.pop ("matrix insertion");
+        }
     }
 
   // That's it.  We don't need to do anything else to the

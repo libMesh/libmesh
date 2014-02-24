@@ -34,8 +34,8 @@ using namespace libMesh;
  *
  */
 Real exact_solution (const Real x,
-		     const Real y,
-		     const Real t)
+                     const Real y,
+                     const Real t)
 {
   const Real xo = 0.2;
   const Real yo = 0.2;

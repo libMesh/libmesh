@@ -176,8 +176,8 @@ int main (int argc, char** argv)
       // solving with low-order finite elements.
       MeshTools::Generation::build_cube (mesh,
                                          ps,
-					 (dim>1) ? ps : 0,
-					 (dim>2) ? ps : 0,
+                                         (dim>1) ? ps : 0,
+                                         (dim>2) ? ps : 0,
                                          -1., 1.,
                                          -halfwidth, halfwidth,
                                          -halfheight, halfheight,
@@ -188,9 +188,9 @@ int main (int argc, char** argv)
   else
     {
       MeshTools::Generation::build_cube (mesh,
-					 ps,
-					 (dim>1) ? ps : 0,
-					 (dim>2) ? ps : 0,
+                                         ps,
+                                         (dim>1) ? ps : 0,
+                                         (dim>2) ? ps : 0,
                                          -1., 1.,
                                          -halfwidth, halfwidth,
                                          -halfheight, halfheight,
@@ -204,17 +204,17 @@ int main (int argc, char** argv)
 
     for ( ; el != end_el; ++el)
       {
-	Elem* elem = *el;
-	const Point cent = elem->centroid();
+        Elem* elem = *el;
+        const Point cent = elem->centroid();
         if (dim > 1)
           {
-	    if ((cent(0) > 0) == (cent(1) > 0))
-	      elem->subdomain_id() = 1;
+            if ((cent(0) > 0) == (cent(1) > 0))
+              elem->subdomain_id() = 1;
           }
         else
           {
-	    if (cent(0) > 0)
-	      elem->subdomain_id() = 1;
+            if (cent(0) > 0)
+              elem->subdomain_id() = 1;
           }
       }
   }
@@ -240,7 +240,7 @@ int main (int argc, char** argv)
   system.add_variable("u",
                       Utility::string_to_enum<Order>   (order),
                       Utility::string_to_enum<FEFamily>(family),
-		      &active_subdomains);
+                      &active_subdomains);
 
   // Add the variable "v" to "Poisson".  "v"
   // will be approximated using second-order approximation.
@@ -248,7 +248,7 @@ int main (int argc, char** argv)
   system.add_variable("v",
                       Utility::string_to_enum<Order>   (order),
                       Utility::string_to_enum<FEFamily>(family),
-		      &active_subdomains);
+                      &active_subdomains);
 
   // Give the system a pointer to the matrix assembly
   // function.
@@ -412,10 +412,10 @@ void assemble_poisson(EquationSystems& es,
       dof_map.dof_indices (elem, dof_indices2,1);
 
       //       std::cout << "dof_indices.size()="
-      // 		<< dof_indices.size()
-      // 		<< ", dof_indices2.size()="
-      // 		<< dof_indices2.size()
-      // 		<< std::endl;
+      // << dof_indices.size()
+      // << ", dof_indices2.size()="
+      // << dof_indices2.size()
+      // << std::endl;
 
       // Compute the element-specific data for the current
       // element.  This involves computing the location of the
@@ -430,7 +430,7 @@ void assemble_poisson(EquationSystems& es,
       // element type is different (i.e. the last element was a
       // triangle, now we are on a quadrilateral).
       Ke.resize (std::max(dof_indices.size(), dof_indices2.size()),
-		 std::max(dof_indices.size(), dof_indices2.size()));
+                 std::max(dof_indices.size(), dof_indices2.size()));
 
       Fe.resize (std::max(dof_indices.size(), dof_indices2.size()));
 
@@ -544,7 +544,7 @@ void assemble_poisson(EquationSystems& es,
         // side MUST live on a boundary of the domain.
         for (unsigned int side=0; side<elem->n_sides(); side++)
           if ((elem->neighbor(side) == NULL) ||
-	      (elem->neighbor(side)->subdomain_id() != elem->subdomain_id()))
+              (elem->neighbor(side)->subdomain_id() != elem->subdomain_id()))
             {
 
               // The penalty value.  \frac{1}{\epsilon}
@@ -616,16 +616,16 @@ void assemble_poisson(EquationSystems& es,
       perf_log.push ("matrix insertion");
 
       if (dof_indices.size())
-	{
-	  system.matrix->add_matrix (Ke, dof_indices);
-	  system.rhs->add_vector    (Fe, dof_indices);
-	}
+        {
+          system.matrix->add_matrix (Ke, dof_indices);
+          system.rhs->add_vector    (Fe, dof_indices);
+        }
 
       if (dof_indices2.size())
-	{
-	  system.matrix->add_matrix (Ke, dof_indices2);
-	  system.rhs->add_vector    (Fe, dof_indices2);
-	}
+        {
+          system.matrix->add_matrix (Ke, dof_indices2);
+          system.rhs->add_vector    (Fe, dof_indices2);
+        }
 
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector

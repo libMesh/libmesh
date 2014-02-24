@@ -120,7 +120,7 @@ FEMParameters::~FEMParameters()
     delete i->second;
 
   for (std::map<int,
-	 std::map<boundary_id_type, FunctionBase<Number> *>
+         std::map<boundary_id_type, FunctionBase<Number> *>
          >::iterator
          i = other_boundary_functions.begin(); i != other_boundary_functions.end();
        ++i)
@@ -130,7 +130,7 @@ FEMParameters::~FEMParameters()
       delete j->second;
 
   for (std::map<int,
-	 std::map<subdomain_id_type, FunctionBase<Number> *>
+         std::map<subdomain_id_type, FunctionBase<Number> *>
          >::iterator
          i = other_interior_functions.begin(); i != other_interior_functions.end();
        ++i)

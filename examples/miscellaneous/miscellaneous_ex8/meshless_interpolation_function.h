@@ -55,7 +55,7 @@ public:
    * Constructor.  Requires a \p \pMeshlessInterpolation object.
    */
   MeshlessInterpolationFunction (const MeshfreeInterpolation &mfi,
-				 Threads::spin_mutex &mutex) :
+                                 Threads::spin_mutex &mutex) :
     _mfi (mfi),
     _mutex(mutex)
   {}
@@ -81,15 +81,15 @@ public:
    * \p time, which defaults to zero.
    */
   Number operator() (const Point& p,
-		     const Real time=0.);
+                     const Real time=0.);
 
   /**
    * Like before, but returns the values in a
    * writable reference.
    */
   void operator() (const Point& p,
-		   const Real time,
-		   DenseVector<Number>& output);
+                   const Real time,
+                   DenseVector<Number>& output);
 
 };
 
@@ -99,7 +99,7 @@ public:
 // MeshlessInterpolationFunction inline methods
 inline
 Number MeshlessInterpolationFunction::operator() (const Point& p,
-						  const Real /* time */)
+                                                  const Real /* time */)
 {
   _pts.clear();
   _pts.push_back(p);
@@ -108,7 +108,7 @@ Number MeshlessInterpolationFunction::operator() (const Point& p,
   Threads::spin_mutex::scoped_lock lock(_mutex);
 
   _mfi.interpolate_field_data (_mfi.field_variables(),
-			       _pts, _vals);
+                               _pts, _vals);
 
   return _vals.front();
 }
@@ -117,8 +117,8 @@ Number MeshlessInterpolationFunction::operator() (const Point& p,
 
 inline
 void MeshlessInterpolationFunction::operator() (const Point& p,
-						const Real time,
-						DenseVector<Number>& output)
+                                                const Real time,
+                                                DenseVector<Number>& output)
 {
   output.resize(1);
   output(0) = (*this)(p,time);

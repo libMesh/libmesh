@@ -131,7 +131,7 @@ int main(int argc, char** argv)
           error_estimator.estimate_error(system, error);
 
           // Output error estimate magnitude
-	  libMesh::out << "Error estimate\nl2 norm = " << error.l2_norm() <<
+          libMesh::out << "Error estimate\nl2 norm = " << error.l2_norm() <<
             "\nmaximum = " << error.maximum() << std::endl;
 
           // Flag elements to be refined and coarsened

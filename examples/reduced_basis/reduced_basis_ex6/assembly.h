@@ -227,7 +227,7 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
 struct ThetaEIM : RBEIMTheta {
 
   ThetaEIM(RBEIMEvaluation& rb_eim_eval_in, unsigned int index_in)
-:
+    :
     RBEIMTheta(rb_eim_eval_in, index_in)
   {}
 

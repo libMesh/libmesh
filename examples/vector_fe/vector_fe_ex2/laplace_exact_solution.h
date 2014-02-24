@@ -30,7 +30,7 @@ public:
   ~LaplaceExactSolution(){}
 
   Real operator()( unsigned int component,
-		   Real x, Real y, Real z = 0.0)
+                   Real x, Real y, Real z = 0.0)
   {
     const Real hp = 0.5*pi;
 
@@ -60,7 +60,7 @@ public:
   ~LaplaceExactGradient(){}
 
   RealGradient operator()( unsigned int component,
-			   Real x, Real y, Real z = 0.0)
+                           Real x, Real y, Real z = 0.0)
   {
     const Real hp = 0.5*pi;
 

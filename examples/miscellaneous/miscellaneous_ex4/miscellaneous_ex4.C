@@ -75,7 +75,7 @@ using namespace libMesh;
 // Function prototype.  This function will assemble the system matrix
 // and right-hand-side.
 void assemble (EquationSystems& es,
-	       const std::string& system_name);
+               const std::string& system_name);
 
 // Begin the main program.  Note that the first
 // statement in the program throws an error if
@@ -113,11 +113,11 @@ int main (int argc, char** argv)
   EquationSystems equation_systems (mesh);
 
   MeshTools::Generation::build_square (mesh,
-				       16,
-				       16,
-				       -1., 1.,
-				       -1., 1.,
-				       QUAD4);
+                                       16,
+                                       16,
+                                       -1., 1.,
+                                       -1., 1.,
+                                       QUAD4);
 
   LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem>
@@ -157,24 +157,24 @@ int main (int argc, char** argv)
       MeshBase::element_iterator       elem_it  = mesh.elements_begin();
       const MeshBase::element_iterator elem_end = mesh.elements_end();
       for (; elem_it != elem_end; ++elem_it)
-	{
-	  Elem* elem = *elem_it;
-	  if(elem->active())
-	    {
-	      if((elem->id()%20)>8)
-		{
-		  elem->set_refinement_flag(Elem::REFINE);
-		}
-	      else
-		{
-		  elem->set_refinement_flag(Elem::DO_NOTHING);
-		}
-	    }
-	  else
-	    {
-	      elem->set_refinement_flag(Elem::INACTIVE);
-	    }
-	}
+        {
+          Elem* elem = *elem_it;
+          if(elem->active())
+            {
+              if((elem->id()%20)>8)
+                {
+                  elem->set_refinement_flag(Elem::REFINE);
+                }
+              else
+                {
+                  elem->set_refinement_flag(Elem::DO_NOTHING);
+                }
+            }
+          else
+            {
+              elem->set_refinement_flag(Elem::INACTIVE);
+            }
+        }
       mesh_refinement.refine_elements();
       equation_systems.reinit();
     }
@@ -230,7 +230,7 @@ int main (int argc, char** argv)
 // computing the proper matrix entries for the element stiffness
 // matrices and right-hand sides.
 void assemble (EquationSystems& es,
-	       const std::string& system_name)
+               const std::string& system_name)
 {
 #ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
@@ -367,11 +367,11 @@ void assemble (EquationSystems& es,
                   // The matrix contribution
                   Ke(i,j) += JxW[qp]*(
                                       // Stiffness matrix
-				      (dphi[i][qp]*dphi[j][qp])
+                                      (dphi[i][qp]*dphi[j][qp])
                                       );
                 }
 
-	      // V and W are the same for this example.
+              // V and W are the same for this example.
               Ve(i) += JxW[qp]*(
                                 phi[i][qp]
                                 );

@@ -90,7 +90,7 @@ protected:
 
   // RHS for adjoint problem
   virtual void element_qoi_derivative (DiffContext &context,
-				       const QoISet & /* qois */);
+                                       const QoISet & /* qois */);
 
   //virtual void element_qoi (DiffContext &context, const QoISet & qois);
 

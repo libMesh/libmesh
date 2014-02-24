@@ -149,7 +149,7 @@ void Biharmonic::run()
 
       // A pretty update message
       if (_verbose)
-	libMesh::out << "Solving for state " << timestep << ", time " << t << "\n";
+        libMesh::out << "Solving for state " << timestep << ", time " << t << "\n";
 
       // Move biharmonic one timestep forward
       step();

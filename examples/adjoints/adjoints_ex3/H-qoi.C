@@ -52,25 +52,25 @@ void CoupledSystemQoI::side_qoi_derivative (DiffContext &context,
     {
       // Loop over all the qps on this side
       for (unsigned int qp=0; qp != n_qpoints; qp++)
-  	{
-	  Real x = q_point[qp](0);
+        {
+          Real x = q_point[qp](0);
 
-	  // If side is on left outlet
-	  if(x < 0.)
-	    {
-	      // Get u at the qp
-	      u = c.side_value(0,qp);
-	      C = c.side_value(3,qp);
+          // If side is on left outlet
+          if(x < 0.)
+            {
+              // Get u at the qp
+              u = c.side_value(0,qp);
+              C = c.side_value(3,qp);
 
-	      // Add the contribution from each basis function
-	      for (unsigned int i=0; i != n_u_dofs; i++)
-		{
-		  Qu(i) += JxW[qp] * -phi[i][qp] * C;
-		  QC(i) += JxW[qp] * phi[i][qp] * -u;
-		}
-	    } // end if
+              // Add the contribution from each basis function
+              for (unsigned int i=0; i != n_u_dofs; i++)
+                {
+                  Qu(i) += JxW[qp] * -phi[i][qp] * C;
+                  QC(i) += JxW[qp] * phi[i][qp] * -u;
+                }
+            } // end if
 
-  	} // end quadrature loop
+        } // end quadrature loop
 
     } // end if on outlet
 }
@@ -106,19 +106,19 @@ void CoupledSystemQoI::side_qoi(DiffContext &context, const QoISet & /* qois */)
     {
       //Loop over all the qps on this side
       for (unsigned int qp=0; qp != n_qpoints; qp++)
-	{
-	  Real x = q_point[qp](0);
+        {
+          Real x = q_point[qp](0);
 
-	  if(x < 0.)
-	    {
-	      // Get u and C at the qp
-	      u = c.side_value(0,qp);
-	      C = c.side_value(3,qp);
+          if(x < 0.)
+            {
+              // Get u and C at the qp
+              u = c.side_value(0,qp);
+              C = c.side_value(3,qp);
 
-	      dQoI_0 += JxW[qp] * -u * C;
-	    } // end if
+              dQoI_0 += JxW[qp] * -u * C;
+            } // end if
 
-  	} // end quadrature loop
+        } // end quadrature loop
 
     } // end if on bdry
 

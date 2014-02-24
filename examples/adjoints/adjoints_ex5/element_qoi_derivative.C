@@ -77,9 +77,9 @@ void HeatSystem::element_qoi_derivative (DiffContext &context,
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       for (unsigned int i=0; i != n_T_dofs; i++)
-	{
-	  Q(i) += -JxW[qp] * old_adjoint[qp] * phi[i][qp] ;
-      	}
+        {
+          Q(i) += -JxW[qp] * old_adjoint[qp] * phi[i][qp] ;
+        }
 
     } // end of the quadrature point qp-loop
 }

@@ -41,8 +41,8 @@ using namespace libMesh;
  * manufactured solutions".
  */
 Real exact_solution (const Real x,
-		     const Real y,
-		     const Real z = 0.)
+                     const Real y,
+                     const Real z = 0.)
 {
   static const Real pi = acos(-1.);
 

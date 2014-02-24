@@ -509,8 +509,8 @@ int main (int argc, char** argv)
   // Adds the variable "u" to "Laplace-Young".  "u"
   // will be approximated using second-order approximation.
   system.add_variable("u",
-		      Utility::string_to_enum<Order>   (order),
-		      Utility::string_to_enum<FEFamily>(family));
+                      Utility::string_to_enum<Order>   (order),
+                      Utility::string_to_enum<FEFamily>(family));
 
   // Give the system a pointer to the functions that update
   // the residual and Jacobian.
@@ -531,10 +531,10 @@ int main (int argc, char** argv)
   // output from during the solve itself, but demonstrates another way
   // to get this information after the solve is complete.
   std::cout << "Laplace-Young system solved at nonlinear iteration "
-	    << system.n_nonlinear_iterations()
-	    << " , final nonlinear residual norm: "
-	    << system.final_nonlinear_residual()
-	    << std::endl;
+            << system.n_nonlinear_iterations()
+            << " , final nonlinear residual norm: "
+            << system.final_nonlinear_residual()
+            << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // After solving the system write the solution

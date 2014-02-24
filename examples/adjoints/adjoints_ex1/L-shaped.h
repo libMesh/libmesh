@@ -49,11 +49,11 @@ protected:
   // Element residual and jacobian calculations
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
-					DiffContext &context);
+                                        DiffContext &context);
 
   // Constraint parts
   virtual bool side_constraint (bool request_jacobian,
-				DiffContext &context);
+                                DiffContext &context);
 
   // Overloading the postprocess function
 
