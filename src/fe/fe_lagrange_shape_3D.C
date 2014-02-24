@@ -770,6 +770,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 
 	    // linear pyramid shape functions
 	  case PYRAMID5:
+          case PYRAMID13:
           case PYRAMID14:
 	    {
 	      libmesh_assert_less (i, 5);
@@ -1499,6 +1500,178 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 			  FE<1,LAGRANGE>::shape_deriv(EDGE3, SECOND, i0[i], 0, p1d));
 		}
 	    }
+
+            // G. Bedrosian, "Shape functions and integration formulas for
+            // three-dimensional finite element analysis", Int. J. Numerical
+            // Methods Engineering, vol 35, p. 95-108, 1992.
+          case PYRAMID13:
+            {
+              libmesh_assert_less (i, 13);
+
+              const Real xi   = p(0);
+              const Real eta  = p(1);
+              const Real zeta = p(2);
+              const Real eps  = 1.e-35;
+
+              // Denominators are perturbed by epsilon to avoid
+              // divide-by-zero issues.
+              Real
+                den = (-1. + zeta + eps),
+                den2 = den*den,
+                xi2 = xi*xi,
+                eta2 = eta*eta,
+                zeta2 = zeta*zeta,
+                zeta3 = zeta2*zeta;
+
+              switch (j)
+                {
+                  // d/dxi
+                case 0:
+                  switch(i)
+                    {
+                    case 0:
+                      return 0.25*(-zeta - eta + 2.*eta*zeta - 2.*xi + 2.*zeta*xi + 2.*eta*xi + zeta2 + eta2)/den;
+
+                    case 1:
+                      return -0.25*(-zeta - eta + 2.*eta*zeta + 2.*xi - 2.*zeta*xi - 2.*eta*xi + zeta2 + eta2)/den;
+
+                    case 2:
+                      return -0.25*(-zeta + eta - 2.*eta*zeta + 2.*xi - 2.*zeta*xi + 2.*eta*xi + zeta2 + eta2)/den;
+
+                    case 3:
+                      return 0.25*(-zeta + eta - 2.*eta*zeta - 2.*xi + 2.*zeta*xi - 2.*eta*xi + zeta2 + eta2)/den;
+
+                    case 4:
+                      return 0.;
+
+                    case 5:
+                      return -(-1. + eta + zeta)*xi/den;
+
+                    case 6:
+                      return 0.5*(-1. + eta + zeta)*(1. + eta - zeta)/den;
+
+                    case 7:
+                      return (1. + eta - zeta)*xi/den;
+
+                    case 8:
+                      return -0.5*(-1. + eta + zeta)*(1. + eta - zeta)/den;
+
+                    case 9:
+                      return -(-1. + eta + zeta)*zeta/den;
+
+                    case 10:
+                      return (-1. + eta + zeta)*zeta/den;
+
+                    case 11:
+                      return -(1. + eta - zeta)*zeta/den;
+
+                    case 12:
+                      return (1. + eta - zeta)*zeta/den;
+
+                    default:
+                      libmesh_error();
+                    }
+
+                  // d/deta
+                case 1:
+                  switch(i)
+                    {
+                    case 0:
+                      return 0.25*(-zeta - 2.*eta + 2.*eta*zeta - xi + 2.*zeta*xi + 2.*eta*xi + zeta2 + xi2)/den;
+
+                    case 1:
+                      return -0.25*(zeta + 2.*eta - 2.*eta*zeta - xi + 2.*zeta*xi + 2.*eta*xi - zeta2 - xi2)/den;
+
+                    case 2:
+                      return -0.25*(-zeta + 2.*eta - 2.*eta*zeta + xi - 2.*zeta*xi + 2.*eta*xi + zeta2 + xi2)/den;
+
+                    case 3:
+                      return 0.25*(zeta - 2.*eta + 2.*eta*zeta + xi - 2.*zeta*xi + 2.*eta*xi - zeta2 - xi2)/den;
+
+                    case 4:
+                      return 0.;
+
+                    case 5:
+                      return -0.5*(-1. + xi + zeta)*(1. + xi - zeta)/den;
+
+                    case 6:
+                      return (1. + xi - zeta)*eta/den;
+
+                    case 7:
+                      return 0.5*(-1. + xi + zeta)*(1. + xi - zeta)/den;
+
+                    case 8:
+                      return -(-1. + xi + zeta)*eta/den;
+
+                    case 9:
+                      return -(-1. + xi + zeta)*zeta/den;
+
+                    case 10:
+                      return (1. + xi - zeta)*zeta/den;
+
+                    case 11:
+                      return -(1. + xi - zeta)*zeta/den;
+
+                    case 12:
+                      return (-1. + xi + zeta)*zeta/den;
+
+                    default:
+                      libmesh_error();
+                    }
+
+                  // d/dzeta
+                case 2:
+                  {
+                    switch(i)
+                      {
+                      case 0:
+                        return -0.25*(xi + eta + 1.)*(-1. + 2.*zeta - zeta2 + eta*xi)/den2;
+
+                      case 1:
+                        return 0.25*(eta - xi + 1.)*(1. - 2.*zeta + zeta2 + eta*xi)/den2;
+
+                      case 2:
+                        return 0.25*(xi + eta - 1.)*(-1. + 2.*zeta - zeta2 + eta*xi)/den2;
+
+                      case 3:
+                        return -0.25*(eta - xi - 1.)*(1. - 2.*zeta + zeta2 + eta*xi)/den2;
+
+                      case 4:
+                        return 4.*zeta - 1.;
+
+                      case 5:
+                        return 0.5*(-2 + eta + 6.*zeta + eta*xi2 + eta*zeta2 - 6.*zeta2 + 2.*zeta3 - 2.*eta*zeta)/den2;
+
+                      case 6:
+                        return -0.5*(2 - 6.*zeta + xi + xi*zeta2 + eta2*xi + 6.*zeta2 - 2.*zeta3 - 2.*zeta*xi)/den2;
+
+                      case 7:
+                        return -0.5*(2 + eta - 6.*zeta + eta*xi2 + eta*zeta2 + 6.*zeta2 - 2.*zeta3 - 2.*eta*zeta)/den2;
+
+                      case 8:
+                        return 0.5*(-2 + 6.*zeta + xi + xi*zeta2 + eta2*xi - 6.*zeta2 + 2.*zeta3 - 2.*zeta*xi)/den2;
+
+                      case 9:
+                        return (1. - eta - 4.*zeta - xi - xi*zeta2 - eta*zeta2 + eta*xi + 5.*zeta2 - 2.*zeta3 + 2.*eta*zeta + 2.*zeta*xi)/den2;
+
+                      case 10:
+                        return -(-1. + eta + 4.*zeta - xi - xi*zeta2 + eta*zeta2 + eta*xi - 5.*zeta2 + 2.*zeta3 - 2.*eta*zeta + 2.*zeta*xi)/den2;
+
+                      case 11:
+                        return (1. + eta - 4.*zeta + xi + xi*zeta2 + eta*zeta2 + eta*xi + 5.*zeta2 - 2.*zeta3 - 2.*eta*zeta - 2.*zeta*xi)/den2;
+
+                      case 12:
+                        return -(-1. - eta + 4.*zeta + xi + xi*zeta2 - eta*zeta2 + eta*xi - 5.*zeta2 + 2.*zeta3 + 2.*eta*zeta - 2.*zeta*xi)/den2;
+
+                      default:
+                        libmesh_error();
+                      }
+                  }
+
+                default:
+                  libmesh_error();
+                }
+            }
 
             // Quadratic shape functions, as defined in R. Graglia, "Higher order
             // bases on pyramidal elements", IEEE Trans Antennas and Propagation,
