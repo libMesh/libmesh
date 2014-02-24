@@ -7,6 +7,9 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
+# Print file we are working on
+echo "Indenting $1"
+
 # The following command:
 # .) Uses only spaces for tabs
 # .) Forces emacs to use C++ mode
@@ -18,4 +21,4 @@ fi
   --eval="(c++-mode)" \
   --eval="(c-set-offset 'innamespace 0)" \
   --eval="(indent-region (point-min) (point-max) nil)" \
-  -f save-buffer
+  -f save-buffer &> /dev/null
