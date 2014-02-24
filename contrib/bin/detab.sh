@@ -17,7 +17,7 @@ echo "Reindenting ${#tabbed_lines[@]} lines in $1."
 
 # Initialize the list of eval commands with the command which causes
 # Emacs to use spaces for tabs.
-eval_commands="--eval=\"(setq-default indent-tabs-mode nil)\""
+eval_commands="--eval=\"(setq-default indent-tabs-mode nil)\" --eval=\"(c++-mode)\""
 
 # Make a long string of --eval commands
 for i in "${tabbed_lines[@]}"
