@@ -120,6 +120,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 
 	    // linear pyramid shape functions
 	  case PYRAMID5:
+          case PYRAMID13:
 	  case PYRAMID14:
 	    {
 	      libmesh_assert_less (i, 5);
@@ -400,6 +401,68 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
 	      return (FE<2,LAGRANGE>::shape(TRI6,  SECOND, i1[i], p2d)*
 		      FE<1,LAGRANGE>::shape(EDGE3, SECOND, i0[i], p1d));
 	    }
+
+            // G. Bedrosian, "Shape functions and integration formulas for
+            // three-dimensional finite element analysis", Int. J. Numerical
+            // Methods Engineering, vol 35, p. 95-108, 1992.
+          case PYRAMID13:
+            {
+              libmesh_assert_less (i, 13);
+
+              const Real xi   = p(0);
+              const Real eta  = p(1);
+              const Real zeta = p(2);
+              const Real eps  = 1.e-35;
+
+              // Denominators are perturbed by epsilon to avoid
+              // divide-by-zero issues.
+              Real den = (1. - zeta + eps);
+
+              switch(i)
+                {
+                case 0:
+                  return 0.25*(-xi - eta - 1.)*((1. - xi)*(1. - eta) - zeta + xi*eta*zeta/den);
+
+                case 1:
+                  return 0.25*(-eta + xi - 1.)*((1. + xi)*(1. - eta) - zeta - xi*eta*zeta/den);
+
+                case 2:
+                  return 0.25*(xi + eta - 1.)*((1. + xi)*(1. + eta) - zeta + xi*eta*zeta/den);
+
+                case 3:
+                  return 0.25*(eta - xi - 1.)*((1. - xi)*(1. + eta) - zeta - xi*eta*zeta/den);
+
+                case 4:
+                  return zeta*(2.*zeta - 1.);
+
+                case 5:
+                  return 0.5*(1. + xi - zeta)*(1. - xi - zeta)*(1. - eta - zeta)/den;
+
+                case 6:
+                  return 0.5*(1. + eta - zeta)*(1. - eta - zeta)*(1. + xi - zeta)/den;
+
+                case 7:
+                  return 0.5*(1. + xi - zeta)*(1. - xi - zeta)*(1. + eta - zeta)/den;
+
+                case 8:
+                  return 0.5*(1. + eta - zeta)*(1. - eta - zeta)*(1. - xi - zeta)/den;
+
+                case 9:
+                  return zeta*(1. - xi - zeta)*(1. - eta - zeta)/den;
+
+                case 10:
+                  return zeta*(1. + xi - zeta)*(1. - eta - zeta)/den;
+
+                case 11:
+                  return zeta*(1. + eta - zeta)*(1. + xi - zeta)/den;
+
+                case 12:
+                  return zeta*(1. - xi - zeta)*(1. + eta - zeta)/den;
+
+                default:
+                  libmesh_error();
+                }
+            }
 
             // Quadratic shape functions, as defined in R. Graglia, "Higher order
             // bases on pyramidal elements", IEEE Trans Antennas and Propagation,
