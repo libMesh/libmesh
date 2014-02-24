@@ -43,22 +43,22 @@ public:
       std::vector<Number> l(global_size);
 
       const dof_id_type
-	first = v.first_local_index(),
-	last  = v.last_local_index();
+        first = v.first_local_index(),
+        last  = v.last_local_index();
 
       for (dof_id_type n=first; n != last; n++)
-	v.set (n, static_cast<Number>(n));
+        v.set (n, static_cast<Number>(n));
       v.close();
 
       if(!to_one)
-	v.localize(l);
+        v.localize(l);
       else
-	v.localize_to_one(l,root_pid);
+        v.localize_to_one(l,root_pid);
 
       if(!to_one || libMesh::global_processor_id() == root_pid)
-	//Yes I really mean v.size()
-	for (dof_id_type i=0; i<v.size(); i++)
-	  CPPUNIT_ASSERT_DOUBLES_EQUAL( libmesh_real(i) , libmesh_real(l[i]) , TOLERANCE*TOLERANCE );
+        //Yes I really mean v.size()
+        for (dof_id_type i=0; i<v.size(); i++)
+          CPPUNIT_ASSERT_DOUBLES_EQUAL( libmesh_real(i) , libmesh_real(l[i]) , TOLERANCE*TOLERANCE );
 
       delete &v;
     }

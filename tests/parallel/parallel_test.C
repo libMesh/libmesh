@@ -174,10 +174,10 @@ public:
   void testIsendRecv ()
   {
     unsigned int procup = (libMesh::processor_id() + 1) %
-                           libMesh::n_processors();
+      libMesh::n_processors();
     unsigned int procdown = (libMesh::n_processors() +
                              libMesh::processor_id() - 1) %
-                             libMesh::n_processors();
+      libMesh::n_processors();
 
     std::vector<unsigned int> src_val(3), recv_val(3);
 
@@ -235,10 +235,10 @@ public:
   void testIrecvSend ()
   {
     unsigned int procup = (libMesh::processor_id() + 1) %
-                           libMesh::n_processors();
+      libMesh::n_processors();
     unsigned int procdown = (libMesh::n_processors() +
                              libMesh::processor_id() - 1) %
-                             libMesh::n_processors();
+      libMesh::n_processors();
 
     std::vector<unsigned int> src_val(3), recv_val(3);
 

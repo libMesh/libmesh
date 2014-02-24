@@ -2,9 +2,9 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
-#define VECTORMAPOBJECTTEST \
-  CPPUNIT_TEST( testCreate );                        \
-
+#define VECTORMAPOBJECTTEST                     \
+  CPPUNIT_TEST( testCreate );                   \
+                                                \
 using namespace libMesh;
 
 class VectormapTest : public CppUnit::TestCase
