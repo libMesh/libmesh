@@ -349,6 +349,7 @@ libmesh_SOURCES =  \
         src/solvers/newton_solver.C \
         src/solvers/no_solution_history.C \
         src/solvers/nonlinear_solver.C \
+        src/solvers/petsc_auto_fieldsplit.C \
         src/solvers/petsc_diff_solver.C \
         src/solvers/petsc_dm_nonlinear_solver.C \
         src/solvers/petsc_linear_solver.C \
