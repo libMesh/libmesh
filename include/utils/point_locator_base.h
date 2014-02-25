@@ -64,7 +64,7 @@ protected:
    * PointLocator that helps in saving memory.
    */
   PointLocatorBase (const MeshBase& mesh,
-		    const PointLocatorBase* master);
+                    const PointLocatorBase* master);
 
 
 public:
@@ -81,8 +81,8 @@ public:
    * This way the user need not remember to delete the object.
    */
   static AutoPtr<PointLocatorBase> build (const PointLocatorType t,
-					  const MeshBase& mesh,
-					  const PointLocatorBase* master = NULL);
+                                          const MeshBase& mesh,
+                                          const PointLocatorBase* master = NULL);
 
   /**
    * Clears the \p PointLocator.

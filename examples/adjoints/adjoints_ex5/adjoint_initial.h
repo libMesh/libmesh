@@ -28,11 +28,11 @@ void adjoint_read_initial_parameters();
 void adjoint_finish_initialization();
 
 Number adjoint_initial_value(const Point& p,
-                     const Parameters&,
-                     const std::string&,
-                     const std::string&);
+                             const Parameters&,
+                             const std::string&,
+                             const std::string&);
 
 Gradient adjoint_initial_grad(const Point& p,
-                      const Parameters&,
-                      const std::string&,
-                      const std::string&);
+                              const Parameters&,
+                              const std::string&,
+                              const std::string&);

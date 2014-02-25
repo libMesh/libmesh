@@ -41,12 +41,12 @@ using namespace libMesh;
 void usage_error(const char *progname)
 {
   libMesh::out << "Options: " << progname << '\n'
-  << " --dim d               mesh dimension           [default: autodetect]\n"
-  << " --inmesh filename     input mesh file\n"
-  << " --insoln filename     input solution file\n"
-  << " --outmesh filename    output mesh file         [default: out_<inmesh>]\n"
-  << " --outsoln filename    output solution file     [default: out_<insoln>]\n"
-  << std::endl;
+               << " --dim d               mesh dimension           [default: autodetect]\n"
+               << " --inmesh filename     input mesh file\n"
+               << " --insoln filename     input solution file\n"
+               << " --outmesh filename    output mesh file         [default: out_<inmesh>]\n"
+               << " --outsoln filename    output solution file     [default: out_<insoln>]\n"
+               << std::endl;
 
   exit(1);
 }
@@ -140,7 +140,7 @@ int main(int argc, char** argv)
   EquationSystems old_es(old_mesh);
   EquationSystems new_es(new_mesh);
 
-  libMeshEnums::XdrMODE read_mode;
+  XdrMODE read_mode;
 
   if (solnname.rfind(".xdr") < solnname.size())
     read_mode = DECODE;

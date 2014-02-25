@@ -24,43 +24,43 @@
 namespace libMesh
 {
 
-  /**
-   * A SolutionHistory class that enables the storage and retrieval of timesteps
-   * and (in the future) adaptive steps
-   */
-  class SolutionHistory
-  {
-  public:
+/**
+ * A SolutionHistory class that enables the storage and retrieval of timesteps
+ * and (in the future) adaptive steps
+ */
+class SolutionHistory
+{
+public:
 
-    // Constructor
-    SolutionHistory() :
-      overwrite_previously_stored(false) {}
+  // Constructor
+  SolutionHistory() :
+    overwrite_previously_stored(false) {}
 
-    // Destructor
-    virtual ~SolutionHistory () {}
+  // Destructor
+  virtual ~SolutionHistory () {}
 
-    // Function to store a solution, pure virtual
-    virtual void store() = 0;
+  // Function to store a solution, pure virtual
+  virtual void store() = 0;
 
-    // Function to retrieve a solution, pure virtual
-    virtual void retrieve() = 0;
+  // Function to retrieve a solution, pure virtual
+  virtual void retrieve() = 0;
 
-    // Cloning function for an AutoPtr, pure virtual, used in the
-    // setter function in time_solver.C
-    virtual AutoPtr<SolutionHistory > clone() const = 0;
+  // Cloning function for an AutoPtr, pure virtual, used in the
+  // setter function in time_solver.C
+  virtual AutoPtr<SolutionHistory > clone() const = 0;
 
-    // Turn on overwrite_previously_stored to overwrite any
-    // already-saved data encountered during subsequent store() calls
-    void set_overwrite_previously_stored (bool val)
-    { overwrite_previously_stored = val; }
+  // Turn on overwrite_previously_stored to overwrite any
+  // already-saved data encountered during subsequent store() calls
+  void set_overwrite_previously_stored (bool val)
+  { overwrite_previously_stored = val; }
 
-  protected:
+protected:
 
-    // Flag to specify whether we want to overwrite previously stored
-    // vectors at a given time or not
-    bool overwrite_previously_stored;
+  // Flag to specify whether we want to overwrite previously stored
+  // vectors at a given time or not
+  bool overwrite_previously_stored;
 
-  }; // end SolutionHistory class definition
+}; // end SolutionHistory class definition
 
 } // end namespace libMesh
 

@@ -55,7 +55,7 @@ public:
    *  Constructor. Initializes Aztec data structures
    */
   AztecLinearSolver (const libMesh::Parallel::Communicator &comm
-		     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.
@@ -78,10 +78,10 @@ public:
    */
   std::pair<unsigned int, Real>
   solve (SparseMatrix<T>  &matrix_in,
-	 NumericVector<T> &solution_in,
-	 NumericVector<T> &rhs_in,
-	 const double tol,
-	 const unsigned int m_its)
+         NumericVector<T> &solution_in,
+         NumericVector<T> &rhs_in,
+         const double tol,
+         const unsigned int m_its)
   {
     return this->solve(matrix_in, matrix_in, solution_in, rhs_in, tol, m_its);
   }
@@ -94,11 +94,11 @@ public:
    */
   std::pair<unsigned int, Real>
   solve (SparseMatrix<T>  &matrix,
-	 SparseMatrix<T>  &preconditioner,
-	 NumericVector<T> &solution,
-	 NumericVector<T> &rhs,
-	 const double tol,
-	 const unsigned int m_its);
+         SparseMatrix<T>  &preconditioner,
+         NumericVector<T> &solution,
+         NumericVector<T> &rhs,
+         const double tol,
+         const unsigned int m_its);
 
   /**
    * This function solves a system whose matrix is a shell matrix.
@@ -116,12 +116,12 @@ public:
    * other preconditioners than JACOBI.
    */
   virtual std::pair<unsigned int, Real>
-    solve (const ShellMatrix<T>& shell_matrix,
-           const SparseMatrix<T>& precond_matrix,
-           NumericVector<T>& solution_in,
-           NumericVector<T>& rhs_in,
-           const double tol,
-           const unsigned int m_its);
+  solve (const ShellMatrix<T>& shell_matrix,
+         const SparseMatrix<T>& precond_matrix,
+         NumericVector<T>& solution_in,
+         NumericVector<T>& rhs_in,
+         const double tol,
+         const unsigned int m_its);
 
   /**
    * Fills the input vector with the sequence of residual norms
@@ -138,10 +138,9 @@ public:
   Real get_initial_residual();
 
   /**
-   * Prints a useful message about why the latest linear solve
-   * con(di)verged.
+   * Returns the solver's convergence flag
    */
-  virtual void print_converged_reason();
+  virtual LinearConvergenceReason get_converged_reason() const;
 
 private:
 

@@ -106,7 +106,7 @@ public:
    * Note that this cannot be a const method, check \p MeshFunction.
    */
   virtual Output operator() (const Point& p,
-			     const Real time = 0.) = 0;
+                             const Real time = 0.) = 0;
 
   /**
    * Return function for vectors.
@@ -114,7 +114,7 @@ public:
    * coordinate \p p.
    */
   void operator() (const Point& p,
-		   DenseVector<Output>& output);
+                   DenseVector<Output>& output);
 
   /**
    * Return function for vectors.
@@ -124,8 +124,8 @@ public:
    * Note that this cannot be a const method, check \p MeshFunction.
    */
   virtual void operator() (const Point& p,
-			   const Real time,
-			   DenseVector<Output>& output) = 0;
+                           const Real time,
+                           DenseVector<Output>& output) = 0;
 
   /**
    * @returns the vector component \p i at coordinate
@@ -139,7 +139,7 @@ public:
    */
   virtual Output component(unsigned int i,
                            const Point& p,
-			   Real time=0.);
+                           Real time=0.);
 
 
   /**
@@ -202,7 +202,7 @@ template <typename Output>
 inline
 Output FunctionBase<Output>::component (unsigned int i,
                                         const Point& p,
-			                Real time)
+                                        Real time)
 {
   DenseVector<Output> outvec(i+1);
   (*this)(p, time, outvec);
@@ -214,7 +214,7 @@ Output FunctionBase<Output>::component (unsigned int i,
 template <typename Output>
 inline
 void FunctionBase<Output>::operator() (const Point& p,
-			               DenseVector<Output>& output)
+                                       DenseVector<Output>& output)
 {
   // Call the time-dependent function with t=0.
   this->operator()(p, 0., output);

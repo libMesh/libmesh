@@ -6,13 +6,24 @@ with libmesh:
 
 .) Using the test_boost.cc file located in this directory, run
 
-   g++ -M -MF foo.d -I/path/to/unpacked/boost/boost_1_XY_Z test_boost.cc
+   $CXX -MM -MF foo.d -I/path/to/unpacked/boost/boost_1_XY_Z test_boost.cc
+
+   where $CXX is the C++ compiler you want to use to build boost
+   dependencies.  Note that different compilers will generate
+   different subsets of boost headers, and therefore the process
+   described here must be repeated with any new compiler you wish to
+   use with libmesh.  If your compiler does not support -MM, you will
+   need to figure out which dependency generation flag it uses that
+   skips system headers.
 
 .) Inspect the contents of the foo.d dependency file. It should contain all
    the headers from the boost distro that are required to build the subset of
-   boost used by libmesh, plus several system headers.
+   boost used by libmesh.
 
-.) Remove the existing boost headers
+.) If you are updating to a brand new version of Boost, remove all the
+   existing boost headers.  Otherwise, if you are just generating
+   dependencies for a new compiler, skip this step and continue with
+   copying files in the next step.
    git rm -r contrib/boost/include/boost
    git ci -a -m"Updating boost."
 
@@ -25,31 +36,19 @@ with libmesh:
    git add contrib/boost/include/boost
    git ci --amend
 
-.) Update contrib/boost/include/Makefile.am with the list of files from foo.d
-   as well.  Commit Makefile.am.
+.) Update contrib/boost/include/Makefile.am with the list of files
+   from foo.d as well.  Commit Makefile.am.  You can get a list of
+   candidate files to install by doing:
+
+   cd $LIBMESH_ROOT/contrib/boost/include
+   find . -name "*.hpp"
 
 .) Run boostrap in the top level of the libmesh source distribution to
    regenerate Makefile.in.  Commit Makefile.in.
 
-.) Follow the normal instructions to make and install libmesh, and verify that
-   test_boost.cc can be built against the boost installed with libmesh.
+.) Follow the normal instructions to make and install libmesh, and
+   verify that test_boost.cc can be built against the boost installed
+   with libmesh.  You can do this, for example, with the
+   Makefile.test_boost included in this directory by typing:
 
-
-#!/bin/bash
-
-# Where to copy files from
-from_dir=/path/to/unpacked/boost/boost_1_XY_Z/boost
-
-# Where to copy files to
-to_dir=/home/username/projects/libmesh_git/contrib/boost/include/boost
-
-# List of files to copy
-files=(assert.hpp config.hpp ...)
-
-for i in "${files[@]}"
-do
-    # Create the directory if it doesn't already exist                                                                                                                                                                                          if [ ! -d $to_dir/`dirname $i` ]; then
-        mkdir -p $to_dir/`dirname $i`;
-    fi
-    cp $from_dir/$i $to_dir/$i
-done
+   make -f Makefile.test_boost test_boost

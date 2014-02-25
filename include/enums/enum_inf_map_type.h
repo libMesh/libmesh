@@ -20,26 +20,19 @@
 #ifndef LIBMESH_ENUM_INF_MAP_TYPE_H
 #define LIBMESH_ENUM_INF_MAP_TYPE_H
 
-/**
- * The \p libMeshEnums namespace is the namespace all \p enum definitions
- * should be put into.
- */
-
 // ------------------------------------------------------------
 // enum Order definition
-namespace libMeshEnums {
+namespace libMesh {
 
-  /**
-   * \enum libMeshEnums::InfMapType defines an \p enum for the
-   * types of coordinate mappings available in infinite elements.
-   */
-  enum InfMapType {CARTESIAN=0,
-		   SPHERICAL,
-		   ELLIPSOIDAL,
-		   INVALID_INF_MAP};
+/**
+ * \enum libMesh::InfMapType defines an \p enum for the
+ * types of coordinate mappings available in infinite elements.
+ */
+enum InfMapType {CARTESIAN=0,
+                 SPHERICAL,
+                 ELLIPSOIDAL,
+                 INVALID_INF_MAP};
 
 }
-
-using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_INF_MAP_TYPE_H

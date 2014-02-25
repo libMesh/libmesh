@@ -24,62 +24,62 @@
 
 namespace libMesh {
 
+/**
+ * Base class for all library singleton objects.
+ */
+class Singleton
+{
+protected:
+
   /**
-   * Base class for all library singleton objects.
+   * Constructor.  Adds the derived object to the singleton cache list.
    */
-  class Singleton
+  Singleton();
+
+  /**
+   * Destructor.
+   */
+  virtual ~Singleton() {}
+
+public:
+
+  /**
+   * Abstract base class for runtime singleton setup.
+   * This will be called from the \p LibMeshInit constructor.
+   */
+  class Setup
   {
   protected:
-
     /**
-     * Constructor.  Adds the derived object to the singleton cache list.
+     * Constructor.  Adds the derived object to the setup cache list.
      */
-    Singleton();
+    Setup ();
 
+  public:
     /**
      * Destructor.
      */
-    virtual ~Singleton() {}
-
-  public:
+    virtual ~Setup() {}
 
     /**
-     * Abstract base class for runtime singleton setup.
-     * This will be called from the \p LibMeshInit constructor.
+     * Setup method.  Importantly, this is called *after main()* from the
+     * \p LibMeshInit constructor.
      */
-    class Setup
-    {
-    protected:
-      /**
-       * Constructor.  Adds the derived object to the setup cache list.
-       */
-      Setup ();
-
-    public:
-      /**
-       * Destructor.
-       */
-      virtual ~Setup() {}
-
-      /**
-       * Setup method.  Importantly, this is called *after main()* from the
-       * \p LibMeshInit constructor.
-       */
-      virtual void setup () = 0;
-    };
-
-    /**
-     * Setup function.  Initializes any derived \p Singleton::Setup objects.
-     * objects.
-     */
-    static void setup();
-
-    /**
-     * Cleanup function.  Removes all dynamically created \p Singleton
-     * objects.
-     */
-    static void cleanup();
+    virtual void setup () = 0;
   };
+
+  /**
+   * Setup function.  Initializes any derived \p Singleton::Setup objects.
+   * objects.
+   */
+  static void setup();
+
+  /**
+   * Cleanup function.  Removes all dynamically created \p Singleton
+   * objects.
+   */
+  static void cleanup();
+};
 
 } // namespace libMesh
 

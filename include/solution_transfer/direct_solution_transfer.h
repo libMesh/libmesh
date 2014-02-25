@@ -36,7 +36,7 @@ class DirectSolutionTransfer : public SolutionTransfer
 {
 public:
   DirectSolutionTransfer(const Parallel::Communicator &comm
-			 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                         LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
   virtual ~DirectSolutionTransfer();
 
   /**

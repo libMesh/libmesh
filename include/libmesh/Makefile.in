@@ -432,13 +432,13 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	periodic_boundary.h periodic_boundary_base.h print_trace.h \
 	reference_counted_object.h reference_counter.h \
 	single_predicates.h sparsity_pattern.h variable.h \
-	variant_filter_iterator.h enum_eigen_solver_type.h \
-	enum_elem_quality.h enum_elem_type.h enum_fe_family.h \
-	enum_inf_map_type.h enum_io_package.h enum_norm_type.h \
-	enum_order.h enum_parallel_type.h enum_point_locator_type.h \
-	enum_preconditioner_type.h enum_quadrature_type.h \
-	enum_solver_package.h enum_solver_type.h \
-	enum_subset_solve_mode.h enum_xdr_mode.h \
+	variant_filter_iterator.h enum_convergence_flags.h \
+	enum_eigen_solver_type.h enum_elem_quality.h enum_elem_type.h \
+	enum_fe_family.h enum_inf_map_type.h enum_io_package.h \
+	enum_norm_type.h enum_order.h enum_parallel_type.h \
+	enum_point_locator_type.h enum_preconditioner_type.h \
+	enum_quadrature_type.h enum_solver_package.h \
+	enum_solver_type.h enum_subset_solve_mode.h enum_xdr_mode.h \
 	adjoint_refinement_estimator.h \
 	adjoint_residual_error_estimator.h discontinuity_measure.h \
 	error_estimator.h exact_error_estimator.h exact_solution.h \
@@ -456,9 +456,9 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	cell_inf_hex.h cell_inf_hex16.h cell_inf_hex18.h \
 	cell_inf_hex8.h cell_inf_prism.h cell_inf_prism12.h \
 	cell_inf_prism6.h cell_prism.h cell_prism15.h cell_prism18.h \
-	cell_prism6.h cell_pyramid.h cell_pyramid14.h cell_pyramid5.h \
-	cell_tet.h cell_tet10.h cell_tet4.h edge.h edge_edge2.h \
-	edge_edge3.h edge_edge4.h edge_inf_edge2.h elem.h \
+	cell_prism6.h cell_pyramid.h cell_pyramid13.h cell_pyramid14.h \
+	cell_pyramid5.h cell_tet.h cell_tet10.h cell_tet4.h edge.h \
+	edge_edge2.h edge_edge3.h edge_edge4.h edge_inf_edge2.h elem.h \
 	elem_quality.h elem_range.h elem_type.h face.h face_inf_quad.h \
 	face_inf_quad4.h face_inf_quad6.h face_quad.h face_quad4.h \
 	face_quad8.h face_quad9.h face_tri.h face_tri3.h face_tri6.h \
@@ -867,6 +867,9 @@ variable.h: $(top_srcdir)/include/base/variable.h
 variant_filter_iterator.h: $(top_srcdir)/include/base/variant_filter_iterator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
+enum_convergence_flags.h: $(top_srcdir)/include/enums/enum_convergence_flags.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
 enum_eigen_solver_type.h: $(top_srcdir)/include/enums/enum_eigen_solver_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
@@ -1063,6 +1066,9 @@ cell_prism6.h: $(top_srcdir)/include/geom/cell_prism6.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 cell_pyramid.h: $(top_srcdir)/include/geom/cell_pyramid.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+cell_pyramid13.h: $(top_srcdir)/include/geom/cell_pyramid13.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 cell_pyramid14.h: $(top_srcdir)/include/geom/cell_pyramid14.h

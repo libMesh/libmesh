@@ -5,7 +5,7 @@ sources=`find base error_estimation fe geom mesh numerics parallel partitioning 
 echo "# Do not edit - automatically generated from $0" > libmesh_SOURCES
 echo -n "libmesh_SOURCES = " >> libmesh_SOURCES
 for source_with_path in $sources ; do
-    
+
     echo " \\" >> libmesh_SOURCES
     echo -n "        "src/$source_with_path >> libmesh_SOURCES
 

@@ -47,13 +47,13 @@ TypeVector<T> TypeVector<T>::unit() const
 
 #if LIBMESH_DIM == 2
   return TypeVector<T>(_coords[0]/length,
-		       _coords[1]/length);
+                       _coords[1]/length);
 #endif
 
 #if LIBMESH_DIM == 3
   return TypeVector<T>(_coords[0]/length,
-		       _coords[1]/length,
-		       _coords[2]/length);
+                       _coords[1]/length,
+                       _coords[2]/length);
 #endif
 
 }
@@ -90,14 +90,14 @@ void TypeVector<T>::print(std::ostream& os) const
 
 template <typename T>
 void TypeVector<T>::write_unformatted (std::ostream &os,
-				       const bool newline) const
+                                       const bool newline) const
 {
   libmesh_assert (os);
 
   os << std::setiosflags(std::ios::showpoint)
-      << (*this)(0) << " "
-      << (*this)(1) << " "
-      << (*this)(2) << " ";
+     << (*this)(0) << " "
+     << (*this)(1) << " "
+     << (*this)(2) << " ";
 
   if (newline)
     os << '\n';

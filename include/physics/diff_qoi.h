@@ -107,7 +107,7 @@ public:
    */
   virtual void element_qoi (DiffContext&,
                             const QoISet&)
-    {}
+  {}
 
   /**
    * Does any work that needs to be done on \p elem in a quantity of
@@ -119,7 +119,7 @@ public:
    */
   virtual void element_qoi_derivative (DiffContext&,
                                        const QoISet&)
-    {}
+  {}
 
   /**
    * Does any work that needs to be done on \p side of \p elem in a
@@ -130,7 +130,7 @@ public:
    */
   virtual void side_qoi (DiffContext&,
                          const QoISet&)
-    {}
+  {}
 
   /**
    * Does any work that needs to be done on \p side of \p elem in a
@@ -142,7 +142,7 @@ public:
    */
   virtual void side_qoi_derivative (DiffContext&,
                                     const QoISet&)
-    {}
+  {}
 
   /**
    * Prepares the result of a build_context() call for use.
@@ -161,15 +161,15 @@ public:
    * Method to combine thread-local qois. By default, simply sums thread qois.
    */
   virtual void thread_join( std::vector<Number>& qoi, const std::vector<Number>& other_qoi,
-			    const QoISet& qoi_indices );
+                            const QoISet& qoi_indices );
 
   /**
    * Method to populate system qoi data structure with process-local qoi. By default, simply
    * sums process qois into system qoi.
    */
   virtual void parallel_op(const Parallel::Communicator &communicator,
-			   std::vector<Number>& sys_qoi, std::vector<Number>& local_qoi,
-			   const QoISet& qoi_indices );
+                           std::vector<Number>& sys_qoi, std::vector<Number>& local_qoi,
+                           const QoISet& qoi_indices );
 };
 
 } // namespace libMesh

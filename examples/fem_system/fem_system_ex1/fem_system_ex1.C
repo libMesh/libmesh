@@ -15,12 +15,12 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>FEMSystem Example 1 - Unsteady Navier-Stokes Equations with
- // FEMSystem</h1>
- //
- // This example shows how the transient nonlinear problem from
- // example 13 can be solved using the
- // DifferentiableSystem class framework
+// <h1>FEMSystem Example 1 - Unsteady Navier-Stokes Equations with
+// FEMSystem</h1>
+//
+// This example shows how the transient nonlinear problem from
+// example 13 can be solved using the
+// DifferentiableSystem class framework
 
 // C++ includes
 #include <iomanip>
@@ -74,11 +74,14 @@ int main (int argc, char** argv)
   const bool transient                 = infile("transient", true);
   const Real deltat                    = infile("deltat", 0.005);
   unsigned int n_timesteps             = infile("n_timesteps", 20);
-  const unsigned int write_interval    = infile("write_interval", 5);
   const unsigned int coarsegridsize    = infile("coarsegridsize", 1);
   const unsigned int coarserefinements = infile("coarserefinements", 0);
   const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
   const unsigned int dim               = infile("dimension", 2);
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+  const unsigned int write_interval    = infile("write_interval", 5);
+#endif
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
@@ -223,14 +226,14 @@ int main (int argc, char** argv)
             }
 
           // Calculate error based on u and v (and w?) but not p
-	  std::vector<Real> weights(2,1.0);  // u, v
+          std::vector<Real> weights(2,1.0);  // u, v
           if (dim == 3)
             weights.push_back(1.0);          // w
           weights.push_back(0.0);            // p
-	  // Keep the same default norm type.
-	  std::vector<FEMNormType>
-	    norms(1, error_estimator->error_norm.type(0));
-	  error_estimator->error_norm = SystemNorm(norms, weights);
+          // Keep the same default norm type.
+          std::vector<FEMNormType>
+            norms(1, error_estimator->error_norm.type(0));
+          error_estimator->error_norm = SystemNorm(norms, weights);
 
           error_estimator->estimate_error(system, error);
 
@@ -301,10 +304,10 @@ int main (int argc, char** argv)
                     << ".e";
 
           ExodusII_IO(mesh).write_timestep(file_name.str(),
-					   equation_systems,
-					   1, /* This number indicates how many time steps
-						 are being written to the file */
-					   system.time);
+                                           equation_systems,
+                                           1, /* This number indicates how many time steps
+                                                 are being written to the file */
+                                           system.time);
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     }

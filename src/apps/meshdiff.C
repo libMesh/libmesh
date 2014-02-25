@@ -61,13 +61,13 @@ int main(int argc, char** argv)
     else
       libMesh::out << "Coarse solution system "
                    << es1.get_system(i).name()
-		   << " not found in fine solution!" << std::endl;
+                   << " not found in fine solution!" << std::endl;
 
   for (unsigned int i = 0; i != es2.n_systems(); ++i)
     if (!es1.has_system(es2.get_system(i).name()))
       libMesh::out << "Fine solution system "
                    << es2.get_system(i).name()
-		   << " not found in coarse solution!" << std::endl;
+                   << " not found in coarse solution!" << std::endl;
 
   if (!es1.n_systems() && !es2.n_systems())
     libMesh::out << "No systems found in fine or coarse solution!"
@@ -87,7 +87,7 @@ int main(int argc, char** argv)
             {
               libMesh::out << "Fine solution system " << sysname
                            << " variable " << varname
-		           << " not found in coarse solution!" << std::endl;
+                           << " not found in coarse solution!" << std::endl;
               continue;
             }
           const unsigned int j2 = sys2.variable_number(varname);
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
             {
               libMesh::out << "Coarse solution system " << sysname
                            << " variable " << varname
-		           << " not found in fine solution!" << std::endl;
+                           << " not found in fine solution!" << std::endl;
               continue;
             }
         }

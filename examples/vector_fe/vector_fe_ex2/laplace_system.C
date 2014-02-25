@@ -33,8 +33,8 @@
 using namespace libMesh;
 
 LaplaceSystem::LaplaceSystem( EquationSystems& es,
-			      const std::string& name_in,
-			      const unsigned int number_in)
+                              const std::string& name_in,
+                              const unsigned int number_in)
   : FEMSystem(es, name_in, number_in)
 {
   return;
@@ -103,7 +103,7 @@ void LaplaceSystem::init_context(DiffContext &context)
 
 
 bool LaplaceSystem::element_time_derivative (bool request_jacobian,
-                                            DiffContext &context)
+                                             DiffContext &context)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
@@ -165,8 +165,8 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
                 {
                   Kuu(i,j) += grad_phi[j][qp].contract(grad_phi[i][qp])*JxW[qp];
 
-		}
-	    }
+                }
+            }
         }
     } // end of the quadrature point qp-loop
 
@@ -174,9 +174,9 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
 }
 
 /*
-bool LaplaceSystem::side_constraint (bool request_jacobian,
-				     DiffContext &context)
-{
+  bool LaplaceSystem::side_constraint (bool request_jacobian,
+  DiffContext &context)
+  {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
   // Get finite element object
@@ -207,27 +207,27 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
   const unsigned int n_qpoints = (c.get_side_qrule())->n_points();
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
-    {
-      Gradient u;
-      c.side_value( u_var, qp, u );
+  {
+  Gradient u;
+  c.side_value( u_var, qp, u );
 
-      Gradient u_exact( this->exact_solution( 0, qpoint[qp](0), qpoint[qp](1) ),
-			this->exact_solution( 1, qpoint[qp](0), qpoint[qp](1) ));
+  Gradient u_exact( this->exact_solution( 0, qpoint[qp](0), qpoint[qp](1) ),
+  this->exact_solution( 1, qpoint[qp](0), qpoint[qp](1) ));
 
-      for (unsigned int i=0; i != n_u_dofs; i++)
-	{
-	  Fu(i) += penalty*(u - u_exact)*phi[i][qp]*JxW[qp];
+  for (unsigned int i=0; i != n_u_dofs; i++)
+  {
+  Fu(i) += penalty*(u - u_exact)*phi[i][qp]*JxW[qp];
 
-	  if (request_jacobian)
-	    {
-	      for (unsigned int j=0; j != n_u_dofs; j++)
-		Kuu(i,j) += penalty*phi[j][qp]*phi[i][qp]*JxW[qp];
-	    }
-	}
-    }
+  if (request_jacobian)
+  {
+  for (unsigned int j=0; j != n_u_dofs; j++)
+  Kuu(i,j) += penalty*phi[j][qp]*phi[i][qp]*JxW[qp];
+  }
+  }
+  }
 
   return request_jacobian;
-}
+  }
 */
 
 RealGradient LaplaceSystem::forcing( const Point& p )
@@ -237,28 +237,28 @@ RealGradient LaplaceSystem::forcing( const Point& p )
   const Real eps = 1.e-3;
 
   const Real fx = -(exact_solution(0,x,y,z-eps) +
-		    exact_solution(0,x,y,z+eps) +
-		    exact_solution(0,x,y-eps,z) +
-		    exact_solution(0,x,y+eps,z) +
-		    exact_solution(0,x-eps,y,z) +
-		    exact_solution(0,x+eps,y,z) -
-		    6.*exact_solution(0,x,y,z))/eps/eps;
+                    exact_solution(0,x,y,z+eps) +
+                    exact_solution(0,x,y-eps,z) +
+                    exact_solution(0,x,y+eps,z) +
+                    exact_solution(0,x-eps,y,z) +
+                    exact_solution(0,x+eps,y,z) -
+                    6.*exact_solution(0,x,y,z))/eps/eps;
 
   const Real fy = -(exact_solution(1,x,y,z-eps) +
-		    exact_solution(1,x,y,z+eps) +
-		    exact_solution(1,x,y-eps,z) +
-		    exact_solution(1,x,y+eps,z) +
-		    exact_solution(1,x-eps,y,z) +
-		    exact_solution(1,x+eps,y,z) -
-		    6.*exact_solution(1,x,y,z))/eps/eps;
+                    exact_solution(1,x,y,z+eps) +
+                    exact_solution(1,x,y-eps,z) +
+                    exact_solution(1,x,y+eps,z) +
+                    exact_solution(1,x-eps,y,z) +
+                    exact_solution(1,x+eps,y,z) -
+                    6.*exact_solution(1,x,y,z))/eps/eps;
 
   const Real fz = -(exact_solution(2,x,y,z-eps) +
-		    exact_solution(2,x,y,z+eps) +
-		    exact_solution(2,x,y-eps,z) +
-		    exact_solution(2,x,y+eps,z) +
-		    exact_solution(2,x-eps,y,z) +
-		    exact_solution(2,x+eps,y,z) -
-		    6.*exact_solution(2,x,y,z))/eps/eps;
+                    exact_solution(2,x,y,z+eps) +
+                    exact_solution(2,x,y-eps,z) +
+                    exact_solution(2,x,y+eps,z) +
+                    exact_solution(2,x-eps,y,z) +
+                    exact_solution(2,x+eps,y,z) -
+                    6.*exact_solution(2,x,y,z))/eps/eps;
 
   return RealGradient( fx, fy, fz );
 }

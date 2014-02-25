@@ -136,7 +136,7 @@ public:
    * should be cleared.  By default, both id maps are deleted.
    */
   void slim (const bool node_id_map = true,
-	     const bool elem_id_map = true);
+             const bool elem_id_map = true);
 
   /**
    * Translates the @e nodal data contained in this object
@@ -153,8 +153,8 @@ public:
    * to), or its \p BoundaryMesh, cf. \p Mesh.
    */
   void translate (const MeshBase& out_mesh,
-		  std::vector<Number>& data_values,
-		  std::vector<std::string>& data_names) const;
+                  std::vector<Number>& data_values,
+                  std::vector<std::string>& data_names) const;
 
   /**
    * Read mesh data from file named \p name.
@@ -195,7 +195,7 @@ public:
    * is no such \p node in the map.
    */
   Number operator() (const Node* node,
-		     const unsigned int i=0) const;
+                     const unsigned int i=0) const;
 
   /**
    * @returns \p true when the node \p node has data,
@@ -261,8 +261,8 @@ public:
    * user @e has to add element-associated data, too.
    */
   void insert_node_data (std::map<const Node*,
-			          std::vector<Number> >& nd,
-			 const bool close_elem_data = true);
+                         std::vector<Number> >& nd,
+                         const bool close_elem_data = true);
 
 
   //----------------------------------------------------------
@@ -273,7 +273,7 @@ public:
    * is no data for \p elem in the map.
    */
   Number operator() (const Elem* elem,
-		     const unsigned int i=0) const;
+                     const unsigned int i=0) const;
 
   /**
    * @returns \p true when the element \p elem has data,
@@ -340,8 +340,8 @@ public:
    * user @e has to add nodal data, too.
    */
   void insert_elem_data (std::map<const Elem*,
-			          std::vector<Number> >& ed,
-			 const bool close_node_data = true);
+                         std::vector<Number> >& ed,
+                         const bool close_node_data = true);
 
 
   //----------------------------------------------------------
@@ -430,7 +430,7 @@ public:
    * a map.
    */
   void add_foreign_node_id (const Node* node,
-			    const unsigned int foreign_node_id);
+                            const unsigned int foreign_node_id);
 
   /**
    * In general, \p MeshData gathers element-associated
@@ -440,7 +440,7 @@ public:
    * a map.
    */
   void add_foreign_elem_id (const Elem* elem,
-			    const unsigned int foreign_elem_id);
+                            const unsigned int foreign_elem_id);
 
   /**
    * Signal to this object that the mesh importer finished
@@ -498,7 +498,7 @@ protected:
    * be changed setting \p mode to \p DECODE.
    */
   void read_xdr (const std::string& name,
-		 const XdrMODE mode = READ);
+                 const XdrMODE mode = READ);
 
   /**
    * Write nodal data in format comparable to
@@ -507,7 +507,7 @@ protected:
    * be changed setting \p mode to \p ENCODE.
    */
   void write_xdr (const std::string& name,
-		  const XdrMODE mode = WRITE);
+                  const XdrMODE mode = WRITE);
 
 
   /**
@@ -647,24 +647,24 @@ protected:
  *
  \verbatim
 
-      -1                                                                              # beginning of dataset
-    2414                                                                              # type of dataset: data at mesh entities
-           1                                                                          # R.  1: unique number of dataset (dataset_label)
-  STRUCTURAL MODE     1                                                               # R.  2: text describing content (dataset_name)
-           1                                                                          # R.  3: data belongs to: nodes, elements,...
-                                                                                      #        (dataset_location)
-  Default Model                                                                       # R.  4: user-specified text (id_lines_1_to_5[0])
-  I-DEAS Master Series                                                                # R.  5: user-specified text (id_lines_1_to_5[1])
-  18-AUG-2003 20:00:12    HPUX11_64     MAR2003                                       # R.  6: user-specified text (id_lines_1_to_5[2])
-  MODE   1 FREQUENCY       501.25 Hz                                                  # R.  7: user-specified text (id_lines_1_to_5[3])
-  STRUCTURAL MODE     1                                                               # R.  8: user-specified text (id_lines_1_to_5[4])
-           0         2         3         8         2         6                        # R.  9: (model_type) (analysis_type)
-                                                                                      #        (data_characteristic) (result_type)
-                                                                                      #        (data_type) (nvaldc)
-           0         0         0         0         0         1         0         0    # R. 10: analysis-specific data (record_10)
-           0         0                                                                # R. 11: analysis-specific data (record_11)
-    0.00000E+00  0.50125E+03  0.99192E+07  0.10000E+01  0.00000E+00  0.00000E+00      # R. 12: analysis-specific data (record_12)
-    0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00      # R. 13: analysis-specific data (record_13)
+ -1                                                                              # beginning of dataset
+ 2414                                                                              # type of dataset: data at mesh entities
+ 1                                                                          # R.  1: unique number of dataset (dataset_label)
+ STRUCTURAL MODE     1                                                               # R.  2: text describing content (dataset_name)
+ 1                                                                          # R.  3: data belongs to: nodes, elements,...
+ #        (dataset_location)
+ Default Model                                                                       # R.  4: user-specified text (id_lines_1_to_5[0])
+ I-DEAS Master Series                                                                # R.  5: user-specified text (id_lines_1_to_5[1])
+ 18-AUG-2003 20:00:12    HPUX11_64     MAR2003                                       # R.  6: user-specified text (id_lines_1_to_5[2])
+ MODE   1 FREQUENCY       501.25 Hz                                                  # R.  7: user-specified text (id_lines_1_to_5[3])
+ STRUCTURAL MODE     1                                                               # R.  8: user-specified text (id_lines_1_to_5[4])
+ 0         2         3         8         2         6                        # R.  9: (model_type) (analysis_type)
+ #        (data_characteristic) (result_type)
+ #        (data_type) (nvaldc)
+ 0         0         0         0         0         1         0         0    # R. 10: analysis-specific data (record_10)
+ 0         0                                                                # R. 11: analysis-specific data (record_11)
+ 0.00000E+00  0.50125E+03  0.99192E+07  0.10000E+01  0.00000E+00  0.00000E+00      # R. 12: analysis-specific data (record_12)
+ 0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00      # R. 13: analysis-specific data (record_13)
  \endverbatim
  *
  * For more details we refer to the general description of the I-DEAS
@@ -720,7 +720,7 @@ public:
   /**
    * @returns \p true when \p this and \p omduh are equal,
    * \p false otherwise.
-  */
+   */
   bool operator == (const MeshDataUnvHeader& omduh) const;
 
   /**
@@ -754,9 +754,9 @@ public:
    * the result type (e.g. stress, strain, velocity, etc.).
    */
   unsigned int model_type,
-               analysis_type,
-               data_characteristic,
-               result_type;
+    analysis_type,
+    data_characteristic,
+    result_type;
 
   /**
    * Record 9, second part. See first part, then we have:
@@ -776,14 +776,14 @@ public:
    * type integer.
    */
   std::vector<int> record_10,
-                   record_11;
+    record_11;
 
   /**
    * Record 12 and 13 are analysis specific data of
    * type Real.
    */
   std::vector<Real> record_12,
-                    record_13;
+    record_13;
 
 
 protected:
@@ -836,16 +836,16 @@ private:
 // element data inline methods
 inline
 Number MeshData::operator() (const Node* node,
-			     const unsigned int i) const
+                             const unsigned int i) const
 {
   libmesh_assert (_active || _compatibility_mode);
   libmesh_assert (_node_data_closed);
 
   std::map<const Node*,
-           std::vector<Number> >::const_iterator pos = _node_data.find(node);
+    std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
   if (pos == _node_data.end())
-      return libMesh::zero;
+    return libMesh::zero;
 
   // we only get here when pos != _node_data.end()
   libmesh_assert_less (i, pos->second.size());
@@ -861,7 +861,7 @@ bool MeshData::has_data (const Node* node) const
   libmesh_assert (_node_data_closed);
 
   std::map<const Node*,
-           std::vector<Number> >::const_iterator pos = _node_data.find(node);
+    std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
   return (pos != _node_data.end());
 }
@@ -875,7 +875,7 @@ const std::vector<Number>& MeshData::get_data (const Node* node) const
   libmesh_assert (_node_data_closed);
 
   std::map<const Node*,
-           std::vector<Number> >::const_iterator pos = _node_data.find(node);
+    std::vector<Number> >::const_iterator pos = _node_data.find(node);
 
 #ifdef DEBUG
   if (pos == _node_data.end())
@@ -892,7 +892,7 @@ const std::vector<Number>& MeshData::get_data (const Node* node) const
 
 inline
 void MeshData::set_data (const Node* node,
-			 const std::vector<Number> &val)
+                         const std::vector<Number> &val)
 {
   this->_node_data[node] = val;
 }
@@ -919,13 +919,13 @@ MeshData::const_node_data_iterator MeshData::node_data_end () const
 // element data inline methods
 inline
 Number MeshData::operator() (const Elem* elem,
-			     const unsigned int i) const
+                             const unsigned int i) const
 {
   libmesh_assert (_active || _compatibility_mode);
   libmesh_assert (_elem_data_closed);
 
   std::map<const Elem*,
-           std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
+    std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
   if (pos == _elem_data.end())
     return libMesh::zero;
@@ -944,7 +944,7 @@ bool MeshData::has_data (const Elem* elem) const
   libmesh_assert (_elem_data_closed);
 
   std::map<const Elem*,
-           std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
+    std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
   return (pos != _elem_data.end());
 }
@@ -958,7 +958,7 @@ const std::vector<Number>& MeshData::get_data (const Elem* elem) const
   libmesh_assert (_elem_data_closed);
 
   std::map<const Elem*,
-           std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
+    std::vector<Number> >::const_iterator pos = _elem_data.find(elem);
 
 #ifdef DEBUG
   if (pos == _elem_data.end())
@@ -975,7 +975,7 @@ const std::vector<Number>& MeshData::get_data (const Elem* elem) const
 
 inline
 void MeshData::set_data (const Elem* elem,
-			 const std::vector<Number> &val)
+                         const std::vector<Number> &val)
 {
   this->_elem_data[elem] = val;
 }
@@ -1034,7 +1034,7 @@ bool MeshData::node_initialized() const
 
 inline
 void MeshData::add_foreign_node_id (const Node* node,
-				    const unsigned int foreign_node_id)
+                                    const unsigned int foreign_node_id)
 {
   if (_active)
     {
@@ -1060,7 +1060,7 @@ void MeshData::add_foreign_node_id (const Node* node,
 
 inline
 void MeshData::add_foreign_elem_id (const Elem* elem,
-				    const unsigned int foreign_elem_id)
+                                    const unsigned int foreign_elem_id)
 {
   if (_active)
     {

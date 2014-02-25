@@ -50,10 +50,10 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
       break;
 #else
       if (libMesh::on_command_line ("--use-petsc-dm")){
-	ap.reset(new PetscDMNonlinearSolver<T>(s));
+        ap.reset(new PetscDMNonlinearSolver<T>(s));
       }
       else {
-	ap.reset(new PetscNonlinearSolver<T>(s));
+        ap.reset(new PetscNonlinearSolver<T>(s));
       }
       break;
 #endif
@@ -67,8 +67,8 @@ NonlinearSolver<T>::build(sys_type& s, const SolverPackage solver_package)
 
     default:
       libMesh::err << "ERROR:  Unrecognized solver package: "
-		    << solver_package
-		    << std::endl;
+                   << solver_package
+                   << std::endl;
       libmesh_error();
     }
 
@@ -80,7 +80,7 @@ AutoPtr<NonlinearSolver<T> >
 NonlinearSolver<T>::build(sys_type&, const SolverPackage)
 {
   libMesh::err << "ERROR: libMesh was compiled without nonlinear solver support"
-	        << std::endl;
+               << std::endl;
   libmesh_not_implemented();
 }
 #endif
@@ -91,10 +91,10 @@ void
 NonlinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
 {
   if(this->_is_initialized)
-  {
-    libMesh::err << "Preconditioner must be attached before the solver is initialized!"<<std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "Preconditioner must be attached before the solver is initialized!"<<std::endl;
+      libmesh_error();
+    }
 
   _preconditioner = preconditioner;
 }

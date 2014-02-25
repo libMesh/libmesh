@@ -42,8 +42,8 @@ using namespace libMesh;
 
 
 void create_random_point_cloud (const unsigned int Npts,
-				std::vector<Point> &pts,
-				const Real max_range = 10)
+                                std::vector<Point> &pts,
+                                const Real max_range = 10)
 {
   std::cout << "Generating "<< Npts << " point cloud...";
   pts.resize(Npts);
@@ -67,8 +67,8 @@ Real exact_solution_u (const Point &p)
     z = p(2);
 
   return (x*x*x   +
-	  y*y*y*y +
-	  z*z*z*z*z);
+          y*y*y*y +
+          z*z*z*z*z);
 }
 
 
@@ -81,8 +81,8 @@ Real exact_solution_v (const Point &p)
     z = p(2);
 
   return (x*x   +
-	  y*y +
-	  z*z*z);
+          y*y +
+          z*z*z);
 }
 
 Number exact_value (const Point& p,
@@ -134,8 +134,8 @@ int main(int argc, char** argv)
       field_vars.push_back("v");
 
       InverseDistanceInterpolation<3> idi (init.comm(),
-					   /* n_interp_pts = */ 8,
-					   /* power =        */ 2);
+                                           /* n_interp_pts = */ 8,
+                                           /* power =        */ 2);
 
       RadialBasisInterpolation<3> rbi (init.comm());
 
@@ -143,22 +143,22 @@ int main(int argc, char** argv)
       rbi.set_field_variables (field_vars);
 
       create_random_point_cloud (100,
-				 idi.get_source_points());
+                                 idi.get_source_points());
 
 
       // Explicitly set the data values we will interpolate from
       {
-	const std::vector<Point> &src_pts  (idi.get_source_points());
-	std::vector<Number>      &src_vals (idi.get_source_vals());
+        const std::vector<Point> &src_pts  (idi.get_source_points());
+        std::vector<Number>      &src_vals (idi.get_source_vals());
 
-	src_vals.clear(); src_vals.reserve(2*src_pts.size());
+        src_vals.clear(); src_vals.reserve(2*src_pts.size());
 
-	for (std::vector<Point>::const_iterator pt_it=src_pts.begin();
-	     pt_it != src_pts.end(); ++pt_it)
-	  {
-	    src_vals.push_back (exact_solution_u (*pt_it));
-	    src_vals.push_back (exact_solution_v (*pt_it));
-	  }
+        for (std::vector<Point>::const_iterator pt_it=src_pts.begin();
+             pt_it != src_pts.end(); ++pt_it)
+          {
+            src_vals.push_back (exact_solution_u (*pt_it));
+            src_vals.push_back (exact_solution_v (*pt_it));
+          }
       }
 
       // give rbi the same info as idi
@@ -172,39 +172,39 @@ int main(int argc, char** argv)
 
       // Interpolate to some other random points, and evaluate the result
       {
-	create_random_point_cloud (10,
-				   tgt_pts);
+        create_random_point_cloud (10,
+                                   tgt_pts);
 
-	//tgt_pts = rbi.get_source_points();
+        //tgt_pts = rbi.get_source_points();
 
-	idi.interpolate_field_data (field_vars,
-				    tgt_pts,
-				    tgt_data_idi);
+        idi.interpolate_field_data (field_vars,
+                                    tgt_pts,
+                                    tgt_data_idi);
 
-	rbi.interpolate_field_data (field_vars,
-				    tgt_pts,
-				    tgt_data_rbi);
+        rbi.interpolate_field_data (field_vars,
+                                    tgt_pts,
+                                    tgt_data_rbi);
 
-      	std::vector<Number>::const_iterator
-	  v_idi=tgt_data_idi.begin(),
-	  v_rbi=tgt_data_rbi.begin();
+        std::vector<Number>::const_iterator
+          v_idi=tgt_data_idi.begin(),
+          v_rbi=tgt_data_rbi.begin();
 
-	for (std::vector<Point>::const_iterator  p_it=tgt_pts.begin();
-	     p_it!=tgt_pts.end(); ++p_it)
-	  {
-	    std::cout << "\nAt target point " << *p_it
-		      << "\n u_interp_idi="   << *v_idi
-		      << ", u_interp_rbi="    << *v_rbi
-		      << ", u_exact="         << exact_solution_u(*p_it);
-	    ++v_idi;
-	    ++v_rbi;
-	    std::cout << "\n v_interp_idi=" << *v_idi
-		      << ", v_interp_rbi="  << *v_rbi
-		      << ", v_exact="       << exact_solution_v(*p_it)
-		      << std::endl;
-	    ++v_idi;
-	    ++v_rbi;
-	  }
+        for (std::vector<Point>::const_iterator  p_it=tgt_pts.begin();
+             p_it!=tgt_pts.end(); ++p_it)
+          {
+            std::cout << "\nAt target point " << *p_it
+                      << "\n u_interp_idi="   << *v_idi
+                      << ", u_interp_rbi="    << *v_rbi
+                      << ", u_exact="         << exact_solution_u(*p_it);
+            ++v_idi;
+            ++v_rbi;
+            std::cout << "\n v_interp_idi=" << *v_idi
+                      << ", v_interp_rbi="  << *v_rbi
+                      << ", v_exact="       << exact_solution_v(*p_it)
+                      << std::endl;
+            ++v_idi;
+            ++v_rbi;
+          }
       }
     }
 
@@ -217,11 +217,11 @@ int main(int argc, char** argv)
 
       // Create equation systems objects.
       EquationSystems
-	es_a(mesh_a), es_b(mesh_b);
+        es_a(mesh_a), es_b(mesh_b);
 
       System
-	&sys_a = es_a.add_system<System>("src_system"),
-	&sys_b = es_b.add_system<System>("dest_system");
+        &sys_a = es_a.add_system<System>("src_system"),
+        &sys_b = es_b.add_system<System>("dest_system");
 
       sys_a.add_variable ("Cp", FIRST);
       sys_b.add_variable ("Cp", FIRST);
@@ -231,11 +231,11 @@ int main(int argc, char** argv)
 
       // Write out the initial conditions.
       TecplotIO(mesh_a).write_equation_systems ("src.dat",
-						es_a);
+                                                es_a);
 
       InverseDistanceInterpolation<3> idi (init.comm(),
-					   /* n_interp_pts = */ 4,
-					   /* power =        */ 2);
+                                           /* n_interp_pts = */ 4,
+                                           /* power =        */ 2);
       RadialBasisInterpolation<3> rbi (init.comm());
 
       std::vector<Point>  &src_pts  (idi.get_source_points());
@@ -247,19 +247,19 @@ int main(int argc, char** argv)
       // We now will loop over every node in the source mesh
       // and add it to a source point list, along with the solution
       {
-	MeshBase::const_node_iterator nd  = mesh_a.local_nodes_begin();
-	MeshBase::const_node_iterator end = mesh_a.local_nodes_end();
+        MeshBase::const_node_iterator nd  = mesh_a.local_nodes_begin();
+        MeshBase::const_node_iterator end = mesh_a.local_nodes_end();
 
-	for (; nd!=end; ++nd)
-	  {
-	    const Node *node(*nd);
-	    src_pts.push_back(*node);
-	    src_vals.push_back(sys_a.current_solution(node->dof_number(0,0,0)));
-	  }
+        for (; nd!=end; ++nd)
+          {
+            const Node *node(*nd);
+            src_pts.push_back(*node);
+            src_vals.push_back(sys_a.current_solution(node->dof_number(0,0,0)));
+          }
 
-	rbi.set_field_variables(field_vars);
-	rbi.get_source_points() = idi.get_source_points();
-	rbi.get_source_vals()   = idi.get_source_vals();
+        rbi.set_field_variables(field_vars);
+        rbi.get_source_points() = idi.get_source_points();
+        rbi.get_source_vals()   = idi.get_source_vals();
       }
 
       // We have only set local values - prepare for use by gathering remote gata
@@ -270,31 +270,31 @@ int main(int argc, char** argv)
       // object.  Since each MeshlessInterpolationFunction shares the same InverseDistanceInterpolation
       // object in a threaded environment we must also provide a locking mechanism.
       {
-	Threads::spin_mutex mutex;
-	MeshlessInterpolationFunction mif(idi, mutex);
+        Threads::spin_mutex mutex;
+        MeshlessInterpolationFunction mif(idi, mutex);
 
-	// project the solution onto system b
-	es_b.init();
-	sys_b.project_solution (&mif);
+        // project the solution onto system b
+        es_b.init();
+        sys_b.project_solution (&mif);
 
-	// Write the result
-	TecplotIO(mesh_b).write_equation_systems ("dest_idi.dat",
-						  es_b);
+        // Write the result
+        TecplotIO(mesh_b).write_equation_systems ("dest_idi.dat",
+                                                  es_b);
       }
 
       // Create a MeshlessInterpolationFunction that uses our RadialBasisInterpolation
       // object.  Since each MeshlessInterpolationFunction shares the same RadialBasisInterpolation
       // object in a threaded environment we must also provide a locking mechanism.
       {
-	Threads::spin_mutex mutex;
-	MeshlessInterpolationFunction mif(rbi, mutex);
+        Threads::spin_mutex mutex;
+        MeshlessInterpolationFunction mif(rbi, mutex);
 
-	// project the solution onto system b
-	sys_b.project_solution (&mif);
+        // project the solution onto system b
+        sys_b.project_solution (&mif);
 
-	// Write the result
-	TecplotIO(mesh_b).write_equation_systems ("dest_rbi.dat",
-						  es_b);
+        // Write the result
+        TecplotIO(mesh_b).write_equation_systems ("dest_rbi.dat",
+                                                  es_b);
       }
     }
 

@@ -9,12 +9,12 @@
 
 using namespace libMesh;
 
-class PetscVectorTest : public NumericVectorTest<PetscVector<Real> > { 
-public: 
+class PetscVectorTest : public NumericVectorTest<PetscVector<Real> > {
+public:
   CPPUNIT_TEST_SUITE( PetscVectorTest );
 
   NUMERICVECTORTEST
-  
+
   CPPUNIT_TEST_SUITE_END();
 };
 

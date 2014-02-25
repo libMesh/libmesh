@@ -37,10 +37,10 @@ namespace libMesh
 
 namespace Parallel {
 
-  /**
-   * Defines a histogram to be used in parallel in conjuction with
-   * a \p BinSorter.
-   */
+/**
+ * Defines a histogram to be used in parallel in conjuction with
+ * a \p BinSorter.
+ */
 template <typename KeyType, typename IdxType=unsigned int>
 class Histogram : public ParallelObject
 {
@@ -52,14 +52,14 @@ public:
   // Constructor
   explicit
   Histogram (const Parallel::Communicator &comm,
-	     const std::vector<KeyType>& d);
+             const std::vector<KeyType>& d);
 
   // The actual function which sorts the data into
   // nbins.  Currently based on the global min and
   // max which you must provide e.g. by using MPI.
   void make_histogram (const IdxType nbins,
-		       KeyType max,
-		       KeyType min);
+                       KeyType max,
+                       KeyType min);
 
   // Build the histogram across all processors and store the
   // result in the input vector \p hist

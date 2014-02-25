@@ -60,7 +60,7 @@ class MeshData;
 // ------------------------------------------------------------
 // VTKIO class definition
 class VTKIO : public MeshInput<MeshBase>,
-	      public MeshOutput<MeshBase>
+              public MeshOutput<MeshBase>
 {
 public:
   /**
@@ -104,7 +104,7 @@ public:
 
   /**
    * Output the mesh without solutions to a .pvtu file
-  */
+   */
   virtual void write (const std::string&);
 
   /**

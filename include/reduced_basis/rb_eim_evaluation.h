@@ -57,7 +57,7 @@ public:
    * Constructor.
    */
   RBEIMEvaluation (const libMesh::Parallel::Communicator &comm 
-		   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.
@@ -201,12 +201,12 @@ private:
    * Write out interpolation_points_elem by putting the elements into
    * a mesh and writing out the mesh.
    */
-  void write_out_interpolation_points_elem(const std::string directory_name);
+  void write_out_interpolation_points_elem(const std::string& directory_name);
 
   /**
    * Read int interpolation_points_elem from a mesh.
    */
-  void read_in_interpolation_points_elem(const std::string directory_name);
+  void read_in_interpolation_points_elem(const std::string& directory_name);
 
   /**
    * This vector stores the parametrized functions

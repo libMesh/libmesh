@@ -53,14 +53,14 @@ public:
    * @returns the (i,j) entry of the matrix.
    */
   unsigned char operator() (const unsigned int i,
-			    const unsigned int j) const;
+                            const unsigned int j) const;
 
   /**
    * @returns the (i,j) entry of the matrix as
    * a writeable reference.
    */
   unsigned char & operator() (const unsigned int i,
-			      const unsigned int j);
+                              const unsigned int j);
 
   /**
    * @returns the size of the matrix, i.e. N for an
@@ -118,7 +118,7 @@ CouplingMatrix::CouplingMatrix (const unsigned int n) :
 
 inline
 unsigned char CouplingMatrix::operator() (const unsigned int i,
-					  const unsigned int j) const
+                                          const unsigned int j) const
 {
   libmesh_assert_less (i, _size);
   libmesh_assert_less (j, _size);
@@ -130,7 +130,7 @@ unsigned char CouplingMatrix::operator() (const unsigned int i,
 
 inline
 unsigned char & CouplingMatrix::operator() (const unsigned int i,
-					    const unsigned int j)
+                                            const unsigned int j)
 {
   libmesh_assert_less (i, _size);
   libmesh_assert_less (j, _size);

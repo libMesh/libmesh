@@ -20,28 +20,19 @@
 #ifndef LIBMESH_ENUM_PARALLEL_TYPE_H
 #define LIBMESH_ENUM_PARALLEL_TYPE_H
 
-/*
- * The \p libMeshEnums namespace is the namespace all \p enum definitions
- * should be put into.
- */
-
 // ------------------------------------------------------------
 // enum SolverType definition
-namespace libMeshEnums {
+namespace libMesh {
 
-  /**
-   * Defines an \p enum for parallel data structure types
-   */
-  enum ParallelType {AUTOMATIC=0,
-                     SERIAL,
-		     PARALLEL,
-		     GHOSTED,
+/**
+ * Defines an \p enum for parallel data structure types
+ */
+enum ParallelType {AUTOMATIC=0,
+                   SERIAL,
+                   PARALLEL,
+                   GHOSTED,
 
-		     INVALID_PARALLELIZATION};
+                   INVALID_PARALLELIZATION};
 }
-
-using namespace libMeshEnums;
-
-
 
 #endif // LIBMESH_ENUM_PARALLEL_TYPE_H

@@ -56,8 +56,8 @@ public:
    * Constructor.  Requires a referece to the \p EquationSystems object.
    */
   Linear (EquationSystems& es,
-	  const std::string& name,
-	  const unsigned int number);
+          const std::string& name,
+          const unsigned int number);
 
   /**
    * Destructor.
@@ -74,7 +74,7 @@ inline
 Linear<T>::Linear(EquationSystems& es) :
   T (es)
 {
-libmesh_deprecated();
+  libmesh_deprecated();
 }
 
 
@@ -82,11 +82,11 @@ libmesh_deprecated();
 template <class T>
 inline
 Linear<T>::Linear (EquationSystems& es,
-		   const std::string& name,
-		   const unsigned int number) :
+                   const std::string& name,
+                   const unsigned int number) :
   T (es, name, number)
 {
-libmesh_deprecated();
+  libmesh_deprecated();
 }
 
 

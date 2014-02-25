@@ -37,9 +37,9 @@ namespace libMesh
 namespace Parallel {
 
 template <typename KeyType, typename IdxType=unsigned int>
-  /**
-   * Perform a parallel sort using a bin-sort method.
-   */
+/**
+ * Perform a parallel sort using a bin-sort method.
+ */
 class BinSorter : public ParallelObject
 {
   // the type of iterator we will be using is inferred from KeyType
@@ -50,14 +50,14 @@ public:
   // Constructor
   explicit
   BinSorter (const Parallel::Communicator &comm,
-	     const std::vector<KeyType>& d);
+             const std::vector<KeyType>& d);
 
   // The actual function which sorts the data into
   // nbins.  Currently based on the global min and
   // max which you must provide e.g. by using MPI.
   void binsort (const IdxType nbins,
-		KeyType max,
-		KeyType min);
+                KeyType max,
+                KeyType min);
 
   // Returns the size of bin b as an unsigned int.
   IdxType sizeof_bin (const IdxType bin) const;

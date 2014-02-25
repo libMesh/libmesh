@@ -38,14 +38,14 @@
 
 namespace libMesh
 {
-  /**
-   * Helper functions for printing scalar and vector types.  Called from Parameters::Parameter<T>::print(...).
-   */
-  template<typename P>
-  void print_helper(std::ostream& os, const P* param);
+/**
+ * Helper functions for printing scalar and vector types.  Called from Parameters::Parameter<T>::print(...).
+ */
+template<typename P>
+void print_helper(std::ostream& os, const P* param);
 
-  template<typename P>
-  void print_helper(std::ostream& os, const std::vector<P>* param);
+template<typename P>
+void print_helper(std::ostream& os, const std::vector<P>* param);
 
 /**
  * This class provides the ability to map between
@@ -305,8 +305,8 @@ inline
 Parameters::Value* Parameters::Parameter<T>::clone () const
 {
   // No good for Solaris C++! - BSK
-//  Parameters::Parameter<T>
-//    *copy = new Parameters::Parameter<T>;
+  //  Parameters::Parameter<T>
+  //    *copy = new Parameters::Parameter<T>;
   Parameter<T>
     *copy = new Parameter<T>;
 
@@ -340,8 +340,9 @@ inline
 Parameters& Parameters::operator= (const Parameters& source)
 {
   this->clear();
+  *this += source;
 
-  return (*this += source);
+  return *this;
 }
 
 inline
@@ -349,11 +350,11 @@ Parameters& Parameters::operator+= (const Parameters& source)
 {
   for (Parameters::const_iterator it = source._values.begin();
        it != source._values.end(); ++it)
-  {
-    if (_values.find(it->first) != _values.end())
-      delete _values[it->first];
-    _values[it->first] = it->second->clone();
-  }
+    {
+      if (_values.find(it->first) != _values.end())
+        delete _values[it->first];
+      _values[it->first] = it->second->clone();
+    }
 
   return *this;
 }
@@ -385,9 +386,9 @@ void Parameters::print (std::ostream& os) const
     {
       os << " "   << it->first
 #ifdef LIBMESH_HAVE_RTTI
-	 << "\t " << it->second->type()
+         << "\t " << it->second->type()
 #endif // LIBMESH_HAVE_RTTI
-	 << "\t ";   it->second->print(os);
+         << "\t ";   it->second->print(os);
       os << '\n';
 
       ++it;
@@ -418,9 +419,9 @@ bool Parameters::have_parameter (const std::string& name) const
 #ifdef LIBMESH_HAVE_RTTI
     if (dynamic_cast<const Parameter<T>*>(it->second) != NULL)
 #else // LIBMESH_HAVE_RTTI
-    if (libmesh_cast_ptr<const Parameter<T>*>(it->second) != NULL)
+      if (libmesh_cast_ptr<const Parameter<T>*>(it->second) != NULL)
 #endif // LIBMESH_HAVE_RTTI
-      return true;
+        return true;
 
   return false;
 }
@@ -437,9 +438,9 @@ const T& Parameters::get (const std::string& name) const
 #ifdef LIBMESH_HAVE_RTTI
                    << ' ' << demangle(typeid(T).name())
 #endif // LIBMESH_HAVE_RTTI
-		    << " parameter named \""
-		    << name << "\":" << std::endl
-		    << *this;
+                   << " parameter named \""
+                   << name << "\":" << std::endl
+                   << *this;
 
       libmesh_error();
     }

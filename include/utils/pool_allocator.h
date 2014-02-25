@@ -33,188 +33,188 @@
 
 namespace libMesh
 {
-  // If Boost is enabled, wrappers to use their allocators.
+// If Boost is enabled, wrappers to use their allocators.
 #ifdef LIBMESH_HAVE_BOOST
 
+/**
+ * An allocator which can be used in standard containers.  Uses
+ * pool-based memory allocation to efficiently allocate many small
+ * objects.  Note that object destruction returns memory to the pool
+ * rather than deallocate it.  It must be explicitly deallocated
+ * prior to program termination.
+ */
+template <typename T>
+class PoolAllocator : public boost::pool_allocator<T>
+{
+public:
+
   /**
-   * An allocator which can be used in standard containers.  Uses
-   * pool-based memory allocation to efficiently allocate many small
-   * objects.  Note that object destruction returns memory to the pool
-   * rather than deallocate it.  It must be explicitly deallocated
-   * prior to program termination.
+   * Methods required for copy construction of containers using this allocator.
    */
-  template <typename T>
-  class PoolAllocator : public boost::pool_allocator<T>
-  {
-  public:
-
-    /**
-     * Methods required for copy construction of containers using this allocator.
-     */
-    template<typename U>
-    struct rebind {
-      typedef PoolAllocator<U> other;
-    };
-
-
-    PoolAllocator() :
-      boost::pool_allocator<T>()
-    {}
-
-    explicit PoolAllocator(const PoolAllocator &o) :
-      boost::pool_allocator<T>(o)
-    {}
-
-    /**
-     * Frees every memory block that doesn't have any allocated chunks.
-     * Returns true if at least one memory block was freed.
-     */
-    static bool release_memory ()
-    {
-      return boost::singleton_pool<boost::pool_allocator_tag, sizeof(T)>::release_memory();
-    }
-
-    /**
-     * Frees every memory block. This function invalidates any pointers previously returned
-     * by allocation functions. Returns true if at least one memory block was freed.
-     */
-    static bool purge_memory ()
-    {
-      return boost::singleton_pool<boost::pool_allocator_tag, sizeof(T)>::purge_memory();
-    }
+  template<typename U>
+  struct rebind {
+    typedef PoolAllocator<U> other;
   };
 
 
+  PoolAllocator() :
+    boost::pool_allocator<T>()
+  {}
+
+  explicit PoolAllocator(const PoolAllocator &o) :
+    boost::pool_allocator<T>(o)
+  {}
 
   /**
-   * An allocator which can be used in standard containers.  Uses
-   * pool-based memory allocation to efficiently allocate many small
-   * objects.  Note that object destruction returns memory to the pool
-   * rather than deallocate it.  It must be explicitly deallocated
-   * prior to program termination.
+   * Frees every memory block that doesn't have any allocated chunks.
+   * Returns true if at least one memory block was freed.
    */
-  template <typename T>
-  class FastPoolAllocator : public boost::fast_pool_allocator<T>
+  static bool release_memory ()
   {
-  public:
+    return boost::singleton_pool<boost::pool_allocator_tag, sizeof(T)>::release_memory();
+  }
 
-    /**
-     * Methods required for copy construction of containers using this allocator.
-     */
-    template<typename U>
-    struct rebind {
-      typedef FastPoolAllocator<U> other;
-    };
-
-
-    FastPoolAllocator() :
-      boost::fast_pool_allocator<T>()
-    {}
-
-    explicit FastPoolAllocator(const FastPoolAllocator &o) :
-      boost::fast_pool_allocator<T>(o)
-    {}
+  /**
+   * Frees every memory block. This function invalidates any pointers previously returned
+   * by allocation functions. Returns true if at least one memory block was freed.
+   */
+  static bool purge_memory ()
+  {
+    return boost::singleton_pool<boost::pool_allocator_tag, sizeof(T)>::purge_memory();
+  }
+};
 
 
-    /**
-     * Frees every memory block that doesn't have any allocated chunks.
-     * Returns true if at least one memory block was freed.
-     */
-    static bool release_memory ()
-    {
-      return boost::singleton_pool<boost::fast_pool_allocator_tag, sizeof(T)>::release_memory();
-    }
 
-    /**
-     * Frees every memory block. This function invalidates any pointers previously returned
-     * by allocation functions. Returns true if at least one memory block was freed.
-     */
-    static bool purge_memory ()
-    {
-      return boost::singleton_pool<boost::fast_pool_allocator_tag, sizeof(T)>::purge_memory();
-    }
+/**
+ * An allocator which can be used in standard containers.  Uses
+ * pool-based memory allocation to efficiently allocate many small
+ * objects.  Note that object destruction returns memory to the pool
+ * rather than deallocate it.  It must be explicitly deallocated
+ * prior to program termination.
+ */
+template <typename T>
+class FastPoolAllocator : public boost::fast_pool_allocator<T>
+{
+public:
+
+  /**
+   * Methods required for copy construction of containers using this allocator.
+   */
+  template<typename U>
+  struct rebind {
+    typedef FastPoolAllocator<U> other;
   };
 
-  // Otherwise fall back to std::allocator<>.
+
+  FastPoolAllocator() :
+    boost::fast_pool_allocator<T>()
+  {}
+
+  explicit FastPoolAllocator(const FastPoolAllocator &o) :
+    boost::fast_pool_allocator<T>(o)
+  {}
+
+
+  /**
+   * Frees every memory block that doesn't have any allocated chunks.
+   * Returns true if at least one memory block was freed.
+   */
+  static bool release_memory ()
+  {
+    return boost::singleton_pool<boost::fast_pool_allocator_tag, sizeof(T)>::release_memory();
+  }
+
+  /**
+   * Frees every memory block. This function invalidates any pointers previously returned
+   * by allocation functions. Returns true if at least one memory block was freed.
+   */
+  static bool purge_memory ()
+  {
+    return boost::singleton_pool<boost::fast_pool_allocator_tag, sizeof(T)>::purge_memory();
+  }
+};
+
+// Otherwise fall back to std::allocator<>.
 #else
 
-  /**
-   * An allocator which can be used in standard containers.
-   * A wrapper for \p std::allocator<> when Boost is not available.
-   */
-  template <typename T>
-  class PoolAllocator : public std::allocator<T>
-  {
-  public:
-
-    /**
-     * Methods required for copy construction of containers using this allocator.
-     */
-    template<typename U>
-    struct rebind {
-      typedef PoolAllocator<U> other;
-    };
-
-    PoolAllocator() :
-      std::allocator<T>()
-    {}
-
-    explicit PoolAllocator(const PoolAllocator &o) :
-      std::allocator<T>(o)
-    {}
-
-    /**
-     * Frees every memory block that doesn't have any allocated chunks.
-     * Returns true if at least one memory block was freed.
-     */
-    static bool release_memory () { /* no-op for std::allocator<> - already freed. */ return false; }
-
-    /**
-     * Frees every memory block. This function invalidates any pointers previously returned
-     * by allocation functions. Returns true if at least one memory block was freed.
-     */
-    static bool purge_memory ()   { /* no-op for std::allocator<> - already freed. */ return false; }
-  };
-
-
+/**
+ * An allocator which can be used in standard containers.
+ * A wrapper for \p std::allocator<> when Boost is not available.
+ */
+template <typename T>
+class PoolAllocator : public std::allocator<T>
+{
+public:
 
   /**
-   * An allocator which can be used in standard containers.
-   * A wrapper for \p std::allocator<> when Boost is not available.
+   * Methods required for copy construction of containers using this allocator.
    */
-  template <typename T>
-  class FastPoolAllocator : public std::allocator<T>
-  {
-  public:
-
-    /**
-     * Methods required for copy construction of containers using this allocator.
-     */
-    template<typename U>
-    struct rebind {
-      typedef FastPoolAllocator<U> other;
-    };
-
-    FastPoolAllocator() :
-      std::allocator<T>()
-    {}
-
-    explicit FastPoolAllocator(const FastPoolAllocator &o) :
-      std::allocator<T>(o)
-    {}
-
-    /**
-     * Frees every memory block that doesn't have any allocated chunks.
-     * Returns true if at least one memory block was freed.
-     */
-    static bool release_memory () { /* no-op for std::allocator<> - already freed. */ return false; }
-
-    /**
-     * Frees every memory block. This function invalidates any pointers previously returned
-     * by allocation functions. Returns true if at least one memory block was freed.
-     */
-    static bool purge_memory ()   { /* no-op for std::allocator<> - already freed. */ return false; }
+  template<typename U>
+  struct rebind {
+    typedef PoolAllocator<U> other;
   };
+
+  PoolAllocator() :
+    std::allocator<T>()
+  {}
+
+  explicit PoolAllocator(const PoolAllocator &o) :
+    std::allocator<T>(o)
+  {}
+
+  /**
+   * Frees every memory block that doesn't have any allocated chunks.
+   * Returns true if at least one memory block was freed.
+   */
+  static bool release_memory () { /* no-op for std::allocator<> - already freed. */ return false; }
+
+  /**
+   * Frees every memory block. This function invalidates any pointers previously returned
+   * by allocation functions. Returns true if at least one memory block was freed.
+   */
+  static bool purge_memory ()   { /* no-op for std::allocator<> - already freed. */ return false; }
+};
+
+
+
+/**
+ * An allocator which can be used in standard containers.
+ * A wrapper for \p std::allocator<> when Boost is not available.
+ */
+template <typename T>
+class FastPoolAllocator : public std::allocator<T>
+{
+public:
+
+  /**
+   * Methods required for copy construction of containers using this allocator.
+   */
+  template<typename U>
+  struct rebind {
+    typedef FastPoolAllocator<U> other;
+  };
+
+  FastPoolAllocator() :
+    std::allocator<T>()
+  {}
+
+  explicit FastPoolAllocator(const FastPoolAllocator &o) :
+    std::allocator<T>(o)
+  {}
+
+  /**
+   * Frees every memory block that doesn't have any allocated chunks.
+   * Returns true if at least one memory block was freed.
+   */
+  static bool release_memory () { /* no-op for std::allocator<> - already freed. */ return false; }
+
+  /**
+   * Frees every memory block. This function invalidates any pointers previously returned
+   * by allocation functions. Returns true if at least one memory block was freed.
+   */
+  static bool purge_memory ()   { /* no-op for std::allocator<> - already freed. */ return false; }
+};
 
 #endif
 

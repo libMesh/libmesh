@@ -32,109 +32,109 @@
 namespace libMesh
 {
 
-  // /**
-  //  * Simple radial basis function.
-  //  */
-  // class SimpleRBF
-  // {
-  // private:
-  //   const Real _rcut;
+// /**
+//  * Simple radial basis function.
+//  */
+// class SimpleRBF
+// {
+// private:
+//   const Real _rcut;
 
-  // public:
+// public:
 
-  //   /**
-  //    * Constructor.
-  //    */
-  //   SimpleRBF (const Real r_cut = 1.) :
-  //     _rcut (r_cut)
-  //   {}
+//   /**
+//    * Constructor.
+//    */
+//   SimpleRBF (const Real r_cut = 1.) :
+//     _rcut (r_cut)
+//   {}
 
-  //   /**
-  //    * Evaluate the radial basis function at the reqested location.
-  //    */
-  //   Real operator()(Real rad) const
-  //   {
-  //     if (rad > _rcut) return 0.;
+//   /**
+//    * Evaluate the radial basis function at the reqested location.
+//    */
+//   Real operator()(Real rad) const
+//   {
+//     if (rad > _rcut) return 0.;
 
-  //     rad /= _rcut;
+//     rad /= _rcut;
 
-  //     return std::sqrt( 1+ rad*rad );
-  //   }
-  // };
+//     return std::sqrt( 1+ rad*rad );
+//   }
+// };
 
 
+
+/**
+ * Wendland's compactly supported Radial Basis Functions.
+ */
+template <unsigned int SpaceDim, unsigned int Continuity>
+class WendlandRBF
+{
+private:
+  const Real _rcut;
+
+public:
 
   /**
-   * Wendland's compactly supported Radial Basis Functions.
+   * Constructor.
    */
-  template <unsigned int SpaceDim, unsigned int Continuity>
-  class WendlandRBF
-  {
-  private:
-    const Real _rcut;
+  WendlandRBF (const Real r_cut = 1.) :
+    _rcut (r_cut)
+  { libmesh_experimental(); }
 
-  public:
-
-    /**
-     * Constructor.
-     */
-    WendlandRBF (const Real r_cut = 1.) :
-      _rcut (r_cut)
-    { libmesh_experimental(); }
-
-    /**
-     * Evaluate the radial basis function at the reqested location.
-     */
-    Real operator()(Real /* rad */) const { libmesh_not_implemented(); return 0.; }
-  };
+  /**
+   * Evaluate the radial basis function at the reqested location.
+   */
+  Real operator()(Real /* rad */) const { libmesh_not_implemented(); return 0.; }
+};
 
 
 
-  //-------------------------------------------------------
-  // Explicit specializations
-  template<>
-  inline
-  Real WendlandRBF<3,0>::operator()(Real rad) const
-  {
-    if (rad > _rcut) return 0.;
+//-------------------------------------------------------
+// Explicit specializations
+template<>
+inline
+Real WendlandRBF<3,0>::operator()(Real rad) const
+{
+  if (rad > _rcut) return 0.;
 
-    rad /= _rcut;
+  rad /= _rcut;
 
-    return Utility::pow<2>(1.-rad);
-  }
+  return Utility::pow<2>(1.-rad);
+}
 
-  template<>
-  inline
-  Real WendlandRBF<3,2>::operator()(Real rad) const
-  {
-    if (rad > _rcut) return 0.;
+template<>
+inline
+Real WendlandRBF<3,2>::operator()(Real rad) const
+{
+  if (rad > _rcut) return 0.;
 
-    rad /= _rcut;
+  rad /= _rcut;
 
-    return Utility::pow<4>(1.-rad)*(4.*rad + 1.);
-  }
+  return Utility::pow<4>(1.-rad)*(4.*rad + 1.);
+}
 
-  template<>
-  inline
-  Real WendlandRBF<3,4>::operator()(Real rad) const
-  {
-    if (rad > _rcut) return 0.;
+template<>
+inline
+Real WendlandRBF<3,4>::operator()(Real rad) const
+{
+  if (rad > _rcut) return 0.;
 
-    rad /= _rcut;
+  rad /= _rcut;
 
-    return Utility::pow<6>(1.-rad)*((35.*rad + 18.)*rad + 3.);
-  }
+  return Utility::pow<6>(1.-rad)*((35.*rad + 18.)*rad + 3.);
+}
 
-  template<>
-  inline
-  Real WendlandRBF<3,8>::operator()(Real rad) const
-  {
-    if (rad > _rcut) return 0.;
+template<>
+inline
+Real WendlandRBF<3,8>::operator()(Real rad) const
+{
+  if (rad > _rcut) return 0.;
 
-    rad /= _rcut;
+  rad /= _rcut;
 
-    return Utility::pow<8>(1.-rad)*(((32.*rad + 25.)*rad + 8.)*rad + 1.);
-  }
+  return Utility::pow<8>(1.-rad)*(((32.*rad + 25.)*rad + 8.)*rad + 1.);
+}
 
 
 } // namespace libMesh

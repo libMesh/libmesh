@@ -161,13 +161,13 @@ DiscontinuityMeasure::boundary_side_integration ()
 
 void
 DiscontinuityMeasure::attach_essential_bc_function
-  (std::pair<bool,Real> fptr(const System& system,
-   const Point& p,
-   const std::string& var_name))
+(std::pair<bool,Real> fptr(const System& system,
+                           const Point& p,
+                           const std::string& var_name))
 {
   _bc_function = fptr;
 
-// We may be turning boundary side integration on or off
+  // We may be turning boundary side integration on or off
   if (fptr)
     integrate_boundary_sides = true;
   else

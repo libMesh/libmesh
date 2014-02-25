@@ -52,24 +52,24 @@
 namespace libMesh
 {
 
-  // must be a signed type!!
+// must be a signed type!!
 #if LIBMESH_DOF_ID_BYTES == 1
-  // Workaround for Eigen bug
-  // typedef int8_t eigen_idx_type;
-  typedef int32_t eigen_idx_type;
+// Workaround for Eigen bug
+// typedef int8_t eigen_idx_type;
+typedef int32_t eigen_idx_type;
 #elif LIBMESH_DOF_ID_BYTES == 2
-  // Workaround for Eigen bug
-  // typedef int16_t eigen_idx_type;
-  typedef int32_t eigen_idx_type;
+// Workaround for Eigen bug
+// typedef int16_t eigen_idx_type;
+typedef int32_t eigen_idx_type;
 #elif LIBMESH_DOF_ID_BYTES == 8
-  typedef int64_t eigen_idx_type;
+typedef int64_t eigen_idx_type;
 #else // LIBMESH_DOF_ID_BYTES = 4 (default)
-  typedef int32_t eigen_idx_type;
+typedef int32_t eigen_idx_type;
 #endif
 
-  // We have to use RowMajor SparseMatrix storage for our preallocation to work
-  typedef Eigen::SparseMatrix<Number, Eigen::RowMajor, eigen_idx_type> EigenSM;
-  typedef Eigen::Matrix<Number, Eigen::Dynamic, 1> EigenSV;
+// We have to use RowMajor SparseMatrix storage for our preallocation to work
+typedef Eigen::SparseMatrix<Number, Eigen::RowMajor, eigen_idx_type> EigenSM;
+typedef Eigen::Matrix<Number, Eigen::Dynamic, 1> EigenSV;
 } // namespace libMesh
 
 

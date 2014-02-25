@@ -76,7 +76,7 @@ public:
    * Constructor.  Takes the filename and the mode.
    * Valid modes are ENCODE, DECODE, READ, and WRITE.
    */
-  Xdr (const std::string& name="", const libMeshEnums::XdrMODE m=UNKNOWN);
+  Xdr (const std::string& name="", const XdrMODE m=UNKNOWN);
 
   /**
    * Destructor.  Closes the file if it is open.

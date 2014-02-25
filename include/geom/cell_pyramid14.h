@@ -43,32 +43,32 @@ namespace libMesh
  * with it outside the library...
  *
  * The node numbering for the pyramid14 is given below:
-   \verbatim
-   PYRAMID14:
-                       o 4
-                     //|\
-                    // | \
-                   //  |  \
-                  //   |   \
-              12 o/    |    o 11
-                //     |     \
-               /o 9    o 10   \
-              //       |       \
-             //        |        \
-          3 o/.......o.|........o 2
-           ./       7  |       /
-          ./           |      /
-         ./            |     /
-        ./             |    /
-     8 o/       o      |   o 6
-      ./        13     |  /
-     ./                | /
-    ./                 |/
-    o--------o---------o
-    0        5         1
+ \verbatim
+ PYRAMID14:
+ o 4
+ //|\
+ // | \
+ //  |  \
+ //   |   \
+ 12 o/    |    o 11
+ //     |     \
+ /o 9    o 10   \
+ //       |       \
+ //        |        \
+ 3 o/.......o.|........o 2
+ ./       7  |       /
+ ./           |      /
+ ./            |     /
+ ./             |    /
+ 8 o/       o      |   o 6
+ ./        13     |  /
+ ./                | /
+ ./                 |/
+ o--------o---------o
+ 0        5         1
 
-   \endverbatim
- */
+ \endverbatim
+*/
 
 // ------------------------------------------------------------
 // Pyramid class definition
@@ -118,14 +118,14 @@ public:
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const;
+                               const unsigned int e) const;
 
   /*
    * @returns true iff the element map is definitely affine within
@@ -143,7 +143,7 @@ public:
    * The \p AutoPtr<Elem> handles the memory aspect.
    */
   AutoPtr<Elem> build_side (const unsigned int i,
-			    bool proxy) const;
+                            bool proxy) const;
 
   /**
    * Builds a \p EDGE3 coincident with edge i.
@@ -152,8 +152,8 @@ public:
   AutoPtr<Elem> build_edge (const unsigned int i) const;
 
   virtual void connectivity(const unsigned int sc,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
   /**
    * @returns 2 for all edge nodes and 4 for face nodes
@@ -165,7 +165,7 @@ public:
    * that defines the \f$ n^{th} \f$ second-order node.
    */
   virtual unsigned short int second_order_adjacent_vertex (const unsigned int n,
-							   const unsigned int v) const;
+                                                           const unsigned int v) const;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to

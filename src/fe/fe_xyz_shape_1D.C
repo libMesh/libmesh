@@ -30,11 +30,11 @@
 // to be recalculated.
 namespace
 {
-  using namespace libMesh;
+using namespace libMesh;
 
-  static dof_id_type old_elem_id = DofObject::invalid_id;
-  static libMesh::Point centroid;
-  static Real max_distance;
+static dof_id_type old_elem_id = DofObject::invalid_id;
+static libMesh::Point centroid;
+static Real max_distance;
 }
 
 
@@ -44,13 +44,13 @@ namespace libMesh
 
 template <>
 Real FE<1,XYZ>::shape(const ElemType,
-		      const Order,
-		      const unsigned int,
-		      const Point&)
+                      const Order,
+                      const unsigned int,
+                      const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
-                << "because the centroid is needed."
-                << std::endl;
+               << "because the centroid is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -60,9 +60,9 @@ Real FE<1,XYZ>::shape(const ElemType,
 
 template <>
 Real FE<1,XYZ>::shape(const Elem* elem,
-		      const Order libmesh_dbg_var(order),
-		      const unsigned int i,
-		      const Point& point_in)
+                      const Order libmesh_dbg_var(order),
+                      const unsigned int i,
+                      const Point& point_in)
 {
   libmesh_assert(elem);
   libmesh_assert_less_equal (i, order + elem->p_level());
@@ -77,10 +77,10 @@ Real FE<1,XYZ>::shape(const Elem* elem,
       old_elem_id = elem->id();
       max_distance = 0.;
       for (unsigned int p = 0; p < elem->n_nodes(); p++)
-      {
-        const Real distance = std::abs(centroid(0) - elem->point(p)(0));
-        max_distance = std::max(distance, max_distance);
-      }
+        {
+          const Real distance = std::abs(centroid(0) - elem->point(p)(0));
+          max_distance = std::max(distance, max_distance);
+        }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -125,14 +125,14 @@ Real FE<1,XYZ>::shape(const Elem* elem,
 
 template <>
 Real FE<1,XYZ>::shape_deriv(const ElemType,
-			    const Order,
-			    const unsigned int,
-			    const unsigned int,
-			    const Point&)
+                            const Order,
+                            const unsigned int,
+                            const unsigned int,
+                            const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
-                << "because the centroid is needed."
-                << std::endl;
+               << "because the centroid is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -142,10 +142,10 @@ Real FE<1,XYZ>::shape_deriv(const ElemType,
 
 template <>
 Real FE<1,XYZ>::shape_deriv(const Elem* elem,
-			    const Order libmesh_dbg_var(order),
-			    const unsigned int i,
-			    const unsigned int libmesh_dbg_var(j),
-			    const Point& point_in)
+                            const Order libmesh_dbg_var(order),
+                            const unsigned int i,
+                            const unsigned int libmesh_dbg_var(j),
+                            const Point& point_in)
 {
   libmesh_assert(elem);
   libmesh_assert_less_equal (i, order + elem->p_level());
@@ -164,10 +164,10 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
       old_elem_id = elem->id();
       max_distance = 0.;
       for (unsigned int p = 0; p < elem->n_nodes(); p++)
-      {
-        const Real distance = std::abs(centroid(0) - elem->point(p)(0));
-        max_distance = std::max(distance, max_distance);
-      }
+        {
+          const Real distance = std::abs(centroid(0) - elem->point(p)(0));
+          max_distance = std::max(distance, max_distance);
+        }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -211,14 +211,14 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
 
 template <>
 Real FE<1,XYZ>::shape_second_deriv(const ElemType,
-			           const Order,
-			           const unsigned int,
-			           const unsigned int,
-			           const Point&)
+                                   const Order,
+                                   const unsigned int,
+                                   const unsigned int,
+                                   const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
-                << "because the centroid is needed."
-                << std::endl;
+               << "because the centroid is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -228,10 +228,10 @@ Real FE<1,XYZ>::shape_second_deriv(const ElemType,
 
 template <>
 Real FE<1,XYZ>::shape_second_deriv(const Elem* elem,
-			           const Order libmesh_dbg_var(order),
-			           const unsigned int i,
-			           const unsigned int libmesh_dbg_var(j),
-			           const Point& point_in)
+                                   const Order libmesh_dbg_var(order),
+                                   const unsigned int i,
+                                   const unsigned int libmesh_dbg_var(j),
+                                   const Point& point_in)
 {
   libmesh_assert(elem);
   libmesh_assert_less_equal (i, order + elem->p_level());
@@ -250,10 +250,10 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem* elem,
       old_elem_id = elem->id();
       max_distance = 0.;
       for (unsigned int p = 0; p < elem->n_nodes(); p++)
-      {
-        const Real distance = std::abs(centroid(0) - elem->point(p)(0));
-        max_distance = std::max(distance, max_distance);
-      }
+        {
+          const Real distance = std::abs(centroid(0) - elem->point(p)(0));
+          max_distance = std::max(distance, max_distance);
+        }
     }
 
   // Using static globals for old_elem_id, etc. will fail

@@ -45,29 +45,29 @@
 // anonymous namespace for implementation details
 namespace {
 
-  using libMesh::Elem;
+using libMesh::Elem;
 
-  /**
-   * Specific weak ordering for Elem*'s to be used in a set.
-   * We use the id, but first sort by level.  This guarantees
-   * when traversing the set from beginning to end the lower
-   * level (parent) elements are encountered first.
-   */
-  struct CompareElemIdsByLevel
+/**
+ * Specific weak ordering for Elem*'s to be used in a set.
+ * We use the id, but first sort by level.  This guarantees
+ * when traversing the set from beginning to end the lower
+ * level (parent) elements are encountered first.
+ */
+struct CompareElemIdsByLevel
+{
+  bool operator()(const Elem *a,
+                  const Elem *b) const
   {
-    bool operator()(const Elem *a,
-		    const Elem *b) const
-    {
-      libmesh_assert (a);
-      libmesh_assert (b);
-      const unsigned int
-	al = a->level(), bl = b->level();
-      const dof_id_type
-	aid = a->id(),   bid = b->id();
+    libmesh_assert (a);
+    libmesh_assert (b);
+    const unsigned int
+      al = a->level(), bl = b->level();
+    const dof_id_type
+      aid = a->id(),   bid = b->id();
 
-      return (al == bl) ? aid < bid : al < bl;
-    }
-  };
+    return (al == bl) ? aid < bid : al < bl;
+  }
+};
 }
 
 
@@ -114,7 +114,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   libmesh_parallel_only(mesh.comm());
   libmesh_assert (!mesh.is_serial());
   libmesh_assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
-				    mesh.unpartitioned_elements_end()) == 0);
+                                    mesh.unpartitioned_elements_end()) == 0);
 
   START_LOG("redistribute()","MeshCommunication");
 
@@ -139,47 +139,47 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
     if (pid != mesh.processor_id()) // don't send to ourselves!!
       {
-	// Build up a list of nodes and elements to send to processor pid.
-	// We will certainly send all the elements assigned to this processor,
-	// but we will also ship off any other elements which touch
-	// their nodes.
-	std::set<const Node*> connected_nodes;
-	{
-	  MeshBase::const_element_iterator       elem_it  = mesh.pid_elements_begin(pid);
-	  const MeshBase::const_element_iterator elem_end = mesh.pid_elements_end(pid);
+        // Build up a list of nodes and elements to send to processor pid.
+        // We will certainly send all the elements assigned to this processor,
+        // but we will also ship off any other elements which touch
+        // their nodes.
+        std::set<const Node*> connected_nodes;
+        {
+          MeshBase::const_element_iterator       elem_it  = mesh.pid_elements_begin(pid);
+          const MeshBase::const_element_iterator elem_end = mesh.pid_elements_end(pid);
 
-	  for (; elem_it!=elem_end; ++elem_it)
-	    {
+          for (; elem_it!=elem_end; ++elem_it)
+            {
               const Elem* elem = *elem_it;
 
               for (unsigned int n=0; n<elem->n_nodes(); n++)
                 connected_nodes.insert (elem->get_node(n));
             }
-	}
+        }
 
-	std::set<const Elem*, CompareElemIdsByLevel> elements_to_send;
-	{
-	  MeshBase::const_element_iterator       elem_it  = mesh.elements_begin();
-	  const MeshBase::const_element_iterator elem_end = mesh.elements_end();
+        std::set<const Elem*, CompareElemIdsByLevel> elements_to_send;
+        {
+          MeshBase::const_element_iterator       elem_it  = mesh.elements_begin();
+          const MeshBase::const_element_iterator elem_end = mesh.elements_end();
 
-	  for (; elem_it!=elem_end; ++elem_it)
-	    {
+          for (; elem_it!=elem_end; ++elem_it)
+            {
               const Elem* elem = *elem_it;
 
               for (unsigned int n=0; n<elem->n_nodes(); n++)
                 if (connected_nodes.count(elem->get_node(n)))
                   elements_to_send.insert (elem);
             }
-	}
+        }
 
         connected_nodes.clear();
         {
-	  std::set<const Elem*, CompareElemIdsByLevel>::iterator
+          std::set<const Elem*, CompareElemIdsByLevel>::iterator
             elem_it  = elements_to_send.begin(),
             elem_end = elements_to_send.end();
 
-	  for (; elem_it!=elem_end; ++elem_it)
-	    {
+          for (; elem_it!=elem_end; ++elem_it)
+            {
               const Elem* elem = *elem_it;
 
               for (unsigned int n=0; n<elem->n_nodes(); n++)
@@ -187,37 +187,37 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
             }
         }
 
-	// the number of nodes we will ship to pid
-	send_n_nodes_and_elem_per_proc[2*pid+0] = connected_nodes.size();
+        // the number of nodes we will ship to pid
+        send_n_nodes_and_elem_per_proc[2*pid+0] = connected_nodes.size();
 
-	// send any nodes off to the destination processor
-	if (!connected_nodes.empty())
-	  {
-	    node_send_requests.push_back(Parallel::request());
+        // send any nodes off to the destination processor
+        if (!connected_nodes.empty())
+          {
+            node_send_requests.push_back(Parallel::request());
 
-	    mesh.comm().send_packed_range (pid,
-					   &mesh,
-					   connected_nodes.begin(),
-					   connected_nodes.end(),
-					   node_send_requests.back(),
-					   nodestag);
-	  }
+            mesh.comm().send_packed_range (pid,
+                                           &mesh,
+                                           connected_nodes.begin(),
+                                           connected_nodes.end(),
+                                           node_send_requests.back(),
+                                           nodestag);
+          }
 
-	// the number of elements we will send to this processor
-	send_n_nodes_and_elem_per_proc[2*pid+1] = elements_to_send.size();
+        // the number of elements we will send to this processor
+        send_n_nodes_and_elem_per_proc[2*pid+1] = elements_to_send.size();
 
-	if (!elements_to_send.empty())
-	  {
-	    // send the elements off to the destination processor
-	    element_send_requests.push_back(Parallel::request());
+        if (!elements_to_send.empty())
+          {
+            // send the elements off to the destination processor
+            element_send_requests.push_back(Parallel::request());
 
-	    mesh.comm().send_packed_range (pid,
-					   &mesh,
-					   elements_to_send.begin(),
-					   elements_to_send.end(),
-					   element_send_requests.back(),
-					   elemstag);
-	  }
+            mesh.comm().send_packed_range (pid,
+                                           &mesh,
+                                           elements_to_send.begin(),
+                                           elements_to_send.end(),
+                                           element_send_requests.back(),
+                                           elemstag);
+          }
       }
 
   std::vector<dof_id_type> recv_n_nodes_and_elem_per_proc(send_n_nodes_and_elem_per_proc);
@@ -238,28 +238,28 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
     {
       if (send_n_nodes_and_elem_per_proc[2*pid+0]) // we have nodes to send
-	{
-	  send_node_pair[pid] = true;
-	  n_send_node_pairs++;
-	}
+        {
+          send_node_pair[pid] = true;
+          n_send_node_pairs++;
+        }
 
       if (send_n_nodes_and_elem_per_proc[2*pid+1]) // we have elements to send
-	{
-	  send_elem_pair[pid] = true;
-	  n_send_elem_pairs++;
-	}
+        {
+          send_elem_pair[pid] = true;
+          n_send_elem_pairs++;
+        }
 
       if (recv_n_nodes_and_elem_per_proc[2*pid+0]) // we have nodes to receive
-	{
-	  recv_node_pair[pid] = true;
-	  n_recv_node_pairs++;
-	}
+        {
+          recv_node_pair[pid] = true;
+          n_recv_node_pairs++;
+        }
 
       if (recv_n_nodes_and_elem_per_proc[2*pid+1]) // we have elements to receive
-	{
-	  recv_elem_pair[pid] = true;
-	  n_recv_elem_pairs++;
-	}
+        {
+          recv_elem_pair[pid] = true;
+          n_recv_elem_pairs++;
+        }
     }
   libmesh_assert_equal_to (n_send_node_pairs, node_send_requests.size());
   libmesh_assert_equal_to (n_send_elem_pairs, element_send_requests.size());
@@ -270,18 +270,18 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
     // but we don't necessarily want to impose an ordering, so
     // just process whatever message is available next.
     mesh.comm().receive_packed_range (Parallel::any_source,
-				      &mesh,
-				      mesh_inserter_iterator<Node>(mesh),
-				      nodestag);
+                                      &mesh,
+                                      mesh_inserter_iterator<Node>(mesh),
+                                      nodestag);
 
   // Receive elements.
   // Similarly we know how many processors are sending us elements,
   // but we don't really care in what order we receive them.
   for (unsigned int elem_comm_step=0; elem_comm_step<n_recv_elem_pairs; elem_comm_step++)
     mesh.comm().receive_packed_range (Parallel::any_source,
-				      &mesh,
-				      mesh_inserter_iterator<Elem>(mesh),
-				      elemstag);
+                                      &mesh,
+                                      mesh_inserter_iterator<Elem>(mesh),
+                                      elemstag);
 
   // Wait for all sends to complete
   Parallel::wait (node_send_requests);
@@ -349,8 +349,8 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   // Let's begin with finding consistent neighbor data information
   // for all the elements we currently have.  We'll use a clean
   // slate here - clear any existing information, including RemoteElem's.
-//  mesh.find_neighbors (/* reset_remote_elements = */ true,
-//		       /* reset_current_list    = */ true);
+  //  mesh.find_neighbors (/* reset_remote_elements = */ true,
+  //       /* reset_current_list    = */ true);
 
   // Get a unique message tag to use in communications; we'll default
   // to some numbers around pi*10000
@@ -390,28 +390,28 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 
     for (; it != it_end; ++it)
       {
-	const Elem * const elem = *it;
-	libmesh_assert(elem);
+        const Elem * const elem = *it;
+        libmesh_assert(elem);
 
-	if (elem->on_boundary()) // denotes *any* side has a NULL neighbor
-	  {
-	    my_interface_elements.push_back(elem); // add the element, but only once, even
-	                                           // if there are multiple NULL neighbors
-	    for (unsigned int s=0; s<elem->n_sides(); s++)
-	      if (elem->neighbor(s) == NULL)
-		{
-		  AutoPtr<Elem> side(elem->build_side(s));
+        if (elem->on_boundary()) // denotes *any* side has a NULL neighbor
+          {
+            my_interface_elements.push_back(elem); // add the element, but only once, even
+            // if there are multiple NULL neighbors
+            for (unsigned int s=0; s<elem->n_sides(); s++)
+              if (elem->neighbor(s) == NULL)
+                {
+                  AutoPtr<Elem> side(elem->build_side(s));
 
-		  for (unsigned int n=0; n<side->n_vertices(); n++)
-		    my_interface_node_set.insert (side->node(n));
-		}
-	  }
+                  for (unsigned int n=0; n<side->n_vertices(); n++)
+                    my_interface_node_set.insert (side->node(n));
+                }
+          }
       }
 
     my_interface_node_list.reserve (my_interface_node_set.size());
     my_interface_node_list.insert  (my_interface_node_list.end(),
-				    my_interface_node_set.begin(),
-				    my_interface_node_set.end());
+                                    my_interface_node_set.begin(),
+                                    my_interface_node_set.end());
   }
 
   // we will now send my_interface_node_list to all of the adjacent processors.
@@ -432,9 +432,9 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
     {
       n_comm_steps[adjacent_processors[comm_step]]=1;
       mesh.comm().send (adjacent_processors[comm_step],
-			my_interface_node_xfer_buffers[comm_step],
-			send_requests[current_request++],
-			element_neighbors_tag);
+                        my_interface_node_xfer_buffers[comm_step],
+                        send_requests[current_request++],
+                        element_neighbors_tag);
     }
 
   //-------------------------------------------------------------------------
@@ -467,188 +467,188 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
       //------------------------------------------------------------------
       // catch incoming node list
       Parallel::Status
-	status(mesh.comm().probe (Parallel::any_source,
-				  element_neighbors_tag));
+        status(mesh.comm().probe (Parallel::any_source,
+                                  element_neighbors_tag));
       const processor_id_type
-	source_pid_idx = status.source(),
-	dest_pid_idx   = source_pid_idx;
+        source_pid_idx = status.source(),
+        dest_pid_idx   = source_pid_idx;
 
       //------------------------------------------------------------------
       // first time - incoming request
       if (n_comm_steps[source_pid_idx] == 1)
-	{
-	  n_comm_steps[source_pid_idx]++;
+        {
+          n_comm_steps[source_pid_idx]++;
 
-	  mesh.comm().receive (source_pid_idx,
-				       common_interface_node_list,
-				       element_neighbors_tag);
-	  const std::size_t
-	    their_interface_node_list_size = common_interface_node_list.size();
+          mesh.comm().receive (source_pid_idx,
+                               common_interface_node_list,
+                               element_neighbors_tag);
+          const std::size_t
+            their_interface_node_list_size = common_interface_node_list.size();
 
-	  // we now have the interface node list from processor source_pid_idx.
-	  // now we can find all of our elements which touch any of these nodes
-	  // and send copies back to this processor.  however, we can make our
-	  // search more efficient by first excluding all the nodes in
-	  // their list which are not also contained in
-	  // my_interface_node_list.  we can do this in place as a set
-	  // intersection.
-	  common_interface_node_list.erase
-	    (std::set_intersection (my_interface_node_list.begin(),
-				    my_interface_node_list.end(),
-				    common_interface_node_list.begin(),
-				    common_interface_node_list.end(),
-				    common_interface_node_list.begin()),
-                                    common_interface_node_list.end());
+          // we now have the interface node list from processor source_pid_idx.
+          // now we can find all of our elements which touch any of these nodes
+          // and send copies back to this processor.  however, we can make our
+          // search more efficient by first excluding all the nodes in
+          // their list which are not also contained in
+          // my_interface_node_list.  we can do this in place as a set
+          // intersection.
+          common_interface_node_list.erase
+            (std::set_intersection (my_interface_node_list.begin(),
+                                    my_interface_node_list.end(),
+                                    common_interface_node_list.begin(),
+                                    common_interface_node_list.end(),
+                                    common_interface_node_list.begin()),
+             common_interface_node_list.end());
 
-	  if (false)
-	    libMesh::out << "[" << mesh.processor_id() << "] "
-		          << "my_interface_node_list.size()="       << my_interface_node_list.size()
-		          << ", [" << source_pid_idx << "] "
-		          << "their_interface_node_list.size()="    << their_interface_node_list_size
-		          << ", common_interface_node_list.size()=" << common_interface_node_list.size()
-		          << std::endl;
+          if (false)
+            libMesh::out << "[" << mesh.processor_id() << "] "
+                         << "my_interface_node_list.size()="       << my_interface_node_list.size()
+                         << ", [" << source_pid_idx << "] "
+                         << "their_interface_node_list.size()="    << their_interface_node_list_size
+                         << ", common_interface_node_list.size()=" << common_interface_node_list.size()
+                         << std::endl;
 
-	  // Now we need to see which of our elements touch the nodes in the list.
-	  // We will certainly send all the active elements which intersect source_pid_idx,
-	  // but we will also ship off the other elements in the same family tree
-	  // as the active ones for data structure consistency.
+          // Now we need to see which of our elements touch the nodes in the list.
+          // We will certainly send all the active elements which intersect source_pid_idx,
+          // but we will also ship off the other elements in the same family tree
+          // as the active ones for data structure consistency.
           //
           // FIXME - shipping full family trees is unnecessary and inefficient.
           //
-	  // We also ship any nodes connected to these elements.  Note
-	  // some of these nodes and elements may be replicated from
-	  // other processors, but that is OK.
-	  std::set<const Elem*, CompareElemIdsByLevel> elements_to_send;
-	  std::set<const Node*> connected_nodes;
+          // We also ship any nodes connected to these elements.  Note
+          // some of these nodes and elements may be replicated from
+          // other processors, but that is OK.
+          std::set<const Elem*, CompareElemIdsByLevel> elements_to_send;
+          std::set<const Node*> connected_nodes;
 
-	  // Check for quick return?
-	  if (common_interface_node_list.empty())
-	    {
-	      // let's try to be smart here - if we have no nodes in common,
-	      // we cannot share elements.  so post the messages expected
-	      // from us here and go on about our business.
-	      // note that even though these are nonblocking sends
-	      // they should complete essentially instantly, because
-	      // in all cases the send buffers are empty
-	      mesh.comm().send_packed_range (dest_pid_idx,
-						     &mesh,
-						     connected_nodes.begin(),
-						     connected_nodes.end(),
-						     send_requests[current_request++],
-						     element_neighbors_tag);
+          // Check for quick return?
+          if (common_interface_node_list.empty())
+            {
+              // let's try to be smart here - if we have no nodes in common,
+              // we cannot share elements.  so post the messages expected
+              // from us here and go on about our business.
+              // note that even though these are nonblocking sends
+              // they should complete essentially instantly, because
+              // in all cases the send buffers are empty
+              mesh.comm().send_packed_range (dest_pid_idx,
+                                             &mesh,
+                                             connected_nodes.begin(),
+                                             connected_nodes.end(),
+                                             send_requests[current_request++],
+                                             element_neighbors_tag);
 
-	      mesh.comm().send_packed_range (dest_pid_idx,
-						     &mesh,
-						     elements_to_send.begin(),
-						     elements_to_send.end(),
-						     send_requests[current_request++],
-						     element_neighbors_tag);
+              mesh.comm().send_packed_range (dest_pid_idx,
+                                             &mesh,
+                                             elements_to_send.begin(),
+                                             elements_to_send.end(),
+                                             send_requests[current_request++],
+                                             element_neighbors_tag);
 
-	      continue;
-	    }
-	  // otherwise, this really *is* an adjacent processor.
-	  adjacent_processors.push_back(source_pid_idx);
+              continue;
+            }
+          // otherwise, this really *is* an adjacent processor.
+          adjacent_processors.push_back(source_pid_idx);
 
-	  std::vector<const Elem*> family_tree;
+          std::vector<const Elem*> family_tree;
 
-	  for (dof_id_type e=0, n_shared_nodes=0; e<my_interface_elements.size(); e++, n_shared_nodes=0)
-	    {
-	      const Elem * elem = my_interface_elements[e];
+          for (dof_id_type e=0, n_shared_nodes=0; e<my_interface_elements.size(); e++, n_shared_nodes=0)
+            {
+              const Elem * elem = my_interface_elements[e];
 
-	      for (unsigned int n=0; n<elem->n_vertices(); n++)
-		if (std::binary_search (common_interface_node_list.begin(),
-					common_interface_node_list.end(),
-					elem->node(n)))
-		  {
-		    n_shared_nodes++;
+              for (unsigned int n=0; n<elem->n_vertices(); n++)
+                if (std::binary_search (common_interface_node_list.begin(),
+                                        common_interface_node_list.end(),
+                                        elem->node(n)))
+                  {
+                    n_shared_nodes++;
 
-		    // TBD - how many nodes do we need to share
-		    // before we care?  certainly 2, but 1?  not
-		    // sure, so let's play it safe...
-		    if (n_shared_nodes > 0) break;
-		  }
+                    // TBD - how many nodes do we need to share
+                    // before we care?  certainly 2, but 1?  not
+                    // sure, so let's play it safe...
+                    if (n_shared_nodes > 0) break;
+                  }
 
-	      if (n_shared_nodes) // share at least one node?
-		{
-		  elem = elem->top_parent();
+              if (n_shared_nodes) // share at least one node?
+                {
+                  elem = elem->top_parent();
 
-		  // avoid a lot of duplicated effort -- if we already have elem
-		  // in the set its entire family tree is already in the set.
-		  if (!elements_to_send.count(elem))
-		    {
+                  // avoid a lot of duplicated effort -- if we already have elem
+                  // in the set its entire family tree is already in the set.
+                  if (!elements_to_send.count(elem))
+                    {
 #ifdef LIBMESH_ENABLE_AMR
-		      elem->family_tree(family_tree);
+                      elem->family_tree(family_tree);
 #else
-		      family_tree.clear();
-		      family_tree.push_back(elem);
+                      family_tree.clear();
+                      family_tree.push_back(elem);
 #endif
-		      for (unsigned int leaf=0; leaf<family_tree.size(); leaf++)
-			{
-			  elem = family_tree[leaf];
-			  elements_to_send.insert (elem);
+                      for (unsigned int leaf=0; leaf<family_tree.size(); leaf++)
+                        {
+                          elem = family_tree[leaf];
+                          elements_to_send.insert (elem);
 
-			  for (unsigned int n=0; n<elem->n_nodes(); n++)
-			    connected_nodes.insert (elem->get_node(n));
-			}
-		    }
-		}
-	    }
+                          for (unsigned int n=0; n<elem->n_nodes(); n++)
+                            connected_nodes.insert (elem->get_node(n));
+                        }
+                    }
+                }
+            }
 
-	  // The elements_to_send and connected_nodes sets now contain all
-	  // the elements and nodes we need to send to this processor.
-	  // All that remains is to pack up the objects (along with
-	  // any boundary conditions) and send the messages off.
-	  {
-	    libmesh_assert (connected_nodes.empty() || !elements_to_send.empty());
-	    libmesh_assert (!connected_nodes.empty() || elements_to_send.empty());
+          // The elements_to_send and connected_nodes sets now contain all
+          // the elements and nodes we need to send to this processor.
+          // All that remains is to pack up the objects (along with
+          // any boundary conditions) and send the messages off.
+          {
+            libmesh_assert (connected_nodes.empty() || !elements_to_send.empty());
+            libmesh_assert (!connected_nodes.empty() || elements_to_send.empty());
 
-	    // send the nodes off to the destination processor
-	    mesh.comm().send_packed_range (dest_pid_idx,
-						   &mesh,
-						   connected_nodes.begin(),
-						   connected_nodes.end(),
-						   send_requests[current_request++],
-						   element_neighbors_tag);
+            // send the nodes off to the destination processor
+            mesh.comm().send_packed_range (dest_pid_idx,
+                                           &mesh,
+                                           connected_nodes.begin(),
+                                           connected_nodes.end(),
+                                           send_requests[current_request++],
+                                           element_neighbors_tag);
 
-	    // send the elements off to the destination processor
-	    mesh.comm().send_packed_range (dest_pid_idx,
-						   &mesh,
-						   elements_to_send.begin(),
-						   elements_to_send.end(),
-						   send_requests[current_request++],
-						   element_neighbors_tag);
-	  }
-	}
+            // send the elements off to the destination processor
+            mesh.comm().send_packed_range (dest_pid_idx,
+                                           &mesh,
+                                           elements_to_send.begin(),
+                                           elements_to_send.end(),
+                                           send_requests[current_request++],
+                                           element_neighbors_tag);
+          }
+        }
       //------------------------------------------------------------------
       // second time - reply of nodes
       else if (n_comm_steps[source_pid_idx] == 2)
-	{
-	  n_comm_steps[source_pid_idx]++;
+        {
+          n_comm_steps[source_pid_idx]++;
 
-	  mesh.comm().receive_packed_range (source_pid_idx,
-					    &mesh,
-					    mesh_inserter_iterator<Node>(mesh),
-					    element_neighbors_tag);
-	}
+          mesh.comm().receive_packed_range (source_pid_idx,
+                                            &mesh,
+                                            mesh_inserter_iterator<Node>(mesh),
+                                            element_neighbors_tag);
+        }
       //------------------------------------------------------------------
       // third time - reply of elements
       else if (n_comm_steps[source_pid_idx] == 3)
-	{
-	  n_comm_steps[source_pid_idx]++;
+        {
+          n_comm_steps[source_pid_idx]++;
 
-	  mesh.comm().receive_packed_range (source_pid_idx,
-					    &mesh,
-					    mesh_inserter_iterator<Elem>(mesh),
-					    element_neighbors_tag);
-	}
+          mesh.comm().receive_packed_range (source_pid_idx,
+                                            &mesh,
+                                            mesh_inserter_iterator<Elem>(mesh),
+                                            element_neighbors_tag);
+        }
       //------------------------------------------------------------------
       // fourth time - shouldn't happen
       else
-	{
-	  libMesh::err << "ERROR:  unexpected number of replies: "
-		        << n_comm_steps[source_pid_idx]
-		    << std::endl;
-	}
+        {
+          libMesh::err << "ERROR:  unexpected number of replies: "
+                       << n_comm_steps[source_pid_idx]
+                       << std::endl;
+        }
     } // done catching & processing replies associated with tag ~ 100,000pi
 
   // allow any pending requests to complete
@@ -686,10 +686,10 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
 
   // Broadcast nodes
   mesh.comm().broadcast_packed_range(&mesh,
-					     mesh.nodes_begin(),
-					     mesh.nodes_end(),
-					     &mesh,
-					     mesh_inserter_iterator<Node>(mesh));
+                                     mesh.nodes_begin(),
+                                     mesh.nodes_end(),
+                                     &mesh,
+                                     mesh_inserter_iterator<Node>(mesh));
 
   // Broadcast elements from coarsest to finest, so that child
   // elements will see their parents already in place.
@@ -698,10 +698,10 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
 
   for (unsigned int l=0; l != n_levels; ++l)
     mesh.comm().broadcast_packed_range(&mesh,
-					       mesh.level_elements_begin(l),
-					       mesh.level_elements_end(l),
-					       &mesh,
-					       mesh_inserter_iterator<Elem>(mesh));
+                                       mesh.level_elements_begin(l),
+                                       mesh.level_elements_end(l),
+                                       &mesh,
+                                       mesh_inserter_iterator<Elem>(mesh));
 
   // Make sure mesh dimension is consistent
   unsigned int mesh_dimension = mesh.mesh_dimension();
@@ -729,7 +729,7 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
 
 #ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
 // ------------------------------------------------------------
-  void MeshCommunication::gather (const processor_id_type, ParallelMesh&) const
+void MeshCommunication::gather (const processor_id_type, ParallelMesh&) const
 {
   // no MPI == one processor, no need for this method...
   return;
@@ -753,15 +753,15 @@ void MeshCommunication::gather (const processor_id_type root_id, ParallelMesh& m
   (root_id == DofObject::invalid_processor_id) ?
 
     mesh.comm().allgather_packed_range (&mesh,
-					mesh.nodes_begin(),
-					mesh.nodes_end(),
-					mesh_inserter_iterator<Node>(mesh)) :
+                                        mesh.nodes_begin(),
+                                        mesh.nodes_end(),
+                                        mesh_inserter_iterator<Node>(mesh)) :
 
     mesh.comm().gather_packed_range (root_id,
-				     &mesh,
-				     mesh.nodes_begin(),
-				     mesh.nodes_end(),
-				     mesh_inserter_iterator<Node>(mesh));
+                                     &mesh,
+                                     mesh.nodes_begin(),
+                                     mesh.nodes_end(),
+                                     mesh_inserter_iterator<Node>(mesh));
 
   // Gather elements from coarsest to finest, so that child
   // elements will see their parents already in place.
@@ -774,15 +774,15 @@ void MeshCommunication::gather (const processor_id_type root_id, ParallelMesh& m
     (root_id == DofObject::invalid_processor_id) ?
 
       mesh.comm().allgather_packed_range (&mesh,
-					  mesh.level_elements_begin(l),
-					  mesh.level_elements_end(l),
-					  mesh_inserter_iterator<Elem>(mesh)) :
+                                          mesh.level_elements_begin(l),
+                                          mesh.level_elements_end(l),
+                                          mesh_inserter_iterator<Elem>(mesh)) :
 
       mesh.comm().gather_packed_range (root_id,
-				       &mesh,
-				       mesh.level_elements_begin(l),
-				       mesh.level_elements_end(l),
-				       mesh_inserter_iterator<Elem>(mesh));
+                                       &mesh,
+                                       mesh.level_elements_begin(l),
+                                       mesh.level_elements_end(l),
+                                       mesh_inserter_iterator<Elem>(mesh));
 
 
   // If we are doing an allgather(), perform sanity check on the result.
@@ -812,32 +812,32 @@ namespace {
 
 struct SyncIds
 {
-typedef dof_id_type datum;
-typedef void (MeshBase::*renumber_obj)(dof_id_type, dof_id_type);
+  typedef dof_id_type datum;
+  typedef void (MeshBase::*renumber_obj)(dof_id_type, dof_id_type);
 
-SyncIds(MeshBase &_mesh, renumber_obj _renumberer) :
-  mesh(_mesh),
-  renumber(_renumberer) {}
+  SyncIds(MeshBase &_mesh, renumber_obj _renumberer) :
+    mesh(_mesh),
+    renumber(_renumberer) {}
 
-MeshBase &mesh;
-renumber_obj renumber;
-// renumber_obj &renumber;
+  MeshBase &mesh;
+  renumber_obj renumber;
+  // renumber_obj &renumber;
 
-// Find the id of each requested DofObject -
-// sync_dofobject_data_by_xyz already did the work for us
-void gather_data (const std::vector<dof_id_type>& ids,
-                  std::vector<datum>& ids_out)
-{
-  ids_out = ids;
-}
+  // Find the id of each requested DofObject -
+  // sync_dofobject_data_by_xyz already did the work for us
+  void gather_data (const std::vector<dof_id_type>& ids,
+                    std::vector<datum>& ids_out)
+  {
+    ids_out = ids;
+  }
 
-void act_on_data (const std::vector<dof_id_type>& old_ids,
-                  std::vector<datum>& new_ids)
-{
-  for (unsigned int i=0; i != old_ids.size(); ++i)
-    if (old_ids[i] != new_ids[i])
-      (mesh.*renumber)(old_ids[i], new_ids[i]);
-}
+  void act_on_data (const std::vector<dof_id_type>& old_ids,
+                    std::vector<datum>& new_ids)
+  {
+    for (unsigned int i=0; i != old_ids.size(); ++i)
+      if (old_ids[i] != new_ids[i])
+        (mesh.*renumber)(old_ids[i], new_ids[i]);
+  }
 };
 }
 
@@ -845,8 +845,8 @@ void act_on_data (const std::vector<dof_id_type>& old_ids,
 
 // ------------------------------------------------------------
 void MeshCommunication::make_node_ids_parallel_consistent
-  (MeshBase &mesh,
-   LocationMap<Node> &loc_map)
+(MeshBase &mesh,
+ LocationMap<Node> &loc_map)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -887,41 +887,41 @@ namespace {
 
 struct SyncProcIds
 {
-typedef processor_id_type datum;
+  typedef processor_id_type datum;
 
-SyncProcIds(MeshBase &_mesh) : mesh(_mesh) {}
+  SyncProcIds(MeshBase &_mesh) : mesh(_mesh) {}
 
-MeshBase &mesh;
+  MeshBase &mesh;
 
-// ------------------------------------------------------------
-void gather_data (const std::vector<dof_id_type>& ids,
-                  std::vector<datum>& data)
-{
-  // Find the processor id of each requested node
-  data.resize(ids.size());
+  // ------------------------------------------------------------
+  void gather_data (const std::vector<dof_id_type>& ids,
+                    std::vector<datum>& data)
+  {
+    // Find the processor id of each requested node
+    data.resize(ids.size());
 
-  for (std::size_t i=0; i != ids.size(); ++i)
-    {
-      // Look for this point in the mesh
-      // We'd better find every node we're asked for
-      Node *node = mesh.node_ptr(ids[i]);
+    for (std::size_t i=0; i != ids.size(); ++i)
+      {
+        // Look for this point in the mesh
+        // We'd better find every node we're asked for
+        Node *node = mesh.node_ptr(ids[i]);
 
-      // Return the node's correct processor id,
-      data[i] = node->processor_id();
-    }
-}
+        // Return the node's correct processor id,
+        data[i] = node->processor_id();
+      }
+  }
 
-// ------------------------------------------------------------
-void act_on_data (const std::vector<dof_id_type>& ids,
-                  std::vector<datum> proc_ids)
-{
-  // Set the ghost node processor ids we've now been informed of
-  for (std::size_t i=0; i != ids.size(); ++i)
-    {
-      Node *node = mesh.node_ptr(ids[i]);
-      node->processor_id() = proc_ids[i];
-    }
-}
+  // ------------------------------------------------------------
+  void act_on_data (const std::vector<dof_id_type>& ids,
+                    std::vector<datum> proc_ids)
+  {
+    // Set the ghost node processor ids we've now been informed of
+    for (std::size_t i=0; i != ids.size(); ++i)
+      {
+        Node *node = mesh.node_ptr(ids[i]);
+        node->processor_id() = proc_ids[i];
+      }
+  }
 };
 }
 
@@ -929,8 +929,8 @@ void act_on_data (const std::vector<dof_id_type>& ids,
 
 // ------------------------------------------------------------
 void MeshCommunication::make_node_proc_ids_parallel_consistent
-  (MeshBase& mesh,
-   LocationMap<Node>& loc_map)
+(MeshBase& mesh,
+ LocationMap<Node>& loc_map)
 {
   START_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
 
@@ -962,8 +962,8 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent
 
 // ------------------------------------------------------------
 void MeshCommunication::make_nodes_parallel_consistent
-  (MeshBase &mesh,
-   LocationMap<Node> &loc_map)
+(MeshBase &mesh,
+ LocationMap<Node> &loc_map)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -1035,7 +1035,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
   // We don't want to delete any element that shares a node
   // with or is an ancestor of a local element.
   MeshBase::const_element_iterator l_elem_it = mesh.local_elements_begin(),
-                                   l_end     = mesh.local_elements_end();
+    l_end     = mesh.local_elements_end();
   for (; l_elem_it != l_end; ++l_elem_it)
     {
       const Elem *elem = *l_elem_it;
@@ -1051,11 +1051,11 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
           libmesh_assert_less (elemid, semilocal_elems.size());
           semilocal_elems[elemid] = true;
 
-	  for (unsigned int n=0; n != elem->n_nodes(); ++n)
-	    semilocal_nodes[elem->node(n)] = true;
+          for (unsigned int n=0; n != elem->n_nodes(); ++n)
+            semilocal_nodes[elem->node(n)] = true;
 
           const Elem *parent = elem->parent();
-	  // Don't proceed from a boundary mesh to an interior mesh
+          // Don't proceed from a boundary mesh to an interior mesh
           if (parent && parent->dim() != elem->dim())
             break;
 
@@ -1078,11 +1078,11 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
         {
           semilocal_elems[elem->id()] = true;
 
-	  for (unsigned int n=0; n != elem->n_nodes(); ++n)
-	    semilocal_nodes[elem->node(n)] = true;
+          for (unsigned int n=0; n != elem->n_nodes(); ++n)
+            semilocal_nodes[elem->node(n)] = true;
 
           const Elem *parent = elem->parent();
-	  // Don't proceed from a boundary mesh to an interior mesh
+          // Don't proceed from a boundary mesh to an interior mesh
           if (parent && parent->dim() != elem->dim())
             break;
 
@@ -1093,7 +1093,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
   // Flag all the elements that share nodes with
   // local and unpartitioned elements, along with their ancestors
   MeshBase::element_iterator nl_elem_it = mesh.not_local_elements_begin(),
-                             nl_end     = mesh.not_local_elements_end();
+    nl_end     = mesh.not_local_elements_end();
   for (; nl_elem_it != nl_end; ++nl_elem_it)
     {
       const Elem *elem = *nl_elem_it;
@@ -1104,11 +1104,11 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
               {
                 semilocal_elems[elem->id()] = true;
 
-	        for (unsigned int nn=0; nn != elem->n_nodes(); ++nn)
-	          semilocal_nodes[elem->node(nn)] = true;
+                for (unsigned int nn=0; nn != elem->n_nodes(); ++nn)
+                  semilocal_nodes[elem->node(nn)] = true;
 
                 const Elem *parent = elem->parent();
-	        // Don't proceed from a boundary mesh to an interior mesh
+                // Don't proceed from a boundary mesh to an interior mesh
                 if (parent && parent->dim() != elem->dim())
                   break;
 
@@ -1126,7 +1126,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
       const Elem *elem = *it;
       semilocal_elems[elem->id()] = true;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
-	semilocal_nodes[elem->node(n)] = true;
+        semilocal_nodes[elem->node(n)] = true;
     }
 
   // Delete all the elements we have no reason to save,
@@ -1137,7 +1137,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
   for (int l = n_levels - 1; l >= 0; --l)
     {
       MeshBase::element_iterator lev_elem_it = mesh.level_elements_begin(l),
-                                 lev_end     = mesh.level_elements_end(l);
+        lev_end     = mesh.level_elements_end(l);
       for (; lev_elem_it != lev_end; ++lev_elem_it)
         {
           Elem *elem = *lev_elem_it;
@@ -1160,7 +1160,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
 
   // Delete all the nodes we have no reason to save
   MeshBase::node_iterator node_it  = mesh.nodes_begin(),
-                          node_end = mesh.nodes_end();
+    node_end = mesh.nodes_end();
   for (node_it = mesh.nodes_begin(); node_it != node_end; ++node_it)
     {
       Node *node = *node_it;

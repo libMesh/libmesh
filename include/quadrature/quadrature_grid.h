@@ -41,13 +41,13 @@ namespace libMesh
 
 class QGrid : public QBase
 {
- public:
+public:
 
   /**
    * Constructor.  Declares the order of the quadrature rule.
    */
   QGrid (const unsigned int _dim,
-	 const Order _order=INVALID_ORDER);
+         const Order _order=INVALID_ORDER);
 
   /**
    * Destructor.
@@ -60,14 +60,14 @@ class QGrid : public QBase
   QuadratureType type() const { return QGRID; }
 
 
- private:
+private:
 
   void init_1D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
   void init_2D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
   void init_3D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
 
 };
 
@@ -77,7 +77,7 @@ class QGrid : public QBase
 // QGauss class members
 inline
 QGrid::QGrid(const unsigned int d,
-	     const Order o) : QBase(d,o)
+             const Order o) : QBase(d,o)
 {
 }
 

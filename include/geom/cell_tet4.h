@@ -35,21 +35,21 @@ namespace libMesh
 /**
  * The \p Tet4 is an element in 3D composed of 4 nodes.
  * It is numbered like this:
-   \verbatim
-  TET4:
-        3
-        o
-       /|\
-      / | \
-     /  |  \
-  0 o...|...o 2
-     \  |  /
-      \ | /
-       \|/
-        o
-        1
-  \endverbatim
- */
+ \verbatim
+ TET4:
+ 3
+ o
+ /|\
+ / | \
+ /  |  \
+ 0 o...|...o 2
+ \  |  /
+ \ | /
+ \|/
+ o
+ 1
+ \endverbatim
+*/
 
 // ------------------------------------------------------------
 // Tet4 class definition
@@ -98,21 +98,21 @@ public:
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const;
+                               const unsigned int e) const;
 
   /*
    * @returns true iff the specified child is on the
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-			        const unsigned int s) const;
+                                const unsigned int s) const;
 
   /*
    * @returns true iff the element map is definitely affine within
@@ -136,7 +136,7 @@ public:
    * The \p AutoPtr<Elem> handles the memory aspect.
    */
   AutoPtr<Elem> build_side (const unsigned int i,
-			    bool proxy) const;
+                            bool proxy) const;
 
   /**
    * Builds a \p EDGE2 built coincident with face i.
@@ -145,8 +145,8 @@ public:
   AutoPtr<Elem> build_edge (const unsigned int i) const;
 
   virtual void connectivity(const unsigned int sc,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -174,7 +174,7 @@ public:
    * bad for interplation, but they can effect the stiffness matrix
    * condition number.
    */
-   std::pair<Real, Real> min_and_max_angle() const;
+  std::pair<Real, Real> min_and_max_angle() const;
 
 protected:
 
@@ -191,8 +191,8 @@ protected:
    * Matrix used to create the elements children.
    */
   float embedding_matrix (const unsigned int i,
-			  const unsigned int j,
-			  const unsigned int k) const;
+                          const unsigned int j,
+                          const unsigned int k) const;
 
   /**
    * Matrix that computes new nodal locations/solution values
@@ -200,26 +200,26 @@ protected:
    */
   static const float _embedding_matrix[8][4][4];
 
-// public:
-//
-//  /**
-//   * Allows the user to reselect the diagonal after refinement.  This
-//   * function may only be called directly after the element is refined
-//   * for the first time (and before the \p EquationSystems::reinit()
-//   * is called).  It will destroy and re-create the children if
-//   * necessary.
-//   */
-//  void reselect_diagonal (const Diagonal diag);
-//
-//  /**
-//   * Reselects the diagonal after refinement to be the optimal one.
-//   * This makes sense if the user has moved some grid points, so that
-//   * the former optimal choice is no longer optimal.  Also, the user
-//   * may exclude one diagonal from this selection by giving it as
-//   * argument.  In this case, the more optimal one of the remaining
-//   * two diagonals is chosen.
-//   */
-//  void reselect_optimal_diagonal (const Diagonal exclude_this=INVALID_DIAG);
+  // public:
+  //
+  //  /**
+  //   * Allows the user to reselect the diagonal after refinement.  This
+  //   * function may only be called directly after the element is refined
+  //   * for the first time (and before the \p EquationSystems::reinit()
+  //   * is called).  It will destroy and re-create the children if
+  //   * necessary.
+  //   */
+  //  void reselect_diagonal (const Diagonal diag);
+  //
+  //  /**
+  //   * Reselects the diagonal after refinement to be the optimal one.
+  //   * This makes sense if the user has moved some grid points, so that
+  //   * the former optimal choice is no longer optimal.  Also, the user
+  //   * may exclude one diagonal from this selection by giving it as
+  //   * argument.  In this case, the more optimal one of the remaining
+  //   * two diagonals is chosen.
+  //   */
+  //  void reselect_optimal_diagonal (const Diagonal exclude_this=INVALID_DIAG);
 
 #endif
 

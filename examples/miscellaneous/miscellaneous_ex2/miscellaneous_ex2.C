@@ -18,24 +18,24 @@
 
 
 
- // <h1>Miscellaneous Example 2 - Complex Numbers and the "FrequencySystem"</h1>
- //
- // This is the seventh example program.  It builds on
- // the previous example programs, introduces complex
- // numbers and the FrequencySystem class to solve a
- // simple Helmholtz equation grad(p)*grad(p)+(omega/c)^2*p=0,
- // for multiple frequencies rather efficiently.
- //
- // The FrequencySystem class offers two solution styles,
- // namely to solve large systems, or to solve
- // moderately-sized systems fast, for multiple frequencies.
- // The latter approach is implemented here.
- //
- // This example uses an L--shaped mesh and nodal boundary data
- // given in the files lshape.un and lshape_data.unv
- //
- // For this example the library has to be compiled with
- // complex numbers enabled.
+// <h1>Miscellaneous Example 2 - Complex Numbers and the "FrequencySystem"</h1>
+//
+// This is the seventh example program.  It builds on
+// the previous example programs, introduces complex
+// numbers and the FrequencySystem class to solve a
+// simple Helmholtz equation grad(p)*grad(p)+(omega/c)^2*p=0,
+// for multiple frequencies rather efficiently.
+//
+// The FrequencySystem class offers two solution styles,
+// namely to solve large systems, or to solve
+// moderately-sized systems fast, for multiple frequencies.
+// The latter approach is implemented here.
+//
+// This example uses an L--shaped mesh and nodal boundary data
+// given in the files lshape.un and lshape_data.unv
+//
+// For this example the library has to be compiled with
+// complex numbers enabled.
 
 // C++ include files that we need
 #include <iostream>
@@ -122,16 +122,16 @@ int main (int argc, char** argv)
   // Check for proper usage.
   if (argc < 3)
     {
-      if (libMesh::processor_id() == 0)
+      if (init.comm().rank() == 0)
         std::cerr << "Usage: " << argv[0] << " -f [frequency]"
                   << std::endl;
 
       libmesh_error();
     }
 
-  if (libMesh::n_processors() > 1)
+  if (init.comm().size() > 1)
     {
-      if (libMesh::processor_id() == 0)
+      if (init.comm().rank() == 0)
         {
           std::cerr << "ERROR: Skipping example 7. " << std::endl;
           std::cerr << "MeshData objects currently only work in serial." << std::endl;
@@ -253,10 +253,10 @@ int main (int argc, char** argv)
       // to an ExodusII-formatted plot file, for every frequency.
 #ifdef LIBMESH_HAVE_EXODUS_API
       char buf[14];
-      sprintf (buf, "out%04d.exd", n);
+      sprintf (buf, "out%04u.exd", n);
 
       ExodusII_IO(mesh).write_equation_systems (buf,
-                                          equation_systems);
+                                                equation_systems);
 #endif
     }
 
@@ -264,7 +264,7 @@ int main (int argc, char** argv)
   // written to disk.  By default, the additional vectors are also
   // saved.
 
-  equation_systems.write ("eqn_sys.dat", libMeshEnums::WRITE);
+  equation_systems.write ("eqn_sys.dat", WRITE);
 
   // All done.
   return 0;

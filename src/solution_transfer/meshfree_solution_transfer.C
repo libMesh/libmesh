@@ -40,9 +40,9 @@ class MeshlessInterpolationFunction : public FunctionBase<Number>
 {
 public:
   MeshlessInterpolationFunction (const MeshfreeInterpolation &mfi,
-				 Threads::spin_mutex &mutex) :
-      _mfi(mfi),
-      _mutex(mutex)
+                                 Threads::spin_mutex &mutex) :
+    _mfi(mfi),
+    _mutex(mutex)
   {}
 
   void init () {}
@@ -54,7 +54,7 @@ public:
   }
 
   Number operator() (const Point& p,
-		     const Real /*time*/)
+                     const Real /*time*/)
   {
     _pts.clear();
     _pts.push_back(p);
@@ -69,8 +69,8 @@ public:
 
 
   void operator() (const Point& p,
-		   const Real time,
-		   DenseVector<Number>& output)
+                   const Real time,
+                   DenseVector<Number>& output)
   {
     output.resize(1);
     output(0) = (*this)(p,time);
@@ -113,11 +113,11 @@ MeshfreeSolutionTransfer::transfer(const Variable & from_var, const Variable & t
     MeshBase::const_node_iterator end = from_mesh.local_nodes_end();
 
     for (; nd!=end; ++nd)
-    {
-      const Node *node(*nd);
-      src_pts.push_back(*node);
-      src_vals.push_back((*from_sys->solution)(node->dof_number(from_sys->number(),from_var.number(),0)));
-    }
+      {
+        const Node *node(*nd);
+        src_pts.push_back(*node);
+        src_vals.push_back((*from_sys->solution)(node->dof_number(from_sys->number(),from_var.number(),0)));
+      }
   }
 
   // We have only set local values - prepare for use by gathering remote gata

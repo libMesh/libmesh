@@ -15,10 +15,10 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Vector Finite Elements Example 3 - Nedelec Elements</h1>
- //
- // This example shows an example of using the Nedelec elements of the
- // first type to solve a model problem in H(curl).
+// <h1>Vector Finite Elements Example 3 - Nedelec Elements</h1>
+//
+// This example shows an example of using the Nedelec elements of the
+// first type to solve a model problem in H(curl).
 
 // Basic include files
 #include "libmesh/equation_systems.h"
@@ -63,22 +63,22 @@ int main (int argc, char** argv)
   // Nedelec triangle elements.
 
   std::string elem_str = command_line_value( std::string("element_type"),
-					     std::string("TRI6") );
+                                             std::string("TRI6") );
 
   if( elem_str != "TRI6" && elem_str != "QUAD8" && elem_str != "QUAD9" )
     {
       libMesh::err << "This example must be run with TRI6, QUAD8, or QUAD9."
-		   << std::endl
-		   << "You entered: " << elem_str << std::endl;
+                   << std::endl
+                   << "You entered: " << elem_str << std::endl;
       libmesh_error();
     }
 
   MeshTools::Generation::build_square (mesh,
-				       grid_size,
-				       grid_size,
-				       -1., 1.,
-				       -1., 1.,
-				       Utility::string_to_enum<ElemType>(elem_str));
+                                       grid_size,
+                                       grid_size,
+                                       -1., 1.,
+                                       -1., 1.,
+                                       Utility::string_to_enum<ElemType>(elem_str));
 
 
   // Print information about the mesh to the screen.
@@ -142,14 +142,14 @@ int main (int argc, char** argv)
 
   // Print out the error values
   std::cout << "L2-Error is: "
-	    << exact_sol.l2_error("CurlCurl", "u")
-	    << std::endl;
+            << exact_sol.l2_error("CurlCurl", "u")
+            << std::endl;
   std::cout << "HCurl semi-norm error is: "
-	    << exact_sol.error_norm("CurlCurl", "u", HCURL_SEMINORM )
-	    << std::endl;
+            << exact_sol.error_norm("CurlCurl", "u", HCURL_SEMINORM )
+            << std::endl;
   std::cout << "HCurl-Error is: "
-	    << exact_sol.hcurl_error("CurlCurl", "u")
-	    << std::endl;
+            << exact_sol.hcurl_error("CurlCurl", "u")
+            << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 

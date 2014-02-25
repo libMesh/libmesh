@@ -57,7 +57,7 @@ public:
    *  Constructor. Initializes Petsc data structures
    */
   SlepcEigenSolver(const Parallel::Communicator &comm
-		   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
 
   /**
@@ -89,23 +89,23 @@ public:
    * solver.
    */
   std::pair<unsigned int, unsigned int>  solve_standard (SparseMatrix<T> &matrix_A,
-							 int nev,
-							 int ncv,
-							 const double tol,
-							 const unsigned int m_its);
+                                                         int nev,
+                                                         int ncv,
+                                                         const double tol,
+                                                         const unsigned int m_its);
 
   /**
    * Same as above except that matrix_A is a ShellMatrix
    * in this case.
    */
   std::pair<unsigned int, unsigned int>  solve_standard (ShellMatrix<T> &shell_matrix,
-							 int nev,
-							 int ncv,
-							 const double tol,
-							 const unsigned int m_its);
+                                                         int nev,
+                                                         int ncv,
+                                                         const double tol,
+                                                         const unsigned int m_its);
 
 
- /**
+  /**
    * This function calls the SLEPc solver to compute
    * the eigenpairs for the generalized eigenproblem
    * defined by the matrix_A and matrix_B,
@@ -118,22 +118,22 @@ public:
    * solver.
    */
   std::pair<unsigned int, unsigned int>  solve_generalized(SparseMatrix<T> &matrix_A,
-							   SparseMatrix<T> &matrix_B,
-							   int nev,
-							   int ncv,
-							   const double tol,
-							   const unsigned int m_its);
+                                                           SparseMatrix<T> &matrix_B,
+                                                           int nev,
+                                                           int ncv,
+                                                           const double tol,
+                                                           const unsigned int m_its);
 
   /**
    * Solve generalized eigenproblem when matrix_A is of
    * type ShellMatrix, matrix_B is of type SparseMatrix.
    */
-    std::pair<unsigned int, unsigned int>  solve_generalized(ShellMatrix<T> &matrix_A,
-  							   SparseMatrix<T> &matrix_B,
-  							   int nev,
-  							   int ncv,
-  							   const double tol,
-  							   const unsigned int m_its);
+  std::pair<unsigned int, unsigned int>  solve_generalized(ShellMatrix<T> &matrix_A,
+                                                           SparseMatrix<T> &matrix_B,
+                                                           int nev,
+                                                           int ncv,
+                                                           const double tol,
+                                                           const unsigned int m_its);
 
   /**
    * Solve generalized eigenproblem when matrix_A is of
@@ -145,12 +145,12 @@ public:
    * -st_ksp_type gmres -st_pc_type jacobi
    * or similar.
    */
-    std::pair<unsigned int, unsigned int>  solve_generalized(SparseMatrix<T> &matrix_A,
-  							   ShellMatrix<T> &matrix_B,
-  							   int nev,
-  							   int ncv,
-  							   const double tol,
-  							   const unsigned int m_its);
+  std::pair<unsigned int, unsigned int>  solve_generalized(SparseMatrix<T> &matrix_A,
+                                                           ShellMatrix<T> &matrix_B,
+                                                           int nev,
+                                                           int ncv,
+                                                           const double tol,
+                                                           const unsigned int m_its);
 
   /**
    * Solve generalized eigenproblem when both matrix_A and
@@ -162,12 +162,12 @@ public:
    * -st_ksp_type gmres -st_pc_type jacobi
    * or similar.
    */
-    std::pair<unsigned int, unsigned int>  solve_generalized(ShellMatrix<T> &matrix_A,
-  							   ShellMatrix<T> &matrix_B,
-  							   int nev,
-  							   int ncv,
-  							   const double tol,
-  							   const unsigned int m_its);
+  std::pair<unsigned int, unsigned int>  solve_generalized(ShellMatrix<T> &matrix_A,
+                                                           ShellMatrix<T> &matrix_B,
+                                                           int nev,
+                                                           int ncv,
+                                                           const double tol,
+                                                           const unsigned int m_its);
 
 
 
@@ -240,20 +240,20 @@ private:
    * Helper function that actually performs the standard eigensolve.
    */
   std::pair<unsigned int, unsigned int>  _solve_standard_helper (Mat mat,
-							 int nev,
-							 int ncv,
-							 const double tol,
-							 const unsigned int m_its);
+                                                                 int nev,
+                                                                 int ncv,
+                                                                 const double tol,
+                                                                 const unsigned int m_its);
 
   /**
    * Helper function that actually performs the generalized eigensolve.
    */
   std::pair<unsigned int, unsigned int>  _solve_generalized_helper (Mat mat_A,
-							         Mat mat_B,
-							         int nev,
-							         int ncv,
-							         const double tol,
-							         const unsigned int m_its);
+                                                                    Mat mat_B,
+                                                                    int nev,
+                                                                    int ncv,
+                                                                    const double tol,
+                                                                    const unsigned int m_its);
 
   /**
    * Tells Slepc to use the user-specified solver stored in

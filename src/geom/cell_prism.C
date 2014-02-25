@@ -39,39 +39,39 @@ dof_id_type Prism::key (const unsigned int s) const
     case 0:  // the triangular face at z=0
 
       return
-	this->compute_key (this->node(0),
-			   this->node(2),
-			   this->node(1));
+        this->compute_key (this->node(0),
+                           this->node(2),
+                           this->node(1));
 
     case 1:  // the quad face at y=0
 
       return
-	this->compute_key (this->node(0),
-			   this->node(1),
-			   this->node(4),
-			   this->node(3));
+        this->compute_key (this->node(0),
+                           this->node(1),
+                           this->node(4),
+                           this->node(3));
 
     case 2:  // the other quad face
 
       return
-	this->compute_key (this->node(1),
-			   this->node(2),
-			   this->node(5),
-			   this->node(4));
+        this->compute_key (this->node(1),
+                           this->node(2),
+                           this->node(5),
+                           this->node(4));
 
     case 3: // the quad face at x=0
 
       return
-	this->compute_key (this->node(2),
-			   this->node(0),
-			   this->node(3),
-			   this->node(5));
+        this->compute_key (this->node(2),
+                           this->node(0),
+                           this->node(3),
+                           this->node(5));
     case 4: // the triangular face at z=1
 
       return
-	this->compute_key (this->node(3),
-			   this->node(4),
-			   this->node(5));
+        this->compute_key (this->node(3),
+                           this->node(4),
+                           this->node(5));
     }
 
   // We'll never get here.
@@ -92,9 +92,9 @@ AutoPtr<Elem> Prism::side (const unsigned int i) const
         Elem* facet = new Tri3;
         AutoPtr<Elem> ap_facet(facet);
 
-	facet->set_node(0) = this->get_node(0);
-	facet->set_node(1) = this->get_node(2);
-	facet->set_node(2) = this->get_node(1);
+        facet->set_node(0) = this->get_node(0);
+        facet->set_node(1) = this->get_node(2);
+        facet->set_node(2) = this->get_node(1);
 
         return ap_facet;
       }
@@ -103,51 +103,51 @@ AutoPtr<Elem> Prism::side (const unsigned int i) const
         Elem* faceq = new Quad4;
         AutoPtr<Elem> ap_faceq(faceq);
 
-	faceq->set_node(0) = this->get_node(0);
-	faceq->set_node(1) = this->get_node(1);
-	faceq->set_node(2) = this->get_node(4);
-	faceq->set_node(3) = this->get_node(3);
+        faceq->set_node(0) = this->get_node(0);
+        faceq->set_node(1) = this->get_node(1);
+        faceq->set_node(2) = this->get_node(4);
+        faceq->set_node(3) = this->get_node(3);
 
-	return ap_faceq;
+        return ap_faceq;
       }
     case 2:  // the other quad face
       {
         Elem* faceq = new Quad4;
         AutoPtr<Elem> ap_faceq(faceq);
 
-	faceq->set_node(0) = this->get_node(1);
-	faceq->set_node(1) = this->get_node(2);
-	faceq->set_node(2) = this->get_node(5);
-	faceq->set_node(3) = this->get_node(4);
+        faceq->set_node(0) = this->get_node(1);
+        faceq->set_node(1) = this->get_node(2);
+        faceq->set_node(2) = this->get_node(5);
+        faceq->set_node(3) = this->get_node(4);
 
-	return ap_faceq;
+        return ap_faceq;
       }
     case 3: // the quad face at x=0
       {
         Elem* faceq = new Quad4;
         AutoPtr<Elem> ap_faceq(faceq);
 
-	faceq->set_node(0) = this->get_node(2);
-	faceq->set_node(1) = this->get_node(0);
-	faceq->set_node(2) = this->get_node(3);
-	faceq->set_node(3) = this->get_node(5);
+        faceq->set_node(0) = this->get_node(2);
+        faceq->set_node(1) = this->get_node(0);
+        faceq->set_node(2) = this->get_node(3);
+        faceq->set_node(3) = this->get_node(5);
 
-	return ap_faceq;
+        return ap_faceq;
       }
     case 4: // the triangular face at z=1
       {
         Elem* facet = new Tri3;
         AutoPtr<Elem> ap_facet(facet);
 
-	facet->set_node(0) = this->get_node(3);
-	facet->set_node(1) = this->get_node(4);
-	facet->set_node(2) = this->get_node(5);
+        facet->set_node(0) = this->get_node(3);
+        facet->set_node(1) = this->get_node(4);
+        facet->set_node(2) = this->get_node(5);
 
         return ap_facet;
       }
     default:
       {
-	libmesh_error();
+        libmesh_error();
         Elem* facet = new Tri3;
         AutoPtr<Elem> ap_facet(facet);
         return ap_facet;
@@ -190,35 +190,35 @@ bool Prism::is_edge_on_side(const unsigned int e,
 
 
 const unsigned short int Prism::_second_order_vertex_child_number[18] =
-{
-  99,99,99,99,99,99, // Vertices
-  0,1,0,0,1,2,3,4,3, // Edges
-  0,1,0              // Faces
-};
+  {
+    99,99,99,99,99,99, // Vertices
+    0,1,0,0,1,2,3,4,3, // Edges
+    0,1,0              // Faces
+  };
 
 
 
 const unsigned short int Prism::_second_order_vertex_child_index[18] =
-{
-  99,99,99,99,99,99, // Vertices
-  1,2,2,3,4,5,4,5,5, // Edges
-  4,5,5              // Faces
-};
+  {
+    99,99,99,99,99,99, // Vertices
+    1,2,2,3,4,5,4,5,5, // Edges
+    4,5,5              // Faces
+  };
 
 
 const unsigned short int Prism::_second_order_adjacent_vertices[9][2] =
-{
-  { 0,  1}, // vertices adjacent to node 6
-  { 1,  2}, // vertices adjacent to node 7
-  { 0,  2}, // vertices adjacent to node 8
+  {
+    { 0,  1}, // vertices adjacent to node 6
+    { 1,  2}, // vertices adjacent to node 7
+    { 0,  2}, // vertices adjacent to node 8
 
-  { 0,  3}, // vertices adjacent to node 9
-  { 1,  4}, // vertices adjacent to node 10
-  { 2,  5}, // vertices adjacent to node 11
+    { 0,  3}, // vertices adjacent to node 9
+    { 1,  4}, // vertices adjacent to node 10
+    { 2,  5}, // vertices adjacent to node 11
 
-  { 3,  4}, // vertices adjacent to node 12
-  { 4,  5}, // vertices adjacent to node 13
-  { 3,  5}  // vertices adjacent to node 14
-};
+    { 3,  4}, // vertices adjacent to node 12
+    { 4,  5}, // vertices adjacent to node 13
+    { 3,  5}  // vertices adjacent to node 14
+  };
 
 } // namespace libMesh

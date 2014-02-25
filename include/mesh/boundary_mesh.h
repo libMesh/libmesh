@@ -41,14 +41,14 @@ namespace libMesh
 // BoundaryMesh class definition
 class BoundaryMesh : public Mesh
 {
- public:
+public:
 
   /**
    * Constructor. Initializes dimenstion and processor id.
    */
   explicit
   BoundaryMesh (const Parallel::Communicator &comm,
-		unsigned int dim=1);
+                unsigned int dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
@@ -66,7 +66,7 @@ class BoundaryMesh : public Mesh
    */
   ~BoundaryMesh();
 
- private:
+private:
 };
 
 

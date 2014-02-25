@@ -43,7 +43,7 @@ namespace libMesh
 // ParmetisPartitioner class definition
 class ParmetisPartitioner : public Partitioner
 {
- public:
+public:
 
   /**
    * Constructor.
@@ -70,18 +70,18 @@ protected:
    * then been adaptively refined) and repartitions it.
    */
   virtual void _do_repartition (MeshBase& mesh,
-				const unsigned int n);
+                                const unsigned int n);
 
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
   virtual void _do_partition (MeshBase& mesh,
-			      const unsigned int n);
+                              const unsigned int n);
 
 private:
 
-// These methods & data only need to be available if the
-// ParMETIS library is available.
+  // These methods & data only need to be available if the
+  // ParMETIS library is available.
 #ifdef LIBMESH_HAVE_PARMETIS
 
   /**

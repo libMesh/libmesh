@@ -17,25 +17,25 @@
 
 
 
- // <h1>Miscellaneous Example 3 - 2D Laplace-Young Problem Using Nonlinear Solvers</h1>
- //
- // This example shows how to use the NonlinearImplicitSystem class
- // to efficiently solve nonlinear problems in parallel.
- //
- // In nonlinear systems, we aim at finding x that satisfy R(x) = 0.
- // In nonlinear finite element analysis, the residual is typically
- // of the form R(x) = K(x)*x - f, with K(x) the system matrix and f
- // the "right-hand-side". The NonlinearImplicitSystem class expects
- // two callback functions to compute the residual R and its Jacobian
- // for the Newton iterations. Here, we just approximate
- // the true Jacobian by K(x).
- //
- // You can turn on preconditining of the matrix free system using the
- // jacobian by passing "-pre" on the command line.  Currently this only
- // work with Petsc so this isn't used by using "make run"
- //
- // This example also runs with the experimental Trilinos NOX solvers by specifying
- // the --use-trilinos command line argument.
+// <h1>Miscellaneous Example 3 - 2D Laplace-Young Problem Using Nonlinear Solvers</h1>
+//
+// This example shows how to use the NonlinearImplicitSystem class
+// to efficiently solve nonlinear problems in parallel.
+//
+// In nonlinear systems, we aim at finding x that satisfy R(x) = 0.
+// In nonlinear finite element analysis, the residual is typically
+// of the form R(x) = K(x)*x - f, with K(x) the system matrix and f
+// the "right-hand-side". The NonlinearImplicitSystem class expects
+// two callback functions to compute the residual R and its Jacobian
+// for the Newton iterations. Here, we just approximate
+// the true Jacobian by K(x).
+//
+// You can turn on preconditining of the matrix free system using the
+// jacobian by passing "-pre" on the command line.  Currently this only
+// work with Petsc so this isn't used by using "make run"
+//
+// This example also runs with the experimental Trilinos NOX solvers by specifying
+// the --use-trilinos command line argument.
 
 
 // C++ include files that we need
@@ -392,7 +392,7 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
 #if !defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_HAVE_TRILINOS)
-  if (libMesh::processor_id() == 0)
+  if (init.comm().rank() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
               << "compiled with nonlinear solver support from\n"
               << "PETSc or Trilinos!"
@@ -401,7 +401,7 @@ int main (int argc, char** argv)
 #endif
 
 #ifndef LIBMESH_ENABLE_AMR
-  if (libMesh::processor_id() == 0)
+  if (init.comm().rank() == 0)
     std::cerr << "ERROR: This example requires libMesh to be\n"
               << "compiled with AMR support!"
               << std::endl;
@@ -414,7 +414,7 @@ int main (int argc, char** argv)
   // Check for proper calling arguments.
   if (argc < 3)
     {
-      if (libMesh::processor_id() == 0)
+      if (init.comm().rank() == 0)
         std::cerr << "Usage:\n"
                   <<"\t " << argv[0] << " -r 2"
                   << std::endl;
@@ -509,8 +509,8 @@ int main (int argc, char** argv)
   // Adds the variable "u" to "Laplace-Young".  "u"
   // will be approximated using second-order approximation.
   system.add_variable("u",
-		      Utility::string_to_enum<Order>   (order),
-		      Utility::string_to_enum<FEFamily>(family));
+                      Utility::string_to_enum<Order>   (order),
+                      Utility::string_to_enum<FEFamily>(family));
 
   // Give the system a pointer to the functions that update
   // the residual and Jacobian.
@@ -531,15 +531,15 @@ int main (int argc, char** argv)
   // output from during the solve itself, but demonstrates another way
   // to get this information after the solve is complete.
   std::cout << "Laplace-Young system solved at nonlinear iteration "
-	    << system.n_nonlinear_iterations()
-	    << " , final nonlinear residual norm: "
-	    << system.final_nonlinear_residual()
-	    << std::endl;
+            << system.n_nonlinear_iterations()
+            << " , final nonlinear residual norm: "
+            << system.final_nonlinear_residual()
+            << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // After solving the system write the solution
   ExodusII_IO (mesh).write_equation_systems ("out.e",
-                                       equation_systems);
+                                             equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 #endif // #ifndef LIBMESH_ENABLE_AMR
 

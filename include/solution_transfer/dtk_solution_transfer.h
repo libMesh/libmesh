@@ -45,7 +45,7 @@ class DTKSolutionTransfer : public SolutionTransfer
 {
 public:
   DTKSolutionTransfer(const libMesh::Parallel::Communicator &comm
-		      LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                      LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
   virtual ~DTKSolutionTransfer();
 
   /**

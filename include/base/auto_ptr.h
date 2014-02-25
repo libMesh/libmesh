@@ -258,8 +258,8 @@ public:
   {
     if (p != _ptr)
       {
-	delete _ptr;
-	_ptr = p;
+        delete _ptr;
+        _ptr = p;
       }
   }
 
@@ -288,8 +288,8 @@ public:
   {
     if (ref._ptr != this->get())
       {
-	delete _ptr;
-	_ptr = ref._ptr;
+        delete _ptr;
+        _ptr = ref._ptr;
       }
     return *this;
   }

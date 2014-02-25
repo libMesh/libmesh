@@ -68,11 +68,11 @@
 // It relies on the VTK version numbers detected during configure.  Note that if
 // LIBMESH_HAVE_VTK is not defined, none of the LIBMESH_DETECTED_VTK_VERSION_* variables will
 // be defined either.
-#define VTK_VERSION_LESS_THAN(major,minor,subminor)                                                     \
-  ((LIBMESH_DETECTED_VTK_VERSION_MAJOR < (major) ||                                                     \
-    (LIBMESH_DETECTED_VTK_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_VTK_VERSION_MINOR < (minor) ||  \
-                                  (LIBMESH_DETECTED_VTK_VERSION_MINOR == (minor) &&                     \
-                                   LIBMESH_DETECTED_VTK_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
+#define VTK_VERSION_LESS_THAN(major,minor,subminor)                     \
+  ((LIBMESH_DETECTED_VTK_VERSION_MAJOR < (major) ||                     \
+    (LIBMESH_DETECTED_VTK_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_VTK_VERSION_MINOR < (minor) || \
+                                                       (LIBMESH_DETECTED_VTK_VERSION_MINOR == (minor) && \
+                                                        LIBMESH_DETECTED_VTK_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
 
 
 
@@ -88,7 +88,7 @@ vtkIdType VTKIO::get_elem_type(ElemType type)
   vtkIdType celltype = VTK_EMPTY_CELL; // initialize to something to avoid compiler warning
 
   switch(type)
-  {
+    {
     case EDGE2:
       celltype = VTK_LINE;
       break;
@@ -158,7 +158,7 @@ vtkIdType VTKIO::get_elem_type(ElemType type)
         libmesh_error();
         break;
       }
-  }
+    }
   return celltype;
 }
 
@@ -178,7 +178,7 @@ void VTKIO::nodes_to_vtk()
 
   MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
   MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
-  for (; nd != nd_end; nd++, local_node_counter++)
+  for (; nd != nd_end; nd++, ++local_node_counter)
     {
       Node* node = (*nd);
 
@@ -439,8 +439,8 @@ void VTKIO::read (const std::string& name)
 
 #ifndef LIBMESH_HAVE_VTK
   libMesh::err << "Cannot read VTK file: " << name
-	        << "\nYou must have VTK installed and correctly configured to read VTK meshes."
-	        << std::endl;
+               << "\nYou must have VTK installed and correctly configured to read VTK meshes."
+               << std::endl;
   libmesh_error();
 
 #else
@@ -480,7 +480,7 @@ void VTKIO::read (const std::string& name)
       // Add node to the nodes vector &
       // tell the MeshData object the foreign node id.
       if (this->_mesh_data != NULL)
-	this->_mesh_data->add_foreign_node_id (newnode, i);
+        this->_mesh_data->add_foreign_node_id (newnode, i);
     }
 
   // Get the number of cells from the _vtk_grid object
@@ -491,7 +491,7 @@ void VTKIO::read (const std::string& name)
       vtkCell* cell = _vtk_grid->GetCell(i);
       Elem* elem = NULL;
       switch (cell->GetCellType())
-	{
+        {
         case VTK_LINE:
           elem = new Edge2;
           break;
@@ -515,38 +515,38 @@ void VTKIO::read (const std::string& name)
           elem = new Quad9();
           break;
 #endif
-	case VTK_TETRA:
-	  elem = new Tet4();
-	  break;
-        case VTK_QUADRATIC_TETRA:
-	  elem = new Tet10();
-	  break;
-	case VTK_WEDGE:
-	  elem = new Prism6();
-	  break;
-        case VTK_QUADRATIC_WEDGE:
-	  elem = new Prism15();
-	  break;
-        case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
-	  elem = new Prism18();
-	  break;
-	case VTK_HEXAHEDRON:
-	  elem = new Hex8();
-	  break;
-	case VTK_QUADRATIC_HEXAHEDRON:
-  	  elem = new Hex20();
-	  break;
-        case VTK_TRIQUADRATIC_HEXAHEDRON:
-	  elem = new Hex27();
-	  break;
-	case VTK_PYRAMID:
-	  elem = new Pyramid5();
-	  break;
-	default:
-	  libMesh::err << "element type not implemented in vtkinterface " << cell->GetCellType() << std::endl;
-	  libmesh_error();
+        case VTK_TETRA:
+          elem = new Tet4();
           break;
-	}
+        case VTK_QUADRATIC_TETRA:
+          elem = new Tet10();
+          break;
+        case VTK_WEDGE:
+          elem = new Prism6();
+          break;
+        case VTK_QUADRATIC_WEDGE:
+          elem = new Prism15();
+          break;
+        case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
+          elem = new Prism18();
+          break;
+        case VTK_HEXAHEDRON:
+          elem = new Hex8();
+          break;
+        case VTK_QUADRATIC_HEXAHEDRON:
+          elem = new Hex20();
+          break;
+        case VTK_TRIQUADRATIC_HEXAHEDRON:
+          elem = new Hex27();
+          break;
+        case VTK_PYRAMID:
+          elem = new Pyramid5();
+          break;
+        default:
+          libMesh::err << "element type not implemented in vtkinterface " << cell->GetCellType() << std::endl;
+          libmesh_error();
+          break;
+        }
 
       // get the straightforward numbering from the VTK cells
       for (unsigned int j=0; j<elem->n_nodes(); ++j)
@@ -577,10 +577,10 @@ void VTKIO::read (const std::string& name)
   if (mesh.mesh_dimension() > LIBMESH_DIM)
     {
       libMesh::err << "Cannot open dimension " <<
-		      mesh.mesh_dimension() <<
-		      " mesh file when configured without " <<
-                      mesh.mesh_dimension() << "D support." <<
-                      std::endl;
+        mesh.mesh_dimension() <<
+        " mesh file when configured without " <<
+        mesh.mesh_dimension() << "D support." <<
+        std::endl;
       libmesh_error();
     }
 #endif
@@ -598,13 +598,13 @@ void VTKIO::write_nodal_data (const std::string& fname,
                               const std::vector<Number>&,
                               const std::vector<std::string>&
 #endif
-)
+                              )
 {
 #ifndef LIBMESH_HAVE_VTK
 
   libMesh::err << "Cannot write VTK file: " << fname
-	        << "\nYou must have VTK installed and correctly configured to read VTK meshes."
-	        << std::endl;
+               << "\nYou must have VTK installed and correctly configured to read VTK meshes."
+               << std::endl;
   libmesh_error();
 
 #else
@@ -649,10 +649,10 @@ void VTKIO::write_nodal_data (const std::string& fname,
               if (!soln.empty())
                 {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-	          libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
-					        << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
-					        << std::endl);
-	          data->SetValue(_local_node_map[k], soln[k*num_vars + variable].real());
+                  libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
+                                   << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
+                                   << std::endl);
+                  data->SetValue(_local_node_map[k], soln[k*num_vars + variable].real());
 #else
                   data->SetValue(_local_node_map[k], soln[k*num_vars + variable]);
 #endif

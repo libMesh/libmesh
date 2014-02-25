@@ -15,12 +15,12 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>FEMSystem Example 1 - Unsteady Navier-Stokes Equations with
- // FEMSystem</h1>
- //
- // This example shows how the transient nonlinear problem from
- // example 13 can be solved using the
- // DifferentiableSystem class framework
+// <h1>FEMSystem Example 1 - Unsteady Navier-Stokes Equations with
+// FEMSystem</h1>
+//
+// This example shows how the transient nonlinear problem from
+// example 13 can be solved using the
+// DifferentiableSystem class framework
 
 // Basic include files
 #include "libmesh/equation_systems.h"
@@ -64,13 +64,13 @@ int main (int argc, char** argv)
   // elements in 3D.  Building these higher-order elements allows
   // us to use higher-order approximation, as in example 3.
   MeshTools::Generation::build_cube (mesh,
-				     grid_size,
-				     grid_size,
-				     grid_size,
-				     -1., 1.,
-				     -1., 1.,
-				     -1., 1.,
-				     HEX8);
+                                     grid_size,
+                                     grid_size,
+                                     grid_size,
+                                     -1., 1.,
+                                     -1., 1.,
+                                     -1., 1.,
+                                     HEX8);
 
   // Print information about the mesh to the screen.
   mesh.print_info();
@@ -133,11 +133,11 @@ int main (int argc, char** argv)
 
   // Print out the error values
   std::cout << "L2-Error is: "
-	    << exact_sol.l2_error("Laplace", "u")
-	    << std::endl;
+            << exact_sol.l2_error("Laplace", "u")
+            << std::endl;
   std::cout << "H1-Error is: "
-	    << exact_sol.h1_error("Laplace", "u")
-	    << std::endl;
+            << exact_sol.h1_error("Laplace", "u")
+            << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 

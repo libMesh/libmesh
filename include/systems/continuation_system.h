@@ -40,15 +40,15 @@ class NewtonSolver;
  * This class inherits from the FEMSystem.  It can be
  * used to do arclength continuation.  Most of the ideas and
  * the notation here come from HB Keller's 1977 paper:
-\verbatim
-@InProceedings{Kell-1977,
-  author = {H.~B.~Keller},
-  title = {{Numerical solution of bifurcation and nonlinear eigenvalue problems}},
-  booktitle = {Applications of Bifurcation Theory, P.~H.~Rabinowitz (ed.)},
-  year = 1977,
-  publisher = {Academic Press},
-  pages = {359--389},
-  notes = {QA 3 U45 No.\ 38 (PMA)}
+ \verbatim
+ @InProceedings{Kell-1977,
+ author = {H.~B.~Keller},
+ title = {{Numerical solution of bifurcation and nonlinear eigenvalue problems}},
+ booktitle = {Applications of Bifurcation Theory, P.~H.~Rabinowitz (ed.)},
+ year = 1977,
+ publisher = {Academic Press},
+ pages = {359--389},
+ notes = {QA 3 U45 No.\ 38 (PMA)}
  }
  \endverbatim
  *
@@ -62,8 +62,8 @@ public:
    * data structures.
    */
   ContinuationSystem (EquationSystems& es,
-		      const std::string& name,
-		      const unsigned int number);
+                      const std::string& name,
+                      const unsigned int number);
 
   /**
    * Destructor.
@@ -286,7 +286,7 @@ protected:
    *   }
    */
   enum RHS_Mode {Residual,
-		 G_Lambda};
+                 G_Lambda};
 
   RHS_Mode rhs_mode;
 

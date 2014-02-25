@@ -119,10 +119,10 @@ int main(int argc, char** argv)
   if (cl.search("--maxpointz"))
     maxpoint(2) = cl.next(maxpoint(2));
 
-libMesh::out << "min point = " << minpoint << std::endl;
-libMesh::out << "max point = " << maxpoint << std::endl;
-libMesh::out << "min normal = " << minnormal << std::endl;
-libMesh::out << "max normal = " << maxnormal << std::endl;
+  libMesh::out << "min point = " << minpoint << std::endl;
+  libMesh::out << "max point = " << maxpoint << std::endl;
+  libMesh::out << "min normal = " << minnormal << std::endl;
+  libMesh::out << "max normal = " << maxnormal << std::endl;
 
   bool matcholdbcid = false;
   boundary_id_type oldbcid = 0;
@@ -155,10 +155,10 @@ libMesh::out << "max normal = " << maxnormal << std::endl;
           const Point &p = face_points[0];
           const Point &n = face_normals[0];
 
-//libMesh::out << "elem = " << elem->id() << std::endl;
-//libMesh::out << "centroid = " << elem->centroid() << std::endl;
-//libMesh::out << "p = " << p << std::endl;
-//libMesh::out << "n = " << n << std::endl;
+          //libMesh::out << "elem = " << elem->id() << std::endl;
+          //libMesh::out << "centroid = " << elem->centroid() << std::endl;
+          //libMesh::out << "p = " << p << std::endl;
+          //libMesh::out << "n = " << n << std::endl;
 
           if (p(0) > minpoint(0) && p(0) < maxpoint(0) &&
               p(1) > minpoint(1) && p(1) < maxpoint(1) &&
@@ -172,8 +172,8 @@ libMesh::out << "max normal = " << maxnormal << std::endl;
                 continue;
               mesh.boundary_info->remove_side(elem, s);
               mesh.boundary_info->add_side(elem, s, bcid);
-//libMesh::out << "Set element " << elem->id() << " side " << s <<
-//                " to boundary " << bcid << std::endl;
+              //libMesh::out << "Set element " << elem->id() << " side " << s <<
+              //                " to boundary " << bcid << std::endl;
             }
         }
     }

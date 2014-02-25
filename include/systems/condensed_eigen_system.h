@@ -54,8 +54,8 @@ public:
    * data structures.
    */
   CondensedEigenSystem (EquationSystems& es,
-	                const std::string& name,
-	                const unsigned int number);
+                        const std::string& name,
+                        const unsigned int number);
 
   /**
    * The type of system.

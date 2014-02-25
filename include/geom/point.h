@@ -41,15 +41,15 @@ namespace libMesh
 
 class Point : public TypeVector<Real>
 {
- public:
+public:
 
   /**
    * Constructor.  By default sets all entries to 0.  Gives the point 0 in
    * \p LIBMESH_DIM dimensions.
    */
   Point  (const Real x=0.,
-	  const Real y=0.,
-	  const Real z=0.);
+          const Real y=0.,
+          const Real z=0.);
 
   /**
    * Copy-constructor.
@@ -66,13 +66,13 @@ class Point : public TypeVector<Real>
    */
   ~Point() {}
 
-//   /**
-//    * @returns a key associated with this point.  Useful for sorting.
-//    */
-//   dof_id_type key() const;
+  //   /**
+  //    * @returns a key associated with this point.  Useful for sorting.
+  //    */
+  //   dof_id_type key() const;
 
 
- protected:
+protected:
 
 
   /**
@@ -87,8 +87,8 @@ class Point : public TypeVector<Real>
 // Inline functions
 inline
 Point::Point (const Real x,
-	      const Real y,
-	      const Real z) :
+              const Real y,
+              const Real z) :
   TypeVector<Real> (x,y,z)
 {
 }

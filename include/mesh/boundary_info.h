@@ -56,7 +56,7 @@ class MeshData;
 
 //------------------------------------------------------
 // BoundaryInfo class definition
-  class BoundaryInfo : public ParallelObject
+class BoundaryInfo : public ParallelObject
 {
 protected:
   friend class MeshBase;
@@ -103,8 +103,8 @@ public:
    * and the MeshData object used for this mesh.
    */
   void sync (UnstructuredMesh& boundary_mesh,
-	     MeshData* boundary_mesh_data=NULL,
-	     MeshData* this_mesh_data=NULL);
+             MeshData* boundary_mesh_data=NULL,
+             MeshData* this_mesh_data=NULL);
 
   /**
    * Close the data structures and prepare for use.
@@ -120,30 +120,30 @@ public:
    * and the MeshData object used for this mesh.
    */
   void sync (const std::set<boundary_id_type> &requested_boundary_ids,
-	     UnstructuredMesh& boundary_mesh,
-	     MeshData* boundary_mesh_data=NULL,
-	     MeshData* this_mesh_data=NULL);
+             UnstructuredMesh& boundary_mesh,
+             MeshData* boundary_mesh_data=NULL,
+             MeshData* this_mesh_data=NULL);
 
   /**
    * Add \p Node \p node with boundary id \p id to the boundary
    * information data structures.
    */
   void add_node (const Node* node,
-		 const boundary_id_type id);
+                 const boundary_id_type id);
 
   /**
    * Add node number \p node with boundary id \p id to the boundary
    * information data structures.
    */
   void add_node (const dof_id_type node,
-		 const boundary_id_type id);
+                 const boundary_id_type id);
 
   /**
    * Add \p Node \p node with boundary ids \p ids to the boundary
    * information data structure.
    */
   void add_node (const Node* node,
-		 const std::vector<boundary_id_type>& ids);
+                 const std::vector<boundary_id_type>& ids);
 
   /**
    * Clears all the boundary information from all of the nodes in the mesh
@@ -156,8 +156,8 @@ public:
    * Edge-based boundary IDs should only be used in 3D.
    */
   void add_edge (const dof_id_type elem,
-		 const unsigned short int edge,
-		 const boundary_id_type id);
+                 const unsigned short int edge,
+                 const boundary_id_type id);
 
   /**
    * Add edge \p edge of element \p elem with boundary id \p id
@@ -165,8 +165,8 @@ public:
    * Edge-based boundary IDs should only be used in 3D.
    */
   void add_edge (const Elem* elem,
-		 const unsigned short int edge,
-		 const boundary_id_type id);
+                 const unsigned short int edge,
+                 const boundary_id_type id);
 
   /**
    * Add edge \p edge of element \p elem with boundary ids \p ids
@@ -174,32 +174,32 @@ public:
    * Edge-based boundary IDs should only be used in 3D.
    */
   void add_edge (const Elem* elem,
-		 const unsigned short int edge,
-		 const std::vector<boundary_id_type>& ids);
+                 const unsigned short int edge,
+                 const std::vector<boundary_id_type>& ids);
 
   /**
    * Add side \p side of element number \p elem with boundary id \p id
    * to the boundary information data structure.
    */
   void add_side (const dof_id_type elem,
-		 const unsigned short int side,
-		 const boundary_id_type id);
+                 const unsigned short int side,
+                 const boundary_id_type id);
 
   /**
    * Add side \p side of element \p elem with boundary id \p id
    * to the boundary information data structure.
    */
   void add_side (const Elem* elem,
-		 const unsigned short int side,
-		 const boundary_id_type id);
+                 const unsigned short int side,
+                 const boundary_id_type id);
 
   /**
    * Add side \p side of element \p elem with boundary ids \p ids
    * to the boundary information data structure.
    */
   void add_side (const Elem* elem,
-		 const unsigned short int side,
-		 const std::vector<boundary_id_type>& ids);
+                 const unsigned short int side,
+                 const std::vector<boundary_id_type>& ids);
 
   /**
    * Removes the boundary conditions associated with node \p node,
@@ -306,7 +306,7 @@ public:
    * \p invalid_id can be used as the default boundary id.
    */
   boundary_id_type boundary_id (const Elem* const elem,
-			        const unsigned short int side) const;
+                                const unsigned short int side) const;
 
   /**
    * Returns the number of boundary ids associated with the \p side
@@ -340,7 +340,7 @@ public:
    * Returns \p invalid_uint if no side has the requested boundary id.
    */
   unsigned int side_with_boundary_id(const Elem* const elem,
-				     const boundary_id_type boundary_id) const;
+                                     const boundary_id_type boundary_id) const;
 
   /**
    * Builds the list of unique node boundary ids.
@@ -372,7 +372,7 @@ public:
    * Creates a list of nodes and ids for those nodes.
    */
   void build_node_list (std::vector<dof_id_type>&      node_id_list,
-			std::vector<boundary_id_type>& bc_id_list) const;
+                        std::vector<boundary_id_type>& bc_id_list) const;
 
   /**
    * Adds nodes with boundary ids based on the side's boundary
@@ -390,8 +390,8 @@ public:
    * Creates a list of element numbers, sides, and  and ids for those sides.
    */
   void build_side_list (std::vector<dof_id_type>&        element_id_list,
-			std::vector<unsigned short int>& side_list,
-			std::vector<boundary_id_type>&   bc_id_list) const;
+                        std::vector<unsigned short int>& side_list,
+                        std::vector<boundary_id_type>&   bc_id_list) const;
 
   /**
    * @returns the user-specified boundary ids.
@@ -473,7 +473,7 @@ public:
   static const boundary_id_type invalid_id;
 
 
- private:
+private:
 
 
   /**
@@ -494,7 +494,7 @@ public:
    */
   std::multimap<const Elem*,
                 std::pair<unsigned short int, boundary_id_type> >
-                                             _boundary_edge_id;
+  _boundary_edge_id;
 
   /**
    * Data structure that maps sides of elements
@@ -502,7 +502,7 @@ public:
    */
   std::multimap<const Elem*,
                 std::pair<unsigned short int, boundary_id_type> >
-                                             _boundary_side_id;
+  _boundary_side_id;
 
   /**
    * A collection of user-specified boundary ids for sides, edges and nodes.
@@ -546,40 +546,40 @@ public:
   std::map<boundary_id_type, std::string> _ns_id_to_name;
 
 
-//   /**
-//    * Functor class for printing a single node's info
-//    * To be used with "for_each".
-//    */
-//   class PrintNodeInfo
-//   {
-//   public:
-//     inline
-//     void operator() (const std::pair<const Node*, short int>& np) const
-//     {
-//       libMesh::out << "  (" << np.first->id()
-//		      << ", "  << np.second
-//		      << ")"  << std::endl;
-//     }
-//   };
+  //   /**
+  //    * Functor class for printing a single node's info
+  //    * To be used with "for_each".
+  //    */
+  //   class PrintNodeInfo
+  //   {
+  //   public:
+  //     inline
+  //     void operator() (const std::pair<const Node*, short int>& np) const
+  //     {
+  //       libMesh::out << "  (" << np.first->id()
+  //      << ", "  << np.second
+  //      << ")"  << std::endl;
+  //     }
+  //   };
 
 
-//   /**
-//    * Functor class for printing a single side's info.
-//    * To be used with "for_each".
-//    */
-//   class PrintSideInfo
-//   {
-//   public:
-//     PrintSideInfo() {}
-//     inline
-//     void operator() (const std::pair<const Elem*, std::pair<unsigned short int,short int> >& sp) const
-//     {
-//       libMesh::out << "  (" << sp.first->id()
-//		      << ", "  << sp.second.first
-//		      << ", "  << sp.second.second
-//		      << ")"   << std::endl;
-//     }
-//   };
+  //   /**
+  //    * Functor class for printing a single side's info.
+  //    * To be used with "for_each".
+  //    */
+  //   class PrintSideInfo
+  //   {
+  //   public:
+  //     PrintSideInfo() {}
+  //     inline
+  //     void operator() (const std::pair<const Elem*, std::pair<unsigned short int,short int> >& sp) const
+  //     {
+  //       libMesh::out << "  (" << sp.first->id()
+  //      << ", "  << sp.second.first
+  //      << ", "  << sp.second.second
+  //      << ")"   << std::endl;
+  //     }
+  //   };
 
 
 

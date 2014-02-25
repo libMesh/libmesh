@@ -40,10 +40,10 @@ FEType::default_quadrature_rule (const unsigned int dim,
       const unsigned int seven = 7;
 
       return AutoPtr<QBase>
-	(new QClough(dim,
-		     static_cast<Order>
-		     (std::max(static_cast<unsigned int>
-			       (this->default_quadrature_order()), seven + extraorder))));
+        (new QClough(dim,
+                     static_cast<Order>
+                     (std::max(static_cast<unsigned int>
+                               (this->default_quadrature_order()), seven + extraorder))));
     }
 
   return AutoPtr<QBase>

@@ -41,15 +41,15 @@ Real elasticity_tensor(unsigned int i,
 struct ElasticityAssembly : ElemAssembly
 {
 
-	ElasticityAssembly(ElasticityRBConstruction& rb_sys_in)
-	:
-  rb_sys(rb_sys_in)
+  ElasticityAssembly(ElasticityRBConstruction& rb_sys_in)
+    :
+    rb_sys(rb_sys_in)
   {}
 
-	/**
-	 * The ElasticityRBConstruction object that will use this assembly.
-	 */
-	ElasticityRBConstruction& rb_sys;
+  /**
+   * The ElasticityRBConstruction object that will use this assembly.
+   */
+  ElasticityRBConstruction& rb_sys;
 };
 
 struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& ) { return 1.; } };
@@ -57,12 +57,12 @@ struct AssemblyA0 : ElasticityAssembly
 {
 
   AssemblyA0(ElasticityRBConstruction& rb_sys_in)
-  :
-  ElasticityAssembly(rb_sys_in)
+    :
+    ElasticityAssembly(rb_sys_in)
   {}
 
   // The interior assembly operator
-	virtual void interior_assembly(FEMContext &c);
+  virtual void interior_assembly(FEMContext &c);
 
 };
 
@@ -71,12 +71,12 @@ struct AssemblyA1 : ElasticityAssembly
 {
 
   AssemblyA1(ElasticityRBConstruction& rb_sys_in)
-  :
-  ElasticityAssembly(rb_sys_in)
+    :
+    ElasticityAssembly(rb_sys_in)
   {}
 
   // The interior assembly operator
-	virtual void interior_assembly(FEMContext &c);
+  virtual void interior_assembly(FEMContext &c);
 
 };
 
@@ -85,12 +85,12 @@ struct AssemblyA2 : ElasticityAssembly
 {
 
   AssemblyA2(ElasticityRBConstruction& rb_sys_in)
-  :
-  ElasticityAssembly(rb_sys_in)
+    :
+    ElasticityAssembly(rb_sys_in)
   {}
 
   // The interior assembly operator
-	virtual void interior_assembly(FEMContext &c);
+  virtual void interior_assembly(FEMContext &c);
 
 };
 
@@ -98,8 +98,8 @@ struct ThetaF0 : RBTheta { virtual Number evaluate(const RBParameters& mu) { ret
 struct AssemblyF0 : ElasticityAssembly
 {
   AssemblyF0(ElasticityRBConstruction& rb_sys_in)
-  :
-  ElasticityAssembly(rb_sys_in)
+    :
+    ElasticityAssembly(rb_sys_in)
   {}
 
   // Apply a traction
@@ -111,8 +111,8 @@ struct ThetaF1 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { r
 struct AssemblyF1 : ElasticityAssembly
 {
   AssemblyF1(ElasticityRBConstruction& rb_sys_in)
-  :
-  ElasticityAssembly(rb_sys_in)
+    :
+    ElasticityAssembly(rb_sys_in)
   {}
 
   // Apply a traction
@@ -123,8 +123,8 @@ struct ThetaF2 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { r
 struct AssemblyF2 : ElasticityAssembly
 {
   AssemblyF2(ElasticityRBConstruction& rb_sys_in)
-  :
-  ElasticityAssembly(rb_sys_in)
+    :
+    ElasticityAssembly(rb_sys_in)
   {}
 
   // Apply a traction
@@ -135,12 +135,12 @@ struct InnerProductAssembly : ElasticityAssembly
 {
 
   InnerProductAssembly(ElasticityRBConstruction& rb_sys_in)
-  :
-  ElasticityAssembly(rb_sys_in)
+    :
+    ElasticityAssembly(rb_sys_in)
   {}
 
   // The interior assembly operator
-	virtual void interior_assembly(FEMContext &c);
+  virtual void interior_assembly(FEMContext &c);
 
 };
 
@@ -179,13 +179,13 @@ struct ElasticityAssemblyExpansion : RBAssemblyExpansion
    * Constructor.
    */
   ElasticityAssemblyExpansion(ElasticityRBConstruction& rb_sys_in)
-  :
-  A0_assembly(rb_sys_in),
-  A1_assembly(rb_sys_in),
-  A2_assembly(rb_sys_in),
-  F0_assembly(rb_sys_in),
-  F1_assembly(rb_sys_in),
-  F2_assembly(rb_sys_in)
+    :
+    A0_assembly(rb_sys_in),
+    A1_assembly(rb_sys_in),
+    A2_assembly(rb_sys_in),
+    F0_assembly(rb_sys_in),
+    F1_assembly(rb_sys_in),
+    F2_assembly(rb_sys_in)
   {
     // And set up the RBAssemblyExpansion object
     attach_A_assembly(&A0_assembly);

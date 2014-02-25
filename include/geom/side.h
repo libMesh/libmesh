@@ -52,13 +52,13 @@ class Node;
 template <class SideType, class ParentType>
 class Side : public SideType
 {
- public:
+public:
 
   /**
    * Constructor.  Creates a side from an element.
    */
   Side (const Elem* parent_in,
-	const unsigned int side_in) :
+        const unsigned int side_in) :
     SideType(const_cast<Elem*>(parent_in)),
     _side_number(side_in)
   {
@@ -121,11 +121,11 @@ class Side : public SideType
   { return 0; }
 
   virtual bool is_child_on_side(const unsigned int,
-			        const unsigned int) const
+                                const unsigned int) const
   { libmesh_error(); return false; }
 
 
- private:
+private:
 
 
   /**
@@ -152,13 +152,13 @@ class Side : public SideType
 template <class EdgeType, class ParentType>
 class SideEdge : public EdgeType
 {
- public:
+public:
 
   /**
    * Constructor.  Creates a side from an element.
    */
   SideEdge (const Elem* my_parent,
-	    const unsigned int my_edge) :
+            const unsigned int my_edge) :
     EdgeType(const_cast<Elem*>(my_parent)),
     _edge_number(my_edge)
   {
@@ -220,7 +220,7 @@ class SideEdge : public EdgeType
   virtual unsigned int n_sides () const { return 0; }
 
 
- private:
+private:
 
 
   /**

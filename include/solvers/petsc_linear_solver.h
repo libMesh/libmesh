@@ -102,7 +102,7 @@ public:
    *  Constructor. Initializes Petsc data structures
    */
   PetscLinearSolver (const libMesh::Parallel::Communicator &comm
-		     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.
@@ -132,7 +132,7 @@ public:
    * \p NULL pointer.
    */
   virtual void restrict_solve_to (const std::vector<unsigned int>* const dofs,
-				  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
+                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
 
   /**
    * Call the Petsc solver.  It calls the method below, using the
@@ -140,10 +140,10 @@ public:
    */
   std::pair<unsigned int, Real>
   solve (SparseMatrix<T>  &matrix_in,
-	 NumericVector<T> &solution_in,
-	 NumericVector<T> &rhs_in,
-	 const double tol,
-	 const unsigned int m_its)
+         NumericVector<T> &solution_in,
+         NumericVector<T> &rhs_in,
+         const double tol,
+         const unsigned int m_its)
   {
     return this->solve(matrix_in, matrix_in, solution_in, rhs_in, tol, m_its);
   }
@@ -155,10 +155,10 @@ public:
    */
   std::pair<unsigned int, Real>
   adjoint_solve (SparseMatrix<T>  &matrix_in,
-	 NumericVector<T> &solution_in,
-	 NumericVector<T> &rhs_in,
-	 const double tol,
-		 const unsigned int m_its);
+                 NumericVector<T> &solution_in,
+                 NumericVector<T> &rhs_in,
+                 const double tol,
+                 const unsigned int m_its);
 
 
   /**
@@ -178,21 +178,21 @@ public:
    */
   std::pair<unsigned int, Real>
   solve (SparseMatrix<T>  &matrix,
-	 SparseMatrix<T>  &preconditioner,
-	 NumericVector<T> &solution,
-	 NumericVector<T> &rhs,
-	 const double tol,
-	 const unsigned int m_its);
+         SparseMatrix<T>  &preconditioner,
+         NumericVector<T> &solution,
+         NumericVector<T> &rhs,
+         const double tol,
+         const unsigned int m_its);
 
   /**
    * This function solves a system whose matrix is a shell matrix.
    */
   std::pair<unsigned int, Real>
-    solve (const ShellMatrix<T>& shell_matrix,
-	   NumericVector<T>& solution_in,
-	   NumericVector<T>& rhs_in,
-	   const double tol,
-	   const unsigned int m_its);
+  solve (const ShellMatrix<T>& shell_matrix,
+         NumericVector<T>& solution_in,
+         NumericVector<T>& rhs_in,
+         const double tol,
+         const unsigned int m_its);
 
   /**
    * This function solves a system whose matrix is a shell matrix, but
@@ -200,12 +200,12 @@ public:
    * other preconditioners than JACOBI.
    */
   virtual std::pair<unsigned int, Real>
-    solve (const ShellMatrix<T>& shell_matrix,
-	   const SparseMatrix<T>& precond_matrix,
-	   NumericVector<T>& solution_in,
-	   NumericVector<T>& rhs_in,
-	   const double tol,
-	   const unsigned int m_its);
+  solve (const ShellMatrix<T>& shell_matrix,
+         const SparseMatrix<T>& precond_matrix,
+         NumericVector<T>& solution_in,
+         NumericVector<T>& rhs_in,
+         const double tol,
+         const unsigned int m_its);
 
   /**
    * Returns the raw PETSc preconditioner context pointer.  This allows
@@ -236,10 +236,9 @@ public:
   Real get_initial_residual();
 
   /**
-   * Prints a useful message about why the latest linear solve
-   * con(di)verged.
+   * Returns the solver's convergence flag
    */
-  virtual void print_converged_reason();
+  virtual LinearConvergenceReason get_converged_reason() const;
 
 private:
 
@@ -322,11 +321,11 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-  PetscLinearSolver<T>::PetscLinearSolver (const libMesh::Parallel::Communicator &comm):
-    LinearSolver<T>(comm),
-    _restrict_solve_to_is(NULL),
-    _restrict_solve_to_is_complement(NULL),
-    _subset_solve_mode(SUBSET_ZERO)
+PetscLinearSolver<T>::PetscLinearSolver (const libMesh::Parallel::Communicator &comm):
+  LinearSolver<T>(comm),
+  _restrict_solve_to_is(NULL),
+  _restrict_solve_to_is_complement(NULL),
+  _subset_solve_mode(SUBSET_ZERO)
 {
   if (this->n_processors() == 1)
     this->_preconditioner_type = ILU_PRECOND;
@@ -369,7 +368,7 @@ PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
 #else
                                              vec_in
 #endif
-  )
+                                             )
 {
   libmesh_assert(_restrict_solve_to_is);
 #if PETSC_VERSION_LESS_THAN(3,0,0)
@@ -379,9 +378,9 @@ PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
   if(_restrict_solve_to_is_complement==NULL)
     {
       int ierr = ISComplement(_restrict_solve_to_is,
-			      vec_in.first_local_index(),
-			      vec_in.last_local_index(),
-			      &_restrict_solve_to_is_complement);
+                              vec_in.first_local_index(),
+                              vec_in.last_local_index(),
+                              &_restrict_solve_to_is_complement);
       LIBMESH_CHKERRABORT(ierr);
     }
 #endif

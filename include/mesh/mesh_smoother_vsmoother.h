@@ -76,7 +76,7 @@ public:
    * Simple constructor to use for smoothing purposes
    */
   VariationalMeshSmoother(UnstructuredMesh& mesh, const double theta=0.5, const uint miniter=2,
-			  const uint maxiter=5, const uint miniterBC=5)
+                          const uint maxiter=5, const uint miniterBC=5)
     :MeshSmoother(mesh),
      _percent_to_move(1),
      _adapt_data(NULL),
@@ -97,8 +97,8 @@ public:
    * Slightly more complicated constructor for mesh redistribution based on adapt_data
    */
   VariationalMeshSmoother(UnstructuredMesh& mesh, std::vector<float>* adapt_data, const double theta=0.5,
-			  const uint miniter=2, const uint maxiter=5, const uint miniterBC=5,
-			  const double percent_to_move=1)
+                          const uint miniter=2, const uint maxiter=5, const uint miniterBC=5,
+                          const double percent_to_move=1)
     :MeshSmoother(mesh),
      _percent_to_move(percent_to_move),
      _adapt_data(adapt_data),
@@ -120,8 +120,8 @@ public:
    * area of interest
    */
   VariationalMeshSmoother(UnstructuredMesh& mesh, const UnstructuredMesh* area_of_interest, std::vector<float>* adapt_data,
-			  const double theta=0.5, const uint miniter=2, const uint maxiter=5,
-			  const uint miniterBC=5, const double percent_to_move=1)
+                          const double theta=0.5, const uint miniter=2, const uint maxiter=5,
+                          const uint miniterBC=5, const double percent_to_move=1)
     :MeshSmoother(mesh),
      _percent_to_move(percent_to_move),
      _adapt_data(adapt_data),
@@ -139,18 +139,18 @@ public:
   {}
 
   enum metric_type
-  {
-    uniform=1,
-    volumetric=2,
-    directional=3
-  };
+    {
+      uniform=1,
+      volumetric=2,
+      directional=3
+    };
 
   enum adapt_type
-  {
-    cell=-1,
-    none=0,
-    node=1
-  };
+    {
+      cell=-1,
+      none=0,
+      node=1
+    };
 
   /**
    * Destructor.
@@ -272,8 +272,8 @@ private:
               int adp, LPDOUBLE afun, FILE *sout);
 
   double minJ_BC(int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-                double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int msglev,
-                double *Vmin, double *emax, double *qmin, int adp, LPDOUBLE afun, int NCN, FILE *sout);
+                 double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int msglev,
+                 double *Vmin, double *emax, double *qmin, int adp, LPDOUBLE afun, int NCN, FILE *sout);
 
   double localP(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLPDOUBLE R, LPINT cell, LPINT mask, double epsilon,
                 double w, int nvert, LPLPDOUBLE H, int me, double vol, int f, double *Vmin,
@@ -299,13 +299,13 @@ private:
   void gener(char grid[], int n, FILE *sout);
 
   void local_sweep(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-                  int nedges, LPINT edges, LPINT hnodes, double w, LPINT iter, int me,
-                      LPLPLPDOUBLE H, int adp, int OPT, FILE *sout);
+                   int nedges, LPINT edges, LPINT hnodes, double w, LPINT iter, int me,
+                   LPLPLPDOUBLE H, int adp, int OPT, FILE *sout);
 
   double minJ_l(int n, int N, LPLPDOUBLE R, LPINT mask, int ncells, LPLPINT cells, LPINT mcells,
-              double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int nedges,
-              LPINT edges, LPINT hnodes, int msglev, double *Vmin, double *emax, double *qmin,
-              int adp, LPDOUBLE afun, FILE *sout);
+                double epsilon, double w, int me, LPLPLPDOUBLE H, double vol, int nedges,
+                LPINT edges, LPINT hnodes, int msglev, double *Vmin, double *emax, double *qmin,
+                int adp, LPDOUBLE afun, FILE *sout);
 };
 
 } // namespace libMesh

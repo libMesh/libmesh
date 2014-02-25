@@ -51,7 +51,7 @@ class Elem;
  */
 class PostscriptIO : public MeshOutput<MeshBase>
 {
- public:
+public:
   /**
    * Constructor.
    */

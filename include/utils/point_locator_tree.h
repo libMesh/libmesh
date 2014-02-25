@@ -63,7 +63,7 @@ public:
    * use the master's tree.
    */
   PointLocatorTree (const MeshBase& mesh,
-		    const PointLocatorBase* master = NULL);
+                    const PointLocatorBase* master = NULL);
 
 
   /**
@@ -78,8 +78,8 @@ public:
    * the build type.
    */
   PointLocatorTree (const MeshBase& mesh,
-		    const Trees::BuildType build_type,
-		    const PointLocatorBase* master = NULL);
+                    const Trees::BuildType build_type,
+                    const PointLocatorBase* master = NULL);
 
 
 

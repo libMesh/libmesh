@@ -35,23 +35,23 @@ dof_id_type Quad::key (const unsigned int s) const
     {
     case 0:
       return
-	this->compute_key (this->node(0),
-			   this->node(1));
+        this->compute_key (this->node(0),
+                           this->node(1));
 
     case 1:
       return
-	this->compute_key (this->node(1),
-			   this->node(2));
+        this->compute_key (this->node(1),
+                           this->node(2));
 
     case 2:
       return
-	this->compute_key (this->node(2),
-			   this->node(3));
+        this->compute_key (this->node(2),
+                           this->node(3));
 
     case 3:
       return
-	this->compute_key (this->node(3),
-			   this->node(0));
+        this->compute_key (this->node(3),
+                           this->node(0));
     }
 
 
@@ -72,39 +72,39 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
     {
     case 0:
       {
-	edge->set_node(0) = this->get_node(0);
-	edge->set_node(1) = this->get_node(1);
+        edge->set_node(0) = this->get_node(0);
+        edge->set_node(1) = this->get_node(1);
 
         AutoPtr<Elem> ap_edge(edge);
-	return ap_edge;
+        return ap_edge;
       }
     case 1:
       {
-	edge->set_node(0) = this->get_node(1);
-	edge->set_node(1) = this->get_node(2);
+        edge->set_node(0) = this->get_node(1);
+        edge->set_node(1) = this->get_node(2);
 
         AutoPtr<Elem> ap_edge(edge);
-	return ap_edge;
+        return ap_edge;
       }
     case 2:
       {
-	edge->set_node(0) = this->get_node(2);
-	edge->set_node(1) = this->get_node(3);
+        edge->set_node(0) = this->get_node(2);
+        edge->set_node(1) = this->get_node(3);
 
         AutoPtr<Elem> ap_edge(edge);
-	return ap_edge;
+        return ap_edge;
       }
     case 3:
       {
-	edge->set_node(0) = this->get_node(3);
-	edge->set_node(1) = this->get_node(0);
+        edge->set_node(0) = this->get_node(3);
+        edge->set_node(1) = this->get_node(0);
 
         AutoPtr<Elem> ap_edge(edge);
-	return ap_edge;
+        return ap_edge;
       }
     default:
       {
-	libmesh_error();
+        libmesh_error();
       }
     }
 
@@ -118,7 +118,7 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
 
 
 bool Quad::is_child_on_side(const unsigned int c,
-                             const unsigned int s) const
+                            const unsigned int s) const
 {
   libmesh_assert_less (c, this->n_children());
   libmesh_assert_less (s, this->n_sides());
@@ -156,16 +156,16 @@ unsigned int Quad::opposite_node(const unsigned int node_in,
     {1, 0, 3, 2, 255, 7, 255, 5};
 
   switch (side_in)
-  {
-  case 0:
-  case 2:
-    return side02_nodes_map[node_in];
-    break;
-  case 1:
-  case 3:
-    return side13_nodes_map[node_in];
-    break;
-  }
+    {
+    case 0:
+    case 2:
+      return side02_nodes_map[node_in];
+      break;
+    case 1:
+    case 3:
+      return side13_nodes_map[node_in];
+      break;
+    }
 
   libmesh_error();
   return 255;
@@ -185,19 +185,19 @@ Real Quad::quality (const ElemQuality q) const
     case DIAGONAL:
     case STRETCH:
       {
-	// Diagonal between node 0 and node 2
-	const Real d02 = this->length(0,2);
+        // Diagonal between node 0 and node 2
+        const Real d02 = this->length(0,2);
 
-	// Diagonal between node 1 and node 3
-	const Real d13 = this->length(1,3);
+        // Diagonal between node 1 and node 3
+        const Real d13 = this->length(1,3);
 
-	// Find the biggest and smallest diagonals
+        // Find the biggest and smallest diagonals
         if ( (d02 > 0.) && (d13 >0.) )
           if (d02 < d13) return d02 / d13;
           else return d13 / d02;
         else
           return 0.;
-	break;
+        break;
       }
 
     default:
@@ -294,29 +294,29 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
 
 
 const unsigned short int Quad::_second_order_adjacent_vertices[4][2] =
-{
-  {0, 1}, // vertices adjacent to node 4
-  {1, 2}, // vertices adjacent to node 5
-  {2, 3}, // vertices adjacent to node 6
-  {0, 3}  // vertices adjacent to node 7
-};
+  {
+    {0, 1}, // vertices adjacent to node 4
+    {1, 2}, // vertices adjacent to node 5
+    {2, 3}, // vertices adjacent to node 6
+    {0, 3}  // vertices adjacent to node 7
+  };
 
 
 
 const unsigned short int Quad::_second_order_vertex_child_number[9] =
-{
-  99,99,99,99, // Vertices
-  0,1,2,0,     // Edges
-  0            // Interior
-};
+  {
+    99,99,99,99, // Vertices
+    0,1,2,0,     // Edges
+    0            // Interior
+  };
 
 
 
 const unsigned short int Quad::_second_order_vertex_child_index[9] =
-{
-  99,99,99,99, // Vertices
-  1,2,3,3,     // Edges
-  2            // Interior
-};
+  {
+    99,99,99,99, // Vertices
+    1,2,3,3,     // Edges
+    2            // Interior
+  };
 
 } // namespace libMesh

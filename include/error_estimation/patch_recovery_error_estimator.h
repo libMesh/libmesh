@@ -73,9 +73,9 @@ public:
    * \p error_per_cell
    */
   virtual void estimate_error (const System& system,
-			       ErrorVector& error_per_cell,
-			       const NumericVector<Number>* solution_vector = NULL,
-			       bool estimate_parent_error = false);
+                               ErrorVector& error_per_cell,
+                               const NumericVector<Number>* solution_vector = NULL,
+                               bool estimate_parent_error = false);
 
   /**
    * The PatchErrorEstimator will build patches of at least this many
@@ -93,20 +93,20 @@ public:
 
   void set_patch_reuse (bool );
 
- protected:
+protected:
 
   /**
    * Returns the spectral polynomial basis function values at a point x,y,z
    */
 
   static std::vector<Real> specpoly(const unsigned int dim,
-				    const Order order,
-				    const Point p,
-				    const unsigned int matsize);
+                                    const Order order,
+                                    const Point p,
+                                    const unsigned int matsize);
 
   bool patch_reuse ;
 
- private:
+private:
 
   /**
    * Class to compute the error contribution for a range
@@ -116,8 +116,8 @@ public:
   {
   public:
     EstimateError (const System& sys,
-		   const PatchRecoveryErrorEstimator &ee,
-		   ErrorVector& epc) :
+                   const PatchRecoveryErrorEstimator &ee,
+                   ErrorVector& epc) :
       system(sys),
       error_estimator(ee),
       error_per_cell(epc)

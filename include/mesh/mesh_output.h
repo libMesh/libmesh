@@ -54,7 +54,7 @@ class EquationSystems;
 template <class MT>
 class MeshOutput
 {
- protected:
+protected:
 
   /**
    * Default constructor. Will set the _obj to NULL, effectively
@@ -71,7 +71,7 @@ class MeshOutput
   MeshOutput (const MT&, const bool is_parallel_format = false);
 
 
- public:
+public:
 
   /**
    * Destructor.
@@ -88,16 +88,16 @@ class MeshOutput
    * where the data is taken from the \p EquationSystems object.
    */
   virtual void write_equation_systems (const std::string&,
-				       const EquationSystems&,
-				       const std::set<std::string>* system_names=NULL);
+                                       const EquationSystems&,
+                                       const std::set<std::string>* system_names=NULL);
 
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
    */
   virtual void write_nodal_data (const std::string&,
-				 const std::vector<Number>&,
-				 const std::vector<std::string>&)
+                                 const std::vector<Number>&,
+                                 const std::vector<std::string>&)
   { libmesh_error(); }
 
   /**
@@ -109,7 +109,7 @@ class MeshOutput
    */
   unsigned int & ascii_precision ();
 
- protected:
+protected:
 
 
   /**
@@ -126,7 +126,7 @@ class MeshOutput
   const bool _is_parallel_format;
 
 
- private:
+private:
 
 
   /**
@@ -147,8 +147,8 @@ class MeshOutput
    * systems specified in system_names.
    */
   void _build_variable_names_and_solution_vector(const EquationSystems& es,
-						 std::vector<Number>& soln,
-						 std::vector<std::string>& names,
+                                                 std::vector<Number>& soln,
+                                                 std::vector<std::string>& names,
                                                  const std::set<std::string>* system_names=NULL);
 };
 
@@ -179,12 +179,12 @@ MeshOutput<MT>::MeshOutput (const MT& obj, const bool is_parallel_format) :
   if (!_is_parallel_format && !this->mesh().is_serial())
     {
       if (this->mesh().processor_id() == 0)
-	{
+        {
           libmesh_do_once(libMesh::out <<
-            "Warning:  This MeshOutput subclass only supports meshes which have been serialized!"
-            << std::endl;);
+                          "Warning:  This MeshOutput subclass only supports meshes which have been serialized!"
+                          << std::endl;);
         }
-//      libmesh_error();
+      //      libmesh_error();
     }
 }
 
@@ -201,8 +201,8 @@ MeshOutput<MT>::~MeshOutput ()
 template <class MT>
 inline
 void MeshOutput<MT>::write_equation_systems (const std::string& fname,
-					     const EquationSystems& es,
-					     const std::set<std::string>* system_names)
+                                             const EquationSystems& es,
+                                             const std::set<std::string>* system_names)
 {
   START_LOG("write_equation_systems()", "MeshOutput");
 
@@ -220,8 +220,8 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
       libmesh_assert(!my_mesh.allow_renumbering());
 
       libmesh_do_once(libMesh::out <<
-        "Warning:  This MeshOutput subclass only supports meshes which are contiguously renumbered!"
-        << std::endl;);
+                      "Warning:  This MeshOutput subclass only supports meshes which are contiguously renumbered!"
+                      << std::endl;);
 
       my_mesh.allow_renumbering(true);
 

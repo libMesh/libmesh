@@ -16,11 +16,11 @@
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 
- // <h1>Vector Finite Element Example 1 - Solving an uncoupled Poisson Problem</h1>
- //
- // This is the first vector FE example program.  It builds on
- // the introduction_ex3 example program by showing how to solve a simple
- // uncoupled Poisson system using vector Lagrange elements.
+// <h1>Vector Finite Element Example 1 - Solving an uncoupled Poisson Problem</h1>
+//
+// This is the first vector FE example program.  It builds on
+// the introduction_ex3 example program by showing how to solve a simple
+// uncoupled Poisson system using vector Lagrange elements.
 
 // C++ include files that we need
 #include <iostream>
@@ -68,7 +68,7 @@ void assemble_poisson(EquationSystems& es,
 
 // Function prototype for the exact solution.
 Real exact_solution (const int component,
-		     const Real x,
+                     const Real x,
                      const Real y,
                      const Real z = 0.);
 
@@ -341,18 +341,18 @@ void assemble_poisson(EquationSystems& es,
             // on the location of the quadrature point (q_point[qp])
             // we will compute it here, outside of the i-loop
             const Real fx = -(exact_solution(0,x,y-eps) +
-			      exact_solution(0,x,y+eps) +
-			      exact_solution(0,x-eps,y) +
-			      exact_solution(0,x+eps,y) -
-			      4.*exact_solution(0,x,y))/eps/eps;
+                              exact_solution(0,x,y+eps) +
+                              exact_solution(0,x-eps,y) +
+                              exact_solution(0,x+eps,y) -
+                              4.*exact_solution(0,x,y))/eps/eps;
 
-	    const Real fy = -(exact_solution(1,x,y-eps) +
-			      exact_solution(1,x,y+eps) +
-			      exact_solution(1,x-eps,y) +
-			      exact_solution(1,x+eps,y) -
-			      4.*exact_solution(1,x,y))/eps/eps;
+            const Real fy = -(exact_solution(1,x,y-eps) +
+                              exact_solution(1,x,y+eps) +
+                              exact_solution(1,x-eps,y) +
+                              exact_solution(1,x+eps,y) -
+                              4.*exact_solution(1,x,y))/eps/eps;
 
-	    const RealGradient f( fx, fy );
+            const RealGradient f( fx, fy );
 
             for (unsigned int i=0; i<phi.size(); i++)
               Fe(i) += JxW[qp]*f*phi[i][qp];
@@ -428,8 +428,8 @@ void assemble_poisson(EquationSystems& es,
                   const Real penalty = 1.e10;
 
                   // The boundary values.
-		  const RealGradient f( exact_solution(0, xf, yf),
-					exact_solution(1, xf, yf) );
+                  const RealGradient f( exact_solution(0, xf, yf),
+                                        exact_solution(1, xf, yf) );
 
                   // Matrix contribution of the L2 projection.
                   for (unsigned int i=0; i<phi_face.size(); i++)

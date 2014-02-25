@@ -103,45 +103,45 @@ void UnsteadySolver::solve ()
   if (reduce_deltat_on_diffsolver_failure)
     {
       bool backtracking_failed =
-	solve_result & DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
+        solve_result & DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
 
       bool max_iterations =
-	solve_result & DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
+        solve_result & DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
 
       if (backtracking_failed || max_iterations)
-	{
-	  // Cut timestep in half
-	  for (unsigned int nr=0; nr<reduce_deltat_on_diffsolver_failure; ++nr)
-	    {
-	      _system.deltat *= 0.5;
-	      libMesh::out << "Newton backtracking failed.  Trying with smaller timestep, dt="
-			    << _system.deltat << std::endl;
+        {
+          // Cut timestep in half
+          for (unsigned int nr=0; nr<reduce_deltat_on_diffsolver_failure; ++nr)
+            {
+              _system.deltat *= 0.5;
+              libMesh::out << "Newton backtracking failed.  Trying with smaller timestep, dt="
+                           << _system.deltat << std::endl;
 
-	      solve_result = _diff_solver->solve();
+              solve_result = _diff_solver->solve();
 
-	      // Check solve results with reduced timestep
-	      bool backtracking_still_failed =
-		solve_result & DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
+              // Check solve results with reduced timestep
+              bool backtracking_still_failed =
+                solve_result & DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
 
-	      bool backtracking_max_iterations =
-		solve_result & DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
+              bool backtracking_max_iterations =
+                solve_result & DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
 
-	      if (!backtracking_still_failed && !backtracking_max_iterations)
-		{
-		  if (!quiet)
-		    libMesh::out << "Reduced dt solve succeeded." << std::endl;
-		  return;
-		}
-	    }
+              if (!backtracking_still_failed && !backtracking_max_iterations)
+                {
+                  if (!quiet)
+                    libMesh::out << "Reduced dt solve succeeded." << std::endl;
+                  return;
+                }
+            }
 
-	  // If we made it here, we still couldn't converge the solve after
-	  // reducing deltat
-	  libMesh::out << "DiffSolver::solve() did not succeed after "
-		        << reduce_deltat_on_diffsolver_failure
-		        << " attempts." << std::endl;
-	  libmesh_convergence_failure();
+          // If we made it here, we still couldn't converge the solve after
+          // reducing deltat
+          libMesh::out << "DiffSolver::solve() did not succeed after "
+                       << reduce_deltat_on_diffsolver_failure
+                       << " attempts." << std::endl;
+          libmesh_convergence_failure();
 
-  	} // end if (backtracking_failed || max_iterations)
+        } // end if (backtracking_failed || max_iterations)
     } // end if (reduce_deltat_on_diffsolver_failure)
 }
 
@@ -160,7 +160,7 @@ void UnsteadySolver::advance_timestep ()
     }
 
   NumericVector<Number> &old_nonlinear_soln =
-  _system.get_vector("_old_nonlinear_solution");
+    _system.get_vector("_old_nonlinear_solution");
   NumericVector<Number> &nonlinear_solution =
     *(_system.solution);
 
@@ -199,20 +199,20 @@ void UnsteadySolver::adjoint_advance_timestep ()
      _system.get_dof_map().get_send_list());
 }
 
-  void UnsteadySolver::retrieve_timestep()
-  {
-    // Retrieve all the stored vectors at the current time
-    solution_history->retrieve();
+void UnsteadySolver::retrieve_timestep()
+{
+  // Retrieve all the stored vectors at the current time
+  solution_history->retrieve();
 
-    // Dont forget to localize the old_nonlinear_solution !
-    _system.get_vector("_old_nonlinear_solution").localize
+  // Dont forget to localize the old_nonlinear_solution !
+  _system.get_vector("_old_nonlinear_solution").localize
     (*old_local_nonlinear_solution,
      _system.get_dof_map().get_send_list());
-  }
+}
 
 
 Number UnsteadySolver::old_nonlinear_solution(const dof_id_type global_dof_number)
-const
+  const
 {
   libmesh_assert_less (global_dof_number, _system.get_dof_map().n_dofs());
   libmesh_assert_less (global_dof_number, old_local_nonlinear_solution->size());

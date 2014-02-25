@@ -37,10 +37,10 @@ namespace libMesh
 {
 
 DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, EquationSystems & in_es):
-    comm(in_comm),
-    es(in_es),
-    mesh(in_es.get_mesh()),
-    dim(mesh.mesh_dimension())
+  comm(in_comm),
+  es(in_es),
+  mesh(in_es.get_mesh()),
+  dim(mesh.mesh_dimension())
 {
   std::set<unsigned int> semi_local_nodes;
   get_semi_local_nodes(semi_local_nodes);
@@ -57,16 +57,16 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
     for(std::set<unsigned int>::iterator it = semi_local_nodes.begin();
         it != semi_local_nodes.end();
         ++it)
-    {
-      const Node & node = mesh.node(*it);
+      {
+        const Node & node = mesh.node(*it);
 
-      vertices[i] = node.id();
+        vertices[i] = node.id();
 
-      for(unsigned int j=0; j<dim; j++)
-        coordinates[(j*num_local_nodes) + i] = node(j);
+        for(unsigned int j=0; j<dim; j++)
+          coordinates[(j*num_local_nodes) + i] = node(j);
 
-      i++;
-    }
+        i++;
+      }
   }
 
   // Currently assuming all elements are the same!
@@ -86,15 +86,15 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
     for(MeshBase::const_element_iterator it = mesh.local_elements_begin();
         it != end;
         ++it)
-    {
-      const Elem & elem = *(*it);
-      elements[i] = elem.id();
+      {
+        const Elem & elem = *(*it);
+        elements[i] = elem.id();
 
-      for(unsigned int j=0; j<n_nodes_per_elem; j++)
-        connectivity[(j*n_local_elem)+i] = elem.node(j);
+        for(unsigned int j=0; j<n_nodes_per_elem; j++)
+          connectivity[(j*n_local_elem)+i] = elem.node(j);
 
-      i++;
-    }
+        i++;
+      }
   }
 
   Teuchos::ArrayRCP<int> permutation_list(n_nodes_per_elem);
@@ -102,58 +102,58 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
     permutation_list[i] = i;
 
   /*
-  if(this->processor_id() == 1)
+    if(this->processor_id() == 1)
     sleep(1);
 
-  libMesh::out<<"n_nodes_per_elem: "<<n_nodes_per_elem<<std::endl;
+    libMesh::out<<"n_nodes_per_elem: "<<n_nodes_per_elem<<std::endl;
 
-  libMesh::out<<"Dim: "<<dim<<std::endl;
+    libMesh::out<<"Dim: "<<dim<<std::endl;
 
-  libMesh::err<<"Vertices size: "<<vertices.size()<<std::endl;
-  {
+    libMesh::err<<"Vertices size: "<<vertices.size()<<std::endl;
+    {
     libMesh::err<<this->processor_id()<<" Vertices: ";
 
     for(unsigned int i=0; i<vertices.size(); i++)
-      libMesh::err<<vertices[i]<<" ";
+    libMesh::err<<vertices[i]<<" ";
 
     libMesh::err<<std::endl;
-  }
+    }
 
-  libMesh::err<<"Coordinates size: "<<coordinates.size()<<std::endl;
-  {
+    libMesh::err<<"Coordinates size: "<<coordinates.size()<<std::endl;
+    {
     libMesh::err<<this->processor_id()<<" Coordinates: ";
 
     for(unsigned int i=0; i<coordinates.size(); i++)
-      libMesh::err<<coordinates[i]<<" ";
+    libMesh::err<<coordinates[i]<<" ";
 
     libMesh::err<<std::endl;
-  }
+    }
 
-  libMesh::err<<"Connectivity size: "<<connectivity.size()<<std::endl;
-  {
+    libMesh::err<<"Connectivity size: "<<connectivity.size()<<std::endl;
+    {
     libMesh::err<<this->processor_id()<<" Connectivity: ";
 
     for(unsigned int i=0; i<connectivity.size(); i++)
-      libMesh::err<<connectivity[i]<<" ";
+    libMesh::err<<connectivity[i]<<" ";
 
     libMesh::err<<std::endl;
-  }
+    }
 
-  libMesh::err<<"Permutation_List size: "<<permutation_list.size()<<std::endl;
-  {
+    libMesh::err<<"Permutation_List size: "<<permutation_list.size()<<std::endl;
+    {
     libMesh::err<<this->processor_id()<<" Permutation_List: ";
 
     for(unsigned int i=0; i<permutation_list.size(); i++)
-      libMesh::err<<permutation_list[i]<<" ";
+    libMesh::err<<permutation_list[i]<<" ";
 
     libMesh::err<<std::endl;
-  }
+    }
 
   */
   Teuchos::RCP<MeshContainerType> mesh_container = Teuchos::rcp(
-    new MeshContainerType(dim, vertices, coordinates,
-                          element_topology, n_nodes_per_elem,
-                          elements, connectivity, permutation_list) );
+                                                                new MeshContainerType(dim, vertices, coordinates,
+                                                                                      element_topology, n_nodes_per_elem,
+                                                                                      elements, connectivity, permutation_list) );
 
   // We only have 1 element topology in this grid so we make just one mesh block
   Teuchos::ArrayRCP<Teuchos::RCP<MeshContainerType> > mesh_blocks(1);
@@ -170,12 +170,12 @@ DTKAdapter::RCP_Evaluator
 DTKAdapter::get_variable_evaluator(std::string var_name)
 {
   if(evaluators.find(var_name) == evaluators.end()) // We haven't created an evaluator for the variable yet
-  {
-    System * sys = find_sys(var_name);
+    {
+      System * sys = find_sys(var_name);
 
-    // Create the FieldEvaluator
-    evaluators[var_name] = Teuchos::rcp(new DTKEvaluator(*sys, var_name));
-  }
+      // Create the FieldEvaluator
+      evaluators[var_name] = Teuchos::rcp(new DTKEvaluator(*sys, var_name));
+    }
 
   return evaluators[var_name];
 }
@@ -184,11 +184,11 @@ Teuchos::RCP<DataTransferKit::FieldManager<DTKAdapter::FieldContainerType> >
 DTKAdapter::get_values_to_fill(std::string var_name)
 {
   if(values_to_fill.find(var_name) == values_to_fill.end())
-  {
-    Teuchos::ArrayRCP<double> data_space(num_local_nodes);
-    Teuchos::RCP<FieldContainerType> field_container = Teuchos::rcp(new FieldContainerType(data_space, 1));
-    values_to_fill[var_name] = Teuchos::rcp(new DataTransferKit::FieldManager<FieldContainerType>(field_container, comm));
-  }
+    {
+      Teuchos::ArrayRCP<double> data_space(num_local_nodes);
+      Teuchos::RCP<FieldContainerType> field_container = Teuchos::rcp(new FieldContainerType(data_space, 1));
+      values_to_fill[var_name] = Teuchos::rcp(new DataTransferKit::FieldManager<FieldContainerType>(field_container, comm));
+    }
 
   return values_to_fill[var_name];
 }
@@ -204,19 +204,19 @@ DTKAdapter::update_variable_values(std::string var_name)
   unsigned int i=0;
   // Loop over the values (one for each node) and assign the value of this variable at each node
   for(FieldContainerType::iterator it=values->begin(); it != values->end(); ++it)
-  {
-    unsigned int node_num = vertices[i];
-    const Node & node = mesh.node(node_num);
-
-    if(node.processor_id() == sys->processor_id())
     {
-      // The 0 is for the component... this only works for LAGRANGE!
-      dof_id_type dof = node.dof_number(sys->number(), var_num, 0);
-      sys->solution->set(dof, *it);
-    }
+      unsigned int node_num = vertices[i];
+      const Node & node = mesh.node(node_num);
 
-    i++;
-  }
+      if(node.processor_id() == sys->processor_id())
+        {
+          // The 0 is for the component... this only works for LAGRANGE!
+          dof_id_type dof = node.dof_number(sys->number(), var_num, 0);
+          sys->solution->set(dof, *it);
+        }
+
+      i++;
+    }
 
   sys->solution->close();
 }
@@ -234,13 +234,13 @@ DTKAdapter::find_sys(std::string var_name)
 
   // Find the system this variable is from
   for(unsigned int i=0; i<es.n_systems(); i++)
-  {
-    if(es.get_system(i).has_variable(var_name))
     {
-      sys = &es.get_system(i);
-      break;
+      if(es.get_system(i).has_variable(var_name))
+        {
+          sys = &es.get_system(i);
+          break;
+        }
     }
-  }
 
   libmesh_assert(sys);
 
@@ -276,12 +276,12 @@ DTKAdapter::get_semi_local_nodes(std::set<unsigned int> & semi_local_nodes)
   for(MeshBase::const_element_iterator it = mesh.local_elements_begin();
       it != end;
       ++it)
-  {
-    const Elem & elem = *(*it);
+    {
+      const Elem & elem = *(*it);
 
-    for(unsigned int j=0; j<elem.n_nodes(); j++)
-      semi_local_nodes.insert(elem.node(j));
-  }
+      for(unsigned int j=0; j<elem.n_nodes(); j++)
+        semi_local_nodes.insert(elem.node(j));
+    }
 }
 
 } // namespace libMesh

@@ -76,7 +76,7 @@ namespace libMesh
 template <typename T>
 class StatisticsVector : public std::vector<T>
 {
- public:
+public:
 
   /**
    * Call the std::vector constructor.
@@ -190,7 +190,7 @@ class StatisticsVector : public std::vector<T>
    * Source: GNU Scientific Library
    */
   virtual void histogram (std::vector<dof_id_type>& bin_members,
-			  unsigned int n_bins=10);
+                          unsigned int n_bins=10);
 
   /**
    * Generates a Matlab/Octave style file which can be used to
@@ -200,14 +200,14 @@ class StatisticsVector : public std::vector<T>
    * the order of the vector.
    */
   void plot_histogram(const processor_id_type my_procid,
-		      const std::string& filename,
-		      unsigned int n_bins);
+                      const std::string& filename,
+                      unsigned int n_bins);
 
   /**
    * A const version of the histogram function.
    */
   virtual void histogram (std::vector<dof_id_type>& bin_members,
-			  unsigned int n_bins=10) const;
+                          unsigned int n_bins=10) const;
 
   /**
    * Returns a vector of dof_id_types which correspond
@@ -226,7 +226,7 @@ class StatisticsVector : public std::vector<T>
   virtual std::vector<dof_id_type> cut_above(Real cut) const;
 
 
- private:
+private:
 
 };
 

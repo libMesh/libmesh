@@ -30,24 +30,24 @@ public:
   ~LaplaceExactSolution(){}
 
   Real operator()( unsigned int component,
-		   Real x, Real y, Real z = 0.0)
+                   Real x, Real y, Real z = 0.0)
   {
     const Real hp = 0.5*pi;
 
     switch(component)
-    {
-    case 0:
-      return cos(hp*x)*sin(hp*y)*cos(hp*z);
+      {
+      case 0:
+        return cos(hp*x)*sin(hp*y)*cos(hp*z);
 
-    case 1:
-      return sin(hp*x)*cos(hp*y)*cos(hp*z);
+      case 1:
+        return sin(hp*x)*cos(hp*y)*cos(hp*z);
 
-    case 2:
-      return sin(hp*x)*cos(hp*y)*sin(hp*z);
+      case 2:
+        return sin(hp*x)*cos(hp*y)*sin(hp*z);
 
-    default:
-      libmesh_error();
-    }
+      default:
+        libmesh_error();
+      }
   }
 };
 
@@ -60,30 +60,30 @@ public:
   ~LaplaceExactGradient(){}
 
   RealGradient operator()( unsigned int component,
-			   Real x, Real y, Real z = 0.0)
+                           Real x, Real y, Real z = 0.0)
   {
     const Real hp = 0.5*pi;
 
     switch(component)
-    {
-    case 0:
-      return RealGradient( -hp*sin(hp*x)*sin(hp*y)*cos(hp*z),
-			   cos(hp*x)*(hp)*cos(hp*y)*cos(hp*z),
-			   cos(hp*x)*sin(hp*y)*(-hp)*sin(hp*z) );
+      {
+      case 0:
+        return RealGradient( -hp*sin(hp*x)*sin(hp*y)*cos(hp*z),
+                             cos(hp*x)*(hp)*cos(hp*y)*cos(hp*z),
+                             cos(hp*x)*sin(hp*y)*(-hp)*sin(hp*z) );
 
-    case 1:
-      return RealGradient( hp*cos(hp*x)*cos(hp*y)*cos(hp*z),
-			   sin(hp*x)*(-hp)*sin(hp*y)*cos(hp*z),
-			   sin(hp*x)*cos(hp*y)*(-hp)*sin(hp*z) );
+      case 1:
+        return RealGradient( hp*cos(hp*x)*cos(hp*y)*cos(hp*z),
+                             sin(hp*x)*(-hp)*sin(hp*y)*cos(hp*z),
+                             sin(hp*x)*cos(hp*y)*(-hp)*sin(hp*z) );
 
-    case 2:
-      return RealGradient( hp*cos(hp*x)*cos(hp*y)*sin(hp*z),
-			   sin(hp*x)*(-hp)*sin(hp*y)*sin(hp*z),
-			   sin(hp*x)*cos(hp*y)*(hp)*cos(hp*z) );
+      case 2:
+        return RealGradient( hp*cos(hp*x)*cos(hp*y)*sin(hp*z),
+                             sin(hp*x)*(-hp)*sin(hp*y)*sin(hp*z),
+                             sin(hp*x)*cos(hp*y)*(hp)*cos(hp*z) );
 
-    default:
-      libmesh_error();
-    }
+      default:
+        libmesh_error();
+      }
   }
 };
 

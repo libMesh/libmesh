@@ -32,7 +32,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // LinearPartitioner implementation
 void LinearPartitioner::_do_partition (MeshBase& mesh,
-				       const unsigned int n)
+                                       const unsigned int n)
 {
   libmesh_assert_greater (n, 0);
 
@@ -57,20 +57,20 @@ void LinearPartitioner::_do_partition (MeshBase& mesh,
 
     for ( ; elem_it != elem_end; ++elem_it)
       {
-	if ((e/blksize) < n)
+        if ((e/blksize) < n)
           {
             Elem *elem = *elem_it;
-	    elem->processor_id() =
-	      libmesh_cast_int<processor_id_type>(e/blksize);
+            elem->processor_id() =
+              libmesh_cast_int<processor_id_type>(e/blksize);
           }
-	else
+        else
           {
             Elem *elem = *elem_it;
-	    elem->processor_id() = 0;
-	    elem = elem->parent();
-	  }
+            elem->processor_id() = 0;
+            elem = elem->parent();
+          }
 
-	e++;
+        e++;
       }
 
     STOP_LOG ("partition()", "LinearPartitioner");

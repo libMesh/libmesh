@@ -31,13 +31,13 @@ namespace libMesh
 
 template <>
 Real FE<3,CLOUGH>::shape(const ElemType,
-			     const Order,
-			     const unsigned int,
-			     const Point&)
+                         const Order,
+                         const unsigned int,
+                         const Point&)
 {
   libMesh::err << "Clough-Tocher elements require the real element\n"
-	        << "to construct gradient-based degrees of freedom."
-	        << std::endl;
+               << "to construct gradient-based degrees of freedom."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -47,9 +47,9 @@ Real FE<3,CLOUGH>::shape(const ElemType,
 
 template <>
 Real FE<3,CLOUGH>::shape(const Elem* elem,
-			     const Order,
-			     const unsigned int,
-			     const Point&)
+                         const Order,
+                         const unsigned int,
+                         const Point&)
 {
   libmesh_assert(elem);
 
@@ -61,14 +61,14 @@ Real FE<3,CLOUGH>::shape(const Elem* elem,
 
 template <>
 Real FE<3,CLOUGH>::shape_deriv(const ElemType,
-				   const Order,
-				   const unsigned int,
-				   const unsigned int,
-				   const Point&)
+                               const Order,
+                               const unsigned int,
+                               const unsigned int,
+                               const Point&)
 {
   libMesh::err << "Clough-Tocher elements require the real element\n"
-	        << "to construct gradient-based degrees of freedom."
-	        << std::endl;
+               << "to construct gradient-based degrees of freedom."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -78,10 +78,10 @@ Real FE<3,CLOUGH>::shape_deriv(const ElemType,
 
 template <>
 Real FE<3,CLOUGH>::shape_deriv(const Elem* elem,
-				   const Order,
-				   const unsigned int,
-				   const unsigned int,
-				   const Point&)
+                               const Order,
+                               const unsigned int,
+                               const unsigned int,
+                               const Point&)
 {
   libmesh_assert(elem);
   libmesh_not_implemented();

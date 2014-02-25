@@ -50,8 +50,8 @@ template <unsigned int N, typename T> class TypeNTensor;
 template <typename T>
 class TypeTensor
 {
-template <typename T2>
-friend class TypeTensor;
+  template <typename T2>
+  friend class TypeTensor;
 
 protected:
 
@@ -68,14 +68,14 @@ protected:
    * etc. arguments also be given explicitly.
    */
   explicit TypeTensor  (const T xx,
-	                const T xy=0,
-	                const T xz=0,
-	                const T yx=0,
-	                const T yy=0,
-	                const T yz=0,
-	                const T zx=0,
-	                const T zy=0,
-	                const T zz=0);
+                        const T xy=0,
+                        const T xz=0,
+                        const T yx=0,
+                        const T yy=0,
+                        const T yz=0,
+                        const T zx=0,
+                        const T zy=0,
+                        const T zz=0);
 
 
   /**
@@ -83,16 +83,16 @@ protected:
    */
   template <typename Scalar>
   explicit TypeTensor  (const Scalar xx,
-	                const Scalar xy=0,
-	                const Scalar xz=0,
-	                const Scalar yx=0,
-	                const Scalar yy=0,
-	                const Scalar yz=0,
-	                const Scalar zx=0,
-	                const Scalar zy=0,
+                        const Scalar xy=0,
+                        const Scalar xz=0,
+                        const Scalar yx=0,
+                        const Scalar yy=0,
+                        const Scalar yz=0,
+                        const Scalar zx=0,
+                        const Scalar zy=0,
                         typename
-                          boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                                                 const Scalar>::type zz=0);
+                        boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                        const Scalar>::type zz=0);
 
   /**
    * Constructor.  Assigns each vector to a different row of the
@@ -361,27 +361,27 @@ public:
 
   TypeTensorColumn(TypeTensor<T> &tensor,
                    unsigned int j) :
-     _tensor(&tensor), _j(j) {}
+    _tensor(&tensor), _j(j) {}
 
   /**
    * Return a writeable reference to the \f$ i,this \f$ element of the
    * tensor.
    */
   T & operator () (const unsigned int i)
-    { return (*_tensor)(i,_j); }
+  { return (*_tensor)(i,_j); }
 
   T & slice (const unsigned int i)
-    { return (*_tensor)(i,_j); }
+  { return (*_tensor)(i,_j); }
 
   /**
    * Assign values to this column of the tensor.
    */
   TypeTensorColumn<T>& operator = (const TypeVector<T>& rhs)
-    {
-      for (unsigned int i=0; i != LIBMESH_DIM; ++i)
-        (*this)(i) = rhs(i);
-      return *this;
-    }
+  {
+    for (unsigned int i=0; i != LIBMESH_DIM; ++i)
+      (*this)(i) = rhs(i);
+    return *this;
+  }
 
 private:
   TypeTensor<T> *_tensor;
@@ -396,16 +396,16 @@ public:
 
   ConstTypeTensorColumn(const TypeTensor<T> &tensor,
                         unsigned int j) :
-     _tensor(&tensor), _j(j) {}
+    _tensor(&tensor), _j(j) {}
 
   /**
    * Return the \f$ i,this \f$ element of the tensor.
    */
   const T & operator () (const unsigned int i) const
-    { return (*_tensor)(i,_j); }
+  { return (*_tensor)(i,_j); }
 
   const T & slice (const unsigned int i) const
-    { return (*_tensor)(i,_j); }
+  { return (*_tensor)(i,_j); }
 
 private:
   const TypeTensor<T> *_tensor;
@@ -440,15 +440,15 @@ TypeTensor<T>::TypeTensor ()
 template <typename T>
 inline
 TypeTensor<T>::TypeTensor
-  (const T xx,
-   const T xy,
-   const T xz,
-   const T yx,
-   const T yy,
-   const T yz,
-   const T zx,
-   const T zy,
-   const T zz)
+(const T xx,
+ const T xy,
+ const T xz,
+ const T yx,
+ const T yy,
+ const T yz,
+ const T zx,
+ const T zy,
+ const T zz)
 {
   _coords[0] = xx;
 
@@ -475,17 +475,17 @@ template <typename T>
 template <typename Scalar>
 inline
 TypeTensor<T>::TypeTensor
-  (const Scalar xx,
-   const Scalar xy,
-   const Scalar xz,
-   const Scalar yx,
-   const Scalar yy,
-   const Scalar yz,
-   const Scalar zx,
-   const Scalar zy,
-   typename
-     boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-                            const Scalar>::type zz)
+(const Scalar xx,
+ const Scalar xy,
+ const Scalar xz,
+ const Scalar yx,
+ const Scalar yy,
+ const Scalar yz,
+ const Scalar zx,
+ const Scalar zy,
+ typename
+ boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+ const Scalar>::type zz)
 {
   _coords[0] = xx;
 
@@ -580,7 +580,7 @@ void TypeTensor<T>::assign (const TypeTensor<T2> &p)
 template <typename T>
 inline
 const T & TypeTensor<T>::operator () (const unsigned int i,
-			      const unsigned int j) const
+                                      const unsigned int j) const
 {
   libmesh_assert_less (i, 3);
   libmesh_assert_less (j, 3);
@@ -599,15 +599,15 @@ const T & TypeTensor<T>::operator () (const unsigned int i,
 template <typename T>
 inline
 T & TypeTensor<T>::operator () (const unsigned int i,
-				const unsigned int j)
+                                const unsigned int j)
 {
 #if LIBMESH_DIM < 3
 
   if (i >= LIBMESH_DIM || j >= LIBMESH_DIM)
     {
-//       libMesh::err << "ERROR:  You are assigning to a tensor component" << std::endl
-// 		<< "that is out of range for the compiled LIBMESH_DIM!"      << std::endl
-// 		<< " LIBMESH_DIM=" << LIBMESH_DIM << " , i=" << i << " , j=" << j << std::endl;
+      //       libMesh::err << "ERROR:  You are assigning to a tensor component" << std::endl
+      // << "that is out of range for the compiled LIBMESH_DIM!"      << std::endl
+      // << " LIBMESH_DIM=" << LIBMESH_DIM << " , i=" << i << " , j=" << j << std::endl;
       libmesh_error();
     }
 
@@ -666,22 +666,22 @@ TypeTensor<T>::operator + (const TypeTensor<T2> &p) const
 
 #if LIBMESH_DIM == 2
   return TypeTensor(_coords[0] + p._coords[0],
-		    _coords[1] + p._coords[1],
-		    0.,
-		    _coords[2] + p._coords[2],
-		    _coords[3] + p._coords[3]);
+                    _coords[1] + p._coords[1],
+                    0.,
+                    _coords[2] + p._coords[2],
+                    _coords[3] + p._coords[3]);
 #endif
 
 #if LIBMESH_DIM == 3
   return TypeTensor(_coords[0] + p._coords[0],
-		    _coords[1] + p._coords[1],
-		    _coords[2] + p._coords[2],
-		    _coords[3] + p._coords[3],
-		    _coords[4] + p._coords[4],
-		    _coords[5] + p._coords[5],
-		    _coords[6] + p._coords[6],
-		    _coords[7] + p._coords[7],
-		    _coords[8] + p._coords[8]);
+                    _coords[1] + p._coords[1],
+                    _coords[2] + p._coords[2],
+                    _coords[3] + p._coords[3],
+                    _coords[4] + p._coords[4],
+                    _coords[5] + p._coords[5],
+                    _coords[6] + p._coords[6],
+                    _coords[7] + p._coords[7],
+                    _coords[8] + p._coords[8]);
 #endif
 
 }
@@ -736,22 +736,22 @@ TypeTensor<T>::operator - (const TypeTensor<T2> &p) const
 
 #if LIBMESH_DIM == 2
   return TypeTensor(_coords[0] - p._coords[0],
-		    _coords[1] - p._coords[1],
-		    0.,
-		    _coords[2] - p._coords[2],
-		    _coords[3] - p._coords[3]);
+                    _coords[1] - p._coords[1],
+                    0.,
+                    _coords[2] - p._coords[2],
+                    _coords[3] - p._coords[3]);
 #endif
 
 #if LIBMESH_DIM == 3
   return TypeTensor(_coords[0] - p._coords[0],
-		    _coords[1] - p._coords[1],
-		    _coords[2] - p._coords[2],
-		    _coords[3] - p._coords[3],
-		    _coords[4] - p._coords[4],
-		    _coords[5] - p._coords[5],
-		    _coords[6] - p._coords[6],
-		    _coords[7] - p._coords[7],
-		    _coords[8] - p._coords[8]);
+                    _coords[1] - p._coords[1],
+                    _coords[2] - p._coords[2],
+                    _coords[3] - p._coords[3],
+                    _coords[4] - p._coords[4],
+                    _coords[5] - p._coords[5],
+                    _coords[6] - p._coords[6],
+                    _coords[7] - p._coords[7],
+                    _coords[8] - p._coords[8]);
 #endif
 
 }
@@ -803,21 +803,21 @@ TypeTensor<T> TypeTensor<T>::operator - () const
 
 #if LIBMESH_DIM == 2
   return TypeTensor(-_coords[0],
-		    -_coords[1],
-		    -_coords[2],
-		    -_coords[3]);
+                    -_coords[1],
+                    -_coords[2],
+                    -_coords[3]);
 #endif
 
 #if LIBMESH_DIM == 3
   return TypeTensor(-_coords[0],
-		    -_coords[1],
-		    -_coords[2],
-		    -_coords[3],
-		    -_coords[4],
-		    -_coords[5],
-		    -_coords[6],
-		    -_coords[7],
-		    -_coords[8]);
+                    -_coords[1],
+                    -_coords[2],
+                    -_coords[3],
+                    -_coords[4],
+                    -_coords[5],
+                    -_coords[6],
+                    -_coords[7],
+                    -_coords[8]);
 #endif
 
 }
@@ -841,21 +841,21 @@ TypeTensor<T>::operator * (const Scalar factor) const
 
 #if LIBMESH_DIM == 2
   return TypeTensor<TS>(_coords[0]*factor,
-		        _coords[1]*factor,
-		        _coords[2]*factor,
-		        _coords[3]*factor);
+                        _coords[1]*factor,
+                        _coords[2]*factor,
+                        _coords[3]*factor);
 #endif
 
 #if LIBMESH_DIM == 3
   return TypeTensor<TS>(_coords[0]*factor,
-		        _coords[1]*factor,
-		        _coords[2]*factor,
-		        _coords[3]*factor,
-		        _coords[4]*factor,
-		        _coords[5]*factor,
-		        _coords[6]*factor,
-		        _coords[7]*factor,
-		        _coords[8]*factor);
+                        _coords[1]*factor,
+                        _coords[2]*factor,
+                        _coords[3]*factor,
+                        _coords[4]*factor,
+                        _coords[5]*factor,
+                        _coords[6]*factor,
+                        _coords[7]*factor,
+                        _coords[8]*factor);
 #endif
 }
 
@@ -867,7 +867,7 @@ typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
   TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
 operator * (const Scalar factor,
-	    const TypeTensor<T> &t)
+            const TypeTensor<T> &t)
 {
   return t * factor;
 }
@@ -906,21 +906,21 @@ TypeTensor<T>::operator / (const Scalar factor) const
 
 #if LIBMESH_DIM == 2
   return TypeTensor<TS>(_coords[0]/factor,
-		        _coords[1]/factor,
-		        _coords[2]/factor,
-		        _coords[3]/factor);
+                        _coords[1]/factor,
+                        _coords[2]/factor,
+                        _coords[3]/factor);
 #endif
 
 #if LIBMESH_DIM == 3
   return TypeTensor<TS>(_coords[0]/factor,
-		        _coords[1]/factor,
-		        _coords[2]/factor,
-		        _coords[3]/factor,
-		        _coords[4]/factor,
-		        _coords[5]/factor,
-		        _coords[6]/factor,
-		        _coords[7]/factor,
-		        _coords[8]/factor);
+                        _coords[1]/factor,
+                        _coords[2]/factor,
+                        _coords[3]/factor,
+                        _coords[4]/factor,
+                        _coords[5]/factor,
+                        _coords[6]/factor,
+                        _coords[7]/factor,
+                        _coords[8]/factor);
 #endif
 
 }
@@ -937,21 +937,21 @@ TypeTensor<T> TypeTensor<T>::transpose() const
 
 #if LIBMESH_DIM == 2
   return TypeTensor(_coords[0],
-		    _coords[2],
-		    _coords[1],
-		    _coords[3]);
+                    _coords[2],
+                    _coords[1],
+                    _coords[3]);
 #endif
 
 #if LIBMESH_DIM == 3
   return TypeTensor(_coords[0],
-		    _coords[3],
-		    _coords[6],
-		    _coords[1],
-		    _coords[4],
-		    _coords[7],
-		    _coords[2],
-		    _coords[5],
-		    _coords[8]);
+                    _coords[3],
+                    _coords[6],
+                    _coords[1],
+                    _coords[4],
+                    _coords[7],
+                    _coords[2],
+                    _coords[5],
+                    _coords[8]);
 #endif
 }
 
@@ -1004,10 +1004,10 @@ TypeTensor<T> TypeTensor<T>::operator * (const TypeTensor<T2> &p) const
 
 
 
-  /**
-   * Multiply 2 tensors together, i.e. sum Aij*Bij.
-   * The tensors may be of different types.
-   */
+/**
+ * Multiply 2 tensors together, i.e. sum Aij*Bij.
+ * The tensors may be of different types.
+ */
 template <typename T>
 template <typename T2>
 inline
@@ -1041,16 +1041,16 @@ T TypeTensor<T>::det() const
 
 #if LIBMESH_DIM == 2
   return (_coords[0] * _coords[3]
-	  - _coords[1] * _coords[2]);
+          - _coords[1] * _coords[2]);
 #endif
 
 #if LIBMESH_DIM == 3
   return (_coords[0] * _coords[4] * _coords[8]
-	  + _coords[1] * _coords[5] * _coords[6]
-	  + _coords[2] * _coords[3] * _coords[7]
-	  - _coords[0] * _coords[5] * _coords[7]
-	  - _coords[1] * _coords[3] * _coords[8]
-	  - _coords[2] * _coords[4] * _coords[6]);
+          + _coords[1] * _coords[5] * _coords[6]
+          + _coords[2] * _coords[3] * _coords[7]
+          - _coords[0] * _coords[5] * _coords[7]
+          - _coords[1] * _coords[3] * _coords[8]
+          - _coords[2] * _coords[4] * _coords[6]);
 #endif
 }
 
@@ -1099,28 +1099,28 @@ bool TypeTensor<T>::operator == (const TypeTensor<T>& rhs) const
 {
 #if LIBMESH_DIM == 1
   return (std::abs(_coords[0] - rhs._coords[0])
-	  < TOLERANCE);
+          < TOLERANCE);
 #endif
 
 #if LIBMESH_DIM == 2
   return ((std::abs(_coords[0] - rhs._coords[0]) +
-	   std::abs(_coords[1] - rhs._coords[1]) +
-	   std::abs(_coords[2] - rhs._coords[2]) +
-	   std::abs(_coords[3] - rhs._coords[3]))
-	  < 4.*TOLERANCE);
+           std::abs(_coords[1] - rhs._coords[1]) +
+           std::abs(_coords[2] - rhs._coords[2]) +
+           std::abs(_coords[3] - rhs._coords[3]))
+          < 4.*TOLERANCE);
 #endif
 
 #if LIBMESH_DIM == 3
   return ((std::abs(_coords[0] - rhs._coords[0]) +
-	   std::abs(_coords[1] - rhs._coords[1]) +
-	   std::abs(_coords[2] - rhs._coords[2]) +
-	   std::abs(_coords[3] - rhs._coords[3]) +
-	   std::abs(_coords[4] - rhs._coords[4]) +
-	   std::abs(_coords[5] - rhs._coords[5]) +
-	   std::abs(_coords[6] - rhs._coords[6]) +
-	   std::abs(_coords[7] - rhs._coords[7]) +
-	   std::abs(_coords[8] - rhs._coords[8]))
-	  < 9.*TOLERANCE);
+           std::abs(_coords[1] - rhs._coords[1]) +
+           std::abs(_coords[2] - rhs._coords[2]) +
+           std::abs(_coords[3] - rhs._coords[3]) +
+           std::abs(_coords[4] - rhs._coords[4]) +
+           std::abs(_coords[5] - rhs._coords[5]) +
+           std::abs(_coords[6] - rhs._coords[6]) +
+           std::abs(_coords[7] - rhs._coords[7]) +
+           std::abs(_coords[8] - rhs._coords[8]))
+          < 9.*TOLERANCE);
 #endif
 
 }

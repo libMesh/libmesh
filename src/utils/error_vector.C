@@ -76,9 +76,9 @@ Real ErrorVector::mean() const
   for (dof_id_type i=0; i<n; i++)
     if (this->is_active_elem(i))
       {
-	the_mean += ( static_cast<Real>((*this)[i]) - the_mean ) / (nnz + 1);
+        the_mean += ( static_cast<Real>((*this)[i]) - the_mean ) / (nnz + 1);
 
-	nnz++;
+        nnz++;
       }
 
   STOP_LOG ("mean()", "ErrorVector");
@@ -135,10 +135,10 @@ Real ErrorVector::variance(const Real mean_in) const
   for (dof_id_type i=0; i<n; i++)
     if (this->is_active_elem(i))
       {
-	const Real delta = ( static_cast<Real>((*this)[i]) - mean_in );
-	the_variance += (delta * delta - the_variance) / (nnz + 1);
+        const Real delta = ( static_cast<Real>((*this)[i]) - mean_in );
+        the_variance += (delta * delta - the_variance) / (nnz + 1);
 
-	nnz++;
+        nnz++;
       }
 
   STOP_LOG ("variance()", "ErrorVector");
@@ -161,10 +161,10 @@ std::vector<dof_id_type> ErrorVector::cut_below(Real cut) const
   for (dof_id_type i=0; i<n; i++)
     if (this->is_active_elem(i))
       {
-	if ((*this)[i] < cut)
-	  {
-	    cut_indices.push_back(i);
-	  }
+        if ((*this)[i] < cut)
+          {
+            cut_indices.push_back(i);
+          }
       }
 
   STOP_LOG ("cut_below()", "ErrorVector");
@@ -187,10 +187,10 @@ std::vector<dof_id_type> ErrorVector::cut_above(Real cut) const
   for (dof_id_type i=0; i<n; i++)
     if (this->is_active_elem(i))
       {
-	if ((*this)[i] > cut)
-	  {
-	    cut_indices.push_back(i);
-	  }
+        if ((*this)[i] > cut)
+          {
+            cut_indices.push_back(i);
+          }
       }
 
   STOP_LOG ("cut_above()", "ErrorVector");
@@ -235,23 +235,23 @@ void ErrorVector::plot_error(const std::string& filename,
   std::vector<dof_id_type> dof_indices;
 
   for ( ; el != end_el; ++el)
-  {
-    const Elem* elem = *el;
+    {
+      const Elem* elem = *el;
 
-    error_dof_map.dof_indices(elem, dof_indices);
+      error_dof_map.dof_indices(elem, dof_indices);
 
-    const dof_id_type elem_id = elem->id();
+      const dof_id_type elem_id = elem->id();
 
-    //0 for the monomial basis
-    const dof_id_type solution_index = dof_indices[0];
+      //0 for the monomial basis
+      const dof_id_type solution_index = dof_indices[0];
 
-    // libMesh::out << "elem_number=" << elem_number << std::endl;
-    libmesh_assert_less (elem_id, (*this).size());
+      // libMesh::out << "elem_number=" << elem_number << std::endl;
+      libmesh_assert_less (elem_id, (*this).size());
 
-    // We may have zero error values in special circumstances
-    // libmesh_assert_greater ((*this)[elem_id], 0.);
-    error_system.solution->set(solution_index, (*this)[elem_id]);
-  }
+      // We may have zero error values in special circumstances
+      // libmesh_assert_greater ((*this)[elem_id], 0.);
+      error_system.solution->set(solution_index, (*this)[elem_id]);
+    }
 
   // We may have to renumber if the original numbering was not
   // contiguous.  Since this is just a temporary mesh, that's probably
@@ -275,7 +275,7 @@ void ErrorVector::plot_error(const std::string& filename,
     }
 #ifdef LIBMESH_HAVE_EXODUS_API
   else if( (filename.rfind(".exo") < filename.size()) ||
-	   (filename.rfind(".e") < filename.size()) )
+           (filename.rfind(".e") < filename.size()) )
     {
       ExodusII_IO io(mesh);
       io.write(filename);
@@ -286,9 +286,9 @@ void ErrorVector::plot_error(const std::string& filename,
     {
       libmesh_here();
       libMesh::err << "Warning: ErrorVector::plot_error currently only"
-                    << " supports .gmv and .plt and .exo/.e (if enabled) output;" << std::endl;
+                   << " supports .gmv and .plt and .exo/.e (if enabled) output;" << std::endl;
       libMesh::err << "Could not recognize filename: " << filename
-                    << std::endl;
+                   << std::endl;
     }
 }
 

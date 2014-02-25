@@ -44,40 +44,40 @@ namespace Threads
 {
 #ifdef LIBMESH_HAVE_TBB_API
 
- //-------------------------------------------------------------------
-  /**
-   * Scalable allocator to be used in multithreaded code chunks which
-   * allocate a lot of dynamic memory.  This allocator can be faster
-   * than the std::allocator when there are multiple threads.
-   */
-  template <typename T>
-  class scalable_allocator : public tbb::scalable_allocator<T>
+//-------------------------------------------------------------------
+/**
+ * Scalable allocator to be used in multithreaded code chunks which
+ * allocate a lot of dynamic memory.  This allocator can be faster
+ * than the std::allocator when there are multiple threads.
+ */
+template <typename T>
+class scalable_allocator : public tbb::scalable_allocator<T>
+{
+public:
+  typedef T* pointer;
+  typedef const T* const_pointer;
+  //     typedef T& reference;              // Intel 7.1 tries to instantiate an allocator<void>,
+  //     typedef const T& const_reference;  // so we can't typedef a reference to void.
+  typedef T value_type;
+  typedef size_t size_type;
+  typedef ptrdiff_t difference_type;
+
+  template<typename U>
+  struct rebind
   {
-  public:
-    typedef T* pointer;
-    typedef const T* const_pointer;
-//     typedef T& reference;              // Intel 7.1 tries to instantiate an allocator<void>,
-//     typedef const T& const_reference;  // so we can't typedef a reference to void.
-    typedef T value_type;
-    typedef size_t size_type;
-    typedef ptrdiff_t difference_type;
-
-    template<typename U>
-    struct rebind
-    {
-      typedef scalable_allocator<U> other;
-    };
-
-    scalable_allocator () :
-      tbb::scalable_allocator<T>() {}
-
-    scalable_allocator (const scalable_allocator &a) :
-      tbb::scalable_allocator<T>(a) {}
-
-    template<typename U>
-    scalable_allocator(const scalable_allocator<U> &a) :
-      tbb::scalable_allocator<T>(a) {}
+    typedef scalable_allocator<U> other;
   };
+
+  scalable_allocator () :
+    tbb::scalable_allocator<T>() {}
+
+  scalable_allocator (const scalable_allocator &a) :
+    tbb::scalable_allocator<T>(a) {}
+
+  template<typename U>
+  scalable_allocator(const scalable_allocator<U> &a) :
+    tbb::scalable_allocator<T>(a) {}
+};
 
 
 
@@ -85,38 +85,38 @@ namespace Threads
 
 
 
- //-------------------------------------------------------------------
-  /**
-   * Just use std::allocator when the Threading Building Blocks is absent.
-   */
-  template <typename T>
-  class scalable_allocator : public std::allocator<T>
+//-------------------------------------------------------------------
+/**
+ * Just use std::allocator when the Threading Building Blocks is absent.
+ */
+template <typename T>
+class scalable_allocator : public std::allocator<T>
+{
+public:
+  typedef T* pointer;
+  typedef const T* const_pointer;
+  //     typedef T& reference;              // Intel 7.1 tries to instantiate an allocator<void>,
+  //     typedef const T& const_reference;  // so we can't typedef a reference to void.
+  typedef T value_type;
+  typedef size_t size_type;
+  typedef ptrdiff_t difference_type;
+
+  template<typename U>
+  struct rebind
   {
-  public:
-    typedef T* pointer;
-    typedef const T* const_pointer;
-//     typedef T& reference;              // Intel 7.1 tries to instantiate an allocator<void>,
-//     typedef const T& const_reference;  // so we can't typedef a reference to void.
-    typedef T value_type;
-    typedef size_t size_type;
-    typedef ptrdiff_t difference_type;
-
-    template<typename U>
-    struct rebind
-    {
-      typedef scalable_allocator<U> other;
-    };
-
-    scalable_allocator () :
-      std::allocator<T>() {}
-
-    scalable_allocator (const scalable_allocator &a) :
-      std::allocator<T>(a) {}
-
-    template<typename U>
-    scalable_allocator(const scalable_allocator<U> &a) :
-      std::allocator<T>(a) {}
+    typedef scalable_allocator<U> other;
   };
+
+  scalable_allocator () :
+    std::allocator<T>() {}
+
+  scalable_allocator (const scalable_allocator &a) :
+    std::allocator<T>(a) {}
+
+  template<typename U>
+  scalable_allocator(const scalable_allocator<U> &a) :
+    std::allocator<T>(a) {}
+};
 
 
 #endif // #ifdef LIBMESH_HAVE_TBB_API

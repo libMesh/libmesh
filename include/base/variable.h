@@ -52,9 +52,9 @@ public:
    */
   Variable (System *sys,
             const std::string &var_name,
-	    const unsigned int var_number,
-	    const unsigned int first_scalar_num,
-	    const FEType &var_type) :
+            const unsigned int var_number,
+            const unsigned int first_scalar_num,
+            const FEType &var_type) :
     _sys(sys),
     _name(var_name),
     _number(var_number),
@@ -69,10 +69,10 @@ public:
    */
   Variable (System *sys,
             const std::string &var_name,
-	    const unsigned int var_number,
-	    const unsigned int first_scalar_num,
-	    const FEType &var_type,
-	    const std::set<subdomain_id_type> &var_active_subdomains) :
+            const unsigned int var_number,
+            const unsigned int first_scalar_num,
+            const FEType &var_type,
+            const std::set<subdomain_id_type> &var_active_subdomains) :
     _sys(sys),
     _name(var_name),
     _number(var_number),
@@ -172,14 +172,14 @@ public:
    */
   VariableGroup (System *sys,
                  const std::vector<std::string> &var_names,
-		 const unsigned int var_number,
-		 const unsigned int first_scalar_num,
-		 const FEType &var_type) :
+                 const unsigned int var_number,
+                 const unsigned int first_scalar_num,
+                 const FEType &var_type) :
     Variable (sys,
               "var_group",
-	      var_number,
-	      first_scalar_num,
-	      var_type),
+              var_number,
+              first_scalar_num,
+              var_type),
     _names(var_names)
   {}
 
@@ -190,17 +190,17 @@ public:
    */
   VariableGroup (System *sys,
                  const std::vector<std::string> &var_names,
-		 const unsigned int var_number,
-		 const unsigned int first_scalar_num,
-		 const FEType &var_type,
-		 const std::set<subdomain_id_type> &var_active_subdomains) :
+                 const unsigned int var_number,
+                 const unsigned int first_scalar_num,
+                 const FEType &var_type,
+                 const std::set<subdomain_id_type> &var_active_subdomains) :
 
     Variable (sys,
               "var_group",
-	      var_number,
-	      first_scalar_num,
-	      var_type,
-	      var_active_subdomains),
+              var_number,
+              first_scalar_num,
+              var_type,
+              var_active_subdomains),
     _names(var_names)
   {}
 
@@ -219,10 +219,10 @@ public:
     libmesh_assert_less (v, this->n_variables());
     return Variable (this->system(),
                      this->name(v),
-		     this->number(v),
-		     this->first_scalar_number(v),
-		     this->type(),
-		     this->active_subdomains());
+                     this->number(v),
+                     this->first_scalar_number(v),
+                     this->type(),
+                     this->active_subdomains());
   }
 
   /**

@@ -25,15 +25,15 @@ namespace libMesh
 
 
 void QConical::init_2D(const ElemType type_in,
-		       unsigned int p)
+                       unsigned int p)
 {
   switch (type_in)
     {
     case TRI3:
     case TRI6:
       {
-	this->conical_product_tri(p);
-	return;
+        this->conical_product_tri(p);
+        return;
 
       } // end case TRI3, TRI6
 
@@ -43,8 +43,8 @@ void QConical::init_2D(const ElemType type_in,
       // Unsupported element type
     default:
       {
-	libMesh::err << "ERROR: Unsupported element type: " << type_in << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: Unsupported element type: " << type_in << std::endl;
+        libmesh_error();
       }
     } // end switch (type_in)
 

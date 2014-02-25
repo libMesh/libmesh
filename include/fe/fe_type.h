@@ -51,7 +51,7 @@ public:
    * and the finite element family \p FEFamily
    */
   FEType(const Order    o = FIRST,
-	 const FEFamily f = LAGRANGE) :
+         const FEFamily f = LAGRANGE) :
     order(o),
     family(f)
   {}
@@ -81,10 +81,10 @@ public:
    * elements are not compiled in.
    */
   FEType(const Order      o  = FIRST,
-	 const FEFamily   f  = LAGRANGE,
-	 const Order      ro = THIRD,
-	 const FEFamily   rf = JACOBI_20_00,
-	 const InfMapType im = CARTESIAN) :
+         const FEFamily   f  = LAGRANGE,
+         const Order      ro = THIRD,
+         const FEFamily   rf = JACOBI_20_00,
+         const InfMapType im = CARTESIAN) :
     order(o),
     radial_order(ro),
     family(f),
@@ -132,13 +132,13 @@ public:
   bool operator== (const FEType &f2) const
   {
     return (order == f2.order
-	    && family == f2.family
+            && family == f2.family
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-	    && radial_order == f2.radial_order
-	    && radial_family == f2.radial_family
-	    && inf_map == f2.inf_map
+            && radial_order == f2.radial_order
+            && radial_family == f2.radial_family
+            && inf_map == f2.inf_map
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-	    );
+            );
   }
 
   /**
@@ -185,7 +185,7 @@ public:
    * be chosen by changing the extraorder parameter.
    */
   AutoPtr<QBase> default_quadrature_rule (const unsigned int dim,
-					  const int extraorder=0) const;
+                                          const int extraorder=0) const;
 
 
 private:

@@ -20,26 +20,19 @@
 #ifndef LIBMESH_ENUM_XDR_MODE_H
 #define LIBMESH_ENUM_XDR_MODE_H
 
-/*
- * The \p libMeshEnums namespace is the namespace all \p enum definitions
- * should be put into.
- */
-
 // ------------------------------------------------------------
 // enum XdrMode definition
-namespace libMeshEnums {
+namespace libMesh {
 
-  /**
-   * Defines an \p enum for read/write mode in Xdr format.
-   * \p READ, \p WRITE perform reading and writing in ASCII format,
-   * and \p DECODE, \p ENCODE do the same in binary format.
-   */
-  enum XdrMODE
-    {
-      UNKNOWN = -1, ENCODE=0, DECODE, WRITE, READ
-    };
+/**
+ * Defines an \p enum for read/write mode in Xdr format.
+ * \p READ, \p WRITE perform reading and writing in ASCII format,
+ * and \p DECODE, \p ENCODE do the same in binary format.
+ */
+enum XdrMODE
+  {
+    UNKNOWN = -1, ENCODE=0, DECODE, WRITE, READ
+  };
 }
-
-using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_XDR_MODE_H

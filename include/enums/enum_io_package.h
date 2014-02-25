@@ -20,35 +20,29 @@
 #ifndef LIBMESH_ENUM_IO_PACKAGE_H
 #define LIBMESH_ENUM_IO_PACKAGE_H
 
-/*
- * The \p libMeshEnums namespace is the namespace all \p enum definitions
- * should be put into.
- */
 
 // ------------------------------------------------------------
 // enum IOPackage definition
-namespace libMeshEnums {
+namespace libMesh {
 
-  /**
-   * libMesh interfaces with several different software packages
-   * for the purposes of creating, reading, and writing mesh files.
-   * These enumerations give an easy way of selecting one or the
-   * other.
-   */
-  enum IOPackage
-    {
-      TECPLOT,
-      GMV,
-      GMSH,
-      VTK,
-      DIVA,
-      TETGEN,
-      UCD,
-      LIBMESH,
-      INVALID_IO_PACKAGE
-    };
+/**
+ * libMesh interfaces with several different software packages
+ * for the purposes of creating, reading, and writing mesh files.
+ * These enumerations give an easy way of selecting one or the
+ * other.
+ */
+enum IOPackage
+  {
+    TECPLOT,
+    GMV,
+    GMSH,
+    VTK,
+    DIVA,
+    TETGEN,
+    UCD,
+    LIBMESH,
+    INVALID_IO_PACKAGE
+  };
 }
-
-using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_IO_PACKAGE_H

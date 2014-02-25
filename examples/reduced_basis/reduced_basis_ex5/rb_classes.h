@@ -48,9 +48,9 @@ public:
   ElasticityRBConstruction (EquationSystems& es,
                             const std::string& name_in,
                             const unsigned int number_in)
-  : Parent(es, name_in, number_in),
-    elasticity_assembly_expansion(*this),
-    ip_assembly(*this)
+    : Parent(es, name_in, number_in),
+      elasticity_assembly_expansion(*this),
+      ip_assembly(*this)
   {}
 
   /**

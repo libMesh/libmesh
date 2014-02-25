@@ -41,13 +41,13 @@ namespace libMesh
 
 class QClough : public QBase
 {
- public:
+public:
 
   /**
    * Constructor.  Declares the order of the quadrature rule.
    */
   QClough (const unsigned int _dim,
-	   const Order _order=INVALID_ORDER);
+           const Order _order=INVALID_ORDER);
 
   /**
    * Destructor.
@@ -60,14 +60,14 @@ class QClough : public QBase
   QuadratureType type() const { return QCLOUGH; }
 
 
- private:
+private:
 
   void init_1D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
   void init_2D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
   void init_3D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
 
 };
 
@@ -77,7 +77,7 @@ class QClough : public QBase
 // QClough class members
 inline
 QClough::QClough(const unsigned int d,
-	         const Order o) : QBase(d,o)
+                 const Order o) : QBase(d,o)
 {
 }
 

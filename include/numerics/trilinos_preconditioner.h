@@ -58,8 +58,8 @@ template <typename T> class ShellMatrix;
 
 template <typename T>
 class TrilinosPreconditioner :
-  public Preconditioner<T>,
-  public Epetra_Operator
+    public Preconditioner<T>,
+    public Epetra_Operator
 {
 public:
 
@@ -67,7 +67,7 @@ public:
    *  Constructor. Initializes PetscPreconditioner data structures
    */
   TrilinosPreconditioner (const libMesh::Parallel::Communicator &comm
-			  LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                          LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.

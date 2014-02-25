@@ -44,7 +44,7 @@ namespace libMesh
 // Edge4 class definition
 class Edge4 : public Edge
 {
-  public:
+public:
 
   /**
    * Constructor. By default this element has no parent.
@@ -83,14 +83,14 @@ class Edge4 : public Edge
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge (i.e. "returns true" in 1D)
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const;
+                               const unsigned int e) const;
 
   /*
    * @returns true iff the element map is definitely affine within
@@ -109,19 +109,19 @@ class Edge4 : public Edge
   Order default_order() const { return THIRD; }
 
   virtual void connectivity(const unsigned int sc,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
   /**
    */
   unsigned int n_second_order_adjacent_vertices (const unsigned int) const
-      { libmesh_error(); return 0;  }
+  { libmesh_error(); return 0;  }
 
   /**
    */
   unsigned short int second_order_adjacent_vertex (const unsigned int,
-						   const unsigned int) const
-      { libmesh_error(); return 0; }
+                                                   const unsigned int) const
+  { libmesh_error(); return 0; }
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -149,8 +149,8 @@ protected:
    * Matrix used to create the elements children.
    */
   float embedding_matrix (const unsigned int i,
-			 const unsigned int j,
-			 const unsigned int k) const
+                          const unsigned int j,
+                          const unsigned int k) const
   { return _embedding_matrix[i][j][k]; }
 
   /**

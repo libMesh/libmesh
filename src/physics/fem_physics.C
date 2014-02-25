@@ -54,27 +54,27 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
   unsigned int n_qpoints = (context.get_element_qrule())->n_points();
 
   const unsigned int n_x_dofs = (_mesh_x_var == libMesh::invalid_uint) ?
-                                0 : context.dof_indices_var[_mesh_x_var].size();
+    0 : context.dof_indices_var[_mesh_x_var].size();
   const unsigned int n_y_dofs = (_mesh_y_var == libMesh::invalid_uint) ?
-                                0 : context.dof_indices_var[_mesh_y_var].size();
+    0 : context.dof_indices_var[_mesh_y_var].size();
   const unsigned int n_z_dofs = (_mesh_z_var == libMesh::invalid_uint) ?
-                                0 : context.dof_indices_var[_mesh_z_var].size();
+    0 : context.dof_indices_var[_mesh_z_var].size();
 
   const unsigned int mesh_xyz_var = n_x_dofs ? _mesh_x_var :
-                                   (n_y_dofs ? _mesh_y_var :
-                                   (n_z_dofs ? _mesh_z_var :
-                                    libMesh::invalid_uint));
+    (n_y_dofs ? _mesh_y_var :
+     (n_z_dofs ? _mesh_z_var :
+      libMesh::invalid_uint));
 
   // If we're our own _mesh_sys, we'd better be in charge of
   // at least one coordinate, and we'd better have the same
   // FE type for all coordinates we are in charge of
   libmesh_assert_not_equal_to (mesh_xyz_var, libMesh::invalid_uint);
   libmesh_assert(!n_x_dofs || context.element_fe_var[_mesh_x_var] ==
-                              context.element_fe_var[mesh_xyz_var]);
+                 context.element_fe_var[mesh_xyz_var]);
   libmesh_assert(!n_y_dofs || context.element_fe_var[_mesh_y_var] ==
-                              context.element_fe_var[mesh_xyz_var]);
+                 context.element_fe_var[mesh_xyz_var]);
   libmesh_assert(!n_z_dofs || context.element_fe_var[_mesh_z_var] ==
-                              context.element_fe_var[mesh_xyz_var]);
+                 context.element_fe_var[mesh_xyz_var]);
 
   const std::vector<std::vector<Real> >     &psi =
     context.element_fe_var[mesh_xyz_var]->get_phi();
@@ -104,7 +104,7 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
       if (this->time_solver->is_steady())
         return request_jacobian;
       else
-	unsteady = libmesh_cast_ptr<UnsteadySolver*>(this->time_solver.get());
+        unsteady = libmesh_cast_ptr<UnsteadySolver*>(this->time_solver.get());
 
       const std::vector<Real> &JxW =
         context.element_fe_var[var]->get_JxW();
@@ -135,21 +135,21 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
         {
           unsigned int j = context.dof_indices_var[_mesh_x_var][i];
           delta_x[i] = libmesh_real(this->current_solution(j)) -
-                       libmesh_real(unsteady->old_nonlinear_solution(j));
+            libmesh_real(unsteady->old_nonlinear_solution(j));
         }
 
       for (unsigned int i = 0; i != n_y_dofs; ++i)
         {
           unsigned int j = context.dof_indices_var[_mesh_y_var][i];
           delta_y[i] = libmesh_real(this->current_solution(j)) -
-                       libmesh_real(unsteady->old_nonlinear_solution(j));
+            libmesh_real(unsteady->old_nonlinear_solution(j));
         }
 
       for (unsigned int i = 0; i != n_z_dofs; ++i)
         {
           unsigned int j = context.dof_indices_var[_mesh_z_var][i];
           delta_z[i] = libmesh_real(this->current_solution(j)) -
-                       libmesh_real(unsteady->old_nonlinear_solution(j));
+            libmesh_real(unsteady->old_nonlinear_solution(j));
         }
 
       for (unsigned int qp = 0; qp != n_qpoints; ++qp)
@@ -158,11 +158,11 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
           RealGradient convection(0.);
 
           for (unsigned int i = 0; i != n_x_dofs; ++i)
-	    convection(0) += delta_x[i] * psi[i][qp];
+            convection(0) += delta_x[i] * psi[i][qp];
           for (unsigned int i = 0; i != n_y_dofs; ++i)
-	    convection(1) += delta_y[i] * psi[i][qp];
+            convection(1) += delta_y[i] * psi[i][qp];
           for (unsigned int i = 0; i != n_z_dofs; ++i)
-	    convection(2) += delta_z[i] * psi[i][qp];
+            convection(2) += delta_z[i] * psi[i][qp];
 
           for (unsigned int i = 0; i != n_u_dofs; ++i)
             {
@@ -218,7 +218,7 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
       const std::vector<std::vector<Real> > &phi = elem_fe->get_phi();
 
       const unsigned int n_dofs = libmesh_cast_int<unsigned int>
-	(context.get_dof_indices(var).size());
+        (context.get_dof_indices(var).size());
 
       DenseSubVector<Number> &Fu = context.get_elem_residual(var);
       DenseSubMatrix<Number> &Kuu = context.get_elem_jacobian( var, var );

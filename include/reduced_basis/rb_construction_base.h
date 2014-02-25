@@ -141,7 +141,7 @@ public:
    * defined below, is "unchanged", this function does nothing.
    */
   void reset_alternative_solver(AutoPtr<LinearSolver<Number> >& ls,
-				const std::pair<std::string,std::string>& orig);
+                                const std::pair<std::string,std::string>& orig);
 
   /**
    * Broadcasts parameters on processor proc_id
@@ -153,12 +153,20 @@ public:
    * Set the seed that is used to randomly generate training parameters.
    */
   void set_training_random_seed(unsigned int seed);
+  
+  /**
+   * In some cases we only want to allow discrete parameter values, instead
+   * of parameters that may take any value in a specified interval.
+   * Here we provide a method to set the d
+   * Set the discrete values for parameter \p mu that are allowed in the
+   * training set. This must be called before the training set is generated.
+   */
 
   /**
    * Set the name of the parameter that we will generate deterministic training parameters for.
    * Defaults to "NONE".
    */
-  void set_deterministic_training_parameter_name(const std::string name);
+  void set_deterministic_training_parameter_name(const std::string& name);
 
   /**
    * Get the name of the parameter that we will generate deterministic training parameters for.
@@ -204,13 +212,13 @@ protected:
    * processors.
    */
   static void get_global_max_error_pair(const Parallel::Communicator &communicator,
-					std::pair<unsigned int, Real>& error_pair);
+                                        std::pair<unsigned int, Real>& error_pair);
 
   /**
    * Static helper function for generating a randomized set of parameters.
    */
   static void generate_training_parameters_random(const Parallel::Communicator &communicator,
-						  std::map<std::string, bool> log_param_scale,
+                                                  std::map<std::string, bool> log_param_scale,
                                                   std::map< std::string, NumericVector<Number>* >& training_parameters_in,
                                                   unsigned int n_training_samples_in,
                                                   const RBParameters& min_parameters,
@@ -219,27 +227,11 @@ protected:
                                                   bool serial_training_set=false);
 
   /**
-   * Static helper function for generating a "partially" random set of parameters, that is
-   * the parameter indicated by this->get_deterministic_training_parameter() will be
-   * deterministic.
-   */
-  static void generate_training_parameters_partially_random(const Parallel::Communicator &communicator,
-							    const std::string& deterministic_parameter_name,
-                                                            const unsigned int deterministic_parameter_repeats,
-                                                            std::map<std::string, bool> log_param_scale,
-                                                            std::map< std::string, NumericVector<Number>* >& training_parameters_in,
-                                                            unsigned int n_deterministic_training_samples_in,
-                                                            const RBParameters& min_parameters,
-                                                            const RBParameters& max_parameters,
-                                                            int training_parameters_random_seed=-1,
-                                                            bool serial_training_set=false);
-
-  /**
    * Static helper function for generating a deterministic set of parameters. Only works with 1 or 2
    * parameters (as defined by the lengths of min/max parameters vectors), otherwise throws an error.
    */
   static void generate_training_parameters_deterministic(const Parallel::Communicator &communicator,
-							 std::map<std::string, bool> log_param_scale,
+                                                         std::map<std::string, bool> log_param_scale,
                                                          std::map< std::string, NumericVector<Number>* >& training_parameters_in,
                                                          unsigned int n_training_samples_in,
                                                          const RBParameters& min_parameters,
@@ -299,19 +291,6 @@ private:
    * number generator seed.
    */
   int training_parameters_random_seed;
-
-  /**
-   * The name of the parameter that we will generate a deterministic
-   * training parameters for in the case of a "partially random" training
-   * set.
-   */
-  std::string _deterministic_training_parameter_name;
-
-  /**
-   * The number of times each sample of the deterministic training parameter
-   * is repeated in generating the training set.
-   */
-  unsigned int _deterministic_training_parameter_repeats;
 
 };
 

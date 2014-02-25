@@ -30,11 +30,11 @@
 // to be recalculated.
 namespace
 {
-  using namespace libMesh;
+using namespace libMesh;
 
-  static dof_id_type old_elem_id = DofObject::invalid_id;
-  static Point centroid;
-  static Point max_distance;
+static dof_id_type old_elem_id = DofObject::invalid_id;
+static Point centroid;
+static Point max_distance;
 }
 
 
@@ -44,13 +44,13 @@ namespace libMesh
 
 template <>
 Real FE<3,XYZ>::shape(const ElemType,
-		      const Order,
-		      const unsigned int,
-		      const Point&)
+                      const Order,
+                      const unsigned int,
+                      const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
-                << "because the centroid is needed."
-                << std::endl;
+               << "because the centroid is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -60,9 +60,9 @@ Real FE<3,XYZ>::shape(const ElemType,
 
 template <>
 Real FE<3,XYZ>::shape(const Elem* elem,
-		      const Order libmesh_dbg_var(order),
-		      const unsigned int i,
-		      const Point& point_in)
+                      const Order libmesh_dbg_var(order),
+                      const unsigned int i,
+                      const Point& point_in)
 {
 #if LIBMESH_DIM == 3
   libmesh_assert(elem);
@@ -78,10 +78,10 @@ Real FE<3,XYZ>::shape(const Elem* elem,
       max_distance = Point(0.,0.,0.);
       for (unsigned int p = 0; p < elem->n_nodes(); p++)
         for (unsigned int d = 0; d < 3; d++)
-        {
-           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
-           max_distance(d) = std::max(distance, max_distance(d));
-        }
+          {
+            const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+            max_distance(d) = std::max(distance, max_distance(d));
+          }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -107,8 +107,8 @@ Real FE<3,XYZ>::shape(const Elem* elem,
   const unsigned int totalorder = order + elem->p_level();
 #endif
   libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
-              (static_cast<unsigned int>(totalorder)+2)*
-              (static_cast<unsigned int>(totalorder)+3)/6);
+                       (static_cast<unsigned int>(totalorder)+2)*
+                       (static_cast<unsigned int>(totalorder)+3)/6);
 
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
@@ -251,14 +251,14 @@ Real FE<3,XYZ>::shape(const Elem* elem,
 
 template <>
 Real FE<3,XYZ>::shape_deriv(const ElemType,
-			    const Order,
-			    const unsigned int,
-			    const unsigned int,
-			    const Point&)
+                            const Order,
+                            const unsigned int,
+                            const unsigned int,
+                            const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
-                << "because the centroid is needed."
-                << std::endl;
+               << "because the centroid is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -268,10 +268,10 @@ Real FE<3,XYZ>::shape_deriv(const ElemType,
 
 template <>
 Real FE<3,XYZ>::shape_deriv(const Elem* elem,
-			    const Order libmesh_dbg_var(order),
-			    const unsigned int i,
-			    const unsigned int j,
-			    const Point& point_in)
+                            const Order libmesh_dbg_var(order),
+                            const unsigned int i,
+                            const unsigned int j,
+                            const Point& point_in)
 {
 #if LIBMESH_DIM == 3
 
@@ -289,10 +289,10 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
       max_distance = Point(0.,0.,0.);
       for (unsigned int p = 0; p < elem->n_nodes(); p++)
         for (unsigned int d = 0; d < 3; d++)
-        {
-           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
-           max_distance(d) = std::max(distance, max_distance(d));
-        }
+          {
+            const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+            max_distance(d) = std::max(distance, max_distance(d));
+          }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -318,8 +318,8 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   const unsigned int totalorder = static_cast<Order>(order + elem->p_level());
 #endif
   libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
-              (static_cast<unsigned int>(totalorder)+2)*
-              (static_cast<unsigned int>(totalorder)+3)/6);
+                       (static_cast<unsigned int>(totalorder)+2)*
+                       (static_cast<unsigned int>(totalorder)+3)/6);
 
   switch (j)
     {
@@ -327,134 +327,134 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
     case 0:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
-  	  return 0.;
+          {
+            // constant
+          case 0:
+            return 0.;
 
-  	  // linear
-  	case 1:
-  	  return 1./distx;
+            // linear
+          case 1:
+            return 1./distx;
 
-  	case 2:
-  	  return 0.;
+          case 2:
+            return 0.;
 
-  	case 3:
-  	  return 0.;
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	  return 2.*dx/distx;
+            // quadratic
+          case 4:
+            return 2.*dx/distx;
 
-  	case 5:
-  	  return dy/distx;
+          case 5:
+            return dy/distx;
 
-  	case 6:
-  	  return 0.;
+          case 6:
+            return 0.;
 
-  	case 7:
-  	  return dz/distx;
+          case 7:
+            return dz/distx;
 
-  	case 8:
-  	  return 0.;
+          case 8:
+            return 0.;
 
-  	case 9:
-  	  return 0.;
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	  return 3.*dx*dx/distx;
+            // cubic
+          case 10:
+            return 3.*dx*dx/distx;
 
-  	case 11:
-  	  return 2.*dx*dy/distx;
+          case 11:
+            return 2.*dx*dy/distx;
 
-  	case 12:
-  	  return dy*dy/distx;
+          case 12:
+            return dy*dy/distx;
 
-  	case 13:
-  	  return 0.;
+          case 13:
+            return 0.;
 
-  	case 14:
-  	  return 2.*dx*dz/distx;
+          case 14:
+            return 2.*dx*dz/distx;
 
-  	case 15:
-  	  return dy*dz/distx;
+          case 15:
+            return dy*dz/distx;
 
-  	case 16:
-  	  return 0.;
+          case 16:
+            return 0.;
 
-  	case 17:
-  	  return dz*dz/distx;
+          case 17:
+            return dz*dz/distx;
 
-  	case 18:
-  	  return 0.;
+          case 18:
+            return 0.;
 
-  	case 19:
-  	  return 0.;
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	  return 4.*dx*dx*dx/distx;
+            // quartics
+          case 20:
+            return 4.*dx*dx*dx/distx;
 
-  	case 21:
-  	  return 3.*dx*dx*dy/distx;
+          case 21:
+            return 3.*dx*dx*dy/distx;
 
-  	case 22:
-  	  return 2.*dx*dy*dy/distx;
+          case 22:
+            return 2.*dx*dy*dy/distx;
 
-  	case 23:
-  	  return dy*dy*dy/distx;
+          case 23:
+            return dy*dy*dy/distx;
 
-  	case 24:
-  	  return 0.;
+          case 24:
+            return 0.;
 
-  	case 25:
-  	  return 3.*dx*dx*dz/distx;
+          case 25:
+            return 3.*dx*dx*dz/distx;
 
-  	case 26:
-  	  return 2.*dx*dy*dz/distx;
+          case 26:
+            return 2.*dx*dy*dz/distx;
 
-  	case 27:
-  	  return dy*dy*dz/distx;
+          case 27:
+            return dy*dy*dz/distx;
 
-  	case 28:
-  	  return 0.;
+          case 28:
+            return 0.;
 
-  	case 29:
-  	  return 2.*dx*dz*dz/distx;
+          case 29:
+            return 2.*dx*dz*dz/distx;
 
-  	case 30:
-  	  return dy*dz*dz/distx;
+          case 30:
+            return dy*dz*dz/distx;
 
-  	case 31:
-  	  return 0.;
+          case 31:
+            return 0.;
 
-  	case 32:
-  	  return dz*dz*dz/distx;
+          case 32:
+            return dz*dz*dz/distx;
 
-  	case 33:
-  	  return 0.;
+          case 33:
+            return 0.;
 
-  	case 34:
-  	  return 0.;
+          case 34:
+            return 0.;
 
-        default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = nx;
-          for (unsigned int index=1; index < nx; index++)
-            val *= dx;
-          for (unsigned int index=0; index != ny; index++)
-            val *= dy;
-          for (unsigned int index=0; index != nz; index++)
-            val *= dz;
-          return val/distx;
-  	}
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = nx;
+            for (unsigned int index=1; index < nx; index++)
+              val *= dx;
+            for (unsigned int index=0; index != ny; index++)
+              val *= dy;
+            for (unsigned int index=0; index != nz; index++)
+              val *= dz;
+            return val/distx;
+          }
       }
 
 
@@ -462,134 +462,134 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
     case 1:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
-  	  return 0.;
+          {
+            // constant
+          case 0:
+            return 0.;
 
-  	  // linear
-  	case 1:
-  	  return 0.;
+            // linear
+          case 1:
+            return 0.;
 
-  	case 2:
-  	  return 1./disty;
+          case 2:
+            return 1./disty;
 
-  	case 3:
-  	  return 0.;
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	  return 0.;
+            // quadratic
+          case 4:
+            return 0.;
 
-  	case 5:
-  	  return dx/disty;
+          case 5:
+            return dx/disty;
 
-  	case 6:
-  	  return 2.*dy/disty;
+          case 6:
+            return 2.*dy/disty;
 
-  	case 7:
-  	  return 0.;
+          case 7:
+            return 0.;
 
-  	case 8:
-  	  return dz/disty;
+          case 8:
+            return dz/disty;
 
-  	case 9:
-  	  return 0.;
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	  return 0.;
+            // cubic
+          case 10:
+            return 0.;
 
-  	case 11:
-  	  return dx*dx/disty;
+          case 11:
+            return dx*dx/disty;
 
-  	case 12:
-  	  return 2.*dx*dy/disty;
+          case 12:
+            return 2.*dx*dy/disty;
 
-  	case 13:
-  	  return 3.*dy*dy/disty;
+          case 13:
+            return 3.*dy*dy/disty;
 
-  	case 14:
-  	  return 0.;
+          case 14:
+            return 0.;
 
-  	case 15:
-  	  return dx*dz/disty;
+          case 15:
+            return dx*dz/disty;
 
-  	case 16:
-  	  return 2.*dy*dz/disty;
+          case 16:
+            return 2.*dy*dz/disty;
 
-  	case 17:
-  	  return 0.;
+          case 17:
+            return 0.;
 
-  	case 18:
-  	  return dz*dz/disty;
+          case 18:
+            return dz*dz/disty;
 
-  	case 19:
-  	  return 0.;
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	  return 0.;
+            // quartics
+          case 20:
+            return 0.;
 
-  	case 21:
-  	  return dx*dx*dx/disty;
+          case 21:
+            return dx*dx*dx/disty;
 
-  	case 22:
-  	  return 2.*dx*dx*dy/disty;
+          case 22:
+            return 2.*dx*dx*dy/disty;
 
-  	case 23:
-  	  return 3.*dx*dy*dy/disty;
+          case 23:
+            return 3.*dx*dy*dy/disty;
 
-  	case 24:
-  	  return 4.*dy*dy*dy/disty;
+          case 24:
+            return 4.*dy*dy*dy/disty;
 
-  	case 25:
-  	  return 0.;
+          case 25:
+            return 0.;
 
-  	case 26:
-  	  return dx*dx*dz/disty;
+          case 26:
+            return dx*dx*dz/disty;
 
-  	case 27:
-  	  return 2.*dx*dy*dz/disty;
+          case 27:
+            return 2.*dx*dy*dz/disty;
 
-  	case 28:
-  	  return 3.*dy*dy*dz/disty;
+          case 28:
+            return 3.*dy*dy*dz/disty;
 
-  	case 29:
-  	  return 0.;
+          case 29:
+            return 0.;
 
-  	case 30:
-  	  return dx*dz*dz/disty;
+          case 30:
+            return dx*dz*dz/disty;
 
-  	case 31:
-  	  return 2.*dy*dz*dz/disty;
+          case 31:
+            return 2.*dy*dz*dz/disty;
 
-  	case 32:
-  	  return 0.;
+          case 32:
+            return 0.;
 
-  	case 33:
-  	  return dz*dz*dz/disty;
+          case 33:
+            return dz*dz*dz/disty;
 
-  	case 34:
-  	  return 0.;
+          case 34:
+            return 0.;
 
-  	default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = ny;
-          for (unsigned int index=0; index != nx; index++)
-            val *= dx;
-          for (unsigned int index=1; index < ny; index++)
-            val *= dy;
-          for (unsigned int index=0; index != nz; index++)
-            val *= dz;
-          return val/disty;
-  	}
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = ny;
+            for (unsigned int index=0; index != nx; index++)
+              val *= dx;
+            for (unsigned int index=1; index < ny; index++)
+              val *= dy;
+            for (unsigned int index=0; index != nz; index++)
+              val *= dz;
+            return val/disty;
+          }
       }
 
 
@@ -597,134 +597,134 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
     case 2:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
-  	  return 0.;
+          {
+            // constant
+          case 0:
+            return 0.;
 
-  	  // linear
-  	case 1:
-  	  return 0.;
+            // linear
+          case 1:
+            return 0.;
 
-  	case 2:
-  	  return 0.;
+          case 2:
+            return 0.;
 
-  	case 3:
-  	  return 1./distz;
+          case 3:
+            return 1./distz;
 
-  	  // quadratic
-  	case 4:
-  	  return 0.;
+            // quadratic
+          case 4:
+            return 0.;
 
-  	case 5:
-  	  return 0.;
+          case 5:
+            return 0.;
 
-  	case 6:
-  	  return 0.;
+          case 6:
+            return 0.;
 
-  	case 7:
-  	  return dx/distz;
+          case 7:
+            return dx/distz;
 
-  	case 8:
-  	  return dy/distz;
+          case 8:
+            return dy/distz;
 
-  	case 9:
-  	  return 2.*dz/distz;
+          case 9:
+            return 2.*dz/distz;
 
-  	  // cubic
-  	case 10:
-  	  return 0.;
+            // cubic
+          case 10:
+            return 0.;
 
-  	case 11:
-  	  return 0.;
+          case 11:
+            return 0.;
 
-  	case 12:
-  	  return 0.;
+          case 12:
+            return 0.;
 
-  	case 13:
-  	  return 0.;
+          case 13:
+            return 0.;
 
-  	case 14:
-  	  return dx*dx/distz;
+          case 14:
+            return dx*dx/distz;
 
-  	case 15:
-  	  return dx*dy/distz;
+          case 15:
+            return dx*dy/distz;
 
-  	case 16:
-  	  return dy*dy/distz;
+          case 16:
+            return dy*dy/distz;
 
-  	case 17:
-  	  return 2.*dx*dz/distz;
+          case 17:
+            return 2.*dx*dz/distz;
 
-  	case 18:
-  	  return 2.*dy*dz/distz;
+          case 18:
+            return 2.*dy*dz/distz;
 
-  	case 19:
-  	  return 3.*dz*dz/distz;
+          case 19:
+            return 3.*dz*dz/distz;
 
-  	  // quartics
-  	case 20:
-  	  return 0.;
+            // quartics
+          case 20:
+            return 0.;
 
-  	case 21:
-  	  return 0.;
+          case 21:
+            return 0.;
 
-  	case 22:
-  	  return 0.;
+          case 22:
+            return 0.;
 
-  	case 23:
-  	  return 0.;
+          case 23:
+            return 0.;
 
-  	case 24:
-  	  return 0.;
+          case 24:
+            return 0.;
 
-  	case 25:
-  	  return dx*dx*dx/distz;
+          case 25:
+            return dx*dx*dx/distz;
 
-  	case 26:
-  	  return dx*dx*dy/distz;
+          case 26:
+            return dx*dx*dy/distz;
 
-  	case 27:
-  	  return dx*dy*dy/distz;
+          case 27:
+            return dx*dy*dy/distz;
 
-  	case 28:
-  	  return dy*dy*dy/distz;
+          case 28:
+            return dy*dy*dy/distz;
 
-  	case 29:
-  	  return 2.*dx*dx*dz/distz;
+          case 29:
+            return 2.*dx*dx*dz/distz;
 
-  	case 30:
-  	  return 2.*dx*dy*dz/distz;
+          case 30:
+            return 2.*dx*dy*dz/distz;
 
-  	case 31:
-  	  return 2.*dy*dy*dz/distz;
+          case 31:
+            return 2.*dy*dy*dz/distz;
 
-  	case 32:
-  	  return 3.*dx*dz*dz/distz;
+          case 32:
+            return 3.*dx*dz*dz/distz;
 
-  	case 33:
-  	  return 3.*dy*dz*dz/distz;
+          case 33:
+            return 3.*dy*dz*dz/distz;
 
-  	case 34:
-  	  return 4.*dz*dz*dz/distz;
+          case 34:
+            return 4.*dz*dz*dz/distz;
 
-  	default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = nz;
-          for (unsigned int index=0; index != nx; index++)
-            val *= dx;
-          for (unsigned int index=0; index != ny; index++)
-            val *= dy;
-          for (unsigned int index=1; index < nz; index++)
-            val *= dz;
-          return val/distz;
-  	}
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = nz;
+            for (unsigned int index=0; index != nx; index++)
+              val *= dx;
+            for (unsigned int index=0; index != ny; index++)
+              val *= dy;
+            for (unsigned int index=1; index < nz; index++)
+              val *= dz;
+            return val/distz;
+          }
       }
 
 
@@ -742,14 +742,14 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 
 template <>
 Real FE<3,XYZ>::shape_second_deriv(const ElemType,
-			           const Order,
-			           const unsigned int,
-			           const unsigned int,
-			           const Point&)
+                                   const Order,
+                                   const unsigned int,
+                                   const unsigned int,
+                                   const Point&)
 {
   libMesh::err << "XYZ polynomials require the element\n"
-                << "because the centroid is needed."
-                << std::endl;
+               << "because the centroid is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -759,10 +759,10 @@ Real FE<3,XYZ>::shape_second_deriv(const ElemType,
 
 template <>
 Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
-			           const Order libmesh_dbg_var(order),
-			           const unsigned int i,
-			           const unsigned int j,
-			           const Point& point_in)
+                                   const Order libmesh_dbg_var(order),
+                                   const unsigned int i,
+                                   const unsigned int j,
+                                   const Point& point_in)
 {
 #if LIBMESH_DIM == 3
 
@@ -780,10 +780,10 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
       max_distance = Point(0.,0.,0.);
       for (unsigned int p = 0; p < elem->n_nodes(); p++)
         for (unsigned int d = 0; d < 3; d++)
-        {
-           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
-           max_distance(d) = std::max(distance, max_distance(d));
-        }
+          {
+            const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+            max_distance(d) = std::max(distance, max_distance(d));
+          }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -815,109 +815,109 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   const unsigned int totalorder = static_cast<Order>(order + elem->p_level());
 #endif
   libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
-              (static_cast<unsigned int>(totalorder)+2)*
-              (static_cast<unsigned int>(totalorder)+3)/6);
+                       (static_cast<unsigned int>(totalorder)+2)*
+                       (static_cast<unsigned int>(totalorder)+3)/6);
 
-    // monomials. since they are hierarchic we only need one case block.
+  // monomials. since they are hierarchic we only need one case block.
   switch (j)
     {
       // d^2()/dx^2
     case 0:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
+          {
+            // constant
+          case 0:
 
-  	  // linear
-  	case 1:
-  	case 2:
-  	case 3:
-  	  return 0.;
+            // linear
+          case 1:
+          case 2:
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	  return 2./dist2x;
+            // quadratic
+          case 4:
+            return 2./dist2x;
 
-  	case 5:
-  	case 6:
-  	case 7:
-  	case 8:
-  	case 9:
-  	  return 0.;
+          case 5:
+          case 6:
+          case 7:
+          case 8:
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	  return 6.*dx/dist2x;
+            // cubic
+          case 10:
+            return 6.*dx/dist2x;
 
-  	case 11:
-  	  return 2.*dy/dist2x;
+          case 11:
+            return 2.*dy/dist2x;
 
-  	case 12:
-  	case 13:
-  	  return 0.;
+          case 12:
+          case 13:
+            return 0.;
 
-  	case 14:
-  	  return 2.*dz/dist2x;
+          case 14:
+            return 2.*dz/dist2x;
 
-  	case 15:
-  	case 16:
-  	case 17:
-  	case 18:
-  	case 19:
-  	  return 0.;
+          case 15:
+          case 16:
+          case 17:
+          case 18:
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	  return 12.*dx*dx/dist2x;
+            // quartics
+          case 20:
+            return 12.*dx*dx/dist2x;
 
-  	case 21:
-  	  return 6.*dx*dy/dist2x;
+          case 21:
+            return 6.*dx*dy/dist2x;
 
-  	case 22:
-  	  return 2.*dy*dy/dist2x;
+          case 22:
+            return 2.*dy*dy/dist2x;
 
-  	case 23:
-  	case 24:
-  	  return 0.;
+          case 23:
+          case 24:
+            return 0.;
 
-  	case 25:
-  	  return 6.*dx*dz/dist2x;
+          case 25:
+            return 6.*dx*dz/dist2x;
 
-  	case 26:
-  	  return 2.*dy*dz/dist2x;
+          case 26:
+            return 2.*dy*dz/dist2x;
 
-  	case 27:
-  	case 28:
-  	  return 0.;
+          case 27:
+          case 28:
+            return 0.;
 
-  	case 29:
-  	  return 2.*dz*dz/dist2x;
+          case 29:
+            return 2.*dz*dz/dist2x;
 
-  	case 30:
-  	case 31:
-  	case 32:
-  	case 33:
-  	case 34:
-  	  return 0.;
+          case 30:
+          case 31:
+          case 32:
+          case 33:
+          case 34:
+            return 0.;
 
-  	default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = nx * (nx - 1);
-          for (unsigned int index=2; index < nx; index++)
-            val *= dx;
-          for (unsigned int index=0; index != ny; index++)
-            val *= dy;
-          for (unsigned int index=0; index != nz; index++)
-            val *= dz;
-          return val/dist2x;
-  	}
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = nx * (nx - 1);
+            for (unsigned int index=2; index < nx; index++)
+              val *= dx;
+            for (unsigned int index=0; index != ny; index++)
+              val *= dy;
+            for (unsigned int index=0; index != nz; index++)
+              val *= dz;
+            return val/dist2x;
+          }
       }
 
 
@@ -925,105 +925,105 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
     case 1:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
+          {
+            // constant
+          case 0:
 
-  	  // linear
-  	case 1:
-  	case 2:
-  	case 3:
-  	  return 0.;
+            // linear
+          case 1:
+          case 2:
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	  return 0.;
+            // quadratic
+          case 4:
+            return 0.;
 
-  	case 5:
-  	  return 1./distxy;
+          case 5:
+            return 1./distxy;
 
-  	case 6:
-  	case 7:
-  	case 8:
-  	case 9:
-  	  return 0.;
+          case 6:
+          case 7:
+          case 8:
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	  return 0.;
+            // cubic
+          case 10:
+            return 0.;
 
-  	case 11:
-  	  return 2.*dx/distxy;
+          case 11:
+            return 2.*dx/distxy;
 
-  	case 12:
-  	  return 2.*dy/distxy;
+          case 12:
+            return 2.*dy/distxy;
 
-  	case 13:
-  	case 14:
-  	  return 0.;
+          case 13:
+          case 14:
+            return 0.;
 
-  	case 15:
-  	  return dz/distxy;
+          case 15:
+            return dz/distxy;
 
-  	case 16:
-  	case 17:
-  	case 18:
-  	case 19:
-  	  return 0.;
+          case 16:
+          case 17:
+          case 18:
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	  return 0.;
+            // quartics
+          case 20:
+            return 0.;
 
-  	case 21:
-  	  return 3.*dx*dx/distxy;
+          case 21:
+            return 3.*dx*dx/distxy;
 
-  	case 22:
-  	  return 4.*dx*dy/distxy;
+          case 22:
+            return 4.*dx*dy/distxy;
 
-  	case 23:
-  	  return 3.*dy*dy/distxy;
+          case 23:
+            return 3.*dy*dy/distxy;
 
-  	case 24:
-  	case 25:
-  	  return 0.;
+          case 24:
+          case 25:
+            return 0.;
 
-  	case 26:
-  	  return 2.*dx*dz/distxy;
+          case 26:
+            return 2.*dx*dz/distxy;
 
-  	case 27:
-  	  return 2.*dy*dz/distxy;
+          case 27:
+            return 2.*dy*dz/distxy;
 
-  	case 28:
-  	case 29:
-  	  return 0.;
+          case 28:
+          case 29:
+            return 0.;
 
-  	case 30:
-  	  return dz*dz/distxy;
+          case 30:
+            return dz*dz/distxy;
 
-  	case 31:
-  	case 32:
-  	case 33:
-  	case 34:
-  	  return 0.;
+          case 31:
+          case 32:
+          case 33:
+          case 34:
+            return 0.;
 
-  	default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = nx * ny;
-          for (unsigned int index=1; index < nx; index++)
-            val *= dx;
-          for (unsigned int index=1; index < ny; index++)
-            val *= dy;
-          for (unsigned int index=0; index != nz; index++)
-            val *= dz;
-          return val/distxy;
-  	}
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = nx * ny;
+            for (unsigned int index=1; index < nx; index++)
+              val *= dx;
+            for (unsigned int index=1; index < ny; index++)
+              val *= dy;
+            for (unsigned int index=0; index != nz; index++)
+              val *= dz;
+            return val/distxy;
+          }
       }
 
 
@@ -1031,104 +1031,104 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
     case 2:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
+          {
+            // constant
+          case 0:
 
-  	  // linear
-  	case 1:
-  	case 2:
-  	case 3:
-  	  return 0.;
+            // linear
+          case 1:
+          case 2:
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	case 5:
-  	  return 0.;
+            // quadratic
+          case 4:
+          case 5:
+            return 0.;
 
-  	case 6:
-  	  return 2./dist2y;
+          case 6:
+            return 2./dist2y;
 
-  	case 7:
-  	case 8:
-  	case 9:
-  	  return 0.;
+          case 7:
+          case 8:
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	case 11:
-  	  return 0.;
+            // cubic
+          case 10:
+          case 11:
+            return 0.;
 
-  	case 12:
-  	  return 2.*dx/dist2y;
-  	case 13:
-  	  return 6.*dy/dist2y;
+          case 12:
+            return 2.*dx/dist2y;
+          case 13:
+            return 6.*dy/dist2y;
 
-  	case 14:
-  	case 15:
-  	  return 0.;
+          case 14:
+          case 15:
+            return 0.;
 
-  	case 16:
-  	  return 2.*dz/dist2y;
+          case 16:
+            return 2.*dz/dist2y;
 
-  	case 17:
-  	case 18:
-  	case 19:
-  	  return 0.;
+          case 17:
+          case 18:
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	case 21:
-  	  return 0.;
+            // quartics
+          case 20:
+          case 21:
+            return 0.;
 
-  	case 22:
-  	  return 2.*dx*dx/dist2y;
+          case 22:
+            return 2.*dx*dx/dist2y;
 
-  	case 23:
-  	  return 6.*dx*dy/dist2y;
+          case 23:
+            return 6.*dx*dy/dist2y;
 
-  	case 24:
-  	  return 12.*dy*dy/dist2y;
+          case 24:
+            return 12.*dy*dy/dist2y;
 
-  	case 25:
-  	case 26:
-  	  return 0.;
+          case 25:
+          case 26:
+            return 0.;
 
-  	case 27:
-  	  return 2.*dx*dz/dist2y;
+          case 27:
+            return 2.*dx*dz/dist2y;
 
-  	case 28:
-  	  return 6.*dy*dz/dist2y;
+          case 28:
+            return 6.*dy*dz/dist2y;
 
-  	case 29:
-  	case 30:
-  	  return 0.;
+          case 29:
+          case 30:
+            return 0.;
 
-  	case 31:
-  	  return 2.*dz*dz/dist2y;
+          case 31:
+            return 2.*dz*dz/dist2y;
 
-  	case 32:
-  	case 33:
-  	case 34:
-  	  return 0.;
+          case 32:
+          case 33:
+          case 34:
+            return 0.;
 
-  	default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = ny * (ny - 1);
-          for (unsigned int index=0; index != nx; index++)
-            val *= dx;
-          for (unsigned int index=2; index < ny; index++)
-            val *= dy;
-          for (unsigned int index=0; index != nz; index++)
-            val *= dz;
-          return val/dist2y;
-  	}
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = ny * (ny - 1);
+            for (unsigned int index=0; index != nx; index++)
+              val *= dx;
+            for (unsigned int index=2; index < ny; index++)
+              val *= dy;
+            for (unsigned int index=0; index != nz; index++)
+              val *= dz;
+            return val/dist2y;
+          }
       }
 
 
@@ -1136,210 +1136,210 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
     case 3:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
+          {
+            // constant
+          case 0:
 
-  	  // linear
-  	case 1:
-  	case 2:
-  	case 3:
-  	  return 0.;
+            // linear
+          case 1:
+          case 2:
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	case 5:
-  	case 6:
-  	  return 0.;
+            // quadratic
+          case 4:
+          case 5:
+          case 6:
+            return 0.;
 
-  	case 7:
-  	  return 1./distxz;
+          case 7:
+            return 1./distxz;
 
-  	case 8:
-  	case 9:
-  	  return 0.;
+          case 8:
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	case 11:
-  	case 12:
-  	case 13:
-  	  return 0.;
+            // cubic
+          case 10:
+          case 11:
+          case 12:
+          case 13:
+            return 0.;
 
-  	case 14:
-  	  return 2.*dx/distxz;
+          case 14:
+            return 2.*dx/distxz;
 
-  	case 15:
-  	  return dy/distxz;
+          case 15:
+            return dy/distxz;
 
-  	case 16:
-  	  return 0.;
+          case 16:
+            return 0.;
 
-  	case 17:
-  	  return 2.*dz/distxz;
+          case 17:
+            return 2.*dz/distxz;
 
-  	case 18:
-  	case 19:
-  	  return 0.;
+          case 18:
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	case 21:
-  	case 22:
-  	case 23:
-  	case 24:
-  	  return 0.;
+            // quartics
+          case 20:
+          case 21:
+          case 22:
+          case 23:
+          case 24:
+            return 0.;
 
-  	case 25:
-  	  return 3.*dx*dx/distxz;
+          case 25:
+            return 3.*dx*dx/distxz;
 
-  	case 26:
-  	  return 2.*dx*dy/distxz;
+          case 26:
+            return 2.*dx*dy/distxz;
 
-  	case 27:
-  	  return dy*dy/distxz;
+          case 27:
+            return dy*dy/distxz;
 
-  	case 28:
-  	  return 0.;
+          case 28:
+            return 0.;
 
-  	case 29:
-  	  return 4.*dx*dz/distxz;
+          case 29:
+            return 4.*dx*dz/distxz;
 
-  	case 30:
-  	  return 2.*dy*dz/distxz;
+          case 30:
+            return 2.*dy*dz/distxz;
 
-  	case 31:
-  	  return 0.;
+          case 31:
+            return 0.;
 
-  	case 32:
-  	  return 3.*dz*dz/distxz;
+          case 32:
+            return 3.*dz*dz/distxz;
 
-  	case 33:
-  	case 34:
-  	  return 0.;
+          case 33:
+          case 34:
+            return 0.;
 
-  	default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = nx * nz;
-          for (unsigned int index=1; index < nx; index++)
-            val *= dx;
-          for (unsigned int index=0; index != ny; index++)
-            val *= dy;
-          for (unsigned int index=1; index < nz; index++)
-            val *= dz;
-          return val/distxz;
-  	}
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = nx * nz;
+            for (unsigned int index=1; index < nx; index++)
+              val *= dx;
+            for (unsigned int index=0; index != ny; index++)
+              val *= dy;
+            for (unsigned int index=1; index < nz; index++)
+              val *= dz;
+            return val/distxz;
+          }
       }
 
       // d^2()/dydz
     case 4:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
+          {
+            // constant
+          case 0:
 
-  	  // linear
-  	case 1:
-  	case 2:
-  	case 3:
-  	  return 0.;
+            // linear
+          case 1:
+          case 2:
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	case 5:
-  	case 6:
-  	case 7:
-  	  return 0.;
+            // quadratic
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+            return 0.;
 
-  	case 8:
-  	  return 1./distyz;
+          case 8:
+            return 1./distyz;
 
-  	case 9:
-  	  return 0.;
+          case 9:
+            return 0.;
 
-  	  // cubic
-  	case 10:
-  	case 11:
-  	case 12:
-  	case 13:
-  	case 14:
-  	  return 0.;
+            // cubic
+          case 10:
+          case 11:
+          case 12:
+          case 13:
+          case 14:
+            return 0.;
 
-  	case 15:
-  	  return dx/distyz;
+          case 15:
+            return dx/distyz;
 
-  	case 16:
-  	  return 2.*dy/distyz;
+          case 16:
+            return 2.*dy/distyz;
 
-  	case 17:
-  	  return 0.;
+          case 17:
+            return 0.;
 
-  	case 18:
-  	  return 2.*dz/distyz;
+          case 18:
+            return 2.*dz/distyz;
 
-  	case 19:
-  	  return 0.;
+          case 19:
+            return 0.;
 
-  	  // quartics
-  	case 20:
-  	case 21:
-  	case 22:
-  	case 23:
-  	case 24:
-  	case 25:
-  	  return 0.;
+            // quartics
+          case 20:
+          case 21:
+          case 22:
+          case 23:
+          case 24:
+          case 25:
+            return 0.;
 
-  	case 26:
-  	  return dx*dx/distyz;
+          case 26:
+            return dx*dx/distyz;
 
-  	case 27:
-  	  return 2.*dx*dy/distyz;
+          case 27:
+            return 2.*dx*dy/distyz;
 
-  	case 28:
-  	  return 3.*dy*dy/distyz;
+          case 28:
+            return 3.*dy*dy/distyz;
 
-  	case 29:
-  	  return 0.;
+          case 29:
+            return 0.;
 
-  	case 30:
-  	  return 2.*dx*dz/distyz;
+          case 30:
+            return 2.*dx*dz/distyz;
 
-  	case 31:
-  	  return 4.*dy*dz/distyz;
+          case 31:
+            return 4.*dy*dz/distyz;
 
-  	case 32:
-  	  return 0.;
+          case 32:
+            return 0.;
 
-  	case 33:
-  	  return 3.*dz*dz/distyz;
+          case 33:
+            return 3.*dz*dz/distyz;
 
-  	case 34:
-  	  return 0.;
+          case 34:
+            return 0.;
 
-  	default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = ny * nz;
-          for (unsigned int index=0; index != nx; index++)
-            val *= dx;
-          for (unsigned int index=1; index < ny; index++)
-            val *= dy;
-          for (unsigned int index=1; index < nz; index++)
-            val *= dz;
-          return val/distyz;
-  	}
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = ny * nz;
+            for (unsigned int index=0; index != nx; index++)
+              val *= dx;
+            for (unsigned int index=1; index < ny; index++)
+              val *= dy;
+            for (unsigned int index=1; index < nz; index++)
+              val *= dz;
+            return val/distyz;
+          }
       }
 
 
@@ -1347,93 +1347,93 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
     case 5:
       {
         switch (i)
-  	{
-  	  // constant
-  	case 0:
+          {
+            // constant
+          case 0:
 
-  	  // linear
-  	case 1:
-  	case 2:
-  	case 3:
-  	  return 0.;
+            // linear
+          case 1:
+          case 2:
+          case 3:
+            return 0.;
 
-  	  // quadratic
-  	case 4:
-  	case 5:
-  	case 6:
-  	case 7:
-  	case 8:
-  	  return 0.;
+            // quadratic
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+          case 8:
+            return 0.;
 
-  	case 9:
-  	  return 2./dist2z;
+          case 9:
+            return 2./dist2z;
 
-  	  // cubic
-  	case 10:
-  	case 11:
-  	case 12:
-  	case 13:
-  	case 14:
-  	case 15:
-  	case 16:
-  	  return 0.;
+            // cubic
+          case 10:
+          case 11:
+          case 12:
+          case 13:
+          case 14:
+          case 15:
+          case 16:
+            return 0.;
 
-  	case 17:
-  	  return 2.*dx/dist2z;
+          case 17:
+            return 2.*dx/dist2z;
 
-  	case 18:
-  	  return 2.*dy/dist2z;
+          case 18:
+            return 2.*dy/dist2z;
 
-  	case 19:
-  	  return 6.*dz/dist2z;
+          case 19:
+            return 6.*dz/dist2z;
 
-  	  // quartics
-  	case 20:
-  	case 21:
-  	case 22:
-  	case 23:
-  	case 24:
-  	case 25:
-  	case 26:
-  	case 27:
-  	case 28:
-  	  return 0.;
+            // quartics
+          case 20:
+          case 21:
+          case 22:
+          case 23:
+          case 24:
+          case 25:
+          case 26:
+          case 27:
+          case 28:
+            return 0.;
 
-  	case 29:
-  	  return 2.*dx*dx/dist2z;
+          case 29:
+            return 2.*dx*dx/dist2z;
 
-  	case 30:
-  	  return 2.*dx*dy/dist2z;
+          case 30:
+            return 2.*dx*dy/dist2z;
 
-  	case 31:
-  	  return 2.*dy*dy/dist2z;
+          case 31:
+            return 2.*dy*dy/dist2z;
 
-  	case 32:
-  	  return 6.*dx*dz/dist2z;
+          case 32:
+            return 6.*dx*dz/dist2z;
 
-  	case 33:
-  	  return 6.*dy*dz/dist2z;
+          case 33:
+            return 6.*dy*dz/dist2z;
 
-  	case 34:
-  	  return 12.*dz*dz/dist2z;
+          case 34:
+            return 12.*dz*dz/dist2z;
 
-  	default:
-          unsigned int o = 0;
-          for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-          unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-          unsigned int block=o, nz = 0;
-          for (; block < i2; block += (o-nz+1)) { nz++; }
-          const unsigned int nx = block - i2;
-          const unsigned int ny = o - nx - nz;
-          Real val = nz * (nz - 1);
-          for (unsigned int index=0; index != nx; index++)
-            val *= dx;
-          for (unsigned int index=0; index != ny; index++)
-            val *= dy;
-          for (unsigned int index=2; index < nz; index++)
-            val *= dz;
-          return val/dist2z;
-  	}
+          default:
+            unsigned int o = 0;
+            for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
+            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
+            unsigned int block=o, nz = 0;
+            for (; block < i2; block += (o-nz+1)) { nz++; }
+            const unsigned int nx = block - i2;
+            const unsigned int ny = o - nx - nz;
+            Real val = nz * (nz - 1);
+            for (unsigned int index=0; index != nx; index++)
+              val *= dx;
+            for (unsigned int index=0; index != ny; index++)
+              val *= dy;
+            for (unsigned int index=2; index < nz; index++)
+              val *= dz;
+            return val/dist2z;
+          }
       }
 
 

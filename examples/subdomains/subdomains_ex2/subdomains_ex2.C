@@ -17,11 +17,11 @@
 
 
 
- // <h1>Subdomains Example 2 - Subdomain-Restricted Variables</h1>
- //
- // This example builds on the fourth example program by showing how
- // to restrict solution fields to a subdomain (or union of
- // subdomains).
+// <h1>Subdomains Example 2 - Subdomain-Restricted Variables</h1>
+//
+// This example builds on the fourth example program by showing how
+// to restrict solution fields to a subdomain (or union of
+// subdomains).
 
 
 // C++ include files that we need
@@ -100,7 +100,7 @@ int main (int argc, char** argv)
   // Check for proper calling arguments.
   if (argc < 3)
     {
-      if (libMesh::processor_id() == 0)
+      if (init.comm().rank() == 0)
         std::cerr << "Usage:\n"
                   <<"\t " << argv[0] << " -d 2(3)" << " -n 15"
                   << std::endl;
@@ -156,7 +156,7 @@ int main (int argc, char** argv)
   // Cannot use discontinuous basis.
   if ((family == "MONOMIAL") || (family == "XYZ"))
     {
-      if (libMesh::processor_id() == 0)
+      if (mesh.processor_id() == 0)
         std::cerr << "ex28 currently requires a C^0 (or higher) FE basis." << std::endl;
       libmesh_error();
     }
@@ -176,8 +176,8 @@ int main (int argc, char** argv)
       // solving with low-order finite elements.
       MeshTools::Generation::build_cube (mesh,
                                          ps,
-					 (dim>1) ? ps : 0,
-					 (dim>2) ? ps : 0,
+                                         (dim>1) ? ps : 0,
+                                         (dim>2) ? ps : 0,
                                          -1., 1.,
                                          -halfwidth, halfwidth,
                                          -halfheight, halfheight,
@@ -188,9 +188,9 @@ int main (int argc, char** argv)
   else
     {
       MeshTools::Generation::build_cube (mesh,
-					 ps,
-					 (dim>1) ? ps : 0,
-					 (dim>2) ? ps : 0,
+                                         ps,
+                                         (dim>1) ? ps : 0,
+                                         (dim>2) ? ps : 0,
                                          -1., 1.,
                                          -halfwidth, halfwidth,
                                          -halfheight, halfheight,
@@ -204,17 +204,17 @@ int main (int argc, char** argv)
 
     for ( ; el != end_el; ++el)
       {
-	Elem* elem = *el;
-	const Point cent = elem->centroid();
+        Elem* elem = *el;
+        const Point cent = elem->centroid();
         if (dim > 1)
           {
-	    if ((cent(0) > 0) == (cent(1) > 0))
-	      elem->subdomain_id() = 1;
+            if ((cent(0) > 0) == (cent(1) > 0))
+              elem->subdomain_id() = 1;
           }
         else
           {
-	    if (cent(0) > 0)
-	      elem->subdomain_id() = 1;
+            if (cent(0) > 0)
+              elem->subdomain_id() = 1;
           }
       }
   }
@@ -240,7 +240,7 @@ int main (int argc, char** argv)
   system.add_variable("u",
                       Utility::string_to_enum<Order>   (order),
                       Utility::string_to_enum<FEFamily>(family),
-		      &active_subdomains);
+                      &active_subdomains);
 
   // Add the variable "v" to "Poisson".  "v"
   // will be approximated using second-order approximation.
@@ -248,7 +248,7 @@ int main (int argc, char** argv)
   system.add_variable("v",
                       Utility::string_to_enum<Order>   (order),
                       Utility::string_to_enum<FEFamily>(family),
-		      &active_subdomains);
+                      &active_subdomains);
 
   // Give the system a pointer to the matrix assembly
   // function.
@@ -267,17 +267,17 @@ int main (int argc, char** argv)
   // After solving the system write the solution
   // to a GMV-formatted plot file.
   if(dim == 1)
-  {
-    GnuPlotIO plot(mesh,"Subdomains Example 2, 1D",GnuPlotIO::GRID_ON);
-    plot.write_equation_systems("gnuplot_script",equation_systems);
-  }
+    {
+      GnuPlotIO plot(mesh,"Subdomains Example 2, 1D",GnuPlotIO::GRID_ON);
+      plot.write_equation_systems("gnuplot_script",equation_systems);
+    }
   else
-  {
+    {
 #ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO (mesh).write_equation_systems ((dim == 3) ?
-      "out_3.e" : "out_2.e",equation_systems);
+      ExodusII_IO (mesh).write_equation_systems ((dim == 3) ?
+                                                 "out_3.e" : "out_2.e",equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
-  }
+    }
 
   // All done.
   return 0;
@@ -307,7 +307,7 @@ void assemble_poisson(EquationSystems& es,
   // application.
   PerfLog perf_log ("Matrix Assembly");
 
-    // Get a constant reference to the mesh object.
+  // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
 
   // The dimension that we are running
@@ -411,11 +411,11 @@ void assemble_poisson(EquationSystems& es,
       dof_map.dof_indices (elem, dof_indices,0);
       dof_map.dof_indices (elem, dof_indices2,1);
 
-//       std::cout << "dof_indices.size()="
-// 		<< dof_indices.size()
-// 		<< ", dof_indices2.size()="
-// 		<< dof_indices2.size()
-// 		<< std::endl;
+      //       std::cout << "dof_indices.size()="
+      // << dof_indices.size()
+      // << ", dof_indices2.size()="
+      // << dof_indices2.size()
+      // << std::endl;
 
       // Compute the element-specific data for the current
       // element.  This involves computing the location of the
@@ -430,7 +430,7 @@ void assemble_poisson(EquationSystems& es,
       // element type is different (i.e. the last element was a
       // triangle, now we are on a quadrilateral).
       Ke.resize (std::max(dof_indices.size(), dof_indices2.size()),
-		 std::max(dof_indices.size(), dof_indices2.size()));
+                 std::max(dof_indices.size(), dof_indices2.size()));
 
       Fe.resize (std::max(dof_indices.size(), dof_indices2.size()));
 
@@ -509,16 +509,16 @@ void assemble_poisson(EquationSystems& es,
 
           Real fxy;
           if(dim==1)
-          {
-            // In 1D, compute the rhs by differentiating the
-            // exact solution twice.
-            const Real pi = libMesh::pi;
-            fxy = (0.25*pi*pi)*sin(.5*pi*x);
-          }
+            {
+              // In 1D, compute the rhs by differentiating the
+              // exact solution twice.
+              const Real pi = libMesh::pi;
+              fxy = (0.25*pi*pi)*sin(.5*pi*x);
+            }
           else
-          {
-            fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
-          }
+            {
+              fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
+            }
 
           // Add the RHS contribution
           for (unsigned int i=0; i<phi.size(); i++)
@@ -544,7 +544,7 @@ void assemble_poisson(EquationSystems& es,
         // side MUST live on a boundary of the domain.
         for (unsigned int side=0; side<elem->n_sides(); side++)
           if ((elem->neighbor(side) == NULL) ||
-	      (elem->neighbor(side)->subdomain_id() != elem->subdomain_id()))
+              (elem->neighbor(side)->subdomain_id() != elem->subdomain_id()))
             {
 
               // The penalty value.  \frac{1}{\epsilon}
@@ -570,35 +570,35 @@ void assemble_poisson(EquationSystems& es,
 
               // Loop over the face quadrature points for integration.
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
-              {
-                // The location on the boundary of the current
-                // face quadrature point.
-                const Real xf = qface_point[qp](0);
+                {
+                  // The location on the boundary of the current
+                  // face quadrature point.
+                  const Real xf = qface_point[qp](0);
 #if LIBMESH_DIM > 1
-                const Real yf = qface_point[qp](1);
+                  const Real yf = qface_point[qp](1);
 #else
-                const Real yf = 0.;
+                  const Real yf = 0.;
 #endif
 #if LIBMESH_DIM > 2
-                const Real zf = qface_point[qp](2);
+                  const Real zf = qface_point[qp](2);
 #else
-                const Real zf = 0.;
+                  const Real zf = 0.;
 #endif
 
 
-                // The boundary value.
-                const Real value = exact_solution(xf, yf, zf);
+                  // The boundary value.
+                  const Real value = exact_solution(xf, yf, zf);
 
-                // Matrix contribution of the L2 projection.
-                for (unsigned int i=0; i<phi_face.size(); i++)
-                  for (unsigned int j=0; j<phi_face.size(); j++)
-                    Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+                  // Matrix contribution of the L2 projection.
+                  for (unsigned int i=0; i<phi_face.size(); i++)
+                    for (unsigned int j=0; j<phi_face.size(); j++)
+                      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
 
-                // Right-hand-side contribution of the L2
-                // projection.
-                for (unsigned int i=0; i<phi_face.size(); i++)
-                  Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-              }
+                  // Right-hand-side contribution of the L2
+                  // projection.
+                  for (unsigned int i=0; i<phi_face.size(); i++)
+                    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
+                }
             }
 
 
@@ -616,16 +616,16 @@ void assemble_poisson(EquationSystems& es,
       perf_log.push ("matrix insertion");
 
       if (dof_indices.size())
-	{
-	  system.matrix->add_matrix (Ke, dof_indices);
-	  system.rhs->add_vector    (Fe, dof_indices);
-	}
+        {
+          system.matrix->add_matrix (Ke, dof_indices);
+          system.rhs->add_vector    (Fe, dof_indices);
+        }
 
       if (dof_indices2.size())
-	{
-	  system.matrix->add_matrix (Ke, dof_indices2);
-	  system.rhs->add_vector    (Fe, dof_indices2);
-	}
+        {
+          system.matrix->add_matrix (Ke, dof_indices2);
+          system.rhs->add_vector    (Fe, dof_indices2);
+        }
 
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector

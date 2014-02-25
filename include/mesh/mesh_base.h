@@ -76,7 +76,7 @@ public:
    * changed by mesh generation/loading) later.
    */
   MeshBase (const Parallel::Communicator &comm,
-	    unsigned int dim=1);
+            unsigned int dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
@@ -395,9 +395,9 @@ public:
    * do this in parallel if you are manually keeping ids consistent.
    */
   virtual Node* add_point (const Point& p,
-			   const dof_id_type id = DofObject::invalid_id,
-			   const processor_id_type proc_id =
-			     DofObject::invalid_processor_id) = 0;
+                           const dof_id_type id = DofObject::invalid_id,
+                           const processor_id_type proc_id =
+                           DofObject::invalid_processor_id) = 0;
 
   /**
    * Add \p Node \p n to the end of the vertex array.
@@ -467,7 +467,7 @@ public:
    * flag.
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
-			       const bool reset_current_list    = true) = 0;
+                               const bool reset_current_list    = true) = 0;
 
   /**
    * After partitoning a mesh it is useful to renumber the nodes and elements
@@ -476,12 +476,12 @@ public:
    */
   virtual void renumber_nodes_and_elements () = 0;
 
-    /**
-     * There is no reason for a user to ever call this function.
-     *
-     * This function restores a previously broken element/node numbering such that
-     * \p mesh.node(n)->id() == n.
-     */
+  /**
+   * There is no reason for a user to ever call this function.
+   *
+   * This function restores a previously broken element/node numbering such that
+   * \p mesh.node(n)->id() == n.
+   */
   virtual void fix_broken_node_and_element_numbering () = 0;
 
 
@@ -504,7 +504,7 @@ public:
    * The argument to skip renumbering is now deprecated - to prevent a
    * mesh from being renumbered, set allow_renumbering(false).
    */
-  void prepare_for_use (const bool skip_renumber_nodes_and_elements=false);
+  void prepare_for_use (const bool skip_renumber_nodes_and_elements=false, const bool skip_find_neighbors=false);
 
   /**
    * Call the default partitioner (currently \p metis_partition()).
@@ -601,7 +601,7 @@ public:
    * implemented in derived classes.
    */
   virtual void read  (const std::string& name, MeshData* mesh_data=NULL,
-		      bool skip_renumber_nodes_and_elements=false) = 0;
+                      bool skip_renumber_nodes_and_elements=false) = 0;
   virtual void write (const std::string& name, MeshData* mesh_data=NULL) = 0;
 
   /**
@@ -961,15 +961,15 @@ private:
 struct
 MeshBase::element_iterator :
 variant_filter_iterator<MeshBase::Predicate,
-			Elem*>
+                        Elem*>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
   element_iterator (const IterType& d,
-		    const IterType& e,
-		    const PredType& p ) :
+                    const IterType& e,
+                    const PredType& p ) :
     variant_filter_iterator<MeshBase::Predicate,
-			    Elem*>(d,e,p) {}
+    Elem*>(d,e,p) {}
 };
 
 
@@ -982,28 +982,28 @@ variant_filter_iterator<MeshBase::Predicate,
 struct
 MeshBase::const_element_iterator :
 variant_filter_iterator<MeshBase::Predicate,
-			Elem* const,
-			Elem* const&,
-			Elem* const*>
+                        Elem* const,
+                        Elem* const&,
+                        Elem* const*>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
   const_element_iterator (const IterType& d,
-			  const IterType& e,
-			  const PredType& p ) :
+                          const IterType& e,
+                          const PredType& p ) :
     variant_filter_iterator<MeshBase::Predicate,
-			    Elem* const,
-			    Elem* const&,
-			    Elem* const*>(d,e,p)  {}
+    Elem* const,
+    Elem* const&,
+    Elem* const*>(d,e,p)  {}
 
 
   // The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
   // variant_filter_iterator copy constructor.  Note that this one is *not* templated!
   const_element_iterator (const MeshBase::element_iterator& rhs) :
     variant_filter_iterator<Predicate,
-			    Elem* const,
-			    Elem* const&,
-			    Elem* const*>(rhs)
+    Elem* const,
+    Elem* const&,
+    Elem* const*>(rhs)
   {
     // libMesh::out << "Called element_iterator conversion-to-const ctor." << std::endl;
   }
@@ -1021,15 +1021,15 @@ variant_filter_iterator<MeshBase::Predicate,
 struct
 MeshBase::node_iterator :
 variant_filter_iterator<MeshBase::Predicate,
-			Node*>
+                        Node*>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
   node_iterator (const IterType& d,
-		 const IterType& e,
-		 const PredType& p ) :
+                 const IterType& e,
+                 const PredType& p ) :
     variant_filter_iterator<MeshBase::Predicate,
-			    Node*>(d,e,p) {}
+    Node*>(d,e,p) {}
 };
 
 
@@ -1042,28 +1042,28 @@ variant_filter_iterator<MeshBase::Predicate,
 struct
 MeshBase::const_node_iterator :
 variant_filter_iterator<MeshBase::Predicate,
-			Node* const,
-			Node* const &,
-			Node* const *>
+                        Node* const,
+                        Node* const &,
+                        Node* const *>
 {
   // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
   template <typename PredType, typename IterType>
   const_node_iterator (const IterType& d,
-		       const IterType& e,
-		       const PredType& p ) :
+                       const IterType& e,
+                       const PredType& p ) :
     variant_filter_iterator<MeshBase::Predicate,
-			    Node* const,
-			    Node* const &,
-			    Node* const *>(d,e,p)  {}
+    Node* const,
+    Node* const &,
+    Node* const *>(d,e,p)  {}
 
 
   // The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
   // variant_filter_iterator copy constructor.  Note that this one is *not* templated!
   const_node_iterator (const MeshBase::node_iterator& rhs) :
     variant_filter_iterator<Predicate,
-			    Node* const,
-			    Node* const &,
-			    Node* const *>(rhs)
+    Node* const,
+    Node* const &,
+    Node* const *>(rhs)
   {
     // libMesh::out << "Called node_iterator conversion-to-const ctor." << std::endl;
   }

@@ -53,8 +53,8 @@ public:
   /**
    * Constructor.
    */
-  DerivedRBEvaluation (const Parallel::Communicator &comm 
-		       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  DerivedRBEvaluation (const Parallel::Communicator &comm
+                       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Clear this object. Overload to also reset residual_type_flag.
@@ -96,7 +96,7 @@ public:
    * The dense vectors that define the derived basis
    * functions based on the uber system.
    */
-   std::vector< DenseVector<Number> > derived_basis_functions;
+  std::vector< DenseVector<Number> > derived_basis_functions;
 
   /**
    * Define an enumeration for the two types of residuals we can

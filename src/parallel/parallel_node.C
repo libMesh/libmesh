@@ -30,19 +30,19 @@
 
 namespace
 {
-  using namespace libMesh;
+using namespace libMesh;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  static const unsigned int header_size = 3;
+static const unsigned int header_size = 3;
 #else
-  static const unsigned int header_size = 2;
+static const unsigned int header_size = 2;
 #endif
 
-  // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int idtypes_per_Real =
-    (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
+// use "(a+b-1)/b" trick to get a/b to round up
+static const unsigned int idtypes_per_Real =
+  (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
 
-  static const largest_id_type node_magic_header = 1234567890;
+static const largest_id_type node_magic_header = 1234567890;
 }
 
 
@@ -59,18 +59,18 @@ unsigned int packable_size (const Node* node, const MeshBase* mesh)
 {
   return
 #ifndef NDEBUG
-         1 + // add an int for the magic header when testing
+    1 + // add an int for the magic header when testing
 #endif
-	 header_size + LIBMESH_DIM*idtypes_per_Real +
-         node->packed_indexing_size() +
-         1 + mesh->boundary_info->n_boundary_ids(node);
+    header_size + LIBMESH_DIM*idtypes_per_Real +
+    node->packed_indexing_size() +
+    1 + mesh->boundary_info->n_boundary_ids(node);
 }
 
 
 
 template <>
 unsigned int packed_size (const Node*,
-			  const std::vector<largest_id_type>::const_iterator in)
+                          const std::vector<largest_id_type>::const_iterator in)
 {
   const unsigned int pre_indexing_size =
 #ifndef NDEBUG
@@ -92,7 +92,7 @@ unsigned int packed_size (const Node*,
 
 template <>
 unsigned int packed_size (const Node* n,
-			  const std::vector<largest_id_type>::iterator in)
+                          const std::vector<largest_id_type>::iterator in)
 {
   return packed_size(n, std::vector<largest_id_type>::const_iterator(in));
 }
@@ -153,11 +153,11 @@ void pack (const Node* node,
   node->pack_indexing(std::back_inserter(data));
 
   libmesh_assert(node->packed_indexing_size() ==
-		 DofObject::unpackable_indexing_size(data.begin() +
-						     start_indices));
+                 DofObject::unpackable_indexing_size(data.begin() +
+                                                     start_indices));
 
   libmesh_assert_equal_to (node->packed_indexing_size(),
-		          data.size() - start_indices);
+                           data.size() - start_indices);
 
   // Add any nodal boundary condition ids
   std::vector<boundary_id_type> bcs =
@@ -226,17 +226,17 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
 
       if (!node->has_dofs())
         {
-	  node->unpack_indexing(in);
-	  libmesh_assert_equal_to (DofObject::unpackable_indexing_size(in),
-			           node->packed_indexing_size());
+          node->unpack_indexing(in);
+          libmesh_assert_equal_to (DofObject::unpackable_indexing_size(in),
+                                   node->packed_indexing_size());
           in += node->packed_indexing_size();
-	}
+        }
       else
         {
-	  // FIXME: We should add some debug mode tests to ensure that
-	  // the encoded indexing is consistent
+          // FIXME: We should add some debug mode tests to ensure that
+          // the encoded indexing is consistent
           in += DofObject::unpackable_indexing_size(in);
-	}
+        }
 
       *out = node;
     }
@@ -260,7 +260,7 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
 
       node->unpack_indexing(in);
       libmesh_assert_equal_to (DofObject::unpackable_indexing_size(in),
-		               node->packed_indexing_size());
+                               node->packed_indexing_size());
       in += node->packed_indexing_size();
     }
 
@@ -278,8 +278,8 @@ void unpack (std::vector<largest_id_type>::const_iterator in,
 
 #ifndef NDEBUG
   libmesh_assert (in - original_in ==
-		  static_cast<int>
-                    (Parallel::packed_size(node, original_in)));
+                  static_cast<int>
+                  (Parallel::packed_size(node, original_in)));
 #endif
 }
 

@@ -44,17 +44,17 @@ class Point;
  * See the JumpErrorEstimator class for most user APIs
  *
  * Full BibteX reference:
-\verbatim
-@Article{Kelly83error,
-  author = {D.~W.~Kelly and J.~P.~Gago and O.~C.~Zienkiewicz and I.~Babuska},
-  title  = {{A posteriori error analysis and adaptive
-             processes in the finite element method: Part I Error analysis}},
-  journal = {Int. J. Num. Meth. Engng.},
-  volume  = {19},
-  pages   = {1593--1619},
-  year    = {1983}
-}
-\endverbatim
+ \verbatim
+ @Article{Kelly83error,
+ author = {D.~W.~Kelly and J.~P.~Gago and O.~C.~Zienkiewicz and I.~Babuska},
+ title  = {{A posteriori error analysis and adaptive
+ processes in the finite element method: Part I Error analysis}},
+ journal = {Int. J. Num. Meth. Engng.},
+ volume  = {19},
+ pages   = {1593--1619},
+ year    = {1983}
+ }
+ \endverbatim
  *
  * @author Benjamin S. Kirk, 2003.
  */
@@ -82,8 +82,8 @@ public:
    * The return value is std::pair<bool, Real>
    */
   void attach_flux_bc_function (std::pair<bool,Real> fptr(const System& system,
-							  const Point& p,
-							  const std::string& var_name));
+                                                          const Point& p,
+                                                          const std::string& var_name));
 
 protected:
 
@@ -117,8 +117,8 @@ protected:
    * Pointer to function that returns BC information.
    */
   std::pair<bool,Real> (* _bc_function) (const System& system,
-					 const Point& p,
-					 const std::string& var_name);
+                                         const Point& p,
+                                         const std::string& var_name);
 };
 
 

@@ -79,7 +79,7 @@ public:
   SimpleRBConstruction (EquationSystems& es,
                         const std::string& name,
                         const unsigned int number)
-  : Parent(es, name, number)
+    : Parent(es, name, number)
   {}
 
   /**
@@ -129,7 +129,7 @@ public:
     elem_fe->get_JxW();
     elem_fe->get_phi();
     elem_fe->get_dphi();
-    
+
     FEBase* side_fe = NULL;
     c.get_side_fe( p_var, side_fe );
     side_fe->get_JxW();

@@ -50,22 +50,22 @@ bool InfEdge2::is_face(const unsigned int) const
 }
 
 bool InfEdge2::is_node_on_side(const unsigned int n,
-			       const unsigned int s) const
+                               const unsigned int s) const
 {
   libmesh_assert_less (s, 1);
   return (s == n);
 }
 
 bool InfEdge2::is_node_on_edge(const unsigned int,
-			       const unsigned int libmesh_dbg_var(e)) const
+                               const unsigned int libmesh_dbg_var(e)) const
 {
   libmesh_assert_equal_to (e, 0);
   return true;
 }
 
 void InfEdge2::connectivity(const unsigned int libmesh_dbg_var(se),
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_equal_to (se, 0);
   libmesh_assert_less (se, this->n_sub_elem());
@@ -77,16 +77,16 @@ void InfEdge2::connectivity(const unsigned int libmesh_dbg_var(se),
     {
     case TECPLOT:
       {
-	conn[0] = this->node(0)+1;
-	conn[1] = this->node(1)+1;
-	return;
+        conn[0] = this->node(0)+1;
+        conn[1] = this->node(1)+1;
+        return;
       }
 
     case VTK:
       {
-	conn[0] = this->node(0);
-	conn[1] = this->node(1);
-	return;
+        conn[0] = this->node(0);
+        conn[1] = this->node(1);
+        return;
       }
 
     default:

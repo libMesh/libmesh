@@ -55,17 +55,17 @@ template <typename T>
 void TrilinosPreconditioner<T>::init ()
 {
   if(!this->_matrix)
-  {
-    libMesh::err << "ERROR: No matrix set for PetscPreconditioner, but init() called" << std::endl;
-    libmesh_error();
-  }
+    {
+      libMesh::err << "ERROR: No matrix set for PetscPreconditioner, but init() called" << std::endl;
+      libmesh_error();
+    }
 
   // Clear the preconditioner in case it has been created in the past
   if (!this->_is_initialized)
-  {
-    EpetraMatrix<T> * matrix = libmesh_cast_ptr<EpetraMatrix<T>*, SparseMatrix<T> >(this->_matrix);
-    _mat = matrix->mat();
-  }
+    {
+      EpetraMatrix<T> * matrix = libmesh_cast_ptr<EpetraMatrix<T>*, SparseMatrix<T> >(this->_matrix);
+      _mat = matrix->mat();
+    }
 
   set_preconditioner_type(this->_preconditioner_type);
 
@@ -91,26 +91,26 @@ TrilinosPreconditioner<T>::compute()
 #endif
 
   switch (this->_preconditioner_type)
-  {
-  // IFPACK preconditioners
-  case ILU_PRECOND:
-  case SOR_PRECOND:
-    ifpack = dynamic_cast<Ifpack_Preconditioner *>(_prec);
-    ifpack->Compute();
-    break;
+    {
+      // IFPACK preconditioners
+    case ILU_PRECOND:
+    case SOR_PRECOND:
+      ifpack = dynamic_cast<Ifpack_Preconditioner *>(_prec);
+      ifpack->Compute();
+      break;
 
 #ifdef LIBMESH_HAVE_ML
-  // ML preconditioners
-  case AMG_PRECOND:
-    ml = dynamic_cast<ML_Epetra::MultiLevelPreconditioner *>(_prec);
-    ml->ComputePreconditioner();
-    break;
+      // ML preconditioners
+    case AMG_PRECOND:
+      ml = dynamic_cast<ML_Epetra::MultiLevelPreconditioner *>(_prec);
+      ml->ComputePreconditioner();
+      break;
 #endif
 
-  default:
-    // no nothing here
-    break;
-  }
+    default:
+      // no nothing here
+      break;
+    }
 }
 
 
@@ -124,54 +124,54 @@ TrilinosPreconditioner<T>::set_preconditioner_type (const PreconditionerType & p
 #endif
 
   switch (preconditioner_type)
-  {
-  case IDENTITY_PRECOND:
-//    pc = new Ifpack_DiagPreconditioner();
-    break;
+    {
+    case IDENTITY_PRECOND:
+      //    pc = new Ifpack_DiagPreconditioner();
+      break;
 
-  case CHOLESKY_PRECOND:
-    break;
+    case CHOLESKY_PRECOND:
+      break;
 
-  case ICC_PRECOND:
-    break;
+    case ICC_PRECOND:
+      break;
 
-  case ILU_PRECOND:
-    pc = new Ifpack_ILU(_mat);
-    pc->SetParameters(_param_list);
-    pc->Initialize();
-    _prec = pc;
-    break;
+    case ILU_PRECOND:
+      pc = new Ifpack_ILU(_mat);
+      pc->SetParameters(_param_list);
+      pc->Initialize();
+      _prec = pc;
+      break;
 
-  case LU_PRECOND:
-    break;
+    case LU_PRECOND:
+      break;
 
-  case ASM_PRECOND:
-    break;
+    case ASM_PRECOND:
+      break;
 
-  case JACOBI_PRECOND:
-    break;
+    case JACOBI_PRECOND:
+      break;
 
-  case BLOCK_JACOBI_PRECOND:
-    break;
+    case BLOCK_JACOBI_PRECOND:
+      break;
 
-  case SOR_PRECOND:
-    break;
+    case SOR_PRECOND:
+      break;
 
-  case EISENSTAT_PRECOND:
-    break;
+    case EISENSTAT_PRECOND:
+      break;
 
 #ifdef LIBMESH_HAVE_ML
-  case AMG_PRECOND:
-    ml = new ML_Epetra::MultiLevelPreconditioner(*_mat, _param_list, false);;
-    _prec = ml;
-    break;
+    case AMG_PRECOND:
+      ml = new ML_Epetra::MultiLevelPreconditioner(*_mat, _param_list, false);;
+      _prec = ml;
+      break;
 #endif
 
-  default:
-    libMesh::err << "ERROR:  Unsupported Trilinos Preconditioner: "
-                  << preconditioner_type       << std::endl
-                  << "Continuing with Trilinos defaults" << std::endl;
-  }
+    default:
+      libMesh::err << "ERROR:  Unsupported Trilinos Preconditioner: "
+                   << preconditioner_type       << std::endl
+                   << "Continuing with Trilinos defaults" << std::endl;
+    }
 
 }
 

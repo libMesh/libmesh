@@ -24,12 +24,12 @@
 #ifdef LIBMESH_ENABLE_PARMESH
 #include "libmesh/parallel_mesh.h"
 namespace libMesh {
-  typedef ParallelMesh DefaultMesh;
+typedef ParallelMesh DefaultMesh;
 }
 #else
 #include "libmesh/serial_mesh.h"
 namespace libMesh {
-  typedef SerialMesh DefaultMesh;
+typedef SerialMesh DefaultMesh;
 }
 #endif
 
@@ -43,13 +43,13 @@ namespace libMesh
 /**
  * The \p Mesh class is a thin wrapper, around the \p SerialMesh class
  * by default.
-*/
+ */
 
 // ------------------------------------------------------------
 // Mesh class definition
 class Mesh : public DefaultMesh
 {
- public:
+public:
 
   /**
    * Constructor.  Takes \p dim, the dimension of the mesh.
@@ -58,7 +58,7 @@ class Mesh : public DefaultMesh
    */
   explicit
   Mesh (const Parallel::Communicator &comm_in,
-	unsigned int dim=1)
+        unsigned int dim=1)
     : DefaultMesh(comm_in,dim) {}
 
 #ifndef LIBMESH_DISABLE_COMMWORLD

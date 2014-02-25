@@ -47,13 +47,13 @@ void LaplaceSystem::side_postprocess(DiffContext &context)
 
       // If on the bottom horizontal bdry (y = -1)
       if(fabs(y - 1.0) <= TOL && x > 0.0)
-	{
-	  // Get the value of the gradient at this point
-	  const Gradient grad_T = c.side_gradient(0,qp);
+        {
+          // Get the value of the gradient at this point
+          const Gradient grad_T = c.side_gradient(0,qp);
 
-	  // Add the contribution of this qp to the integral QoI
-	  dQoI_1 += JxW[qp] * (grad_T * face_normals[qp]) ;
-	}
+          // Add the contribution of this qp to the integral QoI
+          dQoI_1 += JxW[qp] * (grad_T * face_normals[qp]) ;
+        }
 
     } // end of the quadrature point qp-loop
 

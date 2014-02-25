@@ -77,7 +77,7 @@ class SystemSubset;
 // ------------------------------------------------------------
 // System class definition
 class System : public ReferenceCountedObject<System>,
-	       public ParallelObject
+               public ParallelObject
 {
 public:
 
@@ -86,8 +86,8 @@ public:
    * data structures.
    */
   System (EquationSystems& es,
-	  const std::string& name,
-	  const unsigned int number);
+          const std::string& name,
+          const unsigned int number);
 
   /**
    * Abstract base class to be used for sysem initialization.
@@ -325,14 +325,14 @@ public:
    * @e Can be overloaded in derived classes.
    */
   virtual void assemble_qoi
-    (const QoISet &qoi_indices = QoISet());
+  (const QoISet &qoi_indices = QoISet());
 
   /**
    * Calls user qoi derivative function.
    * @e Can be overloaded in derived classes.
    */
   virtual void assemble_qoi_derivative
-    (const QoISet &qoi_indices = QoISet());
+  (const QoISet &qoi_indices = QoISet());
 
   /**
    * Calls residual parameter derivative function.
@@ -369,7 +369,7 @@ public:
    * subset being a \p NULL pointer.
    */
   virtual void restrict_solve_to (const SystemSubset* subset,
-				  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
+                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
 
   /**
    * Solves the system.  Should be overloaded in derived systems.
@@ -386,7 +386,7 @@ public:
    * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
-    sensitivity_solve (const ParameterVector& parameters);
+  sensitivity_solve (const ParameterVector& parameters);
 
   /**
    * Assembles & solves the linear system(s) (dR/du)*u_w = sum(w_p*-dR/dp), for
@@ -399,8 +399,8 @@ public:
    * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
-    weighted_sensitivity_solve (const ParameterVector& parameters,
-                                const ParameterVector& weights);
+  weighted_sensitivity_solve (const ParameterVector& parameters,
+                              const ParameterVector& weights);
 
   /**
    * Solves the adjoint system, for the specified qoi indices, or for
@@ -413,7 +413,7 @@ public:
    * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
-    adjoint_solve (const QoISet& qoi_indices = QoISet());
+  adjoint_solve (const QoISet& qoi_indices = QoISet());
 
   /**
    * Assembles & solves the linear system(s)
@@ -430,9 +430,9 @@ public:
    * This method is only implemented in some derived classes.
    */
   virtual std::pair<unsigned int, Real>
-    weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
-                                        const ParameterVector& weights,
-                                        const QoISet& qoi_indices = QoISet());
+  weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
+                                      const ParameterVector& weights,
+                                      const QoISet& qoi_indices = QoISet());
   /**
    * Accessor for the adjoint_already_solved boolean
    */
@@ -522,8 +522,8 @@ public:
    * some diagnostic info when \p verbose is set.
    */
   virtual bool compare (const System& other_system,
-			const Real threshold,
-			const bool verbose) const;
+                        const Real threshold,
+                        const bool verbose) const;
 
   /**
    * @returns the system name.
@@ -569,14 +569,14 @@ public:
    * finite element spaces with continuous derivatives.
    */
   void project_solution (Number fptr(const Point& p,
-				     const Parameters& parameters,
+                                     const Parameters& parameters,
                                      const std::string& sys_name,
-				     const std::string& unknown_name),
+                                     const std::string& unknown_name),
                          Gradient gptr(const Point& p,
-				       const Parameters& parameters,
+                                       const Parameters& parameters,
                                        const std::string& sys_name,
-				       const std::string& unknown_name),
-			 const Parameters& parameters) const;
+                                       const std::string& unknown_name),
+                         const Parameters& parameters) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -615,15 +615,15 @@ public:
    * finite element spaces with continuous derivatives.
    */
   void project_vector (Number fptr(const Point& p,
-				   const Parameters& parameters,
+                                   const Parameters& parameters,
                                    const std::string& sys_name,
-				   const std::string& unknown_name),
+                                   const std::string& unknown_name),
                        Gradient gptr(const Point& p,
-				     const Parameters& parameters,
+                                     const Parameters& parameters,
                                      const std::string& sys_name,
-				     const std::string& unknown_name),
-		       const Parameters& parameters,
-		       NumericVector<Number>& new_vector) const;
+                                     const std::string& unknown_name),
+                       const Parameters& parameters,
+                       NumericVector<Number>& new_vector) const;
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -659,13 +659,13 @@ public:
   void boundary_project_solution (const std::set<boundary_id_type> &b,
                                   const std::vector<unsigned int> &variables,
                                   Number fptr(const Point& p,
-				              const Parameters& parameters,
+                                              const Parameters& parameters,
                                               const std::string& sys_name,
-				              const std::string& unknown_name),
+                                              const std::string& unknown_name),
                                   Gradient gptr(const Point& p,
-				                const Parameters& parameters,
+                                                const Parameters& parameters,
                                                 const std::string& sys_name,
-				                const std::string& unknown_name),
+                                                const std::string& unknown_name),
                                   const Parameters& parameters);
 
   /**
@@ -703,15 +703,15 @@ public:
   void boundary_project_vector (const std::set<boundary_id_type> &b,
                                 const std::vector<unsigned int> &variables,
                                 Number fptr(const Point& p,
-				            const Parameters& parameters,
+                                            const Parameters& parameters,
                                             const std::string& sys_name,
-				            const std::string& unknown_name),
+                                            const std::string& unknown_name),
                                 Gradient gptr(const Point& p,
-				              const Parameters& parameters,
+                                              const Parameters& parameters,
                                               const std::string& sys_name,
-				              const std::string& unknown_name),
-		                const Parameters& parameters,
-		                NumericVector<Number>& new_vector) const;
+                                              const std::string& unknown_name),
+                                const Parameters& parameters,
+                                NumericVector<Number>& new_vector) const;
 
   /**
    * @returns the system number.
@@ -731,7 +731,7 @@ public:
    * Requires communication with all other processors.
    */
   void update_global_solution (std::vector<Number>& global_soln,
-			       const unsigned int dest_proc) const;
+                               const unsigned int dest_proc) const;
 
   /**
    * @returns a constant reference to this systems's \p _mesh.
@@ -839,7 +839,7 @@ public:
    * unless project_solution_on_reinit() = false is called.
    */
   bool& project_solution_on_reinit (void)
-    { return _solution_projection; }
+  { return _solution_projection; }
 
   /**
    * @returns \p true if this \p System has a vector associated with the
@@ -1116,8 +1116,8 @@ public:
    * for this system.  Returns the index number for the new variable.
    */
   unsigned int add_variable (const std::string& var,
-		             const FEType& type,
-			     const std::set<subdomain_id_type> * const active_subdomains = NULL);
+                             const FEType& type,
+                             const std::set<subdomain_id_type> * const active_subdomains = NULL);
 
   /**
    * Adds the variable \p var to the list of variables
@@ -1125,17 +1125,17 @@ public:
    * as default value for \p FEType.family.
    */
   unsigned int add_variable (const std::string& var,
-		             const Order order = FIRST,
-		             const FEFamily = LAGRANGE,
-			     const std::set<subdomain_id_type> * const active_subdomains = NULL);
+                             const Order order = FIRST,
+                             const FEFamily = LAGRANGE,
+                             const std::set<subdomain_id_type> * const active_subdomains = NULL);
 
   /**
    * Adds the variable \p var to the list of variables
    * for this system.  Returns the index number for the new variable.
    */
   unsigned int add_variables (const std::vector<std::string> &vars,
-			      const FEType& type,
-			      const std::set<subdomain_id_type> * const active_subdomains = NULL);
+                              const FEType& type,
+                              const std::set<subdomain_id_type> * const active_subdomains = NULL);
 
   /**
    * Adds the variable \p var to the list of variables
@@ -1143,9 +1143,9 @@ public:
    * as default value for \p FEType.family.
    */
   unsigned int add_variables (const std::vector<std::string> &vars,
-			      const Order order = FIRST,
-			      const FEFamily = LAGRANGE,
-			      const std::set<subdomain_id_type> * const active_subdomains = NULL);
+                              const Order order = FIRST,
+                              const FEFamily = LAGRANGE,
+                              const std::set<subdomain_id_type> * const active_subdomains = NULL);
 
   /**
    * Return a constant reference to \p Variable \p var.
@@ -1232,38 +1232,38 @@ public:
    * norm (e.g. L2, L_INF, H1)
    */
   Real calculate_norm(const NumericVector<Number>& v,
-		      unsigned int var = 0,
-		      FEMNormType norm_type = L2) const;
+                      unsigned int var = 0,
+                      FEMNormType norm_type = L2) const;
 
   /**
    * @returns a norm of the vector \p v, using \p component_norm and \p
    * component_scale to choose and weight the norms of each variable.
    */
   Real calculate_norm(const NumericVector<Number>& v,
-		      const SystemNorm &norm) const;
+                      const SystemNorm &norm) const;
 
   /**
    * Reads the basic data header for this System.
    */
   void read_header (Xdr& io,
-		    const std::string &version,
-		    const bool read_header=true,
-		    const bool read_additional_data=true,
-		    const bool read_legacy_format=false);
+                    const std::string &version,
+                    const bool read_header=true,
+                    const bool read_additional_data=true,
+                    const bool read_legacy_format=false);
 
   /**
    * Reads additional data, namely vectors, for this System.
    */
   void read_legacy_data (Xdr& io,
-			 const bool read_additional_data=true);
+                         const bool read_additional_data=true);
 
   /**
    * Reads additional data, namely vectors, for this System.
    * This method may safely be called on a distributed-memory mesh.
    */
-    template <typename ValType>
+  template <typename ValType>
   void read_serialized_data (Xdr& io,
-			     const bool read_additional_data=true);
+                             const bool read_additional_data=true);
   /**
    * Non-templated version for backward compatibility.
    *
@@ -1271,8 +1271,8 @@ public:
    * This method may safely be called on a distributed-memory mesh.
    */
   void read_serialized_data (Xdr& io,
-			     const bool read_additional_data=true)
-    { read_serialized_data<Number>(io, read_additional_data); }
+                             const bool read_additional_data=true)
+  { read_serialized_data<Number>(io, read_additional_data); }
 
   /**
    * Read a number of identically distributed vectors.  This method
@@ -1281,7 +1281,7 @@ public:
    */
   template <typename InValType>
   std::size_t read_serialized_vectors (Xdr &io,
-				       const std::vector<NumericVector<Number>*> &vectors) const;
+                                       const std::vector<NumericVector<Number>*> &vectors) const;
 
   /**
    * Non-templated version for backward compatibility.
@@ -1291,8 +1291,8 @@ public:
    * the metadata once.
    */
   std::size_t read_serialized_vectors (Xdr &io,
-				       const std::vector<NumericVector<Number>*> &vectors) const
-    { return read_serialized_vectors<Number>(io, vectors); }
+                                       const std::vector<NumericVector<Number>*> &vectors) const
+  { return read_serialized_vectors<Number>(io, vectors); }
 
   /**
    * Reads additional data, namely vectors, for this System.
@@ -1300,9 +1300,9 @@ public:
    * This method will read an individual file for each processor in the simulation
    * where the local solution components for that processor are stored.
    */
-    template <typename InValType>
+  template <typename InValType>
   void read_parallel_data (Xdr &io,
-			   const bool read_additional_data);
+                           const bool read_additional_data);
 
   /**
    * Non-templated version for backward compatibility.
@@ -1313,22 +1313,22 @@ public:
    * where the local solution components for that processor are stored.
    */
   void read_parallel_data (Xdr &io,
-			   const bool read_additional_data)
-    { read_parallel_data<Number>(io, read_additional_data); }
+                           const bool read_additional_data)
+  { read_parallel_data<Number>(io, read_additional_data); }
 
   /**
    * Writes the basic data header for this System.
    */
   void write_header (Xdr& io,
-		     const std::string &version,
-		     const bool write_additional_data) const;
+                     const std::string &version,
+                     const bool write_additional_data) const;
 
   /**
    * Writes additional data, namely vectors, for this System.
    * This method may safely be called on a distributed-memory mesh.
    */
   void write_serialized_data (Xdr& io,
-			      const bool write_additional_data = true) const;
+                              const bool write_additional_data = true) const;
 
   /**
    * Serialize & write a number of identically distributed vectors.  This method
@@ -1336,7 +1336,7 @@ public:
    * the metadata once.
    */
   dof_id_type write_serialized_vectors (Xdr &io,
-  					const std::vector<const NumericVector<Number>*> &vectors) const;
+                                        const std::vector<const NumericVector<Number>*> &vectors) const;
 
   /**
    * Writes additional data, namely vectors, for this System.
@@ -1345,7 +1345,7 @@ public:
    * where the local solution components for that processor will be stored.
    */
   void write_parallel_data (Xdr &io,
-			    const bool write_additional_data) const;
+                            const bool write_additional_data) const;
 
   /**
    * @returns a string containing information about the
@@ -1357,7 +1357,7 @@ public:
    * Register a user function to use in initializing the system.
    */
   void attach_init_function (void fptr(EquationSystems& es,
-				       const std::string& name));
+                                       const std::string& name));
 
   /**
    * Register a user class to use to initialize the system.
@@ -1370,7 +1370,7 @@ public:
    * matrix and RHS.
    */
   void attach_assemble_function (void fptr(EquationSystems& es,
-					   const std::string& name));
+                                           const std::string& name));
 
   /**
    * Register a user object to use in assembling the system
@@ -1399,7 +1399,7 @@ public:
    * Register a user function for imposing constraints.
    */
   void attach_constraint_function (void fptr(EquationSystems& es,
-					     const std::string& name));
+                                             const std::string& name));
 
   /**
    * Register a user object for imposing constraints.
@@ -1411,7 +1411,7 @@ public:
    * whose values should be placed in \p System::qoi
    */
   void attach_QOI_function (void fptr(EquationSystems& es,
-				      const std::string& name,
+                                      const std::string& name,
                                       const QoISet& qoi_indices));
 
   /**
@@ -1426,7 +1426,7 @@ public:
    * be placed in \p System::rhs
    */
   void attach_QOI_derivative (void fptr(EquationSystems& es,
-				        const std::string& name,
+                                        const std::string& name,
                                         const QoISet& qoi_indices));
 
   /**
@@ -1712,7 +1712,7 @@ protected:
    * is passed through the second argument.
    */
   void project_vector (const NumericVector<Number>&,
-		       NumericVector<Number>&) const;
+                       NumericVector<Number>&) const;
 
 private:
   /**
@@ -1736,8 +1736,8 @@ private:
    * corresponding to Dofs associated with var.
    */
   Real discrete_var_norm (const NumericVector<Number>& v,
-			  unsigned int var,
-			  FEMNormType norm_type) const;
+                          unsigned int var,
+                          FEMNormType norm_type) const;
 
   /**
    * Reads an input vector from the stream \p io and assigns
@@ -1747,12 +1747,12 @@ private:
    */
   template <typename iterator_type, typename InValType>
   std::size_t read_serialized_blocked_dof_objects (const dof_id_type n_objects,
-						   const iterator_type begin,
-						   const iterator_type end,
-                           const InValType dummy,
-						   Xdr &io,
-						   const std::vector<NumericVector<Number>*> &vecs,
-						   const unsigned int var_to_read=libMesh::invalid_uint) const;
+                                                   const iterator_type begin,
+                                                   const iterator_type end,
+                                                   const InValType dummy,
+                                                   Xdr &io,
+                                                   const std::vector<NumericVector<Number>*> &vecs,
+                                                   const unsigned int var_to_read=libMesh::invalid_uint) const;
 
   /**
    * Reads the SCALAR dofs from the stream \p io and assigns the values
@@ -1770,9 +1770,9 @@ private:
    *
    * Returns the length of the vector read.
    */
-    template <typename InValType>
+  template <typename InValType>
   numeric_index_type read_serialized_vector (Xdr& io,
-				             NumericVector<Number> &vec);
+                                             NumericVector<Number> &vec);
 
   /**
    * Non-templated version for backward compatibility.
@@ -1783,8 +1783,8 @@ private:
    * Returns the length of the vector read.
    */
   numeric_index_type read_serialized_vector (Xdr& io,
-				             NumericVector<Number> &vec)
-    { return read_serialized_vector<Number>(io, vec); }
+                                             NumericVector<Number> &vec)
+  { return read_serialized_vector<Number>(io, vec); }
 
   /**
    * Writes an output vector to the stream \p io for a set of \p DofObjects.
@@ -1794,11 +1794,11 @@ private:
    */
   template <typename iterator_type>
   dof_id_type write_serialized_blocked_dof_objects (const std::vector<const NumericVector<Number>*> &vecs,
-						    const dof_id_type n_objects,
-						    const iterator_type begin,
-						    const iterator_type end,
-						    Xdr &io,
-						    const unsigned int var_to_write=libMesh::invalid_uint) const;
+                                                    const dof_id_type n_objects,
+                                                    const iterator_type begin,
+                                                    const iterator_type end,
+                                                    Xdr &io,
+                                                    const unsigned int var_to_write=libMesh::invalid_uint) const;
 
   /**
    * Writes the SCALAR dofs associated with var to the stream \p io.
@@ -1807,7 +1807,7 @@ private:
    */
   unsigned int write_SCALAR_dofs (const NumericVector<Number> &vec,
                                   const unsigned int var,
-				  Xdr &io) const;
+                                  Xdr &io) const;
 
   /**
    * Writes a vector for this System.
@@ -1816,13 +1816,13 @@ private:
    * Returns the number of values written.
    */
   dof_id_type write_serialized_vector (Xdr& io,
-				       const NumericVector<Number> &vec) const;
+                                       const NumericVector<Number> &vec) const;
 
   /**
    * Function that initializes the system.
    */
   void (* _init_system_function) (EquationSystems& es,
-				  const std::string& name);
+                                  const std::string& name);
 
   /**
    * Object that initializes the system.
@@ -1833,7 +1833,7 @@ private:
    * Function that assembles the system.
    */
   void (* _assemble_system_function) (EquationSystems& es,
-				      const std::string& name);
+                                      const std::string& name);
 
   /**
    * Object that assembles the system.
@@ -1860,7 +1860,7 @@ private:
    * Function to impose constraints.
    */
   void (* _constrain_system_function) (EquationSystems& es,
-				       const std::string& name);
+                                       const std::string& name);
 
   /**
    * Object that constrains the system.
@@ -1871,8 +1871,8 @@ private:
    * Function to evaluate quantity of interest
    */
   void (* _qoi_evaluate_function) (EquationSystems& es,
-				   const std::string& name,
-				   const QoISet& qoi_indices);
+                                   const std::string& name,
+                                   const QoISet& qoi_indices);
 
   /**
    * Object to compute quantities of interest.
@@ -1883,8 +1883,8 @@ private:
    * Function to evaluate quantity of interest derivative
    */
   void (* _qoi_evaluate_derivative_function) (EquationSystems& es,
-					      const std::string& name,
-					      const QoISet& qoi_indices);
+                                              const std::string& name,
+                                              const QoISet& qoi_indices);
 
   /**
    * Function to evaluate quantity of interest partial derivative wrt parameter

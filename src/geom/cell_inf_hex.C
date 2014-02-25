@@ -47,48 +47,48 @@ dof_id_type InfHex::key (const unsigned int s) const
     case 0:  // the face at z = -1
 
       return
-	this->compute_key (this->node(0),
-			   this->node(1),
-			   this->node(2),
-			   this->node(3));
+        this->compute_key (this->node(0),
+                           this->node(1),
+                           this->node(2),
+                           this->node(3));
 
     case 1:  // the face at y = -1
 
       return
-	this->compute_key (this->node(0),
-			   this->node(1),
-			   this->node(5),
-			   this->node(4));
+        this->compute_key (this->node(0),
+                           this->node(1),
+                           this->node(5),
+                           this->node(4));
 
     case 2:  // the face at x = 1
 
       return
-	this->compute_key (this->node(1),
-			   this->node(2),
-			   this->node(6),
-			   this->node(5));
+        this->compute_key (this->node(1),
+                           this->node(2),
+                           this->node(6),
+                           this->node(5));
 
     case 3: // the face at y = 1
 
       return
-	this->compute_key (this->node(2),
-			   this->node(3),
-			   this->node(7),
-			   this->node(6));
+        this->compute_key (this->node(2),
+                           this->node(3),
+                           this->node(7),
+                           this->node(6));
 
 
     case 4: // the face at x = -1
 
       return
-	this->compute_key (this->node(3),
-			   this->node(0),
-			   this->node(4),
-			   this->node(7));
+        this->compute_key (this->node(3),
+                           this->node(0),
+                           this->node(4),
+                           this->node(7));
     }
 
   // We'll never get here.
   libmesh_error();
- return 0;
+  return 0;
 }
 
 
@@ -110,21 +110,21 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
         Elem* face = new Quad4;
         AutoPtr<Elem> ap_face(face);
 
-	/*
-	 * Oops, here we are, claiming the normal of the face
-	 * elements point outwards -- and this is the exception:
-	 * For the side built from the base face,
-	 * the normal is pointing _into_ the element!
-	 * Why is that? - In agreement with build_side(),
-	 * which in turn _has_ to build the face in this
-	 * way as to enable the cool way \p InfFE re-uses \p FE.
-	 */
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(2);
-	face->set_node(3) = this->get_node(3);
+        /*
+         * Oops, here we are, claiming the normal of the face
+         * elements point outwards -- and this is the exception:
+         * For the side built from the base face,
+         * the normal is pointing _into_ the element!
+         * Why is that? - In agreement with build_side(),
+         * which in turn _has_ to build the face in this
+         * way as to enable the cool way \p InfFE re-uses \p FE.
+         */
+        face->set_node(0) = this->get_node(0);
+        face->set_node(1) = this->get_node(1);
+        face->set_node(2) = this->get_node(2);
+        face->set_node(3) = this->get_node(3);
 
-	return ap_face;
+        return ap_face;
       }
 
     case 1:  // the face at y = -1
@@ -133,12 +133,12 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
         Elem* face = new InfQuad4;
         AutoPtr<Elem> ap_face(face);
 
-	face->set_node(0) = this->get_node(0);
-	face->set_node(1) = this->get_node(1);
-	face->set_node(2) = this->get_node(4);
-	face->set_node(3) = this->get_node(5);
+        face->set_node(0) = this->get_node(0);
+        face->set_node(1) = this->get_node(1);
+        face->set_node(2) = this->get_node(4);
+        face->set_node(3) = this->get_node(5);
 
-	return ap_face;
+        return ap_face;
       }
 
     case 2:  // the face at x = 1
@@ -146,14 +146,14 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
       {
         Elem* face = new InfQuad4;
         AutoPtr<Elem> ap_face(face);
-	//AutoPtr<Elem> face(new InfQuad4);
+        //AutoPtr<Elem> face(new InfQuad4);
 
-	face->set_node(0) = this->get_node(1);
-	face->set_node(1) = this->get_node(2);
-	face->set_node(2) = this->get_node(5);
-	face->set_node(3) = this->get_node(6);
+        face->set_node(0) = this->get_node(1);
+        face->set_node(1) = this->get_node(2);
+        face->set_node(2) = this->get_node(5);
+        face->set_node(3) = this->get_node(6);
 
-	return ap_face;
+        return ap_face;
       }
 
     case 3: // the face at y = 1
@@ -161,14 +161,14 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
       {
         Elem* face = new InfQuad4;
         AutoPtr<Elem> ap_face(face);
-	//AutoPtr<Elem> face(new InfQuad4);
+        //AutoPtr<Elem> face(new InfQuad4);
 
-	face->set_node(0) = this->get_node(2);
-	face->set_node(1) = this->get_node(3);
-	face->set_node(2) = this->get_node(6);
-	face->set_node(3) = this->get_node(7);
+        face->set_node(0) = this->get_node(2);
+        face->set_node(1) = this->get_node(3);
+        face->set_node(2) = this->get_node(6);
+        face->set_node(3) = this->get_node(7);
 
-	return ap_face;
+        return ap_face;
       }
 
     case 4: // the face at x = -1
@@ -176,20 +176,20 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
       {
         Elem* face = new InfQuad4;
         AutoPtr<Elem> ap_face(face);
-	//AutoPtr<Elem> face(new InfQuad4);
+        //AutoPtr<Elem> face(new InfQuad4);
 
-	face->set_node(0) = this->get_node(3);
-	face->set_node(1) = this->get_node(0);
-	face->set_node(2) = this->get_node(7);
-	face->set_node(3) = this->get_node(4);
+        face->set_node(0) = this->get_node(3);
+        face->set_node(1) = this->get_node(0);
+        face->set_node(2) = this->get_node(7);
+        face->set_node(3) = this->get_node(4);
 
-	return ap_face;
+        return ap_face;
       }
 
     default:
       {
-	libmesh_error();
-	AutoPtr<Elem> ap(NULL);  return ap;
+        libmesh_error();
+        AutoPtr<Elem> ap(NULL);  return ap;
       }
     }
 
@@ -240,21 +240,21 @@ Real InfHex::quality (const ElemQuality q) const
        */
     case DIAGONAL:
       {
-	// Diagonal between node 0 and node 2
-	const Real d02 = this->length(0,2);
+        // Diagonal between node 0 and node 2
+        const Real d02 = this->length(0,2);
 
-	// Diagonal between node 1 and node 3
-	const Real d13 = this->length(1,3);
+        // Diagonal between node 1 and node 3
+        const Real d13 = this->length(1,3);
 
-	// Find the biggest and smallest diagonals
-	const Real min = std::min(d02, d13);
-	const Real max = std::max(d02, d13);
+        // Find the biggest and smallest diagonals
+        const Real min = std::min(d02, d13);
+        const Real max = std::max(d02, d13);
 
-	libmesh_assert_not_equal_to (max, 0.0);
+        libmesh_assert_not_equal_to (max, 0.0);
 
-	return min / max;
+        return min / max;
 
-	break;
+        break;
       }
 
       /**
@@ -267,23 +267,23 @@ Real InfHex::quality (const ElemQuality q) const
     case TAPER:
       {
 
-	/**
-	 * Compute the side lengths.
-	 */
-	const Real d01 = this->length(0,1);
-	const Real d12 = this->length(1,2);
-	const Real d23 = this->length(2,3);
-	const Real d03 = this->length(0,3);
+        /**
+         * Compute the side lengths.
+         */
+        const Real d01 = this->length(0,1);
+        const Real d12 = this->length(1,2);
+        const Real d23 = this->length(2,3);
+        const Real d03 = this->length(0,3);
 
-	std::vector<Real> edge_ratios(2);
+        std::vector<Real> edge_ratios(2);
 
-	// Bottom
-	edge_ratios[8] = std::min(d01, d23) / std::max(d01, d23);
-	edge_ratios[9] = std::min(d03, d12) / std::max(d03, d12);
+        // Bottom
+        edge_ratios[8] = std::min(d01, d23) / std::max(d01, d23);
+        edge_ratios[9] = std::min(d03, d12) / std::max(d03, d12);
 
-	return *(std::min_element(edge_ratios.begin(), edge_ratios.end())) ;
+        return *(std::min_element(edge_ratios.begin(), edge_ratios.end())) ;
 
-	break;
+        break;
       }
 
 
@@ -296,32 +296,31 @@ Real InfHex::quality (const ElemQuality q) const
        */
     case STRETCH:
       {
-	/**
-	 * Should this be a sqrt2, when we do this for the base only?
-	 */
-	const Real sqrt3 = 1.73205080756888;
+        /**
+         * Should this be a sqrt2, when we do this for the base only?
+         */
+        const Real sqrt3 = 1.73205080756888;
 
-	/**
-	 * Compute the maximum diagonal in the base.
-	 */
-	const Real d02 = this->length(0,2);
-	const Real d13 = this->length(1,3);
-	const Real max_diag = std::max(d02, d13);
+        /**
+         * Compute the maximum diagonal in the base.
+         */
+        const Real d02 = this->length(0,2);
+        const Real d13 = this->length(1,3);
+        const Real max_diag = std::max(d02, d13);
 
-	libmesh_assert_not_equal_to ( max_diag, 0.0 );
+        libmesh_assert_not_equal_to ( max_diag, 0.0 );
 
-	/**
-	 * Compute the minimum edge length in the base.
-	 */
-	std::vector<Real> edges(4);
-	edges[0]  = this->length(0,1);
-	edges[1]  = this->length(1,2);
-	edges[2]  = this->length(2,3);
-	edges[3]  = this->length(0,3);
+        /**
+         * Compute the minimum edge length in the base.
+         */
+        std::vector<Real> edges(4);
+        edges[0]  = this->length(0,1);
+        edges[1]  = this->length(1,2);
+        edges[2]  = this->length(2,3);
+        edges[3]  = this->length(0,3);
 
-	const Real min_edge = *(std::min_element(edges.begin(), edges.end()));
-	return sqrt3 * min_edge / max_diag ;
-	break;
+        const Real min_edge = *(std::min_element(edges.begin(), edges.end()));
+        return sqrt3 * min_edge / max_diag ;
       }
 
 
@@ -331,14 +330,14 @@ Real InfHex::quality (const ElemQuality q) const
        */
     default:
       {
-	return Elem::quality(q);
+        return Elem::quality(q);
       }
     }
 
 
-    // Will never get here...
-    libmesh_error();
-    return 0.;
+  // Will never get here...
+  libmesh_error();
+  return 0.;
 }
 
 
@@ -349,67 +348,67 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
 
   std::pair<Real, Real> bounds;
 
-/*
-  switch (q)
+  /*
+    switch (q)
     {
 
     case ASPECT_RATIO:
-      bounds.first  = 1.;
-      bounds.second = 4.;
-      break;
+    bounds.first  = 1.;
+    bounds.second = 4.;
+    break;
 
     case SKEW:
-      bounds.first  = 0.;
-      bounds.second = 0.5;
-      break;
+    bounds.first  = 0.;
+    bounds.second = 0.5;
+    break;
 
     case SHEAR:
     case SHAPE:
-      bounds.first  = 0.3;
-      bounds.second = 1.;
-      break;
+    bounds.first  = 0.3;
+    bounds.second = 1.;
+    break;
 
     case CONDITION:
-      bounds.first  = 1.;
-      bounds.second = 8.;
-      break;
+    bounds.first  = 1.;
+    bounds.second = 8.;
+    break;
 
     case JACOBIAN:
-      bounds.first  = 0.5;
-      bounds.second = 1.;
-      break;
+    bounds.first  = 0.5;
+    bounds.second = 1.;
+    break;
 
     case DISTORTION:
-      bounds.first  = 0.6;
-      bounds.second = 1.;
-      break;
+    bounds.first  = 0.6;
+    bounds.second = 1.;
+    break;
 
     case TAPER:
-      bounds.first  = 0.;
-      bounds.second = 0.4;
-      break;
+    bounds.first  = 0.;
+    bounds.second = 0.4;
+    break;
 
     case STRETCH:
-      bounds.first  = 0.25;
-      bounds.second = 1.;
-      break;
+    bounds.first  = 0.25;
+    bounds.second = 1.;
+    break;
 
     case DIAGONAL:
-      bounds.first  = 0.65;
-      bounds.second = 1.;
-      break;
+    bounds.first  = 0.65;
+    bounds.second = 1.;
+    break;
 
     case SIZE:
-      bounds.first  = 0.5;
-      bounds.second = 1.;
-      break;
+    bounds.first  = 0.5;
+    bounds.second = 1.;
+    break;
 
     default:
-      libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
-      bounds.first  = -1;
-      bounds.second = -1;
+    libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
+    bounds.first  = -1;
+    bounds.second = -1;
     }
-*/
+  */
 
   return bounds;
 }
@@ -419,37 +418,37 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
 
 
 const unsigned short int InfHex::_second_order_adjacent_vertices[8][2] =
-{
-  { 0,  1}, // vertices adjacent to node 8
-  { 1,  2}, // vertices adjacent to node 9
-  { 2,  3}, // vertices adjacent to node 10
-  { 0,  3}, // vertices adjacent to node 11
+  {
+    { 0,  1}, // vertices adjacent to node 8
+    { 1,  2}, // vertices adjacent to node 9
+    { 2,  3}, // vertices adjacent to node 10
+    { 0,  3}, // vertices adjacent to node 11
 
-  { 4,  5}, // vertices adjacent to node 12
-  { 5,  6}, // vertices adjacent to node 13
-  { 6,  7}, // vertices adjacent to node 14
-  { 4,  7}  // vertices adjacent to node 15
-};
+    { 4,  5}, // vertices adjacent to node 12
+    { 5,  6}, // vertices adjacent to node 13
+    { 6,  7}, // vertices adjacent to node 14
+    { 4,  7}  // vertices adjacent to node 15
+  };
 
 
 
 const unsigned short int InfHex::_second_order_vertex_child_number[18] =
-{
-  99,99,99,99,99,99,99,99, // Vertices
-  0,1,2,0,                 // Edges
-  0,1,2,0,0,               // Faces
-  0                        // Interior
-};
+  {
+    99,99,99,99,99,99,99,99, // Vertices
+    0,1,2,0,                 // Edges
+    0,1,2,0,0,               // Faces
+    0                        // Interior
+  };
 
 
 
 const unsigned short int InfHex::_second_order_vertex_child_index[18] =
-{
-  99,99,99,99,99,99,99,99, // Vertices
-  1,2,3,3,                 // Edges
-  5,6,7,7,2,               // Faces
-  6                        // Interior
-};
+  {
+    99,99,99,99,99,99,99,99, // Vertices
+    1,2,3,3,                 // Edges
+    5,6,7,7,2,               // Faces
+    6                        // Interior
+  };
 
 } // namespace libMesh
 

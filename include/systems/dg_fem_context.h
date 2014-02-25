@@ -230,7 +230,7 @@ public:
    */
   bool dg_terms_are_active() const
   { return _dg_terms_active; }
-  
+
   /**
    * Accessor for neighbor edge/face (2D/3D) finite element object for variable var.
    */

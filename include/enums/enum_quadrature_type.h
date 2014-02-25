@@ -22,28 +22,26 @@
 
 // ------------------------------------------------------------
 // enum QuadratureType definition
-namespace libMeshEnums {
+namespace libMesh {
 
-  /**
-   * Defines an \p enum for currently available quadrature rules.
-   */
-  enum QuadratureType {QGAUSS            = 0,
+/**
+ * Defines an \p enum for currently available quadrature rules.
+ */
+enum QuadratureType {QGAUSS            = 0,
 
-		       QJACOBI_1_0       = 1,
-		       QJACOBI_2_0       = 2,
+                     QJACOBI_1_0       = 1,
+                     QJACOBI_2_0       = 2,
 
-		       QSIMPSON          = 3,
-		       QTRAP             = 4,
-		       QGRID             = 5,
-		       QGRUNDMANN_MOLLER = 6,
-		       QMONOMIAL         = 7,
-		       QCONICAL          = 8,
+                     QSIMPSON          = 3,
+                     QTRAP             = 4,
+                     QGRID             = 5,
+                     QGRUNDMANN_MOLLER = 6,
+                     QMONOMIAL         = 7,
+                     QCONICAL          = 8,
 
-		       QCLOUGH           = 21,
+                     QCLOUGH           = 21,
 
-		       INVALID_Q_RULE    = 127};
+                     INVALID_Q_RULE    = 127};
 }
-
-using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_QUADRATURE_TYPE_H

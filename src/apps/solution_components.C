@@ -61,9 +61,9 @@ int main(int argc, char** argv)
   libMesh::out << "Loaded solution " << argv[2] << std::endl;
 
   std::vector<unsigned int> old_sys_num((argc-4)/2),
-                            new_sys_num((argc-4)/2),
-                            old_var_num((argc-4)/2),
-                            new_var_num((argc-4)/2);
+    new_sys_num((argc-4)/2),
+    old_var_num((argc-4)/2),
+    new_var_num((argc-4)/2);
 
   std::vector<const System *> old_system((argc-4)/2);
   std::vector<System *> new_system((argc-4)/2);
@@ -106,7 +106,7 @@ int main(int argc, char** argv)
   // Copy over any nodal degree of freedom coefficients
 
   MeshBase::const_node_iterator       old_nit     = mesh1.local_nodes_begin(),
-                                      new_nit     = mesh2.local_nodes_begin();
+    new_nit     = mesh2.local_nodes_begin();
   const MeshBase::const_node_iterator old_nit_end = mesh1.local_nodes_end();
 
   for (; old_nit != old_nit_end; ++old_nit, ++new_nit)
@@ -127,15 +127,15 @@ int main(int argc, char** argv)
           const unsigned int n_comp =
             old_node->n_comp(old_sys_num[pairnum],old_var_num[pairnum]);
           libmesh_assert_equal_to(n_comp,
-            new_node->n_comp(new_sys_num[pairnum],new_var_num[pairnum]));
+                                  new_node->n_comp(new_sys_num[pairnum],new_var_num[pairnum]));
 
           for(unsigned int i=0; i<n_comp; i++)
             {
               const dof_id_type
                 old_index = old_node->dof_number
-                  (old_sys_num[pairnum], old_var_num[pairnum], i),
+                (old_sys_num[pairnum], old_var_num[pairnum], i),
                 new_index = new_node->dof_number
-                  (new_sys_num[pairnum], new_var_num[pairnum], i);
+                (new_sys_num[pairnum], new_var_num[pairnum], i);
               new_sys.solution->set(new_index,(*old_sys.solution)(old_index));
             }
         }
@@ -145,7 +145,7 @@ int main(int argc, char** argv)
   // Copy over any element degree of freedom coefficients
 
   MeshBase::const_element_iterator       old_eit     = mesh1.active_local_elements_begin(),
-                                         new_eit     = mesh2.active_local_elements_begin();
+    new_eit     = mesh2.active_local_elements_begin();
   const MeshBase::const_element_iterator old_eit_end = mesh1.active_local_elements_end();
 
   for (; old_eit != old_eit_end; ++old_eit, ++new_eit)
@@ -166,15 +166,15 @@ int main(int argc, char** argv)
           const unsigned int n_comp =
             old_elem->n_comp(old_sys_num[pairnum],old_var_num[pairnum]);
           libmesh_assert_equal_to(n_comp,
-            new_elem->n_comp(new_sys_num[pairnum],new_var_num[pairnum]));
+                                  new_elem->n_comp(new_sys_num[pairnum],new_var_num[pairnum]));
 
           for(unsigned int i=0; i<n_comp; i++)
             {
               const dof_id_type
                 old_index = old_elem->dof_number
-                  (old_sys_num[pairnum], old_var_num[pairnum], i),
+                (old_sys_num[pairnum], old_var_num[pairnum], i),
                 new_index = new_elem->dof_number
-                  (new_sys_num[pairnum], new_var_num[pairnum], i);
+                (new_sys_num[pairnum], new_var_num[pairnum], i);
               new_sys.solution->set(new_index,(*old_sys.solution)(old_index));
             }
         }

@@ -32,7 +32,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // ParallelMesh class member functions
 ParallelMesh::ParallelMesh (const Parallel::Communicator &comm,
-			    unsigned int d) :
+                            unsigned int d) :
   UnstructuredMesh (comm,d), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
@@ -143,20 +143,20 @@ void ParallelMesh::update_parallel_id_counts()
   if (_next_free_unpartitioned_elem_id < _max_elem_id)
     _next_free_unpartitioned_elem_id =
       ((_max_elem_id-1) / (this->n_processors() + 1) + 1) *
-        (this->n_processors() + 1) + this->n_processors();
+      (this->n_processors() + 1) + this->n_processors();
   if (_next_free_local_elem_id < _max_elem_id)
     _next_free_local_elem_id =
       ((_max_elem_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
-        (this->n_processors() + 1) + this->processor_id();
+      (this->n_processors() + 1) + this->processor_id();
 
   if (_next_free_unpartitioned_node_id < _max_node_id)
     _next_free_unpartitioned_node_id =
       ((_max_node_id-1) / (this->n_processors() + 1) + 1) *
-        (this->n_processors() + 1) + this->n_processors();
+      (this->n_processors() + 1) + this->n_processors();
   if (_next_free_local_node_id < _max_node_id)
     _next_free_local_node_id =
       ((_max_node_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
-        (this->n_processors() + 1) + this->processor_id();
+      (this->n_processors() + 1) + this->processor_id();
 }
 
 
@@ -384,30 +384,30 @@ Elem* ParallelMesh::add_elem (Elem *e)
       e->set_id (*next_id);
     }
 
-    {
-      // Advance next_ids up high enough that each is pointing to an
-      // unused id and any subsequent increments will still point us
-      // to unused ids
-      _max_elem_id = std::max(_max_elem_id,
-			      static_cast<dof_id_type>(e->id()+1));
+  {
+    // Advance next_ids up high enough that each is pointing to an
+    // unused id and any subsequent increments will still point us
+    // to unused ids
+    _max_elem_id = std::max(_max_elem_id,
+                            static_cast<dof_id_type>(e->id()+1));
 
-      if (_next_free_unpartitioned_elem_id < _max_elem_id)
-        _next_free_unpartitioned_elem_id =
-          ((_max_elem_id-1) / (this->n_processors() + 1) + 1) *
-            (this->n_processors() + 1) + this->n_processors();
-      if (_next_free_local_elem_id < _max_elem_id)
-        _next_free_local_elem_id =
-          ((_max_elem_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
-            (this->n_processors() + 1) + this->processor_id();
+    if (_next_free_unpartitioned_elem_id < _max_elem_id)
+      _next_free_unpartitioned_elem_id =
+        ((_max_elem_id-1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->n_processors();
+    if (_next_free_local_elem_id < _max_elem_id)
+      _next_free_local_elem_id =
+        ((_max_elem_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->processor_id();
 
 #ifndef NDEBUG
-      // We need a const mapvector so we don't inadvertently create
-      // NULL entries when testing for non-NULL ones
-      const mapvector<Elem*,dof_id_type>& const_elements = _elements;
+    // We need a const mapvector so we don't inadvertently create
+    // NULL entries when testing for non-NULL ones
+    const mapvector<Elem*,dof_id_type>& const_elements = _elements;
 #endif
-      libmesh_assert(!const_elements[_next_free_unpartitioned_elem_id]);
-      libmesh_assert(!const_elements[_next_free_local_elem_id]);
-    }
+    libmesh_assert(!const_elements[_next_free_unpartitioned_elem_id]);
+    libmesh_assert(!const_elements[_next_free_local_elem_id]);
+  }
 
   // Don't try to overwrite existing elems
   libmesh_assert (!_elements[e->id()]);
@@ -420,17 +420,17 @@ Elem* ParallelMesh::add_elem (Elem *e)
     _n_elem++;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  if (!e->valid_unique_id() && libMesh::processor_id() == e->processor_id())
+  if (!e->valid_unique_id() && processor_id() == e->processor_id())
     {
       e->set_unique_id() = _next_unique_id;
       _next_unique_id += this->n_processors();
     }
 #endif
 
-// Unpartitioned elems should be added on every processor
-// And shouldn't be added in the same batch as ghost elems
-// But we might be just adding on processor 0 to
-// broadcast later
+  // Unpartitioned elems should be added on every processor
+  // And shouldn't be added in the same batch as ghost elems
+  // But we might be just adding on processor 0 to
+  // broadcast later
 #if 0
 #ifdef DEBUG
   if (elem_procid == DofObject::invalid_processor_id)
@@ -497,8 +497,8 @@ void ParallelMesh::renumber_elem(const dof_id_type old_id,
 
 
 Node* ParallelMesh::add_point (const Point& p,
-			       const dof_id_type id,
-			       const processor_id_type proc_id)
+                               const dof_id_type id,
+                               const processor_id_type proc_id)
 {
   if (_nodes.count(id))
     {
@@ -548,30 +548,30 @@ Node* ParallelMesh::add_node (Node *n)
       n->set_id (*next_id);
     }
 
-    {
-      // Advance next_ids up high enough that each is pointing to an
-      // unused id and any subsequent increments will still point us
-      // to unused ids
-      _max_node_id = std::max(_max_node_id,
-			      static_cast<dof_id_type>(n->id()+1));
+  {
+    // Advance next_ids up high enough that each is pointing to an
+    // unused id and any subsequent increments will still point us
+    // to unused ids
+    _max_node_id = std::max(_max_node_id,
+                            static_cast<dof_id_type>(n->id()+1));
 
-      if (_next_free_unpartitioned_node_id < _max_node_id)
-        _next_free_unpartitioned_node_id =
-          ((_max_node_id-1) / (this->n_processors() + 1) + 1) *
-            (this->n_processors() + 1) + this->n_processors();
-      if (_next_free_local_node_id < _max_node_id)
-        _next_free_local_node_id =
-          ((_max_node_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
-            (this->n_processors() + 1) + this->processor_id();
+    if (_next_free_unpartitioned_node_id < _max_node_id)
+      _next_free_unpartitioned_node_id =
+        ((_max_node_id-1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->n_processors();
+    if (_next_free_local_node_id < _max_node_id)
+      _next_free_local_node_id =
+        ((_max_node_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->processor_id();
 
 #ifndef NDEBUG
-      // We need a const mapvector so we don't inadvertently create
-      // NULL entries when testing for non-NULL ones
-      const mapvector<Node*,dof_id_type>& const_nodes = _nodes;
+    // We need a const mapvector so we don't inadvertently create
+    // NULL entries when testing for non-NULL ones
+    const mapvector<Node*,dof_id_type>& const_nodes = _nodes;
 #endif
-      libmesh_assert(!const_nodes[_next_free_unpartitioned_node_id]);
-      libmesh_assert(!const_nodes[_next_free_local_node_id]);
-    }
+    libmesh_assert(!const_nodes[_next_free_unpartitioned_node_id]);
+    libmesh_assert(!const_nodes[_next_free_local_node_id]);
+  }
 
   // Don't try to overwrite existing nodes
   libmesh_assert (!_nodes[n->id()]);
@@ -584,7 +584,7 @@ Node* ParallelMesh::add_node (Node *n)
     _n_nodes++;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  if (!n->valid_unique_id() && libMesh::processor_id() == n->processor_id())
+  if (!n->valid_unique_id() && processor_id() == n->processor_id())
     {
       n->set_unique_id() = _next_unique_id;
       _next_unique_id += this->n_processors();
@@ -592,10 +592,10 @@ Node* ParallelMesh::add_node (Node *n)
 #endif
 
 
-// Unpartitioned nodes should be added on every processor
-// And shouldn't be added in the same batch as ghost nodes
-// But we might be just adding on processor 0 to
-// broadcast later
+  // Unpartitioned nodes should be added on every processor
+  // And shouldn't be added in the same batch as ghost nodes
+  // But we might be just adding on processor 0 to
+  // broadcast later
 #if 0
 #ifdef DEBUG
   if (node_procid == DofObject::invalid_processor_id)
@@ -744,7 +744,7 @@ void ParallelMesh::update_post_partitioning ()
 
 template <typename T>
 void ParallelMesh::libmesh_assert_valid_parallel_object_ids
-  (const mapvector<T*,dof_id_type> &objects) const
+(const mapvector<T*,dof_id_type> &objects) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -786,10 +786,10 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids
 
       // More human-understandable logic...
       libmesh_assert (
-		      ((min_procid == this->processor_id()) && obj)
-		      ||
-		      (min_procid != this->processor_id())
-		       );
+                      ((min_procid == this->processor_id()) && obj)
+                      ||
+                      (min_procid != this->processor_id())
+                      );
     }
 }
 
@@ -840,7 +840,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 
 template <typename T>
 dof_id_type ParallelMesh::renumber_dof_objects
-  (mapvector<T*,dof_id_type> &objects)
+(mapvector<T*,dof_id_type> &objects)
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -878,7 +878,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
 
   std::vector<dof_id_type> objects_on_proc(this->n_processors(), 0);
   this->comm().allgather(ghost_objects_from_proc[this->processor_id()],
-				 objects_on_proc);
+                         objects_on_proc);
 
 #ifndef NDEBUG
   libmesh_assert(this->comm().verify(unpartitioned_objects));
@@ -890,7 +890,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
   std::vector<dof_id_type> first_object_on_proc(this->n_processors());
   for (processor_id_type i=1; i != this->n_processors(); ++i)
     first_object_on_proc[i] = first_object_on_proc[i-1] +
-                              objects_on_proc[i-1];
+      objects_on_proc[i-1];
   dof_id_type next_id = first_object_on_proc[this->processor_id()];
   dof_id_type first_free_id =
     first_object_on_proc[this->n_processors()-1] +
@@ -913,12 +913,12 @@ dof_id_type ParallelMesh::renumber_dof_objects
   // each.
   for (processor_id_type p=0; p != this->n_processors(); ++p)
     if (p != this->processor_id())
-    {
-      requested_ids[p].reserve(ghost_objects_from_proc[p]);
+      {
+        requested_ids[p].reserve(ghost_objects_from_proc[p]);
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      requested_unique_ids[p].reserve(ghost_objects_from_proc[p]);
+        requested_unique_ids[p].reserve(ghost_objects_from_proc[p]);
 #endif
-    }
+      }
 
   end = objects.end();
   for (it = objects.begin(); it != end; ++it)
@@ -927,14 +927,14 @@ dof_id_type ParallelMesh::renumber_dof_objects
       if (obj->processor_id() == this->processor_id())
         obj->set_id(next_id++);
       else if (obj->processor_id() != DofObject::invalid_processor_id)
-      {
-        requested_ids[obj->processor_id()].push_back(obj->id());
+        {
+          requested_ids[obj->processor_id()].push_back(obj->id());
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-        // It's possible to have an invalid id for dofs not owned by this process.
-        // We'll assert that they match on the receiving end.
-        requested_unique_ids[obj->processor_id()].push_back(obj->valid_unique_id() ? obj-> unique_id() : DofObject::invalid_unique_id);
+          // It's possible to have an invalid id for dofs not owned by this process.
+          // We'll assert that they match on the receiving end.
+          requested_unique_ids[obj->processor_id()].push_back(obj->valid_unique_id() ? obj-> unique_id() : DofObject::invalid_unique_id);
 #endif
-      }
+        }
     }
 
   // Next set ghost object ids from other processors
@@ -944,13 +944,13 @@ dof_id_type ParallelMesh::renumber_dof_objects
         {
           // Trade my requests with processor procup and procdown
           processor_id_type procup = (this->processor_id() + p) %
-                                      this->n_processors();
+            this->n_processors();
           processor_id_type procdown = (this->n_processors() +
                                         this->processor_id() - p) %
-                                        this->n_processors();
+            this->n_processors();
           std::vector<dof_id_type> request_to_fill;
           this->comm().send_receive(procup, requested_ids[procup],
-					    procdown, request_to_fill);
+                                    procdown, request_to_fill);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
           std::vector<unique_id_type> unique_request_to_fill;
@@ -972,21 +972,21 @@ dof_id_type ParallelMesh::renumber_dof_objects
 #endif
 
               libmesh_assert_greater_equal (new_ids[i],
-                     first_object_on_proc[this->processor_id()]);
+                                            first_object_on_proc[this->processor_id()]);
               libmesh_assert_less (new_ids[i],
-                     first_object_on_proc[this->processor_id()] +
-                     objects_on_proc[this->processor_id()]);
+                                   first_object_on_proc[this->processor_id()] +
+                                   objects_on_proc[this->processor_id()]);
             }
 
           // Trade back the results
           std::vector<dof_id_type> filled_request;
           this->comm().send_receive(procdown, new_ids,
-					    procup, filled_request);
+                                    procup, filled_request);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
           std::vector<unique_id_type> unique_filled_request;
           this->comm().send_receive(procdown, new_unique_ids,
-					    procup, unique_filled_request);
+                                    procup, unique_filled_request);
 #endif
 
           // And copy the id changes we've now been informed of
@@ -996,10 +996,10 @@ dof_id_type ParallelMesh::renumber_dof_objects
               libmesh_assert (obj);
               libmesh_assert_equal_to (obj->processor_id(), procup);
               libmesh_assert_greater_equal (filled_request[i],
-                     first_object_on_proc[procup]);
+                                            first_object_on_proc[procup]);
               libmesh_assert_less (filled_request[i],
-                     first_object_on_proc[procup] +
-                     objects_on_proc[procup]);
+                                   first_object_on_proc[procup] +
+                                   objects_on_proc[procup]);
               obj->set_id(filled_request[i]);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -1076,7 +1076,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
   START_LOG("renumber_nodes_and_elements()", "ParallelMesh");
 
 #ifdef DEBUG
-// Make sure our ids and flags are consistent
+  // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
 #endif
@@ -1105,20 +1105,20 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
     for (; it != end;)
       {
-	Node *nd = *it;
+        Node *nd = *it;
         if (!nd)
           _nodes.erase(it++);
         else if (!used_nodes.count(nd->id()))
           {
-	    // remove any boundary information associated with
-	    // this node
-	    this->boundary_info->remove (nd);
+            // remove any boundary information associated with
+            // this node
+            this->boundary_info->remove (nd);
 
-	    // delete the node
-	    delete nd;
+            // delete the node
+            delete nd;
 
             _nodes.erase(it++);
-	  }
+          }
         else
           ++it;
       }
@@ -1134,8 +1134,8 @@ void ParallelMesh::renumber_nodes_and_elements ()
   // new elements
   this->update_parallel_id_counts();
 
-// Make sure our caches are up to date and our
-// DofObjects are well packed
+  // Make sure our caches are up to date and our
+  // DofObjects are well packed
 #ifdef DEBUG
   libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
   libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
@@ -1150,7 +1150,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
 
-// And make sure we've made our numbering monotonic
+  // And make sure we've made our numbering monotonic
   MeshTools::libmesh_assert_valid_elem_ids(*this);
 #endif
 
@@ -1174,7 +1174,7 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
 
     for (; it != end; ++it)
       if (it->second != NULL)
-	it->second->set_id() = it->first;
+        it->second->set_id() = it->first;
   }
 
   // Elements next
@@ -1185,7 +1185,7 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
 
     for (; it != end; ++it)
       if (it->second != NULL)
-	it->second->set_id() = it->first;
+        it->second->set_id() = it->first;
   }
 }
 
@@ -1198,15 +1198,15 @@ dof_id_type ParallelMesh::n_active_elem () const
   // Get local active elements first
   dof_id_type active_elements =
     static_cast<dof_id_type>(std::distance (this->active_local_elements_begin(),
-					    this->active_local_elements_end()));
+                                            this->active_local_elements_end()));
   this->comm().sum(active_elements);
 
   // Then add unpartitioned active elements, which should exist on
   // every processor
   active_elements +=
     static_cast<dof_id_type>(std::distance
-      (this->active_pid_elements_begin(DofObject::invalid_processor_id),
-       this->active_pid_elements_end(DofObject::invalid_processor_id)));
+                             (this->active_pid_elements_begin(DofObject::invalid_processor_id),
+                              this->active_pid_elements_end(DofObject::invalid_processor_id)));
   return active_elements;
 }
 
@@ -1215,13 +1215,13 @@ dof_id_type ParallelMesh::n_active_elem () const
 void ParallelMesh::delete_remote_elements()
 {
 #ifdef DEBUG
-// Make sure our neighbor links are all fine
+  // Make sure our neighbor links are all fine
   MeshTools::libmesh_assert_valid_neighbors(*this);
 
-// And our child/parent links, and our flags
+  // And our child/parent links, and our flags
   MeshTools::libmesh_assert_valid_refinement_tree(*this);
 
-// Make sure our ids and flags are consistent
+  // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
 
@@ -1266,13 +1266,13 @@ void ParallelMesh::delete_remote_elements()
   // libmesh_assert_equal_to (this->n_nodes(), this->max_node_id());
   // libmesh_assert_equal_to (this->n_elem(), this->max_elem_id());
 
-// Make sure our neighbor links are all fine
+  // Make sure our neighbor links are all fine
   MeshTools::libmesh_assert_valid_neighbors(*this);
 
-// And our child/parent links, and our flags
+  // And our child/parent links, and our flags
   MeshTools::libmesh_assert_valid_refinement_tree(*this);
 
-// Make sure our ids and flags are consistent
+  // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
 #endif
@@ -1297,8 +1297,8 @@ void ParallelMesh::allgather()
   _is_serial = true;
   MeshCommunication().allgather(*this);
 
-// Make sure our caches are up to date and our
-// DofObjects are well packed
+  // Make sure our caches are up to date and our
+  // DofObjects are well packed
 #ifdef DEBUG
   libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
   libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
@@ -1311,10 +1311,10 @@ void ParallelMesh::allgather()
   // libmesh_assert_equal_to (this->n_nodes(), this->max_node_id());
   // libmesh_assert_equal_to (this->n_elem(), this->max_elem_id());
 
-// Make sure our neighbor links are all fine
+  // Make sure our neighbor links are all fine
   MeshTools::libmesh_assert_valid_neighbors(*this);
 
-// Make sure our ids and flags are consistent
+  // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
 #endif
@@ -1328,11 +1328,11 @@ void ParallelMesh::assign_unique_ids()
     const elem_iterator_imp end = _elements.end();
 
     for (; it != end; ++it)
-      if ((*it) && ! (*it)->valid_unique_id() && libMesh::processor_id() == (*it)->processor_id())
-      {
-        (*it)->set_unique_id() = _next_unique_id;
-        _next_unique_id += this->n_processors();
-      }
+      if ((*it) && ! (*it)->valid_unique_id() && processor_id() == (*it)->processor_id())
+        {
+          (*it)->set_unique_id() = _next_unique_id;
+          _next_unique_id += this->n_processors();
+        }
   }
 
   {
@@ -1340,11 +1340,11 @@ void ParallelMesh::assign_unique_ids()
     node_iterator_imp end = _nodes.end();
 
     for (; it != end; ++it)
-      if ((*it) && ! (*it)->valid_unique_id() && libMesh::processor_id() == (*it)->processor_id())
-      {
-        (*it)->set_unique_id() = _next_unique_id;
-        _next_unique_id += this->n_processors();
-      }
+      if ((*it) && ! (*it)->valid_unique_id() && processor_id() == (*it)->processor_id())
+        {
+          (*it)->set_unique_id() = _next_unique_id;
+          _next_unique_id += this->n_processors();
+        }
   }
 }
 #endif

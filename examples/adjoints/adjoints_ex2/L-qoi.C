@@ -12,7 +12,7 @@ void LaplaceQoI::init_qoi( std::vector<Number>& sys_qoi )
 // We only have one QoI, so we don't bother checking the qois argument
 // to see if it was requested from us
 void LaplaceQoI::element_qoi (DiffContext &context,
-			      const QoISet & /* qois */ )
+                              const QoISet & /* qois */ )
 
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
@@ -39,13 +39,13 @@ void LaplaceQoI::element_qoi (DiffContext &context,
 
       // If in the sub-domain omega, add the contribution to the integral R
       if(fabs(xf - 0.875) <= 0.125 && fabs(yf - 0.125) <= 0.125)
-      	{
-      	  // Get the solution value at the quadrature point
-      	  Number T = c.interior_value(0, qp);
+        {
+          // Get the solution value at the quadrature point
+          Number T = c.interior_value(0, qp);
 
-      	  // Update the elemental increment dR for each qp
-      	  dQoI_0 += JxW[qp] * T;
-      	}
+          // Update the elemental increment dR for each qp
+          dQoI_0 += JxW[qp] * T;
+        }
 
     }
 
@@ -58,7 +58,7 @@ void LaplaceQoI::element_qoi (DiffContext &context,
 // We only have one QoI, so we don't bother checking the qois argument
 // to see if it was requested from us
 void LaplaceQoI::element_qoi_derivative (DiffContext &context,
-					 const QoISet & /* qois */)
+                                         const QoISet & /* qois */)
 {
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
@@ -94,10 +94,10 @@ void LaplaceQoI::element_qoi_derivative (DiffContext &context,
       // If in the sub-domain over which QoI 0 is supported, add contributions
       // to the adjoint rhs
       if(fabs(x - 0.875) <= 0.125 && fabs(y - 0.125) <= 0.125)
-      	{
-	  for (unsigned int i=0; i != n_T_dofs; i++)
-	    Q(i) += JxW[qp] *phi[i][qp] ;
-      	}
+        {
+          for (unsigned int i=0; i != n_T_dofs; i++)
+            Q(i) += JxW[qp] *phi[i][qp] ;
+        }
 
     } // end of the quadrature point qp-loop
 }

@@ -37,7 +37,7 @@ namespace libMesh
 // MetisPartitioner class definition
 class MetisPartitioner : public Partitioner
 {
- public:
+public:
 
   /**
    * Constructor.
@@ -61,7 +61,7 @@ protected:
    * Partition the \p MeshBase into \p n subdomains.
    */
   virtual void _do_partition (MeshBase& mesh,
-			      const unsigned int n);
+                              const unsigned int n);
 };
 
 

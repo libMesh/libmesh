@@ -61,7 +61,7 @@ const PeriodicBoundaryBase* PeriodicBoundaries::boundary(boundary_id_type id) co
 
 
 const Elem *PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
-					 const PointLocatorBase& point_locator,
+                                         const PointLocatorBase& point_locator,
                                          const Elem* e,
                                          unsigned int side) const
 {

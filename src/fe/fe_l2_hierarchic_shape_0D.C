@@ -30,9 +30,9 @@ namespace libMesh
 
 template <>
 Real FE<0,L2_HIERARCHIC>::shape(const ElemType,
-			   const Order,
-			   const unsigned int i,
-			   const Point&)
+                                const Order,
+                                const unsigned int i,
+                                const Point&)
 {
   libmesh_assert_less (i, 1);
   return 1.;
@@ -42,9 +42,9 @@ Real FE<0,L2_HIERARCHIC>::shape(const ElemType,
 
 template <>
 Real FE<0,L2_HIERARCHIC>::shape(const Elem*,
-			   const Order,
-			   const unsigned int i,
-			   const Point&)
+                                const Order,
+                                const unsigned int i,
+                                const Point&)
 {
   libmesh_assert_less (i, 1);
   return 1.;
@@ -54,10 +54,10 @@ Real FE<0,L2_HIERARCHIC>::shape(const Elem*,
 
 template <>
 Real FE<0,L2_HIERARCHIC>::shape_deriv(const ElemType,
-				 const Order,
-				 const unsigned int,
-				 const unsigned int,
-				 const Point&)
+                                      const Order,
+                                      const unsigned int,
+                                      const unsigned int,
+                                      const Point&)
 {
   // No spatial derivatives in 0D!
   libmesh_error();
@@ -68,10 +68,10 @@ Real FE<0,L2_HIERARCHIC>::shape_deriv(const ElemType,
 
 template <>
 Real FE<0,L2_HIERARCHIC>::shape_deriv(const Elem*,
-				 const Order,
-				 const unsigned int,
-				 const unsigned int,
-				 const Point&)
+                                      const Order,
+                                      const unsigned int,
+                                      const unsigned int,
+                                      const Point&)
 {
   // No spatial derivatives in 0D!
   libmesh_error();
@@ -83,10 +83,10 @@ Real FE<0,L2_HIERARCHIC>::shape_deriv(const Elem*,
 
 template <>
 Real FE<0,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
-					const Order,
-					const unsigned int,
-					const unsigned int,
-					const Point&)
+                                             const Order,
+                                             const unsigned int,
+                                             const unsigned int,
+                                             const Point&)
 {
   // No spatial derivatives in 0D!
   libmesh_error();
@@ -97,10 +97,10 @@ Real FE<0,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
 
 template <>
 Real FE<0,L2_HIERARCHIC>::shape_second_deriv(const Elem*,
-				        const Order,
-				        const unsigned int,
-				        const unsigned int,
-				        const Point&)
+                                             const Order,
+                                             const unsigned int,
+                                             const unsigned int,
+                                             const Point&)
 {
   // No spatial derivatives in 0D!
   libmesh_error();

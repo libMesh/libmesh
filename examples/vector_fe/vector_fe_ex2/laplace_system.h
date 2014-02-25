@@ -37,8 +37,8 @@ public:
 
   // Constructor
   LaplaceSystem( EquationSystems& es,
-		 const std::string& name,
-		 const unsigned int number);
+                 const std::string& name,
+                 const unsigned int number);
 
   // System initialization
   virtual void init_data ();
@@ -53,8 +53,8 @@ public:
 
   // Constraint part
   /*
-  virtual bool side_constraint (bool request_jacobian,
-				DiffContext& context);
+    virtual bool side_constraint (bool request_jacobian,
+    DiffContext& context);
   */
 
 protected:

@@ -46,7 +46,7 @@ class MeshBase;
 // TecplotIO class definition
 class TecplotIO : public MeshOutput<MeshBase>
 {
- public:
+public:
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
@@ -57,7 +57,7 @@ class TecplotIO : public MeshOutput<MeshBase>
    */
   explicit
   TecplotIO (const MeshBase&, const bool binary=false,
-	     const double time=0., const int strand_offset=0);
+             const double time=0., const int strand_offset=0);
 
   /**
    * This method implements writing a mesh to a specified file.
@@ -69,8 +69,8 @@ class TecplotIO : public MeshOutput<MeshBase>
    * specified file where the nodal data and variable names are provided.
    */
   virtual void write_nodal_data (const std::string&,
-				 const std::vector<Number>&,
-				 const std::vector<std::string>&);
+                                 const std::vector<Number>&,
+                                 const std::vector<std::string>&);
 
   /**
    * Flag indicating whether or not to write a binary file
@@ -97,7 +97,7 @@ class TecplotIO : public MeshOutput<MeshBase>
    */
   std::string & zone_title ();
 
- private:
+private:
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -105,8 +105,8 @@ class TecplotIO : public MeshOutput<MeshBase>
    * provided.  This will write an ASCII file.
    */
   void write_ascii (const std::string&,
-		    const std::vector<Number>* = NULL,
-		    const std::vector<std::string>* = NULL);
+                    const std::vector<Number>* = NULL,
+                    const std::vector<std::string>* = NULL);
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -116,8 +116,8 @@ class TecplotIO : public MeshOutput<MeshBase>
    * an ASCII file will be created.
    */
   void write_binary (const std::string&,
-		     const std::vector<Number>* = NULL,
-		     const std::vector<std::string>* = NULL);
+                     const std::vector<Number>* = NULL,
+                     const std::vector<std::string>* = NULL);
 
   //---------------------------------------------------------------------------
   // local data

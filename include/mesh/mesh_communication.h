@@ -69,15 +69,15 @@ public:
    */
   void clear ();
 
-//   /**
-//    * Finds all the processors that may contain
-//    * elements that neighbor my elements.  This list
-//    * is guaranteed to include all processors that border
-//    * any of my elements, but may include additional ones as
-//    * well.  This method computes bounding boxes for the
-//    * elements on each processor and checks for overlaps.
-//    */
-//   void find_neighboring_processors(const MeshBase &);
+  //   /**
+  //    * Finds all the processors that may contain
+  //    * elements that neighbor my elements.  This list
+  //    * is guaranteed to include all processors that border
+  //    * any of my elements, but may include additional ones as
+  //    * well.  This method computes bounding boxes for the
+  //    * elements on each processor and checks for overlaps.
+  //    */
+  //   void find_neighboring_processors(const MeshBase &);
 
   /**
    * This method takes a mesh (which is assumed to reside on
@@ -163,10 +163,10 @@ public:
    */
   template <typename ForwardIterator>
   void find_global_indices (const Parallel::Communicator &communicator,
-			    const MeshTools::BoundingBox &,
-			    const ForwardIterator &,
-			    const ForwardIterator &,
-			    std::vector<dof_id_type> &) const;
+                            const MeshTools::BoundingBox &,
+                            const ForwardIterator &,
+                            const ForwardIterator &,
+                            std::vector<dof_id_type> &) const;
 
   /**
    * Copy ids of ghost elements from their local processors.

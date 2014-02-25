@@ -112,78 +112,78 @@ int main (int argc, char** argv)
   rb_construction.set_rb_evaluation(rb_eval);
 
   if(!online_mode)
-  {
-    // Read data from input file and print state
-    eim_construction.process_parameters_file(eim_parameters);
-    eim_construction.print_info();
-
-    // Perform the EIM Greedy and write out the data
-    eim_construction.initialize_rb_construction();
-    eim_construction.train_reduced_basis();
-    eim_construction.get_rb_evaluation().write_offline_data_to_files("eim_data");
-
-    // Read data from input file and print state
-    rb_construction.process_parameters_file(rb_parameters);
-
-    // attach the EIM theta objects to the RBConstruction and RBEvaluation objects
-    eim_rb_eval.initialize_eim_theta_objects();
-    rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
-
-    // attach the EIM assembly objects to the RBConstruction object
-    eim_construction.initialize_eim_assembly_objects();
-    rb_construction.get_rb_assembly_expansion().attach_multiple_F_assembly(eim_construction.get_eim_assembly_objects());
-
-    // Print out the state of rb_construction now that the EIM objects have been attached
-    rb_construction.print_info();
-
-    // Need to initialize _after_ EIM greedy so that
-    // the system knows how many affine terms there are
-    rb_construction.initialize_rb_construction();
-    rb_construction.train_reduced_basis();
-    rb_construction.get_rb_evaluation().write_offline_data_to_files("rb_data");
-
-    // Write out the basis functions, if requested
-    if(store_basis_functions)
     {
-      // Write out the basis functions
-      eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction,"eim_data");
-      rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,"rb_data");
+      // Read data from input file and print state
+      eim_construction.process_parameters_file(eim_parameters);
+      eim_construction.print_info();
+
+      // Perform the EIM Greedy and write out the data
+      eim_construction.initialize_rb_construction();
+      eim_construction.train_reduced_basis();
+      eim_construction.get_rb_evaluation().write_offline_data_to_files("eim_data");
+
+      // Read data from input file and print state
+      rb_construction.process_parameters_file(rb_parameters);
+
+      // attach the EIM theta objects to the RBConstruction and RBEvaluation objects
+      eim_rb_eval.initialize_eim_theta_objects();
+      rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
+
+      // attach the EIM assembly objects to the RBConstruction object
+      eim_construction.initialize_eim_assembly_objects();
+      rb_construction.get_rb_assembly_expansion().attach_multiple_F_assembly(eim_construction.get_eim_assembly_objects());
+
+      // Print out the state of rb_construction now that the EIM objects have been attached
+      rb_construction.print_info();
+
+      // Need to initialize _after_ EIM greedy so that
+      // the system knows how many affine terms there are
+      rb_construction.initialize_rb_construction();
+      rb_construction.train_reduced_basis();
+      rb_construction.get_rb_evaluation().write_offline_data_to_files("rb_data");
+
+      // Write out the basis functions, if requested
+      if(store_basis_functions)
+        {
+          // Write out the basis functions
+          eim_construction.get_rb_evaluation().write_out_basis_functions(eim_construction,"eim_data");
+          rb_construction.get_rb_evaluation().write_out_basis_functions(rb_construction,"rb_data");
+        }
     }
-  }
   else
-  {
-    eim_rb_eval.read_offline_data_from_files("eim_data");
-
-    // attach the EIM theta objects to rb_eval objects
-    eim_rb_eval.initialize_eim_theta_objects();
-    rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
-
-    // Read in the offline data for rb_eval
-    rb_eval.read_offline_data_from_files("rb_data");
-
-    // Get the parameters at which we will do a reduced basis solve
-    Real online_center_x = infile("online_center_x", 0.);
-    Real online_center_y = infile("online_center_y", 0.);
-    RBParameters online_mu;
-    online_mu.set_value("center_x", online_center_x);
-    online_mu.set_value("center_y", online_center_y);
-    rb_eval.set_parameters(online_mu);
-    rb_eval.print_parameters();
-    rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
-
-    // plot the solution, if requested
-    if(store_basis_functions)
     {
-      // read in the data from files
-      eim_rb_eval.read_in_basis_functions(eim_construction,"eim_data");
-      rb_eval.read_in_basis_functions(rb_construction,"rb_data");
+      eim_rb_eval.read_offline_data_from_files("eim_data");
 
-      eim_construction.load_rb_solution();
-      rb_construction.load_rb_solution();
+      // attach the EIM theta objects to rb_eval objects
+      eim_rb_eval.initialize_eim_theta_objects();
+      rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
+
+      // Read in the offline data for rb_eval
+      rb_eval.read_offline_data_from_files("rb_data");
+
+      // Get the parameters at which we will do a reduced basis solve
+      Real online_center_x = infile("online_center_x", 0.);
+      Real online_center_y = infile("online_center_y", 0.);
+      RBParameters online_mu;
+      online_mu.set_value("center_x", online_center_x);
+      online_mu.set_value("center_y", online_center_y);
+      rb_eval.set_parameters(online_mu);
+      rb_eval.print_parameters();
+      rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
+
+      // plot the solution, if requested
+      if(store_basis_functions)
+        {
+          // read in the data from files
+          eim_rb_eval.read_in_basis_functions(eim_construction,"eim_data");
+          rb_eval.read_in_basis_functions(rb_construction,"rb_data");
+
+          eim_construction.load_rb_solution();
+          rb_construction.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
-      ExodusII_IO(mesh).write_equation_systems("RB_sol.e",equation_systems);
+          ExodusII_IO(mesh).write_equation_systems("RB_sol.e",equation_systems);
 #endif
+        }
     }
-  }
 
 }

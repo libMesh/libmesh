@@ -27,11 +27,11 @@
 #include "libmesh/elem.h"
 
 #ifdef LIBMESH_HAVE_SFCURVES
-  namespace Sfc {
-    extern "C" {
+namespace Sfc {
+extern "C" {
 #     include "sfcurves.h"
-    }
-  }
+}
+}
 #else
 #  include "libmesh/linear_partitioner.h"
 #endif
@@ -43,7 +43,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // SFCPartitioner implementation
 void SFCPartitioner::_do_partition (MeshBase& mesh,
-				    const unsigned int n)
+                                    const unsigned int n)
 {
 
   libmesh_assert_greater (n, 0);
@@ -55,19 +55,19 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
       return;
     }
 
-// What to do if the sfcurves library IS NOT present
+  // What to do if the sfcurves library IS NOT present
 #ifndef LIBMESH_HAVE_SFCURVES
 
   libmesh_here();
   libMesh::err << "ERROR: The library has been built without"    << std::endl
-	        << "Space Filling Curve support.  Using a linear" << std::endl
-	        << "partitioner instead!" << std::endl;
+               << "Space Filling Curve support.  Using a linear" << std::endl
+               << "partitioner instead!" << std::endl;
 
   LinearPartitioner lp;
 
   lp.partition (mesh, n);
 
-// What to do if the sfcurves library IS present
+  // What to do if the sfcurves library IS present
 #else
 
   START_LOG("sfc_partition()", "SFCPartitioner");
@@ -94,8 +94,8 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
   // We need to map the active element ids into a
   // contiguous range.
   {
-//     active_elem_iterator       elem_it (mesh.elements_begin());
-//     const active_elem_iterator elem_end(mesh.elements_end());
+    //     active_elem_iterator       elem_it (mesh.elements_begin());
+    //     const active_elem_iterator elem_end(mesh.elements_end());
 
     MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = mesh.active_elements_end();
@@ -104,12 +104,12 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 
     for (; elem_it != elem_end; ++elem_it)
       {
-	libmesh_assert_less ((*elem_it)->id(), forward_map.size());
-	libmesh_assert_less (el_num, reverse_map.size());
+        libmesh_assert_less ((*elem_it)->id(), forward_map.size());
+        libmesh_assert_less (el_num, reverse_map.size());
 
-	forward_map[(*elem_it)->id()] = el_num;
-	reverse_map[el_num]           = *elem_it;
-	el_num++;
+        forward_map[(*elem_it)->id()] = el_num;
+        reverse_map[el_num]           = *elem_it;
+        el_num++;
       }
     libmesh_assert_equal_to (el_num, n_active_elem);
   }
@@ -117,23 +117,23 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 
   // Get the centroid for each active element
   {
-//     const_active_elem_iterator       elem_it (mesh.const_elements_begin());
-//     const const_active_elem_iterator elem_end(mesh.const_elements_end());
+    //     const_active_elem_iterator       elem_it (mesh.const_elements_begin());
+    //     const const_active_elem_iterator elem_end(mesh.const_elements_end());
 
     MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = mesh.active_elements_end();
 
     for (; elem_it != elem_end; ++elem_it)
       {
-	const Elem* elem = *elem_it;
+        const Elem* elem = *elem_it;
 
-	libmesh_assert_less (elem->id(), forward_map.size());
+        libmesh_assert_less (elem->id(), forward_map.size());
 
-	const Point p = elem->centroid();
+        const Point p = elem->centroid();
 
-	x[forward_map[elem->id()]] = p(0);
-	y[forward_map[elem->id()]] = p(1);
-	z[forward_map[elem->id()]] = p(2);
+        x[forward_map[elem->id()]] = p(0);
+        y[forward_map[elem->id()]] = p(1);
+        z[forward_map[elem->id()]] = p(2);
       }
   }
 
@@ -148,11 +148,11 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
     {
       libmesh_here();
       libMesh::err << "ERROR: Unknown type: " << _sfc_type << std::endl
-		    << " Valid types are"                   << std::endl
-		    << "  \"Hilbert\""                      << std::endl
-		    << "  \"Morton\""                       << std::endl
-		    << " "                                  << std::endl
-		    << "Proceeding with a Hilbert curve."   << std::endl;
+                   << " Valid types are"                   << std::endl
+                   << "  \"Hilbert\""                      << std::endl
+                   << "  \"Morton\""                       << std::endl
+                   << " "                                  << std::endl
+                   << "Proceeding with a Hilbert curve."   << std::endl;
 
       Sfc::hilbert (&x[0], &y[0], &z[0], &size, &table[0]);
     }
@@ -160,27 +160,27 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 
   // Assign the partitioning to the active elements
   {
-//      {
-//        std::ofstream out ("sfc.dat");
-//        out << "variables=x,y,z" << std::endl;
-//        out << "zone f=point" << std::endl;
+    //      {
+    //        std::ofstream out ("sfc.dat");
+    //        out << "variables=x,y,z" << std::endl;
+    //        out << "zone f=point" << std::endl;
 
-//        for (unsigned int i=0; i<n_active_elem; i++)
-//  	out << x[i] << " "
-//  	    << y[i] << " "
-//  	    << z[i] << std::endl;
-//      }
+    //        for (unsigned int i=0; i<n_active_elem; i++)
+    //  out << x[i] << " "
+    //      << y[i] << " "
+    //      << z[i] << std::endl;
+    //      }
 
     const dof_id_type blksize = (n_active_elem+n-1)/n;
 
     for (dof_id_type i=0; i<n_active_elem; i++)
       {
-	libmesh_assert_less (static_cast<unsigned int>(table[i]-1), reverse_map.size());
+        libmesh_assert_less (static_cast<unsigned int>(table[i]-1), reverse_map.size());
 
-	Elem* elem = reverse_map[table[i]-1];
+        Elem* elem = reverse_map[table[i]-1];
 
-	elem->processor_id() = libmesh_cast_int<processor_id_type>
-	  (i/blksize);
+        elem->processor_id() = libmesh_cast_int<processor_id_type>
+          (i/blksize);
       }
   }
 

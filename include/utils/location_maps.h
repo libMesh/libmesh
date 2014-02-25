@@ -39,12 +39,12 @@ class MeshBase;
 class Node;
 
 
-  /**
-   * Data structures that enable location-based lookups
-   * The key is a hash of the Point location.
-   * For efficiency we will use a hashed multimap if it is
-   * available, otherwise a regular multimap.
-   */
+/**
+ * Data structures that enable location-based lookups
+ * The key is a hash of the Point location.
+ * For efficiency we will use a hashed multimap if it is
+ * available, otherwise a regular multimap.
+ */
 template <typename T>
 class LocationMap
 {
@@ -59,7 +59,7 @@ public:
   bool empty() const { return _map.empty(); }
 
   T* find(const Point&,
-	  const Real tol = TOLERANCE);
+          const Real tol = TOLERANCE);
 
   Point point_of(const T&) const;
 

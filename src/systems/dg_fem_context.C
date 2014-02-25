@@ -44,54 +44,54 @@ DGFEMContext::DGFEMContext (const System &sys)
   _neighbor_neighbor_subjacobians.resize(nv);
 
   for (unsigned int i=0; i != nv; ++i)
-  {
-    _neighbor_subresiduals.push_back(new DenseSubVector<Number>(_neighbor_residual));
-    _elem_elem_subjacobians[i].reserve(nv);
-    _elem_neighbor_subjacobians[i].reserve(nv);
-    _neighbor_elem_subjacobians[i].reserve(nv);
-    _neighbor_neighbor_subjacobians[i].reserve(nv);
-
-    for (unsigned int j=0; j != nv; ++j)
     {
-      _elem_elem_subjacobians[i].push_back
-        (new DenseSubMatrix<Number>(_elem_elem_jacobian));
-      _elem_neighbor_subjacobians[i].push_back
-        (new DenseSubMatrix<Number>(_elem_neighbor_jacobian));
-      _neighbor_elem_subjacobians[i].push_back
-        (new DenseSubMatrix<Number>(_neighbor_elem_jacobian));
-      _neighbor_neighbor_subjacobians[i].push_back
-        (new DenseSubMatrix<Number>(_neighbor_neighbor_jacobian));
+      _neighbor_subresiduals.push_back(new DenseSubVector<Number>(_neighbor_residual));
+      _elem_elem_subjacobians[i].reserve(nv);
+      _elem_neighbor_subjacobians[i].reserve(nv);
+      _neighbor_elem_subjacobians[i].reserve(nv);
+      _neighbor_neighbor_subjacobians[i].reserve(nv);
+
+      for (unsigned int j=0; j != nv; ++j)
+        {
+          _elem_elem_subjacobians[i].push_back
+            (new DenseSubMatrix<Number>(_elem_elem_jacobian));
+          _elem_neighbor_subjacobians[i].push_back
+            (new DenseSubMatrix<Number>(_elem_neighbor_jacobian));
+          _neighbor_elem_subjacobians[i].push_back
+            (new DenseSubMatrix<Number>(_neighbor_elem_jacobian));
+          _neighbor_neighbor_subjacobians[i].push_back
+            (new DenseSubMatrix<Number>(_neighbor_neighbor_jacobian));
+        }
     }
-  }
 
   _neighbor_side_fe_var.resize(nv);
   for (unsigned int i=0; i != nv; ++i)
-  {
-    FEType fe_type = sys.variable_type(i);
-
-    if ( _neighbor_side_fe[fe_type] == NULL )
     {
-      _neighbor_side_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
+      FEType fe_type = sys.variable_type(i);
+
+      if ( _neighbor_side_fe[fe_type] == NULL )
+        {
+          _neighbor_side_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
+        }
+      _neighbor_side_fe_var[i] = _neighbor_side_fe[fe_type];
     }
-    _neighbor_side_fe_var[i] = _neighbor_side_fe[fe_type];
-  }
 }
 
 DGFEMContext::~DGFEMContext()
 {
 
   for (std::size_t i=0; i != _neighbor_subresiduals.size(); ++i)
-  {
-    delete _neighbor_subresiduals[i];
-
-    for (std::size_t j=0; j != _elem_elem_subjacobians[i].size(); ++j)
     {
-      delete _elem_elem_subjacobians[i][j];
-      delete _elem_neighbor_subjacobians[i][j];
-      delete _neighbor_elem_subjacobians[i][j];
-      delete _neighbor_neighbor_subjacobians[i][j];
+      delete _neighbor_subresiduals[i];
+
+      for (std::size_t j=0; j != _elem_elem_subjacobians[i].size(); ++j)
+        {
+          delete _elem_elem_subjacobians[i][j];
+          delete _elem_neighbor_subjacobians[i][j];
+          delete _neighbor_elem_subjacobians[i][j];
+          delete _neighbor_neighbor_subjacobians[i][j];
+        }
     }
-  }
 
   // Delete the FE objects
   for (std::map<FEType, FEAbstract *>::iterator i = _neighbor_side_fe.begin();
@@ -124,7 +124,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
       FEType neighbor_side_fe_type = i->first;
       FEAbstract* side_fe = _side_fe[neighbor_side_fe_type];
       qface_side_points = side_fe->get_xyz();
-      
+
       FEInterface::inverse_map (dim,
                                 neighbor_side_fe_type,
                                 &get_neighbor(),
@@ -133,7 +133,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
 
       i->second->reinit(&get_neighbor(), &qface_neighbor_points);
     }
-  
+
   // Set boolean flag to indicate that the DG terms are active on this element
   _dg_terms_active = true;
 
@@ -142,7 +142,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
 
   // Initialize the per-element data for elem.
   get_system().get_dof_map().dof_indices (&get_neighbor(), _neighbor_dof_indices);
-  
+
   const unsigned int n_dofs = dof_indices.size();
   const unsigned int n_neighbor_dofs = libmesh_cast_int<unsigned int>
     (_neighbor_dof_indices.size());
@@ -153,7 +153,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
   _elem_neighbor_jacobian.resize(n_dofs, n_neighbor_dofs);
   _neighbor_elem_jacobian.resize(n_neighbor_dofs, n_dofs);
   _neighbor_neighbor_jacobian.resize(n_neighbor_dofs, n_neighbor_dofs);
-  
+
   // Initialize the per-variable data for elem.
   {
     unsigned int sub_dofs = 0;
@@ -170,8 +170,8 @@ void DGFEMContext::neighbor_side_fe_reinit ()
         for (unsigned int j=0; j != i; ++j)
           {
             const unsigned int n_dofs_var_j =
-	      libmesh_cast_int<unsigned int>
-                (dof_indices_var[j].size());
+              libmesh_cast_int<unsigned int>
+              (dof_indices_var[j].size());
 
             _elem_elem_subjacobians[i][j]->reposition
               (sub_dofs, _neighbor_subresiduals[j]->i_off(),

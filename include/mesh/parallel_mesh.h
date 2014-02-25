@@ -42,13 +42,13 @@ class Node;
  * but be fully parallelized in memory.
  * By "is intended" I mean that it doesn't work that way yet.  Don't
  * use this class unless you're developing or debugging it.
-*/
+ */
 
 // ------------------------------------------------------------
 // UnstructuredMesh class definition
 class ParallelMesh : public UnstructuredMesh
 {
- public:
+public:
 
   /**
    * Constructor.  Takes \p dim, the dimension of the mesh.
@@ -57,7 +57,7 @@ class ParallelMesh : public UnstructuredMesh
    */
   explicit
   ParallelMesh (const Parallel::Communicator &comm,
-		unsigned int dim=1);
+                unsigned int dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
@@ -86,7 +86,7 @@ class ParallelMesh : public UnstructuredMesh
    * Virtual copy-constructor, creates a copy of this mesh
    */
   virtual AutoPtr<MeshBase> clone () const
-    { return AutoPtr<MeshBase>(new ParallelMesh(*this)); }
+  { return AutoPtr<MeshBase>(new ParallelMesh(*this)); }
 
   /**
    * Destructor.
@@ -116,7 +116,7 @@ class ParallelMesh : public UnstructuredMesh
    * exist on the current processor, \p false otherwise
    */
   virtual bool is_serial () const
-    { return _is_serial; }
+  { return _is_serial; }
 
   /**
    * Verify id and processor_id consistency of a parallel
@@ -212,10 +212,10 @@ class ParallelMesh : public UnstructuredMesh
    * functions for adding /deleting nodes elements.
    */
   virtual Node* add_point (const Point& p,
-			   const dof_id_type id =
-			     DofObject::invalid_id,
-			   const processor_id_type proc_id =
-			     DofObject::invalid_processor_id);
+                           const dof_id_type id =
+                           DofObject::invalid_id,
+                           const processor_id_type proc_id =
+                           DofObject::invalid_processor_id);
   virtual Node* add_node (Node* n) ;
 
   /**
@@ -230,12 +230,12 @@ class ParallelMesh : public UnstructuredMesh
   virtual void delete_elem (Elem* e) ;
   virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id);
 
-    /**
-     * There is no reason for a user to ever call this function.
-     *
-     * This function restores a previously broken element/node numbering such that
-     * \p mesh.node(n)->id() == n.
-     */
+  /**
+   * There is no reason for a user to ever call this function.
+   *
+   * This function restores a previously broken element/node numbering such that
+   * \p mesh.node(n)->id() == n.
+   */
   virtual void fix_broken_node_and_element_numbering ();
 
 public:
@@ -447,9 +447,9 @@ protected:
    * nodes or elements.
    */
   dof_id_type _next_free_local_node_id,
-	      _next_free_local_elem_id;
+    _next_free_local_elem_id;
   dof_id_type _next_free_unpartitioned_node_id,
-	      _next_free_unpartitioned_elem_id;
+    _next_free_unpartitioned_elem_id;
 
   /**
    * These are extra ghost elements that we want to make sure

@@ -37,22 +37,22 @@ namespace libMesh
 // ------------------------------------------------------------
 // InfPrism12 class static member initializations
 const unsigned int InfPrism12::side_nodes_map[4][6] =
-{
-  { 0, 1, 2, 6, 7, 8},  // Side 0
-  { 0, 1, 3, 4, 6, 9},  // Side 1
-  { 1, 2, 4, 5, 7, 10}, // Side 2
-  { 2, 0, 5, 3, 8, 11}  // Side 3
-};
+  {
+    { 0, 1, 2, 6, 7, 8},  // Side 0
+    { 0, 1, 3, 4, 6, 9},  // Side 1
+    { 1, 2, 4, 5, 7, 10}, // Side 2
+    { 2, 0, 5, 3, 8, 11}  // Side 3
+  };
 
 const unsigned int InfPrism12::edge_nodes_map[6][3] =
-{
-  { 0, 1, 6},  // Side 0
-  { 1, 2, 7},  // Side 1
-  { 0, 2, 8},  // Side 2
-  { 0, 3, 99}, // Side 3
-  { 1, 4, 99}, // Side 4
-  { 2, 5, 99}  // Side 5
-};
+  {
+    { 0, 1, 6},  // Side 0
+    { 1, 2, 7},  // Side 1
+    { 0, 2, 8},  // Side 2
+    { 0, 3, 99}, // Side 3
+    { 1, 4, 99}, // Side 4
+    { 2, 5, 99}  // Side 5
+  };
 
 
 // ------------------------------------------------------------
@@ -82,7 +82,7 @@ bool InfPrism12::is_face(const unsigned int i) const
 }
 
 bool InfPrism12::is_node_on_side(const unsigned int n,
-				 const unsigned int s) const
+                                 const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 6; ++i)
@@ -92,7 +92,7 @@ bool InfPrism12::is_node_on_side(const unsigned int n,
 }
 
 bool InfPrism12::is_node_on_edge(const unsigned int n,
-				 const unsigned int e) const
+                                 const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 3; ++i)
@@ -102,31 +102,31 @@ bool InfPrism12::is_node_on_edge(const unsigned int n,
 }
 
 AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
-				      bool proxy) const
+                                      bool proxy) const
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
       switch (i)
-	{
-	  // base
-	case 0:
-	  {
-	    AutoPtr<Elem> ap(new Side<Tri6,InfPrism12>(this,i));
-	    return ap;
-	  }
-	  // ifem sides
-	case 1:
-	case 2:
-	case 3:
-	  {
-	    AutoPtr<Elem> ap(new Side<InfQuad6,InfPrism12>(this,i));
-	    return ap;
-	  }
-	default:
-	  libmesh_error();
-	}
+        {
+          // base
+        case 0:
+          {
+            AutoPtr<Elem> ap(new Side<Tri6,InfPrism12>(this,i));
+            return ap;
+          }
+          // ifem sides
+        case 1:
+        case 2:
+        case 3:
+          {
+            AutoPtr<Elem> ap(new Side<InfQuad6,InfPrism12>(this,i));
+            return ap;
+          }
+        default:
+          libmesh_error();
+        }
     }
 
   else
@@ -135,69 +135,69 @@ AutoPtr<Elem> InfPrism12::build_side (const unsigned int i,
       AutoPtr<Elem> face(NULL);
 
       switch (i)
-	{
-	case 0:  // the triangular face at z=-1, base face
-	  {
+        {
+        case 0:  // the triangular face at z=-1, base face
+          {
             face.reset(new Tri6);
 
-	    // Note that for this face element, the normal points inward
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(2);
-	    face->set_node(3) = this->get_node(6);
-	    face->set_node(4) = this->get_node(7);
-	    face->set_node(5) = this->get_node(8);
+            // Note that for this face element, the normal points inward
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(2);
+            face->set_node(3) = this->get_node(6);
+            face->set_node(4) = this->get_node(7);
+            face->set_node(5) = this->get_node(8);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 1:  // the quad face at y=0
-	  {
+        case 1:  // the quad face at y=0
+          {
             face.reset(new InfQuad6);
 
-	    face->set_node(0) = this->get_node(0);
-	    face->set_node(1) = this->get_node(1);
-	    face->set_node(2) = this->get_node(3);
-	    face->set_node(3) = this->get_node(4);
-	    face->set_node(4) = this->get_node(6);
-	    face->set_node(5) = this->get_node(9);
+            face->set_node(0) = this->get_node(0);
+            face->set_node(1) = this->get_node(1);
+            face->set_node(2) = this->get_node(3);
+            face->set_node(3) = this->get_node(4);
+            face->set_node(4) = this->get_node(6);
+            face->set_node(5) = this->get_node(9);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 2:  // the other quad face
-	  {
+        case 2:  // the other quad face
+          {
             face.reset(new InfQuad6);
 
-	    face->set_node(0) = this->get_node(1);
-	    face->set_node(1) = this->get_node(2);
-	    face->set_node(2) = this->get_node(4);
-	    face->set_node(3) = this->get_node(5);
-	    face->set_node(4) = this->get_node(7);
-	    face->set_node(5) = this->get_node(10);
+            face->set_node(0) = this->get_node(1);
+            face->set_node(1) = this->get_node(2);
+            face->set_node(2) = this->get_node(4);
+            face->set_node(3) = this->get_node(5);
+            face->set_node(4) = this->get_node(7);
+            face->set_node(5) = this->get_node(10);
 
-	    break;
-	  }
+            break;
+          }
 
-	case 3: // the quad face at x=0
-	  {
+        case 3: // the quad face at x=0
+          {
             face.reset(new InfQuad6);
 
-	    face->set_node(0) = this->get_node(2);
-	    face->set_node(1) = this->get_node(0);
-	    face->set_node(2) = this->get_node(5);
-	    face->set_node(3) = this->get_node(3);
-	    face->set_node(4) = this->get_node(8);
-	    face->set_node(5) = this->get_node(11);
+            face->set_node(0) = this->get_node(2);
+            face->set_node(1) = this->get_node(0);
+            face->set_node(2) = this->get_node(5);
+            face->set_node(3) = this->get_node(3);
+            face->set_node(4) = this->get_node(8);
+            face->set_node(5) = this->get_node(11);
 
-	    break;
-	  }
+            break;
+          }
 
-	default:
-	  {
-	    libmesh_error();
-	  }
-	}
+        default:
+          {
+            libmesh_error();
+          }
+        }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
@@ -222,8 +222,8 @@ AutoPtr<Elem> InfPrism12::build_edge (const unsigned int i) const
 
 
 void InfPrism12::connectivity(const unsigned int sc,
-			      const IOPackage iop,
-			      std::vector<dof_id_type>& conn) const
+                              const IOPackage iop,
+                              std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -233,66 +233,66 @@ void InfPrism12::connectivity(const unsigned int sc,
     {
     case TECPLOT:
       {
-	conn.resize(8);
-	switch (sc)
-	  {
-	  case 0:
+        conn.resize(8);
+        switch (sc)
+          {
+          case 0:
 
-	    // guess this is a collapsed hex8
-	    conn[0] = this->node(0)+1;
-	    conn[1] = this->node(6)+1;
-	    conn[2] = this->node(8)+1;
-	    conn[3] = this->node(8)+1;
-	    conn[4] = this->node(3)+1;
-	    conn[5] = this->node(9)+1;
-	    conn[6] = this->node(11)+1;
-	    conn[7] = this->node(11)+1;
+            // guess this is a collapsed hex8
+            conn[0] = this->node(0)+1;
+            conn[1] = this->node(6)+1;
+            conn[2] = this->node(8)+1;
+            conn[3] = this->node(8)+1;
+            conn[4] = this->node(3)+1;
+            conn[5] = this->node(9)+1;
+            conn[6] = this->node(11)+1;
+            conn[7] = this->node(11)+1;
 
-	    return;
+            return;
 
-	  case 1:
+          case 1:
 
-	    conn[0] = this->node(6)+1;
-	    conn[1] = this->node(7)+1;
-	    conn[2] = this->node(8)+1;
-	    conn[3] = this->node(8)+1;
-	    conn[4] = this->node(9)+1;
-	    conn[5] = this->node(10)+1;
-	    conn[6] = this->node(11)+1;
-	    conn[7] = this->node(11)+1;
+            conn[0] = this->node(6)+1;
+            conn[1] = this->node(7)+1;
+            conn[2] = this->node(8)+1;
+            conn[3] = this->node(8)+1;
+            conn[4] = this->node(9)+1;
+            conn[5] = this->node(10)+1;
+            conn[6] = this->node(11)+1;
+            conn[7] = this->node(11)+1;
 
-	    return;
+            return;
 
-	  case 2:
+          case 2:
 
-	    conn[0] = this->node(6)+1;
-	    conn[1] = this->node(1)+1;
-	    conn[2] = this->node(7)+1;
-	    conn[3] = this->node(7)+1;
-	    conn[4] = this->node(9)+1;
-	    conn[5] = this->node(4)+1;
-	    conn[6] = this->node(10)+1;
-	    conn[7] = this->node(10)+1;
+            conn[0] = this->node(6)+1;
+            conn[1] = this->node(1)+1;
+            conn[2] = this->node(7)+1;
+            conn[3] = this->node(7)+1;
+            conn[4] = this->node(9)+1;
+            conn[5] = this->node(4)+1;
+            conn[6] = this->node(10)+1;
+            conn[7] = this->node(10)+1;
 
-	    return;
+            return;
 
-	  case 3:
+          case 3:
 
-	    conn[0] = this->node(8)+1;
-	    conn[1] = this->node(7)+1;
-	    conn[2] = this->node(2)+1;
-	    conn[3] = this->node(2)+1;
-	    conn[4] = this->node(11)+1;
-	    conn[5] = this->node(10)+1;
-	    conn[6] = this->node(5)+1;
-	    conn[7] = this->node(5)+1;
+            conn[0] = this->node(8)+1;
+            conn[1] = this->node(7)+1;
+            conn[2] = this->node(2)+1;
+            conn[3] = this->node(2)+1;
+            conn[4] = this->node(11)+1;
+            conn[5] = this->node(10)+1;
+            conn[6] = this->node(5)+1;
+            conn[7] = this->node(5)+1;
 
-	    return;
+            return;
 
-	  default:
-	    libmesh_error();
+          default:
+            libmesh_error();
 
-	  }
+          }
 
       }
 
@@ -308,7 +308,7 @@ void InfPrism12::connectivity(const unsigned int sc,
 
 
 unsigned short int InfPrism12::second_order_adjacent_vertex (const unsigned int n,
-							     const unsigned int v) const
+                                                             const unsigned int v) const
 {
   libmesh_assert_greater_equal (n, this->n_vertices());
   libmesh_assert_less (n, this->n_nodes());
@@ -319,15 +319,15 @@ unsigned short int InfPrism12::second_order_adjacent_vertex (const unsigned int 
 
 
 const unsigned short int InfPrism12::_second_order_adjacent_vertices[6][2] =
-{
-  { 0,  1}, // vertices adjacent to node 6
-  { 1,  2}, // vertices adjacent to node 7
-  { 0,  2}, // vertices adjacent to node 8
+  {
+    { 0,  1}, // vertices adjacent to node 6
+    { 1,  2}, // vertices adjacent to node 7
+    { 0,  2}, // vertices adjacent to node 8
 
-  { 3,  4}, // vertices adjacent to node 9
-  { 4,  5}, // vertices adjacent to node 10
-  { 3,  5}  // vertices adjacent to node 11
-};
+    { 3,  4}, // vertices adjacent to node 9
+    { 4,  5}, // vertices adjacent to node 10
+    { 3,  5}  // vertices adjacent to node 11
+  };
 
 
 
@@ -345,96 +345,96 @@ InfPrism12::second_order_child_vertex (const unsigned int n) const
 
 
 const unsigned short int InfPrism12::_second_order_vertex_child_number[12] =
-{
-  99,99,99,99,99,99, // Vertices
-  0,1,0,             // Edges
-  0,1,0              // Faces
-};
+  {
+    99,99,99,99,99,99, // Vertices
+    0,1,0,             // Edges
+    0,1,0              // Faces
+  };
 
 
 
 const unsigned short int InfPrism12::_second_order_vertex_child_index[12] =
-{
-  99,99,99,99,99,99, // Vertices
-  1,2,2,             // Edges
-  4,5,5              // Faces
-};
+  {
+    99,99,99,99,99,99, // Vertices
+    1,2,2,             // Edges
+    4,5,5              // Faces
+  };
 
 
 
 #ifdef LIBMESH_ENABLE_AMR
 
 const float InfPrism12::_embedding_matrix[4][12][12] =
-{
-  // embedding matrix for child 0
   {
-    //          0           1           2           3           4           5           6           7           8           9          10          11 th parent Node
-    {         1.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 0th child N.
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 1
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0}, // 2
-    {         0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 3
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0}, // 4
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0}, // 5
-    {       0.375,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0,        0.0,        0.0,        0.0}, // 6
-    {         0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.5,       0.25,        0.5,        0.0,        0.0,        0.0}, // 7
-    {       0.375,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0,        0.0}, // 8
-    {         0.0,        0.0,        0.0,      0.375,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0}, // 9
-    {         0.0,        0.0,        0.0,        0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.5,       0.25,        0.5}, // 10
-    {         0.0,        0.0,        0.0,      0.375,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.0,        0.0,       0.75}  // 11
-  },
+    // embedding matrix for child 0
+    {
+      //          0           1           2           3           4           5           6           7           8           9          10          11 th parent Node
+      {         1.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 0th child N.
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 1
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0}, // 2
+      {         0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 3
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0}, // 4
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0}, // 5
+      {       0.375,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0,        0.0,        0.0,        0.0}, // 6
+      {         0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.5,       0.25,        0.5,        0.0,        0.0,        0.0}, // 7
+      {       0.375,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0,        0.0}, // 8
+      {         0.0,        0.0,        0.0,      0.375,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0}, // 9
+      {         0.0,        0.0,        0.0,        0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.5,       0.25,        0.5}, // 10
+      {         0.0,        0.0,        0.0,      0.375,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.0,        0.0,       0.75}  // 11
+    },
 
-  // embedding matrix for child 1
-  {
-    //          0           1           2           3           4           5           6           7           8           9          10          11 th parent Node
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 0th child N.
-    {         0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 1
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0}, // 2
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0}, // 3
-    {         0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 4
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0}, // 5
-    {      -0.125,      0.375,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0,        0.0,        0.0,        0.0}, // 6
-    {         0.0,      0.375,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0,        0.0,        0.0}, // 7
-    {      -0.125,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.5,        0.5,       0.25,        0.0,        0.0,        0.0}, // 8
-    {         0.0,        0.0,        0.0,     -0.125,      0.375,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0}, // 9
-    {         0.0,        0.0,        0.0,        0.0,      0.375,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0}, // 10
-    {         0.0,        0.0,        0.0,     -0.125,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.5,        0.5,       0.25}  // 11
-  },
+    // embedding matrix for child 1
+    {
+      //          0           1           2           3           4           5           6           7           8           9          10          11 th parent Node
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 0th child N.
+      {         0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 1
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0}, // 2
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0}, // 3
+      {         0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 4
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0}, // 5
+      {      -0.125,      0.375,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0,        0.0,        0.0,        0.0}, // 6
+      {         0.0,      0.375,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0,        0.0,        0.0}, // 7
+      {      -0.125,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.5,        0.5,       0.25,        0.0,        0.0,        0.0}, // 8
+      {         0.0,        0.0,        0.0,     -0.125,      0.375,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0}, // 9
+      {         0.0,        0.0,        0.0,        0.0,      0.375,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0}, // 10
+      {         0.0,        0.0,        0.0,     -0.125,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.5,        0.5,       0.25}  // 11
+    },
 
-  // embedding matrix for child 2
-  {
-    //          0           1           2           3           4           5           6           7           8           9          10          11 th parent Node
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0}, // 0th child N.
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0}, // 1
-    {         0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 2
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0}, // 3
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0}, // 4
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 5
-    {      -0.125,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.25,        0.5,        0.5,        0.0,        0.0,        0.0}, // 6
-    {         0.0,     -0.125,      0.375,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0,        0.0,        0.0}, // 7
-    {      -0.125,        0.0,      0.375,        0.0,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0,        0.0}, // 8
-    {         0.0,        0.0,        0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.25,        0.5,        0.5}, // 9
-    {         0.0,        0.0,        0.0,        0.0,     -0.125,      0.375,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0}, // 10
-    {         0.0,        0.0,        0.0,     -0.125,        0.0,      0.375,        0.0,        0.0,        0.0,        0.0,        0.0,       0.75}  // 11
-  },
+    // embedding matrix for child 2
+    {
+      //          0           1           2           3           4           5           6           7           8           9          10          11 th parent Node
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0}, // 0th child N.
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0}, // 1
+      {         0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 2
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0}, // 3
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0}, // 4
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 5
+      {      -0.125,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.25,        0.5,        0.5,        0.0,        0.0,        0.0}, // 6
+      {         0.0,     -0.125,      0.375,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0,        0.0,        0.0}, // 7
+      {      -0.125,        0.0,      0.375,        0.0,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0,        0.0,        0.0}, // 8
+      {         0.0,        0.0,        0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.25,        0.5,        0.5}, // 9
+      {         0.0,        0.0,        0.0,        0.0,     -0.125,      0.375,        0.0,        0.0,        0.0,        0.0,       0.75,        0.0}, // 10
+      {         0.0,        0.0,        0.0,     -0.125,        0.0,      0.375,        0.0,        0.0,        0.0,        0.0,        0.0,       0.75}  // 11
+    },
 
-  // embedding matrix for child 3
-  {
-    //          0           1           2           3           4           5           6           7           8           9          10          11 th parent Node
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 0th child N.
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0}, // 1
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0}, // 2
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0}, // 3
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0}, // 4
-    {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0}, // 5
-    {      -0.125,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.5,        0.5,       0.25,        0.0,        0.0,        0.0}, // 6
-    {      -0.125,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.25,        0.5,        0.5,        0.0,        0.0,        0.0}, // 7
-    {         0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.5,       0.25,        0.5,        0.0,        0.0,        0.0}, // 8
-    {         0.0,        0.0,        0.0,     -0.125,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.5,        0.5,       0.25}, // 9
-    {         0.0,        0.0,        0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.25,        0.5,        0.5}, // 10
-    {         0.0,        0.0,        0.0,        0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.5,       0.25,        0.5}  // 11
-  }
+    // embedding matrix for child 3
+    {
+      //          0           1           2           3           4           5           6           7           8           9          10          11 th parent Node
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0,        0.0}, // 0th child N.
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0,        0.0}, // 1
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0,        0.0}, // 2
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0,        0.0}, // 3
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0,        0.0}, // 4
+      {         0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        1.0}, // 5
+      {      -0.125,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.5,        0.5,       0.25,        0.0,        0.0,        0.0}, // 6
+      {      -0.125,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.25,        0.5,        0.5,        0.0,        0.0,        0.0}, // 7
+      {         0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.5,       0.25,        0.5,        0.0,        0.0,        0.0}, // 8
+      {         0.0,        0.0,        0.0,     -0.125,        0.0,     -0.125,        0.0,        0.0,        0.0,        0.5,        0.5,       0.25}, // 9
+      {         0.0,        0.0,        0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.0,       0.25,        0.5,        0.5}, // 10
+      {         0.0,        0.0,        0.0,        0.0,     -0.125,     -0.125,        0.0,        0.0,        0.0,        0.5,       0.25,        0.5}  // 11
+    }
 
-};
+  };
 
 
 

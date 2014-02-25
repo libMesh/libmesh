@@ -28,8 +28,8 @@ namespace libMesh
 
 template <class Base>
 DerivedRBConstruction<Base>::DerivedRBConstruction (EquationSystems& es,
-		                                    const std::string& name_in,
-		                                    const unsigned int number_in)
+                                                    const std::string& name_in,
+                                                    const unsigned int number_in)
   : Base(es, name_in, number_in)
 {
   // We do not want to compute the output dual norms in
@@ -76,9 +76,9 @@ void DerivedRBConstruction<Base>::load_basis_function(unsigned int i)
   DenseVector<Number> bf = get_derived_basis_function(i);
 
   for(unsigned int j=0; j<uber_system.get_rb_evaluation().get_n_basis_functions(); j++)
-  {
-    Base::solution->add(bf(j), uber_system.get_rb_evaluation().get_basis_function(j));
-  }
+    {
+      Base::solution->add(bf(j), uber_system.get_rb_evaluation().get_basis_function(j));
+    }
 
   STOP_LOG("load_basis_function()", "DerivedRBConstruction");
 }

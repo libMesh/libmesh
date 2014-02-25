@@ -8,8 +8,8 @@
 
 using namespace libMesh;
 
-class NodeTest : public PointTestBase<Node>, public DofObjectTest<Node> { 
-public: 
+class NodeTest : public PointTestBase<Node>, public DofObjectTest<Node> {
+public:
   CPPUNIT_TEST_SUITE( NodeTest );
 
   POINTTEST
@@ -27,8 +27,8 @@ public:
   virtual void setUp()
   {
     PointTestBase<Node>::setUp();
-    
-    dof_object_instance = new Node(1,1,1); 
+
+    dof_object_instance = new Node(1,1,1);
     DofObjectTest<Node>::setUp(dof_object_instance);
   }
 
@@ -38,7 +38,7 @@ public:
 
     delete dof_object_instance;
   }
-  
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( NodeTest );

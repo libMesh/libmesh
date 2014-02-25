@@ -97,13 +97,13 @@ public:
    * The flag \p be_verbose enables some diagnostic output.
    */
   const Point build_inf_elem (const InfElemOriginValue& origin_x,
-			      const InfElemOriginValue& origin_y,
-			      const InfElemOriginValue& origin_z,
-			      const bool x_sym = false,
-			      const bool y_sym = false,
-			      const bool z_sym = false,
-			      const bool be_verbose = false,
-			      std::vector<const Node*>* inner_boundary_nodes = NULL);
+                              const InfElemOriginValue& origin_y,
+                              const InfElemOriginValue& origin_z,
+                              const bool x_sym = false,
+                              const bool y_sym = false,
+                              const bool z_sym = false,
+                              const bool be_verbose = false,
+                              std::vector<const Node*>* inner_boundary_nodes = NULL);
 
 
 
@@ -113,12 +113,12 @@ private:
    * Actual implementation.
    */
   void build_inf_elem (const Point& origin,
-		       const bool x_sym = false,
-		       const bool y_sym = false,
-		       const bool z_sym = false,
-		       const bool be_verbose = false,
-		       std::set<std::pair<dof_id_type,
-		                          unsigned int> >* inner_faces = NULL);
+                       const bool x_sym = false,
+                       const bool y_sym = false,
+                       const bool z_sym = false,
+                       const bool be_verbose = false,
+                       std::set<std::pair<dof_id_type,
+                       unsigned int> >* inner_faces = NULL);
   /**
    * Reference to the mesh we're building infinite
    * elements for.

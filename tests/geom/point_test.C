@@ -7,8 +7,8 @@
 
 using namespace libMesh;
 
-class PointTest : public PointTestBase<Point> { 
-public: 
+class PointTest : public PointTestBase<Point> {
+public:
   CPPUNIT_TEST_SUITE( PointTest );
 
   POINTTEST

@@ -44,6 +44,7 @@ include_HEADERS =  \
         base/sparsity_pattern.h \
         base/variable.h \
         base/variant_filter_iterator.h \
+        enums/enum_convergence_flags.h \
         enums/enum_eigen_solver_type.h \
         enums/enum_elem_quality.h \
         enums/enum_elem_type.h \
@@ -110,6 +111,7 @@ include_HEADERS =  \
         geom/cell_prism18.h \
         geom/cell_prism6.h \
         geom/cell_pyramid.h \
+        geom/cell_pyramid13.h \
         geom/cell_pyramid14.h \
         geom/cell_pyramid5.h \
         geom/cell_tet.h \

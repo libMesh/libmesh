@@ -60,7 +60,7 @@ protected:
    * of this base class.
    */
   QBase (const unsigned int _dim,
-	 const Order _order=INVALID_ORDER);
+         const Order _order=INVALID_ORDER);
 
 public:
 
@@ -84,8 +84,8 @@ public:
    * function.
    */
   static AutoPtr<QBase> build (const std::string &name,
-			       const unsigned int _dim,
-			       const Order _order=INVALID_ORDER);
+                               const unsigned int _dim,
+                               const Order _order=INVALID_ORDER);
 
   /**
    * Builds a specific quadrature rule, identified through the
@@ -95,27 +95,27 @@ public:
    * the quadrature rule.
    */
   static AutoPtr<QBase> build (const QuadratureType _qt,
-			       const unsigned int _dim,
-			       const Order _order=INVALID_ORDER);
+                               const unsigned int _dim,
+                               const Order _order=INVALID_ORDER);
 
   /**
    * @returns the current element type we're set up for
    */
   ElemType get_elem_type() const
-    { return _type; }
+  { return _type; }
 
   /**
    * @returns the current p refinement level we're initialized with
    */
   unsigned int get_p_level() const
-    { return _p_level; }
+  { return _p_level; }
 
   /**
    * @returns the number of points associated with the quadrature rule.
    */
   unsigned int n_points() const
-    { libmesh_assert (!_points.empty());
-      return libmesh_cast_int<unsigned int>(_points.size()); }
+  { libmesh_assert (!_points.empty());
+    return libmesh_cast_int<unsigned int>(_points.size()); }
 
   /**
    * @returns the dimension of the quadrature rule.
@@ -148,20 +148,20 @@ public:
    * @returns the \f$ i^{th} \f$ quadrature point on the reference object.
    */
   Point qp(const unsigned int i) const
-    { libmesh_assert_less (i, _points.size()); return _points[i]; }
+  { libmesh_assert_less (i, _points.size()); return _points[i]; }
 
   /**
    * @returns the \f$ i^{th} \f$ quadrature weight.
    */
   Real w(const unsigned int i) const
-    { libmesh_assert_less (i, _weights.size()); return _weights[i]; }
+  { libmesh_assert_less (i, _weights.size()); return _weights[i]; }
 
   /**
    * Initializes the data structures to contain a quadrature rule
    * for an object of type \p type.
    */
   void init (const ElemType type=INVALID_ELEM,
-	     unsigned int p_level=0);
+             unsigned int p_level=0);
 
   /**
    * @returns the order of the quadrature rule.
@@ -181,7 +181,7 @@ public:
    * entries of old_range to the entries of new_range.
    */
   void scale(std::pair<Real, Real> old_range,
-	     std::pair<Real, Real> new_range);
+             std::pair<Real, Real> new_range);
 
   /**
    * Same as above, but allows you to use the stream syntax.
@@ -223,7 +223,7 @@ protected:
    * is just one point with weight 1.
    */
   virtual void init_0D (const ElemType type=INVALID_ELEM,
-			unsigned int p_level=0);
+                        unsigned int p_level=0);
 
   /**
    * Initializes the 1D quadrature rule by filling the points and
@@ -233,7 +233,7 @@ protected:
    * define the init_1D function, therefore it is pure virtual.
    */
   virtual void init_1D (const ElemType type=INVALID_ELEM,
-			unsigned int p_level=0) = 0;
+                        unsigned int p_level=0) = 0;
 
   /**
    * Initializes the 2D quadrature rule by filling the points and
@@ -244,13 +244,13 @@ protected:
    * error (when \p DEBUG defined) when called.
    */
   virtual void init_2D (const ElemType,
-			unsigned int =0)
+                        unsigned int =0)
 #ifndef DEBUG
   {}
 #else
   {
     libMesh::err << "ERROR: Seems as if this quadrature rule" << std::endl
-	          << " is not implemented for 2D." << std::endl;
+                 << " is not implemented for 2D." << std::endl;
     libmesh_error();
   }
 #endif
@@ -264,13 +264,13 @@ protected:
    * error (when \p DEBUG defined) when called.
    */
   virtual void init_3D (const ElemType,
-			unsigned int =0)
+                        unsigned int =0)
 #ifndef DEBUG
   {}
 #else
   {
     libMesh::err << "ERROR: Seems as if this quadrature rule" << std::endl
-	          << " is not implemented for 3D." << std::endl;
+                 << " is not implemented for 3D." << std::endl;
     libmesh_error();
   }
 #endif
@@ -346,7 +346,7 @@ protected:
 
 inline
 QBase::QBase(const unsigned int d,
-	     const Order o) :
+             const Order o) :
   allow_rules_with_negative_weights(true),
   _dim(d),
   _order(o),
@@ -368,10 +368,10 @@ void QBase::print_info(std::ostream& os) const
   for (unsigned int qpoint=0; qpoint<this->n_points(); qpoint++)
     {
       os << " Point " << qpoint << ":\n"
-	 << "  "
-	 << _points[qpoint]
-	 << " Weight:\n "
-	 << "  w=" << _weights[qpoint] << "\n" << std::endl;
+         << "  "
+         << _points[qpoint]
+         << " Weight:\n "
+         << "  w=" << _weights[qpoint] << "\n" << std::endl;
     }
 }
 

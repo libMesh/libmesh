@@ -72,7 +72,7 @@ public:
    * Constructor.
    */
   RadialBasisInterpolation (const libMesh::Parallel::Communicator &comm,
-			    Real radius=-1) :
+                            Real radius=-1) :
     InverseDistanceInterpolation<KDDim> (comm,8,2),
     _r_bbox(0.),
     _r_override(radius)
@@ -94,8 +94,8 @@ public:
    * Pure virtual, must be overriden in derived classes.
    */
   virtual void interpolate_field_data (const std::vector<std::string> &field_names,
-				       const std::vector<Point>  &tgt_pts,
-				       std::vector<Number> &tgt_vals) const;
+                                       const std::vector<Point>  &tgt_pts,
+                                       std::vector<Number> &tgt_vals) const;
 
 };
 

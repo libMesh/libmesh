@@ -60,8 +60,8 @@ void compute_stresses(EquationSystems& es);
 
 // The main program.
 int main(int argc, char** argv) {
-	// Initialize libMesh.
-	LibMeshInit init (argc, argv);
+  // Initialize libMesh.
+  LibMeshInit init (argc, argv);
 
 #if !defined(LIBMESH_HAVE_XDR)
   // We need XDR support to write out reduced bases
@@ -75,8 +75,8 @@ int main(int argc, char** argv) {
   const unsigned int dim = 3;
   libmesh_example_assert(dim == LIBMESH_DIM, "3D support");
 
-	std::string parameters_filename = "reduced_basis_ex5.in";
-	GetPot infile(parameters_filename);
+  std::string parameters_filename = "reduced_basis_ex5.in";
+  GetPot infile(parameters_filename);
 
   unsigned int n_elem_x  = infile("n_elem_x",0);
   unsigned int n_elem_y  = infile("n_elem_y",0);
@@ -85,14 +85,14 @@ int main(int argc, char** argv) {
   Real y_size            = infile("y_size", 0.);
   Real z_size            = infile("z_size", 0.);
 
-	bool store_basis_functions = infile("store_basis_functions", true);
+  bool store_basis_functions = infile("store_basis_functions", true);
 
-	// Read the "online_mode" flag from the command line
-	GetPot command_line(argc, argv);
-	int online_mode = 0;
-	if ( command_line.search(1, "-online_mode") ) {
-		online_mode = command_line.next(online_mode);
-	}
+  // Read the "online_mode" flag from the command line
+  GetPot command_line(argc, argv);
+  int online_mode = 0;
+  if ( command_line.search(1, "-online_mode") ) {
+    online_mode = command_line.next(online_mode);
+  }
 
 
   Mesh mesh (init.comm(), dim);
@@ -104,15 +104,15 @@ int main(int argc, char** argv) {
                                      0., y_size,
                                      0., z_size,
                                      HEX8);
-	 mesh.print_info();
+  mesh.print_info();
 
-	// Create an equation systems object.
-	EquationSystems equation_systems(mesh);
+  // Create an equation systems object.
+  EquationSystems equation_systems(mesh);
 
-	// We override RBConstruction with ElasticityRBConstruction in order to
-	// specialize a few functions for this particular problem.
-	ElasticityRBConstruction& rb_con =
-		equation_systems.add_system<ElasticityRBConstruction>("RBElasticity");
+  // We override RBConstruction with ElasticityRBConstruction in order to
+  // specialize a few functions for this particular problem.
+  ElasticityRBConstruction& rb_con =
+    equation_systems.add_system<ElasticityRBConstruction>("RBElasticity");
 
   // Also, initialize an ExplicitSystem to store stresses
   ExplicitSystem& stress_system =
@@ -128,82 +128,82 @@ int main(int argc, char** argv) {
   stress_system.add_variable("sigma_22", CONSTANT, MONOMIAL);
   stress_system.add_variable("vonMises", CONSTANT, MONOMIAL);
 
-	// Initialize the data structures for the equation system.
-	equation_systems.init ();
+  // Initialize the data structures for the equation system.
+  equation_systems.init ();
   equation_systems.print_info();
 
-	// Build a new RBEvaluation object which will be used to perform
-	// Reduced Basis calculations. This is required in both the
-	// "Offline" and "Online" stages.
-	ElasticityRBEvaluation rb_eval(mesh.comm());
+  // Build a new RBEvaluation object which will be used to perform
+  // Reduced Basis calculations. This is required in both the
+  // "Offline" and "Online" stages.
+  ElasticityRBEvaluation rb_eval(mesh.comm());
 
-	// We need to give the RBConstruction object a pointer to
-	// our RBEvaluation object
-	rb_con.set_rb_evaluation(rb_eval);
+  // We need to give the RBConstruction object a pointer to
+  // our RBEvaluation object
+  rb_con.set_rb_evaluation(rb_eval);
 
-	if(!online_mode) // Perform the Offline stage of the RB method
-	{
-		// Read in the data that defines this problem from the specified text file
-		rb_con.process_parameters_file(parameters_filename);
+  if(!online_mode) // Perform the Offline stage of the RB method
+    {
+      // Read in the data that defines this problem from the specified text file
+      rb_con.process_parameters_file(parameters_filename);
 
-		// Print out info that describes the current setup of rb_con
-		rb_con.print_info();
+      // Print out info that describes the current setup of rb_con
+      rb_con.print_info();
 
-		// Prepare rb_con for the Construction stage of the RB method.
-		// This sets up the necessary data structures and performs
-		// initial assembly of the "truth" affine expansion of the PDE.
-		rb_con.initialize_rb_construction();
+      // Prepare rb_con for the Construction stage of the RB method.
+      // This sets up the necessary data structures and performs
+      // initial assembly of the "truth" affine expansion of the PDE.
+      rb_con.initialize_rb_construction();
 
-		// Compute the reduced basis space by computing "snapshots", i.e.
-		// "truth" solves, at well-chosen parameter values and employing
-		// these snapshots as basis functions.
-		rb_con.train_reduced_basis();
+      // Compute the reduced basis space by computing "snapshots", i.e.
+      // "truth" solves, at well-chosen parameter values and employing
+      // these snapshots as basis functions.
+      rb_con.train_reduced_basis();
 
-		// Write out the data that will subsequently be required for the Evaluation stage
-		rb_con.get_rb_evaluation().write_offline_data_to_files();
+      // Write out the data that will subsequently be required for the Evaluation stage
+      rb_con.get_rb_evaluation().write_offline_data_to_files();
 
-		// If requested, write out the RB basis functions for visualization purposes
-		if(store_basis_functions)
-		{
-			// Write out the basis functions
-			rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
-		}
-	}
-	else // Perform the Online stage of the RB method
-	{
-		// Read in the reduced basis data
-		rb_eval.read_offline_data_from_files();
+      // If requested, write out the RB basis functions for visualization purposes
+      if(store_basis_functions)
+        {
+          // Write out the basis functions
+          rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
+        }
+    }
+  else // Perform the Online stage of the RB method
+    {
+      // Read in the reduced basis data
+      rb_eval.read_offline_data_from_files();
 
-		// Iinitialize online parameters
-		Real online_x_scaling = infile("online_x_scaling", 0.);
-		Real online_load_Fx   = infile("online_load_Fx",   0.);
-		Real online_load_Fy   = infile("online_load_Fy",   0.);
-		Real online_load_Fz   = infile("online_load_Fz",   0.);
-		RBParameters online_mu;
-		online_mu.set_value("x_scaling", online_x_scaling);
-		online_mu.set_value("load_Fx",   online_load_Fx);
-		online_mu.set_value("load_Fy",   online_load_Fy);
-		online_mu.set_value("load_Fz",   online_load_Fz);
-		rb_eval.set_parameters(online_mu);
-		rb_eval.print_parameters();
+      // Iinitialize online parameters
+      Real online_x_scaling = infile("online_x_scaling", 0.);
+      Real online_load_Fx   = infile("online_load_Fx",   0.);
+      Real online_load_Fy   = infile("online_load_Fy",   0.);
+      Real online_load_Fz   = infile("online_load_Fz",   0.);
+      RBParameters online_mu;
+      online_mu.set_value("x_scaling", online_x_scaling);
+      online_mu.set_value("load_Fx",   online_load_Fx);
+      online_mu.set_value("load_Fy",   online_load_Fy);
+      online_mu.set_value("load_Fz",   online_load_Fz);
+      rb_eval.set_parameters(online_mu);
+      rb_eval.print_parameters();
 
-		// Now do the Online solve using the precomputed reduced basis
-		rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
+      // Now do the Online solve using the precomputed reduced basis
+      rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
 
-		if(store_basis_functions)
-		{
-			// Read in the basis functions
-			rb_eval.read_in_basis_functions(rb_con);
+      if(store_basis_functions)
+        {
+          // Read in the basis functions
+          rb_eval.read_in_basis_functions(rb_con);
 
-			// Plot the solution
-			rb_con.load_rb_solution();
+          // Plot the solution
+          rb_con.load_rb_solution();
 
-			const RBParameters& rb_eval_params = rb_eval.get_parameters();
-			scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_sol.e");
-		}
-	}
+          const RBParameters& rb_eval_params = rb_eval.get_parameters();
+          scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_sol.e");
+        }
+    }
 
-	return 0;
+  return 0;
 }
 
 void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std::string& filename)
@@ -215,11 +215,11 @@ void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std:
   const MeshBase::node_iterator node_end = mesh.nodes_end();
 
   for( ; node_it != node_end; node_it++)
-  {
-    Node* node = *node_it;
+    {
+      Node* node = *node_it;
 
-    (*node)(0) *= mu.get_value("x_scaling");
-  }
+      (*node)(0) *= mu.get_value("x_scaling");
+    }
 
   // Post-process the solution to compute the stresses
   compute_stresses(es);
@@ -232,11 +232,11 @@ void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std:
   node_it = mesh.nodes_begin();
 
   for( ; node_it != node_end; node_it++)
-  {
-    Node* node = *node_it;
+    {
+      Node* node = *node_it;
 
-    (*node)(0) /= mu.get_value("x_scaling");
-  }
+      (*node)(0) /= mu.get_value("x_scaling");
+    }
 }
 
 void compute_stresses(EquationSystems& es)
@@ -290,77 +290,77 @@ void compute_stresses(EquationSystems& es)
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
   for ( ; el != end_el; ++el)
-  {
-    const Elem* elem = *el;
-
-    for(unsigned int var=0; var<3; var++)
     {
-      dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
-    }
+      const Elem* elem = *el;
 
-    fe->reinit (elem);
-
-    elem_sigma.resize(3,3);
-
-    for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-    {
-      for(unsigned int C_i=0; C_i<3; C_i++)
-        for(unsigned int C_j=0; C_j<3; C_j++)
-          for(unsigned int C_k=0; C_k<3; C_k++)
-          {
-            const unsigned int n_var_dofs = dof_indices_var[C_k].size();
-
-            // Get the gradient at this quadrature point
-            Gradient displacement_gradient;
-            for(unsigned int l=0; l<n_var_dofs; l++)
-            {
-              displacement_gradient.add_scaled(dphi[l][qp], system.current_solution(dof_indices_var[C_k][l]));
-            }
-
-            for(unsigned int C_l=0; C_l<3; C_l++)
-            {
-              elem_sigma(C_i,C_j) += JxW[qp]*( elasticity_tensor(C_i,C_j,C_k,C_l) * displacement_gradient(C_l) );
-            }
-
-          }
-    }
-
-    // Get the average stresses by dividing by the element volume
-    elem_sigma.scale(1./elem->volume());
-
-    // load elem_sigma data into stress_system
-    for(unsigned int i=0; i<3; i++)
-      for(unsigned int j=0; j<3; j++)
-      {
-        stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[i][j]);
-
-        // We are using CONSTANT MONOMIAL basis functions, hence we only need to get
-        // one dof index per variable
-        dof_id_type dof_index = stress_dof_indices_var[0];
-
-        if( (stress_system.solution->first_local_index() <= dof_index) &&
-            (dof_index < stress_system.solution->last_local_index()) )
+      for(unsigned int var=0; var<3; var++)
         {
-          stress_system.solution->set(dof_index, elem_sigma(i,j));
+          dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
         }
 
-      }
+      fe->reinit (elem);
 
-    // Also, the von Mises stress
-    Number vonMises_value = std::sqrt( 0.5*( pow(elem_sigma(0,0) - elem_sigma(1,1),2.) +
-                                             pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
-                                             pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
-                                             6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
-                                           ) );
-    stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
-    dof_id_type dof_index = stress_dof_indices_var[0];
-    if( (stress_system.solution->first_local_index() <= dof_index) &&
-        (dof_index < stress_system.solution->last_local_index()) )
-    {
-      stress_system.solution->set(dof_index, vonMises_value);
+      elem_sigma.resize(3,3);
+
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+        {
+          for(unsigned int C_i=0; C_i<3; C_i++)
+            for(unsigned int C_j=0; C_j<3; C_j++)
+              for(unsigned int C_k=0; C_k<3; C_k++)
+                {
+                  const unsigned int n_var_dofs = dof_indices_var[C_k].size();
+
+                  // Get the gradient at this quadrature point
+                  Gradient displacement_gradient;
+                  for(unsigned int l=0; l<n_var_dofs; l++)
+                    {
+                      displacement_gradient.add_scaled(dphi[l][qp], system.current_solution(dof_indices_var[C_k][l]));
+                    }
+
+                  for(unsigned int C_l=0; C_l<3; C_l++)
+                    {
+                      elem_sigma(C_i,C_j) += JxW[qp]*( elasticity_tensor(C_i,C_j,C_k,C_l) * displacement_gradient(C_l) );
+                    }
+
+                }
+        }
+
+      // Get the average stresses by dividing by the element volume
+      elem_sigma.scale(1./elem->volume());
+
+      // load elem_sigma data into stress_system
+      for(unsigned int i=0; i<3; i++)
+        for(unsigned int j=0; j<3; j++)
+          {
+            stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[i][j]);
+
+            // We are using CONSTANT MONOMIAL basis functions, hence we only need to get
+            // one dof index per variable
+            dof_id_type dof_index = stress_dof_indices_var[0];
+
+            if( (stress_system.solution->first_local_index() <= dof_index) &&
+                (dof_index < stress_system.solution->last_local_index()) )
+              {
+                stress_system.solution->set(dof_index, elem_sigma(i,j));
+              }
+
+          }
+
+      // Also, the von Mises stress
+      Number vonMises_value = std::sqrt( 0.5*( pow(elem_sigma(0,0) - elem_sigma(1,1),2.) +
+                                               pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
+                                               pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
+                                               6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
+                                               ) );
+      stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
+      dof_id_type dof_index = stress_dof_indices_var[0];
+      if( (stress_system.solution->first_local_index() <= dof_index) &&
+          (dof_index < stress_system.solution->last_local_index()) )
+        {
+          stress_system.solution->set(dof_index, vonMises_value);
+        }
+
     }
-
-  }
 
   // Should call close and update when we set vector entries directly
   stress_system.solution->close();

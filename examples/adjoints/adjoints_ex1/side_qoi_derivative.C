@@ -55,10 +55,10 @@ void LaplaceSystem::side_qoi_derivative (DiffContext &context,
       // If on the sides where the boundary QoI is supported, add contributions
       // to the adjoint rhs
       if(fabs(y - 1.0) <= TOL && x > 0.0)
-  	{
-  	  for (unsigned int i=0; i != n_T_dofs; i++)
-  	    Q(i) += JxW[qp] * (dphi[i][qp] * face_normals[qp]);
-  	}
+        {
+          for (unsigned int i=0; i != n_T_dofs; i++)
+            Q(i) += JxW[qp] * (dphi[i][qp] * face_normals[qp]);
+        }
 
     } // end of the quadrature point qp-loop
 }

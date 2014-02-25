@@ -75,7 +75,7 @@ public:
     const Real fx = 2.0*(1.0 - y*y) + 2.0*(1.0 - z*z) + (1.0 - y*y)*(1.0 - z*z);
     const Real fy = 2.0*(1.0 - x*x) + 2.0*(1.0 - z*z) + (1.0 - x*x)*(1.0 - z*z) ;
     const Real fz = 2.0*(1.0 - x*x) + 2.0*(1.0 - y*y) + (1.0 - x*x)*(1.0 - y*y);
-    
+
     return RealGradient( fx, fy, fz );
   }
 

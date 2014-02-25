@@ -39,22 +39,22 @@ namespace libMesh
 /**
  * The \p InfHex8 is an infinite element in 3D composed of 8 nodes.
  * It is numbered like this:
-   \verbatim
-  INFHEX8: 7        6                             z^  / y
-           o        o    closer to infinity        | /
-           :        |                              |/
-           :        |                              +----> x
-      4    :   5    |
-       o   :    o   |
-       |   o....|...o 2
-       |  .3    |  /
-       | .      | /
-       |.       |/       base face
-       o--------o
-       0        1
+ \verbatim
+ INFHEX8: 7        6                             z^  / y
+ o        o    closer to infinity        | /
+ :        |                              |/
+ :        |                              +----> x
+ 4    :   5    |
+ o   :    o   |
+ |   o....|...o 2
+ |  .3    |  /
+ | .      | /
+ |.       |/       base face
+ o--------o
+ 0        1
 
-   \endverbatim
- */
+ \endverbatim
+*/
 
 // ------------------------------------------------------------
 // InfHex8 class definition
@@ -103,14 +103,14 @@ public:
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const;
+                               const unsigned int e) const;
 
   /**
    * @returns FIRST
@@ -123,16 +123,16 @@ public:
    * takes care of freeing memory.
    */
   AutoPtr<Elem> build_side (const unsigned int i,
-			    bool proxy) const;
-/*   {  */
-/*     // side() returns an AutoPtr to a DofObject, hence need to cast to Elem* */
-/*     AutoPtr<DofObject> ap_dof_object(this->side(i)); */
-/*     Elem* side = libmesh_cast_ptr<Elem*>(ap_dof_object.release()); */
-/*     libmesh_assert(side); // libmesh_assert that the cast was successful */
+                            bool proxy) const;
+  /*   {  */
+  /*     // side() returns an AutoPtr to a DofObject, hence need to cast to Elem* */
+  /*     AutoPtr<DofObject> ap_dof_object(this->side(i)); */
+  /*     Elem* side = libmesh_cast_ptr<Elem*>(ap_dof_object.release()); */
+  /*     libmesh_assert(side); // libmesh_assert that the cast was successful */
 
-/*     AutoPtr<Elem> ap(side); */
-/*     return ap; */
-/*   } */
+  /*     AutoPtr<Elem> ap(side); */
+  /*     return ap; */
+  /*   } */
 
   /**
    * Returns an \p EDGE2 built coincident with edges 0 to 3, an \p INFEDGE2
@@ -142,15 +142,15 @@ public:
   AutoPtr<Elem> build_edge (const unsigned int i) const;
 
   virtual void connectivity(const unsigned int sc,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
-//   void tecplot_connectivity(const unsigned int sc,
-// 			    std::vector<unsigned int>& conn) const;
+  //   void tecplot_connectivity(const unsigned int sc,
+  //     std::vector<unsigned int>& conn) const;
 
-//   void vtk_connectivity(const unsigned int,
-// 			std::vector<unsigned int>*) const
-//   { libmesh_error(); }
+  //   void vtk_connectivity(const unsigned int,
+  // std::vector<unsigned int>*) const
+  //   { libmesh_error(); }
 
   unsigned int vtk_element_type (const unsigned int) const
   { return 12; }
@@ -190,8 +190,8 @@ protected:
    * Matrix used to create the elements children.
    */
   float embedding_matrix (const unsigned int i,
-			  const unsigned int j,
-			  const unsigned int k) const
+                          const unsigned int j,
+                          const unsigned int k) const
   { return _embedding_matrix[i][j][k]; }
 
   /**

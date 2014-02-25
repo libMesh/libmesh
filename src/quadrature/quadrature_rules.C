@@ -58,8 +58,8 @@ std::string QuadratureRules::name (const QuadratureType q)
 
     default:
       {
-	libMesh::err << "ERROR: Bad qt=" << q << std::endl;
-	libmesh_error();
+        libMesh::err << "ERROR: Bad qt=" << q << std::endl;
+        libmesh_error();
       }
     }
 

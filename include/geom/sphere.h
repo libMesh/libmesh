@@ -47,24 +47,24 @@ namespace libMesh
  * starting with 0. from the positive x axis,
  * \f$ \theta \f$ is measured against the positive
  * z axis.
-   \verbatim
+ \verbatim
 
-          \      | Z
-           \theta|
-            \    |    .
-             \   |   .
-              \  |  .
-               \ | .
-                \|.
-  ---------------+---------.---------
-                /|\       .          Y
-               /phi\     .
-              /  |  \   .
-             /   |   \ .
-            /.........\
-           /     |
-        X /
-   \endverbatim
+ \      | Z
+ \theta|
+ \    |    .
+ \   |   .
+ \  |  .
+ \ | .
+ \|.
+ ---------------+---------.---------
+ /|\       .          Y
+ /phi\     .
+ /  |  \   .
+ /   |   \ .
+ /.........\
+ /     |
+ X /
+ \endverbatim
  *
  * \author Benjamin S. Kirk, Daniel Dreyer
  * \date 2002-2007
@@ -210,8 +210,8 @@ Point Sphere::surface_coords (const Point& cart) const
   const Real phi = std::atan2(c(1), c(0));
 
   return Point(/* radius */ c.size(),
-	       /* theta  */ std::atan2( std::sqrt( c(0)*c(0) + c(1)*c(1) ), c(2) ),
-	       /* phi    */ ( (phi < 0)  ?  2.*libMesh::pi+phi  :  phi ) );
+               /* theta  */ std::atan2( std::sqrt( c(0)*c(0) + c(1)*c(1) ), c(2) ),
+               /* phi    */ ( (phi < 0)  ?  2.*libMesh::pi+phi  :  phi ) );
 }
 
 
@@ -225,8 +225,8 @@ Point Sphere::world_coords (const Point& sph) const
 
   // constant translation out of the origin
   return Point (/* x */ r*std::sin(theta)*std::cos(phi) + this->center()(0),
-		/* y */ r*std::sin(theta)*std::sin(phi) + this->center()(1),
-		/* z */ r*std::cos(theta)               + this->center()(2));
+                /* y */ r*std::sin(theta)*std::sin(phi) + this->center()(1),
+                /* z */ r*std::cos(theta)               + this->center()(2));
 }
 
 

@@ -182,14 +182,14 @@ void write_output(EquationSystems &es,
     {
       mesh.write(numbered_filename(t_step, a_step, solution_type, "mesh", "xda", param));
       es.write(numbered_filename(t_step, a_step, solution_type, "soln", "xda", param),
-               libMeshEnums::WRITE, EquationSystems::WRITE_DATA |
+               WRITE, EquationSystems::WRITE_DATA |
                EquationSystems::WRITE_ADDITIONAL_DATA);
     }
   if (param.output_xdr)
     {
       mesh.write(numbered_filename(t_step, a_step, solution_type, "mesh", "xdr", param));
       es.write(numbered_filename(t_step, a_step, solution_type, "soln", "xdr", param),
-               libMeshEnums::WRITE, EquationSystems::WRITE_DATA |
+               WRITE, EquationSystems::WRITE_DATA |
                EquationSystems::WRITE_ADDITIONAL_DATA);
     }
 }
@@ -197,7 +197,7 @@ void write_output(EquationSystems &es,
 void write_output_headers(FEMParameters &param)
 {
   // Only one processor needs to take care of headers.
-  if (libMesh::processor_id() != 0)
+  if (libMesh::global_processor_id() != 0)
     return;
 
   start_output(param.initial_timestep, "out_clocktime.m", "vector_clocktime");
@@ -228,11 +228,11 @@ void write_output_solvedata(EquationSystems &es,
   unsigned int n_active_elem = mesh.n_active_elem();
   unsigned int n_active_dofs = es.n_active_dofs();
 
-  if (libMesh::processor_id() == 0)
+  if (mesh.processor_id() == 0)
     {
       // Write out the number of elements/dofs used
       std::ofstream activemesh ("out_activemesh.m",
-        std::ios_base::app | std::ios_base::out);
+                                std::ios_base::app | std::ios_base::out);
       activemesh.precision(17);
       activemesh << (a_step + 1) << ' '
                  << n_active_elem << ' '
@@ -240,14 +240,14 @@ void write_output_solvedata(EquationSystems &es,
 
       // Write out the number of solver steps used
       std::ofstream solvesteps ("out_solvesteps.m",
-        std::ios_base::app | std::ios_base::out);
+                                std::ios_base::app | std::ios_base::out);
       solvesteps.precision(17);
       solvesteps << newton_steps << ' '
                  << krylov_steps << std::endl;
 
       // Write out the clock time
       std::ofstream clocktime ("out_clocktime.m",
-        std::ios_base::app | std::ios_base::out);
+                               std::ios_base::app | std::ios_base::out);
       clocktime.precision(17);
       clocktime << tv_sec << '.' << tv_usec << std::endl;
     }
@@ -256,35 +256,35 @@ void write_output_solvedata(EquationSystems &es,
 void write_output_footers(FEMParameters &param)
 {
   // Write footers on output .m files
-  if (libMesh::processor_id() == 0)
+  if (libMesh::global_processor_id() == 0)
     {
       std::ofstream clocktime ("out_clocktime.m",
-        std::ios_base::app | std::ios_base::out);
+                               std::ios_base::app | std::ios_base::out);
       clocktime << "];" << std::endl;
 
       if (param.run_simulation)
         {
           std::ofstream activemesh ("out_activemesh.m",
-            std::ios_base::app | std::ios_base::out);
+                                    std::ios_base::app | std::ios_base::out);
           activemesh << "];" << std::endl;
 
           std::ofstream solvesteps ("out_solvesteps.m",
-            std::ios_base::app | std::ios_base::out);
+                                    std::ios_base::app | std::ios_base::out);
           solvesteps << "];" << std::endl;
 
           if (param.timesolver_tolerance)
             {
               std::ofstream times ("out_time.m",
-                std::ios_base::app | std::ios_base::out);
+                                   std::ios_base::app | std::ios_base::out);
               times << "];" << std::endl;
               std::ofstream timesteps ("out_timesteps.m",
-                std::ios_base::app | std::ios_base::out);
+                                       std::ios_base::app | std::ios_base::out);
               timesteps << "];" << std::endl;
             }
           if (param.steadystate_tolerance)
             {
               std::ofstream changerate ("out_changerate.m",
-                std::ios_base::app | std::ios_base::out);
+                                        std::ios_base::app | std::ios_base::out);
               changerate << "];" << std::endl;
             }
         }
@@ -303,12 +303,12 @@ void write_error(EquationSystems &es,
                  FEMParameters &param,
                  std::string error_type)
 #else
-void write_error(EquationSystems &,
-                 ErrorVector &,
-                 unsigned int,
-                 unsigned int,
-                 FEMParameters &,
-                 std::string)
+  void write_error(EquationSystems &,
+                   ErrorVector &,
+                   unsigned int,
+                   unsigned int,
+                   FEMParameters &,
+                   std::string)
 #endif
 {
 #ifdef LIBMESH_HAVE_GMV
@@ -377,7 +377,7 @@ void read_output(EquationSystems &es,
   mesh.read(file_name_mesh);
 
   // And the stored solution
-  es.read(file_name_soln, libMeshEnums::READ,
+  es.read(file_name_soln, READ,
           EquationSystems::READ_HEADER |
           EquationSystems::READ_DATA |
           EquationSystems::READ_ADDITIONAL_DATA);
@@ -502,7 +502,7 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
       AutoPtr<TimeSolver>(new SteadySolver(system));
 
   system.time_solver->reduce_deltat_on_diffsolver_failure =
-                                        param.deltat_reductions;
+    param.deltat_reductions;
   system.time_solver->quiet           = param.time_solver_quiet;
 
   // Set the time stepping options
@@ -582,10 +582,10 @@ AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters& /* param */)
 // the build_error_estimator_component_wise function below
 AutoPtr<ErrorEstimator>
 build_error_estimator_component_wise
-  (FEMParameters &param,
-   std::vector<std::vector<Real> > &term_weights,
-   std::vector<libMeshEnums::FEMNormType> &primal_error_norm_type,
-   std::vector<libMeshEnums::FEMNormType> &dual_error_norm_type)
+(FEMParameters &param,
+ std::vector<std::vector<Real> > &term_weights,
+ std::vector<FEMNormType> &primal_error_norm_type,
+ std::vector<FEMNormType> &dual_error_norm_type)
 {
   AutoPtr<ErrorEstimator> error_estimator;
 
@@ -637,11 +637,11 @@ build_error_estimator_component_wise
 // are computed using the build_weighted_error_estimator_component_wise below
 AutoPtr<ErrorEstimator>
 build_weighted_error_estimator_component_wise
-  (FEMParameters &param,
-   std::vector<std::vector<Real> > &term_weights,
-   std::vector<libMeshEnums::FEMNormType> &primal_error_norm_type,
-   std::vector<libMeshEnums::FEMNormType> &dual_error_norm_type,
-   std::vector<FEMFunctionBase<Number>*> coupled_system_weight_functions)
+(FEMParameters &param,
+ std::vector<std::vector<Real> > &term_weights,
+ std::vector<FEMNormType> &primal_error_norm_type,
+ std::vector<FEMNormType> &dual_error_norm_type,
+ std::vector<FEMFunctionBase<Number>*> coupled_system_weight_functions)
 {
   AutoPtr<ErrorEstimator> error_estimator;
 
@@ -717,7 +717,7 @@ int main (int argc, char** argv)
     std::ifstream i("general.in");
     if (!i)
       {
-        std::cerr << '[' << libMesh::processor_id()
+        std::cerr << '[' << init.comm().rank()
                   << "] Can't find general.in; exiting early."
                   << std::endl;
         libmesh_error();
@@ -800,7 +800,7 @@ int main (int argc, char** argv)
       std::cout<< "Solving the forward problem" <<std::endl;
 
       std::cout << "We have " << mesh.n_active_elem()
-                    << " active elements and " << equation_systems.n_active_dofs()
+                << " active elements and " << equation_systems.n_active_dofs()
                 << " active dofs." << std::endl << std::endl;
 
       // Solve the forward system
@@ -838,11 +838,11 @@ int main (int argc, char** argv)
           std::cout<< "Solving the adjoint problem" <<std::endl;
           system.adjoint_solve();
 
-	  // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
-	system.set_adjoint_already_solved(true);
+          // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+          system.set_adjoint_already_solved(true);
 
-	  // To plot the adjoint solution, we swap it with the primal solution
-	  // and use the write_output function
+          // To plot the adjoint solution, we swap it with the primal solution
+          // and use the write_output function
           NumericVector<Number> &dual_solution = system.get_adjoint_solution();
           primal_solution.swap(dual_solution);
 
@@ -855,7 +855,7 @@ int main (int argc, char** argv)
           // system for the adjoint error estimate
           Real Pe = (dynamic_cast<CoupledSystem&>(system)).get_Pe();
 
-	  // The total error is the sum: error = error_non_pressure +
+          // The total error is the sum: error = error_non_pressure +
           // error_with_pressure + ...
           // error_estimator_convection_diffusion_x +
           // error_estimator_convection_diffusion_y
@@ -867,14 +867,14 @@ int main (int argc, char** argv)
           // First we build the norm_type_vector_non_pressure vectors and
           // weights_matrix_non_pressure matrix for the non-pressure term
           // error contributions
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             primal_norm_type_vector_non_pressure;
           primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
           primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
           primal_norm_type_vector_non_pressure.push_back(L2);
           primal_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
 
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             dual_norm_type_vector_non_pressure;
           dual_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
           dual_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
@@ -883,7 +883,7 @@ int main (int argc, char** argv)
 
           std::vector<std::vector<Real> >
             weights_matrix_non_pressure(system.n_vars(),
-              std::vector<Real>(system.n_vars(), 0.0));
+                                        std::vector<Real>(system.n_vars(), 0.0));
           weights_matrix_non_pressure[0][0] = 1.;
           weights_matrix_non_pressure[1][1] = 1.;
           weights_matrix_non_pressure[3][3] = 1./Pe;
@@ -892,31 +892,31 @@ int main (int argc, char** argv)
           // to the QoI error from the non pressure term
           AutoPtr<ErrorEstimator> error_estimator_non_pressure =
             build_error_estimator_component_wise
-              (param, weights_matrix_non_pressure,
-               primal_norm_type_vector_non_pressure,
-               dual_norm_type_vector_non_pressure);
+            (param, weights_matrix_non_pressure,
+             primal_norm_type_vector_non_pressure,
+             dual_norm_type_vector_non_pressure);
 
           // Estimate the contributions to the QoI error from the non
           // pressure terms
           error_estimator_non_pressure->estimate_error(system, error_non_pressure);
 
-	  // Plot the estimated error from the non_pressure terms
+          // Plot the estimated error from the non_pressure terms
           write_error(equation_systems, error_non_pressure, 0, a_step, param, "_non_pressure");
 
           // Now for the pressure contributions
           ErrorVector error_with_pressure;
 
-	  // Next we build the norm_type_vector_with_pressure vectors and
+          // Next we build the norm_type_vector_with_pressure vectors and
           // weights_matrix_with_pressure matrix for the pressure term
           // error contributions
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             primal_norm_type_vector_with_pressure;
           primal_norm_type_vector_with_pressure.push_back(H1_X_SEMINORM);
           primal_norm_type_vector_with_pressure.push_back(H1_Y_SEMINORM);
           primal_norm_type_vector_with_pressure.push_back(L2);
           primal_norm_type_vector_with_pressure.push_back(L2);
 
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             dual_norm_type_vector_with_pressure;
           dual_norm_type_vector_with_pressure.push_back(H1_X_SEMINORM);
           dual_norm_type_vector_with_pressure.push_back(H1_Y_SEMINORM);
@@ -925,8 +925,8 @@ int main (int argc, char** argv)
 
           std::vector<std::vector<Real> >
             weights_matrix_with_pressure
-              (system.n_vars(),
-               std::vector<Real>(system.n_vars(), 0.0));
+            (system.n_vars(),
+             std::vector<Real>(system.n_vars(), 0.0));
           weights_matrix_with_pressure[0][2] = 1.;
 
           weights_matrix_with_pressure[1][2] = 1.;
@@ -938,14 +938,14 @@ int main (int argc, char** argv)
           // to the QoI error from the pressure term
           AutoPtr<ErrorEstimator> error_estimator_with_pressure =
             build_error_estimator_component_wise
-              (param, weights_matrix_with_pressure,
-               primal_norm_type_vector_with_pressure,
-               dual_norm_type_vector_with_pressure);
+            (param, weights_matrix_with_pressure,
+             primal_norm_type_vector_with_pressure,
+             dual_norm_type_vector_with_pressure);
 
           // Estimate the contributions to the QoI error from the pressure terms
           error_estimator_with_pressure->estimate_error(system, error_with_pressure);
 
-	  // Plot the error due to the pressure terms
+          // Plot the error due to the pressure terms
           write_error(equation_systems, error_with_pressure, 0, a_step, param, "_with_pressure");
 
           // Now for the convection diffusion term errors (in the x and y directions)
@@ -953,14 +953,14 @@ int main (int argc, char** argv)
           ErrorVector error_convection_diffusion_x;
 
           // The norm type vectors and weights matrix for the convection_diffusion_x errors
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             primal_norm_type_vector_convection_diffusion_x;
           primal_norm_type_vector_convection_diffusion_x.push_back(L2);
           primal_norm_type_vector_convection_diffusion_x.push_back(L2);
           primal_norm_type_vector_convection_diffusion_x.push_back(L2);
           primal_norm_type_vector_convection_diffusion_x.push_back(H1_X_SEMINORM);
 
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             dual_norm_type_vector_convection_diffusion_x;
           dual_norm_type_vector_convection_diffusion_x.push_back(L2);
           dual_norm_type_vector_convection_diffusion_x.push_back(L2);
@@ -970,22 +970,22 @@ int main (int argc, char** argv)
 
           std::vector<std::vector<Real> >
             weights_matrix_convection_diffusion_x
-              (system.n_vars(),
-               std::vector<Real>(system.n_vars(), 0.0));
-	  weights_matrix_convection_diffusion_x[0][3] = 1.;
+            (system.n_vars(),
+             std::vector<Real>(system.n_vars(), 0.0));
+          weights_matrix_convection_diffusion_x[0][3] = 1.;
           weights_matrix_convection_diffusion_x[3][3] = 1.;
 
-	  // We will also have to build and pass the weight functions to the weighted patch recovery estimators
+          // We will also have to build and pass the weight functions to the weighted patch recovery estimators
 
-	  // We pass the identity function as weights to error entries that the above matrix will scale to 0.
+          // We pass the identity function as weights to error entries that the above matrix will scale to 0.
           ConstFEMFunction<Number> identity(1);
 
           // Declare object of class CoupledFEMFunctionsx, the definition of the function contains the weight
-	  // to be applied to the relevant terms
-	  // For ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2} term, returns C,1_h
+          // to be applied to the relevant terms
+          // For ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2} term, returns C,1_h
           CoupledFEMFunctionsx convdiffx0(system, 0);
-	  // For ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} term, returns (u_1)_h
-	  CoupledFEMFunctionsx convdiffx3(system, 3);
+          // For ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} term, returns (u_1)_h
+          CoupledFEMFunctionsx convdiffx3(system, 3);
 
           // Make a vector of pointers to these objects
           std::vector<FEMFunctionBase<Number> *> coupled_system_weight_functions_x;
@@ -997,7 +997,7 @@ int main (int argc, char** argv)
           // Build the error estimator to estimate the contributions
           // to the QoI error from the convection diffusion x term
           AutoPtr<ErrorEstimator> error_estimator_convection_diffusion_x =
-          build_weighted_error_estimator_component_wise
+            build_weighted_error_estimator_component_wise
             (param, weights_matrix_convection_diffusion_x,
              primal_norm_type_vector_convection_diffusion_x,
              dual_norm_type_vector_convection_diffusion_x,
@@ -1008,22 +1008,22 @@ int main (int argc, char** argv)
           error_estimator_convection_diffusion_x->estimate_error
             (system, error_convection_diffusion_x);
 
-	  // Plot this error
+          // Plot this error
           write_error(equation_systems, error_convection_diffusion_x,
                       0, a_step, param, "_convection_diffusion_x");
 
-	  // Now for the y direction terms
+          // Now for the y direction terms
           ErrorVector error_convection_diffusion_y;
 
           // The norm type vectors and weights matrix for the convection_diffusion_x errors
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             primal_norm_type_vector_convection_diffusion_y;
           primal_norm_type_vector_convection_diffusion_y.push_back(L2);
           primal_norm_type_vector_convection_diffusion_y.push_back(L2);
           primal_norm_type_vector_convection_diffusion_y.push_back(L2);
           primal_norm_type_vector_convection_diffusion_y.push_back(H1_Y_SEMINORM);
 
-          std::vector<libMeshEnums::FEMNormType>
+          std::vector<FEMNormType>
             dual_norm_type_vector_convection_diffusion_y;
           dual_norm_type_vector_convection_diffusion_y.push_back(L2);
           dual_norm_type_vector_convection_diffusion_y.push_back(L2);
@@ -1033,14 +1033,14 @@ int main (int argc, char** argv)
 
           std::vector<std::vector<Real> >
             weights_matrix_convection_diffusion_y
-              (system.n_vars(), std::vector<Real>(system.n_vars(), 0.0));
-	  weights_matrix_convection_diffusion_y[1][3] = 1.;
+            (system.n_vars(), std::vector<Real>(system.n_vars(), 0.0));
+          weights_matrix_convection_diffusion_y[1][3] = 1.;
           weights_matrix_convection_diffusion_y[3][3] = 1.;
 
-	  // For ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2} term, returns C,2_h
+          // For ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2} term, returns C,2_h
           CoupledFEMFunctionsy convdiffy1(system, 1);
-	  // For ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} term, returns (u_2)_h
-	  CoupledFEMFunctionsy convdiffy3(system, 3);
+          // For ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} term, returns (u_2)_h
+          CoupledFEMFunctionsy convdiffy3(system, 3);
 
           // Make a vector of pointers to these objects
           std::vector<FEMFunctionBase<Number> *> coupled_system_weight_functions_y;
@@ -1053,16 +1053,16 @@ int main (int argc, char** argv)
           // to the QoI error from the convection diffsion y term
           AutoPtr<ErrorEstimator> error_estimator_convection_diffusion_y =
             build_weighted_error_estimator_component_wise
-              (param, weights_matrix_convection_diffusion_y,
-               primal_norm_type_vector_convection_diffusion_y,
-               dual_norm_type_vector_convection_diffusion_y,
-               coupled_system_weight_functions_y);
+            (param, weights_matrix_convection_diffusion_y,
+             primal_norm_type_vector_convection_diffusion_y,
+             dual_norm_type_vector_convection_diffusion_y,
+             coupled_system_weight_functions_y);
 
           // Estimate the contributions to the QoI error from the
           // convection diffusion y terms
           error_estimator_convection_diffusion_y->estimate_error(system, error_convection_diffusion_y);
 
-	  // Plot this error
+          // Plot this error
           write_error(equation_systems, error_convection_diffusion_y, 0, a_step, param, "_convection_diffusion_y");
 
           if(param.indicator_type == "adjoint_residual")

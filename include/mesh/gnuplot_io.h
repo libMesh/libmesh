@@ -44,11 +44,11 @@ class MeshBase;
 // GnuPlotIO class definition
 class GnuPlotIO : public MeshOutput<MeshBase>
 {
- public:
+public:
 
- /**
-  * Define enumerations to set plotting properties on construction
-  */
+  /**
+   * Define enumerations to set plotting properties on construction
+   */
   enum PlottingProperties { GRID_ON    = 1,
                             PNG_OUTPUT = 2};
 
@@ -60,7 +60,7 @@ class GnuPlotIO : public MeshOutput<MeshBase>
    */
   explicit
   GnuPlotIO (const MeshBase&,
-	     const std::string& = std::string("FE 1D Solution"),
+             const std::string& = std::string("FE 1D Solution"),
              int properties=0);
 
   /**
@@ -73,8 +73,8 @@ class GnuPlotIO : public MeshOutput<MeshBase>
    * specified file where the nodal data and variable names are provided.
    */
   virtual void write_nodal_data (const std::string&,
-				 const std::vector<Number>&,
-				 const std::vector<std::string>&);
+                                 const std::vector<Number>&,
+                                 const std::vector<std::string>&);
 
   /**
    * Set title of plot
@@ -102,15 +102,15 @@ class GnuPlotIO : public MeshOutput<MeshBase>
    */
   std::string axes_limits;
 
- private:
+private:
   /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are optionally
    * provided.  This will write an ASCII file.
    */
   void write_solution (const std::string&,
-		       const std::vector<Number>* = NULL,
-		       const std::vector<std::string>* = NULL);
+                       const std::vector<Number>* = NULL,
+                       const std::vector<std::string>* = NULL);
 
   std::string _title;
 

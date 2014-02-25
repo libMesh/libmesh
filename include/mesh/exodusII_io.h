@@ -50,17 +50,17 @@ class System;
 // ------------------------------------------------------------
 // ExodusII_IO class definition
 class ExodusII_IO : public MeshInput<MeshBase>,
-		    public MeshOutput<MeshBase>,
-		    public ParallelObject
+                    public MeshOutput<MeshBase>,
+                    public ParallelObject
 {
- public:
+public:
 
   /**
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
   explicit
-  ExodusII_IO (MeshBase& mesh);
+  ExodusII_IO (MeshBase& mesh, bool single_precision=false);
 
   /**
    * Destructor.
@@ -132,8 +132,8 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * Write out a nodal solution.
    */
   void write_nodal_data (const std::string&,
-			 const std::vector<Number>&,
-			 const std::vector<std::string>&);
+                         const std::vector<Number>&,
+                         const std::vector<std::string>&);
 
   /**
    * Write out a discontinuous nodal solution.
@@ -158,9 +158,9 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * @param timestep The timestep to write out, should be _1_ indexed.
    */
   void write_timestep (const std::string& fname,
-		       const EquationSystems& es,
-		       const int timestep,
-		       const Real time);
+                       const EquationSystems& es,
+                       const int timestep,
+                       const Real time);
 
   /**
    * Sets the list of variable names to be included in the output.
@@ -198,7 +198,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    */
   void append(bool val);
 
- private:
+private:
   /**
    * Only attempt to instantiate an ExodusII helper class
    * if the Exodus API is defined.  This class will have no
@@ -245,7 +245,7 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    * By default, calling set_output_variables() sets this flag to true, but it provides an override.
    */
   bool _allow_empty_variables;
-  
+
 };
 
 

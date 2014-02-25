@@ -49,9 +49,9 @@ AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
 
 
 void AdjointResidualErrorEstimator::estimate_error (const System& _system,
-						    ErrorVector& error_per_cell,
-						    const NumericVector<Number>* solution_vector,
-					            bool estimate_parent_error)
+                                                    ErrorVector& error_per_cell,
+                                                    const NumericVector<Number>* solution_vector,
+                                                    bool estimate_parent_error)
 {
   START_LOG("estimate_error()", "AdjointResidualErrorEstimator");
 
@@ -103,107 +103,107 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
     {
       // Estimate the primal problem error for each variable
       _primal_error_estimator->estimate_errors
-	(_system.get_equation_systems(), primal_errors_per_cell, &solutionvecs, estimate_parent_error);
+        (_system.get_equation_systems(), primal_errors_per_cell, &solutionvecs, estimate_parent_error);
     }
   else // If not
     {
       // Just get the combined error estimate
       _primal_error_estimator->estimate_error
-	(_system, primal_error_per_cell, solution_vector, estimate_parent_error);
+        (_system, primal_error_per_cell, solution_vector, estimate_parent_error);
     }
 
   // Sum and weight the dual error estimate based on our QoISet
   for (unsigned int i = 0; i != _system.qoi.size(); ++i)
     {
       if (_qoi_set.has_index(i))
-	{
-	  // Get the weight for the current QoI
-	  Real error_weight = _qoi_set.weight(i);
+        {
+          // Get the weight for the current QoI
+          Real error_weight = _qoi_set.weight(i);
 
-	   // We need to make a map of the pointer to the adjoint solution vector
-	  std::map<const System*, const NumericVector<Number>*>adjointsolutionvecs;
-	  adjointsolutionvecs[&_system] = &_system.get_adjoint_solution(i);
+          // We need to make a map of the pointer to the adjoint solution vector
+          std::map<const System*, const NumericVector<Number>*>adjointsolutionvecs;
+          adjointsolutionvecs[&_system] = &_system.get_adjoint_solution(i);
 
-	  // Have we been asked to weight the variable error contributions in any specific manner
-	  if(!error_norm_is_identity) // If we have
-	    {
-	      _dual_error_estimator->estimate_errors
-		(_system.get_equation_systems(), dual_errors_per_cell, &adjointsolutionvecs,
-		 estimate_parent_error);
-	    }
- 	  else // If not
-	    {
-	    // Just get the combined error estimate
-	      _dual_error_estimator->estimate_error
-		(_system, dual_error_per_cell, &(_system.get_adjoint_solution(i)), estimate_parent_error);
-	    }
+          // Have we been asked to weight the variable error contributions in any specific manner
+          if(!error_norm_is_identity) // If we have
+            {
+              _dual_error_estimator->estimate_errors
+                (_system.get_equation_systems(), dual_errors_per_cell, &adjointsolutionvecs,
+                 estimate_parent_error);
+            }
+          else // If not
+            {
+              // Just get the combined error estimate
+              _dual_error_estimator->estimate_error
+                (_system, dual_error_per_cell, &(_system.get_adjoint_solution(i)), estimate_parent_error);
+            }
 
-	  std::size_t error_size;
+          std::size_t error_size;
 
-	  // Get the size of the first ErrorMap vector; this will give us the number of elements
-	  if(!error_norm_is_identity) // If in non default weights case
+          // Get the size of the first ErrorMap vector; this will give us the number of elements
+          if(!error_norm_is_identity) // If in non default weights case
             {
               error_size = dual_errors_per_cell[std::make_pair(&_system, 0)]->size();
             }
-	  else // If in the standard default weights case
-	    {
-	      error_size = dual_error_per_cell.size();
-	    }
+          else // If in the standard default weights case
+            {
+              error_size = dual_error_per_cell.size();
+            }
 
-	  // Resize the ErrorVector(s)
-	  if(!error_norm_is_identity)
-	    {
-	      // Loop over variables
-	      for(unsigned int v = 0; v < n_vars; v++)
-		{
-		  libmesh_assert(!total_dual_errors_per_cell[std::make_pair(&_system, v)]->size() ||
-				 total_dual_errors_per_cell[std::make_pair(&_system, v)]->size() == error_size) ;
-		  total_dual_errors_per_cell[std::make_pair(&_system, v)]->resize(error_size);
-		}
-	    }
-	  else
-	    {
-	      libmesh_assert(!total_dual_error_per_cell.size() ||
-			     total_dual_error_per_cell.size() == error_size);
-	      total_dual_error_per_cell.resize(error_size);
-	    }
+          // Resize the ErrorVector(s)
+          if(!error_norm_is_identity)
+            {
+              // Loop over variables
+              for(unsigned int v = 0; v < n_vars; v++)
+                {
+                  libmesh_assert(!total_dual_errors_per_cell[std::make_pair(&_system, v)]->size() ||
+                                 total_dual_errors_per_cell[std::make_pair(&_system, v)]->size() == error_size) ;
+                  total_dual_errors_per_cell[std::make_pair(&_system, v)]->resize(error_size);
+                }
+            }
+          else
+            {
+              libmesh_assert(!total_dual_error_per_cell.size() ||
+                             total_dual_error_per_cell.size() == error_size);
+              total_dual_error_per_cell.resize(error_size);
+            }
 
-	  for (std::size_t e = 0; e != error_size; ++e)
-	    {
-	      // Have we been asked to weight the variable error contributions in any specific manner
-	      if(!error_norm_is_identity) // If we have
-		{
-		  // Loop over variables
-		  for(unsigned int v = 0; v < n_vars; v++)
-		    {
-		      // Now fill in total_dual_error ErrorMap with the weight
-		      (*total_dual_errors_per_cell[std::make_pair(&_system, v)])[e] +=
-			static_cast<ErrorVectorReal>
-			(error_weight *
-			 (*dual_errors_per_cell[std::make_pair(&_system, v)])[e]);
-		    }
-		}
-	      else // If not
-	      {
-		total_dual_error_per_cell[e] +=
-		  static_cast<ErrorVectorReal>(error_weight * dual_error_per_cell[e]);
-	      }
-	    }
-	}
+          for (std::size_t e = 0; e != error_size; ++e)
+            {
+              // Have we been asked to weight the variable error contributions in any specific manner
+              if(!error_norm_is_identity) // If we have
+                {
+                  // Loop over variables
+                  for(unsigned int v = 0; v < n_vars; v++)
+                    {
+                      // Now fill in total_dual_error ErrorMap with the weight
+                      (*total_dual_errors_per_cell[std::make_pair(&_system, v)])[e] +=
+                        static_cast<ErrorVectorReal>
+                        (error_weight *
+                         (*dual_errors_per_cell[std::make_pair(&_system, v)])[e]);
+                    }
+                }
+              else // If not
+                {
+                  total_dual_error_per_cell[e] +=
+                    static_cast<ErrorVectorReal>(error_weight * dual_error_per_cell[e]);
+                }
+            }
+        }
     }
 
   // Do some debugging plots if requested
   if (!error_plot_suffix.empty())
     {
       if(!error_norm_is_identity) // If we have
-	{
-	  // Loop over variables
-	  for(unsigned int v = 0; v < n_vars; v++)
-	    {
+        {
+          // Loop over variables
+          for(unsigned int v = 0; v < n_vars; v++)
+            {
               std::ostringstream primal_out;
               std::ostringstream dual_out;
-	      primal_out << "primal_" << error_plot_suffix << ".";
-	      dual_out << "dual_" << error_plot_suffix << ".";
+              primal_out << "primal_" << error_plot_suffix << ".";
+              dual_out << "dual_" << error_plot_suffix << ".";
 
               primal_out << std::setw(1)
                          << std::setprecision(0)
@@ -217,26 +217,26 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
                        << std::right
                        << v;
 
-	      (*primal_errors_per_cell[std::make_pair(&_system, v)]).plot_error(primal_out.str(), _system.get_mesh());
-	      (*total_dual_errors_per_cell[std::make_pair(&_system, v)]).plot_error(dual_out.str(), _system.get_mesh());
+              (*primal_errors_per_cell[std::make_pair(&_system, v)]).plot_error(primal_out.str(), _system.get_mesh());
+              (*total_dual_errors_per_cell[std::make_pair(&_system, v)]).plot_error(dual_out.str(), _system.get_mesh());
 
-	      primal_out.clear();
-	      dual_out.clear();
-	    }
-	}
+              primal_out.clear();
+              dual_out.clear();
+            }
+        }
       else // If not
-	{
-	  std::ostringstream primal_out;
-	  std::ostringstream dual_out;
-	  primal_out << "primal_" << error_plot_suffix ;
-	  dual_out << "dual_" << error_plot_suffix ;
+        {
+          std::ostringstream primal_out;
+          std::ostringstream dual_out;
+          primal_out << "primal_" << error_plot_suffix ;
+          dual_out << "dual_" << error_plot_suffix ;
 
-	  primal_error_per_cell.plot_error(primal_out.str(), _system.get_mesh());
-	  total_dual_error_per_cell.plot_error(dual_out.str(), _system.get_mesh());
+          primal_error_per_cell.plot_error(primal_out.str(), _system.get_mesh());
+          total_dual_error_per_cell.plot_error(dual_out.str(), _system.get_mesh());
 
-	  primal_out.clear();
-	  dual_out.clear();
-	}
+          primal_out.clear();
+          dual_out.clear();
+        }
     }
 
   // Weight the primal error by the dual error using the system norm object
@@ -257,12 +257,12 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
             }
 
           error_per_cell[i] =
-	   static_cast<ErrorVectorReal>
-	     (error_norm.calculate_norm(cell_primal_error, cell_dual_error));
+            static_cast<ErrorVectorReal>
+            (error_norm.calculate_norm(cell_primal_error, cell_dual_error));
         }
       else // If not
         {
-	  error_per_cell[i] = primal_error_per_cell[i]*total_dual_error_per_cell[i];
+          error_per_cell[i] = primal_error_per_cell[i]*total_dual_error_per_cell[i];
         }
     }
 

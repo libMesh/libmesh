@@ -35,17 +35,17 @@ namespace libMesh
  * The \p Edge2 is an element in 1D composed of 2 nodes. It is numbered
  * like this:
  *
-   \verbatim
-    EDGE2: o--------o
-           0        1
-   \endverbatim
- */
+ \verbatim
+ EDGE2: o--------o
+ 0        1
+ \endverbatim
+*/
 
 // ------------------------------------------------------------
 // Edge class definition
 class Edge2 : public Edge
 {
- public:
+public:
 
   /**
    * Constructor.  By default this element has no parent.
@@ -79,14 +79,14 @@ class Edge2 : public Edge
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge (i.e. "returns true" in 1D)
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const;
+                               const unsigned int e) const;
 
   /*
    * @returns true iff the element map is definitely affine within
@@ -111,8 +111,8 @@ class Edge2 : public Edge
   Order default_order() const { return FIRST; }
 
   virtual void connectivity(const unsigned int sc,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
   /**
    * An optimized method for computing the length of a 2-node edge.
@@ -144,8 +144,8 @@ protected:
    * Matrix used to create the elements children.
    */
   float embedding_matrix (const unsigned int i,
-			 const unsigned int j,
-			 const unsigned int k) const
+                          const unsigned int j,
+                          const unsigned int k) const
   { return _embedding_matrix[i][j][k]; }
 
   /**

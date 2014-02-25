@@ -42,13 +42,13 @@ namespace libMesh
 
 class QGauss : public QBase
 {
- public:
+public:
 
   /**
    * Constructor.  Declares the order of the quadrature rule.
    */
   QGauss (const unsigned int _dim,
-	  const Order _order=INVALID_ORDER);
+          const Order _order=INVALID_ORDER);
 
   /**
    * Destructor.
@@ -61,14 +61,14 @@ class QGauss : public QBase
   QuadratureType type() const { return QGAUSS; }
 
 
- private:
+private:
 
   void init_1D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
   void init_2D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
   void init_3D (const ElemType _type=INVALID_ELEM,
-		unsigned int p_level=0);
+                unsigned int p_level=0);
 
 
   /**
@@ -78,13 +78,13 @@ class QGauss : public QBase
    * elements.
    */
   void dunavant_rule(const Real rule_data[][4],
-		     const unsigned int n_pts);
+                     const unsigned int n_pts);
 
   void dunavant_rule2(const Real* wts,
-		      const Real* a,
-		      const Real* b,
-		      const unsigned int* permutation_ids,
-		      const unsigned int n_wts);
+                      const Real* a,
+                      const Real* b,
+                      const unsigned int* permutation_ids,
+                      const unsigned int n_wts);
 
   /**
    * The Keast rule is for tets.  It takes permutation points and weights
@@ -93,7 +93,7 @@ class QGauss : public QBase
    * elements.
    */
   void keast_rule(const Real rule_data[][4],
-		  const unsigned int n_pts);
+                  const unsigned int n_pts);
 
 };
 
@@ -103,7 +103,7 @@ class QGauss : public QBase
 // QGauss class members
 inline
 QGauss::QGauss(const unsigned int d,
-	       const Order o) : QBase(d,o)
+               const Order o) : QBase(d,o)
 {
   // explicitly call the init function in 1D since the
   // other tensor-product rules require this one.

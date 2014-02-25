@@ -33,13 +33,21 @@
 #include <vector>
 #include <map>
 
-// Macro to simplify checking Exodus error codes
-#define EX_CHECK_ERR(code, msg) \
-  do { \
-    if ((code) < 0) { \
-      libMesh::err << (msg) << std::endl; \
-      libmesh_error(); \
+// Macros to simplify checking Exodus error codes
+#define EX_CHECK_ERR(code, msg)                 \
+  do {                                          \
+    if ((code) < 0) {                           \
+      libMesh::err << (msg) << std::endl;       \
+      libmesh_error();                          \
     } } while(0)
+
+#define EX_EXCEPTIONLESS_CHECK_ERR(code, msg)   \
+  do {                                          \
+    if ((code) < 0) {                           \
+      libMesh::err << (msg) << std::endl;       \
+      libmesh_exceptionless_error();            \
+    } } while(0)
+
 
 
 namespace libMesh
@@ -47,9 +55,9 @@ namespace libMesh
 
 
 namespace exII {
-  extern "C" {
+extern "C" {
 #include "exodusII.h" // defines MAX_LINE_LENGTH, MAX_STR_LENGTH used later
-  }
+}
 }
 
 /**
@@ -71,7 +79,8 @@ public:
    */
   ExodusII_IO_Helper(const ParallelObject &parent,
                      bool v=false,
-                     bool run_only_on_proc0=true);
+                     bool run_only_on_proc0=true,
+                     bool single_precision=false);
   /**
    * Destructor.
    */
@@ -297,12 +306,12 @@ public:
   /**
    * Writes the vector of values to the element variables.
    */
-  void write_element_values(const MeshBase & mesh, const std::vector<Number> & values, int timestep);
+  void write_element_values(const MeshBase & mesh, const std::vector<Real> & values, int timestep);
 
   /**
    * Writes the vector of values to a nodal variable.
    */
-  void write_nodal_values(int var_id, const std::vector<Number> & values, int timestep);
+  void write_nodal_values(int var_id, const std::vector<Real> & values, int timestep);
 
   /**
    * Writes the vector of information records.
@@ -312,7 +321,7 @@ public:
   /**
    * Writes the vector of global variables.
    */
-  void write_global_values(const std::vector<Number> & values, int timestep);
+  void write_global_values(const std::vector<Real> & values, int timestep);
 
   /**
    * Sets the underlying value of the boolean flag
@@ -329,6 +338,12 @@ public:
    * of the nodes.  Effectively, this "moves" the mesh to a particular position
    */
   void set_coordinate_offset(Point p);
+
+  /**
+   * Returns a vector with three copies of each element in the provided name vector,
+   * starting with r_, i_ and a_ respectively.
+   */
+  std::vector<std::string> get_complex_names(const std::vector<std::string>& names) const;
 
   /**
    * This is the \p ExodusII_IO_Helper Conversion class.  It provides
@@ -356,14 +371,14 @@ public:
    * Prints the message defined in \p msg. Can be turned off if
    * verbosity is set to 0.
    */
-  void message(const std::string msg);
+  void message(const std::string& msg);
 
   /**
    * Prints the message defined in \p msg, and appends the number \p i
    * to the end of the message.  Useful for printing messages in
    * loops.  Can be turned off if verbosity is set to 0.
    */
-  void message(const std::string msg, int i);
+  void message(const std::string& msg, int i);
 
   // File identification flag
   int ex_id;
@@ -545,6 +560,9 @@ protected:
   // On output, shift every point by _coordinate_offset
   Point _coordinate_offset;
 
+  // If true, forces single precision I/O
+  bool _single_precision;
+
 private:
   /**
    * Wraps calls to exII::ex_get_var_names() and exII::ex_get_var_param().
@@ -597,15 +615,15 @@ public:
    * variables.
    */
   Conversion(const int* nm,       // node_map
-	     size_t nm_size,
-	     const int* inm,      // inverse_node_map
-	     size_t inm_size,
-	     const int* sm,       // side_map
-	     size_t sm_size,
-	     const int* ism,      // inverse_side_map
-	     size_t ism_size,
-	     const ElemType ct,   // "canonical" aka libmesh element type
-	     std::string ex_type) // string representing the Exodus element type
+             size_t nm_size,
+             const int* inm,      // inverse_node_map
+             size_t inm_size,
+             const int* sm,       // side_map
+             size_t sm_size,
+             const int* ism,      // inverse_side_map
+             size_t ism_size,
+             const ElemType ct,   // "canonical" aka libmesh element type
+             std::string ex_type) // string representing the Exodus element type
     : node_map(nm),
       node_map_size(nm_size),
       inverse_node_map(inm),
@@ -903,7 +921,13 @@ public:
   static const int pyramid5_node_map[5];
 
   /**
-   * The Pyramid5 node map.  Use this map for biquadratic pyramid elements
+   * The Pyramid13 node map.  Use this map for "serendipity" pyramid elements
+   * in 3D.
+   */
+  static const int pyramid13_node_map[13];
+
+  /**
+   * The Pyramid14 node map.  Use this map for biquadratic pyramid elements
    * in 3D.
    */
   static const int pyramid14_node_map[14];

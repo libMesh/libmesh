@@ -30,7 +30,7 @@ namespace libMesh
 //---------------------------------------------------------
 // CentroidPartitioner methods
 void CentroidPartitioner::_do_partition (MeshBase& mesh,
-					 const unsigned int n)
+                                         const unsigned int n)
 {
   // Check for an easy return
   if (n == 1)
@@ -50,42 +50,42 @@ void CentroidPartitioner::_do_partition (MeshBase& mesh,
     {
     case X:
       {
-	std::sort(_elem_centroids.begin(),
-		  _elem_centroids.end(),
-		  CentroidPartitioner::sort_x);
+        std::sort(_elem_centroids.begin(),
+                  _elem_centroids.end(),
+                  CentroidPartitioner::sort_x);
 
-	break;
+        break;
       }
 
 
     case Y:
       {
-	std::sort(_elem_centroids.begin(),
-		  _elem_centroids.end(),
-		  CentroidPartitioner::sort_y);
+        std::sort(_elem_centroids.begin(),
+                  _elem_centroids.end(),
+                  CentroidPartitioner::sort_y);
 
-	break;
+        break;
 
       }
 
 
     case Z:
       {
-	std::sort(_elem_centroids.begin(),
-		  _elem_centroids.end(),
-		  CentroidPartitioner::sort_z);
+        std::sort(_elem_centroids.begin(),
+                  _elem_centroids.end(),
+                  CentroidPartitioner::sort_z);
 
-	break;
+        break;
       }
 
 
-     case RADIAL:
+    case RADIAL:
       {
-	std::sort(_elem_centroids.begin(),
-		  _elem_centroids.end(),
-		  CentroidPartitioner::sort_radial);
+        std::sort(_elem_centroids.begin(),
+                  _elem_centroids.end(),
+                  CentroidPartitioner::sort_radial);
 
-	break;
+        break;
       }
     default:
       libmesh_error();
@@ -111,7 +111,7 @@ void CentroidPartitioner::_do_partition (MeshBase& mesh,
 
       elem->processor_id() =
         std::min (libmesh_cast_int<processor_id_type>(i / target_size),
-		  libmesh_cast_int<processor_id_type>(n-1));
+                  libmesh_cast_int<processor_id_type>(n-1));
     }
 }
 
@@ -127,8 +127,8 @@ void CentroidPartitioner::compute_centroids (MeshBase& mesh)
   _elem_centroids.clear();
   _elem_centroids.reserve(mesh.n_elem());
 
-//   elem_iterator it(mesh.elements_begin());
-//   const elem_iterator it_end(mesh.elements_end());
+  //   elem_iterator it(mesh.elements_begin());
+  //   const elem_iterator it_end(mesh.elements_end());
 
   MeshBase::element_iterator       it     = mesh.elements_begin();
   const MeshBase::element_iterator it_end = mesh.elements_end();
@@ -145,7 +145,7 @@ void CentroidPartitioner::compute_centroids (MeshBase& mesh)
 
 
 bool CentroidPartitioner::sort_x (const std::pair<Point, Elem*>& lhs,
-				  const std::pair<Point, Elem*>& rhs)
+                                  const std::pair<Point, Elem*>& rhs)
 {
   return (lhs.first(0) < rhs.first(0));
 }
@@ -154,7 +154,7 @@ bool CentroidPartitioner::sort_x (const std::pair<Point, Elem*>& lhs,
 
 
 bool CentroidPartitioner::sort_y (const std::pair<Point, Elem*>& lhs,
-				  const std::pair<Point, Elem*>& rhs)
+                                  const std::pair<Point, Elem*>& rhs)
 {
   return (lhs.first(1) < rhs.first(1));
 }
@@ -164,7 +164,7 @@ bool CentroidPartitioner::sort_y (const std::pair<Point, Elem*>& lhs,
 
 
 bool CentroidPartitioner::sort_z (const std::pair<Point, Elem*>& lhs,
-				  const std::pair<Point, Elem*>& rhs)
+                                  const std::pair<Point, Elem*>& rhs)
 {
   return (lhs.first(2) < rhs.first(2));
 }
@@ -172,7 +172,7 @@ bool CentroidPartitioner::sort_z (const std::pair<Point, Elem*>& lhs,
 
 
 bool CentroidPartitioner::sort_radial (const std::pair<Point, Elem*>& lhs,
-				       const std::pair<Point, Elem*>& rhs)
+                                       const std::pair<Point, Elem*>& rhs)
 {
   return (lhs.first.size() < rhs.first.size());
 }

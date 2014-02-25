@@ -31,10 +31,10 @@ namespace libMesh
 {
 
 
-  /**
-   * Data structure for specifying which Parameters should be
-   * independent variables in a parameter sensitivity calculation.
-   */
+/**
+ * Data structure for specifying which Parameters should be
+ * independent variables in a parameter sensitivity calculation.
+ */
 class ParameterVector
 {
 public:

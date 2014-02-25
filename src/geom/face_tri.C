@@ -38,17 +38,17 @@ dof_id_type Tri::key (const unsigned int s) const
     {
     case 0:
       return
-	this->compute_key (this->node(0),
-			   this->node(1));
+        this->compute_key (this->node(0),
+                           this->node(1));
 
     case 1:
       return
-	this->compute_key (this->node(1),
-			   this->node(2));
+        this->compute_key (this->node(1),
+                           this->node(2));
     case 2:
       return
-	this->compute_key (this->node(2),
-			   this->node(0));
+        this->compute_key (this->node(2),
+                           this->node(0));
     }
 
 
@@ -69,31 +69,31 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
     {
     case 0:
       {
-	edge->set_node(0) = this->get_node(0);
-	edge->set_node(1) = this->get_node(1);
+        edge->set_node(0) = this->get_node(0);
+        edge->set_node(1) = this->get_node(1);
 
         AutoPtr<Elem> ap_edge(edge);
-	return ap_edge;
+        return ap_edge;
       }
     case 1:
       {
-	edge->set_node(0) = this->get_node(1);
-	edge->set_node(1) = this->get_node(2);
+        edge->set_node(0) = this->get_node(1);
+        edge->set_node(1) = this->get_node(2);
 
         AutoPtr<Elem> ap_edge(edge);
-	return ap_edge;
+        return ap_edge;
       }
     case 2:
       {
-	edge->set_node(0) = this->get_node(2);
-	edge->set_node(1) = this->get_node(0);
+        edge->set_node(0) = this->get_node(2);
+        edge->set_node(1) = this->get_node(0);
 
         AutoPtr<Elem> ap_edge(edge);
-	return ap_edge;
+        return ap_edge;
       }
     default:
       {
-	libmesh_error();
+        libmesh_error();
       }
     }
 

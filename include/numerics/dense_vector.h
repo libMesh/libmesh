@@ -156,7 +156,7 @@ public:
    * use the complex conjugate of vec.
    */
   template <typename T2>
-    typename CompareTypes<T, T2>::supertype indefinite_dot (const DenseVector<T2> &vec) const;
+  typename CompareTypes<T, T2>::supertype indefinite_dot (const DenseVector<T2> &vec) const;
 
   /**
    * Tests if \p vec is exactly equal to this vector.
@@ -332,8 +332,8 @@ inline
 void DenseVector<T>::zero()
 {
   std::fill (_val.begin(),
-	     _val.end(),
-	     T(0.));
+             _val.end(),
+             T(0.));
 }
 
 
@@ -386,7 +386,7 @@ inline
 typename boostcopy::enable_if_c<
   ScalarTraits<T2>::value, void >::type
 DenseVector<T>::add (const T2 factor,
-		     const DenseVector<T3>& vec)
+                     const DenseVector<T3>& vec)
 {
   libmesh_assert_equal_to (this->size(), vec.size());
 
@@ -397,7 +397,7 @@ DenseVector<T>::add (const T2 factor,
 template<typename T>
 template<typename T2>
 inline
-  typename CompareTypes<T, T2>::supertype DenseVector<T>::dot (const DenseVector<T2>& vec) const
+typename CompareTypes<T, T2>::supertype DenseVector<T>::dot (const DenseVector<T2>& vec) const
 {
   libmesh_assert_equal_to (this->size(), vec.size());
 
@@ -412,7 +412,7 @@ inline
 template<typename T>
 template<typename T2>
 inline
-  typename CompareTypes<T, T2>::supertype DenseVector<T>::indefinite_dot (const DenseVector<T2>& vec) const
+typename CompareTypes<T, T2>::supertype DenseVector<T>::indefinite_dot (const DenseVector<T2>& vec) const
 {
   libmesh_assert_equal_to (this->size(), vec.size());
 

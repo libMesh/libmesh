@@ -36,25 +36,25 @@ namespace libMesh
 // TransientSystem implementation
 template <class Base>
 TransientSystem<Base>::TransientSystem (EquationSystems& es,
-					const std::string& name_in,
-					const unsigned int number_in) :
+                                        const std::string& name_in,
+                                        const unsigned int number_in) :
 
   Base                 (es, name_in, number_in)
 {
 #ifdef LIBMESH_ENABLE_GHOSTED
   old_local_solution =
     AutoPtr<NumericVector<Number> >
-      (&(this->add_vector("_transient_old_local_solution", true, GHOSTED)));
+    (&(this->add_vector("_transient_old_local_solution", true, GHOSTED)));
   older_local_solution =
     AutoPtr<NumericVector<Number> >
-      (&(this->add_vector("_transient_older_local_solution", true, GHOSTED)));
+    (&(this->add_vector("_transient_older_local_solution", true, GHOSTED)));
 #else
   old_local_solution =
     AutoPtr<NumericVector<Number> >
-      (&(this->add_vector("_transient_old_local_solution", true, SERIAL)));
+    (&(this->add_vector("_transient_old_local_solution", true, SERIAL)));
   older_local_solution =
     AutoPtr<NumericVector<Number> >
-      (&(this->add_vector("_transient_older_local_solution", true, SERIAL)));
+    (&(this->add_vector("_transient_older_local_solution", true, SERIAL)));
 #endif
 }
 
@@ -92,10 +92,10 @@ void TransientSystem<Base>::clear ()
 
   old_local_solution =
     AutoPtr<NumericVector<Number> >
-      (&(this->add_vector("_transient_old_local_solution")));
+    (&(this->add_vector("_transient_old_local_solution")));
   older_local_solution =
     AutoPtr<NumericVector<Number> >
-      (&(this->add_vector("_transient_older_local_solution")));
+    (&(this->add_vector("_transient_older_local_solution")));
 }
 
 
@@ -162,12 +162,12 @@ void TransientSystem<Base>::re_update ()
   // Update the old & older solutions with the send_list,
   // which may have changed since their last update.
   older_local_solution->localize (first_local_dof,
-				  end_local_dof-1,
-				  send_list);
+                                  end_local_dof-1,
+                                  send_list);
 
   old_local_solution->localize (first_local_dof,
-				end_local_dof-1,
-				send_list);
+                                end_local_dof-1,
+                                send_list);
 }
 
 

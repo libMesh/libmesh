@@ -1,0 +1,47 @@
+# The location of the mesh library
+meshdir := $(LIBMESH_DIR)
+
+# If the user has no environment variable
+# called METHOD, he gets optimized mode.
+ifeq (x$(METHOD),x)
+  METHOD := opt
+endif
+
+# installed libmesh location of libmesh-config script
+libmesh_config := $(LIBMESH_DIR)/bin/libmesh-config
+
+# Use the libmesh-config script to determine the usual make variables.
+# Note: passing $METHOD along to the libmesh-config script handles the
+# case where METHOD is not set and the user does
+# make METHOD=dbg foo
+# since in this case, METHOD is never set in the environment and thus
+# never passed to libmesh-config correctly.
+libmesh_CXX      := $(shell METHOD=$(METHOD) $(libmesh_config) --cxx)
+libmesh_INCLUDE  := $(shell METHOD=$(METHOD) $(libmesh_config) --include)
+libmesh_CPPFLAGS := $(shell METHOD=$(METHOD) $(libmesh_config) --cppflags)
+libmesh_CXXFLAGS := $(shell METHOD=$(METHOD) $(libmesh_config) --cxxflags)
+libmesh_LIBS     := $(shell METHOD=$(METHOD) $(libmesh_config) --libs)
+
+.PHONY: clean
+
+# How to build executables.
+# Note: this directory does not compute dependencies, so this target
+# is set up in such a way that it is essentially PHONY: the resulting
+# file will always be foo-opt or foo-dbg and hence the target will
+# always rerun; this seems like the safest way to handle things...
+%: %.cc
+	@echo "Compiling" $<
+	@$(libmesh_CXX) -fno-inline $(libmesh_INCLUDE) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $< -o $@-$(METHOD) $(libmesh_LIBS) $(libmesh_LDFLAGS) $(EXTERNAL_FLAGS)
+
+
+
+clean:
+	@rm -f *~ test_boost-$(METHOD)
+
+
+
+###############################################################################
+
+# Local Variables:
+# mode: makefile
+# End:

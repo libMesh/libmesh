@@ -40,13 +40,13 @@ namespace libMesh
  * and currently represents the default Mesh implementation.
  * Most methods for this class are found in MeshBase, and most
  * implementation details are found in UnstructuredMesh.
-*/
+ */
 
 // ------------------------------------------------------------
 // Mesh class definition
 class SerialMesh : public UnstructuredMesh
 {
- public:
+public:
 
   /**
    * Constructor.  Takes \p dim, the dimension of the mesh.
@@ -55,7 +55,7 @@ class SerialMesh : public UnstructuredMesh
    */
   explicit
   SerialMesh (const Parallel::Communicator &comm,
-	      unsigned int dim=1);
+              unsigned int dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
@@ -84,7 +84,7 @@ class SerialMesh : public UnstructuredMesh
    * Virtual copy-constructor, creates a copy of this mesh
    */
   virtual AutoPtr<MeshBase> clone () const
-    { return AutoPtr<MeshBase>(new SerialMesh(*this)); }
+  { return AutoPtr<MeshBase>(new SerialMesh(*this)); }
 
   /**
    * Destructor.
@@ -145,10 +145,10 @@ class SerialMesh : public UnstructuredMesh
    * functions for adding /deleting nodes elements.
    */
   virtual Node* add_point (const Point& p,
-			   const dof_id_type id =
-			     DofObject::invalid_id,
-			   const processor_id_type proc_id =
-			     DofObject::invalid_processor_id);
+                           const dof_id_type id =
+                           DofObject::invalid_id,
+                           const processor_id_type proc_id =
+                           DofObject::invalid_processor_id);
   virtual Node* add_node (Node* n) ;
 
   /**
@@ -171,12 +171,12 @@ class SerialMesh : public UnstructuredMesh
   virtual void delete_elem (Elem* e) ;
   virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id);
 
-    /**
-     * There is no reason for a user to ever call this function.
-     *
-     * This function restores a previously broken element/node numbering such that
-     * \p mesh.node(n)->id() == n.
-     */
+  /**
+   * There is no reason for a user to ever call this function.
+   *
+   * This function restores a previously broken element/node numbering such that
+   * \p mesh.node(n)->id() == n.
+   */
   virtual void fix_broken_node_and_element_numbering ();
 
   /**
@@ -190,9 +190,12 @@ class SerialMesh : public UnstructuredMesh
    * If \p use_binary_search is true, we use an optimized "sort then binary search" algorithm
    * for finding matching nodes. Otherwise we use a N^2 algorithm (which can be more reliable
    * at dealing with slightly misaligned meshes).
-   * If enforce_all_nodes_match_on_boundaries is true, we throw an error if the number of
+   * If \p enforce_all_nodes_match_on_boundaries is true, we throw an error if the number of
    * nodes on the specified boundaries don't match the number of nodes that were merged.
    * This is a helpful error check in some cases.
+   * If \p skip_find_neighbors is true, a faster stitching method is used, where the lists of
+   * neighbors for each elements are copied as well and patched, without calling the time-consuming
+   * find_neighbors() function.
    */
   void stitch_meshes (SerialMesh& other_mesh,
                       boundary_id_type this_mesh_boundary,
@@ -421,7 +424,8 @@ private:
                          bool clear_stitched_boundary_ids,
                          bool verbose,
                          bool use_binary_search,
-                         bool enforce_all_nodes_match_on_boundaries);
+                         bool enforce_all_nodes_match_on_boundaries,
+                         bool skip_find_neighbors);
 
   /**
    * Typedefs for the container implementation.  In this case,

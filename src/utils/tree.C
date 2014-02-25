@@ -35,8 +35,8 @@ namespace libMesh
 // constructor
 template <unsigned int N>
 Tree<N>::Tree (const MeshBase& m,
-	       const unsigned int target_bin_size,
-	       const Trees::BuildType bt) :
+               const unsigned int target_bin_size,
+               const Trees::BuildType bt) :
   TreeBase(m),
   root(m,target_bin_size),
   build_type(bt)
@@ -54,7 +54,7 @@ Tree<N>::Tree (const MeshBase& m,
       const MeshBase::const_node_iterator end = mesh.nodes_end();
 
       for (; it != end; ++it)
-	root.insert (*it);
+        root.insert (*it);
 
       // Now the tree contains the nodes.
       // However, we want element pointers, so here we
@@ -74,7 +74,7 @@ Tree<N>::Tree (const MeshBase& m,
 
 
       for (; it != end; ++it)
-	root.insert (*it);
+        root.insert (*it);
     }
 }
 

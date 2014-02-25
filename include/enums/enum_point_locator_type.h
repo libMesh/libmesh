@@ -22,18 +22,16 @@
 
 // ------------------------------------------------------------
 // enum PointLocatorType definition
-namespace libMeshEnums {
+namespace libMesh {
 
-  /**
-   * \enum MeshEnums::PointLocatorType defines an \p enum for the types
-   * of point locators (given a point with global coordinates,
-   * locate the corresponding element in space) available in libMesh.
-   */
-  enum PointLocatorType {TREE = 0,
-			 LIST,
-			 INVALID_LOCATOR};
+/**
+ * \enum PointLocatorType defines an \p enum for the types
+ * of point locators (given a point with global coordinates,
+ * locate the corresponding element in space) available in libMesh.
+ */
+enum PointLocatorType {TREE = 0,
+                       LIST,
+                       INVALID_LOCATOR};
 }
-
-using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_POINT_LOCATOR_TYPE_H

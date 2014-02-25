@@ -51,10 +51,10 @@ void LaplaceSystem::element_qoi_derivative (DiffContext &context,
       // If in the sub-domain over which QoI 0 is supported, add contributions
       // to the adjoint rhs
       if(fabs(x - 0.875) <= 0.125 && fabs(y - 0.125) <= 0.125)
-      	{
-	  for (unsigned int i=0; i != n_T_dofs; i++)
-	    Q(i) += JxW[qp] *phi[i][qp] ;
-      	}
+        {
+          for (unsigned int i=0; i != n_T_dofs; i++)
+            Q(i) += JxW[qp] *phi[i][qp] ;
+        }
 
     } // end of the quadrature point qp-loop
 }

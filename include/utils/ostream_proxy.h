@@ -37,19 +37,19 @@ namespace libMesh
 
 
 
- // ------------------------------------------------------------
- // OStreamProxy class definition
- //
- // This class is intended to be reseatable like a pointer-to-ostream
- // for flexibility, but to look like a reference when used to produce
- // less awkward user code.
- //
- // It is up to the user to ensure that the target ostream
+// ------------------------------------------------------------
+// OStreamProxy class definition
+//
+// This class is intended to be reseatable like a pointer-to-ostream
+// for flexibility, but to look like a reference when used to produce
+// less awkward user code.
+//
+// It is up to the user to ensure that the target ostream
 
- template <typename charT=char, typename traits=std::char_traits<charT> >
- class BasicOStreamProxy
- {
- public:
+template <typename charT=char, typename traits=std::char_traits<charT> >
+class BasicOStreamProxy
+{
+public:
   /**
    * This class is going to be used to proxy for ostream, but other
    * character and traits types are possible
@@ -81,19 +81,19 @@ namespace libMesh
    * Reset the internal target to a new \p target output stream.
    */
   BasicOStreamProxy& operator= (streamT& target)
-    {
-       _target = &target;
-       return *this;
-    }
+  {
+    _target = &target;
+    return *this;
+  }
 
   /**
    * Reset the target to the same output stream as in \p old
    */
   BasicOStreamProxy& operator= (const BasicOStreamProxy& old)
-    {
-      _target = old._target;
-      return *this;
-    }
+  {
+    _target = old._target;
+    return *this;
+  }
 
   /**
    * Default destructor.
@@ -164,44 +164,44 @@ namespace libMesh
    * Get the associated format flags
    */
   std::ios_base::fmtflags flags ( ) const
-    { return _target->flags(); }
+  { return _target->flags(); }
 
   /**
    * Set/get the associated format flags
    */
   std::ios_base::fmtflags flags ( std::ios_base::fmtflags fmtfl )
-    { return _target->flags(fmtfl); }
+  { return _target->flags(fmtfl); }
 
   /**
    * Set the associated flags
    */
   std::ios_base::fmtflags setf ( std::ios_base::fmtflags fmtfl )
-    { return _target->setf(fmtfl); }
+  { return _target->setf(fmtfl); }
 
   /**
    * Set the associated flags
    */
   std::ios_base::fmtflags setf ( std::ios_base::fmtflags fmtfl,
                                  std::ios_base::fmtflags mask )
-    { return _target->setf(fmtfl, mask); }
+  { return _target->setf(fmtfl, mask); }
 
   /**
    * Clear the associated flags
    */
   void unsetf ( std::ios_base::fmtflags mask )
-    { _target->unsetf(mask); }
+  { _target->unsetf(mask); }
 
   /**
    * Get the associated write precision
    */
   std::streamsize precision () const
-    { return _target->precision(); }
+  { return _target->precision(); }
 
   /**
    * Set the associated write precision
    */
   std::streamsize precision ( std::streamsize prec )
-    { return _target->precision(prec); }
+  { return _target->precision(prec); }
 
   //
   // Functions that affect the Proxy class:
@@ -229,12 +229,12 @@ namespace libMesh
     return _target;
   }
 
- private:
+private:
   /**
    * The pointer to the "real" ostream we send everything to.
    */
-   streamT* _target;
- };
+  streamT* _target;
+};
 
 typedef BasicOStreamProxy<> OStreamProxy;
 

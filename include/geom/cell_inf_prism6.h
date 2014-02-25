@@ -39,23 +39,23 @@ namespace libMesh
 /**
  * The \p InfPrism6 is an infinite element in 3D composed of 6 nodes.
  * It is numbered like this:
-   \verbatim
-   INFPRISM6:
-           5
-           o
-           :
-           :         closer to infinity
-           :
-     3 o   :   o 4
-       |   :   |
-       | 2 o   |
-       |  . .  |
-       | .   . |
-       |.     .|
-       o-------o     base face
-       0       1
-   \endverbatim
- */
+ \verbatim
+ INFPRISM6:
+ 5
+ o
+ :
+ :         closer to infinity
+ :
+ 3 o   :   o 4
+ |   :   |
+ | 2 o   |
+ |  . .  |
+ | .   . |
+ |.     .|
+ o-------o     base face
+ 0       1
+ \endverbatim
+*/
 
 // ------------------------------------------------------------
 // InfPrism6 class definition
@@ -104,14 +104,14 @@ public:
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const;
+                               const unsigned int e) const;
 
   /**
    * @returns FIRST
@@ -124,7 +124,7 @@ public:
    * takes care of freeing memory.
    */
   AutoPtr<Elem> build_side (const unsigned int i,
-			    bool proxy) const;
+                            bool proxy) const;
 
   /**
    * Returns a \p EDGE2 built coincident with edges 0 to 2, an \p INFEDGE2
@@ -134,18 +134,18 @@ public:
   AutoPtr<Elem> build_edge (const unsigned int i) const;
 
   virtual void connectivity(const unsigned int sc,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
-//   void tecplot_connectivity(const unsigned int sc,
-// 			    std::vector<unsigned int>& conn) const;
+  //   void tecplot_connectivity(const unsigned int sc,
+  //     std::vector<unsigned int>& conn) const;
 
-//   void vtk_connectivity(const unsigned int,
-// 			std::vector<unsigned int>*) const
-//   { libmesh_error(); }
+  //   void vtk_connectivity(const unsigned int,
+  // std::vector<unsigned int>*) const
+  //   { libmesh_error(); }
 
-//   unsigned int vtk_element_type (const unsigned int) const
-//   { return 13; }
+  //   unsigned int vtk_element_type (const unsigned int) const
+  //   { return 13; }
 
   /**
    * @returns \p true when this element contains the point
@@ -182,8 +182,8 @@ protected:
    * Matrix used to create the elements children.
    */
   float embedding_matrix (const unsigned int i,
-			  const unsigned int j,
-			  const unsigned int k) const
+                          const unsigned int j,
+                          const unsigned int k) const
   { return _embedding_matrix[i][j][k]; }
 
   /**

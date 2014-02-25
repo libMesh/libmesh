@@ -47,7 +47,7 @@ public:
    * The vectors themselves have to be stored elsewhere.
    */
   TensorShellMatrix (const NumericVector<T>& v,
-		     const NumericVector<T>& w);
+                     const NumericVector<T>& w);
 
   /**
    * Destructor.
@@ -71,13 +71,13 @@ public:
    * dest.
    */
   virtual void vector_mult (NumericVector<T>& dest,
-			    const NumericVector<T>& arg) const;
+                            const NumericVector<T>& arg) const;
 
   /**
    * Multiplies the matrix with \p arg and adds the result to \p dest.
    */
   virtual void vector_mult_add (NumericVector<T>& dest,
-				const NumericVector<T>& arg) const;
+                                const NumericVector<T>& arg) const;
 
   /**
    * Copies the diagonal part of the matrix into \p dest.
@@ -104,7 +104,7 @@ protected:
 template <typename T>
 inline
 TensorShellMatrix<T>::TensorShellMatrix (const NumericVector<T>& v,
-					 const NumericVector<T>& w):
+                                         const NumericVector<T>& w):
   ShellMatrix<T>(v.comm()),
   _v(v),
   _w(w)

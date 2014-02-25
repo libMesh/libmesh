@@ -8,12 +8,16 @@ if LIBMESH_INSTALL_INTERNAL_BOOST
         boost/config.hpp \
         boost/config/user.hpp \
         boost/config/select_compiler_config.hpp \
+	boost/config/compiler/clang.hpp \
         boost/config/compiler/gcc.hpp \
+        boost/config/compiler/intel.hpp \
+        boost/config/compiler/common_edg.hpp \
         boost/config/select_stdlib_config.hpp \
         boost/config/no_tr1/utility.hpp \
         boost/config/stdlib/libstdcpp3.hpp \
         boost/config/select_platform_config.hpp \
         boost/config/platform/macos.hpp \
+        boost/config/platform/linux.hpp \
         boost/config/posix_features.hpp \
         boost/config/suffix.hpp \
         boost/current_function.hpp \
@@ -64,10 +68,12 @@ if LIBMESH_INSTALL_INTERNAL_BOOST
         boost/mpl/aux_/config/nttp.hpp \
         boost/preprocessor/cat.hpp \
         boost/preprocessor/config/config.hpp \
+        boost/preprocessor/control/detail/edg/while.hpp \
         boost/pool/simple_segregated_storage.hpp \
         boost/type_traits/alignment_of.hpp \
         boost/type_traits/intrinsics.hpp \
         boost/type_traits/config.hpp \
+	boost/type_traits/is_abstract.hpp \
         boost/type_traits/is_same.hpp \
         boost/type_traits/detail/bool_trait_def.hpp \
         boost/type_traits/detail/template_arity_spec.hpp \
@@ -166,6 +172,9 @@ if LIBMESH_INSTALL_INTERNAL_BOOST
         boost/preprocessor/tuple/to_list.hpp \
         boost/preprocessor/list/transform.hpp \
         boost/preprocessor/list/append.hpp \
+        boost/preprocessor/list/detail/edg/fold_left.hpp \
+        boost/preprocessor/list/detail/edg/fold_right.hpp \
+        boost/preprocessor/repetition/detail/edg/for.hpp \
         boost/type_traits/is_pod.hpp \
         boost/type_traits/is_void.hpp \
         boost/type_traits/is_scalar.hpp \

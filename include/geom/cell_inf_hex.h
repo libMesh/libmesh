@@ -55,10 +55,10 @@ public:
    */
   InfHex(const unsigned int nn, Elem* p, Node** nodelinkdata);
 
-//   /**
-//    * @returns 4 for the base \p s=0 and 2 for side faces.
-//    */
-//   unsigned int n_children_per_side(const unsigned int s) const;
+  //   /**
+  //    * @returns 4 for the base \p s=0 and 2 for side faces.
+  //    */
+  //   unsigned int n_children_per_side(const unsigned int s) const;
 
   /**
    * @returns 5.  Infinite elements have one side less
@@ -94,13 +94,13 @@ public:
    * specified side
    */
   virtual bool is_child_on_side(const unsigned int c,
-			        const unsigned int s) const;
+                                const unsigned int s) const;
 
   /*
    * @returns true iff the specified edge is on the specified side
    */
   virtual bool is_edge_on_side(const unsigned int e,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /**
    * @returns an id associated with the \p s side of this element.

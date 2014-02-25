@@ -79,8 +79,8 @@ public:
    * counter-clockwise sense, i.e. (p1-p0)x(p2-p0);
    */
   void create_from_three_points (const Point& p0,
-				 const Point& p1,
-				 const Point& p2 );
+                                 const Point& p1,
+                                 const Point& p2 );
 
   /**
    * Creates an XY plane located at z=zpos,

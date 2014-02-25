@@ -35,7 +35,7 @@ namespace libMesh
 namespace Parallel {
 template <typename KeyType, typename IdxType>
 Histogram<KeyType,IdxType>::Histogram (const Parallel::Communicator &comm_in,
-				       const std::vector<KeyType>& d) :
+                                       const std::vector<KeyType>& d) :
   ParallelObject(comm_in),
   data(d)
 {
@@ -46,14 +46,14 @@ Histogram<KeyType,IdxType>::Histogram (const Parallel::Communicator &comm_in,
 
 template <typename KeyType, typename IdxType>
 void Histogram<KeyType,IdxType>::make_histogram (const IdxType nbins,
-					 KeyType max,
-					 KeyType min)
+                                                 KeyType max,
+                                                 KeyType min)
 {
   libmesh_assert_less (min, max);
 
   // The width of each bin.  Store this as a floating point value
   double bin_width = (Parallel::Utils::to_double(max)-
-		      Parallel::Utils::to_double(min))/static_cast<double>(nbins);
+                      Parallel::Utils::to_double(min))/static_cast<double>(nbins);
 
 
   // The idea for 4 bins of size d is this:
@@ -79,7 +79,7 @@ void Histogram<KeyType,IdxType>::make_histogram (const IdxType nbins,
       bin_bounds[b] = Parallel::Utils::to_double(min) + bin_width * b;
 
       bin_iters[b]  = std::lower_bound (bin_iters[b-1], data.end(),
-					Parallel::Utils::to_key_type<KeyType>(bin_bounds[b]));
+                                        Parallel::Utils::to_key_type<KeyType>(bin_bounds[b]));
     }
 
   bin_iters[nbins]  = data.end();

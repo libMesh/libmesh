@@ -38,23 +38,23 @@ namespace libMesh
  * The \p InfEdge2 is an infinte element in 1D composed of 2 nodes.
  * It is numbered like this:
  *
-   \verbatim
-    INFEDGE2:
+ \verbatim
+ INFEDGE2:
 
-        o         closer to infinity
-        | 1
-        |
-        |
-        |
-        o         base node
-          0
-   \endverbatim
- */
+ o         closer to infinity
+ | 1
+ |
+ |
+ |
+ o         base node
+ 0
+ \endverbatim
+*/
 // ------------------------------------------------------------
 // InfEdge2 class definition
 class InfEdge2 : public Edge
 {
- public:
+public:
 
   /**
    * Constructor.  By default this element has no parent.
@@ -88,14 +88,14 @@ class InfEdge2 : public Edge
    * specified side
    */
   virtual bool is_node_on_side(const unsigned int n,
-			       const unsigned int s) const;
+                               const unsigned int s) const;
 
   /*
    * @returns true iff the specified (local) node number is on the
    * specified edge (i.e. "returns true" in 1D)
    */
   virtual bool is_node_on_edge(const unsigned int n,
-			       const unsigned int e) const;
+                               const unsigned int e) const;
 
   /**
    * @returns \p INFEDGE2
@@ -108,16 +108,16 @@ class InfEdge2 : public Edge
   Order default_order() const { return FIRST; }
 
   virtual void connectivity(const unsigned int se,
-			    const IOPackage iop,
-			    std::vector<dof_id_type>& conn) const;
+                            const IOPackage iop,
+                            std::vector<dof_id_type>& conn) const;
 
-//   const std::vector<unsigned int> tecplot_connectivity(const unsigned int se=0) const;
+  //   const std::vector<unsigned int> tecplot_connectivity(const unsigned int se=0) const;
 
-//   void vtk_connectivity(const unsigned int se,
-// 			std::vector<unsigned int>*conn = NULL) const;
+  //   void vtk_connectivity(const unsigned int se,
+  // std::vector<unsigned int>*conn = NULL) const;
 
-//   unsigned int vtk_element_type (const unsigned int) const
-//   { return 3; }
+  //   unsigned int vtk_element_type (const unsigned int) const
+  //   { return 3; }
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -150,8 +150,8 @@ protected:
    * Matrix used to create the elements children.
    */
   float embedding_matrix (const unsigned int,
-			 const unsigned int,
-			 const unsigned int) const
+                          const unsigned int,
+                          const unsigned int) const
   { libmesh_error(); return 0.; }
 
 #endif

@@ -15,31 +15,31 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
- // <h1>Introduction Example 2 - Defining a Simple System</h1>
- //
- // This is the second example program.  It demonstrates how to
- // create an equation system for a simple scalar system.  This
- // example will also introduce some of the issues involved with using PETSc
- // in your application.
- //
- // This is the first example program that indirectly
- // uses the PETSc library.  By default equation data is stored
- // in PETSc vectors, which may span multiple processors.  Before
- // PETSc is used it must be initialized via libMesh::init().  Note that
- // by passing argc and argv to PETSc you may specify
- // command line arguments to PETSc.  For example, you might
- // try running this example as:
- //
- // ./introduction_ex2 -log_info
- //
- // to see what PETSc is doing behind the scenes or
- //
- // ./introduction_ex2 -log_summary
- //
- // to get a summary of what PETSc did.
- // Among other things, libMesh::init() initializes the MPI
- // communications library and PETSc numeric library on your system if
- // you haven't already done so.
+// <h1>Introduction Example 2 - Defining a Simple System</h1>
+//
+// This is the second example program.  It demonstrates how to
+// create an equation system for a simple scalar system.  This
+// example will also introduce some of the issues involved with using PETSc
+// in your application.
+//
+// This is the first example program that indirectly
+// uses the PETSc library.  By default equation data is stored
+// in PETSc vectors, which may span multiple processors.  Before
+// PETSc is used it must be initialized via libMesh::init().  Note that
+// by passing argc and argv to PETSc you may specify
+// command line arguments to PETSc.  For example, you might
+// try running this example as:
+//
+// ./introduction_ex2 -log_info
+//
+// to see what PETSc is doing behind the scenes or
+//
+// ./introduction_ex2 -log_summary
+//
+// to get a summary of what PETSc did.
+// Among other things, libMesh::init() initializes the MPI
+// communications library and PETSc numeric library on your system if
+// you haven't already done so.
 
 // C++ include files that we need
 #include <iostream>
@@ -139,9 +139,9 @@ int main (int argc, char** argv)
 
   // Write the equation system if the user specified an
   // output file name.  Note that there are two possible
-  // formats to write to.  Specifying libMeshEnums::WRITE will
+  // formats to write to.  Specifying WRITE will
   // create a formatted ASCII file.  Optionally, you can specify
-  // libMeshEnums::ENCODE and get an XDR-encoded binary file.
+  // ENCODE and get an XDR-encoded binary file.
   //
   // We will write the data, clear the object, and read the file
   // we just wrote.  This is simply to demonstrate capability.
@@ -155,7 +155,7 @@ int main (int argc, char** argv)
                   << std::endl;
 
         // Write the system.
-        equation_systems.write (argv[1], libMeshEnums::WRITE);
+        equation_systems.write (argv[1], WRITE);
 
         // Clear the equation systems data structure.
         equation_systems.clear ();
@@ -165,7 +165,7 @@ int main (int argc, char** argv)
 
         // Read the file we just wrote.  This better
         // work!
-        equation_systems.read (argv[1], libMeshEnums::READ);
+        equation_systems.read (argv[1], READ);
 
         // Print the information again.
         equation_systems.print_info();

@@ -66,10 +66,10 @@ extern "C" {
 // users aren't doing any threaded GetPot usage when TBB threads are
 // disabled.
 #if !defined(GETPOT_DISABLE_MUTEX)
-  #include "libmesh/threads.h"
-  #define SCOPED_MUTEX  libMesh::Threads::spin_mutex::scoped_lock lock(_getpot_mtx)
+#include "libmesh/threads.h"
+#define SCOPED_MUTEX  libMesh::Threads::spin_mutex::scoped_lock lock(_getpot_mtx)
 #else
-  #define SCOPED_MUTEX
+#define SCOPED_MUTEX
 #endif
 
 #define getpot_cerr libMesh::err
@@ -93,9 +93,9 @@ extern "C" {
 
 typedef  std::vector<std::string>  STRING_VECTOR;
 
-#define victorate(TYPE, VARIABLE, ITERATOR)                        \
-  std::vector<TYPE>::const_iterator ITERATOR = (VARIABLE).begin(); \
-  for (; (ITERATOR) != (VARIABLE).end(); (ITERATOR)++)
+#define victorate(TYPE, VARIABLE, ITERATOR)                             \
+  std::vector<TYPE>::const_iterator ITERATOR = (VARIABLE).begin();      \
+  for (; (ITERATOR) != (VARIABLE).end(); ++(ITERATOR))
 
 // We allow GETPOT_NAMESPACE to be defined before this file is
 // included; if libraries using two different versions of GetPot might
@@ -105,12 +105,12 @@ typedef  std::vector<std::string>  STRING_VECTOR;
 namespace GETPOT_NAMESPACE {
 #endif
 
-  /**
-   * GetPot - A class for parsing comand line arguments and
-   * configuration files.
-   *
-   * @author (C) 2001-2002 Frank R. Schaefer
-   */
+/**
+ * GetPot - A class for parsing comand line arguments and
+ * configuration files.
+ *
+ * @author (C) 2001-2002 Frank R. Schaefer
+ */
 class GetPot
 {
   inline void _basic_initialization();
@@ -315,6 +315,7 @@ public:
   inline STRING_VECTOR nominus_vector() const;
   inline unsigned nominus_size() const { return getpot_cast_int<unsigned>(idx_nominus.size()); }
   inline const char* next_nominus();
+  inline std::string next_nominus_string();
 
   /**
    * unidentified flying objects
@@ -574,7 +575,7 @@ private:
   inline STRING_VECTOR _read_in_stream(std::istream& istr);
   inline STRING_VECTOR _read_in_file(const std::string& FileName);
   inline std::string _process_section_label(const std::string& Section,
-                                                   STRING_VECTOR& section_stack);
+                                            STRING_VECTOR& section_stack);
 
   /**
    * dollar bracket expressions
@@ -668,7 +669,7 @@ GetPot::GetPot() :
 
 inline
 GetPot::GetPot(const int argc_, const char * const * argv_,
-	       const char* FieldSeparator /* =0x0 */) :
+               const char* FieldSeparator /* =0x0 */) :
   // leave 'char**' non-const to honor less capable compilers ...
   prefix(),
   section(),
@@ -729,8 +730,8 @@ GetPot::parse_command_line(const int argc_, const char * const * argv_,
 
 inline
 GetPot::GetPot(const char* FileName,
-	       const char* CommentStart  /* = 0x0 */, const char* CommentEnd /* = 0x0 */,
-	       const char* FieldSeparator/* = 0x0 */) :
+               const char* CommentStart  /* = 0x0 */, const char* CommentEnd /* = 0x0 */,
+               const char* FieldSeparator/* = 0x0 */) :
   prefix(),
   section(),
   section_list(),
@@ -815,7 +816,7 @@ GetPot::parse_input_file(const std::string& FileName,
   //    vector.
   _apriori_argv.push_back(FileName);
 
-  STRING_VECTOR args = _read_in_file(FileName.c_str());
+  STRING_VECTOR args = _read_in_file(FileName);
   _apriori_argv.insert(_apriori_argv.begin()+1, args.begin(), args.end());
   _parse_argument_vector(_apriori_argv);
 }
@@ -1104,7 +1105,7 @@ GetPot::_read_in_stream(std::istream& istr)
       const std::string Token = _get_next_token(istr);
       // Allow 'keyword =' to parse with an empty string as value.
       // Only break at EOF.
-      // 	if (Token.length() == 0 || Token[0] == EOF) break;
+      // if (Token.length() == 0 || Token[0] == EOF) break;
       if (Token[0] == EOF)
         break;
       brute_tokens.push_back(Token);
@@ -1191,8 +1192,8 @@ GetPot::_skip_whitespace(std::istream& istr)
           }
 
         // RHS: Why is this here?  It breaks on empty comments
-        //	    tmp = istr.get();
-        //	    if (!istr) { istr.unget(); return; }
+        //    tmp = istr.get();
+        //    if (!istr) { istr.unget(); return; }
       }
     // 'tmp' contains last character of _comment_starter
 
@@ -1235,10 +1236,10 @@ GetPot::_get_next_token(std::istream& istr)
   // whitespaces
   std::string token;
   int    tmp = 0;
-  int    last_letter = 0;
   while (true)
     {
-      last_letter = tmp; tmp = istr.get();
+      int last_letter = tmp;
+      tmp = istr.get();
 
       if (tmp == '=')
         {
@@ -1291,10 +1292,10 @@ GetPot::_get_string(std::istream& istr)
   // parse input until next matching '
   std::string str;
   int    tmp = 0;
-  int    last_letter = 0;
   while (true)
     {
-      last_letter = tmp; tmp = istr.get();
+      int last_letter = tmp;
+      tmp = istr.get();
       if (tmp == EOF)
         return str;
 
@@ -1317,11 +1318,11 @@ GetPot::_get_until_closing_bracket(std::istream& istr)
   // parse input until next matching }
   std::string str = "";
   int    tmp = 0;
-  int    last_letter = 0;
   int    brackets = 1;
   while (true)
     {
-      last_letter = tmp; tmp = istr.get();
+      int last_letter = tmp;
+      tmp = istr.get();
       if (tmp == EOF)
         return str;
 
@@ -1349,11 +1350,10 @@ GetPot::_get_until_closing_square_bracket(std::istream& istr)
 {
   // parse input until next matching ]
   std::string str = "";
-  int    tmp = 0;
   int    brackets = 1;
   while (true)
     {
-      tmp = istr.get();
+      int tmp = istr.get();
       if (tmp == EOF)
         return str;
 
@@ -1462,7 +1462,7 @@ GetPot::_convert_to_type(const std::string& String, const char*) const
 
 
 
-  // be more liberal than std C++ in what we interpret as a boolean
+// be more liberal than std C++ in what we interpret as a boolean
 template<>
 inline bool
 GetPot::_convert_to_type<bool>(const std::string& String, const bool& Default) const
@@ -1493,7 +1493,7 @@ GetPot::_convert_to_type<bool>(const std::string& String, const bool& Default) c
 
 
 
-  // Use C++ istream/ostream to handle most type conversions.
+// Use C++ istream/ostream to handle most type conversions.
 template <typename T>
 inline T
 GetPot::_convert_to_type_no_default(const char* VarName, const std::string& String, const T&) const
@@ -2062,10 +2062,27 @@ GetPot::next_nominus()
       // (*) record for later ufo-detection
       _record_argument_request(Tmp);
 
-      return Tmp.c_str();
+      return _internal_managed_copy(Tmp);
     }
 
   return 0;
+}
+
+
+inline std::string
+GetPot::next_nominus_string()
+{
+  if (nominus_cursor < int(idx_nominus.size()) - 1)
+    {
+      const std::string Tmp = argv[idx_nominus[++nominus_cursor]];
+
+      // (*) record for later ufo-detection
+      _record_argument_request(Tmp);
+
+      return Tmp;
+    }
+
+  return "";
 }
 
 
@@ -2322,7 +2339,7 @@ GetPot::_record_variable_request(const std::string& Name) const
 //     arguments => append an argument in the argument vector that reflects the addition
 inline void
 GetPot::_set_variable(const std::string& VarName,
-		      const std::string& Value, const bool Requested /* = true */)
+                      const std::string& Value, const bool Requested /* = true */)
 {
   const GetPot::variable* Var = Requested ?
     _request_variable(VarName.c_str()) :
@@ -3177,7 +3194,7 @@ GetPot::_search_string_vector(const STRING_VECTOR& VecStr, const std::string& St
 
 inline STRING_VECTOR
 GetPot::unidentified_arguments(unsigned Number,
-			       const char* KnownArgument1, ...) const
+                               const char* KnownArgument1, ...) const
 {
   std::set<std::string> known_arguments;
 
@@ -3239,7 +3256,7 @@ GetPot::unidentified_arguments(const std::set<std::string>& Knowns) const
 
 inline STRING_VECTOR
 GetPot::unidentified_options(unsigned Number,
-			     const char* KnownOption1, ...) const
+                             const char* KnownOption1, ...) const
 {
   std::set<std::string> known_options;
 
@@ -3317,14 +3334,14 @@ inline std::string
 GetPot::unidentified_flags(const char* KnownFlagList, int ArgumentNumber=-1) const
 {
   std::string         ufos;
-  STRING_VECTOR known_arguments;
+  // STRING_VECTOR known_arguments;
   std::string         KFL(KnownFlagList);
 
   // (2) iteration over '-' arguments (options)
   if (ArgumentNumber == -1)
     {
       STRING_VECTOR::const_iterator it = argv.begin();
-      it++; // forget about argv[0] (application or filename)
+      ++it; // forget about argv[0] (application or filename)
       for (; it != argv.end(); ++it)
         {
           // -- argument belongs to prefixed section ?
@@ -3379,7 +3396,7 @@ GetPot::unidentified_flags(const char* KnownFlagList, int ArgumentNumber=-1) con
 
 inline STRING_VECTOR
 GetPot::unidentified_variables(unsigned Number,
-			       const char* KnownVariable1, ...) const
+                               const char* KnownVariable1, ...) const
 {
   std::set<std::string> known_variables;
 
@@ -3440,7 +3457,7 @@ GetPot::unidentified_variables() const
 
 inline STRING_VECTOR
 GetPot::unidentified_sections(unsigned Number,
-			      const char* KnownSection1, ...) const
+                              const char* KnownSection1, ...) const
 {
   std::set<std::string> known_sections;
 

@@ -43,7 +43,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // MeshBase class member functions
 MeshBase::MeshBase (const Parallel::Communicator &comm,
-		    unsigned int d) :
+                    unsigned int d) :
   ParallelObject (comm),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
@@ -101,9 +101,9 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _skip_renumber_nodes_and_elements(false)
 {
   if(other_mesh._partitioner.get())
-  {
-    _partitioner = other_mesh._partitioner->clone();
-  }
+    {
+      _partitioner = other_mesh._partitioner->clone();
+    }
 }
 
 
@@ -112,12 +112,12 @@ MeshBase::~MeshBase()
 {
   this->clear();
 
-  libmesh_assert (!libMesh::closed());
+  libmesh_exceptionless_assert (!libMesh::closed());
 }
 
 
 
-void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
+void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
 {
   parallel_object_only();
 
@@ -160,7 +160,8 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
     this->update_parallel_id_counts();
 
   // Let all the elements find their neighbors
-  this->find_neighbors();
+  if(!skip_find_neighbors)
+    this->find_neighbors();
 
   // Partition the mesh.
   this->partition();
@@ -242,10 +243,10 @@ dof_id_type MeshBase::n_nodes_on_proc (const processor_id_type proc_id) const
   // We're either counting a processor's nodes or unpartitioned
   // nodes
   libmesh_assert (proc_id < this->n_processors() ||
-		  proc_id == DofObject::invalid_processor_id);
+                  proc_id == DofObject::invalid_processor_id);
 
   return static_cast<dof_id_type>(std::distance (this->pid_nodes_begin(proc_id),
-						 this->pid_nodes_end  (proc_id)));
+                                                 this->pid_nodes_end  (proc_id)));
 }
 
 
@@ -255,10 +256,10 @@ dof_id_type MeshBase::n_elem_on_proc (const processor_id_type proc_id) const
   // We're either counting a processor's elements or unpartitioned
   // elements
   libmesh_assert (proc_id < this->n_processors() ||
-		  proc_id == DofObject::invalid_processor_id);
+                  proc_id == DofObject::invalid_processor_id);
 
   return static_cast<dof_id_type>(std::distance (this->pid_elements_begin(proc_id),
-						 this->pid_elements_end  (proc_id)));
+                                                 this->pid_elements_end  (proc_id)));
 }
 
 
@@ -267,7 +268,7 @@ dof_id_type MeshBase::n_active_elem_on_proc (const processor_id_type proc_id) co
 {
   libmesh_assert_less (proc_id, this->n_processors());
   return static_cast<dof_id_type>(std::distance (this->active_pid_elements_begin(proc_id),
-						 this->active_pid_elements_end  (proc_id)));
+                                                 this->active_pid_elements_end  (proc_id)));
 }
 
 
@@ -347,17 +348,17 @@ void MeshBase::partition (const unsigned int n_parts)
   if(!skip_partitioning() &&
      partitioner().get() &&
      this->is_serial())
-  {
-    partitioner()->partition (*this, n_parts);
-  }
+    {
+      partitioner()->partition (*this, n_parts);
+    }
   else
-  {
-    // Make sure locally cached partition count
-    this->recalculate_n_partitions();
+    {
+      // Make sure locally cached partition count
+      this->recalculate_n_partitions();
 
-    // Make sure any other locally cached data is correct
-    this->update_post_partitioning();
-  }
+      // Make sure any other locally cached data is correct
+      this->update_post_partitioning();
+    }
 }
 
 unsigned int MeshBase::recalculate_n_partitions()

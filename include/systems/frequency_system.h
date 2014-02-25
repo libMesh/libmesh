@@ -75,8 +75,8 @@ public:
    * data structures.
    */
   FrequencySystem (EquationSystems& es,
-		   const std::string& name,
-		   const unsigned int number);
+                   const std::string& name,
+                   const unsigned int number);
   /**
    * Destructor.
    */
@@ -117,7 +117,7 @@ public:
    * be already set.
    */
   void solve (const unsigned int n_start,
-	      const unsigned int n_stop);
+              const unsigned int n_stop);
 
   /**
    * @returns \p "Frequency".  Helps in identifying
@@ -143,9 +143,9 @@ public:
    * can be disabled with \p allocate_solution_duplicates=false.
    */
   void set_frequencies_by_steps (const Real base_freq,
-				 const Real freq_step=0.,
-				 const unsigned int n_freq=1,
-				 const bool allocate_solution_duplicates=true);
+                                 const Real freq_step=0.,
+                                 const unsigned int n_freq=1,
+                                 const bool allocate_solution_duplicates=true);
 
   /**
    * Set the frequency range for which the system should
@@ -157,9 +157,9 @@ public:
    * can be disabled with \p allocate_solution_duplicates=false.
    */
   void set_frequencies_by_range (const Real min_freq,
-				 const Real max_freq,
-				 const unsigned int n_freq,
-				 const bool allocate_solution_duplicates=true);
+                                 const Real max_freq,
+                                 const unsigned int n_freq,
+                                 const bool allocate_solution_duplicates=true);
 
   /**
    * Set the frequency range by simply copying the values
@@ -169,7 +169,7 @@ public:
    * can be disabled with \p allocate_solution_duplicates=false.
    */
   void set_frequencies (const std::vector<Real>& frequencies,
-			const bool allocate_solution_duplicates=true);
+                        const bool allocate_solution_duplicates=true);
 
   /**
    * @returns the number of frequencies to solve
@@ -183,13 +183,13 @@ public:
    * by the user.
    */
   void attach_solve_function(void fptr(EquationSystems& es,
-				       const std::string& name));
+                                       const std::string& name));
 
   /**
    * Function that computes frequency-dependent data of the system.
    */
   void (* solve_system) (EquationSystems& es,
-			 const std::string& name);
+                         const std::string& name);
 
   /**
    * @returns the number of iterations and the final residual.

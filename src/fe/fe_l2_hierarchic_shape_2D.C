@@ -30,13 +30,13 @@ namespace libMesh
 
 template <>
 Real FE<2,L2_HIERARCHIC>::shape(const ElemType,
-			     const Order,
-			     const unsigned int,
-			     const Point&)
+                                const Order,
+                                const unsigned int,
+                                const Point&)
 {
   libMesh::err << "Hierarchic polynomials require the element type\n"
-	        << "because edge orientation is needed."
-	        << std::endl;
+               << "because edge orientation is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -46,9 +46,9 @@ Real FE<2,L2_HIERARCHIC>::shape(const ElemType,
 
 template <>
 Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
-			     const Order order,
-			     const unsigned int i,
-			     const Point& p)
+                                const Order order,
+                                const unsigned int i,
+                                const Point& p)
 {
   libmesh_assert(elem);
 
@@ -60,12 +60,12 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
     case TRI3:
     case TRI6:
       {
-	const Real zeta1 = p(0);
-	const Real zeta2 = p(1);
-	const Real zeta0 = 1. - zeta1 - zeta2;
+        const Real zeta1 = p(0);
+        const Real zeta2 = p(1);
+        const Real zeta0 = 1. - zeta1 - zeta2;
 
-	libmesh_assert_less (i, (totalorder+1u)*(totalorder+2u)/2);
-	libmesh_assert (elem->type() == TRI6 || totalorder < 2);
+        libmesh_assert_less (i, (totalorder+1u)*(totalorder+2u)/2);
+        libmesh_assert (elem->type() == TRI6 || totalorder < 2);
 
         // Vertex DoFs
         if (i == 0)
@@ -82,10 +82,10 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
               return 0.;
 
             const unsigned int basisorder = i - 1;
-	    // Get factors to account for edge-flipping
-	    Real f0 = 1;
-	    if (basisorder%2 && (elem->point(0) > elem->point(1)))
-	      f0 = -1.;
+            // Get factors to account for edge-flipping
+            Real f0 = 1;
+            if (basisorder%2 && (elem->point(0) > elem->point(1)))
+              f0 = -1.;
 
             Real edgeval = (zeta1 - zeta0) / (zeta1 + zeta0);
             Real crossfunc = zeta0 + zeta1;
@@ -93,8 +93,8 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
               crossfunc *= (zeta0 + zeta1);
 
             return f0 * crossfunc *
-                   FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder,
-                                           basisorder, edgeval);
+              FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder,
+                                         basisorder, edgeval);
           }
         else if (i < 2u*totalorder + 1)
           {
@@ -103,10 +103,10 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
               return 0.;
 
             const unsigned int basisorder = i - totalorder;
-	    // Get factors to account for edge-flipping
-	    Real f1 = 1;
-	    if (basisorder%2 && (elem->point(1) > elem->point(2)))
-	      f1 = -1.;
+            // Get factors to account for edge-flipping
+            Real f1 = 1;
+            if (basisorder%2 && (elem->point(1) > elem->point(2)))
+              f1 = -1.;
 
             Real edgeval = (zeta2 - zeta1) / (zeta2 + zeta1);
             Real crossfunc = zeta2 + zeta1;
@@ -114,8 +114,8 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
               crossfunc *= (zeta2 + zeta1);
 
             return f1 * crossfunc *
-                   FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder,
-                                           basisorder, edgeval);
+              FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder,
+                                         basisorder, edgeval);
           }
         else if (i < 3u*totalorder)
           {
@@ -124,10 +124,10 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
               return 0.;
 
             const unsigned int basisorder = i - (2u*totalorder) + 1;
-	    // Get factors to account for edge-flipping
-	    Real f2 = 1;
-	    if (basisorder%2 && (elem->point(2) > elem->point(0)))
-	      f2 = -1.;
+            // Get factors to account for edge-flipping
+            Real f2 = 1;
+            if (basisorder%2 && (elem->point(2) > elem->point(0)))
+              f2 = -1.;
 
             Real edgeval = (zeta0 - zeta2) / (zeta0 + zeta2);
             Real crossfunc = zeta0 + zeta2;
@@ -135,8 +135,8 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
               crossfunc *= (zeta0 + zeta2);
 
             return f2 * crossfunc *
-                   FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder,
-                                           basisorder, edgeval);
+              FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder,
+                                         basisorder, edgeval);
           }
         // Interior DoFs
         else
@@ -144,7 +144,7 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
             const unsigned int basisnum = i - (3u*totalorder);
             unsigned int exp0 = triangular_number_column[basisnum] + 1;
             unsigned int exp1 = triangular_number_row[basisnum] + 1 -
-                                triangular_number_column[basisnum];
+              triangular_number_column[basisnum];
 
             Real returnval = 1;
             for (unsigned int n = 0; n != exp0; ++n)
@@ -156,7 +156,7 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
           }
       }
 
-    // Hierarchic shape functions on the quadrilateral.
+      // Hierarchic shape functions on the quadrilateral.
     case QUAD4:
       libmesh_assert_less (totalorder, 2);
     case QUAD8:
@@ -168,10 +168,10 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
 
         libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
 
-// Example i, i0, i1 values for totalorder = 5:
-//                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
-//  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 3, 2, 4, 4, 4, 3, 2, 5, 5, 5, 5, 4, 3, 2};
-//  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 3, 3, 2, 3, 4, 4, 4, 2, 3, 4, 5, 5, 5, 5};
+        // Example i, i0, i1 values for totalorder = 5:
+        //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
+        //  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 3, 2, 4, 4, 4, 3, 2, 5, 5, 5, 5, 4, 3, 2};
+        //  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 3, 3, 2, 3, 4, 4, 4, 2, 3, 4, 5, 5, 5, 5};
 
         unsigned int i0, i1;
 
@@ -206,16 +206,16 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
         Real f = 1.;
 
         if ((i0%2) && (i0 > 2) && (i1 == 0))
-	  f = (elem->point(0) > elem->point(1))?-1.:1.;
+          f = (elem->point(0) > elem->point(1))?-1.:1.;
         else if ((i0%2) && (i0>2) && (i1 == 1))
-	  f = (elem->point(3) > elem->point(2))?-1.:1.;
+          f = (elem->point(3) > elem->point(2))?-1.:1.;
         else if ((i0 == 0) && (i1%2) && (i1>2))
-	  f = (elem->point(0) > elem->point(3))?-1.:1.;
+          f = (elem->point(0) > elem->point(3))?-1.:1.;
         else if ((i0 == 1) && (i1%2) && (i1>2))
-	  f = (elem->point(1) > elem->point(2))?-1.:1.;
+          f = (elem->point(1) > elem->point(2))?-1.:1.;
 
         return f*(FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder, i0, xi)*
-		  FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder, i1, eta));
+                  FE<1,L2_HIERARCHIC>::shape(EDGE3, totalorder, i1, eta));
       }
 
     default:
@@ -230,14 +230,14 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
 
 template <>
 Real FE<2,L2_HIERARCHIC>::shape_deriv(const ElemType,
-				   const Order,
-				   const unsigned int,
-				   const unsigned int,
-				   const Point&)
+                                      const Order,
+                                      const unsigned int,
+                                      const unsigned int,
+                                      const Point&)
 {
   libMesh::err << "Hierarchic polynomials require the element type\n"
-	        << "because edge orientation is needed."
-	        << std::endl;
+               << "because edge orientation is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -247,10 +247,10 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const ElemType,
 
 template <>
 Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem* elem,
-				   const Order order,
-				   const unsigned int i,
-				   const unsigned int j,
-				   const Point& p)
+                                      const Order order,
+                                      const unsigned int i,
+                                      const unsigned int j,
+                                      const Point& p)
 {
   libmesh_assert(elem);
 
@@ -266,36 +266,36 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem* elem,
     case TRI3:
     case TRI6:
       {
-	const Real eps = 1.e-6;
+        const Real eps = 1.e-6;
 
-	libmesh_assert_less (j, 2);
+        libmesh_assert_less (j, 2);
 
-	switch (j)
-	  {
-	    //  d()/dxi
-	  case 0:
-	    {
-	      const Point pp(p(0)+eps, p(1));
-	      const Point pm(p(0)-eps, p(1));
+        switch (j)
+          {
+            //  d()/dxi
+          case 0:
+            {
+              const Point pp(p(0)+eps, p(1));
+              const Point pm(p(0)-eps, p(1));
 
-	      return (FE<2,L2_HIERARCHIC>::shape(elem, order, i, pp) -
-		      FE<2,L2_HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-	    }
+              return (FE<2,L2_HIERARCHIC>::shape(elem, order, i, pp) -
+                      FE<2,L2_HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
+            }
 
-	     // d()/deta
-	  case 1:
-	    {
-	      const Point pp(p(0), p(1)+eps);
-	      const Point pm(p(0), p(1)-eps);
+            // d()/deta
+          case 1:
+            {
+              const Point pp(p(0), p(1)+eps);
+              const Point pm(p(0), p(1)-eps);
 
-	      return (FE<2,L2_HIERARCHIC>::shape(elem, order, i, pp) -
-		      FE<2,L2_HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
-	    }
+              return (FE<2,L2_HIERARCHIC>::shape(elem, order, i, pp) -
+                      FE<2,L2_HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
+            }
 
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
       }
 
     case QUAD4:
@@ -303,16 +303,16 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem* elem,
     case QUAD8:
     case QUAD9:
       {
-	// Compute quad shape functions as a tensor-product
-	const Real xi  = p(0);
-	const Real eta = p(1);
+        // Compute quad shape functions as a tensor-product
+        const Real xi  = p(0);
+        const Real eta = p(1);
 
         libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
 
-// Example i, i0, i1 values for totalorder = 5:
-//                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
-//  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
-//  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
+        // Example i, i0, i1 values for totalorder = 5:
+        //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
+        //  static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
+        //  static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 0, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
 
         unsigned int i0, i1;
 
@@ -347,29 +347,29 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem* elem,
         Real f = 1.;
 
         if ((i0%2) && (i0 > 2) && (i1 == 0))
-	  f = (elem->point(0) > elem->point(1))?-1.:1.;
+          f = (elem->point(0) > elem->point(1))?-1.:1.;
         else if ((i0%2) && (i0>2) && (i1 == 1))
-	  f = (elem->point(3) > elem->point(2))?-1.:1.;
+          f = (elem->point(3) > elem->point(2))?-1.:1.;
         else if ((i0 == 0) && (i1%2) && (i1>2))
-	  f = (elem->point(0) > elem->point(3))?-1.:1.;
+          f = (elem->point(0) > elem->point(3))?-1.:1.;
         else if ((i0 == 1) && (i1%2) && (i1>2))
-	  f = (elem->point(1) > elem->point(2))?-1.:1.;
+          f = (elem->point(1) > elem->point(2))?-1.:1.;
 
-	switch (j)
-	  {
-	    // d()/dxi
-	  case 0:
-	    return f*(FE<1,L2_HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0, 0, xi)*
-		      FE<1,L2_HIERARCHIC>::shape      (EDGE3, totalorder, i1,    eta));
+        switch (j)
+          {
+            // d()/dxi
+          case 0:
+            return f*(FE<1,L2_HIERARCHIC>::shape_deriv(EDGE3, totalorder, i0, 0, xi)*
+                      FE<1,L2_HIERARCHIC>::shape      (EDGE3, totalorder, i1,    eta));
 
-	    // d()/deta
-	  case 1:
-	    return f*(FE<1,L2_HIERARCHIC>::shape      (EDGE3, totalorder, i0,    xi)*
-		      FE<1,L2_HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
+            // d()/deta
+          case 1:
+            return f*(FE<1,L2_HIERARCHIC>::shape      (EDGE3, totalorder, i0,    xi)*
+                      FE<1,L2_HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 
-	  default:
-	    libmesh_error();
-	  }
+          default:
+            libmesh_error();
+          }
 
       }
 
@@ -385,14 +385,14 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem* elem,
 
 template <>
 Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
-				          const Order,
-				          const unsigned int,
-				          const unsigned int,
-				          const Point&)
+                                             const Order,
+                                             const unsigned int,
+                                             const unsigned int,
+                                             const Point&)
 {
   libMesh::err << "Hierarchic polynomials require the element type\n"
-	        << "because edge orientation is needed."
-	        << std::endl;
+               << "because edge orientation is needed."
+               << std::endl;
 
   libmesh_error();
   return 0.;
@@ -402,10 +402,10 @@ Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
 
 template <>
 Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const Elem* elem,
-				          const Order order,
-				          const unsigned int i,
-				          const unsigned int j,
-				          const Point& p)
+                                             const Order order,
+                                             const unsigned int i,
+                                             const unsigned int j,
+                                             const Point& p)
 {
   libmesh_assert(elem);
 
@@ -416,39 +416,39 @@ Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const Elem* elem,
   unsigned int prevj = libMesh::invalid_uint;
 
   switch (j)
-  {
-    //  d^2()/dxi^2
+    {
+      //  d^2()/dxi^2
     case 0:
       {
         pp = Point(p(0)+eps, p(1));
         pm = Point(p(0)-eps, p(1));
         prevj = 0;
-	break;
+        break;
       }
 
-    // d^2()/dxideta
+      // d^2()/dxideta
     case 1:
       {
         pp = Point(p(0), p(1)+eps);
         pm = Point(p(0), p(1)-eps);
         prevj = 0;
-	break;
+        break;
       }
 
-    // d^2()/deta^2
+      // d^2()/deta^2
     case 2:
       {
         pp = Point(p(0), p(1)+eps);
         pm = Point(p(0), p(1)-eps);
         prevj = 1;
-	break;
+        break;
       }
     default:
       libmesh_error();
-  }
+    }
   return (FE<2,L2_HIERARCHIC>::shape_deriv(elem, order, i, prevj, pp) -
-	  FE<2,L2_HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm)
-	  )/2./eps;
+          FE<2,L2_HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm)
+          )/2./eps;
 }
 
 } // namespace libMesh

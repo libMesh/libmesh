@@ -30,11 +30,11 @@
 // It instead relies on the PETSc version numbers detected during configure.  Note that if
 // LIBMESH_HAVE_PETSC is not defined, none of the LIBMESH_DETECTED_PETSC_VERSION_* variables will
 // be defined either.
-#define PETSC_VERSION_LESS_THAN(major,minor,subminor)			                                            \
-  ((LIBMESH_DETECTED_PETSC_VERSION_MAJOR < (major) ||						                    \
-    (LIBMESH_DETECTED_PETSC_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_PETSC_VERSION_MINOR < (minor) ||	    \
-				  (LIBMESH_DETECTED_PETSC_VERSION_MINOR == (minor) &&		                    \
-				   LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
+#define PETSC_VERSION_LESS_THAN(major,minor,subminor)                   \
+  ((LIBMESH_DETECTED_PETSC_VERSION_MAJOR < (major) ||                   \
+    (LIBMESH_DETECTED_PETSC_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_PETSC_VERSION_MINOR < (minor) || \
+                                                         (LIBMESH_DETECTED_PETSC_VERSION_MINOR == (minor) && \
+                                                          LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
 
 // The PETSC_VERSION_RELEASE constant was introduced just prior to 2.3.0 (ca. Apr 22 2005),
 // so fall back to using PETSC_VERSION_LESS_THAN in case it doesn't exist.
