@@ -853,11 +853,11 @@ template void DenseMatrix<Number>::_multiply_blas(const DenseMatrixBase<Number>&
 template void DenseMatrix<Number>::_lu_decompose_lapack();
 template void DenseMatrix<Number>::_lu_back_substitute_lapack(const DenseVector<Number>& ,
                                                               DenseVector<Number>&);
-template void DenseMatrix<Number>::_matvec_blas(Number, Number,
+template void DenseMatrix<Number>::_matvec_blas<Number>(Number, Number,
 					        DenseVector<Number>& ,
 					        const DenseVector<Number>&,
 						bool ) const;
-template void DenseMatrix<Real>::_matvec_blas(Complex, Complex,
+template void DenseMatrix<Real>::_matvec_blas<Complex>(Complex, Complex,
                                               DenseVector<Complex>& ,
                                               const DenseVector<Complex>&,
                                               bool ) const;
