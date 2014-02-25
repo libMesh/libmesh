@@ -644,6 +644,33 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point>&
         nodes[4] = Point (0.,0.,1.);
         return;
       }
+    case PYRAMID13:
+      {
+        nodes.resize(13);
+
+        // base corners
+        nodes[0] = Point (-1.,-1.,0.);
+        nodes[1] = Point (1.,-1.,0.);
+        nodes[2] = Point (1.,1.,0.);
+        nodes[3] = Point (-1.,1.,0.);
+
+        // apex
+        nodes[4] = Point (0.,0.,1.);
+
+        // base midedge
+        nodes[5] = Point (0.,-1.,0.);
+        nodes[6] = Point (1.,0.,0.);
+        nodes[7] = Point (0.,1.,0.);
+        nodes[8] = Point (-1,0.,0.);
+
+        // lateral midedge
+        nodes[9] = Point (-.5,-.5,.5);
+        nodes[10] = Point (.5,-.5,.5);
+        nodes[11] = Point (.5,.5,.5);
+        nodes[12] = Point (-.5,.5,.5);
+
+        return;
+      }
     case PYRAMID14:
       {
         nodes.resize(14);
@@ -811,6 +838,7 @@ bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Re
 
 
     case PYRAMID5:
+    case PYRAMID13:
     case PYRAMID14:
       {
         // Check that the point is on the same side of all the faces

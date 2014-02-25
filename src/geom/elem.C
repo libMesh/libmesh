@@ -53,6 +53,7 @@
 #include "libmesh/cell_inf_prism6.h"
 #include "libmesh/cell_inf_prism12.h"
 #include "libmesh/cell_pyramid5.h"
+#include "libmesh/cell_pyramid13.h"
 #include "libmesh/cell_pyramid14.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/mesh_base.h"
@@ -96,6 +97,7 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     18, // PRISM18
 
     5,  // PYRAMID5
+    13, // PYRAMID13
     14, // PYRAMID14
 
     2,  // INFEDGE2
@@ -138,6 +140,7 @@ const unsigned int Elem::type_to_n_sides_map [] =
     5,  // PRISM18
 
     5,  // PYRAMID5
+    5,  // PYRAMID13
     5,  // PYRAMID14
 
     2,  // INFEDGE2
@@ -180,6 +183,7 @@ const unsigned int Elem::type_to_n_edges_map [] =
     9,  // PRISM18
 
     8,  // PYRAMID5
+    8,  // PYRAMID13
     8,  // PYRAMID14
 
     0,  // INFEDGE2
@@ -297,6 +301,11 @@ AutoPtr<Elem> Elem::build(const ElemType type,
     case PYRAMID5:
       {
         elem = new Pyramid5(p);
+        break;
+      }
+    case PYRAMID13:
+      {
+        elem = new Pyramid13(p);
         break;
       }
     case PYRAMID14:
@@ -2031,6 +2040,7 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
     case PRISM18:
       return PRISM6;
     case PYRAMID5:
+    case PYRAMID13:
     case PYRAMID14:
       return PYRAMID5;
 
@@ -2114,8 +2124,8 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
       {
         if (full_ordered)
           return PYRAMID14;
-        else // PYRAMID13 to be added...
-          libmesh_error();
+        else
+          return PYRAMID13;
 
         return INVALID_ELEM;
       }

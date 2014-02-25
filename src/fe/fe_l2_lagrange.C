@@ -329,6 +329,7 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
             return 6;
 
           case PYRAMID5:
+          case PYRAMID13:
           case PYRAMID14:
             return 5;
 

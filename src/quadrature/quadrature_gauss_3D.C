@@ -525,6 +525,7 @@ void QGauss::init_3D(const ElemType type_in,
       //---------------------------------------------
       // Pyramid
     case PYRAMID5:
+    case PYRAMID13:
     case PYRAMID14:
       {
         // We compute the Pyramid rule as a conical product of a

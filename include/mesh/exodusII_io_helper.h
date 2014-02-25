@@ -921,7 +921,13 @@ public:
   static const int pyramid5_node_map[5];
 
   /**
-   * The Pyramid5 node map.  Use this map for biquadratic pyramid elements
+   * The Pyramid13 node map.  Use this map for "serendipity" pyramid elements
+   * in 3D.
+   */
+  static const int pyramid13_node_map[13];
+
+  /**
+   * The Pyramid14 node map.  Use this map for biquadratic pyramid elements
    * in 3D.
    */
   static const int pyramid14_node_map[14];

@@ -134,6 +134,7 @@ void init_elem_type_to_enum ()
 
       elem_type_to_enum["PYRAMID"   ]=PYRAMID5;
       elem_type_to_enum["PYRAMID5"  ]=PYRAMID5;
+      elem_type_to_enum["PYRAMID13" ]=PYRAMID13;
       elem_type_to_enum["PYRAMID14" ]=PYRAMID14;
 
       elem_type_to_enum["INFEDGE"   ]=INFEDGE2;

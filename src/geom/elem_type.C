@@ -79,6 +79,7 @@ std::string ElementTypes::basic_name (const ElemType t)
       }
 
     case PYRAMID5:
+    case PYRAMID13:
     case PYRAMID14:
       {
         its_name = "Pyramid";
@@ -229,6 +230,12 @@ std::string ElementTypes::name(const ElemType t)
     case PYRAMID5:
       {
         its_name = "Pyramid 5";
+        break;
+      }
+
+    case PYRAMID13:
+      {
+        its_name = "Pyramid 13";
         break;
       }
 

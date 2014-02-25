@@ -137,6 +137,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
           case PRISM15:
           case PRISM18:
           case PYRAMID5:
+          case PYRAMID13:
           case PYRAMID14:
             return 4;
 
@@ -183,6 +184,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
           case PRISM15:
           case PRISM18:
           case PYRAMID5:
+          case PYRAMID13:
           case PYRAMID14:
             return 10;
 
@@ -229,6 +231,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
           case PRISM15:
           case PRISM18:
           case PYRAMID5:
+          case PYRAMID13:
           case PYRAMID14:
             return 20;
 
@@ -274,6 +277,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
           case PRISM15:
           case PRISM18:
           case PYRAMID5:
+          case PYRAMID13:
           case PYRAMID14:
             return 35;
 
@@ -318,6 +322,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
           case PRISM15:
           case PRISM18:
           case PYRAMID5:
+          case PYRAMID13:
           case PYRAMID14:
             return (order+1)*(order+2)*(order+3)/6;
 
@@ -385,6 +390,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
           case PRISM15:
           case PRISM18:
           case PYRAMID5:
+          case PYRAMID13:
           case PYRAMID14:
             return 4;
 
@@ -434,6 +440,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
           case PRISM15:
           case PRISM18:
           case PYRAMID5:
+          case PYRAMID13:
           case PYRAMID14:
             return 10;
 
@@ -480,6 +487,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
           case PRISM15:
           case PRISM18:
           case PYRAMID5:
+          case PYRAMID13:
           case PYRAMID14:
             return 20;
 
@@ -526,6 +534,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
           case PRISM15:
           case PRISM18:
           case PYRAMID5:
+          case PYRAMID13:
           case PYRAMID14:
             return 35;
 
@@ -569,6 +578,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
           case PRISM15:
           case PRISM18:
           case PYRAMID5:
+          case PYRAMID13:
           case PYRAMID14:
             return (order+1)*(order+2)*(order+3)/6;
 

@@ -124,6 +124,9 @@ void init_element_equivalence_map()
       element_equivalence_map["PYRAMID"]  = PYRAMID5;
       element_equivalence_map["PYRAMID5"] = PYRAMID5;
 
+      // PYRAMID13 equivalences
+      element_equivalence_map["PYRAMID13"] = PYRAMID13;
+
       // PYRAMID14 equivalences
       element_equivalence_map["PYRAMID14"] = PYRAMID14;
     }
@@ -200,6 +203,7 @@ const int ExodusII_IO_Helper::ElementMaps::prism15_node_map[15]   = {0, 1, 2, 3,
 const int ExodusII_IO_Helper::ElementMaps::prism18_node_map[18]   = {0, 1, 2, 3, 4, 5, 6,  7,  8,  9,
                                                                      10, 11, 12, 13, 14, 15, 16, 17};
 const int ExodusII_IO_Helper::ElementMaps::pyramid5_node_map[5] = {0, 1, 2, 3, 4};
+const int ExodusII_IO_Helper::ElementMaps::pyramid13_node_map[13] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
 const int ExodusII_IO_Helper::ElementMaps::pyramid14_node_map[14] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
 // 3D face map definitions
@@ -2210,6 +2214,21 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
                               ARRAY_LENGTH(pyramid_inverse_face_map),
                               PYRAMID5,
                               "PYRAMID5");
+        return conv;
+      }
+
+    case PYRAMID13:
+      {
+        const Conversion conv(pyramid13_node_map,
+                              ARRAY_LENGTH(pyramid13_node_map),
+                              pyramid13_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(pyramid13_node_map),
+                              pyramid_face_map,
+                              ARRAY_LENGTH(pyramid_face_map),
+                              pyramid_inverse_face_map,
+                              ARRAY_LENGTH(pyramid_inverse_face_map),
+                              PYRAMID13,
+                              "PYRAMID13");
         return conv;
       }
 
