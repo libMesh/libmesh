@@ -217,12 +217,12 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i,
   unsigned int n       = n_local;
   this->comm().sum(n);
   
-  temp_re->init (n, n_local, false, libMeshEnums::PARALLEL);
+  temp_re->init (n, n_local, false, PARALLEL);
 
   if (vec_im)
   {
     temp_im.reset(NumericVector<Number>::build(this->comm()).release());
-    temp_im->init (n, n_local, false, libMeshEnums::PARALLEL);
+    temp_im->init (n, n_local, false, PARALLEL);
   }
 
   std::pair<Real, Real> eval = eigen_solver->get_eigenpair (i, *temp_re, temp_im.get());
