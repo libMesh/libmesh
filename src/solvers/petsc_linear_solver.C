@@ -33,6 +33,7 @@
 #include "libmesh/petsc_vector.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/system.h"
+#include "libmesh/petsc_auto_fieldsplit.h"
 
 namespace libMesh
 {
@@ -412,31 +413,7 @@ PetscLinearSolver<T>::init_names (const System& sys)
 {
   PetscErrorCode ierr = 0;
 
-  if (libMesh::on_command_line("--solver_variable_names"))
-    {
-      PC my_pc = this->pc();
-
-  for (unsigned int v = 0; v != sys.n_vars(); ++v)
-    {
-      const std::string& var_name = sys.variable_name(v);
-      std::vector<dof_id_type> var_idx;
-      sys.get_dof_map().local_variable_indices
-        (var_idx, sys.get_mesh(), v);
-
-      IS is;
-
-      PetscInt *idx = PETSC_NULL;
-      if (!var_idx.empty())
-        idx = reinterpret_cast<PetscInt*>(&var_idx[0]);
-
-      ierr = ISCreateLibMesh(this->comm().get(), var_idx.size(),
-                             idx, PETSC_COPY_VALUES, &is);
-      LIBMESH_CHKERRABORT(ierr);
-
-      ierr = PCFieldSplitSetIS(my_pc, var_name.c_str(), is);
-      LIBMESH_CHKERRABORT(ierr);
-    }
-    }
+  petsc_auto_fieldsplit(this->pc(), sys);
 }
 
 
