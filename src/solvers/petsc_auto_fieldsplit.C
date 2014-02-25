@@ -31,34 +31,79 @@ EXTERN_C_FOR_PETSC_END
 
 // C++ includes
 
+namespace {
+
+void indices_to_fieldsplit (const libMesh::Parallel::Communicator& comm,
+                            const std::vector<dof_id_type>& indices, 
+                            PC my_pc,
+                            const std::string& field_name)
+{
+  const PetscInt *idx = PETSC_NULL;
+  if (!indices.empty())
+  idx = reinterpret_cast<const PetscInt*>(&indices[0]);
+
+  IS is;
+  int ierr = ISCreateLibMesh(comm.get(), indices.size(),
+  idx, PETSC_COPY_VALUES, &is);
+  CHKERRABORT(comm.get(), ierr);
+
+  ierr = PCFieldSplitSetIS(my_pc, field_name.c_str(), is);
+  CHKERRABORT(comm.get(), ierr);
+}
+
+}
+
 namespace libMesh
 {
 
 void petsc_auto_fieldsplit (PC my_pc,
                             const System &sys)
 {
+  std::string sys_prefix = "--solver_group_";
+
+  if (libMesh::on_command_line("--solver_system_names"))
+    {
+      sys_prefix = sys_prefix + sys.name() + "_";
+    }
+
+  std::map<std::string, std::vector<dof_id_type> > group_indices;
+
   if (libMesh::on_command_line("--solver_variable_names"))
     {
       for (unsigned int v = 0; v != sys.n_vars(); ++v)
         {
           const std::string& var_name = sys.variable_name(v);
+
           std::vector<dof_id_type> var_idx;
           sys.get_dof_map().local_variable_indices
             (var_idx, sys.get_mesh(), v);
 
-          IS is;
+          std::string group_command = sys_prefix + var_name;
 
-          PetscInt *idx = PETSC_NULL;
-          if (!var_idx.empty())
-            idx = reinterpret_cast<PetscInt*>(&var_idx[0]);
+          if (libMesh::on_command_line (group_command))
+            {
+              std::string group_name = libMesh::command_line_value
+                (group_command, std::string());
 
-          int ierr = ISCreateLibMesh(sys.comm().get(), var_idx.size(),
-                                     idx, PETSC_COPY_VALUES, &is);
-          CHKERRABORT(sys.comm().get(), ierr);
-
-          ierr = PCFieldSplitSetIS(my_pc, var_name.c_str(), is);
-          CHKERRABORT(sys.comm().get(), ierr);
+              std::vector<dof_id_type> &indices =
+                      group_indices[group_name];
+              const bool prior_indices = !indices.empty();
+              indices.insert(indices.end(), var_idx.begin(),
+                             var_idx.end());
+              if (prior_indices)
+                std::sort(indices.begin(), indices.end());
+            }
+          else
+            {
+              indices_to_fieldsplit (sys.comm(), var_idx, my_pc, var_name);
+            }
         }
+    }
+
+  for (std::map<std::string, std::vector<dof_id_type> >::const_iterator
+       i = group_indices.begin(); i != group_indices.end(); ++i)
+    {
+      indices_to_fieldsplit(sys.comm(), i->second, my_pc, i->first);
     }
 }
 
