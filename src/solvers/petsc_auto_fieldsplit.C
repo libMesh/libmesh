@@ -111,8 +111,8 @@ void petsc_auto_fieldsplit (PC my_pc,
 
 
 #else  // #PETSC_VERSION < 3.2.0
-void assign_solver_fieldsplit_names (PC my_pc,
-                                     const System &sys)
+void petsc_auto_fieldsplit (PC my_pc,
+                            const System &sys)
 {
   if (libMesh::on_command_line("--solver_variable_names"))
     {
