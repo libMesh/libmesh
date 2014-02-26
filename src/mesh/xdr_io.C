@@ -403,12 +403,12 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
   // First write the level-0 elements directly.
   it  = mesh.local_level_elements_begin(0);
   end = mesh.local_level_elements_end(0);
-  for (; it != end; ++it)
+  for (; it != end; ++it, ++my_next_elem)
     {
       pack_element (xfer_conn, *it);
 #ifdef LIBMESH_ENABLE_AMR
       parent_id_map[(*it)->id()] = std::make_pair(this->processor_id(),
-                                                  my_next_elem++);
+                                                  my_next_elem);
 #endif
     }
   xfer_conn.push_back(my_next_elem); // toss in the number of elements transferred.
