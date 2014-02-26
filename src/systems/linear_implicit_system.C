@@ -46,10 +46,6 @@ LinearImplicitSystem::LinearImplicitSystem (EquationSystems& es,
   _subset(NULL),
   _subset_solve_mode(SUBSET_ZERO)
 {
-  if (libMesh::on_command_line("--solver_system_names"))
-    linear_solver->init((this->name()+"_").c_str());
-  else
-    linear_solver->init();
 }
 
 
@@ -82,11 +78,6 @@ void LinearImplicitSystem::init_data ()
 
   // re-initialize the linear solver interface
   linear_solver->clear();
-
-  if (libMesh::on_command_line("--solver_system_names"))
-    linear_solver->init((this->name()+"_").c_str());
-  else
-    linear_solver->init();
 }
 
 
@@ -98,11 +89,6 @@ void LinearImplicitSystem::reinit ()
 
   // initialize parent data
   Parent::reinit();
-
-  if (libMesh::on_command_line("--solver_system_names"))
-    linear_solver->init((this->name()+"_").c_str());
-  else
-    linear_solver->init();
 }
 
 
@@ -133,6 +119,12 @@ void LinearImplicitSystem::solve ()
   // Get a reference to the EquationSystems
   const EquationSystems& es =
     this->get_equation_systems();
+
+  // If the linear solver hasn't been initialized, we do so here.
+  if (libMesh::on_command_line("--solver_system_names"))
+    linear_solver->init((this->name()+"_").c_str());
+  else
+    linear_solver->init();
 
   // Get the user-specifiied linear solver tolerance
   const Real tol            =
