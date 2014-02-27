@@ -26,6 +26,7 @@
 // C++ includes
 #include <sstream>
 #include <fstream>
+#include <algorithm> // std::min_element
 
 namespace libMesh
 {
@@ -89,7 +90,7 @@ void RBParametrized::initialize_parameters(const RBParameters& mu_min_in,
 
   parameters_min = mu_min_in;
   parameters_max = mu_max_in;
-  
+
   // Add in min/max values due to the discrete parameters
   {
     std::map< std::string, std::vector<Real> >::const_iterator it =
@@ -104,7 +105,7 @@ void RBParametrized::initialize_parameters(const RBParameters& mu_min_in,
                          << std::endl;
             libmesh_error();
           }
-    
+
         Real min_val = *std::min_element(it->second.begin(), it->second.end());
         Real max_val = *std::max_element(it->second.begin(), it->second.end());
 
@@ -329,7 +330,7 @@ void RBParametrized::write_discrete_parameter_values_to_file(const std::string& 
           std::string param_name = discrete_it->first;
           unsigned int n_discrete_values = discrete_it->second.size();
           discrete_parameters_out << param_name << n_discrete_values;
-    
+
           for(unsigned int i=0; i<n_discrete_values; i++)
             {
               Real discrete_value = discrete_it->second[i];
@@ -349,7 +350,7 @@ void RBParametrized::read_parameter_data_from_files(const std::string& continuou
                                   read_binary_data,
                                   param_min,
                                   param_max);
-  
+
   std::map< std::string, std::vector<Real> > discrete_parameter_values_in;
   read_discrete_parameter_values_from_file(discrete_param_file_name,
                                            read_binary_data,
@@ -370,7 +371,7 @@ void RBParametrized::read_parameter_ranges_from_file(const std::string& file_nam
   Xdr parameter_ranges_in(file_name, mode);
   unsigned int n_continuous_params;
   parameter_ranges_in >> n_continuous_params;
-  
+
   for(unsigned int i=0; i<n_continuous_params; i++)
     {
       std::string param_name;
@@ -415,10 +416,10 @@ void RBParametrized::read_discrete_parameter_values_from_file(const std::string&
         {
           std::string param_name;
           discrete_parameter_values_in >> param_name;
-      
+
           unsigned int n_discrete_values;
           discrete_parameter_values_in >> n_discrete_values;
-      
+
           std::vector<Real> discrete_values(n_discrete_values);
           for(unsigned int j=0; j<discrete_values.size(); j++)
             {
@@ -427,7 +428,7 @@ void RBParametrized::read_discrete_parameter_values_from_file(const std::string&
 
               discrete_values[j] = param_value;
             }
-      
+
           discrete_parameter_values[param_name] = discrete_values;
         }
     }
@@ -523,7 +524,7 @@ Real RBParametrized::get_closest_value(Real value, const std::vector<Real>& list
 
   std::vector<Real>::const_iterator it = list_of_values.begin();
   std::vector<Real>::const_iterator it_end = list_of_values.end();
-  
+
   Real min_distance = std::numeric_limits<Real>::max();
   Real closest_val = 0.;
   for( ; it != it_end; ++it)
@@ -535,21 +536,21 @@ Real RBParametrized::get_closest_value(Real value, const std::vector<Real>& list
           closest_val = *it;
         }
     }
-  
+
   return closest_val;
 }
 
 bool RBParametrized::is_value_in_list(Real value, const std::vector<Real>& list_of_values, Real tol)
 {
   Real closest_value = get_closest_value(value, list_of_values);
-  
+
   // Check if relative tolerance is satisfied
   Real rel_error = std::abs(value - closest_value) / std::abs(value);
   if( rel_error <= tol )
     {
       return true;
     }
-  
+
   // If relative tolerance isn't satisfied, we should still check an absolute
   // error, since relative tolerance can be misleading if value is close to zero
   Real abs_error = std::abs(value - closest_value);
