@@ -75,6 +75,7 @@ public:
    * Works in 3D for \p TET4s, \p TET10s, \p HEX8s, and \p HEX27s.
    */
   virtual void read (const std::string& name);
+  virtual void read_parallel (const std::string& base_filename);
 
   /**
    * This method implements writing a mesh to a specified file.

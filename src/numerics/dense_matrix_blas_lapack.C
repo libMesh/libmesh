@@ -394,6 +394,81 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma, DenseMatrix<T>& U, Dens
 
 }
 
+    
+    // Hermitian
+extern "C"
+{
+    extern int dgeev_(char*, char*, int*, double*, int*, double*, double*, double*,
+                      int*, double*, int*, double*, int*, int*);
+}
+
+template<typename T>
+void DenseMatrix<T>::_nonhermitian_eig_lapack(DenseVector<T>& dreal, DenseVector<T>& dimag,
+                                              DenseMatrix<T>& vreal, DenseMatrix<T>& vimag)
+{
+    int dim = this->n();
+    dreal.resize(dim); dimag.resize(dim);
+    vreal.resize(dim, dim); vimag.resize(dim, dim);
+    
+    int lwork=16*dim, info=0;
+    std::vector<Real> &alpha_r = dreal.get_values(),
+    & alpha_i = dimag.get_values(),
+    &eig_vec_right = vreal.get_values(),
+    eig_vec_left(dim*dim), work(lwork);
+
+    char N='N',V='V';
+    
+    dgeev_(&N, &V, &dim, _val[0], &dim,
+           &(alpha_r[0]), &(alpha_i[0]), &(eig_vec_left[0]), &dim,
+           &(eig_vec_right[0]), &dim, &(work[0]), &lwork, &info);
+    
+    // check the convergence
+    if (info == 0)
+    {
+        // first copy the eigenvectors and eigenvalues to the solver data structure
+        // any complex eigenvalue appears in conjugate pairs, and the associated eigenvector would
+        // occupy two consecutive columns in the eigenvector matrices. Hence, one should look for conjugate pairs
+        
+        bool if_conjugate = false;
+        unsigned int eig_id = 0;
+        DenseVector<Real> tmp; tmp.resize(dim);
+        
+        while (eig_id < dim)
+        {
+            // if this is the last eigenvalue, then it is not conjugate
+            if (eig_id == dim-1)
+                if_conjugate = false;
+            else
+            {
+                // if the real part for two consecutive eigenvalues is the same, and imaginary part
+                // is opposite in sign, then it is a complex conjugate pair
+                if ((alpha_r[eig_id] == alpha_r[eig_id+1]) &&
+                    (alpha_i[eig_id] == -alpha_i[eig_id+1]))
+                    if_conjugate = true;
+                else
+                    if_conjugate = false;
+            }
+            
+            // look at the two
+            if (if_conjugate)
+            {
+                // first eigenvector (right)
+                vreal.get_column(eig_id+1, tmp); // imaginary part
+                vimag.set_column(eig_id, tmp);
+                tmp.scale(-1.);
+                vimag.set_column(eig_id, tmp); // conjugate
+                
+                vreal.get_column(eig_id, tmp); // real part
+                vreal.set_column(eig_id+1, tmp);
+                eig_id+=2;
+            }
+            else
+                eig_id+=1;
+        }
+    }
+}
+
+    
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 
 template<typename T>
@@ -628,9 +703,10 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& ,
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 
 template<typename T>
-void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
-                                  DenseVector<T>& dest,
-                                  const DenseVector<T>& arg,
+template <typename T2>
+void DenseMatrix<T>::_matvec_blas(T2 alpha, T2 beta,
+				  DenseVector<T2>& dest,
+				  const DenseVector<T2>& arg,
                                   bool trans) const
 {
   // Ensure that dest and arg sizes are compatible
@@ -742,9 +818,10 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
 
 
 template<typename T>
-void DenseMatrix<T>::_matvec_blas(T , T,
-                                  DenseVector<T>& ,
-                                  const DenseVector<T>&,
+template <typename T2>
+void DenseMatrix<T>::_matvec_blas(T2 , T2,
+				  DenseVector<T2>& ,
+				  const DenseVector<T2>&,
                                   bool ) const
 {
   libMesh::err << "No PETSc-provided BLAS/LAPACK available!" << std::endl;
@@ -776,10 +853,14 @@ template void DenseMatrix<Number>::_multiply_blas(const DenseMatrixBase<Number>&
 template void DenseMatrix<Number>::_lu_decompose_lapack();
 template void DenseMatrix<Number>::_lu_back_substitute_lapack(const DenseVector<Number>& ,
                                                               DenseVector<Number>&);
-template void DenseMatrix<Number>::_matvec_blas(Number, Number,
-                                                DenseVector<Number>& ,
-                                                const DenseVector<Number>&,
-                                                bool ) const;
+template void DenseMatrix<Number>::_matvec_blas<Number>(Number, Number,
+					        DenseVector<Number>& ,
+					        const DenseVector<Number>&,
+						bool ) const;
+template void DenseMatrix<Real>::_matvec_blas<Complex>(Complex, Complex,
+                                              DenseVector<Complex>& ,
+                                              const DenseVector<Complex>&,
+                                              bool ) const;
 template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number>&);
 template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number>&, DenseMatrix<Number>&, DenseMatrix<Number>&);
 template void DenseMatrix<Number>::_svd_helper (char, char, std::vector<Number>&,

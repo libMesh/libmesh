@@ -649,7 +649,6 @@ LibMeshInit::~LibMeshInit()
     }
 #endif
 
-
 #if defined(LIBMESH_HAVE_MPI)
   // Allow the user to bypass MPI finalization
   if (!libMesh::on_command_line ("--disable-mpi"))
@@ -658,7 +657,6 @@ LibMeshInit::~LibMeshInit()
 #ifndef LIBMESH_DISABLE_COMMWORLD
       Parallel::Communicator_World.clear();
 #endif
-
       if (libmesh_initialized_mpi)
         MPI_Finalize();
     }

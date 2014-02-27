@@ -68,6 +68,36 @@ public:
   virtual ~EigenSystem ();
 
   /**
+   * Abstract base class to be used for assembly of sensitivity
+   * data for EigenSystem. A user class derived from this class may be used to
+   * assemble the sensitivity of system by attaching an object
+   * with the method \p attach_eigenproblem_sensitivity_assemble_object.
+   */
+  class EigenproblemSensitivityAssembly
+  {
+  public:
+    /**
+     * Destructor.  Virtual because we will have virtual functions.
+     */
+    virtual ~EigenproblemSensitivityAssembly () {}
+    
+    /**
+     * Assembly function.  This function will be called
+     * to assemble the sensitivity of eigenproblem matrices. 
+     * The method provides dA/dp_i and dB/dpi for \par i ^th parameter 
+     * in the vector \par parameters.
+     *
+     * If the routine is not able to provide sensitivity for this parameter,
+     * then it should return false, and the system will attempt to use
+     * finite differencing.
+     */
+    virtual bool sensitivity_assemble (const ParameterVector& parameters,
+                                       const unsigned int i,
+                                       SparseMatrix<Number>* sensitivity_A,
+                                       SparseMatrix<Number>* sensitivity_B) = 0;
+  };
+
+  /**
    * The type of system.
    */
   typedef EigenSystem sys_type;
@@ -100,15 +130,46 @@ public:
   virtual void solve ();
 
   /**
+   * Solves the sensitivity system, for the provided parameters. The return
+   * parameters are irrelevant for EigenSystem. Sensitivity of eigenvalues
+   * are returned in \p sens.
+   *
+   * This method is only implemented in some derived classes.
+   */
+  virtual std::pair<unsigned int, Real>
+  sensitivity_solve (const ParameterVector& parameters,
+                     std::vector<Number>& sens);
+
+  
+  /**
    * Assembles the system matrix.
    */
   virtual void assemble ();
 
-  /**
-   * Returns real and imaginary part of the ith eigenvalue and copies
-   * the respective eigen vector to the solution vector.
+  /*!
+   *  Assembles the sensitivity of matrix_A and matrix_B with respect to the 
+   *  specified parameter
    */
-  virtual std::pair<Real, Real> get_eigenpair (unsigned int i);
+  virtual void assemble_eigensystem_sensitivity(const ParameterVector& parameters,
+                                                const unsigned int p);
+  
+  /**
+   * Returns real and imaginary part of the ith eigenvalue. If the vectors are
+   * provided in the function argument through \p vec_re and \p vec_im, this
+   * method copies the eigenvector in the given vector(s), else copies the
+   * vector to System::solution.
+   *
+   * Note that with Number = Complex, \p vec_im must be NULL, and for 
+   * Number = Real and eigen problem type HEP or GHEP, \p vec_im must be NULL.
+   * For Number = Real and eigenproblem type NHEP or GNHEP, the real and imag.
+   * parts of the eigenvector are copied to \p vec_re and \p vec_im,
+   * respectively. If \p vec_im is not provided, then only the real part will be 
+   * copied to either \p vec_re or System::solution depending on the second
+   * argument.
+   */
+  virtual std::pair<Real, Real> get_eigenpair (unsigned int i,
+                                               NumericVector<Number>* vec_re = NULL,
+                                               NumericVector<Number>* vec_im = NULL);
 
   /**
    * @returns \p "Eigen".  Helps in identifying
@@ -146,6 +207,25 @@ public:
    * , false otherwise.
    */
   bool generalized () const { return _is_generalized_eigenproblem; }
+
+  /**
+   * Register a user function to use in assembling the system
+   * RHS sensitivity. If the routine is unable to provide sensitivity for this
+   * parameter, then it should return false.
+   */
+  void attach_eigenproblem_sensitivity_assemble_function
+  (bool fptr(EquationSystems& es,
+             const std::string& name,
+             const ParameterVector& parameters,
+             const unsigned int i,
+             SparseMatrix<Number>* sensitivity_A,
+             SparseMatrix<Number>* sensitivity_B));
+  
+  /**
+   * Register a user object to use in assembling the system
+   * RHS sensitivity.
+   */
+  void attach_eigenproblem_sensitivity_assemble_object (EigenproblemSensitivityAssembly& assemble);
 
   /**
    * The system matrix for standard eigenvalue problems.
@@ -193,6 +273,16 @@ protected:
   { _n_iterations = its;}
 
 
+  /*!
+   *   checks if either a user provided function or object is available to calculate
+   *   the sensitivity of A & B matrices for this eigenproblem. Returns true
+   *   if user provided function/object is able to calculate the sensitivity
+   *   for this parameter, otherwise returns false.
+   */
+  bool user_eigensystem_sensitivity_assemble(const ParameterVector& parameters,
+                                             const unsigned int p);
+
+  
 private:
 
   /**
@@ -216,6 +306,20 @@ private:
    */
   EigenProblemType _eigen_problem_type;
 
+  /**
+   * Function that assembles the sensitivity of eigen_system.
+   */
+  bool (* _eigenproblem_sensitivity_assemble_system_function) (EquationSystems& es,
+                                                               const std::string& name,
+                                                               const ParameterVector& parameter,
+                                                               const unsigned int i,
+                                                               SparseMatrix<Number>* sensitivity_A,
+                                                               SparseMatrix<Number>* sensitivity_B);
+  
+  /**
+   * Object that assembles the sensitivity of eigen_system.
+   */
+  EigenproblemSensitivityAssembly * _eigenproblem_sensitivity_assemble_system_object;
 
 };
 
