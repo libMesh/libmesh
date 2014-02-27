@@ -44,7 +44,7 @@ void indices_to_fieldsplit (const libMesh::Parallel::Communicator& comm,
 
   IS is;
   int ierr = ISCreateLibMesh(comm.get(), indices.size(),
-  idx, PETSC_COPY_VALUES, &is);
+                             idx, PETSC_COPY_VALUES, &is);
   CHKERRABORT(comm.get(), ierr);
 
   ierr = PCFieldSplitSetIS(my_pc, field_name.c_str(), is);
@@ -80,11 +80,13 @@ void petsc_auto_fieldsplit (PC my_pc,
 
           std::string group_command = sys_prefix + var_name;
 
-          if (libMesh::on_command_line (group_command))
-            {
-              std::string group_name = libMesh::command_line_value
-                (group_command, std::string());
+          const std::string empty_string;
 
+          std::string group_name = libMesh::command_line_value
+            (group_command, empty_string);
+
+          if (group_name != empty_string)
+            {
               std::vector<dof_id_type> &indices =
                       group_indices[group_name];
               const bool prior_indices = !indices.empty();
