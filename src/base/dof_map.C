@@ -1014,10 +1014,16 @@ void DofMap::local_variable_indices(std::vector<dof_id_type>& idx,
             {
               Node* node = elem->get_node(n);
 
+              if (node->processor_id() < this->processor_id())
+                continue;
+
               const unsigned int n_comp = node->n_comp(sys_num, var_num);
               for(unsigned int i=0; i<n_comp; i++)
                 {
                   const dof_id_type index = node->dof_number(sys_num,var_num,i);
+                  libmesh_assert_greater_equal (index, this->first_dof());
+                  libmesh_assert_less (index, this->end_dof());
+
                   if (idx.empty() || index > idx.back())
                     idx.push_back(index);
                 }
