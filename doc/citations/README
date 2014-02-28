@@ -1,12 +1,11 @@
 What is this?
 -------------
 We like to keep track of any publications that actually *use* libmesh
-to to obtain results.  It can be any type of publication: conference
+to obtain results.  It can be any type of publication: conference
 talk, poster, refereed article, technical report, user manual,
 dissertation, etc.  It's best if it is easily accessible from the web.
-We are *not* interested in tracking publications that only mention
-libmesh in a laundry list of FEM libraries, although it is nice to
-have the citations ;-)
+We don't track publications here that only mention libmesh in a laundry
+list of FEM libraries, although it is nice to have the citations ;-)
 
 
 
@@ -31,22 +30,25 @@ OK, so what can I do?
   relevant details.
 
 * Generate a PDF:
-  Type 'make libmesh_refs'.  Assuming you have a reasonably modern
-  version of LaTeX installed, it will produce a file called libmesh_refs.pdf
-  with all the references organized by year.  This is mostly useful for
-  checking that your citation renders correctly (accents, etc.) in PDF.
+  Type 'make all_pdfs'.  Assuming you have a reasonably modern version
+  of LaTeX installed, it will produce a file called all_pdfs.pdf with
+  all the references organized by year.  This is useful for ensuring
+  that your citation renders correctly (accents, etc.) in PDF.
 
 * Update the publications.php site:
   You must have bibtex2html installed, grab it here:
-  https://www.lri.fr/~filliatr/bibtex2html I built from source, but
-  the binaries might also work for you.  Once that's installed and in
-  your PATH, run the ./create_website.sh script.  Several files will
-  be generated, the main one is called publications.php.  You may be
-  able to view it locally by renaming it to publications.html and
-  pointing your browser at file:///path/to/publications.html.  Once
-  you are satisfied with the results, you can upload them to the
-  libmesh site (assuming your sf account name is jimbob and you are a
-  developer on the libmesh project) by doing:
+
+    https://www.lri.fr/~filliatr/bibtex2html
+
+  I built from source, but the binaries might also work for you.  Once
+  that's installed and in your PATH, run the ./create_website.sh
+  script.  Several files will be generated, the main one is called
+  publications.php.  You may be able to view it locally by renaming it
+  to publications.html and pointing your browser at
+  file:///path/to/publications.html.  Once you are satisfied with the
+  results, you can upload them to the libmesh site (assuming your sf
+  account name is jimbob and you are a developer on the libmesh
+  project) by doing:
 
   sftp jimbob,libmesh@web.sf.net
   cd htdocs
@@ -68,4 +70,4 @@ Any other tips I should know?
 
 
 LocalWords:  libmesh bibtex preprints Makefile PDF php JWP LaTeX pdf
-LocalWords:  html jimbob sftp cd htdocs TODO
+LocalWords:  html jimbob sftp cd htdocs TODO pdfs jwpeterson gmail
