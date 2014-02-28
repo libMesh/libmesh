@@ -993,7 +993,6 @@ void DofMap::local_variable_indices(std::vector<dof_id_type>& idx,
                                     unsigned int var_num) const
 {
   const unsigned int sys_num       = this->sys_number();
-  const unsigned int n_var_groups  = this->n_variable_groups();
 
   // If this isn't a SCALAR variable, we need to find all its field
   // dofs on the mesh
