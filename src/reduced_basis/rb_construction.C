@@ -461,7 +461,7 @@ void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number>& vect
   vector.close();
 }
 
-void RBConstruction::initialize_rb_construction()
+void RBConstruction::initialize_rb_construction(bool skip_matrix_assembly)
 {
   // Check that the theta and assembly objects are consistently sized
   libmesh_assert_equal_to (get_rb_theta_expansion().get_n_A_terms(), get_rb_assembly_expansion().get_n_A_terms());
@@ -476,14 +476,17 @@ void RBConstruction::initialize_rb_construction()
 
   // Perform the initialization
   allocate_data_structures();
-  assemble_affine_expansion();
+  assemble_affine_expansion(skip_matrix_assembly);
 }
 
-void RBConstruction::assemble_affine_expansion()
+void RBConstruction::assemble_affine_expansion(bool skip_matrix_assembly)
 {
-  // Assemble and store all of the matrices
-  this->assemble_misc_matrices();
-  this->assemble_all_affine_operators();
+  if(!skip_matrix_assembly)
+  {
+    // Assemble and store all of the matrices
+    this->assemble_misc_matrices();
+    this->assemble_all_affine_operators();
+  }
 
   // Assemble and store all of the vectors
   this->assemble_all_affine_vectors();
@@ -2087,6 +2090,64 @@ NumericVector<Number>* RBConstruction::get_non_dirichlet_output_vector(unsigned 
     }
 
   return non_dirichlet_outputs_vector[n][q_l];
+}
+
+void RBConstruction::get_all_matrices(std::map<std::string, SparseMatrix<Number>*>& all_matrices)
+{
+  all_matrices.clear();
+
+  all_matrices["inner_product"] = get_inner_product_matrix();
+
+  if(store_non_dirichlet_operators)
+  {
+    all_matrices["inner_product_non_dirichlet"] =
+      get_non_dirichlet_inner_product_matrix();
+  }
+
+  for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
+  {
+    std::stringstream matrix_name;
+    matrix_name << "A" << q_a;
+    all_matrices[matrix_name.str()] = get_Aq(q_a);
+
+    if(store_non_dirichlet_operators)
+    {
+      matrix_name << "_non_dirichlet";
+      all_matrices[matrix_name.str()] = get_non_dirichlet_Aq(q_a);
+    }
+  }
+}
+
+void RBConstruction::get_all_vectors(std::map<std::string, NumericVector<Number>*>& all_vectors)
+{
+  all_vectors.clear();
+
+  for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
+  {
+    std::stringstream vector_name;
+    vector_name << "F" << q_f;
+    all_vectors[vector_name.str()] = get_Fq(q_f);
+
+    if(store_non_dirichlet_operators)
+    {
+      vector_name << "_non_dirichlet";
+      all_vectors[vector_name.str()] = get_non_dirichlet_Fq(q_f);
+    }
+  }
+
+  for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
+    for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
+    {
+      std::stringstream output_name;
+      output_name << "output_" << n << "_"<< q_l;
+      all_vectors[output_name.str()] = get_output_vector(n,q_l);
+
+      if(store_non_dirichlet_operators)
+      {
+        output_name << "_non_dirichlet";
+        all_vectors[output_name.str()] = get_non_dirichlet_output_vector(n,q_l);
+      }
+    }
 }
 
 AutoPtr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary_object()

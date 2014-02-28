@@ -277,10 +277,10 @@ void TransientRBConstruction::allocate_data_structures()
   RB_ic_proj_rhs_all_N.resize(Nmax);
 }
 
-void TransientRBConstruction::assemble_affine_expansion()
+void TransientRBConstruction::assemble_affine_expansion(bool skip_matrix_assembly)
 {
   // Call parent's assembly functions
-  Parent::assemble_affine_expansion();
+  Parent::assemble_affine_expansion(skip_matrix_assembly);
 
   // Now update RB_ic_proj_rhs_all_N if necessary.
   // This allows us to compute the L2 projection
@@ -350,6 +350,36 @@ SparseMatrix<Number>* TransientRBConstruction::get_non_dirichlet_M_q(unsigned in
     }
 
   return non_dirichlet_M_q_vector[q];
+}
+
+void TransientRBConstruction::get_all_matrices(std::map<std::string, SparseMatrix<Number>*>& all_matrices)
+{
+  Parent::get_all_matrices(all_matrices);
+
+  all_matrices["L2_matrix"] = L2_matrix.get();
+
+  if(store_non_dirichlet_operators)
+  {
+    all_matrices["L2_matrix_non_dirichlet"] =
+      non_dirichlet_L2_matrix.get();
+  }
+
+  TransientRBThetaExpansion& trans_theta_expansion =
+    libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
+  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
+
+  for(unsigned int q_m=0; q_m<Q_m; q_m++)
+  {
+    std::stringstream matrix_name;
+    matrix_name << "M" << q_m;
+    all_matrices[matrix_name.str()] = get_M_q(q_m);
+
+    if(store_non_dirichlet_operators)
+    {
+      matrix_name << "_non_dirichlet";
+      all_matrices[matrix_name.str()] = get_non_dirichlet_M_q(q_m);
+    }
+  }
 }
 
 void TransientRBConstruction::assemble_L2_matrix(SparseMatrix<Number>* input_matrix, bool apply_dirichlet_bc)

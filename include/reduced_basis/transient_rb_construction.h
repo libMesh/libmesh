@@ -183,6 +183,11 @@ public:
   SparseMatrix<Number>* get_non_dirichlet_M_q(unsigned int q);
 
   /**
+   * Get a map that stores pointers to all of the matrices.
+   */
+  virtual void get_all_matrices(std::map<std::string, SparseMatrix<Number>*>& all_matrices);
+
+  /**
    * Assemble the truth system in the transient linear case.
    */
   virtual void truth_assembly();
@@ -306,7 +311,7 @@ protected:
    * Override assemble_affine_expansion to also initialize
    * RB_ic_proj_rhs_all_N, if necessary.
    */
-  virtual void assemble_affine_expansion();
+  virtual void assemble_affine_expansion(bool skip_matrix_assembly);
 
   /**
    * This function imposes a truth initial condition,
