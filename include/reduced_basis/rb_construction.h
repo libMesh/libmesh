@@ -240,10 +240,13 @@ public:
    * Allocate all the data structures necessary for the construction
    * stage of the RB method. This function also performs
    * matrix and vector assembly of the "truth" affine expansion.
-   * We can optionally skip the matrix assembly step by setting
-   * skip_assembly = false.
+   *
+   * We can optionally skip the matrix or vector assembly steps by setting
+   * skip_matrix_assembly = true, or skip_vector_assembly = true,
+   * respectively.
    */
-  virtual void initialize_rb_construction(bool skip_matrix_assembly=false);
+  virtual void initialize_rb_construction(bool skip_matrix_assembly=false,
+                                          bool skip_vector_assembly=false);
 
   /**
    * Get a pointer to Fq.
@@ -274,6 +277,11 @@ public:
    * Get a map that stores pointers to all of the vectors.
    */
   virtual void get_all_vectors(std::map<std::string, NumericVector<Number>*>& all_vectors);
+
+  /**
+   * Get a map that stores pointers to all of the vectors.
+   */
+  virtual void get_output_vectors(std::map<std::string, NumericVector<Number>*>& all_vectors);
 
   /**
    * Assemble the inner product matrix and store it in input_matrix.
@@ -559,10 +567,11 @@ protected:
 
   /**
    * Assemble the matrices and vectors for this system.
-   * Optionally skip matrix assembly (e.g. we may want to
-   * read the matrices in from disk instead).
+   * Optionally skip matrix or vector assembly (e.g. we may want to
+   * read data in from disk instead).
    */
-  virtual void assemble_affine_expansion(bool skip_matrix_assembly);
+  virtual void assemble_affine_expansion(bool skip_matrix_assembly,
+                                         bool skip_vector_assembly);
 
   /**
    * Assemble the truth matrix and right-hand side

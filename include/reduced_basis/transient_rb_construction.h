@@ -86,7 +86,8 @@ public:
    * Override to check that theta and assembly expansions are consistently
    * sized.
    */
-  virtual void initialize_rb_construction();
+  virtual void initialize_rb_construction(bool skip_matrix_assembly=false,
+                                          bool skip_vector_assembly=false);
 
   /**
    * Perform a truth solve at the current parameter.
@@ -311,7 +312,8 @@ protected:
    * Override assemble_affine_expansion to also initialize
    * RB_ic_proj_rhs_all_N, if necessary.
    */
-  virtual void assemble_affine_expansion(bool skip_matrix_assembly);
+  virtual void assemble_affine_expansion(bool skip_matrix_assembly,
+                                         bool skip_vector_assembly);
 
   /**
    * This function imposes a truth initial condition,

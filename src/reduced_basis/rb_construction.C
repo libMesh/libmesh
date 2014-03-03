@@ -461,7 +461,8 @@ void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number>& vect
   vector.close();
 }
 
-void RBConstruction::initialize_rb_construction(bool skip_matrix_assembly)
+void RBConstruction::initialize_rb_construction(bool skip_matrix_assembly,
+                                                bool skip_vector_assembly)
 {
   // Check that the theta and assembly objects are consistently sized
   libmesh_assert_equal_to (get_rb_theta_expansion().get_n_A_terms(), get_rb_assembly_expansion().get_n_A_terms());
@@ -476,10 +477,11 @@ void RBConstruction::initialize_rb_construction(bool skip_matrix_assembly)
 
   // Perform the initialization
   allocate_data_structures();
-  assemble_affine_expansion(skip_matrix_assembly);
+  assemble_affine_expansion(skip_matrix_assembly, skip_vector_assembly);
 }
 
-void RBConstruction::assemble_affine_expansion(bool skip_matrix_assembly)
+void RBConstruction::assemble_affine_expansion(bool skip_matrix_assembly,
+                                               bool skip_vector_assembly)
 {
   if(!skip_matrix_assembly)
   {
@@ -488,9 +490,12 @@ void RBConstruction::assemble_affine_expansion(bool skip_matrix_assembly)
     this->assemble_all_affine_operators();
   }
 
-  // Assemble and store all of the vectors
-  this->assemble_all_affine_vectors();
-  this->assemble_all_output_vectors();
+  if(!skip_vector_assembly)
+  {
+    // Assemble and store all of the vectors
+    this->assemble_all_affine_vectors();
+    this->assemble_all_output_vectors();
+  }
 }
 
 void RBConstruction::allocate_data_structures()
@@ -2122,6 +2127,8 @@ void RBConstruction::get_all_vectors(std::map<std::string, NumericVector<Number>
 {
   all_vectors.clear();
 
+  get_output_vectors(all_vectors);
+
   for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
   {
     std::stringstream vector_name;
@@ -2134,18 +2141,23 @@ void RBConstruction::get_all_vectors(std::map<std::string, NumericVector<Number>
       all_vectors[vector_name.str()] = get_non_dirichlet_Fq(q_f);
     }
   }
+}
+
+void RBConstruction::get_output_vectors(std::map<std::string, NumericVector<Number>*>& output_vectors)
+{
+  output_vectors.clear();
 
   for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
     for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
     {
       std::stringstream output_name;
       output_name << "output_" << n << "_"<< q_l;
-      all_vectors[output_name.str()] = get_output_vector(n,q_l);
+      output_vectors[output_name.str()] = get_output_vector(n,q_l);
 
       if(store_non_dirichlet_operators)
       {
         output_name << "_non_dirichlet";
-        all_vectors[output_name.str()] = get_non_dirichlet_output_vector(n,q_l);
+        output_vectors[output_name.str()] = get_non_dirichlet_output_vector(n,q_l);
       }
     }
 }

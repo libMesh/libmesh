@@ -125,7 +125,8 @@ void TransientRBConstruction::clear()
   temporal_data.resize(0);
 }
 
-void TransientRBConstruction::initialize_rb_construction()
+void TransientRBConstruction::initialize_rb_construction(bool skip_matrix_assembly,
+                                                         bool skip_vector_assembly)
 {
   // Check that the theta and assembly objects are consistently sized
 #ifndef NDEBUG
@@ -138,7 +139,7 @@ void TransientRBConstruction::initialize_rb_construction()
   // This assert only gets called if DEBUG is on
   libmesh_assert_equal_to (trans_theta_expansion.get_n_M_terms(), trans_assembly_expansion.get_n_M_terms());
 
-  Parent::initialize_rb_construction();
+  Parent::initialize_rb_construction(skip_matrix_assembly, skip_vector_assembly);
 }
 
 void TransientRBConstruction::process_parameters_file (const std::string& parameters_filename)
@@ -277,10 +278,11 @@ void TransientRBConstruction::allocate_data_structures()
   RB_ic_proj_rhs_all_N.resize(Nmax);
 }
 
-void TransientRBConstruction::assemble_affine_expansion(bool skip_matrix_assembly)
+void TransientRBConstruction::assemble_affine_expansion(bool skip_matrix_assembly,
+                                                        bool skip_vector_assembly)
 {
   // Call parent's assembly functions
-  Parent::assemble_affine_expansion(skip_matrix_assembly);
+  Parent::assemble_affine_expansion(skip_matrix_assembly, skip_vector_assembly);
 
   // Now update RB_ic_proj_rhs_all_N if necessary.
   // This allows us to compute the L2 projection
