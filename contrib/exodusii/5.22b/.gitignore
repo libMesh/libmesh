@@ -7,6 +7,9 @@
 exodus/cbind/src/.deps
 exodus/cbind/src/.dirstamp
 exodus/cbind/src/lib*.lo
+exodus/forbind/src/.deps
+exodus/forbind/src/.dirstamp
+exodus/forbind/src/lib*.lo
 
 testcp
 testcp_ln
