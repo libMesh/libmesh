@@ -29,6 +29,7 @@
 #include "libmesh/fe_macro.h"
 #include "libmesh/fe_map.h"
 #include "libmesh/fe_xyz_map.h"
+#include "libmesh/mesh_subdiv_support.h"
 
 namespace libMesh
 {
@@ -317,9 +318,11 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
 void FEMap::compute_single_point_map(const unsigned int dim,
                                      const std::vector<Real>& qw,
                                      const Elem* elem,
-                                     unsigned int p)
+                                     unsigned int p,
+                                     const std::vector<Node*>& elem_nodes)
 {
   libmesh_assert(elem);
+  libmesh_assert_equal_to(phi_map.size(), elem_nodes.size());
 
   switch (dim)
     {
@@ -327,7 +330,8 @@ void FEMap::compute_single_point_map(const unsigned int dim,
       // 0D
     case 0:
       {
-        xyz[p] = elem->point(0);
+        libmesh_assert(elem_nodes[0]);
+        xyz[p] = *elem_nodes[0];
         jac[p] = 1.0;
         JxW[p] = qw[p];
         break;
@@ -349,7 +353,8 @@ void FEMap::compute_single_point_map(const unsigned int dim,
           {
             // Reference to the point, helps eliminate
             // exessive temporaries in the inner loop
-            const Point& elem_point = elem->point(i);
+            libmesh_assert(elem_nodes[i]);
+            const Point& elem_point = *elem_nodes[i];
 
             xyz[p].add_scaled          (elem_point, phi_map[i][p]    );
             dxyzdxi_map[p].add_scaled  (elem_point, dphidxi_map[i][p]);
@@ -430,7 +435,8 @@ void FEMap::compute_single_point_map(const unsigned int dim,
           {
             // Reference to the point, helps eliminate
             // exessive temporaries in the inner loop
-            const Point& elem_point = elem->point(i);
+            libmesh_assert(elem_nodes[i]);
+            const Point& elem_point = *elem_nodes[i];
 
             xyz[p].add_scaled          (elem_point, phi_map[i][p]     );
 
@@ -591,7 +597,8 @@ void FEMap::compute_single_point_map(const unsigned int dim,
           {
             // Reference to the point, helps eliminate
             // exessive temporaries in the inner loop
-            const Point& elem_point = elem->point(i);
+            libmesh_assert(elem_nodes[i]);
+            const Point& elem_point = *elem_nodes[i];
 
             xyz[p].add_scaled           (elem_point, phi_map[i][p]      );
             dxyzdxi_map[p].add_scaled   (elem_point, dphidxi_map[i][p]  );
@@ -727,15 +734,20 @@ void FEMap::compute_affine_map( const unsigned int dim,
   // Resize the vectors to hold data at the quadrature points
   this->resize_quadrature_map_vectors(dim, n_qp);
 
+  // Determine the nodes contributing to element elem
+  std::vector<Node*> elem_nodes(elem->n_nodes(), NULL);
+  for (unsigned int i=0; i<elem->n_nodes(); i++)
+    elem_nodes[i] = elem->get_node(i);
+
   // Compute map at quadrature point 0
-  this->compute_single_point_map(dim, qw, elem, 0);
+  this->compute_single_point_map(dim, qw, elem, 0, elem_nodes);
 
   // Compute xyz at all other quadrature points
   for (unsigned int p=1; p<n_qp; p++)
     {
       xyz[p].zero();
       for (unsigned int i=0; i<phi_map.size(); i++) // sum over the nodes
-        xyz[p].add_scaled        (elem->point(i), phi_map[i][p]    );
+        xyz[p].add_scaled        (*elem_nodes[i], phi_map[i][p]    );
     }
 
   // Copy other map data from quadrature point 0
@@ -801,9 +813,26 @@ void FEMap::compute_map(const unsigned int dim,
   // Resize the vectors to hold data at the quadrature points
   this->resize_quadrature_map_vectors(dim, n_qp);
 
+  // Determine the nodes contributing to element elem
+  std::vector<Node*> elem_nodes;
+  if (elem->type() == TRI3SD)
+  {
+    // Subdivision surface FE require the 1-ring around elem
+    libmesh_assert_equal_to (dim, 2);
+    const Tri3SD* sd_elem = static_cast<const Tri3SD*>(elem);
+    MeshTools::Subdiv::find_one_ring(sd_elem, elem_nodes);
+  }
+  else
+  {
+    // All other FE use only the nodes of elem itself
+    elem_nodes.resize(elem->n_nodes(), NULL);
+    for (unsigned int i=0; i<elem->n_nodes(); i++)
+      elem_nodes[i] = elem->get_node(i);
+  }
+
   // Compute map at all quadrature points
   for (unsigned int p=0; p!=n_qp; p++)
-    this->compute_single_point_map(dim, qw, elem, p);
+    this->compute_single_point_map(dim, qw, elem, p, elem_nodes);
 
   // Stop logging the map computation.
   STOP_LOG("compute_map()", "FEMap");
@@ -1367,5 +1396,8 @@ INSTANTIATE_ALL_MAPS(0);
 INSTANTIATE_ALL_MAPS(1);
 INSTANTIATE_ALL_MAPS(2);
 INSTANTIATE_ALL_MAPS(3);
+
+// subdivision elements are implemented only for 2D meshes
+INSTANTIATE_MAPS(2,SUBDIV);
 
 } // namespace libMesh

@@ -34,6 +34,7 @@ AutoPtr<FETransformationBase<OutputShape> > FETransformationBase<OutputShape>::b
     case SZABAB:
     case CLOUGH: /* PB: Really H2 */
     case HERMITE: /* PB: Really H2 */
+    case SUBDIV:
     case LAGRANGE_VEC:
     case MONOMIAL: /* PB: Shouldn't this be L2 conforming? */
     case XYZ: /* PB: Shouldn't this be L2 conforming? */

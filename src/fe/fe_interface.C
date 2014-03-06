@@ -64,6 +64,9 @@ FEInterface::FEInterface()
         prefix FE<dim,SZABAB>::func_and_args suffix             \
       case XYZ:                                                 \
         prefix FEXYZ<dim>::func_and_args suffix                 \
+      case SUBDIV:                                              \
+        libmesh_assert_equal_to (dim, 2);                       \
+        prefix FE<2,SUBDIV>::func_and_args suffix               \
       default:                                                  \
         libmesh_error();                                        \
       }                                                         \
@@ -97,6 +100,9 @@ FEInterface::FEInterface()
         prefix FE<dim,SZABAB>::func_and_args suffix                     \
       case XYZ:                                                         \
         prefix FEXYZ<dim>::func_and_args suffix                         \
+      case SUBDIV:                                                      \
+        libmesh_assert_equal_to (dim, 2);                               \
+        prefix FE<2,SUBDIV>::func_and_args suffix                       \
       case NEDELEC_ONE:                                                 \
         prefix FENedelecOne<dim>::func_and_args suffix                  \
       default:                                                          \
@@ -130,6 +136,9 @@ FEInterface::FEInterface()
         prefix FE<dim,SZABAB>::func_and_args suffix                     \
       case XYZ:                                                         \
         prefix FEXYZ<dim>::func_and_args suffix                         \
+      case SUBDIV:                                                      \
+        libmesh_assert_equal_to (dim, 2);                               \
+        prefix FE<2,SUBDIV>::func_and_args suffix                       \
       case LAGRANGE_VEC:                                                \
       case NEDELEC_ONE:                                                 \
         libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args" \
@@ -159,6 +168,7 @@ FEInterface::FEInterface()
       case BERNSTEIN:                                                   \
       case SZABAB:                                                      \
       case XYZ:                                                         \
+      case SUBDIV:                                                      \
         libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::shape" \
                      << std::endl;                                      \
         libmesh_error();                                                \
@@ -190,6 +200,9 @@ FEInterface::FEInterface()
         prefix FE<dim,SCALAR>::func_and_args suffix             \
       case XYZ:                                                 \
         prefix FEXYZ<dim>::func_and_args suffix                 \
+      case SUBDIV:                                              \
+        libmesh_assert_equal_to (dim, 2);                       \
+        prefix FE<2,SUBDIV>::func_and_args suffix               \
       default:                                                  \
         libmesh_error();                                        \
       }                                                         \
@@ -219,6 +232,9 @@ FEInterface::FEInterface()
         prefix FE<dim,SCALAR>::func_and_args suffix                     \
       case XYZ:                                                         \
         prefix FEXYZ<dim>::func_and_args suffix                         \
+      case SUBDIV:                                                      \
+        libmesh_assert_equal_to (dim, 2);                               \
+        prefix FE<2,SUBDIV>::func_and_args suffix                       \
       case NEDELEC_ONE:                                                 \
         prefix FENedelecOne<dim>::func_and_args suffix                  \
       default:                                                          \
@@ -248,6 +264,9 @@ FEInterface::FEInterface()
         prefix  FE<dim,SCALAR>::func_and_args suffix                    \
       case XYZ:                                                         \
         prefix  FEXYZ<dim>::func_and_args suffix                        \
+      case SUBDIV:                                                      \
+        libmesh_assert_equal_to (dim, 2);                               \
+        prefix  FE<2,SUBDIV>::func_and_args suffix                      \
       case LAGRANGE_VEC:                                                \
       case NEDELEC_ONE:                                                 \
         libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args" \
@@ -275,6 +294,7 @@ FEInterface::FEInterface()
       case MONOMIAL:                                                    \
       case SCALAR:                                                      \
       case XYZ:                                                         \
+      case SUBDIV:                                                      \
         libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::func_and_args" \
                      << std::endl;                                      \
         libmesh_error();                                                \
@@ -1304,6 +1324,15 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
           return unknown;
         }
       break;
+    case SUBDIV:
+      switch (el_t)
+        {
+        case TRI3SD:
+          return unlimited;
+        default:
+          return unknown;
+        }
+      break;
     case NEDELEC_ONE:
       switch (el_t)
         {
@@ -1334,6 +1363,7 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
     case MONOMIAL:
     case L2_HIERARCHIC:
     case XYZ:
+    case SUBDIV:
     case LAGRANGE_VEC:
     case NEDELEC_ONE:
       return false;

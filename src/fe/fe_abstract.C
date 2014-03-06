@@ -304,6 +304,12 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
               return ap;
             }
 
+          case SUBDIV:
+            {
+              AutoPtr<FEAbstract> ap(new FESubdiv(fet));
+              return ap;
+            }
+
           default:
             libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
             libmesh_error();

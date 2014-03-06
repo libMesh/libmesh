@@ -26,6 +26,7 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/auto_ptr.h"
+#include "libmesh/node.h"
 
 namespace libMesh
 {
@@ -49,11 +50,15 @@ public:
   /**
    * Compute the jacobian and some other additional
    * data fields at the single point with index p.
+   * Takes the integration weights as input, along
+   * with a pointer to the element and a list of
+   * points that contribute to the element.
    */
   void compute_single_point_map(const unsigned int dim,
                                 const std::vector<Real>& qw,
                                 const Elem* elem,
-                                unsigned int p);
+                                unsigned int p,
+                                const std::vector<Node*>& elem_nodes);
 
   /**
    * Compute the jacobian and some other additional

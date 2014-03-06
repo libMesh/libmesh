@@ -554,5 +554,8 @@ INSTANTIATE_FE(2);
 
 INSTANTIATE_FE(3);
 
+// subdivision elements are implemented only for 2D meshes
+template class FE<2,SUBDIV>;
+
 
 } // namespace libMesh

@@ -960,6 +960,7 @@ template void FE<2,SZABAB>::reinit(Elem const*, unsigned int, Real, const std::v
 template void FE<2,SZABAB>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
 template void FE<2,SZABAB>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 #endif
+template void FE<2,SUBDIV>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<2,XYZ>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<2,XYZ>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
 template void FE<2,XYZ>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);

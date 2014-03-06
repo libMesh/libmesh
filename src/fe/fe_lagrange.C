@@ -349,6 +349,7 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
             return 2;
 
           case TRI3:
+          case TRI3SD:
           case TRI6:
             return 3;
 
@@ -485,6 +486,7 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
             }
 
           case TRI3:
+          case TRI3SD:
           case TRI6:
             {
               switch (n)

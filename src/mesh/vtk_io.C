@@ -96,6 +96,7 @@ vtkIdType VTKIO::get_elem_type(ElemType type)
       celltype = VTK_QUADRATIC_EDGE;
       break;// 1
     case TRI3:
+    case TRI3SD:
       celltype = VTK_TRIANGLE;
       break;// 3
     case TRI6:

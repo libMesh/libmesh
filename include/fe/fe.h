@@ -165,7 +165,7 @@ public:
    * j = 5 ==> d^2 phi / dzeta^2
    *
    * Note:  Computing second derivatives is not currently supported
-   * for all element types: C1 (Clough and Hermite), Lagrange,
+   * for all element types: C1 (Clough, Hermite and Subdivision), Lagrange,
    * Hierarchic, L2_Hierarchic, and Monomial are supported.
    * All other element types return an error when asked for second derivatives.
    *
@@ -189,7 +189,7 @@ public:
    * j = 5 ==> d^2 phi / dzeta^2
    *
    * Note:  Computing second derivatives is not currently supported
-   * for all element types: C1 (Clough and Hermite), Lagrange,
+   * for all element types: C1 (Clough, Hermite and Subdivision), Lagrange,
    * Hierarchic, L2_Hierarchic, and Monomial are supported.
    * All other element types return an error when asked for second derivatives.
    *
@@ -538,6 +538,145 @@ public:
                                       const Real xi);
   static Real hermite_raw_shape(const unsigned int basis_num,
                                 const Real xi);
+};
+
+/**
+ * Subdivision finite elements.
+ */
+
+//-------------------------------------------------------------
+// FESubdiv class definition
+
+
+// template specialization prototypes, needed for being able to
+// call them from inside FESubdiv::init_shape_functions
+
+template <>
+Real FE<2,SUBDIV>::shape(const Elem* elem,
+			  const Order order,
+			  const unsigned int i,
+			  const Point& p);
+
+template <>
+Real FE<2,SUBDIV>::shape_deriv(const Elem* elem,
+			  const Order order,
+			  const unsigned int i,
+			  const unsigned int j,
+			  const Point& p);
+
+template <>
+Real FE<2,SUBDIV>::shape_second_deriv(const Elem* elem,
+			  const Order order,
+			  const unsigned int i,
+			  const unsigned int j,
+			  const Point& p);
+
+
+class FESubdiv : public FE<2,SUBDIV>
+{
+public:
+
+  /**
+   * Constructor. Creates a subdivision surface finite element.
+   * Currently only supported for two-dimensional meshes in
+   * three-dimensional space.
+   */
+  FESubdiv(const FEType& fet);
+
+  /**
+   * This is at the core of this class. Use this for each new
+	 * non-ghosted element in the mesh.  Reinitializes all the physical
+   * element-dependent data based on the current element
+   * \p elem.  By default the shape functions and associated
+   * data are computed at the quadrature points specified
+   * by the quadrature rule \p qrule, but may be any points
+   * specified on the reference element specified in the optional
+   * argument \p pts.
+   */
+  virtual void reinit (const Elem* elem,
+		       const std::vector<Point>* const pts = NULL,
+                       const std::vector<Real>* const weights = NULL);
+
+  /**
+   * This prevents some compilers being confused by partially
+   * overriding this virtual function.
+   */
+  virtual void reinit (const Elem*,
+		       const unsigned int,
+		       const Real = TOLERANCE,
+                       const std::vector<Point>* const = NULL,
+                       const std::vector<Real>* const = NULL)
+  { libmesh_error(); }
+
+  /**
+   * Provides the class with the quadrature rule, which provides the
+   * locations (on a reference element) where the shape functions are
+   * to be calculated.
+   */
+  virtual void attach_quadrature_rule (QBase* q);
+
+  /**
+   * Update the various member data fields \p phi,
+   * \p dphidxi, \p dphideta, \p dphidzeta, etc.
+   * for the current element.  These data will be computed
+   * at the points \p qp, which are generally (but need not be)
+   * the quadrature points.
+   */
+  virtual void init_shape_functions(const std::vector<Point>& qp,
+				    const Elem* elem);
+
+  /**
+   * @returns the value of the \f$ i^{th} \f$ of the 12 quartic
+   * box splines interpolating a regular Loop subdivision
+   * element, evaluated at the barycentric coordinates \p v,
+   * \p w.
+   */
+  static Real regular_shape(const unsigned int i,
+			  const Real v,
+			  const Real w);
+
+  /**
+   * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th}
+   * \f$ of the 12 quartic box splines interpolating a regular
+   * Loop subdivision element, evaluated at the barycentric
+   * coordinates \p v, \p w.
+   */
+  static Real regular_shape_deriv(const unsigned int i,
+			  const unsigned int j,
+			  const Real v,
+			  const Real w);
+
+  /**
+   * @returns the second \f$ j^{th} \f$ derivative of the
+   * \f$ i^{th} \f$ of the 12 quartic box splines interpolating
+   * a regular Loop subdivision element, evaluated at the
+   * barycentric coordinates \p v, \p w.
+   */
+  static Real regular_shape_second_deriv(const unsigned int i,
+			  const unsigned int j,
+			  const Real v,
+			  const Real w);
+
+
+  /**
+   * Fills the vector \p weights with the weight coefficients
+   * of the Loop subdivision mask for evaluating the limit surface
+   * at a node explicitly. The size of \p weights will be
+   * 1 + \p valence, where \p valence is the number of neighbor
+   * nodes of the node where the limit surface is to be
+   * evaluated. The weight for the node itself is the first
+   * element of \p weights.
+   */
+  static void loop_subdiv_mask(std::vector<Real> & weights,
+			  const unsigned int valence);
+
+
+  /**
+   * Builds the subdivision matrix \p A for the Loop scheme. The
+   * size depends on the element's \p valence.
+   */
+  static void init_subdiv_matrix(DenseMatrix<Real> &A,
+			  unsigned int valence);
 };
 
 

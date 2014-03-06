@@ -419,6 +419,13 @@ FEGenericBase<Real>::build (const unsigned int dim,
               AutoPtr<FEBase> ap(new FEScalar<2>(fet));
               return ap;
             }
+
+          case SUBDIV:
+            {
+              AutoPtr<FEBase> ap(new FESubdiv(fet));
+              return ap;
+            }
+
           default:
             libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
             libmesh_error();

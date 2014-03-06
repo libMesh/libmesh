@@ -218,7 +218,26 @@ public:
 
 #endif // #ifdef LIBMESH_HAVE_MPI
 
+  /**
+   * @returns the number of nodes connected with this node.
+   * Currently, this value is invalid (zero) except for
+   * subdivision meshes.
+   */
+  unsigned int valence() const { return _valence; }
+
+  /**
+   * Sets the number of nodes connected with this node.
+   */
+  void set_valence(unsigned int val) { _valence = val; }
+
 private:
+
+  /**
+   * The number of nodes connected with this node.
+   * Currently, this value is invalid (zero) except for
+   * subdivision meshes.
+   */
+  unsigned int _valence;
 
   /**
    * This class need access to the node key information,
@@ -249,7 +268,8 @@ Node::Node (const Real x,
             const Real y,
             const Real z,
             const dof_id_type dofid) :
-  Point(x,y,z)
+  Point(x,y,z),
+  _valence(0)
 {
   this->set_id() = dofid;
 }
@@ -260,7 +280,8 @@ inline
 Node::Node (const Node& n) :
   Point(n),
   DofObject(n),
-  ReferenceCountedObject<Node>()
+  ReferenceCountedObject<Node>(),
+  _valence(n.valence())
 {
 }
 

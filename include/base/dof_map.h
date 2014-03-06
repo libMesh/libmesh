@@ -1064,7 +1064,9 @@ private:
    * @param tot_size In DEBUG mode this will add up the total number of
    * dof indices that should have been added to di.
    */
-  void _dof_indices (const Elem* const elem, std::vector<dof_id_type>& di, const unsigned int v
+  void _dof_indices (const Elem* const elem, std::vector<dof_id_type>& di,
+					 const unsigned int v,
+					 const std::vector<Node*>& elem_nodes
 #ifdef DEBUG
                      ,unsigned int & tot_size
 #endif
