@@ -136,7 +136,7 @@ include_HEADERS =  \
         geom/face_quad9.h \
         geom/face_tri.h \
         geom/face_tri3.h \
-        geom/face_tri3_sd.h \
+        geom/face_tri3_subdivision.h \
         geom/face_tri6.h \
         geom/node.h \
         geom/node_elem.h \
@@ -179,7 +179,7 @@ include_HEADERS =  \
         mesh/mesh_smoother.h \
         mesh/mesh_smoother_laplace.h \
         mesh/mesh_smoother_vsmoother.h \
-        mesh/mesh_subdiv_support.h \
+        mesh/mesh_subdivision_support.h \
         mesh/mesh_tetgen_interface.h \
         mesh/mesh_tetgen_wrapper.h \
         mesh/mesh_tools.h \

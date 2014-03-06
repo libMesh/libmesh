@@ -36,6 +36,19 @@
   template void  FE<_dim,_type>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool); \
   template Point FE<_dim,_type>::inverse_map(const Elem*,const Point&,Real,bool)
 
+#define INSTANTIATE_SUBDIVISION_MAPS                                    \
+  template Point FE<2,SUBDIVISION>::map(const Elem*,const Point&);      \
+  template Point FE<2,SUBDIVISION>::map_xi(const Elem*,const Point&);   \
+  template Point FE<2,SUBDIVISION>::map_eta(const Elem*,const Point&);  \
+  template Point FE<2,SUBDIVISION>::map_zeta(const Elem*,const Point&)
+
+#define INSTANTIATE_SUBDIVISION_FE                                      \
+  template unsigned int FE<2,SUBDIVISION>::n_shape_functions () const;  \
+  template void         FE<2,SUBDIVISION>::attach_quadrature_rule (QBase*); \
+  template unsigned int FE<2,SUBDIVISION>::n_quadrature_points () const; \
+  template void         FE<2,SUBDIVISION>::reinit(const Elem*,const std::vector<Point>* const,const std::vector<Real>* const); \
+  template void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point>&, const Elem*)
+
 
 #ifndef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 

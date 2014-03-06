@@ -1065,8 +1065,8 @@ private:
    * dof indices that should have been added to di.
    */
   void _dof_indices (const Elem* const elem, std::vector<dof_id_type>& di,
-					 const unsigned int v,
-					 const std::vector<Node*>& elem_nodes
+                     const unsigned int v,
+                     const std::vector<Node*>& elem_nodes
 #ifdef DEBUG
                      ,unsigned int & tot_size
 #endif

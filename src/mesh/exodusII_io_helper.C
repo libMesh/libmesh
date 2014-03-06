@@ -1928,19 +1928,19 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
         return conv;
       }
 
-    case TRI3SD:
+    case TRI3SUBDIVISION:
       {
-	const Conversion conv(tri3_node_map,
-			      ARRAY_LENGTH(tri3_node_map),
-			      tri3_node_map, // inverse node map same as forward node map
-			      ARRAY_LENGTH(tri3_node_map),
-			      tri_edge_map,
-			      ARRAY_LENGTH(tri_edge_map),
-			      tri_inverse_edge_map,
-			      ARRAY_LENGTH(tri_inverse_edge_map),
-			      TRI3SD,
-			      "TRI3");
-	return conv;
+        const Conversion conv(tri3_node_map,
+                              ARRAY_LENGTH(tri3_node_map),
+                              tri3_node_map, // inverse node map same as forward node map
+                              ARRAY_LENGTH(tri3_node_map),
+                              tri_edge_map,
+                              ARRAY_LENGTH(tri_edge_map),
+                              tri_inverse_edge_map,
+                              ARRAY_LENGTH(tri_inverse_edge_map),
+                              TRI3SUBDIVISION,
+                              "TRI3");
+        return conv;
       }
 
     case TRI6:

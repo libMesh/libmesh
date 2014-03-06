@@ -53,7 +53,7 @@ enum FEFamily {LAGRANGE     = 0,
                // C1 elements
                CLOUGH       = 21,
                HERMITE      = 22,
-               SUBDIV       = 23,
+               SUBDIVISION  = 23,
 
                // A scalar variable that couples to
                // all other DOFs in the system

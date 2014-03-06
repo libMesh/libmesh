@@ -27,51 +27,51 @@ namespace libMesh {
 /**
  * Defines an \p enum for geometric element types.
  */
-enum ElemType {EDGE2=0,    // 0
-               EDGE3,      // 1
-               EDGE4,      // 2
+enum ElemType {EDGE2=0,         // 0
+               EDGE3,           // 1
+               EDGE4,           // 2
 
-               TRI3,       // 3
-               TRI6,       // 4
+               TRI3,            // 3
+               TRI6,            // 4
 
-               QUAD4,      // 5
-               QUAD8,      // 6
-               QUAD9,      // 7
+               QUAD4,           // 5
+               QUAD8,           // 6
+               QUAD9,           // 7
 
-               TET4,       // 8
-               TET10,      // 9
+               TET4,            // 8
+               TET10,           // 9
 
-               HEX8,       // 10
-               HEX20,      // 11
-               HEX27,      // 12
+               HEX8,            // 10
+               HEX20,           // 11
+               HEX27,           // 12
 
-               PRISM6,     // 13
-               PRISM15,    // 14
-               PRISM18,    // 15
+               PRISM6,          // 13
+               PRISM15,         // 14
+               PRISM18,         // 15
 
-               PYRAMID5,   // 16
-               PYRAMID13,  // 17
-               PYRAMID14,  // 18
+               PYRAMID5,        // 16
+               PYRAMID13,       // 17
+               PYRAMID14,       // 18
 
-               INFEDGE2,   // 19
+               INFEDGE2,        // 19
 
-               INFQUAD4,   // 20
-               INFQUAD6,   // 21
+               INFQUAD4,        // 20
+               INFQUAD6,        // 21
 
-               INFHEX8,    // 22
-               INFHEX16,   // 23
-               INFHEX18,   // 24
+               INFHEX8,         // 22
+               INFHEX16,        // 23
+               INFHEX18,        // 24
 
-               INFPRISM6,  // 25
-               INFPRISM12, // 26
+               INFPRISM6,       // 25
+               INFPRISM12,      // 26
 
-               NODEELEM,   // 27
+               NODEELEM,        // 27
 
-               REMOTEELEM, // 28
+               REMOTEELEM,      // 28
 
-               TRI3SD,     // 29
+               TRI3SUBDIVISION, // 29
 
-               INVALID_ELEM};  // 30 - should always be last
+               INVALID_ELEM};   // 30 - should always be last
 }
 
 #endif // LIBMESH_ENUM_ELEM_TYPE_H

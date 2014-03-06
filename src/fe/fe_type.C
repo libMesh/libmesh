@@ -46,7 +46,7 @@ FEType::default_quadrature_rule (const unsigned int dim,
                                (this->default_quadrature_order()), seven + extraorder))));
     }
 
-  if (family == SUBDIV)
+  if (family == SUBDIVISION)
     return AutoPtr<QBase>
       (new QGauss(dim, static_cast<Order>(1 + extraorder)));
 

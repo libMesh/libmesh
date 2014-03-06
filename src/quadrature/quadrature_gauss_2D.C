@@ -67,7 +67,7 @@ void QGauss::init_2D(const ElemType type_in,
       //---------------------------------------------
       // Triangle quadrature rules
     case TRI3:
-    case TRI3SD:
+    case TRI3SUBDIVISION:
     case TRI6:
       {
         switch(_order + 2*p)

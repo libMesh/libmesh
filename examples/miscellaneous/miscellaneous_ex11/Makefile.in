@@ -51,16 +51,17 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
+@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = square_mesh.off .linkstamp
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/examples/Make.common
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5)
-@LIBMESH_DBG_MODE_TRUE@am__append_1 = example-dbg
-@LIBMESH_DEVEL_MODE_TRUE@am__append_2 = example-devel
-@LIBMESH_OPT_MODE_TRUE@am__append_3 = example-opt
-@LIBMESH_PROF_MODE_TRUE@am__append_4 = example-prof
-@LIBMESH_OPROF_MODE_TRUE@am__append_5 = example-oprof
+@LIBMESH_DBG_MODE_TRUE@am__append_2 = example-dbg
+@LIBMESH_DEVEL_MODE_TRUE@am__append_3 = example-devel
+@LIBMESH_OPT_MODE_TRUE@am__append_4 = example-opt
+@LIBMESH_PROF_MODE_TRUE@am__append_5 = example-prof
+@LIBMESH_OPROF_MODE_TRUE@am__append_6 = example-oprof
 subdir = examples/miscellaneous/miscellaneous_ex11
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -110,7 +111,8 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_OPT_MODE_TRUE@am__EXEEXT_3 = example-opt$(EXEEXT)
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = example-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = example-oprof$(EXEEXT)
-am__example_dbg_SOURCES_DIST = miscellaneous_ex11.C run.sh
+am__example_dbg_SOURCES_DIST = miscellaneous_ex11.C run.sh \
+	square_mesh.off
 am__objects_1 = example_dbg-miscellaneous_ex11.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
 @LIBMESH_DBG_MODE_TRUE@am_example_dbg_OBJECTS = $(am__objects_2)
@@ -124,7 +126,8 @@ am__v_lt_1 =
 example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_dbg_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-am__example_devel_SOURCES_DIST = miscellaneous_ex11.C run.sh
+am__example_devel_SOURCES_DIST = miscellaneous_ex11.C run.sh \
+	square_mesh.off
 am__objects_3 = example_devel-miscellaneous_ex11.$(OBJEXT)
 am__objects_4 = $(am__objects_3)
 @LIBMESH_DEVEL_MODE_TRUE@am_example_devel_OBJECTS = $(am__objects_4)
@@ -135,7 +138,8 @@ example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(example_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-am__example_oprof_SOURCES_DIST = miscellaneous_ex11.C run.sh
+am__example_oprof_SOURCES_DIST = miscellaneous_ex11.C run.sh \
+	square_mesh.off
 am__objects_5 = example_oprof-miscellaneous_ex11.$(OBJEXT)
 am__objects_6 = $(am__objects_5)
 @LIBMESH_OPROF_MODE_TRUE@am_example_oprof_OBJECTS = $(am__objects_6)
@@ -146,7 +150,8 @@ example_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(example_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-am__example_opt_SOURCES_DIST = miscellaneous_ex11.C run.sh
+am__example_opt_SOURCES_DIST = miscellaneous_ex11.C run.sh \
+	square_mesh.off
 am__objects_7 = example_opt-miscellaneous_ex11.$(OBJEXT)
 am__objects_8 = $(am__objects_7)
 @LIBMESH_OPT_MODE_TRUE@am_example_opt_OBJECTS = $(am__objects_8)
@@ -156,7 +161,8 @@ example_opt_OBJECTS = $(am_example_opt_OBJECTS)
 example_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_opt_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-am__example_prof_SOURCES_DIST = miscellaneous_ex11.C run.sh
+am__example_prof_SOURCES_DIST = miscellaneous_ex11.C run.sh \
+	square_mesh.off
 am__objects_9 = example_prof-miscellaneous_ex11.$(OBJEXT)
 am__objects_10 = $(am__objects_9)
 @LIBMESH_PROF_MODE_TRUE@am_example_prof_OBJECTS = $(am__objects_10)
@@ -556,7 +562,7 @@ vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 example_name = miscellaneous_ex11
 install_dir = $(examples_install_path)/miscellaneous/ex11
-data = miscellaneous_ex11.C run.sh
+data = miscellaneous_ex11.C run.sh square_mesh.off
 sources = $(data) run.sh
 check_SCRIPTS = run.sh
 
@@ -565,7 +571,11 @@ check_SCRIPTS = run.sh
 # how to make documentation
 #
 CLEANFILES = without_ghosts.pvtu without_ghosts.e with_ghosts.pvtu \
-	with_ghosts.e out.pvtu out.e $(example_name).php stdout.log
+	with_ghosts.e out.pvtu out.e $(am__append_1) \
+	$(example_name).php stdout.log
+
+# also need to link files for VPATH builds
+@LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
 
 ######################################################################
 #
@@ -625,7 +635,8 @@ data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile
 #
 TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir) METHODS="$(METHODS)"
 TESTS = $(check_SCRIPTS)
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .C .lo .o .obj
@@ -1010,13 +1021,15 @@ distdir: $(DISTFILES)
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS) $(check_SCRIPTS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(DATA)
 installdirs:
 	for dir in "$(DESTDIR)$(datadir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -1047,6 +1060,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
@@ -1116,7 +1130,7 @@ ps-am:
 
 uninstall-am: uninstall-dataDATA
 
-.MAKE: check-am install-am install-strip
+.MAKE: all check check-am install install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-TESTS check-am clean \
 	clean-checkPROGRAMS clean-generic clean-libtool cscopelist \
@@ -1132,6 +1146,9 @@ uninstall-am: uninstall-dataDATA
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-dataDATA
 
+@LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f square_mesh.off && $(LN_S) $(srcdir)/square_mesh.off .
+@LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)

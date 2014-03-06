@@ -42,7 +42,7 @@
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/threads.h"
-#include "libmesh/mesh_subdiv_support.h"
+#include "libmesh/mesh_subdivision_support.h"
 
 
 
@@ -1746,20 +1746,20 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 void DofMap::dof_indices (const Elem* const elem,
                           std::vector<dof_id_type>& di) const
 {
-  START_LOG("dof_indices()", "DofMap");
-
   libmesh_assert(elem);
 
   // Clear the DOF indices vector
   di.clear();
 
   // Ghost subdivision elements have no real dofs
-  if (elem->type() == TRI3SD)
-  {
-    const Tri3SD* sd_elem = static_cast<const Tri3SD*>(elem);
-    if (sd_elem->is_ghost())
-      return;
-  }
+  if (elem->type() == TRI3SUBDIVISION)
+    {
+      const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
+      if (sd_elem->is_ghost())
+        return;
+    }
+
+  START_LOG("dof_indices()", "DofMap");
 
   const unsigned int n_vars  = this->n_variables();
 
@@ -1775,19 +1775,19 @@ void DofMap::dof_indices (const Elem* const elem,
 
   // Determine the nodes contributing to element elem
   std::vector<Node*> elem_nodes;
-  if (elem->type() == TRI3SD)
-  {
-    // Subdivision surface FE require the 1-ring around elem
-    const Tri3SD* sd_elem = static_cast<const Tri3SD*>(elem);
-    MeshTools::Subdiv::find_one_ring(sd_elem, elem_nodes);
-  }
+  if (elem->type() == TRI3SUBDIVISION)
+    {
+      // Subdivision surface FE require the 1-ring around elem
+      const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
+      MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
+    }
   else
-  {
-    // All other FE use only the nodes of elem itself
-    elem_nodes.resize(elem->n_nodes(), NULL);
-    for (unsigned int i=0; i<elem->n_nodes(); i++)
-      elem_nodes[i] = elem->get_node(i);
-  }
+    {
+      // All other FE use only the nodes of elem itself
+      elem_nodes.resize(elem->n_nodes(), NULL);
+      for (unsigned int i=0; i<elem->n_nodes(); i++)
+        elem_nodes[i] = elem->get_node(i);
+    }
 
   // Get the dof numbers
   for (unsigned int v=0; v<n_vars; v++)
@@ -1833,20 +1833,20 @@ void DofMap::dof_indices (const Elem* const elem,
                           std::vector<dof_id_type>& di,
                           const unsigned int vn) const
 {
-  START_LOG("dof_indices()", "DofMap");
-
   libmesh_assert(elem);
 
   // Clear the DOF indices vector
   di.clear();
 
   // Ghost subdivision elements have no real dofs
-  if (elem->type() == TRI3SD)
-  {
-    const Tri3SD* sd_elem = static_cast<const Tri3SD*>(elem);
-    if (sd_elem->is_ghost())
-      return;
-  }
+  if (elem->type() == TRI3SUBDIVISION)
+    {
+      const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
+      if (sd_elem->is_ghost())
+        return;
+    }
+
+  START_LOG("dof_indices()", "DofMap");
 
 #ifdef DEBUG
   // Check that sizes match in DEBUG mode
@@ -1860,19 +1860,19 @@ void DofMap::dof_indices (const Elem* const elem,
 
   // Determine the nodes contributing to element elem
   std::vector<Node*> elem_nodes;
-  if (elem->type() == TRI3SD)
-  {
-    // Subdivision surface FE require the 1-ring around elem
-    const Tri3SD* sd_elem = static_cast<const Tri3SD*>(elem);
-    MeshTools::Subdiv::find_one_ring(sd_elem, elem_nodes);
-  }
+  if (elem->type() == TRI3SUBDIVISION)
+    {
+      // Subdivision surface FE require the 1-ring around elem
+      const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
+      MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
+    }
   else
-  {
-    // All other FE use only the nodes of elem itself
-    elem_nodes.resize(elem->n_nodes(), NULL);
-    for (unsigned int i=0; i<elem->n_nodes(); i++)
-      elem_nodes[i] = elem->get_node(i);
-  }
+    {
+      // All other FE use only the nodes of elem itself
+      elem_nodes.resize(elem->n_nodes(), NULL);
+      for (unsigned int i=0; i<elem->n_nodes(); i++)
+        elem_nodes[i] = elem->get_node(i);
+    }
 
   // Get the dof numbers
   if(this->variable(vn).type().family == SCALAR)
@@ -1936,7 +1936,7 @@ void DofMap::_dof_indices (const Elem* const elem,
 
 #ifdef DEBUG
       // The number of dofs per element is non-static for subdivision FE
-      if (this->variable(v).type().family == SUBDIV)
+      if (this->variable(v).type().family == SUBDIVISION)
         tot_size += elem_nodes.size();
       else
         tot_size += FEInterface::n_dofs(dim,fe_type,type);
@@ -2014,7 +2014,7 @@ void DofMap::_dof_indices (const Elem* const elem,
             }
           else
             {
-              libmesh_assert(!elem->active() || fe_type.family == LAGRANGE || fe_type.family == SUBDIV);
+              libmesh_assert(!elem->active() || fe_type.family == LAGRANGE || fe_type.family == SUBDIVISION);
               di.resize(di.size() + nc, DofObject::invalid_id);
             }
         }
@@ -2136,19 +2136,19 @@ void DofMap::old_dof_indices (const Elem* const elem,
 
   // Determine the nodes contributing to element elem
   std::vector<Node*> elem_nodes;
-  if (elem->type() == TRI3SD)
-  {
-    // Subdivision surface FE require the 1-ring around elem
-    const Tri3SD* sd_elem = static_cast<const Tri3SD*>(elem);
-    MeshTools::Subdiv::find_one_ring(sd_elem, elem_nodes);
-  }
+  if (elem->type() == TRI3SUBDIVISION)
+    {
+      // Subdivision surface FE require the 1-ring around elem
+      const Tri3Subdivision* sd_elem = static_cast<const Tri3Subdivision*>(elem);
+      MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
+    }
   else
-  {
-    // All other FE use only the nodes of elem itself
-    elem_nodes.resize(elem->n_nodes(), NULL);
-    for (unsigned int i=0; i<elem->n_nodes(); i++)
-      elem_nodes[i] = elem->get_node(i);
-  }
+    {
+      // All other FE use only the nodes of elem itself
+      elem_nodes.resize(elem->n_nodes(), NULL);
+      for (unsigned int i=0; i<elem->n_nodes(); i++)
+        elem_nodes[i] = elem->get_node(i);
+    }
 
   // Get the dof numbers
   for (unsigned int v=0; v<n_vars; v++)
