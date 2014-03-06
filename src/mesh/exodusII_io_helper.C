@@ -1003,69 +1003,7 @@ void ExodusII_IO_Helper::create(std::string filename)
 
 
 
-
-void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const MeshBase & mesh)
-{
-  if ((_run_only_on_proc0) && (this->processor_id() != 0))
-    return;
-
-  if (_use_mesh_dimension_instead_of_spatial_dimension)
-    num_dim = mesh.mesh_dimension();
-  else
-    num_dim = mesh.spatial_dimension();
-
-  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  for (; it!=end; ++it)
-    num_nodes += (*it)->n_nodes();
-
-  num_elem = mesh.n_elem();
-
-  std::vector<boundary_id_type> unique_side_boundaries;
-  std::vector<boundary_id_type> unique_node_boundaries;
-
-  mesh.boundary_info->build_side_boundary_ids(unique_side_boundaries);
-  mesh.boundary_info->build_node_boundary_ids(unique_node_boundaries);
-
-  num_side_sets = unique_side_boundaries.size();
-  num_node_sets = unique_node_boundaries.size();
-
-  //loop through element and map between block and element vector
-  std::map<subdomain_id_type, std::vector<unsigned int>  > subdomain_map;
-
-  for (it=mesh.active_elements_begin(); it!=end; ++it)
-    {
-      const Elem * elem = *it;
-      subdomain_id_type cur_subdomain = elem->subdomain_id();
-
-      subdomain_map[cur_subdomain].push_back(elem->id());
-    }
-  num_elem_blk = subdomain_map.size();
-
-  if (str_title.size() > MAX_LINE_LENGTH)
-    {
-      libMesh::err << "Warning, Exodus files cannot have titles longer than "
-                   << MAX_LINE_LENGTH
-                   << " characters.  Your title will be truncated."
-                   << std::endl;
-      str_title.resize(MAX_LINE_LENGTH);
-    }
-
-  ex_err = exII::ex_put_init(ex_id,
-                             str_title.c_str(),
-                             num_dim,
-                             num_nodes,
-                             num_elem,
-                             num_elem_blk,
-                             num_node_sets,
-                             num_side_sets);
-
-  EX_CHECK_ERR(ex_err, "Error initializing new Exodus file.");
-}
-
-
-
-void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh)
+void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh, bool use_discontinuous)
 {
   // n_active_elem() is a parallel_only function
   unsigned int n_active_elem = mesh.n_active_elem();
@@ -1078,8 +1016,19 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   else
     num_dim = mesh.spatial_dimension();
 
-  num_nodes = mesh.n_nodes();
   num_elem = mesh.n_elem();
+
+  if(!use_discontinuous)
+  {
+    num_nodes = mesh.n_nodes();
+  }
+  else
+  {
+    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::const_element_iterator end = mesh.active_elements_end();
+    for (; it!=end; ++it)
+      num_nodes += (*it)->n_nodes();
+  }
 
   std::vector<boundary_id_type> unique_side_boundaries;
   std::vector<boundary_id_type> unique_node_boundaries;
@@ -1127,7 +1076,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 
 
 
-void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
+void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use_discontinuous)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
@@ -1145,6 +1094,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
   // map just to be on the safe side.
   node_num_map.resize(num_nodes);
 
+  if(!use_discontinuous)
   {
     MeshBase::const_node_iterator it = mesh.nodes_begin();
     const MeshBase::const_node_iterator end = mesh.nodes_end();
@@ -1167,6 +1117,36 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 
         // Fill in node_num_map entry with the proper (1-based) node id
         node_num_map[i] = node->id() + 1;
+      }
+  }
+  else
+  {
+    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::const_element_iterator end = mesh.active_elements_end();
+
+    unsigned int i = 0;
+    for (; it!=end; ++it)
+      for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+        {
+          x[i]=(*it)->point(n)(0);
+#if LIBMESH_DIM > 1
+          y[i]=(*it)->point(n)(1);
+#else
+          y[i]=0.;
+#endif
+#if LIBMESH_DIM > 2
+          z[i]=(*it)->point(n)(2);
+#else
+          z[i]=0.;
+#endif
+
+          // Let's skip the node_num_map in the discontinuous case,
+          // since we're effectively duplicating nodes for the
+          // sake of discontinuous visualization, so it isn't clear
+          // how to deal with node_num_map here. It's only optional
+          // anyway, so no big deal.
+
+          i++;
       }
   }
 
@@ -1196,72 +1176,17 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 
   EX_CHECK_ERR(ex_err, "Error writing coordinates to Exodus file.");
 
-  // Also write the (1-based) node_num_map to the file.
-  ex_err = exII::ex_put_node_num_map(ex_id, &node_num_map[0]);
-  EX_CHECK_ERR(ex_err, "Error writing node_num_map");
+  if(!use_discontinuous)
+  {
+    // Also write the (1-based) node_num_map to the file.
+    ex_err = exII::ex_put_node_num_map(ex_id, &node_num_map[0]);
+    EX_CHECK_ERR(ex_err, "Error writing node_num_map");
+  }
 }
 
 
 
-void ExodusII_IO_Helper::write_nodal_coordinates_discontinuous(const MeshBase & mesh)
-{
-  if ((_run_only_on_proc0) && (this->processor_id() != 0))
-    return;
-
-  x.resize(num_nodes);
-  y.resize(num_nodes);
-  z.resize(num_nodes);
-
-  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-  unsigned int i = 0;
-  for (; it!=end; ++it)
-    for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-      {
-        x[i]=(*it)->point(n)(0);
-#if LIBMESH_DIM > 1
-        y[i]=(*it)->point(n)(1);
-#else
-        y[i]=0.;
-#endif
-#if LIBMESH_DIM > 2
-        z[i]=(*it)->point(n)(2);
-#else
-        z[i]=0.;
-#endif
-        i++;
-      }
-
-  if(_single_precision)
-    {
-      std::vector<float> x_single(num_nodes), y_single(num_nodes), z_single(num_nodes);
-      for(int i(0); i < num_nodes; ++i)
-        {
-          x_single[i] = static_cast<float>(x[i]);
-          y_single[i] = static_cast<float>(y[i]);
-          z_single[i] = static_cast<float>(z[i]);
-        }
-
-      ex_err = exII::ex_put_coord(ex_id,
-                                  x_single.empty() ? NULL : &x_single[0],
-                                  y_single.empty() ? NULL : &y_single[0],
-                                  z_single.empty() ? NULL : &z_single[0]);
-    }
-  else
-    {
-      ex_err = exII::ex_put_coord(ex_id,
-                                  x.empty() ? NULL : &x[0],
-                                  y.empty() ? NULL : &y[0],
-                                  z.empty() ? NULL : &z[0]);
-    }
-
-  EX_CHECK_ERR(ex_err, "Error writing coordinates to Exodus file.");
-}
-
-
-
-void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
+void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_discontinuous)
 {
   // n_active_elem() is a parallel_only function
   unsigned int n_active_elem = mesh.n_active_elem();
@@ -1300,6 +1225,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 
   // counter indexes into the block_ids vector
   unsigned int counter = 0;
+
+  // node counter for discontinuous plotting
+  unsigned int node_counter = 0;
 
   for (subdomain_map_type::iterator it=subdomain_map.begin(); it!=subdomain_map.end(); ++it)
     {
@@ -1357,6 +1285,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
               libmesh_error();
             }
 
+
           for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); ++j)
             {
               unsigned connect_index   = (i*num_nodes_per_elem)+j;
@@ -1368,9 +1297,19 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
                 }
 
               // FIXME: We are hard-coding the 1-based node numbering assumption here.
-              connect[connect_index] = elem->node(elem_node_index)+1;
+              if(!use_discontinuous)
+              {
+                connect[connect_index] = elem->node(elem_node_index)+1;
+              }
+              else
+              {
+                connect[connect_index] = node_counter*num_nodes_per_elem+elem_node_index+1;
+              }
             }
+
+          node_counter++;
         }
+
       ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
       EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
@@ -1401,86 +1340,6 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
     }
 }
 
-
-
-
-void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
-{
-  if ((_run_only_on_proc0) && (this->processor_id() != 0))
-    return;
-
-  typedef std::map<subdomain_id_type, std::vector<dof_id_type> > subdomain_map_type;
-  subdomain_map_type subdomain_map;
-
-  MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  // loop through element and map between block and element vector
-  for (; mesh_it!=end; ++mesh_it)
-    {
-      const Elem * elem = *mesh_it;
-      subdomain_map[ elem->subdomain_id() ].push_back(elem->id());
-    }
-
-  // This counter is used to fill up the libmesh_elem_num_to_exodus map in the loop below.
-  unsigned libmesh_elem_num_to_exodus_counter = 0;
-
-  for (subdomain_map_type::iterator it=subdomain_map.begin(); it!=subdomain_map.end(); ++it)
-    {
-      subdomain_map_type::mapped_type& tmp_vec = (*it).second;
-
-      ExodusII_IO_Helper::ElementMaps em;
-
-      //Use the first element in this block to get representative information.
-      //Note that Exodus assumes all elements in a block are of the same type!
-      //We are using that same assumption here!
-      const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(tmp_vec[0])->type());
-      num_nodes_per_elem = mesh.elem(tmp_vec[0])->n_nodes();
-
-      ex_err = exII::ex_put_elem_block(ex_id,
-                                       (*it).first,
-                                       conv.exodus_elem_type().c_str(),
-                                       tmp_vec.size(),
-                                       num_nodes_per_elem,
-                                       /*num_attr=*/0);
-
-      EX_CHECK_ERR(ex_err, "Error writing element block.");
-
-      connect.resize(tmp_vec.size()*num_nodes_per_elem);
-
-      for (unsigned int i=0; i<tmp_vec.size(); i++)
-        {
-          unsigned int elem_id = tmp_vec[i];
-          libmesh_elem_num_to_exodus[elem_id] = ++libmesh_elem_num_to_exodus_counter; // 1-based indexing for Exodus
-
-          for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); j++)
-            {
-              const unsigned int connect_index   = (i*num_nodes_per_elem)+j;
-              const unsigned int elem_node_index = conv.get_inverse_node_map(j); // Inverse node map is for writing
-              if (verbose)
-                {
-                  libMesh::out << "Exodus node index: " << j
-                               << "=LibMesh node index " << elem_node_index << std::endl;
-                }
-              connect[connect_index] = i*num_nodes_per_elem+elem_node_index+1;
-            }
-        }
-      ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
-      EX_CHECK_ERR(ex_err, "Error writing element connectivities");
-
-      // Create space in elem_num_map
-      elem_num_map.resize(tmp_vec.size());
-
-      // copy the contents of tmp_vec into the elem_map vector
-      std::copy(tmp_vec.begin(), tmp_vec.end(), elem_num_map.begin());
-
-      // And write to file
-      ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map[0]);
-      EX_CHECK_ERR(ex_err, "Error writing element map");
-    }
-
-  ex_err = exII::ex_update(ex_id);
-  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
-}
 
 
 

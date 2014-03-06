@@ -242,36 +242,20 @@ public:
   virtual void create(std::string filename);
 
   /**
-   * Initializes the Exodus file
+   * Initializes the Exodus file.
    */
-  virtual void initialize(std::string title, const MeshBase & mesh);
-
-  /**
-   * Initializes the Exodus file
-   */
-  void initialize_discontinuous(std::string title, const MeshBase & mesh);
+  virtual void initialize(std::string title, const MeshBase & mesh, bool use_discontinuous=false);
 
   /**
    * Writes the nodal coordinates contained in "mesh"
    */
-  virtual void write_nodal_coordinates(const MeshBase & mesh);
-
-  /**
-   * Writes the nodal coordinates contained in "mesh"
-   */
-  void write_nodal_coordinates_discontinuous(const MeshBase & mesh);
+  virtual void write_nodal_coordinates(const MeshBase & mesh, bool use_discontinuous=false);
 
   /**
    * Writes the elements contained in "mesh". FIXME: This only works
    * for Meshes having a single type of element!
    */
-  virtual void write_elements(const MeshBase & mesh);
-
-  /**
-   * Writes the elements contained in "mesh". FIXME: This only works
-   * for Meshes having a single type of element!
-   */
-  void write_elements_discontinuous(const MeshBase & mesh);
+  virtual void write_elements(const MeshBase & mesh, bool use_discontinuous=false);
 
   /**
    * Writes the sidesets contained in "mesh"
