@@ -892,15 +892,15 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
 
           if (continuous)
             {
-              exio_helper->initialize(fname,mesh);
-              exio_helper->write_nodal_coordinates(mesh);
-              exio_helper->write_elements(mesh);
+              exio_helper->initialize(fname, mesh, /*use_discontinuous=*/ false);
+              exio_helper->write_nodal_coordinates(mesh, /*use_discontinuous=*/ false);
+              exio_helper->write_elements(mesh, /*use_discontinuous=*/ false);
             }
           else
             {
-              exio_helper->initialize_discontinuous(fname,mesh);
-              exio_helper->write_nodal_coordinates_discontinuous(mesh);
-              exio_helper->write_elements_discontinuous(mesh);
+              exio_helper->initialize(fname, mesh, /*use_discontinuous=*/ true);
+              exio_helper->write_nodal_coordinates(mesh, /*use_discontinuous=*/ true);
+              exio_helper->write_elements(mesh, /*use_discontinuous=*/ true);
             }
           exio_helper->write_sidesets(mesh);
           exio_helper->write_nodesets(mesh);
