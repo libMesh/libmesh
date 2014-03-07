@@ -265,12 +265,12 @@ public:
    * This function is specialized from ExodusII_IO_Helper to write only the
    * nodal coordinates stored on the local piece of the Mesh.
    */
-  virtual void write_nodal_coordinates(const MeshBase & mesh);
+  virtual void write_nodal_coordinates(const MeshBase & mesh, bool use_discontinuous=false);
 
   /**
    * This function is specialized to write the connectivity.
    */
-  virtual void write_elements(const MeshBase & mesh);
+  virtual void write_elements(const MeshBase & mesh, bool use_discontinuous=false);
 
   /**
    * Writes the sidesets for this processor.
@@ -292,7 +292,7 @@ public:
    * Specialization of the initialize function from ExodusII_IO_Helper that
    * also writes global initial data to file.
    */
-  virtual void initialize(std::string title, const MeshBase & mesh);
+  virtual void initialize(std::string title, const MeshBase & mesh, bool use_discontinuous=false);
 
   /**
    * Takes a solution vector containing the solution for all variables and outputs it to the files

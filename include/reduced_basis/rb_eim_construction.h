@@ -103,7 +103,8 @@ public:
    * Initialize this system so that we can perform
    * the Construction stage of the RB method.
    */
-  virtual void initialize_rb_construction();
+  virtual void initialize_rb_construction(bool skip_matrix_assembly=false,
+                                          bool skip_vector_assembly=false);
 
   /**
    * Override train_reduced_basis to first initialize _parametrized_functions_in_training_set.

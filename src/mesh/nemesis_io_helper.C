@@ -740,7 +740,7 @@ void Nemesis_IO_Helper::create(std::string filename)
 
 
 
-void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh)
+void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh, bool /*use_discontinuous*/)
 {
   // Make sure that the reference passed in is really a ParallelMesh
   // const ParallelMesh& pmesh = libmesh_cast_ref<const ParallelMesh&>(mesh);
@@ -2288,7 +2288,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
 
 
 
-void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
+void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*use_discontinuous*/)
 {
   // Make sure that the reference passed in is really a ParallelMesh
   // const ParallelMesh& pmesh = libmesh_cast_ref<const ParallelMesh&>(mesh);
@@ -2347,7 +2347,7 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 
 
 
-void Nemesis_IO_Helper::write_elements(const MeshBase & mesh)
+void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discontinuous*/)
 {
 
   // Loop over all blocks, even if we don't have elements in each block.

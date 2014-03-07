@@ -165,9 +165,10 @@ void RBEIMConstruction::init_data()
   Parent::init_data();
 }
 
-void RBEIMConstruction::initialize_rb_construction()
+void RBEIMConstruction::initialize_rb_construction(bool skip_matrix_assembly,
+                                                   bool skip_vector_assembly)
 {
-  Parent::initialize_rb_construction();
+  Parent::initialize_rb_construction(skip_matrix_assembly, skip_vector_assembly);
 
   // initialize a serial vector that we will use for MeshFunction evaluations
   _ghosted_meshfunction_vector = NumericVector<Number>::build(this->comm());
