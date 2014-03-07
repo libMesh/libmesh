@@ -120,7 +120,9 @@ public:
   /**
    * Writes a exodusII file with discontinuous data
    */
-  void write_discontinuous_exodusII (const std::string& name, const EquationSystems& es);
+  void write_discontinuous_exodusII (const std::string& name,
+                                     const EquationSystems& es,
+                                     const std::set<std::string>* system_names=NULL);
 
   /**
    * Write out element solution.

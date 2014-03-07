@@ -70,13 +70,16 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string var_name, unsi
 
 
 
-void ExodusII_IO::write_discontinuous_exodusII(const std::string& name, const EquationSystems& es)
+void ExodusII_IO::write_discontinuous_exodusII(
+  const std::string& name,
+  const EquationSystems& es,
+  const std::set<std::string>* system_names)
 {
   std::vector<std::string> solution_names;
   std::vector<Number>      v;
 
-  es.build_variable_names  (solution_names);
-  es.build_discontinuous_solution_vector (v);
+  es.build_variable_names  (solution_names, NULL, system_names);
+  es.build_discontinuous_solution_vector (v, system_names);
 
   this->write_nodal_data_discontinuous(name, v, solution_names);
 }

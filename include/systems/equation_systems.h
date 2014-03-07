@@ -298,8 +298,11 @@ public:
    * Fill the input vector \p soln with solution values.  The
    * entries will be in variable-major format (corresponding to
    * the names from \p build_variable_names()).
+   * If systems_names!=NULL, only include data from the
+   * specified systems.
    */
-  void build_discontinuous_solution_vector (std::vector<Number>& soln) const;
+  void build_discontinuous_solution_vector (std::vector<Number>& soln,
+                                            const std::set<std::string>* system_names=NULL) const;
 
   /**
    * Read & initialize the systems from disk using the XDR data format.

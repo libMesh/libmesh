@@ -1610,7 +1610,8 @@ void GMVIO::write_binary (const std::string& fname,
 
 void GMVIO::write_discontinuous_gmv (const std::string& name,
                                      const EquationSystems& es,
-                                     const bool write_partitioning) const
+                                     const bool write_partitioning,
+                                     const std::set<std::string>* system_names) const
 {
   std::vector<std::string> solution_names;
   std::vector<Number>      v;
@@ -1618,8 +1619,8 @@ void GMVIO::write_discontinuous_gmv (const std::string& name,
   // Get a reference to the mesh
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
-  es.build_variable_names  (solution_names);
-  es.build_discontinuous_solution_vector (v);
+  es.build_variable_names  (solution_names, NULL, system_names);
+  es.build_discontinuous_solution_vector (v, system_names);
 
   // These are parallel_only functions
   const unsigned int n_active_elem = mesh.n_active_elem();

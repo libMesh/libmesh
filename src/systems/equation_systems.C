@@ -1005,14 +1005,41 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
 
 
 
-void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& soln) const
+void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& soln,
+                                                           const std::set<std::string>* system_names) const
 {
   START_LOG("build_discontinuous_solution_vector()", "EquationSystems");
 
   libmesh_assert (this->n_systems());
 
   const unsigned int dim = _mesh.mesh_dimension();
-  const unsigned int nv  = this->n_vars();
+
+  // Get the number of variables (nv) by counting the number of variables
+  // in each system listed in system_names
+  unsigned int nv = 0;
+
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
+
+  for (; pos != end; ++pos)
+    {
+      // Check current system is listed in system_names, and skip pos if not
+      bool use_current_system = (system_names == NULL);
+      if(!use_current_system)
+        {
+          use_current_system =
+            (std::find( system_names->begin(), system_names->end(), pos->first )
+               != system_names->end());
+        }
+      if(!use_current_system)
+        {
+          continue;
+        }
+
+      const System& system  = *(pos->second);
+      nv += system.n_vars();
+    }
+
   unsigned int tw=0;
 
   // get the total weight
@@ -1040,11 +1067,23 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
   // loop over the elements and build the nodal solution
   // from the element solution.  Then insert this nodal solution
   // into the vector passed to build_solution_vector.
-  const_system_iterator       pos = _systems.begin();
-  const const_system_iterator end = _systems.end();
+  pos = _systems.begin();
 
   for (; pos != end; ++pos)
     {
+      // Check current system is listed in system_names, and skip pos if not
+      bool use_current_system = (system_names == NULL);
+      if(!use_current_system)
+        {
+          use_current_system =
+            (std::find( system_names->begin(), system_names->end(), pos->first )
+               != system_names->end());
+        }
+      if(!use_current_system)
+        {
+          continue;
+        }
+
       const System& system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
 

@@ -150,7 +150,8 @@ public:
    */
   void write_discontinuous_gmv (const std::string& name,
                                 const EquationSystems& es,
-                                const bool write_partitioning) const;
+                                const bool write_partitioning,
+                                const std::set<std::string>* system_names=NULL) const;
 
 
   /**
