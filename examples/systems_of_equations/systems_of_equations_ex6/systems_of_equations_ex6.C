@@ -256,7 +256,8 @@ int main (int argc, char** argv)
   // Plot the solution
 #ifdef LIBMESH_HAVE_EXODUS_API
 
-  ExodusII_IO exo_io(mesh);
+  // Use single precision in this case (reduces the size of the exodus file)
+  ExodusII_IO exo_io(mesh, /*single_precision=*/true);
 
   // First plot the displacement field using a nodal plot
   std::set<std::string> system_names;

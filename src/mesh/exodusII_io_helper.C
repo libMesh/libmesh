@@ -1647,7 +1647,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
           if(_single_precision)
             {
               std::vector<float> cast_data(num_elems_this_block);
-              for(unsigned int l(0); i < num_elems_this_block; ++l)
+              for(unsigned int l=0; l < num_elems_this_block; ++l)
                 {
                   cast_data[l] = static_cast<float>(data[l]);
                 }
