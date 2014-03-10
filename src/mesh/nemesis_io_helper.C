@@ -710,7 +710,9 @@ void Nemesis_IO_Helper::create(std::string filename)
 {
   // Fall back on double precision when necessary since ExodusII
   // doesn't seem to support long double
-  int comp_ws(0), io_ws(0);
+  int
+    comp_ws = 0,
+    io_ws = 0;
 
   if(_single_precision)
     {
@@ -1771,9 +1773,9 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
   this->libmesh_node_num_to_exodus.clear();
 
   // Set the map for nodes
-  for(std::set<int>::iterator it = this->nodes_attached_to_local_elems.begin();
-      it != this->nodes_attached_to_local_elems.end();
-      ++it)
+  for (std::set<int>::iterator it = this->nodes_attached_to_local_elems.begin();
+       it != this->nodes_attached_to_local_elems.end();
+       ++it)
     {
       // I.e. given exodus_node_id,
       // exodus_node_num_to_libmesh[ exodus_node_id ] returns the libmesh ID for that node.
@@ -1796,9 +1798,9 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
   this->libmesh_elem_num_to_exodus.clear();
 
   // Now loop over each subdomain and get a unique numbering for the elements
-  for(std::map<subdomain_id_type, std::vector<unsigned int> >::iterator it = this->subdomain_map.begin();
-      it != this->subdomain_map.end();
-      ++it)
+  for (std::map<subdomain_id_type, std::vector<unsigned int> >::iterator it = this->subdomain_map.begin();
+       it != this->subdomain_map.end();
+       ++it)
     {
       block_ids.push_back((*it).first);
 
@@ -2054,9 +2056,9 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
   // See what we got
   if (verbose)
     {
-      for(std::map<boundary_id_type, std::vector<int> >::iterator it = local_node_boundary_id_lists.begin();
-          it != local_node_boundary_id_lists.end();
-          ++it)
+      for (std::map<boundary_id_type, std::vector<int> >::iterator it = local_node_boundary_id_lists.begin();
+           it != local_node_boundary_id_lists.end();
+           ++it)
         {
           libMesh::out << "[" << this->processor_id() << "] ID: " << (*it).first << ", ";
 
@@ -2184,7 +2186,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
           // Loop over all the elements in the family tree, store their converted IDs
           // and side IDs to the map's vectors.  TODO: Somehow reserve enough space for these
           // push_back's...
-          for(unsigned int j=0; j<family.size(); ++j)
+          for (unsigned int j=0; j<family.size(); ++j)
             {
               const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(mesh.elem(family[j]->id())->type());
 
@@ -2313,7 +2315,7 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*us
       if(_single_precision)
         {
           std::vector<float> x_single(local_num_nodes), y_single(local_num_nodes), z_single(local_num_nodes);
-          for(unsigned int i(0); i < local_num_nodes; ++i)
+          for (unsigned int i=0; i<local_num_nodes; ++i)
             {
               x_single[i] = static_cast<float>(x[i]);
               y_single[i] = static_cast<float>(y[i]);
@@ -2428,7 +2430,7 @@ void Nemesis_IO_Helper::write_nodal_solution
       std::vector<Real> imag_parts(num_nodes);
       std::vector<Real> magnitudes(num_nodes);
 
-      for(int i(0); i < num_nodes; ++i)
+      for (int i=0; i<num_nodes; ++i)
         {
           Number value = values[this->exodus_node_num_to_libmesh[i]*num_vars + c];
           real_parts[i] = value.real();
@@ -2441,8 +2443,8 @@ void Nemesis_IO_Helper::write_nodal_solution
 #else
       std::vector<Number> cur_soln(num_nodes);
 
-      //Copy out this variable's solution
-      for(int i=0; i<num_nodes; i++)
+      // Copy out this variable's solution
+      for (int i=0; i<num_nodes; i++)
         cur_soln[i] = values[this->exodus_node_num_to_libmesh[i]*num_vars + c];
 
       write_nodal_values(c+1,cur_soln,timestep);

@@ -974,7 +974,9 @@ void ExodusII_IO_Helper::create(std::string filename)
   // call create there.
   if ((this->processor_id() == 0) || (!_run_only_on_proc0))
     {
-      int comp_ws(0), io_ws(0);
+      int
+        comp_ws = 0,
+        io_ws = 0;
 
       if(_single_precision)
         {
@@ -1153,7 +1155,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
   if(_single_precision)
     {
       std::vector<float> x_single(num_nodes), y_single(num_nodes), z_single(num_nodes);
-      for(int i(0); i < num_nodes; ++i)
+      for (int i=0; i<num_nodes; ++i)
         {
           x_single[i] = static_cast<float>(x[i]);
           y_single[i] = static_cast<float>(y[i]);
@@ -1647,7 +1649,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
           if(_single_precision)
             {
               std::vector<float> cast_data(num_elems_this_block);
-              for(unsigned int l=0; l < num_elems_this_block; ++l)
+              for (unsigned int l=0; l<num_elems_this_block; ++l)
                 {
                   cast_data[l] = static_cast<float>(data[l]);
                 }
@@ -1686,7 +1688,7 @@ void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Real> 
     {
       unsigned int num_values = values.size();
       std::vector<float> cast_values(num_values);
-      for(unsigned int i(0); i < num_values; ++i)
+      for (unsigned int i=0; i<num_values; ++i)
         {
           cast_values[i] = static_cast<float>(values[i]);
         }
@@ -1753,7 +1755,7 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Real> & values, i
       unsigned int num_values = values.size();
       std::vector<float> cast_values(num_values);
 
-      for(unsigned int i(0); i < num_values; ++i)
+      for (unsigned int i=0; i<num_values; ++i)
         cast_values[i] = static_cast<float>(values[i]);
 
       ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_global_vars, &cast_values[0]);
@@ -1790,7 +1792,7 @@ std::vector<std::string> ExodusII_IO_Helper::get_complex_names(const std::vector
 
   // This will loop over all names and create new "complex" names
   // (i.e. names that start with r_, i_ or a_
-  for(; names_it != names_end; ++names_it)
+  for (; names_it != names_end; ++names_it)
     {
       std::cout << "VARIABLE: " << *names_it << std::endl;
       std::stringstream name_real, name_imag, name_abs;

@@ -555,20 +555,20 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   // of the values in soln
   std::vector<Real> complex_soln(3*num_values);
 
-  for(unsigned i(0); i < num_vars; ++i)
+  for (unsigned i=0; i<num_vars; ++i)
     {
 
-      for(unsigned int j(0); j < num_elems; ++j)
+      for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
           complex_soln[3*i*num_elems + j] = value.real();
         }
-      for(unsigned int j(0); j < num_elems; ++j)
+      for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
           complex_soln[3*i*num_elems + num_elems +j] = value.imag();
         }
-      for(unsigned int j(0); j < num_elems; ++j)
+      for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
           complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
@@ -640,7 +640,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
       std::vector<Real> imag_parts(num_nodes);
       std::vector<Real> magnitudes(num_nodes);
 
-      for(unsigned int i(0); i < num_nodes; ++i)
+      for (unsigned int i=0; i<num_nodes; ++i)
         {
           real_parts[i] = soln[i*num_vars + c].real();
           imag_parts[i] = soln[i*num_vars + c].imag();
@@ -653,7 +653,7 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
       std::vector<Number> cur_soln(num_nodes);
 
       // Copy out this variable's solution
-      for(dof_id_type i=0; i<num_nodes; i++)
+      for (dof_id_type i=0; i<num_nodes; i++)
         cur_soln[i] = soln[i*num_vars + c];
       exio_helper->write_nodal_values(variable_name_position+1,cur_soln,_timestep);
 #endif
@@ -712,20 +712,20 @@ void ExodusII_IO::write_global_data (const std::vector<Number>& soln,
   // of the values in soln
   std::vector<Real> complex_soln(3*num_values);
 
-  for(unsigned i(0); i < num_vars; ++i)
+  for (unsigned i=0; i<num_vars; ++i)
     {
 
-      for(unsigned int j(0); j < num_elems; ++j)
+      for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
           complex_soln[3*i*num_elems + j] = value.real();
         }
-      for(unsigned int j(0); j < num_elems; ++j)
+      for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
           complex_soln[3*i*num_elems + num_elems +j] = value.imag();
         }
-      for(unsigned int j(0); j < num_elems; ++j)
+      for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
           complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
@@ -839,7 +839,7 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
       std::vector<Real> imag_parts(num_nodes);
       std::vector<Real> magnitudes(num_nodes);
 
-      for(int i(0); i < num_nodes; ++i)
+      for (int i=0; i<num_nodes; ++i)
         {
           real_parts[i] = soln[i*num_vars + c].real();
           imag_parts[i] = soln[i*num_vars + c].imag();
@@ -852,7 +852,7 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
       // Copy out this variable's solution
       std::vector<Number> cur_soln(num_nodes);
 
-      for(int i=0; i<num_nodes; i++)
+      for (int i=0; i<num_nodes; i++)
         cur_soln[i] = soln[i*num_vars + c];
 
       exio_helper->write_nodal_values(c+1,cur_soln,_timestep);

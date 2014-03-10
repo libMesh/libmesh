@@ -1092,7 +1092,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       nemhelper->read_nodeset(nodeset);
 
       // Add nodes from the node_list to the BoundaryInfo object
-      for(unsigned int node=0; node<nemhelper->node_list.size(); node++)
+      for (unsigned int node=0; node<nemhelper->node_list.size(); node++)
         {
           // Don't run past the end of our node map!
           if (to_uint(nemhelper->node_list[node]-1) >= nemhelper->node_num_map.size())
@@ -1358,20 +1358,19 @@ void Nemesis_IO::write_global_data (const std::vector<Number>& soln,
   // of the values in soln
   std::vector<Real> complex_soln(3*num_values);
 
-  for(unsigned i(0); i < num_vars; ++i)
+  for (unsigned i=0; i<num_vars; ++i)
     {
-
-      for(unsigned int j(0); j < num_elems; ++j)
+      for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
           complex_soln[3*i*num_elems + j] = value.real();
         }
-      for(unsigned int j(0); j < num_elems; ++j)
+      for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
           complex_soln[3*i*num_elems + num_elems +j] = value.imag();
         }
-      for(unsigned int j(0); j < num_elems; ++j)
+      for (unsigned int j=0; j<num_elems; ++j)
         {
           Number value = soln[i*num_vars + j];
           complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
