@@ -60,7 +60,8 @@ public:
    * This is the constructor required to read a mesh.
    */
   explicit
-  ExodusII_IO (MeshBase& mesh, bool single_precision=false);
+  ExodusII_IO (MeshBase& mesh,
+               bool single_precision=false);
 
   /**
    * Destructor.
@@ -103,19 +104,27 @@ public:
   /**
    * Backward compatibility version of function that takes a single variable name
    */
-  void copy_nodal_solution(System& system, std::string var_name, unsigned int timestep=1);
+  void copy_nodal_solution(System& system,
+                           std::string var_name,
+                           unsigned int timestep=1);
 
   /**
    * If we read in a nodal solution while reading in a mesh, we can attempt
    * to copy that nodal solution into an EquationSystems object.
    */
-  void copy_nodal_solution(System& es, std::string system_var_name, std::string exodus_var_name, unsigned int timestep=1);
+  void copy_nodal_solution(System& system,
+                           std::string system_var_name,
+                           std::string exodus_var_name,
+                           unsigned int timestep=1);
 
   /**
    * If we read in a elemental solution while reading in a mesh, we can attempt
    * to copy that elemental solution into an EquationSystems object.
    */
-  void copy_elemental_solution(System& es, std::string system_var_name, std::string exodus_var_name, unsigned int timestep=1);
+  void copy_elemental_solution(System& system,
+                               std::string system_var_name,
+                               std::string exodus_var_name,
+                               unsigned int timestep=1);
 
   /**
    * Writes a exodusII file with discontinuous data
@@ -171,7 +180,8 @@ public:
    * result in empty vectors supplied here to also be populated with all
    * variables.
    */
-  void set_output_variables(const std::vector<std::string> & output_variables, bool allow_empty = true);
+  void set_output_variables(const std::vector<std::string>& output_variables,
+                            bool allow_empty = true);
 
   /**
    * In the general case, meshes containing 2D elements can be

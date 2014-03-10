@@ -39,7 +39,8 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // ExodusII_IO class members
-ExodusII_IO::ExodusII_IO (MeshBase& mesh, bool single_precision) :
+ExodusII_IO::ExodusII_IO (MeshBase& mesh,
+                          bool single_precision) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase> (mesh),
   ParallelObject(mesh),
@@ -54,7 +55,8 @@ ExodusII_IO::ExodusII_IO (MeshBase& mesh, bool single_precision) :
 }
 
 
-void ExodusII_IO::set_output_variables(const std::vector<std::string> & output_variables, bool allow_empty)
+void ExodusII_IO::set_output_variables(const std::vector<std::string>& output_variables,
+                                       bool allow_empty)
 {
   _output_variables = output_variables;
   _allow_empty_variables = allow_empty;
@@ -62,7 +64,9 @@ void ExodusII_IO::set_output_variables(const std::vector<std::string> & output_v
 
 
 
-void ExodusII_IO::copy_nodal_solution(System& system, std::string var_name, unsigned int timestep)
+void ExodusII_IO::copy_nodal_solution(System& system,
+                                      std::string var_name,
+                                      unsigned int timestep)
 {
   libmesh_deprecated();
   copy_nodal_solution(system, var_name, var_name, timestep);
@@ -70,10 +74,9 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string var_name, unsi
 
 
 
-void ExodusII_IO::write_discontinuous_exodusII(
-  const std::string& name,
-  const EquationSystems& es,
-  const std::set<std::string>* system_names)
+void ExodusII_IO::write_discontinuous_exodusII(const std::string& name,
+                                               const EquationSystems& es,
+                                               const std::set<std::string>* system_names)
 {
   std::vector<std::string> solution_names;
   std::vector<Number>      v;
@@ -411,7 +414,10 @@ int ExodusII_IO::get_num_time_steps()
 
 
 
-void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
+void ExodusII_IO::copy_nodal_solution(System& system,
+                                      std::string system_var_name,
+                                      std::string exodus_var_name,
+                                      unsigned int timestep)
 {
   if (!exio_helper->opened_for_reading)
     {
@@ -446,7 +452,10 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_nam
 
 
 
-void ExodusII_IO::copy_elemental_solution(System& system, std::string system_var_name, std::string exodus_var_name, unsigned int timestep)
+void ExodusII_IO::copy_elemental_solution(System& system,
+                                          std::string system_var_name,
+                                          std::string exodus_var_name,
+                                          unsigned int timestep)
 {
   if (!exio_helper->opened_for_reading)
     {
