@@ -55,11 +55,6 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems& es,
   es.parameters.set<Real>("nonlinear solver relative residual tolerance") = 1e-8;
   es.parameters.set<Real>("nonlinear solver absolute step tolerance") = 1e-8;
   es.parameters.set<Real>("nonlinear solver relative step tolerance") = 1e-8;
-
-  if (libMesh::on_command_line("--solver_system_names"))
-    nonlinear_solver->init((this->name()+"_").c_str());
-  else
-    nonlinear_solver->init();
 }
 
 
@@ -176,6 +171,11 @@ void NonlinearImplicitSystem::solve ()
     }
   else
     {
+      if (libMesh::on_command_line("--solver_system_names"))
+        nonlinear_solver->init((this->name()+"_").c_str());
+      else
+        nonlinear_solver->init();
+
       // Solve the nonlinear system.
       const std::pair<unsigned int, Real> rval =
         nonlinear_solver->solve (*matrix, *solution, *rhs,
