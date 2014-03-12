@@ -675,10 +675,8 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           }
       }
 
-
-
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported order: " << o );
     }
 
   libmesh_error();
