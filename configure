@@ -31341,6 +31341,10 @@ $as_echo ">>> Not using vendor provided tecio libraries, deferring to source bui
       TECPLOT_LIBRARY_PATH=""
       if (test -r $top_srcdir/contrib/tecplot/binary/lib/$host/tecio.a) ; then
 	  TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/binary/lib/$host
+      else
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Configuring Tecplot failed, no tecio exists for $host <<<" >&5
+$as_echo ">>> Configuring Tecplot failed, no tecio exists for $host <<<" >&6; }
+         enabletecplot=no
       fi
 
       # Note: AC_CHECK_HEADER seems to fail if the path to the header
@@ -31366,6 +31370,7 @@ fi
       unset old_CPPFLAGS
   fi
 
+  if (test $enabletecplot = yes); then
   if (test -r $TECPLOT_LIBRARY_PATH/tecio.a -a -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
 
       #--------------------------------------------------------------------------
@@ -31441,7 +31446,10 @@ rm -f core conftest.err conftest.$ac_objext \
       LIBS=$save_LIBS
       CPPFLAGS=$save_CPPFLAGS
     else
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Configuring Tecplot failed, could not find at least one of tecio.a or TECIO.h <<<" >&5
+$as_echo ">>> Configuring Tecplot failed, could not find at least one of tecio.a or TECIO.h <<<" >&6; }
       enabletecplot=no
+  fi
   fi
 
 if (test $enabletecplot = yes); then

@@ -28,6 +28,9 @@ AC_DEFUN([CONFIGURE_TECPLOT],
       TECPLOT_LIBRARY_PATH=""
       if (test -r $top_srcdir/contrib/tecplot/binary/lib/$host/tecio.a) ; then
 	  TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/binary/lib/$host
+      else
+         AC_MSG_RESULT([>>> Configuring Tecplot failed, no tecio exists for $host <<<])
+         enabletecplot=no
       fi
 
       # Note: AC_CHECK_HEADER seems to fail if the path to the header
@@ -49,6 +52,7 @@ AC_DEFUN([CONFIGURE_TECPLOT],
       unset old_CPPFLAGS
   fi
 
+  if (test $enabletecplot = yes); then
   if (test -r $TECPLOT_LIBRARY_PATH/tecio.a -a -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
 
       #--------------------------------------------------------------------------
@@ -92,6 +96,8 @@ AC_DEFUN([CONFIGURE_TECPLOT],
       LIBS=$save_LIBS
       CPPFLAGS=$save_CPPFLAGS
     else
+      AC_MSG_RESULT([>>> Configuring Tecplot failed, could not find at least one of tecio.a or TECIO.h <<<])
       enabletecplot=no
+  fi
   fi
 ])
