@@ -79,8 +79,9 @@ public:
 
   /**
    * Initialize data structures if not done so already.
+   * May assign a name to the solver in some implementations
    */
-  virtual void init ();
+  virtual void init (const char* name = NULL);
 
   /**
    * Call the Petsc solver.  It calls the method below, using the

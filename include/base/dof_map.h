@@ -559,6 +559,13 @@ public:
                              const std::vector<dof_id_type>& dof_indices,
                              DenseVectorBase<Number>& Ue) const;
 
+  /**
+   * Fills an array of those dof indices which belong to the given
+   * variable number and live on the current processor.
+   */
+  void local_variable_indices(std::vector<dof_id_type>& idx,
+                              const MeshBase& mesh,
+                              unsigned int var_num) const;
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
 

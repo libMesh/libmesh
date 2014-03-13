@@ -70,7 +70,7 @@ public:
   /**
    * Initialize data structures if not done so already.
    */
-  void init ();
+  void init (const char *name=NULL);
 
   /**
    * Call the Aztec solver.  It calls the method below, using the

@@ -22,6 +22,7 @@
 #include "libmesh/petsc_diff_solver.h"
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/petsc_vector.h"
+#include "libmesh/petsc_auto_fieldsplit.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
@@ -223,8 +224,24 @@ void PetscDiffSolver::init ()
 #endif
   LIBMESH_CHKERRABORT(ierr);
 
+  if (libMesh::on_command_line("--solver_system_names"))
+    {
+      ierr = SNESSetOptionsPrefix(_snes, (_system.name()+"_").c_str());
+      LIBMESH_CHKERRABORT(ierr);
+    }
+
   ierr = SNESSetFromOptions(_snes);
   LIBMESH_CHKERRABORT(ierr);
+
+  KSP my_ksp;
+  ierr = SNESGetKSP(_snes, &my_ksp);
+  LIBMESH_CHKERRABORT(ierr);
+
+  PC my_pc;
+  ierr = KSPGetPC(my_ksp, &my_pc);
+  LIBMESH_CHKERRABORT(ierr);
+
+  petsc_auto_fieldsplit(my_pc, _system);
 
   STOP_LOG("init()", "PetscDiffSolver");
 }
@@ -241,9 +258,7 @@ void PetscDiffSolver::clear()
 {
   START_LOG("clear()", "PetscDiffSolver");
 
-  int ierr=0;
-
-  ierr = LibMeshSNESDestroy(&_snes);
+  int ierr = LibMeshSNESDestroy(&_snes);
   LIBMESH_CHKERRABORT(ierr);
 
   STOP_LOG("clear()", "PetscDiffSolver");
@@ -254,6 +269,16 @@ void PetscDiffSolver::clear()
 void PetscDiffSolver::reinit()
 {
   Parent::reinit();
+
+  KSP my_ksp;
+  int ierr = SNESGetKSP(_snes, &my_ksp);
+  LIBMESH_CHKERRABORT(ierr);
+
+  PC my_pc;
+  ierr = KSPGetPC(my_ksp, &my_pc);
+  LIBMESH_CHKERRABORT(ierr);
+
+  petsc_auto_fieldsplit(my_pc, _system);
 }
 
 

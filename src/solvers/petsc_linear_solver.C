@@ -24,6 +24,7 @@
 #include <string.h>
 
 // Local Includes
+#include "libmesh/dof_map.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/shell_matrix.h"
@@ -31,6 +32,8 @@
 #include "libmesh/petsc_preconditioner.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/system.h"
+#include "libmesh/petsc_auto_fieldsplit.h"
 
 namespace libMesh
 {
@@ -162,7 +165,7 @@ void PetscLinearSolver<T>::clear ()
 
 
 template <typename T>
-void PetscLinearSolver<T>::init ()
+void PetscLinearSolver<T>::init (const char *name)
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())
@@ -203,6 +206,12 @@ void PetscLinearSolver<T>::init ()
       // Create the linear solver context
       ierr = KSPCreate (this->comm().get(), &_ksp);
       LIBMESH_CHKERRABORT(ierr);
+
+      if (name)
+        {
+          ierr = KSPSetOptionsPrefix(_ksp, name);
+          LIBMESH_CHKERRABORT(ierr);
+        }
 
       // Create the preconditioner context
       ierr = KSPGetPC        (_ksp, &_pc);
@@ -274,7 +283,8 @@ void PetscLinearSolver<T>::init ()
 
 
 template <typename T>
-void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
+void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix,
+                                  const char *name)
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())
@@ -316,6 +326,11 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       ierr = KSPCreate (this->comm().get(), &_ksp);
       LIBMESH_CHKERRABORT(ierr);
 
+      if (name)
+        {
+          ierr = KSPSetOptionsPrefix(_ksp, name);
+          LIBMESH_CHKERRABORT(ierr);
+        }
 
       //ierr = PCCreate (this->comm().get(), &_pc);
       //     LIBMESH_CHKERRABORT(ierr);
@@ -388,6 +403,17 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
           PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
         }
     }
+}
+
+
+
+template <typename T>
+void
+PetscLinearSolver<T>::init_names (const System& sys)
+{
+  PetscErrorCode ierr = 0;
+
+  petsc_auto_fieldsplit(this->pc(), sys);
 }
 
 

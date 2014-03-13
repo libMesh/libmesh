@@ -44,6 +44,7 @@ template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
 template <typename T> class Preconditioner;
+class System;
 
 /**
  * This class provides a uniform interface for linear solvers.  This base
@@ -91,8 +92,19 @@ public:
 
   /**
    * Initialize data structures if not done so already.
+   * May assign a name to the solver in some implementations
    */
-  virtual void init () = 0;
+  virtual void init (const char* name = NULL) = 0;
+
+  /**
+   * Apply names to the system to be solved.  For most packages this
+   * is a no-op; for PETSc this sets an option prefix from the system
+   * name and sets field names from the system's variable names.
+   *
+   * Since field names are applied to DoF numberings, this method must
+   * be called again after any System reinit.
+   */
+  virtual void init_names (const System&) {}
 
   /**
    * Returns the type of solver to use.

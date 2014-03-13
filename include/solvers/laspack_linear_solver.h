@@ -72,7 +72,7 @@ public:
   /**
    * Initialize data structures if not done so already.
    */
-  void init ();
+  void init (const char* name = NULL);
 
   /**
    * Call the Laspack solver

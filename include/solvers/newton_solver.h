@@ -63,6 +63,12 @@ public:
   typedef DiffSolver Parent;
 
   /**
+   * The initialization function.  This method is used to
+   * initialize internal data structures before a simulation begins.
+   */
+  virtual void init ();
+
+  /**
    * The reinitialization function.  This method is used after
    * changes in the mesh.
    */

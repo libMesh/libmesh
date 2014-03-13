@@ -53,7 +53,7 @@ template <typename T> class Preconditioner;
 
 template <typename T>
 class NonlinearSolver : public ReferenceCountedObject<NonlinearSolver<T> >,
-                        public ParallelObject
+  public ParallelObject
 {
 public:
   /**
@@ -92,8 +92,9 @@ public:
 
   /**
    * Initialize data structures if not done so already.
+   * May assign a name to the solver in some implementations
    */
-  virtual void init () = 0;
+  virtual void init (const char* name = NULL) = 0;
 
   /**
    * Solves the nonlinear system.

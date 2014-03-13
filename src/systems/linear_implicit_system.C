@@ -120,6 +120,12 @@ void LinearImplicitSystem::solve ()
   const EquationSystems& es =
     this->get_equation_systems();
 
+  // If the linear solver hasn't been initialized, we do so here.
+  if (libMesh::on_command_line("--solver_system_names"))
+    linear_solver->init((this->name()+"_").c_str());
+  else
+    linear_solver->init();
+
   // Get the user-specifiied linear solver tolerance
   const Real tol            =
     es.parameters.get<Real>("linear solver tolerance");

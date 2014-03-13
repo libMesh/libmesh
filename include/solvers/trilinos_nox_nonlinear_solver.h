@@ -80,7 +80,7 @@ public:
   /**
    * Initialize data structures if not done so already.
    */
-  virtual void init ();
+  virtual void init (const char* name = NULL);
 
   /**
    * Call the Nox solver.  It calls the method below, using the

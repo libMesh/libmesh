@@ -116,13 +116,25 @@ public:
 
   /**
    * Initialize data structures if not done so already.
+   * Assigns a name, which is turned into an underscore-separated
+   * prefix for the underlying KSP object.
    */
-  void init ();
+  void init (const char *name = NULL);
 
   /**
    * Initialize data structures if not done so already plus much more
    */
-  void init (PetscMatrix<T>* matrix);
+  void init (PetscMatrix<T>* matrix, const char *name = NULL);
+
+  /**
+   * Apply names to the system to be solved.  This sets an option
+   * prefix from the system name and sets field names from the
+   * system's variable names.
+   *
+   * Since field names are applied to DoF numberings, this method must
+   * be called again after any System reinit.
+   */
+  virtual void init_names (const System&);
 
   /**
    * After calling this method, all successive solves will be

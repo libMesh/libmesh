@@ -284,7 +284,7 @@ void PetscNonlinearSolver<T>::clear ()
 
 
 template <typename T>
-void PetscNonlinearSolver<T>::init ()
+void PetscNonlinearSolver<T>::init (const char* name)
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())
@@ -306,6 +306,12 @@ void PetscNonlinearSolver<T>::init ()
       LIBMESH_CHKERRABORT(ierr);
 
 #endif
+
+      if (name)
+        {
+          ierr = SNESSetOptionsPrefix(_snes, name);
+          LIBMESH_CHKERRABORT(ierr);
+        }
 
       if (_default_monitor)
         {
