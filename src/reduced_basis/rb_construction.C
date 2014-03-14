@@ -75,11 +75,11 @@ RBConstruction::RBConstruction (EquationSystems& es,
     quiet_mode(true),
     output_dual_innerprods_computed(false),
     Fq_representor_innerprods_computed(false),
+    assert_convergence(false),
     rb_eval(NULL),
     inner_product_assembly(NULL),
     constraint_assembly(NULL),
-    training_tolerance(-1.),
-    assert_convergence(false)
+    training_tolerance(-1.)
 {
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
