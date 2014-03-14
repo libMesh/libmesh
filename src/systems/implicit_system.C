@@ -1392,6 +1392,8 @@ LinearSolver<Number>* ImplicitSystem::get_linear_solver() const
     new_solver->init((this->name()+"_").c_str());
   else
     new_solver->init();
+
+  return new_solver;
 }
 
 
