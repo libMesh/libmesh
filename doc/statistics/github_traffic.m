@@ -33,6 +33,10 @@ data = {
     '2014-Mar-07', 50,  22
     '2014-Mar-08', 50,  11
     '2014-Mar-09', 42,  13
+    '2014-Mar-10', 61,  16
+    '2014-Mar-11', 27,  16
+    '2014-Mar-12', 111, 20
+    '2014-Mar-13', 66,  20
     };
 
 % length works like you would expect it to for cell arrays.
@@ -41,18 +45,21 @@ N=length(data);
 % Can't plot string data automatically?
 x=linspace(1,N,N);
 
-% Plot total views.
 % Note the extra square brackets!  This seems to be required (at least
 % in Octave) to catch the output of data{:,2} as an array.
-% plot(x, [data{:,2}], 'bo-');
+views = [data{:,2}];
+visitors = [data{:,3}];
 
 % Only way to set linestyles with plotyy is after the fact, apparently.
 % plotyy returns the axis handle first, followed by the two plot handles.
-[haxis, h1, h2] = plotyy(x, [data{:,2}], x, [data{:,3}]);
+[haxis, h1, h2] = plotyy(x, views, x, visitors);
 
 % Label the axes
 ylabel (haxis(1), 'Daily Page Views');
 ylabel (haxis(2), 'Daily Unique Visitors');
+
+% Totaling unique visitors doesn't really mean much...
+title (['Total Pageviews: ', num2str(sum(views))]);
 
 % Make thick lines - this looks better in PDF
 set([h1, h2], 'linewidth', 6);
@@ -82,10 +89,5 @@ set (gcf, "paperposition", [0.25, 0.25, 10.75, 8.25]);
 set (gcf, "papersize", [11, 8.5]);
 set (gcf, "paperorientation", 'landscape');
 
-% Make a PDF of this plot.  This is the only place (I know of)
-% where we can control the font size and type used used in the
-% X and Y axes... As of Octave 3.2.3, it appears that this method of setting
-% the Axes font sizes no longer works either...
-print('-dpsc', 'github_traffic.ps', '-FHelvetica:20');
-system ('ps2pdf github_traffic.ps github_traffic.pdf');
-system('rm github_traffic.ps');
+% Make a PDF of this plot.
+print('-dpdf', 'github_traffic.pdf', '-FHelvetica:20');
