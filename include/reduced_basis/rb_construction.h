@@ -726,11 +726,11 @@ protected:
   bool get_convergence_assertion_flag() const;
 
   /**
-   * Setter the flag determining if convergence should be
+   * Setter for the flag determining if convergence should be
    * checked after each solve.
    */
   void set_convergence_assertion_flag(bool flag);
-    
+
   /**
    * Check if the linear solver reports convergence.
    * libmesh_error() is called when that is not the case.
@@ -770,13 +770,13 @@ protected:
    * recompute them unnecessarily.
    */
   bool Fq_representor_innerprods_computed;
-  
+
   /**
    * A boolean flag to indicate whether to check for proper convergence
    * after each solve.
    */
   bool assert_convergence;
-  
+
 private:
 
   //----------- PRIVATE DATA MEMBERS -----------//

@@ -1210,7 +1210,9 @@ Real RBConstruction::truth_solve(int plot_solution)
   solution->zero();
   solve();
   if(assert_convergence)
+  {
     check_convergence();
+  }
 
   const RBParameters& mu = get_parameters();
 
@@ -1549,8 +1551,10 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
             }
 
           solve();
-          if(assert_convergence) 
+          if(assert_convergence)
+          {
             check_convergence();
+          }
 
           if (!is_quiet())
             {
@@ -1705,7 +1709,9 @@ void RBConstruction::compute_output_dual_innerprods()
 
               solve();
               if(assert_convergence)
+              {
                 check_convergence();
+              }
 
               if (!is_quiet())
                 {
@@ -1823,7 +1829,9 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
 
           solve();
           if(assert_convergence)
+          {
             check_convergence();
+          }
 
           if (!is_quiet())
             {

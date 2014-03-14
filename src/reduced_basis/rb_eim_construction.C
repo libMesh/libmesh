@@ -553,19 +553,9 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       // of the function to be approximated
       solve();
       if(assert_convergence)
+      {
         check_convergence();
-
-      // Make sure we didn't max out the number of iterations
-      if( (this->n_linear_iterations() >=
-           this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
-          (this->final_linear_residual() >
-           this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
-        {
-          libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
-                       << this->final_linear_residual() << ", number of iterations = "
-                       << this->n_linear_iterations() << std::endl << std::endl;
-          //     libmesh_error();
-        }
+      }
 
       if(reuse_preconditioner)
         {

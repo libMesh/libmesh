@@ -617,7 +617,9 @@ Real TransientRBConstruction::truth_solve(int write_interval)
       truth_assembly();
       solve();
       if(assert_convergence)
+      {
         check_convergence();
+      }
 
       if(reuse_preconditioner)
         {
@@ -1167,7 +1169,9 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
                          << Utility::get_timestamp() << std::endl;
           solve();
           if(assert_convergence)
+          {
             check_convergence();
+          }
 
           if (!is_quiet())
             {
