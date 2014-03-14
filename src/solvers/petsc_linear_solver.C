@@ -411,8 +411,6 @@ template <typename T>
 void
 PetscLinearSolver<T>::init_names (const System& sys)
 {
-  PetscErrorCode ierr = 0;
-
   petsc_auto_fieldsplit(this->pc(), sys);
 }
 
