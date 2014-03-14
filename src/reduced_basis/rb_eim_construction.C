@@ -552,6 +552,8 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       // Solve to find the best fit, then solution stores the truth representation
       // of the function to be approximated
       solve();
+      if(assert_convergence)
+        check_convergence();
 
       // Make sure we didn't max out the number of iterations
       if( (this->n_linear_iterations() >=

@@ -316,6 +316,9 @@ void RBSCMConstruction::compute_SCM_bounding_box()
       set_eigensolver_properties(q);
 
       solve();
+      if(assert_convergence)
+        check_convergence();
+      
       unsigned int nconv = get_n_converged();
       if (nconv != 0)
         {
@@ -338,6 +341,8 @@ void RBSCMConstruction::compute_SCM_bounding_box()
       set_eigensolver_properties(q);
 
       solve();
+      if(assert_convergence)
+        check_convergence();
       nconv = get_n_converged();
       if (nconv != 0)
         {
@@ -381,6 +386,8 @@ void RBSCMConstruction::evaluate_stability_constant()
 
   set_eigensolver_properties(-1);
   solve();
+  if(assert_convergence)
+    check_convergence();
   unsigned int nconv = get_n_converged();
   if (nconv != 0)
     {

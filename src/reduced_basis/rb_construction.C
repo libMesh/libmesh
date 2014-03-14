@@ -78,7 +78,8 @@ RBConstruction::RBConstruction (EquationSystems& es,
     rb_eval(NULL),
     inner_product_assembly(NULL),
     constraint_assembly(NULL),
-    training_tolerance(-1.)
+    training_tolerance(-1.),
+    assert_convergence(false)
 {
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
@@ -1208,20 +1209,10 @@ Real RBConstruction::truth_solve(int plot_solution)
   // Safer to zero the solution first, especially when using iterative solvers
   solution->zero();
   solve();
+  if(assert_convergence)
+    check_convergence();
 
   const RBParameters& mu = get_parameters();
-
-  // Make sure we didn't max out the number of iterations
-  if( (this->n_linear_iterations() >=
-       this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
-      (this->final_linear_residual() >
-       this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
-    {
-      libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
-                   << this->final_linear_residual() << ", number of iterations = "
-                   << this->n_linear_iterations() << std::endl << std::endl;
-      //     libmesh_error();
-    }
 
   for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
     {
@@ -1558,6 +1549,8 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
             }
 
           solve();
+          if(assert_convergence) 
+            check_convergence();
 
           if (!is_quiet())
             {
@@ -1565,18 +1558,6 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
                            << Utility::get_timestamp() << std::endl;
               libMesh::out << this->n_linear_iterations() << " iterations, final residual "
                            << this->final_linear_residual() << std::endl;
-            }
-
-          // Make sure we didn't max out the number of iterations
-          if( (this->n_linear_iterations() >=
-               this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
-              (this->final_linear_residual() >
-               this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
-            {
-              libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
-                           << this->final_linear_residual() << ", number of iterations = "
-                           << this->n_linear_iterations() << std::endl << std::endl;
-              //         libmesh_error();
             }
 
           // Store the representor
@@ -1723,6 +1704,8 @@ void RBConstruction::compute_output_dual_innerprods()
                              << Utility::get_timestamp() << std::endl;
 
               solve();
+              if(assert_convergence)
+                check_convergence();
 
               if (!is_quiet())
                 {
@@ -1735,18 +1718,6 @@ void RBConstruction::compute_output_dual_innerprods()
                                << this->final_linear_residual() << std::endl;
                 }
 
-              // Make sure we didn't max out the number of iterations
-              if( (this->n_linear_iterations() >=
-                   this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
-                  (this->final_linear_residual() >
-                   this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
-                {
-                  libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
-                               << this->final_linear_residual() << ", number of iterations = "
-                               << this->n_linear_iterations() << std::endl << std::endl;
-                  // libmesh_error();
-
-                }
               *L_q_representor[q_l] = *solution;
 
               if(reuse_preconditioner)
@@ -1851,6 +1822,8 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
                          << Utility::get_timestamp() << std::endl;
 
           solve();
+          if(assert_convergence)
+            check_convergence();
 
           if (!is_quiet())
             {
@@ -1863,18 +1836,6 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
                            << this->final_linear_residual() << std::endl;
             }
 
-          // Make sure we didn't max out the number of iterations
-          if( (this->n_linear_iterations() >=
-               this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
-              (this->final_linear_residual() >
-               this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
-            {
-              libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
-                           << this->final_linear_residual() << ", number of iterations = "
-                           << this->n_linear_iterations() << std::endl << std::endl;
-              //      libmesh_error();
-
-            }
           *Fq_representor[q_f] = *solution;
 
           if(reuse_preconditioner)
@@ -2393,5 +2354,24 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
   STOP_LOG("read_riesz_representors_from_files()", "RBConstruction");
 }
 
+void RBConstruction::check_convergence()
+{
+    libMesh::LinearConvergenceReason conv_flag;
+    conv_flag = get_linear_solver()->get_converged_reason();
+    if(conv_flag < 0)
+    {
+      libmesh_error();
+    }
+}
+
+bool RBConstruction::get_convergence_assertion_flag() const
+{
+  return assert_convergence;
+}
+
+void RBConstruction::set_convergence_assertion_flag(bool flag)
+{
+  assert_convergence = flag;
+}
 
 } // namespace libMesh

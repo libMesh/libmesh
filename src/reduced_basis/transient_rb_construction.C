@@ -616,18 +616,8 @@ Real TransientRBConstruction::truth_solve(int write_interval)
       // We assume that the truth assembly has been attached to the system
       truth_assembly();
       solve();
-
-      // Make sure we didn't max out the number of iterations
-      if( (this->n_linear_iterations() >=
-           this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
-          (this->final_linear_residual() >
-           this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
-        {
-          libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
-                       << this->final_linear_residual() << ", number of iterations = "
-                       << this->n_linear_iterations() << std::endl << std::endl;
-          //       libmesh_error();
-        }
+      if(assert_convergence)
+        check_convergence();
 
       if(reuse_preconditioner)
         {
@@ -1176,6 +1166,8 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
                          << i << " in TransientRBConstruction::update_residual_terms() at "
                          << Utility::get_timestamp() << std::endl;
           solve();
+          if(assert_convergence)
+            check_convergence();
 
           if (!is_quiet())
             {
@@ -1186,18 +1178,6 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
               libMesh::out << this->n_linear_iterations()
                            << " iterations, final residual "
                            << this->final_linear_residual() << std::endl;
-            }
-
-          // Make sure we didn't max out the number of iterations
-          if( (this->n_linear_iterations() >=
-               this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
-              (this->final_linear_residual() >
-               this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
-            {
-              libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
-                           << this->final_linear_residual() << ", number of iterations = "
-                           << this->n_linear_iterations() << std::endl << std::endl;
-              //       libmesh_error();
             }
 
           *trans_rb_eval.M_q_representor[q_m][i] = *solution;
