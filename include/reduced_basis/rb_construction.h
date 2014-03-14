@@ -284,6 +284,14 @@ public:
   virtual void get_output_vectors(std::map<std::string, NumericVector<Number>*>& all_vectors);
 
   /**
+   * Assemble the matrices and vectors for this system.
+   * Optionally skip matrix or vector assembly (e.g. we may want to
+   * read data in from disk instead).
+   */
+  virtual void assemble_affine_expansion(bool skip_matrix_assembly,
+                                         bool skip_vector_assembly);
+
+  /**
    * Assemble the inner product matrix and store it in input_matrix.
    */
   void assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix, bool apply_dof_constraints=true);
@@ -564,14 +572,6 @@ protected:
    * structures required by this class.
    */
   virtual void allocate_data_structures();
-
-  /**
-   * Assemble the matrices and vectors for this system.
-   * Optionally skip matrix or vector assembly (e.g. we may want to
-   * read data in from disk instead).
-   */
-  virtual void assemble_affine_expansion(bool skip_matrix_assembly,
-                                         bool skip_vector_assembly);
 
   /**
    * Assemble the truth matrix and right-hand side
