@@ -702,86 +702,87 @@ unsigned int MeshTools::n_p_levels (const MeshBase& mesh)
 
 
 
-void MeshTools::find_nodal_neighbors(const MeshBase&, const Node& n,
+void MeshTools::find_nodal_neighbors(const MeshBase&,
+                                     const Node& node,
                                      std::vector<std::vector<const Elem*> >& nodes_to_elem_map,
                                      std::vector<const Node*>& neighbors)
 {
-  dof_id_type global_id = n.id();
+  // We'll refer back to the Node ID several times
+  dof_id_type global_id = node.id();
 
-  //Iterators to iterate through the elements that include this node
+  // Iterators to iterate through the elements that include this node
   std::vector<const Elem*>::const_iterator el     = nodes_to_elem_map[global_id].begin();
   std::vector<const Elem*>::const_iterator end_el = nodes_to_elem_map[global_id].end();
 
-  unsigned int n_ed=0; // Number of edges on the element
-  unsigned int ed=0;   // Current edge
-  unsigned int l_n=0;  // Local node number
-  unsigned int o_n=0;  // Other node on this edge
-
-  //Assume we find a edge... then prove ourselves wrong...
-  bool found_edge=true;
-
-  Node * node_to_save = NULL;
-
-  //Look through the elements that contain this node
-  //find the local node id... then find the side that
-  //node lives on in the element
-  //next, look for the _other_ node on that side
-  //That other node is a "nodal_neighbor"... save it
-  for(;el != end_el;++el)
+  // Look through the elements that contain this node
+  // find the local node id... then find the side that
+  // node lives on in the element
+  // next, look for the _other_ node on that side
+  // That other node is a "nodal_neighbor"... save it
+  for (; el != end_el; ++el)
     {
-      //We only care about active elements...
-      if((*el)->active())
+      // Grab an Elem pointer to use in the subsequent loop
+      const Elem* elem = *el;
+
+      // We only care about active elements...
+      if (elem->active())
         {
-          n_ed=(*el)->n_edges();
+          // Which local node number is global_id?
+          unsigned local_node_number = elem->local_node(global_id);
 
-          //Find the local node id
-          while(global_id != (*el)->node(l_n++)) { }
-          l_n--; //Hmmm... take the last one back off
+          // Make sure it was found
+          libmesh_assert_not_equal_to(local_node_number, libMesh::invalid_uint);
 
-          while(ed<n_ed)
+          // Index of the current edge
+          unsigned current_edge = 0;
+
+          while (current_edge < elem->n_edges())
             {
+              // Find the edge the node is on
+              bool found_edge = false;
+              for (; current_edge<elem->n_edges(); ++current_edge)
+                if ( elem->is_node_on_edge(local_node_number, current_edge) )
+                  {
+                    found_edge = true;
+                    break;
+                  }
 
-              //Find the edge the node is on
-              while(found_edge && !(*el)->is_node_on_edge(l_n,ed++))
+              // Did we find one?
+              if (found_edge)
                 {
-                  //This only happens if all the edges have already been found
-                  if(ed>=n_ed)
-                    found_edge=false;
-                }
+                  Node* node_to_save = NULL;
 
-              //Did we find one?
-              if(found_edge)
-                {
-                  ed--; //Take the last one back off again
+                  // Find another node in this element on this edge
+                  for (unsigned other_node_this_edge = 0; other_node_this_edge<elem->n_nodes(); other_node_this_edge++)
+                    if ( (elem->is_node_on_edge(other_node_this_edge, current_edge)) && // On the current edge
+                         (elem->node(other_node_this_edge) != global_id))               // But not the original node
+                      {
+                        // We've found a nodal neighbor!  Save a pointer to it..
+                        node_to_save = elem->get_node(other_node_this_edge);
+                        break;
+                      }
 
-                  //Now find the other node on that edge
-                  while(!(*el)->is_node_on_edge(o_n++,ed) || global_id==(*el)->node(o_n-1)) { }
-                  o_n--;
+                  // Make sure we found something
+                  libmesh_assert(node_to_save != NULL);
 
-                  //We've found one!  Save it..
-                  node_to_save=(*el)->get_node(o_n);
+                  // Search to see if we've already found this one
+                  std::vector<const Node*>::const_iterator result = std::find(neighbors.begin(),
+                                                                              neighbors.end(),
+                                                                              node_to_save);
 
-                  //Search to see if we've already found this one
-                  std::vector<const Node*>::const_iterator result = std::find(neighbors.begin(),neighbors.end(),node_to_save);
-
-                  //If we didn't find it and add it to the vector
-                  if(result == neighbors.end())
+                  // If we didn't already have it, add it to the vector
+                  if (result == neighbors.end())
                     neighbors.push_back(node_to_save);
                 }
 
-              //Reset to look for another
-              o_n=0;
-
-              //Keep looking for edges, node may be on more than one edge
-              ed++;
+              // Keep looking for edges, node may be on more than one edge
+              current_edge++;
             }
-
-          //Reset to get ready for the next element
-          l_n=ed=0;
-          found_edge=true;
         }
     }
 }
+
+
 
 void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<dof_id_type, std::vector<dof_id_type> >& hanging_nodes)
 {
