@@ -564,7 +564,8 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = displacement.e $(example_name).php stdout.log
+CLEANFILES = displacement_and_stress.exo $(example_name).php \
+	stdout.log
 
 ######################################################################
 #
