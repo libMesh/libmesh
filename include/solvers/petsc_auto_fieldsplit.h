@@ -34,7 +34,6 @@
 // releases; we'll support it in 3.2 onward so we don't have to worry
 // about compilation errors
 
-#if !PETSC_VERSION_LESS_THAN(3,2,0)
 EXTERN_C_FOR_PETSC_BEGIN
 #  include <petscksp.h>
 EXTERN_C_FOR_PETSC_END
@@ -45,15 +44,13 @@ EXTERN_C_FOR_PETSC_END
 
 namespace libMesh
 {
-  // Forward declarations
-  class System;
+// Forward declarations
+class System;
 
 void petsc_auto_fieldsplit (PC my_pc, const System &sys);
 
 } // namespace libMesh
 
 
-#else  // #PETSC_VERSION < 2.2.0
-#endif // #PETSC_VERSION > 2.2.0
 #endif // #ifdef LIBMESH_HAVE_PETSC
 #endif // LIBMESH_PETSC_AUTO_FIELDSPLIT_H
