@@ -315,10 +315,12 @@ DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r)
       return DiffSolver::DIVERGED_NO_REASON;
     case SNES_DIVERGED_MAX_IT:
       return DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
-#if !PETSC_VERSION_LESS_THAN(3,2,0)
+#if PETSC_VERSION_LESS_THAN(3,2,0)
+    case SNES_DIVERGED_LS_FAILURE:
+#else
     case SNES_DIVERGED_LINE_SEARCH:
-      return DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
 #endif
+      return DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
       // In PETSc, SNES_CONVERGED_ITERATING means
       // the solve is still iterating, but by the
       // time we get here, we must have either
