@@ -41,10 +41,10 @@ typedef void (*gksighandler_t)(int);
 
 /* These are the holders of the old singal handlers for the trapped signals */
 #ifdef LIBMESH_TLS
-static __thread gksighandler_t old_SIGMEM_handler;  /* Custom signal */
-static __thread gksighandler_t old_SIGERR_handler;  /* Custom signal */
-static __thread gksighandler_t old_SIGMEM_handlers[MAX_JBUFS];  /* Custom signal */
-static __thread gksighandler_t old_SIGERR_handlers[MAX_JBUFS];  /* Custom signal */
+static LIBMESH_TLS gksighandler_t old_SIGMEM_handler;  /* Custom signal */
+static LIBMESH_TLS gksighandler_t old_SIGERR_handler;  /* Custom signal */
+static LIBMESH_TLS gksighandler_t old_SIGMEM_handlers[MAX_JBUFS];  /* Custom signal */
+static LIBMESH_TLS gksighandler_t old_SIGERR_handlers[MAX_JBUFS];  /* Custom signal */
 #else
 static gksighandler_t old_SIGMEM_handler;  /* Custom signal */
 static gksighandler_t old_SIGERR_handler;  /* Custom signal */
