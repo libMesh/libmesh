@@ -49,6 +49,11 @@ public:
    */
   RBParameters();
 
+  /**
+   * Constructor. Set parameters based on the std::map \p parameter_map.
+   */
+  RBParameters(const std::map<std::string, Real>& parameter_map);
+
   // Define a constant iterator for this class
   typedef std::map<std::string, Real>::const_iterator const_iterator;
 

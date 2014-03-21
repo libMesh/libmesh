@@ -32,6 +32,11 @@ RBParameters::RBParameters()
 {
 }
 
+RBParameters::RBParameters(const std::map<std::string, Real>& parameter_map)
+{
+  _parameters = parameter_map;
+}
+
 void RBParameters::clear()
 {
   _parameters.clear();
