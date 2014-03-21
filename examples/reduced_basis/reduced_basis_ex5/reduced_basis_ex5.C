@@ -49,6 +49,15 @@
 #include "rb_classes.h"
 #include "assembly.h"
 
+// boundary IDs
+#define BOUNDARY_ID_MIN_Z 0
+#define BOUNDARY_ID_MIN_Y 1
+#define BOUNDARY_ID_MAX_X 2
+#define BOUNDARY_ID_MAX_Y 3
+#define BOUNDARY_ID_MIN_X 4
+#define BOUNDARY_ID_MAX_Z 5
+#define NODE_BOUNDARY_ID 10
+
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
@@ -104,6 +113,54 @@ int main(int argc, char** argv) {
                                      0., y_size,
                                      0., z_size,
                                      HEX8);
+
+  // Let's add a some node boundary condition so that we can impose a point load
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  for ( ; el != end_el; ++el)
+    {
+      const Elem* elem = *el;
+
+      unsigned int side_max_x = 0, side_max_y = 0, side_max_z = 0;
+      bool found_side_max_x = false, found_side_max_y = false, found_side_max_z = false;
+      for(unsigned int side=0; side<elem->n_sides(); side++)
+        {
+          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
+            {
+              side_max_x = side;
+              found_side_max_x = true;
+            }
+
+          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Y))
+            {
+              side_max_y = side;
+              found_side_max_y = true;
+            }
+
+          if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_Z))
+            {
+              side_max_z = side;
+              found_side_max_z = true;
+            }
+        }
+
+      // If elem has sides on boundaries
+      // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
+      // then let's set a node boundary condition
+      if(found_side_max_x && found_side_max_y && found_side_max_z)
+        {
+          for(unsigned int n=0; n<elem->n_nodes(); n++)
+            {
+              if (elem->is_node_on_side(n, side_max_x) &&
+                  elem->is_node_on_side(n, side_max_y) &&
+                  elem->is_node_on_side(n, side_max_z) )
+                {
+                  mesh.boundary_info->add_node(elem->get_node(n), NODE_BOUNDARY_ID);
+                }
+            }
+        }
+    }
+
   mesh.print_info();
 
   // Create an equation systems object.
@@ -179,11 +236,17 @@ int main(int argc, char** argv) {
       Real online_load_Fx   = infile("online_load_Fx",   0.);
       Real online_load_Fy   = infile("online_load_Fy",   0.);
       Real online_load_Fz   = infile("online_load_Fz",   0.);
+      Real online_point_load_Fx   = infile("online_point_load_Fx",   0.);
+      Real online_point_load_Fy   = infile("online_point_load_Fy",   0.);
+      Real online_point_load_Fz   = infile("online_point_load_Fz",   0.);
       RBParameters online_mu;
       online_mu.set_value("x_scaling", online_x_scaling);
       online_mu.set_value("load_Fx",   online_load_Fx);
       online_mu.set_value("load_Fy",   online_load_Fy);
       online_mu.set_value("load_Fz",   online_load_Fz);
+      online_mu.set_value("point_load_Fx",   online_point_load_Fx);
+      online_mu.set_value("point_load_Fy",   online_point_load_Fy);
+      online_mu.set_value("point_load_Fz",   online_point_load_Fz);
       rb_eval.set_parameters(online_mu);
       rb_eval.print_parameters();
 

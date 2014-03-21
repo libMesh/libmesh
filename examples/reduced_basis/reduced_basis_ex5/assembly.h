@@ -25,6 +25,7 @@ using libMesh::RBThetaExpansion;
 #define BOUNDARY_ID_MAX_Y 3
 #define BOUNDARY_ID_MIN_X 4
 #define BOUNDARY_ID_MAX_Z 5
+#define NODE_BOUNDARY_ID 10
 
 class ElasticityRBConstruction;
 
@@ -131,6 +132,51 @@ struct AssemblyF2 : ElasticityAssembly
   virtual void boundary_assembly(FEMContext &c);
 };
 
+struct ThetaPointLoadX : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("point_load_Fx"); } };
+struct AssemblyPointLoadX : ElemAssembly
+{
+  AssemblyPointLoadX()
+  {}
+
+  // Apply a point load
+  virtual void
+    get_nodal_rhs_values(
+      std::map<numeric_index_type, Number>& values,
+      const System& sys,
+      const Node& node);
+
+};
+
+struct ThetaPointLoadY : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("point_load_Fy"); } };
+struct AssemblyPointLoadY : ElemAssembly
+{
+  AssemblyPointLoadY()
+  {}
+
+  // Apply a point load
+  virtual void
+    get_nodal_rhs_values(
+      std::map<numeric_index_type, Number>& values,
+      const System& sys,
+      const Node& node);
+
+};
+
+struct ThetaPointLoadZ : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("point_load_Fz"); } };
+struct AssemblyPointLoadZ : ElemAssembly
+{
+  AssemblyPointLoadZ()
+  {}
+
+  // Apply a point load
+  virtual void
+    get_nodal_rhs_values(
+      std::map<numeric_index_type, Number>& values,
+      const System& sys,
+      const Node& node);
+
+};
+
 struct InnerProductAssembly : ElasticityAssembly
 {
 
@@ -160,6 +206,9 @@ struct ElasticityThetaExpansion : RBThetaExpansion
     attach_F_theta(&theta_f_0);
     attach_F_theta(&theta_f_1);
     attach_F_theta(&theta_f_2);
+    attach_F_theta(&theta_point_load_x);
+    attach_F_theta(&theta_point_load_y);
+    attach_F_theta(&theta_point_load_z);
   }
 
   // The RBTheta member variables
@@ -169,6 +218,9 @@ struct ElasticityThetaExpansion : RBThetaExpansion
   ThetaF0 theta_f_0;
   ThetaF1 theta_f_1;
   ThetaF2 theta_f_2;
+  ThetaPointLoadX theta_point_load_x;
+  ThetaPointLoadY theta_point_load_y;
+  ThetaPointLoadZ theta_point_load_z;
 };
 
 // Define an RBAssemblyExpansion class for this PDE
@@ -194,6 +246,9 @@ struct ElasticityAssemblyExpansion : RBAssemblyExpansion
     attach_F_assembly(&F0_assembly);
     attach_F_assembly(&F1_assembly);
     attach_F_assembly(&F2_assembly);
+    attach_F_assembly(&point_load_assembly_x);
+    attach_F_assembly(&point_load_assembly_y);
+    attach_F_assembly(&point_load_assembly_z);
   }
 
   // The ElemAssembly objects
@@ -203,6 +258,9 @@ struct ElasticityAssemblyExpansion : RBAssemblyExpansion
   AssemblyF0 F0_assembly;
   AssemblyF1 F1_assembly;
   AssemblyF2 F2_assembly;
+  AssemblyPointLoadX point_load_assembly_x;
+  AssemblyPointLoadY point_load_assembly_y;
+  AssemblyPointLoadZ point_load_assembly_z;
 };
 
 #endif

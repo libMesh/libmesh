@@ -639,6 +639,45 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 
   const MeshBase& mesh = this->get_mesh();
 
+  // First add any node-based terms (e.g. point loads)
+  // We only enter this loop if we have at least one
+  // nodeset, since we use nodesets to indicate
+  // where to impose the node-based terms.
+  if(mesh.boundary_info->n_nodeset_conds() > 0)
+  {
+    std::vector<numeric_index_type> node_id_list;
+    std::vector<boundary_id_type> bc_id_list;
+
+    // Get the list of nodes with boundary IDs
+    mesh.boundary_info->build_node_list(node_id_list, bc_id_list);
+
+    for(unsigned int i=0; i<node_id_list.size(); i++)
+    {
+      const Node& node = mesh.node(node_id_list[i]);
+
+      // If node is on this processor, then all dofs on node are too
+      // so we can do the add below safely
+      if(node.processor_id() == this->comm().rank())
+      {
+        // Get the values to add to the rhs vector
+        std::map<numeric_index_type, Number> rhs_values;
+        elem_assembly->get_nodal_rhs_values(rhs_values, *this, node);
+
+        std::map<numeric_index_type, Number>::const_iterator it =
+          rhs_values.begin();
+        const std::map<numeric_index_type, Number>::const_iterator it_end =
+          rhs_values.end();
+        for( ; it != it_end; ++it)
+        {
+          numeric_index_type dof_index = it->first;
+          Number value = it->second;
+
+          input_vector->add( dof_index, value);
+        }
+      }
+    }
+  }
+
   AutoPtr<DGFEMContext> c = this->build_context();
   DGFEMContext &context  = libmesh_cast_ref<DGFEMContext&>(*c);
 
@@ -761,71 +800,6 @@ void RBConstruction::set_context_solution_vec(NumericVector<Number>& vec)
   // vec from DGFEMContext during assembly
   vec.localize
     (*current_local_solution, this->get_dof_map().get_send_list());
-}
-
-void RBConstruction::assemble_scaled_matvec(Number scalar,
-                                            ElemAssembly* elem_assembly,
-                                            NumericVector<Number>& dest,
-                                            NumericVector<Number>& arg)
-{
-  START_LOG("assemble_scaled_matvec()", "RBConstruction");
-
-  // This function isn't well tested lately, let's mark it as deprecated
-  // In particular, it probably wouldn't work properly with DG terms
-  libmesh_deprecated();
-
-  dest.zero();
-
-  // Set current_local_solution to be arg so that we
-  // can access it from the DGFEMContext. Do this in a
-  // function call so that it can be overloaded as
-  // necessary in subclasses
-  this->set_context_solution_vec(arg);
-
-  const MeshBase& mesh = this->get_mesh();
-
-  AutoPtr<DGFEMContext> c = this->build_context();
-  DGFEMContext &context  = libmesh_cast_ref<DGFEMContext&>(*c);
-
-  this->init_context(context);
-
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
-    {
-      context.pre_fe_reinit(*this, *el);
-      context.elem_fe_reinit();
-      elem_assembly->interior_assembly(context);
-
-      for (context.side = 0;
-           context.side != context.get_elem().n_sides();
-           ++context.side)
-        {
-          // May not need to apply fluxes on non-boundary elements
-          if( (context.get_elem().neighbor(context.side) != NULL) && !impose_internal_fluxes )
-            continue;
-
-          context.side_fe_reinit();
-          elem_assembly->boundary_assembly(context);
-        }
-
-
-      // Now perform the local matrix multiplcation
-      context.get_elem_jacobian().vector_mult(context.get_elem_residual(), context.get_elem_solution());
-      context.get_elem_residual() *= scalar;
-
-      // Apply dof constraints, e.g. Dirichlet or periodic constraints
-      this->get_dof_map().constrain_element_matrix_and_vector
-        (context.get_elem_jacobian(), context.get_elem_residual(), context.get_dof_indices() );
-
-      dest.add_vector (context.get_elem_residual(),
-                       context.get_dof_indices() );
-    }
-
-  dest.close();
-
-  STOP_LOG("assemble_scaled_matvec()", "RBConstruction");
 }
 
 void RBConstruction::truth_assembly()

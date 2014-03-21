@@ -18,10 +18,10 @@
 #ifndef LIBMESH_ELEM_ASSEMBLY_H
 #define LIBMESH_ELEM_ASSEMBLY_H
 
-// Local includes
 #include "libmesh/reference_counted_object.h"
+#include "libmesh/system.h"
+#include "libmesh/node.h"
 
-// C++ includes
 
 namespace libMesh
 {
@@ -58,6 +58,20 @@ public:
    * Perform the element boundary assembly.
    */
   virtual void boundary_assembly(FEMContext& ) { }
+
+  /**
+   * Get values to add to the RHS vector based on \p node.
+   * This allows one to impose point loads, for example.
+   */
+  virtual void
+    get_nodal_rhs_values(
+      std::map<numeric_index_type, Number>& values,
+      const System& ,
+      const Node& )
+  {
+    // By default, just clear the values map
+    values.clear();
+  }
 
 };
 

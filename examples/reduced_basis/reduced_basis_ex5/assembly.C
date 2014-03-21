@@ -326,6 +326,54 @@ void AssemblyF2::boundary_assembly(FEMContext &c)
     }
 }
 
+void AssemblyPointLoadX::get_nodal_rhs_values(
+      std::map<numeric_index_type, Number>& values,
+      const System& sys,
+      const Node& node)
+{
+  // First clear the values map
+  values.clear();
+
+  if(sys.get_mesh().boundary_info->has_boundary_id(&node, NODE_BOUNDARY_ID))
+  {
+    numeric_index_type dof_index =
+      node.dof_number(sys.number(), sys.variable_number("u"), 0);
+    values[dof_index] = 1.;
+  }
+}
+
+void AssemblyPointLoadY::get_nodal_rhs_values(
+      std::map<numeric_index_type, Number>& values,
+      const System& sys,
+      const Node& node)
+{
+  // First clear the values map
+  values.clear();
+
+  if(sys.get_mesh().boundary_info->has_boundary_id(&node, NODE_BOUNDARY_ID))
+  {
+    numeric_index_type dof_index =
+      node.dof_number(sys.number(), sys.variable_number("v"), 0);
+    values[dof_index] = 1.;
+  }
+}
+
+void AssemblyPointLoadZ::get_nodal_rhs_values(
+      std::map<numeric_index_type, Number>& values,
+      const System& sys,
+      const Node& node)
+{
+  // First clear the values map
+  values.clear();
+
+  if(sys.get_mesh().boundary_info->has_boundary_id(&node, NODE_BOUNDARY_ID))
+  {
+    numeric_index_type dof_index =
+      node.dof_number(sys.number(), sys.variable_number("w"), 0);
+    values[dof_index] = 1.;
+  }
+}
+
 void InnerProductAssembly::interior_assembly(FEMContext &c)
 {
   const unsigned int u_var = rb_sys.u_var;

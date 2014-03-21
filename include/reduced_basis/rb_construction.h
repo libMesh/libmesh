@@ -627,16 +627,6 @@ protected:
   virtual void set_context_solution_vec(NumericVector<Number>& vec);
 
   /**
-   * This function loops over the mesh and assembles the
-   * matrix-vector product and stores the scaled result
-   * in dest.
-   */
-  void assemble_scaled_matvec(Number scalar,
-                              ElemAssembly* elem_assembly,
-                              NumericVector<Number>& dest,
-                              NumericVector<Number>& arg);
-
-  /**
    * Assemble and store all the inner-product
    * matrix, the constraint matrix (for constrained
    * problems) and the mass matrix (for time-dependent
