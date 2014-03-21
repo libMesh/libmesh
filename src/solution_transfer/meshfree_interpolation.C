@@ -148,6 +148,10 @@ void MeshfreeInterpolation::gather_remote_data ()
 
   START_LOG ("gather_remote_data()", "MeshfreeInterpolation");
 
+  // block to avoid incorrect completion if called in quick succession on
+  // two different MeshfreeInterpolation objects
+  this->comm().barrier();
+
   std::vector<Real> send_buf, recv_buf;
 
   libmesh_assert_equal_to (_src_vals.size(),
