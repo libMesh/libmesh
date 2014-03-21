@@ -40,42 +40,42 @@ class CBigBitVec
 	CBigBitVec(
 		int iBits = FBV_BITS
 		);
-			
+
 	// Copy construct.  Creates duplicate.
 	CBigBitVec(
 		const CBigBitVec &cBBV
 		);
-	
+
 	// Copy constructor.
 	CBigBitVec(
 		const CFixBitVec &cFBV
 		);
-	
+
 	// Destructor
 	~CBigBitVec();
-	
+
 	// Returns the current size in bits.
 	int
 	getSize() const;
-	
+
 	// Resize function.  Returns the number of bits
 	// we can accomodate after resizing.
 	CBigBitVec &
 	setSize(
 		int iBits
 		);
-	
+
 	// Zeros the bit-vector.
 	CBigBitVec &
 	zero();
-	
+
 	// Truncates the bit-vector to a given precision in
 	// bits (zeroes MSBs without shrinking the vector)
 	CBigBitVec &
 	truncate(
 		int iBits
 		);
-	
+
 	// Assignment operator.  No resizing.
 	CBigBitVec &
 	operator=(
@@ -89,26 +89,26 @@ class CBigBitVec
 	operator=(
 		 FBV_UINT j
 		);
-	
+
 	// Returns the value of the nth bit.
 	bool
 	getBit(
 		int iIndex
 		) const;
-	
+
 	// Sets the value of the nth bit.
 	CBigBitVec &
 	setBit(
 		int iIndex,
 		bool bBit
 		);
-	
+
 	// Toggles the value of the nth bit.
 	CBigBitVec &
 	toggleBit(
 		int iIndex
 		);
-	
+
 	// In place AND.
 	CBigBitVec &
 	operator&=(
@@ -122,7 +122,7 @@ class CBigBitVec
 	operator&=(
 		 FBV_UINT i
 		);
-	
+
 	// AND operator.
 	CBigBitVec
 	operator&(
@@ -136,7 +136,7 @@ class CBigBitVec
 	operator&(
 		 FBV_UINT i
 		);
-	
+
 	// In place OR.
 	CBigBitVec &
 	operator|=(
@@ -150,7 +150,7 @@ class CBigBitVec
 	operator|=(
 		 FBV_UINT i
 		);
-	
+
 	// OR operator.
 	CBigBitVec
 	operator|(
@@ -164,7 +164,7 @@ class CBigBitVec
 	operator|(
 		 FBV_UINT i
 		);
-	
+
 	// In place XOR.
 	CBigBitVec &
 	operator^=(
@@ -178,13 +178,13 @@ class CBigBitVec
 	operator^=(
 		FBV_UINT i
 		);
-	
+
 	// XOR operator.
 	CBigBitVec
 	operator^(
 		const CBigBitVec &cBBV
 		) const;
-	CBigBitVec	
+	CBigBitVec
 	operator^(
 		const CFixBitVec &r
 		);
@@ -192,63 +192,63 @@ class CBigBitVec
 	operator^(
 		 FBV_UINT i
 		);
-	
+
 	// Shift left operation, in place.
 	CBigBitVec &
 	operator<<=(
 		int iBits
 		);
-	
+
 	// Shift left operation.
 	CBigBitVec
 	operator<<(
 		int iBits
 		) const;
-	
+
 	// Shift right operation, in place.
 	CBigBitVec &
 	operator>>=(
 		int iBits
 		);
-	
+
 	// Shift right operation.
 	CBigBitVec
 	operator>>(
 		int iBits
 		) const;
-	
+
 	// Right rotation, in place.
 	CBigBitVec &
 	rotr(
 		int iBits,
 		int iWidth = 0
 		);
-	
+
 	// Right rotation.
 	CBigBitVec
 	rotrCopy(
 		int iBits,
 		int iWidth = 0
 		) const;
-	
+
 	// Left rotation, in place.
 	CBigBitVec &
 	rotl(
 		int iBits,
 		int iWidth = 0
 		);
-	
+
 	// Left rotation.
 	CBigBitVec
 	rotlCopy(
 		int iBits,
 		int iWidth = 0
 		) const;
-	
+
 	// Returns true if the rack is zero valued.
 	bool
 	isZero() const;
-	
+
 	// Returns the number of trailing set bits.
 	int
 	tsb() const;
@@ -258,41 +258,41 @@ class CBigBitVec
 	// 1 to n)
 	int
 	msb() const;
-	
+
 	// Returns the index of the first set bit.
 	// (numbered 1 to n, with 0 meaning no bits were set)
 	int
 	fsb() const;
-	
+
 	// Prefix decrement.  Returns true if there
 	// was a carry, false otherwise.
 	bool
 	operator--();
-	
+
 	// Gray Code
 	CBigBitVec &
 	grayCode();
-	
+
 	// Gray Code Inverse
 	CBigBitVec &
 	grayCodeInv();
-	
+
 	// Complement
 	CBigBitVec &
 	complement();
-	
+
 	// Returns the first rack.
 	FBV_UINT &
 	rack();
 	FBV_UINT
 	rack() const;
-	
+
 	// Returns the racks.
 	FBV_UINT *
 	racks();
 	const FBV_UINT *
 	racks() const;
-	
+
 	// Returns the number of racks.
 	int
 	rackCount() const;
@@ -304,8 +304,8 @@ class CBigBitVec
         // Comparison operator
         bool
 	operator==(const CBigBitVec& other) const;
-  
-  private:	
+
+  private:
 
 	// Right rotates entire racks (in place).
 	void

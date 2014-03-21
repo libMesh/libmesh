@@ -26,7 +26,7 @@
 
 namespace Hilbert
 {
-	
+
 	template<class P,class I>
 	H_INLINE
 	void
@@ -65,8 +65,8 @@ namespace Hilbert
 		}
 		return;
 	}
-	
-	
+
+
 	template<class P,class I>
 	H_INLINE
 	void
@@ -81,10 +81,10 @@ namespace Hilbert
 		for ( j = n-1; j >= 0; --j )
 			l.setBit(j,p[j].getBit(i));
 		return;*/
-		
+
 		int j, jo, ir;
 		FBV_UINT im;
-		
+
 		if ( P::type() == eBig )
 		{
 			ir = i / FBV_BITS;
@@ -95,7 +95,7 @@ namespace Hilbert
 			ir = 0;
 			im = FBV1 << i;
 		}
-		
+
 		j = 0;
 		jo = 0;
 		if ( I::type() == eBig )
@@ -104,10 +104,10 @@ namespace Hilbert
 				_getLocation<P,I>(p,jo,FBV_BITS,ir,im,l.racks()[j]);
 		}
 		_getLocation<P,I>(p,jo,n-jo,ir,im,l.racks()[j]);
-		
+
 		return;
 	}
-	
+
 }
 
 

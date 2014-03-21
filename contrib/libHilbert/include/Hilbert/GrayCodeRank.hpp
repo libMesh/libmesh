@@ -92,7 +92,7 @@ namespace Hilbert
 				}
 				k -= kd;
 			}*/
-			
+
 			// Run through the dimensions
 			j = ds[i];
 			do
@@ -138,7 +138,7 @@ namespace Hilbert
 					r.racks()[jr] |= jm;
 				jm<<=1; if ( jm == 0 ) { jm = 1; ++jr; }
 			}
-			
+
 			im<<=1; if ( im == 0 ) { im = 1; ++ir; }
 		}
 
@@ -203,7 +203,7 @@ namespace Hilbert
 		return;
 	}
 
-	
+
 	template <class I>
 	H_INLINE
 	void
@@ -222,7 +222,7 @@ namespace Hilbert
 
 		mask.zero();
 		b = 0;
-		
+
 		jm = 1; jr = 0;
 		j = d; // #D j = (d==n-1) ? 0 : d+1;
 		do
@@ -232,7 +232,7 @@ namespace Hilbert
 				mask.racks()[jr] |= jm;
 				++b;
 			}
-		
+
 			jm <<= 1; if ( jm == 0 ) { jm=1; ++jr; }
 			if ( ++j == n ) j = 0;
 		}

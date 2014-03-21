@@ -43,7 +43,7 @@ namespace Hilbert
 		return;
 	}
 
-	
+
 	// <CBigBitVec,CBigBitVec>
 	// #TODO
 
@@ -69,8 +69,8 @@ namespace Hilbert
 		w.truncate(n);
 		return;
 	}
-	
-	
+
+
 	// <CFixBitVec,CFixBitVec>
 	template<>
 	H_INLINE

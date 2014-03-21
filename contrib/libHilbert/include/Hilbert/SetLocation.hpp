@@ -77,7 +77,7 @@ namespace Hilbert
 				jm = 1;
 				++lr;
 			}
-			
+
 			int dj = n - j;
 			switch ( n - j )
 			{
@@ -86,7 +86,7 @@ namespace Hilbert
 			}
 			j += dj;
 		}
-		
+
 		return;
 	}
 

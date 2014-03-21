@@ -70,8 +70,8 @@ namespace Hilbert
 		}
 		return;
 	}
-	
-	
+
+
 	// <CFixBitVec,CFixBitVec>
 	template<>
 	H_INLINE

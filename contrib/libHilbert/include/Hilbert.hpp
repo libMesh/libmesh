@@ -77,7 +77,7 @@ namespace Hilbert
 		CBigBitVec &hc, int M = 0, int m = 0 );
 	void compactIndexToCoords( CFixBitVec *p, const int *ms, int n,
 		const CBigBitVec &hc, int M = 0, int m = 0 );
-	
+
 	// big -> big
 	void coordsToIndex( const CBigBitVec *p, int m, int n, CBigBitVec &h );
 	void indexToCoords( CBigBitVec *p, int m, int n, const CBigBitVec &h );

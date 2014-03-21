@@ -378,7 +378,7 @@ CFixBitVec::tsb() const
 	if ( (i&FBVN1S( 2)) == FBVN1S( 2) ) { i>>= 2; c^= 2; }
 	if ( (i&FBVN1S( 1)) == FBVN1S( 1) ) { i>>= 1; c^= 1; }
 
-	return c;	
+	return c;
 }
 
 // Returns the index of the most significant bit
@@ -400,7 +400,7 @@ CFixBitVec::msb() const
 	if ( i & (FBVN1S( 1) <<  1) ) { i >>=  1; c ^=  1; }
 	return ++c;
 }
-                
+
 // Returns the index of the first set bit, numbered from
 // 1 to n.  0 means there were no set bits.
 int

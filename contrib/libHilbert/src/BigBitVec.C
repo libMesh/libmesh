@@ -36,11 +36,11 @@ CBigBitVec::CBigBitVec(
 
 	// Allocate the memory.
 	m_pcRacks = new CFixBitVec[m_iRacks];
-			
+
 	return;
 }
-		
-		
+
+
 // Copy construct.	Creates duplicate.
 CBigBitVec::CBigBitVec(
 	const CBigBitVec &cBBV
@@ -100,14 +100,14 @@ CBigBitVec::setSize(
 	)
 {
 	int i;
-	
+
 	// How many racks do we need?
 	int iRacks = FBVS_NEEDED(iBits);
 
 	// Same size?
 	if ( iRacks == m_iRacks )
 		return (*this);
-	
+
 	// Allocate new racks.
 	CFixBitVec *pcRacks = new CFixBitVec[iRacks];
 
@@ -132,7 +132,7 @@ CBigBitVec::setSize(
 	// Replace old with new.
 	m_iRacks = iRacks;
 	m_pcRacks = pcRacks;
-	
+
 	return (*this);
 }
 
@@ -141,7 +141,7 @@ CBigBitVec::setSize(
 CBigBitVec &
 CBigBitVec::zero()
 {
-	
+
 	/*int i;
 	for ( i = 0; i < m_iRacks; i++ )
 		m_pcRacks[i].zero();*/
@@ -163,12 +163,12 @@ CBigBitVec::truncate(
 	int r, b, i;
 
 	BBV_MODSPLIT(r,b,iBits);
-	
+
 	if ( r >= m_iRacks )
 		return (*this);
 
 	m_pcRacks[r].truncate(b);
-	
+
 	for ( i = r+1; i < m_iRacks; i++ )
 		m_pcRacks[i].zero();
 
@@ -283,10 +283,10 @@ CBigBitVec::operator&=(
 	)
 {
 	int i;
-	
+
 	for ( i = 0; i < BBV_MIN(m_iRacks,cBBV.m_iRacks); i++ )
 		m_pcRacks[i] &= cBBV.m_pcRacks[i];
-	
+
 	return (*this);
 }
 CBigBitVec &
@@ -325,7 +325,7 @@ CBigBitVec::operator&(
 {
 	CBigBitVec t( *this );
 	t &= r;
-	
+
 	return t;
 }
 CBigBitVec
@@ -335,7 +335,7 @@ CBigBitVec::operator&(
 {
 	CBigBitVec t( *this );
 	t &= i;
-	
+
 	return t;
 }
 
@@ -347,10 +347,10 @@ CBigBitVec::operator|=(
 	)
 {
 	int i;
-	
+
 	for ( i = 0; i < BBV_MIN(m_iRacks,cBBV.m_iRacks); i++ )
 		m_pcRacks[i] |= cBBV.m_pcRacks[i];
-	
+
 	return (*this);
 }
 CBigBitVec &
@@ -389,7 +389,7 @@ CBigBitVec::operator|(
 {
 	CBigBitVec t( *this );
 	t |= r;
-	
+
 	return t;
 }
 CBigBitVec
@@ -399,7 +399,7 @@ CBigBitVec::operator|(
 {
 	CBigBitVec t( *this );
 	t |= i;
-	
+
 	return t;
 }
 
@@ -411,10 +411,10 @@ CBigBitVec::operator^=(
 	)
 {
 	int i;
-	
+
 	for ( i = 0; i < BBV_MIN(m_iRacks,cBBV.m_iRacks); i++ )
 		m_pcRacks[i] ^= cBBV.m_pcRacks[i];
-	
+
 	return (*this);
 }
 CBigBitVec &
@@ -446,14 +446,14 @@ CBigBitVec::operator^(
 
 	return t;
 }
-CBigBitVec	
+CBigBitVec
 CBigBitVec::operator^(
 	const CFixBitVec &r
 	)
 {
 	CBigBitVec t( *this );
 	t ^= r;
-	
+
 	return t;
 }
 CBigBitVec
@@ -463,7 +463,7 @@ CBigBitVec::operator^(
 {
 	CBigBitVec t( *this );
 	t ^= i;
-	
+
 	return t;
 }
 
@@ -611,7 +611,7 @@ CBigBitVec::rotr(
 	(*this) >>= iBits;
 	t1 <<= (iWidth-iBits);
 	(*this) |= t1;
-	
+
 	truncate(iWidth);
 
 	return (*this);
@@ -749,7 +749,7 @@ CBigBitVec::operator--()
 	int i = 0;
 	bool b=false;
 	while ( i < m_iRacks && (b = --m_pcRacks[i]) ) i++;
-	
+
 	return b;
 }
 
@@ -834,7 +834,7 @@ CBigBitVec::rackCount() const
 	return m_iRacks;
 }
 
-	
+
 // Right rotates entire racks (in place).
 void
 CBigBitVec::rackRotr(
@@ -842,7 +842,7 @@ CBigBitVec::rackRotr(
 	)
 {
 	assert( 0 <= k && k < m_iRacks );
-	
+
 	int c, v;
 	CFixBitVec tmp;
 
@@ -874,7 +874,7 @@ bool
 CBigBitVec::operator<(const CBigBitVec& b) const
 {
   const CBigBitVec &a = *this;
-  
+
   int rack;
 
   if (a.rackCount() > b.rackCount())
@@ -883,12 +883,12 @@ CBigBitVec::operator<(const CBigBitVec& b) const
 	if (a.racks()[rack] > 0)
 	  return false;
     }
-  
+
   else if (a.rackCount() < b.rackCount())
     {
       for (rack = (b.rackCount()-1); rack >= a.rackCount(); rack--)
 	if (0 < b.racks()[rack])
-	  return true;      
+	  return true;
     }
   else
     rack = a.rackCount()-1;
@@ -904,10 +904,10 @@ bool
 CBigBitVec::operator==(const CBigBitVec& b) const
 {
   const CBigBitVec &a = *this;
-  
+
   if (a.rackCount() != b.rackCount())
     return false;
-  
+
   int rack = a.rackCount()-1;
 
   while (rack > 0 && a.racks()[rack] == b.racks()[rack]) rack--;

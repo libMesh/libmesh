@@ -23,7 +23,7 @@
 #include <ostream>
 
 // Specific extensions to libHilbert-0.2.
-namespace Hilbert 
+namespace Hilbert
 {
   typedef FBV_UINT /**/ inttype;
 
@@ -35,7 +35,7 @@ namespace Hilbert
    * Define a simple struct to facilitate communicating
    * Hilbert indices using MPI-derived datatypes.
    */
-  struct HilbertIndices 
+  struct HilbertIndices
   {
     inttype rack0;
     inttype rack1;
@@ -47,27 +47,27 @@ namespace Hilbert
       rack1(0),
       rack2(0)
     {}
-	
+
     // Constructor from a BitVecType
     HilbertIndices (const CBigBitVec &bv)
     {
       assert (bv.rackCount() == 3);
-      
+
       this->rack0 = bv.racks()[0];
       this->rack1 = bv.racks()[1];
       this->rack2 = bv.racks()[2];
     }
-    
+
     // Assignment operator to a HilbertIndices from a BitVecType
     HilbertIndices&
     operator=(const CBigBitVec &bv)
     {
       assert (bv.rackCount() == 3);
-      
+
       this->rack0 = bv.racks()[0];
       this->rack1 = bv.racks()[1];
       this->rack2 = bv.racks()[2];
-      
+
       return *this;
     }
 
@@ -99,18 +99,18 @@ namespace Hilbert
       return *this < other;
     }
 
-    friend std::ostream& 
+    friend std::ostream&
     operator << (std::ostream& os, const Hilbert::HilbertIndices& t)
     {
       os << t.rack2 << "_"
 	 << t.rack1 << "_"
 	 << t.rack0;
-	
+
       return os;
     }
   };
 
-  
+
   /**
    * Augment the libHilbert CBigBitVec class
    * with a convenient assignment operator from
@@ -119,23 +119,23 @@ namespace Hilbert
   class BitVecType : public CBigBitVec
   {
   public:
-    
+
     BitVecType(unsigned int size = 3*sizeof(double)*sizeof(inttype)) :
       CBigBitVec(size) {};
-    
-    BitVecType& 
+
+    BitVecType&
       operator=(const HilbertIndices &hi)
       {
 	assert (this->rackCount() == 3);
-      
+
 	this->racks()[0] = hi.rack0;
 	this->racks()[1] = hi.rack1;
 	this->racks()[2] = hi.rack2;
-	
+
 	return *this;
       }
 
-    friend std::ostream& 
+    friend std::ostream&
       operator << (std::ostream& os, const Hilbert::BitVecType& t)
       {
 	assert (t.rackCount() == 3);
@@ -143,7 +143,7 @@ namespace Hilbert
 	os << t.racks()[2] << "_"
 	   << t.racks()[1] << "_"
 	   << t.racks()[0];
-	
+
 	return os;
       }
   };
