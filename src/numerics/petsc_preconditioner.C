@@ -83,7 +83,11 @@ void PetscPreconditioner<T>::init ()
       _mat = pmatrix->mat();
     }
 
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
   int ierr = PCSetOperators(_pc,_mat,_mat,SAME_NONZERO_PATTERN);
+#else
+  int ierr = PCSetOperators(_pc,_mat,_mat);
+#endif
   LIBMESH_CHKERRABORT(ierr);
 
   // Set the PCType.  Note: this used to be done *before* the call to

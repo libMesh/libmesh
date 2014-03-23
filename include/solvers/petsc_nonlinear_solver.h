@@ -38,14 +38,18 @@ EXTERN_C_FOR_PETSC_END
 
 namespace libMesh
 {
-// Allow users access to these functions in case they want to reuse them.  Note that users shouldn't
-// need access to these most of the time as they are used internally by this object.
-extern "C"
-{
-  PetscErrorCode __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *);
-  PetscErrorCode __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void *ctx);
-  PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx);
-}
+  // Allow users access to these functions in case they want to reuse them.  Note that users shouldn't
+  // need access to these most of the time as they are used internally by this object.
+  extern "C"
+  {
+    PetscErrorCode __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *);
+    PetscErrorCode __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void *ctx);
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
+    PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx);
+#else
+    PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat jac, Mat pc, void *ctx);
+#endif
+  }
 
 /**
  * This class provides an interface to PETSc
@@ -189,7 +193,11 @@ private:
 #endif
 
   friend PetscErrorCode __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void *ctx);
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
   friend PetscErrorCode __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx);
+#else
+  friend PetscErrorCode __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat jac, Mat pc, void *ctx);
+#endif
 };
 
 

@@ -153,8 +153,13 @@ extern "C"
 
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the Jacobian at X
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
   PetscErrorCode
   __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat *jac, Mat *pc, MatStructure *msflag, void *ctx)
+#else
+  PetscErrorCode
+  __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat jac, Mat pc, void *ctx)
+#endif
   {
     START_LOG("jacobian()", "PetscNonlinearSolver");
 
@@ -176,9 +181,13 @@ extern "C"
     }
 
     NonlinearImplicitSystem &sys = solver->system();
-
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
     PetscMatrix<Number> PC(*pc, sys.comm());
     PetscMatrix<Number> Jac(*jac, sys.comm());
+#else
+    PetscMatrix<Number> PC(pc, sys.comm());
+    PetscMatrix<Number> Jac(jac, sys.comm());
+#endif
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscMatrix<Number>& Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
     PetscVector<Number> X_global(x, sys.comm());
@@ -225,9 +234,9 @@ extern "C"
     PC.close();
     Jac.close();
     X_global.close();
-
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
     *msflag = SAME_NONZERO_PATTERN;
-
+#endif
     STOP_LOG("jacobian()", "PetscNonlinearSolver");
 
     return ierr;

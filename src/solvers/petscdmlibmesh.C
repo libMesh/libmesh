@@ -794,7 +794,11 @@ static PetscErrorCode SNESFunction_DMlibMesh(SNES, Vec x, Vec r, void *ctx)
 
 #undef __FUNCT__
 #define __FUNCT__ "DMlibMeshJacobian"
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
 static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc, MatStructure *msflag)
+#else
+static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
+#endif
 {
   PetscErrorCode ierr;
   PetscFunctionBegin;
@@ -856,20 +860,29 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc, MatStruct
   the_pc.close();
   Jac.close();
   X_global.close();
-
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
   *msflag = SAME_NONZERO_PATTERN;
+#endif
   PetscFunctionReturn(0);
 }
 
 #if !PETSC_RELEASE_LESS_THAN(3,3,1)
 #undef  __FUNCT__
 #define __FUNCT__ "SNESJacobian_DMlibMesh"
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
 static PetscErrorCode SNESJacobian_DMlibMesh(SNES,Vec x,Mat *jac,Mat *pc, MatStructure* flag, void* ctx)
+#else
+static PetscErrorCode SNESJacobian_DMlibMesh(SNES,Vec x,Mat jac,Mat pc, void* ctx)
+#endif
 {
   DM dm = (DM)ctx;
   PetscErrorCode ierr;
   PetscFunctionBegin;
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
   ierr = DMlibMeshJacobian(dm,x,*jac,*pc,flag); CHKERRQ(ierr);
+#else
+  ierr = DMlibMeshJacobian(dm,x,jac,pc); CHKERRQ(ierr);
+#endif
   PetscFunctionReturn(0);
 }
 #endif
