@@ -238,7 +238,9 @@ void Xdr::open (const std::string& name)
           }
 
         libmesh_assert(in.get());
-        libmesh_assert (in->good());
+
+        if (!in->good())
+          libmesh_file_error(name);
         return;
       }
 
