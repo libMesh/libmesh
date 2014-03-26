@@ -1074,6 +1074,7 @@ enable_dirichlet
 enable_nodeconstraint
 enable_parmesh
 enable_ghosted
+enable_node_valence
 enable_1D_only
 enable_2D_only
 enable_pfem
@@ -1843,6 +1844,7 @@ Optional Features:
   --enable-nodeconstraint build with node constraints suppport
   --enable-parmesh        Use experimental ParallelMesh as Mesh
   --enable-ghosted        Use ghosted local vectors when available
+  --enable-node-valence   Compute and store node valence values
   --enable-1D-only        build with support for 1D meshes only
   --enable-2D-only        build with support for 1D and 2D meshes only
   --enable-pfem           build with support for higher order p-FEM shapes
@@ -27019,6 +27021,29 @@ fi
 
 
 # -------------------------------------------------------------
+# Store node valence for use with subdivision surface finite
+#  elements -- enabled by default
+# -------------------------------------------------------------
+# Check whether --enable-node-valence was given.
+if test "${enable_node_valence+set}" = set; then :
+  enableval=$enable_node_valence; enablenodevalence=$enableval
+else
+  enablenodevalence=yes
+fi
+
+
+if test "$enablenodevalence" != no ; then
+
+$as_echo "#define ENABLE_NODE_VALENCE 1" >>confdefs.h
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library to store node valence >>>" >&5
+$as_echo "<<< Configuring library to store node valence >>>" >&6; }
+fi
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
 # 1D or 1D/2D only -- disabled by default
 # -------------------------------------------------------------
 # Check whether --enable-1D-only was given.
@@ -37789,6 +37814,7 @@ echo '  periodic boundary conditions..... :' $enableperiodic
 echo '  reference counting............... :' $enablerefct
 echo '  shape function 2nd derivatives... :' $enablesecond
 echo '  stack trace files................ :' $enabletracefiles
+echo '  track node valence............... :' $enablenodevalence
 echo '  variational smoother............. :' $enablevsmoother
 echo '  xdr binary I/O................... :' $enablexdr
 if (test "x$enablelegacyincludepaths" = "xyes"); then

@@ -673,7 +673,7 @@ void FESubdivision::reinit(const Elem* elem,
   libmesh_assert_equal_to(sd_elem->get_ordered_valence(2), 6);
 
   // no custom quadrature support
-  libmesh_assert_equal_to(pts, NULL);
+  libmesh_assert(pts == NULL);
   libmesh_assert(qrule);
   qrule->init(elem->type());
 

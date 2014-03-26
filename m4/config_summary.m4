@@ -90,6 +90,7 @@ echo '  periodic boundary conditions..... :' $enableperiodic
 echo '  reference counting............... :' $enablerefct
 echo '  shape function 2nd derivatives... :' $enablesecond
 echo '  stack trace files................ :' $enabletracefiles
+echo '  track node valence............... :' $enablenodevalence
 echo '  variational smoother............. :' $enablevsmoother
 echo '  xdr binary I/O................... :' $enablexdr
 if (test "x$enablelegacyincludepaths" = "xyes"); then

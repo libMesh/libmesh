@@ -76,6 +76,11 @@ int main (int argc, char** argv)
   // Skip this 3D example if libMesh was compiled as 1D/2D-only.
   libmesh_example_assert (3 == LIBMESH_DIM, "3D support");
 
+  // Skip this example without --enable-node-valence
+#ifndef LIBMESH_ENABLE_NODE_VALENCE
+  libmesh_example_assert (false, "--enable-node-valence");
+#endif
+
   // Create a 2D mesh distributed across the default MPI communicator.
   Mesh mesh (init.comm(), 2);
 
