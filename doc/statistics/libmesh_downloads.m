@@ -171,35 +171,6 @@ end
 % so reverse it!
 n_downloads = flipud (n_downloads);
 
-% Plot number of downloads.  The last argument to
-% bar is the relative width of each bar.  width=1 means
-% there is no whitespace between the bars... Default is
-% .8
-plot_handle = bar( linspace(1,N,N), n_downloads, .8 );
-
-% Looks like a bar graph with width=1 and with uncolored bars
-% plot_handle = stairs( linspace(1,N,N), n_downloads);
-
-% Some interesting properties set by the "bar" command
-% facecolor = flat
-% facealpha =  1
-% You can change the color to black by doing:
-% set(plot_handle,'facecolor','k');
-
-% This seems like it should set the transparency but I don't
-% think it's supported.
-% set(plot_handle,'facealpha',0.5);
-
-% It feels like there is a lot of 'wasted' space in the
-% plot when most of the lines are above a certain level.
-% We can try to up the minimum y limit... A drawback of
-% doing this is that it looks like some data are missing.
-%set(gca,'ylim',[100 330]);
-
-% Note, first/last bars need space on either side, so
-% don't do this!
-% set(gca, 'xlim', [1 N]);
-
 % Compute and plot "all time" moving average
 moving_average = zeros(1,N);
 running_total = 0;
@@ -209,12 +180,16 @@ for i=1:N
 end
 
 ph = plot(linspace(1,N,N), moving_average, 'r-');
-set(ph,'linewidth',4); %get(ph) % to see more properties
+set(ph, 'linewidth', 6);
 
-% Nice, even though this plot was *after* the bar command,
-% the lengend goes to the lineplot, not the bar graph!
+% Plot number of downloads.  The last argument to
+% bar is the relative width of each bar.  width=1 means
+% there is no whitespace between the bars... Default is
+% .8
+plot_handle = bar( linspace(1,N,N), n_downloads, .8 );
+
+% Add legend for trailing average line
 legend('All time trailing average', 'location', 'northwest');
-% Note: 'location', 'outside' is terrible!
 
 % Specify where ticks go in the 'xticksat' array.  Then it
 % will set the labels itself.
