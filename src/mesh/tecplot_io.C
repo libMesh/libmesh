@@ -217,17 +217,44 @@ void TecplotIO::write_ascii (const std::string& fname,
 
     out_stream << "Zone f=fepoint, n=" << the_mesh.n_nodes() << ", e=" << the_mesh.n_active_sub_elem();
 
-    if (the_mesh.mesh_dimension() == 1)
-      out_stream << ", et=lineseg";
-    else if (the_mesh.mesh_dimension() == 2)
-      out_stream << ", et=quadrilateral";
-    else if (the_mesh.mesh_dimension() == 3)
-      out_stream << ", et=brick";
-    else
-      {
-        // Dimension other than 1, 2, or 3?
-        libmesh_error();
-      }
+    // We cannot choose the element type simply based on the mesh
+    // dimension... there might be 1D elements living in a 3D mesh.
+    // So look at the elements which are actually in the Mesh, and
+    // choose either "lineseg", "quadrilateral", or "brick" depending
+    // on if the elements are 1, 2, or 3D.  If there is a mix of
+    // elements, also detect that and throw an error, I'm not sure
+    // how Tecplot handles this case.
+    std::string et;
+    {
+      std::vector<unsigned> elem_dims(3);
+
+      MeshBase::const_element_iterator       it  = the_mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = the_mesh.active_elements_end();
+      for ( ; it != end; ++it)
+        elem_dims[(*it)->dim() - 1] = 1;
+
+      // Detect and disallow (for now) the writing of mixed dimension meshes.
+      if (std::count(elem_dims.begin(), elem_dims.end(), 1) > 1)
+        {
+          libMesh::err << "Error, cannot write Mesh with mixed element dimensions to Tecplot file!" << std::endl;
+          libmesh_error();
+        }
+
+      if (elem_dims[0])
+        et = "lineseg";
+      else if (elem_dims[1])
+        et = "quadrilateral";
+      else if (elem_dims[2])
+        et = "brick";
+      else
+        {
+          libMesh::err << "No 1, 2, or 3D elements detected!" << std::endl;
+          libmesh_error();
+        }
+    }
+
+    // Write the element type we've determined to the header.
+    out_stream << ", et=" << et;
 
     // Use default mesh color = black
     out_stream << ", c=black\n";
