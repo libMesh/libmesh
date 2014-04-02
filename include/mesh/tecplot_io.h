@@ -119,6 +119,15 @@ private:
                      const std::vector<Number>* = NULL,
                      const std::vector<std::string>* = NULL);
 
+  /**
+   * Determines the logical spatial dimension of the elements in the
+   * Mesh.  Ex: A 1D edge element living in 3D is a logically
+   * one-dimensional element as far as Tecplot is concerned.  Throws
+   * an error if mixed-dimension element types are found, since I'm
+   * not sure how to handle that case currently.
+   */
+  unsigned elem_dimension();
+
   //---------------------------------------------------------------------------
   // local data
 
