@@ -363,7 +363,7 @@ void TecplotIO::write_binary (const std::string& fname,
     cell_type   = -1,
     nn_per_elem = -1;
 
-  switch (the_mesh.mesh_dimension())
+  switch (this->elem_dimension())
     {
     case 1:
       cell_type   = 1;  // FELINESEG
