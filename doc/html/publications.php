@@ -764,21 +764,24 @@ E.&nbsp;E. Prudencio, P.&nbsp;T. Bauman, D.&nbsp;Faghihi, K.&nbsp;Ravi-Chandar, 
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nagler_2013">2</a>]
+[<a name="Grote_2013">2</a>]
 </td>
 <td class="bibtexitem">
-L.&nbsp;Nagler, P.&nbsp;Rong, M.&nbsp;Schanz, and O.&nbsp;von Estorff.
- Sound transmission through a poroelastic layered panel.
- <em>Computational Mechanics</em>, August 2013.
- <a href="http://dx.doi.org/10.1007/s00466-013-0916-x">http://dx.doi.org/10.1007/s00466-013-0916-x</a>.
-<a name="Nagler_2013"></a><pre>
-@article{Nagler_2013,
-  author = {L.~Nagler and P.~Rong and M.~Schanz and O.~von Estorff},
-  title = {{Sound transmission through a poroelastic layered panel}},
-  journal = {Computational Mechanics},
+M.&nbsp;J. Grote, J.&nbsp;Huber, D.&nbsp;Kourounis, and O.&nbsp;Schenk.
+ Inexact interior-point method for PDE-constrained nonlinear
+  optimization.
+ In <em>Institute of Mathematics, University of Basel, Preprint No.
+  2013-15</em>, May 2013.
+
+  <a href="http://math.unibas.ch/fileadmin/mathe/redaktion/Preprints/13_alle/Preprint_1315.pdf">http://math.unibas.ch/fileadmin/mathe/redaktion/Preprints/13_alle/Preprint_1315.pdf</a>.
+<a name="Grote_2013"></a><pre>
+@inproceedings{Grote_2013,
+  author = {M.~J.~Grote and J.~Huber and D.~Kourounis and O.~Schenk},
+  title = {{Inexact interior-point method for PDE-constrained nonlinear optimization}},
+  booktitle = {Institute of Mathematics, University of Basel, Preprint No. 2013-15},
+  month = may,
   year = 2013,
-  month = aug,
-  note = {\url{http://dx.doi.org/10.1007/s00466-013-0916-x}}
+  note = {\url{http://math.unibas.ch/fileadmin/mathe/redaktion/Preprints/13_alle/Preprint_1315.pdf}}
 }
 </pre>
 
@@ -893,33 +896,7 @@ S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2012">7</a>]
-</td>
-<td class="bibtexitem">
-V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekaterinaris.
- A nonlinear dynamic finite element approach for simulating muscular
-  hydrostats.
- <em>Computer Methods in Biomechanics and Biomedical Engineering</em>,
-  2012.
- <a href="http://dx.doi.org/10.1080/10255842.2012.723702">http://dx.doi.org/10.1080/10255842.2012.723702</a>.
-<a name="Vavourakis_2012"></a><pre>
-@article{Vavourakis_2012,
-  author = {V.~Vavourakis and A.~Kazakidi and D.~P.~Tsakiris and J.~A.~Ekaterinaris},
-  title = {{A nonlinear dynamic finite element approach for simulating muscular hydrostats}},
-  journal = {Computer Methods in Biomechanics and Biomedical Engineering},
-  year = 2012,
-  note = {\url{http://dx.doi.org/10.1080/10255842.2012.723702}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Griffith_2012">8</a>]
+[<a name="Griffith_2012">7</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -953,7 +930,35 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2014">1</a>]
+[<a name="Nagler_2014">1</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Nagler, P.&nbsp;Rong, M.&nbsp;Schanz, and O.&nbsp;von Estorff.
+ Sound transmission through a poroelastic layered panel.
+ <em>Computational Mechanics</em>, 53(4):549-560, April 2014.
+ <a href="http://dx.doi.org/10.1007/s00466-013-0916-x">http://dx.doi.org/10.1007/s00466-013-0916-x</a>.
+<a name="Nagler_2014"></a><pre>
+@article{Nagler_2014,
+  author = {L.~Nagler and P.~Rong and M.~Schanz and O.~von Estorff},
+  title = {{Sound transmission through a poroelastic layered panel}},
+  journal = {Computational Mechanics},
+  year = 2014,
+  volume = {53},
+  number = {4},
+  pages = {549--560},
+  month = apr,
+  note = {\url{http://dx.doi.org/10.1007/s00466-013-0916-x}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Kirk_2014">2</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk, R.&nbsp;H. Stogner, P.&nbsp;T. Bauman, and T.&nbsp;A. Oliver.
@@ -981,7 +986,36 @@ B.&nbsp;S. Kirk, R.&nbsp;H. Stogner, P.&nbsp;T. Bauman, and T.&nbsp;A. Oliver.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Short_2014">2</a>]
+[<a name="Vavourakis_2014">3</a>]
+</td>
+<td class="bibtexitem">
+V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekaterinaris.
+ A nonlinear dynamic finite element approach for simulating muscular
+  hydrostats.
+ <em>Computer Methods in Biomechanics and Biomedical Engineering</em>,
+  17(8):917-931, 2014.
+ <a href="http://dx.doi.org/10.1080/10255842.2012.723702">http://dx.doi.org/10.1080/10255842.2012.723702</a>.
+<a name="Vavourakis_2014"></a><pre>
+@article{Vavourakis_2014,
+  author = {V.~Vavourakis and A.~Kazakidi and D.~P.~Tsakiris and J.~A.~Ekaterinaris},
+  title = {{A nonlinear dynamic finite element approach for simulating muscular hydrostats}},
+  journal = {Computer Methods in Biomechanics and Biomedical Engineering},
+  volume = {17},
+  number = {8},
+  pages = {917--931},
+  year = 2014,
+  note = {\url{http://dx.doi.org/10.1080/10255842.2012.723702}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Short_2014">4</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;P. Short, D.&nbsp;Gaston, C.&nbsp;R. Stanek, and S.&nbsp;Yip.
@@ -1011,7 +1045,7 @@ M.&nbsp;P. Short, D.&nbsp;Gaston, C.&nbsp;R. Stanek, and S.&nbsp;Yip.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2014">3</a>]
+[<a name="Eftang_2014">5</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang and A.&nbsp;T. Patera.
@@ -1041,7 +1075,7 @@ J.&nbsp;L. Eftang and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Neveln_2014">4</a>]
+[<a name="Neveln_2014">6</a>]
 </td>
 <td class="bibtexitem">
 I.&nbsp;D. Neveln, R.&nbsp;Bale, A.&nbsp;P.&nbsp;S. Bhalla, O.&nbsp;M. Curet, N.&nbsp;A. Patankar, and M.&nbsp;A.
@@ -1069,7 +1103,7 @@ I.&nbsp;D. Neveln, R.&nbsp;Bale, A.&nbsp;P.&nbsp;S. Bhalla, O.&nbsp;M. Curet, N.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Tonks_2014">5</a>]
+[<a name="Tonks_2014">7</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;R. Tonks, Y.&nbsp;Zhang, X.&nbsp;Bai, and P.&nbsp;C. Millett.
@@ -1097,7 +1131,7 @@ M.&nbsp;R. Tonks, Y.&nbsp;Zhang, X.&nbsp;Bai, and P.&nbsp;C. Millett.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Teague_2014">6</a>]
+[<a name="Teague_2014">8</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Teague, M.&nbsp;Tonks, S.&nbsp;Novascone, and S.&nbsp;Hayes.
