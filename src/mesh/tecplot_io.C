@@ -277,6 +277,9 @@ void TecplotIO::write_ascii (const std::string& fname,
         libmesh_error();
       }
 
+    // Output the time in the header
+    out_stream << ", t=\"T " << _time << "\"";
+
     // Use default mesh color = black
     out_stream << ", c=black\n";
 
