@@ -22,6 +22,7 @@
 
 // Local Includes
 #include "libmesh/error_estimator.h"
+#include "libmesh/function_base.h"
 
 // C++ includes
 #include <cstddef>
