@@ -168,6 +168,42 @@ void TecplotIO::write_nodal_data (const std::string& fname,
 
 
 
+unsigned TecplotIO::elem_dimension()
+{
+  // Get a constant reference to the mesh.
+  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
+
+  std::vector<unsigned> elem_dims(3);
+
+  // Loop over all the elements and mark the proper dimension entry in
+  // the elem_dims vector.
+  MeshBase::const_element_iterator       it  = the_mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end = the_mesh.active_elements_end();
+  for ( ; it != end; ++it)
+    elem_dims[(*it)->dim() - 1] = 1;
+
+  // Detect and disallow (for now) the writing of mixed dimension meshes.
+  if (std::count(elem_dims.begin(), elem_dims.end(), 1) > 1)
+    {
+      libMesh::err << "Error, cannot write Mesh with mixed element dimensions to Tecplot file!" << std::endl;
+      libmesh_error();
+    }
+
+  if (elem_dims[0])
+    return 1;
+  else if (elem_dims[1])
+    return 2;
+  else if (elem_dims[2])
+    return 3;
+  else
+    {
+      libMesh::err << "No 1, 2, or 3D elements detected!" << std::endl;
+      libmesh_error();
+    }
+}
+
+
+
 void TecplotIO::write_ascii (const std::string& fname,
                              const std::vector<Number>* v,
                              const std::vector<std::string>* solution_names)
@@ -217,17 +253,32 @@ void TecplotIO::write_ascii (const std::string& fname,
 
     out_stream << "Zone f=fepoint, n=" << the_mesh.n_nodes() << ", e=" << the_mesh.n_active_sub_elem();
 
-    if (the_mesh.mesh_dimension() == 1)
-      out_stream << ", et=lineseg";
-    else if (the_mesh.mesh_dimension() == 2)
-      out_stream << ", et=quadrilateral";
-    else if (the_mesh.mesh_dimension() == 3)
-      out_stream << ", et=brick";
-    else
+    // We cannot choose the element type simply based on the mesh
+    // dimension... there might be 1D elements living in a 3D mesh.
+    // So look at the elements which are actually in the Mesh, and
+    // choose either "lineseg", "quadrilateral", or "brick" depending
+    // on if the elements are 1, 2, or 3D.
+
+    // Write the element type we've determined to the header.
+    out_stream << ", et=";
+
+    switch (this->elem_dimension())
       {
-        // Dimension other than 1, 2, or 3?
+      case 1:
+        out_stream << "lineseg";
+        break;
+      case 2:
+        out_stream << "quadrilateral";
+        break;
+      case 3:
+        out_stream << "brick";
+        break;
+      default:
         libmesh_error();
       }
+
+    // Output the time in the header
+    out_stream << ", t=\"T " << _time << "\"";
 
     // Use default mesh color = black
     out_stream << ", c=black\n";
@@ -315,7 +366,7 @@ void TecplotIO::write_binary (const std::string& fname,
     cell_type   = -1,
     nn_per_elem = -1;
 
-  switch (the_mesh.mesh_dimension())
+  switch (this->elem_dimension())
     {
     case 1:
       cell_type   = 1;  // FELINESEG
