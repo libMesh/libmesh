@@ -125,7 +125,8 @@ TecplotIO::TecplotIO (const MeshBase& mesh_in,
   _binary (binary_in),
   _time (time_in),
   _strand_offset (strand_offset_in),
-  _zone_title ("zone")
+  _zone_title ("zone"),
+  _ascii_append(false)
 {
   // Gather a list of subdomain ids in the mesh.
   // We must do this now, while we have every
@@ -134,6 +135,39 @@ TecplotIO::TecplotIO (const MeshBase& mesh_in,
   mesh_in.subdomain_ids (_subdomain_ids);
 }
 
+
+
+bool & TecplotIO::binary ()
+{
+  return _binary;
+}
+
+
+
+double & TecplotIO::time ()
+{
+  return _time;
+}
+
+
+
+int & TecplotIO::strand_offset ()
+{
+  return _strand_offset;
+}
+
+
+
+std::string & TecplotIO::zone_title ()
+{
+  return _zone_title;
+}
+
+
+bool & TecplotIO::ascii_append ()
+{
+  return _ascii_append;
+}
 
 
 void TecplotIO::write (const std::string& fname)
@@ -211,8 +245,8 @@ void TecplotIO::write_ascii (const std::string& fname,
   // Should only do this on processor 0!
   libmesh_assert_equal_to (this->mesh().processor_id(), 0);
 
-  // Create an output stream
-  std::ofstream out_stream(fname.c_str());
+  // Create an output stream, possibly in append mode.
+  std::ofstream out_stream(fname.c_str(), _ascii_append ? std::ofstream::app : std::ofstream::out);
 
   // Make sure it opened correctly
   if (!out_stream.good())

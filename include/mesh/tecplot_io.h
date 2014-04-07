@@ -97,6 +97,13 @@ public:
    */
   std::string & zone_title ();
 
+  /**
+   * Set to true to write multiple solutions to a single file (ASCII
+   * only).  Tecplot will read multiple zones in a single file, but
+   * currently you have to repeat the mesh information each time.
+   */
+  bool & ascii_append ();
+
 private:
 
   /**
@@ -152,45 +159,16 @@ private:
   std::string _zone_title;
 
   /**
+   * If true, when writing in ASCII format, open the file in
+   * std::ofstream::app mode.
+   */
+  bool _ascii_append;
+
+  /**
    * The subdomains in the mesh.
    */
   std::set<subdomain_id_type> _subdomain_ids;
 };
-
-
-
-// ------------------------------------------------------------
-// TecplotIO inline members
-inline
-bool & TecplotIO::binary ()
-{
-  return _binary;
-}
-
-
-
-inline
-double & TecplotIO::time ()
-{
-  return _time;
-}
-
-
-
-inline
-int & TecplotIO::strand_offset ()
-{
-  return _strand_offset;
-}
-
-
-
-inline
-std::string & TecplotIO::zone_title ()
-{
-  return _zone_title;
-}
-
 
 } // namespace libMesh
 
