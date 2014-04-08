@@ -465,13 +465,7 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
       }
 
     default:
-      {
-        libMesh::err << "ERROR: Invalid Order "
-                     << Utility::enum_to_string(o)
-                     << " selected for LAGRANGE FE family!"
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for LAGRANGE FE family!");
     }
 
   libmesh_error();
