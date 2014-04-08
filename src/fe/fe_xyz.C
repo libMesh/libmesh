@@ -875,9 +875,7 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem, const std::vector<Po
       }
 
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Invalid dimension " << this->dim);
     }
 
   // Stop logging the shape function computation

@@ -24,6 +24,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/threads.h"
 #include "libmesh/tensor_value.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -97,11 +98,7 @@ void nedelec_one_nodal_soln(const Elem* elem,
             }
 
           default:
-            {
-              libmesh_error();
-
-              break;
-            }
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(elem_type) << " selected for NEDELEC_ONE FE family!");
 
           } // switch(elem_type)
 
@@ -145,9 +142,7 @@ void nedelec_one_nodal_soln(const Elem* elem,
       } // case FIRST
 
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Invalid total order " << Utility::enum_to_string(totalorder) << " selected for NEDELEC_ONE FE family!");
 
     }//switch (totalorder)
 
@@ -190,7 +185,7 @@ unsigned int nedelec_one_n_dofs(const ElemType t, const Order o)
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for NEDELEC_ONE FE family!");
     }
 
   libmesh_error();
@@ -224,7 +219,7 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                   return 1;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n);
                 }
             }
           case QUAD8:
@@ -243,7 +238,7 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                   return 1;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n);
                 }
             }
           case QUAD9:
@@ -263,7 +258,7 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                   return 1;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n);
                 }
             }
           case TET10:
@@ -284,7 +279,7 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                   return 1;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n);
                 }
             }
 
@@ -316,7 +311,7 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                   return 1;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n);
                 }
             }
           case HEX27:
@@ -354,7 +349,7 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                   return 1;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n);
                 }
             }
           default:
@@ -370,7 +365,7 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for NEDELEC_ONE FE family!");
     }
 
   libmesh_error();

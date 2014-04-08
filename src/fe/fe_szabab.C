@@ -24,6 +24,7 @@
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -104,12 +105,8 @@ void szabab_nodal_soln(const Elem* elem,
       }
 
     default:
-      {
-        libmesh_error();
-        return;
-      }
+      libmesh_error_msg("ERROR: Invalid total order " << totalorder);
     }
-
 
   // We should never get here?
   libmesh_error();
@@ -143,7 +140,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 4;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -169,7 +166,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 9;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -194,7 +191,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 16;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -219,7 +216,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 25;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -244,7 +241,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 36;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -269,7 +266,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 49;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -293,15 +290,13 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 64;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
 
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for SZABAB FE family!");
     }
 
   libmesh_error();
@@ -340,7 +335,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 0;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
                 }
             }
 
@@ -361,7 +356,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 0;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
                 }
             }
 
@@ -389,14 +384,13 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 0;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD8/9!");
                 }
             }
 
 
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -424,7 +418,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 1;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
                 }
             }
 
@@ -445,7 +439,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 1;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
                 }
             }
 
@@ -473,14 +467,13 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 1;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD8/9!");
                 }
             }
 
 
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -508,7 +501,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 2;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
                 }
             }
 
@@ -529,7 +522,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 2;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
                 }
             }
 
@@ -557,14 +550,13 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 4;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD8/9!");
                 }
             }
 
 
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -592,7 +584,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 3;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
                 }
             }
 
@@ -613,7 +605,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 3;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
                 }
             }
 
@@ -641,14 +633,13 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 9;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD8/9!");
                 }
             }
 
 
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -676,7 +667,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 4;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
                 }
             }
 
@@ -697,7 +688,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 4;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
                 }
             }
 
@@ -725,14 +716,12 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 16;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD8/9!");
                 }
             }
 
-
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -760,7 +749,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 5;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
                 }
             }
 
@@ -781,7 +770,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 5;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
                 }
             }
 
@@ -809,14 +798,13 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 25;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD8/9!");
                 }
             }
 
 
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -843,7 +831,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 6;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
                 }
             }
 
@@ -864,7 +852,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 6;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
                 }
             }
 
@@ -892,22 +880,18 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 36;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD8/9!");
                 }
             }
 
-
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
 
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for SZABAB FE family!");
     }
 
   libmesh_error();
@@ -952,10 +936,8 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case QUAD9:
             return 0;
 
-
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -991,10 +973,8 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case QUAD9:
             return 0;
 
-
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -1030,10 +1010,8 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case QUAD9:
             return 0;
 
-
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -1069,10 +1047,8 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case QUAD9:
             return 0;
 
-
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -1108,10 +1084,8 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case QUAD9:
             return 0;
 
-
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -1146,10 +1120,8 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case QUAD9:
             return 0;
 
-
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 
@@ -1184,10 +1156,8 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case QUAD9:
             return 0;
 
-
           default:
-            libmesh_error();
-
+            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for SZABAB FE family!");
           }
       }
 

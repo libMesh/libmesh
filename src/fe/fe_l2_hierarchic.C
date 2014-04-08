@@ -21,6 +21,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -120,7 +121,7 @@ unsigned int l2_hierarchic_n_dofs(const ElemType t, const Order o)
     case TRI6:
       return ((o+1)*(o+2)/2);
     default:
-      libmesh_error();
+      libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for L2_HIERARCHIC FE family!");
     }
 
   libmesh_error();

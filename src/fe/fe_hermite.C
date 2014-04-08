@@ -140,7 +140,7 @@ unsigned int hermite_n_dofs_at_node(const ElemType t,
             return 0;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
           }
       }
 
@@ -169,7 +169,7 @@ unsigned int hermite_n_dofs_at_node(const ElemType t,
             return 0;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD4/8/9!");
           }
       }
 
@@ -218,7 +218,7 @@ unsigned int hermite_n_dofs_at_node(const ElemType t,
             return 0;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for HEX8/20/27!");
           }
       }
 
@@ -235,7 +235,6 @@ unsigned int hermite_n_dofs_at_node(const ElemType t,
     }
 
   libmesh_error();
-
   return 0;
 } // hermite_n_dofs_at_node()
 

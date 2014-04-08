@@ -23,6 +23,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/elem.h"
 #include "libmesh/threads.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -416,7 +417,7 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for L2_LAGRANGE FE family!");
     }
 
   libmesh_error();

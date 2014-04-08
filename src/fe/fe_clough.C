@@ -21,6 +21,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/string_to_enum.h"
 
 
 namespace libMesh
@@ -83,9 +84,7 @@ void clough_nodal_soln(const Elem* elem,
       }
 
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Invalid total order " << totalorder);
     }
 } // clough_nodal_soln()
 
@@ -136,9 +135,7 @@ unsigned int clough_n_dofs(const ElemType t, const Order o)
       }
 
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for CLOUGH FE family!");
     }
 
   libmesh_error();
@@ -176,7 +173,7 @@ unsigned int clough_n_dofs_at_node(const ElemType t,
                   return 0;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
                 }
             }
 
@@ -213,7 +210,7 @@ unsigned int clough_n_dofs_at_node(const ElemType t,
                   return 1;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
                 }
             }
 
@@ -230,13 +227,10 @@ unsigned int clough_n_dofs_at_node(const ElemType t,
           }
       }
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for CLOUGH FE family!");
     }
 
   libmesh_error();
-
   return 0;
 } // clough_n_dofs_at_node()
 
@@ -270,11 +264,13 @@ unsigned int clough_n_dofs_per_elem(const ElemType t, const Order o)
 
           }
       }
-      // Otherwise no DOFS per element
+
     default:
-      libmesh_error();
-      return 0;
+      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for CLOUGH FE family!");
     }
+
+  libmesh_error();
+  return 0;
 } // clough_n_dofs_per_elem()
 
 } // anonymous

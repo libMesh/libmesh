@@ -21,6 +21,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -123,7 +124,7 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
     case TRI6:
       return ((o+1)*(o+2)/2);
     default:
-      libmesh_error();
+      libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for HIERARCHIC FE family!");
     }
 
   libmesh_error();
@@ -153,7 +154,7 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
         case 2:
           return 0;
         default:
-          libmesh_error();
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
         }
     case TRI6:
       switch (n)
@@ -170,7 +171,7 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
 
           // Internal DoFs are associated with the elem, not its nodes
         default:
-          libmesh_error();
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
         }
     case QUAD4:
       libmesh_assert_less (n, 4);
@@ -196,7 +197,7 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
           return 0;
 
         default:
-          libmesh_error();
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD4/8/9!");
         }
     case HEX8:
       libmesh_assert_less (n, 8);
@@ -243,7 +244,7 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
         case 26:
           return 0;
         default:
-          libmesh_error();
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for HEX8/20/27!");
         }
     default:
 #ifdef DEBUG
@@ -254,7 +255,6 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
     }
 
   libmesh_error();
-
   return 0;
 } // hierarchic_n_dofs_at_node()
 

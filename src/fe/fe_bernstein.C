@@ -24,6 +24,7 @@
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -103,10 +104,7 @@ void bernstein_nodal_soln(const Elem* elem,
       }
 
     default:
-      {
-        libmesh_error();
-        return;
-      }
+      libmesh_error_msg("ERROR: Invalid total order " << totalorder);
     }
 
 
@@ -135,7 +133,7 @@ unsigned int bernstein_n_dofs(const ElemType t, const Order o)
         else if (o == 2)
           return 8;
         else
-          libmesh_error();
+          libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for BERNSTEIN FE family!");
       }
     case QUAD9:
       return ((o+1)*(o+1));
@@ -148,7 +146,7 @@ unsigned int bernstein_n_dofs(const ElemType t, const Order o)
         else if (o == 2)
           return 20;
         else
-          libmesh_error();
+          libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for BERNSTEIN FE family!");
       }
     case HEX27:
       return ((o+1)*(o+1)*(o+1));
@@ -164,7 +162,7 @@ unsigned int bernstein_n_dofs(const ElemType t, const Order o)
         return ((o+1)*(o+2)*(o+3)/6);
       }
     default:
-      libmesh_error();
+      libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
     }
 
   libmesh_error();
@@ -194,7 +192,7 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
           libmesh_assert (o>1);
           return (o-1);
         default:
-          libmesh_error();
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
         }
     case TRI6:
       switch (n)
@@ -210,7 +208,7 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
           return (o-1);
           // Internal DoFs are associated with the elem, not its nodes
         default:
-          libmesh_error();
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
         }
     case QUAD8:
       libmesh_assert_less (n, 8);
@@ -236,7 +234,7 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
             return 0;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD9!");
           }
       }
     case HEX8:
@@ -285,7 +283,7 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
           return 0;
 
         default:
-          libmesh_error();
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for HEX27!");
         }
     case TET4:
       libmesh_assert_less (n, 4);
@@ -310,12 +308,11 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
           return (o-1);
 
         default:
-          libmesh_error();
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TET10!");
         }
 
     default:
-      libmesh_error();
-
+      libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
     }
 
   libmesh_error();
@@ -356,7 +353,7 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
       libmesh_assert_less (o, 3);
       return 0;
     default:
-      libmesh_error();
+      libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
     }
 
   libmesh_error();
