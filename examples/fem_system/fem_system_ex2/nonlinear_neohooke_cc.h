@@ -34,14 +34,14 @@ using namespace libMesh;
  * large deformations. See e.g. "Nonlinear finite element methods" (P. Wriggers, 2008,
  * Springer) for details.
  */
-class NonlinearNeoHookeCurrentConfig {
+class NonlinearNeoHookeCurrentConfig
+{
 public:
-  NonlinearNeoHookeCurrentConfig(
-                                 const std::vector<std::vector<RealGradient> >& dphi_in,
+  NonlinearNeoHookeCurrentConfig(const std::vector<std::vector<RealGradient> >& dphi_in,
                                  GetPot& args,
                                  bool calculate_linearized_stiffness_in) :
-    dphi(dphi_in),
-    calculate_linearized_stiffness(calculate_linearized_stiffness_in)
+    calculate_linearized_stiffness(calculate_linearized_stiffness_in),
+    dphi(dphi_in)
   {
     E = args("material/neohooke/e_modulus", 10000.0);
     nu = args("material/neohooke/nu", 0.3);
