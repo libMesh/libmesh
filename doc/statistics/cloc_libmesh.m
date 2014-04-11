@@ -41,8 +41,8 @@ data = {
     '2012-07-04', 713  150066
     '2012-08-04', 727  152269
     '2012-09-04', 725  152381
-    '2012-10-04', 1092 155213 % Don't know what happened to the number of files here...
-    '2012-11-04', 1094 156082 % We moved from libmesh/src to src around here so maybe that caused it?
+    '2012-10-04', 734  155213 % cloc reports 1092 and 1094 files for Oct/Nov, Don't know what happened...
+    '2012-11-04', 743  156082 % We moved from libmesh/src to src around here so maybe that caused it?
     '2012-12-04', 752  156903
 % 2013
     '2013-01-04', 754, 158689
