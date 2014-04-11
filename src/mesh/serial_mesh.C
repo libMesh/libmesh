@@ -854,7 +854,6 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
 
   typedef dof_id_type                     key_type;
   typedef std::pair<Elem*, unsigned char> val_type;
-  typedef std::pair<key_type, val_type>   key_val_pair;
   // Mapping between all side keys in this mesh and elements+side numbers relevant to the boundary in this mesh as well.
   std::map<key_type, val_type>            side_to_elem_map;
 
