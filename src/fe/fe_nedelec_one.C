@@ -173,14 +173,7 @@ unsigned int nedelec_one_n_dofs(const ElemType t, const Order o)
             return 12;
 
           default:
-            {
-#ifdef DEBUG
-              libMesh::err << "ERROR: Bad ElemType = " << t
-                           << " for FIRST order approximation!"
-                           << std::endl;
-#endif
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
           }
       }
 
@@ -353,14 +346,7 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
                 }
             }
           default:
-            {
-#ifdef DEBUG
-              libMesh::err << "ERROR: Bad ElemType = " << t
-                           << " for FIRST order approximation!"
-                           << std::endl;
-#endif
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
           }
       }
 

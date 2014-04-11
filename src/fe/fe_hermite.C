@@ -21,6 +21,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {
@@ -99,14 +100,7 @@ unsigned int hermite_n_dofs(const ElemType t, const Order o)
       return ((o+1)*(o+1)*(o+1));
 
     default:
-      {
-#ifdef DEBUG
-        libMesh::err << "ERROR: Bad ElemType = " << t
-                     << " for " << o << "th order approximation!"
-                     << std::endl;
-#endif
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
 
   libmesh_error();
@@ -223,15 +217,7 @@ unsigned int hermite_n_dofs_at_node(const ElemType t,
       }
 
     default:
-      {
-#ifdef DEBUG
-        libMesh::err << "ERROR: Bad ElemType = " << t
-                     << " for " << o << "th order approximation!"
-                     << std::endl;
-#endif
-        libmesh_error();
-      }
-
+      libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
 
   libmesh_error();
@@ -264,14 +250,7 @@ unsigned int hermite_n_dofs_per_elem(const ElemType t,
       return ((o-3)*(o-3)*(o-3));
 
     default:
-      {
-#ifdef DEBUG
-        libMesh::err << "ERROR: Bad ElemType = " << t
-                     << " for " << o << "th order approximation!"
-                     << std::endl;
-#endif
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
 
   // Will never get here...

@@ -247,11 +247,7 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
           libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for HEX8/20/27!");
         }
     default:
-#ifdef DEBUG
-      libMesh::err << "ERROR: Bad ElemType = " << t
-                   << std::endl;
-#endif
-      libmesh_error();
+      libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
 
   libmesh_error();
@@ -287,11 +283,7 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
     case HEX27:
       return ((o-1)*(o-1)*(o-1));
     default:
-#ifdef DEBUG
-      libMesh::err << "ERROR: Bad ElemType = " << t
-                   << std::endl;
-#endif
-      libmesh_error();
+      libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
 
   // Will never get here...
