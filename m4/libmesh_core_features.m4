@@ -458,6 +458,25 @@ fi
 
 
 # -------------------------------------------------------------
+# Store node valence for use with subdivision surface finite
+#  elements -- enabled by default
+# -------------------------------------------------------------
+AC_ARG_ENABLE(node-valence,
+              AC_HELP_STRING([--enable-node-valence],
+                             [Compute and store node valence values]),
+              enablenodevalence=$enableval,
+              enablenodevalence=yes)
+
+if test "$enablenodevalence" != no ; then
+  AC_DEFINE(ENABLE_NODE_VALENCE, 1,
+	   [Flag indicating if the library should compute and store node valence values])
+  AC_MSG_RESULT(<<< Configuring library to store node valence >>>)
+fi
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
 # 1D or 1D/2D only -- disabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(1D-only,

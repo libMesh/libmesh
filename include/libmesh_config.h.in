@@ -121,6 +121,10 @@
    support */
 #undef ENABLE_NODE_CONSTRAINTS
 
+/* Flag indicating if the library should compute and store node valence values
+   */
+#undef ENABLE_NODE_VALENCE
+
 /* Flag indicating if the library should use the experimental ParallelMesh as
    its default Mesh type */
 #undef ENABLE_PARMESH
