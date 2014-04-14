@@ -55,7 +55,6 @@ AutoPtr<SparsityPattern::Build> DofMap::build_sparsity
 (const MeshBase& mesh) const
 {
   libmesh_assert (mesh.is_prepared());
-  libmesh_assert (this->n_variables());
 
   START_LOG("build_sparsity()", "DofMap");
 
