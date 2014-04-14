@@ -33,6 +33,7 @@
 #include "libmesh/edge_edge4.h"
 #include "libmesh/edge_inf_edge2.h"
 #include "libmesh/face_tri3.h"
+#include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/face_quad4.h"
 #include "libmesh/face_quad8.h"
@@ -113,6 +114,8 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     16, // INFPRISM12
 
     1,  // NODEELEM
+
+    3,  // TRI3SUBDIVISION
   };
 
 const unsigned int Elem::type_to_n_sides_map [] =
@@ -233,6 +236,11 @@ AutoPtr<Elem> Elem::build(const ElemType type,
     case TRI3:
       {
         elem = new Tri3(p);
+        break;
+      }
+    case TRI3SUBDIVISION:
+      {
+        elem = new Tri3Subdivision(p);
         break;
       }
     case TRI6:

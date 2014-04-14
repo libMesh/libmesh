@@ -461,18 +461,19 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	edge_edge2.h edge_edge3.h edge_edge4.h edge_inf_edge2.h elem.h \
 	elem_quality.h elem_range.h elem_type.h face.h face_inf_quad.h \
 	face_inf_quad4.h face_inf_quad6.h face_quad.h face_quad4.h \
-	face_quad8.h face_quad9.h face_tri.h face_tri3.h face_tri6.h \
-	node.h node_elem.h node_range.h plane.h point.h \
-	reference_elem.h remote_elem.h side.h sphere.h stored_range.h \
-	surface.h abaqus_io.h boundary_info.h boundary_mesh.h \
-	checkpoint_io.h diva_io.h ensight_io.h exodusII_io.h \
-	exodusII_io_helper.h fro_io.h gmsh_io.h gmv_io.h gnuplot_io.h \
-	inf_elem_builder.h legacy_xdr_io.h matlab_io.h medit_io.h \
-	mesh.h mesh_base.h mesh_communication.h mesh_data.h \
-	mesh_function.h mesh_generation.h mesh_input.h \
-	mesh_inserter_iterator.h mesh_modification.h mesh_output.h \
-	mesh_refinement.h mesh_serializer.h mesh_smoother.h \
-	mesh_smoother_laplace.h mesh_smoother_vsmoother.h \
+	face_quad8.h face_quad9.h face_tri.h face_tri3.h \
+	face_tri3_subdivision.h face_tri6.h node.h node_elem.h \
+	node_range.h plane.h point.h reference_elem.h remote_elem.h \
+	side.h sphere.h stored_range.h surface.h abaqus_io.h \
+	boundary_info.h boundary_mesh.h checkpoint_io.h diva_io.h \
+	ensight_io.h exodusII_io.h exodusII_io_helper.h fro_io.h \
+	gmsh_io.h gmv_io.h gnuplot_io.h inf_elem_builder.h \
+	legacy_xdr_io.h matlab_io.h medit_io.h mesh.h mesh_base.h \
+	mesh_communication.h mesh_data.h mesh_function.h \
+	mesh_generation.h mesh_input.h mesh_inserter_iterator.h \
+	mesh_modification.h mesh_output.h mesh_refinement.h \
+	mesh_serializer.h mesh_smoother.h mesh_smoother_laplace.h \
+	mesh_smoother_vsmoother.h mesh_subdivision_support.h \
 	mesh_tetgen_interface.h mesh_tetgen_wrapper.h mesh_tools.h \
 	mesh_triangle_holes.h mesh_triangle_interface.h \
 	mesh_triangle_wrapper.h nemesis_io.h nemesis_io_helper.h \
@@ -1144,6 +1145,9 @@ face_tri.h: $(top_srcdir)/include/geom/face_tri.h
 face_tri3.h: $(top_srcdir)/include/geom/face_tri3.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
+face_tri3_subdivision.h: $(top_srcdir)/include/geom/face_tri3_subdivision.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
 face_tri6.h: $(top_srcdir)/include/geom/face_tri6.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
@@ -1271,6 +1275,9 @@ mesh_smoother_laplace.h: $(top_srcdir)/include/mesh/mesh_smoother_laplace.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 mesh_smoother_vsmoother.h: $(top_srcdir)/include/mesh/mesh_smoother_vsmoother.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+mesh_subdivision_support.h: $(top_srcdir)/include/mesh/mesh_subdivision_support.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 mesh_tetgen_interface.h: $(top_srcdir)/include/mesh/mesh_tetgen_interface.h

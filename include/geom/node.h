@@ -218,6 +218,26 @@ public:
 
 #endif // #ifdef LIBMESH_HAVE_MPI
 
+  /**
+   * @returns the number of nodes connected with this node.
+   * Currently, this value is invalid (zero) except for
+   * subdivision meshes.
+   */
+  unsigned int valence() const
+  {
+#ifdef LIBMESH_ENABLE_NODE_VALENCE
+    return _valence;
+#else
+    libmesh_not_implemented();
+    return libMesh::invalid_uint;
+#endif
+  }
+
+  /**
+   * Sets the number of nodes connected with this node.
+   */
+  void set_valence(unsigned int val);
+
 private:
 
   /**
@@ -226,6 +246,20 @@ private:
    */
   friend class MeshRefinement;
   friend class Elem;
+
+#ifdef LIBMESH_ENABLE_NODE_VALENCE
+  /**
+   * Type used to store node valence.
+   */
+  typedef unsigned char valence_idx_t;
+
+  /**
+   * The number of nodes connected with this node.
+   * Currently, this value is invalid (zero) except for
+   * subdivision meshes.
+   */
+  valence_idx_t _valence;
+#endif
 };
 
 
@@ -250,6 +284,10 @@ Node::Node (const Real x,
             const Real z,
             const dof_id_type dofid) :
   Point(x,y,z)
+#ifdef LIBMESH_ENABLE_NODE_VALENCE
+  ,
+  _valence(0)
+#endif
 {
   this->set_id() = dofid;
 }
@@ -261,6 +299,10 @@ Node::Node (const Node& n) :
   Point(n),
   DofObject(n),
   ReferenceCountedObject<Node>()
+#ifdef LIBMESH_ENABLE_NODE_VALENCE
+  ,
+  _valence(n._valence)
+#endif
 {
 }
 
@@ -341,6 +383,38 @@ bool Node::active () const
 {
   return (this->id() != Node::invalid_id);
 }
+
+
+
+#ifdef LIBMESH_ENABLE_NODE_VALENCE
+
+inline
+void Node::set_valence (unsigned int val)
+{
+#ifndef NDEBUG
+  if (val != static_cast<valence_idx_t>(val))
+    {
+      libMesh::err << "ERROR: Node::valence_idx_t too small to hold val="
+                   << val
+                   << std::endl;
+      libmesh_error();
+    }
+#endif // #ifndef NDEBUG
+
+  _valence = val;
+}
+
+#else
+
+inline
+void Node::set_valence (unsigned int)
+{
+  libmesh_not_implemented();
+}
+
+#endif // #ifdef LIBMESH_ENABLE_NODE_VALENCE
+
+
 
 
 } // namespace libMesh

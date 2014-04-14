@@ -1074,6 +1074,7 @@ enable_dirichlet
 enable_nodeconstraint
 enable_parmesh
 enable_ghosted
+enable_node_valence
 enable_1D_only
 enable_2D_only
 enable_pfem
@@ -1843,6 +1844,7 @@ Optional Features:
   --enable-nodeconstraint build with node constraints suppport
   --enable-parmesh        Use experimental ParallelMesh as Mesh
   --enable-ghosted        Use ghosted local vectors when available
+  --enable-node-valence   Compute and store node valence values
   --enable-1D-only        build with support for 1D meshes only
   --enable-2D-only        build with support for 1D and 2D meshes only
   --enable-pfem           build with support for higher order p-FEM shapes
@@ -27019,6 +27021,29 @@ fi
 
 
 # -------------------------------------------------------------
+# Store node valence for use with subdivision surface finite
+#  elements -- enabled by default
+# -------------------------------------------------------------
+# Check whether --enable-node-valence was given.
+if test "${enable_node_valence+set}" = set; then :
+  enableval=$enable_node_valence; enablenodevalence=$enableval
+else
+  enablenodevalence=yes
+fi
+
+
+if test "$enablenodevalence" != no ; then
+
+$as_echo "#define ENABLE_NODE_VALENCE 1" >>confdefs.h
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library to store node valence >>>" >&5
+$as_echo "<<< Configuring library to store node valence >>>" >&6; }
+fi
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
 # 1D or 1D/2D only -- disabled by default
 # -------------------------------------------------------------
 # Check whether --enable-1D-only was given.
@@ -34048,7 +34073,7 @@ $as_echo "#define BUILD_DATE __DATE__\" \"__TIME__" >>confdefs.h
 
 # Each example gets a makefile
 if (test "x$enableexamples" = "xyes"); then
-   ac_config_files="$ac_config_files examples/introduction/introduction_ex1/Makefile examples/introduction/introduction_ex2/Makefile examples/introduction/introduction_ex3/Makefile examples/introduction/introduction_ex4/Makefile examples/introduction/introduction_ex5/Makefile examples/adaptivity/adaptivity_ex1/Makefile examples/adaptivity/adaptivity_ex2/Makefile examples/adaptivity/adaptivity_ex3/Makefile examples/adaptivity/adaptivity_ex4/Makefile examples/adaptivity/adaptivity_ex5/Makefile examples/adjoints/adjoints_ex1/Makefile examples/adjoints/adjoints_ex2/Makefile examples/adjoints/adjoints_ex3/Makefile examples/adjoints/adjoints_ex4/Makefile examples/adjoints/adjoints_ex5/Makefile examples/eigenproblems/eigenproblems_ex1/Makefile examples/eigenproblems/eigenproblems_ex2/Makefile examples/eigenproblems/eigenproblems_ex3/Makefile examples/fem_system/fem_system_ex1/Makefile examples/fem_system/fem_system_ex2/Makefile examples/solution_transfer/solution_transfer_ex1/Makefile examples/miscellaneous/miscellaneous_ex1/Makefile examples/miscellaneous/miscellaneous_ex2/Makefile examples/miscellaneous/miscellaneous_ex3/Makefile examples/miscellaneous/miscellaneous_ex4/Makefile examples/miscellaneous/miscellaneous_ex5/Makefile examples/miscellaneous/miscellaneous_ex6/Makefile examples/miscellaneous/miscellaneous_ex7/Makefile examples/miscellaneous/miscellaneous_ex8/Makefile examples/miscellaneous/miscellaneous_ex9/Makefile examples/miscellaneous/miscellaneous_ex10/Makefile examples/subdomains/subdomains_ex1/Makefile examples/subdomains/subdomains_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex1/Makefile examples/systems_of_equations/systems_of_equations_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex3/Makefile examples/systems_of_equations/systems_of_equations_ex4/Makefile examples/systems_of_equations/systems_of_equations_ex5/Makefile examples/systems_of_equations/systems_of_equations_ex6/Makefile examples/reduced_basis/reduced_basis_ex1/Makefile examples/reduced_basis/reduced_basis_ex2/Makefile examples/reduced_basis/reduced_basis_ex3/Makefile examples/reduced_basis/reduced_basis_ex4/Makefile examples/reduced_basis/reduced_basis_ex5/Makefile examples/reduced_basis/reduced_basis_ex6/Makefile examples/reduced_basis/reduced_basis_ex7/Makefile examples/transient/transient_ex1/Makefile examples/transient/transient_ex2/Makefile examples/vector_fe/vector_fe_ex1/Makefile examples/vector_fe/vector_fe_ex2/Makefile examples/vector_fe/vector_fe_ex3/Makefile examples/vector_fe/vector_fe_ex4/Makefile examples/Makefile"
+   ac_config_files="$ac_config_files examples/introduction/introduction_ex1/Makefile examples/introduction/introduction_ex2/Makefile examples/introduction/introduction_ex3/Makefile examples/introduction/introduction_ex4/Makefile examples/introduction/introduction_ex5/Makefile examples/adaptivity/adaptivity_ex1/Makefile examples/adaptivity/adaptivity_ex2/Makefile examples/adaptivity/adaptivity_ex3/Makefile examples/adaptivity/adaptivity_ex4/Makefile examples/adaptivity/adaptivity_ex5/Makefile examples/adjoints/adjoints_ex1/Makefile examples/adjoints/adjoints_ex2/Makefile examples/adjoints/adjoints_ex3/Makefile examples/adjoints/adjoints_ex4/Makefile examples/adjoints/adjoints_ex5/Makefile examples/eigenproblems/eigenproblems_ex1/Makefile examples/eigenproblems/eigenproblems_ex2/Makefile examples/eigenproblems/eigenproblems_ex3/Makefile examples/fem_system/fem_system_ex1/Makefile examples/fem_system/fem_system_ex2/Makefile examples/solution_transfer/solution_transfer_ex1/Makefile examples/miscellaneous/miscellaneous_ex1/Makefile examples/miscellaneous/miscellaneous_ex2/Makefile examples/miscellaneous/miscellaneous_ex3/Makefile examples/miscellaneous/miscellaneous_ex4/Makefile examples/miscellaneous/miscellaneous_ex5/Makefile examples/miscellaneous/miscellaneous_ex6/Makefile examples/miscellaneous/miscellaneous_ex7/Makefile examples/miscellaneous/miscellaneous_ex8/Makefile examples/miscellaneous/miscellaneous_ex9/Makefile examples/miscellaneous/miscellaneous_ex10/Makefile examples/miscellaneous/miscellaneous_ex11/Makefile examples/subdomains/subdomains_ex1/Makefile examples/subdomains/subdomains_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex1/Makefile examples/systems_of_equations/systems_of_equations_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex3/Makefile examples/systems_of_equations/systems_of_equations_ex4/Makefile examples/systems_of_equations/systems_of_equations_ex5/Makefile examples/systems_of_equations/systems_of_equations_ex6/Makefile examples/reduced_basis/reduced_basis_ex1/Makefile examples/reduced_basis/reduced_basis_ex2/Makefile examples/reduced_basis/reduced_basis_ex3/Makefile examples/reduced_basis/reduced_basis_ex4/Makefile examples/reduced_basis/reduced_basis_ex5/Makefile examples/reduced_basis/reduced_basis_ex6/Makefile examples/reduced_basis/reduced_basis_ex7/Makefile examples/transient/transient_ex1/Makefile examples/transient/transient_ex2/Makefile examples/vector_fe/vector_fe_ex1/Makefile examples/vector_fe/vector_fe_ex2/Makefile examples/vector_fe/vector_fe_ex3/Makefile examples/vector_fe/vector_fe_ex4/Makefile examples/Makefile"
 
 fi
 
@@ -35615,6 +35640,7 @@ do
     "examples/miscellaneous/miscellaneous_ex8/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex8/Makefile" ;;
     "examples/miscellaneous/miscellaneous_ex9/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex9/Makefile" ;;
     "examples/miscellaneous/miscellaneous_ex10/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex10/Makefile" ;;
+    "examples/miscellaneous/miscellaneous_ex11/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex11/Makefile" ;;
     "examples/subdomains/subdomains_ex1/Makefile") CONFIG_FILES="$CONFIG_FILES examples/subdomains/subdomains_ex1/Makefile" ;;
     "examples/subdomains/subdomains_ex2/Makefile") CONFIG_FILES="$CONFIG_FILES examples/subdomains/subdomains_ex2/Makefile" ;;
     "examples/systems_of_equations/systems_of_equations_ex1/Makefile") CONFIG_FILES="$CONFIG_FILES examples/systems_of_equations/systems_of_equations_ex1/Makefile" ;;
@@ -37788,6 +37814,7 @@ echo '  periodic boundary conditions..... :' $enableperiodic
 echo '  reference counting............... :' $enablerefct
 echo '  shape function 2nd derivatives... :' $enablesecond
 echo '  stack trace files................ :' $enabletracefiles
+echo '  track node valence............... :' $enablenodevalence
 echo '  variational smoother............. :' $enablevsmoother
 echo '  xdr binary I/O................... :' $enablexdr
 if (test "x$enablelegacyincludepaths" = "xyes"); then
