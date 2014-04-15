@@ -1189,12 +1189,16 @@ protected:
 
 
 
+ public:
+
   /**
    * Replaces this element with \p NULL for all of
    * its neighbors.  This is useful when deleting an
    * element.
    */
   void nullify_neighbors ();
+
+ protected:
 
   /**
    * Pointers to the nodes we are connected to.
@@ -1256,7 +1260,7 @@ protected:
    * It would seem that we are just getting around it
    * by using friends!
    */
-  friend class MeshRefinement;    // (Elem::nullify_neighbors)
+  friend class MeshRefinement;
 };
 
 // ------------------------------------------------------------
