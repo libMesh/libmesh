@@ -28,13 +28,14 @@
 #include "libmesh/enum_subset_solve_mode.h"
 #include "libmesh/enum_parallel_type.h"
 #include "libmesh/fe_type.h"
+#include "libmesh/fem_function_base.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/tensor_value.h" // For point_hessian
+#include "libmesh/parallel_object.h"
 #include "libmesh/qoi_set.h"
 #include "libmesh/reference_counted_object.h"
+#include "libmesh/system_norm.h" // for implicit conversion
+#include "libmesh/tensor_value.h" // For point_hessian
 #include "libmesh/variable.h"
-#include "libmesh/fem_function_base.h"
-#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <cstddef>
@@ -46,7 +47,6 @@ namespace libMesh
 
 // Forward Declarations
 class System;
-class SystemNorm;
 class EquationSystems;
 class MeshBase;
 class Xdr;
@@ -1154,8 +1154,8 @@ public:
    * norm (e.g. L2, L_INF, H1)
    */
   Real calculate_norm(const NumericVector<Number>& v,
-                      unsigned int var = 0,
-                      FEMNormType norm_type = L2) const;
+                      unsigned int var,
+                      FEMNormType norm_type) const;
 
   /**
    * @returns a norm of the vector \p v, using \p component_norm and \p

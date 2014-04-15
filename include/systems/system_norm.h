@@ -23,7 +23,6 @@
 // Local includes
 #include "libmesh/libmesh_common.h" // for Real
 #include "libmesh/enum_norm_type.h"
-#include "libmesh/system.h"
 
 // C++ includes
 #include <vector>
