@@ -133,13 +133,8 @@ DofObject& DofObject::operator= (const DofObject& dof_obj)
 
 void  DofObject::clear_old_dof_object ()
 {
-  // If we have been called before...
-  // prevent a memory leak
-  if (old_dof_object != NULL)
-    {
-      delete this->old_dof_object;
-      this->old_dof_object = NULL;
-    }
+  delete this->old_dof_object;
+  this->old_dof_object = NULL;
 }
 
 

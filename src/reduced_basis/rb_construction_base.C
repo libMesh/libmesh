@@ -71,14 +71,11 @@ void RBConstructionBase<Base>::clear ()
   std::map< std::string, NumericVector<Number>* >::iterator it           = training_parameters.begin();
   std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters.end();
 
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       NumericVector<Number>* training_vector = it->second;
-      if(training_vector)
-        {
-          delete training_vector;
-          training_vector = NULL;
-        }
+      delete training_vector;
+      training_vector = NULL;
     }
   training_parameters.clear();
 }
@@ -286,14 +283,11 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
   // Clear the training set
   std::map< std::string, NumericVector<Number>* >::iterator it           = training_parameters.begin();
   std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters.end();
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       NumericVector<Number>* training_vector = it->second;
-      if(training_vector)
-        {
-          delete training_vector;
-          training_vector = NULL;
-        }
+      delete training_vector;
+      training_vector = NULL;
     }
 
   // Get the number of local and global training parameters
@@ -342,14 +336,11 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
     std::map< std::string, NumericVector<Number>* >::iterator it           = training_parameters_in.begin();
     std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters_in.end();
 
-    for( ; it != it_end; ++it)
+    for ( ; it != it_end; ++it)
       {
         NumericVector<Number>* training_vector = it->second;
-        if(training_vector)
-          {
-            delete training_vector;
-            training_vector = NULL;
-          }
+        delete training_vector;
+        training_vector = NULL;
       }
     training_parameters_in.clear();
   }
@@ -481,14 +472,11 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
     std::map< std::string, NumericVector<Number>* >::iterator it           = training_parameters_in.begin();
     std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters_in.end();
 
-    for( ; it != it_end; ++it)
+    for ( ; it != it_end; ++it)
       {
         NumericVector<Number>* training_vector = it->second;
-        if(training_vector)
-          {
-            delete training_vector;
-            training_vector = NULL;
-          }
+        delete training_vector;
+        training_vector = NULL;
       }
   }
 

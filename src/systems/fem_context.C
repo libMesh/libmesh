@@ -134,8 +134,7 @@ FEMContext::~FEMContext()
   delete side_qrule;
   side_qrule = NULL;
 
-  if (edge_qrule)
-    delete edge_qrule;
+  delete edge_qrule;
   side_qrule = NULL;
 }
 

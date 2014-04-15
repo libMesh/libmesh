@@ -63,21 +63,15 @@ RBEIMAssembly::~RBEIMAssembly()
 {
   for(unsigned int var=0; var<_fe_var.size(); var++)
     {
-      if(_fe_var[var])
-        {
-          delete _fe_var[var];
-          _fe_var[var] = NULL;
-        }
+      delete _fe_var[var];
+      _fe_var[var] = NULL;
     }
   _fe_var.clear();
 
   for(unsigned int var=0; var<_fe_qrule.size(); var++)
     {
-      if(_fe_qrule[var])
-        {
-          delete _fe_qrule[var];
-          _fe_qrule[var] = NULL;
-        }
+      delete _fe_qrule[var];
+      _fe_qrule[var] = NULL;
     }
   _fe_qrule.clear();
 }
@@ -99,13 +93,10 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
     }
 
   // If the qrule is not repeated, then we need to make a new copy of element_qrule.
-  if(!repeated_qrule)
+  if (!repeated_qrule)
     {
       // First, possibly delete the old qrule
-      if(_fe_qrule[var] != NULL)
-        {
-          delete _fe_qrule[var];
-        }
+      delete _fe_qrule[var];
 
       _fe_qrule[var] =
         QBase::build(element_qrule.type(),

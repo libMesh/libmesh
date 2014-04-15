@@ -93,22 +93,16 @@ void TransientRBConstruction::clear()
   // clear the mass matrices
   for(unsigned int q=0; q<M_q_vector.size(); q++)
     {
-      if(M_q_vector[q])
-        {
-          delete M_q_vector[q];
-          M_q_vector[q] = NULL;
-        }
+      delete M_q_vector[q];
+      M_q_vector[q] = NULL;
     }
 
   if(store_non_dirichlet_operators)
     {
       for(unsigned int q=0; q<non_dirichlet_M_q_vector.size(); q++)
         {
-          if(non_dirichlet_M_q_vector[q])
-            {
-              delete non_dirichlet_M_q_vector[q];
-              non_dirichlet_M_q_vector[q] = NULL;
-            }
+          delete non_dirichlet_M_q_vector[q];
+          non_dirichlet_M_q_vector[q] = NULL;
         }
     }
 

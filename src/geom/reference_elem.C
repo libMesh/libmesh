@@ -59,20 +59,18 @@ public:
   ~SingletonCache()
   {
     for (unsigned int e=0; e<elem_list.size(); e++)
-      if (elem_list[e])
-        {
-          delete elem_list[e];
-          elem_list[e] = NULL;
-        }
+      {
+        delete elem_list[e];
+        elem_list[e] = NULL;
+      }
 
     elem_list.clear();
 
     for (unsigned int n=0; n<node_list.size(); n++)
-      if (node_list[n])
-        {
-          delete node_list[n];
-          node_list[n] = NULL;
-        }
+      {
+        delete node_list[n];
+        node_list[n] = NULL;
+      }
 
     node_list.clear();
   }
