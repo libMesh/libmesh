@@ -502,28 +502,27 @@ inline Tnew libmesh_cast_int (Told oldvar)
     } } while (0)
 
 
+// The libmesh_warning macro outputs a file/line/time stamped warning
+// message, if warnings are enabled.
+#ifdef LIBMESH_ENABLE_WARNINGS
+#define libmesh_warning(message) \
+  libmesh_do_once(libMesh::out << message \
+                  << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
+#else
+#define libmesh_warning(message)  ((void) 0)
+#endif
+
 // The libmesh_experimental macro warns that you are using
 // bleeding-edge code
 #undef libmesh_experimental
-#ifdef LIBMESH_ENABLE_WARNINGS
-#define libmesh_experimental()                                          \
-  libmesh_do_once(libMesh::out << "*** Warning, This code is untested, experimental, or likely to see future API changes: " \
-                  << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
-#else
-#define libmesh_experimental()  ((void) 0)
-#endif
+#define libmesh_experimental() \
+  libmesh_warning("*** Warning, This code is untested, experimental, or likely to see future API changes: ");
 
 
 // The libmesh_deprecated macro warns that you are using obsoleted code
 #undef libmesh_deprecated
-#ifdef LIBMESH_ENABLE_WARNINGS
-#define libmesh_deprecated()                                            \
-  libmesh_do_once(libMesh::out << "*** Warning, This code is deprecated, and likely to be removed in future library versions! " \
-                  << __FILE__ << ", line " << __LINE__ << ", compiled " << __DATE__ << " at " << __TIME__ << " ***" << std::endl;)
-#else
-#define libmesh_deprecated()  ((void) 0)
-#endif
-
+#define libmesh_deprecated() \
+  libmesh_warning("*** Warning, This code is deprecated, and likely to be removed in future library versions! ");
 
 // A function template for ignoring unused variables.  This is a way
 // to shut up unused variable compiler warnings on a case by case
