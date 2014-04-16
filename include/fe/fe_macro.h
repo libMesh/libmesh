@@ -47,6 +47,7 @@
   template void         FE<2,SUBDIVISION>::attach_quadrature_rule (QBase*); \
   template unsigned int FE<2,SUBDIVISION>::n_quadrature_points () const; \
   template void         FE<2,SUBDIVISION>::reinit(const Elem*,const std::vector<Point>* const,const std::vector<Real>* const); \
+  template void         FE<2,SUBDIVISION>::init_base_shape_functions(const std::vector<Point>&, const Elem*); \
   template void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point>&, const Elem*)
 
 
