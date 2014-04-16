@@ -58,8 +58,12 @@ void QGrid::init_3D(const ElemType type_in,
     case TET4:
     case TET10:
       {
-        _points.resize((_order+1)*(_order+2)*(_order+3)/6);
-        _weights.resize((_order+1)*(_order+2)*(_order+3)/6);
+        const unsigned int np = (_order+1)*(_order+2)*(_order+3)/6;
+        // Master tet has 1x1 triangle base, height 1, so volume = 1/6
+        const Real weight = Real(1)/Real(6)/np;
+        const Real dx = 1.0/(_order+1);
+        _points.resize(np);
+        _weights.resize(np);
 
         unsigned int pt = 0;
         for (int i = 0; i != _order + 1; ++i)
@@ -68,11 +72,10 @@ void QGrid::init_3D(const ElemType type_in,
               {
                 for (int k = 0; k != _order + 1 - i - j; ++k)
                   {
-                    _points[pt](0) = (double)i / (double)_order;
-                    _points[pt](1) = (double)j / (double)_order;
-                    _points[pt](2) = (double)k / (double)_order;
-                    _weights[pt] = 1.0 / (double)(_order+1) /
-                      (double)(_order+2) / (double)(_order+3);
+                    _points[pt](0) = (i+0.5)*dx;
+                    _points[pt](1) = (j+0.5)*dx;
+                    _points[pt](2) = (k+0.5)*dx;
+                    _weights[pt] = weight;
                     pt++;
                   }
               }
@@ -110,8 +113,13 @@ void QGrid::init_3D(const ElemType type_in,
     case PYRAMID13:
     case PYRAMID14:
       {
-        _points.resize((_order+1)*(_order+2)*(_order+3)/6);
-        _weights.resize((_order+1)*(_order+2)*(_order+3)/6);
+        const unsigned int np = (_order+1)*(_order+2)*(_order+3)/6;
+        _points.resize(np);
+        _weights.resize(np);
+        // Master pyramid has 2x2 base, height 1, so volume = 4/3
+        const Real weight = Real(4)/Real(3)/np;
+        const Real dx = 2.0/(_order+1);
+        const Real dz = 1.0/(_order+1);
 
         unsigned int pt = 0;
         for (int k = 0; k != _order + 1; ++k)
@@ -120,13 +128,12 @@ void QGrid::init_3D(const ElemType type_in,
               {
                 for (int j = 0; j != _order + 1 - k; ++j)
                   {
-                    _points[pt](0) = 2.0 * (double)i / (double)_order
-                      - 1.0 + (double)k / (double)_order;
-                    _points[pt](1) = 2.0 * (double)j / (double)_order
-                      - 1.0 + (double)k / (double)_order;
-                    _points[pt](2) = (double)k / (double)_order;
-                    _weights[pt] = 1.0 / (double)(_order+1) /
-                      (double)(_order+2) / (double)(_order+3);
+                    _points[pt](0) = (i+0.5)*dx-1.0 + 
+                       (k+0.5)*dz;
+                    _points[pt](1) = (j+0.5)*dx-1.0 + 
+                       (k+0.5)*dz;
+                    _points[pt](2) = (k+0.5)*dz;
+                    _weights[pt] = weight;
                     pt++;
                   }
               }

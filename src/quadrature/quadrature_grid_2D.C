@@ -58,18 +58,20 @@ void QGrid::init_2D(const ElemType type_in,
     case TRI3:
     case TRI6:
       {
-        _points.resize((_order + 1)*(_order + 2)/2);
-        _weights.resize((_order + 1)*(_order + 2)/2);
+        const unsigned int np = (_order + 1)*(_order + 2)/2;
+        const Real weight = 0.5/np;
+        const Real dx = 1.0/(_order+1);
+        _points.resize(np);
+        _weights.resize(np);
 
         unsigned int pt = 0;
         for (int i = 0; i != _order + 1; ++i)
           {
             for (int j = 0; j != _order + 1 - i; ++j)
               {
-                _points[pt](0) = (double)i / (double)_order;
-                _points[pt](1) = (double)j / (double)_order;
-                _weights[pt] = 1.0 / (double)(_order+1) /
-                  (double)(_order+2);
+                _points[pt](0) = (i+0.5)*dx;
+                _points[pt](1) = (j+0.5)*dx;
+                _weights[pt] = weight;
                 pt++;
               }
           }

@@ -5,35 +5,36 @@
 
 using namespace libMesh;
 
+#define MACROCOMMA ,
+
+#define TEST_ONE_ORDER(qtype, order) \
+  CPPUNIT_TEST( testBuild<qtype MACROCOMMA order> ); \
+  CPPUNIT_TEST( test1DWeights<qtype MACROCOMMA order> ); \
+  CPPUNIT_TEST( test2DWeights<qtype MACROCOMMA order> ); \
+  CPPUNIT_TEST( test3DWeights<qtype MACROCOMMA order> );
+
+#define TEST_ALL_ORDERS(qtype) \
+  TEST_ONE_ORDER(qtype, FIRST); \
+  TEST_ONE_ORDER(qtype, SECOND); \
+  TEST_ONE_ORDER(qtype, THIRD); \
+  TEST_ONE_ORDER(qtype, FOURTH); \
+  TEST_ONE_ORDER(qtype, FIFTH); \
+  TEST_ONE_ORDER(qtype, SIXTH); \
+  TEST_ONE_ORDER(qtype, SEVENTH); \
+
+
 class QuadratureTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( QuadratureTest );
 
-  CPPUNIT_TEST( testBuild );
-
-  CPPUNIT_TEST( test1DWeights<FIRST> );
-  CPPUNIT_TEST( test1DWeights<SECOND> );
-  CPPUNIT_TEST( test1DWeights<THIRD> );
-  CPPUNIT_TEST( test1DWeights<FOURTH> );
-  CPPUNIT_TEST( test1DWeights<FIFTH> );
-  CPPUNIT_TEST( test1DWeights<SIXTH> );
-  CPPUNIT_TEST( test1DWeights<SEVENTH> );
-
-  CPPUNIT_TEST( test2DWeights<FIRST> );
-  CPPUNIT_TEST( test2DWeights<SECOND> );
-  CPPUNIT_TEST( test2DWeights<THIRD> );
-  CPPUNIT_TEST( test2DWeights<FOURTH> );
-  CPPUNIT_TEST( test2DWeights<FIFTH> );
-  CPPUNIT_TEST( test2DWeights<SIXTH> );
-  CPPUNIT_TEST( test2DWeights<SEVENTH> );
-
-  CPPUNIT_TEST( test3DWeights<FIRST> );
-  CPPUNIT_TEST( test3DWeights<SECOND> );
-  CPPUNIT_TEST( test3DWeights<THIRD> );
-  CPPUNIT_TEST( test3DWeights<FOURTH> );
-  CPPUNIT_TEST( test3DWeights<FIFTH> );
-  CPPUNIT_TEST( test3DWeights<SIXTH> );
-  CPPUNIT_TEST( test3DWeights<SEVENTH> );
+  TEST_ALL_ORDERS(QGAUSS);
+  TEST_ALL_ORDERS(QSIMPSON);
+  TEST_ALL_ORDERS(QTRAP);
+  TEST_ALL_ORDERS(QGRID);
+  TEST_ALL_ORDERS(QGRUNDMANN_MOLLER);
+  TEST_ALL_ORDERS(QMONOMIAL);
+  TEST_ALL_ORDERS(QCONICAL);
+  TEST_ALL_ORDERS(QCLOUGH);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -49,11 +50,12 @@ public:
 
 
 
+  template <QuadratureType qtype, Order order>
   void testBuild ()
   {
-    AutoPtr<QBase> qrule1D = QBase::build (QGAUSS, 1, THIRD);
-    AutoPtr<QBase> qrule2D = QBase::build (QGAUSS, 2, THIRD);
-    AutoPtr<QBase> qrule3D = QBase::build (QGAUSS, 3, THIRD);
+    AutoPtr<QBase> qrule1D = QBase::build (qtype, 1, order);
+    AutoPtr<QBase> qrule2D = QBase::build (qtype, 2, order);
+    AutoPtr<QBase> qrule3D = QBase::build (qtype, 3, order);
 
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(1) , qrule1D->get_dim() );
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(2) , qrule2D->get_dim() );
@@ -63,11 +65,11 @@ public:
 
 
   //-------------------------------------------------------
-  // 1D Gauss Rule Test
-  template <Order order>
+  // 1D Quadrature Rule Test
+  template <QuadratureType qtype, Order order>
   void test1DWeights ()
   {
-    AutoPtr<QBase> qrule = QBase::build(QGAUSS, 1, order);
+    AutoPtr<QBase> qrule = QBase::build(qtype , 1, order);
     qrule->init (EDGE3);
 
     Real sum = 0;
@@ -81,11 +83,11 @@ public:
 
 
   //-------------------------------------------------------
-  // 2D Gauss Rule Test
-  template <Order order>
+  // 2D Quadrature Rule Test
+  template <QuadratureType qtype, Order order>
   void test2DWeights ()
   {
-    AutoPtr<QBase> qrule = QBase::build(QGAUSS, 2, order);
+    AutoPtr<QBase> qrule = QBase::build(qtype, 2, order);
     qrule->init (QUAD8);
 
     Real sum = 0;
@@ -109,10 +111,10 @@ public:
 
   //-------------------------------------------------------
   // 3D Gauss Rule Test
-  template <Order order>
+  template <QuadratureType qtype, Order order>
   void test3DWeights ()
   {
-    AutoPtr<QBase> qrule = QBase::build(QGAUSS, 3, order);
+    AutoPtr<QBase> qrule = QBase::build(qtype, 3, order);
     qrule->init (HEX20);
 
     Real sum = 0;
