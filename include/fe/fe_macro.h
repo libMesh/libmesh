@@ -42,6 +42,8 @@
   template Point FE<2,SUBDIVISION>::map_eta(const Elem*,const Point&);  \
   template Point FE<2,SUBDIVISION>::map_zeta(const Elem*,const Point&)
 
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
 #define INSTANTIATE_SUBDIVISION_FE                                      \
   template unsigned int FE<2,SUBDIVISION>::n_shape_functions () const;  \
   template void         FE<2,SUBDIVISION>::attach_quadrature_rule (QBase*); \
@@ -49,6 +51,17 @@
   template void         FE<2,SUBDIVISION>::reinit(const Elem*,const std::vector<Point>* const,const std::vector<Real>* const); \
   template void         FE<2,SUBDIVISION>::init_base_shape_functions(const std::vector<Point>&, const Elem*); \
   template void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point>&, const Elem*)
+
+#else // LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+#define INSTANTIATE_SUBDIVISION_FE                                      \
+  template unsigned int FE<2,SUBDIVISION>::n_shape_functions () const;  \
+  template void         FE<2,SUBDIVISION>::attach_quadrature_rule (QBase*); \
+  template unsigned int FE<2,SUBDIVISION>::n_quadrature_points () const; \
+  template void         FE<2,SUBDIVISION>::reinit(const Elem*,const std::vector<Point>* const,const std::vector<Real>* const); \
+  template void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point>&, const Elem*)
+
+#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
 #ifndef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
