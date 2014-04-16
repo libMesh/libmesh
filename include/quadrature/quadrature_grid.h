@@ -32,8 +32,18 @@ namespace libMesh
 
 
 /**
- * This class creates quadrature points on a uniform grid, Order
- * points on a side.
+ * This class creates quadrature points on a uniform grid, with
+ * order+1 points on an edge.
+ *
+ * Unlike most libMesh quadrature rules, QGrid does *not* reduce
+ * error exponentially on smooth functions as you increase the
+ * quadrature order.  Instead, it reduces the error quadratically.
+ * However, this error reduction is more reliable on non-smooth
+ * functions.
+ *
+ * This quadrature type may be useful iff you are integrating
+ * functions which have discontinuities or discontinuous derivatives
+ * on scales smaller than your element size.
  */
 
 // ------------------------------------------------------------
