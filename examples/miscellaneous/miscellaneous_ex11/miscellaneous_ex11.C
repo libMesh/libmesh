@@ -33,7 +33,7 @@
 
 // LibMesh includes
 #include "libmesh/libmesh.h"
-#include "libmesh/mesh.h"
+#include "libmesh/serial_mesh.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/mesh_tools.h"
@@ -82,7 +82,8 @@ int main (int argc, char** argv)
 #endif
 
   // Create a 2D mesh distributed across the default MPI communicator.
-  Mesh mesh (init.comm(), 2);
+  // Subdivision surfaces do not appear to work with ParallelMesh yet.
+  SerialMesh mesh (init.comm(), 2);
 
   // Read the coarse square mesh.
   mesh.read ("square_mesh.off");
@@ -199,9 +200,12 @@ int main (int argc, char** argv)
   // Finally, we evaluate the z-displacement "w" at the center node.
   const unsigned int w_var = system.variable_number ("w");
   unsigned int w_dof = center_node->dof_number (system.number(), w_var, 0);
-  std::vector<Real> soln;
-  system.current_local_solution->localize_to_one(soln);
-  Real w = soln[w_dof];
+  Real w = 0;
+  if (w_dof >= system.get_dof_map().first_dof() && 
+      w_dof <  system.get_dof_map().end_dof())
+    w = system.current_solution(w_dof);
+  system.comm().sum(w);
+
 
   // The analytic solution for the maximum displacement of
   // a clamped square plate in pure bending, from Taylor,

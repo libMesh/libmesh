@@ -35,7 +35,7 @@
 
 // libMesh includes
 #include "libmesh/libmesh.h"
-#include "libmesh/mesh.h"
+#include "libmesh/serial_mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/equation_systems.h"
@@ -62,7 +62,7 @@ using namespace libMesh;
 bool compare_elements(const SerialMesh& mesh1, const SerialMesh& mesh2);
 void assemble_poisson(EquationSystems& es,
                       const std::string& system_name);
-void assemble_and_solve(Mesh&, EquationSystems&);
+void assemble_and_solve(MeshBase&, EquationSystems&);
 
 int main (int argc, char** argv)
 {
@@ -104,14 +104,14 @@ int main (int argc, char** argv)
     ps = command_line.next(ps);
 
   // Generate eight meshes that will be stitched
-  Mesh mesh (init.comm());
-  Mesh mesh1(init.comm());
-  Mesh mesh2(init.comm());
-  Mesh mesh3(init.comm());
-  Mesh mesh4(init.comm());
-  Mesh mesh5(init.comm());
-  Mesh mesh6(init.comm());
-  Mesh mesh7(init.comm());
+  SerialMesh mesh (init.comm());
+  SerialMesh mesh1(init.comm());
+  SerialMesh mesh2(init.comm());
+  SerialMesh mesh3(init.comm());
+  SerialMesh mesh4(init.comm());
+  SerialMesh mesh5(init.comm());
+  SerialMesh mesh6(init.comm());
+  SerialMesh mesh7(init.comm());
   MeshTools::Generation::build_cube (mesh, ps, ps, ps, -1,    0,    0,  1,  0, 1, HEX8);
   MeshTools::Generation::build_cube (mesh1, ps, ps, ps,    0,  1,    0,  1,  0, 1, HEX8);
   MeshTools::Generation::build_cube (mesh2, ps, ps, ps, -1,    0, -1,    0,  0, 1, HEX8);
@@ -122,7 +122,7 @@ int main (int argc, char** argv)
   MeshTools::Generation::build_cube (mesh7, ps, ps, ps,    0,  1, -1,    0, -1, 0, HEX8);
 
   // Generate a single unstitched reference mesh
-  Mesh nostitch_mesh(init.comm());
+  SerialMesh nostitch_mesh(init.comm());
   MeshTools::Generation::build_cube (nostitch_mesh, ps*2, ps*2, ps*2, -1, 1, -1, 1, -1, 1, HEX8);
   STOP_LOG("Initialize and create cubes", "main");
 
@@ -169,7 +169,7 @@ int main (int argc, char** argv)
   return 0;
 }
 
-void assemble_and_solve(Mesh& mesh, EquationSystems& equation_systems)
+void assemble_and_solve(MeshBase& mesh, EquationSystems& equation_systems)
 {
   mesh.print_info();
 
