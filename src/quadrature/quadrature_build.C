@@ -23,7 +23,10 @@
 // Local includes
 #include "libmesh/quadrature_clough.h"
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/quadrature_gm.h"
+#include "libmesh/quadrature_grid.h"
 #include "libmesh/quadrature_jacobi.h"
+#include "libmesh/quadrature_monomial.h"
 #include "libmesh/quadrature_simpson.h"
 #include "libmesh/quadrature_trap.h"
 #include "libmesh/string_to_enum.h"
@@ -153,6 +156,23 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
         return ap;
       }
 
+    case QGRID:
+      {
+        AutoPtr<QBase> ap(new QGrid(_dim, _order));
+        return ap;
+      }
+
+    case QGRUNDMANN_MOLLER:
+      {
+        AutoPtr<QBase> ap(new QGrundmann_Moller(_dim, _order));
+        return ap;
+      }
+
+    case QMONOMIAL:
+      {
+        AutoPtr<QBase> ap(new QMonomial(_dim, _order));
+        return ap;
+      }
 
     default:
       {
