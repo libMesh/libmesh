@@ -70,9 +70,6 @@ the same source tree by creating a subdirectory for each compiler build:
 
 
 Dependencies
-============
-
-Requirements
 ------------
 
 libMesh has no required dependencies other than a reasonably modern C
@@ -88,4 +85,7 @@ with libMesh, others can be used from third-party installation.  For a
 list of supported packages and optional dependencies see
 [here](http://libmesh.sourceforge.net/externalsoftware.php)
 
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/52c0727babae956821cca66c19c68908 "githalytics.com")](http://githalytics.com/libMesh/libmesh)
+License
+-------
+
+LibMesh is open source software distributed under the LGPL license, version 2.1.
