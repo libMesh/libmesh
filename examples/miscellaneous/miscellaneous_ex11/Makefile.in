@@ -570,9 +570,9 @@ check_SCRIPTS = run.sh
 #
 # how to make documentation
 #
-CLEANFILES = without_ghosts.pvtu without_ghosts.e with_ghosts.pvtu \
-	with_ghosts.e out.pvtu out.e $(am__append_1) \
-	$(example_name).php stdout.log
+CLEANFILES = without_ghosts.pvtu without_ghosts_*.vtu without_ghosts.e \
+	with_ghosts.pvtu with_ghosts_*.vtu with_ghosts.e out.pvtu \
+	out_*.vtu out.e $(am__append_1) $(example_name).php stdout.log
 
 # also need to link files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp

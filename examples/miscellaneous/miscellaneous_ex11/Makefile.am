@@ -4,7 +4,7 @@ data          = miscellaneous_ex11.C run.sh square_mesh.off
 sources       = $(data) run.sh
 check_SCRIPTS = run.sh
 
-CLEANFILES = without_ghosts.pvtu without_ghosts.e with_ghosts.pvtu with_ghosts.e out.pvtu out.e
+CLEANFILES = without_ghosts.pvtu without_ghosts_*.vtu without_ghosts.e with_ghosts.pvtu with_ghosts_*.vtu with_ghosts.e out.pvtu out_*.vtu out.e
 
 # also need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD
