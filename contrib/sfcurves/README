@@ -1,2 +1,13 @@
-Space-filling curves library written by Bill Barth, Carter Edwards, and
-Robert McLay.
+Copyright (C) 1997, 2000 University of Texas Board of Regents*
+
+The Hilbert encoding algorithm was written by H. Carter Edwards in
+1997 while a graduate student at the University of Texas at Austin.
+This portion of the sfcurves library is licensed under the GNU GPLv1.
+
+The Morton encoding algorithm was written by William L. Barth around
+2000 while a graduate student at the University of Texas at Austin.
+This portion of the sfcurves library is licensed under the GNU GPLv2.
+
+* Both authors were employed as graduate students at the University of
+  Texas at the time they authored this work, therefore the work-for-hire
+  (http://copyright.lib.utexas.edu/whoowns.html) rules apply.
