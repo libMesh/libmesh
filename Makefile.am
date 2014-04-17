@@ -101,7 +101,7 @@ install-data-hook:
 	cd $(DESTDIR)$(prefix) && rm -f Make.common && $(LN_S) etc/libmesh/Make.common Make.common
 	cat $(DESTDIR)$(libmesh_configdir)/libmesh-config | $(SED) "s/has_been_installed=no/has_been_installed=yes/g" > $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed
 	mv $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed $(DESTDIR)$(libmesh_configdir)/libmesh-config && chmod +x $(DESTDIR)$(libmesh_configdir)/libmesh-config
-	cat $(DESTDIR)$(prefix)/contrib/bin/libtool | $(SED) "s/-l -l //g" > $(DESTDIR)$(prefix)/contrib/bin/libtool.fixed
+	cat $(DESTDIR)$(prefix)/contrib/bin/libtool | $(SED) "s/-l //g" > $(DESTDIR)$(prefix)/contrib/bin/libtool.fixed
 	mv $(DESTDIR)$(prefix)/contrib/bin/libtool.fixed $(DESTDIR)$(prefix)/contrib/bin/libtool && chmod +x $(DESTDIR)$(prefix)/contrib/bin/libtool
 
 
