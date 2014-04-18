@@ -2271,8 +2271,8 @@ void Elem::PackedElem::pack (std::vector<largest_id_type> &conn, const Elem* ele
   // use parent_ID of -1 to indicate a level 0 element
   if (elem->level() == 0)
     {
-      conn.push_back(-1);
-      conn.push_back(-1);
+      conn.push_back(static_cast<largest_id_type>(-1));
+      conn.push_back(static_cast<largest_id_type>(-1));
     }
   else
     {
@@ -2280,8 +2280,8 @@ void Elem::PackedElem::pack (std::vector<largest_id_type> &conn, const Elem* ele
       conn.push_back(elem->parent()->which_child_am_i(elem));
     }
 #else
-  conn.push_back (-1);
-  conn.push_back (-1);
+  conn.push_back(static_cast<largest_id_type>(-1));
+  conn.push_back(static_cast<largest_id_type>(-1));
 #endif
 
   for (unsigned int n=0; n<elem->n_nodes(); n++)
@@ -2293,7 +2293,7 @@ void Elem::PackedElem::pack (std::vector<largest_id_type> &conn, const Elem* ele
       if (neigh)
         conn.push_back (neigh->id());
       else
-        conn.push_back (-1);
+        conn.push_back(static_cast<largest_id_type>(-1));
     }
 
   elem->pack_indexing(std::back_inserter(conn));
