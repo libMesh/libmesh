@@ -84,7 +84,7 @@ int main (int argc, char** argv)
   // Skip this example without --enable-amr; requires MeshRefinement
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_assert(false, "--enable-amr");
-#endif
+#else
 
   // Create a 2D mesh distributed across the default MPI communicator.
   // Subdivision surfaces do not appear to work with ParallelMesh yet.
@@ -223,6 +223,8 @@ int main (int argc, char** argv)
   // square plate to the screen.
   std::cout << "z-displacement of the center point: " << w << std::endl;
   std::cout << "Analytic solution for pure bending: " << w_analytic << std::endl;
+
+#endif // #ifdef LIBMESH_ENABLE_AMR
 
   // All done.
   return 0;
