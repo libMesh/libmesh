@@ -81,6 +81,11 @@ int main (int argc, char** argv)
   libmesh_example_assert (false, "--enable-node-valence");
 #endif
 
+  // Skip this example without --enable-amr; requires MeshRefinement
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_example_assert(false, "--enable-amr");
+#endif
+
   // Create a 2D mesh distributed across the default MPI communicator.
   // Subdivision surfaces do not appear to work with ParallelMesh yet.
   SerialMesh mesh (init.comm(), 2);
@@ -201,7 +206,7 @@ int main (int argc, char** argv)
   const unsigned int w_var = system.variable_number ("w");
   unsigned int w_dof = center_node->dof_number (system.number(), w_var, 0);
   Real w = 0;
-  if (w_dof >= system.get_dof_map().first_dof() && 
+  if (w_dof >= system.get_dof_map().first_dof() &&
       w_dof <  system.get_dof_map().end_dof())
     w = system.current_solution(w_dof);
   system.comm().sum(w);
