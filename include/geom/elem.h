@@ -1248,19 +1248,6 @@ protected:
    * The subdomain to which this element belongs.
    */
   subdomain_id_type _sbd_id;
-
-  /**
-   * Make the classes that need to access our build
-   * member friends.  These classes do not really fit
-   * the profile of what a "friend" should be, but
-   * if we are going to protect the constructor and
-   * the build method, there's no way around it.
-   *
-   * Do we *really* need to protect the build member?
-   * It would seem that we are just getting around it
-   * by using friends!
-   */
-  friend class MeshRefinement;
 };
 
 // ------------------------------------------------------------
