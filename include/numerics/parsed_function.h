@@ -115,7 +115,9 @@ public:
         FunctionParserBase<Output> fp;
         fp.AddConstant("pi", std::acos(Real(-1)));
         fp.AddConstant("e", std::exp(Real(1)));
-        fp.Parse(subexpression, variables);
+        if (fp.Parse(subexpression, variables) != -1) // -1 for success
+          libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
+
         fp.Optimize();
         parsers.push_back(fp);
 
@@ -142,7 +144,7 @@ public:
 
     // The remaining locations in _spacetime are currently fixed at construction
     // but could potentially be made dynamic
-    return parsers[0].Eval(&_spacetime[0]);
+    return eval(0);
   }
 
   virtual void operator() (const Point& p,
@@ -165,7 +167,7 @@ public:
     // The remaining locations in _spacetime are currently fixed at construction
     // but could potentially be made dynamic
     for (unsigned int i=0; i != size; ++i)
-      output(i) = parsers[i].Eval(&_spacetime[0]);
+      output(i) = eval(i);
   }
 
   /**
@@ -189,7 +191,7 @@ public:
 
     // The remaining locations in _spacetime are currently fixed at construction
     // but could potentially be made dynamic
-    return parsers[i].Eval(&_spacetime[0]);
+    return eval(i);
   }
 
   /**
@@ -217,6 +219,45 @@ public:
   }
 
 private:
+  // Evaluate the ith FunctionParser and check the result
+  inline Output eval(unsigned int i)
+  {
+#ifndef DEBUG
+    return parsers[i].Eval(&_spacetime[0]);
+#else
+    libmesh_assert(parsers[i]);
+
+    Output result = parsers[i].Eval(&_spacetime[0]);
+    int error_code = parsers[i].EvalError();
+    if (error_code)
+    {
+      libMesh::err << "ERROR: FunctionParser is unable to evaluate the expression at index << " << i << " with arguments:\n";
+      for (unsigned int j=0; j<_spacetime.size(); ++j)
+        libMesh::err << '\t' << _spacetime[j] << '\n';
+      libMesh::err << '\n';
+
+      // Currently no API to report error messages, we'll do it manually
+      switch (error_code)
+      {
+      case 1:
+        libMesh::err << "Reason: Division by zero\n"; break;
+      case 2:
+        libMesh::err << "Reason: Square Root error (negative value)\n"; break;
+      case 3:
+        libMesh::err << "Reason: Log error (negative value)\n"; break;
+      case 4:
+        libMesh::err << "Reason: Trigonometric error (asin or acos of illegal value)\n"; break;
+      case 5:
+        libMesh::err << "Reason: Maximum recursion level reached\n"; break;
+      default:
+        libMesh::err << "Reason: Unknown\n"; break;
+      }
+      libmesh_error();
+    }
+    return result;
+#endif
+  }
+
   std::string _expression;
   std::vector<FunctionParserBase<Output> > parsers;
   std::vector<Output> _spacetime;
