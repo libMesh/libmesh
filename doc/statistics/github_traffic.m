@@ -68,6 +68,13 @@ data = {
     '2014-Apr-11', 51,  20
     '2014-Apr-12', 25,  15
     '2014-Apr-13', 49,  20
+    '2014-Apr-14', 120, 23
+    '2014-Apr-15', 191, 27
+    '2014-Apr-16', 219, 24
+    '2014-Apr-17', 216, 30
+    '2014-Apr-18', 63,  19
+    '2014-Apr-19', 36,  11
+    '2014-Apr-20', 25,   7
     };
 
 % length works like you would expect it to for cell arrays.
@@ -90,7 +97,7 @@ ylabel (haxis(1), 'Daily Page Views');
 ylabel (haxis(2), 'Daily Unique Visitors');
 
 % Totaling unique visitors doesn't really mean much...
-title (['Total Pageviews: ', num2str(sum(views))]);
+title (['Total Pageviews: ', num2str(sum(views)), ', Avg. Daily Unique Visitors: ', num2str(mean(visitors))]);
 
 % Make thick lines - this looks better in PDF
 set([h1, h2], 'linewidth', 6);
