@@ -225,7 +225,6 @@ private:
 #ifndef DEBUG
     return parsers[i].Eval(&_spacetime[0]);
 #else
-    libmesh_assert(parsers[i]);
 
     Output result = parsers[i].Eval(&_spacetime[0]);
     int error_code = parsers[i].EvalError();
