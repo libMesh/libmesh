@@ -225,12 +225,13 @@ private:
 #ifndef DEBUG
     return parsers[i].Eval(&_spacetime[0]);
 #else
+    libmesh_assert_less(i, parsers.size());
 
     Output result = parsers[i].Eval(&_spacetime[0]);
     int error_code = parsers[i].EvalError();
     if (error_code)
     {
-      libMesh::err << "ERROR: FunctionParser is unable to evaluate the expression at index << " << i << " with arguments:\n";
+      libMesh::err << "ERROR: FunctionParser is unable to evaluate the expression at index " << i << " with arguments:\n";
       for (unsigned int j=0; j<_spacetime.size(); ++j)
         libMesh::err << '\t' << _spacetime[j] << '\n';
       libMesh::err << '\n';
