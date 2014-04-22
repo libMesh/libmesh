@@ -40,7 +40,12 @@ namespace libMesh
 // ------------------------------------------------------------
 // ExodusII_IO class members
 ExodusII_IO::ExodusII_IO (MeshBase& mesh,
-                          bool single_precision) :
+#ifdef LIBMESH_HAVE_EXODUS_API
+                          bool single_precision
+#else
+                          bool
+#endif
+                          ) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase> (mesh),
   ParallelObject(mesh),
@@ -985,7 +990,7 @@ void ExodusII_IO::set_coordinate_offset(Point)
 
 
 
-void ExodusII_IO::append(bool val)
+void ExodusII_IO::append(bool)
 {
   libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
   libmesh_error();
@@ -1024,7 +1029,7 @@ void ExodusII_IO::copy_elemental_solution(System&, std::string, std::string, uns
 
 
 
-void ExodusII_IO::write_element_data (const EquationSystems& es)
+void ExodusII_IO::write_element_data (const EquationSystems&)
 {
   libMesh::err << "ERROR, ExodusII API is not defined." << std::endl;
   libmesh_error();

@@ -212,7 +212,7 @@ int main(int argc, char** argv)
 
 #else // LIBMESH_HAVE_EXODUS_API
 
-int main(int argc, char** argv)
+int main(int, char**)
 {
   std::cerr << "Error: meshid requires libMesh configured with --enable-exodus" << std::endl;
 }
