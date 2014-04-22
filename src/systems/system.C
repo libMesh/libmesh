@@ -2263,7 +2263,7 @@ Tensor System::point_hessian(unsigned int, const Point &, const bool) const
   return Tensor();
 }
 
-Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) const
+Tensor System::point_hessian(unsigned int, const Point &, const Elem &) const
 {
   // We can only accumulate a hessian with --enable-second
   libmesh_error();

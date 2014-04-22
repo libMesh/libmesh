@@ -977,9 +977,9 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase &mesh)
 
 
 
+#ifdef LIBMESH_ENABLE_AMR
 void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &mesh)
 {
-#ifdef LIBMESH_ENABLE_AMR
   MeshBase::const_element_iterator el =
     mesh.elements_begin();
   const MeshBase::const_element_iterator el_end =
@@ -1003,8 +1003,10 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &mesh)
             libmesh_assert(elem->get_node(n)->old_dof_object);
         }
     }
-#endif // LIBMESH_ENABLE_AMR
 }
+#else
+void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &) {}
+#endif // LIBMESH_ENABLE_AMR
 
 
 

@@ -77,7 +77,13 @@ inline bool global_idx_mapping_equality (const std::pair<unsigned int, unsigned 
 
 // ------------------------------------------------------------
 // Nemesis_IO class members
-Nemesis_IO::Nemesis_IO (MeshBase& mesh, bool single_precision) :
+Nemesis_IO::Nemesis_IO (MeshBase& mesh,
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+                        bool single_precision
+#else
+                        bool
+#endif
+                        ) :
   MeshInput<MeshBase> (mesh, /*is_parallel_format=*/true),
   MeshOutput<MeshBase> (mesh, /*is_parallel_format=*/true),
   ParallelObject (mesh),
