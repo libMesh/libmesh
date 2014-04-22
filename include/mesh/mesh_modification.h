@@ -32,8 +32,8 @@ namespace libMesh
 {
 
 // forward declarations
+template <typename Output> class FunctionBase;
 class MeshBase;
-
 
 
 // ------------------------------------------------------------
@@ -57,6 +57,18 @@ namespace Modification
  */
 void distort (MeshBase& mesh,
               const Real factor, const bool perturb_boundary=false);
+
+/**
+ * Deterministically perturb the nodal locations.  This function will
+ * move each node from it's current x/y/z coordinates to a new x/y/z
+ * coordinate given by the first LIBMESH_DIM components of the
+ * specified function.
+ *
+ * Nodes on the boundary are also moved.
+ */
+void transform (MeshBase& mesh,
+                const FunctionBase<Real> &transfunc);
+
 
 /**
  * Translates the mesh.  The grid points are translated in the
