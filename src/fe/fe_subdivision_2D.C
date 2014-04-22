@@ -422,8 +422,13 @@ void FESubdivision::init_shape_functions(const std::vector<Point> &qp,
   calculations_started = true;
 
   // If the user forgot to request anything, we'll be safe and calculate everything:
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   if (!calculate_phi && !calculate_dphi && !calculate_d2phi)
     calculate_phi = calculate_dphi = calculate_d2phi = true;
+#else
+  if (!calculate_phi && !calculate_dphi)
+    calculate_phi = calculate_dphi = true;
+#endif
 
   const unsigned int valence = sd_elem->get_ordered_valence(0);
   const unsigned int n_qp = qp.size();
@@ -434,10 +439,12 @@ void FESubdivision::init_shape_functions(const std::vector<Point> &qp,
   dphi.resize        (n_approx_shape_functions);
   dphidxi.resize     (n_approx_shape_functions);
   dphideta.resize    (n_approx_shape_functions);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   d2phi.resize       (n_approx_shape_functions);
   d2phidxi2.resize   (n_approx_shape_functions);
   d2phidxideta.resize(n_approx_shape_functions);
   d2phideta2.resize  (n_approx_shape_functions);
+#endif
 
   for (unsigned int i = 0; i < n_approx_shape_functions; ++i)
     {
@@ -445,10 +452,12 @@ void FESubdivision::init_shape_functions(const std::vector<Point> &qp,
       dphi[i].resize        (n_qp);
       dphidxi[i].resize     (n_qp);
       dphideta[i].resize    (n_qp);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       d2phi[i].resize       (n_qp);
       d2phidxi2[i].resize   (n_qp);
       d2phidxideta[i].resize(n_qp);
       d2phideta2[i].resize  (n_qp);
+#endif
     }
 
   // Renumbering of the shape functions
@@ -465,12 +474,14 @@ void FESubdivision::init_shape_functions(const std::vector<Point> &qp,
               dphideta[i][p]     = FE<2,SUBDIVISION>::shape_deriv       (elem, fe_type.order, cvi[i], 1, qp[p]);
               dphi[i][p](0)      = dphidxi[i][p];
               dphi[i][p](1)      = dphideta[i][p];
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               d2phidxi2[i][p]    = FE<2,SUBDIVISION>::shape_second_deriv(elem, fe_type.order, cvi[i], 0, qp[p]);
               d2phidxideta[i][p] = FE<2,SUBDIVISION>::shape_second_deriv(elem, fe_type.order, cvi[i], 1, qp[p]);
               d2phideta2[i][p]   = FE<2,SUBDIVISION>::shape_second_deriv(elem, fe_type.order, cvi[i], 2, qp[p]);
               d2phi[i][p](0,0)   = d2phidxi2[i][p];
               d2phi[i][p](0,1)   = d2phi[i][p](1,0) = d2phidxideta[i][p];
               d2phi[i][p](1,1)   = d2phideta2[i][p];
+#endif
             }
         }
     }
@@ -482,9 +493,11 @@ void FESubdivision::init_shape_functions(const std::vector<Point> &qp,
       std::vector<Real> tphi(12);
       std::vector<Real> tdphidxi(12);
       std::vector<Real> tdphideta(12);
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       std::vector<Real> td2phidxi2(12);
       std::vector<Real> td2phidxideta(12);
       std::vector<Real> td2phideta2(12);
+#endif
 
       for (unsigned int p = 0; p < n_qp; ++p)
         {
@@ -595,9 +608,12 @@ void FESubdivision::init_shape_functions(const std::vector<Point> &qp,
               tphi[i]          = FE<2,SUBDIVISION>::shape             (elem, fe_type.order, i,    transformed_p);
               tdphidxi[i]      = FE<2,SUBDIVISION>::shape_deriv       (elem, fe_type.order, i, 0, transformed_p);
               tdphideta[i]     = FE<2,SUBDIVISION>::shape_deriv       (elem, fe_type.order, i, 1, transformed_p);
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               td2phidxi2[i]    = FE<2,SUBDIVISION>::shape_second_deriv(elem, fe_type.order, i, 0, transformed_p);
               td2phidxideta[i] = FE<2,SUBDIVISION>::shape_second_deriv(elem, fe_type.order, i, 1, transformed_p);
               td2phideta2[i]   = FE<2,SUBDIVISION>::shape_second_deriv(elem, fe_type.order, i, 2, transformed_p);
+#endif
             }
 
           // Finally, we can compute the irregular shape functions as the product of P
@@ -611,21 +627,27 @@ void FESubdivision::init_shape_functions(const std::vector<Point> &qp,
                   sum1 += P(i,j) * tphi[i];
                   sum2 += P(i,j) * tdphidxi[i];
                   sum3 += P(i,j) * tdphideta[i];
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                   sum4 += P(i,j) * td2phidxi2[i];
                   sum5 += P(i,j) * td2phidxideta[i];
                   sum6 += P(i,j) * td2phideta2[i];
+#endif
                 }
               phi[j][p]          = sum1;
               dphidxi[j][p]      = sum2 * jfac;
               dphideta[j][p]     = sum3 * jfac;
               dphi[j][p](0)      = dphidxi[j][p];
               dphi[j][p](1)      = dphideta[j][p];
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               d2phidxi2[j][p]    = sum4 * jfac * jfac;
               d2phidxideta[j][p] = sum5 * jfac * jfac;
               d2phideta2[j][p]   = sum6 * jfac * jfac;
               d2phi[j][p](0,0)   = d2phidxi2[j][p];
               d2phi[j][p](0,1)   = d2phi[j][p](1,0) = d2phidxideta[j][p];
               d2phi[j][p](1,1)   = d2phideta2[j][p];
+#endif
             }
         } // end quadrature loop
     } // end irregular vertex
@@ -634,9 +656,12 @@ void FESubdivision::init_shape_functions(const std::vector<Point> &qp,
   this->_fe_map->get_phi_map()          = phi;
   this->_fe_map->get_dphidxi_map()      = dphidxi;
   this->_fe_map->get_dphideta_map()     = dphideta;
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   this->_fe_map->get_d2phidxi2_map()    = d2phidxi2;
   this->_fe_map->get_d2phideta2_map()   = d2phideta2;
   this->_fe_map->get_d2phidxideta_map() = d2phidxideta;
+#endif
 
   STOP_LOG("init_shape_functions()", "FESubdivision");
 }
