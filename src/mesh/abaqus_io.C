@@ -225,10 +225,7 @@ void AbaqusIO::read (const std::string& fname)
               // libMesh::out << "Found parts section!" << std::endl;
 
               if (_already_seen_part)
-                {
-                  libMesh::err << "We currently don't support reading Abaqus files with multiple PART sections" << std::endl;
-                  libmesh_error();
-                }
+                libmesh_error_msg("We currently don't support reading Abaqus files with multiple PART sections");
 
               _already_seen_part = true;
             }
@@ -265,10 +262,7 @@ void AbaqusIO::read (const std::string& fname)
               // I haven't seen an unnamed elset yet, but let's detect it
               // just in case...
               if (nset_name == "")
-                {
-                  libMesh::err << "Unnamed nset encountered!" << std::endl;
-                  libmesh_error();
-                }
+                libmesh_error_msg("Unnamed nset encountered!");
 
               // Process any lines of comments that may be present
               this->process_and_discard_comments();
@@ -287,10 +281,7 @@ void AbaqusIO::read (const std::string& fname)
               // I haven't seen an unnamed elset yet, but let's detect it
               // just in case...
               if (elset_name == "")
-                {
-                  libMesh::err << "Unnamed elset encountered!" << std::endl;
-                  libmesh_error();
-                }
+                libmesh_error_msg("Unnamed elset encountered!");
 
               // Debugging
               // libMesh::out << "Processing ELSET: " << elset_name << std::endl;
@@ -336,9 +327,7 @@ void AbaqusIO::read (const std::string& fname)
         break;
 
       // If !in and !in.eof(), stream is in a bad state!
-      libMesh::err << "Stream is bad!\n";
-      libMesh::err << "Perhaps the file: " << fname << " does not exist?" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("Stream is bad! Perhaps the file: " << fname << " does not exist?");
     } // while
 
 
@@ -541,10 +530,7 @@ void AbaqusIO::read_elements(std::string upper)
       the_mesh.set_mesh_dimension(3);
     }
   else
-    {
-      libMesh::err << "Unrecognized element type: " << upper << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Unrecognized element type: " << upper);
 
   // Insert the elem type we detected into the set of all elem types for this mesh
   _elem_types.insert(elem_type);
@@ -555,13 +541,9 @@ void AbaqusIO::read_elements(std::string upper)
   // If the element definition was not found, the call above would have
   // created one with an uninitialized struct.  Check for that here...
   if (eledef.abaqus_zero_based_node_id_to_libmesh_node_id.size() == 0)
-    {
-      // libMesh::err << "No Abaqus->LibMesh mapping information for ElemType "
-      //      << Utility::enum_to_string(elem_type)
-      //      << "!"
-      //      << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("No Abaqus->LibMesh mapping information for ElemType " \
+                      << Utility::enum_to_string(elem_type)             \
+                      << "!");
 
   // We will read elements until the next line begins with *, since that will be the
   // next section.
@@ -620,12 +602,9 @@ void AbaqusIO::read_elements(std::string upper)
                   // If node_ptr() returns NULL, it may mean we have not yet read the
                   // *Nodes section, though I assumed that always came before the *Elements section...
                   if (node == NULL)
-                    {
-                      libMesh::err << "Error!  Mesh returned NULL Node pointer.\n";
-                      libMesh::err << "Either no node exists with ID " << libmesh_global_node_id
-                                   << " or perhaps this input file has *Elements defined before *Nodes?" << std::endl;
-                      libmesh_error();
-                    }
+                    libmesh_error_msg("Error!  Mesh returned NULL Node pointer.  Either no node exists with ID " \
+                                      << libmesh_global_node_id         \
+                                      << " or perhaps this input file has *Elements defined before *Nodes?");
 
                   // Note: id_count is the zero-based abaqus (elem local) node index.  We therefore map
                   // it to a libmesh elem local node index using the element definition map
@@ -648,14 +627,11 @@ void AbaqusIO::read_elements(std::string upper)
 
       // Ensure that we read *exactly* as many nodes as we were expecting to, no more.
       if (id_count != n_nodes_per_elem)
-        {
-          libMesh::err << "Error: Needed to read "
-                       << n_nodes_per_elem
-                       << " nodes, but read "
-                       << id_count
-                       << " instead!" << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Error: Needed to read " \
+                          << n_nodes_per_elem      \
+                          << " nodes, but read "   \
+                          << id_count              \
+                          << " instead!");
 
       // If we are recording Elset IDs, add this element to the correct set for later processing.
       // Make sure to add it with the Abaqus ID, not the libmesh one!
@@ -827,10 +803,7 @@ void AbaqusIO::assign_subdomain_ids()
             Elem* elem = the_mesh.elem(libmesh_elem_id);
 
             if (elem == NULL)
-              {
-                libMesh::err << "Mesh returned NULL pointer for Elem " << libmesh_elem_id << std::endl;
-                libmesh_error();
-              }
+              libmesh_error_msg("Mesh returned NULL pointer for Elem " << libmesh_elem_id);
 
             // Compute the proper subdomain ID, based on the formula in the
             // documentation for this function.
@@ -871,10 +844,7 @@ void AbaqusIO::assign_boundary_node_ids()
           Node* node = the_mesh.node_ptr(libmesh_global_node_id);
 
           if (node == NULL)
-            {
-              libMesh::err << "Error! Mesh returned NULL node pointer!" << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("Error! Mesh returned NULL node pointer!");
 
           // Add this node with the current_id (which is determined by the
           // alphabetical ordering of the map) to the BoundaryInfo object
@@ -921,10 +891,7 @@ void AbaqusIO::assign_sideset_ids()
 
           // Check that the pointer returned from the Mesh is non-NULL
           if (elem == NULL)
-            {
-              libMesh::err << "Mesh returned NULL pointer for Elem " << libmesh_elem_id << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("Mesh returned NULL pointer for Elem " << libmesh_elem_id);
 
           // Grab a reference to the element definition for this element type
           const ElementDefinition& eledef = eletypes[elem->type()];
@@ -932,10 +899,9 @@ void AbaqusIO::assign_sideset_ids()
           // If the element definition was not found, the call above would have
           // created one with an uninitialized struct.  Check for that here...
           if (eledef.abaqus_zero_based_side_id_to_libmesh_side_id.size() == 0)
-            {
-              libMesh::err << "No Abaqus->LibMesh mapping information for ElemType " << Utility::enum_to_string(elem->type()) << "!" << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("No Abaqus->LibMesh mapping information for ElemType " \
+                              << Utility::enum_to_string(elem->type())  \
+                              << "!");
 
           // Add this node with the current_id (which is determined by the
           // alphabetical ordering of the map).  Side numbers in Abaqus are 1-based,
