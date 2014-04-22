@@ -3371,15 +3371,15 @@ inline void Communicator::receive_packed_range
  */
 template <typename T1, typename T2>
 inline void Communicator::send_receive (const unsigned int send_tgt,
-                                        T1 &send,
+                                        T1 &send_val,
                                         const unsigned int recv_source,
-                                        T2 &recv,
+                                        T2 &recv_val,
                                         const MessageTag &,
                                         const MessageTag &) const
 {
   libmesh_assert_equal_to (send_tgt, 0);
   libmesh_assert_equal_to (recv_source, 0);
-  recv = send;
+  recv_val = send_val;
 }
 
 /**
@@ -3401,12 +3401,12 @@ inline void Communicator::send_receive_packed_range
  */
 template <typename T>
 inline void Communicator::gather(const unsigned int root_id,
-                                 T send,
-                                 std::vector<T> &recv) const
+                                 T send_val,
+                                 std::vector<T> &recv_val) const
 {
   libmesh_assert_equal_to (root_id, 0);
-  recv.resize(1);
-  recv[0] = send;
+  recv_val.resize(1);
+  recv_val[0] = send_val;
 }
 
 template <typename T>
@@ -3414,10 +3414,10 @@ inline void Communicator::gather(const unsigned int root_id, std::vector<T>&) co
 { libmesh_assert_equal_to(root_id, 0); }
 
 template <typename T>
-inline void Communicator::allgather(T send, std::vector<T> &recv) const
+inline void Communicator::allgather(T send_val, std::vector<T> &recv_val) const
 {
-  recv.resize(1);
-  recv[0] = send;
+  recv_val.resize(1);
+  recv_val[0] = send_val;
 }
 
 template <typename T>
