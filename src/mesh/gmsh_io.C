@@ -368,13 +368,11 @@ void GmshIO::read_mesh(std::istream& in)
             //
             // Mesh version 2.2 tested by Manav Bhatia; no other
             // libMesh code changes were required for support
-            libMesh::err << "Error: Wrong msh file version " << version << "\n";
-            libmesh_error();
+            libmesh_error_msg("Error: Unknown msh file version " << version);
           }
-          if(format){
-            libMesh::err << "Error: Unknown data format for mesh\n";
-            libmesh_error();
-          }
+
+          if (format)
+            libmesh_error_msg("Error: Unknown data format for mesh in Gmsh reader.");
         }
 
       // read the node block
@@ -474,15 +472,13 @@ void GmshIO::read_mesh(std::istream& in)
                   if (version <= 1.0)
                     {
                       if (elem->n_nodes() != nnodes)
-                        {
-                          libMesh::err << "Number of nodes for element " << id
-                                       << " of type " << eletypes_imp[type].type
-                                       << " (Gmsh type " << type
-                                       << ") does not match Libmesh definition. "
-                                       << "I expected " << elem->n_nodes()
-                                       << " nodes, but got " << nnodes << "\n";
-                          libmesh_error();
-                        }
+                        libmesh_error_msg("Number of nodes for element " \
+                                          << id \
+                                          << " of type " << eletypes_imp[type].type \
+                                          << " (Gmsh type " << type \
+                                          << ") does not match Libmesh definition. " \
+                                          << "I expected " << elem->n_nodes() \
+                                          << " nodes, but got " << nnodes);
                     }
 
                   // add node pointers to the elements
@@ -839,11 +835,7 @@ void GmshIO::write_post (const std::string& fname,
                   break;
                 }
               default:
-                {
-                  libMesh::err << "ERROR: Not existant element type "
-                               << (*it)->type() << std::endl;
-                  libmesh_error();
-                }
+                libmesh_error_msg("ERROR: Nonexistent element type " << (*it)->type());
               }
           }
       }
