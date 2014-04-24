@@ -132,35 +132,7 @@ private:
    * Flag to write binary data.
    */
   bool _binary;
-
-
-
 };
-
-
-
-// ------------------------------------------------------------
-// GmshIO inline members
-inline
-GmshIO::GmshIO (const MeshBase& mesh) :
-  MeshOutput<MeshBase> (mesh),
-  _binary        (false)
-{
-}
-
-
-inline
-GmshIO::GmshIO (MeshBase& mesh) :
-  MeshInput<MeshBase>  (mesh),
-  MeshOutput<MeshBase> (mesh),
-  _binary (false)
-{}
-
-inline
-bool & GmshIO::binary ()
-{
-  return _binary;
-}
 
 
 } // namespace libMesh
