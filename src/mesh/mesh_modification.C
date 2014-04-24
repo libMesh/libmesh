@@ -26,6 +26,7 @@
 
 // Local includes
 #include "libmesh/boundary_info.h"
+#include "libmesh/function_base.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/libmesh_logging.h"
@@ -130,6 +131,43 @@ void MeshTools::Modification::distort (MeshBase& mesh,
 
   // All done
   STOP_LOG("distort()", "MeshTools::Modification");
+}
+
+
+
+void MeshTools::Modification::redistribute (MeshBase& mesh,
+                                            const FunctionBase<Real> &mapfunc)
+{
+  libmesh_assert (mesh.n_nodes());
+  libmesh_assert (mesh.n_elem());
+
+  START_LOG("redistribute()", "MeshTools::Modification");
+
+  DenseVector<Real> output_vec(LIBMESH_DIM);
+
+  // FIXME - we should thread this later.
+  AutoPtr<FunctionBase<Real> > myfunc = mapfunc.clone();
+
+  MeshBase::node_iterator       it  = mesh.nodes_begin();
+  const MeshBase::node_iterator end = mesh.nodes_end();
+
+  for (; it != end; ++it)
+    {
+      Node *node = *it;
+
+      (*myfunc)(*node, output_vec);
+
+      (*node)(0) = output_vec(0);
+#if LIBMESH_DIM > 1
+      (*node)(1) = output_vec(1);
+#endif
+#if LIBMESH_DIM > 2
+      (*node)(2) = output_vec(2);
+#endif
+    }
+
+  // All done
+  STOP_LOG("redistribute()", "MeshTools::Modification");
 }
 
 
