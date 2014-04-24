@@ -62,12 +62,17 @@ void distort (MeshBase& mesh,
  * Deterministically perturb the nodal locations.  This function will
  * move each node from it's current x/y/z coordinates to a new x/y/z
  * coordinate given by the first LIBMESH_DIM components of the
- * specified function.
+ * specified function \p mapfunc
  *
  * Nodes on the boundary are also moved.
+ *
+ * Currently, non-vertex nodes are moved in the same way as vertex
+ * nodes, according to (newx,newy,newz) = mapfunc(x,y,z).  This
+ * behavior is often suboptimal for higher order geometries and may be
+ * subject to change in future libMesh versions.
  */
-void transform (MeshBase& mesh,
-                const FunctionBase<Real> &transfunc);
+void redistribute (MeshBase& mesh,
+                   const FunctionBase<Real> &mapfunc);
 
 
 /**

@@ -135,18 +135,18 @@ void MeshTools::Modification::distort (MeshBase& mesh,
 
 
 
-void MeshTools::Modification::transform (MeshBase& mesh,
-                                         const FunctionBase<Real> &transfunc)
+void MeshTools::Modification::redistribute (MeshBase& mesh,
+                                            const FunctionBase<Real> &mapfunc)
 {
   libmesh_assert (mesh.n_nodes());
   libmesh_assert (mesh.n_elem());
 
-  START_LOG("transform()", "MeshTools::Modification");
+  START_LOG("redistribute()", "MeshTools::Modification");
 
   DenseVector<Real> output_vec(LIBMESH_DIM);
 
   // FIXME - we should thread this later.
-  AutoPtr<FunctionBase<Real> > myfunc = transfunc.clone();
+  AutoPtr<FunctionBase<Real> > myfunc = mapfunc.clone();
 
   MeshBase::node_iterator       it  = mesh.nodes_begin();
   const MeshBase::node_iterator end = mesh.nodes_end();
@@ -167,7 +167,7 @@ void MeshTools::Modification::transform (MeshBase& mesh,
     }
 
   // All done
-  STOP_LOG("transform()", "MeshTools::Modification");
+  STOP_LOG("redistribute()", "MeshTools::Modification");
 }
 
 
