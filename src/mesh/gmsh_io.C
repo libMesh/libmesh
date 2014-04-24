@@ -20,7 +20,8 @@
 // C++ includes
 #include <fstream>
 #include <set>
-#include <cstring> // std::memcpy, std::strncmp
+#include <cstring> // std::memcpy
+#include <numeric>
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -35,18 +36,6 @@
 namespace
 {
 using namespace libMesh;
-
-/**
- * Defines a structure to hold boundary element information.
- *
- * We use a set because it keeps the nodes unique and ordered, and can be
- * easily compared to another set of nodes (the ones on the element side)
- */
-struct boundaryElementInfo
-{
-  std::set<dof_id_type> nodes;
-  unsigned int id;
-};
 
 /**
  * Defines mapping from libMesh element types to Gmsh element types.
@@ -360,8 +349,6 @@ void GmshIO::read_mesh(std::istream& in)
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
   mesh.clear();
 
-  const unsigned int dim = mesh.mesh_dimension();
-
   // some variables
   int format=0, size=0;
   Real version = 1.0;
@@ -434,13 +421,6 @@ void GmshIO::read_mesh(std::istream& in)
 
 
           // Read the element block
-          //
-          // If the element dimension is smaller than the mesh dimension, this is a
-          // boundary element and will be added to mesh.boundary_info.
-          //
-          // Because the elements might not yet exist, the sides are put on hold
-          // until the elements are created, and inserted once reading elements is
-          // finished
           else if (s.find("$ELM") == 0 ||
                    s.find("$Elements") == 0)
             {
@@ -448,9 +428,6 @@ void GmshIO::read_mesh(std::istream& in)
               unsigned int
                 num_elem = 0,
                 node_id = 0;
-
-              // Structure for storing information about boundary elements
-              std::vector<boundaryElementInfo> boundary_elem;
 
               // read how many elements are there, and reserve space in the mesh
               in >> num_elem;
@@ -471,8 +448,8 @@ void GmshIO::read_mesh(std::istream& in)
               //   MSH 2 format require at least the first two tags
               //   (physical and elementary tags).
 
-              // Keep track of the dim-dimensional elements separately from iel
-              unsigned int elem_id_counter = 0;
+              // Keep track of all the element dimensions seen
+              std::vector<unsigned> elem_dimensions_seen(3);
 
               // read the elements
               for (unsigned int iel=0; iel<num_elem; ++iel)
@@ -520,142 +497,214 @@ void GmshIO::read_mesh(std::istream& in)
                   // Assign the value from the eletype object.
                   nnodes = eletype.nnodes;
 
-                  // only elements that match the mesh dimension are added
-                  // if the element dimension is one less than dim, the nodes and
-                  // sides are added to the mesh.boundary_info
-                  if (eletype.dim == dim)
-                    {
-                      // add the elements to the mesh
-                      Elem* elem = Elem::build(eletype.type).release();
-                      elem->set_id(elem_id_counter++);
-                      elem = mesh.add_elem(elem);
+                  // Record this element dimension as being "seen".
+                  // We will treat all elements with dimension <
+                  // max(dimension) as specifying boundary conditions,
+                  // but we won't know what max_elem_dimension_seen is
+                  // until we read the entire file.
+                  elem_dimensions_seen[eletype.dim-1] = 1;
 
-                      // Make sure that the libmesh element we added has nnodes nodes.
-                      if (elem->n_nodes() != nnodes)
-                        libmesh_error_msg("Number of nodes for element " \
-                                          << id \
-                                          << " of type " << eletypes_imp[type].type \
-                                          << " (Gmsh type " << type \
-                                          << ") does not match Libmesh definition. " \
-                                          << "I expected " << elem->n_nodes() \
-                                          << " nodes, but got " << nnodes);
+                  // Add the element to the mesh
+                  {
+                    Elem* elem = Elem::build(eletype.type).release();
+                    elem->set_id(iel);
+                    elem = mesh.add_elem(elem);
 
-                      // Add node pointers to the elements.
-                      // If there is a node translation table, use it.
-                      if (eletype.nodes.size() > 0)
-                        for (unsigned int i=0; i<nnodes; i++)
-                          {
-                            in >> node_id;
-                            elem->set_node(eletype.nodes[i]) = mesh.node_ptr(nodetrans[node_id]);
-                          }
-                      else
-                        {
-                          for (unsigned int i=0; i<nnodes; i++)
-                            {
-                              in >> node_id;
-                              elem->set_node(i) = mesh.node_ptr(nodetrans[node_id]);
-                            }
-                        }
+                    // Make sure that the libmesh element we added has nnodes nodes.
+                    if (elem->n_nodes() != nnodes)
+                      libmesh_error_msg("Number of nodes for element " \
+                                        << id \
+                                        << " of type " << eletypes_imp[type].type \
+                                        << " (Gmsh type " << type \
+                                        << ") does not match Libmesh definition. " \
+                                        << "I expected " << elem->n_nodes() \
+                                        << " nodes, but got " << nnodes);
 
-                      // Finally, set the subdomain ID to physical
-                      elem->subdomain_id() = static_cast<subdomain_id_type>(physical);
-                    } // if element.dim == dim
-
-                  // if this is a boundary
-                  else if (eletype.dim == dim-1)
-                    {
-                      // add the boundary element nodes to the set of nodes
-                      boundaryElementInfo binfo;
-                      std::set<dof_id_type>::iterator iter = binfo.nodes.begin();
+                    // Add node pointers to the elements.
+                    // If there is a node translation table, use it.
+                    if (eletype.nodes.size() > 0)
                       for (unsigned int i=0; i<nnodes; i++)
                         {
                           in >> node_id;
-                          mesh.boundary_info->add_node(nodetrans[node_id], physical);
-                          binfo.nodes.insert(iter, nodetrans[node_id]);
+                          elem->set_node(eletype.nodes[i]) = mesh.node_ptr(nodetrans[node_id]);
                         }
-                      binfo.id = physical;
-                      boundary_elem.push_back(binfo);
-                    }
+                    else
+                      {
+                        for (unsigned int i=0; i<nnodes; i++)
+                          {
+                            in >> node_id;
+                            elem->set_node(i) = mesh.node_ptr(nodetrans[node_id]);
+                          }
+                      }
 
-                  // If the element yet another dimension, just read in the nodes
-                  // and throw them away
-                  else
-                    {
-                      static bool seen_high_dim_element = false;
-                      if (!seen_high_dim_element)
-                        {
-                          libMesh::err << "Warning: can't load an element of dimension "
-                                       << eletype.dim << " into a mesh of dimension "
-                                       << dim << std::endl;
-                          seen_high_dim_element = true;
-                        }
-
-                      for (unsigned int i=0; i<nnodes; i++)
-                        in >> node_id;
-                    }
-                } //element loop
+                    // Finally, set the subdomain ID to physical.  If this is a lower-dimension element, this ID will
+                    // eventually go into the Mesh's BoundaryInfo object.
+                    elem->subdomain_id() = static_cast<subdomain_id_type>(physical);
+                  }
+                } // element loop
 
               // read the $ENDELM delimiter
               std::getline(in, s);
 
+              // Record the max and min element dimension seen while reading the file.
+              unsigned
+                max_elem_dimension_seen=1,
+                min_elem_dimension_seen=3;
 
-              // If any lower dimensional elements have been found in the file,
-              // try to add them to the mesh.boundary_info as sides and nodes with
-              // the respective id's (called "physical" in Gmsh).
-              if (boundary_elem.size() > 0)
+              for (unsigned i=0; i<elem_dimensions_seen.size(); ++i)
+                if (elem_dimensions_seen[i])
+                  {
+                    // Debugging
+                    // libMesh::out << "Seen elements of dimension " << i+1 << std::endl;
+                    max_elem_dimension_seen = std::max(max_elem_dimension_seen, i+1);
+                    min_elem_dimension_seen = std::min(min_elem_dimension_seen, i+1);
+                  }
+
+              // Debugging:
+              // libMesh::out << "max_elem_dimension_seen=" << max_elem_dimension_seen << std::endl;
+              // libMesh::out << "min_elem_dimension_seen=" << min_elem_dimension_seen << std::endl;
+
+              // If the difference between the max and min element dimension seen is larger than
+              // 1, (e.g. the file has 1D and 3D elements only) we don't handle this case.
+              if (max_elem_dimension_seen - min_elem_dimension_seen > 1)
+                libmesh_error_msg("Cannot handle meshes with dimension mismatch greater than 1.");
+
+              // How many different element dimensions did we see while reading from file?
+              unsigned n_dims_seen = std::accumulate(elem_dimensions_seen.begin(),
+                                                     elem_dimensions_seen.end(),
+                                                     static_cast<unsigned>(0),
+                                                     std::plus<unsigned>());
+
+              // Have not yet tested a case where 1, 2, and 3D elements are all in the same Mesh,
+              // though it should theoretically be possible to handle.
+              if (n_dims_seen == 3)
+                libmesh_error_msg("Reading meshes with 1, 2, and 3D elements not currently supported.");
+
+              // Set mesh_dimension based on the largest element dimension seen.
+              mesh.set_mesh_dimension(max_elem_dimension_seen);
+
+              if (n_dims_seen > 1)
                 {
-                  // create an index of the boundary nodes to easily locate which
-                  // element might have that boundary
-                  std::map<dof_id_type, std::vector<unsigned int> > node_index;
-                  for (unsigned int i=0; i<boundary_elem.size(); i++)
-                    {
-                      boundaryElementInfo binfo = boundary_elem[i];
-                      std::set<dof_id_type>::iterator iter = binfo.nodes.begin();
-                      for (; iter!= binfo.nodes.end(); ++iter)
-                        node_index[*iter].push_back(i);
-                    }
+                  // map from (node ids) -> elem of lower dimensional elements that can provide boundary conditions
+                  typedef std::map<std::vector<dof_id_type>, Elem*> provide_container_t;
+                  provide_container_t provide_bcs;
 
-                  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-                  const MeshBase::const_element_iterator end = mesh.active_elements_end();
+                  // 1st loop over active elements - get info about lower-dimensional elements.
+                  {
+                    MeshBase::element_iterator       it  = mesh.active_elements_begin();
+                    const MeshBase::element_iterator end = mesh.active_elements_end();
+                    for ( ; it != end; ++it)
+                      {
+                        Elem* elem = *it;
 
-                  // iterate over all elements and see which boundary element has
-                  // the same set of nodes as on of the boundary elements previously read
-                  for ( ; it != end; ++it)
-                    {
-                      const Elem* elem = *it;
-                      for (unsigned int s=0; s<elem->n_sides(); s++)
-                        if (elem->neighbor(s) == NULL)
+                        if (elem->dim() < max_elem_dimension_seen)
                           {
-                            AutoPtr<Elem> side (elem->build_side(s));
-                            std::set<dof_id_type> side_nodes;
-                            std::set<dof_id_type>::iterator iter = side_nodes.begin();
+                            // Debugging status
+                            // libMesh::out << "Processing Elem " << elem->id() << " as a boundary element." << std::endl;
 
-                            // make a set with all nodes from this side
-                            // this allows for easy comparison
-                            for (unsigned int ns=0; ns<side->n_nodes(); ns++)
-                              side_nodes.insert(iter, side->node(ns));
+                            // To be pushed into the provide_bcs data structure
+                            std::vector<dof_id_type> node_ids(elem->n_nodes());
 
-                            // See whether one of the side node occurs in the list
-                            // of tagged nodes. If we would loop over all side
-                            // nodes, we would just get multiple hits, so taking
-                            // node 0 is enough to do the job
-                            dof_id_type sn = side->node(0);
-                            if (node_index.count(sn) > 0)
+                            // To be consistent with the previous GmshIO behavior, add all the lower-dimensional elements' nodes to
+                            // the Mesh's BoundaryInfo object with the lower-dimensional element's subdomain ID.
+                            for (unsigned n=0; n<elem->n_nodes(); n++)
                               {
-                                // Loop over all tagged ("physical") "sides" which
-                                // contain the node sn (typically just 1 to
-                                // three). For each of these the set of nodes is
-                                // compared to the current element's side nodes
-                                for (std::size_t n=0; n<node_index[sn].size(); n++)
+                                mesh.boundary_info->add_node(elem->node(n), elem->subdomain_id());
+
+                                // And save for our local data structure
+                                node_ids[n] = elem->node(n);
+                              }
+
+                            // Sort before putting into the map
+                            std::sort(node_ids.begin(), node_ids.end());
+                            provide_bcs[node_ids] = elem;
+                          }
+                      }
+                  } // end 1st loop over active elements
+
+                  // Debugging: What did we put in the provide_bcs data structure?
+                  // {
+                  //   provide_container_t::iterator provide_it = provide_bcs.begin();
+                  //   provide_container_t::iterator provide_end = provide_bcs.end();
+                  //   for ( ; provide_it != provide_end; ++provide_it)
+                  //     {
+                  //       std::vector<dof_id_type> node_list = (*provide_it).first;
+                  //       Elem* elem = (*provide_it).second;
+                  //
+                  //       libMesh::out << "Elem " << elem->id() << " provides BCs for the face: ";
+                  //       for (unsigned i=0; i<node_list.size(); ++i)
+                  //         libMesh::out << node_list[i] << " ";
+                  //       libMesh::out << std::endl;
+                  //     }
+                  // }
+
+                  // 2nd loop over active elements - use lower dimensional element data to set BCs for higher dimensional elements
+                  {
+                    MeshBase::element_iterator       it  = mesh.active_elements_begin();
+                    const MeshBase::element_iterator end = mesh.active_elements_end();
+                    for ( ; it != end; ++it)
+                      {
+                        Elem* elem = *it;
+
+                        if (elem->dim() == max_elem_dimension_seen)
+                          {
+                            // This is a max-dimension element that
+                            // may require BCs.  For each of its
+                            // sides, including internal sides, we'll
+                            // see if a lower-dimensional element
+                            // provides boundary information for it.
+                            // Note that we have not yet called
+                            // find_neighbors(), so we can't use
+                            // elem->neighbor(s) in this algorithm...
+
+                            for (unsigned int s=0; s<elem->n_sides(); s++)
+                              {
+                                AutoPtr<Elem> side (elem->build_side(s));
+
+                                // Build up a node_ids vector, which is the key
+                                std::vector<dof_id_type> node_ids(side->n_nodes());
+                                for (unsigned n=0; n<side->n_nodes(); n++)
+                                  node_ids[n] = side->node(n);
+
+                                // Sort the vector before using it as a key
+                                std::sort(node_ids.begin(), node_ids.end());
+
+                                // Look for this key in the provide_bcs map
+                                provide_container_t::iterator iter = provide_bcs.find(node_ids);
+
+                                if (iter != provide_bcs.end())
                                   {
-                                    unsigned int bidx = node_index[sn][n];
-                                    if (boundary_elem[bidx].nodes == side_nodes)
-                                      mesh.boundary_info->add_side(elem, s, boundary_elem[bidx].id);
+                                    Elem* lower_dim_elem = (*iter).second;
+
+                                    // libMesh::out << "Elem "
+                                    //              << lower_dim_elem->id()
+                                    //              << " provides BCs for side "
+                                    //              << s
+                                    //              << " of Elem "
+                                    //              << elem->id()
+                                    //              << std::endl;
+
+                                    // Add boundary information based on the lower-dimensional element's subdomain id.
+                                    mesh.boundary_info->add_side(elem, s, lower_dim_elem->subdomain_id());
                                   }
                               }
-                          } // if elem->neighbor(s) == NULL
-                    } // element loop
-                } // if boundary_elem.size() > 0
+                          }
+                      }
+                  } // end 2nd loop over active elements
+
+                  // 3rd loop over active elements - Remove the lower-dimensional elements
+                  {
+                    MeshBase::element_iterator       it  = mesh.active_elements_begin();
+                    const MeshBase::element_iterator end = mesh.active_elements_end();
+                    for ( ; it != end; ++it)
+                      {
+                        Elem* elem = *it;
+
+                        if (elem->dim() < max_elem_dimension_seen)
+                          mesh.delete_elem(elem);
+                      }
+                  } // end 3rd loop over active elements
+                } // end if (n_dims_seen > 1)
             } // if $ELM
 
           continue;
