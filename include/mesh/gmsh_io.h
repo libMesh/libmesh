@@ -42,8 +42,9 @@ class MeshBase;
  * GMSH software see
  * <a href="http://http://www.geuz.org/gmsh/">the Gmsh home page</a>
  *
- * @author John W. Peterson, 2004
- * @author Martin Lüthi, 2005 (support for reading meshes and writing results)
+ * @author John W. Peterson, 2004, 2014
+ * @author Martin Luthi (mluthi@tnoo.net), 2005: massive overhaul and extension,
+ *                                         plus support for reading meshes and writing results
  */
 
 // ------------------------------------------------------------

@@ -127,7 +127,7 @@ void all_tri (MeshBase& mesh);
  * refined elements, are calculated from the vertex positions of their
  * parent nodes.  Only works in 2D.
  *
- * \author Martin Lüthi (luthi@gi.alaska.edu)
+ * \author Martin Luthi (luthi@gi.alaska.edu)
  * \date 2005
  */
 void smooth(MeshBase&, unsigned int, Real);
