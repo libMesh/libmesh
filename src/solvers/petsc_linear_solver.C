@@ -677,16 +677,16 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
           ierr = MatMultAdd(submat1,subvec1,subrhs,subrhs);
           LIBMESH_CHKERRABORT(ierr);
 
-	  ierr = LibMeshVecScatterDestroy(&scatter1);
-	  LIBMESH_CHKERRABORT(ierr);
-	  ierr = LibMeshVecDestroy(&subvec1);
-	  LIBMESH_CHKERRABORT(ierr);
-	  ierr = LibMeshMatDestroy(&submat1);
-	  LIBMESH_CHKERRABORT(ierr);
-	}
+          ierr = LibMeshVecScatterDestroy(&scatter1);
+          LIBMESH_CHKERRABORT(ierr);
+          ierr = LibMeshVecDestroy(&subvec1);
+          LIBMESH_CHKERRABORT(ierr);
+          ierr = LibMeshMatDestroy(&submat1);
+          LIBMESH_CHKERRABORT(ierr);
+        }
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
       ierr = KSPSetOperators(_ksp, submat, subprecond,
-			     this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
+                             this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
 #else
       ierr = KSPSetOperators(_ksp, submat, subprecond);
 #endif
@@ -704,7 +704,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
     {
  #if PETSC_RELEASE_LESS_THAN(3,5,0)
       ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
-			     this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
+                             this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
 #else
       ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat());
 #endif
@@ -1022,16 +1022,16 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
           ierr = MatMultAdd(submat1,subvec1,subrhs,subrhs);
           LIBMESH_CHKERRABORT(ierr);
 
-	  ierr = LibMeshVecScatterDestroy(&scatter1);
-	  LIBMESH_CHKERRABORT(ierr);
-	  ierr = LibMeshVecDestroy(&subvec1);
-	  LIBMESH_CHKERRABORT(ierr);
-	  ierr = LibMeshMatDestroy(&submat1);
-	  LIBMESH_CHKERRABORT(ierr);
-	}
+          ierr = LibMeshVecScatterDestroy(&scatter1);
+          LIBMESH_CHKERRABORT(ierr);
+          ierr = LibMeshVecDestroy(&subvec1);
+          LIBMESH_CHKERRABORT(ierr);
+          ierr = LibMeshMatDestroy(&submat1);
+          LIBMESH_CHKERRABORT(ierr);
+        }
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
       ierr = KSPSetOperators(_ksp, submat, subprecond,
-			     this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
+                             this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
 #else
       ierr = KSPSetOperators(_ksp, submat, subprecond);
 #endif
@@ -1049,7 +1049,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
     {
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
       ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat(),
-			     this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
+                             this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
 #else
       ierr = KSPSetOperators(_ksp, matrix->mat(), precond->mat());
 #endif
@@ -1303,37 +1303,37 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
           LIBMESH_CHKERRABORT(ierr);
 #endif
 
-	  // The following lines would be correct, but don't work
-	  // correctly in PETSc up to 3.1.0-p5.  See discussion in
-	  // petsc-users of Nov 9, 2010.
-	  //
-	  // ierr = MatMultAdd(submat1,subvec1,subrhs,subrhs);
-	  // LIBMESH_CHKERRABORT(ierr);
-	  //
-	  // We workaround by using a temporary vector.  Note that the
-	  // fix in PETsc 3.1.0-p6 uses a temporary vector internally,
-	  // so this is no effective performance loss.
-	  Vec subvec2 = NULL;
-	  ierr = VecCreate(this->comm().get(),&subvec2);
-	  LIBMESH_CHKERRABORT(ierr);
-	  ierr = VecSetSizes(subvec2,is_local_size,PETSC_DECIDE);
-	  LIBMESH_CHKERRABORT(ierr);
-	  ierr = VecSetFromOptions(subvec2);
-	  LIBMESH_CHKERRABORT(ierr);
-	  ierr = MatMult(submat1,subvec1,subvec2);
-	  LIBMESH_CHKERRABORT(ierr);
-	  ierr = VecAXPY(subrhs,1.0,subvec2);
+          // The following lines would be correct, but don't work
+          // correctly in PETSc up to 3.1.0-p5.  See discussion in
+          // petsc-users of Nov 9, 2010.
+          //
+          // ierr = MatMultAdd(submat1,subvec1,subrhs,subrhs);
+          // LIBMESH_CHKERRABORT(ierr);
+          //
+          // We workaround by using a temporary vector.  Note that the
+          // fix in PETsc 3.1.0-p6 uses a temporary vector internally,
+          // so this is no effective performance loss.
+          Vec subvec2 = NULL;
+          ierr = VecCreate(this->comm().get(),&subvec2);
+          LIBMESH_CHKERRABORT(ierr);
+          ierr = VecSetSizes(subvec2,is_local_size,PETSC_DECIDE);
+          LIBMESH_CHKERRABORT(ierr);
+          ierr = VecSetFromOptions(subvec2);
+          LIBMESH_CHKERRABORT(ierr);
+          ierr = MatMult(submat1,subvec1,subvec2);
+          LIBMESH_CHKERRABORT(ierr);
+          ierr = VecAXPY(subrhs,1.0,subvec2);
 
-	  ierr = LibMeshVecScatterDestroy(&scatter1);
-	  LIBMESH_CHKERRABORT(ierr);
-	  ierr = LibMeshVecDestroy(&subvec1);
-	  LIBMESH_CHKERRABORT(ierr);
-	  ierr = LibMeshMatDestroy(&submat1);
-	  LIBMESH_CHKERRABORT(ierr);
-	}
+          ierr = LibMeshVecScatterDestroy(&scatter1);
+          LIBMESH_CHKERRABORT(ierr);
+          ierr = LibMeshVecDestroy(&subvec1);
+          LIBMESH_CHKERRABORT(ierr);
+          ierr = LibMeshMatDestroy(&submat1);
+          LIBMESH_CHKERRABORT(ierr);
+        }
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
       ierr = KSPSetOperators(_ksp, submat, submat,
-			     DIFFERENT_NONZERO_PATTERN);
+                             DIFFERENT_NONZERO_PATTERN);
 #else
       ierr = KSPSetOperators(_ksp, submat, submat);
 #endif
@@ -1343,7 +1343,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
     {
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
       ierr = KSPSetOperators(_ksp, mat, mat,
-			     DIFFERENT_NONZERO_PATTERN);
+                             DIFFERENT_NONZERO_PATTERN);
 #else
       ierr = KSPSetOperators(_ksp, mat, mat);
 #endif
@@ -1625,7 +1625,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
       ierr = KSPSetOperators(_ksp, submat, subprecond,
-			     DIFFERENT_NONZERO_PATTERN);
+                             DIFFERENT_NONZERO_PATTERN);
 #else
       ierr = KSPSetOperators(_ksp, submat, subprecond);
 #endif
@@ -1643,7 +1643,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
     {
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
       ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T>*>(precond)->mat(),
-			     DIFFERENT_NONZERO_PATTERN);
+                             DIFFERENT_NONZERO_PATTERN);
 #else
       ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T>*>(precond)->mat());
 #endif
