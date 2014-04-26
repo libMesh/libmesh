@@ -203,7 +203,7 @@ endif
 else !FPARSER_DEVEL
   SUBDIRS = extrasrc
 
-#if FPARSER_SUPPORT_OPTIMIZER
-#  libfparser_la_SOURCES += fpoptimizer.cc
-#endif
+if FPARSER_SUPPORT_OPTIMIZER
+  libfparser_la_SOURCES += fpoptimizer.cc
+endif
 endif
