@@ -22,7 +22,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
 		     none)  enablefparser=no ;;
  		    *)  AC_MSG_ERROR(bad value ${withval} for --with-fparser) ;;
 		 esac],
-	      [enablefparserdevel=no])
+              [enablefparserdevel=yes])
 
 
   if (test x$enablefparser = xyes); then
