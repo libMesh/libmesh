@@ -40,6 +40,25 @@
 namespace libMesh
 {
 
+// ------------------------------------------------------------
+// DirichletBoundary class definition
+
+/**
+ * This class allows one to associate dirichlet boundary values with
+ * a given set of mesh boundary ids and system variable ids.
+ *
+ * Dirichlet values must be supplied as the input function "f"; when
+ * using some specialized elements, gradient values must be supplied
+ * via the input function "g".
+ *
+ * Dirichlet functions are allowed to return NaN; if this is
+ * encountered, then the degree of freedom values in a patch around
+ * the location of the returned NaN will be left unconstrained.  E.g.
+ * a NaN on a boundary edge in 3D would leave that edge and the two
+ * adjoining face interiors unconstrained, but would still permit the
+ * other edge and node DoFs around those faces to be constrained.
+ */
+
 class DirichletBoundary
 {
 public:
