@@ -75,6 +75,12 @@ data = {
     '2014-Apr-18', 63,  19
     '2014-Apr-19', 36,  11
     '2014-Apr-20', 25,   7
+    '2014-Apr-21', 115, 24
+    '2014-Apr-22', 128, 31
+    '2014-Apr-23', 87,  25
+    '2014-Apr-24', 108, 23
+    '2014-Apr-25', 111, 20
+    '2014-Apr-26', 89,   9
     };
 
 % length works like you would expect it to for cell arrays.
@@ -106,8 +112,8 @@ set([h1, h2], 'linewidth', 6);
 set(h1, 'marker', 'o');
 set(h2, 'marker', 's');
 
-% Use bigger markers
-set([h1, h2], 'markersize', 12);
+% Set marker size
+set([h1, h2], 'markersize', 6);
 
 % Make dashed line?  Aquaterm doesn't seem to properly display this, but it
 % does work in the PDF!
