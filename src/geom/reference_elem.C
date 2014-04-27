@@ -200,6 +200,7 @@ void init_ref_elem_table()
     ref_elem_file[PRISM18]  = ElemDataStrings::one_prism18;
 
     ref_elem_file[PYRAMID5] = ElemDataStrings::one_pyramid;
+    ref_elem_file[PYRAMID13] = ElemDataStrings::one_pyramid13;
     ref_elem_file[PYRAMID14] = ElemDataStrings::one_pyramid14;
   }
 
