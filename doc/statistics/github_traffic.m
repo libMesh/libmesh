@@ -1,6 +1,4 @@
 clear all
-clf
-hold on
 
 % Github has a "traffic" page now, but it doesn't seem like you can
 % put in an arbitrary date range?  When I looked at it, it showed the
@@ -81,26 +79,94 @@ data = {
     '2014-Apr-24', 108, 23
     '2014-Apr-25', 111, 20
     '2014-Apr-26', 89,   9
+    '2014-Apr-27', 29,  11
     };
 
 % length works like you would expect it to for cell arrays.
 N=length(data);
 
-% Can't plot string data automatically?
-x=linspace(1,N,N);
+% A cell array of strings holding just the dates
+dates = {data{:,1}};
 
 % Note the extra square brackets!  This seems to be required (at least
 % in Octave) to catch the output of data{:,2} as an array.
 views = [data{:,2}];
 visitors = [data{:,3}];
 
-% Only way to set linestyles with plotyy is after the fact, apparently.
-% plotyy returns the axis handle first, followed by the two plot handles.
-[haxis, h1, h2] = plotyy(x, views, x, visitors);
+
+
+% 1.) Make daily plot - You can do this, but it gets a bit hard to read
+
+%% % Can't plot string data automatically?
+%% x=linspace(1,N,N);
+%%
+%% % Only way to set linestyles with plotyy is after the fact, apparently.
+%% % plotyy returns the axis handle first, followed by the two plot handles.
+%% clf;
+%% hold on;
+%% [haxis, h1, h2] = plotyy(x, views, x, visitors);
+%%
+%% % Label the axes
+%% ylabel (haxis(1), 'Daily Page Views');
+%% ylabel (haxis(2), 'Daily Unique Visitors');
+%%
+%% % Totaling unique visitors doesn't really mean much...
+%% title (['Total Pageviews: ', num2str(sum(views)), ', Avg. Daily Unique Visitors: ', num2str(mean(visitors))]);
+%%
+%% % Make thick lines - this looks better in PDF
+%% set([h1, h2], 'linewidth', 6);
+%%
+%% % Turn on markers
+%% set(h1, 'marker', 'o');
+%% set(h2, 'marker', 's');
+%%
+%% % Set marker size
+%% set([h1, h2], 'markersize', 6);
+%%
+%% % Make dashed line?  Aquaterm doesn't seem to properly display this, but it
+%% % does work in the PDF!
+%% set(h1, 'linestyle', '--');
+%%
+%% % Set the xticks and labels so that it shows dates instead of numbers.
+%% xticksat = [1 length(x)];
+%% set(haxis, 'xtick', xticksat);
+%%
+%% for i=1:length(xticksat)
+%%   xtlabels{i} = data{xticksat(i), 1};
+%% end
+%% set(haxis, 'xticklabel', xtlabels);
+%%
+%% % Print to PDF
+%% set (gcf, "paperposition", [0.25, 0.25, 10.75, 8.25]);
+%% set (gcf, "papersize", [11, 8.5]);
+%% set (gcf, "paperorientation", 'landscape');
+%%
+%% % Make a PDF of this plot.
+%% print('-dpdf', 'github_traffic.pdf', '-FHelvetica:20');
+
+
+
+% 2.) Make weekly plot - the data is naturally week-periodic
+week_indexes = 1:7:N;
+
+% Get total views and average unique viewers for each week
+week_views = [];
+week_visitors = [];
+  for i=1:length(week_indexes)-1
+  start = week_indexes(i);
+  stop = week_indexes(i+1) - 1;
+  week_views(end+1) = sum(views(start:stop));
+  week_visitors(end+1) = mean(visitors(start:stop));
+end
+
+clf;
+hold on;
+x=linspace(1, length(week_views), length(week_views));
+[haxis, h1, h2] = plotyy(x, week_views, x, week_visitors);
 
 % Label the axes
-ylabel (haxis(1), 'Daily Page Views');
-ylabel (haxis(2), 'Daily Unique Visitors');
+ylabel (haxis(1), 'Weekly Page Views');
+ylabel (haxis(2), 'Avg. Daily Unique Visitors');
 
 % Totaling unique visitors doesn't really mean much...
 title (['Total Pageviews: ', num2str(sum(views)), ', Avg. Daily Unique Visitors: ', num2str(mean(visitors))]);
@@ -120,11 +186,11 @@ set([h1, h2], 'markersize', 6);
 set(h1, 'linestyle', '--');
 
 % Set the xticks and labels so that it shows dates instead of numbers.
-xticksat = [1 N];
+xticksat = [1 ceil(length(x)/2) length(x)];
 set(haxis, 'xtick', xticksat);
 
 for i=1:length(xticksat)
-  xtlabels{i} = data{xticksat(i), 1};
+  xtlabels{i} = data{week_indexes(xticksat(i)), 1};
 end
 set(haxis, 'xticklabel', xtlabels);
 
@@ -134,4 +200,35 @@ set (gcf, "papersize", [11, 8.5]);
 set (gcf, "paperorientation", 'landscape');
 
 % Make a PDF of this plot.
-print('-dpdf', 'github_traffic.pdf', '-FHelvetica:20');
+print('-dpdf', 'weekly_github_traffic.pdf', '-FHelvetica:20');
+
+
+
+% 3.) Make monthly plot - not enough data to be interesting yet...
+
+%% month_intervals = {'2014-Feb-17', '2014-Mar-17', '2014-Apr-17'};
+%%
+%% % Numerical indexes of the month intervals
+%% month_indexes = [];
+%%
+%% for i=1:length(month_intervals)
+%%   % Calling 'strcmp' on a cell array of strings returns an array of 0s
+%%   % and 1s, then 'find' returns the non-zero index.  The 'end' keyword
+%%   % is used to append to the array.
+%%   month_indexes(end+1) = find(strcmp(month_intervals{i}, dates));
+%% end
+%%
+%% % Get total views and average unique viewers for each month
+%% month_views = [];
+%% month_visitors = [];
+%%   for i=1:length(month_indexes)-1
+%%   start = month_indexes(i);
+%%   stop = month_indexes(i+1) - 1;
+%%   month_views(end+1) = sum(views(start:stop));
+%%   month_visitors(end+1) = mean(visitors(start:stop));
+%% end
+%%
+%% clf;
+%% hold on;
+%% x=linspace(1, length(month_views), length(month_views));
+%% [haxis, h1, h2] = plotyy(x, month_views, x, month_visitors);
