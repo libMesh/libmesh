@@ -46,14 +46,14 @@ for file in $filelist; do
     #echo " "
 
 
-    echo "static const char* $elem_type = " >> $genfile
+    echo "static const char* $elem_type =" >> $genfile
 
     #loop over each line in the file
     while read p; do
 	echo "\"$p\\n\"" >> $genfile
     done < $file
     echo ";" >> $genfile
-    echo " " >> $genfile
-    echo " " >> $genfile
+    echo "" >> $genfile
+    echo "" >> $genfile
 
 done
