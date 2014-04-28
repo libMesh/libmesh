@@ -1,5 +1,6 @@
 #include "fparser_ad.hh"
 #include "extrasrc/fptypes.hh"
+#include <stdlib.h>
 
 using namespace FUNCTIONPARSERTYPES;
 
