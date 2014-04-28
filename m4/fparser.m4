@@ -38,9 +38,9 @@ AC_DEFUN([CONFIGURE_FPARSER],
   		 esac],
   		 [enablefparseroptimizer=yes])
 
-    # note - fparser optimization currently fails on OSX, to disable it regardless
+    # note - fparser optimization may fail on cygwin (please test), so disable it regardless
     case "${host_os}" in
-      *darwin* | *cygwin*)
+      *cygwin*)
         enablefparseroptimizer=no
         AC_MSG_RESULT(>>> Disabling fparser optimization on ${host_os} <<<)
         ;;
