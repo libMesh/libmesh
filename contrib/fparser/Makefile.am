@@ -44,7 +44,7 @@ noinst_PROGRAMS = # none, append below
 # parsed_function.h
 includedir = $(prefix)/include/libmesh
 
-include_HEADERS = fparser.hh
+include_HEADERS = fparser.hh fparser_ad.hh
 
 
 EXTRA_DIST += util/bytecoderules.dat util/bytecoderules_header.txt
@@ -104,7 +104,7 @@ EXTRA_DIST += $(FPOPTIMIZER_CC_FILES) fpoptimizer/fpoptimizer_header.txt fpoptim
 
 
 noinst_LTLIBRARIES     = libfparser.la
-libfparser_la_SOURCES  = fparser.cc
+libfparser_la_SOURCES  = fparser.cc fparser_ad.cc
 libfparser_la_CPPFLAGS = $(AM_CPPFLAGS) $(FEATURE_FLAGS)
 
 
@@ -121,6 +121,8 @@ util_tree_grammar_parser_SOURCES   = \
                                  fparser_mpfr.hh \
                                  fparser.hh \
 			 	 fparser.cc \
+                                 fparser_ad.hh \
+			 	 fparser_ad.cc \
                                  fpoptimizer/logic_comparisons.hh \
                                  fpoptimizer/constantfolding.hh \
                                  fpoptimizer/logic_ifoperations.hh \
