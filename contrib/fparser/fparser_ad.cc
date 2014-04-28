@@ -10,6 +10,15 @@ FunctionParserADBase<Value_t>::FunctionParserADBase() :
     FunctionParserBase<Value_t>(),
     mData(this->getParserData())
 {
+  std::cout << "CTOR     mData->mReferenceCounter = " << mData->mReferenceCounter << std::endl;
+}
+
+template<typename Value_t>
+FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& cpy) :
+    FunctionParserBase<Value_t>(cpy),
+    mData(this->getParserData())
+{
+  std::cout << "CopyCTOR mData->mReferenceCounter = " << mData->mReferenceCounter << std::endl;
 }
 
 template<typename Value_t>
@@ -315,6 +324,9 @@ void FunctionParserADBase<Value_t>::Commit(const DiffProgramFragment & diff)
 template<typename Value_t>
 int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
 {
+  this->ForceDeepCopy();
+  mData = this->getParserData();
+
   // get c string and length of var argument
   const unsigned len = unsigned(var.size());
   const char* name = var.c_str();

@@ -8,6 +8,7 @@ class FunctionParserADBase : public FunctionParserBase<Value_t>
 {
 public:
   FunctionParserADBase();
+  FunctionParserADBase(const FunctionParserADBase& cpy);
 
   int AutoDiff(const std::string& var);
 

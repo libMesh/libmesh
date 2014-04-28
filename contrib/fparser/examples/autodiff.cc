@@ -35,6 +35,9 @@ int main()
   fparser.PrintByteCode(std::cout);
   std::cout << std::endl;
 
+  // Get a copy of the original function
+  FunctionParserAD fparser2(fparser);
+
   // Generate derivative with respect to x
   fparser.AutoDiff("x");
   std::cout << "Unsimplified derivative:\n";
@@ -45,6 +48,11 @@ int main()
   fparser.Optimize();
   std::cout << "Simplified derivative:\n";
   fparser.PrintByteCode(std::cout);
+  std::cout << std::endl;
+
+  // Check if the copied instance is still the original function
+  std::cout << "Copy of the original:\n";
+  fparser2.PrintByteCode(std::cout);
   std::cout << std::endl;
 
   return 0;
