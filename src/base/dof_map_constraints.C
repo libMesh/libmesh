@@ -831,7 +831,7 @@ private:
           for (unsigned int i = 0; i < n_dofs; i++)
             {
               DofConstraintRow empty_row;
-              if (dof_is_fixed[i] && !std::isnan(Ue(i)))
+              if (dof_is_fixed[i] && !libmesh_isnan(Ue(i)))
                 add_fn (dof_indices[i], empty_row, Ue(i));
             }
         }
