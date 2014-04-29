@@ -52,6 +52,8 @@ private:
   void Commit(const DiffProgramFragment & code);
 };
 
+
 class FunctionParserAD: public FunctionParserADBase<double> {};
+class FunctionParserAD_f: public FunctionParserADBase<float> {};
 
 #endif //ONCE_FPARSERAD_H_

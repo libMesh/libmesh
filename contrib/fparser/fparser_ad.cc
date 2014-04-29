@@ -551,5 +551,17 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
 }
 
 
-// Instantiate class
-template class FunctionParserADBase<double>;
+#define FUNCTIONPARSERAD_INSTANTIATE_CLASS(type) \
+    template class FunctionParserADBase< type >;
+
+#ifndef FP_DISABLE_DOUBLE_TYPE
+FUNCTIONPARSERAD_INSTANTIATE_CLASS(double)
+#endif
+
+#ifdef FP_SUPPORT_FLOAT_TYPE
+FUNCTIONPARSERAD_INSTANTIATE_CLASS(float)
+#endif
+
+#ifdef FP_SUPPORT_LONG_DOUBLE_TYPE
+FUNCTIONPARSERAD_INSTANTIATE_CLASS(long double)
+#endif
