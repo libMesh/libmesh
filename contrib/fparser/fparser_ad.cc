@@ -40,15 +40,16 @@ int FunctionParserADBase<Value_t>::OpcodeSize(unsigned op)
       case cDeg: case cRad:
       case cExp: case cExp2:
       case cLog: case cLog2: case cLog10:
-      case cSin: case cCos:
+      case cSin: case cCos: case cTan:
+      case cAsin: case cAcos: case cAtan:
         return 1;
 
       // these opcode takes two arguments off the stack
       case cAdd: case cSub: case cRSub:
       case cMul: case cDiv: case cRDiv:
       case cPow: case cMod:
+      case cHypot:
       case cEqual: case cNEqual: case cLess:
-      case cLessOrEq: case cGreater: case cGreaterOrEq:
       case cAnd: case cAbsAnd:
       case cOr: case cAbsOr:
         return 2;
@@ -191,6 +192,25 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       outer.push_back(OpcodeDataPair(cMul, 0));
       return outer;
 
+    // also capture cRdiv here but switch a and b first!
+    case cRDiv:
+      std::swap(prog_a, prog_b);
+    case cDiv:
+      // db/a - a*db/b^2
+      prog_da = DiffFunction(prog_a);
+      prog_db = DiffFunction(prog_b);
+      outer = prog_db;
+      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+      outer.push_back(OpcodeDataPair(cDiv, 0));
+      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+      outer.insert(outer.end(), prog_db.begin(), prog_db.end());
+      outer.push_back(OpcodeDataPair(cMul, 0));
+      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+      outer.push_back(OpcodeDataPair(cSqr, 0));
+      outer.push_back(OpcodeDataPair(cDiv, 0));
+      outer.push_back(OpcodeDataPair(cSub, 0));
+      return outer;
+
     case cLog2:
     case cLog10:
       // *1/ln(base)
@@ -229,25 +249,6 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       prog_da = DiffFunction(prog_a);
       outer = prog_da;
       outer.push_back(OpcodeDataPair(cNeg, 0));
-      return outer;
-
-    // also capture cRdiv here but switch a and b first!
-    case cRDiv:
-      std::swap(prog_a, prog_b);
-    case cDiv:
-      // db/a - a*db/b^2
-      prog_da = DiffFunction(prog_a);
-      prog_db = DiffFunction(prog_b);
-      outer = prog_db;
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodeDataPair(cDiv, 0));
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.insert(outer.end(), prog_db.begin(), prog_db.end());
-      outer.push_back(OpcodeDataPair(cMul, 0));
-      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-      outer.push_back(OpcodeDataPair(cSqr, 0));
-      outer.push_back(OpcodeDataPair(cDiv, 0));
-      outer.push_back(OpcodeDataPair(cSub, 0));
       return outer;
 
     case cInv:
@@ -299,6 +300,45 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       outer.push_back(OpcodeDataPair(cNeg, 0));
       return outer;
 
+    case cTan :
+      // (tan(a)^2+1)*da
+      prog_da = DiffFunction(prog_a);
+      outer = prog_a;
+      outer.push_back(OpcodeDataPair(cTan, 0));
+      outer.push_back(OpcodeDataPair(cSqr, 0));
+      outer.push_back(OpcodeDataPair(cImmed, 1.0));
+      outer.push_back(OpcodeDataPair(cAdd, 0));
+      outer.insert(outer.end(), prog_da.begin(), prog_da.end());
+      outer.push_back(OpcodeDataPair(cMul, 0));
+      return outer;
+
+    case cAtan :
+      // da/(a^2+1)
+      prog_da = DiffFunction(prog_a);
+      outer = prog_da;
+      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+      outer.push_back(OpcodeDataPair(cSqr, 0));
+      outer.push_back(OpcodeDataPair(cImmed, 1.0));
+      outer.push_back(OpcodeDataPair(cAdd, 0));
+      outer.push_back(OpcodeDataPair(cDiv, 0));
+      return outer;
+
+    case cAsin:
+      // da/sqrt(1-a^2)
+    case cAcos:
+      // -da/sqrt(1-a^2)
+      prog_da = DiffFunction(prog_a);
+      outer = prog_da;
+      outer.push_back(OpcodeDataPair(cImmed, 1.0));
+      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+      outer.push_back(OpcodeDataPair(cSqr, 0));
+      outer.push_back(OpcodeDataPair(cSub, 0));
+      outer.push_back(OpcodeDataPair(cSqrt, 0));
+      outer.push_back(OpcodeDataPair(cDiv, 0));
+      if (op == cAcos)
+        outer.push_back(OpcodeDataPair(cNeg, 0));
+      return outer;
+
     case cSqrt :
       // da/(2*sqrt(a))
       prog_da = DiffFunction(prog_a);
@@ -319,6 +359,23 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       outer.push_back(OpcodeDataPair(cAbs, 0));
       outer.push_back(OpcodeDataPair(cDiv, 0));
       outer.push_back(OpcodeDataPair(cMul, 0));
+      return outer;
+
+    case cHypot:
+      // (a*da+b*db)/hypot(a,b)
+      prog_da = DiffFunction(prog_a);
+      prog_db = DiffFunction(prog_b);
+      outer = prog_a;
+      outer.insert(outer.end(), prog_da.begin(), prog_da.end());
+      outer.push_back(OpcodeDataPair(cMul, 0));
+      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+      outer.insert(outer.end(), prog_db.begin(), prog_db.end());
+      outer.push_back(OpcodeDataPair(cMul, 0));
+      outer.push_back(OpcodeDataPair(cAdd, 0));
+      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
+      outer.push_back(OpcodeDataPair(cHypot, 0));
+      outer.push_back(OpcodeDataPair(cDiv, 0));
       return outer;
   }
 
@@ -379,6 +436,8 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
   const std::vector<Value_t>& Immed = mData->mImmed;
 
   // uncompressed immediate data representation
+  // we also expand a few multiopcodes into elementary opcodes
+  // to keep the diff rules above simple (cDup must be expanded in this step)
   DiffProgramFragment orig;
   unsigned op;
   unsigned int nImmed = 0;
@@ -393,6 +452,32 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
       Interval arg = GetArgument(orig);
       orig.insert(orig.end(), arg.first, arg.second);
     }
+    else if (op == cSinCos)
+    {
+      // this instructuon puts two values on the stack!
+      Interval arg = GetArgument(orig);
+      DiffProgramFragment sub(arg.first, arg.second);
+      orig.push_back(OpcodeDataPair(cSin, 0.0));
+      orig.insert(orig.end(), sub.begin(), sub.end());
+      orig.push_back(OpcodeDataPair(cCos, 0.0));
+    }
+    else if (op == cCsc)
+    {
+      orig.push_back(OpcodeDataPair(cSin, 0.0));
+      orig.push_back(OpcodeDataPair(cInv, 0.0));
+    }
+    else if (op == cSec)
+    {
+      orig.push_back(OpcodeDataPair(cSin, 0.0));
+      orig.push_back(OpcodeDataPair(cInv, 0.0));
+    }
+    else if (op == cCot)
+    {
+      orig.push_back(OpcodeDataPair(cTan, 0.0));
+      orig.push_back(OpcodeDataPair(cInv, 0.0));
+    }
+    else if (op == cNop)
+      continue;
     else
       orig.push_back(OpcodeDataPair(op, 0.0));
   }
