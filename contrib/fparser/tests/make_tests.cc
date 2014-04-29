@@ -15,26 +15,28 @@ namespace
 {
     std::string GetDefinesFor(const std::string& type)
     {
-        if(type == "float") return "FP_SUPPORT_FLOAT_TYPE";
-        if(type == "long double") return "FP_SUPPORT_LONG_DOUBLE_TYPE";
-        if(type == "long") return "FP_SUPPORT_LONG_INT_TYPE";
-        if(type == "MpfrFloat") return "FP_SUPPORT_MPFR_FLOAT_TYPE";
-        if(type == "GmpInt") return "FP_SUPPORT_GMP_INT_TYPE";
-        if(type == "std::complex<double>") return "FP_SUPPORT_COMPLEX_DOUBLE_TYPE";
-        if(type == "std::complex<float>") return "FP_SUPPORT_COMPLEX_FLOAT_TYPE";
-        if(type == "std::complex<long double>") return "FP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE";
+        if(type == "float") return "FP_TEST_WANT_FLOAT_TYPE";
+        if(type == "long double") return "FP_TEST_WANT_LONG_DOUBLE_TYPE";
+        if(type == "long") return "FP_TEST_WANT_LONG_INT_TYPE";
+        if(type == "double") return "FP_TEST_WANT_DOUBLE_TYPE";
+        if(type == "MpfrFloat") return "FP_TEST_WANT_MPFR_FLOAT_TYPE";
+        if(type == "GmpInt") return "FP_TEST_WANT_GMP_INT_TYPE";
+        if(type == "std::complex<double>") return "FP_TEST_WANT_COMPLEX_DOUBLE_TYPE";
+        if(type == "std::complex<float>") return "FP_TEST_WANT_COMPLEX_FLOAT_TYPE";
+        if(type == "std::complex<long double>") return "FP_TEST_WANT_COMPLEX_LONG_DOUBLE_TYPE";
         return std::string();
     }
     std::string GetTypeForDefine(const std::string& def)
     {
-        if(def == "FP_SUPPORT_FLOAT_TYPE") return "float";
-        if(def == "FP_SUPPORT_LONG_DOUBLE_TYPE") return "long double";
-        if(def == "FP_SUPPORT_LONG_INT_TYPE") return "long";
-        if(def == "FP_SUPPORT_MPFR_FLOAT_TYPE") return "MpfrFloat";
-        if(def == "FP_SUPPORT_GMP_INT_TYPE") return "GmpInt";
-        if(def == "FP_SUPPORT_COMPLEX_DOUBLE_TYPE") return "std::complex<double>";
-        if(def == "FP_SUPPORT_COMPLEX_FLOAT_TYPE") return "std::complex<float>";
-        if(def == "FP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE") return "std::complex<long double>";
+        if(def == "FP_TEST_WANT_FLOAT_TYPE") return "float";
+        if(def == "FP_TEST_WANT_LONG_DOUBLE_TYPE") return "long double";
+        if(def == "FP_TEST_WANT_LONG_INT_TYPE") return "long";
+        if(def == "FP_TEST_WANT_DOUBLE_TYPE") return "double";
+        if(def == "FP_TEST_WANT_MPFR_FLOAT_TYPE") return "MpfrFloat";
+        if(def == "FP_TEST_WANT_GMP_INT_TYPE") return "GmpInt";
+        if(def == "FP_TEST_WANT_COMPLEX_DOUBLE_TYPE") return "std::complex<double>";
+        if(def == "FP_TEST_WANT_COMPLEX_FLOAT_TYPE") return "std::complex<float>";
+        if(def == "FP_TEST_WANT_COMPLEX_LONG_DOUBLE_TYPE") return "std::complex<long double>";
         return "double";
     }
     std::string NumConst(const std::string& type, const std::string& value, bool direct_cast = false)
@@ -176,13 +178,13 @@ namespace
     {
         return "template<typename Value_t> static Value_t "+name+"(const Value_t* vars)";
     }
-    std::string test_specialization(const std::string& name, const std::string& type)
+    /*std::string test_specialization(const std::string& name, const std::string& type)
     {
-        return "template<> Value_t "+name+"<Value_t> (const Value_t* vars) /* " + type + " */";
-    }
+        return "template<> Value_t "+name+"<Value_t> (const Value_t* vars) /""* " + type + " *""/";
+    }*/
     std::string test_specialized_declaration(const std::string& name, const std::string& type)
     {
-        return "Value_t "+name+"(const Value_t* vars) /* " + type + " */";
+        return "Value_t "+name+"(const Value_t* vars) /""* " + type + " *""/";
     }
 }
 
@@ -313,7 +315,9 @@ void ListTests(std::ostream& outStream)
                     << "    { " << testdata.ParamAmount
                     << ", " << ranges.str()
                     << ", " << (testdata.UseDegrees ? "true" : "false")
-                    << ", " << testdata.TestFuncName;
+                    << ", " << testdata.TestFuncName
+                    << ",";
+
                 if(/*type == "MpfrFloat"
                 &&*/ testdata.DataTypes.find("double")
                 != testdata.DataTypes.end())
@@ -321,12 +325,11 @@ void ListTests(std::ostream& outStream)
                     // If the same test is defined for both "double" and
                     // "MpfrFloat", include an extra pointer to the "double"
                     // test in the "MpfrFloat" test.
-                    linebuf << ", " << testdata.TestFuncName;
+                    linebuf << "DBL_ONLY(" << testdata.TestFuncName << ")";
                     //n_duplicates = 1;
                 }
                 else
-                    linebuf
-                        << ", 0";
+                    linebuf << "DBL_ONLY(0)";
 
                 if(/*type == "GmpInt"
                 &&*/ testdata.DataTypes.find("long")
@@ -335,15 +338,14 @@ void ListTests(std::ostream& outStream)
                     // If the same test is defined for both "long" and
                     // "GmpInt", include an extra pointer to the "long"
                     // test in the "GmpInt" test.
-                    linebuf << ", " << testdata.TestFuncName;
+                    linebuf << "LNG_ONLY(" << testdata.TestFuncName << ")";
                     //n_duplicates = 1;
                 }
                 else
-                    linebuf
-                        << ", 0";
+                    linebuf << "LNG_ONLY(0)";
 
                 linebuf
-                    << ",\n      " << TranslateString(testdata.ParamString)
+                    << "\n      " << TranslateString(testdata.ParamString)
                     << ", " << TranslateString(testdata.TestName)
                     << ", " << TranslateString(testdata.FuncString)
                     << " },\n";
@@ -508,7 +510,7 @@ void CompileFunction(const char*& funcstr, const std::string& eval_name,
 
                         if(mpfrconst_set.insert(mpfrconst_name).second)
                         {
-                            std::string& defs = define_sections["FP_SUPPORT_MPFR_FLOAT_TYPE"].definitions;
+                            std::string& defs = define_sections["FP_TEST_WANT_MPFR_FLOAT_TYPE"].definitions;
                             if(defs.empty())
                                 defs += "static const Value_t ";
                             else
@@ -922,7 +924,7 @@ void CompileTest(const std::string& testname, FILE* fp)
                             if(!test.IfDef.empty())
                                 out2 << "#endif /* " << test.IfDef << " */\n";
 
-                            define_sections["FP_SUPPORT_MPFR_FLOAT_TYPE"]
+                            define_sections["FP_TEST_WANT_MPFR_FLOAT_TYPE"]
                                 .namespace_functions[funcname.first] += out2.str();
                         }
                     }
@@ -1023,7 +1025,20 @@ int main(int argc, char* argv[])
         fclose(fp);
     }
 
-    out << "#define APP(x,y) x##y\n";
+    out <<
+        "#ifdef FP_TEST_WANT_DOUBLE_TYPE\n"
+        " #define DBL_ONLY(p) p,\n"
+        "#else\n"
+        " #define DBL_ONLY(p)\n"
+        "#endif\n"
+        "\n"
+        "#ifdef FP_TEST_WANT_LONG_INT_TYPE\n"
+        " #define LNG_ONLY(p) p,\n"
+        "#else\n"
+        " #define LNG_ONLY(p)\n"
+        "#endif\n"
+        "\n"
+        "#define APP(x,y) x##y\n";
     for(std::map<std::string, std::pair<std::string,std::string> >::const_iterator
         i = class_declarations.begin();
         i != class_declarations.end();

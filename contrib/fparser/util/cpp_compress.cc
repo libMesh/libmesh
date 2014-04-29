@@ -32,7 +32,7 @@ namespace
             "FP_TRACE_OPCODENAME",
             "FP_TRACE_BYTECODE_OPTIMIZATION",
             "FP_TRACE_BYTECODE_ADD",
-            "N","P",
+            "N","P", "DBL_ONLY", "LNG_ONLY",
             "incStackPtr", "TryCompilePowi","findName"
         };
         parametric_macro_list.clear();
@@ -197,13 +197,15 @@ namespace
 
             if(Debug)
                 result += tok.meta.preproc
-                           ? (InDefineMode ? "¿" : "¡")
-                           : (InDefineMode ? "?" : "!");
+                           ? (InDefineMode ? "\xBF" : "\xA1")  // upside-down ? and !
+                           : (InDefineMode ? "\x3F" : "\x21"); // ?, !
             else if (!result.empty() && result[result.size()-1] != '\n')
             {
                 if (!InDefineMode && NewLines && value[0] == '#') result += '\n';
                 else if (isnamechar(value[0])
                      && (isnamechar(result[result.size()-1])
+                       || result[result.size()-1] == '"'
+                       || result[result.size()-1] == '\''
                             //     || result[result.size()-1]==')'
                             /* An identifier preceded by an identifier character
                              * requires a separator. Also, an identifier
@@ -211,6 +213,9 @@ namespace
                              * that ends in an identifier character requires a
                              * separator when using Microsoft C++, thus you may
                              * need to include the ")" check above sometimes.
+                             * Also, in C++11 you can't tack an identifier right
+                             * after a string or character constant or there will
+                             * be an error. 
                              */
                         ))
                 {

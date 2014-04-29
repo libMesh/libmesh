@@ -64,16 +64,16 @@ namespace
 
     template<typename Value_t> Value_t epsilon() { return Value_t(1e-9); }
     template<> inline float epsilon<float>() { return 1e-5F; }
-    template<> inline long epsilon<long>() { return 0; }
+    //template<> inline long epsilon<long>() { return 0; }
 
 #ifdef FP_SUPPORT_MPFR_FLOAT_TYPE
     template<> inline MpfrFloat epsilon<MpfrFloat>()
     { return MpfrFloat::someEpsilon(); }
 #endif
 
-#ifdef FP_SUPPORT_GMP_INT_TYPE
-    template<> inline GmpInt epsilon<GmpInt>() { return 0; }
-#endif
+//#ifdef FP_SUPPORT_GMP_INT_TYPE
+    //template<> inline GmpInt epsilon<GmpInt>() { return 0; }
+//#endif
 
     template<typename Value_t>
     Value_t Sqr(const Value_t* p)
@@ -110,24 +110,25 @@ namespace
      public:
         ParserWithConsts()
         {
-            AddConstant("pi", Value_t(3.14159265358979323846));
-            AddConstant("e", Value_t(2.71828182845904523536));
-            AddUnit("k", Value_t(1000));
-            AddUnit("M", Value_t(1000000));
-            AddUnit("dozen", Value_t(12));
-            AddUnit("dozens", Value_t(12));
+            typedef FunctionParserBase<Value_t> b;
+            b::AddConstant("pi", Value_t(3.14159265358979323846));
+            b::AddConstant("e", Value_t(2.71828182845904523536));
+            b::AddUnit("k", Value_t(1000));
+            b::AddUnit("M", Value_t(1000000));
+            b::AddUnit("dozen", Value_t(12));
+            b::AddUnit("dozens", Value_t(12));
 
-            AddFunction("sqr", Sqr<Value_t>, 1);
-            AddFunction("sub", Sub<Value_t>, 2);
-            AddFunction("value", Value<Value_t>, 0);
+            b::AddFunction("sqr", Sqr<Value_t>, 1);
+            b::AddFunction("sub", Sub<Value_t>, 2);
+            b::AddFunction("value", Value<Value_t>, 0);
 
             static InitializableParser<Value_t> SqrFun("x*x", "x");
             static InitializableParser<Value_t> SubFun("x-y", "x,y");
             static InitializableParser<Value_t> ValueFun("5", "");
 
-            AddFunction("psqr", SqrFun);
-            AddFunction("psub", SubFun);
-            AddFunction("pvalue", ValueFun);
+            b::AddFunction("psqr", SqrFun);
+            b::AddFunction("psub", SubFun);
+            b::AddFunction("pvalue", ValueFun);
         }
 
         // Publicize fparser's parsing functions

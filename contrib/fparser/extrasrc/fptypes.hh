@@ -1,5 +1,5 @@
 /***************************************************************************\
-|* Function Parser for C++ v4.5                                            *|
+|* Function Parser for C++ v4.5.1                                          *|
 |*-------------------------------------------------------------------------*|
 |* Copyright: Juha Nieminen, Joel Yliluoma                                 *|
 |*                                                                         *|
@@ -15,12 +15,6 @@
 
 #ifndef ONCE_FPARSER_TYPES_H_
 #define ONCE_FPARSER_TYPES_H_
-
-#include "libmesh_config.h"
-// Communicate to fparser that threads are being utilized
-#ifdef LIBMESH_USING_THREADS
-#  define FP_USE_THREAD_SAFE_EVAL
-#endif
 
 #include "../fpconfig.hh"
 #include <cstring>
@@ -73,7 +67,6 @@ namespace FUNCTIONPARSERTYPES
         cLog2by, /* log2by(x,y) = log2(x) * y */
         cNop,    /* Used by fpoptimizer internally; should not occur in bytecode */
 #endif
-
         cSinCos,   /* sin(x) followed by cos(x) (two values are pushed to stack) */
         cSinhCosh, /* hyperbolic equivalent of sincos */
         cAbsAnd,    /* As cAnd,       but assume both operands are absolute values */
