@@ -33,11 +33,8 @@ int FunctionParserADBase<Value_t>::OpcodeSize(unsigned op)
     {
       // these opcode takes one argument off the stack
       case cInv: case cNeg:
-      case cNot: case cAbsNot:
-      case cNotNot: case cAbsNotNot:
       case cSqr: case cAbs:
       case cSqrt: case cRSqrt:
-      case cDeg: case cRad:
       case cExp: case cExp2:
       case cLog: case cLog2: case cLog10:
       case cSin: case cCos: case cTan:
@@ -49,11 +46,16 @@ int FunctionParserADBase<Value_t>::OpcodeSize(unsigned op)
       case cAdd: case cSub: case cRSub:
       case cMul: case cDiv: case cRDiv:
       case cPow: case cHypot:
+#ifdef FP_SUPPORT_OPTIMIZER
+      case cLog2by:
+#endif
         return 2;
 
       // these opcodes effectively take nothing off the stack (but put one value on there)
-      //case cDup:
-      //  return 0;
+#ifdef FP_SUPPORT_OPTIMIZER
+      case cNop:
+        return 0;
+#endif
 
       default:
         std::cerr << cDup<< " Unhandled opcode " << op << std::endl;;
@@ -81,12 +83,32 @@ FunctionParserADBase<Value_t>::GetArgument(const DiffProgramFragment & orig)
     }
     ip--;
 
-    // a size two opcode needs two elements from teh stack, but also puts one back on!
+    // a size two opcode needs two elements from the stack, but also puts one back on!
     int this_size = OpcodeSize((*ip).first);
     stack_size -= this_size > 0 ? this_size-1 : this_size;
   } while (stack_size < 1);
 
   return Interval(ip, orig.end());
+}
+
+template<typename Value_t>
+typename FunctionParserADBase<Value_t>::Interval
+FunctionParserADBase<Value_t>::GetArgument(const DiffProgramFragment & orig, unsigned int index)
+{
+  // argument loction
+  Interval arg;
+  DiffProgramFragment head;
+  std::copy(orig.begin(), orig.end()-1, std::back_inserter(head));
+
+  // iterate over the past arguments
+  int i = index;
+  do
+  {
+    arg = GetArgument(head);
+    head.resize(std::distance<typename DiffProgramFragment::const_iterator>(head.begin(), arg.first));
+  } while (--i >= 0);
+
+  return arg;
 }
 
 template<typename Value_t>
@@ -385,6 +407,7 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       outer.push_back(OpcodeDataPair(cImmed, Value_t(0)));
       return outer;
 
+#ifdef FP_SUPPORT_OPTIMIZER
     case cLog2by:
       // (db*ln(a) + b*da/a)/ln(2)
       prog_da = DiffFunction(prog_a);
@@ -400,6 +423,7 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       outer.push_back(OpcodeDataPair(cImmed, std::log(Value_t(2))));
       outer.push_back(OpcodeDataPair(cDiv, 0));
       return outer;
+#endif
   }
 
   //outer.insert( v1.end(), v2.begin(), v2.end() );
@@ -458,6 +482,9 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
   // get a reference to the immediate values
   const std::vector<Value_t>& Immed = mData->mImmed;
 
+  // lookup map for jump targets
+  //`std::vector<unsigned>
+
   // uncompressed immediate data representation
   // we also expand a few multiopcodes into elementary opcodes
   // to keep the diff rules above simple (cDup must be expanded in this step)
@@ -473,6 +500,14 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
     {
       // substitute full code for cDup opcodes
       Interval arg = GetArgument(orig);
+      orig.insert(orig.end(), arg.first, arg.second);
+    }
+    else if (op == cFetch)
+    {
+      // get index and advance instruction counter
+      exit(1); // unfortulately index counts from the _bottom_ of the stack. Sigh.
+      unsigned index = ByteCode[++i];
+      Interval arg = GetArgument(orig, index); // maybe off by one
       orig.insert(orig.end(), arg.first, arg.second);
     }
     else if (op == cSinCos)
@@ -499,8 +534,10 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
       orig.push_back(OpcodeDataPair(cTan, 0.0));
       orig.push_back(OpcodeDataPair(cInv, 0.0));
     }
+#ifdef FP_SUPPORT_OPTIMIZER
     else if (op == cNop)
       continue;
+#endif
     else
       orig.push_back(OpcodeDataPair(op, 0.0));
   }
