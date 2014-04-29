@@ -20,10 +20,11 @@ int main()
   // works:
   //std::string func = "log(2+8*x^2)";
   //std::string func = "(4*x+8*x^2)+(3*x+4*x^2+7)";
-  std::string func = "x*log(x)+(1-x)*log(1-x)";
+  //std::string func = "x*log(x)+(1-x)*log(1-x)";
 
   //std::string func = "3*a^2 + 7*x^2";
   //std::string func = "3*x + 4*x^2";
+  std::string func = "abs(3*x^3)";
 
   //std::string func = "sin(x^2)";
   //std::string func = "sqrt(3*x)";
