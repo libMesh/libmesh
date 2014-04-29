@@ -551,5 +551,6 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
 }
 
 
-// Instantiate class
+// Instantiate classes
 template class FunctionParserADBase<double>;
+template class FunctionParserADBase<float>;
