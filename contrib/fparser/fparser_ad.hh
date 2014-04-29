@@ -39,6 +39,12 @@ private:
   /// get the preceeding argument
   Interval GetArgument(const DiffProgramFragment & code);
 
+  /// get argument n before
+  Interval GetArgument(const DiffProgramFragment & code, unsigned int index);
+
+  /// remove the code fragments that generate the n previous arguments
+  //std::vector<DiffProgramFragment> PopArguments(DiffProgramFragment & code, unsigned int index);
+
   /// variable to diff for
   unsigned mVarOp;
 

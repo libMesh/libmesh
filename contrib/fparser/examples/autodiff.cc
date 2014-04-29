@@ -24,7 +24,8 @@ int main()
 
   //std::string func = "3*a^2 + 7*x^2";
   //std::string func = "3*x + 4*x^2";
-  std::string func = "hypot(3*x,7*sin(x))";
+  //std::string func = "hypot(3*x,7*sin(x))";
+  std::string func = "if(x-3,x^2,if(x-4,1,7*x))";
 
   //std::string func = "sin(x^2)";
   //std::string func = "sqrt(3*x)";
