@@ -35,11 +35,11 @@ int FunctionParserADBase<Value_t>::OpcodeSize(unsigned op)
       case cInv: case cNeg:
       case cNot: case cAbsNot:
       case cNotNot: case cAbsNotNot:
-      case cSqr:
+      case cSqr: case cAbs:
       case cSqrt: case cRSqrt:
       case cDeg: case cRad:
       case cExp: case cExp2:
-      case cLog:
+      case cLog: case cLog2: case cLog10:
       case cSin: case cCos:
         return 1;
 
@@ -191,17 +191,28 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       outer.push_back(OpcodeDataPair(cMul, 0));
       return outer;
 
+    case cLog2:
+    case cLog10:
+      // *1/ln(base)
     case cLog:
       // da/a
       prog_da = DiffFunction(prog_a);
       outer = prog_da;
       outer.insert(outer.end(), prog_a.begin(), prog_a.end());
       outer.push_back(OpcodeDataPair(cDiv, 0));
+      if (op == cLog2) {
+        outer.push_back(OpcodeDataPair(cImmed, std::log(2.0)));
+        outer.push_back(OpcodeDataPair(cDiv, 0));
+      }
+      else if (op == cLog10) {
+        outer.push_back(OpcodeDataPair(cImmed, std::log(10.0)));
+        outer.push_back(OpcodeDataPair(cDiv, 0));
+      }
       return outer;
 
     case cExp:
     case cExp2:
-      // da/a
+      // da*exp(a)
       prog_da = DiffFunction(prog_a);
       outer = prog_da;
       outer.insert(outer.end(), prog_a.begin(), prog_a.end());
@@ -297,6 +308,17 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       outer.push_back(OpcodeDataPair(cSqrt, 0));
       outer.push_back(OpcodeDataPair(cMul, 0));
       outer.push_back(OpcodeDataPair(cDiv, 0));
+      return outer;
+
+    case cAbs:
+      // da*a/|a|
+      prog_da = DiffFunction(prog_a);
+      outer = prog_da;
+      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+      outer.push_back(OpcodeDataPair(cDup, 0));
+      outer.push_back(OpcodeDataPair(cAbs, 0));
+      outer.push_back(OpcodeDataPair(cDiv, 0));
+      outer.push_back(OpcodeDataPair(cMul, 0));
       return outer;
   }
 
