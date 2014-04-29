@@ -16,6 +16,12 @@
 #ifndef ONCE_FPARSER_TYPES_H_
 #define ONCE_FPARSER_TYPES_H_
 
+#include "libmesh_config.h"
+// Communicate to fparser that threads are being utilized
+#ifdef LIBMESH_USING_THREADS
+#  define FP_USE_THREAD_SAFE_EVAL
+#endif
+
 #include "../fpconfig.hh"
 #include <cstring>
 
