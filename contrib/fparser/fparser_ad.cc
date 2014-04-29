@@ -33,11 +33,8 @@ int FunctionParserADBase<Value_t>::OpcodeSize(unsigned op)
     {
       // these opcode takes one argument off the stack
       case cInv: case cNeg:
-      case cNot: case cAbsNot:
-      case cNotNot: case cAbsNotNot:
       case cSqr: case cAbs:
       case cSqrt: case cRSqrt:
-      case cDeg: case cRad:
       case cExp: case cExp2:
       case cLog: case cLog2: case cLog10:
       case cSin: case cCos: case cTan:
@@ -499,8 +496,10 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
       orig.push_back(OpcodeDataPair(cTan, 0.0));
       orig.push_back(OpcodeDataPair(cInv, 0.0));
     }
+#ifdef FP_SUPPORT_OPTIMIZER
     else if (op == cNop)
       continue;
+#endif
     else
       orig.push_back(OpcodeDataPair(op, 0.0));
   }
