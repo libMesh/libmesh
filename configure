@@ -33466,7 +33466,7 @@ if test "${with_fparser+set}" = set; then :
  		    *)  as_fn_error $? "bad value ${withval} for --with-fparser" "$LINENO" 5 ;;
 		 esac
 else
-  enablefparserdevel=no
+  enablefparserdevel=yes
 fi
 
 

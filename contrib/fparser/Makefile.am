@@ -165,6 +165,8 @@ DISTCLEANFILES += util/tree_grammar_parser # in case it wasn't conditionally cle
 
 if FPARSER_DEVEL
 
+AM_CPPFLAGS += -I$(srcdir)/extrasrc
+
 # extrasrc/fp_opcode_add.inc is a generated source, and this rule specifies how we build it.
 extrasrc/fp_opcode_add.inc: \
 		util/bytecoderules_parser \
