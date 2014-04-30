@@ -35,6 +35,7 @@
 #include <cmath>
 #include <cmath>
 #include <cstddef>
+#include <limits>
 #include <string>
 
 namespace libMesh {
@@ -113,6 +114,7 @@ public:
         // Parse (and optimize if possible) the subexpression.
         // Add some basic constants, to Real precision.
         FunctionParserBase<Output> fp;
+        fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
         fp.AddConstant("pi", std::acos(Real(-1)));
         fp.AddConstant("e", std::exp(Real(1)));
         if (fp.Parse(subexpression, variables) != -1) // -1 for success

@@ -1,4 +1,4 @@
-/* Function Parser for C++ v4.5     
+/* Function Parser for C++ v4.5.1   
 
   NOTE:
   Do not include this file in your project. The fparser.cc file #includes

@@ -312,8 +312,18 @@ namespace FPoptimizer_CodeTree
                 // No guess which branch is chosen. Produce a spanning min & max.
                 range<Value_t> res1 = CalculateResultBoundaries( tree.GetParam(1) );
                 range<Value_t> res2 = CalculateResultBoundaries( tree.GetParam(2) );
-                if(!res2.min.known) res1.min.known = false; else if(res1.min.known && (res2.min.val) < res1.min.val) res1.min.val = res2.min.val;
-                if(!res2.max.known) res1.max.known = false; else if(res1.max.known && (res2.max.val) > res1.max.val) res1.max.val = res2.max.val;
+                if(!res2.min.known)
+                  res1.min.known = false;
+                else if(res1.min.known && (res2.min.val) < res1.min.val)
+                  res1.min.val = res2.min.val;
+                else if (std::isnan(res2.min.val))
+                  res1.min.val = res2.min.val;
+                if(!res2.max.known)
+                  res1.max.known = false;
+                else if(res1.max.known && (res2.max.val) > res1.max.val)
+                  res1.max.val = res2.max.val;
+                else if (std::isnan(res2.max.val))
+                  res1.max.val = res2.max.val;
                 return res1;
             }
 

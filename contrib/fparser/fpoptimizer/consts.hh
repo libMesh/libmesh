@@ -47,6 +47,6 @@ namespace FUNCTIONPARSERTYPES
     template<typename Value_t>
     inline Value_t fp_const_negativezero()
     {
-        return -fp_epsilon<Value_t>();
+        return -Epsilon<Value_t>::value;
     }
 }

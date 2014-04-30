@@ -55,36 +55,46 @@ void FunctionParserBase<Value_t>::Optimize()
     //PrintByteCode(std::cout);
 }
 
+#define FUNCTIONPARSER_INSTANTIATE_EMPTY_OPTIMIZE(type) \
+    template<> void FunctionParserBase< type >::Optimize() {}
+
 #ifdef FP_SUPPORT_MPFR_FLOAT_TYPE
-template<>
-void FunctionParserBase<MpfrFloat>::Optimize()
-{}
+FUNCTIONPARSER_INSTANTIATE_EMPTY_OPTIMIZE(MpfrFloat)
 #endif
 
 #ifdef FP_SUPPORT_GMP_INT_TYPE
-template<>
-void FunctionParserBase<GmpInt>::Optimize()
-{}
+FUNCTIONPARSER_INSTANTIATE_EMPTY_OPTIMIZE(GmpInt)
 #endif
 
 #ifdef FP_SUPPORT_COMPLEX_DOUBLE_TYPE
-template<>
-void FunctionParserBase<std::complex<double> >::Optimize()
-{}
+FUNCTIONPARSER_INSTANTIATE_EMPTY_OPTIMIZE(std::complex<double>)
 #endif
 
 #ifdef FP_SUPPORT_COMPLEX_FLOAT_TYPE
-template<>
-void FunctionParserBase<std::complex<float> >::Optimize()
-{}
+FUNCTIONPARSER_INSTANTIATE_EMPTY_OPTIMIZE(std::complex<float>)
 #endif
 
 #ifdef FP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE
-template<>
-void FunctionParserBase<std::complex<long double> >::Optimize()
-{}
+FUNCTIONPARSER_INSTANTIATE_EMPTY_OPTIMIZE(std::complex<long double>)
 #endif
 
-FUNCTIONPARSER_INSTANTIATE_TYPES
+#define FUNCTIONPARSER_INSTANTIATE_OPTIMIZE(type) \
+    template void FunctionParserBase<type>::Optimize();
 
+#ifndef FP_DISABLE_DOUBLE_TYPE
+FUNCTIONPARSER_INSTANTIATE_OPTIMIZE(double)
 #endif
+
+#ifdef FP_SUPPORT_FLOAT_TYPE
+FUNCTIONPARSER_INSTANTIATE_OPTIMIZE(float)
+#endif
+
+#ifdef FP_SUPPORT_LONG_DOUBLE_TYPE
+FUNCTIONPARSER_INSTANTIATE_OPTIMIZE(long double)
+#endif
+
+#ifdef FP_SUPPORT_LONG_INT_TYPE
+FUNCTIONPARSER_INSTANTIATE_OPTIMIZE(long)
+#endif
+
+#endif // FP_SUPPORT_OPTIMIZER

@@ -47,6 +47,43 @@ typedef FunctionParser_mpfr DefaultParser;
 #error "FunctionParserBase<double> was disabled and no viable floating point alternative has been defined"
 #endif
 
+#undef FP_TEST_WANT_FLOAT_TYPE
+#ifdef FP_SUPPORT_FLOAT_TYPE
+ #define FP_TEST_WANT_FLOAT_TYPE
+#endif
+#undef FP_TEST_WANT_DOUBLE_TYPE
+#ifndef FP_DISABLE_DOUBLE_TYPE
+ #define FP_TEST_WANT_DOUBLE_TYPE
+#endif
+#undef FP_TEST_WANT_LONG_DOUBLE_TYPE
+#ifdef FP_SUPPORT_LONG_DOUBLE_TYPE
+ #define FP_TEST_WANT_LONG_DOUBLE_TYPE
+#endif
+#undef FP_TEST_WANT_MPFR_FLOAT_TYPE
+#ifdef FP_SUPPORT_MPFR_FLOAT_TYPE
+ #define FP_TEST_WANT_MPFR_FLOAT_TYPE
+#endif
+#undef FP_TEST_WANT_GMP_INT_TYPE
+#ifdef FP_SUPPORT_GMP_INT_TYPE
+ #define FP_TEST_WANT_GMP_INT_TYPE
+#endif
+#undef FP_TEST_WANT_LONG_INT_TYPE
+#if defined(FP_SUPPORT_LONG_INT_TYPE) || defined(FP_SUPPORT_GMP_INT_TYPE)
+ #define FP_TEST_WANT_LONG_INT_TYPE
+#endif
+#undef FP_TEST_WANT_COMPLEX_FLOAT_TYPE
+#ifdef FP_SUPPORT_COMPLEX_FLOAT_TYPE
+ #define FP_TEST_WANT_COMPLEX_FLOAT_TYPE
+#endif
+#undef FP_TEST_WANT_COMPLEX_DOUBLE_TYPE
+#ifdef FP_SUPPORT_COMPLEX_DOUBLE_TYPE
+ #define FP_TEST_WANT_COMPLEX_DOUBLE_TYPE
+#endif
+#undef FP_TEST_WANT_COMPLEX_LONG_DOUBLE_TYPE
+#ifdef FP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE
+ #define FP_TEST_WANT_COMPLEX_LONG_DOUBLE_TYPE
+#endif
+
 typedef DefaultParser::value_type DefaultValue_t;
 
 
@@ -122,15 +159,11 @@ namespace
     template<typename Value_t>
     inline Value_t Epsilon() { return Value_t(1e-9); }
 
-#ifdef FP_SUPPORT_FLOAT_TYPE
     template<>
     inline float Epsilon<float>() { return 1e-3f; }
-#endif
 
-#ifdef FP_SUPPORT_LONG_DOUBLE_TYPE
     template<>
     inline long double Epsilon<long double>() { return 1e-10l; }
-#endif
 
 #ifdef FP_SUPPORT_MPFR_FLOAT_TYPE
     template<>
@@ -155,7 +188,7 @@ namespace
 
 
 #ifndef _MSC_VER
-    void setAnsiColor(unsigned color)
+    /*void setAnsiColor(unsigned color)
     {
         static int bold = 0;
         std::cout << "\33[";
@@ -166,13 +199,13 @@ namespace
         }
         else if(bold) { std::cout << "0;"; bold=0; }
         std::cout << 30+color << "m";
-    }
+    }*/
 
     void setAnsiBold() { std::cout << "\33[1m"; }
 
     void resetAnsiColor() { std::cout << "\33[0m"; }
 #else
-    void setAnsiColor(unsigned) {}
+    /*void setAnsiColor(unsigned) {}*/
     void setAnsiBold() {}
     void resetAnsiColor() {}
 #endif
@@ -1525,8 +1558,12 @@ struct TestType
     bool useDegrees;
 
     Value_t (*funcPtr)(const Value_t*);
+#ifdef FP_TEST_WANT_DOUBLE_TYPE
     double (*doubleFuncPtr)(const double*);
+#endif
+#ifdef FP_TEST_WANT_LONG_INT_TYPE
     long (*longFuncPtr)(const long*);
+#endif
 
     const char* paramString;
     const char* testName;
@@ -1690,13 +1727,7 @@ namespace
 #define fp_equal tb_fp_equal
 #define fp_nequal tb_fp_nequal
 
-#if defined(FP_SUPPORT_GMP_INT_TYPE) && !defined(FP_SUPPORT_LONG_INT_TYPE)
-#define FP_SUPPORT_LONG_INT_TYPE
 #include "testbed_tests.inc"
-#undef FP_SUPPORT_LONG_INT_TYPE
-#else
-#include "testbed_tests.inc"
-#endif
 
 #undef fp_less
 #undef fp_lessOrEq
@@ -1712,7 +1743,7 @@ namespace
     void testAgainstDouble(Value_t*, Value_t, const TestType<Value_t>&,
                            std::ostream&) {}
 
-#ifdef FP_SUPPORT_MPFR_FLOAT_TYPE
+#if defined(FP_TEST_WANT_MPFR_FLOAT_TYPE) && defined(FP_TEST_WANT_DOUBLE_TYPE)
     void testAgainstDouble(MpfrFloat* vars, MpfrFloat parserValue,
                            const TestType<MpfrFloat>& testData,
                            std::ostream& error)
@@ -1769,7 +1800,7 @@ namespace
     void testAgainstLongInt(Value_t*, Value_t, const TestType<Value_t>&,
                             std::ostream&) {}
 
-#ifdef FP_SUPPORT_GMP_INT_TYPE
+#if defined(FP_TEST_WANT_GMP_INT_TYPE) && defined(FP_TEST_WANT_LONG_INT_TYPE)
     void testAgainstLongInt(GmpInt* vars, GmpInt parserValue,
                             const TestType<GmpInt>& testData,
                             std::ostream& error)
@@ -2301,8 +2332,8 @@ namespace OptimizerTests
 
         const TestType<DefaultValue_t> testData =
         {
-            1, -4.0, 4.0, 0.49, false, &evaluateFunction, 0, 0, "x",
-            "'trig. combo optimizer test'", funcString.c_str()
+            1, -4.0, 4.0, 0.49, false, &evaluateFunction, DBL_ONLY(0)LNG_ONLY(0)
+            "x", "'trig. combo optimizer test'", funcString.c_str()
         };
 
         DefaultParser parser;
