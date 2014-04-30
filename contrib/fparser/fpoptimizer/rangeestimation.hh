@@ -2,10 +2,13 @@
 #define FPOptimizer_RangeEstimationHH
 
 #include "codetree.hh"
+#include "fpaux.hh"
 #include "valuerange.hh"
 
 namespace FPoptimizer_CodeTree
 {
+    using namespace FUNCTIONPARSERTYPES;
+
     enum TriTruthValue { IsAlways, IsNever, Unknown };
 
     /* This function calculates the minimum and maximum values
