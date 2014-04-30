@@ -369,7 +369,46 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
 
       if (!flag)
         {
+#if MPI_VERSION > 1
+          int mpi_thread_provided;
+          const int mpi_thread_requested = libMesh::n_threads() > 1 ?
+                                           MPI_THREAD_FUNNELED :
+                                           MPI_THREAD_SINGLE;
+
+          MPI_Init_thread (&argc, const_cast<char***>(&argv),
+                           mpi_thread_requested, &mpi_thread_provided);
+
+          if ((libMesh::n_threads() > 1) &&
+              (mpi_thread_provided < MPI_THREAD_FUNNELED))
+            {
+              libmesh_warning("Warning: MPI failed to guarantee MPI_THREAD_FUNNELED\n" << 
+                              "for a threaded run.\n" <<
+                              "Be sure your library is funneled-thread-safe..." <<
+                               std::endl);
+
+              // Ideally, if an MPI stack tells us it's unsafe for us
+              // to use threads, we shouldn't use threads.
+              // In practice, we've encountered one MPI stack (an
+              // mvapich2 configuration) that returned
+              // MPI_THREAD_SINGLE as a proper warning, two stacks
+              // that handle MPI_THREAD_FUNNELED properly, and two
+              // current stacks plus a couple old stacks that return
+              // MPI_THREAD_SINGLE but support libMesh threaded runs
+              // anyway.
+
+              // libMesh::libMeshPrivateData::_n_threads = 1;
+              // task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
+            }
+#else
+          if (libMesh::libMeshPrivateData::_n_threads > 1)
+            {
+              libmesh_warning("Warning: using MPI1 for threaded code.\n" <<
+                              "Be sure your library is funneled-thread-safe..." <<
+                              std::endl);
+            }
+
           MPI_Init (&argc, const_cast<char***>(&argv));
+#endif
           libmesh_initialized_mpi = true;
         }
 

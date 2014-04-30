@@ -1823,8 +1823,8 @@ Optional Features:
   --enable-unordered-containers
                           Use unordered_map/unordered_set if available
   --enable-openmp         Build with OpenMP Support
-  --enable-warnings       Display warnings when using deprecated or
-                          experimental codes
+  --enable-warnings       Warn when using deprecated, experimental, or
+                          questionable code
   --enable-blocked-storage
                           Support for blocked matrix/vector storage
   --enable-default-comm-world

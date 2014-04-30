@@ -11,7 +11,7 @@ AC_MSG_RESULT(---------------------------------------------)
 # library warnings - enable by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(warnings,
-              [AC_HELP_STRING([--enable-warnings],[Display warnings when using deprecated or experimental codes])],
+              [AC_HELP_STRING([--enable-warnings],[Warn when using deprecated, experimental, or questionable code])],
               enablewarnings=$enableval,
               enablewarnings=yes)
 
