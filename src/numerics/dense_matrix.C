@@ -171,7 +171,7 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T2>& A)
       for (unsigned int i=0; i<n_cols; ++i)
         for (unsigned int j=0; j<=i; ++j)
           for (unsigned int k=0; k<n_rows; ++k) // inner products are over n_rows
-	    (*this)(i,j) += B(k,i)*B(k,j);
+            (*this)(i,j) += B(k,i)*B(k,j);
 
       // Copy lower-triangular part into upper-triangular part
       for (unsigned int i=0; i<n_cols; ++i)
@@ -199,8 +199,8 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T2>& A)
       for (unsigned int i=0; i<m_s; i++)
         for (unsigned int k=0; k<p_s; k++)
           if (A.transpose(i,k) != 0.)
-	    for (unsigned int j=0; j<n_s; j++)
-	      (*this)(i,j) += A.transpose(i,k)*B(k,j);
+            for (unsigned int j=0; j<n_s; j++)
+              (*this)(i,j) += A.transpose(i,k)*B(k,j);
     }
 }
 

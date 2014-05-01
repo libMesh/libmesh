@@ -125,7 +125,7 @@ public:
    * \p dest := (*this) * \p arg.
    */
   void vector_mult(DenseVector<T>& dest,
-		   const DenseVector<T>& arg) const;
+                   const DenseVector<T>& arg) const;
 
   /**
    * Performs the matrix-vector multiplication,
@@ -134,7 +134,7 @@ public:
    */
   template <typename T2>
   void vector_mult(DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
-		   const DenseVector<T2>& arg) const;
+                   const DenseVector<T2>& arg) const;
 
   /**
    * Performs the matrix-vector multiplication,
