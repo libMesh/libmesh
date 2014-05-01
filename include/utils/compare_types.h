@@ -38,6 +38,19 @@ struct enable_if_c<false, T> {};
 }
 
 
+// TypesEqual takes two types as parameters.
+// If they are the exact same type, then TypesEqual::value is the boolean true,
+// otherwise TypesEqual::value is the boolean false.
+template <typename T1, typename T2>
+struct TypesEqual {
+  static const bool value = false;
+};
+
+template <typename T>
+struct TypesEqual<T,T> {
+  static const bool value = true;
+};
+
 
 // Complete list of scalar classes, needed for disambiguation
 template <typename T>

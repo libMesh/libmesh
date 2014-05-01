@@ -104,29 +104,77 @@ public:
   virtual void left_multiply (const DenseMatrixBase<T>& M2);
 
   /**
-   * Right multiplies by the matrix \p M3.
+   * Left multipliess by the matrix \p M2 of different type
    */
-  virtual void right_multiply (const DenseMatrixBase<T>& M3);
+  template <typename T2>
+  void left_multiply (const DenseMatrixBase<T2>& M2);
+
+  /**
+   * Right multiplies by the matrix \p M2.
+   */
+  virtual void right_multiply (const DenseMatrixBase<T>& M2);
+
+  /**
+   * Right multiplies by the matrix \p M2 of different type
+   */
+  template <typename T2>
+  void right_multiply (const DenseMatrixBase<T2>& M2);
 
   /**
    * Performs the matrix-vector multiplication,
    * \p dest := (*this) * \p arg.
    */
-  void vector_mult(DenseVector<T>& dest, const DenseVector<T>& arg) const;
+  void vector_mult(DenseVector<T>& dest,
+		   const DenseVector<T>& arg) const;
+
+  /**
+   * Performs the matrix-vector multiplication,
+   * \p dest := (*this) * \p arg
+   * on mixed types
+   */
+  template <typename T2>
+  void vector_mult(DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
+		   const DenseVector<T2>& arg) const;
 
   /**
    * Performs the matrix-vector multiplication,
    * \p dest := (*this)^T * \p arg.
    */
-  void vector_mult_transpose(DenseVector<T>& dest, const DenseVector<T>& arg) const;
+  void vector_mult_transpose
+    (DenseVector<T>& dest,
+     const DenseVector<T>& arg) const;
+
+  /**
+   * Performs the matrix-vector multiplication,
+   * \p dest := (*this)^T * \p arg.
+   * on mixed types
+   */
+  template <typename T2>
+  void vector_mult_transpose
+    (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
+     const DenseVector<T2>& arg) const;
 
   /**
    * Performs the scaled matrix-vector multiplication,
    * \p dest += \p factor * (*this) * \p arg.
    */
-  void vector_mult_add (DenseVector<T>& dest,
-                        const T factor,
-                        const DenseVector<T>& arg) const;
+  void vector_mult_add
+    (DenseVector<T>& dest,
+     const T factor,
+     const DenseVector<T>& arg) const;
+
+  /**
+   * Performs the scaled matrix-vector multiplication,
+   * \p dest += \p factor * (*this) * \p arg.
+   * on mixed types
+   */
+  template <typename T2, typename T3>
+  void vector_mult_add
+    (DenseVector<
+       typename CompareTypes<T,
+         typename CompareTypes<T2,T3>::supertype>::supertype>& dest,
+     const T2 factor,
+     const DenseVector<T3>& arg) const;
 
   /**
    * Put the \p sub_m x \p sub_n principal submatrix into \p dest.
@@ -253,11 +301,25 @@ public:
    */
   void left_multiply_transpose (const DenseMatrix<T>& A);
 
+  /**
+   * Left multiplies by the transpose of the matrix \p A of different
+   * type
+   */
+  template <typename T2>
+  void left_multiply_transpose (const DenseMatrix<T2>& A);
+
 
   /**
    * Right multiplies by the transpose of the matrix \p A
    */
   void right_multiply_transpose (const DenseMatrix<T>& A);
+
+  /**
+   * Right multiplies by the transpose of the matrix \p A of different
+   * type.
+   */
+  template <typename T2>
+  void right_multiply_transpose (const DenseMatrix<T2>& A);
 
   /**
    * @returns the \p (i,j) element of the transposed matrix.

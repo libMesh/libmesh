@@ -59,6 +59,27 @@ void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T>& M2)
 
 
 
+template<typename T>
+template<typename T2>
+void DenseMatrix<T>::left_multiply (const DenseMatrixBase<T2>& M2)
+{
+  // (*this) <- M2 * (*this)
+  // Where:
+  // (*this) = (m x n),
+  // M2      = (m x p),
+  // M3      = (p x n)
+
+  // M3 is a copy of *this before it gets resize()d
+  DenseMatrix<T> M3(*this);
+
+  // Resize *this so that the result can fit
+  this->resize (M2.m(), M3.n());
+
+  // Call the multiply function in the base class
+  this->multiply(*this, M2, M3);
+}
+
+
 
 template<typename T>
 void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
@@ -125,6 +146,63 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
 
 
 
+template<typename T>
+template<typename T2>
+void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T2>& A)
+{
+  //Check to see if we are doing (A^T)*A
+  if (this == &A)
+    {
+      //libmesh_here();
+      DenseMatrix<T> B(*this);
+
+      // Simple but inefficient way
+      // return this->left_multiply_transpose(B);
+
+      // More efficient, but more code way
+      // If A is mxn, the result will be a square matrix of Size n x n.
+      const unsigned int n_rows = A.m();
+      const unsigned int n_cols = A.n();
+
+      // resize() *this and also zero out all entries.
+      this->resize(n_cols,n_cols);
+
+      // Compute the lower-triangular part
+      for (unsigned int i=0; i<n_cols; ++i)
+        for (unsigned int j=0; j<=i; ++j)
+          for (unsigned int k=0; k<n_rows; ++k) // inner products are over n_rows
+	    (*this)(i,j) += B(k,i)*B(k,j);
+
+      // Copy lower-triangular part into upper-triangular part
+      for (unsigned int i=0; i<n_cols; ++i)
+        for (unsigned int j=i+1; j<n_cols; ++j)
+          (*this)(i,j) = (*this)(j,i);
+    }
+
+  else
+    {
+      DenseMatrix<T> B(*this);
+
+      this->resize (A.n(), B.n());
+
+      libmesh_assert_equal_to (A.m(), B.m());
+      libmesh_assert_equal_to (this->m(), A.n());
+      libmesh_assert_equal_to (this->n(), B.n());
+
+      const unsigned int m_s = A.n();
+      const unsigned int p_s = A.m();
+      const unsigned int n_s = this->n();
+
+      // Do it this way because there is a
+      // decent chance (at least for constraint matrices)
+      // that A.transpose(i,k) = 0.
+      for (unsigned int i=0; i<m_s; i++)
+        for (unsigned int k=0; k<p_s; k++)
+          if (A.transpose(i,k) != 0.)
+	    for (unsigned int j=0; j<n_s; j++)
+	      (*this)(i,j) += A.transpose(i,k)*B(k,j);
+    }
+}
 
 
 
@@ -149,6 +227,27 @@ void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T>& M3)
 
       this->multiply(*this, M2, M3);
     }
+}
+
+
+
+template<typename T>
+template<typename T2>
+void DenseMatrix<T>::right_multiply (const DenseMatrixBase<T2>& M3)
+{
+  // (*this) <- M3 * (*this)
+  // Where:
+  // (*this) = (m x n),
+  // M2      = (m x p),
+  // M3      = (p x n)
+
+  // M2 is a copy of *this before it gets resize()d
+  DenseMatrix<T> M2(*this);
+
+  // Resize *this so that the result can fit
+  this->resize (M2.m(), M3.n());
+
+  this->multiply(*this, M2, M3);
 }
 
 
@@ -219,8 +318,70 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
 
 
 template<typename T>
-void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
-                                  const DenseVector<T>& arg) const
+template<typename T2>
+void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T2>& B)
+{
+  //Check to see if we are doing B*(B^T)
+  if (this == &B)
+    {
+      //libmesh_here();
+      DenseMatrix<T> A(*this);
+
+      // Simple but inefficient way
+      // return this->right_multiply_transpose(A);
+
+      // More efficient, more code
+      // If B is mxn, the result will be a square matrix of Size m x m.
+      const unsigned int n_rows = B.m();
+      const unsigned int n_cols = B.n();
+
+      // resize() *this and also zero out all entries.
+      this->resize(n_rows,n_rows);
+
+      // Compute the lower-triangular part
+      for (unsigned int i=0; i<n_rows; ++i)
+        for (unsigned int j=0; j<=i; ++j)
+          for (unsigned int k=0; k<n_cols; ++k) // inner products are over n_cols
+            (*this)(i,j) += A(i,k)*A(j,k);
+
+      // Copy lower-triangular part into upper-triangular part
+      for (unsigned int i=0; i<n_rows; ++i)
+        for (unsigned int j=i+1; j<n_rows; ++j)
+          (*this)(i,j) = (*this)(j,i);
+    }
+
+  else
+    {
+      DenseMatrix<T> A(*this);
+
+      this->resize (A.m(), B.m());
+
+      libmesh_assert_equal_to (A.n(), B.n());
+      libmesh_assert_equal_to (this->m(), A.m());
+      libmesh_assert_equal_to (this->n(), B.m());
+
+      const unsigned int m_s = A.m();
+      const unsigned int p_s = A.n();
+      const unsigned int n_s = this->n();
+
+      // Do it this way because there is a
+      // decent chance (at least for constraint matrices)
+      // that B.transpose(k,j) = 0.
+      for (unsigned int j=0; j<n_s; j++)
+        for (unsigned int k=0; k<p_s; k++)
+          if (B.transpose(k,j) != 0.)
+            for (unsigned int i=0; i<m_s; i++)
+              (*this)(i,j) += A(i,k)*B.transpose(k,j);
+    }
+}
+
+
+
+
+template<typename T>
+void DenseMatrix<T>::vector_mult
+  (DenseVector<T>& dest,
+   const DenseVector<T>& arg) const
 {
   // Make sure the input sizes are compatible
   libmesh_assert_equal_to (this->n(), arg.size());
@@ -248,10 +409,37 @@ void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
 
 
 
+template<typename T>
+template<typename T2>
+void DenseMatrix<T>::vector_mult
+  (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
+   const DenseVector<T2>& arg) const
+{
+  // Make sure the input sizes are compatible
+  libmesh_assert_equal_to (this->n(), arg.size());
+
+  // Resize and clear dest.
+  // Note: DenseVector::resize() also zeros the vector.
+  dest.resize(this->m());
+
+  // Short-circuit if the matrix is empty
+  if(this->m() == 0 || this->n() == 0)
+    return;
+
+  const unsigned int n_rows = this->m();
+  const unsigned int n_cols = this->n();
+
+  for(unsigned int i=0; i<n_rows; i++)
+    for(unsigned int j=0; j<n_cols; j++)
+      dest(i) += (*this)(i,j)*arg(j);
+}
+
+
 
 template<typename T>
-void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest,
-                                            const DenseVector<T>& arg) const
+void DenseMatrix<T>::vector_mult_transpose
+  (DenseVector<T>& dest,
+   const DenseVector<T>& arg) const
 {
   // Make sure the input sizes are compatible
   libmesh_assert_equal_to (this->m(), arg.size());
@@ -288,9 +476,43 @@ void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest,
 
 
 template<typename T>
-void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest,
-                                      const T factor,
-                                      const DenseVector<T>& arg) const
+template<typename T2>
+void DenseMatrix<T>::vector_mult_transpose
+  (DenseVector<typename CompareTypes<T,T2>::supertype>& dest,
+   const DenseVector<T2>& arg) const
+{
+  // Make sure the input sizes are compatible
+  libmesh_assert_equal_to (this->m(), arg.size());
+
+  // Resize and clear dest.
+  // Note: DenseVector::resize() also zeros the vector.
+  dest.resize(this->n());
+
+  // Short-circuit if the matrix is empty
+  if(this->m() == 0)
+    return;
+
+  const unsigned int n_rows = this->m();
+  const unsigned int n_cols = this->n();
+
+  // WORKS
+  // for(unsigned int j=0; j<n_cols; j++)
+  //   for(unsigned int i=0; i<n_rows; i++)
+  //     dest(j) += (*this)(i,j)*arg(i);
+
+  // ALSO WORKS, (i,j) just swapped
+  for(unsigned int i=0; i<n_cols; i++)
+    for(unsigned int j=0; j<n_rows; j++)
+      dest(i) += (*this)(j,i)*arg(j);
+}
+
+
+
+template<typename T>
+void DenseMatrix<T>::vector_mult_add
+  (DenseVector<T>& dest,
+   const T factor,
+   const DenseVector<T>& arg) const
 {
   // Short-circuit if the matrix is empty
   if(this->m() == 0)
@@ -307,6 +529,30 @@ void DenseMatrix<T>::vector_mult_add (DenseVector<T>& dest,
       this->vector_mult(temp, arg);
       dest.add(factor, temp);
     }
+}
+
+
+
+template<typename T>
+template<typename T2, typename T3>
+void DenseMatrix<T>::vector_mult_add
+  (DenseVector<
+     typename CompareTypes<T,
+       typename CompareTypes<T2,T3>::supertype>::supertype>& dest,
+   const T2 factor,
+   const DenseVector<T3>& arg) const
+{
+  // Short-circuit if the matrix is empty
+  if(this->m() == 0)
+  {
+    dest.resize(0);
+    return;
+  }
+
+  DenseVector<typename CompareTypes<T,T3>::supertype>
+    temp(arg.size());
+  this->vector_mult(temp, arg);
+  dest.add(factor, temp);
 }
 
 
@@ -806,16 +1052,61 @@ void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
 
 //--------------------------------------------------------------
 // Explicit instantiations
+#define LIBMESH_VMA_INSTANTIATE(T1,T2,T3) \
+template void DenseMatrix<T1>::vector_mult_add \
+  (DenseVector< \
+     typename CompareTypes<T2, \
+       typename CompareTypes<T2,T3>::supertype>::supertype>& dest, \
+   const T2 factor, \
+   const DenseVector<T3>& arg) const \
+
 template class DenseMatrix<Real>;
 template void DenseMatrix<Real>::cholesky_solve(const DenseVector<Real>&, DenseVector<Real>&);
 template void DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<Real>&, DenseVector<Real>&) const;
 template void DenseMatrix<Real>::cholesky_solve(const DenseVector<Complex>&, DenseVector<Complex>&);
 template void DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<Complex>&, DenseVector<Complex>&) const;
+LIBMESH_VMA_INSTANTIATE(Real,int,Real);
+#ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
+LIBMESH_VMA_INSTANTIATE(Real,float,Real);
+#endif
+#ifndef LIBMESH_DEFAULT_DOUBLE_PRECISION
+LIBMESH_VMA_INSTANTIATE(Real,double,Real);
+#endif
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseMatrix<Complex>;
 template void DenseMatrix<Complex>::cholesky_solve(const DenseVector<Complex>&,DenseVector<Complex>&);
 template void DenseMatrix<Complex>::_cholesky_back_substitute(const DenseVector<Complex>&, DenseVector<Complex>&) const;
+template void DenseMatrix<Real>::vector_mult
+  (DenseVector<typename CompareTypes<Real,Complex>::supertype>& dest,
+   const DenseVector<Complex>& arg) const;
+template void DenseMatrix<Real>::vector_mult_transpose
+  (DenseVector<typename CompareTypes<Real,Complex>::supertype>& dest,
+   const DenseVector<Complex>& arg) const;
+LIBMESH_VMA_INSTANTIATE(Real,int,Complex);
+LIBMESH_VMA_INSTANTIATE(Complex,int,Complex);
+LIBMESH_VMA_INSTANTIATE(Complex,int,Real);
+LIBMESH_VMA_INSTANTIATE(Real,std::complex<int>,Complex);
+LIBMESH_VMA_INSTANTIATE(Complex,std::complex<int>,Complex);
+LIBMESH_VMA_INSTANTIATE(Complex,std::complex<int>,Real);
+
+LIBMESH_VMA_INSTANTIATE(Real,float,Complex);
+LIBMESH_VMA_INSTANTIATE(Complex,float,Complex);
+LIBMESH_VMA_INSTANTIATE(Complex,float,Real);
+LIBMESH_VMA_INSTANTIATE(Real,std::complex<float>,Complex);
+#ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
+LIBMESH_VMA_INSTANTIATE(Complex,std::complex<float>,Complex);
+#endif
+LIBMESH_VMA_INSTANTIATE(Complex,std::complex<float>,Real);
+
+LIBMESH_VMA_INSTANTIATE(Real,double,Complex);
+LIBMESH_VMA_INSTANTIATE(Complex,double,Complex);
+LIBMESH_VMA_INSTANTIATE(Complex,double,Real);
+LIBMESH_VMA_INSTANTIATE(Real,std::complex<double>,Complex);
+#ifndef LIBMESH_DEFAULT_DOUBLE_PRECISION
+LIBMESH_VMA_INSTANTIATE(Complex,std::complex<double>,Complex);
+#endif
+LIBMESH_VMA_INSTANTIATE(Complex,std::complex<double>,Real);
 #endif
 
 } // namespace libMesh

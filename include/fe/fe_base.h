@@ -21,16 +21,17 @@
 #define LIBMESH_FE_BASE_H
 
 // Local includes
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/fe_abstract.h"
-#include "libmesh/point.h"
-#include "libmesh/vector_value.h"
-#include "libmesh/enum_elem_type.h"
-#include "libmesh/fe_type.h"
 #include "libmesh/auto_ptr.h"
+#include "libmesh/compare_types.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/fe_abstract.h"
 #include "libmesh/fe_transformation_base.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/point.h"
+#include "libmesh/reference_counted_object.h"
 #include "libmesh/tensor_tools.h"
 #include "libmesh/type_n_tensor.h"
+#include "libmesh/vector_value.h"
 
 // C++ includes
 #include <cstddef>
@@ -66,20 +67,6 @@ class PointLocatorBase;
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 class InfFE;
 #endif
-
-// TypesEqual takes two types as parameters.
-// If they are the exact same type, then TypesEqual::value is the boolean true,
-// otherwise TypesEqual::value is the boolean false.
-// FIXME: Need to put this in a common place
-template <typename T1, typename T2>
-struct TypesEqual {
-  static const bool value = false;
-};
-
-template <typename T>
-struct TypesEqual<T,T> {
-  static const bool value = true;
-};
 
 /**
  * This class forms the foundation from which generic finite
