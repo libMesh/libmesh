@@ -97,8 +97,7 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--enable-exodus");
 #endif
 
-  // The example sparsity augmentation code needs more work to be
-  // Laspack-compatible
+  // The sparsity augmentation code requires PETSc
   libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // Skip this 3D example if libMesh was compiled as 1D or 2D-only.
