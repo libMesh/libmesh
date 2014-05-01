@@ -1055,7 +1055,7 @@ void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
 #define LIBMESH_VMA_INSTANTIATE(T1,T2,T3) \
 template void DenseMatrix<T1>::vector_mult_add \
   (DenseVector< \
-     typename CompareTypes<T2, \
+     typename CompareTypes<T1, \
        typename CompareTypes<T2,T3>::supertype>::supertype>& dest, \
    const T2 factor, \
    const DenseVector<T3>& arg) const \
