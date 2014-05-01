@@ -34,7 +34,7 @@ int FunctionParserADBase<Value_t>::OpcodeSize(unsigned op)
       // these opcode takes one argument off the stack
       case cInv: case cNeg:
       case cSqr: case cAbs:
-      case cSqrt: case cRSqrt:
+      case cSqrt: case cRSqrt: case cCbrt:
       case cExp: case cExp2:
       case cLog: case cLog2: case cLog10:
       case cSin: case cCos: case cTan:
@@ -46,16 +46,7 @@ int FunctionParserADBase<Value_t>::OpcodeSize(unsigned op)
       case cAdd: case cSub: case cRSub:
       case cMul: case cDiv: case cRDiv:
       case cPow: case cHypot:
-#ifdef FP_SUPPORT_OPTIMIZER
-      case cLog2by:
-#endif
         return 2;
-
-      // these opcodes effectively take nothing off the stack (but put one value on there)
-#ifdef FP_SUPPORT_OPTIMIZER
-      case cNop:
-        return 0;
-#endif
 
       default:
         std::cerr << cDup<< " Unhandled opcode " << op << std::endl;;
@@ -369,6 +360,32 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       outer.push_back(OpcodeDataPair(cDiv, 0));
       return outer;
 
+    case cRSqrt :
+      // -da/(2*a^(3/2)))
+      prog_da = DiffFunction(prog_a);
+      outer = prog_da;
+      outer.push_back(OpcodeDataPair(cImmed, Value_t(2)));
+      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+      outer.push_back(OpcodeDataPair(cImmed, Value_t(3)));
+      outer.push_back(OpcodeDataPair(cPow, 0));
+      outer.push_back(OpcodeDataPair(cSqrt, 0));
+      outer.push_back(OpcodeDataPair(cMul, 0));
+      outer.push_back(OpcodeDataPair(cDiv, 0));
+      outer.push_back(OpcodeDataPair(cNeg, 0));
+      return outer;
+
+    case cCbrt :
+      // da/(3*a^(2/3))
+      prog_da = DiffFunction(prog_a);
+      outer = prog_da;
+      outer.push_back(OpcodeDataPair(cImmed, Value_t(3)));
+      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
+      outer.push_back(OpcodeDataPair(cCbrt, 0));
+      outer.push_back(OpcodeDataPair(cSqr, 0));
+      outer.push_back(OpcodeDataPair(cMul, 0));
+      outer.push_back(OpcodeDataPair(cDiv, 0));
+      return outer;
+
     case cAbs:
       // da*a/|a|
       prog_da = DiffFunction(prog_a);
@@ -406,24 +423,6 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       // FP could not deal with them in a useful way in any case)
       outer.push_back(OpcodeDataPair(cImmed, Value_t(0)));
       return outer;
-
-#ifdef FP_SUPPORT_OPTIMIZER
-    case cLog2by:
-      // (db*ln(a) + b*da/a)/ln(2)
-      prog_da = DiffFunction(prog_a);
-      prog_db = DiffFunction(prog_b);
-      outer = prog_db;
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodeDataPair(cLog, 0));
-      outer.insert(outer.end(), prog_b.begin(), prog_b.end());
-      outer.insert(outer.end(), prog_da.begin(), prog_da.end());
-      outer.push_back(OpcodeDataPair(cMul, 0));
-      outer.insert(outer.end(), prog_a.begin(), prog_a.end());
-      outer.push_back(OpcodeDataPair(cDiv, 0));
-      outer.push_back(OpcodeDataPair(cImmed, std::log(Value_t(2))));
-      outer.push_back(OpcodeDataPair(cDiv, 0));
-      return outer;
-#endif
   }
 
   //outer.insert( v1.end(), v2.begin(), v2.end() );

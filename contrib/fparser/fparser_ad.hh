@@ -10,9 +10,11 @@ public:
   FunctionParserADBase();
   FunctionParserADBase(const FunctionParserADBase& cpy);
 
+  /**
+   * auto-differentiate for var
+   */
   int AutoDiff(const std::string& var);
 
-  int UnDup();
 protected:
   /**
    * A list of opcodes and immediate values
