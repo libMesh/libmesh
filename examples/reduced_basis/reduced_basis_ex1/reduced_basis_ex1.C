@@ -74,8 +74,9 @@ int main (int argc, char** argv)
   // XDR binary support requires double precision
   libmesh_example_assert(false, "--disable-singleprecision");
 #endif
-  // FIXME: This example currently segfaults with Trilinos?
-  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+  // FIXME: This example currently segfaults with Trilinos?  It works
+  // with PETSc and Eigen sparse linear solvers though.
+  libmesh_example_assert(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
