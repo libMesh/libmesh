@@ -68,6 +68,12 @@ int main (int argc, char** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
 
+  // This example NaNs with the Eigen sparse linear solvers and
+  // Trilinos solvers, but should work OK with either PETSc or
+  // Laspack.
+  libmesh_example_assert(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc or --enable-laspack");
+  libmesh_example_assert(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc or --enable-laspack");
+
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
   Mesh mesh(init.comm());
