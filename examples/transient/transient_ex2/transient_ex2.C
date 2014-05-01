@@ -127,9 +127,10 @@ int main (int argc, char** argv)
 
     }
 
-  // LasPack solvers don't work so well for this example, Trilinos doesn't work at all,
-  // Eigen has not yet been tested...
-  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+  // LasPack solvers don't work so well for this example, Trilinos doesn't work at all.
+  // PETSc and Eigen both work...
+  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS || \
+                         libMesh::default_solver_package() == EIGEN_SOLVERS, "--enable-petsc");
 
   // Get the name of the mesh file
   // from the command line.
