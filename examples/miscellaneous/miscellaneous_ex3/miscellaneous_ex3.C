@@ -392,20 +392,11 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
 #if !defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_HAVE_TRILINOS)
-  if (init.comm().rank() == 0)
-    std::cerr << "ERROR: This example requires libMesh to be\n"
-              << "compiled with nonlinear solver support from\n"
-              << "PETSc or Trilinos!"
-              << std::endl;
-  return 0;
+  libmesh_example_assert(false, "--enable-petsc or --enable-trilinos");
 #endif
 
 #ifndef LIBMESH_ENABLE_AMR
-  if (init.comm().rank() == 0)
-    std::cerr << "ERROR: This example requires libMesh to be\n"
-              << "compiled with AMR support!"
-              << std::endl;
-  return 0;
+  libmesh_example_assert(false, "--enable-amr");
 #else
 
   // Create a GetPot object to parse the command line
