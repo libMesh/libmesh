@@ -244,10 +244,10 @@ int main (int argc, char** argv)
 {
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
   // Skip this 2D example if libMesh was compiled as 1D-only.
-  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Initialize libMesh.
   LibMeshInit init (argc, argv);

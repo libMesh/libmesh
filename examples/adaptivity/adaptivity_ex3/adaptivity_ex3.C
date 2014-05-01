@@ -114,7 +114,7 @@ int main(int argc, char** argv)
 
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
 
   // Parse the input file
@@ -142,7 +142,7 @@ int main(int argc, char** argv)
   singularity = input_file("singularity", true);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
-  libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
+  libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
   // Output file for plotting the error as a function of
   // the number of degrees of freedom.

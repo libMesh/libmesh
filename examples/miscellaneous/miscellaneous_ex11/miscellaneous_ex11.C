@@ -76,21 +76,21 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
   // Skip this 3D example if libMesh was compiled as 1D/2D-only.
-  libmesh_example_assert (3 == LIBMESH_DIM, "3D support");
+  libmesh_example_requires (3 == LIBMESH_DIM, "3D support");
 
   // Skip this example without --enable-node-valence
 #ifndef LIBMESH_ENABLE_NODE_VALENCE
-  libmesh_example_assert (false, "--enable-node-valence");
+  libmesh_example_requires (false, "--enable-node-valence");
 #endif
 
   // Skip this example without --enable-amr; requires MeshRefinement
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
 
   // Skip this example without --enable-second; requires d2phi
 #ifndef LIBMESH_ENABLE_SECOND
-  libmesh_example_assert(false, "--enable-second");
+  libmesh_example_requires(false, "--enable-second");
 #else
 
   // Create a 2D mesh distributed across the default MPI communicator.

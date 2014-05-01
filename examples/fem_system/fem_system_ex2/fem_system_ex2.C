@@ -141,11 +141,11 @@ int main(int argc, char** argv)
 
   // Skip this example if we do not meet certain requirements
 #ifndef LIBMESH_HAVE_VTK
-  libmesh_example_assert(false, "--enable-vtk");
+  libmesh_example_requires(false, "--enable-vtk");
 #endif
 
   // Trilinos gives us an inverted element on this one...
-  libmesh_example_assert(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
+  libmesh_example_requires(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
 
   // Threaded assembly doesn't currently work with the moving mesh
   // code.
@@ -162,7 +162,7 @@ int main(int argc, char** argv)
 
   // Create System and Mesh
   int dim = args("mesh/generation/dimension", 3);
-  libmesh_example_assert(dim <= LIBMESH_DIM, "3D support");
+  libmesh_example_requires(dim <= LIBMESH_DIM, "3D support");
 
   // Create a mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm(), dim);

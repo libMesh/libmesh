@@ -116,17 +116,17 @@ int main(int argc, char** argv)
   // Adaptive constraint calculations for fine Hermite elements seems
   // to require half-decent precision
 #ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
-  libmesh_example_assert(false, "double precision");
+  libmesh_example_requires(false, "double precision");
 #endif
 
   // This example requires Adaptive Mesh Refinement support
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
 
   // This example requires second derivative calculation support
 #ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  libmesh_example_assert(false, "--enable-second");
+  libmesh_example_requires(false, "--enable-second");
 #else
 
   // Parse the input file
@@ -149,7 +149,7 @@ int main(int argc, char** argv)
     input_file("max_linear_iterations", 10000);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
-  libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
+  libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
   // We have only defined 2 and 3 dimensional problems
   libmesh_assert (dim == 2 || dim == 3);

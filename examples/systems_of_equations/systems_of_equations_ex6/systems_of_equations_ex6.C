@@ -100,7 +100,7 @@ int main (int argc, char** argv)
   const unsigned int dim = 3;
 
   // Make sure libMesh was compiled for 3D
-  libmesh_example_assert(dim == LIBMESH_DIM, "3D support");
+  libmesh_example_requires(dim == LIBMESH_DIM, "3D support");
 
   // Create a 3D mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm(), dim);

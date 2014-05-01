@@ -116,7 +116,7 @@ int main (int argc, char** argv)
 
   // This example is designed for complex numbers.
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
-  libmesh_example_assert(false, "--enable-complex");
+  libmesh_example_requires(false, "--enable-complex");
 #else
 
   // Check for proper usage.
@@ -156,7 +156,7 @@ int main (int argc, char** argv)
   const unsigned int n_frequencies = 3;
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
-  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.

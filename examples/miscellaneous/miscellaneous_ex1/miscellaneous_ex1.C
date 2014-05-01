@@ -86,11 +86,11 @@ int main (int argc, char** argv)
 
   // This example requires Infinite Elements
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  libmesh_example_assert(false, "--enable-ifem");
+  libmesh_example_requires(false, "--enable-ifem");
 #else
 
   // Skip this 3D example if libMesh was compiled as 1D/2D-only.
-  libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
+  libmesh_example_requires(3 <= LIBMESH_DIM, "3D support");
 
   // Tell the user what we are doing.
   std::cout << "Running ex6 with dim = 3" << std::endl << std::endl;

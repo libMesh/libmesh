@@ -98,11 +98,11 @@ int main (int argc, char** argv)
 
   // Only our PETSc interface currently supports solves restricted to
   // subdomains
-  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
 
   // Declare a performance log for the main program
@@ -146,7 +146,7 @@ int main (int argc, char** argv)
     dim = command_line.next(dim);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
-  libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
+  libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
   // Create a mesh with user-defined dimension.
   // Read number of elements from command line

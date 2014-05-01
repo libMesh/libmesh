@@ -53,17 +53,17 @@ int main (int argc, char** argv)
 
   // This example fails without at least double precision FP
 #ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
-  libmesh_example_assert(false, "--disable-singleprecision");
+  libmesh_example_requires(false, "--disable-singleprecision");
 #endif
 
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
 
   // Trilinos and Eigen solvers NaN by default here.
   // We'll skip this example for now.
-  libmesh_example_assert(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
-  libmesh_example_assert(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
+  libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
+  libmesh_example_requires(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
 
   // Parse the input file
   GetPot infile("fem_system_ex1.in");
@@ -84,7 +84,7 @@ int main (int argc, char** argv)
 #endif
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
-  libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
+  libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
   // We have only defined 2 and 3 dimensional problems
   libmesh_assert (dim == 2 || dim == 3);

@@ -152,7 +152,7 @@ int main (int argc, char** argv)
   quad_type = static_cast<QuadratureType>(std::atoi(argv[2]));
 
   // Skip this 3D example if libMesh was compiled as 1D-only.
-  libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
+  libmesh_example_requires(3 <= LIBMESH_DIM, "3D support");
 
   // The following is identical to example 4, and therefore
   // not commented.  Differences are mentioned when present.

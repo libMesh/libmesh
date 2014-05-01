@@ -704,11 +704,11 @@ int main (int argc, char** argv)
 
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
 
   // This doesn't converge with Eigen BICGSTAB for some reason...
-  libmesh_example_assert(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
+  libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
 
   std::cout << "Started " << argv[0] << std::endl;
 
@@ -731,7 +731,7 @@ int main (int argc, char** argv)
   param.read(infile);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
-  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Create a mesh with the given dimension, distributed
   // across the default MPI communicator.

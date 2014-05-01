@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
 
   // Create a mesh, with dimension to be overridden later, on the

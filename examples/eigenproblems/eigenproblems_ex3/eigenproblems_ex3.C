@@ -87,7 +87,7 @@ int main (int argc, char** argv)
 
   // This example uses an ExodusII input file
 #ifndef LIBMESH_HAVE_EXODUS_API
-  libmesh_example_assert(false, "--enable-exodus");
+  libmesh_example_requires(false, "--enable-exodus");
 #endif
 
   // This example is designed for the SLEPc eigen solver interface.
@@ -102,13 +102,13 @@ int main (int argc, char** argv)
 
 #ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
   // SLEPc currently gives us a nasty crash with Real==float
-  libmesh_example_assert(false, "--disable-singleprecision");
+  libmesh_example_requires(false, "--disable-singleprecision");
 #endif
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   // SLEPc currently gives us an "inner product not well defined" with
   // Number==complex
-  libmesh_example_assert(false, "--disable-complex");
+  libmesh_example_requires(false, "--disable-complex");
 #endif
 
   // Tell the user what we are doing.
@@ -122,7 +122,7 @@ int main (int argc, char** argv)
   }
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
-  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Use GetPot to parse the command line arguments
   GetPot command_line (argc, argv);

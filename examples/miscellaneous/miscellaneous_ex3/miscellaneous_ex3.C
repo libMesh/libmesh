@@ -392,11 +392,11 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
 #if !defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_HAVE_TRILINOS)
-  libmesh_example_assert(false, "--enable-petsc or --enable-trilinos");
+  libmesh_example_requires(false, "--enable-petsc or --enable-trilinos");
 #endif
 
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
 
   // Create a GetPot object to parse the command line
@@ -464,7 +464,7 @@ int main (int argc, char** argv)
     }
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
-  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Create a mesh, with dimension to be overridden by the file,
   // distributed across the default MPI communicator.

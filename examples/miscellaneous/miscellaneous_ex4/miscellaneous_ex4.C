@@ -88,9 +88,9 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
 #if !defined(LIBMESH_ENABLE_AMR)
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
-  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // Brief message to the user regarding the program name
   // and command line arguments.
@@ -103,7 +103,7 @@ int main (int argc, char** argv)
   std::cout << std::endl << std::endl;
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
-  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.

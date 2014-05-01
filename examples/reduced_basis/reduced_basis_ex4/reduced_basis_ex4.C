@@ -50,14 +50,14 @@ int main (int argc, char** argv)
 
 #if !defined(LIBMESH_HAVE_XDR)
   // We need XDR support to write out reduced bases
-  libmesh_example_assert(false, "--enable-xdr");
+  libmesh_example_requires(false, "--enable-xdr");
 #elif defined(LIBMESH_DEFAULT_SINGLE_PRECISION)
   // XDR binary support requires double precision
-  libmesh_example_assert(false, "--disable-singleprecision");
+  libmesh_example_requires(false, "--disable-singleprecision");
 #endif
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
-  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Define the names of the input files we will read the problem properties from
   std::string eim_parameters = "eim.in";

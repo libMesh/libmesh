@@ -129,8 +129,8 @@ int main (int argc, char** argv)
 
   // LasPack solvers don't work so well for this example, Trilinos doesn't work at all.
   // PETSc and Eigen both work...
-  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS || \
-                         libMesh::default_solver_package() == EIGEN_SOLVERS, "--enable-petsc");
+  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS || \
+                           libMesh::default_solver_package() == EIGEN_SOLVERS, "--enable-petsc");
 
   // Get the name of the mesh file
   // from the command line.
@@ -138,7 +138,7 @@ int main (int argc, char** argv)
   std::cout << "Mesh file is: " << mesh_file << std::endl;
 
   // Skip this 3D example if libMesh was compiled as 1D or 2D-only.
-  libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
+  libmesh_example_requires(3 <= LIBMESH_DIM, "3D support");
 
   // Create a mesh.
   // This example directly references all mesh nodes and is

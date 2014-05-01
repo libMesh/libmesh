@@ -399,8 +399,8 @@ extern OStreamProxy err;
     LIBMESH_THROW(libMesh::ConvergenceFailure());       \
   } while(0)
 
-// The libmesh_example_assert() macro prints a message and calls
-// "return 0;" if the assertion specified by the macro is not true.  This
+// The libmesh_example_requires() macro prints a message and calls
+// "return 77;" if the condition specified by the macro is not true.  This
 // macro is used in the example executables, which should run when the
 // configure-time libMesh options support them but which should exit
 // without failure otherwise.
@@ -409,13 +409,13 @@ extern OStreamProxy err;
 // "return" from main to immediately exit successfully - std::exit()
 // gets seen by at least some MPI stacks as failure.
 //
-// We now return 77, the automake code for a skipped test.
+// 77 is the automake code for a skipped test.
 
-#define libmesh_example_assert(asserted, requirement)                   \
+#define libmesh_example_requires(condition, option)                     \
   do {                                                                  \
-    if (!(asserted)) {                                                  \
-      libMesh::out << "Assertion `" #asserted "' failed.  Configuring libMesh with " requirement " may be required to run this code." << std::endl; \
-      return 77;                                                        \
+    if (!(condition)) {                                                 \
+      libMesh::out << "Configuring libMesh with " #option " is required to run this example." << std::endl; \
+        return 77;                                                      \
     } } while(0)
 
 // libmesh_cast_ref and libmesh_cast_ptr do a dynamic cast and assert

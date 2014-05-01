@@ -70,24 +70,24 @@ int main (int argc, char** argv)
 
   // This example requires SLEPc and GLPK
 #if !defined(LIBMESH_HAVE_SLEPC) || !defined(LIBMESH_HAVE_GLPK)
-  libmesh_example_assert(false, "--enable-slepc --enable-glpk");
+  libmesh_example_requires(false, "--enable-slepc --enable-glpk");
 #else
 
 #if !defined(LIBMESH_HAVE_XDR)
   // We need XDR support to write out reduced bases
-  libmesh_example_assert(false, "--enable-xdr");
+  libmesh_example_requires(false, "--enable-xdr");
 #elif defined(LIBMESH_DEFAULT_SINGLE_PRECISION)
   // XDR binary support requires double precision
-  libmesh_example_assert(false, "--disable-singleprecision");
+  libmesh_example_requires(false, "--disable-singleprecision");
 #endif
   // FIXME: This example currently segfaults with Trilinos?
-  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // FIXME: This example needs lapack, which is serial only
-  libmesh_example_assert(init.comm().size() == 1, "mpirun -np 1");
+  libmesh_example_requires(init.comm().size() == 1, "mpirun -np 1");
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
-  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Parse the input file (reduced_basis_ex2.in) using GetPot
   std::string parameters_filename = "reduced_basis_ex2.in";

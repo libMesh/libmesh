@@ -74,7 +74,7 @@ Biharmonic::JR::JR(EquationSystems& eqSys,
 
   // Adaptivity stuff is commented out for now...
   // #ifndef   LIBMESH_ENABLE_AMR
-  //   libmesh_example_assert(false, "--enable-amr");
+  //   libmesh_example_requires(false, "--enable-amr");
   // #else
   //   // In case we ever get around to doing mesh refinement.
   //   _biharmonic._meshRefinement = new MeshRefinement(_mesh);

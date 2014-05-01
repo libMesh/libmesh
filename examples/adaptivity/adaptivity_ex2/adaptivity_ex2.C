@@ -114,12 +114,12 @@ int main (int argc, char** argv)
   LibMeshInit init (argc, argv);
 
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
 
   // Our Trilinos interface does not yet support adaptive transient
   // problems
-  libmesh_example_assert(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
+  libmesh_example_requires(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
 
   // Brief message to the user regarding the program name
   // and command line arguments.
@@ -188,7 +188,7 @@ int main (int argc, char** argv)
 
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
-  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Create a new mesh on the default MPI communicator.
   // We still need some work on automatic parallel restarts with

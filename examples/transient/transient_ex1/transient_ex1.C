@@ -107,11 +107,11 @@ int main (int argc, char** argv)
   // it only refines uniformly, the refinement code used is the same
   // underneath
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
-  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Read the mesh from file.  This is the coarse mesh that will be used
   // in example 10 to demonstrate adaptive mesh refinement.  Here we will

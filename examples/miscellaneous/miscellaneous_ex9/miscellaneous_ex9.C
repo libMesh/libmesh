@@ -94,14 +94,14 @@ int main (int argc, char** argv)
 
   // This example uses an ExodusII input file
 #ifndef LIBMESH_HAVE_EXODUS_API
-  libmesh_example_assert(false, "--enable-exodus");
+  libmesh_example_requires(false, "--enable-exodus");
 #endif
 
   // The sparsity augmentation code requires PETSc
-  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // Skip this 3D example if libMesh was compiled as 1D or 2D-only.
-  libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
+  libmesh_example_requires(3 <= LIBMESH_DIM, "3D support");
 
   GetPot command_line (argc, argv);
 

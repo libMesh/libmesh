@@ -96,7 +96,7 @@ int main (int argc, char** argv)
   const unsigned int dim = 3;
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
-  libmesh_example_assert(dim <= LIBMESH_DIM, "3D support");
+  libmesh_example_requires(dim <= LIBMESH_DIM, "3D support");
 
   // Read number of elements used in each cube from command line
   int ps = 10;

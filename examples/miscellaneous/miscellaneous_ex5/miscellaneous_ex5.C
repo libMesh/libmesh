@@ -455,7 +455,7 @@ int main (int argc, char** argv)
 
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
-  libmesh_example_assert(false, "--enable-amr");
+  libmesh_example_requires(false, "--enable-amr");
 #else
 
   //Parse the input file
@@ -475,7 +475,7 @@ int main (int argc, char** argv)
   const unsigned int dim                       = input_file("dimension", 3);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
-  libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
+  libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
 
   // Create a mesh, with dimension to be overridden later, distributed
