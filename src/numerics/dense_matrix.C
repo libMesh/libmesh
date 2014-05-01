@@ -1055,8 +1055,8 @@ void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
 #define LIBMESH_VMA_INSTANTIATE(T1,T2,T3) \
 template void DenseMatrix<T1>::vector_mult_add \
   (DenseVector< \
-     typename CompareTypes<T1, \
-       typename CompareTypes<T2,T3>::supertype>::supertype>& dest, \
+     CompareTypes<T1, \
+       CompareTypes<T2,T3>::supertype>::supertype>& dest, \
    const T2 factor, \
    const DenseVector<T3>& arg) const \
 
@@ -1078,10 +1078,10 @@ template class DenseMatrix<Complex>;
 template void DenseMatrix<Complex>::cholesky_solve(const DenseVector<Complex>&,DenseVector<Complex>&);
 template void DenseMatrix<Complex>::_cholesky_back_substitute(const DenseVector<Complex>&, DenseVector<Complex>&) const;
 template void DenseMatrix<Real>::vector_mult
-  (DenseVector<typename CompareTypes<Real,Complex>::supertype>& dest,
+  (DenseVector<CompareTypes<Real,Complex>::supertype>& dest,
    const DenseVector<Complex>& arg) const;
 template void DenseMatrix<Real>::vector_mult_transpose
-  (DenseVector<typename CompareTypes<Real,Complex>::supertype>& dest,
+  (DenseVector<CompareTypes<Real,Complex>::supertype>& dest,
    const DenseVector<Complex>& arg) const;
 LIBMESH_VMA_INSTANTIATE(Real,int,Complex);
 LIBMESH_VMA_INSTANTIATE(Complex,int,Complex);
