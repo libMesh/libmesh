@@ -1086,9 +1086,11 @@ template void DenseMatrix<Real>::vector_mult_transpose
 LIBMESH_VMA_INSTANTIATE(Real,int,Complex);
 LIBMESH_VMA_INSTANTIATE(Complex,int,Complex);
 LIBMESH_VMA_INSTANTIATE(Complex,int,Real);
-LIBMESH_VMA_INSTANTIATE(Real,std::complex<int>,Complex);
-LIBMESH_VMA_INSTANTIATE(Complex,std::complex<int>,Complex);
-LIBMESH_VMA_INSTANTIATE(Complex,std::complex<int>,Real);
+
+// complex<int> and complex<float_foo> don't interact well
+//LIBMESH_VMA_INSTANTIATE(Real,std::complex<int>,Complex);
+//LIBMESH_VMA_INSTANTIATE(Complex,std::complex<int>,Complex);
+//LIBMESH_VMA_INSTANTIATE(Complex,std::complex<int>,Real);
 
 LIBMESH_VMA_INSTANTIATE(Real,float,Complex);
 LIBMESH_VMA_INSTANTIATE(Complex,float,Complex);
