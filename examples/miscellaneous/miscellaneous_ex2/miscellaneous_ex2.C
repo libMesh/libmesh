@@ -70,7 +70,7 @@
 // Define matrix and vector data types for the global
 // equation system.  These are base classes,
 // from which specific implementations, like
-// the PETSc or LASPACK implementations, are derived.
+// the PETSc and Eigen implementations, are derived.
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/numeric_vector.h"
 
@@ -353,7 +353,7 @@ void assemble_helmholtz(EquationSystems& es,
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
   // Now this is slightly different from example 4.
-  // We will not add directly to the overall (PETSc/LASPACK) matrix,
+  // We will not add directly to the global matrix,
   // but to the additional matrices "stiffness_mass" and "damping".
   // The same holds for the right-hand-side vector Fe, which we will
   // later on store in the additional vector "rhs".

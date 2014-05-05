@@ -40,7 +40,7 @@ void EigenSparseLinearSolver<T>::clear ()
     {
       this->_is_initialized = false;
 
-      this->_solver_type         = GMRES;
+      this->_solver_type         = BICGSTAB;
       this->_preconditioner_type = ILU_PRECOND;
     }
 }

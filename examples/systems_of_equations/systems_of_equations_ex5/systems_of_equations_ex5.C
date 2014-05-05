@@ -80,6 +80,9 @@ int main (int argc, char** argv)
   // Initialize libMesh and any dependent libaries
   LibMeshInit init (argc, argv);
 
+  // This example NaNs with the Eigen sparse linear solvers
+  libmesh_example_assert(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc or --enable-laspack");
+
   // Initialize the cantilever mesh
   const unsigned int dim = 2;
 

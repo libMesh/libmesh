@@ -60,7 +60,7 @@
 // Define matrix and vector data types for the global
 // equation system.  These are base classes,
 // from which specific implementations, like
-// the PETSc or LASPACK implementations, are derived.
+// the PETSc and Eigen implementations, are derived.
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/numeric_vector.h"
 
@@ -127,27 +127,10 @@ int main (int argc, char** argv)
 
     }
 
-  // LasPack solvers don't work so well for this example
-  // (not sure why), and Trilinos matrices don't work at all.
-  // Print a warning to the user if PETSc is not in use.
-  if (libMesh::default_solver_package() == LASPACK_SOLVERS)
-    {
-      std::cout << "WARNING! It appears you are using the\n"
-                << "LasPack solvers.  This example may not converge\n"
-                << "using LasPack, but should work OK with PETSc.\n"
-                << "http://www.mcs.anl.gov/petsc/\n"
-                << std::endl;
-    }
-  else if (libMesh::default_solver_package() == TRILINOS_SOLVERS)
-    {
-      std::cout << "WARNING! It appears you are using the\n"
-                << "Trilinos solvers.  The current libMesh Epetra\n"
-                << "interface does not allow sparse matrix addition,\n"
-                << "as is needed in this problem.  We recommend\n"
-                << "using PETSc: http://www.mcs.anl.gov/petsc/\n"
-                << std::endl;
-      return 0;
-    }
+  // LasPack solvers don't work so well for this example, Trilinos doesn't work at all.
+  // PETSc and Eigen both work...
+  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS || \
+                         libMesh::default_solver_package() == EIGEN_SOLVERS, "--enable-petsc");
 
   // Get the name of the mesh file
   // from the command line.

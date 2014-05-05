@@ -152,6 +152,8 @@ inline
 EigenSparseLinearSolver<T>::EigenSparseLinearSolver (const libMesh::Parallel::Communicator &comm) :
   LinearSolver<T>(comm)
 {
+  // The GMRES iterative solver isn't supported by Eigen, so use BICGSTAB instead
+  this->_solver_type = BICGSTAB;
 }
 
 
