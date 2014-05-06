@@ -15,6 +15,13 @@ public:
    */
   int AutoDiff(const std::string& var);
 
+  /**
+   * check if the function is equal to 0
+   * This is a common case for vanishing derivatives. This relies on the
+   * function to be optimized.
+   */
+  bool isZero();
+
 protected:
   /**
    * A list of opcodes and immediate values

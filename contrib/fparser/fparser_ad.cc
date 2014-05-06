@@ -448,6 +448,14 @@ void FunctionParserADBase<Value_t>::Commit(const DiffProgramFragment & diff)
 }
 
 template<typename Value_t>
+bool FunctionParserADBase<Value_t>::isZero()
+{
+  // determine if the program is a single cImmed 0
+  return (mData->mByteCode.size() == 1  && mData->mImmed.size() == 1 &&
+          mData->mByteCode[0] == cImmed && mData->mImmed[0] == Value_t(0));
+}
+
+template<typename Value_t>
 int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
 {
   this->ForceDeepCopy();
