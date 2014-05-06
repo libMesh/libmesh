@@ -193,9 +193,23 @@ N=length(data);
 % Can't plot string data automatically?
 x=linspace(1,N,N);
 
+% Extract data
+n_files = [data{:,2}];
+n_lines = [data{:,3}];
+
 % Only way to set linestyles with plotyy is after the fact, apparently.
 % plotyy returns the axis handle first, followed by the two plot handles.
-[haxis, h1, h2] = plotyy(x, [data{:,2}], x, [data{:,3}] ./ 1000);
+[haxis, h1, h2] = plotyy(x, n_files, x, n_lines ./ 1000);
+
+% Make linear fit, the numbers tell approximate {n_files,n_lines} per month
+files_fit = polyfit(x, n_files, 1);
+lines_fit = polyfit(x, n_lines, 1);
+
+files_per_month = files_fit(1);
+lines_per_month = lines_fit(1);
+
+text(50, 50, ['Approx. ', num2str(files_per_month, '%.1f'), ' files added/month']);
+text(50, 35, ['Approx. ', num2str(lines_per_month, '%.1f'), ' lines added/month']);
 
 % Label the axes
 ylabel (haxis(1), 'Files');
