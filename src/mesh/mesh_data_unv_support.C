@@ -816,14 +816,6 @@ bool MeshDataUnvHeader::need_D_to_e (std::string& number)
 {
   // find "D" in string, start looking at 6th element, to improve speed.
   // We dont expect a "D" earlier
-
-  // #ifdef __HP_aCC
-  //   // Use an "int" instead of unsigned int,
-  //   // otherwise HP aCC may crash!
-  //   const int position = number.find("D",6);
-  // #else
-  //   const unsigned int position = number.find("D",6);
-  // #endif
   std::string::size_type position = number.find("D",6);
 
   if(position!=std::string::npos)     // npos means no position

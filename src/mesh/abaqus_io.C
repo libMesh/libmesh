@@ -220,7 +220,7 @@ void AbaqusIO::read (const std::string& fname)
           std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
 
           // 0.) Look for the "*Part" section
-          if (upper.find("*PART") == 0)
+          if (upper.find("*PART") == static_cast<std::string::size_type>(0))
             {
               // libMesh::out << "Found parts section!" << std::endl;
 
@@ -231,7 +231,7 @@ void AbaqusIO::read (const std::string& fname)
             }
 
           // 1.) Look for the "*Nodes" section
-          if (upper.find("*NODE") == 0)
+          if (upper.find("*NODE") == static_cast<std::string::size_type>(0))
             {
               // Process any lines of comments that may be present
               this->process_and_discard_comments();
@@ -243,7 +243,7 @@ void AbaqusIO::read (const std::string& fname)
 
 
           // 2.) Look for the "*Element" section
-          else if (upper.find("*ELEMENT,") == 0)
+          else if (upper.find("*ELEMENT,") == static_cast<std::string::size_type>(0))
             {
               // Process any lines of comments that may be present
               this->process_and_discard_comments();
@@ -255,7 +255,7 @@ void AbaqusIO::read (const std::string& fname)
 
 
           // 3.) Look for a Nodeset section
-          else if (upper.find("*NSET") == 0)
+          else if (upper.find("*NSET") == static_cast<std::string::size_type>(0))
             {
               std::string nset_name = this->parse_label(s, "nset");
 
@@ -274,7 +274,7 @@ void AbaqusIO::read (const std::string& fname)
 
 
           // 4.) Look for an Elset section
-          else if (upper.find("*ELSET") == 0)
+          else if (upper.find("*ELSET") == static_cast<std::string::size_type>(0))
             {
               std::string elset_name = this->parse_label(s, "elset");
 
@@ -298,7 +298,7 @@ void AbaqusIO::read (const std::string& fname)
           // 5.) Look for a Surface section.  Need to be a little
           // careful, since there are also "surface interaction"
           // sections we don't want to read here.
-          else if (upper.find("*SURFACE,") == 0)
+          else if (upper.find("*SURFACE,") == static_cast<std::string::size_type>(0))
             {
               // libMesh::out << "Found SURFACE section: " << s << std::endl;
 

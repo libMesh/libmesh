@@ -415,13 +415,6 @@ void UNVIO::count_nodes (std::istream& in_file)
   // line does not contain a "D", then the
   // other lines won't, too.
   {
-    // #ifdef __HP_aCC
-    //     // Use an "int" instead of unsigned int,
-    //     // otherwise HP aCC may crash!
-    //     const int position          = data.find("D",6);
-    // #else
-    //     const unsigned int position = data.find("D",6);
-    // #endif
     std::string::size_type position = data.find("D",6);
 
     if (position!=std::string::npos) // npos means no position

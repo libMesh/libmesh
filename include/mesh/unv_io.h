@@ -320,14 +320,7 @@ Real UNVIO::D_to_e (std::string& number) const
    * 6th element, to improve speed.
    * We dont expect a "D" earlier
    */
-
-#ifdef __HP_aCC
-  // Use an int instead of an unsigned int,
-  // otherwise HP aCC may crash!
-  const int position = number.find("D",6);
-#else
   const std::string::size_type position = number.find("D",6);
-#endif
 
   libmesh_assert (position != std::string::npos);
   number.replace(position, 1, "e");

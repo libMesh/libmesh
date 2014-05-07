@@ -367,7 +367,7 @@ void GmshIO::read_mesh(std::istream& in)
         {
           // Process s...
 
-          if (s.find("$MeshFormat") == 0)
+          if (s.find("$MeshFormat") == static_cast<std::string::size_type>(0))
             {
               in >> version >> format >> size;
               if ((version != 2.0) && (version != 2.1) && (version != 2.2))
@@ -393,9 +393,9 @@ void GmshIO::read_mesh(std::istream& in)
             }
 
           // read the node block
-          else if (s.find("$NOD") == 0 ||
-                   s.find("$NOE") == 0 ||
-                   s.find("$Nodes") == 0)
+          else if (s.find("$NOD") == static_cast<std::string::size_type>(0) ||
+                   s.find("$NOE") == static_cast<std::string::size_type>(0) ||
+                   s.find("$Nodes") == static_cast<std::string::size_type>(0))
             {
               unsigned int num_nodes = 0;
               in >> num_nodes;
@@ -419,8 +419,8 @@ void GmshIO::read_mesh(std::istream& in)
 
 
           // Read the element block
-          else if (s.find("$ELM") == 0 ||
-                   s.find("$Elements") == 0)
+          else if (s.find("$ELM") == static_cast<std::string::size_type>(0) ||
+                   s.find("$Elements") == static_cast<std::string::size_type>(0))
             {
               // For reading the number of elements and the node ids from the stream
               unsigned int
