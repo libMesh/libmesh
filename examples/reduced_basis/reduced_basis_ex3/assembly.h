@@ -30,6 +30,7 @@ using libMesh::Real;
 using libMesh::RealGradient;
 using libMesh::TransientRBThetaExpansion;
 using libMesh::TransientRBAssemblyExpansion;
+using libMesh::FEBase;
 
 // Functors for the parameter-dependent part of the affine decomposition of the PDE
 // The RHS and outputs just require a constant value of 1, so use a default RBTheta object there

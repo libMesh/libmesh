@@ -40,6 +40,8 @@ using libMesh::RBEIMEvaluation;
 using libMesh::RBEIMTheta;
 using libMesh::Real;
 using libMesh::RealGradient;
+using libMesh::Elem;
+using libMesh::FEBase;
 
 struct ElemAssemblyWithConstruction : ElemAssembly
 {

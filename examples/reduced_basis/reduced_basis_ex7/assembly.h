@@ -34,6 +34,7 @@ using libMesh::RBThetaExpansion;
 using libMesh::Real;
 using libMesh::RealGradient;
 using libMesh::MeshBase;
+using libMesh::FEBase;
 
 // Functors for the parameter-dependent part of the affine decomposition of the PDE
 struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& mu) { Number val(1., mu.get_value("frequency")*damping_epsilon); return val; } };

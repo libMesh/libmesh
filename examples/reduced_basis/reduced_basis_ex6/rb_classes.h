@@ -48,7 +48,7 @@ public:
   /**
    * Constructor. Just set the theta expansion.
    */
-  SimpleRBEvaluation(const Parallel::Communicator& comm)
+  SimpleRBEvaluation(const libMesh::Parallel::Communicator& comm)
     : RBEvaluation(comm)
   {
     set_rb_theta_expansion(ex6_theta_expansion);
@@ -102,7 +102,7 @@ public:
    */
   virtual void init_data()
   {
-    u_var = this->add_variable ("u", FIRST);
+    u_var = this->add_variable ("u", libMesh::FIRST);
 
     // Generate a DirichletBoundary object
     dirichlet_bc = build_zero_dirichlet_boundary_object();

@@ -17,6 +17,9 @@ using libMesh::RBAssemblyExpansion;
 using libMesh::RBParameters;
 using libMesh::RBTheta;
 using libMesh::RBThetaExpansion;
+using libMesh::numeric_index_type;
+using libMesh::System;
+using libMesh::Node;
 
 // boundary IDs
 #define BOUNDARY_ID_MIN_Z 0
