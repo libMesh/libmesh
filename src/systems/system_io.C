@@ -2343,7 +2343,6 @@ dof_id_type System::write_serialized_vectors (Xdr &io,
   return written_length;
 }
 
-} // namespace libMesh
 
 
 
@@ -2357,3 +2356,5 @@ template void System::read_serialized_data<Real> (Xdr& io, const bool read_addit
 template numeric_index_type System::read_serialized_vector<Real> (Xdr& io, NumericVector<Number>& vec);
 template std::size_t System::read_serialized_vectors<Real> (Xdr &io, const std::vector<NumericVector<Number>*> &vectors) const;
 #endif
+
+} // namespace libMesh

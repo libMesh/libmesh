@@ -45,7 +45,7 @@
 // anonymous namespace for implementation details
 namespace {
 
-using libMesh::Elem;
+using namespace libMesh;
 
 /**
  * Specific weak ordering for Elem*'s to be used in a set.

@@ -32,8 +32,9 @@ EXTERN_C_FOR_PETSC_END
 // C++ includes
 
 namespace {
+using namespace libMesh;
 
-void indices_to_fieldsplit (const libMesh::Parallel::Communicator& comm,
+void indices_to_fieldsplit (const Parallel::Communicator& comm,
                             const std::vector<dof_id_type>& indices,
                             PC my_pc,
                             const std::string& field_name)
