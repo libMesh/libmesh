@@ -62,7 +62,7 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-#ifdef LIBMESH_ENABLE_SECOND
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 // Function prototype.  This is the function that will assemble
 // the stiffness matrix and the right-hand-side vector ready
 // for solution.
@@ -89,7 +89,7 @@ int main (int argc, char** argv)
 #else
 
   // Skip this example without --enable-second; requires d2phi
-#ifndef LIBMESH_ENABLE_SECOND
+#ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
   libmesh_example_requires(false, "--enable-second");
 #else
 
@@ -231,7 +231,7 @@ int main (int argc, char** argv)
   std::cout << "z-displacement of the center point: " << w << std::endl;
   std::cout << "Analytic solution for pure bending: " << w_analytic << std::endl;
 
-#endif // #ifdef LIBMESH_ENABLE_SECOND
+#endif // #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
@@ -239,7 +239,7 @@ int main (int argc, char** argv)
   return 0;
 }
 
-#ifdef LIBMESH_ENABLE_SECOND
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 // We now define the matrix and rhs vector assembly function
 // for the shell system.  This function implements the
@@ -636,4 +636,4 @@ void assemble_shell (EquationSystems& es, const std::string& system_name)
   } // end of ghost element loop
 }
 
-#endif // LIBMESH_ENABLE_SECOND
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
