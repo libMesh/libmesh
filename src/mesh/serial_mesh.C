@@ -31,6 +31,8 @@ LIBMESH_DEFINE_HASH_POINTERS
 
 namespace
 {
+using namespace libMesh;
+
 // A custom comparison function, based on Point::operator<,
 // that tries to ignore floating point differences in components
 // of the point

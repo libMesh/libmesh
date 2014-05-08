@@ -4,8 +4,13 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/equation_systems.h"
 
+using libMesh::DofMap;
+using libMesh::EquationSystems;
+using libMesh::dof_id_type;
+using libMesh::boundary_id_type;
+
 // Convenient typedef for a map for (element id,side id) --> element neighbor id
-typedef std::map< std::pair<dof_id_type,unsigned char>, dof_id_type> ElementIdMap;
+typedef std::map< std::pair<dof_id_type, unsigned char>, dof_id_type> ElementIdMap;
 
 class AugmentSparsityOnInterface : public DofMap::AugmentSparsityPattern
 {
@@ -45,7 +50,7 @@ public:
   /**
    * User-defined function to augment the sparsity pattern.
    */
-  virtual void augment_sparsity_pattern (SparsityPattern::Graph & ,
+  virtual void augment_sparsity_pattern (libMesh::SparsityPattern::Graph & ,
                                          std::vector<dof_id_type> & n_nz,
                                          std::vector<dof_id_type> & n_oz);
 

@@ -18,7 +18,7 @@ class SimpleEIMEvaluation : public RBEIMEvaluation
 {
 public:
 
-  SimpleEIMEvaluation(const Parallel::Communicator& comm)
+  SimpleEIMEvaluation(const libMesh::Parallel::Communicator& comm)
     : RBEIMEvaluation(comm)
   {
     attach_parametrized_function(&sg);
@@ -64,7 +64,7 @@ public:
    */
   virtual void init_data()
   {
-    u_var = this->add_variable ("f_EIM", FIRST);
+    u_var = this->add_variable ("f_EIM", libMesh::FIRST);
 
     Parent::init_data();
 

@@ -31,6 +31,8 @@
 
 namespace
 {
+using namespace libMesh;
+
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 static const unsigned int header_size = 11;
 #else

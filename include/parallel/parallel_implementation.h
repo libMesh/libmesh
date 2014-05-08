@@ -173,10 +173,6 @@ public:
 // Anonymous namespace for helper functions
 namespace {
 
-// Safe to use this here since it won't "infect" anything outside the
-// anonymous namespace
-using namespace libMesh;
-
 // Internal helper function to create vector<something_useable> from
 // vector<bool> for compatibility with MPI bitwise operations
 template <typename T>
@@ -226,9 +222,9 @@ inline void send_receive_vec_of_vec
  std::vector<std::vector<T1> > &send,
  const unsigned int source_processor_id,
  std::vector<std::vector<T2> > &recv,
- const Parallel::MessageTag &send_tag,
- const Parallel::MessageTag &recv_tag,
- const Parallel::Communicator &comm)
+ const libMesh::Parallel::MessageTag &send_tag,
+ const libMesh::Parallel::MessageTag &recv_tag,
+ const libMesh::Parallel::Communicator &comm)
 {
   START_LOG("send_receive()", "Parallel");
 
@@ -249,7 +245,7 @@ inline void send_receive_vec_of_vec
 
   // The outer buffer size
   MPI_Pack_size (1,
-                 Parallel::StandardType<unsigned int>(),
+                 libMesh::Parallel::StandardType<unsigned int>(),
                  comm.get(),
                  &packedsize);
   sendsize += packedsize;
@@ -258,14 +254,14 @@ inline void send_receive_vec_of_vec
     {
       // The size of the ith inner buffer
       MPI_Pack_size (1,
-                     Parallel::StandardType<unsigned int>(),
+                     libMesh::Parallel::StandardType<unsigned int>(),
                      comm.get(),
                      &packedsize);
       sendsize += packedsize;
 
       // The data for each inner buffer
-      MPI_Pack_size (libmesh_cast_int<int>(send[i].size()),
-                     Parallel::StandardType<T1>
+      MPI_Pack_size (libMesh::libmesh_cast_int<int>(send[i].size()),
+                     libMesh::Parallel::StandardType<T1>
                      (send[i].empty() ? NULL : &send[i][0]),
                      comm.get(),
                      &packedsize);
@@ -279,30 +275,30 @@ inline void send_receive_vec_of_vec
   int pos=0;
 
   // ... the size of the outer buffer
-  sendsize = libmesh_cast_int<int>(send.size());
-  MPI_Pack (&sendsize, 1, Parallel::StandardType<unsigned int>(),
-            &sendbuf[0], libmesh_cast_int<int>(sendbuf.size()), &pos,
+  sendsize = libMesh::libmesh_cast_int<int>(send.size());
+  MPI_Pack (&sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
+            &sendbuf[0], libMesh::libmesh_cast_int<int>(sendbuf.size()), &pos,
             comm.get());
 
   for (std::size_t i=0; i<send.size(); i++)
     {
       // ... the size of the ith inner buffer
-      sendsize = libmesh_cast_int<int>(send[i].size());
-      MPI_Pack (&sendsize, 1, Parallel::StandardType<unsigned int>(),
-                &sendbuf[0], libmesh_cast_int<int>(sendbuf.size()), &pos,
+      sendsize = libMesh::libmesh_cast_int<int>(send[i].size());
+      MPI_Pack (&sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
+                &sendbuf[0], libMesh::libmesh_cast_int<int>(sendbuf.size()), &pos,
                 comm.get());
 
       // ... the contents of the ith inner buffer
       if (!send[i].empty())
-        MPI_Pack (&send[i][0], libmesh_cast_int<int>(send[i].size()),
-                  Parallel::StandardType<T1>(&send[i][0]),
-                  &sendbuf[0], libmesh_cast_int<int>(sendbuf.size()), &pos,
+        MPI_Pack (&send[i][0], libMesh::libmesh_cast_int<int>(send[i].size()),
+                  libMesh::Parallel::StandardType<T1>(&send[i][0]),
+                  &sendbuf[0], libMesh::libmesh_cast_int<int>(sendbuf.size()), &pos,
                   comm.get());
     }
 
   libmesh_assert_equal_to (static_cast<unsigned int>(pos), sendbuf.size());
 
-  Parallel::Request request;
+  libMesh::Parallel::Request request;
 
   comm.send (dest_processor_id, sendbuf, MPI_PACKED, request, send_tag);
 
@@ -311,8 +307,8 @@ inline void send_receive_vec_of_vec
   // Unpack the received buffer
   libmesh_assert (!recvbuf.empty());
   pos=0;
-  MPI_Unpack (&recvbuf[0], libmesh_cast_int<int>(recvbuf.size()), &pos,
-              &sendsize, 1, Parallel::StandardType<unsigned int>(),
+  MPI_Unpack (&recvbuf[0], libMesh::libmesh_cast_int<int>(recvbuf.size()), &pos,
+              &sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
               comm.get());
 
   // ... size the outer buffer
@@ -320,8 +316,8 @@ inline void send_receive_vec_of_vec
 
   for (std::size_t i=0; i<recv.size(); i++)
     {
-      MPI_Unpack (&recvbuf[0], libmesh_cast_int<int>(recvbuf.size()), &pos,
-                  &sendsize, 1, Parallel::StandardType<unsigned int>(),
+      MPI_Unpack (&recvbuf[0], libMesh::libmesh_cast_int<int>(recvbuf.size()), &pos,
+                  &sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
                   comm.get());
 
       // ... size the inner buffer
@@ -329,9 +325,9 @@ inline void send_receive_vec_of_vec
 
       // ... unpack the inner buffer if it is not empty
       if (!recv[i].empty())
-        MPI_Unpack (&recvbuf[0], libmesh_cast_int<int>(recvbuf.size()), &pos,
-                    &recv[i][0], libmesh_cast_int<int>(recv[i].size()),
-                    Parallel::StandardType<T2>(&recv[i][0]),
+        MPI_Unpack (&recvbuf[0], libMesh::libmesh_cast_int<int>(recvbuf.size()), &pos,
+                    &recv[i][0], libMesh::libmesh_cast_int<int>(recv[i].size()),
+                    libMesh::Parallel::StandardType<T2>(&recv[i][0]),
                     comm.get());
     }
 

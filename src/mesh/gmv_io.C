@@ -52,6 +52,8 @@ extern "C"
 // anonymous namespace to hold local data
 namespace
 {
+using namespace libMesh;
+
 /**
  * Defines mapping from libMesh element types to GMV element types.
  * Note: Not all of the GMV element types have an identity mapping

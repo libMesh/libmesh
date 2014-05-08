@@ -33,6 +33,8 @@ using libMesh::RBTheta;
 using libMesh::RBThetaExpansion;
 using libMesh::Real;
 using libMesh::RealGradient;
+using libMesh::Elem;
+using libMesh::FEBase;
 
 struct ShiftedGaussian : public RBParametrizedFunction
 {

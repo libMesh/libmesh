@@ -4,6 +4,8 @@
 // libMesh includes
 #include "libmesh/linear_implicit_system.h"
 
+using namespace libMesh;
+
 AugmentSparsityOnInterface::AugmentSparsityOnInterface(EquationSystems& es,
                                                        boundary_id_type crack_boundary_lower,
                                                        boundary_id_type crack_boundary_upper)

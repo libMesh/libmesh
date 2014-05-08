@@ -31,6 +31,8 @@
 // Anonymous namespace to hold mapping Data for Abaqus/libMesh element types
 namespace
 {
+using namespace libMesh;
+
 /**
  * Data structure used for mapping Abaqus IDs to libMesh IDs, and
  * eventually (possibly) vice-versa.

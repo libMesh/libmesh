@@ -44,6 +44,8 @@
 // Anonymous namespace for file local data
 namespace
 {
+using namespace libMesh;
+
 // Define equivalence classes of Cubit/Exodus element types that map to
 // libmesh ElemTypes
 std::map<std::string, ElemType> element_equivalence_map;

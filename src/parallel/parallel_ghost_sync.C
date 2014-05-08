@@ -1,5 +1,7 @@
 #include "libmesh/parallel_ghost_sync.h"
 
+namespace libMesh
+{
 
 SyncNodalPositions::SyncNodalPositions(MeshBase& m)
   : mesh(m)
@@ -49,3 +51,5 @@ void SyncNodalPositions::act_on_data (const std::vector<dof_id_type>& ids, std::
       *node = data[i];
     } // end for
 } // act_on_data()
+
+} // namespace
