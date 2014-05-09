@@ -125,23 +125,17 @@ void MeshData::read_xdr (const std::string& name,
     io.data (vtype);
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
     if (vtype != "COMPLEX")
-      {
-        libMesh::err << "ERROR: File does not contain complex-valued data!"
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: File does not contain complex-valued data!");
+
 #elif LIBMESH_USE_REAL_NUMBERS
     if (vtype != "REAL")
-      {
-        libMesh::err << "ERROR: File does not contain real-valued data!"
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: File does not contain real-valued data!");
+
 #else
     /*
      * What number type is this?
      */
-    libmesh_error();
+    libmesh_error_msg("Must be using either real or complex numbers!");
 #endif
   }
 
@@ -203,10 +197,7 @@ void MeshData::read_xdr (const std::string& name,
         else
           {
             if (previous_values_size != values.size())
-              {
-                libMesh::err << "ERROR: Size mismatch for n_cnt = " << n_cnt << std::endl;
-                libmesh_error();
-              }
+              libmesh_error_msg("ERROR: Size mismatch for n_cnt = " << n_cnt);
           }
 #endif
 
@@ -258,10 +249,7 @@ void MeshData::read_xdr (const std::string& name,
         else
           {
             if (previous_values_size != values.size())
-              {
-                libMesh::err << "ERROR: Size mismatch for n_cnt = " << n_cnt << std::endl;
-                libmesh_error();
-              }
+              libmesh_error_msg("ERROR: Size mismatch for n_cnt = " << n_cnt);
           }
 #endif
 

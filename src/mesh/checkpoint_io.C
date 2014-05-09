@@ -420,12 +420,7 @@ void CheckpointIO::read (const std::string& name)
         std::ifstream in (file_name_stream.str().c_str());
 
         if (!in.good())
-          {
-            libMesh::err << "ERROR: cannot locate specified file:\n\t"
-                         << file_name_stream.str()
-                         << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << file_name_stream.str());
       }
 
       Xdr io (file_name_stream.str(), this->binary() ? DECODE : READ);
@@ -439,10 +434,7 @@ void CheckpointIO::read (const std::string& name)
         io.data(parallel, "# parallel");
 
         if(static_cast<unsigned int>(parallel_mesh) != parallel)
-          {
-            libMesh::err << "Attempted to utilize a checkpoint file with an incompatible mesh distribution!" << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("Attempted to utilize a checkpoint file with an incompatible mesh distribution!");
       }
 
       // If this is a parallel mesh then we need to check to ensure we're reading this on the same number of procs
@@ -452,10 +444,7 @@ void CheckpointIO::read (const std::string& name)
           io.data(n_procs, "# n_procs");
 
           if(n_procs != this->n_processors())
-            {
-              libMesh::err << "Attempted to utilize a checkpoint file on " << this->n_processors() << " processors but it was written using " << n_procs << "!!";
-              libmesh_error();
-            }
+            libmesh_error_msg("Attempted to utilize a checkpoint file on " << this->n_processors() << " processors but it was written using " << n_procs << "!!");
         }
 
       // read subdomain names

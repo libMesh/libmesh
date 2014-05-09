@@ -87,10 +87,7 @@ unsigned int idx(const ElemType type,
       }
 
     default:
-      {
-        libMesh::err << "ERROR: Unrecognized 2D element type." << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unrecognized 2D element type.");
     }
 
   return libMesh::invalid_uint;
@@ -130,10 +127,7 @@ unsigned int idx(const ElemType type,
       }
 
     default:
-      {
-        libMesh::err << "ERROR: Unrecognized element type." << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unrecognized element type.");
     }
 
   return libMesh::invalid_uint;
@@ -221,10 +215,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unrecognized 1D element type." << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unrecognized 1D element type.");
           }
 
         // Reserve nodes
@@ -250,10 +241,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unrecognized 1D element type." << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unrecognized 1D element type.");
           }
 
 
@@ -373,10 +361,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unrecognized 1D element type." << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unrecognized 1D element type.");
 
           }
 
@@ -439,10 +424,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unrecognized 1D element type." << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unrecognized 1D element type.");
           }
 
         // Scale the nodal positions
@@ -500,10 +482,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unrecognized 2D element type." << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unrecognized 2D element type.");
           }
 
 
@@ -530,10 +509,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
           default:
-            {
-              libMesh::err << "ERROR: Unrecognized 2D element type." << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unrecognized 2D element type.");
           }
 
 
@@ -619,10 +595,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
           default:
-            {
-              libMesh::err << "ERROR: Unrecognized 2D element type." << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unrecognized 2D element type.");
           }
 
 
@@ -785,10 +758,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
           default:
-            {
-              libMesh::err << "ERROR: Unrecognized 2D element type." << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unrecognized 2D element type.");
           }
 
 
@@ -865,10 +835,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unrecognized 3D element type." << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unrecognized 3D element type.");
           }
 
 
@@ -905,10 +872,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unrecognized 3D element type." << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unrecognized 3D element type.");
           }
 
 
@@ -1010,10 +974,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
           default:
-            {
-              libMesh::err << "ERROR: Unrecognized 3D element type." << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unrecognized 3D element type.");
           }
 
 
@@ -1296,10 +1257,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 
 
           default:
-            {
-              libMesh::err << "ERROR: Unrecognized 3D element type." << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unrecognized 3D element type.");
           }
 
 
@@ -1453,9 +1411,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
       } // end case dim==3
 
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("Unknown dimension " << mesh.mesh_dimension());
     }
 
   STOP_LOG("build_cube()", "MeshTools::Generation");
@@ -1545,8 +1501,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh&,
                                           const unsigned int,
                                           const bool)
 {
-  libMesh::out << "Building a circle/sphere only works with AMR." << std::endl;
-  libmesh_error();
+  libmesh_error_msg("Building a circle/sphere only works with AMR.");
 }
 
 #else
@@ -1745,9 +1700,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
           {
             // FIXME: We'd need an all_tet() routine (which could also be used by
             // build_square()) to do Tets, or Prisms for that matter.
-            libMesh::err << "Error: Only HEX8/27 currently supported."
-                         << std::endl;
-            libmesh_error();
+            libmesh_error_msg("Error: Only HEX8/27 currently supported.");
           }
 
 
@@ -1881,7 +1834,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
       } // end case 3
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unknown dimension " << mesh.mesh_dimension());
 
 
 

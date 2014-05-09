@@ -541,12 +541,7 @@ void UnstructuredMesh::read (const std::string& name,
       std::ifstream in (full_name.str().c_str());
 
       if (!in.good())
-        {
-          libMesh::err << "ERROR: cannot locate specified file:\n\t"
-                       << full_name.str()
-                       << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << full_name.str());
     }
   else if(name.rfind(".cp")) {} // Do error checking in the reader
   else
@@ -554,12 +549,7 @@ void UnstructuredMesh::read (const std::string& name,
       std::ifstream in (name.c_str());
 
       if (!in.good())
-        {
-          libMesh::err << "ERROR: cannot locate specified file:\n\t"
-                       << name
-                       << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << name);
     }
 
   // Set the skip_renumber_nodes_and_elements flag on all processors.
@@ -657,9 +647,7 @@ void UnstructuredMesh::read (const std::string& name,
                 libmesh_file_error(system_string);
               STOP_LOG("system(bunzip2)", "Mesh");
 #else
-              libMesh::err << "ERROR: need bzip2/bunzip2 to open .bz2 file "
-                           << name << std::endl;
-              libmesh_error();
+              libmesh_error_msg("ERROR: need bzip2/bunzip2 to open .bz2 file " << name);
 #endif
             }
           else if (name.size() - name.rfind(".xz") == 3)
@@ -674,9 +662,7 @@ void UnstructuredMesh::read (const std::string& name,
                 libmesh_file_error(system_string);
               STOP_LOG("system(xz -d)", "XdrIO");
 #else
-              libMesh::err << "ERROR: need xz to open .xz file "
-                           << name << std::endl;
-              libmesh_error();
+              libmesh_error_msg("ERROR: need xz to open .xz file " << name);
 #endif
             }
 
@@ -697,12 +683,8 @@ void UnstructuredMesh::read (const std::string& name,
           else if (new_name.rfind(".unv") < new_name.size())
             {
               if (mesh_data == NULL)
-                {
-                  libMesh::err << "Error! You must pass a "
-                               << "valid MeshData pointer to "
-                               << "read UNV files!" << std::endl;
-                  libmesh_error();
-                }
+                libmesh_error_msg("Error! You must pass a valid MeshData pointer to read UNV files!");
+
               UNVIO(*this, *mesh_data).read (new_name);
             }
 
@@ -728,29 +710,27 @@ void UnstructuredMesh::read (const std::string& name,
 
           else
             {
-              libMesh::err << " ERROR: Unrecognized file extension: " << name
-                           << "\n   I understand the following:\n\n"
-                           << "     *.e    -- Sandia's ExodusII format\n"
-                           << "     *.exd  -- Sandia's ExodusII format\n"
-                           << "     *.gmv  -- LANL's General Mesh Viewer format\n"
-                           << "     *.mat  -- Matlab triangular ASCII file\n"
-                           << "     *.n    -- Sandia's Nemesis format\n"
-                           << "     *.nem  -- Sandia's Nemesis format\n"
-                           << "     *.off  -- OOGL OFF surface format\n"
-                           << "     *.ucd  -- AVS's ASCII UCD format\n"
-                           << "     *.unv  -- I-deas Universal format\n"
-                           << "     *.vtu  -- Paraview VTK format\n"
-                           << "     *.inp  -- Abaqus .inp format\n"
-                           << "     *.xda  -- libMesh ASCII format\n"
-                           << "     *.xdr  -- libMesh binary format\n"
-                           << "     *.gz   -- any above format gzipped\n"
-                           << "     *.bz2  -- any above format bzip2'ed\n"
-                           << "     *.xz   -- any above format xzipped\n"
-                           << "     *.cpa  -- libMesh Checkpoint ASCII format\n"
-                           << "     *.cpr  -- libMesh Checkpoint binary format\n"
-
-                           << std::endl;
-              libmesh_error();
+              libmesh_error_msg(" ERROR: Unrecognized file extension: " \
+                                << name                                 \
+                                << "\n   I understand the following:\n\n" \
+                                << "     *.e    -- Sandia's ExodusII format\n" \
+                                << "     *.exd  -- Sandia's ExodusII format\n" \
+                                << "     *.gmv  -- LANL's General Mesh Viewer format\n" \
+                                << "     *.mat  -- Matlab triangular ASCII file\n" \
+                                << "     *.n    -- Sandia's Nemesis format\n" \
+                                << "     *.nem  -- Sandia's Nemesis format\n" \
+                                << "     *.off  -- OOGL OFF surface format\n" \
+                                << "     *.ucd  -- AVS's ASCII UCD format\n" \
+                                << "     *.unv  -- I-deas Universal format\n" \
+                                << "     *.vtu  -- Paraview VTK format\n" \
+                                << "     *.inp  -- Abaqus .inp format\n" \
+                                << "     *.xda  -- libMesh ASCII format\n" \
+                                << "     *.xdr  -- libMesh binary format\n" \
+                                << "     *.gz   -- any above format gzipped\n" \
+                                << "     *.bz2  -- any above format bzip2'ed\n" \
+                                << "     *.xz   -- any above format xzipped\n" \
+                                << "     *.cpa  -- libMesh Checkpoint ASCII format\n" \
+                                << "     *.cpr  -- libMesh Checkpoint binary format\n");
             }
 
           // If we temporarily decompressed a file, remove the
@@ -859,12 +839,8 @@ void UnstructuredMesh::write (const std::string& name,
         else if (new_name.rfind(".unv") < new_name.size())
           {
             if (mesh_data == NULL)
-              {
-                libMesh::err << "Error! You must pass a "
-                             << "valid MeshData pointer to "
-                             << "write UNV files!" << std::endl;
-                libmesh_error();
-              }
+              libmesh_error_msg("Error! You must pass a valid MeshData pointer to write UNV files!");
+
             UNVIO(*this, *mesh_data).write (new_name);
           }
 

@@ -218,10 +218,7 @@ unsigned TecplotIO::elem_dimension()
 
   // Detect and disallow (for now) the writing of mixed dimension meshes.
   if (std::count(elem_dims.begin(), elem_dims.end(), 1) > 1)
-    {
-      libMesh::err << "Error, cannot write Mesh with mixed element dimensions to Tecplot file!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error, cannot write Mesh with mixed element dimensions to Tecplot file!");
 
   if (elem_dims[0])
     return 1;
@@ -230,10 +227,7 @@ unsigned TecplotIO::elem_dimension()
   else if (elem_dims[2])
     return 3;
   else
-    {
-      libMesh::err << "No 1, 2, or 3D elements detected!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("No 1, 2, or 3D elements detected!");
 }
 
 
@@ -308,7 +302,7 @@ void TecplotIO::write_ascii (const std::string& fname,
         out_stream << "brick";
         break;
       default:
-        libmesh_error();
+        libmesh_error_msg("Unsupported element dimension: " << this->elem_dimension());
       }
 
     // Output the time in the header
@@ -418,7 +412,7 @@ void TecplotIO::write_binary (const std::string& fname,
       break;
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported element dimension: " << this->elem_dimension());
     }
 
   // Build a string containing all the variable names to pass to Tecplot

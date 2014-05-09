@@ -806,8 +806,7 @@ void ExodusII_IO_Helper::read_var_names(ExodusVarType type)
       this->read_var_names_impl("g", num_global_vars, global_var_names);
       break;
     default:
-      libMesh::err << "Unrecognized ExodusVarType " << type << std::endl;
-      libmesh_error();
+      libmesh_error_msg("Unrecognized ExodusVarType " << type);
     }
 }
 
@@ -863,8 +862,7 @@ void ExodusII_IO_Helper::write_var_names(ExodusVarType type, std::vector<std::st
       this->write_var_names_impl("g", num_global_vars, names);
       break;
     default:
-      libMesh::err << "Unrecognized ExodusVarType " << type << std::endl;
-      libmesh_error();
+      libmesh_error_msg("Unrecognized ExodusVarType " << type);
     }
 }
 
@@ -1278,16 +1276,12 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
           // with a mysterious segfault while trying to write mixed
           // element meshes in optimized mode.
           if (elem->type() != conv.get_canonical_type())
-            {
-              libMesh::err << "Error: Exodus requires all elements with a given subdomain ID to be the same type.\n"
-                           << "Can't write both "
-                           << Utility::enum_to_string(elem->type())
-                           << " and "
-                           << Utility::enum_to_string(conv.get_canonical_type())
-                           << " in the same block!"
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("Error: Exodus requires all elements with a given subdomain ID to be the same type.\n" \
+                              << "Can't write both "                  \
+                              << Utility::enum_to_string(elem->type()) \
+                              << " and "                              \
+                              << Utility::enum_to_string(conv.get_canonical_type()) \
+                              << " in the same block!");
 
 
           for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); ++j)
@@ -1827,14 +1821,10 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
   if (it != element_equivalence_map.end())
     return assign_conversion( it->second );
   else
-    {
-      libMesh::err << "ERROR! Unrecognized element type_str: " << type_str << std::endl;
-      libmesh_error();
-    }
-
-  libmesh_error();
+    libmesh_error_msg("ERROR! Unrecognized element type_str: " << type_str);
 
   // dummy return value, we won't get here
+  libmesh_error();
   return assign_conversion (EDGE2);
 }
 
@@ -2126,12 +2116,11 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported element type: " << type);
     }
 
+  // We will never get here
   libmesh_error();
-
-  // dummy return value, we will never get here
   const Conversion conv(tri3_node_map,
                         ARRAY_LENGTH(tri3_node_map),
                         tri3_node_map, // inverse node map same as forward node map
@@ -2193,10 +2182,8 @@ char** ExodusII_IO_Helper::NamesData::get_char_star_star()
 char* ExodusII_IO_Helper::NamesData::get_char_star(int i)
 {
   if (static_cast<unsigned>(i) >= table_size)
-    {
-      libMesh::err << "Requested char* " << i << " but only have " << table_size << "!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Requested char* " << i << " but only have " << table_size << "!");
+
   else
     return &(data_table[i][0]);
 }

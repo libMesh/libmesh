@@ -56,24 +56,18 @@ void MeshData::read_tetgen (const std::string& name)
       desc.erase(position);
     }
   else
-    {
-      libMesh::err << "ERROR: Unrecognized file name: "
-                   << name << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Unrecognized file name: " << name);
 
   // Set the streams from which to read in.
   std::ifstream node_stream (name_node.c_str());
   std::ifstream ele_stream  (name_ele.c_str());
 
   if ( !node_stream.good() || !ele_stream.good() )
-    {
-      libMesh::err << "ERROR: One or both Input file(s) not good." << std::endl
-                   << "Error checking files "
-                   << name_node << " and "
-                   << name_ele  << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: One or both Input file(s) not good.\n"  \
+                      << "Error opening files "                       \
+                      << name_node                                    \
+                      << " and "                                      \
+                      << name_ele);
 
 
   // Set the descriptive name.

@@ -515,7 +515,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
     default:
       // Hm?
-      libmesh_error();
+      libmesh_error_msg("Unknown mesh dimension " << this->mesh_dimension());
     }
 
 
@@ -546,11 +546,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
       // make sure it is linear order
       if (lo_elem->default_order() != FIRST)
-        {
-          libMesh::err << "ERROR: This is not a linear element: type="
-                       << lo_elem->type() << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR: This is not a linear element: type=" << lo_elem->type());
 
       // this does _not_ work for refined elements
       libmesh_assert_equal_to (lo_elem->level (), 0);
@@ -987,10 +983,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                                     }
 
                                   default:
-                                    {
-                                      libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
-                                      libmesh_error();
-                                    }
+                                    libmesh_error_msg("Quad4/8/9 cannot have more than 4 sides.");
                                   }
                               }
 
@@ -1028,10 +1021,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                                     }
 
                                   default:
-                                    {
-                                      libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
-                                      libmesh_error();
-                                    }
+                                    libmesh_error_msg("Quad4/8/9 cannot have more than 4 sides.");
                                   }
                               } // end edge_swap==true
                           } // end if (b_id != BoundaryInfo::invalid_id)
@@ -1084,10 +1074,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                             }
 
                           default:
-                            {
-                              libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
-                              libmesh_error();
-                            }
+                            libmesh_error_msg("Quad4/8/9 cannot have more than 4 sides.");
                           }
                       }
 
@@ -1121,10 +1108,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
                             }
 
                           default:
-                            {
-                              libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
-                              libmesh_error();
-                            }
+                            libmesh_error_msg("Quad4/8/9 cannot have more than 4 sides.");
                           }
                       } // end edge_swap==true
                   } // end if (elem->neighbor(sn) == remote_elem)

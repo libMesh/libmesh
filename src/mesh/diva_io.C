@@ -355,9 +355,7 @@ void DivaIO::write_stream (std::ostream& out_file)
                      << the_mesh.elem(e)->node(5)+1 << '\n';
           }
         else if (the_mesh.elem(e)->type() == PRISM18)
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("PRISM18 element type not supported.");
       }
 
 

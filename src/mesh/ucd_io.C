@@ -54,11 +54,7 @@ void UCDIO::read (const std::string& file_name)
 
 #else
 
-      libMesh::err << "ERROR:  You must have the zlib.h header "
-                   << "files and libraries to read and write "
-                   << "compressed streams."
-                   << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR:  You must have the zlib.h header files and libraries to read and write compressed streams.");
 
 #endif
       return;
@@ -85,11 +81,7 @@ void UCDIO::write (const std::string& file_name)
 
 #else
 
-      libMesh::err << "ERROR:  You must have the zlib.h header "
-                   << "files and libraries to read and write "
-                   << "compressed streams."
-                   << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR:  You must have the zlib.h header files and libraries to read and write compressed streams.");
 
 #endif
       return;
@@ -189,7 +181,7 @@ void UCDIO::read_implementation (std::istream& in)
         else if (type == "prism")
           elem = new Prism6;
         else
-          libmesh_error();
+          libmesh_error_msg("Unsupported element type = " << type);
 
         for (unsigned int n=0; n<elem->n_nodes(); n++)
           {
@@ -218,14 +210,11 @@ void UCDIO::read_implementation (std::istream& in)
 
 #if LIBMESH_DIM < 3
     if (mesh.mesh_dimension() > LIBMESH_DIM)
-      {
-        libMesh::err << "Cannot open dimension " <<
-          mesh.mesh_dimension() <<
-          " mesh file when configured without " <<
-          mesh.mesh_dimension() << "D support." <<
-          std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("Cannot open dimension " \
+                        << mesh.mesh_dimension() \
+                        << " mesh file when configured without " \
+                        << mesh.mesh_dimension() \
+                        << "D support.");
 #endif
   }
 }
@@ -241,12 +230,8 @@ void UCDIO::write_implementation (std::ostream& out_stream)
   // UCD doesn't work in 1D
   libmesh_assert_not_equal_to (mesh.mesh_dimension(), 1);
   if(mesh.mesh_dimension() != 3)
-    {
-      libMesh::err << "Error: Can't write boundary elements for meshes of dimension less than 3"
-                   << "Mesh dimension = " << mesh.mesh_dimension()
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Can't write boundary elements for meshes of dimension less than 3. " \
+                      << "Mesh dimension = " << mesh.mesh_dimension());
 
   // Write header
   this->write_header(out_stream,mesh,mesh.n_elem(),0);
@@ -321,11 +306,7 @@ void UCDIO::write_interior_elems(std::ostream& out_stream, const MeshBase& mesh)
       if( (etype != TRI3) && (etype != QUAD4) &&
           (etype != TET4) && (etype != HEX8) &&
           (etype != PRISM6) && (etype != PYRAMID5) )
-        {
-          libMesh::err << "Error: Unsupported ElemType for UCDIO."
-                       << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Error: Unsupported ElemType for UCDIO.");
 
       out_stream << e++ << " 0 " << type[etype] << "\t";
       // (*it)->write_ucd_connectivity(out_stream);

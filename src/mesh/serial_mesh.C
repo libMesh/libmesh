@@ -198,12 +198,7 @@ const Node& SerialMesh::node (const dof_id_type i) const
 Node& SerialMesh::node (const dof_id_type i)
 {
   if (i >= this->n_nodes())
-    {
-      libMesh::out << " i=" << i
-                   << ", n_nodes()=" << this->n_nodes()
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg(" i=" << i << ", n_nodes()=" << this->n_nodes());
 
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -496,25 +491,16 @@ Node* SerialMesh::add_node (Node* n)
 Node* SerialMesh::insert_node(Node* n)
 {
   if (!n)
-    {
-      libMesh::err << "Error, attempting to insert NULL node." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error, attempting to insert NULL node.");
 
   if (n->id() == DofObject::invalid_id)
-    {
-      libMesh::err << "Error, cannot insert node with invalid id." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error, cannot insert node with invalid id.");
 
   if (n->id() < _nodes.size())
     {
       // Don't allow inserting on top of an existing Node.
       if (_nodes[ n->id() ] != NULL)
-        {
-          libMesh::err << "Error, cannot insert node on top of existing node." << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Error, cannot insert node on top of existing node.");
     }
   else
     {
@@ -1001,10 +987,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                     Point other_point = other_iter->first;
 
                     if (!this_point.absolute_fuzzy_equals(other_point, tol*h_min))
-                      {
-                        libMesh::out << "Error: mismatched points: " << this_point << " and " << other_point << std::endl;
-                        libmesh_error();
-                      }
+                      libmesh_error_msg("Error: mismatched points: " << this_point << " and " << other_point);
                   }
 
 
@@ -1046,10 +1029,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                     {
                       // Make sure we didn't already find a matching node!
                       if(found_matching_nodes)
-                        {
-                          libMesh::out << "Error: Found multiple matching nodes in stitch_meshes" << std::endl;
-                          libmesh_error();
-                        }
+                        libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
 
                       node_to_node_map[this_node_id] = other_node_id;
                       other_to_this_node_map[other_node_id] = this_node_id;
@@ -1103,11 +1083,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
           unsigned int other_mesh_n_nodes = other_boundary_node_ids.size();
           if( (n_matching_nodes != this_mesh_n_nodes) ||
               (n_matching_nodes != other_mesh_n_nodes) )
-            {
-              libMesh::out << "Error: We expected the number of nodes to match."
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("Error: We expected the number of nodes to match.");
         }
     }
   else

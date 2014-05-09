@@ -101,9 +101,7 @@ void OFFIO::read_stream(std::istream& in)
           if (nv == 3)
             {
 #if LIBMESH_DIM < 2
-              libMesh::err << "Cannot open dimension 2 mesh file when configured without 2D support." <<
-                std::endl;
-              libmesh_error();
+              libmesh_error_msg("Cannot open dimension 2 mesh file when configured without 2D support.");
 #endif
             }
         }
@@ -111,9 +109,16 @@ void OFFIO::read_stream(std::istream& in)
       Elem* elem;
       switch (nv)
         {
-        case 2: elem = new Edge2; break;
-        case 3: elem = new Tri3 ; break;
-        default: libmesh_error();
+        case 2:
+          elem = new Edge2;
+          break;
+
+        case 3:
+          elem = new Tri3;
+          break;
+
+        default:
+          libmesh_error_msg("Unsupported nv = " << nv);
         }
 
       elem->set_id(e);

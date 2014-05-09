@@ -150,10 +150,7 @@ void TriangleWrapper::copy_tri_to_mesh(const triangulateio& triangle_data_input,
           }
 
         default:
-          {
-            libMesh::err << "ERROR: Unrecognized triangular element type." << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("ERROR: Unrecognized triangular element type.");
         }
     }
 

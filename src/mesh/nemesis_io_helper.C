@@ -1809,10 +1809,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
 
       // The code below assumes this subdomain block is not empty, make sure that's the case!
       if (elem_ids_this_subdomain.size() == 0)
-        {
-          libMesh::err << "Error, no element IDs found in subdomain " << (*it).first << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Error, no element IDs found in subdomain " << (*it).first);
 
       ExodusII_IO_Helper::ElementMaps em;
 
@@ -2202,14 +2199,10 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
                   local_elem_boundary_id_side_lists[ bndry_id_list[i] ].push_back(conv.get_inverse_side_map( bndry_side_list[i] ));
                 }
               else
-                {
-                  libMesh::err << "Error, no Exodus mapping for Elem "
-                               << family[j]->id()
-                               << " on processor "
-                               << this->processor_id()
-                               << std::endl;
-                  libmesh_error();
-                }
+                libmesh_error_msg("Error, no Exodus mapping for Elem " \
+                                  << family[j]->id()                  \
+                                  << " on processor "                 \
+                                  << this->processor_id());
             }
         }
     }

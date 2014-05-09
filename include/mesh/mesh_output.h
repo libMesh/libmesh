@@ -98,7 +98,7 @@ public:
   virtual void write_nodal_data (const std::string&,
                                  const std::vector<Number>&,
                                  const std::vector<std::string>&)
-  { libmesh_error(); }
+  { libmesh_not_implemented(); }
 
   /**
    * Return/set the precision to use when writing ASCII files.
@@ -184,7 +184,6 @@ MeshOutput<MT>::MeshOutput (const MT& obj, const bool is_parallel_format) :
                           "Warning:  This MeshOutput subclass only supports meshes which have been serialized!"
                           << std::endl;);
         }
-      //      libmesh_error();
     }
 }
 

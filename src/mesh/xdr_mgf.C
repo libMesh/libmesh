@@ -86,13 +86,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 
         // Make sure the file is ready for use
         if (!mp_fp)
-          {
-            libMesh::err << "XDR Error: Accessing file: "
-                         << fn
-                         << " failed."
-                         << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("XDR Error: Accessing file: " << fn << " failed.");
 
         // Create the XDR handle
         mp_xdr_handle = new XDR;
@@ -128,10 +122,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
       }
 
     default:
-      {
-        libMesh::out << "Unrecognized file access type!" << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("Unrecognized file access type!");
     }
 
 
@@ -163,7 +154,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
           name << "LIBM " << this->get_num_levels();
 
         else
-          libmesh_error();
+          libmesh_error_msg("Unknown orig " << orig);
 
         // Fill the buffer
         std::sprintf(&buf[0], "%s", name.str().c_str());
@@ -237,7 +228,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unknown m_type" << m_type);
     }
 
 
@@ -263,12 +254,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
         }
 
       else
-        {
-          libMesh::err <<
-            "No originating software can be determined for header string '" <<
-            name << "'. Error." << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR: No originating software can be determined for header string '" << name);
     }
 
 }
@@ -330,7 +316,7 @@ int XdrMGF::dataBlk(int* array, int numvar, int size)
 
     default:
       // Unknown access type
-      libmesh_error();
+      libmesh_error_msg("Unknown m_type" << m_type);
     }
 
   return totalSize;
@@ -412,7 +398,7 @@ int XdrMGF::dataBlk(Real* array, int numvar, int size)
 
     default:
       // Unknown access type
-      libmesh_error();
+      libmesh_error_msg("Unknown m_type" << m_type);
     }
 
   return totalSize;

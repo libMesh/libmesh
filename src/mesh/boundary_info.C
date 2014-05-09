@@ -528,14 +528,9 @@ void BoundaryInfo::add_node(const Node* node,
                             const boundary_id_type id)
 {
   if (id == invalid_id)
-    {
-      libMesh::err << "ERROR: You may not set a boundary ID of "
-                   << invalid_id << std::endl
-                   << " That is reserved for internal use.\n"
-                   << std::endl;
-
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: You may not set a boundary ID of "   \
+                      << invalid_id                                \
+                      << "\n That is reserved for internal use.");
 
   // A convenient typedef
   typedef std::multimap<const Node*, boundary_id_type>::const_iterator Iter;
@@ -573,14 +568,9 @@ void BoundaryInfo::add_node(const Node* node,
       boundary_id_type id=ids[i];
 
       if (id == invalid_id)
-        {
-          libMesh::err << "ERROR: You may not set a boundary ID of "
-                       << invalid_id << std::endl
-                       << " That is reserved for internal use.\n"
-                       << std::endl;
-
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR: You may not set a boundary ID of "    \
+                          << invalid_id                                 \
+                          << "\n That is reserved for internal use.");
 
       bool already_inserted = false;
       for (Iter p = pos.first;p != pos.second; ++p)
@@ -625,14 +615,9 @@ void BoundaryInfo::add_edge(const Elem* elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   if (id == invalid_id)
-    {
-      libMesh::err << "ERROR: You may not set a boundary ID of "
-                   << invalid_id << std::endl
-                   << " That is reserved for internal use.\n"
-                   << std::endl;
-
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: You may not set a boundary ID of "        \
+                      << invalid_id                                     \
+                      << "\n That is reserved for internal use.");
 
   // A convenient typedef
   typedef std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
@@ -681,14 +666,9 @@ void BoundaryInfo::add_edge(const Elem* elem,
       boundary_id_type id=ids[i];
 
       if (id == invalid_id)
-        {
-          libMesh::err << "ERROR: You may not set a boundary ID of "
-                       << invalid_id << std::endl
-                       << " That is reserved for internal use.\n"
-                       << std::endl;
-
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR: You may not set a boundary ID of "   \
+                          << invalid_id                                \
+                          << "\n That is reserved for internal use.");
 
       bool already_inserted = false;
       for (Iter p = pos.first;p != pos.second; ++p)
@@ -730,14 +710,9 @@ void BoundaryInfo::add_side(const Elem* elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   if (id == invalid_id)
-    {
-      libMesh::err << "ERROR: You may not set a boundary ID of "
-                   << invalid_id << std::endl
-                   << " That is reserved for internal use.\n"
-                   << std::endl;
-
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: You may not set a boundary ID of "        \
+                      << invalid_id                                     \
+                      << "\n That is reserved for internal use.");
 
   // A convenient typedef
   typedef std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
@@ -786,14 +761,9 @@ void BoundaryInfo::add_side(const Elem* elem,
       boundary_id_type id=ids[i];
 
       if (id == invalid_id)
-        {
-          libMesh::err << "ERROR: You may not set a boundary ID of "
-                       << invalid_id << std::endl
-                       << " That is reserved for internal use.\n"
-                       << std::endl;
-
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR: You may not set a boundary ID of "    \
+                          << invalid_id                                 \
+                          << "\n That is reserved for internal use.");
 
       bool already_inserted = false;
       for (Iter p = pos.first;p != pos.second; ++p)
@@ -1874,8 +1844,7 @@ boundary_id_type BoundaryInfo::get_id_by_name(const std::string& name) const
         return iter->first;
     }
 
-  libMesh::err << "The sideset/nodeset named " << name << " does not exist in mesh!" << std::endl;
-  libmesh_error();
+  libmesh_error_msg("The sideset/nodeset named " << name << " does not exist in mesh!");
 }
 
 } // namespace libMesh

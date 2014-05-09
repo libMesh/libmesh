@@ -37,8 +37,7 @@
 #define EX_CHECK_ERR(code, msg)                 \
   do {                                          \
     if ((code) < 0) {                           \
-      libMesh::err << (msg) << std::endl;       \
-      libmesh_error();                          \
+      libmesh_error_msg((msg));                 \
     } } while(0)
 
 #define EX_EXCEPTIONLESS_CHECK_ERR(code, msg)   \

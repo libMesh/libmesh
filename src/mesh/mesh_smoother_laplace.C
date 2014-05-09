@@ -55,10 +55,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
 
   // Ensure that the find_boundary_nodes() function returned a properly-sized vector
   if (on_boundary.size() != _mesh.n_nodes())
-    {
-      libMesh::err << "MeshTools::find_boundary_nodes() returned incorrect length vector!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("MeshTools::find_boundary_nodes() returned incorrect length vector!");
 
   // We can only update the nodes after all new positions were
   // determined. We store the new positions here
@@ -76,10 +73,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
             Node* node = *it;
 
             if (node == NULL)
-              {
-                libMesh::err << "[" << _mesh.processor_id() << "]: Node iterator returned NULL pointer." << std::endl;
-                libmesh_error();
-              }
+              libmesh_error_msg("[" << _mesh.processor_id() << "]: Node iterator returned NULL pointer.");
 
             // leave the boundary intact
             // Only relocate the nodes which are vertices of an element
@@ -97,10 +91,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
                     Node* connected_node = _mesh.node_ptr(_graph[node->id()][j]);
 
                     if (connected_node == NULL)
-                      {
-                        libMesh::err << "Error! Libmesh returned NULL pointer for node " << _graph[connected_node->id()][j] << std::endl;
-                        libmesh_error();
-                      }
+                      libmesh_error_msg("Error! Libmesh returned NULL pointer for node " << _graph[connected_node->id()][j]);
 
                     avg_position.add( *connected_node );
                   } // end for(j)
@@ -263,14 +254,7 @@ void LaplaceMeshSmoother::init()
       } // case 3
 
     default:
-      {
-        libMesh::err << "At this time it is not possible "
-                     << "to smooth a dimension "
-                     << _mesh.mesh_dimension()
-                     << "mesh.  Aborting..."
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("At this time it is not possible to smooth a dimension " << _mesh.mesh_dimension() << "mesh.  Aborting...");
     }
 
   // Done building graph from local elements.  Let's now allgather the

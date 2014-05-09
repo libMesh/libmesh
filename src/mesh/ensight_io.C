@@ -569,8 +569,7 @@ void EnsightIO::elem_type_to_string(ElemType type, char* buffer)
     std::strcpy(buffer,"quad8");
     break;
   case QUAD9:
-    libMesh::out<<"QUAD9: element not supported!"<<std::endl;
-    libmesh_error();
+    libmesh_error_msg("QUAD9: element not supported!");
     break;
 
   case TRI3:
@@ -592,8 +591,7 @@ void EnsightIO::elem_type_to_string(ElemType type, char* buffer)
     std::strcpy(buffer,"hexa20");
     break;
   case HEX27:
-    libMesh::out<<"HEX27: element not supported!"<<std::endl;
-    libmesh_error();
+    libmesh_error_msg("HEX27: element not supported!");
     break;
   case PYRAMID5:
     std::strcpy(buffer,"pyramid5");

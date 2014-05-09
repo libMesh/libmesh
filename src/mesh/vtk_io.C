@@ -154,11 +154,7 @@ vtkIdType VTKIO::get_elem_type(ElemType type)
     case NODEELEM:
     case INVALID_ELEM:
     default:
-      {
-        libMesh::err<<"element type "<<type<<" not implemented"<<std::endl;
-        libmesh_error();
-        break;
-      }
+      libmesh_error_msg("Element type " << type << " not implemented.");
     }
   return celltype;
 }
@@ -246,12 +242,7 @@ void VTKIO::cells_to_vtk()
 
               // Error checking...
               if (the_node == NULL)
-                {
-                  libMesh::err << "Error getting pointer to node "
-                               << global_node_id
-                               << "!" << std::endl;
-                  libmesh_error();
-                }
+                libmesh_error_msg("Error getting pointer to node " << global_node_id << "!");
 
               // InsertNextPoint accepts either a double or float array of length 3.
               Real pt[3] = {0., 0., 0.};
@@ -408,10 +399,8 @@ void VTKIO::read (const std::string& name)
   elems_of_dimension.resize(4, false);
 
 #ifndef LIBMESH_HAVE_VTK
-  libMesh::err << "Cannot read VTK file: " << name
-               << "\nYou must have VTK installed and correctly configured to read VTK meshes."
-               << std::endl;
-  libmesh_error();
+  libmesh_error_msg("Cannot read VTK file: " << name \
+                    << "\nYou must have VTK installed and correctly configured to read VTK meshes.");
 
 #else
   // Use a typedef, because these names are just crazy
@@ -513,9 +502,7 @@ void VTKIO::read (const std::string& name)
           elem = new Pyramid5();
           break;
         default:
-          libMesh::err << "element type not implemented in vtkinterface " << cell->GetCellType() << std::endl;
-          libmesh_error();
-          break;
+          libmesh_error_msg("Element type not implemented in vtkinterface " << cell->GetCellType());
         }
 
       // get the straightforward numbering from the VTK cells
@@ -545,14 +532,11 @@ void VTKIO::read (const std::string& name)
 
 #if LIBMESH_DIM < 3
   if (mesh.mesh_dimension() > LIBMESH_DIM)
-    {
-      libMesh::err << "Cannot open dimension " <<
-        mesh.mesh_dimension() <<
-        " mesh file when configured without " <<
-        mesh.mesh_dimension() << "D support." <<
-        std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Cannot open dimension "  \
+                      << mesh.mesh_dimension()              \
+                      << " mesh file when configured without "  \
+                      << mesh.mesh_dimension()                  \
+                      << "D support.");
 #endif
 
 #endif // LIBMESH_HAVE_VTK
@@ -572,10 +556,8 @@ void VTKIO::write_nodal_data (const std::string& fname,
 {
 #ifndef LIBMESH_HAVE_VTK
 
-  libMesh::err << "Cannot write VTK file: " << fname
-               << "\nYou must have VTK installed and correctly configured to read VTK meshes."
-               << std::endl;
-  libmesh_error();
+  libmesh_error_msg("Cannot write VTK file: " << fname                  \
+                    << "\nYou must have VTK installed and correctly configured to read VTK meshes.");
 
 #else
 

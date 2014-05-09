@@ -164,7 +164,8 @@ template <class MT>
 inline
 MT& MeshInput<MT>::mesh ()
 {
-  if (_obj == NULL) libmesh_error();
+  if (_obj == NULL)
+    libmesh_error_msg("ERROR: _obj should not be NULL!");
   return *_obj;
 }
 

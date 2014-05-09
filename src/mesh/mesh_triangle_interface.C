@@ -275,15 +275,10 @@ void TriangleInterface::triangulate()
       }
 
     case INVALID_TRIANGULATION_TYPE:
-      {
-        libmesh_error();
-        break;
-      }
+      libmesh_error_msg("ERROR: INVALID_TRIANGULATION_TYPE selected!");
 
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("Unrecognized _triangulation_type");
     }
 
 
@@ -303,10 +298,7 @@ void TriangleInterface::triangulate()
       }
 
     default:
-      {
-        libMesh::err << "ERROR: Unrecognized triangular element type." << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unrecognized triangular element type.");
     }
 
 

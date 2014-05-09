@@ -879,10 +879,7 @@ const std::vector<Number>& MeshData::get_data (const Node* node) const
 
 #ifdef DEBUG
   if (pos == _node_data.end())
-    {
-      libMesh::err << "ERROR: No data for this node.  Use has_data() first!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: No data for this node.  Use has_data() first!");
 #endif
 
   return pos->second;
@@ -962,10 +959,7 @@ const std::vector<Number>& MeshData::get_data (const Elem* elem) const
 
 #ifdef DEBUG
   if (pos == _elem_data.end())
-    {
-      libMesh::err << "ERROR: No data for this element.  Use has_data() first!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: No data for this element.  Use has_data() first!");
 #endif
 
   return pos->second;

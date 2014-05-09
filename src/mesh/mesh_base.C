@@ -453,8 +453,7 @@ subdomain_id_type MeshBase::get_id_by_name(const std::string& name) const
         return iter->first;
     }
 
-  libMesh::err << "Block '" << name << "' does not exist in mesh" << std::endl;
-  libmesh_error();
+  libmesh_error_msg("Block '" << name << "' does not exist in mesh");
 }
 
 

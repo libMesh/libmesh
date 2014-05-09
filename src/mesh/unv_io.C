@@ -87,11 +87,7 @@ void UNVIO::read (const std::string& file_name)
 
 #else
 
-      libMesh::err << "ERROR:  You must have the zlib.h header "
-                   << "files and libraries to read and write "
-                   << "compressed streams."
-                   << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR:  You must have the zlib.h header files and libraries to read and write compressed streams.");
 
 #endif
       return;
@@ -133,11 +129,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
     // the first time we read the file,
     // merely to obtain overall info
     if ( !in_stream.good() )
-      {
-        libMesh::err << "ERROR: Input file not good."
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Input file not good.");
 
 
     // Count nodes and elements, then let
@@ -208,27 +200,17 @@ void UNVIO::read_implementation (std::istream& in_stream)
     // the datasets for nodes and elements,
     // otherwise the unv files is bad!
     if (!found_elem)
-      {
-        libMesh::err << "ERROR: Could not find elements!" << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Could not find elements!");
 
     if (!found_node)
-      {
-        libMesh::err << "ERROR: Could not find nodes!" << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Could not find nodes!");
 
 
     // Don't close, just seek to the beginning
     in_stream.seekg(0, std::ios::beg);
 
     if (!in_stream.good() )
-      {
-        libMesh::err << "ERROR: Cannot re-read input file."
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Cannot re-read input file.");
   }
 
 
@@ -255,7 +237,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
           this->element_in (in_stream);
 
         else
-          libmesh_error();
+          libmesh_error_msg("Unsupported order_of_datasets[ds] value " << order_of_datasets[ds]);
       }
 
     // Set the mesh dimension to the largest encountered for an element
@@ -265,14 +247,11 @@ void UNVIO::read_implementation (std::istream& in_stream)
 
 #if LIBMESH_DIM < 3
     if (MeshInput<MeshBase>::mesh().mesh_dimension() > LIBMESH_DIM)
-      {
-        libMesh::err << "Cannot open dimension " <<
-          MeshInput<MeshBase>::mesh().mesh_dimension() <<
-          " mesh file when configured without " <<
-          MeshInput<MeshBase>::mesh().mesh_dimension() << "D support." <<
-          std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("Cannot open dimension "                        \
+                        << MeshInput<MeshBase>::mesh().mesh_dimension() \
+                        << " mesh file when configured without "        \
+                        << MeshInput<MeshBase>::mesh().mesh_dimension() \
+                        << "D support." );
 #endif
 
     // tell the MeshData object that we are finished
@@ -303,11 +282,7 @@ void UNVIO::write (const std::string& file_name)
 
 #else
 
-      libMesh::err << "ERROR:  You must have the zlib.h header "
-                   << "files and libraries to read and write "
-                   << "compressed streams."
-                   << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR:  You must have the zlib.h header files and libraries to read and write compressed streams.");
 
 #endif
 
@@ -328,11 +303,7 @@ void UNVIO::write (const std::string& file_name)
 void UNVIO::write_implementation (std::ostream& out_file)
 {
   if ( !out_file.good() )
-    {
-      libMesh::err << "ERROR: Output file not good."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Output file not good.");
 
 
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -378,11 +349,7 @@ void UNVIO::count_nodes (std::istream& in_file)
   // if this->_n_nodes is not 0 the dataset
   // has already been scanned
   if (this->_n_nodes != 0)
-    {
-      libMesh::err << "Error: Trying to scan nodes twice!"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Trying to scan nodes twice!");
 
 
   // Read from file, count nodes,
@@ -393,11 +360,7 @@ void UNVIO::count_nodes (std::istream& in_file)
 
 
   if (data == "-1")
-    {
-      libMesh::err << "ERROR: Bad, already reached end of dataset before even starting to read nodes!"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Bad, already reached end of dataset before even starting to read nodes!");
 
 
   // ignore the misc data for this node
@@ -459,11 +422,7 @@ void UNVIO::count_nodes (std::istream& in_file)
 
 
   if (in_file.eof())
-    {
-      libMesh::err << "ERROR: File ended before end of node dataset!"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: File ended before end of node dataset!");
 
   if (this->verbose())
     libMesh::out << "  Nodes   : " << this->_n_nodes << std::endl;
@@ -481,11 +440,7 @@ void UNVIO::count_elements (std::istream& in_file)
   START_LOG("count_elements()","UNVIO");
 
   if (this->_n_elements != 0)
-    {
-      libMesh::err << "Error: Trying to scan elements twice!"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Trying to scan elements twice!");
 
 
   // Simply read the element
@@ -531,11 +486,7 @@ void UNVIO::count_elements (std::istream& in_file)
 
 
   if (in_file.eof())
-    {
-      libMesh::err << "ERROR: File ended before end of element dataset!"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: File ended before end of element dataset!");
 
   if (this->verbose())
     libMesh::out << "  Elements: " << this->_n_elements << std::endl;
@@ -556,10 +507,7 @@ void UNVIO::node_in (std::istream& in_file)
   const bool ok = this->beginning_of_dataset(in_file, _label_dataset_nodes);
 
   if (!ok)
-    {
-      libMesh::err << "ERROR: Could not find node dataset!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Could not find node dataset!");
 
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
@@ -666,10 +614,7 @@ void UNVIO::element_in (std::istream& in_file)
   const bool ok = this->beginning_of_dataset(in_file, _label_dataset_elements);
 
   if (!ok)
-    {
-      libMesh::err << "ERROR: Could not find element dataset!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Could not find element dataset!");
 
 
   unsigned int      element_lab,       // element label (not supported yet)
@@ -753,13 +698,7 @@ void UNVIO::element_in (std::istream& in_file)
           }
 
         case 43: // Plane Stress Cubic Triangle
-          {
-            libMesh::err << "ERROR: UNV-element type 43: Plane Stress Cubic Triangle"
-                         << " not supported."
-                         << std::endl;
-            libmesh_error();
-            break;
-          }
+          libmesh_error_msg("ERROR: UNV-element type 43: Plane Stress Cubic Triangle not supported.");
 
         case 44: // Plane Stress Linear Quadrilateral
         case 94: // Thin Shell   Linear Quadrilateral
@@ -806,13 +745,7 @@ void UNVIO::element_in (std::istream& in_file)
           }
 
         case 46: // Plane Stress Cubic Quadrilateral
-          {
-            libMesh::err << "ERROR: UNV-element type 46: Plane Stress Cubic Quadrilateral"
-                         << " not supported."
-                         << std::endl;
-            libmesh_error();
-            break;
-          }
+          libmesh_error_msg("ERROR: UNV-element type 46: Plane Stress Cubic Quadrilateral not supported.");
 
         case 111: // Solid Linear Tetrahedron
           {
@@ -883,13 +816,7 @@ void UNVIO::element_in (std::istream& in_file)
           }
 
         case 117: // Solid Cubic Brick
-          {
-            libMesh::err << "Error: UNV-element type 117: Solid Cubic Brick"
-                         << " not supported."
-                         << std::endl;
-            libmesh_error();
-            break;
-          }
+          libmesh_error_msg("Error: UNV-element type 117: Solid Cubic Brick not supported.");
 
         case 118: // Solid Quadratic Tetrahedron
           {
@@ -909,14 +836,7 @@ void UNVIO::element_in (std::istream& in_file)
           }
 
         default: // Unrecognized element type
-          {
-            libMesh::err << "ERROR: UNV-element type "
-                         << fe_descriptor_id
-                         << " not supported."
-                         << std::endl;
-            libmesh_error();
-            break;
-          }
+          libmesh_error_msg("ERROR: UNV-element type " << fe_descriptor_id << " not supported.");
         }
 
       // nodes are being stored in element
@@ -1226,15 +1146,7 @@ void UNVIO::element_out(std::ostream& out_file)
           }
 
         default:
-          {
-            libMesh::err << "ERROR: Element type = "
-                         << elem->type()
-                         << " not supported in "
-                         << "UNVIO!"
-                         << std::endl;
-            libmesh_error();
-            break;
-          }
+          libmesh_error_msg("ERROR: Element type = " << elem->type() << " not supported in " << "UNVIO!");
         }
 
 

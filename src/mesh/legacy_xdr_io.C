@@ -390,7 +390,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
   else
     {
       // I don't know what type of mesh it is.
-      libmesh_error();
+      libmesh_error_msg("Unrecognized flag " << m.get_orig_flag());
     }
 
   // read in the nodal coordinates and form points.
@@ -485,11 +485,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
 
                             // If the parent was not previously added, we cannot continue.
                             if (it == parents.end())
-                              {
-                                libMesh::err << "Parent element with ID " << parent_ID
-                                             << " not found." << std::endl;
-                                libmesh_error();
-                              }
+                              libmesh_error_msg("Parent element with ID " << parent_ID << " not found.");
 
                             // Set the my_parent pointer
                             my_parent = (*it).second;
@@ -580,7 +576,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
                   }
                 else
                   // We can probably handle this, but we don't expect it
-                  libmesh_error();
+                  libmesh_error_msg("Unexpected NULL elem encountered while reading libmesh XDR file.");
               }
           }
         }
@@ -593,11 +589,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
 #ifdef DEBUG
       if (mesh_data != NULL)
         if (mesh_data->active())
-          {
-            libMesh::err << "ERROR: MeshData not implemented for MGF-style mesh."
-                         << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("ERROR: MeshData not implemented for MGF-style mesh.");
 #endif
 
       for (int ielm=0; ielm < numElem; ++ielm)
@@ -621,14 +613,11 @@ void LegacyXdrIO::read_mesh (const std::string& name,
 
 #if LIBMESH_DIM < 3
   if (mesh.mesh_dimension() > LIBMESH_DIM)
-    {
-      libMesh::err << "Cannot open dimension " <<
-        mesh.mesh_dimension() <<
-        " mesh file when configured without " <<
-        mesh.mesh_dimension() << "D support." <<
-        std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Cannot open dimension "              \
+                      << mesh.mesh_dimension()                          \
+                      << " mesh file when configured without "          \
+                      << mesh.mesh_dimension()                          \
+                      << "D support." );
 #endif
 
   // tell the MeshData object that we are finished
@@ -805,7 +794,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
     totalWeight = non_subactive_weight+2*numElem;
 
   else
-    libmesh_error();
+    libmesh_error_msg("Unrecognized flag " << m.get_orig_flag());
 
   // Set the total weight in the header
   mh.setSumWghts(totalWeight);
@@ -858,7 +847,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
                   nn = mesh.elem(e)->n_nodes() + 2;
 
                 else
-                  libmesh_error();
+                  libmesh_error_msg("Unrecognized orig_type = " << orig_type);
 
                 // Loop over the connectivity entries for this element and write to conn.
                 START_LOG("set connectivity", "LegacyXdrIO::write_mesh");

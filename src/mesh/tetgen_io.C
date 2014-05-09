@@ -44,9 +44,7 @@ void TetGenIO::read (const std::string& name)
   MeshInput<MeshBase>::mesh().set_mesh_dimension(3);
 
 #if LIBMESH_DIM < 3
-  libMesh::err << "Cannot open dimension 3 mesh file when configured without 3D support." <<
-    std::endl;
-  libmesh_error();
+  libmesh_error_msg("Cannot open dimension 3 mesh file when configured without 3D support.");
 #endif
 
   // Check name for *.node or *.ele extension.
@@ -67,11 +65,7 @@ void TetGenIO::read (const std::string& name)
       name_node    = dummy.replace(position, 4, ".node");
     }
   else
-    {
-      libMesh::err << "ERROR: Unrecognized file name: "
-                   << name << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Unrecognized file name: " << name);
 
 
 
@@ -80,13 +74,11 @@ void TetGenIO::read (const std::string& name)
   std::ifstream ele_stream  (name_ele.c_str());
 
   if ( !node_stream.good() || !ele_stream.good() )
-    {
-      libMesh::err << "ERROR: One or both Input file(s) not good." << std::endl
-                   << "Error checking files "
-                   << name_node << " and "
-                   << name_ele  << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error while opening either "     \
+                      << name_node                      \
+                      << " or "                         \
+                      << name_ele);
+
   libMesh::out<< "TetGenIO found the tetgen files to read " <<std::endl;
 
   // Skip the comment lines at the beginning
@@ -226,11 +218,8 @@ void TetGenIO::element_in (std::istream& ele_stream)
         elem = new Tet10;
 
       else
-        {
-          libMesh::err << "Elements with " << n_nodes
-                       << " nodes are not supported in the LibMesh tetgen module\n";
-          libmesh_error();
-        }
+        libmesh_error_msg("Elements with " << n_nodes << " nodes are not supported in the LibMesh tetgen module.");
+
       elem->set_id(i);
 
       mesh.add_elem (elem);
@@ -274,11 +263,7 @@ void TetGenIO::write (const std::string& fname)
   libmesh_assert_equal_to (MeshOutput<MeshBase>::mesh().mesh_dimension(), 3);
 
   if (!(fname.rfind(".poly") < fname.size()))
-    {
-      libMesh::err << "ERROR: Unrecognized file name: "
-                   << fname << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Unrecognized file name: " << fname);
 
   // Open the output file stream
   std::ofstream out_stream (fname.c_str());
