@@ -55,11 +55,11 @@ fi
 
 
 # --------------------------------------------------------------
-# Allow user to specify --enable-strict-lgpl
-# By default libmesh is built with some contrib libraries whose
-# licenses are not compatible with the LGPL, configure with
-# --enable-strict-lgpl to build libmesh with only LGPL-compatible
-# contrib libraries.
+# Allow user to specify --disable-strict-lgpl
+# By default libmesh is built only with LGPL-compatible contrib
+# libraries, but the user can pass --disable-strict-lgpl to configure
+# to turn on Laspack, Triangle, and Space-filling curves library
+# support.
 # --------------------------------------------------------------
 AC_ARG_ENABLE(strict-lgpl,
               AC_HELP_STRING([--enable-strict-lgpl],
@@ -69,7 +69,7 @@ AC_ARG_ENABLE(strict-lgpl,
                   no) enablestrictlgpl=no ;;
                   *) AC_MSG_ERROR(bad value ${enableval} for --enable-strict-lgpl) ;;
                esac],
-              [enablestrictlgpl=no])
+              [enablestrictlgpl=yes])
 
 
 # --------------------------------------------------------------
@@ -196,6 +196,7 @@ fi
 # --enable-strict-lgpl is specified
 # -------------------------------------------------------------
 if (test $enablestrictlgpl = yes) ; then
+  AC_MSG_RESULT([<<< Laspack support is disabled, configure with --disable-strict-lgpl to enable it >>>])
   enablelaspack=no;
 else
   CONFIGURE_LASPACK
@@ -215,6 +216,7 @@ AC_CONFIG_FILES([contrib/laspack/Makefile])
 # --enable-strict-lgpl is specified
 # -------------------------------------------------------------
 if (test $enablestrictlgpl = yes) ; then
+  AC_MSG_RESULT([<<< The space filling curves partitioner is disabled, configure with --disable-strict-lgpl to enable it >>>])
   enablesfc=no;
 else
   CONFIGURE_SFC
@@ -382,6 +384,7 @@ AC_CONFIG_FILES([contrib/tetgen/Makefile])
 # Triangle -- enabled unless --enable-strict-lgpl is specified
 # -------------------------------------------------------------
 if (test $enablestrictlgpl = yes) ; then
+  AC_MSG_RESULT([<<< Triangle meshing support is disabled, configure with --disable-strict-lgpl to enable it >>>])
   enabletriangle=no;
 else
   CONFIGURE_TRIANGLE
