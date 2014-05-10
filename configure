@@ -1086,6 +1086,7 @@ enable_reference_counting
 enable_perflog
 enable_examples
 enable_optional
+enable_strict_lgpl
 enable_nested
 enable_boost
 with_boost
@@ -1858,6 +1859,8 @@ Optional Features:
   --enable-examples       support compilation, installation, & running example
                           suite
   --enable-optional       en/disable optional external libraries
+  --enable-strict-lgpl    Compile libmesh with LGPL-compatible contrib
+                          libraries only
   --enable-nested         en/disable nested autoconf subpackages
   --enable-boost          build with either external or built-in BOOST support
   --enable-petsc          build with PETSc iterative solver suppport
@@ -27425,6 +27428,26 @@ fi
 
 
 # --------------------------------------------------------------
+# Allow user to specify --disable-strict-lgpl
+# By default libmesh is built only with LGPL-compatible contrib
+# libraries, but the user can pass --disable-strict-lgpl to configure
+# to turn on Laspack, Triangle, and Space-filling curves library
+# support.
+# --------------------------------------------------------------
+# Check whether --enable-strict-lgpl was given.
+if test "${enable_strict_lgpl+set}" = set; then :
+  enableval=$enable_strict_lgpl; case "${enableval}" in
+                  yes) enablestrictlgpl=yes ;;
+                  no) enablestrictlgpl=no ;;
+                  *) as_fn_error $? "bad value ${enableval} for --enable-strict-lgpl" "$LINENO" 5 ;;
+               esac
+else
+  enablestrictlgpl=yes
+fi
+
+
+
+# --------------------------------------------------------------
 # Allow for disable-nested
 # --------------------------------------------------------------
 # Check whether --enable-nested was given.
@@ -30839,8 +30862,14 @@ fi
 
 
 # -------------------------------------------------------------
-# LASPACK iterative solvers -- enabled by default
+# LASPACK iterative solvers -- enabled unless
+# --enable-strict-lgpl is specified
 # -------------------------------------------------------------
+if (test $enablestrictlgpl = yes) ; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Laspack support is disabled, configure with --disable-strict-lgpl to enable it >>>" >&5
+$as_echo "<<< Laspack support is disabled, configure with --disable-strict-lgpl to enable it >>>" >&6; }
+  enablelaspack=no;
+else
 
   # Check whether --enable-laspack was given.
 if test "${enable_laspack+set}" = set; then :
@@ -30873,9 +30902,11 @@ $as_echo "<<< Configuring library with Laspack support >>>" >&6; }
 
 
 
-if (test $enablelaspack = yes); then
-  libmesh_contrib_INCLUDES="$LASPACK_INCLUDE $libmesh_contrib_INCLUDES"
+  if (test $enablelaspack = yes); then
+    libmesh_contrib_INCLUDES="$LASPACK_INCLUDE $libmesh_contrib_INCLUDES"
+  fi
 fi
+
  if test x$enablelaspack = xyes; then
   LIBMESH_ENABLE_LASPACK_TRUE=
   LIBMESH_ENABLE_LASPACK_FALSE='#'
@@ -30891,8 +30922,14 @@ ac_config_files="$ac_config_files contrib/laspack/Makefile"
 
 
 # -------------------------------------------------------------
-# Space filling curves -- enabled by default
+# Space filling curves -- enabled unless
+# --enable-strict-lgpl is specified
 # -------------------------------------------------------------
+if (test $enablestrictlgpl = yes) ; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< The space filling curves partitioner is disabled, configure with --disable-strict-lgpl to enable it >>>" >&5
+$as_echo "<<< The space filling curves partitioner is disabled, configure with --disable-strict-lgpl to enable it >>>" >&6; }
+  enablesfc=no;
+else
 
   # Check whether --enable-sfc was given.
 if test "${enable_sfc+set}" = set; then :
@@ -30925,9 +30962,11 @@ $as_echo "<<< Configuring library with SFC support >>>" >&6; }
 
 
 
-if (test $enablesfc = yes); then
-  libmesh_contrib_INCLUDES="$SFC_INCLUDE $libmesh_contrib_INCLUDES"
+  if (test $enablesfc = yes); then
+    libmesh_contrib_INCLUDES="$SFC_INCLUDE $libmesh_contrib_INCLUDES"
+  fi
 fi
+
  if test x$enablesfc = xyes; then
   LIBMESH_ENABLE_SFC_TRUE=
   LIBMESH_ENABLE_SFC_FALSE='#'
@@ -31879,8 +31918,13 @@ ac_config_files="$ac_config_files contrib/tetgen/Makefile"
 
 
 # -------------------------------------------------------------
-# Triangle -- enabled by default (it is distributed in contrib)
+# Triangle -- enabled unless --enable-strict-lgpl is specified
 # -------------------------------------------------------------
+if (test $enablestrictlgpl = yes) ; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Triangle meshing support is disabled, configure with --disable-strict-lgpl to enable it >>>" >&5
+$as_echo "<<< Triangle meshing support is disabled, configure with --disable-strict-lgpl to enable it >>>" >&6; }
+  enabletriangle=no;
+else
 
   # Check whether --enable-triangle was given.
 if test "${enable_triangle+set}" = set; then :
@@ -31913,9 +31957,11 @@ $as_echo "<<< Configuring library with Triangle support >>>" >&6; }
 
 
 
-if (test $enabletriangle = yes); then
-  libmesh_contrib_INCLUDES="$TRIANGLE_INCLUDE $libmesh_contrib_INCLUDES"
+  if (test $enabletriangle = yes); then
+    libmesh_contrib_INCLUDES="$TRIANGLE_INCLUDE $libmesh_contrib_INCLUDES"
+  fi
 fi
+
  if test x$enabletriangle = xyes; then
   LIBMESH_ENABLE_TRIANGLE_TRUE=
   LIBMESH_ENABLE_TRIANGLE_FALSE='#'

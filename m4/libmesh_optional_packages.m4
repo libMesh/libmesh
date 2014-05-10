@@ -55,6 +55,24 @@ fi
 
 
 # --------------------------------------------------------------
+# Allow user to specify --disable-strict-lgpl
+# By default libmesh is built only with LGPL-compatible contrib
+# libraries, but the user can pass --disable-strict-lgpl to configure
+# to turn on Laspack, Triangle, and Space-filling curves library
+# support.
+# --------------------------------------------------------------
+AC_ARG_ENABLE(strict-lgpl,
+              AC_HELP_STRING([--enable-strict-lgpl],
+                             [Compile libmesh with LGPL-compatible contrib libraries only]),
+              [case "${enableval}" in
+                  yes) enablestrictlgpl=yes ;;
+                  no) enablestrictlgpl=no ;;
+                  *) AC_MSG_ERROR(bad value ${enableval} for --enable-strict-lgpl) ;;
+               esac],
+              [enablestrictlgpl=yes])
+
+
+# --------------------------------------------------------------
 # Allow for disable-nested
 # --------------------------------------------------------------
 AC_ARG_ENABLE(nested,
@@ -174,12 +192,19 @@ fi
 
 
 # -------------------------------------------------------------
-# LASPACK iterative solvers -- enabled by default
+# LASPACK iterative solvers -- enabled unless
+# --enable-strict-lgpl is specified
 # -------------------------------------------------------------
-CONFIGURE_LASPACK
-if (test $enablelaspack = yes); then
-  libmesh_contrib_INCLUDES="$LASPACK_INCLUDE $libmesh_contrib_INCLUDES"
+if (test $enablestrictlgpl = yes) ; then
+  AC_MSG_RESULT([<<< Laspack support is disabled, configure with --disable-strict-lgpl to enable it >>>])
+  enablelaspack=no;
+else
+  CONFIGURE_LASPACK
+  if (test $enablelaspack = yes); then
+    libmesh_contrib_INCLUDES="$LASPACK_INCLUDE $libmesh_contrib_INCLUDES"
+  fi
 fi
+
 AM_CONDITIONAL(LIBMESH_ENABLE_LASPACK, test x$enablelaspack = xyes)
 AC_CONFIG_FILES([contrib/laspack/Makefile])
 # -------------------------------------------------------------
@@ -187,12 +212,19 @@ AC_CONFIG_FILES([contrib/laspack/Makefile])
 
 
 # -------------------------------------------------------------
-# Space filling curves -- enabled by default
+# Space filling curves -- enabled unless
+# --enable-strict-lgpl is specified
 # -------------------------------------------------------------
-CONFIGURE_SFC
-if (test $enablesfc = yes); then
-  libmesh_contrib_INCLUDES="$SFC_INCLUDE $libmesh_contrib_INCLUDES"
+if (test $enablestrictlgpl = yes) ; then
+  AC_MSG_RESULT([<<< The space filling curves partitioner is disabled, configure with --disable-strict-lgpl to enable it >>>])
+  enablesfc=no;
+else
+  CONFIGURE_SFC
+  if (test $enablesfc = yes); then
+    libmesh_contrib_INCLUDES="$SFC_INCLUDE $libmesh_contrib_INCLUDES"
+  fi
 fi
+
 AM_CONDITIONAL(LIBMESH_ENABLE_SFC, test x$enablesfc = xyes)
 AC_CONFIG_FILES([contrib/sfcurves/Makefile])
 # -------------------------------------------------------------
@@ -349,12 +381,18 @@ AC_CONFIG_FILES([contrib/tetgen/Makefile])
 
 
 # -------------------------------------------------------------
-# Triangle -- enabled by default (it is distributed in contrib)
+# Triangle -- enabled unless --enable-strict-lgpl is specified
 # -------------------------------------------------------------
-CONFIGURE_TRIANGLE
-if (test $enabletriangle = yes); then
-  libmesh_contrib_INCLUDES="$TRIANGLE_INCLUDE $libmesh_contrib_INCLUDES"
+if (test $enablestrictlgpl = yes) ; then
+  AC_MSG_RESULT([<<< Triangle meshing support is disabled, configure with --disable-strict-lgpl to enable it >>>])
+  enabletriangle=no;
+else
+  CONFIGURE_TRIANGLE
+  if (test $enabletriangle = yes); then
+    libmesh_contrib_INCLUDES="$TRIANGLE_INCLUDE $libmesh_contrib_INCLUDES"
+  fi
 fi
+
 AM_CONDITIONAL(LIBMESH_ENABLE_TRIANGLE, test x$enabletriangle = xyes)
 AC_CONFIG_FILES([contrib/triangle/Makefile])
 # -------------------------------------------------------------
