@@ -338,7 +338,7 @@ public:
    */
   void add_vector (const NumericVector<T>&,
                    const SparseMatrix<T>&)
-  { libmesh_error(); }
+  { libmesh_not_implemented(); }
 
   /**
    * \f$U+=V\f$ where U and V are type
@@ -357,7 +357,7 @@ public:
    */
   void add_vector_transpose (const NumericVector<T>&,
                              const SparseMatrix<T>&)
-  { libmesh_error(); }
+  { libmesh_not_implemented(); }
 
   /**
    * \f$ U=v \f$ where v is a \p std::vector<T>
@@ -618,11 +618,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
 
   // No other options without MPI!
   if (n != n_local)
-    {
-      libMesh::err << "ERROR:  MPI is required for n != n_local!"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR:  MPI is required for n != n_local!");
 
 #endif
 

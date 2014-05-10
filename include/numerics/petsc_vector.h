@@ -851,7 +851,7 @@ void PetscVector<T>::init (const numeric_index_type n,
       LIBMESH_CHKERRABORT(ierr);
     }
   else
-    libmesh_error();
+    libmesh_error_msg("Unsupported type " << this->_type);
 
   this->_is_initialized = true;
   this->_is_closed = true;
@@ -1236,9 +1236,7 @@ numeric_index_type PetscVector<T>::map_global_to_local_index (const numeric_inde
           error_message << "}\n";
         }
 
-      libMesh::err << error_message.str();
-
-      libmesh_error();
+      libmesh_error_msg(error_message.str());
     }
   libmesh_assert (it != _global_to_local_map.end());
 #endif

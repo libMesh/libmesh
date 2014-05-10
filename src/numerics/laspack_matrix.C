@@ -138,10 +138,7 @@ void LaspackMatrix<T>::init (const numeric_index_type libmesh_dbg_var(m_in),
   libmesh_assert_equal_to (m_in, n_in);
   libmesh_assert_greater (nnz, 0);
 
-
-  libMesh::err << "ERROR: Only the init() member that uses the" << std::endl
-               << "DofMap is implemented for Laspack matrices!" << std::endl;
-  libmesh_error();
+  libmesh_error_msg("ERROR: Only the init() member that uses the DofMap is implemented for Laspack matrices!");
 
   this->_is_initialized = true;
 }

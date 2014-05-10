@@ -205,10 +205,7 @@ public:
       std::find(_additional_vars.begin(), _additional_vars.end(), variable_name);
 
     if (it == _additional_vars.end())
-      {
-        libMesh::err << "ERROR: Requested variable not found in parsed function\n" << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Requested variable not found in parsed function");
 
     // Iterator Arithmetic (How far from the end of the array is our target address?)
     return _spacetime[_spacetime.size() - (_additional_vars.end() - it)];
@@ -239,23 +236,32 @@ private:
       libMesh::err << '\n';
 
       // Currently no API to report error messages, we'll do it manually
+      std::string error_message = "Reason: ";
+
       switch (error_code)
       {
       case 1:
-        libMesh::err << "Reason: Division by zero\n"; break;
+        error_message += "Division by zero";
+        break;
       case 2:
-        libMesh::err << "Reason: Square Root error (negative value)\n"; break;
+        error_message += "Square Root error (negative value)";
+        break;
       case 3:
-        libMesh::err << "Reason: Log error (negative value)\n"; break;
+        error_message += "Log error (negative value)";
+        break;
       case 4:
-        libMesh::err << "Reason: Trigonometric error (asin or acos of illegal value)\n"; break;
+        error_message += "Trigonometric error (asin or acos of illegal value)";
+        break;
       case 5:
-        libMesh::err << "Reason: Maximum recursion level reached\n"; break;
+        error_message += "Maximum recursion level reached";
+        break;
       default:
-        libMesh::err << "Reason: Unknown\n"; break;
+        error_message += "Unknown";
+        break;
       }
-      libmesh_error();
+      libmesh_error_msg(error_message);
     }
+
     return result;
 #endif
   }

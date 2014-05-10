@@ -54,11 +54,11 @@ public:
 
   TypeNTensor (const TypeTensor<T>&) {}
 
-  operator TypeVector<T> () const { libmesh_error(); return 0; }
-  operator VectorValue<T> () const { libmesh_error(); return 0; }
+  operator TypeVector<T> () const { libmesh_not_implemented(); return 0; }
+  operator VectorValue<T> () const { libmesh_not_implemented(); return 0; }
 
-  operator TypeTensor<T> () const { libmesh_error(); return 0; }
-  operator TensorValue<T> () const { libmesh_error(); return 0; }
+  operator TypeTensor<T> () const { libmesh_not_implemented(); return 0; }
+  operator TensorValue<T> () const { libmesh_not_implemented(); return 0; }
 
   /**
    * Destructor.

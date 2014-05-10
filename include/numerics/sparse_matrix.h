@@ -425,9 +425,7 @@ protected:
                               const std::vector<numeric_index_type>& ,
                               const bool) const
   {
-    libMesh::err << "Error! This function is not yet implemented in the base class!"
-                 << std::endl;
-    libmesh_error();
+    libmesh_not_implemented();
   }
 
   /**

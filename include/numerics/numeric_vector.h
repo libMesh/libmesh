@@ -635,8 +635,7 @@ public:
   virtual void create_subvector(NumericVector<T>& ,
                                 const std::vector<numeric_index_type>& ) const
   {
-    libMesh::err << "ERROR: Not Implemented in base class yet!" << std::endl;
-    libmesh_error();
+    libmesh_not_implemented();
   }
 
   /**
@@ -694,7 +693,7 @@ NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
   _is_initialized(false),
   _type(ptype)
 {
-  libmesh_error(); // Abstract base class!
+  libmesh_not_implemented(); // Abstract base class!
   // init(n, n, false, ptype);
 }
 
@@ -711,7 +710,7 @@ NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
   _is_initialized(false),
   _type(ptype)
 {
-  libmesh_error(); // Abstract base class!
+  libmesh_not_implemented(); // Abstract base class!
   // init(n, n_local, false, ptype);
 }
 
@@ -729,7 +728,7 @@ NumericVector<T>::NumericVector (const Parallel::Communicator &comm_in,
   _is_initialized(false),
   _type(ptype)
 {
-  libmesh_error(); // Abstract base class!
+  libmesh_not_implemented(); // Abstract base class!
   // init(n, n_local, ghost, false, ptype);
 }
 
@@ -741,42 +740,6 @@ NumericVector<T>::~NumericVector ()
 {
   clear ();
 }
-
-
-
-// These should be pure virtual, not bugs waiting to happen - RHS
-/*
-  template <typename T>
-  inline
-  NumericVector<T> & NumericVector<T>::operator= (const T)
-  {
-  //  libmesh_error();
-
-  return *this;
-  }
-
-
-
-  template <typename T>
-  inline
-  NumericVector<T> & NumericVector<T>::operator= (const NumericVector<T>&)
-  {
-  //  libmesh_error();
-
-  return *this;
-  }
-
-
-
-  template <typename T>
-  inline
-  NumericVector<T> & NumericVector<T>::operator= (const std::vector<T>&)
-  {
-  //  libmesh_error();
-
-  return *this;
-  }
-*/
 
 
 

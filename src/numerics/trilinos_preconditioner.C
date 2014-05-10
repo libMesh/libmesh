@@ -55,10 +55,7 @@ template <typename T>
 void TrilinosPreconditioner<T>::init ()
 {
   if(!this->_matrix)
-    {
-      libMesh::err << "ERROR: No matrix set for PetscPreconditioner, but init() called" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: No matrix set for PetscPreconditioner, but init() called");
 
   // Clear the preconditioner in case it has been created in the past
   if (!this->_is_initialized)

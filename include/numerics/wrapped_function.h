@@ -220,9 +220,8 @@ Output WrappedFunction<Output>::component (unsigned int i,
                            _sys.name(), _sys.variable_name(v));
         }
     }
-  libMesh::err << "Component index " << i <<
-    " not found in system " << _sys.name() << std::endl;
-  libmesh_error();
+
+  libmesh_error_msg("Component index " << i << " not found in system " << _sys.name());
   return Output();
 }
 

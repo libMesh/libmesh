@@ -447,13 +447,10 @@ DistributedVector<T>::operator = (const DistributedVector<T>& v)
   _last_local_index  = v._last_local_index;
 
   if (v.local_size() == this->local_size())
-    {
-      _values = v._values;
-    }
+    _values = v._values;
+
   else
-    {
-      libmesh_error();
-    }
+    libmesh_error_msg("v.local_size() = " << v.local_size() << " must be equal to this->local_size() = " << this->local_size());
 
   return *this;
 }
@@ -476,10 +473,7 @@ DistributedVector<T>::operator = (const std::vector<T>& v)
       _values[i-first_local_index()] = v[i];
 
   else
-    {
-      libmesh_error();
-    }
-
+    libmesh_error_msg("Incompatible sizes in DistributedVector::operator=");
 
   return *this;
 }

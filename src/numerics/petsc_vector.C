@@ -39,15 +39,6 @@ namespace libMesh
 //-----------------------------------------------------------------------
 // PetscVector members
 
-// void PetscVector<T>::init (const NumericVector<T>& v, const bool fast)
-// {
-//   libmesh_error();
-
-//   init (v.local_size(), v.size(), fast);
-
-//   vec = libmesh_cast_ref<const PetscVector<T>&>(v).vec;
-// }
-
 template <typename T>
 T PetscVector<T>::sum () const
 {
@@ -297,11 +288,9 @@ template <typename T>
 void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T>&,
                                                      const SparseMatrix<T>&)
 {
-
-  libMesh::out << "MatMultHermitianTranspose was introduced in PETSc 3.1.0,"
-               << "No one has made it backwards compatible with older "
-               << "versions of PETSc so far." << std::endl;
-  libmesh_error();
+  libmesh_error_msg("MatMultHermitianTranspose was introduced in PETSc 3.1.0," \
+                    << "No one has made it backwards compatible with older " \
+                    << "versions of PETSc so far.");
 }
 
 #else
@@ -1284,11 +1273,10 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T>& vec1,
 
 #if PETSC_VERSION_LESS_THAN(2,3,1)
 
-  libMesh::out << "This method has been developed with PETSc 2.3.1.  "
-               << "No one has made it backwards compatible with older "
-               << "versions of PETSc so far; however, it might work "
-               << "without any change with some older version." << std::endl;
-  libmesh_error();
+  libmesh_error_msg("This method has been developed with PETSc 2.3.1.  " \
+                    << "No one has made it backwards compatible with older " \
+                    << "versions of PETSc so far; however, it might work " \
+                    << "without any change with some older version.");
 
 #else
 

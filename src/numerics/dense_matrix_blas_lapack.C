@@ -71,11 +71,7 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
           break;
       }
     default:
-      {
-        libMesh::out << "Unknown flag selected or matrices are ";
-        libMesh::out << "incompatible for multiplication." << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("Unknown flag selected or matrices are incompatible for multiplication.");
     }
 
   // For this to work, the passed arg. must actually be a DenseMatrix<T>
@@ -181,10 +177,7 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& other,
     case LEFT_MULTIPLY_TRANSPOSE:  { this->_m = other.n(); break; }
     case RIGHT_MULTIPLY_TRANSPOSE: { this->_n = other.m(); break; }
     default:
-      {
-        libMesh::out << "Unknown flag selected." << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("Unknown flag selected.");
     }
 
   // Swap my data vector with the result
@@ -197,8 +190,7 @@ template<typename T>
 void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T>& ,
                                     _BLAS_Multiply_Flag )
 {
-  libMesh::err << "No PETSc-provided BLAS/LAPACK available!" << std::endl;
-  libmesh_error();
+  libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
 }
 
 #endif
@@ -261,12 +253,7 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
 
   // Check return value for errors
   if (INFO != 0)
-    {
-      libMesh::out << "INFO="
-                   << INFO
-                   << ", Error during Lapack LU factorization!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("INFO=" << INFO << ", Error during Lapack LU factorization!");
 
   // Set the flag for LU decomposition
   this->_decomposition_type = LU_BLAS_LAPACK;
@@ -277,8 +264,7 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
 template<typename T>
 void DenseMatrix<T>::_lu_decompose_lapack ()
 {
-  libMesh::err << "No PETSc-provided BLAS/LAPACK available!" << std::endl;
-  libmesh_error();
+  libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
 }
 
 #endif
@@ -501,12 +487,7 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
 
   // Check return value for errors
   if (INFO != 0)
-    {
-      libMesh::out << "INFO="
-                   << INFO
-                   << ", Error during Lapack SVD calculation!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("INFO=" << INFO << ", Error during Lapack SVD calculation!");
 }
 
 
@@ -519,8 +500,7 @@ void DenseMatrix<T>::_svd_helper (char,
                                   std::vector<T>&,
                                   std::vector<T>&)
 {
-  libMesh::err << "No PETSc-provided BLAS/LAPACK available!" << std::endl;
-  libmesh_error();
+  libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
 }
 
 #endif
@@ -593,12 +573,7 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& b,
 
   // Check return value for errors
   if (INFO != 0)
-    {
-      libMesh::out << "INFO="
-                   << INFO
-                   << ", Error during Lapack LU solve!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("INFO=" << INFO << ", Error during Lapack LU solve!");
 
   // Don't do this if you already made a copy of b above
   // Swap b and x.  The solution will then be in x, and whatever was originally
@@ -615,8 +590,7 @@ template<typename T>
 void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T>& ,
                                                  DenseVector<T>& )
 {
-  libMesh::err << "No PETSc-provided BLAS/LAPACK available!" << std::endl;
-  libmesh_error();
+  libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
 }
 
 #endif
@@ -639,10 +613,7 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
       // dest  ~ A     * arg
       // (mx1)   (mxn) * (nx1)
       if ((dest.size() != this->m()) || (arg.size() != this->n()))
-        {
-          libMesh::out << "Improper input argument sizes!" << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Improper input argument sizes!");
     }
 
   else // trans == true
@@ -651,10 +622,7 @@ void DenseMatrix<T>::_matvec_blas(T alpha, T beta,
       // dest  ~ A^T   * arg
       // (nx1)   (nxm) * (mx1)
       if ((dest.size() != this->n()) || (arg.size() != this->m()))
-        {
-          libMesh::out << "Improper input argument sizes!" << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Improper input argument sizes!");
     }
 
   // Calling sequence for dgemv:
@@ -747,8 +715,7 @@ void DenseMatrix<T>::_matvec_blas(T , T,
                                   const DenseVector<T>&,
                                   bool ) const
 {
-  libMesh::err << "No PETSc-provided BLAS/LAPACK available!" << std::endl;
-  libmesh_error();
+  libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
 }
 
 

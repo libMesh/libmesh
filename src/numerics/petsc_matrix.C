@@ -605,7 +605,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
 
             // Check to see that mkstemp did not fail.
             if (fd == -1)
-              libmesh_error();
+              libmesh_error_msg("mkstemp failed in PetscMatrix::print_personal()");
 
             // mkstemp returns a file descriptor for an open file,
             // so let's close it before we hand it to PETSc!
@@ -792,11 +792,10 @@ void PetscMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 
 #if PETSC_VERSION_LESS_THAN(2,3,1)
 
-  libMesh::out << "This method has been developed with PETSc 2.3.1.  "
-               << "No one has made it backwards compatible with older "
-               << "versions of PETSc so far; however, it might work "
-               << "without any change with some older version." << std::endl;
-  libmesh_error();
+  libmesh_error_msg("This method has been developed with PETSc 2.3.1.  " \
+                    << "No one has made it backwards compatible with older " \
+                    << "versions of PETSc so far; however, it might work " \
+                    << "without any change with some older version.");
 
 #else
 

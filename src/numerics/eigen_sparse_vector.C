@@ -401,7 +401,7 @@ EigenSparseVector<T>::operator = (const std::vector<T>& v)
       this->set (i, v[i]);
 
   else
-    libmesh_error();
+    libmesh_error_msg("this->size() = " << this->size() << " must be equal to v.size() = " << v.size());
 
   return *this;
 }

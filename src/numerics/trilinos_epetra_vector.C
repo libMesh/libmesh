@@ -171,10 +171,7 @@ void EpetraVector<T>::reciprocal()
     {
       // Don't divide by zero (maybe only check this in debug mode?)
       if (std::abs(values[i]) < std::numeric_limits<T>::min())
-        {
-          libMesh::err << "Error, divide by zero in DistributedVector<T>::reciprocal()!" << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Error, divide by zero in DistributedVector<T>::reciprocal()!");
 
       values[i] = 1. / values[i];
     }

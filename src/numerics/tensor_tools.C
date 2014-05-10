@@ -27,8 +27,7 @@ namespace TensorTools
 // Needed for ExactSolution to compile
 Number curl_from_grad( const VectorValue<Number>& )
 {
-  libMesh::err << "Operation not defined for scalar quantities." << std::endl;
-  libmesh_error();
+  libmesh_error_msg("Operation not defined for scalar quantities.");
 }
 
 VectorValue<Number> curl_from_grad( const TensorValue<Number>& grad )
@@ -52,8 +51,7 @@ TensorValue<Number> curl_from_grad( const TypeNTensor<3,Number>& /* grad */ )
 // Needed for ExactSolution to compile
 Number div_from_grad( const VectorValue<Number>& /* grad */ )
 {
-  libMesh::err << "Operation not defined for scalar quantities." << std::endl;
-  libmesh_error();
+  libmesh_error_msg("Operation not defined for scalar quantities.");
 }
 
 Number div_from_grad( const TensorValue<Number>& grad )

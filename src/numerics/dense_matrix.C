@@ -636,12 +636,7 @@ void DenseMatrix<T>::lu_solve (const DenseVector<T>& b,
       }
 
     default:
-      {
-        libMesh::err << "Error! This matrix already has a "
-                     << "different decomposition..."
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("Error! This matrix already has a different decomposition...");
     }
 
   if (this->use_blas_lapack)
@@ -753,10 +748,7 @@ void DenseMatrix<T>::_lu_decompose ()
 
       // If the max abs entry found is zero, the matrix is singular
       if (A(i,i) == libMesh::zero)
-        {
-          libMesh::out << "Matrix A is singular!" << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Matrix A is singular!");
 
       // Scale upper triangle entries of row i by the diagonal entry
       // Note: don't scale the diagonal entry itself!
@@ -826,12 +818,7 @@ T DenseMatrix<T>::det ()
         break;
       }
     default:
-      {
-        libMesh::err << "Error! Can't compute the determinant under "
-                     << "the current decomposition."
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("Error! Can't compute the determinant under the current decomposition.");
     }
 
   // A variable to keep track of the running product of diagonal terms.
@@ -890,12 +877,7 @@ void DenseMatrix<T>::cholesky_solve (const DenseVector<T2>& b,
       }
 
     default:
-      {
-        libMesh::err << "Error! This matrix already has a "
-                     << "different decomposition..."
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("Error! This matrix already has a different decomposition...");
     }
 
   // Perform back substitution
@@ -936,12 +918,7 @@ void DenseMatrix<T>::_cholesky_decompose ()
             {
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
               if (A(i,j) <= 0.0)
-                {
-                  libMesh::err << "Error! Can only use Cholesky decomposition "
-                               << "with symmetric positive definite matrices."
-                               << std::endl;
-                  libmesh_error();
-                }
+                libmesh_error_msg("Error! Can only use Cholesky decomposition with symmetric positive definite matrices.");
 #endif
 
               A(i,i) = std::sqrt(A(i,j));
