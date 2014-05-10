@@ -92,7 +92,7 @@ public:
         Real sum = 0;
 
         for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-          sum += qrule->w(qp) * std::pow(qrule->qp(qp)(0), mode);
+          sum += qrule->w(qp) * std::pow(qrule->qp(qp)(0), static_cast<Real>(mode));
 
         const Real exact = (mode % 2) ?
           0 : (Real(2.0) / (mode+1));
@@ -127,8 +127,8 @@ if (std::abs(exact - sum) >= TOLERANCE*TOLERANCE)
           Real sum = 0;
 
           for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-            sum += qrule->w(qp) * std::pow(qrule->qp(qp)(0), modex)
-                                * std::pow(qrule->qp(qp)(1), modey);
+            sum += qrule->w(qp) * std::pow(qrule->qp(qp)(0), static_cast<Real>(modex))
+                                * std::pow(qrule->qp(qp)(1), static_cast<Real>(modey));
 
           const Real exactx = (modex % 2) ?
             0 : (Real(2.0) / (modex+1));
@@ -168,9 +168,9 @@ if (std::abs(exact - sum) >= TOLERANCE*TOLERANCE)
             Real sum = 0;
 
             for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-              sum += qrule->w(qp) * std::pow(qrule->qp(qp)(0), modex)
-                                  * std::pow(qrule->qp(qp)(1), modey)
-                                  * std::pow(qrule->qp(qp)(2), modez);
+              sum += qrule->w(qp) * std::pow(qrule->qp(qp)(0), static_cast<Real>(modex))
+                                  * std::pow(qrule->qp(qp)(1), static_cast<Real>(modey))
+                                  * std::pow(qrule->qp(qp)(2), static_cast<Real>(modez));
 
             const Real exactx = (modex % 2) ?
               0 : (Real(2.0) / (modex+1));
