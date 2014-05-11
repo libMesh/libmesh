@@ -139,8 +139,7 @@ Elem* read_ref_elem (const ElemType Type,
     {
       delete elem;
       elem = NULL;
-      libMesh::err << "ERROR while creating element singleton!\n";
-      libmesh_error();
+      libmesh_error_msg("ERROR while creating element singleton!");
     }
 
   else

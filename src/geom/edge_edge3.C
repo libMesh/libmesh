@@ -118,7 +118,7 @@ void Edge3::connectivity(const unsigned int sc,
             return;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid sc = " << sc);
           }
       }
 
@@ -147,15 +147,13 @@ void Edge3::connectivity(const unsigned int sc,
           return;
 
           default:
-          libmesh_error();
+          libmesh_error_msg("Invalid sc = " << sc);
           }
         */
       }
 
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
 }
 

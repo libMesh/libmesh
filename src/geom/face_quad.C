@@ -52,11 +52,12 @@ dof_id_type Quad::key (const unsigned int s) const
       return
         this->compute_key (this->node(3),
                            this->node(0));
+
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
     }
 
-
-  // We will never get here...  Look at the code above.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -103,14 +104,10 @@ AutoPtr<Elem> Quad::side (const unsigned int i) const
         return ap_edge;
       }
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("Invalid side i = " << i);
     }
 
-
-  // We will never get here...  Look at the code above.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   AutoPtr<Elem> ap_edge(edge);
   return ap_edge;
 }
@@ -148,8 +145,6 @@ unsigned int Quad::opposite_node(const unsigned int node_in,
   libmesh_assert_less (side_in, this->n_sides());
   libmesh_assert(this->is_node_on_side(node_in, side_in));
 
-  //unsigned int opposite;
-
   static const unsigned char side02_nodes_map[] =
     {3, 2, 1, 0, 6, 255, 4, 255};
   static const unsigned char side13_nodes_map[] =
@@ -160,14 +155,14 @@ unsigned int Quad::opposite_node(const unsigned int node_in,
     case 0:
     case 2:
       return side02_nodes_map[node_in];
-      break;
     case 1:
     case 3:
       return side13_nodes_map[node_in];
-      break;
+    default:
+      libmesh_error_msg("Unsupported side_in = " << side_in);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 255;
 }
 

@@ -72,10 +72,12 @@ dof_id_type Prism::key (const unsigned int s) const
         this->compute_key (this->node(3),
                            this->node(4),
                            this->node(5));
+
+    default:
+      libmesh_error_msg("Invalid side " << s);
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -146,16 +148,10 @@ AutoPtr<Elem> Prism::side (const unsigned int i) const
         return ap_facet;
       }
     default:
-      {
-        libmesh_error();
-        Elem* facet = new Tri3;
-        AutoPtr<Elem> ap_facet(facet);
-        return ap_facet;
-      }
+      libmesh_error_msg("Invalid side i = " << i);
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   Elem* facet = new Tri3;
   AutoPtr<Elem> ap_facet(facet);
   return ap_facet;

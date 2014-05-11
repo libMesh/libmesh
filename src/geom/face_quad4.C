@@ -171,14 +171,13 @@ AutoPtr<Elem> Quad4::build_side (const unsigned int i,
             return edge;
           }
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
     }
 
-  // We will never get here...
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -216,10 +215,8 @@ void Quad4::connectivity(const unsigned int libmesh_dbg_var(sf),
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
 
 

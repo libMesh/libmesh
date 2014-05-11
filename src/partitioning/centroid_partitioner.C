@@ -88,7 +88,7 @@ void CentroidPartitioner::_do_partition (MeshBase& mesh,
         break;
       }
     default:
-      libmesh_error();
+      libmesh_error_msg("Unknown sort method: " << this->sort_method());
     }
 
 

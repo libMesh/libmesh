@@ -59,10 +59,12 @@ dof_id_type Tet::key (const unsigned int s) const
         this->compute_key (this->node(2),
                            this->node(0),
                            this->node(3));
+
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -115,13 +117,10 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
         return ap_face;
       }
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("Invalid side i = " << i);
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   AutoPtr<Elem> ap_face(face);
   return ap_face;
 }

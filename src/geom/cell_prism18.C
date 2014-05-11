@@ -162,10 +162,11 @@ dof_id_type Prism18::key (const unsigned int s) const
       {
         return Prism::key(4);
       }
+    default:
+      libmesh_error_msg("Invalid side " << s);
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -198,9 +199,7 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
           }
 
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
     }
 
@@ -286,18 +285,16 @@ AutoPtr<Elem> Prism18::build_side (const unsigned int i,
             break;
           }
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
     }
 
-  // We'll never get here.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -440,7 +437,7 @@ void Prism18::connectivity(const unsigned int sc,
             }
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid sc = " << sc);
           }
 
       }
@@ -570,17 +567,14 @@ void Prism18::connectivity(const unsigned int sc,
           }
 
           default:
-          libmesh_error();
+          libmesh_error_msg("Invalid sc = " << sc);
           }
         */
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
-
 }
 
 
@@ -607,10 +601,11 @@ unsigned int Prism18::n_second_order_adjacent_vertices (const unsigned int n) co
       return 4;
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid node n = " << n);
     }
-  libmesh_error();
-  return static_cast<unsigned int>(-1);
+
+  libmesh_error_msg("We'll never get here!");
+  return libMesh::invalid_uint;
 }
 
 
@@ -652,7 +647,7 @@ unsigned short int Prism18::second_order_adjacent_vertex (const unsigned int n,
 
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never ge here!");
   return static_cast<unsigned short int>(-1);
 }
 

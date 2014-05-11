@@ -49,11 +49,12 @@ dof_id_type Tri::key (const unsigned int s) const
       return
         this->compute_key (this->node(2),
                            this->node(0));
+
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
     }
 
-
-  // We will never get here...  Look at the code above.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -92,14 +93,10 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
         return ap_edge;
       }
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("Invalid side i = " << i);
     }
 
-
-  // We will never get here...  Look at the code above.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   AutoPtr<Elem> ap_edge(edge);
   return ap_edge;
 }

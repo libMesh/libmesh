@@ -34,7 +34,6 @@ dof_id_type Pyramid::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 
-
   switch (s)
     {
     case 0:  // triangular face 1
@@ -72,10 +71,12 @@ dof_id_type Pyramid::key (const unsigned int s) const
                            this->node(3),
                            this->node(2),
                            this->node(1));
+
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -147,16 +148,14 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
       }
     default:
       {
-        libmesh_error();
+        libmesh_error_msg("Invalid side i = " << i);
         AutoPtr<Elem> ap_face(NULL);
         return ap_face;
       }
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   AutoPtr<Elem> ap_face(NULL);
-
   return ap_face;
 }
 

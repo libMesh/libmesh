@@ -88,8 +88,7 @@ dof_id_type Hex::key (const unsigned int s) const
                            this->node(7));
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -167,15 +166,10 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
         return ap;
       }
     default:
-      {
-        libmesh_error();
-        AutoPtr<Elem> ap(face);
-        return ap;
-      }
+      libmesh_error_msg("Unsupported side i = " << i);
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   AutoPtr<Elem> ap(face);
   return ap;
 }
@@ -244,18 +238,17 @@ unsigned int Hex::opposite_node(const unsigned int node_in,
     case 0:
     case 5:
       return side05_nodes_map[node_in];
-      break;
     case 1:
     case 3:
       return side13_nodes_map[node_in];
-      break;
     case 2:
     case 4:
       return side24_nodes_map[node_in];
-      break;
+    default:
+      libmesh_error_msg("Unsupported side_in = " << side_in);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 255;
 }
 
@@ -395,14 +388,10 @@ Real Hex::quality (const ElemQuality q) const
        * Maybe the base class knows...
        */
     default:
-      {
-        return Elem::quality(q);
-      }
+      return Elem::quality(q);
     }
 
-
-  // Will never get here...
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 

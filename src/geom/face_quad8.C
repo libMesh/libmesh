@@ -179,11 +179,12 @@ dof_id_type Quad8::key (const unsigned int s) const
 
       return
         this->compute_key (this->node(7));
+
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
     }
 
-
-  // We will never get here...  Look at the code above.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -240,14 +241,13 @@ AutoPtr<Elem> Quad8::build_side (const unsigned int i,
             return edge;
           }
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
     }
 
-  // We will never get here...
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -320,7 +320,7 @@ void Quad8::connectivity(const unsigned int sf,
             return;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid sf = " << sf);
           }
       }
 
@@ -390,15 +390,13 @@ void Quad8::connectivity(const unsigned int sf,
         //        return;
 
         //      default:
-        //        libmesh_error();
+        //        libmesh_error_msg("Invalid sf = " << sf);
         //      }
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
 
 

@@ -33,7 +33,7 @@ void NodeElem::connectivity(const unsigned int,
                             const IOPackage,
                             std::vector<dof_id_type>&) const
 {
-  libmesh_error();
+  libmesh_not_implemented();
 }
 
 #ifdef LIBMESH_ENABLE_AMR

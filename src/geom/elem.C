@@ -377,12 +377,8 @@ AutoPtr<Elem> Elem::build(const ElemType type,
 #endif
 
     default:
-      {
-        libMesh::err << "ERROR: Undefined element type!." << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Undefined element type!");
     }
-
 
   AutoPtr<Elem> ap(elem);
   return ap;
@@ -1282,45 +1278,9 @@ void Elem::write_connectivity (std::ostream& out_stream,
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
-
-
-// void Elem::write_tecplot_connectivity(std::ostream& out) const
-// {
-//   libmesh_assert (!out.bad());
-//   libmesh_assert(_nodes);
-
-//   // This connectivity vector will be used repeatedly instead
-//   // of being reconstructed inside the loop.
-//   std::vector<dof_id_type> conn;
-//   for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
-//     {
-//       this->connectivity(sc, TECPLOT, conn);
-
-//       std::copy(conn.begin(),
-//  conn.end(),
-//  std::ostream_iterator<dof_id_type>(out, " "));
-
-//       out << std::endl;
-//     }
-// }
-
-
-
-// void Elem::write_ucd_connectivity(std::ostream &out) const
-// {
-//   libmesh_assert (out);
-//   libmesh_assert(_nodes);
-
-//   for (unsigned int i=0; i<this->n_nodes(); i++)
-//     out << this->node(i)+1 << "\t";
-
-//   out << std::endl;
-// }
 
 
 
@@ -1345,9 +1305,7 @@ Real Elem::quality (const ElemQuality q) const
       }
     }
 
-
-  // Will never get here...
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -1395,9 +1353,7 @@ void Elem::add_child (Elem* elem)
         }
     }
 
-  libMesh::err << "Error: Tried to add a child to an element with full children array"
-               << std::endl;
-  libmesh_error();
+  libmesh_error_msg("Error: Tried to add a child to an element with full children array");
 }
 
 
@@ -2145,7 +2101,6 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
       // infinite elements
     case INFEDGE2:
       {
-        // libmesh_error();
         return INVALID_ELEM;
       }
 

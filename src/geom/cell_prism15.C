@@ -154,9 +154,7 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
           }
 
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
     }
 
@@ -239,18 +237,16 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
             break;
           }
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
     }
 
-  // We'll never get here.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -320,11 +316,8 @@ void Prism15::connectivity(const unsigned int libmesh_dbg_var(sc),
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
-
 }
 
 

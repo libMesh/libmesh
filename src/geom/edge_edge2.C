@@ -102,12 +102,8 @@ void Edge2::connectivity(const unsigned int libmesh_dbg_var(sc),
       }
 
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
 
 

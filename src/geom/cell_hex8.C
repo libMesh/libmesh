@@ -191,16 +191,13 @@ AutoPtr<Elem> Hex8::build_side (const unsigned int i,
             return face;
           }
         default:
-          {
-            libmesh_error();
-            return face;
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
     }
 
-  // We'll never get here.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -254,10 +251,8 @@ void Hex8::connectivity(const unsigned int libmesh_dbg_var(sc),
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
 
 

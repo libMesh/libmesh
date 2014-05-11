@@ -62,10 +62,7 @@ void Tri3Subdivision::prepare_subdivision_properties()
         {
           irregular_idx = i;
           if (this->get_node(MeshTools::Subdivision::next[i])->valence() != 6 || this->get_node(MeshTools::Subdivision::prev[i])->valence() != 6)
-            {
-              std::cout << "Error: The mesh contains elements with more than one irregular vertex!" << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("Error: The mesh contains elements with more than one irregular vertex!");
         }
     }
 
@@ -92,7 +89,7 @@ void Tri3Subdivision::prepare_subdivision_properties()
       _ordered_nodes[2] = this->get_node(1);
       break;
     default:
-      libmesh_error();
+      libmesh_error_msg("Unrecognized irregular_idx = " << irregular_idx);
     }
 
   _subdivision_updated = true;

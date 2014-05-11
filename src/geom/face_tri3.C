@@ -146,15 +146,13 @@ AutoPtr<Elem> Tri3::build_side (const unsigned int i,
             return edge;
           }
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
     }
 
-  // We will never get here...  Look at the code above.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -187,10 +185,8 @@ void Tri3::connectivity(const unsigned int libmesh_dbg_var(sf),
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
 
 

@@ -158,7 +158,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i,
       AutoPtr<Elem> face(new Quad8);
       face->subdomain_id() = this->subdomain_id();
 
-      // Think of a unit cube: (-1,1) x (-1,1)x (1,1)
+      // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
       switch (i)
         {
         case 0:  // the face at z=0
@@ -240,16 +240,13 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i,
             return face;
           }
         default:
-          {
-            libmesh_error();
-            return face;
-          }
+          libmesh_error_msg("Unsupported side i = " << i);
         }
     }
 
-  // We'll never get here.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -293,7 +290,7 @@ void Hex20::connectivity(const unsigned int sc,
             return;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Unknown sc = " << sc);
           }
       }
 
@@ -326,15 +323,13 @@ void Hex20::connectivity(const unsigned int sc,
             return;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Unknown sc = " << sc);
           }
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
 
 

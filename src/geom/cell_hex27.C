@@ -191,10 +191,12 @@ dof_id_type Hex27::key (const unsigned int s) const
 
       return
         this->compute_key (this->node(25));
+
+    default:
+      libmesh_error_msg("Invalid side " << s);
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -304,16 +306,13 @@ AutoPtr<Elem> Hex27::build_side (const unsigned int i,
             return face;
           }
         default:
-          {
-            libmesh_error();
-            return face;
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
     }
 
-  // We'll never get here.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -448,7 +447,7 @@ void Hex27::connectivity(const unsigned int sc,
             return;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid sc = " << sc);
           }
       }
 
@@ -595,16 +594,14 @@ void Hex27::connectivity(const unsigned int sc,
           return;
 
           default:
-          libmesh_error();
+          libmesh_error_msg("Invalid sc = " << sc);
           }
         */
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
 
 
@@ -641,10 +638,10 @@ unsigned int Hex27::n_second_order_adjacent_vertices (const unsigned int n) cons
       return 8;
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid node number n = " << n);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return libMesh::invalid_uint;
 }
 

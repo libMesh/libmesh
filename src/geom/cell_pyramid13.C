@@ -139,9 +139,7 @@ AutoPtr<Elem> Pyramid13::build_side (const unsigned int i, bool proxy) const
           }
 
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
     }
 
@@ -220,19 +218,16 @@ AutoPtr<Elem> Pyramid13::build_side (const unsigned int i, bool proxy) const
             break;
           }
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
     }
 
-
-  // We'll never get here.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -248,7 +243,7 @@ AutoPtr<Elem> Pyramid13::build_edge (const unsigned int i) const
 
 void Pyramid13::connectivity(const unsigned int libmesh_dbg_var(sc),
                              const IOPackage iop,
-                             std::vector<dof_id_type>& conn) const
+                             std::vector<dof_id_type>& /*conn*/) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());
@@ -258,36 +253,19 @@ void Pyramid13::connectivity(const unsigned int libmesh_dbg_var(sc),
     {
     case TECPLOT:
       {
-        // FIXME
-        conn.resize(8);
-        conn[0] = this->node(0)+1;
-        conn[1] = this->node(1)+1;
-        conn[2] = this->node(2)+1;
-        conn[3] = this->node(3)+1;
-        conn[4] = this->node(4)+1;
-        conn[5] = this->node(4)+1;
-        conn[6] = this->node(4)+1;
-        conn[7] = this->node(4)+1;
-        return;
+        // TODO
+        libmesh_not_implemented();
       }
 
     case VTK:
       {
-        // FIXME
-        conn.resize(5);
-        conn[0] = this->node(3);
-        conn[1] = this->node(2);
-        conn[2] = this->node(1);
-        conn[3] = this->node(0);
-        conn[4] = this->node(4);
-        return;
+        // TODO
+        libmesh_not_implemented();
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-    libmesh_error();
 }
 
 
@@ -307,12 +285,11 @@ void Pyramid13::connectivity(const unsigned int libmesh_dbg_var(sc),
         return 2;
 
       default:
-        libmesh_error();
+        libmesh_error_msg("Invalid node n = " << n);
       }
 
-    // We'll never get here
-    libmesh_error();
-    return static_cast<unsigned int>(-1);
+    libmesh_error_msg("We'll never get here!");
+    return libMesh::invalid_uint;
   }
 
 
@@ -354,15 +331,11 @@ void Pyramid13::connectivity(const unsigned int libmesh_dbg_var(sc),
         }
 
       default:
-        {
-          // We can't handle this n, throw an error!
-          libmesh_error();
-        }
+        libmesh_error_msg("Invalid n = " << n);
 
       }
 
-    // We'll never get here
-    libmesh_error();
+    libmesh_error_msg("We'll never get here!");
     return static_cast<unsigned short int>(-1);
   }
 
