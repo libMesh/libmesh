@@ -73,10 +73,12 @@ dof_id_type InfPrism::key (const unsigned int s) const
                            this->node(0),
                            this->node(3),
                            this->node(5));
+
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -145,15 +147,12 @@ AutoPtr<Elem> InfPrism::side (const unsigned int i) const
       }
 
     default:
-      {
-        libmesh_error();
-        AutoPtr<Elem> ap(NULL);  return ap;
-      }
+      libmesh_error_msg("Invalid side i = " << i);
     }
 
-  // We'll never get here.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 

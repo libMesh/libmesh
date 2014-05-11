@@ -129,7 +129,7 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
             return ap;
           }
         default:
-          libmesh_error();
+          libmesh_error_msg("Invalid side i = " << i);
         }
     }
 
@@ -173,18 +173,16 @@ AutoPtr<Elem> InfQuad6::build_side (const unsigned int i,
             break;
           }
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
 
       edge->subdomain_id() = this->subdomain_id();
       return edge;
     }
 
-  // We will never get here...
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -224,15 +222,13 @@ void InfQuad6::connectivity(const unsigned int sf,
             return;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid sf = " << sf);
           }
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
 
 

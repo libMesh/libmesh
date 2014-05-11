@@ -127,7 +127,7 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
             return ap;
           }
         default:
-          libmesh_error();
+          libmesh_error_msg("Invalid side i = " << i);
         }
     }
 
@@ -201,19 +201,16 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
           }
 
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
     }
 
-
-  // We'll never get here.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -313,12 +310,9 @@ void InfHex8::connectivity(const unsigned int libmesh_dbg_var(sc),
         return;
       }
 
-
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
 
 

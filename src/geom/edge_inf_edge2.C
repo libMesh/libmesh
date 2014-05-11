@@ -90,10 +90,8 @@ void InfEdge2::connectivity(const unsigned int libmesh_dbg_var(se),
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
 
 } // namespace libMesh

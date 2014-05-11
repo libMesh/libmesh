@@ -57,10 +57,12 @@ dof_id_type InfQuad::key (const unsigned int s) const
       return
         this->compute_key (this->node(0),
                            this->node(2));
+
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
     }
 
-  // We will never get here...  Look at the code above.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -107,15 +109,12 @@ AutoPtr<Elem> InfQuad::side (const unsigned int i) const
       }
 
     default:
-      {
-        libmesh_error();
-        AutoPtr<Elem> ap(NULL);  return ap;
-      }
+      libmesh_error_msg("Invalid side i = " << i);
     }
 
-  // We will never get here...  Look at the code above.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 

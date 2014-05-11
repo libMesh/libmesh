@@ -129,7 +129,7 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
             return ap;
           }
         default:
-          libmesh_error();
+          libmesh_error_msg("Invalid side i = " << i);
         }
     }
 
@@ -215,19 +215,16 @@ AutoPtr<Elem> InfHex16::build_side (const unsigned int i,
           }
 
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
     }
 
-
-  // We'll never get here.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 AutoPtr<Elem> InfHex16::build_edge (const unsigned int i) const
@@ -268,16 +265,13 @@ void InfHex16::connectivity(const unsigned int sc,
             return;
 
           default:
-            libmesh_error();
-
+            libmesh_error_msg("Invalid sc = " << sc);
           }
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
 
 

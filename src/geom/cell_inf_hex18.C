@@ -147,10 +147,11 @@ dof_id_type InfHex18::key (const unsigned int s) const
                            this->node(0),
                            this->node(4),
                            this->node(7));
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -181,7 +182,7 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
             return ap;
           }
         default:
-          libmesh_error();
+          libmesh_error_msg("Invalid side i = " << i);
         }
     }
 
@@ -269,18 +270,16 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
           }
 
         default:
-          {
-            libmesh_error();
-          }
+          libmesh_error_msg("Invalid side i = " << i);
         }
 
       face->subdomain_id() = this->subdomain_id();
       return face;
     }
 
-  // We'll never get here.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -364,15 +363,13 @@ void InfHex18::connectivity(const unsigned int sc,
             return;
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid sc = " << sc);
           }
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unsupported IO package " << iop);
     }
-
-  libmesh_error();
 }
 
 
@@ -397,10 +394,10 @@ unsigned int InfHex18::n_second_order_adjacent_vertices (const unsigned int n) c
       return 4;
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid node n = " << n);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return libMesh::invalid_uint;
 }
 

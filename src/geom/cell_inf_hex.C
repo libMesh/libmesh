@@ -84,10 +84,12 @@ dof_id_type InfHex::key (const unsigned int s) const
                            this->node(0),
                            this->node(4),
                            this->node(7));
+
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
     }
 
-  // We'll never get here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -187,15 +189,12 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
       }
 
     default:
-      {
-        libmesh_error();
-        AutoPtr<Elem> ap(NULL);  return ap;
-      }
+      libmesh_error_msg("Invalid side i = " << i);
     }
 
-  // We'll never get here.
-  libmesh_error();
-  AutoPtr<Elem> ap(NULL);  return ap;
+  libmesh_error_msg("We'll never get here!");
+  AutoPtr<Elem> ap(NULL);
+  return ap;
 }
 
 
@@ -329,14 +328,10 @@ Real InfHex::quality (const ElemQuality q) const
        * Maybe the base class knows...
        */
     default:
-      {
-        return Elem::quality(q);
-      }
+      return Elem::quality(q);
     }
 
-
-  // Will never get here...
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
