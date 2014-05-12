@@ -1656,7 +1656,38 @@ void BoundaryInfo::build_side_list (std::vector<dof_id_type>&        el,
     }
 }
 
+void BoundaryInfo::build_active_side_list (std::vector<dof_id_type>&        el,
+                                           std::vector<unsigned short int>& sl,
+                                           std::vector<boundary_id_type>&   il) const
+{
+  std::multimap<const Elem*,
+    std::pair<unsigned short int,
+    boundary_id_type> >::const_iterator pos;
 
+  for (pos=_boundary_side_id.begin(); pos != _boundary_side_id.end();
+       ++pos)
+    {
+      // Don't add remote sides
+      if (pos->first->is_remote())
+        continue;
+
+      // Loop over the sides of possible children
+      std::vector< const Elem * > family;
+#ifdef LIBMESH_ENABLE_AMR
+      pos->first->active_family_tree_by_side(family, pos->second.first);
+#else
+      family.push_back(pos->first);
+#endif
+
+      // Populate the list items
+      for (std::vector<const Elem *>::iterator elem_it = family.begin(); elem_it != family.end(); elem_it++)
+      {
+        el.push_back ((*elem_it)->id());
+        sl.push_back (pos->second.first);
+        il.push_back (pos->second.second);
+      }
+    }
+}
 
 void BoundaryInfo::print_info(std::ostream& out_stream) const
 {
