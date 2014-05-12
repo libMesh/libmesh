@@ -392,6 +392,12 @@ public:
   void build_side_list (std::vector<dof_id_type>&        element_id_list,
                         std::vector<unsigned short int>& side_list,
                         std::vector<boundary_id_type>&   bc_id_list) const;
+  /**
+   * Creates a list of active element numbers, sides, and  and ids for those sides.
+   */
+  void build_active_side_list (std::vector<dof_id_type>&        element_id_list,
+                               std::vector<unsigned short int>& side_list,
+                               std::vector<boundary_id_type>&   bc_id_list) const;
 
   /**
    * @returns the user-specified boundary ids.
