@@ -1627,6 +1627,11 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
       subdomain_map[elem->subdomain_id()].push_back(elem->id());
     }
 
+  // Use mesh.n_elem() to access into the values vector rather than
+  // the number of elements the Exodus writer thinks the mesh has,
+  // which may not include inactive elements.
+  dof_id_type n_elem = mesh.n_elem();
+
   // For each variable, create a 'data' array which holds all the elemental variable
   // values *for a given block* on this processor, then write that data vector to file
   // before moving onto the next block.
@@ -1642,7 +1647,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
           std::vector<Real> data(num_elems_this_block);
 
           for (unsigned int k=0; k<num_elems_this_block; ++k)
-            data[k] = values[i*num_elem + elem_nums[k]];
+            data[k] = values[i*n_elem + elem_nums[k]];
 
           if(_single_precision)
             {
