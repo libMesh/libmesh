@@ -168,10 +168,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
           }
 
         default:
-          {
-            libMesh::err << "Don't know what to do with this many permutation points!" << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("Don't know what to do with this many permutation points!");
         }
 
     }
@@ -253,10 +250,7 @@ void QGauss::dunavant_rule2(const Real* wts,
           }
 
         default:
-          {
-            libMesh::err << "Unknown permutation id: " << permutation_ids[p] << "!" << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("Unknown permutation id: " << permutation_ids[p] << "!");
         }
     }
 
@@ -355,10 +349,7 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
           }
 
         default:
-          {
-            libMesh::err << "Don't know what to do with this many permutation points!" << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("Don't know what to do with this many permutation points!");
         }
     }
 }

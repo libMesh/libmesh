@@ -116,10 +116,7 @@ QuadratureType QJacobi::type() const
     return QJACOBI_2_0;
 
   else
-    {
-      libmesh_error();
-      return INVALID_Q_RULE;
-    }
+    libmesh_error_msg("Invalid Jacobi quadrature rule: alpha = " << _alpha << ", beta = " << _beta);
 }
 
 

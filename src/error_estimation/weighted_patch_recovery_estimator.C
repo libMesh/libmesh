@@ -469,13 +469,11 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 #endif
                         }
 #else
-                      libMesh::err << "ERROR:  --enable-second-derivatives is required\n"
-                                   << "        for _sobolev_order == 2!\n";
-                      libmesh_error();
+                      libmesh_error_msg("ERROR:  --enable-second-derivatives is required \nfor _sobolev_order == 2!");
 #endif
                     }
                   else
-                    libmesh_error();
+                    libmesh_error_msg("Unsupported error norm type!");
                 } // end quadrature loop
             } // end patch loop
 
@@ -770,9 +768,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       temperr[5] -= hess_u_h(1,2);
 #endif
 #else
-                      libMesh::err << "ERROR:  --enable-second-derivatives is required\n"
-                                   << "        for _sobolev_order == 2!\n";
-                      libmesh_error();
+                      libmesh_error_msg("ERROR:  --enable-second-derivatives is required \nfor _sobolev_order == 2!");
 #endif
                     }
 
@@ -825,7 +821,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                        error_estimator.error_norm.type(var) == H2_SEMINORM)
                 new_error_per_cell[e] += error_estimator.error_norm.weight_sq(var) * element_error;
               else
-                libmesh_error();
+                libmesh_error_msg("Unsupported error norm type!");
             }  // End (re) loop over patch elements
 
         } // end variables loop

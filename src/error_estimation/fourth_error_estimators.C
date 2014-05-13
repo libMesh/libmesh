@@ -124,20 +124,18 @@ LaplacianErrorEstimator::initialize(const System&,
                                     ErrorVector&,
                                     bool)
 {
-  libMesh::err << "Error: LaplacianErrorEstimator requires second "
-               << "derivative support; try configuring libmesh with "
-               << "--enable-second" << std::endl;
-  libmesh_error();
+  libmesh_error_msg("Error: LaplacianErrorEstimator requires second " \
+                    << "derivative support; try configuring libmesh with " \
+                    << "--enable-second");
 }
 
 
 void
 LaplacianErrorEstimator::internal_side_integration ()
 {
-  libMesh::err << "Error: LaplacianErrorEstimator requires second "
-               << "derivative support; try configuring libmesh with "
-               << "--enable-second" << std::endl;
-  libmesh_error();
+  libmesh_error_msg("Error: LaplacianErrorEstimator requires second "   \
+                    << "derivative support; try configuring libmesh with " \
+                    << "--enable-second");
 }
 
 } // namespace libMesh

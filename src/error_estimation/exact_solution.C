@@ -270,23 +270,13 @@ std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
     _errors.find(sys_name);
 
   if (sys_iter == _errors.end())
-    {
-      libMesh::err << "Sorry, couldn't find the requested system '"
-                   << sys_name << "'."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Sorry, couldn't find the requested system '" << sys_name << "'.");
 
   // Make sure the requested unknown_name exists.
   SystemErrorMap::iterator var_iter = (*sys_iter).second.find(unknown_name);
 
   if (var_iter == (*sys_iter).second.end())
-    {
-      libMesh::err << "Sorry, couldn't find the requested variable '"
-                   << unknown_name << "'."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Sorry, couldn't find the requested variable '" << unknown_name << "'.");
 
   // Return a reference to the proper error entry
   return (*var_iter).second;
@@ -323,10 +313,8 @@ void ExactSolution::compute_error(const std::string& sys_name,
         break;
       }
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid variable type!");
     }
-
-  return;
 }
 
 
@@ -357,20 +345,14 @@ Real ExactSolution::error_norm(const std::string& sys_name,
     case HCURL:
       {
         if(FEInterface::field_type(fe_type) == TYPE_SCALAR)
-          {
-            libMesh::err << "Cannot compute HCurl error norm of scalar-valued variables!" << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("Cannot compute HCurl error norm of scalar-valued variables!");
         else
           return std::sqrt(error_vals[0] + error_vals[5]);
       }
     case HDIV:
       {
         if(FEInterface::field_type(fe_type) == TYPE_SCALAR)
-          {
-            libMesh::err << "Cannot compute HDiv error norm of scalar-valued variables!" << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("Cannot compute HDiv error norm of scalar-valued variables!");
         else
           return std::sqrt(error_vals[0] + error_vals[6]);
       }
@@ -381,20 +363,14 @@ Real ExactSolution::error_norm(const std::string& sys_name,
     case HCURL_SEMINORM:
       {
         if(FEInterface::field_type(fe_type) == TYPE_SCALAR)
-          {
-            libMesh::err << "Cannot compute HCurl error seminorm of scalar-valued variables!" << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("Cannot compute HCurl error seminorm of scalar-valued variables!");
         else
           return std::sqrt(error_vals[5]);
       }
     case HDIV_SEMINORM:
       {
         if(FEInterface::field_type(fe_type) == TYPE_SCALAR)
-          {
-            libMesh::err << "Cannot compute HDiv error seminorm of scalar-valued variables!" << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("Cannot compute HDiv error seminorm of scalar-valued variables!");
         else
           return std::sqrt(error_vals[6]);
       }
@@ -403,9 +379,8 @@ Real ExactSolution::error_norm(const std::string& sys_name,
     case L_INF:
       return error_vals[4];
 
-      // Currently only Sobolev norms/seminorms are supported
     default:
-      libmesh_error();
+      libmesh_error_msg("Currently only Sobolev norms/seminorms are supported!");
     }
 }
 

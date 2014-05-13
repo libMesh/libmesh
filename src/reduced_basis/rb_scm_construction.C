@@ -79,10 +79,7 @@ void RBSCMConstruction::set_rb_scm_evaluation(RBSCMEvaluation& rb_scm_eval_in)
 RBSCMEvaluation& RBSCMConstruction::get_rb_scm_evaluation()
 {
   if(!rb_scm_eval)
-    {
-      libMesh::out << "Error: RBSCMEvaluation object hasn't been initialized yet" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: RBSCMEvaluation object hasn't been initialized yet");
 
   return *rb_scm_eval;
 }
@@ -330,10 +327,7 @@ void RBSCMConstruction::compute_SCM_bounding_box()
           libMesh::out << std::endl << "B_min("<<q<<") = " << rb_scm_eval->get_B_min(q) << std::endl;
         }
       else
-        {
-          libMesh::err << "Eigen solver for computing B_min did not converge" << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Eigen solver for computing B_min did not converge");
 
       // Compute B_max(q)
       eigen_solver->set_position_of_spectrum(LARGEST_REAL);
@@ -354,10 +348,7 @@ void RBSCMConstruction::compute_SCM_bounding_box()
           libMesh::out << "B_max("<<q<<") = " << rb_scm_eval->get_B_max(q) << std::endl;
         }
       else
-        {
-          libMesh::err << "Eigen solver for computing B_max did not converge" << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Eigen solver for computing B_max did not converge");
     }
 
   STOP_LOG("compute_SCM_bounding_box()", "RBSCMConstruction");
@@ -413,11 +404,7 @@ void RBSCMConstruction::evaluate_stability_constant()
         }
     }
   else
-    {
-      libMesh::err << "Error: Eigensolver did not converge in evaluate_stability_constant"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Eigensolver did not converge in evaluate_stability_constant");
 
   STOP_LOG("evaluate_stability_constant()", "RBSCMConstruction");
 }
@@ -434,11 +421,7 @@ Number RBSCMConstruction::Aq_inner_product(unsigned int q,
                                            const NumericVector<Number>& w)
 {
   if(q >= get_rb_theta_expansion().get_n_A_terms())
-    {
-      libMesh::err << "Error: We must have q < Q_a in Aq_inner_product."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < Q_a in Aq_inner_product.");
 
   matrix_A->zero();
   add_scaled_symm_Aq(q, 1.);

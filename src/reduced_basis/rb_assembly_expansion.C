@@ -34,11 +34,7 @@ void RBAssemblyExpansion::perform_A_interior_assembly(unsigned int q,
                                                       FEMContext& context)
 {
   if(q >= get_n_A_terms())
-    {
-      libMesh::err << "Error: We must have q < get_n_A_terms in perform_A_interior_assembly."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < get_n_A_terms in perform_A_interior_assembly.");
 
   libmesh_assert(_A_assembly_vector[q]);
 
@@ -49,11 +45,7 @@ void RBAssemblyExpansion::perform_A_boundary_assembly(unsigned int q,
                                                       FEMContext& context)
 {
   if(q >= get_n_A_terms())
-    {
-      libMesh::err << "Error: We must have q < get_n_A_terms in perform_A_boundary_assembly."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < get_n_A_terms in perform_A_boundary_assembly.");
 
   libmesh_assert(_A_assembly_vector[q]);
 
@@ -64,11 +56,7 @@ void RBAssemblyExpansion::perform_F_interior_assembly(unsigned int q,
                                                       FEMContext& context)
 {
   if(q >= get_n_F_terms())
-    {
-      libMesh::err << "Error: We must have q < get_n_F_terms in perform_F_interior_assembly."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < get_n_F_terms in perform_F_interior_assembly.");
 
   libmesh_assert(_A_assembly_vector[q]);
 
@@ -79,11 +67,7 @@ void RBAssemblyExpansion::perform_F_boundary_assembly(unsigned int q,
                                                       FEMContext& context)
 {
   if(q >= get_n_F_terms())
-    {
-      libMesh::err << "Error: We must have q < get_n_F_terms in perform_F_interior_assembly."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < get_n_F_terms in perform_F_interior_assembly.");
 
   libmesh_assert(_A_assembly_vector[q]);
 
@@ -95,12 +79,8 @@ void RBAssemblyExpansion::perform_output_interior_assembly(unsigned int output_i
                                                            FEMContext& context)
 {
   if( (output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)) )
-    {
-      libMesh::err << "Error: We must have output_index < n_outputs and "
-                   << "q_l < get_n_output_terms(output_index) in perform_output_interior_assembly."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have output_index < n_outputs and " \
+                      << "q_l < get_n_output_terms(output_index) in perform_output_interior_assembly.");
 
   libmesh_assert(_output_assembly_vector[output_index][q_l]);
 
@@ -112,12 +92,8 @@ void RBAssemblyExpansion::perform_output_boundary_assembly(unsigned int output_i
                                                            FEMContext& context)
 {
   if( (output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)) )
-    {
-      libMesh::err << "Error: We must have output_index < n_outputs and "
-                   << "q_l < get_n_output_terms(output_index) in perform_output_boundary_assembly."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have output_index < n_outputs and " \
+                      << "q_l < get_n_output_terms(output_index) in perform_output_boundary_assembly.");
 
   libmesh_assert(_output_assembly_vector[output_index][q_l]);
 
@@ -145,11 +121,8 @@ unsigned int RBAssemblyExpansion::get_n_outputs() const
 unsigned int RBAssemblyExpansion::get_n_output_terms(unsigned int index) const
 {
   if(index >= get_n_outputs())
-    {
-      libMesh::err << "Error: We must have index < n_outputs in get_Q_l."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have index < n_outputs in get_Q_l.");
+
   return libmesh_cast_int<unsigned int>
     (_output_assembly_vector[index].size());
 }
@@ -195,11 +168,7 @@ void RBAssemblyExpansion::attach_output_assembly(ElemAssembly* output_assembly)
 ElemAssembly& RBAssemblyExpansion::get_A_assembly(unsigned int q)
 {
   if(q >= get_n_A_terms())
-    {
-      libMesh::err << "Error: We must have q < get_n_A_terms in get_A_assembly."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < get_n_A_terms in get_A_assembly.");
 
   return *_A_assembly_vector[q];
 }
@@ -207,11 +176,7 @@ ElemAssembly& RBAssemblyExpansion::get_A_assembly(unsigned int q)
 ElemAssembly& RBAssemblyExpansion::get_F_assembly(unsigned int q)
 {
   if(q >= get_n_F_terms())
-    {
-      libMesh::err << "Error: We must have q < get_n_F_terms in get_F_assembly."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < get_n_F_terms in get_F_assembly.");
 
   return *_F_assembly_vector[q];
 }
@@ -220,12 +185,8 @@ ElemAssembly& RBAssemblyExpansion::get_output_assembly(unsigned int output_index
                                                        unsigned int q_l)
 {
   if( (output_index >= get_n_outputs()) || (q_l >= get_n_output_terms(output_index)) )
-    {
-      libMesh::err << "Error: We must have output_index < n_outputs and "
-                   << "q_l < get_n_output_terms(output_index) in get_output_assembly."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have output_index < n_outputs and " \
+                      << "q_l < get_n_output_terms(output_index) in get_output_assembly.");
 
   return *_output_assembly_vector[output_index][q_l];
 }

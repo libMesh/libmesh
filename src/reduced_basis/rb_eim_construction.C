@@ -125,10 +125,7 @@ void RBEIMConstruction::set_best_fit_type_flag (const std::string& best_fit_type
         best_fit_type_flag = EIM_BEST_FIT;
       }
     else
-      {
-        libMesh::out << "Error: invalid best_fit_type in input file" << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("Error: invalid best_fit_type in input file");
 }
 
 void RBEIMConstruction::print_info()
@@ -375,12 +372,8 @@ void RBEIMConstruction::enrich_RB_space()
 void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
 {
   if(!serial_training_set)
-    {
-      libMesh::err << "Error: We must have serial_training_set==true in "
-                   << "RBEIMConstruction::initialize_parametrized_functions_in_training_set"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have serial_training_set==true in " \
+                      << "RBEIMConstruction::initialize_parametrized_functions_in_training_set");
 
   libMesh::out << "Initializing parametrized functions in training set..." << std::endl;
   // initialize rb_eval's parameters
@@ -446,10 +439,7 @@ Real RBEIMConstruction::compute_best_fit_error()
         break;
       }
     default:
-      {
-        libMesh::out << "Should not reach here" << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("Should not reach here");
     }
 
   // load the error into solution

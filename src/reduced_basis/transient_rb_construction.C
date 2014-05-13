@@ -318,11 +318,7 @@ SparseMatrix<Number>* TransientRBConstruction::get_M_q(unsigned int q)
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
 
   if(q >= trans_theta_expansion.get_n_M_terms())
-    {
-      libMesh::err << "Error: We must have q < Q_m in get_M_q."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < Q_m in get_M_q.");
 
   return M_q_vector[q];
 }
@@ -330,20 +326,13 @@ SparseMatrix<Number>* TransientRBConstruction::get_M_q(unsigned int q)
 SparseMatrix<Number>* TransientRBConstruction::get_non_dirichlet_M_q(unsigned int q)
 {
   if(!store_non_dirichlet_operators)
-    {
-      libMesh::err << "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_M_q." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_M_q.");
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
 
   if(q >= trans_theta_expansion.get_n_M_terms())
-    {
-      libMesh::err << "Error: We must have q < Q_m in get_M_q."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < Q_m in get_M_q.");
 
   return non_dirichlet_M_q_vector[q];
 }
@@ -502,10 +491,7 @@ void TransientRBConstruction::set_L2_assembly(ElemAssembly& L2_assembly_in)
 ElemAssembly& TransientRBConstruction::get_L2_assembly()
 {
   if(!L2_assembly)
-    {
-      libMesh::out << "Error: L2_assembly hasn't been initialized yet" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: L2_assembly hasn't been initialized yet");
 
   return *L2_assembly;
 }
@@ -519,11 +505,7 @@ void TransientRBConstruction::assemble_Mq_matrix(unsigned int q, SparseMatrix<Nu
     libmesh_cast_ref<TransientRBAssemblyExpansion&>(get_rb_assembly_expansion());
 
   if(q >= trans_theta_expansion.get_n_M_terms())
-    {
-      libMesh::err << "Error: We must have q < Q_m in assemble_Mq_matrix."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < Q_m in assemble_Mq_matrix.");
 
   input_matrix->zero();
   add_scaled_matrix_and_vector(1.,
@@ -788,17 +770,12 @@ void TransientRBConstruction::add_IC_to_RB_space()
   START_LOG("add_IC_to_RB_space()", "TransientRBConstruction");
 
   if (get_rb_evaluation().get_n_basis_functions() > 0)
-    {
-      libMesh::out << "Error: Should not call TransientRBConstruction::add_IC_to_RB_space() "
-                   << "on a system that already contains basis functions." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Should not call TransientRBConstruction::add_IC_to_RB_space() " \
+                      << "on a system that already contains basis functions.");
+
   if (!nonzero_initialization)
-    {
-      libMesh::out << "Error: Should not call TransientRBConstruction::add_IC_to_RB_space() "
-                   << "when nonzero_initialization==false." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Should not call TransientRBConstruction::add_IC_to_RB_space() " \
+                      << "when nonzero_initialization==false.");
 
   initialize_truth();
 
@@ -907,10 +884,7 @@ void TransientRBConstruction::enrich_RB_space()
 #endif
 
   if (INFO != 0)
-    {
-      libMesh::out << "Error in LAPACK syev eigensolver routine, INFO = " << INFO << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error in LAPACK syev eigensolver routine, INFO = " << INFO);
 
   // eval and evec now hold the sorted eigenvalues/eigenvectors
   libMesh::out << std::endl << "POD Eigenvalues:" << std::endl;
@@ -1028,12 +1002,11 @@ void TransientRBConstruction::load_rb_solution()
   DenseVector<Number> RB_solution_vector_k = trans_rb_eval.RB_temporal_solution_data[time_step];
 
   if(RB_solution_vector_k.size() > get_rb_evaluation().get_n_basis_functions())
-    {
-      libMesh::err << "ERROR: rb_eval object contains " << get_rb_evaluation().get_n_basis_functions() << " basis functions."
-                   << " RB_solution vector constains " << RB_solution_vector_k.size() << " entries."
-                   << " RB_solution in TransientRBConstruction::load_rb_solution is too long!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: rb_eval object contains " \
+                      << get_rb_evaluation().get_n_basis_functions() \
+                      << " basis functions. RB_solution vector constains " \
+                      << RB_solution_vector_k.size() \
+                      << " entries. RB_solution in TransientRBConstruction::load_rb_solution is too long!");
 
   for(unsigned int i=0; i<RB_solution_vector_k.size(); i++)
     {
@@ -1404,10 +1377,9 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 //       (this->final_linear_residual() >
 //        this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
 //   {
-//     libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+//     libmesh_error_msg("Warning: Linear solver may not have converged! Final linear residual = "
 //                  << this->final_linear_residual() << ", number of iterations = "
-//                  << this->n_linear_iterations() << std::endl << std::endl;
-// //     libmesh_error();
+//                  << this->n_linear_iterations());
 //   }
 //
 //  inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
@@ -1493,11 +1465,7 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
     for (unsigned int j=0; j<trans_rb_eval.M_q_representor[i].size(); ++j)
       {
         if (trans_rb_eval.M_q_representor[i][j] != NULL)
-          {
-            libMesh::out << "Error, must delete existing M_q_representor before reading in from file."
-                         << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("Error, must delete existing M_q_representor before reading in from file.");
       }
 
   // Now ready to read them in from file!
@@ -1514,10 +1482,7 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
             int stat_result = stat(file_name.str().c_str(), &stat_info);
 
             if (stat_result != 0)
-              {
-                libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-                libmesh_error();
-              }
+              libmesh_error_msg("File does not exist: " << file_name.str());
           }
 
         Xdr aqr_data(file_name.str(),

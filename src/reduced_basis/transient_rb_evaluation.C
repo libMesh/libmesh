@@ -165,11 +165,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
   START_LOG("rb_solve()", "TransientRBEvaluation");
 
   if(N > get_n_basis_functions())
-    {
-      libMesh::err << "ERROR: N cannot be larger than the number "
-                   << "of basis functions in rb_solve" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
 
   const RBParameters& mu = get_parameters();
 
@@ -552,7 +548,6 @@ Real TransientRBEvaluation::compute_residual_dual_norm(const unsigned int N)
       // Sometimes this is negative due to rounding error,
       // but error is on the order of 1.e-10, so shouldn't
       // affect result
-      //    libmesh_error();
       residual_norm_sq = std::abs(residual_norm_sq);
     }
 
@@ -703,7 +698,6 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
       // Sometimes this is negative due to rounding error,
       // but error is on the order of 1.e-10, so shouldn't
       // affect result
-      //    libmesh_error();
       residual_norm_sq = std::abs(residual_norm_sq);
     }
 

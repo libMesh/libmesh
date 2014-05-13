@@ -417,12 +417,9 @@ void DerivedRBConstruction<RBConstruction>::load_rb_solution()
   solution->zero();
 
   if(get_rb_evaluation().RB_solution.size() > get_rb_evaluation().get_n_basis_functions())
-    {
-      libMesh::err << "ERROR: rb_eval contains " << get_rb_evaluation().get_n_basis_functions() << " basis functions."
-                   << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries."
-                   << " RB_solution in RBConstruction::load_rb_solution is too long!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: rb_eval contains " << get_rb_evaluation().get_n_basis_functions() << " basis functions." \
+                      << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries." \
+                      << " RB_solution in RBConstruction::load_rb_solution is too long!");
 
   DerivedRBEvaluation<RBEvaluation>& der_rb_eval =
     libmesh_cast_ref<DerivedRBEvaluation<RBEvaluation>&>(get_rb_evaluation());

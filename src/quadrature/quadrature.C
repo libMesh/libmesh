@@ -62,7 +62,7 @@ void QBase::init(const ElemType t,
       return;
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid dimension _dim = " << _dim);
     }
 }
 

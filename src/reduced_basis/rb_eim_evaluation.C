@@ -106,11 +106,7 @@ Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index,
                                                        const Elem& elem)
 {
   if(var_index >= get_n_parametrized_functions())
-    {
-      libMesh::err << "Error: We must have var_index < get_n_parametrized_functions() in evaluate_parametrized_function."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have var_index < get_n_parametrized_functions() in evaluate_parametrized_function.");
 
   return _parametrized_functions[var_index]->evaluate(get_parameters(), p, elem);
 }
@@ -131,16 +127,10 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
   START_LOG("rb_solve()", "RBEIMEvaluation");
 
   if(N > get_n_basis_functions())
-    {
-      libMesh::err << "ERROR: N cannot be larger than the number "
-                   << "of basis functions in rb_solve" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
+
   if(N==0)
-    {
-      libMesh::err << "ERROR: N must be greater than 0 in rb_solve" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: N must be greater than 0 in rb_solve");
 
   // Get the rhs by sampling parametrized_function
   // at the first N interpolation_points
@@ -209,16 +199,10 @@ void RBEIMEvaluation::rb_solve(DenseVector<Number>& EIM_rhs)
   START_LOG("rb_solve()", "RBEIMEvaluation");
 
   if(EIM_rhs.size() > get_n_basis_functions())
-    {
-      libMesh::err << "ERROR: N cannot be larger than the number "
-                   << "of basis functions in rb_solve" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
+
   if(EIM_rhs.size()==0)
-    {
-      libMesh::err << "ERROR: N must be greater than 0 in rb_solve" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: N must be greater than 0 in rb_solve");
 
   const unsigned int N = EIM_rhs.size();
   DenseMatrix<Number> interpolation_matrix_N;

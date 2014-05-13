@@ -201,10 +201,7 @@ void QMonomial::stroud_rule(const Real rule_data[][3],
             break;
           }
         default:
-          {
-            libMesh::err << "Unknown symmetry!" << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("Unknown symmetry!");
         } // end switch(rule_symmetry[i])
     }
 }
@@ -361,10 +358,7 @@ void QMonomial::kim_rule(const Real rule_data[][4],
             break;
           }
         default:
-          {
-            libMesh::err << "Unknown rule ID: " << rule_id[i] << "!" << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("Unknown rule ID: " << rule_id[i] << "!");
         } // end switch(rule_id[i])
     }
 }

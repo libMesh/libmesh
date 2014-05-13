@@ -249,9 +249,7 @@ protected:
   {}
 #else
   {
-    libMesh::err << "ERROR: Seems as if this quadrature rule" << std::endl
-                 << " is not implemented for 2D." << std::endl;
-    libmesh_error();
+    libmesh_error_msg("ERROR: Seems as if this quadrature rule \nis not implemented for 2D.");
   }
 #endif
 
@@ -269,9 +267,7 @@ protected:
   {}
 #else
   {
-    libMesh::err << "ERROR: Seems as if this quadrature rule" << std::endl
-                 << " is not implemented for 3D." << std::endl;
-    libmesh_error();
+    libmesh_error_msg("ERROR: Seems as if this quadrature rule \nis not implemented for 3D.");
   }
 #endif
 

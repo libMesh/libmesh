@@ -89,7 +89,7 @@ private:
                 unsigned int =0)
   {
     // See about making this non-pure virtual in the base class?
-    libmesh_error();
+    libmesh_not_implemented();
   }
 
   /**

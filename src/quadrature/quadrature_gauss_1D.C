@@ -775,17 +775,8 @@ void QGauss::init_1D(const ElemType,
 
 
     default:
-      {
-        libMesh::err << "Quadrature rule " << _order
-                     << " not supported!" << std::endl;
-
-        libmesh_error();
-      }
+      libmesh_error_msg("Quadrature rule " << _order << " not supported!");
     }
-
-
-
-  return;
 }
 
 } // namespace libMesh

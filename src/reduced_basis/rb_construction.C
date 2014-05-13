@@ -166,10 +166,7 @@ void RBConstruction::set_rb_evaluation(RBEvaluation& rb_eval_in)
 RBEvaluation& RBConstruction::get_rb_evaluation()
 {
   if(!rb_eval)
-    {
-      libMesh::out << "Error: RBEvaluation object hasn't been initialized yet" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: RBEvaluation object hasn't been initialized yet");
 
   return *rb_eval;
 }
@@ -408,10 +405,7 @@ void RBConstruction::set_rb_assembly_expansion(RBAssemblyExpansion& rb_assembly_
 RBAssemblyExpansion& RBConstruction::get_rb_assembly_expansion()
 {
   if(!rb_assembly_expansion)
-    {
-      libMesh::out << "Error: RBAssemblyExpansion object hasn't been initialized yet" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: RBAssemblyExpansion object hasn't been initialized yet");
 
   return *rb_assembly_expansion;
 }
@@ -424,10 +418,7 @@ void RBConstruction::set_inner_product_assembly(ElemAssembly& inner_product_asse
 ElemAssembly& RBConstruction::get_inner_product_assembly()
 {
   if(!inner_product_assembly)
-    {
-      libMesh::out << "Error: inner_product_assembly hasn't been initialized yet" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: inner_product_assembly hasn't been initialized yet");
 
   return *inner_product_assembly;
 }
@@ -440,10 +431,7 @@ void RBConstruction::set_constraint_assembly(ElemAssembly& constraint_assembly_i
 ElemAssembly& RBConstruction::get_constraint_assembly()
 {
   if(!constraint_assembly)
-    {
-      libMesh::out << "Error: constraint_assembly hasn't been initialized yet" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: constraint_assembly hasn't been initialized yet");
 
   return *constraint_assembly;
 }
@@ -868,11 +856,7 @@ void RBConstruction::assemble_and_add_constraint_matrix(SparseMatrix<Number>* in
 void RBConstruction::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dof_constraints)
 {
   if(q >= get_rb_theta_expansion().get_n_A_terms())
-    {
-      libMesh::err << "Error: We must have q < Q_a in assemble_Aq_matrix."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < Q_a in assemble_Aq_matrix.");
 
   input_matrix->zero();
 
@@ -889,11 +873,7 @@ void RBConstruction::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix
   START_LOG("add_scaled_Aq()", "RBConstruction");
 
   if(q_a >= get_rb_theta_expansion().get_n_A_terms())
-    {
-      libMesh::err << "Error: We must have q < Q_a in add_scaled_Aq."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < Q_a in add_scaled_Aq.");
 
   if(!symmetrize)
     {
@@ -976,11 +956,7 @@ void RBConstruction::assemble_Fq_vector(unsigned int q,
                                         bool apply_dof_constraints)
 {
   if(q >= get_rb_theta_expansion().get_n_F_terms())
-    {
-      libMesh::err << "Error: We must have q < Q_f in assemble_Fq_vector."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < Q_f in assemble_Fq_vector.");
 
   input_vector->zero();
 
@@ -1165,11 +1141,7 @@ void RBConstruction::update_greedy_param_list()
 const RBParameters& RBConstruction::get_greedy_parameter(unsigned int i)
 {
   if( i >= get_rb_evaluation().greedy_param_list.size() )
-    {
-      libMesh::out << "Error: Argument in RBConstruction::get_greedy_parameter is too large."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Argument in RBConstruction::get_greedy_parameter is too large.");
 
   return get_rb_evaluation().greedy_param_list[i];
 }
@@ -1866,12 +1838,9 @@ void RBConstruction::load_rb_solution()
   solution->zero();
 
   if(get_rb_evaluation().RB_solution.size() > get_rb_evaluation().get_n_basis_functions())
-    {
-      libMesh::err << "ERROR: System contains " << get_rb_evaluation().get_n_basis_functions() << " basis functions."
-                   << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries."
-                   << " RB_solution in RBConstruction::load_rb_solution is too long!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: System contains " << get_rb_evaluation().get_n_basis_functions() << " basis functions." \
+                      << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries." \
+                      << " RB_solution in RBConstruction::load_rb_solution is too long!");
 
   for(unsigned int i=0; i<get_rb_evaluation().RB_solution.size(); i++)
     {
@@ -1922,10 +1891,9 @@ void RBConstruction::load_rb_solution()
 //       (this->final_linear_residual() >
 //        this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
 //   {
-//     libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
-//                  << this->final_linear_residual() << ", number of iterations = "
-//                  << this->n_linear_iterations() << std::endl << std::endl;
-// //     libmesh_error();
+//     libmesh_error_msg("Warning: Linear solver may not have converged! Final linear residual = "
+//                       << this->final_linear_residual() << ", number of iterations = "
+//                       << this->n_linear_iterations());
 //   }
 //
 //   inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
@@ -1945,11 +1913,7 @@ SparseMatrix<Number>* RBConstruction::get_inner_product_matrix()
 SparseMatrix<Number>* RBConstruction::get_non_dirichlet_inner_product_matrix()
 {
   if(!store_non_dirichlet_operators)
-    {
-      libMesh::err << "Error: Must have store_non_dirichlet_operators==true "
-                   << "to access non_dirichlet_inner_product_matrix." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_inner_product_matrix.");
 
   return non_dirichlet_inner_product_matrix.get();
 }
@@ -1957,11 +1921,7 @@ SparseMatrix<Number>* RBConstruction::get_non_dirichlet_inner_product_matrix()
 SparseMatrix<Number>* RBConstruction::get_Aq(unsigned int q)
 {
   if(q >= get_rb_theta_expansion().get_n_A_terms())
-    {
-      libMesh::err << "Error: We must have q < Q_a in get_Aq."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < Q_a in get_Aq.");
 
   return Aq_vector[q];
 }
@@ -1969,17 +1929,10 @@ SparseMatrix<Number>* RBConstruction::get_Aq(unsigned int q)
 SparseMatrix<Number>* RBConstruction::get_non_dirichlet_Aq(unsigned int q)
 {
   if(!store_non_dirichlet_operators)
-    {
-      libMesh::err << "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_Aq." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_Aq.");
 
   if(q >= get_rb_theta_expansion().get_n_A_terms())
-    {
-      libMesh::err << "Error: We must have q < Q_a in get_Aq."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < Q_a in get_Aq.");
 
   return non_dirichlet_Aq_vector[q];
 }
@@ -1987,11 +1940,7 @@ SparseMatrix<Number>* RBConstruction::get_non_dirichlet_Aq(unsigned int q)
 NumericVector<Number>* RBConstruction::get_Fq(unsigned int q)
 {
   if(q >= get_rb_theta_expansion().get_n_F_terms())
-    {
-      libMesh::err << "Error: We must have q < Q_f in get_Fq."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < Q_f in get_Fq.");
 
   return Fq_vector[q];
 }
@@ -1999,17 +1948,10 @@ NumericVector<Number>* RBConstruction::get_Fq(unsigned int q)
 NumericVector<Number>* RBConstruction::get_non_dirichlet_Fq(unsigned int q)
 {
   if(!store_non_dirichlet_operators)
-    {
-      libMesh::err << "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_Fq." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_Fq.");
 
   if(q >= get_rb_theta_expansion().get_n_F_terms())
-    {
-      libMesh::err << "Error: We must have q < Q_f in get_Fq."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have q < Q_f in get_Fq.");
 
   return non_dirichlet_Fq_vector[q];
 }
@@ -2017,12 +1959,8 @@ NumericVector<Number>* RBConstruction::get_non_dirichlet_Fq(unsigned int q)
 NumericVector<Number>* RBConstruction::get_output_vector(unsigned int n, unsigned int q_l)
 {
   if( (n >= get_rb_theta_expansion().get_n_outputs()) || (q_l >= get_rb_theta_expansion().get_n_output_terms(n)) )
-    {
-      libMesh::err << "Error: We must have n < n_outputs and "
-                   << "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_output_vector."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have n < n_outputs and "          \
+                      << "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_output_vector.");
 
   return outputs_vector[n][q_l];
 }
@@ -2030,12 +1968,8 @@ NumericVector<Number>* RBConstruction::get_output_vector(unsigned int n, unsigne
 NumericVector<Number>* RBConstruction::get_non_dirichlet_output_vector(unsigned int n, unsigned int q_l)
 {
   if( (n >= get_rb_theta_expansion().get_n_outputs()) || (q_l >= get_rb_theta_expansion().get_n_output_terms(n)) )
-    {
-      libMesh::err << "Error: We must have n < n_outputs and "
-                   << "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_non_dirichlet_output_vector."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: We must have n < n_outputs and "          \
+                      << "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_non_dirichlet_output_vector.");
 
   return non_dirichlet_outputs_vector[n][q_l];
 }
@@ -2241,11 +2175,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
   for (unsigned int i=0; i<Fq_representor.size(); ++i)
     {
       if (Fq_representor[i] != NULL)
-        {
-          libMesh::out << "Error, must delete existing Fq_representor before reading in from file."
-                       << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Error, must delete existing Fq_representor before reading in from file.");
     }
 
   for (unsigned int i=0; i<Fq_representor.size(); i++)
@@ -2260,10 +2190,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
           int stat_result = stat(file_name.str().c_str(), &stat_info);
 
           if (stat_result != 0)
-            {
-              libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("File does not exist: " << file_name.str());
         }
 
       Xdr fqr_data(file_name.str(),
@@ -2293,11 +2220,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
     for (unsigned int j=0; j<get_rb_evaluation().Aq_representor[i].size(); ++j)
       {
         if (get_rb_evaluation().Aq_representor[i][j] != NULL)
-          {
-            libMesh::out << "Error, must delete existing Aq_representor before reading in from file."
-                         << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("Error, must delete existing Aq_representor before reading in from file.");
       }
 
   // Now ready to read them in from file!
@@ -2314,10 +2237,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
             int stat_result = stat(file_name.str().c_str(), &stat_info);
 
             if (stat_result != 0)
-              {
-                libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-                libmesh_error();
-              }
+              libmesh_error_msg("File does not exist: " << file_name.str());
           }
 
         Xdr aqr_data(file_name.str(), read_binary_residual_representors ? DECODE : READ);
@@ -2341,9 +2261,7 @@ void RBConstruction::check_convergence()
     libMesh::LinearConvergenceReason conv_flag;
     conv_flag = get_linear_solver()->get_converged_reason();
     if(conv_flag < 0)
-    {
-      libmesh_error();
-    }
+      libmesh_error_msg("Error, conv_flag < 0!");
 }
 
 bool RBConstruction::get_convergence_assertion_flag() const

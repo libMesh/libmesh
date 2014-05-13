@@ -88,10 +88,7 @@ void RBEvaluation::set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_i
 RBThetaExpansion& RBEvaluation::get_rb_theta_expansion()
 {
   if(!is_rb_theta_expansion_initialized())
-    {
-      libMesh::out << "Error: rb_theta_expansion hasn't been initialized yet" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: rb_theta_expansion hasn't been initialized yet");
 
   return *rb_theta_expansion;
 }
@@ -114,11 +111,7 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
   START_LOG("resize_data_structures()", "RBEvaluation");
 
   if(Nmax < this->get_n_basis_functions())
-    {
-      libMesh::err << "Error: Cannot set Nmax to be less than the "
-                   << "current number of basis functions."  << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Cannot set Nmax to be less than the current number of basis functions.");
 
   // Resize/clear inner product matrix
   if(compute_RB_inner_product)
@@ -221,11 +214,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
   START_LOG("rb_solve()", "RBEvaluation");
 
   if(N > get_n_basis_functions())
-    {
-      libMesh::err << "ERROR: N cannot be larger than the number "
-                   << "of basis functions in rb_solve" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
 
   const RBParameters& mu = get_parameters();
 
@@ -379,7 +368,6 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
       //     Sometimes this is negative due to rounding error,
       //     but when this occurs the error is on the order of 1.e-10,
       //     so shouldn't affect error bound much...
-      //     libmesh_error();
       residual_norm_sq = std::abs(residual_norm_sq);
     }
 
@@ -1065,10 +1053,7 @@ void RBEvaluation::read_in_vectors(System& sys,
               int stat_result = stat(file_name.str().c_str(), &stat_info);
 
               if (stat_result != 0)
-                {
-                  libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-                  libmesh_error();
-                }
+                libmesh_error_msg("File does not exist: " << file_name.str());
             }
 
           Xdr vector_data(file_name.str(),
@@ -1108,10 +1093,7 @@ void RBEvaluation::read_in_vectors(System& sys,
           int stat_result = stat(file_name.str().c_str(), &stat_info);
 
           if (stat_result != 0)
-            {
-              libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("File does not exist: " << file_name.str());
         }
 
       Xdr vector_data(file_name.str(),

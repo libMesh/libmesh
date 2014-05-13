@@ -266,19 +266,11 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
   // First, make sure that an initial training set has already been
   // generated
   if(!training_parameters_initialized)
-    {
-      libMesh::out << "Error: load_training_set cannot be used to initialize parameters"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: load_training_set cannot be used to initialize parameters");
 
   // Make sure that the training set has the correct number of parameters
   if(new_training_set.size() != get_n_params())
-    {
-      libMesh::out << "Error: Incorrect number of parameters in load_training_set."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Error: Incorrect number of parameters in load_training_set.");
 
   // Clear the training set
   std::map< std::string, NumericVector<Number>* >::iterator it           = training_parameters.begin();
@@ -556,12 +548,11 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       // First make sure n_training_samples_in is a square number
       unsigned int n_training_parameters_per_var = static_cast<unsigned int>( std::sqrt(static_cast<Real>(n_training_samples_in)) );
       if( (n_training_parameters_per_var*n_training_parameters_per_var) != n_training_samples_in)
-        {
-          libMesh::out << "Error: Number of training parameters = " << n_training_samples_in << "." << std::endl
-                       << "Deterministic training set generation with two parameters requires " << std::endl
-                       << "the number of training parameters to be a perfect square." << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Error: Number of training parameters = " \
+                          << n_training_samples_in \
+                          << ".\n" \
+                          << "Deterministic training set generation with two parameters requires\n " \
+                          << "the number of training parameters to be a perfect square.");
 
       // make a matrix to store all the parameters, put them in vector form afterwards
       std::vector< std::vector<Real> > training_parameters_matrix(num_params);

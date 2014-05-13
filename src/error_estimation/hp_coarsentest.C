@@ -165,15 +165,11 @@ void HPCoarsenTest::select_refinement (System &system)
   if (!component_scale.empty())
     {
       if (component_scale.size() != n_vars)
-        {
-          libMesh::err << "ERROR: component_scale is the wrong size:"
-                       << std::endl
-                       << " component_scale.size()=" << component_scale.size()
-                       << std::endl
-                       << " n_vars=" << n_vars
-                       << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR: component_scale is the wrong size:\n" \
+                          << " component_scale.size()=" \
+                          << component_scale.size()     \
+                          << "\n n_vars=" \
+                          << n_vars);
     }
   else
     {
