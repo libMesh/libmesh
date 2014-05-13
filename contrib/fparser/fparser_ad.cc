@@ -11,7 +11,6 @@ FunctionParserADBase<Value_t>::FunctionParserADBase() :
     FunctionParserBase<Value_t>(),
     mData(this->getParserData())
 {
-  std::cout << "CTOR     mData->mReferenceCounter = " << mData->mReferenceCounter << std::endl;
 }
 
 template<typename Value_t>
@@ -19,7 +18,6 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
     FunctionParserBase<Value_t>(cpy),
     mData(this->getParserData())
 {
-  std::cout << "CopyCTOR mData->mReferenceCounter = " << mData->mReferenceCounter << std::endl;
 }
 
 template<typename Value_t>
@@ -108,7 +106,7 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
 {
   // check for empty DiffProgramFragments
   if (orig.empty()) {
-    std::cout << "Empty programm passed in!\n";
+    std::cerr << "Empty programm passed in!\n";
     exit(1);
   }
 
@@ -426,7 +424,7 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
   }
 
   //outer.insert( v1.end(), v2.begin(), v2.end() );
-  std::cout << "Unknown opcode!\n";
+  std::cerr << "Unknown opcode!\n";
   exit(1);
   //return outer;
 }
