@@ -136,83 +136,15 @@ public:
   std::string get_info () const;
 
 #ifdef LIBMESH_HAVE_MPI
-  /**
-   * Convenient way to communicate nodes.  This struct defines a
-   * packed up node which can be easily communicated through a
-   * derived MPI datatype.
-   *
-   * \author Benjamin S. Kirk
-   * \date 2008
-   */
-  struct PackedNode
-  {
-    static const unsigned int header_size = 2;
-
-    dof_id_type id;
-    processor_id_type pid;
-    Real x;
-    // FIXME: We should drop z (and y) if libMesh is built 2D (or 1D) only
-    Real y;
-    Real z;
-
-    PackedNode () :
-      id(0),
-      pid(DofObject::invalid_processor_id),
-      x(0.),
-      y(0.),
-      z(0.)
-    {}
-
-    explicit
-    PackedNode (const Node &node) :
-      id(node.id()),
-      pid(node.processor_id()),
-      x(node(0)),
-#if LIBMESH_DIM > 1
-      y(node(1)),
-#else
-      y(0.),
-#endif
-#if LIBMESH_DIM > 2
-      z(node(2))
-#else
-      z(0.)
-#endif
-    {}
-
-    AutoPtr<Node> build_node () const
-    {
-      AutoPtr<Node> node(new Node(x,y,z,id));
-      node->processor_id() = pid;
-      return node;
-    }
-
-    Point build_point () const
-    {
-      return Point(x,y,z);
-    }
-
-    static MPI_Datatype create_mpi_datatype ();
-
-    /**
-     * For each node the serialization is of the form
-     * [ processor_id self_ID x1 x2 y1 y2 z1 z2
-     *  dof_object_buffer_1 ...]
-     * There may be 1 or 3 or 4 ints per coordinate depending on
-     * machine architecture.
-     */
-    static void pack (std::vector<largest_id_type> &conn, const Node* node);
-
-    static void unpack (std::vector<largest_id_type>::const_iterator start, Node& node);
-  };
-
   unsigned int packed_size() const
   {
+    const unsigned int header_size = 2;
+
     // use "(a+b-1)/b" trick to get a/b to round up
     static const unsigned int idtypes_per_Real =
       (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
 
-    return PackedNode::header_size + LIBMESH_DIM*idtypes_per_Real +
+    return header_size + LIBMESH_DIM*idtypes_per_Real +
       this->packed_indexing_size();
   }
 
