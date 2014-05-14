@@ -350,11 +350,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
       old_vector_ptr = local_old_vector;
     }
   else // unknown old_v.type()
-    {
-      libMesh::err << "ERROR: Unknown old_v.type() == " << old_v.type()
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Unknown old_v.type() == " << old_v.type());
 
   // Note that the above will have zeroed the new_vector.
   // Just to be sure, assert that new_vector_ptr and old_vector_ptr
@@ -737,7 +733,7 @@ void System::boundary_project_vector
 #ifndef LIBMESH_ENABLE_AMR
 void ProjectVector::operator()(const ConstElemRange &) const
 {
-  libmesh_error();
+  libmesh_not_implemented();
 }
 #else
 void ProjectVector::operator()(const ConstElemRange &range) const
@@ -1163,7 +1159,7 @@ void BuildProjectionList::unique()
 #ifndef LIBMESH_ENABLE_AMR
 void BuildProjectionList::operator()(const ConstElemRange &)
 {
-  libmesh_error();
+  libmesh_not_implemented();
 }
 #else
 void BuildProjectionList::operator()(const ConstElemRange &range)
@@ -1523,7 +1519,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                     }
                 }
               else
-                libmesh_error();
+                libmesh_error_msg("Unknown continuity " << cont);
             }
 
           // In 3D, project any edge values next
@@ -2122,7 +2118,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
                     }
                 }
               else
-                libmesh_error();
+                libmesh_error_msg("Unknown continuity " << cont);
             }
 
           // In 3D, project any edge values next
@@ -2769,7 +2765,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                     }
                 }
               else
-                libmesh_error();
+                libmesh_error_msg("Unknown continuity " << cont);
             }
 
           // In 3D, project any edge values next

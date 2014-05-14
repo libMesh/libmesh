@@ -14,7 +14,7 @@ void NoSolutionHistory::store()
 void NoSolutionHistory::retrieve()
 {
   // Nothing was stored, so nothing can be retrieved
-  libmesh_error();
+  libmesh_not_implemented();
 }
 
 }

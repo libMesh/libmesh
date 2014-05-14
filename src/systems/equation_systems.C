@@ -404,12 +404,7 @@ System & EquationSystems::add_system (const std::string& sys_type,
 #endif
 
   else
-    {
-      libMesh::err << "ERROR: Unknown system type: "
-                   << sys_type
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Unknown system type: " << sys_type);
 
   // Return a reference to the new system
   //return (*this)(name);
@@ -426,12 +421,7 @@ void EquationSystems::delete_system (const std::string& name)
   libmesh_deprecated();
 
   if (!_systems.count(name))
-    {
-      libMesh::err << "ERROR: no system named "
-                   << name  << std::endl;
-
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: no system named " << name);
 
   delete _systems[name];
 
@@ -569,8 +559,7 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
                       var_names[var_num++] = var_name+"_z";
                       break;
                     default:
-                      libMesh::err << "Invalid dim in build_variable_names" << std::endl;
-                      libmesh_error();
+                      libmesh_error_msg("Invalid dim in build_variable_names");
                     }
                 }
               else
@@ -589,7 +578,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>&,
                                              const std::string&) const
 {
   //TODO:[BSK] re-implement this from the method below
-  libmesh_error();
+  libmesh_not_implemented();
 
   //   // Get a reference to the named system
   //   const System& system = this->get_system(system_name);

@@ -127,10 +127,7 @@ void NewmarkSystem::clear ()
 
 void NewmarkSystem::reinit ()
 {
-  libmesh_error();
-
-  // initialize parent data
-  LinearImplicitSystem::reinit();
+  libmesh_not_implemented();
 }
 
 

@@ -41,8 +41,6 @@ EigenSolver<T>::build(const Parallel::Communicator &comm,
   switch (solver_package)
     {
 
-
-
 #ifdef LIBMESH_HAVE_SLEPC
     case SLEPC_SOLVERS:
       {
@@ -51,12 +49,8 @@ EigenSolver<T>::build(const Parallel::Communicator &comm,
       }
 #endif
 
-
     default:
-      libMesh::err << "ERROR:  Unrecognized eigen solver package: "
-                   << solver_package
-                   << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR:  Unrecognized eigen solver package: " << solver_package);
     }
 
   AutoPtr<EigenSolver<T> > ap(NULL);

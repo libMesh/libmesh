@@ -114,7 +114,7 @@ public:
   /**
    * If the quasi-Newton step length must be reduced to below this
    * factor to give a residual reduction, then the Newton solver
-   * dies with a libmesh_error()
+   * dies with an error message.
    * It is currently set to 1e-5 by default.
    */
   Real minsteplength;

@@ -146,10 +146,7 @@ void FrequencySystem::init_data ()
           this->set_current_frequency(0);
         }
       else
-        {
-          libMesh::err << "ERROR: Need to set frequencies before calling init(). " << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR: Need to set frequencies before calling init().");
     }
 
   _finished_init = true;
@@ -165,10 +162,7 @@ void FrequencySystem::assemble ()
   libmesh_assert (_finished_init);
 
   if (_finished_assemble)
-    {
-      libMesh::err << "ERROR: Matrices already assembled." << std::endl;
-      libmesh_error ();
-    }
+    libmesh_error_msg("ERROR: Matrices already assembled.");
 
   // Log how long assemble() takes
   START_LOG("assemble()", "FrequencySystem");
@@ -198,11 +192,7 @@ void FrequencySystem::set_frequencies_by_steps (const Real base_freq,
 
   // sanity check
   if (_finished_set_frequencies)
-    {
-      libMesh::err << "ERROR: frequencies already initialized."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: frequencies already initialized.");
 
   EquationSystems& es =
     this->get_equation_systems();
@@ -241,10 +231,7 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
   libmesh_assert_greater (n_freq, 0);
 
   if (_finished_set_frequencies)
-    {
-      libMesh::err << "ERROR: frequencies already initialized. " << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: frequencies already initialized.");
 
   EquationSystems& es =
     this->get_equation_systems();
@@ -281,10 +268,7 @@ void FrequencySystem::set_frequencies (const std::vector<Real>& frequencies,
   libmesh_assert(!frequencies.empty());
 
   if (_finished_set_frequencies)
-    {
-      libMesh::err << "ERROR: frequencies already initialized. " << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: frequencies already initialized.");
 
   EquationSystems& es =
     this->get_equation_systems();

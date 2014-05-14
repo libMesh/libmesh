@@ -177,9 +177,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T>&,
                                    const double,
                                    const unsigned int)
 {
-  libMesh::err << "ERROR: Eigen does not support a user-supplied preconditioner!"
-               << std::endl;
-  libmesh_error();
+  libmesh_error_msg("ERROR: Eigen does not support a user-supplied preconditioner!");
 
   std::pair<unsigned int, Real> p;
   return p;

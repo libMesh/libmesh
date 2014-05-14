@@ -103,7 +103,7 @@ void assemble_unconstrained_element_system
 
           libMesh::out.precision(old_precision);
 
-          libmesh_error();
+          libmesh_error_msg("Relative error too large, exiting!");
         }
     }
 
@@ -198,7 +198,7 @@ void assemble_unconstrained_element_system
                            << analytic_jacobian << std::endl;
               libMesh::out.precision(old_precision);
 
-              libmesh_error();
+              libmesh_error_msg("Relative error too large, exiting!");
             }
           // Once we've verified a side, we'll want to add back the
           // rest of the accumulated jacobian
@@ -1016,9 +1016,7 @@ void FEMSystem::init_context(DiffContext &c)
             }
             break;
           default:
-            {
-              libmesh_error();
-            }
+            libmesh_error_msg("Unrecognized field type!");
           }
       }
 }
@@ -1030,7 +1028,7 @@ void FEMSystem::mesh_position_get()
   // This function makes no sense unless we've already picked out some
   // variable(s) to reflect mesh position coordinates
   if (!_mesh_sys)
-    libmesh_error();
+    libmesh_error_msg("_mesh_sys was NULL!");
 
   // We currently assume mesh variables are in our own system
   if (_mesh_sys != this)

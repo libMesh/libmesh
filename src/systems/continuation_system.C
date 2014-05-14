@@ -360,15 +360,10 @@ void ContinuationSystem::continuation_solve()
 {
   // Be sure the user has set the continuation parameter pointer
   if (!continuation_parameter)
-    {
-      libMesh::err << "You must set the continuation_parameter pointer "
-                   << "to a member variable of the derived class, preferably in the "
-                   << "Derived class's init_data function.  This is how the ContinuationSystem "
-                   << "updates the continuation parameter."
-                   << std::endl;
-
-      libmesh_error();
-    }
+    libmesh_error_msg("You must set the continuation_parameter pointer " \
+                      << "to a member variable of the derived class, preferably in the " \
+                      << "Derived class's init_data function.  This is how the ContinuationSystem " \
+                      << "updates the continuation parameter.");
 
   // Use extra precision for all the numbers printed in this function.
   std::streamsize old_precision = libMesh::out.precision();
@@ -537,12 +532,10 @@ void ContinuationSystem::continuation_solve()
                       current_linear_tolerance *= initial_newton_tolerance; // reduce the linear tolerance to force the solver to do some work
                     }
                   else
-                    {
-                      // We shouldn't get here ... it means the linear solver did no work on a Newton
-                      // step other than the first one.  If this happens, we need to think more about our
-                      // tolerance selection.
-                      libmesh_error();
-                    }
+                    // We shouldn't get here ... it means the linear solver did no work on a Newton
+                    // step other than the first one.  If this happens, we need to think more about our
+                    // tolerance selection.
+                    libmesh_error_msg("Linear solver did no work!");
                 }
 
             } while (rval.first==0);
@@ -593,10 +586,7 @@ void ContinuationSystem::continuation_solve()
           rhs->close();
           const Real yrhsnorm=rhs->l2_norm();
           if (yrhsnorm == 0.0)
-            {
-              libMesh::out << "||G_Lambda|| = 0" << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("||G_Lambda|| = 0");
 
           // We select a tolerance for the y-system which is based on the inexact Newton
           // tolerance but scaled by an extra term proportional to the RHS (which is not -> 0 in this case)
@@ -802,7 +792,7 @@ void ContinuationSystem::continuation_solve()
               libMesh::out << "Backtracking failed." << std::endl;
 
               // 1.) Quit, exit program.
-              //libmesh_error();
+              //libmesh_error_msg("Backtracking failed!");
 
               // 2.) Continue with last newton_stepfactor
               if (newton_step<3)
@@ -847,7 +837,6 @@ void ContinuationSystem::continuation_solve()
           if (*continuation_parameter < min_continuation_parameter)
             {
               libMesh::out << "Continuation parameter fell below min-allowable value." << std::endl;
-              // libmesh_error();
               break; // out of Newton iteration loop, newton_converged = false
             }
 
@@ -859,7 +848,6 @@ void ContinuationSystem::continuation_solve()
                            << *continuation_parameter
                            << " exceeded max-allowable value."
                            << std::endl;
-              // libmesh_error();
               break; // out of Newton iteration loop, newton_converged = false
             }
 
@@ -929,10 +917,7 @@ void ContinuationSystem::continuation_solve()
   // Check for convergence of the whole arcstep.  If not converged at this
   // point, we have no choice but to quit.
   if (!arcstep_converged)
-    {
-      libMesh::out << "Arcstep failed to converge after max number of reductions! Exiting..." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Arcstep failed to converge after max number of reductions! Exiting...");
 
   // Print converged solution control parameter and max value.
   libMesh::out << "lambda_current=" << *continuation_parameter << std::endl;
@@ -1420,11 +1405,7 @@ void ContinuationSystem::apply_predictor()
     }
 
   else
-    {
-      // Unknown predictor
-      libmesh_error();
-    }
-
+    libmesh_error_msg("Unknown predictor!");
 }
 
 } // namespace libMesh

@@ -51,11 +51,8 @@ extern "C"
   {
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
 
-    if(!preconditioner->initialized())
-      {
-        err<<"Preconditioner not initialized!  Make sure you call init() before solve!"<<std::endl;
-        libmesh_error();
-      }
+    if (!preconditioner->initialized())
+      libmesh_error_msg("Preconditioner not initialized!  Make sure you call init() before solve!");
 
     preconditioner->setup();
 
@@ -81,11 +78,8 @@ extern "C"
     PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
 
-    if(!preconditioner->initialized())
-      {
-        err<<"Preconditioner not initialized!  Make sure you call init() before solve!"<<std::endl;
-        libmesh_error();
-      }
+    if (!preconditioner->initialized())
+      libmesh_error_msg("Preconditioner not initialized!  Make sure you call init() before solve!");
 
     preconditioner->setup();
 
@@ -1155,25 +1149,19 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 #if PETSC_VERSION_LESS_THAN(2,3,1)
   // FIXME[JWP]: There will be a bunch of unused variable warnings
   // for older PETScs here.
-  libMesh::out << "This method has been developed with PETSc 2.3.1.  "
-               << "No one has made it backwards compatible with older "
-               << "versions of PETSc so far; however, it might work "
-               << "without any change with some older version." << std::endl;
-  libmesh_error();
-  return std::make_pair(0,0.0);
+  libmesh_error_msg("This method has been developed with PETSc 2.3.1.  " \
+                    << "No one has made it backwards compatible with older " \
+                    << "versions of PETSc so far; however, it might work " \
+                    << "without any change with some older version.");
 
 #else
 
 #if PETSC_VERSION_LESS_THAN(3,1,0)
-  if(_restrict_solve_to_is!=NULL)
-    {
-      libMesh::out << "The current implementation of subset solves with "
-                   << "shell matrices requires PETSc version 3.1 or above.  "
-                   << "Older PETSc version do not support automatic "
-                   << "submatrix generation of shell matrices."
-                   << std::endl;
-      libmesh_error();
-    }
+  if (_restrict_solve_to_is!=NULL)
+    libmesh_error_msg("The current implementation of subset solves with " \
+                      << "shell matrices requires PETSc version 3.1 or above.  " \
+                      << "Older PETSc version do not support automatic " \
+                      << "submatrix generation of shell matrices.");
 #endif
 
   START_LOG("solve()", "PetscLinearSolver");
@@ -1438,25 +1426,19 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 #if PETSC_VERSION_LESS_THAN(2,3,1)
   // FIXME[JWP]: There will be a bunch of unused variable warnings
   // for older PETScs here.
-  libMesh::out << "This method has been developed with PETSc 2.3.1.  "
-               << "No one has made it backwards compatible with older "
-               << "versions of PETSc so far; however, it might work "
-               << "without any change with some older version." << std::endl;
-  libmesh_error();
-  return std::make_pair(0,0.0);
+  libmesh_error_msg("This method has been developed with PETSc 2.3.1.  " \
+                    << "No one has made it backwards compatible with older " \
+                    << "versions of PETSc so far; however, it might work " \
+                    << "without any change with some older version.");
 
 #else
 
 #if PETSC_VERSION_LESS_THAN(3,1,0)
-  if(_restrict_solve_to_is!=NULL)
-    {
-      libMesh::out << "The current implementation of subset solves with "
-                   << "shell matrices requires PETSc version 3.1 or above.  "
-                   << "Older PETSc version do not support automatic "
-                   << "submatrix generation of shell matrices."
-                   << std::endl;
-      libmesh_error();
-    }
+  if (_restrict_solve_to_is!=NULL)
+    libmesh_error_msg("The current implementation of subset solves with " \
+                      << "shell matrices requires PETSc version 3.1 or above.  " \
+                      << "Older PETSc version do not support automatic " \
+                      << "submatrix generation of shell matrices.");
 #endif
 
   START_LOG("solve()", "PetscLinearSolver");

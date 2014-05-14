@@ -747,16 +747,10 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
   if (_sys->nonlinear_solver->residual && _sys->nonlinear_solver->residual_object)
-    {
-      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Residual!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the Residual!");
 
   if (_sys->nonlinear_solver->matvec && _sys->nonlinear_solver->residual_and_jacobian_object)
-    {
-      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!");
 
   if (_sys->nonlinear_solver->residual != NULL)
     _sys->nonlinear_solver->residual(*(_sys->current_local_solution.get()), R, *_sys);
@@ -771,7 +765,7 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
     _sys->nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian(*(_sys->current_local_solution.get()), &R, NULL, *_sys);
 
   else
-    libmesh_error();
+    libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
   R.close();
   X_global.close();
@@ -831,16 +825,10 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
   if (sys.nonlinear_solver->jacobian && sys.nonlinear_solver->jacobian_object)
-    {
-      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Jacobian!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the Jacobian!");
 
   if (sys.nonlinear_solver->matvec && sys.nonlinear_solver->residual_and_jacobian_object)
-    {
-      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!");
 
   if (sys.nonlinear_solver->jacobian != NULL)
     sys.nonlinear_solver->jacobian(*(sys.current_local_solution.get()), the_pc, sys);
@@ -855,7 +843,7 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
     sys.nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian(*(sys.current_local_solution.get()), NULL, &the_pc, sys);
 
   else
-    libmesh_error();
+    libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
   the_pc.close();
   Jac.close();

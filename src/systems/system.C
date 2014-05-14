@@ -99,14 +99,14 @@ System::System (const System& other) :
   _mesh(other._mesh),
   _sys_number(other._sys_number)
 {
-  libmesh_error();
+  libmesh_not_implemented();
 }
 
 
 
 System& System::operator= (const System&)
 {
-  libmesh_error();
+  libmesh_not_implemented();
 }
 
 
@@ -298,8 +298,7 @@ void System::init_data ()
                              _dof_map->get_send_list(), false,
                              GHOSTED);
 #else
-          libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
 #endif
         }
       else if (type == SERIAL)
@@ -337,8 +336,7 @@ void System::restrict_vectors ()
                                  _dof_map->get_send_list(), false,
                                  GHOSTED);
 #else
-              libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
-              libmesh_error();
+              libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
 #endif
             }
           else
@@ -698,8 +696,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
                      _dof_map->get_send_list(), false,
                      GHOSTED);
 #else
-          libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
 #endif
         }
       else
@@ -788,13 +785,7 @@ const NumericVector<Number> & System::get_vector (const std::string& vec_name) c
   const_vectors_iterator pos = _vectors.find(vec_name);
 
   if (pos == _vectors.end())
-    {
-      libMesh::err << "ERROR: vector "
-                   << vec_name
-                   << " does not exist in this system!"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: vector " << vec_name << " does not exist in this system!");
 
   return *(pos->second);
 }
@@ -807,13 +798,7 @@ NumericVector<Number> & System::get_vector (const std::string& vec_name)
   vectors_iterator pos = _vectors.find(vec_name);
 
   if (pos == _vectors.end())
-    {
-      libMesh::err << "ERROR: vector "
-                   << vec_name
-                   << " does not exist in this system!"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: vector " << vec_name << " does not exist in this system!");
 
   return *(pos->second);
 }
@@ -1086,11 +1071,7 @@ unsigned int System::add_variable (const std::string& var,
         if (this->variable_type(v) == type)
           return _variables[v].number();
 
-        libMesh::err << "ERROR: incompatible variable "
-                     << var
-                     << " has already been added for this system!"
-                     << std::endl;
-        libmesh_error();
+        libmesh_error_msg("ERROR: incompatible variable " << var << " has already been added for this system!");
       }
 
   // Optimize for VariableGroups here - if the user is adding multiple
@@ -1178,11 +1159,7 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
           if (this->variable_type(v) == type)
             return _variables[v].number();
 
-          libMesh::err << "ERROR: incompatible variable "
-                       << vars[ov]
-                       << " has already been added for this system!"
-                       << std::endl;
-          libmesh_error();
+          libmesh_error_msg("ERROR: incompatible variable " << vars[ov] << " has already been added for this system!");
         }
 
   const unsigned int curr_n_vars = this->n_vars();
@@ -1244,13 +1221,8 @@ unsigned short int System::variable_number (const std::string& var) const
     pos = _variable_numbers.find(var);
 
   if (pos == _variable_numbers.end())
-    {
-      libMesh::err << "ERROR: variable "
-                   << var
-                   << " does not exist in this system!"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: variable " << var << " does not exist in this system!");
+
   libmesh_assert_equal_to (_variables[pos->second].name(), var);
 
   return pos->second;
@@ -1372,7 +1344,7 @@ Real System::discrete_var_norm(const NumericVector<Number>& v,
   if(norm_type == DISCRETE_L_INF)
     return v.subset_linfty_norm(var_indices);
   else
-    libmesh_error();
+    libmesh_error_msg("Invalid norm_type = " << norm_type);
 }
 
 
@@ -1429,7 +1401,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
           if(norm_type0 == DISCRETE_L_INF)
             return v.linfty_norm();
           else
-            libmesh_error();
+            libmesh_error_msg("Invalid norm_type0 = " << norm_type0);
         }
 
       for (unsigned int var=0; var != this->n_vars(); ++var)
@@ -2256,8 +2228,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) co
 #else
 Tensor System::point_hessian(unsigned int, const Point &, const bool) const
 {
-  // We can only accumulate a hessian with --enable-second
-  libmesh_error();
+  libmesh_error_msg("We can only accumulate a hessian with --enable-second");
 
   // Avoid compiler warnings
   return Tensor();
@@ -2265,8 +2236,7 @@ Tensor System::point_hessian(unsigned int, const Point &, const bool) const
 
 Tensor System::point_hessian(unsigned int, const Point &, const Elem &) const
 {
-  // We can only accumulate a hessian with --enable-second
-  libmesh_error();
+  libmesh_error_msg("We can only accumulate a hessian with --enable-second");
 
   // Avoid compiler warnings
   return Tensor();

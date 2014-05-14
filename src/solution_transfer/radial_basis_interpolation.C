@@ -51,8 +51,7 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
 
 #ifndef LIBMESH_HAVE_EIGEN
 
-  libMesh::err << "ERROR: this functionality presently requires Eigen!\n";
-  libmesh_error();
+  libmesh_error_msg("ERROR: this functionality presently requires Eigen!");
 
 #else
   START_LOG ("prepare_for_use()", "RadialBasisInterpolation<>");
@@ -168,18 +167,11 @@ void RadialBasisInterpolation<KDDim,RBF>::interpolate_field_data (const std::vec
   // If we already have field variables, we assume we are appending.
   // that means the names and ordering better be identical!
   if (this->_names.size() != field_names.size())
-    {
-      libMesh::err << "ERROR:  when adding field data to an existing list the\n"
-                   << "varaible list must be the same!\n";
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+
   for (unsigned int v=0; v<this->_names.size(); v++)
     if (_names[v] != field_names[v])
-      {
-        libMesh::err << "ERROR:  when adding field data to an existing list the\n"
-                     << "varaible list must be the same!\n";
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
 
   RBF rbf(_r_bbox);

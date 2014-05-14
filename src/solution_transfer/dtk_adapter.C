@@ -265,8 +265,7 @@ DTKAdapter::get_element_topology(const Elem * elem)
   else if(type == PYRAMID5)
     return DataTransferKit::DTK_PYRAMID;
 
-  libMesh::err<<"Element type not supported by DTK!"<<std::endl;
-  libmesh_error();
+  libmesh_error_msg("Element type not supported by DTK!");
 }
 
 void

@@ -162,10 +162,7 @@ bool EigenTimeSolver::element_residual(bool request_jacobian,
     }
 
   else
-    {
-      libmesh_error();
-      return false;
-    }
+    libmesh_error_msg("Unrecognized value now_assembling = " << now_assembling);
 }
 
 
@@ -205,10 +202,7 @@ bool EigenTimeSolver::side_residual(bool request_jacobian,
     }
 
   else
-    {
-      libmesh_error();
-      return false;
-    }
+    libmesh_error_msg("Unrecognized value now_assembling = " << now_assembling);
 }
 
 } // namespace libMesh

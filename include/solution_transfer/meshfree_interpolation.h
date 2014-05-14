@@ -241,8 +241,7 @@ protected:
           }
 
         default:
-          libMesh::err << "ERROR: unknown size " << size << std::endl;
-          libmesh_error();
+          libmesh_error_msg("ERROR: unknown size " << size);
         }
 
       return -1.;

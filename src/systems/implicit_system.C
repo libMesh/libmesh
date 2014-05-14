@@ -208,13 +208,8 @@ SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string& mat_name)
 {
   // only add matrices before initializing...
   if (!_can_add_matrices)
-    {
-      libMesh::err << "ERROR: Too late.  Cannot add matrices to the system after initialization"
-                   << std::endl
-                   << " any more.  You should have done this earlier."
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Too late.  Cannot add matrices to the system after initialization"
+                      << "\n any more.  You should have done this earlier.");
 
   // Return the matrix if it is already there.
   if (this->have_matrix(mat_name))
@@ -261,13 +256,7 @@ const SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string& mat_
   const_matrices_iterator pos = _matrices.find (mat_name);
 
   if (pos == _matrices.end())
-    {
-      libMesh::err << "ERROR: matrix "
-                   << mat_name
-                   << " does not exist in this system!"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: matrix " << mat_name << " does not exist in this system!");
 
   return *(pos->second);
 }
@@ -280,13 +269,7 @@ SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string& mat_name)
   matrices_iterator pos = _matrices.find (mat_name);
 
   if (pos == _matrices.end())
-    {
-      libMesh::err << "ERROR: matrix "
-                   << mat_name
-                   << " does not exist in this system!"
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: matrix " << mat_name << " does not exist in this system!");
 
   return *(pos->second);
 }

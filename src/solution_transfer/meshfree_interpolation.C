@@ -81,18 +81,11 @@ void MeshfreeInterpolation::add_field_data (const std::vector<std::string> &fiel
   if (!_names.empty())
     {
       if (_names.size() != field_names.size())
-        {
-          libMesh::err << "ERROR:  when adding field data to an existing list the\n"
-                       << "varaible list must be the same!\n";
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+
       for (unsigned int v=0; v<_names.size(); v++)
         if (_names[v] != field_names[v])
-          {
-            libMesh::err << "ERROR:  when adding field data to an existing list the\n"
-                         << "varaible list must be the same!\n";
-            libmesh_error();
-          }
+          libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
     }
 
   // otherwise copy the names
@@ -123,8 +116,7 @@ void MeshfreeInterpolation::prepare_for_use ()
       break;
 
     case INVALID_STRATEGY:
-      libmesh_error();
-      break;
+      libmesh_error_msg("Invalid _parallelization_strategy = " << _parallelization_strategy);
 
     default:
       // no preparation required for other strategies
@@ -299,18 +291,11 @@ void InverseDistanceInterpolation<KDDim>::interpolate_field_data (const std::vec
   // If we already have field variables, we assume we are appending.
   // that means the names and ordering better be identical!
   if (_names.size() != field_names.size())
-    {
-      libMesh::err << "ERROR:  when adding field data to an existing list the\n"
-                   << "varaible list must be the same!\n";
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
+
   for (unsigned int v=0; v<_names.size(); v++)
     if (_names[v] != field_names[v])
-      {
-        libMesh::err << "ERROR:  when adding field data to an existing list the\n"
-                     << "varaible list must be the same!\n";
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
   tgt_vals.resize (tgt_pts.size()*this->n_field_variables());
 
@@ -347,10 +332,8 @@ void InverseDistanceInterpolation<KDDim>::interpolate_field_data (const std::vec
   }
 #else
 
-  libMesh::err << "ERROR:  This functionality requires the library to be configured\n"
-               << "with nanoflann KD-Tree approximate nearest neighbor support!\n"
-               << std::endl;
-  libmesh_error();
+  libmesh_error_msg("ERROR:  This functionality requires the library to be configured\n" \
+                    << "with nanoflann KD-Tree approximate nearest neighbor support!");
 
 #endif
 
@@ -373,7 +356,9 @@ void InverseDistanceInterpolation<KDDim>::interpolate (const Point              
 
       for (++it; it!= src_dist_sqr.end(); ++it)
         {
-          if (*it < min_dist) libmesh_error();
+          if (*it < min_dist)
+            libmesh_error_msg(*it << " was less than min_dist = " << min_dist);
+
           min_dist = *it;
         }
     }

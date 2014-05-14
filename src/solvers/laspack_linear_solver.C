@@ -268,9 +268,8 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
   // Check for an error
   if (LASResult() != LASOK)
     {
-      libMesh::err << "ERROR:  LASPACK Error: " << std::endl;
       WriteLASErrDescr(stdout);
-      libmesh_error();
+      libmesh_error_msg("Exiting after LASPACK Error!");
     }
 
   STOP_LOG("solve()", "LaspackLinearSolver");
@@ -444,9 +443,8 @@ LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
   // Check for an error
   if (LASResult() != LASOK)
     {
-      libMesh::err << "ERROR:  LASPACK Error: " << std::endl;
       WriteLASErrDescr(stdout);
-      libmesh_error();
+      libmesh_error_msg("Exiting after LASPACK Error!");
     }
 
   STOP_LOG("adjoint_solve()", "LaspackLinearSolver");

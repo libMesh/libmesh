@@ -143,17 +143,21 @@ public:
    * We don't allow systems to be attached to each other
    */
   virtual AutoPtr<DifferentiablePhysics> clone_physics()
-  { libmesh_error();
+  {
+    libmesh_not_implemented();
     // dummy
-    return AutoPtr<DifferentiablePhysics>(this); }
+    return AutoPtr<DifferentiablePhysics>(this);
+  }
 
   /**
    * We don't allow systems to be attached to each other
    */
   virtual AutoPtr<DifferentiableQoI> clone()
-  { libmesh_error();
+  {
+    libmesh_not_implemented();
     // dummy
-    return AutoPtr<DifferentiableQoI>(this); }
+    return AutoPtr<DifferentiableQoI>(this);
+  }
 
   /**
    * Returns const reference to DifferentiablePhysics object. Note

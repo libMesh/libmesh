@@ -114,17 +114,10 @@ bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
   // will be used, so catch that as an error
 
   if (_solver->residual && _solver->residual_object)
-    {
-      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Residual!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the Residual!");
 
   if (_solver->matvec && _solver->residual_and_jacobian_object)
-    {
-      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
-      libmesh_error();
-    }
-  //-----------------------------------------------------------------------------
+    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!");
 
   if      (_solver->residual != NULL)                     _solver->residual                                            (*sys.current_local_solution.get(), R, sys);
   else if (_solver->residual_object != NULL)              _solver->residual_object->residual                           (*sys.current_local_solution.get(), R, sys);
@@ -166,23 +159,17 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
   if (_solver->jacobian && _solver->jacobian_object)
-    {
-      libMesh::err << "ERROR: cannot specify both a function and object to compute the Jacobian!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Jacobian!");
 
   if (_solver->matvec && _solver->residual_and_jacobian_object)
-    {
-      libMesh::err << "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!" << std::endl;
-      libmesh_error();
-    }
-  //-----------------------------------------------------------------------------
+    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
   if      (_solver->jacobian != NULL)                     _solver->jacobian                                            (*sys.current_local_solution.get(), Jac, sys);
   else if (_solver->jacobian_object != NULL)              _solver->jacobian_object->jacobian                           (*sys.current_local_solution.get(), Jac, sys);
   else if (_solver->matvec   != NULL)                     _solver->matvec                                              (*sys.current_local_solution.get(), NULL, &Jac, sys);
   else if (_solver->residual_and_jacobian_object != NULL) _solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), NULL, &Jac, sys);
-  else libmesh_error();
+  else
+    libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
   Jac.close();
   X_global.close();
@@ -226,23 +213,17 @@ bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
   if (_solver->jacobian && _solver->jacobian_object)
-    {
-      libMesh::err << "ERROR: cannot specify both a function and object to compute the Jacobian!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Jacobian!");
 
   if (_solver->matvec && _solver->residual_and_jacobian_object)
-    {
-      libMesh::err << "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!" << std::endl;
-      libmesh_error();
-    }
-  //-----------------------------------------------------------------------------
+    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
   if      (_solver->jacobian != NULL)                     _solver->jacobian                                            (*sys.current_local_solution.get(), Jac, sys);
   else if (_solver->jacobian_object != NULL)              _solver->jacobian_object->jacobian                           (*sys.current_local_solution.get(), Jac, sys);
   else if (_solver->matvec   != NULL)                     _solver->matvec                                              (*sys.current_local_solution.get(), NULL, &Jac, sys);
   else if (_solver->residual_and_jacobian_object != NULL) _solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), NULL, &Jac, sys);
-  else libmesh_error();
+  else
+    libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
   Jac.close();
   X_global.close();

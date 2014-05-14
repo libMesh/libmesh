@@ -218,23 +218,13 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
   if (nonlinear_solver->jacobian && nonlinear_solver->jacobian_object)
-    {
-      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Jacobian!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the Jacobian!");
 
   if (nonlinear_solver->residual && nonlinear_solver->residual_object)
-    {
-      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the Residual!" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the Residual!");
 
   if (nonlinear_solver->matvec && nonlinear_solver->residual_and_jacobian_object)
-    {
-      libMesh::err << "ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!" << std::endl;
-      libmesh_error();
-    }
-  //-----------------------------------------------------------------------------
+    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!");
 
 
   if (get_jacobian)
@@ -252,7 +242,7 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
         nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian (*current_local_solution.get(), get_residual?rhs:NULL, matrix, *this);
 
       else
-        libmesh_error();
+        libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
     }
 
   if (get_residual)
@@ -278,7 +268,7 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
         }
 
       else
-        libmesh_error();
+        libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
     }
   else
     libmesh_assert(get_jacobian);  // I can't believe you really wanted to assemble *nothing*

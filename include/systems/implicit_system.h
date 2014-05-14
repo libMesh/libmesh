@@ -147,7 +147,7 @@ public:
    * own way of handling assembly.
    */
   virtual void assembly(bool /* get_residual */ , bool /* get_jacobian */)
-  { libmesh_error(); }
+  { libmesh_not_implemented(); }
 
   /**
    * Residual parameter derivative function.
