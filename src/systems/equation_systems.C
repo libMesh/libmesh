@@ -1018,6 +1018,7 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
   // in each system listed in system_names
   unsigned int nv = 0;
 
+  {
   const_system_iterator       pos = _systems.begin();
   const const_system_iterator end = _systems.end();
 
@@ -1039,6 +1040,7 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
       const System& system  = *(pos->second);
       nv += system.n_vars();
     }
+  }
 
   unsigned int tw=0;
 
@@ -1067,7 +1069,9 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
   // loop over the elements and build the nodal solution
   // from the element solution.  Then insert this nodal solution
   // into the vector passed to build_solution_vector.
-  pos = _systems.begin();
+  {
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
 
   for (; pos != end; ++pos)
     {
@@ -1139,6 +1143,7 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 
       var_num += nv_sys;
     }
+  }
 
   STOP_LOG("build_discontinuous_solution_vector()", "EquationSystems");
 }

@@ -68,14 +68,14 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  PetscVector (const Parallel::Communicator &comm,
+  PetscVector (const Parallel::Communicator &comm_in,
                const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
-  PetscVector (const Parallel::Communicator &comm,
+  PetscVector (const Parallel::Communicator &comm_in,
                const numeric_index_type n,
                const ParallelType type = AUTOMATIC);
 
@@ -83,7 +83,7 @@ public:
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  PetscVector (const Parallel::Communicator &comm,
+  PetscVector (const Parallel::Communicator &comm_in,
                const numeric_index_type n,
                const numeric_index_type n_local,
                const ParallelType type = AUTOMATIC);
@@ -93,7 +93,7 @@ public:
    * dimension to \p n, but additionally reserve memory for the
    * indices specified by the \p ghost argument.
    */
-  PetscVector (const Parallel::Communicator &comm,
+  PetscVector (const Parallel::Communicator &comm_in,
                const numeric_index_type N,
                const numeric_index_type n_local,
                const std::vector<numeric_index_type>& ghost,
@@ -107,7 +107,7 @@ public:
    * and to simply provide additional functionality with the PetscVector.
    */
   PetscVector(Vec v,
-              const Parallel::Communicator &comm
+              const Parallel::Communicator &comm_in
               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -631,8 +631,8 @@ private:
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (const Parallel::Communicator &comm, const ParallelType ptype)
-  : NumericVector<T>(comm, ptype),
+PetscVector<T>::PetscVector (const Parallel::Communicator &comm_in, const ParallelType ptype)
+  : NumericVector<T>(comm_in, ptype),
     _array_is_present(false),
     _first(0),
     _last(0),
@@ -648,10 +648,10 @@ PetscVector<T>::PetscVector (const Parallel::Communicator &comm, const ParallelT
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (const Parallel::Communicator &comm,
+PetscVector<T>::PetscVector (const Parallel::Communicator &comm_in,
                              const numeric_index_type n,
                              const ParallelType ptype)
-  : NumericVector<T>(comm, ptype),
+  : NumericVector<T>(comm_in, ptype),
     _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
@@ -665,11 +665,11 @@ PetscVector<T>::PetscVector (const Parallel::Communicator &comm,
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (const Parallel::Communicator &comm,
+PetscVector<T>::PetscVector (const Parallel::Communicator &comm_in,
                              const numeric_index_type n,
                              const numeric_index_type n_local,
                              const ParallelType ptype)
-  : NumericVector<T>(comm, ptype),
+  : NumericVector<T>(comm_in, ptype),
     _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
@@ -683,12 +683,12 @@ PetscVector<T>::PetscVector (const Parallel::Communicator &comm,
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (const Parallel::Communicator &comm,
+PetscVector<T>::PetscVector (const Parallel::Communicator &comm_in,
                              const numeric_index_type n,
                              const numeric_index_type n_local,
                              const std::vector<numeric_index_type>& ghost,
                              const ParallelType ptype)
-  : NumericVector<T>(comm, ptype),
+  : NumericVector<T>(comm_in, ptype),
     _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
@@ -705,8 +705,8 @@ PetscVector<T>::PetscVector (const Parallel::Communicator &comm,
 template <typename T>
 inline
 PetscVector<T>::PetscVector (Vec v,
-                             const Parallel::Communicator &comm)
-  : NumericVector<T>(comm, AUTOMATIC),
+                             const Parallel::Communicator &comm_in)
+  : NumericVector<T>(comm_in, AUTOMATIC),
     _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
@@ -1373,7 +1373,6 @@ void PetscVector<T>::_get_array(void) const
         }
 
       { // cache ownership range
-        PetscErrorCode ierr=0;
         PetscInt petsc_first=0, petsc_last=0;
         ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
         LIBMESH_CHKERRABORT(ierr);

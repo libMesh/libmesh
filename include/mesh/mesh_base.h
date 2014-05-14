@@ -75,7 +75,7 @@ public:
    * The mesh dimension can be changed (and may automatically be
    * changed by mesh generation/loading) later.
    */
-  MeshBase (const Parallel::Communicator &comm,
+  MeshBase (const Parallel::Communicator &comm_in,
             unsigned int dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD

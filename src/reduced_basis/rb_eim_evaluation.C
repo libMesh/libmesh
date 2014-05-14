@@ -34,13 +34,13 @@
 namespace libMesh
 {
 
-RBEIMEvaluation::RBEIMEvaluation(const libMesh::Parallel::Communicator &comm)
+RBEIMEvaluation::RBEIMEvaluation(const libMesh::Parallel::Communicator &comm_in)
   :
-  RBEvaluation(comm),
+  RBEvaluation(comm_in),
   extra_interpolation_point_elem(NULL),
   _previous_N(0),
   _previous_error_bound(-1),
-  _interpolation_points_mesh(comm)
+  _interpolation_points_mesh(comm_in)
 {
   // Indicate that we need to compute the RB
   // inner product matrix in this case

@@ -116,9 +116,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // SerialMesh class member functions
-SerialMesh::SerialMesh (const Parallel::Communicator &comm,
+SerialMesh::SerialMesh (const Parallel::Communicator &comm_in,
                         unsigned int d) :
-  UnstructuredMesh (comm,d)
+  UnstructuredMesh (comm_in,d)
 {
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   // In serial we just need to reset the next unique id to zero
@@ -1167,8 +1167,8 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
           dof_id_type new_id = other_elem->id() - elem_delta;
           other_elem->set_id(new_id);
 
-          unsigned int n_nodes = other_elem->n_nodes();
-          for (unsigned int n=0; n != n_nodes; ++n)
+          unsigned int other_n_nodes = other_elem->n_nodes();
+          for (unsigned int n=0; n != other_n_nodes; ++n)
             {
               const std::vector<boundary_id_type>& ids =
                 other_mesh->boundary_info->boundary_ids(other_elem->get_node(n));

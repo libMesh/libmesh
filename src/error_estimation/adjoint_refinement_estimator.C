@@ -240,13 +240,14 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // over the nodes each element contains, and then query it for the number of coarse
   // grid elements it was a node of
 
-  // We will be iterating over all the active elements in the fine mesh that live on
-  // this processor
-  MeshBase::const_element_iterator elem_it = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
-
   // Keep track of which nodes we have already dealt with
   LIBMESH_BEST_UNORDERED_SET<dof_id_type> processed_node_ids;
+
+  // We will be iterating over all the active elements in the fine mesh that live on
+  // this processor
+  {
+  MeshBase::const_element_iterator elem_it = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
   // Start loop over elems
   for(; elem_it != elem_end; ++elem_it)
@@ -329,6 +330,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
         } // End loop over nodes
 
     }  // End loop over elems
+  }
 
   // Get a DoF map, will be used to get the nodal dof_indices for each element
   DofMap &dof_map = system.get_dof_map();

@@ -105,16 +105,16 @@ std::string demangle(const char *name)
   return ret;
 }
 
-void print_trace(std::ostream &out)
+void print_trace(std::ostream &out_stream)
 {
   void *addresses[40];
   char **strings;
 
   int size = backtrace(addresses, 40);
   strings = backtrace_symbols(addresses, size);
-  out << "Stack frames: " << size << std::endl;
+  out_stream << "Stack frames: " << size << std::endl;
   for(int i = 0; i < size; i++)
-    out << i << ": " << process_trace(strings[i]) << std::endl;
+    out_stream << i << ": " << process_trace(strings[i]) << std::endl;
   std::free(strings);
 }
 

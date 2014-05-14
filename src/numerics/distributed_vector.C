@@ -167,9 +167,9 @@ NumericVector<T> & DistributedVector<T>::operator /= (NumericVector<T> & v)
 
   DistributedVector<T> & v_vec = libmesh_cast_ref<DistributedVector<T>&>(v);
 
-  std::size_t size = _values.size();
+  std::size_t local_size = _values.size();
 
-  for(std::size_t i=0; i<size; i++)
+  for(std::size_t i=0; i<local_size; i++)
     _values[i] = _values[i] / v_vec._values[i];
 
   return *this;

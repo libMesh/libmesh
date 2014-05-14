@@ -491,9 +491,9 @@ private:
 // DistributedVector inline methods
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm,
+DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm_in,
                                          const ParallelType ptype)
-  : NumericVector<T>(comm, ptype),
+  : NumericVector<T>(comm_in, ptype),
     _global_size      (0),
     _local_size       (0),
     _first_local_index(0),
@@ -506,10 +506,10 @@ DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm,
 
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm,
+DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm_in,
                                          const numeric_index_type n,
                                          const ParallelType ptype)
-  : NumericVector<T>(comm, ptype)
+  : NumericVector<T>(comm_in, ptype)
 {
   this->init(n, n, false, ptype);
 }
@@ -518,11 +518,11 @@ DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm,
 
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm,
+DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm_in,
                                          const numeric_index_type n,
                                          const numeric_index_type n_local,
                                          const ParallelType ptype)
-  : NumericVector<T>(comm, ptype)
+  : NumericVector<T>(comm_in, ptype)
 {
   this->init(n, n_local, false, ptype);
 }
@@ -531,12 +531,12 @@ DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm,
 
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm,
+DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm_in,
                                          const numeric_index_type n,
                                          const numeric_index_type n_local,
                                          const std::vector<numeric_index_type>& ghost,
                                          const ParallelType ptype)
-  : NumericVector<T>(comm, ptype)
+  : NumericVector<T>(comm_in, ptype)
 {
   this->init(n, n_local, ghost, false, ptype);
 }

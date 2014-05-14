@@ -939,14 +939,14 @@ void DofMap::distribute_dofs (MeshBase& mesh)
     for ( ; node_it != node_end; ++node_it)
       {
         DofObject const * const dofobj = *node_it;
-        const processor_id_type proc_id = dofobj->processor_id();
+        const processor_id_type obj_proc_id = dofobj->processor_id();
 
         for (unsigned int v=0; v != dofobj->n_vars(sys_num); ++v)
           for (unsigned int c=0; c != dofobj->n_comp(sys_num,v); ++c)
             {
               const dof_id_type dofid = dofobj->dof_number(sys_num,v,c);
-              libmesh_assert_greater_equal (dofid, this->first_dof(proc_id));
-              libmesh_assert_less (dofid, this->end_dof(proc_id));
+              libmesh_assert_greater_equal (dofid, this->first_dof(obj_proc_id));
+              libmesh_assert_less (dofid, this->end_dof(obj_proc_id));
             }
       }
 
@@ -955,14 +955,14 @@ void DofMap::distribute_dofs (MeshBase& mesh)
     for ( ; elem_it != elem_end; ++elem_it)
       {
         DofObject const * const dofobj = *elem_it;
-        const processor_id_type proc_id = dofobj->processor_id();
+        const processor_id_type obj_proc_id = dofobj->processor_id();
 
         for (unsigned int v=0; v != dofobj->n_vars(sys_num); ++v)
           for (unsigned int c=0; c != dofobj->n_comp(sys_num,v); ++c)
             {
               const dof_id_type dofid = dofobj->dof_number(sys_num,v,c);
-              libmesh_assert_greater_equal (dofid, this->first_dof(proc_id));
-              libmesh_assert_less (dofid, this->end_dof(proc_id));
+              libmesh_assert_greater_equal (dofid, this->first_dof(obj_proc_id));
+              libmesh_assert_less (dofid, this->end_dof(obj_proc_id));
             }
       }
   }

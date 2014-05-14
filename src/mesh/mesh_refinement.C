@@ -98,7 +98,7 @@ void MeshRefinement::clear ()
 
 
 Node* MeshRefinement::add_point (const Point& p,
-                                 const processor_id_type processor_id,
+                                 const processor_id_type proc_id,
                                  const Real tol)
 {
   START_LOG("add_point()", "MeshRefinement");
@@ -113,7 +113,7 @@ Node* MeshRefinement::add_point (const Point& p,
 
   // Add the node, with a default id and the requested
   // processor_id
-  node = _mesh.add_point (p, DofObject::invalid_id, processor_id);
+  node = _mesh.add_point (p, DofObject::invalid_id, proc_id);
 
   libmesh_assert(node);
 

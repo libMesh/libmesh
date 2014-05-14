@@ -653,11 +653,12 @@ void GmshIO::read_mesh(std::istream& in)
                             // provides boundary information for it.
                             // Note that we have not yet called
                             // find_neighbors(), so we can't use
-                            // elem->neighbor(s) in this algorithm...
+                            // elem->neighbor(sn) in this algorithm...
 
-                            for (unsigned int s=0; s<elem->n_sides(); s++)
+                            for (unsigned int sn=0;
+                                 sn<elem->n_sides(); sn++)
                               {
-                                AutoPtr<Elem> side (elem->build_side(s));
+                                AutoPtr<Elem> side (elem->build_side(sn));
 
                                 // Build up a node_ids vector, which is the key
                                 std::vector<dof_id_type> node_ids(side->n_nodes());
@@ -677,13 +678,13 @@ void GmshIO::read_mesh(std::istream& in)
                                     // libMesh::out << "Elem "
                                     //              << lower_dim_elem->id()
                                     //              << " provides BCs for side "
-                                    //              << s
+                                    //              << sn
                                     //              << " of Elem "
                                     //              << elem->id()
                                     //              << std::endl;
 
                                     // Add boundary information based on the lower-dimensional element's subdomain id.
-                                    mesh.boundary_info->add_side(elem, s, lower_dim_elem->subdomain_id());
+                                    mesh.boundary_info->add_side(elem, sn, lower_dim_elem->subdomain_id());
                                   }
                               }
                           }

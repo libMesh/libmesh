@@ -54,7 +54,7 @@ public:
    * changed by mesh generation/loading) later.
    */
   explicit
-  SerialMesh (const Parallel::Communicator &comm,
+  SerialMesh (const Parallel::Communicator &comm_in,
               unsigned int dim=1);
 
 #ifndef LIBMESH_DISABLE_COMMWORLD

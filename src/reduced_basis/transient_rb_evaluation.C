@@ -36,8 +36,9 @@
 namespace libMesh
 {
 
-TransientRBEvaluation::TransientRBEvaluation (const Parallel::Communicator &comm) :
-  RBEvaluation(comm)
+TransientRBEvaluation::TransientRBEvaluation 
+  (const Parallel::Communicator &comm_in) :
+  RBEvaluation(comm_in)
 {
   // Indicate that we need to compute the RB
   // inner product matrix in this case

@@ -31,9 +31,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // ParallelMesh class member functions
-ParallelMesh::ParallelMesh (const Parallel::Communicator &comm,
+ParallelMesh::ParallelMesh (const Parallel::Communicator &comm_in,
                             unsigned int d) :
-  UnstructuredMesh (comm,d), _is_serial(true),
+  UnstructuredMesh (comm_in,d), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
   _next_free_local_elem_id(this->processor_id()),

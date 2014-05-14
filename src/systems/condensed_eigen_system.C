@@ -32,9 +32,9 @@ namespace libMesh
 {
 
 CondensedEigenSystem::CondensedEigenSystem (EquationSystems& es,
-                                            const std::string& name,
-                                            const unsigned int number)
-  : Parent(es, name, number),
+                                            const std::string& name_in,
+                                            const unsigned int number_in)
+  : Parent(es, name_in, number_in),
     condensed_matrix_A(SparseMatrix<Number>::build(es.comm())),
     condensed_matrix_B(SparseMatrix<Number>::build(es.comm())),
     condensed_dofs_initialized(false)

@@ -56,7 +56,7 @@ public:
   /**
    *  Constructor. Initializes Petsc data structures
    */
-  SlepcEigenSolver(const Parallel::Communicator &comm
+  SlepcEigenSolver(const Parallel::Communicator &comm_in
                    LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
 
@@ -260,8 +260,8 @@ private:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-SlepcEigenSolver<T>::SlepcEigenSolver (const Parallel::Communicator &comm) :
-  EigenSolver<T>(comm)
+SlepcEigenSolver<T>::SlepcEigenSolver (const Parallel::Communicator &comm_in) :
+  EigenSolver<T>(comm_in)
 {
   this->_eigen_solver_type  = ARNOLDI;
   this->_eigen_problem_type = NHEP;

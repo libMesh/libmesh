@@ -42,10 +42,11 @@ class METIS_CSR_Graph
 public:
   std::vector<int> offsets, vals;
 
-  void prep_n_nonzeros(const libMesh::dof_id_type row, const libMesh::dof_id_type n_nonzeros)
+  void prep_n_nonzeros(const libMesh::dof_id_type row,
+                       const libMesh::dof_id_type n_nonzeros_in)
   {
     libmesh_assert_less (row+1, offsets.size());
-    offsets[row+1] = n_nonzeros;
+    offsets[row+1] = n_nonzeros_in;
   }
 
 
