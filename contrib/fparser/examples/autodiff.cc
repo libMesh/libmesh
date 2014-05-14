@@ -1,4 +1,4 @@
-// Simple example file for teh auto-differentiation module
+// Simple example file for the auto-differentiation module
 // (c) 2014 by Daniel Schwen
 // =======================================================
 

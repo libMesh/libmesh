@@ -106,7 +106,7 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
 {
   // check for empty DiffProgramFragments
   if (orig.empty()) {
-    std::cerr << "Empty programm passed in!\n";
+    std::cerr << "Empty program passed in!\n";
     exit(1);
   }
 
@@ -486,9 +486,6 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
 
   // get a reference to the immediate values
   const std::vector<Value_t>& Immed = mData->mImmed;
-
-  // lookup map for jump targets
-  //`std::vector<unsigned>
 
   // uncompressed immediate data representation
   // we also expand a few multiopcodes into elementary opcodes
