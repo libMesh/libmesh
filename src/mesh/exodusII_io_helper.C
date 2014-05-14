@@ -1152,15 +1152,12 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
       }
   }
 
-  if(_single_precision)
+  if (_single_precision)
     {
-      std::vector<float> x_single(num_nodes), y_single(num_nodes), z_single(num_nodes);
-      for (int i=0; i<num_nodes; ++i)
-        {
-          x_single[i] = static_cast<float>(x[i]);
-          y_single[i] = static_cast<float>(y[i]);
-          z_single[i] = static_cast<float>(z[i]);
-        }
+      std::vector<float>
+        x_single(x.begin(), x.end()),
+        y_single(y.begin(), y.end()),
+        z_single(z.begin(), z.end());
 
       ex_err = exII::ex_put_coord(ex_id,
                                   x_single.empty() ? NULL : &x_single[0],
@@ -1649,13 +1646,10 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
           for (unsigned int k=0; k<num_elems_this_block; ++k)
             data[k] = values[i*n_elem + elem_nums[k]];
 
-          if(_single_precision)
+          if (_single_precision)
             {
-              std::vector<float> cast_data(num_elems_this_block);
-              for (unsigned int l=0; l<num_elems_this_block; ++l)
-                {
-                  cast_data[l] = static_cast<float>(data[l]);
-                }
+              std::vector<float> cast_data(data.begin(), data.end());
+
               ex_err = exII::ex_put_elem_var(ex_id,
                                              timestep,
                                              i+1,
@@ -1687,14 +1681,9 @@ void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Real> 
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  if(_single_precision)
+  if (_single_precision)
     {
-      unsigned int num_values = values.size();
-      std::vector<float> cast_values(num_values);
-      for (unsigned int i=0; i<num_values; ++i)
-        {
-          cast_values[i] = static_cast<float>(values[i]);
-        }
+      std::vector<float> cast_values(values.begin(), values.end());
       ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &cast_values[0]);
     }
   else
@@ -1753,14 +1742,9 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Real> & values, i
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  if(_single_precision)
+  if (_single_precision)
     {
-      unsigned int num_values = values.size();
-      std::vector<float> cast_values(num_values);
-
-      for (unsigned int i=0; i<num_values; ++i)
-        cast_values[i] = static_cast<float>(values[i]);
-
+      std::vector<float> cast_values(values.begin(), values.end());
       ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_global_vars, &cast_values[0]);
     }
   else
