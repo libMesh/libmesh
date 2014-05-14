@@ -28,15 +28,25 @@ AC_DEFUN([CONFIGURE_FPARSER],
   if (test x$enablefparser = xyes); then
 
 
+    AC_ARG_ENABLE(fparser-debugging,
+                  AC_HELP_STRING([--enable-fparser-debugging],
+                                 [enable fparser debugging functions]),
+		[case "${enableval}" in
+		  yes)  enablefparserdebugging=yes ;;
+		   no)  enablefparserdebugging=no ;;
+		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-debugging) ;;
+		 esac],
+		 [enablefparserdebugging=yes])
+
     AC_ARG_ENABLE(fparser-optimizer,
                   AC_HELP_STRING([--enable-fparser-optimizer],
                                  [use fparser optimization where possible]),
-  		[case "${enableval}" in
-  		  yes)  enablefparseroptimizer=yes ;;
-  		   no)  enablefparseroptimizer=no ;;
-   		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-optimizer) ;;
-  		 esac],
-  		 [enablefparseroptimizer=yes])
+		[case "${enableval}" in
+		  yes)  enablefparseroptimizer=yes ;;
+		   no)  enablefparseroptimizer=no ;;
+		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-optimizer) ;;
+		 esac],
+		 [enablefparseroptimizer=yes])
 
     # note - fparser optimization may fail on cygwin (please test), so disable it regardless
     case "${host_os}" in
@@ -66,6 +76,12 @@ AC_DEFUN([CONFIGURE_FPARSER],
         AC_MSG_RESULT(<<< Configuring library with fparser support (release version) >>>)
       fi
 
+      # This define in libmesh_config.h is used internally in fparser.hh and various source files
+      if (test $enablefparserdebugging = yes); then
+        AC_DEFINE(FPARSER_SUPPORT_DEBUGGING, 1, [Enable fparser debugging functions])
+        AC_MSG_RESULT(<<< Configuring library with fparser debugging functions >>>)
+      fi
+
   else
      FPARSER_INCLUDE=""
      FPARSER_LIBRARY=""
@@ -79,4 +95,5 @@ AC_DEFUN([CONFIGURE_FPARSER],
   AM_CONDITIONAL(FPARSER_DEVEL,                test x$enablefparserdevel = xyes)
   AM_CONDITIONAL(FPARSER_NO_SUPPORT_OPTIMIZER, test x$enablefparseroptimizer = xno)
   AM_CONDITIONAL(FPARSER_SUPPORT_OPTIMIZER,    test x$enablefparseroptimizer = xyes)
+  AM_CONDITIONAL(FPARSER_SUPPORT_DEBUGGING,    test x$enablefparserdebugging = xyes)
 ])

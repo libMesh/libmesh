@@ -661,6 +661,8 @@ CPPUNIT_CFLAGS
 CPPUNIT_CONFIG
 LIBMESH_ENABLE_FPARSER_FALSE
 LIBMESH_ENABLE_FPARSER_TRUE
+FPARSER_SUPPORT_DEBUGGING_FALSE
+FPARSER_SUPPORT_DEBUGGING_TRUE
 FPARSER_SUPPORT_OPTIMIZER_FALSE
 FPARSER_SUPPORT_OPTIMIZER_TRUE
 FPARSER_NO_SUPPORT_OPTIMIZER_FALSE
@@ -1137,6 +1139,7 @@ enable_nemesis
 enable_libHilbert
 enable_fparser
 with_fparser
+enable_fparser_debugging
 enable_fparser_optimizer
 enable_cppunit
 with_cppunit_prefix
@@ -1896,6 +1899,8 @@ Optional Features:
   --enable-nemesis        build with NemesisII API support
   --enable-libHilbert     build with libHilbert, from Chris Hamilton
   --enable-fparser        build with C++ function parser support
+  --enable-fparser-debugging
+                          enable fparser debugging functions
   --enable-fparser-optimizer
                           use fparser optimization where possible
   --enable-cppunit        Build with cppunit C++ unit testing support
@@ -33520,13 +33525,25 @@ fi
   if (test x$enablefparser = xyes); then
 
 
+    # Check whether --enable-fparser-debugging was given.
+if test "${enable_fparser_debugging+set}" = set; then :
+  enableval=$enable_fparser_debugging; case "${enableval}" in
+		  yes)  enablefparserdebugging=yes ;;
+		   no)  enablefparserdebugging=no ;;
+		    *)  as_fn_error $? "bad value ${enableval} for --enable-fparser-debugging" "$LINENO" 5 ;;
+		 esac
+else
+  enablefparserdebugging=yes
+fi
+
+
     # Check whether --enable-fparser-optimizer was given.
 if test "${enable_fparser_optimizer+set}" = set; then :
   enableval=$enable_fparser_optimizer; case "${enableval}" in
-  		  yes)  enablefparseroptimizer=yes ;;
-  		   no)  enablefparseroptimizer=no ;;
-   		    *)  as_fn_error $? "bad value ${enableval} for --enable-fparser-optimizer" "$LINENO" 5 ;;
-  		 esac
+		  yes)  enablefparseroptimizer=yes ;;
+		   no)  enablefparseroptimizer=no ;;
+		    *)  as_fn_error $? "bad value ${enableval} for --enable-fparser-optimizer" "$LINENO" 5 ;;
+		 esac
 else
   enablefparseroptimizer=yes
 fi
@@ -33679,6 +33696,15 @@ $as_echo "#define HAVE_FPARSER_DEVEL 0" >>confdefs.h
 $as_echo "<<< Configuring library with fparser support (release version) >>>" >&6; }
       fi
 
+      # This define in libmesh_config.h is used internally in fparser.hh and various source files
+      if (test $enablefparserdebugging = yes); then
+
+$as_echo "#define FPARSER_SUPPORT_DEBUGGING 1" >>confdefs.h
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with fparser debugging functions >>>" >&5
+$as_echo "<<< Configuring library with fparser debugging functions >>>" >&6; }
+      fi
+
   else
      FPARSER_INCLUDE=""
      FPARSER_LIBRARY=""
@@ -33718,6 +33744,14 @@ fi
 else
   FPARSER_SUPPORT_OPTIMIZER_TRUE='#'
   FPARSER_SUPPORT_OPTIMIZER_FALSE=
+fi
+
+   if test x$enablefparserdebugging = xyes; then
+  FPARSER_SUPPORT_DEBUGGING_TRUE=
+  FPARSER_SUPPORT_DEBUGGING_FALSE='#'
+else
+  FPARSER_SUPPORT_DEBUGGING_TRUE='#'
+  FPARSER_SUPPORT_DEBUGGING_FALSE=
 fi
 
 
@@ -34453,6 +34487,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${FPARSER_SUPPORT_OPTIMIZER_TRUE}" && test -z "${FPARSER_SUPPORT_OPTIMIZER_FALSE}"; then
   as_fn_error $? "conditional \"FPARSER_SUPPORT_OPTIMIZER\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${FPARSER_SUPPORT_DEBUGGING_TRUE}" && test -z "${FPARSER_SUPPORT_DEBUGGING_FALSE}"; then
+  as_fn_error $? "conditional \"FPARSER_SUPPORT_DEBUGGING\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_FPARSER_TRUE}" && test -z "${LIBMESH_ENABLE_FPARSER_FALSE}"; then

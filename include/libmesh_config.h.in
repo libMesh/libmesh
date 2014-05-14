@@ -158,6 +158,9 @@
 /* Flag indicating if the library should have warnings enabled */
 #undef ENABLE_WARNINGS
 
+/* Enable fparser debugging functions */
+#undef FPARSER_SUPPORT_DEBUGGING
+
 /* Flag indicating whether the library shall be compiled to use the Trilinos
    solver collection */
 #undef HAVE_AZTECOO

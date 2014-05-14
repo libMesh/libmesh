@@ -14,6 +14,14 @@
 #include <string>
 #include <vector>
 
+#include "libmesh_config.h"
+// Debugging support was enabled at compile time
+#ifdef LIBMESH_FPARSER_SUPPORT_DEBUGGING
+#  ifndef FUNCTIONPARSER_SUPPORT_DEBUGGING
+#    define FUNCTIONPARSER_SUPPORT_DEBUGGING
+#  endif
+#endif
+
 #ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
 #include <iostream>
 #endif
