@@ -1613,7 +1613,9 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
   // Loop over the element blocks and write the data one block at a time
   std::map<unsigned int, std::vector<unsigned int> > subdomain_map;
 
-  const unsigned int num_vars = values.size() / num_elem;
+  // Ask the file how many element vars it has, store it in the num_elem_vars variable.
+  ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
+  EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
   MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
@@ -1625,10 +1627,15 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
       subdomain_map[elem->subdomain_id()].push_back(elem->id());
     }
 
+  // Use mesh.n_elem() to access into the values vector rather than
+  // the number of elements the Exodus writer thinks the mesh has,
+  // which may not include inactive elements.
+  dof_id_type n_elem = mesh.n_elem();
+
   // For each variable, create a 'data' array which holds all the elemental variable
   // values *for a given block* on this processor, then write that data vector to file
   // before moving onto the next block.
-  for (unsigned int i=0; i<num_vars; ++i)
+  for (unsigned int i=0; i<static_cast<unsigned>(num_elem_vars); ++i)
     {
       // The size of the subdomain map is the number of blocks.
       std::map<unsigned int, std::vector<unsigned int> >::iterator it = subdomain_map.begin();
@@ -1640,7 +1647,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
           std::vector<Real> data(num_elems_this_block);
 
           for (unsigned int k=0; k<num_elems_this_block; ++k)
-            data[k] = values[i*num_elem + elem_nums[k]];
+            data[k] = values[i*n_elem + elem_nums[k]];
 
           if(_single_precision)
             {
