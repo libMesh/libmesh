@@ -8,6 +8,19 @@ using namespace FPoptimizer_CodeTree;
 
 //#define DEBUG_SUBSTITUTIONS_extra_verbose
 
+// Intel 11.1 has problems with std::isnan().  In libMesh we have some
+// workarounds, but don't need to include all that infrastructure here.
+// So, this little hack will do.
+namespace
+{
+  template <typename T>
+  inline
+  int isnan_workaround(T t)
+  {
+    return (t != t);
+  }
+}
+
 namespace FPoptimizer_CodeTree
 {
     template<typename Value_t>
@@ -316,13 +329,13 @@ namespace FPoptimizer_CodeTree
                   res1.min.known = false;
                 else if(res1.min.known && (res2.min.val) < res1.min.val)
                   res1.min.val = res2.min.val;
-                else if (std::isnan(res2.min.val))
+                else if (isnan_workaround(res2.min.val))
                   res1.min.val = res2.min.val;
                 if(!res2.max.known)
                   res1.max.known = false;
                 else if(res1.max.known && (res2.max.val) > res1.max.val)
                   res1.max.val = res2.max.val;
-                else if (std::isnan(res2.max.val))
+                else if (isnan_workaround(res2.max.val))
                   res1.max.val = res2.max.val;
                 return res1;
             }
