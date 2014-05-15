@@ -305,7 +305,7 @@ public:
    * from p to search for existing nodes.
    */
   Node* add_point (const Point& p,
-                   const processor_id_type processor_id,
+                   const processor_id_type proc_id,
                    const Real tol);
 
   /**

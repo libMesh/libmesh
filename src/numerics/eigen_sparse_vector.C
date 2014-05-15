@@ -274,13 +274,13 @@ void EigenSparseVector<T>::add_vector (const NumericVector<T> &vec_in,
                                        const SparseMatrix<T>  &mat_in)
 {
   // Make sure the data passed in are really in Eigen types
-  const EigenSparseVector<T>* vec = libmesh_cast_ptr<const EigenSparseVector<T>*>(&vec_in);
+  const EigenSparseVector<T>* e_vec = libmesh_cast_ptr<const EigenSparseVector<T>*>(&vec_in);
   const EigenSparseMatrix<T>* mat = libmesh_cast_ptr<const EigenSparseMatrix<T>*>(&mat_in);
 
-  libmesh_assert(vec);
+  libmesh_assert(e_vec);
   libmesh_assert(mat);
 
-  _vec += mat->_mat*vec->_vec;
+  _vec += mat->_mat*e_vec->_vec;
 }
 
 
@@ -290,13 +290,13 @@ void EigenSparseVector<T>::add_vector_transpose (const NumericVector<T> &vec_in,
                                                  const SparseMatrix<T>  &mat_in)
 {
   // Make sure the data passed in are really in Eigen types
-  const EigenSparseVector<T>* vec = libmesh_cast_ptr<const EigenSparseVector<T>*>(&vec_in);
+  const EigenSparseVector<T>* e_vec = libmesh_cast_ptr<const EigenSparseVector<T>*>(&vec_in);
   const EigenSparseMatrix<T>* mat = libmesh_cast_ptr<const EigenSparseMatrix<T>*>(&mat_in);
 
-  libmesh_assert(vec);
+  libmesh_assert(e_vec);
   libmesh_assert(mat);
 
-  _vec += mat->_mat.transpose()*vec->_vec;
+  _vec += mat->_mat.transpose()*e_vec->_vec;
 }
 
 

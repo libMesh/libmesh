@@ -588,7 +588,7 @@ void CheckpointIO::read_connectivity (Xdr &io)
 
           const dof_id_type id                 = elem_data[0];
           const ElemType elem_type             = static_cast<ElemType>(elem_data[1]);
-          const processor_id_type processor_id = elem_data[2];
+          const processor_id_type proc_id      = elem_data[2];
           const subdomain_id_type subdomain_id = elem_data[3];
           const dof_id_type parent_id          = elem_data[4];
 
@@ -605,7 +605,7 @@ void CheckpointIO::read_connectivity (Xdr &io)
             highest_elem_dim = elem->dim();
 
           elem->set_id()       = id;
-          elem->processor_id() = processor_id;
+          elem->processor_id() = proc_id;
           elem->subdomain_id() = subdomain_id;
 
 #ifdef LIBMESH_ENABLE_AMR

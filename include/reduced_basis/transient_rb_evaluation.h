@@ -55,7 +55,7 @@ public:
   /**
    * Constructor.
    */
-  TransientRBEvaluation (const Parallel::Communicator &comm
+  TransientRBEvaluation (const Parallel::Communicator &comm_in
                          LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**

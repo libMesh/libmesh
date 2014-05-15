@@ -44,9 +44,9 @@ namespace libMesh
 // ------------------------------------------------------------
 // FrequencySystem implementation
 FrequencySystem::FrequencySystem (EquationSystems& es,
-                                  const std::string& name,
-                                  const unsigned int number) :
-  LinearImplicitSystem      (es, name, number),
+                                  const std::string& name_in,
+                                  const unsigned int number_in) :
+  LinearImplicitSystem      (es, name_in, number_in),
   solve_system              (NULL),
   _finished_set_frequencies (false),
   _keep_solution_duplicates (true),
@@ -105,8 +105,8 @@ void FrequencySystem::clear_all ()
   // EquationSystems object
   if (es.parameters.have_parameter<unsigned int> ("n_frequencies"))
     {
-      unsigned int n_frequencies = es.parameters.get<unsigned int>("n_frequencies");
-      for (unsigned int n=0; n < n_frequencies; n++)
+      unsigned int n_freq = es.parameters.get<unsigned int>("n_frequencies");
+      for (unsigned int n=0; n < n_freq; n++)
         es.parameters.remove(this->form_freq_param_name(n));
       es.parameters.remove("current frequency");
     }

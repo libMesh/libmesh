@@ -59,8 +59,8 @@ public:
    * data structures.
    */
   EigenSystem (EquationSystems& es,
-               const std::string& name,
-               const unsigned int number);
+               const std::string& name_in,
+               const unsigned int number_in);
 
   /**
    * Destructor.

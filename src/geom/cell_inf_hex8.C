@@ -240,22 +240,22 @@ bool InfHex8::contains_point (const Point& p, Real tol) const
    * this infinite element.  Therefore if this fails,
    * fall back to the FEInterface::inverse_map()
    */
-  const Point origin (this->origin());
+  const Point my_origin (this->origin());
 
   /*
    * determine the minimal distance of the base from the origin
    * Use size_sq() instead of size(), it is faster
    */
-  const Real min_distance_sq = std::min((Point(this->point(0)-origin)).size_sq(),
-                                        std::min((Point(this->point(1)-origin)).size_sq(),
-                                                 std::min((Point(this->point(2)-origin)).size_sq(),
-                                                          (Point(this->point(3)-origin)).size_sq())));
+  const Real min_distance_sq = std::min((Point(this->point(0)-my_origin)).size_sq(),
+                                        std::min((Point(this->point(1)-my_origin)).size_sq(),
+                                                 std::min((Point(this->point(2)-my_origin)).size_sq(),
+                                                          (Point(this->point(3)-my_origin)).size_sq())));
 
   /*
    * work with 1% allowable deviation.  We can still fall
    * back to the InfFE::inverse_map()
    */
-  const Real conservative_p_dist_sq = 1.01 * (Point(p-origin).size_sq());
+  const Real conservative_p_dist_sq = 1.01 * (Point(p-my_origin).size_sq());
 
 
 

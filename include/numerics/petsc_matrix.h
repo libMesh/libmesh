@@ -93,7 +93,7 @@ public:
    * \p init(...).
    */
   explicit
-  PetscMatrix (const Parallel::Communicator &comm
+  PetscMatrix (const Parallel::Communicator &comm_in
                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
@@ -105,7 +105,7 @@ public:
    */
   explicit
   PetscMatrix (Mat m,
-               const Parallel::Communicator &comm
+               const Parallel::Communicator &comm_in
                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**

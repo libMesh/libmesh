@@ -1322,7 +1322,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
             DofObject::invalid_id :
             libmesh_cast_int<dof_id_type>(*it);
           ++it;
-          const processor_id_type processor_id =
+          const processor_id_type proc_id =
             libmesh_cast_int<processor_id_type>(*it);
           ++it;
           const subdomain_id_type subdomain_id =
@@ -1343,7 +1343,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem, std
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
           elem->set_unique_id() = unique_id;
 #endif
-          elem->processor_id() = processor_id;
+          elem->processor_id() = proc_id;
           elem->subdomain_id() = subdomain_id;
 #ifdef LIBMESH_ENABLE_AMR
           elem->hack_p_level(p_level);
