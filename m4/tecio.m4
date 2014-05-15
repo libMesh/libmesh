@@ -4,8 +4,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_TECIO],
 [
   AC_ARG_ENABLE(tecio,
-                AC_HELP_STRING([--enable-tecio],
-                               [build with Tecplot TecIO API support (from source)]),
+                AC_HELP_STRING([--disable-tecio],
+                               [build without Tecplot TecIO API support (from source)]),
 		[case "${enableval}" in
 		  yes)  enabletecio=yes ;;
 		   no)  enabletecio=no ;;

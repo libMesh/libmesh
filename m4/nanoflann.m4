@@ -4,8 +4,8 @@
 AC_DEFUN([CONFIGURE_NANOFLANN],
 [
   AC_ARG_ENABLE(nanoflann,
-                AC_HELP_STRING([--enable-nanoflann],
-                               [build with space-filling curves suppport]),
+                AC_HELP_STRING([--disable-nanoflann],
+                               [build without nanoflann KD-tree suppport]),
 		[case "${enableval}" in
 		  yes)  enablenanoflann=yes ;;
 		   no)  enablenanoflann=no ;;

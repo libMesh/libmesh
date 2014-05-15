@@ -4,8 +4,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_GMV],
 [
   AC_ARG_ENABLE(gmv,
-                AC_HELP_STRING([--enable-gmv],
-                               [build with GMV file I/O support]),
+                AC_HELP_STRING([--disable-gmv],
+                               [build without GMV file I/O support]),
 		[case "${enableval}" in
 		  yes)  enablegmv=yes ;;
 		   no)  enablegmv=no ;;

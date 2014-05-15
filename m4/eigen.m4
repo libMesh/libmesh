@@ -22,8 +22,8 @@
 AC_DEFUN([CONFIGURE_EIGEN],
 [
   AC_ARG_ENABLE(eigen,
-                AC_HELP_STRING([--enable-eigen],
-                               [build with Eigen linear algebra support]),
+                AC_HELP_STRING([--disable-eigen],
+                               [build without Eigen linear algebra support]),
 		[case "${enableval}" in
 		  yes)  enableeigen=yes ;;
 		   no)  enableeigen=no ;;

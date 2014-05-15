@@ -7,8 +7,8 @@ AC_DEFUN([CONFIGURE_VTK],
   AC_ARG_VAR([VTK_DIR],     [path to VTK installation])
 
   AC_ARG_ENABLE(vtk,
-                AC_HELP_STRING([--enable-vtk],
-                               [build with VTK file I/O support]),
+                AC_HELP_STRING([--disable-vtk],
+                               [build without VTK file I/O support]),
 		[case "${enableval}" in
 		  yes)  enablevtk=yes ;;
 		   no)  enablevtk=no ;;

@@ -11,8 +11,8 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
      #                             smart about which compilers to look for
      # -------------------------------------------------------------------
      AC_ARG_ENABLE(mpi,
-                   AC_HELP_STRING([--enable-mpi],
-                                  [build with MPI message passing support]),
+                   AC_HELP_STRING([--disable-mpi],
+                                  [build without MPI message passing support]),
    		   [case "${enableval}" in
    		     yes)  enablempi=yes ;;
    		      no)  enablempi=no ;;
@@ -83,8 +83,8 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   # --disable-fortran
   # --------------------------------------------------------------
   AC_ARG_ENABLE(fortran,
-                AC_HELP_STRING([--enable-fortran],
-                               [build with Fortran language support]),
+                AC_HELP_STRING([--disable-fortran],
+                               [build without Fortran language support]),
 		[case "${enableval}" in
 		  yes)  enablefortran=yes ;;
 		   no)  enablefortran=no ;;
@@ -529,8 +529,8 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   # in the case blocks below we may add GLIBCXX-specific pedantic debugging preprocessor
   # definitions. however, allow the knowing user to preclude that if they need to.
   AC_ARG_ENABLE(glibcxx-debugging,
-	 [AC_HELP_STRING([--enable-glibcxx-debugging],
-	                 [add -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC to CXXFLAGS_DBG (yes by default)])],
+	 [AC_HELP_STRING([--disable-glibcxx-debugging],
+	                 [omit -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC even in dbg mode])],
 	 [case "${enableval}" in
 	   yes)  enableglibcxxdebugging=yes ;;
 	    no)  enableglibcxxdebugging=no ;;

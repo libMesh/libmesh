@@ -4,8 +4,8 @@
 AC_DEFUN([CONFIGURE_HDF5],
 [
   AC_ARG_ENABLE(hdf5,
-                AC_HELP_STRING([--enable-hdf5],
-                               [build with HDF5 support]),
+                AC_HELP_STRING([--disable-hdf5],
+                               [build without HDF5 support]),
 		[case "${enableval}" in
 		  yes)  enablehdf5=yes ;;
 		   no)  enablehdf5=no ;;

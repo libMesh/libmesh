@@ -4,8 +4,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_EXODUS],
 [
   AC_ARG_ENABLE(exodus,
-                AC_HELP_STRING([--enable-exodus],
-                               [build with ExodusII API support]),
+                AC_HELP_STRING([--disable-exodus],
+                               [build without ExodusII API support]),
 		[case "${enableval}" in
 		  yes|new|v522)  enableexodus=yes; exodusversion="v5.22" ;;
 		      old|v509)  enableexodus=yes; exodusversion="v5.09" ;;

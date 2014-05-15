@@ -1800,15 +1800,15 @@ Optional Features:
   --disable-maintainer-mode
                           disable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
-  --enable-mpi            build with MPI message passing support
+  --disable-mpi           build without MPI message passing support
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
                           speeds up one-time build
-  --enable-fortran        build with Fortran language support
-  --enable-glibcxx-debugging
-                          add -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC to
-                          CXXFLAGS_DBG (yes by default)
+  --disable-fortran       build without Fortran language support
+  --disable-glibcxx-debugging
+                          omit -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC even
+                          in dbg mode
   --enable-coverage       configure code coverage analysis tools
   --enable-static[=PKGS]  build static libraries [default=no]
   --enable-shared[=PKGS]  build shared libraries [default=yes]
@@ -1822,12 +1822,13 @@ Optional Features:
                           Use triple-precision scalars
   --enable-quadrupleprecision
                           Use quadruple-precision scalars
-  --enable-getpwuid       allow calls to getpwuid
-  --enable-exceptions     throw exceptions on unexpected errors
-  --enable-unordered-containers
-                          Use unordered_map/unordered_set if available
-  --enable-openmp         Build with OpenMP Support
-  --enable-warnings       Warn when using deprecated, experimental, or
+  --disable-getpwuid      do not make calls to getpwuid
+  --disable-exceptions    exit rather than throw exceptions on unexpected
+                          errors
+  --disable-unordered-containers
+                          Use map/set instead of unordered_map/unordered_set
+  --disable-openmp        Build without OpenMP Support
+  --disable-warnings      Do not warn about deprecated, experimental, or
                           questionable code
   --enable-blocked-storage
                           Support for blocked matrix/vector storage
@@ -1838,73 +1839,75 @@ Optional Features:
                           #include "libmesh/header.h"
   --enable-legacy-using-namespace
                           add "using namespace libMesh" to libMesh headers
-  --enable-everything     treat all applicable options as enabled
+  --enable-everything     enable all non-conflicting options
   --enable-unique-id      build with unique id suppport
   --enable-tracefiles     write stack trace files on unexpected errors
-  --enable-amr            build with adaptive mesh refinement (AMR) suppport
-  --enable-vsmoother      build with variational smoother suppport
-  --enable-periodic       build with periodic boundary condition suppport
-  --enable-dirichlet      build with Dirichlet boundary constraint support
+  --disable-amr           build without adaptive mesh refinement (AMR)
+                          suppport
+  --disable-vsmoother     build without variational smoother suppport
+  --disable-periodic      build without periodic boundary condition suppport
+  --disable-dirichlet     build without Dirichlet boundary constraint support
   --enable-nodeconstraint build with node constraints suppport
-  --enable-parmesh        Use experimental ParallelMesh as Mesh
-  --enable-ghosted        Use ghosted local vectors when available
-  --enable-node-valence   Compute and store node valence values
+  --enable-parmesh        Use distributed ParallelMesh as Mesh
+  --disable-ghosted       Use dense instead of sparse/ghosted local vectors
+  --disable-node-valence  Do not compute and store node valence values
   --enable-1D-only        build with support for 1D meshes only
   --enable-2D-only        build with support for 1D and 2D meshes only
-  --enable-pfem           build with support for higher order p-FEM shapes
+  --disable-pfem          build without support for higher p order FEM shapes
   --enable-ifem           build with infinite elements
-  --enable-second         build with second derivatives
-  --enable-xdr            enable XDR platform-independent binary I/O
-  --enable-complex        build with complex number support
-  --enable-reference-counting
-                          build with reference counting suppport
+  --disable-second        build without second derivatives support
+  --disable-xdr           build without XDR platform-independent binary I/O
+  --enable-complex        build to support complex-number solutions
+  --disable-reference-counting
+                          build without reference counting support
   --enable-perflog        build with performance logging turned on
-  --enable-examples       support compilation, installation, & running example
-                          suite
-  --enable-optional       en/disable optional external libraries
+  --disable-examples      Do not compile, install, or test with example suite
+  --disable-optional      build without most optional external libraries
   --enable-strict-lgpl    Compile libmesh with LGPL-compatible contrib
                           libraries only
-  --enable-nested         en/disable nested autoconf subpackages
-  --enable-boost          build with either external or built-in BOOST support
-  --enable-petsc          build with PETSc iterative solver suppport
-  --enable-slepc          build with SLEPc eigen solver support
-  --enable-trilinos       build with Trilinos support
-  --enable-tbb            build with threading support via Threading Building
-                          Blocks
-  --enable-pthreads       build with threading support via POSIX threads
-                          (pthreads)
-  --enable-cppthreads     Build with C++ std::thread support
-  --enable-laspack        build with LASPACK iterative solver suppport
-  --enable-sfc            build with space-filling curves suppport
-  --enable-gzstreams      build with gzstreams compressed I/O suppport
-  --enable-bzip2          build with bzip2 compressed I/O suppport
-  --enable-xz             build with xz compressed I/O suppport
-  --enable-tecio          build with Tecplot TecIO API support (from source)
+  --disable-nested        Do not use nested autoconf subpackages
+  --disable-boost         build without either external or built-in BOOST
+                          support
+  --disable-petsc         build without PETSc iterative solver suppport
+  --disable-slepc         build without SLEPc eigen solver support
+  --disable-trilinos      build without Trilinos support
+  --disable-tbb           build without threading support via Threading
+                          Building Blocks
+  --disable-pthreads      build without POSIX threading (pthreads) support
+  --disable-cppthreads    Build without C++ std::thread support
+  --disable-laspack       build without LASPACK iterative solver suppport
+  --disable-sfc           build without space-filling curves suppport
+  --disable-gzstreams     build without gzstreams compressed I/O suppport
+  --disable-bzip2         build without bzip2 compressed I/O suppport
+  --disable-xz            build without xz compressed I/O suppport
+  --disable-tecio         build without Tecplot TecIO API support (from
+                          source)
   --enable-tecplot        build with Tecplot binary file I/O support (using
                           distributed libraries)
-  --enable-metis          build with Metis graph partitioning suppport
-  --enable-parmetis       build with Parmetis parallel graph partitioning
+  --disable-metis         build without Metis graph partitioning suppport
+  --disable-parmetis      build without Parmetis parallel graph partitioning
                           suppport
-  --enable-tetgen         build with TetGen tetrahedrization library support
-  --enable-triangle       build with Triangle Delaunay triangulation library
+  --disable-tetgen        build without TetGen tetrahedrization library
                           support
-  --enable-gmv            build with GMV file I/O support
-  --enable-vtk            build with VTK file I/O support
-  --enable-eigen          build with Eigen linear algebra support
-  --enable-glpk           build with GLPK support
-  --enable-hdf5           build with HDF5 support
-  --enable-netcdf         build with netCDF binary I/O
-  --enable-exodus         build with ExodusII API support
+  --disable-triangle      build without Triangle Delaunay triangulation
+                          library support
+  --disable-gmv           build without GMV file I/O support
+  --disable-vtk           build without VTK file I/O support
+  --disable-eigen         build without Eigen linear algebra support
+  --disable-glpk          build without GLPK support
+  --disable-hdf5          build without HDF5 support
+  --disable-netcdf        build without netCDF binary I/O
+  --disable-exodus        build without ExodusII API support
   --enable-exodus-fortran build with ExodusII Fortran API support
-  --enable-nemesis        build with NemesisII API support
-  --enable-libHilbert     build with libHilbert, from Chris Hamilton
-  --enable-fparser        build with C++ function parser support
-  --enable-fparser-debugging
-                          enable fparser debugging functions
-  --enable-fparser-optimizer
-                          use fparser optimization where possible
-  --enable-cppunit        Build with cppunit C++ unit testing support
-  --enable-nanoflann      build with space-filling curves suppport
+  --disable-nemesis       build without NemesisII API support
+  --disable-libHilbert    build without Chris Hamilton's libHilbert
+  --disable-fparser       build without C++ function parser support
+  --disable-fparser-debugging
+                          do not provide fparser debugging functions
+  --disable-fparser-optimizer
+                          do not optimize parsed functions
+  --disable-cppunit       Build without cppunit C++ unit testing support
+  --disable-nanoflann     build without nanoflann KD-tree suppport
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1921,16 +1924,16 @@ Optional Packages:
   --with-sysroot=DIR Search for dependent libraries within DIR
                         (or the compiler's sysroot if not specified).
   --with-boundary-id-bytes=<1|2|4|8>
-                          bytes used per boundary side per boundary_id
+                          bytes used per boundary side per boundary_id [2]
   --with-dof-id-bytes=<1|2|4|8>
-                          bytes used per dof object id, dof index
+                          bytes used per dof object id, dof index [4]
   --with-processor-id-bytes=<1|2|4|8>
-                          bytes used for processor id
+                          bytes used for processor id [4]
   --with-subdomain-id-bytes=<1|2|4|8>
                           bytes of storage per element used to store the
-                          subdomain_id
+                          subdomain_id [2]
   --with-unique-id-bytes=<1|2|4|8>
-                          bytes used per unique id
+                          bytes used per unique id [4]
   --with-boost[=ARG]      use Boost library from a standard location
                           (ARG=yes), from the specified location (ARG=<path>),
                           or disable it (ARG=no) [ARG=yes]
@@ -26484,7 +26487,7 @@ fi
 
 
 # --------------------------------------------------------------
-# default comm_world - enabled by default
+# default comm_world - now disabled by default
 # --------------------------------------------------------------
 # Check whether --enable-default-comm-world was given.
 if test "${enable_default_comm_world+set}" = set; then :
@@ -26985,7 +26988,7 @@ fi
 
 
 # -------------------------------------------------------------
-# Mesh == ParallelMesh -- disabled until it's debugged/finished
+# Mesh == ParallelMesh -- disabled by default for max compatibility
 # -------------------------------------------------------------
 # Check whether --enable-parmesh was given.
 if test "${enable_parmesh+set}" = set; then :

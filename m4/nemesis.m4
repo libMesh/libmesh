@@ -4,8 +4,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_NEMESIS],
 [
   AC_ARG_ENABLE(nemesis,
-                AC_HELP_STRING([--enable-nemesis],
-                               [build with NemesisII API support]),
+                AC_HELP_STRING([--disable-nemesis],
+                               [build without NemesisII API support]),
 		[case "${enableval}" in
 		  yes|new|v522) enablenemesis=yes ; nemesisversion="v5.22" ;;
 		      old|v309) enablenemesis=yes ; nemesisversion="v3.09" ;;
