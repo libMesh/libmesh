@@ -1902,8 +1902,8 @@ Optional Features:
   --disable-nemesis       build without NemesisII API support
   --disable-libHilbert    build without Chris Hamilton's libHilbert
   --disable-fparser       build without C++ function parser support
-  --disable-fparser-debugging
-                          do not provide fparser debugging functions
+  --enable-fparser-debugging
+                          Build fparser with bytecode debugging functions
   --disable-fparser-optimizer
                           do not optimize parsed functions
   --disable-cppunit       Build without cppunit C++ unit testing support
@@ -33536,7 +33536,7 @@ if test "${enable_fparser_debugging+set}" = set; then :
 		    *)  as_fn_error $? "bad value ${enableval} for --enable-fparser-debugging" "$LINENO" 5 ;;
 		 esac
 else
-  enablefparserdebugging=yes
+  enablefparserdebugging=no
 fi
 
 
