@@ -69,7 +69,10 @@ public:
     b(b_in),
     variables(variables_in),
     f(f_in ? f_in->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
-    g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >(NULL))
+    g(g_in ? g_in->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
+    f_fem(AutoPtr<FEMFunctionBase<Number> >(NULL)),
+    g_fem(AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
+    f_system(NULL)
   {
     libmesh_assert(f.get());
     f->init();
@@ -83,7 +86,10 @@ public:
     b(b_in),
     variables(variables_in),
     f(f_in.clone()),
-    g(AutoPtr<FunctionBase<Gradient> >(NULL))
+    g(AutoPtr<FunctionBase<Gradient> >(NULL)),
+    f_fem(AutoPtr<FEMFunctionBase<Number> >(NULL)),
+    g_fem(AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
+    f_system(NULL)
   {
     f->init();
   }
@@ -96,29 +102,109 @@ public:
     b(b_in),
     variables(variables_in),
     f(f_in.clone()),
-    g(g_in.clone())
+    g(g_in.clone()),
+    f_fem(AutoPtr<FEMFunctionBase<Number> >(NULL)),
+    g_fem(AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
+    f_system(NULL)
   {
     f->init();
     g->init();
   }
 
 
+  DirichletBoundary(const std::set<boundary_id_type> &b_in,
+                    const std::vector<unsigned int>& variables_in,
+                    const System& f_sys_in,
+                    const FEMFunctionBase<Number> *f_in,
+                    const FEMFunctionBase<Gradient> *g_in = NULL) :
+    b(b_in),
+    variables(variables_in),
+    f(AutoPtr<FunctionBase<Number> >(NULL)),
+    g(AutoPtr<FunctionBase<Gradient> >(NULL)),
+    f_fem(f_in ? f_in->clone() : AutoPtr<FEMFunctionBase<Number> >(NULL)),
+    g_fem(g_in ? g_in->clone() : AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
+    f_system(&f_sys_in)
+  {
+    libmesh_assert(f_fem.get());
+    f_fem->init();
+    if (g_fem.get())
+      g_fem->init();
+  }
+
+  DirichletBoundary(const std::set<boundary_id_type> &b_in,
+                    const std::vector<unsigned int>& variables_in,
+                    const System& f_sys_in,
+                    const FEMFunctionBase<Number> &f_in) :
+    b(b_in),
+    variables(variables_in),
+    f(AutoPtr<FunctionBase<Number> >(NULL)),
+    g(AutoPtr<FunctionBase<Gradient> >(NULL)),
+    f_fem(f_in.clone()),
+    g_fem(AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
+    f_system(&f_sys_in)
+  {
+    f_fem->init();
+  }
+
+
+  DirichletBoundary(const std::set<boundary_id_type> &b_in,
+                    const std::vector<unsigned int>& variables_in,
+                    const System& f_sys_in,
+                    const FEMFunctionBase<Number> &f_in,
+                    const FEMFunctionBase<Gradient> &g_in) :
+    b(b_in),
+    variables(variables_in),
+    f(AutoPtr<FunctionBase<Number> >(NULL)),
+    g(AutoPtr<FunctionBase<Gradient> >(NULL)),
+    f_fem(f_in.clone()),
+    g_fem(g_in.clone()),
+    f_system(&f_sys_in)
+  {
+    f_fem->init();
+    g_fem->init();
+  }
+
+
+
+
   DirichletBoundary (const DirichletBoundary &dirichlet_in) :
     b(dirichlet_in.b),
     variables(dirichlet_in.variables),
-    f(dirichlet_in.f.get() ? dirichlet_in.f->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
-    g(dirichlet_in.g.get() ? dirichlet_in.g->clone() : AutoPtr<FunctionBase<Gradient> >(NULL))
+    f(dirichlet_in.f.get() ?
+      dirichlet_in.f->clone() : AutoPtr<FunctionBase<Number> >(NULL)),
+    g(dirichlet_in.g.get() ?
+      dirichlet_in.g->clone() : AutoPtr<FunctionBase<Gradient> >(NULL)),
+    f_fem(dirichlet_in.f_fem.get() ?
+      dirichlet_in.f_fem->clone() : AutoPtr<FEMFunctionBase<Number> >(NULL)),
+    g_fem(dirichlet_in.g_fem.get() ?
+      dirichlet_in.g_fem->clone() : AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
+    f_system(dirichlet_in.f_system)
   {
-    libmesh_assert(f.get());
-    f->init();
+    libmesh_assert(f.get() || f_fem.get());
+    libmesh_assert(!(f.get() && f_fem.get()));
+    libmesh_assert(!(f.get() && g_fem.get()));
+    libmesh_assert(!(f_fem.get() && g.get()));
+    libmesh_assert(!(f_fem.get()) && !f_system);
+    if (f.get())
+      f->init();
     if (g.get())
       g->init();
+    if (f_fem.get())
+      f_fem->init();
+    if (g_fem.get())
+      g_fem->init();
   }
 
   std::set<boundary_id_type> b;
   std::vector<unsigned int> variables;
+
   AutoPtr<FunctionBase<Number> > f;
   AutoPtr<FunctionBase<Gradient> > g;
+
+  AutoPtr<FEMFunctionBase<Number> > f_fem;
+  AutoPtr<FEMFunctionBase<Gradient> > g_fem;
+
+  const System *f_system;
 };
 
 
