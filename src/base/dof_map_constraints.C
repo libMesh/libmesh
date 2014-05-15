@@ -373,11 +373,14 @@ private:
 
     // If our supplied functions require a FEMContext, create and
     // initialize one
-    FEMContext context;
+    AutoPtr<FEMContext> context;
     if (f_fem)
-      f->init_context(*context);
+      {
+        context = AutoPtr<FEMContext>(new FEMContext(*f_system));
+        f_fem->init_context(*context);
+      }
     if (g_fem)
-      g->init_context(*context);
+      g_fem->init_context(*context);
 
     // Iterate over all the elements in the range
     for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
@@ -385,7 +388,7 @@ private:
         const Elem* elem = *elem_it;
 
         if (f_system)
-          context.pre_fe_reinit(f_system, elem);
+          context->pre_fe_reinit(*f_system, elem);
 
         // We only calculate Dirichlet constraints on active
         // elements
@@ -505,7 +508,7 @@ private:
                 for( unsigned int c = 0; c < n_vec_dim; c++ )
                   {
                     Ue(current_dof+c) =
-                      f_component(f, f_fem, context, var_component+c,
+                      f_component(f, f_fem, *context, var_component+c,
                                   elem->point(n), time);
                     dof_is_fixed[current_dof+c] = true;
                   }
@@ -515,12 +518,12 @@ private:
             else if (fe_type.family == HERMITE)
               {
                 Ue(current_dof) =
-                  f_component(f, f_fem, context, var_component,
+                  f_component(f, f_fem, *context, var_component,
                               elem->point(n), time);
                 dof_is_fixed[current_dof] = true;
                 current_dof++;
                 Gradient grad =
-                  g_component(g, g_fem, context, var_component,
+                  g_component(g, g_fem, *context, var_component,
                               elem->point(n), time);
                 // x derivative
                 Ue(current_dof) = grad(0);
@@ -534,10 +537,10 @@ private:
                     nxminus(0) -= TOLERANCE;
                     nxplus(0) += TOLERANCE;
                     Gradient gxminus =
-                      g_component(g, g_fem, context, var_component,
+                      g_component(g, g_fem, *context, var_component,
                                   nxminus, time);
                     Gradient gxplus =
-                      g_component(g, g_fem, context, var_component,
+                      g_component(g, g_fem, *context, var_component,
                                   nxplus, time);
                     // y derivative
                     Ue(current_dof) = grad(1);
@@ -566,10 +569,10 @@ private:
                         nyminus(1) -= TOLERANCE;
                         nyplus(1) += TOLERANCE;
                         Gradient gyminus =
-                          g_component(g, g_fem, context, var_component,
+                          g_component(g, g_fem, *context, var_component,
                                       nyminus, time);
                         Gradient gyplus =
-                          g_component(g, g_fem, context, var_component,
+                          g_component(g, g_fem, *context, var_component,
                                       nyplus, time);
                         // xz derivative
                         Ue(current_dof) = (gyplus(2) - gyminus(2))
@@ -590,16 +593,16 @@ private:
                         nxpyp(0) += TOLERANCE;
                         nxpyp(1) += TOLERANCE;
                         Gradient gxmym =
-                          g_component(g, g_fem, context, var_component,
+                          g_component(g, g_fem, *context, var_component,
                                       nxmym, time);
                         Gradient gxmyp =
-                          g_component(g, g_fem, context, var_component,
+                          g_component(g, g_fem, *context, var_component,
                                       nxmyp, time);
                         Gradient gxpym =
-                          g_component(g, g_fem, context, var_component,
+                          g_component(g, g_fem, *context, var_component,
                                       nxpym, time);
                         Gradient gxpyp =
-                          g_component(g, g_fem, context, var_component,
+                          g_component(g, g_fem, *context, var_component,
                                       nxpyp, time);
                         Number gxzplus = (gxpyp(2) - gxmyp(2))
                           / 2. / TOLERANCE;
@@ -620,12 +623,12 @@ private:
               {
                 libmesh_assert_equal_to (nc, 1 + dim);
                 Ue(current_dof) =
-                  f_component(f, f_fem, context, var_component,
+                  f_component(f, f_fem, *context, var_component,
                               elem->point(n), time);
                 dof_is_fixed[current_dof] = true;
                 current_dof++;
                 Gradient grad =
-                  g_component(g, g_fem, context, var_component,
+                  g_component(g, g_fem, *context, var_component,
                               elem->point(n), time);
                 for (unsigned int i=0; i!= dim; ++i)
                   {
@@ -678,7 +681,7 @@ private:
 
                   for( unsigned int c = 0; c < n_vec_dim; c++)
                     f_accessor(c) =
-                      f_component(f, f_fem, context, var_component+c,
+                      f_component(f, f_fem, *context, var_component+c,
                                   xyz_values[qp], time);
 
                   // solution grad at the quadrature point
@@ -706,7 +709,7 @@ private:
                     for( unsigned int c = 0; c < n_vec_dim; c++)
                       for( unsigned int d = 0; d < g_rank; d++ )
                         g_accessor(c + d*dim ) =
-                          g_component(g, g_fem, context, var_component,
+                          g_component(g, g_fem, *context, var_component,
                                       xyz_values[qp], time)(c);
 
                   // Form edge projection matrix
@@ -800,7 +803,7 @@ private:
 
                   for( unsigned int c = 0; c < n_vec_dim; c++)
                     f_accessor(c) =
-                      f_component(f, f_fem, context, var_component+c,
+                      f_component(f, f_fem, *context, var_component+c,
                                   xyz_values[qp], time);
 
                   // solution grad at the quadrature point
@@ -828,7 +831,7 @@ private:
                     for( unsigned int c = 0; c < n_vec_dim; c++)
                       for( unsigned int d = 0; d < g_rank; d++ )
                         g_accessor(c + d*dim ) =
-                          g_component(g, g_fem, context, var_component,
+                          g_component(g, g_fem, *context, var_component,
                                       xyz_values[qp], time)(c);
 
                   // Form side projection matrix

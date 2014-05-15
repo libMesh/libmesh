@@ -25,8 +25,10 @@
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
 // Local Includes -----------------------------------
+#include "libmesh/fem_function_base.h"
 #include "libmesh/function_base.h"
 #include "libmesh/id_types.h"
+#include "libmesh/system.h"
 #include "libmesh/vector_value.h"
 
 // C++ Includes   -----------------------------------
@@ -126,9 +128,6 @@ public:
     f_system(&f_sys_in)
   {
     libmesh_assert(f_fem.get());
-    f_fem->init();
-    if (g_fem.get())
-      g_fem->init();
   }
 
   DirichletBoundary(const std::set<boundary_id_type> &b_in,
@@ -143,7 +142,6 @@ public:
     g_fem(AutoPtr<FEMFunctionBase<Gradient> >(NULL)),
     f_system(&f_sys_in)
   {
-    f_fem->init();
   }
 
 
@@ -160,8 +158,6 @@ public:
     g_fem(g_in.clone()),
     f_system(&f_sys_in)
   {
-    f_fem->init();
-    g_fem->init();
   }
 
 
@@ -189,10 +185,6 @@ public:
       f->init();
     if (g.get())
       g->init();
-    if (f_fem.get())
-      f_fem->init();
-    if (g_fem.get())
-      g_fem->init();
   }
 
   std::set<boundary_id_type> b;
