@@ -361,10 +361,12 @@ void DofObject::set_n_comp_group(const unsigned int s,
   if (ncomp >= ncv_magic)
     {
       const index_t ncvm = ncv_magic;
-      libMesh::err << "ERROR: ncomp must be less than DofObject::ncv_magic!\n"
-                   << "ncomp = " << ncomp << ", ncv_magic = " << ncvm
-                   << "\nrecompile and try again!\n";
-      libmesh_error();
+      libmesh_error_msg("ERROR: ncomp must be less than DofObject::ncv_magic!\n" \
+                        << "ncomp = "                                   \
+                        << ncomp                                \
+                        << ", ncv_magic = "                     \
+                        << ncvm                                 \
+                        << "\nrecompile and try again!");
     }
 #endif
 

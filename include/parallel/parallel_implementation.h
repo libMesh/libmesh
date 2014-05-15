@@ -518,7 +518,7 @@ inline Communicator::Communicator (const Communicator &) :
   used_tag_values(),
   _I_duped_it(false)
 {
-  libmesh_error();
+  libmesh_not_implemented();
 }
 
 inline void Communicator::assign(const communicator &comm)
@@ -593,7 +593,7 @@ inline int Status::tag () const
 #ifdef LIBMESH_HAVE_MPI
   return _status.MPI_TAG;
 #else
-  libmesh_error();
+  libmesh_not_implemented();
   return 0;
 #endif
 }
@@ -609,7 +609,7 @@ inline unsigned int Status::size (const data_type &type) const
 #else
 inline unsigned int Status::size (const data_type &) const
 {
-  libmesh_error();
+  libmesh_not_implemented();
   return 0;
 }
 #endif
@@ -3295,72 +3295,72 @@ inline void Communicator::set_union(T&, const unsigned int root_id) const
  */
 inline status Communicator::probe (const unsigned int,
                                    const MessageTag&) const
-{ libmesh_error(); status s; return s; }
+{ libmesh_not_implemented(); status s; return s; }
 
 /**
  * We do not currently support sends on one processor without MPI.
  */
 template <typename T>
 inline void Communicator::send (const unsigned int, T&, const MessageTag &) const
-{ libmesh_error(); }
+{ libmesh_not_implemented(); }
 
 template <typename T>
 inline void Communicator::send (const unsigned int, T&, Request&,
                                 const MessageTag&) const
-{ libmesh_error(); }
+{ libmesh_not_implemented(); }
 
 template <typename T>
 inline void Communicator::send (const unsigned int, T&, const DataType&,
                                 const MessageTag &) const
-{ libmesh_error(); }
+{ libmesh_not_implemented(); }
 
 template <typename T>
 inline void Communicator::send (const unsigned int, T&, const DataType&, Request&,
                                 const MessageTag &) const
-{ libmesh_error(); }
+{ libmesh_not_implemented(); }
 
 template <typename Context, typename Iter>
 inline void Communicator::send_packed_range
 (const unsigned int, const Context*, Iter, const Iter, const MessageTag&) const
-{ libmesh_error(); }
+{ libmesh_not_implemented(); }
 
 template <typename Context, typename Iter>
 inline void Communicator::send_packed_range
 (const unsigned int, const Context*, Iter, const Iter, Request&,
  const MessageTag&) const
-{ libmesh_error(); }
+{ libmesh_not_implemented(); }
 
 /**
  * We do not currently support receives on one processor without MPI.
  */
 template <typename T>
 inline Status Communicator::receive (const unsigned int, T&, const MessageTag&) const
-{ libmesh_error(); return Status(); }
+{ libmesh_not_implemented(); return Status(); }
 
 template <typename T>
 inline void Communicator::receive
 (const unsigned int, T&, Request&, const MessageTag&) const
-{ libmesh_error(); }
+{ libmesh_not_implemented(); }
 
 template <typename T>
 inline Status Communicator::receive
 (const unsigned int, T&, const DataType&, const MessageTag&) const
-{ libmesh_error(); return Status(); }
+{ libmesh_not_implemented(); return Status(); }
 
 template <typename T>
 inline void Communicator::receive
 (const unsigned int, T&, const DataType&, Request&, const MessageTag&) const
-{ libmesh_error(); }
+{ libmesh_not_implemented(); }
 
 template <typename Context, typename OutputIter>
 inline void Communicator::receive_packed_range
 (const unsigned int, Context*, OutputIter, const MessageTag&) const
-{ libmesh_error(); }
+{ libmesh_not_implemented(); }
 
 template <typename Context, typename OutputIter>
 inline void Communicator::receive_packed_range
 (const unsigned int, Context*, OutputIter, Request&, const MessageTag&) const
-{ libmesh_error(); }
+{ libmesh_not_implemented(); }
 
 /**
  * Send-receive data from one processor.
@@ -3390,7 +3390,7 @@ inline void Communicator::send_receive_packed_range
  RangeIter /* send_begin */, const RangeIter /* send_end */,
  const unsigned int /* source_processor_id */, Context2*,
  OutputIter /* out */, const MessageTag &, const MessageTag &) const
-{ libmesh_error(); }
+{ libmesh_not_implemented(); }
 
 /**
  * Gather-to-root on one processor.

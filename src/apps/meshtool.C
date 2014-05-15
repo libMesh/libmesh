@@ -796,7 +796,7 @@ int main (int argc, char** argv)
         }
 
       else
-        libmesh_error();
+        libmesh_error_msg("Invalid value, convert_second_order = " << convert_second_order);
 
       if (verbose)
         libMesh::out << message << std::endl;
@@ -934,7 +934,7 @@ int main (int argc, char** argv)
             else if (names.size() == 3)
               new_mesh.write(names[1], soln, var_names);
             else
-              libmesh_error();
+              libmesh_error_msg("Invalid names.size() = " << names.size());
           }
         else
           {
@@ -943,7 +943,7 @@ int main (int argc, char** argv)
             else if (names.size() == 3)
               mesh.write(names[1], soln, var_names);
             else
-              libmesh_error();
+              libmesh_error_msg("Invalid names.size() = " << names.size());
           }
 
 
@@ -967,7 +967,7 @@ int main (int argc, char** argv)
               mesh.boundary_info->sync(boundary_mesh, &boundary_mesh_data, &mesh_data);
 
             else
-              libmesh_error();
+              libmesh_error_msg("Invalid value write_bndry = " << write_bndry);
 
             if (names.size() == 2)
               boundary_mesh.write(boundary_name);

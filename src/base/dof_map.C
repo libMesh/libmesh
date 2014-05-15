@@ -204,7 +204,7 @@ bool DofMap::is_periodic_boundary (const boundary_id_type boundaryid) const
 
 // void DofMap::add_variable (const Variable &var)
 // {
-//   libmesh_error();
+//   libmesh_not_implemented();
 //   _variables.push_back (var);
 // }
 
@@ -578,21 +578,15 @@ void DofMap::reinit(MeshBase& mesh)
               FEInterface::max_order(base_fe_type, type))
             {
 #  ifdef DEBUG
-              if (FEInterface::max_order(base_fe_type,type) <
-                  static_cast<unsigned int>(base_fe_type.order))
-                {
-                  libMesh::err
-                    << "ERROR: Finite element "
-                    << Utility::enum_to_string(base_fe_type.family)
-                    << " on geometric element "
-                    << Utility::enum_to_string(type) << std::endl
-                    << "only supports FEInterface::max_order = "
-                    << FEInterface::max_order(base_fe_type,type)
-                    << ", not fe_type.order = " << base_fe_type.order
-                    << std::endl;
-
-                  libmesh_error();
-                }
+              if (FEInterface::max_order(base_fe_type,type) < static_cast<unsigned int>(base_fe_type.order))
+                libmesh_error_msg("ERROR: Finite element "              \
+                                  << Utility::enum_to_string(base_fe_type.family) \
+                                  << " on geometric element "           \
+                                  << Utility::enum_to_string(type)      \
+                                  << "\nonly supports FEInterface::max_order = " \
+                                  << FEInterface::max_order(base_fe_type,type) \
+                                  << ", not fe_type.order = "           \
+                                  << base_fe_type.order);
 
               libMesh::err
                 << "WARNING: Finite element "

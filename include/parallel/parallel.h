@@ -1152,8 +1152,9 @@ public:
 // FakeCommunicator for debugging inappropriate CommWorld uses
 class FakeCommunicator
 {
-  operator Communicator& () {
-    libmesh_error();
+  operator Communicator& ()
+  {
+    libmesh_not_implemented();
     static Communicator temp;
     return temp;
   }

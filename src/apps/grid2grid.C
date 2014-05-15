@@ -46,13 +46,7 @@ int main (int argc, char** argv)
   const unsigned int dim = 3;
 
   if (argc < 6)
-    {
-      libMesh::err << "Usage: " << argv[0]
-                   << " ivar m0.mesh m1.mesh s0.soln s1.soln"
-                   << std::endl;
-
-      libmesh_error();
-    }
+    libmesh_error_msg("Usage: " << argv[0] << " ivar m0.mesh m1.mesh s0.soln s1.soln");
 
   // declare the coarse and fine meshes.
   Mesh mesh_coarse(init.comm(), dim);

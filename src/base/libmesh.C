@@ -121,14 +121,10 @@ void libmesh_handleFPE(int /*signo*/, siginfo_t *info, void * /*context*/)
     }
   libMesh::err << ")!" << std::endl;
 
-  libMesh::err << std::endl;
-  libMesh::err << "To track this down, compile debug version, start debugger, set breakpoint for 'libmesh_handleFPE' and run" << std::endl;
-  libMesh::err << "In gdb do:" << std::endl;
-  libMesh::err << "  break libmesh_handleFPE" << std::endl;
-  libMesh::err << "  run ..." << std::endl;
-  libMesh::err << "  bt" << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("\nTo track this down, compile in debug mode, then in gdb do:\n" \
+                    << "  break libmesh_handleFPE\n"                    \
+                    << "  run ...\n"                                    \
+                    << "  bt");
 }
 }
 
@@ -137,7 +133,7 @@ void libmesh_handleFPE(int /*signo*/, siginfo_t *info, void * /*context*/)
 #ifdef LIBMESH_HAVE_MPI
 void libMesh_MPI_Handler (MPI_Comm *, int *, ...)
 {
-  libmesh_error();
+  libmesh_not_implemented();
 }
 #endif
 

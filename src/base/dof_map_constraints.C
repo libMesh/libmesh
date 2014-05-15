@@ -581,7 +581,7 @@ private:
                   }
               }
             else
-              libmesh_error();
+              libmesh_error_msg("Unknown continuity cont = " << cont);
           }
 
         // In 3D, project any edge values next
@@ -643,7 +643,7 @@ private:
                         break;
                       }
                     default:
-                      libmesh_error();
+                      libmesh_error_msg("Unknown field type!");
                     }
 
                   if (cont == C_ONE)
@@ -763,7 +763,7 @@ private:
                         break;
                       }
                     default:
-                      libmesh_error();
+                      libmesh_error_msg("Unknown field type!");
                     }
 
                   if (cont == C_ONE)
@@ -891,7 +891,7 @@ public:
               break;
             }
           default:
-            libmesh_error();
+            libmesh_error_msg("Unknown field type!");
           }
 
       }
@@ -1100,11 +1100,7 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
   // Optionally allow the user to overwrite constraints.  Defaults to false.
   if (forbid_constraint_overwrite)
     if (this->is_constrained_dof(dof_number))
-      {
-        libMesh::err << "ERROR: DOF " << dof_number << " was already constrained!"
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: DOF " << dof_number << " was already constrained!");
 
   _dof_constraints.insert(std::make_pair(dof_number, constraint_row));
   _primal_constraint_values.insert(std::make_pair(dof_number, constraint_rhs));
@@ -1121,11 +1117,7 @@ void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
   if (forbid_constraint_overwrite)
     {
       if (!this->is_constrained_dof(dof_number))
-        {
-          libMesh::err << "ERROR: DOF " << dof_number << " has no corresponding primal constraint!"
-                       << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR: DOF " << dof_number << " has no corresponding primal constraint!");
 #ifndef NDEBUG
       // No way to do this without a non-normalized tolerance?
       /*
@@ -1878,11 +1870,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
       v_global = v;
     }
   else // unknown v->type()
-    {
-      libMesh::err << "ERROR: Unknown v->type() == " << v->type()
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Unknown v->type() == " << v->type());
 
   // We should never hit these asserts because we should error-out in
   // else clause above.  Just to be sure we don't try to use v_local
@@ -1980,11 +1968,7 @@ void DofMap::enforce_adjoint_constraints_exactly
       v_global = &v;
     }
   else // unknown v.type()
-    {
-      libMesh::err << "ERROR: Unknown v.type() == " << v.type()
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Unknown v.type() == " << v.type());
 
   // We should never hit these asserts because we should error-out in
   // else clause above.  Just to be sure we don't try to use v_local

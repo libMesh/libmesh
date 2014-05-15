@@ -643,7 +643,7 @@ unique_id_type & DofObject::set_unique_id ()
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   return _unique_id;
 #else
-  libmesh_error();
+  libmesh_not_implemented();
 #endif
 }
 
@@ -934,8 +934,7 @@ unsigned int DofObject::var_to_vg (const unsigned int s,
       if (var < vg_end) return vg;
     }
 
-  // we should never get here
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 

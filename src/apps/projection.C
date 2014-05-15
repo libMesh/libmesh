@@ -147,10 +147,7 @@ int main(int argc, char** argv)
   else if (solnname.rfind(".xda") < solnname.size())
     read_mode = READ;
   else
-    {
-      libMesh::err << "Unrecognized file extension on " << solnname << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Unrecognized file extension on " << solnname);
 
   old_es.read(solnname, read_mode,
               EquationSystems::READ_HEADER |

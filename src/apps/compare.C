@@ -332,12 +332,10 @@ int main (int argc, char** argv)
 
 
   if (dim == static_cast<unsigned int>(-1))
-    {
-      libMesh::out << "ERROR:  you must specify the dimension on "
-                   << "the command line!\n\n"
-                   << argv[0] << " -d 3 ... for example\n\n";
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR:  you must specify the dimension on "      \
+                      << "the command line!\n\n"                        \
+                      << argv[0]                                        \
+                      << " -d 3 ... for example");
 
   if (quiet)
     verbose = false;
@@ -389,10 +387,7 @@ int main (int argc, char** argv)
       right_system.read (names[2], format);
     }
   else
-    {
-      libMesh::out << "Bad input specified." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Bad input specified.");
 
   are_equal = do_compare (left_system, right_system, threshold, verbose);
 

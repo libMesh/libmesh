@@ -136,11 +136,10 @@ AutoPtr<Base> Factory<Base>::build (const std::string& name)
              it = factory_map().begin(); it != factory_map().end(); ++it)
         libMesh::err << "  " << it->first << std::endl;
 
-      libmesh_error();
+      libmesh_error_msg("Exiting...");
 
-      // Do this the stoopid way for IBM xlC
+      // We'll never get here
       AutoPtr<Base> ret_val (NULL);
-
       return ret_val;
     }
 
