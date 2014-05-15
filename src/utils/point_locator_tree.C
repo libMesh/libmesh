@@ -156,11 +156,7 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
           if (my_master->initialized())
             this->_tree = my_master->_tree;
           else
-            {
-              libMesh::err << "ERROR: Initialize master first, then servants!"
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Initialize master first, then servants!");
         }
 
 
@@ -196,12 +192,12 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
 
       if (this->_element == NULL)
         {
-          /* No element seems to contain this point.  If out-of-mesh
-             mode is enabled, just return NULL.  If not, however, we
-             have to perform a linear search before we call \p
-             libmesh_error() since in the case of curved elements, the
-             bounding box computed in \p TreeNode::insert(const
-             Elem*) might be slightly inaccurate.  */
+          // No element seems to contain this point.  If out-of-mesh
+          // mode is enabled, just return NULL.  If not, however, we
+          // have to perform a linear search before we throw an
+          // error, since in the case of curved elements, the
+          // bounding box computed in \p TreeNode::insert(const
+          // Elem*) might be slightly inaccurate.
           if(!_out_of_mesh_mode)
             {
               START_LOG("linear search", "PointLocatorTree");
@@ -216,18 +212,13 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
                     return this->_element = (*pos);
                   }
 
-              /*
-                if (this->_element == NULL)
-                {
-                libMesh::err << std::endl
-                << " ******** Serious Problem.  Could not find an Element "
-                << "in the Mesh"
-                << std:: endl
-                << " ******** that contains the Point "
-                << p;
-                libmesh_error();
-                }
-              */
+              // if (this->_element == NULL)
+              // {
+              // libmesh_error_msg(<< " ******** Serious Problem.  Could not find an Element "
+              // << "in the Mesh\n"
+              // << " ******** that contains the Point "
+              // << p);
+              // }
               STOP_LOG("linear search", "PointLocatorTree");
             }
         }
@@ -257,10 +248,7 @@ void PointLocatorTree::enable_out_of_mesh_mode (void)
       const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
       for ( ; pos != end_pos; ++pos)
         if (!(*pos)->has_affine_map())
-          {
-            libMesh::err << "ERROR: Out-of-mesh mode is currently only supported if all elements have affine mappings." << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("ERROR: Out-of-mesh mode is currently only supported if all elements have affine mappings.");
 #endif
 
       _out_of_mesh_mode = true;

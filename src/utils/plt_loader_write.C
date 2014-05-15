@@ -564,11 +564,7 @@ void PltLoader::write_dat (const std::string& name,
 
       // Otherwise, unrecognized zone type
       else
-        {
-          libMesh::err << "Unrecognized zone type: ";
-          libMesh::err << "this->zone_type(z)==" << this->zone_type(z) << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Unrecognized zone type: this->zone_type(z)==" << this->zone_type(z));
     }
 }
 

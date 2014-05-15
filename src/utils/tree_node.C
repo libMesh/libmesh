@@ -289,9 +289,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
             }
 
           default:
-            libMesh::err << "c >= N! : " << c
-                         << std::endl;
-            libmesh_error();
+            libmesh_error_msg("c >= N! : " << c);
           }
 
 
@@ -342,9 +340,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
             }
 
           default:
-            libMesh::err << "c >= N!" << std::endl;
-            libmesh_error();
-
+            libmesh_error_msg("c >= N!");
           }
 
         break;
@@ -372,8 +368,7 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
             }
 
           default:
-            libMesh::err << "c >= N!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("c >= N!");
           }
 
         break;
@@ -381,14 +376,10 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 
 
     default:
-      libMesh::err << "Only implemented for Octrees, QuadTrees, and Binary Trees!" << std::endl;
-      libmesh_error();
-
+      libmesh_error_msg("Only implemented for Octrees, QuadTrees, and Binary Trees!");
     }
 
-  // How did we get here?
-  libmesh_error();
-
+  libmesh_error_msg("We'll never get here!");
   Point min, max;
   return std::make_pair (min, max);
 }
@@ -538,12 +529,7 @@ const Elem* TreeNode<N>::find_element(const Point& p) const
   else
     return this->find_element_in_children(p);
 
-
-
-  // Should never get here.  See if-else structure
-  // above with return statements that must get executed.
-  libmesh_error();
-
+  libmesh_error_msg("We'll never get here!");
   return NULL;
 }
 

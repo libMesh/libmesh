@@ -92,9 +92,7 @@ void PointLocatorList::init ()
     }
 
   else
-
     {
-
       if (this->_master == NULL)
         {
           START_LOG("init(no master)", "PointLocatorList");
@@ -137,15 +135,9 @@ void PointLocatorList::init ()
           if (my_master->initialized())
             this->_list = my_master->_list;
           else
-            {
-              libMesh::err << "ERROR: Initialize master first, then servants!"
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Initialize master first, then servants!");
         }
-
     }
-
 
   // ready for take-off
   this->_initialized = true;

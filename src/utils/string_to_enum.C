@@ -620,7 +620,7 @@ namespace Utility {
     init_enum_to_##VAR_NAME ();                                         \
                                                                         \
     if (!enum_to_##VAR_NAME .count(e))                                  \
-      libmesh_error();                                                  \
+      libmesh_error_msg("No " #ENUM_NAME " with enumeration " << e << " found."); \
                                                                         \
     return enum_to_##VAR_NAME [e];                                      \
   }

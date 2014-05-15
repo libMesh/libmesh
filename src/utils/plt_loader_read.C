@@ -36,12 +36,7 @@ void PltLoader::read (const std::string& name)
   std::ifstream in (name.c_str(), std::ios::in|std::ios::binary);
 
   if (!in.good())
-    {
-      libMesh::err << "Error reading input file " << name
-                   << std::endl;
-
-      libmesh_error();
-    }
+    libmesh_error_msg("Error reading input file " << name);
 
 
   if (this->verbose())
@@ -197,11 +192,7 @@ void PltLoader::read_header (std::istream& in)
 
             // Did we overrun the file?
             if (!in.good())
-              {
-                libMesh::err << "ERROR: Unexpected end-of-file!"
-                             << std::endl;
-                libmesh_error();
-              }
+              libmesh_error_msg("ERROR: Unexpected end-of-file!");
 
             // Found a Zone marker
             else if (f == 299.)
@@ -403,11 +394,7 @@ void PltLoader::read_header (std::istream& in)
 
             // Did we overrun the file?
             if (!in.good())
-              {
-                libMesh::err << "ERROR: Unexpected end-of-file!"
-                             << std::endl;
-                libmesh_error();
-              }
+              libmesh_error_msg("ERROR: Unexpected end-of-file!");
 
             // Found a Zone marker
             else if (f == 299.)
@@ -560,13 +547,7 @@ void PltLoader::read_header (std::istream& in)
   //----------------------------------------------------
   // Unrecognized Tecplot Version!
   else
-    {
-      libMesh::err << "ERROR:  This plot file was written by an unrecognized version of Tecplot!:"
-                   << std::endl
-                   << this->version()
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR:  This plot file was written by an unrecognized version of Tecplot!:\n" << this->version());
 
 
 
@@ -661,11 +642,7 @@ void PltLoader::read_data (std::istream& in)
 
           // Did we overrun the file?
           if (!in.good())
-            {
-              libMesh::err << "ERROR: Unexpected end-of-file!"
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unexpected end-of-file!");
 
           // Get the number of repeated vars.
           unsigned int n_rep_vars=0;
@@ -681,9 +658,7 @@ void PltLoader::read_data (std::istream& in)
             // Get the repeated variables number.
             for (unsigned int v=0; v<n_rep_vars; v++)
               {
-                libMesh::err << "ERROR:  I don't understand repeated variables yet!"
-                             << std::endl;
-                libmesh_error();
+                libmesh_error_msg("ERROR:  I don't understand repeated variables yet!");
 
                 in.read (buf, LIBMESH_SIZEOF_INT);
                 std::memcpy  (&rep_vars[v], buf, LIBMESH_SIZEOF_INT);
@@ -745,12 +720,7 @@ void PltLoader::read_data (std::istream& in)
               }
 
             default:
-              {
-                libMesh::err << "ERROR: Unsupported Zone type: "
-                             << this->zone_type(zone)
-                             << std::endl;
-                libmesh_error();
-              }
+              libmesh_error_msg("ERROR: Unsupported Zone type: " << this->zone_type(zone));
             } // end switch on zone type
         }
 
@@ -773,11 +743,7 @@ void PltLoader::read_data (std::istream& in)
 
           // Did we overrun the file?
           if (!in.good())
-            {
-              libMesh::err << "ERROR: Unexpected end-of-file!"
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unexpected end-of-file!");
 
           // Get the variable data type
           for (unsigned int v=0; v<this->n_vars(); v++)
@@ -807,11 +773,7 @@ void PltLoader::read_data (std::istream& in)
                     rb(sv);
 
                     if (sv != -1)
-                      {
-                        libMesh::err << "ERROR:  I don't understand variable sharing!"
-                                     << std::endl;
-                        libmesh_error();
-                      }
+                      libmesh_error_msg("ERROR:  I don't understand variable sharing!");
                   }
               }
           }
@@ -839,7 +801,7 @@ void PltLoader::read_data (std::istream& in)
                 this->read_point_data (in, zone);
 
               else
-                libmesh_error();
+                libmesh_error_msg("Unrecognized zone_pack(zone) = " << this->zone_pack(zone));
             }
           else
             {
@@ -852,7 +814,7 @@ void PltLoader::read_data (std::istream& in)
                 this->read_fepoint_data (in, zone);
 
               else
-                libmesh_error();
+                libmesh_error_msg("Unrecognized zone_pack(zone) = " << this->zone_pack(zone));
             }
         }
 
@@ -861,13 +823,7 @@ void PltLoader::read_data (std::istream& in)
       //----------------------------------------------------
       // Unrecognized Tecplot Version!
       else
-        {
-          libMesh::err << "ERROR:  This plot file was written by an unrecognized version of Tecplot!:"
-                       << std::endl
-                       << this->version()
-                       << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR:  This plot file was written by an unrecognized version of Tecplot!:\n" << this->version());
 
     } // end loop on zones
 }
@@ -931,12 +887,7 @@ void PltLoader::read_block_data (std::istream& in, const unsigned int zone)
           }
 
         default:
-          {
-            libMesh::err << "ERROR: Unsupported data type: "
-                         << this->var_type(var)
-                         << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("ERROR: Unsupported data type: " << this->var_type(var));
         }
     }
 }
@@ -991,12 +942,7 @@ void PltLoader::read_point_data (std::istream& in, const unsigned int zone)
               _data[zone][var].push_back(d);
             }
           else
-            {
-              libMesh::err << "ERROR: unsupported data type: "
-                           << this->var_type(var)
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: unsupported data type: " << this->var_type(var));
 }
 
 
@@ -1049,12 +995,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
           }
 
         default:
-          {
-            libMesh::err << "ERROR: Unsupported data type: "
-                         << this->var_type(var)
-                         << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("ERROR: Unsupported data type: " << this->var_type(var));
         }
     }
 
@@ -1066,11 +1007,7 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
     rb(rep);
 
     if (rep == 1 && this->n_zones() > 1)
-      {
-        libMesh::err << "ERROR:  Repeated connectivity not supported!"
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR:  Repeated connectivity not supported!");
 
     // Read the connectivity
     else
@@ -1134,12 +1071,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
           _data[zone][var].push_back(d);
         }
       else
-        {
-          libMesh::err << "ERROR: unsupported data type: "
-                       << this->var_type(var)
-                       << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("ERROR: unsupported data type: " << this->var_type(var));
 
   // Read the connectivity
   {
@@ -1150,11 +1082,7 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
     rb(rep);
 
     if (rep == 1)
-      {
-        libMesh::err << "ERROR:  Repeated connectivity not supported!"
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR:  Repeated connectivity not supported!");
 
     // Read the connectivity
     else

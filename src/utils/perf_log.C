@@ -72,16 +72,11 @@ void PerfLog::clear()
       for (std::map<std::pair<std::string,std::string>, PerfData>::iterator
              pos = log.begin(); pos != log.end(); ++pos)
         if (pos->second.open)
-          {
-            libMesh::out
-              << "ERROR clearning performance log for class "
-              << label_name << std::endl
-              << "event " << pos->first.second << " is still being monitored!"
-              << std::endl;
-
-            libmesh_error();
-          }
-
+          libmesh_error_msg("ERROR clearning performance log for class " \
+                            << label_name                             \
+                            << "\nevent "                             \
+                            << pos->first.second                      \
+                            << " is still being monitored!");
 
       gettimeofday (&tstart, NULL);
 

@@ -35,6 +35,7 @@
 #include <map>
 #include <string>
 #include <typeinfo>
+#include <sstream>
 
 namespace libMesh
 {
@@ -434,15 +435,17 @@ const T& Parameters::get (const std::string& name) const
 {
   if (!this->have_parameter<T>(name))
     {
-      libMesh::err << "ERROR: no"
-#ifdef LIBMESH_HAVE_RTTI
-                   << ' ' << demangle(typeid(T).name())
-#endif // LIBMESH_HAVE_RTTI
-                   << " parameter named \""
-                   << name << "\":" << std::endl
-                   << *this;
+      std::ostringstream oss;
 
-      libmesh_error();
+      oss << "ERROR: no";
+#ifdef LIBMESH_HAVE_RTTI
+      oss << ' ' << demangle(typeid(T).name());
+#endif
+      oss << " parameter named \""
+          << name << "\":\n"
+          << *this;
+
+      libmesh_error_msg(oss.str());
     }
 
   Parameters::const_iterator it = _values.find(name);

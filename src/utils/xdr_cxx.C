@@ -49,10 +49,7 @@ void bzip_file (const std::string &unzipped_name)
 
   STOP_LOG("system(bzip2)", "XdrIO");
 #else
-  libMesh::err << "ERROR: need bzip2/bunzip2 to create "
-               << unzipped_name << ".bz2"
-               << std::endl;
-  libmesh_error();
+  libmesh_error_msg("ERROR: need bzip2/bunzip2 to create " << unzipped_name << ".bz2");
 #endif
 }
 
@@ -74,9 +71,7 @@ std::string unzip_file (const std::string &name)
         libmesh_file_error(system_string);
       STOP_LOG("system(bunzip2)", "XdrIO");
 #else
-      libMesh::err << "ERROR: need bzip2/bunzip2 to open .bz2 file "
-                   << name << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: need bzip2/bunzip2 to open .bz2 file " << name);
 #endif
     }
   else if (name.size() - name.rfind(".xz") == 3)
@@ -91,9 +86,7 @@ std::string unzip_file (const std::string &name)
         libmesh_file_error(system_string);
       STOP_LOG("system(xz -d)", "XdrIO");
 #else
-      libMesh::err << "ERROR: need xz to open .xz file "
-                   << name << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: need xz to open .xz file " << name);
 #endif
     }
   return new_name;
@@ -111,10 +104,7 @@ void xzip_file (const std::string &unzipped_name)
 
   STOP_LOG("system(xz)", "XdrIO");
 #else
-  libMesh::err << "ERROR: need xz to create "
-               << unzipped_name << ".xz"
-               << std::endl;
-  libmesh_error();
+  libmesh_error_msg("ERROR: need xz to create " << unzipped_name << ".xz");
 #endif
 }
 
@@ -194,13 +184,9 @@ void Xdr::open (const std::string& name)
         xdrstdio_create (xdrs, fp, (mode == ENCODE) ? XDR_ENCODE : XDR_DECODE);
 #else
 
-        libMesh::err << "ERROR: Functionality is not available." << std::endl
-                     << "Make sure LIBMESH_HAVE_XDR is defined at build time"
-                     << std::endl
-                     << "The XDR interface is not available in this installation"
-                     << std::endl;
-
-        libmesh_error();
+        libmesh_error_msg("ERROR: Functionality is not available.\n" \
+                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
+                          << "The XDR interface is not available in this installation");
 
 #endif
         return;
@@ -221,9 +207,7 @@ void Xdr::open (const std::string& name)
             in.reset(inf);
             inf->open(name.c_str(), std::ios::in);
 #else
-            libMesh::err << "ERROR: need gzstream to handle .gz files!!!"
-                         << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
 #endif
           }
         else
@@ -258,9 +242,7 @@ void Xdr::open (const std::string& name)
             out.reset(outf);
             outf->open(name.c_str(), std::ios::out);
 #else
-            libMesh::err << "ERROR: need gzstream to handle .gz files!!!"
-                         << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
 #endif
           }
         else
@@ -286,7 +268,7 @@ void Xdr::open (const std::string& name)
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid mode = " << mode);
     }
 }
 
@@ -316,13 +298,9 @@ void Xdr::close ()
           }
 #else
 
-        libMesh::err << "ERROR: Functionality is not available." << std::endl
-                     << "Make sure LIBMESH_HAVE_XDR is defined at build time"
-                     << std::endl
-                     << "The XDR interface is not available in this installation"
-                     << std::endl;
-
-        libmesh_error();
+        libmesh_error_msg("ERROR: Functionality is not available.\n" \
+                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
+                          << "The XDR interface is not available in this installation");
 
 #endif
         file_name = "";
@@ -359,7 +337,7 @@ void Xdr::close ()
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid mode = " << mode);
     }
 }
 
@@ -382,13 +360,9 @@ bool Xdr::is_open() const
 
 #else
 
-        libMesh::err << "ERROR: Functionality is not available." << std::endl
-                     << "Make sure LIBMESH_HAVE_XDR is defined at build time"
-                     << std::endl
-                     << "The XDR interface is not available in this installation"
-                     << std::endl;
-
-        libmesh_error();
+        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
+                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
+                          << "The XDR interface is not available in this installation");
 
         return false;
 
@@ -411,7 +385,7 @@ bool Xdr::is_open() const
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid mode = " << mode);
     }
 
   return false;
@@ -652,13 +626,9 @@ void Xdr::data (T& a, const char* comment_in)
 
 #else
 
-        libMesh::err << "ERROR: Functionality is not available." << std::endl
-                     << "Make sure LIBMESH_HAVE_XDR is defined at build time"
-                     << std::endl
-                     << "The XDR interface is not available in this installation"
-                     << std::endl;
-
-        libmesh_error();
+        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
+                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
+                          << "The XDR interface is not available in this installation");
 
 #endif
         return;
@@ -686,7 +656,7 @@ void Xdr::data (T& a, const char* comment_in)
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid mode = " << mode);
     }
 }
 
@@ -723,13 +693,9 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 
 #else
 
-        libMesh::err << "ERROR: Functionality is not available." << std::endl
-                     << "Make sure LIBMESH_HAVE_XDR is defined at build time"
-                     << std::endl
-                     << "The XDR interface is not available in this installation"
-                     << std::endl;
-
-        libmesh_error();
+        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
+                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
+                          << "The XDR interface is not available in this installation");
 
 #endif
         return;
@@ -765,13 +731,9 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
 
 #else
 
-        libMesh::err << "ERROR: Functionality is not available." << std::endl
-                     << "Make sure LIBMESH_HAVE_XDR is defined at build time"
-                     << std::endl
-                     << "The XDR interface is not available in this installation"
-                     << std::endl;
-
-        libmesh_error();
+        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
+                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
+                          << "The XDR interface is not available in this installation");
 
 #endif
         return;
@@ -825,7 +787,7 @@ void Xdr::data_stream (T *val, const unsigned int len, const unsigned int line_b
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid mode = " << mode);
     }
 }
 
@@ -852,13 +814,9 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 
 #else
 
-        libMesh::err << "ERROR: Functionality is not available." << std::endl
-                     << "Make sure LIBMESH_HAVE_XDR is defined at build time"
-                     << std::endl
-                     << "The XDR interface is not available in this installation"
-                     << std::endl;
-
-        libmesh_error();
+        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
+                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
+                          << "The XDR interface is not available in this installation");
 
 #endif
         return;
@@ -924,7 +882,7 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid mode = " << mode);
     }
 }
 
@@ -950,13 +908,9 @@ void Xdr::data_stream (float *val, const unsigned int len, const unsigned int li
 
 #else
 
-        libMesh::err << "ERROR: Functionality is not available." << std::endl
-                     << "Make sure LIBMESH_HAVE_XDR is defined at build time"
-                     << std::endl
-                     << "The XDR interface is not available in this installation"
-                     << std::endl;
-
-        libmesh_error();
+        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
+                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
+                          << "The XDR interface is not available in this installation");
 
 #endif
         return;
@@ -1022,7 +976,7 @@ void Xdr::data_stream (float *val, const unsigned int len, const unsigned int li
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid mode = " << mode);
     }
 }
 template <>
@@ -1074,13 +1028,9 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 
 #else
 
-        libMesh::err << "ERROR: Functionality is not available." << std::endl
-                     << "Make sure LIBMESH_HAVE_XDR is defined at build time"
-                     << std::endl
-                     << "The XDR interface is not available in this installation"
-                     << std::endl;
-
-        libmesh_error();
+        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
+                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
+                          << "The XDR interface is not available in this installation");
 
 #endif
         return;
@@ -1146,7 +1096,7 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid mode = " << mode);
     }
 }
 
@@ -1194,13 +1144,9 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
           }
 #else
 
-        libMesh::err << "ERROR: Functionality is not available." << std::endl
-                     << "Make sure LIBMESH_HAVE_XDR is defined at build time"
-                     << std::endl
-                     << "The XDR interface is not available in this installation"
-                     << std::endl;
-
-        libmesh_error();
+        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
+                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
+                          << "The XDR interface is not available in this installation");
 
 #endif
         return;
@@ -1271,7 +1217,7 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid mode = " << mode);
     }
 }
 
@@ -1322,13 +1268,9 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
           }
 #else
 
-        libMesh::err << "ERROR: Functionality is not available." << std::endl
-                     << "Make sure LIBMESH_HAVE_XDR is defined at build time"
-                     << std::endl
-                     << "The XDR interface is not available in this installation"
-                     << std::endl;
-
-        libmesh_error();
+        libmesh_error_msg("ERROR: Functionality is not available.\n"    \
+                          << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
+                          << "The XDR interface is not available in this installation");
 
 #endif
         return;
@@ -1401,7 +1343,7 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid mode = " << mode);
     }
 }
 #endif // # LIBMESH_USE_COMPLEX_NUMBERS
@@ -1433,7 +1375,7 @@ void Xdr::comment (std::string &comment_in)
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid mode = " << mode);
     }
 }
 

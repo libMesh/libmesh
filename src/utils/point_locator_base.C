@@ -74,13 +74,10 @@ AutoPtr<PointLocatorBase> PointLocatorBase::build (const PointLocatorType t,
       }
 
     default:
-      {
-        libMesh::err << "ERROR: Bad PointLocatorType = " << t << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Bad PointLocatorType = " << t);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   AutoPtr<PointLocatorBase> ap(NULL);
   return ap;
 }

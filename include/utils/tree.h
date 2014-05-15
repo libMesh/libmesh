@@ -146,7 +146,7 @@ Tree<N>::Tree (const Tree<N>& other_tree) :
   root       (other_tree.root),
   build_type (other_tree.build_type)
 {
-  libmesh_error();
+  libmesh_not_implemented();
 }
 
 
