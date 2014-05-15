@@ -4,8 +4,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_TETGEN],
 [
   AC_ARG_ENABLE(tetgen,
-                AC_HELP_STRING([--enable-tetgen],
-                               [build with TetGen tetrahedrization library support]),
+                AC_HELP_STRING([--disable-tetgen],
+                               [build without TetGen tetrahedrization library support]),
 		[case "${enableval}" in
 		  yes)  enabletetgen=yes ;;
 		   no)  enabletetgen=no ;;

@@ -4,8 +4,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_TBB],
 [
   AC_ARG_ENABLE(tbb,
-                AC_HELP_STRING([--enable-tbb],
-                               [build with threading support via Threading Building Blocks]),
+                AC_HELP_STRING([--disable-tbb],
+                               [build without threading support via Threading Building Blocks]),
 		[case "${enableval}" in
 		  yes)  enabletbb=yes ;;
 		   no)  enabletbb=no ;;

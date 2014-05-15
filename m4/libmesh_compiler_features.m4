@@ -65,8 +65,8 @@ AC_C_RESTRICT
 # --disable-getpwuid.
 # --------------------------------------------------------------
 AC_ARG_ENABLE(getpwuid,
-              AC_HELP_STRING([--enable-getpwuid],
-                             [allow calls to getpwuid]),
+              AC_HELP_STRING([--disable-getpwuid],
+                             [do not make calls to getpwuid]),
               enablegetpwuid=$enableval,
               enablegetpwuid=yes)
 
@@ -83,8 +83,8 @@ fi
 # C++ exceptions - enabled by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(exceptions,
-              AC_HELP_STRING([--enable-exceptions],
-                             [throw exceptions on unexpected errors]),
+              AC_HELP_STRING([--disable-exceptions],
+                             [exit rather than throw exceptions on unexpected errors]),
               enableexceptions=$enableval,
               enableexceptions=yes)
 
@@ -139,8 +139,8 @@ AC_CHECK_HEADERS(xmmintrin.h)
 AC_HAVE_FEEXCEPT
 
 AC_ARG_ENABLE(unordered-containers,
-              AC_HELP_STRING([--enable-unordered-containers],
-                             [Use unordered_map/unordered_set if available]),
+              AC_HELP_STRING([--disable-unordered-containers],
+                             [Use map/set instead of unordered_map/unordered_set]),
               enableunorderedcontainers=$enableval,
               enableunorderedcontainers=yes)
 
@@ -166,8 +166,8 @@ AX_CXX_GLIBC_BACKTRACE
 # OpenMP Support  -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(openmp,
-             AC_HELP_STRING([--enable-openmp],
-                            [Build with OpenMP Support]),
+             AC_HELP_STRING([--disable-openmp],
+                            [Build without OpenMP Support]),
              enableopenmp=$enableval,
              enableopenmp=yes)
 if (test "$enableopenmp" != no) ; then

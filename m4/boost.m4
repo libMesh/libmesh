@@ -5,8 +5,8 @@
 AC_DEFUN([CONFIGURE_BOOST],
 [
   AC_ARG_ENABLE(boost,
-                AC_HELP_STRING([--enable-boost],
-                               [build with either external or built-in BOOST support]),
+                AC_HELP_STRING([--disable-boost],
+                               [build without either external or built-in BOOST support]),
    	        [case "${enableval}" in
   	      	  yes)  enableboost=yes ;;
   		   no)  enableboost=no ;;

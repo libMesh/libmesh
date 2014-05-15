@@ -449,8 +449,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_TRILINOS],
 [
   AC_ARG_ENABLE(trilinos,
-                AC_HELP_STRING([--enable-trilinos],
-                               [build with Trilinos support]),
+                AC_HELP_STRING([--disable-trilinos],
+                               [build without Trilinos support]),
 		[case "${enableval}" in
 		  yes)  enabletrilinos=yes ;;
 		   no)  enabletrilinos=no ;;

@@ -10,8 +10,8 @@
 AC_DEFUN([CONFIGURE_GLPK],
 [
   AC_ARG_ENABLE(glpk,
-                AC_HELP_STRING([--enable-glpk],
-                               [build with GLPK support]),
+                AC_HELP_STRING([--disable-glpk],
+                               [build without GLPK support]),
 		[case "${enableval}" in
 		  yes)  enableglpk=yes ;;
 		   no)  enableglpk=no ;;

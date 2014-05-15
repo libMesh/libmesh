@@ -4,8 +4,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_LASPACK],
 [
   AC_ARG_ENABLE(laspack,
-                AC_HELP_STRING([--enable-laspack],
-                               [build with LASPACK iterative solver suppport]),
+                AC_HELP_STRING([--disable-laspack],
+                               [build without LASPACK iterative solver suppport]),
 		[case "${enableval}" in
 		  yes)  enablelaspack=yes ;;
 		   no)  enablelaspack=no ;;
