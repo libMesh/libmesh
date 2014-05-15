@@ -21,6 +21,7 @@
 #define LIBMESH_FE_BASE_H
 
 // Local includes
+#include "libmesh/libmesh_common.h"
 #include "libmesh/auto_ptr.h"
 #include "libmesh/compare_types.h"
 #include "libmesh/enum_elem_type.h"
