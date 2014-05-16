@@ -50,7 +50,7 @@ protected:
                      const std::vector<std::string>* additional_vars=NULL,
                      const std::vector<Output>* initial_vals=NULL)
     : _expression(expression),
-      _n_vars(sys.n_variables())
+      _n_vars(sys.n_vars())
   {
     std::string variables = "x";
 #if LIBMESH_DIM > 1
@@ -63,7 +63,7 @@ protected:
 
     _spacetime.resize(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0));
 
-    for (unsigned int v=0; v != _n_vars)
+    for (unsigned int v=0; v != _n_vars; ++v)
       {
         variables += ',';
         variables += sys.variable_name(v);
@@ -186,7 +186,7 @@ public:
 #endif
     _spacetime[LIBMESH_DIM] = time;
 
-    for (unsigned int v=0; v != _n_vars)
+    for (unsigned int v=0; v != _n_vars; ++v)
       {
         c.point_value(v, p, _spacetime[LIBMESH_DIM+1+v]);
       }
@@ -203,7 +203,7 @@ public:
    * Returns in \p output the values of the data at the
    * coordinate \p p and for time \p time.
    */
-  void operator() (const FEMContext&, const Point& p,
+  void operator() (const FEMContext& c, const Point& p,
                    const Real time,
                    DenseVector<Output>& output)
   {
@@ -216,7 +216,7 @@ public:
 #endif
     _spacetime[LIBMESH_DIM] = time;
 
-    for (unsigned int v=0; v != _n_vars)
+    for (unsigned int v=0; v != _n_vars; ++v)
       {
         c.point_value(v, p, _spacetime[LIBMESH_DIM+1+v]);
       }
@@ -238,7 +238,7 @@ public:
    */
   virtual Output component(const FEMContext& c, unsigned int i,
                            const Point& p,
-                           Real time=0.);
+                           Real time=0.)
   {
     _spacetime[0] = p(0);
 #if LIBMESH_DIM > 1
@@ -249,7 +249,7 @@ public:
 #endif
     _spacetime[LIBMESH_DIM] = time;
 
-    for (unsigned int v=0; v != _n_vars)
+    for (unsigned int v=0; v != _n_vars; ++v)
       {
         c.point_value(v, p, _spacetime[LIBMESH_DIM+1+v]);
       }
