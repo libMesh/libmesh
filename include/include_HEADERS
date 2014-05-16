@@ -223,6 +223,7 @@ include_HEADERS =  \
         numerics/fem_function_base.h \
         numerics/function_base.h \
         numerics/numeric_vector.h \
+        numerics/parsed_fem_function.h \
         numerics/parsed_function.h \
         numerics/petsc_macro.h \
         numerics/petsc_matrix.h \
