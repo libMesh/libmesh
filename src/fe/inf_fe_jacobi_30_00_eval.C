@@ -239,12 +239,10 @@ Real jacobi_30_00_eval(Real v, unsigned i)
 
 
     default:
-      libMesh::err << "bad index i = " << i << std::endl;
-      libmesh_error();
-
+      libmesh_error_msg("bad index i = " << i);
     }
 
-  // we never end up here.
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 } // jacobi_30_00_eval()
 
@@ -448,12 +446,10 @@ Real jacobi_30_00_eval_deriv(Real v, unsigned i)
 
 
     default:
-      libMesh::err << "bad index i = " << i << std::endl;
-      libmesh_error();
-
+      libmesh_error_msg("bad index i = " << i);
     }
 
-  // we never end up here.
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 } // jacobi_30_00_eval_deriv()
 

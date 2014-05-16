@@ -40,8 +40,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
           return 1.;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -55,8 +54,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
           return v+1.;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -73,8 +71,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
           return -4.*(v+1.)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -94,8 +91,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
           return -13.5*(v+1.)*v*(v+.6666666666666667);
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -118,8 +114,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
           return -42.66666666666667*(v+1.)*v*(v+.75)*(v+.5);
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -145,8 +140,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
           return -130.2083333333333*(v+1.)*v*(v+.8)*(v+.6)*(v+.4);
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -175,8 +169,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
           return -388.8*(v+1.)*v*(v+.8333333333333333)*(v+.6666666666666667)*(v+.5)*(v+.3333333333333333);
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -257,8 +250,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
             (v+.2857142857142857);
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -293,8 +285,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
           return -3328.812698412698*(v+1.)*v*(v+.875)*(v+.75)*(v+.625)*(v+.5)*(v+.375)*(v+.25);
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -413,8 +404,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
             (v+.2222222222222222);
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -455,8 +445,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
           return -27557.31922398588*(v+1.)*v*(v+.9)*(v+.8)*(v+.7)*(v+.6)*(v+.5)*(v+.4)*(v+.3)*(v+.2);
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -621,8 +610,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
             (v+.1818181818181818);
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -813,8 +801,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
             (v+.1666666666666667);
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -1033,8 +1020,7 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
             (v+.1538461538461538);
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -1283,20 +1269,16 @@ Real lagrange_eval(Real v, Order o_radial, unsigned i)
             (v+.1428571428571429);
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
       // provided the constructor worked fine, we should never end up here.
     default:
-      libMesh::err << "Lagrange polynomials only defined up to 15. "
-                   << std::endl;
-      libmesh_error();
+      libmesh_error_msg("Lagrange polynomials only defined up to 15.");
     } // switch (o_radial)
 
-      // we never end up here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 } // lagrange_eval()
 
@@ -1316,8 +1298,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
           return 0.;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -1331,8 +1312,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
           return 1.;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -1349,8 +1329,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
           return -8.*v-4.;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -1370,8 +1349,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
           return -9.+(-45.-40.5*v)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -1394,8 +1372,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
           return -16.+(-138.6666666666667+(-288.-170.6666666666667*v)*v)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -1421,8 +1398,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
           return -25.+(-320.8333333333333+(-1109.375+(-1458.333333333333-651.0416666666667*v)*v)*v)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -1451,8 +1427,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
           return -36.+(-626.4+(-3132.+(-6696.+(-6480.-2332.8*v)*v)*v)*v)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -1524,8 +1499,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
                 (-26471.02500000002-8006.66805555556*v)*v)*v)*v)*v)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -1614,8 +1588,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
                  (-101944.8888888889-26630.50158730159*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -1723,8 +1696,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
                   (-375804.7071428573-86477.78772321433*v)*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -1853,8 +1825,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
                    (-1339285.714285714-275573.1922398588*v)*v)*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -2006,8 +1977,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
                     (-4645978.282255849-864866.7263891657*v)*v)*v)*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -2184,8 +2154,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
                      (-15765995.52000002-2680405.377662341*v)*v)*v)*v)*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -2389,8 +2358,7 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
                       (-52529953.82954764-8219964.997401437*v)*v)*v)*v)*v)*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
@@ -2623,20 +2591,16 @@ Real lagrange_eval_deriv(Real v, Order o_radial, unsigned i)
                        (-172329980.5646387-24982748.66173757*v)*v)*v)*v)*v)*v)*v)*v)*v)*v)*v)*v)*v;
 
         default:
-          libMesh::err << "bad index i = " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("bad index i = " << i);
         }
 
 
       // provided the constructor worked fine, we should never end up here.
     default:
-      libMesh::err << "Lagrange polynomials only defined up to 15. "
-                   << std::endl;
-      libmesh_error();
+      libmesh_error_msg("Lagrange polynomials only defined up to 15.");
     } // switch (o_radial)
 
-      // we never end up here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 } // lagrange_eval_deriv()
 

@@ -81,15 +81,10 @@ ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type (const ElemType type)
       return INVALID_ELEM;
 
     default:
-      {
-        libMesh::err << "ERROR: Unsupported element type!: " << type
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unsupported element type!: " << type);
     }
 
-
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return INVALID_ELEM;
 }
 
@@ -112,8 +107,7 @@ unsigned int InfFE<Dim,T_radial,T_base>::Base::n_base_mapping_sf (const ElemType
                                               base_mapping_order);
   else
     {
-      // whoa, cool infinite element!
-      libmesh_error();
+      libmesh_error_msg("Unsupported Dim = " << Dim);
       return 0;
     }
 }

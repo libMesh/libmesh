@@ -296,7 +296,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
       }
 #ifdef DEBUG
     default:
-      libmesh_error();
+      libmesh_error_msg("Unknown Dim = " << Dim);
 #endif
     }
 
@@ -339,10 +339,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
         }
     }
   else
-    {
-      libMesh::err << "compute_data() for 1-dimensional InfFE not implemented." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("compute_data() for 1-dimensional InfFE not implemented.");
 
 #else
 
@@ -375,10 +372,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
         }
     }
   else
-    {
-      libMesh::err << "compute_data() for 1-dimensional InfFE not implemented." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("compute_data() for 1-dimensional InfFE not implemented.");
 
 #endif
 }
@@ -467,10 +461,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
             }
 
           default:
-            {
-              libmesh_error();
-              return;
-            }
+            libmesh_error_msg("Unrecognized outer_node_index = " << outer_node_index);
           }
       }
 
@@ -537,10 +528,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
             }
 
           default:
-            {
-              libmesh_error();
-              return;
-            }
+            libmesh_error_msg("Unrecognized outer_node_index = " << outer_node_index);
           }
       }
 
@@ -586,21 +574,13 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
             }
 
           default:
-            {
-              libmesh_error();
-              return;
-            }
+            libmesh_error_msg("Unrecognized outer_node_index = " << outer_node_index);
           }
       }
 
 
     default:
-      {
-        libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type
-                     << ", node=" << outer_node_index << std::endl;
-        libmesh_error();
-        return;
-      }
+      libmesh_error_msg("ERROR: Bad infinite element type=" << inf_elem_type << ", node=" << outer_node_index);
     }
 }
 
@@ -693,12 +673,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_el
             break;
           }
         default:
-          {
-            libMesh::err << "ERROR: Bad infinite element type=" << inf_elem_type
-                         << ", node=" << outer_node_index << std::endl;
-            libmesh_error();
-            break;
-          }
+          libmesh_error_msg("ERROR: Bad infinite element type=" << inf_elem_type << ", node=" << outer_node_index);
         }
 
 
@@ -858,7 +833,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unrecognized inf_elem_type = " << inf_elem_type);
     }
 
 

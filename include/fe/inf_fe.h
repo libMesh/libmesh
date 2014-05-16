@@ -519,7 +519,7 @@ protected:
    */
   virtual void init_base_shape_functions(const std::vector<Point>&,
                                          const Elem*)
-  { libmesh_error(); }
+  { libmesh_not_implemented(); }
 
   /**
    * Some of the member data only depend on the radial part of the
@@ -858,8 +858,7 @@ Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
       return 0.;
 
     default:
-      libmesh_error();
-      return 0.;
+      libmesh_error_msg("Invalid Dim = " << Dim);
     }
 }
 

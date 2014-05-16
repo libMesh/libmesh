@@ -39,13 +39,10 @@ Real infinite_map_eval(Real v, unsigned i)
       return (1.+v)/(1.-v);
 
     default:
-      libMesh::err << "bad index i = " << i << std::endl;
-      libmesh_error();
-
+      libmesh_error_msg("bad index i = " << i);
     }
 
-  // we never end up here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -63,13 +60,10 @@ Real infinite_map_eval_deriv(Real v, unsigned i)
       return 2./((1.-v)*(1.-v));
 
     default:
-      libMesh::err << "bad index i = " << i << std::endl;
-      libmesh_error();
-
+      libmesh_error_msg("bad index i = " << i);
     }
 
-  // we never end up here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 

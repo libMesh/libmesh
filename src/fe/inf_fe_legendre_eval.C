@@ -161,13 +161,10 @@ Real legendre_eval(Real v,  unsigned i)
 
 
     default:
-      libMesh::err << "bad index i = " << i << std::endl;
-      libmesh_error();
-
+      libmesh_error_msg("bad index i = " << i);
     }
 
-  // we never end up here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 } // legendre_eval()
 
@@ -301,13 +298,10 @@ Real legendre_eval_deriv(Real v, unsigned i)
 
 
     default:
-      libMesh::err << "bad index i = " << i << std::endl;
-      libmesh_error();
-
+      libmesh_error_msg("bad index i = " << i);
     }
 
-  // we never end up here.
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 } // legendre_eval_deriv()
 
