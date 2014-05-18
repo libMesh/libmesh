@@ -55,8 +55,7 @@ AutoPtr<FEMap> FEMap::build( FEType fe_type )
       }
     }
 
-  //Shouldn't ever get here
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return AutoPtr<FEMap>();
 }
 
@@ -305,7 +304,7 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid Dim = " << Dim);
     }
 
   // Stop logging the reference->physical map initialization
@@ -383,14 +382,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         jac[p] = dxyzdxi_map[p].size();
 
         if (jac[p] <= 0.)
-          {
-            libMesh::err << "ERROR: negative Jacobian: "
-                         << jac[p]
-                         << " in element "
-                         << elem->id()
-                         << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("ERROR: negative Jacobian: " << jac[p] << " in element " << elem->id());
 
         // The inverse Jacobian entries also come from the
         // generalized inverse of T (see also the 2D element
@@ -468,14 +460,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         jac[p] = (dx_dxi*dy_deta - dx_deta*dy_dxi);
 
         if (jac[p] <= 0.)
-          {
-            libMesh::err << "ERROR: negative Jacobian: "
-                         << jac[p]
-                         << " in element "
-                         << elem->id()
-                         << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("ERROR: negative Jacobian: " << jac[p] << " in element " << elem->id());
 
         JxW[p] = jac[p]*qw[p];
 
@@ -533,13 +518,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         const Real det = (g11*g22 - g12*g21);
 
         if (det <= 0.)
-          {
-            libMesh::err << "ERROR: negative Jacobian! "
-                         << " in element "
-                         << elem->id()
-                         << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("ERROR: negative Jacobian! " << " in element " << elem->id());
 
         const Real inv_det = 1./det;
         jac[p] = std::sqrt(det);
@@ -641,14 +620,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                   dz_dxi*(dx_deta*dy_dzeta - dy_deta*dx_dzeta));
 
         if (jac[p] <= 0.)
-          {
-            libMesh::err << "ERROR: negative Jacobian: "
-                         << jac[p]
-                         << " in element "
-                         << elem->id()
-                         << std::endl;
-            libmesh_error();
-          }
+          libmesh_error_msg("ERROR: negative Jacobian: " << jac[p] << " in element " << elem->id());
 
         JxW[p] = jac[p]*qw[p];
 
@@ -673,7 +645,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid dim = " << dim);
     }
 }
 
@@ -1107,7 +1079,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 
           //  Some other dimension?
         default:
-          libmesh_error();
+          libmesh_error_msg("Invalid Dim = " << Dim);
         } // end switch(Dim), dp now computed
 
 
@@ -1173,12 +1145,13 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
                   libMesh::err << "ERROR: Newton scheme FAILED to converge in "
                                << cnt
                                << " iterations!"
-                               << " in element " << elem->id()
+                               << " in element "
+                               << elem->id()
                                << std::endl;
 
                   elem->print_info(libMesh::err);
 
-                  libmesh_error();
+                  libmesh_error_msg("Exiting...");
                 }
             }
           //  Return a far off point when secure is false - this

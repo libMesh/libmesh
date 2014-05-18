@@ -31,14 +31,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const ElemType,
                                       const unsigned int,
                                       const Point&)
 {
-#if LIBMESH_DIM > 1
-  libMesh::err << "Nedelec elements require the element type\n"
-               << "because edge orientation is needed."
-               << std::endl;
-  libmesh_error();
-#endif // LIBMESH_DIM > 1
-
-  libmesh_error();
+  libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
   return RealGradient();
 }
 
@@ -109,8 +102,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem* elem,
                   }
 
                 default:
-                  libmesh_error();
-
+                  libmesh_error_msg("Invalid i = " << i);
                 }
 
               return RealGradient();
@@ -149,31 +141,22 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem* elem,
                   }
 
                 default:
-                  libmesh_error();
-
+                  libmesh_error_msg("Invalid i = " << i);
                 }
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unsupported 2D element type!: " << elem->type()
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unsupported 2D element type!: " << elem->type());
           }
       }
 
       // unsupported order
     default:
-      {
-        libMesh::err << "ERROR: Unsupported 2D FE order!: " << total_order
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << total_order);
     }
 #endif // LIBMESH_DIM > 1
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return RealGradient();
 }
 
@@ -186,14 +169,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const ElemType,
                                             const unsigned int,
                                             const Point&)
 {
-#if LIBMESH_DIM > 1
-  libMesh::err << "Nedelec elements require the element type\n"
-               << "because edge orientation is needed."
-               << std::endl;
-  libmesh_error();
-#endif // LIBMESH_DIM > 1
-
-  libmesh_error();
+  libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
   return RealGradient();
 }
 
@@ -249,7 +225,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem* elem,
                             return RealGradient( 0.0, 0.25 );
                         }
                       default:
-                        libmesh_error();
+                        libmesh_error_msg("Invalid i = " << i);
                       }
                   } // j=0
 
@@ -276,12 +252,12 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem* elem,
                             return RealGradient( -0.25 );
                         }
                       default:
-                        libmesh_error();
+                        libmesh_error_msg("Invalid i = " << i);
                       }
                   } // j=1
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid j = " << j);
                 }
 
               return RealGradient();
@@ -315,7 +291,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem* elem,
                     break;
                   }
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid i = " << i);
                 }
 
               switch (j)
@@ -331,29 +307,21 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem* elem,
                     return RealGradient( f*(-1.0) );
                   }
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid j = " << j);
                 }
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unsupported 2D element type!: " << elem->type()
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unsupported 2D element type!: " << elem->type());
           }
       }
       // unsupported order
     default:
-      {
-        libMesh::err << "ERROR: Unsupported 2D FE order!: " << total_order
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << total_order);
     }
 #endif // LIBMESH_DIM > 1
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return RealGradient();
 }
 
@@ -367,14 +335,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const ElemType,
                                                    const unsigned int,
                                                    const Point&)
 {
-#if LIBMESH_DIM > 1
-  libMesh::err << "Nedelec elements require the element type\n"
-               << "because edge orientation is needed."
-               << std::endl;
-  libmesh_error();
-#endif // LIBMESH_DIM > 1
-
-  libmesh_error();
+  libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
   return RealGradient();
 }
 
@@ -420,28 +381,20 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unsupported 2D element type!: " << elem->type()
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unsupported 2D element type!: " << elem->type());
 
           } // end switch (type)
       } // end case FIRST
 
       // unsupported order
     default:
-      {
-        libMesh::err << "ERROR: Unsupported 2D FE order!: " << total_order
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << total_order);
 
     } // end switch (order)
 
 #endif // LIBMESH_DIM > 1
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return RealGradient();
 }
 

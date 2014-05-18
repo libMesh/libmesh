@@ -28,14 +28,11 @@ void HCurlFETransformation<OutputShape>::map_phi( const unsigned int dim,
                                                   const FEGenericBase<OutputShape>& fe,
                                                   std::vector<std::vector<OutputShape> >& phi ) const
 {
-  switch(dim)
+  switch (dim)
     {
-      // These element transformations only make sense in 2D and 3D
     case 0:
     case 1:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("These element transformations only make sense in 2D and 3D.");
 
     case 2:
       {
@@ -121,11 +118,8 @@ void HCurlFETransformation<OutputShape>::map_phi( const unsigned int dim,
       }
 
     default:
-      libmesh_error();
-
+      libmesh_error_msg("Invalid dim = " << dim);
     } // switch(dim)
-
-  return;
 }
 
 template< typename OutputShape >
@@ -135,14 +129,11 @@ void HCurlFETransformation<OutputShape>::map_curl( const unsigned int dim,
                                                    const FEGenericBase<OutputShape>& fe,
                                                    std::vector<std::vector<OutputShape> >& curl_phi ) const
 {
-  switch(dim)
+  switch (dim)
     {
-      // These element transformations only make sense in 2D and 3D
     case 0:
     case 1:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("These element transformations only make sense in 2D and 3D.");
 
     case 2:
       {
@@ -229,11 +220,8 @@ void HCurlFETransformation<OutputShape>::map_curl( const unsigned int dim,
       }
 
     default:
-      libmesh_error();
-
+      libmesh_error_msg("Invalid dim = " << dim);
     } // switch(dim)
-
-  return;
 }
 
 template class HCurlFETransformation<RealGradient>;
@@ -245,9 +233,7 @@ void HCurlFETransformation<Real>::map_phi( const unsigned int,
                                            const FEGenericBase<Real>&,
                                            std::vector<std::vector<Real> >& ) const
 {
-  libMesh::err << "HCurl transformations only make sense for vector-valued elements."
-               << std::endl;
-  libmesh_error();
+  libmesh_error_msg("HCurl transformations only make sense for vector-valued elements.");
 }
 
 template<>
@@ -257,9 +243,7 @@ void HCurlFETransformation<Real>::map_curl( const unsigned int,
                                             const FEGenericBase<Real>&,
                                             std::vector<std::vector<Real> >& ) const
 {
-  libMesh::err << "HCurl transformations only make sense for vector-valued elements."
-               << std::endl;
-  libmesh_error();
+  libmesh_error_msg("HCurl transformations only make sense for vector-valued elements.");
 }
 
 

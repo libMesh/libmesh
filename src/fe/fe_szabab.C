@@ -107,10 +107,6 @@ void szabab_nodal_soln(const Elem* elem,
     default:
       libmesh_error_msg("ERROR: Invalid total order " << totalorder);
     }
-
-  // We should never get here?
-  libmesh_error();
-  return;
 } // szabab_nodal_soln()
 
 
@@ -299,7 +295,7 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
       libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for SZABAB FE family!");
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 } // szabab_n_dofs()
 
@@ -894,8 +890,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
       libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for SZABAB FE family!");
     }
 
-  libmesh_error();
-
+  libmesh_error_msg("We'll never get here!");
   return 0;
 } // szabab_n_dofs_at_node()
 

@@ -71,10 +71,8 @@ void H1FETransformation<OutputShape>::map_phi( const unsigned int dim,
         break;
       }
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid dim = " << dim);
     }
-
-  return;
 }
 
 
@@ -207,11 +205,8 @@ void H1FETransformation<OutputShape>::map_dphi( const unsigned int dim,
       }
 
     default:
-      libmesh_error();
-
+      libmesh_error_msg("Invalid dim = " << dim);
     } // switch(dim)
-
-  return;
 }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -238,7 +233,7 @@ void H1FETransformation<OutputShape>::map_d2phi( const unsigned int dim,
                   );
 
 
-  switch(dim)
+  switch (dim)
     {
     case 0: // No derivatives in 0D
       {
@@ -444,11 +439,8 @@ void H1FETransformation<OutputShape>::map_d2phi( const unsigned int dim,
       }
 
     default:
-      libmesh_error();
-
+      libmesh_error_msg("Invalid dim = " << dim);
     } // switch(dim)
-
-  return;
 }
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -459,9 +451,7 @@ void H1FETransformation<Real>::map_curl( const unsigned int,
                                          const FEGenericBase<Real>&,
                                          std::vector<std::vector<Real> >& ) const
 {
-  libMesh::err << "Computing the curl of a shape function only\n"
-               << "makes sense for vector-valued elements." << std::endl;
-  libmesh_error();
+  libmesh_error_msg("Computing the curl of a shape function only \nmakes sense for vector-valued elements.");
 }
 
 template< >
@@ -471,14 +461,12 @@ void H1FETransformation<RealGradient>::map_curl( const unsigned int dim,
                                                  const FEGenericBase<RealGradient>& fe,
                                                  std::vector<std::vector<RealGradient> >& curl_phi ) const
 {
-  switch(dim)
+  switch (dim)
     {
-      // The curl only make sense in 2D and 3D
     case 0:
     case 1:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("The curl only make sense in 2D and 3D");
+
     case 2:
       {
         const std::vector<std::vector<RealGradient> >& dphidxi = fe.get_dphidxi();
@@ -585,10 +573,8 @@ void H1FETransformation<RealGradient>::map_curl( const unsigned int dim,
         break;
       }
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid dim = " << dim);
     }
-
-  return;
 }
 
 
@@ -600,9 +586,7 @@ void H1FETransformation<Real>::map_div
  const FEGenericBase<Real>&,
  std::vector<std::vector<FEGenericBase<Real>::OutputDivergence> >& ) const
 {
-  libMesh::err << "Computing the divergence of a shape function only\n"
-               << "makes sense for vector-valued elements." << std::endl;
-  libmesh_error();
+  libmesh_error_msg("Computing the divergence of a shape function only \nmakes sense for vector-valued elements.");
 }
 
 
@@ -614,14 +598,12 @@ void H1FETransformation<RealGradient>::map_div
  const FEGenericBase<RealGradient>& fe,
  std::vector<std::vector<FEGenericBase<RealGradient>::OutputDivergence> >& div_phi) const
 {
-  switch(dim)
+  switch (dim)
     {
-      // The divergence only make sense in 2D and 3D
     case 0:
     case 1:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("The divergence only make sense in 2D and 3D");
+
     case 2:
       {
         const std::vector<std::vector<RealGradient> >& dphidxi = fe.get_dphidxi();

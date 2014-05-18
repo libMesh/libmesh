@@ -65,11 +65,10 @@ AutoPtr<FETransformationBase<OutputShape> > FETransformationBase<OutputShape>::b
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Unknown family = " << fe_type.family);
     }
 
-  // Should never get here...
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   AutoPtr<FETransformationBase<OutputShape> > ap( NULL );
   return ap;
 }

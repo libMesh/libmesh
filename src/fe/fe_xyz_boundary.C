@@ -44,9 +44,7 @@ void FEXYZ<0>::reinit(const Elem*,
                       const std::vector<Point>* const,
                       const std::vector<Real>* const)
 {
-  libMesh::err << "ERROR: This method only makes sense for 2D/3D elements!"
-               << std::endl;
-  libmesh_error();
+  libmesh_error_msg("ERROR: This method only makes sense for 2D/3D elements!");
 }
 
 
@@ -59,9 +57,7 @@ void FEXYZ<1>::reinit(const Elem*,
                       const std::vector<Point>* const,
                       const std::vector<Real>* const)
 {
-  libMesh::err << "ERROR: This method only makes sense for 2D/3D elements!"
-               << std::endl;
-  libmesh_error();
+  libmesh_error_msg("ERROR: This method only makes sense for 2D/3D elements!");
 }
 
 
@@ -219,10 +215,8 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
         break;
       }
 
-
     default:
-      libmesh_error();
-
+      libmesh_error_msg("Invalid dim " << this->dim);
     }
 
   STOP_LOG("compute_face_values()", "FEXYZ");

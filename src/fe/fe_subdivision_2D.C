@@ -181,10 +181,10 @@ Real FESubdivision::regular_shape(const unsigned int i,
       return factor*(pow<4>(w) + 2*v*w*w*w);
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid i = " << i);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -232,7 +232,7 @@ Real FESubdivision::regular_shape_deriv(const unsigned int i,
           case 11:
             return w*w*w/6;
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid i = " << i);
           }
       }
     case 1: // eta derivatives
@@ -269,14 +269,14 @@ Real FESubdivision::regular_shape_deriv(const unsigned int i,
           case 11:
             return factor*(6*v*w*w + 4*w*w*w);
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid i = " << i);
           }
       }
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid j = " << j);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -321,7 +321,7 @@ Real FESubdivision::regular_shape_second_deriv(const unsigned int i,
           case 11:
             return 0.;
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid i = " << i);
           }
       }
     case 1: //eta-xi derivative
@@ -353,7 +353,7 @@ Real FESubdivision::regular_shape_second_deriv(const unsigned int i,
           case 11:
             return w*w/2.;
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid i = " << i);
           }
       }
     case 2: // eta-eta derivative
@@ -385,14 +385,14 @@ Real FESubdivision::regular_shape_second_deriv(const unsigned int i,
           case 11:
             return v*w + w*w;
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid i = " << i);
           }
       }
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid j = " << j);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -584,10 +584,7 @@ void FESubdivision::init_shape_functions(const std::vector<Point> &qp,
 
           u = 1 - v - w;
           if ((u > 1 + eps) || (u < -eps))
-            {
-              std::cout << "SUBDIVISION irregular patch: u is outside valid range!\n";
-              libmesh_error();
-            }
+            libmesh_error_msg("SUBDIVISION irregular patch: u is outside valid range!");
 
           DenseMatrix<Real> A;
           init_subdivision_matrix(A, valence);
@@ -732,16 +729,14 @@ Real FE<2,SUBDIVISION>::shape(const ElemType type,
             libmesh_assert_less(i, 12);
             return FESubdivision::regular_shape(i,p(0),p(1));
           default:
-            std::cerr << "ERROR: Unsupported element type!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Unsupported element type!");
           }
       }
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported polynomial order!");
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -776,16 +771,14 @@ Real FE<2,SUBDIVISION>::shape_deriv(const ElemType type,
             libmesh_assert_less(i, 12);
             return FESubdivision::regular_shape_deriv(i,j,p(0),p(1));
           default:
-            std::cerr << "ERROR: Unsupported element type!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Unsupported element type!");
           }
       }
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported polynomial order!");
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -821,16 +814,14 @@ Real FE<2,SUBDIVISION>::shape_second_deriv(const ElemType type,
             libmesh_assert_less(i, 12);
             return FESubdivision::regular_shape_second_deriv(i,j,p(0),p(1));
           default:
-            std::cerr << "ERROR: Unsupported element type!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Unsupported element type!");
           }
       }
     default:
-      std::cerr << "ERROR: Unsupported polynomial order!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported polynomial order!");
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -894,7 +885,7 @@ void FE<2,SUBDIVISION>::side_map(const Elem*,
                                  const std::vector<Point>&,
                                  std::vector<Point>&)
 {
-  libmesh_error();
+  libmesh_not_implemented();
 }
 
 template <>
@@ -904,7 +895,7 @@ void FE<2,SUBDIVISION>::edge_reinit(Elem const*,
                                     const std::vector<Point>* const,
                                     const std::vector<Real>* const)
 {
-  libmesh_error();
+  libmesh_not_implemented();
 }
 
 template <>
@@ -913,7 +904,7 @@ Point FE<2,SUBDIVISION>::inverse_map(const Elem*,
                                      const Real,
                                      const bool)
 {
-  libmesh_error();
+  libmesh_not_implemented();
 }
 
 template <>
@@ -923,13 +914,13 @@ void FE<2,SUBDIVISION>::inverse_map(const Elem*,
                                     Real,
                                     bool)
 {
-  libmesh_error();
+  libmesh_not_implemented();
 }
 
 
 
 // The number of dofs per subdivision element depends on the valence of its nodes, so it is non-static
-template <> unsigned int FE<2,SUBDIVISION>::n_dofs(const ElemType, const Order) { libmesh_error(); return 0; }
+template <> unsigned int FE<2,SUBDIVISION>::n_dofs(const ElemType, const Order) { libmesh_not_implemented(); return 0; }
 
 // Loop subdivision elements have only a single dof per node
 template <> unsigned int FE<2,SUBDIVISION>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 1; }

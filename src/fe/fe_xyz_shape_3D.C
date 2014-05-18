@@ -48,11 +48,7 @@ Real FE<3,XYZ>::shape(const ElemType,
                       const unsigned int,
                       const Point&)
 {
-  libMesh::err << "XYZ polynomials require the element\n"
-               << "because the centroid is needed."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("XYZ polynomials require the element because the centroid is needed.");
   return 0.;
 }
 
@@ -243,7 +239,7 @@ Real FE<3,XYZ>::shape(const Elem* elem,
 
 #endif
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -256,11 +252,7 @@ Real FE<3,XYZ>::shape_deriv(const ElemType,
                             const unsigned int,
                             const Point&)
 {
-  libMesh::err << "XYZ polynomials require the element\n"
-               << "because the centroid is needed."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
   return 0.;
 }
 
@@ -729,12 +721,12 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid j = " << j);
     }
 
 #endif
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -747,11 +739,7 @@ Real FE<3,XYZ>::shape_second_deriv(const ElemType,
                                    const unsigned int,
                                    const Point&)
 {
-  libMesh::err << "XYZ polynomials require the element\n"
-               << "because the centroid is needed."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("XYZ polynomials require the element \nbecause the centroid is needed.");
   return 0.;
 }
 
@@ -1438,12 +1426,12 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid j = " << j);
     }
 
 #endif
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 

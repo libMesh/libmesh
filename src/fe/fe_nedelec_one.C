@@ -181,7 +181,7 @@ unsigned int nedelec_one_n_dofs(const ElemType t, const Order o)
       libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for NEDELEC_ONE FE family!");
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -354,9 +354,8 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
       libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for NEDELEC_ONE FE family!");
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
-
 }
 
 
@@ -482,9 +481,7 @@ void nedelec_one_compute_constraints (DofConstraints &/*constraints*/,
 } // anonymous namespace
 
 #define NEDELEC_LOW_D_ERROR_MESSAGE                                     \
-  libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
-  << std::endl;                                                         \
-  libmesh_error();
+  libmesh_error_msg("ERROR: This method makes no sense for low-D elements!");
 
 
 // Do full-specialization for every dimension, instead

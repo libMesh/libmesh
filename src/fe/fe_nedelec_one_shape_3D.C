@@ -31,14 +31,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const ElemType,
                                       const unsigned int,
                                       const Point&)
 {
-#if LIBMESH_DIM == 3
-  libMesh::err << "Nedelec elements require the element type\n"
-               << "because edge orientation is needed."
-               << std::endl;
-  libmesh_error();
-#endif
-
-  libmesh_error();
+  libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
   return RealGradient();
 }
 
@@ -166,7 +159,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem* elem,
                   }
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid i = " << i);
                 }
 
               return RealGradient();
@@ -181,26 +174,17 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem* elem,
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unsupported 3D element type!: " << elem->type()
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << elem->type());
           }
       }
 
       // unsupported order
     default:
-      {
-        libMesh::err << "ERROR: Unsupported 3D FE order!: " << totalorder
-                     << std::endl;
-
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << totalorder);
     }
 #endif
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return RealGradient();
 }
 
@@ -214,14 +198,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const ElemType,
                                             const unsigned int,
                                             const Point&)
 {
-#if LIBMESH_DIM == 3
-  libMesh::err << "Nedelec elements require the element type\n"
-               << "because edge orientation is needed."
-               << std::endl;
-  libmesh_error();
-#endif
-
-  libmesh_error();
+  libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
   return RealGradient();
 }
 
@@ -329,7 +306,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
                             return RealGradient( 0.0,  0.125*(-1.0-zeta), 0.0 );
                         }
                       default:
-                        libmesh_error();
+                        libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
                   } // j=0
@@ -401,7 +378,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
                             return RealGradient(  0.125*(1.0+zeta), 0.0, 0.0 );
                         }
                       default:
-                        libmesh_error();
+                        libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
                   } // j=1
@@ -474,13 +451,13 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
                             return RealGradient( 0.0,  0.125*(1.0-xi), 0.0 );
                         }
                       default:
-                        libmesh_error();
+                        libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
                   } // j = 2
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid j = " << j);
                 }
 
               return RealGradient();
@@ -495,26 +472,18 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem* elem,
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unsupported 3D element type!: " << elem->type()
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << elem->type());
           }
       }
 
       // unsupported order
     default:
-      {
-        libMesh::err << "ERROR: Unsupported 3D FE order!: " << totalorder
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << totalorder);
     }
 
 #endif
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return RealGradient();
 }
 
@@ -527,14 +496,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const ElemType,
                                                    const unsigned int,
                                                    const Point&)
 {
-#if LIBMESH_DIM == 3
-  libMesh::err << "Nedelec elements require the element type\n"
-               << "because edge orientation is needed."
-               << std::endl;
-  libmesh_error();
-#endif
-
-  libmesh_error();
+  libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
   return RealGradient();
 }
 
@@ -635,7 +597,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
                             return RealGradient( 0.0, 0.0, -0.125 );
                         }
                       default:
-                        libmesh_error();
+                        libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
                   } // j=1
@@ -691,7 +653,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
                             return RealGradient( 0.0, -0.125, 0.0 );
                         }
                       default:
-                        libmesh_error();
+                        libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
                   } // j = 3
@@ -740,7 +702,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
                             return RealGradient(  0.125, 0.0, 0.0 );
                         }
                       default:
-                        libmesh_error();
+                        libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
                   } // j = 4
@@ -753,7 +715,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
                   } // j = 5
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid j = " << j);
                 }
 
               return RealGradient();
@@ -768,27 +730,19 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
             }
 
           default:
-            {
-              libMesh::err << "ERROR: Unsupported 3D element type!: " << elem->type()
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Unsupported 3D element type!: " << elem->type());
 
           } //switch(type)
 
       } // case FIRST:
       // unsupported order
     default:
-      {
-        libMesh::err << "ERROR: Unsupported 3D FE order!: " << totalorder
-                     << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << totalorder);
     }
 
 #endif
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return RealGradient();
 }
 

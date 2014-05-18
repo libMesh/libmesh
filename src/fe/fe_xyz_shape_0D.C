@@ -59,8 +59,7 @@ Real FE<0,XYZ>::shape_deriv(const ElemType,
                             const unsigned int,
                             const Point&)
 {
-  // No spatial derivatives in 0D!
-  libmesh_error();
+  libmesh_error_msg("No spatial derivatives in 0D!");
   return 0.;
 }
 
@@ -73,8 +72,7 @@ Real FE<0,XYZ>::shape_deriv(const Elem*,
                             const unsigned int,
                             const Point&)
 {
-  // No spatial derivatives in 0D!
-  libmesh_error();
+  libmesh_error_msg("No spatial derivatives in 0D!");
   return 0.;
 }
 
@@ -88,8 +86,7 @@ Real FE<0,XYZ>::shape_second_deriv(const ElemType,
                                    const unsigned int,
                                    const Point&)
 {
-  // No spatial derivatives in 0D!
-  libmesh_error();
+  libmesh_error_msg("No spatial derivatives in 0D!");
   return 0.;
 }
 
@@ -102,8 +99,7 @@ Real FE<0,XYZ>::shape_second_deriv(const Elem*,
                                    const unsigned int,
                                    const Point&)
 {
-  // No spatial derivatives in 0D!
-  libmesh_error();
+  libmesh_error_msg("No spatial derivatives in 0D!");
   return 0.;
 }
 

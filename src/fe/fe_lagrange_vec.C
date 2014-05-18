@@ -593,7 +593,7 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape(const ElemType type, const Or
       return libMesh::RealGradient( Real(0), value );
 
     default:
-      libmesh_error();
+      libmesh_error_msg("i%2 must be either 0 or 1!");
     }
 
   //dummy
@@ -614,7 +614,7 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const ElemType type, co
       return libMesh::RealGradient( Real(0), value );
 
     default:
-      libmesh_error();
+      libmesh_error_msg("i%2 must be either 0 or 1!");
     }
 
   //dummy
@@ -635,7 +635,7 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
       return libMesh::RealGradient( Real(0), value );
 
     default:
-      libmesh_error();
+      libmesh_error_msg("i%2 must be either 0 or 1!");
     }
 
   //dummy
@@ -661,7 +661,7 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape(const ElemType type, const Or
       return libMesh::RealGradient( Real(0), Real(0), value );
 
     default:
-      libmesh_error();
+      libmesh_error_msg("i%3 must be 0, 1, or 2!");
     }
 
   //dummy
@@ -685,7 +685,7 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const ElemType type, co
       return libMesh::RealGradient( Real(0), Real(0), value );
 
     default:
-      libmesh_error();
+      libmesh_error_msg("i%3 must be 0, 1, or 2!");
     }
 
   //dummy
@@ -709,7 +709,7 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const ElemType t
       return libMesh::RealGradient( Real(0), Real(0), value );
 
     default:
-      libmesh_error();
+      libmesh_error_msg("i%3 must be 0, 1, or 2!");
     }
 
   //dummy
@@ -777,7 +777,7 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape(const Elem* elem, const Order
       return libMesh::RealGradient( Real(0), value );
 
     default:
-      libmesh_error();
+      libmesh_error_msg("i%2 must be either 0 or 1!");
     }
 
   //dummy
@@ -798,7 +798,7 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_deriv(const Elem* elem, const
       return libMesh::RealGradient( Real(0), value );
 
     default:
-      libmesh_error();
+      libmesh_error_msg("i%2 must be either 0 or 1!");
     }
 
   //dummy
@@ -819,7 +819,7 @@ template <> RealGradient FE<2,LAGRANGE_VEC>::shape_second_deriv(const Elem* elem
       return libMesh::RealGradient( Real(0), value );
 
     default:
-      libmesh_error();
+      libmesh_error_msg("i%2 must be either 0 or 1!");
     }
 
   //dummy
@@ -844,7 +844,7 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape(const Elem* elem, const Order
       return libMesh::RealGradient( Real(0), Real(0), value );
 
     default:
-      libmesh_error();
+      libmesh_error_msg("i%3 must be 0, 1, or 2!");
     }
 
   //dummy
@@ -868,7 +868,7 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_deriv(const Elem* elem, const
       return libMesh::RealGradient( Real(0), Real(0), value );
 
     default:
-      libmesh_error();
+      libmesh_error_msg("i%3 must be 0, 1, or 2!");
     }
 
   //dummy
@@ -892,7 +892,7 @@ template <> RealGradient FE<3,LAGRANGE_VEC>::shape_second_deriv(const Elem* elem
       return libMesh::RealGradient( Real(0), Real(0), value );
 
     default:
-      libmesh_error();
+      libmesh_error_msg("i%3 must be 0, 1, or 2!");
     }
 
   //dummy

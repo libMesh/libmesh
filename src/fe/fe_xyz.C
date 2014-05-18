@@ -305,8 +305,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
       }
     }
 
-  libmesh_error();
-
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 

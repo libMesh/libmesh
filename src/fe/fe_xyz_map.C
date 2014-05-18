@@ -208,7 +208,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
         break;
       }
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid dim = " << dim);
 
     } // switch(dim)
 
