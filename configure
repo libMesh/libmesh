@@ -32314,7 +32314,7 @@ fi
 
       # The QHULL API is distributed with libmesh, so we don't have to guess
       # where it might be installed...
-      QHULL_INCLUDE="-I\$(top_srcdir)/contrib/qhull/qhull/src/libqhull -I\$(top_srcdir)/contrib/qhull/qhull/src/libqhullcpp"
+      QHULL_INCLUDE="-I\$(top_srcdir)/contrib/qhull/qhull/src -I\$(top_srcdir)/contrib/qhull/qhull/src/libqhull -I\$(top_srcdir)/contrib/qhull/qhull/src/libqhullcpp"
 
 $as_echo "#define HAVE_QHULL_API 1" >>confdefs.h
 
