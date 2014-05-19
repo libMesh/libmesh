@@ -47,8 +47,11 @@ if LIBMESH_ENABLE_FPARSER
 fparser.hh: \$(top_srcdir)/contrib/fparser/fparser.hh
 	\$(AM_V_GEN)rm -f \$@ && \$(LN_S) \$< \$@
 
-  BUILT_SOURCES  += fparser.hh
-  DISTCLEANFILES += fparser.hh
+fparser_ad.hh: \$(top_srcdir)/contrib/fparser/fparser_ad.hh
+	\$(AM_V_GEN)rm -f \$@ && \$(LN_S) \$< \$@
+
+  BUILT_SOURCES  += fparser.hh fparser_ad.hh
+  DISTCLEANFILES += fparser.hh fparser_ad.hh
 
 endif
 
