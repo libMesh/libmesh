@@ -211,7 +211,7 @@ xticksat = [1 ceil(length(x)/2) length(x)];
 set(haxis, 'xtick', xticksat);
 
 for i=1:length(xticksat)
-  xtlabels{i} = data{week_indexes(xticksat(i)), 1};
+  xtlabels{i} = ['Week of\n', data{week_indexes(xticksat(i)), 1}];
 end
 set(haxis, 'xticklabel', xtlabels);
 
