@@ -39,7 +39,7 @@ namespace libMesh
 template <typename Output=Number>
 class ParsedFEMFunction : public FEMFunctionBase<Output>
 {
-protected:
+public:
 
   /**
    * Constructor.
@@ -49,7 +49,8 @@ protected:
                      const std::string& expression,
                      const std::vector<std::string>* additional_vars=NULL,
                      const std::vector<Output>* initial_vals=NULL)
-    : _expression(expression),
+    : _sys(sys),
+      _expression(expression),
       _n_vars(sys.n_vars())
   {
     std::string variables = "x";
@@ -131,12 +132,7 @@ protected:
         nextstart = (end == std::string::npos) ?
           std::string::npos : end + 1;
       }
-
-    this->_initialized = true;
   }
-
-
-public:
 
   /**
    * Destructor.
@@ -163,7 +159,7 @@ public:
   virtual AutoPtr<FEMFunctionBase<Output> > clone () const {
     return AutoPtr<FEMFunctionBase<Output> >
       (new ParsedFEMFunction
-         (_expression, &_additional_vars, &_initial_vals));
+         (_sys, _expression, &_additional_vars, &_initial_vals));
   }
 
   // ------------------------------------------------------
@@ -262,6 +258,7 @@ public:
   }
 
 private:
+  const System& _sys;
   std::string _expression;
   unsigned int _n_vars;
   std::vector<FunctionParserBase<Output> > parsers;
