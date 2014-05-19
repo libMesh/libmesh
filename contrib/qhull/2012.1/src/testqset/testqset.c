@@ -214,7 +214,7 @@ void readOptions(int argc, char **argv, const char *promptstr, int *numInts, int
     char *endp;
 
     if (argc != 2 && argc != 3) {
-        printf(promptstr);
+        printf("%s", promptstr);
         exit(0);
     }
     numIntsArg= strtol(argv[1], &endp, 10);
