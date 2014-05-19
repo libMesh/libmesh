@@ -151,7 +151,12 @@ AC_DEFINE_UNQUOTED(IO_COMPATIBILITY_VERSION, ["0.7.4"],            [libMesh I/O 
 AC_PROG_LN_S
 # -------------------------------------------------------------
 
-
+# ---------------------------------------------------------------
+# this seems to get done automatically for C++, but not C?
+# Required for QHull rules as implemented
+# --------------------------------------------------------------
+AM_PROG_CC_C_O
+# --------------------------------------------------------------
 
 # --------------------------------------------------------------
 # parent directories -- portably and without race conditions

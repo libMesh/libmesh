@@ -1,0 +1,6 @@
+05/09/2013
+Benjamin S. Kirk, changed declaration to comment out unuser parameter
+src/libqhullcpp/QhullLinkedList.h:
+  QhullLinkedList.h:70:61: warning: unused parameter 'l' [-Wunused-parameter]
+  -  QhullLinkedList<T> &operator=(const QhullLinkedList<T> &l) {}
+  +  QhullLinkedList<T> &operator=(const QhullLinkedList<T> & /* l */) {}

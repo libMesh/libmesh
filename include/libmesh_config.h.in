@@ -316,6 +316,9 @@
 /* Have PTHREAD_PRIO_INHERIT. */
 #undef HAVE_PTHREAD_PRIO_INHERIT
 
+/* Flag indicating whether the library will be compiled with Qhull support */
+#undef HAVE_QHULL_API
+
 /* Define to 1 if you have the <rpc/rpc.h> header file. */
 #undef HAVE_RPC_RPC_H
 
@@ -459,6 +462,9 @@
 
 /* libMesh minor version number */
 #undef MINOR_VERSION
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+#undef NO_MINUS_C_MINUS_O
 
 /* Name of package */
 #undef PACKAGE
