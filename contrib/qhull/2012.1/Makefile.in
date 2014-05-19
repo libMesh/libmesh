@@ -195,7 +195,9 @@ am__objects_3 = src/libqhull/libqhullcpp_a-geom.$(OBJEXT) \
 am_libqhullcpp_a_OBJECTS = $(am__objects_3)
 libqhullcpp_a_OBJECTS = $(am_libqhullcpp_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libdbg_la_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
+@LIBMESH_DBG_MODE_TRUE@libdbg_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am__libdbg_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhull/libqhull.h src/libqhull/mem.h \
 	src/libqhull/merge.h src/libqhull/poly.h \
@@ -278,7 +280,8 @@ libdbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libdbg_la_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_DBG_MODE_TRUE@am_libdbg_la_rpath =
-libdevel_la_DEPENDENCIES =
+@LIBMESH_DEVEL_MODE_TRUE@libdevel_la_DEPENDENCIES =  \
+@LIBMESH_DEVEL_MODE_TRUE@	$(am__DEPENDENCIES_2)
 am__libdevel_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhull/libqhull.h src/libqhull/mem.h \
 	src/libqhull/merge.h src/libqhull/poly.h \
@@ -361,7 +364,8 @@ libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libdevel_la_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_rpath =
-liboprof_la_DEPENDENCIES =
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_DEPENDENCIES =  \
+@LIBMESH_OPROF_MODE_TRUE@	$(am__DEPENDENCIES_2)
 am__liboprof_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhull/libqhull.h src/libqhull/mem.h \
 	src/libqhull/merge.h src/libqhull/poly.h \
@@ -444,7 +448,7 @@ liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(liboprof_la_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_rpath =
-libopt_la_DEPENDENCIES =
+@LIBMESH_OPT_MODE_TRUE@libopt_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am__libopt_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhull/libqhull.h src/libqhull/mem.h \
 	src/libqhull/merge.h src/libqhull/poly.h \
@@ -523,7 +527,8 @@ libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libopt_la_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_OPT_MODE_TRUE@am_libopt_la_rpath =
-libprof_la_DEPENDENCIES =
+@LIBMESH_PROF_MODE_TRUE@libprof_la_DEPENDENCIES =  \
+@LIBMESH_PROF_MODE_TRUE@	$(am__DEPENDENCIES_2)
 am__libprof_la_SOURCES_DIST = src/libqhull/geom.h src/libqhull/io.h \
 	src/libqhull/libqhull.h src/libqhull/mem.h \
 	src/libqhull/merge.h src/libqhull/poly.h \
@@ -885,6 +890,7 @@ PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
 PWD = @PWD@
+QHULL_LIBS = @QHULL_LIBS@
 RANLIB = @RANLIB@
 RPATHFLAG = @RPATHFLAG@
 SED = @SED@
@@ -1003,6 +1009,7 @@ vtkversion = @vtkversion@
 
 # the -Dqh_QHpointer is required for linking the C++ API
 pkg_cppflags = -I$(srcdir)/src -Dqh_QHpointer
+pkg_libs = $(QHULL_LIBS)
 
 # libqhull c sources
 libqhull_sources = \

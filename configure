@@ -736,6 +736,7 @@ GMV_LIBRARY
 GMV_INCLUDE
 LIBMESH_ENABLE_QHULL_FALSE
 LIBMESH_ENABLE_QHULL_TRUE
+QHULL_LIBS
 LIBMESH_ENABLE_TRIANGLE_FALSE
 LIBMESH_ENABLE_TRIANGLE_TRUE
 TRIANGLE_LIBRARY
@@ -32135,9 +32136,182 @@ fi
  # if unspecified, depend on enableoptional
 
   QHULL_INCLUDE=""
+  QHULL_LIBS=""
 
   # fix for --disable-optional
   if (test "x$enableqhull" = "xyes"); then
+
+      # look for require -lm libraries
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing sqrt" >&5
+$as_echo_n "checking for library containing sqrt... " >&6; }
+if ${ac_cv_search_sqrt+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char sqrt ();
+int
+main ()
+{
+return sqrt ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' m; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_sqrt=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_sqrt+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_sqrt+:} false; then :
+
+else
+  ac_cv_search_sqrt=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_sqrt" >&5
+$as_echo "$ac_cv_search_sqrt" >&6; }
+ac_res=$ac_cv_search_sqrt
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  QHULL_LIBS="-lm"
+fi
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing trunc" >&5
+$as_echo_n "checking for library containing trunc... " >&6; }
+if ${ac_cv_search_trunc+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char trunc ();
+int
+main ()
+{
+return trunc ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' m; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_trunc=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_trunc+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_trunc+:} false; then :
+
+else
+  ac_cv_search_trunc=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_trunc" >&5
+$as_echo "$ac_cv_search_trunc" >&6; }
+ac_res=$ac_cv_search_trunc
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  QHULL_LIBS="-lm"
+fi
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing cos" >&5
+$as_echo_n "checking for library containing cos... " >&6; }
+if ${ac_cv_search_cos+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cos ();
+int
+main ()
+{
+return cos ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' m; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_cos=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_cos+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_cos+:} false; then :
+
+else
+  ac_cv_search_cos=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_cos" >&5
+$as_echo "$ac_cv_search_cos" >&6; }
+ac_res=$ac_cv_search_cos
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  QHULL_LIBS="-lm"
+fi
+
+
+
       # The QHULL API is distributed with libmesh, so we don't have to guess
       # where it might be installed...
       QHULL_INCLUDE="-I\$(top_srcdir)/contrib/qhull/qhull/src/libqhull -I\$(top_srcdir)/contrib/qhull/qhull/src/libqhullcpp"
@@ -32147,6 +32321,8 @@ $as_echo "#define HAVE_QHULL_API 1" >>confdefs.h
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Qhull version 2012.1 support >>>" >&5
 $as_echo "<<< Configuring library with Qhull version 2012.1 support >>>" >&6; }
   fi
+
+
 
 if (test $enableqhull = yes); then
   libmesh_contrib_INCLUDES="$QHULL_INCLUDE $libmesh_contrib_INCLUDES"
