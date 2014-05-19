@@ -1,5 +1,6 @@
 # the -Dqh_QHpointer is required for linking the C++ API
 pkg_cppflags = -I$(srcdir)/src -Dqh_QHpointer
+pkg_libs     = $(QHULL_LIBS)
 
 # libqhull c sources
 libqhull_sources = \
