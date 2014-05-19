@@ -141,46 +141,46 @@ check_PROGRAMS = # empty, append below
 check_PROGRAMS += rbox
 rbox_SOURCES    = src/rbox/rbox.c
 rbox_CPPFLAGS   = -I$(srcdir)/src/libqhull
-rbox_LDADD      = libqhull.a
+rbox_LDADD      = libqhull.a -lm
 
 check_PROGRAMS  += qconvex
 qconvex_SOURCES  = src/qconvex/qconvex.c
 qconvex_CPPFLAGS = -I$(srcdir)/src/libqhull
-qconvex_LDADD    = libqhull.a
+qconvex_LDADD    = libqhull.a -lm
 
 check_PROGRAMS    += qdelaunay
 qdelaunay_SOURCES  = src/qdelaunay/qdelaun.c
 qdelaunay_CPPFLAGS = -I$(srcdir)/src/libqhull
-qdelaunay_LDADD    = libqhull.a
+qdelaunay_LDADD    = libqhull.a -lm
 
 check_PROGRAMS += qhalf
 qhalf_SOURCES   = src/qhalf/qhalf.c
 qhalf_CPPFLAGS  = -I$(srcdir)/src/libqhull
-qhalf_LDADD     = libqhull.a
+qhalf_LDADD     = libqhull.a -lm
 
 check_PROGRAMS   += qvoronoi
 qvoronoi_SOURCES  = src/qvoronoi/qvoronoi.c
 qvoronoi_CPPFLAGS = -I$(srcdir)/src/libqhull
-qvoronoi_LDADD    = libqhull.a
+qvoronoi_LDADD    = libqhull.a -lm
 
 check_PROGRAMS += qhull
 qhull_SOURCES   = src/qhull/unix.c
 qhull_CPPFLAGS  = -I$(srcdir)/src/libqhull
-qhull_LDADD     = libqhull.a
+qhull_LDADD     = libqhull.a -lm
 
 check_PROGRAMS   += testqset
 testqset_SOURCES  = src/testqset/testqset.c src/libqhull/qset.c src/libqhull/mem.c
-testqset_CPPFLAGS = -I$(srcdir)/src/libqhull
+testqset_CPPFLAGS = -I$(srcdir)/src/libqhull -lm
 
 check_PROGRAMS  += user_eg
 user_eg_SOURCES  = src/user_eg/user_eg.c
 user_eg_CPPFLAGS = -I$(srcdir)/src/libqhull -Dqh_QHpointer
-user_eg_LDADD    = libqhull_p.a
+user_eg_LDADD    = libqhull_p.a -lm
 
 check_PROGRAMS   += user_eg2
 user_eg2_SOURCES  = src/user_eg2/user_eg2.c
 user_eg2_CPPFLAGS = -I$(srcdir)/src/libqhull
-user_eg2_LDADD    = libqhull.a
+user_eg2_LDADD    = libqhull.a -lm
 
 check_PROGRAMS   += user_eg3
 user_eg3_SOURCES  = src/user_eg3/user_eg3.cpp
@@ -188,7 +188,7 @@ user_eg3_CPPFLAGS = -I$(srcdir)/src \
                     -I$(srcdir)/src/libqhullcpp \
                     -I$(srcdir)/src/libqhull \
                     -Dqh_QHpointer
-user_eg3_LDADD    = libqhullcpp.a libqhull_p.a
+user_eg3_LDADD    = libqhullcpp.a libqhull_p.a -lm
 
 # All these targets were pulled straight
 # from the upstream Makefile
