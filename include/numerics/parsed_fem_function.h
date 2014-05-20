@@ -62,7 +62,7 @@ public:
 #endif
     variables += ",t";
 
-    _spacetime.resize(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0));
+    _spacetime.resize(LIBMESH_DIM+1 + _n_vars + (additional_vars ? additional_vars->size() : 0));
 
     for (unsigned int v=0; v != _n_vars; ++v)
       {

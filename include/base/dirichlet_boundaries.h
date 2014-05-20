@@ -180,7 +180,7 @@ public:
     libmesh_assert(!(f.get() && f_fem.get()));
     libmesh_assert(!(f.get() && g_fem.get()));
     libmesh_assert(!(f_fem.get() && g.get()));
-    libmesh_assert(!(f_fem.get()) && !f_system);
+    libmesh_assert(!(f_fem.get() && !f_system));
     if (f.get())
       f->init();
     if (g.get())
