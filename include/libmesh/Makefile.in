@@ -53,8 +53,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_1 = fparser.hh
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_2 = fparser.hh
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_1 = fparser.hh fparser_ad.hh
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_2 = fparser.hh fparser_ad.hh
 @LIBMESH_ENABLE_NANOFLANN_TRUE@am__append_3 = nanoflann.hpp
 @LIBMESH_ENABLE_NANOFLANN_TRUE@am__append_4 = nanoflann.hpp
 @LIBMESH_ENABLE_EXODUS_V509_TRUE@am__append_5 = exodusII.h \
@@ -758,6 +758,9 @@ uninstall-am:
 # contrib rules
 
 @LIBMESH_ENABLE_FPARSER_TRUE@fparser.hh: $(top_srcdir)/contrib/fparser/fparser.hh
+@LIBMESH_ENABLE_FPARSER_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+@LIBMESH_ENABLE_FPARSER_TRUE@fparser_ad.hh: $(top_srcdir)/contrib/fparser/fparser_ad.hh
 @LIBMESH_ENABLE_FPARSER_TRUE@	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 @LIBMESH_ENABLE_NANOFLANN_TRUE@nanoflann.hpp: $(top_srcdir)/contrib/nanoflann/include/nanoflann.hpp
