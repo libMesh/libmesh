@@ -249,6 +249,42 @@ private:
 
   const AddConstraint     &add_fn;
 
+  static Number f_component
+    (FunctionBase<Number> *f,
+     FEMFunctionBase<Number> *f_fem,
+     const FEMContext* c,
+     unsigned int i,
+     const Point& p,
+     Real time)
+  {
+    if (f_fem)
+      {
+        if (c)
+          return f_fem->component(*c, i, p, time);
+        else
+          return std::numeric_limits<Number>::quiet_NaN();
+      }
+    return f->component(i, p, time);
+  }
+
+  static Gradient g_component
+    (FunctionBase<Gradient> *g,
+     FEMFunctionBase<Gradient> *g_fem,
+     const FEMContext* c,
+     unsigned int i,
+     const Point& p,
+     Real time)
+  {
+    if (g_fem)
+      {
+        if (c)
+          return g_fem->component(*c, i, p, time);
+        else
+          return std::numeric_limits<Number>::quiet_NaN();
+      }
+    return g->component(i, p, time);
+  }
+
   template<typename OutputType>
   void apply_dirichlet_impl( const ConstElemRange &range,
                              const unsigned int var, const Variable&variable,
@@ -263,10 +299,21 @@ private:
 
     FunctionBase<Number> *f = dirichlet.f.get();
     FunctionBase<Gradient> *g = dirichlet.g.get();
+
+    FEMFunctionBase<Number> *f_fem = dirichlet.f_fem.get();
+    FEMFunctionBase<Gradient> *g_fem = dirichlet.g_fem.get();
+
+    const System *f_system = dirichlet.f_system;
+
     const std::set<boundary_id_type> &b = dirichlet.b;
 
     // We need data to project
-    libmesh_assert(f);
+    libmesh_assert(f || f_fem);
+    libmesh_assert(!(f && f_fem));
+
+    // Iff our data depends on a system, we should have it.
+    libmesh_assert(!(f && f_system));
+    libmesh_assert(!(f_fem && !f_system));
 
     // The element matrix and RHS for projections.
     // Note that Ke is always real-valued, whereas
@@ -308,7 +355,13 @@ private:
     if (cont == C_ONE)
       {
         // We'll need gradient data for a C1 projection
-        libmesh_assert(g);
+        libmesh_assert(g || g_fem);
+
+        // We currently demand that either neither nor both function
+        // object depend on current FEM data.
+        libmesh_assert(!(g && g_fem));
+        libmesh_assert(!(f && g_fem));
+        libmesh_assert(!(f_fem && g));
 
         const std::vector<std::vector<OutputGradient> >&
           ref_dphi = fe->get_dphi();
@@ -328,10 +381,41 @@ private:
     // Side/edge local DOF indices
     std::vector<unsigned int> side_dofs;
 
+    // If our supplied functions require a FEMContext, and if we have
+    // an initialized solution to use with that FEMContext, then
+    // create one
+    AutoPtr<FEMContext> context;
+    if (f_fem)
+      {
+        libmesh_assert(f_system);
+        if (f_system->current_local_solution->initialized())
+          {
+            context = AutoPtr<FEMContext>(new FEMContext(*f_system));
+            f_fem->init_context(*context);
+            if (g_fem)
+              g_fem->init_context(*context);
+          }
+      }
+
     // Iterate over all the elements in the range
     for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
       {
         const Elem* elem = *elem_it;
+
+        // There's a chicken-and-egg problem with FEMFunction-based
+        // Dirichlet constraints: we can't evaluate the FEMFunction
+        // until we have an initialized local solution vector, we
+        // can't initialize local solution vectors until we have a
+        // send list, and we can't generate a send list until we know
+        // all our constraints
+        //
+        // We don't generate constraints on uninitialized systems;
+        // currently user code will have to reinit() before any
+        // FEMFunction-based constraints will be correct.  This should
+        // be fine, since user code would want to reinit() after
+        // setting initial conditions anyway.
+        if (f_system && context.get())
+          context->pre_fe_reinit(*f_system, elem);
 
         // We only calculate Dirichlet constraints on active
         // elements
@@ -451,8 +535,8 @@ private:
                 for( unsigned int c = 0; c < n_vec_dim; c++ )
                   {
                     Ue(current_dof+c) =
-                      f->component(var_component+c,
-                                   elem->point(n), time);
+                      f_component(f, f_fem, context.get(), var_component+c,
+                                  elem->point(n), time);
                     dof_is_fixed[current_dof+c] = true;
                   }
                 current_dof += n_vec_dim;
@@ -461,13 +545,13 @@ private:
             else if (fe_type.family == HERMITE)
               {
                 Ue(current_dof) =
-                  f->component(var_component,
-                               elem->point(n), time);
+                  f_component(f, f_fem, context.get(), var_component,
+                              elem->point(n), time);
                 dof_is_fixed[current_dof] = true;
                 current_dof++;
                 Gradient grad =
-                  g->component(var_component,
-                               elem->point(n), time);
+                  g_component(g, g_fem, context.get(), var_component,
+                              elem->point(n), time);
                 // x derivative
                 Ue(current_dof) = grad(0);
                 dof_is_fixed[current_dof] = true;
@@ -480,11 +564,11 @@ private:
                     nxminus(0) -= TOLERANCE;
                     nxplus(0) += TOLERANCE;
                     Gradient gxminus =
-                      g->component(var_component,
-                                   nxminus, time);
+                      g_component(g, g_fem, context.get(), var_component,
+                                  nxminus, time);
                     Gradient gxplus =
-                      g->component(var_component,
-                                   nxplus, time);
+                      g_component(g, g_fem, context.get(), var_component,
+                                  nxplus, time);
                     // y derivative
                     Ue(current_dof) = grad(1);
                     dof_is_fixed[current_dof] = true;
@@ -512,11 +596,11 @@ private:
                         nyminus(1) -= TOLERANCE;
                         nyplus(1) += TOLERANCE;
                         Gradient gyminus =
-                          g->component(var_component,
-                                       nyminus, time);
+                          g_component(g, g_fem, context.get(), var_component,
+                                      nyminus, time);
                         Gradient gyplus =
-                          g->component(var_component,
-                                       nyplus, time);
+                          g_component(g, g_fem, context.get(), var_component,
+                                      nyplus, time);
                         // xz derivative
                         Ue(current_dof) = (gyplus(2) - gyminus(2))
                           / 2. / TOLERANCE;
@@ -536,17 +620,17 @@ private:
                         nxpyp(0) += TOLERANCE;
                         nxpyp(1) += TOLERANCE;
                         Gradient gxmym =
-                          g->component(var_component,
-                                       nxmym, time);
+                          g_component(g, g_fem, context.get(), var_component,
+                                      nxmym, time);
                         Gradient gxmyp =
-                          g->component(var_component,
-                                       nxmyp, time);
+                          g_component(g, g_fem, context.get(), var_component,
+                                      nxmyp, time);
                         Gradient gxpym =
-                          g->component(var_component,
-                                       nxpym, time);
+                          g_component(g, g_fem, context.get(), var_component,
+                                      nxpym, time);
                         Gradient gxpyp =
-                          g->component(var_component,
-                                       nxpyp, time);
+                          g_component(g, g_fem, context.get(), var_component,
+                                      nxpyp, time);
                         Number gxzplus = (gxpyp(2) - gxmyp(2))
                           / 2. / TOLERANCE;
                         Number gxzminus = (gxpym(2) - gxmym(2))
@@ -566,13 +650,13 @@ private:
               {
                 libmesh_assert_equal_to (nc, 1 + dim);
                 Ue(current_dof) =
-                  f->component(var_component,
-                               elem->point(n), time);
+                  f_component(f, f_fem, context.get(), var_component,
+                              elem->point(n), time);
                 dof_is_fixed[current_dof] = true;
                 current_dof++;
                 Gradient grad =
-                  g->component(var_component,
-                               elem->point(n), time);
+                  g_component(g, g_fem, context.get(), var_component,
+                              elem->point(n), time);
                 for (unsigned int i=0; i!= dim; ++i)
                   {
                     Ue(current_dof) = grad(i);
@@ -623,7 +707,9 @@ private:
                   libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
 
                   for( unsigned int c = 0; c < n_vec_dim; c++)
-                    f_accessor(c) = f->component(var_component+c, xyz_values[qp], time);
+                    f_accessor(c) =
+                      f_component(f, f_fem, context.get(), var_component+c,
+                                  xyz_values[qp], time);
 
                   // solution grad at the quadrature point
                   OutputNumberGradient finegrad;
@@ -650,8 +736,8 @@ private:
                     for( unsigned int c = 0; c < n_vec_dim; c++)
                       for( unsigned int d = 0; d < g_rank; d++ )
                         g_accessor(c + d*dim ) =
-                          g->component(var_component,
-                                       xyz_values[qp], time)(c);
+                          g_component(g, g_fem, context.get(), var_component,
+                                      xyz_values[qp], time)(c);
 
                   // Form edge projection matrix
                   for (unsigned int sidei=0, freei=0;
@@ -743,7 +829,9 @@ private:
                   libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
 
                   for( unsigned int c = 0; c < n_vec_dim; c++)
-                    f_accessor(c) = f->component(var_component+c, xyz_values[qp], time);
+                    f_accessor(c) =
+                      f_component(f, f_fem, context.get(), var_component+c,
+                                  xyz_values[qp], time);
 
                   // solution grad at the quadrature point
                   OutputNumberGradient finegrad;
@@ -770,8 +858,8 @@ private:
                     for( unsigned int c = 0; c < n_vec_dim; c++)
                       for( unsigned int d = 0; d < g_rank; d++ )
                         g_accessor(c + d*dim ) =
-                          g->component(var_component,
-                                       xyz_values[qp], time)(c);
+                          g_component(g, g_fem, context.get(), var_component,
+                                      xyz_values[qp], time)(c);
 
                   // Form side projection matrix
                   for (unsigned int sidei=0, freei=0;
