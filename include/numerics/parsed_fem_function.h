@@ -121,6 +121,7 @@ public:
         // Parse (and optimize if possible) the subexpression.
         // Add some basic constants, to Real precision.
         FunctionParserBase<Output> fp;
+        fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
         fp.AddConstant("pi", std::acos(Real(-1)));
         fp.AddConstant("e", std::exp(Real(1)));
         fp.Parse(subexpression, variables);
