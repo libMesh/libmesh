@@ -25,6 +25,7 @@
 // Local Includes
 #include "libmesh/fem_function_base.h"
 #include "libmesh/point.h"
+#include "libmesh/system.h"
 
 // FParser includes
 #include "fparser.hh"
