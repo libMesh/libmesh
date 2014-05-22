@@ -46,7 +46,6 @@ PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
 
 
 
-
 PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
                                     const Trees::BuildType build_type,
                                     const PointLocatorBase* master) :
@@ -60,12 +59,10 @@ PointLocatorTree::PointLocatorTree (const MeshBase& mesh,
 
 
 
-
 PointLocatorTree::~PointLocatorTree ()
 {
   this->clear ();
 }
-
 
 
 
@@ -85,22 +82,15 @@ void PointLocatorTree::clear ()
 
 
 
-
-
-void PointLocatorTree::init (const Trees::BuildType build_type)
+void PointLocatorTree::init (Trees::BuildType build_type)
 {
   libmesh_assert (!this->_tree);
 
   if (this->_initialized)
-    {
-      libMesh::err << "ERROR: Already initialized!  Will ignore this call..."
-                   << std::endl;
-    }
+    libMesh::err << "ERROR: Already initialized!  Will ignore this call..." << std::endl;
 
   else
-
     {
-
       if (this->_master == NULL)
         {
           START_LOG("init(no master)", "PointLocatorTree");
@@ -144,7 +134,6 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
         }
 
       else
-
         {
           // We are _not_ the master.  Let our Tree point to
           // the master's tree.  But for this we first transform
@@ -159,7 +148,6 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
             libmesh_error_msg("ERROR: Initialize master first, then servants!");
         }
 
-
       // Not all PointLocators may own a tree, but all of them
       // use their own element pointer.  Let the element pointer
       // be unique for every interpolator.
@@ -169,12 +157,9 @@ void PointLocatorTree::init (const Trees::BuildType build_type)
       this->_element = NULL;
     }
 
-
   // ready for take-off
   this->_initialized = true;
 }
-
-
 
 
 
@@ -198,7 +183,7 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
           // error, since in the case of curved elements, the
           // bounding box computed in \p TreeNode::insert(const
           // Elem*) might be slightly inaccurate.
-          if(!_out_of_mesh_mode)
+          if (!_out_of_mesh_mode)
             {
               START_LOG("linear search", "PointLocatorTree");
               MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
@@ -233,15 +218,17 @@ const Elem* PointLocatorTree::operator() (const Point& p) const
   return this->_element;
 }
 
-void PointLocatorTree::enable_out_of_mesh_mode (void)
+
+
+void PointLocatorTree::enable_out_of_mesh_mode ()
 {
-  /* Out-of-mesh mode is currently only supported if all of the
-     elements have affine mappings.  The reason is that for quadratic
-     mappings, it is not easy to construct a relyable bounding box of
-     the element, and thus, the fallback linear search in \p
-     operator() is required.  Hence, out-of-mesh mode would be
-     extremely slow.  */
-  if(!_out_of_mesh_mode)
+  // Out-of-mesh mode is currently only supported if all of the
+  // elements have affine mappings.  The reason is that for quadratic
+  // mappings, it is not easy to construct a relyable bounding box of
+  // the element, and thus, the fallback linear search in \p
+  // operator() is required.  Hence, out-of-mesh mode would be
+  // extremely slow.
+  if (!_out_of_mesh_mode)
     {
 #ifdef DEBUG
       MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
@@ -255,7 +242,9 @@ void PointLocatorTree::enable_out_of_mesh_mode (void)
     }
 }
 
-void PointLocatorTree::disable_out_of_mesh_mode (void)
+
+
+void PointLocatorTree::disable_out_of_mesh_mode ()
 {
   _out_of_mesh_mode = false;
 }

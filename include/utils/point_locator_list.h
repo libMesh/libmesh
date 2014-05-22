@@ -62,9 +62,6 @@ class Elem;
  *
  * @author Daniel Dreyer, 2003
  */
-
-// ------------------------------------------------------------
-// PointLocatorList class definition
 class PointLocatorList : public PointLocatorBase
 {
 public:
@@ -80,9 +77,6 @@ public:
    */
   PointLocatorList (const MeshBase& mesh,
                     const PointLocatorBase* master = NULL);
-
-
-public:
 
   /**
    * Destructor.
@@ -114,17 +108,16 @@ public:
    * return a NULL pointer instead of crashing.  Per default, this
    * mode is off.
    */
-  virtual void enable_out_of_mesh_mode (void);
+  virtual void enable_out_of_mesh_mode ();
 
   /**
    * Disables out-of-mesh mode (default).  If asked to find a point
    * that is contained in no mesh at all, the point locator will now
    * crash.
    */
-  virtual void disable_out_of_mesh_mode (void);
+  virtual void disable_out_of_mesh_mode ();
 
 protected:
-
   /**
    * Pointer to the list of element centroids.  Only the
    * master @e has such a list.  For servants, this
@@ -132,12 +125,7 @@ protected:
    * it's not a std::list as the name might suggest, but a std::vector.
    */
   std::vector<std::pair<Point, const Elem *> >* _list;
-
 };
-
-
-// ------------------------------------------------------------
-// PointLocatorList inline methods
 
 
 } // namespace libMesh

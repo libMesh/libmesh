@@ -51,12 +51,10 @@ PointLocatorList::PointLocatorList (const MeshBase& mesh,
 
 
 
-
 PointLocatorList::~PointLocatorList ()
 {
   this->clear ();
 }
-
 
 
 
@@ -79,17 +77,12 @@ void PointLocatorList::clear ()
 
 
 
-
-
 void PointLocatorList::init ()
 {
   libmesh_assert (!this->_list);
 
   if (this->_initialized)
-    {
-      libMesh::err << "ERROR: Already initialized!  Will ignore this call..."
-                   << std::endl;
-    }
+    libMesh::err << "ERROR: Already initialized!  Will ignore this call..." << std::endl;
 
   else
     {
@@ -109,9 +102,6 @@ void PointLocatorList::init ()
           // fill our list with the centroids and element
           // pointers of the mesh.  For this use the handy
           // element iterators.
-          //   const_active_elem_iterator       el (this->_mesh.elements_begin());
-          //   const const_active_elem_iterator end(this->_mesh.elements_end());
-
           MeshBase::const_element_iterator       el  = _mesh.active_elements_begin();
           const MeshBase::const_element_iterator end = _mesh.active_elements_end();
 
@@ -122,7 +112,6 @@ void PointLocatorList::init ()
         }
 
       else
-
         {
           // We are _not_ the master.  Let our _list point to
           // the master's list.  But for this we first transform
@@ -142,8 +131,6 @@ void PointLocatorList::init ()
   // ready for take-off
   this->_initialized = true;
 }
-
-
 
 
 
@@ -178,7 +165,6 @@ const Elem* PointLocatorList::operator() (const Point& p) const
     const Elem *      last_elem        = NULL;
     const std::size_t max_index        = my_list.size();
 
-
     for (std::size_t n=1; n<max_index; n++)
       {
         const Real current_distance_sq = Point(my_list[n].first -p).size_sq();
@@ -196,18 +182,21 @@ const Elem* PointLocatorList::operator() (const Point& p) const
     STOP_LOG("operator()", "PointLocatorList");
 
     // return the element
-    return (last_elem);
+    return last_elem;
   }
-
 }
 
-void PointLocatorList::enable_out_of_mesh_mode (void)
+
+
+void PointLocatorList::enable_out_of_mesh_mode ()
 {
   /* This functionality is not yet implemented for PointLocatorList.  */
   libmesh_not_implemented();
 }
 
-void PointLocatorList::disable_out_of_mesh_mode (void)
+
+
+void PointLocatorList::disable_out_of_mesh_mode ()
 {
   /* This functionality is not yet implemented for PointLocatorList.  */
   libmesh_not_implemented();

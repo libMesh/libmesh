@@ -46,14 +46,9 @@ class Elem;
  *
  * @author Daniel Dreyer, 2003
  */
-
-// ------------------------------------------------------------
-// PointLocatorTree class definition
 class PointLocatorTree : public PointLocatorBase
 {
 public:
-
-
   /**
    * Constructor.  Needs the \p mesh in which the points
    * should be located.  Optionally takes a master
@@ -81,10 +76,6 @@ public:
                     const Trees::BuildType build_type,
                     const PointLocatorBase* master = NULL);
 
-
-
-public:
-
   /**
    * Destructor.
    */
@@ -99,7 +90,7 @@ public:
    * Initializes the locator, so that the \p operator() methods can
    * be used.  This function allocates dynamic memory with "new".
    */
-  void init(const Trees::BuildType build_type);
+  void init(Trees::BuildType build_type);
 
   /**
    * Initializes the locator, so that the \p operator() methods can
@@ -121,17 +112,16 @@ public:
    * return a NULL pointer instead of crashing.  Per default, this
    * mode is off.
    */
-  virtual void enable_out_of_mesh_mode (void);
+  virtual void enable_out_of_mesh_mode ();
 
   /**
    * Disables out-of-mesh mode (default).  If asked to find a point
    * that is contained in no mesh at all, the point locator will now
    * crash.
    */
-  virtual void disable_out_of_mesh_mode (void);
+  virtual void disable_out_of_mesh_mode ();
 
 protected:
-
   /**
    * Pointer to our tree.  The tree is built at run-time
    * through \p init().  For servant PointLocators (not master),
@@ -151,12 +141,7 @@ protected:
    * enable_out_of_mesh_mode() for details.
    */
   bool _out_of_mesh_mode;
-
 };
-
-
-// ------------------------------------------------------------
-// PointLocatorTree inline methods
 
 
 } // namespace libMesh

@@ -51,9 +51,14 @@ PointLocatorBase::~PointLocatorBase ()
 
 
 
+bool PointLocatorBase::initialized () const
+{
+  return this->_initialized;
+}
 
 
-AutoPtr<PointLocatorBase> PointLocatorBase::build (const PointLocatorType t,
+
+AutoPtr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
                                                    const MeshBase& mesh,
                                                    const PointLocatorBase* master)
 {
@@ -61,15 +66,13 @@ AutoPtr<PointLocatorBase> PointLocatorBase::build (const PointLocatorType t,
     {
     case TREE:
       {
-        AutoPtr<PointLocatorBase> ap(new PointLocatorTree(mesh,
-                                                          master));
+        AutoPtr<PointLocatorBase> ap(new PointLocatorTree(mesh, master));
         return ap;
       }
 
     case LIST:
       {
-        AutoPtr<PointLocatorBase> ap(new PointLocatorList(mesh,
-                                                          master));
+        AutoPtr<PointLocatorBase> ap(new PointLocatorList(mesh, master));
         return ap;
       }
 

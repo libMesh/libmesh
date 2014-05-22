@@ -51,13 +51,9 @@ class Elem;
  *
  * @author Daniel Dreyer, 2003
  */
-
-// ------------------------------------------------------------
-// PointLocatorBase class definition
 class PointLocatorBase : public ReferenceCountedObject<PointLocatorBase>
 {
 protected:
-
   /**
    * Constructor.  Protected so that this base class
    * cannot be explicitly instantiated.  Takes a master
@@ -66,9 +62,7 @@ protected:
   PointLocatorBase (const MeshBase& mesh,
                     const PointLocatorBase* master);
 
-
 public:
-
   /**
    * Destructor.
    */
@@ -80,7 +74,7 @@ public:
    * An \p AutoPtr<PointLocatorBase> is returned to prevent memory leak.
    * This way the user need not remember to delete the object.
    */
-  static AutoPtr<PointLocatorBase> build (const PointLocatorType t,
+  static AutoPtr<PointLocatorBase> build (PointLocatorType t,
                                           const MeshBase& mesh,
                                           const PointLocatorBase* master = NULL);
 
@@ -113,17 +107,16 @@ public:
    * return a NULL pointer instead of crashing.  Per default, this
    * mode is off.
    */
-  virtual void enable_out_of_mesh_mode (void) = 0;
+  virtual void enable_out_of_mesh_mode () = 0;
 
   /**
    * Disables out-of-mesh mode (default).  If asked to find a point
    * that is contained in no mesh at all, the point locator will now
    * crash.
    */
-  virtual void disable_out_of_mesh_mode (void) = 0;
+  virtual void disable_out_of_mesh_mode () = 0;
 
 protected:
-
   /**
    * Const pointer to our master, initialized to \p NULL if none
    * given.  When using multiple PointLocators, one can be assigned
@@ -140,17 +133,7 @@ protected:
    * \p true when properly initialized, \p false otherwise.
    */
   bool _initialized;
-
 };
-
-
-// ------------------------------------------------------------
-// PointLocatorBase inline methods
-inline
-bool PointLocatorBase::initialized () const
-{
-  return (this->_initialized);
-}
 
 } // namespace libMesh
 
