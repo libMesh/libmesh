@@ -35,21 +35,21 @@ namespace libMesh
 /**
  * The \p Tet4 is an element in 3D composed of 4 nodes.
  * It is numbered like this:
- \verbatim
- TET4:
- 3
- o
- /|\
- / | \
- /  |  \
- 0 o...|...o 2
- \  |  /
- \ | /
- \|/
- o
- 1
- \endverbatim
-*/
+ * \verbatim
+ * TET4:
+ *       3
+ *       o
+ *      /|\
+ *     / | \
+ *    /  |  \
+ * 0 o...|...o 2
+ *    \  |  /
+ *     \ | /
+ *      \|/
+ *       o
+ *       1
+ * \endverbatim
+ */
 
 // ------------------------------------------------------------
 // Tet4 class definition

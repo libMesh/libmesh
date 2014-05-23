@@ -43,20 +43,20 @@ namespace libMesh
  * so this class is directly derived from \p Elem, without an intermediate
  * \p InfFace class or so.
  * It looks like this:
- \verbatim
-
- closer to infinity
- |           |
- |           |
- side 2 |           | side 1
- |           |
- |           |
- -----------             base side
-
- side 0
-
- \endverbatim
-*/
+ * \verbatim
+ *
+ *                                 closer to infinity
+ *        |           |
+ *        |           |
+ * side 2 |           | side 1
+ *        |           |
+ *        |           |
+ *         -----------             base side
+ *
+ *           side 0
+ *
+ * \endverbatim
+ */
 // ------------------------------------------------------------
 // InfQuad class definition
 class InfQuad : public Elem

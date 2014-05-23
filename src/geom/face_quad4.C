@@ -227,14 +227,14 @@ Real Quad4::volume () const
   // libmesh counter-clockwise numbering scheme.
 
   //        3           2        D           C
-  // QUAD4: o-----------o o-----------o
-  //        |           | |           |
-  //        |           | |           |
-  //        |           |  |           |
-  //        |           | |           |
-  //        |           | |           |
-  //        o-----------o o-----------o
-  //        0           1 A           B
+  // QUAD4: o-----------o        o-----------o
+  //        |           |        |           |
+  //        |           |        |           |
+  //        |           |        |           |
+  //        |           |        |           |
+  //        |           |        |           |
+  //        o-----------o        o-----------o
+  //        0           1        A           B
 
   // Vector pointing from A to C
   Point AC ( this->point(2) - this->point(0) );

@@ -35,11 +35,11 @@ namespace libMesh
  * The \p Edge2 is an element in 1D composed of 2 nodes. It is numbered
  * like this:
  *
- \verbatim
- EDGE2: o--------o
- 0        1
- \endverbatim
-*/
+ * \verbatim
+ *  EDGE2: o--------o
+ *         0        1
+ * \endverbatim
+ */
 
 // ------------------------------------------------------------
 // Edge class definition

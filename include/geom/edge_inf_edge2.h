@@ -38,18 +38,18 @@ namespace libMesh
  * The \p InfEdge2 is an infinte element in 1D composed of 2 nodes.
  * It is numbered like this:
  *
- \verbatim
- INFEDGE2:
-
- o         closer to infinity
- | 1
- |
- |
- |
- o         base node
- 0
- \endverbatim
-*/
+ * \verbatim
+ * INFEDGE2:
+ *
+ *     o         closer to infinity
+ *     | 1
+ *     |
+ *     |
+ *     |
+ *     o         base node
+ *       0
+ * \endverbatim
+ */
 // ------------------------------------------------------------
 // InfEdge2 class definition
 class InfEdge2 : public Edge

@@ -39,23 +39,23 @@ namespace libMesh
 /**
  * The \p InfPrism6 is an infinite element in 3D composed of 6 nodes.
  * It is numbered like this:
- \verbatim
- INFPRISM6:
- 5
- o
- :
- :         closer to infinity
- :
- 3 o   :   o 4
- |   :   |
- | 2 o   |
- |  . .  |
- | .   . |
- |.     .|
- o-------o     base face
- 0       1
- \endverbatim
-*/
+ * \verbatim
+ * INFPRISM6:
+ *         5
+ *         o
+ *         :
+ *         :         closer to infinity
+ *         :
+ *   3 o   :   o 4
+ *     |   :   |
+ *     | 2 o   |
+ *     |  . .  |
+ *     | .   . |
+ *     |.     .|
+ *     o-------o     base face
+ *     0       1
+ * \endverbatim
+ */
 
 // ------------------------------------------------------------
 // InfPrism6 class definition

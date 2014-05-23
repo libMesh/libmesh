@@ -35,28 +35,28 @@ namespace libMesh
 /**
  * The \p Tet10 is an element in 3D composed of 10 nodes.
  * It is numbered like this:
- \verbatim
- 3
- TET10:      o
- /|\
- / | \
- 7  /  |  \9
- o   |   o
- /    |8   \
- /     o     \
- /    6 |      \
- 0 o.....o.|.......o 2
- \      |      /
- \     |     /
- \    |    /
- 4 o   |   o 5
- \  |  /
- \ | /
- \|/
- o
- 1
- \endverbatim
-*/
+ * \verbatim
+ *             3
+ * TET10:      o
+ *            /|\
+ *           / | \
+ *       7  /  |  \9
+ *         o   |   o
+ *        /    |8   \
+ *       /     o     \
+ *      /    6 |      \
+ *   0 o.....o.|.......o 2
+ *      \      |      /
+ *       \     |     /
+ *        \    |    /
+ *       4 o   |   o 5
+ *          \  |  /
+ *           \ | /
+ *            \|/
+ *             o
+ *             1
+ *  \endverbatim
+ */
 
 // ------------------------------------------------------------
 // Tet10 class definition

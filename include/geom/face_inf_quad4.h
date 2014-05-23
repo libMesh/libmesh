@@ -38,18 +38,18 @@ namespace libMesh
 /**
  * The \p INFQUAD4 is an infinite element in 2D composed of 4 nodes.
  * It is numbered like this:
- \verbatim
- 2           3
- INFQUAD4: o           o   closer to infinity
- |           |
- |           |
- |           |
- |           |
- |           |
- o-----------o   base side
- 0           1
- \endverbatim
-*/
+ * \verbatim
+ *              2           3
+ *    INFQUAD4: o           o   closer to infinity
+ *              |           |
+ *              |           |
+ *              |           |
+ *              |           |
+ *              |           |
+ *              o-----------o   base side
+ *              0           1
+ * \endverbatim
+ */
 // ------------------------------------------------------------
 // InfQuad4 class definition
 class InfQuad4 : public InfQuad

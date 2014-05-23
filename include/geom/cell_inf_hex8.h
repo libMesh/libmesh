@@ -39,22 +39,22 @@ namespace libMesh
 /**
  * The \p InfHex8 is an infinite element in 3D composed of 8 nodes.
  * It is numbered like this:
- \verbatim
- INFHEX8: 7        6                             z^  / y
- o        o    closer to infinity        | /
- :        |                              |/
- :        |                              +----> x
- 4    :   5    |
- o   :    o   |
- |   o....|...o 2
- |  .3    |  /
- | .      | /
- |.       |/       base face
- o--------o
- 0        1
-
- \endverbatim
-*/
+ * \verbatim
+ * INFHEX8: 7        6                             z^  / y
+ *          o        o    closer to infinity        | /
+ *          :        |                              |/
+ *          :        |                              +----> x
+ *     4    :   5    |
+ *      o   :    o   |
+ *      |   o....|...o 2
+ *      |  .3    |  /
+ *      | .      | /
+ *      |.       |/       base face
+ *      o--------o
+ *      0        1
+ *
+ * \endverbatim
+ */
 
 // ------------------------------------------------------------
 // InfHex8 class definition

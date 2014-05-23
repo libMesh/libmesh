@@ -35,20 +35,20 @@ namespace libMesh
 /**
  * The \p Prism6 is an element in 3D composed of 6 nodes.
  * It is numbered like this:
- \verbatim
- PRISM6:
- 5
- o
- /:\
- / : \
- /  o  \
- 3 o-------o 4
- | . 2 . |
- |.     .|
- o-------o
- 0       1
- \endverbatim
-*/
+ * \verbatim
+ * PRISM6:
+ *         5
+ *         o
+ *        /:\
+ *       / : \
+ *      /  o  \
+ *   3 o-------o 4
+ *     | . 2 . |
+ *     |.     .|
+ *     o-------o
+ *     0       1
+ * \endverbatim
+ */
 
 // ------------------------------------------------------------
 // Prism class definition

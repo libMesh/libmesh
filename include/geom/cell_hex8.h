@@ -35,22 +35,22 @@ namespace libMesh
 /**
  * The \p Hex8 is an element in 3D composed of 8 nodes.
  * It is numbered like this:
- \verbatim
- HEX8: 7        6
- o--------o
- /:       /|
- / :      / |
- 4 /  :   5 /  |
- o--------o   |
- |   o....|...o 2
- |  .3    |  /
- | .      | /
- |.       |/
- o--------o
- 0        1
-
- \endverbatim
-*/
+ * \verbatim
+ *  HEX8: 7        6
+ *        o--------o
+ *       /:       /|
+ *      / :      / |
+ *   4 /  :   5 /  |
+ *    o--------o   |
+ *    |   o....|...o 2
+ *    |  .3    |  /
+ *    | .      | /
+ *    |.       |/
+ *    o--------o
+ *    0        1
+ *
+ * \endverbatim
+ */
 
 // ------------------------------------------------------------
 // Hex class definition

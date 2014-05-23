@@ -39,18 +39,18 @@ namespace libMesh
 /**
  * The \p INFQUAD6 is an infinite element in 2D composed of 6 nodes.
  * It is numbered like this:
- \verbatim
- 2     5     3
- INFQUAD6: o     o     o   closer to infinity
- |           |
- |           |
- |           |
- |           |
- |           |
- o-----o-----o   base side
- 0     4     1
- \endverbatim
-*/
+ * \verbatim
+ *           2     5     3
+ * INFQUAD6: o     o     o   closer to infinity
+ *           |           |
+ *           |           |
+ *           |           |
+ *           |           |
+ *           |           |
+ *           o-----o-----o   base side
+ *           0     4     1
+ * \endverbatim
+ */
 
 // ------------------------------------------------------------
 // InfQuad6 class definition

@@ -39,27 +39,27 @@ namespace libMesh
 /**
  * The \p InfPrism12 is an infinite element in 3D composed of 12 nodes.
  * It is numbered like this:
- \verbatim
- INFPRISM12:
- 5
- o
- :
- :
- :
- 11 o   :   o 10
- :  2:   :
- :   o   :        closer to infinity
- :  . .  :
- 3o   : . o9. :   o4
- |   :.  |  .:   |
- |   o   |   o   |
- |  . 8  |  7 .  |
- | .     |     . |
- |.      |      .|     base face
- o-------o-------o
- 0       6       1
- \endverbatim
-*/
+ * \verbatim
+ * INFPRISM12:
+ *          5
+ *          o
+ *          :
+ *          :
+ *          :
+ *   11 o   :   o 10
+ *      :  2:   :
+ *      :   o   :        closer to infinity
+ *      :  . .  :
+ * 3o   : . o9. :   o4
+ *  |   :.  |  .:   |
+ *  |   o   |   o   |
+ *  |  . 8  |  7 .  |
+ *  | .     |     . |
+ *  |.      |      .|     base face
+ *  o-------o-------o
+ *  0       6       1
+ * \endverbatim
+ */
 
 // ------------------------------------------------------------
 // InfPrism12 class definition
