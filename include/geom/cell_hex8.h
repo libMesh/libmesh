@@ -51,9 +51,6 @@ namespace libMesh
  *
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Hex class definition
 class Hex8 : public Hex
 {
 public:

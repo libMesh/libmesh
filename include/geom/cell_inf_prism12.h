@@ -60,9 +60,6 @@ namespace libMesh
  *  0       6       1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// InfPrism12 class definition
 class InfPrism12 : public InfPrism
 {
 public:

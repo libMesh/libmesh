@@ -37,9 +37,6 @@ namespace libMesh
  * The \p NodeElem is a point element, generally used as
  * a side of a 1D element.
  */
-
-// ------------------------------------------------------------
-// NodeElem class definition
 class NodeElem : public Elem
 {
 public:

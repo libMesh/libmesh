@@ -50,9 +50,6 @@ namespace libMesh
  *
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Pyramid class definition
 class Pyramid5 : public Pyramid
 {
 public:

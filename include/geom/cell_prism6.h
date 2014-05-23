@@ -49,9 +49,6 @@ namespace libMesh
  *     0       1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Prism class definition
 class Prism6 : public Prism
 {
 public:

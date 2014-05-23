@@ -87,9 +87,6 @@ class PointLocatorBase;
  *
  * \author Benjamin S. Kirk, 2002-2007
  */
-
-// ------------------------------------------------------------
-// Elem class definition
 class Elem : public ReferenceCountedObject<Elem>,
              public DofObject
 {

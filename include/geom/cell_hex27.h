@@ -65,9 +65,6 @@ namespace libMesh
  *    0              8              1
  *  \endverbatim
  */
-
-// ------------------------------------------------------------
-// Hex27 class definition
 class Hex27 : public Hex
 {
 public:

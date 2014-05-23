@@ -32,9 +32,6 @@ namespace libMesh
 /**
  * The \p Tri3 is an element in 2D composed of 3 nodes.
  */
-
-// ------------------------------------------------------------
-// Tri3Subdivision class definition
 class Tri3Subdivision : public Tri3
 {
 public:

@@ -69,9 +69,6 @@ namespace libMesh
  *   0              8              1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// InfHex16 class definition
 class InfHex16 : public InfHex
 {
 public:

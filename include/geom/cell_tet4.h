@@ -50,9 +50,6 @@ namespace libMesh
  *       1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Tet4 class definition
 class Tet4 : public Tet
 {
 public:

@@ -36,9 +36,6 @@ namespace libMesh
  * three dimensions.  A cell could be a tetrahedron, a hexahedron,
  * a pyramid, a prism, etc...
  */
-
-// ------------------------------------------------------------
-// Cell class definition
 class Cell : public Elem
 {
 public:

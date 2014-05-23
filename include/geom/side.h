@@ -46,9 +46,6 @@ class Node;
  *
  * \author  Benjamin S. Kirk
  */
-
-// ------------------------------------------------------------
-//Side class definition
 template <class SideType, class ParentType>
 class Side : public SideType
 {

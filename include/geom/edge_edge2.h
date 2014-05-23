@@ -40,9 +40,6 @@ namespace libMesh
  *         0        1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Edge class definition
 class Edge2 : public Edge
 {
 public:

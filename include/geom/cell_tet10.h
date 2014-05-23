@@ -57,9 +57,6 @@ namespace libMesh
  *             1
  *  \endverbatim
  */
-
-// ------------------------------------------------------------
-// Tet10 class definition
 class Tet10 : public Tet
 {
 public:

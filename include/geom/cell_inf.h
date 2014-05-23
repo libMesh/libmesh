@@ -38,9 +38,6 @@ namespace libMesh
  * three dimensions.  An infinite cell could be an infinite hexahedron,
  * or an infinite prism.
  */
-
-// ------------------------------------------------------------
-// InfCell class definition
 class InfCell : public Elem
 {
 public:

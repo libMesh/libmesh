@@ -42,9 +42,6 @@ namespace libMesh
  * at a specific distance from the mesh origin (and therefore
  * define a side).  Still, this face is not to be used!
  */
-
-// ------------------------------------------------------------
-// InfHex class definition
 class InfHex : public InfCell
 {
 public:

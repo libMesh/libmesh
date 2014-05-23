@@ -37,9 +37,6 @@ class Mesh;
  * two dimensions.  A face could be a triangle, a quadrilateral,
  * a pentagon, etc...
  */
-
-// ------------------------------------------------------------
-// Face class definition
 class Face : public Elem
 {
 public:

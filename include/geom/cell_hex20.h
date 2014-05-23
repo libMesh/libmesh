@@ -65,9 +65,6 @@ namespace libMesh
  *     0              8              1
  *   \endverbatim
  */
-
-// ------------------------------------------------------------
-// Hex20 class definition
 class Hex20 : public Hex
 {
 public:

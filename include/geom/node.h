@@ -50,7 +50,6 @@ class MeshRefinement;
  * \author Benjamin S. Kirk
  * \date 2003
  */
-
 class Node : public Point,
              public DofObject,
              public ReferenceCountedObject<Node>

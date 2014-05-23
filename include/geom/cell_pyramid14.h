@@ -69,9 +69,6 @@ namespace libMesh
  *
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Pyramid class definition
 class Pyramid14 : public Pyramid
 {
 public:

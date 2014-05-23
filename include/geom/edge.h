@@ -39,9 +39,6 @@ class Mesh;
  * The \p Edge is an element in 1D. It can be thought of as a
  * line segment.
  */
-
-// ------------------------------------------------------------
-// Edge class definition
 class Edge : public Elem
 {
 public:

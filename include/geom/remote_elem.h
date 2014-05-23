@@ -44,9 +44,6 @@ namespace libMesh
  *
  * \author Roy H. Stogner, 2007
  */
-
-// ------------------------------------------------------------
-// RemoteElem class definition
 class RemoteElem : public Elem,
                    public Singleton
 {

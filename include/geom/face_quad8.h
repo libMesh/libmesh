@@ -53,9 +53,6 @@ class Mesh;
  *        0     4     1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Quad8 class definition
 class Quad8 : public Quad
 {
 public:

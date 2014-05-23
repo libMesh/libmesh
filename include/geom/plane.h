@@ -34,9 +34,6 @@ namespace libMesh
  *
  * @author Benjamin S. Kirk, 2002
  */
-
-// ------------------------------------------------------------
-// Plane class definition
 class Plane : public Surface
 {
 public:

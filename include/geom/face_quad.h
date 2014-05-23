@@ -49,9 +49,6 @@ namespace libMesh
  *
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Quad class definition
 class Quad : public Face
 {
 public:

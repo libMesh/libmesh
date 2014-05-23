@@ -52,9 +52,6 @@ namespace libMesh
  *        0     4     1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Quad9 class definition
 class Quad9 : public Quad
 {
 public:

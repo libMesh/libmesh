@@ -39,9 +39,6 @@ namespace libMesh
  *
  * @author Benjamin S. Kirk, 2002
  */
-
-// ------------------------------------------------------------
-// Surface class definition
 class Surface
 {
 public:

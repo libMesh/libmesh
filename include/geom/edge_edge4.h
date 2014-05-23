@@ -39,9 +39,6 @@ namespace libMesh
  *         0    2    3    1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Edge4 class definition
 class Edge4 : public Edge
 {
 public:

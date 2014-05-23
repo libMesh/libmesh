@@ -32,9 +32,6 @@ namespace libMesh
 /**
  * The \p Tet is an element in 3D composed of 4 sides.
  */
-
-// ------------------------------------------------------------
-// Tet class definition
 class Tet : public Cell
 {
 public:

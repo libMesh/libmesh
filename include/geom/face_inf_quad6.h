@@ -51,9 +51,6 @@ namespace libMesh
  *           0     4     1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// InfQuad6 class definition
 class InfQuad6 : public InfQuad
 {
 public:

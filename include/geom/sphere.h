@@ -69,9 +69,6 @@ namespace libMesh
  * \author Benjamin S. Kirk, Daniel Dreyer
  * \date 2002-2007
  */
-
-// ------------------------------------------------------------
-// Sphere class definition
 class Sphere : public Surface
 {
 public:

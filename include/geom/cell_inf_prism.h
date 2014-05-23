@@ -42,9 +42,6 @@ namespace libMesh
  * at a specific distance from the mesh origin (and therefore
  * define a side).  Still, this face is not to be used!
  */
-
-// ------------------------------------------------------------
-// InfPrism class definition
 class InfPrism : public InfCell
 {
 public:

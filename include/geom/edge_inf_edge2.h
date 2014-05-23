@@ -50,8 +50,6 @@ namespace libMesh
  *       0
  * \endverbatim
  */
-// ------------------------------------------------------------
-// InfEdge2 class definition
 class InfEdge2 : public Edge
 {
 public:

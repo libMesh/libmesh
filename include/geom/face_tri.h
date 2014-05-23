@@ -51,9 +51,6 @@ namespace libMesh
  *
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Tri class definition
 class Tri : public Face
 {
 public:

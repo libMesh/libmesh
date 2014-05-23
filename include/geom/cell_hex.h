@@ -32,9 +32,6 @@ namespace libMesh
 /**
  * The \p Hex is an element in 3D with 6 sides.
  */
-
-// ------------------------------------------------------------
-// Hex class definition
 class Hex : public Cell
 {
 public:

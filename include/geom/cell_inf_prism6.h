@@ -56,9 +56,6 @@ namespace libMesh
  *     0       1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// InfPrism6 class definition
 class InfPrism6 : public InfPrism
 {
 public:

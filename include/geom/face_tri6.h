@@ -53,9 +53,6 @@ namespace libMesh
  *   0     3     1
  * \endverbatim
  */
-
-// ------------------------------------------------------------
-// Tri6 class definition
 class Tri6 : public Tri
 {
 public:
