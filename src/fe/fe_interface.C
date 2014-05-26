@@ -31,9 +31,7 @@ namespace libMesh
 //FEInterface class members
 FEInterface::FEInterface()
 {
-  libMesh::err << "ERROR: Do not define an object of this type."
-               << std::endl;
-  libmesh_error();
+  libmesh_error_msg("ERROR: Do not define an object of this type.");
 }
 
 
@@ -68,7 +66,7 @@ FEInterface::FEInterface()
         libmesh_assert_equal_to (dim, 2);                       \
         prefix FE<2,SUBDIVISION>::func_and_args suffix          \
       default:                                                  \
-        libmesh_error();                                        \
+        libmesh_error_msg("Unsupported family = " << fe_t.family); \
       }                                                         \
   } while (0)
 
@@ -106,7 +104,7 @@ FEInterface::FEInterface()
       case NEDELEC_ONE:                                                 \
         prefix FENedelecOne<dim>::func_and_args suffix                  \
       default:                                                          \
-        libmesh_error();                                                \
+        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
   } while (0)
 
@@ -141,11 +139,9 @@ FEInterface::FEInterface()
         prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
       case LAGRANGE_VEC:                                                \
       case NEDELEC_ONE:                                                 \
-        libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args" \
-                     << std::endl;                                      \
-        libmesh_error();                                                \
+        libmesh_error_msg("Error: Can only request scalar valued elements for Real FEInterface::func_and_args"); \
       default:                                                          \
-        libmesh_error();                                                \
+        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
   } while(0)
 
@@ -169,11 +165,9 @@ FEInterface::FEInterface()
       case SZABAB:                                                      \
       case XYZ:                                                         \
       case SUBDIVISION:                                                 \
-        libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::shape" \
-                     << std::endl;                                      \
-        libmesh_error();                                                \
+        libmesh_error_msg("Error: Can only request vector valued elements for RealGradient FEInterface::shape"); \
       default:                                                          \
-        libmesh_error();                                                \
+        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
   } while(0)
 
@@ -204,7 +198,7 @@ FEInterface::FEInterface()
         libmesh_assert_equal_to (dim, 2);                       \
         prefix FE<2,SUBDIVISION>::func_and_args suffix          \
       default:                                                  \
-        libmesh_error();                                        \
+        libmesh_error_msg("Unsupported family = " << fe_t.family); \
       }                                                         \
   } while (0)
 
@@ -238,7 +232,7 @@ FEInterface::FEInterface()
       case NEDELEC_ONE:                                                 \
         prefix FENedelecOne<dim>::func_and_args suffix                  \
       default:                                                          \
-        libmesh_error();                                                \
+        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
   } while (0)
 
@@ -269,11 +263,9 @@ FEInterface::FEInterface()
         prefix  FE<2,SUBDIVISION>::func_and_args suffix                 \
       case LAGRANGE_VEC:                                                \
       case NEDELEC_ONE:                                                 \
-        libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args" \
-                     << std::endl;                                      \
-        libmesh_error();                                                \
+        libmesh_error_msg("Error: Can only request scalar valued elements for Real FEInterface::func_and_args"); \
       default:                                                          \
-        libmesh_error();                                                \
+        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
   } while(0)
 
@@ -295,11 +287,9 @@ FEInterface::FEInterface()
       case SCALAR:                                                      \
       case XYZ:                                                         \
       case SUBDIVISION:                                                 \
-        libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::func_and_args" \
-                     << std::endl;                                      \
-        libmesh_error();                                                \
+        libmesh_error_msg("Error: Can only request vector valued elements for RealGradient FEInterface::func_and_args"); \
       default:                                                          \
-        libmesh_error();                                                \
+        libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
   } while(0)
 #endif
@@ -322,7 +312,7 @@ FEInterface::FEInterface()
       case 3:                                           \
         fe_family_switch (3, func_and_args, return, ;); \
       default:                                          \
-        libmesh_error();                                \
+        libmesh_error_msg("Invalid dim = " << dim);     \
       }                                                 \
   } while (0)
 
@@ -343,7 +333,7 @@ FEInterface::FEInterface()
       case 3:                                                           \
         fe_family_with_vec_switch (3, func_and_args, return, ;);        \
       default:                                                          \
-        libmesh_error();                                                \
+        libmesh_error_msg("Invalid dim = " << dim);                     \
       }                                                                 \
   } while (0)
 
@@ -365,7 +355,7 @@ FEInterface::FEInterface()
       case 3:                                                   \
         fe_family_switch (3, func_and_args, ;, ; return;);      \
       default:                                                  \
-        libmesh_error();                                        \
+        libmesh_error_msg("Invalid dim = " << dim);             \
       }                                                         \
   } while (0)
 
@@ -386,7 +376,7 @@ FEInterface::FEInterface()
       case 3:                                                           \
         fe_family_with_vec_switch (3, func_and_args, ;, ; return;);     \
       default:                                                          \
-        libmesh_error();                                                \
+        libmesh_error_msg("Invalid dim = " << dim);                     \
       }                                                                 \
   } while (0)
 
@@ -413,7 +403,7 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
   fe_with_vec_switch(n_shape_functions(t, o));
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -436,7 +426,7 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
   fe_with_vec_switch(n_dofs(t, o));
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -459,7 +449,7 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 
   fe_with_vec_switch(n_dofs_at_node(t, o, n));
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -482,7 +472,7 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
   fe_with_vec_switch(n_dofs_per_elem(t, o));
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -499,7 +489,7 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 
   void_fe_with_vec_switch(dofs_on_side(elem, o, s, di));
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
 }
 
 
@@ -514,7 +504,7 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 
   void_fe_with_vec_switch(dofs_on_edge(elem, o, e, di));
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
 }
 
 
@@ -551,7 +541,7 @@ Point FEInterface::map(unsigned int dim,
 {
   fe_with_vec_switch(map(elem, p));
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return Point();
 }
 
@@ -575,7 +565,7 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
   fe_with_vec_switch(inverse_map(elem, p, tolerance, secure));
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return Point();
 }
 
@@ -609,18 +599,14 @@ void FEInterface::inverse_map (const unsigned int dim,
     {
       ifem_inverse_map(dim, fe_t, elem, physical_points, reference_points, tolerance, secure);
       return;
-
-      //       libMesh::err << "ERROR: Not implemented!"
-      // << std::endl;
-      //       libmesh_error();
+      // libmesh_not_implemented();
     }
 
 #endif
 
   void_fe_with_vec_switch(inverse_map(elem, physical_points, reference_points, tolerance, secure));
 
-  libmesh_error();
-  return;
+  libmesh_error_msg("We'll never get here!");
 }
 
 
@@ -652,7 +638,7 @@ Real FEInterface::shape(const unsigned int dim,
 
   fe_switch(shape(t,o,i,p));
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -673,7 +659,7 @@ Real FEInterface::shape(const unsigned int dim,
 
   fe_switch(shape(elem,o,i,p));
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -977,7 +963,7 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid dimension = " << elem->dim());
     }
 }
 

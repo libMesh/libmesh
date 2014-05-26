@@ -53,8 +53,7 @@ Real FE<1,L2_LAGRANGE>::shape(const ElemType,
             return .5*(1. + xi);
 
           default:
-            libMesh::err << "Invalid shape function index!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("Invalid shape function index i = " << i);
           }
       }
 
@@ -77,8 +76,7 @@ Real FE<1,L2_LAGRANGE>::shape(const ElemType,
             return (1. - xi*xi);
 
           default:
-            libMesh::err << "Invalid shape function index!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("Invalid shape function index i = " << i);
           }
       }
 
@@ -104,20 +102,15 @@ Real FE<1,L2_LAGRANGE>::shape(const ElemType,
             return 27./16.*(1.-xi*xi)*(1./3.+xi);
 
           default:
-            libMesh::err << "Invalid shape function index!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("Invalid shape function index i = " << i);
           }
       }
 
     default:
-      {
-        libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unsupported polynomial order = " << order);
     }
 
-
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -166,8 +159,7 @@ Real FE<1,L2_LAGRANGE>::shape_deriv(const ElemType,
             return .5;
 
           default:
-            libMesh::err << "Invalid shape function index!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("Invalid shape function index i = " << i);
           }
       }
 
@@ -189,8 +181,7 @@ Real FE<1,L2_LAGRANGE>::shape_deriv(const ElemType,
             return -2.*xi;
 
           default:
-            libMesh::err << "Invalid shape function index!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("Invalid shape function index i = " << i);
           }
       }
 
@@ -215,20 +206,16 @@ Real FE<1,L2_LAGRANGE>::shape_deriv(const ElemType,
             return 27./16.*(-3.*xi*xi-2./3.*xi+1.);
 
           default:
-            libMesh::err << "Invalid shape function index!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("Invalid shape function index i = " << i);
           }
       }
 
 
     default:
-      {
-        libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unsupported polynomial order = " << order);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -287,11 +274,7 @@ Real FE<1,L2_LAGRANGE>::shape_second_deriv(const ElemType,
             return -2.;
 
           default:
-            {
-              libMesh::err << "Invalid shape function index requested!"
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("Invalid shape function index i = " << i);
           }
       } // end case SECOND
 
@@ -312,23 +295,16 @@ Real FE<1,L2_LAGRANGE>::shape_second_deriv(const ElemType,
             return 27./16.*(-6*xi-2./3.);
 
           default:
-            {
-              libMesh::err << "Invalid shape function index requested!"
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("Invalid shape function index i = " << i);
           }
       } // end case THIRD
 
 
     default:
-      {
-        libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unsupported polynomial order = " << order);
     } // end switch (order)
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 

@@ -34,11 +34,7 @@ Real FE<2,L2_HIERARCHIC>::shape(const ElemType,
                                 const unsigned int,
                                 const Point&)
 {
-  libMesh::err << "Hierarchic polynomials require the element type\n"
-               << "because edge orientation is needed."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Hierarchic polynomials require the element type \nbecause edge orientation is needed.");
   return 0.;
 }
 
@@ -219,8 +215,7 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem* elem,
       }
 
     default:
-      libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported element type = " << elem->type());
     }
 
   return 0.;
@@ -235,11 +230,7 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const ElemType,
                                       const unsigned int,
                                       const Point&)
 {
-  libMesh::err << "Hierarchic polynomials require the element type\n"
-               << "because edge orientation is needed."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Hierarchic polynomials require the element type \nbecause edge orientation is needed.");
   return 0.;
 }
 
@@ -294,7 +285,7 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem* elem,
 
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid derivative index j = " << j);
           }
       }
 
@@ -368,14 +359,12 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem* elem,
                       FE<1,L2_HIERARCHIC>::shape_deriv(EDGE3, totalorder, i1, 0, eta));
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid derivative index j = " << j);
           }
-
       }
 
     default:
-      libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported element type = " << type);
     }
 
   return 0.;
@@ -390,11 +379,7 @@ Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
                                              const unsigned int,
                                              const Point&)
 {
-  libMesh::err << "Hierarchic polynomials require the element type\n"
-               << "because edge orientation is needed."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Hierarchic polynomials require the element type \nbecause edge orientation is needed.");
   return 0.;
 }
 
@@ -444,7 +429,7 @@ Real FE<2,L2_HIERARCHIC>::shape_second_deriv(const Elem* elem,
         break;
       }
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid derivative index j = " << j);
     }
   return (FE<2,L2_HIERARCHIC>::shape_deriv(elem, order, i, prevj, pp) -
           FE<2,L2_HIERARCHIC>::shape_deriv(elem, order, i, prevj, pm)
