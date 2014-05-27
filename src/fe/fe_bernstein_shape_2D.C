@@ -36,11 +36,7 @@ Real FE<2,BERNSTEIN>::shape(const ElemType,
                             const unsigned int,
                             const Point&)
 {
-  libMesh::err << "Bernstein polynomials require the element type\n"
-               << "because edge orientation is needed."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Bernstein polynomials require the element type \nbecause edge orientation is needed.");
   return 0.;
 }
 
@@ -164,7 +160,8 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
               case 1: return x;  //f0,1,1
               case 2: return y;  //f1,0,1
 
-              default: libmesh_error(); return 0;
+              default:
+                libmesh_error_msg("Invalid shape function index i = " << i);
               }
           }
         case SECOND:
@@ -185,7 +182,8 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
               case 4: return 2.*x*y;
               case 5: return 2.*r*y;
 
-              default: libmesh_error(); return 0;
+              default:
+                libmesh_error_msg("Invalid shape function index i = " << i);
               }
           }
         case THIRD:
@@ -219,7 +217,8 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 
               case 9: return 6.*x*y*r;
 
-              default: libmesh_error(); return 0;
+              default:
+                libmesh_error_msg("Invalid shape function index shape = " << shape);
               }
           }
         case FOURTH:
@@ -261,7 +260,8 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
               case 13: return 12.*x*x*y*r;
               case 14: return 12.*x*y*y*r;
 
-              default: libmesh_error(); return 0;
+              default:
+                libmesh_error_msg("Invalid shape function index shape = " << shape);
               }
           }
         case FIFTH:
@@ -308,7 +308,8 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
               case 19: return 20.*pow<3>(x)*y*r;
               case 20: return 30.*pow<2>(x)*pow<2>(y)*r;
 
-              default: libmesh_error(); return 0;
+              default:
+                libmesh_error_msg("Invalid shape function index shape = " << shape);
               }
           }
         case SIXTH:
@@ -362,25 +363,16 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
               case 26: return 60.*pow<3>(x)*pow<2>(y)*r;
               case 27: return 30.*pow<4>(x)*y*r;
 
-              default: libmesh_error(); return 0;
+              default:
+                libmesh_error_msg("Invalid shape function index shape = " << shape);
               } // switch shape
           } // case TRI6
         default:
-          {
-            libMesh::err << "ERROR: element order!" << std::endl;
-            libmesh_error();
-          }
-
-
+          libmesh_error_msg("Invalid totalorder = " << totalorder);
         } // switch order
 
-
     default:
-      {
-        libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-        libmesh_error();
-      }
-
+      libmesh_error_msg("ERROR: Unsupported element type = " << type);
     } // switch type
 
 
@@ -943,7 +935,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
   //       libmesh_error();
   //     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -956,11 +948,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const ElemType,
                                   const unsigned int,
                                   const Point&)
 {
-  libMesh::err << "Bernstein polynomials require the element type\n"
-               << "because edge orientation is needed."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Bernstein polynomials require the element type \nbecause edge orientation is needed.");
   return 0.;
 }
 
@@ -1078,7 +1066,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
                     FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i1[8], 0, eta));
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid shape function derivative j = " << j);
           }
       }
 
@@ -1114,16 +1102,12 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid shape function derivative j = " << j);
           }
       }
 
     default:
-      {
-        libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-        libmesh_error();
-      }
-
+      libmesh_error_msg("ERROR: Unsupported element type = " << type);
     }
 
   // old code
@@ -1783,7 +1767,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
   //     }
 
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 

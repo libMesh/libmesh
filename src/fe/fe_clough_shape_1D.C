@@ -116,7 +116,7 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
         }
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -144,7 +144,7 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
         }
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -165,7 +165,7 @@ Real clough_raw_shape(const unsigned int basis_num,
       return -xi*xi + xi*xi*xi;
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -183,11 +183,7 @@ Real FE<1,CLOUGH>::shape(const ElemType,
                          const unsigned int,
                          const Point&)
 {
-  libMesh::err << "Clough-Tocher elements require the real element\n"
-               << "to construct gradient-based degrees of freedom."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
 }
 
@@ -231,21 +227,19 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
                 case 3:
                   return d2xd2x * clough_raw_shape(3, p);
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
             }
           default:
-            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Unsupported element type = " << type);
           }
       }
       // by default throw an error
     default:
-      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -258,11 +252,7 @@ Real FE<1,CLOUGH>::shape_deriv(const ElemType,
                                const unsigned int,
                                const Point&)
 {
-  libMesh::err << "Clough-Tocher elements require the real element\n"
-               << "to construct gradient-based degrees of freedom."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
 }
 
@@ -305,21 +295,19 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem* elem,
                 case 3:
                   return d2xd2x * clough_raw_shape_deriv(3, j, p);
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
             }
           default:
-            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Unsupported element type = " << type);
           }
       }
       // by default throw an error
     default:
-      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -362,21 +350,19 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem* elem,
                 case 3:
                   return d2xd2x * clough_raw_shape_second_deriv(3, j, p);
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
             }
           default:
-            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Unsupported element type = " << type);
           }
       }
       // by default throw an error
     default:
-      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 

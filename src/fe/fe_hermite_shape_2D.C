@@ -127,7 +127,7 @@ Real hermite_bases_2D
           coef = dxdxi[0][bases1D[0]] * dxdxi[1][bases1D[1]];
           bases1D[0] += 2; bases1D[1] += 2; break;
         default:
-          libmesh_error();
+          libmesh_error_msg("Invalid basisnum = " << basisnum);
         }
     }
   // Edges
@@ -161,7 +161,7 @@ Real hermite_bases_2D
             coef = dxdxi[0][0];
           break;
         default:
-          libmesh_error();
+          libmesh_error_msg("Invalid basisnum = " << basisnum);
         }
     }
   // Interior
@@ -190,11 +190,7 @@ Real FE<2,HERMITE>::shape(const ElemType,
                           const unsigned int,
                           const Point&)
 {
-  libMesh::err << "Hermite elements require the real element\n"
-               << "to construct gradient-based degrees of freedom."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
 }
 
@@ -241,11 +237,10 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
           FEHermite<1>::hermite_raw_shape(bases1D[1],p(1));
       }
     default:
-      libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported element type = " << type);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -258,11 +253,7 @@ Real FE<2,HERMITE>::shape_deriv(const ElemType,
                                 const unsigned int,
                                 const Point&)
 {
-  libMesh::err << "Hermite elements require the real element\n"
-               << "to construct gradient-based degrees of freedom."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
 }
 
@@ -318,15 +309,14 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
               FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
               FEHermite<1>::hermite_raw_shape_deriv(bases1D[1],p(1));
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid derivative index j = " << j);
           }
       }
     default:
-      libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported element type = " << type);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -386,15 +376,14 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
               FEHermite<1>::hermite_raw_shape(bases1D[0],p(0)) *
               FEHermite<1>::hermite_raw_shape_second_deriv(bases1D[1],p(1));
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid derivative index j = " << j);
           }
       }
     default:
-      libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported element type = " << type);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 

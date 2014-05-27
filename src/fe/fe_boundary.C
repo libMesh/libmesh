@@ -44,9 +44,7 @@ namespace libMesh
                              const std::vector<Point>* const,           \
                              const std::vector<Real>* const)            \
   {                                                                     \
-    libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
-                 << std::endl;                                          \
-    libmesh_error();                                                    \
+    libmesh_error_msg("ERROR: This method makes no sense for low-D elements!"); \
   }
 
 #define SIDEMAP_ERROR(_dim, _type, _func)                               \
@@ -57,9 +55,7 @@ namespace libMesh
                              const std::vector<Point>&,                 \
                              std::vector<Point>&)                       \
   {                                                                     \
-    libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
-                 << std::endl;                                          \
-    libmesh_error();                                                    \
+    libmesh_error_msg("ERROR: This method makes no sense for low-D elements!"); \
   }
 
 #define FACE_EDGE_SHAPE_ERROR(_dim, _func)                              \
@@ -67,9 +63,7 @@ namespace libMesh
   void FEMap::_func<_dim>(const std::vector<Point>&,                    \
                           const Elem* )                                 \
   {                                                                     \
-    libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
-                 << std::endl;                                          \
-    libmesh_error();                                                    \
+    libmesh_error_msg("ERROR: This method makes no sense for low-D elements!"); \
   }
 
 
@@ -795,8 +789,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real>& qw,
 
 
     default:
-      libmesh_error();
-
+      libmesh_error_msg("Invalid dimension dim = " << dim);
     }
   STOP_LOG("compute_face_map()", "FEMap");
 }

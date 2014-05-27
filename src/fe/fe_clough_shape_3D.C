@@ -35,11 +35,7 @@ Real FE<3,CLOUGH>::shape(const ElemType,
                          const unsigned int,
                          const Point&)
 {
-  libMesh::err << "Clough-Tocher elements require the real element\n"
-               << "to construct gradient-based degrees of freedom."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
 }
 
@@ -66,11 +62,7 @@ Real FE<3,CLOUGH>::shape_deriv(const ElemType,
                                const unsigned int,
                                const Point&)
 {
-  libMesh::err << "Clough-Tocher elements require the real element\n"
-               << "to construct gradient-based degrees of freedom."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Clough-Tocher elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
 }
 

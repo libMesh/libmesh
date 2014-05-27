@@ -105,7 +105,7 @@ Real FEHermite<1>::hermite_raw_shape_second_deriv
               (i-4)*(i-5)*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -142,7 +142,7 @@ Real FEHermite<1>::hermite_raw_shape_deriv
               (i-4)*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -178,7 +178,7 @@ Real FEHermite<1>::hermite_raw_shape
 
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -189,11 +189,7 @@ Real FE<1,HERMITE>::shape(const ElemType,
                           const unsigned int,
                           const Point&)
 {
-  libMesh::err << "Hermite elements require the real element\n"
-               << "to construct gradient-based degrees of freedom."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
 }
 
@@ -246,17 +242,15 @@ Real FE<1,HERMITE>::shape(const Elem* elem,
                 }
             }
           default:
-            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Unsupported element type = " << type);
           }
       }
       // by default throw an error
     default:
-      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -269,11 +263,7 @@ Real FE<1,HERMITE>::shape_deriv(const ElemType,
                                 const unsigned int,
                                 const Point&)
 {
-  libMesh::err << "Hermite elements require the real element\n"
-               << "to construct gradient-based degrees of freedom."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Hermite elements require the real element \nto construct gradient-based degrees of freedom.");
   return 0.;
 }
 
@@ -325,17 +315,15 @@ Real FE<1,HERMITE>::shape_deriv(const Elem* elem,
                 }
             }
           default:
-            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Unsupported element type = " << type);
           }
       }
       // by default throw an error
     default:
-      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -387,17 +375,15 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem* elem,
                 }
             }
           default:
-            libMesh::err << "ERROR: Unsupported element type!" << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Unsupported element type = " << type);
           }
       }
       // by default throw an error
     default:
-      libMesh::err << "ERROR: Unsupported polynomial order!" << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unsupported polynomial order = " << totalorder);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 

@@ -38,11 +38,7 @@ Real FE<3,BERNSTEIN>::shape(const ElemType,
                             const unsigned int,
                             const Point&)
 {
-  libMesh::err << "Bernstein polynomials require the element type\n"
-               << "because edge and face orientation is needed."
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("Bernstein polynomials require the element type \nbecause edge and face orientation is needed.");
   return 0.;
 }
 
@@ -64,7 +60,6 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 
   switch (totalorder)
     {
-
       // 1st order Bernstein.
     case FIRST:
       {
@@ -91,7 +86,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
                 case  3:  return zeta3;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
             }
 
@@ -121,7 +116,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid element type = " << type);
           }
       }
 
@@ -158,7 +153,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
                 case  9:  return 2.*zeta2*zeta3;
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid shape function index i = " << i);
                 }
             }
 
@@ -250,7 +245,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid element type = " << type);
           }
 
       }
@@ -323,7 +318,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
             // case 19:  return 6.*zeta2*zeta0*zeta3;
 
             // default:
-            //   libmesh_error();
+            // libmesh_error_msg("Invalid shape function index i = " << i);
             // }
             //     }
 
@@ -840,8 +835,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 
 
           default:
-            libmesh_error();
-
+            libmesh_error_msg("Invalid element type = " << type);
           } //case HEX27
 
       }//case THIRD
@@ -1368,18 +1362,18 @@ Real FE<3,BERNSTEIN>::shape(const Elem* elem,
 
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid element type = " << type);
           }
       }
 
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid totalorder = " << totalorder);
     }
 
 #endif
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -1393,11 +1387,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const ElemType,
                                   const unsigned int,
                                   const Point& )
 {
-  libMesh::err << "Bernstein polynomials require the element type\n"
-               << "because edge and face orientation is needed."
-               << std::endl;
-  libmesh_error();
-
+  libmesh_error_msg("Bernstein polynomials require the element type \nbecause edge and face orientation is needed.");
   return 0.;
 }
 
@@ -1421,8 +1411,6 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
 
   switch (totalorder)
     {
-
-
       // 1st order Bernstein.
     case FIRST:
       {
@@ -1471,9 +1459,8 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
                             FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
                   }
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid derivative index j = " << j);
                 }
-
             }
 
 
@@ -1519,13 +1506,12 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
                           FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta));
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid derivative index j = " << j);
                 }
             }
 
-
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid element type = " << type);
           }
       }
 
@@ -1578,9 +1564,8 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
                             FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
                   }
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid derivative index j = " << j);
                 }
-
             }
 
             // Bernstein shape functions on the hexahedral.
@@ -1713,7 +1698,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
                           FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[26], 0, zeta));
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid derivative index j = " << j);
                 }
             }
 
@@ -1756,13 +1741,13 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
                           FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta));
 
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid derivative index j = " << j);
                 }
             }
 
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid element type = " << type);
           }
       }
 
@@ -1815,7 +1800,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
             //     FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
             //   }
             // default:
-            //   libmesh_error();
+            // libmesh_error_msg("Invalid derivative index j = " << j);
             // }
 
 
@@ -1863,7 +1848,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
                             FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
                   }
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid derivative index j = " << j);
                 }
 
             }
@@ -2383,13 +2368,13 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
             //   FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta_mapped));
 
             // default:
-            //   libmesh_error();
+            // libmesh_error_msg("Invalid derivative index j = " << j);
             // }
             //     }
 
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid element type = " << type);
           }
       }
 
@@ -2438,7 +2423,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
                             FE<3,BERNSTEIN>::shape(elem, order, i, pm))/2./eps;
                   }
                 default:
-                  libmesh_error();
+                  libmesh_error_msg("Invalid derivative index j = " << j);
                 }
             }
 
@@ -2957,24 +2942,24 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem* elem,
             //   FE<1,BERNSTEIN>::shape_deriv(EDGE3, totalorder, i2[i], 0, zeta_mapped));
 
             // default:
-            //   libmesh_error();
+            //   libmesh_error_msg("Invalid derivative index j = " << j);
             // }
             //    }
 
 
           default:
-            libmesh_error();
+            libmesh_error_msg("Invalid element type = " << type);
           }
       }
 
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid totalorder = " << totalorder);
     }
 
 #endif
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
