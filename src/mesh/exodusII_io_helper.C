@@ -906,15 +906,14 @@ void ExodusII_IO_Helper::write_var_names_impl(const char* var_type, int& count, 
 
 void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_name, int time_step)
 {
-  // CAUTION: this assumes that libMesh element numbering is identical to exodus block-by-block element numbering
-  // There is no way how to get the whole elemental field from the exodus file, so we have to go block by block
-
+  // There is no way to get the whole elemental field from the
+  // exodus file, so we have to go block by block.
   elem_var_values.resize(num_elem);
 
   this->read_var_names(ELEMENTAL);
 
   // See if we can find the variable we are looking for
-  unsigned int var_index = 0;
+  unsigned var_index = 0;
   bool found = false;
 
   // Do a linear search for nodal_var_name in nodal_var_names
@@ -929,20 +928,21 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
     {
       libMesh::err << "Unable to locate variable named: " << elemental_var_name << std::endl;
       libMesh::err << "Available variables: " << std::endl;
-      for (unsigned int i=0; i<elem_var_names.size(); ++i)
+      for (unsigned i=0; i<elem_var_names.size(); ++i)
         libMesh::err << elem_var_names[i] << std::endl;
 
       libmesh_error();
     }
 
-  unsigned int ex_el_num = 0;
-  for (unsigned int i=0; i<static_cast<unsigned int>(num_elem_blk); i++)
+  // Sequential index which we can use to look up the element ID in the elem_num_map.
+  unsigned ex_el_num = 0;
+
+  for (unsigned i=0; i<static_cast<unsigned>(num_elem_blk); i++)
     {
-      int n_blk_elems = 0;
       ex_err = exII::ex_get_elem_block(ex_id,
                                        block_ids[i],
                                        NULL,
-                                       &n_blk_elems,
+                                       &num_elem_this_blk,
                                        NULL,
                                        NULL);
       EX_CHECK_ERR(ex_err, "Error getting number of elements in block.");
@@ -952,13 +952,25 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
                                      time_step,
                                      var_index+1,
                                      block_ids[i],
-                                     n_blk_elems,
+                                     num_elem_this_blk,
                                      &block_elem_var_values[0]);
       EX_CHECK_ERR(ex_err, "Error getting elemental values.");
 
-      for (unsigned int j=0; j<static_cast<unsigned int>(n_blk_elems); j++)
+      for (unsigned j=0; j<static_cast<unsigned>(num_elem_this_blk); j++)
         {
-          elem_var_values[ex_el_num] = block_elem_var_values[j];
+          // Use the elem_num_map to obtain the ID of this element in the Exodus file,
+          // and remember to subtract 1 since libmesh is zero-based and Exodus is 1-based.
+          unsigned mapped_elem_id = this->elem_num_map[ex_el_num] - 1;
+
+          // Make sure we can actually write into this location in the elem_var_values vector
+          if (mapped_elem_id >= elem_var_values.size())
+            libmesh_error_msg("Error reading elemental variable values in Exodus!");
+
+          // Write into the mapped_elem_id entry of the
+          // elem_var_values vector.
+          elem_var_values[mapped_elem_id] = block_elem_var_values[j];
+
+          // Go to the next sequential element ID.
           ex_el_num++;
         }
     }
