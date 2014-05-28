@@ -129,8 +129,7 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
             }
 
           default:
-            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
       }
       // 1D
@@ -213,8 +212,7 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
             }
 
           default:
-            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
       }
 
@@ -311,8 +309,7 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
             }
 
           default:
-            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
       }
 
@@ -323,11 +320,7 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            {
-              libMesh::out << "ERROR: Clough-Tocher elements currently only support 1D and 2D"
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Clough-Tocher elements currently only support 1D and 2D");
 
           case HERMITE:
             {
@@ -404,16 +397,15 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
             }
 
           default:
-            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid dimension dim = " << dim);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   AutoPtr<FEAbstract> ap(NULL);
   return ap;
 }
@@ -707,13 +699,10 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point>&
 
         return;
       }
+
     default:
-      {
-        libMesh::err << "ERROR: Unknown element type " << itemType << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("ERROR: Unknown element type " << itemType);
     }
-  return;
 }
 
 bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Real eps)
@@ -898,8 +887,7 @@ bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Re
 #endif
 
     default:
-      libMesh::err << "ERROR: Unknown element type " << t << std::endl;
-      libmesh_error();
+      libmesh_error_msg("ERROR: Unknown element type " << t);
     }
 
   // If we get here then the point is _not_ in the

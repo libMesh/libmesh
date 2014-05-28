@@ -514,7 +514,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid dimension Dim = " << Dim);
     }
 
   // Stop logging the shape function initialization

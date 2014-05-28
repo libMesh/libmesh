@@ -54,8 +54,7 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
         case 1:
           return (1.+xi)/2.;
         default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Invalid shape function index i = " << i);
         }
 
     case SECOND:
@@ -69,8 +68,7 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
         case 2:
           return (1./2.)*(1.-xi)*(1.+xi);
         default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Invalid shape function index i = " << i);
         }
 
     case THIRD:
@@ -86,8 +84,7 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
         case 3:
           return (3./8.)*pow<2>(1.+xi)*(1.-xi);
         default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Invalid shape function index i = " << i);
         }
 
     case FOURTH:
@@ -105,8 +102,7 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
         case 4:
           return (1./ 4.)*pow<3>(1.+xi)*(1.-xi);
         default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Invalid shape function index i = " << i);
         }
 
 
@@ -127,8 +123,7 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
         case 5:
           return (5./32.)*pow<4>(1.+xi)*(1.-xi);
         default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Invalid shape function index i = " << i);
         }
 
 
@@ -151,8 +146,7 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
         case 6:
           return ( 3./32.)*pow<5>(1.+xi)*(1.-xi);
         default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Invalid shape function index i = " << i);
         }
 
     default:
@@ -185,13 +179,10 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
                 * std::pow((1-xi)/2,m);
             }
           }
-
-        // we should never get here
-        libmesh_error();
       }
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 
@@ -236,8 +227,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
         case 1:
           return .5;
         default:
-          libMesh::err << "Invalid shape function index " << i << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Invalid shape function index i = " << i);
         }
 
     case SECOND:
@@ -251,8 +241,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
         case 2:
           return -xi;
         default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Invalid shape function index i = " << i);
         }
 
     case THIRD:
@@ -268,8 +257,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
         case 3:
           return  0.375 -.75*xi -1.125*pow<2>(xi);
         default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Invalid shape function index i = " << i);
         }
 
     case FOURTH:
@@ -287,8 +275,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
         case 4:
           return  0.5 -1.5*pow<2>(xi)-pow<3>(xi);
         default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Invalid shape function index i = " << i);
         }
 
     case FIFTH:
@@ -308,8 +295,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
         case 5:
           return  (5./ 8.)*pow<3>(1.+xi)*(1.-xi) -(5./32.)*pow<4>(1.+xi);
         default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Invalid shape function index i = " << i);
         }
 
     case SIXTH:
@@ -331,8 +317,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
         case 6:
           return  (15./32.)*pow<4>(1.+xi)*(1.-xi)-(3./32.)*pow<5>(1.+xi);
         default:
-          libMesh::err << "Invalid shape function index!" << std::endl;
-          libmesh_error();
+          libmesh_error_msg("Invalid shape function index i = " << i);
         }
 
 
@@ -367,14 +352,11 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
                                      - 1./2. * m * std::pow((1+xi)/2,n)   * std::pow((1-xi)/2,m-1));
             }
           }
-
-        // we should never get here
-        libmesh_error();
       }
 
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0.;
 }
 

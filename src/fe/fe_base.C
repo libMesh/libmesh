@@ -263,8 +263,7 @@ FEGenericBase<Real>::build (const unsigned int dim,
             }
 
           default:
-            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
       }
       // 1D
@@ -341,8 +340,7 @@ FEGenericBase<Real>::build (const unsigned int dim,
             }
 
           default:
-            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
       }
 
@@ -427,8 +425,7 @@ FEGenericBase<Real>::build (const unsigned int dim,
             }
 
           default:
-            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
       }
 
@@ -439,11 +436,7 @@ FEGenericBase<Real>::build (const unsigned int dim,
         switch (fet.family)
           {
           case CLOUGH:
-            {
-              libMesh::out << "ERROR: Clough-Tocher elements currently only support 1D and 2D"
-                           << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Clough-Tocher elements currently only support 1D and 2D");
 
           case HERMITE:
             {
@@ -508,16 +501,15 @@ FEGenericBase<Real>::build (const unsigned int dim,
             }
 
           default:
-            libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid dimension dim = " << dim);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   AutoPtr<FEBase> ap(NULL);
   return ap;
 }
@@ -545,10 +537,7 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
               return ap;
             }
           default:
-            {
-              libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
       }
     case 1:
@@ -561,10 +550,7 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
               return ap;
             }
           default:
-            {
-              libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
       }
     case 2:
@@ -582,10 +568,7 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
               return ap;
             }
           default:
-            {
-              libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
       }
     case 3:
@@ -603,19 +586,15 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
               return ap;
             }
           default:
-            {
-              libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Bad FEType.family= " << fet.family);
           }
       }
 
     default:
-      libmesh_error();
-
+      libmesh_error_msg("Invalid dimension dim = " << dim);
     } // switch(dim)
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   AutoPtr<FEVectorBase> ap(NULL);
   return ap;
 }
@@ -646,11 +625,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
         switch (fet.radial_family)
           {
           case INFINITE_MAP:
-            {
-              libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                           << " with FEFamily = " << fet.radial_family << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Can't build an infinite element with FEFamily = " << fet.radial_family);
 
           case JACOBI_20_00:
             {
@@ -662,9 +637,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                     return ap;
                   }
                 default:
-                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                               << " with InfMapType = " << fet.inf_map << std::endl;
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << fet.inf_map);
                 }
             }
 
@@ -678,9 +651,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                     return ap;
                   }
                 default:
-                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                               << " with InfMapType = " << fet.inf_map << std::endl;
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << fet.inf_map);
                 }
             }
 
@@ -694,9 +665,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                     return ap;
                   }
                 default:
-                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                               << " with InfMapType = " << fet.inf_map << std::endl;
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << fet.inf_map);
                 }
             }
 
@@ -710,19 +679,13 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                     return ap;
                   }
                 default:
-                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                               << " with InfMapType = " << fet.inf_map << std::endl;
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Can't build an infinite element with InfMapType = " << fet.inf_map);
                 }
             }
 
-
-
           default:
-            libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << fet.radial_family);
           }
-
       }
 
 
@@ -734,11 +697,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
         switch (fet.radial_family)
           {
           case INFINITE_MAP:
-            {
-              libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                           << " with FEFamily = " << fet.radial_family << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Can't build an infinite element with FEFamily = " << fet.radial_family);
 
           case JACOBI_20_00:
             {
@@ -750,9 +709,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                     return ap;
                   }
                 default:
-                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                               << " with InfMapType = " << fet.inf_map << std::endl;
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
             }
 
@@ -766,9 +723,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                     return ap;
                   }
                 default:
-                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                               << " with InfMapType = " << fet.inf_map << std::endl;
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
             }
 
@@ -782,9 +737,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                     return ap;
                   }
                 default:
-                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                               << " with InfMapType = " << fet.inf_map << std::endl;
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
             }
 
@@ -798,19 +751,13 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                     return ap;
                   }
                 default:
-                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                               << " with InfMapType = " << fet.inf_map << std::endl;
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
             }
 
-
-
           default:
-            libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << fet.radial_family);
           }
-
       }
 
 
@@ -822,11 +769,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
         switch (fet.radial_family)
           {
           case INFINITE_MAP:
-            {
-              libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                           << " with FEFamily = " << fet.radial_family << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("ERROR: Don't build an infinite element with FEFamily = " << fet.radial_family);
 
           case JACOBI_20_00:
             {
@@ -838,9 +781,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                     return ap;
                   }
                 default:
-                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                               << " with InfMapType = " << fet.inf_map << std::endl;
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
             }
 
@@ -854,9 +795,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                     return ap;
                   }
                 default:
-                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                               << " with InfMapType = " << fet.inf_map << std::endl;
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
             }
 
@@ -870,9 +809,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                     return ap;
                   }
                 default:
-                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                               << " with InfMapType = " << fet.inf_map << std::endl;
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
             }
 
@@ -886,25 +823,20 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                     return ap;
                   }
                 default:
-                  libMesh::err << "ERROR: Don't build an infinite element " << std::endl
-                               << " with InfMapType = " << fet.inf_map << std::endl;
-                  libmesh_error();
+                  libmesh_error_msg("ERROR: Don't build an infinite element with InfMapType = " << fet.inf_map);
                 }
             }
 
-
-
           default:
-            libMesh::err << "ERROR: Bad FEType.radial_family= " << fet.radial_family << std::endl;
-            libmesh_error();
+            libmesh_error_msg("ERROR: Bad FEType.radial_family= " << fet.radial_family);
           }
       }
 
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid dimension dim = " << dim);
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   AutoPtr<FEBase> ap(NULL);
   return ap;
 }
@@ -917,7 +849,7 @@ FEGenericBase<RealGradient>::build_InfFE (const unsigned int,
                                           const FEType& )
 {
   // No vector types defined... YET.
-  libmesh_error();
+  libmesh_not_implemented();
   AutoPtr<FEVectorBase> ap(NULL);
   return ap;
 }
@@ -1968,10 +1900,7 @@ compute_periodic_constraints (DofConstraints &constraints,
               const Elem* neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
 
               if (neigh == NULL)
-                {
-                  libMesh::err << "PeriodicBoundaries point locator object returned NULL!" << std::endl;
-                  libmesh_error();
-                }
+                libmesh_error_msg("PeriodicBoundaries point locator object returned NULL!");
 
               // periodic (and possibly h refinement) constraints:
               // constrain dofs shared between

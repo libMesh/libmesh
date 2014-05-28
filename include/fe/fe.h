@@ -606,7 +606,7 @@ public:
                        const Real = TOLERANCE,
                        const std::vector<Point>* const = NULL,
                        const std::vector<Real>* const = NULL)
-  { libmesh_error(); }
+  { libmesh_not_implemented(); }
 
   /**
    * Provides the class with the quadrature rule, which provides the

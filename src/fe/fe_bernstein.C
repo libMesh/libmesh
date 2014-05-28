@@ -106,11 +106,6 @@ void bernstein_nodal_soln(const Elem* elem,
     default:
       libmesh_error_msg("ERROR: Invalid total order " << totalorder);
     }
-
-
-  // How did we get here?
-  libmesh_error();
-  return;
 } //  bernstein_nodal_soln()
 
 
@@ -165,7 +160,7 @@ unsigned int bernstein_n_dofs(const ElemType t, const Order o)
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 } // bernstein_n_dofs()
 
@@ -315,7 +310,7 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 } // bernstein_n_dofs_at_node()
 
@@ -356,7 +351,7 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
     }
 
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 } // bernstein_n_dofs_per_elem
 
