@@ -2155,7 +2155,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
                   // 0        -> 3
                   // 1        -> 1
                   libmesh_assert_less(s, 2);
-                  const unsigned sidemap[2] = {3, 1};
+                  const unsigned short sidemap[2] = {3, 1};
                   mesh.boundary_info->add_side(new_elem, sidemap[s], ids_to_copy);
                 }
             }
@@ -2168,7 +2168,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
               // For 2D->3D extrusion, the "top" ID is 1+the original
               // element's number of sides.  For 1D->2D extrusion, the
               // "top" ID is side 2.
-              const unsigned top_id = new_elem->dim() == 3 ? elem->n_sides()+1 : 2;
+              const unsigned short top_id = new_elem->dim() == 3 ? elem->n_sides()+1 : 2;
               mesh.boundary_info->add_side(new_elem, top_id, next_side_id+1);
             }
         }
