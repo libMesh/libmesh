@@ -214,8 +214,7 @@ void MeshTools::Modification::rotate (MeshBase& mesh,
                                       const Real theta,
                                       const Real psi)
 {
-  libmesh_assert_not_equal_to (mesh.mesh_dimension(), 1);
-
+#if LIBMESH_DIM == 3
   const Real  p = -phi/180.*libMesh::pi;
   const Real  t = -theta/180.*libMesh::pi;
   const Real  s = -psi/180.*libMesh::pi;
@@ -240,6 +239,9 @@ void MeshTools::Modification::rotate (MeshBase& mesh,
                    (-cp*ss-sp*ct*cs)*x + (-sp*ss+cp*ct*cs)*y + (st*cs)*z,
                    ( sp*st)*x          + (-cp*st)*y          + (ct)*z   );
     }
+#else
+  libmesh_error_msg("MeshTools::Modification::rotate() requires libMesh to be compiled with LIBMESH_DIM==3");
+#endif
 }
 
 

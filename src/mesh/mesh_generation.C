@@ -2012,10 +2012,6 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
       // build_extrusion currently only works on coarse meshes
       libmesh_assert (!elem->parent());
 
-      // We need a map from low-D to high-D sides for boundary id
-      // setting
-      std::vector<unsigned char> sidemap(4);
-
       for (unsigned int k=0; k != nz; ++k)
         {
           Elem *new_elem;
@@ -2144,14 +2140,37 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
               const std::vector<boundary_id_type> ids_to_copy =
                 cross_section.boundary_info->boundary_ids(elem, s);
 
-              mesh.boundary_info->add_side(new_elem, s+1, ids_to_copy);
+              if (new_elem->dim() == 3)
+                {
+                  // For 2D->3D extrusion, we give the boundary IDs
+                  // for side s on the old element to side s+1 on the
+                  // new element.  This is just a happy coincidence as
+                  // far as I can tell...
+                  mesh.boundary_info->add_side(new_elem, s+1, ids_to_copy);
+                }
+              else
+                {
+                  // For 1D->2D extrusion, the boundary IDs map as:
+                  // Old elem -> New elem
+                  // 0        -> 3
+                  // 1        -> 1
+                  libmesh_assert_less(s, 2);
+                  const unsigned short sidemap[2] = {3, 1};
+                  mesh.boundary_info->add_side(new_elem, sidemap[s], ids_to_copy);
+                }
             }
 
           // Give new boundary ids to bottom and top
           if (k == 0)
             mesh.boundary_info->add_side(new_elem, 0, next_side_id);
           if (k == nz-1)
-            mesh.boundary_info->add_side(new_elem, elem->n_sides()+1, next_side_id+1);
+            {
+              // For 2D->3D extrusion, the "top" ID is 1+the original
+              // element's number of sides.  For 1D->2D extrusion, the
+              // "top" ID is side 2.
+              const unsigned short top_id = new_elem->dim() == 3 ? elem->n_sides()+1 : 2;
+              mesh.boundary_info->add_side(new_elem, top_id, next_side_id+1);
+            }
         }
     }
 
