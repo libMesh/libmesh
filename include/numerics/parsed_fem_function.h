@@ -27,8 +27,10 @@
 #include "libmesh/point.h"
 #include "libmesh/system.h"
 
-// FParser includes
-#include "fparser.hh"
+#ifdef LIBMESH_HAVE_FPARSER
+  // FParser includes
+  #include "fparser.hh"
+#endif
 
 // C++ includes
 
@@ -119,6 +121,7 @@ public:
         // fparser can crash on empty expressions
         libmesh_assert(!subexpression.empty());
 
+#ifdef LIBMESH_HAVE_FPARSER
         // Parse (and optimize if possible) the subexpression.
         // Add some basic constants, to Real precision.
         FunctionParserBase<Output> fp;
@@ -128,6 +131,9 @@ public:
         fp.Parse(subexpression, variables);
         fp.Optimize();
         parsers.push_back(fp);
+#else
+        libmesh_error("ERROR: This functionality requires fparser!");
+#endif
 
         // If at end, use nextstart=maxSize.  Else start at next
         // character.
@@ -221,12 +227,17 @@ public:
 
     unsigned int size = output.size();
 
+#ifdef LIBMESH_HAVE_FPARSER
     libmesh_assert_equal_to (size, parsers.size());
+#else
+    libmesh_error("ERROR: This functionality requires fparser!");
+#endif
 
     // The remaining locations in _spacetime are currently fixed at construction
     // but could potentially be made dynamic
     for (unsigned int i=0; i != size; ++i)
       output(i) = parsers[i].Eval(&_spacetime[0]);
+
   }
 
 
@@ -251,19 +262,25 @@ public:
       {
         c.point_value(v, p, _spacetime[LIBMESH_DIM+1+v]);
       }
-
+#ifdef LIBMESH_HAVE_FPARSER
     libmesh_assert_less (i, parsers.size());
 
     // The remaining locations in _spacetime are currently fixed at construction
     // but could potentially be made dynamic
     return parsers[i].Eval(&_spacetime[0]);
+#else
+    libmesh_error("ERROR: This functionality requires fparser!");
+    return 0;
+#endif
   }
 
 private:
   const System& _sys;
   std::string _expression;
   unsigned int _n_vars;
+#ifdef LIBMESH_HAVE_FPARSER
   std::vector<FunctionParserBase<Output> > parsers;
+#endif
   std::vector<Output> _spacetime;
 
   // Additional variables/values that can be parsed and handled by the function parser
