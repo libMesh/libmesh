@@ -412,10 +412,10 @@ Real RBEIMConstruction::compute_best_fit_error()
       {
         // compute the rhs by performing inner products
         DenseVector<Number> best_fit_rhs(RB_size);
+
+        inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
         for(unsigned int i=0; i<RB_size; i++)
           {
-            inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
-
             best_fit_rhs(i) = inner_product_storage_vector->dot(get_rb_evaluation().get_basis_function(i));
           }
 
