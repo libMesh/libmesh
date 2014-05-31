@@ -385,6 +385,9 @@ void assemble_matrices(EquationSystems& es,
     } // end of element loop
 
 
+#else
+  // Avoid compiler warnings
+  libmesh_ignore(es);
 #endif // LIBMESH_HAVE_SLEPC
 
   /**
@@ -464,6 +467,11 @@ void get_dirichlet_dofs(EquationSystems& es,
 
     } // end of element loop
 
+#else
+  // Avoid compiler warnings
+  libmesh_ignore(es);
+  libmesh_ignore(system_name);
+  libmesh_ignore(dirichlet_dof_ids);
 #endif // LIBMESH_HAVE_SLEPC
 
   /**

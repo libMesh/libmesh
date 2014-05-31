@@ -337,6 +337,9 @@ void assemble_mass(EquationSystems& es,
     } // end of element loop
 
 
+#else
+  // Avoid compiler warnings
+  libmesh_ignore(es);
 #endif // LIBMESH_HAVE_SLEPC
 
   /**

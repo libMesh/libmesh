@@ -264,8 +264,6 @@ struct AssemblyEIM : RBEIMAssembly
 
     const std::vector<std::vector<RealGradient> >& dphi = elem_fe->get_dphi();
 
-    const std::vector<Point>& qpoints = elem_fe->get_xyz();
-
     // The number of local degrees of freedom in each variable
     const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
 

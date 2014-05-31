@@ -155,6 +155,9 @@ void triangulate_domain(const Parallel::Communicator& comm)
   // Write the result to file
   mesh.write("delaunay_l_shaped_hole.e");
 
+#else
+  // Avoid compiler warnings
+  libmesh_ignore(comm);
 #endif // LIBMESH_HAVE_TRIANGLE
 }
 
