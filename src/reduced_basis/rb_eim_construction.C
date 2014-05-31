@@ -534,9 +534,15 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
               DenseSubVector<Number>& subresidual_var = context.get_elem_residual( var );
 
+              std::vector<Number> fn_vals(n_qpoints);
               for(unsigned int qp=0; qp<n_qpoints; qp++)
+              {
+                fn_vals[qp] = eim_eval.evaluate_parametrized_function(var, xyz[qp], *(*el));
                 for(unsigned int i=0; i != n_var_dofs; i++)
-                  subresidual_var(i) += JxW[qp] * eim_eval.evaluate_parametrized_function(var, xyz[qp], *(*el)) * phi[i][qp];
+                {
+                  subresidual_var(i) += JxW[qp] * fn_vals[qp] * phi[i][qp];
+                }
+              }
             }
 
           // Apply constraints, e.g. periodic constraints
@@ -565,7 +571,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
   if(plot_solution > 0)
     {
 #ifdef LIBMESH_HAVE_EXODUS_API
-      ExodusII_IO(get_mesh()).write_equation_systems ("truth.e",
+      ExodusII_IO(get_mesh()).write_equation_systems ("truth.exo",
                                                       this->get_equation_systems());
 #endif
     }
