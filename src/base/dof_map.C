@@ -167,6 +167,8 @@ DofMap::DofMap(const unsigned int number,
   , _dirichlet_boundaries(new DirichletBoundaries)
   , _adjoint_dirichlet_boundaries()
 #endif
+  , _implicit_neighbor_dofs_initialized(false),
+  _implicit_neighbor_dofs(false)
 {
   _matrices.clear();
 }
@@ -1546,6 +1548,12 @@ void DofMap::prepare_send_list ()
 }
 
 
+void DofMap::set_implicit_neighbor_dofs(bool implicit_neighbor_dofs)
+{
+  _implicit_neighbor_dofs_initialized = true;
+  _implicit_neighbor_dofs = implicit_neighbor_dofs;
+}
+
 
 bool DofMap::use_coupled_neighbor_dofs(const MeshBase& mesh) const
 {
@@ -1553,6 +1561,12 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase& mesh) const
   // include sensitivities between neighbor degrees of freedom
   bool implicit_neighbor_dofs =
     libMesh::on_command_line ("--implicit_neighbor_dofs");
+
+  // Possibly override the commandline option
+  if(_implicit_neighbor_dofs_initialized)
+  {
+    implicit_neighbor_dofs = _implicit_neighbor_dofs;
+  }
 
   // If the user specifies --implicit_neighbor_dofs 0, then
   // presumably he knows what he is doing and we won't try to

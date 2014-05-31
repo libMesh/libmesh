@@ -538,6 +538,15 @@ public:
   bool all_semilocal_indices (const std::vector<dof_id_type>& dof_indices) const;
 
   /**
+   * Allow the implicit_neighbor_dofs flag to be set programmatically.
+   * This overrides the --implicit_neighbor_dofs commandline option.
+   * We can use this to set the implicit neighbor dofs option differently
+   * for different systems, whereas the commandline option is the same
+   * for all systems.
+   */
+  void set_implicit_neighbor_dofs(bool implicit_neighbor_dofs);
+
+  /**
    * Tells other library functions whether or not this problem
    * includes coupling between dofs in neighboring cells, as can
    * currently be specified on the command line or inferred from
@@ -1366,6 +1375,13 @@ private:
 #endif
 
   friend class SparsityPattern::Build;
+
+  /**
+   * Bools to indicate if we override the --implicit_neighbor_dofs
+   * commandline options.
+   */
+  bool _implicit_neighbor_dofs_initialized;
+  bool _implicit_neighbor_dofs;
 };
 
 

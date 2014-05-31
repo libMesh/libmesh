@@ -68,6 +68,13 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
 
   // attach empty RBAssemblyExpansion object
   set_rb_assembly_expansion(_empty_rb_assembly_expansion);
+
+  // We only do "L2 projection" solves in this class, hence
+  // we should set implicit_neighbor_dofs = false. This is
+  // important when we use DISCONTINUOUS basis functions, since
+  // otherwise the L2 projection matrix uses much more memory
+  // than necessary.
+  get_dof_map().set_implicit_neighbor_dofs(false);
 }
 
 RBEIMConstruction::~RBEIMConstruction ()
