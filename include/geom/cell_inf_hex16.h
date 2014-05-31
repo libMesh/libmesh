@@ -147,13 +147,6 @@ public:
                             const IOPackage iop,
                             std::vector<dof_id_type>& conn) const;
 
-  //   void tecplot_connectivity(const unsigned int sc,
-  //     std::vector<unsigned int>& conn) const;
-
-  //   void vtk_connectivity(const unsigned int,
-  // std::vector<unsigned int>*) const
-  //   { libmesh_error(); }
-
   unsigned int vtk_element_type (const unsigned int) const
   { return 12; }
 

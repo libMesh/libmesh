@@ -132,7 +132,7 @@ public:
         fp.Optimize();
         parsers.push_back(fp);
 #else
-        libmesh_error("ERROR: This functionality requires fparser!");
+        libmesh_error_msg("ERROR: This functionality requires fparser!");
 #endif
 
         // If at end, use nextstart=maxSize.  Else start at next
@@ -230,7 +230,7 @@ public:
 #ifdef LIBMESH_HAVE_FPARSER
     libmesh_assert_equal_to (size, parsers.size());
 #else
-    libmesh_error("ERROR: This functionality requires fparser!");
+    libmesh_error_msg("ERROR: This functionality requires fparser!");
 #endif
 
     // The remaining locations in _spacetime are currently fixed at construction
@@ -269,7 +269,7 @@ public:
     // but could potentially be made dynamic
     return parsers[i].Eval(&_spacetime[0]);
 #else
-    libmesh_error("ERROR: This functionality requires fparser!");
+    libmesh_error_msg("ERROR: This functionality requires fparser!");
     return 0;
 #endif
   }

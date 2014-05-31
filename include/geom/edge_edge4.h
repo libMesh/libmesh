@@ -112,13 +112,13 @@ public:
   /**
    */
   unsigned int n_second_order_adjacent_vertices (const unsigned int) const
-  { libmesh_error(); return 0;  }
+  { libmesh_not_implemented(); return 0;  }
 
   /**
    */
   unsigned short int second_order_adjacent_vertex (const unsigned int,
                                                    const unsigned int) const
-  { libmesh_error(); return 0; }
+  { libmesh_not_implemented(); return 0; }
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

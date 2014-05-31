@@ -393,8 +393,7 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
     // under its current id
     return this->_mesh.node_ptr(fid);
 
-  // should never get here
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return NULL;
 }
 
@@ -426,8 +425,7 @@ unsigned int MeshData::node_to_foreign_id (const Node* n) const
     // return libMesh's node id
     return n->id();
 
-  // should never get here
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 
@@ -459,8 +457,7 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
     // return element using the libMesh id
     return this->_mesh.elem(fid);
 
-  // should never get here
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return NULL;
 }
 
@@ -492,8 +489,7 @@ unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
     // return libMesh's element id
     return e->id();
 
-  // should never get here
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return 0;
 }
 

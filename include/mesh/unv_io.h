@@ -307,7 +307,7 @@ bool UNVIO::beginning_of_dataset (std::istream& in_file,
     }
 
   // should never end up here
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return false;
 }
 

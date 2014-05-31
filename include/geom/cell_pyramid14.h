@@ -193,7 +193,7 @@ protected:
   float embedding_matrix (const unsigned int,
                           const unsigned int,
                           const unsigned int) const
-  { libmesh_error(); return 0.; }
+  { libmesh_not_implemented(); return 0.; }
 
 #endif
 };

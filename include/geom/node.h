@@ -324,12 +324,7 @@ void Node::set_valence (unsigned int val)
 {
 #ifndef NDEBUG
   if (val != static_cast<valence_idx_t>(val))
-    {
-      libMesh::err << "ERROR: Node::valence_idx_t too small to hold val="
-                   << val
-                   << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Node::valence_idx_t too small to hold val=" << val);
 #endif // #ifndef NDEBUG
 
   _valence = val;

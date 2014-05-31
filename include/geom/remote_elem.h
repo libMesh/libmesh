@@ -74,22 +74,22 @@ public:
   static const Elem & create ();
 
   virtual const Point & point (const unsigned int i) const
-  { libmesh_error(); return Elem::point(i); }
+  { libmesh_not_implemented(); return Elem::point(i); }
 
   virtual Point & point (const unsigned int i)
-  { libmesh_error(); return Elem::point(i); }
+  { libmesh_not_implemented(); return Elem::point(i); }
 
   virtual dof_id_type node (const unsigned int i) const
-  { libmesh_error(); return Elem::node(i); }
+  { libmesh_not_implemented(); return Elem::node(i); }
 
   virtual Node* get_node (const unsigned int i) const
-  { libmesh_error(); return Elem::get_node(i); }
+  { libmesh_not_implemented(); return Elem::get_node(i); }
 
   virtual Node* & set_node (const unsigned int i)
-  { libmesh_error(); return Elem::set_node(i); }
+  { libmesh_not_implemented(); return Elem::set_node(i); }
 
   virtual dof_id_type key (const unsigned int) const
-  { libmesh_error(); return 0; }
+  { libmesh_not_implemented(); return 0; }
 
   virtual bool is_remote () const
   { return true; }
@@ -97,77 +97,77 @@ public:
   virtual void connectivity(const unsigned int,
                             const IOPackage,
                             std::vector<dof_id_type>&) const
-  { libmesh_error(); }
+  { libmesh_not_implemented(); }
 
   virtual ElemType type () const
   { return REMOTEELEM; }
 
   virtual unsigned int dim () const
-  { libmesh_error(); return 0; }
+  { libmesh_not_implemented(); return 0; }
 
   virtual unsigned int n_nodes () const
-  { libmesh_error(); return 0; }
+  { libmesh_not_implemented(); return 0; }
 
   virtual unsigned int n_sides () const
-  { libmesh_error(); return 0; }
+  { libmesh_not_implemented(); return 0; }
 
   virtual unsigned int n_vertices () const
-  { libmesh_error(); return 0; }
+  { libmesh_not_implemented(); return 0; }
 
   virtual unsigned int n_edges () const
-  { libmesh_error(); return 0; }
+  { libmesh_not_implemented(); return 0; }
 
   virtual unsigned int n_faces () const
-  { libmesh_error(); return 0; }
+  { libmesh_not_implemented(); return 0; }
 
   virtual unsigned int n_children () const
-  { libmesh_error(); return 0; }
+  { libmesh_not_implemented(); return 0; }
 
   virtual bool is_vertex(const unsigned int) const
-  { libmesh_error(); return false; }
+  { libmesh_not_implemented(); return false; }
 
   virtual bool is_edge(const unsigned int) const
-  { libmesh_error(); return false; }
+  { libmesh_not_implemented(); return false; }
 
   virtual bool is_face(const unsigned int) const
-  { libmesh_error(); return false; }
+  { libmesh_not_implemented(); return false; }
 
   virtual bool is_node_on_side(const unsigned int,
                                const unsigned int) const
-  { libmesh_error(); return false; }
+  { libmesh_not_implemented(); return false; }
 
   virtual bool is_child_on_side(const unsigned int,
                                 const unsigned int) const
-  { libmesh_error(); return false; }
+  { libmesh_not_implemented(); return false; }
 
   virtual bool is_edge_on_side(const unsigned int,
                                const unsigned int) const
-  { libmesh_error(); return false; }
+  { libmesh_not_implemented(); return false; }
 
   virtual bool is_node_on_edge(const unsigned int,
                                const unsigned int) const
-  { libmesh_error(); return false; }
+  { libmesh_not_implemented(); return false; }
 
   virtual unsigned int n_sub_elem () const
-  { libmesh_error(); return 0; }
+  { libmesh_not_implemented(); return 0; }
 
   virtual AutoPtr<Elem> side (const unsigned int) const
-  { libmesh_error(); return AutoPtr<Elem>(NULL); }
+  { libmesh_not_implemented(); return AutoPtr<Elem>(NULL); }
 
   virtual AutoPtr<Elem> build_side (const unsigned int,
                                     bool) const
-  { libmesh_error(); return AutoPtr<Elem>(NULL); }
+  { libmesh_not_implemented(); return AutoPtr<Elem>(NULL); }
 
   virtual AutoPtr<Elem> build_edge (const unsigned int) const
-  { libmesh_error(); return AutoPtr<Elem>(NULL); }
+  { libmesh_not_implemented(); return AutoPtr<Elem>(NULL); }
 
   virtual Order default_order () const
-  { libmesh_error(); return FIRST; }
+  { libmesh_not_implemented(); return FIRST; }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   virtual bool infinite () const
-  { libmesh_error(); return false; }
+  { libmesh_not_implemented(); return false; }
 
 #endif
 
@@ -180,7 +180,7 @@ public:
   virtual float embedding_matrix (const unsigned int,
                                   const unsigned int,
                                   const unsigned int) const
-  { libmesh_error(); return 0.; }
+  { libmesh_not_implemented(); return 0.; }
 
 #endif
 

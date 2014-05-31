@@ -598,7 +598,7 @@ public:
    * for an abstract Elem, it is an error.
    */
   virtual std::pair<Real,Real> qual_bounds (const ElemQuality) const
-  { libmesh_error(); return std::make_pair(0.,0.); }
+  { libmesh_not_implemented(); return std::make_pair(0.,0.); }
 
   /**
    * @returns true if the point p is contained in this element,
@@ -1110,7 +1110,7 @@ public:
    * all zero point would very likely lead to unexpected
    * behavior.
    */
-  virtual Point origin () const { libmesh_error(); return Point(); }
+  virtual Point origin () const { libmesh_not_implemented(); return Point(); }
 
 #endif
 
@@ -1807,10 +1807,7 @@ unsigned int Elem::which_child_am_i (const Elem* e) const
     if (this->child(c) == e)
       return c;
 
-  libMesh::err << "ERROR:  which_child_am_i() was called with a non-child!"
-               << std::endl;
-
-  libmesh_error();
+  libmesh_error_msg("ERROR:  which_child_am_i() was called with a non-child!");
 
   return libMesh::invalid_uint;
 }

@@ -109,15 +109,6 @@ public:
                             const IOPackage iop,
                             std::vector<dof_id_type>& conn) const;
 
-  //   const std::vector<unsigned int> tecplot_connectivity(const unsigned int se=0) const;
-
-  //   void vtk_connectivity(const unsigned int se,
-  // std::vector<unsigned int>*conn = NULL) const;
-
-  //   unsigned int vtk_element_type (const unsigned int) const
-  //   { return 3; }
-
-
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
@@ -150,7 +141,7 @@ protected:
   float embedding_matrix (const unsigned int,
                           const unsigned int,
                           const unsigned int) const
-  { libmesh_error(); return 0.; }
+  { libmesh_not_implemented(); return 0.; }
 
 #endif
 };

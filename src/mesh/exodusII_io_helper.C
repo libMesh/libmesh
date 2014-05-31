@@ -770,12 +770,11 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
 
   if (!found)
     {
-      libMesh::err << "Unable to locate variable named: " << nodal_var_name << std::endl;
       libMesh::err << "Available variables: " << std::endl;
       for (unsigned int i=0; i<nodal_var_names.size(); ++i)
         libMesh::err << nodal_var_names[i] << std::endl;
 
-      libmesh_error();
+      libmesh_error_msg("Unable to locate variable named: " << nodal_var_name);
     }
 
   // Allocate enough space to store the nodal variable values
@@ -926,12 +925,11 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
   if (!found)
     {
-      libMesh::err << "Unable to locate variable named: " << elemental_var_name << std::endl;
       libMesh::err << "Available variables: " << std::endl;
       for (unsigned i=0; i<elem_var_names.size(); ++i)
         libMesh::err << elem_var_names[i] << std::endl;
 
-      libmesh_error();
+      libmesh_error_msg("Unable to locate variable named: " << elemental_var_name);
     }
 
   // Sequential index which we can use to look up the element ID in the elem_num_map.
@@ -1594,7 +1592,7 @@ void ExodusII_IO_Helper::check_existing_vars(ExodusVarType type,
       for (unsigned i=0; i<names.size(); ++i)
         libMesh::out << names[i] << std::endl;
 
-      libmesh_error();
+      libmesh_error_msg("Cannot overwrite existing variables in Exodus II file.");
     }
 }
 
@@ -1826,8 +1824,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
   else
     libmesh_error_msg("ERROR! Unrecognized element type_str: " << type_str);
 
-  // dummy return value, we won't get here
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   return assign_conversion (EDGE2);
 }
 
@@ -2122,8 +2119,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
       libmesh_error_msg("Unsupported element type: " << type);
     }
 
-  // We will never get here
-  libmesh_error();
+  libmesh_error_msg("We'll never get here!");
   const Conversion conv(tri3_node_map,
                         ARRAY_LENGTH(tri3_node_map),
                         tri3_node_map, // inverse node map same as forward node map

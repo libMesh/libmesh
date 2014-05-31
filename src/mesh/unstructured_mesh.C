@@ -491,7 +491,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                                      << " neighbor at level " << neigh->level()
                                      << std::endl;
                         GMVIO(*this).write ("bad_mesh.gmv");
-                        libmesh_error();
+                        libmesh_error_msg("Problematic mesh written to bad_mesh.gmv.");
                       }
 #endif // DEBUG
                 }

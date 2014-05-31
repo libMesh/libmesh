@@ -122,15 +122,6 @@ public:
                             const IOPackage iop,
                             std::vector<dof_id_type>& conn) const;
 
-  //   void tecplot_connectivity(const unsigned int sf,
-  //     std::vector<unsigned int>& conn) const;
-
-  //   void vtk_connectivity(const unsigned int sc,
-  // std::vector<unsigned int>*conn = NULL) const;
-
-  //   unsigned int vtk_element_type (const unsigned int) const
-  //   { return 9; }
-
   /**
    * @returns \p true when this element contains the point
    * \p p.  Customized for this \p InfQuad4, since knowledge

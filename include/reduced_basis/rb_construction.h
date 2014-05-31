@@ -723,7 +723,7 @@ protected:
 
   /**
    * Check if the linear solver reports convergence.
-   * libmesh_error() is called when that is not the case.
+   * Throw an error when that is not the case.
    */
   void check_convergence();
 
