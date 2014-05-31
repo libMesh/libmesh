@@ -1,4 +1,4 @@
-AUTOMAKE_OPTIONS = subdir-objects 
+AUTOMAKE_OPTIONS = subdir-objects
 
 ###########################################################
 # add contributed libraries that are conditionally compiled
@@ -23,11 +23,11 @@ endif
 
 if LIBMESH_ENABLE_GMV
   SUBDIRS    += gmv
-  opt_libs   += gmv/libopt.la 
-  dbg_libs   += gmv/libdbg.la 
-  devel_libs += gmv/libdevel.la 
-  prof_libs  += gmv/libprof.la 
-  oprof_libs += gmv/liboprof.la 
+  opt_libs   += gmv/libopt.la
+  dbg_libs   += gmv/libdbg.la
+  devel_libs += gmv/libdevel.la
+  prof_libs  += gmv/libprof.la
+  oprof_libs += gmv/liboprof.la
 endif
 
 if LIBMESH_ENABLE_GZSTREAMS
@@ -86,20 +86,20 @@ endif
 if LIBMESH_ENABLE_NEMESIS
 if LIBMESH_ENABLE_NEMESIS_V309
   SUBDIRS    += nemesis/v3.09
-  opt_libs   += nemesis/v3.09/libopt.la 
-  dbg_libs   += nemesis/v3.09/libdbg.la 
-  devel_libs += nemesis/v3.09/libdevel.la 
-  prof_libs  += nemesis/v3.09/libprof.la 
-  oprof_libs += nemesis/v3.09/liboprof.la 
+  opt_libs   += nemesis/v3.09/libopt.la
+  dbg_libs   += nemesis/v3.09/libdbg.la
+  devel_libs += nemesis/v3.09/libdevel.la
+  prof_libs  += nemesis/v3.09/libprof.la
+  oprof_libs += nemesis/v3.09/liboprof.la
 endif
 
 if LIBMESH_ENABLE_NEMESIS_V522
   SUBDIRS    += nemesis/v5.22/nemesis
-  opt_libs   += nemesis/v5.22/nemesis/libopt.la 
-  dbg_libs   += nemesis/v5.22/nemesis/libdbg.la 
-  devel_libs += nemesis/v5.22/nemesis/libdevel.la 
-  prof_libs  += nemesis/v5.22/nemesis/libprof.la 
-  oprof_libs += nemesis/v5.22/nemesis/liboprof.la 
+  opt_libs   += nemesis/v5.22/nemesis/libopt.la
+  dbg_libs   += nemesis/v5.22/nemesis/libdbg.la
+  devel_libs += nemesis/v5.22/nemesis/libdevel.la
+  prof_libs  += nemesis/v5.22/nemesis/libprof.la
+  oprof_libs += nemesis/v5.22/nemesis/liboprof.la
 endif
 endif
 
@@ -140,6 +140,15 @@ if LIBMESH_ENABLE_TETGEN
   devel_libs += tetgen/libdevel.la
   prof_libs  += tetgen/libprof.la
   oprof_libs += tetgen/liboprof.la
+endif
+
+if LIBMESH_ENABLE_QHULL
+  SUBDIRS    += qhull/qhull
+  opt_libs   += qhull/qhull/libopt.la
+  dbg_libs   += qhull/qhull/libdbg.la
+  devel_libs += qhull/qhull/libdevel.la
+  prof_libs  += qhull/qhull/libprof.la
+  oprof_libs += qhull/qhull/liboprof.la
 endif
 
 if LIBMESH_ENABLE_LIBHILBERT
@@ -211,7 +220,7 @@ endif
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = 
+noinst_LTLIBRARIES =
 
 if LIBMESH_OPT_MODE
   noinst_LTLIBRARIES        += libcontrib_opt.la

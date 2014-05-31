@@ -734,6 +734,9 @@ LIBMESH_ENABLE_GMV_FALSE
 LIBMESH_ENABLE_GMV_TRUE
 GMV_LIBRARY
 GMV_INCLUDE
+LIBMESH_ENABLE_QHULL_FALSE
+LIBMESH_ENABLE_QHULL_TRUE
+QHULL_LIBS
 LIBMESH_ENABLE_TRIANGLE_FALSE
 LIBMESH_ENABLE_TRIANGLE_TRUE
 TRIANGLE_LIBRARY
@@ -1121,6 +1124,7 @@ with_metis
 enable_parmetis
 enable_tetgen
 enable_triangle
+enable_qhull
 enable_gmv
 enable_vtk
 with_vtk_include
@@ -1891,6 +1895,7 @@ Optional Features:
                           support
   --disable-triangle      build without Triangle Delaunay triangulation
                           library support
+  --enable-qhull          build with Qhull API support
   --disable-gmv           build without GMV file I/O support
   --disable-vtk           build without VTK file I/O support
   --disable-eigen         build without Eigen linear algebra support
@@ -23793,7 +23798,137 @@ fi
 
 # -------------------------------------------------------------
 
+# ---------------------------------------------------------------
+# this seems to get done automatically for C++, but not C?
+# Required for QHull rules as implemented
+# --------------------------------------------------------------
+if test "x$CC" != xcc; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $CC and cc understand -c and -o together" >&5
+$as_echo_n "checking whether $CC and cc understand -c and -o together... " >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether cc understands -c and -o together" >&5
+$as_echo_n "checking whether cc understands -c and -o together... " >&6; }
+fi
+set dummy $CC; ac_cc=`$as_echo "$2" |
+		      sed 's/[^a-zA-Z0-9_]/_/g;s/^[0-9]/_/'`
+if eval \${ac_cv_prog_cc_${ac_cc}_c_o+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+# Make sure it works both with $CC and with simple cc.
+# We do the test twice because some compilers refuse to overwrite an
+# existing .o file with -o, though they will create one.
+ac_try='$CC -c conftest.$ac_ext -o conftest2.$ac_objext >&5'
+rm -f conftest2.*
+if { { case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } &&
+   test -f conftest2.$ac_objext && { { case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; };
+then
+  eval ac_cv_prog_cc_${ac_cc}_c_o=yes
+  if test "x$CC" != xcc; then
+    # Test first that cc exists at all.
+    if { ac_try='cc -c conftest.$ac_ext >&5'
+  { { case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }; then
+      ac_try='cc -c conftest.$ac_ext -o conftest2.$ac_objext >&5'
+      rm -f conftest2.*
+      if { { case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } &&
+	 test -f conftest2.$ac_objext && { { case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; };
+      then
+	# cc works too.
+	:
+      else
+	# cc exists but doesn't like -o.
+	eval ac_cv_prog_cc_${ac_cc}_c_o=no
+      fi
+    fi
+  fi
+else
+  eval ac_cv_prog_cc_${ac_cc}_c_o=no
+fi
+rm -f core conftest*
+
+fi
+if eval test \$ac_cv_prog_cc_${ac_cc}_c_o = yes; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+$as_echo "#define NO_MINUS_C_MINUS_O 1" >>confdefs.h
+
+fi
+
+# FIXME: we rely on the cache variable name because
+# there is no other way.
+set dummy $CC
+am_cc=`echo $2 | sed 's/[^a-zA-Z0-9_]/_/g;s/^[0-9]/_/'`
+eval am_t=\$ac_cv_prog_cc_${am_cc}_c_o
+if test "$am_t" != yes; then
+   # Losing compiler, so override with the script.
+   # FIXME: It is wrong to rewrite CC.
+   # But if we don't then we get into trouble of one sort or another.
+   # A longer-term fix would be to have automake use am__CC in this case,
+   # and then we could set am__CC="\$(top_srcdir)/compile \$(CC)"
+   CC="$am_aux_dir/compile $CC"
+fi
+
+
+# --------------------------------------------------------------
 
 # --------------------------------------------------------------
 # parent directories -- portably and without race conditions
@@ -31985,6 +32120,228 @@ ac_config_files="$ac_config_files contrib/triangle/Makefile"
 
 
 # -------------------------------------------------------------
+# Qhull -- enabled by default
+# -------------------------------------------------------------
+
+  # Check whether --enable-qhull was given.
+if test "${enable_qhull+set}" = set; then :
+  enableval=$enable_qhull; case "${enableval}" in
+		  yes)  enableqhull=yes;;
+		   no)  enableqhull=no;;
+ 		    *)  as_fn_error $? "bad value ${enableval} for --enable-qhull" "$LINENO" 5 ;;
+		 esac
+else
+  enableqhull=$enableoptional
+fi
+ # if unspecified, depend on enableoptional
+
+  QHULL_INCLUDE=""
+  QHULL_LIBS=""
+
+  # fix for --disable-optional
+  if (test "x$enableqhull" = "xyes"); then
+
+      # look for require -lm libraries
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing sqrt" >&5
+$as_echo_n "checking for library containing sqrt... " >&6; }
+if ${ac_cv_search_sqrt+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char sqrt ();
+int
+main ()
+{
+return sqrt ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' m; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_sqrt=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_sqrt+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_sqrt+:} false; then :
+
+else
+  ac_cv_search_sqrt=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_sqrt" >&5
+$as_echo "$ac_cv_search_sqrt" >&6; }
+ac_res=$ac_cv_search_sqrt
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  QHULL_LIBS="-lm"
+fi
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing trunc" >&5
+$as_echo_n "checking for library containing trunc... " >&6; }
+if ${ac_cv_search_trunc+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char trunc ();
+int
+main ()
+{
+return trunc ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' m; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_trunc=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_trunc+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_trunc+:} false; then :
+
+else
+  ac_cv_search_trunc=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_trunc" >&5
+$as_echo "$ac_cv_search_trunc" >&6; }
+ac_res=$ac_cv_search_trunc
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  QHULL_LIBS="-lm"
+fi
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing cos" >&5
+$as_echo_n "checking for library containing cos... " >&6; }
+if ${ac_cv_search_cos+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cos ();
+int
+main ()
+{
+return cos ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' m; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_cos=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_cos+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_cos+:} false; then :
+
+else
+  ac_cv_search_cos=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_cos" >&5
+$as_echo "$ac_cv_search_cos" >&6; }
+ac_res=$ac_cv_search_cos
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  QHULL_LIBS="-lm"
+fi
+
+
+
+      # The QHULL API is distributed with libmesh, so we don't have to guess
+      # where it might be installed...
+      QHULL_INCLUDE="-I\$(top_srcdir)/contrib/qhull/qhull/src -I\$(top_srcdir)/contrib/qhull/qhull/src/libqhull -I\$(top_srcdir)/contrib/qhull/qhull/src/libqhullcpp"
+
+$as_echo "#define HAVE_QHULL_API 1" >>confdefs.h
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Qhull version 2012.1 support >>>" >&5
+$as_echo "<<< Configuring library with Qhull version 2012.1 support >>>" >&6; }
+  fi
+
+
+
+if (test $enableqhull = yes); then
+  libmesh_contrib_INCLUDES="$QHULL_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+ if test x$enableqhull = xyes; then
+  LIBMESH_ENABLE_QHULL_TRUE=
+  LIBMESH_ENABLE_QHULL_FALSE='#'
+else
+  LIBMESH_ENABLE_QHULL_TRUE='#'
+  LIBMESH_ENABLE_QHULL_FALSE=
+fi
+
+ac_config_files="$ac_config_files contrib/qhull/qhull/Makefile"
+
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
 # GMV -- file I/O API is enabled by default (it is distributed in contrib)
 # -------------------------------------------------------------
 
@@ -34408,6 +34765,10 @@ if test -z "${LIBMESH_ENABLE_TRIANGLE_TRUE}" && test -z "${LIBMESH_ENABLE_TRIANG
   as_fn_error $? "conditional \"LIBMESH_ENABLE_TRIANGLE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${LIBMESH_ENABLE_QHULL_TRUE}" && test -z "${LIBMESH_ENABLE_QHULL_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_QHULL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${LIBMESH_ENABLE_GMV_TRUE}" && test -z "${LIBMESH_ENABLE_GMV_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_GMV\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -35685,6 +36046,7 @@ do
     "contrib/parmetis/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/parmetis/Makefile" ;;
     "contrib/tetgen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/tetgen/Makefile" ;;
     "contrib/triangle/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/triangle/Makefile" ;;
+    "contrib/qhull/qhull/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/qhull/qhull/Makefile" ;;
     "contrib/gmv/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/gmv/Makefile" ;;
     "contrib/eigen/eigen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/eigen/eigen/Makefile" ;;
     "contrib/netcdf/v3/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/netcdf/v3/Makefile" ;;
@@ -37962,6 +38324,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo '     'version....................... : $petscversion
   fi
   echo '  'pthreads......................... : $enablepthreads
+  echo '  'qhull............................ : $enableqhull
   echo '  'sfcurves......................... : $enablesfc
   echo '  'slepc............................ : $enableslepc
   echo '  'tbb.............................. : $enabletbb

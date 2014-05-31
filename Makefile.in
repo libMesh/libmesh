@@ -59,6 +59,7 @@ host_triplet = @host@
 target_triplet = @target@
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/src/libmesh_SOURCES \
+	$(top_srcdir)/build-aux/compile \
 	$(top_srcdir)/build-aux/config.guess \
 	$(top_srcdir)/build-aux/config.sub \
 	$(top_srcdir)/build-aux/depcomp \
@@ -76,9 +77,10 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/contrib/utils/libmesh-opt.pc.in \
 	$(top_srcdir)/contrib/utils/libmesh-prof.pc.in \
 	$(top_srcdir)/doc/Doxyfile.in $(top_srcdir)/doc/dot.in AUTHORS \
-	COPYING ChangeLog INSTALL NEWS build-aux/config.guess \
-	build-aux/config.sub build-aux/depcomp build-aux/install-sh \
-	build-aux/ltmain.sh build-aux/missing build-aux/ylwrap
+	COPYING ChangeLog INSTALL NEWS build-aux/compile \
+	build-aux/config.guess build-aux/config.sub build-aux/depcomp \
+	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
+	build-aux/ylwrap
 @LIBMESH_DBG_MODE_TRUE@am__append_1 = libmesh_dbg.la
 @LIBMESH_DEVEL_MODE_TRUE@am__append_2 = libmesh_devel.la
 @LIBMESH_OPT_MODE_TRUE@am__append_3 = libmesh_opt.la
@@ -124,14 +126,14 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/nemesis.m4 $(top_srcdir)/m4/netcdf.m4 \
 	$(top_srcdir)/m4/parmetis.m4 $(top_srcdir)/m4/petsc.m4 \
 	$(top_srcdir)/m4/precision.m4 \
-	$(top_srcdir)/m4/prefix_config.m4 $(top_srcdir)/m4/sfc.m4 \
-	$(top_srcdir)/m4/slepc.m4 $(top_srcdir)/m4/sstream.m4 \
-	$(top_srcdir)/m4/strstream.m4 $(top_srcdir)/m4/tbb.m4 \
-	$(top_srcdir)/m4/tecio.m4 $(top_srcdir)/m4/tecplot.m4 \
-	$(top_srcdir)/m4/tetgen.m4 $(top_srcdir)/m4/threads.m4 \
-	$(top_srcdir)/m4/triangle.m4 $(top_srcdir)/m4/trilinos.m4 \
-	$(top_srcdir)/m4/unordered.m4 $(top_srcdir)/m4/vtk.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/prefix_config.m4 $(top_srcdir)/m4/qhull.m4 \
+	$(top_srcdir)/m4/sfc.m4 $(top_srcdir)/m4/slepc.m4 \
+	$(top_srcdir)/m4/sstream.m4 $(top_srcdir)/m4/strstream.m4 \
+	$(top_srcdir)/m4/tbb.m4 $(top_srcdir)/m4/tecio.m4 \
+	$(top_srcdir)/m4/tecplot.m4 $(top_srcdir)/m4/tetgen.m4 \
+	$(top_srcdir)/m4/threads.m4 $(top_srcdir)/m4/triangle.m4 \
+	$(top_srcdir)/m4/trilinos.m4 $(top_srcdir)/m4/unordered.m4 \
+	$(top_srcdir)/m4/vtk.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -4218,6 +4220,7 @@ PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
 PWD = @PWD@
+QHULL_LIBS = @QHULL_LIBS@
 RANLIB = @RANLIB@
 RPATHFLAG = @RPATHFLAG@
 SED = @SED@

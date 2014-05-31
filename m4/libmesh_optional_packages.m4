@@ -400,6 +400,19 @@ AC_CONFIG_FILES([contrib/triangle/Makefile])
 
 
 # -------------------------------------------------------------
+# Qhull -- enabled by default
+# -------------------------------------------------------------
+CONFIGURE_QHULL
+if (test $enableqhull = yes); then
+  libmesh_contrib_INCLUDES="$QHULL_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_QHULL, test x$enableqhull = xyes)
+AC_CONFIG_FILES([contrib/qhull/qhull/Makefile])
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
 # GMV -- file I/O API is enabled by default (it is distributed in contrib)
 # -------------------------------------------------------------
 CONFIGURE_GMV

@@ -54,11 +54,11 @@ target_triplet = @target@
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@am__append_1 = boost/include
 @LIBMESH_INSTALL_INTERNAL_EIGEN_TRUE@am__append_2 = eigen/eigen
 @LIBMESH_ENABLE_GMV_TRUE@am__append_3 = gmv
-@LIBMESH_ENABLE_GMV_TRUE@am__append_4 = gmv/libopt.la 
-@LIBMESH_ENABLE_GMV_TRUE@am__append_5 = gmv/libdbg.la 
-@LIBMESH_ENABLE_GMV_TRUE@am__append_6 = gmv/libdevel.la 
-@LIBMESH_ENABLE_GMV_TRUE@am__append_7 = gmv/libprof.la 
-@LIBMESH_ENABLE_GMV_TRUE@am__append_8 = gmv/liboprof.la 
+@LIBMESH_ENABLE_GMV_TRUE@am__append_4 = gmv/libopt.la
+@LIBMESH_ENABLE_GMV_TRUE@am__append_5 = gmv/libdbg.la
+@LIBMESH_ENABLE_GMV_TRUE@am__append_6 = gmv/libdevel.la
+@LIBMESH_ENABLE_GMV_TRUE@am__append_7 = gmv/libprof.la
+@LIBMESH_ENABLE_GMV_TRUE@am__append_8 = gmv/liboprof.la
 @LIBMESH_ENABLE_GZSTREAMS_TRUE@am__append_9 = gzstream
 @LIBMESH_ENABLE_GZSTREAMS_TRUE@am__append_10 = gzstream/libopt.la
 @LIBMESH_ENABLE_GZSTREAMS_TRUE@am__append_11 = gzstream/libdbg.la
@@ -94,17 +94,17 @@ target_triplet = @target@
 @LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_37 = exodusii/v5.22/exodus/libprof.la
 @LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_38 = exodusii/v5.22/exodus/liboprof.la
 @LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_39 = nemesis/v3.09
-@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_40 = nemesis/v3.09/libopt.la 
-@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_41 = nemesis/v3.09/libdbg.la 
-@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_42 = nemesis/v3.09/libdevel.la 
-@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_43 = nemesis/v3.09/libprof.la 
-@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_44 = nemesis/v3.09/liboprof.la 
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_40 = nemesis/v3.09/libopt.la
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_41 = nemesis/v3.09/libdbg.la
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_42 = nemesis/v3.09/libdevel.la
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_43 = nemesis/v3.09/libprof.la
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_44 = nemesis/v3.09/liboprof.la
 @LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V522_TRUE@am__append_45 = nemesis/v5.22/nemesis
-@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V522_TRUE@am__append_46 = nemesis/v5.22/nemesis/libopt.la 
-@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V522_TRUE@am__append_47 = nemesis/v5.22/nemesis/libdbg.la 
-@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V522_TRUE@am__append_48 = nemesis/v5.22/nemesis/libdevel.la 
-@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V522_TRUE@am__append_49 = nemesis/v5.22/nemesis/libprof.la 
-@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V522_TRUE@am__append_50 = nemesis/v5.22/nemesis/liboprof.la 
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V522_TRUE@am__append_46 = nemesis/v5.22/nemesis/libopt.la
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V522_TRUE@am__append_47 = nemesis/v5.22/nemesis/libdbg.la
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V522_TRUE@am__append_48 = nemesis/v5.22/nemesis/libdevel.la
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V522_TRUE@am__append_49 = nemesis/v5.22/nemesis/libprof.la
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V522_TRUE@am__append_50 = nemesis/v5.22/nemesis/liboprof.la
 @LIBMESH_ENABLE_TECIO_TRUE@am__append_51 = tecplot/tecio
 @LIBMESH_ENABLE_TECIO_TRUE@am__append_52 = tecplot/tecio/libopt.la
 @LIBMESH_ENABLE_TECIO_TRUE@am__append_53 = tecplot/tecio/libdbg.la
@@ -132,48 +132,54 @@ target_triplet = @target@
 @LIBMESH_ENABLE_TETGEN_TRUE@am__append_72 = tetgen/libdevel.la
 @LIBMESH_ENABLE_TETGEN_TRUE@am__append_73 = tetgen/libprof.la
 @LIBMESH_ENABLE_TETGEN_TRUE@am__append_74 = tetgen/liboprof.la
-@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_75 = libHilbert
-@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_76 = libHilbert/libopt.la
-@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_77 = libHilbert/libdbg.la
-@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_78 = libHilbert/libdevel.la
-@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_79 = libHilbert/libprof.la
-@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_80 = libHilbert/liboprof.la
-@LIBMESH_ENABLE_LASPACK_TRUE@am__append_81 = laspack
-@LIBMESH_ENABLE_LASPACK_TRUE@am__append_82 = laspack/libopt.la
-@LIBMESH_ENABLE_LASPACK_TRUE@am__append_83 = laspack/libdbg.la
-@LIBMESH_ENABLE_LASPACK_TRUE@am__append_84 = laspack/libdevel.la
-@LIBMESH_ENABLE_LASPACK_TRUE@am__append_85 = laspack/libprof.la
-@LIBMESH_ENABLE_LASPACK_TRUE@am__append_86 = laspack/liboprof.la
-@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_87 = metis
-@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_88 = metis/libopt.la
-@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_89 = metis/libdbg.la
-@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_90 = metis/libdevel.la
-@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_91 = metis/libprof.la
-@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_92 = metis/liboprof.la
-@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_93 = parmetis
-@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_94 = parmetis/libopt.la
-@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_95 = parmetis/libdbg.la
-@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_96 = parmetis/libdevel.la
-@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_97 = parmetis/libprof.la
-@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_98 = parmetis/liboprof.la
-@LIBMESH_ENABLE_SFC_TRUE@am__append_99 = sfcurves
-@LIBMESH_ENABLE_SFC_TRUE@am__append_100 = sfcurves/libopt.la
-@LIBMESH_ENABLE_SFC_TRUE@am__append_101 = sfcurves/libdbg.la
-@LIBMESH_ENABLE_SFC_TRUE@am__append_102 = sfcurves/libdevel.la
-@LIBMESH_ENABLE_SFC_TRUE@am__append_103 = sfcurves/libprof.la
-@LIBMESH_ENABLE_SFC_TRUE@am__append_104 = sfcurves/liboprof.la
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_105 = fparser
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_106 = fparser/libfparser.la
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_107 = fparser/libfparser.la
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_108 = fparser/libfparser.la
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_109 = fparser/libfparser.la
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_110 = fparser/libfparser.la
-@LIBMESH_ENABLE_NANOFLANN_TRUE@am__append_111 = nanoflann
-@LIBMESH_OPT_MODE_TRUE@am__append_112 = libcontrib_opt.la
-@LIBMESH_DBG_MODE_TRUE@am__append_113 = libcontrib_dbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_114 = libcontrib_devel.la
-@LIBMESH_PROF_MODE_TRUE@am__append_115 = libcontrib_prof.la
-@LIBMESH_OPROF_MODE_TRUE@am__append_116 = libcontrib_oprof.la
+@LIBMESH_ENABLE_QHULL_TRUE@am__append_75 = qhull/qhull
+@LIBMESH_ENABLE_QHULL_TRUE@am__append_76 = qhull/qhull/libopt.la
+@LIBMESH_ENABLE_QHULL_TRUE@am__append_77 = qhull/qhull/libdbg.la
+@LIBMESH_ENABLE_QHULL_TRUE@am__append_78 = qhull/qhull/libdevel.la
+@LIBMESH_ENABLE_QHULL_TRUE@am__append_79 = qhull/qhull/libprof.la
+@LIBMESH_ENABLE_QHULL_TRUE@am__append_80 = qhull/qhull/liboprof.la
+@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_81 = libHilbert
+@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_82 = libHilbert/libopt.la
+@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_83 = libHilbert/libdbg.la
+@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_84 = libHilbert/libdevel.la
+@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_85 = libHilbert/libprof.la
+@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_86 = libHilbert/liboprof.la
+@LIBMESH_ENABLE_LASPACK_TRUE@am__append_87 = laspack
+@LIBMESH_ENABLE_LASPACK_TRUE@am__append_88 = laspack/libopt.la
+@LIBMESH_ENABLE_LASPACK_TRUE@am__append_89 = laspack/libdbg.la
+@LIBMESH_ENABLE_LASPACK_TRUE@am__append_90 = laspack/libdevel.la
+@LIBMESH_ENABLE_LASPACK_TRUE@am__append_91 = laspack/libprof.la
+@LIBMESH_ENABLE_LASPACK_TRUE@am__append_92 = laspack/liboprof.la
+@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_93 = metis
+@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_94 = metis/libopt.la
+@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_95 = metis/libdbg.la
+@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_96 = metis/libdevel.la
+@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_97 = metis/libprof.la
+@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_98 = metis/liboprof.la
+@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_99 = parmetis
+@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_100 = parmetis/libopt.la
+@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_101 = parmetis/libdbg.la
+@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_102 = parmetis/libdevel.la
+@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_103 = parmetis/libprof.la
+@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_104 = parmetis/liboprof.la
+@LIBMESH_ENABLE_SFC_TRUE@am__append_105 = sfcurves
+@LIBMESH_ENABLE_SFC_TRUE@am__append_106 = sfcurves/libopt.la
+@LIBMESH_ENABLE_SFC_TRUE@am__append_107 = sfcurves/libdbg.la
+@LIBMESH_ENABLE_SFC_TRUE@am__append_108 = sfcurves/libdevel.la
+@LIBMESH_ENABLE_SFC_TRUE@am__append_109 = sfcurves/libprof.la
+@LIBMESH_ENABLE_SFC_TRUE@am__append_110 = sfcurves/liboprof.la
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_111 = fparser
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_112 = fparser/libfparser.la
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_113 = fparser/libfparser.la
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_114 = fparser/libfparser.la
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_115 = fparser/libfparser.la
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_116 = fparser/libfparser.la
+@LIBMESH_ENABLE_NANOFLANN_TRUE@am__append_117 = nanoflann
+@LIBMESH_OPT_MODE_TRUE@am__append_118 = libcontrib_opt.la
+@LIBMESH_DBG_MODE_TRUE@am__append_119 = libcontrib_dbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_120 = libcontrib_devel.la
+@LIBMESH_PROF_MODE_TRUE@am__append_121 = libcontrib_prof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_122 = libcontrib_oprof.la
 subdir = contrib
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp
@@ -206,14 +212,14 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/nemesis.m4 $(top_srcdir)/m4/netcdf.m4 \
 	$(top_srcdir)/m4/parmetis.m4 $(top_srcdir)/m4/petsc.m4 \
 	$(top_srcdir)/m4/precision.m4 \
-	$(top_srcdir)/m4/prefix_config.m4 $(top_srcdir)/m4/sfc.m4 \
-	$(top_srcdir)/m4/slepc.m4 $(top_srcdir)/m4/sstream.m4 \
-	$(top_srcdir)/m4/strstream.m4 $(top_srcdir)/m4/tbb.m4 \
-	$(top_srcdir)/m4/tecio.m4 $(top_srcdir)/m4/tecplot.m4 \
-	$(top_srcdir)/m4/tetgen.m4 $(top_srcdir)/m4/threads.m4 \
-	$(top_srcdir)/m4/triangle.m4 $(top_srcdir)/m4/trilinos.m4 \
-	$(top_srcdir)/m4/unordered.m4 $(top_srcdir)/m4/vtk.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/prefix_config.m4 $(top_srcdir)/m4/qhull.m4 \
+	$(top_srcdir)/m4/sfc.m4 $(top_srcdir)/m4/slepc.m4 \
+	$(top_srcdir)/m4/sstream.m4 $(top_srcdir)/m4/strstream.m4 \
+	$(top_srcdir)/m4/tbb.m4 $(top_srcdir)/m4/tecio.m4 \
+	$(top_srcdir)/m4/tecplot.m4 $(top_srcdir)/m4/tetgen.m4 \
+	$(top_srcdir)/m4/threads.m4 $(top_srcdir)/m4/triangle.m4 \
+	$(top_srcdir)/m4/trilinos.m4 $(top_srcdir)/m4/unordered.m4 \
+	$(top_srcdir)/m4/vtk.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -342,8 +348,8 @@ CTAGS = ctags
 DIST_SUBDIRS = boost/include eigen/eigen gmv gzstream netcdf/v3 \
 	netcdf/v4 exodusii/v5.09 exodusii/v5.22/exodus nemesis/v3.09 \
 	nemesis/v5.22/nemesis tecplot/tecio tecplot/binary triangle \
-	tetgen libHilbert laspack metis parmetis sfcurves fparser \
-	nanoflann
+	tetgen qhull/qhull libHilbert laspack metis parmetis sfcurves \
+	fparser nanoflann
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
   dir0=`pwd`; \
@@ -542,6 +548,7 @@ PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
 PWD = @PWD@
+QHULL_LIBS = @QHULL_LIBS@
 RANLIB = @RANLIB@
 RPATHFLAG = @RPATHFLAG@
 SED = @SED@
@@ -657,7 +664,7 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-AUTOMAKE_OPTIONS = subdir-objects 
+AUTOMAKE_OPTIONS = subdir-objects
 
 ###########################################################
 # add contributed libraries that are conditionally compiled
@@ -667,37 +674,43 @@ SUBDIRS = $(am__append_1) $(am__append_2) $(am__append_3) \
 	$(am__append_45) $(am__append_51) $(am__append_57) \
 	$(am__append_63) $(am__append_69) $(am__append_75) \
 	$(am__append_81) $(am__append_87) $(am__append_93) \
-	$(am__append_99) $(am__append_105) $(am__append_111)
+	$(am__append_99) $(am__append_105) $(am__append_111) \
+	$(am__append_117)
 opt_libs = $(am__append_4) $(am__append_10) $(am__append_16) \
 	$(am__append_22) $(am__append_28) $(am__append_34) \
 	$(am__append_40) $(am__append_46) $(am__append_52) \
 	$(am__append_58) $(am__append_64) $(am__append_70) \
 	$(am__append_76) $(am__append_82) $(am__append_88) \
-	$(am__append_94) $(am__append_100) $(am__append_106)
+	$(am__append_94) $(am__append_100) $(am__append_106) \
+	$(am__append_112)
 dbg_libs = $(am__append_5) $(am__append_11) $(am__append_17) \
 	$(am__append_23) $(am__append_29) $(am__append_35) \
 	$(am__append_41) $(am__append_47) $(am__append_53) \
 	$(am__append_59) $(am__append_65) $(am__append_71) \
 	$(am__append_77) $(am__append_83) $(am__append_89) \
-	$(am__append_95) $(am__append_101) $(am__append_107)
+	$(am__append_95) $(am__append_101) $(am__append_107) \
+	$(am__append_113)
 devel_libs = $(am__append_6) $(am__append_12) $(am__append_18) \
 	$(am__append_24) $(am__append_30) $(am__append_36) \
 	$(am__append_42) $(am__append_48) $(am__append_54) \
 	$(am__append_60) $(am__append_66) $(am__append_72) \
 	$(am__append_78) $(am__append_84) $(am__append_90) \
-	$(am__append_96) $(am__append_102) $(am__append_108)
+	$(am__append_96) $(am__append_102) $(am__append_108) \
+	$(am__append_114)
 prof_libs = $(am__append_7) $(am__append_13) $(am__append_19) \
 	$(am__append_25) $(am__append_31) $(am__append_37) \
 	$(am__append_43) $(am__append_49) $(am__append_55) \
 	$(am__append_61) $(am__append_67) $(am__append_73) \
 	$(am__append_79) $(am__append_85) $(am__append_91) \
-	$(am__append_97) $(am__append_103) $(am__append_109)
+	$(am__append_97) $(am__append_103) $(am__append_109) \
+	$(am__append_115)
 oprof_libs = $(am__append_8) $(am__append_14) $(am__append_20) \
 	$(am__append_26) $(am__append_32) $(am__append_38) \
 	$(am__append_44) $(am__append_50) $(am__append_56) \
 	$(am__append_62) $(am__append_68) $(am__append_74) \
 	$(am__append_80) $(am__append_86) $(am__append_92) \
-	$(am__append_98) $(am__append_104) $(am__append_110)
+	$(am__append_98) $(am__append_104) $(am__append_110) \
+	$(am__append_116)
 
 # Doesn't seem to be used directly in this Makefile; add
 # it in case someone includes this Makefile?
@@ -707,8 +720,8 @@ AM_LDFLAGS = $(libmesh_LDFLAGS)
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = $(am__append_112) $(am__append_113) \
-	$(am__append_114) $(am__append_115) $(am__append_116)
+noinst_LTLIBRARIES = $(am__append_118) $(am__append_119) \
+	$(am__append_120) $(am__append_121) $(am__append_122)
 @LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_SOURCES = cppsource.C
 @LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
