@@ -49,7 +49,7 @@ void LaplaceSystem::init_context(DiffContext &context)
   side_fe->get_dphi();
 }
 
-#define optassert(X) {if (!(X)) libmesh_error();}
+#define optassert(X) {if (!(X)) libmesh_error_msg("Assertion " #X " failed.");}
 
 // Assemble the element contributions to the stiffness matrix
 bool LaplaceSystem::element_time_derivative (bool request_jacobian,

@@ -43,12 +43,7 @@ void HeatSystem::init_data ()
   {
     std::ifstream i("heat.in");
     if (!i)
-      {
-        std::cerr << '[' << this->processor_id()
-                  << "] Can't find heat.in; exiting early."
-                  << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg('[' << this->processor_id() << "] Can't find heat.in; exiting early.");
   }
   GetPot infile("heat.in");
   _k = infile("k", 1.0);
@@ -106,7 +101,7 @@ void HeatSystem::init_context(DiffContext &context)
   FEMSystem::init_context(context);
 }
 
-#define optassert(X) {if (!(X)) libmesh_error();}
+#define optassert(X) {if (!(X)) libmesh_error_msg("Assertion " #X " failed.");}
 //#define optassert(X) libmesh_assert(X);
 
 bool HeatSystem::element_time_derivative (bool request_jacobian,

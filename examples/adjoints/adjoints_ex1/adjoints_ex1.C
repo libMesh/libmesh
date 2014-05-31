@@ -224,10 +224,8 @@ AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param, QoISet &qois
       p2->set_patch_reuse(param.patch_reuse);
     }
   else
-    {
-      std::cerr << "Unknown indicator_type" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Unknown indicator_type = " << param.indicator_type);
+
   return error_estimator;
 }
 
@@ -248,12 +246,7 @@ int main (int argc, char** argv)
   {
     std::ifstream i("general.in");
     if (!i)
-      {
-        std::cerr << '[' << init.comm().rank()
-                  << "] Can't find general.in; exiting early."
-                  << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg('[' << init.comm().rank() << "] Can't find general.in; exiting early.");
   }
   GetPot infile("general.in");
 

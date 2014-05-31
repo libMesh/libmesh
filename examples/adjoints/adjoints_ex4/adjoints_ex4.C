@@ -215,12 +215,7 @@ int main (int argc, char** argv)
   {
     std::ifstream i("general.in");
     if (!i)
-      {
-        std::cerr << '[' << init.comm().rank()
-                  << "] Can't find general.in; exiting early."
-                  << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg('[' << init.comm().rank() << "] Can't find general.in; exiting early.");
   }
   GetPot infile("general.in");
 

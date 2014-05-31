@@ -107,13 +107,7 @@ int main (int argc, char** argv)
 
   // Check for proper usage.
   if (argc < 2)
-    {
-      if (init.comm().rank() == 0)
-        std::cerr << "Usage: " << argv[0] << " [meshfile]"
-                  << std::endl;
-
-      libmesh_error();
-    }
+    libmesh_error_msg("Usage: " << argv[0] << " [meshfile]");
 
   // Tell the user what we are doing.
   else

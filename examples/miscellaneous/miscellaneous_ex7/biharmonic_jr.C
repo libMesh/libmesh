@@ -68,7 +68,7 @@ Biharmonic::JR::JR(EquationSystems& eqSys,
       break;
 #endif
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid dimension = " << _biharmonic._dim);
     }
 #endif // LIBMESH_ENABLE_PERIODIC
 

@@ -121,13 +121,7 @@ int main (int argc, char** argv)
 
   // Check for proper usage.
   if (argc < 3)
-    {
-      if (init.comm().rank() == 0)
-        std::cerr << "Usage: " << argv[0] << " -f [frequency]"
-                  << std::endl;
-
-      libmesh_error();
-    }
+    libmesh_error_msg("Usage: " << argv[0] << " -f [frequency]");
 
   if (init.comm().size() > 1)
     {

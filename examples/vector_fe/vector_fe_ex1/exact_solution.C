@@ -52,7 +52,7 @@ Real exact_solution (const int component,
     case 2:
       return sin(.5*pi*x)*cos(.5*pi*y)*cos(.5*pi*z)*cos(.5*pi*x*y*z);
     default:
-      libmesh_error();
+      libmesh_error_msg("Invalid component = " << component);
     }
 
   //dummy

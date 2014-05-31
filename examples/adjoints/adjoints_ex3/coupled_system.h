@@ -119,7 +119,7 @@ public:
 
   virtual void operator() (const FEMContext&, const Point&,
                            const Real, DenseVector<Number>&)
-  {libmesh_error();}
+  { libmesh_not_implemented(); }
 
   virtual Number operator() (const FEMContext&, const Point& p,
                              const Real time = 0.);
@@ -146,7 +146,7 @@ public:
   virtual void operator() (const FEMContext&, const Point&,
                            const Real,
                            DenseVector<Number>&)
-  {libmesh_error();}
+  { libmesh_not_implemented(); }
 
   virtual Number operator() (const FEMContext&, const Point& p,
                              const Real time = 0.);

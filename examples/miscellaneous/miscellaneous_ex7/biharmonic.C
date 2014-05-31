@@ -192,7 +192,7 @@ Biharmonic::Biharmonic(UnstructuredMesh* m) :
   else if (energy == "log_double_obstacle")
     _energy = LOG_DOUBLE_OBSTACLE;
   else
-    ERROR(std::string("Unknown energy type: ") + energy);
+    libmesh_error_msg("Unknown energy type: " << energy);
 
   _tol     = command_line_value("tol",1.0e-8);
   _theta   = command_line_value("theta", .001);
@@ -208,12 +208,12 @@ Biharmonic::Biharmonic(UnstructuredMesh* m) :
   // Dimension
   _dim = command_line_value("dim",1);
 
-  ASSERT((_dim <= 3) && (_dim > 0), "Invalid mesh dimension");
+  libmesh_assert_msg((_dim <= 3) && (_dim > 0), "Invalid mesh dimension");
 
   // Build the mesh
   // Yes, it's better to make a coarse mesh and then refine it. We'll get to it later.
   _N = command_line_value("N", 8);
-  ASSERT(_N > 0, "Invalid mesh size");
+  libmesh_assert_msg(_N > 0, "Invalid mesh size");
 
   switch (_dim)
     {
@@ -227,21 +227,21 @@ Biharmonic::Biharmonic(UnstructuredMesh* m) :
       MeshTools::Generation::build_cube(*_mesh, _N, _N, _N, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, HEX8);
       break;
     default:
-      ASSERT((_dim <= 3) && (_dim > 0), "Invalid mesh dimension");
+      libmesh_assert_msg((_dim <= 3) && (_dim > 0), "Invalid mesh dimension");
       break;
     }
 
   // Determine the initial timestep size
   _dt0 = command_line_value("dt", 1.0/(10*_kappa*_N*_N*_N*_N));
-  ASSERT(_dt0>=0, "Negative initial timestep");
+  libmesh_assert_msg(_dt0>=0, "Negative initial timestep");
 
   _t0 = command_line_value("min_time", 0.0);
   _t1 = command_line_value("max_time", _t0 + 50.0*_dt0);
-  ASSERT(_t1 >= _t0, "Final time less than initial time");
+  libmesh_assert_msg(_t1 >= _t0, "Final time less than initial time");
   _T = _t1 - _t0;
 
   _cnWeight = command_line_value("crank_nicholson_weight", 1.0);
-  ASSERT(_cnWeight <= 1 && _cnWeight >= 0, "Crank-Nicholson weight must be between 0 and 1");
+  libmesh_assert_msg(_cnWeight <= 1 && _cnWeight >= 0, "Crank-Nicholson weight must be between 0 and 1");
 
   // Initial state
   _initialState = STRIP;
@@ -253,14 +253,14 @@ Biharmonic::Biharmonic(UnstructuredMesh* m) :
   else if (initialState == std::string("rod"))
     _initialState = ROD;
   else
-    ERROR("Unknown initial state: neither ball nor rod nor srip");
+    libmesh_error_msg("Unknown initial state: neither ball nor rod nor srip");
 
   std::vector<Real> icenter;
   command_line_vector("initial_center", icenter);
 
   // Check that the point defining the center was in the right spatial dimension
   if (icenter.size() > _dim)
-    ASSERT(icenter.size() > _dim, "Invalid dimension for the initial state center of mass");
+    libmesh_assert_msg(icenter.size() > _dim, "Invalid dimension for the initial state center of mass");
 
   // Pad
   icenter.resize(3);

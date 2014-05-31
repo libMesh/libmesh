@@ -74,12 +74,8 @@ int main (int argc, char** argv)
 
   // Check for proper calling arguments.
   if (argc < 3)
-    {
-      std::cout << "Usage:\n"
-                <<"\t " << argv[0] << " -n 15"
-                << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("Usage:\n" << "\t " << argv[0] << " -n 15");
+
   // Brief message to the user regarding the program name
   // and command line arguments.
   else

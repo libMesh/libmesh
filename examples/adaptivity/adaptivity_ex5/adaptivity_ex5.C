@@ -182,13 +182,9 @@ int main (int argc, char** argv)
     init_timestep = command_line.next(0);
   else
     {
-      if (init.comm().rank() == 0)
-        std::cerr << "ERROR: Initial timestep not specified\n" << std::endl;
-
       // This handy function will print the file name, line number,
-      // and then abort.  Currrently the library does not use C++
-      // exception handling.
-      libmesh_error();
+      // specified message, and then throw an exception.
+      libmesh_error_msg("ERROR: Initial timestep not specified!");
     }
 
   // This value is also obtained from the command line, and specifies
@@ -199,10 +195,7 @@ int main (int argc, char** argv)
   if(command_line.search("-n_timesteps"))
     n_timesteps = command_line.next(0);
   else
-    {
-      std::cout << "ERROR: Number of timesteps not specified\n" << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("ERROR: Number of timesteps not specified");
 
   // The user can specify a different exact solution on the command
   // line, if we have an expression parser compiled in

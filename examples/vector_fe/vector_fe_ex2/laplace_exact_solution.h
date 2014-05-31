@@ -46,7 +46,7 @@ public:
         return sin(hp*x)*cos(hp*y)*sin(hp*z);
 
       default:
-        libmesh_error();
+        libmesh_error_msg("Invalid component = " << component);
       }
   }
 };
@@ -82,7 +82,7 @@ public:
                              sin(hp*x)*cos(hp*y)*(hp)*cos(hp*z) );
 
       default:
-        libmesh_error();
+        libmesh_error_msg("Invalid component = " << component);
       }
   }
 };

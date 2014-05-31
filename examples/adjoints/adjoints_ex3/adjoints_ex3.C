@@ -400,27 +400,17 @@ void read_output(EquationSystems &es,
           char header[headersize];
           timesteps.getline (header, headersize);
           if (strcmp(header, "vector_timesteps = [") != 0)
-            {
-              std::cout << "Bad header in out_timesteps.m:" << std::endl
-                        << header
-                        << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("Bad header in out_timesteps.m:\n" << header);
 
           times.getline (header, headersize);
           if (strcmp(header, "vector_time = [") != 0)
-            {
-              std::cout << "Bad header in out_time.m:" << std::endl
-                        << header
-                        << std::endl;
-              libmesh_error();
-            }
+            libmesh_error_msg("Bad header in out_time.m:\n" << header);
 
           // Read each timestep
           for (unsigned int i = 0; i != t_step; ++i)
             {
               if (!times.good())
-                libmesh_error();
+                libmesh_error_msg("Error: File out_time.m is in non-good state.");
               times >> current_time;
               timesteps >> current_timestep;
             }
@@ -429,7 +419,7 @@ void read_output(EquationSystems &es,
           current_time += current_timestep;
         }
       else
-        libmesh_error();
+        libmesh_error_msg("Error opening out_time.m or out_timesteps.m");
     }
   else
     current_time = t_step * param.deltat;
@@ -472,11 +462,7 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
           innersolver = eulersolver;
         }
       else
-        {
-          std::cerr << "Don't recognize core TimeSolver type: "
-                    << param.timesolver_core << std::endl;
-          libmesh_error();
-        }
+        libmesh_error_msg("Don't recognize core TimeSolver type: " << param.timesolver_core);
 
       if (param.timesolver_tolerance)
         {
@@ -518,7 +504,7 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
       PetscDiffSolver *solver = new PetscDiffSolver(system);
       system.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver);
 #else
-      libmesh_error();
+      libmesh_error_msg("This example requires libMesh to be compiled with PETSc support.");
 #endif
     }
   else
@@ -716,12 +702,7 @@ int main (int argc, char** argv)
   {
     std::ifstream i("general.in");
     if (!i)
-      {
-        std::cerr << '[' << init.comm().rank()
-                  << "] Can't find general.in; exiting early."
-                  << std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg('[' << init.comm().rank() << "] Can't find general.in; exiting early.");
   }
 
   GetPot infile("general.in");

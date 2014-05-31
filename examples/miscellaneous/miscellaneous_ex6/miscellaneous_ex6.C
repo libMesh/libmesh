@@ -316,10 +316,7 @@ void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper
 
                 // Check for not found
                 if (it == node_id_map.end())
-                  {
-                    libMesh::err << "Node id " << old_elem->node(i) << " not found in map!" << std::endl;
-                    libmesh_error();
-                  }
+                  libmesh_error_msg("Node id " << old_elem->node(i) << " not found in map!");
 
                 // Mapping to node ID in input mesh
                 unsigned new_node_id = (*it).second;

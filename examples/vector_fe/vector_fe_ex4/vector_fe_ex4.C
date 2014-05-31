@@ -66,12 +66,9 @@ int main (int argc, char** argv)
                                              std::string("HEX27") );
 
   if( elem_str != "HEX20" && elem_str != "HEX27" )
-    {
-      libMesh::err << "This example must be run with HEX20 or HEX27."
-                   << std::endl
-                   << "You entered: " << elem_str << std::endl;
-      libmesh_error();
-    }
+      libmesh_error_msg("You entered: " \
+                        << elem_str \
+                        << " but this example must be run with HEX20 or HEX27.");
 
   MeshTools::Generation::build_cube (mesh,
                                      grid_size,

@@ -427,11 +427,9 @@ Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
       break;
 
     default:
-      {
-        std::cout<<"Wrong variable number"<<var<<" passed to CoupledFEMFunctionsx object ! Quitting !"<<std::endl;
-        libmesh_error();
-      }
-
+      libmesh_error_msg("Wrong variable number "                        \
+                        << var                                          \
+                        << " passed to CoupledFEMFunctionsx object! Quitting!");
     }
 
   return weight;
@@ -461,10 +459,9 @@ Number CoupledFEMFunctionsy::operator()(const FEMContext& c, const Point& p,
       break;
 
     default:
-      {
-        std::cout<<"Wrong variable number "<<var<<" passed to CoupledFEMFunctionsy object ! Quitting !"<<std::endl;
-        libmesh_error();
-      }
+      libmesh_error_msg("Wrong variable number "                        \
+                        << var                                          \
+                        << " passed to CoupledFEMFunctionsy object! Quitting!");
     }
 
   return weight;

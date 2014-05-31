@@ -48,14 +48,9 @@ int main (int argc, char** argv)
   // a filename to write the mesh into.
   if (argc < 4)
     {
-      if (init.comm().rank() == 0)
-        std::cerr << "Usage: " << argv[0] << " -d 2 in.mesh [-o out.mesh]"
-                  << std::endl;
-
       // This handy function will print the file name, line number,
-      // and then abort.  Currently the library does not use C++
-      // exception handling.
-      libmesh_error();
+      // specified message, and then throw an exception.
+      libmesh_error_msg("Usage: " << argv[0] << " -d 2 in.mesh [-o out.mesh]");
     }
 
   // Get the dimensionality of the mesh from argv[2]

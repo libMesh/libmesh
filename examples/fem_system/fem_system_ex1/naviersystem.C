@@ -678,8 +678,6 @@ Point NavierSystem::forcing(const Point& p)
       }
 
     default:
-      {
-        libmesh_error();
-      }
+      libmesh_error_msg("Invalid application id = " << application);
     }
 }

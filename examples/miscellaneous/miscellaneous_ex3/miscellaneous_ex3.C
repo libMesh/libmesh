@@ -405,14 +405,9 @@ int main (int argc, char** argv)
   // Check for proper calling arguments.
   if (argc < 3)
     {
-      if (init.comm().rank() == 0)
-        std::cerr << "Usage:\n"
-                  <<"\t " << argv[0] << " -r 2"
-                  << std::endl;
-
       // This handy function will print the file name, line number,
-      // and then abort.
-      libmesh_error();
+      // specified message, and then throw an exception.
+      libmesh_error_msg("Usage:\n" << "\t " << argv[0] << " -r 2");
     }
 
   // Brief message to the user regarding the program name
@@ -445,10 +440,7 @@ int main (int argc, char** argv)
 
   // Cannot use dicontinuous basis.
   if ((family == "MONOMIAL") || (family == "XYZ"))
-    {
-      std::cout << "ex19 currently requires a C^0 (or higher) FE basis." << std::endl;
-      libmesh_error();
-    }
+    libmesh_error_msg("This example requires a C^0 (or higher) FE basis.");
 
   if ( command_line.search(1, "-pre") )
     {
