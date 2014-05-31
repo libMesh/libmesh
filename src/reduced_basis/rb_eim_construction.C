@@ -518,32 +518,36 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
           context.pre_fe_reinit(*this, *el);
           context.elem_fe_reinit();
 
-          for(unsigned int var=0; var<n_vars(); var++)
+          // All variables should have the same quadrature rule, hence
+          // we can get JxW and xyz based on first_elem_fe.
+          FEBase* first_elem_fe = NULL;
+          context.get_element_fe( 0, first_elem_fe );
+          unsigned int n_qpoints = context.get_element_qrule().n_points();
+          const std::vector<Real> &JxW = first_elem_fe->get_JxW();
+          const std::vector<Point> &xyz = first_elem_fe->get_xyz();
+
+          // Loop over qp before var because parametrized functions often use
+          // some caching based on qp.
+          for(unsigned int qp=0; qp<n_qpoints; qp++)
+          {
+            for(unsigned int var=0; var<n_vars(); var++)
             {
               FEBase* elem_fe = NULL;
               context.get_element_fe( var, elem_fe );
-              const std::vector<Real> &JxW = elem_fe->get_JxW();
-
               const std::vector<std::vector<Real> >& phi = elem_fe->get_phi();
-
-              const std::vector<Point> &xyz = elem_fe->get_xyz();
-
-              unsigned int n_qpoints = context.get_element_qrule().n_points();
-              unsigned int n_var_dofs = libmesh_cast_int<unsigned int>
-                (context.get_dof_indices( var ).size());
 
               DenseSubVector<Number>& subresidual_var = context.get_elem_residual( var );
 
-              std::vector<Number> fn_vals(n_qpoints);
-              for(unsigned int qp=0; qp<n_qpoints; qp++)
+              unsigned int n_var_dofs = libmesh_cast_int<unsigned int>
+                (context.get_dof_indices( var ).size());
+
+              Number eval_result = eim_eval.evaluate_parametrized_function(var, xyz[qp], *(*el));
+              for(unsigned int i=0; i != n_var_dofs; i++)
               {
-                fn_vals[qp] = eim_eval.evaluate_parametrized_function(var, xyz[qp], *(*el));
-                for(unsigned int i=0; i != n_var_dofs; i++)
-                {
-                  subresidual_var(i) += JxW[qp] * fn_vals[qp] * phi[i][qp];
-                }
+                subresidual_var(i) += JxW[qp] * eval_result * phi[i][qp];
               }
             }
+          }
 
           // Apply constraints, e.g. periodic constraints
           this->get_dof_map().constrain_element_vector(context.get_elem_residual(), context.get_dof_indices() );
