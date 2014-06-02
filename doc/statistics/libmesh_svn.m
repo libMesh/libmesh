@@ -1,5 +1,6 @@
 % This data varies a lot month to month...
 % https://sourceforge.net/project/stats/detail.php?group_id=71130&ugn=libmesh&type=svn&mode=12months
+% As of June 1, 2014 the site above no longer exists...
 
 clear all
 clf
