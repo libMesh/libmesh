@@ -214,17 +214,6 @@ class StandardType<Point> : public DataType
 public:
   explicit
   StandardType(const Point *example=NULL) {
-    // We need an example for MPI_Address to use
-    Point *ex;
-    AutoPtr<Point> temp;
-    if (example)
-      ex = const_cast<Point *>(example);
-    else
-      {
-        temp.reset(new Point());
-        ex = temp.get();
-      }
-
     // _static_type never gets freed, but it only gets committed once
     // per T, so it's not a *huge* memory leak...
     static data_type _static_type;
@@ -232,6 +221,19 @@ public:
     if (!_is_initialized)
       {
 #ifdef LIBMESH_HAVE_MPI
+
+        // We need an example for MPI_Address to use
+        Point *ex;
+
+        AutoPtr<Point> temp;
+        if (example)
+          ex = const_cast<Point *>(example);
+        else
+          {
+            temp.reset(new Point());
+            ex = temp.get();
+          }
+
         StandardType<Real> T_type(&((*ex)(0)));
 
 #if MPI_VERSION == 1
