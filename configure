@@ -1867,8 +1867,8 @@ Optional Features:
   --enable-perflog        build with performance logging turned on
   --disable-examples      Do not compile, install, or test with example suite
   --disable-optional      build without most optional external libraries
-  --enable-strict-lgpl    Compile libmesh with LGPL-compatible contrib
-                          libraries only
+  --disable-strict-lgpl   Compile libmesh with even non-LGPL-compatible
+                          contrib libraries
   --disable-nested        Do not use nested autoconf subpackages
   --disable-boost         build without either external or built-in BOOST
                           support

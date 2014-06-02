@@ -62,8 +62,8 @@ fi
 # support.
 # --------------------------------------------------------------
 AC_ARG_ENABLE(strict-lgpl,
-              AC_HELP_STRING([--enable-strict-lgpl],
-                             [Compile libmesh with LGPL-compatible contrib libraries only]),
+              AC_HELP_STRING([--disable-strict-lgpl],
+                             [Compile libmesh with even non-LGPL-compatible contrib libraries]),
               [case "${enableval}" in
                   yes) enablestrictlgpl=yes ;;
                   no) enablestrictlgpl=no ;;
