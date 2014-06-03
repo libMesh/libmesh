@@ -38,21 +38,19 @@ class MeshBase;
  *
  * @author Benjamin S. Kirk, 2002
  */
-
-// ------------------------------------------------------------
-// Tree class definition
 template <unsigned int N>
 class Tree : public TreeBase
 {
 public:
-
   /**
    * Constructor. Requires a mesh and the target bin size. Optionally takes the build method.
    */
-  Tree (const MeshBase& m, const unsigned int target_bin_size, Trees::BuildType bt=Trees::NODES);
+  Tree (const MeshBase& m,
+        unsigned int target_bin_size,
+        Trees::BuildType bt=Trees::NODES);
 
   /**
-   * Copy-constructor.
+   * Copy-constructor.  Not currently implemented.
    */
   Tree (const Tree<N>& other_tree);
 
@@ -64,14 +62,12 @@ public:
   /**
    * Prints the nodes.
    */
-  void print_nodes(std::ostream& my_out=libMesh::out) const
-  { my_out << "Printing nodes...\n"; root.print_nodes(my_out); }
+  void print_nodes(std::ostream& my_out=libMesh::out) const;
 
   /**
    * Prints the nodes.
    */
-  void print_elements(std::ostream& my_out=libMesh::out) const
-  { my_out << "Printing elements...\n"; root.print_elements(my_out); }
+  void print_elements(std::ostream& my_out=libMesh::out) const;
 
   /**
    * @returns the number of active bins.
@@ -90,8 +86,6 @@ public:
 
 
 private:
-
-
   /**
    * The tree root.
    */
@@ -101,7 +95,6 @@ private:
    * How the tree is built.
    */
   const Trees::BuildType build_type;
-
 };
 
 
@@ -130,34 +123,6 @@ typedef Tree<4> QuadTree;
  */
 typedef Tree<8> OctTree;
 }
-
-
-
-// ------------------------------------------------------------
-// Tree class inline methods
-
-
-
-// copy-constructor
-template <unsigned int N>
-inline
-Tree<N>::Tree (const Tree<N>& other_tree) :
-  TreeBase   (other_tree),
-  root       (other_tree.root),
-  build_type (other_tree.build_type)
-{
-  libmesh_not_implemented();
-}
-
-
-
-template <unsigned int N>
-inline
-const Elem* Tree<N>::operator() (const Point& p) const
-{
-  return this->find_element(p);
-}
-
 
 } // namespace libMesh
 

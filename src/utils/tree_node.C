@@ -69,38 +69,34 @@ void TreeNode<N>::insert (const Elem* elem)
 {
   libmesh_assert(elem);
 
-  /* We first want to find the corners of the cuboid surrounding the
-     cell.  */
-  Point minCoord = elem->point(0);
-  Point maxCoord = minCoord;
-  unsigned int dim = elem->dim();
-  for(unsigned int i=elem->n_nodes()-1; i>0; i--)
+  // We first want to find the corners of the cuboid surrounding the cell.
+  Point min_coord = elem->point(0);
+  Point max_coord = min_coord;
+  for (unsigned i=1; i<elem->n_nodes(); ++i)
     {
       Point p = elem->point(i);
-      for(unsigned int d=0; d<dim; d++)
+      for (unsigned d=0; d<elem->dim(); ++d)
         {
-          if(minCoord(d)>p(d)) minCoord(d) = p(d);
-          if(maxCoord(d)<p(d)) maxCoord(d) = p(d);
+          if (min_coord(d) > p(d))
+            min_coord(d) = p(d);
+
+          if (max_coord(d) < p(d))
+            max_coord(d) = p(d);
         }
     }
 
-  /* Next, find out whether this cuboid has got non-empty intersection
-     with the bounding box of the current tree node.  */
+  // Next, find out whether this cuboid has got non-empty intersection
+  // with the bounding box of the current tree node.
   bool intersects = true;
-  for(unsigned int d=0; d<dim; d++)
+  for (unsigned int d=0; d<elem->dim(); d++)
     {
-      if(maxCoord(d)<this->bounding_box.first(d) ||
-         minCoord(d)>this->bounding_box.second(d))
-        {
-          intersects = false;
-        }
+      if (max_coord(d) < this->bounding_box.first(d) || min_coord(d) > this->bounding_box.second(d))
+        intersects = false;
     }
 
-  /* If not, we should not care about this element.  */
-  if(!intersects)
-    {
-      return;
-    }
+  // If not, we should not care about this element.
+  if (!intersects)
+    return;
 
   // Only add the element if we are active
   if (this->active())
@@ -159,11 +155,9 @@ void TreeNode<N>::refine ()
         children[c]->insert(elements[e]);
     }
 
-  // We don't need to store nodes or elements any more,
-  // they have been added to the children.
-  // Note that we cannot use std::vector<>::clear() here
-  // since that in general does not reduce capacity!!
-  // That would be a bad, bad thing.
+  // We don't need to store nodes or elements any more, they have been
+  // added to the children.  Use the "swap trick" to actually reduce
+  // the capacity of these vectors.
   std::vector<const Node*>().swap(nodes);
   std::vector<const Elem*>().swap(elements);
 
@@ -177,6 +171,15 @@ template <unsigned int N>
 void TreeNode<N>::set_bounding_box (const std::pair<Point, Point>& bbox)
 {
   bounding_box = bbox;
+}
+
+
+
+template <unsigned int N>
+bool TreeNode<N>::bounds_node (const Node* nd) const
+{
+  libmesh_assert(nd);
+  return bounds_point(*nd);
 }
 
 
@@ -208,11 +211,10 @@ bool TreeNode<N>::bounds_point (const Point& p) const
 
 template <unsigned int N>
 std::pair<Point, Point>
-TreeNode<N>::create_bounding_box (const unsigned int c) const
+TreeNode<N>::create_bounding_box (unsigned int c) const
 {
   switch (N)
     {
-
       // How to refine an OctTree Node
     case 8:
       {
@@ -224,75 +226,39 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
         const Real ymax = bounding_box.second(1);
         const Real zmax = bounding_box.second(2);
 
-        const Real xc = xmin + .5*(xmax - xmin);
-        const Real yc = ymin + .5*(ymax - ymin);
-        const Real zc = zmin + .5*(zmax - zmin);
-
+        const Real xc = .5*(xmin + xmax);
+        const Real yc = .5*(ymin + ymax);
+        const Real zc = .5*(zmin + zmax);
 
         switch (c)
           {
-
           case 0:
-            {
-              const Point min(xmin, ymin, zmin);
-              const Point max(xc,   yc,   zc);
-              return std::make_pair (min, max);
-            }
-
+            return std::make_pair (Point(xmin, ymin, zmin),
+                                   Point(xc,   yc,   zc));
           case 1:
-            {
-              const Point min(xc,   ymin, zmin);
-              const Point max(xmax, yc,   zc);
-              return std::make_pair (min, max);
-            }
-
+            return std::make_pair (Point(xc,   ymin, zmin),
+                                   Point(xmax, yc,   zc));
           case 2:
-            {
-              const Point min(xmin, yc,   zmin);
-              const Point max(xc,   ymax, zc);
-              return std::make_pair (min, max);
-            }
-
+            return std::make_pair (Point(xmin, yc,   zmin),
+                                   Point(xc,   ymax, zc));
           case 3:
-            {
-              const Point min(xc,   yc,   zmin);
-              const Point max(xmax, ymax, zc);
-              return std::make_pair (min, max);
-            }
-
+            return std::make_pair (Point(xc,   yc,   zmin),
+                                   Point(xmax, ymax, zc));
           case 4:
-            {
-              const Point min(xmin, ymin, zc);
-              const Point max(xc,   yc,   zmax);
-              return std::make_pair (min, max);
-            }
-
+            return std::make_pair (Point(xmin, ymin, zc),
+                                   Point(xc,   yc,   zmax));
           case 5:
-            {
-              const Point min(xc,   ymin, zc);
-              const Point max(xmax, yc,   zmax);
-              return std::make_pair (min, max);
-            }
-
+            return std::make_pair (Point(xc,   ymin, zc),
+                                   Point(xmax, yc,   zmax));
           case 6:
-            {
-              const Point min(xmin, yc,   zc);
-              const Point max(xc,   ymax, zmax);
-              return std::make_pair (min, max);
-            }
-
+            return std::make_pair (Point(xmin, yc,   zc),
+                                   Point(xc,   ymax, zmax));
           case 7:
-            {
-              const Point min(xc,   yc,   zc);
-              const Point max(xmax, ymax, zmax);
-              return std::make_pair (min, max);
-            }
-
+            return std::make_pair (Point(xc,   yc,   zc),
+                                   Point(xmax, ymax, zmax));
           default:
             libmesh_error_msg("c >= N! : " << c);
           }
-
-
 
         break;
       } // case 8
@@ -306,39 +272,23 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
         const Real xmax = bounding_box.second(0);
         const Real ymax = bounding_box.second(1);
 
-        const Real xc = xmin + .5*(xmax - xmin);
-        const Real yc = ymin + .5*(ymax - ymin);
+        const Real xc = .5*(xmin + xmax);
+        const Real yc = .5*(ymin + ymax);
 
         switch (c)
           {
           case 0:
-            {
-              const Point min(xmin, ymin);
-              const Point max(xc,   yc);
-              return std::make_pair (min, max);
-            }
-
+            return std::make_pair (Point(xmin, ymin),
+                                   Point(xc,   yc));
           case 1:
-            {
-              const Point min(xc,   ymin);
-              const Point max(xmax, yc);
-              return std::make_pair (min, max);
-            }
-
+            return std::make_pair (Point(xc,   ymin),
+                                   Point(xmax, yc));
           case 2:
-            {
-              const Point min(xmin, yc);
-              const Point max(xc,   ymax);
-              return std::make_pair (min, max);
-            }
-
+            return std::make_pair (Point(xmin, yc),
+                                   Point(xc,   ymax));
           case 3:
-            {
-              const Point min(xc,   yc);
-              const Point max(xmax, ymax);
-              return std::make_pair (min, max);
-            }
-
+            return std::make_pair (Point(xc,   yc),
+                                   Point(xmax, ymax));
           default:
             libmesh_error_msg("c >= N!");
           }
@@ -353,27 +303,22 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 
         const Real xmax = bounding_box.second(0);
 
-        const Real xc = xmin + .5*(xmax - xmin);
+        const Real xc = .5*(xmin + xmax);
 
         switch (c)
           {
           case 0:
-            {
-              return std::make_pair (Point(xmin), Point(xc));
-            }
-
+            return std::make_pair (Point(xmin),
+                                   Point(xc));
           case 1:
-            {
-              return std::make_pair (Point(xc), Point(xmax));
-            }
-
+            return std::make_pair (Point(xc),
+                                   Point(xmax));
           default:
             libmesh_error_msg("c >= N!");
           }
 
         break;
       } // case 2
-
 
     default:
       libmesh_error_msg("Only implemented for Octrees, QuadTrees, and Binary Trees!");
@@ -397,7 +342,6 @@ void TreeNode<N>::print_nodes(std::ostream& out_stream) const
         out_stream << " " << nodes[n]->id();
 
       out_stream << std::endl << std::endl;
-
     }
   else
     {
@@ -519,9 +463,8 @@ const Elem* TreeNode<N>::find_element(const Point& p) const
         // Search the active elements in the active TreeNode.
         for (std::vector<const Elem*>::const_iterator pos=elements.begin();
              pos != elements.end(); ++pos)
-          if ((*pos)->active())
-            if ((*pos)->contains_point(p))
-              return *pos;
+          if ((*pos)->active() && (*pos)->contains_point(p))
+            return *pos;
 
       // The point was not found in any element
       return NULL;

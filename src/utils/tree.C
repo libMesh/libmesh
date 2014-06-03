@@ -35,7 +35,7 @@ namespace libMesh
 // constructor
 template <unsigned int N>
 Tree<N>::Tree (const MeshBase& m,
-               const unsigned int target_bin_size,
+               unsigned int target_bin_size,
                const Trees::BuildType bt) :
   TreeBase(m),
   root(m,target_bin_size),
@@ -80,10 +80,51 @@ Tree<N>::Tree (const MeshBase& m,
 
 
 
+// copy-constructor is not implemented
+template <unsigned int N>
+Tree<N>::Tree (const Tree<N>& other_tree) :
+  TreeBase   (other_tree),
+  root       (other_tree.root),
+  build_type (other_tree.build_type)
+{
+  libmesh_not_implemented();
+}
+
+
+
+
+
+
+template <unsigned int N>
+void Tree<N>::print_nodes(std::ostream& my_out) const
+{
+  my_out << "Printing nodes...\n";
+  root.print_nodes(my_out);
+}
+
+
+
+template <unsigned int N>
+void Tree<N>::print_elements(std::ostream& my_out) const
+{
+  my_out << "Printing elements...\n";
+  root.print_elements(my_out);
+}
+
+
+
 template <unsigned int N>
 const Elem* Tree<N>::find_element(const Point& p) const
 {
   return root.find_element(p);
+}
+
+
+
+template <unsigned int N>
+const Elem* Tree<N>::operator() (const Point& p) const
+{
+  return this->find_element(p);
 }
 
 
