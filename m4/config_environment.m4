@@ -65,7 +65,7 @@ AC_DEFINE_UNQUOTED([BUILD_ARCH],     "${BUILD_ARCH}",     [Architecture of the b
 AC_DEFINE_UNQUOTED([BUILD_HOST],     "${BUILD_HOST}",     [Build host name])
 AC_DEFINE_UNQUOTED([BUILD_VERSION],  "${BUILD_VERSION}",  [SVN revision])
 AC_DEFINE_UNQUOTED([BUILD_DEVSTATUS],"${BUILD_DEVSTATUS}",[Dev/Release build])
-AC_DEFINE(         [BUILD_DATE],     __DATE__" "__TIME__, [Build date])
+AC_DEFINE(         [BUILD_DATE],     __DATE__ " " __TIME__, [Build date])
 
 AC_SUBST(BUILD_USER)
 AC_SUBST(BUILD_ARCH)

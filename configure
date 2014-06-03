@@ -34500,7 +34500,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-$as_echo "#define BUILD_DATE __DATE__\" \"__TIME__" >>confdefs.h
+$as_echo "#define BUILD_DATE __DATE__ \" \" __TIME__" >>confdefs.h
 
 
 
