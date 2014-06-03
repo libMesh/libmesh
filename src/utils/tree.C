@@ -45,7 +45,6 @@ Tree<N>::Tree (const MeshBase& m,
   // box for the entire domain.
   root.set_bounding_box (MeshTools::bounding_box(mesh));
 
-
   if (build_type == Trees::NODES)
     {
       // Add all the nodes to the root node.  It will
@@ -72,10 +71,23 @@ Tree<N>::Tree (const MeshBase& m,
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
+      for (; it != end; ++it)
+        root.insert (*it);
+    }
+
+  else if (build_type == Trees::LOCAL_ELEMENTS)
+    {
+      // Add all active, local elements to the root node.  It will
+      // automatically build the tree for us.
+      MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
 
       for (; it != end; ++it)
         root.insert (*it);
     }
+
+  else
+    libmesh_error_msg("Unknown build_type = " << build_type);
 }
 
 

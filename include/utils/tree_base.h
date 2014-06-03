@@ -39,13 +39,17 @@ class Elem;
 namespace Trees
 {
 /**
- * \p enum defining how to build the tree.  \p NODES will populate
- * the tree with nodes and then replace the nodes with element
+ * \p enum defining how to build the tree.  \p NODES will populate the
+ * tree with nodes and then replace the nodes with element
  * connectivity, \p ELEMENTS will populate the tree with the elements
- * directly.
+ * directly.  LOCAL_ELEMENTS will populate the tree only with elements
+ * from the current processor.  This experimental capability may be
+ * useful if you do not wish to include off-processor elements in the
+ * search for a Point.
  */
 enum BuildType {NODES=0,
                 ELEMENTS,
+                LOCAL_ELEMENTS,
                 INVALID_BUILD_TYPE };
 }
 
@@ -53,22 +57,16 @@ enum BuildType {NODES=0,
  * This is the base class for trees, it allows pointer
  * usage of trees.
  */
-
-// ------------------------------------------------------------
-// TreeBase class definition
 class TreeBase : public ReferenceCountedObject<TreeBase>
 {
 protected:
-
   /**
    * Constructor.  Protected.
    */
   explicit
   TreeBase (const MeshBase& m);
 
-
 public:
-
   /**
    * Destructor.
    */
@@ -101,9 +99,7 @@ protected:
    * at construction.
    */
   const MeshBase& mesh;
-
 };
-
 
 // ------------------------------------------------------------
 // TreeBase class inline methods

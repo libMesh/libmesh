@@ -66,7 +66,19 @@ AutoPtr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
     {
     case TREE:
       {
-        AutoPtr<PointLocatorBase> ap(new PointLocatorTree(mesh, master));
+        AutoPtr<PointLocatorBase> ap(new PointLocatorTree(mesh, /*Trees::NODES,*/ master));
+        return ap;
+      }
+
+    case TREE_ELEMENTS:
+      {
+        AutoPtr<PointLocatorBase> ap(new PointLocatorTree(mesh, Trees::ELEMENTS, master));
+        return ap;
+      }
+
+    case TREE_LOCAL_ELEMENTS:
+      {
+        AutoPtr<PointLocatorBase> ap(new PointLocatorTree(mesh, Trees::LOCAL_ELEMENTS, master));
         return ap;
       }
 
