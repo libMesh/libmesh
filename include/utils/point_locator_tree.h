@@ -96,7 +96,7 @@ public:
    * Initializes the locator, so that the \p operator() methods can
    * be used.  This function allocates dynamic memory with "new".
    */
-  virtual void init() { this->init(Trees::NODES); }
+  virtual void init();
 
   /**
    * Locates the element in which the point with global coordinates
@@ -141,6 +141,11 @@ protected:
    * enable_out_of_mesh_mode() for details.
    */
   bool _out_of_mesh_mode;
+
+  /**
+   * How the underlying tree is built.
+   */
+  Trees::BuildType _build_type;
 };
 
 

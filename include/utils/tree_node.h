@@ -46,15 +46,13 @@ template <unsigned int N>
 class TreeNode
 {
 public:
-
-
   /**
    * Constructor.  Takes a pointer to this node's
    * parent.  The pointer should only be NULL
    * for the top-level (root) node.
    */
   TreeNode (const MeshBase& m,
-            const unsigned int tbs,
+            unsigned int tbs,
             const TreeNode<N> *p = NULL);
 
   /**
@@ -101,8 +99,7 @@ public:
    * @returns true if this TreeNode (or its children) contain node n,
    * false otherwise.
    */
-  bool bounds_node (const Node* nd) const
-  { libmesh_assert(nd); return bounds_point(*nd); }
+  bool bounds_node (const Node* nd) const;
 
   /**
    * @returns true if this TreeNode (or its children) contain point p,
@@ -130,8 +127,7 @@ public:
   /**
    * Transforms node numbers to element pointers.
    */
-  void transform_nodes_to_elements (std::vector<std::vector<const Elem*> >&
-                                    nodes_to_elem);
+  void transform_nodes_to_elements (std::vector<std::vector<const Elem*> >& nodes_to_elem);
 
   /**
    * @returns the number of active bins below
@@ -146,8 +142,6 @@ public:
 
 
 private:
-
-
   /**
    * Look for point \p p in our children.
    */
@@ -156,7 +150,7 @@ private:
   /**
    * Constructs the bounding box for child \p c.
    */
-  std::pair<Point, Point> create_bounding_box (const unsigned int c) const;
+  std::pair<Point, Point> create_bounding_box (unsigned int c) const;
 
   /**
    * Reference to the mesh.
@@ -201,7 +195,6 @@ private:
    * Does this node contain any infinite elements.
    */
   bool contains_ifems;
-
 };
 
 
@@ -213,7 +206,7 @@ private:
 template <unsigned int N>
 inline
 TreeNode<N>::TreeNode (const MeshBase& m,
-                       const unsigned int tbs,
+                       unsigned int tbs,
                        const TreeNode<N>* p) :
   mesh           (m),
   tgt_bin_size   (tbs),

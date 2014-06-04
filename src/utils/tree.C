@@ -35,7 +35,7 @@ namespace libMesh
 // constructor
 template <unsigned int N>
 Tree<N>::Tree (const MeshBase& m,
-               const unsigned int target_bin_size,
+               unsigned int target_bin_size,
                const Trees::BuildType bt) :
   TreeBase(m),
   root(m,target_bin_size),
@@ -44,7 +44,6 @@ Tree<N>::Tree (const MeshBase& m,
   // Set the root node bounding box equal to the bounding
   // box for the entire domain.
   root.set_bounding_box (MeshTools::bounding_box(mesh));
-
 
   if (build_type == Trees::NODES)
     {
@@ -72,10 +71,56 @@ Tree<N>::Tree (const MeshBase& m,
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
+      for (; it != end; ++it)
+        root.insert (*it);
+    }
+
+  else if (build_type == Trees::LOCAL_ELEMENTS)
+    {
+      // Add all active, local elements to the root node.  It will
+      // automatically build the tree for us.
+      MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
 
       for (; it != end; ++it)
         root.insert (*it);
     }
+
+  else
+    libmesh_error_msg("Unknown build_type = " << build_type);
+}
+
+
+
+// copy-constructor is not implemented
+template <unsigned int N>
+Tree<N>::Tree (const Tree<N>& other_tree) :
+  TreeBase   (other_tree),
+  root       (other_tree.root),
+  build_type (other_tree.build_type)
+{
+  libmesh_not_implemented();
+}
+
+
+
+
+
+
+template <unsigned int N>
+void Tree<N>::print_nodes(std::ostream& my_out) const
+{
+  my_out << "Printing nodes...\n";
+  root.print_nodes(my_out);
+}
+
+
+
+template <unsigned int N>
+void Tree<N>::print_elements(std::ostream& my_out) const
+{
+  my_out << "Printing elements...\n";
+  root.print_elements(my_out);
 }
 
 
@@ -84,6 +129,14 @@ template <unsigned int N>
 const Elem* Tree<N>::find_element(const Point& p) const
 {
   return root.find_element(p);
+}
+
+
+
+template <unsigned int N>
+const Elem* Tree<N>::operator() (const Point& p) const
+{
+  return this->find_element(p);
 }
 
 
