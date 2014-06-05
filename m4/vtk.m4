@@ -106,8 +106,6 @@ AC_DEFUN([CONFIGURE_VTK],
 
          AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_SUBMINOR, [$vtkbuild],
            [VTK's subminor version number, as detected by vtk.m4])
-
-         AC_MSG_RESULT(<<< Configuring library with VTK version $vtkversion support >>>)
        fi
 
        if (test x$enablevtk = xyes); then
@@ -118,9 +116,10 @@ AC_DEFUN([CONFIGURE_VTK],
 
          dnl Save original value of LIBS, then append $VTK_LIB
          old_LIBS="$LIBS"
+         old_CPPFLAGS="$CPPFLAGS"
 
          if (test $vtkmajor > 5); then
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkFiltersCore-$vtkmajorminor"
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor -lvtkFiltersCore-$vtkmajorminor"
          else
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
          fi
@@ -130,19 +129,32 @@ AC_DEFUN([CONFIGURE_VTK],
 	 fi
 
          LIBS="$old_LIBS $VTK_LIBRARY"
+         CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
          dnl Try to compile test prog to check for existence of VTK libraries
-         dnl AC_HAVE_LIBRARY uses the LIBS variable.
+         dnl AC_LINK_IFELSE uses the LIBS variable.  Note that we cannot use
+         dnl AC_HAVE_LIBRARY here because its first argument must be a literal
+         dnl string.
          if (test $vtkmajor > 5); then
-           AC_HAVE_LIBRARY([vtkIOCore-$vtkmajorminor], [enablevtk=yes], [enablevtk=no])
+           AC_LINK_IFELSE(
+           [
+             AC_LANG_PROGRAM([
+             #include "vtkSmartPointer.h"
+             #include "vtkCellArray.h"
+             #include "vtkUnstructuredGrid.h"
+             #include "vtkPoints.h"
+             #include "vtkDoubleArray.h"
+                              ],
+                             [
+             vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+             vtkSmartPointer<vtkUnstructuredGrid> grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+             vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+             vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
+                             ])
+           ],
+           [enablevtk=yes], [enablevtk=no])
 
-           if (test $enablevtk = yes); then
-             AC_HAVE_LIBRARY([vtkCommonCore-$vtkmajorminor], [enablevtk=yes], [enablevtk=no])
-           fi
-
-           if (test $enablevtk = yes); then
-             AC_HAVE_LIBRARY([vtkFiltersCore]-$vtkmajorminor, [enablevtk=yes], [enablevtk=no])
-           fi
+         dnl Check for VTK 5.x libraries
          else
            AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering])
 
@@ -156,15 +168,16 @@ AC_DEFUN([CONFIGURE_VTK],
            fi
          fi
 
-         dnl Reset $LIBS
+         dnl Reset $LIBS, $CPPFLAGS
          LIBS="$old_LIBS"
+         CPPFLAGS="$old_CPPFLAGS"
        fi
 
        dnl If both the header file and the required libs were found, continue.
        if (test x$enablevtk = xyes); then
          VTK_INCLUDE="-I$VTK_INC"
          AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
-         AC_MSG_RESULT(<<< Configuring library with VTK support >>>)
+         AC_MSG_RESULT(<<< Configuring library with VTK version $vtkversion support >>>)
        else
          VTK_LIBRARY=''
          AC_MSG_RESULT(<<< Configuring library without VTK support >>>)
