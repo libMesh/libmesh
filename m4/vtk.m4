@@ -85,15 +85,14 @@ AC_DEFUN([CONFIGURE_VTK],
        fi
 
        dnl Discover the major, minor, and build versions of VTK by looking in
-       dnl vtkConfigure.h.  This may eventually be useful for linking against
-       dnl different subsets of libraries.
+       dnl vtkConfigure.h and vtkVersionMacros.h
        if (test x$enablevtk = xyes); then
-         vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_MAJOR_VERSION[ ]*//g"`
-         vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_MINOR_VERSION[ ]*//g"`
-         vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_BUILD_VERSION[ ]*//g"`
+         vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtk{Configure,VersionMacros}.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
+         vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtk{Configure,VersionMacros}.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
+         vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtk{Configure,VersionMacros}.h | sed -e "s/.*#define VTK_BUILD_VERSION[ ]*//g"`
          vtkversion=$vtkmajor.$vtkminor.$vtkbuild
 
-         vtkmajorminor=$vtkmajor.$vtkminor.x
+         vtkmajorminor=$vtkmajor.$vtkminor
 
          AC_SUBST(vtkversion)
          AC_SUBST(vtkmajor)
@@ -120,7 +119,12 @@ AC_DEFUN([CONFIGURE_VTK],
          dnl Save original value of LIBS, then append $VTK_LIB
          old_LIBS="$LIBS"
 
-         VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
+         if (test $vtkmajor > 5); then
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkFiltersCore-$vtkmajorminor"
+         else
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
+         fi
+
 	 if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
 	   VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
 	 fi
@@ -129,15 +133,27 @@ AC_DEFUN([CONFIGURE_VTK],
 
          dnl Try to compile test prog to check for existence of VTK libraries
          dnl AC_HAVE_LIBRARY uses the LIBS variable.
-         AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering])
+         if (test $vtkmajor > 5); then
+           AC_HAVE_LIBRARY([vtkIOCore-$vtkmajorminor], [enablevtk=yes], [enablevtk=no])
 
-         if (test $enablevtk = yes); then
-           AC_HAVE_LIBRARY([vtkCommon], [enablevtk=yes], [enablevtk=no])
-         fi
+           if (test $enablevtk = yes); then
+             AC_HAVE_LIBRARY([vtkCommonCore-$vtkmajorminor], [enablevtk=yes], [enablevtk=no])
+           fi
 
-         dnl As of VTK 5.4 it seems we also need vtkFiltering
-         if (test $enablevtk = yes); then
-           AC_HAVE_LIBRARY([vtkFiltering], [enablevtk=yes], [enablevtk=no])
+           if (test $enablevtk = yes); then
+             AC_HAVE_LIBRARY([vtkFiltersCore]-$vtkmajorminor, [enablevtk=yes], [enablevtk=no])
+           fi
+         else
+           AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering])
+
+           if (test $enablevtk = yes); then
+             AC_HAVE_LIBRARY([vtkCommon], [enablevtk=yes], [enablevtk=no])
+           fi
+
+           dnl As of VTK 5.4 it seems we also need vtkFiltering
+           if (test $enablevtk = yes); then
+             AC_HAVE_LIBRARY([vtkFiltering], [enablevtk=yes], [enablevtk=no])
+           fi
          fi
 
          dnl Reset $LIBS
@@ -149,6 +165,9 @@ AC_DEFUN([CONFIGURE_VTK],
          VTK_INCLUDE="-I$VTK_INC"
          AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
          AC_MSG_RESULT(<<< Configuring library with VTK support >>>)
+       else
+         VTK_LIBRARY=''
+         AC_MSG_RESULT(<<< Configuring library without VTK support >>>)
        fi
     fi
   fi
