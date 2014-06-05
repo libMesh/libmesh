@@ -118,7 +118,7 @@ AC_DEFUN([CONFIGURE_VTK],
          old_LIBS="$LIBS"
          old_CPPFLAGS="$CPPFLAGS"
 
-         if (test $vtkmajor > 5); then
+         if (test $vtkmajor -gt 5); then
            VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor -lvtkFiltersCore-$vtkmajorminor"
          else
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
@@ -135,7 +135,7 @@ AC_DEFUN([CONFIGURE_VTK],
          dnl AC_LINK_IFELSE uses the LIBS variable.  Note that we cannot use
          dnl AC_HAVE_LIBRARY here because its first argument must be a literal
          dnl string.
-         if (test $vtkmajor > 5); then
+         if (test $vtkmajor -gt 5); then
            AC_LINK_IFELSE(
            [
              AC_LANG_PROGRAM([
