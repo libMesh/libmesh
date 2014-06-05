@@ -32523,18 +32523,16 @@ cat >>confdefs.h <<_ACEOF
 #define DETECTED_VTK_VERSION_SUBMINOR $vtkbuild
 _ACEOF
 
-
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with VTK version $vtkversion support >>>" >&5
-$as_echo "<<< Configuring library with VTK version $vtkversion support >>>" >&6; }
        fi
 
        if (test x$enablevtk = xyes); then
 
 
                   old_LIBS="$LIBS"
+         old_CPPFLAGS="$CPPFLAGS"
 
          if (test $vtkmajor > 5); then
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkFiltersCore-$vtkmajorminor"
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor -lvtkFiltersCore-$vtkmajorminor"
          else
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
          fi
@@ -32544,132 +32542,42 @@ $as_echo "<<< Configuring library with VTK version $vtkversion support >>>" >&6;
 	 fi
 
          LIBS="$old_LIBS $VTK_LIBRARY"
+         CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
-                           if (test $vtkmajor > 5); then
-           as_ac_Lib=`$as_echo "ac_cv_lib_vtkIOCore-$vtkmajorminor''_main" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lvtkIOCore-$vtkmajorminor" >&5
-$as_echo_n "checking for main in -lvtkIOCore-$vtkmajorminor... " >&6; }
-if eval \${$as_ac_Lib+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lvtkIOCore-$vtkmajorminor  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+                                             if (test $vtkmajor > 5); then
+           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
+
+             #include "vtkSmartPointer.h"
+             #include "vtkCellArray.h"
+             #include "vtkUnstructuredGrid.h"
+             #include "vtkPoints.h"
+             #include "vtkDoubleArray.h"
 
 int
 main ()
 {
-return main ();
+
+             vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+             vtkSmartPointer<vtkUnstructuredGrid> grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+             vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+             vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
+
   ;
   return 0;
 }
+
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  eval "$as_ac_Lib=yes"
-else
-  eval "$as_ac_Lib=no"
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-eval ac_res=\$$as_ac_Lib
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
   enablevtk=yes
 else
   enablevtk=no
 fi
-ac_cv_lib_vtkIOCore-$vtkmajorminor=ac_cv_lib_vtkIOCore-$vtkmajorminor_main
-
-
-           if (test $enablevtk = yes); then
-             as_ac_Lib=`$as_echo "ac_cv_lib_vtkCommonCore-$vtkmajorminor''_main" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lvtkCommonCore-$vtkmajorminor" >&5
-$as_echo_n "checking for main in -lvtkCommonCore-$vtkmajorminor... " >&6; }
-if eval \${$as_ac_Lib+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lvtkCommonCore-$vtkmajorminor  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  eval "$as_ac_Lib=yes"
-else
-  eval "$as_ac_Lib=no"
-fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-eval ac_res=\$$as_ac_Lib
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  enablevtk=yes
-else
-  enablevtk=no
-fi
-ac_cv_lib_vtkCommonCore-$vtkmajorminor=ac_cv_lib_vtkCommonCore-$vtkmajorminor_main
 
-           fi
-
-           if (test $enablevtk = yes); then
-             as_ac_Lib=`$as_echo "ac_cv_lib_vtkFiltersCore-$vtkmajorminor''_main" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lvtkFiltersCore-$vtkmajorminor" >&5
-$as_echo_n "checking for main in -lvtkFiltersCore-$vtkmajorminor... " >&6; }
-if eval \${$as_ac_Lib+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lvtkFiltersCore-$vtkmajorminor  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  eval "$as_ac_Lib=yes"
-else
-  eval "$as_ac_Lib=no"
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-eval ac_res=\$$as_ac_Lib
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  enablevtk=yes
-else
-  enablevtk=no
-fi
-ac_cv_lib_vtkFiltersCore-$vtkmajorminor=ac_cv_lib_vtkFiltersCore-$vtkmajorminor_main
-
-           fi
-         else
+                  else
            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lvtkIO" >&5
 $as_echo_n "checking for main in -lvtkIO... " >&6; }
 if ${ac_cv_lib_vtkIO_main+:} false; then :
@@ -32790,6 +32698,7 @@ ac_cv_lib_vtkFiltering=ac_cv_lib_vtkFiltering_main
          fi
 
                   LIBS="$old_LIBS"
+         CPPFLAGS="$old_CPPFLAGS"
        fi
 
               if (test x$enablevtk = xyes); then
@@ -32797,8 +32706,8 @@ ac_cv_lib_vtkFiltering=ac_cv_lib_vtkFiltering_main
 
 $as_echo "#define HAVE_VTK 1" >>confdefs.h
 
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with VTK support >>>" >&5
-$as_echo "<<< Configuring library with VTK support >>>" >&6; }
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with VTK version $vtkversion support >>>" >&5
+$as_echo "<<< Configuring library with VTK version $vtkversion support >>>" >&6; }
        else
          VTK_LIBRARY=''
          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library without VTK support >>>" >&5
