@@ -632,7 +632,7 @@ void VTKIO::write_nodal_data (const std::string& fname,
 
   // Not sure exactly when this changed, but SetInput() is not a
   // method on vtkXMLPUnstructuredGridWriter as of VTK 6.1.0
-#if VTK_VERSION_LESS_THAN(6,1,0)
+#if VTK_VERSION_LESS_THAN(6,0,0)
   writer->SetInput(_vtk_grid);
 #else
   writer->SetInputData(_vtk_grid);
