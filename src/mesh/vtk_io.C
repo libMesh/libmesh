@@ -49,6 +49,10 @@
 // Tell VTK not to use old header files
 #define VTK_LEGACY_REMOVE
 
+// I get a lot of "warning: extra ';' inside a class [-Wextra-semi]" from clang
+// on VTK header files.
+#include "libmesh/ignore_warnings.h"
+
 #include "vtkXMLUnstructuredGridReader.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLPUnstructuredGridWriter.h"
@@ -61,6 +65,8 @@
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkSmartPointer.h"
+
+#include "libmesh/restore_warnings.h"
 
 // A convenient macro for comparing VTK versions.  Returns 1 if the
 // current VTK version is < major.minor.subminor and zero otherwise.
