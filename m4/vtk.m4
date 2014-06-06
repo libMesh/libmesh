@@ -87,11 +87,20 @@ AC_DEFUN([CONFIGURE_VTK],
        dnl Discover the major, minor, and build versions of VTK by looking in
        dnl vtkConfigure.h and vtkVersionMacros.h
        if (test x$enablevtk = xyes); then
-         vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtk{Configure,VersionMacros}.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
-         vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtk{Configure,VersionMacros}.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
-         vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtk{Configure,VersionMacros}.h | sed -e "s/.*#define VTK_BUILD_VERSION[ ]*//g"`
-         vtkversion=$vtkmajor.$vtkminor.$vtkbuild
 
+         dnl If we have the vtkVersionMacros.h (VTK 6.x) find the version there
+         if (test -r $VTK_INC/vtkVersionMacros.h) ; then
+           vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
+           vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
+           vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_BUILD_VERSION[ ]*//g"`
+         dnl Otherwise (VTK 5.x) find the version numbers in vtkConfigure.h
+         elif (test -r $VTK_INC/vtkConfigure.h); then
+           vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
+           vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
+           vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/.*#define VTK_BUILD_VERSION[ ]*//g"`
+         fi
+
+         vtkversion=$vtkmajor.$vtkminor.$vtkbuild
          vtkmajorminor=$vtkmajor.$vtkminor
 
          AC_SUBST(vtkversion)

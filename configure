@@ -32495,11 +32495,18 @@ $as_echo "VTK header files not found!" >&6; }
        fi
 
                      if (test x$enablevtk = xyes); then
-         vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtk{Configure,VersionMacros}.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
-         vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtk{Configure,VersionMacros}.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
-         vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtk{Configure,VersionMacros}.h | sed -e "s/.*#define VTK_BUILD_VERSION[ ]*//g"`
-         vtkversion=$vtkmajor.$vtkminor.$vtkbuild
 
+                  if (test -r $VTK_INC/vtkVersionMacros.h) ; then
+           vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
+           vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
+           vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_BUILD_VERSION[ ]*//g"`
+                  elif (test -r $VTK_INC/vtkConfigure.h); then
+           vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
+           vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
+           vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/.*#define VTK_BUILD_VERSION[ ]*//g"`
+         fi
+
+         vtkversion=$vtkmajor.$vtkminor.$vtkbuild
          vtkmajorminor=$vtkmajor.$vtkminor
 
 
