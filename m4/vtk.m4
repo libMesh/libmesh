@@ -85,15 +85,23 @@ AC_DEFUN([CONFIGURE_VTK],
        fi
 
        dnl Discover the major, minor, and build versions of VTK by looking in
-       dnl vtkConfigure.h.  This may eventually be useful for linking against
-       dnl different subsets of libraries.
+       dnl vtkConfigure.h and vtkVersionMacros.h
        if (test x$enablevtk = xyes); then
-         vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_MAJOR_VERSION[ ]*//g"`
-         vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_MINOR_VERSION[ ]*//g"`
-         vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_BUILD_VERSION[ ]*//g"`
-         vtkversion=$vtkmajor.$vtkminor.$vtkbuild
 
-         vtkmajorminor=$vtkmajor.$vtkminor.x
+         dnl If we have the vtkVersionMacros.h (VTK 6.x) find the version there
+         if (test -r $VTK_INC/vtkVersionMacros.h) ; then
+           vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
+           vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
+           vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_BUILD_VERSION[ ]*//g"`
+         dnl Otherwise (VTK 5.x) find the version numbers in vtkConfigure.h
+         elif (test -r $VTK_INC/vtkConfigure.h); then
+           vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
+           vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
+           vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/.*#define VTK_BUILD_VERSION[ ]*//g"`
+         fi
+
+         vtkversion=$vtkmajor.$vtkminor.$vtkbuild
+         vtkmajorminor=$vtkmajor.$vtkminor
 
          AC_SUBST(vtkversion)
          AC_SUBST(vtkmajor)
@@ -107,8 +115,6 @@ AC_DEFUN([CONFIGURE_VTK],
 
          AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_SUBMINOR, [$vtkbuild],
            [VTK's subminor version number, as detected by vtk.m4])
-
-         AC_MSG_RESULT(<<< Configuring library with VTK version $vtkversion support >>>)
        fi
 
        if (test x$enablevtk = xyes); then
@@ -119,36 +125,74 @@ AC_DEFUN([CONFIGURE_VTK],
 
          dnl Save original value of LIBS, then append $VTK_LIB
          old_LIBS="$LIBS"
+         old_CPPFLAGS="$CPPFLAGS"
 
-         VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
+         if (test $vtkmajor -gt 5); then
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
+                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor"
+         else
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
+         fi
+
 	 if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
 	   VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
 	 fi
 
          LIBS="$old_LIBS $VTK_LIBRARY"
+         CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
          dnl Try to compile test prog to check for existence of VTK libraries
-         dnl AC_HAVE_LIBRARY uses the LIBS variable.
-         AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering])
+         dnl AC_LINK_IFELSE uses the LIBS variable.  Note that we cannot use
+         dnl AC_HAVE_LIBRARY here because its first argument must be a literal
+         dnl string.
+         if (test $vtkmajor -gt 5); then
+           AC_LINK_IFELSE(
+           [
+             AC_LANG_PROGRAM([
+             #include "vtkSmartPointer.h"
+             #include "vtkCellArray.h"
+             #include "vtkUnstructuredGrid.h"
+             #include "vtkPoints.h"
+             #include "vtkDoubleArray.h"
+             #include "vtkXMLPUnstructuredGridWriter.h"
+                              ],
+                             [
+             vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+             vtkSmartPointer<vtkUnstructuredGrid> grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+             vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+             vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
+             vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
+                             ])
+           ],
+           [enablevtk=yes], [enablevtk=no])
 
-         if (test $enablevtk = yes); then
-           AC_HAVE_LIBRARY([vtkCommon], [enablevtk=yes], [enablevtk=no])
+         dnl Check for VTK 5.x libraries
+         else
+           AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering])
+
+           if (test $enablevtk = yes); then
+             AC_HAVE_LIBRARY([vtkCommon], [enablevtk=yes], [enablevtk=no])
+           fi
+
+           dnl As of VTK 5.4 it seems we also need vtkFiltering
+           if (test $enablevtk = yes); then
+             AC_HAVE_LIBRARY([vtkFiltering], [enablevtk=yes], [enablevtk=no])
+           fi
          fi
 
-         dnl As of VTK 5.4 it seems we also need vtkFiltering
-         if (test $enablevtk = yes); then
-           AC_HAVE_LIBRARY([vtkFiltering], [enablevtk=yes], [enablevtk=no])
-         fi
-
-         dnl Reset $LIBS
+         dnl Reset $LIBS, $CPPFLAGS
          LIBS="$old_LIBS"
+         CPPFLAGS="$old_CPPFLAGS"
        fi
 
        dnl If both the header file and the required libs were found, continue.
        if (test x$enablevtk = xyes); then
          VTK_INCLUDE="-I$VTK_INC"
          AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
-         AC_MSG_RESULT(<<< Configuring library with VTK support >>>)
+         AC_MSG_RESULT(<<< Configuring library with VTK version $vtkversion support >>>)
+       else
+         VTK_LIBRARY=''
+         AC_MSG_RESULT(<<< Configuring library without VTK support >>>)
        fi
     fi
   fi

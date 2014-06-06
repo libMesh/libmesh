@@ -49,6 +49,10 @@
 // Tell VTK not to use old header files
 #define VTK_LEGACY_REMOVE
 
+// I get a lot of "warning: extra ';' inside a class [-Wextra-semi]" from clang
+// on VTK header files.
+#include "libmesh/ignore_warnings.h"
+
 #include "vtkXMLUnstructuredGridReader.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLPUnstructuredGridWriter.h"
@@ -61,6 +65,8 @@
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkSmartPointer.h"
+
+#include "libmesh/restore_warnings.h"
 
 // A convenient macro for comparing VTK versions.  Returns 1 if the
 // current VTK version is < major.minor.subminor and zero otherwise.
@@ -630,7 +636,14 @@ void VTKIO::write_nodal_data (const std::string& fname,
   // the ghosts are cells rather than nodes.
   writer->SetGhostLevel(1);
 
+  // Not sure exactly when this changed, but SetInput() is not a
+  // method on vtkXMLPUnstructuredGridWriter as of VTK 6.1.0
+#if VTK_VERSION_LESS_THAN(6,0,0)
   writer->SetInput(_vtk_grid);
+#else
+  writer->SetInputData(_vtk_grid);
+#endif
+
   writer->SetFileName(fname.c_str());
   writer->SetDataModeToAscii();
 
