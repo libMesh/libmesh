@@ -128,7 +128,8 @@ AC_DEFUN([CONFIGURE_VTK],
          old_CPPFLAGS="$CPPFLAGS"
 
          if (test $vtkmajor -gt 5); then
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor -lvtkFiltersCore-$vtkmajorminor"
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
+                                   -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor"
          else
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
          fi
@@ -153,12 +154,14 @@ AC_DEFUN([CONFIGURE_VTK],
              #include "vtkUnstructuredGrid.h"
              #include "vtkPoints.h"
              #include "vtkDoubleArray.h"
+             #include "vtkXMLPUnstructuredGridWriter.h"
                               ],
                              [
              vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
              vtkSmartPointer<vtkUnstructuredGrid> grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
              vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
              vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
+             vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
                              ])
            ],
            [enablevtk=yes], [enablevtk=no])
