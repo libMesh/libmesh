@@ -28,7 +28,7 @@
 #include "libmesh/point.h"
 
 // FParser includes
-#include "libmesh/fparser.hh"
+#include "libmesh/fparser_ad:.hh"
 
 // C++ includes
 #include <algorithm> // std::find
@@ -113,7 +113,7 @@ public:
 
         // Parse (and optimize if possible) the subexpression.
         // Add some basic constants, to Real precision.
-        FunctionParserBase<Output> fp;
+        FunctionParserADBase<Output> fp;
         fp.AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
         fp.AddConstant("pi", std::acos(Real(-1)));
         fp.AddConstant("e", std::exp(Real(1)));
@@ -267,7 +267,7 @@ private:
   }
 
   std::string _expression;
-  std::vector<FunctionParserBase<Output> > parsers;
+  std::vector<FunctionParserADBase<Output> > parsers;
   std::vector<Output> _spacetime;
 
   // Additional variables/values that can be parsed and handled by the function parser
