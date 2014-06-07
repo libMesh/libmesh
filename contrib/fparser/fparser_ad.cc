@@ -47,8 +47,7 @@ int FunctionParserADBase<Value_t>::OpcodeSize(unsigned op)
         return 2;
 
       default:
-        std::cerr << cDup<< " Unhandled opcode " << op << std::endl;;
-        exit(1);
+        throw UnsupportedOpcodeException;
     }
   }
 }
@@ -66,10 +65,7 @@ FunctionParserADBase<Value_t>::GetArgument(const DiffProgramFragment & orig)
   do {
     // take one step back
     if (ip == orig.begin())
-    {
-      std::cerr << "Not enough arguments on the stack!\n";
-      exit(1);
-    }
+      throw StackExhaustedException;
     ip--;
 
     // a size two opcode needs two elements from the stack, but also puts one back on!
@@ -105,10 +101,8 @@ typename FunctionParserADBase<Value_t>::DiffProgramFragment
 FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
 {
   // check for empty DiffProgramFragments
-  if (orig.empty()) {
-    std::cerr << "Empty program passed in!\n";
-    exit(1);
-  }
+  if (orig.empty())
+    throw EmptyProgramException;
 
   // this stores the opcode of the differentiated function
   DiffProgramFragment outer, prog_a, prog_b, prog_da, prog_db;
@@ -156,10 +150,7 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
     std::copy(arg.first, arg.second, std::back_inserter(prog_a));
   }
   else
-  {
-    std::cerr << "Unhandled opcode argument count.\n";
-    exit(1);
-  }
+    throw UnsupportedArgumentCountException;
 
   // create derivatives
   switch (op)
@@ -423,10 +414,8 @@ FunctionParserADBase<Value_t>::DiffFunction(const DiffProgramFragment & orig)
       return outer;
   }
 
-  //outer.insert( v1.end(), v2.begin(), v2.end() );
-  std::cerr << "Unknown opcode!\n";
-  exit(1);
-  //return outer;
+  // we encountered an unsupported opcode (this should not happen here)
+  throw UnsupportedOpcodeException;
 }
 
 template<typename Value_t>
@@ -451,6 +440,19 @@ bool FunctionParserADBase<Value_t>::isZero()
   // determine if the program is a single cImmed 0
   return (mData->mByteCode.size() == 1  && mData->mImmed.size() == 1 &&
           mData->mByteCode[0] == cImmed && mData->mImmed[0] == Value_t(0));
+}
+
+template<typename Value_t>
+void FunctionParserADBase<Value_t>::setZero()
+{
+  this->ForceDeepCopy();
+  mData = this->getParserData();
+
+  // set program to a single cImmed 0
+  mData->mByteCode.resize(1);
+  mData->mImmed.resize(1);
+  mData->mByteCode[0] = cImmed;
+  mData->mImmed[0] = Value_t(0);
 }
 
 template<typename Value_t>
@@ -490,66 +492,77 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
   // uncompressed immediate data representation
   // we also expand a few multiopcodes into elementary opcodes
   // to keep the diff rules above simple (cDup must be expanded in this step)
-  DiffProgramFragment orig;
+  DiffProgramFragment orig, diff;
   unsigned op;
   unsigned int nImmed = 0;
-  for (unsigned int i = 0; i < ByteCode.size(); ++i)
-  {
-    op = ByteCode[i];
-    if (op == cImmed)
-      orig.push_back(OpcodeDataPair(op, Immed[nImmed++]));
-    else if (op == cDup)
-    {
-      // substitute full code for cDup opcodes
-      Interval arg = GetArgument(orig);
-      orig.insert(orig.end(), arg.first, arg.second);
-    }
-    else if (op == cFetch)
-    {
-      // get index and advance instruction counter
-      exit(1); // unfortulately index counts from the _bottom_ of the stack. Sigh.
-      unsigned index = ByteCode[++i];
-      Interval arg = GetArgument(orig, index); // maybe off by one
-      orig.insert(orig.end(), arg.first, arg.second);
-    }
-    else if (op == cSinCos)
-    {
-      // this instructuon puts two values on the stack!
-      Interval arg = GetArgument(orig);
-      DiffProgramFragment sub(arg.first, arg.second);
-      orig.push_back(OpcodeDataPair(cSin, 0.0));
-      orig.insert(orig.end(), sub.begin(), sub.end());
-      orig.push_back(OpcodeDataPair(cCos, 0.0));
-    }
-    else if (op == cCsc)
-    {
-      orig.push_back(OpcodeDataPair(cSin, 0.0));
-      orig.push_back(OpcodeDataPair(cInv, 0.0));
-    }
-    else if (op == cSec)
-    {
-      orig.push_back(OpcodeDataPair(cSin, 0.0));
-      orig.push_back(OpcodeDataPair(cInv, 0.0));
-    }
-    else if (op == cCot)
-    {
-      orig.push_back(OpcodeDataPair(cTan, 0.0));
-      orig.push_back(OpcodeDataPair(cInv, 0.0));
-    }
-#ifdef FP_SUPPORT_OPTIMIZER
-    else if (op == cNop)
-      continue;
-#endif
-    else
-      orig.push_back(OpcodeDataPair(op, 0.0));
-  }
 
-  DiffProgramFragment diff  = DiffFunction(orig);
+  try
+  {
+    for (unsigned int i = 0; i < ByteCode.size(); ++i)
+    {
+      op = ByteCode[i];
+      if (op == cImmed)
+        orig.push_back(OpcodeDataPair(op, Immed[nImmed++]));
+      else if (op == cDup)
+      {
+        // substitute full code for cDup opcodes
+        Interval arg = GetArgument(orig);
+        orig.insert(orig.end(), arg.first, arg.second);
+      }
+      else if (op == cFetch)
+      {
+        // get index and advance instruction counter
+        throw UnsupportedOpcodeException; // for now
+
+        unsigned index = ByteCode[++i];
+        Interval arg = GetArgument(orig, index); // maybe off by one
+        orig.insert(orig.end(), arg.first, arg.second);
+      }
+      else if (op == cSinCos)
+      {
+        // this instructuon puts two values on the stack!
+        Interval arg = GetArgument(orig);
+        DiffProgramFragment sub(arg.first, arg.second);
+        orig.push_back(OpcodeDataPair(cSin, 0.0));
+        orig.insert(orig.end(), sub.begin(), sub.end());
+        orig.push_back(OpcodeDataPair(cCos, 0.0));
+      }
+      else if (op == cCsc)
+      {
+        orig.push_back(OpcodeDataPair(cSin, 0.0));
+        orig.push_back(OpcodeDataPair(cInv, 0.0));
+      }
+      else if (op == cSec)
+      {
+        orig.push_back(OpcodeDataPair(cSin, 0.0));
+        orig.push_back(OpcodeDataPair(cInv, 0.0));
+      }
+      else if (op == cCot)
+      {
+        orig.push_back(OpcodeDataPair(cTan, 0.0));
+        orig.push_back(OpcodeDataPair(cInv, 0.0));
+      }
+  #ifdef FP_SUPPORT_OPTIMIZER
+      else if (op == cNop)
+        continue;
+  #endif
+      else
+        orig.push_back(OpcodeDataPair(op, 0.0));
+    }
+
+    diff  = DiffFunction(orig);
+  }
+  catch(std::exception &e)
+  {
+    std::cerr << "AutoDiff exception: " << e.what() << std::endl;
+    setZero();
+    return 0;
+  }
 
   // create compressed program representation
   Commit(diff);
 
-  return 0;
+  return -1;
 }
 
 

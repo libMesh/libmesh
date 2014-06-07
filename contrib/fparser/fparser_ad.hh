@@ -2,6 +2,8 @@
 #define ONCE_FPARSERAD_H_
 
 #include "fparser.hh"
+//#include "libmesh_common.h"
+#include <exception>
 
 template<typename Value_t>
 class FunctionParserADBase : public FunctionParserBase<Value_t>
@@ -21,6 +23,12 @@ public:
    * function to be optimized.
    */
   bool isZero();
+
+  /**
+   * set the bytecode of this function to return constant zero.
+   * this provides a well defined state in case AutoDiff fails
+   */
+  void setZero();
 
 protected:
   /**
@@ -59,6 +67,20 @@ private:
 
   // write the DiffProgramFragement into the internal bytecode storage
   void Commit(const DiffProgramFragment & code);
+
+  // Exceptions
+  class UnsupportedOpcode : public std::exception {
+    virtual const char* what() const throw() { return "Unsupported opcode"; }
+  } UnsupportedOpcodeException;
+  class StackExhausted : public std::exception {
+    virtual const char* what() const throw() { return "Stack exhausted."; }
+  } StackExhaustedException;
+  class EmptyProgram : public std::exception {
+    virtual const char* what() const throw() { return "Empty programm passed in."; }
+  } EmptyProgramException;
+  class UnsupportedArgumentCount : public std::exception {
+    virtual const char* what() const throw() { return "Unsupported argument count."; }
+  } UnsupportedArgumentCountException;
 };
 
 
