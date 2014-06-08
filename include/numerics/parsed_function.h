@@ -25,6 +25,7 @@
 
 // Local includes
 #include "libmesh/dense_vector.h"
+#include "libmesh/vector_value.h"
 #include "libmesh/point.h"
 
 // FParser includes
@@ -40,7 +41,7 @@
 
 namespace libMesh {
 
-template <typename Output=Number>
+template <typename Output=Number, typename OutputGradient=Gradient>
 class ParsedFunction : public FunctionBase<Output>
 {
 public:
@@ -120,6 +121,29 @@ public:
         if (fp.Parse(subexpression, variables) != -1) // -1 for success
           libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
 
+        // generate derivatives through automatic differentiation
+        FunctionParserADBase<Output> dx_fp(fp);
+        dx_fp.AutoDiff("x");
+        dx_fp.Optimize();
+        dx_parsers.push_back(dx_fp);
+#if LIBMESH_DIM > 1
+        FunctionParserADBase<Output> dy_fp(fp);
+        dy_fp.AutoDiff("y");
+        dy_fp.Optimize();
+        dy_parsers.push_back(dy_fp);
+#endif
+#if LIBMESH_DIM > 2
+        FunctionParserADBase<Output> dz_fp(fp);
+        dz_fp.AutoDiff("z");
+        dz_fp.Optimize();
+        dz_parsers.push_back(dz_fp);
+#endif
+        FunctionParserADBase<Output> dt_fp(fp);
+        dt_fp.AutoDiff("t");
+        dt_fp.Optimize();
+        dt_parsers.push_back(dt_fp);
+
+        // now optimise original function (after derivatives are taken)
         fp.Optimize();
         parsers.push_back(fp);
 
@@ -135,32 +159,39 @@ public:
   virtual Output operator() (const Point& p,
                              const Real time = 0)
   {
-    _spacetime[0] = p(0);
+    setSpacetime(p, time);
+    return eval(parsers[0]);
+  }
+
+  virtual Output dot(const Point& p,
+                     const Real time = 0)
+  {
+    setSpacetime(p, time);
+    return eval(dt_parsers[0]);
+  }
+
+  virtual OutputGradient gradient(const Point& p,
+                                  const Real time = 0)
+  {
+    OutputGradient grad;
+    setSpacetime(p, time);
+
+    grad(0) = eval(dx_parsers[0]);
 #if LIBMESH_DIM > 1
-    _spacetime[1] = p(1);
+    grad(1) = eval(dy_parsers[0]);
 #endif
 #if LIBMESH_DIM > 2
-    _spacetime[2] = p(2);
+    grad(2) = eval(dz_parsers[0]);
 #endif
-    _spacetime[LIBMESH_DIM] = time;
 
-    // The remaining locations in _spacetime are currently fixed at construction
-    // but could potentially be made dynamic
-    return eval(0);
+    return grad;
   }
 
   virtual void operator() (const Point& p,
                            const Real time,
                            DenseVector<Output>& output)
   {
-    _spacetime[0] = p(0);
-#if LIBMESH_DIM > 1
-    _spacetime[1] = p(1);
-#endif
-#if LIBMESH_DIM > 2
-    _spacetime[2] = p(2);
-#endif
-    _spacetime[LIBMESH_DIM] = time;
+    setSpacetime(p, time);
 
     unsigned int size = output.size();
 
@@ -169,7 +200,7 @@ public:
     // The remaining locations in _spacetime are currently fixed at construction
     // but could potentially be made dynamic
     for (unsigned int i=0; i != size; ++i)
-      output(i) = eval(i);
+      output(i) = eval(parsers[i]);
   }
 
   /**
@@ -180,20 +211,13 @@ public:
                             const Point& p,
                             Real time)
   {
-    _spacetime[0] = p(0);
-#if LIBMESH_DIM > 1
-    _spacetime[1] = p(1);
-#endif
-#if LIBMESH_DIM > 2
-    _spacetime[2] = p(2);
-#endif
-    _spacetime[LIBMESH_DIM] = time;
-
+    setSpacetime(p, time);
     libmesh_assert_less (i, parsers.size());
 
     // The remaining locations in _spacetime are currently fixed at construction
     // but could potentially be made dynamic
-    return eval(i);
+    libmesh_assert_less(i, parsers.size());
+    return eval(parsers[i]);
   }
 
   /**
@@ -218,19 +242,35 @@ public:
   }
 
 private:
+  // Set the _spacetime argument vector
+  void setSpacetime(const Point& p,
+                    const Real time = 0)
+  {
+    _spacetime[0] = p(0);
+#if LIBMESH_DIM > 1
+    _spacetime[1] = p(1);
+#endif
+#if LIBMESH_DIM > 2
+    _spacetime[2] = p(2);
+#endif
+    _spacetime[LIBMESH_DIM] = time;
+
+    // The remaining locations in _spacetime are currently fixed at construction
+    // but could potentially be made dynamic
+  }
+
   // Evaluate the ith FunctionParser and check the result
-  inline Output eval(unsigned int i)
+  inline Output eval(FunctionParserADBase<Output> & parser)
   {
 #ifndef DEBUG
-    return parsers[i].Eval(&_spacetime[0]);
+    return parser.Eval(&_spacetime[0]);
 #else
-    libmesh_assert_less(i, parsers.size());
 
-    Output result = parsers[i].Eval(&_spacetime[0]);
-    int error_code = parsers[i].EvalError();
+    Output result = parser.Eval(&_spacetime[0]);
+    int error_code = parser.EvalError();
     if (error_code)
     {
-      libMesh::err << "ERROR: FunctionParser is unable to evaluate the expression at index " << i << " with arguments:\n";
+      //libMesh::err << "ERROR: FunctionParser is unable to evaluate the expression  " << parser.name() << " with arguments:\n";
       for (unsigned int j=0; j<_spacetime.size(); ++j)
         libMesh::err << '\t' << _spacetime[j] << '\n';
       libMesh::err << '\n';
@@ -269,6 +309,16 @@ private:
   std::string _expression;
   std::vector<FunctionParserADBase<Output> > parsers;
   std::vector<Output> _spacetime;
+
+  // derivative functions
+  std::vector<FunctionParserADBase<Output> > dx_parsers;
+#if LIBMESH_DIM > 1
+  std::vector<FunctionParserADBase<Output> > dy_parsers;
+#endif
+#if LIBMESH_DIM > 2
+  std::vector<FunctionParserADBase<Output> > dz_parsers;
+#endif
+  std::vector<FunctionParserADBase<Output> > dt_parsers;
 
   // Additional variables/values that can be parsed and handled by the function parser
   std::vector<std::string> _additional_vars;
