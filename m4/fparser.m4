@@ -29,14 +29,14 @@ AC_DEFUN([CONFIGURE_FPARSER],
 
 
     AC_ARG_ENABLE(fparser-debugging,
-                  AC_HELP_STRING([--disable-fparser-debugging],
-                                 [do not provide fparser debugging functions]),
+                  AC_HELP_STRING([--enable-fparser-debugging],
+                                 [Build fparser with bytecode debugging functions]),
 		[case "${enableval}" in
 		  yes)  enablefparserdebugging=yes ;;
 		   no)  enablefparserdebugging=no ;;
 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-debugging) ;;
 		 esac],
-		 [enablefparserdebugging=yes])
+                 [enablefparserdebugging=no])
 
     AC_ARG_ENABLE(fparser-optimizer,
                   AC_HELP_STRING([--disable-fparser-optimizer],
