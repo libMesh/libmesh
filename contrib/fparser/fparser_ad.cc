@@ -556,13 +556,13 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
   {
     std::cerr << "AutoDiff exception: " << e.what() << std::endl;
     setZero();
-    return 1;
+    return 0;
   }
 
   // create compressed program representation
   Commit(diff);
 
-  return 0;
+  return -1;
 }
 
 

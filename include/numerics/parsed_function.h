@@ -29,7 +29,7 @@
 #include "libmesh/point.h"
 
 // FParser includes
-#include "libmesh/fparser_ad:.hh"
+#include "libmesh/fparser_ad.hh"
 
 // C++ includes
 #include <algorithm> // std::find
@@ -48,7 +48,7 @@ public:
   explicit
   ParsedFunction (const std::string& expression, const std::vector<std::string>* additional_vars=NULL,
                   const std::vector<Output>* initial_vals=NULL)
-    : _expression(expression)
+    : _expression(expression), _valid_derivatives(true)
       // Size the spacetime vector to account for space, time, and any additional
       // variables passed
       //_spacetime(LIBMESH_DIM+1 + (additional_vars ? additional_vars->size() : 0)),
@@ -123,23 +123,27 @@ public:
 
         // generate derivatives through automatic differentiation
         FunctionParserADBase<Output> dx_fp(fp);
-        dx_fp.AutoDiff("x");
+        if (dx_fp.AutoDiff("x") != -1) // -1 for success
+          _valid_derivatives = false;
         dx_fp.Optimize();
         dx_parsers.push_back(dx_fp);
 #if LIBMESH_DIM > 1
         FunctionParserADBase<Output> dy_fp(fp);
-        dy_fp.AutoDiff("y");
+        if (dy_fp.AutoDiff("y") != -1) // -1 for success
+          _valid_derivatives = false;
         dy_fp.Optimize();
         dy_parsers.push_back(dy_fp);
 #endif
 #if LIBMESH_DIM > 2
         FunctionParserADBase<Output> dz_fp(fp);
-        dz_fp.AutoDiff("z");
+        if (dz_fp.AutoDiff("z") != -1) // -1 for success
+          _valid_derivatives = false;
         dz_fp.Optimize();
         dz_parsers.push_back(dz_fp);
 #endif
         FunctionParserADBase<Output> dt_fp(fp);
-        dt_fp.AutoDiff("t");
+        if (dt_fp.AutoDiff("t") != -1) // -1 for success
+          _valid_derivatives = false;
         dt_fp.Optimize();
         dt_parsers.push_back(dt_fp);
 
@@ -162,6 +166,9 @@ public:
     setSpacetime(p, time);
     return eval(parsers[0]);
   }
+
+  // Query if the automatic derivative generation was successful
+  virtual bool has_derivatives() { return _valid_derivatives; }
 
   virtual Output dot(const Point& p,
                      const Real time = 0)
@@ -319,6 +326,7 @@ private:
   std::vector<FunctionParserADBase<Output> > dz_parsers;
 #endif
   std::vector<FunctionParserADBase<Output> > dt_parsers;
+  bool _valid_derivatives;
 
   // Additional variables/values that can be parsed and handled by the function parser
   std::vector<std::string> _additional_vars;
