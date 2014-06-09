@@ -127,6 +127,9 @@ if (test "x$enableoptional" = "xyes"); then
   if (test "x$enablefparser" = "xyes" -a "x$enablefparserdevel" = "xyes"); then
   echo '     'build from version............ : devel
   fi
+  if (test "x$enablefparser" = "xyes" -a "x$enablefparserdebugging" = "xyes"); then
+  echo '     'fparser debugging............. : enabled
+  fi
   echo '  'glpk............................. : $enableglpk
   echo '  'gmv.............................. : $enablegmv
   echo '  'gzstream......................... : $enablegz
