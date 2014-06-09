@@ -57,15 +57,17 @@ target_triplet = @target@
 
 # some systems have trouble with the fparser optimizer
 @FPARSER_NO_SUPPORT_OPTIMIZER_TRUE@am__append_1 = -DFP_NO_SUPPORT_OPTIMIZER
+#FEATURE_FLAGS += -DFP_USE_STRTOLD
+@FPARSER_SUPPORT_DEBUGGING_TRUE@am__append_2 = -DFUNCTIONPARSER_SUPPORT_DEBUGGING
 noinst_PROGRAMS = $(am__EXEEXT_1)
-@FPARSER_DEVEL_TRUE@am__append_2 = util/tree_grammar_parser \
+@FPARSER_DEVEL_TRUE@am__append_3 = util/tree_grammar_parser \
 @FPARSER_DEVEL_TRUE@	util/bytecoderules_parser \
 @FPARSER_DEVEL_TRUE@	util/cpp_compress
-@FPARSER_DEVEL_TRUE@am__append_3 = extrasrc/fp_opcode_add.inc \
+@FPARSER_DEVEL_TRUE@am__append_4 = extrasrc/fp_opcode_add.inc \
 @FPARSER_DEVEL_TRUE@	fpoptimizer/grammar_data.cc
-@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_4 = $(FPOPTIMIZER_CC_FILES)
-@FPARSER_DEVEL_TRUE@am__append_5 = $(BUILT_SOURCES)
-@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_6 = fpoptimizer.cc
+@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_5 = $(FPOPTIMIZER_CC_FILES)
+@FPARSER_DEVEL_TRUE@am__append_6 = $(BUILT_SOURCES)
+@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_7 = fpoptimizer.cc
 subdir = contrib/fparser
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/build-aux/depcomp \
@@ -651,18 +653,15 @@ FEATURE_FLAGS = -DFP_ENABLE_EVAL $(am__append_1) \
 	-DFP_SUPPORT_FLOAT_TYPE -DFP_SUPPORT_LONG_DOUBLE_TYPE \
 	-DFP_SUPPORT_LONG_INT_TYPE -DFP_SUPPORT_COMPLEX_DOUBLE_TYPE \
 	-DFP_SUPPORT_COMPLEX_FLOAT_TYPE \
-	-DFP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE
-#FEATURE_FLAGS += -DFP_USE_STRTOLD
-
-#FEATURE_FLAGS += -DFUNCTIONPARSER_SUPPORT_DEBUGGING
+	-DFP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE $(am__append_2)
 EXTRA_DIST = util/bytecoderules.dat util/bytecoderules_header.txt \
 	fpoptimizer/treerules.dat $(FPOPTIMIZER_CC_FILES) \
 	fpoptimizer/fpoptimizer_header.txt \
 	fpoptimizer/fpoptimizer_footer.txt
-BUILT_SOURCES = $(am__append_3)
+BUILT_SOURCES = $(am__append_4)
 
 # when doing 'make clean' we need to remove the generated sources
-CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_5)
+CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_6)
 DISTCLEANFILES = util/tree_grammar_parser # in case it wasn't \
 	conditionally cleaned
 include_HEADERS = fparser.hh fparser_ad.hh
@@ -706,8 +705,8 @@ FPOPTIMIZER_CC_FILES = \
 	    fpoptimizer/optimize_main.cc
 
 noinst_LTLIBRARIES = libfparser.la
-libfparser_la_SOURCES = fparser.cc fparser_ad.cc $(am__append_4) \
-	$(am__append_6)
+libfparser_la_SOURCES = fparser.cc fparser_ad.cc $(am__append_5) \
+	$(am__append_7)
 libfparser_la_CPPFLAGS = $(AM_CPPFLAGS) $(FEATURE_FLAGS)
 
 # util/tree_grammar_parser is a utility which is required to build 
