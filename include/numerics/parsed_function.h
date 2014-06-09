@@ -163,7 +163,7 @@ public:
   virtual Output operator() (const Point& p,
                              const Real time = 0)
   {
-    setSpacetime(p, time);
+    set_spacetime(p, time);
     return eval(parsers[0]);
   }
 
@@ -173,7 +173,7 @@ public:
   virtual Output dot(const Point& p,
                      const Real time = 0)
   {
-    setSpacetime(p, time);
+    set_spacetime(p, time);
     return eval(dt_parsers[0]);
   }
 
@@ -181,7 +181,7 @@ public:
                                   const Real time = 0)
   {
     OutputGradient grad;
-    setSpacetime(p, time);
+    set_spacetime(p, time);
 
     grad(0) = eval(dx_parsers[0]);
 #if LIBMESH_DIM > 1
@@ -198,7 +198,7 @@ public:
                            const Real time,
                            DenseVector<Output>& output)
   {
-    setSpacetime(p, time);
+    set_spacetime(p, time);
 
     unsigned int size = output.size();
 
@@ -218,7 +218,7 @@ public:
                             const Point& p,
                             Real time)
   {
-    setSpacetime(p, time);
+    set_spacetime(p, time);
     libmesh_assert_less (i, parsers.size());
 
     // The remaining locations in _spacetime are currently fixed at construction
@@ -250,7 +250,7 @@ public:
 
 private:
   // Set the _spacetime argument vector
-  void setSpacetime(const Point& p,
+  void set_spacetime(const Point& p,
                     const Real time = 0)
   {
     _spacetime[0] = p(0);
