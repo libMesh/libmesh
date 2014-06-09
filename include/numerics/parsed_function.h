@@ -28,7 +28,7 @@
 #include "libmesh/point.h"
 
 // FParser includes
-#include "fparser.hh"
+#include "libmesh/fparser.hh"
 
 // C++ includes
 #include <algorithm> // std::find

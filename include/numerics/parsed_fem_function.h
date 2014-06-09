@@ -29,7 +29,7 @@
 
 #ifdef LIBMESH_HAVE_FPARSER
   // FParser includes
-  #include "fparser.hh"
+  #include "libmesh/fparser.hh"
 #endif
 
 // C++ includes
