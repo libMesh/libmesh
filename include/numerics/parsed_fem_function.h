@@ -197,7 +197,12 @@ public:
 
     // The remaining locations in _spacetime are currently fixed at construction
     // but could potentially be made dynamic
+#if LIBMESH_HAVE_FPARSER
     return parsers[0].Eval(&_spacetime[0]);
+#else
+    libmesh_error_msg("ERROR: This functionality requires fparser!");
+    return Output(0);
+#endif
   }
 
 
@@ -229,15 +234,14 @@ public:
 
 #ifdef LIBMESH_HAVE_FPARSER
     libmesh_assert_equal_to (size, parsers.size());
-#else
-    libmesh_error_msg("ERROR: This functionality requires fparser!");
-#endif
 
     // The remaining locations in _spacetime are currently fixed at construction
     // but could potentially be made dynamic
     for (unsigned int i=0; i != size; ++i)
       output(i) = parsers[i].Eval(&_spacetime[0]);
-
+#else
+    libmesh_error_msg("ERROR: This functionality requires fparser!");
+#endif
   }
 
 
@@ -270,7 +274,7 @@ public:
     return parsers[i].Eval(&_spacetime[0]);
 #else
     libmesh_error_msg("ERROR: This functionality requires fparser!");
-    return 0;
+    return Output(0);
 #endif
   }
 
