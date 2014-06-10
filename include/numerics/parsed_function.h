@@ -164,7 +164,7 @@ public:
                              const Real time = 0)
   {
     set_spacetime(p, time);
-    return eval(parsers[0]);
+    return eval(parsers[0], "f()", 0);
   }
 
   // Query if the automatic derivative generation was successful
@@ -174,7 +174,7 @@ public:
                      const Real time = 0)
   {
     set_spacetime(p, time);
-    return eval(dt_parsers[0]);
+    return eval(dt_parsers[0], "dot(f())", 0);
   }
 
   virtual OutputGradient gradient(const Point& p,
@@ -183,12 +183,12 @@ public:
     OutputGradient grad;
     set_spacetime(p, time);
 
-    grad(0) = eval(dx_parsers[0]);
+    grad(0) = eval(dx_parsers[0], "grad_x(f())", 0);
 #if LIBMESH_DIM > 1
-    grad(1) = eval(dy_parsers[0]);
+    grad(1) = eval(dy_parsers[0], "grad_y(f())", 0);
 #endif
 #if LIBMESH_DIM > 2
-    grad(2) = eval(dz_parsers[0]);
+    grad(2) = eval(dz_parsers[0], "grad_z(f())", 0);
 #endif
 
     return grad;
@@ -207,7 +207,7 @@ public:
     // The remaining locations in _spacetime are currently fixed at construction
     // but could potentially be made dynamic
     for (unsigned int i=0; i != size; ++i)
-      output(i) = eval(parsers[i]);
+      output(i) = eval(parsers[i], "f()", i);
   }
 
   /**
@@ -224,7 +224,7 @@ public:
     // The remaining locations in _spacetime are currently fixed at construction
     // but could potentially be made dynamic
     libmesh_assert_less(i, parsers.size());
-    return eval(parsers[i]);
+    return eval(parsers[i], "f()", i);
   }
 
   /**
@@ -267,7 +267,7 @@ private:
   }
 
   // Evaluate the ith FunctionParser and check the result
-  inline Output eval(FunctionParserADBase<Output> & parser)
+  inline Output eval(FunctionParserADBase<Output> & parser, const std::string & function_name, unsigned int component)
   {
 #ifndef DEBUG
     return parser.Eval(&_spacetime[0]);
@@ -277,7 +277,7 @@ private:
     int error_code = parser.EvalError();
     if (error_code)
     {
-      //libMesh::err << "ERROR: FunctionParser is unable to evaluate the expression  " << parser.name() << " with arguments:\n";
+      libMesh::err << "ERROR: FunctionParser is unable to evaluate component " << component << " of expression  " << function_name << " with arguments:\n";
       for (unsigned int j=0; j<_spacetime.size(); ++j)
         libMesh::err << '\t' << _spacetime[j] << '\n';
       libMesh::err << '\n';

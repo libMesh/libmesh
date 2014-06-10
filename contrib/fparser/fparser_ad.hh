@@ -25,7 +25,7 @@ public:
   bool isZero();
 
   /**
-   * set the opcode of this function to return constant zero.
+   * set the bytecode of this function to return constant zero.
    * this provides a well defined state in case AutoDiff fails
    */
   void setZero();
