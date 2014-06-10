@@ -152,7 +152,6 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
       // Process each variable in the system using the current patch
       for (unsigned int var=0; var<n_vars; var++)
         {
-#ifndef DEBUG
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           libmesh_assert (error_estimator.error_norm.type(var) == L2 ||
                           error_estimator.error_norm.type(var) == H1_SEMINORM ||
@@ -192,7 +191,6 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                              (error_estimator.error_norm.type(var-1) == L_INF ||
                               error_estimator.error_norm.type(var-1) == W1_INF_SEMINORM ||
                               error_estimator.error_norm.type(var-1) == W2_INF_SEMINORM)));
-#endif
 
           // Possibly skip this variable
           if (error_estimator.error_norm.weight(var) == 0.0) continue;
