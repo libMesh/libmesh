@@ -97,11 +97,19 @@ std::string process_trace(const char *name)
 std::string demangle(const char *name)
 {
   int status = 0;
-  char *d = 0;
   std::string ret = name;
-  try { if ( (d = abi::__cxa_demangle(name, 0, 0, &status)) ) ret = d; }
-  catch(...) {  }
-  std::free(d);
+
+  // Actually do the demangling
+  char *demangled_name = abi::__cxa_demangle(name, 0, 0, &status);
+
+  // If demangling returns non-NULL, save the result in a string.
+  if (demangled_name)
+    ret = demangled_name;
+
+  // According to cxxabi.h docs, the caller is responsible for
+  // deallocating memory.
+  std::free(demangled_name);
+
   return ret;
 }
 
