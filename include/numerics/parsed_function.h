@@ -269,10 +269,7 @@ private:
   // Evaluate the ith FunctionParser and check the result
   inline Output eval(FunctionParserADBase<Output> & parser, const std::string & function_name, unsigned int component)
   {
-#ifndef DEBUG
-    return parser.Eval(&_spacetime[0]);
-#else
-
+#ifndef NDEBUG
     Output result = parser.Eval(&_spacetime[0]);
     int error_code = parser.EvalError();
     if (error_code)
@@ -310,6 +307,8 @@ private:
     }
 
     return result;
+#else
+    return parser.Eval(&_spacetime[0]);
 #endif
   }
 
