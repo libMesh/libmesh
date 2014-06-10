@@ -541,6 +541,11 @@ struct token {
   const  char* s;
   struct token *next;
 };
+
+
+// The following functions are only needed for older PETScs.
+#if PETSC_RELEASE_LESS_THAN(3,3,1)
+
 #undef __FUNCT__
 #define __FUNCT__ "DMLibMeshParseDecompositionDescriptor_Private"
 static PetscErrorCode  DMLibMeshParseDecompositionDescriptor_Private(DM dm, const char* ddesc, PetscInt* dtype, PetscInt* dcount, PetscInt** dsizes, char ****dlists)
@@ -715,6 +720,9 @@ static PetscErrorCode  DMCreateDomainDecompositionDM_libMesh(DM dm, const char* 
   else SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_PLIB, "Uexpected unknown decomposition type for domain decomposition descriptor %s", ddesc);
   PetscFunctionReturn(0);
 }
+
+#endif
+
 
 #undef __FUNCT__
 #define __FUNCT__ "DMlibMeshFunction"
