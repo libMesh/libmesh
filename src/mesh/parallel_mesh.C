@@ -431,16 +431,14 @@ Elem* ParallelMesh::add_elem (Elem *e)
   // And shouldn't be added in the same batch as ghost elems
   // But we might be just adding on processor 0 to
   // broadcast later
-#if 0
-#ifdef DEBUG
-  if (elem_procid == DofObject::invalid_processor_id)
-    {
-      dof_id_type elem_id = e->id();
-      this->comm().max(elem_id);
-      libmesh_assert_equal_to (elem_id, e->id());
-    }
-#endif
-#endif
+  // #ifdef DEBUG
+  //   if (elem_procid == DofObject::invalid_processor_id)
+  //     {
+  //       dof_id_type elem_id = e->id();
+  //       this->comm().max(elem_id);
+  //       libmesh_assert_equal_to (elem_id, e->id());
+  //     }
+  // #endif
 
   return e;
 }
@@ -596,16 +594,14 @@ Node* ParallelMesh::add_node (Node *n)
   // And shouldn't be added in the same batch as ghost nodes
   // But we might be just adding on processor 0 to
   // broadcast later
-#if 0
-#ifdef DEBUG
-  if (node_procid == DofObject::invalid_processor_id)
-    {
-      dof_id_type node_id = n->id();
-      this->comm().max(node_id);
-      libmesh_assert_equal_to (node_id, n->id());
-    }
-#endif
-#endif
+  // #ifdef DEBUG
+  //   if (node_procid == DofObject::invalid_processor_id)
+  //     {
+  //       dof_id_type node_id = n->id();
+  //       this->comm().max(node_id);
+  //       libmesh_assert_equal_to (node_id, n->id());
+  //     }
+  // #endif
 
   return n;
 }
