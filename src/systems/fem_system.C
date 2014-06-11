@@ -147,9 +147,8 @@ void assemble_unconstrained_element_system
           // In DEBUG mode, we've already set elem_jacobian == 0,
           // so we can make sure side_residual didn't compute a
           // jacobian and lie about it
-#ifdef DEBUG
           libmesh_assert_equal_to (_femcontext.get_elem_jacobian().l1_norm(), 0.0);
-#endif
+
           // Logging of numerical jacobians is done separately
           _sys.numerical_side_jacobian(_femcontext);
 
