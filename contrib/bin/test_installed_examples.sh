@@ -1,6 +1,13 @@
 #!/bin/bash
-set -e
+#set -e
 #env
+
+# Respect the JOBS environment variable, if it is set
+if [ -n "$JOBS" ]; then
+    n_concurrent=$JOBS
+else
+    n_concurrent=5
+fi
 
 # Terminal commands to goto specific columns
 rescol=65;
@@ -42,40 +49,69 @@ fi
 #echo "installed_CXXFLAGS=$installed_CXXFLAGS"
 #echo "installed_LIBS=$installed_LIBS"
 
-returnval=0
+# this function handles the I/O and compiling of a particular example.
+# by encapsulating this in a function we can fork it and run multiple builds
+# simultaneously
+function test_example()
+{
+    myreturn=0
+    app_to_link="ex_app"
+    errlog=$app_to_link.log
 
-app_to_link="ex_app"
-errlog=$app_to_link.log
+    stdout=`mktemp -t stdout.XXXXXXXXXX`
 
-#echo " "
-#echo "$app_to_link"
-#echo "$errlog"
-#echo " "
+    echo -n "Testing example installation $exdir ... " > $stdout
+    cd $examples_install_path/$exdir
+
+    if $CXX $installed_CXXFLAGS *.C -o $app_to_link $installed_LIBS > $errlog 2>&1 ; then
+
+ 	echo -e $gotocolumn $white"["$green"   OK   "$white"]" >> $stdout
+	echo -e -n $colorreset >> $stdout
+
+    else
+ 	echo -e $gotocolumn $white"["$red" FAILED "$white"]" >> $stdout
+	echo -e -n $colorreset >> $stdout
+	echo "Compile line:"  >> $stdout
+	echo $CXX $installed_CXXFLAGS *.C -o $app_to_link $installed_LIBS >> $stdout
+	echo ""  >> $stdout
+	echo "Output:"  >> $stdout
+	cat $errlog  >> $stdout
+	echo ""  >> $stdout
+	myreturn=1
+    fi
+
+    cat $stdout
+    rm -f $app_to_link $errlog $stdout
+
+    return $myreturn
+}
+
+
+# loop over each example and fork tests
 
 cd $examples_install_path
+
+returnval=0
+nrunning=0
+runninglist=""
+
 for exdir in */* ; do
 
-    echo -n "Testing example installation $exdir ... "
-    cd $examples_install_path/$exdir
-    
-    if $CXX $installed_CXXFLAGS *.C -o $app_to_link $installed_LIBS > $errlog 2>&1 ; then
-	 
- 	echo -e $gotocolumn $white"["$green"   OK   "$white"]";
-	echo -e -n $colorreset;
-	
+    if [ $nrunning -lt $n_concurrent ]; then
+        test_example $exdir &
+        runninglist="$runninglist $!"
+        nrunning=$(($nrunning+1))
     else
- 	echo -e $gotocolumn $white"["$red" FAILED "$white"]";
-	echo -e -n $colorreset;
-	echo "Compile line:"
-	echo $CXX $installed_CXXFLAGS *.C -o $app_to_link $installed_LIBS
-	echo ""
-	echo "Output:"
-	cat $errlog
-	echo ""
-	returnval=1	
+        for pid in $runninglist ; do
+            wait $pid
+            # accumulate the number of failed tests
+            returnval=$(($returnval+$?))
+        done
+        nrunning=0
+        runninglist=""
     fi
-    
-    rm -f $app_to_link $errlog    
 done
+
+wait
 
 exit $returnval
