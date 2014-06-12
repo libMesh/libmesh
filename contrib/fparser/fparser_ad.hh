@@ -30,6 +30,11 @@ public:
    */
   void setZero();
 
+  /**
+   * Do not report any error messages to the console
+   */
+  void silenceAutoDiffErrors(bool _silence = true) { mSilenceErrors = _silence; }
+
 protected:
   /**
    * A list of opcodes and immediate values
@@ -65,8 +70,14 @@ private:
   /// variable to diff for
   unsigned mVarOp;
 
-  // write the DiffProgramFragement into the internal bytecode storage
+  /// write the DiffProgramFragement into the internal bytecode storage
   void Commit(const DiffProgramFragment & code);
+
+  /**
+   * In certain applications derivatives are built proactively and may never be used.
+   * We silence all AutoDiff exceptions in that case to avoid confusing the user.
+   */
+  bool mSilenceErrors;
 
   // Exceptions
   class UnsupportedOpcode : public std::exception {
