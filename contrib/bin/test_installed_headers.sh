@@ -1,7 +1,12 @@
 #!/bin/bash
 #set -e
 
-n_concurrent=20
+# Respect the JOBS environment variable, if it is set
+if [ -n "$JOBS" ]; then
+    n_concurrent=$JOBS
+else
+    n_concurrent=20
+fi
 
 #echo MAKEFLAGS=$MAKEFLAGS
 

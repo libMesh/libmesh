@@ -2,7 +2,12 @@
 #set -e
 #env
 
-n_concurrent=5
+# Respect the JOBS environment variable, if it is set
+if [ -n "$JOBS" ]; then
+    n_concurrent=$JOBS
+else
+    n_concurrent=5
+fi
 
 # Terminal commands to goto specific columns
 rescol=65;
