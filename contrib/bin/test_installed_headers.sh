@@ -27,21 +27,25 @@ fi
 testing_installed_tree="no"
 
 if (test "x$test_CXXFLAGS" = "x"); then
-    
+
     testing_installed_tree="yes"
 
     if (test "x$PKG_CONFIG" != "xno"); then
 	test_CXXFLAGS=`pkg-config libmesh --cflags`
-	
+
     elif (test -x $LIBMESH_CONFIG_PATH/libmesh-config); then
 	test_CXXFLAGS=`$LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include`
-	
+
     else
 	echo "Cannot query package installation!!"
 	exit 1
     fi
 fi
 
+
+if [ "x$HEADERS_TO_TEST" = "x" ]; then
+    HEADERS_TO_TEST=$DEFAULT_HEADERS_TO_TEST
+fi
 
 
 returnval=0
@@ -54,39 +58,37 @@ for header_to_test in $HEADERS_TO_TEST ; do
 	    continue
 	fi
     fi
-    
+
     echo -n "Testing Header $header_to_test ... "
-    
+
     header_name=`basename $header_to_test`
     app_file=`mktemp -t $header_name.XXXXXXXXXX`
     source_file=$app_file.cxx
     object_file=$app_file.o
     errlog=$app_file.log
-    
+
     echo "#include \"libmesh/$header_name\"" >> $source_file
     echo "int foo () { return 0; }" >> $source_file
 
     #echo $CXX $test_CXXFLAGS $source_file -o $app_file
     if $CXX $test_CXXFLAGS $source_file -c -o $object_file >$errlog 2>&1 ; then
- 	echo -e $gotocolumn $white"["$green"   OK   "$white"]";
-	echo -e -n $colorreset;    
+        echo -e $gotocolumn $white"["$green"   OK   "$white"]";
+        echo -e -n $colorreset;
     else
- 	echo -e $gotocolumn $white"["$red" FAILED "$white"]";
-	echo -e -n $colorreset;
-	echo "Source file:"
-	cat $source_file
-	echo ""
-	echo "Command line:"
-	echo $CXX $test_CXXFLAGS $source_file -c -o $object_file
-	echo ""
-	echo "Output:"
-	cat $errlog
-	echo ""
-	returnval=1
+        echo -e $gotocolumn $white"["$red" FAILED "$white"]";
+        echo -e -n $colorreset;
+        echo "Source file:"
+        cat $source_file
+        echo ""
+        echo "Command line:"
+        echo $CXX $test_CXXFLAGS $source_file -c -o $object_file
+        echo ""
+        echo "Output:"
+        cat $errlog
+        echo ""
+        returnval=1
     fi
 
-    #echo -e -n $colorreset;    
-    #cat $source_file
     rm -f $source_file $app_file $object_file $errlog
 done
 
