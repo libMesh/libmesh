@@ -9,14 +9,16 @@ using namespace FUNCTIONPARSERTYPES;
 template<typename Value_t>
 FunctionParserADBase<Value_t>::FunctionParserADBase() :
     FunctionParserBase<Value_t>(),
-    mData(this->getParserData())
+    mData(this->getParserData()),
+    mSilenceErrors(false)
 {
 }
 
 template<typename Value_t>
 FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& cpy) :
     FunctionParserBase<Value_t>(cpy),
-    mData(this->getParserData())
+    mData(this->getParserData()),
+    mSilenceErrors(cpy.mSilenceErrors)
 {
 }
 
@@ -554,7 +556,12 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
   }
   catch(std::exception &e)
   {
-    std::cerr << "AutoDiff exception: " << e.what() << std::endl;
+    static bool printed_error = false;
+    if (!printed_error && !mSilenceErrors)
+    {
+      std::cerr << "AutoDiff exception: " << e.what() << " (this message will only be shown once per process)"<< std::endl;
+      printed_error = true;
+    }
     setZero();
     return 0;
   }

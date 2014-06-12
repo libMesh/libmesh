@@ -121,6 +121,10 @@ public:
         if (fp.Parse(subexpression, variables) != -1) // -1 for success
           libmesh_error_msg("ERROR: FunctionParser is unable to parse expression: " << subexpression << '\n' << fp.ErrorMsg());
 
+        // use of derivatives is optional. suppress error output on the console
+        // use the has_derivatives() method to check if AutoDiff was successful.
+        fp.silenceAutoDiffErrors();
+
         // generate derivatives through automatic differentiation
         FunctionParserADBase<Output> dx_fp(fp);
         if (dx_fp.AutoDiff("x") != -1) // -1 for success
