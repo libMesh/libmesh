@@ -1,6 +1,9 @@
 #!/bin/bash
-set -e
-#env
+#set -e
+
+n_concurrent=20
+
+#echo MAKEFLAGS=$MAKEFLAGS
 
 # Terminal commands to goto specific columns
 rescol=65;
@@ -43,12 +46,61 @@ if (test "x$test_CXXFLAGS" = "x"); then
 fi
 
 
+# this function handles the I/O and compiling of a particular header file
+# by encapsulating this in a function we can fork it and run multiple builds
+# simultaneously
+function test_header()
+{
+    myreturn=0
+    header_to_test=$1
+    header_name=`basename $header_to_test`
+    app_file=`mktemp -t $header_name.XXXXXXXXXX`
+    source_file=$app_file.cxx
+    object_file=$app_file.o
+    errlog=$app_file.log
+    stdout=$app_file.stdout
+
+    echo -n "Testing Header $header_to_test ... " > $stdout
+
+
+    echo "#include \"libmesh/$header_name\"" >> $source_file
+    echo "int foo () { return 0; }" >> $source_file
+
+    #echo $CXX $test_CXXFLAGS $source_file -o $app_file
+    if $CXX $test_CXXFLAGS $source_file -c -o $object_file >$errlog 2>&1 ; then
+        echo -e $gotocolumn $white"["$green"   OK   "$white"]" >> $stdout
+        echo -e -n $colorreset >> $stdout
+    else
+        echo -e $gotocolumn $white"["$red" FAILED "$white"]" >> $stdout
+        echo -e -n $colorreset >> $stdout
+        echo "Source file:" >> $stdout
+        cat $source_file  >> $stdout
+        echo ""  >> $stdout
+        echo "Command line:" >> $stdout
+        echo $CXX $test_CXXFLAGS $source_file -c -o $object_file  >> $stdout
+        echo ""  >> $stdout
+        echo "Output:" >> $stdout
+        cat $errlog >> $stdout
+        echo "" >> $stdout
+        myreturn=1
+    fi
+
+    cat $stdout
+    rm -f $source_file $app_file $object_file $errlog $stdout
+
+    return $myreturn
+}
+
+
 if [ "x$HEADERS_TO_TEST" = "x" ]; then
     HEADERS_TO_TEST=$DEFAULT_HEADERS_TO_TEST
 fi
 
 
+# loop over each header and fork tests
 returnval=0
+nrunning=0
+runninglist=""
 for header_to_test in $HEADERS_TO_TEST ; do
 
     # skip the files that live in contrib that we are installing when testing
@@ -59,38 +111,22 @@ for header_to_test in $HEADERS_TO_TEST ; do
 	fi
     fi
 
-    echo -n "Testing Header $header_to_test ... "
-
-    header_name=`basename $header_to_test`
-    app_file=`mktemp -t $header_name.XXXXXXXXXX`
-    source_file=$app_file.cxx
-    object_file=$app_file.o
-    errlog=$app_file.log
-
-    echo "#include \"libmesh/$header_name\"" >> $source_file
-    echo "int foo () { return 0; }" >> $source_file
-
-    #echo $CXX $test_CXXFLAGS $source_file -o $app_file
-    if $CXX $test_CXXFLAGS $source_file -c -o $object_file >$errlog 2>&1 ; then
-        echo -e $gotocolumn $white"["$green"   OK   "$white"]";
-        echo -e -n $colorreset;
+    if [ $nrunning -lt $n_concurrent ]; then
+        test_header $header_to_test &
+        runninglist="$runninglist $!"
+        nrunning=$(($nrunning+1))
     else
-        echo -e $gotocolumn $white"["$red" FAILED "$white"]";
-        echo -e -n $colorreset;
-        echo "Source file:"
-        cat $source_file
-        echo ""
-        echo "Command line:"
-        echo $CXX $test_CXXFLAGS $source_file -c -o $object_file
-        echo ""
-        echo "Output:"
-        cat $errlog
-        echo ""
-        returnval=1
+        for pid in $runninglist ; do
+            wait $pid
+            # accumulate the number of failed tests
+            returnval=$(($returnval+$?))
+        done
+        nrunning=0
+        runninglist=""
     fi
-
-    rm -f $source_file $app_file $object_file $errlog
 done
+
+wait
 
 exit $returnval
 
