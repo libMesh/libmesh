@@ -113,51 +113,44 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
 
 double VariationalMeshSmoother::smooth(unsigned int)
 {
-  int n, me, gr, adp, miniter, miniterBC, maxiter, N, ncells, nedges, s, vms_err=0;
-  double theta;
   char grid[40], metr[40], grid_old[40], adap[40];
-  //  FILE *stream;
-  double*** H;
-  double** R;
-  int** cells;
-  int* mask;
-  int* edges;
-  int* mcells;
-  int* hnodes;
-  int iter[4],i,j;
+  int iter[4];
   clock_t ticks1, ticks2;
 
   FILE *sout;
   sout=fopen("smoother.out","wr");//stdout;
 
-  n=_dim;
-  me=_metric;
-  gr=_generate_data?0:1;
-  adp=_adaptive_func;
-  theta=_theta;
-  miniter=_miniter;
-  maxiter=_maxiter;
-  miniterBC=_miniterBC;
+  int
+    n = _dim,
+    me = _metric,
+    gr = _generate_data ? 0 : 1,
+    adp = _adaptive_func,
+    miniter = _miniter,
+    maxiter = _maxiter,
+    miniterBC = _miniterBC;
+
+  double theta = _theta;
 
   if ((gr==0)&&(me>1))
     {
-      for (i=0;i<40;i++)
+      for (int i=0; i<40; i++)
         grid_old[i]=grid[i];
 
       // generate metric from initial mesh (me=2,3)
       metr_data_gen(grid, metr, n, me, sout);
     }
 
-  s=_dim;
-  N=_mesh.n_nodes();
-  ncells=_mesh.n_active_elem();
+  int
+    s = _dim,
+    N = _mesh.n_nodes(),
+    ncells = _mesh.n_active_elem();
 
-  //I wish I could do this in readgr... but the way she allocs
-  //memory we need to do this here... or pass a lot of things around
+  // I wish I could do this in readgr... but the way she allocs
+  // memory we need to do this here... or pass a lot of things around
   MeshTools::find_hanging_nodes_and_parents(_mesh,_hanging_nodes);
 
-  nedges=_hanging_nodes.size();
-  //nedges=0;
+  int nedges = _hanging_nodes.size();
+
   if (s!=n)
     {
       fprintf(sout,"Error: dim in input file is inconsistent with dim in .cfg \n");
@@ -165,28 +158,18 @@ double VariationalMeshSmoother::smooth(unsigned int)
       return _dist_norm;
     }
 
-  mask=alloc_i_n1(N);
-  edges=alloc_i_n1(2*nedges);
-  mcells=alloc_i_n1(ncells);
-  hnodes=alloc_i_n1(nedges);
-  H=alloc_d_n1_n2_n3(ncells,n,n);
-  R=alloc_d_n1_n2(N,n);
-  cells=alloc_i_n1_n2(ncells,3*n+n%2);
-  for (i=0;i<ncells;i++)
-    {
-      cells[i]=alloc_i_n1(3*n+n%2);
-      if (me>1)
-        {
-          H[i]=alloc_d_n1_n2(n,n);
-          for (j=0;j<n;j++)
-            H[i][j]=alloc_d_n1(n);
-        }
-    }
-  for (i=0;i<N;i++)
-    R[i]=alloc_d_n1(n);
+  std::vector<int>
+    mask(N),
+    edges(2*nedges),
+    mcells(ncells),
+    hnodes(nedges);
+
+  Array2D<double> R(N,n);
+  Array2D<int> cells(ncells, 3*n + n%2);
+  Array3D<double> H(ncells, n, n);
 
   // initial grid
-  vms_err=readgr(n,N,R,mask,ncells,cells,mcells,nedges,edges,hnodes,sout);
+  int vms_err = readgr(n, R, mask, cells, mcells, edges, hnodes, sout);
   if (vms_err<0)
     {
       fprintf(sout,"Error reading input mesh file\n");
@@ -195,7 +178,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
     }
 
   if (me>1)
-    vms_err=readmetr(metr,H,ncells,n,sout);
+    vms_err=readmetr(metr, H, ncells, n, sout);
 
   if (vms_err<0)
     {
@@ -212,7 +195,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
   // grid optimization
   fprintf(sout,"Starting Grid Optimization \n");
   ticks1=clock();
-  full_smooth(n,N,R,mask,ncells,cells,mcells,nedges,edges,hnodes,theta,iter,me,H,adp,adap,gr,sout);
+  full_smooth(n, N, R, mask, ncells, cells, mcells, nedges, &edges[0], hnodes, theta, iter, me, H, adp, adap, gr, sout);
   ticks2=clock();
   fprintf(sout,"full_smooth took (%d-%d)/%ld = %ld seconds \n",
           static_cast<int>(ticks2),
@@ -222,29 +205,8 @@ double VariationalMeshSmoother::smooth(unsigned int)
 
   // save result
   fprintf(sout,"Saving Result \n");
-  writegr(n,N,R,mask,ncells,cells,mcells,nedges,edges,hnodes,"fin_grid.dat", 4-me+3*gr, grid_old, sout);
+  writegr(n, N, R, mask, ncells, cells, mcells, nedges, edges, hnodes, "fin_grid.dat", 4-me+3*gr, grid_old, sout);
 
-  for (i=0;i<N;i++)
-    free(R[i]);
-
-  for (i=0;i<ncells;i++)
-    {
-      if (me>1)
-        {
-          for (j=0;j<n;j++)
-            free(H[i][j]);
-          free(H[i]);
-        }
-      free(cells[i]);
-    }
-
-  free(cells);
-  free(H);
-  free(R);
-  free(mask);
-  free(edges);
-  free(mcells);
-  free(hnodes);
   fclose(sout);
   libmesh_assert_greater (_dist_norm, 0);
 
@@ -256,14 +218,14 @@ double VariationalMeshSmoother::smooth(unsigned int)
 // save grid
 int VariationalMeshSmoother::writegr(int /*n*/,
                                      int /*N*/,
-                                     double** R,
-                                     int* /*mask*/,
+                                     Array2D<double>& R,
+                                     std::vector<int>& /*mask*/,
                                      int /*ncells*/,
-                                     int** /*cells*/,
-                                     int* /*mcells*/,
+                                     Array2D<int>& /*cells*/,
+                                     std::vector<int>& /*mcells*/,
                                      int /*nedges*/,
-                                     int* /*edges*/,
-                                     int* /*hnodes*/,
+                                     std::vector<int>& /*edges*/,
+                                     std::vector<int>& /*hnodes*/,
                                      const char /*grid*/[],
                                      int /*me*/,
                                      const char /*grid_old*/[],
@@ -376,15 +338,12 @@ int VariationalMeshSmoother::writegr(int /*n*/,
 
 // reading grid from input file
 int VariationalMeshSmoother::readgr(int n,
-                                    int /*N*/,
-                                    double** R,
-                                    int* mask,
-                                    int /*ncells*/,
-                                    int** cells,
-                                    int* mcells,
-                                    int /*nedges*/,
-                                    int* edges,
-                                    int* hnodes,
+                                    Array2D<double>& R,
+                                    std::vector<int>& mask,
+                                    Array2D<int>& cells,
+                                    std::vector<int>& mcells,
+                                    std::vector<int>& edges,
+                                    std::vector<int>& hnodes,
                                     FILE * /*sout*/)
 {
   libMesh::out << "Sarting readgr" << std::endl;
@@ -601,7 +560,7 @@ int VariationalMeshSmoother::readgr(int n,
 
 // Read Metrics
 int VariationalMeshSmoother::readmetr(char *name,
-                                      double*** H,
+                                      Array3D<double>& H,
                                       int ncells,
                                       int n,
                                       FILE * /*sout*/)
@@ -698,7 +657,7 @@ void VariationalMeshSmoother::adjust_adapt_data()
 
 
 // Read Adaptivity
-int VariationalMeshSmoother::read_adp(double* afun,
+int VariationalMeshSmoother::read_adp(std::vector<double>& afun,
                                       char /*adap*/[],
                                       FILE * /*sout*/)
 {
@@ -747,13 +706,15 @@ double VariationalMeshSmoother::jac2(double x1,double y1,double x2,double y2)
 
 
 // BasisA determines matrix H^(-T)Q on one Jacobian matrix
-int VariationalMeshSmoother::basisA(int n, double** Q, int nvert, double* K, double** H, int me)
+int VariationalMeshSmoother::basisA(int n,
+                                    Array2D<double>& Q,
+                                    int nvert,
+                                    std::vector<double>& K,
+                                    Array2D<double>& H,
+                                    int me)
 {
-  double** U;
   int i,j,k;
-  U=alloc_d_n1_n2(n,nvert);
-  for (i=0; i<n; i++)
-    U[i]=alloc_d_n1(nvert);
+  Array2D<double> U(n, nvert);
 
   if (n==2)
     {
@@ -908,10 +869,6 @@ int VariationalMeshSmoother::basisA(int n, double** Q, int nvert, double* K, dou
       }
     }
 
-  for (i=0; i<n; i++)
-    free(U[i]);
-
-  free(U);
   return 0;
 }
 
@@ -920,10 +877,10 @@ int VariationalMeshSmoother::basisA(int n, double** Q, int nvert, double* K, dou
 // Specify adaptive function
 void VariationalMeshSmoother::adp_renew(int n,
                                         int N,
-                                        double** R,
+                                        Array2D<double>& R,
                                         int ncells,
-                                        int** cells,
-                                        double* afun,
+                                        Array2D<int>& cells,
+                                        std::vector<double>& afun,
                                         int adp,
                                         FILE * /*sout*/)
 {
@@ -969,39 +926,39 @@ void VariationalMeshSmoother::adp_renew(int n,
 // Preprocess mesh data and control smoothing/untangling iterations
 void VariationalMeshSmoother::full_smooth(int n,
                                           int N,
-                                          double** R,
-                                          int* mask,
+                                          Array2D<double>& R,
+                                          std::vector<int>& mask,
                                           int ncells,
-                                          int** cells,
-                                          int* mcells,
+                                          Array2D<int>& cells,
+                                          std::vector<int>& mcells,
                                           int nedges,
                                           int* edges,
-                                          int* hnodes,
+                                          std::vector<int>& hnodes,
                                           double w,
                                           int* iter,
                                           int me,
-                                          double*** H,
+                                          Array3D<double>& H,
                                           int adp,
                                           char adap[],
                                           int gr,
                                           FILE *sout)
 {
-  double* afun=NULL;
-  double* Gamma;
-  int* maskf;
   double  Jk, epsilon, eps, qmin, vol, emax, Vmin, Enm1;
   int i, ii, j, counter, NBN, ladp, msglev=1;
 
-  // Adaptive function is on cells
+  int afun_size = 0;
+
   if (adp<0)
-    afun=alloc_d_n1(ncells);
+    // Adaptive function is on cells
+    afun_size = ncells;
 
-  // Adaptive function is on nodes
-  if (adp>0)
-    afun=alloc_d_n1(N);
+  else if (adp>0)
+    // Adaptive function is on nodes
+    afun_size = N;
 
-  maskf=alloc_i_n1(N);
-  Gamma=alloc_d_n1(ncells);
+  std::vector<double> afun(afun_size);
+  std::vector<int> maskf(N);
+  std::vector<double> Gamma(ncells);
 
   if (msglev>=1)
     fprintf(sout,"N=%d ncells=%d nedges=%d \n",N,ncells,nedges);
@@ -1053,7 +1010,8 @@ void VariationalMeshSmoother::full_smooth(int n,
   Enm1=1.0;
 
   // read adaptive function from file
-  if (adp*gr!=0) read_adp(afun, adap, sout);
+  if (adp*gr!=0)
+    read_adp(afun, adap, sout);
 
   while (((qmin<=0)||(counter<iter[0])||(fabs(emax-Enm1)>1e-3)) &&
          ii<iter[1] &&
@@ -1095,8 +1053,6 @@ void VariationalMeshSmoother::full_smooth(int n,
         }
     }
 
-  free(Gamma);
-
   // BN correction - 2D only!
   epsilon=0.000000001;
   if (NBN>0)
@@ -1137,10 +1093,6 @@ void VariationalMeshSmoother::full_smooth(int n,
         if (msglev>=1)
           fprintf(sout, "NBC smoothed niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e  \n",counter,qmin,Vmin,emax);
       }
-
-  // free memory
-  // free(maskf);
-  // if (adp!=0) free(afun);
 }
 
 
@@ -1148,27 +1100,25 @@ void VariationalMeshSmoother::full_smooth(int n,
 // Determines the values of maxE_theta
 double VariationalMeshSmoother::maxE(int n,
                                      int /*N*/,
-                                     double** R,
+                                     Array2D<double>& R,
                                      int ncells,
-                                     int** cells,
-                                     int* mcells,
+                                     Array2D<int>& cells,
+                                     std::vector<int>& mcells,
                                      int me,
-                                     double*** H,
+                                     Array3D<double>& H,
                                      double v,
                                      double epsilon,
                                      double w,
-                                     double* Gamma,
+                                     std::vector<double>& Gamma,
                                      double *qmin,
                                      FILE * /*sout*/)
 {
-  double** Q;
-  double K[9], a1[3], a2[3], a3[3];
+  double a1[3], a2[3], a3[3];
   double  gemax, det, tr, E=0.0, sigma=0.0, chi, vmin;
   int  ii, i, j, k, l, m, nn, kk, ll;
 
-  Q = alloc_d_n1_n2(3, 10);
-  for (i=0; i<n; i++)
-    Q[i]=alloc_d_n1(3*n+n%2);
+  Array2D<double> Q(3, 3*n+n%2);
+  std::vector<double> K(9);
 
   gemax=-1e32;
   vmin=1e32;
@@ -1181,7 +1131,7 @@ double VariationalMeshSmoother::maxE(int n,
             if (cells[ii][3]==-1)
               {
                 // tri
-                basisA(2,Q,3,K,H[ii],me);
+                basisA(2, Q, 3, K, H[ii], me);
                 for (k=0; k<2; k++)
                   {
                     a1[k]=0;
@@ -1524,10 +1474,6 @@ double VariationalMeshSmoother::maxE(int n,
 
   (*qmin)=vmin;
 
-  for (i=0; i<n; i++)
-    free(Q[i]);
-  free(Q);
-
   return gemax;
 }
 
@@ -1536,24 +1482,22 @@ double VariationalMeshSmoother::maxE(int n,
 // Compute min Jacobian determinant (minq), min cell volume (Vmin), and average cell volume (vol).
 double VariationalMeshSmoother::minq(int n,
                                      int /*N*/,
-                                     double** R,
+                                     Array2D<double>& R,
                                      int ncells,
-                                     int** cells,
-                                     int* mcells,
+                                     Array2D<int>& cells,
+                                     std::vector<int>& mcells,
                                      int me,
-                                     double*** H,
+                                     Array3D<double>& H,
                                      double *vol,
                                      double *Vmin,
                                      FILE * /*sout*/)
 {
-  double** Q;
-  double K[9], a1[3], a2[3], a3[3];
+  double a1[3], a2[3], a3[3];
   double  v, vmin, gqmin, det, vcell, sigma=0.0;
   int  ii, i, j, k, l, m, nn, kk, ll;
 
-  Q = alloc_d_n1_n2(3, 10);
-  for (i=0; i<n; i++)
-    Q[i]=alloc_d_n1(3*n+n%2);
+  std::vector<double> K(9);
+  Array2D<double> Q(3, 3*n+n%2);
 
   v=0;
   vmin=1e32;
@@ -1891,10 +1835,6 @@ double VariationalMeshSmoother::minq(int n,
   (*vol)=v/static_cast<double>(ncells);
   (*Vmin)=vmin;
 
-  for (i=0; i<n; i++)
-    free(Q[i]);
-  free(Q);
-
   return gqmin;
 }
 
@@ -1905,39 +1845,27 @@ double VariationalMeshSmoother::minq(int n,
 // local minimization problem for optimal step in this minimization direction (tau=min J(R+tau P))
 double VariationalMeshSmoother::minJ(int n,
                                      int N,
-                                     double** R,
-                                     int* mask,
+                                     Array2D<double>& R,
+                                     std::vector<int>& mask,
                                      int ncells,
-                                     int** cells,
-                                     int* mcells,
+                                     Array2D<int>& cells,
+                                     std::vector<int>& mcells,
                                      double epsilon,
                                      double w,
                                      int me,
-                                     double*** H,
+                                     Array3D<double>& H,
                                      double vol,
                                      int nedges,
                                      int* edges,
-                                     int* hnodes,
+                                     std::vector<int>& hnodes,
                                      int msglev,
                                      double *Vmin,
                                      double *emax,
                                      double *qmin,
                                      int adp,
-                                     double* afun,
+                                     std::vector<double>& afun,
                                      FILE *sout)
 {
-  double*** W;  // local Hessian matrix;
-  double** F;  // F - local gradient;
-  double** A;
-  double** G;  // G - adaptation metric;
-  double* b;  // rhs for solver
-  double* u;  // u - solution vector;
-  double* a;  // matrix
-  int* ia;
-  int* ja;  // matrix connectivity for solver;
-  int** JA;  // A, JA - internal form of global matrix;
-  double** Rpr;
-  double** P;  // P - minimization direction;
   double  tau=0.0, J, T, Jpr, lVmin, lemax, lqmin, gVmin=0.0, gemax=0.0,
     gqmin=0.0, gtmin0=0.0, gtmax0=0.0, gqmin0=0.0;
   double eps, nonzero, Tau_hn, g_i;
@@ -1948,41 +1876,35 @@ double VariationalMeshSmoother::minJ(int n,
   // columns - max number of nonzero entries in every row of global matrix;
 
   columns=n*n*10;
-  W=alloc_d_n1_n2_n3(n,3*n+n%2,3*n+n%2);
-  F = alloc_d_n1_n2(n,3*n+n%2);
-  for (i=0; i<n; i++)
-    {
-      F[i]=alloc_d_n1(3*n+n%2);
-      W[i]=alloc_d_n1_n2(3*n+n%2,3*n+n%2);
-      for (j=0; j<3*n+n%2; j++)
-        W[i][j]=alloc_d_n1(3*n+n%2);
-    }
 
-  Rpr=alloc_d_n1_n2(N,n);
-  P=alloc_d_n1_n2(N,n);
+  // local Hessian matrix
+  Array3D<double> W(n, 3*n+n%2, 3*n+n%2);
 
-  for (i=0; i<N; i++)
-    {
-      Rpr[i]=alloc_d_n1(n);
-      P[i]=alloc_d_n1(n);
-    }
+  // F - local gradient
+  Array2D<double> F(n, 3*n+n%2);
 
-  A = alloc_d_n1_n2(n*N, columns);
-  b = alloc_d_n1(n*N);
-  u = alloc_d_n1(n*N);
-  a = alloc_d_n1(n*N*columns);
-  ia = alloc_i_n1(n*N+1);
-  ja = alloc_i_n1(n*N*columns);
-  JA = alloc_i_n1_n2(n*N, columns);
-  for (i=0; i<n*N; i++)
-    {
-      A[i] = alloc_d_n1(columns);
-      JA[i] = alloc_i_n1(columns);
-    }
+  Array2D<double> Rpr(N, n);
 
-  G=alloc_d_n1_n2(ncells,n);
-  for (i=0; i<ncells; i++)
-    G[i]=alloc_d_n1(n);
+  // P - minimization direction
+  Array2D<double> P(N, n);
+
+  // A, JA - internal form of global matrix
+  Array2D<int> JA(n*N, columns);
+  Array2D<double> A(n*N, columns);
+
+  // G - adaptation metric
+  Array2D<double> G(ncells, n);
+
+  // rhs for solver
+  std::vector<double> b(n*N);
+
+  // u - solution vector
+  std::vector<double> u(n*N);
+
+  // matrix
+  std::vector<double> a(n*N*columns);
+  std::vector<int> ia(n*N+1);
+  std::vector<int> ja(n*N*columns);
 
   // find minimization direction P
   nonzero=0;
@@ -2371,43 +2293,6 @@ double VariationalMeshSmoother::minJ(int n,
   if (msglev>=2)
     fprintf(sout, "tau=%e, J=%e  \n",T,J);
 
-  free(b);
-  free(u);
-  free(ia);
-  free(ja);
-  free(a);
-  for (i=0; i<n; i++)
-    {
-      for (j=0; j<3*n+n%2; j++)
-        free(W[i][j]);
-
-      free(W[i]);
-      free(F[i]);
-    }
-  free(W);
-  free(F);
-  for (i=0; i<N; i++)
-    {
-      free(Rpr[i]);
-      free(P[i]);
-    }
-  free(Rpr);
-  free(P);
-
-  for (i=0; i<n*N; i++)
-    {
-      free(A[i]);
-      free(JA[i]);
-    }
-
-  free(A);
-  free(JA);
-
-  for (i=0; i<ncells; i++)
-    free(G[i]);
-
-  free(G);
-
   return sqrt(nonzero);
 }
 
@@ -2417,74 +2302,49 @@ double VariationalMeshSmoother::minJ(int n,
 // using Lagrange multiplier formulation: minimize L=J+\sum lam*g;
 // only works in 2D
 double VariationalMeshSmoother::minJ_BC(int N,
-                                        double** R,
-                                        int* mask,
+                                        Array2D<double>& R,
+                                        std::vector<int>& mask,
                                         int ncells,
-                                        int** cells,
-                                        int* mcells,
+                                        Array2D<int>& cells,
+                                        std::vector<int>& mcells,
                                         double epsilon,
                                         double w,
                                         int me,
-                                        double*** H,
+                                        Array3D<double>& H,
                                         double vol,
                                         int msglev,
                                         double *Vmin,
                                         double *emax,
                                         double *qmin,
                                         int adp,
-                                        double* afun,
+                                        std::vector<double>& afun,
                                         int NCN,
                                         FILE *sout)
 {
   // new form of matrices, 5 iterations for minL
-  double*** W;
-  double** F;
-  double** G;
-  double* b;
-  double* hm;
-  double* Plam;
-  double* constr;
-  double* lam;
-  int* Bind;
-  double** Rpr;
-  double** P;
   double  tau=0.0, J=0.0, T, Jpr, L, lVmin, lqmin, gVmin=0.0, gqmin=0.0, gVmin0=0.0,
     gqmin0=0.0, lemax, gemax=0.0, gemax0=0.0;
   double a, g, qq=0.0, eps, nonzero, x0, y0, del1, del2, Bx, By;
   int index, i, j, k=0, l, nz, I;
   int ind, nvert;
 
-  // memory
-  Bind=alloc_i_n1(NCN);   //array of sliding BN
-  lam=alloc_d_n1(NCN);
-  hm=alloc_d_n1(2*N);
-  Plam=alloc_d_n1(NCN);
-  constr=alloc_d_n1(4*NCN);   //holds constraints = local approximation to the boundary
-  F = alloc_d_n1_n2(2, 6);
-  W=alloc_d_n1_n2_n3(2, 6, 6);
+  // array of sliding BN
+  std::vector<int> Bind(NCN);
+  std::vector<double> lam(NCN);
+  std::vector<double> hm(2*N);
+  std::vector<double> Plam(NCN);
 
-  for (i=0; i<2; i++)
-    {
-      F[i]=alloc_d_n1(6);
-      W[i]=alloc_d_n1_n2(6,6);
-      for (j=0; j<6; j++)
-        W[i][j]=alloc_d_n1(6);
-    }
+  // holds constraints = local approximation to the boundary
+  std::vector<double> constr(4*NCN);
 
-  Rpr=alloc_d_n1_n2(N,2);
-  P=alloc_d_n1_n2(N,2);
+  Array2D<double> F(2, 6);
+  Array3D<double> W(2, 6, 6);
+  Array2D<double> Rpr(N, 2);
+  Array2D<double> P(N, 2);
 
-  for (i=0; i<N; i++)
-    {
-      Rpr[i]=alloc_d_n1(2);
-      P[i]=alloc_d_n1(2);
-    }
+  std::vector<double> b(2*N);
 
-  b = alloc_d_n1(2*N);
-  G=alloc_d_n1_n2(ncells,6);
-
-  for (i=0; i<ncells; i++)
-    G[i]=alloc_d_n1(6);
+  Array2D<double> G(ncells, 6);
 
   // assembler of constraints
   eps=sqrt(vol)*1e-9;
@@ -2902,38 +2762,6 @@ double VariationalMeshSmoother::minJ_BC(int N,
   if (msglev>=2)
     fprintf(sout, "tau=%e, J=%e, L=%e  \n",T,J,L);
 
-  free(lam);
-  free(b);
-  for (i=0; i<2; i++)
-    {
-      for (j=0; j<6; j++)
-        free(W[i][j]);
-
-      free(W[i]);
-      free(F[i]);
-    }
-
-  free(W);
-  free(F);
-
-  for (i=0; i<N; i++)
-    {
-      free(Rpr[i]);
-      free(P[i]);
-    }
-
-  free(Rpr);
-  free(P);
-
-  for (i=0; i<ncells; i++)
-    free(G[i]);
-
-  free(G);
-  free(Bind);
-  free(constr);
-  free(hm);
-  free(Plam);
-
   return sqrt(nonzero);
 }
 
@@ -2941,31 +2769,31 @@ double VariationalMeshSmoother::minJ_BC(int N,
 
 // composes local matrix W and right side F from all quadrature nodes of one cell
 double VariationalMeshSmoother::localP(int n,
-                                       double*** W,
-                                       double** F,
-                                       double** R,
-                                       int* cell_in,
-                                       int* mask,
+                                       Array3D<double>& W,
+                                       Array2D<double>& F,
+                                       Array2D<double>& R,
+                                       std::vector<int>& cell_in,
+                                       std::vector<int>& mask,
                                        double epsilon,
                                        double w,
                                        int nvert,
-                                       double** H,
+                                       Array2D<double>& H,
                                        int me,
                                        double vol,
                                        int f,
                                        double *Vmin,
                                        double *qmin,
                                        int adp,
-                                       double* afun,
-                                       double* Gloc,
+                                       std::vector<double>& afun,
+                                       std::vector<double>& Gloc,
                                        FILE *sout)
 {
   int  ii, jj, kk, i, j, k, l, m, nn;
   double  sigma=0.0, fun, lqmin, gqmin, g;
-  double K[9];
   // f - flag, f=0 for determination of Hessian and gradient of the functional,
   // f=1 for determination of the functional value only;
   // K - determines approximation rule for local integral over the cell
+  std::vector<double> K(9);
 
 
   // adaptivity, determined on the first step for adp>0 (nodal based)
@@ -3217,28 +3045,25 @@ double VariationalMeshSmoother::localP(int n,
 
 // avertex - assembly of adaptivity metric on a cell
 double VariationalMeshSmoother::avertex(int n,
-                                        double* afun,
-                                        double* G,
-                                        double** R,
-                                        int* cell_in,
+                                        std::vector<double>& afun,
+                                        std::vector<double>& G,
+                                        Array2D<double>& R,
+                                        std::vector<int>& cell_in,
                                         int nvert,
                                         int adp,
                                         FILE * /*sout*/)
 {
-  double** Q;
-  double* K;
   double a1[3], a2[3], a3[3], qu[3];
   int i,j;
   double det, g, df0, df1, df2;
-  K=alloc_d_n1(8);
-  Q = alloc_d_n1_n2(3, nvert);
-  for (i=0; i<n; i++)
-    Q[i]=alloc_d_n1(nvert);
+  std::vector<double> K(8);
+  Array2D<double> Q(3, nvert);
 
   for (i=0; i<8; i++)
     K[i]=0.5;  //cell center
 
-  basisA(n,Q,nvert,K,Q,1);
+  basisA(n, Q, nvert, K, Q, 1);
+
   for (i=0; i<n; i++)
     {
       a1[i]=0;
@@ -3306,10 +3131,6 @@ double VariationalMeshSmoother::avertex(int n,
         G[i]=g;
     }
 
-  for (i=0; i<n; i++)
-    free(Q[i]);
-  free(Q);
-
   return g;
 }
 
@@ -3317,53 +3138,37 @@ double VariationalMeshSmoother::avertex(int n,
 
 // Computes local matrics W and local rhs F on one basis
 double VariationalMeshSmoother::vertex(int n,
-                                       double*** W,
-                                       double** F,
-                                       double** R,
-                                       int* cell_in,
+                                       Array3D<double>& W,
+                                       Array2D<double>& F,
+                                       Array2D<double>& R,
+                                       std::vector<int>& cell_in,
                                        double epsilon,
                                        double w,
                                        int nvert,
-                                       double* K,
-                                       double** H,
+                                       std::vector<double>& K,
+                                       Array2D<double>& H,
                                        int me,
                                        double vol,
                                        int f,
                                        double *qmin,
                                        int adp,
-                                       double* g,
+                                       std::vector<double>& g,
                                        double sigma,
                                        FILE * /*sout*/)
 {
-  double*** P = NULL;
-  double*** d2phi = NULL;
-  double** gpr = NULL;
-  double** dphi = NULL;
-  double** dfe = NULL;
-  double** Q;
   double a1[3], a2[3], a3[3], av1[3], av2[3], av3[3];
   int i,j,k,i1;
   double tr=0.0, det=0.0, dchi, chi, fet, phit=0.0, G, con=100.0;
-  Q = alloc_d_n1_n2(3, nvert);
-  for (i=0;i<n;i++) Q[i]=alloc_d_n1(nvert);
-  if (f==0){
-    gpr = alloc_d_n1_n2(3, nvert);
-    dphi=alloc_d_n1_n2(3,3);
-    dfe=alloc_d_n1_n2(3,3);
-    for (i=0;i<n;i++){ gpr[i]=alloc_d_n1(nvert);
-      dphi[i]=alloc_d_n1(3);
-      dfe[i]=alloc_d_n1(3);}
-    P = alloc_d_n1_n2_n3(3,3,3);
-    d2phi = alloc_d_n1_n2_n3(3,3,3);
-    for (i=0;i<n;i++){ P[i]=alloc_d_n1_n2(3,3);
-      d2phi[i]=alloc_d_n1_n2(3,3);
-      for (j=0;j<n;j++){ P[i][j]=alloc_d_n1(3);
-        d2phi[i][j]=alloc_d_n1(3);}
-    }
-  }
+
+  Array3D<double> P(3, 3, 3);
+  Array3D<double> d2phi(3, 3, 3);
+  Array2D<double> gpr(3, nvert);
+  Array2D<double> dphi(3, 3);
+  Array2D<double> dfe(3, 3);
+  Array2D<double> Q(3, nvert);
 
   // hessian, function, gradient
-  basisA(n,Q,nvert,K,H,me);
+  basisA(n, Q, nvert, K, H, me);
   for (i=0;i<n;i++)
     {
       a1[i]=0;
@@ -3544,36 +3349,6 @@ double VariationalMeshSmoother::vertex(int n,
         }
     }
 
-  /*----------------------------------------*/
-  for (i=0;i<n;i++)
-    free(Q[i]);
-  free(Q);
-  if (f==0)
-    {
-      for (i=0;i<n;i++)
-        {
-          free(gpr[i]);
-          free(dphi[i]);
-          free(dfe[i]);
-        }
-      free(gpr);
-      free(dphi);
-      free(dfe);
-
-      for (i=0;i<n;i++)
-        {
-          for (j=0;j<n;j++)
-            {
-              free(P[i][j]);
-              free(d2phi[i][j]);
-            }
-          free(P[i]);
-          free(d2phi[i]);
-        }
-      free(P);
-      free(d2phi);
-    }
-
   return fet*sigma;
 }
 
@@ -3583,21 +3358,18 @@ double VariationalMeshSmoother::vertex(int n,
 // by Conjugate Gradient (CG) method preconditioned by
 // Point Jacobi (diagonal scaling)
 int VariationalMeshSmoother::solver(int n,
-                                    int* ia,
-                                    int* ja,
-                                    double* a,
-                                    double* x,
-                                    double* b,
+                                    std::vector<int>& ia,
+                                    std::vector<int>& ja,
+                                    std::vector<double>& a,
+                                    std::vector<double>& x,
+                                    std::vector<double>& b,
                                     double eps,
                                     int maxite,
                                     int msglev,
                                     FILE *sout)
 {
   int info, i;
-  double* u;
-  double* r;
-  double* p;
-  double* z;
+  std::vector<double> u(n), r(n), p(n), z(n);
 
   info = 0;
 
@@ -3609,23 +3381,11 @@ int VariationalMeshSmoother::solver(int n,
   if (info != 0)
     return info;
 
-  // Allocate working arrays
-  u=alloc_d_n1(n);
-  r=alloc_d_n1(n);
-  p=alloc_d_n1(n);
-  z=alloc_d_n1(n);
-
   // PJ preconditioner construction
   for (i=0;i<n;i++) u[i]=1.0/a[ia[i]];
 
   // PCG iterations
   info=pcg_ic0(n, ia, ja, a, u, x, b, r, p, z, eps, maxite, msglev, sout);
-
-  // Free working arrays
-  free(u);
-  free(r);
-  free(p);
-  free(z);
 
   // Mat sparse_global;
   // MatCreateSeqAIJWithArrays(PETSC_COMM_SELF,n,n,ia,ja,a,&sparse_global);
@@ -3639,9 +3399,9 @@ int VariationalMeshSmoother::solver(int n,
 
 // Input parameter check
 int VariationalMeshSmoother::pcg_par_check(int n,
-                                           int* ia,
-                                           int* ja,
-                                           double* a,
+                                           std::vector<int>& ia,
+                                           std::vector<int>& ja,
+                                           std::vector<double>& a,
                                            double eps,
                                            int maxite,
                                            int msglev,
@@ -3737,15 +3497,15 @@ int VariationalMeshSmoother::pcg_par_check(int n,
 
 // Solve the SPD linear system by PCG method
 int VariationalMeshSmoother::pcg_ic0(int n,
-                                     int* ia,
-                                     int* ja,
-                                     double* a,
-                                     double* u,
-                                     double* x,
-                                     double* b,
-                                     double* r,
-                                     double* p,
-                                     double* z,
+                                     std::vector<int>& ia,
+                                     std::vector<int>& ja,
+                                     std::vector<double>& a,
+                                     std::vector<double>& u,
+                                     std::vector<double>& x,
+                                     std::vector<double>& b,
+                                     std::vector<double>& r,
+                                     std::vector<double>& p,
+                                     std::vector<double>& z,
                                      double eps,
                                      int maxite,
                                      int msglev,
@@ -3907,19 +3667,13 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
                                             int me,
                                             FILE *sout)
 {
-  double** R;
-  int** cells;
-  int* mask;
-  int* mcells;
-  double** Q;
-  double K[9], a1[3], a2[3], a3[3];
+  double a1[3], a2[3], a3[3];
   double det, g1, g2, g3, det_o, g1_o, g2_o, g3_o, eps=1e-3;
   int  i, j, k, l, N, ncells, Ncells, nvert, scanned;
   FILE *stream;
 
-  Q = alloc_d_n1_n2(3, 10);
-  for (i=0; i<n; i++)
-    Q[i]=alloc_d_n1(3*n+n%2);
+  std::vector<double> K(9);
+  Array2D<double> Q(3, 3*n + n%2);
 
   // read the initial mesh
   stream=fopen(grid,"r");
@@ -3927,18 +3681,14 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
   libmesh_assert_not_equal_to (scanned, EOF);
   fclose(stream);
 
-  mask=alloc_i_n1(N);
-  mcells=alloc_i_n1(ncells);
-  R=alloc_d_n1_n2(N,n);
-  cells=alloc_i_n1_n2(ncells,3*n+n%2);
+  std::vector<int>
+    mask(N),
+    mcells(ncells);
 
-  for (i=0; i<ncells; i++)
-    cells[i]=alloc_i_n1(3*n+n%2);
+  Array2D<int> cells(ncells, 3*n + n%2);
+  Array2D<double> R(N,n);
 
-  for (i=0; i<N; i++)
-    R[i]=alloc_d_n1(n);
-
-  readgr(n,N,R,mask,ncells,cells,mcells,0,mcells,mcells, sout);
+  readgr(n, R, mask, cells, mcells, mcells, mcells, sout);
 
   // genetrate metric file
   stream=fopen(metr,"w+");
@@ -3957,7 +3707,7 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
             if (nvert==3)
               {
                 // tri
-                basisA(2,Q,3,K,Q,1);
+                basisA(2, Q, 3, K, Q, 1);
                 for (k=0; k<2; k++)
                   {
                     a1[k]=0;
@@ -4492,10 +4242,6 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
       }
   fclose(stream);
 
-  for (i=0; i<n; i++)
-    free(Q[i]);
-  free(Q);
-
   // write new grid connectivity
   grid[0]=grid[1];
   grid[2]=grid[3];
@@ -4511,12 +4257,6 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
 
       fprintf(stream,"%d \n",mask[i]);
     }
-
-  for (i=0; i<N; i++)
-    free(R[i]);
-
-  free(R);
-  free(mask);
 
   for (i=0; i<ncells; i++)
     if (mcells[i]>=0)
@@ -4562,12 +4302,6 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
       }
 
   fclose(stream);
-
-  for (i=0; i<ncells; i++)
-    free(cells[i]);
-
-  free(cells);
-  free(mcells);
 }
 
 } // namespace libMesh
