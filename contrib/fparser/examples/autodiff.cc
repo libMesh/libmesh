@@ -30,7 +30,8 @@ int main()
 
   //std::string func = "sin(x^2)";
   //std::string func = "sin(3*x)+x*5*sin(3*x)+x^2*(3+sin(3*x))";
-  std::string func = "x^(-1/2)";
+  std::string func = "if(x<x*x,x^(-1/2),5)";
+//std::string func = "5+if(x<x*x,1,3)*6+x";
 
 
   // Parse the input expression into bytecode
@@ -49,7 +50,7 @@ int main()
   FunctionParserAD fparser2(fparser);
 
   // Generate derivative with respect to x
-  fparser.AutoDiff("x");
+  std::cout << "AutoDiff returned " << fparser.AutoDiff("x") << std::endl;
   std::cout << "Unsimplified derivative:\n";
   fparser.PrintByteCode(std::cout);
   std::cout << std::endl;
