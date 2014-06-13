@@ -113,12 +113,9 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
 
 double VariationalMeshSmoother::smooth(unsigned int)
 {
-  char grid[40], metr[40], grid_old[40], adap[40];
-  int iter[4];
-  clock_t ticks1, ticks2;
+  char grid[40], metr[40], grid_old[40];
 
-  FILE *sout;
-  sout=fopen("smoother.out","wr");//stdout;
+  FILE *sout = fopen("smoother.out","wr");
 
   int
     n = _dim,
@@ -187,16 +184,18 @@ double VariationalMeshSmoother::smooth(unsigned int)
       return _dist_norm;
     }
 
+  int iter[4];
   iter[0]=miniter;
   iter[1]=maxiter;
   iter[2]=miniterBC;
 
+  char adap[40];
 
   // grid optimization
   fprintf(sout,"Starting Grid Optimization \n");
-  ticks1=clock();
+  clock_t ticks1=clock();
   full_smooth(n, N, R, mask, ncells, cells, mcells, nedges, &edges[0], hnodes, theta, iter, me, H, adp, adap, gr, sout);
-  ticks2=clock();
+  clock_t ticks2=clock();
   fprintf(sout,"full_smooth took (%d-%d)/%ld = %ld seconds \n",
           static_cast<int>(ticks2),
           static_cast<int>(ticks1),
@@ -232,7 +231,6 @@ int VariationalMeshSmoother::writegr(int /*n*/,
                                      FILE* /*sout*/)
 {
   libMesh::out << "Starting writegr" << std::endl;
-  int i;
 
   // Adjust nodal coordinates to new positions
   {
@@ -241,8 +239,7 @@ int VariationalMeshSmoother::writegr(int /*n*/,
 
     libmesh_assert_equal_to (_dist_norm, 0.0);
     _dist_norm=0;
-    i=0;
-    for (; it != end; ++it)
+    for (int i=0; it != end; ++it)
       {
         double total_dist=0.0;
 
@@ -347,7 +344,6 @@ int VariationalMeshSmoother::readgr(int n,
                                     FILE * /*sout*/)
 {
   libMesh::out << "Sarting readgr" << std::endl;
-  int i;
   // add error messages where format can be inconsistent
 
   // Find the boundary nodes
@@ -363,8 +359,7 @@ int VariationalMeshSmoother::readgr(int n,
     std::vector<std::vector<const Elem*> > nodes_to_elem_map;
     MeshTools::build_nodes_to_elem_map(_mesh, nodes_to_elem_map);
 
-    i=0;
-    for (; it != end; ++it)
+    for (int i=0; it != end; ++it)
       {
         // For each node grab its X Y [Z] coordinates
         for (unsigned int j=0;j<_dim;j++)
@@ -451,8 +446,7 @@ int VariationalMeshSmoother::readgr(int n,
     MeshBase::const_element_iterator it  = _mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = _mesh.active_elements_end();
 
-    i=0;
-    for (; it != end; ++it)
+    for (int i=0; it != end; ++it)
       {
         // Keep track of the number of nodes
         // there must be 6 for 2D
@@ -533,7 +527,7 @@ int VariationalMeshSmoother::readgr(int n,
     std::map<dof_id_type, std::vector<dof_id_type> >::iterator it = _hanging_nodes.begin();
     std::map<dof_id_type, std::vector<dof_id_type> >::iterator end = _hanging_nodes.end();
 
-    for (i=0; it!=end; it++)
+    for (int i=0; it!=end; it++)
       {
         libMesh::out << "Parent 1: " << (it->second)[0] << std::endl;
         libMesh::out << "Parent 2: " << (it->second)[1] << std::endl;
@@ -565,23 +559,20 @@ int VariationalMeshSmoother::readmetr(char *name,
                                       int n,
                                       FILE * /*sout*/)
 {
-  int i, j, k, scanned;
-  double d;
-  FILE *stream;
-
-  stream=fopen(name,"r");
-  for (i=0; i<ncells; i++)
-    for (j=0; j<n; j++)
+  FILE *stream = fopen(name,"r");
+  for (int i=0; i<ncells; i++)
+    for (int j=0; j<n; j++)
       {
-        for (k=0; k<n; k++)
+        for (int k=0; k<n; k++)
           {
-            scanned = fscanf(stream,"%le ",&d);
+            double d;
+            int scanned = fscanf(stream,"%le ", &d);
             libmesh_assert_not_equal_to (scanned, EOF);
             H[i][j][k]=d;
           }
-      scanned = fscanf(stream,"\n");
-      libmesh_assert_not_equal_to (scanned, EOF);
-    }
+        int scanned = fscanf(stream,"\n");
+        libmesh_assert_not_equal_to (scanned, EOF);
+      }
 
   fclose(stream);
 
@@ -593,16 +584,13 @@ int VariationalMeshSmoother::readmetr(char *name,
 // Stolen from ErrorVector!
 float VariationalMeshSmoother::adapt_minimum() const
 {
-  std::vector<float>& adapt_data = *_adapt_data;
-
-  const std::size_t n = adapt_data.size();
   float min = 1.e30;
 
-  for (unsigned int i=0; i<n; i++)
+  for (unsigned int i=0; i<_adapt_data->size(); i++)
     {
       // Only positive (or zero) values in the error vector
-      libmesh_assert_greater_equal (adapt_data[i], 0.);
-      min = std::min (min, adapt_data[i]);
+      libmesh_assert_greater_equal ((*_adapt_data)[i], 0.);
+      min = std::min (min, (*_adapt_data)[i]);
     }
 
   // ErrorVectors are for positive values
@@ -628,9 +616,7 @@ void VariationalMeshSmoother::adjust_adapt_data()
   const MeshBase::const_element_iterator aoe_end_el = aoe_mesh.elements_end();
 
   // Counter to keep track of which spot in adapt_data we're looking at
-  int i=0;
-
-  for (; el != end_el; el++)
+  for (int i=0; el != end_el; el++)
     {
       // Only do this for active elements
       if (adapt_data[i])
@@ -661,18 +647,16 @@ int VariationalMeshSmoother::read_adp(std::vector<double>& afun,
                                       char /*adap*/[],
                                       FILE * /*sout*/)
 {
-  int i, m, j;
-
   std::vector<float>& adapt_data = *_adapt_data;
 
   if (_area_of_interest)
     adjust_adapt_data();
 
-  m=adapt_data.size();
+  int m = adapt_data.size();
 
-  j=0;
-  for (i=0; i<m; i++)
-    if (adapt_data[i]!=0)
+  int j=0;
+  for (int i=0; i<m; i++)
+    if (adapt_data[i] != 0)
       {
         afun[j]=adapt_data[i];
         j++;
@@ -698,7 +682,10 @@ double VariationalMeshSmoother::jac3(double x1,
 
 
 
-double VariationalMeshSmoother::jac2(double x1,double y1,double x2,double y2)
+double VariationalMeshSmoother::jac2(double x1,
+                                     double y1,
+                                     double x2,
+                                     double y2)
 {
   return x1*y2 - x2*y1;
 }
@@ -713,7 +700,6 @@ int VariationalMeshSmoother::basisA(int n,
                                     Array2D<double>& H,
                                     int me)
 {
-  int i,j,k;
   Array2D<double> U(n, nvert);
 
   if (n==2)
@@ -851,19 +837,19 @@ int VariationalMeshSmoother::basisA(int n,
 
   if (me==1)
     {
-      for (i=0; i<n; i++)
-        for (j=0; j<nvert; j++)
+      for (int i=0; i<n; i++)
+        for (int j=0; j<nvert; j++)
           Q[i][j]=U[i][j];
 
     }
   else
     {
-    for (i=0; i<n; i++)
+    for (int i=0; i<n; i++)
       {
-      for (j=0; j<nvert; j++)
+      for (int j=0; j<nvert; j++)
         {
           Q[i][j]=0;
-          for (k=0; k<n; k++)
+          for (int k=0; k<n; k++)
             Q[i][j]+=H[k][i]*U[k][j];
         }
       }
@@ -884,39 +870,40 @@ void VariationalMeshSmoother::adp_renew(int n,
                                         int adp,
                                         FILE * /*sout*/)
 {
-  int i, j, nvert;
-  double x, y, z;
-
   // evaluates given adaptive function on the provided mesh
   if (adp<0)
     {
-      for (i=0; i<ncells; i++)
+      for (int i=0; i<ncells; i++)
         {
-          x=y=z=0;
-          nvert=0;
-          while (cells[i][nvert]>=0)
+          double
+            x = 0.,
+            y = 0.,
+            z = 0.;
+          int nvert=0;
+          while (cells[i][nvert] >= 0)
             {
-              x+=R[cells[i][nvert]][0];
-              y+=R[cells[i][nvert]][1];
+              x += R[cells[i][nvert]][0];
+              y += R[cells[i][nvert]][1];
               if (n==3)
-                z+=R[cells[i][nvert]][2];
+                z += R[cells[i][nvert]][2];
               nvert++;
             }
 
           // adaptive function, cell based
-          afun[i]=5*(x+y+z);
+          afun[i] = 5*(x+y+z);
         }
     }
-  if (adp>0)
+
+  else if (adp>0)
     {
-      for (i=0; i<N; i++)
+      for (int i=0; i<N; i++)
         {
-          z=0;
-          for (j=0; j<n; j++)
-            z+=R[i][j];
+          double z = 0;
+          for (int j=0; j<n; j++)
+            z += R[i][j];
 
           // adaptive function, node based
-          afun[i]=5*sin(R[i][0]);
+          afun[i] = 5*sin(R[i][0]);
         }
     }
 }
@@ -943,16 +930,16 @@ void VariationalMeshSmoother::full_smooth(int n,
                                           int gr,
                                           FILE *sout)
 {
-  double  Jk, epsilon, eps, qmin, vol, emax, Vmin, Enm1;
-  int i, ii, j, counter, NBN, ladp, msglev=1;
+  // Control the amount of print statements in this funcion
+  int msglev=1;
 
   int afun_size = 0;
 
-  if (adp<0)
+  if (adp < 0)
     // Adaptive function is on cells
     afun_size = ncells;
 
-  else if (adp>0)
+  else if (adp > 0)
     // Adaptive function is on nodes
     afun_size = N;
 
@@ -965,111 +952,123 @@ void VariationalMeshSmoother::full_smooth(int n,
 
 
   // Boundary node counting
-  NBN=0;
-  for (i=0;i<N;i++)
+  int NBN=0;
+  for (int i=0; i<N; i++)
     if (mask[i]==2 || mask[i]==1)
       NBN++;
 
   if (NBN>0)
     {
-      if (msglev>=1) fprintf(sout,"# of Boundary Nodes=%d  \n",NBN);
+      if (msglev>=1)
+        fprintf(sout,"# of Boundary Nodes=%d  \n",NBN);
 
       NBN=0;
-      for (i=0;i<N;i++)
+      for (int i=0; i<N; i++)
         if (mask[i]==2)
           NBN++;
-      if (msglev>=1) fprintf(sout,"# of moving Boundary Nodes=%d  \n",NBN);
+
+      if (msglev>=1)
+        fprintf(sout,"# of moving Boundary Nodes=%d  \n",NBN);
     }
 
-  for (i=0;i<N;i++)
+  for (int i=0; i<N; i++)
     {
-      if ((mask[i]==1)||(mask[i]==2))
+      if ((mask[i]==1) || (mask[i]==2))
         maskf[i]=1;
       else
         maskf[i]=0;
     }
 
   // determination of min jacobian
-  qmin=minq(n, N, R, ncells, cells, mcells, me, H, &vol, &Vmin, sout);
-  if (me>1) vol=1.0;
-  if (msglev>=1) fprintf(sout,"vol=%e  qmin=%e min volume = %e\n",vol,qmin,Vmin);
+  double vol, Vmin;
+  double qmin = minq(n, N, R, ncells, cells, mcells, me, H, &vol, &Vmin, sout);
+
+  if (me > 1)
+    vol = 1.0;
+
+  if (msglev >= 1)
+    fprintf(sout,"vol=%e  qmin=%e min volume = %e\n",vol,qmin,Vmin);
 
   // compute max distortion measure over all cells
-  epsilon=0.000000001;
-  eps = qmin < 0 ? sqrt(epsilon*epsilon+0.004*qmin*qmin*vol*vol) : epsilon;
+  double epsilon = 1.e-9;
+  double eps = qmin < 0 ? sqrt(epsilon*epsilon+0.004*qmin*qmin*vol*vol) : epsilon;
+  double emax = maxE(n, N, R, ncells, cells, mcells, me, H, vol, eps, w, Gamma, &qmin, sout);
 
-  emax=maxE(n, N, R, ncells, cells, mcells, me, H, vol, eps, w, Gamma, &qmin, sout);
-
-  if (msglev>=1)
+  if (msglev >= 1)
     fprintf(sout," emax=%e \n",emax);
 
   // unfolding/smoothing
 
   // iteration tolerance
-  ii=0; counter=0;
-  Enm1=1.0;
+  double Enm1 = 1.0;
 
   // read adaptive function from file
   if (adp*gr!=0)
     read_adp(afun, adap, sout);
 
-  while (((qmin<=0)||(counter<iter[0])||(fabs(emax-Enm1)>1e-3)) &&
-         ii<iter[1] &&
-         counter<iter[1])
-    {
-      libmesh_assert_less (counter, iter[1]);
+  {
+    int
+      counter = 0,
+      ii = 0;
 
-      Enm1=emax;
+    while (((qmin<=0) || (counter<iter[0]) || (fabs(emax-Enm1)>1e-3)) && (ii < iter[1]) && (counter < iter[1]))
+      {
+        libmesh_assert_less (counter, iter[1]);
 
-      if ((ii>=0)&&(ii%2==0))
-        {
-          if (qmin<0)
-            eps=sqrt(epsilon*epsilon+0.004*qmin*qmin*vol*vol);
-          else
-            eps=epsilon;
-        }
+        Enm1 = emax;
 
-      if ((qmin<=0)||(counter<ii))
-        ladp=0;
-      else
-        ladp=adp;
+        if ((ii>=0) && (ii%2==0))
+          {
+            if (qmin<0)
+              eps=sqrt(epsilon*epsilon+0.004*qmin*qmin*vol*vol);
+            else
+              eps=epsilon;
+          }
 
-      // update adaptation function before each iteration
-      if ((ladp!=0) && (gr==0))
-        adp_renew(n, N, R, ncells, cells, afun, adp, sout);
+        int ladp = adp;
 
-      Jk=minJ(n, N, R, maskf, ncells, cells, mcells, eps, w, me, H, vol, nedges, edges, hnodes,
-              msglev, &Vmin, &emax, &qmin, ladp, afun, sout);
+        if ((qmin<=0) || (counter<ii))
+          ladp=0;
 
-      if (qmin>0)
-        counter++;
-      else
-        ii++;
+        // update adaptation function before each iteration
+        if ((ladp!=0) && (gr==0))
+          adp_renew(n, N, R, ncells, cells, afun, adp, sout);
 
-      if (msglev>=1)
-        {
-          fprintf(sout, "niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e  Jk=%e \n",counter,qmin,Vmin,emax, Jk);
-          fprintf(sout," emax=%e, Enm1=%e \n",emax,Enm1);
-        }
-    }
+        double Jk = minJ(n, N, R, maskf, ncells, cells, mcells, eps, w, me, H, vol, nedges, edges, hnodes,
+                         msglev, &Vmin, &emax, &qmin, ladp, afun, sout);
+
+        if (qmin>0)
+          counter++;
+        else
+          ii++;
+
+        if (msglev>=1)
+          {
+            fprintf(sout, "niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e, Jk=%e \n", counter, qmin, Vmin, emax, Jk);
+            fprintf(sout," emax=%e, Enm1=%e \n",emax, Enm1);
+          }
+      }
+  }
 
   // BN correction - 2D only!
   epsilon=0.000000001;
   if (NBN>0)
-    for (counter=0; counter<iter[2]; counter++)
+    for (int counter=0; counter<iter[2]; counter++)
       {
         // update adaptation function before each iteration
-        if ((adp!=0)&&(gr==0))
+        if ((adp!=0) && (gr==0))
           adp_renew(n, N, R, ncells, cells, afun, adp, sout);
-        Jk=minJ_BC(N, R, mask, ncells, cells, mcells, eps, w, me, H, vol, msglev, &Vmin, &emax, &qmin, adp, afun, NBN, sout);
+
+        double Jk = minJ_BC(N, R, mask, ncells, cells, mcells, eps, w, me, H, vol, msglev, &Vmin, &emax, &qmin, adp, afun, NBN, sout);
+
         if (msglev>=1)
           fprintf(sout, "NBC niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e  \n",counter,qmin,Vmin,emax);
 
-        // Outrageous Enm1 to make sure we hit this atleast once
+        // Outrageous Enm1 to make sure we hit this at least once
         Enm1=99999;
 
         // Now that we've moved the boundary nodes (or not) we need to resmoooth
-        for (j=0;(j<iter[1]);j++)
+        for (int j=0; j<iter[1]; j++)
           {
             if (fabs(emax-Enm1)<1e-2)
               break;
@@ -1078,10 +1077,10 @@ void VariationalMeshSmoother::full_smooth(int n,
             Enm1=emax;
 
             // update adaptation function before each iteration
-            if ((adp!=0)&&(gr==0))
+            if ((adp!=0) && (gr==0))
               adp_renew(n, N, R, ncells, cells, afun, adp, sout);
 
-            Jk=minJ(n, N, R, maskf, ncells, cells, mcells, eps, w, me, H, vol, nedges, edges, hnodes,msglev, &Vmin, &emax, &qmin, adp, afun, sout);
+            Jk = minJ(n, N, R, maskf, ncells, cells, mcells, eps, w, me, H, vol, nedges, edges, hnodes,msglev, &Vmin, &emax, &qmin, adp, afun, sout);
 
             if (msglev>=1)
               {
@@ -1113,94 +1112,87 @@ double VariationalMeshSmoother::maxE(int n,
                                      double *qmin,
                                      FILE * /*sout*/)
 {
-  double a1[3], a2[3], a3[3];
-  double  gemax, det, tr, E=0.0, sigma=0.0, chi, vmin;
-  int  ii, i, j, k, l, m, nn, kk, ll;
-
   Array2D<double> Q(3, 3*n+n%2);
   std::vector<double> K(9);
 
-  gemax=-1e32;
-  vmin=1e32;
+  double
+    gemax = -1.e32,
+    vmin = 1.e32;
 
-  for (ii=0; ii<ncells; ii++)
+  for (int ii=0; ii<ncells; ii++)
     if (mcells[ii]>=0)
       {
+        // Final value of E will be saved in Gamma at the end of this loop
+        double E = 0.0;
+
         if (n==2)
           {
             if (cells[ii][3]==-1)
               {
                 // tri
                 basisA(2, Q, 3, K, H[ii], me);
-                for (k=0; k<2; k++)
-                  {
-                    a1[k]=0;
-                    a2[k]=0;
 
-                    for (l=0; l<3; l++)
-                      {
-                        a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-                        a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
-                      }
-                  }
+                std::vector<double> a1(3), a2(3);
+                for (int k=0; k<2; k++)
+                  for (int l=0; l<3; l++)
+                    {
+                      a1[k] += Q[k][l]*R[cells[ii][l]][0];
+                      a2[k] += Q[k][l]*R[cells[ii][l]][1];
+                    }
 
-                det=jac2(a1[0],a1[1],a2[0],a2[1]);
-                tr=0.5*(a1[0]*a1[0]+a2[0]*a2[0]+a1[1]*a1[1]+a2[1]*a2[1]);
-                chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-                E=(1-w)*tr/chi+0.5*w*(v+det*det/v)/chi;
+                double det = jac2(a1[0], a1[1], a2[0], a2[1]);
+                double tr = 0.5*(a1[0]*a1[0] + a2[0]*a2[0] + a1[1]*a1[1] + a2[1]*a2[1]);
+                double chi = 0.5*(det+sqrt(det*det+epsilon*epsilon));
+                E = (1-w)*tr/chi+0.5*w*(v+det*det/v)/chi;
 
-                if (E>gemax)
-                  gemax=E;
-                if (vmin>det)
-                  vmin=det;
+                if (E > gemax)
+                  gemax = E;
+                if (vmin > det)
+                  vmin = det;
 
               }
             else if (cells[ii][4]==-1)
               {
-                E=0;
                 // quad
-                for (i=0; i<2; i++)
+                for (int i=0; i<2; i++)
                   {
                     K[0]=i;
-                    for (j=0; j<2; j++)
+                    for (int j=0; j<2; j++)
                       {
                         K[1]=j;
                         basisA(2,Q,4,K,H[ii],me);
 
-                        for (k=0; k<2; k++)
-                          {
-                            a1[k]=0;
-                            a2[k]=0;
-                            for (l=0; l<4; l++)
-                              {
-                                a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-                                a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
-                              }
-                          }
+                        std::vector<double> a1(3), a2(3);
+                        for (int k=0; k<2; k++)
+                          for (int l=0; l<4; l++)
+                            {
+                              a1[k] += Q[k][l]*R[cells[ii][l]][0];
+                              a2[k] += Q[k][l]*R[cells[ii][l]][1];
+                            }
 
-                        det=jac2(a1[0],a1[1],a2[0],a2[1]);
-                        tr=0.5*(a1[0]*a1[0]+a2[0]*a2[0]+a1[1]*a1[1]+a2[1]*a2[1]);
-                        chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-                        E+=0.25*((1-w)*tr/chi+0.5*w*(v+det*det/v)/chi);
-                        if (vmin>det)
-                          vmin=det;
+                        double det = jac2(a1[0],a1[1],a2[0],a2[1]);
+                        double tr = 0.5*(a1[0]*a1[0] + a2[0]*a2[0] + a1[1]*a1[1] + a2[1]*a2[1]);
+                        double chi = 0.5*(det+sqrt(det*det+epsilon*epsilon));
+                        E += 0.25*((1-w)*tr/chi+0.5*w*(v+det*det/v)/chi);
+
+                        if (vmin > det)
+                          vmin = det;
                       }
                   }
-                if (E>gemax)
-                  gemax=E;
 
+                if (E > gemax)
+                  gemax=E;
               }
             else
               {
-                E=0;
                 // quad tri
-                for (i=0; i<3; i++)
+                for (int i=0; i<3; i++)
                   {
                     K[0]=i*0.5;
-                    k=i/2;
+                    int k = i/2;
                     K[1]=static_cast<double>(k);
 
-                    for (j=0; j<3; j++)
+                    for (int j=0; j<3; j++)
                       {
                         K[2]=j*0.5;
                         k=j/2;
@@ -1208,33 +1200,30 @@ double VariationalMeshSmoother::maxE(int n,
 
                         basisA(2,Q,6,K,H[ii],me);
 
-                        for (k=0; k<2; k++)
-                          {
-                            a1[k]=0;
-                            a2[k]=0;
+                        std::vector<double> a1(3), a2(3);
+                        for (int k=0; k<2; k++)
+                          for (int l=0; l<6; l++)
+                            {
+                              a1[k] += Q[k][l]*R[cells[ii][l]][0];
+                              a2[k] += Q[k][l]*R[cells[ii][l]][1];
+                            }
 
-                            for (l=0; l<6; l++)
-                              {
-                                a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-                                a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
-                              }
-                          }
-
-                        det=jac2(a1[0],a1[1],a2[0],a2[1]);
+                        double det = jac2(a1[0],a1[1],a2[0],a2[1]);
+                        double sigma = 1.0/24.;
 
                         if (i==j)
-                          sigma=1.0/12;
-                        else
-                          sigma=1.0/24;
+                          sigma = 1.0/12;
 
-                        tr=0.5*(a1[0]*a1[0]+a2[0]*a2[0]+a1[1]*a1[1]+a2[1]*a2[1]);
-                        chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-                        E+=sigma*((1-w)*tr/chi+0.5*w*(v+det*det/v)/chi);
-                        if (vmin>det) vmin=det;
+                        double tr = 0.5*(a1[0]*a1[0] + a2[0]*a2[0] + a1[1]*a1[1] + a2[1]*a2[1]);
+                        double chi = 0.5*(det+sqrt(det*det+epsilon*epsilon));
+                        E += sigma*((1-w)*tr/chi+0.5*w*(v+det*det/v)/chi);
+                        if (vmin > det)
+                          vmin = det;
                       }
                   }
-                if (E>gemax)
-                  gemax=E;
+
+                if (E > gemax)
+                  gemax = E;
               }
           }
 
@@ -1244,157 +1233,148 @@ double VariationalMeshSmoother::maxE(int n,
               {
                 // tetr
                 basisA(3,Q,4,K,H[ii],me);
-                for (k=0; k<3; k++)
-                  {
-                    a1[k]=0;
-                    a2[k]=0;
-                    a3[k]=0;
 
-                    for (l=0; l<4; l++)
-                      {
-                        a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-                        a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
-                        a3[k]=a3[k]+Q[k][l]*R[cells[ii][l]][2];
-                      }
-                  }
+                std::vector<double> a1(3), a2(3), a3(3);
+                for (int k=0; k<3; k++)
+                  for (int l=0; l<4; l++)
+                    {
+                      a1[k] += Q[k][l]*R[cells[ii][l]][0];
+                      a2[k] += Q[k][l]*R[cells[ii][l]][1];
+                      a3[k] += Q[k][l]*R[cells[ii][l]][2];
+                    }
 
-                det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-                tr=0;
-                for (k=0; k<3; k++)
-                  tr+=(a1[k]*a1[k]+a2[k]*a2[k]+a3[k]*a3[k])/3.0;
+                double det = jac3(a1[0], a1[1], a1[2],
+                                  a2[0], a2[1], a2[2],
+                                  a3[0], a3[1], a3[2]);
+                double tr = 0.;
+                for (int k=0; k<3; k++)
+                  tr += (a1[k]*a1[k] + a2[k]*a2[k] + a3[k]*a3[k])/3.0;
 
-                chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-                E=(1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi;
+                double chi = 0.5*(det+sqrt(det*det+epsilon*epsilon));
+                E = (1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi;
 
-                if (E>gemax)
-                  gemax=E;
-                if (vmin>det)
-                  vmin=det;
+                if (E > gemax)
+                  gemax = E;
 
+                if (vmin > det)
+                  vmin = det;
               }
             else if (cells[ii][6]==-1)
               {
                 // prism
-                E=0;
-                for (i=0; i<2; i++)
+                for (int i=0; i<2; i++)
                   {
                     K[0]=i;
-                    for (j=0; j<2; j++)
+                    for (int j=0; j<2; j++)
                       {
                         K[1]=j;
-                        for (k=0; k<3; k++)
+                        for (int k=0; k<3; k++)
                           {
                             K[2]=static_cast<double>(k)/2.0;
                             K[3]=static_cast<double>(k%2);
                             basisA(3,Q,6,K,H[ii],me);
 
-                            for (kk=0; kk<3; kk++)
-                              {
-                                a1[kk]=0;
-                                a2[kk]=0;
-                                a3[kk]=0;
-                                for (ll=0; ll<6; ll++)
-                                  {
-                                    a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
-                                    a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
-                                    a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
-                                  }
-                              }
+                            std::vector<double> a1(3), a2(3), a3(3);
+                            for (int kk=0; kk<3; kk++)
+                              for (int ll=0; ll<6; ll++)
+                                {
+                                  a1[kk] += Q[kk][ll]*R[cells[ii][ll]][0];
+                                  a2[kk] += Q[kk][ll]*R[cells[ii][ll]][1];
+                                  a3[kk] += Q[kk][ll]*R[cells[ii][ll]][2];
+                                }
 
-                            det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                            double det = jac3(a1[0], a1[1], a1[2],
+                                              a2[0], a2[1], a2[2],
+                                              a3[0], a3[1], a3[2]);
+                            double tr = 0;
+                            for (int kk=0; kk<3; kk++)
+                              tr += (a1[kk]*a1[kk]+a2[kk]*a2[kk]+a3[kk]*a3[kk])/3.0;
 
-                            tr=0;
-                            for (kk=0; kk<3; kk++)
-                              tr+=(a1[kk]*a1[kk]+a2[kk]*a2[kk]+a3[kk]*a3[kk])/3.0;
-
-                            chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-                            E+=((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)/12.0;
-                            if (vmin>det)
-                              vmin=det;
+                            double chi = 0.5*(det+sqrt(det*det+epsilon*epsilon));
+                            E += ((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)/12.0;
+                            if (vmin > det)
+                              vmin = det;
                           }
                       }
                   }
 
-                if (E>gemax)
-                  gemax=E;
+                if (E > gemax)
+                  gemax = E;
               }
             else if (cells[ii][8]==-1)
               {
-                E=0;
                 // hex
-                for (i=0; i<2; i++)
+                for (int i=0; i<2; i++)
                   {
                     K[0]=i;
-                    for (j=0; j<2; j++)
+                    for (int j=0; j<2; j++)
                       {
                         K[1]=j;
-                        for (k=0; k<2; k++)
+                        for (int k=0; k<2; k++)
                           {
                             K[2]=k;
-                            for (l=0; l<2; l++)
+                            for (int l=0; l<2; l++)
                               {
                                 K[3]=l;
-                                for (m=0; m<2; m++)
+                                for (int m=0; m<2; m++)
                                   {
                                     K[4]=m;
-                                    for (nn=0; nn<2; nn++)
+                                    for (int nn=0; nn<2; nn++)
                                       {
                                         K[5]=nn;
                                         basisA(3,Q,8,K,H[ii],me);
-                                        for (kk=0; kk<3; kk++)
-                                          {
-                                            a1[kk]=0;
-                                            a2[kk]=0;
-                                            a3[kk]=0;
-                                            for (ll=0; ll<8; ll++)
-                                              {
-                                                a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
-                                                a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
-                                                a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
-                                              }
-                                          }
 
-                                        det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                                        std::vector<double> a1(3), a2(3), a3(3);
+                                        for (int kk=0; kk<3; kk++)
+                                          for (int ll=0; ll<8; ll++)
+                                            {
+                                              a1[kk] += Q[kk][ll]*R[cells[ii][ll]][0];
+                                              a2[kk] += Q[kk][ll]*R[cells[ii][ll]][1];
+                                              a3[kk] += Q[kk][ll]*R[cells[ii][ll]][2];
+                                            }
 
-                                        if ((i==nn)&&(j==l)&&(k==m))
-                                          sigma=1./27.;
+                                        double det = jac3(a1[0], a1[1], a1[2],
+                                                          a2[0], a2[1], a2[2],
+                                                          a3[0], a3[1], a3[2]);
+                                        double sigma = 0.0;
 
-                                        if (((i==nn)&&(j==l)&&(k!=m))||((i==nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k==m)))
-                                          sigma=1./(27.*2.);
+                                        if ((i==nn) && (j==l) && (k==m))
+                                          sigma = 1./27.;
 
-                                        if (((i==nn)&&(j!=l)&&(k!=m))||((i!=nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k!=m)))
-                                          sigma=1./(27.*4.);
+                                        if (((i==nn) && (j==l) && (k!=m)) || ((i==nn) && (j!=l) && (k==m)) || ((i!=nn) && (j==l) && (k==m)))
+                                          sigma = 1./(27.*2.);
 
-                                        if ((i!=nn)&&(j!=l)&&(k!=m))
-                                          sigma=1./(27.*8.);
+                                        if (((i==nn) && (j!=l) && (k!=m)) || ((i!=nn) && (j!=l) && (k==m)) || ((i!=nn) && (j==l) && (k!=m)))
+                                          sigma = 1./(27.*4.);
 
-                                        tr=0;
-                                        for (kk=0; kk<3; kk++)
-                                          tr+=(a1[kk]*a1[kk]+a2[kk]*a2[kk]+a3[kk]*a3[kk])/3.0;
+                                        if ((i!=nn) && (j!=l) && (k!=m))
+                                          sigma = 1./(27.*8.);
 
-                                        chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-                                        E+=((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)*sigma;
-                                        if
-                                          (vmin>det) vmin=det;
+                                        double tr = 0;
+                                        for (int kk=0; kk<3; kk++)
+                                          tr += (a1[kk]*a1[kk] + a2[kk]*a2[kk] + a3[kk]*a3[kk])/3.0;
+
+                                        double chi = 0.5*(det+sqrt(det*det+epsilon*epsilon));
+                                        E += ((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)*sigma;
+                                        if (vmin > det)
+                                          vmin = det;
                                       }
                                   }
                               }
                           }
                       }
                   }
-                if (E>gemax)
-                  gemax=E;
+                if (E > gemax)
+                  gemax = E;
               }
             else
               {
                 // quad tetr
-                E=0;
-
-                for (i=0; i<4; i++)
+                for (int i=0; i<4; i++)
                   {
-                    for (j=0; j<4; j++)
+                    for (int j=0; j<4; j++)
                       {
-                        for (k=0; k<4; k++)
+                        for (int k=0; k<4; k++)
                           {
                             switch (i)
                               {
@@ -1431,48 +1411,48 @@ double VariationalMeshSmoother::maxE(int n,
                               }
 
                             basisA(3,Q,10,K,H[ii],me);
-                            for (kk=0; kk<3; kk++)
-                              {
-                                a1[kk]=0;
-                                a2[kk]=0;
-                                a3[kk]=0;
 
-                                for (ll=0; ll<10; ll++)
-                                  {
-                                    a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
-                                    a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
-                                    a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
-                                  }
-                              }
+                            std::vector<double> a1(3), a2(3), a3(3);
+                            for (int kk=0; kk<3; kk++)
+                              for (int ll=0; ll<10; ll++)
+                                {
+                                  a1[kk] += Q[kk][ll]*R[cells[ii][ll]][0];
+                                  a2[kk] += Q[kk][ll]*R[cells[ii][ll]][1];
+                                  a3[kk] += Q[kk][ll]*R[cells[ii][ll]][2];
+                                }
 
-                            det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                            double det = jac3(a1[0], a1[1], a1[2],
+                                              a2[0], a2[1], a2[2],
+                                              a3[0], a3[1], a3[2]);
+                            double sigma = 0.;
 
-                            if ((i==j)&&(j==k))
-                              sigma=1.0/120;
-                            else if ((i==j)||(j==k)||(i==k))
-                              sigma=1.0/360;
+                            if ((i==j) && (j==k))
+                              sigma = 1.0/120;
+                            else if ((i==j) || (j==k) || (i==k))
+                              sigma = 1.0/360;
                             else
-                              sigma=1.0/720;
+                              sigma = 1.0/720;
 
-                            tr=0;
-                            for (kk=0; kk<3; kk++)
-                              tr+=(a1[kk]*a1[kk]+a2[kk]*a2[kk]+a3[kk]*a3[kk])/3.0;
+                            double tr = 0;
+                            for (int kk=0; kk<3; kk++)
+                              tr += (a1[kk]*a1[kk] + a2[kk]*a2[kk] + a3[kk]*a3[kk])/3.0;
 
-                            chi=0.5*(det+sqrt(det*det+epsilon*epsilon));
-                            E+=((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)*sigma;
-                            if (vmin>det)
-                              vmin=det;
+                            double chi = 0.5*(det+sqrt(det*det+epsilon*epsilon));
+                            E += ((1-w)*pow(tr,1.5)/chi+0.5*w*(v+det*det/v)/chi)*sigma;
+                            if (vmin > det)
+                              vmin = det;
                           }
                       }
                   }
-                if (E>gemax)
+
+                if (E > gemax)
                   gemax=E;
               }
           }
-        Gamma[ii]=E;
+        Gamma[ii] = E;
       }
 
-  (*qmin)=vmin;
+  *qmin = vmin;
 
   return gemax;
 }
@@ -1492,18 +1472,14 @@ double VariationalMeshSmoother::minq(int n,
                                      double *Vmin,
                                      FILE * /*sout*/)
 {
-  double a1[3], a2[3], a3[3];
-  double  v, vmin, gqmin, det, vcell, sigma=0.0;
-  int  ii, i, j, k, l, m, nn, kk, ll;
-
   std::vector<double> K(9);
   Array2D<double> Q(3, 3*n+n%2);
 
-  v=0;
-  vmin=1e32;
-  gqmin=1e32;
+  double v = 0;
+  double vmin = 1.e32;
+  double gqmin = 1.e32;
 
-  for (ii=0; ii<ncells; ii++)
+  for (int ii=0; ii<ncells; ii++)
     if (mcells[ii]>=0)
       {
         if (n==2)
@@ -1513,98 +1489,87 @@ double VariationalMeshSmoother::minq(int n,
               {
                 // tri
                 basisA(2,Q,3,K,H[ii],me);
-                for (k=0; k<2; k++)
-                  {
-                    a1[k]=0;
-                    a2[k]=0;
 
-                    for (l=0; l<3; l++)
-                      {
-                        a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-                        a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
-                      }
-                  }
+                std::vector<double> a1(3), a2(3);
+                for (int k=0; k<2; k++)
+                  for (int l=0; l<3; l++)
+                    {
+                      a1[k] += Q[k][l]*R[cells[ii][l]][0];
+                      a2[k] += Q[k][l]*R[cells[ii][l]][1];
+                    }
 
-                det=jac2(a1[0],a1[1],a2[0],a2[1]);
-                if (gqmin>det)
-                  gqmin=det;
+                double det = jac2(a1[0],a1[1],a2[0],a2[1]);
+                if (gqmin > det)
+                  gqmin = det;
 
-                if (vmin>det)
-                  vmin=det;
+                if (vmin > det)
+                  vmin = det;
 
-                v+=det;
+                v += det;
               }
             else if (cells[ii][4]==-1)
               {
-                vcell=0;
                 // quad
-
-                for (i=0; i<2; i++)
+                double vcell = 0.;
+                for (int i=0; i<2; i++)
                   {
                     K[0]=i;
-                    for (j=0; j<2; j++)
+                    for (int j=0; j<2; j++)
                       {
                         K[1]=j;
                         basisA(2,Q,4,K,H[ii],me);
 
-                        for (k=0; k<2; k++)
-                          {
-                            a1[k]=0;
-                            a2[k]=0;
-                            for (l=0; l<4; l++)
-                              {
-                                a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-                                a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
-                              }
-                          }
+                        std::vector<double> a1(3), a2(3);
+                        for (int k=0; k<2; k++)
+                          for (int l=0; l<4; l++)
+                            {
+                              a1[k] += Q[k][l]*R[cells[ii][l]][0];
+                              a2[k] += Q[k][l]*R[cells[ii][l]][1];
+                            }
 
-                        det=jac2(a1[0],a1[1],a2[0],a2[1]);
-                        if (gqmin>det)
-                          gqmin=det;
+                        double det = jac2(a1[0],a1[1],a2[0],a2[1]);
+                        if (gqmin > det)
+                          gqmin = det;
 
-                        v+=0.25*det;
-                        vcell+=0.25*det;
+                        v += 0.25*det;
+                        vcell += 0.25*det;
                       }
                   }
-                if (vmin>vcell)
+                if (vmin > vcell)
                   vmin=vcell;
               }
             else
               {
-                vcell=0;
                 // quad tri
-                for (i=0; i<3; i++)
+                double vcell = 0.0;
+                for (int i=0; i<3; i++)
                   {
                     K[0]=i*0.5;
-                    k=i/2;
+                    int k=i/2;
                     K[1]=static_cast<double>(k);
 
-                    for (j=0; j<3; j++)
+                    for (int j=0; j<3; j++)
                       {
                         K[2]=j*0.5;
                         k=j/2;
                         K[3]=static_cast<double>(k);
                         basisA(2,Q,6,K,H[ii],me);
 
-                        for (k=0; k<2; k++)
-                          {
-                            a1[k]=0;
-                            a2[k]=0;
-                            for (l=0; l<6; l++)
-                              {
-                                a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-                                a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
-                              }
-                          }
+                        std::vector<double> a1(3), a2(3);
+                        for (int k=0; k<2; k++)
+                          for (int l=0; l<6; l++)
+                            {
+                              a1[k] += Q[k][l]*R[cells[ii][l]][0];
+                              a2[k] += Q[k][l]*R[cells[ii][l]][1];
+                            }
 
-                        det=jac2(a1[0],a1[1],a2[0],a2[1]);
-                        if (gqmin>det)
-                          gqmin=det;
+                        double det = jac2(a1[0],a1[1],a2[0],a2[1]);
+                        if (gqmin > det)
+                          gqmin = det;
 
+                        double sigma = 1.0/24;
                         if (i==j)
-                          sigma=1.0/12;
-                        else
-                          sigma=1.0/24;
+                          sigma = 1.0/12;
 
                         v+=sigma*det;
                         vcell+=sigma*det;
@@ -1621,64 +1586,60 @@ double VariationalMeshSmoother::minq(int n,
               {
                 // tetr
                 basisA(3,Q,4,K,H[ii],me);
-                for (k=0; k<3; k++)
-                  {
-                    a1[k]=0;
-                    a2[k]=0;
-                    a3[k]=0;
 
-                    for (l=0; l<4; l++)
-                      {
-                        a1[k]=a1[k]+Q[k][l]*R[cells[ii][l]][0];
-                        a2[k]=a2[k]+Q[k][l]*R[cells[ii][l]][1];
-                        a3[k]=a3[k]+Q[k][l]*R[cells[ii][l]][2];
-                      }
-                  }
+                std::vector<double> a1(3), a2(3), a3(3);
+                for (int k=0; k<3; k++)
+                  for (int l=0; l<4; l++)
+                    {
+                      a1[k] += Q[k][l]*R[cells[ii][l]][0];
+                      a2[k] += Q[k][l]*R[cells[ii][l]][1];
+                      a3[k] += Q[k][l]*R[cells[ii][l]][2];
+                    }
 
-                det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                double det = jac3(a1[0], a1[1], a1[2],
+                                  a2[0], a2[1], a2[2],
+                                  a3[0], a3[1], a3[2]);
 
-                if (gqmin>det)
-                  gqmin=det;
+                if (gqmin > det)
+                  gqmin = det;
 
-                if (vmin>det)
-                  vmin=det;
+                if (vmin > det)
+                  vmin = det;
                 v+=det;
               }
             else if (cells[ii][6]==-1)
               {
                 // prism
-                vcell=0;
-                for (i=0; i<2; i++)
+                double vcell = 0.0;
+                for (int i=0; i<2; i++)
                   {
                     K[0]=i;
-                    for (j=0; j<2; j++)
+                    for (int j=0; j<2; j++)
                       {
                         K[1]=j;
 
-                        for (k=0; k<3; k++)
+                        for (int k=0; k<3; k++)
                           {
                             K[2]=static_cast<double>(k)/2.0;
                             K[3]=static_cast<double>(k%2);
                             basisA(3,Q,6,K,H[ii],me);
 
-                            for (kk=0; kk<3; kk++)
-                              {
-                                a1[kk]=0;
-                                a2[kk]=0;
-                                a3[kk]=0;
+                            std::vector<double> a1(3), a2(3), a3(3);
+                            for (int kk=0; kk<3; kk++)
+                              for (int ll=0; ll<6; ll++)
+                                {
+                                  a1[kk] += Q[kk][ll]*R[cells[ii][ll]][0];
+                                  a2[kk] += Q[kk][ll]*R[cells[ii][ll]][1];
+                                  a3[kk] += Q[kk][ll]*R[cells[ii][ll]][2];
+                                }
 
-                                for (ll=0; ll<6; ll++)
-                                  {
-                                    a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
-                                    a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
-                                    a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
-                                  }
-                              }
-
-                            det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                            double det = jac3(a1[0], a1[1], a1[2],
+                                              a2[0], a2[1], a2[2],
+                                              a3[0], a3[1], a3[2]);
                             if (gqmin>det)
                               gqmin=det;
-                            sigma=1.0/12.0;
+
+                            double sigma = 1.0/12.0;
                             v+=sigma*det;
                             vcell+=sigma*det;
                           }
@@ -1689,55 +1650,57 @@ double VariationalMeshSmoother::minq(int n,
               }
             else if (cells[ii][8]==-1)
               {
-                vcell=0;  // hex
-                for (i=0; i<2; i++)
+                // hex
+                double vcell = 0.0;
+                for (int i=0; i<2; i++)
                   {
                     K[0]=i;
-                    for (j=0; j<2; j++)
+                    for (int j=0; j<2; j++)
                       {
                         K[1]=j;
-                        for (k=0; k<2; k++)
+                        for (int k=0; k<2; k++)
                           {
                             K[2]=k;
-                            for (l=0; l<2; l++)
+                            for (int l=0; l<2; l++)
                               {
                                 K[3]=l;
-                                for (m=0; m<2; m++)
+                                for (int m=0; m<2; m++)
                                   {
                                     K[4]=m;
-                                    for (nn=0; nn<2; nn++)
+                                    for (int nn=0; nn<2; nn++)
                                       {
                                         K[5]=nn;
                                         basisA(3,Q,8,K,H[ii],me);
 
-                                        for (kk=0; kk<3; kk++)
-                                          {
-                                            a1[kk]=0;
-                                            a2[kk]=0;
-                                            a3[kk]=0;
-                                            for (ll=0; ll<8; ll++)
-                                              {
-                                                a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
-                                                a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
-                                                a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
-                                              }
-                                          }
+                                        std::vector<double> a1(3), a2(3), a3(3);
+                                        for (int kk=0; kk<3; kk++)
+                                          for (int ll=0; ll<8; ll++)
+                                            {
+                                              a1[kk] += Q[kk][ll]*R[cells[ii][ll]][0];
+                                              a2[kk] += Q[kk][ll]*R[cells[ii][ll]][1];
+                                              a3[kk] += Q[kk][ll]*R[cells[ii][ll]][2];
+                                            }
 
-                                        det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                                        double det = jac3(a1[0], a1[1], a1[2],
+                                                          a2[0], a2[1], a2[2],
+                                                          a3[0], a3[1], a3[2]);
+
                                         if (gqmin>det)
                                           gqmin=det;
 
-                                        if ((i==nn)&&(j==l)&&(k==m))
-                                          sigma=1./27.;
+                                        double sigma = 0.0;
 
-                                        if (((i==nn)&&(j==l)&&(k!=m))||((i==nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k==m)))
-                                          sigma=1./(27.*2.);
+                                        if ((i==nn) && (j==l) && (k==m))
+                                          sigma = 1./27.;
 
-                                        if (((i==nn)&&(j!=l)&&(k!=m))||((i!=nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k!=m)))
-                                          sigma=1./(27.*4.);
+                                        if (((i==nn) && (j==l) && (k!=m)) || ((i==nn) && (j!=l) && (k==m)) || ((i!=nn) && (j==l) && (k==m)))
+                                          sigma = 1./(27.*2.);
 
-                                        if ((i!=nn)&&(j!=l)&&(k!=m))
-                                          sigma=1./(27.*8.);
+                                        if (((i==nn) && (j!=l) && (k!=m)) || ((i!=nn) && (j!=l) && (k==m)) || ((i!=nn) && (j==l) && (k!=m)))
+                                          sigma = 1./(27.*4.);
+
+                                        if ((i!=nn) && (j!=l) && (k!=m))
+                                          sigma = 1./(27.*8.);
 
                                         v+=sigma*det;
                                         vcell+=sigma*det;
@@ -1748,18 +1711,18 @@ double VariationalMeshSmoother::minq(int n,
                       }
                   }
 
-                if (vmin>vcell)
-                  vmin=vcell;
+                if (vmin > vcell)
+                  vmin = vcell;
               }
             else
               {
                 // quad tetr
-                vcell=0;
-                for (i=0; i<4; i++)
+                double vcell = 0.0;
+                for (int i=0; i<4; i++)
                   {
-                    for (j=0; j<4; j++)
+                    for (int j=0; j<4; j++)
                       {
-                        for (k=0; k<4; k++)
+                        for (int k=0; k<4; k++)
                           {
                             switch (i)
                               {
@@ -1797,43 +1760,43 @@ double VariationalMeshSmoother::minq(int n,
 
                             basisA(3,Q,10,K,H[ii],me);
 
-                            for (kk=0; kk<3; kk++)
-                              {
-                                a1[kk]=0;
-                                a2[kk]=0;
-                                a3[kk]=0;
+                            std::vector<double> a1(3), a2(3), a3(3);
+                            for (int kk=0; kk<3; kk++)
+                              for (int ll=0; ll<10; ll++)
+                                {
+                                  a1[kk] += Q[kk][ll]*R[cells[ii][ll]][0];
+                                  a2[kk] += Q[kk][ll]*R[cells[ii][ll]][1];
+                                  a3[kk] += Q[kk][ll]*R[cells[ii][ll]][2];
+                                }
 
-                                for (ll=0; ll<10; ll++)
-                                  {
-                                    a1[kk]=a1[kk]+Q[kk][ll]*R[cells[ii][ll]][0];
-                                    a2[kk]=a2[kk]+Q[kk][ll]*R[cells[ii][ll]][1];
-                                    a3[kk]=a3[kk]+Q[kk][ll]*R[cells[ii][ll]][2];
-                                  }
-                              }
-                            det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+                            double det = jac3(a1[0], a1[1], a1[2],
+                                              a2[0], a2[1], a2[2],
+                                              a3[0], a3[1], a3[2]);
                             if (gqmin>det)
                               gqmin=det;
 
-                            if ((i==j)&&(j==k))
-                              sigma=1.0/120;
-                            else if ((i==j)||(j==k)||(i==k))
-                              sigma=1.0/360;
-                            else sigma=1.0/720;
+                            double sigma = 0.0;
+
+                            if ((i==j) && (j==k))
+                              sigma = 1.0/120;
+                            else if ((i==j) || (j==k) || (i==k))
+                              sigma = 1.0/360;
+                            else
+                              sigma = 1.0/720;
 
                             v+=sigma*det;
                             vcell+=sigma*det;
                           }
                       }
                   }
-                if (vmin>vcell)
-                  vmin=vcell;
+                if (vmin > vcell)
+                  vmin = vcell;
               }
           }
       }
 
-
-  (*vol)=v/static_cast<double>(ncells);
-  (*Vmin)=vmin;
+  *vol = v/static_cast<double>(ncells);
+  *Vmin = vmin;
 
   return gqmin;
 }
@@ -1866,16 +1829,8 @@ double VariationalMeshSmoother::minJ(int n,
                                      std::vector<double>& afun,
                                      FILE *sout)
 {
-  double  tau=0.0, J, T, Jpr, lVmin, lemax, lqmin, gVmin=0.0, gemax=0.0,
-    gqmin=0.0, gtmin0=0.0, gtmax0=0.0, gqmin0=0.0;
-  double eps, nonzero, Tau_hn, g_i;
-  int index, i, ii, j, jj, k, l, m, nz;
-  int sch, ind, columns, nvert, ind_i, ind_j, ind_k;
-  // Jpr - value of functional;
-  // nonzero - norm of gradient;
-  // columns - max number of nonzero entries in every row of global matrix;
-
-  columns=n*n*10;
+  // columns - max number of nonzero entries in every row of global matrix
+  int columns = n*n*10;
 
   // local Hessian matrix
   Array3D<double> W(n, 3*n+n%2, 3*n+n%2);
@@ -1906,70 +1861,65 @@ double VariationalMeshSmoother::minJ(int n,
   std::vector<int> ia(n*N+1);
   std::vector<int> ja(n*N*columns);
 
+  // nonzero - norm of gradient
+  double nonzero = 0.;
+
+  // Jpr - value of functional
+  double Jpr = 0.;
+
   // find minimization direction P
-  nonzero=0;
-  Jpr=0;
-  for (i=0; i<n*N; i++)
+  for (int i=0; i<ncells; i++)
     {
-      // initialise matrix and rhs
-      for (j=0; j<columns; j++)
-        {
-          A[i][j] = 0;
-          JA[i][j] =0;
-        }
-      b[i] = 0;
-    }
-  for (i=0; i<ncells; i++)
-    {
-      nvert=0;
+      int nvert = 0;
       while (cells[i][nvert]>=0)
         nvert++;
 
       // determination of local matrices on each cell
-      for (j=0; j<n; j++)
+      for (int j=0; j<n; j++)
         {
           G[i][j]=0;  // adaptation metric G is held constant throughout minJ run
           if (adp<0)
             {
-              for (k=0; k<abs(adp); k++)
+              for (int k=0; k<abs(adp); k++)
                 G[i][j]=G[i][j]+afun[i*(-adp)+k];  // cell-based adaptivity is computed here
             }
         }
-      for (index=0; index<n; index++)
+      for (int index=0; index<n; index++)
         {
-          //initialise local matrices
-          for (k=0; k<3*n+n%2; k++)
+          // initialise local matrices
+          for (int k=0; k<3*n+n%2; k++)
             {
               F[index][k]=0;
 
-              for (j=0; j<3*n+n%2; j++)
+              for (int j=0; j<3*n+n%2; j++)
                 W[index][k][j]=0;
             }
         }
       if (mcells[i]>=0)
         {
-          //if cell is not excluded
-          Jpr+=localP(n, W, F, R, cells[i], mask, epsilon, w, nvert, H[i],
-                      me, vol, 0, &lVmin, &lqmin, adp, afun, G[i], sout);
+          // if cell is not excluded
+          double lVmin, lqmin;
+          Jpr += localP(n, W, F, R, cells[i], mask, epsilon, w, nvert, H[i],
+                        me, vol, 0, &lVmin, &lqmin, adp, afun, G[i], sout);
         }
       else
         {
-          for (index=0; index<n; index++)
-            for (j=0; j<nvert; j++)
+          for (int index=0; index<n; index++)
+            for (int j=0; j<nvert; j++)
               W[index][j][j]=1;
         }
 
       // assembly of an upper triangular part of a global matrix A
-      for (index=0; index<n; index++)
+      for (int index=0; index<n; index++)
         {
-          for (l=0; l<nvert; l++)
+          for (int l=0; l<nvert; l++)
             {
-              for (m=0; m<nvert; m++)
+              for (int m=0; m<nvert; m++)
                 {
                 if ((W[index][l][m]!=0)&&(cells[i][m]>=cells[i][l]))
                   {
-                    sch=0;
-                    ind=1;
+                    int sch = 0;
+                    int ind = 1;
                     while (ind!=0)
                       {
                         if (A[cells[i][l]+index*N][sch]!=0)
@@ -1988,7 +1938,9 @@ double VariationalMeshSmoother::minJ(int n,
                             JA[cells[i][l]+index*N][sch]=cells[i][m]+index*N;
                             ind = 0;
                           }
-                        if (sch>columns-1) fprintf(sout,"error: # of nonzero entries in the %d row of Hessian =%d >= columns=%d \n",cells[i][l],sch,columns);
+
+                        if (sch>columns-1)
+                          fprintf(sout,"error: # of nonzero entries in the %d row of Hessian =%d >= columns=%d \n",cells[i][l],sch,columns);
                       }
                   }
                 }
@@ -2001,23 +1953,23 @@ double VariationalMeshSmoother::minJ(int n,
   // HN correction
 
   // tolerance for HN being the mid-edge node for its parents
-  Tau_hn=pow(vol,1.0/static_cast<double>(n))*1e-10;
-  for (i=0; i<nedges; i++)
+  double Tau_hn = pow(vol,1.0/static_cast<double>(n))*1e-10;
+  for (int i=0; i<nedges; i++)
     {
-      ind_i=hnodes[i];
-      ind_j=edges[2*i];
-      ind_k=edges[2*i+1];
+      int ind_i = hnodes[i];
+      int ind_j = edges[2*i];
+      int ind_k = edges[2*i+1];
 
-      for (j=0; j<n; j++)
+      for (int j=0; j<n; j++)
         {
-          g_i=R[ind_i][j]-0.5*(R[ind_j][j]+R[ind_k][j]);
+          int g_i = R[ind_i][j]-0.5*(R[ind_j][j]+R[ind_k][j]);
           Jpr+=g_i*g_i/(2*Tau_hn);
           b[ind_i+j*N]-=g_i/Tau_hn;
           b[ind_j+j*N]+=0.5*g_i/Tau_hn;
           b[ind_k+j*N]+=0.5*g_i/Tau_hn;
         }
 
-      for (ind=0; ind<columns; ind++)
+      for (int ind=0; ind<columns; ind++)
         {
           if (JA[ind_i][ind]==ind_i)
             A[ind_i][ind]+=1.0/Tau_hn;
@@ -2082,65 +2034,64 @@ double VariationalMeshSmoother::minJ(int n,
     }
 
   // ||\grad J||_2
-  for (i=0; i<n*N; i++)
+  for (int i=0; i<n*N; i++)
     nonzero += b[i]*b[i];
 
   // sort matrix A
-  for (i=0; i<n*N; i++)
+  for (int i=0; i<n*N; i++)
     {
-      for (j=columns-1; j>1; j--)
+      for (int j=columns-1; j>1; j--)
         {
-          for (k=0; k<j; k++)
+          for (int k=0; k<j; k++)
             {
               if (JA[i][k]>JA[i][k+1])
                 {
-                  sch=JA[i][k];
-                  JA[i][k]=JA[i][k+1];
-                  JA[i][k+1]=sch;
-                  tau=A[i][k];
-                  A[i][k]=A[i][k+1];
-                  A[i][k+1]=tau;
+                  int sch = JA[i][k];
+                  JA[i][k] = JA[i][k+1];
+                  JA[i][k+1] = sch;
+                  double tmp = A[i][k];
+                  A[i][k] = A[i][k+1];
+                  A[i][k+1] = tmp;
                 }
             }
         }
     }
 
-  eps=sqrt(vol)*1e-9;
+  double eps = sqrt(vol)*1e-9;
 
   // solver for P (unconstrained)
   ia[0]=0;
-  j=0;
-  for (i=0; i<n*N; i++)
-    {
-      u[i]=0;
-      nz=0;
-      for (k=0; k<columns; k++)
-        {
-          if (A[i][k]!=0)
-            {
-              nz++;
-              ja[j]=JA[i][k]+1;
-              a[j]=A[i][k];
-              j++;
-            }
-        }
-      ia[i+1]=ia[i]+nz;
-    }
-  nz=ia[n*N];
-  m=n*N;
+  {
+    int j = 0;
+    for (int i=0; i<n*N; i++)
+      {
+        u[i] = 0;
+        int nz = 0;
+        for (int k=0; k<columns; k++)
+          {
+            if (A[i][k] != 0)
+              {
+                nz++;
+                ja[j]=JA[i][k]+1;
+                a[j]=A[i][k];
+                j++;
+              }
+          }
+        ia[i+1] = ia[i] + nz;
+      }
+  }
 
-  if (msglev>=3)
-    sch=1;
-  else sch=0;
+  int nz = ia[n*N];
+  int m = n*N;
+  int sch = (msglev >= 3) ? 1 : 0;
 
+  nz = solver(m, ia, ja, a, u, b, eps, 100, sch, sout);
+  // sol_pcg_pj(m, ia, ja, a, u, b, eps, 100, sch);
 
-  nz=solver(m,ia,ja,a,u,b,eps,100,sch, sout);
-  //    sol_pcg_pj(m,ia,ja,a,u,b,eps,100,sch);
-
-  for (i=0; i<N; i++)
+  for (int i=0; i<N; i++)
     {
       //ensure fixed nodes are not moved
-      for (index=0; index<n; index++)
+      for (int index=0; index<n; index++)
         if (mask[i]==1)
           P[i][index]=0;
         else
@@ -2150,9 +2101,9 @@ double VariationalMeshSmoother::minJ(int n,
   // P is determined
   if (msglev>=4)
     {
-    for (i=0; i<N; i++)
+    for (int i=0; i<N; i++)
       {
-      for (j=0; j<n; j++)
+      for (int j=0; j<n; j++)
         if (P[i][j]!=0)
           fprintf(sout, "P[%d][%d]=%f  ",i,j,P[i][j]);
       }
@@ -2162,50 +2113,61 @@ double VariationalMeshSmoother::minJ(int n,
   if (msglev>=3)
     fprintf(sout, "dJ=%e J0=%e \n",sqrt(nonzero),Jpr);
 
-  J=1e32;
-  j=1;
+  double
+    J = 1.e32,
+    tau = 0.0,
+    gVmin = 0.0,
+    gemax = 0.0,
+    gqmin = 0.0;
 
-  while ((Jpr<=J)&&(j>-30))
+  int j = 1;
+
+  while ((Jpr<=J) && (j>-30))
     {
-      j=j-1;
+      j = j-1;
 
       // search through finite # of values for tau
       tau=pow(2.0,j);
-      for (i=0; i<N; i++)
+      for (int i=0; i<N; i++)
         {
-          for (k=0; k<n; k++)
+          for (int k=0; k<n; k++)
             Rpr[i][k]=R[i][k]+tau*P[i][k];
         }
 
-      J=0;
+      J = 0;
       gVmin=1e32;
       gemax=-1e32;
       gqmin=1e32;
-      for (i=0; i<ncells; i++)
+      for (int i=0; i<ncells; i++)
         {
           if (mcells[i]>=0)
             {
-              nvert=0;
+              int nvert=0;
               while (cells[i][nvert]>=0)
                 nvert++;
-              lemax=localP(n, W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, &lVmin, &lqmin, adp, afun, G[i], sout);
-              J+=lemax;
-              if (gVmin>lVmin)
+
+              double lVmin, lqmin;
+              double lemax = localP(n, W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, &lVmin, &lqmin, adp, afun, G[i], sout);
+
+              J += lemax;
+              if (gVmin > lVmin)
                 gVmin=lVmin;
-              if (gemax<lemax)
+
+              if (gemax < lemax)
                 gemax=lemax;
-              if (gqmin>lqmin)
+
+              if (gqmin > lqmin)
                 gqmin=lqmin;
 
               // HN correction
-              for (ii=0; ii<nedges; ii++)
+              for (int ii=0; ii<nedges; ii++)
                 {
-                  ind_i=hnodes[ii];
-                  ind_j=edges[2*ii];
-                  ind_k=edges[2*ii+1];
-                  for (jj=0; jj<n; jj++)
+                  int ind_i = hnodes[ii];
+                  int ind_j = edges[2*ii];
+                  int ind_k = edges[2*ii+1];
+                  for (int jj=0; jj<n; jj++)
                     {
-                      g_i=Rpr[ind_i][jj]-0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
+                      int g_i = Rpr[ind_i][jj]-0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
                       J+=g_i*g_i/(2*Tau_hn);
                     }
                 }
@@ -2215,51 +2177,57 @@ double VariationalMeshSmoother::minJ(int n,
         fprintf(sout, "tau=%f J=%f \n",tau,J);
     }
 
-  if (j==-30)
-    T=0;
-  else
+
+  double
+    T = 0.0,
+    gtmin0 = 0.0,
+    gtmax0 = 0.0,
+    gqmin0 = 0.0;
+
+  if (j != -30)
     {
-      Jpr=J;
-      for (i=0; i<N; i++)
+      Jpr = J;
+      for (int i=0; i<N; i++)
         {
-          for (k=0; k<n; k++)
+          for (int k=0; k<n; k++)
             Rpr[i][k]=R[i][k]+tau*0.5*P[i][k];
         }
 
-      J=0;
+      J = 0;
       gtmin0=1e32;
       gtmax0=-1e32;
       gqmin0=1e32;
-      for (i=0; i<ncells; i++)
+      for (int i=0; i<ncells; i++)
         {
           if (mcells[i]>=0)
             {
-              nvert=0;
+              int nvert=0;
               while (cells[i][nvert]>=0)
                 nvert++;
 
-              lemax=localP(n, W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, &lVmin, &lqmin, adp, afun, G[i], sout);
-              J+=lemax;
+              double lVmin, lqmin;
+              double lemax = localP(n, W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, &lVmin, &lqmin, adp, afun, G[i], sout);
+              J += lemax;
 
-              if (gtmin0>lVmin)
-                gtmin0=lVmin;
+              if (gtmin0 > lVmin)
+                gtmin0 = lVmin;
 
-              if (gtmax0<lemax)
-                gtmax0=lemax;
+              if (gtmax0 < lemax)
+                gtmax0 = lemax;
 
-              if (gqmin0>lqmin)
-                gqmin0=lqmin;
+              if (gqmin0 > lqmin)
+                gqmin0 = lqmin;
 
               // HN correction
-              for (ii=0; ii<nedges; ii++)
+              for (int ii=0; ii<nedges; ii++)
                 {
-                  ind_i=hnodes[ii];
-                  ind_j=edges[2*ii];
-                  ind_k=edges[2*ii+1];
+                  int ind_i = hnodes[ii];
+                  int ind_j = edges[2*ii];
+                  int ind_k = edges[2*ii+1];
 
-                  for (jj=0; jj<n; jj++)
+                  for (int jj=0; jj<n; jj++)
                     {
-                      g_i=Rpr[ind_i][jj]-0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
+                      int g_i = Rpr[ind_i][jj]-0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
                       J+=g_i*g_i/(2*Tau_hn);
                     }
                 }
@@ -2267,27 +2235,28 @@ double VariationalMeshSmoother::minJ(int n,
         }
     }
 
-  if (Jpr>J)
+  if (Jpr > J)
     {
       T=0.5*tau;
-      (*Vmin)=gtmin0;
-      (*emax)=gtmax0;
-      (*qmin)=gqmin0;
+      *Vmin = gtmin0;
+      *emax = gtmax0;
+      *qmin = gqmin0;
     }
   else
     {
-      T=tau;  J=Jpr;
-      (*Vmin)=gVmin;
-      (*emax)=gemax;
-      (*qmin)=gqmin;
+      T=tau;
+      J=Jpr;
+      *Vmin = gVmin;
+      *emax = gemax;
+      *qmin = gqmin;
     }
 
-  nonzero=0;
-  for (j=0; j<N; j++)
-    for (k=0; k<n; k++)
+  nonzero = 0;
+  for (int j=0; j<N; j++)
+    for (int k=0; k<n; k++)
       {
-        R[j][k]=R[j][k]+T*P[j][k];
-        nonzero+=T*P[j][k]*T*P[j][k];
+        R[j][k] = R[j][k] + T*P[j][k];
+        nonzero += T*P[j][k]*T*P[j][k];
       }
 
   if (msglev>=2)
@@ -2325,7 +2294,7 @@ double VariationalMeshSmoother::minJ_BC(int N,
   double  tau=0.0, J=0.0, T, Jpr, L, lVmin, lqmin, gVmin=0.0, gqmin=0.0, gVmin0=0.0,
     gqmin0=0.0, lemax, gemax=0.0, gemax0=0.0;
   double a, g, qq=0.0, eps, nonzero, x0, y0, del1, del2, Bx, By;
-  int index, i, j, k=0, l, nz, I;
+  int index, i, j, k=0, nz, I;
   int ind, nvert;
 
   // array of sliding BN
@@ -2366,7 +2335,7 @@ double VariationalMeshSmoother::minJ_BC(int N,
       ind=0;
 
       // boundary connectivity
-      for (l=0; l<ncells; l++)
+      for (int l=0; l<ncells; l++)
         {
           nvert=0;
 
@@ -2487,8 +2456,8 @@ double VariationalMeshSmoother::minJ_BC(int N,
         }
     }
 
-  // for (i=0; i<NCN; i++){
-  // for (j=0; j<4; j++) fprintf(stdout," %e ",constr[4*i+j]);
+  // for (int i=0; i<NCN; i++){
+  // for (int j=0; j<4; j++) fprintf(stdout," %e ",constr[4*i+j]);
   // fprintf(stdout, "constr %d node %d \n",i,Bind[i]);
   // }
 
@@ -2546,7 +2515,7 @@ double VariationalMeshSmoother::minJ_BC(int N,
 
           for (index=0; index<2; index++)
             {
-              for (l=0; l<nvert; l++)
+              for (int l=0; l<nvert; l++)
                 {
                   // diagonal Hessian
                   hm[cells[i][l]+index*N]=hm[cells[i][l]+index*N]+W[index][l][l];
@@ -2788,7 +2757,7 @@ double VariationalMeshSmoother::localP(int n,
                                        std::vector<double>& Gloc,
                                        FILE *sout)
 {
-  int  ii, jj, kk, i, j, k, l, m, nn;
+  int kk, i, j, k, l, nn;
   double  sigma=0.0, fun, lqmin, gqmin, g;
   // f - flag, f=0 for determination of Hessian and gradient of the functional,
   // f=1 for determination of the functional value only;
@@ -2922,7 +2891,7 @@ double VariationalMeshSmoother::localP(int n,
                       for (l=0; l<2; l++)
                         {
                           K[3]=l;
-                          for (m=0; m<2; m++)
+                          for (int m=0; m<2; m++)
                             {
                               K[4]=m;
                               for (nn=0; nn<2; nn++)
@@ -3016,13 +2985,13 @@ double VariationalMeshSmoother::localP(int n,
     }
 
   // fixed nodes correction
-  for (ii=0; ii<nvert; ii++)
+  for (int ii=0; ii<nvert; ii++)
     {
       if (mask[cell_in[ii]]==1)
         {
           for (kk=0; kk<n; kk++)
             {
-              for (jj=0; jj<nvert; jj++)
+              for (int jj=0; jj<nvert; jj++)
                 {
                   W[kk][ii][jj]=0;
                   W[kk][jj][ii]=0;
@@ -3035,8 +3004,8 @@ double VariationalMeshSmoother::localP(int n,
     }
   // end of fixed nodes correction
 
-  (*Vmin)=g;
-  (*qmin)=gqmin/vol;
+  *Vmin = g;
+  *qmin = gqmin/vol;
 
   return fun;
 }
@@ -3053,82 +3022,83 @@ double VariationalMeshSmoother::avertex(int n,
                                         int adp,
                                         FILE * /*sout*/)
 {
-  double a1[3], a2[3], a3[3], qu[3];
-  int i,j;
-  double det, g, df0, df1, df2;
-  std::vector<double> K(8);
+  std::vector<double> a1(3), a2(3), a3(3), qu(3), K(8);
   Array2D<double> Q(3, nvert);
 
-  for (i=0; i<8; i++)
-    K[i]=0.5;  //cell center
+  for (int i=0; i<8; i++)
+    K[i] = 0.5;  // cell center
 
   basisA(n, Q, nvert, K, Q, 1);
 
-  for (i=0; i<n; i++)
-    {
-      a1[i]=0;
-      a2[i]=0;
-      a3[i]=0;
-      qu[i]=0;
-      for (j=0; j<nvert; j++)
-        {
-          a1[i]+=Q[i][j]*R[cell_in[j]][0];
-          a2[i]+=Q[i][j]*R[cell_in[j]][1];
-          if (n==3)
-            a3[i]+=Q[i][j]*R[cell_in[j]][2];
-          qu[i]+=Q[i][j]*afun[cell_in[j]];
-        }
-    }
+  for (int i=0; i<n; i++)
+    for (int j=0; j<nvert; j++)
+      {
+        a1[i] += Q[i][j]*R[cell_in[j]][0];
+        a2[i] += Q[i][j]*R[cell_in[j]][1];
+        if (n==3)
+          a3[i] += Q[i][j]*R[cell_in[j]][2];
+
+        qu[i] += Q[i][j]*afun[cell_in[j]];
+      }
+
+  double det = 0.0;
 
   if (n==2)
-    det=jac2(a1[0],a1[1],a2[0],a2[1]);
+    det = jac2(a1[0], a1[1],
+               a2[0], a2[1]);
   else
-    det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
+    det = jac3(a1[0], a1[1], a1[2],
+               a2[0], a2[1], a2[2],
+               a3[0], a3[1], a3[2]);
+
+  // Return val
+  double g = 0.0;
 
   if (det!=0)
     {
       if (n==2)
         {
-          df0=jac2(qu[0],qu[1],a2[0],a2[1])/det;
-          df1=jac2(a1[0],a1[1],qu[0],qu[1])/det;
-          g=(1+df0*df0+df1*df1);
+          double df0 = jac2(qu[0], qu[1], a2[0], a2[1])/det;
+          double df1 = jac2(a1[0], a1[1], qu[0], qu[1])/det;
+          g = (1 + df0*df0 + df1*df1);
+
           if (adp==2)
             {
               // directional adaptation G=diag(g_i)
-              G[0]=1+df0*df0;
-              G[1]=1+df1*df1;
+              G[0] = 1 + df0*df0;
+              G[1] = 1 + df1*df1;
             }
           else
             {
-              for (i=0; i<n; i++)
+              for (int i=0; i<n; i++)
                 G[i]=g;  // simple adaptation G=gI
             }
         }
       else
         {
-          df0=(qu[0]*(a2[1]*a3[2]-a2[2]*a3[1])+qu[1]*(a2[2]*a3[0]-a2[0]*a3[2])+qu[2]*(a2[0]*a3[1]-a2[1]*a3[0]))/det;
-          df1=(qu[0]*(a3[1]*a1[2]-a3[2]*a1[1])+qu[1]*(a3[2]*a1[0]-a3[0]*a1[2])+qu[2]*(a3[0]*a1[1]-a3[1]*a1[0]))/det;
-          df2=(qu[0]*(a1[1]*a2[2]-a1[2]*a2[1])+qu[1]*(a1[2]*a2[0]-a1[0]*a2[2])+qu[2]*(a1[0]*a2[1]-a1[1]*a2[0]))/det;
-          g=(1+df0*df0+df1*df1+df2*df2);
+          double df0 = (qu[0]*(a2[1]*a3[2]-a2[2]*a3[1]) + qu[1]*(a2[2]*a3[0]-a2[0]*a3[2]) + qu[2]*(a2[0]*a3[1]-a2[1]*a3[0]))/det;
+          double df1 = (qu[0]*(a3[1]*a1[2]-a3[2]*a1[1]) + qu[1]*(a3[2]*a1[0]-a3[0]*a1[2]) + qu[2]*(a3[0]*a1[1]-a3[1]*a1[0]))/det;
+          double df2 = (qu[0]*(a1[1]*a2[2]-a1[2]*a2[1]) + qu[1]*(a1[2]*a2[0]-a1[0]*a2[2]) + qu[2]*(a1[0]*a2[1]-a1[1]*a2[0]))/det;
+          g = (1+df0*df0+df1*df1+df2*df2);
           if (adp==2)
             {
               // directional adaptation G=diag(g_i)
-              G[0]=1+df0*df0;
-              G[1]=1+df1*df1;
-              G[2]=1+df2*df2;
+              G[0] = 1 + df0*df0;
+              G[1] = 1 + df1*df1;
+              G[2] = 1 + df2*df2;
             }
           else
             {
-              for (i=0; i<n; i++)
-                G[i]=g;  // simple adaptation G=gI
+              for (int i=0; i<n; i++)
+                G[i] = g;  // simple adaptation G=gI
             }
         }
     }
   else
     {
-      g=1.0;
-      for (i=0; i<n; i++)
-        G[i]=g;
+      g = 1.0;
+      for (int i=0; i<n; i++)
+        G[i] = g;
     }
 
   return g;
@@ -3156,196 +3126,198 @@ double VariationalMeshSmoother::vertex(int n,
                                        double sigma,
                                        FILE * /*sout*/)
 {
-  double a1[3], a2[3], a3[3], av1[3], av2[3], av3[3];
-  int i,j,k,i1;
-  double tr=0.0, det=0.0, dchi, chi, fet, phit=0.0, G, con=100.0;
-
-  Array3D<double> P(3, 3, 3);
-  Array3D<double> d2phi(3, 3, 3);
-  Array2D<double> gpr(3, nvert);
-  Array2D<double> dphi(3, 3);
-  Array2D<double> dfe(3, 3);
-  Array2D<double> Q(3, nvert);
-
   // hessian, function, gradient
+  Array2D<double> Q(3, nvert);
   basisA(n, Q, nvert, K, H, me);
-  for (i=0;i<n;i++)
-    {
-      a1[i]=0;
-      a2[i]=0;
-      a3[i]=0;
-      for (j=0;j<nvert;j++)
-        {
-          a1[i]+=Q[i][j]*R[cell_in[j]][0];
-          a2[i]+=Q[i][j]*R[cell_in[j]][1];
-          if (n==3)
-            a3[i]+=Q[i][j]*R[cell_in[j]][2];
-        }
-    }
+
+  std::vector<double> a1(3), a2(3), a3(3);
+  for (int i=0; i<n; i++)
+    for (int j=0; j<nvert; j++)
+      {
+        a1[i] += Q[i][j]*R[cell_in[j]][0];
+        a2[i] += Q[i][j]*R[cell_in[j]][1];
+        if (n==3)
+          a3[i] += Q[i][j]*R[cell_in[j]][2];
+      }
+
   // account for adaptation
+  double G = 0.0;
   if (adp<2)
-    G=g[0];
+    G = g[0];
   else
     {
-      G=1.0;
-      for (i=0;i<n;i++)
+      G = 1.0;
+      for (int i=0; i<n; i++)
         {
-          a1[i]*=sqrt(g[0]);
-          a2[i]*=sqrt(g[1]);
+          a1[i] *= sqrt(g[0]);
+          a2[i] *= sqrt(g[1]);
           if (n==3)
-            a3[i]*=sqrt(g[2]);
+            a3[i] *= sqrt(g[2]);
         }
     }
+
+  double
+    det = 0.0,
+    tr = 0.0,
+    phit = 0.0;
+
+  std::vector<double> av1(3), av2(3), av3(3);
 
   if (n==2)
     {
-      av1[0]= a2[1];  av1[1]=-a2[0];
-      av2[0]=-a1[1];  av2[1]= a1[0];
-      det=jac2(a1[0],a1[1],a2[0],a2[1]);
-      tr=0;
-      for (i=0;i<2;i++) tr=tr+a1[i]*a1[i]/2+a2[i]*a2[i]/2;
-      phit=(1-w)*tr+w*(vol/G+det*det*G/vol)/2.;
+      av1[0] =  a2[1];
+      av1[1] = -a2[0];
+      av2[0] = -a1[1];
+      av2[1] =  a1[0];
+      det = jac2(a1[0], a1[1], a2[0], a2[1]);
+      for (int i=0; i<2; i++)
+        tr += 0.5*(a1[i]*a1[i] + a2[i]*a2[i]);
+
+      phit = (1-w)*tr + w*(vol/G + det*det*G/vol)/2.;
     }
 
   if (n==3)
     {
-      av1[0]= a2[1]*a3[2]-a2[2]*a3[1];  av1[1]=a2[2]*a3[0]-a2[0]*a3[2]; av1[2]=a2[0]*a3[1]-a2[1]*a3[0];
-      av2[0]= a3[1]*a1[2]-a3[2]*a1[1];  av2[1]=a3[2]*a1[0]-a3[0]*a1[2]; av2[2]=a3[0]*a1[1]-a3[1]*a1[0];
-      av3[0]= a1[1]*a2[2]-a1[2]*a2[1];  av3[1]=a1[2]*a2[0]-a1[0]*a2[2]; av3[2]=a1[0]*a2[1]-a1[1]*a2[0];
-      det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
-      tr=0;
-      for (i=0;i<3;i++) tr=tr+a1[i]*a1[i]/3+a2[i]*a2[i]/3+a3[i]*a3[i]/3;
-      phit=(1-w)*pow(tr,1.5)+w*(vol/G+det*det*G/vol)/2.;
+      av1[0] = a2[1]*a3[2] - a2[2]*a3[1];
+      av1[1] = a2[2]*a3[0] - a2[0]*a3[2];
+      av1[2] = a2[0]*a3[1] - a2[1]*a3[0];
+
+      av2[0] = a3[1]*a1[2] - a3[2]*a1[1];
+      av2[1] = a3[2]*a1[0] - a3[0]*a1[2];
+      av2[2] = a3[0]*a1[1] - a3[1]*a1[0];
+
+      av3[0] = a1[1]*a2[2] - a1[2]*a2[1];
+      av3[1] = a1[2]*a2[0] - a1[0]*a2[2];
+      av3[2] = a1[0]*a2[1] - a1[1]*a2[0];
+
+      det = jac3(a1[0], a1[1], a1[2],
+                 a2[0], a2[1], a2[2],
+                 a3[0], a3[1], a3[2]);
+
+      for (int i=0; i<3; i++)
+        tr += (1./3.)*(a1[i]*a1[i] + a2[i]*a2[i] + a3[i]*a3[i]);
+
+      phit = (1-w)*pow(tr,1.5) + w*(vol/G + det*det*G/vol)/2.;
     }
 
-  dchi=0.5+det*0.5/sqrt(epsilon*epsilon+det*det);
-  chi=0.5*(det+sqrt(epsilon*epsilon+det*det));
-  if (chi!=0) fet=phit/chi; else fet=1e32; // function is computed
-  (*qmin)=det*G;
+  double dchi = 0.5 + det*0.5/sqrt(epsilon*epsilon+det*det);
+  double chi = 0.5*(det+sqrt(epsilon*epsilon+det*det));
+  double fet = (chi != 0.0) ? phit/chi : 1.e32;
+  *qmin = det*G;
 
   // gradient and Hessian
   if (f==0)
     {
+      Array3D<double> P(3, 3, 3);
+      Array3D<double> d2phi(3, 3, 3);
+      Array2D<double> dphi(3, 3);
+      Array2D<double> dfe(3, 3);
+
       if (n==2)
         {
-          for (i=0;i<2;i++)
+          for (int i=0; i<2; i++)
             {
-              dphi[0][i]=(1-w)*a1[i]+w*G*det*av1[i]/vol;
-              dphi[1][i]=(1-w)*a2[i]+w*G*det*av2[i]/vol;
+              dphi[0][i] = (1-w)*a1[i] + w*G*det*av1[i]/vol;
+              dphi[1][i] = (1-w)*a2[i] + w*G*det*av2[i]/vol;
             }
 
-          for (i=0;i<2;i++)
+          for (int i=0; i<2; i++)
             {
-              for (j=0;j<2;j++)
+              for (int j=0; j<2; j++)
                 {
-                  d2phi[0][i][j]=w*G*av1[i]*av1[j]/vol;
-                  d2phi[1][i][j]=w*G*av2[i]*av2[j]/vol;
+                  d2phi[0][i][j] = w*G*av1[i]*av1[j]/vol;
+                  d2phi[1][i][j] = w*G*av2[i]*av2[j]/vol;
 
-                  if (i==j) for (k=0;k<2;k++)
-                             {
-                               d2phi[k][i][j]+=(1-w);
-                             }
+                  if (i==j)
+                    for (int k=0; k<2; k++)
+                      d2phi[k][i][j] += 1.-w;
                 }
             }
 
-          for (i=0;i<2;i++)
+          for (int i=0; i<2; i++)
             {
-              dfe[0][i]=(dphi[0][i]-fet*dchi*av1[i])/chi;
-              dfe[1][i]=(dphi[1][i]-fet*dchi*av2[i])/chi;
+              dfe[0][i] = (dphi[0][i] - fet*dchi*av1[i])/chi;
+              dfe[1][i] = (dphi[1][i] - fet*dchi*av2[i])/chi;
             }
 
-          for (i=0;i<2;i++)
+          for (int i=0; i<2; i++)
             {
-              for (j=0;j<2;j++)
+              for (int j=0; j<2; j++)
                 {
-                  P[0][i][j]=(d2phi[0][i][j]-dchi*(av1[i]*dfe[0][j]+dfe[0][i]*av1[j]))/chi;
-                  P[1][i][j]=(d2phi[1][i][j]-dchi*(av2[i]*dfe[1][j]+dfe[1][i]*av2[j]))/chi;
+                  P[0][i][j] = (d2phi[0][i][j] - dchi*(av1[i]*dfe[0][j] + dfe[0][i]*av1[j]))/chi;
+                  P[1][i][j] = (d2phi[1][i][j] - dchi*(av2[i]*dfe[1][j] + dfe[1][i]*av2[j]))/chi;
                 }
             }
         }
 
       if (n==3)
         {
-          for (i=0;i<3;i++)
+          for (int i=0; i<3; i++)
             {
-              dphi[0][i]=(1-w)*sqrt(tr)*a1[i]+w*G*det*av1[i]/vol;
-              dphi[1][i]=(1-w)*sqrt(tr)*a2[i]+w*G*det*av2[i]/vol;
-              dphi[2][i]=(1-w)*sqrt(tr)*a3[i]+w*G*det*av3[i]/vol;
+              dphi[0][i] = (1-w)*sqrt(tr)*a1[i] + w*G*det*av1[i]/vol;
+              dphi[1][i] = (1-w)*sqrt(tr)*a2[i] + w*G*det*av2[i]/vol;
+              dphi[2][i] = (1-w)*sqrt(tr)*a3[i] + w*G*det*av3[i]/vol;
             }
 
-          for (i=0;i<3;i++)
+          for (int i=0; i<3; i++)
             {
               if (tr!=0)
                 {
-                  d2phi[0][i][i]=(1-w)/(3.*sqrt(tr))*a1[i]*a1[i]+w*G*av1[i]*av1[i]/vol;
-                  d2phi[1][i][i]=(1-w)/(3.*sqrt(tr))*a2[i]*a2[i]+w*G*av2[i]*av2[i]/vol;
-                  d2phi[2][i][i]=(1-w)/(3.*sqrt(tr))*a3[i]*a3[i]+w*G*av3[i]*av3[i]/vol;
+                  d2phi[0][i][i] = (1-w)/(3.*sqrt(tr))*a1[i]*a1[i] + w*G*av1[i]*av1[i]/vol;
+                  d2phi[1][i][i] = (1-w)/(3.*sqrt(tr))*a2[i]*a2[i] + w*G*av2[i]*av2[i]/vol;
+                  d2phi[2][i][i] = (1-w)/(3.*sqrt(tr))*a3[i]*a3[i] + w*G*av3[i]*av3[i]/vol;
                 }
               else
                 {
-                  for (k=0;k<3;k++)
-                    d2phi[k][i][i]=0;
+                  for (int k=0; k<3; k++)
+                    d2phi[k][i][i] = 0.;
                 }
 
-              for (k=0;k<3;k++)
-                d2phi[k][i][i]+=(1-w)*sqrt(tr);
+              for (int k=0; k<3; k++)
+                d2phi[k][i][i] += (1-w)*sqrt(tr);
             }
 
-          for (i=0;i<3;i++)
+          const double con = 100.0;
+
+          for (int i=0; i<3; i++)
             {
-              dfe[0][i]=(dphi[0][i]-fet*dchi*av1[i]+con*epsilon*a1[i])/chi;
-              dfe[1][i]=(dphi[1][i]-fet*dchi*av2[i]+con*epsilon*a2[i])/chi;
-              dfe[2][i]=(dphi[2][i]-fet*dchi*av3[i]+con*epsilon*a3[i])/chi;
+              dfe[0][i] = (dphi[0][i] - fet*dchi*av1[i] + con*epsilon*a1[i])/chi;
+              dfe[1][i] = (dphi[1][i] - fet*dchi*av2[i] + con*epsilon*a2[i])/chi;
+              dfe[2][i] = (dphi[2][i] - fet*dchi*av3[i] + con*epsilon*a3[i])/chi;
             }
 
-          for (i=0;i<3;i++)
+          for (int i=0; i<3; i++)
             {
-              P[0][i][i]=(d2phi[0][i][i]-dchi*(av1[i]*dfe[0][i]+dfe[0][i]*av1[i])+con*epsilon)/chi;
-              P[1][i][i]=(d2phi[1][i][i]-dchi*(av2[i]*dfe[1][i]+dfe[1][i]*av2[i])+con*epsilon)/chi;
-              P[2][i][i]=(d2phi[2][i][i]-dchi*(av3[i]*dfe[2][i]+dfe[2][i]*av3[i])+con*epsilon)/chi;
+              P[0][i][i] = (d2phi[0][i][i] - dchi*(av1[i]*dfe[0][i] + dfe[0][i]*av1[i]) + con*epsilon)/chi;
+              P[1][i][i] = (d2phi[1][i][i] - dchi*(av2[i]*dfe[1][i] + dfe[1][i]*av2[i]) + con*epsilon)/chi;
+              P[2][i][i] = (d2phi[2][i][i] - dchi*(av3[i]*dfe[2][i] + dfe[2][i]*av3[i]) + con*epsilon)/chi;
             }
 
-          for (k=0;k<3;k++)
-            {
-              for (i=0;i<3;i++)
-                {
-                  for (j=0;j<3;j++)
-                    {
-                      if (i!=j)
-                        P[k][i][j]=0;
-                    }
-                }
-            }
+          for (int k=0; k<3; k++)
+            for (int i=0; i<3; i++)
+              for (int j=0; j<3; j++)
+                if (i != j)
+                  P[k][i][j] = 0.;
         }
 
       /*--------matrix W, right side F---------------------*/
-      for (i1=0;i1<n;i1++)
+      Array2D<double> gpr(3, nvert);
+
+      for (int i1=0; i1<n; i1++)
         {
-          for (i=0;i<n;i++)
-            {
-              for (j=0;j<nvert;j++)
-                {
-                  gpr[i][j]=0;
-                  for (k=0;k<n;k++) gpr[i][j]=gpr[i][j]+P[i1][i][k]*Q[k][j];
-                }
-            }
+          for (int i=0; i<n; i++)
+            for (int j=0; j<nvert; j++)
+              for (int k=0; k<n; k++)
+                gpr[i][j] += P[i1][i][k]*Q[k][j];
 
-          for (i=0;i<nvert;i++)
-            {
-              for (j=0;j<nvert;j++)
-                {
-                  for (k=0;k<n;k++)
-                    {
-                      W[i1][i][j]=W[i1][i][j]+Q[k][i]*gpr[k][j]*sigma;
-                    }
-                }
-            }
+          for (int i=0; i<nvert; i++)
+            for (int j=0; j<nvert; j++)
+              for (int k=0; k<n; k++)
+                W[i1][i][j] += Q[k][i]*gpr[k][j]*sigma;
 
-          for (i=0;i<nvert;i++)
-            {
-              for (k=0;k<2;k++)
-                F[i1][i]=F[i1][i]+Q[k][i]*dfe[i1][k]*sigma;
-            }
+          for (int i=0; i<nvert; i++)
+            for (int k=0; k<2; k++)
+              F[i1][i] += Q[k][i]*dfe[i1][k]*sigma;
         }
     }
 
