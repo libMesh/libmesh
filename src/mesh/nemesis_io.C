@@ -424,13 +424,12 @@ void Nemesis_IO::read (const std::string& base_filename)
     {
       const unsigned int local_node_idx  = nemhelper->node_mapi[i]-1;
 #ifndef NDEBUG
-      const unsigned int global_node_idx = nemhelper->node_num_map[local_node_idx]-1;
       const unsigned int owning_pid_idx  = node_ownership[local_node_idx];
 #endif
 
       // an internal node we do not own? huh??
       libmesh_assert_equal_to (owning_pid_idx, this->processor_id());
-      libmesh_assert_less (global_node_idx, to_uint(nemhelper->num_nodes_global));
+      libmesh_assert_less (my_next_node, to_uint(nemhelper->num_nodes_global));
 
       // "Catch" the node pointer after addition, make sure the
       // ID matches the requested value.
