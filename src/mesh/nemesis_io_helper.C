@@ -2305,15 +2305,12 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*us
 
   if (local_num_nodes)
     {
-      if(_single_precision)
+      if (_single_precision)
         {
-          std::vector<float> x_single(local_num_nodes), y_single(local_num_nodes), z_single(local_num_nodes);
-          for (unsigned int i=0; i<local_num_nodes; ++i)
-            {
-              x_single[i] = static_cast<float>(x[i]);
-              y_single[i] = static_cast<float>(y[i]);
-              z_single[i] = static_cast<float>(z[i]);
-            }
+          std::vector<float>
+            x_single(x.begin(), x.end()),
+            y_single(y.begin(), y.end()),
+            z_single(z.begin(), z.end());
 
           ex_err = exII::ex_put_coord(ex_id, &x_single[0], &y_single[0], &z_single[0]);
         }
