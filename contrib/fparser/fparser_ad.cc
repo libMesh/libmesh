@@ -511,6 +511,8 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
         Interval arg = GetArgument(orig);
         orig.insert(orig.end(), arg.first, arg.second);
       }
+      else if (op == cJump)
+        throw UnsupportedOpcodeException;
       else if (op == cFetch)
       {
         // get index and advance instruction counter
@@ -522,7 +524,7 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
       }
       else if (op == cSinCos)
       {
-        // this instructuon puts two values on the stack!
+        // this instruction puts two values on the stack!
         Interval arg = GetArgument(orig);
         DiffProgramFragment sub(arg.first, arg.second);
         orig.push_back(OpcodeDataPair(cSin, 0.0));
