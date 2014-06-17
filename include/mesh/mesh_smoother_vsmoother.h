@@ -160,11 +160,35 @@ private:
   /**
    * Smoother control variables
    */
-  const unsigned _dim,_miniter,_maxiter,_miniterBC;
+  const unsigned _dim;
+  const unsigned _miniter;
+  const unsigned _maxiter;
+  const unsigned _miniterBC;
   const metric_type _metric;
   const adapt_type _adaptive_func;
   const double _theta;
   const bool _generate_data;
+
+  /**
+   * The number of nodes in the Mesh at the time of smoothing.
+   * Not set until smooth() is actually called to mimic the
+   * original code's behavior.
+   */
+  unsigned _n_nodes;
+
+  /**
+   * The number of active elements in the Mesh at the time of smoothing.
+   * Not set until smooth() is actually called to mimic the
+   * original code's behavior.
+   */
+  unsigned _n_cells;
+
+  /**
+   * The number of hanging node edges in the Mesh at the time of smoothing.
+   * Not set until smooth() is actually called to mimic the
+   * original code's behavior.
+   */
+  unsigned _n_hanging_edges;
 
   /**
    * Area of Interest Mesh
@@ -219,68 +243,53 @@ private:
   };
 
 
-  int writegr(int n, int N, Array2D<double>& R, std::vector<int>& mask, int ncells, Array2D<int>& cells,
-              std::vector<int>& mcells, int nedges, std::vector<int>& edges, std::vector<int>& hnodes, const char grid[],
-              int me, const char grid_old[], FILE *sout);
+  int writegr(const Array2D<double>& R);
 
-  int readgr(int n,
-             Array2D<double>& R,
+  int readgr(Array2D<double>& R,
              std::vector<int>& mask,
              Array2D<int>& cells,
              std::vector<int>& mcells,
              std::vector<int>& edges,
-             std::vector<int>& hnodes,
-             FILE *sout);
+             std::vector<int>& hnodes);
 
-  int readmetr(char *name, Array3D<double>& H, int ncells, int n, FILE *sout);
+  int readmetr(char *name,
+               Array3D<double>& H);
 
-  int read_adp(std::vector<double>& afun, char *adap, FILE *sout);
+  int read_adp(std::vector<double>& afun);
 
   double jac3(double x1, double y1, double z1,
               double x2, double y2, double z2,
               double x3, double y3, double z3);
 
-  double jac2(double x1, double y1, double x2, double y2);
+  double jac2(double x1, double y1,
+              double x2, double y2);
 
-  int basisA(int n,
-             Array2D<double>& Q,
+  int basisA(Array2D<double>& Q,
              int nvert,
              const std::vector<double>& K,
              const Array2D<double>& H,
              int me);
 
-  void adp_renew(int n,
-                 int N,
-                 const Array2D<double>& R,
-                 int ncells,
+  void adp_renew(const Array2D<double>& R,
                  const Array2D<int>& cells,
                  std::vector<double>& afun,
-                 int adp,
-                 FILE *sout);
+                 int adp);
 
-  void full_smooth(int n,
-                   int N,
-                   Array2D<double>& R,
+  void full_smooth(Array2D<double>& R,
                    const std::vector<int>& mask,
-                   int ncells,
                    const Array2D<int>& cells,
                    const std::vector<int>& mcells,
-                   int nedges,
                    const std::vector<int>& edges,
                    const std::vector<int>& hnodes,
                    double w,
-                   int* iter,
+                   const std::vector<int>& iter,
                    int me,
                    const Array3D<double>& H,
                    int adp,
-                   char *adap,
                    int gr,
                    FILE *sout);
 
-  double maxE(int n,
-              int N,
-              Array2D<double>& R,
-              int ncells,
+  double maxE(Array2D<double>& R,
               const Array2D<int>& cells,
               const std::vector<int>& mcells,
               int me,
@@ -289,26 +298,18 @@ private:
               double epsilon,
               double w,
               std::vector<double>& Gamma,
-              double *qmin,
-              FILE *sout);
+              double& qmin);
 
-  double minq(int n,
-              int N,
-              const Array2D<double>& R,
-              int ncells,
+  double minq(const Array2D<double>& R,
               const Array2D<int>& cells,
               const std::vector<int>& mcells,
               int me,
               const Array3D<double>& H,
-              double *vol,
-              double *Vmin,
-              FILE *sout);
+              double& vol,
+              double& Vmin);
 
-  double minJ(int n,
-              int N,
-              Array2D<double>& R,
+  double minJ(Array2D<double>& R,
               const std::vector<int>& mask,
-              int ncells,
               const Array2D<int>& cells,
               const std::vector<int>& mcells,
               double epsilon,
@@ -316,21 +317,18 @@ private:
               int me,
               const Array3D<double>& H,
               double vol,
-              int nedges,
               const std::vector<int>& edges,
               const std::vector<int>& hnodes,
               int msglev,
-              double *Vmin,
-              double *emax,
-              double *qmin,
+              double& Vmin,
+              double& emax,
+              double& qmin,
               int adp,
               const std::vector<double>& afun,
               FILE *sout);
 
-  double minJ_BC(int N,
-                 Array2D<double>& R,
+  double minJ_BC(Array2D<double>& R,
                  const std::vector<int>& mask,
-                 int ncells,
                  const Array2D<int>& cells,
                  const std::vector<int>& mcells,
                  double epsilon,
@@ -339,16 +337,15 @@ private:
                  const Array3D<double>& H,
                  double vol,
                  int msglev,
-                 double *Vmin,
-                 double *emax,
-                 double *qmin,
+                 double& Vmin,
+                 double& emax,
+                 double& qmin,
                  int adp,
                  const std::vector<double>& afun,
                  int NCN,
                  FILE *sout);
 
-  double localP(int n,
-                Array3D<double>& W,
+  double localP(Array3D<double>& W,
                 Array2D<double>& F,
                 Array2D<double>& R,
                 const std::vector<int>& cell_in,
@@ -360,24 +357,20 @@ private:
                 int me,
                 double vol,
                 int f,
-                double *Vmin,
-                double *qmin,
+                double& Vmin,
+                double& qmin,
                 int adp,
                 const std::vector<double>& afun,
-                std::vector<double>& Gloc,
-                FILE *sout);
+                std::vector<double>& Gloc);
 
-  double avertex(int n,
-                 const std::vector<double>& afun,
+  double avertex(const std::vector<double>& afun,
                  std::vector<double>& G,
                  const Array2D<double>& R,
                  const std::vector<int>& cell_in,
                  int nvert,
-                 int adp,
-                 FILE *sout);
+                 int adp);
 
-  double vertex(int n,
-                Array3D<double>& W,
+  double vertex(Array3D<double>& W,
                 Array2D<double>& F,
                 const Array2D<double>& R,
                 const std::vector<int>& cell_in,
@@ -389,13 +382,15 @@ private:
                 int me,
                 double vol,
                 int f,
-                double *Vmin,
+                double& Vmin,
                 int adp,
                 const std::vector<double>& g,
-                double sigma,
-                FILE *sout);
+                double sigma);
 
-  void metr_data_gen(char grid[], char metr[], int n, int me, FILE *sout);
+  void metr_data_gen(char grid[],
+                     char metr[],
+                     int n,
+                     int me);
 
   int solver(int n,
              const std::vector<int>& ia,
@@ -432,7 +427,7 @@ private:
                     int msglev,
                     FILE *sout);
 
-  void gener(char grid[], int n, FILE *sout);
+  void gener(char grid[], int n);
 };
 
 } // namespace libMesh

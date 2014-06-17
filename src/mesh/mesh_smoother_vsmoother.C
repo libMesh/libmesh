@@ -58,6 +58,9 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
   _adaptive_func(none),
   _theta(theta),
   _generate_data(false),
+  _n_nodes(0),
+  _n_cells(0),
+  _n_hanging_edges(0),
   _area_of_interest(NULL)
 {}
 
@@ -82,6 +85,9 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
   _adaptive_func(cell),
   _theta(theta),
   _generate_data(false),
+  _n_nodes(0),
+  _n_cells(0),
+  _n_hanging_edges(0),
   _area_of_interest(NULL)
 {}
 
@@ -106,6 +112,9 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh& mesh,
   _adaptive_func(cell),
   _theta(theta),
   _generate_data(false),
+  _n_nodes(0),
+  _n_cells(0),
+  _n_hanging_edges(0),
   _area_of_interest(area_of_interest)
 {}
 
@@ -118,7 +127,6 @@ double VariationalMeshSmoother::smooth(unsigned int)
   FILE *sout = fopen("smoother.out","wr");
 
   int
-    n = _dim,
     me = _metric,
     gr = _generate_data ? 0 : 1,
     adp = _adaptive_func,
@@ -128,45 +136,36 @@ double VariationalMeshSmoother::smooth(unsigned int)
 
   double theta = _theta;
 
-  if ((gr==0)&&(me>1))
+  if (gr==0 && me>1)
     {
       for (int i=0; i<40; i++)
-        grid_old[i]=grid[i];
+        grid_old[i] = grid[i];
 
       // generate metric from initial mesh (me=2,3)
-      metr_data_gen(grid, metr, n, me, sout);
+      metr_data_gen(grid, metr, _dim, me);
     }
 
-  int
-    s = _dim,
-    N = _mesh.n_nodes(),
-    ncells = _mesh.n_active_elem();
+  // Initialize the _n_nodes member variable
+  this->_n_nodes = _mesh.n_nodes();
+  this->_n_cells = _mesh.n_active_elem();
 
   // I wish I could do this in readgr... but the way she allocs
   // memory we need to do this here... or pass a lot of things around
-  MeshTools::find_hanging_nodes_and_parents(_mesh,_hanging_nodes);
-
-  int nedges = _hanging_nodes.size();
-
-  if (s!=n)
-    {
-      fprintf(sout,"Error: dim in input file is inconsistent with dim in .cfg \n");
-      fclose(sout);
-      return _dist_norm;
-    }
+  MeshTools::find_hanging_nodes_and_parents(_mesh, _hanging_nodes);
+  this->_n_hanging_edges = _hanging_nodes.size();
 
   std::vector<int>
-    mask(N),
-    edges(2*nedges),
-    mcells(ncells),
-    hnodes(nedges);
+    mask(_n_nodes),
+    edges(2*_n_hanging_edges),
+    mcells(_n_cells),
+    hnodes(_n_hanging_edges);
 
-  Array2D<double> R(N,n);
-  Array2D<int> cells(ncells, 3*n + n%2);
-  Array3D<double> H(ncells, n, n);
+  Array2D<double> R(_n_nodes, _dim);
+  Array2D<int> cells(_n_cells, 3*_dim + _dim%2);
+  Array3D<double> H(_n_cells, _dim, _dim);
 
   // initial grid
-  int vms_err = readgr(n, R, mask, cells, mcells, edges, hnodes, sout);
+  int vms_err = readgr(R, mask, cells, mcells, edges, hnodes);
   if (vms_err<0)
     {
       fprintf(sout,"Error reading input mesh file\n");
@@ -175,7 +174,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
     }
 
   if (me>1)
-    vms_err=readmetr(metr, H, ncells, n, sout);
+    vms_err = readmetr(metr, H);
 
   if (vms_err<0)
     {
@@ -184,17 +183,15 @@ double VariationalMeshSmoother::smooth(unsigned int)
       return _dist_norm;
     }
 
-  int iter[4];
-  iter[0]=miniter;
-  iter[1]=maxiter;
-  iter[2]=miniterBC;
-
-  char adap[40];
+  std::vector<int> iter(4);
+  iter[0] = miniter;
+  iter[1] = maxiter;
+  iter[2] = miniterBC;
 
   // grid optimization
   fprintf(sout,"Starting Grid Optimization \n");
   clock_t ticks1=clock();
-  full_smooth(n, N, R, mask, ncells, cells, mcells, nedges, edges, hnodes, theta, iter, me, H, adp, adap, gr, sout);
+  full_smooth(R, mask, cells, mcells, edges, hnodes, theta, iter, me, H, adp, gr, sout);
   clock_t ticks2=clock();
   fprintf(sout,"full_smooth took (%d-%d)/%ld = %ld seconds \n",
           static_cast<int>(ticks2),
@@ -204,7 +201,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
 
   // save result
   fprintf(sout,"Saving Result \n");
-  writegr(n, N, R, mask, ncells, cells, mcells, nedges, edges, hnodes, "fin_grid.dat", 4-me+3*gr, grid_old, sout);
+  writegr(R);
 
   fclose(sout);
   libmesh_assert_greater (_dist_norm, 0);
@@ -215,20 +212,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
 
 
 // save grid
-int VariationalMeshSmoother::writegr(int /*n*/,
-                                     int /*N*/,
-                                     Array2D<double>& R,
-                                     std::vector<int>& /*mask*/,
-                                     int /*ncells*/,
-                                     Array2D<int>& /*cells*/,
-                                     std::vector<int>& /*mcells*/,
-                                     int /*nedges*/,
-                                     std::vector<int>& /*edges*/,
-                                     std::vector<int>& /*hnodes*/,
-                                     const char /*grid*/[],
-                                     int /*me*/,
-                                     const char /*grid_old*/[],
-                                     FILE* /*sout*/)
+int VariationalMeshSmoother::writegr(const Array2D<double>& R)
 {
   libMesh::out << "Starting writegr" << std::endl;
 
@@ -237,95 +221,37 @@ int VariationalMeshSmoother::writegr(int /*n*/,
     MeshBase::node_iterator       it  = _mesh.nodes_begin();
     const MeshBase::node_iterator end = _mesh.nodes_end();
 
-    libmesh_assert_equal_to (_dist_norm, 0.0);
-    _dist_norm=0;
-    for (int i=0; it != end; ++it)
+    libmesh_assert_equal_to(_dist_norm, 0.0);
+    _dist_norm = 0;
+    for (int i=0; it!=end; ++it)
       {
-        double total_dist=0.0;
+        double total_dist = 0.0;
 
         // For each node set its X Y [Z] coordinates
-        for (unsigned int j=0;j<_dim;j++)
+        for (unsigned int j=0; j<_dim; j++)
           {
-            double distance = R[i][j]-(*(*it))(j);
+            // Get a reference to the node
+            Node& node = *(*it);
+
+            double distance = R[i][j] - node(j);
 
             // Save the squares of the distance
-            total_dist+=Utility::pow<2>(distance);
+            total_dist += Utility::pow<2>(distance);
 
-            (*(*it))(j)=(*(*it))(j)+(distance*_percent_to_move);
+            node(j) += distance*_percent_to_move;
           }
 
         libmesh_assert_greater_equal (total_dist, 0.0);
 
         // Add the distance this node moved to the global distance
-        _dist_norm+=total_dist;
+        _dist_norm += total_dist;
 
         i++;
       }
 
-    //Relative "error"
-    _dist_norm=sqrt(_dist_norm/_mesh.n_nodes());
+    // Relative "error"
+    _dist_norm = sqrt(_dist_norm/_mesh.n_nodes());
   }
-
-  // int scanned;
-  // if (me>=3){
-  // fprintf(stream,"%d \n%d \n%d \n%d \n",n,N,ncells,nedges);
-  //
-  // for (i=0;i<N;i++){//node coordinates
-  // for (unsigned int j=0;j<n;j++) fprintf(stream,"%e ",R[i][j]);
-  // fprintf(stream,"%d \n",mask[i]);
-  // }
-  // for (i=0;i<ncells;i++){//cell connectivity
-  // int nvert=0;
-  // while (cells[i][nvert]>=0){
-  // fprintf(stream,"%d ",cells[i][nvert]);
-  // nvert++;
-  // }
-  // for (unsigned int j=nvert;j<3*n+n%2;j++) fprintf(stream,"-1 ");
-  // fprintf(stream,"%d \n",mcells[i]);
-  // }
-  // //hanging nodes on edges
-  // for (i=0;i<nedges;i++) fprintf(stream,"%d %d %d \n",edges[2*i],edges[2*i+1],hnodes[i]);
-  // } else {//restoring original grid connectivity when me>1
-  // int lo, Ncells;
-  // double d1;
-  // stream1=fopen(grid_old,"r");
-  // scanned = fscanf(stream1,"%d \n%d \n%d \n%d \n",&lo,&i,&Ncells,&nedges);
-  // libmesh_assert_not_equal_to (scanned, EOF);
-  // fprintf(stream,"%d \n%d \n%d \n%d \n",n,N,Ncells,nedges);
-  //
-  // for (i=0;i<N;i++){//node coordinates
-  // for (unsigned int j=0;j<n;j++) {fprintf(stream,"%e ",R[i][j]);
-  // scanned = fscanf(stream1,"%le ",&d1);
-  // libmesh_assert_not_equal_to (scanned, EOF);
-  // }
-  // fprintf(stream,"%d \n",mask[i]);
-  // scanned = fscanf(stream1,"%d \n",&lo);
-  // libmesh_assert_not_equal_to (scanned, EOF);
-  // }
-  // for (i=0;i<Ncells;i++){
-  // for (unsigned int j=0;j<=3*n+n%2;j++){
-  // scanned = fscanf(stream1,"%d ",&lo);
-  // libmesh_assert_not_equal_to (scanned, EOF);
-  // fprintf(stream,"%d ",lo);
-  // }
-  // scanned = fscanf(stream1,"\n");
-  // libmesh_assert_not_equal_to (scanned, EOF);
-  // fprintf(stream,"\n");
-  // }
-  // for (i=0;i<nedges;i++){
-  // for (unsigned int j=0;j<3;j++){
-  // scanned = fscanf(stream1,"%d ",&lo);
-  // libmesh_assert_not_equal_to (scanned, EOF);
-  // fprintf(stream,"%d ",lo);
-  // }
-  // scanned = fscanf(stream1,"\n");
-  // libmesh_assert_not_equal_to (scanned, EOF);
-  // fprintf(stream,"\n");
-  // }
-  // fclose(stream1);
-  // }
-  //
-  // fclose(stream);
 
   libMesh::out << "Finished writegr" << std::endl;
   return 0;
@@ -334,14 +260,12 @@ int VariationalMeshSmoother::writegr(int /*n*/,
 
 
 // reading grid from input file
-int VariationalMeshSmoother::readgr(int n,
-                                    Array2D<double>& R,
+int VariationalMeshSmoother::readgr(Array2D<double>& R,
                                     std::vector<int>& mask,
                                     Array2D<int>& cells,
                                     std::vector<int>& mcells,
                                     std::vector<int>& edges,
-                                    std::vector<int>& hnodes,
-                                    FILE * /*sout*/)
+                                    std::vector<int>& hnodes)
 {
   libMesh::out << "Sarting readgr" << std::endl;
   // add error messages where format can be inconsistent
@@ -361,9 +285,12 @@ int VariationalMeshSmoother::readgr(int n,
 
     for (int i=0; it != end; ++it)
       {
+        // Get a reference to the node
+        Node& node = *(*it);
+
         // For each node grab its X Y [Z] coordinates
-        for (unsigned int j=0;j<_dim;j++)
-          R[i][j]=(*(*it))(j);
+        for (unsigned int j=0; j<_dim; j++)
+          R[i][j] = node(j);
 
         // Set the Proper Mask
         // Internal nodes are 0
@@ -377,14 +304,14 @@ int VariationalMeshSmoother::readgr(int n,
                 // Find all the nodal neighbors... that is the nodes directly connected
                 // to this node through one edge
                 std::vector<const Node*> neighbors;
-                MeshTools::find_nodal_neighbors(_mesh, *(*it), nodes_to_elem_map, neighbors);
+                MeshTools::find_nodal_neighbors(_mesh, node, nodes_to_elem_map, neighbors);
 
                 std::vector<const Node*>::const_iterator ne = neighbors.begin();
                 std::vector<const Node*>::const_iterator ne_end = neighbors.end();
 
                 // Grab the x,y coordinates
-                Real x = (*(*it))(0);
-                Real y = (*(*it))(1);
+                Real x = node(0);
+                Real y = node(1);
 
                 // Theta will represent the atan2 angle (meaning with the proper quadrant in mind)
                 // of the neighbor node in a system where the current node is at the origin
@@ -403,7 +330,7 @@ int VariationalMeshSmoother::readgr(int n,
                   }
 
                 // Assume the node is immovable... then prove otherwise
-                mask[i]=1;
+                mask[i] = 1;
 
                 // Search through neighbor nodes looking for two that form a straight line with this node
                 for (unsigned int a=0; a<thetas.size()-1; a++)
@@ -423,17 +350,17 @@ int VariationalMeshSmoother::readgr(int n,
                            )
                           {
                             // if ((*(*it))(1) > 0.25 || (*(*it))(0) > .7 || (*(*it))(0) < .01)
-                            mask[i]=2;
+                            mask[i] = 2;
                           }
 
                       }
                   }
               }
             else // In 3D set all boundary nodes to be fixed
-              mask[i]=1;
+              mask[i] = 1;
           }
         else
-          mask[i]=0;  // Internal Node
+          mask[i] = 0;  // Internal Node
 
         // libMesh::out << "Node: " << i << "  Mask: " << mask[i] << std::endl;
         i++;
@@ -448,6 +375,8 @@ int VariationalMeshSmoother::readgr(int n,
 
     for (int i=0; it != end; ++it)
       {
+        const Elem* elem = *it;
+
         // Keep track of the number of nodes
         // there must be 6 for 2D
         // 10 for 3D
@@ -465,54 +394,60 @@ int VariationalMeshSmoother::readgr(int n,
 
         if (_dim == 2)
           {
-            switch((*it)->n_vertices())
+            switch (elem->n_vertices())
               {
                 // Grab nodes that do exist
               case 3:  // Tri
-                for (unsigned int k=0;k<(*it)->n_vertices();k++)
+                for (unsigned int k=0; k<elem->n_vertices(); k++)
                   cells[i][k]=(*it)->node(k);
                 num=(*it)->n_vertices();
                 break;
+
               case 4:  // Quad 4
-                cells[i][0]=(*it)->node(0);
-                cells[i][1]=(*it)->node(1);
-                cells[i][2]=(*it)->node(3); // Note that 2 and 3 are switched!
-                cells[i][3]=(*it)->node(2);
+                cells[i][0] = elem->node(0);
+                cells[i][1] = elem->node(1);
+                cells[i][2] = elem->node(3); // Note that 2 and 3 are switched!
+                cells[i][3] = elem->node(2);
                 num=4;
                 break;
+
               default:
-                libmesh_error_msg("Unknown number of vertices = " << (*it)->n_vertices());
+                libmesh_error_msg("Unknown number of vertices = " << elem->n_vertices());
               }
           }
         else
           {
             // Grab nodes that do exist
-            switch((*it)->n_vertices())
+            switch (elem->n_vertices())
               {
-              case 4:  //Tet 4
-                for (unsigned int k=0;k<(*it)->n_vertices();k++)
-                  cells[i][k]=(*it)->node(k);
-                num=(*it)->n_vertices();
+                // Tet 4
+              case 4:
+                for (unsigned int k=0; k<elem->n_vertices(); k++)
+                  cells[i][k] = elem->node(k);
+                num = elem->n_vertices();
                 break;
-              case 8:  //Hex 8f
-                cells[i][0]=(*it)->node(0);
-                cells[i][1]=(*it)->node(1);
-                cells[i][2]=(*it)->node(3); // Note that 2 and 3 are switched!
-                cells[i][3]=(*it)->node(2);
 
-                cells[i][4]=(*it)->node(4);
-                cells[i][5]=(*it)->node(5);
-                cells[i][6]=(*it)->node(7); // Note that 6 and 7 are switched!
-                cells[i][7]=(*it)->node(6);
+                // Hex 8
+              case 8:
+                cells[i][0] = elem->node(0);
+                cells[i][1] = elem->node(1);
+                cells[i][2] = elem->node(3); // Note that 2 and 3 are switched!
+                cells[i][3] = elem->node(2);
+
+                cells[i][4] = elem->node(4);
+                cells[i][5] = elem->node(5);
+                cells[i][6] = elem->node(7); // Note that 6 and 7 are switched!
+                cells[i][7] = elem->node(6);
                 num=8;
+
               default:
-                libmesh_assert(false);
+                libmesh_error_msg("Unknown 3D element with = " << elem->n_vertices() << " vertices.");
               }
           }
 
         // Fill in the rest with -1
-        for (int j=num;j<3*n+n%2;j++)
-          cells[i][j]=-1;
+        for (int j=num; j<static_cast<int>(cells[i].size()); j++)
+          cells[i][j] = -1;
 
         // Mask it with 0 to state that this is an active element
         // FIXME: Could be something other than zero
@@ -522,10 +457,11 @@ int VariationalMeshSmoother::readgr(int n,
       }
   }
 
-  //Grab hanging node connectivity
+  // Grab hanging node connectivity
   {
-    std::map<dof_id_type, std::vector<dof_id_type> >::iterator it = _hanging_nodes.begin();
-    std::map<dof_id_type, std::vector<dof_id_type> >::iterator end = _hanging_nodes.end();
+    std::map<dof_id_type, std::vector<dof_id_type> >::iterator
+      it = _hanging_nodes.begin(),
+      end = _hanging_nodes.end();
 
     for (int i=0; it!=end; it++)
       {
@@ -534,13 +470,13 @@ int VariationalMeshSmoother::readgr(int n,
         libMesh::out << "Hanging Node: " << it->first << std::endl << std::endl;
 
         // First Parent
-        edges[2*i]=(it->second)[1];
+        edges[2*i] = (it->second)[1];
 
         // Second Parent
-        edges[2*i+1]=(it->second)[0];
+        edges[2*i+1] = (it->second)[0];
 
         // Hanging Node
-        hnodes[i]=it->first;
+        hnodes[i] = it->first;
 
         i++;
       }
@@ -554,21 +490,18 @@ int VariationalMeshSmoother::readgr(int n,
 
 // Read Metrics
 int VariationalMeshSmoother::readmetr(char *name,
-                                      Array3D<double>& H,
-                                      int ncells,
-                                      int n,
-                                      FILE * /*sout*/)
+                                      Array3D<double>& H)
 {
   FILE *stream = fopen(name,"r");
-  for (int i=0; i<ncells; i++)
-    for (int j=0; j<n; j++)
+  for (unsigned i=0; i<_n_cells; i++)
+    for (unsigned j=0; j<_dim; j++)
       {
-        for (int k=0; k<n; k++)
+        for (unsigned k=0; k<_dim; k++)
           {
             double d;
             int scanned = fscanf(stream,"%le ", &d);
             libmesh_assert_not_equal_to (scanned, EOF);
-            H[i][j][k]=d;
+            H[i][j][k] = d;
           }
         int scanned = fscanf(stream,"\n");
         libmesh_assert_not_equal_to (scanned, EOF);
@@ -643,9 +576,7 @@ void VariationalMeshSmoother::adjust_adapt_data()
 
 
 // Read Adaptivity
-int VariationalMeshSmoother::read_adp(std::vector<double>& afun,
-                                      char /*adap*/[],
-                                      FILE * /*sout*/)
+int VariationalMeshSmoother::read_adp(std::vector<double>& afun)
 {
   std::vector<float>& adapt_data = *_adapt_data;
 
@@ -693,28 +624,27 @@ double VariationalMeshSmoother::jac2(double x1,
 
 
 // BasisA determines matrix H^(-T)Q on one Jacobian matrix
-int VariationalMeshSmoother::basisA(int n,
-                                    Array2D<double>& Q,
+int VariationalMeshSmoother::basisA(Array2D<double>& Q,
                                     int nvert,
                                     const std::vector<double>& K,
                                     const Array2D<double>& H,
                                     int me)
 {
-  Array2D<double> U(n, nvert);
+  Array2D<double> U(_dim, nvert);
 
-  if (n==2)
+  if (_dim==2)
     {
     if (nvert==4)
       {
         // quad
-        U[0][0]=(-(1-K[1]));
-        U[0][1]=( (1-K[1]));
-        U[0][2]=(-    K[1]);
-        U[0][3]=(     K[1]);
-        U[1][0]=(-(1-K[0]));
-        U[1][1]=(-    K[0]);
-        U[1][2]=( (1-K[0]));
-        U[1][3]=(     K[0]);
+        U[0][0] = (-(1-K[1]));
+        U[0][1] = ( (1-K[1]));
+        U[0][2] = (-    K[1]);
+        U[0][3] = (     K[1]);
+        U[1][0] = (-(1-K[0]));
+        U[1][1] = (-    K[0]);
+        U[1][2] = ( (1-K[0]));
+        U[1][3] = (     K[0]);
       }
     else if (nvert==3)
       {
@@ -732,61 +662,61 @@ int VariationalMeshSmoother::basisA(int n,
     else if (nvert==6)
       {
         // curved triangle
-        U[0][0]=-3*(1-K[0]-K[1]*0.5)+(K[0]-0.5*K[1])+K[1];
-        U[0][1]=-(1-K[0]-K[1]*0.5)+(K[0]-0.5*K[1])*3-K[1];
-        U[0][2]=0;
-        U[0][3]=K[1]*4;
-        U[0][4]=-4*K[1];
-        U[0][5]=4*(1-K[0]-K[1]*0.5)-4*(K[0]-0.5*K[1]);
-        U[1][0]=(1-K[2]-K[3]*0.5)*(-1.5)+(K[2]-0.5*K[3])*(0.5)+K[3]*(0.5);
-        U[1][1]=(1-K[2]-K[3]*0.5)*(0.5)+(K[2]-0.5*K[3])*(-1.5)+K[3]*(0.5);
-        U[1][2]=(1-K[2]-K[3]*0.5)*(-1)+(K[2]-0.5*K[3])*(-1)+K[3]*(3);
-        U[1][3]=(K[2]-0.5*K[3])*(4.0)+K[3]*(-2.0);
-        U[1][4]=(1-K[2]-K[3]*0.5)*(4.0)+K[3]*(-2.0);
-        U[1][5]=(1-K[2]-K[3]*0.5)*(-2.0)+(K[2]-0.5*K[3])*(-2.0);
+        U[0][0] = -3*(1-K[0]-K[1]*0.5)+(K[0]-0.5*K[1])+K[1];
+        U[0][1] = -(1-K[0]-K[1]*0.5)+(K[0]-0.5*K[1])*3-K[1];
+        U[0][2] = 0;
+        U[0][3] = K[1]*4;
+        U[0][4] = -4*K[1];
+        U[0][5] = 4*(1-K[0]-K[1]*0.5)-4*(K[0]-0.5*K[1]);
+        U[1][0] = (1-K[2]-K[3]*0.5)*(-1.5)+(K[2]-0.5*K[3])*(0.5)+K[3]*(0.5);
+        U[1][1] = (1-K[2]-K[3]*0.5)*(0.5)+(K[2]-0.5*K[3])*(-1.5)+K[3]*(0.5);
+        U[1][2] = (1-K[2]-K[3]*0.5)*(-1)+(K[2]-0.5*K[3])*(-1)+K[3]*(3);
+        U[1][3] = (K[2]-0.5*K[3])*(4.0)+K[3]*(-2.0);
+        U[1][4] = (1-K[2]-K[3]*0.5)*(4.0)+K[3]*(-2.0);
+        U[1][5] = (1-K[2]-K[3]*0.5)*(-2.0)+(K[2]-0.5*K[3])*(-2.0);
       }
     else
       libmesh_error_msg("Invalid nvert = " << nvert);
     }
 
-  if (n==3)
+  if (_dim==3)
     {
       if (nvert==8)
         {
           // hex
-          U[0][0]=(-(1-K[0])*(1-K[1]));
-          U[0][1]=( (1-K[0])*(1-K[1]));
-          U[0][2]=(-    K[0]*(1-K[1]));
-          U[0][3]=(     K[0]*(1-K[1]));
-          U[0][4]=(-(1-K[0])*    K[1]);
-          U[0][5]=( (1-K[0])*    K[1]);
-          U[0][6]=(-    K[0]*    K[1]);
-          U[0][7]=(     K[0]*    K[1]);
-          U[1][0]=(-(1-K[2])*(1-K[3]));
-          U[1][1]=(-    K[2]*(1-K[3]));
-          U[1][2]=( (1-K[2])*(1-K[3]));
-          U[1][3]=(     K[2]*(1-K[3]));
-          U[1][4]=(-(1-K[2])*    K[3]);
-          U[1][5]=(-    K[2]*    K[3]);
-          U[1][6]=( (1-K[2])*    K[3]);
-          U[1][7]=(     K[2]*    K[3]);
-          U[2][0]=(-(1-K[4])*(1-K[5]));
-          U[2][1]=(-    K[4]*(1-K[5]));
-          U[2][2]=(-(1-K[4])*    K[5]);
-          U[2][3]=(-    K[4]*    K[5]);
-          U[2][4]=( (1-K[4])*(1-K[5]));
-          U[2][5]=(     K[4]*(1-K[5]));
-          U[2][6]=( (1-K[4])*    K[5]);
-          U[2][7]=(     K[4]*    K[5]);
+          U[0][0] = (-(1-K[0])*(1-K[1]));
+          U[0][1] = ( (1-K[0])*(1-K[1]));
+          U[0][2] = (-    K[0]*(1-K[1]));
+          U[0][3] = (     K[0]*(1-K[1]));
+          U[0][4] = (-(1-K[0])*    K[1]);
+          U[0][5] = ( (1-K[0])*    K[1]);
+          U[0][6] = (-    K[0]*    K[1]);
+          U[0][7] = (     K[0]*    K[1]);
+          U[1][0] = (-(1-K[2])*(1-K[3]));
+          U[1][1] = (-    K[2]*(1-K[3]));
+          U[1][2] = ( (1-K[2])*(1-K[3]));
+          U[1][3] = (     K[2]*(1-K[3]));
+          U[1][4] = (-(1-K[2])*    K[3]);
+          U[1][5] = (-    K[2]*    K[3]);
+          U[1][6] = ( (1-K[2])*    K[3]);
+          U[1][7] = (     K[2]*    K[3]);
+          U[2][0] = (-(1-K[4])*(1-K[5]));
+          U[2][1] = (-    K[4]*(1-K[5]));
+          U[2][2] = (-(1-K[4])*    K[5]);
+          U[2][3] = (-    K[4]*    K[5]);
+          U[2][4] = ( (1-K[4])*(1-K[5]));
+          U[2][5] = (     K[4]*(1-K[5]));
+          U[2][6] = ( (1-K[4])*    K[5]);
+          U[2][7] = (     K[4]*    K[5]);
         }
       else if (nvert==4)
         {
           // linear tetr
           // for regular reference tetrahedron
-          U[0][0]=-1; U[1][0]=-1.0/sqrt(3.0); U[2][0]=-1.0/sqrt(6.0);
-          U[0][1]=1;  U[1][1]=-1.0/sqrt(3.0); U[2][1]=-1.0/sqrt(6.0);
-          U[0][2]=0;  U[1][2]=2.0/sqrt(3.0);  U[2][2]=-1.0/sqrt(6.0);
-          U[0][3]=0;  U[1][3]=0;              U[2][3]=3.0/sqrt(6.0);
+          U[0][0] = -1; U[1][0] = -1.0/sqrt(3.0); U[2][0] = -1.0/sqrt(6.0);
+          U[0][1] = 1;  U[1][1] = -1.0/sqrt(3.0); U[2][1] = -1.0/sqrt(6.0);
+          U[0][2] = 0;  U[1][2] = 2.0/sqrt(3.0);  U[2][2] = -1.0/sqrt(6.0);
+          U[0][3] = 0;  U[1][3] = 0;              U[2][3] = 3.0/sqrt(6.0);
 
           // for right corner reference tetrahedron
           // U[0][0]=-1; U[1][0]=-1; U[2][0]=-1;
@@ -798,38 +728,48 @@ int VariationalMeshSmoother::basisA(int n,
         {
           // prism
           // for regular triangle in the prism base
-          U[0][0]=-1+K[0]; U[1][0]=(-1+K[1])/2.0; U[2][0]=-1+K[2]+K[3]/2.0;
-          U[0][1]=1-K[0]; U[1][1]=(-1+K[1])/2.0; U[2][1]=-K[2]+K[3]/2.0;
-          U[0][2]=0; U[1][2]=(1-K[1]); U[2][2]=-K[3];
-          U[0][3]=-K[0]; U[1][3]=(-K[1])/2.0; U[2][3]=1-K[2]-K[3]/2.0;
-          U[0][4]=K[0]; U[1][4]=(-K[1])/2.0; U[2][4]=K[2]-K[3]/2.0;
-          U[0][5]=0; U[1][5]=K[1]; U[2][5]=K[3];
+          U[0][0] = -1+K[0]; U[1][0] = (-1+K[1])/2.0; U[2][0] = -1+K[2]+K[3]/2.0;
+          U[0][1] = 1-K[0];  U[1][1] = (-1+K[1])/2.0; U[2][1] = -K[2]+K[3]/2.0;
+          U[0][2] = 0;       U[1][2] = (1-K[1]);      U[2][2] = -K[3];
+          U[0][3] = -K[0];   U[1][3] = (-K[1])/2.0;   U[2][3] = 1-K[2]-K[3]/2.0;
+          U[0][4] = K[0];    U[1][4] = (-K[1])/2.0;   U[2][4] = K[2]-K[3]/2.0;
+          U[0][5] = 0;       U[1][5] = K[1];          U[2][5] = K[3];
         }
       else if (nvert==10)
         {
           // quad tetr
-          U[0][0]=(1-K[0]-K[1]/2-K[2]/3)*(-3)+(K[0]-K[1]/2-K[2]/3)+(K[1]-K[2]/3)+K[2];
-          U[0][1]=(1-K[0]-K[1]/2-K[2]/3)*(-1)+(K[0]-K[1]/2-K[2]/3)*3-(K[1]-K[2]/3)-K[2];
-          U[0][2]=0; U[0][3]=0;
-          U[0][4]=4*(K[1]-K[2]/3); U[0][5]=-4*(K[1]-K[2]/3);
-          U[0][6]=4*(1-K[0]-K[1]/2-K[2]/3)-4*(K[0]-K[1]/2-K[2]/3);
-          U[0][7]=4*K[2]; U[0][8]=0; U[0][9]=-4*K[2];
-          U[1][0]=(1-K[3]-K[4]/2-K[5]/3)*(-3/2)+(K[3]-K[4]/2-K[5]/3)/2+(K[4]-K[5]/3)/2+K[5]/2;
-          U[1][1]=(1-K[3]-K[4]/2-K[5]/3)/2+(K[3]-K[4]/2-K[5]/3)*(-3/2)+(K[4]-K[5]/3)/2+K[5]/2;
-          U[1][2]=-(1-K[3]-K[4]/2-K[5]/3)-(K[3]-K[4]/2-K[5]/3)+3*(K[4]-K[5]/3)-K[5];
-          U[1][3]=0; U[1][4]=4*(K[3]-K[4]/2-K[5]/3)-2*(K[4]-K[5]/3);
-          U[1][5]=4*(1-K[3]-K[4]/2-K[5]/3)-2*(K[4]-K[5]/3);
-          U[1][6]=-2*(1-K[3]-K[4]/2-K[5]/3)-2*(K[3]-K[4]/2-K[5]/3);
-          U[1][7]=-2*K[5]; U[1][8]=4*K[5]; U[1][9]=-2*K[5];
-          U[2][0]=-(1-K[6]-K[7]/2-K[8]/3)+(K[6]-K[7]/2-K[8]/3)/3+(K[7]-K[8]/3)/3+K[8]/3;
-          U[2][1]=(1-K[6]-K[7]/2-K[8]/3)/3-(K[6]-K[7]/2-K[8]/3)+(K[7]-K[8]/3)/3+K[8]/3;
-          U[2][2]=(1-K[6]-K[7]/2-K[8]/3)/3+(K[6]-K[7]/2-K[8]/3)/3-(K[7]-K[8]/3)+K[8]/3;
-          U[2][3]=-(1-K[6]-K[7]/2-K[8]/3)-(K[6]-K[7]/2-K[8]/3)-(K[7]-K[8]/3)+3*K[8];
-          U[2][4]=-4*(K[6]-K[7]/2-K[8]/3)/3-4*(K[7]-K[8]/3)/3;
-          U[2][5]=-4*(1-K[6]-K[7]/2-K[8]/3)/3-4*(K[7]-K[8]/3)/3;
-          U[2][6]=-4*(1-K[6]-K[7]/2-K[8]/3)/3-4*(K[6]-K[7]/2-K[8]/3)/3;
-          U[2][7]=4*(K[6]-K[7]/2-K[8]/3)-4*K[8]/3;
-          U[2][8]=4*(K[7]-K[8]/3)-4*K[8]/3; U[2][9]=4*(1-K[6]-K[7]/2-K[8]/3)-4*K[8]/3;
+          U[0][0] = (1-K[0]-K[1]/2-K[2]/3)*(-3)+(K[0]-K[1]/2-K[2]/3)+(K[1]-K[2]/3)+K[2];
+          U[0][1] = (1-K[0]-K[1]/2-K[2]/3)*(-1)+(K[0]-K[1]/2-K[2]/3)*3-(K[1]-K[2]/3)-K[2];
+          U[0][2] = 0;
+          U[0][3] = 0;
+          U[0][4] = 4*(K[1]-K[2]/3);
+          U[0][5] = -4*(K[1]-K[2]/3);
+          U[0][6] = 4*(1-K[0]-K[1]/2-K[2]/3)-4*(K[0]-K[1]/2-K[2]/3);
+          U[0][7] = 4*K[2];
+          U[0][8] = 0;
+          U[0][9] = -4*K[2];
+
+          U[1][0] = (1-K[3]-K[4]/2-K[5]/3)*(-3/2)+(K[3]-K[4]/2-K[5]/3)/2+(K[4]-K[5]/3)/2+K[5]/2;
+          U[1][1] = (1-K[3]-K[4]/2-K[5]/3)/2+(K[3]-K[4]/2-K[5]/3)*(-3/2)+(K[4]-K[5]/3)/2+K[5]/2;
+          U[1][2] = -(1-K[3]-K[4]/2-K[5]/3)-(K[3]-K[4]/2-K[5]/3)+3*(K[4]-K[5]/3)-K[5];
+          U[1][3] = 0;
+          U[1][4] = 4*(K[3]-K[4]/2-K[5]/3)-2*(K[4]-K[5]/3);
+          U[1][5] = 4*(1-K[3]-K[4]/2-K[5]/3)-2*(K[4]-K[5]/3);
+          U[1][6] = -2*(1-K[3]-K[4]/2-K[5]/3)-2*(K[3]-K[4]/2-K[5]/3);
+          U[1][7] = -2*K[5];
+          U[1][8] = 4*K[5];
+          U[1][9] = -2*K[5];
+
+          U[2][0] = -(1-K[6]-K[7]/2-K[8]/3)+(K[6]-K[7]/2-K[8]/3)/3+(K[7]-K[8]/3)/3+K[8]/3;
+          U[2][1] = (1-K[6]-K[7]/2-K[8]/3)/3-(K[6]-K[7]/2-K[8]/3)+(K[7]-K[8]/3)/3+K[8]/3;
+          U[2][2] = (1-K[6]-K[7]/2-K[8]/3)/3+(K[6]-K[7]/2-K[8]/3)/3-(K[7]-K[8]/3)+K[8]/3;
+          U[2][3] = -(1-K[6]-K[7]/2-K[8]/3)-(K[6]-K[7]/2-K[8]/3)-(K[7]-K[8]/3)+3*K[8];
+          U[2][4] = -4*(K[6]-K[7]/2-K[8]/3)/3-4*(K[7]-K[8]/3)/3;
+          U[2][5] = -4*(1-K[6]-K[7]/2-K[8]/3)/3-4*(K[7]-K[8]/3)/3;
+          U[2][6] = -4*(1-K[6]-K[7]/2-K[8]/3)/3-4*(K[6]-K[7]/2-K[8]/3)/3;
+          U[2][7] = 4*(K[6]-K[7]/2-K[8]/3)-4*K[8]/3;
+          U[2][8] = 4*(K[7]-K[8]/3)-4*K[8]/3;
+          U[2][9] = 4*(1-K[6]-K[7]/2-K[8]/3)-4*K[8]/3;
         }
       else
         libmesh_error_msg("Invalid nvert = " << nvert);
@@ -837,22 +777,20 @@ int VariationalMeshSmoother::basisA(int n,
 
   if (me==1)
     {
-      for (int i=0; i<n; i++)
+      for (unsigned i=0; i<_dim; i++)
         for (int j=0; j<nvert; j++)
-          Q[i][j]=U[i][j];
+          Q[i][j] = U[i][j];
 
     }
   else
     {
-    for (int i=0; i<n; i++)
-      {
-      for (int j=0; j<nvert; j++)
-        {
-          Q[i][j]=0;
-          for (int k=0; k<n; k++)
-            Q[i][j]+=H[k][i]*U[k][j];
-        }
-      }
+      for (unsigned i=0; i<_dim; i++)
+        for (int j=0; j<nvert; j++)
+          {
+            Q[i][j] = 0;
+            for (unsigned k=0; k<_dim; k++)
+              Q[i][j] += H[k][i]*U[k][j];
+          }
     }
 
   return 0;
@@ -861,19 +799,15 @@ int VariationalMeshSmoother::basisA(int n,
 
 
 // Specify adaptive function
-void VariationalMeshSmoother::adp_renew(int n,
-                                        int N,
-                                        const Array2D<double>& R,
-                                        int ncells,
+void VariationalMeshSmoother::adp_renew(const Array2D<double>& R,
                                         const Array2D<int>& cells,
                                         std::vector<double>& afun,
-                                        int adp,
-                                        FILE * /*sout*/)
+                                        int adp)
 {
   // evaluates given adaptive function on the provided mesh
   if (adp<0)
     {
-      for (int i=0; i<ncells; i++)
+      for (unsigned i=0; i<_n_cells; i++)
         {
           double
             x = 0.,
@@ -884,7 +818,7 @@ void VariationalMeshSmoother::adp_renew(int n,
             {
               x += R[cells[i][nvert]][0];
               y += R[cells[i][nvert]][1];
-              if (n==3)
+              if (_dim==3)
                 z += R[cells[i][nvert]][2];
               nvert++;
             }
@@ -896,10 +830,10 @@ void VariationalMeshSmoother::adp_renew(int n,
 
   else if (adp>0)
     {
-      for (int i=0; i<N; i++)
+      for (unsigned i=0; i<_n_nodes; i++)
         {
           double z = 0;
-          for (int j=0; j<n; j++)
+          for (unsigned j=0; j<_dim; j++)
             z += R[i][j];
 
           // adaptive function, node based
@@ -911,22 +845,17 @@ void VariationalMeshSmoother::adp_renew(int n,
 
 
 // Preprocess mesh data and control smoothing/untangling iterations
-void VariationalMeshSmoother::full_smooth(int n,
-                                          int N,
-                                          Array2D<double>& R,
+void VariationalMeshSmoother::full_smooth(Array2D<double>& R,
                                           const std::vector<int>& mask,
-                                          int ncells,
                                           const Array2D<int>& cells,
                                           const std::vector<int>& mcells,
-                                          int nedges,
                                           const std::vector<int>& edges,
                                           const std::vector<int>& hnodes,
                                           double w,
-                                          int* iter,
+                                          const std::vector<int>& iter,
                                           int me,
                                           const Array3D<double>& H,
                                           int adp,
-                                          char adap[],
                                           int gr,
                                           FILE *sout)
 {
@@ -935,25 +864,25 @@ void VariationalMeshSmoother::full_smooth(int n,
 
   int afun_size = 0;
 
+  // Adaptive function is on cells
   if (adp < 0)
-    // Adaptive function is on cells
-    afun_size = ncells;
+    afun_size = _n_cells;
 
+  // Adaptive function is on nodes
   else if (adp > 0)
-    // Adaptive function is on nodes
-    afun_size = N;
+    afun_size = _n_nodes;
 
   std::vector<double> afun(afun_size);
-  std::vector<int> maskf(N);
-  std::vector<double> Gamma(ncells);
+  std::vector<int> maskf(_n_nodes);
+  std::vector<double> Gamma(_n_cells);
 
-  if (msglev>=1)
-    fprintf(sout,"N=%d ncells=%d nedges=%d \n",N,ncells,nedges);
+  if (msglev >= 1)
+    fprintf(sout, "N=%d ncells=%d nedges=%d \n", _n_nodes, _n_cells, _n_hanging_edges);
 
 
   // Boundary node counting
   int NBN=0;
-  for (int i=0; i<N; i++)
+  for (unsigned i=0; i<_n_nodes; i++)
     if (mask[i]==2 || mask[i]==1)
       NBN++;
 
@@ -963,7 +892,7 @@ void VariationalMeshSmoother::full_smooth(int n,
         fprintf(sout,"# of Boundary Nodes=%d  \n",NBN);
 
       NBN=0;
-      for (int i=0; i<N; i++)
+      for (unsigned i=0; i<_n_nodes; i++)
         if (mask[i]==2)
           NBN++;
 
@@ -971,7 +900,7 @@ void VariationalMeshSmoother::full_smooth(int n,
         fprintf(sout,"# of moving Boundary Nodes=%d  \n",NBN);
     }
 
-  for (int i=0; i<N; i++)
+  for (unsigned i=0; i<_n_nodes; i++)
     {
       if ((mask[i]==1) || (mask[i]==2))
         maskf[i]=1;
@@ -981,7 +910,7 @@ void VariationalMeshSmoother::full_smooth(int n,
 
   // determination of min jacobian
   double vol, Vmin;
-  double qmin = minq(n, N, R, ncells, cells, mcells, me, H, &vol, &Vmin, sout);
+  double qmin = minq(R, cells, mcells, me, H, vol, Vmin);
 
   if (me > 1)
     vol = 1.0;
@@ -992,7 +921,7 @@ void VariationalMeshSmoother::full_smooth(int n,
   // compute max distortion measure over all cells
   double epsilon = 1.e-9;
   double eps = qmin < 0 ? sqrt(epsilon*epsilon+0.004*qmin*qmin*vol*vol) : epsilon;
-  double emax = maxE(n, N, R, ncells, cells, mcells, me, H, vol, eps, w, Gamma, &qmin, sout);
+  double emax = maxE(R, cells, mcells, me, H, vol, eps, w, Gamma, qmin);
 
   if (msglev >= 1)
     fprintf(sout," emax=%e \n",emax);
@@ -1004,7 +933,7 @@ void VariationalMeshSmoother::full_smooth(int n,
 
   // read adaptive function from file
   if (adp*gr!=0)
-    read_adp(afun, adap, sout);
+    read_adp(afun);
 
   {
     int
@@ -1032,10 +961,10 @@ void VariationalMeshSmoother::full_smooth(int n,
 
         // update adaptation function before each iteration
         if ((ladp!=0) && (gr==0))
-          adp_renew(n, N, R, ncells, cells, afun, adp, sout);
+          adp_renew(R, cells, afun, adp);
 
-        double Jk = minJ(n, N, R, maskf, ncells, cells, mcells, eps, w, me, H, vol, nedges, edges, hnodes,
-                         msglev, &Vmin, &emax, &qmin, ladp, afun, sout);
+        double Jk = minJ(R, maskf, cells, mcells, eps, w, me, H, vol, edges, hnodes,
+                         msglev, Vmin, emax, qmin, ladp, afun, sout);
 
         if (qmin>0)
           counter++;
@@ -1057,9 +986,9 @@ void VariationalMeshSmoother::full_smooth(int n,
       {
         // update adaptation function before each iteration
         if ((adp!=0) && (gr==0))
-          adp_renew(n, N, R, ncells, cells, afun, adp, sout);
+          adp_renew(R, cells, afun, adp);
 
-        double Jk = minJ_BC(N, R, mask, ncells, cells, mcells, eps, w, me, H, vol, msglev, &Vmin, &emax, &qmin, adp, afun, NBN, sout);
+        double Jk = minJ_BC(R, mask, cells, mcells, eps, w, me, H, vol, msglev, Vmin, emax, qmin, adp, afun, NBN, sout);
 
         if (msglev>=1)
           fprintf(sout, "NBC niter=%d, qmin*G/vol=%e, Vmin=%e, emax=%e  \n",counter,qmin,Vmin,emax);
@@ -1078,9 +1007,9 @@ void VariationalMeshSmoother::full_smooth(int n,
 
             // update adaptation function before each iteration
             if ((adp!=0) && (gr==0))
-              adp_renew(n, N, R, ncells, cells, afun, adp, sout);
+              adp_renew(R, cells, afun, adp);
 
-            Jk = minJ(n, N, R, maskf, ncells, cells, mcells, eps, w, me, H, vol, nedges, edges, hnodes,msglev, &Vmin, &emax, &qmin, adp, afun, sout);
+            Jk = minJ(R, maskf, cells, mcells, eps, w, me, H, vol, edges, hnodes, msglev, Vmin, emax, qmin, adp, afun, sout);
 
             if (msglev>=1)
               {
@@ -1097,10 +1026,7 @@ void VariationalMeshSmoother::full_smooth(int n,
 
 
 // Determines the values of maxE_theta
-double VariationalMeshSmoother::maxE(int n,
-                                     int /*N*/,
-                                     Array2D<double>& R,
-                                     int ncells,
+double VariationalMeshSmoother::maxE(Array2D<double>& R,
                                      const Array2D<int>& cells,
                                      const std::vector<int>& mcells,
                                      int me,
@@ -1109,28 +1035,27 @@ double VariationalMeshSmoother::maxE(int n,
                                      double epsilon,
                                      double w,
                                      std::vector<double>& Gamma,
-                                     double *qmin,
-                                     FILE * /*sout*/)
+                                     double& qmin)
 {
-  Array2D<double> Q(3, 3*n+n%2);
+  Array2D<double> Q(3, 3*_dim + _dim%2);
   std::vector<double> K(9);
 
   double
     gemax = -1.e32,
     vmin = 1.e32;
 
-  for (int ii=0; ii<ncells; ii++)
+  for (unsigned ii=0; ii<_n_cells; ii++)
     if (mcells[ii]>=0)
       {
         // Final value of E will be saved in Gamma at the end of this loop
         double E = 0.0;
 
-        if (n==2)
+        if (_dim==2)
           {
             if (cells[ii][3]==-1)
               {
                 // tri
-                basisA(2, Q, 3, K, H[ii], me);
+                basisA(Q, 3, K, H[ii], me);
 
                 std::vector<double> a1(3), a2(3);
                 for (int k=0; k<2; k++)
@@ -1160,7 +1085,7 @@ double VariationalMeshSmoother::maxE(int n,
                     for (int j=0; j<2; j++)
                       {
                         K[1]=j;
-                        basisA(2,Q,4,K,H[ii],me);
+                        basisA(Q, 4, K, H[ii], me);
 
                         std::vector<double> a1(3), a2(3);
                         for (int k=0; k<2; k++)
@@ -1198,7 +1123,7 @@ double VariationalMeshSmoother::maxE(int n,
                         k=j/2;
                         K[3]=static_cast<double>(k);
 
-                        basisA(2,Q,6,K,H[ii],me);
+                        basisA(Q, 6, K, H[ii], me);
 
                         std::vector<double> a1(3), a2(3);
                         for (int k=0; k<2; k++)
@@ -1227,12 +1152,12 @@ double VariationalMeshSmoother::maxE(int n,
               }
           }
 
-        if (n==3)
+        if (_dim==3)
           {
             if (cells[ii][4]==-1)
               {
                 // tetr
-                basisA(3,Q,4,K,H[ii],me);
+                basisA(Q, 4, K, H[ii], me);
 
                 std::vector<double> a1(3), a2(3), a3(3);
                 for (int k=0; k<3; k++)
@@ -1272,7 +1197,7 @@ double VariationalMeshSmoother::maxE(int n,
                           {
                             K[2]=static_cast<double>(k)/2.0;
                             K[3]=static_cast<double>(k%2);
-                            basisA(3,Q,6,K,H[ii],me);
+                            basisA(Q, 6, K, H[ii], me);
 
                             std::vector<double> a1(3), a2(3), a3(3);
                             for (int kk=0; kk<3; kk++)
@@ -1322,7 +1247,7 @@ double VariationalMeshSmoother::maxE(int n,
                                     for (int nn=0; nn<2; nn++)
                                       {
                                         K[5]=nn;
-                                        basisA(3,Q,8,K,H[ii],me);
+                                        basisA(Q, 8, K, H[ii], me);
 
                                         std::vector<double> a1(3), a2(3), a3(3);
                                         for (int kk=0; kk<3; kk++)
@@ -1410,7 +1335,7 @@ double VariationalMeshSmoother::maxE(int n,
                                 K[6]=1.0/2;  K[7]=1.0/3;  K[8]=1;  break;
                               }
 
-                            basisA(3,Q,10,K,H[ii],me);
+                            basisA(Q, 10, K, H[ii], me);
 
                             std::vector<double> a1(3), a2(3), a3(3);
                             for (int kk=0; kk<3; kk++)
@@ -1452,7 +1377,7 @@ double VariationalMeshSmoother::maxE(int n,
         Gamma[ii] = E;
       }
 
-  *qmin = vmin;
+  qmin = vmin;
 
   return gemax;
 }
@@ -1460,35 +1385,31 @@ double VariationalMeshSmoother::maxE(int n,
 
 
 // Compute min Jacobian determinant (minq), min cell volume (Vmin), and average cell volume (vol).
-double VariationalMeshSmoother::minq(int n,
-                                     int /*N*/,
-                                     const Array2D<double>& R,
-                                     int ncells,
+double VariationalMeshSmoother::minq(const Array2D<double>& R,
                                      const Array2D<int>& cells,
                                      const std::vector<int>& mcells,
                                      int me,
                                      const Array3D<double>& H,
-                                     double *vol,
-                                     double *Vmin,
-                                     FILE * /*sout*/)
+                                     double& vol,
+                                     double& Vmin)
 {
   std::vector<double> K(9);
-  Array2D<double> Q(3, 3*n+n%2);
+  Array2D<double> Q(3, 3*_dim + _dim%2);
 
   double v = 0;
   double vmin = 1.e32;
   double gqmin = 1.e32;
 
-  for (int ii=0; ii<ncells; ii++)
+  for (unsigned ii=0; ii<_n_cells; ii++)
     if (mcells[ii]>=0)
       {
-        if (n==2)
+        if (_dim==2)
           {
             // 2D
             if (cells[ii][3]==-1)
               {
                 // tri
-                basisA(2,Q,3,K,H[ii],me);
+                basisA(Q, 3, K, H[ii], me);
 
                 std::vector<double> a1(3), a2(3);
                 for (int k=0; k<2; k++)
@@ -1517,7 +1438,7 @@ double VariationalMeshSmoother::minq(int n,
                     for (int j=0; j<2; j++)
                       {
                         K[1]=j;
-                        basisA(2,Q,4,K,H[ii],me);
+                        basisA(Q, 4, K, H[ii], me);
 
                         std::vector<double> a1(3), a2(3);
                         for (int k=0; k<2; k++)
@@ -1553,7 +1474,7 @@ double VariationalMeshSmoother::minq(int n,
                         K[2]=j*0.5;
                         k=j/2;
                         K[3]=static_cast<double>(k);
-                        basisA(2,Q,6,K,H[ii],me);
+                        basisA(Q, 6, K, H[ii], me);
 
                         std::vector<double> a1(3), a2(3);
                         for (int k=0; k<2; k++)
@@ -1579,13 +1500,13 @@ double VariationalMeshSmoother::minq(int n,
                   vmin=vcell;
               }
           }
-        if (n==3)
+        if (_dim==3)
           {
             // 3D
             if (cells[ii][4]==-1)
               {
                 // tetr
-                basisA(3,Q,4,K,H[ii],me);
+                basisA(Q, 4, K, H[ii], me);
 
                 std::vector<double> a1(3), a2(3), a3(3);
                 for (int k=0; k<3; k++)
@@ -1622,7 +1543,7 @@ double VariationalMeshSmoother::minq(int n,
                           {
                             K[2]=static_cast<double>(k)/2.0;
                             K[3]=static_cast<double>(k%2);
-                            basisA(3,Q,6,K,H[ii],me);
+                            basisA(Q, 6, K, H[ii], me);
 
                             std::vector<double> a1(3), a2(3), a3(3);
                             for (int kk=0; kk<3; kk++)
@@ -1670,7 +1591,7 @@ double VariationalMeshSmoother::minq(int n,
                                     for (int nn=0; nn<2; nn++)
                                       {
                                         K[5]=nn;
-                                        basisA(3,Q,8,K,H[ii],me);
+                                        basisA(Q, 8, K, H[ii], me);
 
                                         std::vector<double> a1(3), a2(3), a3(3);
                                         for (int kk=0; kk<3; kk++)
@@ -1758,7 +1679,7 @@ double VariationalMeshSmoother::minq(int n,
                                 K[6]=1.0/2;  K[7]=1.0/3;  K[8]=1;  break;
                               }
 
-                            basisA(3,Q,10,K,H[ii],me);
+                            basisA(Q, 10, K, H[ii], me);
 
                             std::vector<double> a1(3), a2(3), a3(3);
                             for (int kk=0; kk<3; kk++)
@@ -1795,8 +1716,9 @@ double VariationalMeshSmoother::minq(int n,
           }
       }
 
-  *vol = v/static_cast<double>(ncells);
-  *Vmin = vmin;
+  // Fill in return value references
+  vol = v/static_cast<double>(_n_cells);
+  Vmin = vmin;
 
   return gqmin;
 }
@@ -1806,11 +1728,8 @@ double VariationalMeshSmoother::minq(int n,
 // Executes one step of minimization algorithm:
 // finds minimization direction (P=H^{-1} \grad J) and solves approximately
 // local minimization problem for optimal step in this minimization direction (tau=min J(R+tau P))
-double VariationalMeshSmoother::minJ(int n,
-                                     int N,
-                                     Array2D<double>& R,
+double VariationalMeshSmoother::minJ(Array2D<double>& R,
                                      const std::vector<int>& mask,
-                                     int ncells,
                                      const Array2D<int>& cells,
                                      const std::vector<int>& mcells,
                                      double epsilon,
@@ -1818,48 +1737,47 @@ double VariationalMeshSmoother::minJ(int n,
                                      int me,
                                      const Array3D<double>& H,
                                      double vol,
-                                     int nedges,
                                      const std::vector<int>& edges,
                                      const std::vector<int>& hnodes,
                                      int msglev,
-                                     double *Vmin,
-                                     double *emax,
-                                     double *qmin,
+                                     double& Vmin,
+                                     double& emax,
+                                     double& qmin,
                                      int adp,
                                      const std::vector<double>& afun,
                                      FILE *sout)
 {
   // columns - max number of nonzero entries in every row of global matrix
-  int columns = n*n*10;
+  int columns = _dim*_dim*10;
 
   // local Hessian matrix
-  Array3D<double> W(n, 3*n+n%2, 3*n+n%2);
+  Array3D<double> W(_dim, 3*_dim + _dim%2, 3*_dim + _dim%2);
 
   // F - local gradient
-  Array2D<double> F(n, 3*n+n%2);
+  Array2D<double> F(_dim, 3*_dim + _dim%2);
 
-  Array2D<double> Rpr(N, n);
+  Array2D<double> Rpr(_n_nodes, _dim);
 
   // P - minimization direction
-  Array2D<double> P(N, n);
+  Array2D<double> P(_n_nodes, _dim);
 
   // A, JA - internal form of global matrix
-  Array2D<int> JA(n*N, columns);
-  Array2D<double> A(n*N, columns);
+  Array2D<int> JA(_dim*_n_nodes, columns);
+  Array2D<double> A(_dim*_n_nodes, columns);
 
   // G - adaptation metric
-  Array2D<double> G(ncells, n);
+  Array2D<double> G(_n_cells, _dim);
 
   // rhs for solver
-  std::vector<double> b(n*N);
+  std::vector<double> b(_dim*_n_nodes);
 
   // u - solution vector
-  std::vector<double> u(n*N);
+  std::vector<double> u(_dim*_n_nodes);
 
   // matrix
-  std::vector<double> a(n*N*columns);
-  std::vector<int> ia(n*N+1);
-  std::vector<int> ja(n*N*columns);
+  std::vector<double> a(_dim*_n_nodes*columns);
+  std::vector<int> ia(_dim*_n_nodes + 1);
+  std::vector<int> ja(_dim*_n_nodes*columns);
 
   // nonzero - norm of gradient
   double nonzero = 0.;
@@ -1868,30 +1786,30 @@ double VariationalMeshSmoother::minJ(int n,
   double Jpr = 0.;
 
   // find minimization direction P
-  for (int i=0; i<ncells; i++)
+  for (unsigned i=0; i<_n_cells; i++)
     {
       int nvert = 0;
       while (cells[i][nvert]>=0)
         nvert++;
 
       // determination of local matrices on each cell
-      for (int j=0; j<n; j++)
+      for (unsigned j=0; j<_dim; j++)
         {
           G[i][j]=0;  // adaptation metric G is held constant throughout minJ run
           if (adp<0)
             {
               for (int k=0; k<abs(adp); k++)
-                G[i][j]=G[i][j]+afun[i*(-adp)+k];  // cell-based adaptivity is computed here
+                G[i][j] += afun[i*(-adp)+k];  // cell-based adaptivity is computed here
             }
         }
-      for (int index=0; index<n; index++)
+      for (unsigned index=0; index<_dim; index++)
         {
           // initialise local matrices
-          for (int k=0; k<3*n+n%2; k++)
+          for (unsigned k=0; k<3*_dim + _dim%2; k++)
             {
               F[index][k]=0;
 
-              for (int j=0; j<3*n+n%2; j++)
+              for (unsigned j=0; j<3*_dim + _dim%2; j++)
                 W[index][k][j]=0;
             }
         }
@@ -1899,34 +1817,34 @@ double VariationalMeshSmoother::minJ(int n,
         {
           // if cell is not excluded
           double lVmin, lqmin;
-          Jpr += localP(n, W, F, R, cells[i], mask, epsilon, w, nvert, H[i],
-                        me, vol, 0, &lVmin, &lqmin, adp, afun, G[i], sout);
+          Jpr += localP(W, F, R, cells[i], mask, epsilon, w, nvert, H[i],
+                        me, vol, 0, lVmin, lqmin, adp, afun, G[i]);
         }
       else
         {
-          for (int index=0; index<n; index++)
+          for (unsigned index=0; index<_dim; index++)
             for (int j=0; j<nvert; j++)
-              W[index][j][j]=1;
+              W[index][j][j] = 1;
         }
 
       // assembly of an upper triangular part of a global matrix A
-      for (int index=0; index<n; index++)
+      for (unsigned index=0; index<_dim; index++)
         {
           for (int l=0; l<nvert; l++)
             {
               for (int m=0; m<nvert; m++)
                 {
-                if ((W[index][l][m]!=0)&&(cells[i][m]>=cells[i][l]))
+                if ((W[index][l][m]!=0) && (cells[i][m]>=cells[i][l]))
                   {
                     int sch = 0;
                     int ind = 1;
                     while (ind!=0)
                       {
-                        if (A[cells[i][l]+index*N][sch]!=0)
+                        if (A[cells[i][l]+index*_n_nodes][sch]!=0)
                           {
-                            if (JA[cells[i][l]+index*N][sch]==(cells[i][m]+index*N))
+                            if (JA[cells[i][l]+index*_n_nodes][sch] == static_cast<int>(cells[i][m]+index*_n_nodes))
                               {
-                                A[cells[i][l]+index*N][sch] = A[cells[i][l]+index*N][sch] + W[index][l][m];
+                                A[cells[i][l]+index*_n_nodes][sch] = A[cells[i][l]+index*_n_nodes][sch] + W[index][l][m];
                                 ind=0;
                               }
                             else
@@ -1934,8 +1852,8 @@ double VariationalMeshSmoother::minJ(int n,
                           }
                         else
                           {
-                            A[cells[i][l]+index*N][sch] = W[index][l][m];
-                            JA[cells[i][l]+index*N][sch]=cells[i][m]+index*N;
+                            A[cells[i][l]+index*_n_nodes][sch] = W[index][l][m];
+                            JA[cells[i][l]+index*_n_nodes][sch] = cells[i][m]+index*_n_nodes;
                             ind = 0;
                           }
 
@@ -1944,7 +1862,7 @@ double VariationalMeshSmoother::minJ(int n,
                       }
                   }
                 }
-              b[cells[i][l]+index*N]=b[cells[i][l]+index*N]-F[index][l];
+              b[cells[i][l]+index*_n_nodes] = b[cells[i][l]+index*_n_nodes] - F[index][l];
             }
         }
       // end of matrix A
@@ -1953,20 +1871,20 @@ double VariationalMeshSmoother::minJ(int n,
   // HN correction
 
   // tolerance for HN being the mid-edge node for its parents
-  double Tau_hn = pow(vol,1.0/static_cast<double>(n))*1e-10;
-  for (int i=0; i<nedges; i++)
+  double Tau_hn = pow(vol,1.0/static_cast<double>(_dim))*1e-10;
+  for (unsigned i=0; i<_n_hanging_edges; i++)
     {
       int ind_i = hnodes[i];
       int ind_j = edges[2*i];
       int ind_k = edges[2*i+1];
 
-      for (int j=0; j<n; j++)
+      for (unsigned j=0; j<_dim; j++)
         {
           int g_i = R[ind_i][j]-0.5*(R[ind_j][j]+R[ind_k][j]);
-          Jpr+=g_i*g_i/(2*Tau_hn);
-          b[ind_i+j*N]-=g_i/Tau_hn;
-          b[ind_j+j*N]+=0.5*g_i/Tau_hn;
-          b[ind_k+j*N]+=0.5*g_i/Tau_hn;
+          Jpr += g_i*g_i/(2*Tau_hn);
+          b[ind_i + j*_n_nodes] -= g_i/Tau_hn;
+          b[ind_j + j*_n_nodes] += 0.5*g_i/Tau_hn;
+          b[ind_k + j*_n_nodes] += 0.5*g_i/Tau_hn;
         }
 
       for (int ind=0; ind<columns; ind++)
@@ -1974,22 +1892,24 @@ double VariationalMeshSmoother::minJ(int n,
           if (JA[ind_i][ind]==ind_i)
             A[ind_i][ind]+=1.0/Tau_hn;
 
-          if (JA[ind_i+N][ind]==ind_i+N)
-            A[ind_i+N][ind]+=1.0/Tau_hn;
+          if (JA[ind_i+_n_nodes][ind] == static_cast<int>(ind_i+_n_nodes))
+            A[ind_i+_n_nodes][ind]+=1.0/Tau_hn;
 
-          if (n==3)
-            if (JA[ind_i+2*N][ind]==ind_i+2*N)
-              A[ind_i+2*N][ind]+=1.0/Tau_hn;
+          if (_dim==3)
+            if (JA[ind_i+2*_n_nodes][ind] == static_cast<int>(ind_i+2*_n_nodes))
+              A[ind_i+2*_n_nodes][ind]+=1.0/Tau_hn;
 
           if ((JA[ind_i][ind]==ind_j)||(JA[ind_i][ind]==ind_k))
             A[ind_i][ind]-=0.5/Tau_hn;
 
-          if ((JA[ind_i+N][ind]==ind_j+N)||(JA[ind_i+N][ind]==ind_k+N))
-            A[ind_i+N][ind]-=0.5/Tau_hn;
+          if ((JA[ind_i+_n_nodes][ind] == static_cast<int>(ind_j+_n_nodes)) ||
+              (JA[ind_i+_n_nodes][ind] == static_cast<int>(ind_k+_n_nodes)))
+            A[ind_i+_n_nodes][ind]-=0.5/Tau_hn;
 
-          if (n==3)
-            if ((JA[ind_i+2*N][ind]==ind_j+2*N)||(JA[ind_i+2*N][ind]==ind_k+2*N))
-              A[ind_i+2*N][ind]-=0.5/Tau_hn;
+          if (_dim==3)
+            if ((JA[ind_i+2*_n_nodes][ind] == static_cast<int>(ind_j+2*_n_nodes)) ||
+                (JA[ind_i+2*_n_nodes][ind] == static_cast<int>(ind_k+2*_n_nodes)))
+              A[ind_i+2*_n_nodes][ind]-=0.5/Tau_hn;
 
           if (JA[ind_j][ind]==ind_i)
             A[ind_j][ind]-=0.5/Tau_hn;
@@ -1997,48 +1917,52 @@ double VariationalMeshSmoother::minJ(int n,
           if (JA[ind_k][ind]==ind_i)
             A[ind_k][ind]-=0.5/Tau_hn;
 
-          if (JA[ind_j+N][ind]==ind_i+N)
-            A[ind_j+N][ind]-=0.5/Tau_hn;
+          if (JA[ind_j+_n_nodes][ind] == static_cast<int>(ind_i+_n_nodes))
+            A[ind_j+_n_nodes][ind]-=0.5/Tau_hn;
 
-          if (JA[ind_k+N][ind]==ind_i+N)
-            A[ind_k+N][ind]-=0.5/Tau_hn;
+          if (JA[ind_k+_n_nodes][ind] == static_cast<int>(ind_i+_n_nodes))
+            A[ind_k+_n_nodes][ind]-=0.5/Tau_hn;
 
-          if (n==3)
-            if (JA[ind_j+2*N][ind]==ind_i+2*N)
-              A[ind_j+2*N][ind]-=0.5/Tau_hn;
+          if (_dim==3)
+            if (JA[ind_j+2*_n_nodes][ind] == static_cast<int>(ind_i+2*_n_nodes))
+              A[ind_j+2*_n_nodes][ind]-=0.5/Tau_hn;
 
-          if (n==3)
-            if (JA[ind_k+2*N][ind]==ind_i+2*N)
-              A[ind_k+2*N][ind]-=0.5/Tau_hn;
+          if (_dim==3)
+            if (JA[ind_k+2*_n_nodes][ind] == static_cast<int>(ind_i+2*_n_nodes))
+              A[ind_k+2*_n_nodes][ind]-=0.5/Tau_hn;
 
-          if ((JA[ind_j][ind]==ind_j)||(JA[ind_j][ind]==ind_k))
+          if ((JA[ind_j][ind]==ind_j) || (JA[ind_j][ind]==ind_k))
             A[ind_j][ind]+=0.25/Tau_hn;
 
           if ((JA[ind_k][ind]==ind_j)||(JA[ind_k][ind]==ind_k))
             A[ind_k][ind]+=0.25/Tau_hn;
 
-          if ((JA[ind_j+N][ind]==ind_j+N)||(JA[ind_j+N][ind]==ind_k+N))
-            A[ind_j+N][ind]+=0.25/Tau_hn;
+          if ((JA[ind_j+_n_nodes][ind] == static_cast<int>(ind_j+_n_nodes)) ||
+              (JA[ind_j+_n_nodes][ind] == static_cast<int>(ind_k+_n_nodes)))
+            A[ind_j+_n_nodes][ind]+=0.25/Tau_hn;
 
-          if ((JA[ind_k+N][ind]==ind_j+N)||(JA[ind_k+N][ind]==ind_k+N))
-            A[ind_k+N][ind]+=0.25/Tau_hn;
+          if ((JA[ind_k+_n_nodes][ind] == static_cast<int>(ind_j+_n_nodes)) ||
+              (JA[ind_k+_n_nodes][ind] == static_cast<int>(ind_k+_n_nodes)))
+            A[ind_k+_n_nodes][ind]+=0.25/Tau_hn;
 
-          if (n==3)
-            if ((JA[ind_j+2*N][ind]==ind_j+2*N)||(JA[ind_j+2*N][ind]==ind_k+2*N))
-              A[ind_j+2*N][ind]+=0.25/Tau_hn;
+          if (_dim==3)
+            if ((JA[ind_j+2*_n_nodes][ind] == static_cast<int>(ind_j+2*_n_nodes)) ||
+                (JA[ind_j+2*_n_nodes][ind] == static_cast<int>(ind_k+2*_n_nodes)))
+              A[ind_j+2*_n_nodes][ind]+=0.25/Tau_hn;
 
-          if (n==3)
-            if ((JA[ind_k+2*N][ind]==ind_j+2*N)||(JA[ind_k+2*N][ind]==ind_k+2*N))
-              A[ind_k+2*N][ind]+=0.25/Tau_hn;
+          if (_dim==3)
+            if ((JA[ind_k+2*_n_nodes][ind] == static_cast<int>(ind_j+2*_n_nodes)) ||
+                (JA[ind_k+2*_n_nodes][ind] == static_cast<int>(ind_k+2*_n_nodes)))
+              A[ind_k+2*_n_nodes][ind]+=0.25/Tau_hn;
         }
     }
 
   // ||\grad J||_2
-  for (int i=0; i<n*N; i++)
+  for (unsigned i=0; i<_dim*_n_nodes; i++)
     nonzero += b[i]*b[i];
 
   // sort matrix A
-  for (int i=0; i<n*N; i++)
+  for (unsigned i=0; i<_dim*_n_nodes; i++)
     {
       for (int j=columns-1; j>1; j--)
         {
@@ -2063,7 +1987,7 @@ double VariationalMeshSmoother::minJ(int n,
   ia[0]=0;
   {
     int j = 0;
-    for (int i=0; i<n*N; i++)
+    for (unsigned i=0; i<_dim*_n_nodes; i++)
       {
         u[i] = 0;
         int nz = 0;
@@ -2081,30 +2005,30 @@ double VariationalMeshSmoother::minJ(int n,
       }
   }
 
-  int nz = ia[n*N];
-  int m = n*N;
+  int nz = ia[_dim*_n_nodes];
+  int m = _dim*_n_nodes;
   int sch = (msglev >= 3) ? 1 : 0;
 
   nz = solver(m, ia, ja, a, u, b, eps, 100, sch, sout);
   // sol_pcg_pj(m, ia, ja, a, u, b, eps, 100, sch);
 
-  for (int i=0; i<N; i++)
+  for (unsigned i=0; i<_n_nodes; i++)
     {
       //ensure fixed nodes are not moved
-      for (int index=0; index<n; index++)
+      for (unsigned index=0; index<_dim; index++)
         if (mask[i]==1)
           P[i][index]=0;
         else
-          P[i][index]=u[i+index*N];
+          P[i][index]=u[i+index*_n_nodes];
     }
 
   // P is determined
   if (msglev>=4)
     {
-    for (int i=0; i<N; i++)
+    for (unsigned i=0; i<_n_nodes; i++)
       {
-      for (int j=0; j<n; j++)
-        if (P[i][j]!=0)
+      for (unsigned j=0; j<_dim; j++)
+        if (P[i][j] != 0)
           fprintf(sout, "P[%d][%d]=%f  ",i,j,P[i][j]);
       }
     }
@@ -2128,17 +2052,15 @@ double VariationalMeshSmoother::minJ(int n,
 
       // search through finite # of values for tau
       tau=pow(2.0,j);
-      for (int i=0; i<N; i++)
-        {
-          for (int k=0; k<n; k++)
-            Rpr[i][k]=R[i][k]+tau*P[i][k];
-        }
+      for (unsigned i=0; i<_n_nodes; i++)
+        for (unsigned k=0; k<_dim; k++)
+          Rpr[i][k] = R[i][k] + tau*P[i][k];
 
       J = 0;
       gVmin=1e32;
       gemax=-1e32;
       gqmin=1e32;
-      for (int i=0; i<ncells; i++)
+      for (unsigned i=0; i<_n_cells; i++)
         {
           if (mcells[i]>=0)
             {
@@ -2147,7 +2069,7 @@ double VariationalMeshSmoother::minJ(int n,
                 nvert++;
 
               double lVmin, lqmin;
-              double lemax = localP(n, W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, &lVmin, &lqmin, adp, afun, G[i], sout);
+              double lemax = localP(W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, lVmin, lqmin, adp, afun, G[i]);
 
               J += lemax;
               if (gVmin > lVmin)
@@ -2160,12 +2082,12 @@ double VariationalMeshSmoother::minJ(int n,
                 gqmin=lqmin;
 
               // HN correction
-              for (int ii=0; ii<nedges; ii++)
+              for (unsigned ii=0; ii<_n_hanging_edges; ii++)
                 {
                   int ind_i = hnodes[ii];
                   int ind_j = edges[2*ii];
                   int ind_k = edges[2*ii+1];
-                  for (int jj=0; jj<n; jj++)
+                  for (unsigned jj=0; jj<_dim; jj++)
                     {
                       int g_i = Rpr[ind_i][jj]-0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
                       J+=g_i*g_i/(2*Tau_hn);
@@ -2187,17 +2109,15 @@ double VariationalMeshSmoother::minJ(int n,
   if (j != -30)
     {
       Jpr = J;
-      for (int i=0; i<N; i++)
-        {
-          for (int k=0; k<n; k++)
-            Rpr[i][k]=R[i][k]+tau*0.5*P[i][k];
-        }
+      for (unsigned i=0; i<_n_nodes; i++)
+        for (unsigned k=0; k<_dim; k++)
+          Rpr[i][k] = R[i][k] + tau*0.5*P[i][k];
 
       J = 0;
       gtmin0=1e32;
       gtmax0=-1e32;
       gqmin0=1e32;
-      for (int i=0; i<ncells; i++)
+      for (unsigned i=0; i<_n_cells; i++)
         {
           if (mcells[i]>=0)
             {
@@ -2206,7 +2126,7 @@ double VariationalMeshSmoother::minJ(int n,
                 nvert++;
 
               double lVmin, lqmin;
-              double lemax = localP(n, W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, &lVmin, &lqmin, adp, afun, G[i], sout);
+              double lemax = localP(W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, lVmin, lqmin, adp, afun, G[i]);
               J += lemax;
 
               if (gtmin0 > lVmin)
@@ -2219,15 +2139,15 @@ double VariationalMeshSmoother::minJ(int n,
                 gqmin0 = lqmin;
 
               // HN correction
-              for (int ii=0; ii<nedges; ii++)
+              for (unsigned ii=0; ii<_n_hanging_edges; ii++)
                 {
                   int ind_i = hnodes[ii];
                   int ind_j = edges[2*ii];
                   int ind_k = edges[2*ii+1];
 
-                  for (int jj=0; jj<n; jj++)
+                  for (unsigned jj=0; jj<_dim; jj++)
                     {
-                      int g_i = Rpr[ind_i][jj]-0.5*(Rpr[ind_j][jj]+Rpr[ind_k][jj]);
+                      int g_i = Rpr[ind_i][jj] - 0.5*(Rpr[ind_j][jj] + Rpr[ind_k][jj]);
                       J+=g_i*g_i/(2*Tau_hn);
                     }
                 }
@@ -2238,22 +2158,24 @@ double VariationalMeshSmoother::minJ(int n,
   if (Jpr > J)
     {
       T=0.5*tau;
-      *Vmin = gtmin0;
-      *emax = gtmax0;
-      *qmin = gqmin0;
+      // Set up return values passed by reference
+      Vmin = gtmin0;
+      emax = gtmax0;
+      qmin = gqmin0;
     }
   else
     {
       T=tau;
       J=Jpr;
-      *Vmin = gVmin;
-      *emax = gemax;
-      *qmin = gqmin;
+      // Set up return values passed by reference
+      Vmin = gVmin;
+      emax = gemax;
+      qmin = gqmin;
     }
 
   nonzero = 0;
-  for (int j=0; j<N; j++)
-    for (int k=0; k<n; k++)
+  for (unsigned j=0; j<_n_nodes; j++)
+    for (unsigned k=0; k<_dim; k++)
       {
         R[j][k] = R[j][k] + T*P[j][k];
         nonzero += T*P[j][k]*T*P[j][k];
@@ -2270,10 +2192,8 @@ double VariationalMeshSmoother::minJ(int n,
 // minJ() with sliding Boundary Nodes constraints and no account for HN,
 // using Lagrange multiplier formulation: minimize L=J+\sum lam*g;
 // only works in 2D
-double VariationalMeshSmoother::minJ_BC(int N,
-                                        Array2D<double>& R,
+double VariationalMeshSmoother::minJ_BC(Array2D<double>& R,
                                         const std::vector<int>& mask,
-                                        int ncells,
                                         const Array2D<int>& cells,
                                         const std::vector<int>& mcells,
                                         double epsilon,
@@ -2282,25 +2202,22 @@ double VariationalMeshSmoother::minJ_BC(int N,
                                         const Array3D<double>& H,
                                         double vol,
                                         int msglev,
-                                        double *Vmin,
-                                        double *emax,
-                                        double *qmin,
+                                        double& Vmin,
+                                        double& emax,
+                                        double& qmin,
                                         int adp,
                                         const std::vector<double>& afun,
                                         int NCN,
                                         FILE *sout)
 {
   // new form of matrices, 5 iterations for minL
-  double  tau=0.0, J=0.0, T, Jpr, L, lVmin, lqmin, gVmin=0.0, gqmin=0.0, gVmin0=0.0,
+  double tau=0.0, J=0.0, T, Jpr, L, lVmin, lqmin, gVmin=0.0, gqmin=0.0, gVmin0=0.0,
     gqmin0=0.0, lemax, gemax=0.0, gemax0=0.0;
-  double a, g, qq=0.0, eps, nonzero, x0, y0, del1, del2, Bx, By;
-  int index, i, j, k=0, nz, I;
-  int ind, nvert;
 
   // array of sliding BN
   std::vector<int> Bind(NCN);
   std::vector<double> lam(NCN);
-  std::vector<double> hm(2*N);
+  std::vector<double> hm(2*_n_nodes);
   std::vector<double> Plam(NCN);
 
   // holds constraints = local approximation to the boundary
@@ -2308,36 +2225,46 @@ double VariationalMeshSmoother::minJ_BC(int N,
 
   Array2D<double> F(2, 6);
   Array3D<double> W(2, 6, 6);
-  Array2D<double> Rpr(N, 2);
-  Array2D<double> P(N, 2);
+  Array2D<double> Rpr(_n_nodes, 2);
+  Array2D<double> P(_n_nodes, 2);
 
-  std::vector<double> b(2*N);
+  std::vector<double> b(2*_n_nodes);
 
-  Array2D<double> G(ncells, 6);
+  Array2D<double> G(_n_cells, 6);
 
   // assembler of constraints
-  eps=sqrt(vol)*1e-9;
+  const double eps = sqrt(vol)*1e-9;
 
-  for (i=0; i<4*NCN; i++)
+  for (int i=0; i<4*NCN; i++)
     constr[i]=1.0/eps;
 
-  I=0;
-  for (i=0; i<N; i++)
-    if (mask[i]==2)
-      {
-        Bind[I]=i;
-        I++;
-      }
+  {
+    int I = 0;
+    for (unsigned i=0; i<_n_nodes; i++)
+      if (mask[i]==2)
+        {
+          Bind[I]=i;
+          I++;
+        }
+  }
 
-  for (I=0; I<NCN; I++)
+  for (int I=0; I<NCN; I++)
     {
-      i=Bind[I];
-      ind=0;
+      // The boundary connectivity loop sets up the j and k indices
+      // but I am not sure about the logic of this: j and k are overwritten
+      // at every iteration of the boundary connectivity loop and only used
+      // *after* the boundary connectivity loop -- this seems like a bug but
+      // I maintained the original behavior of the algorithm [JWP].
+      int
+        i = Bind[I],
+        j = 0,
+        k = 0,
+        ind = 0;
 
       // boundary connectivity
-      for (int l=0; l<ncells; l++)
+      for (unsigned l=0; l<_n_cells; l++)
         {
-          nvert=0;
+          int nvert = 0;
 
           while (cells[l][nvert]>=0)
             nvert++;
@@ -2347,9 +2274,35 @@ double VariationalMeshSmoother::minJ_BC(int N,
             case 3: // tri
               if (i==cells[l][0])
                 {
-                  if (mask[cells[l][1]]>0) {if (ind==0) {j=cells[l][1];   ind++;  } else {k=cells[l][1];   ind++;  }}
-                  if (mask[cells[l][2]]>0) {if (ind==0) {j=cells[l][2];   ind++;  } else {k=cells[l][2];   ind++;  }}
+                  if (mask[cells[l][1]]>0)
+                    {
+                      if (ind==0)
+                        {
+                          j = cells[l][1];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][1];
+                          ind++;
+                        }
+                    }
+
+                  if (mask[cells[l][2]]>0)
+                    {
+                      if (ind==0)
+                        {
+                          j = cells[l][2];
+                          ind++;
+                        }
+                      else
+                        {
+                          k = cells[l][2];
+                          ind++;
+                        }
+                    }
                 }
+
               if (i==cells[l][1])
                 {
                   if (mask[cells[l][0]]>0) {if (ind==0) {j=cells[l][0];   ind++;  } else {k=cells[l][0];   ind++;  }}
@@ -2407,12 +2360,15 @@ double VariationalMeshSmoother::minJ_BC(int N,
                   k=cells[l][1];
                 }
               break;
+
+            default:
+              libmesh_error_msg("Unrecognized nvert = " << nvert);
             }
         } // end boundary connectivity
 
       // lines
-      del1=R[j][0]-R[i][0];
-      del2=R[i][0]-R[k][0];
+      double del1 = R[j][0] - R[i][0];
+      double del2 = R[i][0] - R[k][0];
 
       if ((fabs(del1)<eps)&&(fabs(del2)<eps))
         {
@@ -2427,7 +2383,8 @@ double VariationalMeshSmoother::minJ_BC(int N,
           del2=R[i][1]-R[k][1];
           if ((fabs(del1)<eps)&&(fabs(del2)<eps))
             {
-              constr[I*4]=0;   constr[I*4+1]=1;
+              constr[I*4]=0;
+              constr[I*4+1]=1;
               constr[I*4+2]=R[i][0];
               constr[I*4+3]=R[i][1];
             }
@@ -2444,12 +2401,12 @@ double VariationalMeshSmoother::minJ_BC(int N,
               else
                 {
                   // circle
-                  x0=((R[k][1]-R[j][1])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1])+
-                      (R[j][1]-R[i][1])*(R[k][0]*R[k][0]-R[j][0]*R[j][0]+R[k][1]*R[k][1]-R[j][1]*R[j][1]))/(2*J);
-                  y0=((R[j][0]-R[k][0])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1])+
-                      (R[i][0]-R[j][0])*(R[k][0]*R[k][0]-R[j][0]*R[j][0]+R[k][1]*R[k][1]-R[j][1]*R[j][1]))/(2*J);
-                  constr[I*4]=x0;
-                  constr[I*4+1]=y0;
+                  double x0 = ((R[k][1]-R[j][1])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1])+
+                               (R[j][1]-R[i][1])*(R[k][0]*R[k][0]-R[j][0]*R[j][0]+R[k][1]*R[k][1]-R[j][1]*R[j][1]))/(2*J);
+                  double y0 = ((R[j][0]-R[k][0])*(R[i][0]*R[i][0]-R[j][0]*R[j][0]+R[i][1]*R[i][1]-R[j][1]*R[j][1])+
+                               (R[i][0]-R[j][0])*(R[k][0]*R[k][0]-R[j][0]*R[j][0]+R[k][1]*R[k][1]-R[j][1]*R[j][1]))/(2*J);
+                  constr[I*4] = x0;
+                  constr[I*4+1] = y0;
                   constr[I*4+2]=(R[i][0]-x0)*(R[i][0]-x0)+(R[i][1]-y0)*(R[i][1]-y0);
                 }
             }
@@ -2462,158 +2419,161 @@ double VariationalMeshSmoother::minJ_BC(int N,
   // }
 
   // initial values
-  for (i=0; i<NCN; i++)
+  for (int i=0; i<NCN; i++)
     lam[i]=0;
 
-  for (nz=0; nz<5; nz++)
+  // Eventual return value
+  double nonzero = 0.;
+
+  // Temporary result variable
+  double qq = 0.;
+
+  for (int nz=0; nz<5; nz++)
     {
       // find H and -grad J
-      nonzero=0;
+      nonzero = 0.0;
       Jpr=0;
-      for (i=0; i<2*N; i++)
+      for (unsigned i=0; i<2*_n_nodes; i++)
         {
           b[i] = 0;
           hm[i]=0;
         }
 
-      for (i=0; i<ncells; i++)
+      for (unsigned i=0; i<_n_cells; i++)
         {
-          nvert=0;
+          int nvert = 0;
 
           while (cells[i][nvert]>=0)
             nvert++;
 
-          for (j=0; j<nvert; j++)
+          for (int j=0; j<nvert; j++)
             {
               G[i][j]=0;
               if (adp<0)
-                for (k=0; k<abs(adp); k++)
-                  G[i][j]=G[i][j]+afun[i*(-adp)+k];
+                for (int k=0; k<abs(adp); k++)
+                  G[i][j] += afun[i*(-adp) + k];
             }
 
-          for (index=0; index<2; index++)
-            {
-              for (k=0; k<nvert; k++)
-                {
-                  F[index][k]=0;
-                  for (j=0; j<nvert; j++)
-                    W[index][k][j]=0;
-                }
-            }
+          for (int index=0; index<2; index++)
+            for (int k=0; k<nvert; k++)
+              {
+                F[index][k]=0;
+                for (int j=0; j<nvert; j++)
+                  W[index][k][j] = 0;
+              }
 
           if (mcells[i]>=0)
-            {
-              Jpr+=localP(2, W, F, R, cells[i], mask, epsilon, w, nvert, H[i],
-                          me, vol, 0, &lVmin, &lqmin, adp, afun, G[i], sout);
-            }
+            Jpr += localP(W, F, R, cells[i], mask, epsilon, w, nvert, H[i],
+                          me, vol, 0, lVmin, lqmin, adp, afun, G[i]);
+
           else
             {
-              for (index=0; index<2; index++)
-                for (j=0; j<nvert; j++)
-                  W[index][j][j]=1;
+              for (unsigned index=0; index<2; index++)
+                for (int j=0; j<nvert; j++)
+                  W[index][j][j] = 1;
             }
 
-          for (index=0; index<2; index++)
-            {
-              for (int l=0; l<nvert; l++)
-                {
-                  // diagonal Hessian
-                  hm[cells[i][l]+index*N]=hm[cells[i][l]+index*N]+W[index][l][l];
-                  b[cells[i][l]+index*N]=b[cells[i][l]+index*N]-F[index][l];
-                }
-            }
+          for (unsigned index=0; index<2; index++)
+            for (int l=0; l<nvert; l++)
+              {
+                // diagonal Hessian
+                hm[cells[i][l] + index*_n_nodes] += W[index][l][l];
+                b[cells[i][l] + index*_n_nodes] -= F[index][l];
+              }
         }
 
       // ||grad J||_2
-      for (i=0; i<2*N; i++)
+      for (unsigned i=0; i<2*_n_nodes; i++)
         nonzero += b[i]*b[i];
 
       // solve for Plam
-      for (I=0; I<NCN; I++)
+      for (int I=0; I<NCN; I++)
         {
-          i=Bind[I];
+          int i = Bind[I];
+          double
+            Bx = 0.,
+            By = 0.,
+            g = 0.;
+
           if (constr[4*I+3]<0.5/eps)
             {
-              Bx=constr[4*I];
-              By=constr[4*I+1];
-              g=(R[i][0]-constr[4*I+2])*constr[4*I]+(R[i][1]-constr[4*I+3])*constr[4*I+1];
+              Bx = constr[4*I];
+              By = constr[4*I+1];
+              g = (R[i][0]-constr[4*I+2])*constr[4*I]+(R[i][1]-constr[4*I+3])*constr[4*I+1];
             }
           else
             {
-              Bx=2*(R[i][0]-constr[4*I]);
-              By=2*(R[i][1]-constr[4*I+1]);
-              hm[i]+=2*lam[I];
-              hm[i+N]+=2*lam[I];
-              g=(R[i][0]-constr[4*I])*(R[i][0]-constr[4*I])+(R[i][1]-constr[4*I+1])*(R[i][1]-constr[4*I+1])-constr[4*I+2];
+              Bx = 2*(R[i][0]-constr[4*I]);
+              By = 2*(R[i][1]-constr[4*I+1]);
+              hm[i] += 2*lam[I];
+              hm[i+_n_nodes] += 2*lam[I];
+              g = (R[i][0]-constr[4*I])*(R[i][0]-constr[4*I])+(R[i][1]-constr[4*I+1])*(R[i][1]-constr[4*I+1])-constr[4*I+2];
             }
 
-          Jpr+=lam[I]*g;
-          qq=Bx*b[i]/hm[i]+By*b[i+N]/hm[i+N]-g;
-          a=Bx*Bx/hm[i]+By*By/hm[i+N];
+          Jpr += lam[I]*g;
+          qq = Bx*b[i]/hm[i] + By*b[i+_n_nodes]/hm[i+_n_nodes] - g;
+          double a = Bx*Bx/hm[i] + By*By/hm[i+_n_nodes];
 
-          if (a!=0)
-            Plam[I]=qq/a;
+          if (a != 0)
+            Plam[I] = qq/a;
           else
             fprintf(sout,"error: B^TH-1B is degenerate \n");
 
-          b[i]-=Plam[I]*Bx;  b[i+N]-=Plam[I]*By;
-          Plam[I]-=lam[I];
+          b[i] -= Plam[I]*Bx;
+          b[i+_n_nodes] -= Plam[I]*By;
+          Plam[I] -= lam[I];
         }
 
       // solve for P
-      for (i=0; i<N; i++)
+      for (unsigned i=0; i<_n_nodes; i++)
         {
-          P[i][0]=b[i]/hm[i];
-          P[i][1]=b[i+N]/hm[i+N];
+          P[i][0] = b[i]/hm[i];
+          P[i][1] = b[i+_n_nodes]/hm[i+_n_nodes];
         }
 
       // correct solution
-      for (i=0; i<N; i++)
-        for (j=0; j<2; j++)
-          if ((fabs(P[i][j])<eps)||(mask[i]==1))
-            P[i][j]=0;
+      for (unsigned i=0; i<_n_nodes; i++)
+        for (unsigned j=0; j<2; j++)
+          if ((fabs(P[i][j])<eps) || (mask[i]==1))
+            P[i][j] = 0;
 
       // P is determined
       if (msglev>=3)
         {
-          for (i=0; i<N; i++)
-            {
-              for (j=0; j<2; j++)
-                if (P[i][j]!=0)
-                  fprintf(sout, "P[%d][%d]=%f  ",i,j,P[i][j]);
-            }
+          for (unsigned i=0; i<_n_nodes; i++)
+            for (unsigned j=0; j<2; j++)
+              if (P[i][j] != 0)
+                fprintf(sout, "P[%d][%d]=%f  ", i, j, P[i][j]);
         }
 
       // local minimization problem, determination of tau
       if (msglev>=3)
-        fprintf(sout, "dJ=%e L0=%e \n",sqrt(nonzero), Jpr);
+        fprintf(sout, "dJ=%e L0=%e \n", sqrt(nonzero), Jpr);
 
       L=1e32;
-      j=1;
+      int j = 1;
 
-      while ((Jpr<=L)&&(j>-30))
+      while ((Jpr<=L) && (j>-30))
         {
           j=j-1;
           tau=pow(2.0,j);
-          for (i=0; i<N; i++)
-            {
-              for (k=0; k<2; k++)
-                Rpr[i][k]=R[i][k]+tau*P[i][k];
-            }
+          for (unsigned i=0; i<_n_nodes; i++)
+            for (unsigned k=0; k<2; k++)
+              Rpr[i][k] = R[i][k] + tau*P[i][k];
 
           J=0;
           gVmin=1e32;
           gemax=-1e32;
           gqmin=1e32;
-          for (i=0; i<ncells; i++)
+          for (unsigned i=0; i<_n_cells; i++)
             if (mcells[i]>=0)
               {
-                nvert=0;
+                int nvert = 0;
                 while (cells[i][nvert]>=0)
                   nvert++;
 
-                lemax=localP(2, W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, &lVmin,
-                             &lqmin, adp, afun, G[i], sout);
+                lemax = localP(W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, lVmin,
+                               lqmin, adp, afun, G[i]);
                 J+=lemax;
 
                 if (gVmin>lVmin)
@@ -2629,23 +2589,25 @@ double VariationalMeshSmoother::minJ_BC(int N,
           L=J;
 
           // constraints contribution
-          for (I=0; I<NCN; I++)
+          for (int I=0; I<NCN; I++)
             {
-              i=Bind[I];
+              int i = Bind[I];
+              double g = 0.0;
+
               if (constr[4*I+3]<0.5/eps)
-                g=(Rpr[i][0]-constr[4*I+2])*constr[4*I]+(Rpr[i][1]-constr[4*I+3])*constr[4*I+1];
+                g = (Rpr[i][0]-constr[4*I+2])*constr[4*I]+(Rpr[i][1]-constr[4*I+3])*constr[4*I+1];
 
               else
-                g=(Rpr[i][0]-constr[4*I])*(Rpr[i][0]-constr[4*I])+
-                  (Rpr[i][1]-constr[4*I+1])*(Rpr[i][1]-constr[4*I+1])-constr[4*I+2];
+                g = (Rpr[i][0]-constr[4*I])*(Rpr[i][0]-constr[4*I]) +
+                    (Rpr[i][1]-constr[4*I+1])*(Rpr[i][1]-constr[4*I+1])-constr[4*I+2];
 
-              L+=(lam[I]+tau*Plam[I])*g;
+              L += (lam[I] + tau*Plam[I])*g;
             }
 
           // end of constraints
           if (msglev>=3)
             fprintf(sout," tau=%f J=%f \n",tau,J);
-        }
+        } // end while
 
       if (j==-30)
         T=0;
@@ -2653,26 +2615,24 @@ double VariationalMeshSmoother::minJ_BC(int N,
         {
           Jpr=L;
           qq=J;
-          for (i=0; i<N; i++)
-            {
-              for (k=0; k<2; k++)
-                Rpr[i][k]=R[i][k]+tau*0.5*P[i][k];
-            }
+          for (unsigned i=0; i<_n_nodes; i++)
+            for (unsigned k=0; k<2; k++)
+              Rpr[i][k] = R[i][k] + tau*0.5*P[i][k];
 
           J=0;
           gVmin0=1e32;
           gemax0=-1e32;
           gqmin0=1e32;
 
-          for (i=0; i<ncells; i++)
+          for (unsigned i=0; i<_n_cells; i++)
             if (mcells[i]>=0)
               {
-                nvert=0;
+                int nvert=0;
                 while (cells[i][nvert]>=0)
                   nvert++;
 
-                lemax=localP(2, W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, &lVmin,
-                             &lqmin, adp, afun, G[i], sout);
+                lemax = localP(W, F, Rpr, cells[i], mask, epsilon, w, nvert, H[i], me, vol, 1, lVmin,
+                               lqmin, adp, afun, G[i]);
                 J+=lemax;
 
                 if (gVmin0>lVmin)
@@ -2688,18 +2648,19 @@ double VariationalMeshSmoother::minJ_BC(int N,
           L=J;
 
           // constraints contribution
-          for (I=0; I<NCN; I++)
+          for (int I=0; I<NCN; I++)
             {
-              i=Bind[I];
+              int i = Bind[I];
+              double g = 0.0;
 
               if (constr[4*I+3]<0.5/eps)
-                g=(Rpr[i][0]-constr[4*I+2])*constr[4*I]+(Rpr[i][1]-constr[4*I+3])*constr[4*I+1];
+                g = (Rpr[i][0]-constr[4*I+2])*constr[4*I]+(Rpr[i][1]-constr[4*I+3])*constr[4*I+1];
 
               else
-                g=(Rpr[i][0]-constr[4*I])*(Rpr[i][0]-constr[4*I])+
-                  (Rpr[i][1]-constr[4*I+1])*(Rpr[i][1]-constr[4*I+1])-constr[4*I+2];
+                g = (Rpr[i][0]-constr[4*I])*(Rpr[i][0]-constr[4*I]) +
+                    (Rpr[i][1]-constr[4*I+1])*(Rpr[i][1]-constr[4*I+1])-constr[4*I+2];
 
-              L+=(lam[I]+tau*0.5*Plam[I])*g;
+              L += (lam[I]+tau*0.5*Plam[I])*g;
             }
           // end of constraints
         }
@@ -2707,29 +2668,33 @@ double VariationalMeshSmoother::minJ_BC(int N,
       if (Jpr>L)
         {
           T=0.5*tau;
-          (*Vmin)=gVmin0;
-          (*emax)=gemax0;
-          (*qmin)=gqmin0;
+          // Set return values by reference
+          Vmin = gVmin0;
+          emax = gemax0;
+          qmin = gqmin0;
         }
       else
         {
-          T=tau;  L=Jpr;  J=qq;
-          (*Vmin)=gVmin;
-          (*emax)=gemax;
-          (*qmin)=gqmin;
+          T=tau;
+          L=Jpr;
+          J=qq;
+          // Set return values by reference
+          Vmin = gVmin;
+          emax = gemax;
+          qmin = gqmin;
         }
 
-      for (j=0; j<N; j++)
-        for (k=0; k<2; k++)
-          R[j][k] += T*P[j][k];
+      for (unsigned i=0; i<_n_nodes; i++)
+        for (unsigned k=0; k<2; k++)
+          R[i][k] += T*P[i][k];
 
-      for (i=0; i<NCN; i++)
+      for (int i=0; i<NCN; i++)
         lam[i] += T*Plam[i];
 
     } // end Lagrangian iter
 
   if (msglev>=2)
-    fprintf(sout, "tau=%e, J=%e, L=%e  \n",T,J,L);
+    fprintf(sout, "tau=%e, J=%e, L=%e  \n", T, J, L);
 
   return sqrt(nonzero);
 }
@@ -2737,8 +2702,7 @@ double VariationalMeshSmoother::minJ_BC(int N,
 
 
 // composes local matrix W and right side F from all quadrature nodes of one cell
-double VariationalMeshSmoother::localP(int n,
-                                       Array3D<double>& W,
+double VariationalMeshSmoother::localP(Array3D<double>& W,
                                        Array2D<double>& F,
                                        Array2D<double>& R,
                                        const std::vector<int>& cell_in,
@@ -2750,14 +2714,13 @@ double VariationalMeshSmoother::localP(int n,
                                        int me,
                                        double vol,
                                        int f,
-                                       double *Vmin,
-                                       double *qmin,
+                                       double& Vmin,
+                                       double& qmin,
                                        int adp,
                                        const std::vector<double>& afun,
-                                       std::vector<double>& Gloc,
-                                       FILE *sout)
+                                       std::vector<double>& Gloc)
 {
-  int kk, i, j, k, l, nn;
+  int i, j, k, l, nn;
   double  sigma=0.0, fun, lqmin, gqmin, g;
   // f - flag, f=0 for determination of Hessian and gradient of the functional,
   // f=1 for determination of the functional value only;
@@ -2769,10 +2732,10 @@ double VariationalMeshSmoother::localP(int n,
   if (f==0)
     {
       if (adp>0)
-        avertex(n, afun, Gloc, R, cell_in, nvert, adp, sout);
+        avertex(afun, Gloc, R, cell_in, nvert, adp);
       if (adp==0)
         {
-          for (i=0; i<n; i++)
+          for (unsigned i=0; i<_dim; i++)
             Gloc[i]=1.0;
         }
     }
@@ -2782,14 +2745,14 @@ double VariationalMeshSmoother::localP(int n,
   g=0;  //Vmin
 
   // cell integration depending on cell type
-  if (n==2)
+  if (_dim==2)
     {
       //2D
       if (nvert==3)
         {
           //tri
           sigma=1.0;
-          fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me, vol, f, &lqmin, adp, Gloc, sigma, sout);
+          fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me, vol, f, lqmin, adp, Gloc, sigma);
           g+=sigma*lqmin;
           if (gqmin>lqmin)
             gqmin=lqmin;
@@ -2804,8 +2767,8 @@ double VariationalMeshSmoother::localP(int n,
                 {
                   K[1]=j;
                   sigma=0.25;
-                  fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
-                              vol, f, &lqmin, adp, Gloc, sigma, sout);
+                  fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me,
+                                vol, f, lqmin, adp, Gloc, sigma);
                   g+=sigma*lqmin;
                   if (gqmin>lqmin)
                     gqmin=lqmin;
@@ -2831,8 +2794,8 @@ double VariationalMeshSmoother::localP(int n,
                   else
                     sigma=1.0/24;
 
-                  fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
-                              vol, f, &lqmin, adp, Gloc, sigma, sout);
+                  fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me,
+                                vol, f, lqmin, adp, Gloc, sigma);
                   g+=sigma*lqmin;
                   if (gqmin>lqmin)
                     gqmin=lqmin;
@@ -2840,15 +2803,15 @@ double VariationalMeshSmoother::localP(int n,
             }
         }
     }
-  if (n==3)
+  if (_dim==3)
     {
       //3D
       if (nvert==4)
         {
           //tetr
           sigma=1.0;
-          fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
-                      vol, f, &lqmin, adp, Gloc, sigma, sout);
+          fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me,
+                        vol, f, lqmin, adp, Gloc, sigma);
           g+=sigma*lqmin;
           if (gqmin>lqmin)
             gqmin=lqmin;
@@ -2867,8 +2830,8 @@ double VariationalMeshSmoother::localP(int n,
                       K[2]=static_cast<double>(k)/2.0;
                       K[3]=static_cast<double>(k%2);
                       sigma=1.0/12.0;
-                      fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
-                                  vol, f, &lqmin, adp, Gloc, sigma, sout);
+                      fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me,
+                                    vol, f, lqmin, adp, Gloc, sigma);
                       g+=sigma*lqmin;
                       if (gqmin>lqmin)
                         gqmin=lqmin;
@@ -2910,8 +2873,8 @@ double VariationalMeshSmoother::localP(int n,
                                   if ((i!=nn)&&(j!=l)&&(k!=m))
                                     sigma=1./(27.*8.);
 
-                                  fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
-                                              vol, f, &lqmin, adp, Gloc, sigma, sout);
+                                  fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me,
+                                                vol, f, lqmin, adp, Gloc, sigma);
                                   g+=sigma*lqmin;
 
                                   if (gqmin>lqmin)
@@ -2973,8 +2936,8 @@ double VariationalMeshSmoother::localP(int n,
                       else
                         sigma=1.0/720;
 
-                      fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
-                                  vol, f, &lqmin, adp, Gloc, sigma, sout);
+                      fun += vertex(W, F, R, cell_in, epsilon, w, nvert, K, H, me,
+                                    vol, f, lqmin, adp, Gloc, sigma);
                       g+=sigma*lqmin;
                       if (gqmin>lqmin)
                         gqmin=lqmin;
@@ -2989,7 +2952,7 @@ double VariationalMeshSmoother::localP(int n,
     {
       if (mask[cell_in[ii]]==1)
         {
-          for (kk=0; kk<n; kk++)
+          for (unsigned kk=0; kk<_dim; kk++)
             {
               for (int jj=0; jj<nvert; jj++)
                 {
@@ -3004,8 +2967,9 @@ double VariationalMeshSmoother::localP(int n,
     }
   // end of fixed nodes correction
 
-  *Vmin = g;
-  *qmin = gqmin/vol;
+  // Set up return value references
+  Vmin = g;
+  qmin = gqmin/vol;
 
   return fun;
 }
@@ -3013,14 +2977,12 @@ double VariationalMeshSmoother::localP(int n,
 
 
 // avertex - assembly of adaptivity metric on a cell
-double VariationalMeshSmoother::avertex(int n,
-                                        const std::vector<double>& afun,
+double VariationalMeshSmoother::avertex(const std::vector<double>& afun,
                                         std::vector<double>& G,
                                         const Array2D<double>& R,
                                         const std::vector<int>& cell_in,
                                         int nvert,
-                                        int adp,
-                                        FILE * /*sout*/)
+                                        int adp)
 {
   std::vector<double> a1(3), a2(3), a3(3), qu(3), K(8);
   Array2D<double> Q(3, nvert);
@@ -3028,14 +2990,14 @@ double VariationalMeshSmoother::avertex(int n,
   for (int i=0; i<8; i++)
     K[i] = 0.5;  // cell center
 
-  basisA(n, Q, nvert, K, Q, 1);
+  basisA(Q, nvert, K, Q, 1);
 
-  for (int i=0; i<n; i++)
+  for (unsigned i=0; i<_dim; i++)
     for (int j=0; j<nvert; j++)
       {
         a1[i] += Q[i][j]*R[cell_in[j]][0];
         a2[i] += Q[i][j]*R[cell_in[j]][1];
-        if (n==3)
+        if (_dim==3)
           a3[i] += Q[i][j]*R[cell_in[j]][2];
 
         qu[i] += Q[i][j]*afun[cell_in[j]];
@@ -3043,7 +3005,7 @@ double VariationalMeshSmoother::avertex(int n,
 
   double det = 0.0;
 
-  if (n==2)
+  if (_dim==2)
     det = jac2(a1[0], a1[1],
                a2[0], a2[1]);
   else
@@ -3056,7 +3018,7 @@ double VariationalMeshSmoother::avertex(int n,
 
   if (det!=0)
     {
-      if (n==2)
+      if (_dim==2)
         {
           double df0 = jac2(qu[0], qu[1], a2[0], a2[1])/det;
           double df1 = jac2(a1[0], a1[1], qu[0], qu[1])/det;
@@ -3070,8 +3032,8 @@ double VariationalMeshSmoother::avertex(int n,
             }
           else
             {
-              for (int i=0; i<n; i++)
-                G[i]=g;  // simple adaptation G=gI
+              for (unsigned i=0; i<_dim; i++)
+                G[i] = g;  // simple adaptation G=gI
             }
         }
       else
@@ -3079,7 +3041,7 @@ double VariationalMeshSmoother::avertex(int n,
           double df0 = (qu[0]*(a2[1]*a3[2]-a2[2]*a3[1]) + qu[1]*(a2[2]*a3[0]-a2[0]*a3[2]) + qu[2]*(a2[0]*a3[1]-a2[1]*a3[0]))/det;
           double df1 = (qu[0]*(a3[1]*a1[2]-a3[2]*a1[1]) + qu[1]*(a3[2]*a1[0]-a3[0]*a1[2]) + qu[2]*(a3[0]*a1[1]-a3[1]*a1[0]))/det;
           double df2 = (qu[0]*(a1[1]*a2[2]-a1[2]*a2[1]) + qu[1]*(a1[2]*a2[0]-a1[0]*a2[2]) + qu[2]*(a1[0]*a2[1]-a1[1]*a2[0]))/det;
-          g = (1+df0*df0+df1*df1+df2*df2);
+          g = 1 + df0*df0 + df1*df1 + df2*df2;
           if (adp==2)
             {
               // directional adaptation G=diag(g_i)
@@ -3089,7 +3051,7 @@ double VariationalMeshSmoother::avertex(int n,
             }
           else
             {
-              for (int i=0; i<n; i++)
+              for (unsigned i=0; i<_dim; i++)
                 G[i] = g;  // simple adaptation G=gI
             }
         }
@@ -3097,7 +3059,7 @@ double VariationalMeshSmoother::avertex(int n,
   else
     {
       g = 1.0;
-      for (int i=0; i<n; i++)
+      for (unsigned i=0; i<_dim; i++)
         G[i] = g;
     }
 
@@ -3107,8 +3069,7 @@ double VariationalMeshSmoother::avertex(int n,
 
 
 // Computes local matrics W and local rhs F on one basis
-double VariationalMeshSmoother::vertex(int n,
-                                       Array3D<double>& W,
+double VariationalMeshSmoother::vertex(Array3D<double>& W,
                                        Array2D<double>& F,
                                        const Array2D<double>& R,
                                        const std::vector<int>& cell_in,
@@ -3120,23 +3081,22 @@ double VariationalMeshSmoother::vertex(int n,
                                        int me,
                                        double vol,
                                        int f,
-                                       double *qmin,
+                                       double& qmin,
                                        int adp,
                                        const std::vector<double>& g,
-                                       double sigma,
-                                       FILE * /*sout*/)
+                                       double sigma)
 {
   // hessian, function, gradient
   Array2D<double> Q(3, nvert);
-  basisA(n, Q, nvert, K, H, me);
+  basisA(Q, nvert, K, H, me);
 
   std::vector<double> a1(3), a2(3), a3(3);
-  for (int i=0; i<n; i++)
+  for (unsigned i=0; i<_dim; i++)
     for (int j=0; j<nvert; j++)
       {
         a1[i] += Q[i][j]*R[cell_in[j]][0];
         a2[i] += Q[i][j]*R[cell_in[j]][1];
-        if (n==3)
+        if (_dim==3)
           a3[i] += Q[i][j]*R[cell_in[j]][2];
       }
 
@@ -3147,11 +3107,11 @@ double VariationalMeshSmoother::vertex(int n,
   else
     {
       G = 1.0;
-      for (int i=0; i<n; i++)
+      for (unsigned i=0; i<_dim; i++)
         {
           a1[i] *= sqrt(g[0]);
           a2[i] *= sqrt(g[1]);
-          if (n==3)
+          if (_dim==3)
             a3[i] *= sqrt(g[2]);
         }
     }
@@ -3163,7 +3123,7 @@ double VariationalMeshSmoother::vertex(int n,
 
   std::vector<double> av1(3), av2(3), av3(3);
 
-  if (n==2)
+  if (_dim==2)
     {
       av1[0] =  a2[1];
       av1[1] = -a2[0];
@@ -3176,7 +3136,7 @@ double VariationalMeshSmoother::vertex(int n,
       phit = (1-w)*tr + w*(vol/G + det*det*G/vol)/2.;
     }
 
-  if (n==3)
+  if (_dim==3)
     {
       av1[0] = a2[1]*a3[2] - a2[2]*a3[1];
       av1[1] = a2[2]*a3[0] - a2[0]*a3[2];
@@ -3203,7 +3163,9 @@ double VariationalMeshSmoother::vertex(int n,
   double dchi = 0.5 + det*0.5/sqrt(epsilon*epsilon+det*det);
   double chi = 0.5*(det+sqrt(epsilon*epsilon+det*det));
   double fet = (chi != 0.0) ? phit/chi : 1.e32;
-  *qmin = det*G;
+
+  // Set return value reference
+  qmin = det*G;
 
   // gradient and Hessian
   if (f==0)
@@ -3213,7 +3175,7 @@ double VariationalMeshSmoother::vertex(int n,
       Array2D<double> dphi(3, 3);
       Array2D<double> dfe(3, 3);
 
-      if (n==2)
+      if (_dim==2)
         {
           for (int i=0; i<2; i++)
             {
@@ -3222,17 +3184,15 @@ double VariationalMeshSmoother::vertex(int n,
             }
 
           for (int i=0; i<2; i++)
-            {
-              for (int j=0; j<2; j++)
-                {
-                  d2phi[0][i][j] = w*G*av1[i]*av1[j]/vol;
-                  d2phi[1][i][j] = w*G*av2[i]*av2[j]/vol;
+            for (int j=0; j<2; j++)
+              {
+                d2phi[0][i][j] = w*G*av1[i]*av1[j]/vol;
+                d2phi[1][i][j] = w*G*av2[i]*av2[j]/vol;
 
-                  if (i==j)
-                    for (int k=0; k<2; k++)
-                      d2phi[k][i][j] += 1.-w;
-                }
-            }
+                if (i==j)
+                  for (int k=0; k<2; k++)
+                    d2phi[k][i][j] += 1.-w;
+              }
 
           for (int i=0; i<2; i++)
             {
@@ -3241,16 +3201,14 @@ double VariationalMeshSmoother::vertex(int n,
             }
 
           for (int i=0; i<2; i++)
-            {
-              for (int j=0; j<2; j++)
-                {
-                  P[0][i][j] = (d2phi[0][i][j] - dchi*(av1[i]*dfe[0][j] + dfe[0][i]*av1[j]))/chi;
-                  P[1][i][j] = (d2phi[1][i][j] - dchi*(av2[i]*dfe[1][j] + dfe[1][i]*av2[j]))/chi;
-                }
-            }
+            for (int j=0; j<2; j++)
+              {
+                P[0][i][j] = (d2phi[0][i][j] - dchi*(av1[i]*dfe[0][j] + dfe[0][i]*av1[j]))/chi;
+                P[1][i][j] = (d2phi[1][i][j] - dchi*(av2[i]*dfe[1][j] + dfe[1][i]*av2[j]))/chi;
+              }
         }
 
-      if (n==3)
+      if (_dim==3)
         {
           for (int i=0; i<3; i++)
             {
@@ -3303,16 +3261,16 @@ double VariationalMeshSmoother::vertex(int n,
       /*--------matrix W, right side F---------------------*/
       Array2D<double> gpr(3, nvert);
 
-      for (int i1=0; i1<n; i1++)
+      for (unsigned i1=0; i1<_dim; i1++)
         {
-          for (int i=0; i<n; i++)
+          for (unsigned i=0; i<_dim; i++)
             for (int j=0; j<nvert; j++)
-              for (int k=0; k<n; k++)
+              for (unsigned k=0; k<_dim; k++)
                 gpr[i][j] += P[i1][i][k]*Q[k][j];
 
           for (int i=0; i<nvert; i++)
             for (int j=0; j<nvert; j++)
-              for (int k=0; k<n; k++)
+              for (unsigned k=0; k<_dim; k++)
                 W[i1][i][j] += Q[k][i]*gpr[k][j]*sigma;
 
           for (int i=0; i<nvert; i++)
@@ -3570,8 +3528,7 @@ int VariationalMeshSmoother::pcg_ic0(int n,
 
 // Sample mesh file generation
 void VariationalMeshSmoother::gener(char grid[],
-                                    int n,
-                                    FILE * /*sout*/)
+                                    int n)
 {
   FILE *stream;
   int i, j, k, n1=3, N, ncells, mask, ii, jj, kk, nc;
@@ -3633,8 +3590,7 @@ void VariationalMeshSmoother::gener(char grid[],
 void VariationalMeshSmoother::metr_data_gen(char grid[],
                                             char metr[],
                                             int n,
-                                            int me,
-                                            FILE *sout)
+                                            int me)
 {
   double a1[3], a2[3], a3[3];
   double det, g1, g2, g3, det_o, g1_o, g2_o, g3_o, eps=1e-3;
@@ -3657,7 +3613,7 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
   Array2D<int> cells(ncells, 3*n + n%2);
   Array2D<double> R(N,n);
 
-  readgr(n, R, mask, cells, mcells, mcells, mcells, sout);
+  readgr(R, mask, cells, mcells, mcells, mcells);
 
   // genetrate metric file
   stream=fopen(metr,"w+");
@@ -3676,7 +3632,7 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
             if (nvert==3)
               {
                 // tri
-                basisA(2, Q, 3, K, Q, 1);
+                basisA(Q, 3, K, Q, 1);
                 for (k=0; k<2; k++)
                   {
                     a1[k]=0;
@@ -3843,7 +3799,7 @@ void VariationalMeshSmoother::metr_data_gen(char grid[],
           if (nvert==4)
             {
               // tetr
-              basisA(3,Q,4,K,Q,1);
+              basisA(Q, 4, K, Q, 1);
               for (k=0; k<3; k++)
                 {
                   a1[k]=0;
