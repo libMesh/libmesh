@@ -189,8 +189,9 @@ private:
       _data.resize(nx, std::vector<T>(ny));
     }
 
-    // Accessor
+    // Accessors
     std::vector<T>& operator[](unsigned i) {return _data[i];}
+    const std::vector<T>& operator[](unsigned i) const {return _data[i];}
 
   private:
     std::vector<std::vector<T> > _data;
@@ -209,8 +210,9 @@ private:
       _data.resize(nx, Array2D<T>(ny,nz));
     }
 
-    // Accessor
+    // Accessors
     Array2D<T>& operator[](unsigned i) {return _data[i];}
+    const Array2D<T>& operator[](unsigned i) const {return _data[i];}
 
   private:
     std::vector<Array2D<T> > _data;
@@ -221,64 +223,214 @@ private:
               std::vector<int>& mcells, int nedges, std::vector<int>& edges, std::vector<int>& hnodes, const char grid[],
               int me, const char grid_old[], FILE *sout);
 
-  int readgr(int n, Array2D<double>& R, std::vector<int>& mask,
-             Array2D<int>& cells, std::vector<int>& mcells, std::vector<int>& edges, std::vector<int>& hnodes, FILE *sout);
+  int readgr(int n,
+             Array2D<double>& R,
+             std::vector<int>& mask,
+             Array2D<int>& cells,
+             std::vector<int>& mcells,
+             std::vector<int>& edges,
+             std::vector<int>& hnodes,
+             FILE *sout);
 
   int readmetr(char *name, Array3D<double>& H, int ncells, int n, FILE *sout);
 
   int read_adp(std::vector<double>& afun, char *adap, FILE *sout);
 
-  double jac3(double x1, double y1, double z1, double x2, double y2,
-              double z2, double x3, double y3, double z3);
+  double jac3(double x1, double y1, double z1,
+              double x2, double y2, double z2,
+              double x3, double y3, double z3);
 
   double jac2(double x1, double y1, double x2, double y2);
 
-  int basisA(int n, Array2D<double>& Q, int nvert, std::vector<double>& K, Array2D<double>& H, int me);
+  int basisA(int n,
+             Array2D<double>& Q,
+             int nvert,
+             const std::vector<double>& K,
+             const Array2D<double>& H,
+             int me);
 
-  void adp_renew(int n, int N, Array2D<double>& R, int ncells, Array2D<int>& cells,
-                 std::vector<double>& afun, int adp, FILE *sout);
+  void adp_renew(int n,
+                 int N,
+                 const Array2D<double>& R,
+                 int ncells,
+                 const Array2D<int>& cells,
+                 std::vector<double>& afun,
+                 int adp,
+                 FILE *sout);
 
-  void full_smooth(int n, int N, Array2D<double>& R, std::vector<int>& mask, int ncells, Array2D<int>& cells, std::vector<int>& mcells,
-                   int nedges, int* edges, std::vector<int>& hnodes, double w, int* iter, int me,
-                   Array3D<double>& H, int adp, char *adap, int gr, FILE *sout);
+  void full_smooth(int n,
+                   int N,
+                   Array2D<double>& R,
+                   const std::vector<int>& mask,
+                   int ncells,
+                   const Array2D<int>& cells,
+                   const std::vector<int>& mcells,
+                   int nedges,
+                   const std::vector<int>& edges,
+                   const std::vector<int>& hnodes,
+                   double w,
+                   int* iter,
+                   int me,
+                   const Array3D<double>& H,
+                   int adp,
+                   char *adap,
+                   int gr,
+                   FILE *sout);
 
-  double maxE(int n, int N, Array2D<double>& R, int ncells, Array2D<int>& cells, std::vector<int>& mcells,
-              int me, Array3D<double>& H, double v, double epsilon, double w, std::vector<double>& Gamma,
-              double *qmin, FILE *sout);
+  double maxE(int n,
+              int N,
+              Array2D<double>& R,
+              int ncells,
+              const Array2D<int>& cells,
+              const std::vector<int>& mcells,
+              int me,
+              const Array3D<double>& H,
+              double v,
+              double epsilon,
+              double w,
+              std::vector<double>& Gamma,
+              double *qmin,
+              FILE *sout);
 
-  double minq(int n, int N, Array2D<double>& R, int ncells, Array2D<int>& cells, std::vector<int>& mcells,
-              int me, Array3D<double>& H, double *vol, double *Vmin, FILE *sout);
+  double minq(int n,
+              int N,
+              const Array2D<double>& R,
+              int ncells,
+              const Array2D<int>& cells,
+              const std::vector<int>& mcells,
+              int me,
+              const Array3D<double>& H,
+              double *vol,
+              double *Vmin,
+              FILE *sout);
 
-  double minJ(int n, int N, Array2D<double>& R, std::vector<int>& mask, int ncells, Array2D<int>& cells, std::vector<int>& mcells,
-              double epsilon, double w, int me, Array3D<double>& H, double vol, int nedges,
-              int* edges, std::vector<int>& hnodes, int msglev, double *Vmin, double *emax, double *qmin,
-              int adp, std::vector<double>& afun, FILE *sout);
+  double minJ(int n,
+              int N,
+              Array2D<double>& R,
+              const std::vector<int>& mask,
+              int ncells,
+              const Array2D<int>& cells,
+              const std::vector<int>& mcells,
+              double epsilon,
+              double w,
+              int me,
+              const Array3D<double>& H,
+              double vol,
+              int nedges,
+              const std::vector<int>& edges,
+              const std::vector<int>& hnodes,
+              int msglev,
+              double *Vmin,
+              double *emax,
+              double *qmin,
+              int adp,
+              const std::vector<double>& afun,
+              FILE *sout);
 
-  double minJ_BC(int N, Array2D<double>& R, std::vector<int>& mask, int ncells, Array2D<int>& cells, std::vector<int>& mcells,
-                 double epsilon, double w, int me, Array3D<double>& H, double vol, int msglev,
-                 double *Vmin, double *emax, double *qmin, int adp, std::vector<double>& afun, int NCN, FILE *sout);
+  double minJ_BC(int N,
+                 Array2D<double>& R,
+                 const std::vector<int>& mask,
+                 int ncells,
+                 const Array2D<int>& cells,
+                 const std::vector<int>& mcells,
+                 double epsilon,
+                 double w,
+                 int me,
+                 const Array3D<double>& H,
+                 double vol,
+                 int msglev,
+                 double *Vmin,
+                 double *emax,
+                 double *qmin,
+                 int adp,
+                 const std::vector<double>& afun,
+                 int NCN,
+                 FILE *sout);
 
-  double localP(int n, Array3D<double>& W, Array2D<double>& F, Array2D<double>& R, std::vector<int>& cell, std::vector<int>& mask, double epsilon,
-                double w, int nvert, Array2D<double>& H, int me, double vol, int f, double *Vmin,
-                double *qmin, int adp, std::vector<double>& afun, std::vector<double>& Gloc, FILE *sout);
+  double localP(int n,
+                Array3D<double>& W,
+                Array2D<double>& F,
+                Array2D<double>& R,
+                const std::vector<int>& cell_in,
+                const std::vector<int>& mask,
+                double epsilon,
+                double w,
+                int nvert,
+                const Array2D<double>& H,
+                int me,
+                double vol,
+                int f,
+                double *Vmin,
+                double *qmin,
+                int adp,
+                const std::vector<double>& afun,
+                std::vector<double>& Gloc,
+                FILE *sout);
 
-  double avertex(int n, std::vector<double>& afun, std::vector<double>& G, Array2D<double>& R, std::vector<int>& cell, int nvert, int adp, FILE *sout);
+  double avertex(int n,
+                 const std::vector<double>& afun,
+                 std::vector<double>& G,
+                 const Array2D<double>& R,
+                 const std::vector<int>& cell_in,
+                 int nvert,
+                 int adp,
+                 FILE *sout);
 
-  double vertex(int n, Array3D<double>& W, Array2D<double>& F, Array2D<double>& R, std::vector<int>& cell,
-                double epsilon, double w, int nvert, std::vector<double>& K,
-                Array2D<double>& H, int me, double vol, int f, double *Vmin, int adp,
-                std::vector<double>& G, double sigma, FILE *sout);
+  double vertex(int n,
+                Array3D<double>& W,
+                Array2D<double>& F,
+                const Array2D<double>& R,
+                const std::vector<int>& cell_in,
+                double epsilon,
+                double w,
+                int nvert,
+                const std::vector<double>& K,
+                const Array2D<double>& H,
+                int me,
+                double vol,
+                int f,
+                double *Vmin,
+                int adp,
+                const std::vector<double>& g,
+                double sigma,
+                FILE *sout);
 
   void metr_data_gen(char grid[], char metr[], int n, int me, FILE *sout);
 
-  int solver(int n, std::vector<int>& ia, std::vector<int>& ja, std::vector<double>& a, std::vector<double>& x, std::vector<double>& b, double eps,
-             int maxite, int msglev, FILE *sout);
+  int solver(int n,
+             const std::vector<int>& ia,
+             const std::vector<int>& ja,
+             const std::vector<double>& a,
+             std::vector<double>& x,
+             const std::vector<double>& b,
+             double eps,
+             int maxite,
+             int msglev,
+             FILE *sout);
 
-  int pcg_ic0(int n, std::vector<int>& ia, std::vector<int>& ja, std::vector<double>& a, std::vector<double>& u,
-              std::vector<double>& x, std::vector<double>& b, std::vector<double>& r,
-              std::vector<double>& p, std::vector<double>& z, double eps, int maxite, int msglev, FILE *sout);
+  int pcg_ic0(int n,
+              const std::vector<int>& ia,
+              const std::vector<int>& ja,
+              const std::vector<double>& a,
+              const std::vector<double>& u,
+              std::vector<double>& x,
+              const std::vector<double>& b,
+              std::vector<double>& r,
+              std::vector<double>& p,
+              std::vector<double>& z,
+              double eps,
+              int maxite,
+              int msglev,
+              FILE *sout);
 
-  int pcg_par_check(int n, std::vector<int>& ia, std::vector<int>& ja, std::vector<double>& a, double eps, int maxite, int msglev, FILE *sout);
+  int pcg_par_check(int n,
+                    const std::vector<int>& ia,
+                    const std::vector<int>& ja,
+                    const std::vector<double>& a,
+                    double eps,
+                    int maxite,
+                    int msglev,
+                    FILE *sout);
 
   void gener(char grid[], int n, FILE *sout);
 };
