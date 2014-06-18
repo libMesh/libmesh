@@ -252,7 +252,8 @@ public:
 
 // ------------------------------------------------------------
 // System implementation
-void System::project_vector (NumericVector<Number>& vector) const
+void System::project_vector (NumericVector<Number>& vector,
+                             int is_adjoint) const
 {
   // Create a copy of the vector, which currently
   // contains the old data.
@@ -260,7 +261,7 @@ void System::project_vector (NumericVector<Number>& vector) const
     old_vector (vector.clone());
 
   // Project the old vector to the new vector
-  this->project_vector (*old_vector, vector);
+  this->project_vector (*old_vector, vector, is_adjoint);
 }
 
 
@@ -270,7 +271,8 @@ void System::project_vector (NumericVector<Number>& vector) const
  * interpolations on each element.
  */
 void System::project_vector (const NumericVector<Number>& old_v,
-                             NumericVector<Number>& new_v) const
+                             NumericVector<Number>& new_v,
+                             int is_adjoint) const
 {
   START_LOG ("project_vector()", "System");
 
@@ -425,7 +427,11 @@ void System::project_vector (const NumericVector<Number>& old_v,
       new_v.close();
     }
 
-  this->get_dof_map().enforce_constraints_exactly(*this, &new_v);
+  if (is_adjoint == -1)
+    this->get_dof_map().enforce_constraints_exactly(*this, &new_v);
+  else if (is_adjoint >= 0)
+    this->get_dof_map().enforce_adjoint_constraints_exactly(new_v,
+                                                            is_adjoint);
 
 #else
 
@@ -498,11 +504,12 @@ void System::project_vector (Number fptr(const Point& p,
                                            const std::string& sys_name,
                                            const std::string& unknown_name),
                              const Parameters& parameters,
-                             NumericVector<Number>& new_vector) const
+                             NumericVector<Number>& new_vector,
+                             int is_adjoint) const
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
   WrappedFunction<Gradient> g(*this, gptr, &parameters);
-  this->project_vector(new_vector, &f, &g);
+  this->project_vector(new_vector, &f, &g, is_adjoint);
 }
 
 /**
@@ -511,7 +518,8 @@ void System::project_vector (Number fptr(const Point& p,
  */
 void System::project_vector (NumericVector<Number>& new_vector,
                              FunctionBase<Number> *f,
-                             FunctionBase<Gradient> *g) const
+                             FunctionBase<Gradient> *g,
+                             int is_adjoint) const
 {
   START_LOG ("project_vector()", "System");
 
@@ -561,7 +569,11 @@ void System::project_vector (NumericVector<Number>& new_vector,
   new_vector.close();
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
+  if (is_adjoint == -1)
+    this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
+  else if (is_adjoint >= 0)
+    this->get_dof_map().enforce_adjoint_constraints_exactly(new_vector,
+                                                            is_adjoint);
 #endif
 
   STOP_LOG("project_vector()", "System");
@@ -574,7 +586,8 @@ void System::project_vector (NumericVector<Number>& new_vector,
  */
 void System::project_vector (NumericVector<Number>& new_vector,
                              FEMFunctionBase<Number> *f,
-                             FEMFunctionBase<Gradient> *g) const
+                             FEMFunctionBase<Gradient> *g,
+                             int is_adjoint) const
 {
   START_LOG ("project_fem_vector()", "System");
 
@@ -621,7 +634,11 @@ void System::project_vector (NumericVector<Number>& new_vector,
   new_vector.close();
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
+  if (is_adjoint == -1)
+    this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
+  else if (is_adjoint >= 0)
+    this->get_dof_map().enforce_adjoint_constraints_exactly(new_vector,
+                                                            is_adjoint);
 #endif
 
   STOP_LOG("project_fem_vector()", "System");
@@ -688,11 +705,13 @@ void System::boundary_project_vector
                const std::string& sys_name,
                const std::string& unknown_name),
  const Parameters& parameters,
- NumericVector<Number>& new_vector) const
+ NumericVector<Number>& new_vector,
+ int is_adjoint) const
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
   WrappedFunction<Gradient> g(*this, gptr, &parameters);
-  this->boundary_project_vector(b, variables, new_vector, &f, &g);
+  this->boundary_project_vector(b, variables, new_vector, &f, &g,
+                                is_adjoint);
 }
 
 /**
@@ -704,7 +723,8 @@ void System::boundary_project_vector
  const std::vector<unsigned int> &variables,
  NumericVector<Number>& new_vector,
  FunctionBase<Number> *f,
- FunctionBase<Gradient> *g) const
+ FunctionBase<Gradient> *g,
+ int is_adjoint) const
 {
   START_LOG ("boundary_project_vector()", "System");
 
@@ -722,7 +742,11 @@ void System::boundary_project_vector
   new_vector.close();
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
+  if (is_adjoint == -1)
+    this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
+  else if (is_adjoint >= 0)
+    this->get_dof_map().enforce_adjoint_constraints_exactly(new_vector,
+                                                            is_adjoint);
 #endif
 
   STOP_LOG("boundary_project_vector()", "System");

@@ -509,10 +509,14 @@ public:
    * element spaces with continuous derivatives.
    * If non-default \p Parameters are to be used, they can be provided
    * in the \p parameters argument.
+   *
+   * Constrain the new vector using the requested adjoint rather than
+   * primal constraints if is_adjoint is non-negative.
    */
   void project_vector (NumericVector<Number>& new_vector,
                        FunctionBase<Number> *f,
-                       FunctionBase<Gradient> *g = NULL) const;
+                       FunctionBase<Gradient> *g = NULL,
+                       int is_adjoint = -1) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -523,10 +527,14 @@ public:
    * element spaces with continuous derivatives.
    * If non-default \p Parameters are to be used, they can be provided
    * in the \p parameters argument.
+   *
+   * Constrain the new vector using the requested adjoint rather than
+   * primal constraints if is_adjoint is non-negative.
    */
   void project_vector (NumericVector<Number>& new_vector,
                        FEMFunctionBase<Number> *f,
-                       FEMFunctionBase<Gradient> *g = NULL) const;
+                       FEMFunctionBase<Gradient> *g = NULL,
+                       int is_adjoint = -1) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -535,6 +543,9 @@ public:
    * represented by function pointers.
    * A gradient \p gptr is only required/used for projecting onto
    * finite element spaces with continuous derivatives.
+   *
+   * Constrain the new vector using the requested adjoint rather than
+   * primal constraints if is_adjoint is non-negative.
    */
   void project_vector (Number fptr(const Point& p,
                                    const Parameters& parameters,
@@ -545,7 +556,8 @@ public:
                                      const std::string& sys_name,
                                      const std::string& unknown_name),
                        const Parameters& parameters,
-                       NumericVector<Number>& new_vector) const;
+                       NumericVector<Number>& new_vector,
+                       int is_adjoint = -1) const;
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -603,12 +615,16 @@ public:
    * element spaces with continuous derivatives.
    * If non-default \p Parameters are to be used, they can be provided
    * in the \p parameters argument.
+   *
+   * Constrain the new vector using the requested adjoint rather than
+   * primal constraints if is_adjoint is non-negative.
    */
   void boundary_project_vector (const std::set<boundary_id_type> &b,
                                 const std::vector<unsigned int> &variables,
                                 NumericVector<Number>& new_vector,
                                 FunctionBase<Number> *f,
-                                FunctionBase<Gradient> *g = NULL) const;
+                                FunctionBase<Gradient> *g = NULL,
+                                int is_adjoint = -1) const;
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -621,6 +637,9 @@ public:
    * represented by function pointers.
    * A gradient \p gptr is only required/used for projecting onto
    * finite element spaces with continuous derivatives.
+   *
+   * Constrain the new vector using the requested adjoint rather than
+   * primal constraints if is_adjoint is non-negative.
    */
   void boundary_project_vector (const std::set<boundary_id_type> &b,
                                 const std::vector<unsigned int> &variables,
@@ -633,7 +652,8 @@ public:
                                               const std::string& sys_name,
                                               const std::string& unknown_name),
                                 const Parameters& parameters,
-                                NumericVector<Number>& new_vector) const;
+                                NumericVector<Number>& new_vector,
+                                int is_adjoint = -1) const;
 
   /**
    * @returns the system number.
@@ -834,7 +854,26 @@ public:
    */
   const std::string & vector_name (const NumericVector<Number> & vec_reference) const;
 
+   /**
+   * Allows one to set the QoI index controlling whether the vector
+   * identified by vec_name represents a solution from the adjoint
+   * (qoi_num >= 0) or primal (qoi_num == -1) space.  This becomes
+   * significant if those spaces have differing heterogeneous
+   * Dirichlet constraints.
+   *
+   * qoi_num == -2 can be used to indicate a vector which should not
+   * be affected by constraints during projection operations.
+   */
+  void set_vector_as_adjoint (const std::string &vec_name, int qoi_num);
+
   /**
+   * @returns the int describing whether the vector identified by
+   * vec_name represents a solution from an adjoint (non-negative) or
+   * the primal (-1) space.
+   */
+  int vector_as_adjoint (const std::string &vec_name) const;
+
+ /**
    * Allows one to set the boolean controlling whether the vector
    * identified by vec_name should be "preserved": projected to new
    * meshes, saved, etc.
@@ -1571,16 +1610,24 @@ protected:
   /**
    * Projects the vector defined on the old mesh onto the
    * new mesh.
+   *
+   * Constrain the new vector using the requested adjoint rather than
+   * primal constraints if is_adjoint is non-negative.
    */
-  void project_vector (NumericVector<Number>&) const;
+  void project_vector (NumericVector<Number>&,
+                       int is_adjoint = -1) const;
 
   /**
    * Projects the vector defined on the old mesh onto the
    * new mesh. The original vector is unchanged and the new vector
    * is passed through the second argument.
+   *
+   * Constrain the new vector using the requested adjoint rather than
+   * primal constraints if is_adjoint is non-negative.
    */
   void project_vector (const NumericVector<Number>&,
-                       NumericVector<Number>&) const;
+                       NumericVector<Number>&,
+                       int is_adjoint = -1) const;
 
 private:
   /**
@@ -1805,6 +1852,12 @@ private:
    * onto a changed grid, false if it should be zeroed.
    */
   std::map<std::string, bool> _vector_projections;
+
+  /**
+   * Holds non-negative if a vector by that name should be projected
+   * using adjoint constraints/BCs, -1 if primal
+   */
+  std::map<std::string, int> _vector_is_adjoint;
 
   /**
    * Holds the type of a vector

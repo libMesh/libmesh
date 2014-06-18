@@ -215,6 +215,7 @@ void System::clear ()
 
     _vectors.clear();
     _vector_projections.clear();
+    _vector_is_adjoint.clear();
     _vector_types.clear();
     _can_add_vectors = true;
   }
@@ -324,7 +325,7 @@ void System::restrict_vectors ()
       NumericVector<Number>* v = pos->second;
 
       if (_vector_projections[pos->first])
-        this->project_vector (*v);
+        this->project_vector (*v, _vector_is_adjoint[pos->first]);
       else
         {
           ParallelType type = _vector_types[pos->first];
@@ -718,6 +719,7 @@ void System::remove_vector (const std::string& vec_name)
 
   _vectors.erase(vec_name);
   _vector_projections.erase(vec_name);
+  _vector_is_adjoint.erase(vec_name);
   _vector_types.erase(vec_name);
 }
 
@@ -870,6 +872,8 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
   return v->first;
 }
 
+
+
 void System::set_vector_preservation (const std::string &vec_name,
                                       bool preserve)
 {
@@ -884,6 +888,27 @@ bool System::vector_preservation (const std::string &vec_name) const
     return false;
 
   return _vector_projections.find(vec_name)->second;
+}
+
+
+
+void System::set_vector_as_adjoint (const std::string &vec_name,
+                                    int qoi_num)
+{
+  // We reserve -1 for vectors which get primal constraints, -2 for
+  // vectors which get no constraints
+  libmesh_assert_greater_equal(qoi_num, -2);
+  _vector_is_adjoint[vec_name] = qoi_num;
+}
+
+
+
+int System::vector_as_adjoint (const std::string &vec_name) const
+{
+  libmesh_assert(_vector_is_adjoint.find(vec_name) !=
+                 _vector_is_adjoint.end());
+
+  return _vector_is_adjoint.find(vec_name)->second;
 }
 
 
@@ -944,7 +969,9 @@ NumericVector<Number> & System::add_adjoint_solution (unsigned int i)
   std::ostringstream adjoint_name;
   adjoint_name << "adjoint_solution" << i;
 
-  return this->add_vector(adjoint_name.str());
+  NumericVector<Number> &returnval = this->add_vector(adjoint_name.str());
+  this->set_vector_as_adjoint(adjoint_name.str(), i);
+  return returnval;
 }
 
 
@@ -974,7 +1001,9 @@ NumericVector<Number> & System::add_weighted_sensitivity_adjoint_solution (unsig
   std::ostringstream adjoint_name;
   adjoint_name << "weighted_sensitivity_adjoint_solution" << i;
 
-  return this->add_vector(adjoint_name.str());
+  NumericVector<Number> &returnval = this->add_vector(adjoint_name.str());
+  this->set_vector_as_adjoint(adjoint_name.str(), i);
+  return returnval;
 }
 
 
