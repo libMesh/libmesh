@@ -141,12 +141,14 @@ namespace FPoptimizer_CodeTree
 #include "instantiate.hh"
 namespace FPoptimizer_CodeTree
 {
+#ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
 #define FP_INSTANTIATE(type) \
     template void DumpHashes(const CodeTree<type>& tree, std::ostream& o); \
     template void DumpTree(const CodeTree<type>& tree, std::ostream& o); \
     template void DumpTreeWithIndent(const CodeTree<type>& tree, std::ostream& o, const std::string& indent);
     FPOPTIMIZER_EXPLICITLY_INSTANTIATE(FP_INSTANTIATE)
 #undef FP_INSTANTIATE
+#endif
 }
 /* END_EXPLICIT_INSTANTATION */
 
