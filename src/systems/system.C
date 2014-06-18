@@ -325,7 +325,7 @@ void System::restrict_vectors ()
       NumericVector<Number>* v = pos->second;
 
       if (_vector_projections[pos->first])
-        this->project_vector (*v);
+        this->project_vector (*v, _vector_is_adjoint[pos->first]);
       else
         {
           ParallelType type = _vector_types[pos->first];
