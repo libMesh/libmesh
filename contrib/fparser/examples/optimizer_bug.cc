@@ -18,10 +18,10 @@ int main()
   FunctionParser fparser;
 
   // The White Whale
-  std::string func = "(-W*(c-cv_eq)^2*(1-cv_eq-c)*2 + W*(c-cv_eq)*2*(1-cv_eq-c)^2)*16";
+  std::string func = "c*2*(1-c)^2 - c^2*(1-c)*2";
 
   // Parse the input expression into bytecode
-  fparser.Parse(func, "c,W,cv_eq");
+  fparser.Parse(func, "c");
 #ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
   std::cout << "Input Expression:\n" << func << std::endl;
   fparser.PrintByteCode(std::cout);
