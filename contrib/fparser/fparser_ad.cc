@@ -441,7 +441,7 @@ void FunctionParserADBase<Value_t>::Commit(const DiffProgramFragment & diff)
     if (diff[i].first == cImmed)
       mData->mImmed.push_back(diff[i].second);
   }
-  
+
 #ifndef FP_USE_THREAD_SAFE_EVAL
   mData->mStack.resize(mData->stackSize);
 #endif
@@ -566,6 +566,9 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
     }
 
     diff  = DiffFunction(orig);
+
+    // create compressed program representation
+    Commit(diff);
   }
   catch(std::exception &e)
   {
@@ -578,9 +581,6 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
     setZero();
     return 0;
   }
-
-  // create compressed program representation
-  Commit(diff);
 
   return -1;
 }
