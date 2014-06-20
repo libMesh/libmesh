@@ -27,10 +27,12 @@ coarsegridsize = 20
 max_adaptivesteps = 0
 
 # Turn this off to see the NewtonSolver chatter
-solver_quiet = true
+solver_quiet = false
 
 # Solve the 2D or 3D problem
 dimension = 2
 
 # Nonlinear solver tolerance
 relative_step_tolerance = 1e-3
+
+relative_residual_tolerance = 1.e-6
