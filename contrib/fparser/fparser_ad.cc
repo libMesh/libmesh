@@ -426,14 +426,25 @@ void FunctionParserADBase<Value_t>::Commit(const DiffProgramFragment & diff)
   // loop over diff and fill in mByteCode and mImmed
   mData->mByteCode.clear();
   mData->mImmed.clear();
+  mData->mStackSize = 0;
+  int stack_size = 0;
 
   // compressed immediate data representation
   for (unsigned int i = 0; i < diff.size(); ++i)
   {
-    mData->mByteCode.push_back(diff[i].first);
+    int op = diff[i].first;
+    int op_size = OpcodeSize(op);
+    stack_size -= op_size > 0 ? op_size-1 : op_size;
+    if (stack_size > mData->mStackSize) mData->mStackSize = stack_size;
+
+    mData->mByteCode.push_back(op);
     if (diff[i].first == cImmed)
       mData->mImmed.push_back(diff[i].second);
   }
+
+#ifndef FP_USE_THREAD_SAFE_EVAL
+  mData->mStack.resize(mData->stackSize);
+#endif
 }
 
 template<typename Value_t>
@@ -555,6 +566,9 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
     }
 
     diff  = DiffFunction(orig);
+
+    // create compressed program representation
+    Commit(diff);
   }
   catch(std::exception &e)
   {
@@ -567,9 +581,6 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var)
     setZero();
     return 0;
   }
-
-  // create compressed program representation
-  Commit(diff);
 
   return -1;
 }
