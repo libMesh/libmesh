@@ -544,7 +544,7 @@ cAdd (cMul {%@P (cAdd {(cPow[x 2]) (cPow[y 2])})}) (cMul {&@N x y}) : (cMul % (c
 
 # Note: These two rules should be done in constantfolding, but it's complicated.
 # 5*x - 5*y = 5*(x-y)
-cAdd (cMul %@P <1>) (cMul -% <2>) : (cMul % (cAdd <1> (cMul -1 <2>))) # TEST 20/addnegmulpos
+cAdd (cMul %@P <1>) (cMul -% <2>) : (cMul % (cAdd (cMul <1>) (cMul -1 <2>))) # TEST 20/addnegmulpos
 # 5 - 5*x   = -5*(x-1)
 #cAdd %@M            (cMul -% <2>) : (cMul -% (cAdd (cMul <2>) -1))
 cAdd %@M            (cMul -% <2>) : (cMul % (cAdd 1 (cMul <2> -1)))   # TEST 20/addnegmulneg
