@@ -217,6 +217,7 @@ end
 
 clf;
 hold on;
+
 x=linspace(1, length(week_views), length(week_views));
 [haxis, h1, h2] = plotyy(x, week_views, x, week_visitors);
 
@@ -251,9 +252,20 @@ end
 set(haxis, 'xticklabel', xtlabels);
 
 % Print to PDF
-set (gcf, "paperposition", [0.25, 0.25, 10.75, 8.25]);
 set (gcf, "papersize", [11, 8.5]);
 set (gcf, "paperorientation", 'landscape');
+
+% I was using these paper settings in older versions of Octave, but
+% they changed in 3.8.0
+is_380 = strcmp(version(), '3.8.0');
+
+if (!is_380)
+  set (gcf, "paperposition", [0.25, 0.25, 10.75, 8.25]);
+else
+  % In Octave 3.8.0, the default paperposition is [0.25000, 2.50000, 8.00000, 6.00000],
+  % the third number makes the plot taller instead of wider!
+  set (gcf, "paperposition", [0.25, 0.25, 8.0, 10.5]);
+end
 
 % Make a PDF of this plot.
 print('-dpdf', 'weekly_github_traffic.pdf', '-FHelvetica:20');
