@@ -212,7 +212,7 @@ int main (int argc, char** argv)
   // Finally, we evaluate the z-displacement "w" at the center node.
   const unsigned int w_var = system.variable_number ("w");
   unsigned int w_dof = center_node->dof_number (system.number(), w_var, 0);
-  Real w = 0;
+  Number w = 0;
   if (w_dof >= system.get_dof_map().first_dof() &&
       w_dof <  system.get_dof_map().end_dof())
     w = system.current_solution(w_dof);
@@ -611,10 +611,10 @@ void assemble_shell (EquationSystems& es, const std::string& system_name)
       // The node in the interior of the domain, \p n1, is the
       // hardest to find.  Walk along the edges of element \p nb until
       // we have identified it.
-      unsigned int n = 0;
+      unsigned int n_int = 0;
       nodes[0] = nb_elem->get_node(0);
       while (nodes[0]->id() == nodes[1]->id() || nodes[0]->id() == nodes[2]->id())
-        nodes[0] = nb_elem->get_node(++n);
+        nodes[0] = nb_elem->get_node(++n_int);
 
       // The penalty value.  \f$ \frac{1}{\epsilon} \f$
       const Real penalty = 1.e10;
