@@ -1,6 +1,10 @@
 #include "libmesh/vectormap.h"
+
+// Ignore unused parameter warnings coming from cppuint headers
+#include <libmesh/ignore_warnings.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
+#include <libmesh/restore_warnings.h>
 
 #define VECTORMAPOBJECTTEST                     \
   CPPUNIT_TEST( testCreate );                   \

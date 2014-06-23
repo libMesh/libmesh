@@ -1,8 +1,11 @@
 #ifndef __numeric_vector_test_h__
 #define __numeric_vector_test_h__
 
+// Ignore unused parameter warnings coming from cppuint headers
+#include <libmesh/ignore_warnings.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
+#include <libmesh/restore_warnings.h>
 
 #define NUMERICVECTORTEST                       \
   CPPUNIT_TEST( testLocalize );                 \
