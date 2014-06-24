@@ -23,7 +23,7 @@ Biharmonic::JR::JR(EquationSystems& eqSys,
 {
   // Check that we can actually compute second derivatives
 #ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  ERROR("Must have second derivatives enabled");
+  libmesh_error_msg("Must have second derivatives enabled");
 #endif
 
 #ifdef LIBMESH_ENABLE_PERIODIC
