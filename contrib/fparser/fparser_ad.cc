@@ -443,7 +443,7 @@ void FunctionParserADBase<Value_t>::Commit(const DiffProgramFragment & diff)
   }
 
 #ifndef FP_USE_THREAD_SAFE_EVAL
-  mData->mStack.resize(mData->stackSize);
+  mData->mStack.resize(mData->mStackSize);
 #endif
 }
 
