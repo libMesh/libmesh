@@ -37,6 +37,7 @@ using libMesh::FEMContext;
 using libMesh::RBConstruction;
 using libMesh::RBEvaluation;
 using libMesh::Real;
+using libMesh::SECOND;
 
 
 // A simple subclass of RBEvaluation, which just needs to specify
@@ -50,8 +51,8 @@ public:
   /**
    * Constructor. Just set the theta expansion.
    */
-  SimpleRBEvaluation(const libMesh::Parallel::Communicator& comm)
-    : RBEvaluation(comm)
+  SimpleRBEvaluation(const libMesh::Parallel::Communicator& comm_in)
+    : RBEvaluation(comm_in)
   {
     set_rb_theta_expansion(acoustics_rb_theta_expansion);
   }
@@ -77,9 +78,9 @@ class SimpleRBConstruction : public RBConstruction
 public:
 
   SimpleRBConstruction (EquationSystems& es,
-                        const std::string& name,
-                        const unsigned int number)
-    : Parent(es, name, number)
+                        const std::string& name_in,
+                        const unsigned int number_in)
+    : Parent(es, name_in, number_in)
   {}
 
   /**
