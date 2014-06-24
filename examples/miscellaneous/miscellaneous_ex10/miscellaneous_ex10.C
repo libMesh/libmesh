@@ -142,12 +142,11 @@ int main (int argc, char** argv)
   STOP_LOG("Initialize and solve systems", "main");
 
   START_LOG("Result comparison", "main");
-  Real error_tol = 1e-10;
   ExactSolution comparison(equation_systems_stitch);
   comparison.attach_reference_solution(&equation_systems_nostitch);
   comparison.compute_error("Poisson", "u");
   Real error = comparison.l2_error("Poisson", "u");
-  libmesh_assert(error < error_tol);
+  libmesh_assert_less(error, TOLERANCE*sqrt(TOLERANCE));
   libMesh::out << "L2 error between stitched and non-stitched cases: " << error << std::endl;
   STOP_LOG("Result comparison", "main");
 
