@@ -109,7 +109,7 @@ Elem* read_ref_elem (const ElemType Type,
   in >> elem_type;
 
   libmesh_assert_less (elem_type, INVALID_ELEM);
-  libmesh_assert_equal_to (elem_type, Type);
+  libmesh_assert_equal_to (elem_type, static_cast<unsigned int>(Type));
   libmesh_assert_equal_to (n_nodes, Elem::type_to_n_nodes_map[elem_type]);
 
   // Construct the elem
