@@ -1262,20 +1262,73 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                 {
                   Elem* el = this->elem(elem_id);
                   fixed_elems.insert(elem_id);
-                  for(dof_id_type s(0); s < el->n_neighbors(); ++s)
+                  for(unsigned int s = 0; s < el->n_neighbors(); ++s)
                     {
                       if(el->neighbor(s) == NULL)
                         {
                           key_type key = el->key(s);
-                          std::map<key_type, val_type>::const_iterator key_val_it;
-                          key_val_it = side_to_elem_map.find(key);
+                          typedef
+                            std::map<key_type, val_type>::iterator key_val_it_type;
+                          std::pair<key_val_it_type, key_val_it_type>
+                            bounds = side_to_elem_map.equal_range(key);
 
-                          if(key_val_it != side_to_elem_map.end())
+                          if(bounds.first != bounds.second)
                             {
-                              Elem* neighbor = key_val_it->second.first;
-                              dof_id_type neighbor_side = key_val_it->second.second;
-                              el->set_neighbor(s, key_val_it->second.first);
-                              neighbor->set_neighbor(neighbor_side, el);
+                              // Get the side for this element
+                              const AutoPtr<Elem> my_side(el->side(s));
+
+                              // Look at all the entries with an equivalent key
+                              while (bounds.first != bounds.second)
+                                {
+                                  // Get the potential element
+                                  Elem* neighbor = bounds.first->second.first;
+
+                                  // Get the side for the neighboring element
+                                  const unsigned int ns = bounds.first->second.second;
+                                  const AutoPtr<Elem> their_side(neighbor->side(ns));
+                                  //libmesh_assert(my_side.get());
+                                  //libmesh_assert(their_side.get());
+
+                                  // If found a match with my side
+                                  //
+                                  // We need special tests here for 1D:
+                                  // since parents and children have an equal
+                                  // side (i.e. a node), we need to check
+                                  // ns != ms, and we also check level() to
+                                  // avoid setting our neighbor pointer to
+                                  // any of our neighbor's descendants
+                                  if( (*my_side == *their_side) &&
+                                      (el->level() == neighbor->level()) &&
+                                      ((_dim != 1) || (ns != s)) )
+                                    {
+                                      // So share a side.  Is this a mixed pair
+                                      // of subactive and active/ancestor
+                                      // elements?
+                                      // If not, then we're neighbors.
+                                      // If so, then the subactive's neighbor is
+
+                                      if (el->subactive() ==
+                                          neighbor->subactive())
+                                        {
+                                          // an element is only subactive if it has
+                                          // been coarsened but not deleted
+                                          el->set_neighbor (s,neighbor);
+                                          neighbor->set_neighbor(ns,el);
+                                        }
+                                      else if (el->subactive())
+                                        {
+                                          el->set_neighbor(s,neighbor);
+                                        }
+                                      else if (neighbor->subactive())
+                                        {
+                                          neighbor->set_neighbor(ns,el);
+                                        }
+                                      side_to_elem_map.erase (bounds.first);
+                                      break;
+                                    }
+
+                                  ++bounds.first;
+                                }
                             }
                         }
                     }
