@@ -211,7 +211,7 @@ int main (int argc, char** argv)
 
   // Finally, we evaluate the z-displacement "w" at the center node.
   const unsigned int w_var = system.variable_number ("w");
-  unsigned int w_dof = center_node->dof_number (system.number(), w_var, 0);
+  dof_id_type w_dof = center_node->dof_number (system.number(), w_var, 0);
   Number w = 0;
   if (w_dof >= system.get_dof_map().first_dof() &&
       w_dof <  system.get_dof_map().end_dof())
@@ -333,10 +333,10 @@ void assemble_shell (EquationSystems& es, const std::string& system_name)
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
-  std::vector<unsigned int> dof_indices;
-  std::vector<unsigned int> dof_indices_u;
-  std::vector<unsigned int> dof_indices_v;
-  std::vector<unsigned int> dof_indices_w;
+  std::vector<dof_id_type> dof_indices;
+  std::vector<dof_id_type> dof_indices_u;
+  std::vector<dof_id_type> dof_indices_v;
+  std::vector<dof_id_type> dof_indices_w;
 
   // Now we will loop over all the elements in the mesh.  We will
   // compute the element matrix and right-hand-side contribution.
@@ -366,10 +366,10 @@ void assemble_shell (EquationSystems& es, const std::string& system_name)
     dof_map.dof_indices (elem, dof_indices_v, v_var);
     dof_map.dof_indices (elem, dof_indices_w, w_var);
 
-    const unsigned int n_dofs   = dof_indices.size();
-    const unsigned int n_u_dofs = dof_indices_u.size();
-    const unsigned int n_v_dofs = dof_indices_v.size();
-    const unsigned int n_w_dofs = dof_indices_w.size();
+    const std::size_t n_dofs   = dof_indices.size();
+    const std::size_t n_u_dofs = dof_indices_u.size();
+    const std::size_t n_v_dofs = dof_indices_v.size();
+    const std::size_t n_w_dofs = dof_indices_w.size();
 
     // Compute the element-specific data for the current
     // element.  This involves computing the location of the
@@ -625,9 +625,9 @@ void assemble_shell (EquationSystems& es, const std::string& system_name)
       // boundary side \p s.
       for (unsigned int n=0; n<4; ++n)
       {
-        const unsigned int u_dof = nodes[n]->dof_number (system.number(), u_var, 0);
-        const unsigned int v_dof = nodes[n]->dof_number (system.number(), v_var, 0);
-        const unsigned int w_dof = nodes[n]->dof_number (system.number(), w_var, 0);
+        const dof_id_type u_dof = nodes[n]->dof_number (system.number(), u_var, 0);
+        const dof_id_type v_dof = nodes[n]->dof_number (system.number(), v_var, 0);
+        const dof_id_type w_dof = nodes[n]->dof_number (system.number(), w_var, 0);
         system.matrix->add (u_dof, u_dof, penalty);
         system.matrix->add (v_dof, v_dof, penalty);
         system.matrix->add (w_dof, w_dof, penalty);
