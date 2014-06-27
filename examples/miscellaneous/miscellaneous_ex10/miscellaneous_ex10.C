@@ -155,7 +155,7 @@ int main (int argc, char** argv)
   ExodusII_IO(mesh).write_equation_systems(
                                            "solution_stitch.exo",
                                            equation_systems_stitch);
-  ExodusII_IO(mesh).write_equation_systems(
+  ExodusII_IO(nostitch_mesh).write_equation_systems(
                                            "solution_nostitch.exo",
                                            equation_systems_nostitch);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
