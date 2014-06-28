@@ -25,6 +25,7 @@
 #include "libmesh/serial_mesh.h"
 #include "libmesh/utility.h"
 
+#include LIBMESH_INCLUDE_UNORDERED_MAP
 #include LIBMESH_INCLUDE_UNORDERED_SET
 LIBMESH_DEFINE_HASH_POINTERS
 
@@ -842,8 +843,10 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
 
   typedef dof_id_type                     key_type;
   typedef std::pair<Elem*, unsigned char> val_type;
+  typedef std::pair<key_type, val_type>   key_val_pair;
+  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<key_type, val_type> map_type;
   // Mapping between all side keys in this mesh and elements+side numbers relevant to the boundary in this mesh as well.
-  std::map<key_type, val_type>            side_to_elem_map;
+  map_type side_to_elem_map;
 
   // If there is only one mesh (i.e. other_mesh==NULL), then loop over this mesh twice
   if(!other_mesh)
@@ -899,7 +902,16 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                               val_type val;
                               val.first = el;
                               val.second = side_id;
-                              side_to_elem_map[key] = val;
+
+                              key_val_pair kvp;
+                              kvp.first = key;
+                              kvp.second = val;
+                              // side_to_elem_map[key] = val;
+#if defined(LIBMESH_HAVE_UNORDERED_MAP) || defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) || defined(LIBMESH_HAVE_HASH_MAP) || defined(LIBMESH_HAVE_EXT_HASH_MAP)
+                              side_to_elem_map.insert (kvp);
+#else
+                              side_to_elem_map.insert (side_to_elem_map.begin(),kvp);
+#endif
                             }
                         }
                     }
@@ -1268,7 +1280,7 @@ void SerialMesh::stitching_helper (SerialMesh* other_mesh,
                         {
                           key_type key = el->key(s);
                           typedef
-                            std::map<key_type, val_type>::iterator key_val_it_type;
+                            map_type::iterator key_val_it_type;
                           std::pair<key_val_it_type, key_val_it_type>
                             bounds = side_to_elem_map.equal_range(key);
 
