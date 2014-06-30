@@ -22,7 +22,7 @@
 AC_DEFUN([CONFIGURE_EIGEN],
 [
   AC_ARG_ENABLE(eigen,
-                AC_HELP_STRING([--disable-eigen],
+                AS_HELP_STRING([--disable-eigen],
                                [build without Eigen linear algebra support]),
 		[case "${enableval}" in
 		  yes)  enableeigen=yes ;;
@@ -41,7 +41,7 @@ AC_DEFUN([CONFIGURE_EIGEN],
 
     # User-specific include path
     AC_ARG_WITH(eigen-include,
-                AC_HELP_STRING([--with-eigen-include=PATH],[Specify the path for EIGEN header files]),
+                AS_HELP_STRING([--with-eigen-include=PATH],[Specify the path for EIGEN header files]),
                 witheigeninc=$withval,
                 witheigeninc=no)
 

@@ -4,7 +4,7 @@
 AC_DEFUN([CONFIGURE_SLEPC],
 [
   AC_ARG_ENABLE(slepc,
-                AC_HELP_STRING([--disable-slepc],
+                AS_HELP_STRING([--disable-slepc],
                                [build without SLEPc eigen solver support]),
 		[case "${enableval}" in
 		  yes)  enableslepc=yes ;;

@@ -13,7 +13,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
   fi
 
   AC_ARG_WITH(trilinos,
-              AC_HELP_STRING([--with-trilinos=PATH],[Specify the path to Trilinos installation]),
+              AS_HELP_STRING([--with-trilinos=PATH],[Specify the path to Trilinos installation]),
               withtrilinosdir=$withval,
               withtrilinosdir=$TRILINOS_DIR)
 
@@ -185,7 +185,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
   fi
 
   AC_ARG_WITH(trilinos,
-              AC_HELP_STRING([--with-trilinos=PATH],[Specify the path to Trilinos installation]),
+              AS_HELP_STRING([--with-trilinos=PATH],[Specify the path to Trilinos installation]),
               withtrilinosdir=$withval,
               withtrilinosdir=$TRILINOS_DIR)
 
@@ -213,7 +213,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
 
   dnl Nox
   AC_ARG_WITH(nox,
-              AC_HELP_STRING([--with-nox=PATH],[Specify the path to Nox installation]),
+              AS_HELP_STRING([--with-nox=PATH],[Specify the path to Nox installation]),
               withnoxdir=$withval,
               withnoxdir=$TRILINOS_DIR)
 
@@ -240,7 +240,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
 
   dnl ML
   AC_ARG_WITH(ml,
-              AC_HELP_STRING([--with-ml=PATH],[Specify the path to ML installation]),
+              AS_HELP_STRING([--with-ml=PATH],[Specify the path to ML installation]),
               withmldir=$withval,
               withmldir=$TRILINOS_DIR)
 
@@ -265,7 +265,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
 
   dnl Tpetra
   AC_ARG_WITH(tpetra,
-              AC_HELP_STRING([--with-tpetra=PATH],[Specify the path to Tpetra installation]),
+              AS_HELP_STRING([--with-tpetra=PATH],[Specify the path to Tpetra installation]),
               withtpetradir=$withval,
               withtpetradir=$TRILINOS_DIR)
 
@@ -292,7 +292,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
 
   dnl DTK
   AC_ARG_WITH(dtk,
-              AC_HELP_STRING([--with-dtk=PATH],[Specify the path to Dtk installation]),
+              AS_HELP_STRING([--with-dtk=PATH],[Specify the path to Dtk installation]),
               withdtkdir=$withval,
               withdtkdir=$TRILINOS_DIR)
 
@@ -449,7 +449,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_TRILINOS],
 [
   AC_ARG_ENABLE(trilinos,
-                AC_HELP_STRING([--disable-trilinos],
+                AS_HELP_STRING([--disable-trilinos],
                                [build without Trilinos support]),
 		[case "${enableval}" in
 		  yes)  enabletrilinos=yes ;;

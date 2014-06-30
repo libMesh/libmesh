@@ -4,7 +4,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_EXODUS],
 [
   AC_ARG_ENABLE(exodus,
-                AC_HELP_STRING([--disable-exodus],
+                AS_HELP_STRING([--disable-exodus],
                                [build without ExodusII API support]),
 		[case "${enableval}" in
 		  yes|new|v522)  enableexodus=yes; exodusversion="v5.22" ;;
@@ -44,7 +44,7 @@ AC_DEFUN([CONFIGURE_EXODUS],
 	  AC_DEFINE(HAVE_EXODUS_API, 1, [Flag indicating whether the library will be compiled with Exodus support])
 	  AC_MSG_RESULT(<<< Configuring library with Exodus version $exodusversion support >>>)
 	  AC_ARG_ENABLE(exodus-fortran,
-	                AC_HELP_STRING([--enable-exodus-fortran],
+	                AS_HELP_STRING([--enable-exodus-fortran],
 			               [build with ExodusII Fortran API support]),
 			[case "${enableval}" in
 			    yes)  enableexodusfortran=yes; ;;

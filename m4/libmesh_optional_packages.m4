@@ -35,7 +35,7 @@ libmesh_installed_LIBS=""
 # Allow for disable-optional
 # --------------------------------------------------------------
 AC_ARG_ENABLE(optional,
-              AC_HELP_STRING([--disable-optional],
+              AS_HELP_STRING([--disable-optional],
                              [build without most optional external libraries]),
 	      [case "${enableval}" in
 	      	  yes) enableoptional=yes ;;
@@ -62,7 +62,7 @@ fi
 # support.
 # --------------------------------------------------------------
 AC_ARG_ENABLE(strict-lgpl,
-              AC_HELP_STRING([--disable-strict-lgpl],
+              AS_HELP_STRING([--disable-strict-lgpl],
                              [Compile libmesh with even non-LGPL-compatible contrib libraries]),
               [case "${enableval}" in
                   yes) enablestrictlgpl=yes ;;
@@ -76,7 +76,7 @@ AC_ARG_ENABLE(strict-lgpl,
 # Allow for disable-nested
 # --------------------------------------------------------------
 AC_ARG_ENABLE(nested,
-              AC_HELP_STRING([--disable-nested],
+              AS_HELP_STRING([--disable-nested],
                              [Do not use nested autoconf subpackages]),
 	      [case "${enableval}" in
 	      	  yes) enablenested=yes ;;
@@ -151,7 +151,7 @@ fi
 # Pthread support -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(pthreads,
-              AC_HELP_STRING([--disable-pthreads],
+              AS_HELP_STRING([--disable-pthreads],
                              [build without POSIX threading (pthreads) support]),
 		[case "${enableval}" in
 		  yes)  enablepthreads=yes ;;
@@ -180,7 +180,7 @@ fi
 # C++ Thread Support  -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(cppthreads,
-             AC_HELP_STRING([--disable-cppthreads],
+             AS_HELP_STRING([--disable-cppthreads],
                             [Build without C++ std::thread support]),
              enablecppthreads=$enableval,
              enablecppthreads=yes)
@@ -249,7 +249,7 @@ AC_CONFIG_FILES([contrib/gzstream/Makefile])
 # Compressed Files with bzip2
 # -------------------------------------------------------------
 AC_ARG_ENABLE(bzip2,
-              AC_HELP_STRING([--disable-bzip2],
+              AS_HELP_STRING([--disable-bzip2],
                              [build without bzip2 compressed I/O suppport]),
               enablebz2=$enableval,
               enablebz2=$enableoptional)
@@ -273,7 +273,7 @@ fi
 # Compressed Files with xz
 # -------------------------------------------------------------
 AC_ARG_ENABLE(xz,
-              AC_HELP_STRING([--disable-xz],
+              AS_HELP_STRING([--disable-xz],
                              [build without xz compressed I/O suppport]),
               enablexz=$enableval,
               enablexz=$enableoptional)
@@ -563,7 +563,7 @@ AC_CONFIG_FILES([contrib/fparser/extrasrc/Makefile])
 # cppunit C++ unit testing -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(cppunit,
-             AC_HELP_STRING([--disable-cppunit],
+             AS_HELP_STRING([--disable-cppunit],
                             [Build without cppunit C++ unit testing support]),
 		[case "${enableval}" in
 		  yes)  enablecppunit=yes ;;

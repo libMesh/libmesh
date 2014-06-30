@@ -4,7 +4,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_SFC],
 [
   AC_ARG_ENABLE(sfc,
-                AC_HELP_STRING([--disable-sfc],
+                AS_HELP_STRING([--disable-sfc],
                                [build without space-filling curves suppport]),
 		[case "${enableval}" in
 		  yes)  enablesfc=yes ;;

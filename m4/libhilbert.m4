@@ -4,7 +4,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_LIBHILBERT],
 [
   AC_ARG_ENABLE(libHilbert,
-                AC_HELP_STRING([--disable-libHilbert],
+                AS_HELP_STRING([--disable-libHilbert],
                                [build without Chris Hamilton's libHilbert]),
 		[case "${enableval}" in
 		  yes)  enablelibhilbert=yes ;;

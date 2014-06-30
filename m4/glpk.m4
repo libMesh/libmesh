@@ -10,7 +10,7 @@
 AC_DEFUN([CONFIGURE_GLPK],
 [
   AC_ARG_ENABLE(glpk,
-                AC_HELP_STRING([--disable-glpk],
+                AS_HELP_STRING([--disable-glpk],
                                [build without GLPK support]),
 		[case "${enableval}" in
 		  yes)  enableglpk=yes ;;
@@ -24,13 +24,13 @@ AC_DEFUN([CONFIGURE_GLPK],
 
     # User-specific include path
     AC_ARG_WITH(glpk-include,
-                AC_HELP_STRING([--with-glpk-include=PATH],[Specify the path for GLPK header files]),
+                AS_HELP_STRING([--with-glpk-include=PATH],[Specify the path for GLPK header files]),
                 withglpkinc=$withval,
                 withglpkinc=no)
 
     # User-specific library path
     AC_ARG_WITH(glpk-lib,
-                AC_HELP_STRING([--with-glpk-lib=PATH],[Specify the path for GLPK libs]),
+                AS_HELP_STRING([--with-glpk-lib=PATH],[Specify the path for GLPK libs]),
                 withglpklib=$withval,
                 withglpklib=no)
 

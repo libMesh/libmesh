@@ -4,7 +4,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_TRIANGLE],
 [
   AC_ARG_ENABLE(triangle,
-                AC_HELP_STRING([--disable-triangle],
+                AS_HELP_STRING([--disable-triangle],
                                [build without Triangle Delaunay triangulation library support]),
 		[case "${enableval}" in
 		  yes)  enabletriangle=yes ;;

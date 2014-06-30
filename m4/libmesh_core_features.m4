@@ -11,7 +11,7 @@ AC_MSG_RESULT(---------------------------------------------)
 # library warnings - enable by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(warnings,
-              [AC_HELP_STRING([--disable-warnings],[Do not warn about deprecated, experimental, or questionable code])],
+              [AS_HELP_STRING([--disable-warnings],[Do not warn about deprecated, experimental, or questionable code])],
               enablewarnings=$enableval,
               enablewarnings=yes)
 
@@ -32,7 +32,7 @@ fi
 #   See http://sourceforge.net/mailarchive/forum.php?thread_name=B4613A7D-0033-43C7-A9DF-5A801217A097%40nasa.gov&forum_name=libmesh-devel
 # --------------------------------------------------------------
 AC_ARG_ENABLE(blocked-storage,
-              [AC_HELP_STRING([--enable-blocked-storage],[Support for blocked matrix/vector storage])],
+              [AS_HELP_STRING([--enable-blocked-storage],[Support for blocked matrix/vector storage])],
               enableblockedstorage=$enableval,
               enableblockedstorage=no)
 
@@ -48,7 +48,7 @@ fi
 # default comm_world - now disabled by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(default-comm-world,
-              [AC_HELP_STRING([--enable-default-comm-world],[Provide global libMesh::CommWorld])],
+              [AS_HELP_STRING([--enable-default-comm-world],[Provide global libMesh::CommWorld])],
               enabledefaultcommworld=$enableval,
               enabledefaultcommworld=no)
 
@@ -68,7 +68,7 @@ fi
 # legacy include paths - disabled by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(legacy-include-paths,
-              [AC_HELP_STRING([--enable-legacy-include-paths],[allow for e.g. #include "header.h" instead of #include "libmesh/header.h"])],
+              [AS_HELP_STRING([--enable-legacy-include-paths],[allow for e.g. #include "header.h" instead of #include "libmesh/header.h"])],
               enablelegacyincludepaths=$enableval,
               enablelegacyincludepaths=no)
 
@@ -86,7 +86,7 @@ fi
 # legacy "using namespace libMesh" - disabled by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(legacy-using-namespace,
-              [AC_HELP_STRING([--enable-legacy-using-namespace],[add "using namespace libMesh" to libMesh headers])],
+              [AS_HELP_STRING([--enable-legacy-using-namespace],[add "using namespace libMesh" to libMesh headers])],
               enablelegacyusingnamespace=$enableval,
               enablelegacyusingnamespace=no)
 
@@ -106,7 +106,7 @@ fi
 # size of boundary_id_type -- default 2 bytes
 # -------------------------------------------------------------
 AC_ARG_WITH([boundary_id_bytes],
-	    AC_HELP_STRING([--with-boundary-id-bytes=<1|2|4|8>],
+	    AS_HELP_STRING([--with-boundary-id-bytes=<1|2|4|8>],
                            [bytes used per boundary side per boundary_id [2]]),
 	    [boundary_bytes="$withval"],
 	    [boundary_bytes=2])
@@ -139,7 +139,7 @@ AC_MSG_RESULT([configuring size of boundary_id... $boundary_bytes])
 # size of dof_id_type -- default 4 bytes
 # -------------------------------------------------------------
 AC_ARG_WITH([dof_id_bytes],
-	    AC_HELP_STRING([--with-dof-id-bytes=<1|2|4|8>],
+	    AS_HELP_STRING([--with-dof-id-bytes=<1|2|4|8>],
                            [bytes used per dof object id, dof index [4]]),
 	    [dof_bytes="$withval"],
 	    [dof_bytes=4])
@@ -172,7 +172,7 @@ AC_MSG_RESULT([configuring size of dof_id... $dof_bytes])
 # size of processor_id_type -- default 4 bytes
 # -------------------------------------------------------------
 AC_ARG_WITH([processor_id_bytes],
-	    AC_HELP_STRING([--with-processor-id-bytes=<1|2|4|8>],
+	    AS_HELP_STRING([--with-processor-id-bytes=<1|2|4|8>],
                            [bytes used for processor id [4]]),
 	    [processor_bytes="$withval"],
 	    [processor_bytes=2])
@@ -205,7 +205,7 @@ AC_MSG_RESULT([configuring size of processor_id... $processor_bytes])
 # size of subdomain_id_type -- default 2 bytes
 # -------------------------------------------------------------
 AC_ARG_WITH([subdomain_id_bytes],
-	    AC_HELP_STRING([--with-subdomain-id-bytes=<1|2|4|8>],
+	    AS_HELP_STRING([--with-subdomain-id-bytes=<1|2|4|8>],
                            [bytes of storage per element used to store the subdomain_id [2]]),
 	    [subdomain_bytes="$withval"],
 	    [subdomain_bytes=2])
@@ -248,7 +248,7 @@ AC_MSG_RESULT([configuring size of subdomain_id... $subdomain_bytes])
 #
 # -------------------------------------------------------------
 AC_ARG_ENABLE(everything,
-              AC_HELP_STRING([--enable-everything],
+              AS_HELP_STRING([--enable-everything],
                              [enable all non-conflicting options]),
               enableeverything=$enableval,
               enableeverything=no)
@@ -259,7 +259,7 @@ AC_ARG_ENABLE(everything,
 # unique_id -- disable by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(unique-id,
-              AC_HELP_STRING([--enable-unique-id],
+              AS_HELP_STRING([--enable-unique-id],
                              [build with unique id suppport]),
 	      [case "${enableval}" in
 	          yes)  enableuniqueid=yes ;;
@@ -281,7 +281,7 @@ fi
 # size of unique_id_type -- default 8 bytes
 # -------------------------------------------------------------
 AC_ARG_WITH([unique_id_bytes],
-	    AC_HELP_STRING([--with-unique-id-bytes=<1|2|4|8>],
+	    AS_HELP_STRING([--with-unique-id-bytes=<1|2|4|8>],
                            [bytes used per unique id [4]]),
 	    [unique_bytes="$withval"],
 	    [unique_bytes=8])
@@ -317,7 +317,7 @@ fi
 # Write stack trace output files on error() - disabled by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(tracefiles,
-              AC_HELP_STRING([--enable-tracefiles],
+              AS_HELP_STRING([--enable-tracefiles],
                              [write stack trace files on unexpected errors]),
               enabletracefiles=$enableval,
               enabletracefiles=$enableeverything)
@@ -334,7 +334,7 @@ fi
 # AMR -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(amr,
-              AC_HELP_STRING([--disable-amr],
+              AS_HELP_STRING([--disable-amr],
                              [build without adaptive mesh refinement (AMR) suppport]),
               enableamr=$enableval,
               enableamr=yes)
@@ -352,7 +352,7 @@ fi
 # Variational smoother -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(vsmoother,
-              AC_HELP_STRING([--disable-vsmoother],
+              AS_HELP_STRING([--disable-vsmoother],
                              [build without variational smoother suppport]),
               enablevsmoother=$enableval,
               enablevsmoother=yes)
@@ -370,7 +370,7 @@ fi
 # Periodic BCs -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(periodic,
-              AC_HELP_STRING([--disable-periodic],
+              AS_HELP_STRING([--disable-periodic],
                              [build without periodic boundary condition suppport]),
               enableperiodic=$enableval,
               enableperiodic=yes)
@@ -388,7 +388,7 @@ fi
 # Dirichlet BC constraints -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(dirichlet,
-              AC_HELP_STRING([--disable-dirichlet],
+              AS_HELP_STRING([--disable-dirichlet],
                              [build without Dirichlet boundary constraint support]),
               enabledirichlet=$enableval,
               enabledirichlet=yes)
@@ -406,7 +406,7 @@ fi
 # NodeConstraints -- disabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(nodeconstraint,
-              AC_HELP_STRING([--enable-nodeconstraint],
+              AS_HELP_STRING([--enable-nodeconstraint],
                              [build with node constraints suppport]),
               enablenodeconstraint=$enableval,
               enablenodeconstraint=$enableeverything)
@@ -424,7 +424,7 @@ fi
 # Mesh == ParallelMesh -- disabled by default for max compatibility
 # -------------------------------------------------------------
 AC_ARG_ENABLE(parmesh,
-              AC_HELP_STRING([--enable-parmesh],
+              AS_HELP_STRING([--enable-parmesh],
                              [Use distributed ParallelMesh as Mesh]),
               enableparmesh=$enableval,
               enableparmesh=no)
@@ -443,7 +443,7 @@ fi
 # Ghosted instead of Serial local vectors -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(ghosted,
-              AC_HELP_STRING([--disable-ghosted],
+              AS_HELP_STRING([--disable-ghosted],
                              [Use dense instead of sparse/ghosted local vectors]),
               enableghosted=$enableval,
               enableghosted=yes)
@@ -462,7 +462,7 @@ fi
 #  elements -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(node-valence,
-              AC_HELP_STRING([--disable-node-valence],
+              AS_HELP_STRING([--disable-node-valence],
                              [Do not compute and store node valence values]),
               enablenodevalence=$enableval,
               enablenodevalence=yes)
@@ -480,13 +480,13 @@ fi
 # 1D or 1D/2D only -- disabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(1D-only,
-              AC_HELP_STRING([--enable-1D-only],
+              AS_HELP_STRING([--enable-1D-only],
                              [build with support for 1D meshes only]),
               enable1D=$enableval,
               enable1D=no)
 
 AC_ARG_ENABLE(2D-only,
-              AC_HELP_STRING([--enable-2D-only],
+              AS_HELP_STRING([--enable-2D-only],
                              [build with support for 1D and 2D meshes only]),
               enable2D=$enableval,
               enable2D=no)
@@ -511,7 +511,7 @@ fi
 # higher order shapes -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(pfem,
-              AC_HELP_STRING([--disable-pfem],
+              AS_HELP_STRING([--disable-pfem],
                              [build without support for higher p order FEM shapes]),
               enablepfem=$enableval,
               enablepfem=yes)
@@ -529,7 +529,7 @@ fi
 # Infinite Elements  -- disabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(ifem,
-              AC_HELP_STRING([--enable-ifem],
+              AS_HELP_STRING([--enable-ifem],
                              [build with infinite elements]),
               enableifem=$enableval,
               enableifem=$enableeverything)
@@ -550,7 +550,7 @@ AM_CONDITIONAL(LIBMESH_ENABLE_INFINITE_ELEMENTS, test x$enableifem != no )
 # Second Derivative Calculations -- disabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(second,
-              AC_HELP_STRING([--disable-second],
+              AS_HELP_STRING([--disable-second],
                              [build without second derivatives support]),
               enablesecond=$enableval,
               enablesecond=yes)
@@ -568,7 +568,7 @@ fi
 # XDR binary IO support - enabled by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(xdr,
-              AC_HELP_STRING([--disable-xdr],
+              AS_HELP_STRING([--disable-xdr],
                              [build without XDR platform-independent binary I/O]),
               enablexdr=$enableval,
               enablexdr=yes)
@@ -606,7 +606,7 @@ fi
 # complex numbers -- disabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(complex,
-              AC_HELP_STRING([--enable-complex],
+              AS_HELP_STRING([--enable-complex],
                              [build to support complex-number solutions]),
  	      [case "${enableval}" in
 	          yes)  enablecomplex=yes ;;
@@ -635,7 +635,7 @@ AM_CONDITIONAL(LIBMESH_ENABLE_COMPLEX, test x$enablecomplex = xyes)
 # Reference Counting -- enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(reference-counting,
-              AC_HELP_STRING([--disable-reference-counting],
+              AS_HELP_STRING([--disable-reference-counting],
                              [build without reference counting support]),
               enablerefct=$enableval,
               enablerefct=yes)
@@ -657,7 +657,7 @@ fi
 # Performance Logging -- disabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(perflog,
-              AC_HELP_STRING([--enable-perflog],
+              AS_HELP_STRING([--enable-perflog],
                              [build with performance logging turned on]),
               enableperflog=$enableval,
               enableperflog=$enableeverything)
@@ -675,7 +675,7 @@ fi
 # Examples - enabled by default
 # -------------------------------------------------------------
 AC_ARG_ENABLE(examples,
-              AC_HELP_STRING([--disable-examples],
+              AS_HELP_STRING([--disable-examples],
                              [Do not compile, install, or test with example suite]),
  	      [case "${enableval}" in
 	          yes)  enableexamples=yes ;;

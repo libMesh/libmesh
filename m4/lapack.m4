@@ -36,7 +36,7 @@ AC_REQUIRE([ACX_BLAS])
 acx_lapack_ok=no
 
 AC_ARG_WITH(lapack,
-            AC_HELP_STRING([--with-lapack=<lib>], [use LAPACK library <lib>]))
+            AS_HELP_STRING([--with-lapack=<lib>], [use LAPACK library <lib>]))
 case $with_lapack in
         yes | "") ;;
         no) acx_lapack_ok=disable ;;

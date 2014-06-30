@@ -4,7 +4,7 @@
 AC_DEFUN([CONFIGURE_GZ],
 [
   AC_ARG_ENABLE(gzstreams,
-                AC_HELP_STRING([--disable-gzstreams],
+                AS_HELP_STRING([--disable-gzstreams],
                                [build without gzstreams compressed I/O suppport]),
 		[case "${enableval}" in
 		  yes)  enablegz=yes ;;

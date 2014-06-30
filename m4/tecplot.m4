@@ -4,7 +4,7 @@
 AC_DEFUN([CONFIGURE_TECPLOT],
 [
   AC_ARG_ENABLE(tecplot,
-                AC_HELP_STRING([--enable-tecplot],
+                AS_HELP_STRING([--enable-tecplot],
                                [build with Tecplot binary file I/O support (using distributed libraries)]),
 		[case "${enableval}" in
 		  yes)  enabletecplot=yes ;;

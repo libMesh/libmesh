@@ -9,7 +9,7 @@ if (test "x$MPIHOME" = x) ; then
 fi
 
 AC_ARG_WITH([mpi],
-	    AC_HELP_STRING([--with-mpi=PATH],
+	    AS_HELP_STRING([--with-mpi=PATH],
                            [Prefix where MPI is installed (MPIHOME)]),
 	    [MPI="$withval"],
 	    [
@@ -94,7 +94,7 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
             GMHOME="/usr"
           fi
           AC_ARG_WITH([gm],
-	              AC_HELP_STRING([--with-gm=PATH],
+	              AS_HELP_STRING([--with-gm=PATH],
                                      [Prefix where GM is installed (GMHOME)]),
 		      [GM="$withval"],
 		      [

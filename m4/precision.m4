@@ -5,19 +5,19 @@ dnl ----------------------------------------------------------------------------
 AC_DEFUN([ACX_CHOOSE_PRECISION],
 [
 AC_ARG_ENABLE(singleprecision,
-              AC_HELP_STRING([--enable-singleprecision],
+              AS_HELP_STRING([--enable-singleprecision],
                              [Use single-precision scalars]),
               enablesingleprecision=$enableval,
               enablesingleprecision=no)
 
 AC_ARG_ENABLE(tripleprecision,
-              AC_HELP_STRING([--enable-tripleprecision],
+              AS_HELP_STRING([--enable-tripleprecision],
                              [Use triple-precision scalars]),
               enabletripleprecision=$enableval,
               enabletripleprecision=no)
 
 AC_ARG_ENABLE(quadrupleprecision,
-              AC_HELP_STRING([--enable-quadrupleprecision],
+              AS_HELP_STRING([--enable-quadrupleprecision],
                              [Use quadruple-precision scalars]),
               enablequadrupleprecision=$enableval,
               enablequadrupleprecision=no)
