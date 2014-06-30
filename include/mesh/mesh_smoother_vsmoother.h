@@ -31,6 +31,7 @@
 #include <cstddef>
 #include <vector>
 #include <map>
+#include <fstream>
 
 namespace libMesh
 {
@@ -191,6 +192,11 @@ private:
   unsigned _n_hanging_edges;
 
   /**
+   * All output (including debugging) is sent to the _logfile.
+   */
+  std::ofstream _logfile;
+
+  /**
    * Area of Interest Mesh
    */
   const UnstructuredMesh * _area_of_interest;
@@ -286,8 +292,7 @@ private:
                    int me,
                    const Array3D<double>& H,
                    int adp,
-                   int gr,
-                   FILE *sout);
+                   int gr);
 
   double maxE(Array2D<double>& R,
               const Array2D<int>& cells,
@@ -324,8 +329,7 @@ private:
               double& emax,
               double& qmin,
               int adp,
-              const std::vector<double>& afun,
-              FILE *sout);
+              const std::vector<double>& afun);
 
   double minJ_BC(Array2D<double>& R,
                  const std::vector<int>& mask,
@@ -342,8 +346,7 @@ private:
                  double& qmin,
                  int adp,
                  const std::vector<double>& afun,
-                 int NCN,
-                 FILE *sout);
+                 int NCN);
 
   double localP(Array3D<double>& W,
                 Array2D<double>& F,
@@ -400,8 +403,7 @@ private:
              const std::vector<double>& b,
              double eps,
              int maxite,
-             int msglev,
-             FILE *sout);
+             int msglev);
 
   int pcg_ic0(int n,
               const std::vector<int>& ia,
@@ -415,8 +417,7 @@ private:
               std::vector<double>& z,
               double eps,
               int maxite,
-              int msglev,
-              FILE *sout);
+              int msglev);
 
   int pcg_par_check(int n,
                     const std::vector<int>& ia,
@@ -424,8 +425,7 @@ private:
                     const std::vector<double>& a,
                     double eps,
                     int maxite,
-                    int msglev,
-                    FILE *sout);
+                    int msglev);
 
   void gener(char grid[], int n);
 };
