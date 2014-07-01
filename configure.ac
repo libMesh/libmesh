@@ -106,6 +106,14 @@ LIBMESH_SET_COMPILERS
 # --------------------------------------------------------------
 LIBMESH_SET_CXX_FLAGS
 
+# --------------------------------------------------------------
+# Standard autoconf macro for determining the proper -std=c++11
+# flag for the current compiler.  Adds the result to CXXFLAGS if
+# one is found.
+# ax_cxx_compile_stdcxx_11.m4
+# --------------------------------------------------------------
+AX_CXX_COMPILE_STDCXX_11([noext],[optional])
+
 #------------------------------------------------------
 # Checks for code coverage
 # this must be done after we look for our own compilers
