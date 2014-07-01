@@ -114,6 +114,12 @@ LIBMESH_SET_CXX_FLAGS
 # --------------------------------------------------------------
 AX_CXX_COMPILE_STDCXX_11([noext],[optional])
 
+# --------------------------------------------------------------
+# Test for specific C++11 features
+# --------------------------------------------------------------
+LIBMESH_TEST_CXX11_MOVE
+LIBMESH_TEST_CXX11_SHARED_PTR
+
 #------------------------------------------------------
 # Checks for code coverage
 # this must be done after we look for our own compilers
