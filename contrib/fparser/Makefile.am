@@ -35,6 +35,11 @@ if FPARSER_SUPPORT_DEBUGGING
   FEATURE_FLAGS += -DFUNCTIONPARSER_SUPPORT_DEBUGGING
 endif
 
+# Wrap code that uses std::move in fparser for compilers that don't support it
+if HAVE_CXX11_MOVE
+  FEATURE_FLAGS += -DFP_SUPPORT_CXX11_MOVE
+endif
+
 EXTRA_DIST      = # none, append below
 BUILT_SOURCES   = # none, append below
 CLEANFILES      = # none, append below

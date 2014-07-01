@@ -1273,7 +1273,7 @@ p;}
 xT&eQ1=(Ref*b){Set(b)n21*this;}
 xT&eQ1=(const
 xT&b){Set(b.p)n21*this;}
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#ifdef FP_SUPPORT_CXX11_MOVE
 xT(xT&&b):p(b.p){b.p=0;}
 xT&eQ1=(xT&&b){if(p!=b.p){eH2;p=b.p;b.p=0;eX3*this;}
 #endif
@@ -1409,7 +1409,7 @@ f,FuncOpcodeTag);eI2
 xH3{}
 ;e3
 tQ1,xH3);
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#ifdef FP_SUPPORT_CXX11_MOVE
 e3
 Value_t&&v,xH3);
 #endif
@@ -1447,7 +1447,7 @@ x3&xI3
 SetParamsMove(x3&tL1
 lU1
 GetUniqueRef();
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#ifdef FP_SUPPORT_CXX11_MOVE
 void
 SetParams(x3&&tL1
 #endif
@@ -1579,7 +1579,7 @@ x22
 o,unsigned
 f);i8
 tS1;
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#ifdef FP_SUPPORT_CXX11_MOVE
 i8
 Value_t&&i);xQ2(xQ2&&b);
 #endif
@@ -1597,7 +1597,7 @@ yQ
 lT1(i
 yA
 xH3());}
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#ifdef FP_SUPPORT_CXX11_MOVE
 cN1
 CodeTreeImmed
 tZ3&&i)yQ
@@ -4600,7 +4600,7 @@ xH3
 nE
 i)){data
 xA
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#ifdef FP_SUPPORT_CXX11_MOVE
 lN
 Value_t&&i
 yA
@@ -4751,14 +4751,14 @@ xZ.swap(tmp);}
 lB
 SetParamsMove(nJ){xZ.swap(tL1
 lY2.clear();}
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#ifdef FP_SUPPORT_CXX11_MOVE
 lB
 SetParams(eO&&lY2){SetParamsMove(tL1}
 #endif
 lB
 DelParam(size_t
 index){eO&eD3=xZ;
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#ifdef FP_SUPPORT_CXX11_MOVE
 y63
 erase(y63
 begin()+index);
@@ -4832,7 +4832,7 @@ b.l82){}
 i0
 tS1:yS
 cImmed),Value(i),n8
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#ifdef FP_SUPPORT_CXX11_MOVE
 i0
 xQ2
 xE&&b):yS
