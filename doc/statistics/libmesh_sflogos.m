@@ -8,7 +8,6 @@ hold on
 %
 % This view should give you the last 12 months data
 % https://sourceforge.net/project/stats/detail.php?group_id=71130&ugn=libmesh&mode=12months&type=sfweb
-% As of June 1, 2014 the site above no longer exists...
 
 % This data has now changed to Google-analytics style...
 % After you select the proper date range, scroll down to the bottom
@@ -17,7 +16,7 @@ hold on
 
 %               "Other"   "SF Logo"
 cell_data = {
-{'Apr', '2014',   357   , 15700}
+{'Apr', '2014',   357   , 15700} % As of June 1, 2014 the site above no longer exists...
 {'Mar', '2014',   363   , 13050}
 {'Feb', '2014',   484   , 14375}
 {'Jan', '2014',   489   , 11195}

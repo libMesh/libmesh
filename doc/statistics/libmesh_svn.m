@@ -1,6 +1,5 @@
 % This data varies a lot month to month...
 % https://sourceforge.net/project/stats/detail.php?group_id=71130&ugn=libmesh&type=svn&mode=12months
-% As of June 1, 2014 the site above no longer exists...
 
 clear all
 clf
@@ -20,7 +19,7 @@ hold on
 % The first month with statistics is October 2007
 %               Read    Write   Total files updated
 cell_data = {
-{'Apr', '2014',  0      ,0      ,0}
+{'Apr', '2014',  0      ,0      ,0} % As of June 1, 2014 the site above no longer exists...
 {'Mar', '2014',  0      ,0      ,0}
 {'Feb', '2014',  0      ,0      ,0}
 {'Jan', '2014',  0      ,0      ,0}
