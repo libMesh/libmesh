@@ -175,6 +175,15 @@
 /* Define to 1 if you have the <csignal> header file. */
 #undef HAVE_CSIGNAL
 
+/* define if the compiler supports basic C++11 syntax */
+#undef HAVE_CXX11
+
+/* Flag indicating whether compiler supports std::move */
+#undef HAVE_CXX11_MOVE
+
+/* Flag indicating whether compiler supports std::shared_ptr */
+#undef HAVE_CXX11_SHARED_PTR
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
