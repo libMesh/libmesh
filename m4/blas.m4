@@ -40,7 +40,7 @@ acx_blas_ok=no
 acx_blas_save_LIBS="$LIBS"
 
 AC_ARG_WITH(blas,
-            AC_HELP_STRING([--with-blas=<lib>], [use BLAS library <lib>]))
+            AS_HELP_STRING([--with-blas=<lib>], [use BLAS library <lib>]))
 case $with_blas in
 	yes | "") ;;
 	no) acx_blas_ok=disable ;;

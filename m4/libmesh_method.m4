@@ -12,7 +12,7 @@
 #  # accept --with-method=METHOD.  but default to $METHOD, which is either set
 #  # by the user already or defaulted to opt above
 #  AC_ARG_WITH(method,
-#              AC_HELP_STRING([--with-method=METHOD],
+#              AS_HELP_STRING([--with-method=METHOD],
 #                             [method used to build libMesh (opt,dbg,devel,oprofile)]),
 #              [case "${withval}" in
 #                   opt)   METHOD=opt   ;;
@@ -97,7 +97,7 @@ AC_DEFUN([LIBMESH_SET_METHODS],
  # accept --with-methods=METHODS.  but default to $METHODS, which is either set
  # by the user already or defaulted above
  AC_ARG_WITH(methods,
-             AC_HELP_STRING([--with-methods=METHODS],
+             AS_HELP_STRING([--with-methods=METHODS],
                             [methods used to build libMesh (opt,dbg,devel,prof,oprof)]),
              [for method in ${withval} ; do
                 # make sure each method specified makes sense

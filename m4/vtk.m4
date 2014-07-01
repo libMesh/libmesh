@@ -7,7 +7,7 @@ AC_DEFUN([CONFIGURE_VTK],
   AC_ARG_VAR([VTK_DIR],     [path to VTK installation])
 
   AC_ARG_ENABLE(vtk,
-                AC_HELP_STRING([--disable-vtk],
+                AS_HELP_STRING([--disable-vtk],
                                [build without VTK file I/O support]),
 		[case "${enableval}" in
 		  yes)  enablevtk=yes ;;
@@ -50,13 +50,13 @@ AC_DEFUN([CONFIGURE_VTK],
 
     dnl User-specific include path
     AC_ARG_WITH(vtk-include,
-                AC_HELP_STRING([--with-vtk-include=PATH],[Specify the path for VTK header files]),
+                AS_HELP_STRING([--with-vtk-include=PATH],[Specify the path for VTK header files]),
                 withvtkinc=$withval,
                 withvtkinc=no)
 
     dnl User-specific library path
     AC_ARG_WITH(vtk-lib,
-                AC_HELP_STRING([--with-vtk-lib=PATH],[Specify the path for VTK libs]),
+                AS_HELP_STRING([--with-vtk-lib=PATH],[Specify the path for VTK libs]),
                 withvtklib=$withval,
                 withvtklib=no)
 

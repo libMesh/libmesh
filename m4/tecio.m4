@@ -4,7 +4,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_TECIO],
 [
   AC_ARG_ENABLE(tecio,
-                AC_HELP_STRING([--disable-tecio],
+                AS_HELP_STRING([--disable-tecio],
                                [build without Tecplot TecIO API support (from source)]),
 		[case "${enableval}" in
 		  yes)  enabletecio=yes ;;
@@ -14,7 +14,7 @@ AC_DEFUN([CONFIGURE_TECIO],
 		 [enabletecio=$enableoptional])
 
   AC_ARG_WITH(tecio-x11-include,
-              AC_HELP_STRING([--with-tecio-x11-include=PATH],
+              AS_HELP_STRING([--with-tecio-x11-include=PATH],
                              [Path to X11 header files. E.g. /usr/include but _not_ /usr/include/X11]),
               withteciox11inc=$withval,
               withteciox11inc=no)

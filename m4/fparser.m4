@@ -4,7 +4,7 @@
 AC_DEFUN([CONFIGURE_FPARSER],
 [
   AC_ARG_ENABLE([fparser],
-                AC_HELP_STRING([--disable-fparser],
+                AS_HELP_STRING([--disable-fparser],
                                [build without C++ function parser support]),
 		[case "${enableval}" in
 		  yes)  enablefparser=yes ;;
@@ -14,7 +14,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
 		 [enablefparser=$enableoptional])
 
   AC_ARG_WITH([fparser],
-	       AC_HELP_STRING([--with-fparser=<release|none|devel>],
+	       AS_HELP_STRING([--with-fparser=<release|none|devel>],
                               [Determine which version of the C++ function parser to use]),
 	      [case "${withval}" in
 		  release)  enablefparserdevel=no  ;;
@@ -29,7 +29,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
 
 
     AC_ARG_ENABLE(fparser-debugging,
-                  AC_HELP_STRING([--enable-fparser-debugging],
+                  AS_HELP_STRING([--enable-fparser-debugging],
                                  [Build fparser with bytecode debugging functions]),
 		[case "${enableval}" in
 		  yes)  enablefparserdebugging=yes ;;
@@ -39,7 +39,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
                  [enablefparserdebugging=no])
 
     AC_ARG_ENABLE(fparser-optimizer,
-                  AC_HELP_STRING([--disable-fparser-optimizer],
+                  AS_HELP_STRING([--disable-fparser-optimizer],
                                  [do not optimize parsed functions]),
 		[case "${enableval}" in
 		  yes)  enablefparseroptimizer=yes ;;

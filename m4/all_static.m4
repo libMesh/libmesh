@@ -6,7 +6,7 @@
 AC_DEFUN([AX_ALL_STATIC],
 [
   AC_ARG_ENABLE(all-static,
-                [AC_HELP_STRING([--enable-all-static],[Pass -all-static to libtool's link mode])],
+                [AS_HELP_STRING([--enable-all-static],[Pass -all-static to libtool's link mode])],
                 enableallstatic=$enableval,
                 enableallstatic=no)
 

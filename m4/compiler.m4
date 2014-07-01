@@ -11,7 +11,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
      #                             smart about which compilers to look for
      # -------------------------------------------------------------------
      AC_ARG_ENABLE(mpi,
-                   AC_HELP_STRING([--disable-mpi],
+                   AS_HELP_STRING([--disable-mpi],
                                   [build without MPI message passing support]),
    		   [case "${enableval}" in
    		     yes)  enablempi=yes ;;
@@ -27,7 +27,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   fi
 
   AC_ARG_WITH([cxx],
-  	    AC_HELP_STRING([--with-cxx=CXX],
+  	    AS_HELP_STRING([--with-cxx=CXX],
                              [C++ compiler to use]),
   	    [CXX="$withval"],
   	    [])
@@ -57,7 +57,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
     CC_TRY_LIST="mpicc $CC_TRY_LIST"
   fi
   AC_ARG_WITH([cc],
-  	    AC_HELP_STRING([--with-cc=CC],
+  	    AS_HELP_STRING([--with-cc=CC],
                              [C compiler to use]),
   	    [CC="$withval"],
   	    [])
@@ -83,7 +83,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   # --disable-fortran
   # --------------------------------------------------------------
   AC_ARG_ENABLE(fortran,
-                AC_HELP_STRING([--disable-fortran],
+                AS_HELP_STRING([--disable-fortran],
                                [build without Fortran language support]),
 		[case "${enableval}" in
 		  yes)  enablefortran=yes ;;
@@ -101,7 +101,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
       FC_TRY_LIST="mpif90 $FC_TRY_LIST"
     fi
     AC_ARG_WITH([fc],
-    	    AC_HELP_STRING([--with-fc=FC],
+    	    AS_HELP_STRING([--with-fc=FC],
                                [Fortran compiler to use]),
     	    [FC="$withval"],
     	    [])
@@ -127,7 +127,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
       F77_TRY_LIST="mpif77 $F77_TRY_LIST"
     fi
     AC_ARG_WITH([f77],
-    	    AC_HELP_STRING([--with-f77=F77],
+    	    AS_HELP_STRING([--with-f77=F77],
                                [Fortran compiler to use]),
     	    [F77="$withval"],
     	    [])
@@ -529,7 +529,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   # in the case blocks below we may add GLIBCXX-specific pedantic debugging preprocessor
   # definitions. however, allow the knowing user to preclude that if they need to.
   AC_ARG_ENABLE(glibcxx-debugging,
-	 [AC_HELP_STRING([--disable-glibcxx-debugging],
+	 [AS_HELP_STRING([--disable-glibcxx-debugging],
 	                 [omit -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC even in dbg mode])],
 	 [case "${enableval}" in
 	   yes)  enableglibcxxdebugging=yes ;;

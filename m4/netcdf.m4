@@ -4,7 +4,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_NETCDF],
 [
   AC_ARG_ENABLE(netcdf,
-                AC_HELP_STRING([--disable-netcdf],
+                AS_HELP_STRING([--disable-netcdf],
                                [build without netCDF binary I/O]),
 		[case "${enableval}" in
                   yes|new|v4) enablenetcdf=yes; netcdfversion=4  ;;

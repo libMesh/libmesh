@@ -4,7 +4,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_PARMETIS],
 [
   AC_ARG_ENABLE(parmetis,
-                AC_HELP_STRING([--disable-parmetis],
+                AS_HELP_STRING([--disable-parmetis],
                                [build without Parmetis parallel graph partitioning suppport]),
 		[case "${enableval}" in
 		  yes)  enableparmetis=yes ;;
