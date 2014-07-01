@@ -318,10 +318,21 @@ end % if plot_type
 % General plotting commands:
 
 % Hard-coded landscape orientation
-set (gcf, "paperposition", [0.25, 0.25, 10.75, 8.25]); % [xmin, ymin, xmax, ymax]
 set (gcf, "papersize", [11, 8.5]);
 set (gcf, "paperorientation", 'landscape');
 
+% Handle newer versions of Octave
+is_380 = strcmp(version(), '3.8.0');
+
+% I was using these paper settings in older versions of Octave, but
+% they changed in 3.8.0
+if (!is_380)
+  set (gcf, "paperposition", [0.25, 0.25, 10.75, 8.25]);
+else
+  % In Octave 3.8.0, the default paperposition is [0.25000, 2.50000, 8.00000, 6.00000],
+  % the third number makes the plot taller instead of wider!
+  set (gcf, "paperposition", [0.25, 0.25, 8.0, 10.5]);
+end
 
 print('-dpsc', [plot_filename,'.ps'], ['-FHelvetica:', num2str(print_fontsize)]);
 system (['ps2pdf ', plot_filename, '.ps ', plot_filename, '.pdf']);

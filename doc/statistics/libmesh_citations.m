@@ -42,6 +42,9 @@ cell_data = {
     {'T', 28} % Theses
     };
 
+% Handle newer versions of Octave
+is_380 = strcmp(version(), '3.8.0');
+
 % Strip numerical data from cell_data
 N=length(cell_data);
 y=zeros(1,N);
@@ -54,6 +57,7 @@ plot_handle1 = bar( linspace(1,N-2,N-2), y(1:N-2), .8 );
 plot_handle2 = bar( linspace(N-1,N,2),   y(N-1:N), .8 );
 
 % Sets color all bars in the plot
+set(plot_handle1(1), 'facecolor', 'b');
 set(plot_handle2(1), 'facecolor', 'g');
 
 % Sum up total
@@ -90,9 +94,16 @@ set(xh, 'fontname', 'Helvetica', 'fontsize', my_fontsize);
 
 % Hard-coded paper settings... this seemed to be necessary in 3.2.3,
 % hopefully they have since fixed it?
-set (gcf, "paperposition", [0.25, 0.25, 10.75, 8.25]); % [xmin, ymin, xmax, ymax]
 set (gcf, "papersize", [11, 8.5]);
 set (gcf, "paperorientation", 'landscape');
+
+if (!is_380)
+  set (gcf, "paperposition", [0.25, 0.25, 10.75, 8.25]);
+else
+  % In Octave 3.8.0, the default paperposition is [0.25000, 2.50000, 8.00000, 6.00000],
+  % the third number makes the plot taller instead of wider!
+  set (gcf, "paperposition", [0.25, 0.25, 8.0, 10.5]);
+end
 
 % Does this actually work now???  Hurray, it does work as of Octave 3.2.3
 set(gca, 'Fontsize', my_fontsize);
