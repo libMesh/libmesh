@@ -43,12 +43,12 @@ m4_define([_AX_CXX_COMPILE_STDCXX_11_testbody], [[
       static_assert(sizeof(int) <= sizeof(T), "not big enough");
     };
 
-    struct Base {
-    virtual void f() {}
-    };
-    struct Child : public Base {
-    virtual void f() override {}
-    };
+    // struct Base {
+    // virtual void f() {}
+    // };
+    // struct Child : public Base {
+    // virtual void f() override {}
+    // };
 
     typedef check<check<bool>> right_angle_brackets;
 
