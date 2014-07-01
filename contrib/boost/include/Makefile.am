@@ -25,6 +25,7 @@ if LIBMESH_INSTALL_INTERNAL_BOOST
         boost/memory_order.hpp \
         boost/shared_ptr.hpp \
         boost/smart_ptr/shared_ptr.hpp \
+        boost/utility/addressof.hpp \
         boost/config/no_tr1/memory.hpp \
         boost/throw_exception.hpp \
         boost/exception/detail/attribute_noreturn.hpp \
