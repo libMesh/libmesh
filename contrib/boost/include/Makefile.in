@@ -132,8 +132,8 @@ am__nobase_include_HEADERS_DIST = boost/assert.hpp boost/config.hpp \
 	boost/config/posix_features.hpp boost/config/suffix.hpp \
 	boost/current_function.hpp boost/checked_delete.hpp \
 	boost/memory_order.hpp boost/shared_ptr.hpp \
-	boost/smart_ptr/shared_ptr.hpp boost/config/no_tr1/memory.hpp \
-	boost/throw_exception.hpp \
+	boost/smart_ptr/shared_ptr.hpp boost/utility/addressof.hpp \
+	boost/config/no_tr1/memory.hpp boost/throw_exception.hpp \
 	boost/exception/detail/attribute_noreturn.hpp \
 	boost/detail/workaround.hpp boost/exception/exception.hpp \
 	boost/smart_ptr/detail/shared_count.hpp \
@@ -617,6 +617,7 @@ vtkversion = @vtkversion@
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/memory_order.hpp \
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/shared_ptr.hpp \
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/smart_ptr/shared_ptr.hpp \
+@LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/utility/addressof.hpp \
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/config/no_tr1/memory.hpp \
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/throw_exception.hpp \
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@        boost/exception/detail/attribute_noreturn.hpp \
