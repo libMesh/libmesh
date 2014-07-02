@@ -98,3 +98,35 @@ struct Foo
   ])
 
 
+AC_DEFUN([LIBMESH_TEST_CXX11_REGEX],
+  [
+    AC_MSG_CHECKING(for C++11 std::regex support)
+
+    AC_LANG_PUSH([C++])
+
+    have_cxx11_regex=no
+
+    dnl We actually have to try and *run* the test program, since
+    dnl GCC up to 4.7 will compile this but then is not able to run it.
+    AC_RUN_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <regex>
+    ]], [[
+std::regex integer_regex("(\\+|-)?[[:digit:]]+");
+regex_match("abc", integer_regex);
+regex_match("123", integer_regex);
+    ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_REGEX, 1, [Flag indicating whether compiler supports std::regex])
+        have_cxx11_regex=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ],[
+        dnl The test program is not run when cross-compiling, so you are supposed to
+        dnl provide a "pessimistic" action here.  We'll just assume the compiler does
+        dnl not support C++11 regexes in this case.
+        AC_MSG_RESULT(no)
+    ])
+
+    AC_LANG_POP([C++])
+    AM_CONDITIONAL(HAVE_CXX11_REGEX, test x$have_cxx11_regex == xyes)
+  ])
