@@ -185,3 +185,38 @@ std::vector<std::string> v = { "xyzzy", "plugh", "abracadabra" };
     AC_LANG_POP([C++])
     AM_CONDITIONAL(HAVE_CXX11_INITIALIZER_LIST, test x$have_cxx11_initializer_list == xyes)
   ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES],
+  [
+    AC_MSG_CHECKING(for C++11 variadic template support)
+
+    AC_LANG_PUSH([C++])
+
+    have_cxx11_variadic_templates=no
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+// Base case
+template <typename T>
+T sum(T t) { return t; }
+
+// Compute sum of arbitary number of passed parameters.
+template <typename T, typename ...P>
+T sum(T t, P ...p)
+{
+  t += sum(p...);
+  return t;
+}
+    ]], [[
+sum(1, 2, 3, 4, 5);
+    ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_VARIADIC_TEMPLATES, 1, [Flag indicating whether compiler supports variadic templates])
+        have_cxx11_variadic_templates=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    AC_LANG_POP([C++])
+    AM_CONDITIONAL(HAVE_CXX11_VARIADIC_TEMPLATES, test x$have_cxx11_variadic_templates == xyes)
+  ])
