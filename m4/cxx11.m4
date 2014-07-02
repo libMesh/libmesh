@@ -159,3 +159,29 @@ AC_DEFUN([LIBMESH_TEST_CXX11_OVERRIDE],
     AC_LANG_POP([C++])
     AM_CONDITIONAL(HAVE_CXX11_OVERRIDE, test x$have_cxx11_override == xyes)
   ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_INITIALIZER_LIST],
+  [
+    AC_MSG_CHECKING(for C++11 initializer list support)
+
+    AC_LANG_PUSH([C++])
+
+    have_cxx11_initializer_list=no
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+@%:@include <vector>
+@%:@include <string>
+    ]], [[
+std::vector<std::string> v = { "xyzzy", "plugh", "abracadabra" };
+    ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_INITIALIZER_LIST, 1, [Flag indicating whether compiler supports initializer lists])
+        have_cxx11_initializer_list=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    AC_LANG_POP([C++])
+    AM_CONDITIONAL(HAVE_CXX11_INITIALIZER_LIST, test x$have_cxx11_initializer_list == xyes)
+  ])
