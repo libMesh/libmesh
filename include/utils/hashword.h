@@ -145,19 +145,13 @@ uint32_t hashword2(const uint32_t& first, const uint32_t& second, uint32_t initv
 inline
 uint64_t hashword2(const uint64_t first, const uint64_t second)
 {
-  // big prime number
-  const unsigned int bp = 65449;
-
-  return (first%bp + (second<<5)%bp);
+  return (first%65449 + (second<<5)%65449);
 }
 
 inline
 uint16_t hashword2(const uint16_t first, const uint16_t second)
 {
-  // "big" prime number
-  const uint16_t bp = 257;
-
-  return static_cast<uint16_t>(first%bp + (second<<3)%bp);
+  return (first%65449 + (second<<5)%65449);
 }
 
 // Another homegrown implementation for 64-bit unsigned ints
