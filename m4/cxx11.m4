@@ -220,3 +220,29 @@ sum(1, 2, 3, 4, 5);
     AC_LANG_POP([C++])
     AM_CONDITIONAL(HAVE_CXX11_VARIADIC_TEMPLATES, test x$have_cxx11_variadic_templates == xyes)
   ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_THREAD],
+  [
+    AC_MSG_CHECKING(for C++11 <thread> support)
+
+    AC_LANG_PUSH([C++])
+
+    have_cxx11_thread=no
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+@%:@include <thread>
+void my_thread_func() {}
+    ]], [[
+std::thread t(my_thread_func);
+    ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_THREAD, 1, [Flag indicating whether compiler supports std::thread])
+        have_cxx11_thread=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    AC_LANG_POP([C++])
+    AM_CONDITIONAL(HAVE_CXX11_THREAD, test x$have_cxx11_thread == xyes)
+  ])
