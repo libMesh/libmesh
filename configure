@@ -1047,6 +1047,7 @@ enable_fortran
 with_fc
 with_f77
 enable_glibcxx_debugging
+enable_cxx11
 enable_coverage
 with_methods
 enable_static
@@ -1818,6 +1819,7 @@ Optional Features:
   --disable-glibcxx-debugging
                           omit -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC even
                           in dbg mode
+  --disable-cxx11         build without C++11 support
   --enable-coverage       configure code coverage analysis tools
   --enable-static[=PKGS]  build static libraries [default=no]
   --enable-shared[=PKGS]  build shared libraries [default=yes]
@@ -6640,9 +6642,9 @@ fi
       # Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
       #        when dealing with C APIs that take void* pointers.
       gcc4.4 | gcc4.5 | gcc4.6)
-	 CXXFLAGS_OPT="$CXXFLAGS_OPT -std=c++0x -Wdisabled-optimization"
-         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
-	 CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
+         CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
+         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
+         CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
 
          if (test "x$enableglibcxxdebugging" = "xyes"); then
            CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
@@ -7059,11 +7061,28 @@ $as_echo "No specific options for this C++ compiler known" >&6; }
 
 
 # --------------------------------------------------------------
-# Standard autoconf macro for determining the proper -std=c++11
-# flag for the current compiler.  Adds the result to CXXFLAGS if
-# one is found.
-# ax_cxx_compile_stdcxx_11.m4
+# Allow the user to explicitly turn off C++11 support by saying
+# --disable-cxx11.  Otherwise, C++11 support is enabled by default
+# although libmesh does not (currently) use any C++11 features.
 # --------------------------------------------------------------
+# Check whether --enable-cxx11 was given.
+if test "${enable_cxx11+set}" = set; then :
+  enableval=$enable_cxx11; case "${enableval}" in
+                   yes) enablecxx11=yes ;;
+                   no)  enablecxx11=no ;;
+                   *)   as_fn_error $? "bad value ${enableval} for --disable-cxx11" "$LINENO" 5 ;;
+                   esac
+else
+  enablecxx11=yes
+fi
+
+
+if (test "x$enablecxx11" = "xyes"); then
+  # --------------------------------------------------------------
+  # Standard autoconf macro for determining the proper -std=c++11
+  # flag for the current compiler.  Adds the result to CXXFLAGS if
+  # one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
+  # --------------------------------------------------------------
 
     ax_cxx_compile_cxx11_required=false
   ac_ext=cpp
@@ -7203,9 +7222,12 @@ $as_echo "#define HAVE_CXX11 1" >>confdefs.h
 
   fi
 
+fi
 
 # --------------------------------------------------------------
-# Test for specific C++11 features
+# Test for specific C++11 features.  Note, we still run these
+# tests even when C++11 has been explicitly disabled even though
+# we know they will fail, since they contain AM_CONDITIONALs.
 # --------------------------------------------------------------
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::move support" >&5
