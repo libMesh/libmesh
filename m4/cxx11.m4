@@ -246,3 +246,30 @@ std::thread t(my_thread_func);
     AC_LANG_POP([C++])
     AM_CONDITIONAL(HAVE_CXX11_THREAD, test x$have_cxx11_thread == xyes)
   ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
+  [
+    AC_MSG_CHECKING(for C++11 <type_traits> support)
+
+    AC_LANG_PUSH([C++])
+
+    have_cxx11_type_traits=no
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+@%:@include <type_traits>
+    ]], [[
+bool a = std::is_void<char>::value;
+bool b = std::is_integral<char>::value;
+bool c = std::is_floating_point<char>::value;
+    ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_TYPE_TRAITS, 1, [Flag indicating whether compiler supports std::thread])
+        have_cxx11_type_traits=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    AC_LANG_POP([C++])
+    AM_CONDITIONAL(HAVE_CXX11_TYPE_TRAITS, test x$have_cxx11_type_traits == xyes)
+  ])
