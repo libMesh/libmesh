@@ -137,6 +137,7 @@ fi
 # --------------------------------------------------------------
 LIBMESH_TEST_CXX11_MOVE
 LIBMESH_TEST_CXX11_SHARED_PTR
+LIBMESH_TEST_CXX11_UNIQUE_PTR
 
 #------------------------------------------------------
 # Checks for code coverage

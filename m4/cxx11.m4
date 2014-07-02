@@ -64,3 +64,37 @@ AC_DEFUN([LIBMESH_TEST_CXX11_SHARED_PTR],
   ])
 
 
+AC_DEFUN([LIBMESH_TEST_CXX11_UNIQUE_PTR],
+  [
+    AC_MSG_CHECKING(for C++11 std::unique_ptr support)
+
+    AC_LANG_PUSH([C++])
+
+    have_cxx11_unique_ptr=no
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <iostream>
+    @%:@include <memory>
+struct Foo
+{
+  Foo()      { std::cout << "Foo::Foo\n";  }
+  ~Foo()     { std::cout << "Foo::~Foo\n"; }
+};
+    ]], [[
+{
+  // up now owns a Foo
+  std::unique_ptr<Foo> up(new Foo);
+} // Foo deleted when up goes out of scope
+    ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_UNIQUE_PTR, 1, [Flag indicating whether compiler supports std::unique_ptr])
+        have_cxx11_unique_ptr=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    AC_LANG_POP([C++])
+    AM_CONDITIONAL(HAVE_CXX11_UNIQUE_PTR, test x$have_cxx11_unique_ptr == xyes)
+  ])
+
+
