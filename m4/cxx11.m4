@@ -130,3 +130,32 @@ regex_match("123", integer_regex);
     AC_LANG_POP([C++])
     AM_CONDITIONAL(HAVE_CXX11_REGEX, test x$have_cxx11_regex == xyes)
   ])
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_OVERRIDE],
+  [
+    AC_MSG_CHECKING(for C++11 override keyword support)
+
+    AC_LANG_PUSH([C++])
+
+    have_cxx11_override=no
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    ]], [[
+    struct Base {
+    virtual void f() {}
+    };
+    struct Child : public Base {
+    virtual void f() override {}
+    };
+    ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_OVERRIDE, 1, [Flag indicating whether compiler supports the override keyword])
+        have_cxx11_override=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    AC_LANG_POP([C++])
+    AM_CONDITIONAL(HAVE_CXX11_OVERRIDE, test x$have_cxx11_override == xyes)
+  ])
