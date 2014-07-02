@@ -916,6 +916,20 @@ CODE_COVERAGE_ENABLED_TRUE
 HAVE_GCOV_TOOLS
 GCOV_FLAGS
 have_gcov
+HAVE_CXX11_TYPE_TRAITS_FALSE
+HAVE_CXX11_TYPE_TRAITS_TRUE
+HAVE_CXX11_THREAD_FALSE
+HAVE_CXX11_THREAD_TRUE
+HAVE_CXX11_VARIADIC_TEMPLATES_FALSE
+HAVE_CXX11_VARIADIC_TEMPLATES_TRUE
+HAVE_CXX11_INITIALIZER_LIST_FALSE
+HAVE_CXX11_INITIALIZER_LIST_TRUE
+HAVE_CXX11_OVERRIDE_FALSE
+HAVE_CXX11_OVERRIDE_TRUE
+HAVE_CXX11_REGEX_FALSE
+HAVE_CXX11_REGEX_TRUE
+HAVE_CXX11_UNIQUE_PTR_FALSE
+HAVE_CXX11_UNIQUE_PTR_TRUE
 HAVE_CXX11_SHARED_PTR_FALSE
 HAVE_CXX11_SHARED_PTR_TRUE
 HAVE_CXX11_MOVE_FALSE
@@ -2259,6 +2273,48 @@ fi
 
 } # ac_fn_f77_try_compile
 
+# ac_fn_cxx_try_run LINENO
+# ------------------------
+# Try to link conftest.$ac_ext, and return whether this succeeded. Assumes
+# that executables *can* be run.
+ac_fn_cxx_try_run ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  if { { ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_link") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && { ac_try='./conftest$ac_exeext'
+  { { case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }; then :
+  ac_retval=0
+else
+  $as_echo "$as_me: program exited with status $ac_status" >&5
+       $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+       ac_retval=$ac_status
+fi
+  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+  as_fn_set_status $ac_retval
+
+} # ac_fn_cxx_try_run
+
 # ac_fn_c_try_link LINENO
 # -----------------------
 # Try to link conftest.$ac_ext, and return whether this succeeded.
@@ -2656,48 +2712,6 @@ fi
   as_fn_set_status $ac_retval
 
 } # ac_fn_fc_try_link
-
-# ac_fn_cxx_try_run LINENO
-# ------------------------
-# Try to link conftest.$ac_ext, and return whether this succeeded. Assumes
-# that executables *can* be run.
-ac_fn_cxx_try_run ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  if { { ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_link") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } && { ac_try='./conftest$ac_exeext'
-  { { case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; }; then :
-  ac_retval=0
-else
-  $as_echo "$as_me: program exited with status $ac_status" >&5
-       $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-       ac_retval=$ac_status
-fi
-  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} # ac_fn_cxx_try_run
 
 # ac_fn_cxx_compute_int LINENO EXPR VAR INCLUDES
 # ----------------------------------------------
@@ -7105,13 +7119,6 @@ else
       static_assert(sizeof(int) <= sizeof(T), "not big enough");
     };
 
-    // struct Base {
-    // virtual void f() {}
-    // };
-    // struct Child : public Base {
-    // virtual void f() override {}
-    // };
-
     typedef check<check<bool>> right_angle_brackets;
 
     int a;
@@ -7123,6 +7130,11 @@ else
 
     auto d = a;
     auto l = [](){};
+
+    // The compiler may evaluate something like:
+    // const int val = multiply(10, 10);
+    // at compile time.
+    constexpr int multiply (int x, int y) { return x * y; }
 
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
@@ -7159,13 +7171,6 @@ else
       static_assert(sizeof(int) <= sizeof(T), "not big enough");
     };
 
-    // struct Base {
-    // virtual void f() {}
-    // };
-    // struct Child : public Base {
-    // virtual void f() override {}
-    // };
-
     typedef check<check<bool>> right_angle_brackets;
 
     int a;
@@ -7177,6 +7182,11 @@ else
 
     auto d = a;
     auto l = [](){};
+
+    // The compiler may evaluate something like:
+    // const int val = multiply(10, 10);
+    // at compile time.
+    constexpr int multiply (int x, int y) { return x * y; }
 
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
@@ -7357,6 +7367,464 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 else
   HAVE_CXX11_SHARED_PTR_TRUE='#'
   HAVE_CXX11_SHARED_PTR_FALSE=
+fi
+
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::unique_ptr support" >&5
+$as_echo_n "checking for C++11 std::unique_ptr support... " >&6; }
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    have_cxx11_unique_ptr=no
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <iostream>
+    #include <memory>
+struct Foo
+{
+  Foo()      { std::cout << "Foo::Foo\n";  }
+  ~Foo()     { std::cout << "Foo::~Foo\n"; }
+};
+
+int
+main ()
+{
+
+{
+  // up now owns a Foo
+  std::unique_ptr<Foo> up(new Foo);
+} // Foo deleted when up goes out of scope
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_UNIQUE_PTR 1" >>confdefs.h
+
+        have_cxx11_unique_ptr=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+     if test x$have_cxx11_unique_ptr == xyes; then
+  HAVE_CXX11_UNIQUE_PTR_TRUE=
+  HAVE_CXX11_UNIQUE_PTR_FALSE='#'
+else
+  HAVE_CXX11_UNIQUE_PTR_TRUE='#'
+  HAVE_CXX11_UNIQUE_PTR_FALSE=
+fi
+
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::regex support" >&5
+$as_echo_n "checking for C++11 std::regex support... " >&6; }
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    have_cxx11_regex=no
+
+            if test "$cross_compiling" = yes; then :
+
+                                { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <regex>
+
+int
+main ()
+{
+
+std::regex integer_regex("(\\+|-)?[[:digit:]]+");
+regex_match("abc", integer_regex);
+regex_match("123", integer_regex);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_run "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_REGEX 1" >>confdefs.h
+
+        have_cxx11_regex=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+     if test x$have_cxx11_regex == xyes; then
+  HAVE_CXX11_REGEX_TRUE=
+  HAVE_CXX11_REGEX_FALSE='#'
+else
+  HAVE_CXX11_REGEX_TRUE='#'
+  HAVE_CXX11_REGEX_FALSE=
+fi
+
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 override keyword support" >&5
+$as_echo_n "checking for C++11 override keyword support... " >&6; }
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    have_cxx11_override=no
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+
+    struct Base {
+    virtual void f() {}
+    };
+    struct Child : public Base {
+    virtual void f() override {}
+    };
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_OVERRIDE 1" >>confdefs.h
+
+        have_cxx11_override=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+     if test x$have_cxx11_override == xyes; then
+  HAVE_CXX11_OVERRIDE_TRUE=
+  HAVE_CXX11_OVERRIDE_FALSE='#'
+else
+  HAVE_CXX11_OVERRIDE_TRUE='#'
+  HAVE_CXX11_OVERRIDE_FALSE=
+fi
+
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 initializer list support" >&5
+$as_echo_n "checking for C++11 initializer list support... " >&6; }
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    have_cxx11_initializer_list=no
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <vector>
+#include <string>
+
+int
+main ()
+{
+
+std::vector<std::string> v = { "xyzzy", "plugh", "abracadabra" };
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_INITIALIZER_LIST 1" >>confdefs.h
+
+        have_cxx11_initializer_list=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+     if test x$have_cxx11_initializer_list == xyes; then
+  HAVE_CXX11_INITIALIZER_LIST_TRUE=
+  HAVE_CXX11_INITIALIZER_LIST_FALSE='#'
+else
+  HAVE_CXX11_INITIALIZER_LIST_TRUE='#'
+  HAVE_CXX11_INITIALIZER_LIST_FALSE=
+fi
+
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 variadic template support" >&5
+$as_echo_n "checking for C++11 variadic template support... " >&6; }
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    have_cxx11_variadic_templates=no
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+// Base case
+template <typename T>
+T sum(T t) { return t; }
+
+// Compute sum of arbitary number of passed parameters.
+template <typename T, typename ...P>
+T sum(T t, P ...p)
+{
+  t += sum(p...);
+  return t;
+}
+
+int
+main ()
+{
+
+sum(1, 2, 3, 4, 5);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_VARIADIC_TEMPLATES 1" >>confdefs.h
+
+        have_cxx11_variadic_templates=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+     if test x$have_cxx11_variadic_templates == xyes; then
+  HAVE_CXX11_VARIADIC_TEMPLATES_TRUE=
+  HAVE_CXX11_VARIADIC_TEMPLATES_FALSE='#'
+else
+  HAVE_CXX11_VARIADIC_TEMPLATES_TRUE='#'
+  HAVE_CXX11_VARIADIC_TEMPLATES_FALSE=
+fi
+
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 <thread> support" >&5
+$as_echo_n "checking for C++11 <thread> support... " >&6; }
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    have_cxx11_thread=no
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <thread>
+void my_thread_func() {}
+
+int
+main ()
+{
+
+std::thread t(my_thread_func);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_THREAD 1" >>confdefs.h
+
+        have_cxx11_thread=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+     if test x$have_cxx11_thread == xyes; then
+  HAVE_CXX11_THREAD_TRUE=
+  HAVE_CXX11_THREAD_FALSE='#'
+else
+  HAVE_CXX11_THREAD_TRUE='#'
+  HAVE_CXX11_THREAD_FALSE=
+fi
+
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 <type_traits> support" >&5
+$as_echo_n "checking for C++11 <type_traits> support... " >&6; }
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    have_cxx11_type_traits=no
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <type_traits>
+
+int
+main ()
+{
+
+bool a = std::is_void<char>::value;
+bool b = std::is_integral<char>::value;
+bool c = std::is_floating_point<char>::value;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_TYPE_TRAITS 1" >>confdefs.h
+
+        have_cxx11_type_traits=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+     if test x$have_cxx11_type_traits == xyes; then
+  HAVE_CXX11_TYPE_TRAITS_TRUE=
+  HAVE_CXX11_TYPE_TRAITS_FALSE='#'
+else
+  HAVE_CXX11_TYPE_TRAITS_TRUE='#'
+  HAVE_CXX11_TYPE_TRAITS_FALSE=
 fi
 
 
@@ -35086,6 +35554,34 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_SHARED_PTR_TRUE}" && test -z "${HAVE_CXX11_SHARED_PTR_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_SHARED_PTR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_UNIQUE_PTR_TRUE}" && test -z "${HAVE_CXX11_UNIQUE_PTR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_UNIQUE_PTR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_REGEX_TRUE}" && test -z "${HAVE_CXX11_REGEX_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_REGEX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_OVERRIDE_TRUE}" && test -z "${HAVE_CXX11_OVERRIDE_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_OVERRIDE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_INITIALIZER_LIST_TRUE}" && test -z "${HAVE_CXX11_INITIALIZER_LIST_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_INITIALIZER_LIST\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_VARIADIC_TEMPLATES_TRUE}" && test -z "${HAVE_CXX11_VARIADIC_TEMPLATES_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_VARIADIC_TEMPLATES\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_THREAD_TRUE}" && test -z "${HAVE_CXX11_THREAD_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_THREAD\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_TYPE_TRAITS_TRUE}" && test -z "${HAVE_CXX11_TYPE_TRAITS_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_TYPE_TRAITS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${CODE_COVERAGE_ENABLED_TRUE}" && test -z "${CODE_COVERAGE_ENABLED_FALSE}"; then
