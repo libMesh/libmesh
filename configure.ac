@@ -106,6 +106,38 @@ LIBMESH_SET_COMPILERS
 # --------------------------------------------------------------
 LIBMESH_SET_CXX_FLAGS
 
+# --------------------------------------------------------------
+# Allow the user to explicitly turn off C++11 support by saying
+# --disable-cxx11.  Otherwise, C++11 support is enabled by default
+# although libmesh does not (currently) use any C++11 features.
+# --------------------------------------------------------------
+AC_ARG_ENABLE(cxx11,
+              AC_HELP_STRING([--disable-cxx11],
+                             [build without C++11 support]),
+                             [case "${enableval}" in
+                   yes) enablecxx11=yes ;;
+                   no)  enablecxx11=no ;;
+                   *)   AC_MSG_ERROR(bad value ${enableval} for --disable-cxx11) ;;
+                   esac],
+                   [enablecxx11=yes])
+
+if (test "x$enablecxx11" = "xyes"); then
+  # --------------------------------------------------------------
+  # Standard autoconf macro for determining the proper -std=c++11
+  # flag for the current compiler.  Adds the result to CXXFLAGS if
+  # one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
+  # --------------------------------------------------------------
+  AX_CXX_COMPILE_STDCXX_11([noext],[optional])
+fi
+
+# --------------------------------------------------------------
+# Test for specific C++11 features.  Note, we still run these
+# tests even when C++11 has been explicitly disabled even though
+# we know they will fail, since they contain AM_CONDITIONALs.
+# --------------------------------------------------------------
+LIBMESH_TEST_CXX11_MOVE
+LIBMESH_TEST_CXX11_SHARED_PTR
+
 #------------------------------------------------------
 # Checks for code coverage
 # this must be done after we look for our own compilers

@@ -62,7 +62,7 @@ namespace FPoptimizer_CodeTree
         data->Recalculate_Hash_NoRecursion();
     }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#ifdef FP_SUPPORT_CXX11_MOVE
     template<typename Value_t>
     CodeTree<Value_t>::CodeTree(Value_t&& i, typename CodeTree<Value_t>::ImmedTag)
         : data(new CodeTreeData<Value_t>(std::move(i)))
@@ -278,7 +278,7 @@ namespace FPoptimizer_CodeTree
         RefParams.clear();
     }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#ifdef FP_SUPPORT_CXX11_MOVE
     template<typename Value_t>
     void CodeTree<Value_t>::SetParams(std::vector<CodeTree<Value_t> >&& RefParams)
     {
@@ -292,7 +292,7 @@ namespace FPoptimizer_CodeTree
     {
         std::vector<CodeTree<Value_t> >& Params = data->Params;
         //std::cout << "DelParam(" << index << ") called\n";
-    #ifdef __GXX_EXPERIMENTAL_CXX0X__
+    #ifdef FP_SUPPORT_CXX11_MOVE
         /* rvalue reference semantics makes this optimal */
         Params.erase( Params.begin() + index );
     #else
@@ -397,7 +397,7 @@ namespace FPoptimizer_CodeTree
     {
     }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#ifdef FP_SUPPORT_CXX11_MOVE
     template<typename Value_t>
     CodeTreeData<Value_t>::CodeTreeData(CodeTreeData<Value_t>&& b)
         : RefCount(0),

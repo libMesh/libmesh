@@ -594,9 +594,9 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
       # Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
       #        when dealing with C APIs that take void* pointers.
       gcc4.4 | gcc4.5 | gcc4.6)
-	 CXXFLAGS_OPT="$CXXFLAGS_OPT -std=c++0x -Wdisabled-optimization"
-         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
-	 CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
+         CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
+         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
+         CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
 
          if (test "x$enableglibcxxdebugging" = "xyes"); then
            CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"

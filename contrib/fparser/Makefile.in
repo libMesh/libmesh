@@ -59,15 +59,18 @@ target_triplet = @target@
 @FPARSER_NO_SUPPORT_OPTIMIZER_TRUE@am__append_1 = -DFP_NO_SUPPORT_OPTIMIZER
 #FEATURE_FLAGS += -DFP_USE_STRTOLD
 @FPARSER_SUPPORT_DEBUGGING_TRUE@am__append_2 = -DFUNCTIONPARSER_SUPPORT_DEBUGGING
+
+# Wrap code that uses std::move in fparser for compilers that don't support it
+@HAVE_CXX11_MOVE_TRUE@am__append_3 = -DFP_SUPPORT_CXX11_MOVE
 noinst_PROGRAMS = $(am__EXEEXT_1)
-@FPARSER_DEVEL_TRUE@am__append_3 = util/tree_grammar_parser \
+@FPARSER_DEVEL_TRUE@am__append_4 = util/tree_grammar_parser \
 @FPARSER_DEVEL_TRUE@	util/bytecoderules_parser \
 @FPARSER_DEVEL_TRUE@	util/cpp_compress
-@FPARSER_DEVEL_TRUE@am__append_4 = extrasrc/fp_opcode_add.inc \
+@FPARSER_DEVEL_TRUE@am__append_5 = extrasrc/fp_opcode_add.inc \
 @FPARSER_DEVEL_TRUE@	fpoptimizer/grammar_data.cc
-@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_5 = $(FPOPTIMIZER_CC_FILES)
-@FPARSER_DEVEL_TRUE@am__append_6 = $(BUILT_SOURCES)
-@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_7 = fpoptimizer.cc
+@FPARSER_DEVEL_TRUE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_6 = $(FPOPTIMIZER_CC_FILES)
+@FPARSER_DEVEL_TRUE@am__append_7 = $(BUILT_SOURCES)
+@FPARSER_DEVEL_FALSE@@FPARSER_SUPPORT_OPTIMIZER_TRUE@am__append_8 = fpoptimizer.cc
 subdir = contrib/fparser
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/build-aux/depcomp \
@@ -76,6 +79,7 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/all_static.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
+	$(top_srcdir)/m4/ax_cxx_compile_stdcxx_11.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/m4/ax_pthread.m4 \
 	$(top_srcdir)/m4/ax_split_version.m4 \
 	$(top_srcdir)/m4/ax_tls.m4 $(top_srcdir)/m4/backtrace.m4 \
@@ -83,12 +87,12 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/config_environment.m4 \
 	$(top_srcdir)/m4/config_summary.m4 \
 	$(top_srcdir)/m4/coverage.m4 $(top_srcdir)/m4/cppunit.m4 \
-	$(top_srcdir)/m4/demangle.m4 $(top_srcdir)/m4/eigen.m4 \
-	$(top_srcdir)/m4/exodus.m4 $(top_srcdir)/m4/feexcept.m4 \
-	$(top_srcdir)/m4/fparser.m4 $(top_srcdir)/m4/glpk.m4 \
-	$(top_srcdir)/m4/gmv.m4 $(top_srcdir)/m4/gz.m4 \
-	$(top_srcdir)/m4/hdf5.m4 $(top_srcdir)/m4/laspack.m4 \
-	$(top_srcdir)/m4/libhilbert.m4 \
+	$(top_srcdir)/m4/cxx11.m4 $(top_srcdir)/m4/demangle.m4 \
+	$(top_srcdir)/m4/eigen.m4 $(top_srcdir)/m4/exodus.m4 \
+	$(top_srcdir)/m4/feexcept.m4 $(top_srcdir)/m4/fparser.m4 \
+	$(top_srcdir)/m4/glpk.m4 $(top_srcdir)/m4/gmv.m4 \
+	$(top_srcdir)/m4/gz.m4 $(top_srcdir)/m4/hdf5.m4 \
+	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \
 	$(top_srcdir)/m4/libmesh_core_features.m4 \
 	$(top_srcdir)/m4/libmesh_method.m4 \
@@ -432,6 +436,7 @@ GREP = @GREP@
 GXX_VERSION = @GXX_VERSION@
 GZSTREAM_INCLUDE = @GZSTREAM_INCLUDE@
 GZSTREAM_LIB = @GZSTREAM_LIB@
+HAVE_CXX11 = @HAVE_CXX11@
 HAVE_DOT = @HAVE_DOT@
 HAVE_GCOV_TOOLS = @HAVE_GCOV_TOOLS@
 HDF5_CFLAGS = @HDF5_CFLAGS@
@@ -654,15 +659,16 @@ FEATURE_FLAGS = -DFP_ENABLE_EVAL $(am__append_1) \
 	-DFP_SUPPORT_FLOAT_TYPE -DFP_SUPPORT_LONG_DOUBLE_TYPE \
 	-DFP_SUPPORT_LONG_INT_TYPE -DFP_SUPPORT_COMPLEX_DOUBLE_TYPE \
 	-DFP_SUPPORT_COMPLEX_FLOAT_TYPE \
-	-DFP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE $(am__append_2)
+	-DFP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE $(am__append_2) \
+	$(am__append_3)
 EXTRA_DIST = util/bytecoderules.dat util/bytecoderules_header.txt \
 	fpoptimizer/treerules.dat $(FPOPTIMIZER_CC_FILES) \
 	fpoptimizer/fpoptimizer_header.txt \
 	fpoptimizer/fpoptimizer_footer.txt
-BUILT_SOURCES = $(am__append_4)
+BUILT_SOURCES = $(am__append_5)
 
 # when doing 'make clean' we need to remove the generated sources
-CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_6)
+CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_7)
 DISTCLEANFILES = util/tree_grammar_parser # in case it wasn't \
 	conditionally cleaned
 include_HEADERS = fparser.hh fparser_ad.hh
@@ -706,8 +712,8 @@ FPOPTIMIZER_CC_FILES = \
 	    fpoptimizer/optimize_main.cc
 
 noinst_LTLIBRARIES = libfparser.la
-libfparser_la_SOURCES = fparser.cc fparser_ad.cc $(am__append_5) \
-	$(am__append_7)
+libfparser_la_SOURCES = fparser.cc fparser_ad.cc $(am__append_6) \
+	$(am__append_8)
 libfparser_la_CPPFLAGS = $(AM_CPPFLAGS) $(FEATURE_FLAGS)
 
 # util/tree_grammar_parser is a utility which is required to build 
