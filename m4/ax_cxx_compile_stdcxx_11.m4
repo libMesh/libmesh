@@ -43,13 +43,6 @@ m4_define([_AX_CXX_COMPILE_STDCXX_11_testbody], [[
       static_assert(sizeof(int) <= sizeof(T), "not big enough");
     };
 
-    // struct Base {
-    // virtual void f() {}
-    // };
-    // struct Child : public Base {
-    // virtual void f() override {}
-    // };
-
     typedef check<check<bool>> right_angle_brackets;
 
     int a;
@@ -61,6 +54,11 @@ m4_define([_AX_CXX_COMPILE_STDCXX_11_testbody], [[
 
     auto d = a;
     auto l = [](){};
+
+    // The compiler may evaluate something like:
+    // const int val = multiply(10, 10);
+    // at compile time.
+    constexpr int multiply (int x, int y) { return x * y; }
 ]])
 
 AC_DEFUN([AX_CXX_COMPILE_STDCXX_11], [dnl

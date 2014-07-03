@@ -178,11 +178,32 @@
 /* define if the compiler supports basic C++11 syntax */
 #undef HAVE_CXX11
 
+/* Flag indicating whether compiler supports initializer lists */
+#undef HAVE_CXX11_INITIALIZER_LIST
+
 /* Flag indicating whether compiler supports std::move */
 #undef HAVE_CXX11_MOVE
 
+/* Flag indicating whether compiler supports the override keyword */
+#undef HAVE_CXX11_OVERRIDE
+
+/* Flag indicating whether compiler supports std::regex */
+#undef HAVE_CXX11_REGEX
+
 /* Flag indicating whether compiler supports std::shared_ptr */
 #undef HAVE_CXX11_SHARED_PTR
+
+/* Flag indicating whether compiler supports std::thread */
+#undef HAVE_CXX11_THREAD
+
+/* Flag indicating whether compiler supports std::thread */
+#undef HAVE_CXX11_TYPE_TRAITS
+
+/* Flag indicating whether compiler supports std::unique_ptr */
+#undef HAVE_CXX11_UNIQUE_PTR
+
+/* Flag indicating whether compiler supports variadic templates */
+#undef HAVE_CXX11_VARIADIC_TEMPLATES
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
