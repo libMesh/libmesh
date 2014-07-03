@@ -99,14 +99,6 @@ AC_LANG([C++])
 LIBMESH_SET_COMPILERS
 
 # --------------------------------------------------------------
-# See aclocal.m4 for the definition of this as well.  It uses the
-# output of DETERMINE_CXX_BRAND to set special flags for idiosyncratic
-# compilers.  For example, newer versions of GCC have additional C++ debugging
-# flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
-# --------------------------------------------------------------
-LIBMESH_SET_CXX_FLAGS
-
-# --------------------------------------------------------------
 # Allow the user to explicitly turn off C++11 support by saying
 # --disable-cxx11.  Otherwise, C++11 support is enabled by default
 # although libmesh does not (currently) use any C++11 features.
@@ -129,6 +121,14 @@ if (test "x$enablecxx11" = "xyes"); then
   # --------------------------------------------------------------
   AX_CXX_COMPILE_STDCXX_11([noext],[optional])
 fi
+
+# --------------------------------------------------------------
+# See aclocal.m4 for the definition of this as well.  It uses the
+# output of DETERMINE_CXX_BRAND to set special flags for idiosyncratic
+# compilers.  For example, newer versions of GCC have additional C++ debugging
+# flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
+# --------------------------------------------------------------
+LIBMESH_SET_CXX_FLAGS
 
 # --------------------------------------------------------------
 # Test for specific C++11 features.  Note, we still run these

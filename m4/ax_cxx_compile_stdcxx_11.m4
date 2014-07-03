@@ -95,6 +95,12 @@ AC_DEFUN([AX_CXX_COMPILE_STDCXX_11], [dnl
          CXXFLAGS="$ac_save_CXXFLAGS"])
       if eval test x\$$cachevar = xyes; then
         CXXFLAGS="$CXXFLAGS $switch"
+        dnl libmesh propagates CXXFLAGS_OPT, CXXFLAGS_DEVEL, and CXXFLAGS_DBG
+        dnl to its config script, so make sure they know about the C++11 flag
+        dnl we found.
+        CXXFLAGS_OPT="$CXXFLAGS_OPT $switch"
+        CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $switch"
+        CXXFLAGS_DBG="$CXXFLAGS_DBG $switch"
         ac_success=yes
         break
       fi
@@ -115,6 +121,12 @@ AC_DEFUN([AX_CXX_COMPILE_STDCXX_11], [dnl
          CXXFLAGS="$ac_save_CXXFLAGS"])
       if eval test x\$$cachevar = xyes; then
         CXXFLAGS="$CXXFLAGS $switch"
+        dnl libmesh propagates CXXFLAGS_OPT, CXXFLAGS_DEVEL, and CXXFLAGS_DBG
+        dnl to its config script, so make sure they know about the C++11 flag
+        dnl we found.
+        CXXFLAGS_OPT="$CXXFLAGS_OPT $switch"
+        CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $switch"
+        CXXFLAGS_DBG="$CXXFLAGS_DBG $switch"
         ac_success=yes
         break
       fi
