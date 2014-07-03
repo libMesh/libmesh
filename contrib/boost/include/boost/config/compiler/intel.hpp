@@ -303,8 +303,16 @@ template<> struct assert_intrinsic_wchar_t<unsigned short> {};
 #  define BOOST_HAS_STDINT_H
 #endif
 
-#if defined(__LP64__) && defined(__GNUC__) && (BOOST_INTEL_CXX_VERSION >= 1310)
-#  define BOOST_HAS_INT128
+// [JWP]: The __INTEL_COMPILER macro is unreliable for ICC 12.1.0 [0]
+// but apparently the __INTEL_COMPILER_BUILD_DATE macro *is* reliable.
+// I've seen some ICC 12.1.0 compilers that don't have __int128 and some
+// that do, and I'm not sure what differentiates them, so I'm going to
+// go ahead and disable it for Intel 11...
+// [0]: http://www.open-mpi.org/community/lists/devel/att-9855/attachment
+#if defined(__INTEL_COMPILER_BUILD_DATE)
+#  if (__INTEL_COMPILER_BUILD_DATE != 20110811) && defined(__LP64__) && defined(__GNUC__) && (BOOST_INTEL_CXX_VERSION >= 1310)
+#    define BOOST_HAS_INT128
+#  endif
 #endif
 
 //
