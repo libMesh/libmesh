@@ -562,9 +562,15 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   ierr = SNESGetLinearSolveIterations(_snes, &_n_linear_iterations);
   LIBMESH_CHKERRABORT(ierr);
 
+#endif
+
+# if PETSC_VERSION_LESS_THAN(3,5,0)
+  // SNESGetFunctionNorm was removed in PETSc 3.5.0
   ierr = SNESGetFunctionNorm(_snes,&final_residual_norm);
   LIBMESH_CHKERRABORT(ierr);
-
+#else
+  ierr = VecNorm(r->vec(),NORM_2,&final_residual_norm);
+  LIBMESH_CHKERRABORT(ierr);
 #endif
 
   // Get and store the reason for convergence
