@@ -172,23 +172,43 @@ uint64_t hashword(const uint64_t *k, size_t length)
   return c;
 }
 
-// Another homegrown implementation for 16-bit unsigned ints
+// In a personal communication from Bob Jenkins, he recommended using
+// "Probably final() from lookup3.c... You could hash up to 6 16-bit
+// integers that way.  The output is c, or the top or bottom 16 bits
+// of c if you only need 16 bit hash values." [JWP]
 inline
 uint16_t hashword(const uint16_t *k, size_t length)
 {
-  // "big" prime number
-  const uint16_t bp = 257;
+  // Three values that will be passed to final() after they are initialized.
+  uint32_t a = 0;
+  uint32_t b = 0;
+  uint32_t c = 0;
 
-  uint16_t c = 0;
-  uint16_t shift=0;
-  for (size_t i=0; i != length; ++i)
+  switch (length)
     {
-      c = static_cast<uint16_t>
-        (c + static_cast<uint16_t>(k[i] << shift) % bp);
-      shift = static_cast<uint16_t>(shift+3);
+    case 3:
+      {
+        // Cast the inputs to 32 bit integers and call final().
+        a = k[0];
+        b = k[1];
+        c = k[2];
+        break;
+      }
+    case 4:
+      {
+        // Combine the 4 16-bit inputs, "w, x, y, z" into two 32-bit
+        // inputs "wx" and "yz" using bit operations and call final.
+        a = ((k[0]<<16) | (k[1] & 0xffff)); // wx
+        b = ((k[2]<<16) | (k[3] & 0xffff)); // yz
+        break;
+      }
+    default:
+      libmesh_error_msg("Unsupported length: " << length);
     }
 
-  return c;
+  // Result is returned in c
+  final(a,b,c);
+  return static_cast<uint16_t>(c);
 }
 
 } // end Utility namespace
